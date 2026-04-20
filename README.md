@@ -1,0 +1,11 @@
+# UMTAS Platform
+
+**UMTAS** (University-agnostic Core-and-Adapter platform) is designed to fix scheduling and venue allocation at universities. It provides preference-driven student schedules, an anonymised real-time analytics dashboard, and a reusable simulation service.
+
+## Tech Stack
+- **Frontend**: Next.js (React + TypeScript) + Tailwind CSS
+- **Backend Core**: Nest.js + TypeORM + PostgreSQL
+- **Microservices**: FastAPI + pdfplumber + Google OR-Tools
+- **Infrastructure**: Docker + pnpm monorepo + Traefik
+
+For more detailed project planning and architecture design, please refer to the `UMTAS Initial Planning Doc.md`.
