@@ -75,13 +75,13 @@ services:
       - "traefik.http.routers.grafana.tls.certresolver=myresolver"
       - "traefik.http.services.grafana.loadbalancer.server.port=3000"
 
-watchtower:
-  image: containrrr/watchtower
-  container_name: watchtower
-  restart: always
-  volumes:
-    - /var/run/docker.sock:/var/run/docker.sock
-  command: --interval 30 --cleanup
+# watchtower:
+#   image: containrrr/watchtower
+#   container_name: watchtower
+#   restart: always
+#   volumes:
+#     - /var/run/docker.sock:/var/run/docker.sock
+#   command: --interval 30 --cleanup
 
 # simulator:
 #     build:
