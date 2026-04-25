@@ -6,7 +6,8 @@
   "scripts": {
     "test": "turbo run test",
     "dev": "turbo run dev",
-    "dev:infra": "docker compose up -d",
+    "dev:infra": "docker compose up -d postgres redis minio solver",
+    "dev:monitor": "docker compose --profile dev-docker --profile monitoring up",
     "dev:pglite": "docker compose --profile dev-pglite up --build",
     "dev:docker": "docker compose --profile dev-docker up --build",
     "start:prod": "docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build",

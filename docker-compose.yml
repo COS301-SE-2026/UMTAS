@@ -9,6 +9,8 @@ volumes:
   minio_data:
   redis_data:
   grafana_data:
+  prometheus_data:
+  loki_data:
 
 services:
   postgres:
@@ -57,6 +59,7 @@ services:
       - internal
     profiles:
       - dev-docker
+      - dev-infra
       - dev-pglite
       - server
 
@@ -68,9 +71,6 @@ services:
     networks:
       - gateway
       - internal
-    depends_on:
-      postgres:
-        condition: service_healthy
     profiles:
       - dev-docker
       - dev-pglite
@@ -97,3 +97,29 @@ services:
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD}
     volumes:
       - grafana_data:/var/lib/grafana
+    profiles:
+      - monitoring
+      - server
+
+  prometheus:
+    image: prom/prometheus:latest
+    networks:
+      - internal
+    volumes:
+      - ./infra/prometheus:/etc/prometheus
+      - prometheus_data:/prometheus
+    profiles:
+      - monitoring
+      - server
+
+  loki:
+    image: grafana/loki:latest
+    networks:
+      - internal
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - ./infra/loki:/etc/loki
+      - loki_data:/loki
+    profiles:
+      - monitoring
+      - server
