@@ -64,7 +64,7 @@ venv.bak/
 
 # Docker
 .docker/
-
+docker-compose.override.yml
 # Testing
 coverage/
 .nyc_output/
