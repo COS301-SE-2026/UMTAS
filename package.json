@@ -1,0 +1,35 @@
+{
+  "name": "UMTAS",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "turbo run test",
+    "dev": "turbo run dev",
+    "dev:infra": "docker compose up -d",
+    "dev:pglite": "docker compose --profile dev-pglite up --build",
+    "dev:docker": "docker compose --profile dev-docker up --build",
+    "start:prod": "docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build",
+    "build": "turbo run build",
+    "setup": "scripts/bootstrap.sh",
+    "lint": "turbo run lint",
+    "ci": "turbo run ci",
+    "prepare": "husky install"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.33.2",
+  "devDependencies": {
+    "@types/node": "^25.6.0",
+    "eslint": "^10.2.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0",
+    "prettier": "^3.8.3",
+    "turbo": "^2.9.6",
+    "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.3"
+  }
+}

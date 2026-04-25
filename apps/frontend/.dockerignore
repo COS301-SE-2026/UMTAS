@@ -1,0 +1,8 @@
+node_modules
+.next
+coverage
+dist
+.turbo
+.git
+*.log
+pnpm-debug.log*
