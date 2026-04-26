@@ -17,13 +17,16 @@
     "lint": "turbo run lint",
     "lint-staged": "lint-staged",
     "ci": "turbo run ci",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "act": "act --container-architecture linux/amd64"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.33.2",
   "devDependencies": {
+    "@commitlint/cli": "^20.5.2",
+    "@commitlint/config-conventional": "^20.5.0",
     "@types/node": "^25.6.0",
     "eslint": "^10.2.1",
     "husky": "^9.1.7",
