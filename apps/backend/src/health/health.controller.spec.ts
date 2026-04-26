@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from '@jest/globals';
 import { Test, TestingModule } from '@nestjs/testing';
 import { HealthController } from './health.controller';
 import { HealthService } from './health.service';
@@ -20,11 +20,14 @@ describe('HealthController', () => {
         {
           provide: HealthService,
           useValue: {
-            writeHello: vi.fn().mockResolvedValue(mockEntity),
+            writeHello: jest.fn().mockResolvedValue(mockEntity),
           },
         },
       ],
-    }).compile();
+    })
+      .overrideGuard('Roles')
+      .useValue({})
+      .compile();
 
     controller = module.get<HealthController>(HealthController);
     service = module.get<HealthService>(HealthService);
@@ -37,7 +40,7 @@ describe('HealthController', () => {
   describe('hello', () => {
     it('should call healthService.writeHello()', async () => {
       await controller.hello();
-      expect(service.writeHello).toHaveBeenCalledOnce();
+      expect(service.writeHello).toHaveBeenCalledTimes(1);
     });
 
     it('should return success response with correct shape', async () => {
@@ -52,7 +55,7 @@ describe('HealthController', () => {
     });
 
     it('should propagate service errors', async () => {
-      vi.mocked(service.writeHello).mockRejectedValueOnce(
+      (service.writeHello as jest.Mock).mockRejectedValueOnce(
         new Error('DB connection failed'),
       );
 

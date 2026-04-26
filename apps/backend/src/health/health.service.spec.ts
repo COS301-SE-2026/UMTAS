@@ -1,14 +1,14 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from '@jest/globals';
 import { Test, TestingModule } from '@nestjs/testing';
 import { DatabaseService } from '../db/database.service';
 import { HealthService } from './health.service';
-import { helloWorldTable } from './hello-world.schema';
+import { helloWorldTable } from '../entities/hello-world/hello-world.schema';
 
 describe('HealthService', () => {
   let service: HealthService;
-  const returningMock = vi.fn();
-  const valuesMock = vi.fn();
-  const insertMock = vi.fn();
+  const returningMock = jest.fn();
+  const valuesMock = jest.fn();
+  const insertMock = jest.fn();
 
   const mockEntity = {
     id: 'test-uuid-1234',
@@ -53,7 +53,7 @@ describe('HealthService', () => {
       await service.writeHello();
 
       expect(valuesMock).toHaveBeenCalledWith({ message: 'Hello World' });
-      expect(returningMock).toHaveBeenCalledOnce();
+      expect(returningMock).toHaveBeenCalledTimes(1);
     });
 
     it('should return the saved entity', async () => {
