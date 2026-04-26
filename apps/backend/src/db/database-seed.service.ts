@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { eq } from 'drizzle-orm';
 import { DatabaseService } from './database.service.js';
-import { usersTable } from './schema.js';
+import { usersTable } from '../entities/index.js';
 
 interface SeedTask {
   name: string;
