@@ -1,8 +1,9 @@
 node_modules
 .next
-coverage
-dist
-.turbo
 .git
-*.log
-pnpm-debug.log*
+*.md
+.env*
+*.test.tsx
+*.test.ts
+vitest.config.ts
+src/test-setup.ts
