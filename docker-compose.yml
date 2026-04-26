@@ -34,6 +34,7 @@ services:
     image: redis:7-alpine
     networks:
       - internal
+    command: redis-server --requirepass ${REDIS_PASSWORD}
     volumes:
       - redis_data:/data
 
@@ -71,6 +72,8 @@ services:
     networks:
       - gateway
       - internal
+    environment:
+      - BACKEND_PORT=${BACKEND_PORT}
     profiles:
       - dev-docker
       - dev-pglite
@@ -97,6 +100,7 @@ services:
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD}
     volumes:
       - grafana_data:/var/lib/grafana
+      - ./infra/grafana/provisioning:/etc/grafana/provisioning
     profiles:
       - monitoring
       - server
@@ -120,6 +124,19 @@ services:
     volumes:
       - ./infra/loki:/etc/loki
       - loki_data:/loki
+    profiles:
+      - monitoring
+      - server
+
+  promtail:
+    image: grafana/promtail:latest
+    networks:
+      - internal
+    volumes:
+      - /var/log:/var/log
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - ./infra/promtail/promtail-config.yaml:/etc/promtail/config.yml
+    command: -config.file=/etc/promtail/config.yml
     profiles:
       - monitoring
       - server

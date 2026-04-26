@@ -11,6 +11,7 @@
     "dev:pglite": "docker compose --profile dev-pglite up --build",
     "dev:docker": "docker compose --profile dev-docker up --build",
     "start:prod": "docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build",
+    "start:server": "docker compose -f docker-compose.yml -f docker-compose.prod.yml --profile server up -d --build",
     "build": "turbo run build",
     "setup": "scripts/bootstrap.sh",
     "lint": "turbo run lint",

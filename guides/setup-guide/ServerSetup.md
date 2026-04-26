@@ -24,3 +24,7 @@ We installed Docker and Docker Compose to ensure that every environment runs an 
 # 5 Repository Prep
 
 We cloned the repo to a specific deployment home to keep it seperated from user files and system binaries.
+
+## Server Philosophy -> GitOps/Infrastructure As Code
+
+Why? If our server stops tomorrow, we essentially have all the config required to spin up a replacement server with minimal fuss. This ensures Vigil does not encounter config drift. We can confidently know that our stagiing code is a mirror image of our repo.
