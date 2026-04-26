@@ -10,6 +10,9 @@
       "outputs": ["coverage/**"],
       "inputs": ["src/**/*.ts", "src/**/*.tsx", "tests/**/*.ts"]
     },
+    "lint": {
+      "dependsOn": ["^build"]
+    },
     "dev": {
       "cache": false,
       "persistent": true
