@@ -65,6 +65,7 @@ venv.bak/
 # Docker
 .docker/
 docker-compose.override.yml
+letsencrypt/
 # Testing
 coverage/
 .nyc_output/
