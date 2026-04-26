@@ -13,21 +13,9 @@ services:
     volumes:
       - /var/run/docker.sock.raw:/var/run/docker.sock:ro
       - ./letsencrypt:/letsencrypt
+      - ./infra/traefik/traefik.yml:/etc/traefik/traefik.yml:ro
     command:
-      - "--providers.docker.useBindPortIP=true"
-      - "--providers.docker.endpoint=unix:///var/run/docker.sock"
-      - "--providers.docker.httpClientTimeout=300s"
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
-      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
-      - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
-      - "--api.dashboard=true"
-      - "--certificatesresolvers.myresolver.acme.dnschallenge=true"
-      - "--certificatesresolvers.myresolver.acme.dnschallenge.provider=cloudflare"
       - "--certificatesresolvers.myresolver.acme.email=${LETSENCRYPT_EMAIL}"
-      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.traefik.rule=Host(`traefik.${DOMAIN}`)"
@@ -41,7 +29,7 @@ services:
       - "traefik.http.routers.minio.rule=Host(`storage.${DOMAIN}`)"
       - "traefik.http.routers.minio.entrypoints=websecure"
       - "traefik.http.routers.minio.tls.certresolver=myresolver"
-      - "traefik.http.services.minio.loadbalancer.server.port=9000"
+      - "traefik.http.services.minio.loadbalancer.server.port=9001"
 
   solver:
     labels:
@@ -75,13 +63,17 @@ services:
       - "traefik.http.routers.grafana.tls.certresolver=myresolver"
       - "traefik.http.services.grafana.loadbalancer.server.port=3000"
 
-# watchtower:
-#   image: containrrr/watchtower
-#   container_name: watchtower
-#   restart: always
-#   volumes:
-#     - /var/run/docker.sock:/var/run/docker.sock
-#   command: --interval 30 --cleanup
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    restart: always
+    environment:
+      - DOCKER_API_VERSION=1.44
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --schedule "0 0 * * * *" --cleanup
+    profiles:
+      - server
 
 # simulator:
 #     build:
