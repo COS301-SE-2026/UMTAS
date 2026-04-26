@@ -62,9 +62,18 @@ venv.bak/
 .env.test.local
 .env.production.local
 
+# Database
+*.db
+*.sqlite
+*.sqlite3
+pglite-data/
+data/
+.pglite/
+
 # Docker
 .docker/
 docker-compose.override.yml
+
 # Testing
 coverage/
 .nyc_output/
@@ -95,6 +104,16 @@ Temporary Items
 *.swo
 .project
 .settings/
+*.code-workspace
+.DS_Store
+
+# Test & Coverage
+playwright-report/
+test-results/
+.coverage
+
+# Turbo
+.turbo/
 
 # AI Assistants
 .gemini/
