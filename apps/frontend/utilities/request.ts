@@ -13,7 +13,6 @@ export class RequestBuilder<RequestType, ResponseType> {
   private headers: Record<string, string> = {
     "Content-Type": "application/json",
   };
-  private body?: RequestType;
 
   public setUrl(url: string): this {
     // change this to use the env base url
@@ -37,34 +36,38 @@ export class RequestBuilder<RequestType, ResponseType> {
     return this;
   }
 
-  public setBody(body: RequestType): this {
-    this.body = body;
-    return this;
-  }
+  public async send(body?: RequestType): Promise<ResponseType> {
+    if (this.method !== RequestMethod.GET && body === undefined) {
+      console.error("The Body must be provided for non GET requests");
+      throw new Error(
+        "500 Internal Server Error: Request body required for non GET method",
+      );
+    }
 
-  public async send(): Promise<ResponseType> {
     const response = await fetch(this.url, {
       method: this.method,
       headers: this.headers,
-      body: this.body ? JSON.stringify(this.body) : undefined,
+      body: body ? JSON.stringify(body) : undefined,
     });
 
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
 
+    // returns the json instead of the promise
     return (await response.json()) as ResponseType;
   }
 }
 
-interface HealthCheckRequest {}
-
+interface HealthCheckRequest {
+  exampleString: string;
+}
 interface HealthCheckResponse {
   status: string;
   uptime?: number;
 }
 
-export class HealthCheckRequestBuilder extends RequestBuilder<
+export class HealthCheck extends RequestBuilder<
   HealthCheckRequest,
   HealthCheckResponse
 > {
@@ -76,12 +79,10 @@ export class HealthCheckRequestBuilder extends RequestBuilder<
   }
 }
 
-function exampleUsage() {
-  async function checkHealth() {
-    const builder = new HealthCheckRequestBuilder();
-
-    const response = await builder.send();
-
-    console.log("Health status:", response.status, "Uptime:", response.uptime);
-  }
+// Example usage
+async function exampleUsage() {
+  const response = await new HealthCheck().send();
+  console.log("Health status:", response.status, "Uptime:", response.uptime);
 }
+
+// can either have frontend making functions like these or just using the builders
