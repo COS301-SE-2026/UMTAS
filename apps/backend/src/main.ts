@@ -1,12 +1,20 @@
-import * as path from 'node:path';
-import * as dotenv from 'dotenv';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
-dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
-
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  await app.listen(Number(process.env.BACKEND_PORT ?? 3000));
+  const port = process.env.PORT ?? 3000;
+  console.log(`[STARTUP] Listening on port ${port}`);
+
+  app.enableCors({
+    origin: process.env.CORS_ORIGIN ?? 'http://localhost:3001',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    credentials: true,
+  });
+
+  await app.listen(port);
 }
-bootstrap();
+bootstrap().catch((err) => {
+  console.error('Failed to start app', err);
+  process.exit(1);
+});
