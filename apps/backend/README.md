@@ -25,6 +25,27 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+## Database Mode And Seeding
+
+The API supports two datasource modes via environment variables:
+
+- `DB_MODE=PGLITE` uses in-memory PGlite (good for local development and CI).
+- `DB_MODE=DATABASE` uses PostgreSQL via `DATABASE_URL`.
+
+On startup (non-production), Drizzle migrations in `apps/api/drizzle` run automatically.
+
+Seeding is controlled by:
+
+- `SEED=TRUE` to run seed tasks after migrations.
+- `SEED=FALSE` to skip seeding.
+
+Current default seed task creates a system-admin user if the configured email does not exist yet.
+You can configure it with:
+
+- `SEED_SYSTEM_ADMIN_NAME`
+- `SEED_SYSTEM_ADMIN_EMAIL`
+- `SEED_TASKS` (optional, comma-separated; currently supports `default-system-admin`)
+
 ## Project setup
 
 ```bash
