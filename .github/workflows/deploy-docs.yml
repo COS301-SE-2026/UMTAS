@@ -24,8 +24,8 @@ jobs:
       - name: Fetch latest wiki changes
         run: |
           cd wiki
-          git fetch origin main
-          git checkout origin/main
+          git fetch origin master
+          git checkout origin/master
 
       - name: Configure Git Credentials
         run: |
