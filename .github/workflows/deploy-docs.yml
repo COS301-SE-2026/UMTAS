@@ -6,6 +6,7 @@ on:
     paths:
       - "wiki"
       - ".github/workflows/deploy-docs.yml"
+  gollum:
   workflow_dispatch:
 
 jobs:
@@ -18,6 +19,12 @@ jobs:
         with:
           submodules: recursive
           fetch-depth: 0
+
+      - name: Fetch latest wiki changes
+        run: |
+          cd wiki
+          git fetch origin main
+          git checkout origin/main
 
       - name: Configure Git Credentials
         run: |
