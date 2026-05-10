@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - main
+      - setup-docs
     paths:
       - "wiki"
       - ".github/workflows/deploy-docs.yml"
