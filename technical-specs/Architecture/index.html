@@ -1,0 +1,2018 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../API-Contracts/">
+      
+      
+        <link rel="next" href="../SRS/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Software Architecture Requirements and Design Specifications - UMTAS Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#software-architecture-requirements-and-design-specifications" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="UMTAS Documentation" class="md-header__button md-logo" aria-label="UMTAS Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            UMTAS Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Software Architecture Requirements and Design Specifications
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  UMTAS Project Wiki
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../design/Brand-Style-Guide/" class="md-tabs__link">
+          
+  
+  
+  Design
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../developer-guides/Branch-Protection-Setup/" class="md-tabs__link">
+          
+  
+  
+  Developer guides
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../diagrams/" class="md-tabs__link">
+          
+  
+  
+  Diagrams
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../management/Team-Profiles/" class="md-tabs__link">
+          
+  
+  
+  Management
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../API-Contracts/" class="md-tabs__link">
+          
+  
+  
+  Technical specs
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="UMTAS Documentation" class="md-nav__button md-logo" aria-label="UMTAS Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    UMTAS Documentation
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    UMTAS Project Wiki
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Design
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Design
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/Brand-Style-Guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Brand Style Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../design/Wireframes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Wireframes and Navigation Flows
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Developer guides
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Developer guides
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer-guides/Branch-Protection-Setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Branch Protection Setup Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer-guides/Repo-Setup-Guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Repo Setup Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../developer-guides/Server-Setup-Guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Server Setup Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Diagrams
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Diagrams
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../diagrams/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Diagrams
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Management
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Management
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../management/Team-Profiles/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Team Profiles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_5_2" id="__nav_5_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Meeting minutes
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Meeting minutes
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../management/meeting-minutes/Client-Meetings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Client Meeting Minutes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../management/meeting-minutes/Internal-Standups/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Internal Stand-up Meeting Minutes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Technical specs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Technical specs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../API-Contracts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Service Contracts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Software Architecture Requirements and Design Specifications
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Software Architecture Requirements and Design Specifications
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#table-of-contents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Table of Contents
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#intent-of-architecture-document" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Intent of Architecture Document
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-overall-software-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1 Overall Software Architecture
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1 Overall Software Architecture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11-architectural-quality-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1 Architectural Quality Requirements
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1.1 Architectural Quality Requirements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#111-flexibility" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.1 Flexibility
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#112-maintainability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.2 Maintainability
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#113-scalability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.3 Scalability
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#114-performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.4 Performance
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#115-reliability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.5 Reliability
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#116-security" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.6 Security
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#117-auditability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.7 Auditability
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#118-testability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.8 Testability
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#119-usability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.9 Usability
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1110-integrability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.10 Integrability
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12-architectural-responsibility" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.2 Architectural Responsibility
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#13-architecture-constraints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.3 Architecture Constraints
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-architectural-component-a" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2 Architectural Component A
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2 Architectural Component A">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-architectural-quality-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 Architectural Quality Requirements
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.1 Architectural Quality Requirements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#211-quality-requirement-a" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1.1 Quality Requirement A
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-architectural-responsibility" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 Architectural Responsibility
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-frameworks-and-technologies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3 Frameworks and Technologies
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#24-architectural-realization-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.4 Architectural Realization Mapping
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#25-technology-choice" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5 Technology Choice
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3 Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../SRS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Software Requirements and Design Specifications
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#table-of-contents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Table of Contents
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#intent-of-architecture-document" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Intent of Architecture Document
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-overall-software-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1 Overall Software Architecture
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1 Overall Software Architecture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11-architectural-quality-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1 Architectural Quality Requirements
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1.1 Architectural Quality Requirements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#111-flexibility" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.1 Flexibility
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#112-maintainability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.2 Maintainability
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#113-scalability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.3 Scalability
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#114-performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.4 Performance
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#115-reliability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.5 Reliability
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#116-security" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.6 Security
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#117-auditability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.7 Auditability
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#118-testability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.8 Testability
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#119-usability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.9 Usability
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1110-integrability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1.10 Integrability
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12-architectural-responsibility" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.2 Architectural Responsibility
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#13-architecture-constraints" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.3 Architecture Constraints
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-architectural-component-a" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2 Architectural Component A
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2 Architectural Component A">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-architectural-quality-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 Architectural Quality Requirements
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.1 Architectural Quality Requirements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#211-quality-requirement-a" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1.1 Quality Requirement A
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-architectural-responsibility" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 Architectural Responsibility
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-frameworks-and-technologies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3 Frameworks and Technologies
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#24-architectural-realization-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.4 Architectural Realization Mapping
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#25-technology-choice" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5 Technology Choice
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3 Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="software-architecture-requirements-and-design-specifications">Software Architecture Requirements and Design Specifications</h1>
+<p><strong>Department of Computer Science</strong><br />
+Faculty of Engineering, Built Environment &amp; IT<br />
+University of Pretoria<br />
+COS301 - Software Engineering</p>
+<p><strong>Item:</strong> Mini Project 2026<br />
+<strong>Team Name:</strong> The head hunters</p>
+<hr />
+<h2 id="table-of-contents">Table of Contents</h2>
+<ul>
+<li><a href="#intent-of-architecture-document">Intent of Architecture Document</a></li>
+<li><a href="#1-overall-software-architecture">1 Overall Software Architecture</a></li>
+<li><a href="#11-architectural-quality-requirements">1.1 Architectural Quality Requirements</a><ul>
+<li><a href="#111-flexibility">1.1.1 Flexibility</a></li>
+<li><a href="#112-maintainability">1.1.2 Maintainability</a></li>
+<li><a href="#113-scalability">1.1.3 Scalability</a></li>
+<li><a href="#114-performance">1.1.4 Performance</a></li>
+<li><a href="#115-reliability">1.1.5 Reliability</a></li>
+<li><a href="#116-security">1.1.6 Security</a></li>
+<li><a href="#117-auditability">1.1.7 Auditability</a></li>
+<li><a href="#118-testability">1.1.8 Testability</a></li>
+<li><a href="#119-usability">1.1.9 Usability</a></li>
+<li><a href="#1110-integrability">1.1.10 Integrability</a></li>
+</ul>
+</li>
+<li><a href="#12-architectural-responsibility">1.2 Architectural Responsibility</a></li>
+<li><a href="#13-architecture-constraints">1.3 Architecture Constraints</a></li>
+<li><a href="#2-architectural-component-a">2 Architectural Component A</a></li>
+<li><a href="#21-architectural-quality-requirements">2.1 Architectural Quality Requirements</a><ul>
+<li><a href="#211-quality-requirement-a">2.1.1 Quality Requirement A</a></li>
+</ul>
+</li>
+<li><a href="#22-architectural-responsibility">2.2 Architectural Responsibility</a></li>
+<li><a href="#23-frameworks-and-technologies">2.3 Frameworks and Technologies</a></li>
+<li><a href="#24-architectural-realization-mapping">2.4 Architectural Realization Mapping</a></li>
+<li><a href="#25-technology-choice">2.5 Technology Choice</a></li>
+<li><a href="#3-summary">3 Summary</a></li>
+</ul>
+<hr />
+<h2 id="intent-of-architecture-document">Intent of Architecture Document</h2>
+<p>In the architectural document, a discussion on the overall system is expected, thereafter, each architectural component is discussed on a granular level. For each architectural component, focus on the requirements around the software infrastructure of the application's functionality. The purpose of the infrastructure is to address the non-functional requirements. Consider the following:</p>
+<ul>
+<li>the architectural responsibilities which need to be addressed,</li>
+<li>the access and integration requirements for the system,</li>
+<li>the quality requirements, and</li>
+<li>the architecture constraints specified by the client.</li>
+</ul>
+<hr />
+<h2 id="1-overall-software-architecture">1 Overall Software Architecture</h2>
+<p>This section should contain a discussion on the high-level architecture of your software system using the following bullet points ensuring to <strong>discuss each level of granularity</strong> for the <strong>overall software architecture</strong>.</p>
+<ul>
+<li>
+<p>All discussions in this section should focus on the system as a whole.</p>
+</li>
+<li>
+<p>At the <strong>first level of granularity</strong> for the overall software architecture, a discussion on whether your system will be using:</p>
+</li>
+<li>Client-Server architecture</li>
+<li>
+<p>Peer-to-peer architecture</p>
+</li>
+<li>
+<p>The <strong>second level of granularity</strong> for the overall software architecture, deals with the communication patterns that your software architecture will utilise between various subsystems. These include:</p>
+</li>
+<li>Request-Response Model</li>
+<li>Message brokering</li>
+<li>Event driven messaging</li>
+<li>Push-pull model</li>
+</ul>
+<p>Application level communication protocols and standards should also be considered as they place architectural constraints on components lower down in the system. Communications protocols and standards include:
+  - <strong>Messaging protocols</strong>
+    - Simple Object Access Protocol (SOAP)
+    - Representational state transfer (REST)
+    - Message Queuing Telemetry Transport (MQTT)
+    - Advanced Message Queuing Protocol (AMQP)
+    - HyperText Transfer Protocol (HTTP)
+  - <strong>Queryable protocols</strong>
+    - Open Data Protocol (OData)
+    - GraphQL
+  - <strong>Distributed Object Brokering (DOB)</strong>
+    - Common Object Request Broker Architecture (CORBA)
+  - <strong>Remote Procedure Call (RPC)</strong>
+    - Apache Thrift
+    - gRPC
+    - Extensible Markup Language RPC (XML-RPC)</p>
+<ul>
+<li>The <strong>third level of granularity</strong> for the overall software architecture, deals with the architectural patterns that will be utilized within each subsystem. It is important to note that various patterns can be combined within one subsystem. Architectural patterns include:</li>
+<li>Layered (n-Tier) architecture</li>
+<li>Command-Query Responsibility Segregating (CQRS)</li>
+<li>Domain Driven Design (DDD)</li>
+<li>Event Sourcing (ES)</li>
+<li>Service Oriented Architecture (SOA)</li>
+<li>Enterprise Service Bus (ESB)</li>
+<li>
+<p>Microservices</p>
+</li>
+<li>
+<p>Include a figure to show the high-level architecture of your system, ensuring Figure 1 shows a high-level overview of the software architecture. In particular, it shows the high-level architecture as a client-server and layered architecture, implying that a request-response model will be the primary form of communication with the system. The architecture furthermore highlights the different architectures for different subsystems and how they interact.</p>
+</li>
+</ul>
+<p><em>Figure 1: A high-level overview of the software architecture for project name.</em></p>
+<blockquote>
+<p><strong>Note:</strong> This should be technology neutral as the high-level architecture covers the design of the system. Technologies never choose your architecture, rather you use architectural strategies and patterns to help you choose a technology.</p>
+</blockquote>
+<hr />
+<h3 id="11-architectural-quality-requirements">1.1 Architectural Quality Requirements</h3>
+<p>The quality requirements are the requirements around the quality attributes of the systems and the services it provides. This includes quality requirements like maintainability, flexibility, extensibility, performance, scalability, security, auditability, usability, and testability requirements. It is important to note that <strong>not all systems will have all the above mentioned quality attributes</strong>.</p>
+<p>The proceeding subsections discuss how to define these quality requirements with relevant quantifications. <strong>Note:</strong> quality requirements are also technology neutral.</p>
+<h4 id="111-flexibility">1.1.1 Flexibility</h4>
+<p>Discuss why the system needs to be flexible and provide the necessary quantifications of reasonable thresholds that the system should be able to achieve.</p>
+<p><strong>Example:</strong> It is important for the system to be flexible such that new adaptations to the architecture can be made for adding newer subsystems or swapping out layers in favour of better business decisions. The flexibility of the system can be measured by checking:</p>
+<ul>
+<li>by ensuring the cyclomatic complexity of functions are kept low,</li>
+<li>high code modularity,</li>
+<li>ensuring tight cohesion, loose coupling between different modules,</li>
+<li>code compliance with coding convention,</li>
+<li>ensuring code is self-documenting and readable,</li>
+<li>ensuring that there is no direct implementation on used packages, but that all external packages are placed behind standardized APIs or are ring-fenced by application interfaces,</li>
+<li>a combination of other software measures such as bugs, vulnerabilities, code smells, maintainability ratings can all be considered together to determine the flexibility of a system.</li>
+</ul>
+<h4 id="112-maintainability">1.1.2 Maintainability</h4>
+<p>Discuss why the maintainability of the system is important and why this is a concern for the longevity of the system. Quantify the maintainability of the system by describing the life cycle or life span on the system and which factors need to be considered to further the ability of the system to run for the expected life span.</p>
+<p><strong>Example:</strong> It is important for the system to be maintainable such that the services rendered can be consumed with minimal disruptions to business operations. The maintainability of the system can be measured by checking:</p>
+<ul>
+<li>the maintainability Index using some defined measure, such as maintainability rating provided by SonarQube,</li>
+<li>Cyclomatic Complexity,</li>
+<li>Depth of Inheritance,</li>
+<li>Class Coupling, etc.</li>
+</ul>
+<h4 id="113-scalability">1.1.3 Scalability</h4>
+<p>Discuss why the scalability of the system is important and how future growth might affect the system. How will your system be able to handle this growth, i.e. what is your scaling strategy, horizontal or vertical scaling. Quantify the scalability of the system by describing what is the minimum amount of users/sessions/traffic load/processing load/classification that needs to be done over a time period, e.g. 1min, 5min, 15min, 1hour, 24hours etc.</p>
+<p><strong>Example:</strong> As the system will be used to assist ER personnel in prioritising patients, it is important the system can scale to ensure it can prioritise at least 15 patients per minute. The scalability of the system can be measured by checking:</p>
+<ul>
+<li>executing concurrent connection requests,</li>
+<li>executing ramp-up testing to ensure that minimum thresholds are met,</li>
+<li>chaos testing ensuring predefined thresholds are met.</li>
+</ul>
+<h4 id="114-performance">1.1.4 Performance</h4>
+<p>Discuss why the performance of the system is important and what the effects of performance can have on the users. Quantify performance by providing metrics of acceptable ranges on factors that affect performance.</p>
+<p><strong>Example:</strong> The system needs to be performant as it manages hospital equipment, thereby needed to respond to multiple patients at once as this could be a matter of life and death. The performance of the system can be measured by checking:</p>
+<ul>
+<li>the number of requests the system can handle per second (e.g. 100 requests per second).</li>
+<li>the average/max response time for requests (e.g. A maximum of 300ms to handle a request).</li>
+</ul>
+<h4 id="115-reliability">1.1.5 Reliability</h4>
+<p>Discuss why the reliability of the system is important and how it will affect the operations of your system. Although it is difficult to quantify reliability, there are manual checks and methods to achieve this.</p>
+<p><strong>Example:</strong> The system needs to be reliable as it deals with medical equipment thereby ensuring that operations continue as expected and nothing prevents the system of going into a fail state, or doing operations that are not expected due to bugs. The reliability of the system can be measured by checking:</p>
+<ul>
+<li>the hardware components to ensure they function as expected.</li>
+<li>the correctness of the system.</li>
+<li>the ability to restart or recover from a system failure.</li>
+</ul>
+<h4 id="116-security">1.1.6 Security</h4>
+<p>Discuss why the security of the system is important and what would the implications of this quality attribute. Quantify security by performing security testing, and passing security audits that look for specific configurations and loopholes.</p>
+<p><strong>Example:</strong> The security of the system is paramount as the system monitors medical equipment. Therefore, the system should not allow unauthorized access or the ability to switch off equipment without authorization. The security of the system can be measured by checking:</p>
+<ul>
+<li>security standards and specification (e.g. using AES512 encryption, and SHA512 hashing, etc.).</li>
+<li>OWASP application security guidelines.</li>
+<li>mitigating attacks (Injection attacks, CSRF, etc).</li>
+</ul>
+<h4 id="117-auditability">1.1.7 Auditability</h4>
+<p>Discuss why the auditability of the system is important and the concerns of being transparent. Quantify auditability by specifying the logging level and the type of information that should be auditable.</p>
+<p><strong>Example:</strong> As users interact with the system accountability and auditability needs to be accounted for as a record of which individual turned off equipment should be logged as well as any errors or exceptions thrown by the system. The auditability of the system can be measured by checking:</p>
+<ul>
+<li>error logs, application logs, access logs.</li>
+<li>adding granular logging abilities to traceback activity.</li>
+</ul>
+<h4 id="118-testability">1.1.8 Testability</h4>
+<p>Discuss why the testability of the system is important and the implications of code that is not tested, what code coverage is expected and what type of tests should be conducted.</p>
+<p><strong>Example:</strong> The system should test all functions and operations thereby it is important that unit, integration, regression tests are implemented with code testing coverage above 80%. The testability of the system can be measured by checking:</p>
+<ul>
+<li>automation of unit tests on a CI/CD platform.</li>
+<li>checking the build status of the system.</li>
+<li>checking the code testing coverage.</li>
+</ul>
+<h4 id="119-usability">1.1.9 Usability</h4>
+<p>Discuss why the usability of the system is important and how your users will interact with your system, what the UI interfaces should have and how it would be tested/quantified.</p>
+<p><strong>Example:</strong> The system should be intuitive to use and easy to interact with providing the best user experience. Therefore, the use of shocking bright colors are to be avoided and good positioning of elements to maximise space usage without cluttering the UI. The usability of the system can be measured by checking:</p>
+<ul>
+<li>prototyping of user screens.</li>
+<li>developing wireframes.</li>
+<li>performing UI tests (both using frameworks or physical tests with a small group of real users).</li>
+</ul>
+<h4 id="1110-integrability">1.1.10 Integrability</h4>
+<p>Discuss why the integrability of the system is important and how being able to integrate with other systems needs to be achieved. Quantify integrability by using your architecture and provide the metrics of being able to integrate.</p>
+<p><strong>Example:</strong> The system should be able to integrate with external services and integration testing between each service should be carried out passing all tests and checking regression testing to ensure that the system was always in working state. Using a microservices architecture allowed the system to easily integrate with services as there is separation of concerns. The integrability of the system can be measured by using two approaches:</p>
+<ul>
+<li>top-down integration</li>
+<li>bottom-up integration</li>
+</ul>
+<hr />
+<h3 id="12-architectural-responsibility">1.2 Architectural Responsibility</h3>
+<p>The architectural responsibility are components within your architecture that is responsible for carrying out certain tasks within the architecture. For example, a <code>TransactionManager</code> responsibility is needed for management of database transactions in the architecture.</p>
+<hr />
+<h3 id="13-architecture-constraints">1.3 Architecture Constraints</h3>
+<ul>
+<li>
+<p>Discussion on the architectural constraints that are imposed by <strong>external factors</strong> such as the client, end-users device specifications, constraints imposed by an external API/service/partner/application/environment/hardware.</p>
+</li>
+<li>
+<p><strong>Important</strong> to note that any subjective constraints as mentioned below are unacceptable and should <strong>not</strong> appear in a technology neutral architectural specification:</p>
+</li>
+<li>We only know language/framework/technology X</li>
+<li>We really want to learn/play/explore with language/framework/technology X</li>
+</ul>
+<blockquote>
+<p>Repeat Sections 2 – 2.5 for each identified architectural component in your system.</p>
+</blockquote>
+<hr />
+<h2 id="2-architectural-component-a">2 Architectural Component A</h2>
+<p>Discussion on how this component fits together into your overall architecture, which other components depends on this component, how does this component interact with other components.</p>
+<h3 id="21-architectural-quality-requirements">2.1 Architectural Quality Requirements</h3>
+<p>Discussion about the required architecture requirements that needs to be present for this system. Which architecture requirements are propagated down from the Overall Software Architecture.</p>
+<h4 id="211-quality-requirement-a">2.1.1 Quality Requirement A</h4>
+<p>Repeat for each quality requirement for architectural component A.</p>
+<ul>
+<li>Discussion around the quality requirement, why is it important, what is the requirement.</li>
+<li>Quality requirements that can be considered are:</li>
+<li>Flexibility</li>
+<li>Maintainability</li>
+<li>Scalability</li>
+<li>Performance</li>
+<li>Reliability</li>
+<li>Security</li>
+<li>Auditability</li>
+<li>Testability</li>
+<li>Usability</li>
+<li>Integrability</li>
+<li>Deployability</li>
+</ul>
+<hr />
+<h3 id="22-architectural-responsibility">2.2 Architectural Responsibility</h3>
+<p>Discussion about the architectural responsibilities that you have identified. This is part of the scientific process of technology neutral software engineering. After identification of the requirements, the next section will investigate the frameworks and technologies that could possibly satisfy the required responsibilities.</p>
+<p>The architectural responsibilities of the architectural component A are shown in Figure 2.</p>
+<p><em>Figure 2: A high-level overview of the architectural responsibilities for architectural component A</em></p>
+<hr />
+<h3 id="23-frameworks-and-technologies">2.3 Frameworks and Technologies</h3>
+<p>Discussion around the technologies and framework that you will consider to realize the identified responsibilities above. It is always good to compare <strong>at least three frameworks and technologies</strong>. Important to note that if your chosen technology or framework is not a full featured framework, that requires you to utilise external or community projects, such as a node backend, you should identify <strong>at least three modules/projects/libraries</strong> for each of the responsibilities that you will be satisfying with an external library. Discussion can also resolve about the type of licenses if that is a consideration that should be taken into account.</p>
+<p>Your scientific analysis here of identifying which framework satisfies your responsibilities the best, will be the architectural framework going forward.</p>
+<hr />
+<h3 id="24-architectural-realization-mapping">2.4 Architectural Realization Mapping</h3>
+<p>This section is concerned with showing how the identified framework above realizes each of the responsibilities you have identified. This will assist not only yourself but other interested readers to identify how your concrete system fits together.</p>
+<p><em>Figure 3: The components in framework A addressing the architectural responsibilities for architectural Component A</em></p>
+<hr />
+<h3 id="25-technology-choice">2.5 Technology Choice</h3>
+<p>Make a decision on what technology will be used for this subsystem and explain why this technology was chosen. As part of your reasoning ensure that it is scientific and not objective.</p>
+<hr />
+<h2 id="3-summary">3 Summary</h2>
+<p>Conclude this document with a summary that binds all the technology choices together, forming your effective <strong>"technology stack"</strong>. This technology stack will be used to assist in developing your deployment diagrams and models later on.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "search.suggest", "search.highlight"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
