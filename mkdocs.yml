@@ -3,6 +3,8 @@ site_url: https://cos301-se-2026.github.io/UMTAS/
 
 theme:
   name: material
+  logo: assets/images/logos/Vigil_Owl_Logo.png
+  favicon: assets/images/logos/Vigil_Owl_Logo.png
   palette:
     - scheme: default
       primary: deep purple
@@ -31,6 +33,7 @@ plugins:
   - drawio
 
 markdown_extensions:
+  - md_in_html
   - admonition
   - pymdownx.details
   - pymdownx.superfences:

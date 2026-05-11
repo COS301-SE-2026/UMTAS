@@ -11,7 +11,7 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
 <td style="border: none; width: 140px; vertical-align: top; padding-right: 24px;">
   <img src="../assets/images/team/Wilmar_smit_PFP.png" width="120" style="border-radius: 50%; display: block;" alt="Wilmar Smit">
 </td>
-<td style="border: none; vertical-align: top;">
+<td style="border: none; vertical-align: top;" markdown="1">
 
 ### Wilmar Smit
 
@@ -32,7 +32,7 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
 <td style="border: none; width: 140px; vertical-align: top; padding-right: 24px;">
   <img src="../assets/images/team/Michael_Tomlinson_PFP.jpeg" width="120" style="border-radius: 50%; display: block;" alt="Michael Tomlinson">
 </td>
-<td style="border: none; vertical-align: top;">
+<td style="border: none; vertical-align: top;" markdown="1">
 
 ### Michael Tomlinson
 
@@ -53,7 +53,7 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
 <td style="border: none; width: 140px; vertical-align: top; padding-right: 24px;">
   <img src="../assets/images/team/Johan_Coetzer_PFP.jpeg" width="120" style="border-radius: 50%; display: block;" alt="Johan Coetzer">
 </td>
-<td style="border: none; vertical-align: top;">
+<td style="border: none; vertical-align: top;" markdown="1">
 
 ### Johan Coetzer
 
@@ -74,7 +74,7 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
 <td style="border: none; width: 140px; vertical-align: top; padding-right: 24px;">
   <img src="../assets/images/team/Marcel_PFP.jpeg" width="120" style="border-radius: 50%; display: block;" alt="Marcel Stoltz">
 </td>
-<td style="border: none; vertical-align: top;">
+<td style="border: none; vertical-align: top;" markdown="1">
 
 ### Marcel Stoltz
 
@@ -94,7 +94,7 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
 <td style="border: none; width: 140px; vertical-align: top; padding-right: 24px;">
   <img src="../assets/images/team/Aidan_Dawson_PFP.jpg" width="120" style="border-radius: 50%; display: block;" alt="Aidan Dawson">
 </td>
-<td style="border: none; vertical-align: top;">
+<td style="border: none; vertical-align: top;" markdown="1">
 
 ### Aidan Dawson
 

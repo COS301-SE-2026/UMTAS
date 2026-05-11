@@ -1,47 +1,26 @@
-<p align="center">
-  <img src="assets/images/VigilOWL.png" width="150" alt="Team Vigil Logo">
-  &nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="assets/images/Tyto_Small.jpeg" width="150" alt="Tyto Insights Logo">
-</p>
+<div align="center" style="margin-top: 40px;">
+  <img src="assets/images/logos/Vigil_Owl_Logo.png" width="180" style="margin-bottom: 20px;">
+  <img src="assets/images/logos/Tyto_Logo.png" width="300" style="margin-bottom: 20px;">
 
-<h1 align="center">UMTAS Project Wiki</h1>
-<h3 align="center">Team Vigil - UMTAS - User Management and Task Automation System</h3>
+# UMTAS
 
-<p align="center">
-  <img src="assets/images/tyto_insights_cover.jpeg" width="100%" alt="UMTAS Cover Image">
-</p>
-
-Welcome to the official wiki for the **UMTAS** project. This documentation serves as the single source of truth for our requirements, design, and development processes for COS 301.
+### University Management & Timetabling Automation System
 
 ---
 
-## Navigation
-
-### [Management](management/Team-Profiles)
-
-- **Team:** [Profiles & LinkedIn](management/Team-Profiles)
-- **Governance:** [Branching Strategy](management/Branching-Strategy)
-- **Logs:** [Stand-up Minutes](management/meeting-minutes/Internal-Standups) | [Client Minutes](management/meeting-minutes/Client-Meetings)
-
-### [Technical Specifications](technical-specs/SRS)
-
-- **Requirements:** [Software Requirements Specification (SRS)](technical-specs/SRS)
-- **Design:** [Architecture & Quality Requirements](technical-specs/Architecture)
-- **Interfaces:** [API Service Contracts](technical-specs/API-Contracts)
-
-### [Design & UX](design/Brand-Style-Guide)
-
-- **Branding:** [Brand Style Guide](design/Brand-Style-Guide)
-- **Layout:** [Wireframes & Navigation Flow](design/Wireframes)
-
-### [Developer Resources](developer-guides/Repo-Setup-Guide)
-
-- **Setup:** [Repo Guide](developer-guides/Repo-Setup-Guide) | [Server Guide](developer-guides/Server-Setup-Guide)
-- **Visuals:** [Diagram Repository](diagrams/README)
+![Cover Banner](assets/images/covers/cover_banner.png)
 
 ---
 
-## Demo 1 Status
+[Get Started](developer-guides/Repo-Setup-Guide.md){ .md-button .md-button--primary }
+[Team Profiles](management/Team-Profiles.md){ .md-button }
 
-- **Status:** In Progress
-- **Next Milestone:** Demo 1 (22nd May 2026)
+</div>
+
+<br>
+
+## 📌 Project Overview
+
+The **University Management & Timetabling Automation System (UMTAS)** is a high-performance, university-agnostic platform designed to automate the ingestion, parsing, and optimisation of university timetables.
+
+Built in partnership with **Tyto Insights**, UMTAS leverages a Core-and-Adapter architecture to ensure seamless integration with diverse university data sources while providing students with a modern, real-time scheduling interface.
