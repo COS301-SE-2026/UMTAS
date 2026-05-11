@@ -1,12 +1,5 @@
 name: Deploy MkDocs
 on:
-  push:
-    branches:
-      - main
-      - setup-docs
-    paths:
-      - "wiki"
-      - ".github/workflows/deploy-docs.yml"
   gollum:
   workflow_dispatch:
 
