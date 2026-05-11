@@ -4,12 +4,13 @@ on:
     branches:
       - main
       - dev
-        - setup-docs
+      - setup-docs
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches:
       - dev
       - main
+      - setup-docs
 
 permissions:
   contents: write
@@ -39,7 +40,6 @@ jobs:
         run: |
           export PATH_PREFIX="dev"
           mkdocs build
-          # This deploys to the /dev subfolder on the gh-pages branch
           mkdir -p site_mapping
           mv site site_mapping/dev
           cd site_mapping
@@ -53,6 +53,25 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git commit -m "docs: deploy dev version"
+          git push origin HEAD:gh-pages
+
+      - name: Deploy Test Branch
+        if: github.event_name == 'push' && github.ref == 'refs/heads/setup-docs'
+        run: |
+          mkdocs build
+          mkdir -p site_mapping
+          mv site site_mapping/test-setup
+          cd site_mapping
+          touch .nojekyll
+          remote_repo="https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"
+          git init
+          git remote add origin $remote_repo
+          git fetch origin gh-pages
+          git reset origin/gh-pages
+          git add test-setup/
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit -m "docs: deploy test version"
           git push origin HEAD:gh-pages
 
       - name: PR Preview
