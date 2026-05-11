@@ -4,7 +4,7 @@ Visual representation of the system structure and user interaction points.
 
 ---
 
-## 🗺️ Navigation Flow
+## :material-map: Navigation Flow
 
 _Illustration of how users move between key screens (Login -> Dashboard -> Feature)._
 
@@ -14,7 +14,7 @@ _Illustration of how users move between key screens (Login -> Dashboard -> Featu
 
 ---
 
-## 🖼️ Screen Layouts
+## :material-image: Screen Layouts
 
 ### Login Page
 

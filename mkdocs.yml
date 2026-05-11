@@ -1,23 +1,21 @@
 site_name: UMTAS Documentation
 site_url: https://cos301-se-2026.github.io/UMTAS/
+extra_css:
+  - stylesheets/extra.css
 
 theme:
   name: material
-  logo: assets/images/logos/Vigil_Owl_Logo.png
-  favicon: assets/images/logos/Vigil_Owl_Logo.png
+  logo: assets/images/VigilOWL.png
+  favicon: assets/images/VigilOWL.png
+  icon:
+    logo: material/owl
   palette:
-    - scheme: default
-      primary: deep purple
-      accent: purple
-      toggle:
-        icon: material/brightness-7
-        name: Switch to dark mode
-    - scheme: slate
-      primary: deep purple
-      accent: purple
-      toggle:
-        icon: material/brightness-4
-        name: Switch to light mode
+    scheme: default
+    primary: white
+    accent: black
+  font:
+    text: Inter
+    code: Fira Code
   features:
     - navigation.tabs
     - navigation.sections
@@ -31,6 +29,7 @@ theme:
 plugins:
   - search
   - drawio
+  - swagger-ui-tag
 
 markdown_extensions:
   - md_in_html

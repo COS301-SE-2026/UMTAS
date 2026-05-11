@@ -1,32 +1,24 @@
 # Repo Setup Guide
 
 _Written by Marcel Stoltz_  
-_24 Apr 2026_
+:material-calendar: _24 Apr 2026_
 
 ---
 
-## Purpose
+## :material-bullseye: Purpose
 
 This guide serves as a repo setup guide for the **2026 Vigil Capstone Team**, specifically for the UMTAS Project.
 
-### Our Approach to the Ideal Developer Experience Monorepo
+### Our Approach to the Ideal Developer Experience
 
-We will be using `pnpm workspaces` via root scripts such as **TurboRepo**.
+We use `pnpm workspaces` via root scripts such as **TurboRepo**.
 
 **The goal?**  
 Frontend devs never need to worry about Python dependencies, and backend devs don't have to struggle with `venv`.
 
-**How do we approach this?**  
-We split the architecture into two distinct sections:
-
-1. **Docker Infrastructure:** Databases, queues, storage
-2. **Native Application:** Next.js, NestJS
-
-This setup ensures that devs have the benefit of containerized infrastructure to mimic the server, whilst having the benefit of hot-reload in the application themselves.
-
 ---
 
-## The Motivation: "One Command For Them All"
+## :material-auto-fix: The "One Command" Workflow
 
 ### A: Bootstrap a New Dev
 
@@ -34,59 +26,70 @@ This setup ensures that devs have the benefit of containerized infrastructure to
 pnpm run setup
 ```
 
-**Steps:**
-
-1. Checks required tools
-2. Copies `.env.example` to `.env`
-3. Runs `pnpm install`
-4. Docker image for the solver section gets handled
-
-> **Note:** DB seeding is handled inside the DB container without needing any manual scripts.
+??? note "What happens during setup?" 1. **Tool Check**: Verifies `docker`, `pnpm`, and `node` versions. 2. **Env Config**: Copies `.env.example` to `.env`. 3. **Install**: Runs `pnpm install` across all workspaces. 4. **Solver Prep**: Pulls or builds the Docker image for the Python solver.
 
 ---
 
-### B: Ready To Dev
+### B: Development Lifecycle
 
-We use a split strategy to give our devs the fastest possible dev setup. This requires two terminal tabs. Everything is driven by a single `docker-compose.yml` file leveraging Docker Compose profiles which allows for multiple states.
+We use a split strategy for the fastest hot-reload performance.
 
-- **Terminal 1: Start the Infrastructure**
+=== "Terminal 1: Infrastructure"
 
-  ```bash
-  pnpm run dev:infra
-  ```
+    ```bash
+    pnpm run dev:infra # (1)
+    ```
 
-  _Docker Compose Boots -> Postgres + Redis + MinIO + Python Solver_
+    1.  Starts **Postgres**, **Redis**, **MinIO**, and the **Python Solver** container.
 
-- **Terminal 2: Start the Actual Code**
-  ```bash
-  pnpm run dev
-  ```
-  _Turborepo Boots -> Next.js frontend + NestJS Backend_
+=== "Terminal 2: Application"
 
----
+    ```bash
+    pnpm run dev # (2)
+    ```
 
-### C: Alternative & Deployment Modes
-
-While **`B: Ready to Dev`** is the best option for local development, we do still retain the following docker profiles for testing and deployments:
-
-1. **Full Docker Dev** (`pnpm run dev:docker`)
-   - Boots Full Infrastructure + frontend + backend.
-   - Useful to test everything before pushing to the server.
-
-2. **Monitoring Mode** (`pnpm run dev:monitor`)
-   - Adding a monitoring flag to the previous command boots up the **PLG Stack**:
-     - Grafana
-     - Prometheus
-     - Loki
-
-3. **Production Server Mode** (`pnpm run start:prod`)
-   - Boots the entire stack using `docker-compose.prod.yml` + Traefik + WatchTower.
+    2.  Boots **Turborepo** to run the Next.js frontend and NestJS backend natively.
 
 ---
 
-### Testing and CI
+## :material-layers: Deployment & Advanced Modes
 
-1. **Unit & Integration:** Powered by Jest.
-2. **E2E:** Powered by Playwright.
-3. **Pre-commit Hooks:** Powered by Husky + Lint Staged.
-4. **Local CI:** We simulate the CI on GitHub locally using `act`.
+While local native dev is fastest, we maintain Docker profiles for full system testing.
+
+??? abstract "Full Docker Stack"
+**Command**: `pnpm run dev:docker`
+
+    Boots the full infrastructure PLUS the frontend and backend in containers. Use this to verify network flows and environment variables before a merge.
+
+??? abstract "Monitoring Mode (PLG Stack)"
+**Command**: `pnpm run dev:monitor`
+
+    Adds the observability layer:
+    - **Grafana**: Dashboards
+    - **Prometheus**: Metrics
+    - **Loki**: Log Aggregation
+
+---
+
+## :material-flask: Quality Assurance
+
+1. **Unit & Integration**: Powered by **Jest**.
+2. **E2E**: Powered by **Playwright**.
+3. **Pre-commit Hooks**: Managed by **Husky** + **Lint Staged**.
+4. **Local CI Simulation**: Run your GitHub Actions locally using `act`.
+
+---
+
+## :material-help-circle: Troubleshooting
+
+??? bug "Docker Permission Denied"
+Ensure your user is part of the `docker` group:
+`bash
+    sudo usermod -aG docker $USER
+    `
+
+??? bug "PNPM Lockfile Conflicts"
+If you encounter lockfile issues after a heavy merge, run:
+`bash
+    pnpm install --no-frozen-lockfile
+    `

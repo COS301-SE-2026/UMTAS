@@ -1,0 +1,85 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+
+:root {
+  --md-primary-fg-color: #ffffff;
+  --md-primary-fg-color--light: #ffffff;
+  --md-primary-fg-color--dark: #ffffff;
+  --md-primary-bg-color: #1a1a1a; /* Text color on white background */
+}
+
+/* Fix Header Text Visibility (Charcoal on White) */
+.md-header {
+  color: #1a1a1a !important;
+  background-color: #ffffff !important;
+  border-bottom: 1px solid #eee;
+}
+
+.md-header__button,
+.md-header__topic {
+  color: #1a1a1a !important;
+}
+
+/* Fix Sidebar Navigation Visibility */
+.md-nav__link {
+  color: #666 !important; /* Muted gray for inactive */
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 500;
+}
+
+.md-nav__link--active,
+.md-nav__link:hover {
+  color: #1a1a1a !important; /* Charcoal for active/hover */
+  font-weight: 700 !important;
+}
+
+/* Table of Contents Visibility */
+.md-typeset h1,
+.md-typeset h2,
+.md-typeset h3 {
+  color: #1a1a1a !important;
+  font-family: "DM Sans", sans-serif !important;
+}
+
+/* Rest of the Brand Styles */
+h1,
+h2,
+h3,
+h4,
+.md-header__topic {
+  font-family: "DM Sans", sans-serif !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.02em;
+}
+
+.md-card,
+.grid.cards > ul > li {
+  border: 1px solid #eee !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02) !important;
+  border-radius: 4px !important;
+}
+
+.md-card:hover,
+.grid.cards > ul > li:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06) !important;
+  border-color: #1a1a1a !important;
+}
+
+.team-member img {
+  width: 120px !important;
+  height: 120px !important;
+  object-fit: cover !important;
+  border-radius: 50%;
+  border: 2px solid #f0f0f0;
+}
+
+a {
+  text-decoration: none !important;
+}
+
+/* Active Tab indicator (Monochrome) */
+.md-tabs__link--active {
+  color: #1a1a1a !important;
+  border-bottom: 2px solid #1a1a1a;
+}

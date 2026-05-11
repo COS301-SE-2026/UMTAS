@@ -4,7 +4,7 @@ This guide defines the visual identity of the UMTAS project to ensure consistenc
 
 ---
 
-## 🎨 Color Palette
+## :material-palette: Color Palette
 
 | Usage      | Sample | HEX       | Usage Description          |
 | ---------- | ------ | --------- | -------------------------- |
@@ -16,7 +16,7 @@ This guide defines the visual identity of the UMTAS project to ensure consistenc
 
 ---
 
-## 🔡 Typography
+## :material-format-size: Typography
 
 - **Primary Font:** [Font Name] (e.g. Inter, Roboto)
 - **Headings:** [Size/Weight]
@@ -24,14 +24,14 @@ This guide defines the visual identity of the UMTAS project to ensure consistenc
 
 ---
 
-## 📐 Logo and Iconography
+## :material-ruler-square: Logo and Iconography
 
 - [Guidelines for logo usage]
 - **Icon Set:** [e.g. Lucide-react, FontAwesome]
 
 ---
 
-## ✨ Design Principles
+## :material-sparkles: Design Principles
 
 1.  **Consistency:** Standard UI components across all modules.
 2.  **Simplicity:** Minimalist layout to reduce cognitive load.
@@ -40,7 +40,7 @@ This guide defines the visual identity of the UMTAS project to ensure consistenc
 
 ---
 
-## 🍱 UI Component Styling
+## :material-view-dashboard: UI Component Styling
 
 - **Buttons:** [Style description]
 - **Forms:** [Validation styling]
