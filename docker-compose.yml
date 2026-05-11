@@ -1,0 +1,142 @@
+networks:
+  gateway:
+    driver: bridge
+  internal:
+    internal: true
+
+volumes:
+  postgres_data:
+  minio_data:
+  redis_data:
+  grafana_data:
+  prometheus_data:
+  loki_data:
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    networks:
+      - internal
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infra/database/seeds.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    networks:
+      - internal
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - redis_data:/data
+
+  minio:
+    image: minio/minio
+    networks:
+      - gateway
+      - internal
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes:
+      - minio_data:/data
+
+  solver:
+    build:
+      context: ./apps/solver
+      dockerfile: solver.Dockerfile
+    image: ${DOCKER_REGISTRY}/${PROJECT_NAME}-solver:latest
+    networks:
+      - gateway
+      - internal
+    profiles:
+      - dev-docker
+      - dev-infra
+      - dev-pglite
+      - server
+
+  backend:
+    build:
+      context: ./apps/backend
+      dockerfile: ../../docker/backend/backend.Dockerfile
+    image: ${DOCKER_REGISTRY}/${PROJECT_NAME}-backend:latest
+    networks:
+      - gateway
+      - internal
+    environment:
+      - BACKEND_PORT=${BACKEND_PORT}
+    profiles:
+      - dev-docker
+      - dev-pglite
+      - server
+
+  frontend:
+    build:
+      context: ./apps/frontend
+      dockerfile: ../../docker/frontend/frontend.Dockerfile
+    image: ${DOCKER_REGISTRY}/${PROJECT_NAME}-frontend:latest
+    networks:
+      - gateway
+    profiles:
+      - dev-docker
+      - dev-pglite
+      - server
+
+  grafana:
+    image: grafana/grafana:9.5.2
+    networks:
+      - gateway
+      - internal
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD}
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./infra/grafana/provisioning:/etc/grafana/provisioning
+    profiles:
+      - monitoring
+      - server
+
+  prometheus:
+    image: prom/prometheus:latest
+    networks:
+      - internal
+    volumes:
+      - ./infra/prometheus:/etc/prometheus
+      - prometheus_data:/prometheus
+    profiles:
+      - monitoring
+      - server
+
+  loki:
+    image: grafana/loki:latest
+    networks:
+      - internal
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - ./infra/loki:/etc/loki
+      - loki_data:/loki
+    profiles:
+      - monitoring
+      - server
+
+  promtail:
+    image: grafana/promtail:latest
+    networks:
+      - internal
+    volumes:
+      - /var/log:/var/log
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - ./infra/promtail/promtail-config.yaml:/etc/promtail/config.yml
+    command: -config.file=/etc/promtail/config.yml
+    profiles:
+      - monitoring
+      - server

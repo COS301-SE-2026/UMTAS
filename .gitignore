@@ -17,6 +17,9 @@ pids
 # Dependency directories
 node_modules/
 jspm_packages/
+package-lock.json
+yarn.lock
+
 
 # Next.js build output
 .next/
@@ -64,7 +67,8 @@ venv.bak/
 
 # Docker
 .docker/
-
+docker-compose.override.yml
+letsencrypt/
 # Testing
 coverage/
 .nyc_output/
@@ -105,3 +109,6 @@ Temporary Items
 .cursorrules
 .cody/
 .raiden/
+
+# Drizzle
+**/drizzle/meta/
