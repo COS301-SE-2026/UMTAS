@@ -21,19 +21,19 @@
 
 ## 1. Tech Stack Summary (as per Dev Decisions + Tender)
 
-| Layer                   | Technology                                                       | Why we chose it                                           |
-| ----------------------- | ---------------------------------------------------------------- | --------------------------------------------------------- |
-| **Package Manager**     | pnpm                                                             | Fast monorepo workspaces + caching                        |
-| **Bundler**             | Vite (Rollup under the hood)                                     | Blazing-fast CI/CD builds                                 |
-| **Frontend**            | Next.js (React + TypeScript) + Tailwind CSS                      | SSR, shared DTOs, mobile-first PWA-ready                  |
-| **Backend Core**        | Nest.js + TypeORM + PostgreSQL                                   | Modular, OpenAPI-first, strong DI                         |
-| **Auth**                | BetterAuth (NextAuth + plugins)                                  | Full OAuth2 Google Calendar write scope                   |
-| **Python Microservice** | FastAPI + pdfplumber + Google OR-Tools (CP-SAT)                  | High-performance PDF extraction + constraint optimisation |
-| **Caching / Queue**     | Redis + BullMQ                                                   | Sessions + async optimisation jobs                        |
-| **Dev DB / Access**     | WireGuard VPN + optional PGLite                                  | Secure team access                                        |
-| **Infrastructure**      | Docker + Compose + Traefik + Watchtower                          | Zero-touch deployment on Tyto Ubuntu server               |
-| **CI/CD**               | GitHub Actions + Husky + Prettier + ESLint + Vitest + Playwright | Every PR is tested & Docker image pushed                  |
-| **Testing**             | Unit (Vitest) + Integration (Playwright) + Load (Locust)         | Regression suite for 100 % parse & 0 % overlap            |
+| Layer                   | Technology                                                     | Why we chose it                                           |
+| ----------------------- | -------------------------------------------------------------- | --------------------------------------------------------- |
+| **Package Manager**     | pnpm                                                           | Fast monorepo workspaces + caching                        |
+| **Bundler**             | Webpack / Turbopack                                            | Default Next.js bundler                                   |
+| **Frontend**            | Next.js (React + TypeScript) + Tailwind CSS                    | SSR, shared DTOs, mobile-first PWA-ready                  |
+| **Backend Core**        | Nest.js + TypeORM + PostgreSQL                                 | Modular, OpenAPI-first, strong DI                         |
+| **Auth**                | BetterAuth (NextAuth + plugins)                                | Full OAuth2 Google Calendar write scope                   |
+| **Python Microservice** | FastAPI + pdfplumber + Google OR-Tools (CP-SAT)                | High-performance PDF extraction + constraint optimisation |
+| **Caching / Queue**     | Redis + BullMQ                                                 | Sessions + async optimisation jobs                        |
+| **Dev DB / Access**     | WireGuard VPN + optional PGLite                                | Secure team access                                        |
+| **Infrastructure**      | Docker + Compose + Traefik + Watchtower                        | Zero-touch deployment on Tyto Ubuntu server               |
+| **CI/CD**               | GitHub Actions + Husky + Prettier + ESLint + Jest + Playwright | Every PR is tested & Docker image pushed                  |
+| **Testing**             | Unit (Jest) + Integration (Playwright) + Load (Locust)         | Regression suite for 100 % parse & 0 % overlap            |
 
 **Architecture style:** Core-and-Adapter + separate Python intelligence microservice (see Mermaid below).
 
@@ -120,7 +120,7 @@ classDiagram
 - **Cruise Mode** (heavy academic weeks): 1 retro/week, mentor monthly.
 - **Crunch Mode** (recess / lighter weeks): 3 stand-ups + 1 retro/week, mentor fortnightly.
 
-**Quality Gates** – Every PR: Vitest + Playwright + OpenAPI validation + regression tests for 100 % parse accuracy and 0 % overlaps.
+**Quality Gates** – Every PR: Jest + Playwright + OpenAPI validation + regression tests for 100 % parse accuracy and 0 % overlaps.
 
 ---
 
@@ -184,7 +184,7 @@ Sprints are **2 weeks** by default (Cruise or Crunch mode). We use GitHub Projec
 | ----------- | ------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
 | **0**       | 20 Apr – 3 May (2 weeks)  | Foundations & Monorepo             | pnpm monorepo, Docker Compose, Traefik, WireGuard VPN, GitHub Actions CI, basic auth (BetterAuth)                                                                         | Local stack runs end-to-end. CI green.                                                                                  |
 | **1**       | 4 May – 17 May (2 weeks)  | Core API + Basic Optimisation      | Nest.js Core skeleton, TypeORM schema (User, Preference, Schedule entities), FastAPI microservice stub, simple OR-Tools constraint solver (conflict-free single schedule) | **Demo 1 Ready (22 May)**<br>Basic student flow: select mock modules → set preferences → generate 1–3 ranked schedules. |
-| **2**       | 18 May – 31 May (2 weeks) | Frontend Student Portal (MVP)      | Next.js progressive disclosure UI (module selection → preferences → schedule options), calendar export (.ics), Vitest + Playwright tests                                  | **Post-Demo 1 polish**<br>Live student UI working with Core (mock data). Under 3 min end-to-end.                        |
+| **2**       | 18 May – 31 May (2 weeks) | Frontend Student Portal (MVP)      | Next.js progressive disclosure UI (module selection → preferences → schedule options), calendar export (.ics), Jest + Playwright tests                                    | **Post-Demo 1 polish**<br>Live student UI working with Core (mock data). Under 3 min end-to-end.                        |
 | **3**       | 1 Jun – 14 Jun (2 weeks)  | Full Optimisation Logic            | OR-Tools multi-option ranking (time blocks, gap density, day consolidation), Redis + BullMQ async jobs, conflict detection edge cases                                     | Optimiser returns 3+ realistic options with zero overlaps (regression suite passes).                                    |
 | **4**       | 15 Jun – 28 Jun (2 weeks) | Adapters – Phase 1                 | UP PDF Adapter (pdfplumber) + Mock REST Adapter. Core consumes both via normalised schema.                                                                                | Core + Optimiser now works with real UP PDF data. 100 % parsing accuracy on ground-truth set.                           |
 | **5**       | 29 Jun – 12 Jul (2 weeks) | Analytics Layer + Admin Dashboard  | Anonymised AttendanceAggregate, k-anonymity + UUID dissociation, basic venue heatmaps (Recharts), real-time updates (SSE)                                                 | **Demo 2 Ready (31 Jul)**<br>Admin can view live anonymised heatmaps + over-capacity warnings from real PDF data.       |
@@ -236,7 +236,7 @@ High-performance Python web framework (ASGI) used for the Intelligence Microserv
 Real-time visual dashboard element in the admin analytics layer. Colour-coded grid showing planned attendance density per venue/time-slot, enabling quick identification of overcrowding or under-utilisation.
 
 **Husky**  
-Lightweight Git hooks manager. Runs Prettier, ESLint, and Vitest checks automatically before every commit/push, enforcing code quality across the monorepo.
+Lightweight Git hooks manager. Runs Prettier, ESLint, and Jest checks automatically before every commit/push, enforcing code quality across the monorepo.
 
 **k-anonymity**  
 Privacy protection technique (used in UMTAS analytics). Ensures that any released data (e.g., attendance aggregates) cannot be distinguished from at least _k_-1 other records. Combined with UUID dissociation to achieve POPIA/GDPR compliance.
@@ -260,7 +260,7 @@ Google’s open-source constraint programming solver. Core engine inside the Fas
 Python library for extracting tables and text from PDFs. Powers the University of Pretoria PDF Adapter; extracts module codes, venues, times, and groups with near-100 % accuracy against ground-truth datasets.
 
 **Playwright**  
-End-to-end browser automation and integration testing framework. Used alongside Vitest to test full user flows (module selection → preference UI → schedule export → calendar sync).
+End-to-end browser automation and integration testing framework. Used alongside Jest to test full user flows (module selection → preference UI → schedule export → calendar sync).
 
 **POPIA / GDPR**  
 South African Protection of Personal Information Act and EU General Data Protection Regulation. UMTAS is built privacy-by-design: individual student UUIDs are dissociated before any data reaches the analytics aggregator; cryptographic audit trails prove compliance.
@@ -281,7 +281,7 @@ Standalone microservice that generates 20 000+ synthetic student profiles and ru
 Modern edge router and load balancer. Automatically discovers Docker services, handles SSL termination, and routes traffic to the Next.js frontend, Nest.js API, and FastAPI microservice.
 
 **Turbopack**  
-Next.js’s new Rust-based incremental bundler (default in Next.js 16+ as of 2026). Used for ultra-fast `next dev` and `next build`. Completely independent of Vitest (which always runs on Vite).
+Next.js’s new Rust-based incremental bundler (default in Next.js 16+ as of 2026). Used for ultra-fast `next dev` and `next build`.
 
 **TypeORM**  
 TypeScript ORM for PostgreSQL. Enables entity-based schema definition (instead of a single massive schema file), reducing merge conflicts in the monorepo while supporting versioned migrations.
@@ -289,11 +289,8 @@ TypeScript ORM for PostgreSQL. Enables entity-based schema definition (instead o
 **UUID Dissociation**  
 Privacy technique where individual student UUIDs are stripped or replaced with temporary tokens before data enters the analytics layer. Ensures admin dashboards see only aggregate metrics with zero re-identification risk.
 
-**Vite**  
-Next-generation frontend build tool (used by Vitest). Extremely fast due to native ES modules and Rollup bundling under the hood. Powers all unit/integration tests in the UMTAS monorepo.
-
-**Vitest**  
-Vite-native unit and component testing framework. Blazing-fast alternative to Jest; configured to run with React Testing Library and jsdom. Works seamlessly alongside Turbopack in Next.js.
+**Jest**  
+Comprehensive JavaScript testing framework. Configured to run with React Testing Library and jsdom for robust unit and component testing across the monorepo.
 
 **Watchtower**  
 Lightweight Docker container that automatically updates other running containers when new images appear in the Docker Registry. Enables zero-touch, zero-downtime deployments on the Tyto Ubuntu server.
