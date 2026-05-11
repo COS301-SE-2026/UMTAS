@@ -9,8 +9,10 @@
 
 ### University Management & Timetabling Automation System
 
-**A Strategic Partnership between [Tyto Analytics](https://www.tytoinsights.co/) and Team Vigil**  
+**A Strategic Partnership between [Tyto Insights](https://tyto.africa/) and Team Vigil**  
 _Built by: Wilmar Smit, Michael Tomlinson, Johan Coetzer, Marcel Stoltz, & Aidan Dawson_
+
+---
 
 </div>
 

@@ -31,7 +31,7 @@ This guide defines the visual identity of the UMTAS project to ensure consistenc
 
 ---
 
-## :material-sparkles: Design Principles
+## :sparkles: Design Principles
 
 1.  **Consistency:** Standard UI components across all modules.
 2.  **Simplicity:** Minimalist layout to reduce cognitive load.

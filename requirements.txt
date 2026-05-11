@@ -1,3 +1,4 @@
 mkdocs-material
 mkdocs-drawio
 mkdocs-swagger-ui-tag
+pymdown-extensions
