@@ -1,0 +1,9 @@
+node_modules
+.next
+.git
+*.md
+.env*
+*.test.tsx
+*.test.ts
+vitest.config.ts
+src/test-setup.ts
