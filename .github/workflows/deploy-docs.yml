@@ -11,14 +11,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          submodules: recursive
           fetch-depth: 0
 
       - name: Fetch latest wiki changes
         run: |
-          cd wiki
-          git fetch origin master
-          git checkout origin/master
+          git clone https://github.com/COS301-SE-2026/UMTAS.wiki.git wiki --branch master --depth 1
 
       - name: Configure Git Credentials
         run: |
