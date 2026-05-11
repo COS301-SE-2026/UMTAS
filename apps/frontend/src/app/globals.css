@@ -49,6 +49,23 @@
 }
 
 :root {
+  /* Decided light mode values */
+  --bg-base: #ffffff;
+  --bg-surface: #f4f4f5;
+  --bg-elevated: #e4e4e7;
+  --text-primary: #09090b;
+  --text-secondary: #52525b;
+  --text-disabled: #a1a1aa;
+  --border: #e4e4e7;
+  --ring: #18181b;
+  --shadow: rgba(0, 0, 0, 0.08);
+
+  /* Motion tokens */
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 400ms;
+  --easing-default: cubic-bezier(0.4, 0, 0.2, 1);
+
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -83,6 +100,20 @@
   --sidebar-ring: oklch(0.708 0 0);
 }
 
+/* Decided dark mode val */
+[data-theme="dark"] {
+  --bg-base: #18181b;
+  --bg-surface: #27272a;
+  --bg-elevated: #3f3f46;
+  --text-primary: #e8e8e8;
+  --text-secondary: #9a9a9a;
+  --text-disabled: #555555;
+  --border: #3f3f46;
+  --ring: #e8e8e8;
+  --shadow: rgba(0, 0, 0, 0.35);
+}
+
+/* Will most likely be deleted */
 .dark {
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
@@ -115,6 +146,15 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
 }
 
 @layer base {
