@@ -37,8 +37,9 @@ This guide defines how frontend work should be built, checked, and prepared for 
 
 === "Components"
 Prefer extending `shadcn/ui` patterns over inventing one-off components. Keep components small and focused.
-```tsx
-import { Button } from "@/components/ui/button"
+
+    ```tsx
+    import { Button } from "@/components/ui/button"
 
     export function ActionButton() {
       return <Button variant="outline">Action</Button>

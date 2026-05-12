@@ -38,10 +38,11 @@ As a core part of **TDD**, your local validation loop is the fastest feedback yo
 
 === "Using `act`"
 `act` allows you to run your GitHub Actions workflows inside Docker containers on your local machine.
-`bash
+
+    ```bash
     # Run the default push workflow
     act push
-    `
+    ```
 
 === "PGLite Parity"
 Always use **PGLite** for local checks if the CI uses it. This ensures that database-dependent tests behave identically on your machine and the runner.

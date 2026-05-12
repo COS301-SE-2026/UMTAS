@@ -38,7 +38,8 @@ Unit testing forms the core of our **Red-Green-Refactor** workflow. The fundamen
 
 === "Naming"
 Use descriptive names that read like a sentence:
-`it('should return 400 if the date is in the past', () => { ... })`
+
+    `it('should return 400 if the date is in the past', () => { ... })`
 
 === "Mocking"
 Avoid over-mocking. If you need to mock more than 3 dependencies, your function might be doing too much.

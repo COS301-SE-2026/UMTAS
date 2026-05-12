@@ -5,12 +5,27 @@ This guide defines how we use branches and pull requests so collaboration stays 
 
 ---
 
-## :material-source-branch: Workflow (TDD Git Flow)
+## :material-source-branch: Branch Structure
+
+| Branch       | Purpose                                                      |
+| :----------- | :----------------------------------------------------------- |
+| `main`       | Production-ready. Protected — no direct pushes.              |
+| `dev`        | Integration target. All pull requests merge here.            |
+| `feat/*`     | New features. Cut from `dev`, PR back to `dev`.              |
+| `fix/*`      | Bug fixes. Cut from `dev`, PR back to `dev`.                 |
+| `docs/*`     | Documentation-only changes.                                  |
+| `refactor/*` | Code quality or structural changes with no behaviour change. |
+
+Branch names must use the prefix matching the PR type, followed by a short kebab-case description — e.g. `feat/pdf-parser`, `fix/auth-token-expiry`.
+
+---
+
+## :material-map-marker-path: Workflow (TDD Git Flow)
 
 Follow these steps for every new feature or bug fix:
 
 1.  **Sync**: Start from the latest `dev`.
-2.  **Branch**: Create a dedicated feature branch.
+2.  **Branch**: Create a dedicated branch using the naming convention above.
 3.  **Red**: Write a failing test for your next unit of work (Jest/pytest).
 4.  **Green**: Build the feature code to pass the test.
 5.  **Refactor**: Clean up the code and commit.
@@ -37,7 +52,8 @@ Every PR should include a clear title, description, and the following metadata:
 | **Reviewer**      | Assign at least one teammate               |
 
 ??? note "Pull Request Template (Copy/Paste)"
-```markdown ## Objective
+
+````markdown ## Objective
 [What are we trying to achieve?]
 
     ## Changes
@@ -54,3 +70,4 @@ Every PR should include a clear title, description, and the following metadata:
     - [ ] Conflicts resolved
     - [ ] CI passing
     ```
+````

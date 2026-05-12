@@ -38,9 +38,10 @@ Testing endpoint-to-database behavior and external services should be done **tes
 
 === "PGLite (Database)"
 Use **PGLite** for database integration tests. It allows you to spin up a fresh, in-memory Postgres instance for every test file, ensuring total isolation.
-`bash
+
+    ```bash
     pnpm run test:pglite
-    `
+    ```
 
 === "Playwright (E2E)"
 Use Playwright for user-facing flows where browser behavior matters. Focus on high-value paths like "Student can upload PDF and view schedule."

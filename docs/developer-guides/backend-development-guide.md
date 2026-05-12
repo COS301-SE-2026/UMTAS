@@ -39,15 +39,17 @@ This guide defines the expected workflow for building backend features and endpo
 
 === "DrizzleORM (Default)"
 Use Drizzle for all core entity management. Ensure schemas are located in `packages/database/schema`.
-`typescript
+
+    ```typescript
     export const users = pgTable('users', {
       id: uuid('id').primaryKey().defaultRandom(),
       email: text('email').unique().notNull(),
     });
-    `
+    ```
 
 === "PGLite (Testing)"
 Use PGLite for lightning-fast, isolated unit tests. No Docker required.
-`bash
+
+    ```bash
     pnpm run test:pglite
-    `
+    ```

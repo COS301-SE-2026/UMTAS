@@ -63,6 +63,7 @@ While local native dev is fastest, we maintain Docker profiles for full system t
 **Command**: `pnpm run dev:monitor`
 
     Adds the observability layer:
+
     - **Grafana**: Dashboards
     - **Prometheus**: Metrics
     - **Loki**: Log Aggregation
@@ -82,12 +83,14 @@ While local native dev is fastest, we maintain Docker profiles for full system t
 
 ??? bug "Docker Permission Denied"
 Ensure your user is part of the `docker` group:
-`bash
+
+    ```bash
     sudo usermod -aG docker $USER
-    `
+    ```
 
 ??? bug "PNPM Lockfile Conflicts"
 If you encounter lockfile issues after a heavy merge, run:
-`bash
+
+    ```bash
     pnpm install --no-frozen-lockfile
-    `
+    ```
