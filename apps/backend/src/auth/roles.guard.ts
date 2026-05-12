@@ -7,9 +7,9 @@ import {
   SetMetadata,
 } from '@nestjs/common';
 import type { Request } from 'express';
-import type { AuthSession } from './auth.js';
-import type { AppRole } from './roles.js';
-import { AuthService } from './auth.service.js';
+import type { AuthSession } from './auth';
+import type { AppRole } from './roles';
+import { AuthService } from './auth.service';
 
 export const ROLES_KEY = 'roles';
 

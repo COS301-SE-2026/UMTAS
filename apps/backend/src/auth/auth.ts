@@ -3,16 +3,13 @@ import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
 import { APIError, betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
-import { createAccessControl } from 'better-auth/plugins/access';
 import { admin } from 'better-auth/plugins/admin';
-import {
-  defaultRoles,
-  defaultStatements,
-} from 'better-auth/plugins/admin/access';
-import { Redis } from 'ioredis';
+import { defaultRoles } from 'better-auth/plugins/admin/access';
 import { redisStorage } from '@better-auth/redis-storage';
-import * as appSchema from '../db/schema.js';
-import { isAppRole } from './roles.js';
+import * as appSchema from '../db/schema';
+import { isAppRole } from './roles';
+import { getRedisClient } from '../redis/redis';
+import { ac, student, uniAdmin, sysAdmin } from './permissions';
 
 export type AppDatabase =
   | NodePgDatabase<typeof appSchema>
@@ -36,6 +33,11 @@ interface CreateAuthInput {
     email: string;
     url: string;
   }) => Promise<void>;
+  sendVerificationEmail?: (input: {
+    email: string;
+    url: string;
+    name: string;
+  }) => Promise<void>;
   redisUrl?: string;
 }
 
@@ -51,11 +53,11 @@ export function createAuth(input: CreateAuthInput): AuthInstance {
     isProduction,
     logger,
     sendResetPasswordEmail,
+    sendVerificationEmail,
     redisUrl,
   } = input;
 
-  const ac = createAccessControl({ ...defaultStatements } as const);
-  const redisClient = redisUrl ? new Redis(redisUrl) : null;
+  const redisClient = redisUrl ? getRedisClient() : null;
 
   return betterAuth({
     secondaryStorage: redisClient
@@ -79,11 +81,31 @@ export function createAuth(input: CreateAuthInput): AuthInstance {
     trustedOrigins,
     emailAndPassword: {
       enabled: true,
+      requireEmailVerification: true,
+      minPasswordLength: 8,
+      maxPasswordLength: 128,
       sendResetPassword: async ({ user, url }) => {
         void sendResetPasswordEmail({ email: user.email, url });
       },
       onPasswordReset: async ({ user }) => {
         logger.log(`Password reset completed for ${user.email}`);
+      },
+    },
+    emailVerification: {
+      sendOnSignUp: true,
+      autoSignInAfterVerification: true,
+      sendVerificationEmail: async ({ user, url }) => {
+        if (sendVerificationEmail) {
+          await sendVerificationEmail({
+            email: user.email,
+            url,
+            name: user.name || 'User',
+          });
+        } else {
+          logger.warn(
+            `Email verification email not sent (no mailer configured)`,
+          );
+        }
       },
     },
     socialProviders:
@@ -118,7 +140,7 @@ export function createAuth(input: CreateAuthInput): AuthInstance {
       max: 100,
     },
     session: {
-      expiresIn: 60 * 60 * 24 * 7,
+      expiresIn: 60 * 60 * 24 * 30,
       updateAge: 60 * 60 * 24,
       freshAge: 60 * 60,
       cookieCache: {
@@ -131,7 +153,7 @@ export function createAuth(input: CreateAuthInput): AuthInstance {
       encryptOAuthTokens: true,
       storeStateStrategy: 'cookie',
       accountLinking: {
-        enabled: false,
+        enabled: true,
       },
     },
     advanced: {
@@ -157,12 +179,12 @@ export function createAuth(input: CreateAuthInput): AuthInstance {
       admin({
         ac,
         defaultRole: 'student',
-        adminRoles: ['system_admin'],
+        adminRoles: ['sys_admin'],
         adminUserIds: systemAdminUserIds,
         roles: {
-          student: defaultRoles.user,
-          university_admin: defaultRoles.user,
-          system_admin: defaultRoles.admin,
+          student,
+          uni_admin: uniAdmin,
+          sys_admin: sysAdmin,
         },
       }),
     ],
@@ -186,7 +208,7 @@ export function createAuth(input: CreateAuthInput): AuthInstance {
             const requestedRole = data.role;
 
             if (
-              actorRole === 'system_admin' &&
+              actorRole === 'sys_admin' &&
               requestedRole !== undefined &&
               !isAppRole(requestedRole)
             ) {
@@ -195,7 +217,7 @@ export function createAuth(input: CreateAuthInput): AuthInstance {
               });
             }
 
-            if (actorRole === 'system_admin' && isAppRole(requestedRole)) {
+            if (actorRole === 'sys_admin' && isAppRole(requestedRole)) {
               return { data };
             }
 

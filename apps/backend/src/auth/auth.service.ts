@@ -1,9 +1,11 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { DatabaseService } from '../db/database.service.js';
-import { createAuth } from './auth.js';
-import type { AuthInstance } from './auth.js';
-import type { AppDatabase } from './auth.js';
+import { DatabaseService } from '../db/database.service';
+import { MailerService } from '../mail/mailer.service';
+import { createAuth } from './auth';
+import { createRedisClient } from '../redis/redis';
+import type { AuthInstance } from './auth';
+import type { AppDatabase } from './auth';
 
 @Injectable()
 export class AuthService implements OnModuleInit {
@@ -14,6 +16,7 @@ export class AuthService implements OnModuleInit {
   constructor(
     private readonly databaseService: DatabaseService,
     private readonly configService: ConfigService,
+    private readonly mailerService: MailerService,
   ) {}
 
   onModuleInit() {
@@ -22,6 +25,13 @@ export class AuthService implements OnModuleInit {
       this.logger.error('BETTER_AUTH_SECRET is required');
       throw new Error('BETTER_AUTH_SECRET is required');
     }
+
+    // Initialize shared Redis client on bootstrap
+    const redisUrl = this.configService.get<string>('REDIS_URL');
+    if (redisUrl) {
+      createRedisClient(redisUrl);
+    }
+
     this.logger.log('Auth service initialized with env validation');
   }
 
@@ -68,8 +78,18 @@ export class AuthService implements OnModuleInit {
       redisUrl,
       logger: this.logger,
       sendResetPasswordEmail: async ({ email, url }) => {
-        this.logger.log(`Password reset requested for ${email}: ${url}`);
-        // TODO: integrate Resend / Nodemailer here
+        await this.mailerService.sendMail({
+          to: email,
+          subject: 'Reset your UMTAS password',
+          html: `<p>Click <a href="${url}">here</a> to reset your password. Link expires in 1 hour.</p>`,
+        });
+      },
+      sendVerificationEmail: async ({ email, url, name }) => {
+        await this.mailerService.sendMail({
+          to: email,
+          subject: 'Verify your UMTAS account',
+          html: `<p>Hi ${name || 'User'},</p><p>Please <a href="${url}">verify your email</a> to activate your account.</p>`,
+        });
       },
     });
     this.authInitialized = true;
