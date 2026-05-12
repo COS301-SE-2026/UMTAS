@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { DatabaseService } from '../db/database.service.js';
-import { HelloWorld, helloWorldTable } from '../entities/hello-world/index.js';
+import { DatabaseService } from '../db/database.service';
+import { HelloWorld, helloWorldTable } from '../entities/hello-world/index';
 
 @Injectable()
 export class HealthService {
