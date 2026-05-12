@@ -35,16 +35,18 @@ pnpm run setup
 We use a split strategy for the fastest hot-reload performance.
 
 === "Terminal 1: Infrastructure"
-`bash
+
+    ```bash
     pnpm run dev:infra # (1)
-    `
+    ```
 
     1.  Starts **Postgres**, **Redis**, **MinIO**, and the **Python Solver** container.
 
 === "Terminal 2: Application"
-`bash
+
+    ```bash
     pnpm run dev # (2)
-    `
+    ```
 
     2.  Boots **Turborepo** to run the Next.js frontend and NestJS backend natively.
 

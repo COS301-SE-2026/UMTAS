@@ -52,8 +52,7 @@ Every PR should include a clear title, description, and the following metadata:
 | **Reviewer**      | Assign at least one teammate               |
 
 ??? note "Pull Request Template (Copy/Paste)"
-
-````markdown ## Objective
+```markdown ## Objective
 [What are we trying to achieve?]
 
     ## Changes
@@ -70,4 +69,3 @@ Every PR should include a clear title, description, and the following metadata:
     - [ ] Conflicts resolved
     - [ ] CI passing
     ```
-````
