@@ -1,5 +1,5 @@
 import { Logger } from '@nestjs/common';
-import { DatabaseService } from '../database.service.js';
+import { DatabaseService } from '../database.service';
 
 export interface ISeedMigration {
   name: string;

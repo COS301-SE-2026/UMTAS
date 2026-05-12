@@ -1,12 +1,12 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { sql } from 'drizzle-orm';
-import { DatabaseService } from './database.service.js';
-import { DatabaseSeedService } from './database-seed.service.js';
+import { DatabaseService } from './database.service';
+import { DatabaseSeedService } from './database-seed.service';
 import { migrate as migrateNodePg } from 'drizzle-orm/node-postgres/migrator';
 import { migrate as migratePglite } from 'drizzle-orm/pglite/migrator';
 import { join } from 'node:path';
-import { DB_MODES, parseSeedFlag } from './database.constants.js';
+import { DB_MODES, parseSeedFlag } from './database.constants';
 
 @Injectable()
 export class DatabaseInitService implements OnApplicationBootstrap {
