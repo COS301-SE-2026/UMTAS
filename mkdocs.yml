@@ -56,7 +56,6 @@ markdown_extensions:
   - tables
   - toc:
       permalink: true
-  - pymdownx.blocks.grid
 
 nav:
   - Home: index.md
