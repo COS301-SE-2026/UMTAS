@@ -36,7 +36,12 @@
     "typescript": "^6.0.3"
   },
   "dependencies": {
-    "dotenv": "^16.0.3"
+    "@nestjs-modules/mailer": "^2.3.4",
+    "@types/handlebars": "^4.1.0",
+    "@types/nodemailer": "^8.0.0",
+    "dotenv": "^16.0.3",
+    "handlebars": "^4.7.9",
+    "nodemailer": "^8.0.7"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,mjs,cjs,json,md,yml,yaml,css,scss}": "prettier --write"
