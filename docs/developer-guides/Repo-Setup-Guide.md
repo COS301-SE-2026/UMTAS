@@ -26,7 +26,11 @@ Frontend devs never need to worry about Python dependencies, and backend devs do
 pnpm run setup
 ```
 
-??? note "What happens during setup?" 1. **Tool Check**: Verifies `docker`, `pnpm`, and `node` versions. 2. **Env Config**: Copies `.env.example` to `.env`. 3. **Install**: Runs `pnpm install` across all workspaces. 4. **Solver Prep**: Pulls or builds the Docker image for the Python solver.
+??? note "What happens during setup?"
+    1. **Tool Check**: Verifies `docker`, `pnpm`, and `node` versions.
+    2. **Env Config**: Copies `.env.example` to `.env`.
+    3. **Install**: Runs `pnpm install` across all workspaces.
+    4. **Solver Prep**: Pulls or builds the Docker image for the Python solver.
 
 ---
 
@@ -57,12 +61,12 @@ We use a split strategy for the fastest hot-reload performance.
 While local native dev is fastest, we maintain Docker profiles for full system testing.
 
 ??? abstract "Full Docker Stack"
-**Command**: `pnpm run dev:docker`
+    **Command**: `pnpm run dev:docker`
 
     Boots the full infrastructure PLUS the frontend and backend in containers. Use this to verify network flows and environment variables before a merge.
 
 ??? abstract "Monitoring Mode (PLG Stack)"
-**Command**: `pnpm run dev:monitor`
+    **Command**: `pnpm run dev:monitor`
 
     Adds the observability layer:
 
@@ -84,14 +88,14 @@ While local native dev is fastest, we maintain Docker profiles for full system t
 ## :material-help-circle: Troubleshooting
 
 ??? bug "Docker Permission Denied"
-Ensure your user is part of the `docker` group:
+    Ensure your user is part of the `docker` group:
 
     ```bash
     sudo usermod -aG docker $USER
     ```
 
 ??? bug "PNPM Lockfile Conflicts"
-If you encounter lockfile issues after a heavy merge, run:
+    If you encounter lockfile issues after a heavy merge, run:
 
     ```bash
     pnpm install --no-frozen-lockfile

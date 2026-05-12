@@ -1,7 +1,7 @@
 # Integration Testing Guide
 
 !!! info "Purpose"
-This guide defines how we test the interaction between parts of the system so features work together as expected across database and service boundaries.
+    This guide defines how we test the interaction between parts of the system so features work together as expected across database and service boundaries.
 
 ---
 
@@ -30,21 +30,26 @@ Testing endpoint-to-database behavior and external services should be done **tes
 
 ## :material-check-decagram: Definition of Done
 
-??? success "Integration Checklist" - [ ] Full interaction path is covered (Request → Logic → DB → Response). - [ ] Test data (Fixtures) are reliable and version-controlled. - [ ] External dependencies are stubbed or mocked in the approved way. - [ ] Suite passes in the local ephemeral environment. - [ ] No fragile shared state exists between tests.
+??? success "Integration Checklist"
+    - [ ] Full interaction path is covered (Request → Logic → DB → Response).
+    - [ ] Test data (Fixtures) are reliable and version-controlled.
+    - [ ] External dependencies are stubbed or mocked in the approved way.
+    - [ ] Suite passes in the local ephemeral environment.
+    - [ ] No fragile shared state exists between tests.
 
 ---
 
 ## :material-layers: Best Practices
 
 === "PGLite (Database)"
-Use **PGLite** for database integration tests. It allows you to spin up a fresh, in-memory Postgres instance for every test file, ensuring total isolation.
+    Use **PGLite** for database integration tests. It allows you to spin up a fresh, in-memory Postgres instance for every test file, ensuring total isolation.
 
     ```bash
     pnpm run test:pglite
     ```
 
 === "Playwright (E2E)"
-Use Playwright for user-facing flows where browser behavior matters. Focus on high-value paths like "Student can upload PDF and view schedule."
+    Use Playwright for user-facing flows where browser behavior matters. Focus on high-value paths like "Student can upload PDF and view schedule."
 
 === "Seed Data"
-Keep your seed data / fixtures minimal. Large fixtures make tests slow and hard to maintain. Prefer programmatic setup in `beforeEach`.
+    Keep your seed data / fixtures minimal. Large fixtures make tests slow and hard to maintain. Prefer programmatic setup in `beforeEach`.

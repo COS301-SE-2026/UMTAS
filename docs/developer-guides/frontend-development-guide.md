@@ -1,7 +1,7 @@
 # Frontend Development Guide
 
 !!! info "Purpose"
-This guide defines how frontend work should be built, checked, and prepared for review to deliver a consistent user experience and professional UI code.
+    This guide defines how frontend work should be built, checked, and prepared for review to deliver a consistent user experience and professional UI code.
 
 ---
 
@@ -29,14 +29,20 @@ This guide defines how frontend work should be built, checked, and prepared for 
 
 ## :material-check-decagram: Definition of Done
 
-??? success "Frontend Checklist" - [ ] UI matches the feature design exactly. - [ ] Responsive behavior verified (Mobile/Desktop). - [ ] Loading, Success, and Error states are handled. - [ ] Components are modular and reusable. - [ ] Manually verified in at least two browsers. - [ ] PR includes visual evidence (Screenshots/Video).
+??? success "Frontend Checklist"
+    - [ ] UI matches the feature design exactly.
+    - [ ] Responsive behavior verified (Mobile/Desktop).
+    - [ ] Loading, Success, and Error states are handled.
+    - [ ] Components are modular and reusable.
+    - [ ] Manually verified in at least two browsers.
+    - [ ] PR includes visual evidence (Screenshots/Video).
 
 ---
 
 ## :material-palette: UI Best Practices
 
 === "Components"
-Prefer extending `shadcn/ui` patterns over inventing one-off components. Keep components small and focused.
+    Prefer extending `shadcn/ui` patterns over inventing one-off components. Keep components small and focused.
 
     ```tsx
     import { Button } from "@/components/ui/button"
@@ -47,7 +53,7 @@ Prefer extending `shadcn/ui` patterns over inventing one-off components. Keep co
     ```
 
 === "Styling"
-Use Tailwind class usage intentionally. Avoid "magic numbers" in layouts; use the spacing scale.
+    Use Tailwind class usage intentionally. Avoid "magic numbers" in layouts; use the spacing scale.
 
 === "State"
-Make state handling explicit. Use server components where possible for data fetching to reduce client-side complexity.
+    Make state handling explicit. Use server components where possible for data fetching to reduce client-side complexity.

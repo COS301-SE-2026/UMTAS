@@ -1,7 +1,7 @@
 # Server & Infrastructure Guide
 
 !!! info "Purpose"
-This guide defines how server-side infrastructure is managed, updated, and monitored. It covers the full lifecycle from Docker packaging to Grafana observability.
+    This guide defines how server-side infrastructure is managed, updated, and monitored. It covers the full lifecycle from Docker packaging to Grafana observability.
 
 ---
 
@@ -29,17 +29,22 @@ This guide defines how server-side infrastructure is managed, updated, and monit
 
 ## :material-check-decagram: Definition of Done
 
-??? success "Server Checklist" - [ ] Service configuration is reproducible and versioned. - [ ] Deployment risk is documented (e.g. downtime required?). - [ ] Monitoring impact considered (new dashboard needed?). - [ ] Rollback plan is clear. - [ ] CI/CD container build tests pass.
+??? success "Server Checklist"
+    - [ ] Service configuration is reproducible and versioned.
+    - [ ] Deployment risk is documented (e.g. downtime required?).
+    - [ ] Monitoring impact considered (new dashboard needed?).
+    - [ ] Rollback plan is clear.
+    - [ ] CI/CD container build tests pass.
 
 ---
 
 ## :material-monitor-eye: Monitoring & Logging
 
 === "Prometheus (Metrics)"
-Collects numeric data (CPU, RAM, Request counts). Every new service must expose a `/metrics` endpoint.
+    Collects numeric data (CPU, RAM, Request counts). Every new service must expose a `/metrics` endpoint.
 
 === "Loki (Logs)"
-Aggregates all container logs. Use `docker logs` labels to ensure logs are correctly tagged in Grafana.
+    Aggregates all container logs. Use `docker logs` labels to ensure logs are correctly tagged in Grafana.
 
 === "Grafana (Dashboards)"
-The single pane of glass. Ensure new infrastructure changes are reflected in the **System Health** dashboard.
+    The single pane of glass. Ensure new infrastructure changes are reflected in the **System Health** dashboard.

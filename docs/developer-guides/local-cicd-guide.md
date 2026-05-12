@@ -1,7 +1,7 @@
 # Local CI/CD Guide
 
 !!! info "Purpose"
-This guide defines the checks developers should run locally before pushing code. The goal is to catch issues in the "inner loop" before they reach the remote GitHub Actions pipeline.
+    This guide defines the checks developers should run locally before pushing code. The goal is to catch issues in the "inner loop" before they reach the remote GitHub Actions pipeline.
 
 ---
 
@@ -30,14 +30,19 @@ As a core part of **TDD**, your local validation loop is the fastest feedback yo
 
 ## :material-check-decagram: Definition of Done
 
-??? success "Pre-Push Checklist" - [ ] All linting issues resolved. - [ ] `pnpm build` succeeds for all affected packages. - [ ] Unit and Integration tests are 100% green. - [ ] Relevant `act` workflows pass locally. - [ ] Branch is up-to-date with `dev`.
+??? success "Pre-Push Checklist"
+    - [ ] All linting issues resolved.
+    - [ ] `pnpm build` succeeds for all affected packages.
+    - [ ] Unit and Integration tests are 100% green.
+    - [ ] Relevant `act` workflows pass locally.
+    - [ ] Branch is up-to-date with `dev`.
 
 ---
 
 ## :material-layers: Best Practices
 
 === "Using `act`"
-`act` allows you to run your GitHub Actions workflows inside Docker containers on your local machine.
+    `act` allows you to run your GitHub Actions workflows inside Docker containers on your local machine.
 
     ```bash
     # Run the default push workflow
@@ -45,7 +50,7 @@ As a core part of **TDD**, your local validation loop is the fastest feedback yo
     ```
 
 === "PGLite Parity"
-Always use **PGLite** for local checks if the CI uses it. This ensures that database-dependent tests behave identically on your machine and the runner.
+    Always use **PGLite** for local checks if the CI uses it. This ensures that database-dependent tests behave identically on your machine and the runner.
 
 === "CI as Confirmation"
-Treat remote CI as **confirmation**, not discovery. If CI fails, it usually means a local check was skipped.
+    Treat remote CI as **confirmation**, not discovery. If CI fails, it usually means a local check was skipped.

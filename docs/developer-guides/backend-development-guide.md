@@ -1,7 +1,7 @@
 # Backend Development Guide
 
 !!! info "Purpose"
-This guide defines the expected workflow for building backend features and endpoints in a consistent, review-friendly way using our modern stack.
+    This guide defines the expected workflow for building backend features and endpoints in a consistent, review-friendly way using our modern stack.
 
 ---
 
@@ -31,14 +31,20 @@ This guide defines the expected workflow for building backend features and endpo
 
 ## :material-check-decagram: Definition of Done
 
-??? success "Backend Checklist" - [ ] Work is isolated in a feature branch. - [ ] Swagger definitions are complete and tested. - [ ] Unit and Integration tests are passed. - [ ] Drizzle migrations are generated and tested. - [ ] CI passes successfully. - [ ] Code follows the [Core-and-Adapter](../diagrams/architecture/Adapter-Pattern.md) pattern.
+??? success "Backend Checklist"
+    - [ ] Work is isolated in a feature branch.
+    - [ ] Swagger definitions are complete and tested.
+    - [ ] Unit and Integration tests are passed.
+    - [ ] Drizzle migrations are generated and tested.
+    - [ ] CI passes successfully.
+    - [ ] Code follows the [Core-and-Adapter](../diagrams/architecture/Adapter-Pattern.md) pattern.
 
 ---
 
 ## :material-database: Database Strategy
 
 === "DrizzleORM (Default)"
-Use Drizzle for all core entity management. Ensure schemas are located in `packages/database/schema`.
+    Use Drizzle for all core entity management. Ensure schemas are located in `packages/database/schema`.
 
     ```typescript
     export const users = pgTable('users', {
@@ -48,7 +54,7 @@ Use Drizzle for all core entity management. Ensure schemas are located in `packa
     ```
 
 === "PGLite (Testing)"
-Use PGLite for lightning-fast, isolated unit tests. No Docker required.
+    Use PGLite for lightning-fast, isolated unit tests. No Docker required.
 
     ```bash
     pnpm run test:pglite

@@ -1,7 +1,7 @@
 # Git Strategy Guide
 
 !!! info "Purpose"
-This guide defines how we use branches and pull requests so collaboration stays clean, predictable, and easy to review.
+    This guide defines how we use branches and pull requests so collaboration stays clean, predictable, and easy to review.
 
 ---
 
@@ -35,7 +35,14 @@ Follow these steps for every new feature or bug fix:
 
 ## :material-check-decagram: Definition of Done
 
-??? success "Criteria for a Merge-Ready Branch" - [ ] Work is isolated in a dedicated branch. - [ ] The branch targets `dev`. - [ ] The PR is complete and review-ready. - [ ] Related issues are linked. - [ ] Merge conflicts are resolved. - [ ] CI passes successfully. - [ ] The branch history is understandable enough to review.
+??? success "Criteria for a Merge-Ready Branch"
+    - [ ] Work is isolated in a dedicated branch.
+    - [ ] The branch targets `dev`.
+    - [ ] The PR is complete and review-ready.
+    - [ ] Related issues are linked.
+    - [ ] Merge conflicts are resolved.
+    - [ ] CI passes successfully.
+    - [ ] The branch history is understandable enough to review.
 
 ---
 
@@ -52,8 +59,9 @@ Every PR should include a clear title, description, and the following metadata:
 | **Reviewer**      | Assign at least one teammate               |
 
 ??? note "Pull Request Template (Copy/Paste)"
-```markdown ## Objective
-[What are we trying to achieve?]
+    ```markdown
+    ## Objective
+    [What are we trying to achieve?]
 
     ## Changes
     - [Change 1]

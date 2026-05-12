@@ -1,7 +1,7 @@
 # Unit Testing Guide
 
 !!! info "Purpose"
-This guide defines how we write and maintain unit tests so logic can be validated quickly and consistently across all services.
+    This guide defines how we write and maintain unit tests so logic can be validated quickly and consistently across all services.
 
 ---
 
@@ -28,20 +28,28 @@ Unit testing forms the core of our **Red-Green-Refactor** workflow. The fundamen
 
 ## :material-check-decagram: Definition of Done
 
-??? success "Unit Test Checklist" - [ ] Happy path and edge cases are covered. - [ ] Tests are readable, stable, and deterministic. - [ ] Test names clearly describe the expected behavior. - [ ] Suite passes locally in under 30 seconds. - [ ] CI coverage requirements are met.
+??? success "Unit Test Checklist"
+    - [ ] Happy path and edge cases are covered.
+    - [ ] Tests are readable, stable, and deterministic.
+    - [ ] Test names clearly describe the expected behavior.
+    - [ ] Suite passes locally in under 30 seconds.
+    - [ ] CI coverage requirements are met.
 
 ---
 
 ## :material-lightbulb: Best Practices
 
-=== "What to Test" - Utility functions and pure logic. - Isolated business rules (e.g. scheduling constraints). - Component behavior in isolation (rendering, events).
+=== "What to Test"
+    - Utility functions and pure logic.
+    - Isolated business rules (e.g. scheduling constraints).
+    - Component behavior in isolation (rendering, events).
 
 === "Naming"
-Use descriptive names that read like a sentence:
+    Use descriptive names that read like a sentence:
 
     ```typescript
     it('should return 400 if the date is in the past', () => { ... })
     ```
 
 === "Mocking"
-Avoid over-mocking. If you need to mock more than 3 dependencies, your function might be doing too much.
+    Avoid over-mocking. If you need to mock more than 3 dependencies, your function might be doing too much.
