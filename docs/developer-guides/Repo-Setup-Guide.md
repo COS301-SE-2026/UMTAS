@@ -5,7 +5,7 @@ _Written by Marcel Stoltz_
 
 ---
 
-## :material-bullseye: Purpose
+## :material-target: Purpose
 
 This guide serves as a repo setup guide for the **2026 Vigil Capstone Team**, specifically for the UMTAS Project.
 

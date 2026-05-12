@@ -42,7 +42,7 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
 - **Student Number:** u24569705
 - **LinkedIn:** [Michael Tomlinson](https://www.linkedin.com/in/michaeltomlinson)
 - **GitHub:** [michaeltomlinsontuks](https://github.com/michaeltomlinsontuks)
-- **Bio:** Third-year Computer Science student. Currently a Software Developer Intern at Tyto Insights, with prior experience migrating legacy systems to modern stacks at DCS Engineering. Michael serves as the System Architect, specialising in the UMTAS core stack: PostgreSQL, TypeORM, Nest.js, and Next.js. He is responsible for the Core-and-Adapter pattern implementation, ensuring the system remains university-agnostic. His Tuks PDF Calendar project provides the foundational domain expertise required for the project's complex PDF parsing challenges.
+- **Bio:** Third-year Computer Science student. Currently a Software Developer Intern at Tyto Insights, with prior experience migrating legacy systems to modern stacks at DCS Engineering. Michael serves as the System Architect, specialising in the UMTAS core stack: PostgreSQL, DrizzleORM, NestJS, and Next.js. He is responsible for the Core-and-Adapter pattern implementation, ensuring the system remains university-agnostic. His Tuks PDF Calendar project provides the foundational domain expertise required for the project's complex PDF parsing challenges.
 
 </div>
 
@@ -85,7 +85,7 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
 - **Role:** DevOps Lead & Backend Specialist
 - **Student Number:** u24566552
 - **LinkedIn:** [Marcel Stoltz](https://www.linkedin.com/in/marcel-stoltz/)
-- **Bio:** Third-year Computer Science student and Software Developer Intern at Tyto Insights (Skunkworks division). Marcel leads the DevOps and Infrastructure workstream, specialising in Docker environments and automated deployment pipelines. With a technical focus on system availability and CI/CD execution, he ensures the Nest.js backend and PostgreSQL services are optimised for high-performance delivery. His previous work at Gendac provides the backend versatility necessary to support the project.
+- **Bio:** Third-year Computer Science student and Software Developer Intern at Tyto Insights (Skunkworks division). Marcel leads the DevOps and Infrastructure workstream, specialising in Docker environments and automated deployment pipelines. With a technical focus on system availability and CI/CD execution, he ensures the NestJS backend and PostgreSQL services are optimised for high-performance delivery. His previous work at Gendac provides the backend versatility necessary to support the project.
 
 </div>
 

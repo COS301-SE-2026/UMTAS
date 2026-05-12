@@ -1,3 +1,0 @@
-# WatchTower
-
-![WatchTower](../DevOps.drawio)
