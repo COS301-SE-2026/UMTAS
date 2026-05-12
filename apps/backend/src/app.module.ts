@@ -1,13 +1,15 @@
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
-import { AppController } from './app.controller.js';
-import { AppService } from './app.service.js';
-import { DatabaseModule } from './db/database.module.js';
-import { HealthModule } from './health/health.module.js';
-import { AuthController } from './auth/auth.controller.js';
-import { AuthService } from './auth/auth.service.js';
-import { RolesGuard } from './auth/roles.guard.js';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { DatabaseModule } from './db/database.module';
+import { HealthModule } from './health/health.module';
+import { MailModule } from './mail/mail.module';
+import { AuthController } from './auth/auth.controller';
+import { AuthService } from './auth/auth.service';
+import { AuthGuard } from './auth/auth.guard';
+import { RolesGuard } from './auth/roles.guard';
 
 @Module({
   imports: [
@@ -17,11 +19,16 @@ import { RolesGuard } from './auth/roles.guard.js';
     }),
     DatabaseModule,
     HealthModule,
+    MailModule,
   ],
   controllers: [AppController, AuthController],
   providers: [
     AppService,
     AuthService,
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
     {
       provide: APP_GUARD,
       useClass: RolesGuard,

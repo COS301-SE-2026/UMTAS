@@ -1,1 +1,1 @@
-export * from './hello-world.schema.js';
+export * from './hello-world.schema';
