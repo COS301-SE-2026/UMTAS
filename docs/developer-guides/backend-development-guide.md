@@ -31,7 +31,7 @@ This guide defines the expected workflow for building backend features and endpo
 
 ## :material-check-decagram: Definition of Done
 
-??? success "Backend Checklist" - [ ] Work is isolated in a feature branch. - [ ] Swagger definitions are complete and tested. - [ ] Unit and Integration tests are passed. - [ ] Drizzle migrations are generated and tested. - [ ] CI passes successfully. - [ ] Code follows the [Core-and-Adapter](../../diagrams/architecture/Adapter-Pattern.md) pattern.
+??? success "Backend Checklist" - [ ] Work is isolated in a feature branch. - [ ] Swagger definitions are complete and tested. - [ ] Unit and Integration tests are passed. - [ ] Drizzle migrations are generated and tested. - [ ] CI passes successfully. - [ ] Code follows the [Core-and-Adapter](../diagrams/architecture/Adapter-Pattern.md) pattern.
 
 ---
 

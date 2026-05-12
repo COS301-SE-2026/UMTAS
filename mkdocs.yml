@@ -21,15 +21,22 @@ theme:
     - navigation.sections
     - navigation.top
     - navigation.footer
+    - navigation.indexes
     - toc.follow
     - search.suggest
     - search.highlight
     - content.code.copy
+    - content.tabs.link
 
 plugins:
   - search
   - drawio
   - swagger-ui-tag
+  - minify:
+      minify_html: true
+  - git-revision-date-localized:
+      enable_creation_date: true
+      type: timeago
 
 markdown_extensions:
   - md_in_html
@@ -47,6 +54,8 @@ markdown_extensions:
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
   - attr_list
   - tables
+  - toc:
+      permalink: true
 
 nav:
   - Home: index.md

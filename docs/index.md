@@ -2,7 +2,7 @@
 
 <div style="display: flex; justify-content: center; align-items: center; gap: 60px; margin-top: 40px; margin-bottom: 30px;">
   <img src="assets/images/VigilOWL.png" width="120">
-  <img src="assets/images/tyto_insights_cover.jpeg" width="280">
+  <img src="assets/images/Tytobanner.svg" width="280">
 </div>
 
 # UMTAS

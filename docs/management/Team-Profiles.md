@@ -85,6 +85,7 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
 - **Role:** DevOps Lead & Backend Specialist
 - **Student Number:** u24566552
 - **LinkedIn:** [Marcel Stoltz](https://www.linkedin.com/in/marcel-stoltz/)
+- **GitHub:** [marcelstoltz00](https://github.com/marcelstoltz00)
 - **Bio:** Third-year Computer Science student and Software Developer Intern at Tyto Insights (Skunkworks division). Marcel leads the DevOps and Infrastructure workstream, specialising in Docker environments and automated deployment pipelines. With a technical focus on system availability and CI/CD execution, he ensures the NestJS backend and PostgreSQL services are optimised for high-performance delivery. His previous work at Gendac provides the backend versatility necessary to support the project.
 
 </div>
