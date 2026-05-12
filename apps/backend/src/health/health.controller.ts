@@ -1,6 +1,6 @@
 import { Controller, Post } from '@nestjs/common';
-import { HealthService } from './health.service.js';
-import { Roles } from '../auth/roles.guard.js';
+import { HealthService } from './health.service';
+import { Roles } from '../auth/roles.guard';
 
 @Controller('health')
 export class HealthController {
