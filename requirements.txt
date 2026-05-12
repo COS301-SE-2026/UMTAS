@@ -1,4 +1,4 @@
-mkdocs-material>=9.5.0
+mkdocs-material[imaging]>=9.5.0
 mkdocs-drawio>=1.6.0
 mkdocs-swagger-ui-tag>=0.6.10
 pymdown-extensions>=10.7.0
