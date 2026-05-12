@@ -1,8 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { eq } from 'drizzle-orm';
-import { DatabaseService } from './database.service.js';
-import { usersTable } from '../entities/index.js';
+import { DatabaseService } from './database.service';
+import { usersTable } from '../entities/index';
+import { AuthSeed } from './seeds/auth.seed';
 
 interface SeedTask {
   name: string;
@@ -22,6 +23,10 @@ export class DatabaseSeedService {
       {
         name: 'default-system-admin',
         run: this.seedDefaultSystemAdmin.bind(this),
+      },
+      {
+        name: 'auth-seed',
+        run: this.seedAuthTestData.bind(this),
       },
     ];
 
@@ -93,10 +98,15 @@ export class DatabaseSeedService {
       id: seedUserId,
       name: seedName,
       email: seedEmail,
-      role: 'system_admin',
+      role: 'sys_admin',
       emailVerified: true,
     });
 
     this.logger.log(`Seeded default system admin user (${seedEmail}).`);
+  }
+
+  private async seedAuthTestData(): Promise<void> {
+    const authSeed = new AuthSeed();
+    await authSeed.run(this.dbService);
   }
 }
