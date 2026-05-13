@@ -20,6 +20,8 @@ jspm_packages/
 package-lock.json
 yarn.lock
 
+.turbo
+
 
 # Next.js build output
 .next/
