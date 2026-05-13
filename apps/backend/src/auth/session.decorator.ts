@@ -28,9 +28,12 @@ export interface SessionData {
   };
 }
 
-export const CurrentSession = createParamDecorator(
-  (_data: unknown, ctx: ExecutionContext): SessionData => {
-    const req = ctx.switchToHttp().getRequest<IncomingMessage>();
-    return (req as any).session;
-  },
-);
+export const currentSessionFactory = (
+  _data: unknown,
+  ctx: ExecutionContext,
+): SessionData => {
+  const req = ctx.switchToHttp().getRequest<IncomingMessage>();
+  return (req as any).session;
+};
+
+export const CurrentSession = createParamDecorator(currentSessionFactory);

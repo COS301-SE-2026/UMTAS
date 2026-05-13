@@ -1,4 +1,3 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { RolesGuard, ROLES_KEY } from './roles.guard';
 import { AuthService } from './auth.service';
@@ -6,7 +5,6 @@ import type { AuthSession } from './auth';
 
 describe('RolesGuard', () => {
   let guard: RolesGuard;
-  let authService: AuthService;
 
   const mockAuthService = {
     getAuth: jest.fn().mockReturnValue({
@@ -16,19 +14,8 @@ describe('RolesGuard', () => {
     }),
   };
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        RolesGuard,
-        {
-          provide: AuthService,
-          useValue: mockAuthService,
-        },
-      ],
-    }).compile();
-
-    guard = module.get<RolesGuard>(RolesGuard);
-    authService = module.get<AuthService>(AuthService);
+  beforeEach(() => {
+    guard = new RolesGuard(mockAuthService as unknown as AuthService);
   });
 
   describe('canActivate', () => {
@@ -82,7 +69,7 @@ describe('RolesGuard', () => {
       };
 
       jest.spyOn(Reflect, 'getMetadata').mockReturnValue(requiredRoles);
-      mockRequest.authSession = mockSession;
+      mockRequest.session = mockSession;
 
       const result = await guard.canActivate(mockExecutionContext);
       expect(result).toBe(true);
@@ -112,7 +99,7 @@ describe('RolesGuard', () => {
       };
 
       jest.spyOn(Reflect, 'getMetadata').mockReturnValue(requiredRoles);
-      mockRequest.authSession = mockSession;
+      mockRequest.session = mockSession;
 
       await expect(guard.canActivate(mockExecutionContext)).rejects.toThrow(
         ForbiddenException,
@@ -166,7 +153,7 @@ describe('RolesGuard', () => {
 
       const result = await guard.canActivate(mockExecutionContext);
       expect(result).toBe(true);
-      expect(mockRequest.authSession).toEqual(mockSession);
+      expect(mockRequest.session).toEqual(mockSession);
     });
 
     it('should allow multiple valid roles', async () => {
@@ -193,7 +180,7 @@ describe('RolesGuard', () => {
       };
 
       jest.spyOn(Reflect, 'getMetadata').mockReturnValue(requiredRoles);
-      mockRequest.authSession = mockSession;
+      mockRequest.session = mockSession;
 
       const result = await guard.canActivate(mockExecutionContext);
       expect(result).toBe(true);
