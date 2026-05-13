@@ -1,4 +1,5 @@
 import { Logger } from '@nestjs/common';
+import { hashPassword } from 'better-auth/crypto';
 import { DatabaseService } from '../database.service';
 import {
   usersTable,
@@ -7,6 +8,8 @@ import {
   verificationsTable,
 } from '../../entities';
 import { eq } from 'drizzle-orm';
+
+export const TEST_PASSWORD = 'Test@UMTAS2024!';
 
 export interface ISeedMigration {
   name: string;
@@ -76,7 +79,6 @@ export class AuthSeed implements ISeedMigration {
         banned: false,
         banReason: null,
         banExpires: null,
-        timezone: 'Africa/Johannesburg',
         createdAt: now,
         updatedAt: now,
       },
@@ -90,7 +92,6 @@ export class AuthSeed implements ISeedMigration {
         banned: false,
         banReason: null,
         banExpires: null,
-        timezone: 'Africa/Johannesburg',
         createdAt: now,
         updatedAt: now,
       },
@@ -104,7 +105,6 @@ export class AuthSeed implements ISeedMigration {
         banned: false,
         banReason: null,
         banExpires: null,
-        timezone: 'Africa/Johannesburg',
         createdAt: now,
         updatedAt: now,
       },
@@ -118,7 +118,6 @@ export class AuthSeed implements ISeedMigration {
         banned: false,
         banReason: null,
         banExpires: null,
-        timezone: 'Africa/Johannesburg',
         createdAt: now,
         updatedAt: now,
       },
@@ -186,14 +185,13 @@ export class AuthSeed implements ISeedMigration {
 
   private async seedTestAccounts(db: DatabaseService): Promise<void> {
     const now = new Date();
+    const hashedPassword = await hashPassword(TEST_PASSWORD);
 
-    // Seeded with credential provider (email/password auth)
-    // In real scenarios, password would be bcrypt hashed
     const accounts = [
       {
         id: 'test-account-student',
         userId: this.testUserIds.student,
-        accountId: 'credential-student',
+        accountId: this.testUserIds.student,
         providerId: 'credential',
         accessToken: null,
         refreshToken: null,
@@ -201,7 +199,7 @@ export class AuthSeed implements ISeedMigration {
         accessTokenExpiresAt: null,
         refreshTokenExpiresAt: null,
         scope: null,
-        password: '$2b$10$mockBcryptHashForTestingPurposes', // Mock bcrypt hash
+        password: hashedPassword,
         createdAt: now,
         updatedAt: now,
       },
@@ -210,10 +208,10 @@ export class AuthSeed implements ISeedMigration {
         userId: this.testUserIds.student,
         accountId: 'google-123456789',
         providerId: 'google',
-        accessToken: 'mock-google-access-token',
-        refreshToken: 'mock-google-refresh-token',
-        idToken: 'mock-google-id-token',
-        accessTokenExpiresAt: new Date(now.getTime() + 3600 * 1000),
+        accessToken: null,
+        refreshToken: null,
+        idToken: null,
+        accessTokenExpiresAt: null,
         refreshTokenExpiresAt: null,
         scope: 'openid email profile',
         password: null,
@@ -223,7 +221,7 @@ export class AuthSeed implements ISeedMigration {
       {
         id: 'test-account-uni-admin',
         userId: this.testUserIds.uniAdmin,
-        accountId: 'credential-uni-admin',
+        accountId: this.testUserIds.uniAdmin,
         providerId: 'credential',
         accessToken: null,
         refreshToken: null,
@@ -231,14 +229,14 @@ export class AuthSeed implements ISeedMigration {
         accessTokenExpiresAt: null,
         refreshTokenExpiresAt: null,
         scope: null,
-        password: '$2b$10$mockBcryptHashForTestingPurposes',
+        password: hashedPassword,
         createdAt: now,
         updatedAt: now,
       },
       {
         id: 'test-account-sys-admin',
         userId: this.testUserIds.sysAdmin,
-        accountId: 'credential-sys-admin',
+        accountId: this.testUserIds.sysAdmin,
         providerId: 'credential',
         accessToken: null,
         refreshToken: null,
@@ -246,7 +244,7 @@ export class AuthSeed implements ISeedMigration {
         accessTokenExpiresAt: null,
         refreshTokenExpiresAt: null,
         scope: null,
-        password: '$2b$10$mockBcryptHashForTestingPurposes',
+        password: hashedPassword,
         createdAt: now,
         updatedAt: now,
       },
