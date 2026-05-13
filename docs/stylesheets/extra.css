@@ -22,16 +22,37 @@
 /* Sidebar Navigation */
 .md-nav__link {
   color: #666 !important;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   font-weight: 500;
+  transition: all 0.2s ease;
 }
 
-.md-nav__link--active,
-.md-nav__link:hover {
+.md-nav__link--active {
   color: #1a1a1a !important;
   font-weight: 700 !important;
+  border-left: 2px solid #1a1a1a;
+  padding-left: calc(0.6rem - 2px);
+}
+
+.md-nav__link:hover {
+  color: #1a1a1a !important;
+}
+
+/* Add top spacing before each new section in the sidebar */
+.md-nav--secondary .md-nav__item:first-child {
+  margin-top: 0.5rem;
+}
+
+/* Section title styling in left nav */
+.md-nav__title {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #999 !important;
+  font-weight: 700;
+  padding: 0.5rem 0.6rem 0.25rem;
 }
 
 /* Typography Overrides */
