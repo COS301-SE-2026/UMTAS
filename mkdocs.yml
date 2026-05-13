@@ -5,8 +5,8 @@ extra_css:
 
 theme:
   name: material
-  logo: assets/images/VigilOWL.png
-  favicon: assets/images/VigilOWL.png
+  logo: assets/LOGOS/VigilOWL-removebg-preview.png
+  favicon: assets/LOGOS/VigilOWL-removebg-preview.png
   icon:
     logo: material/owl
   palette:

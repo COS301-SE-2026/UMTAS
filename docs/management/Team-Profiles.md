@@ -75,7 +75,7 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
 <div class="team-member" style="display: flex; align-items: flex-start; margin-bottom: 40px;" markdown="1">
 
 <div style="flex: 0 0 140px; margin-right: 24px;">
-  <img src="../../assets/images/team/Marcel_PFP.jpeg" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; display: block;" alt="Marcel Stoltz">
+  <img src="../../assets/images/team/Marcel_Stoltz_PFP.png" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; display: block;" alt="Marcel Stoltz">
 </div>
 
 <div style="flex: 1;" markdown="1">
@@ -113,6 +113,20 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
 </div>
 
 </div>
+
+---
+
+---
+
+## :material-handshake: Partners & Affiliations
+
+<div style="display: flex; align-items: center; gap: 48px; flex-wrap: wrap; margin: 24px 0;">
+  <img src="../../assets/images/Tytobanner.svg" width="180" alt="Tyto Insights">
+  <a href="https://dns.africa/c/"><img src="../../assets/LOGOS/DNS_BUSINESS_BLACK_TRANSPARENT.png" width="140" alt="DNS Business"></a>
+  <img src="../../assets/images/UP_Logo.png" width="64" alt="University of Pretoria">
+</div>
+
+UMTAS is a [COS 301](https://www.up.ac.za/) capstone project built in partnership with **[Tyto Insights](https://tyto.africa/)** and **[DNS Business](https://dns.africa/c/)**, under the Faculty of Engineering, Built Environment and Information Technology at the **University of Pretoria**.
 
 ---
 

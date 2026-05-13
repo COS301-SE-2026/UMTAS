@@ -1,15 +1,19 @@
 <div align="center" markdown="1">
 
-<div style="display: flex; justify-content: center; align-items: center; gap: 60px; margin-top: 40px; margin-bottom: 30px;">
-  <img src="assets/images/VigilOWL.png" width="120">
-  <img src="assets/images/Tytobanner.svg" width="280">
+<div style="display: flex; justify-content: center; align-items: center; margin-top: 40px; margin-bottom: 20px;">
+  <img src="assets/images/VigilLogoOwl.png" width="220">
+</div>
+
+<div style="display: flex; justify-content: center; align-items: center; gap: 40px; margin-bottom: 30px;">
+  <a href="https://tyto.africa/"><img src="assets/images/Tytobanner.svg" width="200" alt="Tyto Insights"></a>
+  <a href="https://dns.africa/c/"><img src="assets/LOGOS/DNS_BUSINESS_BLACK_TRANSPARENT.png" width="150" alt="DNS Business"></a>
 </div>
 
 # UMTAS
 
 ### University Management & Timetabling Automation System
 
-**A Strategic Partnership between [Tyto Insights](https://tyto.africa/) and Team Vigil**  
+**A Strategic Partnership between [Tyto Insights](https://tyto.africa/), [DNS Business](https://dns.africa/c/), and Team Vigil**  
 _Built by: Wilmar Smit, Michael Tomlinson, Johan Coetzer, Marcel Stoltz, & Aidan Dawson_
 
 ---

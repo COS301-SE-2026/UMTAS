@@ -2,9 +2,15 @@
 
 <br>
 
-<img src="docs/assets/images/VigilOWL.png" width="90" alt="Team Vigil">
-&nbsp;&nbsp;&nbsp;
-<img src="docs/assets/images/Tytobanner.svg" width="240" alt="Tyto Insights">
+<img src="docs/assets/images/VigilLogoOwl.png" width="220" alt="Team Vigil">
+
+<br><br>
+
+<a href="https://tyto.africa/"><img src="docs/assets/images/Tytobanner.svg" width="200" alt="Tyto Insights"></a>
+&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="https://dns.africa/c/"><img src="docs/assets/LOGOS/DNS_BUSINESS_BLACK_TRANSPARENT.png" width="160" alt="DNS Business"></a>
+&nbsp;&nbsp;&nbsp;&nbsp;
+<img src="docs/assets/images/UP_Logo.png" width="70" alt="University of Pretoria">
 
 <br><br>
 
@@ -12,17 +18,19 @@
 
 **University Management & Timetabling Automation System**
 
-_A strategic partnership between Tyto Insights and Team Vigil_
+_A strategic partnership between Tyto Insights, DNS Business, and Team Vigil_
 
-[![Tyto Insights](https://img.shields.io/badge/Tyto_Insights-tyto.africa-18181b?style=flat-square)](https://tyto.africa/)
+[![Tyto Insights](https://img.shields.io/badge/Tyto_Insights-tyto.africa-18181b?style=for-the-badge)](https://tyto.africa/)
+[![DNS Business](https://img.shields.io/badge/DNS_Business-dns.africa-003366?style=for-the-badge)](https://dns.africa/c/)
+[![University of Pretoria](https://img.shields.io/badge/University_of_Pretoria-COS_301-003B5C?style=for-the-badge)](https://www.up.ac.za/)
 
 <br>
 
-[![Docs](https://img.shields.io/badge/Docs-passing-8CA1AF?style=flat-square&logo=readthedocs&logoColor=white)](https://cos301-se-2026.github.io/UMTAS/)
-[![Issues](https://img.shields.io/github/issues/COS301-SE-2026/UMTAS?style=flat-square&logo=github&logoColor=white&label=Issues)](https://github.com/COS301-SE-2026/UMTAS/issues)
-[![Last Commit](https://img.shields.io/github/last-commit/COS301-SE-2026/UMTAS/dev?style=flat-square&label=Last+Commit)](https://github.com/COS301-SE-2026/UMTAS/commits/dev)
-[![pnpm](https://img.shields.io/badge/pnpm-monorepo-F69220?style=flat-square&logo=pnpm&logoColor=white)](https://pnpm.io/)
-[![Node](https://img.shields.io/badge/Node-%3E%3D20-339933?style=flat-square&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
+[![Docs](https://img.shields.io/badge/Docs-passing-8CA1AF?style=for-the-badge&logo=readthedocs&logoColor=white)](https://cos301-se-2026.github.io/UMTAS/)
+[![Issues](https://img.shields.io/github/issues/COS301-SE-2026/UMTAS?style=for-the-badge&logo=github&logoColor=white&label=Issues)](https://github.com/COS301-SE-2026/UMTAS/issues)
+[![Last Commit](https://img.shields.io/github/last-commit/COS301-SE-2026/UMTAS/dev?style=for-the-badge&label=Last+Commit)](https://github.com/COS301-SE-2026/UMTAS/commits/dev)
+[![pnpm](https://img.shields.io/badge/pnpm-monorepo-F69220?style=for-the-badge&logo=pnpm&logoColor=white)](https://pnpm.io/)
+[![Node](https://img.shields.io/badge/Node-%3E%3D20-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
 
 <!-- Uncomment once GitHub Actions workflow names are confirmed
 [![CI](https://github.com/COS301-SE-2026/UMTAS/actions/workflows/ci.yml/badge.svg?style=flat-square)](https://github.com/COS301-SE-2026/UMTAS/actions/workflows/ci.yml)
@@ -135,7 +143,7 @@ All development follows a **TDD Git Flow**. Feature work is done in short-lived 
 
 <div align="center">
 
-[![Git Strategy Guide](https://img.shields.io/badge/Git_Strategy_Guide-Commit_Conventions_&_PR_Template-3f3f46?style=flat-square&logo=readthedocs&logoColor=white)](https://cos301-se-2026.github.io/UMTAS/developer-guides/git-strategy-guide/)
+[![Git Strategy Guide](https://img.shields.io/badge/Git_Strategy_Guide-Commit_Conventions_&_PR_Template-3f3f46?style=for-the-badge&logo=readthedocs&logoColor=white)](https://cos301-se-2026.github.io/UMTAS/developer-guides/git-strategy-guide/)
 
 </div>
 
@@ -185,8 +193,8 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
         Third-year CS student and primary coordinator between frontend and backend workstreams. Ensures architectural alignment across the full stack and manages the integration of diverse components into a cohesive system. Professional experience at Tyto Insights informs his approach to building scalable, production-ready systems.
       </details>
       <br>
-      <a href="https://www.linkedin.com/in/wilmar-smit-3b11842a3/"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=flat-square&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
-      <a href="https://github.com/wilmar-smit"><img src="https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white" alt="GitHub"></a>
+      <a href="https://www.linkedin.com/in/wilmar-smit-3b11842a3/"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
+      <a href="https://github.com/wilmar-smit"><img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"></a>
     </td>
   </tr>
 </table>
@@ -206,8 +214,8 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
         Third-year CS student and Software Developer Intern at Tyto Insights, with prior experience migrating legacy systems at DCS Engineering. Serves as System Architect, responsible for the Core-and-Adapter pattern that keeps UMTAS university-agnostic. His Tuks PDF Calendar project provides the foundational domain expertise for the platform's PDF parsing challenges.
       </details>
       <br>
-      <a href="https://www.linkedin.com/in/michaeltomlinson"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=flat-square&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
-      <a href="https://github.com/michaeltomlinsontuks"><img src="https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white" alt="GitHub"></a>
+      <a href="https://www.linkedin.com/in/michaeltomlinson"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
+      <a href="https://github.com/michaeltomlinsontuks"><img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"></a>
     </td>
   </tr>
 </table>
@@ -227,8 +235,8 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
         Third-year CS student and Software Developer Intern at Tyto Insights (Skunkworks). As Frontend Lead, manages the Next.js ecosystem with a focus on responsive component architecture and intuitive UX. Bridges complex system logic with the interface to ensure that the heavy data requirements of UMTAS are delivered through a high-performance, accessible dashboard.
       </details>
       <br>
-      <a href="https://www.linkedin.com/in/johan-coetzer-01bb26401"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=flat-square&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
-      <a href="https://github.com/jcoet-gh"><img src="https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white" alt="GitHub"></a>
+      <a href="https://www.linkedin.com/in/johan-coetzer-01bb26401"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
+      <a href="https://github.com/jcoet-gh"><img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"></a>
     </td>
   </tr>
 </table>
@@ -238,7 +246,7 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
 <table>
   <tr>
     <td width="130" valign="top">
-      <img src="docs/assets/images/team/Marcel_PFP.jpeg" width="110" alt="Marcel Stoltz">
+      <img src="docs/assets/images/team/Marcel_Stoltz_PFP.png" width="110" alt="Marcel Stoltz">
     </td>
     <td valign="top">
       <strong>Marcel Stoltz</strong> &nbsp;—&nbsp; DevOps Lead &amp; Backend Specialist<br><br>
@@ -248,8 +256,8 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
         Third-year CS student and Software Developer Intern at Tyto Insights (Skunkworks). Leads the DevOps and infrastructure workstream, specialising in Docker environments and automated deployment pipelines. Ensures the NestJS backend and PostgreSQL services are optimised for high-performance delivery. Previous work at Gendac provides backend versatility across the stack.
       </details>
       <br>
-      <a href="https://www.linkedin.com/in/marcel-stoltz/"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=flat-square&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
-      <a href="https://github.com/marcelstoltz00"><img src="https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white" alt="GitHub"></a>
+      <a href="https://www.linkedin.com/in/marcel-stoltz/"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
+      <a href="https://github.com/marcelstoltz00"><img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"></a>
     </td>
   </tr>
 </table>
@@ -269,8 +277,8 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
         Third-year CS student focused on backend development and contract-driven integration. Responsible for core backend functionality, strict adherence to API contracts across all system components, data integrity and PDF extraction accuracy, and automated testing to maintain reliable interactions between the frontend, backend, and external adapters.
       </details>
       <br>
-      <a href="https://www.linkedin.com/in/aidan-dawson-3514692ba"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=flat-square&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
-      <a href="https://github.com/sdcreek240"><img src="https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white" alt="GitHub"></a>
+      <a href="https://www.linkedin.com/in/aidan-dawson-3514692ba"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
+      <a href="https://github.com/sdcreek240"><img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"></a>
     </td>
   </tr>
 </table>
@@ -287,7 +295,7 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
 
 <div align="center">
 
-[![Repo Setup Guide](https://img.shields.io/badge/Repo_Setup_Guide-Full_Environment_Walkthrough-3f3f46?style=flat-square&logo=readthedocs&logoColor=white)](https://cos301-se-2026.github.io/UMTAS/developer-guides/Repo-Setup-Guide/)
+[![Repo Setup Guide](https://img.shields.io/badge/Repo_Setup_Guide-Full_Environment_Walkthrough-3f3f46?style=for-the-badge&logo=readthedocs&logoColor=white)](https://cos301-se-2026.github.io/UMTAS/developer-guides/Repo-Setup-Guide/)
 
 </div>
 
@@ -423,5 +431,5 @@ Adds Grafana, Prometheus, and Loki to the stack for local observability testing.
 ---
 
 <div align="center">
-<sub>Built by Team Vigil in partnership with Tyto Insights &nbsp;·&nbsp; University of Pretoria &nbsp;·&nbsp; COS 301 Capstone 2026</sub>
+<sub>Built by Team Vigil in partnership with Tyto Insights &amp; DNS Business &nbsp;·&nbsp; University of Pretoria &nbsp;·&nbsp; COS 301 Capstone 2026</sub>
 </div>
