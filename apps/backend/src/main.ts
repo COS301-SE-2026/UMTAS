@@ -26,7 +26,10 @@ async function bootstrap() {
     .addServer(`http://localhost:${port}`, 'Local development')
     .addServer('https://api.umtas.co.za', 'Production')
     .addTag('Health', 'System health checks')
-    .addTag('Auth', 'Authentication endpoints (BetterAuth)')
+    .addTag('Auth Email', 'Email-based authentication and account management')
+    .addTag('Auth Google', 'Google OAuth and account linking')
+    .addTag('Auth Session', 'Session monitoring and management')
+    .addTag('Auth Admin', 'Administrative user management')
     .build();
 
   const document = SwaggerModule.createDocument(app, swaggerConfig);

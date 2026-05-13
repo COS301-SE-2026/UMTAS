@@ -1,4 +1,13 @@
-import { All, Controller, Get, Logger, Post, Req, Res } from '@nestjs/common';
+import {
+  All,
+  Body,
+  Controller,
+  Get,
+  Logger,
+  Post,
+  Req,
+  Res,
+} from '@nestjs/common';
 import {
   ApiBody,
   ApiCookieAuth,
@@ -10,6 +19,7 @@ import {
 } from '@nestjs/swagger';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { AuthService } from './auth.service';
+import { Public } from './auth.guard';
 import {
   AdminBanUserDto,
   AdminCreateUserDto,
@@ -26,11 +36,11 @@ import {
 
 const USER_EXAMPLE = {
   id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
-  email: 'user@example.com',
-  name: 'John Doe',
-  emailVerified: false,
+  email: 'system-admin@local.umtas',
+  name: 'System Admin',
+  emailVerified: true,
   image: null,
-  role: 'student',
+  role: 'sys_admin',
   banned: false,
   createdAt: '2025-01-01T00:00:00Z',
   updatedAt: '2025-01-01T00:00:00Z',
@@ -49,7 +59,7 @@ const SESSION_EXAMPLE = {
 
 const AUTH_RESPONSE_EXAMPLE = { user: USER_EXAMPLE, session: SESSION_EXAMPLE };
 
-@ApiTags('Auth')
+@Public()
 @Controller('api/auth')
 export class AuthController {
   private readonly logger = new Logger(AuthController.name);
@@ -58,6 +68,7 @@ export class AuthController {
 
   // ─── Registration ─────────────────────────────────────────────────────────────
 
+  @ApiTags('Auth Email')
   @Post('sign-up/email')
   @ApiOperation({
     summary: 'Register with email and password',
@@ -86,12 +97,15 @@ export class AuthController {
   async signUpEmail(
     @Req() req: IncomingMessage,
     @Res() res: ServerResponse,
+    @Body() body: SignUpEmailDto,
   ): Promise<void> {
+    this.logger.log(`Sign-up attempt for user: ${body.email}`);
     return this.handleRequest(req, res);
   }
 
   // ─── Sign in ──────────────────────────────────────────────────────────────────
 
+  @ApiTags('Auth Email')
   @Post('sign-in/email')
   @ApiOperation({
     summary: 'Sign in with email and password',
@@ -117,12 +131,15 @@ export class AuthController {
   async signInEmail(
     @Req() req: IncomingMessage,
     @Res() res: ServerResponse,
+    @Body() body: SignInEmailDto,
   ): Promise<void> {
+    this.logger.log(`Login attempt for user: ${body.email}`);
     return this.handleRequest(req, res);
   }
 
   // ─── Sign out ─────────────────────────────────────────────────────────────────
 
+  @ApiTags('Auth Session')
   @Post('sign-out')
   @ApiCookieAuth('umtas-session')
   @ApiOperation({
@@ -148,6 +165,7 @@ export class AuthController {
 
   // ─── Session management ───────────────────────────────────────────────────────
 
+  @ApiTags('Auth Session')
   @Get('session')
   @ApiCookieAuth('umtas-session')
   @ApiOperation({
@@ -171,6 +189,7 @@ export class AuthController {
     return this.handleRequest(req, res);
   }
 
+  @ApiTags('Auth Session')
   @Get('list-sessions')
   @ApiCookieAuth('umtas-session')
   @ApiOperation({
@@ -194,6 +213,7 @@ export class AuthController {
     return this.handleRequest(req, res);
   }
 
+  @ApiTags('Auth Session')
   @Post('revoke-session')
   @ApiCookieAuth('umtas-session')
   @ApiOperation({
@@ -219,12 +239,14 @@ export class AuthController {
   async revokeSession(
     @Req() req: IncomingMessage,
     @Res() res: ServerResponse,
+    @Body() _body: RevokeSessionDto,
   ): Promise<void> {
     return this.handleRequest(req, res);
   }
 
   // ─── Email verification ───────────────────────────────────────────────────────
 
+  @ApiTags('Auth Email')
   @Post('send-verification-email')
   @ApiCookieAuth('umtas-session')
   @ApiOperation({
@@ -254,6 +276,7 @@ export class AuthController {
     return this.handleRequest(req, res);
   }
 
+  @ApiTags('Auth Email')
   @Post('verify-email')
   @ApiOperation({
     summary: 'Verify email address using the code from the verification email',
@@ -273,12 +296,14 @@ export class AuthController {
   async verifyEmail(
     @Req() req: IncomingMessage,
     @Res() res: ServerResponse,
+    @Body() _body: VerifyEmailDto,
   ): Promise<void> {
     return this.handleRequest(req, res);
   }
 
   // ─── Password reset ───────────────────────────────────────────────────────────
 
+  @ApiTags('Auth Email')
   @Post('forget-password')
   @ApiOperation({
     summary: 'Request a password reset email',
@@ -295,10 +320,12 @@ export class AuthController {
   async forgetPassword(
     @Req() req: IncomingMessage,
     @Res() res: ServerResponse,
+    @Body() _body: ForgetPasswordDto,
   ): Promise<void> {
     return this.handleRequest(req, res);
   }
 
+  @ApiTags('Auth Email')
   @Post('reset-password')
   @ApiOperation({
     summary: 'Reset password using the token from the reset email',
@@ -318,12 +345,14 @@ export class AuthController {
   async resetPassword(
     @Req() req: IncomingMessage,
     @Res() res: ServerResponse,
+    @Body() _body: ResetPasswordDto,
   ): Promise<void> {
     return this.handleRequest(req, res);
   }
 
   // ─── Change password ──────────────────────────────────────────────────────────
 
+  @ApiTags('Auth Email')
   @Post('change-password')
   @ApiCookieAuth('umtas-session')
   @ApiOperation({
@@ -349,12 +378,14 @@ export class AuthController {
   async changePassword(
     @Req() req: IncomingMessage,
     @Res() res: ServerResponse,
+    @Body() _body: ChangePasswordDto,
   ): Promise<void> {
     return this.handleRequest(req, res);
   }
 
   // ─── Google OAuth ─────────────────────────────────────────────────────────────
 
+  @ApiTags('Auth Google')
   @Get('callback/google')
   @ApiOperation({
     summary: 'Google OAuth callback',
@@ -386,9 +417,11 @@ export class AuthController {
     @Req() req: IncomingMessage,
     @Res() res: ServerResponse,
   ): Promise<void> {
+    this.logger.log('Google OAuth callback received');
     return this.handleRequest(req, res);
   }
 
+  @ApiTags('Auth Google')
   @Post('link-account/google')
   @ApiCookieAuth('umtas-session')
   @ApiOperation({
@@ -420,12 +453,14 @@ export class AuthController {
   async linkGoogleAccount(
     @Req() req: IncomingMessage,
     @Res() res: ServerResponse,
+    @Body() _body: LinkGoogleAccountDto,
   ): Promise<void> {
     return this.handleRequest(req, res);
   }
 
   // ─── Admin ────────────────────────────────────────────────────────────────────
 
+  @ApiTags('Auth Admin')
   @Post('admin/create-user')
   @ApiCookieAuth('umtas-session')
   @ApiOperation({
@@ -456,10 +491,12 @@ export class AuthController {
   async adminCreateUser(
     @Req() req: IncomingMessage,
     @Res() res: ServerResponse,
+    @Body() _body: AdminCreateUserDto,
   ): Promise<void> {
     return this.handleRequest(req, res);
   }
 
+  @ApiTags('Auth Admin')
   @Post('admin/ban-user')
   @ApiCookieAuth('umtas-session')
   @ApiOperation({
@@ -490,10 +527,12 @@ export class AuthController {
   async adminBanUser(
     @Req() req: IncomingMessage,
     @Res() res: ServerResponse,
+    @Body() _body: AdminBanUserDto,
   ): Promise<void> {
     return this.handleRequest(req, res);
   }
 
+  @ApiTags('Auth Admin')
   @Post('admin/update-user')
   @ApiCookieAuth('umtas-session')
   @ApiOperation({
@@ -529,13 +568,14 @@ export class AuthController {
   async adminUpdateUser(
     @Req() req: IncomingMessage,
     @Res() res: ServerResponse,
+    @Body() _body: AdminUpdateUserDto,
   ): Promise<void> {
     return this.handleRequest(req, res);
   }
 
   // ─── Catch-all for internal BetterAuth routes ─────────────────────────────────
 
-  @All('*')
+  @All('*path')
   @ApiExcludeEndpoint()
   async handler(
     @Req() req: IncomingMessage,
