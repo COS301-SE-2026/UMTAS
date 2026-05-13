@@ -31,6 +31,7 @@ theme:
 plugins:
   - search
   - drawio
+  - kroki:
   - swagger-ui-tag
   - minify:
       minify_html: true
@@ -61,19 +62,30 @@ nav:
   - Home: index.md
   - Marking Guide: management/Marking-Guide.md
   - Requirements (SRS):
-      - 4.1.1 Introduction: requirements/Introduction.md
-      - 4.1.2 Domain Model: requirements/Domain-Model.md
-      - 4.1.3 User Stories: requirements/User-Stories.md
-      - 4.1.4 Use Cases: requirements/Use-Cases.md
-      - 4.1.5 Functional Requirements: requirements/Functional-Requirements.md
-      - 4.1.6 Quality Requirements: requirements/Quality-Requirements.md
-      - 4.1.7 Architectural Requirements: requirements/Architectural-Requirements.md
-      - 4.1.8 Technology Requirements: requirements/Technology-Requirements.md
-      - 4.1.9 Traceability Matrix: requirements/Traceability-Matrix.md
-      - 4.1.10 API Service Contracts: requirements/API-Service-Contracts.md
+      - Introduction: requirements/Introduction.md
+      - Functional Requirements: requirements/Functional-Requirements.md
+      - User Stories & Characteristics: requirements/User-Stories.md
+      - Domain Model: requirements/Domain-Model.md
+      - Use Cases: requirements/Use-Cases.md
+      - Quality Requirements: requirements/Quality-Requirements.md
+      - Architectural Requirements: requirements/Architectural-Requirements.md
+      - Technology Requirements: requirements/Technology-Requirements.md
+      - API Service Contracts: requirements/API-Service-Contracts.md
+      - Traceability Matrix: requirements/Traceability-Matrix.md
+      - SRS Brief: requirements/SRS-Brief.md
+  - Architecture:
+      - Overall Architecture: architecture/Overall-Architecture.md
+      - Core API: architecture/Core-API.md
+      - Scheduling Solver: architecture/Scheduling-Solver.md
+      - PDF Parser & Job Queue: architecture/PDF-Parser.md
+      - University API Adapter: architecture/University-API-Adapter.md
+      - Frontend Component: architecture/Frontend-Component.md
+      - Architecture Summary: architecture/Architecture-Summary.md
+      - Architecture Brief: architecture/Architecture-Brief.md
   - Design Specifications:
-      - 4.2.1 Brand Style: design/Brand-Style.md
-      - 4.2.2 Wireframes: design/Wireframes.md
+      - Brand Style Guide: design/Brand-Style-Guide.md
+      - Wireframes: design/Wireframes.md
+      - Design Brief: design/Design-Brief.md
   - Diagrams Repository: diagrams/README.md
   - API Reference: api/API-Reference.md
   - Developer Portal:
