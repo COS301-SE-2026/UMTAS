@@ -112,3 +112,7 @@ Temporary Items
 
 # Drizzle
 **/drizzle/meta/
+
+# Documentation
+site/
+working_docs/
