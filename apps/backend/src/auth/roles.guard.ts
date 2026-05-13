@@ -43,7 +43,7 @@ export class RolesGuard implements CanActivate {
     requiredRoles: AppRole[],
   ): Promise<boolean> {
     let session: AuthSession | null =
-      (request as unknown as Record<string, unknown>).authSession ?? null;
+      (request as unknown as Record<string, unknown>).session ?? null;
 
     if (!session && (request.headers.cookie || request.headers.authorization)) {
       const headers = new Headers();
@@ -57,7 +57,7 @@ export class RolesGuard implements CanActivate {
         const data = await auth.api.getSession({ headers });
         if (data) {
           session = data as AuthSession;
-          (request as unknown as Record<string, unknown>).authSession = session;
+          (request as unknown as Record<string, unknown>).session = session;
         }
       } catch (err) {
         this.logger.error('Failed to fetch session via auth API', err);
@@ -69,6 +69,9 @@ export class RolesGuard implements CanActivate {
     }
 
     const userRole = (session.user as { role?: unknown }).role as AppRole;
+    if (userRole === 'sys_admin') {
+      return true;
+    }
     const hasRole = requiredRoles.includes(userRole);
 
     if (!hasRole) {

@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ExecutionContext } from '@nestjs/common';
-import { CurrentSession } from './session.decorator';
+import { currentSessionFactory } from './session.decorator';
 
 describe('CurrentSession Decorator', () => {
   it('should extract session from request', () => {
@@ -36,14 +36,7 @@ describe('CurrentSession Decorator', () => {
       }),
     } as unknown as ExecutionContext;
 
-    const factory = CurrentSession.createParamDecorator(
-      (_data: unknown, ctx: ExecutionContext) => {
-        const req = ctx.switchToHttp().getRequest();
-        return req.session;
-      },
-    );
-
-    const result = factory(undefined, mockExecutionContext);
+    const result = currentSessionFactory(undefined, mockExecutionContext);
     expect(result).toEqual(mockSession);
     expect(result.user.id).toBe('user-1');
     expect(result.session.token).toBe('token-123');
@@ -56,14 +49,7 @@ describe('CurrentSession Decorator', () => {
       }),
     } as unknown as ExecutionContext;
 
-    const factory = CurrentSession.createParamDecorator(
-      (_data: unknown, ctx: ExecutionContext) => {
-        const req = ctx.switchToHttp().getRequest();
-        return req.session;
-      },
-    );
-
-    const result = factory(undefined, mockExecutionContext);
+    const result = currentSessionFactory(undefined, mockExecutionContext);
     expect(result).toBeUndefined();
   });
 
@@ -103,14 +89,7 @@ describe('CurrentSession Decorator', () => {
       }),
     } as unknown as ExecutionContext;
 
-    const factory = CurrentSession.createParamDecorator(
-      (_data: unknown, ctx: ExecutionContext) => {
-        const req = ctx.switchToHttp().getRequest();
-        return req.session;
-      },
-    );
-
-    const result = factory(undefined, mockExecutionContext);
+    const result = currentSessionFactory(undefined, mockExecutionContext);
     expect(result.user.role).toBe('uni_admin');
     expect(result.session.impersonatedBy).toBeNull();
   });
