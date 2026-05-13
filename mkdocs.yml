@@ -17,6 +17,8 @@ theme:
     text: Inter
     code: Fira Code
   features:
+    - navigation.instant
+    - navigation.expand
     - navigation.tabs
     - navigation.sections
     - navigation.top
@@ -38,8 +40,11 @@ plugins:
   - git-revision-date-localized:
       enable_creation_date: true
       type: timeago
+      enable_git_follow: false
 
 markdown_extensions:
+  - pymdownx.snippets:
+      base_path: docs
   - md_in_html
   - admonition
   - pymdownx.details
@@ -57,11 +62,14 @@ markdown_extensions:
   - tables
   - toc:
       permalink: true
+      toc_depth: 3
 
 nav:
   - Home: index.md
-  - Marking Guide: management/Marking-Guide.md
   - Requirements (SRS):
+      - Overview: requirements/index.md
+      - SRS Brief: requirements/SRS-Brief.md
+      - Full SRS (Print View): requirements/Master-SRS.md
       - Introduction: requirements/Introduction.md
       - Functional Requirements: requirements/Functional-Requirements.md
       - User Stories & Characteristics: requirements/User-Stories.md
@@ -72,8 +80,10 @@ nav:
       - Technology Requirements: requirements/Technology-Requirements.md
       - API Service Contracts: requirements/API-Service-Contracts.md
       - Traceability Matrix: requirements/Traceability-Matrix.md
-      - SRS Brief: requirements/SRS-Brief.md
   - Architecture:
+      - Overview: architecture/index.md
+      - Architecture Brief: architecture/Architecture-Brief.md
+      - Full Architecture (Print View): architecture/Architecture-Print.md
       - Overall Architecture: architecture/Overall-Architecture.md
       - Core API: architecture/Core-API.md
       - Scheduling Solver: architecture/Scheduling-Solver.md
@@ -81,24 +91,27 @@ nav:
       - University API Adapter: architecture/University-API-Adapter.md
       - Frontend Component: architecture/Frontend-Component.md
       - Architecture Summary: architecture/Architecture-Summary.md
-      - Architecture Brief: architecture/Architecture-Brief.md
   - Design Specifications:
+      - Overview: design/index.md
+      - Design Brief: design/Design-Brief.md
+      - Full Design (Print View): design/Design-Print.md
       - Brand Style Guide: design/Brand-Style-Guide.md
       - Wireframes: design/Wireframes.md
-      - Design Brief: design/Design-Brief.md
-  - Diagrams Repository: diagrams/README.md
-  - API Reference: api/API-Reference.md
-  - Developer Portal:
-      - Overview: developer-guides/index.md
-      - Repo Setup: developer-guides/Repo-Setup-Guide.md
-      - Git Strategy: developer-guides/git-strategy-guide.md
-      - Master Dev Guide: developer-guides/master-development-guide.md
-      - Backend Development: developer-guides/backend-development-guide.md
-      - Frontend Development: developer-guides/frontend-development-guide.md
-      - Server Setup: developer-guides/Server-Setup-Guide.md
-      - Server Operations: developer-guides/server-guide.md
-      - Unit Testing: developer-guides/unit-testing-guide.md
-      - Integration Testing: developer-guides/integration-testing-guide.md
-      - Local CI/CD: developer-guides/local-cicd-guide.md
-  - Management:
+  - Admin:
+      - Marking Guide: management/Marking-Guide.md
       - Team Profiles: management/Team-Profiles.md
+      - References:
+          - All Diagrams: diagrams/README.md
+          - API Reference: api/API-Reference.md
+      - Developer Portal:
+          - Overview: developer-guides/index.md
+          - Repo Setup: developer-guides/Repo-Setup-Guide.md
+          - Git Strategy: developer-guides/git-strategy-guide.md
+          - Master Dev Guide: developer-guides/master-development-guide.md
+          - Backend Development: developer-guides/backend-development-guide.md
+          - Frontend Development: developer-guides/frontend-development-guide.md
+          - Server Setup: developer-guides/Server-Setup-Guide.md
+          - Server Operations: developer-guides/server-guide.md
+          - Unit Testing: developer-guides/unit-testing-guide.md
+          - Integration Testing: developer-guides/integration-testing-guide.md
+          - Local CI/CD: developer-guides/local-cicd-guide.md
