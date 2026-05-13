@@ -6,7 +6,7 @@ The functional requirements define the core capabilities and features of the UMT
 
 These features are fundamental to all user roles and must be implemented by all development teams.
 
-### Registration & Login
+### Registration & Login {#registration-login}
 
 - **R0.1:** The system shall allow users to register with email and password.
 - **R0.2:** The system shall allow users to log in with registered credentials.
@@ -17,7 +17,7 @@ These features are fundamental to all user roles and must be implemented by all 
 - **R0.4:** The system shall support light and dark theme options.
 - **R0.5:** The system shall persist theme preferences per user.
 
-### Form Validation
+### Form Validation {#form-validation}
 
 - **R0.6:** The system shall validate all user input on the client side before submission.
 - **R0.7:** The system shall validate all user input on the server side for security.

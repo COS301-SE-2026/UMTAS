@@ -1,41 +1,81 @@
 # Demo 1 Marking Guide
 
-This document provides a direct mapping from the project requirements (as per the COS301 Demo 1 Specification) to the corresponding sections in our documentation.
-
-## 4.1 Requirements Specifications (SRS)
-
-| Requirement                              | Documentation Section                                                             |
-| :--------------------------------------- | :-------------------------------------------------------------------------------- |
-| **4.1.1 Introduction**                   | [4.1.1 Introduction](../requirements/Introduction.md)                             |
-| **4.1.2 Domain Model**                   | [4.1.2 Domain Model](../requirements/Domain-Model.md)                             |
-| **4.1.3 User Stories / Characteristics** | [4.1.3 User Stories](../requirements/User-Stories.md)                             |
-| **4.1.4 Use Cases**                      | [4.1.4 Use Cases](../requirements/Use-Cases.md)                                   |
-| **4.1.5 Functional Requirements**        | [4.1.5 Functional Requirements](../requirements/Functional-Requirements.md)       |
-| **4.1.6 Quality Requirements**           | [4.1.6 Quality Requirements](../requirements/Quality-Requirements.md)             |
-| **4.1.7 Architectural Requirements**     | [4.1.7 Architectural Requirements](../requirements/Architectural-Requirements.md) |
-| **4.1.8 Technology Requirements**        | [4.1.8 Technology Requirements](../requirements/Technology-Requirements.md)       |
-| **4.1.9 Traceability Matrix**            | [4.1.9 Traceability Matrix](../requirements/Traceability-Matrix.md)               |
-| **4.1.10 API Service Contracts**         | [4.1.10 API Service Contracts](../requirements/API-Service-Contracts.md)          |
-
-## 4.2 Design Specifications
-
-| Requirement           | Documentation Section                         |
-| :-------------------- | :-------------------------------------------- |
-| **4.2.1 Brand Style** | [4.2.1 Brand Style](../design/Brand-Style.md) |
-| **4.2.2 Wireframes**  | [4.2.2 Wireframes](../design/Wireframes.md)   |
-
-## 5 Base Features
-
-| Feature                    | Implementation Status                                                                    |
-| :------------------------- | :--------------------------------------------------------------------------------------- |
-| **Registration and Login** | [Functional Requirements](../requirements/Functional-Requirements.md#registration-login) |
-| **Basic Themes**           | [Brand Style](../design/Brand-Style.md#themes)                                           |
-| **Form Validation**        | [Functional Requirements](../requirements/Functional-Requirements.md#form-validation)    |
+Navigation guide for Demo 1 markers. Each rubric item links directly to the relevant documentation.
 
 ---
 
-## :material-map: Quick Navigation
+## Demo Presentation
 
+### Project Overview
 - [Home Page](../index.md)
+- [Requirements Overview](../requirements/index.md)
+- [Architecture Overview](../architecture/index.md)
+
+### Project Plan
+- [SRS Brief](../requirements/SRS-Brief.md)
+- [Architecture Brief](../architecture/Architecture-Brief.md)
+- [Full SRS (Print View)](../requirements/Master-SRS.md)
+
+### Live Demo — Features
+> Assessed live against the working prototype. At least 3 use cases implemented and tested.
+- [Use Cases](../requirements/Use-Cases.md)
+- [Functional Requirements](../requirements/Functional-Requirements.md)
+- [Domain Model](../requirements/Domain-Model.md)
+
+### Live Demo — CI + Repo Setup + Testing
+> Assessed via the GitHub repository. Check CI badges, branch structure, and test coverage.
+- [Git Strategy](../developer-guides/git-strategy-guide.md)
+- [Repo Setup Guide](../developer-guides/Repo-Setup-Guide.md)
+- [Local CI/CD Guide](../developer-guides/local-cicd-guide.md)
+- [Unit Testing Guide](../developer-guides/unit-testing-guide.md)
+- [Integration Testing Guide](../developer-guides/integration-testing-guide.md)
+
+---
+
+## Documentation
+
+### SRS — Functional Requirements
+- [Functional Requirements](../requirements/Functional-Requirements.md)
+- [Full SRS (Print View)](../requirements/Master-SRS.md)
+
+### SRS — Use Cases + Use Case Diagrams
+- [Use Cases](../requirements/Use-Cases.md)
 - [All Diagrams](../diagrams/README.md)
-- [API Reference](../api/API-Reference.md)
+
+### SRS — Domain Model
+- [Domain Model](../requirements/Domain-Model.md)
+
+### SRS — Preliminary Architecture
+- [Architecture Brief](../architecture/Architecture-Brief.md)
+- [Overall Architecture](../architecture/Overall-Architecture.md)
+- [Full Architecture (Print View)](../architecture/Architecture-Print.md)
+- [All Diagrams](../diagrams/README.md)
+
+### Design — Brand Style Guide
+- [Brand Style Guide](../design/Brand-Style-Guide.md)
+
+### Design — Wireframes
+- [Wireframes](../design/Wireframes.md)
+
+---
+
+## Base Features
+
+| Feature | Documentation |
+| :------ | :------------ |
+| Registration & Login | [Functional Requirements](../requirements/Functional-Requirements.md) |
+| Basic Themes | [Brand Style Guide](../design/Brand-Style-Guide.md) |
+| Form Validation | [Functional Requirements](../requirements/Functional-Requirements.md) |
+
+---
+
+## Quick Navigation
+
+| Section | Link |
+| :------ | :--- |
+| Home | [index.md](../index.md) |
+| Full SRS (Print) | [Master-SRS.md](../requirements/Master-SRS.md) |
+| Full Architecture (Print) | [Architecture-Print.md](../architecture/Architecture-Print.md) |
+| Full Design (Print) | [design/Design-Print.md](../design/Design-Print.md) |
+| All Diagrams | [diagrams/README.md](../diagrams/README.md) |
+| API Reference | [API-Reference.md](../api/API-Reference.md) |

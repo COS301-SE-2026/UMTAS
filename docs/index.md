@@ -22,29 +22,67 @@ _Built by: Wilmar Smit, Michael Tomlinson, Johan Coetzer, Marcel Stoltz, & Aidan
 
 <br>
 
-## :material-rocket-launch: Quick Start
-
-Get up and running with the UMTAS platform in minutes.
+## :material-book-open-variant: Documentation Sections
 
 <div class="grid cards" markdown>
 
--   :material-presentation-play:{ .lg .middle } __Demo 1 Deliverables__
+-   :material-file-document-multiple:{ .lg .middle } __Requirements (SRS)__
+
+    ---
+
+    Functional requirements, user stories, domain model, use cases, quality and architectural requirements.
+
+    [:octicons-arrow-right-24: View Requirements](requirements/index.md)
+
+-   :material-sitemap:{ .lg .middle } __Architecture__
+
+    ---
+
+    Core-and-Adapter pattern, system diagrams, service breakdowns, and component architecture.
+
+    [:octicons-arrow-right-24: View Architecture](architecture/index.md)
+
+-   :material-palette:{ .lg .middle } __Design Specifications__
+
+    ---
+
+    Brand style guide, wireframes, and full design brief for the UMTAS platform.
+
+    [:octicons-arrow-right-24: View Design](design/index.md)
+
+-   :material-account-cog:{ .lg .middle } __Admin & Developer Guides__
+
+    ---
+
+    Marking guide, team profiles, API reference, and the full developer portal.
+
+    [:octicons-arrow-right-24: View Admin](management/Marking-Guide.md)
+
+</div>
+
+---
+
+## :material-rocket-launch: Quick Start
+
+<div class="grid cards" markdown>
+
+-   :material-presentation-play:{ .lg .middle } __Marking Guide__
 
     ---
 
     Access the complete Requirements Specification (SRS), Design Specs, and Marking Guide.
 
-    [:octicons-arrow-right-24: Marking Guide](management/Marking-Guide.md)
+    [:octicons-arrow-right-24: View Guide](management/Marking-Guide.md)
 
--   :material-library-shelves:{ .lg .middle } __Documentation & Guides__
+-   :material-library-shelves:{ .lg .middle } __Developer Portal__
 
     ---
 
-    Browse our collection of developer guides, setup manuals, and contribution workflows.
+    Browse developer guides, setup manuals, and contribution workflows.
 
-    [:octicons-arrow-right-24: Browse Guides](developer-guides/Repo-Setup-Guide.md)
+    [:octicons-arrow-right-24: Browse Guides](developer-guides/index.md)
 
--   :material-rocket-launch:{ .lg .middle } __Getting Started__
+-   :material-wrench:{ .lg .middle } __Repo Setup__
 
     ---
 
@@ -59,14 +97,6 @@ Get up and running with the UMTAS platform in minutes.
     Explore the interactive Swagger documentation for the Core and Adapter services.
 
     [:octicons-arrow-right-24: View APIs](api/API-Reference.md)
-
--   :material-sitemap:{ .lg .middle } __Architecture__
-
-    ---
-
-    Deep dive into the Core-and-Adapter pattern and system diagrams.
-
-    [:octicons-arrow-right-24: System Diagrams](diagrams/README.md)
 
 -   :material-account-group:{ .lg .middle } __Team Vigil__
 
