@@ -23,7 +23,7 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core';
 import { usersTable } from '../auth/auth.schema.js';
-import { modulesTable, eventsTable } from './timetable.schema.js';
+import { modulesTable, eventsTable } from './Modules_Events.schema.js';
 
 const recurringCriteriaColumns = {
   id: uuid('id')
