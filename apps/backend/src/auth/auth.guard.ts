@@ -40,7 +40,12 @@ export class AuthGuard implements CanActivate {
       }
     }
 
-    const session = await auth.api.getSession({ headers });
+    let session;
+    try {
+      session = await auth.api.getSession({ headers });
+    } catch {
+      throw new UnauthorizedException('No active session');
+    }
 
     if (!session) {
       throw new UnauthorizedException('No active session');

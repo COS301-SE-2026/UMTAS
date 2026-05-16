@@ -1,4 +1,8 @@
-import { ExecutionContext, ForbiddenException } from '@nestjs/common';
+import {
+  ExecutionContext,
+  ForbiddenException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { RolesGuard, ROLES_KEY } from './roles.guard';
 import { AuthService } from './auth.service';
 import type { AuthSession } from './auth';
@@ -117,7 +121,7 @@ describe('RolesGuard', () => {
       });
 
       await expect(guard.canActivate(mockExecutionContext)).rejects.toThrow(
-        ForbiddenException,
+        UnauthorizedException,
       );
     });
 

@@ -9,7 +9,8 @@ import {
 } from '../../entities';
 import { eq } from 'drizzle-orm';
 
-export const TEST_PASSWORD = 'Test@UMTAS2024!';
+export const TEST_PASSWORD =
+  process.env.SEED_TEST_PASSWORD || 'Test@UMTAS2024!';
 
 export interface ISeedMigration {
   name: string;
@@ -28,6 +29,7 @@ export class AuthSeed implements ISeedMigration {
   private readonly testUserIds = {
     student: 'test-student-001',
     studentTwo: 'test-student-002',
+    lecturer: 'test-lecturer-001',
     uniAdmin: 'test-uni-admin-001',
     sysAdmin: 'test-sys-admin-001',
   };
@@ -35,12 +37,18 @@ export class AuthSeed implements ISeedMigration {
   private readonly testSessionIds = {
     studentActive: 'test-session-student-active',
     studentExpired: 'test-session-student-expired',
+    lecturerActive: 'test-session-lecturer-active',
     uniAdminActive: 'test-session-uni-admin-active',
     sysAdminActive: 'test-session-sys-admin-active',
   };
 
   async run(db: DatabaseService): Promise<void> {
     try {
+      if (process.env.NODE_ENV === 'production') {
+        this.logger.warn('Auth seed skipped in production environment');
+        return;
+      }
+
       // Check if seed already exists
       const existing = await db.db
         .select({ id: usersTable.id })
@@ -89,6 +97,19 @@ export class AuthSeed implements ISeedMigration {
         emailVerified: true,
         image: null,
         role: 'student',
+        banned: false,
+        banReason: null,
+        banExpires: null,
+        createdAt: now,
+        updatedAt: now,
+      },
+      {
+        id: this.testUserIds.lecturer,
+        name: 'Test Lecturer',
+        email: 'test.lecturer@example.com',
+        emailVerified: true,
+        image: null,
+        role: 'lecturer',
         banned: false,
         banReason: null,
         banExpires: null,
@@ -156,6 +177,17 @@ export class AuthSeed implements ISeedMigration {
         updatedAt: new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000),
       },
       {
+        id: this.testSessionIds.lecturerActive,
+        userId: this.testUserIds.lecturer,
+        token: 'test-token-lecturer-active-' + Date.now(),
+        expiresAt: futureExpiry,
+        ipAddress: '127.0.0.1',
+        userAgent: 'Test Client',
+        impersonatedBy: null,
+        createdAt: now,
+        updatedAt: now,
+      },
+      {
         id: this.testSessionIds.uniAdminActive,
         userId: this.testUserIds.uniAdmin,
         token: 'test-token-uni-admin-active-' + Date.now(),
@@ -215,6 +247,21 @@ export class AuthSeed implements ISeedMigration {
         refreshTokenExpiresAt: null,
         scope: 'openid email profile',
         password: null,
+        createdAt: now,
+        updatedAt: now,
+      },
+      {
+        id: 'test-account-lecturer',
+        userId: this.testUserIds.lecturer,
+        accountId: this.testUserIds.lecturer,
+        providerId: 'credential',
+        accessToken: null,
+        refreshToken: null,
+        idToken: null,
+        accessTokenExpiresAt: null,
+        refreshTokenExpiresAt: null,
+        scope: null,
+        password: hashedPassword,
         createdAt: now,
         updatedAt: now,
       },
@@ -298,6 +345,12 @@ export const TEST_AUTH_DATA = {
       name: 'Another Student',
       role: 'student',
     },
+    lecturer: {
+      id: 'test-lecturer-001',
+      email: 'test.lecturer@example.com',
+      name: 'Test Lecturer',
+      role: 'lecturer',
+    },
     uniAdmin: {
       id: 'test-uni-admin-001',
       email: 'uni.admin@example.com',
@@ -314,6 +367,7 @@ export const TEST_AUTH_DATA = {
   sessions: {
     studentActive: 'test-session-student-active',
     studentExpired: 'test-session-student-expired',
+    lecturerActive: 'test-session-lecturer-active',
     uniAdminActive: 'test-session-uni-admin-active',
     sysAdminActive: 'test-session-sys-admin-active',
   },

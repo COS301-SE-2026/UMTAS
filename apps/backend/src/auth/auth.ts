@@ -9,7 +9,7 @@ import { redisStorage } from '@better-auth/redis-storage';
 import * as appSchema from '../db/schema';
 import { isAppRole } from './roles';
 import { getRedisClient } from '../redis/redis';
-import { ac, student, uniAdmin, sysAdmin } from './permissions';
+import { ac, student, lecturer, uniAdmin, sysAdmin } from './permissions';
 
 export type AppDatabase =
   | NodePgDatabase<typeof appSchema>
@@ -19,8 +19,50 @@ type Database = AppDatabase;
 export type AuthInstance = ReturnType<typeof betterAuth>;
 export type AuthSession = any;
 
+export interface GoogleProfile {
+  name?: unknown;
+  email?: unknown;
+  picture?: unknown;
+}
+
+export function mapGoogleProfileToUser(profile: GoogleProfile): {
+  name: string;
+  email: string;
+  image?: string;
+} {
+  const result: { name: string; email: string; image?: string } = {
+    name:
+      typeof profile.name === 'string'
+        ? profile.name
+        : typeof profile.email === 'string'
+          ? profile.email.split('@')[0]
+          : '',
+    email: typeof profile.email === 'string' ? profile.email : '',
+  };
+
+  if (typeof profile.picture === 'string') {
+    result.image = profile.picture;
+  }
+
+  return result;
+}
+
+function logAuditEvent(
+  logger: LoggerService,
+  event: Record<string, unknown>,
+): void {
+  logger.log(
+    JSON.stringify({
+      audit: true,
+      timestamp: new Date().toISOString(),
+      ...event,
+    }),
+  );
+}
+
 interface CreateAuthInput {
   db: Database;
+  dbProvider: 'pg' | 'mysql' | 'sqlite';
   baseURL: string;
   secret: string;
   trustedOrigins: string[];
@@ -32,6 +74,7 @@ interface CreateAuthInput {
   sendResetPasswordEmail: (input: {
     email: string;
     url: string;
+    name?: string;
   }) => Promise<void>;
   sendVerificationEmail?: (input: {
     email: string;
@@ -44,6 +87,7 @@ interface CreateAuthInput {
 export function createAuth(input: CreateAuthInput): AuthInstance {
   const {
     db,
+    dbProvider,
     baseURL,
     secret,
     trustedOrigins,
@@ -67,7 +111,7 @@ export function createAuth(input: CreateAuthInput): AuthInstance {
         })
       : undefined,
     database: drizzleAdapter(db, {
-      provider: 'pg',
+      provider: dbProvider,
       schema: {
         user: appSchema.usersTable,
         session: appSchema.sessionsTable,
@@ -85,7 +129,11 @@ export function createAuth(input: CreateAuthInput): AuthInstance {
       minPasswordLength: 8,
       maxPasswordLength: 128,
       sendResetPassword: async ({ user, url }) => {
-        void sendResetPasswordEmail({ email: user.email, url });
+        await sendResetPasswordEmail({
+          email: user.email,
+          url,
+          name: user.name || 'User',
+        });
       },
       onPasswordReset: async ({ user }) => {
         logger.log(`Password reset completed for ${user.email}`);
@@ -115,21 +163,7 @@ export function createAuth(input: CreateAuthInput): AuthInstance {
               clientId: googleClientId,
               clientSecret: googleClientSecret,
               scope: ['openid', 'email', 'profile'],
-              mapProfileToUser: (profile) => {
-                const result: { name: string; email: string; image?: string } =
-                  {
-                    name:
-                      typeof profile.name === 'string'
-                        ? profile.name
-                        : 'Student',
-                    email:
-                      typeof profile.email === 'string' ? profile.email : '',
-                  };
-                if (typeof profile.picture === 'string') {
-                  result.image = profile.picture;
-                }
-                return result;
-              },
+              mapProfileToUser: mapGoogleProfileToUser,
             },
           }
         : undefined,
@@ -183,6 +217,7 @@ export function createAuth(input: CreateAuthInput): AuthInstance {
         adminUserIds: systemAdminUserIds,
         roles: {
           student,
+          lecturer,
           uni_admin: uniAdmin,
           sys_admin: sysAdmin,
         },
@@ -207,18 +242,29 @@ export function createAuth(input: CreateAuthInput): AuthInstance {
             const actorRole = userObj?.role;
             const requestedRole = data.role;
 
-            if (
-              actorRole === 'sys_admin' &&
-              requestedRole !== undefined &&
-              !isAppRole(requestedRole)
-            ) {
+            if (requestedRole !== undefined && !isAppRole(requestedRole)) {
               throw new APIError('BAD_REQUEST', {
                 message: 'Invalid role value provided',
               });
             }
 
-            if (actorRole === 'sys_admin' && isAppRole(requestedRole)) {
+            // sys_admin may assign any valid role, or omit role (defaults to student)
+            if (actorRole === 'sys_admin') {
               return { data };
+            }
+
+            // uni_admin may only assign student or lecturer
+            if (actorRole === 'uni_admin') {
+              const assignable = ['student', 'lecturer'];
+              if (
+                requestedRole !== undefined &&
+                !assignable.includes(requestedRole as string)
+              ) {
+                throw new APIError('FORBIDDEN', {
+                  message: 'uni_admin can only assign student or lecturer role',
+                });
+              }
+              return { data: { ...data, role: requestedRole ?? 'student' } };
             }
 
             return {
@@ -228,10 +274,32 @@ export function createAuth(input: CreateAuthInput): AuthInstance {
               },
             };
           },
+          after: async (
+            data: Record<string, unknown>,
+            ctx: Record<string, unknown> | null,
+          ) => {
+            const actor = (ctx?.context as Record<string, unknown> | undefined)
+              ?.session as Record<string, unknown> | undefined;
+            logAuditEvent(logger, {
+              action: 'user.create',
+              actorId: actor?.user
+                ? String((actor.user as Record<string, unknown>).id)
+                : undefined,
+              actorRole: actor?.user
+                ? String((actor.user as Record<string, unknown>).role)
+                : undefined,
+              targetUserId: String(data.id),
+              targetEmail: String(data.email ?? ''),
+            });
+          },
         },
         update: {
           after: async (data: Record<string, unknown>) => {
-            logger.warn(`User updated: ${String(data.id)}`);
+            logAuditEvent(logger, {
+              action: 'user.update',
+              targetUserId: String(data.id),
+              targetEmail: String(data.email ?? ''),
+            });
           },
         },
       },
@@ -245,6 +313,20 @@ export function createAuth(input: CreateAuthInput): AuthInstance {
             logger.log(
               `Session created for user ${String(data.userId)} from ${requestObj?.headers?.get('x-forwarded-for') ?? 'unknown-ip'}`,
             );
+
+            if (data.impersonatedBy) {
+              logAuditEvent(logger, {
+                event: 'impersonate',
+                actorSessionId: String(data.impersonatedBy),
+                targetUserId: String(data.userId),
+              });
+            }
+
+            logAuditEvent(logger, {
+              action: 'session.create',
+              targetUserId: String(data.userId),
+              sessionId: String(data.id),
+            });
           },
         },
       },
@@ -254,6 +336,11 @@ export function createAuth(input: CreateAuthInput): AuthInstance {
             logger.log(
               `Account linked for user ${String(data.userId)} via ${String(data.providerId)}`,
             );
+            logAuditEvent(logger, {
+              action: 'account.link',
+              targetUserId: String(data.userId),
+              providerId: String(data.providerId),
+            });
           },
         },
       },
