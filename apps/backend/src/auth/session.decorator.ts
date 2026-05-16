@@ -1,5 +1,5 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
-import type { IncomingMessage } from 'node:http';
+import type { RequestWithSession } from './auth.guard';
 
 export interface SessionData {
   user: {
@@ -31,9 +31,9 @@ export interface SessionData {
 export const currentSessionFactory = (
   _data: unknown,
   ctx: ExecutionContext,
-): SessionData => {
-  const req = ctx.switchToHttp().getRequest<IncomingMessage>();
-  return (req as any).session;
+): SessionData | undefined => {
+  const req = ctx.switchToHttp().getRequest<RequestWithSession>();
+  return req.session;
 };
 
 export const CurrentSession = createParamDecorator(currentSessionFactory);
