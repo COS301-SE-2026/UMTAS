@@ -120,5 +120,18 @@ describe('AuthGuard', () => {
       const result = await guard.canActivate(mockExecutionContext);
       expect(result).toBe(true);
     });
+
+    it('should throw UnauthorizedException when getSession rejects', async () => {
+      jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(false);
+      jest.spyOn(mockAuthService, 'getAuth').mockReturnValueOnce({
+        api: {
+          getSession: jest.fn().mockRejectedValue(new Error('network error')),
+        },
+      });
+
+      await expect(guard.canActivate(mockExecutionContext)).rejects.toThrow(
+        UnauthorizedException,
+      );
+    });
   });
 });
