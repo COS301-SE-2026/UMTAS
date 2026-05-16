@@ -113,6 +113,67 @@ describe('RolesGuard', () => {
       );
     });
 
+    it('should allow sys_admin to bypass any role restriction', () => {
+      const requiredRoles = ['lecturer'];
+      const mockSession: SessionData = {
+        user: {
+          id: 'admin-1',
+          email: 'admin@example.com',
+          role: 'sys_admin',
+          name: 'Admin',
+          emailVerified: true,
+          banned: false,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        session: {
+          id: 'session-admin',
+          token: 'token',
+          userId: 'admin-1',
+          expiresAt: new Date(Date.now() + 3600000).toISOString(),
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+      };
+
+      jest.spyOn(Reflect, 'getMetadata').mockReturnValue(requiredRoles);
+      mockRequest.session = mockSession;
+
+      const result = guard.canActivate(mockExecutionContext);
+      expect(result).toBe(true);
+    });
+
+    it('should throw UnauthorizedException when session user has no role', () => {
+      const requiredRoles = ['student'];
+      const mockSession: SessionData = {
+        user: {
+          id: 'user-no-role',
+          email: 'norole@example.com',
+          role: '' as unknown as 'student',
+          name: 'No Role',
+          emailVerified: true,
+          banned: false,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        session: {
+          id: 'session-norole',
+          token: 'token',
+          userId: 'user-no-role',
+          expiresAt: new Date(Date.now() + 3600000).toISOString(),
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+      };
+
+      jest.spyOn(Reflect, 'getMetadata').mockReturnValue(requiredRoles);
+      mockRequest.session = mockSession;
+
+      expect(() => guard.canActivate(mockExecutionContext)).toThrow(
+        UnauthorizedException,
+      );
+    });
+
     it('should allow multiple valid roles', () => {
       const requiredRoles = ['student', 'uni_admin', 'sys_admin'];
       const mockSession: SessionData = {
