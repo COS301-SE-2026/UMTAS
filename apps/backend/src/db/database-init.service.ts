@@ -7,6 +7,8 @@ import { migrate as migrateNodePg } from 'drizzle-orm/node-postgres/migrator';
 import { migrate as migratePglite } from 'drizzle-orm/pglite/migrator';
 import { join } from 'node:path';
 import { DB_MODES, parseSeedFlag } from './database.constants';
+import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
 @Injectable()
 export class DatabaseInitService implements OnApplicationBootstrap {
@@ -29,17 +31,27 @@ export class DatabaseInitService implements OnApplicationBootstrap {
 
     try {
       if (dbMode === DB_MODES.PGLITE) {
-        await migratePglite(this.databaseService.db as any, {
-          migrationsFolder,
-        });
+        await migratePglite(
+          this.databaseService.db as unknown as PgliteDatabase<
+            Record<string, unknown>
+          >,
+          {
+            migrationsFolder,
+          },
+        );
       } else {
         await this.databaseService.db.execute(sql`
           CREATE EXTENSION IF NOT EXISTS "pgcrypto";
         `);
 
-        await migrateNodePg(this.databaseService.db as any, {
-          migrationsFolder,
-        });
+        await migrateNodePg(
+          this.databaseService.db as unknown as NodePgDatabase<
+            Record<string, unknown>
+          >,
+          {
+            migrationsFolder,
+          },
+        );
       }
       this.logger.log('Database migrations applied successfully');
 

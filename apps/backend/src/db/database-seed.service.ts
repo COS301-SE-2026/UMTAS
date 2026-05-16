@@ -23,11 +23,11 @@ export class DatabaseSeedService {
     const allSeedTasks: SeedTask[] = [
       {
         name: 'default-system-admin',
-        run: this.seedDefaultSystemAdmin.bind(this),
+        run: () => this.seedDefaultSystemAdmin(),
       },
       {
         name: 'auth-seed',
-        run: this.seedAuthTestData.bind(this),
+        run: () => this.seedAuthTestData(),
       },
     ];
 
