@@ -1,4 +1,3 @@
-import HelloButton from "@/components/HelloButton";
 import AuthSection from "@/components/AuthSection";
 
 export default function Home() {
@@ -40,7 +39,6 @@ export default function Home() {
             Press the button below to send a request through the entire stack
           </p>
           <AuthSection />
-          <HelloButton />
         </div>
       </main>
     </div>
