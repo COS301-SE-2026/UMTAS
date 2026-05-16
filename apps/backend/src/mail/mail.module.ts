@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MailerModule } from '@nestjs-modules/mailer';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/adapters/handlebars.adapter';
 import { join } from 'path';
 import { MailerService } from './mailer.service';
 
@@ -17,7 +18,13 @@ import { MailerService } from './mailer.service';
       defaults: {
         from: process.env.SMTP_FROM ?? 'noreply@umtas.co.za',
       },
-      // Template configuration - will be set up dynamically in service
+      template: {
+        dir: join(process.cwd(), 'src/mail/templates'),
+        adapter: new HandlebarsAdapter(),
+        options: {
+          strict: true,
+        },
+      },
     }),
   ],
   providers: [MailerService],

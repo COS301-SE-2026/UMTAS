@@ -1,35 +1,27 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { DatabaseService } from '../db/database.service';
+import { MailerService } from '../mail/mailer.service';
 import { HealthService } from './health.service';
-import { helloWorldTable } from '../entities/hello-world/hello-world.schema';
 
 describe('HealthService', () => {
   let service: HealthService;
-  const returningMock = jest.fn();
-  const valuesMock = jest.fn();
-  const insertMock = jest.fn();
-
-  const mockEntity = {
-    id: 'test-uuid-1234',
-    message: 'Hello World',
-    createdAt: new Date('2026-04-20T00:00:00Z'),
-  };
+  const executeMock = jest.fn();
+  const mailerVerifyMock = jest.fn();
 
   beforeEach(async () => {
-    returningMock.mockReset().mockResolvedValue([mockEntity]);
-    valuesMock.mockReset().mockReturnValue({ returning: returningMock });
-    insertMock.mockReset().mockReturnValue({ values: valuesMock });
+    executeMock.mockReset().mockResolvedValue([]);
+    mailerVerifyMock.mockReset().mockResolvedValue(undefined);
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         HealthService,
         {
           provide: DatabaseService,
-          useValue: {
-            db: {
-              insert: insertMock,
-            },
-          },
+          useValue: { db: { execute: executeMock } },
+        },
+        {
+          provide: MailerService,
+          useValue: { verify: mailerVerifyMock },
         },
       ],
     }).compile();
@@ -41,32 +33,22 @@ describe('HealthService', () => {
     expect(service).toBeDefined();
   });
 
-  describe('writeHello', () => {
-    it('should create an entity with message "Hello World"', async () => {
-      await service.writeHello();
+  describe('check', () => {
+    it('should return ok status with database service listed', async () => {
+      const result = await service.check();
 
-      expect(insertMock).toHaveBeenCalledWith(helloWorldTable);
+      expect(result.status).toBe('ok');
+      expect(result.services.database).toBe('ok');
+      expect(executeMock).toHaveBeenCalledTimes(1);
     });
 
-    it('should insert the expected payload', async () => {
-      await service.writeHello();
+    it('should return error status when database check fails', async () => {
+      executeMock.mockRejectedValueOnce(new Error('Connection refused'));
 
-      expect(valuesMock).toHaveBeenCalledWith({ message: 'Hello World' });
-      expect(returningMock).toHaveBeenCalledTimes(1);
-    });
+      const result = await service.check();
 
-    it('should return the saved entity', async () => {
-      const result = await service.writeHello();
-
-      expect(result).toEqual(mockEntity);
-      expect(result.id).toBe('test-uuid-1234');
-      expect(result.message).toBe('Hello World');
-    });
-
-    it('should propagate database errors', async () => {
-      returningMock.mockRejectedValueOnce(new Error('Connection refused'));
-
-      await expect(service.writeHello()).rejects.toThrow('Connection refused');
+      expect(result.status).toBe('error');
+      expect(result.services.database).toBe('error');
     });
   });
 });

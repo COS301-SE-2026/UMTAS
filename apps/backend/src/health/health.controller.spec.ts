@@ -6,12 +6,6 @@ describe('HealthController', () => {
   let controller: HealthController;
   let service: HealthService;
 
-  const mockEntity = {
-    id: 'test-uuid-1234',
-    message: 'Hello World',
-    createdAt: new Date('2026-04-20T00:00:00Z'),
-  };
-
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [HealthController],
@@ -19,14 +13,11 @@ describe('HealthController', () => {
         {
           provide: HealthService,
           useValue: {
-            writeHello: jest.fn().mockResolvedValue(mockEntity),
+            check: jest.fn().mockResolvedValue({ status: 'ok' }),
           },
         },
       ],
-    })
-      .overrideGuard('Roles')
-      .useValue({})
-      .compile();
+    }).compile();
 
     controller = module.get<HealthController>(HealthController);
     service = module.get<HealthService>(HealthService);
@@ -36,29 +27,24 @@ describe('HealthController', () => {
     expect(controller).toBeDefined();
   });
 
-  describe('hello', () => {
-    it('should call healthService.writeHello()', async () => {
-      await controller.hello();
-      expect(service.writeHello).toHaveBeenCalledTimes(1);
+  describe('check', () => {
+    it('should call healthService.check()', async () => {
+      await controller.check();
+      expect(service.check).toHaveBeenCalledTimes(1);
     });
 
-    it('should return success response with correct shape', async () => {
-      const result = await controller.hello();
+    it('should return health status', async () => {
+      const result = await controller.check();
 
-      expect(result).toEqual({
-        success: true,
-        message: 'Hello World',
-        id: 'test-uuid-1234',
-        createdAt: mockEntity.createdAt,
-      });
+      expect(result).toEqual({ status: 'ok' });
     });
 
     it('should propagate service errors', async () => {
-      (service.writeHello as jest.Mock).mockRejectedValueOnce(
+      (service.check as jest.Mock).mockRejectedValueOnce(
         new Error('DB connection failed'),
       );
 
-      await expect(controller.hello()).rejects.toThrow('DB connection failed');
+      await expect(controller.check()).rejects.toThrow('DB connection failed');
     });
   });
 });
