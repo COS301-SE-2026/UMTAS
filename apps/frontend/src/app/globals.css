@@ -49,22 +49,33 @@
 }
 
 :root {
-  /* Decided light mode values */
   --bg-base: #ffffff;
   --bg-surface: #f4f4f5;
   --bg-elevated: #e4e4e7;
+
   --text-primary: #09090b;
   --text-secondary: #52525b;
   --text-disabled: #a1a1aa;
+
   --border: #e4e4e7;
   --ring: #18181b;
   --shadow: rgba(0, 0, 0, 0.08);
 
-  /* Motion tokens */
   --duration-fast: 150ms;
   --duration-normal: 250ms;
   --duration-slow: 400ms;
   --easing-default: cubic-bezier(0.4, 0, 0.2, 1);
+
+  --btn-primary-bg: #18181b;
+  --btn-primary-text: #ffffff;
+  --btn-primary-hover: #27272a;
+
+  --error-bg: #fee2e2;
+  --error-text: #991b1b;
+  --success-bg: #dcfce7;
+  --success-text: #15803d;
+  --warning-bg: #fef3c7;
+  --warning-text: #b45309;
 
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -81,9 +92,7 @@
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
@@ -100,17 +109,29 @@
   --sidebar-ring: oklch(0.708 0 0);
 }
 
-/* Decided dark mode val */
 [data-theme="dark"] {
   --bg-base: #18181b;
   --bg-surface: #27272a;
   --bg-elevated: #3f3f46;
+
   --text-primary: #e8e8e8;
   --text-secondary: #9a9a9a;
   --text-disabled: #555555;
+
   --border: #3f3f46;
   --ring: #e8e8e8;
   --shadow: rgba(0, 0, 0, 0.35);
+
+  --btn-primary-bg: #f4f4f5;
+  --btn-primary-text: #18181b;
+  --btn-primary-hover: #e4e4e7;
+
+  --error-bg: #7f1d1d;
+  --error-text: #fca5a5;
+  --success-bg: #14532d;
+  --success-text: #86efac;
+  --warning-bg: #78350f;
+  --warning-text: #fcd34d;
 }
 
 /* Will most likely be deleted */
