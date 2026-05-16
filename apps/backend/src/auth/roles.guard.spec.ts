@@ -3,7 +3,7 @@ import {
   ForbiddenException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { RolesGuard } from './roles.guard';
+import { ROLES_KEY, Roles, RolesGuard } from './roles.guard';
 import type { RequestWithSession } from './auth.guard';
 import type { SessionData } from './session.decorator';
 
@@ -36,6 +36,45 @@ describe('RolesGuard', () => {
 
     it('should allow access when no roles are required', () => {
       jest.spyOn(Reflect, 'getMetadata').mockReturnValue(undefined);
+
+      const result = guard.canActivate(mockExecutionContext);
+      expect(result).toBe(true);
+    });
+
+    it('should read role metadata from the class when handler has none', () => {
+      const requiredRoles = ['lecturer'];
+      const mockSession: SessionData = {
+        user: {
+          id: 'user-class-meta',
+          email: 'lecturer@example.com',
+          role: 'lecturer',
+          name: 'Lecturer',
+          emailVerified: true,
+          banned: false,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        session: {
+          id: 'session-class-meta',
+          token: 'token',
+          userId: 'user-class-meta',
+          expiresAt: new Date(Date.now() + 3600000).toISOString(),
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+      };
+
+      const getMetadataSpy = jest.spyOn(Reflect, 'getMetadata');
+      getMetadataSpy.mockImplementation((key, target) => {
+        if (target === mockExecutionContext.getHandler()) {
+          return undefined;
+        }
+        if (target === mockExecutionContext.getClass()) {
+          return requiredRoles;
+        }
+        return undefined;
+      });
+      mockRequest.session = mockSession;
 
       const result = guard.canActivate(mockExecutionContext);
       expect(result).toBe(true);
@@ -149,7 +188,7 @@ describe('RolesGuard', () => {
         user: {
           id: 'user-no-role',
           email: 'norole@example.com',
-          role: '' as unknown as 'student',
+          role: '',
           name: 'No Role',
           emailVerified: true,
           banned: false,
@@ -203,5 +242,13 @@ describe('RolesGuard', () => {
       const result = guard.canActivate(mockExecutionContext);
       expect(result).toBe(true);
     });
+  });
+});
+
+describe('Roles decorator', () => {
+  it('creates a metadata decorator', () => {
+    const decorator: unknown = Roles('student', 'lecturer');
+    expect(typeof decorator).toBe('function');
+    expect(ROLES_KEY).toBe('roles');
   });
 });
