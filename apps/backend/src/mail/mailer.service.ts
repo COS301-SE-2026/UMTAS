@@ -64,8 +64,11 @@ export class MailerService {
         `Email sent to ${options.to} (${options.template || 'text'})`,
       );
     } catch (error) {
-      this.logger.error(`Failed to send email to ${options.to}`, error);
-      throw error;
+      this.logger.warn(
+        `Failed to send email to ${options.to}. Email service may be unavailable.`,
+        error,
+      );
+      // Don't throw: email is optional in dev. Background tasks should not fail due to email.
     }
   }
 
