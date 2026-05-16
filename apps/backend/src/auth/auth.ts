@@ -225,7 +225,7 @@ export function createAuth(input: CreateAuthInput): AuthInstance {
     session: {
       expiresIn: 60 * 60 * 24 * 7, // 7 days (reduced from 30 for classroom security)
       updateAge: 60 * 60 * 24, // Update session after 1 day of inactivity
-      freshAge: 60 * 60, // Require fresh auth for sensitive operations (1 hour)
+      freshAge: 60 * 10, // Require fresh auth for sensitive operations (10 minutes)
       cookieCache: {
         enabled: true,
         maxAge: 60 * 5,

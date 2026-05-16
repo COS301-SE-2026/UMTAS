@@ -2,6 +2,7 @@ import {
   CanActivate,
   ExecutionContext,
   Injectable,
+  Logger,
   UnauthorizedException,
   SetMetadata,
 } from '@nestjs/common';
@@ -20,6 +21,8 @@ export interface RequestWithSession extends IncomingMessage {
 
 @Injectable()
 export class AuthGuard implements CanActivate {
+  private readonly logger = new Logger(AuthGuard.name);
+
   constructor(
     private reflector: Reflector,
     private authService: AuthService,
@@ -49,7 +52,11 @@ export class AuthGuard implements CanActivate {
     try {
       const result = await auth.api.getSession({ headers });
       session = result as SessionData | null;
-    } catch {
+    } catch (error) {
+      this.logger.error(
+        'Session fetch failed',
+        error instanceof Error ? error.stack : String(error),
+      );
       throw new UnauthorizedException('No active session');
     }
 
