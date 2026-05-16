@@ -1,6 +1,5 @@
 import {
   All,
-  Body,
   Controller,
   Get,
   Logger,
@@ -20,6 +19,7 @@ import {
 } from '@nestjs/swagger';
 import { toNodeHandler } from 'better-auth/node';
 import type { IncomingMessage, ServerResponse } from 'node:http';
+import { Readable } from 'stream';
 import { AuthService } from './auth.service';
 import { Public } from './auth.guard';
 import { RequiresFreshSession } from './fresh-session.guard';
@@ -101,9 +101,7 @@ export class AuthController {
   async signUpEmail(
     @Req() req: IncomingMessage,
     @Res() res: ServerResponse,
-    @Body() body: SignUpEmailDto,
   ): Promise<void> {
-    this.logger.log(`Sign-up attempt for user: ${body.email}`);
     return this.handleRequest(req, res);
   }
 
@@ -136,9 +134,7 @@ export class AuthController {
   async signInEmail(
     @Req() req: IncomingMessage,
     @Res() res: ServerResponse,
-    @Body() body: SignInEmailDto,
   ): Promise<void> {
-    this.logger.log(`Login attempt for user: ${body.email}`);
     return this.handleRequest(req, res);
   }
 
@@ -327,7 +323,70 @@ export class AuthController {
     @Req() req: IncomingMessage,
     @Res() res: ServerResponse,
   ): Promise<void> {
-    return this.handleRequest(req, res);
+    let email = '<unknown>';
+    let reqForBetterAuth: IncomingMessage = req;
+
+    // NestJS body-parser middleware consumes the stream and sets req.body.
+    // Prefer that; only fall back to stream reading if body-parser is disabled.
+    const preParsed = (req as unknown as { body?: Record<string, unknown> })
+      .body;
+    if (typeof preParsed?.email === 'string') {
+      email = preParsed.email;
+      // req stream already consumed; BetterAuth also reads req.body, so pass original
+    } else {
+      const chunks: Buffer[] = [];
+      for await (const chunk of req) {
+        chunks.push(
+          Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk as string),
+        );
+      }
+      const rawBody = Buffer.concat(chunks);
+      try {
+        const parsed = JSON.parse(rawBody.toString()) as Record<
+          string,
+          unknown
+        >;
+        if (typeof parsed.email === 'string') email = parsed.email;
+      } catch {
+        // Non-JSON body — fall through
+      }
+      // Re-inject buffered body so BetterAuth can read the stream
+      reqForBetterAuth = Object.assign(Readable.from([rawBody]), {
+        headers: req.headers,
+        method: req.method,
+        url: req.url,
+        socket: req.socket,
+        httpVersion: req.httpVersion,
+        httpVersionMajor: req.httpVersionMajor,
+        httpVersionMinor: req.httpVersionMinor,
+        complete: req.complete,
+        rawHeaders: req.rawHeaders,
+        trailers: req.trailers,
+        rawTrailers: req.rawTrailers,
+      }) as unknown as IncomingMessage;
+    }
+
+    const found = await this.authService.userExistsByEmail(email);
+    this.logger.log(
+      `Password reset requested for ${email}: ${found ? 'found' : 'not found'}`,
+    );
+
+    if (!found) {
+      res.statusCode = 200;
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify({}));
+      return;
+    }
+
+    // BetterAuth v1.6.9 renamed /forget-password → /request-password-reset.
+    // The client still calls /forget-password (camelCase proxy convention), so
+    // we rewrite the URL here to match the actual server-side route.
+    reqForBetterAuth.url = reqForBetterAuth.url?.replace(
+      'forget-password',
+      'request-password-reset',
+    );
+
+    return this.handleRequest(reqForBetterAuth, res);
   }
 
   @Public()
@@ -635,10 +694,19 @@ export class AuthController {
     try {
       const auth = this.authService.getAuth();
       const nodeHandler = toNodeHandler(auth.handler);
+
+      this.logger.log(`Auth request: ${req.method} ${req.url}`);
+
       await nodeHandler(req, res);
+
+      if (res.statusCode >= 400) {
+        this.logger.warn(
+          `Auth request failed: ${req.method} ${req.url} -> Status ${res.statusCode}`,
+        );
+      }
     } catch (error) {
       this.logger.error(
-        `Auth handler error: ${error instanceof Error ? error.message : String(error)}`,
+        `Auth handler exception: ${error instanceof Error ? error.message : String(error)}`,
         error instanceof Error ? error.stack : undefined,
       );
       if (!res.headersSent) {
