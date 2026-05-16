@@ -50,6 +50,16 @@ services:
     volumes:
       - minio_data:/data
 
+  mailhog:
+    image: mailhog/mailhog:latest
+    platform: linux/amd64
+    networks:
+      - gateway
+      - internal
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
   solver:
     build:
       context: ./apps/solver
