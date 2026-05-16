@@ -17,3 +17,5 @@ export function assertAppRole(value: unknown): AppRole {
   }
   return value;
 }
+
+export const SYS_ADMIN_ROLE: AppRole = 'sys_admin';
