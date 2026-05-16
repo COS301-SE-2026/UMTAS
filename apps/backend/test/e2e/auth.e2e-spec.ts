@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument */
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
@@ -44,14 +45,18 @@ describe('Auth e2e', () => {
 
       const signUpRes = await request(app.getHttpServer())
         .post('/api/auth/sign-up/email')
-        .send({ email, password, name: 'E2E User' });
+        .send({
+          email,
+          password,
+          name: 'E2E User',
+        });
       expect([200, 201]).toContain(signUpRes.status);
       expect(signUpRes.body.user.emailVerified).toBe(false);
 
       const sent = mockMailer.getSent();
       expect(sent.length).toBeGreaterThan(0);
       const verifyMail = sent[sent.length - 1];
-      const code = verifyMail.context?.verifyUrl as string | undefined;
+      const code = verifyMail.context?.verifyUrl;
       expect(code).toBeTruthy();
 
       const verifyRes = await request(app.getHttpServer())
@@ -87,14 +92,21 @@ describe('Auth e2e', () => {
 
       const res = await request(app.getHttpServer())
         .post('/api/auth/sign-up/email')
-        .send({ email, password: 'Password1!', name: 'Second' });
+        .send({
+          email,
+          password: 'Password1!',
+          name: 'Second',
+        });
       expect(res.status).toBe(422);
     }, 10000);
 
     test('sign-in with wrong password → 401', async () => {
       const res = await request(app.getHttpServer())
         .post('/api/auth/sign-in/email')
-        .send({ email: 'nobody@example.com', password: 'WrongPass1!' });
+        .send({
+          email: 'nobody@example.com',
+          password: 'WrongPass1!',
+        });
       expect(res.status).toBe(401);
     });
 

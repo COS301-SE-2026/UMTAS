@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
 // jest.mock hoisted to top by Jest to stub better-auth/node
 jest.mock('better-auth/node', () => ({
-  toNodeHandler: (h: any) => h,
+  toNodeHandler: (h: unknown) => h,
 }));
 
 import { Test, TestingModule } from '@nestjs/testing';
@@ -10,6 +11,7 @@ import { AuthController } from '../../src/auth/auth.controller';
 import { AuthService } from '../../src/auth/auth.service';
 import { MailerService } from '../../src/mail/mailer.service';
 import { createMockMailer } from '../utils/mailer.mock';
+import type { IncomingMessage, ServerResponse } from 'node:http';
 
 // Tests Google OAuth routing and duplicate-email handling using mocked provider flow.
 
@@ -28,8 +30,8 @@ describe('Google OAuth (mocked)', () => {
     mockMailer = createMockMailer();
 
     // Create a fake auth.handler that simulates BetterAuth behaviour for google endpoints
-    const fakeHandler = jest.fn(async (req: any, res: any) => {
-      const url = req.url || '';
+    const fakeHandler = jest.fn((req: IncomingMessage, res: ServerResponse) => {
+      const url = (req as unknown as { url: string }).url || '';
       if (url.includes('/link-account/google')) {
         res.statusCode = 422;
         res.end(JSON.stringify({ error: 'EMAIL_ALREADY_IN_USE' }));
@@ -77,6 +79,6 @@ describe('Google OAuth (mocked)', () => {
       .post('/api/auth/link-account/google')
       .send({ code: 'abc', state: 'xyz' });
     expect([422]).toContain(res.status);
-    expect(res.body).toEqual({ error: 'EMAIL_ALREADY_IN_USE' });
+    expect(res.body.error).toEqual('EMAIL_ALREADY_IN_USE');
   });
 });
