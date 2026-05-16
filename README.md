@@ -5,7 +5,7 @@
 ## Tech Stack
 
 - **Frontend**: Next.js (React + TypeScript) + Tailwind CSS
-- **Backend Core**: Nest.js + TypeORM + PostgreSQL
+- **Backend Core**: Nest.js + DrizzleORM + PostgreSQL
 - **Microservices**: FastAPI + pdfplumber + Google OR-Tools
 - **Infrastructure**: Docker + pnpm monorepo + Traefik
 
@@ -16,3 +16,5 @@ For more detailed project planning and architecture design, please refer to the 
 - `pnpm run dev` starts the local Turbo workspace.
 - `pnpm run dev:pglite` starts the lightweight Docker-backed profile.
 - `pnpm run dev:docker` starts the Postgres Docker-backed profile.
+
+For local auth dev, `DB_MODE=PGLITE` is the quickest setup. The backend also needs `REDIS_URL` in production and SMTP on port `1025` for Mailpit-style mail capture.
