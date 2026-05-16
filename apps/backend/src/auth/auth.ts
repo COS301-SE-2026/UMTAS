@@ -110,6 +110,7 @@ interface CreateAuthInput {
   systemAdminUserIds?: string[];
   isProduction: boolean;
   logger: LoggerService;
+  appURL?: string;
   sendResetPasswordEmail: (input: {
     email: string;
     url: string;
@@ -128,6 +129,7 @@ export function createAuth(input: CreateAuthInput): AuthInstance {
     db,
     dbProvider,
     baseURL,
+    appURL,
     secret,
     trustedOrigins,
     googleClientId,
@@ -179,30 +181,88 @@ export function createAuth(input: CreateAuthInput): AuthInstance {
       minPasswordLength: 8,
       maxPasswordLength: 128,
       sendResetPassword: async ({ user, url }) => {
+        logger.log(`BetterAuth generated reset URL: ${url}`);
+        // url is constructed using baseURL (backend). If appURL (frontend) is
+        // provided, we want to point the user to the frontend reset page.
+        let resetUrl = url;
+        if (appURL) {
+          try {
+            const urlObj = new URL(url);
+            // BetterAuth puts the reset token in the path (/reset-password/{token}),
+            // not a query param. Fall back to path extraction when ?token= is absent.
+            const token =
+              urlObj.searchParams.get('token') ??
+              (urlObj.pathname.split('/').pop() || null);
+            if (token) {
+              resetUrl = `${appURL.replace(/\/$/, '')}/reset-password?token=${token}`;
+              logger.log(`Rewrote reset URL to: ${resetUrl}`);
+            } else {
+              logger.warn(`Reset URL missing token: ${url}`);
+            }
+          } catch (error) {
+            logger.error(`Failed to rewrite reset URL: ${url}`, error);
+          }
+        }
+
+        logger.log(
+          `Password reset requested for ${user.email}. Link: ${resetUrl}`,
+        );
+        logAuditEvent(logger, {
+          action: 'password.reset_requested',
+          targetUserId: user.id,
+          targetEmail: user.email,
+        });
         await sendResetPasswordEmail({
           email: user.email,
-          url,
+          url: resetUrl,
           name: user.name || 'User',
         });
       },
       // eslint-disable-next-line @typescript-eslint/require-await
       onPasswordReset: async ({ user }) => {
         logger.log(`Password reset completed for ${user.email}`);
+        logAuditEvent(logger, {
+          action: 'password.reset_completed',
+          targetUserId: user.id,
+          targetEmail: user.email,
+        });
       },
     },
     emailVerification: {
       sendOnSignUp: true,
       autoSignInAfterVerification: true,
       sendVerificationEmail: async ({ user, url }) => {
+        logger.log(`BetterAuth generated verification URL: ${url}`);
+        // url is constructed using baseURL (backend). If appURL (frontend) is
+        // provided, we want to point the user to the frontend verification page.
+        let verifyUrl = url;
+        if (appURL) {
+          try {
+            const urlObj = new URL(url);
+            const token = urlObj.searchParams.get('token');
+            if (token) {
+              verifyUrl = `${appURL.replace(/\/$/, '')}/verify-email?token=${token}`;
+              logger.log(`Rewrote verification URL to: ${verifyUrl}`);
+            } else {
+              logger.warn(`Verification URL missing token: ${url}`);
+            }
+          } catch (error) {
+            logger.error(`Failed to rewrite verification URL: ${url}`, error);
+          }
+        }
+
+        logger.log(
+          `Sending verification email to ${user.email}. Link: ${verifyUrl}`,
+        );
         if (sendVerificationEmail) {
           await sendVerificationEmail({
             email: user.email,
-            url,
+            url: verifyUrl,
             name: user.name || 'User',
           });
         } else {
           logger.warn(
-            `Email verification email not sent (no mailer configured)`,
+            `Email verification email not sent for ${user.email} (no mailer configured)`,
           );
         }
       },
