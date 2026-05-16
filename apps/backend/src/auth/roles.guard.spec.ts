@@ -3,35 +3,27 @@ import {
   ForbiddenException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { RolesGuard, ROLES_KEY } from './roles.guard';
-import { AuthService } from './auth.service';
-import type { AuthSession } from './auth';
+import { RolesGuard } from './roles.guard';
+import type { RequestWithSession } from './auth.guard';
+import type { SessionData } from './session.decorator';
 
 describe('RolesGuard', () => {
   let guard: RolesGuard;
 
-  const mockAuthService = {
-    getAuth: jest.fn().mockReturnValue({
-      api: {
-        getSession: jest.fn(),
-      },
-    }),
-  };
-
   beforeEach(() => {
-    guard = new RolesGuard(mockAuthService as unknown as AuthService);
+    guard = new RolesGuard();
   });
 
   describe('canActivate', () => {
     let mockExecutionContext: ExecutionContext;
-    let mockRequest: any;
+    let mockRequest: RequestWithSession;
 
     beforeEach(() => {
       mockRequest = {
         headers: {
           cookie: 'test-cookie',
         },
-      };
+      } as unknown as RequestWithSession;
 
       mockExecutionContext = {
         switchToHttp: jest.fn().mockReturnValue({
@@ -42,16 +34,16 @@ describe('RolesGuard', () => {
       } as unknown as ExecutionContext;
     });
 
-    it('should allow access when no roles are required', async () => {
+    it('should allow access when no roles are required', () => {
       jest.spyOn(Reflect, 'getMetadata').mockReturnValue(undefined);
 
-      const result = await guard.canActivate(mockExecutionContext);
+      const result = guard.canActivate(mockExecutionContext);
       expect(result).toBe(true);
     });
 
-    it('should allow access when user has required role', async () => {
+    it('should allow access when user has required role', () => {
       const requiredRoles = ['student'];
-      const mockSession: AuthSession = {
+      const mockSession: SessionData = {
         user: {
           id: 'user-1',
           email: 'student@example.com',
@@ -75,13 +67,13 @@ describe('RolesGuard', () => {
       jest.spyOn(Reflect, 'getMetadata').mockReturnValue(requiredRoles);
       mockRequest.session = mockSession;
 
-      const result = await guard.canActivate(mockExecutionContext);
+      const result = guard.canActivate(mockExecutionContext);
       expect(result).toBe(true);
     });
 
-    it('should deny access when user lacks required role', async () => {
+    it('should deny access when user lacks required role', () => {
       const requiredRoles = ['sys_admin'];
-      const mockSession: AuthSession = {
+      const mockSession: SessionData = {
         user: {
           id: 'user-1',
           email: 'student@example.com',
@@ -105,64 +97,25 @@ describe('RolesGuard', () => {
       jest.spyOn(Reflect, 'getMetadata').mockReturnValue(requiredRoles);
       mockRequest.session = mockSession;
 
-      await expect(guard.canActivate(mockExecutionContext)).rejects.toThrow(
+      expect(() => guard.canActivate(mockExecutionContext)).toThrow(
         ForbiddenException,
       );
     });
 
-    it('should deny access when session is missing', async () => {
+    it('should deny access when session is missing from request', () => {
       const requiredRoles = ['student'];
 
       jest.spyOn(Reflect, 'getMetadata').mockReturnValue(requiredRoles);
-      jest.spyOn(mockAuthService, 'getAuth').mockReturnValueOnce({
-        api: {
-          getSession: jest.fn().mockResolvedValue(null),
-        },
-      });
+      // No session attached to request (AuthGuard was bypassed or route is misconfigured)
 
-      await expect(guard.canActivate(mockExecutionContext)).rejects.toThrow(
+      expect(() => guard.canActivate(mockExecutionContext)).toThrow(
         UnauthorizedException,
       );
     });
 
-    it('should fetch session from auth API if not cached', async () => {
-      const requiredRoles = ['uni_admin'];
-      const mockSession: AuthSession = {
-        user: {
-          id: 'user-2',
-          email: 'admin@example.com',
-          role: 'uni_admin',
-          name: 'Jane Admin',
-          emailVerified: true,
-          banned: false,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-        session: {
-          id: 'session-2',
-          token: 'token',
-          userId: 'user-2',
-          expiresAt: new Date(Date.now() + 3600000).toISOString(),
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-      };
-
-      jest.spyOn(Reflect, 'getMetadata').mockReturnValue(requiredRoles);
-      jest.spyOn(mockAuthService, 'getAuth').mockReturnValueOnce({
-        api: {
-          getSession: jest.fn().mockResolvedValue(mockSession),
-        },
-      });
-
-      const result = await guard.canActivate(mockExecutionContext);
-      expect(result).toBe(true);
-      expect(mockRequest.session).toEqual(mockSession);
-    });
-
-    it('should allow multiple valid roles', async () => {
+    it('should allow multiple valid roles', () => {
       const requiredRoles = ['student', 'uni_admin', 'sys_admin'];
-      const mockSession: AuthSession = {
+      const mockSession: SessionData = {
         user: {
           id: 'user-3',
           email: 'admin@uni.example.com',
@@ -186,7 +139,7 @@ describe('RolesGuard', () => {
       jest.spyOn(Reflect, 'getMetadata').mockReturnValue(requiredRoles);
       mockRequest.session = mockSession;
 
-      const result = await guard.canActivate(mockExecutionContext);
+      const result = guard.canActivate(mockExecutionContext);
       expect(result).toBe(true);
     });
   });
