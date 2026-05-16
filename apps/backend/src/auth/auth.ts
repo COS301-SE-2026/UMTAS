@@ -4,7 +4,6 @@ import type { PgliteDatabase } from 'drizzle-orm/pglite';
 import { APIError, betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { admin } from 'better-auth/plugins/admin';
-import { defaultRoles } from 'better-auth/plugins/admin/access';
 import { redisStorage } from '@better-auth/redis-storage';
 import * as appSchema from '../db/schema';
 import { isAppRole } from './roles';
@@ -17,7 +16,32 @@ export type AppDatabase =
 type Database = AppDatabase;
 
 export type AuthInstance = ReturnType<typeof betterAuth>;
-export type AuthSession = any;
+export interface AuthSession {
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    emailVerified: boolean;
+    image?: string | null;
+    role: string;
+    banned: boolean | null;
+    banReason?: string | null;
+    banExpires?: Date | null;
+    createdAt: Date;
+    updatedAt: Date;
+  };
+  session: {
+    id: string;
+    token: string;
+    userId: string;
+    expiresAt: Date;
+    ipAddress?: string | null;
+    userAgent?: string | null;
+    impersonatedBy?: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+  };
+}
 
 export interface GoogleProfile {
   name?: unknown;
@@ -58,6 +82,21 @@ function logAuditEvent(
       ...event,
     }),
   );
+}
+
+function extractActorFromCtx(ctx: Record<string, unknown> | null): {
+  id?: string;
+  role?: string;
+} {
+  const session = (ctx?.context as Record<string, unknown> | undefined)
+    ?.session as Record<string, unknown> | undefined;
+  const user = session?.user as Record<string, unknown> | undefined;
+  const userId = user?.id as string | number | null | undefined;
+  const userRole = user?.role as string | number | null | undefined;
+  return {
+    id: userId != null ? String(userId) : undefined,
+    role: userRole != null ? String(userRole) : undefined,
+  };
 }
 
 interface CreateAuthInput {
@@ -103,6 +142,16 @@ export function createAuth(input: CreateAuthInput): AuthInstance {
 
   const redisClient = redisUrl ? getRedisClient() : null;
 
+  // Validate Redis client in production when redisUrl is provided
+  if (isProduction && redisUrl && !redisClient) {
+    throw new Error(
+      'Redis URL configured but client initialization failed. Rate limiting and session storage require Redis in production.',
+    );
+  }
+
+  // Type cast needed: BetterAuth's admin plugin extends the user schema at
+  // runtime (adds banned/role fields) but the generic type system can't
+  // represent this as assignable to the base Auth<BetterAuthOptions>.
   return betterAuth({
     secondaryStorage: redisClient
       ? redisStorage({
@@ -135,7 +184,7 @@ export function createAuth(input: CreateAuthInput): AuthInstance {
           name: user.name || 'User',
         });
       },
-      onPasswordReset: async ({ user }) => {
+      onPasswordReset: ({ user }) => {
         logger.log(`Password reset completed for ${user.email}`);
       },
     },
@@ -174,9 +223,9 @@ export function createAuth(input: CreateAuthInput): AuthInstance {
       max: 100,
     },
     session: {
-      expiresIn: 60 * 60 * 24 * 30,
-      updateAge: 60 * 60 * 24,
-      freshAge: 60 * 60,
+      expiresIn: 60 * 60 * 24 * 7, // 7 days (reduced from 30 for classroom security)
+      updateAge: 60 * 60 * 24, // Update session after 1 day of inactivity
+      freshAge: 60 * 60, // Require fresh auth for sensitive operations (1 hour)
       cookieCache: {
         enabled: true,
         maxAge: 60 * 5,
@@ -187,6 +236,10 @@ export function createAuth(input: CreateAuthInput): AuthInstance {
       encryptOAuthTokens: true,
       storeStateStrategy: 'cookie',
       accountLinking: {
+        // Safe: BetterAuth only links accounts with matching email.
+        // `requireEmailVerification: true` ensures the credential account
+        // has a verified email before an OAuth account can link to it,
+        // preventing OAuth account takeover via unverified email registration.
         enabled: true,
       },
     },
@@ -226,7 +279,7 @@ export function createAuth(input: CreateAuthInput): AuthInstance {
     databaseHooks: {
       user: {
         create: {
-          before: async (
+          before: (
             data: Record<string, unknown>,
             ctx: Record<string, unknown> | null,
           ) => {
@@ -258,13 +311,15 @@ export function createAuth(input: CreateAuthInput): AuthInstance {
               const assignable = ['student', 'lecturer'];
               if (
                 requestedRole !== undefined &&
-                !assignable.includes(requestedRole as string)
+                !assignable.includes(requestedRole)
               ) {
                 throw new APIError('FORBIDDEN', {
                   message: 'uni_admin can only assign student or lecturer role',
                 });
               }
-              return { data: { ...data, role: requestedRole ?? 'student' } };
+              return {
+                data: { ...data, role: requestedRole ?? 'student' },
+              };
             }
 
             return {
@@ -274,38 +329,33 @@ export function createAuth(input: CreateAuthInput): AuthInstance {
               },
             };
           },
-          after: async (
+          after: (
             data: Record<string, unknown>,
             ctx: Record<string, unknown> | null,
           ) => {
-            const actor = (ctx?.context as Record<string, unknown> | undefined)
-              ?.session as Record<string, unknown> | undefined;
+            const actor = extractActorFromCtx(ctx);
             logAuditEvent(logger, {
               action: 'user.create',
-              actorId: actor?.user
-                ? String((actor.user as Record<string, unknown>).id)
-                : undefined,
-              actorRole: actor?.user
-                ? String((actor.user as Record<string, unknown>).role)
-                : undefined,
+              actorId: actor.id,
+              actorRole: actor.role,
               targetUserId: String(data.id),
-              targetEmail: String(data.email ?? ''),
+              targetEmail: typeof data.email === 'string' ? data.email : '',
             });
           },
         },
         update: {
-          after: async (data: Record<string, unknown>) => {
+          after: (data: Record<string, unknown>) => {
             logAuditEvent(logger, {
               action: 'user.update',
               targetUserId: String(data.id),
-              targetEmail: String(data.email ?? ''),
+              targetEmail: typeof data.email === 'string' ? data.email : '',
             });
           },
         },
       },
       session: {
         create: {
-          after: async (
+          after: (
             data: Record<string, unknown>,
             ctx: Record<string, unknown> | null,
           ) => {
@@ -317,7 +367,10 @@ export function createAuth(input: CreateAuthInput): AuthInstance {
             if (data.impersonatedBy) {
               logAuditEvent(logger, {
                 event: 'impersonate',
-                actorSessionId: String(data.impersonatedBy),
+                actorSessionId:
+                  typeof data.impersonatedBy === 'string'
+                    ? data.impersonatedBy
+                    : JSON.stringify(data.impersonatedBy),
                 targetUserId: String(data.userId),
               });
             }
@@ -332,7 +385,7 @@ export function createAuth(input: CreateAuthInput): AuthInstance {
       },
       account: {
         create: {
-          after: async (data: Record<string, unknown>) => {
+          after: (data: Record<string, unknown>) => {
             logger.log(
               `Account linked for user ${String(data.userId)} via ${String(data.providerId)}`,
             );
@@ -345,5 +398,5 @@ export function createAuth(input: CreateAuthInput): AuthInstance {
         },
       },
     },
-  }) as any;
+  });
 }
