@@ -96,7 +96,7 @@
       "^(\\.{1,2}/.*)\\.js$": "$1"
     },
     "setupFilesAfterEnv": [
-      "<rootDir>/../test/jest.setup.ts"
+      "<rootDir>/../test/jest.setup.cjs"
     ],
     "transformIgnorePatterns": [
       "node_modules/(?!(better-auth|@better-auth)/)"
