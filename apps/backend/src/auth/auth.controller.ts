@@ -63,7 +63,6 @@ const SESSION_EXAMPLE = {
 
 const AUTH_RESPONSE_EXAMPLE = { user: USER_EXAMPLE, session: SESSION_EXAMPLE };
 
-@Public()
 @Controller('api/auth')
 export class AuthController {
   private readonly logger = new Logger(AuthController.name);
@@ -72,6 +71,7 @@ export class AuthController {
 
   // ─── Registration ─────────────────────────────────────────────────────────────
 
+  @Public()
   @ApiTags('Auth Email')
   @Post('sign-up/email')
   @ApiOperation({
@@ -109,6 +109,7 @@ export class AuthController {
 
   // ─── Sign in ──────────────────────────────────────────────────────────────────
 
+  @Public()
   @ApiTags('Auth Email')
   @Post('sign-in/email')
   @ApiOperation({
@@ -244,7 +245,6 @@ export class AuthController {
   async revokeSession(
     @Req() req: IncomingMessage,
     @Res() res: ServerResponse,
-    @Body() _body: RevokeSessionDto,
   ): Promise<void> {
     return this.handleRequest(req, res);
   }
@@ -281,6 +281,7 @@ export class AuthController {
     return this.handleRequest(req, res);
   }
 
+  @Public()
   @ApiTags('Auth Email')
   @Post('verify-email')
   @ApiOperation({
@@ -301,13 +302,13 @@ export class AuthController {
   async verifyEmail(
     @Req() req: IncomingMessage,
     @Res() res: ServerResponse,
-    @Body() _body: VerifyEmailDto,
   ): Promise<void> {
     return this.handleRequest(req, res);
   }
 
   // ─── Password reset ───────────────────────────────────────────────────────────
 
+  @Public()
   @ApiTags('Auth Email')
   @Post('forget-password')
   @ApiOperation({
@@ -325,11 +326,11 @@ export class AuthController {
   async forgetPassword(
     @Req() req: IncomingMessage,
     @Res() res: ServerResponse,
-    @Body() _body: ForgetPasswordDto,
   ): Promise<void> {
     return this.handleRequest(req, res);
   }
 
+  @Public()
   @ApiTags('Auth Email')
   @Post('reset-password')
   @ApiOperation({
@@ -350,7 +351,6 @@ export class AuthController {
   async resetPassword(
     @Req() req: IncomingMessage,
     @Res() res: ServerResponse,
-    @Body() _body: ResetPasswordDto,
   ): Promise<void> {
     return this.handleRequest(req, res);
   }
@@ -384,13 +384,13 @@ export class AuthController {
   async changePassword(
     @Req() req: IncomingMessage,
     @Res() res: ServerResponse,
-    @Body() _body: ChangePasswordDto,
   ): Promise<void> {
     return this.handleRequest(req, res);
   }
 
   // ─── Google OAuth ─────────────────────────────────────────────────────────────
 
+  @Public()
   @ApiTags('Auth Google')
   @Get('callback/google')
   @ApiOperation({
@@ -463,7 +463,6 @@ export class AuthController {
   async linkGoogleAccount(
     @Req() req: IncomingMessage,
     @Res() res: ServerResponse,
-    @Body() _body: LinkGoogleAccountDto,
   ): Promise<void> {
     if (!this.hasGoogleOAuth()) {
       throw new NotFoundException('Google OAuth is not configured');
@@ -505,7 +504,6 @@ export class AuthController {
   async adminCreateUser(
     @Req() req: IncomingMessage,
     @Res() res: ServerResponse,
-    @Body() _body: AdminCreateUserDto,
   ): Promise<void> {
     return this.handleRequest(req, res);
   }
@@ -537,7 +535,6 @@ export class AuthController {
   async adminImpersonateUser(
     @Req() req: IncomingMessage,
     @Res() res: ServerResponse,
-    @Body() _body: AdminImpersonateUserDto,
   ): Promise<void> {
     return this.handleRequest(req, res);
   }
@@ -574,7 +571,6 @@ export class AuthController {
   async adminBanUser(
     @Req() req: IncomingMessage,
     @Res() res: ServerResponse,
-    @Body() _body: AdminBanUserDto,
   ): Promise<void> {
     return this.handleRequest(req, res);
   }
@@ -616,7 +612,6 @@ export class AuthController {
   async adminUpdateUser(
     @Req() req: IncomingMessage,
     @Res() res: ServerResponse,
-    @Body() _body: AdminUpdateUserDto,
   ): Promise<void> {
     return this.handleRequest(req, res);
   }
