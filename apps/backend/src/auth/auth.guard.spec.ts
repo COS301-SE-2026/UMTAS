@@ -133,5 +133,18 @@ describe('AuthGuard', () => {
         UnauthorizedException,
       );
     });
+
+    it('should throw UnauthorizedException when getSession rejects with non-Error', async () => {
+      jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(false);
+      jest.spyOn(mockAuthService, 'getAuth').mockReturnValueOnce({
+        api: {
+          getSession: jest.fn().mockRejectedValue('string error'),
+        },
+      });
+
+      await expect(guard.canActivate(mockExecutionContext)).rejects.toThrow(
+        UnauthorizedException,
+      );
+    });
   });
 });

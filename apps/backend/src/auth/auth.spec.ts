@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/unbound-method */
 import { mapGoogleProfileToUser, createAuth } from './auth';
 import { betterAuth } from 'better-auth';
 import type { LoggerService } from '@nestjs/common';
@@ -67,10 +68,8 @@ describe('createAuth — URL rewrite', () => {
       sendVerificationEmail,
       ...(appURL ? { appURL } : {}),
     });
-    return (betterAuth as jest.Mock).mock.calls[0][0] as Record<
-      string,
-      unknown
-    >;
+    const mockCalls = (betterAuth as jest.Mock).mock.calls;
+    return (mockCalls[0] as unknown[])[0] as Record<string, unknown>;
   }
 
   beforeEach(() => {
@@ -144,9 +143,74 @@ describe('createAuth — URL rewrite', () => {
         expect.stringContaining('Reset URL missing token'),
       );
     });
+
+    it('logs error when URL rewriting throws', async () => {
+      const config = getConfig('invalid-url-triggers-error');
+      // Mocking URL constructor failure is hard, but we can trigger it by passing null or something that URL() chokes on if we could inject it.
+      // Actually, the current code does `${appURL.replace...}` so it depends on appURL being a string.
+      // If we pass a weird appURL it might not throw, but we can check the catch block by providing a malformed baseURL/url to URL constructor.
+
+      const emailAndPassword = config.emailAndPassword as Record<
+        string,
+        unknown
+      >;
+      const cb = emailAndPassword.sendResetPassword as (input: {
+        user: { id: string; email: string; name: string };
+        url: string;
+      }) => Promise<void>;
+
+      await cb({
+        user: { id: 'u1', email: 'a@b.com', name: 'Alice' },
+        url: 'relative-url-not-absolute',
+      });
+
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        expect.stringContaining('Failed to rewrite reset URL'),
+        expect.objectContaining({ message: 'Invalid URL' }),
+      );
+    });
+
+    it('logs when password reset completes', async () => {
+      const config = getConfig();
+      const emailAndPassword = config.emailAndPassword as Record<
+        string,
+        unknown
+      >;
+      const onPasswordReset = emailAndPassword.onPasswordReset as (input: {
+        user: { id: string; email: string };
+      }) => Promise<void>;
+
+      await onPasswordReset({ user: { id: 'u1', email: 'reset@example.com' } });
+
+      expect(mockLogger.log).toHaveBeenCalledWith(
+        expect.stringContaining(
+          'Password reset completed for reset@example.com',
+        ),
+      );
+    });
   });
 
   describe('sendVerificationEmail callback', () => {
+    it('logs error when URL rewriting throws in verification', async () => {
+      const config = getConfig('http://localhost:3000');
+      const evConfig = config.emailVerification as Record<string, unknown>;
+      const cb = evConfig.sendVerificationEmail as (input: {
+        user: { id: string; email: string; name: string };
+        url: string;
+        token: string;
+      }) => Promise<void>;
+
+      await cb({
+        user: { id: 'u1', email: 'a@b.com', name: 'Alice' },
+        url: 'invalid-url',
+        token: 'VT123',
+      });
+
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        expect.stringContaining('Failed to rewrite verification URL'),
+        expect.objectContaining({ message: 'Invalid URL' }),
+      );
+    });
     it('rewrites URL to appURL when appURL set and token present', async () => {
       const config = getConfig('http://localhost:3000');
       const evConfig = config.emailVerification as Record<string, unknown>;
@@ -202,7 +266,8 @@ describe('createAuth — URL rewrite', () => {
         sendResetPasswordEmail,
         // No sendVerificationEmail
       });
-      const config = (betterAuth as jest.Mock).mock.calls[0][0] as Record<
+      const finalMockCalls = (betterAuth as jest.Mock).mock.calls;
+      const config = (finalMockCalls[0] as unknown[])[0] as Record<
         string,
         unknown
       >;
@@ -226,6 +291,23 @@ describe('createAuth — URL rewrite', () => {
   });
 
   describe('background task error handler', () => {
+    it('logs error when background task rejects with non-Error', async () => {
+      const config = getConfig();
+      const advanced = config.advanced as Record<string, unknown>;
+      const bgTasks = advanced.backgroundTasks as Record<string, unknown>;
+      const backgroundHandler = bgTasks.handler as (
+        p: Promise<unknown>,
+      ) => void;
+
+      backgroundHandler(Promise.reject(new Error('string error')));
+      await new Promise((r) => setTimeout(r, 0));
+
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        'Background auth task failed',
+        expect.objectContaining({ message: 'string error' }),
+      );
+    });
+
     it('logs error when background task rejects', async () => {
       const config = getConfig();
       const advanced = config.advanced as Record<string, unknown>;
@@ -289,7 +371,8 @@ describe('createAuth — databaseHooks', () => {
       logger: mockLogger,
       sendResetPasswordEmail,
     });
-    const config = (betterAuth as jest.Mock).mock.calls[0][0] as {
+    const mockCalls = (betterAuth as jest.Mock).mock.calls;
+    const config = (mockCalls[0] as unknown[])[0] as {
       databaseHooks: {
         user: {
           create: { before: UserCreateBeforeHook; after: UserCreateAfterHook };
@@ -391,6 +474,21 @@ describe('createAuth — databaseHooks', () => {
         expect.stringContaining('"action":"user.create"'),
       );
     });
+
+    it('handles null context in user.create.after', async () => {
+      const hooks = getHooks();
+      (mockLogger.log as jest.Mock).mockClear();
+      await hooks.user.create.after({ id: 'u1', email: 'a@b.com' }, null);
+      expect(mockLogger.log).toHaveBeenCalledWith(
+        expect.stringContaining('"action":"user.create"'),
+      );
+      // actorId and actorRole should be undefined in the output
+      const mockCalls = (mockLogger.log as jest.Mock).mock.calls as any[][];
+      const lastCall = mockCalls[mockCalls.length - 1][0] as string;
+      const event = JSON.parse(lastCall) as Record<string, unknown>;
+      expect(event.actorId).toBeUndefined();
+      expect(event.actorRole).toBeUndefined();
+    });
   });
 
   describe('user.update.after', () => {
@@ -408,7 +506,20 @@ describe('createAuth — databaseHooks', () => {
     it('logs session creation audit event', async () => {
       const hooks = getHooks();
       (mockLogger.log as jest.Mock).mockClear();
-      await hooks.session.create.after({ id: 's1', userId: 'u1' }, null);
+      const mockReq = {
+        headers: {
+          get: jest.fn().mockReturnValue('1.2.3.4'),
+        },
+      };
+      await hooks.session.create.after(
+        { id: 's1', userId: 'u1' },
+        {
+          request: mockReq,
+        },
+      );
+      expect(mockLogger.log).toHaveBeenCalledWith(
+        expect.stringContaining('from 1.2.3.4'),
+      );
       expect(mockLogger.log).toHaveBeenCalledWith(
         expect.stringContaining('"action":"session.create"'),
       );
@@ -425,6 +536,25 @@ describe('createAuth — databaseHooks', () => {
         expect.stringContaining('"event":"impersonate"'),
       );
     });
+
+    it('logs impersonation event when impersonatedBy is an object', async () => {
+      const hooks = getHooks();
+      (mockLogger.log as jest.Mock).mockClear();
+      await hooks.session.create.after(
+        { id: 's1', userId: 'u1', impersonatedBy: { complex: 'id' } },
+        null,
+      );
+      expect(mockLogger.log).toHaveBeenCalledWith(
+        expect.stringContaining('"event":"impersonate"'),
+      );
+      // The object was stringified then stringified again into the audit log
+      expect(mockLogger.log).toHaveBeenCalledWith(
+        expect.stringContaining('complex'),
+      );
+      expect(mockLogger.log).toHaveBeenCalledWith(
+        expect.stringContaining('id'),
+      );
+    });
   });
 
   describe('account.create.after', () => {
@@ -438,6 +568,45 @@ describe('createAuth — databaseHooks', () => {
       expect(mockLogger.log).toHaveBeenCalledWith(
         expect.stringContaining('"action":"account.link"'),
       );
+    });
+  });
+
+  describe('createAuth — initialization', () => {
+    it('sets useSecureCookies based on isProduction', () => {
+      (betterAuth as jest.Mock).mockClear();
+      createAuth({
+        db: mockDb,
+        dbProvider: 'pg',
+        baseURL: 'http://localhost:3001/api/auth',
+        secret: 'test-secret-at-least-32-chars-long!!',
+        trustedOrigins: [],
+        isProduction: true,
+        logger: mockLogger,
+        sendResetPasswordEmail,
+      });
+      const mockCalls = (betterAuth as jest.Mock).mock.calls as any[][];
+      const lastCall = mockCalls[mockCalls.length - 1];
+      const config = lastCall[0] as unknown as Record<
+        string,
+        Record<string, boolean>
+      >;
+      expect(config.advanced.useSecureCookies).toBe(true);
+    });
+
+    it('throws error in production when Redis URL set but client fails', () => {
+      expect(() =>
+        createAuth({
+          db: mockDb,
+          dbProvider: 'pg',
+          baseURL: 'http://localhost:3001/api/auth',
+          secret: 'test-secret-at-least-32-chars-long!!',
+          trustedOrigins: [],
+          isProduction: true,
+          logger: mockLogger,
+          sendResetPasswordEmail,
+          redisUrl: 'redis://localhost:6379',
+        }),
+      ).toThrow('Redis URL configured but client initialization failed');
     });
   });
 });

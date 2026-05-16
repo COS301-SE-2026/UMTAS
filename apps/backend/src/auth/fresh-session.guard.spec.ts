@@ -1,67 +1,74 @@
+import { Test, TestingModule } from '@nestjs/testing';
 import { ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { FreshSessionGuard } from './fresh-session.guard';
-import type { RequestWithSession } from './auth.guard';
 
 describe('FreshSessionGuard', () => {
   let guard: FreshSessionGuard;
 
-  beforeEach(() => {
-    guard = new FreshSessionGuard();
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [FreshSessionGuard],
+    }).compile();
+
+    guard = module.get<FreshSessionGuard>(FreshSessionGuard);
   });
 
-  it('should be defined', () => {
+  it('is defined', () => {
     expect(guard).toBeDefined();
   });
 
-  it('should allow a fresh session (< 10 minutes old)', () => {
-    const now = Date.now();
-    const createdAt = new Date(now - 5 * 60 * 1000).toISOString(); // 5 mins ago
+  it('throws UnauthorizedException if no session', () => {
+    const mockContext = {
+      switchToHttp: () => ({
+        getRequest: () => ({ session: null }),
+      }),
+    } as unknown as ExecutionContext;
 
-    const context = {
+    expect(() => guard.canActivate(mockContext)).toThrow(UnauthorizedException);
+    expect(() => guard.canActivate(mockContext)).toThrow('No active session');
+  });
+
+  it('throws UnauthorizedException if session is older than 10 minutes', () => {
+    const tenMinutesAgo = new Date(Date.now() - 11 * 60 * 1000);
+    const mockContext = {
       switchToHttp: () => ({
         getRequest: () => ({
           session: {
             session: {
-              createdAt,
+              createdAt: tenMinutesAgo.toISOString(),
             },
           },
         }),
       }),
     } as unknown as ExecutionContext;
 
-    const result = guard.canActivate(context);
-    expect(result).toBe(true);
+    expect(() => guard.canActivate(mockContext)).toThrow(UnauthorizedException);
+    try {
+      guard.canActivate(mockContext);
+    } catch (e: unknown) {
+      if (e instanceof UnauthorizedException) {
+        const response = e.getResponse() as Record<string, unknown>;
+        expect(response.error).toBe('SESSION_STALE');
+      } else {
+        throw e;
+      }
+    }
   });
 
-  it('should throw UnauthorizedException for a stale session (> 10 minutes old)', () => {
-    const now = Date.now();
-    const createdAt = new Date(now - 10 * 60 * 1000 - 1000).toISOString(); // 10 minutes and 1 second ago
-
-    const context = {
+  it('returns true if session is fresh (under 10 minutes)', () => {
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+    const mockContext = {
       switchToHttp: () => ({
         getRequest: () => ({
           session: {
             session: {
-              createdAt,
+              createdAt: fiveMinutesAgo.toISOString(),
             },
           },
         }),
       }),
     } as unknown as ExecutionContext;
 
-    expect(() => guard.canActivate(context)).toThrow(UnauthorizedException);
-  });
-
-  it('should throw UnauthorizedException if no session exists', () => {
-    const context = {
-      switchToHttp: () => ({
-        getRequest: () =>
-          ({
-            session: undefined,
-          }) as RequestWithSession,
-      }),
-    } as unknown as ExecutionContext;
-
-    expect(() => guard.canActivate(context)).toThrow(UnauthorizedException);
+    expect(guard.canActivate(mockContext)).toBe(true);
   });
 });
