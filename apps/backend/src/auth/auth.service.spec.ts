@@ -260,9 +260,9 @@ describe('AuthService', () => {
       svc.getAuth();
 
       // Extract the captured betterAuth config and invoke the sendResetPassword callback
-      const capturedConfig = (betterAuth as jest.Mock).mock.calls.at(
-        -1,
-      )?.[0] as Record<string, unknown>;
+      const mockCalls = (betterAuth as jest.Mock).mock.calls;
+      const lastCall = mockCalls[mockCalls.length - 1] as unknown[];
+      const capturedConfig = lastCall[0] as Record<string, unknown>;
       const emailAndPassword = capturedConfig.emailAndPassword as Record<
         string,
         unknown

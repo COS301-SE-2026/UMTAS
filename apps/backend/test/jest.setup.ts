@@ -60,3 +60,10 @@ jest.mock('@better-auth/redis-storage', () => ({
 jest.mock('better-auth/node', () => ({
   toNodeHandler: jest.fn((handler: unknown) => handler),
 }));
+
+jest.mock('better-auth/crypto', () => ({
+  hashPassword: jest.fn((value: string) => Promise.resolve(`hashed:${value}`)),
+  verifyPassword: jest.fn(() => Promise.resolve(true)),
+}));
+
+export {};
