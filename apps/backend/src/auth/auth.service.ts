@@ -5,7 +5,6 @@ import { MailerService } from '../mail/mailer.service';
 import { createAuth } from './auth';
 import { createRedisClient } from '../redis/redis';
 import type { AuthInstance } from './auth';
-import type { AppDatabase } from './auth';
 
 @Injectable()
 export class AuthService implements OnModuleInit {
@@ -73,8 +72,8 @@ export class AuthService implements OnModuleInit {
       this.configService.get<string>('NODE_ENV') === 'production';
     const redisUrl = this.configService.get<string>('REDIS_URL');
 
-    // Both PGlite and Postgres use the 'pg' drizzle adapter provider.
-    // Explicitly derived from dbMode so any future driver change is caught here.
+    // PGlite is PostgreSQL-compatible, so both PGlite and Postgres use the 'pg'
+    // drizzle adapter provider (controls SQL dialect, not the driver).
     const dbProvider = 'pg' as const;
 
     this.authInstance = createAuth({

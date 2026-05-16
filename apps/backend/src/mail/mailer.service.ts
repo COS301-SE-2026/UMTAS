@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { MailerService as NestMailerService } from '@nestjs-modules/mailer';
+import type { ISendMailOptions } from '@nestjs-modules/mailer';
 
 export interface SendMailOptions {
   to: string;
@@ -25,12 +26,15 @@ export class MailerService {
 
   async verify(): Promise<void> {
     try {
-      // NestMailerService doesn't expose the transporter verify directly easily,
-      // but we can try to send a test if needed, or check if transporter exists.
-      // @nestjs-modules/mailer uses nodemailer under the hood.
-      const transporter = (this.mailerService as any).messenger?.transporter;
-      if (transporter && typeof transporter.verify === 'function') {
-        await transporter.verify();
+      // @nestjs-modules/mailer wraps nodemailer. We access the underlying transporter
+      // directly since no public verify() API is exposed. May need updating on
+      // major version bumps of @nestjs-modules/mailer.
+      const service = this.mailerService as unknown as {
+        transporter?: { verify?: () => Promise<unknown> };
+      };
+      if (typeof service.transporter?.verify === 'function') {
+        await service.transporter.verify();
+        this.logger.log('Mailer verification succeeded');
       }
     } catch (error) {
       this.logger.error('Mailer verification failed', error);
@@ -40,7 +44,7 @@ export class MailerService {
 
   async sendMail(options: SendMailOptions): Promise<void> {
     try {
-      const mailOptions: any = {
+      const mailOptions: ISendMailOptions = {
         to: options.to,
         subject: options.subject,
       };
@@ -94,7 +98,11 @@ export class MailerService {
     email: string;
     name: string;
     url: string;
+    expiresInHours?: number;
   }): Promise<void> {
+    // Default token expiry (1 hour) — sync with BetterAuth's email verification token TTL
+    const expiresInHours = input.expiresInHours ?? 1;
+
     await this.sendTemplateMail({
       to: input.email,
       subject: 'Reset your UMTAS password',
@@ -102,7 +110,7 @@ export class MailerService {
       context: {
         name: input.name,
         resetUrl: input.url,
-        expiresInHours: 1,
+        expiresInHours,
       },
     });
   }
