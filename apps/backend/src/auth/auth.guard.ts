@@ -8,10 +8,15 @@ import {
 import { Reflector } from '@nestjs/core';
 import type { IncomingMessage } from 'node:http';
 import { AuthService } from './auth.service';
+import type { SessionData } from './session.decorator';
 
 // Decorator to mark routes as public (no auth required)
 export const IS_PUBLIC_KEY = 'isPublic';
 export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
+
+export interface RequestWithSession extends IncomingMessage {
+  session?: SessionData;
+}
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -27,7 +32,7 @@ export class AuthGuard implements CanActivate {
     ]);
     if (isPublic) return true;
 
-    const req = context.switchToHttp().getRequest<IncomingMessage>();
+    const req = context.switchToHttp().getRequest<RequestWithSession>();
     const auth = this.authService.getAuth();
 
     // Extract session from request via better-auth API
@@ -40,9 +45,10 @@ export class AuthGuard implements CanActivate {
       }
     }
 
-    let session;
+    let session: SessionData | null;
     try {
-      session = await auth.api.getSession({ headers });
+      const result = await auth.api.getSession({ headers });
+      session = result as SessionData | null;
     } catch {
       throw new UnauthorizedException('No active session');
     }
@@ -52,7 +58,7 @@ export class AuthGuard implements CanActivate {
     }
 
     // Attach session to request so controllers can access it
-    (req as any).session = session;
+    req.session = session;
     return true;
   }
 }
