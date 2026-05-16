@@ -5,11 +5,12 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
+import type { RequestWithSession } from './auth.guard';
 
 @Injectable()
 export class FreshSessionGuard implements CanActivate {
-  async canActivate(context: ExecutionContext): Promise<boolean> {
-    const req = context.switchToHttp().getRequest();
+  canActivate(context: ExecutionContext): boolean {
+    const req = context.switchToHttp().getRequest<RequestWithSession>();
     const session = req.session?.session;
 
     if (!session) {
@@ -18,9 +19,9 @@ export class FreshSessionGuard implements CanActivate {
 
     const createdAt = new Date(session.createdAt).getTime();
     const now = Date.now();
-    const oneHour = 60 * 60 * 1000;
+    const TEN_MINUTES = 10 * 60 * 1000;
 
-    if (now - createdAt > oneHour) {
+    if (now - createdAt > TEN_MINUTES) {
       throw new UnauthorizedException({
         error: 'SESSION_STALE',
         message: 'Re-authenticate to continue',
@@ -33,6 +34,6 @@ export class FreshSessionGuard implements CanActivate {
 
 /**
  * Decorator that applies FreshSessionGuard to a route.
- * Ensures the session is less than 1 hour old.
+ * Ensures the session is less than 10 minutes old.
  */
 export const RequiresFreshSession = () => UseGuards(FreshSessionGuard);
