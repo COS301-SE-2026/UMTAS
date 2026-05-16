@@ -8,14 +8,10 @@ import {
   verificationsTable,
 } from '../../entities';
 import { eq } from 'drizzle-orm';
+import type { ISeedMigration } from './types';
 
 export const TEST_PASSWORD =
   process.env.SEED_TEST_PASSWORD || 'Test@UMTAS2024!';
-
-export interface ISeedMigration {
-  name: string;
-  run: (db: DatabaseService) => Promise<void>;
-}
 
 /**
  * Auth seed migration for testing and local development
