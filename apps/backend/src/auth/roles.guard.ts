@@ -5,6 +5,7 @@ import {
   Injectable,
   Logger,
   SetMetadata,
+  UnauthorizedException,
 } from '@nestjs/common';
 import type { Request } from 'express';
 import type { AuthSession } from './auth';
@@ -45,12 +46,18 @@ export class RolesGuard implements CanActivate {
     let session: AuthSession | null =
       (request as unknown as Record<string, unknown>).session ?? null;
 
-    if (!session && (request.headers.cookie || request.headers.authorization)) {
+    if (!session) {
       const headers = new Headers();
-      if (request.headers.cookie)
-        headers.set('cookie', String(request.headers.cookie));
-      if (request.headers.authorization)
-        headers.set('authorization', String(request.headers.authorization));
+      if (request.headers) {
+        for (const [key, value] of Object.entries(request.headers)) {
+          if (value) {
+            headers.set(
+              key,
+              Array.isArray(value) ? value.join(', ') : String(value),
+            );
+          }
+        }
+      }
 
       const auth = this.authService.getAuth();
       try {
@@ -65,7 +72,7 @@ export class RolesGuard implements CanActivate {
     }
 
     if (!session || !(session.user as { role?: unknown })?.role) {
-      throw new ForbiddenException('No active session');
+      throw new UnauthorizedException('No active session');
     }
 
     const userRole = (session.user as { role?: unknown }).role as AppRole;
@@ -76,7 +83,7 @@ export class RolesGuard implements CanActivate {
 
     if (!hasRole) {
       this.logger.warn(
-        `Access denied: user ${session.user.id} role=${userRole} required=${requiredRoles.join(',')}`,
+        `Access denied: user ${session?.user?.id} role=${userRole} required=${requiredRoles.join(',')}`,
       );
       throw new ForbiddenException('Insufficient permissions');
     }

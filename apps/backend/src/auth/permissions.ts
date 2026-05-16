@@ -26,6 +26,16 @@ export const student = ac.newRole({
 });
 
 /**
+ * lecturer — created by a uni_admin. Read-only on venues/timetables;
+ * can update (but not create or delete) modules within their university.
+ */
+export const lecturer = ac.newRole({
+  module: ['update', 'view'],
+  venue: ['view'],
+  timetable: ['view'],
+});
+
+/**
  * uni_admin — full user management within their university,
  * plus venue/module/parse job administration.
  * Cannot manage universities themselves (sys_admin only).

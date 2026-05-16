@@ -4,6 +4,7 @@ import {
   Controller,
   Get,
   Logger,
+  NotFoundException,
   Post,
   Req,
   Res,
@@ -17,12 +18,15 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { toNodeHandler } from 'better-auth/node';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { AuthService } from './auth.service';
 import { Public } from './auth.guard';
+import { RequiresFreshSession } from './fresh-session.guard';
 import {
   AdminBanUserDto,
   AdminCreateUserDto,
+  AdminImpersonateUserDto,
   AdminUpdateUserDto,
   ChangePasswordDto,
   ForgetPasswordDto,
@@ -215,6 +219,7 @@ export class AuthController {
 
   @ApiTags('Auth Session')
   @Post('revoke-session')
+  @RequiresFreshSession()
   @ApiCookieAuth('umtas-session')
   @ApiOperation({
     summary: 'Terminate a specific session by ID',
@@ -354,6 +359,7 @@ export class AuthController {
 
   @ApiTags('Auth Email')
   @Post('change-password')
+  @RequiresFreshSession()
   @ApiCookieAuth('umtas-session')
   @ApiOperation({
     summary: 'Change password for the signed-in user',
@@ -417,12 +423,16 @@ export class AuthController {
     @Req() req: IncomingMessage,
     @Res() res: ServerResponse,
   ): Promise<void> {
+    if (!this.hasGoogleOAuth()) {
+      throw new NotFoundException('Google OAuth is not configured');
+    }
     this.logger.log('Google OAuth callback received');
     return this.handleRequest(req, res);
   }
 
   @ApiTags('Auth Google')
   @Post('link-account/google')
+  @RequiresFreshSession()
   @ApiCookieAuth('umtas-session')
   @ApiOperation({
     summary: 'Link a Google account to the current user',
@@ -455,6 +465,9 @@ export class AuthController {
     @Res() res: ServerResponse,
     @Body() _body: LinkGoogleAccountDto,
   ): Promise<void> {
+    if (!this.hasGoogleOAuth()) {
+      throw new NotFoundException('Google OAuth is not configured');
+    }
     return this.handleRequest(req, res);
   }
 
@@ -462,6 +475,7 @@ export class AuthController {
 
   @ApiTags('Auth Admin')
   @Post('admin/create-user')
+  @RequiresFreshSession()
   @ApiCookieAuth('umtas-session')
   @ApiOperation({
     summary: 'Create a new user — requires sys_admin role',
@@ -497,7 +511,40 @@ export class AuthController {
   }
 
   @ApiTags('Auth Admin')
+  @Post('admin/impersonate-user')
+  @RequiresFreshSession()
+  @ApiCookieAuth('umtas-session')
+  @ApiOperation({
+    summary: 'Impersonate a user — requires sys_admin role',
+    operationId: 'adminImpersonateUser',
+  })
+  @ApiBody({ type: AdminImpersonateUserDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Impersonation successful. Sets a new session cookie.',
+    schema: { example: AUTH_RESPONSE_EXAMPLE },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized',
+    schema: { example: { error: 'UNAUTHORIZED' } },
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Insufficient permissions (sys_admin required)',
+    schema: { example: { error: 'INSUFFICIENT_PERMISSIONS' } },
+  })
+  async adminImpersonateUser(
+    @Req() req: IncomingMessage,
+    @Res() res: ServerResponse,
+    @Body() _body: AdminImpersonateUserDto,
+  ): Promise<void> {
+    return this.handleRequest(req, res);
+  }
+
+  @ApiTags('Auth Admin')
   @Post('admin/ban-user')
+  @RequiresFreshSession()
   @ApiCookieAuth('umtas-session')
   @ApiOperation({
     summary: 'Ban a user — requires sys_admin role',
@@ -534,6 +581,7 @@ export class AuthController {
 
   @ApiTags('Auth Admin')
   @Post('admin/update-user')
+  @RequiresFreshSession()
   @ApiCookieAuth('umtas-session')
   @ApiOperation({
     summary: "Update a user's details — requires sys_admin role",
@@ -590,15 +638,21 @@ export class AuthController {
   ): Promise<void> {
     try {
       const auth = this.authService.getAuth();
-      const { toNodeHandler } = await import('better-auth/node');
       const nodeHandler = toNodeHandler(auth.handler);
       await nodeHandler(req, res);
     } catch (error) {
       this.logger.error('Auth handler error', error);
       if (!res.headersSent) {
         res.statusCode = 500;
-        res.end(JSON.stringify({ error: 'Internal auth error' }));
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ error: 'Internal server error' }));
       }
     }
+  }
+
+  private hasGoogleOAuth(): boolean {
+    return Boolean(
+      process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET,
+    );
   }
 }

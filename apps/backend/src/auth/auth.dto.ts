@@ -191,3 +191,12 @@ export class AdminUpdateUserDto {
   })
   role?: 'student' | 'uni_admin' | 'sys_admin';
 }
+
+export class AdminImpersonateUserDto {
+  @ApiProperty({
+    example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+    default: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+    description: 'UUID of the user to impersonate',
+  })
+  userId: string;
+}

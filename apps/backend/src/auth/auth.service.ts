@@ -26,8 +26,15 @@ export class AuthService implements OnModuleInit {
       throw new Error('BETTER_AUTH_SECRET is required');
     }
 
-    // Initialize shared Redis client on bootstrap
+    const isProduction =
+      this.configService.get<string>('NODE_ENV') === 'production';
     const redisUrl = this.configService.get<string>('REDIS_URL');
+    if (isProduction && !redisUrl) {
+      this.logger.error('REDIS_URL is required in production');
+      throw new Error('REDIS_URL is required in production');
+    }
+
+    // Initialize shared Redis client on bootstrap
     if (redisUrl) {
       createRedisClient(redisUrl);
     }
@@ -66,8 +73,13 @@ export class AuthService implements OnModuleInit {
       this.configService.get<string>('NODE_ENV') === 'production';
     const redisUrl = this.configService.get<string>('REDIS_URL');
 
+    // Both PGlite and Postgres use the 'pg' drizzle adapter provider.
+    // Explicitly derived from dbMode so any future driver change is caught here.
+    const dbProvider = 'pg' as const;
+
     this.authInstance = createAuth({
       db,
+      dbProvider,
       baseURL,
       secret,
       trustedOrigins,
@@ -77,18 +89,18 @@ export class AuthService implements OnModuleInit {
       isProduction,
       redisUrl,
       logger: this.logger,
-      sendResetPasswordEmail: async ({ email, url }) => {
-        await this.mailerService.sendMail({
-          to: email,
-          subject: 'Reset your UMTAS password',
-          html: `<p>Click <a href="${url}">here</a> to reset your password. Link expires in 1 hour.</p>`,
+      sendResetPasswordEmail: async ({ email, url, name }) => {
+        await this.mailerService.sendResetPasswordEmail({
+          email,
+          name: name ?? 'User',
+          url,
         });
       },
       sendVerificationEmail: async ({ email, url, name }) => {
-        await this.mailerService.sendMail({
-          to: email,
-          subject: 'Verify your UMTAS account',
-          html: `<p>Hi ${name || 'User'},</p><p>Please <a href="${url}">verify your email</a> to activate your account.</p>`,
+        await this.mailerService.sendVerificationEmail({
+          email,
+          name,
+          url,
         });
       },
     });

@@ -1,6 +1,11 @@
-export type AppRole = 'student' | 'uni_admin' | 'sys_admin';
+export type AppRole = 'student' | 'lecturer' | 'uni_admin' | 'sys_admin';
 
-const VALID_ROLES: AppRole[] = ['student', 'uni_admin', 'sys_admin'];
+const VALID_ROLES: AppRole[] = [
+  'student',
+  'lecturer',
+  'uni_admin',
+  'sys_admin',
+];
 
 export function isAppRole(value: unknown): value is AppRole {
   return typeof value === 'string' && VALID_ROLES.includes(value as AppRole);

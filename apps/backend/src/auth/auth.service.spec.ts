@@ -69,6 +69,21 @@ describe('AuthService', () => {
       expect(() => service.onModuleInit()).not.toThrow();
     });
 
+    it('should reject production boot without REDIS_URL', () => {
+      jest.spyOn(configService, 'get').mockImplementation((key: string) => {
+        const config: Record<string, string | undefined> = {
+          BETTER_AUTH_SECRET: 'test-secret-key-32-chars-minimum!!',
+          NODE_ENV: 'production',
+          REDIS_URL: undefined,
+        };
+        return config[key];
+      });
+
+      expect(() => service.onModuleInit()).toThrow(
+        'REDIS_URL is required in production',
+      );
+    });
+
     it('should throw error if BETTER_AUTH_SECRET is missing', () => {
       jest.spyOn(configService, 'get').mockReturnValueOnce(undefined);
       expect(() => service.onModuleInit()).toThrow(
