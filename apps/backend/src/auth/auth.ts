@@ -152,6 +152,7 @@ export function createAuth(input: CreateAuthInput): AuthInstance {
   // Type cast needed: BetterAuth's admin plugin extends the user schema at
   // runtime (adds banned/role fields) but the generic type system can't
   // represent this as assignable to the base Auth<BetterAuthOptions>.
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return betterAuth({
     secondaryStorage: redisClient
       ? redisStorage({
@@ -184,7 +185,8 @@ export function createAuth(input: CreateAuthInput): AuthInstance {
           name: user.name || 'User',
         });
       },
-      onPasswordReset: ({ user }) => {
+      // eslint-disable-next-line @typescript-eslint/require-await
+      onPasswordReset: async ({ user }) => {
         logger.log(`Password reset completed for ${user.email}`);
       },
     },
@@ -279,7 +281,8 @@ export function createAuth(input: CreateAuthInput): AuthInstance {
     databaseHooks: {
       user: {
         create: {
-          before: (
+          // eslint-disable-next-line @typescript-eslint/require-await
+          before: async (
             data: Record<string, unknown>,
             ctx: Record<string, unknown> | null,
           ) => {
@@ -329,7 +332,8 @@ export function createAuth(input: CreateAuthInput): AuthInstance {
               },
             };
           },
-          after: (
+          // eslint-disable-next-line @typescript-eslint/require-await
+          after: async (
             data: Record<string, unknown>,
             ctx: Record<string, unknown> | null,
           ) => {
@@ -344,7 +348,8 @@ export function createAuth(input: CreateAuthInput): AuthInstance {
           },
         },
         update: {
-          after: (data: Record<string, unknown>) => {
+          // eslint-disable-next-line @typescript-eslint/require-await
+          after: async (data: Record<string, unknown>) => {
             logAuditEvent(logger, {
               action: 'user.update',
               targetUserId: String(data.id),
@@ -355,7 +360,8 @@ export function createAuth(input: CreateAuthInput): AuthInstance {
       },
       session: {
         create: {
-          after: (
+          // eslint-disable-next-line @typescript-eslint/require-await
+          after: async (
             data: Record<string, unknown>,
             ctx: Record<string, unknown> | null,
           ) => {
@@ -385,7 +391,8 @@ export function createAuth(input: CreateAuthInput): AuthInstance {
       },
       account: {
         create: {
-          after: (data: Record<string, unknown>) => {
+          // eslint-disable-next-line @typescript-eslint/require-await
+          after: async (data: Record<string, unknown>) => {
             logger.log(
               `Account linked for user ${String(data.userId)} via ${String(data.providerId)}`,
             );
@@ -398,5 +405,5 @@ export function createAuth(input: CreateAuthInput): AuthInstance {
         },
       },
     },
-  });
+  }) as any;
 }
