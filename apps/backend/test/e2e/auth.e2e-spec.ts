@@ -291,4 +291,81 @@ describe('Auth e2e', () => {
       expect(res.status).toBe(403);
     });
   });
+
+  describe('Password Reset Flow', () => {
+    it('forgetPassword with unknown email returns 200 without sending mail', async () => {
+      const res = await request(app.getHttpServer())
+        .post('/api/auth/forget-password')
+        .send({ email: 'nonexistent-e2e@example.com' });
+
+      expect(res.status).toBe(200);
+      expect(mockMailer.getSent()).toHaveLength(0);
+    });
+
+    it('forgetPassword with known email sends reset mail', async () => {
+      const res = await request(app.getHttpServer())
+        .post('/api/auth/forget-password')
+        .send({ email: TEST_AUTH_DATA.users.student.email });
+
+      expect(res.status).toBe(200);
+      const sent = mockMailer.getSent();
+      expect(sent.length).toBeGreaterThan(0);
+      const resetMail = sent.find((m) => m.template === 'reset-password');
+      expect(resetMail).toBeDefined();
+      expect(resetMail?.context?.resetUrl).toMatch(/\/reset-password\?token=/);
+    });
+
+    it('forgetPassword reset URL points to frontend (appURL), not backend port 3001', async () => {
+      await request(app.getHttpServer())
+        .post('/api/auth/forget-password')
+        .send({ email: TEST_AUTH_DATA.users.student.email });
+
+      const sent = mockMailer.getSent();
+      const resetMail = sent.find((m) => m.template === 'reset-password');
+      expect(resetMail?.context?.resetUrl).not.toContain(':3001');
+    });
+  });
+
+  describe('Email Verification URL Rewrite', () => {
+    it('verify-email URL in mail points to frontend, not backend port 3001', async () => {
+      const email = `e2e+urlrewrite+${Date.now()}@example.com`;
+
+      await request(app.getHttpServer())
+        .post('/api/auth/sign-up/email')
+        .send({ email, password: 'Password1!', name: 'URL Rewrite Test' });
+
+      const sent = mockMailer.getSent();
+      const verifyMail = sent.find(
+        (m) => m.template === 'verify-email' && m.to === email,
+      );
+      expect(verifyMail).toBeDefined();
+      expect(verifyMail?.context?.verifyUrl).not.toContain(':3001');
+      expect(verifyMail?.context?.verifyUrl).toMatch(/\/verify-email\?token=/);
+    }, 10000);
+  });
+
+  describe('Role Boundary Integration', () => {
+    it('uni_admin cannot assign uni_admin role via admin/create-user', async () => {
+      const uniAdminAgent = request.agent(app.getHttpServer());
+      await uniAdminAgent.post('/api/auth/sign-in/email').send({
+        email: TEST_AUTH_DATA.users.uniAdmin.email,
+        password: TEST_PASSWORD,
+      });
+
+      const res = await uniAdminAgent.post('/api/auth/admin/create-user').send({
+        email: `boundary-test-${Date.now()}@example.com`,
+        password: 'Password1!',
+        name: 'Boundary Test',
+        role: 'uni_admin',
+      });
+      expect(res.status).toBe(403);
+    });
+
+    it('unauthenticated request to protected route returns 401', async () => {
+      const res = await request(app.getHttpServer())
+        .post('/api/auth/sign-out')
+        .send();
+      expect(res.status).toBe(401);
+    });
+  });
 });
