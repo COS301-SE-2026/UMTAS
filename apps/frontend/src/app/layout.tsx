@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import { DM_Sans } from "next/font/google";
+import { headers } from "next/headers";
+import { auth } from "@/../utilities/auth";
+import { AppShellTemplate } from "@/components/templates/app/AppShellTemplate";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -10,18 +13,56 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Vigil",
+  title: {
+    default: "Vigil",
+    template: "%s | Vigil",
+  },
   description: "Made by Vigil.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  let userName: string | null = null;
+  let userEmail: string | null = null;
+
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+    userName = session?.user?.name ?? null;
+    userEmail = session?.user?.email ?? null;
+  } catch {
+    // No session yet nav renders without user info, proxy handles redirect.
+  }
+
   return (
-    <html lang="en" className={`${dmSans.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col">{children}</body>
+    <html
+      lang="en"
+      className={`${dmSans.variable} h-full antialiased`}
+      suppressHydrationWarning
+    >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+            (function() {
+              try {
+                var theme = localStorage.getItem('umtas-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+              } catch(e) {}
+            })();
+          `,
+          }}
+        />
+      </head>
+      <body className="min-h-full flex flex-col">
+        <AppShellTemplate userName={userName} userEmail={userEmail}>
+          {children}
+        </AppShellTemplate>
+      </body>
     </html>
   );
 }
