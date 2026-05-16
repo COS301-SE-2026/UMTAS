@@ -52,6 +52,29 @@ export default function AuthSection() {
     }
   };
 
+  const handleForgotPassword = async () => {
+    if (!email) {
+      setError("Please enter your email address first");
+      return;
+    }
+    setStatus("loading");
+    setError(null);
+    try {
+      const { error } = await authClient.forgetPassword({
+        email,
+      });
+      if (error) {
+        throw new Error(error.message || "Request failed");
+      }
+      setStatus("idle");
+      alert("Password reset email sent! Please check your inbox.");
+    } catch (err: unknown) {
+      const error = err as Record<string, unknown>;
+      setError((error.message as string) || "An error occurred");
+      setStatus("error");
+    }
+  };
+
   const handleLogout = async () => {
     await authClient.signOut();
   };
@@ -172,6 +195,23 @@ export default function AuthSection() {
             Register
           </button>
         </div>
+        <button
+          onClick={handleForgotPassword}
+          disabled={status === "loading"}
+          style={{
+            marginTop: "0.5rem",
+            padding: "0.5rem",
+            background: "transparent",
+            color: "#2196F3",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+            fontSize: "0.875rem",
+            textDecoration: "underline",
+          }}
+        >
+          Forgot Password?
+        </button>
       </div>
 
       {error && (
