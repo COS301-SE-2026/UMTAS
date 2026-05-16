@@ -618,6 +618,7 @@ export class AuthController {
 
   // ─── Catch-all for internal BetterAuth routes ─────────────────────────────────
 
+  @Public()
   @All('*path')
   @ApiExcludeEndpoint()
   async handler(
