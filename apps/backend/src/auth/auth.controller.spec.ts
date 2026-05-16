@@ -104,6 +104,7 @@ describe('AuthController — forgetPassword', () => {
       url: '/api/auth/forget-password',
       headers: { 'content-type': 'application/json' },
       body: { email: 'nobody@example.com' },
+
       [Symbol.asyncIterator]: async function* () {},
     } as unknown as IncomingMessage;
 
@@ -113,6 +114,7 @@ describe('AuthController — forgetPassword', () => {
       'nobody@example.com',
     );
     expect(nodeHandler).not.toHaveBeenCalled();
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(res.end).toHaveBeenCalledWith(JSON.stringify({}));
   });
 
@@ -144,6 +146,7 @@ describe('AuthController — forgetPassword', () => {
       url: '/api/auth/forget-password',
       headers: {},
       body: { email: 'found@example.com' },
+
       [Symbol.asyncIterator]: async function* () {},
     } as unknown as IncomingMessage;
 
@@ -153,6 +156,44 @@ describe('AuthController — forgetPassword', () => {
       'found@example.com',
     );
     expect(capturedUrl).toContain('request-password-reset');
+  });
+
+  it('reads email from raw request body when body parser is absent', async () => {
+    const nodeHandler = jest.fn().mockResolvedValue(undefined);
+    const mockAuthService = {
+      getAuth: jest.fn(() => ({ handler: nodeHandler })),
+      userExistsByEmail: jest.fn().mockResolvedValue(true),
+    };
+
+    const module = await Test.createTestingModule({
+      controllers: [AuthController],
+      providers: [{ provide: AuthService, useValue: mockAuthService }],
+    }).compile();
+    const ctrl = module.get<AuthController>(AuthController);
+
+    const res = {
+      statusCode: 200,
+      end: jest.fn(),
+      setHeader: jest.fn(),
+      headersSent: false,
+    } as unknown as ServerResponse;
+
+    const req = {
+      method: 'POST',
+      url: '/api/auth/forget-password',
+      headers: {},
+      // eslint-disable-next-line @typescript-eslint/require-await
+      [Symbol.asyncIterator]: async function* () {
+        yield Buffer.from(JSON.stringify({ email: 'stream@example.com' }));
+      },
+    } as unknown as IncomingMessage;
+
+    await ctrl.forgetPassword(req, res);
+
+    expect(mockAuthService.userExistsByEmail).toHaveBeenCalledWith(
+      'stream@example.com',
+    );
+    expect(nodeHandler).toHaveBeenCalled();
   });
 });
 
@@ -187,6 +228,7 @@ describe('AuthController — handleRequest error path', () => {
     await ctrl.signInEmail(req, res);
 
     expect(res.statusCode).toBe(500);
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(res.end).toHaveBeenCalledWith(
       JSON.stringify({ error: 'Internal server error' }),
     );
@@ -219,6 +261,84 @@ describe('AuthController — handleRequest error path', () => {
 
     await ctrl.getSession(req, res);
 
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(res.end).not.toHaveBeenCalled();
+  });
+});
+
+describe('AuthController — delegate routes', () => {
+  it('forwards standard auth routes to BetterAuth', async () => {
+    const nodeHandler = jest.fn().mockResolvedValue(undefined);
+    const mockAuthService = {
+      getAuth: jest.fn(() => ({ handler: nodeHandler })),
+    };
+
+    const module = await Test.createTestingModule({
+      controllers: [AuthController],
+      providers: [{ provide: AuthService, useValue: mockAuthService }],
+    }).compile();
+    const ctrl = module.get<AuthController>(AuthController);
+
+    const req = {
+      method: 'POST',
+      url: '/api/auth/test',
+      headers: {},
+    } as unknown as IncomingMessage;
+    const res = {
+      headersSent: false,
+      setHeader: jest.fn(),
+      end: jest.fn(),
+      statusCode: 200,
+    } as unknown as ServerResponse;
+
+    await ctrl.signInEmail(req, res);
+    await ctrl.signOut(req, res);
+    await ctrl.getSession(req, res);
+    await ctrl.listSessions(req, res);
+    await ctrl.revokeSession(req, res);
+    await ctrl.sendVerificationEmail(req, res);
+    await ctrl.verifyEmail(req, res);
+    await ctrl.resetPassword(req, res);
+    await ctrl.changePassword(req, res);
+    await ctrl.adminCreateUser(req, res);
+    await ctrl.adminImpersonateUser(req, res);
+    await ctrl.adminBanUser(req, res);
+    await ctrl.adminUpdateUser(req, res);
+
+    expect(nodeHandler).toHaveBeenCalled();
+    expect(toNodeHandler).toHaveBeenCalledWith(nodeHandler);
+  });
+
+  it('allows Google OAuth routes when env vars are set', async () => {
+    process.env.GOOGLE_CLIENT_ID = 'client-id';
+    process.env.GOOGLE_CLIENT_SECRET = 'client-secret';
+
+    const nodeHandler = jest.fn().mockResolvedValue(undefined);
+    const mockAuthService = {
+      getAuth: jest.fn(() => ({ handler: nodeHandler })),
+    };
+
+    const module = await Test.createTestingModule({
+      controllers: [AuthController],
+      providers: [{ provide: AuthService, useValue: mockAuthService }],
+    }).compile();
+    const ctrl = module.get<AuthController>(AuthController);
+
+    const req = {
+      method: 'GET',
+      url: '/api/auth/callback/google?code=x&state=y',
+      headers: {},
+    } as unknown as IncomingMessage;
+    const res = {
+      headersSent: false,
+      setHeader: jest.fn(),
+      end: jest.fn(),
+      statusCode: 200,
+    } as unknown as ServerResponse;
+
+    await ctrl.googleOAuthCallback(req, res);
+    await ctrl.linkGoogleAccount(req, res);
+
+    expect(nodeHandler).toHaveBeenCalled();
   });
 });
