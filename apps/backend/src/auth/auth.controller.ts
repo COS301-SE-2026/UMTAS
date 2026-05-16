@@ -636,7 +636,10 @@ export class AuthController {
       const nodeHandler = toNodeHandler(auth.handler);
       await nodeHandler(req, res);
     } catch (error) {
-      this.logger.error('Auth handler error', error);
+      this.logger.error(
+        `Auth handler error: ${error instanceof Error ? error.message : String(error)}`,
+        error instanceof Error ? error.stack : undefined,
+      );
       if (!res.headersSent) {
         res.statusCode = 500;
         res.setHeader('Content-Type', 'application/json');
