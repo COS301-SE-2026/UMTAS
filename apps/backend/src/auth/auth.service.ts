@@ -28,9 +28,15 @@ export class AuthService implements OnModuleInit {
     const isProduction =
       this.configService.get<string>('NODE_ENV') === 'production';
     const redisUrl = this.configService.get<string>('REDIS_URL');
-    if (isProduction && !redisUrl) {
-      this.logger.error('REDIS_URL is required in production');
-      throw new Error('REDIS_URL is required in production');
+
+    if (!redisUrl) {
+      if (isProduction) {
+        this.logger.error('REDIS_URL is required in production');
+        throw new Error('REDIS_URL is required in production');
+      }
+      this.logger.warn(
+        'REDIS_URL not set. Rate limiting will use in-memory fallback (dev only).',
+      );
     }
 
     // Initialize shared Redis client on bootstrap
