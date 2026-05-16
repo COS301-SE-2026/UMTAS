@@ -9,6 +9,9 @@ let redisInstance: Redis | null = null;
  * Get or create a shared Redis instance.
  * Used by BetterAuth, BullMQ, and other services.
  * Call once on app bootstrap.
+ *
+ * In production, throws if Redis connection fails (rate limiting is required).
+ * In development, returns null if Redis is not available.
  */
 export function createRedisClient(redisUrl?: string): Redis | null {
   if (!redisUrl) {
@@ -40,7 +43,15 @@ export function createRedisClient(redisUrl?: string): Redis | null {
 
     return redisInstance;
   } catch (error) {
-    logger.error('Failed to create Redis client', error);
+    const errorMessage = `Failed to create Redis client: ${error instanceof Error ? error.message : String(error)}`;
+    logger.error(errorMessage);
+
+    // In production, Redis is required for rate limiting and sessions
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error(errorMessage);
+    }
+
+    // In development, allow app to boot without Redis
     return null;
   }
 }
