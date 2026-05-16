@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
+import { betterAuth } from 'better-auth';
 import { AuthService } from './auth.service';
 import { DatabaseService } from '../db/database.service';
 import { MailerService } from '../mail/mailer.service';
@@ -60,6 +61,14 @@ describe('AuthService', () => {
     configService = module.get<ConfigService>(ConfigService);
     mailerService = module.get<MailerService>(MailerService);
   });
+
+  function makeDrizzleMock(rows: unknown[] = []) {
+    const limitMock = jest.fn().mockResolvedValue(rows);
+    const whereMock = jest.fn().mockReturnValue({ limit: limitMock });
+    const fromMock = jest.fn().mockReturnValue({ where: whereMock });
+    const selectMock = jest.fn().mockReturnValue({ from: fromMock });
+    return { select: selectMock };
+  }
 
   describe('onModuleInit', () => {
     it('should initialize without error when BETTER_AUTH_SECRET is set', () => {
@@ -140,6 +149,137 @@ describe('AuthService', () => {
       service.onModuleInit();
       const auth = service.getAuth();
       expect(auth).toBeDefined();
+    });
+  });
+
+  describe('userExistsByEmail', () => {
+    it('returns true when user row found', async () => {
+      const drizzle = makeDrizzleMock([{ id: 'user-1' }]);
+      const localModule = await Test.createTestingModule({
+        providers: [
+          AuthService,
+          {
+            provide: ConfigService,
+            useValue: {
+              get: jest.fn((key: string) => {
+                const c: Record<string, string | undefined> = {
+                  BETTER_AUTH_SECRET: 'test-secret-key-32-chars-minimum!!',
+                  NODE_ENV: 'development',
+                };
+                return c[key];
+              }),
+            },
+          },
+          {
+            provide: DatabaseService,
+            useValue: { db: drizzle },
+          },
+          {
+            provide: MailerService,
+            useValue: { sendMail: jest.fn() },
+          },
+        ],
+      }).compile();
+
+      const svc = localModule.get<AuthService>(AuthService);
+      const result = await svc.userExistsByEmail('found@example.com');
+      expect(result).toBe(true);
+      expect(drizzle.select).toHaveBeenCalled();
+    });
+
+    it('returns false when no user found', async () => {
+      const drizzle = makeDrizzleMock([]);
+      const localModule = await Test.createTestingModule({
+        providers: [
+          AuthService,
+          {
+            provide: ConfigService,
+            useValue: {
+              get: jest.fn((key: string) => {
+                const c: Record<string, string | undefined> = {
+                  BETTER_AUTH_SECRET: 'test-secret-key-32-chars-minimum!!',
+                  NODE_ENV: 'development',
+                };
+                return c[key];
+              }),
+            },
+          },
+          {
+            provide: DatabaseService,
+            useValue: { db: drizzle },
+          },
+          {
+            provide: MailerService,
+            useValue: { sendMail: jest.fn() },
+          },
+        ],
+      }).compile();
+
+      const svc = localModule.get<AuthService>(AuthService);
+      const result = await svc.userExistsByEmail('missing@example.com');
+      expect(result).toBe(false);
+    });
+  });
+
+  describe('getAuth — mail callback wiring', () => {
+    it('wires sendResetPasswordEmail to mailerService.sendResetPasswordEmail', async () => {
+      const mockMailerService = {
+        sendResetPasswordEmail: jest.fn().mockResolvedValue(undefined),
+        sendVerificationEmail: jest.fn().mockResolvedValue(undefined),
+      };
+      const localModule = await Test.createTestingModule({
+        providers: [
+          AuthService,
+          {
+            provide: ConfigService,
+            useValue: {
+              get: jest.fn((key: string) => {
+                const c: Record<string, string | undefined> = {
+                  BETTER_AUTH_SECRET: 'test-secret-key-32-chars-minimum!!',
+                  BETTER_AUTH_URL: 'http://localhost:3001',
+                  NEXT_PUBLIC_APP_URL: 'http://localhost:3000',
+                  NODE_ENV: 'development',
+                };
+                return c[key];
+              }),
+            },
+          },
+          {
+            provide: DatabaseService,
+            useValue: { db: {} },
+          },
+          {
+            provide: MailerService,
+            useValue: mockMailerService,
+          },
+        ],
+      }).compile();
+
+      const svc = localModule.get<AuthService>(AuthService);
+      svc.onModuleInit();
+      svc.getAuth();
+
+      // Extract the captured betterAuth config and invoke the sendResetPassword callback
+      const capturedConfig = (betterAuth as jest.Mock).mock.calls.at(
+        -1,
+      )?.[0] as Record<string, unknown>;
+      const emailAndPassword = capturedConfig.emailAndPassword as Record<
+        string,
+        unknown
+      >;
+      const sendResetPassword = emailAndPassword.sendResetPassword as (input: {
+        user: { id: string; email: string; name: string };
+        url: string;
+      }) => Promise<void>;
+
+      await sendResetPassword({
+        user: { id: 'u1', email: 'a@b.com', name: 'Alice' },
+        url: 'http://localhost:3001/reset',
+      });
+
+      expect(mockMailerService.sendResetPasswordEmail).toHaveBeenCalledWith(
+        expect.objectContaining({ email: 'a@b.com' }),
+      );
     });
   });
 });
