@@ -244,3 +244,200 @@ describe('createAuth — URL rewrite', () => {
     });
   });
 });
+
+describe('createAuth — databaseHooks', () => {
+  const mockLogger: LoggerService = {
+    log: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+    debug: jest.fn(),
+    verbose: jest.fn(),
+  };
+  const mockDb = {} as never;
+  const sendResetPasswordEmail = jest.fn().mockResolvedValue(undefined);
+
+  type UserCreateBeforeHook = (
+    data: Record<string, unknown>,
+    ctx: Record<string, unknown> | null,
+  ) => Promise<{ data: Record<string, unknown> }>;
+
+  type UserCreateAfterHook = (
+    data: Record<string, unknown>,
+    ctx: Record<string, unknown> | null,
+  ) => Promise<void>;
+
+  type UserUpdateAfterHook = (data: Record<string, unknown>) => Promise<void>;
+
+  type SessionCreateAfterHook = (
+    data: Record<string, unknown>,
+    ctx: Record<string, unknown> | null,
+  ) => Promise<void>;
+
+  type AccountCreateAfterHook = (
+    data: Record<string, unknown>,
+  ) => Promise<void>;
+
+  function getHooks() {
+    (betterAuth as jest.Mock).mockClear();
+    createAuth({
+      db: mockDb,
+      dbProvider: 'pg',
+      baseURL: 'http://localhost:3001/api/auth',
+      secret: 'test-secret-at-least-32-chars-long!!',
+      trustedOrigins: [],
+      isProduction: false,
+      logger: mockLogger,
+      sendResetPasswordEmail,
+    });
+    const config = (betterAuth as jest.Mock).mock.calls[0][0] as {
+      databaseHooks: {
+        user: {
+          create: { before: UserCreateBeforeHook; after: UserCreateAfterHook };
+          update: { after: UserUpdateAfterHook };
+        };
+        session: { create: { after: SessionCreateAfterHook } };
+        account: { create: { after: AccountCreateAfterHook } };
+      };
+    };
+    return config.databaseHooks;
+  }
+
+  function makeCtx(actorRole?: string) {
+    if (!actorRole) return null;
+    return {
+      context: {
+        session: {
+          user: { id: 'actor-1', role: actorRole },
+        },
+      },
+    };
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  describe('user.create.before', () => {
+    it('defaults role to student when no role provided and no actor', async () => {
+      const hooks = getHooks();
+      const result = await hooks.user.create.before({ email: 'x@x.com' }, null);
+      expect(result.data.role).toBe('student');
+    });
+
+    it('sys_admin passes data through unchanged (no role override)', async () => {
+      const hooks = getHooks();
+      const result = await hooks.user.create.before(
+        { email: 'x@x.com' },
+        makeCtx('sys_admin'),
+      );
+      // sys_admin returns { data } unchanged — input had no role, so output has no role
+      expect(result.data.role).toBeUndefined();
+    });
+
+    it('allows sys_admin to assign any valid role', async () => {
+      const hooks = getHooks();
+      const result = await hooks.user.create.before(
+        { email: 'x@x.com', role: 'uni_admin' },
+        makeCtx('sys_admin'),
+      );
+      expect(result.data.role).toBe('uni_admin');
+    });
+
+    it('allows uni_admin to assign lecturer', async () => {
+      const hooks = getHooks();
+      const result = await hooks.user.create.before(
+        { email: 'x@x.com', role: 'lecturer' },
+        makeCtx('uni_admin'),
+      );
+      expect(result.data.role).toBe('lecturer');
+    });
+
+    it('defaults uni_admin create to student when no role provided', async () => {
+      const hooks = getHooks();
+      const result = await hooks.user.create.before(
+        { email: 'x@x.com' },
+        makeCtx('uni_admin'),
+      );
+      expect(result.data.role).toBe('student');
+    });
+
+    it('throws FORBIDDEN when uni_admin tries to assign sys_admin', async () => {
+      const hooks = getHooks();
+      await expect(
+        hooks.user.create.before(
+          { email: 'x@x.com', role: 'sys_admin' },
+          makeCtx('uni_admin'),
+        ),
+      ).rejects.toThrow('uni_admin can only assign student or lecturer role');
+    });
+
+    it('throws BAD_REQUEST for invalid role string', async () => {
+      const hooks = getHooks();
+      await expect(
+        hooks.user.create.before({ email: 'x@x.com', role: 'hacker' }, null),
+      ).rejects.toThrow('Invalid role value provided');
+    });
+  });
+
+  describe('user.create.after', () => {
+    it('calls logger.log with audit event containing user.create action', async () => {
+      const hooks = getHooks();
+      (mockLogger.log as jest.Mock).mockClear();
+      await hooks.user.create.after(
+        { id: 'u1', email: 'a@b.com' },
+        makeCtx('sys_admin'),
+      );
+      expect(mockLogger.log).toHaveBeenCalledWith(
+        expect.stringContaining('"action":"user.create"'),
+      );
+    });
+  });
+
+  describe('user.update.after', () => {
+    it('calls logger.log with audit event containing user.update action', async () => {
+      const hooks = getHooks();
+      (mockLogger.log as jest.Mock).mockClear();
+      await hooks.user.update.after({ id: 'u1', email: 'a@b.com' });
+      expect(mockLogger.log).toHaveBeenCalledWith(
+        expect.stringContaining('"action":"user.update"'),
+      );
+    });
+  });
+
+  describe('session.create.after', () => {
+    it('logs session creation audit event', async () => {
+      const hooks = getHooks();
+      (mockLogger.log as jest.Mock).mockClear();
+      await hooks.session.create.after({ id: 's1', userId: 'u1' }, null);
+      expect(mockLogger.log).toHaveBeenCalledWith(
+        expect.stringContaining('"action":"session.create"'),
+      );
+    });
+
+    it('logs impersonation event when impersonatedBy set', async () => {
+      const hooks = getHooks();
+      (mockLogger.log as jest.Mock).mockClear();
+      await hooks.session.create.after(
+        { id: 's1', userId: 'u1', impersonatedBy: 'admin-session-1' },
+        null,
+      );
+      expect(mockLogger.log).toHaveBeenCalledWith(
+        expect.stringContaining('"event":"impersonate"'),
+      );
+    });
+  });
+
+  describe('account.create.after', () => {
+    it('calls logger.log with audit event containing account.link action', async () => {
+      const hooks = getHooks();
+      (mockLogger.log as jest.Mock).mockClear();
+      await hooks.account.create.after({
+        userId: 'u1',
+        providerId: 'credential',
+      });
+      expect(mockLogger.log).toHaveBeenCalledWith(
+        expect.stringContaining('"action":"account.link"'),
+      );
+    });
+  });
+});
