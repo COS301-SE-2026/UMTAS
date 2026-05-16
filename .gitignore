@@ -21,6 +21,7 @@ package-lock.json
 yarn.lock
 
 .turbo
+.skills
 
 
 # Next.js build output
