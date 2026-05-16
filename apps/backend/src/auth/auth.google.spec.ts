@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { mapGoogleProfileToUser, createAuth } from './auth';
 import { betterAuth } from 'better-auth';
+import type { AppDatabase } from './auth';
 
 describe('Google OAuth helpers', () => {
   describe('mapGoogleProfileToUser', () => {
@@ -30,19 +32,25 @@ describe('Google OAuth helpers', () => {
   });
 
   describe('createAuth config gating', () => {
-    const mockInput: any = {
-      db: {},
-      dbProvider: 'pg',
-      baseURL: 'http://localhost:3000',
-      secret: 'secret',
-      trustedOrigins: [],
-      isProduction: false,
-      logger: { log: jest.fn(), error: jest.fn(), warn: jest.fn() },
-      sendResetPasswordEmail: jest.fn(),
-    };
-
     it('disables google provider when client ID/secret missing', () => {
-      createAuth({ ...mockInput });
+      createAuth({
+        db: {} as unknown as AppDatabase,
+        dbProvider: 'pg' as const,
+        baseURL: 'http://localhost:3000',
+        secret: 'secret',
+        trustedOrigins: [],
+        isProduction: false,
+        logger: {
+          log: jest.fn(),
+          error: jest.fn(),
+          warn: jest.fn(),
+          debug: jest.fn(),
+          verbose: jest.fn(),
+          fatal: jest.fn(),
+          setLogLevels: jest.fn(),
+        },
+        sendResetPasswordEmail: jest.fn() as any,
+      });
       expect(betterAuth).toHaveBeenCalledWith(
         expect.objectContaining({
           socialProviders: undefined,
@@ -52,7 +60,22 @@ describe('Google OAuth helpers', () => {
 
     it('enables google provider when client ID/secret provided', () => {
       createAuth({
-        ...mockInput,
+        db: {} as unknown as AppDatabase,
+        dbProvider: 'pg' as const,
+        baseURL: 'http://localhost:3000',
+        secret: 'secret',
+        trustedOrigins: [],
+        isProduction: false,
+        logger: {
+          log: jest.fn(),
+          error: jest.fn(),
+          warn: jest.fn(),
+          debug: jest.fn(),
+          verbose: jest.fn(),
+          fatal: jest.fn(),
+          setLogLevels: jest.fn(),
+        },
+        sendResetPasswordEmail: jest.fn() as any,
         googleClientId: 'client-id',
         googleClientSecret: 'client-secret',
       });

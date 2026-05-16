@@ -29,8 +29,9 @@ describe('HealthController', () => {
 
   describe('check', () => {
     it('should call healthService.check()', async () => {
+      const checkSpy = jest.spyOn(service, 'check');
       await controller.check();
-      expect(service.check).toHaveBeenCalledTimes(1);
+      expect(checkSpy).toHaveBeenCalledTimes(1);
     });
 
     it('should return health status', async () => {

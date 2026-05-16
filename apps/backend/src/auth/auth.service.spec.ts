@@ -1,6 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
-import { Logger } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { DatabaseService } from '../db/database.service';
 import { MailerService } from '../mail/mailer.service';
@@ -10,7 +9,6 @@ jest.mock('../redis/redis');
 describe('AuthService', () => {
   let service: AuthService;
   let configService: ConfigService;
-  let databaseService: DatabaseService;
   let mailerService: MailerService;
 
   const mockDb = {
@@ -60,7 +58,6 @@ describe('AuthService', () => {
 
     service = module.get<AuthService>(AuthService);
     configService = module.get<ConfigService>(ConfigService);
-    databaseService = module.get<DatabaseService>(DatabaseService);
     mailerService = module.get<MailerService>(MailerService);
   });
 
@@ -119,11 +116,11 @@ describe('AuthService', () => {
       expect(auth).toBeDefined();
     });
 
-    it('should pass email callbacks to auth instance', async () => {
+    it('should pass email callbacks to auth instance', () => {
       service.onModuleInit();
       const auth = service.getAuth();
       expect(auth).toBeDefined();
-      expect(mailerService.sendMail).toBeDefined();
+      expect(typeof mailerService.sendMail).toBe('function');
     });
 
     it('should handle system admin user IDs', () => {

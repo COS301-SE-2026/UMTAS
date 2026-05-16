@@ -3,8 +3,8 @@ import { ac, lecturer, student, uniAdmin, sysAdmin } from './permissions';
 describe('Permissions & Access Control', () => {
   it('defines platform statements', () => {
     expect(ac.statements).toMatchObject({
-      user: expect.any(Array),
-      session: expect.any(Array),
+      user: expect.any(Array) as unknown,
+      session: expect.any(Array) as unknown,
       timetable: ['create', 'view', 'delete', 'export'],
       module: ['create', 'update', 'delete', 'view'],
       venue: ['create', 'update', 'delete', 'view'],
@@ -18,7 +18,7 @@ describe('Permissions & Access Control', () => {
     expect(student).toEqual({
       timetable: ['create', 'view', 'delete', 'export'],
     });
-    expect(student.module).toBeUndefined();
+    expect((student as Record<string, unknown>).module).toBeUndefined();
   });
 
   it('allows lecturer only module update/view and read-only venue/timetable access', () => {
@@ -27,8 +27,12 @@ describe('Permissions & Access Control', () => {
       venue: ['view'],
       timetable: ['view'],
     });
-    expect(lecturer.module).not.toContain('create');
-    expect(lecturer.module).not.toContain('delete');
+    expect((lecturer as Record<string, unknown>).module).not.toContain(
+      'create',
+    );
+    expect((lecturer as Record<string, unknown>).module).not.toContain(
+      'delete',
+    );
   });
 
   it('keeps uni_admin off university management', () => {
@@ -41,7 +45,7 @@ describe('Permissions & Access Control', () => {
       analytics: ['view'],
       parseJob: ['create', 'view'],
     });
-    expect(uniAdmin.university).toBeUndefined();
+    expect((uniAdmin as Record<string, unknown>).university).toBeUndefined();
   });
 
   it('gives sys_admin university management', () => {

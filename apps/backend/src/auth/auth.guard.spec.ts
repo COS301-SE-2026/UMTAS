@@ -1,13 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { AuthGuard, IS_PUBLIC_KEY } from './auth.guard';
+import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
+import type { RequestWithSession } from './auth.guard';
 
 describe('AuthGuard', () => {
   let guard: AuthGuard;
   let reflector: Reflector;
-  let authService: AuthService;
 
   const mockAuthService = {
     getAuth: jest.fn().mockReturnValue({
@@ -31,12 +31,11 @@ describe('AuthGuard', () => {
 
     guard = module.get<AuthGuard>(AuthGuard);
     reflector = module.get<Reflector>(Reflector);
-    authService = module.get<AuthService>(AuthService);
   });
 
   describe('canActivate', () => {
     let mockExecutionContext: ExecutionContext;
-    let mockRequest: any;
+    let mockRequest: RequestWithSession;
 
     beforeEach(() => {
       mockRequest = {
@@ -44,7 +43,7 @@ describe('AuthGuard', () => {
           cookie: 'test-cookie',
           authorization: 'Bearer test-token',
         },
-      };
+      } as unknown as RequestWithSession;
 
       mockExecutionContext = {
         switchToHttp: jest.fn().mockReturnValue({
