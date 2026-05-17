@@ -1,6 +1,7 @@
 {
   "name": "backend",
   "version": "0.0.1",
+  "packageManager": "pnpm@10.33.2",
   "description": "",
   "author": "",
   "private": true,
@@ -70,6 +71,15 @@
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.20.0",
     "zod": "^4.3.6"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@nestjs/core",
+      "@swc/core",
+      "esbuild",
+      "msgpackr-extract",
+      "unrs-resolver"
+    ]
   },
   "jest": {
     "moduleFileExtensions": [
