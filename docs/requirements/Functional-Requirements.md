@@ -1,5 +1,12 @@
 # Functional Requirements
 
+!!! abstract "Section Brief"
+    Functional requirements specify the observable behaviors the system must exhibit. Each requirement is uniquely identified (R*x*.*y*), assigned to a sub-system, and traceable to a use case via the [Traceability Matrix](Traceability-Matrix.md). Requirements follow the IEEE 830 *"the system shall..."* convention.
+
+    **Sub-systems covered:** Core Optimizer · API Core · Frontend · Authentication
+
+---
+
 ## Sub-system: Core Optimizer
 
 - R1.1: The system shall generate optimized schedules using CP-SAT...

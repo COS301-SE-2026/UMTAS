@@ -1,1 +1,16 @@
+# Block direct commits to protected branches
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+if [ "$BRANCH" = "main" ] || [ "$BRANCH" = "master" ] || [ "$BRANCH" = "dev" ]; then
+  echo "Direct commits to '$BRANCH' are not allowed. Use a feature branch and open a PR."
+  exit 1
+fi
+
 pnpm run lint-staged
+
+# Type check only if TypeScript files are staged
+STAGED_TS=$(git diff --cached --name-only --diff-filter=ACMR | grep -E 'apps/(frontend|backend)/.*\.(ts|tsx)$' || true)
+if [ -n "$STAGED_TS" ]; then
+  echo "Running type check..."
+  pnpm -C apps/frontend exec tsc --noEmit
+  pnpm -C apps/backend exec tsc --noEmit
+fi

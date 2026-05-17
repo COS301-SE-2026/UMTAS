@@ -1,0 +1,5 @@
+echo "Running tests..."
+pnpm run test
+
+echo "Running build check..."
+pnpm run build

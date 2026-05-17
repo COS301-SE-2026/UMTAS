@@ -27,11 +27,13 @@
   "devDependencies": {
     "@commitlint/cli": "^20.5.2",
     "@commitlint/config-conventional": "^20.5.0",
+    "@secretlint/secretlint-rule-preset-recommend": "^13.0.2",
     "@types/node": "^25.6.0",
     "eslint": "^10.2.1",
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",
     "prettier": "^3.8.3",
+    "secretlint": "^13.0.2",
     "turbo": "^2.9.6",
     "typescript": "^6.0.3"
   },
@@ -39,6 +41,9 @@
     "dotenv": "^16.0.3"
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx,mjs,cjs,json,md,yml,yaml,css,scss}": "prettier --write"
+    "*.{js,jsx,ts,tsx,mjs,cjs,json,md,yml,yaml,css,scss}": "prettier --write",
+    "apps/frontend/**/*.{js,jsx,ts,tsx}": "eslint --fix --config apps/frontend/eslint.config.mjs",
+    "apps/backend/**/*.{js,ts}": "eslint --fix --config apps/backend/eslint.config.mjs",
+    "**/*": "secretlint"
   }
 }

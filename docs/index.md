@@ -22,6 +22,14 @@ _Built by: Wilmar Smit, Michael Tomlinson, Johan Coetzer, Marcel Stoltz, & Aidan
 
 <br>
 
+## :material-information-outline: Project Overview
+
+UMTAS automates the full timetabling lifecycle — from ingesting raw PDF schedules, resolving hard and soft scheduling constraints via a CP-SAT solver, through to delivering conflict-free, personalized timetables to up to 20,000 concurrent students.
+
+The system is university-agnostic by design: a Core-and-Adapter architecture cleanly separates scheduling logic from institution-specific data formats, allowing any university to plug in without changes to the core.
+
+---
+
 ## :material-rocket-launch: Quick Start
 
 Get up and running with the UMTAS platform in minutes.
@@ -134,8 +142,3 @@ The platform is built using a modern, high-performance stack designed for scale 
 
 ---
 
-## :material-information-outline: Project Overview
-
-The **University Management & Timetabling Automation System (UMTAS)** is a high-performance, university-agnostic platform designed to automate the ingestion, parsing, and optimisation of university timetables.
-
-Built in partnership with **Tyto Insights**, UMTAS leverages a Core-and-Adapter architecture to ensure seamless integration with diverse university data sources while providing students with a modern, real-time scheduling interface.
