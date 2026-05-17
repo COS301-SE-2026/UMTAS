@@ -23,14 +23,15 @@
 // });
 
 // export const { signIn, signUp, signOut, useSession, getSession } = authClient;
+type AuthResult = { error: { message: string } | null };
 
 export const signIn = {
-  email: async (_opts: unknown) => ({ error: null }),
-  social: async (_opts: unknown) => ({ error: null }),
+  email: async (_opts: unknown): Promise<AuthResult> => ({ error: null }),
+  social: async (_opts: unknown): Promise<AuthResult> => ({ error: null }),
 };
 
 export const signUp = {
-  email: async (_opts: unknown) => ({ error: null }),
+  email: async (_opts: unknown): Promise<AuthResult> => ({ error: null }),
 };
 
 export const signOut = async (_opts?: unknown) => {};
