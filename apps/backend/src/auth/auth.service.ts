@@ -3,7 +3,6 @@ import { ConfigService } from '@nestjs/config';
 import { DatabaseService } from '../db/database.service.js';
 import { createAuth } from './auth.js';
 import type { AuthInstance } from './auth.js';
-import type { AppDatabase } from './auth.js';
 
 @Injectable()
 export class AuthService implements OnModuleInit {
