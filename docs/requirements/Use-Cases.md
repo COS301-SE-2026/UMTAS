@@ -10,6 +10,8 @@
 This section defines the primary use cases for the UMTAS platform. Use cases are grouped according to subsystem boundaries to improve readability and align with the modular system architecture.
 
 ## 8.1 Authentication System
+[Authentication System](../diagrams/requirements/Authentication-System.md) 
+
 **Description:** The Authentication System manages user identity and access control for the platform. It provides functionality for account registration, authentication, and logout for all authorised users.
 
 **Scope:** The subsystem includes user login, registration, and logout capabilities for Students, University Administrators, and Tyto Administrators.
@@ -67,6 +69,8 @@ This section defines the primary use cases for the UMTAS platform. Use cases are
 | **Requirements Covered** | R1.2.3 |
 
 ## 8.2 Timetable Management System
+[[:octicons-graph-24: View Diagram](../diagrams/requirements/Timetable-Management-System.md)]
+
 **Description:** The Timetable Management System enables students to create, generate, modify, organise, and manage academic timetables within the platform.
 
 **Scope:** The subsystem supports timetable creation, viewing, editing, deletion, semester assignment, preference management, and timetable generation functionality.
@@ -160,6 +164,8 @@ This section defines the primary use cases for the UMTAS platform. Use cases are
 | **Requirements Covered** | R2.2.3 |
 
 ## 8.3 Timetable Import System
+[[:octicons-graph-24: View Diagram](../diagrams/requirements/Timetable-Import-System.md)]
+
 **Description:** The Timetable Import System enables students to import timetable data from external university sources such as PDFs and institutional APIs.
 
 **Scope:** The subsystem supports timetable parsing, validation, import processing, and user customisation of imported timetable data.
@@ -193,6 +199,8 @@ This section defines the primary use cases for the UMTAS platform. Use cases are
 | **Requirements Covered** | R2.3.2 \| R2.4.2 |
 
 ## 8.4 Calendar Integration System
+[[:octicons-graph-24: View Diagram](../diagrams/requirements/Calender-Integration-System.md)]
+
 **Description:** The Calendar Integration System enables students to export their timetables to external calendar applications for ongoing schedule management.
 
 **Scope:** Covers export to Google Calendar via OAuth and download as a standard .ics file.
@@ -226,6 +234,8 @@ This section defines the primary use cases for the UMTAS platform. Use cases are
 | **Requirements Covered** | R2.5.1 |
 
 ## 8.5 University Analytics System
+[[:octicons-graph-24: View Diagram](../diagrams/requirements/University-Analytics-System.md)]
+
 **Description:** The University Analytics System provides analytical insights into timetable utilisation, attendance patterns, lecturer workload, and demand trends for university administrators.
 
 **Scope:** The subsystem supports timetable analytics, attendance analysis, venue utilisation monitoring, workload evaluation, and demand forecasting functionality.
@@ -319,6 +329,8 @@ This section defines the primary use cases for the UMTAS platform. Use cases are
 | **Requirements Covered** | R3.1.1 |
 
 ## 8.6 Tyto Simulation System
+[[:octicons-graph-24: View Diagram](../diagrams/requirements/Tyto-Simulation-System.md)]
+
 **Description:** The Tyto Simulation System evaluates system performance and scalability through large-scale simulated timetable workloads and stress testing.
 
 **Scope:** The subsystem supports simulation execution, stress testing, performance metric collection, and analytics visualisation under simulated load conditions.
