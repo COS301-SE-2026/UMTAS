@@ -1,5 +1,3 @@
-// requestBuilder.ts
-
 enum RequestMethod {
   GET = "GET",
   POST = "POST",
@@ -15,9 +13,8 @@ export class RequestBuilder<RequestType, ResponseType> {
   };
 
   public setUrl(url: string): this {
-    // change this to use the env base url
-    const baseUrl = "placeholderVeryWrong/";
-    this.url = baseUrl + url;
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+    this.url = `${baseUrl}/${url.replace(/^\//, "")}`;
     return this;
   }
 
@@ -37,52 +34,19 @@ export class RequestBuilder<RequestType, ResponseType> {
   }
 
   public async send(body?: RequestType): Promise<ResponseType> {
-    if (this.method !== RequestMethod.GET && body === undefined) {
-      console.error("The Body must be provided for non GET requests");
-      throw new Error(
-        "500 Internal Server Error: Request body required for non GET method",
-      );
-    }
-
     const response = await fetch(this.url, {
       method: this.method,
       headers: this.headers,
-      body: body ? JSON.stringify(body) : undefined,
+      credentials: "include",
+      body: body !== undefined ? JSON.stringify(body) : undefined,
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
+      throw new Error(`HTTP ${response.status}: ${await response.text()}`);
     }
 
-    // returns the json instead of the promise
     return (await response.json()) as ResponseType;
   }
 }
 
-interface HealthCheckRequest {
-  exampleString: string;
-}
-interface HealthCheckResponse {
-  status: string;
-  uptime?: number;
-}
-
-export class HealthCheck extends RequestBuilder<
-  HealthCheckRequest,
-  HealthCheckResponse
-> {
-  constructor() {
-    super();
-    this.setUrl(`/health`)
-      .setMethod(RequestMethod.GET)
-      .setBearerToken("Bearer_Example");
-  }
-}
-
-// Example usage
-async function exampleUsage() {
-  const response = await new HealthCheck().send();
-  console.log("Health status:", response.status, "Uptime:", response.uptime);
-}
-
-// can either have frontend making functions like these or just using the builders
+export { RequestMethod };
