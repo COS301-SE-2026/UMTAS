@@ -53,8 +53,8 @@
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,mjs,cjs,json,md,yml,yaml,css,scss}": "prettier --write",
-    "apps/frontend/**/*.{js,jsx,ts,tsx}": "eslint --fix --config apps/frontend/eslint.config.mjs",
-    "apps/backend/**/*.{js,ts}": "eslint --fix --config apps/backend/eslint.config.mjs",
+    "apps/frontend/src/**/*.{ts,tsx}": "eslint --fix --config apps/frontend/eslint.config.mjs",
+    "apps/backend/src/**/*.ts": "eslint --fix --config apps/backend/eslint.config.mjs",
     "**/*": "secretlint"
   }
 }
