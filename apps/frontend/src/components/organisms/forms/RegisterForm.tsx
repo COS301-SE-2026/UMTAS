@@ -94,7 +94,7 @@ export function RegisterForm() {
       if (result?.error) {
         setGlobalError(mapAuthError(result.error.message ?? "Unknown error"));
       } else {
-        router.push("/dashboard");
+        router.push("/verify-pending");
       }
     } catch {
       setGlobalError(
