@@ -15,11 +15,26 @@
  *   POST /api/auth/reset-password
  */
 
-//update import backend asseblief
-import { createAuthClient } from "better-auth/react";
+//update as need, I am just using stubs for now
+// import { createAuthClient } from "better-auth/react";
 
-export const authClient = createAuthClient({
-  baseURL: process.env.NEXT_PUBLIC_APP_URL,
-});
+// export const authClient = createAuthClient({
+//   baseURL: process.env.NEXT_PUBLIC_APP_URL,
+// });
 
-export const { signIn, signUp, signOut, useSession, getSession } = authClient;
+// export const { signIn, signUp, signOut, useSession, getSession } = authClient;
+
+export const signIn = {
+  email: async (_opts: unknown) => ({ error: null }),
+  social: async (_opts: unknown) => ({ error: null }),
+};
+
+export const signUp = {
+  email: async (_opts: unknown) => ({ error: null }),
+};
+
+export const signOut = async (_opts?: unknown) => {};
+
+export const useSession = () => ({ data: null, isPending: false });
+
+export const getSession = async () => null;
