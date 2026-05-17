@@ -24,6 +24,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "shared-types": "workspace:*",
     "@better-auth/redis-storage": "^1.6.8",
     "@electric-sql/pglite": "^0.4.4",
     "@nestjs/axios": "^4.0.1",

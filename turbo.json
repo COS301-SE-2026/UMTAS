@@ -3,19 +3,37 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**", ".next/**"]
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true,
+      "dependsOn": ["^build"]
     },
     "test": {
       "dependsOn": ["^build"],
       "outputs": ["coverage/**"],
-      "inputs": ["src/**/*.ts", "src/**/*.tsx", "tests/**/*.ts"]
+      "inputs": [
+        "src/**/*.ts",
+        "src/**/*.tsx",
+        "test/**/*.ts",
+        "tests/**/*.ts",
+        "jest.config.*",
+        "playwright.config.*"
+      ]
     },
     "lint": {
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build"],
+      "inputs": [
+        "src/**/*.ts",
+        "src/**/*.tsx",
+        "eslint.config.*",
+        ".eslintrc.*",
+        "tsconfig.json"
+      ]
     },
-    "dev": {
-      "cache": false,
-      "persistent": true
+    "ci": {
+      "dependsOn": ["build", "lint", "test"]
     }
   }
 }
