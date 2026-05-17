@@ -1,9 +1,13 @@
 packages:
   - "apps/*"
   - "packages/*"
+
+# Allowlist for packages permitted to run lifecycle scripts during install.
+# Per-package onlyBuiltDependencies entries must be consistent with this list.
 allowBuilds:
-  "@nestjs/core": false
-  esbuild: false
-  msgpackr-extract: false
-  sharp: false
-  unrs-resolver: false
+  - "@nestjs/core"
+  - "@swc/core"
+  - "esbuild"
+  - "msgpackr-extract"
+  - "sharp"
+  - "unrs-resolver"
