@@ -149,6 +149,15 @@ export function LoginForm() {
             />
           </FormField>
 
+          <div className="flex justify-end -mt-2">
+            <Link
+              href="/forgot-password"
+              className="text-[12px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] underline-offset-2 hover:underline transition-colors duration-150"
+            >
+              Forgot password?
+            </Link>
+          </div>
+
           <Button
             type="submit"
             disabled={anyLoading || !email || !password}
