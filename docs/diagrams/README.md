@@ -6,18 +6,111 @@ This section contains all architectural and system diagrams for the UMTAS platfo
 
 ---
 
-## :material-clipboard-list: Requirements & Use Cases
+<div class="grid cards" markdown>
+
+-   :material-clipboard-list:{ .lg .middle } __Requirements & Use Cases__
+
+    ---
+
+    System context, student and admin interaction flows, and UML use case diagrams.
+
+    [:octicons-arrow-right-24: View Section](#requirements-use-cases)
+
+-   :material-ruler-square:{ .lg .middle } __Architecture__
+
+    ---
+
+    Core-and-Adapter platform overview, component breakdown, deployment topology, and adapter interface design.
+
+    [:octicons-arrow-right-24: View Section](#architecture)
+
+-   :material-sync:{ .lg .middle } __Process & Interaction__
+
+    ---
+
+    Logic flow between objects for key use cases and activity diagrams for complex business logic.
+
+    [:octicons-arrow-right-24: View Section](#process-interaction)
+
+-   :material-graph:{ .lg .middle } __Domain Model__
+
+    ---
+
+    University-agnostic core domain entities and relationships.
+
+    [:octicons-arrow-right-24: View Section](#domain-model)
+
+-   :material-database:{ .lg .middle } __Database__
+
+    ---
+
+    Full ERD, POPIA privacy boundary, and DrizzleORM migration versioning overview.
+
+    [:octicons-arrow-right-24: View Section](#database)
+
+-   :material-api:{ .lg .middle } __API & Integration__
+
+    ---
+
+    REST API surface, NestJS ↔ FastAPI inter-service protocol, OAuth2 flow, and BullMQ job lifecycle.
+
+    [:octicons-arrow-right-24: View Section](#api-integration)
+
+-   :material-monitor:{ .lg .middle } __Frontend__
+
+    ---
+
+    Student portal page flow, Next.js component hierarchy, and client-side state transitions.
+
+    [:octicons-arrow-right-24: View Section](#frontend)
+
+-   :material-cog:{ .lg .middle } __DevOps & Infrastructure__
+
+    ---
+
+    CI/CD pipeline, Traefik routing, storage architecture, and Watchtower auto-deployment.
+
+    [:octicons-arrow-right-24: View Section](#devops-infrastructure)
+
+-   :material-shield-lock:{ .lg .middle } __Security & Compliance__
+
+    ---
+
+    BetterAuth session lifecycle, POPIA data anonymisation pipeline, and WireGuard VPN boundaries.
+
+    [:octicons-arrow-right-24: View Section](#security-compliance)
+
+-   :material-test-tube:{ .lg .middle } __Testing__
+
+    ---
+
+    Unit → Integration → E2E testing strategy and requirement traceability to test cases.
+
+    [:octicons-arrow-right-24: View Section](#testing)
+
+-   :material-chart-bar:{ .lg .middle } __Analytics & Simulation__
+
+    ---
+
+    Anonymised attendance aggregation, 20k synthetic student load generator, and venue heatmap logic.
+
+    [:octicons-arrow-right-24: View Section](#analytics-simulation)
+
+</div>
+
+---
+
+## :material-clipboard-list: Requirements & Use Cases { #requirements-use-cases }
 
 | Diagram                                                            | Description                                                |
 | ------------------------------------------------------------------ | ---------------------------------------------------------- |
 | [System Context Diagram](requirements/System-Context-Diagram.md)   | High-level system interaction overview (External Entities) |
 | [Student Use Cases](requirements/Student-Use-Cases.md)             | Student interaction flows and requirements                 |
 | [Admin Use Cases](requirements/Admin-Use-Cases.md)                 | Administrative management flows                            |
-| [System Use Case Diagram](requirements/System-Use-Case-Diagram.md) | Standard UML use case interaction overview                 |
 
 ---
 
-## :material-ruler-square: Architecture
+## :material-ruler-square: Architecture { #architecture }
 
 | Diagram                                                          | Description                                                |
 | ---------------------------------------------------------------- | ---------------------------------------------------------- |
@@ -29,7 +122,7 @@ This section contains all architectural and system diagrams for the UMTAS platfo
 
 ---
 
-## :material-sync: Process & Interaction
+## :material-sync: Process & Interaction { #process-interaction }
 
 | Diagram                                                      | Description                                                     |
 | ------------------------------------------------------------ | --------------------------------------------------------------- |
@@ -38,7 +131,7 @@ This section contains all architectural and system diagrams for the UMTAS platfo
 
 ---
 
-## :material-graph: Domain Model
+## :material-graph: Domain Model { #domain-model }
 
 | Diagram                                          | Description                                                |
 | ------------------------------------------------ | ---------------------------------------------------------- |
@@ -46,7 +139,7 @@ This section contains all architectural and system diagrams for the UMTAS platfo
 
 ---
 
-## :material-database: Database
+## :material-database: Database { #database }
 
 | Diagram                                            | Description                                     |
 | -------------------------------------------------- | ----------------------------------------------- |
@@ -56,7 +149,7 @@ This section contains all architectural and system diagrams for the UMTAS platfo
 
 ---
 
-## :material-api: API & Integration
+## :material-api: API & Integration { #api-integration }
 
 | Diagram                                                         | Description                                         |
 | --------------------------------------------------------------- | --------------------------------------------------- |
@@ -67,7 +160,7 @@ This section contains all architectural and system diagrams for the UMTAS platfo
 
 ---
 
-## :material-monitor: Frontend
+## :material-monitor: Frontend { #frontend }
 
 | Diagram                                          | Description                   |
 | ------------------------------------------------ | ----------------------------- |
@@ -77,7 +170,7 @@ This section contains all architectural and system diagrams for the UMTAS platfo
 
 ---
 
-## :material-cog: DevOps & Infrastructure
+## :material-cog: DevOps & Infrastructure { #devops-infrastructure }
 
 | Diagram                                                      | Description                                     |
 | ------------------------------------------------------------ | ----------------------------------------------- |
@@ -90,7 +183,7 @@ This section contains all architectural and system diagrams for the UMTAS platfo
 
 ---
 
-## :material-shield-lock: Security & Compliance
+## :material-shield-lock: Security & Compliance { #security-compliance }
 
 | Diagram                                          | Description                                  |
 | ------------------------------------------------ | -------------------------------------------- |
@@ -100,7 +193,7 @@ This section contains all architectural and system diagrams for the UMTAS platfo
 
 ---
 
-## :material-test-tube: Testing
+## :material-test-tube: Testing { #testing }
 
 | Diagram                                         | Description                                  |
 | ----------------------------------------------- | -------------------------------------------- |
@@ -109,7 +202,7 @@ This section contains all architectural and system diagrams for the UMTAS platfo
 
 ---
 
-## :material-chart-bar: Analytics & Simulation
+## :material-chart-bar: Analytics & Simulation { #analytics-simulation }
 
 | Diagram                                                         | Description                                 |
 | --------------------------------------------------------------- | ------------------------------------------- |

@@ -7,6 +7,12 @@
 
 ---
 
-REST API surface between NestJS core and frontend.
+## :material-rocket-launch: UMTAS Core API (NestJS)
 
-![API Contracts](../diagrams/api/API.drawio)
+<swagger-ui src="https://petstore.swagger.io/v2/swagger.json" />
+
+---
+
+## :material-robot: PDF Parser & Solver API (FastAPI)
+
+<swagger-ui src="https://petstore.swagger.io/v2/swagger.json" />

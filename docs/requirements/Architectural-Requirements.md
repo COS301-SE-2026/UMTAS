@@ -1,40 +1,16 @@
 # Architectural Requirements
 
 !!! abstract "Section Brief"
-    This section specifies the architectural decisions, quality constraints, and component responsibilities that govern the UMTAS system design. It is structured in two parts:
+    This section specifies the architectural decisions and component responsibilities that govern the UMTAS system design. It is structured in two parts:
 
-    1. **Overall software architecture** — system-wide quality attributes, architectural responsibility, and constraints that every component must satisfy.
+    1. **Overall software architecture** — system-wide architectural responsibility and constraints that every component must satisfy. Non-functional quality requirements are documented in [Quality Requirements](Quality-Requirements.md).
     2. **Per-component architecture** — a breakdown of each major architectural component including its quality requirements, responsibilities, chosen frameworks, and technology rationale.
 
 ---
 
 ## 1. Overall Software Architecture
 
-### 1.1 Architectural Quality Requirements
-
-#### 1.1.1 Flexibility
-
-#### 1.1.2 Maintainability
-
-#### 1.1.3 Scalability
-
-#### 1.1.4 Performance
-
-#### 1.1.5 Reliability
-
-#### 1.1.6 Security
-
-#### 1.1.7 Auditability
-
-#### 1.1.8 Testability
-
-#### 1.1.9 Usability
-
-#### 1.1.10 Integrability
-
----
-
-### 1.2 Architectural Responsibility
+### 1.1 Architectural Responsibility
 
 | Role | Responsibility |
 |---|---|
@@ -47,7 +23,7 @@
 
 ---
 
-### 1.3 Architecture Constraints
+### 1.2 Architecture Constraints
 
 ---
 
