@@ -12,7 +12,7 @@ const PUBLIC_PATHS = [
   "/auth-callback",
 ];
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const isPublicPath = PUBLIC_PATHS.some((path) => pathname.startsWith(path));
