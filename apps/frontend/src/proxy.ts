@@ -11,19 +11,19 @@
 
 import { NextRequest, NextResponse } from "next/server";
 
-const SESSION_COOKIE_NAME = "better-auth.session-token";
+//const SESSION_COOKIE_NAME = "better-auth.session-token";
 
-const PUBLIC_PATHS = ["/login", "/register", "/auth-callback"];
+//const PUBLIC_PATHS = ["/login", "/register", "/auth-callback"];
 
 export function proxy(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  // const { pathname } = request.nextUrl;
 
-  const isPublicPath = PUBLIC_PATHS.some((path) => pathname.startsWith(path));
-  const isAuthApiPath = pathname.startsWith("/api/auth");
+  // const isPublicPath = PUBLIC_PATHS.some((path) => pathname.startsWith(path));
+  // const isAuthApiPath = pathname.startsWith("/api/auth");
 
-  if (isPublicPath || isAuthApiPath) {
-    return NextResponse.next();
-  }
+  // if (isPublicPath || isAuthApiPath) {
+  //   return NextResponse.next();
+  // }
 
   // const sessionCookie = request.cookies.get(SESSION_COOKIE_NAME);
 
@@ -41,5 +41,3 @@ export const config = {
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };
-
-export { proxy as middleware };
