@@ -21,7 +21,7 @@ As a core part of **TDD**, your local validation loop is the fastest feedback yo
 
 | Tool           | Role                        | Command                 |
 | :------------- | :-------------------------- | :---------------------- |
-| **act**        | Local GitHub Actions runner | `act -j build-and-test` |
+| **act**        | Local GitHub Actions runner | `pnpm run act` |
 | **pnpm**       | Monorepo task runner        | `pnpm run check`        |
 | **ESLint**     | Static code analysis        | `pnpm run lint`         |
 | **TypeScript** | Type safety check           | `pnpm run typecheck`    |
@@ -42,12 +42,20 @@ As a core part of **TDD**, your local validation loop is the fastest feedback yo
 ## :material-layers: Best Practices
 
 === "Using `act`"
-    `act` allows you to run your GitHub Actions workflows inside Docker containers on your local machine.
+    `act` runs GitHub Actions workflows inside Docker containers on your local machine.
+    Configuration lives in `.actrc` (image pinning, architecture, socket path).
 
     ```bash
-    # Run the default push workflow
-    act push
+    # Run the CI job (lint → build → test) — safe locally, no secrets needed
+    pnpm run act
+
+    # List all jobs that will run without executing them
+    act push -j ci -l
     ```
+
+    !!! warning "Avoid running the full workflow"
+        Omitting `-j ci` will also queue the `docker`, `deploy`, and `notify` jobs, which
+        require DockerHub and SSH secrets and will fail or push images unintentionally.
 
 === "PGLite Parity"
     Always use **PGLite** for local checks if the CI uses it. This ensures that database-dependent tests behave identically on your machine and the runner.

@@ -18,7 +18,7 @@
     "lint-staged": "lint-staged",
     "ci": "turbo run ci",
     "prepare": "husky",
-    "act": "act --container-architecture linux/amd64"
+    "act": "act push -j ci --container-architecture linux/amd64"
   },
   "keywords": [],
   "author": "",
@@ -39,6 +39,16 @@
   },
   "dependencies": {
     "dotenv": "^16.0.3"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@nestjs/core",
+      "@swc/core",
+      "esbuild",
+      "msgpackr-extract",
+      "sharp",
+      "unrs-resolver"
+    ]
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,mjs,cjs,json,md,yml,yaml,css,scss}": "prettier --write",
