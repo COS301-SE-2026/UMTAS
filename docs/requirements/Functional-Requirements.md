@@ -7,26 +7,61 @@
 
 ---
 
-## Sub-system: Core Optimizer
+The following functional requirements describe the high-level capabilities of the system. With more depth provided in developed systems
 
-- R1.1: The system shall generate optimized schedules using CP-SAT...
+---
+## R1: External Layer
 
-## Sub-system: API Core
+### R1.1 Information Website
+- **R1.1.1:** The system shall provide a landing page for all users prior to login/register.  
+- **R1.1.2:** The landing page shall present system functionalities to entice users.  
 
-- R2.1: The system shall manage user sessions and preferences...
+### R1.2 Login and Register System
+- **R1.2.1:** The system shall allow users to log in.  
+- **R1.2.2:** The system shall allow users to register.  
+- **R1.2.3:** The system shall manage user sessions.  
 
 ---
 
-## Registration & Login
+## R2: Student Layer
 
-The platform supports secure user onboarding and authentication.
+### R2.1 Timetable Management
+- **R2.1.1:** The system shall allow students to view timetables.  
+- **R2.1.2:** The system shall allow students to update timetables.  
+- **R2.1.3:** The system shall allow students to delete timetables.  
 
-- **OAuth 2.0**: Integration with Google Workspace for student and staff login.
-- **Session Management**: Secure cookie-based sessions with BetterAuth.
+### R2.2 Timetable Creation – Builder
+- **R2.2.1:** The system shall allow students to create new timetables.  
+- **R2.2.2:** The system shall provide semester control for timetables.  
+- **R2.2.3:** The system shall allow timetable customisation.  
 
-## Form Validation
+### R2.3 Timetable Creation – PDF System
+- **R2.3.1:** The system shall automate timetable creation using a PDF if provided by a university of all classes.  
+- **R2.3.2:** The system shall allow user modification of PDF‑generated timetables.  
+- **R2.3.3:** The system shall allow semester control of PDF‑generated timetables.  
 
-All user inputs are validated on both client and server sides.
+### R2.4 Timetable Creation – API System
+- **R2.4.1:** The system shall automate timetable creation using a school‑provided API (if applicable).  
+- **R2.4.2:** The system shall allow user customisation of API‑generated timetables.  
 
-- **Zod Schemas**: Used for typesafe validation of all API requests.
-- **React Hook Form**: Provides real-time feedback for frontend input fields.
+### R2.5 Calendar Exporting
+- **R2.5.1:** The system shall allow export of timetables as `.ics` files for calendar import.  
+- **R2.5.2:** The system shall allow direct sync with Google Calendar.  
+  - **R2.5.2.1:** The system shall support creating a Google Calendar instance.  
+
+---
+
+## R3: University Layer
+
+### R3.1 Analytics System
+- **R3.1.1:** The system shall allow university admins to view registered students for a module time slot.  
+- **R3.1.2:** The system shall allow university admins to view actual attendance for a module time slot.  
+- **R3.1.3:** The system shall allow university admins to view projected attendance (user submitted).  
+
+---
+## R4: Tyto Analytics Layer
+
+### R4.1 Simulation System
+- **R4.1.1:** The system shall support 20,000+ simulations to evaluate efficiency.  
+- **R4.1.2:** The system shall provide a dashboard to view analytics under simulation load.  
+- **R4.1.3:** The system shall use authentication distinct from student and admin roles.  
