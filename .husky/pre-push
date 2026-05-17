@@ -1,5 +1,16 @@
-# echo "Running tests..."
-# pnpm run test
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
-# echo "Running build check..."
-# pnpm run build
+# Allow pushes from protected/integration branches
+case "$BRANCH" in
+  main|master|dev|HEAD) exit 0 ;;
+esac
+
+# Enforce branch naming convention
+if ! echo "$BRANCH" | grep -qE '^(feat|fix|chore|refactor|hotfix|docs|test)/[a-z0-9]([a-z0-9-]*[a-z0-9])?$'; then
+  echo "Branch name '$BRANCH' does not follow the naming convention."
+  echo "Expected: <type>/<description>"
+  echo "  Types : feat, fix, chore, refactor, hotfix, docs, test"
+  echo "  Format: lowercase letters, digits, hyphens (no leading/trailing hyphens)"
+  echo "  Example: feat/add-user-auth, fix/login-redirect"
+  exit 1
+fi
