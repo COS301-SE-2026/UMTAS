@@ -14,7 +14,9 @@ export class RequestBuilder<RequestType, ResponseType> {
 
   public setUrl(url: string): this {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
-    this.url = `${baseUrl}/${url.replace(/^\//, "")}`;
+    const cleanBase = baseUrl.replace(/\/$/, "");
+    const cleanPath = url.replace(/^\//, "");
+    this.url = `${cleanBase}/${cleanPath}`;
     return this;
   }
 
@@ -34,6 +36,14 @@ export class RequestBuilder<RequestType, ResponseType> {
   }
 
   public async send(body?: RequestType): Promise<ResponseType> {
+    const methodsRequiringBody: string[] = [
+      RequestMethod.POST,
+      RequestMethod.PUT,
+    ];
+    if (methodsRequiringBody.includes(this.method) && body === undefined) {
+      throw new Error(`Request body required for ${this.method} requests`);
+    }
+
     const response = await fetch(this.url, {
       method: this.method,
       headers: this.headers,
@@ -42,7 +52,13 @@ export class RequestBuilder<RequestType, ResponseType> {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+      let errorBody = "";
+      try {
+        errorBody = await response.text();
+      } catch {
+        errorBody = "(could not read response body)";
+      }
+      throw new Error(`HTTP ${response.status}: ${errorBody}`);
     }
 
     return (await response.json()) as ResponseType;
