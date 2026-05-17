@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "turbo run test",
+    "test:unit": "turbo run test --filter=!./apps/e2e",
     "dev": "turbo run dev",
     "dev:infra": "docker compose up -d postgres redis minio solver",
     "dev:monitor": "docker compose --profile dev-docker --profile monitoring up --build",
