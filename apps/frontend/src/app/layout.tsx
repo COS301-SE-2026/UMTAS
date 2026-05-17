@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { DM_Sans } from "next/font/google";
 import { headers } from "next/headers";
-import { auth } from "@/../utilities/auth";
 import { AppShellTemplate } from "@/components/templates/app/AppShellTemplate";
 import "./globals.css";
 
@@ -14,29 +13,35 @@ const dmSans = DM_Sans({
 
 export const metadata: Metadata = {
   title: {
-    default: "Vigil",
-    template: "%s | Vigil",
+    default: "UMTAS",
+    template: "%s | UMTAS",
   },
-  description: "Made by Vigil.",
+  description: "University Module Timetable Assistance System",
 };
+
+async function getServerSession() {
+  try {
+    const cookieHeader = (await headers()).get("cookie") ?? "";
+    const res = await fetch(
+      `${process.env.API_URL || "http://localhost:3001"}/api/auth/session`,
+      {
+        headers: { cookie: cookieHeader },
+        cache: "no-store",
+      },
+    );
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
 
 export default async function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  let userName: string | null = null;
-  let userEmail: string | null = null;
-
-  try {
-    const session = await auth.api.getSession({
-      headers: await headers(),
-    });
-    userName = session?.user?.name ?? null;
-    userEmail = session?.user?.email ?? null;
-  } catch {
-    // No session yet nav renders without user info, proxy handles redirect.
-  }
+}: Readonly<{ children: React.ReactNode }>) {
+  const session = await getServerSession();
+  const userName = session?.user?.name ?? null;
+  const userEmail = session?.user?.email ?? null;
 
   return (
     <html
@@ -48,13 +53,13 @@ export default async function RootLayout({
         <script
           dangerouslySetInnerHTML={{
             __html: `
-            (function() {
-              try {
-                var theme = localStorage.getItem('umtas-theme') || 'dark';
-                document.documentElement.setAttribute('data-theme', theme);
-              } catch(e) {}
-            })();
-          `,
+              (function() {
+                try {
+                  var theme = localStorage.getItem('umtas-theme') || 'dark';
+                  document.documentElement.setAttribute('data-theme', theme);
+                } catch(e) {}
+              })();
+            `,
           }}
         />
       </head>
