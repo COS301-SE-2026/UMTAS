@@ -27,6 +27,13 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
+  // Role-based routing stubs — all roles currently go to /dashboard.
+  // Once server-side session decoding is wired up, uncomment and fill in:
+  // const role = decodeSessionRole(sessionCookie.value); // TODO: implement
+  // if ((role === "uni_admin" || role === "sys_admin") && pathname.startsWith("/dashboard")) {
+  //   return NextResponse.redirect(new URL("/admin", request.url));
+  // }
+
   return NextResponse.next();
 }
 
