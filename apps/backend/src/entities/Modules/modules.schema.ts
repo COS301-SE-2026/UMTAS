@@ -13,12 +13,4 @@ export const modules = pgTable('Modules', {
   moduleName: varchar('moduleName', { length: 256 }).notNull(),
   styling: jsonb('styling'),
   userID: uuid('userID').notNull(),
-  timetableID: integer('timetableID').references(() => timetable.timetableID, {
-    onDelete: 'cascade',
-  }),
-});
-
-export const timetable = pgTable('Timetable', {
-  timetableID: serial('timetableID').primaryKey(),
-  timetableName: varchar('timetableName'),
 });
