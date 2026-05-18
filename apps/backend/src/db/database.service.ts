@@ -4,9 +4,9 @@ import { drizzle as drizzleNodePg } from 'drizzle-orm/node-postgres';
 import { drizzle as drizzlePglite } from 'drizzle-orm/pglite';
 import { PGlite } from '@electric-sql/pglite';
 import { Pool } from 'pg';
-import * as schema from './schema.js';
-import type { AppDatabase } from '../auth/auth.js';
-import { DB_MODES, parseDbMode, type DbMode } from './database.constants.js';
+import * as schema from './schema';
+import type { AppDatabase } from '../auth/auth';
+import { DB_MODES, parseDbMode, type DbMode } from './database.constants';
 
 @Injectable()
 export class DatabaseService implements OnModuleDestroy {

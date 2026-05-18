@@ -17,6 +17,8 @@ services:
     image: postgres:15-alpine
     networks:
       - internal
+    ports:
+      - "5432:5432"
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
@@ -43,12 +45,25 @@ services:
     networks:
       - gateway
       - internal
+    ports:
+      - "9000:9000"
+      - "9001:9001"
     command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     volumes:
       - minio_data:/data
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    platform: linux/amd64
+    networks:
+      - gateway
+      - internal
+    ports:
+      - "1025:1025"
+      - "8025:8025"
 
   solver:
     build:
@@ -86,6 +101,11 @@ services:
     image: ${DOCKER_REGISTRY}:frontend-latest
     networks:
       - gateway
+    environment:
+      - PORT=${FRONTEND_PORT}
+      - API_URL=http://backend:${BACKEND_PORT}
+      - NEXT_PUBLIC_APP_URL=http://localhost:${FRONTEND_PORT}
+      - NEXT_PUBLIC_API_URL=http://localhost:${FRONTEND_PORT}/api/auth
     profiles:
       - dev-docker
       - dev-pglite

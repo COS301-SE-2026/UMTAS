@@ -1,8 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { eq } from 'drizzle-orm';
-import { DatabaseService } from './database.service.js';
-import { usersTable } from '../entities/index.js';
+import { hashPassword } from 'better-auth/crypto';
+import { DatabaseService } from './database.service';
+import { usersTable, accountsTable } from '../entities/index';
+import { AuthSeed } from './seeds/auth.seed';
 
 interface SeedTask {
   name: string;
@@ -21,7 +23,11 @@ export class DatabaseSeedService {
     const allSeedTasks: SeedTask[] = [
       {
         name: 'default-system-admin',
-        run: this.seedDefaultSystemAdmin.bind(this),
+        run: () => this.seedDefaultSystemAdmin(),
+      },
+      {
+        name: 'auth-seed',
+        run: () => this.seedAuthTestData(),
       },
     ];
 
@@ -77,6 +83,9 @@ export class DatabaseSeedService {
     const seedEmail =
       this.configService.get<string>('SEED_SYSTEM_ADMIN_EMAIL') ??
       'system-admin@local.umtas';
+    const seedPassword =
+      this.configService.get<string>('SEED_SYSTEM_ADMIN_PASSWORD') ??
+      'Admin@UMTAS2024!';
 
     const existing = await this.dbService.db
       .select({ id: usersTable.id })
@@ -89,14 +98,29 @@ export class DatabaseSeedService {
       return;
     }
 
+    const hashedPassword = await hashPassword(seedPassword);
+
     await this.dbService.db.insert(usersTable).values({
       id: seedUserId,
       name: seedName,
       email: seedEmail,
-      role: 'system_admin',
+      role: 'sys_admin',
       emailVerified: true,
     });
 
+    await this.dbService.db.insert(accountsTable).values({
+      id: `${seedUserId}-account`,
+      userId: seedUserId,
+      accountId: seedUserId,
+      providerId: 'credential',
+      password: hashedPassword,
+    });
+
     this.logger.log(`Seeded default system admin user (${seedEmail}).`);
+  }
+
+  private async seedAuthTestData(): Promise<void> {
+    const authSeed = new AuthSeed();
+    await authSeed.run(this.dbService);
   }
 }

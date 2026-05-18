@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Verify your email</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body style="font-family: 'DM Sans', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 32px; background:#ffffff; color:#09090b;">
+  <!-- [INSERT UMTAS LOGO HERE] calendar icon left, "UMTAS" wordmark right (DM Sans SemiBold) -->
+  <header style="display:flex;align-items:center;gap:12px;margin-bottom:24px;">
+    <div aria-hidden="true" style="display:flex;align-items:center;gap:8px;">
+      <span style="display:inline-block;width:40px;height:32px;border-radius:6px;background:#f4f4f5;border:1px solid #e4e4e7;display:flex;align-items:center;justify-content:center;color:#52525b;font-size:14px;">📅</span>
+      <span style="font-weight:600;font-size:18px;letter-spacing:0;font-family:'DM Sans', Arial, sans-serif;">UMTAS</span>
+    </div>
+  </header>
+
+  <h2 style="font-size:18px;margin:0 0 12px 0;font-weight:600;">Verify your email address</h2>
+  <p>Hi {{name}},</p>
+  <p>Thanks for registering with UMTAS. Please verify your email address to activate your account:</p>
+  <p style="margin: 24px 0;">
+    <a href="{{verifyUrl}}" style="background:#18181b;color:#ffffff;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:500;display:inline-block;">Verify Email</a>
+  </p>
+  <p style="color:#52525b;font-size:14px;">If you did not create a UMTAS account, you can ignore this email.</p>
+  <hr style="border:none;border-top:1px solid #e4e4e7;margin:32px 0;" />
+  <p style="color:#9ca3af;font-size:12px;">UMTAS — University Modular Timetable &amp; Analytics System</p>
+</body>
+</html>
