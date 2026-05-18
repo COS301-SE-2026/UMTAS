@@ -27,3 +27,27 @@
   - There won't be 3 levels anymore. Only 1 that is heavily expanded.
 
 # The actual view timetable page will be done afterwards
+
+3 pages
+
+- builder - modules
+- builder events (the main thing)
+  - date
+  - name
+  - code
+  - time
+  - type
+- our only type is lecture
+  - lecture needs to be assigned to modules (FK)
+  - dropdown from same event builder page
+  - lecture linked to module
+  - saved modules in DB
+  - create modules if you dont have in the DB
+    - the modules have their own attributes
+      - they have
+        - name
+        - code
+        - colour
+  - the event type links to the modules. the modules are not events
+
+So basically events<-lecture<-modules (the only event we have now)
