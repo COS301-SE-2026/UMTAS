@@ -68,6 +68,9 @@ services:
     restart: always
     networks:
       - internal
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
     environment:
       - DOCKER_API_VERSION=1.44
       - REPO_USER=${DOCKERHUB_USERNAME}
@@ -75,9 +78,10 @@ services:
       - WATCHTOWER_NOTIFICATION_URL=${WATCHTOWER_DISCORD_URL}
       - WATCHTOWER_NOTIFICATIONS_LEVEL=info
       - WATCHTOWER_HTTP_API_METRICS=true
+      - WATCHTOWER_HTTP_API_TOKEN=${WATCHTOWER_HTTP_API_TOKEN}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    command: --schedule "0 0 * * * *" --cleanup --notification-title-tag "UMTAS"
+    command: --schedule "0 0 * * * *" --cleanup
     profiles:
       - server
 
