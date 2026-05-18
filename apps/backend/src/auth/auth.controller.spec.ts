@@ -72,9 +72,9 @@ describe('AuthController', () => {
     } as unknown as IncomingMessage;
     const res = {} as ServerResponse;
 
-    await expect(
-      controller.linkGoogleAccount(req, res, { code: 'code', state: 'state' }),
-    ).rejects.toThrow(NotFoundException);
+    await expect(controller.linkGoogleAccount(req, res)).rejects.toThrow(
+      NotFoundException,
+    );
   });
 });
 

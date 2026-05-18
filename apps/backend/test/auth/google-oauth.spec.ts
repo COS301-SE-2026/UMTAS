@@ -6,7 +6,7 @@ jest.mock('better-auth/node', () => ({
 
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
+import request from 'supertest';
 import { AuthController } from '../../src/auth/auth.controller';
 import { AuthService } from '../../src/auth/auth.service';
 import { MailerService } from '../../src/mail/mailer.service';
@@ -49,7 +49,7 @@ describe('Google OAuth (mocked)', () => {
 
     const mockAuthService = {
       getAuth: jest.fn(() => ({ handler: fakeHandler })),
-    } as Partial<AuthService> as AuthService;
+    } as unknown as AuthService;
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
       controllers: [AuthController],

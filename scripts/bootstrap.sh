@@ -30,3 +30,6 @@ echo "==> Installing dependencies..."
 echo ""
 echo "=== Bootstrap complete ==="
 echo "    Next: edit .env files as needed, then run 'pnpm run reset' to initialize."
+# Install Playwright browsers for E2E tests
+pnpm -C apps/e2e exec playwright install chromium
+

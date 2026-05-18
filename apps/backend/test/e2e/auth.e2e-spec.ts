@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument */
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
+import request from 'supertest';
 import { AppModule } from '../../src/app.module';
 import { MailerService } from '../../src/mail/mailer.service';
 import { createMockMailer } from '../../test/utils/mailer.mock';
@@ -174,7 +174,7 @@ describe('Auth e2e', () => {
   });
 
   describe('Admin Operations', () => {
-    let sysAdminAgent: request.SuperAgentTest;
+    let sysAdminAgent: ReturnType<typeof request.agent>;
 
     beforeEach(async () => {
       sysAdminAgent = request.agent(app.getHttpServer());

@@ -1,12 +1,12 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { eq } from 'drizzle-orm';
-import { DatabaseService } from '../db/database.service';
 import { MailerService } from '../mail/mailer.service';
 import * as appSchema from '../db/schema';
-import { createAuth } from './auth';
 import { createRedisClient } from '../redis/redis';
 import type { AuthInstance } from './auth';
+import { DatabaseService } from '../db/database.service.js';
+import { createAuth } from './auth.js';
 
 @Injectable()
 export class AuthService implements OnModuleInit {

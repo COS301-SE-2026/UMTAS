@@ -37,8 +37,8 @@ describe('CurrentSession Decorator', () => {
 
     const result = currentSessionFactory(undefined, mockExecutionContext);
     expect(result).toEqual(mockSession);
-    expect(result.user.id).toBe('user-1');
-    expect(result.session.token).toBe('token-123');
+    expect(result!.user.id).toBe('user-1');
+    expect(result!.session.token).toBe('token-123');
   });
 
   it('should handle missing session gracefully', () => {
@@ -89,7 +89,7 @@ describe('CurrentSession Decorator', () => {
     } as unknown as ExecutionContext;
 
     const result = currentSessionFactory(undefined, mockExecutionContext);
-    expect(result.user.role).toBe('uni_admin');
-    expect(result.session.impersonatedBy).toBeNull();
+    expect(result!.user.role).toBe('uni_admin');
+    expect(result!.session.impersonatedBy).toBeNull();
   });
 });

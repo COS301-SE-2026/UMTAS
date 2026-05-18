@@ -106,7 +106,7 @@ describe('AuthGuard', () => {
 
     it('should handle array header values correctly', async () => {
       mockRequest.headers = {
-        'accept-encoding': ['gzip', 'deflate'],
+        'accept-encoding': 'gzip, deflate',
       };
 
       const mockSession = { user: { id: 'user-1' } };
