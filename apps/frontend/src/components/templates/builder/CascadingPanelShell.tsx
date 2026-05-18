@@ -3,29 +3,17 @@
 // Manages the cascading panel layout for the timetable builder.
 
 /* Layout model:
-    [ Left rail: StepPill list ]  [ Panel 1: Modules ]  [ Panel 2: Preferences ]  [ Panel 3: Review ]
+    [ Left rail: StepPill list ]  [ Panel 1: Modules ]
 */
 
 import React, { useState, useCallback } from "react";
 import { BookOpen, SlidersHorizontal, ClipboardCheck } from "lucide-react";
 import { StepPill } from "@/components/atoms/builder/StepPill";
 import { ModulesPanel } from "@/components/organisms/builder/ModulesPanel";
-import {
-  PreferencesPanel,
-  type Preferences,
-} from "@/components/organisms/viewTimetable/PreferencesPanel";
-import { ReviewPanel } from "@/components/organisms/viewTimetable/ReviewPanel";
 import type { Module } from "@/components/molecules/builder/ModuleCard";
 import { useRouter } from "next/navigation";
 
 type OpenPanel = null | "modules" | "preferences" | "review";
-
-const DEFAULT_PREFERENCES: Preferences = {
-  preferredDays: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-  timeOfDay: "any",
-  compactGaps: false,
-  fewerDays: false,
-};
 
 function moduleSummary(modules: Module[]): string | undefined {
   if (modules.length === 0) return undefined;
@@ -33,21 +21,10 @@ function moduleSummary(modules: Module[]): string | undefined {
   return `${modules[0].name} + ${modules.length - 1} more`;
 }
 
-function prefSummary(prefs: Preferences): string {
-  const days =
-    prefs.preferredDays.length === 5 || prefs.preferredDays.length === 0
-      ? "Any day"
-      : prefs.preferredDays.map((d) => d.slice(0, 3)).join(", ");
-  const time = prefs.timeOfDay === "any" ? "no time pref" : prefs.timeOfDay;
-  return `${days} · ${time}`;
-}
-
 export function CascadingPanelShell() {
   const router = useRouter();
   const [openPanel, setOpenPanel] = useState<OpenPanel>(null);
   const [modules, setModules] = useState<Module[]>([]);
-  const [preferences, setPreferences] =
-    useState<Preferences>(DEFAULT_PREFERENCES);
   const [modulesComplete, setModulesComplete] = useState(false);
   const [preferencesComplete, setPreferencesComplete] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -59,18 +36,6 @@ export function CascadingPanelShell() {
   function handleModulesDone() {
     setModulesComplete(true);
     setOpenPanel("preferences");
-  }
-
-  function handlePreferencesDone() {
-    setPreferencesComplete(true);
-    setOpenPanel("review");
-  }
-
-  async function handleGenerate() {
-    setIsGenerating(true);
-    // replace this with real API call through utilities/request.ts
-    await new Promise((res) => setTimeout(res, 2500));
-    router.push("/schedules");
   }
 
   function panelStyle(panel: OpenPanel): React.CSSProperties {
@@ -110,26 +75,6 @@ export function CascadingPanelShell() {
             isComplete={modulesComplete}
             onClick={() => openPanelFor("modules")}
           />
-
-          {/* Step 2 Preferences */}
-          <StepPill
-            icon={<SlidersHorizontal size={15} />}
-            label="Preferences"
-            summary={modulesComplete ? prefSummary(preferences) : undefined}
-            isActive={openPanel === "preferences"}
-            isComplete={preferencesComplete}
-            onClick={() => openPanelFor("preferences")}
-            disabled={!modulesComplete}
-          />
-
-          {/* Step 3 Review and Generate */}
-          <StepPill
-            icon={<ClipboardCheck size={15} />}
-            label="Review & Generate"
-            isActive={openPanel === "review"}
-            onClick={() => openPanelFor("review")}
-            disabled={!modulesComplete || !preferencesComplete}
-          />
         </div>
       </div>
 
@@ -160,37 +105,6 @@ export function CascadingPanelShell() {
             onChange={setModules}
             onClose={() => setOpenPanel(null)}
             onDone={handleModulesDone}
-          />
-        </div>
-
-        {/* Preferences panel */}
-        <div
-          className="absolute inset-0 rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] overflow-hidden"
-          style={panelStyle("preferences")}
-          aria-hidden={openPanel !== "preferences"}
-        >
-          <PreferencesPanel
-            preferences={preferences}
-            onChange={setPreferences}
-            onClose={() => setOpenPanel(null)}
-            onDone={handlePreferencesDone}
-          />
-        </div>
-
-        {/* Review panel */}
-        <div
-          className="absolute inset-0 rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] overflow-hidden"
-          style={panelStyle("review")}
-          aria-hidden={openPanel !== "review"}
-        >
-          <ReviewPanel
-            modules={modules}
-            preferences={preferences}
-            isGenerating={isGenerating}
-            onGenerate={handleGenerate}
-            onClose={() => setOpenPanel(null)}
-            onEditModules={() => setOpenPanel("modules")}
-            onEditPreferences={() => setOpenPanel("preferences")}
           />
         </div>
       </div>

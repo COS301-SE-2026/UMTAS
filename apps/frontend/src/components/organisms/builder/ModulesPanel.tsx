@@ -50,76 +50,32 @@ export function ModulesPanel({
     }
     setInputError("");
     setInputValue("");
-    onChange([...modules, { id: generateId(), name: trimmed, timeSlots: [] }]);
+    onChange([
+      ...modules,
+      {
+        id: generateId(),
+        code: "",
+        name: trimmed,
+        colour: "",
+        description: "",
+      },
+    ]);
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
     if (e.key === "Enter") handleAdd();
   }
 
-  function handleRemoveModule(id: string) {
+  function handleRemove(id: string) {
     onChange(modules.filter((m) => m.id !== id));
   }
 
-  function handleAddSlot(moduleId: string) {
-    onChange(
-      modules.map((m) =>
-        m.id === moduleId
-          ? { ...m, timeSlots: [...m.timeSlots, { ...EMPTY_SLOT }] }
-          : m,
-      ),
-    );
-  }
-
-  function handleRemoveSlot(moduleId: string, idx: number) {
-    onChange(
-      modules.map((m) =>
-        m.id === moduleId
-          ? { ...m, timeSlots: m.timeSlots.filter((_, i) => i !== idx) }
-          : m,
-      ),
-    );
-  }
-
-  function handleUpdateSlot(moduleId: string, idx: number, slot: TimeSlot) {
-    onChange(
-      modules.map((m) =>
-        m.id === moduleId
-          ? {
-              ...m,
-              timeSlots: m.timeSlots.map((s, i) => (i === idx ? slot : s)),
-            }
-          : m,
-      ),
-    );
-  }
-
-  function handleDone() {
-    // Validate at least 1 module, every module has at least 1 fully-filled slot
-    if (modules.length === 0) {
-      setInputError("Add at least one module before continuing.");
-      return;
-    }
-    const newErrors: Record<string, Record<number, string>> = {};
-    let hasError = false;
-
-    for (const mod of modules) {
-      if (mod.timeSlots.length === 0) {
-        newErrors[mod.id] = { 0: "Add at least one time slot." };
-        hasError = true;
-        continue;
-      }
-      for (let i = 0; i < mod.timeSlots.length; i++) {
-        const s = mod.timeSlots[i];
-        if (!s.day || !s.startTime || !s.endTime) {
-          if (!newErrors[mod.id]) newErrors[mod.id] = {};
-          newErrors[mod.id][i] = "Complete all fields for this slot.";
-          hasError = true;
-        }
-      }
-    }
-    setSlotErrors(newErrors);
-    if (!hasError) onDone();
+  function handleUpdate(
+    id: string,
+    field: keyof Omit<Module, "id" | "timeSlots">,
+    value: string,
+  ) {
+    onChange(modules.map((m) => (m.id === id ? { ...m, [field]: value } : m)));
   }
 
   return (
@@ -131,7 +87,6 @@ export function ModulesPanel({
           <Button
             type="button"
             size="sm"
-            onClick={handleDone}
             disabled={modules.length === 0}
             className="h-7 px-3 text-xs bg-[var(--text-primary)] text-[var(--bg-base)] hover:opacity-90"
           >
@@ -175,15 +130,14 @@ export function ModulesPanel({
             <p className="text-xs font-medium text-[var(--text-secondary)] uppercase tracking-wider">
               {modules.length} module{modules.length !== 1 ? "s" : ""}
             </p>
-            {modules.map((mod) => (
+            {modules.map((mod, index) => (
               <ModuleCard
                 key={mod.id}
                 module={mod}
-                onRemoveModule={handleRemoveModule}
-                onAddTimeSlot={handleAddSlot}
-                onRemoveTimeSlot={handleRemoveSlot}
-                onUpdateTimeSlot={handleUpdateSlot}
-                slotErrors={slotErrors[mod.id]}
+                index={index}
+                onUpdate={handleUpdate}
+                onRemove={handleRemove}
+                errors={slotErrors[mod.id]}
               />
             ))}
           </div>
