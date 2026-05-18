@@ -11,7 +11,6 @@ import {
   ModuleCard,
   type Module,
 } from "@/components/molecules/builder/ModuleCard";
-import type { TimeSlot } from "@/components/atoms/builder/TimeSlotSelect";
 
 interface ModulesPanelProps {
   modules: Module[];
@@ -24,8 +23,6 @@ function generateId() {
   return Math.random().toString(36).slice(2, 9);
 }
 
-const EMPTY_SLOT: TimeSlot = { day: "", startTime: "", endTime: "" };
-
 export function ModulesPanel({
   modules,
   onChange,
@@ -34,9 +31,6 @@ export function ModulesPanel({
 }: ModulesPanelProps) {
   const [inputValue, setInputValue] = useState("");
   const [inputError, setInputError] = useState("");
-  const [slotErrors, setSlotErrors] = useState<
-    Record<string, Record<number, string>>
-  >({});
 
   function handleAdd() {
     const trimmed = inputValue.trim().toUpperCase();
@@ -57,7 +51,6 @@ export function ModulesPanel({
         code: "",
         name: trimmed,
         colour: "",
-        description: "",
       },
     ]);
   }
@@ -72,7 +65,7 @@ export function ModulesPanel({
 
   function handleUpdate(
     id: string,
-    field: keyof Omit<Module, "id" | "timeSlots">,
+    field: keyof Omit<Module, "id">,
     value: string,
   ) {
     onChange(modules.map((m) => (m.id === id ? { ...m, [field]: value } : m)));
@@ -137,7 +130,7 @@ export function ModulesPanel({
                 index={index}
                 onUpdate={handleUpdate}
                 onRemove={handleRemove}
-                errors={slotErrors[mod.id]}
+                errors={undefined}
               />
             ))}
           </div>

@@ -3,29 +3,24 @@
 import React from "react";
 import { Trash2, Plus } from "lucide-react";
 import { Input } from "@/components/atoms/baseShadcn/input";
-import { Textarea } from "@/components/atoms/baseShadcn/textarea";
 import { Label } from "@/components/atoms/baseShadcn/label";
 import { Button } from "@/components/atoms/baseShadcn/button";
 import {
   ColourPicker,
   Module_Colours,
 } from "@/components/atoms/builder/colourPicker";
-import {} from "@/components/atoms/builder/TimeSlotSelect";
 
 export interface Module {
   id: string;
   code: string;
   name: string;
   colour: string;
-  description: string;
 }
 
 export interface ModuleErrors {
   code?: string;
   name?: string;
   colour?: string;
-  description?: string;
-  timeSlots?: Record<number, string>;
 }
 
 interface ModuleCardProps {
@@ -33,7 +28,7 @@ interface ModuleCardProps {
   index: number;
   onUpdate: (
     id: string,
-    field: keyof Omit<Module, "id" | "timeSlots">,
+    field: keyof Omit<Module, "id">,
     value: string,
   ) => void;
   onRemove: (id: string) => void;
@@ -149,34 +144,6 @@ export function ModuleCard({
           />
           {errors?.colour && (
             <p className="text-xs text-red-500">{errors.colour}</p>
-          )}
-        </div>
-
-        {/* module description */}
-        <div className="flex flex-col gap-1.5 sm:col-span-2">
-          <Label
-            htmlFor={`module-desc-${module.id}`}
-            className="text-xs font-medium text-[var(--text-secondary)]"
-          >
-            Description
-            <span className="ml-1 font-normal text-[var(--text-secondary)] opacity-60">
-              (optional)
-            </span>
-          </Label>
-          <Textarea
-            id={`module-desc-${module.id}`}
-            value={module.description}
-            onChange={(e) => onUpdate(module.id, "description", e.target.value)}
-            placeholder="Brief description of this module…"
-            rows={2}
-            className={[
-              "resize-none bg-[var(--bg-base)] border-[var(--border)] text-[var(--text-primary)]",
-              "placeholder:text-[var(--text-secondary)] focus-visible:ring-1 focus-visible:ring-[var(--text-primary)] text-sm",
-              errors?.description ? "border-red-500" : "",
-            ].join(" ")}
-          />
-          {errors?.description && (
-            <p className="text-xs text-red-500">{errors.description}</p>
           )}
         </div>
       </div>
