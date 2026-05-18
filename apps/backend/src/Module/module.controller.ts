@@ -15,12 +15,13 @@ import {
   ApiOkResponse,
   ApiOperation,
 } from '@nestjs/swagger';
-
+import { Public } from '../auth/auth.guard';
 @Controller('modules')
 export class ModuleController {
   constructor(private readonly service: ModuleService) {}
 
   //Create
+  @Public()
   @Post()
   @ApiOperation({ summary: 'Create a module' })
   @ApiCreatedResponse({ description: 'Module created succesfully' })
@@ -29,14 +30,16 @@ export class ModuleController {
   }
 
   //Get all
+  @Public()
   @Get()
-  @ApiOperation({ summary: 'Get moduels' })
+  @ApiOperation({ summary: 'Get modules' })
   @ApiOkResponse({ description: 'Modules returned successfully' })
   getAll() {
     return this.service.getAll();
   }
 
   //Get by id
+  @Public()
   @Get(':moduleId')
   @ApiOperation({ summary: 'Get certain module' })
   @ApiOkResponse({ description: 'Module returned successfully' })
@@ -45,6 +48,7 @@ export class ModuleController {
   }
 
   //Update
+  @Public()
   @Patch(':moduleId')
   @ApiOperation({ summary: 'Get one module' })
   @ApiOkResponse({ description: 'Module returned successfully' })
@@ -55,6 +59,7 @@ export class ModuleController {
     return this.service.update(moduleId, dto);
   }
 
+  @Public()
   @Delete(':moduleId')
   @ApiOperation({ summary: 'Delete module by id' })
   @ApiOkResponse({ description: 'Module deleted successfully' })

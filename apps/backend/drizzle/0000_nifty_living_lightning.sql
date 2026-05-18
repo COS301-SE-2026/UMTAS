@@ -56,8 +56,44 @@ CREATE TABLE "verification" (
 	"updatedAt" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "Event" (
+	"userID" uuid NOT NULL,
+	"eventID" serial PRIMARY KEY NOT NULL,
+	"eventCriteria" jsonb
+);
+--> statement-breakpoint
+CREATE TABLE "EventsToTimetables" (
+	"eventID" integer NOT NULL,
+	"timetableID" integer NOT NULL,
+	CONSTRAINT "EventsToTimetables_eventID_timetableID_pk" PRIMARY KEY("eventID","timetableID")
+);
+--> statement-breakpoint
+CREATE TABLE "Timetable" (
+	"timetableID" serial PRIMARY KEY NOT NULL,
+	"timetableName" varchar
+);
+--> statement-breakpoint
+CREATE TABLE "LectureEv" (
+	"lectureID" serial PRIMARY KEY NOT NULL,
+	"moduleID" integer,
+	"eventID" integer,
+	"venue" varchar(30)
+);
+--> statement-breakpoint
+CREATE TABLE "Modules" (
+	"moduleID" serial PRIMARY KEY NOT NULL,
+	"moduleCode" varchar(6) NOT NULL,
+	"moduleName" varchar(256) NOT NULL,
+	"styling" jsonb,
+	"userID" uuid NOT NULL
+);
+--> statement-breakpoint
 ALTER TABLE "account" ADD CONSTRAINT "account_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "session" ADD CONSTRAINT "session_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "EventsToTimetables" ADD CONSTRAINT "EventsToTimetables_eventID_Event_eventID_fk" FOREIGN KEY ("eventID") REFERENCES "public"."Event"("eventID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "EventsToTimetables" ADD CONSTRAINT "EventsToTimetables_timetableID_Timetable_timetableID_fk" FOREIGN KEY ("timetableID") REFERENCES "public"."Timetable"("timetableID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "LectureEv" ADD CONSTRAINT "LectureEv_moduleID_Modules_moduleID_fk" FOREIGN KEY ("moduleID") REFERENCES "public"."Modules"("moduleID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "LectureEv" ADD CONSTRAINT "LectureEv_eventID_Event_eventID_fk" FOREIGN KEY ("eventID") REFERENCES "public"."Event"("eventID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 CREATE UNIQUE INDEX "account_provider_account_unique" ON "account" USING btree ("providerId","accountId");--> statement-breakpoint
 CREATE INDEX "account_user_id_idx" ON "account" USING btree ("userId");--> statement-breakpoint
 CREATE UNIQUE INDEX "rate_limit_key_unique" ON "rateLimit" USING btree ("key");--> statement-breakpoint
