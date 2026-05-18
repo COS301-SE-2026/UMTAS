@@ -68,9 +68,7 @@ services:
     restart: always
     networks:
       - internal
-    dns:
-      - 8.8.8.8
-      - 1.1.1.1
+      - gateway
     environment:
       - DOCKER_API_VERSION=1.44
       - REPO_USER=${DOCKERHUB_USERNAME}
