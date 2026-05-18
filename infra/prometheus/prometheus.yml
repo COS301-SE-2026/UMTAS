@@ -34,3 +34,24 @@ scrape_configs:
           service: solver
           language: python
     metrics_path: /metrics
+
+  - job_name: node
+    static_configs:
+      - targets: ["node-exporter:9100"]
+        labels:
+          service: node-exporter
+
+  - job_name: cadvisor
+    static_configs:
+      - targets: ["cadvisor:8080"]
+        labels:
+          service: cadvisor
+    metric_relabel_configs:
+      - source_labels: [container_label_com_docker_compose_service]
+        target_label: compose_service
+
+  - job_name: postgres
+    static_configs:
+      - targets: ["postgres-exporter:9187"]
+        labels:
+          service: postgres
