@@ -13,18 +13,17 @@ import { authClient } from "@/../utilities/auth-client";
 function VerifyEmailContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const token = searchParams.get("token");
+
   const [status, setStatus] = useState<"loading" | "success" | "error">(
-    "loading",
+    token ? "loading" : "error",
   );
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState(
+    token ? "" : "Invalid verification link. No token found.",
+  );
 
   useEffect(() => {
-    const token = searchParams.get("token");
-    if (!token) {
-      setStatus("error");
-      setMessage("Invalid verification link. No token found.");
-      return;
-    }
+    if (!token) return;
 
     authClient
       .verifyEmail({ query: { token } })
@@ -40,7 +39,7 @@ function VerifyEmailContent() {
           err instanceof Error ? err.message : "An unexpected error occurred.",
         );
       });
-  }, [searchParams, router]);
+  }, [token, router]);
 
   return (
     <AuthPageTemplate>
