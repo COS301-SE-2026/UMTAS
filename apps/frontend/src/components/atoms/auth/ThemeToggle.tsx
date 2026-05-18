@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Sun, Moon } from "lucide-react";
 import { Button } from "@/components/atoms/baseShadcn/button";
 
 export function ThemeToggle() {
   const [isDark, setIsDark] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     const stored = localStorage.getItem("umtas-theme");
@@ -18,6 +19,7 @@ export function ThemeToggle() {
       "data-theme",
       shouldBeDark ? "dark" : "light",
     );
+    setMounted(true);
   }, []);
 
   function toggle() {
@@ -29,6 +31,8 @@ export function ThemeToggle() {
     );
     localStorage.setItem("umtas-theme", next ? "dark" : "light");
   }
+
+  if (!mounted) return null;
 
   return (
     <Button

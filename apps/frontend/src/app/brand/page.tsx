@@ -4,14 +4,21 @@ import { useState, useEffect } from "react";
 
 export default function BrandPage() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     const stored = localStorage.getItem("umtas-theme") as
       | "light"
       | "dark"
       | null;
-    if (stored) setTheme(stored);
+    if (stored) {
+      setTheme(stored);
+      document.documentElement.setAttribute("data-theme", stored);
+    }
+    setMounted(true);
   }, []);
+
+  if (!mounted) return null;
 
   function toggleTheme() {
     const next = theme === "light" ? "dark" : "light";
