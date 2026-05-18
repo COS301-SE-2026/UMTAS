@@ -77,7 +77,7 @@ services:
       - WATCHTOWER_HTTP_API_METRICS=true
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    command: --schedule "0 0 * * * *" --cleanup --notification-title "UMTAS Watchtower"
+    command: --schedule "0 0 * * * *" --cleanup --notification-title-tag "UMTAS"
     profiles:
       - server
 
