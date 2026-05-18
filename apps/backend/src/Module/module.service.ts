@@ -70,18 +70,19 @@ export class ModuleService {
   async update(moduleId: string, dto: UpdateModuleDto) {
     //Find module
     const [module] = await this.dbService.db
+      .select()
       .from(ModuleTable)
       .where(eq(ModuleTable.id, moduleId))
       .limit(1);
 
     if (!module)
-      throw new NotFoundException(`Module id[${moduleId}] already exists`);
+      throw new NotFoundException(`Module id[${moduleId}] not found`);
 
     const updatedCode = dto.code?.trim().toUpperCase();
 
     if (updatedCode && updatedCode !== module.code) {
       //check for module with same NEW code
-      const [dupModule] = this.dbService.db
+      const [dupModule] = await this.dbService.db
         .from(ModuleTable)
         .where(eq(ModuleTable.code, updatedCode))
         .limit(1);
@@ -90,26 +91,30 @@ export class ModuleService {
         throw new ConflictException('Duplicate module for new code found');
     } //duplicate module for new code
 
-    const [newModule] = this.dbService.db.update(ModuleTable).set({
-      code: updatedCode ?? module.code,
-      name: dto.name ?? module.name,
-      description: dto.description ?? module.description,
-      styling: dto.styling ?? module.styling,
-    });
+    const [newModule] = this.dbService.db
+      .update(ModuleTable)
+      .set({
+        code: updatedCode ?? module.code,
+        name: dto.name ?? module.name,
+        description: dto.description ?? module.description,
+        styling: dto.styling ?? module.styling,
+      })
+      .where(eq(ModuleTable.id, moduleId))
+      .returning();
 
     if (!newModule)
       throw new InternalServerErrorException('New module not created');
 
     return {
-      newModule,
+      module: newModule,
     };
   } //update
 
-  async delete(moduleId: string) {
+  async deleteById(moduleId: string) {
     const [module] = this.dbService.db
       .select()
       .from(ModuleTable)
-      .where(eq(ModuleTable.id, id))
+      .where(eq(ModuleTable.id, moduleId))
       .limit(1);
 
     if (!module) throw new NotFoundException(`Module [${moduleId}] not found`);

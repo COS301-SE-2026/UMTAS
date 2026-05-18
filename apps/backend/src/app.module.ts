@@ -8,6 +8,7 @@ import { HealthModule } from './health/health.module.js';
 import { AuthController } from './auth/auth.controller.js';
 import { AuthService } from './auth/auth.service.js';
 import { RolesGuard } from './auth/roles.guard.js';
+import { EventModule } from './Events/event.module.js';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { RolesGuard } from './auth/roles.guard.js';
     }),
     DatabaseModule,
     HealthModule,
+    EventModule,
   ],
   controllers: [AppController, AuthController],
   providers: [

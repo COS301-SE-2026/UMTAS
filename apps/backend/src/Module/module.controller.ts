@@ -24,7 +24,7 @@ export class ModuleController {
   //Create
   @Post()
   @ApiOperation({ summary: 'Create a module' })
-  @ApiCreatedResponse({ description: 'Module create succesfully' })
+  @ApiCreatedResponse({ description: 'Module created succesfully' })
   createModule(@Body() dto: CreateModuleDto) {
     return this.service.create(dto);
   }
@@ -51,5 +51,12 @@ export class ModuleController {
   @ApiOkResponse({ description: 'Module returned successfully' })
   update(@Param('moduleId') moduleId: string, @Body() dto: UpdateModuleDto) {
     return this.service.update(moduleId, dto);
+  }
+
+  @Delete('moduleId')
+  @ApiOperation({ summary: 'Delete module by id' })
+  @ApiOkResponse({ description: 'Module deleted successfully' })
+  delete(@Param('moduleId') moduleId: string) {
+    return this.service.deleteById(moduleId);
   }
 } //EventController
