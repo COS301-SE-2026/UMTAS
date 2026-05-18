@@ -4,6 +4,7 @@ import React from "react";
 import { Trash2 } from "lucide-react";
 import { Input } from "@/components/atoms/baseShadcn/input";
 import { Label } from "@/components/atoms/baseShadcn/label";
+import { Button } from "@/components/atoms/baseShadcn/button";
 import {
   Select,
   SelectContent,
@@ -13,8 +14,10 @@ import {
 } from "@/components/atoms/baseShadcn/select";
 import { TimeSlotSelect } from "@/components/atoms/builder/TimeSlotSelect";
 import type { TimeSlot } from "@/components/atoms/builder/TimeSlotSelect";
-import type { Module } from "@/components/molecules/builder/ModuleCard";
+import { EventTypeDropdown } from "@/components/atoms/builder/eventDropdown";
 import type { EventType } from "@/components/atoms/builder/eventDropdown";
+import { PanelHeader } from "@/components/atoms/builder/PanelHeader";
+import { type Module } from "@/components/molecules/builder/ModuleCard";
 
 export interface BuilderEvent {
   id: string;
@@ -32,7 +35,6 @@ export interface EventErrors {
   code?: string;
   date?: string;
   time?: string;
-  moduleId?: string;
 }
 
 interface EventCardProps {
@@ -45,6 +47,7 @@ interface EventCardProps {
     value: string,
   ) => void;
   onRemove: (id: string) => void;
+  onContinue: () => void;
   errors?: EventErrors;
 }
 
@@ -54,6 +57,7 @@ export function EventCard({
   modules,
   onUpdate,
   onRemove,
+  onContinue,
   errors,
 }: EventCardProps) {
   const inputClass =
@@ -78,17 +82,23 @@ export function EventCard({
     return inputClass;
   }
 
+  function isContinueDisabled() {
+    if (!event.type) return true;
+    if (!event.name) return true;
+    if (!event.code) return true;
+    if (!event.date) return true;
+    if (!event.startTime) return true;
+    if (!event.endTime) return true;
+    if (!event.moduleId) return true;
+    return false;
+  }
+
   function renderModuleField() {
     if (modules.length === 0) {
       return (
-        <div
-          className={
-            inputClass +
-            " flex items-center rounded-md border px-3 text-[var(--text-secondary)] opacity-60 cursor-not-allowed"
-          }
-        >
-          No modules, create one first
-        </div>
+        <p className="text-xs text-[var(--text-secondary)]">
+          No modules yet — create some in the Modules step first.
+        </p>
       );
     }
 
@@ -97,9 +107,7 @@ export function EventCard({
         value={event.moduleId}
         onValueChange={(v) => onUpdate(event.id, "moduleId", v)}
       >
-        <SelectTrigger
-          className={getInputClass(!!errors?.moduleId) + " w-full"}
-        >
+        <SelectTrigger className={getInputClass(false) + " w-full"}>
           <SelectValue placeholder="Select a module" />
         </SelectTrigger>
         <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)]">
@@ -123,126 +131,118 @@ export function EventCard({
     );
   }
 
-  function renderHeaderCode() {
-    if (event.code) {
-      return (
-        <span className="font-mono text-xs font-semibold text-[var(--text-primary)]">
-          · {event.code}
-        </span>
-      );
-    }
-    return null;
-  }
-
   return (
-    <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] overflow-hidden">
-      {/* header */}
-      <div
-        className="flex items-center justify-between gap-2 px-3 py-2 border-b border-[var(--border)]"
-        style={{ borderLeftWidth: "3px", borderLeftColor: "var(--border)" }}
-      >
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-medium text-[var(--text-secondary)]">
-            Event {index + 1}
-          </span>
-          {renderHeaderCode()}
-        </div>
-        <button
-          type="button"
-          onClick={() => onRemove(event.id)}
-          className="flex h-6 w-6 items-center justify-center rounded text-[var(--text-secondary)] hover:bg-red-500/10 hover:text-red-400 transition-colors"
-          aria-label={"Remove event " + (index + 1)}
-        >
-          <Trash2 size={14} />
-        </button>
-      </div>
+    <div className="flex h-full flex-col">
+      <PanelHeader
+        title={event.name || "Event " + (index + 1)}
+        onClose={() => onRemove(event.id)}
+      />
+      <div className="flex-1 overflow-y-auto p-4">
+        <div className="flex flex-col gap-3">
+          {/* name */}
+          <div className="flex flex-col gap-1.5">
+            <Label
+              htmlFor={"event-name-" + event.id}
+              className="text-xs font-medium text-[var(--text-secondary)]"
+            >
+              Name
+            </Label>
+            <Input
+              id={"event-name-" + event.id}
+              value={event.name}
+              onChange={(e) => onUpdate(event.id, "name", e.target.value)}
+              placeholder="e.g. COS301 Lecture Group A"
+              className={getInputClass(!!errors?.name)}
+            />
+            {errors?.name && (
+              <p className="text-xs text-red-500">{errors.name}</p>
+            )}
+          </div>
 
-      {/* fields */}
-      <div className="grid grid-cols-1 gap-3 p-3 sm:grid-cols-2">
-        {/* name */}
-        <div className="flex flex-col gap-1.5">
-          <Label
-            htmlFor={"event-name-" + event.id}
-            className="text-xs font-medium text-[var(--text-secondary)]"
+          {/* code */}
+          <div className="flex flex-col gap-1.5">
+            <Label
+              htmlFor={"event-code-" + event.id}
+              className="text-xs font-medium text-[var(--text-secondary)]"
+            >
+              Code
+            </Label>
+            <Input
+              id={"event-code-" + event.id}
+              value={event.code}
+              onChange={(e) => onUpdate(event.id, "code", e.target.value)}
+              placeholder="e.g. COS301-LEC-A"
+              maxLength={20}
+              className={getInputClass(!!errors?.code)}
+            />
+            {errors?.code && (
+              <p className="text-xs text-red-500">{errors.code}</p>
+            )}
+          </div>
+
+          {/* date */}
+          <div className="flex flex-col gap-1.5">
+            <Label
+              htmlFor={"event-date-" + event.id}
+              className="text-xs font-medium text-[var(--text-secondary)]"
+            >
+              Date
+            </Label>
+            <Input
+              id={"event-date-" + event.id}
+              type="date"
+              value={event.date}
+              onChange={(e) => onUpdate(event.id, "date", e.target.value)}
+              className={getInputClass(!!errors?.date)}
+            />
+            {errors?.date && (
+              <p className="text-xs text-red-500">{errors.date}</p>
+            )}
+          </div>
+
+          {/* time */}
+          <div className="flex flex-col gap-1.5">
+            <Label className="text-xs font-medium text-[var(--text-secondary)]">
+              Time
+            </Label>
+            <TimeSlotSelect
+              value={timeSlotValue}
+              onChange={handleTimeChange}
+              onRemove={() => {}}
+              error={errors?.time}
+              hideDaySelect
+            />
+          </div>
+
+          {/* event type */}
+          <div className="flex flex-col gap-1.5">
+            <Label className="text-xs font-medium text-[var(--text-secondary)]">
+              Event Type
+            </Label>
+            <EventTypeDropdown
+              value={event.type}
+              onChange={(v) => onUpdate(event.id, "type", v)}
+            />
+          </div>
+
+          {/* module assignment */}
+          <div className="flex flex-col gap-1.5">
+            <Label className="text-xs font-medium text-[var(--text-secondary)]">
+              Module
+            </Label>
+            {renderModuleField()}
+          </div>
+
+          {/* continue */}
+          <Button
+            type="button"
+            size="sm"
+            disabled={isContinueDisabled()}
+            onClick={onContinue}
+            className="h-9 w-full text-xs bg-[var(--text-primary)] text-[var(--bg-base)] hover:opacity-90"
           >
-            Name
-          </Label>
-          <Input
-            id={"event-name-" + event.id}
-            value={event.name}
-            onChange={(e) => onUpdate(event.id, "name", e.target.value)}
-            placeholder="e.g. COS301 Lecture Group A"
-            className={getInputClass(!!errors?.name)}
-          />
-          {errors?.name && (
-            <p className="text-xs text-red-500">{errors.name}</p>
-          )}
-        </div>
-
-        {/* code */}
-        <div className="flex flex-col gap-1.5">
-          <Label
-            htmlFor={"event-code-" + event.id}
-            className="text-xs font-medium text-[var(--text-secondary)]"
-          >
-            Code
-          </Label>
-          <Input
-            id={"event-code-" + event.id}
-            value={event.code}
-            onChange={(e) => onUpdate(event.id, "code", e.target.value)}
-            placeholder="e.g. COS301-LEC-A"
-            maxLength={20}
-            className={getInputClass(!!errors?.code)}
-          />
-          {errors?.code && (
-            <p className="text-xs text-red-500">{errors.code}</p>
-          )}
-        </div>
-
-        {/* date */}
-        <div className="flex flex-col gap-1.5">
-          <Label
-            htmlFor={"event-date-" + event.id}
-            className="text-xs font-medium text-[var(--text-secondary)]"
-          >
-            Date
-          </Label>
-          <Input
-            id={"event-date-" + event.id}
-            type="date"
-            value={event.date}
-            onChange={(e) => onUpdate(event.id, "date", e.target.value)}
-            className={getInputClass(!!errors?.date)}
-          />
-          {errors?.date && (
-            <p className="text-xs text-red-500">{errors.date}</p>
-          )}
-        </div>
-
-        {/* module assignment */}
-        <div className="flex flex-col gap-1.5">
-          <Label className="text-xs font-medium text-[var(--text-secondary)]">
-            Module
-          </Label>
-          {renderModuleField()}
-          {errors?.moduleId && (
-            <p className="text-xs text-red-500">{errors.moduleId}</p>
-          )}
-        </div>
-
-        {/* time */}
-        <div className="flex flex-col gap-1.5 sm:col-span-2">
-          <Label className="text-xs font-medium text-[var(--text-secondary)]">
-            Time
-          </Label>
-          <TimeSlotSelect
-            value={timeSlotValue}
-            onChange={handleTimeChange}
-            onRemove={() => {}}
-            error={errors?.time}
-            hideDaySelect
-          />
+            Continue
+          </Button>
         </div>
       </div>
     </div>
