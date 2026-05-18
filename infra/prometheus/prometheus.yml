@@ -35,12 +35,6 @@ scrape_configs:
           language: python
     metrics_path: /metrics
 
-  - job_name: node
-    static_configs:
-      - targets: ["node-exporter:9100"]
-        labels:
-          service: node-exporter
-
   - job_name: cadvisor
     static_configs:
       - targets: ["cadvisor:8080"]
