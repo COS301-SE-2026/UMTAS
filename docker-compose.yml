@@ -60,7 +60,7 @@ services:
     build:
       context: ./apps/solver
       dockerfile: solver.Dockerfile
-    image: ${DOCKER_REGISTRY}:solver-latest
+    image: ${DOCKER_REGISTRY}:solver-dev
     networks:
       - gateway
       - internal
@@ -74,12 +74,23 @@ services:
     build:
       context: ./apps/backend
       dockerfile: ../../docker/backend/backend.Dockerfile
-    image: ${DOCKER_REGISTRY}:backend-latest
+    image: ${DOCKER_REGISTRY}:backend-dev
     networks:
       - gateway
       - internal
     environment:
-      - BACKEND_PORT=${BACKEND_PORT}
+      - PORT=${BACKEND_PORT}
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
+      - DB_MODE=${DB_MODE}
+      - SEED=${SEED}
+      - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
+      - BETTER_AUTH_URL=https://api.${DOMAIN}
+      - BETTER_AUTH_TRUSTED_ORIGINS=https://${DOMAIN}
+      - CORS_ORIGIN=https://${DOMAIN}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - SYSTEM_ADMIN_USER_IDS=${SYSTEM_ADMIN_USER_IDS}
     profiles:
       - dev-docker
       - dev-pglite
@@ -89,9 +100,11 @@ services:
     build:
       context: ./apps/frontend
       dockerfile: ../../docker/frontend/frontend.Dockerfile
-    image: ${DOCKER_REGISTRY}:frontend-latest
+    image: ${DOCKER_REGISTRY}:frontend-dev
     networks:
       - gateway
+    environment:
+      - NEXT_PUBLIC_API_URL=https://api.${DOMAIN}
     profiles:
       - dev-docker
       - dev-pglite
