@@ -7,7 +7,7 @@ import {
   varchar,
 } from 'drizzle-orm/pg-core';
 
-export const modules = pgTable('modules', {
+export const modules = pgTable('Modules', {
   moduleID: serial('moduleID').primaryKey(),
   moduleCode: varchar('moduleCode', { length: 6 }).notNull(),
   moduleName: varchar('moduleName', { length: 256 }).notNull(),
@@ -18,7 +18,7 @@ export const modules = pgTable('modules', {
   }),
 });
 
-export const timetable = pgTable('timetable', {
+export const timetable = pgTable('Timetable', {
   timetableID: serial('timetableID').primaryKey(),
   timetableName: varchar('timetableName'),
 });
