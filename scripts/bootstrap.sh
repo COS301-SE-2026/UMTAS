@@ -14,3 +14,6 @@ fi
 # Install dependencies
 pnpm install
 
+# Install Playwright browsers for E2E tests
+pnpm -C apps/e2e exec playwright install chromium
+

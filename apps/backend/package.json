@@ -1,6 +1,7 @@
 {
   "name": "backend",
   "version": "0.0.1",
+  "packageManager": "pnpm@10.33.2",
   "description": "",
   "author": "",
   "private": true,
@@ -11,6 +12,7 @@
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "dev": "nest start --watch",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
@@ -23,6 +25,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "shared-types": "workspace:*",
     "@better-auth/redis-storage": "^1.6.8",
     "@electric-sql/pglite": "^0.4.4",
     "@nestjs/axios": "^4.0.1",
@@ -70,22 +73,5 @@
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.20.0",
     "zod": "^4.3.6"
-  },
-  "jest": {
-    "moduleFileExtensions": [
-      "js",
-      "json",
-      "ts"
-    ],
-    "rootDir": "src",
-    "testRegex": ".*\\.spec\\.ts$",
-    "transform": {
-      "^.+\\.(t|j)s$": "ts-jest"
-    },
-    "collectCoverageFrom": [
-      "**/*.(t|j)s"
-    ],
-    "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
   }
 }

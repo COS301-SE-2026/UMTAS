@@ -2,6 +2,7 @@
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@10.33.2",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -10,6 +11,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "shared-types": "workspace:*",
     "better-auth": "^1.6.5",
     "next": "16.2.4",
     "react": "19.2.4",

@@ -1,0 +1,92 @@
+site_name: UMTAS Documentation
+site_url: https://cos301-se-2026.github.io/UMTAS/
+extra_css:
+  - stylesheets/extra.css
+
+theme:
+  name: material
+  logo: assets/LOGOS/VigilOWL-removebg-preview.png
+  favicon: assets/LOGOS/VigilOWL-removebg-preview.png
+  icon:
+    logo: material/owl
+  palette:
+    scheme: default
+    primary: white
+    accent: black
+  font:
+    text: Inter
+    code: Fira Code
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.footer
+    - navigation.indexes
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.tabs.link
+
+plugins:
+  - search
+  - drawio
+  - swagger-ui-tag
+  - minify:
+      minify_html: true
+  - git-revision-date-localized:
+      enable_creation_date: true
+      type: timeago
+
+markdown_extensions:
+  - md_in_html
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - attr_list
+  - tables
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Marking Guide: management/Marking-Guide.md
+  - Requirements (SRS):
+      - 4.1.1 Introduction: requirements/Introduction.md
+      - 4.1.2 Domain Model: requirements/Domain-Model.md
+      - 4.1.3 User Stories: requirements/User-Stories.md
+      - 4.1.4 Use Cases: requirements/Use-Cases.md
+      - 4.1.5 Functional Requirements: requirements/Functional-Requirements.md
+      - 4.1.6 Quality Requirements: requirements/Quality-Requirements.md
+      - 4.1.7 Architectural Requirements: requirements/Architectural-Requirements.md
+      - 4.1.8 Technology Requirements: requirements/Technology-Requirements.md
+      - 4.1.9 Traceability Matrix: requirements/Traceability-Matrix.md
+      - 4.1.10 API Service Contracts: requirements/API-Service-Contracts.md
+  - Design Specifications:
+      - 4.2.1 Brand Style: design/Brand-Style.md
+      - 4.2.2 Wireframes: design/Wireframes.md
+  - Diagrams Repository: diagrams/README.md
+  - API Reference: api/API-Reference.md
+  - Developer Portal:
+      - Overview: developer-guides/index.md
+      - Repo Setup: developer-guides/Repo-Setup-Guide.md
+      - Git Strategy: developer-guides/git-strategy-guide.md
+      - Master Dev Guide: developer-guides/master-development-guide.md
+      - Backend Development: developer-guides/backend-development-guide.md
+      - Frontend Development: developer-guides/frontend-development-guide.md
+      - Server Setup: developer-guides/Server-Setup-Guide.md
+      - Server Operations: developer-guides/server-guide.md
+      - Unit Testing: developer-guides/unit-testing-guide.md
+      - Integration Testing: developer-guides/integration-testing-guide.md
+      - Local CI/CD: developer-guides/local-cicd-guide.md
+  - Management:
+      - Team Profiles: management/Team-Profiles.md

@@ -54,7 +54,7 @@ services:
     build:
       context: ./apps/solver
       dockerfile: solver.Dockerfile
-    image: ${DOCKER_REGISTRY}/${PROJECT_NAME}-solver:latest
+    image: ${DOCKER_REGISTRY}:solver-latest
     networks:
       - gateway
       - internal
@@ -68,7 +68,7 @@ services:
     build:
       context: ./apps/backend
       dockerfile: ../../docker/backend/backend.Dockerfile
-    image: ${DOCKER_REGISTRY}/${PROJECT_NAME}-backend:latest
+    image: ${DOCKER_REGISTRY}:backend-latest
     networks:
       - gateway
       - internal
@@ -83,7 +83,7 @@ services:
     build:
       context: ./apps/frontend
       dockerfile: ../../docker/frontend/frontend.Dockerfile
-    image: ${DOCKER_REGISTRY}/${PROJECT_NAME}-frontend:latest
+    image: ${DOCKER_REGISTRY}:frontend-latest
     networks:
       - gateway
     profiles:
