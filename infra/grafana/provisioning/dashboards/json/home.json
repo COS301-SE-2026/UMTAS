@@ -352,7 +352,7 @@
       "collapsed": false,
       "gridPos": { "h": 1, "w": 24, "x": 0, "y": 14 },
       "id": 22,
-      "title": "Container Resources",
+      "title": "Host Resources",
       "type": "row"
     },
     {
@@ -363,14 +363,15 @@
           "custom": {
             "axisCenteredZero": false,
             "axisColorMode": "text",
-            "axisLabel": "CPU cores",
             "axisPlacement": "auto",
             "fillOpacity": 10,
             "gradientMode": "none",
             "lineWidth": 2,
             "showPoints": "never"
           },
-          "unit": "short"
+          "unit": "percentunit",
+          "min": 0,
+          "max": 1
         },
         "overrides": []
       },
@@ -388,12 +389,12 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "prometheus" },
-          "expr": "sum(rate(container_cpu_usage_seconds_total{compose_service!=\"\"}[5m])) by (compose_service)",
-          "legendFormat": "{{compose_service}}",
+          "expr": "1 - avg(rate(node_cpu_seconds_total{mode=\"idle\"}[5m]))",
+          "legendFormat": "CPU",
           "refId": "A"
         }
       ],
-      "title": "Container CPU Usage",
+      "title": "Host CPU Usage",
       "type": "timeseries"
     },
     {
@@ -428,12 +429,18 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "prometheus" },
-          "expr": "sum(container_memory_usage_bytes{compose_service!=\"\"}) by (compose_service)",
-          "legendFormat": "{{compose_service}}",
+          "expr": "node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes",
+          "legendFormat": "Used",
           "refId": "A"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "node_memory_MemAvailable_bytes",
+          "legendFormat": "Available",
+          "refId": "B"
         }
       ],
-      "title": "Container Memory Usage",
+      "title": "Host Memory Usage",
       "type": "timeseries"
     },
     {

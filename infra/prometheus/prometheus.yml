@@ -35,14 +35,11 @@ scrape_configs:
           language: python
     metrics_path: /metrics
 
-  - job_name: cadvisor
+  - job_name: node
     static_configs:
-      - targets: ["cadvisor:8080"]
+      - targets: ["node-exporter:9100"]
         labels:
-          service: cadvisor
-    metric_relabel_configs:
-      - source_labels: [container_label_com_docker_compose_service]
-        target_label: compose_service
+          service: node-exporter
 
   - job_name: postgres
     static_configs:

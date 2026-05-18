@@ -174,25 +174,20 @@ services:
     profiles:
       - server
 
-  cadvisor:
-    image: gcr.io/cadvisor/cadvisor:v0.52.1
+  node-exporter:
+    image: prom/node-exporter:v1.9.1
     restart: unless-stopped
     networks:
       - internal
     volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
       - /:/rootfs:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /var/run:/var/run:ro
-      - /sys:/sys:ro
-      - /var/lib/docker:/var/lib/docker:ro
-      - /dev/disk:/dev/disk:ro
-    devices:
-      - /dev/kmsg
-    privileged: true
     command:
-      - "--docker_only=true"
-      - "--store_container_labels=true"
-      - "--disable_metrics=advtcp,cpuLoad,cpu_topology,hugetlb,memory_numa,process,referenced_memory,resctrl,sched,tcp,udp"
+      - "--path.procfs=/host/proc"
+      - "--path.rootfs=/rootfs"
+      - "--path.sysfs=/host/sys"
+      - "--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)"
     labels:
       - "com.centurylinklabs.watchtower.enable=false"
     profiles:
