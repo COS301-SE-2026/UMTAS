@@ -1,16 +1,36 @@
 global:
-  scrape_interval: 30s
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  scrape_timeout: 10s
+  external_labels:
+    environment: production
+    project: umtas
+
+rule_files: []
 
 scrape_configs:
-  - job_name: "prometheus"
+  - job_name: prometheus
     static_configs:
       - targets: ["localhost:9090"]
-  - job_name: "traefik"
+
+  - job_name: traefik
     static_configs:
-      - targets: ["traefik:8080"]
-  - job_name: "nestjs-backend"
+      - targets: ["traefik:8082"]
+        labels:
+          service: traefik
+
+  - job_name: backend
     static_configs:
       - targets: ["backend:8000"]
-  - job_name: "python-solver"
+        labels:
+          service: backend
+          language: nestjs
+    metrics_path: /metrics
+
+  - job_name: solver
     static_configs:
       - targets: ["solver:8000"]
+        labels:
+          service: solver
+          language: python
+    metrics_path: /metrics

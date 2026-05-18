@@ -9,6 +9,14 @@ datasources:
     isDefault: true
     version: 1
     editable: false
+    jsonData:
+      httpMethod: POST
+      prometheusType: Prometheus
+      prometheusVersion: 2.45.0
+      cacheLevel: Medium
+      incrementalQuerying: true
+      queryTimeout: "60s"
+
   - name: Loki
     type: loki
     uid: loki
@@ -17,3 +25,6 @@ datasources:
     isDefault: false
     version: 1
     editable: false
+    jsonData:
+      maxLines: 5000
+      timeout: "60"

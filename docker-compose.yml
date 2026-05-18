@@ -1,7 +1,9 @@
 networks:
   gateway:
+    name: gateway
     driver: bridge
   internal:
+    name: internal
     internal: true
 
 volumes:
@@ -11,6 +13,7 @@ volumes:
   grafana_data:
   prometheus_data:
   loki_data:
+  letsencrypt_data:
 
 services:
   postgres:
@@ -109,9 +112,16 @@ services:
     image: prom/prometheus:latest
     networks:
       - internal
+    ports:
+      - "9090:9090"
     volumes:
       - ./infra/prometheus:/etc/prometheus
       - prometheus_data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=30d"
+      - "--web.enable-lifecycle"
     profiles:
       - monitoring
       - server
@@ -133,7 +143,7 @@ services:
     networks:
       - internal
     volumes:
-      - /var/log:/var/log
+      - /var/run/docker.sock:/var/run/docker.sock:ro
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - ./infra/promtail/promtail-config.yaml:/etc/promtail/config.yml
     command: -config.file=/etc/promtail/config.yml
