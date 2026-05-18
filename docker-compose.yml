@@ -17,6 +17,8 @@ services:
     image: postgres:15-alpine
     networks:
       - internal
+    ports:
+      - "5432:5432"
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
@@ -43,6 +45,9 @@ services:
     networks:
       - gateway
       - internal
+    ports:
+      - "9000:9000"
+      - "9001:9001"
     command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
