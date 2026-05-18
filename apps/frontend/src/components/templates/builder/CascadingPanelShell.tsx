@@ -13,8 +13,8 @@ import { ModulesPanel } from "@/components/organisms/builder/ModulesPanel";
 import {
   PreferencesPanel,
   type Preferences,
-} from "@/components/organisms/builder/PreferencesPanel";
-import { ReviewPanel } from "@/components/organisms/builder/ReviewPanel";
+} from "@/components/organisms/viewTimetable/PreferencesPanel";
+import { ReviewPanel } from "@/components/organisms/viewTimetable/ReviewPanel";
 import type { Module } from "@/components/molecules/builder/ModuleCard";
 import { useRouter } from "next/navigation";
 

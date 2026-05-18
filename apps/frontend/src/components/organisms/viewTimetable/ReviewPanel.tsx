@@ -14,10 +14,10 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/atoms/baseShadcn/button";
 import { PanelHeader } from "@/components/atoms/builder/PanelHeader";
-import { GeneratingSkeleton } from "@/components/atoms/builder/GeneratingSkeleton";
-import { ReviewSummaryItem } from "@/components/molecules/builder/ReviewSummaryItem";
+import { GeneratingSkeleton } from "@/components/atoms/viewTimetable/GeneratingSkeleton";
+import { ReviewSummaryItem } from "@/components/molecules/viewTimetable/ReviewSummaryItem";
 import type { Module } from "@/components/molecules/builder/ModuleCard";
-import type { Preferences } from "@/components/organisms/builder/PreferencesPanel";
+import type { Preferences } from "@/components/organisms/viewTimetable/PreferencesPanel";
 
 interface ReviewPanelProps {
   modules: Module[];

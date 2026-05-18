@@ -10,7 +10,7 @@ import {
   ToggleGroupItem,
 } from "@/components/atoms/baseShadcn/toggle-group";
 import { PanelHeader } from "@/components/atoms/builder/PanelHeader";
-import { PreferenceRow } from "@/components/molecules/builder/PreferenceRow";
+import { PreferenceRow } from "@/components/molecules/viewTimetable/PreferenceRow";
 
 export interface Preferences {
   preferredDays: string[];
