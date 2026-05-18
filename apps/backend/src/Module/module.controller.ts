@@ -7,14 +7,13 @@ import {
   Get,
   Param,
   Patch,
-  ParseFileOptions,
   Delete,
+  ParseIntPipe,
 } from '@nestjs/common';
 import {
   ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
-  ApiTags,
 } from '@nestjs/swagger';
 
 @Controller('modules')
@@ -38,25 +37,28 @@ export class ModuleController {
   }
 
   //Get by id
-  @Get()
+  @Get(':moduleId')
   @ApiOperation({ summary: 'Get certain module' })
   @ApiOkResponse({ description: 'Module returned successfully' })
-  getById(@Param('moduleId') moduleId: string) {
+  getById(@Param('moduleId', ParseIntPipe) moduleId: number) {
     return this.service.getById(moduleId);
   }
 
   //Update
-  @Patch('moduleId')
+  @Patch(':moduleId')
   @ApiOperation({ summary: 'Get one module' })
   @ApiOkResponse({ description: 'Module returned successfully' })
-  update(@Param('moduleId') moduleId: string, @Body() dto: UpdateModuleDto) {
+  update(
+    @Param('moduleId', ParseIntPipe) moduleId: number,
+    @Body() dto: UpdateModuleDto,
+  ) {
     return this.service.update(moduleId, dto);
   }
 
-  @Delete('moduleId')
+  @Delete(':moduleId')
   @ApiOperation({ summary: 'Delete module by id' })
   @ApiOkResponse({ description: 'Module deleted successfully' })
-  delete(@Param('moduleId') moduleId: string) {
+  delete(@Param('moduleId', ParseIntPipe) moduleId: number) {
     return this.service.deleteById(moduleId);
   }
 } //EventController

@@ -6,7 +6,9 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
+
 import { DatabaseService } from '../db/database.service';
+import { modules } from '../entities/Modules/index';
 import { CreateModuleDto, UpdateModuleDto } from './dto/module.dto';
 
 @Injectable()
@@ -23,41 +25,41 @@ export class ModuleService {
 
     const [existingModule] = await this.dbService.db
       .select()
-      .from(ModuleTable)
-      .where(eq(ModuleTable.code, code))
+      .from(modules)
+      .where(eq(modules.moduleCode, code))
       .limit(1);
 
     if (existingModule)
       throw new ConflictException(`Module: ${code} already exists`);
 
-    const [module] = await this.dbService.db
-      .insert(ModuleTable)
+    const [newModule] = await this.dbService.db
+      .insert(modules)
       .values({
-        code,
-        name,
-        description: dto.description,
+        moduleCode: code,
+        moduleName: name,
+        userID: dto.userId,
         styling: dto.styling,
-        userId: dto.userId,
       })
       .returning();
 
-    if (!module) throw new InternalServerErrorException('Module not created');
+    if (!newModule)
+      throw new InternalServerErrorException('Module not created');
 
-    return { module: module };
+    return { module: newModule };
   } //create
 
   //return all
   async getAll() {
-    const modules = await this.dbService.db.select().from(ModuleTable);
+    const foundModules = await this.dbService.db.select().from(modules);
 
-    return { modules };
+    return { modules: foundModules };
   } //getAll
 
-  async getById(id: string) {
+  async getById(id: number) {
     const [module] = await this.dbService.db
       .select()
-      .from(ModuleTable)
-      .where(eq(ModuleTable.id, id))
+      .from(modules)
+      .where(eq(modules.moduleID, id))
       .limit(1);
 
     if (!module) throw new NotFoundException('Module not found');
@@ -67,12 +69,12 @@ export class ModuleService {
     };
   } //getById
 
-  async update(moduleId: string, dto: UpdateModuleDto) {
+  async update(moduleId: number, dto: UpdateModuleDto) {
     //Find module
     const [module] = await this.dbService.db
       .select()
-      .from(ModuleTable)
-      .where(eq(ModuleTable.id, moduleId))
+      .from(modules)
+      .where(eq(modules.moduleID, moduleId))
       .limit(1);
 
     if (!module)
@@ -80,26 +82,26 @@ export class ModuleService {
 
     const updatedCode = dto.code?.trim().toUpperCase();
 
-    if (updatedCode && updatedCode !== module.code) {
+    if (updatedCode && updatedCode !== module.moduleCode) {
       //check for module with same NEW code
       const [dupModule] = await this.dbService.db
-        .from(ModuleTable)
-        .where(eq(ModuleTable.code, updatedCode))
+        .select()
+        .from(modules)
+        .where(eq(modules.moduleCode, updatedCode))
         .limit(1);
 
       if (dupModule)
         throw new ConflictException('Duplicate module for new code found');
     } //duplicate module for new code
 
-    const [newModule] = this.dbService.db
-      .update(ModuleTable)
+    const [newModule] = await this.dbService.db
+      .update(modules)
       .set({
-        code: updatedCode ?? module.code,
-        name: dto.name ?? module.name,
-        description: dto.description ?? module.description,
+        moduleCode: updatedCode ?? module.moduleCode,
+        moduleName: dto.name?.trim() ?? module.moduleName,
         styling: dto.styling ?? module.styling,
       })
-      .where(eq(ModuleTable.id, moduleId))
+      .where(eq(modules.moduleID, moduleId))
       .returning();
 
     if (!newModule)
@@ -110,18 +112,18 @@ export class ModuleService {
     };
   } //update
 
-  async deleteById(moduleId: string) {
-    const [module] = this.dbService.db
+  async deleteById(moduleId: number) {
+    const [module] = await this.dbService.db
       .select()
-      .from(ModuleTable)
-      .where(eq(ModuleTable.id, moduleId))
+      .from(modules)
+      .where(eq(modules.moduleID, moduleId))
       .limit(1);
 
     if (!module) throw new NotFoundException(`Module [${moduleId}] not found`);
 
     await this.dbService.db
-      .delete(ModuleTable)
-      .where(eq(ModuleTable.id, moduleId));
+      .delete(modules)
+      .where(eq(modules.moduleID, moduleId));
 
     return {
       success: true,

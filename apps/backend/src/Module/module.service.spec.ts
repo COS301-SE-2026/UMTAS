@@ -23,12 +23,11 @@ describe('ModuleService', () => {
   } as unknown as DatabaseService;
 
   const mockModule = {
-    id: 'module-id',
-    code: 'COS332',
-    name: 'Computer Networks',
-    description: 'Networks module',
+    moduleID: 1,
+    moduleCode: 'COS332',
+    moduleName: 'Computer Networks',
     styling: '#3B82F6',
-    userId: 'user-id',
+    userID: '550e8400-e29b-41d4-a716-446655440000',
   };
 
   beforeEach(() => {
@@ -75,7 +74,6 @@ describe('ModuleService', () => {
       where: jest.fn().mockResolvedValue(undefined),
     });
   }
-
   //Create
   describe('create', () => {
     it('should create a module', async () => {
@@ -85,9 +83,8 @@ describe('ModuleService', () => {
       const result = await service.create({
         code: 'cos332',
         name: 'Computer Networks',
-        description: 'Networks module',
         styling: '#3B82F6',
-        userId: 'user-id',
+        userId: '550e8400-e29b-41d4-a716-446655440000',
       });
 
       expect(result).toEqual({ module: mockModule });
@@ -100,7 +97,8 @@ describe('ModuleService', () => {
         service.create({
           code: '',
           name: '',
-        } as any),
+          userId: '550e8400-e29b-41d4-a716-446655440000',
+        }),
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -111,6 +109,7 @@ describe('ModuleService', () => {
         service.create({
           code: 'COS332',
           name: 'Computer Networks',
+          userId: '550e8400-e29b-41d4-a716-446655440000',
         }),
       ).rejects.toThrow(ConflictException);
     });
@@ -123,11 +122,13 @@ describe('ModuleService', () => {
         service.create({
           code: 'COS332',
           name: 'Computer Networks',
+          userId: '550e8400-e29b-41d4-a716-446655440000',
         }),
       ).rejects.toThrow(InternalServerErrorException);
     });
   });
 
+  //getAll
   describe('getAll', () => {
     it('should return all modules', async () => {
       mockSelectAllResult([mockModule]);
@@ -138,11 +139,12 @@ describe('ModuleService', () => {
     });
   });
 
-  describe('get by id', () => {
+  //getById
+  describe('getById', () => {
     it('should return one module', async () => {
       mockSelectResult([mockModule]);
 
-      await expect(service.getById('module-id')).resolves.toEqual({
+      await expect(service.getById(1)).resolves.toEqual({
         module: mockModule,
       });
     });
@@ -150,32 +152,31 @@ describe('ModuleService', () => {
     it('should throw if module is not found', async () => {
       mockSelectResult([]);
 
-      await expect(service.getById('missing-id')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(service.getById(999)).rejects.toThrow(NotFoundException);
     });
   });
 
+  //Update
   describe('update', () => {
     it('should update a module', async () => {
       mockSelectResult([mockModule]);
-      mockUpdateResult([{ ...mockModule, name: 'Updated Networks' }]);
+      mockUpdateResult([{ ...mockModule, moduleName: 'Updated Networks' }]);
 
       await expect(
-        service.update('module-id', {
+        service.update(1, {
           name: 'Updated Networks',
         }),
       ).resolves.toEqual({
-        module: { ...mockModule, name: 'Updated Networks' },
+        module: { ...mockModule, moduleName: 'Updated Networks' },
       });
     });
 
     it('should throw if module does not exist', async () => {
       mockSelectResult([]);
 
-      await expect(
-        service.update('missing-id', { name: 'Updated' }),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.update(999, { name: 'Updated' })).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('should reject duplicate updated code', async () => {
@@ -190,27 +191,30 @@ describe('ModuleService', () => {
         .mockReturnValueOnce({
           from: jest.fn().mockReturnValue({
             where: jest.fn().mockReturnValue({
-              limit: jest
-                .fn()
-                .mockResolvedValue([
-                  { ...mockModule, id: 'other-id', code: 'COS301' },
-                ]),
+              limit: jest.fn().mockResolvedValue([
+                {
+                  ...mockModule,
+                  moduleID: 2,
+                  moduleCode: 'COS301',
+                },
+              ]),
             }),
           }),
         });
 
-      await expect(
-        service.update('module-id', { code: 'COS301' }),
-      ).rejects.toThrow(ConflictException);
+      await expect(service.update(1, { code: 'COS301' })).rejects.toThrow(
+        ConflictException,
+      );
     });
   });
 
-  describe('remove', () => {
+  //deleteById
+  describe('deleteById', () => {
     it('should remove a module', async () => {
       mockSelectResult([mockModule]);
       mockDeleteResult();
 
-      await expect(service.deleteById('module-id')).resolves.toEqual({
+      await expect(service.deleteById(1)).resolves.toEqual({
         success: true,
       });
     });
@@ -218,9 +222,7 @@ describe('ModuleService', () => {
     it('should throw if module does not exist', async () => {
       mockSelectResult([]);
 
-      await expect(service.deleteById('missing-id')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(service.deleteById(999)).rejects.toThrow(NotFoundException);
     });
   });
 });

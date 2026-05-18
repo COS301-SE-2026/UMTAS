@@ -7,12 +7,11 @@ describe('ModuleController', () => {
   let service: jest.Mocked<ModuleService>;
 
   const mockModule = {
-    id: 'module-id',
-    code: 'COS332',
-    name: 'Computer Networks',
-    description: 'Networks module',
+    moduleID: 1,
+    moduleCode: 'COS332',
+    moduleName: 'Computer Networks',
     styling: '#3B82F6',
-    userId: 'user-id',
+    userID: '550e8400-e29b-41d4-a716-446655440000',
   };
 
   beforeEach(async () => {
@@ -23,10 +22,10 @@ describe('ModuleController', () => {
           provide: ModuleService,
           useValue: {
             create: jest.fn(),
-            findAll: jest.fn(),
-            findOne: jest.fn(),
+            getAll: jest.fn(),
+            getById: jest.fn(),
             update: jest.fn(),
-            remove: jest.fn(),
+            deleteById: jest.fn(),
           },
         },
       ],
@@ -67,34 +66,34 @@ describe('ModuleController', () => {
   it('should return one module', async () => {
     service.getById.mockResolvedValue({ module: mockModule });
 
-    await expect(controller.getById('module-id')).resolves.toEqual({
+    await expect(controller.getById(1)).resolves.toEqual({
       module: mockModule,
     });
 
-    expect(service.getById).toHaveBeenCalledWith('module-id');
+    expect(service.getById).toHaveBeenCalledWith(1);
   }); //get one module
 
   it('should update a module', async () => {
     const dto = { name: 'Updated Networks' };
 
     service.update.mockResolvedValue({
-      module: { ...mockModule, name: 'Updated Networks' },
+      module: { ...mockModule, moduleName: 'Updated Networks' },
     });
 
-    await expect(controller.update('module-id', dto)).resolves.toEqual({
-      module: { ...mockModule, name: 'Updated Networks' },
+    await expect(controller.update(1, dto)).resolves.toEqual({
+      module: { ...mockModule, moduleName: 'Updated Networks' },
     });
 
-    expect(service.update).toHaveBeenCalledWith('module-id', dto);
+    expect(service.update).toHaveBeenCalledWith(1, dto);
   }); //update module
 
   it('should remove a module', async () => {
     service.deleteById.mockResolvedValue({ success: true });
 
-    await expect(controller.delete('module-id')).resolves.toEqual({
+    await expect(controller.delete(1)).resolves.toEqual({
       success: true,
     });
 
-    expect(service.deleteById).toHaveBeenCalledWith('module-id');
+    expect(service.deleteById).toHaveBeenCalledWith(1);
   }); //Delete
 });
