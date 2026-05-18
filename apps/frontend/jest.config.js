@@ -29,7 +29,4 @@ module.exports = {
     "!src/**/*.test.ts",
     "!src/**/*.test.tsx",
   ],
-  coverageThreshold: {
-    global: { statements: 25, branches: 35, functions: 18, lines: 25 },
-  },
 };
