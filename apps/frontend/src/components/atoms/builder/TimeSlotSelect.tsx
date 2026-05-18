@@ -23,6 +23,7 @@ interface TimeSlotSelectProps {
   onChange: (value: TimeSlot) => void;
   onRemove: () => void;
   error?: string;
+  hideDaySelect?: boolean;
 }
 
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
@@ -41,29 +42,32 @@ export function TimeSlotSelect({
   onChange,
   onRemove,
   error,
+  hideDaySelect,
 }: TimeSlotSelectProps) {
   return (
     <div className="flex flex-col gap-1">
       <div className="flex flex-wrap items-center gap-1.5">
-        <Select
-          value={value.day}
-          onValueChange={(v) => onChange({ ...value, day: v })}
-        >
-          <SelectTrigger className={`${triggerClass} w-[120px]`}>
-            <SelectValue placeholder="Day" />
-          </SelectTrigger>
-          <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)]">
-            {DAYS.map((d) => (
-              <SelectItem
-                key={d}
-                value={d}
-                className="text-xs text-[var(--text-primary)] focus:bg-[var(--bg-elevated)]"
-              >
-                {d}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        {!hideDaySelect && (
+          <Select
+            value={value.day}
+            onValueChange={(v) => onChange({ ...value, day: v })}
+          >
+            <SelectTrigger className={`${triggerClass} w-[120px]`}>
+              <SelectValue placeholder="Day" />
+            </SelectTrigger>
+            <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)]">
+              {DAYS.map((d) => (
+                <SelectItem
+                  key={d}
+                  value={d}
+                  className="text-xs text-[var(--text-primary)] focus:bg-[var(--bg-elevated)]"
+                >
+                  {d}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
 
         <Select
           value={value.startTime}
