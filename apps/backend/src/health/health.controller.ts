@@ -1,10 +1,15 @@
-import { Controller, Post } from '@nestjs/common';
+import { Controller, Get, Post } from '@nestjs/common';
 import { HealthService } from './health.service.js';
 import { Roles } from '../auth/roles.guard.js';
 
 @Controller('health')
 export class HealthController {
   constructor(private readonly healthService: HealthService) {}
+
+  @Get()
+  live() {
+    return { status: 'ok' };
+  }
 
   @Post('hello')
   @Roles('student')
