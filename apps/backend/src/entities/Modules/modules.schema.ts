@@ -1,4 +1,11 @@
-import { jsonb, pgTable, serial, uuid, varchar } from 'drizzle-orm/pg-core';
+import {
+  integer,
+  jsonb,
+  pgTable,
+  serial,
+  uuid,
+  varchar,
+} from 'drizzle-orm/pg-core';
 
 export const modules = pgTable('modules', {
   moduleID: serial('moduleID').primaryKey(),
@@ -6,4 +13,12 @@ export const modules = pgTable('modules', {
   moduleName: varchar('moduleName', { length: 256 }).notNull(),
   styling: jsonb('styling'),
   userID: uuid('userID').notNull(),
+  timetableID: integer('timetableID').references(() => timetable.timetableID, {
+    onDelete: 'cascade',
+  }),
+});
+
+export const timetable = pgTable('timetable', {
+  timetableID: serial('timetableID').primaryKey(),
+  timetableName: varchar('timetableName'),
 });
