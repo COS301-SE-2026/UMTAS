@@ -88,7 +88,7 @@ services:
       - gateway
       - internal
     environment:
-      - PORT=${BACKEND_PORT}
+      - BACKEND_PORT=${BACKEND_PORT}
     profiles:
       - dev-docker
       - dev-pglite
