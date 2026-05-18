@@ -1,10 +1,10 @@
 "use client";
 import React, { useState } from "react";
-import { ColourPicker } from "@/components/organisms/builder/colourPicker";
+import { ColourPicker } from "@/components/atoms/builder/colourPicker";
 import {
   EventTypeDropdown,
   EventType,
-} from "@/components/organisms/builder/eventDropdown";
+} from "@/components/atoms/builder/eventDropdown";
 
 export default function temp() {
   const [selectedColour, setSelectedColour] = useState("#4A90F8");
