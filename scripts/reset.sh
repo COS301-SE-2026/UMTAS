@@ -23,10 +23,14 @@ done
 
 echo "==> Stopping docker containers..."
 cd "$ROOT_DIR"
-if [ "$HARD" = "true" ]; then
-  docker compose down -v --remove-orphans
+if ! docker info > /dev/null 2>&1; then
+  echo "    [warn] Docker not running — skipping container shutdown"
 else
-  docker compose down --remove-orphans
+  if [ "$HARD" = "true" ]; then
+    docker compose down -v --remove-orphans
+  else
+    docker compose down --remove-orphans
+  fi
 fi
 
 echo "==> Installing dependencies..."
@@ -38,7 +42,13 @@ rm -rf "$ROOT_DIR/apps/backend/drizzle"
 echo "==> Generating fresh migrations..."
 (cd "$ROOT_DIR/apps/backend" && pnpm db:generate)
 
-if [ "$DB_MODE" = "DATABASE" ]; then
+if ! docker info > /dev/null 2>&1; then
+  echo "    [warn] Docker not running — skipping infra startup"
+  echo ""
+  echo "=== Done (no Docker) ==="
+  echo "    Start Docker, then run 'pnpm dev:infra' to bring up services."
+  echo "    Run 'pnpm dev' to start the app."
+elif [ "$DB_MODE" = "DATABASE" ]; then
   echo "==> Starting infrastructure (DATABASE mode)..."
   docker compose up -d postgres redis minio mailhog
 

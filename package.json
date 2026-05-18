@@ -13,7 +13,7 @@
     "start:prod": "docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build",
     "start:server": "docker compose -f docker-compose.yml -f docker-compose.prod.yml --profile server up -d --build",
     "build": "turbo run build",
-    "setup": "bash scripts/bootstrap.sh",
+    "bootstrap": "bash scripts/bootstrap.sh",
     "reset": "bash scripts/reset.sh",
     "reset:hard": "HARD=true bash scripts/reset.sh",
     "db:generate": "pnpm --filter backend db:generate",

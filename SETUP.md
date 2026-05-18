@@ -19,7 +19,7 @@ git clone <repo-url>
 cd UMTAS
 
 # 2. Bootstrap — copies .env files, installs deps
-pnpm setup
+pnpm bootstrap
 
 # 3. Configure env files (see section below)
 #    Edit .env, apps/backend/.env.local, apps/frontend/.env.local
@@ -78,7 +78,7 @@ Add `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` to both `.env` and `apps/backend
 
 | Script             | Description                                                            |
 | ------------------ | ---------------------------------------------------------------------- |
-| `pnpm setup`       | Copy .env files + install deps (first-time only)                       |
+| `pnpm bootstrap`   | Copy .env files + install deps (first-time only)                       |
 | `pnpm reset`       | Kill ports → docker down → install → start infra → generate migrations |
 | `pnpm reset:hard`  | Same as reset but also wipes docker volumes (drops all data)           |
 | `pnpm dev`         | Start frontend + backend dev servers                                   |

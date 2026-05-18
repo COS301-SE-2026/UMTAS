@@ -29,4 +29,4 @@ echo "==> Installing dependencies..."
 
 echo ""
 echo "=== Bootstrap complete ==="
-echo "    Next: edit .env files as needed, then run 'pnpm reset' to initialize."
+echo "    Next: edit .env files as needed, then run 'pnpm run reset' to initialize."
