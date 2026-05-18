@@ -19,9 +19,15 @@ export class ModuleService {
   async create(dto: CreateModuleDto) {
     const code = dto.code?.trim().toUpperCase();
     const name = dto.name?.trim();
+    const description = dto.description?.trim();
 
     if (!code || !name)
-      throw new BadRequestException('Code/Name required for module creation');
+      throw new BadRequestException(
+        'Code and name are required for module creation',
+      );
+
+    if (!dto.userId)
+      throw new BadRequestException('User ID is required for module creation');
 
     const [existingModule] = await this.dbService.db
       .select()
@@ -37,6 +43,7 @@ export class ModuleService {
       .values({
         moduleCode: code,
         moduleName: name,
+        moduleDescription: description,
         userID: dto.userId,
         styling: dto.styling,
       })
@@ -80,7 +87,19 @@ export class ModuleService {
     if (!module)
       throw new NotFoundException(`Module id[${moduleId}] not found`);
 
+    if (
+      dto.code === undefined &&
+      dto.name === undefined &&
+      dto.description === undefined &&
+      dto.styling === undefined
+    ) {
+      throw new BadRequestException(
+        'At least one field is required to update a module',
+      );
+    }
+
     const updatedCode = dto.code?.trim().toUpperCase();
+    const updatedDescription = dto.description?.trim();
 
     if (updatedCode && updatedCode !== module.moduleCode) {
       //check for module with same NEW code
@@ -99,6 +118,7 @@ export class ModuleService {
       .set({
         moduleCode: updatedCode ?? module.moduleCode,
         moduleName: dto.name?.trim() ?? module.moduleName,
+        moduleDescription: updatedDescription ?? module.moduleDescription,
         styling: dto.styling ?? module.styling,
       })
       .where(eq(modules.moduleID, moduleId))

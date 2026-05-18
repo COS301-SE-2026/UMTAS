@@ -26,6 +26,7 @@ describe('ModuleService', () => {
     moduleID: 1,
     moduleCode: 'COS332',
     moduleName: 'Computer Networks',
+    moduleDescription: 'Networks module',
     styling: '#3B82F6',
     userID: '550e8400-e29b-41d4-a716-446655440000',
   };
@@ -102,6 +103,16 @@ describe('ModuleService', () => {
       ).rejects.toThrow(BadRequestException);
     });
 
+    it('should reject missing userId', async () => {
+      await expect(
+        service.create({
+          code: 'COS332',
+          name: 'Computer Networks',
+          styling: '#3B82F6',
+        } as any),
+      ).rejects.toThrow(BadRequestException);
+    });
+
     it('should reject duplicate module code', async () => {
       mockSelectResult([mockModule]);
 
@@ -169,6 +180,14 @@ describe('ModuleService', () => {
       ).resolves.toEqual({
         module: { ...mockModule, moduleName: 'Updated Networks' },
       });
+    });
+
+    it('should reject empty update payload', async () => {
+      mockSelectResult([mockModule]);
+
+      await expect(service.update(1, {} as any)).rejects.toThrow(
+        BadRequestException,
+      );
     });
 
     it('should throw if module does not exist', async () => {

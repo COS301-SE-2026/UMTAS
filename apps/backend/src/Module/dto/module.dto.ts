@@ -1,35 +1,54 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString, Length } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Length,
+} from 'class-validator';
 
 export class CreateModuleDto {
   @ApiProperty({
     example: 'COS332',
     description: 'Module code used by the university',
   })
+  @IsString()
+  @IsNotEmpty()
+  @Length(2, 10)
   code!: string;
 
   @ApiProperty({
     example: 'Computer Networks',
     description: 'Name of the module',
   })
+  @IsString()
+  @IsNotEmpty()
+  @Length(1, 100)
   name!: string;
 
   @ApiPropertyOptional({
     example: 'Introduction to computer networking concepts',
     description: 'Short module description',
   })
+  @IsOptional()
+  @IsString()
+  @Length(1, 500)
   description?: string;
 
   @ApiProperty({
     example: '550e8400-e29b-41d4-a716-446655440000',
     description: 'Temporary user ID until auth context is connected',
   })
+  @IsString()
+  @IsUUID()
   userId!: string;
 
   @ApiPropertyOptional({
     example: '#3B82F6',
     description: 'Optional display styling for the module',
   })
+  @IsOptional()
+  @IsString()
   styling?: string;
 }
 
@@ -58,6 +77,7 @@ export class UpdateModuleDto {
   })
   @IsOptional()
   @IsString()
+  @Length(1, 500)
   description?: string;
 
   @ApiPropertyOptional({

@@ -10,6 +10,7 @@ describe('ModuleController', () => {
     moduleID: 1,
     moduleCode: 'COS332',
     moduleName: 'Computer Networks',
+    moduleDescription: 'Networks module',
     styling: '#3B82F6',
     userID: '550e8400-e29b-41d4-a716-446655440000',
   };
