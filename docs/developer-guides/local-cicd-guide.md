@@ -1,64 +1,80 @@
 # Local CI/CD Guide
 
-!!! info "Purpose"
-    This guide defines the checks developers should run locally before pushing code. The goal is to catch issues in the "inner loop" before they reach the remote GitHub Actions pipeline.
+!!! info "CI is confirmation, not discovery."
+    Catch everything locally first. If remote CI fails, a local check was skipped.
 
 ---
 
-## :material-auto-fix: Workflow (Inner Loop)
+## :material-map-marker: Where Things Live
 
-As a core part of **TDD**, your local validation loop is the fastest feedback you have.
-
-1.  **Sync**: Pull latest `dev` and rebase.
-2.  **Lint & Build**: Ensure code style and type safety.
-3.  **Test**: Run **Jest** (Unit) and **Playwright** (E2E).
-4.  **Simulate**: Use `act` to run GitHub Actions workflows locally.
-5.  **Push**: Only push once the local "CI" passes.
+```
+.husky/
+  pre-commit   ← fires on every git commit
+  pre-push     ← fires on every git push
+.actrc         ← act image + architecture config
+.github/workflows/ci.yml   ← the real pipeline (lint → build → test → docker → deploy)
+```
 
 ---
 
-## :material-github: Local CI Tools
+## :material-console: What to Run
 
-| Tool           | Role                        | Command                 |
-| :------------- | :-------------------------- | :---------------------- |
-| **act**        | Local GitHub Actions runner | `pnpm run act` |
-| **pnpm**       | Monorepo task runner        | `pnpm run check`        |
-| **ESLint**     | Static code analysis        | `pnpm run lint`         |
-| **TypeScript** | Type safety check           | `pnpm run typecheck`    |
+```bash
+pnpm run lint        # ESLint across all apps
+pnpm run build       # Turborepo build (dependency order respected)
+pnpm run test:unit   # Jest unit + integration (no e2e)
+pnpm run act         # simulate the full CI job locally
+```
+
+!!! warning "Always use `pnpm run act`, not plain `act`"
+    Plain `act` queues the `docker`, `deploy`, and `notify` jobs which require secrets and will fail or push images. `pnpm run act` scopes to `-j ci` only.
+
+---
+
+## :material-hook: Git Hooks
+
+=== "Pre-Commit"
+    1. **Blocks commits to `main`, `master`, `dev`** — use a feature branch.
+    2. **Runs `lint-staged`** — Prettier, ESLint, secretlint on staged files.
+    3. **Type-checks staged TypeScript** — only the app(s) with staged `.ts`/`.tsx` files.
+
+=== "Pre-Push"
+    1. **Passes protected branches through** (`main`, `master`, `dev`) — no checks.
+    2. **Enforces branch naming** on all other branches:
+
+    ```
+    <type>/<description>
+    ```
+
+    | **type**        | `feat`, `fix`, `chore`, `refactor`, `hotfix`, `docs`, `test` |
+    | :-------------- | :------------------------------------------------------------ |
+    | **description** | Lowercase, digits, hyphens. No leading/trailing hyphens.      |
+
+    ✅ `feat/add-user-auth` &nbsp; ✅ `fix/login-redirect`
+
+    ❌ `feature/AddUserAuth` &nbsp; ❌ `myBranch`
+
+---
+
+## :material-alert-circle: What to Worry About
+
+??? warning "CI job order"
+    ```
+    ci (lint → build → test)
+      └── docker   ← push events only, needs ci to pass
+            └── deploy   ← dev branch only
+                  └── notify (Discord)
+    ```
+    Fix lint/build/test failures first — nothing else runs until `ci` passes.
 
 ---
 
 ## :material-check-decagram: Definition of Done
 
 ??? success "Pre-Push Checklist"
-    - [ ] All linting issues resolved.
-    - [ ] `pnpm build` succeeds for all affected packages.
-    - [ ] Unit and Integration tests are 100% green.
-    - [ ] Relevant `act` workflows pass locally.
+    - [ ] Branch name follows `<type>/<description>`.
+    - [ ] `pnpm run lint` passes.
+    - [ ] `pnpm run build` passes.
+    - [ ] `pnpm run test:unit` is fully green.
+    - [ ] E2E tests pass locally (`pnpm --filter e2e run test`).
     - [ ] Branch is up-to-date with `dev`.
-
----
-
-## :material-layers: Best Practices
-
-=== "Using `act`"
-    `act` runs GitHub Actions workflows inside Docker containers on your local machine.
-    Configuration lives in `.actrc` (image pinning, architecture, socket path).
-
-    ```bash
-    # Run the CI job (lint → build → test) — safe locally, no secrets needed
-    pnpm run act
-
-    # List all jobs that will run without executing them
-    act push -j ci -l
-    ```
-
-    !!! warning "Avoid running the full workflow"
-        Omitting `-j ci` will also queue the `docker`, `deploy`, and `notify` jobs, which
-        require DockerHub and SSH secrets and will fail or push images unintentionally.
-
-=== "PGLite Parity"
-    Always use **PGLite** for local checks if the CI uses it. This ensures that database-dependent tests behave identically on your machine and the runner.
-
-=== "CI as Confirmation"
-    Treat remote CI as **confirmation**, not discovery. If CI fails, it usually means a local check was skipped.

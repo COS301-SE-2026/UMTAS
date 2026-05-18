@@ -1,55 +1,65 @@
 # Integration Testing Guide
 
-!!! info "Purpose"
-    This guide defines how we test the interaction between parts of the system so features work together as expected across database and service boundaries.
+!!! info "Write the failing integration test first."
+    Integration tests verify that pieces of the system work together: HTTP → service → database → response.
 
 ---
 
-## :material-auto-fix: Workflow (Interaction Focus)
+## :material-map-marker: Where Things Live
 
-Testing endpoint-to-database behavior and external services should be done **test-first** to guarantee reliable architecture interaction boundaries.
+=== "Backend (Jest + PGLite)"
+    ```
+    apps/backend/src/
+      some.controller.spec.ts   ← integration test next to the controller
+    ```
+    Each test file gets a fresh in-memory Postgres — no Docker needed.
 
-1.  **Identify**: Pinpoint the cross-service flow or system interaction to validate.
-2.  **Prepare**: Set up the environment and test data (fixture/seed).
-3.  **Red**: Write the failing integration test asserting the correct HTTP response or database state.
-4.  **Green**: Write the minimal code to satisfy the integration bounds.
-5.  **Refactor**: Clean up the interaction logic while keeping the test suite green.
-6.  **Verify**: Confirm CI passes and the feature can be reviewed with confidence.
+=== "Microservices (FastAPI)"
+    ```
+    apps/solver/tests/
+      test_contract.py   ← NestJS ↔ FastAPI contract tests
+    ```
 
 ---
 
-## :material-flask: Tools & Environment
+## :material-flask: Tools
 
-| Layer             | Tool                                                                                                                  | Focus                                      |
-| :---------------- | :-------------------------------------------------------------------------------------------------------------------- | :----------------------------------------- |
-| **API to DB**     | ![Jest](https://img.shields.io/badge/-jest-%23C21325?style=for-the-badge&logo=jest&logoColor=white) + **PGLite**      | Controller, Service, and ORM integration   |
-| **E2E / Browser** | ![Playwright](https://img.shields.io/badge/-playwright-%232EAD33?style=for-the-badge&logo=playwright&logoColor=white) | Full user-facing flows (Login, Scheduling) |
-| **Microservices** | ![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi&logoColor=white)              | NestJS ↔ FastAPI communication contracts   |
+| Layer             | Tool                                                                                                                | Focus                                    |
+| :---------------- | :------------------------------------------------------------------------------------------------------------------ | :--------------------------------------- |
+| **API → DB**      | ![Jest](https://img.shields.io/badge/-jest-%23C21325?style=for-the-badge&logo=jest&logoColor=white) + **PGLite**   | Controller, Service, and ORM integration |
+| **Microservices** | ![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi&logoColor=white)           | NestJS ↔ FastAPI contracts               |
+
+---
+
+## :material-console: What to Run
+
+```bash
+pnpm run test:unit             # all unit + integration tests (no e2e)
+pnpm --filter backend run test # backend only
+```
+
+---
+
+## :material-alert-circle: What to Worry About
+
+??? warning "Test isolation"
+    PGLite is fresh per file, but state leaks between tests within the same file.
+    Always use `beforeEach` to reset data. Never rely on test execution order.
+
+??? warning "What belongs here vs unit tests"
+    An integration test must cross a real boundary (HTTP → service, service → DB).
+    If you're mocking the database, it's a unit test — move it.
+
+??? warning "Fixtures"
+    Keep seed data minimal. Only insert the exact rows your test needs.
 
 ---
 
 ## :material-check-decagram: Definition of Done
 
-??? success "Integration Checklist"
-    - [ ] Full interaction path is covered (Request → Logic → DB → Response).
-    - [ ] Test data (Fixtures) are reliable and version-controlled.
-    - [ ] External dependencies are stubbed or mocked in the approved way.
-    - [ ] Suite passes in the local ephemeral environment.
-    - [ ] No fragile shared state exists between tests.
-
----
-
-## :material-layers: Best Practices
-
-=== "PGLite (Database)"
-    Use **PGLite** for database integration tests. It allows you to spin up a fresh, in-memory Postgres instance for every test file, ensuring total isolation.
-
-    ```bash
-    pnpm run test:pglite
-    ```
-
-=== "Playwright (E2E)"
-    Use Playwright for user-facing flows where browser behavior matters. Focus on high-value paths like "Student can upload PDF and view schedule."
-
-=== "Seed Data"
-    Keep your seed data / fixtures minimal. Large fixtures make tests slow and hard to maintain. Prefer programmatic setup in `beforeEach`.
+??? success "Integration Test Checklist"
+    - [ ] Failing test written before the feature.
+    - [ ] Full path covered: Request → Service → DB → Response.
+    - [ ] Each test file is fully isolated — no shared state.
+    - [ ] External HTTP calls (solver, third-party) are mocked.
+    - [ ] Suite passes locally (`pnpm run test:unit`).

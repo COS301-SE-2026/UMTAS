@@ -1,55 +1,72 @@
 # Unit Testing Guide
 
-!!! info "Purpose"
-    This guide defines how we write and maintain unit tests so logic can be validated quickly and consistently across all services.
+!!! info "Write the test first, always."
+    **Red → Green → Refactor.** Never write feature code without a failing test waiting for it.
 
 ---
 
-## :material-auto-fix: Workflow (TDD Foundation)
+## :material-map-marker: Where Things Live
 
-Unit testing forms the core of our **Red-Green-Refactor** workflow. The fundamental rule is: **Always write the failing test first.**
+=== "Backend"
+    ```
+    apps/backend/src/
+      some.service.ts        ← source
+      some.service.spec.ts   ← test lives next to it
+    ```
 
-1.  **Red (Failing)**: Write the failing unit test using **Jest** or **pytest** _before_ you write the feature logic.
-2.  **Green (Pass)**: Write the minimal feature logic necessary to pass the test.
-3.  **Refactor**: Clean up the code and remove duplicates while keeping tests green.
-4.  **Verify**: Run the suite locally and include tests in your PR.
+=== "Frontend"
+    ```
+    apps/frontend/src/
+      some.component.tsx       ← source
+      some.component.spec.tsx  ← test lives next to it (or in __tests__/)
+    ```
+
+=== "Shared Base"
+    ```
+    jest.config.base.js   ← shared timeout + reporters — don't touch
+    ```
 
 ---
 
-## :material-test-tube: Tools & Frameworks
+## :material-console: What to Run
 
-| Context                      | Tool                                                                                                         |
-| :--------------------------- | :----------------------------------------------------------------------------------------------------------- |
-| **Frontend/Backend (JS/TS)** | ![Jest](https://img.shields.io/badge/-jest-%23C21325?style=for-the-badge&logo=jest&logoColor=white)          |
-| **Solver (Python)**          | ![pytest](https://img.shields.io/badge/pytest-%230A9EDC.svg?style=for-the-badge&logo=pytest&logoColor=white) |
-| **Code Quality**             | ![ESLint](https://img.shields.io/badge/eslint-3A33D1?style=for-the-badge&logo=eslint&logoColor=white)        |
+```bash
+pnpm run test:unit                              # all unit tests (no e2e)
+pnpm --filter backend run test -- --coverage   # backend with coverage
+pnpm --filter frontend run test -- --coverage  # frontend with coverage
+```
+
+---
+
+## :material-alert-circle: What to Worry About
+
+??? warning "Coverage thresholds — CI blocks merges below these"
+    | App          | Statements | Branches | Functions | Lines |
+    | :----------- | :--------: | :------: | :-------: | :---: |
+    | **Backend**  | 20%        | 8%       | 12%       | 18%   |
+    | **Frontend** | 25%        | 35%      | 18%       | 25%   |
+
+??? warning "Test quality"
+    - Name reads like a sentence: `it('should return 400 if the date is in the past')`
+    - One behaviour per test — if it can fail for two reasons, split it.
+    - Only mock what crosses a real boundary (HTTP, DB, file system).
 
 ---
 
 ## :material-check-decagram: Definition of Done
 
 ??? success "Unit Test Checklist"
-    - [ ] Happy path and edge cases are covered.
-    - [ ] Tests are readable, stable, and deterministic.
-    - [ ] Test names clearly describe the expected behavior.
-    - [ ] Suite passes locally in under 30 seconds.
-    - [ ] CI coverage requirements are met.
+    - [ ] Failing test written before the feature.
+    - [ ] Happy path and edge cases covered.
+    - [ ] Test name clearly describes the expected behaviour.
+    - [ ] Suite passes locally (`pnpm run test:unit`).
+    - [ ] Coverage thresholds met.
 
 ---
 
-## :material-lightbulb: Best Practices
+## :material-test-tube: Tools
 
-=== "What to Test"
-    - Utility functions and pure logic.
-    - Isolated business rules (e.g. scheduling constraints).
-    - Component behavior in isolation (rendering, events).
-
-=== "Naming"
-    Use descriptive names that read like a sentence:
-
-    ```typescript
-    it('should return 400 if the date is in the past', () => { ... })
-    ```
-
-=== "Mocking"
-    Avoid over-mocking. If you need to mock more than 3 dependencies, your function might be doing too much.
+| Context                | Tool                                                                                                         |
+| :--------------------- | :----------------------------------------------------------------------------------------------------------- |
+| **Frontend / Backend** | ![Jest](https://img.shields.io/badge/-jest-%23C21325?style=for-the-badge&logo=jest&logoColor=white)          |
+| **Solver (Python)**    | ![pytest](https://img.shields.io/badge/pytest-%230A9EDC.svg?style=for-the-badge&logo=pytest&logoColor=white) |

@@ -72,6 +72,14 @@ Welcome to the UMTAS Developer Portal. Here you will find everything you need to
 
     [:octicons-arrow-right-24: Integration Guide](integration-testing-guide.md)
 
+-   :material-monitor-screenshot:{ .lg .middle } __E2E Testing__
+
+    ---
+
+    Full user-flow testing in a real browser with Playwright.
+
+    [:octicons-arrow-right-24: E2E Guide](e2e-testing-guide.md)
+
 </div>
 
 ---
