@@ -22,6 +22,9 @@ import { AuthAlert } from "@/components/molecules/OAuth/AuthAlert";
 import { PasswordStrengthBadge } from "@/components/molecules/OAuth/PasswordStrengthBadge";
 import { signUp, signIn } from "@/../utilities/auth-client";
 
+const getAppUrl = () =>
+  process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3001";
+
 interface FieldErrors {
   name?: string;
   email?: string;
@@ -88,7 +91,7 @@ export function RegisterForm() {
         name,
         email,
         password,
-        callbackURL: "/dashboard",
+        callbackURL: `${getAppUrl()}/dashboard`,
       });
 
       if (result?.error) {
@@ -112,7 +115,7 @@ export function RegisterForm() {
     try {
       await signIn.social({
         provider: "google",
-        callbackURL: "/dashboard",
+        callbackURL: `${getAppUrl()}/auth-callback`,
       });
     } catch {
       setGlobalError(

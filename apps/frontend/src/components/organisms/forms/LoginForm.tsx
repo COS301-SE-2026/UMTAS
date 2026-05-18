@@ -21,6 +21,9 @@ import { AuthDivider } from "@/components/molecules/OAuth/AuthDivider";
 import { AuthAlert } from "@/components/molecules/OAuth/AuthAlert";
 import { signIn } from "@/../utilities/auth-client";
 
+const getAppUrl = () =>
+  process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3001";
+
 function mapAuthError(message: string): string {
   if (
     message.toLowerCase().includes("invalid") ||
@@ -63,7 +66,7 @@ export function LoginForm() {
       const result = await signIn.email({
         email,
         password,
-        callbackURL: "/dashboard",
+        callbackURL: `${getAppUrl()}/dashboard`,
       });
 
       if (result?.error) {
@@ -85,7 +88,7 @@ export function LoginForm() {
     try {
       await signIn.social({
         provider: "google",
-        callbackURL: "/dashboard",
+        callbackURL: `${getAppUrl()}/auth-callback`,
       });
     } catch {
       setError("Google sign-in failed. Try again or use email and password.");

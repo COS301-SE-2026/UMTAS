@@ -1,18 +1,12 @@
 import { UmtasLogo } from "@/components/atoms/auth/UmtasLogo";
 import { NavLinks } from "@/components/molecules/nav/NavLinks";
 import { NavUser } from "@/components/molecules/nav/NavUser";
-import { Separator } from "@/components/atoms/baseShadcn/separator";
-
-interface TopNavBarProps {
-  userName?: string | null;
-  userEmail?: string | null;
-}
 
 /**
  * Layout:
  *   [Logo]   [Nav links]   ...spasie...   [ThemeToggle] [Avatar] [Sign out]
  */
-export function TopNavBar({ userName, userEmail }: TopNavBarProps) {
+export function TopNavBar() {
   return (
     <header
       className="sticky top-0 z-40 w-full bg-[--bg-surface] border-b border-[--border]"
@@ -31,7 +25,7 @@ export function TopNavBar({ userName, userEmail }: TopNavBarProps) {
         <div className="flex-1 sm:hidden" aria-hidden />
 
         {/* Right: User controls */}
-        <NavUser name={userName} email={userEmail} />
+        <NavUser />
       </div>
 
       {/* Mobile nav, shown below header on small screens */}
