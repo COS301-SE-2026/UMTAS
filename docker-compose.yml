@@ -99,13 +99,14 @@ services:
     networks:
       - gateway
       - internal
+    ports:
+      - "3000:3000"
     environment:
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD}
     volumes:
       - grafana_data:/var/lib/grafana
       - ./infra/grafana/provisioning:/etc/grafana/provisioning
     profiles:
-      - monitoring
       - server
 
   prometheus:
@@ -123,7 +124,6 @@ services:
       - "--storage.tsdb.retention.time=30d"
       - "--web.enable-lifecycle"
     profiles:
-      - monitoring
       - server
 
   loki:
@@ -135,7 +135,6 @@ services:
       - ./infra/loki:/etc/loki
       - loki_data:/loki
     profiles:
-      - monitoring
       - server
 
   promtail:
@@ -148,5 +147,4 @@ services:
       - ./infra/promtail/promtail-config.yaml:/etc/promtail/config.yml
     command: -config.file=/etc/promtail/config.yml
     profiles:
-      - monitoring
       - server

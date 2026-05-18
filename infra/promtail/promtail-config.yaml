@@ -23,10 +23,6 @@ scrape_configs:
         labels:
           job: docker
           __path__: /var/lib/docker/containers/*/*-json.log
-    relabel_configs:
-      - source_labels: [__path__]
-        regex: "/var/lib/docker/containers/([^/]+)/.*"
-        target_label: container_id
     pipeline_stages:
       - json:
           expressions:
@@ -41,5 +37,10 @@ scrape_configs:
           fallback_formats:
             - RFC3339
             - "2006-01-02T15:04:05Z"
+      - regex:
+          source: filename
+          expression: "/var/lib/docker/containers/(?P<container_id>[^/]+)/.*"
+      - labels:
+          container_id:
       - output:
           source: output
