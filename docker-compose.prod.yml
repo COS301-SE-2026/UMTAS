@@ -66,12 +66,15 @@ services:
     image: containrrr/watchtower
     container_name: watchtower
     restart: always
+    networks:
+      - internal
     environment:
       - DOCKER_API_VERSION=1.44
       - REPO_USER=${DOCKERHUB_USERNAME}
       - REPO_PASS=${DOCKERHUB_TOKEN}
       - WATCHTOWER_NOTIFICATION_URL=${WATCHTOWER_DISCORD_URL}
       - WATCHTOWER_NOTIFICATIONS_LEVEL=info
+      - WATCHTOWER_HTTP_API_METRICS=true
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     command: --schedule "0 0 * * * *" --cleanup --notification-title "UMTAS Watchtower"

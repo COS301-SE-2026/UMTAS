@@ -1,5 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { collectDefaultMetrics, register } from 'prom-client';
+import type { Request, Response } from 'express';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -21,6 +23,12 @@ async function bootstrap() {
     new DocumentBuilder().setTitle('UMTAS API').setVersion('1.0').build(),
   );
   SwaggerModule.setup('api-docs', app, document);
+
+  collectDefaultMetrics();
+  app.getHttpAdapter().get('/metrics', async (_req: Request, res: Response) => {
+    res.set('Content-Type', register.contentType);
+    res.end(await register.metrics());
+  });
 
   await app.listen(port);
 }

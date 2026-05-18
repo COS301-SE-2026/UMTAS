@@ -193,6 +193,24 @@ services:
     profiles:
       - server
 
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.52.1
+    restart: unless-stopped
+    networks:
+      - internal
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+    command:
+      - "--docker_only=true"
+      - "--store_container_labels=true"
+      - "--disable_metrics=accelerator,advtcp,app,cpu,cpuLoad,cpu_topology,diskIO,hugetlb,memory,memory_numa,network,oom_event,percpu,perf_event,process,referenced_memory,resctrl,sched,tcp,udp"
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+    profiles:
+      - server
+
   postgres-exporter:
     image: prometheuscommunity/postgres-exporter:v0.17.1
     restart: unless-stopped

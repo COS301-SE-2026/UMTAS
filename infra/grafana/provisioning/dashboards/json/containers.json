@@ -24,27 +24,14 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
-  "links": [
-    {
-      "asDropdown": true,
-      "icon": "external link",
-      "includeVars": false,
-      "keepTime": true,
-      "tags": [],
-      "targetBlank": false,
-      "title": "Dashboards",
-      "tooltip": "",
-      "type": "dashboards",
-      "url": ""
-    }
-  ],
+  "links": [],
   "liveNow": false,
   "panels": [
     {
       "collapsed": false,
       "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
-      "id": 20,
-      "title": "Service Status",
+      "id": 10,
+      "title": "Watchtower",
       "type": "row"
     },
     {
@@ -52,22 +39,11 @@
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "thresholds" },
-          "mappings": [
-            {
-              "options": {
-                "0": { "color": "red", "index": 0, "text": "DOWN" },
-                "1": { "color": "green", "index": 1, "text": "UP" }
-              },
-              "type": "value"
-            }
-          ],
           "thresholds": {
             "mode": "absolute",
-            "steps": [
-              { "color": "red", "value": null },
-              { "color": "green", "value": 1 }
-            ]
-          }
+            "steps": [{ "color": "blue", "value": null }]
+          },
+          "unit": "short"
         },
         "overrides": []
       },
@@ -88,12 +64,12 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "prometheus" },
-          "expr": "up{job=\"backend\"}",
+          "expr": "watchtower_containers_scanned",
           "instant": true,
           "refId": "A"
         }
       ],
-      "title": "Backend",
+      "title": "Containers Scanned",
       "type": "stat"
     },
     {
@@ -101,22 +77,14 @@
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "thresholds" },
-          "mappings": [
-            {
-              "options": {
-                "0": { "color": "red", "index": 0, "text": "DOWN" },
-                "1": { "color": "green", "index": 1, "text": "UP" }
-              },
-              "type": "value"
-            }
-          ],
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "red", "value": null },
-              { "color": "green", "value": 1 }
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 1 }
             ]
-          }
+          },
+          "unit": "short"
         },
         "overrides": []
       },
@@ -137,12 +105,12 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "prometheus" },
-          "expr": "up{job=\"solver\"}",
+          "expr": "watchtower_containers_updated",
           "instant": true,
           "refId": "A"
         }
       ],
-      "title": "Solver",
+      "title": "Updated (last scan)",
       "type": "stat"
     },
     {
@@ -150,22 +118,14 @@
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "thresholds" },
-          "mappings": [
-            {
-              "options": {
-                "0": { "color": "red", "index": 0, "text": "DOWN" },
-                "1": { "color": "green", "index": 1, "text": "UP" }
-              },
-              "type": "value"
-            }
-          ],
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "red", "value": null },
-              { "color": "green", "value": 1 }
+              { "color": "green", "value": null },
+              { "color": "red", "value": 1 }
             ]
-          }
+          },
+          "unit": "short"
         },
         "overrides": []
       },
@@ -186,12 +146,12 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "prometheus" },
-          "expr": "up{job=\"postgres\"}",
+          "expr": "watchtower_containers_failed",
           "instant": true,
           "refId": "A"
         }
       ],
-      "title": "Postgres",
+      "title": "Failed (last scan)",
       "type": "stat"
     },
     {
@@ -199,27 +159,132 @@
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "thresholds" },
-          "mappings": [
-            {
-              "options": {
-                "0": { "color": "red", "index": 0, "text": "DOWN" },
-                "1": { "color": "green", "index": 1, "text": "UP" }
-              },
-              "type": "value"
-            }
-          ],
           "thresholds": {
             "mode": "absolute",
-            "steps": [
-              { "color": "red", "value": null },
-              { "color": "green", "value": 1 }
-            ]
-          }
+            "steps": [{ "color": "blue", "value": null }]
+          },
+          "unit": "short"
         },
         "overrides": []
       },
       "gridPos": { "h": 4, "w": 6, "x": 18, "y": 1 },
       "id": 4,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "watchtower_scans_total",
+          "instant": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Total Scans",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisPlacement": "auto",
+            "fillOpacity": 20,
+            "gradientMode": "none",
+            "lineWidth": 2,
+            "showPoints": "never"
+          },
+          "unit": "short"
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "Updated" },
+            "properties": [
+              {
+                "id": "color",
+                "value": { "fixedColor": "green", "mode": "fixed" }
+              }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "Failed" },
+            "properties": [
+              {
+                "id": "color",
+                "value": { "fixedColor": "red", "mode": "fixed" }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 5 },
+      "id": 5,
+      "options": {
+        "legend": {
+          "calcs": ["sum"],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": { "mode": "multi", "sort": "none" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "increase(watchtower_scans_total[1h])",
+          "legendFormat": "Scans",
+          "refId": "A"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "watchtower_containers_updated",
+          "legendFormat": "Updated",
+          "refId": "B"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "watchtower_containers_failed",
+          "legendFormat": "Failed",
+          "refId": "C"
+        }
+      ],
+      "title": "Watchtower Activity",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 13 },
+      "id": 11,
+      "title": "Running Containers",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "blue", "value": null }]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 14 },
+      "id": 6,
       "options": {
         "colorMode": "background",
         "graphMode": "none",
@@ -235,241 +300,134 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "prometheus" },
-          "expr": "up{job=\"traefik\"}",
+          "expr": "count(count by (name) (container_last_seen{compose_service!=\"\"}))",
           "instant": true,
           "refId": "A"
         }
       ],
-      "title": "Traefik",
+      "title": "Containers Running",
       "type": "stat"
     },
     {
-      "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 },
-      "id": 21,
-      "title": "HTTP Traffic",
-      "type": "row"
-    },
-    {
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
+          "color": { "mode": "thresholds" },
           "custom": {
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "req/s",
-            "axisPlacement": "auto",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "lineWidth": 2,
-            "showPoints": "never"
+            "align": "auto",
+            "displayMode": "auto",
+            "filterable": true
           },
-          "unit": "reqps"
-        },
-        "overrides": []
-      },
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
-      "id": 5,
-      "options": {
-        "legend": {
-          "calcs": ["mean", "max"],
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": { "mode": "multi", "sort": "desc" }
-      },
-      "targets": [
-        {
-          "datasource": { "type": "prometheus", "uid": "prometheus" },
-          "expr": "sum(rate(traefik_service_requests_total[5m])) by (service)",
-          "legendFormat": "{{service}}",
-          "refId": "A"
-        }
-      ],
-      "title": "Request Rate",
-      "type": "timeseries"
-    },
-    {
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "fieldConfig": {
-        "defaults": {
-          "color": { "mode": "palette-classic" },
-          "custom": {
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "req/s",
-            "axisPlacement": "auto",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "lineWidth": 2,
-            "showPoints": "never"
-          },
-          "unit": "reqps"
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "green", "value": null }]
+          }
         },
         "overrides": [
           {
-            "matcher": { "id": "byFrameRefID", "options": "A" },
+            "matcher": { "id": "byName", "options": "Service" },
+            "properties": [{ "id": "custom.width", "value": 160 }]
+          },
+          {
+            "matcher": { "id": "byName", "options": "Container" },
+            "properties": [{ "id": "custom.width", "value": 200 }]
+          },
+          {
+            "matcher": { "id": "byName", "options": "Started" },
             "properties": [
-              {
-                "id": "color",
-                "value": { "fixedColor": "orange", "mode": "fixed" }
-              }
+              { "id": "unit", "value": "dateTimeAsLocal" },
+              { "id": "custom.width", "value": 200 }
             ]
           },
           {
-            "matcher": { "id": "byFrameRefID", "options": "B" },
+            "matcher": { "id": "byName", "options": "Uptime" },
             "properties": [
+              { "id": "unit", "value": "s" },
+              { "id": "custom.displayMode", "value": "color-background" },
               {
-                "id": "color",
-                "value": { "fixedColor": "red", "mode": "fixed" }
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [{ "color": "green", "value": null }]
+                }
               }
             ]
           }
         ]
       },
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 },
-      "id": 6,
-      "options": {
-        "legend": {
-          "calcs": ["mean", "max"],
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": { "mode": "multi", "sort": "desc" }
-      },
-      "targets": [
-        {
-          "datasource": { "type": "prometheus", "uid": "prometheus" },
-          "expr": "sum(rate(traefik_service_requests_total{code=~\"4..\"}[5m])) by (service)",
-          "legendFormat": "4xx {{service}}",
-          "refId": "A"
-        },
-        {
-          "datasource": { "type": "prometheus", "uid": "prometheus" },
-          "expr": "sum(rate(traefik_service_requests_total{code=~\"5..\"}[5m])) by (service)",
-          "legendFormat": "5xx {{service}}",
-          "refId": "B"
-        }
-      ],
-      "title": "Error Rate (4xx / 5xx)",
-      "type": "timeseries"
-    },
-    {
-      "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 14 },
-      "id": 22,
-      "title": "Host Resources",
-      "type": "row"
-    },
-    {
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "fieldConfig": {
-        "defaults": {
-          "color": { "mode": "palette-classic" },
-          "custom": {
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisPlacement": "auto",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "lineWidth": 2,
-            "showPoints": "never"
-          },
-          "unit": "percentunit",
-          "min": 0,
-          "max": 1
-        },
-        "overrides": []
-      },
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 15 },
+      "gridPos": { "h": 14, "w": 18, "x": 6, "y": 14 },
       "id": 7,
       "options": {
-        "legend": {
-          "calcs": ["mean", "max"],
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": { "mode": "multi", "sort": "desc" }
+        "footer": { "fields": "", "reducer": ["sum"], "show": false },
+        "showHeader": true,
+        "sortBy": [{ "desc": false, "displayName": "Service" }]
       },
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "prometheus" },
-          "expr": "1 - avg(rate(node_cpu_seconds_total{mode=\"idle\"}[5m]))",
-          "legendFormat": "CPU",
+          "expr": "container_start_time_seconds{compose_service!=\"\"}",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "",
           "refId": "A"
         }
       ],
-      "title": "Host CPU Usage",
-      "type": "timeseries"
-    },
-    {
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "fieldConfig": {
-        "defaults": {
-          "color": { "mode": "palette-classic" },
-          "custom": {
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisPlacement": "auto",
-            "fillOpacity": 10,
-            "gradientMode": "none",
-            "lineWidth": 2,
-            "showPoints": "never"
-          },
-          "unit": "bytes"
-        },
-        "overrides": []
-      },
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 15 },
-      "id": 8,
-      "options": {
-        "legend": {
-          "calcs": ["mean", "max"],
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": { "mode": "multi", "sort": "desc" }
-      },
-      "targets": [
+      "title": "Container List",
+      "transformations": [
         {
-          "datasource": { "type": "prometheus", "uid": "prometheus" },
-          "expr": "node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes",
-          "legendFormat": "Used",
-          "refId": "A"
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "__name__": true,
+              "id": true,
+              "image": true,
+              "instance": true,
+              "job": true,
+              "project": true,
+              "service": true
+            },
+            "renameByName": {
+              "compose_service": "Service",
+              "name": "Container",
+              "Value": "Started"
+            }
+          }
         },
         {
-          "datasource": { "type": "prometheus", "uid": "prometheus" },
-          "expr": "node_memory_MemAvailable_bytes",
-          "legendFormat": "Available",
-          "refId": "B"
+          "id": "calculateField",
+          "options": {
+            "alias": "Uptime",
+            "mode": "reduceRow",
+            "reduce": { "reducer": "sum" },
+            "binary": {
+              "left": "time()",
+              "right": "Started",
+              "reducer": "diff"
+            }
+          }
         }
       ],
-      "title": "Host Memory Usage",
-      "type": "timeseries"
+      "type": "table"
     },
     {
       "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 23 },
-      "id": 23,
-      "title": "Logs",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 28 },
+      "id": 12,
+      "title": "Deploy Log",
       "type": "row"
     },
     {
       "datasource": { "type": "loki", "uid": "loki" },
       "fieldConfig": { "defaults": {}, "overrides": [] },
-      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 24 },
-      "id": 9,
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 29 },
+      "id": 8,
       "options": {
         "dedupStrategy": "none",
         "enableLogDetails": true,
         "prettifyLogMessage": false,
         "showCommonLabels": false,
-        "showLabels": true,
+        "showLabels": false,
         "showTime": true,
         "sortOrder": "Descending",
         "wrapLogMessage": true
@@ -477,24 +435,24 @@
       "targets": [
         {
           "datasource": { "type": "loki", "uid": "loki" },
-          "expr": "{job=\"docker\", stream=\"stderr\"}",
+          "expr": "{job=\"docker\", compose_service=\"watchtower\"}",
           "refId": "A"
         }
       ],
-      "title": "Recent Errors (stderr)",
+      "title": "Watchtower Logs",
       "type": "logs"
     }
   ],
-  "refresh": "30s",
+  "refresh": "1m",
   "schemaVersion": 36,
   "style": "dark",
-  "tags": ["home", "overview"],
+  "tags": ["containers", "cicd", "watchtower"],
   "templating": { "list": [] },
-  "time": { "from": "now-1h", "to": "now" },
+  "time": { "from": "now-24h", "to": "now" },
   "timepicker": {},
   "timezone": "",
-  "title": "Overview",
-  "uid": "home-overview",
+  "title": "Containers & Deployments",
+  "uid": "containers-deployments",
   "version": 1,
   "weekStart": ""
 }
