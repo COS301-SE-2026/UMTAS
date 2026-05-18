@@ -136,6 +136,46 @@ jobs:
           cache-from: type=gha,scope=solver-${{ github.ref_name }}
           cache-to: type=gha,mode=max,scope=solver-${{ github.ref_name }}
 
+  health-check:
+    name: Production Health Check
+    runs-on: ubuntu-latest
+    needs: docker
+    if: github.event_name == 'push' && github.ref_name == 'main'
+
+    steps:
+      - name: Wait for Watchtower redeploy
+        run: |
+          echo "Waiting 60s for Watchtower to pull and restart containers..."
+          sleep 60
+
+      - name: Check production health endpoints
+        env:
+          DOMAIN: ${{ secrets.PROD_DOMAIN }}
+        run: |
+          failed=0
+
+          check() {
+            local url=$1
+            local attempt
+            for attempt in 1 2 3 4 5; do
+              status=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$url")
+              if [ "$status" = "200" ]; then
+                echo "OK: $url returned HTTP 200"
+                return 0
+              fi
+              echo "Attempt $attempt/5: $url returned HTTP $status"
+              [ "$attempt" -lt 5 ] && sleep 20
+            done
+            echo "FAIL: $url did not return HTTP 200 after 5 attempts"
+            return 1
+          }
+
+          check "https://api.${DOMAIN}/health"     || failed=1
+          check "https://solver.${DOMAIN}/health"  || failed=1
+          check "https://${DOMAIN}"                || failed=1
+
+          exit $failed
+
   notify:
     name: Notify Discord
     runs-on: ubuntu-latest
