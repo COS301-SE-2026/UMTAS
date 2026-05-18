@@ -20,6 +20,9 @@ jspm_packages/
 package-lock.json
 yarn.lock
 
+.turbo
+.skills
+
 
 # Next.js build output
 .next/
@@ -114,5 +117,6 @@ Temporary Items
 # Drizzle
 **/drizzle/meta/
 
+working_docs/
 # Local act secrets
 .secrets

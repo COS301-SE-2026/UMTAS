@@ -1,7 +1,7 @@
 import { Global, Module } from '@nestjs/common';
-import { DatabaseInitService } from './database-init.service.js';
-import { DatabaseService } from './database.service.js';
-import { DatabaseSeedService } from './database-seed.service.js';
+import { DatabaseInitService } from './database-init.service';
+import { DatabaseService } from './database.service';
+import { DatabaseSeedService } from './database-seed.service';
 
 @Global()
 @Module({
