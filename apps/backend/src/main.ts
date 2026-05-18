@@ -7,7 +7,7 @@ async function bootstrap() {
   const port = process.env.PORT ?? 3001;
 
   app.enableCors({
-    origin: process.env.CORS_ORIGIN ?? 'http://localhost:3000',
+    origin: process.env.CORS_ORIGIN ?? 'http://localhost:3001',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     credentials: true,
   });

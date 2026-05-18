@@ -64,10 +64,9 @@ export class AuthService implements OnModuleInit {
     }
 
     const db = this.databaseService.db;
-    // Default to port 3001 and /api/auth path for backend
     const baseURL =
       this.configService.get<string>('BETTER_AUTH_URL') ??
-      'http://localhost:3001/api/auth';
+      'http://localhost:3000/api/auth';
 
     // Frontend URL for link generation. Ensure we read it from config,
     // which now includes local .env files.
@@ -77,7 +76,7 @@ export class AuthService implements OnModuleInit {
         .get<string>('BETTER_AUTH_TRUSTED_ORIGINS')
         ?.split(',')[0]
         ?.trim() ??
-      'http://localhost:3000';
+      'http://localhost:3001';
 
     const secret = this.configService.get<string>('BETTER_AUTH_SECRET')!;
     const trustedOrigins = (

@@ -4,7 +4,7 @@ import { headers } from "next/headers";
 export default async function RootPage() {
   const cookieHeader = (await headers()).get("cookie") ?? "";
   const res = await fetch(
-    `${process.env.API_URL || "http://localhost:3001"}/api/auth/session`,
+    `${process.env.API_URL || "http://localhost:3000"}/api/auth/session`,
     {
       headers: { cookie: cookieHeader },
       cache: "no-store",

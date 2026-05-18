@@ -83,7 +83,7 @@ services:
       - gateway
       - internal
     environment:
-      - BACKEND_PORT=${BACKEND_PORT}
+      - PORT=${BACKEND_PORT}
     profiles:
       - dev-docker
       - dev-pglite
@@ -96,6 +96,11 @@ services:
     image: ${DOCKER_REGISTRY}/${PROJECT_NAME}-frontend:latest
     networks:
       - gateway
+    environment:
+      - PORT=${FRONTEND_PORT}
+      - API_URL=http://backend:${BACKEND_PORT}
+      - NEXT_PUBLIC_APP_URL=http://localhost:${FRONTEND_PORT}
+      - NEXT_PUBLIC_API_URL=http://localhost:${FRONTEND_PORT}/api/auth
     profiles:
       - dev-docker
       - dev-pglite
