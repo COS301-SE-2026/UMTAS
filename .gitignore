@@ -20,6 +20,9 @@ jspm_packages/
 package-lock.json
 yarn.lock
 
+.turbo
+.skills
+
 
 # Next.js build output
 .next/
@@ -56,6 +59,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+!apps/*/src/lib/
 
 # Environment variables
 .env
@@ -112,3 +116,7 @@ Temporary Items
 
 # Drizzle
 **/drizzle/meta/
+
+working_docs/
+# Local act secrets
+.secrets

@@ -5,20 +5,26 @@
   "main": "index.js",
   "scripts": {
     "test": "turbo run test",
+    "test:unit": "turbo run test --filter=!./apps/e2e -- --passWithNoTests",
     "dev": "turbo run dev",
-    "dev:infra": "docker compose up -d postgres redis minio solver",
-    "dev:monitor": "docker compose --profile dev-docker --profile monitoring up",
+    "dev:infra": "docker compose up -d postgres redis minio solver mailhog",
+    "dev:monitor": "docker compose --profile dev-docker --profile monitoring up --build",
     "dev:pglite": "docker compose --profile dev-pglite up --build",
     "dev:docker": "docker compose --profile dev-docker up --build",
     "start:prod": "docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build",
     "start:server": "docker compose -f docker-compose.yml -f docker-compose.prod.yml --profile server up -d --build",
     "build": "turbo run build",
-    "setup": "scripts/bootstrap.sh",
+    "bootstrap": "bash scripts/bootstrap.sh",
+    "reset": "bash scripts/reset.sh",
+    "reset:hard": "HARD=true bash scripts/reset.sh",
+    "db:generate": "pnpm --filter backend db:generate",
+    "db:migrate": "pnpm --filter backend db:migrate",
+    "db:studio": "pnpm --filter backend db:studio",
     "lint": "turbo run lint",
     "lint-staged": "lint-staged",
     "ci": "turbo run ci",
-    "prepare": "husky install",
-    "act": "act --container-architecture linux/amd64"
+    "prepare": "husky",
+    "act": "act push -j ci --container-architecture linux/amd64"
   },
   "keywords": [],
   "author": "",
@@ -27,18 +33,40 @@
   "devDependencies": {
     "@commitlint/cli": "^20.5.2",
     "@commitlint/config-conventional": "^20.5.0",
+    "@secretlint/secretlint-rule-preset-recommend": "^13.0.2",
+    "@types/lodash": "^4.17.24",
     "@types/node": "^25.6.0",
     "eslint": "^10.2.1",
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",
     "prettier": "^3.8.3",
+    "secretlint": "^13.0.2",
     "turbo": "^2.9.6",
     "typescript": "^6.0.3"
   },
   "dependencies": {
-    "dotenv": "^16.0.3"
+    "@nestjs-modules/mailer": "^2.3.4",
+    "@types/handlebars": "^4.1.0",
+    "@types/nodemailer": "^8.0.0",
+    "dotenv": "^16.0.3",
+    "handlebars": "^4.7.9",
+    "lodash": "^4.18.1",
+    "nodemailer": "^8.0.7"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@nestjs/core",
+      "@swc/core",
+      "esbuild",
+      "msgpackr-extract",
+      "sharp",
+      "unrs-resolver"
+    ]
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx,mjs,cjs,json,md,yml,yaml,css,scss}": "prettier --write"
+    "*.{js,jsx,ts,tsx,mjs,cjs,json,md,yml,yaml,css,scss}": "prettier --write",
+    "apps/frontend/src/**/*.{ts,tsx}": "eslint --fix --config apps/frontend/eslint.config.mjs",
+    "apps/backend/src/**/*.ts": "eslint --fix --config apps/backend/eslint.config.mjs",
+    "**/*": "secretlint"
   }
 }

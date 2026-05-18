@@ -1,4 +1,8 @@
+const base = require("../../jest.config.base.js");
+
+/** @type {import('jest').Config} */
 module.exports = {
+  ...base,
   preset: "ts-jest",
   testEnvironment: "jsdom",
   roots: ["<rootDir>/src"],

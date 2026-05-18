@@ -1,6 +1,7 @@
 {
   "name": "backend",
   "version": "0.0.1",
+  "packageManager": "pnpm@10.33.2",
   "description": "",
   "author": "",
   "private": true,
@@ -11,6 +12,7 @@
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "dev": "nest start --watch",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
@@ -31,17 +33,19 @@
     "@nestjs/config": "^4.0.4",
     "@nestjs/core": "^11.0.1",
     "@nestjs/platform-express": "^11.0.1",
-    "@nestjs/swagger": "^11.4.3",
+    "@nestjs/swagger": "^11.4.2",
     "@nestjs/terminus": "^11.1.1",
     "better-auth": "^1.6.9",
     "bullmq": "^5.76.1",
     "dotenv": "^16.6.1",
     "drizzle-orm": "^0.45.2",
     "ioredis": "^5.10.1",
+    "lodash": "^4.18.1",
     "pg": "^8.20.0",
     "postgres": "^3.4.9",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
+    "shared-types": "workspace:*",
     "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
@@ -53,6 +57,7 @@
     "@swc/core": "^1.5.0",
     "@types/express": "^5.0.0",
     "@types/jest": "^30.0.0",
+    "@types/lodash": "^4.17.24",
     "@types/node": "^24.0.0",
     "@types/pg": "^8.15.6",
     "@types/supertest": "^7.0.0",
@@ -82,8 +87,25 @@
     "rootDir": "src",
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
-      "^.+\\.(t|j)s$": "ts-jest"
+      "^.+\\.(t|j)s$": [
+        "ts-jest",
+        {
+          "useESM": true
+        }
+      ]
     },
+    "extensionsToTreatAsEsm": [
+      ".ts"
+    ],
+    "moduleNameMapper": {
+      "^(\\.{1,2}/.*)\\.js$": "$1"
+    },
+    "setupFilesAfterEnv": [
+      "<rootDir>/../test/jest.setup.ts"
+    ],
+    "transformIgnorePatterns": [
+      "node_modules/(?!(better-auth|@better-auth)/)"
+    ],
     "collectCoverageFrom": [
       "**/*.(t|j)s"
     ],
