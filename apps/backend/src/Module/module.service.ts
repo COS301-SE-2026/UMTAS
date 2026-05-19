@@ -134,7 +134,7 @@ export class ModuleService {
       .returning();
 
     if (!newModule)
-      throw new InternalServerErrorException('New module not created');
+      throw new InternalServerErrorException('Module not updated');
 
     return {
       module: newModule,

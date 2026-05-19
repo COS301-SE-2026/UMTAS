@@ -17,6 +17,7 @@ export const Event = pgTable('Event', {
 export const Timetable = pgTable('Timetable', {
   timetableID: serial('timetableID').primaryKey(),
   timetableName: varchar('timetableName'),
+  userID: uuid('userID').notNull(),
 });
 
 export const EventsToTimetables = pgTable(
