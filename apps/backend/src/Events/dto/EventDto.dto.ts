@@ -1,11 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import {
-  IsObject,
-  IsOptional,
-  IsEnum,
-  IsString,
-  ValidateNested,
-} from 'class-validator';
+import { IsOptional, IsEnum, IsString, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export enum EventType {
@@ -19,7 +13,7 @@ export class EventCriteriaDto {
   })
   @IsOptional()
   @IsEnum(EventType)
-  type?: EventType;
+  type?: EventType | null;
 
   @ApiProperty({ example: 'Monday' })
   @IsString()
@@ -41,7 +35,7 @@ export class EventCriteriaDto {
   @ApiPropertyOptional({ example: 'IT 2-26' })
   @IsOptional()
   @IsString()
-  venue!: string;
+  venue?: string;
 } //EventCriteriaDto
 
 export class CreateEventDto {
@@ -79,20 +73,50 @@ export class LectureResponseDto {
   venue?: string | null;
 } //LectureResponseDto
 
-export class UpdateEventDto {
+export class UpdateEventCriteriaDto {
   @ApiPropertyOptional({
-    example: {
-      day: 'Tuesday',
-      startTime: '10:30',
-      endTime: '12:20',
-      type: 'practical',
-      moduleCode: 'COS301',
-    },
-    description: 'Updated flexible JSON criteria for the event',
+    enum: EventType,
+    example: EventType.LECTURE,
   })
   @IsOptional()
-  @IsObject()
-  eventCriteria?: Record<string, unknown>;
+  @IsEnum(EventType)
+  type?: EventType;
+
+  @ApiPropertyOptional({ example: 'Tuesday' })
+  @IsOptional()
+  @IsString()
+  day?: string;
+
+  @ApiPropertyOptional({ example: '10:30' })
+  @IsOptional()
+  @IsString()
+  startTime?: string;
+
+  @ApiPropertyOptional({ example: '12:20' })
+  @IsOptional()
+  @IsString()
+  endTime?: string;
+
+  @ApiPropertyOptional({ example: 'COS301' })
+  @IsOptional()
+  @IsString()
+  moduleCode?: string;
+
+  @ApiPropertyOptional({ example: 'IT 2-26' })
+  @IsOptional()
+  @IsString()
+  venue?: string;
+} //udpateEventCriteria
+
+export class UpdateEventDto {
+  @ApiPropertyOptional({
+    type: UpdateEventCriteriaDto,
+    description: 'Event update criteria',
+  })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => UpdateEventCriteriaDto)
+  eventCriteria?: UpdateEventCriteriaDto;
 } //Update event
 
 export class EventResponseDto {

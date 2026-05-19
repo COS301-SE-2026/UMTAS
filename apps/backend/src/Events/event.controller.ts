@@ -5,6 +5,7 @@ import {
   Post,
   Get,
   ParseIntPipe,
+  Patch,
 } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
@@ -12,6 +13,7 @@ import {
   CreateEventDto,
   EventResponseDto,
   EventListResponseDto,
+  UpdateEventDto,
 } from './dto/EventDto.dto';
 
 import { EventService } from './event.service';
@@ -105,4 +107,45 @@ export class EventController {
   ) {
     return this.service.getById(session.user.id, id);
   } //get by id
+
+  //update
+  @Patch(':id')
+  @Roles('student')
+  @ApiOperation({
+    summary: 'Update an event',
+    operationId: 'updateEvent',
+  })
+  @ApiBody({ type: UpdateEventDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Event updated successfully',
+    type: EventResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Missing or invalid update payload',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'No active session',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Insufficient permissions',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Event or referenced module not found',
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Event was not updated',
+  })
+  updateEvent(
+    @CurrentSession() session: SessionData,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateEventDto,
+  ) {
+    return this.service.updateEvent(session.user.id, id, dto);
+  }
 } //EventController
