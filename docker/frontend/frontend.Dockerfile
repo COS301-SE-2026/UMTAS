@@ -1,4 +1,4 @@
-FROM node:22-alpine AS base
+FROM node:26-alpine AS base
 WORKDIR /app
 RUN corepack enable
 
@@ -15,7 +15,7 @@ RUN pnpm --filter=shared-types build
 RUN pnpm --filter=frontend build
 RUN pnpm --filter=frontend deploy --prod --legacy /deploy
 
-FROM node:22-alpine AS runtime
+FROM node:26-alpine AS runtime
 WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
