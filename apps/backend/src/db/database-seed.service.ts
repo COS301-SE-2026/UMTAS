@@ -76,7 +76,7 @@ export class DatabaseSeedService {
   }
 
   private async seedDefaultSystemAdmin(): Promise<void> {
-    const seedUserId = 'seed-system-admin';
+    const seedUserId = '00000000-0000-0000-0000-000000000001'; //admin uuid
     const seedName =
       this.configService.get<string>('SEED_SYSTEM_ADMIN_NAME') ??
       'System Admin';

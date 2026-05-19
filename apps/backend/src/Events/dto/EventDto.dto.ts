@@ -1,22 +1,83 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsObject, IsOptional } from 'class-validator';
+import {
+  IsObject,
+  IsOptional,
+  IsEnum,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
+import { Type } from 'class-transformer';
 
-export class CreateEventDto {
+export enum EventType {
+  LECTURE = 'lecture',
+}
+
+export class EventCriteriaDto {
   @ApiPropertyOptional({
-    example: {
-      day: 'Monday',
-      startTime: '08:30',
-      endTime: '10:20',
-      type: 'lecture',
-      moduleCode: 'COS301',
-    },
-    description:
-      'Flexible JSON criteria used to describe or classify the event',
+    enum: EventType,
+    example: EventType.LECTURE,
   })
   @IsOptional()
-  @IsObject()
-  eventCriteria?: Record<string, unknown>;
+  @IsEnum(EventType)
+  type?: EventType;
+
+  @ApiProperty({ example: 'Monday' })
+  @IsString()
+  day!: string;
+
+  @ApiProperty({ example: '08:30' })
+  @IsString()
+  startTime!: string;
+
+  @ApiProperty({ example: '10:20' })
+  @IsString()
+  endTime!: string;
+
+  @ApiPropertyOptional({ example: 'COS301' })
+  @IsOptional()
+  @IsString()
+  moduleCode?: string;
+
+  @ApiPropertyOptional({ example: 'IT 2-26' })
+  @IsOptional()
+  @IsString()
+  venue!: string;
+}
+
+export class CreateEventDto {
+  @ApiProperty({
+    type: EventCriteriaDto,
+    description: 'Criteria for an event',
+  })
+  @ValidateNested()
+  @Type(() => EventCriteriaDto)
+  eventCriteria!: EventCriteriaDto;
 } //CreateEventDto
+
+export class EventDto {
+  @ApiProperty({ example: 1 })
+  eventID!: number;
+
+  @ApiProperty({ example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' })
+  userID!: string;
+
+  @ApiProperty({ type: EventCriteriaDto })
+  eventCriteria!: EventCriteriaDto;
+}
+
+export class LectureResponseDto {
+  @ApiProperty({ example: 1 })
+  lectureID!: number;
+
+  @ApiPropertyOptional({ example: 12, nullable: true })
+  moduleID!: number | null;
+
+  @ApiPropertyOptional({ example: 1, nullable: true })
+  eventID!: number | null;
+
+  @ApiPropertyOptional({ example: 'IT 2-26', nullable: true })
+  venue!: string | null;
+} //LectureResponseDto
 
 export class UpdateEventDto {
   @ApiPropertyOptional({
@@ -43,11 +104,13 @@ export class EventResponseDto {
         day: 'Monday',
         startTime: '08:30',
         endTime: '10:20',
-        type: 'lecture',
       },
     },
   })
-  event!: unknown;
+  event!: EventDto;
+
+  @ApiPropertyOptional({ type: LectureResponseDto })
+  lecture?: LectureResponseDto;
 } //event response
 
 export class EventListResponse {

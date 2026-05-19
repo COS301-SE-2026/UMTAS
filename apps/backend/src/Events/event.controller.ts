@@ -47,4 +47,7 @@ export class EventController {
   ) {
     return this.service.createEvent(session.user.id, dto);
   }
+
+  // @Get()
+  // @Roles('student')
 } //EventController

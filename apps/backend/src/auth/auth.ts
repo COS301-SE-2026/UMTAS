@@ -346,6 +346,9 @@ export function createAuth(input: CreateAuthInput): AuthInstance {
             data: Record<string, unknown>,
             ctx: Record<string, unknown> | null,
           ) => {
+            // generate uuid
+            if (!data.id) data.id = crypto.randomUUID();
+
             const contextObj = ctx?.context as
               | Record<string, unknown>
               | undefined;

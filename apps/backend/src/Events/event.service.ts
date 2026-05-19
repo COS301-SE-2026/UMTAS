@@ -2,11 +2,16 @@ import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
-// import { eq } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { DatabaseService } from '../db/database.service';
-import { Event } from '../entities/Events/index';
-import { CreateEventDto, EventResponseDto } from './dto/EventDto.dto';
+import { Event, LectureEv, modules } from '../entities/index';
+import {
+  CreateEventDto,
+  EventResponseDto,
+  EventType,
+} from './dto/EventDto.dto';
 
 @Injectable()
 export class EventService {
@@ -18,17 +23,77 @@ export class EventService {
   ): Promise<EventResponseDto> {
     if (!userId) throw new BadRequestException('User ID required');
 
-    const [newEvent] = await this.databaseService.db
-      .insert(Event)
+    const criteria = dto.eventCriteria;
+
+    this.validateEventTypeCriteria(criteria);
+
+    return await this.databaseService.db.transaction(async (tx) => {
+      const [newEvent] = await tx
+        .insert(Event)
+        .values({
+          userID: userId,
+          eventCriteria: dto.eventCriteria ?? null,
+        })
+        .returning();
+
+      if (!newEvent)
+        throw new InternalServerErrorException('Event was not created');
+
+      if (criteria.type !== EventType.LECTURE) return { event: newEvent };
+
+      const lecture = await this.createLectureForEvent(
+        tx,
+        newEvent.eventID,
+        criteria,
+      );
+
+      return { event: newEvent, lecture };
+    });
+  } //createEvent
+
+  //getAllEvents
+
+  //Helpers
+  private async createLectureForEvent(
+    tx: typeof this.databaseService.db,
+    eventID: number,
+    criteria: NonNullable<CreateEventDto['eventCriteria']>,
+  ) {
+    const [mod] = await tx
+      .select()
+      .from(modules)
+      .where(eq(modules.moduleCode, criteria.moduleCode!))
+      .limit(1);
+
+    if (!mod)
+      throw new NotFoundException(
+        `Module not found for code: ${criteria.moduleCode}`,
+      );
+
+    const [lec] = await tx
+      .insert(LectureEv)
       .values({
-        userID: userId,
-        eventCriteria: dto.eventCriteria ?? null,
+        moduleID: mod.moduleID,
+        eventID: eventID,
+        venue: criteria.venue ?? null,
       })
       .returning();
 
-    if (!newEvent)
-      throw new InternalServerErrorException('Event was not created');
+    if (!lec) throw new InternalServerErrorException('Lecture not created');
 
-    return { event: newEvent };
-  } //createEvent
+    return lec;
+  } //createLectureForEvent
+
+  private validateEventTypeCriteria(criteria: CreateEventDto['eventCriteria']) {
+    if (!criteria)
+      throw new BadRequestException('Criteria required to create event');
+
+    if (!criteria.type) return;
+
+    if (criteria.type !== EventType.LECTURE)
+      throw new BadRequestException('Only lectures right now');
+
+    if (!criteria.moduleCode)
+      throw new BadRequestException('Lecture Events need a moduleCode');
+  } //validateEvetTypeCriteria
 } //EventService
