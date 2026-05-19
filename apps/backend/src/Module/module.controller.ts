@@ -20,6 +20,7 @@ import { ApiBody, ApiResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { CurrentSession } from '../auth/session.decorator';
 import type { SessionData } from '../auth/session.decorator';
+import { Roles } from '../auth/roles.guard';
 
 @ApiTags('Modules')
 @Controller('modules')
@@ -29,6 +30,7 @@ export class ModuleController {
   //Create
   // @Public()
   @Post()
+  @Roles('student', 'uni_admin', 'sys_admin')
   @ApiOperation({ summary: 'Create a module' })
   @ApiBody({ type: CreateModuleDto })
   @ApiResponse({
@@ -54,6 +56,7 @@ export class ModuleController {
   //Get all
   // @Public()
   @Get()
+  @Roles('student', 'uni_admin', 'sys_admin')
   @ApiOperation({
     summary: 'Get all modules for the current user',
     operationId: 'getModules',
@@ -74,6 +77,7 @@ export class ModuleController {
   //Get by id
   // @Public()
   @Get(':moduleId')
+  @Roles('student', 'uni_admin', 'sys_admin')
   @ApiOperation({
     summary: 'Get a module by ID',
     operationId: 'getModuleById',
@@ -101,6 +105,7 @@ export class ModuleController {
   //Update
   // @Public()
   @Patch(':moduleId')
+  @Roles('student', 'uni_admin', 'sys_admin')
   @ApiOperation({
     summary: 'Update a module',
     operationId: 'updateModule',
@@ -133,6 +138,7 @@ export class ModuleController {
 
   // @Public()
   @Delete(':moduleId')
+  @Roles('student', 'uni_admin', 'sys_admin')
   @ApiOperation({
     summary: 'Delete a module by ID',
     operationId: 'deleteModule',
