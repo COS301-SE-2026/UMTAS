@@ -20,7 +20,7 @@ export class RequestBuilder<
   };
 
   protected setUrl(url: keyof paths): this {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+    const baseUrl = process.env.API_URL || "http://localhost:3000";
     const cleanBase = baseUrl.replace(/\/$/, "");
     const cleanPath = (url as string).replace(/^\//, "");
     this.url = `${cleanBase}/${cleanPath}`;

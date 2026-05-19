@@ -81,3 +81,16 @@ export class deleteModulesById extends RequestBuilder<
     this.setUrl("/modules/{moduleId}").setMethod(RequestMethod.DELETE);
   }
 }
+
+export type {
+  createModuleReq,
+  createModuleRes,
+  getAllModulesRes,
+  getModuleByIdReq,
+  getModuleByIdRes,
+  updateModuleByIdBody,
+  updateModuleByIdPath,
+  updateModuleByIdRes,
+  deleteModulesByIdRes,
+  deleteModulesByIdPath,
+};
