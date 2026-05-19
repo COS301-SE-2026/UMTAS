@@ -20,6 +20,7 @@
     "db:generate": "pnpm --filter backend db:generate",
     "db:migrate": "pnpm --filter backend db:migrate",
     "db:studio": "pnpm --filter backend db:studio",
+    "api:generate": "pnpm --filter frontend api:generate",
     "lint": "turbo run lint",
     "lint-staged": "lint-staged",
     "ci": "turbo run ci",
