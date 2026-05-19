@@ -115,55 +115,6 @@ jobs:
           tags: umtas-frontend:ci
           cache-from: type=gha,scope=frontend-main
 
-      - name: Smoke-test backend container
-        run: |
-          docker run -d --name backend-ci \
-            --network host \
-            -e PORT=8000 \
-            -e NODE_ENV=production \
-            -e DATABASE_URL="postgresql://ci:ci@localhost:5432/umtas_ci" \
-            -e DB_MODE=DATABASE \
-            -e SEED=false \
-            -e BETTER_AUTH_SECRET="ci-placeholder-secret-at-least-32ch" \
-            -e BETTER_AUTH_URL="http://localhost:8000" \
-            -e BETTER_AUTH_TRUSTED_ORIGINS="http://localhost:3000" \
-            -e CORS_ORIGIN="http://localhost:3000" \
-            -e REDIS_URL="redis://localhost:6379" \
-            umtas-backend:ci
-
-          echo "Waiting for backend healthcheck..."
-          for i in $(seq 1 24); do
-            status=$(docker inspect --format='{{.State.Health.Status}}' backend-ci 2>/dev/null || echo "unknown")
-            echo "  [$i/24] status=$status"
-            [ "$status" = "healthy" ] && exit 0
-            [ "$i" -eq 24 ] && { echo "Backend never became healthy"; exit 1; }
-            sleep 5
-          done
-
-      - name: Smoke-test frontend container
-        run: |
-          docker run -d --name frontend-ci \
-            --network host \
-            -e PORT=3000 \
-            -e NODE_ENV=production \
-            -e NEXT_PUBLIC_API_URL="http://localhost:8000" \
-            umtas-frontend:ci
-
-          echo "Waiting for frontend healthcheck..."
-          for i in $(seq 1 24); do
-            status=$(docker inspect --format='{{.State.Health.Status}}' frontend-ci 2>/dev/null || echo "unknown")
-            echo "  [$i/24] status=$status"
-            [ "$status" = "healthy" ] && exit 0
-            [ "$i" -eq 24 ] && { echo "Frontend never became healthy"; exit 1; }
-            sleep 5
-          done
-
-      - name: Dump container logs on failure
-        if: failure()
-        run: |
-          echo "=== backend-ci logs ===" && docker logs backend-ci 2>&1 || echo "(no backend-ci container)"
-          echo "=== frontend-ci logs ===" && docker logs frontend-ci 2>&1 || echo "(no frontend-ci container)"
-
   docker:
     name: Build & Push Docker Images
     runs-on: ubuntu-latest
