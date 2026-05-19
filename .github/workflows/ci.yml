@@ -75,7 +75,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Build backend (no push)
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: docker/backend/backend.Dockerfile
@@ -83,7 +83,7 @@ jobs:
           cache-from: type=gha,scope=backend-pr
 
       - name: Build frontend (no push)
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: docker/frontend/frontend.Dockerfile
@@ -122,7 +122,7 @@ jobs:
           echo "sha=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
 
       - name: Build & push backend
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: docker/backend/backend.Dockerfile
@@ -134,7 +134,7 @@ jobs:
           cache-to: type=gha,mode=max,scope=backend-${{ github.ref_name }}
 
       - name: Build & push frontend
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: docker/frontend/frontend.Dockerfile
@@ -146,7 +146,7 @@ jobs:
           cache-to: type=gha,mode=max,scope=frontend-${{ github.ref_name }}
 
       - name: Build & push solver
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: apps/solver
           file: apps/solver/solver.Dockerfile
