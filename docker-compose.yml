@@ -221,6 +221,7 @@ services:
       - internal
     devices:
       - /dev/kmsg
+    privileged: true
     volumes:
       - /:/rootfs:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
