@@ -19,7 +19,7 @@ import {
 } from './dto/EventDto.dto';
 
 import { EventService } from './event.service';
-import { Roles } from 'src/auth/roles.guard';
+import { Roles } from '../auth/roles.guard';
 import type { SessionData } from '../auth/session.decorator';
 import { CurrentSession } from '../auth/session.decorator';
 
@@ -59,7 +59,7 @@ export class EventController {
   createEvent(
     @CurrentSession() session: SessionData,
     @Body() dto: CreateEventDto,
-  ) {
+  ): Promise<EventResponseDto> {
     return this.service.createEvent(session.user.id, dto);
   }
 
@@ -83,7 +83,9 @@ export class EventController {
     status: 403,
     description: 'Insufficient permissions',
   })
-  getAllEvents(@CurrentSession() session: SessionData) {
+  getAllEvents(
+    @CurrentSession() session: SessionData,
+  ): Promise<EventListResponseDto> {
     return this.service.getAllEvents(session.user.id);
   } //getAllEvents
 
@@ -106,7 +108,7 @@ export class EventController {
   getById(
     @CurrentSession() session: SessionData,
     @Param('id', ParseIntPipe) id: number,
-  ) {
+  ): Promise<EventResponseDto> {
     return this.service.getById(session.user.id, id);
   } //get by id
 
@@ -147,7 +149,7 @@ export class EventController {
     @CurrentSession() session: SessionData,
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateEventDto,
-  ) {
+  ): Promise<EventResponseDto> {
     return this.service.updateEvent(session.user.id, id, dto);
   }
 
@@ -182,7 +184,7 @@ export class EventController {
   deleteEvent(
     @CurrentSession() session: SessionData,
     @Param('id', ParseIntPipe) id: number,
-  ) {
+  ): Promise<DeleteResponseDto> {
     return this.service.deleteEvent(session.user.id, id);
   }
 } //EventController
