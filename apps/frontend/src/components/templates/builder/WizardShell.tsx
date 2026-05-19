@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 import { WizardStepper } from "@/components/atoms/builder/WizardStepper";
 import { WizardFooter } from "@/components/atoms/builder/WizardFooter";
 import { ModulesStep } from "@/components/organisms/builder/ModulesStep";
@@ -17,8 +17,12 @@ const Steps = [
   { label: "Generate" },
 ];
 
-function generateId() {
-  return Math.random().toString(36).slice(2, 9);
+function generateId(): string {
+  const crypto = window.crypto;
+  const array = new Uint32Array(1);
+  crypto.getRandomValues(array);
+
+  return array[0].toString();
 }
 
 function emptyModule(): Module {

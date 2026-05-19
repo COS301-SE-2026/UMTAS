@@ -15,8 +15,12 @@ interface EventsPanelProps {
   onEventSelect: (id: string) => void;
 }
 
-function generateId() {
-  return Math.random().toString(36).slice(2, 9);
+function generateId(): string {
+  const crypto = window.crypto;
+  const array = new Uint32Array(1);
+  crypto.getRandomValues(array);
+
+  return array[0].toString();
 }
 
 export function emptyEvent(): BuilderEvent {
