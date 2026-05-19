@@ -69,10 +69,12 @@ export class updateModulesBuilder extends RequestBuilder<
 type deleteModulesByIdRes =
   paths["/modules/{moduleId}"]["delete"]["responses"]["200"]["content"]["application/json"];
 
+type deleteModulesByIdPath =
+  paths["/modules/{moduleId}"]["delete"]["parameters"]["path"];
 export class deleteModulesById extends RequestBuilder<
   undefined,
-  undefined,
-  deleteModulesById
+  deleteModulesByIdPath,
+  deleteModulesByIdRes
 > {
   constructor() {
     super();
