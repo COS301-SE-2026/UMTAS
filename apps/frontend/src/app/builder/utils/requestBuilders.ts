@@ -11,7 +11,17 @@ type getModuleByIdReq =
 type getModuleByIdRes =
   paths["/modules/{moduleId}"]["get"]["responses"]["200"]["content"]["application/json"]["module"];
 
+type updateModuleByIdBody =
+  paths["/modules/{moduleId}"]["patch"]["requestBody"]["content"]["application/json"];
+
+type updateModuleByIdPath =
+  paths["/modules/{moduleId}"]["patch"]["parameters"]["path"];
+
+type updateModuleByIdRes =
+  paths["/modules/{moduleId}"]["patch"]["responses"]["200"]["content"]["application/json"]["module"];
+
 export class createModulesBuilder extends RequestBuilder<
+  undefined,
   createModuleReq,
   createModuleRes
 > {
@@ -23,6 +33,7 @@ export class createModulesBuilder extends RequestBuilder<
 
 export class getAllModulesBuilder extends RequestBuilder<
   undefined,
+  undefined,
   getAllModulesRes
 > {
   constructor() {
@@ -32,12 +43,23 @@ export class getAllModulesBuilder extends RequestBuilder<
 }
 
 export class getModulesByIdBuilder extends RequestBuilder<
+  getModuleByIdReq,
   undefined,
-  getModuleByIdRes,
-  getModuleByIdReq
+  getModuleByIdRes
 > {
   constructor() {
     super();
     this.setUrl("/modules/{moduleId}").setMethod(RequestMethod.GET);
+  }
+}
+
+export class updateModules extends RequestBuilder<
+  updateModuleByIdPath,
+  updateModuleByIdBody,
+  updateModuleByIdRes
+> {
+  constructor() {
+    super();
+    this.setUrl("/modules/{moduleId}").setMethod(RequestMethod.PATCH);
   }
 }

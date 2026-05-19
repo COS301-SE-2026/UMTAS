@@ -1,21 +1,28 @@
+import { paths } from "../src/lib/api";
+
 enum RequestMethod {
   GET = "GET",
   POST = "POST",
   PUT = "PUT",
   DELETE = "DELETE",
+  PATCH = "PATCH",
 }
 
-export class RequestBuilder<RequestType, ResponseType, PathType = undefined> {
+export class RequestBuilder<
+  PathType = undefined,
+  RequestType = undefined,
+  ResponseType = undefined,
+> {
   private url: string = "";
   private method: RequestMethod = RequestMethod.GET;
   private headers: Record<string, string> = {
     "Content-Type": "application/json",
   };
 
-  protected setUrl(url: string): this {
+  protected setUrl(url: keyof paths): this {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
     const cleanBase = baseUrl.replace(/\/$/, "");
-    const cleanPath = url.replace(/^\//, "");
+    const cleanPath = (url as string).replace(/^\//, "");
     this.url = `${cleanBase}/${cleanPath}`;
     return this;
   }
@@ -43,6 +50,7 @@ export class RequestBuilder<RequestType, ResponseType, PathType = undefined> {
     const methodsRequiringBody: RequestMethod[] = [
       RequestMethod.POST,
       RequestMethod.PUT,
+      RequestMethod.PATCH,
     ];
 
     if (methodsRequiringBody.includes(this.method) && body === undefined) {
