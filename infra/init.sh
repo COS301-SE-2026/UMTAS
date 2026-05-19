@@ -253,6 +253,7 @@ MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
 
 # ─── Cache (Redis) ────────────────────────────────────────
 REDIS_PASSWORD=${REDIS_PASSWORD}
+REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379
 
 # ─── Monitoring (Grafana) ─────────────────────────────────
 GRAFANA_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
