@@ -8,12 +8,13 @@ import {
   uniqueIndex,
   integer,
   bigint,
+  uuid,
 } from 'drizzle-orm/pg-core';
 
 export const usersTable = pgTable(
   'user',
   {
-    id: text('id').primaryKey(),
+    id: uuid('id').primaryKey().defaultRandom(),
     name: text('name').notNull(),
     email: text('email').notNull(),
     emailVerified: boolean('emailVerified').notNull().default(false),
@@ -40,7 +41,7 @@ export const sessionsTable = pgTable(
   {
     id: text('id').primaryKey(),
     token: text('token').notNull(),
-    userId: text('userId')
+    userId: uuid('userId')
       .notNull()
       .references(() => usersTable.id, { onDelete: 'cascade' }),
     expiresAt: timestamp('expiresAt', { withTimezone: true }).notNull(),
@@ -67,7 +68,7 @@ export const accountsTable = pgTable(
     id: text('id').primaryKey(),
     accountId: text('accountId').notNull(),
     providerId: text('providerId').notNull(),
-    userId: text('userId')
+    userId: uuid('userId')
       .notNull()
       .references(() => usersTable.id, { onDelete: 'cascade' }),
     accessToken: text('accessToken'),
