@@ -16,7 +16,7 @@
     "build": "turbo run build",
     "update": "pnpm update -r",
     "sync": "docker compose down -v && docker compose up -d postgres redis minio mailhog && sleep 5 && pnpm install && pnpm db:migrate",
-    "reset": "docker compose down -v && docker compose up -d postgres redis minio mailhog && sleep 5 && pnpm install && rm -rf apps/backend/drizzle && pnpm db:generate && pnpm db:migrate",
+    "reset": "docker compose down -v && docker compose up -d postgres redis minio mailhog && sleep 5 && pnpm install && rm -rf apps/backend/drizzle && pnpm db:generate && sleep 5 && pnpm db:migrate",
     "db:generate": "pnpm --filter backend db:generate",
     "db:migrate": "pnpm --filter backend db:migrate",
     "db:studio": "pnpm --filter backend db:studio",

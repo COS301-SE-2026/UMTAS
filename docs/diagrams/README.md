@@ -102,11 +102,14 @@ This section contains all architectural and system diagrams for the UMTAS platfo
 
 ## :material-clipboard-list: Requirements & Use Cases { #requirements-use-cases }
 
-| Diagram                                                            | Description                                                |
-| ------------------------------------------------------------------ | ---------------------------------------------------------- |
-| [System Context Diagram](requirements/System-Context-Diagram.md)   | High-level system interaction overview (External Entities) |
-| [Student Use Cases](requirements/Student-Use-Cases.md)             | Student interaction flows and requirements                 |
-| [Admin Use Cases](requirements/Admin-Use-Cases.md)                 | Administrative management flows                            |
+| Diagram                                                                        | Description                                                |
+| ------------------------------------------------------------------------------ | ---------------------------------------------------------- |
+| [Authentication System](requirements/Authentication-System.md)                 | User identity and access control flows                     |
+| [Timetable Management System](requirements/Timetable-Management-System.md)     | Manual and automated timetable generation                  |
+| [Timetable Import System](requirements/Timetable-Import-System.md)             | External source (PDF/API) ingestion logic                  |
+| [Calendar Integration System](requirements/Calender-Integration-System.md)     | Export to Google Calendar and .ics file flows              |
+| [University Analytics System](requirements/University-Analytics-System.md)     | Administrative reporting and demand forecasting            |
+| [Tyto Simulation System](requirements/Tyto-Simulation-System.md)               | Large-scale performance and scalability simulations        |
 
 ---
 

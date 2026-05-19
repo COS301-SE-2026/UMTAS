@@ -10,6 +10,7 @@ import { AuthController } from './auth/auth.controller';
 import { AuthService } from './auth/auth.service';
 import { AuthGuard } from './auth/auth.guard';
 import { RolesGuard } from './auth/roles.guard';
+import { ModuleModule } from './Module/module.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { RolesGuard } from './auth/roles.guard';
     DatabaseModule,
     HealthModule,
     MailModule,
+    ModuleModule,
   ],
   controllers: [AppController, AuthController],
   providers: [
