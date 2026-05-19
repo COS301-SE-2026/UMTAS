@@ -1,10 +1,9 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import type { RequestWithSession } from './auth.guard';
 
-type UUID = string & { readonly __brand: 'UUID' };
 export interface SessionData {
   user: {
-    id: UUID;
+    id: string;
     name: string;
     email: string;
     emailVerified: boolean;
