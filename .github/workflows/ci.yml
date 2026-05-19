@@ -160,8 +160,8 @@ jobs:
       - name: Dump container logs on failure
         if: failure()
         run: |
-          docker logs backend-ci 2>/dev/null || true
-          docker logs frontend-ci 2>/dev/null || true
+          echo "=== backend-ci logs ===" && docker logs backend-ci 2>&1 || echo "(no backend-ci container)"
+          echo "=== frontend-ci logs ===" && docker logs frontend-ci 2>&1 || echo "(no frontend-ci container)"
 
   docker:
     name: Build & Push Docker Images
