@@ -123,6 +123,7 @@ services:
       - gateway
     environment:
       - NEXT_PUBLIC_API_URL=https://api.${DOMAIN}
+      - API_URL=https://api.${DOMAIN}
     profiles:
       - dev-docker
       - dev-pglite

@@ -79,7 +79,7 @@ services:
       - WATCHTOWER_HTTP_API_TOKEN=${WATCHTOWER_HTTP_API_TOKEN}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-    command: --schedule "0 */5 * * * *" --cleanup
+    command: --schedule "0/30 * * * * *" --cleanup
     profiles:
       - server
 
