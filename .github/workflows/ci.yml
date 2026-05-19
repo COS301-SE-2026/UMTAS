@@ -67,6 +67,27 @@ jobs:
     permissions:
       contents: read
 
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: umtas_ci
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -74,21 +95,73 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build backend (no push)
+      - name: Build backend image
         uses: docker/build-push-action@v6
         with:
           context: .
           file: docker/backend/backend.Dockerfile
           push: false
-          cache-from: type=gha,scope=backend-pr
+          load: true
+          tags: umtas-backend:ci
+          cache-from: type=gha,scope=backend-main
 
-      - name: Build frontend (no push)
+      - name: Build frontend image
         uses: docker/build-push-action@v6
         with:
           context: .
           file: docker/frontend/frontend.Dockerfile
           push: false
-          cache-from: type=gha,scope=frontend-pr
+          load: true
+          tags: umtas-frontend:ci
+          cache-from: type=gha,scope=frontend-main
+
+      - name: Smoke-test backend container
+        run: |
+          docker run -d --name backend-ci \
+            --network host \
+            -e PORT=8000 \
+            -e NODE_ENV=production \
+            -e DATABASE_URL="postgresql://ci:ci@localhost:5432/umtas_ci" \
+            -e DB_MODE=postgres \
+            -e SEED=false \
+            -e BETTER_AUTH_SECRET="ci-placeholder-secret-at-least-32ch" \
+            -e BETTER_AUTH_URL="http://localhost:8000" \
+            -e BETTER_AUTH_TRUSTED_ORIGINS="http://localhost:3000" \
+            -e CORS_ORIGIN="http://localhost:3000" \
+            umtas-backend:ci
+
+          echo "Waiting for backend healthcheck..."
+          for i in $(seq 1 24); do
+            status=$(docker inspect --format='{{.State.Health.Status}}' backend-ci 2>/dev/null || echo "unknown")
+            echo "  [$i/24] status=$status"
+            [ "$status" = "healthy" ] && exit 0
+            [ "$i" -eq 24 ] && { echo "Backend never became healthy"; exit 1; }
+            sleep 5
+          done
+
+      - name: Smoke-test frontend container
+        run: |
+          docker run -d --name frontend-ci \
+            --network host \
+            -e PORT=3000 \
+            -e NODE_ENV=production \
+            -e NEXT_PUBLIC_API_URL="http://localhost:8000" \
+            umtas-frontend:ci
+
+          echo "Waiting for frontend healthcheck..."
+          for i in $(seq 1 24); do
+            status=$(docker inspect --format='{{.State.Health.Status}}' frontend-ci 2>/dev/null || echo "unknown")
+            echo "  [$i/24] status=$status"
+            [ "$status" = "healthy" ] && exit 0
+            [ "$i" -eq 24 ] && { echo "Frontend never became healthy"; exit 1; }
+            sleep 5
+          done
+
+      - name: Dump container logs on failure
+        if: failure()
+        run: |
+          docker logs backend-ci 2>/dev/null || true
+          docker logs frontend-ci 2>/dev/null || true
 
   docker:
     name: Build & Push Docker Images
