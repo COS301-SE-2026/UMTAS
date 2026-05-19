@@ -13,7 +13,7 @@ COPY packages/shared-types/ ./packages/shared-types/
 COPY apps/frontend/ ./apps/frontend/
 RUN pnpm --filter=shared-types build
 RUN pnpm --filter=frontend build
-RUN pnpm --filter=frontend deploy --prod --legacy /deploy
+RUN pnpm --filter=frontend deploy --prod --legacy /deploy && cp -r apps/frontend/.next /deploy/.next
 
 FROM node:22-alpine AS runtime
 WORKDIR /app
