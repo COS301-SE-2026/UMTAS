@@ -1,10 +1,9 @@
 "use client";
 
 import React from "react";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, MoveRight } from "lucide-react";
 import { Button } from "@/components/atoms/baseShadcn/button";
 import { Separator } from "@/components/atoms/baseShadcn/separator";
-import { MoveRight } from "lucide-react";
 
 interface WizardFooterProps {
   onBack?: () => void;
@@ -30,9 +29,9 @@ export function WizardFooter({
         variant="ghost"
         size="default"
         onClick={onBack}
-        className="flex items-center gap-1.5 text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+        className="flex items-center gap-2 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-[var(--duration-fast)]"
       >
-        <ArrowLeft size={14} />
+        <ArrowLeft size={16} strokeWidth={1.5} />
         Back
       </Button>
     );
@@ -41,7 +40,7 @@ export function WizardFooter({
   return (
     <div className="border-t border-[var(--border)] bg-[var(--bg-base)]">
       <Separator />
-      <div className="flex items-center justify-between px-6 py-3">
+      <div className="flex items-center justify-between px-8 py-4">
         <div>{renderBackButton()}</div>
 
         <Button
@@ -49,10 +48,10 @@ export function WizardFooter({
           size="default"
           disabled={nextDisabled}
           onClick={onNext}
-          className="flex items-center gap-1.5 bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] hover:bg-[var(--btn-primary-hover)] disabled:opacity-40"
+          className="flex items-center gap-2 text-sm bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] hover:bg-[var(--btn-primary-hover)] disabled:opacity-40 transition-colors duration-[var(--duration-fast)]"
         >
           {nextLabel}
-          <MoveRight size={14} />
+          <MoveRight size={16} strokeWidth={1.5} />
         </Button>
       </div>
     </div>
