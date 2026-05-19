@@ -6,6 +6,7 @@ import {
   Get,
   ParseIntPipe,
   Patch,
+  Delete,
 } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
@@ -14,6 +15,7 @@ import {
   EventResponseDto,
   EventListResponseDto,
   UpdateEventDto,
+  DeleteResponseDto,
 } from './dto/EventDto.dto';
 
 import { EventService } from './event.service';
@@ -147,5 +149,40 @@ export class EventController {
     @Body() dto: UpdateEventDto,
   ) {
     return this.service.updateEvent(session.user.id, id, dto);
+  }
+
+  //delete
+  @Delete(':id')
+  @Roles('student')
+  @ApiOperation({
+    summary: 'Delete an event',
+    operationId: 'deleteEvent',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Event deleted successfully',
+    type: DeleteResponseDto,
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'No active session',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Insufficient permissions',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Event not found',
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Event was not deleted',
+  })
+  deleteEvent(
+    @CurrentSession() session: SessionData,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.service.deleteEvent(session.user.id, id);
   }
 } //EventController

@@ -13,6 +13,7 @@ import {
   EventType,
   EventListResponseDto,
   UpdateEventDto,
+  DeleteResponseDto,
 } from './dto/EventDto.dto';
 
 import { AppDatabase } from '../db/database.service';
@@ -151,6 +152,30 @@ export class EventService {
       };
     });
   } //udpate
+
+  async deleteEvent(
+    userId: string,
+    eventId: number,
+  ): Promise<DeleteResponseDto> {
+    const [existingEvent] = await this.databaseService.db
+      .select()
+      .from(Event)
+      .where(and(eq(Event.eventID, eventId), eq(Event.userID, userId)))
+      .limit(1);
+
+    if (!existingEvent)
+      throw new NotFoundException(`Event not found for id: ${eventId}`);
+
+    const [delEvent] = await this.databaseService.db
+      .delete(Event)
+      .where(and(eq(Event.eventID, eventId), eq(Event.userID, userId)))
+      .returning();
+
+    if (!delEvent)
+      throw new InternalServerErrorException('Event was not deleted');
+
+    return { success: true };
+  } //delete
 
   //=======================================================
   //Helpers
