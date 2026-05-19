@@ -374,7 +374,7 @@
   "timepicker": {},
   "timezone": "",
   "title": "Node Exporter",
-  "uid": "node-exporter",
+  "uid": "node-exporter-host",
   "version": 1,
   "weekStart": ""
 }

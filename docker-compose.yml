@@ -128,7 +128,7 @@ services:
       - server
 
   grafana:
-    image: grafana/grafana:9.5.2
+    image: grafana/grafana:10.4.3
     restart: unless-stopped
     networks:
       - gateway
@@ -203,6 +203,7 @@ services:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
       - /:/rootfs:ro
+      - /run/udev:/run/udev:ro
     command:
       - "--path.procfs=/host/proc"
       - "--path.rootfs=/rootfs"
@@ -225,7 +226,7 @@ services:
     command:
       - "--docker_only=true"
       - "--store_container_labels=true"
-      - "--disable_metrics=accelerator,advtcp,app,cpu,cpuLoad,cpu_topology,diskIO,hugetlb,memory,memory_numa,network,oom_event,percpu,perf_event,process,referenced_memory,resctrl,sched,tcp,udp"
+      - "--disable_metrics=advtcp,app,cpu,cpuLoad,diskIO,hugetlb,memory,network,oom_event,percpu,perf_event,process,referenced_memory,resctrl,sched,tcp,udp"
     labels:
       - "com.centurylinklabs.watchtower.enable=false"
     profiles:
