@@ -107,6 +107,7 @@ services:
       - CORS_ORIGIN=https://${DOMAIN}
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - REDIS_URL=${REDIS_URL}
       - SYSTEM_ADMIN_USER_IDS=${SYSTEM_ADMIN_USER_IDS}
     profiles:
       - dev-docker
