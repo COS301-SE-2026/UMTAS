@@ -11,10 +11,15 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions: {}
+
 jobs:
   ci:
     name: Lint, Build & Test
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write
     env:
       NEXT_TELEMETRY_DISABLED: 1
 
@@ -59,6 +64,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: ci
     if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout code
@@ -88,6 +95,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: ci
     if: github.event_name == 'push'
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout code
@@ -153,6 +162,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: docker
     if: github.event_name == 'push' && github.ref_name == 'main'
+    permissions: {}
 
     steps:
       - name: Wait for Watchtower redeploy
@@ -193,6 +203,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: docker
     if: always() && github.ref_name == 'dev'
+    permissions: {}
 
     steps:
       - name: Send Discord notification
