@@ -488,14 +488,14 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "prometheus" },
-          "expr": "docker_container_health",
+          "expr": "docker_container_health and on(container) (docker_container_running == 1)",
           "format": "table",
           "instant": true,
           "refId": "A"
         },
         {
           "datasource": { "type": "prometheus", "uid": "prometheus" },
-          "expr": "docker_container_restart_count",
+          "expr": "docker_container_restart_count and on(container) (docker_container_running == 1)",
           "format": "table",
           "instant": true,
           "refId": "B"
