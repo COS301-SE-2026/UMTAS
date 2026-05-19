@@ -115,8 +115,8 @@ services:
 
   frontend:
     build:
-      context: ./apps/frontend
-      dockerfile: ../../docker/frontend/frontend.Dockerfile
+      context: .
+      dockerfile: docker/frontend/frontend.Dockerfile
     image: ${DOCKER_REGISTRY}:frontend-dev
     networks:
       - gateway

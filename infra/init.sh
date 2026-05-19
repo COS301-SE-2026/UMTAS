@@ -97,7 +97,8 @@ setup_infra() {
     prompt_required TRAEFIK_DASHBOARD_CREDENTIALS "Traefik dashboard credentials (htpasswd hash)"
     prompt_required DOCKERHUB_USERNAME "Docker Hub username"
     prompt_required DOCKERHUB_TOKEN "Docker Hub access token"
-    prompt_optional WATCHTOWER_DISCORD_URL "Watchtower Discord webhook URL"
+    printf "${YELLOW}Hint: Shoutrrr format — discord://TOKEN@WEBHOOK_ID (not the https:// URL)${RESET}\n"
+    prompt_optional WATCHTOWER_DISCORD_URL "Watchtower Discord webhook URL (discord://TOKEN@WEBHOOK_ID)"
 }
 
 setup_app() {
