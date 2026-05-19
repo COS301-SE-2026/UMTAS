@@ -9,12 +9,10 @@ This page contains the interactive documentation for the UMTAS APIs (NestJS Core
 
 ## :material-rocket-launch: UMTAS Core API (NestJS)
 
-<swagger-ui src="https://petstore.swagger.io/v2/swagger.json" />
+<swagger-ui src="https://api.capstone-vigil.dns.net.za/api-docs-json" />
 
 ---
 
-<!-- ## :material-robot: PDF Parser & Solver API (FastAPI)
+## :material-robot: PDF Parser & Solver API (FastAPI)
 
-> :material-construction: **Placeholder**: Replace the `src` below with your local `openapi.json` once generated.
-
-<swagger-ui src="https://petstore.swagger.io/v2/swagger.json" /> -->
+<swagger-ui src="https://solver.capstone-vigil.dns.net.za/openapi.json" />

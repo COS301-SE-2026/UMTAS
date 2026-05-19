@@ -2,3 +2,4 @@ fastapi
 uvicorn
 ortools
 pdfplumber
+prometheus-fastapi-instrumentator

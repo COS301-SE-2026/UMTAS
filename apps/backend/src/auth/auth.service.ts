@@ -5,8 +5,8 @@ import { MailerService } from '../mail/mailer.service';
 import * as appSchema from '../db/schema';
 import { createRedisClient } from '../redis/redis';
 import type { AuthInstance } from './auth';
-import { DatabaseService } from '../db/database.service.js';
-import { createAuth } from './auth.js';
+import { DatabaseService } from '../db/database.service';
+import { createAuth } from './auth';
 
 @Injectable()
 export class AuthService implements OnModuleInit {

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
 // jest.mock hoisted to top by Jest to stub better-auth/node
 jest.mock('better-auth/node', () => ({
   toNodeHandler: (h: unknown) => h,
