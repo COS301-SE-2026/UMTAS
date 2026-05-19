@@ -1,23 +1,14 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
+import { useState, useEffect } from "react";
 
 export default function BrandPage() {
-  const mounted = useSyncExternalStore(
-    () => () => {},
-    () => true,
-    () => false,
-  );
-  const [theme, setTheme] = useState<"light" | "dark">(() => {
-    if (typeof window === "undefined") return "light";
-    return (
-      (document.documentElement.getAttribute("data-theme") as
-        | "light"
-        | "dark") ?? "light"
-    );
+  const [theme, setTheme] = useState<string | null>(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("theme");
+    }
+    return null;
   });
-
-  if (!mounted) return null;
 
   function toggleTheme() {
     const next = theme === "light" ? "dark" : "light";

@@ -5,12 +5,15 @@ import { LogOut } from "lucide-react";
 import { UserAvatar } from "@/components/atoms/nav/UserAvatar";
 import { ThemeToggle } from "@/components/atoms/auth/ThemeToggle";
 import { Button } from "@/components/atoms/baseShadcn/button";
-import { signOut, useSession } from "@/../utilities/auth-client";
+import { signOut } from "@/../utilities/auth-client";
 
-export function NavUser() {
+interface NavUserProps {
+  name?: string | null;
+  email?: string | null;
+}
+
+export function NavUser({ name, email }: NavUserProps) {
   const router = useRouter();
-  const { data: session } = useSession();
-  const name = session?.user?.name ?? null;
 
   async function handleSignOut() {
     await signOut({

@@ -2,12 +2,6 @@
  * /auth-callback page - renders while auth happens
  *
  * BetterAuth handles the actual token exchange at GET /api/auth/callback/google.
- *
- * This is NOT a BetterAuth route. It is the frontend loading screen only.
- * Route the user here by setting callbackURL="/auth-callback" in the signIn
- * calls if a distinct loading screen is preferred over direct /dashboard
- * redirect. Currently signIn.social points directly at /dashboard which is
- * the simpler approach.
  */
 
 "use client";

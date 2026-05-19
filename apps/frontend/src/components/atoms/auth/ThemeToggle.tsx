@@ -1,31 +1,33 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
+import React, { useEffect, useState } from "react";
 import { Sun, Moon } from "lucide-react";
 import { Button } from "@/components/atoms/baseShadcn/button";
 
 export function ThemeToggle() {
-  const mounted = useSyncExternalStore(
-    () => () => {},
-    () => true,
-    () => false,
-  );
-  const [isDark, setIsDark] = useState(() => {
-    if (typeof window === "undefined") return false;
-    return document.documentElement.getAttribute("data-theme") === "dark";
+  const [isDark, setIsDark] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("umtas-theme");
+      const prefersDark = window.matchMedia(
+        "(prefers-color-scheme: dark)",
+      ).matches;
+      return stored === "dark" || (!stored && prefersDark);
+    }
+    return false;
   });
+
+  useEffect(() => {
+    document.documentElement.setAttribute(
+      "data-theme",
+      isDark ? "dark" : "light",
+    );
+  }, [isDark]);
 
   function toggle() {
     const next = !isDark;
     setIsDark(next);
-    document.documentElement.setAttribute(
-      "data-theme",
-      next ? "dark" : "light",
-    );
     localStorage.setItem("umtas-theme", next ? "dark" : "light");
   }
-
-  if (!mounted) return null;
 
   return (
     <Button
