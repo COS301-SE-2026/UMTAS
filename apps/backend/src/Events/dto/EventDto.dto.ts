@@ -10,7 +10,7 @@ import { Type } from 'class-transformer';
 
 export enum EventType {
   LECTURE = 'lecture',
-}
+} //event type
 
 export class EventCriteriaDto {
   @ApiPropertyOptional({
@@ -42,7 +42,7 @@ export class EventCriteriaDto {
   @IsOptional()
   @IsString()
   venue!: string;
-}
+} //EventCriteriaDto
 
 export class CreateEventDto {
   @ApiProperty({
@@ -63,20 +63,20 @@ export class EventDto {
 
   @ApiProperty({ type: EventCriteriaDto })
   eventCriteria!: EventCriteriaDto;
-}
+} //EventDto
 
 export class LectureResponseDto {
   @ApiProperty({ example: 1 })
   lectureID!: number;
 
-  @ApiPropertyOptional({ example: 12, nullable: true })
+  @ApiProperty({ example: 12, nullable: true })
   moduleID!: number | null;
 
-  @ApiPropertyOptional({ example: 1, nullable: true })
+  @ApiProperty({ example: 1, nullable: true })
   eventID!: number | null;
 
   @ApiPropertyOptional({ example: 'IT 2-26', nullable: true })
-  venue!: string | null;
+  venue?: string | null;
 } //LectureResponseDto
 
 export class UpdateEventDto {
@@ -115,10 +115,10 @@ export class EventResponseDto {
 
 export class EventListResponse {
   @ApiProperty({
-    type: [Object],
-    description: 'List of events',
+    type: [EventResponseDto],
+    description: 'List of events with optional lecture details',
   })
-  events!: unknown[];
+  events!: EventResponseDto[];
 } //event list
 
 export class DeleteResponseDto {

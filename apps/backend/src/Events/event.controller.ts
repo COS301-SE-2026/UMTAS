@@ -1,7 +1,11 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, Get } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import { CreateEventDto, EventResponseDto } from './dto/EventDto.dto';
+import {
+  CreateEventDto,
+  EventResponseDto,
+  EventListResponse,
+} from './dto/EventDto.dto';
 
 import { EventService } from './event.service';
 import { Roles } from 'src/auth/roles.guard';
@@ -48,6 +52,27 @@ export class EventController {
     return this.service.createEvent(session.user.id, dto);
   }
 
-  // @Get()
-  // @Roles('student')
+  //get All
+  @Get()
+  @Roles('student')
+  @ApiOperation({
+    summary: 'Get all events',
+    operationId: 'getAllEvents',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Events fetched successfully',
+    type: EventListResponse,
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'No active session',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Insufficient permissions',
+  })
+  getAllEvents(@CurrentSession() session: SessionData) {
+    return this.service.getAllEvents(session.user.id);
+  } //getAllEvents
 } //EventController

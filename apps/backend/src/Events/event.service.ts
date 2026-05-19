@@ -11,6 +11,7 @@ import {
   CreateEventDto,
   EventResponseDto,
   EventType,
+  EventListResponse,
 } from './dto/EventDto.dto';
 
 @Injectable()
@@ -52,6 +53,23 @@ export class EventService {
   } //createEvent
 
   //getAllEvents
+  async getAllEvents(userId: string): Promise<EventListResponse> {
+    const r = await this.databaseService.db
+      .select({
+        event: Event,
+        lecture: LectureEv,
+      })
+      .from(Event)
+      .leftJoin(LectureEv, eq(LectureEv.eventID, Event.eventID))
+      .where(eq(Event.userID, userId));
+
+    return {
+      events: r.map((r) => ({
+        event: r.event as EventResponseDto['event'],
+        ...(r.lecture ? { lecture: r.lecture } : {}),
+      })),
+    };
+  } //getAllEvents
 
   //Helpers
   private async createLectureForEvent(
