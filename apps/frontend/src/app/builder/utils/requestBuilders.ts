@@ -32,8 +32,9 @@ export class getAllModulesBuilder extends RequestBuilder<
 }
 
 export class getModulesByIdBuilder extends RequestBuilder<
-  getModuleByIdReq,
-  getModuleByIdRes
+  undefined,
+  getModuleByIdRes,
+  getModuleByIdReq
 > {
   constructor() {
     super();

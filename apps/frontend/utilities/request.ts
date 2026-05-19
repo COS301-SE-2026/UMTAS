@@ -35,7 +35,11 @@ export class RequestBuilder<RequestType, ResponseType, PathType = undefined> {
     return this;
   }
 
-  public async send(body?: RequestType): Promise<ResponseType> {
+  public async send(args: {
+    paths?: PathType;
+    body?: RequestType;
+  }): Promise<ResponseType> {
+    const { paths, body } = args;
     const methodsRequiringBody: RequestMethod[] = [
       RequestMethod.POST,
       RequestMethod.PUT,
@@ -47,24 +51,20 @@ export class RequestBuilder<RequestType, ResponseType, PathType = undefined> {
 
     let finalUrl = this.url;
 
-    if (this.method === RequestMethod.GET && body !== undefined) {
-      const params = new URLSearchParams();
-      Object.entries(body as Record<string, string | number | boolean>).forEach(
+    if (paths) {
+      Object.entries(paths as Record<string, string>).forEach(
         ([key, value]) => {
-          params.append(key, String(value));
+          finalUrl = finalUrl.split(`{${key}}`).join(String(value));
+          finalUrl = finalUrl.split(`:${key}`).join(String(value));
         },
       );
-      finalUrl += `?${params.toString()}`;
     }
 
     const response = await fetch(finalUrl, {
       method: this.method,
       headers: this.headers,
       credentials: "include",
-      body:
-        this.method !== RequestMethod.GET && body !== undefined
-          ? JSON.stringify(body)
-          : undefined,
+      body: body !== undefined ? JSON.stringify(body) : undefined,
     });
 
     if (!response.ok) {
