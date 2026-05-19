@@ -21,13 +21,13 @@ export class AuthSeed implements ISeedMigration {
   name = 'auth-seed';
   private readonly logger = new Logger('AuthSeed');
 
-  // Test user IDs (use consistent IDs for reliable testing)
+  // Test user IDs (use consistent UUIDs for reliable testing)
   private readonly testUserIds = {
-    student: 'test-student-001',
-    studentTwo: 'test-student-002',
-    lecturer: 'test-lecturer-001',
-    uniAdmin: 'test-uni-admin-001',
-    sysAdmin: 'test-sys-admin-001',
+    student: '550e8400-e29b-41d4-a716-446655440001',
+    studentTwo: '550e8400-e29b-41d4-a716-446655440002',
+    lecturer: '550e8400-e29b-41d4-a716-446655440003',
+    uniAdmin: '550e8400-e29b-41d4-a716-446655440004',
+    sysAdmin: '550e8400-e29b-41d4-a716-446655440005',
   };
 
   private readonly testSessionIds = {

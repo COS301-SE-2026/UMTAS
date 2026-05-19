@@ -2,7 +2,7 @@ CREATE TABLE "account" (
 	"id" text PRIMARY KEY NOT NULL,
 	"accountId" text NOT NULL,
 	"providerId" text NOT NULL,
-	"userId" text NOT NULL,
+	"userId" uuid NOT NULL,
 	"accessToken" text,
 	"refreshToken" text,
 	"idToken" text,
@@ -24,7 +24,7 @@ CREATE TABLE "rateLimit" (
 CREATE TABLE "session" (
 	"id" text PRIMARY KEY NOT NULL,
 	"token" text NOT NULL,
-	"userId" text NOT NULL,
+	"userId" uuid NOT NULL,
 	"expiresAt" timestamp with time zone NOT NULL,
 	"ipAddress" text,
 	"userAgent" text,
@@ -34,7 +34,7 @@ CREATE TABLE "session" (
 );
 --> statement-breakpoint
 CREATE TABLE "user" (
-	"id" text PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" text NOT NULL,
 	"email" text NOT NULL,
 	"emailVerified" boolean DEFAULT false NOT NULL,
