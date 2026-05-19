@@ -15,6 +15,10 @@ describe('ModuleController', () => {
     userID: '550e8400-e29b-41d4-a716-446655440000',
   };
 
+  const session = {
+    user: { id: '550e8400-e29b-41d4-a716-446655440000' },
+  } as any;
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ModuleController],
@@ -42,37 +46,36 @@ describe('ModuleController', () => {
       name: 'Computer Networks',
       description: 'Networks module',
       styling: '#3B82F6',
-      userId: 'user-id',
-    };
+    } as any;
 
     service.create.mockResolvedValue({ module: mockModule });
 
-    await expect(controller.createModule(dto)).resolves.toEqual({
+    await expect(controller.createModule(dto, session)).resolves.toEqual({
       module: mockModule,
     });
 
-    expect(service.create).toHaveBeenCalledWith(dto);
-  }); //create
+    expect(service.create).toHaveBeenCalledWith(session.user.id, dto);
+  });
 
   it('should return all modules', async () => {
     service.getAll.mockResolvedValue({ modules: [mockModule] });
 
-    await expect(controller.getAll()).resolves.toEqual({
+    await expect(controller.getAll(session)).resolves.toEqual({
       modules: [mockModule],
     });
 
-    expect(service.getAll).toHaveBeenCalled();
-  }); //get all
+    expect(service.getAll).toHaveBeenCalledWith(session.user.id);
+  });
 
   it('should return one module', async () => {
     service.getById.mockResolvedValue({ module: mockModule });
 
-    await expect(controller.getById(1)).resolves.toEqual({
+    await expect(controller.getById(session, 1)).resolves.toEqual({
       module: mockModule,
     });
 
-    expect(service.getById).toHaveBeenCalledWith(1);
-  }); //get one module
+    expect(service.getById).toHaveBeenCalledWith(session.user.id, 1);
+  });
 
   it('should update a module', async () => {
     const dto = { name: 'Updated Networks' };
@@ -81,20 +84,20 @@ describe('ModuleController', () => {
       module: { ...mockModule, moduleName: 'Updated Networks' },
     });
 
-    await expect(controller.update(1, dto)).resolves.toEqual({
+    await expect(controller.update(session, 1, dto)).resolves.toEqual({
       module: { ...mockModule, moduleName: 'Updated Networks' },
     });
 
-    expect(service.update).toHaveBeenCalledWith(1, dto);
-  }); //update module
+    expect(service.update).toHaveBeenCalledWith(session.user.id, 1, dto);
+  });
 
   it('should remove a module', async () => {
     service.deleteById.mockResolvedValue({ success: true });
 
-    await expect(controller.delete(1)).resolves.toEqual({
+    await expect(controller.delete(session, 1)).resolves.toEqual({
       success: true,
     });
 
-    expect(service.deleteById).toHaveBeenCalledWith(1);
-  }); //Delete
+    expect(service.deleteById).toHaveBeenCalledWith(session.user.id, 1);
+  });
 });

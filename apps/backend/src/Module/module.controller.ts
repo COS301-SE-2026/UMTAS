@@ -2,6 +2,7 @@ import { ModuleService } from './module.service';
 import {
   CreateModuleDto,
   DeleteModuleResponseDto,
+  ModuleListResponseDto,
   SingleModuleResponseDto,
   UpdateModuleDto,
 } from './dto/module.dto';
@@ -16,7 +17,9 @@ import {
   ParseIntPipe,
 } from '@nestjs/common';
 import { ApiBody, ApiResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Public } from '../auth/auth.guard';
+
+import { CurrentSession } from '../auth/session.decorator';
+import type { SessionData } from '../auth/session.decorator';
 
 @ApiTags('Modules')
 @Controller('modules')
@@ -24,7 +27,7 @@ export class ModuleController {
   constructor(private readonly service: ModuleService) {}
 
   //Create
-  @Public()
+  // @Public()
   @Post()
   @ApiOperation({ summary: 'Create a module' })
   @ApiBody({ type: CreateModuleDto })
@@ -41,36 +44,35 @@ export class ModuleController {
     status: 409,
     description: 'Module code already exists',
   })
-  createModule(@Body() dto: CreateModuleDto) {
-    return this.service.create(dto);
+  createModule(
+    @Body() dto: CreateModuleDto,
+    @CurrentSession() session: SessionData,
+  ) {
+    return this.service.create(session.user.id, dto);
   }
 
   //Get all
-  @Public()
+  // @Public()
   @Get()
   @ApiOperation({
-    summary: 'Get a module by ID',
-    operationId: 'getModuleById',
+    summary: 'Get all modules for the current user',
+    operationId: 'getModules',
   })
   @ApiResponse({
     status: 200,
-    description: 'Module returned successfully',
-    type: SingleModuleResponseDto,
+    description: 'Modules returned successfully',
+    type: ModuleListResponseDto,
   })
   @ApiResponse({
     status: 400,
-    description: 'Invalid module ID',
+    description: 'Invalid request',
   })
-  @ApiResponse({
-    status: 404,
-    description: 'Module not found',
-  })
-  getAll() {
-    return this.service.getAll();
+  getAll(@CurrentSession() session: SessionData) {
+    return this.service.getAll(session.user.id);
   }
 
   //Get by id
-  @Public()
+  // @Public()
   @Get(':moduleId')
   @ApiOperation({
     summary: 'Get a module by ID',
@@ -89,12 +91,15 @@ export class ModuleController {
     status: 404,
     description: 'Module not found',
   })
-  getById(@Param('moduleId', ParseIntPipe) moduleId: number) {
-    return this.service.getById(moduleId);
+  getById(
+    @CurrentSession() session: SessionData,
+    @Param('moduleId', ParseIntPipe) moduleId: number,
+  ) {
+    return this.service.getById(session.user.id, moduleId);
   }
 
   //Update
-  @Public()
+  // @Public()
   @Patch(':moduleId')
   @ApiOperation({
     summary: 'Update a module',
@@ -119,13 +124,14 @@ export class ModuleController {
     description: 'Duplicate module code detected',
   })
   update(
+    @CurrentSession() session: SessionData,
     @Param('moduleId', ParseIntPipe) moduleId: number,
     @Body() dto: UpdateModuleDto,
   ) {
-    return this.service.update(moduleId, dto);
+    return this.service.update(session.user.id, moduleId, dto);
   }
 
-  @Public()
+  // @Public()
   @Delete(':moduleId')
   @ApiOperation({
     summary: 'Delete a module by ID',
@@ -144,7 +150,10 @@ export class ModuleController {
     status: 404,
     description: 'Module not found',
   })
-  delete(@Param('moduleId', ParseIntPipe) moduleId: number) {
-    return this.service.deleteById(moduleId);
+  delete(
+    @CurrentSession() session: SessionData,
+    @Param('moduleId', ParseIntPipe) moduleId: number,
+  ) {
+    return this.service.deleteById(session.user.id, moduleId);
   }
 } //ModuleController

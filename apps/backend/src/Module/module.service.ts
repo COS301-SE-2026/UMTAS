@@ -5,7 +5,7 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 
 import { DatabaseService } from '../db/database.service';
 import { modules } from '../entities/Modules/index';
@@ -22,7 +22,10 @@ export class ModuleService {
   constructor(private readonly dbService: DatabaseService) {}
 
   // Create module
-  async create(dto: CreateModuleDto): Promise<SingleModuleResponseDto> {
+  async create(
+    userId: string,
+    dto: CreateModuleDto,
+  ): Promise<SingleModuleResponseDto> {
     const code = dto.code?.trim().toUpperCase();
     const name = dto.name?.trim();
     const description = dto.description?.trim();
@@ -32,13 +35,13 @@ export class ModuleService {
         'Code and name are required for module creation',
       );
 
-    if (!dto.userId)
+    if (!userId)
       throw new BadRequestException('User ID is required for module creation');
 
     const [existingModule] = await this.dbService.db
       .select()
       .from(modules)
-      .where(eq(modules.moduleCode, code))
+      .where(and(eq(modules.userID, userId), eq(modules.moduleCode, code)))
       .limit(1);
 
     if (existingModule)
@@ -50,7 +53,7 @@ export class ModuleService {
         moduleCode: code,
         moduleName: name,
         moduleDescription: description,
-        userID: dto.userId,
+        userID: userId,
         styling: dto.styling,
       })
       .returning();
@@ -62,17 +65,26 @@ export class ModuleService {
   } //create
 
   //return all
-  async getAll(): Promise<ModuleListResponseDto> {
-    const foundModules = await this.dbService.db.select().from(modules);
+  async getAll(userId: string): Promise<ModuleListResponseDto> {
+    if (!userId)
+      throw new BadRequestException('User ID is required to fetch modules');
+
+    const foundModules = await this.dbService.db
+      .select()
+      .from(modules)
+      .where(eq(modules.userID, userId));
 
     return { modules: foundModules };
   } //getAll
 
-  async getById(id: number): Promise<SingleModuleResponseDto> {
+  async getById(userId: string, id: number): Promise<SingleModuleResponseDto> {
+    if (!userId)
+      throw new BadRequestException('User ID is required to fetch a module');
+
     const [module] = await this.dbService.db
       .select()
       .from(modules)
-      .where(eq(modules.moduleID, id))
+      .where(and(eq(modules.userID, userId), eq(modules.moduleID, id)))
       .limit(1);
 
     if (!module) throw new NotFoundException('Module not found');
@@ -83,14 +95,18 @@ export class ModuleService {
   } //getById
 
   async update(
+    userId: string,
     moduleId: number,
     dto: UpdateModuleDto,
   ): Promise<SingleModuleResponseDto> {
+    if (!userId)
+      throw new BadRequestException('User ID is required to update a module');
+
     //Find module
     const [module] = await this.dbService.db
       .select()
       .from(modules)
-      .where(eq(modules.moduleID, moduleId))
+      .where(and(eq(modules.userID, userId), eq(modules.moduleID, moduleId)))
       .limit(1);
 
     if (!module)
@@ -115,7 +131,9 @@ export class ModuleService {
       const [dupModule] = await this.dbService.db
         .select()
         .from(modules)
-        .where(eq(modules.moduleCode, updatedCode))
+        .where(
+          and(eq(modules.userID, userId), eq(modules.moduleCode, updatedCode)),
+        )
         .limit(1);
 
       if (dupModule)
@@ -130,7 +148,7 @@ export class ModuleService {
         moduleDescription: updatedDescription ?? module.moduleDescription,
         styling: dto.styling ?? module.styling,
       })
-      .where(eq(modules.moduleID, moduleId))
+      .where(and(eq(modules.userID, userId), eq(modules.moduleID, moduleId)))
       .returning();
 
     if (!newModule)
@@ -141,18 +159,24 @@ export class ModuleService {
     };
   } //update
 
-  async deleteById(moduleId: number): Promise<DeleteModuleResponseDto> {
+  async deleteById(
+    userId: string,
+    moduleId: number,
+  ): Promise<DeleteModuleResponseDto> {
+    if (!userId)
+      throw new BadRequestException('User ID is required to delete a module');
+
     const [module] = await this.dbService.db
       .select()
       .from(modules)
-      .where(eq(modules.moduleID, moduleId))
+      .where(and(eq(modules.userID, userId), eq(modules.moduleID, moduleId)))
       .limit(1);
 
     if (!module) throw new NotFoundException(`Module [${moduleId}] not found`);
 
     await this.dbService.db
       .delete(modules)
-      .where(eq(modules.moduleID, moduleId));
+      .where(and(eq(modules.userID, userId), eq(modules.moduleID, moduleId)));
 
     return {
       success: true,

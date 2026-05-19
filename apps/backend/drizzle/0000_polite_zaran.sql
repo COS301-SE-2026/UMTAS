@@ -70,7 +70,8 @@ CREATE TABLE "EventsToTimetables" (
 --> statement-breakpoint
 CREATE TABLE "Timetable" (
 	"timetableID" serial PRIMARY KEY NOT NULL,
-	"timetableName" varchar
+	"timetableName" varchar,
+	"userID" uuid NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "LectureEv" (
@@ -82,9 +83,10 @@ CREATE TABLE "LectureEv" (
 --> statement-breakpoint
 CREATE TABLE "Modules" (
 	"moduleID" serial PRIMARY KEY NOT NULL,
-	"moduleCode" varchar(6) NOT NULL,
+	"moduleCode" varchar(10) NOT NULL,
 	"moduleName" varchar(256) NOT NULL,
-	"styling" jsonb,
+	"moduleDescription" text,
+	"styling" varchar(32),
 	"userID" uuid NOT NULL
 );
 --> statement-breakpoint
