@@ -5,28 +5,27 @@ import { Sun, Moon } from "lucide-react";
 import { Button } from "@/components/atoms/baseShadcn/button";
 
 export function ThemeToggle() {
-  const [isDark, setIsDark] = useState(false);
+  const [isDark, setIsDark] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("umtas-theme");
+      const prefersDark = window.matchMedia(
+        "(prefers-color-scheme: dark)",
+      ).matches;
+      return stored === "dark" || (!stored && prefersDark);
+    }
+    return false;
+  });
 
   useEffect(() => {
-    const stored = localStorage.getItem("umtas-theme");
-    const prefersDark = window.matchMedia(
-      "(prefers-color-scheme: dark)",
-    ).matches;
-    const shouldBeDark = stored === "dark" || (!stored && prefersDark);
-    setIsDark(shouldBeDark);
     document.documentElement.setAttribute(
       "data-theme",
-      shouldBeDark ? "dark" : "light",
+      isDark ? "dark" : "light",
     );
-  }, []);
+  }, [isDark]);
 
   function toggle() {
     const next = !isDark;
     setIsDark(next);
-    document.documentElement.setAttribute(
-      "data-theme",
-      next ? "dark" : "light",
-    );
     localStorage.setItem("umtas-theme", next ? "dark" : "light");
   }
 

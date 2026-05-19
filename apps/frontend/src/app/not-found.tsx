@@ -15,7 +15,7 @@ export default function NotFound() {
         Page not found
       </h1>
       <p className="text-[--text-secondary] text-sm mb-8 max-w-xs">
-        The page you're looking for doesn't exist.
+        {"The page you're looking for doesn't exist."}
       </p>
 
       <Button asChild>

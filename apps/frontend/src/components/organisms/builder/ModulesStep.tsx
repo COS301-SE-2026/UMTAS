@@ -118,10 +118,11 @@ export function ModulesStep({
   }
 
   function handleConfirm(id: string) {
-    const module = modules.find((m) => m.id === id);
-    if (!module) return;
+    const lectureModule = modules.find((m) => m.id === id);
+    if (!lectureModule) return;
 
-    const { errors: validationErrors, hasErrors } = validateModule(module);
+    const { errors: validationErrors, hasErrors } =
+      validateModule(lectureModule);
     if (hasErrors) {
       setErrorMap((prev) => ({ ...prev, [id]: validationErrors }));
       return;

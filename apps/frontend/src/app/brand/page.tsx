@@ -3,15 +3,12 @@
 import { useState, useEffect } from "react";
 
 export default function BrandPage() {
-  const [theme, setTheme] = useState<"light" | "dark">("light");
-
-  useEffect(() => {
-    const stored = localStorage.getItem("umtas-theme") as
-      | "light"
-      | "dark"
-      | null;
-    if (stored) setTheme(stored);
-  }, []);
+  const [theme, setTheme] = useState<string | null>(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("theme");
+    }
+    return null;
+  });
 
   function toggleTheme() {
     const next = theme === "light" ? "dark" : "light";
