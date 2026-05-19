@@ -8,7 +8,8 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Loader2, MailCheck } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/components/atoms/baseShadcn/card";
 import { Button } from "@/components/atoms/baseShadcn/button";
 import { Input } from "@/components/atoms/baseShadcn/input";
@@ -20,6 +21,9 @@ import { AuthDivider } from "@/components/molecules/OAuth/AuthDivider";
 import { AuthAlert } from "@/components/molecules/OAuth/AuthAlert";
 import { PasswordStrengthBadge } from "@/components/molecules/OAuth/PasswordStrengthBadge";
 import { signUp, signIn } from "@/../utilities/auth-client";
+
+const getAppUrl = () =>
+  process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3001";
 
 interface FieldErrors {
   name?: string;
@@ -63,6 +67,7 @@ function mapAuthError(message: string): string {
 }
 
 export function RegisterForm() {
+  const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -71,7 +76,6 @@ export function RegisterForm() {
   const [globalError, setGlobalError] = useState<string | null>(null);
   const [isEmailLoading, setIsEmailLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
 
   async function handleEmailSignUp(e: React.FormEvent) {
     e.preventDefault();
@@ -87,13 +91,13 @@ export function RegisterForm() {
         name,
         email,
         password,
-        callbackURL: "/dashboard",
+        callbackURL: `${getAppUrl()}/dashboard`,
       });
 
       if (result?.error) {
         setGlobalError(mapAuthError(result.error.message ?? "Unknown error"));
       } else {
-        setSuccess(true);
+        router.push("/verify-pending");
       }
     } catch {
       setGlobalError(
@@ -111,7 +115,7 @@ export function RegisterForm() {
     try {
       await signIn.social({
         provider: "google",
-        callbackURL: "/dashboard",
+        callbackURL: `${getAppUrl()}/auth-callback`,
       });
     } catch {
       setGlobalError(
@@ -122,37 +126,6 @@ export function RegisterForm() {
   }
 
   const anyLoading = isEmailLoading || isGoogleLoading;
-  if (success) {
-    return (
-      <Card className="w-full max-w-[440px] bg-[var(--bg-surface)] border border-[var(--border)]">
-        <CardContent className="p-8 flex flex-col gap-4 items-center text-center">
-          <UmtasLogo size="md" />
-          <MailCheck
-            size={32}
-            strokeWidth={1.5}
-            className="text-[var(--text-primary)]"
-          />
-          <h1 className="text-[23px] font-semibold text-[var(--text-primary)]">
-            Check your inbox
-          </h1>
-          <p className="text-[14px] text-[var(--text-secondary)]">
-            We sent a verification link to{" "}
-            <span className="text-[var(--text-primary)]">{email}</span>. Open it
-            to activate your account.
-          </p>
-          <p className="text-[12px] text-[var(--text-secondary)]">
-            Wrong email?{" "}
-            <button
-              onClick={() => setSuccess(false)}
-              className="text-[var(--text-primary)] underline-offset-2  hover:underline"
-            >
-              Go back
-            </button>
-          </p>
-        </CardContent>
-      </Card>
-    );
-  }
 
   return (
     <Card

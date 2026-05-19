@@ -1,36 +1,37 @@
-/**
- * Next.js middleware for route protection
- * Public routes (no auth required):
- *   /login
- *   /register
- *   /auth-callback
- *   /api/auth/* (BetterAuth handler routes)
- *
- * changed as needed backend peeps
- */
-
 import { NextRequest, NextResponse } from "next/server";
 
-//const SESSION_COOKIE_NAME = "better-auth.session-token";
+const SESSION_COOKIE_NAME = "umtas-session";
 
-//const PUBLIC_PATHS = ["/login", "/register", "/auth-callback"];
+const PUBLIC_PATHS = [
+  "/login",
+  "/register",
+  "/forgot-password",
+  "/verify-pending",
+  "/verify-email",
+  "/reset-password",
+  "/auth-callback",
+];
 
 export function proxy(request: NextRequest) {
-  // const { pathname } = request.nextUrl;
+  const { pathname } = request.nextUrl;
 
-  // const isPublicPath = PUBLIC_PATHS.some((path) => pathname.startsWith(path));
-  // const isAuthApiPath = pathname.startsWith("/api/auth");
+  const isPublicPath = PUBLIC_PATHS.some((path) => pathname.startsWith(path));
+  const isAuthApiPath = pathname.startsWith("/api/auth");
 
-  // if (isPublicPath || isAuthApiPath) {
-  //   return NextResponse.next();
-  // }
+  if (isPublicPath || isAuthApiPath) return NextResponse.next();
 
-  // const sessionCookie = request.cookies.get(SESSION_COOKIE_NAME);
+  const sessionCookie = request.cookies.get(SESSION_COOKIE_NAME);
+  if (!sessionCookie?.value) {
+    const loginUrl = new URL("/login", request.url);
+    loginUrl.searchParams.set("next", pathname);
+    return NextResponse.redirect(loginUrl);
+  }
 
-  // if (!sessionCookie?.value) {
-  //   const loginUrl = new URL("/login", request.url);
-  //   loginUrl.searchParams.set("next", pathname);
-  //   return NextResponse.redirect(loginUrl);
+  // Role-based routing stubs — all roles currently go to /dashboard.
+  // Once server-side session decoding is wired up, uncomment and fill in:
+  // const role = decodeSessionRole(sessionCookie.value); // TODO: implement
+  // if ((role === "uni_admin" || role === "sys_admin") && pathname.startsWith("/dashboard")) {
+  //   return NextResponse.redirect(new URL("/admin", request.url));
   // }
 
   return NextResponse.next();

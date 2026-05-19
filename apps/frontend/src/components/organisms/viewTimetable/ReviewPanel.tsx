@@ -3,6 +3,7 @@
 // Shows a read-only summary
 // of modules and preferences then fires the solver on confirmation.
 
+/*
 import React from "react";
 import {
   BookOpen,
@@ -75,7 +76,7 @@ export function ReviewPanel({
           <GeneratingSkeleton />
         ) : (
           <div className="space-y-4">
-            {/* Summary cards */}
+            {/* Summary cards }
             <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] px-4">
               <ReviewSummaryItem
                 icon={<BookOpen size={14} />}
@@ -109,7 +110,7 @@ export function ReviewPanel({
               />
             </div>
 
-            {/* Per module slot detail */}
+            {/* Per module slot detail }
             <div>
               <p className="mb-2 text-xs font-medium uppercase tracking-wider text-[var(--text-secondary)]">
                 Module detail
@@ -139,7 +140,7 @@ export function ReviewPanel({
               </div>
             </div>
 
-            {/* Generate button */}
+            {/* Generate button }
             <Button
               type="button"
               onClick={onGenerate}
@@ -158,3 +159,4 @@ export function ReviewPanel({
     </div>
   );
 }
+*/

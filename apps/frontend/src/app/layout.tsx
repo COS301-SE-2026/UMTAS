@@ -14,10 +14,10 @@ const dmSans = DM_Sans({
 
 export const metadata: Metadata = {
   title: {
-    default: "Vigil",
-    template: "%s | Vigil",
+    default: "UMTAS",
+    template: "%s | UMTAS",
   },
-  description: "Made by Vigil.",
+  description: "University Module Timetable Assistance System",
 };
 
 export default async function RootLayout({

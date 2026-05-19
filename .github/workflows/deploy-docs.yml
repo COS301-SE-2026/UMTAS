@@ -1,0 +1,89 @@
+name: Deploy MkDocs
+on:
+  push:
+    branches:
+      - main
+      - dev
+      - setup-docs
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    branches:
+      - dev
+      - main
+      - setup-docs
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.x
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Deploy Production
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: mkdocs gh-deploy --force
+
+      - name: Deploy Development
+        if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
+        run: |
+          # Dynamically set site_url for dev branch
+          sed -i 's|site_url: .*|site_url: https://cos301-se-2026.github.io/UMTAS/dev/|' mkdocs.yml
+          mkdocs build
+          mkdir -p site_mapping
+          mv site site_mapping/dev
+          cd site_mapping
+          touch .nojekyll
+          remote_repo="https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"
+          git init
+          git remote add origin $remote_repo
+          git fetch origin gh-pages
+          git reset origin/gh-pages
+          git add dev/
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit -m "docs: deploy dev version"
+          git push origin HEAD:gh-pages
+
+      - name: Deploy Test Branch
+        if: github.event_name == 'push' && github.ref == 'refs/heads/setup-docs'
+        run: |
+          # Dynamically set site_url for setup-docs branch
+          sed -i 's|site_url: .*|site_url: https://cos301-se-2026.github.io/UMTAS/test-setup/|' mkdocs.yml
+          mkdocs build
+          mkdir -p site_mapping
+          mv site site_mapping/test-setup
+          cd site_mapping
+          touch .nojekyll
+          remote_repo="https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"
+          git init
+          git remote add origin $remote_repo
+          git fetch origin gh-pages
+          git reset origin/gh-pages
+          git add test-setup/
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit -m "docs: deploy test version"
+          git push origin HEAD:gh-pages
+
+      - name: PR Preview
+        if: github.event_name == 'pull_request'
+        uses: rossjrw/pr-preview-action@v1
+        with:
+          source-dir: site
+          preview-branch: gh-pages
+          umbrella-dir: previews
+          action: ${{ github.event.action }}
+        env:
+          BUILD_COMMAND: mkdocs build

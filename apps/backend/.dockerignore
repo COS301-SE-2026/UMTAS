@@ -1,7 +1,10 @@
 node_modules
+.next
 dist
-coverage
-.turbo
 .git
-*.log
-pnpm-debug.log*
+*.md
+.env*
+test
+*.spec.ts
+*.test.ts
+vitest.config.ts

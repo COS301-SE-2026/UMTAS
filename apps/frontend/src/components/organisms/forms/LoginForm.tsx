@@ -21,6 +21,9 @@ import { AuthDivider } from "@/components/molecules/OAuth/AuthDivider";
 import { AuthAlert } from "@/components/molecules/OAuth/AuthAlert";
 import { signIn } from "@/../utilities/auth-client";
 
+const getAppUrl = () =>
+  process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3001";
+
 function mapAuthError(message: string): string {
   if (
     message.toLowerCase().includes("invalid") ||
@@ -63,7 +66,7 @@ export function LoginForm() {
       const result = await signIn.email({
         email,
         password,
-        callbackURL: "/dashboard",
+        callbackURL: `${getAppUrl()}/dashboard`,
       });
 
       if (result?.error) {
@@ -85,7 +88,7 @@ export function LoginForm() {
     try {
       await signIn.social({
         provider: "google",
-        callbackURL: "/dashboard",
+        callbackURL: `${getAppUrl()}/auth-callback`,
       });
     } catch {
       setError("Google sign-in failed. Try again or use email and password.");
@@ -148,6 +151,15 @@ export function LoginForm() {
               className="h-9 bg-[var(--bg-base)] border-[var(--border)] text-[var(--text-primary)] placeholder:text-[var(--text-disabled)]"
             />
           </FormField>
+
+          <div className="flex justify-end -mt-2">
+            <Link
+              href="/forgot-password"
+              className="text-[12px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] underline-offset-2 hover:underline transition-colors duration-150"
+            >
+              Forgot password?
+            </Link>
+          </div>
 
           <Button
             type="submit"
