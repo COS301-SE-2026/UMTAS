@@ -48,5 +48,4 @@ certificatesResolvers:
   myresolver:
     acme:
       storage: /letsencrypt/acme.json
-      httpChallenge:
-        entryPoint: web
+      tlsChallenge: {}
