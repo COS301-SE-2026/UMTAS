@@ -451,7 +451,7 @@
             ]
           },
           {
-            "matcher": { "id": "byName", "options": "Failures" },
+            "matcher": { "id": "byName", "options": "Restarts" },
             "properties": [
               { "id": "custom.width", "value": 90 },
               { "id": "custom.displayMode", "value": "color-background" },
