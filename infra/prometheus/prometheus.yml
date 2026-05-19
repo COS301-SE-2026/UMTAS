@@ -62,3 +62,5 @@ scrape_configs:
         labels:
           service: watchtower
     metrics_path: /v1/metrics
+    authorization:
+      credentials_file: /tmp/watchtower_token

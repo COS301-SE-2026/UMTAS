@@ -149,9 +149,12 @@ services:
     restart: unless-stopped
     networks:
       - internal
+    environment:
+      - WATCHTOWER_HTTP_API_TOKEN=${WATCHTOWER_HTTP_API_TOKEN}
     volumes:
       - ./infra/prometheus:/etc/prometheus
       - prometheus_data:/prometheus
+    entrypoint: ["/etc/prometheus/docker-entrypoint.sh"]
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--storage.tsdb.path=/prometheus"
