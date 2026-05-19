@@ -1,4 +1,4 @@
-FROM node:20-alpine AS base
+FROM node:26-alpine AS base
 RUN npm install -g pnpm@10.33.0
 
 # ── Dependencies ──
@@ -20,7 +20,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN pnpm run build
 
 # ── Production ──
-FROM node:20-alpine AS production
+FROM node:26-alpine AS production
 WORKDIR /app
 
 ENV NODE_ENV=production
