@@ -59,7 +59,7 @@ export function WizardStepper({
   }
 
   return (
-    <div className="flex items-center px-8 py-5 border-b border-[var(--border)] bg-[var(--bg-base)]">
+    <div className="flex items-center px-8 py-3 border-b border-[var(--border)] bg-[var(--bg-base)]">
       {steps.map((step, index) => {
         const isClickable = isCompleted(index);
 
