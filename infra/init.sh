@@ -239,8 +239,8 @@ WATCHTOWER_DISCORD_URL=${WATCHTOWER_DISCORD_URL:-}
 WATCHTOWER_HTTP_API_TOKEN=${WATCHTOWER_HTTP_API_TOKEN}
 
 # ─── Ports ────────────────────────────────────────────────
-BACKEND_PORT=3000
-FRONTEND_PORT=3001
+BACKEND_PORT=8000
+FRONTEND_PORT=3000
 
 # ─── Database ─────────────────────────────────────────────
 DB_USER=capstone_admin
