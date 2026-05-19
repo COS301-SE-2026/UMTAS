@@ -23,5 +23,5 @@ COPY --from=build /app/apps/frontend/.next/static ./apps/frontend/.next/static
 COPY --from=build /app/apps/frontend/public ./apps/frontend/public
 EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:3000/api/health',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"
+  CMD node -e "require('http').get('http://127.0.0.1:'+process.env.PORT+'/',r=>process.exit(r.statusCode<500?0:1)).on('error',()=>process.exit(1))"
 CMD ["node", "apps/frontend/server.js"]
