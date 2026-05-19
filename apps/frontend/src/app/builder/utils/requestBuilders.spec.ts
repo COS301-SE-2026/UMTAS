@@ -1,6 +1,6 @@
 import { getAllModulesBuilder } from "./requestBuilders";
 import { getModulesByIdBuilder } from "./requestBuilders";
-const apiUrl = process.env.API_URL || "http://localhost:300";
+const apiUrl = process.env.API_URL || "http://localhost:3000";
 
 describe("getAllModulesBuilder", () => {
   beforeEach(() => {
@@ -23,6 +23,7 @@ describe("getAllModulesBuilder", () => {
 
     const builder = new getAllModulesBuilder();
     await builder.send({});
+    console.log("Fetch called with:", (global.fetch as jest.Mock).mock.calls);
 
     expect(global.fetch).toHaveBeenCalledWith(
       apiUrl + "/modules",
@@ -47,7 +48,8 @@ describe("getModulesByIdBuilder", () => {
   it("should correctly hit the parameter listed endpoint", async () => {
     const builder = new getModulesByIdBuilder();
 
-    await builder.send({ paths: { moduleId: "123" } });
+    await builder.send({ paths: { moduleId: 123 } });
+    console.log("Fetch called with:", (global.fetch as jest.Mock).mock.calls);
 
     expect(global.fetch).toHaveBeenCalledWith(
       apiUrl + "/modules/123",

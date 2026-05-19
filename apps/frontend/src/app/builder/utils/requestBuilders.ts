@@ -4,6 +4,24 @@ type createModuleReq =
   paths["/modules"]["post"]["requestBody"]["content"]["application/json"];
 type createModuleRes =
   paths["/modules"]["post"]["responses"]["201"]["content"]["application/json"]["module"];
+type deleteModulesByIdRes =
+  paths["/modules/{moduleId}"]["delete"]["responses"]["200"]["content"]["application/json"];
+type deleteModulesByIdPath =
+  paths["/modules/{moduleId}"]["delete"]["parameters"]["path"];
+type getAllModulesRes =
+  paths["/modules"]["get"]["responses"]["200"]["content"]["application/json"]["modules"];
+type getModuleByIdReq =
+  paths["/modules/{moduleId}"]["get"]["parameters"]["path"];
+type getModuleByIdRes =
+  paths["/modules/{moduleId}"]["get"]["responses"]["200"]["content"]["application/json"]["module"];
+type updateModuleByIdBody =
+  paths["/modules/{moduleId}"]["patch"]["requestBody"]["content"]["application/json"];
+
+type updateModuleByIdPath =
+  paths["/modules/{moduleId}"]["patch"]["parameters"]["path"];
+
+type updateModuleByIdRes =
+  paths["/modules/{moduleId}"]["patch"]["responses"]["200"]["content"]["application/json"]["module"];
 
 export class createModulesBuilder extends RequestBuilder<
   undefined,
@@ -16,9 +34,6 @@ export class createModulesBuilder extends RequestBuilder<
   }
 }
 
-type getAllModulesRes =
-  paths["/modules"]["get"]["responses"]["200"]["content"]["application/json"]["modules"];
-
 export class getAllModulesBuilder extends RequestBuilder<
   undefined,
   undefined,
@@ -29,11 +44,6 @@ export class getAllModulesBuilder extends RequestBuilder<
     this.setUrl("/modules").setMethod(RequestMethod.GET);
   }
 }
-
-type getModuleByIdReq =
-  paths["/modules/{moduleId}"]["get"]["parameters"]["path"];
-type getModuleByIdRes =
-  paths["/modules/{moduleId}"]["get"]["responses"]["200"]["content"]["application/json"]["module"];
 
 export class getModulesByIdBuilder extends RequestBuilder<
   getModuleByIdReq,
@@ -46,15 +56,6 @@ export class getModulesByIdBuilder extends RequestBuilder<
   }
 }
 
-type updateModuleByIdBody =
-  paths["/modules/{moduleId}"]["patch"]["requestBody"]["content"]["application/json"];
-
-type updateModuleByIdPath =
-  paths["/modules/{moduleId}"]["patch"]["parameters"]["path"];
-
-type updateModuleByIdRes =
-  paths["/modules/{moduleId}"]["patch"]["responses"]["200"]["content"]["application/json"]["module"];
-
 export class updateModulesBuilder extends RequestBuilder<
   updateModuleByIdPath,
   updateModuleByIdBody,
@@ -66,11 +67,6 @@ export class updateModulesBuilder extends RequestBuilder<
   }
 }
 
-type deleteModulesByIdRes =
-  paths["/modules/{moduleId}"]["delete"]["responses"]["200"]["content"]["application/json"];
-
-type deleteModulesByIdPath =
-  paths["/modules/{moduleId}"]["delete"]["parameters"]["path"];
 export class deleteModulesById extends RequestBuilder<
   undefined,
   deleteModulesByIdPath,
