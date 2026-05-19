@@ -4,14 +4,14 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import { DatabaseService } from '../db/database.service';
 import { Event, LectureEv, modules } from '../entities/index';
 import {
   CreateEventDto,
   EventResponseDto,
   EventType,
-  EventListResponse,
+  EventListResponseDto,
 } from './dto/EventDto.dto';
 
 @Injectable()
@@ -53,7 +53,7 @@ export class EventService {
   } //createEvent
 
   //getAllEvents
-  async getAllEvents(userId: string): Promise<EventListResponse> {
+  async getAllEvents(userId: string): Promise<EventListResponseDto> {
     const r = await this.databaseService.db
       .select({
         event: Event,
@@ -70,6 +70,26 @@ export class EventService {
       })),
     };
   } //getAllEvents
+
+  //getById
+  async getById(userId: string, eventId: number): Promise<EventResponseDto> {
+    const [row] = await this.databaseService.db
+      .select({
+        event: Event,
+        lecture: LectureEv,
+      })
+      .from(Event)
+      .leftJoin(LectureEv, eq(LectureEv.eventID, Event.eventID))
+      .where(and(eq(Event.eventID, eventId), eq(Event.userID, userId)))
+      .limit(1);
+
+    if (!row) throw new NotFoundException(`Event not found for id: ${eventId}`);
+
+    return {
+      event: row.event as EventResponseDto['event'],
+      ...(row.lecture ? { lecture: row.lecture } : {}),
+    };
+  } //getById
 
   //Helpers
   private async createLectureForEvent(

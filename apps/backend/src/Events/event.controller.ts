@@ -1,10 +1,17 @@
-import { Body, Controller, Post, Get } from '@nestjs/common';
+import {
+  Param,
+  Body,
+  Controller,
+  Post,
+  Get,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import {
   CreateEventDto,
   EventResponseDto,
-  EventListResponse,
+  EventListResponseDto,
 } from './dto/EventDto.dto';
 
 import { EventService } from './event.service';
@@ -62,7 +69,7 @@ export class EventController {
   @ApiResponse({
     status: 200,
     description: 'Events fetched successfully',
-    type: EventListResponse,
+    type: EventListResponseDto,
   })
   @ApiResponse({
     status: 401,
@@ -75,4 +82,27 @@ export class EventController {
   getAllEvents(@CurrentSession() session: SessionData) {
     return this.service.getAllEvents(session.user.id);
   } //getAllEvents
+
+  //get by id
+  @Get(':id')
+  @Roles('student')
+  @ApiOperation({
+    summary: 'Get event by ID',
+    operationId: 'getEventById',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Event fetched successfully',
+    type: EventResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Event not found',
+  })
+  getById(
+    @CurrentSession() session: SessionData,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.service.getById(session.user.id, id);
+  } //get by id
 } //EventController

@@ -113,7 +113,7 @@ export class EventResponseDto {
   lecture?: LectureResponseDto;
 } //event response
 
-export class EventListResponse {
+export class EventListResponseDto {
   @ApiProperty({
     type: [EventResponseDto],
     description: 'List of events with optional lecture details',
