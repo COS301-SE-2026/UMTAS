@@ -197,10 +197,13 @@ services:
       - server
 
   health-exporter:
-    image: ghcr.io/aroberts/docker-health-exporter:latest
+    image: fviolence/docker-health-exporter:latest
     restart: unless-stopped
     networks:
       - internal
+    environment:
+      - PORT=9066
+      - SCRAPE_INTERVAL=15
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     labels:

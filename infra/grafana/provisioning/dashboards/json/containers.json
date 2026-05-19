@@ -438,17 +438,12 @@
                     "type": "value",
                     "options": {
                       "0": { "text": "Unhealthy", "color": "red", "index": 0 },
-                      "1": { "text": "Healthy", "color": "green", "index": 1 },
-                      "2": {
+                      "0.5": {
                         "text": "Starting",
                         "color": "orange",
-                        "index": 2
+                        "index": 1
                       },
-                      "3": {
-                        "text": "No Healthcheck",
-                        "color": "gray",
-                        "index": 3
-                      }
+                      "1": { "text": "Healthy", "color": "green", "index": 2 }
                     }
                   }
                 ]
@@ -493,14 +488,14 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "prometheus" },
-          "expr": "docker_container_health_status",
+          "expr": "docker_container_health",
           "format": "table",
           "instant": true,
           "refId": "A"
         },
         {
           "datasource": { "type": "prometheus", "uid": "prometheus" },
-          "expr": "docker_container_health_failure_streak",
+          "expr": "docker_container_restart_count",
           "format": "table",
           "instant": true,
           "refId": "B"
@@ -515,17 +510,16 @@
             "excludeByName": {
               "Time": true,
               "__name__": true,
-              "container_id": true,
+              "id": true,
+              "hostname": true,
               "instance": true,
-              "job": true,
-              "stack": true
+              "job": true
             },
             "renameByName": {
-              "service": "Service",
-              "container_name": "Container",
+              "container": "Container",
               "image": "Image",
               "Value #A": "Health",
-              "Value #B": "Failures"
+              "Value #B": "Restarts"
             }
           }
         }
