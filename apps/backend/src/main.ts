@@ -1,5 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { collectDefaultMetrics, register } from 'prom-client';
+import type { Request, Response } from 'express';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -7,12 +9,20 @@ async function bootstrap() {
   const port = process.env.PORT ?? 3001;
 
   app.enableCors({
-    origin: process.env.CORS_ORIGIN ?? 'http://localhost:3001',
+    origin: [
+      process.env.CORS_ORIGIN ?? 'http://localhost:3001',
+      'https://cos301-se-2026.github.io',
+    ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     credentials: true,
   });
 
-  // Swagger/OpenAPI documentation
+  collectDefaultMetrics();
+  app.getHttpAdapter().get('/metrics', async (_req: Request, res: Response) => {
+    res.set('Content-Type', register.contentType);
+    res.end(await register.metrics());
+  });
+
   const swaggerConfig = new DocumentBuilder()
     .setTitle('UMTAS API')
     .setDescription('University Management Timetable & Scheduling System API')
