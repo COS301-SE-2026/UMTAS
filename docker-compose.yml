@@ -196,6 +196,18 @@ services:
     profiles:
       - server
 
+  health-exporter:
+    image: ghcr.io/aroberts/docker-health-exporter:latest
+    restart: unless-stopped
+    networks:
+      - internal
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+    profiles:
+      - server
+
   node-exporter:
     image: prom/node-exporter:v1.9.1
     restart: unless-stopped

@@ -411,8 +411,130 @@
       "type": "table"
     },
     {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "custom": {
+            "align": "auto",
+            "displayMode": "auto",
+            "filterable": true
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "green", "value": null }]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "Health" },
+            "properties": [
+              { "id": "custom.width", "value": 140 },
+              { "id": "custom.displayMode", "value": "color-background" },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "0": { "text": "Unhealthy", "color": "red", "index": 0 },
+                      "1": { "text": "Healthy", "color": "green", "index": 1 },
+                      "2": {
+                        "text": "Starting",
+                        "color": "orange",
+                        "index": 2
+                      },
+                      "3": {
+                        "text": "No Healthcheck",
+                        "color": "gray",
+                        "index": 3
+                      }
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "Failures" },
+            "properties": [
+              { "id": "custom.width", "value": 90 },
+              { "id": "custom.displayMode", "value": "color-background" },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    { "color": "green", "value": null },
+                    { "color": "red", "value": 1 }
+                  ]
+                }
+              },
+              { "id": "color", "value": { "mode": "thresholds" } }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "Service" },
+            "properties": [{ "id": "custom.width", "value": 160 }]
+          },
+          {
+            "matcher": { "id": "byName", "options": "Container" },
+            "properties": [{ "id": "custom.width", "value": 220 }]
+          }
+        ]
+      },
+      "gridPos": { "h": 12, "w": 24, "x": 0, "y": 28 },
+      "id": 13,
+      "options": {
+        "footer": { "fields": "", "reducer": ["sum"], "show": false },
+        "showHeader": true,
+        "sortBy": [{ "desc": false, "displayName": "Service" }]
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "docker_container_health_status",
+          "format": "table",
+          "instant": true,
+          "refId": "A"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "expr": "docker_container_health_failure_streak",
+          "format": "table",
+          "instant": true,
+          "refId": "B"
+        }
+      ],
+      "title": "Health Status",
+      "transformations": [
+        { "id": "merge", "options": {} },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "__name__": true,
+              "container_id": true,
+              "instance": true,
+              "job": true,
+              "stack": true
+            },
+            "renameByName": {
+              "service": "Service",
+              "container_name": "Container",
+              "image": "Image",
+              "Value #A": "Health",
+              "Value #B": "Failures"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
       "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 28 },
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 40 },
       "id": 12,
       "title": "Deploy Log",
       "type": "row"
@@ -420,7 +542,7 @@
     {
       "datasource": { "type": "loki", "uid": "loki" },
       "fieldConfig": { "defaults": {}, "overrides": [] },
-      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 29 },
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 41 },
       "id": 8,
       "options": {
         "dedupStrategy": "none",
