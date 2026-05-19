@@ -1,12 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
-import { Plus, Trash2, CheckCircle, Inbox } from "lucide-react";
+import { Plus, Trash2, CheckCircle, Inbox, AlertCircle } from "lucide-react";
 import {
-  ModuleCard,
-  type Module,
-  type ModuleErrors,
-} from "@/components/molecules/builder/ModuleCard";
+  EventCard,
+  type BuilderEvent,
+  type EventErrors,
+} from "@/components/molecules/builder/EventCard";
+import type { Module } from "@/components/molecules/builder/ModuleCard";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -17,58 +18,90 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
 } from "@/components/atoms/baseShadcn/alert-dialog";
+import { Alert, AlertDescription } from "@/components/atoms/baseShadcn/alert";
 import { Button } from "@/components/atoms/baseShadcn/button";
 import { Card, CardContent } from "@/components/atoms/baseShadcn/card";
 
-interface ModulesStepProps {
+interface EventsStepProps {
+  events: BuilderEvent[];
   modules: Module[];
   onAdd: () => void;
   onUpdate: (
     id: string,
-    field: keyof Omit<Module, "id">,
+    field: keyof Omit<BuilderEvent, "id">,
     value: string,
   ) => void;
   onRemove: (id: string) => void;
-  onNavigateAway: () => void;
+  onGoToModules: () => void;
 }
 
-function validateModule(module: Module) {
-  const errors: ModuleErrors = {};
+function validateEvent(event: BuilderEvent): {
+  errors: EventErrors;
+  hasErrors: boolean;
+} {
+  const errors: EventErrors = {};
   let hasErrors = false;
 
-  if (!module.code.trim()) {
-    errors.code = "Code is required";
-    hasErrors = true;
-  }
-  if (!module.name.trim()) {
+  if (!event.name.trim()) {
     errors.name = "Name is required";
     hasErrors = true;
   }
-  if (!module.colour) {
-    errors.colour = "Colour is required";
+  if (!event.code.trim()) {
+    errors.code = "Code is required";
+    hasErrors = true;
+  }
+  if (!event.date) {
+    errors.date = "Date is required";
+    hasErrors = true;
+  }
+  if (!event.startTime || !event.endTime) {
+    errors.time = "Start and end time are required";
+    hasErrors = true;
+  }
+  if (event.startTime && event.endTime && event.startTime >= event.endTime) {
+    errors.time = "Start time must be before end time";
+    hasErrors = true;
+  }
+  if (event.type === "lecture" && !event.moduleId) {
+    errors.moduleId = "A module must be assigned to a lecture";
     hasErrors = true;
   }
 
   return { errors, hasErrors };
 }
 
-function isModuleComplete(module: Module) {
-  return !!(module.code && module.name && module.colour);
+function isEventComplete(event: BuilderEvent) {
+  if (!event.name) return false;
+  if (!event.code) return false;
+  if (!event.date) return false;
+  if (!event.startTime) return false;
+  if (!event.endTime) return false;
+  if (event.type === "lecture" && !event.moduleId) return false;
+  return true;
 }
 
-export function ModulesStep({
+function getLinkedModuleName(event: BuilderEvent, modules: Module[]) {
+  const found = modules.find((m) => m.id === event.moduleId);
+  if (found) {
+    return found.code + " - " + found.name;
+  }
+  return null;
+}
+
+export function EventsStep({
+  events,
   modules,
   onAdd,
   onUpdate,
   onRemove,
-  onNavigateAway,
-}: ModulesStepProps) {
+  onGoToModules,
+}: EventsStepProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [errorMap, setErrorMap] = useState<Record<string, ModuleErrors>>({});
+  const [errorMap, setErrorMap] = useState<Record<string, EventErrors>>({});
   const [isDirty, setIsDirty] = useState(false);
   const [showGuard, setShowGuard] = useState(false);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
-  const [snapshot, setSnapshot] = useState<Module | null>(null);
+  const [snapshot, setSnapshot] = useState<BuilderEvent | null>(null);
 
   function requestNavigation(action: () => void) {
     if (isDirty) {
@@ -81,9 +114,13 @@ export function ModulesStep({
 
   function handleGuardConfirm() {
     if (snapshot) {
-      onUpdate(snapshot.id, "code", snapshot.code);
       onUpdate(snapshot.id, "name", snapshot.name);
-      onUpdate(snapshot.id, "colour", snapshot.colour);
+      onUpdate(snapshot.id, "code", snapshot.code);
+      onUpdate(snapshot.id, "date", snapshot.date);
+      onUpdate(snapshot.id, "startTime", snapshot.startTime);
+      onUpdate(snapshot.id, "endTime", snapshot.endTime);
+      onUpdate(snapshot.id, "type", snapshot.type);
+      onUpdate(snapshot.id, "moduleId", snapshot.moduleId);
     }
     setIsDirty(false);
     setShowGuard(false);
@@ -106,7 +143,7 @@ export function ModulesStep({
     }
 
     function doSelect() {
-      const selected = modules.find((m) => m.id === id);
+      const selected = events.find((e) => e.id === id);
       if (selected) {
         setSnapshot({ ...selected });
       }
@@ -118,10 +155,10 @@ export function ModulesStep({
   }
 
   function handleConfirm(id: string) {
-    const module = modules.find((m) => m.id === id);
-    if (!module) return;
+    const event = events.find((e) => e.id === id);
+    if (!event) return;
 
-    const { errors: validationErrors, hasErrors } = validateModule(module);
+    const { errors: validationErrors, hasErrors } = validateEvent(event);
     if (hasErrors) {
       setErrorMap((prev) => ({ ...prev, [id]: validationErrors }));
       return;
@@ -135,15 +172,6 @@ export function ModulesStep({
     setIsDirty(false);
     setSnapshot(null);
     setSelectedId(null);
-  }
-
-  function handleAdd() {
-    function doAdd() {
-      onAdd();
-      setIsDirty(false);
-      setSnapshot(null);
-    }
-    requestNavigation(doAdd);
   }
 
   function handleRemove(id: string) {
@@ -162,7 +190,7 @@ export function ModulesStep({
 
   function handleUpdate(
     id: string,
-    field: keyof Omit<Module, "id">,
+    field: keyof Omit<BuilderEvent, "id">,
     value: string,
   ) {
     setIsDirty(true);
@@ -175,41 +203,69 @@ export function ModulesStep({
         <div className="flex h-12 w-12 items-center justify-center rounded-full border border-[var(--border)] text-[var(--text-secondary)]">
           <Inbox size={20} strokeWidth={1.5} />
         </div>
-        <p className="text-base text-[var(--text-secondary)]">No modules yet</p>
+        <p className="text-base text-[var(--text-secondary)]">No events yet.</p>
         <p className="text-sm text-[var(--text-secondary)]">
-          Add a module below to start
+          Add an event below to get started.
         </p>
       </div>
     );
   }
 
-  function renderModuleRow(module: Module, index: number) {
-    const isComplete = isModuleComplete(module);
-    const isSelected = selectedId === module.id;
-    const errors = errorMap[module.id];
+  function renderNoModulesWarning() {
+    return (
+      <Alert className="mb-4 border-[var(--border)] bg-[var(--bg-surface)]">
+        <AlertCircle size={16} strokeWidth={1.5} />
+        <AlertDescription className="text-base text-[var(--text-secondary)]">
+          No modules yet.{" "}
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={onGoToModules}
+            className="h-auto p-0 text-base underline text-[var(--text-primary)] hover:bg-transparent hover:opacity-70 transition-opacity duration-[var(--duration-fast)]"
+          >
+            Go back to Step 1 to create some.
+          </Button>
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
+  function renderEventRow(event: BuilderEvent, index: number) {
+    const isComplete = isEventComplete(event);
+    const isSelected = selectedId === event.id;
+    const errors = errorMap[event.id];
+    const moduleName = getLinkedModuleName(event, modules);
 
     return (
-      <div key={module.id} className="flex flex-col gap-2">
+      <div key={event.id} className="flex flex-col gap-2">
         {/* summary row */}
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={() => handleSelect(module.id)}
+            onClick={() => handleSelect(event.id)}
             className="flex flex-1 items-center gap-3 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] px-4 py-4 text-left transition-colors duration-[var(--duration-fast)] hover:bg-[var(--bg-elevated)] shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.08)]"
           >
-            <span
-              className="h-3 w-3 rounded-full flex-shrink-0"
-              style={{ backgroundColor: module.colour || "var(--border)" }}
-            />
             <div className="flex-1 min-w-0">
               <p className="text-base font-medium text-[var(--text-primary)] truncate">
-                {module.name || "Module " + (index + 1)}
+                {event.name || "Event " + (index + 1)}
               </p>
-              {module.code && (
-                <p className="text-sm font-mono text-[var(--text-secondary)]">
-                  {module.code}
-                </p>
-              )}
+              <div className="flex flex-wrap items-center gap-2 mt-0.5">
+                {event.date && (
+                  <p className="text-sm text-[var(--text-secondary)]">
+                    {event.date}
+                  </p>
+                )}
+                {event.startTime && event.endTime && (
+                  <p className="text-sm text-[var(--text-secondary)]">
+                    {event.startTime} - {event.endTime}
+                  </p>
+                )}
+                {moduleName && (
+                  <p className="text-sm font-mono text-[var(--text-secondary)]">
+                    {moduleName}
+                  </p>
+                )}
+              </div>
             </div>
             {isComplete && !isSelected && (
               <CheckCircle
@@ -220,13 +276,13 @@ export function ModulesStep({
             )}
           </button>
 
-          {/* trash button on summary row*/}
+          {/* trash button */}
           <Button
             type="button"
             variant="ghost"
             size="icon"
-            onClick={() => handleRemove(module.id)}
-            aria-label={"Remove module " + (index + 1)}
+            onClick={() => handleRemove(event.id)}
+            aria-label={"Remove event " + (index + 1)}
             className="h-10 w-10 flex-shrink-0 border border-[var(--border)] text-[var(--text-secondary)] transition-colors duration-[var(--duration-fast)] hover:border-[var(--error-text)] hover:text-[var(--error-text)] hover:bg-transparent"
           >
             <Trash2 size={16} strokeWidth={1.5} />
@@ -238,21 +294,23 @@ export function ModulesStep({
           <div className="flex flex-col gap-2 pl-2">
             <Card className="border-[var(--border)] bg-[var(--bg-surface)] shadow-none">
               <CardContent className="p-0">
-                <ModuleCard
-                  module={module}
+                <EventCard
+                  event={event}
                   index={index}
+                  modules={modules}
                   onUpdate={handleUpdate}
                   onRemove={handleRemove}
+                  onGoToModules={onGoToModules}
                   errors={errors}
                 />
               </CardContent>
             </Card>
-            {/* confirm button */}
+
             <Button
               type="button"
               variant="outline"
-              onClick={() => handleConfirm(module.id)}
-              aria-label="Confirm module"
+              onClick={() => handleConfirm(event.id)}
+              aria-label="Confirm event"
               className="w-full gap-2 border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-primary)] transition-colors duration-[var(--duration-fast)] hover:bg-[var(--bg-elevated)]"
             >
               <CheckCircle size={16} strokeWidth={1.5} />
@@ -261,6 +319,25 @@ export function ModulesStep({
           </div>
         )}
       </div>
+    );
+  }
+
+  function renderAddButton() {
+    if (modules.length === 0) {
+      return null;
+    }
+
+    return (
+      <button
+        type="button"
+        onClick={onAdd}
+        className="mt-4 flex w-full items-center gap-3 rounded-lg border border-dashed border-[var(--border)] px-4 py-4 text-left text-base text-[var(--text-secondary)] transition-colors duration-[var(--duration-fast)] hover:border-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+      >
+        <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border border-dashed border-[var(--border)]">
+          <Plus size={16} strokeWidth={1.5} />
+        </span>
+        Add event
+      </button>
     );
   }
 
@@ -287,33 +364,26 @@ export function ModulesStep({
 
       <div className="mb-5">
         <h2 className="text-lg font-semibold text-[var(--text-primary)]">
-          Modules
+          Events
         </h2>
         <p className="text-base text-[var(--text-secondary)] mt-1">
-          {modules.length === 0
-            ? "Add the modules you want to schedule."
-            : modules.length +
-              " module" +
-              (modules.length !== 1 ? "s" : "") +
+          {events.length === 0
+            ? "Add the events you want to schedule."
+            : events.length +
+              " event" +
+              (events.length !== 1 ? "s" : "") +
               " added."}
         </p>
       </div>
 
+      {modules.length === 0 && renderNoModulesWarning()}
+
       <div className="flex flex-col gap-3">
-        {modules.length === 0 && renderEmptyState()}
-        {modules.map((module, index) => renderModuleRow(module, index))}
+        {events.length === 0 && renderEmptyState()}
+        {events.map((event, index) => renderEventRow(event, index))}
       </div>
 
-      <button
-        type="button"
-        onClick={handleAdd}
-        className="mt-4 flex w-full items-center gap-3 rounded-lg border border-dashed border-[var(--border)] px-4 py-4 text-left text-base text-[var(--text-secondary)] transition-colors duration-[var(--duration-fast)] hover:border-[var(--text-secondary)] hover:text-[var(--text-primary)]"
-      >
-        <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border border-dashed border-[var(--border)]">
-          <Plus size={16} strokeWidth={1.5} />
-        </span>
-        Add module
-      </button>
+      {renderAddButton()}
     </div>
   );
 }
