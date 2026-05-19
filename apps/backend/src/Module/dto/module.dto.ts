@@ -50,7 +50,7 @@ export class CreateModuleDto {
   @IsOptional()
   @IsString()
   styling?: string;
-}
+} //create
 
 export class UpdateModuleDto {
   @ApiPropertyOptional({
@@ -87,4 +87,44 @@ export class UpdateModuleDto {
   @IsOptional()
   @IsString()
   styling?: string;
+} //udpate
+
+export class ModuleResponseDto {
+  @ApiProperty({ example: 1 })
+  moduleID!: number;
+
+  @ApiProperty({ example: 'COS332' })
+  moduleCode!: string;
+
+  @ApiProperty({ example: 'Computer Networks' })
+  moduleName!: string;
+
+  @ApiPropertyOptional({
+    example: 'Introduction to computer networking concepts',
+    nullable: true,
+  })
+  moduleDescription?: string | null;
+
+  @ApiProperty({
+    example: '550e8400-e29b-41d4-a716-446655440000',
+  })
+  userID!: string;
+
+  @ApiPropertyOptional({ example: '#3B82F6', nullable: true })
+  styling?: string | null;
+} //Response
+
+export class SingleModuleResponseDto {
+  @ApiProperty({ type: ModuleResponseDto })
+  module!: ModuleResponseDto;
 }
+
+export class ModuleListResponseDto {
+  @ApiProperty({ type: [ModuleResponseDto] })
+  modules!: ModuleResponseDto[];
+} //list
+
+export class DeleteModuleResponseDto {
+  @ApiProperty({ example: true })
+  success!: boolean;
+} //delete

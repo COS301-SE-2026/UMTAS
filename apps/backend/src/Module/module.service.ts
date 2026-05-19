@@ -9,14 +9,20 @@ import { eq } from 'drizzle-orm';
 
 import { DatabaseService } from '../db/database.service';
 import { modules } from '../entities/Modules/index';
-import { CreateModuleDto, UpdateModuleDto } from './dto/module.dto';
+import {
+  CreateModuleDto,
+  DeleteModuleResponseDto,
+  ModuleListResponseDto,
+  SingleModuleResponseDto,
+  UpdateModuleDto,
+} from './dto/module.dto';
 
 @Injectable()
 export class ModuleService {
   constructor(private readonly dbService: DatabaseService) {}
 
   // Create module
-  async create(dto: CreateModuleDto) {
+  async create(dto: CreateModuleDto): Promise<SingleModuleResponseDto> {
     const code = dto.code?.trim().toUpperCase();
     const name = dto.name?.trim();
     const description = dto.description?.trim();
@@ -56,13 +62,13 @@ export class ModuleService {
   } //create
 
   //return all
-  async getAll() {
+  async getAll(): Promise<ModuleListResponseDto> {
     const foundModules = await this.dbService.db.select().from(modules);
 
     return { modules: foundModules };
   } //getAll
 
-  async getById(id: number) {
+  async getById(id: number): Promise<SingleModuleResponseDto> {
     const [module] = await this.dbService.db
       .select()
       .from(modules)
@@ -76,7 +82,10 @@ export class ModuleService {
     };
   } //getById
 
-  async update(moduleId: number, dto: UpdateModuleDto) {
+  async update(
+    moduleId: number,
+    dto: UpdateModuleDto,
+  ): Promise<SingleModuleResponseDto> {
     //Find module
     const [module] = await this.dbService.db
       .select()
@@ -132,7 +141,7 @@ export class ModuleService {
     };
   } //update
 
-  async deleteById(moduleId: number) {
+  async deleteById(moduleId: number): Promise<DeleteModuleResponseDto> {
     const [module] = await this.dbService.db
       .select()
       .from(modules)

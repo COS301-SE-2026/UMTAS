@@ -1,5 +1,11 @@
 import { ModuleService } from './module.service';
-import { CreateModuleDto, UpdateModuleDto } from './dto/module.dto';
+import {
+  CreateModuleDto,
+  DeleteModuleResponseDto,
+  ModuleListResponseDto,
+  SingleModuleResponseDto,
+  UpdateModuleDto,
+} from './dto/module.dto';
 import {
   Post,
   Body,
@@ -30,7 +36,10 @@ export class ModuleController {
   @Public()
   @Post()
   @ApiOperation({ summary: 'Create a module' })
-  @ApiCreatedResponse({ description: 'Module created successfully' })
+  @ApiCreatedResponse({
+    description: 'Module created successfully',
+    type: SingleModuleResponseDto,
+  })
   @ApiBadRequestResponse({ description: 'Missing or invalid module payload' })
   @ApiConflictResponse({ description: 'Module code already exists' })
   createModule(@Body() dto: CreateModuleDto) {
@@ -41,7 +50,10 @@ export class ModuleController {
   @Public()
   @Get()
   @ApiOperation({ summary: 'Get modules' })
-  @ApiOkResponse({ description: 'Modules returned successfully' })
+  @ApiOkResponse({
+    description: 'Modules returned successfully',
+    type: ModuleListResponseDto,
+  })
   getAll() {
     return this.service.getAll();
   }
@@ -50,7 +62,10 @@ export class ModuleController {
   @Public()
   @Get(':moduleId')
   @ApiOperation({ summary: 'Get a module by ID' })
-  @ApiOkResponse({ description: 'Module returned successfully' })
+  @ApiOkResponse({
+    description: 'Module returned successfully',
+    type: SingleModuleResponseDto,
+  })
   @ApiBadRequestResponse({ description: 'Invalid module ID' })
   @ApiNotFoundResponse({ description: 'Module not found' })
   getById(@Param('moduleId', ParseIntPipe) moduleId: number) {
@@ -61,7 +76,10 @@ export class ModuleController {
   @Public()
   @Patch(':moduleId')
   @ApiOperation({ summary: 'Update a module' })
-  @ApiOkResponse({ description: 'Module returned successfully' })
+  @ApiOkResponse({
+    description: 'Module returned successfully',
+    type: SingleModuleResponseDto,
+  })
   @ApiBadRequestResponse({ description: 'Invalid update payload or module ID' })
   @ApiConflictResponse({ description: 'Duplicate module code detected' })
   @ApiNotFoundResponse({ description: 'Module not found' })
@@ -75,10 +93,13 @@ export class ModuleController {
   @Public()
   @Delete(':moduleId')
   @ApiOperation({ summary: 'Delete module by id' })
-  @ApiOkResponse({ description: 'Module deleted successfully' })
+  @ApiOkResponse({
+    description: 'Module deleted successfully',
+    type: DeleteModuleResponseDto,
+  })
   @ApiBadRequestResponse({ description: 'Invalid module ID' })
   @ApiNotFoundResponse({ description: 'Module not found' })
   delete(@Param('moduleId', ParseIntPipe) moduleId: number) {
     return this.service.deleteById(moduleId);
   }
-} //EventController
+} //ModuleController
