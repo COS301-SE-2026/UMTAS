@@ -236,17 +236,13 @@ export function ModulesStep({
         {/* inline edit form */}
         {isSelected && (
           <div className="flex flex-col gap-2 pl-2">
-            <Card className="border-[var(--border)] bg-[var(--bg-surface)] shadow-none">
-              <CardContent className="p-0">
-                <ModuleCard
-                  module={module}
-                  index={index}
-                  onUpdate={handleUpdate}
-                  onRemove={handleRemove}
-                  errors={errors}
-                />
-              </CardContent>
-            </Card>
+            <ModuleCard
+              module={module}
+              index={index}
+              onUpdate={handleUpdate}
+              onRemove={handleRemove}
+              errors={errors}
+            />
             {/* confirm button */}
             <Button
               type="button"

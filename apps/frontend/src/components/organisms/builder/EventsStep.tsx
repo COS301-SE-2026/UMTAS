@@ -292,19 +292,15 @@ export function EventsStep({
         {/* inline edit form */}
         {isSelected && (
           <div className="flex flex-col gap-2 pl-2">
-            <Card className="border-[var(--border)] bg-[var(--bg-surface)] shadow-none">
-              <CardContent className="p-0">
-                <EventCard
-                  event={event}
-                  index={index}
-                  modules={modules}
-                  onUpdate={handleUpdate}
-                  onRemove={handleRemove}
-                  onGoToModules={onGoToModules}
-                  errors={errors}
-                />
-              </CardContent>
-            </Card>
+            <EventCard
+              event={event}
+              index={index}
+              modules={modules}
+              onUpdate={handleUpdate}
+              onRemove={handleRemove}
+              onGoToModules={onGoToModules}
+              errors={errors}
+            />
 
             <Button
               type="button"
