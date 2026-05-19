@@ -122,6 +122,7 @@ services:
     networks:
       - gateway
     environment:
+      - PORT=${FRONTEND_PORT}
       - NEXT_PUBLIC_API_URL=https://api.${DOMAIN}
       - API_URL=https://api.${DOMAIN}
     profiles:
