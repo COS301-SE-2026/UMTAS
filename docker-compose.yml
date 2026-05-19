@@ -1,7 +1,9 @@
 networks:
   gateway:
+    name: gateway
     driver: bridge
   internal:
+    name: internal
     internal: true
 
 volumes:
@@ -11,10 +13,12 @@ volumes:
   grafana_data:
   prometheus_data:
   loki_data:
+  letsencrypt_data:
 
 services:
   postgres:
     image: postgres:15-alpine
+    restart: unless-stopped
     networks:
       - gateway
       - internal
@@ -35,6 +39,7 @@ services:
 
   redis:
     image: redis:7-alpine
+    restart: unless-stopped
     networks:
       - gateway
       - internal
@@ -43,7 +48,8 @@ services:
       - redis_data:/data
 
   minio:
-    image: minio/minio
+    image: minio/minio:RELEASE.2023-09-30T07-02-29Z
+    restart: unless-stopped
     networks:
       - gateway
       - internal
@@ -71,7 +77,7 @@ services:
     build:
       context: ./apps/solver
       dockerfile: solver.Dockerfile
-    image: ${DOCKER_REGISTRY}:solver-latest
+    image: ${DOCKER_REGISTRY}:solver-dev
     networks:
       - gateway
       - internal
@@ -85,12 +91,23 @@ services:
     build:
       context: ./apps/backend
       dockerfile: ../../docker/backend/backend.Dockerfile
-    image: ${DOCKER_REGISTRY}:backend-latest
+    image: ${DOCKER_REGISTRY}:backend-dev
     networks:
       - gateway
       - internal
     environment:
-      - BACKEND_PORT=${BACKEND_PORT}
+      - PORT=${BACKEND_PORT}
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
+      - DB_MODE=${DB_MODE}
+      - SEED=${SEED}
+      - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
+      - BETTER_AUTH_URL=https://api.${DOMAIN}
+      - BETTER_AUTH_TRUSTED_ORIGINS=https://${DOMAIN}
+      - CORS_ORIGIN=https://${DOMAIN}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - SYSTEM_ADMIN_USER_IDS=${SYSTEM_ADMIN_USER_IDS}
     profiles:
       - dev-docker
       - dev-pglite
@@ -100,65 +117,136 @@ services:
     build:
       context: ./apps/frontend
       dockerfile: ../../docker/frontend/frontend.Dockerfile
-    image: ${DOCKER_REGISTRY}:frontend-latest
+    image: ${DOCKER_REGISTRY}:frontend-dev
     networks:
       - gateway
     environment:
-      - PORT=${FRONTEND_PORT}
-      - API_URL=http://backend:${BACKEND_PORT}
-      - NEXT_PUBLIC_APP_URL=http://localhost:${FRONTEND_PORT}
-      - NEXT_PUBLIC_API_URL=http://localhost:${FRONTEND_PORT}/api/auth
+      - NEXT_PUBLIC_API_URL=https://api.${DOMAIN}
     profiles:
       - dev-docker
       - dev-pglite
       - server
 
   grafana:
-    image: grafana/grafana:9.5.2
+    image: grafana/grafana:10.4.3
+    restart: unless-stopped
     networks:
       - gateway
       - internal
     environment:
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD}
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /etc/grafana/provisioning/dashboards/json/home.json
     volumes:
       - grafana_data:/var/lib/grafana
       - ./infra/grafana/provisioning:/etc/grafana/provisioning
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
     profiles:
-      - monitoring
       - server
 
   prometheus:
-    image: prom/prometheus:latest
+    image: prom/prometheus:v3.4.0
+    restart: unless-stopped
     networks:
       - internal
+    environment:
+      - WATCHTOWER_HTTP_API_TOKEN=${WATCHTOWER_HTTP_API_TOKEN}
     volumes:
       - ./infra/prometheus:/etc/prometheus
       - prometheus_data:/prometheus
+    entrypoint: ["/etc/prometheus/docker-entrypoint.sh"]
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=30d"
+      - "--web.enable-lifecycle"
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
     profiles:
-      - monitoring
       - server
 
   loki:
-    image: grafana/loki:latest
+    image: grafana/loki:3.4.3
+    restart: unless-stopped
     networks:
       - internal
     command: -config.file=/etc/loki/local-config.yaml
     volumes:
       - ./infra/loki:/etc/loki
       - loki_data:/loki
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
     profiles:
-      - monitoring
       - server
 
   promtail:
-    image: grafana/promtail:latest
+    image: grafana/promtail:3.4.3
+    restart: unless-stopped
     networks:
       - internal
     volumes:
-      - /var/log:/var/log
+      - /var/run/docker.sock:/var/run/docker.sock:ro
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - ./infra/promtail/promtail-config.yaml:/etc/promtail/config.yml
     command: -config.file=/etc/promtail/config.yml
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
     profiles:
-      - monitoring
+      - server
+
+  node-exporter:
+    image: prom/node-exporter:v1.9.1
+    restart: unless-stopped
+    networks:
+      - internal
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+      - /run/udev:/run/udev:ro
+    command:
+      - "--path.procfs=/host/proc"
+      - "--path.rootfs=/rootfs"
+      - "--path.sysfs=/host/sys"
+      - "--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)"
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+    profiles:
+      - server
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.52.1
+    restart: unless-stopped
+    networks:
+      - internal
+    devices:
+      - /dev/kmsg
+    privileged: true
+    volumes:
+      - /:/rootfs:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+    command:
+      - "--docker_only=true"
+      - "--store_container_labels=true"
+      - "--disable_metrics=advtcp,app,cpu,cpuLoad,diskIO,hugetlb,memory,network,oom_event,percpu,perf_event,process,referenced_memory,resctrl,sched,tcp,udp"
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+    profiles:
+      - server
+
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:v0.17.1
+    restart: unless-stopped
+    networks:
+      - internal
+    environment:
+      DATA_SOURCE_NAME: "postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}?sslmode=disable"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+    profiles:
       - server

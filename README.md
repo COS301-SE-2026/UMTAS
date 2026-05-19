@@ -2,63 +2,138 @@
 
 <br>
 
-<img src="docs/assets/images/VigilLogoOwl.png" width="220" alt="Team Vigil">
+<img src="docs/assets/images/VigilLogoOwl-animated.svg" width="300" alt="Team Vigil">
 
-<br><br>
+<br>
 
-<a href="https://tyto.africa/"><img src="docs/assets/images/Tytobanner.svg" width="200" alt="Tyto Insights"></a>
-&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="https://dns.africa/c/"><img src="docs/assets/LOGOS/DNS_BUSINESS_BLACK_TRANSPARENT.png" width="160" alt="DNS Business"></a>
-&nbsp;&nbsp;&nbsp;&nbsp;
-<img src="docs/assets/images/UP_Logo.png" width="70" alt="University of Pretoria">
+<img src="docs/assets/images/umtas-wordmark.svg" width="500" alt="UMTAS">
 
-<br><br>
+<br>
 
-# UMTAS
+### University Management & Timetabling Automation System
 
-**University Management & Timetabling Automation System**
+**A Strategic Partnership between [Tyto Insights](https://tyto.africa/), [DNS Business](https://dns.africa/c/), and Team Vigil**
 
-_A strategic partnership between Tyto Insights, DNS Business, and Team Vigil_
+_Built by: Wilmar Smit, Michael Tomlinson, Johan Coetzer, Marcel Stoltz, & Aidan Dawson_
 
-[![Tyto Insights](https://img.shields.io/badge/Tyto_Insights-tyto.africa-18181b?style=for-the-badge)](https://tyto.africa/)
+<br>
+
+[![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&weight=500&size=18&duration=3500&pause=1000&color=3B82F6&center=true&vCenter=true&width=580&lines=Automated+timetabling%2C+powered+by+OR-Tools;PDF+schedule+ingestion+%E2%80%94+zero+manual+entry;University-agnostic+by+design;Up+to+20%2C000+concurrent+students)](https://cos301-se-2026.github.io/UMTAS/)
+
+<br>
+
+<!-- Status & CI — tracking dev branch where workflows live -->
+
+[![Docs](https://img.shields.io/github/actions/workflow/status/COS301-SE-2026/UMTAS/deploy-docs.yml?branch=dev&style=for-the-badge&logo=readthedocs&logoColor=white&label=Docs)](https://cos301-se-2026.github.io/UMTAS/)
+[![Issues](https://img.shields.io/github/issues/COS301-SE-2026/UMTAS?style=for-the-badge&logo=github&logoColor=white&labelColor=1e293b&color=1d4ed8)](https://github.com/COS301-SE-2026/UMTAS/issues)
+[![Last Commit](https://img.shields.io/github/last-commit/COS301-SE-2026/UMTAS/dev?style=for-the-badge&logo=git&logoColor=white&labelColor=1e293b&color=1d4ed8)](https://github.com/COS301-SE-2026/UMTAS/commits/dev)
+[![CI](https://img.shields.io/github/actions/workflow/status/COS301-SE-2026/UMTAS/ci.yml?branch=dev&style=for-the-badge&logo=githubactions&logoColor=white&label=CI)](https://github.com/COS301-SE-2026/UMTAS/actions/workflows/ci.yml)
+[![Coverage](https://img.shields.io/codecov/c/github/COS301-SE-2026/UMTAS/dev?style=for-the-badge&logo=codecov&logoColor=white&label=Coverage)](https://codecov.io/gh/COS301-SE-2026/UMTAS)
+[![Quality Gate](https://img.shields.io/badge/Quality_Gate-pending-3f3f46?style=for-the-badge&logo=sonarcloud&logoColor=white)](https://sonarcloud.io/dashboard?id=COS301-SE-2026_UMTAS)
+[![Uptime](https://img.shields.io/uptimerobot/ratio/m803102764-591e06f9f3d70c1a4b161f6f?style=for-the-badge&logo=uptimerobot&logoColor=white&label=Uptime+30d&color=1d4ed8)](https://dashboard.uptimerobot.com/monitors/803102764)
+
+<!-- Platform & Tooling -->
+
+[![pnpm](https://img.shields.io/badge/pnpm-monorepo-F69220?style=for-the-badge&logo=pnpm&logoColor=white)](https://pnpm.io/)
+[![Node](https://img.shields.io/badge/Node-%3E%3D20-16a34a?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
+[![Turborepo](https://img.shields.io/badge/Turborepo-workspace-000000?style=for-the-badge&logo=turborepo&logoColor=white)](https://turborepo.com/)
+[![Docker Pulls](https://img.shields.io/docker/pulls/vigilcs/umtas?style=for-the-badge&logo=docker&logoColor=white&label=Docker+Pulls&color=0db7ed)](https://hub.docker.com/u/vigilcs)
+[![Release](https://img.shields.io/badge/Release-pre--release-3f3f46?style=for-the-badge&logo=github&logoColor=white)](https://github.com/COS301-SE-2026/UMTAS/releases)
+
+<br>
+
+<img src="docs/assets/images/sponsors-marquee.svg" width="900" alt="Tyto Insights · DNS Business · University of Pretoria">
+
+<br>
+
+<!-- Partners & Affiliation -->
+
+[![Tyto Insights](https://img.shields.io/badge/Tyto_Insights-tyto.africa-0f172a?style=for-the-badge)](https://tyto.africa/)
 [![DNS Business](https://img.shields.io/badge/DNS_Business-dns.africa-003366?style=for-the-badge)](https://dns.africa/c/)
 [![University of Pretoria](https://img.shields.io/badge/University_of_Pretoria-COS_301-003B5C?style=for-the-badge)](https://www.up.ac.za/)
 
 <br>
 
-[![Docs](https://img.shields.io/badge/Docs-passing-8CA1AF?style=for-the-badge&logo=readthedocs&logoColor=white)](https://cos301-se-2026.github.io/UMTAS/)
-[![Issues](https://img.shields.io/github/issues/COS301-SE-2026/UMTAS?style=for-the-badge&logo=github&logoColor=white&label=Issues)](https://github.com/COS301-SE-2026/UMTAS/issues)
-[![Last Commit](https://img.shields.io/github/last-commit/COS301-SE-2026/UMTAS/dev?style=for-the-badge&label=Last+Commit)](https://github.com/COS301-SE-2026/UMTAS/commits/dev)
-[![pnpm](https://img.shields.io/badge/pnpm-monorepo-F69220?style=for-the-badge&logo=pnpm&logoColor=white)](https://pnpm.io/)
-[![Node](https://img.shields.io/badge/Node-%3E%3D20-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
-
-<!-- Uncomment once GitHub Actions workflow names are confirmed
-[![CI](https://github.com/COS301-SE-2026/UMTAS/actions/workflows/ci.yml/badge.svg?style=flat-square)](https://github.com/COS301-SE-2026/UMTAS/actions/workflows/ci.yml)
--->
-
-<!-- Uncomment once Codecov / SonarCloud is connected
-[![Coverage](https://codecov.io/gh/COS301-SE-2026/UMTAS/branch/main/graph/badge.svg)](https://codecov.io/gh/COS301-SE-2026/UMTAS)
-[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=COS301-SE-2026_UMTAS&metric=alert_status)](https://sonarcloud.io/dashboard?id=COS301-SE-2026_UMTAS)
--->
-
-<!-- Uncomment once Uptime Robot / NodePing monitors are created
-[![Uptime](https://img.shields.io/uptimerobot/ratio/mXXXXXXXXXX?style=flat-square&color=14532d&label=Uptime+30d)](https://uptimerobot.com)
--->
-
-<br>
+<!-- Documentation Links -->
 
 [![Functional Requirements](<https://img.shields.io/badge/Functional_Requirements_(SRS)-View_Document-14532d?style=for-the-badge&logo=googledocs&logoColor=white>)](https://cos301-se-2026.github.io/UMTAS/requirements/Introduction/)
-[![Full Documentation](https://img.shields.io/badge/Full_Documentation-Visit_Site-18181b?style=for-the-badge&logo=readthedocs&logoColor=white)](https://cos301-se-2026.github.io/UMTAS/)
-[![Project Board](https://img.shields.io/badge/Project_Board-View_on_GitHub-78350f?style=for-the-badge&logo=github&logoColor=white)](https://github.com/orgs/COS301-SE-2026/projects/[ID])
-[![Issue Tracker](https://img.shields.io/badge/Issue_Tracker-GitHub_Issues-7f1d1d?style=for-the-badge&logo=github&logoColor=white)](https://github.com/COS301-SE-2026/UMTAS/issues)
-
-<br>
+[![Full Documentation](https://img.shields.io/badge/Full_Documentation-Visit_Site-14532d?style=for-the-badge&logo=readthedocs&logoColor=white)](https://cos301-se-2026.github.io/UMTAS/)
+[![Project Board](https://img.shields.io/badge/Project_Board-View_on_GitHub-14532d?style=for-the-badge&logo=github&logoColor=white)](https://github.com/orgs/COS301-SE-2026/projects)
+[![Issue Tracker](https://img.shields.io/badge/Issue_Tracker-GitHub_Issues-14532d?style=for-the-badge&logo=github&logoColor=white)](https://github.com/COS301-SE-2026/UMTAS/issues)
 
 </div>
 
+---
+
 <div align="center">
 
-## Technology Stack
+## <img src="https://api.iconify.design/mdi/information-outline.svg?color=%233B82F6" width="24" height="24" valign="middle"> Project Overview
+
+</div>
+
+UMTAS automates the full university timetabling lifecycle — from ingesting raw PDF schedules and extracting hard and soft scheduling constraints, through to delivering conflict-free, optimised timetables to up to **20,000 concurrent students**.
+
+The system is **university-agnostic by design**: a Core-and-Adapter architecture cleanly separates the constraint-solving engine from institution-specific data formats. Onboarding a new university requires only a thin adapter — the core solver remains untouched.
+
+<br>
+
+<table width="100%">
+  <tr>
+    <td width="50%" valign="top">
+      <h4><img src="https://api.iconify.design/mdi/file-pdf-box.svg?color=%233B82F6" width="18" height="18" valign="middle"> The Problem</h4>
+      <p>Traditional timetabling is a multi-week manual process. Administrators juggle hundreds of constraints — venue capacities, lecturer availability, student group conflicts — in spreadsheets. A single room change cascades into hours of rescheduling.</p>
+    </td>
+    <td width="50%" valign="top">
+      <h4><img src="https://api.iconify.design/mdi/lightbulb-outline.svg?color=%233B82F6" width="18" height="18" valign="middle"> The Solution</h4>
+      <p>UMTAS ingests the university's existing PDF calendar, parses all constraints automatically, and invokes a CP-SAT constraint-programming solver to generate an optimal schedule in seconds — not weeks.</p>
+    </td>
+  </tr>
+</table>
+
+---
+
+<div align="center">
+
+## <img src="https://api.iconify.design/mdi/star-outline.svg?color=%233B82F6" width="24" height="24" valign="middle"> Features
+
+</div>
+
+<table width="100%">
+  <tr>
+    <td width="33%" valign="top" align="center">
+      <h3><img src="https://api.iconify.design/mdi/file-document-outline.svg?color=%233B82F6" width="20" height="20" valign="middle"> PDF Ingestion</h3>
+      <p>PyMuPDF-powered extraction parses structured and semi-structured university PDF calendars into machine-readable constraint sets — zero manual data entry.</p>
+    </td>
+    <td width="33%" valign="top" align="center">
+      <h3><img src="https://api.iconify.design/mdi/calculator-variant-outline.svg?color=%233B82F6" width="20" height="20" valign="middle"> Constraint Solving</h3>
+      <p>Google OR-Tools CP-SAT solver handles hard constraints (no double-booking, room capacity) and soft constraints (lecturer preferences, day-spread) with optimal solutions.</p>
+    </td>
+    <td width="33%" valign="top" align="center">
+      <h3><img src="https://api.iconify.design/mdi/alert-circle-outline.svg?color=%233B82F6" width="20" height="20" valign="middle"> Conflict Detection</h3>
+      <p>BullMQ-backed job queue processes re-solve requests asynchronously. Administrators receive conflict alerts and revised schedules without blocking the UI.</p>
+    </td>
+  </tr>
+  <tr>
+    <td width="33%" valign="top" align="center">
+      <h3><img src="https://api.iconify.design/mdi/domain.svg?color=%233B82F6" width="20" height="20" valign="middle"> University-Agnostic</h3>
+      <p>A Core-and-Adapter architecture decouples the solver from any single institution's data format. New universities onboard by implementing a thin adapter — the core is never touched.</p>
+    </td>
+    <td width="33%" valign="top" align="center">
+      <h3><img src="https://api.iconify.design/mdi/chart-bar.svg?color=%233B82F6" width="20" height="20" valign="middle"> Observability</h3>
+      <p>Prometheus metrics, Grafana dashboards, and Loki log aggregation are provisioned out-of-the-box. PostHog captures product analytics for continuous UX improvement.</p>
+    </td>
+    <td width="33%" valign="top" align="center">
+      <h3><img src="https://api.iconify.design/mdi/shield-lock-outline.svg?color=%233B82F6" width="20" height="20" valign="middle"> Secure by Default</h3>
+      <p>OAuth 2.0 authentication, role-based access control, Redis-backed session management, and MinIO for isolated document storage. All traffic routed through Traefik with TLS termination.</p>
+    </td>
+  </tr>
+</table>
+
+---
+
+<div align="center">
+
+## <img src="https://api.iconify.design/mdi/layers-outline.svg?color=%233B82F6" width="24" height="24" valign="middle"> Technology Stack
 
 </div>
 
@@ -112,30 +187,43 @@ _A strategic partnership between Tyto Insights, DNS Business, and Team Vigil_
 
 <div align="center">
 
-## Repository Structure
+## <img src="https://api.iconify.design/mdi/file-tree-outline.svg?color=%233B82F6" width="24" height="24" valign="middle"> Repository Structure
 
 </div>
 
 This is a **pnpm monorepo** managed by Turborepo. All applications, shared packages, and infrastructure live in one repository to enable atomic commits and shared tooling across every workstream.
 
-```
-UMTAS/
-├── apps/
-│   ├── web/          # Next.js frontend
-│   └── api/          # NestJS core backend
-├── packages/
-│   ├── database/     # DrizzleORM schema & migrations
-│   ├── types/        # Shared TypeScript types
-│   └── config/       # Shared ESLint, TSConfig
-├── solver/           # FastAPI + OR-Tools Python service
-└── infra/            # Docker Compose, Traefik, Grafana provisioning
+```mermaid
+mindmap
+  root((UMTAS))
+    apps
+      web
+        Next.js Frontend
+        React · Tailwind · Shadcn
+      api
+        NestJS Backend
+        DrizzleORM · BullMQ
+    packages
+      database
+        Schema & Migrations
+      types
+        Shared TypeScript
+      config
+        ESLint · TSConfig
+    solver
+      FastAPI Service
+      OR-Tools · PyMuPDF
+    infra
+      Docker Compose
+      Traefik · Grafana
+      Prometheus · Loki
 ```
 
 ---
 
 <div align="center">
 
-## Branching Strategy
+## <img src="https://api.iconify.design/mdi/source-branch.svg?color=%233B82F6" width="24" height="24" valign="middle"> Branching Strategy
 
 </div>
 
@@ -172,7 +260,7 @@ gitGraph LR:
 
 <div align="center">
 
-## Team
+## <img src="https://api.iconify.design/mdi/account-group-outline.svg?color=%233B82F6" width="24" height="24" valign="middle"> Team
 
 </div>
 
@@ -182,8 +270,8 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
 
 <table>
   <tr>
-    <td width="130" valign="top">
-      <img src="docs/assets/images/team/Wilmar_smit_PFP.png" width="110" alt="Wilmar Smit">
+    <td width="140" align="center" valign="top">
+      <img src="docs/assets/images/team/framed/Wilmar_smit_PFP_circle.svg" width="120" alt="Wilmar Smit">
     </td>
     <td valign="top">
       <strong>Wilmar Smit</strong> &nbsp;—&nbsp; Team Lead &amp; Integration Lead<br><br>
@@ -199,12 +287,10 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
   </tr>
 </table>
 
----
-
 <table>
   <tr>
-    <td width="130" valign="top">
-      <img src="docs/assets/images/team/Michael_Tomlinson_PFP.jpeg" width="110" alt="Michael Tomlinson">
+    <td width="140" align="center" valign="top">
+      <img src="docs/assets/images/team/framed/Michael_Tomlinson_PFP_circle.svg" width="120" alt="Michael Tomlinson">
     </td>
     <td valign="top">
       <strong>Michael Tomlinson</strong> &nbsp;—&nbsp; Lead Developer &amp; System Architect<br><br>
@@ -220,12 +306,10 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
   </tr>
 </table>
 
----
-
 <table>
   <tr>
-    <td width="130" valign="top">
-      <img src="docs/assets/images/team/Johan_Coetzer_PFP.jpeg" width="110" alt="Johan Coetzer">
+    <td width="140" align="center" valign="top">
+      <img src="docs/assets/images/team/framed/Johan_Coetzer_PFP_circle.svg" width="120" alt="Johan Coetzer">
     </td>
     <td valign="top">
       <strong>Johan Coetzer</strong> &nbsp;—&nbsp; Frontend Lead &amp; Full-Stack Developer<br><br>
@@ -241,12 +325,10 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
   </tr>
 </table>
 
----
-
 <table>
   <tr>
-    <td width="130" valign="top">
-      <img src="docs/assets/images/team/Marcel_Stoltz_PFP.png" width="110" alt="Marcel Stoltz">
+    <td width="140" align="center" valign="top">
+      <img src="docs/assets/images/team/framed/Marcel_Stoltz_PFP_circle.svg" width="120" alt="Marcel Stoltz">
     </td>
     <td valign="top">
       <strong>Marcel Stoltz</strong> &nbsp;—&nbsp; DevOps Lead &amp; Backend Specialist<br><br>
@@ -262,12 +344,10 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
   </tr>
 </table>
 
----
-
 <table>
   <tr>
-    <td width="130" valign="top">
-      <img src="docs/assets/images/team/Aidan_Dawson_PFP.jpg" width="110" alt="Aidan Dawson">
+    <td width="140" align="center" valign="top">
+      <img src="docs/assets/images/team/framed/Aidan_Dawson_PFP_circle.svg" width="120" alt="Aidan Dawson">
     </td>
     <td valign="top">
       <strong>Aidan Dawson</strong> &nbsp;—&nbsp; Backend Developer &amp; Integration<br><br>
@@ -283,13 +363,11 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
   </tr>
 </table>
 
-<br>
-
 ---
 
 <div align="center">
 
-## Getting Started
+## <img src="https://api.iconify.design/mdi/console-line.svg?color=%233B82F6" width="24" height="24" valign="middle"> Getting Started
 
 </div>
 
@@ -355,7 +433,7 @@ Adds Grafana, Prometheus, and Loki to the stack for local observability testing.
 
 <div align="center">
 
-## Documentation
+## <img src="https://api.iconify.design/mdi/bookshelf.svg?color=%233B82F6" width="24" height="24" valign="middle"> Documentation
 
 </div>
 
@@ -372,16 +450,16 @@ Adds Grafana, Prometheus, and Loki to the stack for local observability testing.
 <br>
 <div align="center">
 
-[![Introduction](https://img.shields.io/badge/Introduction-14532d?style=flat-square)](https://cos301-se-2026.github.io/UMTAS/requirements/Introduction/)
-[![Domain Model](https://img.shields.io/badge/Domain_Model-14532d?style=flat-square)](https://cos301-se-2026.github.io/UMTAS/requirements/Domain-Model/)
-[![User Stories](https://img.shields.io/badge/User_Stories-14532d?style=flat-square)](https://cos301-se-2026.github.io/UMTAS/requirements/User-Stories/)
-[![Use Cases](https://img.shields.io/badge/Use_Cases-14532d?style=flat-square)](https://cos301-se-2026.github.io/UMTAS/requirements/Use-Cases/)
-[![Functional Requirements](https://img.shields.io/badge/Functional_Requirements-14532d?style=flat-square)](https://cos301-se-2026.github.io/UMTAS/requirements/Functional-Requirements/)
-[![Quality Requirements](https://img.shields.io/badge/Quality_Requirements-14532d?style=flat-square)](https://cos301-se-2026.github.io/UMTAS/requirements/Quality-Requirements/)
-[![Architectural Requirements](https://img.shields.io/badge/Architectural_Requirements-14532d?style=flat-square)](https://cos301-se-2026.github.io/UMTAS/requirements/Architectural-Requirements/)
-[![Technology Requirements](https://img.shields.io/badge/Technology_Requirements-14532d?style=flat-square)](https://cos301-se-2026.github.io/UMTAS/requirements/Technology-Requirements/)
-[![Traceability Matrix](https://img.shields.io/badge/Traceability_Matrix-14532d?style=flat-square)](https://cos301-se-2026.github.io/UMTAS/requirements/Traceability-Matrix/)
-[![API Service Contracts](https://img.shields.io/badge/API_Service_Contracts-14532d?style=flat-square)](https://cos301-se-2026.github.io/UMTAS/requirements/API-Service-Contracts/)
+[![Introduction](https://img.shields.io/badge/Introduction-14532d?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/requirements/Introduction/)
+[![Domain Model](https://img.shields.io/badge/Domain_Model-14532d?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/requirements/Domain-Model/)
+[![User Stories](https://img.shields.io/badge/User_Stories-14532d?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/requirements/User-Stories/)
+[![Use Cases](https://img.shields.io/badge/Use_Cases-14532d?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/requirements/Use-Cases/)
+[![Functional Requirements](https://img.shields.io/badge/Functional_Requirements-14532d?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/requirements/Functional-Requirements/)
+[![Quality Requirements](https://img.shields.io/badge/Quality_Requirements-14532d?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/requirements/Quality-Requirements/)
+[![Architectural Requirements](https://img.shields.io/badge/Architectural_Requirements-14532d?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/requirements/Architectural-Requirements/)
+[![Technology Requirements](https://img.shields.io/badge/Technology_Requirements-14532d?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/requirements/Technology-Requirements/)
+[![Traceability Matrix](https://img.shields.io/badge/Traceability_Matrix-14532d?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/requirements/Traceability-Matrix/)
+[![API Service Contracts](https://img.shields.io/badge/API_Service_Contracts-14532d?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/requirements/API-Service-Contracts/)
 
 </div>
 </details>
@@ -391,9 +469,9 @@ Adds Grafana, Prometheus, and Loki to the stack for local observability testing.
 <br>
 <div align="center">
 
-[![Brand Style Guide](https://img.shields.io/badge/Brand_Style_Guide-78350f?style=flat-square)](https://cos301-se-2026.github.io/UMTAS/design/Brand-Style/)
-[![Wireframes](https://img.shields.io/badge/Wireframes-78350f?style=flat-square)](https://cos301-se-2026.github.io/UMTAS/design/Wireframes/)
-[![Diagrams Repository](https://img.shields.io/badge/Diagrams_Repository-78350f?style=flat-square)](https://cos301-se-2026.github.io/UMTAS/diagrams/README/)
+[![Brand Style Guide](https://img.shields.io/badge/Brand_Style_Guide-78350f?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/design/Brand-Style/)
+[![Wireframes](https://img.shields.io/badge/Wireframes-78350f?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/design/Wireframes/)
+[![Diagrams Repository](https://img.shields.io/badge/Diagrams_Repository-78350f?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/diagrams/README/)
 
 </div>
 </details>
@@ -403,16 +481,16 @@ Adds Grafana, Prometheus, and Loki to the stack for local observability testing.
 <br>
 <div align="center">
 
-[![Repo Setup](https://img.shields.io/badge/Repo_Setup-3f3f46?style=flat-square)](https://cos301-se-2026.github.io/UMTAS/developer-guides/Repo-Setup-Guide/)
-[![Git Strategy](https://img.shields.io/badge/Git_Strategy-3f3f46?style=flat-square)](https://cos301-se-2026.github.io/UMTAS/developer-guides/git-strategy-guide/)
-[![Master Dev Guide](https://img.shields.io/badge/Master_Dev_Guide-3f3f46?style=flat-square)](https://cos301-se-2026.github.io/UMTAS/developer-guides/master-development-guide/)
-[![Backend Development](https://img.shields.io/badge/Backend_Development-3f3f46?style=flat-square)](https://cos301-se-2026.github.io/UMTAS/developer-guides/backend-development-guide/)
-[![Frontend Development](https://img.shields.io/badge/Frontend_Development-3f3f46?style=flat-square)](https://cos301-se-2026.github.io/UMTAS/developer-guides/frontend-development-guide/)
-[![Server Setup](https://img.shields.io/badge/Server_Setup-3f3f46?style=flat-square)](https://cos301-se-2026.github.io/UMTAS/developer-guides/Server-Setup-Guide/)
-[![Server Operations](https://img.shields.io/badge/Server_Operations-3f3f46?style=flat-square)](https://cos301-se-2026.github.io/UMTAS/developer-guides/server-guide/)
-[![Unit Testing](https://img.shields.io/badge/Unit_Testing-3f3f46?style=flat-square)](https://cos301-se-2026.github.io/UMTAS/developer-guides/unit-testing-guide/)
-[![Integration Testing](https://img.shields.io/badge/Integration_Testing-3f3f46?style=flat-square)](https://cos301-se-2026.github.io/UMTAS/developer-guides/integration-testing-guide/)
-[![Local CI/CD](https://img.shields.io/badge/Local_CI%2FCD-3f3f46?style=flat-square)](https://cos301-se-2026.github.io/UMTAS/developer-guides/local-cicd-guide/)
+[![Repo Setup](https://img.shields.io/badge/Repo_Setup-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/developer-guides/Repo-Setup-Guide/)
+[![Git Strategy](https://img.shields.io/badge/Git_Strategy-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/developer-guides/git-strategy-guide/)
+[![Master Dev Guide](https://img.shields.io/badge/Master_Dev_Guide-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/developer-guides/master-development-guide/)
+[![Backend Development](https://img.shields.io/badge/Backend_Development-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/developer-guides/backend-development-guide/)
+[![Frontend Development](https://img.shields.io/badge/Frontend_Development-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/developer-guides/frontend-development-guide/)
+[![Server Setup](https://img.shields.io/badge/Server_Setup-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/developer-guides/Server-Setup-Guide/)
+[![Server Operations](https://img.shields.io/badge/Server_Operations-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/developer-guides/server-guide/)
+[![Unit Testing](https://img.shields.io/badge/Unit_Testing-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/developer-guides/unit-testing-guide/)
+[![Integration Testing](https://img.shields.io/badge/Integration_Testing-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/developer-guides/integration-testing-guide/)
+[![Local CI/CD](https://img.shields.io/badge/Local_CI%2FCD-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/developer-guides/local-cicd-guide/)
 
 </div>
 </details>
@@ -422,8 +500,8 @@ Adds Grafana, Prometheus, and Loki to the stack for local observability testing.
 <br>
 <div align="center">
 
-[![API Reference](https://img.shields.io/badge/API_Reference-52525b?style=flat-square)](https://cos301-se-2026.github.io/UMTAS/api/API-Reference/)
-[![Team Profiles](https://img.shields.io/badge/Team_Profiles-52525b?style=flat-square)](https://cos301-se-2026.github.io/UMTAS/management/Team-Profiles/)
+[![API Reference](https://img.shields.io/badge/API_Reference-52525b?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/api/API-Reference/)
+[![Team Profiles](https://img.shields.io/badge/Team_Profiles-52525b?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/management/Team-Profiles/)
 
 </div>
 </details>

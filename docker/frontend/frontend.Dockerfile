@@ -1,33 +1,27 @@
-FROM node:22-alpine AS build
-
+FROM node:22-alpine AS base
 WORKDIR /app
-
 RUN corepack enable
 
-COPY package.json ./
-RUN pnpm install --no-frozen-lockfile
+FROM base AS deps
+COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./
+COPY packages/shared-types/package.json ./packages/shared-types/
+COPY apps/frontend/package.json ./apps/frontend/
+RUN pnpm install --frozen-lockfile
 
-COPY . .
-RUN pnpm build
+FROM deps AS build
+COPY packages/shared-types/ ./packages/shared-types/
+COPY apps/frontend/ ./apps/frontend/
+RUN pnpm --filter=shared-types build
+RUN pnpm --filter=frontend build
+RUN pnpm --filter=frontend deploy --prod --legacy /deploy && cp -r apps/frontend/.next /deploy/.next
 
 FROM node:22-alpine AS runtime
-
 WORKDIR /app
-
 ENV NODE_ENV=production
 ENV PORT=3000
-
 RUN corepack enable
-
-COPY package.json ./
-COPY --from=build /app/node_modules ./node_modules
-COPY --from=build /app/.next ./.next
-COPY --from=build /app/public ./public
-COPY --from=build /app/next.config.ts ./next.config.ts
-COPY --from=build /app/postcss.config.mjs ./postcss.config.mjs
-COPY --from=build /app/tsconfig.json ./tsconfig.json
-COPY --from=build /app/src ./src
-
+COPY --from=build /deploy .
 EXPOSE 3000
-
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:3000/api/health',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"
 CMD ["pnpm", "start"]

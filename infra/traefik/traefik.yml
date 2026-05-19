@@ -2,6 +2,9 @@ global:
   checkNewVersion: true
   sendAnonymousUsage: false
 
+log:
+  level: INFO
+
 api:
   dashboard: true
   insecure: false
@@ -14,8 +17,26 @@ entryPoints:
         entryPoint:
           to: websecure
           scheme: https
+          permanent: true
   websecure:
     address: ":443"
+    http:
+      tls:
+        certResolver: myresolver
+  metrics:
+    address: ":8082"
+
+metrics:
+  prometheus:
+    entryPoint: metrics
+    addEntryPointsLabels: true
+    addRoutersLabels: true
+    addServicesLabels: true
+    buckets:
+      - 0.1
+      - 0.3
+      - 1.2
+      - 5.0
 
 providers:
   docker:
@@ -23,7 +44,6 @@ providers:
     exposedByDefault: false
     network: gateway
     httpClientTimeout: 300s
-    useBindPortIP: true
 
 certificatesResolvers:
   myresolver:
