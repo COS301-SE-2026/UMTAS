@@ -20,6 +20,7 @@ services:
     image: postgres:15-alpine
     restart: unless-stopped
     networks:
+      - gateway
       - internal
     ports:
       - "5432:5432"
@@ -40,6 +41,7 @@ services:
     image: redis:7-alpine
     restart: unless-stopped
     networks:
+      - gateway
       - internal
     command: redis-server --requirepass ${REDIS_PASSWORD}
     volumes:
