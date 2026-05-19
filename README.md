@@ -39,7 +39,6 @@ _Built by: Wilmar Smit, Michael Tomlinson, Johan Coetzer, Marcel Stoltz, & Aidan
 [![Turborepo](https://img.shields.io/badge/Turborepo-workspace-000000?style=for-the-badge&logo=turborepo&logoColor=white)](https://turborepo.com/)
 [![Docker Pulls](https://img.shields.io/docker/pulls/vigilcs/umtas?style=for-the-badge&logo=docker&logoColor=white&label=Docker+Pulls&color=0db7ed)](https://hub.docker.com/u/vigilcs)
 [![Release](https://img.shields.io/badge/Release-pre--release-3f3f46?style=for-the-badge&logo=github&logoColor=white)](https://github.com/COS301-SE-2026/UMTAS/releases)
-[![License](https://img.shields.io/badge/License-MIT-14532d?style=for-the-badge)](https://github.com/COS301-SE-2026/UMTAS/blob/main/LICENSE)
 
 <br>
 
