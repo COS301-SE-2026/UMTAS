@@ -89,8 +89,8 @@ services:
 
   backend:
     build:
-      context: ./apps/backend
-      dockerfile: ../../docker/backend/backend.Dockerfile
+      context: .
+      dockerfile: docker/backend/backend.Dockerfile
     image: ${DOCKER_REGISTRY}:backend-dev
     networks:
       - gateway
@@ -137,8 +137,10 @@ services:
     healthcheck:
       test:
         [
-          "CMD-SHELL",
-          'node -e "require(''http'').get(''http://127.0.0.1:''+process.env.PORT+''/api/health'',r=>process.exit(r.statusCode<500?0:1)).on(''error'',()=>process.exit(1))"',
+          "CMD",
+          "node",
+          "-e",
+          "const os=require('os');const ip=Object.values(os.networkInterfaces()).flat().find((a)=>a.family==='IPv4'&&!a.internal)?.address;if(!ip) process.exit(1);require('http').get('http://'+ip+':'+process.env.PORT+'/api/health',r=>process.exit(r.statusCode<500?0:1)).on('error',()=>process.exit(1))",
         ]
       interval: 30s
       timeout: 5s
