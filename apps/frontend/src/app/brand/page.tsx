@@ -92,6 +92,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/atoms/baseShadcn/tooltip";
+import { WeeklyGrid } from "@/components/organisms/viewTimetable/WeeklyGrid";
+import type { ScheduleEvent } from "@/types/schedule";
 
 type Theme = "light" | "dark";
 
@@ -454,6 +456,55 @@ const Breakpoint = [
       "Full 12-column grid. Max-width 1280px centered. Primary design target.",
   },
 ];
+
+const mockEvents: ScheduleEvent[] = [
+  {
+    id: "1",
+    code: "COS301",
+    name: "COS301",
+    subLabel: "Lecture",
+    date: "2026-05-04",
+    startTime: "08:00",
+    endTime: "09:00",
+    isRecurring: true,
+    accentColour: "#4A90F8",
+  },
+  {
+    id: "2",
+    code: "COS333",
+    name: "COS333",
+    subLabel: "Lecture",
+    date: "2026-05-05",
+    startTime: "09:00",
+    endTime: "11:00",
+    isRecurring: true,
+    accentColour: "#22C55E",
+  },
+  {
+    id: "3",
+    code: "COS344",
+    name: "COS344",
+    subLabel: "Lecture",
+    date: "2026-05-06",
+    startTime: "10:00",
+    endTime: "11:00",
+    isRecurring: true,
+    accentColour: "#F59E0B",
+  },
+  {
+    id: "4",
+    code: "COS314",
+    name: "COS314",
+    subLabel: "Lecture",
+    date: "2026-05-07",
+    startTime: "13:00",
+    endTime: "14:00",
+    isRecurring: true,
+    accentColour: "#F56363",
+  },
+];
+
+const mockWeekStart = new Date("2026-05-04");
 
 // contrast ratio helper
 
@@ -1292,7 +1343,7 @@ function ColoursSection() {
       index="01"
       label="Foundation"
       title="A monochrome system, intentionally restrained."
-      description="No hue-based accents anywhere. Hierarchy comes from tone, weight and spacing. The discipline is what makes the interface feel institutional-grade without being cold."
+      description="Hierarchy comes from tone, weight and spacing. The discipline is what makes the interface feel institutional-grade without being cold."
     >
       {/* mode tabs */}
       <div
@@ -1592,9 +1643,7 @@ function ColoursSection() {
       </div>
 
       {/* status colours */}
-      <MicroLabel style={{ marginBottom: 12 }}>
-        Status Colours · the only permitted hue exceptions
-      </MicroLabel>
+      <MicroLabel style={{ marginBottom: 12 }}>Status Colours</MicroLabel>
       <div
         style={{
           display: "grid",
@@ -3101,7 +3150,7 @@ export function ComponentsSection() {
         behaviour all derive from the tokens above.
       </p>
       <div style={{ marginBottom: 40 }}>
-        <ScheduleGridDemo />
+        <WeeklyGrid events={mockEvents} weekStart={mockWeekStart} />
       </div>
     </SectionShell>
   );
@@ -3459,8 +3508,8 @@ export default function BrandPage() {
                     }}
                   >
                     The University Modular Timetable &amp; Analytics System runs
-                    on a strictly monochrome design language. No hue-based
-                    accents. Hierarchy through tone, weight and spacing alone.
+                    on a strictly monochrome design language. Hierarchy through
+                    tone, weight and spacing.
                   </p>
 
                   <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
@@ -3566,54 +3615,13 @@ export default function BrandPage() {
                 >
                   <div
                     style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      marginBottom: 16,
-                      paddingBottom: 14,
-                      borderBottom: "1px solid #27272a",
+                      height: 480,
+                      overflow: "hidden",
+                      borderRadius: 16,
                     }}
                   >
-                    <div
-                      style={{ display: "flex", alignItems: "center", gap: 8 }}
-                    >
-                      <CalendarDays size={14} style={{ color: "#9a9a9a" }} />
-                      <span
-                        style={{
-                          fontSize: 13,
-                          fontWeight: 500,
-                          color: "#e8e8e8",
-                        }}
-                      >
-                        Semester 1 · Week 4
-                      </span>
-                    </div>
-                    <div
-                      style={{ display: "flex", alignItems: "center", gap: 6 }}
-                    >
-                      <span
-                        style={{
-                          width: 6,
-                          height: 6,
-                          borderRadius: 9999,
-                          backgroundColor: "#86efac",
-                          display: "inline-block",
-                        }}
-                      />
-                      <span
-                        style={{
-                          fontSize: 10,
-                          fontWeight: 500,
-                          color: "#9a9a9a",
-                          textTransform: "uppercase",
-                          letterSpacing: "0.06em",
-                        }}
-                      >
-                        Live preview
-                      </span>
-                    </div>
+                    <WeeklyGrid events={mockEvents} weekStart={mockWeekStart} />
                   </div>
-                  <HeroScheduleGrid reducedMotion={reducedMotion} />
                   <div
                     style={{
                       marginTop: 16,
