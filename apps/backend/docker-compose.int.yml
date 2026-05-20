@@ -40,9 +40,10 @@ services:
       - backend-int-pnpm-store:/pnpm
     command: >
       sh -c "corepack enable &&
-             corepack prepare pnpm@10.33.2 --activate &&
-             pnpm install --frozen-lockfile &&
-             pnpm --filter backend test:int:local"
+            corepack prepare pnpm@10.33.2 --activate &&
+            pnpm install --frozen-lockfile &&
+            pnpm --filter backend db:generate &&
+            pnpm --filter backend test:int:local"
 
 volumes:
   backend-int-root-node-modules:
