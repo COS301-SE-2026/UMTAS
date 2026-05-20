@@ -121,4 +121,38 @@ describe('ModuleService integration', () => {
       userID: USER_A,
     });
   });
+
+  //update
+  it('update module', async () => {
+    const mod = await service.create(USER_A, cos301);
+
+    const result = await service.update(USER_A, mod.module.moduleID, {
+      code: 'COS333333',
+      name: 'new Name',
+      description: 'updatedDescription',
+      styling: '#939393',
+    });
+
+    expect(result.module).toMatchObject({
+      moduleID: mod.module.moduleID,
+      moduleCode: 'COS333333',
+      moduleName: 'new Name',
+      moduleDescription: 'updatedDescription',
+      styling: '#939393',
+      userID: USER_A,
+    });
+  });
+
+  //delete
+  it('should delete module after creation', async () => {
+    const mod = await service.create(USER_A, cos301);
+
+    await expect(
+      service.deleteById(USER_A, mod.module.moduleID),
+    ).resolves.toEqual({ success: true });
+
+    await expect(service.getById(USER_A, mod.module.moduleID)).rejects.toThrow(
+      'Module not found',
+    );
+  });
 });
