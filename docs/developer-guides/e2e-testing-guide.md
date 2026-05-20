@@ -1,7 +1,7 @@
 # E2E Testing Guide
 
 !!! info "E2E tests verify real user flows in a real browser."
-    Use them for high-value journeys only — login, scheduling, file upload. Logic that fits in a unit or integration test belongs there instead.
+    Use them for high-value journeys only - login, scheduling, file upload. Logic that fits in a unit or integration test belongs there instead.
 
 ---
 
@@ -77,7 +77,7 @@ pnpm --filter e2e exec playwright install
 ## :material-check-decagram: Definition of Done
 
 ??? success "E2E Checklist"
-    - [ ] Test covers a real user journey — not logic that belongs in a unit test.
+    - [ ] Test covers a real user journey - not logic that belongs in a unit test.
     - [ ] Test file is in `apps/e2e/tests/`.
     - [ ] No `test.only` left in the file.
     - [ ] App is running and tests pass locally.

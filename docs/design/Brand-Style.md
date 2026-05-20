@@ -12,7 +12,7 @@
 **Product name:** UMTAS (University Modular Timetable & Analytics System)
 **Owner:** Tyto Insights · **Built by:** Team Vigil
 
-**Personality:** Professional, precise, and uncluttered. UMTAS is a tool for students and administrators at South African universities. The visual language must communicate trust, clarity, and competence — not playfulness or decoration.
+**Personality:** Professional, precise, and uncluttered. UMTAS is a tool for students and administrators at South African universities. The visual language must communicate trust, clarity, and competence - not playfulness or decoration.
 
 **Design philosophy:** Monochrome charcoal. The system uses no hue-based accent colour. All visual hierarchy is achieved through tone, weight, spacing, and subtle shadow. The result is a UI that feels institutional-grade without being cold.
 
@@ -31,11 +31,11 @@
 ![DNS Business](../assets/LOGOS/DNS_BUSINESS_BLACK_TRANSPARENT.png)
 ![University of Pretoria](../assets/images/UP_Logo.png)
 
-**Icon library:** Lucide Icons (`lucide-react`) — latest stable. Install: `pnpm add lucide-react`. See [Section 8](#8-icons) for full usage rules.
+**Icon library:** Lucide Icons (`lucide-react`) - latest stable. Install: `pnpm add lucide-react`. See [Section 8](#8-icons) for full usage rules.
 
 ### 1.2 Voice & Tone
 
-**Voice (constant personality):** Helpful guide — clear and supportive, never cold. UMTAS speaks like a knowledgeable colleague who anticipates what the user needs and explains it simply. It is never terse to the point of being unhelpful, and never chatty to the point of wasting time.
+**Voice (constant personality):** Helpful guide - clear and supportive, never cold. UMTAS speaks like a knowledgeable colleague who anticipates what the user needs and explains it simply. It is never terse to the point of being unhelpful, and never chatty to the point of wasting time.
 
 **Tone (situational adjustment):**
 
@@ -58,7 +58,7 @@
 
 ## :material-palette: 2. Colour System
 
-UMTAS supports both **light mode** and **dark mode**. The palette is strictly monochrome — no hue-based accent colours are used anywhere in the system.
+UMTAS supports both **light mode** and **dark mode**. The palette is strictly monochrome - no hue-based accent colours are used anywhere in the system.
 
 ### 2.1 Dark Mode Palette
 
@@ -104,7 +104,7 @@ UMTAS supports both **light mode** and **dark mode**. The palette is strictly mo
 
 ### 2.3 Status Colours
 
-Status colours are the **only permitted hue exceptions** and must be muted — never vivid.
+Status colours are the **only permitted hue exceptions** and must be muted - never vivid.
 
 | Status  | Dark Mode                     | Light Mode                    |
 | ------- | ----------------------------- | ----------------------------- |
@@ -115,10 +115,10 @@ Status colours are the **only permitted hue exceptions** and must be muted — n
 ### 2.4 Colour Rules
 
 !!! warning "Strict"
-    - **No hue-based accent colours** anywhere in the system — no blue, green, purple, or orange outside of status use.
+    - **No hue-based accent colours** anywhere in the system - no blue, green, purple, or orange outside of status use.
     - All interactive feedback (hover, focus, active) uses tonal shifts within the charcoal scale only.
-    - Never use colour as the sole indicator of state — always pair with text or iconography (WCAG requirement).
-    - Never use `--text-secondary` for body copy — only for metadata, captions, and labels where reduced contrast is acceptable for supplementary content.
+    - Never use colour as the sole indicator of state - always pair with text or iconography (WCAG requirement).
+    - Never use `--text-secondary` for body copy - only for metadata, captions, and labels where reduced contrast is acceptable for supplementary content.
 
 ---
 
@@ -128,7 +128,7 @@ Status colours are the **only permitted hue exceptions** and must be muted — n
 
 - Import via Next.js `next/font/google`: `import { DM_Sans } from 'next/font/google'`
 - Weights used: 400 (Regular), 500 (Medium), 600 (SemiBold)
-- No italic variants in the UI — avoid entirely.
+- No italic variants in the UI - avoid entirely.
 
 DM Sans was chosen for its soft, slightly rounded geometry that keeps the interface professional without feeling sterile. It is highly legible at small sizes, important for compact, data-dense schedule views.
 
@@ -146,7 +146,7 @@ DM Sans was chosen for its soft, slightly rounded geometry that keeps the interf
 
 ### 3.2 Typography Rules
 
-- Use weight and size to create hierarchy — never colour alone.
+- Use weight and size to create hierarchy - never colour alone.
 - Headings use SemiBold (600) only. No Bold (700) or heavier.
 - Body copy is always Regular (400). Never SemiBold in running text.
 - Micro labels only: `text-transform: uppercase` and `letter-spacing: 0.04em`.
@@ -156,7 +156,7 @@ DM Sans was chosen for its soft, slightly rounded geometry that keeps the interf
 
 ## :material-border-radius: 4. Border Radius
 
-**Strategy:** shadcn/ui default radius system — `var(--radius)` = `0.5rem` (8px) globally.
+**Strategy:** shadcn/ui default radius system - `var(--radius)` = `0.5rem` (8px) globally.
 
 | Element           | Radius           |
 | ----------------- | ---------------- |
@@ -172,7 +172,7 @@ DM Sans was chosen for its soft, slightly rounded geometry that keeps the interf
 
 ## :material-ruler: 5. Spacing & Density
 
-**Design intent:** Compact and dense. UMTAS displays scheduling data — modules, time slots, days, venues. The layout must pack information efficiently without sacrificing legibility.
+**Design intent:** Compact and dense. UMTAS displays scheduling data - modules, time slots, days, venues. The layout must pack information efficiently without sacrificing legibility.
 
 **Base unit:** 4px · **Grid:** 12-column, 24px gutters, max-width 1280px, centered.
 
@@ -192,7 +192,7 @@ DM Sans was chosen for its soft, slightly rounded geometry that keeps the interf
 
 ## :material-layers: 6. Shadow & Elevation
 
-**Strategy:** Subtle — cards feel slightly lifted off the surface, but shadows never overpower.
+**Strategy:** Subtle - cards feel slightly lifted off the surface, but shadows never overpower.
 
 | Level  | CSS Value                                                   | Usage                   |
 | ------ | ----------------------------------------------------------- | ----------------------- |
@@ -229,7 +229,7 @@ All transitions in UMTAS use consistent duration and easing tokens so state chan
 
 - Hover feedback always uses `--duration-fast`.
 - Mode (light/dark) toggle uses `--duration-normal` on background and text colour transitions.
-- Never animate layout-affecting properties (width, height, padding) — animate `opacity` and `transform` only.
+- Never animate layout-affecting properties (width, height, padding) - animate `opacity` and `transform` only.
 - Respect `prefers-reduced-motion`: all transitions must be suppressed when this media query is active.
 
 ```css
@@ -247,12 +247,12 @@ All transitions in UMTAS use consistent duration and easing tokens so state chan
 
 ## :material-vector-square: 8. Icons
 
-**Library:** Lucide Icons (`lucide-react`) — latest stable. Install: `pnpm add lucide-react`
+**Library:** Lucide Icons (`lucide-react`) - latest stable. Install: `pnpm add lucide-react`
 
 **Usage rules:**
 
 - Default size: `16px` in body / table contexts, `20px` in headings and nav items.
-- Stroke width: `1.5` (Lucide default) — do not change.
+- Stroke width: `1.5` (Lucide default) - do not change.
 - Icons are always the same colour as the text they accompany. Never independently coloured.
 - Never use filled icon variants. Lucide is outline-only.
 - Icon + label spacing: always `space-1` (4px) gap.
@@ -347,19 +347,19 @@ The grid is a core UMTAS component.
 
 ## :material-shield-check: 11. Accessibility
 
-Accessibility is a system property — baked into every token, every component, every guideline. Target: **WCAG 2.2 AA**.
+Accessibility is a system property - baked into every token, every component, every guideline. Target: **WCAG 2.2 AA**.
 
 ### 11.1 Colour Contrast
 
 - Body text minimum: **4.5:1** contrast ratio against its background.
 - Large text (Display, H1, H2) minimum: **3:1**.
 - The monochrome charcoal palette has been selected to meet AA at both primary text weights in both modes.
-- Never use `--text-secondary` for body copy — only for metadata, captions, and labels where reduced contrast is acceptable for supplementary content.
+- Never use `--text-secondary` for body copy - only for metadata, captions, and labels where reduced contrast is acceptable for supplementary content.
 
 ### 11.2 Keyboard Navigation
 
 - Every interactive element must be reachable by `Tab` key.
-- Focus ring: `ring-2 ring-offset-2 ring-[--ring]` — always visible, never hidden with `outline: none` without a custom replacement.
+- Focus ring: `ring-2 ring-offset-2 ring-[--ring]` - always visible, never hidden with `outline: none` without a custom replacement.
 - No keyboard traps anywhere in the interface.
 
 ### 11.3 Semantics

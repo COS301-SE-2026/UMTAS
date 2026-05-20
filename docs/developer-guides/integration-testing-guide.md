@@ -12,7 +12,7 @@
     apps/backend/src/
       some.controller.spec.ts   ← integration test next to the controller
     ```
-    Each test file gets a fresh in-memory Postgres — no Docker needed.
+    Each test file gets a fresh in-memory Postgres - no Docker needed.
 
 === "Microservices (FastAPI)"
     ```
@@ -48,7 +48,7 @@ pnpm --filter backend run test # backend only
 
 ??? warning "What belongs here vs unit tests"
     An integration test must cross a real boundary (HTTP → service, service → DB).
-    If you're mocking the database, it's a unit test — move it.
+    If you're mocking the database, it's a unit test - move it.
 
 ??? warning "Fixtures"
     Keep seed data minimal. Only insert the exact rows your test needs.
@@ -60,6 +60,6 @@ pnpm --filter backend run test # backend only
 ??? success "Integration Test Checklist"
     - [ ] Failing test written before the feature.
     - [ ] Full path covered: Request → Service → DB → Response.
-    - [ ] Each test file is fully isolated — no shared state.
+    - [ ] Each test file is fully isolated - no shared state.
     - [ ] External HTTP calls (solver, third-party) are mocked.
     - [ ] Suite passes locally (`pnpm run test:unit`).

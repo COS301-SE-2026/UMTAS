@@ -9,14 +9,14 @@
 
 | Branch       | Purpose                                                      |
 | :----------- | :----------------------------------------------------------- |
-| `main`       | Production-ready. Protected — no direct pushes.              |
+| `main`       | Production-ready. Protected - no direct pushes.              |
 | `dev`        | Integration target. All pull requests merge here.            |
 | `feat/*`     | New features. Cut from `dev`, PR back to `dev`.              |
 | `fix/*`      | Bug fixes. Cut from `dev`, PR back to `dev`.                 |
 | `docs/*`     | Documentation-only changes.                                  |
 | `refactor/*` | Code quality or structural changes with no behaviour change. |
 
-Branch names must use the prefix matching the PR type, followed by a short kebab-case description — e.g. `feat/pdf-parser`, `fix/auth-token-expiry`.
+Branch names must use the prefix matching the PR type, followed by a short kebab-case description - e.g. `feat/pdf-parser`, `fix/auth-token-expiry`.
 
 ---
 

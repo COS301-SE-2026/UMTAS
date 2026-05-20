@@ -18,7 +18,7 @@ This section defines the primary use cases for the UMTAS platform. Use cases are
 
 **Scope:** The subsystem includes user login, registration, and logout capabilities for Students, University Administrators, and Tyto Administrators.
 
-!!! success "Demo 1 — Fully Implemented"
+!!! success "Demo 1 - Fully Implemented"
     All use cases in this subsystem were implemented for Demo 1.
 
 ### 8.1.1 Use Cases
@@ -80,7 +80,7 @@ This section defines the primary use cases for the UMTAS platform. Use cases are
 
 **Scope:** The subsystem supports timetable creation, viewing, editing, deletion, semester assignment, preference management, and timetable generation functionality.
 
-!!! warning "Demo 1 — Partially Implemented"
+!!! warning "Demo 1 - Partially Implemented"
     **Implemented:** UC-ST-01 · UC-ST-02 · UC-ST-03 · UC-ST-04 · UC-ST-05
 
     **Not implemented:** UC-ST-06 · UC-ST-07
@@ -180,7 +180,7 @@ This section defines the primary use cases for the UMTAS platform. Use cases are
 
 **Scope:** The subsystem supports timetable parsing, validation, import processing, and user customisation of imported timetable data.
 
-!!! failure "Demo 1 — Not Implemented"
+!!! failure "Demo 1 - Not Implemented"
     No use cases in this subsystem were implemented for Demo 1.
 
 ### 8.3.1 Use Cases
@@ -218,7 +218,7 @@ This section defines the primary use cases for the UMTAS platform. Use cases are
 
 **Scope:** Covers export to Google Calendar via OAuth and download as a standard .ics file.
 
-!!! warning "Demo 1 — Partially Implemented"
+!!! warning "Demo 1 - Partially Implemented"
     **Implemented:** UC-EX-02
 
     **Not implemented:** UC-EX-01
@@ -258,7 +258,7 @@ This section defines the primary use cases for the UMTAS platform. Use cases are
 
 **Scope:** The subsystem supports timetable analytics, attendance analysis, venue utilisation monitoring, workload evaluation, and demand forecasting functionality.
 
-!!! failure "Demo 1 — Not Implemented"
+!!! failure "Demo 1 - Not Implemented"
     No use cases in this subsystem were implemented for Demo 1.
 
 ### 8.5.1 Use Cases
@@ -356,7 +356,7 @@ This section defines the primary use cases for the UMTAS platform. Use cases are
 
 **Scope:** The subsystem supports simulation execution, stress testing, performance metric collection, and analytics visualisation under simulated load conditions.
 
-!!! failure "Demo 1 — Not Implemented"
+!!! failure "Demo 1 - Not Implemented"
     No use cases in this subsystem were implemented for Demo 1.
 
 ### 8.6.1 Use Cases

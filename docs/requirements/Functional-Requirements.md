@@ -16,7 +16,7 @@ The following functional requirements describe the high-level capabilities of th
 
 ### R1.1 Information Website
 
-!!! failure "Demo 1 — Not Implemented"
+!!! failure "Demo 1 - Not Implemented"
     No requirements in this sub-system were implemented for Demo 1.
 
 - **R1.1.1** :material-close-circle:{ style="color: #e53935" } The system shall provide a landing page for all users prior to login/register.  
@@ -24,7 +24,7 @@ The following functional requirements describe the high-level capabilities of th
 
 ### R1.2 Login and Register System
 
-!!! success "Demo 1 — Fully Implemented"
+!!! success "Demo 1 - Fully Implemented"
     All requirements in this sub-system were implemented for Demo 1.
 
 - **R1.2.1** :material-check-circle:{ style="color: #4caf50" } The system shall allow users to log in.  
@@ -37,7 +37,7 @@ The following functional requirements describe the high-level capabilities of th
 
 ### R2.1 Timetable Management
 
-!!! success "Demo 1 — Fully Implemented"
+!!! success "Demo 1 - Fully Implemented"
     All requirements in this sub-system were implemented for Demo 1.
 
 - **R2.1.1** :material-check-circle:{ style="color: #4caf50" } The system shall allow students to view timetables.  
@@ -46,7 +46,7 @@ The following functional requirements describe the high-level capabilities of th
 
 ### R2.2 Timetable Creation – Builder
 
-!!! warning "Demo 1 — Partially Implemented"
+!!! warning "Demo 1 - Partially Implemented"
     **Implemented:** R2.2.1
 
     **Partially implemented:** R2.2.3
@@ -59,7 +59,7 @@ The following functional requirements describe the high-level capabilities of th
 
 ### R2.3 Timetable Creation – PDF System
 
-!!! failure "Demo 1 — Not Implemented"
+!!! failure "Demo 1 - Not Implemented"
     No requirements in this sub-system were implemented for Demo 1.
 
 - **R2.3.1** :material-close-circle:{ style="color: #e53935" } The system shall automate timetable creation using a PDF if provided by a university of all classes.  
@@ -68,7 +68,7 @@ The following functional requirements describe the high-level capabilities of th
 
 ### R2.4 Timetable Creation – API System
 
-!!! failure "Demo 1 — Not Implemented"
+!!! failure "Demo 1 - Not Implemented"
     No requirements in this sub-system were implemented for Demo 1.
 
 - **R2.4.1** :material-close-circle:{ style="color: #e53935" } The system shall automate timetable creation using a school‑provided API (if applicable).  
@@ -76,7 +76,7 @@ The following functional requirements describe the high-level capabilities of th
 
 ### R2.5 Calendar Exporting
 
-!!! warning "Demo 1 — Partially Implemented"
+!!! warning "Demo 1 - Partially Implemented"
     **Implemented:** R2.5.1
 
     **Not implemented:** R2.5.2 · R2.5.2.1
@@ -91,7 +91,7 @@ The following functional requirements describe the high-level capabilities of th
 
 ### R3.1 Analytics System
 
-!!! failure "Demo 1 — Not Implemented"
+!!! failure "Demo 1 - Not Implemented"
     No requirements in this sub-system were implemented for Demo 1.
 
 - **R3.1.1** :material-close-circle:{ style="color: #e53935" } The system shall allow university admins to view registered students for a module time slot.  
@@ -103,7 +103,7 @@ The following functional requirements describe the high-level capabilities of th
 
 ### R4.1 Simulation System
 
-!!! failure "Demo 1 — Not Implemented"
+!!! failure "Demo 1 - Not Implemented"
     No requirements in this sub-system were implemented for Demo 1.
 
 - **R4.1.1** :material-close-circle:{ style="color: #e53935" } The system shall support 20,000+ simulations to evaluate efficiency.  
