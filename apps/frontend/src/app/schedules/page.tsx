@@ -5,6 +5,8 @@ import { Module } from "@/components/molecules/builder/ModuleCard";
 import { BuilderEvent } from "@/components/molecules/builder/EventCard";
 import { EventType } from "@/components/atoms/builder/eventDropdown";
 import { EmptySchedule } from "@/components/organisms/viewTimetable/EmptySchedule";
+import { ScheduleHeader } from "@/components/molecules/viewTimetable/ScheduleHeader";
+import { WeekNavBar } from "@/components/molecules/viewTimetable/WeekNavBar";
 
 function exampleModule(): Module {
   return {
@@ -34,6 +36,14 @@ export default function schedulesPage() {
     <div>
       <EventBlock event={exampleEvent()} module={exampleModule()} />
       <EmptySchedule />
+      <ScheduleHeader eventCount={1} moduleCount={1} onExport={EmptySchedule} />
+      <WeekNavBar
+        currentIndex={1}
+        onNext={EmptySchedule}
+        onPrev={EmptySchedule}
+        totalWeeks={1}
+        weekStart={new Date()}
+      />
     </div>
   );
 }
