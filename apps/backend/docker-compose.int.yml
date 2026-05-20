@@ -18,6 +18,7 @@ services:
     depends_on:
       - redis-int
     environment:
+      MIGRATIONS_PATH: /app/apps/backend/drizzle
       CI: 'true'
       NODE_ENV: test
       DB_MODE: pglite

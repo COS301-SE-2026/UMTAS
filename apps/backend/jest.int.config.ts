@@ -12,12 +12,14 @@ const config: Config = {
   testEnvironment: 'node',
   moduleFileExtensions: ['ts', 'js', 'json', 'mjs'],
 
-  transformIgnorePatterns: ['node_modules/(?!(better-auth)/)'],
+  globals: {
+    MIGRATIONS_PATH: '<rootDir>/drizzle', // resolves to apps/backend/drizzle
+  },
 
+  transformIgnorePatterns: ['node_modules/(?!(better-auth)/)'],
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1',
   },
-
   setupFilesAfterEnv: [],
   testTimeout: 30000,
 };
