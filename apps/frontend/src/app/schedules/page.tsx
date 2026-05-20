@@ -1,50 +1,44 @@
 "use client";
 
-import { EventBlock } from "@/components/molecules/viewTimetable/EventBlock";
-import { Module } from "@/components/molecules/builder/ModuleCard";
-import { BuilderEvent } from "@/components/molecules/builder/EventCard";
-import { EventType } from "@/components/atoms/builder/eventDropdown";
-import { EmptySchedule } from "@/components/organisms/viewTimetable/EmptySchedule";
+import React, { useState } from "react";
+import { Separator } from "@/components/atoms/baseShadcn/separator";
 import { ScheduleHeader } from "@/components/molecules/viewTimetable/ScheduleHeader";
-import { WeekNavBar } from "@/components/molecules/viewTimetable/WeekNavBar";
-import { ScheduleEvent } from "@/types/schedule";
-import { WeeklyGrid } from "@/components/organisms/viewTimetable/WeeklyGrid";
+import { ScheduleView } from "@/components/organisms/viewTimetable/ScheduleView";
 
-function exampleModule(): Module {
-  return {
-    id: "1",
-    code: "COS123",
-    name: "Very fun module",
-    colour: "red",
-  };
-}
+export default function SchedulesPage() {
+  const [eventCount, setEventCount] = useState(0);
+  const [moduleCount, setModuleCount] = useState(0);
+  const [exportFn, setExportFn] = useState<(() => void) | null>(null);
 
-const exampleEvent: ScheduleEvent = {
-  id: "1",
-  name: "Lecture",
-  code: "COS 301",
-  date: "2026-05-20",
-  startTime: "12:30",
-  endTime: "13:20",
-  isRecurring: true,
-  accentColour: "#4f46e5",
-  subLabel: "roos hall",
-};
+  function handleExport() {
+    if (exportFn) {
+      exportFn();
+    }
+  }
 
-export default function schedulesPage() {
+  function handleExportReady(fn: () => void) {
+    setExportFn(() => fn);
+  }
+
   return (
-    <div>
-      <EventBlock event={exampleEvent} />
-      <EmptySchedule />
-      <ScheduleHeader eventCount={1} moduleCount={1} onExport={EmptySchedule} />
-      <WeekNavBar
-        currentIndex={1}
-        onNext={EmptySchedule}
-        onPrev={EmptySchedule}
-        totalWeeks={1}
-        weekStart={new Date()}
+    <div className="bg-[var(--bg-base)] flex flex-col min-h-[calc(100vh-56px)]">
+      <ScheduleHeader
+        eventCount={eventCount}
+        moduleCount={moduleCount}
+        onExport={handleExport}
       />
-      <WeeklyGrid events={[exampleEvent]} weekStart={new Date()} />
+
+      <Separator className="bg-[var(--border)]" />
+
+      <div className="px-8 py-6">
+        <div className="mx-auto max-w-6xl">
+          <ScheduleView
+            onEventCountChange={setEventCount}
+            onModuleCountChange={setModuleCount}
+            onExportReady={handleExportReady}
+          />
+        </div>
+      </div>
     </div>
   );
 }

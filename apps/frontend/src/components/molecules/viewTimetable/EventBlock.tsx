@@ -9,18 +9,43 @@ interface EventBlockProps {
   event: ScheduleEvent;
 }
 
+function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
+  const clean = hex.replace("#", "");
+  if (clean.length !== 6) return null;
+  return {
+    r: parseInt(clean.slice(0, 2), 16),
+    g: parseInt(clean.slice(2, 4), 16),
+    b: parseInt(clean.slice(4, 6), 16),
+  };
+}
+
 export function EventBlock({ event }: EventBlockProps) {
-  function getAccentStyle() {
-    if (event.accentColour) {
-      return { borderLeftColor: event.accentColour };
+  function getBlockStyle() {
+    if (!event.accentColour) {
+      return {
+        borderLeftColor: "var(--border)",
+        backgroundColor: "var(--bg-elevated)",
+      };
     }
-    return { borderLeftColor: "var(--border)" };
+
+    const rgb = hexToRgb(event.accentColour);
+    if (!rgb) {
+      return {
+        borderLeftColor: event.accentColour,
+        backgroundColor: "var(--bg-elevated)",
+      };
+    }
+
+    return {
+      borderLeftColor: event.accentColour,
+      backgroundColor: "rgba(" + rgb.r + "," + rgb.g + "," + rgb.b + ", 0.12)",
+    };
   }
 
   return (
     <div
-      className="flex flex-col gap-1 rounded-sm border-l-2 bg-[var(--bg-elevated)] px-2 py-1.5 h-full overflow-hidden"
-      style={getAccentStyle()}
+      className="flex flex-col gap-1 rounded-sm border-l-2 px-2 py-1.5 h-full overflow-hidden"
+      style={getBlockStyle()}
     >
       <p className="text-xs font-medium text-[var(--text-primary)] truncate leading-tight">
         {event.name}

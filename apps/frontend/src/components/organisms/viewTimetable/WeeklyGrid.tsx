@@ -20,6 +20,9 @@ for (let h = 7; h <= 20; h++) {
 }
 
 const SlotHeight = 40;
+const TotalHeight = TimeSlots.length * SlotHeight;
+const HeaderHeight = 48;
+const TimeColWidth = 56;
 
 function getWeekDates(weekStart: Date): Date[] {
   const dates: Date[] = [];
@@ -79,7 +82,7 @@ function getDayIndex(dateStr: string): number {
 export function WeeklyGrid({ events, weekStart }: WeeklyGridProps) {
   const weekDates = getWeekDates(weekStart);
 
-  function getEventsForCell(date: Date): ScheduleEvent[] {
+  function getEventsForDay(date: Date): ScheduleEvent[] {
     const dateStr = isoDateStr(date);
     const result: ScheduleEvent[] = [];
 
@@ -107,89 +110,117 @@ export function WeeklyGrid({ events, weekStart }: WeeklyGridProps) {
     return result;
   }
 
-  function renderCell(date: Date, slotIndex: number) {
-    const slotTime = TimeSlots[slotIndex];
-    const cellKey = isoDateStr(date) + "-" + slotTime;
-
-    const cellEvents = getEventsForCell(date).filter(
-      (e) => timeToSlotIndex(e.startTime) === slotIndex,
-    );
-
-    if (cellEvents.length === 0) {
-      return (
+  function renderTimeColumn() {
+    return (
+      <div
+        className="flex-shrink-0 border-r border-[var(--border)]"
+        style={{ width: TimeColWidth }}
+      >
+        {/* time label header spacer */}
         <div
-          key={cellKey + "-empty"}
-          className="border border-[var(--border)] rounded-[4px] bg-[var(--bg-base)]"
-          style={{ height: SlotHeight }}
+          className="border-b border-[var(--border)]"
+          style={{ height: HeaderHeight }}
         />
-      );
-    }
 
-    const event = cellEvents[0];
-    const span = slotSpan(event.startTime, event.endTime);
+        {/* time labels */}
+        <div className="relative" style={{ height: TotalHeight }}>
+          {TimeSlots.map((slot, index) => {
+            if (!slot.endsWith(":00")) {
+              return null;
+            }
+
+            return (
+              <div
+                key={slot}
+                className="absolute right-0 pr-2 flex items-start justify-end"
+                style={{
+                  top: index * SlotHeight,
+                  height: SlotHeight,
+                  width: TimeColWidth,
+                }}
+              >
+                <span className="text-[10px] font-medium text-[var(--text-secondary)] uppercase tracking-[0.04em] leading-none pt-1">
+                  {slot}
+                </span>
+              </div>
+            );
+          })}
+
+          {/* horizontal slot lines */}
+          {TimeSlots.map((slot, index) => (
+            <div
+              key={"line-" + slot}
+              className="absolute left-0 right-0 border-b border-[var(--border)]"
+              style={{ top: (index + 1) * SlotHeight, width: "100%" }}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  function renderDayColumn(date: Date) {
+    const dayEvents = getEventsForDay(date);
 
     return (
       <div
-        key={cellKey + "-event"}
-        style={{
-          height: span * SlotHeight,
-          gridRow: "span " + span,
-        }}
+        key={isoDateStr(date)}
+        className="flex-1 border-r border-[var(--border)] min-w-0"
       >
-        <EventBlock event={event} />
+        {/* col headers */}
+        <div
+          className="flex flex-col items-center justify-center border-b border-[var(--border)] bg-[var(--bg-elevated)]"
+          style={{ height: HeaderHeight }}
+        >
+          <span className="text-[10px] font-medium uppercase tracking-[0.04em] text-[var(--text-secondary)]">
+            {formatColumnHeader(date).day}
+          </span>
+          <span className="text-xs font-medium text-[var(--text-primary)]">
+            {formatColumnHeader(date).date}
+          </span>
+        </div>
+
+        {/* day body */}
+        <div
+          className="relative bg-[var(--bg-base)]"
+          style={{ height: TotalHeight }}
+        >
+          {/* horizontal slot lines */}
+          {TimeSlots.map((slot, index) => (
+            <div
+              key={"line-" + slot}
+              className="absolute left-0 right-0 border-b border-[var(--border)]"
+              style={{ top: (index + 1) * SlotHeight }}
+            />
+          ))}
+
+          {/* events */}
+          {dayEvents.map((event) => {
+            const slotIndex = timeToSlotIndex(event.startTime);
+            const span = slotSpan(event.startTime, event.endTime);
+            const top = slotIndex * SlotHeight;
+            const height = span * SlotHeight;
+
+            return (
+              <div
+                key={event.id}
+                className="absolute left-0 right-0 p-0.5 z-20"
+                style={{ top, height }}
+              >
+                <EventBlock event={event} />
+              </div>
+            );
+          })}
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="w-full overflow-x-auto rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.08)]">
-      <div
-        className="min-w-[640px]"
-        style={{
-          display: "grid",
-          gridTemplateColumns: "56px repeat(5, 1fr)",
-        }}
-      >
-        <div className="h-12 border-b border-[var(--border)]" />
-
-        {/* column head */}
-        {weekDates.map((date) => {
-          const header = formatColumnHeader(date);
-          return (
-            <div
-              key={isoDateStr(date)}
-              className="h-12 flex flex-col items-center justify-center border-b border-l border-[var(--border)]"
-            >
-              <span className="text-[10px] font-medium uppercase tracking-[0.04em] text-[var(--text-secondary)]">
-                {header.day}
-              </span>
-              <span className="text-xs font-medium text-[var(--text-primary)]">
-                {header.date}
-              </span>
-            </div>
-          );
-        })}
-
-        {/* time rows */}
-        {TimeSlots.map((slot, slotIndex) => {
-          return (
-            <React.Fragment key={"row-" + slot}>
-              <div
-                className="border-b border-[var(--border)] flex items-start justify-end pr-2 pt-1"
-                style={{ height: SlotHeight }}
-              >
-                {slot.endsWith(":00") && (
-                  <span className="text-[10px] font-medium text-[var(--text-secondary)] uppercase tracking-[0.04em] leading-none">
-                    {slot}
-                  </span>
-                )}
-              </div>
-
-              {/* day */}
-              {weekDates.map((date) => renderCell(date, slotIndex))}
-            </React.Fragment>
-          );
-        })}
+    <div className="w-full rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.08)]">
+      <div className="flex w-full">
+        {renderTimeColumn()}
+        {weekDates.map((date) => renderDayColumn(date))}
       </div>
     </div>
   );
