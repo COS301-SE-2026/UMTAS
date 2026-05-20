@@ -14,6 +14,7 @@ import {
   createModulesBuilder,
   getAllModulesBuilder,
   deleteModulesById,
+  updateModulesBuilder,
 } from "@/app/builder/utils/modules/requestBuilders";
 
 const Steps = [
@@ -78,11 +79,31 @@ export function WizardShell() {
     }
   }
 
-  function handleModuleUpdate(
+  async function handleModuleUpdate(
     id: number,
-    field: keyof Omit<ModuleResponseDto, "moduleID" | "userID">,
+    field: keyof Omit<ModuleResponseDto, "moduleID" | "userID"> | "confirm",
     value: string,
   ) {
+    if (field === "confirm") {
+      const targetModule = modules.find((m) => m.moduleID === id);
+      if (!targetModule) return;
+
+      try {
+        const builder = new updateModulesBuilder();
+        await builder.send({
+          paths: { moduleId: id },
+          body: {
+            code: targetModule.moduleCode,
+            name: targetModule.moduleName,
+            styling: targetModule.styling || undefined,
+          },
+        });
+      } catch (error) {
+        console.error("Failed to update module:", error);
+      }
+      return;
+    }
+
     setModules((prev) =>
       prev.map((m) => {
         if (m.moduleID === id) {

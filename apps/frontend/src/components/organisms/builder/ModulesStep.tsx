@@ -17,7 +17,6 @@ import {
   AlertDialogCancel,
 } from "@/components/atoms/baseShadcn/alert-dialog";
 import { Button } from "@/components/atoms/baseShadcn/button";
-import { Card, CardContent } from "@/components/atoms/baseShadcn/card";
 import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
 
 interface ModulesStepProps {
@@ -25,9 +24,9 @@ interface ModulesStepProps {
   onAdd: () => void;
   onUpdate: (
     id: number,
-    field: keyof Omit<ModuleResponseDto, "moduleID" | "userID">,
+    field: keyof Omit<ModuleResponseDto, "moduleID" | "userID"> | "confirm",
     value: string,
-  ) => void;
+  ) => void | Promise<void>;
   onRemove: (id: number) => void;
   onNavigateAway: () => void;
 }
@@ -71,6 +70,7 @@ export function ModulesStep({
   const [snapshot, setSnapshot] = useState<ModuleResponseDto | null>(null);
   const [isAdding, setIsAdding] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isConfirming, setIsConfirming] = useState(false);
 
   function requestNavigation(action: () => void) {
     if (isDirty) {
@@ -119,7 +119,8 @@ export function ModulesStep({
     requestNavigation(doSelect);
   }
 
-  function handleConfirm(id: number) {
+  async function handleConfirm(id: number) {
+    if (isConfirming) return;
     const lectureModule = modules.find((m) => m.moduleID === id);
     if (!lectureModule) return;
 
@@ -130,14 +131,22 @@ export function ModulesStep({
       return;
     }
 
-    setErrorMap((prev) => {
-      const next = { ...prev };
-      delete next[id];
-      return next;
-    });
-    setIsDirty(false);
-    setSnapshot(null);
-    setSelectedId(null);
+    setIsConfirming(true);
+    try {
+      await onUpdate(id, "confirm", "");
+      setErrorMap((prev) => {
+        const next = { ...prev };
+        delete next[id];
+        return next;
+      });
+      setIsDirty(false);
+      setSnapshot(null);
+      setSelectedId(null);
+    } catch (error) {
+      console.error("Failed to confirm module:", error);
+    } finally {
+      setIsConfirming(false);
+    }
   }
 
   function handleAdd() {
@@ -262,11 +271,12 @@ export function ModulesStep({
               type="button"
               variant="outline"
               onClick={() => handleConfirm(module.moduleID)}
+              disabled={isConfirming}
               aria-label="Confirm module"
-              className="w-full gap-2 border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-primary)] transition-colors duration-[var(--duration-fast)] hover:bg-[var(--bg-elevated)]"
+              className="w-full gap-2 border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-primary)] transition-colors duration-[var(--duration-fast)] hover:bg-[var(--bg-elevated)] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <CheckCircle size={16} strokeWidth={1.5} />
-              Confirm
+              {isConfirming ? "Confirming..." : "Confirm"}
             </Button>
           </div>
         )}
