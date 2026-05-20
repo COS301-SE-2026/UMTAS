@@ -10,6 +10,7 @@ const PUBLIC_PATHS = [
   "/verify-email",
   "/reset-password",
   "/auth-callback",
+  "/api/health",
 ];
 
 export function proxy(request: NextRequest) {
@@ -17,8 +18,10 @@ export function proxy(request: NextRequest) {
 
   const isPublicPath = PUBLIC_PATHS.some((path) => pathname.startsWith(path));
   const isAuthApiPath = pathname.startsWith("/api/auth");
+  const isHealthApiPath = pathname.startsWith("/api/health");
 
-  if (isPublicPath || isAuthApiPath) return NextResponse.next();
+  if (isPublicPath || isAuthApiPath || isHealthApiPath)
+    return NextResponse.next();
 
   const sessionCookie = request.cookies.get(SESSION_COOKIE_NAME);
   if (!sessionCookie?.value) {
