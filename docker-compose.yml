@@ -143,7 +143,7 @@ services:
     networks:
       - gateway
     environment:
-      - API_URL=https://api.${DOMAIN}
+      - API_URL=http://backend:${BACKEND_PORT}
     healthcheck:
       test:
         [
