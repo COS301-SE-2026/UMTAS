@@ -25,6 +25,7 @@ function exampleEvent(): BuilderEvent {
     endTime: "10:30",
     type: "lecture" as EventType,
     moduleId: "ID",
+    isRecurring: true,
   };
 }
 
