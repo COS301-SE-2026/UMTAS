@@ -12,6 +12,7 @@ import { AuthGuard } from './auth/auth.guard';
 import { RolesGuard } from './auth/roles.guard';
 import { ModuleModule } from './Module/module.module';
 import { EventModule } from './Events/event.module';
+import { TimetableModule } from './Timetable/timetable.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { EventModule } from './Events/event.module';
     MailModule,
     ModuleModule,
     EventModule,
+    TimetableModule,
   ],
   controllers: [AppController, AuthController],
   providers: [

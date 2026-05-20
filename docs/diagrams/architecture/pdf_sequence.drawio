@@ -1,0 +1,233 @@
+<mxfile host="Electron">
+  <diagram name="Page-1" id="Ss4rxd8gN4Yh0QDbYqtd">
+    <mxGraphModel dx="3010" dy="2263" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="-CdCgc4V3lMu8j1JLXUa-1" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;elbow&quot;:&quot;vertical&quot;,&quot;curved&quot;:0,&quot;rounded&quot;:0};size=65;fillColor=light-dark(#eeeeee,#1f2020);strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);" value="User" vertex="1">
+          <mxGeometry height="1568" width="150" x="20" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="-CdCgc4V3lMu8j1JLXUa-2" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;elbow&quot;:&quot;vertical&quot;,&quot;curved&quot;:0,&quot;rounded&quot;:0};size=65;fillColor=light-dark(#eeeeee,#1f2020);strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);" value="Frontend" vertex="1">
+          <mxGeometry height="1568" width="150" x="303" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="-CdCgc4V3lMu8j1JLXUa-3" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;elbow&quot;:&quot;vertical&quot;,&quot;curved&quot;:0,&quot;rounded&quot;:0};size=65;fillColor=light-dark(#eeeeee,#1f2020);strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);" value="Core API" vertex="1">
+          <mxGeometry height="1568" width="150" x="622" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="-CdCgc4V3lMu8j1JLXUa-4" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;elbow&quot;:&quot;vertical&quot;,&quot;curved&quot;:0,&quot;rounded&quot;:0};size=65;fillColor=light-dark(#eeeeee,#1f2020);strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);" value="Object Storage" vertex="1">
+          <mxGeometry height="1568" width="150" x="822" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="-CdCgc4V3lMu8j1JLXUa-5" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;elbow&quot;:&quot;vertical&quot;,&quot;curved&quot;:0,&quot;rounded&quot;:0};size=65;fillColor=light-dark(#eeeeee,#1f2020);strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);" value="PDF Job Queue" vertex="1">
+          <mxGeometry height="1568" width="150" x="1022" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="-CdCgc4V3lMu8j1JLXUa-6" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;elbow&quot;:&quot;vertical&quot;,&quot;curved&quot;:0,&quot;rounded&quot;:0};size=65;fillColor=light-dark(#eeeeee,#1f2020);strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);" value="PDF Parser" vertex="1">
+          <mxGeometry height="1568" width="150" x="1222" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="-CdCgc4V3lMu8j1JLXUa-7" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;elbow&quot;:&quot;vertical&quot;,&quot;curved&quot;:0,&quot;rounded&quot;:0};size=65;fillColor=light-dark(#eeeeee,#1f2020);strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);" value="Optimiser Job Queue" vertex="1">
+          <mxGeometry height="1568" width="174" x="1422" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="-CdCgc4V3lMu8j1JLXUa-8" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;elbow&quot;:&quot;vertical&quot;,&quot;curved&quot;:0,&quot;rounded&quot;:0};size=65;fillColor=light-dark(#eeeeee,#1f2020);strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);" value="Optimiser" vertex="1">
+          <mxGeometry height="1568" width="150" x="1646" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="-CdCgc4V3lMu8j1JLXUa-9" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;elbow&quot;:&quot;vertical&quot;,&quot;curved&quot;:0,&quot;rounded&quot;:0};size=65;fillColor=light-dark(#eeeeee,#1f2020);strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);" value="Database" vertex="1">
+          <mxGeometry height="1568" width="150" x="1846" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="-CdCgc4V3lMu8j1JLXUa-10" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;elbow&quot;:&quot;vertical&quot;,&quot;curved&quot;:0,&quot;rounded&quot;:0};size=65;fillColor=light-dark(#eeeeee,#1f2020);strokeColor=light-dark(#999999,#cccccc);fontColor=light-dark(#333333,#cccccc);" value="Solution Cache" vertex="1">
+          <mxGeometry height="1568" width="150" x="2046" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="-CdCgc4V3lMu8j1JLXUa-11" parent="1" style="shape=umlFrame;dashed=1;pointerEvents=0;dropTarget=0;strokeColor=#B3B3B3;height=20;width=30;fillColor=light-dark(#eeeeee,#1f2020);fontColor=light-dark(#333333,#cccccc);" value="alt" vertex="1">
+          <mxGeometry height="648" width="1765" x="367" y="845" as="geometry" />
+        </mxCell>
+        <mxCell id="-CdCgc4V3lMu8j1JLXUa-12" parent="-CdCgc4V3lMu8j1JLXUa-11" style="text;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;" value="[Cache hit]" vertex="1">
+          <mxGeometry height="20" width="1735" x="30" as="geometry" />
+        </mxCell>
+        <mxCell id="-CdCgc4V3lMu8j1JLXUa-13" parent="-CdCgc4V3lMu8j1JLXUa-11" style="shape=line;dashed=1;whiteSpace=wrap;verticalAlign=top;labelPosition=center;verticalLabelPosition=middle;align=center;strokeColor=#B3B3B3;" value="[Cache miss]" vertex="1">
+          <mxGeometry height="4" width="1765" y="146" as="geometry" />
+        </mxCell>
+        <mxCell id="-CdCgc4V3lMu8j1JLXUa-14" edge="1" parent="1" source="-CdCgc4V3lMu8j1JLXUa-1" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=block;" target="-CdCgc4V3lMu8j1JLXUa-2" value="Upload PDF">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="245" y="123" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-CdCgc4V3lMu8j1JLXUa-15" edge="1" parent="1" source="-CdCgc4V3lMu8j1JLXUa-2" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=block;" target="-CdCgc4V3lMu8j1JLXUa-3" value="POST /pdf-upload">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="546" y="171" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-CdCgc4V3lMu8j1JLXUa-16" edge="1" parent="1" source="-CdCgc4V3lMu8j1JLXUa-3" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=block;" target="-CdCgc4V3lMu8j1JLXUa-4" value="Store PDF">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="806" y="219" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-CdCgc4V3lMu8j1JLXUa-17" edge="1" parent="1" source="-CdCgc4V3lMu8j1JLXUa-3" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=block;" target="-CdCgc4V3lMu8j1JLXUa-5" value="Push parse job (PDF ref + callback URL)">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="906" y="267" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-CdCgc4V3lMu8j1JLXUa-18" edge="1" parent="1" source="-CdCgc4V3lMu8j1JLXUa-3" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;dashed=1;dashPattern=2 3;endArrow=block;" target="-CdCgc4V3lMu8j1JLXUa-2" value="202 Accepted (job ID)">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="549" y="315" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-CdCgc4V3lMu8j1JLXUa-19" edge="1" parent="1" source="-CdCgc4V3lMu8j1JLXUa-5" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=block;" target="-CdCgc4V3lMu8j1JLXUa-6" value="Pull job">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1206" y="363" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-CdCgc4V3lMu8j1JLXUa-20" edge="1" parent="1" source="-CdCgc4V3lMu8j1JLXUa-6" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=block;" target="-CdCgc4V3lMu8j1JLXUa-4" value="Retrieve PDF">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1109" y="411" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-CdCgc4V3lMu8j1JLXUa-21" edge="1" parent="1" source="-CdCgc4V3lMu8j1JLXUa-6" style="curved=1;endArrow=block;rounded=0;" target="-CdCgc4V3lMu8j1JLXUa-6" value="Parse (university-specific adapter)">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1348" y="459" />
+              <mxPoint x="1348" y="489" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-CdCgc4V3lMu8j1JLXUa-22" edge="1" parent="1" source="-CdCgc4V3lMu8j1JLXUa-6" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=block;" target="-CdCgc4V3lMu8j1JLXUa-3" value="HTTP POST /jobs/{jobId}/callback (normalised payload)">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1009" y="537" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-CdCgc4V3lMu8j1JLXUa-23" edge="1" parent="1" source="-CdCgc4V3lMu8j1JLXUa-3" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=block;" target="-CdCgc4V3lMu8j1JLXUa-9" value="Persist parsed timetable data">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1318" y="585" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-CdCgc4V3lMu8j1JLXUa-24" edge="1" parent="1" source="-CdCgc4V3lMu8j1JLXUa-3" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;dashed=1;dashPattern=2 3;endArrow=block;" target="-CdCgc4V3lMu8j1JLXUa-6" value="200 OK">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1006" y="633" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-CdCgc4V3lMu8j1JLXUa-25" edge="1" parent="1" source="-CdCgc4V3lMu8j1JLXUa-3" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;dashed=1;dashPattern=2 3;endArrow=block;" target="-CdCgc4V3lMu8j1JLXUa-2" value="Push notification (parse complete)">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="549" y="681" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-CdCgc4V3lMu8j1JLXUa-26" edge="1" parent="1" source="-CdCgc4V3lMu8j1JLXUa-1" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=block;" target="-CdCgc4V3lMu8j1JLXUa-2" value="Request timetable generation">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="245" y="729" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-CdCgc4V3lMu8j1JLXUa-27" edge="1" parent="1" source="-CdCgc4V3lMu8j1JLXUa-2" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=block;" target="-CdCgc4V3lMu8j1JLXUa-3" value="POST /generate">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="546" y="777" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-CdCgc4V3lMu8j1JLXUa-28" edge="1" parent="1" source="-CdCgc4V3lMu8j1JLXUa-3" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=block;" target="-CdCgc4V3lMu8j1JLXUa-10" value="Check for cached solution">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1418" y="825" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-CdCgc4V3lMu8j1JLXUa-29" edge="1" parent="1" source="-CdCgc4V3lMu8j1JLXUa-10" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;dashed=1;dashPattern=2 3;endArrow=block;" target="-CdCgc4V3lMu8j1JLXUa-3" value="Return cached solution">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1421" y="918" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-CdCgc4V3lMu8j1JLXUa-30" edge="1" parent="1" source="-CdCgc4V3lMu8j1JLXUa-3" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;dashed=1;dashPattern=2 3;endArrow=block;" target="-CdCgc4V3lMu8j1JLXUa-2" value="200 OK (solution)">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="549" y="966" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-CdCgc4V3lMu8j1JLXUa-31" edge="1" parent="1" source="-CdCgc4V3lMu8j1JLXUa-3" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=block;" target="-CdCgc4V3lMu8j1JLXUa-7" value="Push optimisation job (constraints + callback URL)">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1112" y="1059" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-CdCgc4V3lMu8j1JLXUa-32" edge="1" parent="1" source="-CdCgc4V3lMu8j1JLXUa-3" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;dashed=1;dashPattern=2 3;endArrow=block;" target="-CdCgc4V3lMu8j1JLXUa-2" value="202 Accepted (job ID)">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="549" y="1107" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-CdCgc4V3lMu8j1JLXUa-33" edge="1" parent="1" source="-CdCgc4V3lMu8j1JLXUa-7" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=block;" target="-CdCgc4V3lMu8j1JLXUa-8" value="Pull job">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1624" y="1155" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-CdCgc4V3lMu8j1JLXUa-34" edge="1" parent="1" source="-CdCgc4V3lMu8j1JLXUa-8" style="curved=1;endArrow=block;rounded=0;" target="-CdCgc4V3lMu8j1JLXUa-8" value="Solve (CP-SAT / heuristic)">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1772" y="1203" />
+              <mxPoint x="1772" y="1233" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-CdCgc4V3lMu8j1JLXUa-35" edge="1" parent="1" source="-CdCgc4V3lMu8j1JLXUa-8" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=block;" target="-CdCgc4V3lMu8j1JLXUa-3" value="HTTP POST /jobs/{jobId}/callback (solution payload)">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1221" y="1281" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-CdCgc4V3lMu8j1JLXUa-36" edge="1" parent="1" source="-CdCgc4V3lMu8j1JLXUa-3" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=block;" target="-CdCgc4V3lMu8j1JLXUa-9" value="Persist solution">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1318" y="1329" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-CdCgc4V3lMu8j1JLXUa-37" edge="1" parent="1" source="-CdCgc4V3lMu8j1JLXUa-3" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=block;" target="-CdCgc4V3lMu8j1JLXUa-10" value="Cache solution">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1418" y="1377" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-CdCgc4V3lMu8j1JLXUa-38" edge="1" parent="1" source="-CdCgc4V3lMu8j1JLXUa-3" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;dashed=1;dashPattern=2 3;endArrow=block;" target="-CdCgc4V3lMu8j1JLXUa-8" value="200 OK">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1218" y="1425" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-CdCgc4V3lMu8j1JLXUa-39" edge="1" parent="1" source="-CdCgc4V3lMu8j1JLXUa-3" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;dashed=1;dashPattern=2 3;endArrow=block;" target="-CdCgc4V3lMu8j1JLXUa-2" value="Push notification (solution ready)">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="549" y="1473" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

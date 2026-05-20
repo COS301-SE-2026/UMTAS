@@ -15,6 +15,7 @@ import type { TimeSlot } from "@/components/atoms/builder/TimeSlotSelect";
 import { EventTypeDropdown } from "@/components/atoms/builder/eventDropdown";
 import type { EventType } from "@/components/atoms/builder/eventDropdown";
 import { type Module } from "@/components/molecules/builder/ModuleCard";
+import { Switch } from "@/components/atoms/baseShadcn/switch";
 
 export interface BuilderEvent {
   id: string;
@@ -25,6 +26,7 @@ export interface BuilderEvent {
   endTime: string;
   type: EventType;
   moduleId: string;
+  isRecurring: boolean;
 }
 
 export interface EventErrors {
@@ -205,6 +207,24 @@ export function EventCard({
           {errors?.date && (
             <p className="text-sm text-[var(--error-text)]">{errors.date}</p>
           )}
+        </div>
+        {/* isRecurring */}
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex flex-col gap-0.5">
+            <Label className="text-sm font-medium text-[var(--text-secondary)]">
+              Weekly recurrence
+            </Label>
+            <p className="text-xs text-[var(--text-secondary)]">
+              Repeat this event every week on the same day.
+            </p>
+          </div>
+          <Switch
+            checked={event.isRecurring}
+            onCheckedChange={(v) =>
+              onUpdate(event.id, "isRecurring", String(v))
+            }
+            className="data-[state=checked]:bg-[var(--text-primary)]"
+          />
         </div>
 
         {/* time */}

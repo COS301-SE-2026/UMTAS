@@ -1,4 +1,4 @@
 if git diff HEAD@{1} --name-only | grep -q 'pnpm-lock.yaml'; then
-  echo "pnpm-lock.yaml changed — running pnpm install..."
+  echo "pnpm-lock.yaml changed - running pnpm install..."
   pnpm install
 fi

@@ -9,7 +9,7 @@ This page contains the interactive documentation for the UMTAS APIs (NestJS Core
 
 ## :material-rocket-launch: UMTAS Core API (NestJS)
 
-<swagger-ui src="https://api.capstone-vigil.dns.net.za/api-docs-json" />
+<swagger-ui src="https://api.capstone-vigil.dns.net.za/api/docs-json" />
 
 ---
 

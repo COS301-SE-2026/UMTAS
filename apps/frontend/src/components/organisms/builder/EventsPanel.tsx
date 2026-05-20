@@ -33,6 +33,7 @@ export function emptyEvent(): BuilderEvent {
     endTime: "",
     type: "lecture" as EventType,
     moduleId: "",
+    isRecurring: false,
   };
 }
 

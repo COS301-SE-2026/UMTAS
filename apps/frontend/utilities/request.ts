@@ -1,26 +1,39 @@
+import { paths } from "../src/lib/api";
+
 enum RequestMethod {
   GET = "GET",
   POST = "POST",
   PUT = "PUT",
   DELETE = "DELETE",
+  PATCH = "PATCH",
 }
 
-export class RequestBuilder<RequestType, ResponseType> {
+export class RequestBuilder<
+  PathType = undefined,
+  RequestType = undefined,
+  ResponseType = undefined,
+> {
   private url: string = "";
   private method: RequestMethod = RequestMethod.GET;
   private headers: Record<string, string> = {
     "Content-Type": "application/json",
   };
 
-  public setUrl(url: string): this {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+  protected setUrl(url: keyof paths): this {
+    const baseUrl = process.env.API_URL || "http://localhost:3000";
     const cleanBase = baseUrl.replace(/\/$/, "");
-    const cleanPath = url.replace(/^\//, "");
+    const cleanPath = (url as string).replace(/^\//, "");
     this.url = `${cleanBase}/${cleanPath}`;
+
+    // Automatically set Origin header in Node.js environments for CORS/CSRF
+    if (typeof window === "undefined") {
+      this.headers["Origin"] = cleanBase;
+    }
+
     return this;
   }
 
-  public setMethod(method: RequestMethod): this {
+  protected setMethod(method: RequestMethod): this {
     this.method = method;
     return this;
   }
@@ -30,21 +43,38 @@ export class RequestBuilder<RequestType, ResponseType> {
     return this;
   }
 
-  public setBearerToken(token: string): this {
+  protected setBearerToken(token: string): this {
     this.headers["Authorization"] = `Bearer ${token}`;
     return this;
   }
 
-  public async send(body?: RequestType): Promise<ResponseType> {
-    const methodsRequiringBody: string[] = [
+  public async send(args: {
+    paths?: PathType;
+    body?: RequestType;
+  }): Promise<ResponseType> {
+    const { paths, body } = args;
+    const methodsRequiringBody: RequestMethod[] = [
       RequestMethod.POST,
       RequestMethod.PUT,
+      RequestMethod.PATCH,
     ];
+
     if (methodsRequiringBody.includes(this.method) && body === undefined) {
       throw new Error(`Request body required for ${this.method} requests`);
     }
 
-    const response = await fetch(this.url, {
+    let finalUrl = this.url;
+
+    if (paths) {
+      Object.entries(paths as Record<string, string>).forEach(
+        ([key, value]) => {
+          finalUrl = finalUrl.split(`{${key}}`).join(String(value));
+          finalUrl = finalUrl.split(`:${key}`).join(String(value));
+        },
+      );
+    }
+
+    const response = await fetch(finalUrl, {
       method: this.method,
       headers: this.headers,
       credentials: "include",
@@ -59,6 +89,16 @@ export class RequestBuilder<RequestType, ResponseType> {
         errorBody = "(could not read response body)";
       }
       throw new Error(`HTTP ${response.status}: ${errorBody}`);
+    }
+
+    const contentType = response.headers.get("content-type");
+    if (
+      response.status === 204 ||
+      response.headers.get("content-length") === "0" ||
+      !contentType ||
+      !contentType.includes("application/json")
+    ) {
+      return {} as ResponseType;
     }
 
     return (await response.json()) as ResponseType;

@@ -122,3 +122,4 @@ working_docs/
 .secrets
 
 .pnpm-store/
+apps/frontend/junit.xml

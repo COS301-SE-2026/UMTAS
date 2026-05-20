@@ -31,7 +31,7 @@
 
 ??? success "Frontend Checklist"
     - [ ] UI matches the feature design exactly.
-    - [ ] Responsive behavior verified (Mobile/Desktop).
+    - [ ] Responsive behaviour verified (Mobile/Desktop).
     - [ ] Loading, Success, and Error states are handled.
     - [ ] Components are modular and reusable.
     - [ ] Manually verified in at least two browsers.
