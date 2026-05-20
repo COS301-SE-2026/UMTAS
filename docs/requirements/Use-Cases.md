@@ -1,20 +1,25 @@
 # Use Cases
 
 !!! abstract "Section Brief"
-    Use cases detail the concrete interactions between system actors and the UMTAS platform. Each use case describes a discrete system capability with pre-conditions, a main flow, and exception paths. All use cases map directly to functional requirements in the [Traceability Matrix](Traceability-Matrix.md).
+    Use cases detail the concrete interactions between system actors and the UMTAS platform. Each use case describes a discrete system capability with a precondition, trigger, basic flow, alternate flows, and postcondition. All use cases map directly to functional requirements in the [Traceability Matrix](Traceability-Matrix.md).
 
-    **Actors:** Student · Administrator · System (automated/scheduled processes)
+    **Subsystems:** Authentication · Timetable Management · Timetable Import · Calendar Integration · University Analytics · Tyto Simulation
+
+    **Actors:** User · Student · University Administrator · Tyto Administrator
 
 ---
 
 This section defines the primary use cases for the UMTAS platform. Use cases are grouped according to subsystem boundaries to improve readability and align with the modular system architecture.
 
 ## 8.1 Authentication System
-[Authentication System](../diagrams/requirements/Authentication-System.md) 
+![Authentication System](../diagrams/requirements/Authentication-System.svg)
 
 **Description:** The Authentication System manages user identity and access control for the platform. It provides functionality for account registration, authentication, and logout for all authorised users.
 
 **Scope:** The subsystem includes user login, registration, and logout capabilities for Students, University Administrators, and Tyto Administrators.
+
+!!! success "Demo 1 — Fully Implemented"
+    All use cases in this subsystem were implemented for Demo 1.
 
 ### 8.1.1 Use Cases
 | Use Case ID | Use Case Name | Actor(s) |
@@ -24,7 +29,7 @@ This section defines the primary use cases for the UMTAS platform. Use cases are
 | UC-AU-03 | Reset Password | User |
 | UC-AU-04 | Logout | User |
 
-#### UC-AU-01: Register Account
+#### UC-AU-01: Register Account · :material-check-circle:{ style="color: #4caf50" }
 | Field | Detail |
 | :--- | :--- |
 | **Actor** | User (Student) |
@@ -35,7 +40,7 @@ This section defines the primary use cases for the UMTAS platform. Use cases are
 | **Postcondition** | Account created and activated |
 | **Requirements Covered** | R1.2.2 |
 
-#### UC-AU-02: Login
+#### UC-AU-02: Login · :material-check-circle:{ style="color: #4caf50" }
 | Field | Detail |
 | :--- | :--- |
 | **Actor** | User |
@@ -46,7 +51,7 @@ This section defines the primary use cases for the UMTAS platform. Use cases are
 | **Postcondition** | User is authenticated |
 | **Requirements Covered** | R1.2.1 \| R1.2.3 |
 
-#### UC-AU-03: Reset Password
+#### UC-AU-03: Reset Password · :material-check-circle:{ style="color: #4caf50" }
 | Field | Detail |
 | :--- | :--- |
 | **Actor** | User |
@@ -57,7 +62,7 @@ This section defines the primary use cases for the UMTAS platform. Use cases are
 | **Postcondition** | Password updated |
 | **Requirements Covered** | R1.2.1 |
 
-#### UC-AU-04: Logout
+#### UC-AU-04: Logout · :material-check-circle:{ style="color: #4caf50" }
 | Field | Detail |
 | :--- | :--- |
 | **Actor** | User |
@@ -69,11 +74,16 @@ This section defines the primary use cases for the UMTAS platform. Use cases are
 | **Requirements Covered** | R1.2.3 |
 
 ## 8.2 Timetable Management System
-[[:octicons-graph-24: View Diagram](../diagrams/requirements/Timetable-Management-System.md)]
+![Timetable Management System](../diagrams/requirements/Timetable-Management-System.svg)
 
 **Description:** The Timetable Management System enables students to create, generate, modify, organise, and manage academic timetables within the platform.
 
 **Scope:** The subsystem supports timetable creation, viewing, editing, deletion, semester assignment, preference management, and timetable generation functionality.
+
+!!! warning "Demo 1 — Partially Implemented"
+    **Implemented:** UC-ST-01 · UC-ST-02 · UC-ST-03 · UC-ST-04 · UC-ST-05
+
+    **Not implemented:** UC-ST-06 · UC-ST-07
 
 ### 8.2.1 Use Cases
 | Use Case ID | Use Case Name                 | Actor(s) |
@@ -86,18 +96,18 @@ This section defines the primary use cases for the UMTAS platform. Use cases are
 | UC-ST-06    | Set Scheduling Preferences    | Student  |
 | UC-ST-07    | Resolve Constraint Violations | Student  |
 
-#### UC-ST-01: Create Timetable (Manual)
+#### UC-ST-01: Create Timetable (Manual) · :material-check-circle:{ style="color: #4caf50" }
 | Field | Detail |
 | :--- | :--- |
 | **Actor** | Student |
 | **Precondition** | Student is authenticated |
-| **Trigger** | Student selects “Create Timetable” |
+| **Trigger** | Student selects "Create Timetable" |
 | **Basic Flow** | 1. System displays timetable builder<br>2. Student adds modules and assigns time slots<br>3. System validates entries for conflicts<br>4. Student saves timetable<br>5. System confirms and stores |
 | **Alternate Flow** | **A1: Time conflict detected**<br>System prompts resolution.<br>**A2: Missing required fields**<br>System highlights incomplete entries. |
 | **Postcondition** | Timetable saved |
 | **Requirements Covered** | R2.2.1 |
 
-#### UC-ST-02: Generate Timetable
+#### UC-ST-02: Generate Timetable · :material-check-circle:{ style="color: #4caf50" }
 | Field | Detail |
 | :--- | :--- |
 | **Actor** | Student |
@@ -108,7 +118,7 @@ This section defines the primary use cases for the UMTAS platform. Use cases are
 | **Postcondition** | Generated timetable stored and displayed |
 | **Requirements Covered** | R2.2.1 \| R2.2.3 |
 
-#### UC-ST-03: View Timetable
+#### UC-ST-03: View Timetable · :material-check-circle:{ style="color: #4caf50" }
 | Field | Detail |
 | :--- | :--- |
 | **Actor** | Student |
@@ -119,7 +129,7 @@ This section defines the primary use cases for the UMTAS platform. Use cases are
 | **Postcondition** | Timetable displayed |
 | **Requirements Covered** | R2.1.1 |
 
-#### UC-ST-04: Modify Timetable
+#### UC-ST-04: Modify Timetable · :material-check-circle:{ style="color: #4caf50" }
 | Field | Detail |
 | :--- | :--- |
 | **Actor** | Student |
@@ -130,7 +140,7 @@ This section defines the primary use cases for the UMTAS platform. Use cases are
 | **Postcondition** | Updated timetable stored |
 | **Requirements Covered** | R2.1.2 |
 
-#### UC-ST-05: Delete Timetable
+#### UC-ST-05: Delete Timetable · :material-check-circle:{ style="color: #4caf50" }
 | Field | Detail |
 | :--- | :--- |
 | **Actor** | Student |
@@ -141,7 +151,7 @@ This section defines the primary use cases for the UMTAS platform. Use cases are
 | **Postcondition** | Timetable removed |
 | **Requirements Covered** | R2.1.3 |
 
-#### UC-ST-06: Set Scheduling Preferences
+#### UC-ST-06: Set Scheduling Preferences · :material-close-circle:{ style="color: #e53935" }
 | Field | Detail |
 | :--- | :--- |
 | **Actor** | Student |
@@ -152,7 +162,7 @@ This section defines the primary use cases for the UMTAS platform. Use cases are
 | **Postcondition** | Preferences stored and applied during next generation |
 | **Requirements Covered** | R2.2.3 |
 
-#### UC-ST-07: Resolve Constraint Violations
+#### UC-ST-07: Resolve Constraint Violations · :material-close-circle:{ style="color: #e53935" }
 | Field | Detail |
 | :--- | :--- |
 | **Actor** | Student |
@@ -164,11 +174,14 @@ This section defines the primary use cases for the UMTAS platform. Use cases are
 | **Requirements Covered** | R2.2.3 |
 
 ## 8.3 Timetable Import System
-[[:octicons-graph-24: View Diagram](../diagrams/requirements/Timetable-Import-System.md)]
+![Timetable Import System](../diagrams/requirements/Requirements.drawio)
 
 **Description:** The Timetable Import System enables students to import timetable data from external university sources such as PDFs and institutional APIs.
 
 **Scope:** The subsystem supports timetable parsing, validation, import processing, and user customisation of imported timetable data.
+
+!!! failure "Demo 1 — Not Implemented"
+    No use cases in this subsystem were implemented for Demo 1.
 
 ### 8.3.1 Use Cases
 | Use Case ID | Use Case Name | Actor(s) |
@@ -176,7 +189,7 @@ This section defines the primary use cases for the UMTAS platform. Use cases are
 | UC-ST-08 | Import Timetable | Student |
 | UC-ST-09 | Customise Imported Timetable | Student |
 
-#### UC-ST-08: Import Timetable
+#### UC-ST-08: Import Timetable · :material-close-circle:{ style="color: #e53935" }
 | Field | Detail |
 | :--- | :--- |
 | **Actor** | Student |
@@ -187,7 +200,7 @@ This section defines the primary use cases for the UMTAS platform. Use cases are
 | **Postcondition** | Imported timetable stored and available for customisation |
 | **Requirements Covered** | R2.3.1 \| R2.4.1 \| R2.2.2 |
 
-#### UC-ST-09: Customise Imported Timetable
+#### UC-ST-09: Customise Imported Timetable · :material-close-circle:{ style="color: #e53935" }
 | Field | Detail |
 | :--- | :--- |
 | **Actor** | Student |
@@ -199,11 +212,16 @@ This section defines the primary use cases for the UMTAS platform. Use cases are
 | **Requirements Covered** | R2.3.2 \| R2.4.2 |
 
 ## 8.4 Calendar Integration System
-[[:octicons-graph-24: View Diagram](../diagrams/requirements/Calender-Integration-System.md)]
+![Calendar Integration System](../diagrams/requirements/Calender-Integration-System.svg)
 
 **Description:** The Calendar Integration System enables students to export their timetables to external calendar applications for ongoing schedule management.
 
 **Scope:** Covers export to Google Calendar via OAuth and download as a standard .ics file.
+
+!!! warning "Demo 1 — Partially Implemented"
+    **Implemented:** UC-EX-02
+
+    **Not implemented:** UC-EX-01
 
 ### 8.4.1 Use Cases
 | Use Case ID | Use Case Name | Actor(s) |
@@ -211,7 +229,7 @@ This section defines the primary use cases for the UMTAS platform. Use cases are
 | UC-EX-01 | Export Timetable to Google Calendar | Student |
 | UC-EX-02 | Download Timetable as .ics File | Student |
 
-#### UC-EX-01: Export Timetable to Google Calendar
+#### UC-EX-01: Export Timetable to Google Calendar · :material-close-circle:{ style="color: #e53935" }
 | Field | Detail |
 | :--- | :--- |
 | **Actor** | Student |
@@ -222,7 +240,7 @@ This section defines the primary use cases for the UMTAS platform. Use cases are
 | **Postcondition** | Timetable events created in Google Calendar |
 | **Requirements Covered** | R2.5.2 |
 
-#### UC-EX-02: Download Timetable as .ics File
+#### UC-EX-02: Download Timetable as .ics File · :material-check-circle:{ style="color: #4caf50" }
 | Field | Detail |
 | :--- | :--- |
 | **Actor** | Student |
@@ -234,11 +252,14 @@ This section defines the primary use cases for the UMTAS platform. Use cases are
 | **Requirements Covered** | R2.5.1 |
 
 ## 8.5 University Analytics System
-[[:octicons-graph-24: View Diagram](../diagrams/requirements/University-Analytics-System.md)]
+![University Analytics System](../diagrams/requirements/Requirements.drawio)
 
 **Description:** The University Analytics System provides analytical insights into timetable utilisation, attendance patterns, lecturer workload, and demand trends for university administrators.
 
 **Scope:** The subsystem supports timetable analytics, attendance analysis, venue utilisation monitoring, workload evaluation, and demand forecasting functionality.
+
+!!! failure "Demo 1 — Not Implemented"
+    No use cases in this subsystem were implemented for Demo 1.
 
 ### 8.5.1 Use Cases
 | Use Case ID | Use Case Name | Actor(s) |
@@ -251,7 +272,7 @@ This section defines the primary use cases for the UMTAS platform. Use cases are
 | UC-AD-06 | View Projected Attendance | University Administrator |
 | UC-AD-07 | View Registered Students for Module | University Administrator |
 
-#### UC-AD-01: View Venue Analytics
+#### UC-AD-01: View Venue Analytics · :material-close-circle:{ style="color: #e53935" }
 | Field | Detail |
 | :--- | :--- |
 | **Actor** | University Administrator |
@@ -262,7 +283,7 @@ This section defines the primary use cases for the UMTAS platform. Use cases are
 | **Postcondition** | Venue utilisation insights displayed |
 | **Requirements Covered** | R3.1.1 \| R3.1.2 |
 
-#### UC-AD-02: View Lecturer Workload Analytics
+#### UC-AD-02: View Lecturer Workload Analytics · :material-close-circle:{ style="color: #e53935" }
 | Field | Detail |
 | :--- | :--- |
 | **Actor** | University Administrator |
@@ -273,7 +294,7 @@ This section defines the primary use cases for the UMTAS platform. Use cases are
 | **Postcondition** | Lecturer workload insights displayed |
 | **Requirements Covered** | R3.1.1 |
 
-#### UC-AD-03: View Demand & Overcapacity Patterns
+#### UC-AD-03: View Demand & Overcapacity Patterns · :material-close-circle:{ style="color: #e53935" }
 | Field | Detail |
 | :--- | :--- |
 | **Actor** | University Administrator |
@@ -284,7 +305,7 @@ This section defines the primary use cases for the UMTAS platform. Use cases are
 | **Postcondition** | Demand and overcapacity insights displayed |
 | **Requirements Covered** | R3.1.3 |
 
-#### UC-AD-04: Reallocate Venue (Advisory)
+#### UC-AD-04: Reallocate Venue (Advisory) · :material-close-circle:{ style="color: #e53935" }
 | Field | Detail |
 | :--- | :--- |
 | **Actor** | University Administrator |
@@ -295,7 +316,7 @@ This section defines the primary use cases for the UMTAS platform. Use cases are
 | **Postcondition** | Suggested venue improvements visualised |
 | **Requirements Covered** | R3.1.1 \| R3.1.3 |
 
-#### UC-AD-05: View Actual Attendance
+#### UC-AD-05: View Actual Attendance · :material-close-circle:{ style="color: #e53935" }
 | Field | Detail |
 | :--- | :--- |
 | **Actor** | University Administrator |
@@ -306,7 +327,7 @@ This section defines the primary use cases for the UMTAS platform. Use cases are
 | **Postcondition** | Actual attendance figures visible to administrator |
 | **Requirements Covered** | R3.1.2 |
 
-#### UC-AD-06: View Projected Attendance
+#### UC-AD-06: View Projected Attendance · :material-close-circle:{ style="color: #e53935" }
 | Field | Detail |
 | :--- | :--- |
 | **Actor** | University Administrator |
@@ -317,7 +338,7 @@ This section defines the primary use cases for the UMTAS platform. Use cases are
 | **Postcondition** | Projected attendance data visible to administrator |
 | **Requirements Covered** | R3.1.3 |
 
-#### UC-AD-07: View Registered Students for Module
+#### UC-AD-07: View Registered Students for Module · :material-close-circle:{ style="color: #e53935" }
 | Field | Detail |
 | :--- | :--- |
 | **Actor** | University Administrator |
@@ -329,11 +350,14 @@ This section defines the primary use cases for the UMTAS platform. Use cases are
 | **Requirements Covered** | R3.1.1 |
 
 ## 8.6 Tyto Simulation System
-[[:octicons-graph-24: View Diagram](../diagrams/requirements/Tyto-Simulation-System.md)]
+![Tyto Simulation](../diagrams/requirements/Requirements.drawio)
 
 **Description:** The Tyto Simulation System evaluates system performance and scalability through large-scale simulated timetable workloads and stress testing.
 
 **Scope:** The subsystem supports simulation execution, stress testing, performance metric collection, and analytics visualisation under simulated load conditions.
+
+!!! failure "Demo 1 — Not Implemented"
+    No use cases in this subsystem were implemented for Demo 1.
 
 ### 8.6.1 Use Cases
 | Use Case ID | Use Case Name | Actor(s) |
@@ -341,7 +365,7 @@ This section defines the primary use cases for the UMTAS platform. Use cases are
 | UC-TY-01 | Run Simulation Batch | Tyto Administrator |
 | UC-TY-02 | View Simulation Analytics | Tyto Administrator |
 
-#### UC-TY-01: Run Simulation Batch
+#### UC-TY-01: Run Simulation Batch · :material-close-circle:{ style="color: #e53935" }
 | Field | Detail |
 | :--- | :--- |
 | **Actor** | Tyto Administrator |
@@ -352,7 +376,7 @@ This section defines the primary use cases for the UMTAS platform. Use cases are
 | **Postcondition** | Simulation results stored |
 | **Requirements Covered** | R4.1.1 |
 
-#### UC-TY-02: View Simulation Analytics
+#### UC-TY-02: View Simulation Analytics · :material-close-circle:{ style="color: #e53935" }
 | Field | Detail |
 | :--- | :--- |
 | **Actor** | Tyto Administrator |

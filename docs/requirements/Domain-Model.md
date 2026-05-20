@@ -31,7 +31,7 @@ The model is organised into four phases that mirror the planned build-out of the
 
 This phase captures the complete core of the system: users, the academic calendar, modules, events, enrolment, timetables, and the input/output pipeline. Everything the system needs to parse a timetable, solve it, and export it to a calendar is represented here.
 
-** INSERT DIAGRAM LINK TO DRAWIO HERE **
+![Core Domain Model](../diagrams/domain/Domain.drawio)
 
 ### Phase 1 - Entity Summary
 
