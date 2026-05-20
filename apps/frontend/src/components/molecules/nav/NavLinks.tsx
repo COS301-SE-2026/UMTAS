@@ -4,6 +4,7 @@ const NAV_ITEMS = [
   { href: "/dashboard", label: "Home" },
   { href: "/builder", label: "Build Schedule" },
   { href: "/schedules", label: "My Schedules" },
+  { href: "/brand", label: "Brand" },
 ] as const;
 
 export function NavLinks() {

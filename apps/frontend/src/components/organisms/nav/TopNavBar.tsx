@@ -15,7 +15,7 @@ interface TopNavBarProps {
 export function TopNavBar({ userName, userEmail }: TopNavBarProps) {
   return (
     <header
-      className="sticky top-0 z-40 w-full bg-[--bg-surface] border-b border-[--border]"
+      className="sticky top-0 z-40 w-full bg-surface border-b border-[--border]"
       role="banner"
     >
       <div className="mx-auto flex h-14 max-w-[1280px] items-center gap-6 px-4 sm:px-6">
