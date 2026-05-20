@@ -48,11 +48,16 @@ jobs:
           git remote add origin $remote_repo
           git fetch origin gh-pages
           git reset origin/gh-pages
-          git add dev/
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git commit -m "docs: deploy dev version"
-          git push origin HEAD:gh-pages
+          git add dev/
+
+          if git diff --staged --quiet; then
+            echo "No changes to docs detected. Skipping commit."
+          else
+            git commit -m "docs: deploy dev version"
+            git push origin HEAD:gh-pages
+          fi
 
       - name: PR Preview
         if: github.event_name == 'pull_request'
