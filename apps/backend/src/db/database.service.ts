@@ -44,10 +44,14 @@ export class DatabaseService implements OnModuleDestroy {
     }
   }
 
+  //when testing we definitly need cleanup, otherwise jest hangs
   async onModuleDestroy(): Promise<void> {
-    if (!this.isTest) {
-      if (this.pool) await this.pool.end();
-      if (this.pglite) await this.pglite.close();
+    if (this.pool) {
+      await this.pool.end();
+    }
+
+    if (this.pglite) {
+      await this.pglite.close();
     }
   }
 }
