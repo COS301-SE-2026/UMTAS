@@ -88,7 +88,7 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "prometheus" },
-          "expr": "up{job=\"backend\"}",
+          "expr": "clamp_max(count(container_start_time_seconds{compose_service=\"backend\"}), 1)",
           "instant": true,
           "refId": "A"
         }
@@ -137,7 +137,7 @@
       "targets": [
         {
           "datasource": { "type": "prometheus", "uid": "prometheus" },
-          "expr": "up{job=\"solver\"}",
+          "expr": "clamp_max(count(container_start_time_seconds{compose_service=\"solver\"}), 1)",
           "instant": true,
           "refId": "A"
         }

@@ -35,8 +35,12 @@ export class ModuleService {
         'Code and name are required for module creation',
       );
 
-    if (!userId)
-      throw new BadRequestException('User ID is required for module creation');
+    if (code.length > 10)
+      throw new BadRequestException(
+        'Module code should be shorter than 10 characters',
+      );
+    // if (!userId)
+    //   throw new BadRequestException('User ID is required for module creation');
 
     const [existingModule] = await this.dbService.db
       .select()
@@ -66,8 +70,8 @@ export class ModuleService {
 
   //return all
   async getAll(userId: string): Promise<ModuleListResponseDto> {
-    if (!userId)
-      throw new BadRequestException('User ID is required to fetch modules');
+    // if (!userId)
+    //   throw new BadRequestException('User ID is required to fetch modules');
 
     const foundModules = await this.dbService.db
       .select()
@@ -99,8 +103,8 @@ export class ModuleService {
     moduleId: number,
     dto: UpdateModuleDto,
   ): Promise<SingleModuleResponseDto> {
-    if (!userId)
-      throw new BadRequestException('User ID is required to update a module');
+    // if (!userId)
+    //   throw new BadRequestException('User ID is required to update a module');
 
     //Find module
     const [module] = await this.dbService.db
@@ -122,6 +126,11 @@ export class ModuleService {
         'At least one field is required to update a module',
       );
     }
+
+    if (dto.code && dto.code.length > 10)
+      throw new BadRequestException(
+        'Module code should be shorter than 10 characters',
+      );
 
     const updatedCode = dto.code?.trim().toUpperCase();
     const updatedDescription = dto.description?.trim();

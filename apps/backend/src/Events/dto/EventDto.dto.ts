@@ -7,6 +7,7 @@ import {
   IsBoolean,
 } from 'class-validator';
 import { Type } from 'class-transformer';
+import { Length } from 'class-validator';
 
 export enum EventType {
   LECTURE = 'lecture',
@@ -36,6 +37,7 @@ export class EventCriteriaDto {
   @ApiPropertyOptional({ example: 'COS301' })
   @IsOptional()
   @IsString()
+  @Length(6, 10)
   moduleCode?: string;
 
   @ApiPropertyOptional({ example: 'IT 2-26' })

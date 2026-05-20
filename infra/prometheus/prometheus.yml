@@ -56,6 +56,12 @@ scrape_configs:
       - source_labels: [container_label_com_docker_compose_service]
         target_label: compose_service
 
+  - job_name: health-exporter
+    static_configs:
+      - targets: ["health-exporter:9066"]
+        labels:
+          service: health-exporter
+
   - job_name: watchtower
     static_configs:
       - targets: ["watchtower:8080"]
