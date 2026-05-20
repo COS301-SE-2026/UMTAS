@@ -13,6 +13,7 @@ import type { EventType } from "@/components/atoms/builder/eventDropdown";
 import {
   createModulesBuilder,
   getAllModulesBuilder,
+  deleteModulesById,
 } from "@/app/builder/utils/modules/requestBuilders";
 
 const Steps = [
@@ -92,8 +93,15 @@ export function WizardShell() {
     );
   }
 
-  function handleModuleRemove(id: number) {
-    setModules((prev) => prev.filter((m) => m.moduleID !== id));
+  async function handleModuleRemove(id: number) {
+    try {
+      const builder = new deleteModulesById();
+      await builder.send({
+        paths: { moduleId: id },
+      });
+    } catch (error) {
+      console.error("Failed to delete module:", error);
+    }
   }
 
   function handleEventAdd() {

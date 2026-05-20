@@ -70,6 +70,7 @@ export function ModulesStep({
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
   const [snapshot, setSnapshot] = useState<ModuleResponseDto | null>(null);
   const [isAdding, setIsAdding] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   function requestNavigation(action: () => void) {
     if (isDirty) {
@@ -153,17 +154,23 @@ export function ModulesStep({
   }
 
   function handleRemove(id: number) {
+    if (isDeleting) return;
+
     if (selectedId === id) {
       setSelectedId(null);
       setIsDirty(false);
       setSnapshot(null);
     }
+
+    setIsDeleting(true);
+    onRemove(id);
+    setTimeout(() => setIsDeleting(false), 2000);
+
     setErrorMap((prev) => {
       const next = { ...prev };
       delete next[id];
       return next;
     });
-    onRemove(id);
   }
 
   function handleUpdate(
@@ -232,8 +239,9 @@ export function ModulesStep({
             variant="ghost"
             size="icon"
             onClick={() => handleRemove(module.moduleID)}
+            disabled={isDeleting}
             aria-label={"Remove module " + (index + 1)}
-            className="h-10 w-10 flex-shrink-0 border border-[var(--border)] text-[var(--text-secondary)] transition-colors duration-[var(--duration-fast)] hover:border-[var(--error-text)] hover:text-[var(--error-text)] hover:bg-transparent"
+            className="h-10 w-10 flex-shrink-0 border border-[var(--border)] text-[var(--text-secondary)] transition-colors duration-[var(--duration-fast)] hover:border-[var(--error-text)] hover:text-[var(--error-text)] hover:bg-transparent disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Trash2 size={16} strokeWidth={1.5} />
           </Button>
