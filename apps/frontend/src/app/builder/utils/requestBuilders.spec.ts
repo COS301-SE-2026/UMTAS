@@ -1,5 +1,15 @@
-import { getAllModulesBuilder } from "./requestBuilders";
-import { getModulesByIdBuilder } from "./requestBuilders";
+import {
+  createModulesBuilder,
+  getAllModulesBuilder,
+  getModulesByIdBuilder,
+  updateModulesBuilder,
+  deleteModulesById,
+  createModuleReq,
+  updateModuleByIdBody,
+  updateModuleByIdPath,
+  deleteModulesByIdPath,
+} from "./requestBuilders";
+
 const apiUrl = process.env.API_URL || "http://localhost:3000";
 
 describe("getAllModulesBuilder", () => {
@@ -54,6 +64,97 @@ describe("getModulesByIdBuilder", () => {
     expect(global.fetch).toHaveBeenCalledWith(
       apiUrl + "/modules/123",
       expect.objectContaining({ method: "GET" }),
+    );
+  });
+});
+
+describe("createModulesBuilder", () => {
+  beforeEach(() => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 201,
+      headers: {
+        get: (name: string) =>
+          name === "content-type" ? "application/json" : null,
+      },
+      json: async () => ({ module: {} }),
+    });
+  });
+
+  it("should hit the /modules endpoint with POST", async () => {
+    const builder = new createModulesBuilder();
+    const mockBody: createModuleReq = {
+      name: "New Module",
+      code: "CS101",
+      userId: "550e8400-e29b-41d4-a716-446655440000",
+    };
+    await builder.send({ body: mockBody });
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      apiUrl + "/modules",
+      expect.objectContaining({
+        method: "POST",
+        body: JSON.stringify(mockBody),
+      }),
+    );
+  });
+});
+
+describe("updateModulesBuilder", () => {
+  beforeEach(() => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: {
+        get: (name: string) =>
+          name === "content-type" ? "application/json" : null,
+      },
+      json: async () => ({ module: {} }),
+    });
+  });
+
+  it("should hit the /modules/{moduleId} endpoint with PATCH", async () => {
+    const builder = new updateModulesBuilder();
+    const mockPath: updateModuleByIdPath = { moduleId: 123 };
+    const mockBody: updateModuleByIdBody = { name: "Updated Module" };
+    await builder.send({
+      paths: mockPath,
+      body: mockBody,
+    });
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      apiUrl + "/modules/123",
+      expect.objectContaining({
+        method: "PATCH",
+        body: JSON.stringify(mockBody),
+      }),
+    );
+  });
+});
+
+describe("deleteModulesById", () => {
+  beforeEach(() => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: {
+        get: (name: string) =>
+          name === "content-type" ? "application/json" : null,
+      },
+      json: async () => ({}),
+    });
+  });
+
+  it("should hit the /modules/{moduleId} endpoint with DELETE", async () => {
+    const builder = new deleteModulesById();
+    const mockPath: deleteModulesByIdPath = { moduleId: 123 };
+    await builder.send({ paths: mockPath });
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      apiUrl + "/modules/123",
+      expect.objectContaining({
+        method: "DELETE",
+      }),
     );
   });
 });

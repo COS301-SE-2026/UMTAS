@@ -68,8 +68,8 @@ export class updateModulesBuilder extends RequestBuilder<
 }
 
 export class deleteModulesById extends RequestBuilder<
-  undefined,
   deleteModulesByIdPath,
+  undefined,
   deleteModulesByIdRes
 > {
   constructor() {
