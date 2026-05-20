@@ -18,6 +18,7 @@ import {
 import {
   getAllEventsBuilder,
   createEventsBuilder,
+  deleteEventById,
   type EventResponse,
 } from "@/app/builder/utils/events/eventRequestBuilder";
 
@@ -233,9 +234,22 @@ export function WizardShell() {
     );
   }
 
-  function handleEventRemove(id: number) {
-    // Placeholder for now
-    console.log("Remove event requested", id);
+  async function handleEventRemove(id: number) {
+    const targetEvent = events.find((e) => e.event.eventID === id);
+    if (targetEvent && !targetEvent.event.userID) {
+      setEvents((prev) => prev.filter((e) => e.event.eventID !== id));
+      return;
+    }
+
+    try {
+      const builder = new deleteEventById();
+      await builder.send({
+        paths: { id },
+      });
+      setEventsTrigger((prev) => prev + 1);
+    } catch (error) {
+      console.error("Failed to delete event:", error);
+    }
   }
 
   function handleStepClick(index: number) {
