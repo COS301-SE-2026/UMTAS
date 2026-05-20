@@ -5,6 +5,7 @@ import { ModuleService } from '../module.service';
 
 import { DatabaseService } from '../../db/database.service';
 import { modules } from '../../entities/Modules/index';
+import { NotFoundException } from '@nestjs/common';
 
 const USER_A = '00000000-0000-0000-0000-000000000001';
 const USER_B = '00000000-0000-0000-0000-000000000002';
@@ -54,6 +55,7 @@ describe('ModuleService integration', () => {
     await moduleRef?.close();
   });
 
+  //CREATE _______________________________________________________________________
   //Create Module
   it('creates a module', async () => {
     const result = await service.create(USER_A, {
@@ -108,6 +110,7 @@ describe('ModuleService integration', () => {
     });
   });
 
+  //GETALL _______________________________________________________
   //only return modules for user
   it('return only the modules created by user', async () => {
     await service.create(USER_A, cos301);
@@ -121,6 +124,44 @@ describe('ModuleService integration', () => {
       userID: USER_A,
     });
   });
+
+  //return nothing if there is nothing
+  it('return nothing if no modules created for user', async () => {
+    const result = await service.getAll(USER_A);
+    expect(result.modules).toEqual([]);
+  });
+
+  //GETBYID _______________________________________________________________
+  //returns correct module
+  it('return correct module when fetching by id', async () => {
+    const mod301 = await service.create(USER_A, cos301);
+    const mod332 = await service.create(USER_A, cos332);
+
+    const result301 = await service.getById(USER_A, mod301.module.moduleID);
+    const result332 = await service.getById(USER_A, mod332.module.moduleID);
+
+    expect(mod301.module.moduleID).toEqual(result301.module.moduleID);
+    expect(mod332.module.moduleID).toEqual(result332.module.moduleID);
+  });
+
+  //throw NotFound if module doesnt exists
+  it('missing module causes Module not found', async () => {
+    await expect(service.getById(USER_A, 0)).rejects.toThrow(NotFoundException);
+    await expect(service.getById(USER_A, 0)).rejects.toThrow(
+      'Module not found',
+    );
+  });
+
+  //cannot fetch other users module
+  it('cannot fetch other users module ', async () => {
+    const mod = await service.create(USER_A, cos301);
+
+    await expect(service.getById(USER_B, mod.module.moduleID)).rejects.toThrow(
+      NotFoundException,
+    );
+  });
+
+  //UPDATE __________________________________________________________________
 
   //update
   it('update module', async () => {
@@ -143,6 +184,7 @@ describe('ModuleService integration', () => {
     });
   });
 
+  //DELETE _____________________________________________________________________
   //delete
   it('should delete module after creation', async () => {
     const mod = await service.create(USER_A, cos301);
