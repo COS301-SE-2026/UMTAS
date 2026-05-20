@@ -103,7 +103,7 @@ export class MailerService {
     url: string;
     expiresInHours?: number;
   }): Promise<void> {
-    // Default token expiry (1 hour) — sync with BetterAuth's email verification token TTL
+    // Default token expiry (1 hour) - sync with BetterAuth's email verification token TTL
     const expiresInHours = input.expiresInHours ?? 1;
 
     await this.sendTemplateMail({

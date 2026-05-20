@@ -3,8 +3,8 @@
 !!! abstract "Section Brief"
     This section specifies the architectural decisions and component responsibilities that govern the UMTAS system design. It is structured in two parts:
 
-    1. **Overall software architecture** — system-wide architectural responsibility and constraints that every component must satisfy. Non-functional quality requirements are documented in [Quality Requirements](Quality-Requirements.md).
-    2. **Per-component architecture** — a breakdown of each major architectural component including its quality requirements, responsibilities, chosen frameworks, and technology rationale.
+    1. **Overall software architecture** - system-wide architectural responsibility and constraints that every component must satisfy. Non-functional quality requirements are documented in [Quality Requirements](Quality-Requirements.md).
+    2. **Per-component architecture** - a breakdown of each major architectural component including its quality requirements, responsibilities, chosen frameworks, and technology rationale.
 
 ---
 
@@ -27,7 +27,7 @@
 
 ---
 
-## 2. Frontend — Next.js
+## 2. Frontend - Next.js
 
 ### 2.1 Architectural Quality Requirements
 
@@ -41,7 +41,7 @@
 
 ---
 
-## 3. API Core — NestJS
+## 3. API Core - NestJS
 
 ### 3.1 Architectural Quality Requirements
 
@@ -55,7 +55,7 @@
 
 ---
 
-## 4. Core Optimizer — FastAPI
+## 4. Core Optimizer - FastAPI
 
 ### 4.1 Architectural Quality Requirements
 
@@ -69,7 +69,7 @@
 
 ---
 
-## 5. Database Layer — PostgreSQL
+## 5. Database Layer - PostgreSQL
 
 ### 5.1 Architectural Quality Requirements
 

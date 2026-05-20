@@ -1,7 +1,7 @@
 # Technology Requirements
 
 !!! abstract "Section Brief"
-    This section documents the approved technology stack for UMTAS. All choices are binding for contributing sub-teams and were selected to satisfy the architectural quality attributes defined in the [Architectural Requirements](Architectural-Requirements.md) — primarily performance, maintainability, and scalability at university scale.
+    This section documents the approved technology stack for UMTAS. All choices are binding for contributing sub-teams and were selected to satisfy the architectural quality attributes defined in the [Architectural Requirements](Architectural-Requirements.md) - primarily performance, maintainability, and scalability at university scale.
 
 ---
 

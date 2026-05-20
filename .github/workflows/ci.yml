@@ -249,7 +249,7 @@ jobs:
 
           if [ "$DEPLOY_STATUS" = "success" ]; then
             COLOR=3066993
-            TITLE="✅ Images Pushed — Watchtower deploying"
+            TITLE="✅ Images Pushed - Watchtower deploying"
           else
             COLOR=15158332
             TITLE="❌ Image Push Failed"
