@@ -14,6 +14,18 @@ type getAllEventsRes =
   paths["/events"]["get"]["responses"]["200"]["content"]["application/json"];
 
 type getEventByIDPath = paths["/events/{id}"]["get"]["parameters"]["path"];
+type getEventByIDRes =
+  paths["/events/{id}"]["get"]["responses"]["200"]["content"]["application/json"];
+type updateEventByIdPath = paths["/events/{id}"]["patch"]["parameters"]["path"];
+type updateEventByIdBody =
+  paths["/events/{id}"]["patch"]["requestBody"]["content"]["application/json"];
+type updateEventByIdRes =
+  paths["/events/{id}"]["patch"]["responses"]["200"]["content"]["application/json"];
+
+type deleteEventByIdPath =
+  paths["/events/{id}"]["delete"]["parameters"]["path"];
+type deleteEventByIdRes =
+  paths["/events/{id}"]["delete"]["responses"]["200"]["content"]["application/json"];
 
 export class createEventsBuilder extends RequestBuilder<
   undefined,
@@ -40,10 +52,32 @@ export class getAllEventsBuilder extends RequestBuilder<
 export class getEventByIDBuilder extends RequestBuilder<
   getEventByIDPath,
   undefined,
-  undefined
+  getEventByIDRes
 > {
   constructor() {
     super();
     this.setUrl("/events/{id}").setMethod(RequestMethod.GET);
+  }
+}
+
+export class updateEventByID extends RequestBuilder<
+  updateEventByIdPath,
+  updateEventByIdBody,
+  updateEventByIdRes
+> {
+  constructor() {
+    super();
+    this.setUrl("/events/{id}").setMethod(RequestMethod.PATCH);
+  }
+}
+
+export class deleteEventById extends RequestBuilder<
+  deleteEventByIdPath,
+  undefined,
+  deleteEventByIdRes
+> {
+  constructor() {
+    super();
+    this.setUrl("/events/{id}").setMethod(RequestMethod.DELETE);
   }
 }
