@@ -1,0 +1,1 @@
+ALTER TABLE "Event" ADD COLUMN "isRecurring" boolean DEFAULT false NOT NULL;

@@ -38,6 +38,7 @@ export class EventService {
         .values({
           userID: userId,
           eventCriteria: dto.eventCriteria ?? null,
+          isRecurring: dto.isRecurring ?? false,
         })
         .returning();
 
@@ -100,10 +101,12 @@ export class EventService {
     eventId: number,
     dto: UpdateEventDto,
   ): Promise<EventResponseDto> {
-    if (!dto.eventCriteria || Object.keys(dto.eventCriteria).length === 0)
-      throw new BadRequestException(
-        'At least one eventCriteria  field required',
-      );
+    const critUpdate =
+      dto.eventCriteria && Object.keys(dto.eventCriteria).length > 0;
+    const recUpdate = dto.isRecurring !== undefined;
+
+    if (!critUpdate && !recUpdate)
+      throw new BadRequestException('At least one update field required');
 
     return await this.databaseService.db.transaction(async (tx) => {
       const [exRow] = await tx
@@ -132,7 +135,10 @@ export class EventService {
 
       const [updatedEvent] = await tx
         .update(Event)
-        .set({ eventCriteria: mergedCriteria })
+        .set({
+          ...(critUpdate ? { eventCriteria: mergedCriteria } : {}),
+          ...(recUpdate ? { isRecurring: dto.isRecurring } : {}),
+        })
         .where(and(eq(Event.eventID, eventId), eq(Event.userID, userId)))
         .returning();
 
@@ -228,7 +234,7 @@ export class EventService {
   } //validateEvetTypeCriteria
 
   private async syncSubtypeForEvent(
-    tx: typeof this.databaseService.db,
+    tx: AppDatabase,
     eventID: number,
     criteria: NonNullable<CreateEventDto['eventCriteria']>,
     existingLecture?: typeof LectureEv.$inferSelect | null,

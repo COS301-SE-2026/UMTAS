@@ -1,5 +1,11 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsEnum, IsString, ValidateNested } from 'class-validator';
+import {
+  IsOptional,
+  IsEnum,
+  IsString,
+  ValidateNested,
+  IsBoolean,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export enum EventType {
@@ -46,6 +52,11 @@ export class CreateEventDto {
   @ValidateNested()
   @Type(() => EventCriteriaDto)
   eventCriteria!: EventCriteriaDto;
+
+  @ApiPropertyOptional({ example: false, default: false })
+  @IsOptional()
+  @IsBoolean()
+  isRecurring?: boolean;
 } //CreateEventDto
 
 export class EventDto {
@@ -57,6 +68,9 @@ export class EventDto {
 
   @ApiProperty({ type: EventCriteriaDto })
   eventCriteria!: EventCriteriaDto;
+
+  // @ApiProperty({ example: true})
+  // isRecurring: boolean;
 } //EventDto
 
 export class LectureResponseDto {
@@ -106,6 +120,11 @@ export class UpdateEventCriteriaDto {
   @IsOptional()
   @IsString()
   venue?: string;
+
+  // @ApiPropertyOptional({ example: true })
+  // @IsOptional()
+  // @IsBoolean()
+  // isRecurring?: boolean;
 } //udpateEventCriteria
 
 export class UpdateEventDto {
@@ -117,6 +136,11 @@ export class UpdateEventDto {
   @ValidateNested()
   @Type(() => UpdateEventCriteriaDto)
   eventCriteria?: UpdateEventCriteriaDto;
+
+  @ApiPropertyOptional({ example: false, default: false })
+  @IsOptional()
+  @IsBoolean()
+  isRecurring?: boolean;
 } //Update event
 
 export class EventResponseDto {
