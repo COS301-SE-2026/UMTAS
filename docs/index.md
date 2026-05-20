@@ -24,7 +24,7 @@ _Built by: Wilmar Smit, Michael Tomlinson, Johan Coetzer, Marcel Stoltz, & Aidan
 
 ## :material-information-outline: Project Overview
 
-UMTAS automates the full timetabling lifecycle — from ingesting raw PDF schedules, resolving hard and soft scheduling constraints via a CP-SAT solver, through to delivering conflict-free, personalized timetables to up to 20,000 concurrent students.
+UMTAS automates the full timetabling lifecycle - from ingesting raw PDF schedules, resolving hard and soft scheduling constraints via a CP-SAT solver, through to delivering conflict-free, personalized timetables to up to 20,000 concurrent students.
 
 The system is university-agnostic by design: a Core-and-Adapter architecture cleanly separates scheduling logic from institution-specific data formats, allowing any university to plug in without changes to the core.
 

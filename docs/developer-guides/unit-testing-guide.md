@@ -23,7 +23,7 @@
 
 === "Shared Base"
     ```
-    jest.config.base.js   ← shared timeout + reporters — don't touch
+    jest.config.base.js   ← shared timeout + reporters - don't touch
     ```
 
 ---
@@ -40,7 +40,7 @@ pnpm --filter frontend run test -- --coverage  # frontend with coverage
 
 ## :material-alert-circle: What to Worry About
 
-??? warning "Coverage thresholds — CI blocks merges below these"
+??? warning "Coverage thresholds - CI blocks merges below these"
     | App          | Statements | Branches | Functions | Lines |
     | :----------- | :--------: | :------: | :-------: | :---: |
     | **Backend**  | 20%        | 8%       | 12%       | 18%   |
@@ -48,7 +48,7 @@ pnpm --filter frontend run test -- --coverage  # frontend with coverage
 
 ??? warning "Test quality"
     - Name reads like a sentence: `it('should return 400 if the date is in the past')`
-    - One behaviour per test — if it can fail for two reasons, split it.
+    - One behaviour per test - if it can fail for two reasons, split it.
     - Only mock what crosses a real boundary (HTTP, DB, file system).
 
 ---

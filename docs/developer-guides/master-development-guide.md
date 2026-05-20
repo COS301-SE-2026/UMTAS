@@ -23,7 +23,7 @@ Use the following specialized guides based on your current task:
 | [:material-server: Backend Dev](./backend-development-guide.md)  | NestJS APIs, DrizzleORM, Python Solver, Swagger. |
 | [:material-web: Frontend Dev](./frontend-development-guide.md)   | Next.js UI, Shadcn/UI, Radix state.              |
 | [:material-cog: Server & Infra](./server-guide.md)               | Docker, Traefik, MinIO, Monitoring (PLG).        |
-| [:material-test-tube: Unit Testing](./unit-testing-guide.md)     | Isolated logic, utilities, component behavior.   |
+| [:material-test-tube: Unit Testing](./unit-testing-guide.md)     | Isolated logic, utilities, component behaviour.  |
 | [:material-flask: Integration](./integration-testing-guide.md)   | Cross-service communication, database flows.     |
 | [:material-github: Local CI/CD](./local-cicd-guide.md)           | Running `act` and pre-push checks.               |
 | [:material-source-branch: Git Strategy](./git-strategy-guide.md) | Branching, PRs, and naming conventions.          |
@@ -50,7 +50,7 @@ For new team members, we recommend the following onboarding path:
     - **Changing Docker, Traefik, or MinIO?** :octicons-arrow-right-24: [Server Guide](./server-guide.md)
     - **Adding observability or logs?** :octicons-arrow-right-24: [Server Guide](./server-guide.md)
     - **Validating isolated logic?** :octicons-arrow-right-24: [Unit Testing Guide](./unit-testing-guide.md)
-    - **Testing cross-service behavior?** :octicons-arrow-right-24: [Integration Testing Guide](./integration-testing-guide.md)
+    - **Testing cross-service behaviour?** :octicons-arrow-right-24: [Integration Testing Guide](./integration-testing-guide.md)
     - **Troubleshooting CI readiness?** :octicons-arrow-right-24: [Local CI/CD Guide](./local-cicd-guide.md)
     - **Creating branches or PRs?** :octicons-arrow-right-24: [Git Strategy Guide](./git-strategy-guide.md)
 
