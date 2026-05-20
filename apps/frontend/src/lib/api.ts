@@ -381,6 +381,43 @@ export interface paths {
     patch: operations["updateModule"];
     trace?: never;
   };
+  "/events": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get all events */
+    get: operations["getAllEvents"];
+    put?: never;
+    /** Create an event */
+    post: operations["createEvent"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/events/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get event by ID */
+    get: operations["getEventById"];
+    put?: never;
+    post?: never;
+    /** Delete an event */
+    delete: operations["deleteEvent"];
+    options?: never;
+    head?: never;
+    /** Update an event */
+    patch: operations["updateEvent"];
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -567,12 +604,6 @@ export interface components {
        */
       description?: string;
       /**
-       * Format: uuid
-       * @description Temporary user ID until auth context is connected
-       * @example 550e8400-e29b-41d4-a716-446655440000
-       */
-      userId: string;
-      /**
        * @description Optional display styling for the module
        * @example #3B82F6
        */
@@ -622,6 +653,101 @@ export interface components {
     };
     DeleteModuleResponseDto: {
       /** @example true */
+      success: Record<string, never>;
+    };
+    EventCriteriaDto: {
+      /**
+       * @example lecture
+       * @enum {string|null}
+       */
+      type?: "lecture" | null;
+      /** @example Monday */
+      day: string;
+      /** @example 08:30 */
+      startTime: string;
+      /** @example 10:20 */
+      endTime: string;
+      /** @example COS301 */
+      moduleCode?: string;
+      /** @example IT 2-26 */
+      venue?: string;
+    };
+    CreateEventDto: {
+      /** @description Criteria for an event */
+      eventCriteria: components["schemas"]["EventCriteriaDto"];
+      /**
+       * @default false
+       * @example false
+       */
+      isRecurring: Record<string, never>;
+    };
+    EventDto: {
+      /** @example 1 */
+      eventID: number;
+      /** @example a1b2c3d4-e5f6-7890-abcd-ef1234567890 */
+      userID: string;
+      eventCriteria: components["schemas"]["EventCriteriaDto"];
+    };
+    LectureResponseDto: {
+      /** @example 1 */
+      lectureID: number;
+      /** @example 12 */
+      moduleID: Record<string, never> | null;
+      /** @example 1 */
+      eventID: Record<string, never> | null;
+      /** @example IT 2-26 */
+      venue?: string | null;
+    };
+    EventResponseDto: {
+      /**
+       * @example {
+       *       "eventID": 1,
+       *       "userID": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+       *       "eventCriteria": {
+       *         "day": "Monday",
+       *         "startTime": "08:30",
+       *         "endTime": "10:20"
+       *       }
+       *     }
+       */
+      event: components["schemas"]["EventDto"];
+      lecture?: components["schemas"]["LectureResponseDto"];
+    };
+    EventListResponseDto: {
+      /** @description List of events with optional lecture details */
+      events: components["schemas"]["EventResponseDto"][];
+    };
+    UpdateEventCriteriaDto: {
+      /**
+       * @example lecture
+       * @enum {string}
+       */
+      type?: "lecture";
+      /** @example Tuesday */
+      day?: string;
+      /** @example 10:30 */
+      startTime?: string;
+      /** @example 12:20 */
+      endTime?: string;
+      /** @example COS301 */
+      moduleCode?: string;
+      /** @example IT 2-26 */
+      venue?: string;
+    };
+    UpdateEventDto: {
+      /** @description Event update criteria */
+      eventCriteria?: components["schemas"]["UpdateEventCriteriaDto"];
+      /**
+       * @default false
+       * @example false
+       */
+      isRecurring: Record<string, never>;
+    };
+    DeleteResponseDto: {
+      /**
+       * @default true
+       * @example true
+       */
       success: Record<string, never>;
     };
   };
@@ -1561,6 +1687,232 @@ export interface operations {
       };
       /** @description Duplicate module code detected */
       409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getAllEvents: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Events fetched successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["EventListResponseDto"];
+        };
+      };
+      /** @description No active session */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Insufficient permissions */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  createEvent: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateEventDto"];
+      };
+    };
+    responses: {
+      /** @description Event created successfully */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["EventResponseDto"];
+        };
+      };
+      /** @description Missing or invalid event payload */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No active session */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Insufficient permissions */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Event was not created */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getEventById: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Event fetched successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["EventResponseDto"];
+        };
+      };
+      /** @description Event not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  deleteEvent: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Event deleted successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DeleteResponseDto"];
+        };
+      };
+      /** @description No active session */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Insufficient permissions */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Event not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Event was not deleted */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  updateEvent: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateEventDto"];
+      };
+    };
+    responses: {
+      /** @description Event updated successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["EventResponseDto"];
+        };
+      };
+      /** @description Missing or invalid update payload */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No active session */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Insufficient permissions */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Event or referenced module not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Event was not updated */
+      500: {
         headers: {
           [name: string]: unknown;
         };
