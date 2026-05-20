@@ -418,6 +418,43 @@ export interface paths {
     patch: operations["updateEvent"];
     trace?: never;
   };
+  "/timetables": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get all timetables */
+    get: operations["getAllTimetables"];
+    put?: never;
+    /** Create a timetable */
+    post: operations["createTimetable"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/timetables/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get timetable by ID */
+    get: operations["getTimetableById"];
+    put?: never;
+    post?: never;
+    /** Delete a timetable */
+    delete: operations["deleteTimetable"];
+    options?: never;
+    head?: never;
+    /** Update a timetable */
+    patch: operations["updateTimetable"];
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -748,6 +785,73 @@ export interface components {
        * @default true
        * @example true
        */
+      success: Record<string, never>;
+    };
+    CreateTimetableDto: {
+      /**
+       * @description Display name for the timetable
+       * @example Semester 1
+       */
+      timetableName?: string;
+      /**
+       * @description Event IDs to attach on creation
+       * @example [
+       *       1,
+       *       2,
+       *       3
+       *     ]
+       */
+      eventIds?: string[];
+    };
+    TimetableDto: {
+      /** @example 1 */
+      timetableID: number;
+      /** @example a1b2c3d4-e5f6-7890-abcd-ef1234567890 */
+      userID: string;
+      /** @example Semester 1 */
+      timetableName?: string | null;
+    };
+    TimetableResponseDto: {
+      timetable: components["schemas"]["TimetableDto"];
+      /**
+       * @description IDs of events linked to this timetable
+       * @example [
+       *       1,
+       *       2,
+       *       3
+       *     ]
+       */
+      eventIds?: string[];
+    };
+    TimetableListResponseDto: {
+      /** @description List of timetables with their linked event IDs */
+      timetables: components["schemas"]["TimetableResponseDto"][];
+    };
+    UpdateTimetableDto: {
+      /**
+       * @description Updated display name for the timetable
+       * @example Semester 2
+       */
+      timetableName?: string;
+      /**
+       * @description Event IDs to link to the timetable
+       * @example [
+       *       4,
+       *       5
+       *     ]
+       */
+      addEventIds?: string[];
+      /**
+       * @description Event IDs to unlink from the timetable
+       * @example [
+       *       1,
+       *       2
+       *     ]
+       */
+      removeEventIds?: string[];
+    };
+    DeleteTimetableResponseDto: {
+      /** @example true */
       success: Record<string, never>;
     };
   };
@@ -1912,6 +2016,214 @@ export interface operations {
         content?: never;
       };
       /** @description Event was not updated */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getAllTimetables: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Timetables fetched successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TimetableListResponseDto"];
+        };
+      };
+      /** @description No active session */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  createTimetable: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateTimetableDto"];
+      };
+    };
+    responses: {
+      /** @description Timetable created successfully */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TimetableResponseDto"];
+        };
+      };
+      /** @description Missing or invalid request payload */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No active session */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Timetable was not created */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getTimetableById: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Timetable ID */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Timetable fetched successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TimetableResponseDto"];
+        };
+      };
+      /** @description No active session */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Timetable not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  deleteTimetable: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Timetable ID */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Timetable deleted successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DeleteTimetableResponseDto"];
+        };
+      };
+      /** @description No active session */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Timetable not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Timetable was not deleted */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  updateTimetable: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Timetable ID */
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateTimetableDto"];
+      };
+    };
+    responses: {
+      /** @description Timetable updated successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TimetableResponseDto"];
+        };
+      };
+      /** @description Missing or invalid update payload */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No active session */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Timetable not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Timetable was not updated */
       500: {
         headers: {
           [name: string]: unknown;

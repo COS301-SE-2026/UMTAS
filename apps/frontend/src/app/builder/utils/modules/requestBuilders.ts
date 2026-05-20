@@ -1,4 +1,8 @@
-import { RequestBuilder, RequestMethod } from "../../../../utilities/request";
+import {
+  RequestBuilder,
+  RequestMethod,
+} from "../../../../../utilities/request";
+
 import { paths } from "@/lib/api";
 type createModuleReq =
   paths["/modules"]["post"]["requestBody"]["content"]["application/json"];
