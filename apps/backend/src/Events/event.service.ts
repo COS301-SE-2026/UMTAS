@@ -47,7 +47,13 @@ export class EventService {
       if (!newEvent)
         throw new InternalServerErrorException('Event was not created');
 
-      if (criteria.type !== EventType.LECTURE) return { event: newEvent };
+      const mappedEvent = {
+        ...newEvent,
+        name: newEvent.eventName ?? undefined,
+        code: newEvent.eventCode ?? undefined,
+      } as EventResponseDto['event'];
+
+      if (criteria.type !== EventType.LECTURE) return { event: mappedEvent };
 
       const lecture = await this.createLectureForEvent(
         tx,
@@ -55,7 +61,7 @@ export class EventService {
         criteria,
       );
 
-      return { event: newEvent, lecture };
+      return { event: mappedEvent, lecture };
     });
   } //createEvent
 
@@ -72,7 +78,11 @@ export class EventService {
 
     return {
       events: r.map((r) => ({
-        event: r.event as EventResponseDto['event'],
+        event: {
+          ...r.event,
+          name: r.event.eventName ?? undefined,
+          code: r.event.eventCode ?? undefined,
+        } as EventResponseDto['event'],
         ...(r.lecture ? { lecture: r.lecture } : {}),
       })),
     };
@@ -93,7 +103,11 @@ export class EventService {
     if (!row) throw new NotFoundException(`Event not found for id: ${eventId}`);
 
     return {
-      event: row.event as EventResponseDto['event'],
+      event: {
+        ...row.event,
+        name: row.event.eventName ?? undefined,
+        code: row.event.eventCode ?? undefined,
+      } as EventResponseDto['event'],
       ...(row.lecture ? { lecture: row.lecture } : {}),
     };
   } //getById
@@ -152,6 +166,12 @@ export class EventService {
       if (!updatedEvent)
         throw new InternalServerErrorException('Event not updated');
 
+      const mappedEvent = {
+        ...updatedEvent,
+        name: updatedEvent.eventName ?? undefined,
+        code: updatedEvent.eventCode ?? undefined,
+      } as EventResponseDto['event'];
+
       const lecture = await this.syncSubtypeForEvent(
         tx,
         updatedEvent.eventID,
@@ -160,7 +180,7 @@ export class EventService {
       );
 
       return {
-        event: updatedEvent,
+        event: mappedEvent,
         ...(lecture ? { lecture } : {}),
       };
     });

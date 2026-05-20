@@ -19,6 +19,7 @@ import {
   getAllEventsBuilder,
   createEventsBuilder,
   deleteEventById,
+  updateEventByID,
   type EventResponse,
 } from "@/app/builder/utils/events/eventRequestBuilder";
 
@@ -155,25 +156,33 @@ export function WizardShell() {
       if (!targetEvent) return;
 
       try {
-        const builder = new createEventsBuilder();
-        await builder.send({
-          body: {
-            name: targetEvent.event.name,
-            code: targetEvent.event.code,
-            eventCriteria: {
-              day: targetEvent.event.eventCriteria.day,
-              startTime: targetEvent.event.eventCriteria.startTime,
-              endTime: targetEvent.event.eventCriteria.endTime,
-              type: targetEvent.event.eventCriteria.type || "lecture",
-              moduleCode: targetEvent.event.eventCriteria.moduleCode,
-              venue: targetEvent.event.eventCriteria.venue,
-            },
-            isRecurring: targetEvent.event.isRecurring || false,
+        const payload = {
+          name: targetEvent.event.name,
+          code: targetEvent.event.code,
+          eventCriteria: {
+            day: targetEvent.event.eventCriteria.day,
+            startTime: targetEvent.event.eventCriteria.startTime,
+            endTime: targetEvent.event.eventCriteria.endTime,
+            type: targetEvent.event.eventCriteria.type || "lecture",
+            moduleCode: targetEvent.event.eventCriteria.moduleCode,
+            venue: targetEvent.event.eventCriteria.venue,
           },
-        });
+          isRecurring: targetEvent.event.isRecurring || false,
+        };
+
+        if (!targetEvent.event.userID) {
+          const builder = new createEventsBuilder();
+          await builder.send({ body: payload });
+        } else {
+          const builder = new updateEventByID();
+          await builder.send({
+            paths: { id },
+            body: payload,
+          });
+        }
         setEventsTrigger((prev) => prev + 1);
       } catch (error) {
-        console.error("Failed to create event:", error);
+        console.error("Failed to update/create event:", error);
       }
       return;
     }
