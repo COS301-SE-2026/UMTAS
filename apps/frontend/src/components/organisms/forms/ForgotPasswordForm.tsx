@@ -24,7 +24,7 @@ export function ForgotPasswordForm() {
     try {
       await authClient.requestPasswordReset({
         email,
-        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL || ""}/reset-password`,
+        redirectTo: `${window.location.origin}/reset-password`,
       });
       setSubmitted(true);
     } catch {

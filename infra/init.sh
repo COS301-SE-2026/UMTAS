@@ -269,10 +269,6 @@ CORS_ORIGIN=${CORS_ORIGIN}
 GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:-}
 GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET:-}
 
-# ─── Frontend application ─────────────────────────────────
-NEXT_PUBLIC_API_URL=https://api.${DOMAIN}
-NEXT_PUBLIC_APP_URL=https://${DOMAIN}
-
 # ─── Email (SMTP) ─────────────────────────────────────────
 # Defaults to mailhog container — override for real SMTP
 SMTP_HOST=${SMTP_HOST:-mailhog}
