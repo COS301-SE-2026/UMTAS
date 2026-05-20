@@ -43,11 +43,9 @@ providers:
     endpoint: "unix:///var/run/docker.sock"
     exposedByDefault: false
     network: gateway
-    httpClientTimeout: 300s
 
 certificatesResolvers:
   myresolver:
     acme:
       storage: /letsencrypt/acme.json
-      httpChallenge:
-        entryPoint: web
+      tlsChallenge: {}
