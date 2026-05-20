@@ -37,8 +37,9 @@ export class MailerService {
         this.logger.log('Mailer verification succeeded');
       }
     } catch (error) {
-      this.logger.error('Mailer verification failed', error);
-      throw error;
+      this.logger.warn('Mailer verification failed (SMTP unavailable)', error);
+      // Don't throw: email is optional and SMTP may not be configured.
+      // The application should continue to operate.
     }
   }
 
