@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Skeleton } from "@/components/atoms/baseShadcn/skeleton";
 import { WeeklyGrid } from "@/components/organisms/viewTimetable/WeeklyGrid";
 import { EmptySchedule } from "@/components/organisms/viewTimetable/EmptySchedule";
@@ -49,13 +49,14 @@ export function ScheduleView({
     onEventCountChange(events.length);
   }, [modules.length, events.length, onModuleCountChange, onEventCountChange]);
 
+  const doExport = useCallback(() => {
+    const icsContent = generateICS(events, modules);
+    downloadICS(icsContent, "umtas-schedule.ics");
+  }, [events, modules]);
+
   useEffect(() => {
-    function doExport() {
-      const icsContent = generateICS(events, modules);
-      downloadICS(icsContent, "umtas-schedule.ics");
-    }
     onExportReady(doExport);
-  }, [events, modules, onExportReady]);
+  }, [doExport, onExportReady]);
   const weekStarts = getAllWeekStarts(events);
   const currentWeekStart = weekStarts[currentWeekIndex] ?? null;
   const resolvedEvents = resolveScheduleEvents(events, modules);

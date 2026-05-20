@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { Separator } from "@/components/atoms/baseShadcn/separator";
 import { ScheduleHeader } from "@/components/molecules/viewTimetable/ScheduleHeader";
 import { ScheduleView } from "@/components/organisms/viewTimetable/ScheduleView";
@@ -16,9 +16,9 @@ export default function SchedulesPage() {
     }
   }
 
-  function handleExportReady(fn: () => void) {
+  const handleExportReady = useCallback((fn: () => void) => {
     setExportFn(() => fn);
-  }
+  }, []);
 
   return (
     <div className="bg-[var(--bg-base)] flex flex-col min-h-[calc(100vh-56px)]">

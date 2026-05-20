@@ -118,7 +118,7 @@ export function WeeklyGrid({ events, weekStart }: WeeklyGridProps) {
       >
         {/* time label header spacer */}
         <div
-          className="border-b border-[var(--border)]"
+          className="border-b border-[var(--bg-elevated)]"
           style={{ height: HeaderHeight }}
         />
 
@@ -185,12 +185,12 @@ export function WeeklyGrid({ events, weekStart }: WeeklyGridProps) {
           className="relative bg-[var(--bg-base)]"
           style={{ height: TotalHeight }}
         >
-          {/* horizontal slot lines */}
+          {/* empty cell grid */}
           {TimeSlots.map((slot, index) => (
             <div
-              key={"line-" + slot}
-              className="absolute left-0 right-0 border-b border-[var(--border)]"
-              style={{ top: (index + 1) * SlotHeight }}
+              key={"cell-" + slot}
+              className="absolute left-0 right-0 border-b border-[var(--border)] bg-[var(--bg-base)]"
+              style={{ top: index * SlotHeight, height: SlotHeight }}
             />
           ))}
 
@@ -217,7 +217,7 @@ export function WeeklyGrid({ events, weekStart }: WeeklyGridProps) {
   }
 
   return (
-    <div className="w-full rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.08)]">
+    <div className="w-full rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.08)] overflow-hidden">
       <div className="flex w-full">
         {renderTimeColumn()}
         {weekDates.map((date) => renderDayColumn(date))}

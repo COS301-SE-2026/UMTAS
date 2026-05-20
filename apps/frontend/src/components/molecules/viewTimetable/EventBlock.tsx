@@ -38,13 +38,13 @@ export function EventBlock({ event }: EventBlockProps) {
 
     return {
       borderLeftColor: event.accentColour,
-      backgroundColor: "rgba(" + rgb.r + "," + rgb.g + "," + rgb.b + ", 0.12)",
+      backgroundColor: "rgba(" + rgb.r + "," + rgb.g + "," + rgb.b + ", 0.2)",
     };
   }
 
   return (
     <div
-      className="flex flex-col gap-1 rounded-sm border-l-2 px-2 py-1.5 h-full overflow-hidden"
+      className="flex flex-col gap-1 rounded-sm border-l-[3px] px-2 py-1.5 h-full overflow-hidden"
       style={getBlockStyle()}
     >
       <p className="text-xs font-medium text-[var(--text-primary)] truncate leading-tight">
@@ -52,12 +52,9 @@ export function EventBlock({ event }: EventBlockProps) {
       </p>
 
       {event.subLabel && (
-        <Badge
-          variant="outline"
-          className="w-fit px-1.5 py-0 text-[10px] font-medium uppercase tracking-[0.04em] border-[var(--border)] text-[var(--text-secondary)] bg-transparent"
-        >
+        <span className="text-[10px] font-medium uppercase tracking-[0.04em] text-[var(--text-secondary)] truncate">
           {event.subLabel}
-        </Badge>
+        </span>
       )}
 
       <div className="flex items-center gap-1 mt-auto">
