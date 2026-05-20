@@ -155,7 +155,7 @@ export function ModulesStep({
     function doAdd() {
       setIsAdding(true);
       onAdd();
-      setTimeout(() => setIsAdding(false), 2000);
+      setTimeout(() => setIsAdding(false), 500);
       setIsDirty(false);
       setSnapshot(null);
     }
@@ -173,7 +173,7 @@ export function ModulesStep({
 
     setIsDeleting(true);
     onRemove(id);
-    setTimeout(() => setIsDeleting(false), 2000);
+    setTimeout(() => setIsDeleting(false), 500);
 
     setErrorMap((prev) => {
       const next = { ...prev };

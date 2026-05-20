@@ -7,24 +7,27 @@ import { paths } from "@/lib/api";
 
 type createEventBody =
   paths["/events"]["post"]["requestBody"]["content"]["application/json"];
-type createEventRes =
+export type createEventRes =
   paths["/events"]["post"]["responses"]["201"]["content"]["application/json"];
 
-type getAllEventsRes =
+export type getAllEventsRes =
   paths["/events"]["get"]["responses"]["200"]["content"]["application/json"];
 
+export type EventResponse = getAllEventsRes["events"][number];
+
 type getEventByIDPath = paths["/events/{id}"]["get"]["parameters"]["path"];
-type getEventByIDRes =
+export type getEventByIDRes =
   paths["/events/{id}"]["get"]["responses"]["200"]["content"]["application/json"];
+
 type updateEventByIdPath = paths["/events/{id}"]["patch"]["parameters"]["path"];
 type updateEventByIdBody =
   paths["/events/{id}"]["patch"]["requestBody"]["content"]["application/json"];
-type updateEventByIdRes =
+export type updateEventByIdRes =
   paths["/events/{id}"]["patch"]["responses"]["200"]["content"]["application/json"];
 
 type deleteEventByIdPath =
   paths["/events/{id}"]["delete"]["parameters"]["path"];
-type deleteEventByIdRes =
+export type deleteEventByIdRes =
   paths["/events/{id}"]["delete"]["responses"]["200"]["content"]["application/json"];
 
 export class createEventsBuilder extends RequestBuilder<

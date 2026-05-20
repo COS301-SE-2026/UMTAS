@@ -16,18 +16,7 @@ import { EventTypeDropdown } from "@/components/atoms/builder/eventDropdown";
 import type { EventType } from "@/components/atoms/builder/eventDropdown";
 import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
 import { Switch } from "@/components/atoms/baseShadcn/switch";
-
-export interface BuilderEvent {
-  id: string;
-  name: string;
-  code: string;
-  date: string;
-  startTime: string;
-  endTime: string;
-  type: EventType;
-  moduleId: string;
-  isRecurring: boolean;
-}
+import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
 
 export interface EventErrors {
   name?: string;
@@ -38,15 +27,11 @@ export interface EventErrors {
 }
 
 interface EventCardProps {
-  event: BuilderEvent;
+  event: EventResponse;
   index: number;
   modules: ModuleResponseDto[];
-  onUpdate: (
-    id: string,
-    field: keyof Omit<BuilderEvent, "id">,
-    value: string,
-  ) => void;
-  onRemove: (id: string) => void;
+  onUpdate: (id: number, field: string, value: string | boolean) => void;
+  onRemove: (id: number) => void;
   onGoToModules?: () => void;
   errors?: EventErrors;
 }
@@ -67,13 +52,13 @@ export function EventCard({
 
   const timeSlotValue: TimeSlot = {
     day: "",
-    startTime: event.startTime,
-    endTime: event.endTime,
+    startTime: event.event.eventCriteria?.startTime || "",
+    endTime: event.event.eventCriteria?.endTime || "",
   };
 
   function handleTimeChange(slot: TimeSlot) {
-    onUpdate(event.id, "startTime", slot.startTime);
-    onUpdate(event.id, "endTime", slot.endTime);
+    onUpdate(event.event.eventID, "startTime", slot.startTime);
+    onUpdate(event.event.eventID, "endTime", slot.endTime);
   }
 
   function getInputClass(hasError: boolean) {
@@ -98,8 +83,8 @@ export function EventCard({
 
     return (
       <Select
-        value={event.moduleId}
-        onValueChange={(v) => onUpdate(event.id, "moduleId", v)}
+        value={String(event.lecture?.moduleID || "")}
+        onValueChange={(v) => onUpdate(event.event.eventID, "moduleId", v)}
       >
         <SelectTrigger
           className={getInputClass(!!errors?.moduleId) + " w-full"}
@@ -128,7 +113,7 @@ export function EventCard({
   }
 
   function renderModuleSection() {
-    if (event.type !== "lecture") {
+    if (event.event.eventCriteria?.type !== "lecture") {
       return null;
     }
 
@@ -148,18 +133,20 @@ export function EventCard({
   return (
     <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.08)]">
       <div className="flex flex-col gap-4 p-4">
-        {/* name */}
+        {/* name - mapped to moduleCode for now since DTO doesn't have name */}
         <div className="flex flex-col gap-2">
           <Label
-            htmlFor={"event-name-" + event.id}
+            htmlFor={"event-name-" + event.event.eventID}
             className="text-sm font-medium text-[var(--text-secondary)]"
           >
             Name
           </Label>
           <Input
-            id={"event-name-" + event.id}
-            value={event.name}
-            onChange={(e) => onUpdate(event.id, "name", e.target.value)}
+            id={"event-name-" + event.event.eventID}
+            value={event.event.eventCriteria?.moduleCode || ""}
+            onChange={(e) =>
+              onUpdate(event.event.eventID, "name", e.target.value)
+            }
             placeholder="e.g. COS301 Lecture Group A"
             className={getInputClass(!!errors?.name)}
           />
@@ -168,18 +155,20 @@ export function EventCard({
           )}
         </div>
 
-        {/* code */}
+        {/* code - also mapped to moduleCode */}
         <div className="flex flex-col gap-2">
           <Label
-            htmlFor={"event-code-" + event.id}
+            htmlFor={"event-code-" + event.event.eventID}
             className="text-sm font-medium text-[var(--text-secondary)]"
           >
             Code
           </Label>
           <Input
-            id={"event-code-" + event.id}
-            value={event.code}
-            onChange={(e) => onUpdate(event.id, "code", e.target.value)}
+            id={"event-code-" + event.event.eventID}
+            value={event.event.eventCriteria?.moduleCode || ""}
+            onChange={(e) =>
+              onUpdate(event.event.eventID, "code", e.target.value)
+            }
             placeholder="e.g. COS301-LEC-A"
             maxLength={20}
             className={getInputClass(!!errors?.code)}
@@ -189,42 +178,27 @@ export function EventCard({
           )}
         </div>
 
-        {/* date */}
+        {/* date - mapped to day */}
         <div className="flex flex-col gap-2">
           <Label
-            htmlFor={"event-date-" + event.id}
+            htmlFor={"event-date-" + event.event.eventID}
             className="text-sm font-medium text-[var(--text-secondary)]"
           >
             Date
           </Label>
           <Input
-            id={"event-date-" + event.id}
-            type="date"
-            value={event.date}
-            onChange={(e) => onUpdate(event.id, "date", e.target.value)}
+            id={"event-date-" + event.event.eventID}
+            type="text"
+            value={event.event.eventCriteria?.day || ""}
+            onChange={(e) =>
+              onUpdate(event.event.eventID, "date", e.target.value)
+            }
+            placeholder="e.g. Monday"
             className={getInputClass(!!errors?.date)}
           />
           {errors?.date && (
             <p className="text-sm text-[var(--error-text)]">{errors.date}</p>
           )}
-        </div>
-        {/* isRecurring */}
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex flex-col gap-0.5">
-            <Label className="text-sm font-medium text-[var(--text-secondary)]">
-              Weekly recurrence
-            </Label>
-            <p className="text-xs text-[var(--text-secondary)]">
-              Repeat this event every week on the same day.
-            </p>
-          </div>
-          <Switch
-            checked={event.isRecurring}
-            onCheckedChange={(v) =>
-              onUpdate(event.id, "isRecurring", String(v))
-            }
-            className="data-[state=checked]:bg-[var(--text-primary)]"
-          />
         </div>
 
         {/* time */}
@@ -242,8 +216,8 @@ export function EventCard({
             Event type
           </Label>
           <EventTypeDropdown
-            value={event.type}
-            onChange={(v) => onUpdate(event.id, "type", v)}
+            value={(event.event.eventCriteria?.type as EventType) || "lecture"}
+            onChange={(v) => onUpdate(event.event.eventID, "type", v)}
           />
         </div>
 

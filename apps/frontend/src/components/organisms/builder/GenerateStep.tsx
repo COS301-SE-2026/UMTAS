@@ -5,17 +5,21 @@ import { Button } from "@/components/atoms/baseShadcn/button";
 import { Separator } from "@/components/atoms/baseShadcn/separator";
 import { Skeleton } from "@/components/atoms/baseShadcn/skeleton";
 import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
-import type { BuilderEvent } from "@/components/molecules/builder/EventCard";
+import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
 
 interface GenerateStepProps {
   modules: ModuleResponseDto[];
-  events: BuilderEvent[];
+  events: EventResponse[];
   onGenerate: () => void;
   isGenerating: boolean;
 }
 
-function getLinkedModule(moduleId: string, modules: ModuleResponseDto[]) {
-  const found = modules.find((m) => String(m.moduleID) === moduleId);
+function getLinkedModule(
+  moduleID: number | null | undefined,
+  modules: ModuleResponseDto[],
+) {
+  if (!moduleID) return null;
+  const found = modules.find((m) => m.moduleID === moduleID);
   if (found) {
     return found;
   }
@@ -88,27 +92,34 @@ export function GenerateStep({
 
         <div className="flex flex-col gap-2">
           {events.map((event) => {
-            const linkedModule = getLinkedModule(event.moduleId, modules);
-            const timeString = formatTime(event.startTime, event.endTime);
+            const criteria = event.event.eventCriteria;
+            const linkedModule = getLinkedModule(
+              event.lecture?.moduleID,
+              modules,
+            );
+            const timeString = formatTime(
+              criteria?.startTime || "",
+              criteria?.endTime || "",
+            );
 
             return (
               <div
-                key={event.id}
+                key={event.event.eventID}
                 className="flex flex-col gap-1 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] px-4 py-4 shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.08)]"
               >
                 <div className="flex items-start justify-between gap-2">
                   <p className="text-base font-medium text-[var(--text-primary)]">
-                    {event.name}
+                    {criteria?.moduleCode || "Event"}
                   </p>
                   <span className="text-sm font-mono text-[var(--text-secondary)] flex-shrink-0">
-                    {event.code}
+                    {criteria?.moduleCode || ""}
                   </span>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2">
-                  {event.date && (
+                  {criteria?.day && (
                     <p className="text-sm text-[var(--text-secondary)]">
-                      {event.date}
+                      {criteria.day}
                     </p>
                   )}
                   {timeString && (

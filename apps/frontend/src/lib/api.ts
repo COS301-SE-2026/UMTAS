@@ -729,9 +729,9 @@ export interface components {
       /** @example 1 */
       lectureID: number;
       /** @example 12 */
-      moduleID: Record<string, never> | null;
+      moduleID: number | null;
       /** @example 1 */
-      eventID: Record<string, never> | null;
+      eventID: number | null;
       /** @example IT 2-26 */
       venue?: string | null;
     };

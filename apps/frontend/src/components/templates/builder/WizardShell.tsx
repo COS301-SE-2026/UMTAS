@@ -8,7 +8,6 @@ import { ModulesStep } from "@/components/organisms/builder/ModulesStep";
 import { EventsStep } from "@/components/organisms/builder/EventsStep";
 import { GenerateStep } from "@/components/organisms/builder/GenerateStep";
 import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
-import type { BuilderEvent } from "@/components/molecules/builder/EventCard";
 import type { EventType } from "@/components/atoms/builder/eventDropdown";
 import {
   createModulesBuilder,
@@ -16,6 +15,10 @@ import {
   deleteModulesById,
   updateModulesBuilder,
 } from "@/app/builder/utils/modules/requestBuilders";
+import {
+  getAllEventsBuilder,
+  type EventResponse,
+} from "@/app/builder/utils/events/eventRequestBuilder";
 
 const Steps = [
   { label: "Modules" },
@@ -41,27 +44,15 @@ function emptyModule(): ModuleResponseDto {
   };
 }
 
-function emptyEvent(): BuilderEvent {
-  return {
-    id: generateId(),
-    name: "",
-    code: "",
-    date: "",
-    startTime: "",
-    endTime: "",
-    type: "lecture" as EventType,
-    moduleId: "",
-    isRecurring: false,
-  };
-}
-
 export function WizardShell() {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [modules, setModules] = useState<ModuleResponseDto[]>([]);
-  const [events, setEvents] = useState<BuilderEvent[]>([]);
+  const [events, setEvents] = useState<EventResponse[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [modulesTrigger, setModulesTrigger] = useState(0);
+  const [eventsTrigger, setEventsTrigger] = useState(0);
 
   async function handleModuleAdd() {
     try {
@@ -74,6 +65,7 @@ export function WizardShell() {
           styling: "#3B82F6",
         },
       });
+      setModulesTrigger((prev) => prev + 1);
     } catch (error) {
       console.error("Failed to create module:", error);
     }
@@ -98,6 +90,7 @@ export function WizardShell() {
             styling: targetModule.styling || undefined,
           },
         });
+        setModulesTrigger((prev) => prev + 1);
       } catch (error) {
         console.error("Failed to update module:", error);
       }
@@ -120,32 +113,29 @@ export function WizardShell() {
       await builder.send({
         paths: { moduleId: id },
       });
+      setModulesTrigger((prev) => prev + 1);
     } catch (error) {
       console.error("Failed to delete module:", error);
     }
   }
 
   function handleEventAdd() {
-    setEvents((prev) => [...prev, emptyEvent()]);
+    // Placeholder for now
+    console.log("Add event requested");
   }
 
   function handleEventUpdate(
-    id: string,
-    field: keyof Omit<BuilderEvent, "id">,
-    value: string,
+    id: number,
+    field: string,
+    value: string | boolean,
   ) {
-    setEvents((prev) =>
-      prev.map((e) => {
-        if (e.id === id) {
-          return { ...e, [field]: value };
-        }
-        return e;
-      }),
-    );
+    // Placeholder for now
+    console.log("Update event requested", id, field, value);
   }
 
-  function handleEventRemove(id: string) {
-    setEvents((prev) => prev.filter((e) => e.id !== id));
+  function handleEventRemove(id: number) {
+    // Placeholder for now
+    console.log("Remove event requested", id);
   }
 
   function handleStepClick(index: number) {
@@ -174,7 +164,7 @@ export function WizardShell() {
     setIsGenerating(true);
     localStorage.setItem("umtas-schedule-modules", JSON.stringify(modules));
     localStorage.setItem("umtas-schedule-events", JSON.stringify(events));
-    await new Promise((res) => setTimeout(res, 2500));
+    await new Promise((res) => setTimeout(res, 500));
     router.push("/schedules");
   }
 
@@ -197,10 +187,16 @@ export function WizardShell() {
       return !hasValidModule;
     }
     if (currentStep === 1) {
-      const hasValidEvent = events.some(
-        (e) =>
-          e.name && e.code && e.date && e.startTime && e.endTime && e.moduleId,
-      );
+      const hasValidEvent = events.some((e) => {
+        const crit = e.event.eventCriteria;
+        return (
+          crit?.moduleCode &&
+          crit?.day &&
+          crit?.startTime &&
+          crit?.endTime &&
+          (crit.type !== "lecture" || e.lecture?.moduleID)
+        );
+      });
       return !hasValidEvent;
     }
     if (currentStep === 2) {
@@ -221,7 +217,22 @@ export function WizardShell() {
       };
       fetchModules();
     }
-  }, [currentStep]);
+  }, [currentStep, modulesTrigger]);
+
+  useEffect(() => {
+    if (currentStep === 1) {
+      const fetchEvents = async () => {
+        try {
+          const builder = new getAllEventsBuilder();
+          const response = await builder.send({});
+          setEvents(response.events);
+        } catch (error) {
+          console.error("Failed to fetch events:", error);
+        }
+      };
+      fetchEvents();
+    }
+  }, [currentStep, eventsTrigger]);
 
   function renderStep() {
     if (currentStep === 0) {

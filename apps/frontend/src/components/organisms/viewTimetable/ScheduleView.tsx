@@ -12,7 +12,7 @@ import {
   downloadICS,
 } from "@/lib/scheduleUtils";
 import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
-import type { BuilderEvent } from "@/components/molecules/builder/EventCard";
+import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
 
 interface ScheduleViewProps {
   onEventCountChange: (count: number) => void;
@@ -33,7 +33,7 @@ export function ScheduleView({
     return [];
   });
 
-  const [events] = useState<BuilderEvent[]>(() => {
+  const [events] = useState<EventResponse[]>(() => {
     if (typeof window !== "undefined") {
       const rawEvents = localStorage.getItem("umtas-schedule-events");
       return rawEvents ? JSON.parse(rawEvents) : [];

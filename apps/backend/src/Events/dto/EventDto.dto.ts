@@ -79,10 +79,10 @@ export class LectureResponseDto {
   @ApiProperty({ example: 1 })
   lectureID!: number;
 
-  @ApiProperty({ example: 12, nullable: true })
+  @ApiProperty({ example: 12, nullable: true, type: Number })
   moduleID!: number | null;
 
-  @ApiProperty({ example: 1, nullable: true })
+  @ApiProperty({ example: 1, nullable: true, type: Number })
   eventID!: number | null;
 
   @ApiPropertyOptional({ example: 'IT 2-26', nullable: true })

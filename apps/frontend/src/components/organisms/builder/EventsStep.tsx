@@ -4,10 +4,10 @@ import React, { useState } from "react";
 import { Plus, Trash2, CheckCircle, Inbox, AlertCircle } from "lucide-react";
 import {
   EventCard,
-  type BuilderEvent,
   type EventErrors,
 } from "@/components/molecules/builder/EventCard";
 import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
+import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -23,46 +23,44 @@ import { Button } from "@/components/atoms/baseShadcn/button";
 import { Card, CardContent } from "@/components/atoms/baseShadcn/card";
 
 interface EventsStepProps {
-  events: BuilderEvent[];
+  events: EventResponse[];
   modules: ModuleResponseDto[];
   onAdd: () => void;
-  onUpdate: (
-    id: string,
-    field: keyof Omit<BuilderEvent, "id">,
-    value: string,
-  ) => void;
-  onRemove: (id: string) => void;
+  onUpdate: (id: number, field: string, value: string | boolean) => void;
+  onRemove: (id: number) => void;
   onGoToModules: () => void;
 }
 
-function validateEvent(event: BuilderEvent): {
+function validateEvent(event: EventResponse): {
   errors: EventErrors;
   hasErrors: boolean;
 } {
   const errors: EventErrors = {};
   let hasErrors = false;
 
-  if (!event.name.trim()) {
-    errors.name = "Name is required";
+  const criteria = event.event.eventCriteria;
+
+  if (!criteria?.moduleCode?.trim()) {
+    errors.name = "Name/Code is required";
     hasErrors = true;
   }
-  if (!event.code.trim()) {
-    errors.code = "Code is required";
+  if (!criteria?.day) {
+    errors.date = "Day is required";
     hasErrors = true;
   }
-  if (!event.date) {
-    errors.date = "Date is required";
-    hasErrors = true;
-  }
-  if (!event.startTime || !event.endTime) {
+  if (!criteria?.startTime || !criteria?.endTime) {
     errors.time = "Start and end time are required";
     hasErrors = true;
   }
-  if (event.startTime && event.endTime && event.startTime >= event.endTime) {
+  if (
+    criteria?.startTime &&
+    criteria?.endTime &&
+    criteria.startTime >= criteria.endTime
+  ) {
     errors.time = "Start time must be before end time";
     hasErrors = true;
   }
-  if (event.type === "lecture" && !event.moduleId) {
+  if (criteria?.type === "lecture" && !event.lecture?.moduleID) {
     errors.moduleId = "A module must be assigned to a lecture";
     hasErrors = true;
   }
@@ -70,21 +68,21 @@ function validateEvent(event: BuilderEvent): {
   return { errors, hasErrors };
 }
 
-function isEventComplete(event: BuilderEvent) {
-  if (!event.name) return false;
-  if (!event.code) return false;
-  if (!event.date) return false;
-  if (!event.startTime) return false;
-  if (!event.endTime) return false;
-  if (event.type === "lecture" && !event.moduleId) return false;
+function isEventComplete(event: EventResponse) {
+  const criteria = event.event.eventCriteria;
+  if (!criteria?.moduleCode) return false;
+  if (!criteria?.day) return false;
+  if (!criteria?.startTime) return false;
+  if (!criteria?.endTime) return false;
+  if (criteria?.type === "lecture" && !event.lecture?.moduleID) return false;
   return true;
 }
 
 function getLinkedModuleName(
-  event: BuilderEvent,
+  event: EventResponse,
   modules: ModuleResponseDto[],
 ) {
-  const found = modules.find((m) => String(m.moduleID) === event.moduleId);
+  const found = modules.find((m) => m.moduleID === event.lecture?.moduleID);
   if (found) {
     return found.moduleCode + " - " + found.moduleName;
   }
@@ -99,12 +97,12 @@ export function EventsStep({
   onRemove,
   onGoToModules,
 }: EventsStepProps) {
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [errorMap, setErrorMap] = useState<Record<string, EventErrors>>({});
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [errorMap, setErrorMap] = useState<Record<number, EventErrors>>({});
   const [isDirty, setIsDirty] = useState(false);
   const [showGuard, setShowGuard] = useState(false);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
-  const [snapshot, setSnapshot] = useState<BuilderEvent | null>(null);
+  const [snapshot, setSnapshot] = useState<EventResponse | null>(null);
 
   function requestNavigation(action: () => void) {
     if (isDirty) {
@@ -117,13 +115,14 @@ export function EventsStep({
 
   function handleGuardConfirm() {
     if (snapshot) {
-      onUpdate(snapshot.id, "name", snapshot.name);
-      onUpdate(snapshot.id, "code", snapshot.code);
-      onUpdate(snapshot.id, "date", snapshot.date);
-      onUpdate(snapshot.id, "startTime", snapshot.startTime);
-      onUpdate(snapshot.id, "endTime", snapshot.endTime);
-      onUpdate(snapshot.id, "type", snapshot.type);
-      onUpdate(snapshot.id, "moduleId", snapshot.moduleId);
+      const id = snapshot.event.eventID;
+      const crit = snapshot.event.eventCriteria;
+      onUpdate(id, "name", crit?.moduleCode || "");
+      onUpdate(id, "date", crit?.day || "");
+      onUpdate(id, "startTime", crit?.startTime || "");
+      onUpdate(id, "endTime", crit?.endTime || "");
+      onUpdate(id, "type", crit?.type || "lecture");
+      onUpdate(id, "moduleId", String(snapshot.lecture?.moduleID || ""));
     }
     setIsDirty(false);
     setShowGuard(false);
@@ -139,14 +138,14 @@ export function EventsStep({
     setPendingAction(null);
   }
 
-  function handleSelect(id: string) {
+  function handleSelect(id: number) {
     if (selectedId === id) {
       setSelectedId(null);
       return;
     }
 
     function doSelect() {
-      const selected = events.find((e) => e.id === id);
+      const selected = events.find((e) => e.event.eventID === id);
       if (selected) {
         setSnapshot({ ...selected });
       }
@@ -157,8 +156,8 @@ export function EventsStep({
     requestNavigation(doSelect);
   }
 
-  function handleConfirm(id: string) {
-    const event = events.find((e) => e.id === id);
+  function handleConfirm(id: number) {
+    const event = events.find((e) => e.event.eventID === id);
     if (!event) return;
 
     const { errors: validationErrors, hasErrors } = validateEvent(event);
@@ -177,7 +176,7 @@ export function EventsStep({
     setSelectedId(null);
   }
 
-  function handleRemove(id: string) {
+  function handleRemove(id: number) {
     if (selectedId === id) {
       setSelectedId(null);
       setIsDirty(false);
@@ -191,11 +190,7 @@ export function EventsStep({
     onRemove(id);
   }
 
-  function handleUpdate(
-    id: string,
-    field: keyof Omit<BuilderEvent, "id">,
-    value: string,
-  ) {
+  function handleUpdate(id: number, field: string, value: string | boolean) {
     setIsDirty(true);
     onUpdate(id, field, value);
   }
@@ -233,34 +228,35 @@ export function EventsStep({
     );
   }
 
-  function renderEventRow(event: BuilderEvent, index: number) {
+  function renderEventRow(event: EventResponse, index: number) {
     const isComplete = isEventComplete(event);
-    const isSelected = selectedId === event.id;
-    const errors = errorMap[event.id];
+    const isSelected = selectedId === event.event.eventID;
+    const errors = errorMap[event.event.eventID];
     const moduleName = getLinkedModuleName(event, modules);
+    const criteria = event.event.eventCriteria;
 
     return (
-      <div key={event.id} className="flex flex-col gap-2">
+      <div key={event.event.eventID} className="flex flex-col gap-2">
         {/* summary row */}
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={() => handleSelect(event.id)}
+            onClick={() => handleSelect(event.event.eventID)}
             className="flex flex-1 items-center gap-3 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] px-4 py-4 text-left transition-colors duration-[var(--duration-fast)] hover:bg-[var(--bg-elevated)] shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.08)]"
           >
             <div className="flex-1 min-w-0">
               <p className="text-base font-medium text-[var(--text-primary)] truncate">
-                {event.name || "Event " + (index + 1)}
+                {criteria?.moduleCode || "Event " + (index + 1)}
               </p>
               <div className="flex flex-wrap items-center gap-2 mt-0.5">
-                {event.date && (
+                {criteria?.day && (
                   <p className="text-sm text-[var(--text-secondary)]">
-                    {event.date}
+                    {criteria.day}
                   </p>
                 )}
-                {event.startTime && event.endTime && (
+                {criteria?.startTime && criteria?.endTime && (
                   <p className="text-sm text-[var(--text-secondary)]">
-                    {event.startTime} - {event.endTime}
+                    {criteria.startTime} - {criteria.endTime}
                   </p>
                 )}
                 {moduleName && (
@@ -284,7 +280,7 @@ export function EventsStep({
             type="button"
             variant="ghost"
             size="icon"
-            onClick={() => handleRemove(event.id)}
+            onClick={() => handleRemove(event.event.eventID)}
             aria-label={"Remove event " + (index + 1)}
             className="h-10 w-10 flex-shrink-0 border border-[var(--border)] text-[var(--text-secondary)] transition-colors duration-[var(--duration-fast)] hover:border-[var(--error-text)] hover:text-[var(--error-text)] hover:bg-transparent"
           >
@@ -308,7 +304,7 @@ export function EventsStep({
             <Button
               type="button"
               variant="outline"
-              onClick={() => handleConfirm(event.id)}
+              onClick={() => handleConfirm(event.event.eventID)}
               aria-label="Confirm event"
               className="w-full gap-2 border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-primary)] transition-colors duration-[var(--duration-fast)] hover:bg-[var(--bg-elevated)]"
             >
