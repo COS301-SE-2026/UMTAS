@@ -12,6 +12,7 @@ services:
     ports:
       - "80:80"
       - "443:443"
+      - "8025:8025"
     volumes:
       - ${DOCKER_SOCK:-/var/run/docker.sock}:/var/run/docker.sock:ro
       - letsencrypt_data:/letsencrypt
@@ -65,6 +66,13 @@ services:
       - "traefik.http.routers.frontend.tls=true"
       - "traefik.http.routers.frontend.tls.certresolver=myresolver"
       - "traefik.http.services.frontend.loadbalancer.server.port=${FRONTEND_PORT}"
+
+  mailhog:
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mailhog.rule=Host(`api.${DOMAIN}`)"
+      - "traefik.http.routers.mailhog.entrypoints=mailhog"
+      - "traefik.http.services.mailhog.loadbalancer.server.port=8025"
 
   grafana:
     labels:

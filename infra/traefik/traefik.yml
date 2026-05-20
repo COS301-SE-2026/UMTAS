@@ -25,6 +25,8 @@ entryPoints:
         certResolver: myresolver
   metrics:
     address: ":8082"
+  mailhog:
+    address: ":8025"
 
 metrics:
   prometheus:

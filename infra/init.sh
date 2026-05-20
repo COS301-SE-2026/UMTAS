@@ -104,7 +104,7 @@ setup_infra() {
 setup_app() {
     section "Application"
 
-    local default_auth_url="https://api.${DOMAIN}/api/auth"
+    local default_auth_url="https://api.${DOMAIN}"
     local default_origins="https://${DOMAIN}"
 
     prompt_required BETTER_AUTH_URL "Better Auth URL" "$default_auth_url"
@@ -261,7 +261,6 @@ GRAFANA_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
 
 # ─── Backend application ──────────────────────────────────
 NODE_ENV=production
-PORT=3000
 BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
 BETTER_AUTH_URL=${BETTER_AUTH_URL}
 BETTER_AUTH_TRUSTED_ORIGINS=${BETTER_AUTH_TRUSTED_ORIGINS}
@@ -269,6 +268,10 @@ CORS_ORIGIN=${CORS_ORIGIN}
 
 GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:-}
 GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET:-}
+
+# ─── Frontend application ─────────────────────────────────
+NEXT_PUBLIC_API_URL=https://api.${DOMAIN}
+NEXT_PUBLIC_APP_URL=https://${DOMAIN}
 
 # ─── Seeding ──────────────────────────────────────────────
 SEED=${SEED}
