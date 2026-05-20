@@ -89,8 +89,8 @@ services:
 
   backend:
     build:
-      context: ./apps/backend
-      dockerfile: ../../docker/backend/backend.Dockerfile
+      context: .
+      dockerfile: docker/backend/backend.Dockerfile
     image: ${DOCKER_REGISTRY}:backend-dev
     networks:
       - gateway
@@ -107,7 +107,18 @@ services:
       - CORS_ORIGIN=https://${DOMAIN}
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - REDIS_URL=${REDIS_URL}
       - SYSTEM_ADMIN_USER_IDS=${SYSTEM_ADMIN_USER_IDS}
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          'node -e "require(''http'').get(''http://127.0.0.1:''+process.env.PORT+''/health'',r=>process.exit(r.statusCode<500?0:1)).on(''error'',()=>process.exit(1))"',
+        ]
+      interval: 30s
+      timeout: 5s
+      start_period: 15s
+      retries: 3
     profiles:
       - dev-docker
       - dev-pglite
@@ -115,13 +126,26 @@ services:
 
   frontend:
     build:
-      context: ./apps/frontend
-      dockerfile: ../../docker/frontend/frontend.Dockerfile
+      context: .
+      dockerfile: docker/frontend/frontend.Dockerfile
     image: ${DOCKER_REGISTRY}:frontend-dev
     networks:
       - gateway
     environment:
       - NEXT_PUBLIC_API_URL=https://api.${DOMAIN}
+      - API_URL=https://api.${DOMAIN}
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "const os=require('os');const ip=Object.values(os.networkInterfaces()).flat().find((a)=>a.family==='IPv4'&&!a.internal)?.address;if(!ip) process.exit(1);require('http').get('http://'+ip+':'+process.env.PORT+'/api/health',r=>process.exit(r.statusCode<500?0:1)).on('error',()=>process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 5s
+      start_period: 20s
+      retries: 3
     profiles:
       - dev-docker
       - dev-pglite
@@ -189,6 +213,21 @@ services:
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - ./infra/promtail/promtail-config.yaml:/etc/promtail/config.yml
     command: -config.file=/etc/promtail/config.yml
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
+    profiles:
+      - server
+
+  health-exporter:
+    image: fviolence/docker-health-exporter:latest
+    restart: unless-stopped
+    networks:
+      - internal
+    environment:
+      - PORT=9066
+      - SCRAPE_INTERVAL=15
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     labels:
       - "com.centurylinklabs.watchtower.enable=false"
     profiles:
