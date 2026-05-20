@@ -7,6 +7,8 @@ import { EventType } from "@/components/atoms/builder/eventDropdown";
 import { EmptySchedule } from "@/components/organisms/viewTimetable/EmptySchedule";
 import { ScheduleHeader } from "@/components/molecules/viewTimetable/ScheduleHeader";
 import { WeekNavBar } from "@/components/molecules/viewTimetable/WeekNavBar";
+import { ScheduleEvent } from "@/types/schedule";
+import { WeeklyGrid } from "@/components/organisms/viewTimetable/WeeklyGrid";
 
 function exampleModule(): Module {
   return {
@@ -17,24 +19,22 @@ function exampleModule(): Module {
   };
 }
 
-function exampleEvent(): BuilderEvent {
-  return {
-    id: "1",
-    name: "COS lecture",
-    code: "COS123L",
-    date: "2026/03/03",
-    startTime: "9:30",
-    endTime: "10:30",
-    type: "lecture" as EventType,
-    moduleId: "ID",
-    isRecurring: true,
-  };
-}
+const exampleEvent: ScheduleEvent = {
+  id: "1",
+  name: "Lecture",
+  code: "COS 301",
+  date: "2026-05-20",
+  startTime: "12:30",
+  endTime: "13:20",
+  isRecurring: true,
+  accentColour: "#4f46e5",
+  subLabel: "roos hall",
+};
 
 export default function schedulesPage() {
   return (
     <div>
-      <EventBlock event={exampleEvent()} module={exampleModule()} />
+      <EventBlock event={exampleEvent} />
       <EmptySchedule />
       <ScheduleHeader eventCount={1} moduleCount={1} onExport={EmptySchedule} />
       <WeekNavBar
@@ -44,6 +44,7 @@ export default function schedulesPage() {
         totalWeeks={1}
         weekStart={new Date()}
       />
+      <WeeklyGrid events={[exampleEvent]} weekStart={new Date()} />
     </div>
   );
 }
