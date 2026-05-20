@@ -21,10 +21,6 @@ export class DatabaseInitService implements OnApplicationBootstrap {
   ) {}
 
   async onApplicationBootstrap(): Promise<void> {
-    if (this.configService.get<string>('NODE_ENV') === 'production') {
-      return;
-    }
-
     const dbMode = this.databaseService.dbMode;
     const shouldSeed = parseSeedFlag(this.configService.get<string>('SEED'));
     const migrationsFolder = join(process.cwd(), 'drizzle');
