@@ -69,6 +69,7 @@ export function ModulesStep({
   const [showGuard, setShowGuard] = useState(false);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
   const [snapshot, setSnapshot] = useState<ModuleResponseDto | null>(null);
+  const [isAdding, setIsAdding] = useState(false);
 
   function requestNavigation(action: () => void) {
     if (isDirty) {
@@ -139,8 +140,12 @@ export function ModulesStep({
   }
 
   function handleAdd() {
+    if (isAdding) return;
+
     function doAdd() {
+      setIsAdding(true);
       onAdd();
+      setTimeout(() => setIsAdding(false), 2000);
       setIsDirty(false);
       setSnapshot(null);
     }
@@ -304,12 +309,13 @@ export function ModulesStep({
       <button
         type="button"
         onClick={handleAdd}
-        className="mt-4 flex w-full items-center gap-3 rounded-lg border border-dashed border-[var(--border)] px-4 py-4 text-left text-base text-[var(--text-secondary)] transition-colors duration-[var(--duration-fast)] hover:border-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+        disabled={isAdding}
+        className="mt-4 flex w-full items-center gap-3 rounded-lg border border-dashed border-[var(--border)] px-4 py-4 text-left text-base text-[var(--text-secondary)] transition-colors duration-[var(--duration-fast)] hover:border-[var(--text-secondary)] hover:text-[var(--text-primary)] disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border border-dashed border-[var(--border)]">
           <Plus size={16} strokeWidth={1.5} />
         </span>
-        Add module
+        {isAdding ? "Adding..." : "Add module"}
       </button>
     </div>
   );

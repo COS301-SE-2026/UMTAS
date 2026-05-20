@@ -61,8 +61,20 @@ export function WizardShell() {
   const [events, setEvents] = useState<BuilderEvent[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  function handleModuleAdd() {
-    setModules((prev) => [...prev, emptyModule()]);
+  async function handleModuleAdd() {
+    try {
+      const nextNum = modules.length + 1;
+      const builder = new createModulesBuilder();
+      await builder.send({
+        body: {
+          code: `MOD-${nextNum}`,
+          name: `Module ${nextNum}`,
+          styling: "#3B82F6",
+        },
+      });
+    } catch (error) {
+      console.error("Failed to create module:", error);
+    }
   }
 
   function handleModuleUpdate(
