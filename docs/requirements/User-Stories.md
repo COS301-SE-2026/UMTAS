@@ -18,6 +18,22 @@ A student enrolled at a university that uses the system to access and personalis
 - May set preferences such as minimising gaps between classes or avoiding early morning lectures.  
 
 ### User Stories:
+- Login stories
+- Builder
+
+| User Story    | User Story                                                                                                     |
+| ------------- | -------------------------------------------------------------------------------------------------------------- |
+| US-BUILDER-1  | As a student I want to create a module with descriptive detail about it.                                       |
+| US-BUILDER-2  | As a student I want to edit a module to change details about it.                                               |
+| US-BUILDER-3  | As a student I want to delete modules if I see the need to.                                                    |
+| US-BUILDER-4  | As a student I want to create events which capture event details that represent more closely a calendar event. |
+| US-BUILDER-5  | As a student I want to modify these events to adjust the criteria about them.                                  |
+| US-BUILDER-6  | As a student I want to delete events if I see the need to.                                                     |
+| US-BUILDER-7  | As a student I want to create a timetable which is a snapshot of chosen events at a time.                      |
+| US-BUILDER-8  | As a student I want to edit a created timetable.                                                               |
+| US-BUILDER-9  | As a student I want to delete a created timetable.                                                             |
+| US-BUILDER-10 | As a student I want to export a .ics calendar.                                                                 |
+
 
 ---
 
