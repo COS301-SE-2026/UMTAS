@@ -87,7 +87,7 @@ services:
     build:
       context: ./apps/solver
       dockerfile: solver.Dockerfile
-    image: ${DOCKER_REGISTRY}:solver-dev
+    image: ${DOCKER_REGISTRY}:solver-${IMAGE_TAG}
     networks:
       - gateway
       - internal
@@ -101,7 +101,7 @@ services:
     build:
       context: .
       dockerfile: docker/backend/backend.Dockerfile
-    image: ${DOCKER_REGISTRY}:backend-dev
+    image: ${DOCKER_REGISTRY}:backend-${IMAGE_TAG}
     networks:
       - gateway
       - internal
@@ -138,7 +138,7 @@ services:
     build:
       context: .
       dockerfile: docker/frontend/frontend.Dockerfile
-    image: ${DOCKER_REGISTRY}:frontend-dev
+    image: ${DOCKER_REGISTRY}:frontend-${IMAGE_TAG}
     networks:
       - gateway
     environment:
