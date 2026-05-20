@@ -44,6 +44,11 @@ export class MailerService {
   }
 
   async sendMail(options: SendMailOptions): Promise<void> {
+    const emailType = options.template || 'text';
+    this.logger.log(
+      `[MAIL] Attempting to send email to ${options.to} (${emailType}): "${options.subject}"`,
+    );
+
     try {
       const mailOptions: ISendMailOptions = {
         to: options.to,
@@ -62,11 +67,11 @@ export class MailerService {
 
       await this.mailerService.sendMail(mailOptions);
       this.logger.log(
-        `Email sent to ${options.to} (${options.template || 'text'})`,
+        `[MAIL] ✓ Successfully sent email to ${options.to} (${emailType})`,
       );
     } catch (error) {
-      this.logger.warn(
-        `Failed to send email to ${options.to}. Email service may be unavailable.`,
+      this.logger.error(
+        `[MAIL] ✗ Failed to send email to ${options.to} (${emailType}): ${error instanceof Error ? error.message : String(error)}`,
         error,
       );
       // Don't throw: email is optional in dev. Background tasks should not fail due to email.
@@ -87,6 +92,9 @@ export class MailerService {
     name: string;
     url: string;
   }): Promise<void> {
+    this.logger.log(
+      `[MAIL] Sending verification email for user: ${input.name} (${input.email})`,
+    );
     await this.sendTemplateMail({
       to: input.email,
       subject: 'Verify your UMTAS account',
@@ -107,6 +115,9 @@ export class MailerService {
     // Default token expiry (1 hour) - sync with BetterAuth's email verification token TTL
     const expiresInHours = input.expiresInHours ?? 1;
 
+    this.logger.log(
+      `[MAIL] Sending password reset email for user: ${input.name} (${input.email}), expires in ${expiresInHours}h`,
+    );
     await this.sendTemplateMail({
       to: input.email,
       subject: 'Reset your UMTAS password',

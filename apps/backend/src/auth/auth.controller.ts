@@ -247,7 +247,7 @@ export class AuthController {
   }
 
   // ─── Email verification ───────────────────────────────────────────────────────
-
+  @Public()
   @ApiTags('Auth Email')
   @Post('send-verification-email')
   @ApiCookieAuth('umtas-session')
