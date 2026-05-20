@@ -1,102 +1,77 @@
 # Domain Model
 
 !!! abstract "Section Brief"
-    The domain model defines the core entities, relationships, and bounded contexts of UMTAS. It establishes the shared conceptual vocabulary between business stakeholders and the engineering team, and directly underpins all database schema decisions and service boundary definitions.
+    The domain model defines the core entities, relationships, and bounded contexts of UMTAS. It establishes the shared conceptual vocabulary between the development team and the university, and directly underpins all database schema and service boundary decisions.
 
-    Key entities include: **Student**, **Module**, **Venue**, **Timetable**, **Schedule Slot**, and **Preference**. Understanding how these relate is essential before reading the Functional Requirements or Architectural sections.
+    Key entities: **User**, **Module**, **Event**, **EventCriteria**, **Lecture**, **Timetable**.
+
+---
 
 ## Overview
 
-The domain model describes every entity the system tracks, how those entities relate to each other, and what data each one carries. It is the shared vocabulary between the development team and the university - when the system talks about a *Module*, a *Timetable*, or a *Restriction*, this document defines exactly what that means.
+The domain model describes every entity the system tracks, how those entities relate, and what data each carries. **The core scheduling domain is within the current implementation scope.** Future phases covering venues, lecturers, preferences, and analytics are preliminary sketches that will be revisited as those features are built.
 
-The model is organised into four phases that mirror the planned build-out of the system. **Only Phase 1 is within the current implementation scope.** Phases 2–4 are preliminary sketches that will be revisited and likely redesigned as those features are built. They are included here to give clients a clear picture of the intended direction.
+**Event hierarchy.** Every item that can appear on a timetable descends from a single abstract `Event` base, which carries an embedded `EventCriteria` value object storing scheduling details. Only `Lecture` is implemented in the current scope.
 
----
+**Role-based user model.** `User` carries a `role` discriminator (`STUDENT`, `UNI_ADMIN`, `SYS_ADMIN`) enforced at the API boundary.
 
-## How the Model is Structured
-
-**Event-Calendar architecture.** Every item that can appear on a calendar - lectures, exams, labs, bootcamps - descends from a single abstract `Event` base. Academic events are linked to a `Module`; non-academic events (e.g. bootcamps, workshops) are not, and bypass the solver entirely.
-
-**Calendar → Restrictions.** The abstract `Calendar` base owns a set of `Restriction` records (public holidays, recesses, exam periods, day-swaps). The `AcademicCalendar` extends `Calendar` and defines the valid scheduling window that the constraint solver must work within.
-
-**Extensible JSONB fields.** Subtype-specific scheduling constraints are stored in a `criteria` field; supplementary resolved data in a `details` field. Both are schema-flexible - new constraint types can be added without a database migration.
-
-**Phased migration.** Each phase diagram is additive - it shows only new entities and how they connect to existing ones. String fields that are promoted to proper foreign keys in later phases are noted explicitly.
+**Extensible criteria.** `EventCriteria` is stored as JSONB - new scheduling metadata can be added without a database migration.
 
 ---
 
-## Phase 1 - Core Scheduling Domain
+## Implemented - Core Scheduling Domain
 
-**Scope:** Demo 1 · Current implementation target
+!!! success "Demo 1 - Implemented"
+    A user creates `Module` records for their enrolled courses, attaches `Lecture` events carrying an `EventCriteria` value object, and groups events into named `Timetable` collections.
 
-This phase captures the complete core of the system: users, the academic calendar, modules, events, enrolment, timetables, and the input/output pipeline. Everything the system needs to parse a timetable, solve it, and export it to a calendar is represented here.
+![Domain Model Diagram](../diagrams/domain/Domain.svg)
 
-![Core Domain Model](../diagrams/domain/Domain.drawio)
+### Entity Summary
 
-### Phase 1 - Entity Summary
-
-| Package                    | Entities                                                       | Purpose                                                       |
-| -------------------------- | -------------------------------------------------------------- | ------------------------------------------------------------- |
-| **User Management**        | User (abstract), Student, UniversityAdmin, SystemAdmin         | All actors in the system; role determines access rights       |
-| **Institution & Calendar** | University, Calendar (abstract), AcademicCalendar, Restriction | Defines the valid scheduling framework per semester           |
-| **Module**                 | Module                                                         | A taught subject; the anchor for all academic events          |
-| **Events**                 | Event (abstract), Lecture, Tutorial, Lab, Test, Exam, Bootcamp | Everything that can appear on a timetable                     |
-| **Enrolment**              | Enrollment, EnrollmentChoice                                   | Tracks which students are registered for which modules/groups |
-| **Timetable**              | Timetable, TimetableEntry                                      | The solved or manually built schedule                         |
-| **Export & Input**         | CalendarExport, ParseJob                                       | Handles PDF/API ingestion and calendar export output          |
+| Package | Entities | Purpose |
+| :--- | :--- | :--- |
+| **User Management** | User (abstract), Student, UniversityAdmin, SystemAdmin | All actors in the system; role governs access rights |
+| **Module** | Module | A taught subject (e.g. COS301); the anchor for academic events |
+| **Events** | Event (abstract), EventCriteria (value object), Lecture | Everything that can appear on a timetable |
+| **Timetable** | Timetable | A named collection of events forming a student's personal schedule |
 
 ---
 
-## Phase 2 - Venue Entities
+## Future Plans
 
-**Scope:** Planned future phase · Subject to redesign
+!!! failure "Not Implemented - Subject to Redesign"
+    The following extensions are planned for future phases. They are included here to give clients a clear picture of the intended direction.
 
-This phase promotes the venue from a plain text string on a `TimetableEntry` to a first-class entity the solver can reason about - filtering venues by capacity, type, and equipment when assigning time slots.
+??? failure "Venue Entities"
 
-**New entities:** `Venue`, `VenueCapacity`  
-**Migration:** `TimetableEntry.resolvedVenue: String` → `resolvedVenueId: UUID (FK → Venue)`
+    Promotes venue from a plain text string to a first-class `Venue` entity the solver can filter by capacity, type, and equipment.
 
-**Figure 2 - Phase 2: Venue** 
-- - -
-## Phase 3 - Lecturer Entity & Student Preferences
+    **New entities:** `Venue`, `VenueCapacity`  
+    **Migration:** `EventCriteria.venue : String` → `resolvedVenueId : UUID (FK → Venue)`
 
-**Scope:** Planned future phase · Subject to redesign
+??? failure "Lecturer & Preferences"
 
-This phase adds two independent concerns: lecturer unavailability (hard constraints the solver must honour) and student scheduling preferences (soft and hard constraints the solver can optimise against).
+    Adds lecturer unavailability (hard solver constraints) and student scheduling preferences (soft/hard constraints). Expands the event hierarchy with Tutorial, Lab, Test, and Exam subtypes.
 
-**New entities:** `Lecturer`, `LecturerUnavailability`, `StudentPreference`, `PreferenceRule`  
-**Migration:** Lecturer identifier in `Event.criteria` (JSONB) → `lecturerId: UUID (FK → Lecturer)` on Lecture, Tutorial, Lab, Test, Exam
+    **New entities:** `Lecturer`, `LecturerUnavailability`, `StudentPreference`, `PreferenceRule`, `Tutorial`, `Lab`, `Test`, `Exam`  
+    **Migration:** Lecturer identifier in `EventCriteria` (JSONB) → `lecturerId : UUID (FK → Lecturer)`
 
----
+??? failure "Analytics"
 
-## Phase 4 - Analytics
+    Introduces derived reporting entities computed from existing data for the admin dashboard. Detailed modelling is deferred until this subsystem is built.
 
-**Scope:** Rough sketch · Subject to redesign
-
-This phase introduces derived reporting entities - data that is computed from Phase 1–3 records and stored for the university admin dashboard. Detailed attribute and relationship modelling is intentionally deferred until this subsystem is actively being built.
-
-**New entities:** `VenueUtilization`, `LecturerWorkloadReport`, `AttendanceLog`
-## Phase Overview
-
-| Phase                    | Status                             | New Entities                                                                                                                                                                                                                                     | Key Migration                                                                                |
-| ------------------------ | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------- |
-| **1 - Core**             | Current scope                      | User, Student, UniversityAdmin, SystemAdmin, University, Calendar, AcademicCalendar, Restriction, Module, Event, Lecture, Tutorial, Lab, Test, Exam, Bootcamp, Enrollment, EnrollmentChoice, Timetable, TimetableEntry, CalendarExport, ParseJob | -                                                                                            |
-| **2 - Venues**           | Future · subject to redesign       | Venue, VenueCapacity                                                                                                                                                                                                                             | `TimetableEntry.resolvedVenue: String` → `resolvedVenueId: UUID (FK → Venue)`                |
-| **3 - Lecturer & Prefs** | Future · subject to redesign       | Lecturer, LecturerUnavailability, StudentPreference, PreferenceRule                                                                                                                                                                              | Lecturer identifier in `Event.criteria` → `lecturerId: UUID (FK)` on academic event subtypes |
-| **4 -Analytics**         | Rough sketch · subject to redesign | VenueUtilization, LecturerWorkloadReport, AttendanceLog                                                                                                                                                                                          | -                                                                                            |
+    **New entities:** `VenueUtilization`, `LecturerWorkloadReport`, `AttendanceLog`
 
 ---
 
 ## Terminology Reference
 
-| Term                  | Meaning                                                                                                              |
-| --------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| **Academic Calendar** | A semester-scoped calendar for one university. Defines the valid scheduling window and carries all restrictions.     |
-| **Restriction**       | Any constraint on when events can be scheduled- public holidays, recesses, exam periods, day-swaps.                  |
-| **Module**            | A taught subject (e.g. COS301). The anchor for all academic events.                                                  |
-| **Event**             | Anything that can appear on a timetable. Academic events link to a Module; non-academic events do not.               |
-| **TimetableEntry**    | A single resolved occurrence of an Event - a specific date, start time, duration, and venue.                         |
-| **Timetable**         | A collection of TimetableEntries, owned by a Student, with a status (draft, generated, exported).                    |
-| **ParseJob**          | A background job that processes a PDF or API data source and produces Module records.                                |
-| **CalendarExport**    | A record of an export to Google Calendar or a downloaded `.ics` file.                                                |
-| **EnrollmentChoice**  | A student's selection from the available groups or times for a module event (e.g. choosing Tutorial Group A over B). |
+| Term | Meaning |
+| :--- | :--- |
+| **User** | Any authenticated actor. Role (`STUDENT`, `UNI_ADMIN`, `SYS_ADMIN`) governs access at the API boundary. |
+| **Module** | A taught subject (e.g. COS301). The anchor for all academic events. |
+| **Event** | Abstract base for anything that appears on a timetable. Carries an embedded `EventCriteria` value object. |
+| **EventCriteria** | JSONB value object embedded in `Event`. Stores type, day, start/end time, venue, and module code. |
+| **Lecture** | The only concrete `Event` subtype in the current implementation. Identified by `EventCriteria.type = LECTURE`. |
+| **Timetable** | A named collection of events owned by a user (e.g. "Semester 1"). |
+| **EventType** | Enumeration inside `EventCriteria`. Currently `LECTURE` only; extended in future phases. |

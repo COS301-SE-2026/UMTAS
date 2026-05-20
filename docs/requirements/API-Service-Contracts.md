@@ -9,10 +9,10 @@
 
 ## :material-rocket-launch: UMTAS Core API (NestJS)
 
-<swagger-ui src="https://petstore.swagger.io/v2/swagger.json" />
+<swagger-ui src="https://api.capstone-vigil.dns.net.za/api/docs-json" />
 
 ---
 
 ## :material-robot: PDF Parser & Solver API (FastAPI)
 
-<swagger-ui src="https://petstore.swagger.io/v2/swagger.json" />
+<swagger-ui src="https://solver.capstone-vigil.dns.net.za/openapi.json" />
