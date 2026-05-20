@@ -8,7 +8,13 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
 import {
   CreateTimetableDto,
@@ -79,6 +85,7 @@ export class TimetableController {
     summary: 'Get timetable by ID',
     operationId: 'getTimetableById',
   })
+  @ApiParam({ name: 'id', type: Number, description: 'Timetable ID' })
   @ApiResponse({
     status: 200,
     description: 'Timetable fetched successfully',
@@ -100,6 +107,7 @@ export class TimetableController {
     summary: 'Update a timetable',
     operationId: 'updateTimetable',
   })
+  @ApiParam({ name: 'id', type: Number, description: 'Timetable ID' })
   @ApiBody({ type: UpdateTimetableDto })
   @ApiResponse({
     status: 200,
@@ -128,6 +136,7 @@ export class TimetableController {
     summary: 'Delete a timetable',
     operationId: 'deleteTimetable',
   })
+  @ApiParam({ name: 'id', type: Number, description: 'Timetable ID' })
   @ApiResponse({
     status: 200,
     description: 'Timetable deleted successfully',
