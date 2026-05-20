@@ -11,7 +11,7 @@ import {
   generateICS,
   downloadICS,
 } from "@/lib/scheduleUtils";
-import type { Module } from "@/components/molecules/builder/ModuleCard";
+import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
 import type { BuilderEvent } from "@/components/molecules/builder/EventCard";
 
 interface ScheduleViewProps {
@@ -25,7 +25,7 @@ export function ScheduleView({
   onModuleCountChange,
   onExportReady,
 }: ScheduleViewProps) {
-  const [modules] = useState<Module[]>(() => {
+  const [modules] = useState<ModuleResponseDto[]>(() => {
     if (typeof window !== "undefined") {
       const rawModules = localStorage.getItem("umtas-schedule-modules");
       return rawModules ? JSON.parse(rawModules) : [];

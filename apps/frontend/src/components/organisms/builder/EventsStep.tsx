@@ -7,7 +7,7 @@ import {
   type BuilderEvent,
   type EventErrors,
 } from "@/components/molecules/builder/EventCard";
-import type { Module } from "@/components/molecules/builder/ModuleCard";
+import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -24,7 +24,7 @@ import { Card, CardContent } from "@/components/atoms/baseShadcn/card";
 
 interface EventsStepProps {
   events: BuilderEvent[];
-  modules: Module[];
+  modules: ModuleResponseDto[];
   onAdd: () => void;
   onUpdate: (
     id: string,
@@ -80,10 +80,13 @@ function isEventComplete(event: BuilderEvent) {
   return true;
 }
 
-function getLinkedModuleName(event: BuilderEvent, modules: Module[]) {
-  const found = modules.find((m) => m.id === event.moduleId);
+function getLinkedModuleName(
+  event: BuilderEvent,
+  modules: ModuleResponseDto[],
+) {
+  const found = modules.find((m) => String(m.moduleID) === event.moduleId);
   if (found) {
-    return found.code + " - " + found.name;
+    return found.moduleCode + " - " + found.moduleName;
   }
   return null;
 }

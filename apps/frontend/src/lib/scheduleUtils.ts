@@ -1,4 +1,4 @@
-import type { Module } from "@/components/molecules/builder/ModuleCard";
+import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
 import type { BuilderEvent } from "@/components/molecules/builder/EventCard";
 import type { ScheduleEvent } from "@/types/schedule";
 
@@ -62,7 +62,7 @@ export function getAllWeekStarts(events: BuilderEvent[]): Date[] {
 
 export function resolveScheduleEvents(
   events: BuilderEvent[],
-  modules: Module[],
+  modules: ModuleResponseDto[],
 ): ScheduleEvent[] {
   const resolved: ScheduleEvent[] = [];
 
@@ -72,7 +72,9 @@ export function resolveScheduleEvents(
       (event.isRecurring as unknown as string) === "true";
 
     if (event.type === "lecture") {
-      const lectureModule = modules.find((m) => m.id === event.moduleId);
+      const lectureModule = modules.find(
+        (m) => String(m.moduleID) === event.moduleId,
+      );
       resolved.push({
         id: event.id,
         name: event.name,
@@ -81,8 +83,8 @@ export function resolveScheduleEvents(
         startTime: event.startTime,
         endTime: event.endTime,
         isRecurring,
-        accentColour: lectureModule ? lectureModule.colour : null,
-        subLabel: lectureModule ? lectureModule.code : null,
+        accentColour: lectureModule ? lectureModule.styling || null : null,
+        subLabel: lectureModule ? lectureModule.moduleCode : null,
       });
       continue;
     }
@@ -104,7 +106,10 @@ export function resolveScheduleEvents(
   return resolved;
 }
 
-export function generateICS(events: BuilderEvent[], modules: Module[]): string {
+export function generateICS(
+  events: BuilderEvent[],
+  modules: ModuleResponseDto[],
+): string {
   const lines: string[] = [];
 
   lines.push("BEGIN:VCALENDAR");
@@ -119,8 +124,10 @@ export function generateICS(events: BuilderEvent[], modules: Module[]): string {
       continue;
     }
 
-    const lectureModule = modules.find((m) => m.id === event.moduleId);
-    const moduleName = lectureModule ? lectureModule.name : "";
+    const lectureModule = modules.find(
+      (m) => String(m.moduleID) === event.moduleId,
+    );
+    const moduleName = lectureModule ? lectureModule.moduleName : "";
     const dateStr = event.date.replace(/-/g, "");
     const startStr = event.startTime.replace(":", "") + "00";
     const endStr = event.endTime.replace(":", "") + "00";

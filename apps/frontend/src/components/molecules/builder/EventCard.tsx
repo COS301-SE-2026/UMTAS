@@ -14,7 +14,7 @@ import { TimeSlotSelect } from "@/components/atoms/builder/TimeSlotSelect";
 import type { TimeSlot } from "@/components/atoms/builder/TimeSlotSelect";
 import { EventTypeDropdown } from "@/components/atoms/builder/eventDropdown";
 import type { EventType } from "@/components/atoms/builder/eventDropdown";
-import { type Module } from "@/components/molecules/builder/ModuleCard";
+import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
 import { Switch } from "@/components/atoms/baseShadcn/switch";
 
 export interface BuilderEvent {
@@ -40,7 +40,7 @@ export interface EventErrors {
 interface EventCardProps {
   event: BuilderEvent;
   index: number;
-  modules: Module[];
+  modules: ModuleResponseDto[];
   onUpdate: (
     id: string,
     field: keyof Omit<BuilderEvent, "id">,
@@ -108,14 +108,14 @@ export function EventCard({
         </SelectTrigger>
         <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)]">
           {modules.map((m) => {
-            let label = m.name;
-            if (m.code) {
-              label = m.code + " - " + m.name;
+            let label = m.moduleName;
+            if (m.moduleCode) {
+              label = m.moduleCode + " - " + m.moduleName;
             }
             return (
               <SelectItem
-                key={m.id}
-                value={m.id}
+                key={m.moduleID}
+                value={String(m.moduleID)}
                 className="text-sm text-[var(--text-primary)] focus:bg-[var(--bg-elevated)]"
               >
                 {label}

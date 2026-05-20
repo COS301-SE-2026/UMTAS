@@ -4,18 +4,18 @@ import React from "react";
 import { Button } from "@/components/atoms/baseShadcn/button";
 import { Separator } from "@/components/atoms/baseShadcn/separator";
 import { Skeleton } from "@/components/atoms/baseShadcn/skeleton";
-import type { Module } from "@/components/molecules/builder/ModuleCard";
+import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
 import type { BuilderEvent } from "@/components/molecules/builder/EventCard";
 
 interface GenerateStepProps {
-  modules: Module[];
+  modules: ModuleResponseDto[];
   events: BuilderEvent[];
   onGenerate: () => void;
   isGenerating: boolean;
 }
 
-function getLinkedModule(moduleId: string, modules: Module[]) {
-  const found = modules.find((m) => m.id === moduleId);
+function getLinkedModule(moduleId: string, modules: ModuleResponseDto[]) {
+  const found = modules.find((m) => String(m.moduleID) === moduleId);
   if (found) {
     return found;
   }
@@ -51,19 +51,19 @@ export function GenerateStep({
           {modules.map((module) => {
             return (
               <div
-                key={module.id}
+                key={module.moduleID}
                 className="flex items-center gap-3 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] px-4 py-4 shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.08)]"
               >
                 <span
                   className="h-3 w-3 rounded-full flex-shrink-0"
-                  style={{ backgroundColor: module.colour || "var(--border)" }}
+                  style={{ backgroundColor: module.styling || "var(--border)" }}
                 />
                 <div className="flex-1 min-w-0">
                   <p className="text-base text-[var(--text-primary)] truncate">
-                    {module.name}
+                    {module.moduleName}
                   </p>
                   <p className="text-sm font-mono text-[var(--text-secondary)]">
-                    {module.code}
+                    {module.moduleCode}
                   </p>
                 </div>
               </div>
@@ -122,11 +122,11 @@ export function GenerateStep({
                         className="h-2 w-2 rounded-full flex-shrink-0"
                         style={{
                           backgroundColor:
-                            linkedModule.colour || "var(--border)",
+                            linkedModule.styling || "var(--border)",
                         }}
                       />
                       <p className="text-sm font-mono text-[var(--text-secondary)]">
-                        {linkedModule.code}
+                        {linkedModule.moduleCode}
                       </p>
                     </div>
                   )}

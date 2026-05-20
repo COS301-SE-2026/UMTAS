@@ -1,15 +1,19 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { WizardStepper } from "@/components/atoms/builder/WizardStepper";
 import { WizardFooter } from "@/components/atoms/builder/WizardFooter";
 import { ModulesStep } from "@/components/organisms/builder/ModulesStep";
 import { EventsStep } from "@/components/organisms/builder/EventsStep";
 import { GenerateStep } from "@/components/organisms/builder/GenerateStep";
-import type { Module } from "@/components/molecules/builder/ModuleCard";
+import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
 import type { BuilderEvent } from "@/components/molecules/builder/EventCard";
 import type { EventType } from "@/components/atoms/builder/eventDropdown";
+import {
+  createModulesBuilder,
+  getAllModulesBuilder,
+} from "@/app/builder/utils/modules/requestBuilders";
 
 const Steps = [
   { label: "Modules" },
@@ -25,12 +29,13 @@ function generateId(): string {
   return array[0].toString();
 }
 
-function emptyModule(): Module {
+function emptyModule(): ModuleResponseDto {
   return {
-    id: generateId(),
-    code: "",
-    name: "",
-    colour: "",
+    moduleID: Number(generateId()),
+    moduleCode: "",
+    moduleName: "",
+    styling: "",
+    userID: "",
   };
 }
 
@@ -52,7 +57,7 @@ export function WizardShell() {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
-  const [modules, setModules] = useState<Module[]>([]);
+  const [modules, setModules] = useState<ModuleResponseDto[]>([]);
   const [events, setEvents] = useState<BuilderEvent[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -61,13 +66,13 @@ export function WizardShell() {
   }
 
   function handleModuleUpdate(
-    id: string,
-    field: keyof Omit<Module, "id">,
+    id: number,
+    field: keyof Omit<ModuleResponseDto, "moduleID" | "userID">,
     value: string,
   ) {
     setModules((prev) =>
       prev.map((m) => {
-        if (m.id === id) {
+        if (m.moduleID === id) {
           return { ...m, [field]: value };
         }
         return m;
@@ -75,8 +80,8 @@ export function WizardShell() {
     );
   }
 
-  function handleModuleRemove(id: string) {
-    setModules((prev) => prev.filter((m) => m.id !== id));
+  function handleModuleRemove(id: number) {
+    setModules((prev) => prev.filter((m) => m.moduleID !== id));
   }
 
   function handleEventAdd() {
@@ -145,7 +150,9 @@ export function WizardShell() {
 
   function isNextDisabled() {
     if (currentStep === 0) {
-      const hasValidModule = modules.some((m) => m.code && m.name && m.colour);
+      const hasValidModule = modules.some(
+        (m) => m.moduleCode && m.moduleName && m.styling,
+      );
       return !hasValidModule;
     }
     if (currentStep === 1) {
@@ -160,6 +167,20 @@ export function WizardShell() {
     }
     return false;
   }
+  useEffect(() => {
+    if (currentStep === 0) {
+      const fetchModules = async () => {
+        try {
+          const builder = new getAllModulesBuilder();
+          const response = await builder.send({});
+          setModules(response.modules);
+        } catch (error) {
+          console.error("Failed to fetch modules:", error);
+        }
+      };
+      fetchModules();
+    }
+  }, [currentStep]);
 
   function renderStep() {
     if (currentStep === 0) {

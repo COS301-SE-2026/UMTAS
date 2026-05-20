@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import { Plus, Trash2, CheckCircle, Inbox } from "lucide-react";
 import {
   ModuleCard,
-  type Module,
   type ModuleErrors,
 } from "@/components/molecules/builder/ModuleCard";
 import {
@@ -19,41 +18,42 @@ import {
 } from "@/components/atoms/baseShadcn/alert-dialog";
 import { Button } from "@/components/atoms/baseShadcn/button";
 import { Card, CardContent } from "@/components/atoms/baseShadcn/card";
+import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
 
 interface ModulesStepProps {
-  modules: Module[];
+  modules: ModuleResponseDto[];
   onAdd: () => void;
   onUpdate: (
-    id: string,
-    field: keyof Omit<Module, "id">,
+    id: number,
+    field: keyof Omit<ModuleResponseDto, "moduleID" | "userID">,
     value: string,
   ) => void;
-  onRemove: (id: string) => void;
+  onRemove: (id: number) => void;
   onNavigateAway: () => void;
 }
 
-function validateModule(module: Module) {
+function validateModule(module: ModuleResponseDto) {
   const errors: ModuleErrors = {};
   let hasErrors = false;
 
-  if (!module.code.trim()) {
-    errors.code = "Code is required";
+  if (!module.moduleCode.trim()) {
+    errors.moduleCode = "Code is required";
     hasErrors = true;
   }
-  if (!module.name.trim()) {
-    errors.name = "Name is required";
+  if (!module.moduleName.trim()) {
+    errors.moduleName = "Name is required";
     hasErrors = true;
   }
-  if (!module.colour) {
-    errors.colour = "Colour is required";
+  if (!module.styling) {
+    errors.styling = "Colour is required";
     hasErrors = true;
   }
 
   return { errors, hasErrors };
 }
 
-function isModuleComplete(module: Module) {
-  return !!(module.code && module.name && module.colour);
+function isModuleComplete(module: ModuleResponseDto) {
+  return !!(module.moduleCode && module.moduleName && module.styling);
 }
 
 export function ModulesStep({
@@ -63,12 +63,12 @@ export function ModulesStep({
   onRemove,
   onNavigateAway,
 }: ModulesStepProps) {
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [errorMap, setErrorMap] = useState<Record<string, ModuleErrors>>({});
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [errorMap, setErrorMap] = useState<Record<number, ModuleErrors>>({});
   const [isDirty, setIsDirty] = useState(false);
   const [showGuard, setShowGuard] = useState(false);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
-  const [snapshot, setSnapshot] = useState<Module | null>(null);
+  const [snapshot, setSnapshot] = useState<ModuleResponseDto | null>(null);
 
   function requestNavigation(action: () => void) {
     if (isDirty) {
@@ -81,9 +81,9 @@ export function ModulesStep({
 
   function handleGuardConfirm() {
     if (snapshot) {
-      onUpdate(snapshot.id, "code", snapshot.code);
-      onUpdate(snapshot.id, "name", snapshot.name);
-      onUpdate(snapshot.id, "colour", snapshot.colour);
+      onUpdate(snapshot.moduleID, "moduleCode", snapshot.moduleCode);
+      onUpdate(snapshot.moduleID, "moduleName", snapshot.moduleName);
+      onUpdate(snapshot.moduleID, "styling", snapshot.styling || "");
     }
     setIsDirty(false);
     setShowGuard(false);
@@ -99,14 +99,14 @@ export function ModulesStep({
     setPendingAction(null);
   }
 
-  function handleSelect(id: string) {
+  function handleSelect(id: number) {
     if (selectedId === id) {
       setSelectedId(null);
       return;
     }
 
     function doSelect() {
-      const selected = modules.find((m) => m.id === id);
+      const selected = modules.find((m) => m.moduleID === id);
       if (selected) {
         setSnapshot({ ...selected });
       }
@@ -117,8 +117,8 @@ export function ModulesStep({
     requestNavigation(doSelect);
   }
 
-  function handleConfirm(id: string) {
-    const lectureModule = modules.find((m) => m.id === id);
+  function handleConfirm(id: number) {
+    const lectureModule = modules.find((m) => m.moduleID === id);
     if (!lectureModule) return;
 
     const { errors: validationErrors, hasErrors } =
@@ -147,7 +147,7 @@ export function ModulesStep({
     requestNavigation(doAdd);
   }
 
-  function handleRemove(id: string) {
+  function handleRemove(id: number) {
     if (selectedId === id) {
       setSelectedId(null);
       setIsDirty(false);
@@ -162,8 +162,8 @@ export function ModulesStep({
   }
 
   function handleUpdate(
-    id: string,
-    field: keyof Omit<Module, "id">,
+    id: number,
+    field: keyof Omit<ModuleResponseDto, "moduleID" | "userID">,
     value: string,
   ) {
     setIsDirty(true);
@@ -184,31 +184,31 @@ export function ModulesStep({
     );
   }
 
-  function renderModuleRow(module: Module, index: number) {
+  function renderModuleRow(module: ModuleResponseDto, index: number) {
     const isComplete = isModuleComplete(module);
-    const isSelected = selectedId === module.id;
-    const errors = errorMap[module.id];
+    const isSelected = selectedId === module.moduleID;
+    const errors = errorMap[module.moduleID];
 
     return (
-      <div key={module.id} className="flex flex-col gap-2">
+      <div key={module.moduleID} className="flex flex-col gap-2">
         {/* summary row */}
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={() => handleSelect(module.id)}
+            onClick={() => handleSelect(module.moduleID)}
             className="flex flex-1 items-center gap-3 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] px-4 py-4 text-left transition-colors duration-[var(--duration-fast)] hover:bg-[var(--bg-elevated)] shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.08)]"
           >
             <span
               className="h-3 w-3 rounded-full flex-shrink-0"
-              style={{ backgroundColor: module.colour || "var(--border)" }}
+              style={{ backgroundColor: module.styling || "var(--border)" }}
             />
             <div className="flex-1 min-w-0">
               <p className="text-base font-medium text-[var(--text-primary)] truncate">
-                {module.name || "Module " + (index + 1)}
+                {module.moduleName || "Module " + (index + 1)}
               </p>
-              {module.code && (
+              {module.moduleCode && (
                 <p className="text-sm font-mono text-[var(--text-secondary)]">
-                  {module.code}
+                  {module.moduleCode}
                 </p>
               )}
             </div>
@@ -226,7 +226,7 @@ export function ModulesStep({
             type="button"
             variant="ghost"
             size="icon"
-            onClick={() => handleRemove(module.id)}
+            onClick={() => handleRemove(module.moduleID)}
             aria-label={"Remove module " + (index + 1)}
             className="h-10 w-10 flex-shrink-0 border border-[var(--border)] text-[var(--text-secondary)] transition-colors duration-[var(--duration-fast)] hover:border-[var(--error-text)] hover:text-[var(--error-text)] hover:bg-transparent"
           >
@@ -248,7 +248,7 @@ export function ModulesStep({
             <Button
               type="button"
               variant="outline"
-              onClick={() => handleConfirm(module.id)}
+              onClick={() => handleConfirm(module.moduleID)}
               aria-label="Confirm module"
               className="w-full gap-2 border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-primary)] transition-colors duration-[var(--duration-fast)] hover:bg-[var(--bg-elevated)]"
             >
