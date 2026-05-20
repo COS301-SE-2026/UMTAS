@@ -21,7 +21,7 @@ export function AppShellTemplate({
   userEmail,
 }: AppShellTemplateProps) {
   return (
-    <div className="min-h-dvh bg-[--bg-base] flex flex-col">
+    <div className="min-h-dvh bg-[-var(-bg-base)] flex flex-col">
       <TopNavBar userName={userName} userEmail={userEmail} />
       <PageWrapper>{children}</PageWrapper>
     </div>
