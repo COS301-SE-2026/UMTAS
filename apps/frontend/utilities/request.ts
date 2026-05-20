@@ -24,6 +24,12 @@ export class RequestBuilder<
     const cleanBase = baseUrl.replace(/\/$/, "");
     const cleanPath = (url as string).replace(/^\//, "");
     this.url = `${cleanBase}/${cleanPath}`;
+
+    // Automatically set Origin header in Node.js environments for CORS/CSRF
+    if (typeof window === "undefined") {
+      this.headers["Origin"] = cleanBase;
+    }
+
     return this;
   }
 
@@ -32,7 +38,7 @@ export class RequestBuilder<
     return this;
   }
 
-  protected setHeaders(headers: Record<string, string>): this {
+  public setHeaders(headers: Record<string, string>): this {
     this.headers = { ...this.headers, ...headers };
     return this;
   }

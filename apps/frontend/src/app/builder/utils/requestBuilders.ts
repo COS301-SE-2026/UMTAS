@@ -3,17 +3,17 @@ import { paths } from "@/lib/api";
 type createModuleReq =
   paths["/modules"]["post"]["requestBody"]["content"]["application/json"];
 type createModuleRes =
-  paths["/modules"]["post"]["responses"]["201"]["content"]["application/json"]["module"];
+  paths["/modules"]["post"]["responses"]["201"]["content"]["application/json"];
 type deleteModulesByIdRes =
   paths["/modules/{moduleId}"]["delete"]["responses"]["200"]["content"]["application/json"];
 type deleteModulesByIdPath =
   paths["/modules/{moduleId}"]["delete"]["parameters"]["path"];
 type getAllModulesRes =
-  paths["/modules"]["get"]["responses"]["200"]["content"]["application/json"]["modules"];
+  paths["/modules"]["get"]["responses"]["200"]["content"]["application/json"];
 type getModuleByIdReq =
   paths["/modules/{moduleId}"]["get"]["parameters"]["path"];
 type getModuleByIdRes =
-  paths["/modules/{moduleId}"]["get"]["responses"]["200"]["content"]["application/json"]["module"];
+  paths["/modules/{moduleId}"]["get"]["responses"]["200"]["content"]["application/json"];
 type updateModuleByIdBody =
   paths["/modules/{moduleId}"]["patch"]["requestBody"]["content"]["application/json"];
 
@@ -21,7 +21,7 @@ type updateModuleByIdPath =
   paths["/modules/{moduleId}"]["patch"]["parameters"]["path"];
 
 type updateModuleByIdRes =
-  paths["/modules/{moduleId}"]["patch"]["responses"]["200"]["content"]["application/json"]["module"];
+  paths["/modules/{moduleId}"]["patch"]["responses"]["200"]["content"]["application/json"];
 
 export class createModulesBuilder extends RequestBuilder<
   undefined,
