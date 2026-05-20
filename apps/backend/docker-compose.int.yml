@@ -1,0 +1,53 @@
+networks:
+  internal:
+    name: umtas-int-internal
+
+services:
+  redis-int:
+    image: redis:7-alpine
+    restart: 'no'
+    networks:
+      - internal
+    command: redis-server --requirepass ${REDIS_PASSWORD:-test-password}
+
+  backend-int:
+    image: node:22-alpine
+    working_dir: /app
+    networks:
+      - internal
+    depends_on:
+      - redis-int
+    environment:
+      MIGRATIONS_PATH: /app/apps/backend/drizzle
+      CI: 'true'
+      NODE_ENV: test
+      DB_MODE: pglite
+      SEED: 'true'
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-test-password}
+      REDIS_URL: redis://:${REDIS_PASSWORD:-test-password}@redis-int:6379
+      BETTER_AUTH_SECRET: test-secret
+      BETTER_AUTH_URL: http://backend-int:3000
+      BETTER_AUTH_TRUSTED_ORIGINS: http://backend-int:3000
+      CORS_ORIGIN: http://backend-int:3000
+      PNPM_HOME: /pnpm
+      XDG_DATA_HOME: /pnpm
+    volumes:
+      - ../..:/app
+      - backend-int-root-node-modules:/app/node_modules
+      - backend-int-backend-node-modules:/app/apps/backend/node_modules
+      - backend-int-e2e-node-modules:/app/apps/e2e/node_modules
+      - backend-int-shared-types-node-modules:/app/packages/shared-types/node_modules
+      - backend-int-pnpm-store:/pnpm
+    command: >
+      sh -c "corepack enable &&
+            corepack prepare pnpm@10.33.2 --activate &&
+            pnpm install --frozen-lockfile &&
+            pnpm --filter backend db:generate &&
+            pnpm --filter backend test:int:local"
+
+volumes:
+  backend-int-root-node-modules:
+  backend-int-backend-node-modules:
+  backend-int-e2e-node-modules:
+  backend-int-shared-types-node-modules:
+  backend-int-pnpm-store:
