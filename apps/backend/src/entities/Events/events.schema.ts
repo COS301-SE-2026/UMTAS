@@ -6,12 +6,14 @@ import {
   serial,
   uuid,
   varchar,
+  boolean,
 } from 'drizzle-orm/pg-core';
 
 export const Event = pgTable('Event', {
   userID: uuid('userID').notNull(),
   eventID: serial('eventID').primaryKey(),
   eventCriteria: jsonb('eventCriteria'),
+  isRecurring: boolean('isRecurring').notNull().default(false),
 });
 
 export const Timetable = pgTable('Timetable', {
