@@ -45,7 +45,7 @@
     "@commitlint/config-conventional": "^20.5.3",
     "@secretlint/secretlint-rule-preset-recommend": "^13.0.2",
     "@types/lodash": "^4.17.24",
-    "@types/node": "^25.9.0",
+    "@types/node": "^25.9.1",
     "eslint": "^10.4.0",
     "husky": "^9.1.7",
     "jest": "^30.4.2",
@@ -57,7 +57,7 @@
     "typescript": "^6.0.3"
   },
   "dependencies": {
-    "@nestjs-modules/mailer": "^2.3.5",
+    "@nestjs-modules/mailer": "^2.3.6",
     "@types/handlebars": "^4.1.0",
     "@types/nodemailer": "^8.0.0",
     "dotenv": "^16.6.1",
