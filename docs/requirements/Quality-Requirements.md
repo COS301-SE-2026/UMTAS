@@ -13,23 +13,29 @@
 
 ## Maintainability
 
-- Cyclomatic complexity ≤ 10 per function; SonarCloud maintainability rating of A.
+- Cyclomatic complexity ≤ 10 per function.
+- SonarCloud maintainability rating of A.
 
 ## Scalability
 
-- Minimum 10 concurrent university sessions; 50 PDF parse jobs per hour per worker instance.
+- Minimum 10 concurrent university sessions.
+- 50 PDF parse jobs per hour per worker instance.
 
 ## Performance
 
-- Standard CRUD responses ≤ 300 ms at p95; solver timeout of 60 seconds with partial result fallback.
+- Standard CRUD responses ≤ 300 ms at p95.
+- Solver timeout of 60 seconds with partial result fallback.
 
 ## Reliability
 
-- All merges gated on passing CI; failed jobs retried with exponential backoff and dead-lettered on exhaustion.
+- All merges gated on passing CI.
+- Failed jobs retried with exponential backoff and dead-lettered on exhaustion.
 
 ## Security
 
-- HTTPS enforced in production; RBAC on every endpoint; OWASP Top 10 review in CI.
+- HTTPS enforced in production.
+- RBAC on every endpoint.
+- OWASP Top 10 review in CI.
 
 ## Auditability
 
@@ -37,11 +43,13 @@
 
 ## Testability
 
-- 80% minimum code coverage; all tests executable in CI without external service dependencies.
+- 80% minimum code coverage.
+- all tests executable in CI without external service dependencies.
 
 ## Usability
 
-- WCAG 2.1 AA compliance; university branding configurable via theming layer without code changes.
+- WCAG 2.1 AA compliance.
+- University branding configurable via theming layer without code changes.
 
 ## Integrability
 

@@ -13,14 +13,14 @@
 
 ## 2. Component Overview
 
-- **Frontend** - renders timetable views for all user roles; handles authentication state and route-level access control; communicates exclusively with the API Core via REST.
-- **API Core** - single entry point for all client requests; enforces JWT authentication (via BetterAuth) and RBAC; owns all database access and orchestrates background job dispatch.
-- **Scheduling Optimizer** - stateless computation service; receives constraint specifications, executes scheduling algorithms, and returns solutions or partial results at timeout.
-- **PDF Parser** - extracts and normalises timetable data from university-supplied PDFs; runs as independently scalable workers consuming from the PDF job queue.
-- **University API Adapter** - fetches and normalises structured data from external university APIs; decoupled from the Core Engine via the adapter interface.
-- **PostgreSQL** - system of record for all persistent data; enforces referential integrity across modules, rooms, staff, and timetable slots.
+- **Frontend** - renders timetable views for all user roles. Handles authentication state and route-level access control. Communicates exclusively with the API Core via REST.
+- **API Core** - single entry point for all client requests. Enforces JWT authentication (via BetterAuth) and RBAC. Owns all database access and orchestrates background job dispatch.
+- **Scheduling Optimizer** - stateless computation service. Receives constraint specifications, executes scheduling algorithms, and returns solutions or partial results at timeout.
+- **PDF Parser** - extracts and normalises timetable data from university-supplied PDFs. Runs as independently scalable workers consuming from the PDF job queue.
+- **University API Adapter** - fetches and normalises structured data from external university APIs. Decoupled from the Core Engine via the adapter interface.
+- **PostgreSQL** - system of record for all persistent data. Enforces referential integrity across modules, rooms, staff, and timetable slots.
 - **Redis** - in-memory store for session tokens, solution cache, and BullMQ message brokering.
-- **BullMQ** - decouples long-running tasks (optimisation, PDF parsing) from the synchronous request cycle; provides retry, dead-letter, and job visibility.
+- **BullMQ** - decouples long-running tasks (optimisation, PDF parsing) from the synchronous request cycle. Provides retry, dead-letter, and job visibility.
 
 ---
 
@@ -54,7 +54,7 @@
 
 | ID | Constraint | Source |
 |---|---|---|
-| C1 | The system must integrate with the Google Calendar API; the OAuth flow must conform to Google's OAuth 2.0 authorisation code flow with PKCE. | Client requirement |
+| C1 | The system must integrate with the Google Calendar API. The OAuth flow must conform to Google's OAuth 2.0 authorisation code flow with PKCE. | Client requirement |
 | C2 | The constraint solver must expose its interface over HTTP, as it runs in a separate process and may be implemented in a different language from the primary server. | Language boundary - solver is Python |
 | C3 | PDF parsing must support, at minimum, the University of Pretoria timetable PDF format at initial delivery. | Client requirement |
 | C4 | All services must be containerisable and deployable on a standard Linux host via container orchestration. | Deployment environment |
