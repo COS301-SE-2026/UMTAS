@@ -13,7 +13,8 @@
 A student enrolled at a university that uses the system to access and personalise their academic timetable.
 
 **Characteristics:**
-- Varying levels of technical proficiency; the interface must be simple and intuitive.  
+- Varying levels of technical proficiency.
+- The interface must be simple and intuitive.  
 - Primarily interested in viewing their personalised schedule and exporting it to their preferred calendar application.  
 - May set preferences such as minimising gaps between classes or avoiding early morning lectures.  
 

@@ -14,7 +14,7 @@
     ![Next.js](https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white) ![Tailwind CSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)
     ![Shadcn/UI](https://img.shields.io/badge/shadcn%2Fui-000000?style=for-the-badge&logo=shadcnui&logoColor=white) ![Radix UI](https://img.shields.io/badge/radix%20ui-161616?style=for-the-badge&logo=radix-ui&logoColor=white)
 
-    - **Next.js** for SSR and the React component model; **Shadcn/UI + Radix UI** for headless WCAG-compliant primitives.
+    - **Next.js** for SSR and the React component model. **Shadcn/UI + Radix UI** for headless WCAG-compliant primitives.
     - University theming applied through Tailwind CSS custom properties only - no per-university code changes.
 
 -   __:material-server: Backend & Core__
@@ -27,7 +27,7 @@
 
     - **NestJS + DrizzleORM** enforce the layered architecture with compile-time type-safe SQL.
     - **PostgreSQL + Redis** for persistent relational storage and combined session cache / BullMQ broker.
-    - **BetterAuth** for OAuth 2.0, JWT, and session management; supports both third-party OAuth and password-based flows.
+    - **BetterAuth** for OAuth 2.0, JWT, and session management. Supports both third-party OAuth and password-based flows.
 
 -   __:material-brain: Solver & AI__
 
@@ -37,7 +37,7 @@
     ![PyMuPDF](https://img.shields.io/badge/pymupdf-41454a?style=for-the-badge&logo=python&logoColor=white) ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
 
     - **FastAPI + OR-Tools (CP-SAT)** for the async solver service with OpenAPI docs and partial result support at timeout.
-    - **PyMuPDF** for spatially-aware PDF extraction; bounding-box positioning is required to interpret timetable grid layouts.
+    - **PyMuPDF** for spatially-aware PDF extraction. Bounding-box positioning is required to interpret timetable grid layouts.
 
 -   __:material-layers: Infra & DevOps__
 
@@ -48,7 +48,7 @@
     ![pnpm](https://img.shields.io/badge/pnpm-%234a4a4a.svg?style=for-the-badge&logo=pnpm&logoColor=f69220) ![MinIO](https://img.shields.io/badge/minio-C72C48?style=for-the-badge&logo=minio&logoColor=white)
 
     - **Docker + Traefik** for containerised deployment with SSL termination and blue-green switching.
-    - **pnpm + Turborepo** for monorepo workspace management; **MinIO** for S3-compatible PDF object storage.
+    - **pnpm + Turborepo** for monorepo workspace management. **MinIO** for S3-compatible PDF object storage.
 
 -   __:material-test-tube: Testing & QA__
 
@@ -57,7 +57,7 @@
     ![Jest](https://img.shields.io/badge/-jest-%23C21325?style=for-the-badge&logo=jest&logoColor=white) ![pytest](https://img.shields.io/badge/pytest-%230A9EDC.svg?style=for-the-badge&logo=pytest&logoColor=white)
     ![Playwright](https://img.shields.io/badge/-playwright-%232EAD33?style=for-the-badge&logo=playwright&logoColor=white) ![act](https://img.shields.io/badge/act-2088FF?style=for-the-badge&logo=github&logoColor=white)
 
-    - **Jest + pytest** for unit/integration tests; **Playwright** for E2E in headless CI mode.
+    - **Jest + pytest** for unit/integration tests. **Playwright** for E2E in headless CI mode.
 
 -   __:material-monitor-eye: Monitoring__
 
