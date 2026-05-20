@@ -37,6 +37,8 @@ export class EventService {
         .insert(Event)
         .values({
           userID: userId,
+          eventName: dto.name ?? null,
+          eventCode: dto.code ?? null,
           eventCriteria: dto.eventCriteria ?? null,
           isRecurring: dto.isRecurring ?? false,
         })
@@ -104,9 +106,12 @@ export class EventService {
     const critUpdate =
       dto.eventCriteria && Object.keys(dto.eventCriteria).length > 0;
     const recUpdate = dto.isRecurring !== undefined;
+    const nameUpdate = dto.name !== undefined;
+    const codeUpdate = dto.code !== undefined;
 
-    if (!critUpdate && !recUpdate)
+    if (!critUpdate && !recUpdate && !nameUpdate && !codeUpdate) {
       throw new BadRequestException('At least one update field required');
+    }
 
     return await this.databaseService.db.transaction(async (tx) => {
       const [exRow] = await tx
@@ -136,6 +141,8 @@ export class EventService {
       const [updatedEvent] = await tx
         .update(Event)
         .set({
+          ...(nameUpdate ? { eventName: dto.name?.trim() || null } : {}),
+          ...(codeUpdate ? { eventCode: dto.code?.trim() || null } : {}),
           ...(critUpdate ? { eventCriteria: mergedCriteria } : {}),
           ...(recUpdate ? { isRecurring: dto.isRecurring } : {}),
         })

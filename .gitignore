@@ -121,3 +121,5 @@ working_docs/
 # Local act secrets
 .secrets
 apps/frontend/junit.xml
+
+.pnpm-store/
