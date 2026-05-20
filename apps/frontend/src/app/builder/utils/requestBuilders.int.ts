@@ -4,8 +4,11 @@
 import {
   getAllModulesBuilder,
   createModulesBuilder,
+  getModulesByIdBuilder,
+  updateModulesBuilder,
   deleteModulesById,
   createModuleReq,
+  updateModuleByIdBody,
 } from "./requestBuilders";
 
 const apiUrl = process.env.API_URL || "http://localhost:3000";
@@ -57,34 +60,65 @@ describe("Request Builders Integration Tests", () => {
       const result = await builder.send({});
       console.log("getAllModules Response:", JSON.stringify(result, null, 2));
 
+      expect(result.modules).toBeDefined();
       expect(Array.isArray(result.modules)).toBe(true);
     });
   });
 
-  describe("createModulesBuilder", () => {
-    it("should create a module successfully", async () => {
-      const builder = new createModulesBuilder();
-      const deleteBuilder = new deleteModulesById();
+  describe("Module CRUD Lifecycle", () => {
+    it("should create, get, update, and delete a module", async () => {
+      // create
+      const createBuilder = new createModulesBuilder();
+      if (sessionCookie) createBuilder.setHeaders({ Cookie: sessionCookie });
 
-      if (sessionCookie) {
-        deleteBuilder.setHeaders({ Cookie: sessionCookie });
-        builder.setHeaders({ Cookie: sessionCookie });
-      }
-      deleteBuilder.send({ paths: { moduleId: 2 } });
       const mockModule: createModuleReq = {
         code: `COS301`,
-        name: "Integration Test Module",
+        name: "Lifecycle Test Module",
         description: "Created by integration test",
-        userId: "550e8400-e29b-41d4-a716-446655440000", // type expects it backend doesnt care
-        styling: "#FF0000",
+        userId: "550e8400-e29b-41d4-a716-446655440000",
+        styling: "#00FF00",
       };
 
-      const result = await builder.send({ body: mockModule });
-      console.log("createModules Response:", JSON.stringify(result, null, 2));
+      const createResult = await createBuilder.send({ body: mockModule });
+      console.log("Create Response:", JSON.stringify(createResult, null, 2));
+      const moduleId = createResult.module.moduleID;
+      expect(moduleId).toBeDefined();
 
-      expect(result.module).toBeDefined();
-      expect(result.module.moduleCode).toBe(mockModule.code);
-      expect(result.module.moduleName).toBe(mockModule.name);
+      // get by id
+      const getBuilder = new getModulesByIdBuilder();
+      if (sessionCookie) getBuilder.setHeaders({ Cookie: sessionCookie });
+
+      const getResult = await getBuilder.send({ paths: { moduleId } });
+      console.log("Get Response:", JSON.stringify(getResult, null, 2));
+      expect(getResult.module.moduleID).toBe(moduleId);
+      expect(getResult.module.moduleCode).toBe(mockModule.code);
+
+      // update
+      const updateBuilder = new updateModulesBuilder();
+      if (sessionCookie) updateBuilder.setHeaders({ Cookie: sessionCookie });
+
+      const updateBody: updateModuleByIdBody = {
+        name: "Updated Lifecycle Name",
+        styling: "#0000FF",
+      };
+
+      const updateResult = await updateBuilder.send({
+        paths: { moduleId },
+        body: updateBody,
+      });
+      console.log("Update Response:", JSON.stringify(updateResult, null, 2));
+      expect(updateResult.module.moduleName).toBe(updateBody.name);
+      expect(updateResult.module.styling).toBe(updateBody.styling);
+
+      // delete
+      const deleteBuilder = new deleteModulesById();
+      if (sessionCookie) deleteBuilder.setHeaders({ Cookie: sessionCookie });
+
+      const deleteResult = await deleteBuilder.send({
+        paths: { moduleId },
+      });
+      console.log("Delete Response:", JSON.stringify(deleteResult, null, 2));
+      expect(deleteResult.success).toBeDefined();
     });
   });
 });
