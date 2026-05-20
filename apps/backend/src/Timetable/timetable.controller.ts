@@ -25,7 +25,6 @@ import {
 } from './dto/timetable.dto';
 
 import { TimetableService } from './timetable.service';
-import { Roles } from '../auth/roles.guard';
 import { CurrentSession } from '../auth/session.decorator';
 import type { SessionData } from '../auth/session.decorator';
 
@@ -35,7 +34,6 @@ export class TimetableController {
   constructor(private readonly service: TimetableService) {}
 
   @Post()
-  @Roles('student')
   @ApiOperation({
     summary: 'Create a timetable',
     operationId: 'createTimetable',
@@ -51,7 +49,6 @@ export class TimetableController {
     description: 'Missing or invalid request payload',
   })
   @ApiResponse({ status: 401, description: 'No active session' })
-  @ApiResponse({ status: 403, description: 'Insufficient permissions' })
   @ApiResponse({ status: 500, description: 'Timetable was not created' })
   createTimetable(
     @CurrentSession() session: SessionData,
@@ -61,7 +58,6 @@ export class TimetableController {
   } //createTimetable
 
   @Get()
-  @Roles('student')
   @ApiOperation({
     summary: 'Get all timetables',
     operationId: 'getAllTimetables',
@@ -72,7 +68,6 @@ export class TimetableController {
     type: TimetableListResponseDto,
   })
   @ApiResponse({ status: 401, description: 'No active session' })
-  @ApiResponse({ status: 403, description: 'Insufficient permissions' })
   getAllTimetables(
     @CurrentSession() session: SessionData,
   ): Promise<TimetableListResponseDto> {
@@ -80,7 +75,6 @@ export class TimetableController {
   } //getAllTimetables
 
   @Get(':id')
-  @Roles('student')
   @ApiOperation({
     summary: 'Get timetable by ID',
     operationId: 'getTimetableById',
@@ -92,7 +86,6 @@ export class TimetableController {
     type: TimetableResponseDto,
   })
   @ApiResponse({ status: 401, description: 'No active session' })
-  @ApiResponse({ status: 403, description: 'Insufficient permissions' })
   @ApiResponse({ status: 404, description: 'Timetable not found' })
   getTimetableById(
     @CurrentSession() session: SessionData,
@@ -102,7 +95,6 @@ export class TimetableController {
   } //getTimetableById
 
   @Patch(':id')
-  @Roles('student')
   @ApiOperation({
     summary: 'Update a timetable',
     operationId: 'updateTimetable',
@@ -119,7 +111,6 @@ export class TimetableController {
     description: 'Missing or invalid update payload',
   })
   @ApiResponse({ status: 401, description: 'No active session' })
-  @ApiResponse({ status: 403, description: 'Insufficient permissions' })
   @ApiResponse({ status: 404, description: 'Timetable not found' })
   @ApiResponse({ status: 500, description: 'Timetable was not updated' })
   updateTimetable(
@@ -131,7 +122,6 @@ export class TimetableController {
   } //updateTimetable
 
   @Delete(':id')
-  @Roles('student')
   @ApiOperation({
     summary: 'Delete a timetable',
     operationId: 'deleteTimetable',
@@ -143,7 +133,6 @@ export class TimetableController {
     type: DeleteTimetableResponseDto,
   })
   @ApiResponse({ status: 401, description: 'No active session' })
-  @ApiResponse({ status: 403, description: 'Insufficient permissions' })
   @ApiResponse({ status: 404, description: 'Timetable not found' })
   @ApiResponse({ status: 500, description: 'Timetable was not deleted' })
   deleteTimetable(
