@@ -273,12 +273,22 @@ GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET:-}
 NEXT_PUBLIC_API_URL=https://api.${DOMAIN}
 NEXT_PUBLIC_APP_URL=https://${DOMAIN}
 
+# ─── Email (SMTP) ─────────────────────────────────────────
+# Defaults to mailhog container — override for real SMTP
+SMTP_HOST=${SMTP_HOST:-mailhog}
+SMTP_PORT=${SMTP_PORT:-1025}
+SMTP_SECURE=${SMTP_SECURE:-false}
+SMTP_USER=${SMTP_USER:-}
+SMTP_PASS=${SMTP_PASS:-}
+SMTP_FROM=${SMTP_FROM:-UMTAS <noreply@umtas.co.za>}
+
 # ─── Seeding ──────────────────────────────────────────────
 SEED=${SEED}
 SEED_TASKS=default-system-admin
 SEED_SYSTEM_ADMIN_NAME=${SEED_SYSTEM_ADMIN_NAME}
 SEED_SYSTEM_ADMIN_EMAIL=${SEED_SYSTEM_ADMIN_EMAIL}
 SEED_SYSTEM_ADMIN_PASSWORD=${SEED_SYSTEM_ADMIN_PASSWORD}
+SEED_TEST_PASSWORD=Test@UMTAS2024!
 SYSTEM_ADMIN_USER_IDS=seed-system-admin
 EOF
 }
