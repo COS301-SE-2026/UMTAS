@@ -1,3 +1,3 @@
 # System Overview
 
-![System Overview](Architecture.drawio)
+![System Overview](Architecture.svg)

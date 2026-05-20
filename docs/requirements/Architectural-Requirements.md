@@ -10,6 +10,8 @@
 
 ## 1. Overall Software Architecture
 
+![System Architecture](../diagrams/architecture/Architecture.svg)
+
 ### 1.1 Architectural Responsibility
 
 | Role | Responsibility |
