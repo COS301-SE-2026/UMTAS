@@ -1,11 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import {
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  IsUUID,
-  Length,
-} from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, Length } from 'class-validator';
 
 export class CreateModuleDto {
   @ApiProperty({
@@ -34,14 +28,6 @@ export class CreateModuleDto {
   @IsString()
   @Length(1, 500)
   description?: string;
-
-  @ApiProperty({
-    example: '550e8400-e29b-41d4-a716-446655440000',
-    description: 'Temporary user ID until auth context is connected',
-  })
-  @IsString()
-  @IsUUID()
-  userId!: string;
 
   @ApiPropertyOptional({
     example: '#3B82F6',
