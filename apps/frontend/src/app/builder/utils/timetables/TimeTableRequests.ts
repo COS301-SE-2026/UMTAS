@@ -10,8 +10,10 @@ type createTimeTableBody =
 type createTimeTableRes =
   paths["/timetables"]["post"]["responses"]["201"]["content"]["application/json"];
 
-type getAllTimeTablesRes =
+export type getAllTimeTablesRes =
   paths["/timetables"]["get"]["responses"]["200"]["content"]["application/json"];
+
+export type TimetableResponse = getAllTimeTablesRes["timetables"][number];
 
 type getTTbyIdPath = paths["/timetables/{id}"]["get"]["parameters"]["path"];
 type getTTbyIdRes =

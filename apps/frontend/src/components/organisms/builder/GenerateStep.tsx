@@ -1,16 +1,18 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/atoms/baseShadcn/button";
 import { Separator } from "@/components/atoms/baseShadcn/separator";
 import { Skeleton } from "@/components/atoms/baseShadcn/skeleton";
+import { Input } from "@/components/atoms/baseShadcn/input";
+import { Label } from "@/components/atoms/baseShadcn/label";
 import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
 import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
 
 interface GenerateStepProps {
   modules: ModuleResponseDto[];
   events: EventResponse[];
-  onGenerate: () => void;
+  onGenerate: (name: string) => void;
   isGenerating: boolean;
 }
 
@@ -39,6 +41,8 @@ export function GenerateStep({
   onGenerate,
   isGenerating,
 }: GenerateStepProps) {
+  const [timetableName, setTimetableName] = useState("My New Schedule");
+
   function renderModulesSummary() {
     return (
       <div className="flex flex-col gap-3">
@@ -187,13 +191,29 @@ export function GenerateStep({
         </p>
       </div>
 
+      <div className="mb-6 flex flex-col gap-2">
+        <Label
+          htmlFor="timetable-name"
+          className="text-sm font-medium text-[var(--text-secondary)]"
+        >
+          Schedule Name
+        </Label>
+        <Input
+          id="timetable-name"
+          value={timetableName}
+          onChange={(e) => setTimetableName(e.target.value)}
+          placeholder="e.g. Semester 1, 2024"
+          className="bg-[var(--bg-surface)] border-[var(--border)] text-[var(--text-primary)] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--ring)]"
+        />
+      </div>
+
       <div className="mb-8">{renderContent()}</div>
 
       <Button
         type="button"
         size="default"
         disabled={isGenerating}
-        onClick={onGenerate}
+        onClick={() => onGenerate(timetableName)}
         className="w-full text-sm bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] hover:bg-[var(--btn-primary-hover)] disabled:opacity-40 transition-colors duration-[var(--duration-fast)]"
       >
         {isGenerating ? "Generating..." : "Generate schedule"}

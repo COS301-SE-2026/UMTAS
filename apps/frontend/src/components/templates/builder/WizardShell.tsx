@@ -22,6 +22,7 @@ import {
   updateEventByID,
   type EventResponse,
 } from "@/app/builder/utils/events/eventRequestBuilder";
+import { createTimeTableBuilder } from "@/app/builder/utils/timetables/TimeTableRequests";
 
 const Steps = [
   { label: "Modules" },
@@ -283,12 +284,26 @@ export function WizardShell() {
     }
   }
 
-  async function handleGenerate() {
+  async function handleGenerate(name: string) {
     setIsGenerating(true);
-    localStorage.setItem("umtas-schedule-modules", JSON.stringify(modules));
-    localStorage.setItem("umtas-schedule-events", JSON.stringify(events));
-    await new Promise((res) => setTimeout(res, 500));
-    router.push("/schedules");
+    try {
+      const confirmedEventIds = events
+        .filter((e) => e.event.userID)
+        .map((e) => String(e.event.eventID));
+
+      const builder = new createTimeTableBuilder();
+      await builder.send({
+        body: {
+          timetableName: name || "Generated Schedule",
+          eventIds: confirmedEventIds,
+        },
+      });
+
+      router.push("/schedules");
+    } catch (error) {
+      console.error("Failed to generate timetable:", error);
+      setIsGenerating(false);
+    }
   }
 
   function getNextLabel() {
