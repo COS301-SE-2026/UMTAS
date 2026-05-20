@@ -716,7 +716,7 @@ export interface components {
        * @default false
        * @example false
        */
-      isRecurring: Record<string, never>;
+      isRecurring: boolean;
     };
     EventDto: {
       /** @example 1 */
@@ -724,6 +724,8 @@ export interface components {
       /** @example a1b2c3d4-e5f6-7890-abcd-ef1234567890 */
       userID: string;
       eventCriteria: components["schemas"]["EventCriteriaDto"];
+      /** @example true */
+      isRecurring?: boolean;
     };
     LectureResponseDto: {
       /** @example 1 */
@@ -778,7 +780,7 @@ export interface components {
        * @default false
        * @example false
        */
-      isRecurring: Record<string, never>;
+      isRecurring: boolean;
     };
     DeleteResponseDto: {
       /**

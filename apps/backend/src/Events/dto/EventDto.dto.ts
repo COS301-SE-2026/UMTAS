@@ -71,7 +71,7 @@ export class CreateEventDto {
   @Type(() => EventCriteriaDto)
   eventCriteria!: EventCriteriaDto;
 
-  @ApiPropertyOptional({ example: false, default: false })
+  @ApiPropertyOptional({ example: false, default: false, type: Boolean })
   @IsOptional()
   @IsBoolean()
   isRecurring?: boolean;
@@ -103,8 +103,10 @@ export class EventDto {
   @ApiProperty({ type: EventCriteriaDto })
   eventCriteria!: EventCriteriaDto;
 
-  // @ApiProperty({ example: true})
-  // isRecurring: boolean;
+  @ApiPropertyOptional({ example: true, type: Boolean })
+  @IsOptional()
+  @IsBoolean()
+  isRecurring?: boolean;
 } //EventDto
 
 export class LectureResponseDto {
@@ -187,7 +189,7 @@ export class UpdateEventDto {
   @Type(() => UpdateEventCriteriaDto)
   eventCriteria?: UpdateEventCriteriaDto;
 
-  @ApiPropertyOptional({ example: false, default: false })
+  @ApiPropertyOptional({ example: false, default: false, type: Boolean })
   @IsOptional()
   @IsBoolean()
   isRecurring?: boolean;

@@ -5,8 +5,10 @@ import {
 
 import { paths } from "@/lib/api";
 
-type createEventBody =
+export type CreateEventBody =
   paths["/events"]["post"]["requestBody"]["content"]["application/json"];
+export type EventCriteria = CreateEventBody["eventCriteria"];
+
 export type createEventRes =
   paths["/events"]["post"]["responses"]["201"]["content"]["application/json"];
 
@@ -32,7 +34,7 @@ export type deleteEventByIdRes =
 
 export class createEventsBuilder extends RequestBuilder<
   undefined,
-  createEventBody,
+  CreateEventBody,
   createEventRes
 > {
   constructor() {
