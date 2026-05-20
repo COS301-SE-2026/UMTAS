@@ -30,13 +30,13 @@
 - **Push-Pull (BullMQ/Redis)** - distributes parse and optimisation jobs across stateless worker replicas.
 - **HTTP Callback** - workers notify the Core API of job completion via POST to a callback URL embedded in the job payload.
 
-![PDF Upload Sequence](../diagrams/architecture/pdf_sequence.svg)
+![SD](../diagrams/architecture/SD.svg)
 
 ---
 
 ## 4. Architectural Patterns
 
-- **Client-Server** - all frontends are thin clients; the server tier owns all state and computation.
+- **Client-Server** - all frontends are thin clients. The server tier owns all state and computation.
 - **Service-Oriented Architecture (SOA)** - solver and PDF parser are independently deployable compute services sharing the Core's data store.
 
 ---
@@ -58,5 +58,5 @@
 | C3 | PDF parsing must support, at minimum, the University of Pretoria timetable PDF format at initial delivery. | Client requirement |
 | C4 | All services must be containerisable and deployable on a standard Linux host via container orchestration. | Deployment environment |
 | C5 | SSL termination and routing must be handled by a reverse proxy positioned in front of all backend services. | Security + deployment requirement |
-| C6 | The system must be accessible via modern web browsers only; no native mobile application is required. Desktop and mobile viewports must both be supported. | Client requirement + end-user device |
+| C6 | The system must be accessible via modern web browsers only. No native mobile application is required. Desktop and mobile viewports must both be supported. | Client requirement + end-user device |
 | C7 | Monorepo tooling must support workspace-level dependency management across multiple applications (frontend, backend, solver). | Development environment |
