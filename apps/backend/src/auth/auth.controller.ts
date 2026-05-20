@@ -166,6 +166,7 @@ export class AuthController {
 
   // ─── Session management ───────────────────────────────────────────────────────
 
+  @Public()
   @ApiTags('Auth Session')
   @Get('session')
   @ApiCookieAuth('umtas-session')
