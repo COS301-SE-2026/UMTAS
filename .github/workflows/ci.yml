@@ -47,6 +47,9 @@ jobs:
       - name: Run Tests
         run: pnpm run test:unit
 
+      - name: Run Integration Tests
+        run: pnpm --filter backend test:int
+
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
         with:

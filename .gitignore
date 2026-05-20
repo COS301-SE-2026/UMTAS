@@ -120,3 +120,5 @@ Temporary Items
 working_docs/
 # Local act secrets
 .secrets
+
+.pnpm-store/
