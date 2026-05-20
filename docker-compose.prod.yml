@@ -70,7 +70,7 @@ services:
   mailhog:
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.mailhog.rule=Host(`api.${DOMAIN}`)"
+      - "traefik.http.routers.mailhog.rule=PathPrefix(`/`)"
       - "traefik.http.routers.mailhog.entrypoints=mailhog"
       - "traefik.http.services.mailhog.loadbalancer.server.port=8025"
 

@@ -139,6 +139,8 @@ services:
     build:
       context: .
       dockerfile: docker/frontend/frontend.Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=https://api.${DOMAIN}
     image: ${DOCKER_REGISTRY}:frontend-dev
     networks:
       - gateway
