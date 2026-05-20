@@ -24,4 +24,4 @@ UMTAS addresses the critical need for automated timetabling and venue management
 
 ## Scope
 
-The system covers PDF ingestion, core schedule optimization, and student preference management.
+The system covers PDF ingestion, core schedule optimisation, and student preference management.
