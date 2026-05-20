@@ -38,7 +38,6 @@
 
 - **Client-Server** - all frontends are thin clients; the server tier owns all state and computation.
 - **Service-Oriented Architecture (SOA)** - solver and PDF parser are independently deployable compute services sharing the Core's data store.
-- **Layered (n-Tier)** - Core API structured as Controller → Service → Repository.
 
 ---
 
