@@ -17,7 +17,7 @@ volumes:
 
 services:
   postgres:
-    image: postgres:15-alpine
+    image: postgres:15-alpine@sha256:df7bca0066e6f60cc3dd32faa70caddec20e2c22b58932f79498e5704b23854a
     restart: unless-stopped
     networks:
       - gateway
@@ -38,7 +38,7 @@ services:
       retries: 5
 
   redis:
-    image: redis:7-alpine
+    image: redis:7-alpine@sha256:6ab0b6e7381779332f97b8ca76193e45b0756f38d4c0dcda72dbb3c32061ab99
     restart: unless-stopped
     networks:
       - gateway
@@ -46,9 +46,14 @@ services:
     command: redis-server --requirepass ${REDIS_PASSWORD}
     volumes:
       - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   minio:
-    image: minio/minio:RELEASE.2023-09-30T07-02-29Z
+    image: minio/minio:RELEASE.2023-09-30T07-02-29Z@sha256:6262bc9a2730eeaf16be1bf436a3c2bca2ab76639f113778601a9f89c1485b56
     restart: unless-stopped
     networks:
       - gateway
@@ -64,7 +69,7 @@ services:
       - minio_data:/data
 
   mailhog:
-    image: mailhog/mailhog:latest
+    image: mailhog/mailhog@sha256:8d76a3d4ffa32a3661311944007a415332c4bb855657f4f6c57996405c009bea
     platform: linux/amd64
     networks:
       - gateway
@@ -72,6 +77,11 @@ services:
     ports:
       - "1025:1025"
       - "8025:8025"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8025/api/v2/messages"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   solver:
     build:
