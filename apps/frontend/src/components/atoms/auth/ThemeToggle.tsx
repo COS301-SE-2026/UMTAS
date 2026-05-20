@@ -1,20 +1,30 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useSyncExternalStore, useEffect } from "react";
 import { Sun, Moon } from "lucide-react";
 import { Button } from "@/components/atoms/baseShadcn/button";
 
+const THEME_KEY = "umtas-theme";
+const THEME_CHANGE = "umtas-theme-change";
+
+function getSnapshot(): boolean {
+  const stored = localStorage.getItem(THEME_KEY);
+  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  return stored === "dark" || (!stored && prefersDark);
+}
+
+function subscribe(callback: () => void): () => void {
+  const mql = window.matchMedia("(prefers-color-scheme: dark)");
+  mql.addEventListener("change", callback);
+  window.addEventListener(THEME_CHANGE, callback);
+  return () => {
+    mql.removeEventListener("change", callback);
+    window.removeEventListener(THEME_CHANGE, callback);
+  };
+}
+
 export function ThemeToggle() {
-  const [isDark, setIsDark] = useState<boolean>(() => {
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("umtas-theme");
-      const prefersDark = window.matchMedia(
-        "(prefers-color-scheme: dark)",
-      ).matches;
-      return stored === "dark" || (!stored && prefersDark);
-    }
-    return false;
-  });
+  const isDark = useSyncExternalStore(subscribe, getSnapshot, () => false);
 
   useEffect(() => {
     document.documentElement.setAttribute(
@@ -24,9 +34,8 @@ export function ThemeToggle() {
   }, [isDark]);
 
   function toggle() {
-    const next = !isDark;
-    setIsDark(next);
-    localStorage.setItem("umtas-theme", next ? "dark" : "light");
+    localStorage.setItem(THEME_KEY, isDark ? "light" : "dark");
+    window.dispatchEvent(new Event(THEME_CHANGE));
   }
 
   return (
