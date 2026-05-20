@@ -19,6 +19,12 @@ A student enrolled at a university that uses the system to access and personalis
 
 ### User Stories:
 - Login stories
+
+| User Story | User Story                                 |
+| ---------- | ------------------------------------------ |
+| US-LOGIN-1 | as a student i want to login to my account |
+| US-LOGIN-2 | as a student i want to register an account |
+| US-LOGIN-3 | as a student i want to reset my password   |
 - Builder
 
 | User Story    | User Story                                                                                                     |
