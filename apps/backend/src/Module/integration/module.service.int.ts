@@ -34,13 +34,12 @@ describe('ModuleService integration', () => {
     );
 
     expect(result).toMatchObject({
-      code: 'COS301',
-      name: 'Software Engineering',
-    });
-
-    expect(result).toMatchObject({
-      code: 'COS301',
-      name: 'Software Engineering',
+      module: {
+        moduleCode: 'COS301',
+        moduleName: 'Software Engineering',
+        moduleDescription: 'Capstone module',
+        userID: '00000000-0000-0000-0000-000000000001',
+      },
     });
   });
 });
