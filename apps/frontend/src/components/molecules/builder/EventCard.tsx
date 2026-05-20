@@ -24,6 +24,7 @@ export interface EventErrors {
   date?: string;
   time?: string;
   moduleId?: string;
+  venue?: string;
 }
 
 interface EventCardProps {
@@ -133,7 +134,7 @@ export function EventCard({
   return (
     <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.08)]">
       <div className="flex flex-col gap-4 p-4">
-        {/* name - mapped to moduleCode for now since DTO doesn't have name */}
+        {/* name */}
         <div className="flex flex-col gap-2">
           <Label
             htmlFor={"event-name-" + event.event.eventID}
@@ -143,7 +144,7 @@ export function EventCard({
           </Label>
           <Input
             id={"event-name-" + event.event.eventID}
-            value={event.event.eventCriteria?.moduleCode || ""}
+            value={event.event.name || ""}
             onChange={(e) =>
               onUpdate(event.event.eventID, "name", e.target.value)
             }
@@ -155,7 +156,7 @@ export function EventCard({
           )}
         </div>
 
-        {/* code - also mapped to moduleCode */}
+        {/* code */}
         <div className="flex flex-col gap-2">
           <Label
             htmlFor={"event-code-" + event.event.eventID}
@@ -165,7 +166,7 @@ export function EventCard({
           </Label>
           <Input
             id={"event-code-" + event.event.eventID}
-            value={event.event.eventCriteria?.moduleCode || ""}
+            value={event.event.code || ""}
             onChange={(e) =>
               onUpdate(event.event.eventID, "code", e.target.value)
             }
@@ -175,6 +176,28 @@ export function EventCard({
           />
           {errors?.code && (
             <p className="text-sm text-[var(--error-text)]">{errors.code}</p>
+          )}
+        </div>
+
+        {/* venue */}
+        <div className="flex flex-col gap-2">
+          <Label
+            htmlFor={"event-venue-" + event.event.eventID}
+            className="text-sm font-medium text-[var(--text-secondary)]"
+          >
+            Venue
+          </Label>
+          <Input
+            id={"event-venue-" + event.event.eventID}
+            value={event.event.eventCriteria?.venue || ""}
+            onChange={(e) =>
+              onUpdate(event.event.eventID, "venue", e.target.value)
+            }
+            placeholder="e.g. IT 2-26"
+            className={getInputClass(!!errors?.venue)}
+          />
+          {errors?.venue && (
+            <p className="text-sm text-[var(--error-text)]">{errors.venue}</p>
           )}
         </div>
 
@@ -188,12 +211,11 @@ export function EventCard({
           </Label>
           <Input
             id={"event-date-" + event.event.eventID}
-            type="text"
+            type="date"
             value={event.event.eventCriteria?.day || ""}
             onChange={(e) =>
               onUpdate(event.event.eventID, "date", e.target.value)
             }
-            placeholder="e.g. Monday"
             className={getInputClass(!!errors?.date)}
           />
           {errors?.date && (

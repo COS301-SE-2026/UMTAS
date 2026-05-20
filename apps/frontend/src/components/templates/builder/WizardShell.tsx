@@ -17,6 +17,7 @@ import {
 } from "@/app/builder/utils/modules/requestBuilders";
 import {
   getAllEventsBuilder,
+  createEventsBuilder,
   type EventResponse,
 } from "@/app/builder/utils/events/eventRequestBuilder";
 
@@ -120,17 +121,116 @@ export function WizardShell() {
   }
 
   function handleEventAdd() {
-    // Placeholder for now
-    console.log("Add event requested");
+    const newEventId = Number(generateId());
+    setEvents((prev) => [
+      ...prev,
+      {
+        event: {
+          eventID: newEventId,
+          userID: "",
+          name: "",
+          code: "",
+          eventCriteria: {
+            day: "",
+            startTime: "",
+            endTime: "",
+            type: "lecture",
+            moduleCode: "",
+            venue: "",
+          },
+          isRecurring: false,
+        },
+      },
+    ]);
   }
 
-  function handleEventUpdate(
+  async function handleEventUpdate(
     id: number,
     field: string,
     value: string | boolean,
   ) {
-    // Placeholder for now
-    console.log("Update event requested", id, field, value);
+    if (field === "confirm") {
+      const targetEvent = events.find((e) => e.event.eventID === id);
+      if (!targetEvent) return;
+
+      try {
+        const builder = new createEventsBuilder();
+        await builder.send({
+          body: {
+            name: targetEvent.event.name,
+            code: targetEvent.event.code,
+            eventCriteria: {
+              day: targetEvent.event.eventCriteria.day,
+              startTime: targetEvent.event.eventCriteria.startTime,
+              endTime: targetEvent.event.eventCriteria.endTime,
+              type: targetEvent.event.eventCriteria.type || "lecture",
+              moduleCode: targetEvent.event.eventCriteria.moduleCode,
+              venue: targetEvent.event.eventCriteria.venue,
+            },
+            isRecurring: targetEvent.event.isRecurring || false,
+          },
+        });
+        setEventsTrigger((prev) => prev + 1);
+      } catch (error) {
+        console.error("Failed to create event:", error);
+      }
+      return;
+    }
+
+    setEvents((prev) =>
+      prev.map((e) => {
+        if (e.event.eventID === id) {
+          if (field === "name" || field === "code") {
+            return {
+              ...e,
+              event: {
+                ...e.event,
+                [field]: value,
+              },
+            };
+          }
+
+          if (field === "moduleId") {
+            const selectedModule = modules.find(
+              (m) => m.moduleID === Number(value),
+            );
+            return {
+              ...e,
+              event: {
+                ...e.event,
+                eventCriteria: {
+                  ...e.event.eventCriteria,
+                  moduleCode: selectedModule?.moduleCode || "",
+                },
+              },
+              lecture: {
+                ...e.lecture,
+                lectureID: e.lecture?.lectureID || 0,
+                eventID: id,
+                moduleID: Number(value),
+              },
+            };
+          }
+
+          const fieldMap: Record<string, string> = {
+            date: "day",
+          };
+          const criteriaField = fieldMap[field] || field;
+
+          return {
+            ...e,
+            event: {
+              ...e.event,
+              eventCriteria: {
+                ...e.event.eventCriteria,
+                [criteriaField]: value,
+              },
+            },
+          };
+        }
+        return e;
+      }),
+    );
   }
 
   function handleEventRemove(id: number) {

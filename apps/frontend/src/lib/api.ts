@@ -710,6 +710,10 @@ export interface components {
       venue?: string;
     };
     CreateEventDto: {
+      /** @example event name */
+      name?: string;
+      /** @example lec1 */
+      code?: string;
       /** @description Criteria for an event */
       eventCriteria: components["schemas"]["EventCriteriaDto"];
       /**
@@ -723,6 +727,10 @@ export interface components {
       eventID: number;
       /** @example a1b2c3d4-e5f6-7890-abcd-ef1234567890 */
       userID: string;
+      /** @example event name */
+      name?: string;
+      /** @example lec1 */
+      code?: string;
       eventCriteria: components["schemas"]["EventCriteriaDto"];
       /** @example true */
       isRecurring?: boolean;
@@ -742,6 +750,8 @@ export interface components {
        * @example {
        *       "eventID": 1,
        *       "userID": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+       *       "name": "eventnameidk",
+       *       "code": "lec1",
        *       "eventCriteria": {
        *         "day": "Monday",
        *         "startTime": "08:30",
@@ -774,6 +784,10 @@ export interface components {
       venue?: string;
     };
     UpdateEventDto: {
+      /** @example event name */
+      name?: string;
+      /** @example lec1 */
+      code?: string;
       /** @description Event update criteria */
       eventCriteria?: components["schemas"]["UpdateEventCriteriaDto"];
       /**

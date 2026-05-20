@@ -40,12 +40,16 @@ function validateEvent(event: EventResponse): {
 
   const criteria = event.event.eventCriteria;
 
-  if (!criteria?.moduleCode?.trim()) {
-    errors.name = "Name/Code is required";
+  if (!event.event.name?.trim()) {
+    errors.name = "Name is required";
+    hasErrors = true;
+  }
+  if (!event.event.code?.trim()) {
+    errors.code = "Code is required";
     hasErrors = true;
   }
   if (!criteria?.day) {
-    errors.date = "Day is required";
+    errors.date = "Date is required";
     hasErrors = true;
   }
   if (!criteria?.startTime || !criteria?.endTime) {
@@ -70,7 +74,8 @@ function validateEvent(event: EventResponse): {
 
 function isEventComplete(event: EventResponse) {
   const criteria = event.event.eventCriteria;
-  if (!criteria?.moduleCode) return false;
+  if (!event.event.name) return false;
+  if (!event.event.code) return false;
   if (!criteria?.day) return false;
   if (!criteria?.startTime) return false;
   if (!criteria?.endTime) return false;
@@ -117,7 +122,8 @@ export function EventsStep({
     if (snapshot) {
       const id = snapshot.event.eventID;
       const crit = snapshot.event.eventCriteria;
-      onUpdate(id, "name", crit?.moduleCode || "");
+      onUpdate(id, "name", snapshot.event.name || "");
+      onUpdate(id, "code", snapshot.event.code || "");
       onUpdate(id, "date", crit?.day || "");
       onUpdate(id, "startTime", crit?.startTime || "");
       onUpdate(id, "endTime", crit?.endTime || "");
@@ -171,6 +177,7 @@ export function EventsStep({
       delete next[id];
       return next;
     });
+    onUpdate(id, "confirm", "");
     setIsDirty(false);
     setSnapshot(null);
     setSelectedId(null);
@@ -246,9 +253,16 @@ export function EventsStep({
           >
             <div className="flex-1 min-w-0">
               <p className="text-base font-medium text-[var(--text-primary)] truncate">
-                {criteria?.moduleCode || "Event " + (index + 1)}
+                {event.event.name ||
+                  criteria?.moduleCode ||
+                  "Event " + (index + 1)}
               </p>
               <div className="flex flex-wrap items-center gap-2 mt-0.5">
+                {event.event.code && (
+                  <p className="text-sm font-mono text-[var(--text-secondary)]">
+                    {event.event.code}
+                  </p>
+                )}
                 {criteria?.day && (
                   <p className="text-sm text-[var(--text-secondary)]">
                     {criteria.day}
