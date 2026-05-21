@@ -270,6 +270,14 @@ CORS_ORIGIN=${CORS_ORIGIN}
 GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:-}
 GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET:-}
 
+# ─── SMTP / Email ─────────────────────────────────────────
+SMTP_HOST=mailserver
+SMTP_PORT=25
+SMTP_SECURE=false
+SMTP_USER=
+SMTP_PASS=
+SMTP_FROM=UMTAS <noreply@${DOMAIN}>
+
 # ─── Seeding ──────────────────────────────────────────────
 SEED=${SEED}
 SEED_TASKS=default-system-admin

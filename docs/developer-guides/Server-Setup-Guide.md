@@ -62,3 +62,9 @@ Every config file is stored in the `/infra` folder. This ensures that there are 
 - **Tech:** Watchtower
 - **Why:** Auto-updates our containers when new images are pushed to the registry.
 - **Config:** Watchtower runs every hour.
+
+### Mail Server
+
+- **Tools:** `infra/init.sh` for the root `.env`, then `infra/mail_setup.sh` for the mailserver
+- **Use:** Run `bash infra/init.sh` to generate the server env, then `bash infra/mail_setup.sh bootstrap` over SSH to create `/opt/mailserver`, write the compose/env files, and start `docker-mailserver`.
+- **Mailbox CLI:** Use `bash infra/mail_setup.sh add-user user@domain` and `bash infra/mail_setup.sh add-alias alias@domain target@domain` after bootstrap.

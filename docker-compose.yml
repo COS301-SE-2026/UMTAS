@@ -14,6 +14,9 @@ volumes:
   prometheus_data:
   loki_data:
   letsencrypt_data:
+  mailserver_mail:
+  mailserver_state:
+  mailserver_logs:
 
 services:
   postgres:
@@ -63,6 +66,53 @@ services:
     volumes:
       - minio_data:/data
 
+  mailserver:
+    image: ghcr.io/docker-mailserver/docker-mailserver:latest
+    container_name: mailserver
+    hostname: mail.${DOMAIN}
+    restart: always
+    stop_grace_period: 1m
+    cap_add:
+      - NET_ADMIN
+    networks:
+      - gateway
+      - internal
+    ports:
+      - "25:25"
+      - "465:465"
+      - "587:587"
+      - "993:993"
+    environment:
+      OVERRIDE_HOSTNAME: mail.${DOMAIN}
+      DOMAINNAME: ${DOMAIN}
+      POSTMASTER_ADDRESS: postmaster@${DOMAIN}
+      SSL_TYPE: letsencrypt
+      ENABLE_SASLAUTHD: "0"
+      PERMIT_DOCKER: network
+      POSTFIX_INET_PROTOCOLS: ipv4
+      ENABLE_DOVECOT: "1"
+      DOVECOT_MAILBOX_FORMAT: maildir
+      ENABLE_SPAMASSASSIN: "0"
+      ENABLE_CLAMAV: "0"
+      ENABLE_FAIL2BAN: "0"
+      LOG_LEVEL: info
+    volumes:
+      - mailserver_mail:/var/mail
+      - mailserver_state:/var/mail-state
+      - mailserver_logs:/var/log/mail
+      - ./infra/mailserver:/tmp/docker-mailserver
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "ss --listening --tcp | grep -P 'LISTEN.+:smtp' || exit 1",
+        ]
+      timeout: 3s
+      retries: 5
+    profiles:
+      - server
+
   mailhog:
     image: mailhog/mailhog:latest
     platform: linux/amd64
@@ -72,6 +122,10 @@ services:
     ports:
       - "1025:1025"
       - "8025:8025"
+    profiles:
+      - dev-docker
+      - dev-infra
+      - dev-pglite
 
   solver:
     build:
@@ -109,6 +163,12 @@ services:
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
       - REDIS_URL=${REDIS_URL}
       - SYSTEM_ADMIN_USER_IDS=${SYSTEM_ADMIN_USER_IDS}
+      - SMTP_HOST=${SMTP_HOST:-mailhog}
+      - SMTP_PORT=${SMTP_PORT:-1025}
+      - SMTP_SECURE=${SMTP_SECURE:-false}
+      - SMTP_USER=${SMTP_USER:-}
+      - SMTP_PASS=${SMTP_PASS:-}
+      - SMTP_FROM=${SMTP_FROM:-UMTAS <noreply@${DOMAIN}>}
     healthcheck:
       test:
         [
