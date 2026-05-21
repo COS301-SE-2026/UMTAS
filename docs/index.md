@@ -76,6 +76,14 @@ Get up and running with the UMTAS platform in minutes.
 
     [:octicons-arrow-right-24: Team Profiles](management/Team-Profiles.md)
 
+-   :material-web:{ .lg .middle } __Live Application__
+
+    ---
+
+    Access the deployed UMTAS platform running in our production environment.
+
+    [:octicons-arrow-right-24: Open App](https://capstone-vigil.dns.net.za/){ target="_blank" }
+
 </div>
 
 ---
