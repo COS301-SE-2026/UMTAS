@@ -13,7 +13,7 @@ COPY packages/shared-types/ ./packages/shared-types/
 COPY apps/backend/ ./apps/backend/
 RUN pnpm --filter=shared-types build
 RUN pnpm --filter=backend build
-RUN pnpm --filter=backend deploy --prod --legacy /deploy && cp -r apps/backend/dist /deploy/dist
+RUN pnpm --filter=backend deploy --prod --legacy /deploy && cp -r apps/backend/dist /deploy/dist && cp -r apps/backend/drizzle /deploy/drizzle
 
 FROM node:22-alpine AS runtime
 WORKDIR /app

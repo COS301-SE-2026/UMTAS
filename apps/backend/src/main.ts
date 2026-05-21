@@ -4,7 +4,10 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { collectDefaultMetrics, register } from 'prom-client';
 import type { Request, Response } from 'express';
 import { join } from 'path';
+import { migrate } from 'drizzle-orm/node-postgres/migrator';
 import { AppModule } from './app.module';
+import { DatabaseService } from './db/database.service';
+import { DB_MODES } from './db/database.constants';
 import {
   swaggerCustomCss,
   swaggerCustomJs,
@@ -15,6 +18,16 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.useStaticAssets(join(__dirname, '..', 'public'));
   const port = process.env.PORT ?? 3001;
+
+  if (process.env.NODE_ENV !== 'production') {
+    const dbService = app.get(DatabaseService);
+    if (dbService.dbMode !== DB_MODES.PGLITE) {
+      await migrate(dbService.db as any, {
+        migrationsFolder: join(__dirname, '..', 'drizzle'),
+      });
+      console.log('[STARTUP] Database migrations applied');
+    }
+  }
 
   app.enableCors({
     origin: [
