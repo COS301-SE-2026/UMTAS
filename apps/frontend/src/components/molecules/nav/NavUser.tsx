@@ -16,6 +16,7 @@ export function NavUser({ name: nameProp }: NavUserProps) {
   const { data: session } = useSession();
 
   const name = session?.user?.name ?? nameProp;
+  const isLoggedIn = !!session?.user;
 
   async function handleSignOut() {
     await signOut({
@@ -29,20 +30,24 @@ export function NavUser({ name: nameProp }: NavUserProps) {
     <div className="flex items-center gap-3">
       <ThemeToggle />
 
-      <div className="flex items-center gap-2">
-        <UserAvatar name={name} />
-      </div>
+      {isLoggedIn && (
+        <>
+          <div className="flex items-center gap-2">
+            <UserAvatar name={name} />
+          </div>
 
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={handleSignOut}
-        aria-label="Sign out"
-        className="gap-1.5 text-[--text-secondary] hover:text-[--text-primary]"
-      >
-        <LogOut size={15} aria-hidden />
-        <span className="hidden sm:inline">Sign out</span>
-      </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleSignOut}
+            aria-label="Sign out"
+            className="gap-1.5 text-[--text-secondary] hover:text-[--text-primary]"
+          >
+            <LogOut size={15} aria-hidden />
+            <span className="hidden sm:inline">Sign out</span>
+          </Button>
+        </>
+      )}
     </div>
   );
 }

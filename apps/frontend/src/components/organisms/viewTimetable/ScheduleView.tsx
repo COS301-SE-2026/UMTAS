@@ -111,6 +111,12 @@ export function ScheduleView({
     return { events: [], modules: [] };
   }, [selectedTimetableId, timetables, allEvents, allModules]);
 
+  const weekStarts = useMemo(() => getAllWeekStarts(events), [events]);
+  const resolvedEvents = useMemo(
+    () => resolveScheduleEvents(events, modules),
+    [events, modules],
+  );
+
   useEffect(() => {
     onModuleCountChange(modules.length);
     onEventCountChange(events.length);
@@ -124,9 +130,7 @@ export function ScheduleView({
   useEffect(() => {
     onExportReady(doExport);
   }, [doExport, onExportReady]);
-  const weekStarts = getAllWeekStarts(events);
   const currentWeekStart = weekStarts[currentWeekIndex] ?? null;
-  const resolvedEvents = resolveScheduleEvents(events, modules);
 
   function handlePrevWeek() {
     if (currentWeekIndex > 0) {
@@ -182,7 +186,10 @@ export function ScheduleView({
         <div className="w-64">
           <Select
             value={selectedTimetableId}
-            onValueChange={setSelectedTimetableId}
+            onValueChange={(newValue) => {
+              setSelectedTimetableId(newValue);
+              setCurrentWeekIndex(0); // Reset the week index here instead!
+            }}
           >
             <SelectTrigger className="bg-[var(--bg-surface)] border-[var(--border)]">
               <SelectValue placeholder="Select a timetable" />
