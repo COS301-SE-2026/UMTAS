@@ -72,7 +72,7 @@ export class MailerService {
     } catch (error) {
       this.logger.error(
         `[MAIL] ✗ Failed to send email to ${options.to} (${emailType}): ${error instanceof Error ? error.message : String(error)}`,
-        error,
+        error instanceof Error ? error.stack : error,
       );
       // Don't throw: email is optional in dev. Background tasks should not fail due to email.
     }

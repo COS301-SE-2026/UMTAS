@@ -271,12 +271,13 @@ GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET:-}
 
 # ─── Email (SMTP) ─────────────────────────────────────────
 # Defaults to mailhog container - override for real SMTP
-SMTP_HOST=${SMTP_HOST:-mailhog}
-SMTP_PORT=${SMTP_PORT:-1025}
-SMTP_SECURE=${SMTP_SECURE:-false}
-SMTP_USER=${SMTP_USER:-}
-SMTP_PASS=${SMTP_PASS:-}
-SMTP_FROM=${SMTP_FROM:-UMTAS <noreply@umtas.co.za>}
+MAIL_HOST=${MAIL_HOST:-mailhog}
+MAIL_PORT=${MAIL_PORT:-1025}
+MAIL_SECURE=${MAIL_SECURE:-false}
+MAIL_SERVICE=${MAIL_SERVICE:-}
+MAIL_USER=${MAIL_USER:-}
+MAIL_PASS=${MAIL_PASS:-}
+MAIL_FROM=${MAIL_FROM:-UMTAS <noreply@umtas.co.za>}
 
 # ─── Seeding ──────────────────────────────────────────────
 SEED=${SEED}
