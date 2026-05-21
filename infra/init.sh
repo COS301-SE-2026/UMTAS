@@ -91,6 +91,7 @@ generate_secrets() {
 setup_infra() {
     section "Infrastructure"
 
+    prompt_required IMAGE_TAG "Docker image tag (e.g. latest, v1.0.0, sha-abc1234)"
     prompt_required DOMAIN "Domain (e.g. example.com)"
     prompt_required LETSENCRYPT_EMAIL "Let's Encrypt email"
     printf "${YELLOW}Hint: generate with: htpasswd -nb admin YOUR_PASSWORD | sed -e 's/\\\$/\\\$\\\$/g'${RESET}\n"
@@ -116,6 +117,18 @@ setup_app() {
     else
         GOOGLE_CLIENT_SECRET=""
     fi
+}
+
+setup_smtp() {
+    section "SMTP / Email (Resend)"
+
+    prompt_required SMTP_FROM_NAME "From display name" "UMTAS"
+    prompt_secret SMTP_PASS "Resend API key"
+    SMTP_HOST="smtp.resend.com"
+    SMTP_PORT="465"
+    SMTP_SECURE="true"
+    SMTP_USER="resend"
+    SMTP_FROM="${SMTP_FROM_NAME} <noreply@${DOMAIN}>"
 }
 
 setup_seeding() {
@@ -152,6 +165,7 @@ validate_all() {
 
     # Required fields
     local required_vars=(
+        IMAGE_TAG
         DOMAIN LETSENCRYPT_EMAIL TRAEFIK_DASHBOARD_CREDENTIALS
         DOCKERHUB_USERNAME DOCKERHUB_TOKEN
         BETTER_AUTH_URL BETTER_AUTH_TRUSTED_ORIGINS CORS_ORIGIN
@@ -198,6 +212,12 @@ validate_all() {
         ((errors++))
     fi
 
+    # SMTP key
+    if [[ -z "${SMTP_PASS:-}" ]]; then
+        printf "${YELLOW}  WARN: SMTP_PASS empty - email delivery will fail${RESET}\n"
+        ((warnings++))
+    fi
+
     # Google OAuth partial config
     if [[ -n "${GOOGLE_CLIENT_ID:-}" && -z "${GOOGLE_CLIENT_SECRET:-}" ]]; then
         printf "${YELLOW}  WARN: GOOGLE_CLIENT_ID set but GOOGLE_CLIENT_SECRET empty - OAuth will fail${RESET}\n"
@@ -228,6 +248,7 @@ LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
 
 PROJECT_NAME=umtas
 DOCKER_REGISTRY=${DOCKERHUB_USERNAME}/umtas
+IMAGE_TAG=${IMAGE_TAG}
 
 TRAEFIK_DASHBOARD_CREDENTIALS=${TRAEFIK_DASHBOARD_CREDENTIALS}
 
@@ -269,13 +290,13 @@ CORS_ORIGIN=${CORS_ORIGIN}
 GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:-}
 GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET:-}
 
-# ─── SMTP / Email ─────────────────────────────────────────
-SMTP_HOST=mailserver
-SMTP_PORT=25
-SMTP_SECURE=false
-SMTP_USER=
-SMTP_PASS=
-SMTP_FROM=UMTAS <noreply@${DOMAIN}>
+# ─── SMTP / Email (Resend) ────────────────────────────────
+SMTP_HOST=${SMTP_HOST}
+SMTP_PORT=${SMTP_PORT}
+SMTP_SECURE=${SMTP_SECURE}
+SMTP_USER=${SMTP_USER}
+SMTP_PASS=${SMTP_PASS}
+SMTP_FROM=${SMTP_FROM}
 
 # ─── Seeding ──────────────────────────────────────────────
 SEED=${SEED}
@@ -327,6 +348,7 @@ main() {
     # Collect prompted values
     setup_infra
     setup_app
+    setup_smtp
     setup_seeding
 
     # Validate
