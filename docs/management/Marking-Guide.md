@@ -21,7 +21,7 @@ This document provides a direct mapping from the project requirements (as per th
 
 | Requirement           | Documentation Section                         |
 | :-------------------- | :-------------------------------------------- |
-| **4.2.1 Brand Style** | [4.2.1 Brand Style](../design/Brand-Style.md) |
+| **4.2.1 Brand Style** | [4.2.1 Brand Style](https://brand.capstone-vigil.dns.net.za/) |
 | **4.2.2 Wireframes**  | [4.2.2 Wireframes](../design/Wireframes.md)   |
 
 ## 5 Base Features
@@ -29,7 +29,7 @@ This document provides a direct mapping from the project requirements (as per th
 | Feature                    | Implementation Status                                                                    |
 | :------------------------- | :--------------------------------------------------------------------------------------- |
 | **Registration and Login** | [Functional Requirements](../requirements/Functional-Requirements.md#registration-login) |
-| **Basic Themes**           | [Brand Style](../design/Brand-Style.md#themes)                                           |
+| **Basic Themes**           | [Brand Style](https://brand.capstone-vigil.dns.net.za/)                                  |
 | **Form Validation**        | [Functional Requirements](../requirements/Functional-Requirements.md#form-validation)    |
 
 ---
@@ -37,5 +37,4 @@ This document provides a direct mapping from the project requirements (as per th
 ## :material-map: Quick Navigation
 
 - [Home Page](../index.md)
-- [All Diagrams](../diagrams/README.md)
 - [API Reference](../api/API-Reference.md)
