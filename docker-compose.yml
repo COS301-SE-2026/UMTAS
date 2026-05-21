@@ -111,14 +111,27 @@ services:
       - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
       - DB_MODE=${DB_MODE}
       - SEED=${SEED}
+      - SEED_TASKS=${SEED_TASKS}
+      - SEED_SYSTEM_ADMIN_NAME=${SEED_SYSTEM_ADMIN_NAME}
+      - SEED_SYSTEM_ADMIN_EMAIL=${SEED_SYSTEM_ADMIN_EMAIL}
+      - SEED_SYSTEM_ADMIN_PASSWORD=${SEED_SYSTEM_ADMIN_PASSWORD}
+      - SEED_TEST_PASSWORD=${SEED_TEST_PASSWORD}
       - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
       - BETTER_AUTH_URL=https://api.${DOMAIN}
       - BETTER_AUTH_TRUSTED_ORIGINS=https://${DOMAIN}
       - CORS_ORIGIN=https://${DOMAIN}
+      - NEXT_PUBLIC_APP_URL=https://${DOMAIN}
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
       - REDIS_URL=${REDIS_URL}
       - SYSTEM_ADMIN_USER_IDS=${SYSTEM_ADMIN_USER_IDS}
+      - MAIL_HOST=${MAIL_HOST:-mailhog}
+      - MAIL_PORT=${MAIL_PORT:-1025}
+      - MAIL_SECURE=${MAIL_SECURE:-false}
+      - MAIL_SERVICE=${MAIL_SERVICE:-}
+      - MAIL_USER=${MAIL_USER:-}
+      - MAIL_PASS=${MAIL_PASS:-}
+      - MAIL_FROM=${MAIL_FROM:-UMTAS <noreply@umtas.co.za>}
     healthcheck:
       test:
         [
@@ -138,12 +151,13 @@ services:
     build:
       context: .
       dockerfile: docker/frontend/frontend.Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=https://api.${DOMAIN}
     image: ${DOCKER_REGISTRY}:frontend-${IMAGE_TAG}
     networks:
       - gateway
     environment:
-      - NEXT_PUBLIC_API_URL=https://api.${DOMAIN}
-      - API_URL=https://api.${DOMAIN}
+      - API_URL=http://backend:${BACKEND_PORT}
     healthcheck:
       test:
         [

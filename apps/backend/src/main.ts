@@ -42,7 +42,7 @@ async function bootstrap() {
     })
     .addBearerAuth(undefined, 'bearer')
     .addServer(`http://localhost:${port}`, 'Local development')
-    .addServer('https://api.umtas.co.za', 'Production')
+    .addServer('https://api.capstone-vigil.dns.net.za', 'Production')
     .addTag('Health', 'System health checks')
     .addTag('Auth Email', 'Email-based authentication and account management')
     .addTag('Auth Google', 'Google OAuth and account linking')

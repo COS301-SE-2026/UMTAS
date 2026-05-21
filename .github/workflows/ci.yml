@@ -22,6 +22,7 @@ jobs:
       checks: write
     env:
       NEXT_TELEMETRY_DISABLED: 1
+      NEXT_PUBLIC_API_URL: https://api.${{ secrets.PROD_DOMAIN }}
 
     steps:
       - name: Checkout code
@@ -115,6 +116,8 @@ jobs:
           file: docker/frontend/frontend.Dockerfile
           push: false
           load: true
+          build-args: |
+            NEXT_PUBLIC_API_URL=https://api.${{ secrets.PROD_DOMAIN }}
           tags: umtas-frontend:ci
           cache-from: type=gha,scope=frontend-main
 
@@ -167,6 +170,8 @@ jobs:
           context: .
           file: docker/frontend/frontend.Dockerfile
           push: true
+          build-args: |
+            NEXT_PUBLIC_API_URL=https://api.${{ secrets.PROD_DOMAIN }}
           tags: |
             vigilcs/umtas:frontend-${{ steps.tag.outputs.suffix }}
             vigilcs/umtas:frontend-${{ steps.tag.outputs.sha }}

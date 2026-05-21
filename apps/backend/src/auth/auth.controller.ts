@@ -96,7 +96,7 @@ export class AuthController {
   })
   @ApiResponse({
     status: 429,
-    description: 'Rate limited — max 100 requests per 60 seconds',
+    description: 'Rate limited - max 100 requests per 60 seconds',
   })
   async signUpEmail(
     @Req() req: IncomingMessage,
@@ -122,7 +122,7 @@ export class AuthController {
   })
   @ApiResponse({
     status: 400,
-    description: 'Email not verified — must verify before signing in',
+    description: 'Email not verified - must verify before signing in',
     schema: { example: { error: 'EMAIL_NOT_VERIFIED' } },
   })
   @ApiResponse({
@@ -166,6 +166,7 @@ export class AuthController {
 
   // ─── Session management ───────────────────────────────────────────────────────
 
+  @Public()
   @ApiTags('Auth Session')
   @Get('session')
   @ApiCookieAuth('umtas-session')
@@ -246,7 +247,7 @@ export class AuthController {
   }
 
   // ─── Email verification ───────────────────────────────────────────────────────
-
+  @Public()
   @ApiTags('Auth Email')
   @Post('send-verification-email')
   @ApiCookieAuth('umtas-session')
@@ -315,7 +316,7 @@ export class AuthController {
   @ApiResponse({
     status: 200,
     description:
-      'Reset email sent. Always returns 200 — does not reveal whether the email exists.',
+      'Reset email sent. Always returns 200 - does not reveal whether the email exists.',
     schema: { example: {} },
   })
   @ApiResponse({ status: 429, description: 'Rate limited' })
@@ -348,7 +349,7 @@ export class AuthController {
         >;
         if (typeof parsed.email === 'string') email = parsed.email;
       } catch {
-        // Non-JSON body — fall through
+        // Non-JSON body - fall through
       }
       // Re-inject buffered body so BetterAuth can read the stream
       reqForBetterAuth = Object.assign(Readable.from([rawBody]), {
@@ -455,7 +456,7 @@ export class AuthController {
   @ApiOperation({
     summary: 'Google OAuth callback',
     description:
-      'Handles the redirect from Google after OAuth authorisation. Not intended to be called directly — Google redirects the browser here automatically.',
+      'Handles the redirect from Google after OAuth authorisation. Not intended to be called directly - Google redirects the browser here automatically.',
     operationId: 'googleOAuthCallback',
   })
   @ApiQuery({
@@ -536,7 +537,7 @@ export class AuthController {
   @RequiresFreshSession()
   @ApiCookieAuth('umtas-session')
   @ApiOperation({
-    summary: 'Create a new user — requires sys_admin role',
+    summary: 'Create a new user - requires sys_admin role',
     operationId: 'adminCreateUser',
   })
   @ApiBody({ type: AdminCreateUserDto })
@@ -572,7 +573,7 @@ export class AuthController {
   @RequiresFreshSession()
   @ApiCookieAuth('umtas-session')
   @ApiOperation({
-    summary: 'Impersonate a user — requires sys_admin role',
+    summary: 'Impersonate a user - requires sys_admin role',
     operationId: 'adminImpersonateUser',
   })
   @ApiBody({ type: AdminImpersonateUserDto })
@@ -603,7 +604,7 @@ export class AuthController {
   @RequiresFreshSession()
   @ApiCookieAuth('umtas-session')
   @ApiOperation({
-    summary: 'Ban a user — requires sys_admin role',
+    summary: 'Ban a user - requires sys_admin role',
     operationId: 'adminBanUser',
   })
   @ApiBody({ type: AdminBanUserDto })
@@ -639,7 +640,7 @@ export class AuthController {
   @RequiresFreshSession()
   @ApiCookieAuth('umtas-session')
   @ApiOperation({
-    summary: "Update a user's details — requires sys_admin role",
+    summary: "Update a user's details - requires sys_admin role",
     operationId: 'adminUpdateUser',
   })
   @ApiBody({ type: AdminUpdateUserDto })

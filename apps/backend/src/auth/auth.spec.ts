@@ -41,7 +41,7 @@ describe('mapGoogleProfileToUser', () => {
   });
 });
 
-describe('createAuth — URL rewrite', () => {
+describe('createAuth - URL rewrite', () => {
   const mockLogger: LoggerService = {
     log: jest.fn(),
     warn: jest.fn(),
@@ -327,7 +327,7 @@ describe('createAuth — URL rewrite', () => {
   });
 });
 
-describe('createAuth — databaseHooks', () => {
+describe('createAuth - databaseHooks', () => {
   const mockLogger: LoggerService = {
     log: jest.fn(),
     warn: jest.fn(),
@@ -413,7 +413,7 @@ describe('createAuth — databaseHooks', () => {
         { email: 'x@x.com' },
         makeCtx('sys_admin'),
       );
-      // sys_admin returns { data } unchanged — input had no role, so output has no role
+      // sys_admin returns { data } unchanged - input had no role, so output has no role
       expect(result.data.role).toBeUndefined();
     });
 
@@ -571,7 +571,7 @@ describe('createAuth — databaseHooks', () => {
     });
   });
 
-  describe('createAuth — initialization', () => {
+  describe('createAuth - initialization', () => {
     it('sets useSecureCookies based on isProduction', () => {
       (betterAuth as jest.Mock).mockClear();
       createAuth({
