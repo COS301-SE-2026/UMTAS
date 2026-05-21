@@ -21,8 +21,7 @@ import { AuthDivider } from "@/components/molecules/OAuth/AuthDivider";
 import { AuthAlert } from "@/components/molecules/OAuth/AuthAlert";
 import { signIn } from "@/../utilities/auth-client";
 
-const getAppUrl = () =>
-  process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3001";
+const getAppUrl = () => window.location.origin;
 
 function mapAuthError(message: string): string {
   if (

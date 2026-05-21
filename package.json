@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "turbo run test",
-    "test:unit": "turbo run test --filter=!./apps/e2e -- --coverage --passWithNoTests",
+    "test:unit": "turbo run test --filter=!./apps/e2e -- --coverage",
     "dev": "turbo run dev",
     "dev:infra": "docker compose up -d postgres redis minio solver mailhog",
     "dev:monitor": "docker compose --profile dev-docker --profile monitoring up --build",

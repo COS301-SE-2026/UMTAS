@@ -37,12 +37,18 @@ export class MailerService {
         this.logger.log('Mailer verification succeeded');
       }
     } catch (error) {
-      this.logger.error('Mailer verification failed', error);
-      throw error;
+      this.logger.warn('Mailer verification failed (SMTP unavailable)', error);
+      // Don't throw: email is optional and SMTP may not be configured.
+      // The application should continue to operate.
     }
   }
 
   async sendMail(options: SendMailOptions): Promise<void> {
+    const emailType = options.template || 'text';
+    this.logger.log(
+      `[MAIL] Attempting to send email to ${options.to} (${emailType}): "${options.subject}"`,
+    );
+
     try {
       const mailOptions: ISendMailOptions = {
         to: options.to,
@@ -61,12 +67,12 @@ export class MailerService {
 
       await this.mailerService.sendMail(mailOptions);
       this.logger.log(
-        `Email sent to ${options.to} (${options.template || 'text'})`,
+        `[MAIL] ✓ Successfully sent email to ${options.to} (${emailType})`,
       );
     } catch (error) {
-      this.logger.warn(
-        `Failed to send email to ${options.to}. Email service may be unavailable.`,
-        error,
+      this.logger.error(
+        `[MAIL] ✗ Failed to send email to ${options.to} (${emailType}): ${error instanceof Error ? error.message : String(error)}`,
+        error instanceof Error ? error.stack : error,
       );
       // Don't throw: email is optional in dev. Background tasks should not fail due to email.
     }
@@ -86,6 +92,9 @@ export class MailerService {
     name: string;
     url: string;
   }): Promise<void> {
+    this.logger.log(
+      `[MAIL] Sending verification email for user: ${input.name} (${input.email})`,
+    );
     await this.sendTemplateMail({
       to: input.email,
       subject: 'Verify your UMTAS account',
@@ -103,9 +112,12 @@ export class MailerService {
     url: string;
     expiresInHours?: number;
   }): Promise<void> {
-    // Default token expiry (1 hour) — sync with BetterAuth's email verification token TTL
+    // Default token expiry (1 hour) - sync with BetterAuth's email verification token TTL
     const expiresInHours = input.expiresInHours ?? 1;
 
+    this.logger.log(
+      `[MAIL] Sending password reset email for user: ${input.name} (${input.email}), expires in ${expiresInHours}h`,
+    );
     await this.sendTemplateMail({
       to: input.email,
       subject: 'Reset your UMTAS password',

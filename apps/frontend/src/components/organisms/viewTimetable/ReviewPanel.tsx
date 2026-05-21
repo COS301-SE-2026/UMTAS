@@ -55,7 +55,7 @@ function buildPreferenceSummary(prefs: Preferences): string {
 
 function buildModuleSummary(modules: Module[]): string {
   const total = modules.reduce((acc, m) => acc + m.timeSlots.length, 0);
-  return `${modules.map((m) => m.name).join(", ")} — ${total} slot${total !== 1 ? "s" : ""} total`;
+  return `${modules.map((m) => m.name).join(", ")} - ${total} slot${total !== 1 ? "s" : ""} total`;
 }
 
 export function ReviewPanel({
@@ -95,8 +95,8 @@ export function ReviewPanel({
                 label="Gap density"
                 value={
                   preferences.compactGaps
-                    ? "Compact — minimal gaps"
-                    : "Relaxed — gaps allowed"
+                    ? "Compact - minimal gaps"
+                    : "Relaxed - gaps allowed"
                 }
               />
               <ReviewSummaryItem

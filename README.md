@@ -22,14 +22,14 @@ _Built by: Wilmar Smit, Michael Tomlinson, Johan Coetzer, Marcel Stoltz, & Aidan
 
 <br>
 
-<!-- Status & CI — tracking dev branch where workflows live -->
+<!-- Status & CI - tracking dev branch where workflows live -->
 
 [![Docs](https://img.shields.io/github/actions/workflow/status/COS301-SE-2026/UMTAS/deploy-docs.yml?branch=dev&style=for-the-badge&logo=readthedocs&logoColor=white&label=Docs)](https://cos301-se-2026.github.io/UMTAS/)
 [![Issues](https://img.shields.io/github/issues/COS301-SE-2026/UMTAS?style=for-the-badge&logo=github&logoColor=white&labelColor=1e293b&color=1d4ed8)](https://github.com/COS301-SE-2026/UMTAS/issues)
 [![Last Commit](https://img.shields.io/github/last-commit/COS301-SE-2026/UMTAS/dev?style=for-the-badge&logo=git&logoColor=white&labelColor=1e293b&color=1d4ed8)](https://github.com/COS301-SE-2026/UMTAS/commits/dev)
 [![CI](https://img.shields.io/github/actions/workflow/status/COS301-SE-2026/UMTAS/ci.yml?branch=dev&style=for-the-badge&logo=githubactions&logoColor=white&label=CI)](https://github.com/COS301-SE-2026/UMTAS/actions/workflows/ci.yml)
 [![Coverage](https://img.shields.io/codecov/c/github/COS301-SE-2026/UMTAS/dev?style=for-the-badge&logo=codecov&logoColor=white&label=Coverage)](https://codecov.io/gh/COS301-SE-2026/UMTAS)
-[![Quality Gate](https://img.shields.io/badge/Quality_Gate-pending-3f3f46?style=for-the-badge&logo=sonarcloud&logoColor=white)](https://sonarcloud.io/dashboard?id=COS301-SE-2026_UMTAS)
+[![Quality Gate](https://img.shields.io/sonar/quality_gate/COS301-SE-2026_UMTAS?server=https%3A%2F%2Fsonarcloud.io&style=for-the-badge&logo=sonarcloud&logoColor=white)](https://sonarcloud.io/dashboard?id=COS301-SE-2026_UMTAS)
 [![Uptime](https://img.shields.io/uptimerobot/ratio/m803102764-591e06f9f3d70c1a4b161f6f?style=for-the-badge&logo=uptimerobot&logoColor=white&label=Uptime+30d&color=1d4ed8)](https://dashboard.uptimerobot.com/monitors/803102764)
 
 <!-- Platform & Tooling -->
@@ -58,7 +58,7 @@ _Built by: Wilmar Smit, Michael Tomlinson, Johan Coetzer, Marcel Stoltz, & Aidan
 
 [![Functional Requirements](<https://img.shields.io/badge/Functional_Requirements_(SRS)-View_Document-14532d?style=for-the-badge&logo=googledocs&logoColor=white>)](https://cos301-se-2026.github.io/UMTAS/requirements/Introduction/)
 [![Full Documentation](https://img.shields.io/badge/Full_Documentation-Visit_Site-14532d?style=for-the-badge&logo=readthedocs&logoColor=white)](https://cos301-se-2026.github.io/UMTAS/)
-[![Project Board](https://img.shields.io/badge/Project_Board-View_on_GitHub-14532d?style=for-the-badge&logo=github&logoColor=white)](https://github.com/orgs/COS301-SE-2026/projects)
+[![Project Board](https://img.shields.io/badge/Project_Board-View_on_GitHub-14532d?style=for-the-badge&logo=github&logoColor=white)](https://github.com/orgs/COS301-SE-2026/projects/31)
 [![Issue Tracker](https://img.shields.io/badge/Issue_Tracker-GitHub_Issues-14532d?style=for-the-badge&logo=github&logoColor=white)](https://github.com/COS301-SE-2026/UMTAS/issues)
 
 </div>
@@ -71,9 +71,9 @@ _Built by: Wilmar Smit, Michael Tomlinson, Johan Coetzer, Marcel Stoltz, & Aidan
 
 </div>
 
-UMTAS automates the full university timetabling lifecycle — from ingesting raw PDF schedules and extracting hard and soft scheduling constraints, through to delivering conflict-free, optimised timetables to up to **20,000 concurrent students**.
+UMTAS automates the full university timetabling lifecycle - from ingesting raw PDF schedules and extracting hard and soft scheduling constraints, through to delivering conflict-free, optimised timetables to up to **20,000 concurrent students**.
 
-The system is **university-agnostic by design**: a Core-and-Adapter architecture cleanly separates the constraint-solving engine from institution-specific data formats. Onboarding a new university requires only a thin adapter — the core solver remains untouched.
+The system is **university-agnostic by design**: a Core-and-Adapter architecture cleanly separates the constraint-solving engine from institution-specific data formats. Onboarding a new university requires only a thin adapter - the core solver remains untouched.
 
 <br>
 
@@ -81,11 +81,11 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
   <tr>
     <td width="50%" valign="top">
       <h4><img src="https://api.iconify.design/mdi/file-pdf-box.svg?color=%233B82F6" width="18" height="18" valign="middle"> The Problem</h4>
-      <p>Traditional timetabling is a multi-week manual process. Administrators juggle hundreds of constraints — venue capacities, lecturer availability, student group conflicts — in spreadsheets. A single room change cascades into hours of rescheduling.</p>
+      <p>Traditional timetabling is a multi-week manual process. Administrators juggle hundreds of constraints - venue capacities, lecturer availability, student group conflicts - in spreadsheets. A single room change cascades into hours of rescheduling.</p>
     </td>
     <td width="50%" valign="top">
       <h4><img src="https://api.iconify.design/mdi/lightbulb-outline.svg?color=%233B82F6" width="18" height="18" valign="middle"> The Solution</h4>
-      <p>UMTAS ingests the university's existing PDF calendar, parses all constraints automatically, and invokes a CP-SAT constraint-programming solver to generate an optimal schedule in seconds — not weeks.</p>
+      <p>UMTAS ingests the university's existing PDF calendar, parses all constraints automatically, and invokes a CP-SAT constraint-programming solver to generate an optimal schedule in seconds - not weeks.</p>
     </td>
   </tr>
 </table>
@@ -98,11 +98,15 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 
 </div>
 
+<details>
+<summary><strong>Expand features</strong></summary>
+<br>
+
 <table width="100%">
   <tr>
     <td width="33%" valign="top" align="center">
       <h3><img src="https://api.iconify.design/mdi/file-document-outline.svg?color=%233B82F6" width="20" height="20" valign="middle"> PDF Ingestion</h3>
-      <p>PyMuPDF-powered extraction parses structured and semi-structured university PDF calendars into machine-readable constraint sets — zero manual data entry.</p>
+      <p>PyMuPDF-powered extraction parses structured and semi-structured university PDF calendars into machine-readable constraint sets - zero manual data entry.</p>
     </td>
     <td width="33%" valign="top" align="center">
       <h3><img src="https://api.iconify.design/mdi/calculator-variant-outline.svg?color=%233B82F6" width="20" height="20" valign="middle"> Constraint Solving</h3>
@@ -116,7 +120,7 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
   <tr>
     <td width="33%" valign="top" align="center">
       <h3><img src="https://api.iconify.design/mdi/domain.svg?color=%233B82F6" width="20" height="20" valign="middle"> University-Agnostic</h3>
-      <p>A Core-and-Adapter architecture decouples the solver from any single institution's data format. New universities onboard by implementing a thin adapter — the core is never touched.</p>
+      <p>A Core-and-Adapter architecture decouples the solver from any single institution's data format. New universities onboard by implementing a thin adapter - the core is never touched.</p>
     </td>
     <td width="33%" valign="top" align="center">
       <h3><img src="https://api.iconify.design/mdi/chart-bar.svg?color=%233B82F6" width="20" height="20" valign="middle"> Observability</h3>
@@ -129,6 +133,8 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
   </tr>
 </table>
 
+</details>
+
 ---
 
 <div align="center">
@@ -136,6 +142,10 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 ## <img src="https://api.iconify.design/mdi/layers-outline.svg?color=%233B82F6" width="24" height="24" valign="middle"> Technology Stack
 
 </div>
+
+<details>
+<summary><strong>Expand technology stack</strong></summary>
+<br>
 
 **Frontend & UI**
 
@@ -183,6 +193,8 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 ![Loki](https://img.shields.io/badge/Loki-fec006?style=for-the-badge&logo=grafana&logoColor=black)
 ![PostHog](https://img.shields.io/badge/PostHog-000000?style=for-the-badge&logo=posthog&logoColor=white)
 
+</details>
+
 ---
 
 <div align="center">
@@ -193,31 +205,66 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 
 This is a **pnpm monorepo** managed by Turborepo. All applications, shared packages, and infrastructure live in one repository to enable atomic commits and shared tooling across every workstream.
 
-```mermaid
-mindmap
-  root((UMTAS))
-    apps
-      web
-        Next.js Frontend
-        React · Tailwind · Shadcn
-      api
-        NestJS Backend
-        DrizzleORM · BullMQ
-    packages
-      database
-        Schema & Migrations
-      types
-        Shared TypeScript
-      config
-        ESLint · TSConfig
-    solver
-      FastAPI Service
-      OR-Tools · PyMuPDF
-    infra
-      Docker Compose
-      Traefik · Grafana
-      Prometheus · Loki
+<details>
+<summary><strong>Expand directory tree</strong></summary>
+<br>
+
 ```
+UMTAS/
+├── apps/
+│   ├── backend/              # NestJS API — controllers, services, DrizzleORM, BullMQ
+│   │   └── src/
+│   │       ├── auth/         # BetterAuth, JWT, RBAC
+│   │       ├── Events/       # Event scheduling domain
+│   │       ├── Module/       # Module management
+│   │       ├── Timetable/    # Timetable CRUD & generation
+│   │       ├── mail/         # Transactional email
+│   │       └── db/           # Drizzle schema & migrations
+│   ├── frontend/             # Next.js — App Router, Tailwind, Shadcn/UI
+│   │   └── src/
+│   │       ├── app/          # Route segments
+│   │       ├── components/   # Shared UI components
+│   │       └── lib/          # Utilities & API client
+│   ├── solver/               # FastAPI — OR-Tools CP-SAT constraint solver
+│   │   ├── main.py
+│   │   └── swagger_ui.py
+│   └── e2e/                  # Playwright end-to-end tests
+├── packages/
+│   ├── database/             # Shared Drizzle schema & migration tooling
+│   └── shared-types/         # Shared TypeScript types across apps
+├── infra/
+│   ├── traefik/              # Reverse proxy & TLS termination
+│   ├── grafana/              # Dashboards & alerting
+│   ├── prometheus/           # Metrics scraping
+│   ├── loki/                 # Log aggregation
+│   └── promtail/             # Log shipping
+├── docker-compose.yml        # Base service definitions
+├── docker-compose.prod.yml   # Production overrides
+├── turbo.json                # Turborepo pipeline config
+└── pnpm-workspace.yaml       # Workspace package declarations
+```
+
+</details>
+
+---
+
+<div align="center">
+
+## <img src="https://api.iconify.design/mdi/sitemap-outline.svg?color=%233B82F6" width="24" height="24" valign="middle"> System Architecture
+
+</div>
+
+<details open>
+<summary><strong>System architecture diagram</strong></summary>
+<br>
+
+<div align="center">
+<img src="docs/diagrams/architecture/Architecture.svg" alt="UMTAS System Architecture" width="900">
+</div>
+
+The system follows a **Service-Oriented Architecture**. The Next.js frontend communicates exclusively with the NestJS API Core, which enforces JWT authentication and RBAC before dispatching long-running work (PDF parsing, constraint solving) to stateless workers via a BullMQ job queue. The FastAPI solver and PDF parser run as independently scalable services. All traffic is routed through Traefik with TLS termination.
+
+</details>
 
 ---
 
@@ -226,6 +273,10 @@ mindmap
 ## <img src="https://api.iconify.design/mdi/source-branch.svg?color=%233B82F6" width="24" height="24" valign="middle"> Branching Strategy
 
 </div>
+
+<details>
+<summary><strong>Expand branching strategy</strong></summary>
+<br>
 
 All development follows a **TDD Git Flow**. Feature work is done in short-lived branches and merged into `dev` via pull request. `main` only receives merges from `dev` at release points. Every pull request requires CI to pass and at least one peer review.
 
@@ -256,6 +307,8 @@ gitGraph LR:
    merge dev id: "v0.2.0"
 ```
 
+</details>
+
 ---
 
 <div align="center">
@@ -274,7 +327,7 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
       <img src="docs/assets/images/team/framed/Wilmar_smit_PFP_circle.svg" width="120" alt="Wilmar Smit">
     </td>
     <td valign="top">
-      <strong>Wilmar Smit</strong> &nbsp;—&nbsp; Team Lead &amp; Integration Lead<br><br>
+      <strong>Wilmar Smit</strong> &nbsp;-&nbsp; Team Lead &amp; Integration Lead<br><br>
       <details>
         <summary>About</summary>
         <br>
@@ -293,7 +346,7 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
       <img src="docs/assets/images/team/framed/Michael_Tomlinson_PFP_circle.svg" width="120" alt="Michael Tomlinson">
     </td>
     <td valign="top">
-      <strong>Michael Tomlinson</strong> &nbsp;—&nbsp; Lead Developer &amp; System Architect<br><br>
+      <strong>Michael Tomlinson</strong> &nbsp;-&nbsp; Lead Developer &amp; System Architect<br><br>
       <details>
         <summary>About</summary>
         <br>
@@ -312,7 +365,7 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
       <img src="docs/assets/images/team/framed/Johan_Coetzer_PFP_circle.svg" width="120" alt="Johan Coetzer">
     </td>
     <td valign="top">
-      <strong>Johan Coetzer</strong> &nbsp;—&nbsp; Frontend Lead &amp; Full-Stack Developer<br><br>
+      <strong>Johan Coetzer</strong> &nbsp;-&nbsp; Frontend Lead &amp; Full-Stack Developer<br><br>
       <details>
         <summary>About</summary>
         <br>
@@ -331,7 +384,7 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
       <img src="docs/assets/images/team/framed/Marcel_Stoltz_PFP_circle.svg" width="120" alt="Marcel Stoltz">
     </td>
     <td valign="top">
-      <strong>Marcel Stoltz</strong> &nbsp;—&nbsp; DevOps Lead &amp; Backend Specialist<br><br>
+      <strong>Marcel Stoltz</strong> &nbsp;-&nbsp; DevOps Lead &amp; Backend Specialist<br><br>
       <details>
         <summary>About</summary>
         <br>
@@ -350,7 +403,7 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
       <img src="docs/assets/images/team/framed/Aidan_Dawson_PFP_circle.svg" width="120" alt="Aidan Dawson">
     </td>
     <td valign="top">
-      <strong>Aidan Dawson</strong> &nbsp;—&nbsp; Backend Developer &amp; Integration<br><br>
+      <strong>Aidan Dawson</strong> &nbsp;-&nbsp; Backend Developer &amp; Integration<br><br>
       <details>
         <summary>About</summary>
         <br>
@@ -378,7 +431,7 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
 </div>
 
 <details open>
-<summary><strong>Bootstrap — First Time Setup</strong></summary>
+<summary><strong>Bootstrap - First Time Setup</strong></summary>
 <br>
 
 ```bash
@@ -394,10 +447,10 @@ Verifies tool versions, copies `.env.example` to `.env`, installs all workspace 
 <br>
 
 ```bash
-# Terminal 1 — infrastructure (Postgres, Redis, MinIO, Solver)
+# Terminal 1 - infrastructure (Postgres, Redis, MinIO, Solver)
 pnpm run dev:infra
 
-# Terminal 2 — application (Next.js + NestJS via Turborepo)
+# Terminal 2 - application (Next.js + NestJS via Turborepo)
 pnpm run dev
 ```
 
@@ -413,7 +466,7 @@ Runs infrastructure in Docker and the application natively for the fastest hot-r
 pnpm run dev:docker
 ```
 
-Boots the complete stack — frontend, backend, and all infrastructure — in containers. Use this to verify network flows and environment variables before a merge.
+Boots the complete stack - frontend, backend, and all infrastructure - in containers. Use this to verify network flows and environment variables before a merge.
 
 </details>
 
@@ -446,7 +499,7 @@ Adds Grafana, Prometheus, and Loki to the stack for local observability testing.
 <br>
 
 <details>
-<summary><strong>Requirements & Architecture</strong> &nbsp;—&nbsp; 10 documents</summary>
+<summary><strong>Requirements & Architecture</strong> &nbsp;-&nbsp; 10 documents</summary>
 <br>
 <div align="center">
 
@@ -465,7 +518,7 @@ Adds Grafana, Prometheus, and Loki to the stack for local observability testing.
 </details>
 
 <details>
-<summary><strong>Design & Diagrams</strong> &nbsp;—&nbsp; 3 documents</summary>
+<summary><strong>Design & Diagrams</strong> &nbsp;-&nbsp; 3 documents</summary>
 <br>
 <div align="center">
 
@@ -477,7 +530,7 @@ Adds Grafana, Prometheus, and Loki to the stack for local observability testing.
 </details>
 
 <details>
-<summary><strong>Developer Guides</strong> &nbsp;—&nbsp; 10 guides</summary>
+<summary><strong>Developer Guides</strong> &nbsp;-&nbsp; 10 guides</summary>
 <br>
 <div align="center">
 
@@ -496,7 +549,7 @@ Adds Grafana, Prometheus, and Loki to the stack for local observability testing.
 </details>
 
 <details>
-<summary><strong>Reference</strong> &nbsp;—&nbsp; 2 documents</summary>
+<summary><strong>Reference</strong> &nbsp;-&nbsp; 2 documents</summary>
 <br>
 <div align="center">
 

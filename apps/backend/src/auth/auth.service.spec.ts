@@ -221,7 +221,7 @@ describe('AuthService', () => {
     });
   });
 
-  describe('getAuth — mail callback wiring', () => {
+  describe('getAuth - mail callback wiring', () => {
     it('wires sendResetPasswordEmail to mailerService.sendResetPasswordEmail', async () => {
       const mockMailerService = {
         sendResetPasswordEmail: jest.fn().mockResolvedValue(undefined),

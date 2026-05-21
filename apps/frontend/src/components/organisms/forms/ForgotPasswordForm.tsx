@@ -24,7 +24,7 @@ export function ForgotPasswordForm() {
     try {
       await authClient.requestPasswordReset({
         email,
-        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL || ""}/reset-password`,
+        redirectTo: `${window.location.origin}/reset-password`,
       });
       setSubmitted(true);
     } catch {
@@ -59,7 +59,7 @@ export function ForgotPasswordForm() {
           <div className="flex flex-col gap-4">
             <AuthAlert
               type="success"
-              message="Check your inbox — if that address is registered, a reset link is on its way."
+              message="Check your inbox - if that address is registered, a reset link is on its way."
             />
             <p className="text-[12px] text-[var(--text-secondary)] text-center">
               <Link
