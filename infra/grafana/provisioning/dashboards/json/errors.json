@@ -337,19 +337,15 @@
       "title": "Error Count by Service",
       "transformations": [
         {
-          "id": "labelsToFields",
-          "options": { "mode": "columns", "valueLabel": "compose_service" }
-        },
-        {
           "id": "reduce",
-          "options": { "reducers": ["sum"] }
+          "options": { "reducers": ["last"] }
         },
         {
           "id": "organize",
           "options": {
             "renameByName": {
               "Field": "Service",
-              "Sum": "Errors"
+              "Last": "Errors"
             }
           }
         }
