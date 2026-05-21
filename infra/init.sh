@@ -91,6 +91,7 @@ generate_secrets() {
 setup_infra() {
     section "Infrastructure"
 
+    prompt_required IMAGE_TAG "Docker image tag (e.g. latest, v1.0.0, sha-abc1234)"
     prompt_required DOMAIN "Domain (e.g. example.com)"
     prompt_required LETSENCRYPT_EMAIL "Let's Encrypt email"
     printf "${YELLOW}Hint: generate with: htpasswd -nb admin YOUR_PASSWORD | sed -e 's/\\\$/\\\$\\\$/g'${RESET}\n"
@@ -152,6 +153,7 @@ validate_all() {
 
     # Required fields
     local required_vars=(
+        IMAGE_TAG
         DOMAIN LETSENCRYPT_EMAIL TRAEFIK_DASHBOARD_CREDENTIALS
         DOCKERHUB_USERNAME DOCKERHUB_TOKEN
         BETTER_AUTH_URL BETTER_AUTH_TRUSTED_ORIGINS CORS_ORIGIN
@@ -228,6 +230,7 @@ LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
 
 PROJECT_NAME=umtas
 DOCKER_REGISTRY=${DOCKERHUB_USERNAME}/umtas
+IMAGE_TAG=${IMAGE_TAG}
 
 TRAEFIK_DASHBOARD_CREDENTIALS=${TRAEFIK_DASHBOARD_CREDENTIALS}
 
