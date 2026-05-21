@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const SESSION_COOKIE_NAME = "umtas.session_token";
+const SESSION_COOKIE_NAME =
+  process.env.NODE_ENV === "production"
+    ? "__Secure-umtas.session_token"
+    : "umtas.session_token";
 
 const PUBLIC_PATHS = [
   "/login",
