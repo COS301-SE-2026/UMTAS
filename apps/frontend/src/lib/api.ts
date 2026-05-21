@@ -216,7 +216,7 @@ export interface paths {
     };
     /**
      * Google OAuth callback
-     * @description Handles the redirect from Google after OAuth authorisation. Not intended to be called directly — Google redirects the browser here automatically.
+     * @description Handles the redirect from Google after OAuth authorisation. Not intended to be called directly - Google redirects the browser here automatically.
      */
     get: operations["googleOAuthCallback"];
     put?: never;
@@ -253,7 +253,7 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** Create a new user — requires sys_admin role */
+    /** Create a new user - requires sys_admin role */
     post: operations["adminCreateUser"];
     delete?: never;
     options?: never;
@@ -270,7 +270,7 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** Impersonate a user — requires sys_admin role */
+    /** Impersonate a user - requires sys_admin role */
     post: operations["adminImpersonateUser"];
     delete?: never;
     options?: never;
@@ -287,7 +287,7 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** Ban a user — requires sys_admin role */
+    /** Ban a user - requires sys_admin role */
     post: operations["adminBanUser"];
     delete?: never;
     options?: never;
@@ -304,7 +304,7 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** Update a user's details — requires sys_admin role */
+    /** Update a user's details - requires sys_admin role */
     post: operations["adminUpdateUser"];
     delete?: never;
     options?: never;
@@ -938,7 +938,7 @@ export interface operations {
           "application/json": unknown;
         };
       };
-      /** @description Rate limited — max 100 requests per 60 seconds */
+      /** @description Rate limited - max 100 requests per 60 seconds */
       429: {
         headers: {
           [name: string]: unknown;
@@ -969,7 +969,7 @@ export interface operations {
           "application/json": unknown;
         };
       };
-      /** @description Email not verified — must verify before signing in */
+      /** @description Email not verified - must verify before signing in */
       400: {
         headers: {
           [name: string]: unknown;
@@ -1216,7 +1216,7 @@ export interface operations {
       };
     };
     responses: {
-      /** @description Reset email sent. Always returns 200 — does not reveal whether the email exists. */
+      /** @description Reset email sent. Always returns 200 - does not reveal whether the email exists. */
       200: {
         headers: {
           [name: string]: unknown;

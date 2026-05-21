@@ -69,10 +69,11 @@ describe("Request Builders Integration Tests", () => {
     it("should create, get, update, and delete a module", async () => {
       // create
       const createBuilder = new createModulesBuilder();
+      const moduleCode = "COS222";
       if (sessionCookie) createBuilder.setHeaders({ Cookie: sessionCookie });
 
       const mockModule: createModuleReq = {
-        code: `COS301`,
+        code: moduleCode,
         name: "Lifecycle Test Module",
         description: "Created by integration test",
         styling: "#00FF00",

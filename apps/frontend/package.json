@@ -9,6 +9,7 @@
     "start": "next start",
     "lint": "eslint",
     "test": "jest",
+    "test:int": "jest --config jest.int.config.js",
     "api:generate": "openapi-typescript http://localhost:3000/api/docs-json -o ./src/lib/api.ts"
   },
   "dependencies": {
