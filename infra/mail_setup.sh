@@ -2,26 +2,32 @@
 
 set -euo pipefail
 
-MAILSERVER_ROOT="${MAILSERVER_ROOT:-/opt/mailserver}"
 MAILSERVER_DOMAIN="${MAILSERVER_DOMAIN:-capstone-vigil.dns.net.za}"
-MAILSERVER_HOSTNAME="${MAILSERVER_HOSTNAME:-mail.${MAILSERVER_DOMAIN}}"
-MAILSERVER_POSTMASTER_ADDRESS="${MAILSERVER_POSTMASTER_ADDRESS:-postmaster@${MAILSERVER_DOMAIN}}"
-MAILSERVER_NETWORK="${MAILSERVER_NETWORK:-gateway}"
-MAILSERVER_CERTS_DIR="${MAILSERVER_CERTS_DIR:-/etc/letsencrypt}"
-MAILSERVER_IMAGE="${MAILSERVER_IMAGE:-ghcr.io/docker-mailserver/docker-mailserver:latest}"
+MAILSERVER_CONTAINER="${MAILSERVER_CONTAINER:-mailserver}"
+
+TEAM_USERS=(
+  michael
+  wilmar
+  marcel
+  johan
+  aidan
+)
 
 usage() {
   cat <<EOF
-Usage: $0 <bootstrap|add-user|add-alias|list-users|status|logs>
+Usage: $0 <provision|add-user|add-alias|list-users|status|logs>
+
+Commands:
+  provision          Add all team mailboxes and aliases
+  add-user <email>   Add a single mailbox (prompts for password)
+  add-alias <alias> <target>
+  list-users
+  status
+  logs
 
 Environment overrides:
-  MAILSERVER_ROOT
-  MAILSERVER_DOMAIN
-  MAILSERVER_HOSTNAME
-  MAILSERVER_POSTMASTER_ADDRESS
-  MAILSERVER_NETWORK
-  MAILSERVER_CERTS_DIR
-  MAILSERVER_IMAGE
+  MAILSERVER_DOMAIN      (default: capstone-vigil.dns.net.za)
+  MAILSERVER_CONTAINER   (default: mailserver)
 EOF
 }
 
@@ -30,144 +36,58 @@ die() {
   exit 1
 }
 
-require_cmd() {
-  command -v "$1" >/dev/null 2>&1 || die "Missing required command: $1"
+exec_setup() {
+  docker exec -it "$MAILSERVER_CONTAINER" setup "$@"
 }
 
-ensure_network() {
-  docker network inspect "$MAILSERVER_NETWORK" >/dev/null 2>&1 || die "Docker network '$MAILSERVER_NETWORK' does not exist"
-}
+provision() {
+  printf 'Adding team mailboxes for @%s\n' "$MAILSERVER_DOMAIN"
+  for user in "${TEAM_USERS[@]}"; do
+    printf '\n--- %s@%s ---\n' "$user" "$MAILSERVER_DOMAIN"
+    exec_setup email add "${user}@${MAILSERVER_DOMAIN}"
+  done
 
-write_compose() {
-  local compose_file="$MAILSERVER_ROOT/docker-compose.yml"
-  cat >"$compose_file" <<EOF
-version: "3.8"
+  printf '\n--- noreply@%s ---\n' "$MAILSERVER_DOMAIN"
+  exec_setup email add "noreply@${MAILSERVER_DOMAIN}"
 
-services:
-  mailserver:
-    image: ${MAILSERVER_IMAGE}
-    container_name: mailserver
-    hostname: ${MAILSERVER_HOSTNAME}
-    env_file: mailserver.env
-    ports:
-      - "25:25"
-      - "465:465"
-      - "587:587"
-      - "993:993"
-    volumes:
-      - ./data/mail:/var/mail
-      - ./data/mail-state:/var/mail-state
-      - ./data/logs:/var/log/mail
-      - ./config:/tmp/docker-mailserver
-      - ${MAILSERVER_CERTS_DIR}:/etc/letsencrypt:ro
-    restart: always
-    stop_grace_period: 1m
-    cap_add:
-      - NET_ADMIN
-    healthcheck:
-      test: "ss --listening --tcp | grep -P 'LISTEN.+:smtp' || exit 1"
-      timeout: 3s
-      retries: 5
-    networks:
-      - traefik_network
+  printf '\nAdding team@ aliases\n'
+  for user in "${TEAM_USERS[@]}"; do
+    exec_setup alias add "team@${MAILSERVER_DOMAIN}" "${user}@${MAILSERVER_DOMAIN}"
+  done
 
-networks:
-  traefik_network:
-    external: true
-    name: ${MAILSERVER_NETWORK}
-EOF
-}
-
-write_env() {
-  local env_file="$MAILSERVER_ROOT/mailserver.env"
-  cat >"$env_file" <<EOF
-# General
-OVERRIDE_HOSTNAME=${MAILSERVER_HOSTNAME}
-DOMAINNAME=${MAILSERVER_DOMAIN}
-POSTMASTER_ADDRESS=${MAILSERVER_POSTMASTER_ADDRESS}
-
-# TLS — uses certificates managed by Traefik / Let's Encrypt
-SSL_TYPE=letsencrypt
-
-# Authentication
-ENABLE_SASLAUTHD=0
-PERMIT_DOCKER=network
-
-# Postfix
-POSTFIX_INET_PROTOCOLS=ipv4
-
-# Dovecot
-ENABLE_DOVECOT=1
-DOVECOT_MAILBOX_FORMAT=maildir
-
-# Spam / Virus (disable for now, enable later if needed)
-ENABLE_SPAMASSASSIN=0
-ENABLE_CLAMAV=0
-ENABLE_FAIL2BAN=0
-
-# Logs
-LOG_LEVEL=info
-EOF
-}
-
-bootstrap() {
-  require_cmd docker
-  require_cmd mkdir
-  ensure_network
-
-  mkdir -p \
-    "$MAILSERVER_ROOT/config" \
-    "$MAILSERVER_ROOT/data/mail" \
-    "$MAILSERVER_ROOT/data/mail-state" \
-    "$MAILSERVER_ROOT/data/logs"
-
-  write_compose
-  write_env
-
-  cd "$MAILSERVER_ROOT"
-  if docker compose version >/dev/null 2>&1; then
-    docker compose up -d
-  elif command -v docker-compose >/dev/null 2>&1; then
-    docker-compose up -d
-  else
-    die "Docker Compose is not installed"
-  fi
-
-  printf 'Mailserver configured in %s\n' "$MAILSERVER_ROOT"
-  printf 'Add mailboxes with:\n'
-  printf '  %s setup email add user@%s\n' "docker exec -it mailserver" "$MAILSERVER_DOMAIN"
+  printf '\nDone. Verify with: %s list-users\n' "$0"
 }
 
 add_user() {
   local address="${1:-}"
   [[ -n "$address" ]] || die "Usage: $0 add-user user@${MAILSERVER_DOMAIN}"
-  docker exec -it mailserver setup email add "$address"
+  exec_setup email add "$address"
 }
 
 add_alias() {
   local alias="${1:-}"
   local target="${2:-}"
   [[ -n "$alias" && -n "$target" ]] || die "Usage: $0 add-alias alias@${MAILSERVER_DOMAIN} target@${MAILSERVER_DOMAIN}"
-  docker exec -it mailserver setup alias add "$alias" "$target"
+  exec_setup alias add "$alias" "$target"
 }
 
 list_users() {
-  docker exec -it mailserver setup email list
+  exec_setup email list
 }
 
 status() {
-  docker ps --filter name=mailserver
+  docker ps --filter "name=${MAILSERVER_CONTAINER}"
 }
 
 logs() {
-  docker logs --tail 100 mailserver
+  docker logs --tail 100 "$MAILSERVER_CONTAINER"
 }
 
 main() {
   local command="${1:-}"
   case "$command" in
-    bootstrap|setup|init)
-      bootstrap
+    provision)
+      provision
       ;;
     add-user)
       add_user "${2:-}"
