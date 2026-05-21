@@ -303,6 +303,7 @@ export function createAuth(input: CreateAuthInput): AuthInstance {
         // has a verified email before an OAuth account can link to it,
         // preventing OAuth account takeover via unverified email registration.
         enabled: true,
+        trustedProviders: ['google'],
       },
     },
     advanced: {
@@ -311,6 +312,7 @@ export function createAuth(input: CreateAuthInput): AuthInstance {
       cookiePrefix: 'umtas',
       defaultCookieAttributes: {
         sameSite: 'lax',
+        domain: process.env.COOKIE_DOMAIN,
       },
       ipAddress: {
         ipAddressHeaders: ['x-forwarded-for', 'x-real-ip'],
