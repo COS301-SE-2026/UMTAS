@@ -8,7 +8,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/components/atoms/baseShadcn/card";
 import { Button } from "@/components/atoms/baseShadcn/button";
@@ -21,8 +21,13 @@ import { AuthDivider } from "@/components/molecules/OAuth/AuthDivider";
 import { AuthAlert } from "@/components/molecules/OAuth/AuthAlert";
 import { PasswordStrengthBadge } from "@/components/molecules/OAuth/PasswordStrengthBadge";
 import { signUp, signIn } from "@/../utilities/auth-client";
-
-const getAppUrl = () => window.location.origin;
+import {
+  buildAuthCallbackUrl,
+  buildAuthLinkHref,
+  buildRedirectUrl,
+  resolveAuthRedirectTarget,
+  storeAuthRedirectTarget,
+} from "@/lib/auth-redirect";
 
 interface FieldErrors {
   name?: string;
@@ -67,6 +72,7 @@ function mapAuthError(message: string): string {
 
 export function RegisterForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -75,6 +81,7 @@ export function RegisterForm() {
   const [globalError, setGlobalError] = useState<string | null>(null);
   const [isEmailLoading, setIsEmailLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const redirectTarget = resolveAuthRedirectTarget(searchParams);
 
   async function handleEmailSignUp(e: React.FormEvent) {
     e.preventDefault();
@@ -84,19 +91,24 @@ export function RegisterForm() {
     if (Object.keys(errors).length > 0) return;
 
     setIsEmailLoading(true);
+    storeAuthRedirectTarget(redirectTarget);
 
     try {
       const result = await signUp.email({
         name,
         email,
         password,
-        callbackURL: `${getAppUrl()}/dashboard`,
+        callbackURL: buildRedirectUrl(redirectTarget),
       });
 
       if (result?.error) {
         setGlobalError(mapAuthError(result.error.message ?? "Unknown error"));
       } else {
-        router.push("/verify-pending");
+        router.push(
+          redirectTarget === "/dashboard"
+            ? "/verify-pending"
+            : `/verify-pending?next=${encodeURIComponent(redirectTarget)}`,
+        );
       }
     } catch {
       setGlobalError(
@@ -110,11 +122,12 @@ export function RegisterForm() {
   async function handleGoogleSignUp() {
     setGlobalError(null);
     setIsGoogleLoading(true);
+    storeAuthRedirectTarget(redirectTarget);
 
     try {
       await signIn.social({
         provider: "google",
-        callbackURL: `${getAppUrl()}/auth-callback`,
+        callbackURL: buildAuthCallbackUrl(redirectTarget),
       });
     } catch {
       setGlobalError(
@@ -256,7 +269,7 @@ export function RegisterForm() {
         <p className="text-[12px] text-[var(--text-secondary)] text-center">
           Already have an account?{" "}
           <Link
-            href="/login"
+            href={buildAuthLinkHref("/login", redirectTarget)}
             className="text-[var(--text-primary)] underline-offset-2 hover:underline transition-colors duration-150"
           >
             Log in

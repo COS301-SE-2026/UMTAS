@@ -14,6 +14,7 @@ import {
   EventListResponseDto,
   UpdateEventDto,
   DeleteResponseDto,
+  EventCriteriaDto,
 } from './dto/EventDto.dto';
 
 import { AppDatabase } from '../db/database.service';
@@ -39,37 +40,39 @@ export class EventService {
 
     this.validateEventTypeCriteria(criteria);
 
-    return await this.databaseService.db.transaction(async (tx) => {
-      const [newEvent] = await tx
-        .insert(Event)
-        .values({
-          userID: userId,
-          eventName: dto.name ?? null,
-          eventCode: dto.code ?? null,
-          eventCriteria: dto.eventCriteria ?? null,
-          isRecurring: dto.isRecurring ?? false,
-        })
-        .returning();
+    return await this.databaseService.db.transaction(
+      async (tx: AppDatabase) => {
+        const [newEvent] = await tx
+          .insert(Event)
+          .values({
+            userID: userId,
+            eventName: dto.name ?? null,
+            eventCode: dto.code ?? null,
+            eventCriteria: dto.eventCriteria ?? null,
+            isRecurring: dto.isRecurring ?? false,
+          })
+          .returning();
 
-      if (!newEvent)
-        throw new InternalServerErrorException('Event was not created');
+        if (!newEvent)
+          throw new InternalServerErrorException('Event was not created');
 
-      const mappedEvent = {
-        ...newEvent,
-        name: newEvent.eventName ?? undefined,
-        code: newEvent.eventCode ?? undefined,
-      } as EventResponseDto['event'];
+        const mappedEvent = {
+          ...newEvent,
+          name: newEvent.eventName ?? undefined,
+          code: newEvent.eventCode ?? undefined,
+        } as EventResponseDto['event'];
 
-      if (criteria.type !== EventType.LECTURE) return { event: mappedEvent };
+        if (criteria.type !== EventType.LECTURE) return { event: mappedEvent };
 
-      const lecture = await this.createLectureForEvent(
-        tx,
-        newEvent.eventID,
-        criteria,
-      );
+        const lecture = await this.createLectureForEvent(
+          tx,
+          newEvent.eventID,
+          criteria,
+        );
 
-      return { event: mappedEvent, lecture };
-    });
+        return { event: mappedEvent, lecture };
+      },
+    );
   } //createEvent
 
   //getAllEvents
@@ -141,63 +144,67 @@ export class EventService {
         'event code should be between 1 and 10 characters',
       );
 
-    return await this.databaseService.db.transaction(async (tx) => {
-      const [exRow] = await tx
-        .select({
-          event: Event,
-          lecture: LectureEv,
-        })
-        .from(Event)
-        .leftJoin(LectureEv, eq(LectureEv.eventID, Event.eventID))
-        .where(and(eq(Event.eventID, eventId), eq(Event.userID, userId)))
-        .limit(1);
+    return await this.databaseService.db.transaction(
+      async (tx: AppDatabase) => {
+        const [exRow] = await tx
+          .select({
+            event: Event,
+            lecture: LectureEv,
+          })
+          .from(Event)
+          .leftJoin(LectureEv, eq(LectureEv.eventID, Event.eventID))
+          .where(and(eq(Event.eventID, eventId), eq(Event.userID, userId)))
+          .limit(1);
 
-      if (!exRow)
-        throw new NotFoundException(`Event not found for eventId: ${eventId}`);
+        if (!exRow)
+          throw new NotFoundException(
+            `Event not found for eventId: ${eventId}`,
+          );
 
-      const exCriteria = exRow.event.eventCriteria ?? {};
+        const exCriteria = exRow.event.eventCriteria ?? {};
 
-      const mergedCriteria = {
-        ...exCriteria,
-        ...dto.eventCriteria,
-      };
+        const mergedCriteria = {
+          ...exCriteria,
+          ...dto.eventCriteria,
+        };
 
-      if (mergedCriteria.type === null) delete mergedCriteria.type;
+        if (mergedCriteria.type === null) delete mergedCriteria.type;
 
-      this.validateEventTypeCriteria(mergedCriteria);
+        this.validateEventTypeCriteria(mergedCriteria);
 
-      const [updatedEvent] = await tx
-        .update(Event)
-        .set({
-          ...(nameUpdate ? { eventName: dto.name?.trim() || null } : {}),
-          ...(codeUpdate ? { eventCode: dto.code?.trim() || null } : {}),
-          ...(critUpdate ? { eventCriteria: mergedCriteria } : {}),
-          ...(recUpdate ? { isRecurring: dto.isRecurring } : {}),
-        })
-        .where(and(eq(Event.eventID, eventId), eq(Event.userID, userId)))
-        .returning();
+        const [updatedEvent] = await tx
+          .update(Event)
+          .set({
+            ...(nameUpdate ? { eventName: dto.name?.trim() || null } : {}),
+            ...(codeUpdate ? { eventCode: dto.code?.trim() || null } : {}),
+            ...(critUpdate ? { eventCriteria: mergedCriteria } : {}),
+            ...(recUpdate ? { isRecurring: dto.isRecurring } : {}),
+          })
+          .where(and(eq(Event.eventID, eventId), eq(Event.userID, userId)))
+          .returning();
 
-      if (!updatedEvent)
-        throw new InternalServerErrorException('Event not updated');
+        if (!updatedEvent)
+          throw new InternalServerErrorException('Event not updated');
 
-      const mappedEvent = {
-        ...updatedEvent,
-        name: updatedEvent.eventName ?? undefined,
-        code: updatedEvent.eventCode ?? undefined,
-      } as EventResponseDto['event'];
+        const mappedEvent = {
+          ...updatedEvent,
+          name: updatedEvent.eventName ?? undefined,
+          code: updatedEvent.eventCode ?? undefined,
+        } as EventResponseDto['event'];
 
-      const lecture = await this.syncSubtypeForEvent(
-        tx,
-        updatedEvent.eventID,
-        mergedCriteria,
-        exRow.lecture,
-      );
+        const lecture = await this.syncSubtypeForEvent(
+          tx,
+          updatedEvent.eventID,
+          mergedCriteria as EventCriteriaDto,
+          exRow.lecture,
+        );
 
-      return {
-        event: mappedEvent,
-        ...(lecture ? { lecture } : {}),
-      };
-    });
+        return {
+          event: mappedEvent,
+          ...(lecture ? { lecture } : {}),
+        };
+      },
+    );
   } //udpate
 
   async deleteEvent(

@@ -2,10 +2,7 @@
 
 import { Input } from "@/components/atoms/baseShadcn/input";
 import { Label } from "@/components/atoms/baseShadcn/label";
-import {
-  ColourPicker,
-  Module_Colours,
-} from "@/components/atoms/builder/colourPicker";
+import { ColourPicker } from "@/components/atoms/builder/colourPicker";
 import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
 
 export interface ModuleErrors {
@@ -16,23 +13,15 @@ export interface ModuleErrors {
 
 interface ModuleCardProps {
   module: ModuleResponseDto;
-  index: number;
   onUpdate: (
     id: number,
     field: keyof Omit<ModuleResponseDto, "moduleID" | "userID">,
     value: string,
   ) => void;
-  onRemove: (id: number) => void;
   errors?: ModuleErrors;
 }
 
-export function ModuleCard({
-  module,
-  index,
-  onUpdate,
-  onRemove,
-  errors,
-}: ModuleCardProps) {
+export function ModuleCard({ module, onUpdate, errors }: ModuleCardProps) {
   const inputClass =
     "h-10 bg-[var(--bg-base)] border-[var(--border)] text-[var(--text-primary)] " +
     "placeholder:text-[var(--text-disabled)] focus-visible:ring-2 focus-visible:ring-offset-2 " +

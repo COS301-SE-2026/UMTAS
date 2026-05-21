@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import { Suspense } from "react";
 import { AuthPageTemplate } from "@/components/templates/auth/AuthPageTemplate";
 import { LoginForm } from "@/components/organisms/forms/LoginForm";
 
@@ -10,7 +11,9 @@ export const metadata: Metadata = {
 export default function LoginPage() {
   return (
     <AuthPageTemplate>
-      <LoginForm />
+      <Suspense fallback={null}>
+        <LoginForm />
+      </Suspense>
     </AuthPageTemplate>
   );
 }

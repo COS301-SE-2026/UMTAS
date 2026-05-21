@@ -28,7 +28,6 @@ interface ModulesStepProps {
     value: string,
   ) => void | Promise<void>;
   onRemove: (id: number) => void;
-  onNavigateAway: () => void;
 }
 
 function validateModule(module: ModuleResponseDto) {
@@ -60,7 +59,6 @@ export function ModulesStep({
   onAdd,
   onUpdate,
   onRemove,
-  onNavigateAway,
 }: ModulesStepProps) {
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [errorMap, setErrorMap] = useState<Record<number, ModuleErrors>>({});
@@ -261,9 +259,7 @@ export function ModulesStep({
           <div className="flex flex-col gap-2 pl-2">
             <ModuleCard
               module={module}
-              index={index}
               onUpdate={handleUpdate}
-              onRemove={handleRemove}
               errors={errors}
             />
             {/* confirm button */}

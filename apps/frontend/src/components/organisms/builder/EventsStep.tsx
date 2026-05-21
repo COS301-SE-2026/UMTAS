@@ -20,7 +20,6 @@ import {
 } from "@/components/atoms/baseShadcn/alert-dialog";
 import { Alert, AlertDescription } from "@/components/atoms/baseShadcn/alert";
 import { Button } from "@/components/atoms/baseShadcn/button";
-import { Card, CardContent } from "@/components/atoms/baseShadcn/card";
 
 interface EventsStepProps {
   events: EventResponse[];
@@ -307,10 +306,8 @@ export function EventsStep({
           <div className="flex flex-col gap-2 pl-2">
             <EventCard
               event={event}
-              index={index}
               modules={modules}
               onUpdate={handleUpdate}
-              onRemove={handleRemove}
               onGoToModules={onGoToModules}
               errors={errors}
             />

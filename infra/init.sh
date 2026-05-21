@@ -269,15 +269,13 @@ CORS_ORIGIN=${CORS_ORIGIN}
 GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:-}
 GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET:-}
 
-# ─── Email (SMTP) ─────────────────────────────────────────
-# Defaults to mailhog container - override for real SMTP
-MAIL_HOST=${MAIL_HOST:-mailhog}
-MAIL_PORT=${MAIL_PORT:-1025}
-MAIL_SECURE=${MAIL_SECURE:-false}
-MAIL_SERVICE=${MAIL_SERVICE:-}
-MAIL_USER=${MAIL_USER:-}
-MAIL_PASS=${MAIL_PASS:-}
-MAIL_FROM=${MAIL_FROM:-UMTAS <noreply@umtas.co.za>}
+# ─── SMTP / Email ─────────────────────────────────────────
+SMTP_HOST=mailserver
+SMTP_PORT=25
+SMTP_SECURE=false
+SMTP_USER=
+SMTP_PASS=
+SMTP_FROM=UMTAS <noreply@${DOMAIN}>
 
 # ─── Seeding ──────────────────────────────────────────────
 SEED=${SEED}

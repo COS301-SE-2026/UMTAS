@@ -9,10 +9,9 @@ import { signOut } from "@/../utilities/auth-client";
 
 interface NavUserProps {
   name?: string | null;
-  email?: string | null;
 }
 
-export function NavUser({ name, email }: NavUserProps) {
+export function NavUser({ name }: NavUserProps) {
   const router = useRouter();
 
   async function handleSignOut() {
