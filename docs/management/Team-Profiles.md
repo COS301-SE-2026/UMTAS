@@ -40,7 +40,7 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
 
 - **Role:** Lead Developer & System Architect
 - **Student Number:** u24569705
-- **LinkedIn:** [Michael Tomlinson](https://www.linkedin.com/in/michaeltomlinson)
+- **LinkedIn:** [Michael Tomlinson](https://www.linkedin.com/in/michael-tomlinson-089511274/)
 - **GitHub:** [michaeltomlinsontuks](https://github.com/michaeltomlinsontuks)
 - **Bio:** Third-year Computer Science student. Currently a Software Developer Intern at Tyto Insights, with prior experience migrating legacy systems to modern stacks at DCS Engineering. Michael serves as the System Architect, specialising in the UMTAS core stack: PostgreSQL, DrizzleORM, NestJS, and Next.js. He is responsible for the Core-and-Adapter pattern implementation, ensuring the system remains university-agnostic. His Tuks PDF Calendar project provides the foundational domain expertise required for the project's complex PDF parsing challenges.
 
