@@ -123,3 +123,5 @@ working_docs/
 
 .pnpm-store/
 apps/frontend/junit.xml
+
+.pnpm-store/

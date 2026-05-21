@@ -1,5 +1,5 @@
-import type { Module } from "@/components/molecules/builder/ModuleCard";
-import type { BuilderEvent } from "@/components/molecules/builder/EventCard";
+import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
+import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
 import type { ScheduleEvent } from "@/types/schedule";
 
 export function isoDateStr(date: Date): string {
@@ -45,14 +45,15 @@ export function formatWeekRange(weekStart: Date): string {
   return startStr + " - " + endStr;
 }
 
-export function getAllWeekStarts(events: BuilderEvent[]): Date[] {
+export function getAllWeekStarts(events: EventResponse[]): Date[] {
   const weekStartSet = new Set<string>();
 
   for (const event of events) {
-    if (!event.date) {
+    const day = event.event.eventCriteria?.day;
+    if (!day) {
       continue;
     }
-    const monday = getMonday(new Date(event.date));
+    const monday = getMonday(new Date(day));
     weekStartSet.add(isoDateStr(monday));
   }
 
@@ -61,40 +62,41 @@ export function getAllWeekStarts(events: BuilderEvent[]): Date[] {
 }
 
 export function resolveScheduleEvents(
-  events: BuilderEvent[],
-  modules: Module[],
+  events: EventResponse[],
+  modules: ModuleResponseDto[],
 ): ScheduleEvent[] {
   const resolved: ScheduleEvent[] = [];
 
   for (const event of events) {
-    const isRecurring =
-      event.isRecurring === true ||
-      (event.isRecurring as unknown as string) === "true";
+    const criteria = event.event.eventCriteria;
+    const isRecurring = false; // Temporarily disabled
 
-    if (event.type === "lecture") {
-      const lectureModule = modules.find((m) => m.id === event.moduleId);
+    if (criteria?.type === "lecture") {
+      const lectureModule = modules.find(
+        (m) => m.moduleID === event.lecture?.moduleID,
+      );
       resolved.push({
-        id: event.id,
-        name: event.name,
-        code: event.code,
-        date: event.date,
-        startTime: event.startTime,
-        endTime: event.endTime,
+        id: String(event.event.eventID),
+        name: criteria?.moduleCode || "",
+        code: criteria?.moduleCode || "",
+        date: criteria?.day || "",
+        startTime: criteria?.startTime || "",
+        endTime: criteria?.endTime || "",
         isRecurring,
-        accentColour: lectureModule ? lectureModule.colour : null,
-        subLabel: lectureModule ? lectureModule.code : null,
+        accentColour: lectureModule ? lectureModule.styling || null : null,
+        subLabel: lectureModule ? lectureModule.moduleCode : null,
       });
       continue;
     }
 
     // future event types
     resolved.push({
-      id: event.id,
-      name: event.name,
-      code: event.code,
-      date: event.date,
-      startTime: event.startTime,
-      endTime: event.endTime,
+      id: String(event.event.eventID),
+      name: criteria?.moduleCode || "",
+      code: criteria?.moduleCode || "",
+      date: criteria?.day || "",
+      startTime: criteria?.startTime || "",
+      endTime: criteria?.endTime || "",
       isRecurring,
       accentColour: null,
       subLabel: null,
@@ -104,7 +106,10 @@ export function resolveScheduleEvents(
   return resolved;
 }
 
-export function generateICS(events: BuilderEvent[], modules: Module[]): string {
+export function generateICS(
+  events: EventResponse[],
+  modules: ModuleResponseDto[],
+): string {
   const lines: string[] = [];
 
   lines.push("BEGIN:VCALENDAR");
@@ -115,27 +120,30 @@ export function generateICS(events: BuilderEvent[], modules: Module[]): string {
   lines.push("X-WR-TIMEZONE:Africa/Johannesburg");
 
   for (const event of events) {
-    if (!event.date || !event.startTime || !event.endTime) {
+    const criteria = event.event.eventCriteria;
+    if (!criteria?.day || !criteria?.startTime || !criteria?.endTime) {
       continue;
     }
 
-    const lectureModule = modules.find((m) => m.id === event.moduleId);
-    const moduleName = lectureModule ? lectureModule.name : "";
-    const dateStr = event.date.replace(/-/g, "");
-    const startStr = event.startTime.replace(":", "") + "00";
-    const endStr = event.endTime.replace(":", "") + "00";
-    const uid = event.id + "@umtas.vigil";
-    const isRecurring =
-      event.isRecurring === true ||
-      (event.isRecurring as unknown as string) === "true";
+    const lectureModule = modules.find(
+      (m) => m.moduleID === event.lecture?.moduleID,
+    );
+    const moduleName = lectureModule ? lectureModule.moduleName : "";
+    const dateStr = criteria.day.replace(/-/g, "");
+    const startStr = criteria.startTime.replace(":", "") + "00";
+    const endStr = criteria.endTime.replace(":", "") + "00";
+    const uid = event.event.eventID + "@umtas.vigil";
+    const isRecurring = false; // Temporarily disabled
 
     lines.push("BEGIN:VEVENT");
     lines.push("UID:" + uid);
     lines.push("DTSTART;TZID=Africa/Johannesburg:" + dateStr + "T" + startStr);
     lines.push("DTEND;TZID=Africa/Johannesburg:" + dateStr + "T" + endStr);
-    lines.push("SUMMARY:" + event.name);
+    lines.push("SUMMARY:" + (criteria.moduleCode || "Event"));
     lines.push(
-      "DESCRIPTION:" + event.code + (moduleName ? " - " + moduleName : ""),
+      "DESCRIPTION:" +
+        (criteria.moduleCode || "") +
+        (moduleName ? " - " + moduleName : ""),
     );
 
     if (isRecurring) {

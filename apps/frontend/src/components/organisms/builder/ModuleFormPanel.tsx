@@ -5,35 +5,35 @@ import { Button } from "@/components/atoms/baseShadcn/button";
 import { PanelHeader } from "@/components/atoms/builder/PanelHeader";
 import {
   ModuleCard,
-  type Module,
   type ModuleErrors,
 } from "@/components/molecules/builder/ModuleCard";
+import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
 
 interface ModuleFormPanelProps {
-  module: Module;
+  module: ModuleResponseDto;
   onUpdate: (
-    id: string,
-    field: keyof Omit<Module, "id">,
+    id: number,
+    field: keyof Omit<ModuleResponseDto, "moduleID" | "userID">,
     value: string,
   ) => void;
   onClose: () => void;
   onDone: () => void;
 }
 
-function validateModule(module: Module) {
+function validateModule(module: ModuleResponseDto) {
   const errors: ModuleErrors = {};
   let hasErrors = false;
 
-  if (!module.code.trim()) {
-    errors.code = "Code is required";
+  if (!module.moduleCode.trim()) {
+    errors.moduleCode = "Code is required";
     hasErrors = true;
   }
-  if (!module.name.trim()) {
-    errors.name = "Name is required";
+  if (!module.moduleName.trim()) {
+    errors.moduleName = "Name is required";
     hasErrors = true;
   }
-  if (!module.colour) {
-    errors.colour = "Colour is required";
+  if (!module.styling) {
+    errors.styling = "Colour is required";
     hasErrors = true;
   }
 

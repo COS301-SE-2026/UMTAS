@@ -47,6 +47,22 @@ export class EventCriteriaDto {
 } //EventCriteriaDto
 
 export class CreateEventDto {
+  @ApiPropertyOptional({
+    example: 'event name',
+  })
+  @IsOptional()
+  @IsString()
+  @Length(32)
+  name?: string;
+
+  @ApiPropertyOptional({
+    example: 'lec1',
+  })
+  @IsOptional()
+  @IsString()
+  @Length(10)
+  code?: string;
+
   @ApiProperty({
     type: EventCriteriaDto,
     description: 'Criteria for an event',
@@ -55,7 +71,7 @@ export class CreateEventDto {
   @Type(() => EventCriteriaDto)
   eventCriteria!: EventCriteriaDto;
 
-  @ApiPropertyOptional({ example: false, default: false })
+  @ApiPropertyOptional({ example: false, default: false, type: Boolean })
   @IsOptional()
   @IsBoolean()
   isRecurring?: boolean;
@@ -68,21 +84,39 @@ export class EventDto {
   @ApiProperty({ example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' })
   userID!: string;
 
+  @ApiPropertyOptional({
+    example: 'event name',
+  })
+  @IsOptional()
+  @IsString()
+  @Length(32)
+  name?: string;
+
+  @ApiPropertyOptional({
+    example: 'lec1',
+  })
+  @IsOptional()
+  @IsString()
+  @Length(10)
+  code?: string;
+
   @ApiProperty({ type: EventCriteriaDto })
   eventCriteria!: EventCriteriaDto;
 
-  // @ApiProperty({ example: true})
-  // isRecurring: boolean;
+  @ApiPropertyOptional({ example: true, type: Boolean })
+  @IsOptional()
+  @IsBoolean()
+  isRecurring?: boolean;
 } //EventDto
 
 export class LectureResponseDto {
   @ApiProperty({ example: 1 })
   lectureID!: number;
 
-  @ApiProperty({ example: 12, nullable: true })
+  @ApiProperty({ example: 12, nullable: true, type: Number })
   moduleID!: number | null;
 
-  @ApiProperty({ example: 1, nullable: true })
+  @ApiProperty({ example: 1, nullable: true, type: Number })
   eventID!: number | null;
 
   @ApiPropertyOptional({ example: 'IT 2-26', nullable: true })
@@ -131,6 +165,22 @@ export class UpdateEventCriteriaDto {
 
 export class UpdateEventDto {
   @ApiPropertyOptional({
+    example: 'event name',
+  })
+  @IsOptional()
+  @IsString()
+  @Length(32)
+  name?: string;
+
+  @ApiPropertyOptional({
+    example: 'lec1',
+  })
+  @IsOptional()
+  @IsString()
+  @Length(10)
+  code?: string;
+
+  @ApiPropertyOptional({
     type: UpdateEventCriteriaDto,
     description: 'Event update criteria',
   })
@@ -139,7 +189,7 @@ export class UpdateEventDto {
   @Type(() => UpdateEventCriteriaDto)
   eventCriteria?: UpdateEventCriteriaDto;
 
-  @ApiPropertyOptional({ example: false, default: false })
+  @ApiPropertyOptional({ example: false, default: false, type: Boolean })
   @IsOptional()
   @IsBoolean()
   isRecurring?: boolean;
@@ -150,6 +200,8 @@ export class EventResponseDto {
     example: {
       eventID: 1,
       userID: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+      name: 'eventnameidk',
+      code: 'lec1',
       eventCriteria: {
         day: 'Monday',
         startTime: '08:30',

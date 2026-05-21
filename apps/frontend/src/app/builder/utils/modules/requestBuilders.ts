@@ -1,5 +1,10 @@
-import { RequestBuilder, RequestMethod } from "../../../../utilities/request";
-import { paths } from "@/lib/api";
+import {
+  RequestBuilder,
+  RequestMethod,
+} from "../../../../../utilities/request";
+
+import { paths, components } from "@/lib/api";
+
 type createModuleReq =
   paths["/modules"]["post"]["requestBody"]["content"]["application/json"];
 type createModuleRes =
@@ -22,6 +27,8 @@ type updateModuleByIdPath =
 
 type updateModuleByIdRes =
   paths["/modules/{moduleId}"]["patch"]["responses"]["200"]["content"]["application/json"];
+
+export type ModuleResponseDto = components["schemas"]["ModuleResponseDto"];
 
 export class createModulesBuilder extends RequestBuilder<
   undefined,
