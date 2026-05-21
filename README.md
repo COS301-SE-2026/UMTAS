@@ -58,6 +58,7 @@ _Built by: Wilmar Smit, Michael Tomlinson, Johan Coetzer, Marcel Stoltz, & Aidan
 
 [![Functional Requirements](<https://img.shields.io/badge/Functional_Requirements_(SRS)-View_Document-14532d?style=for-the-badge&logo=googledocs&logoColor=white>)](https://cos301-se-2026.github.io/UMTAS/requirements/Introduction/)
 [![Full Documentation](https://img.shields.io/badge/Full_Documentation-Visit_Site-14532d?style=for-the-badge&logo=readthedocs&logoColor=white)](https://cos301-se-2026.github.io/UMTAS/)
+[![Brand Style Guide](https://img.shields.io/badge/Brand_Style_Guide-Visit_Site-14532d?style=for-the-badge&logo=materialdesign&logoColor=white)](https://brand.capstone-vigil.dns.net.za/)
 [![Project Board](https://img.shields.io/badge/Project_Board-View_on_GitHub-14532d?style=for-the-badge&logo=github&logoColor=white)](https://github.com/orgs/COS301-SE-2026/projects/31)
 [![Issue Tracker](https://img.shields.io/badge/Issue_Tracker-GitHub_Issues-14532d?style=for-the-badge&logo=github&logoColor=white)](https://github.com/COS301-SE-2026/UMTAS/issues)
 
@@ -492,7 +493,9 @@ Adds Grafana, Prometheus, and Loki to the stack for local observability testing.
 
 <div align="center">
 
+[![capstone-vigil.dns.net.za](https://img.shields.io/badge/capstone--vigil.dns.net.za-Visit_Website-14532d?style=for-the-badge&logo=vercel&logoColor=white)](https://capstone-vigil.dns.net.za/)
 [![cos301-se-2026.github.io/UMTAS](https://img.shields.io/badge/cos301--se--2026.github.io%2FUMTAS-Visit_Docs-18181b?style=for-the-badge&logo=readthedocs&logoColor=white)](https://cos301-se-2026.github.io/UMTAS/)
+[![brand.capstone-vigil.dns.net.za](https://img.shields.io/badge/brand.capstone--vigil.dns.net.za-Visit_Brand_Site-14532d?style=for-the-badge&logo=materialdesign&logoColor=white)](https://brand.capstone-vigil.dns.net.za/)
 
 </div>
 
@@ -518,13 +521,12 @@ Adds Grafana, Prometheus, and Loki to the stack for local observability testing.
 </details>
 
 <details>
-<summary><strong>Design & Diagrams</strong> &nbsp;-&nbsp; 3 documents</summary>
+<summary><strong>Design Specifications</strong> &nbsp;-&nbsp; 2 documents</summary>
 <br>
 <div align="center">
 
-[![Brand Style Guide](https://img.shields.io/badge/Brand_Style_Guide-78350f?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/design/Brand-Style/)
+[![Brand Style Guide](https://img.shields.io/badge/Brand_Style_Guide-14532d?style=for-the-badge)](https://brand.capstone-vigil.dns.net.za/)
 [![Wireframes](https://img.shields.io/badge/Wireframes-78350f?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/design/Wireframes/)
-[![Diagrams Repository](https://img.shields.io/badge/Diagrams_Repository-78350f?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/diagrams/README/)
 
 </div>
 </details>
