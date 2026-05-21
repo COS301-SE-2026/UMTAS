@@ -25,33 +25,35 @@ export class TimetableService {
     userId: string,
     dto: CreateTimetableDto,
   ): Promise<TimetableResponseDto> {
-    return await this.databaseService.db.transaction(async (tx) => {
-      const [newTimetable] = await tx
-        .insert(Timetable)
-        .values({ userID: userId, timetableName: dto.timetableName ?? null })
-        .returning();
+    return await this.databaseService.db.transaction(
+      async (tx: AppDatabase) => {
+        const [newTimetable] = await tx
+          .insert(Timetable)
+          .values({ userID: userId, timetableName: dto.timetableName ?? null })
+          .returning();
 
-      if (!newTimetable)
-        throw new InternalServerErrorException('Timetable was not created');
+        if (!newTimetable)
+          throw new InternalServerErrorException('Timetable was not created');
 
-      const eventIds: number[] = [];
+        const eventIds: number[] = [];
 
-      if (dto.eventIds?.length) {
-        await this.validateEventIds(tx, userId, dto.eventIds);
-        await tx.insert(EventsToTimetables).values(
-          dto.eventIds.map((eventID) => ({
-            eventID,
-            timetableID: newTimetable.timetableID,
-          })),
-        );
-        eventIds.push(...dto.eventIds);
-      }
+        if (dto.eventIds?.length) {
+          await this.validateEventIds(tx, userId, dto.eventIds);
+          await tx.insert(EventsToTimetables).values(
+            dto.eventIds.map((eventID) => ({
+              eventID,
+              timetableID: newTimetable.timetableID,
+            })),
+          );
+          eventIds.push(...dto.eventIds);
+        }
 
-      return {
-        timetable: newTimetable,
-        ...(eventIds.length ? { eventIds } : {}),
-      };
-    });
+        return {
+          timetable: newTimetable,
+          ...(eventIds.length ? { eventIds } : {}),
+        };
+      },
+    );
   } //createTimetable
 
   async getAllTimetables(userId: string): Promise<TimetableListResponseDto> {
@@ -98,7 +100,7 @@ export class TimetableService {
     if (!hasName && !hasAdd && !hasRemove)
       throw new BadRequestException('At least one update field required');
 
-    await this.databaseService.db.transaction(async (tx) => {
+    await this.databaseService.db.transaction(async (tx: AppDatabase) => {
       const [existing] = await tx
         .select()
         .from(Timetable)

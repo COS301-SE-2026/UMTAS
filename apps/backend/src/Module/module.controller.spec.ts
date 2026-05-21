@@ -1,7 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ModuleController } from './module.controller';
 import { ModuleService } from './module.service';
+import { CreateModuleDto } from './dto/module.dto';
 
+/* eslint-disable @typescript-eslint/unbound-method */
 describe('ModuleController', () => {
   let controller: ModuleController;
   let service: jest.Mocked<ModuleService>;
@@ -15,9 +17,9 @@ describe('ModuleController', () => {
     userID: '550e8400-e29b-41d4-a716-446655440000',
   };
 
-  const session = {
+  const session: { user: { id: string } } = {
     user: { id: '550e8400-e29b-41d4-a716-446655440000' },
-  } as any;
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -41,12 +43,12 @@ describe('ModuleController', () => {
   });
 
   it('should create module', async () => {
-    const dto = {
+    const dto: CreateModuleDto = {
       code: 'COS332',
       name: 'Computer Networks',
       description: 'Networks module',
       styling: '#3B82F6',
-    } as any;
+    };
 
     service.create.mockResolvedValue({ module: mockModule });
 
