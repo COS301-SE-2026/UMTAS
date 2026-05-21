@@ -10,7 +10,10 @@ import {
   deleteModulesByIdPath,
 } from "./requestBuilders";
 
-const apiUrl = process.env.API_URL || "http://localhost:3000";
+const apiUrl =
+  (typeof window === "undefined"
+    ? process.env.API_URL
+    : process.env.NEXT_PUBLIC_API_URL) || "http://localhost:3000";
 
 describe("getAllModulesBuilder", () => {
   beforeEach(() => {
