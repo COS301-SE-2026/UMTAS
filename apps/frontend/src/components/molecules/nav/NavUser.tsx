@@ -5,14 +5,17 @@ import { LogOut } from "lucide-react";
 import { UserAvatar } from "@/components/atoms/nav/UserAvatar";
 import { ThemeToggle } from "@/components/atoms/auth/ThemeToggle";
 import { Button } from "@/components/atoms/baseShadcn/button";
-import { signOut } from "@/../utilities/auth-client";
+import { signOut, useSession } from "@/../utilities/auth-client";
 
 interface NavUserProps {
   name?: string | null;
 }
 
-export function NavUser({ name }: NavUserProps) {
+export function NavUser({ name: nameProp }: NavUserProps) {
   const router = useRouter();
+  const { data: session } = useSession();
+
+  const name = session?.user?.name ?? nameProp;
 
   async function handleSignOut() {
     await signOut({
@@ -26,17 +29,10 @@ export function NavUser({ name }: NavUserProps) {
     <div className="flex items-center gap-3">
       <ThemeToggle />
 
-      {/* user id */}
       <div className="flex items-center gap-2">
         <UserAvatar name={name} />
-        {name && (
-          <span className="hidden sm:block text-sm font-medium text-[--text-primary] max-w-[160px] truncate">
-            {name}
-          </span>
-        )}
       </div>
 
-      {/* sign out */}
       <Button
         variant="ghost"
         size="sm"
