@@ -15,7 +15,6 @@ import type { TimeSlot } from "@/components/atoms/builder/TimeSlotSelect";
 import { EventTypeDropdown } from "@/components/atoms/builder/eventDropdown";
 import type { EventType } from "@/components/atoms/builder/eventDropdown";
 import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
-import { Switch } from "@/components/atoms/baseShadcn/switch";
 import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
 
 export interface EventErrors {
@@ -29,20 +28,16 @@ export interface EventErrors {
 
 interface EventCardProps {
   event: EventResponse;
-  index: number;
   modules: ModuleResponseDto[];
   onUpdate: (id: number, field: string, value: string | boolean) => void;
-  onRemove: (id: number) => void;
   onGoToModules?: () => void;
   errors?: EventErrors;
 }
 
 export function EventCard({
   event,
-  index,
   modules,
   onUpdate,
-  onRemove,
   onGoToModules,
   errors,
 }: EventCardProps) {

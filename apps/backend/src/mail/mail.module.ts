@@ -4,6 +4,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/adapters/handlebars.adapter';
 import { join } from 'path';
 import { MailerService } from './mailer.service';
+import type { TransportOptions } from 'nodemailer';
 
 @Module({
   imports: [
@@ -20,7 +21,7 @@ import { MailerService } from './mailer.service';
         const mailFrom =
           configService.get<string>('MAIL_FROM') || 'noreply@umtas.co.za';
 
-        let transport: any;
+        let transport: unknown;
         if (mailService) {
           transport = {
             service: mailService,
@@ -43,7 +44,7 @@ import { MailerService } from './mailer.service';
         }
 
         return {
-          transport,
+          transport: transport as TransportOptions,
           defaults: {
             from: mailFrom,
           },

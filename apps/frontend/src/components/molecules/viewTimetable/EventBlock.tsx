@@ -2,7 +2,6 @@
 
 import React from "react";
 import { Clock } from "lucide-react";
-import { Badge } from "@/components/atoms/baseShadcn/badge";
 import type { ScheduleEvent } from "@/types/schedule";
 
 interface EventBlockProps {

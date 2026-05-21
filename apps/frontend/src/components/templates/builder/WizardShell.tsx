@@ -8,7 +8,6 @@ import { ModulesStep } from "@/components/organisms/builder/ModulesStep";
 import { EventsStep } from "@/components/organisms/builder/EventsStep";
 import { GenerateStep } from "@/components/organisms/builder/GenerateStep";
 import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
-import type { EventType } from "@/components/atoms/builder/eventDropdown";
 import {
   createModulesBuilder,
   getAllModulesBuilder,
@@ -36,16 +35,6 @@ function generateId(): string {
   crypto.getRandomValues(array);
 
   return array[0].toString();
-}
-
-function emptyModule(): ModuleResponseDto {
-  return {
-    moduleID: Number(generateId()),
-    moduleCode: "",
-    moduleName: "",
-    styling: "",
-    userID: "",
-  };
 }
 
 export function WizardShell() {
@@ -380,7 +369,6 @@ export function WizardShell() {
           onAdd={handleModuleAdd}
           onUpdate={handleModuleUpdate}
           onRemove={handleModuleRemove}
-          onNavigateAway={() => setCurrentStep(1)}
         />
       );
     }

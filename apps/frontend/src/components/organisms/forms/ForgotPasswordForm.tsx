@@ -10,8 +10,13 @@ import { UmtasLogo } from "@/components/atoms/auth/UmtasLogo";
 import { FormField } from "@/components/molecules/OAuth/FormField";
 import { AuthAlert } from "@/components/molecules/OAuth/AuthAlert";
 import { authClient } from "@/../utilities/auth-client";
+import {
+  buildAuthLinkHref,
+  resolveAuthRedirectTarget,
+} from "@/lib/auth-redirect";
 
 export function ForgotPasswordForm() {
+  const redirectTarget = resolveAuthRedirectTarget();
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -63,7 +68,7 @@ export function ForgotPasswordForm() {
             />
             <p className="text-[12px] text-[var(--text-secondary)] text-center">
               <Link
-                href="/login"
+                href={buildAuthLinkHref("/login", redirectTarget)}
                 className="text-[var(--text-primary)] underline-offset-2 hover:underline transition-colors duration-150"
               >
                 Back to log in
@@ -113,7 +118,7 @@ export function ForgotPasswordForm() {
             </form>
             <p className="text-[12px] text-[var(--text-secondary)] text-center">
               <Link
-                href="/login"
+                href={buildAuthLinkHref("/login", redirectTarget)}
                 className="text-[var(--text-primary)] underline-offset-2 hover:underline transition-colors duration-150"
               >
                 Back to log in

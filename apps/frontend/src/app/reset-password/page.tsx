@@ -12,10 +12,15 @@ import { FormField } from "@/components/molecules/OAuth/FormField";
 import { AuthAlert } from "@/components/molecules/OAuth/AuthAlert";
 import { AuthPageTemplate } from "@/components/templates/auth/AuthPageTemplate";
 import { authClient } from "@/../utilities/auth-client";
+import {
+  buildAuthLinkHref,
+  resolveAuthRedirectTarget,
+} from "@/lib/auth-redirect";
 
 function ResetPasswordContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const redirectTarget = resolveAuthRedirectTarget(searchParams);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [status, setStatus] = useState<
@@ -48,8 +53,10 @@ function ResetPasswordContent() {
       const { error } = await authClient.resetPassword({ newPassword, token });
       if (error) throw new Error(error.message ?? "Reset failed");
       setStatus("success");
-      setMessage("Password reset successfully. Redirecting to login…");
-      setTimeout(() => router.push("/login"), 3000);
+      setMessage(
+        `Password reset successfully. Redirecting to ${redirectTarget}…`,
+      );
+      setTimeout(() => router.push(redirectTarget), 3000);
     } catch (err: unknown) {
       setStatus("error");
       setMessage(
@@ -148,7 +155,7 @@ function ResetPasswordContent() {
               </form>
               <p className="text-[12px] text-[var(--text-secondary)] text-center">
                 <Link
-                  href="/login"
+                  href={buildAuthLinkHref("/login", redirectTarget)}
                   className="text-[var(--text-primary)] underline-offset-2 hover:underline transition-colors duration-150"
                 >
                   Back to log in
