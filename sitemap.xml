@@ -2,62 +2,266 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://cos301-se-2026.github.io/UMTAS/</loc>
-         <lastmod>2026-05-11</lastmod>
+         <lastmod>2026-05-21</lastmod>
     </url>
     <url>
-         <loc>https://cos301-se-2026.github.io/UMTAS/design/Brand-Style-Guide/</loc>
-         <lastmod>2026-05-11</lastmod>
+         <loc>https://cos301-se-2026.github.io/UMTAS/api/API-Reference/</loc>
+         <lastmod>2026-05-21</lastmod>
     </url>
     <url>
          <loc>https://cos301-se-2026.github.io/UMTAS/design/Wireframes/</loc>
-         <lastmod>2026-05-11</lastmod>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/developer-guides/</loc>
+         <lastmod>2026-05-21</lastmod>
     </url>
     <url>
          <loc>https://cos301-se-2026.github.io/UMTAS/developer-guides/Repo-Setup-Guide/</loc>
-         <lastmod>2026-05-11</lastmod>
+         <lastmod>2026-05-21</lastmod>
     </url>
     <url>
          <loc>https://cos301-se-2026.github.io/UMTAS/developer-guides/Server-Setup-Guide/</loc>
-         <lastmod>2026-05-11</lastmod>
+         <lastmod>2026-05-21</lastmod>
     </url>
     <url>
-         <loc>https://cos301-se-2026.github.io/UMTAS/diagrams/CICD-Pipeline/</loc>
-         <lastmod>2026-05-11</lastmod>
+         <loc>https://cos301-se-2026.github.io/UMTAS/developer-guides/backend-development-guide/</loc>
+         <lastmod>2026-05-21</lastmod>
     </url>
     <url>
-         <loc>https://cos301-se-2026.github.io/UMTAS/diagrams/Data-Storage-Layer/</loc>
-         <lastmod>2026-05-11</lastmod>
+         <loc>https://cos301-se-2026.github.io/UMTAS/developer-guides/e2e-testing-guide/</loc>
+         <lastmod>2026-05-21</lastmod>
     </url>
     <url>
-         <loc>https://cos301-se-2026.github.io/UMTAS/diagrams/Local-Vs-Prod-Dev/</loc>
-         <lastmod>2026-05-11</lastmod>
+         <loc>https://cos301-se-2026.github.io/UMTAS/developer-guides/frontend-development-guide/</loc>
+         <lastmod>2026-05-21</lastmod>
     </url>
     <url>
-         <loc>https://cos301-se-2026.github.io/UMTAS/diagrams/Monitoring-Observability-Stack/</loc>
-         <lastmod>2026-05-11</lastmod>
+         <loc>https://cos301-se-2026.github.io/UMTAS/developer-guides/git-strategy-guide/</loc>
+         <lastmod>2026-05-21</lastmod>
     </url>
     <url>
-         <loc>https://cos301-se-2026.github.io/UMTAS/diagrams/Network-Flow/</loc>
-         <lastmod>2026-05-11</lastmod>
+         <loc>https://cos301-se-2026.github.io/UMTAS/developer-guides/integration-testing-guide/</loc>
+         <lastmod>2026-05-21</lastmod>
     </url>
     <url>
-         <loc>https://cos301-se-2026.github.io/UMTAS/diagrams/WatchTower/</loc>
-         <lastmod>2026-05-11</lastmod>
+         <loc>https://cos301-se-2026.github.io/UMTAS/developer-guides/local-cicd-guide/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/developer-guides/master-development-guide/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/developer-guides/server-guide/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/developer-guides/unit-testing-guide/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/diagrams/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/diagrams/analytics/Analytics-Pipeline/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/diagrams/analytics/Heatmap-Logic/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/diagrams/analytics/Simulation-Architecture/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/diagrams/api/API-Contracts/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/diagrams/api/BullMQ-Flow/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/diagrams/api/Microservice-Communication/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/diagrams/api/OAuth-Flow/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/diagrams/architecture/Adapter-Pattern/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/diagrams/architecture/Component-Architecture/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/diagrams/architecture/Data-Flow/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/diagrams/architecture/Deployment-Topology/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/diagrams/architecture/Interaction-Sequence/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/diagrams/architecture/Process-Flow/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/diagrams/architecture/System-Overview/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/diagrams/database/ERD/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/diagrams/database/Privacy-Boundary/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/diagrams/database/Schema-Migrations/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/diagrams/devops/CICD-Pipeline/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/diagrams/devops/Data-Storage-Layer/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/diagrams/devops/Local-Vs-Prod-Dev/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/diagrams/devops/Monitoring-Observability-Stack/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/diagrams/devops/Network-Flow/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/diagrams/devops/WatchTower/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/diagrams/domain/Core-Domain-Model/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/diagrams/frontend/Component-Tree/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/diagrams/frontend/Navigation-Flow/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/diagrams/frontend/State-Management/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/diagrams/requirements/Authentication-System/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/diagrams/requirements/Calender-Integration-System/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/diagrams/requirements/Timetable-Import-System/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/diagrams/requirements/Timetable-Management-System/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/diagrams/requirements/Tyto-Simulation-System/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/diagrams/requirements/University-Analytics-System/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/diagrams/security/Auth-Flow/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/diagrams/security/Network-Security/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/diagrams/security/POPIA-Flow/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/diagrams/testing/Coverage-Map/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/diagrams/testing/Testing-Strategy/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/management/Marking-Guide/</loc>
+         <lastmod>2026-05-21</lastmod>
     </url>
     <url>
          <loc>https://cos301-se-2026.github.io/UMTAS/management/Team-Profiles/</loc>
-         <lastmod>2026-05-11</lastmod>
+         <lastmod>2026-05-21</lastmod>
     </url>
     <url>
-         <loc>https://cos301-se-2026.github.io/UMTAS/technical-specs/API-Contracts/</loc>
-         <lastmod>2026-05-11</lastmod>
+         <loc>https://cos301-se-2026.github.io/UMTAS/requirements/API-Service-Contracts/</loc>
+         <lastmod>2026-05-21</lastmod>
     </url>
     <url>
-         <loc>https://cos301-se-2026.github.io/UMTAS/technical-specs/Architecture/</loc>
-         <lastmod>2026-05-11</lastmod>
+         <loc>https://cos301-se-2026.github.io/UMTAS/requirements/Architectural-Requirements/</loc>
+         <lastmod>2026-05-21</lastmod>
     </url>
     <url>
-         <loc>https://cos301-se-2026.github.io/UMTAS/technical-specs/SRS/</loc>
-         <lastmod>2026-05-11</lastmod>
+         <loc>https://cos301-se-2026.github.io/UMTAS/requirements/Domain-Model/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/requirements/Functional-Requirements/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/requirements/Introduction/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/requirements/Quality-Requirements/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/requirements/Technology-Requirements/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/requirements/Traceability-Matrix/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/requirements/Use-Cases/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/requirements/User-Stories/</loc>
+         <lastmod>2026-05-21</lastmod>
     </url>
 </urlset>
