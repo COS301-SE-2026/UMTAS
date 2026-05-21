@@ -52,7 +52,7 @@ export class CreateEventDto {
   })
   @IsOptional()
   @IsString()
-  @Length(32)
+  @Length(1, 32)
   name?: string;
 
   @ApiPropertyOptional({
@@ -60,7 +60,7 @@ export class CreateEventDto {
   })
   @IsOptional()
   @IsString()
-  @Length(10)
+  @Length(1, 10)
   code?: string;
 
   @ApiProperty({
@@ -89,7 +89,7 @@ export class EventDto {
   })
   @IsOptional()
   @IsString()
-  @Length(32)
+  @Length(1, 32)
   name?: string;
 
   @ApiPropertyOptional({
@@ -97,7 +97,7 @@ export class EventDto {
   })
   @IsOptional()
   @IsString()
-  @Length(10)
+  @Length(1, 10)
   code?: string;
 
   @ApiProperty({ type: EventCriteriaDto })
@@ -169,7 +169,7 @@ export class UpdateEventDto {
   })
   @IsOptional()
   @IsString()
-  @Length(32)
+  @Length(1, 32)
   name?: string;
 
   @ApiPropertyOptional({
@@ -177,7 +177,7 @@ export class UpdateEventDto {
   })
   @IsOptional()
   @IsString()
-  @Length(10)
+  @Length(1, 10)
   code?: string;
 
   @ApiPropertyOptional({
