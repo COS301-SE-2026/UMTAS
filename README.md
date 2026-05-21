@@ -271,6 +271,24 @@ The system follows a **Service-Oriented Architecture**. The Next.js frontend com
 
 <div align="center">
 
+## <img src="https://api.iconify.design/mdi/infinity.svg?color=%233B82F6" width="24" height="24" valign="middle"> CI/CD Pipeline
+
+</div>
+
+<details>
+<summary><strong>CI/CD diagram</strong></summary>
+<br>
+
+<div align="center">
+<img src="docs/diagrams/architecture/DeploymentDiagram.svg" alt="UMTAS CI/CD Pipeline" width="900">
+</div>
+
+</details>
+
+---
+
+<div align="center">
+
 ## <img src="https://api.iconify.design/mdi/source-branch.svg?color=%233B82F6" width="24" height="24" valign="middle"> Branching Strategy
 
 </div>
