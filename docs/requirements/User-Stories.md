@@ -55,8 +55,6 @@ An academic staff member whose availability and preferences influence the timeta
 - Interested in ensuring their scheduled lectures do not conflict with other commitments. 
 - May have venue or time preferences.  
 
-### User Stories:
-
 
 ---
 
@@ -70,7 +68,6 @@ A staff member responsible for managing and approving the institutional timetabl
 - Responsible for configuring the system with venues, time slots, modules, and lecturer assignments.  
 - Interested in analytics such as venue utilisation, overcapacity alerts, and schedule conflict reports.  
 
-### User Stories:
 
 ---
 
@@ -82,5 +79,3 @@ A technical operator responsible for system health, access management, and confi
 **Characteristics:**
 - High technical proficiency.  
 - Responsible for deploying new university adapter instances and maintaining system infrastructure.  
-
-### User Stories:
