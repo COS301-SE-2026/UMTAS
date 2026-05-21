@@ -29,7 +29,7 @@ _Built by: Wilmar Smit, Michael Tomlinson, Johan Coetzer, Marcel Stoltz, & Aidan
 [![Last Commit](https://img.shields.io/github/last-commit/COS301-SE-2026/UMTAS/dev?style=for-the-badge&logo=git&logoColor=white&labelColor=1e293b&color=1d4ed8)](https://github.com/COS301-SE-2026/UMTAS/commits/dev)
 [![CI](https://img.shields.io/github/actions/workflow/status/COS301-SE-2026/UMTAS/ci.yml?branch=dev&style=for-the-badge&logo=githubactions&logoColor=white&label=CI)](https://github.com/COS301-SE-2026/UMTAS/actions/workflows/ci.yml)
 [![Coverage](https://img.shields.io/codecov/c/github/COS301-SE-2026/UMTAS/dev?style=for-the-badge&logo=codecov&logoColor=white&label=Coverage)](https://codecov.io/gh/COS301-SE-2026/UMTAS)
-[![Quality Gate](https://img.shields.io/badge/Quality_Gate-pending-3f3f46?style=for-the-badge&logo=sonarcloud&logoColor=white)](https://sonarcloud.io/dashboard?id=COS301-SE-2026_UMTAS)
+[![Quality Gate](https://img.shields.io/sonar/quality_gate/COS301-SE-2026_UMTAS?server=https%3A%2F%2Fsonarcloud.io&style=for-the-badge&logo=sonarcloud&logoColor=white)](https://sonarcloud.io/dashboard?id=COS301-SE-2026_UMTAS)
 [![Uptime](https://img.shields.io/uptimerobot/ratio/m803102764-591e06f9f3d70c1a4b161f6f?style=for-the-badge&logo=uptimerobot&logoColor=white&label=Uptime+30d&color=1d4ed8)](https://dashboard.uptimerobot.com/monitors/803102764)
 
 <!-- Platform & Tooling -->
@@ -58,7 +58,7 @@ _Built by: Wilmar Smit, Michael Tomlinson, Johan Coetzer, Marcel Stoltz, & Aidan
 
 [![Functional Requirements](<https://img.shields.io/badge/Functional_Requirements_(SRS)-View_Document-14532d?style=for-the-badge&logo=googledocs&logoColor=white>)](https://cos301-se-2026.github.io/UMTAS/requirements/Introduction/)
 [![Full Documentation](https://img.shields.io/badge/Full_Documentation-Visit_Site-14532d?style=for-the-badge&logo=readthedocs&logoColor=white)](https://cos301-se-2026.github.io/UMTAS/)
-[![Project Board](https://img.shields.io/badge/Project_Board-View_on_GitHub-14532d?style=for-the-badge&logo=github&logoColor=white)](https://github.com/orgs/COS301-SE-2026/projects)
+[![Project Board](https://img.shields.io/badge/Project_Board-View_on_GitHub-14532d?style=for-the-badge&logo=github&logoColor=white)](https://github.com/orgs/COS301-SE-2026/projects/31)
 [![Issue Tracker](https://img.shields.io/badge/Issue_Tracker-GitHub_Issues-14532d?style=for-the-badge&logo=github&logoColor=white)](https://github.com/COS301-SE-2026/UMTAS/issues)
 
 </div>
@@ -98,6 +98,10 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 
 </div>
 
+<details>
+<summary><strong>Expand features</strong></summary>
+<br>
+
 <table width="100%">
   <tr>
     <td width="33%" valign="top" align="center">
@@ -129,6 +133,8 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
   </tr>
 </table>
 
+</details>
+
 ---
 
 <div align="center">
@@ -136,6 +142,10 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 ## <img src="https://api.iconify.design/mdi/layers-outline.svg?color=%233B82F6" width="24" height="24" valign="middle"> Technology Stack
 
 </div>
+
+<details>
+<summary><strong>Expand technology stack</strong></summary>
+<br>
 
 **Frontend & UI**
 
@@ -183,6 +193,8 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 ![Loki](https://img.shields.io/badge/Loki-fec006?style=for-the-badge&logo=grafana&logoColor=black)
 ![PostHog](https://img.shields.io/badge/PostHog-000000?style=for-the-badge&logo=posthog&logoColor=white)
 
+</details>
+
 ---
 
 <div align="center">
@@ -193,31 +205,66 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 
 This is a **pnpm monorepo** managed by Turborepo. All applications, shared packages, and infrastructure live in one repository to enable atomic commits and shared tooling across every workstream.
 
-```mermaid
-mindmap
-  root((UMTAS))
-    apps
-      web
-        Next.js Frontend
-        React · Tailwind · Shadcn
-      api
-        NestJS Backend
-        DrizzleORM · BullMQ
-    packages
-      database
-        Schema & Migrations
-      types
-        Shared TypeScript
-      config
-        ESLint · TSConfig
-    solver
-      FastAPI Service
-      OR-Tools · PyMuPDF
-    infra
-      Docker Compose
-      Traefik · Grafana
-      Prometheus · Loki
+<details>
+<summary><strong>Expand directory tree</strong></summary>
+<br>
+
 ```
+UMTAS/
+├── apps/
+│   ├── backend/              # NestJS API — controllers, services, DrizzleORM, BullMQ
+│   │   └── src/
+│   │       ├── auth/         # BetterAuth, JWT, RBAC
+│   │       ├── Events/       # Event scheduling domain
+│   │       ├── Module/       # Module management
+│   │       ├── Timetable/    # Timetable CRUD & generation
+│   │       ├── mail/         # Transactional email
+│   │       └── db/           # Drizzle schema & migrations
+│   ├── frontend/             # Next.js — App Router, Tailwind, Shadcn/UI
+│   │   └── src/
+│   │       ├── app/          # Route segments
+│   │       ├── components/   # Shared UI components
+│   │       └── lib/          # Utilities & API client
+│   ├── solver/               # FastAPI — OR-Tools CP-SAT constraint solver
+│   │   ├── main.py
+│   │   └── swagger_ui.py
+│   └── e2e/                  # Playwright end-to-end tests
+├── packages/
+│   ├── database/             # Shared Drizzle schema & migration tooling
+│   └── shared-types/         # Shared TypeScript types across apps
+├── infra/
+│   ├── traefik/              # Reverse proxy & TLS termination
+│   ├── grafana/              # Dashboards & alerting
+│   ├── prometheus/           # Metrics scraping
+│   ├── loki/                 # Log aggregation
+│   └── promtail/             # Log shipping
+├── docker-compose.yml        # Base service definitions
+├── docker-compose.prod.yml   # Production overrides
+├── turbo.json                # Turborepo pipeline config
+└── pnpm-workspace.yaml       # Workspace package declarations
+```
+
+</details>
+
+---
+
+<div align="center">
+
+## <img src="https://api.iconify.design/mdi/sitemap-outline.svg?color=%233B82F6" width="24" height="24" valign="middle"> System Architecture
+
+</div>
+
+<details open>
+<summary><strong>System architecture diagram</strong></summary>
+<br>
+
+<div align="center">
+<img src="docs/diagrams/architecture/Architecture.svg" alt="UMTAS System Architecture" width="900">
+</div>
+
+The system follows a **Service-Oriented Architecture**. The Next.js frontend communicates exclusively with the NestJS API Core, which enforces JWT authentication and RBAC before dispatching long-running work (PDF parsing, constraint solving) to stateless workers via a BullMQ job queue. The FastAPI solver and PDF parser run as independently scalable services. All traffic is routed through Traefik with TLS termination.
+
+</details>
 
 ---
 
@@ -226,6 +273,10 @@ mindmap
 ## <img src="https://api.iconify.design/mdi/source-branch.svg?color=%233B82F6" width="24" height="24" valign="middle"> Branching Strategy
 
 </div>
+
+<details>
+<summary><strong>Expand branching strategy</strong></summary>
+<br>
 
 All development follows a **TDD Git Flow**. Feature work is done in short-lived branches and merged into `dev` via pull request. `main` only receives merges from `dev` at release points. Every pull request requires CI to pass and at least one peer review.
 
@@ -255,6 +306,8 @@ gitGraph LR:
    checkout main
    merge dev id: "v0.2.0"
 ```
+
+</details>
 
 ---
 

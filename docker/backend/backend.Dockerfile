@@ -1,4 +1,4 @@
-FROM node:22-alpine AS base
+FROM node:22-alpine@sha256:968df39aedcea65eeb078fb336ed7191baf48f972b4479711397108be0966920 AS base
 WORKDIR /app
 RUN corepack enable
 
@@ -15,12 +15,13 @@ RUN pnpm --filter=shared-types build
 RUN pnpm --filter=backend build
 RUN pnpm --filter=backend deploy --prod --legacy /deploy && cp -r apps/backend/dist /deploy/dist
 
-FROM node:22-alpine AS runtime
+FROM node:22-alpine@sha256:968df39aedcea65eeb078fb336ed7191baf48f972b4479711397108be0966920 AS runtime
 WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=8000
 COPY --from=build /deploy .
 EXPOSE 8000
+USER node
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
   CMD node -e "require('http').get('http://127.0.0.1:'+process.env.PORT+'/health',r=>process.exit(r.statusCode<500?0:1)).on('error',()=>process.exit(1))"
 CMD ["node", "dist/main"]
