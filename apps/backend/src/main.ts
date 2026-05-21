@@ -1,11 +1,19 @@
 import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { collectDefaultMetrics, register } from 'prom-client';
 import type { Request, Response } from 'express';
+import { join } from 'path';
 import { AppModule } from './app.module';
+import {
+  swaggerCustomCss,
+  swaggerCustomJs,
+  swaggerFaviconUrl,
+} from './swagger-theme';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  app.useStaticAssets(join(__dirname, '..', 'public'));
   const port = process.env.PORT ?? 3001;
 
   app.enableCors({
@@ -34,20 +42,30 @@ async function bootstrap() {
     })
     .addBearerAuth(undefined, 'bearer')
     .addServer(`http://localhost:${port}`, 'Local development')
-    .addServer('https://api.umtas.co.za', 'Production')
+    .addServer('https://api.capstone-vigil.dns.net.za', 'Production')
     .addTag('Health', 'System health checks')
     .addTag('Auth Email', 'Email-based authentication and account management')
     .addTag('Auth Google', 'Google OAuth and account linking')
     .addTag('Auth Session', 'Session monitoring and management')
     .addTag('Auth Admin', 'Administrative user management')
+    .addTag('Modules', 'Academic module management')
+    .addTag('Events', 'Scheduling event management')
+    .addTag('Timetables', 'Timetable generation and management')
     .build();
 
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('api/docs', app, document, {
+    customSiteTitle: 'UMTAS API Docs',
+    customfavIcon: swaggerFaviconUrl,
+    customCss: swaggerCustomCss,
+    customJsStr: [swaggerCustomJs],
     swaggerOptions: {
       persistAuthorization: true,
       displayOperationId: true,
       defaultModelsExpandDepth: 2,
+      docExpansion: 'list',
+      filter: true,
+      tagsSorter: 'alpha',
     },
   });
 

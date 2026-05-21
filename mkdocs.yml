@@ -30,6 +30,7 @@ theme:
 
 plugins:
   - search
+  - glightbox
   - drawio
   - swagger-ui-tag
   - minify:
@@ -74,7 +75,6 @@ nav:
   - Design Specifications:
       - 4.2.1 Brand Style: design/Brand-Style.md
       - 4.2.2 Wireframes: design/Wireframes.md
-  - Diagrams Repository: diagrams/README.md
   - API Reference: api/API-Reference.md
   - Developer Portal:
       - Overview: developer-guides/index.md

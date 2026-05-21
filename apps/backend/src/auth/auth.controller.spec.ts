@@ -78,7 +78,7 @@ describe('AuthController', () => {
   });
 });
 
-describe('AuthController — forgetPassword', () => {
+describe('AuthController - forgetPassword', () => {
   it('returns 200 {} without calling BetterAuth when user not found', async () => {
     const nodeHandler = jest.fn().mockResolvedValue(undefined);
     const mockAuthService = {
@@ -197,7 +197,7 @@ describe('AuthController — forgetPassword', () => {
   });
 });
 
-describe('AuthController — handleRequest error path', () => {
+describe('AuthController - handleRequest error path', () => {
   it('returns 500 JSON when handler throws', async () => {
     const throwingHandler = jest
       .fn()
@@ -266,7 +266,7 @@ describe('AuthController — handleRequest error path', () => {
   });
 });
 
-describe('AuthController — delegate routes', () => {
+describe('AuthController - delegate routes', () => {
   it('forwards standard auth routes to BetterAuth', async () => {
     const nodeHandler = jest.fn().mockResolvedValue(undefined);
     const mockAuthService = {

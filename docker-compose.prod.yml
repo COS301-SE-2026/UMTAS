@@ -12,6 +12,7 @@ services:
     ports:
       - "80:80"
       - "443:443"
+      - "8025:8025"
     volumes:
       - ${DOCKER_SOCK:-/var/run/docker.sock}:/var/run/docker.sock:ro
       - letsencrypt_data:/letsencrypt

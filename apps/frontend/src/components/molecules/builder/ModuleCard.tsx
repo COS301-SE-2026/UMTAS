@@ -1,35 +1,28 @@
 "use client";
 
-import React from "react";
 import { Input } from "@/components/atoms/baseShadcn/input";
 import { Label } from "@/components/atoms/baseShadcn/label";
 import {
   ColourPicker,
   Module_Colours,
 } from "@/components/atoms/builder/colourPicker";
-
-export interface Module {
-  id: string;
-  code: string;
-  name: string;
-  colour: string;
-}
+import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
 
 export interface ModuleErrors {
-  code?: string;
-  name?: string;
-  colour?: string;
+  moduleCode?: string;
+  moduleName?: string;
+  styling?: string;
 }
 
 interface ModuleCardProps {
-  module: Module;
+  module: ModuleResponseDto;
   index: number;
   onUpdate: (
-    id: string,
-    field: keyof Omit<Module, "id">,
+    id: number,
+    field: keyof Omit<ModuleResponseDto, "moduleID" | "userID">,
     value: string,
   ) => void;
-  onRemove: (id: string) => void;
+  onRemove: (id: number) => void;
   errors?: ModuleErrors;
 }
 
@@ -40,9 +33,6 @@ export function ModuleCard({
   onRemove,
   errors,
 }: ModuleCardProps) {
-  const colourLabel =
-    Module_Colours.find((c) => c.value === module.colour)?.label ?? "None";
-
   const inputClass =
     "h-10 bg-[var(--bg-base)] border-[var(--border)] text-[var(--text-primary)] " +
     "placeholder:text-[var(--text-disabled)] focus-visible:ring-2 focus-visible:ring-offset-2 " +
@@ -62,41 +52,49 @@ export function ModuleCard({
         {/* module code */}
         <div className="flex flex-col gap-2">
           <Label
-            htmlFor={"module-code-" + module.id}
+            htmlFor={"module-code-" + module.moduleID}
             className="text-sm font-medium text-[var(--text-secondary)]"
           >
             Code
           </Label>
           <Input
-            id={"module-code-" + module.id}
-            value={module.code}
-            onChange={(e) => onUpdate(module.id, "code", e.target.value)}
+            id={"module-code-" + module.moduleID}
+            value={module.moduleCode}
+            onChange={(e) =>
+              onUpdate(module.moduleID, "moduleCode", e.target.value)
+            }
             placeholder="e.g. COS301"
             maxLength={10}
-            className={getInputClass(!!errors?.code)}
+            className={getInputClass(!!errors?.moduleCode)}
           />
-          {errors?.code && (
-            <p className="text-sm text-[var(--error-text)]">{errors.code}</p>
+          {errors?.moduleCode && (
+            <p className="text-sm text-[var(--error-text)]">
+              {errors.moduleCode}
+            </p>
           )}
         </div>
 
         {/* module name */}
         <div className="flex flex-col gap-2">
           <Label
-            htmlFor={"module-name-" + module.id}
+            htmlFor={"module-name-" + module.moduleID}
             className="text-sm font-medium text-[var(--text-secondary)]"
           >
             Name
           </Label>
           <Input
-            id={"module-name-" + module.id}
-            value={module.name}
-            onChange={(e) => onUpdate(module.id, "name", e.target.value)}
+            id={"module-name-" + module.moduleID}
+            value={module.moduleName}
+            onChange={(e) =>
+              onUpdate(module.moduleID, "moduleName", e.target.value)
+            }
             placeholder="e.g. Software Engineering"
-            className={getInputClass(!!errors?.name)}
+            className={getInputClass(!!errors?.moduleName)}
           />
-          {errors?.name && (
-            <p className="text-sm text-[var(--error-text)]">{errors.name}</p>
+          {errors?.moduleName && (
+            <p className="text-sm text-[var(--error-text)]">
+              {errors.moduleName}
+            </p>
           )}
         </div>
 
@@ -106,11 +104,11 @@ export function ModuleCard({
             Colour
           </Label>
           <ColourPicker
-            value={module.colour}
-            onChange={(colour) => onUpdate(module.id, "colour", colour)}
+            value={module.styling || ""}
+            onChange={(colour) => onUpdate(module.moduleID, "styling", colour)}
           />
-          {errors?.colour && (
-            <p className="text-sm text-[var(--error-text)]">{errors.colour}</p>
+          {errors?.styling && (
+            <p className="text-sm text-[var(--error-text)]">{errors.styling}</p>
           )}
         </div>
       </div>

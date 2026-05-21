@@ -5,7 +5,13 @@ import { drizzle as drizzlePglite } from 'drizzle-orm/pglite';
 import { PGlite } from '@electric-sql/pglite';
 import { Pool } from 'pg';
 import * as schema from './schema';
-import type { AppDatabase } from '../auth/auth';
+
+import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import type { PgliteDatabase } from 'drizzle-orm/pglite';
+export type AppDatabase =
+  | NodePgDatabase<typeof schema>
+  | PgliteDatabase<typeof schema>;
+
 import { DB_MODES, parseDbMode, type DbMode } from './database.constants';
 
 @Injectable()
@@ -38,10 +44,14 @@ export class DatabaseService implements OnModuleDestroy {
     }
   }
 
+  //when testing we definitly need cleanup, otherwise jest hangs
   async onModuleDestroy(): Promise<void> {
-    if (!this.isTest) {
-      if (this.pool) await this.pool.end();
-      if (this.pglite) await this.pglite.close();
+    if (this.pool) {
+      await this.pool.end();
+    }
+
+    if (this.pglite) {
+      await this.pglite.close();
     }
   }
 }

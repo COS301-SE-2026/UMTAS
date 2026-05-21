@@ -34,12 +34,12 @@ pnpm run act         # simulate the full CI job locally
 ## :material-hook: Git Hooks
 
 === "Pre-Commit"
-    1. **Blocks commits to `main`, `master`, `dev`** — use a feature branch.
-    2. **Runs `lint-staged`** — Prettier, ESLint, secretlint on staged files.
-    3. **Type-checks staged TypeScript** — only the app(s) with staged `.ts`/`.tsx` files.
+    1. **Blocks commits to `main`, `master`, `dev`** - use a feature branch.
+    2. **Runs `lint-staged`** - Prettier, ESLint, secretlint on staged files.
+    3. **Type-checks staged TypeScript** - only the app(s) with staged `.ts`/`.tsx` files.
 
 === "Pre-Push"
-    1. **Passes protected branches through** (`main`, `master`, `dev`) — no checks.
+    1. **Passes protected branches through** (`main`, `master`, `dev`) - no checks.
     2. **Enforces branch naming** on all other branches:
 
     ```
@@ -65,7 +65,7 @@ pnpm run act         # simulate the full CI job locally
             └── deploy   ← dev branch only
                   └── notify (Discord)
     ```
-    Fix lint/build/test failures first — nothing else runs until `ci` passes.
+    Fix lint/build/test failures first - nothing else runs until `ci` passes.
 
 ---
 

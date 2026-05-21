@@ -12,7 +12,7 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
-    // Config files use CommonJS require() — not TypeScript source
+    // Config files use CommonJS require() - not TypeScript source
     "jest.config.js",
     // Generated output
     "coverage/**",
@@ -24,7 +24,7 @@ const eslintConfig = defineConfig([
       react: { version: "19.0" },
     },
     rules: {
-      // App Router has no pages/ directory — this Pages Router rule is N/A
+      // App Router has no pages/ directory - this Pages Router rule is N/A
       "@next/next/no-html-link-for-pages": "off",
     },
   },

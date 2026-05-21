@@ -59,7 +59,10 @@ CREATE TABLE "verification" (
 CREATE TABLE "Event" (
 	"userID" uuid NOT NULL,
 	"eventID" serial PRIMARY KEY NOT NULL,
-	"eventCriteria" jsonb
+	"eventName" varchar(32),
+	"eventCode" varchar(10),
+	"eventCriteria" jsonb,
+	"isRecurring" boolean DEFAULT false NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "EventsToTimetables" (

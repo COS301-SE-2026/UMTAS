@@ -120,3 +120,8 @@ Temporary Items
 working_docs/
 # Local act secrets
 .secrets
+
+.pnpm-store/
+apps/frontend/junit.xml
+
+.pnpm-store/

@@ -2,7 +2,7 @@ import { createAccessControl } from 'better-auth/plugins/access';
 import { defaultStatements, adminAc } from 'better-auth/plugins/admin/access';
 
 /**
- * Statement definitions — resource types and their allowed actions.
+ * Statement definitions - resource types and their allowed actions.
  * These are the permissions that can be granted to roles.
  */
 const statements = {
@@ -18,7 +18,7 @@ const statements = {
 export const ac = createAccessControl(statements);
 
 /**
- * student — can manage their own timetables only.
+ * student - can manage their own timetables only.
  * All other resources are blocked at the service layer.
  */
 export const student = ac.newRole({
@@ -26,7 +26,7 @@ export const student = ac.newRole({
 });
 
 /**
- * lecturer — created by a uni_admin. Read-only on venues/timetables;
+ * lecturer - created by a uni_admin. Read-only on venues/timetables;
  * can update (but not create or delete) modules within their university.
  */
 export const lecturer = ac.newRole({
@@ -36,7 +36,7 @@ export const lecturer = ac.newRole({
 });
 
 /**
- * uni_admin — full user management within their university,
+ * uni_admin - full user management within their university,
  * plus venue/module/parse job administration.
  * Cannot manage universities themselves (sys_admin only).
  */
@@ -50,7 +50,7 @@ export const uniAdmin = ac.newRole({
 });
 
 /**
- * sys_admin — full platform access including university provisioning.
+ * sys_admin - full platform access including university provisioning.
  */
 export const sysAdmin = ac.newRole({
   ...adminAc.statements,

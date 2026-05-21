@@ -22,8 +22,7 @@ import { AuthAlert } from "@/components/molecules/OAuth/AuthAlert";
 import { PasswordStrengthBadge } from "@/components/molecules/OAuth/PasswordStrengthBadge";
 import { signUp, signIn } from "@/../utilities/auth-client";
 
-const getAppUrl = () =>
-  process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3001";
+const getAppUrl = () => window.location.origin;
 
 interface FieldErrors {
   name?: string;

@@ -67,7 +67,7 @@ export default function VerifyPendingPage() {
           {resendStatus === "sent" && (
             <AuthAlert
               type="success"
-              message="Email sent — check your inbox."
+              message="Email sent - check your inbox."
             />
           )}
           {resendStatus === "error" && (
