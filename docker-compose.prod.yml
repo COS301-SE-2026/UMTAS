@@ -1,0 +1,127 @@
+services:
+  traefik:
+    image: traefik:v3.6
+    container_name: traefik
+    restart: always
+    security_opt:
+      - no-new-privileges:true
+    user: "0:0"
+    networks:
+      - gateway
+      - internal
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8025:8025"
+    volumes:
+      - ${DOCKER_SOCK:-/var/run/docker.sock}:/var/run/docker.sock:ro
+      - letsencrypt_data:/letsencrypt
+      - ./infra/traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+    command:
+      - "--certificatesresolvers.myresolver.acme.email=${LETSENCRYPT_EMAIL}"
+      - "--certificatesresolvers.myresolver.acme.caserver=${ACME_CA_SERVER:-https://acme-v02.api.letsencrypt.org/directory}"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.${DOMAIN}`)"
+      - "traefik.http.routers.traefik.service=api@internal"
+      - "traefik.http.routers.traefik.entrypoints=websecure"
+      - "traefik.http.routers.traefik.tls=true"
+      - "traefik.http.routers.traefik.tls.certresolver=myresolver"
+      - "traefik.http.routers.traefik.middlewares=traefik-auth"
+      - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_DASHBOARD_CREDENTIALS}"
+
+  minio:
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.minio.rule=Host(`storage.${DOMAIN}`)"
+      - "traefik.http.routers.minio.entrypoints=websecure"
+      - "traefik.http.routers.minio.tls=true"
+      - "traefik.http.routers.minio.tls.certresolver=myresolver"
+      - "traefik.http.services.minio.loadbalancer.server.port=9001"
+
+  solver:
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.solver.rule=Host(`solver.${DOMAIN}`)"
+      - "traefik.http.routers.solver.entrypoints=websecure"
+      - "traefik.http.routers.solver.tls=true"
+      - "traefik.http.routers.solver.tls.certresolver=myresolver"
+      - "traefik.http.services.solver.loadbalancer.server.port=8000"
+
+  backend:
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=gateway"
+      - "traefik.http.routers.backend.rule=Host(`api.${DOMAIN}`)"
+      - "traefik.http.routers.backend.entrypoints=websecure"
+      - "traefik.http.routers.backend.tls=true"
+      - "traefik.http.routers.backend.tls.certresolver=myresolver"
+      - "traefik.http.services.backend.loadbalancer.server.port=${BACKEND_PORT}"
+
+  frontend:
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.frontend.entrypoints=websecure"
+      - "traefik.http.routers.frontend.tls=true"
+      - "traefik.http.routers.frontend.tls.certresolver=myresolver"
+      - "traefik.http.services.frontend.loadbalancer.server.port=${FRONTEND_PORT}"
+
+  brand-style:
+    image: vigilcs/umtas-brand-style:latest
+    restart: unless-stopped
+    networks:
+      - gateway
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=gateway"
+      - "traefik.http.routers.brand-style.rule=Host(`brand.${DOMAIN}`)"
+      - "traefik.http.routers.brand-style.entrypoints=websecure"
+      - "traefik.http.routers.brand-style.tls=true"
+      - "traefik.http.routers.brand-style.tls.certresolver=myresolver"
+      - "traefik.http.services.brand-style.loadbalancer.server.port=6767"
+
+  grafana:
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.grafana.rule=Host(`grafana.${DOMAIN}`)"
+      - "traefik.http.routers.grafana.entrypoints=websecure"
+      - "traefik.http.routers.grafana.tls=true"
+      - "traefik.http.routers.grafana.tls.certresolver=myresolver"
+      - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    restart: always
+    networks:
+      - internal
+      - gateway
+    environment:
+      - DOCKER_API_VERSION=1.44
+      - REPO_USER=${DOCKERHUB_USERNAME}
+      - REPO_PASS=${DOCKERHUB_TOKEN}
+      - WATCHTOWER_NOTIFICATION_URL=${WATCHTOWER_DISCORD_URL}
+      - WATCHTOWER_NOTIFICATIONS_LEVEL=info
+      - WATCHTOWER_HTTP_API_METRICS=true
+      - WATCHTOWER_HTTP_API_TOKEN=${WATCHTOWER_HTTP_API_TOKEN}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --schedule "0/30 * * * * *" --cleanup
+    profiles:
+      - server
+
+# simulator:
+#     build:
+#       context: ./apps/simulator
+#       dockerfile: simulator.Dockerfile
+#     image: ${DOCKER_REGISTRY}/${PROJECT_NAME}-simulator:latest
+#     networks:
+#       - gateway
+#       - internal
+#     depends_on:
+#       postgres:
+#         condition: service_healthy
+#     profiles:
+#       - dev-docker
+#       - server

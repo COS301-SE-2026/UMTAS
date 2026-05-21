@@ -1,0 +1,5 @@
+# $3 is 1 for branch checkout, 0 for file checkout
+if [ "$3" = "1" ] && git diff "$1" "$2" --name-only | grep -q 'pnpm-lock.yaml'; then
+  echo "pnpm-lock.yaml changed - running pnpm install..."
+  pnpm install
+fi

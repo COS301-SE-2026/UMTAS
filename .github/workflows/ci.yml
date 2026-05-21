@@ -1,0 +1,276 @@
+name: CI / CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  ci:
+    name: Lint, Build & Test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write
+    env:
+      NEXT_TELEMETRY_DISABLED: 1
+      NEXT_PUBLIC_API_URL: https://api.${{ secrets.PROD_DOMAIN }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+
+      - name: Enable Corepack (pnpm)
+        run: corepack enable pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run Linter
+        run: pnpm run lint
+
+      - name: Run Build
+        run: pnpm run build
+
+      - name: Run Tests
+        run: pnpm run test:unit
+
+      - name: Run Integration Tests
+        run: pnpm --filter backend test:int
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@75cd11691c0faa626561e295848008c8a7dddffe # v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@0fa95f0e1eeaafde2c782583b36b28ad0d8c77d3 # v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: "**/junit.xml"
+
+  docker-check:
+    name: Validate Docker Builds (PR)
+    runs-on: ubuntu-latest
+    needs: ci
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: umtas_ci
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+
+      - name: Build backend image
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        with:
+          context: .
+          file: docker/backend/backend.Dockerfile
+          push: false
+          load: true
+          tags: umtas-backend:ci
+          cache-from: type=gha,scope=backend-main
+
+      - name: Build frontend image
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        with:
+          context: .
+          file: docker/frontend/frontend.Dockerfile
+          push: false
+          load: true
+          build-args: |
+            NEXT_PUBLIC_API_URL=https://api.${{ secrets.PROD_DOMAIN }}
+          tags: umtas-frontend:ci
+          cache-from: type=gha,scope=frontend-main
+
+  docker:
+    name: Build & Push Docker Images
+    runs-on: ubuntu-latest
+    needs: ci
+    if: github.event_name == 'push'
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Resolve image tags
+        id: tag
+        run: |
+          if [ "${{ github.ref_name }}" = "main" ]; then
+            echo "suffix=latest" >> $GITHUB_OUTPUT
+          else
+            echo "suffix=dev" >> $GITHUB_OUTPUT
+          fi
+          echo "sha=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
+      - name: Build & push backend
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        with:
+          context: .
+          file: docker/backend/backend.Dockerfile
+          push: true
+          tags: |
+            vigilcs/umtas:backend-${{ steps.tag.outputs.suffix }}
+            vigilcs/umtas:backend-${{ steps.tag.outputs.sha }}
+          cache-from: type=gha,scope=backend-${{ github.ref_name }}
+          cache-to: type=gha,mode=max,scope=backend-${{ github.ref_name }}
+
+      - name: Build & push frontend
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        with:
+          context: .
+          file: docker/frontend/frontend.Dockerfile
+          push: true
+          build-args: |
+            NEXT_PUBLIC_API_URL=https://api.${{ secrets.PROD_DOMAIN }}
+          tags: |
+            vigilcs/umtas:frontend-${{ steps.tag.outputs.suffix }}
+            vigilcs/umtas:frontend-${{ steps.tag.outputs.sha }}
+          cache-from: type=gha,scope=frontend-${{ github.ref_name }}
+          cache-to: type=gha,mode=max,scope=frontend-${{ github.ref_name }}
+
+      - name: Build & push solver
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        with:
+          context: apps/solver
+          file: apps/solver/solver.Dockerfile
+          push: true
+          tags: |
+            vigilcs/umtas:solver-${{ steps.tag.outputs.suffix }}
+            vigilcs/umtas:solver-${{ steps.tag.outputs.sha }}
+          cache-from: type=gha,scope=solver-${{ github.ref_name }}
+          cache-to: type=gha,mode=max,scope=solver-${{ github.ref_name }}
+
+  health-check:
+    name: Production Health Check
+    runs-on: ubuntu-latest
+    needs: docker
+    if: github.event_name == 'push' && github.ref_name == 'main'
+    permissions: {}
+
+    steps:
+      - name: Wait for Watchtower redeploy
+        run: |
+          echo "Waiting 60s for Watchtower to pull and restart containers..."
+          sleep 60
+
+      - name: Check production health endpoints
+        env:
+          DOMAIN: ${{ secrets.PROD_DOMAIN }}
+        run: |
+          failed=0
+
+          check() {
+            local url=$1
+            local attempt
+            for attempt in 1 2 3 4 5; do
+              status=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$url")
+              if [ "$status" = "200" ]; then
+                echo "OK: $url returned HTTP 200"
+                return 0
+              fi
+              echo "Attempt $attempt/5: $url returned HTTP $status"
+              [ "$attempt" -lt 5 ] && sleep 20
+            done
+            echo "FAIL: $url did not return HTTP 200 after 5 attempts"
+            return 1
+          }
+
+          check "https://api.${DOMAIN}/health"     || failed=1
+          check "https://solver.${DOMAIN}/health"  || failed=1
+          check "https://${DOMAIN}"                || failed=1
+
+          exit $failed
+
+  notify:
+    name: Notify Discord
+    runs-on: ubuntu-latest
+    needs: docker
+    if: always() && github.ref_name == 'dev'
+    permissions: {}
+
+    steps:
+      - name: Send Discord notification
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          DEPLOY_STATUS: ${{ needs.docker.result }}
+          COMMIT_SHA: ${{ github.sha }}
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
+          ACTOR: ${{ github.actor }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          SHORT_SHA="${COMMIT_SHA:0:7}"
+
+          if [ "$DEPLOY_STATUS" = "success" ]; then
+            COLOR=3066993
+            TITLE="✅ Images Pushed - Watchtower deploying"
+          else
+            COLOR=15158332
+            TITLE="❌ Image Push Failed"
+          fi
+
+          curl -s -o /dev/null -w "%{http_code}" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"embeds\": [{
+                \"title\": \"$TITLE\",
+                \"color\": $COLOR,
+                \"fields\": [
+                  { \"name\": \"Branch\", \"value\": \"dev\", \"inline\": true },
+                  { \"name\": \"Commit\", \"value\": \"\`$SHORT_SHA\`\", \"inline\": true },
+                  { \"name\": \"Author\", \"value\": \"$ACTOR\", \"inline\": true },
+                  { \"name\": \"Message\", \"value\": \"$COMMIT_MSG\" },
+                  { \"name\": \"Run\", \"value\": \"[View in GitHub]($RUN_URL)\" }
+                ]
+              }]
+            }" \
+            "$DISCORD_WEBHOOK"

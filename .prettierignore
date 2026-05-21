@@ -1,0 +1,2 @@
+# MkDocs uses admonition/tab syntax that Prettier collapses
+docs/**/*.md

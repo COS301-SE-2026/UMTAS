@@ -1,0 +1,71 @@
+name: Deploy MkDocs
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    branches:
+      - dev
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: 3.x
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Deploy Production
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: mkdocs gh-deploy --force
+
+      - name: Deploy Development
+        if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
+        run: |
+          # Dynamically set site_url for dev branch
+          sed -i 's|site_url: .*|site_url: https://cos301-se-2026.github.io/UMTAS/dev/|' mkdocs.yml
+          mkdocs build
+          mkdir -p site_mapping
+          mv site site_mapping/dev
+          cd site_mapping
+          touch .nojekyll
+          remote_repo="https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"
+          git init
+          git remote add origin $remote_repo
+          git fetch origin gh-pages
+          git reset origin/gh-pages
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add dev/
+
+          if git diff --staged --quiet; then
+            echo "No changes to docs detected. Skipping commit."
+          else
+            git commit -m "docs: deploy dev version"
+            git push origin HEAD:gh-pages
+          fi
+
+      - name: PR Preview
+        if: github.event_name == 'pull_request'
+        uses: rossjrw/pr-preview-action@ffa7509e91a3ec8dfc2e5536c4d5c1acdf7a6de9 # v1
+        with:
+          source-dir: site
+          preview-branch: gh-pages
+          umbrella-dir: previews
+          action: ${{ github.event.action }}
+        env:
+          BUILD_COMMAND: mkdocs build

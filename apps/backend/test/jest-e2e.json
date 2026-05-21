@@ -1,0 +1,26 @@
+{
+  "preset": "ts-jest/presets/default-esm",
+  "testEnvironment": "node",
+  "rootDir": ".",
+  "testRegex": ".e2e-spec.ts$",
+  "moduleNameMapper": {
+    "^(\\.{1,2}/.*)\\.js$": "$1"
+  },
+  "transform": {
+    "^.+\\.(t|j)sx?$": [
+      "ts-jest",
+      {
+        "useESM": true
+      }
+    ],
+    "^.+\\.mjs$": [
+      "ts-jest",
+      {
+        "useESM": true
+      }
+    ]
+  },
+  "extensionsToTreatAsEsm": [".ts"],
+  "setupFilesAfterEnv": ["<rootDir>/jest.setup.cjs"],
+  "transformIgnorePatterns": ["node_modules/(?!(better-auth|@better-auth)/)"]
+}
