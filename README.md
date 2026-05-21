@@ -353,7 +353,7 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
         Third-year CS student and Software Developer Intern at Tyto Insights, with prior experience migrating legacy systems at DCS Engineering. Serves as System Architect, responsible for the Core-and-Adapter pattern that keeps UMTAS university-agnostic. His Tuks PDF Calendar project provides the foundational domain expertise for the platform's PDF parsing challenges.
       </details>
       <br>
-      <a href="https://www.linkedin.com/in/michaeltomlinson"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
+      <a href="https://www.linkedin.com/in/michael-tomlinson-089511274/"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
       <a href="https://github.com/michaeltomlinsontuks"><img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"></a>
     </td>
   </tr>
