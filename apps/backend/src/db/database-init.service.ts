@@ -25,6 +25,11 @@ export class DatabaseInitService implements OnApplicationBootstrap {
     const shouldSeed = parseSeedFlag(this.configService.get<string>('SEED'));
     const migrationsFolder = join(process.cwd(), 'drizzle');
 
+    if (!shouldSeed) {
+      this.logger.log('Skipping migrations and seeding (SEED not enabled)');
+      return;
+    }
+
     try {
       if (dbMode === DB_MODES.PGLITE) {
         await migratePglite(
@@ -51,9 +56,7 @@ export class DatabaseInitService implements OnApplicationBootstrap {
       }
       this.logger.log('Database migrations applied successfully');
 
-      if (shouldSeed) {
-        await this.databaseSeedService.seed();
-      }
+      await this.databaseSeedService.seed();
     } catch (error) {
       this.logger.error('Failed to run database migrations', error);
       throw error;

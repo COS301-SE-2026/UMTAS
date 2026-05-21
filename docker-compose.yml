@@ -125,12 +125,12 @@ services:
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
       - REDIS_URL=${REDIS_URL}
       - SYSTEM_ADMIN_USER_IDS=${SYSTEM_ADMIN_USER_IDS}
-      - SMTP_HOST=${SMTP_HOST:-mailhog}
-      - SMTP_PORT=${SMTP_PORT:-1025}
-      - SMTP_SECURE=${SMTP_SECURE:-false}
-      - SMTP_USER=${SMTP_USER:-}
-      - SMTP_PASS=${SMTP_PASS:-}
-      - SMTP_FROM=${SMTP_FROM:-UMTAS <noreply@${DOMAIN}>}
+      - MAIL_HOST=${MAIL_HOST:-mailhog}
+      - MAIL_PORT=${MAIL_PORT:-1025}
+      - MAIL_SECURE=${MAIL_SECURE:-false}
+      - MAIL_USER=${MAIL_USER:-}
+      - MAIL_PASS=${MAIL_PASS:-}
+      - MAIL_FROM=${MAIL_FROM:-UMTAS <noreply@${DOMAIN}>}
     healthcheck:
       test:
         [
