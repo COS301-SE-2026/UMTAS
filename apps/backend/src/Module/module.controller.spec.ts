@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ModuleController } from './module.controller';
 import { ModuleService } from './module.service';
 import { CreateModuleDto } from './dto/module.dto';
+import type { SessionData } from '../auth/session.decorator';
 
 /* eslint-disable @typescript-eslint/unbound-method */
 describe('ModuleController', () => {
@@ -17,8 +18,25 @@ describe('ModuleController', () => {
     userID: '550e8400-e29b-41d4-a716-446655440000',
   };
 
-  const session: { user: { id: string } } = {
-    user: { id: '550e8400-e29b-41d4-a716-446655440000' },
+  const session: SessionData = {
+    user: {
+      id: '550e8400-e29b-41d4-a716-446655440000',
+      name: 'Test User',
+      email: 'test@example.com',
+      emailVerified: false,
+      role: 'student',
+      banned: false,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    },
+    session: {
+      id: 'sess-1',
+      token: 'tok',
+      userId: '550e8400-e29b-41d4-a716-446655440000',
+      expiresAt: new Date(Date.now() + 1000 * 60 * 60).toISOString(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    },
   };
 
   beforeEach(async () => {

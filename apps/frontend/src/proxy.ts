@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const SESSION_COOKIE_NAME = "umtas-session";
+const SESSION_COOKIE_NAME = "umtas.session_token";
 
 const PUBLIC_PATHS = [
   "/login",
