@@ -1,39 +1,16 @@
 "use client";
 
-import React, { useState } from "react";
 import { Plus, CalendarDays } from "lucide-react";
 import { PanelHeader } from "@/components/atoms/builder/PanelHeader";
 import { StepPill } from "@/components/atoms/builder/StepPill";
-import type { BuilderEvent } from "@/components/molecules/builder/EventCard";
-import type { EventType } from "@/components/atoms/builder/eventDropdown";
+import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
 
 interface EventsPanelProps {
-  events: BuilderEvent[];
+  events: EventResponse[];
   onClose: () => void;
   onAdd: () => void;
-  selectedEventId: string | null;
-  onEventSelect: (id: string) => void;
-}
-
-function generateId(): string {
-  const crypto = window.crypto;
-  const array = new Uint32Array(1);
-  crypto.getRandomValues(array);
-
-  return array[0].toString();
-}
-
-export function emptyEvent(): BuilderEvent {
-  return {
-    id: generateId(),
-    name: "",
-    code: "",
-    date: "",
-    startTime: "",
-    endTime: "",
-    type: "lecture" as EventType,
-    moduleId: "",
-  };
+  selectedEventId: number | null;
+  onEventSelect: (id: number) => void;
 }
 
 export function EventsPanel({
@@ -62,17 +39,20 @@ export function EventsPanel({
   function renderEventPills() {
     return (
       <div className="space-y-1">
-        {events.map((event, index) => (
-          <StepPill
-            key={event.id}
-            icon={<CalendarDays size={15} />}
-            label={event.name || "Event " + (index + 1)}
-            summary={event.date || undefined}
-            isActive={selectedEventId === event.id}
-            isComplete={!!(event.type && event.moduleId)}
-            onClick={() => onEventSelect(event.id)}
-          />
-        ))}
+        {events.map((event, index) => {
+          const criteria = event.event.eventCriteria;
+          return (
+            <StepPill
+              key={event.event.eventID}
+              icon={<CalendarDays size={15} />}
+              label={criteria?.moduleCode || "Event " + (index + 1)}
+              summary={criteria?.day || undefined}
+              isActive={selectedEventId === event.event.eventID}
+              isComplete={!!(criteria?.type && event.lecture?.moduleID)}
+              onClick={() => onEventSelect(event.event.eventID)}
+            />
+          );
+        })}
       </div>
     );
   }

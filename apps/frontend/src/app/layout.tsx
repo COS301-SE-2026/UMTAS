@@ -44,7 +44,7 @@ export default async function RootLayout({
       className={`${dmSans.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <head>
+      <head suppressHydrationWarning>
         <script
           dangerouslySetInnerHTML={{
             __html: `
