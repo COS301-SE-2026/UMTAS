@@ -75,13 +75,7 @@ export function ModuleFormPanel({
         }
       />
       <div className="flex-1 overflow-y-auto p-4">
-        <ModuleCard
-          module={module}
-          index={0}
-          onUpdate={onUpdate}
-          onRemove={() => {}}
-          errors={errors}
-        />
+        <ModuleCard module={module} onUpdate={onUpdate} errors={errors} />
       </div>
     </div>
   );

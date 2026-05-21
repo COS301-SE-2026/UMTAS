@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { AuthPageTemplate } from "@/components/templates/auth/AuthPageTemplate";
 import { RegisterForm } from "@/components/organisms/forms/RegisterForm";
 
@@ -10,7 +11,9 @@ export const metadata: Metadata = {
 export default function RegisterPage() {
   return (
     <AuthPageTemplate>
-      <RegisterForm />
+      <Suspense fallback={null}>
+        <RegisterForm />
+      </Suspense>
     </AuthPageTemplate>
   );
 }

@@ -8,7 +8,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/components/atoms/baseShadcn/card";
 import { Button } from "@/components/atoms/baseShadcn/button";
@@ -20,8 +20,13 @@ import { GoogleSignInButton } from "@/components/molecules/OAuth/GoogleSignInBut
 import { AuthDivider } from "@/components/molecules/OAuth/AuthDivider";
 import { AuthAlert } from "@/components/molecules/OAuth/AuthAlert";
 import { signIn } from "@/../utilities/auth-client";
-
-const getAppUrl = () => window.location.origin;
+import {
+  buildAuthCallbackUrl,
+  buildAuthLinkHref,
+  buildRedirectUrl,
+  resolveAuthRedirectTarget,
+  storeAuthRedirectTarget,
+} from "@/lib/auth-redirect";
 
 function mapAuthError(message: string): string {
   if (
@@ -50,28 +55,31 @@ function mapAuthError(message: string): string {
 
 export function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isEmailLoading, setIsEmailLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const redirectTarget = resolveAuthRedirectTarget(searchParams);
 
   async function handleEmailSignIn(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     setIsEmailLoading(true);
+    storeAuthRedirectTarget(redirectTarget);
 
     try {
       const result = await signIn.email({
         email,
         password,
-        callbackURL: `${getAppUrl()}/dashboard`,
+        callbackURL: buildRedirectUrl(redirectTarget),
       });
 
       if (result?.error) {
         setError(mapAuthError(result.error.message ?? "Unknown error"));
       } else {
-        router.push("/dashboard");
+        router.push(redirectTarget);
       }
     } catch {
       setError("Sign-in failed. Check your connection and try again.");
@@ -83,11 +91,12 @@ export function LoginForm() {
   async function handleGoogleSignIn() {
     setError(null);
     setIsGoogleLoading(true);
+    storeAuthRedirectTarget(redirectTarget);
 
     try {
       await signIn.social({
         provider: "google",
-        callbackURL: `${getAppUrl()}/auth-callback`,
+        callbackURL: buildAuthCallbackUrl(redirectTarget),
       });
     } catch {
       setError("Google sign-in failed. Try again or use email and password.");
@@ -192,7 +201,7 @@ export function LoginForm() {
         <p className="text-[12px] text-[var(--text-secondary)] text-center">
           Don&apos;t have an account?{" "}
           <Link
-            href="/register"
+            href={buildAuthLinkHref("/register", redirectTarget)}
             className="text-[var(--text-primary)] underline-offset-2 hover:underline transition-colors duration-150"
           >
             Register

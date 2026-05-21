@@ -9,11 +9,17 @@ import { Button } from "@/components/atoms/baseShadcn/button";
 import { UmtasLogo } from "@/components/atoms/auth/UmtasLogo";
 import { AuthPageTemplate } from "@/components/templates/auth/AuthPageTemplate";
 import { authClient } from "@/../utilities/auth-client";
+import {
+  clearAuthRedirectTarget,
+  buildAuthLinkHref,
+  resolveAuthRedirectTarget,
+} from "@/lib/auth-redirect";
 
 function VerifyEmailContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
+  const redirectTarget = resolveAuthRedirectTarget(searchParams);
 
   const [status, setStatus] = useState<"loading" | "success" | "error">(
     token ? "loading" : "error",
@@ -30,8 +36,9 @@ function VerifyEmailContent() {
       .then(({ error }) => {
         if (error) throw new Error(error.message ?? "Verification failed");
         setStatus("success");
-        setMessage("Email verified! Redirecting to login…");
-        setTimeout(() => router.push("/login"), 3000);
+        clearAuthRedirectTarget();
+        setMessage(`Email verified! Redirecting to ${redirectTarget}…`);
+        setTimeout(() => router.push(redirectTarget), 3000);
       })
       .catch((err: unknown) => {
         setStatus("error");
@@ -39,7 +46,7 @@ function VerifyEmailContent() {
           err instanceof Error ? err.message : "An unexpected error occurred.",
         );
       });
-  }, [token, router]);
+  }, [token, redirectTarget, router]);
 
   return (
     <AuthPageTemplate>
@@ -104,7 +111,9 @@ function VerifyEmailContent() {
                 asChild
                 className="w-full h-9 bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] hover:bg-[var(--btn-primary-hover)]"
               >
-                <Link href="/login">Go to login</Link>
+                <Link href={buildAuthLinkHref("/login", redirectTarget)}>
+                  Go to login
+                </Link>
               </Button>
             </div>
           )}

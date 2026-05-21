@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { Suspense, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Loader2, Mail } from "lucide-react";
 import { Card, CardContent } from "@/components/atoms/baseShadcn/card";
 import { Button } from "@/components/atoms/baseShadcn/button";
@@ -9,13 +10,19 @@ import { UmtasLogo } from "@/components/atoms/auth/UmtasLogo";
 import { AuthAlert } from "@/components/molecules/OAuth/AuthAlert";
 import { AuthPageTemplate } from "@/components/templates/auth/AuthPageTemplate";
 import { authClient, useSession } from "@/../utilities/auth-client";
+import {
+  buildAuthLinkHref,
+  resolveAuthRedirectTarget,
+} from "@/lib/auth-redirect";
 
-export default function VerifyPendingPage() {
+function VerifyPendingContent() {
+  const searchParams = useSearchParams();
   const { data: session } = useSession();
   const [isLoading, setIsLoading] = useState(false);
   const [resendStatus, setResendStatus] = useState<"idle" | "sent" | "error">(
     "idle",
   );
+  const redirectTarget = resolveAuthRedirectTarget(searchParams);
 
   async function handleResend() {
     setResendStatus("idle");
@@ -23,7 +30,7 @@ export default function VerifyPendingPage() {
     try {
       const { error } = await authClient.sendVerificationEmail({
         email: session?.user?.email ?? "",
-        callbackURL: "/dashboard",
+        callbackURL: redirectTarget,
       });
       setResendStatus(error ? "error" : "sent");
     } catch {
@@ -96,7 +103,7 @@ export default function VerifyPendingPage() {
           <p className="text-[12px] text-[var(--text-secondary)]">
             Wrong email?{" "}
             <Link
-              href="/register"
+              href={buildAuthLinkHref("/register", redirectTarget)}
               className="text-[var(--text-primary)] underline-offset-2 hover:underline transition-colors duration-150"
             >
               Register again
@@ -105,5 +112,13 @@ export default function VerifyPendingPage() {
         </CardContent>
       </Card>
     </AuthPageTemplate>
+  );
+}
+
+export default function VerifyPendingPage() {
+  return (
+    <Suspense fallback={null}>
+      <VerifyPendingContent />
+    </Suspense>
   );
 }
