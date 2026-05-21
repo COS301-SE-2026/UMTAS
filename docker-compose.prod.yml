@@ -68,7 +68,7 @@ services:
       - "traefik.http.services.frontend.loadbalancer.server.port=${FRONTEND_PORT}"
 
   brand-style:
-    image: umtas-brand-style:latest
+    image: vigilcs/umtas-brand-style:latest
     restart: unless-stopped
     networks:
       - gateway
