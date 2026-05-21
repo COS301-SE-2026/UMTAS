@@ -66,6 +66,20 @@ services:
       - "traefik.http.routers.frontend.tls.certresolver=myresolver"
       - "traefik.http.services.frontend.loadbalancer.server.port=${FRONTEND_PORT}"
 
+  brand-style:
+    image: umtas-brand-style:latest
+    restart: unless-stopped
+    networks:
+      - gateway
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=gateway"
+      - "traefik.http.routers.brand-style.rule=Host(`brand.${DOMAIN}`)"
+      - "traefik.http.routers.brand-style.entrypoints=websecure"
+      - "traefik.http.routers.brand-style.tls=true"
+      - "traefik.http.routers.brand-style.tls.certresolver=myresolver"
+      - "traefik.http.services.brand-style.loadbalancer.server.port=6767"
+
   grafana:
     labels:
       - "traefik.enable=true"
