@@ -24,7 +24,7 @@ The domain model describes every entity the system tracks, how those entities re
 !!! success "Demo 1 - Implemented"
     A user creates `Module` records for their enrolled courses, attaches `Lecture` events carrying an `EventCriteria` value object, and groups events into named `Timetable` collections.
 
-![Domain Model Diagram](../diagrams/domain/Domain.svg)
+![Domain Model](../diagrams/domain/Domain.svg)
 
 ### Entity Summary
 

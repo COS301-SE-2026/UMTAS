@@ -73,7 +73,7 @@ nav:
       - 4.1.9 Traceability Matrix: requirements/Traceability-Matrix.md
       - 4.1.10 API Service Contracts: requirements/API-Service-Contracts.md
   - Design Specifications:
-      - 4.2.1 Brand Style: design/Brand-Style.md
+      - 4.2.1 Brand Style: https://brand.capstone-vigil.dns.net.za/
       - 4.2.2 Wireframes: design/Wireframes.md
   - API Reference: api/API-Reference.md
   - Developer Portal:

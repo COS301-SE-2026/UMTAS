@@ -40,12 +40,6 @@ pnpm --filter frontend run test -- --coverage  # frontend with coverage
 
 ## :material-alert-circle: What to Worry About
 
-??? warning "Coverage thresholds - CI blocks merges below these"
-    | App          | Statements | Branches | Functions | Lines |
-    | :----------- | :--------: | :------: | :-------: | :---: |
-    | **Backend**  | 20%        | 8%       | 12%       | 18%   |
-    | **Frontend** | 25%        | 35%      | 18%       | 25%   |
-
 ??? warning "Test quality"
     - Name reads like a sentence: `it('should return 400 if the date is in the past')`
     - One behaviour per test - if it can fail for two reasons, split it.

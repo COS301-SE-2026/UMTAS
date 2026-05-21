@@ -1,4 +1,4 @@
-# Diagram Repository
+# System Diagrams
 
 This section contains all architectural and system diagrams for the UMTAS platform, organised by concern.
 

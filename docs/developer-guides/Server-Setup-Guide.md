@@ -13,12 +13,6 @@ Before we installed any services, we ensured that all entry points were secure.
 
 We moved the SSH port from port `22` to another port (`2222`) to drastically reduce the background noise logs from potential automated attacks.
 
-### Key-Only Auth
-
-> **Something to consider:**
-
-We disabled password authentication due to the fact that passwords can be guessed or leaked. Using Keys makes brute-forcing the passwords essentially impossible.
-
 ### Enable UFW
 
 This firewall acts as our outer gate. We deny all incoming traffic by default, ensuring that when we unknowingly expose an internal container port, it won't be publicly accessible. We would need to explicitly whitelist it to expose the port.
@@ -61,7 +55,7 @@ Every config file is stored in the `/infra` folder. This ensures that there are 
 
 - **Tech:** Watchtower
 - **Why:** Auto-updates our containers when new images are pushed to the registry.
-- **Config:** Watchtower runs every hour.
+- **Config:** Watchtower runs every 30 seconds.
 
 ### Mail Server
 

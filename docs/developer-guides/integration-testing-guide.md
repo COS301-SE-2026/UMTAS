@@ -34,8 +34,7 @@
 ## :material-console: What to Run
 
 ```bash
-pnpm run test:unit             # all unit + integration tests (no e2e)
-pnpm --filter backend run test # backend only
+pnpm run test:int             # all integration tests
 ```
 
 ---
@@ -62,4 +61,4 @@ pnpm --filter backend run test # backend only
     - [ ] Full path covered: Request → Service → DB → Response.
     - [ ] Each test file is fully isolated - no shared state.
     - [ ] External HTTP calls (solver, third-party) are mocked.
-    - [ ] Suite passes locally (`pnpm run test:unit`).
+    - [ ] Suite passes locally (`pnpm run test:int`).

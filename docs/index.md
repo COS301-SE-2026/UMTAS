@@ -60,6 +60,14 @@ Get up and running with the UMTAS platform in minutes.
 
     [:octicons-arrow-right-24: View APIs](api/API-Reference.md)
 
+-   :material-palette:{ .lg .middle } __Brand Style Guide__
+
+    ---
+
+    View the UMTAS visual identity, design tokens, and brand usage guidance.
+
+    [:octicons-arrow-right-24: Open Brand Site](https://brand.capstone-vigil.dns.net.za/)
+
 -   :material-account-group:{ .lg .middle } __Team Vigil__
 
     ---
@@ -71,6 +79,7 @@ Get up and running with the UMTAS platform in minutes.
 </div>
 
 ---
+
 
 ## :material-tools: Technology Stack
 
@@ -125,4 +134,3 @@ The platform is built using a modern, high-performance stack designed for scale 
 </div>
 
 ---
-
