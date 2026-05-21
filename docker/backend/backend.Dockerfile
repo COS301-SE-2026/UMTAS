@@ -1,4 +1,4 @@
-FROM node:22-alpine@sha256:968df39aedcea65eeb078fb336ed7191baf48f972b4479711397108be0966920 AS base
+FROM node:22-alpine AS base
 WORKDIR /app
 RUN corepack enable
 
@@ -15,7 +15,7 @@ RUN pnpm --filter=shared-types build
 RUN pnpm --filter=backend build
 RUN pnpm --filter=backend deploy --prod --legacy /deploy && cp -r apps/backend/dist /deploy/dist
 
-FROM node:22-alpine@sha256:968df39aedcea65eeb078fb336ed7191baf48f972b4479711397108be0966920 AS runtime
+FROM node:22-alpine AS runtime
 WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=8000
