@@ -70,9 +70,6 @@ export class ModuleService {
 
   //return all
   async getAll(userId: string): Promise<ModuleListResponseDto> {
-    // if (!userId)
-    //   throw new BadRequestException('User ID is required to fetch modules');
-
     const foundModules = await this.dbService.db
       .select()
       .from(modules)
@@ -82,9 +79,6 @@ export class ModuleService {
   } //getAll
 
   async getById(userId: string, id: number): Promise<SingleModuleResponseDto> {
-    if (!userId)
-      throw new BadRequestException('User ID is required to fetch a module');
-
     const [module] = await this.dbService.db
       .select()
       .from(modules)
@@ -103,9 +97,6 @@ export class ModuleService {
     moduleId: number,
     dto: UpdateModuleDto,
   ): Promise<SingleModuleResponseDto> {
-    // if (!userId)
-    //   throw new BadRequestException('User ID is required to update a module');
-
     //Find module
     const [module] = await this.dbService.db
       .select()
@@ -172,9 +163,6 @@ export class ModuleService {
     userId: string,
     moduleId: number,
   ): Promise<DeleteModuleResponseDto> {
-    if (!userId)
-      throw new BadRequestException('User ID is required to delete a module');
-
     const [module] = await this.dbService.db
       .select()
       .from(modules)
