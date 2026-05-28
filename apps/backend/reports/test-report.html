@@ -1,0 +1,277 @@
+<html><head><meta charset="utf-8"/><title>My Test Report</title><style type="text/css">:root {
+  --text-primary: #111;
+  --text-secondary: #4f4f4f;
+  --success: #006633;
+  --success-bright: #80ffbf;
+  --danger: #cc071e;
+  --danger-bright: #fbdfe0;
+  --warning: #995c00;
+  --warning-bright: #ffeea8;
+  --panel: #eee;
+  --border: #949494;
+  --disabled: #6b6b6b;
+}
+
+html,
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  margin: 0;
+  padding: 0;
+  color: var(--text-primary);
+}
+body {
+  padding: 2rem 1rem;
+}
+.jesthtml-content {
+  margin: 0 auto;
+  max-width: 70rem;
+}
+header {
+  display: flex;
+  align-items: center;
+}
+#title {
+  margin: 0;
+  flex-grow: 1;
+}
+#logo {
+  height: 4rem;
+}
+#timestamp {
+  color: var(--text-secondary);
+  margin-top: 0.5rem;
+}
+
+#metadata-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.additional-information-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  color: var(--text-secondary);
+}
+
+/** SUMMARY */
+#summary {
+  color: var(--text-primary);
+  display: flex;
+  font-family: monospace;
+  font-size: 1rem;
+}
+#summary > div {
+  margin-right: 0.5rem;
+  background: var(--panel);
+  padding: 1rem;
+  min-width: 15rem;
+}
+#summary > div:last-child {
+  margin-right: 0;
+}
+@media only screen and (max-width: 720px) {
+  #summary {
+    flex-direction: column;
+  }
+  #summary > div {
+    margin-right: 0;
+    margin-top: 1rem;
+  }
+  #summary > div:first-child {
+    margin-top: 0;
+  }
+}
+
+.summary-total {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+.summary-passed {
+  color: var(--success);
+  border-left: 0.4rem solid var(--success);
+  padding-left: 0.5rem;
+  margin-bottom: 0.15rem;
+}
+.summary-failed,
+.summary-obsolete-snapshots {
+  color: var(--danger);
+  border-left: 0.4rem solid var(--danger);
+  padding-left: 0.5rem;
+  margin-bottom: 0.15rem;
+}
+.summary-pending {
+  color: var(--warning);
+  border-left: 0.4rem solid var(--warning);
+  padding-left: 0.5rem;
+  margin-bottom: 0.15rem;
+}
+.summary-empty {
+  color: var(--disabled);
+  border-left: 0.4rem solid var(--disabled);
+  margin-bottom: 0.15rem;
+}
+
+.test-result {
+  padding: 1rem;
+  margin-bottom: 0.25rem;
+}
+.test-result:last-child {
+  border: 0;
+}
+.test-result.passed {
+  background-color: var(--success-bright);
+  color: var(--success);
+}
+.test-result.failed {
+  background-color: var(--danger-bright);
+  color: var(--danger);
+}
+.test-result.pending {
+  background-color: var(--warning-bright);
+  color: var(--warning);
+}
+
+.test-info {
+  display: flex;
+  justify-content: space-between;
+}
+.test-suitename {
+  width: 20%;
+  text-align: left;
+  font-weight: bold;
+  word-break: break-word;
+}
+.test-title {
+  width: 40%;
+  text-align: left;
+  font-style: italic;
+}
+.test-status {
+  width: 20%;
+  text-align: right;
+}
+.test-duration {
+  width: 10%;
+  text-align: right;
+  font-size: 0.85rem;
+}
+
+.failureMessages {
+  padding: 0 1rem;
+  margin-top: 1rem;
+  border-top: 1px dashed var(--danger);
+}
+.failureMessages.suiteFailure {
+  border-top: none;
+}
+.failureMsg {
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  white-space: -pre-wrap;
+  white-space: -o-pre-wrap;
+  word-wrap: break-word;
+}
+
+.suite-container {
+  margin-bottom: 1rem;
+}
+.suite-info {
+  padding: 1rem;
+  background-color: var(--panel);
+  color: var(--text-secondary);
+  border: 0.15rem solid;
+  border-color: var(--panel);
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+.suite-info:hover {
+  border-color: var(--border);
+  cursor: pointer;
+}
+.suite-info .suite-path {
+  word-break: break-all;
+  flex-grow: 1;
+  font-family: monospace;
+  font-size: 1rem;
+}
+.suite-info .suite-time {
+  margin-left: 1rem;
+  padding: 0.2rem 0.3rem;
+  font-size: 0.85rem;
+}
+.suite-info .suite-time.warn {
+  background-color: var(--danger);
+  color: #fff;
+}
+.suite-info:before {
+  content: "\2303";
+  display: inline-block;
+  margin-right: 1rem;
+  transform: rotate(180deg) translateY(0.15rem);
+}
+.suite-container[open] .suite-info:before {
+  transform: rotate(0deg) translateY(0.15rem);
+}
+
+/* CONSOLE LOGS */
+.suite-consolelog {
+  margin-bottom: 0.25rem;
+  padding: 1rem;
+  background-color: var(--panel);
+}
+.suite-consolelog-header {
+  font-weight: bold;
+}
+.suite-consolelog-item {
+  padding: 0.5rem;
+}
+.suite-consolelog-item pre {
+  margin: 0.5rem 0;
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  white-space: -pre-wrap;
+  white-space: -o-pre-wrap;
+  word-wrap: break-word;
+}
+.suite-consolelog-item-origin {
+  color: var(--text-secondary);
+  font-weight: bold;
+}
+.suite-consolelog-item-message {
+  color: var(--text-primary);
+  font-size: 1rem;
+  padding: 0 0.5rem;
+}
+
+/* OBSOLETE SNAPSHOTS */
+.suite-obsolete-snapshots {
+  margin-bottom: 0.25rem;
+  padding: 1rem;
+  background-color: var(--danger-bright);
+  color: var(--danger);
+}
+.suite-obsolete-snapshots-header {
+  font-weight: bold;
+}
+.suite-obsolete-snapshots-item {
+  padding: 0.5rem;
+}
+.suite-obsolete-snapshots-item pre {
+  margin: 0.5rem 0;
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  white-space: -pre-wrap;
+  white-space: -o-pre-wrap;
+  word-wrap: break-word;
+}
+.suite-obsolete-snapshots-item-message {
+  color: var(--text-primary);
+  font-size: 1rem;
+  padding: 0 0.5rem;
+}
+</style></head><body><main class="jesthtml-content"><header><h1 id="title">My Test Report</h1></header><section id="metadata-container"><div id="timestamp">Started: 2026-05-28 15:51:43</div><div id="summary"><div id="suite-summary"><div class="summary-total">Suites (19)</div><div class="summary-passed ">19 passed</div><div class="summary-failed  summary-empty">0 failed</div><div class="summary-pending  summary-empty">0 pending</div></div><div id="test-summary"><div class="summary-total">Tests (154)</div><div class="summary-passed ">154 passed</div><div class="summary-failed  summary-empty">0 failed</div><div class="summary-pending  summary-empty">0 pending</div></div></div></section><details id="suite-1" class="suite-container" open=""><summary class="suite-info"><div class="suite-path">/home/aidan/COS301/CapStone/UMTAS/apps/backend/src/auth/auth.spec.ts</div><div class="suite-time">4.257s</div></summary><div class="suite-tests"><div class="test-result passed"><div class="test-info"><div class="test-suitename">mapGoogleProfileToUser</div><div class="test-title">maps full profile with all fields</div><div class="test-status">passed</div><div class="test-duration">0.014s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">mapGoogleProfileToUser</div><div class="test-title">falls back to email prefix when name missing</div><div class="test-status">passed</div><div class="test-duration">0.018s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">mapGoogleProfileToUser</div><div class="test-title">returns empty strings when name and email both missing</div><div class="test-status">passed</div><div class="test-duration">0.082s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">mapGoogleProfileToUser</div><div class="test-title">ignores non-string picture</div><div class="test-status">passed</div><div class="test-duration">0.002s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">createAuth - URL rewrite &gt; sendResetPassword</div><div class="test-title">rewrites URL to appURL when appURL set and token in path</div><div class="test-status">passed</div><div class="test-duration">0.009s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">createAuth - URL rewrite &gt; sendResetPassword</div><div class="test-title">uses original URL when no appURL</div><div class="test-status">passed</div><div class="test-duration">0.001s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">createAuth - URL rewrite &gt; sendResetPassword</div><div class="test-title">warns and uses original URL when token cannot be extracted</div><div class="test-status">passed</div><div class="test-duration">0.002s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">createAuth - URL rewrite &gt; sendResetPassword</div><div class="test-title">logs error when URL rewriting throws</div><div class="test-status">passed</div><div class="test-duration">0.003s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">createAuth - URL rewrite &gt; sendResetPassword</div><div class="test-title">logs when password reset completes</div><div class="test-status">passed</div><div class="test-duration">0.014s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">createAuth - URL rewrite &gt; sendVerificationEmail callback</div><div class="test-title">logs error when URL rewriting throws in verification</div><div class="test-status">passed</div><div class="test-duration">0.002s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">createAuth - URL rewrite &gt; sendVerificationEmail callback</div><div class="test-title">rewrites URL to appURL when appURL set and token present</div><div class="test-status">passed</div><div class="test-duration">0.002s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">createAuth - URL rewrite &gt; sendVerificationEmail callback</div><div class="test-title">warns when URL missing token</div><div class="test-status">passed</div><div class="test-duration">0.017s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">createAuth - URL rewrite &gt; sendVerificationEmail callback</div><div class="test-title">warns instead of sending when no sendVerificationEmail provided</div><div class="test-status">passed</div><div class="test-duration">0.002s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">createAuth - URL rewrite &gt; background task error handler</div><div class="test-title">logs error when background task rejects with non-Error</div><div class="test-status">passed</div><div class="test-duration">0.007s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">createAuth - URL rewrite &gt; background task error handler</div><div class="test-title">logs error when background task rejects</div><div class="test-status">passed</div><div class="test-duration">0.003s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">createAuth - databaseHooks &gt; user.create.before</div><div class="test-title">defaults role to student when no role provided and no actor</div><div class="test-status">passed</div><div class="test-duration">0.002s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">createAuth - databaseHooks &gt; user.create.before</div><div class="test-title">sys_admin passes data through unchanged (no role override)</div><div class="test-status">passed</div><div class="test-duration">0.001s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">createAuth - databaseHooks &gt; user.create.before</div><div class="test-title">allows sys_admin to assign any valid role</div><div class="test-status">passed</div><div class="test-duration">0.001s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">createAuth - databaseHooks &gt; user.create.before</div><div class="test-title">allows uni_admin to assign lecturer</div><div class="test-status">passed</div><div class="test-duration">0.018s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">createAuth - databaseHooks &gt; user.create.before</div><div class="test-title">defaults uni_admin create to student when no role provided</div><div class="test-status">passed</div><div class="test-duration"> </div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">createAuth - databaseHooks &gt; user.create.before</div><div class="test-title">throws FORBIDDEN when uni_admin tries to assign sys_admin</div><div class="test-status">passed</div><div class="test-duration">0.105s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">createAuth - databaseHooks &gt; user.create.before</div><div class="test-title">throws BAD_REQUEST for invalid role string</div><div class="test-status">passed</div><div class="test-duration">0.002s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">createAuth - databaseHooks &gt; user.create.after</div><div class="test-title">calls logger.log with audit event containing user.create action</div><div class="test-status">passed</div><div class="test-duration">0.011s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">createAuth - databaseHooks &gt; user.create.after</div><div class="test-title">handles null context in user.create.after</div><div class="test-status">passed</div><div class="test-duration">0.002s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">createAuth - databaseHooks &gt; user.update.after</div><div class="test-title">calls logger.log with audit event containing user.update action</div><div class="test-status">passed</div><div class="test-duration">0.001s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">createAuth - databaseHooks &gt; session.create.after</div><div class="test-title">logs session creation audit event</div><div class="test-status">passed</div><div class="test-duration">0.003s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">createAuth - databaseHooks &gt; session.create.after</div><div class="test-title">logs impersonation event when impersonatedBy set</div><div class="test-status">passed</div><div class="test-duration">0.001s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">createAuth - databaseHooks &gt; session.create.after</div><div class="test-title">logs impersonation event when impersonatedBy is an object</div><div class="test-status">passed</div><div class="test-duration">0.013s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">createAuth - databaseHooks &gt; account.create.after</div><div class="test-title">calls logger.log with audit event containing account.link action</div><div class="test-status">passed</div><div class="test-duration">0.001s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">createAuth - databaseHooks &gt; createAuth - initialization</div><div class="test-title">sets useSecureCookies based on isProduction</div><div class="test-status">passed</div><div class="test-duration">0.001s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">createAuth - databaseHooks &gt; createAuth - initialization</div><div class="test-title">throws error in production when Redis URL set but client fails</div><div class="test-status">passed</div><div class="test-duration">0.965s</div></div></div></div></details><details id="suite-2" class="suite-container" open=""><summary class="suite-info"><div class="suite-path">/home/aidan/COS301/CapStone/UMTAS/apps/backend/src/auth/auth.controller.spec.ts</div><div class="suite-time warn">5.667s</div></summary><div class="suite-tests"><div class="test-result passed"><div class="test-info"><div class="test-suitename">AuthController</div><div class="test-title">forwards requests through better-auth node handler</div><div class="test-status">passed</div><div class="test-duration">0.037s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">AuthController</div><div class="test-title">returns 404 for google oauth routes when env missing</div><div class="test-status">passed</div><div class="test-duration">0.064s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">AuthController</div><div class="test-title">returns 404 for google account linking when env missing</div><div class="test-status">passed</div><div class="test-duration">0.01s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">AuthController - forgetPassword</div><div class="test-title">returns 200 {} without calling BetterAuth when user not found</div><div class="test-status">passed</div><div class="test-duration">0.01s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">AuthController - forgetPassword</div><div class="test-title">rewrites URL to request-password-reset and delegates to BetterAuth when user found</div><div class="test-status">passed</div><div class="test-duration">0.012s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">AuthController - forgetPassword</div><div class="test-title">reads email from raw request body when body parser is absent</div><div class="test-status">passed</div><div class="test-duration">0.012s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">AuthController - handleRequest error path</div><div class="test-title">returns 500 JSON when handler throws</div><div class="test-status">passed</div><div class="test-duration">0.015s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">AuthController - handleRequest error path</div><div class="test-title">does not call res.end if headers already sent when handler throws</div><div class="test-status">passed</div><div class="test-duration">0.008s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">AuthController - delegate routes</div><div class="test-title">forwards standard auth routes to BetterAuth</div><div class="test-status">passed</div><div class="test-duration">0.012s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">AuthController - delegate routes</div><div class="test-title">allows Google OAuth routes when env vars are set</div><div class="test-status">passed</div><div class="test-duration">0.01s</div></div></div></div></details><details id="suite-3" class="suite-container" open=""><summary class="suite-info"><div class="suite-path">/home/aidan/COS301/CapStone/UMTAS/apps/backend/src/Events/event.service.spec.ts</div><div class="suite-time warn">5.823s</div></summary><div class="suite-tests"><div class="test-result passed"><div class="test-info"><div class="test-suitename">EventService &gt; createEvent</div><div class="test-title">shold throw BadRequestException for invalid input</div><div class="test-status">passed</div><div class="test-duration">0.124s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">EventService &gt; createEvent</div><div class="test-title">should throw BadRequestException when LECTURE type lacks moduleCode</div><div class="test-status">passed</div><div class="test-duration">0.015s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">EventService &gt; createEvent</div><div class="test-title">should create generic event successfully</div><div class="test-status">passed</div><div class="test-duration">0.033s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">EventService &gt; createEvent</div><div class="test-title">should throw InternalServerErrorException on faild insert</div><div class="test-status">passed</div><div class="test-duration">0.012s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">EventService &gt; createEvent</div><div class="test-title">should create LECTURE event with module lookup</div><div class="test-status">passed</div><div class="test-duration">0.027s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">EventService &gt; createEvent</div><div class="test-title">should throw NotFoundException when module not found</div><div class="test-status">passed</div><div class="test-duration">0.008s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">EventService &gt; getAllEvents</div><div class="test-title">should retrun events list</div><div class="test-status">passed</div><div class="test-duration">0.006s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">EventService &gt; getById</div><div class="test-title">should throw NotFoundException when event not found</div><div class="test-status">passed</div><div class="test-duration">0.005s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">EventService &gt; getById</div><div class="test-title">should return event with lecture</div><div class="test-status">passed</div><div class="test-duration">0.007s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">EventService &gt; updateEvent</div><div class="test-title">should throw BadRequestException for missing eventCriteria</div><div class="test-status">passed</div><div class="test-duration">0.016s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">EventService &gt; updateEvent</div><div class="test-title">should throw NotFoundExeception when event not found</div><div class="test-status">passed</div><div class="test-duration">0.008s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">EventService &gt; updateEvent</div><div class="test-title">should update event successfuly</div><div class="test-status">passed</div><div class="test-duration">0.01s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">EventService &gt; updateEvent</div><div class="test-title">should throw InternalServerErrorException on failed update</div><div class="test-status">passed</div><div class="test-duration">0.005s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">EventService &gt; deleteEvnt</div><div class="test-title">should throw NotFoundException when event not found</div><div class="test-status">passed</div><div class="test-duration">0.006s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">EventService &gt; deleteEvnt</div><div class="test-title">should delete event successfully</div><div class="test-status">passed</div><div class="test-duration">0.006s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">EventService &gt; deleteEvnt</div><div class="test-title">should throw InternalServerErrorException on failed delete</div><div class="test-status">passed</div><div class="test-duration">0.008s</div></div></div></div></details><details id="suite-4" class="suite-container" open=""><summary class="suite-info"><div class="suite-path">/home/aidan/COS301/CapStone/UMTAS/apps/backend/src/Module/module.service.spec.ts</div><div class="suite-time">0.424s</div></summary><div class="suite-tests"><div class="test-result passed"><div class="test-info"><div class="test-suitename">ModuleService &gt; create</div><div class="test-title">should create a module</div><div class="test-status">passed</div><div class="test-duration">0.004s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">ModuleService &gt; create</div><div class="test-title">should reject missing code or name</div><div class="test-status">passed</div><div class="test-duration">0.023s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">ModuleService &gt; create</div><div class="test-title">should reject duplicate module code</div><div class="test-status">passed</div><div class="test-duration">0.003s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">ModuleService &gt; create</div><div class="test-title">should throw if insert returns nothing</div><div class="test-status">passed</div><div class="test-duration">0.002s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">ModuleService &gt; getAll</div><div class="test-title">should return all modules</div><div class="test-status">passed</div><div class="test-duration">0.002s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">ModuleService &gt; getById</div><div class="test-title">should return one module</div><div class="test-status">passed</div><div class="test-duration">0.002s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">ModuleService &gt; getById</div><div class="test-title">should throw if module is not found</div><div class="test-status">passed</div><div class="test-duration">0.002s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">ModuleService &gt; update</div><div class="test-title">should update a module</div><div class="test-status">passed</div><div class="test-duration">0.002s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">ModuleService &gt; update</div><div class="test-title">should reject empty update payload</div><div class="test-status">passed</div><div class="test-duration">0.001s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">ModuleService &gt; update</div><div class="test-title">should throw if module does not exist</div><div class="test-status">passed</div><div class="test-duration">0.002s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">ModuleService &gt; update</div><div class="test-title">should reject duplicate updated code</div><div class="test-status">passed</div><div class="test-duration">0.002s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">ModuleService &gt; deleteById</div><div class="test-title">should remove a module</div><div class="test-status">passed</div><div class="test-duration">0.002s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">ModuleService &gt; deleteById</div><div class="test-title">should throw if module does not exist</div><div class="test-status">passed</div><div class="test-duration">0.002s</div></div></div></div></details><details id="suite-5" class="suite-container" open=""><summary class="suite-info"><div class="suite-path">/home/aidan/COS301/CapStone/UMTAS/apps/backend/src/Module/module.controller.spec.ts</div><div class="suite-time">2.233s</div></summary><div class="suite-tests"><div class="test-result passed"><div class="test-info"><div class="test-suitename">ModuleController</div><div class="test-title">should create module</div><div class="test-status">passed</div><div class="test-duration">0.03s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">ModuleController</div><div class="test-title">should return all modules</div><div class="test-status">passed</div><div class="test-duration">0.007s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">ModuleController</div><div class="test-title">should return one module</div><div class="test-status">passed</div><div class="test-duration">0.013s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">ModuleController</div><div class="test-title">should update a module</div><div class="test-status">passed</div><div class="test-duration">0.01s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">ModuleController</div><div class="test-title">should remove a module</div><div class="test-status">passed</div><div class="test-duration">0.008s</div></div></div></div></details><details id="suite-6" class="suite-container" open=""><summary class="suite-info"><div class="suite-path">/home/aidan/COS301/CapStone/UMTAS/apps/backend/src/Timetable/timetable.controller.spec.ts</div><div class="suite-time">0.859s</div></summary><div class="suite-tests"><div class="test-result passed"><div class="test-info"><div class="test-suitename">TimetableController &gt; createTimetable</div><div class="test-title">should call service with session userId and dto and return the result</div><div class="test-status">passed</div><div class="test-duration">0.016s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">TimetableController &gt; getAllTimetables</div><div class="test-title">should call service with session userId and return the timetable list</div><div class="test-status">passed</div><div class="test-duration">0.006s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">TimetableController &gt; getTimetableById</div><div class="test-title">should call service with session userId and timetable id and return the result</div><div class="test-status">passed</div><div class="test-duration">0.005s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">TimetableController &gt; updateTimetable</div><div class="test-title">should call service with session userId, id, and dto and return the updated timetable</div><div class="test-status">passed</div><div class="test-duration">0.007s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">TimetableController &gt; deleteTimetable</div><div class="test-title">should call service with session userId and id and return success</div><div class="test-status">passed</div><div class="test-duration">0.007s</div></div></div></div></details><details id="suite-7" class="suite-container" open=""><summary class="suite-info"><div class="suite-path">/home/aidan/COS301/CapStone/UMTAS/apps/backend/src/Events/event.controller.spec.ts</div><div class="suite-time">1.283s</div></summary><div class="suite-tests"><div class="test-result passed"><div class="test-info"><div class="test-suitename">EventController &gt; createEvent</div><div class="test-title">delegates to service with session userId and dto</div><div class="test-status">passed</div><div class="test-duration">0.015s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">EventController &gt; createEvent</div><div class="test-title">propagates service errors</div><div class="test-status">passed</div><div class="test-duration">0.019s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">EventController &gt; getAllEvents</div><div class="test-title">delegates to service with session userId</div><div class="test-status">passed</div><div class="test-duration">0.005s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">EventController &gt; getById</div><div class="test-title">delegates to service with session userId and id</div><div class="test-status">passed</div><div class="test-duration">0.019s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">EventController &gt; updateEvent</div><div class="test-title">delegates to service with session userId, id, and dto</div><div class="test-status">passed</div><div class="test-duration">0.012s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">EventController &gt; updateEvent</div><div class="test-title">propagates service errors</div><div class="test-status">passed</div><div class="test-duration">0.009s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">EventController &gt; deleteEvent</div><div class="test-title">delegates to service with session userId and id</div><div class="test-status">passed</div><div class="test-duration">0.004s</div></div></div></div></details><details id="suite-8" class="suite-container" open=""><summary class="suite-info"><div class="suite-path">/home/aidan/COS301/CapStone/UMTAS/apps/backend/src/auth/auth.service.spec.ts</div><div class="suite-time">0.977s</div></summary><div class="suite-tests"><div class="test-result passed"><div class="test-info"><div class="test-suitename">AuthService &gt; onModuleInit</div><div class="test-title">should initialize without error when BETTER_AUTH_SECRET is set</div><div class="test-status">passed</div><div class="test-duration">0.021s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">AuthService &gt; onModuleInit</div><div class="test-title">should reject production boot without REDIS_URL</div><div class="test-status">passed</div><div class="test-duration">0.052s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">AuthService &gt; onModuleInit</div><div class="test-title">should throw error if BETTER_AUTH_SECRET is missing</div><div class="test-status">passed</div><div class="test-duration">0.015s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">AuthService &gt; getAuth</div><div class="test-title">should return cached auth instance on subsequent calls</div><div class="test-status">passed</div><div class="test-duration">0.008s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">AuthService &gt; getAuth</div><div class="test-title">should create auth instance with base configuration</div><div class="test-status">passed</div><div class="test-duration">0.008s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">AuthService &gt; getAuth</div><div class="test-title">should initialize Redis client when REDIS_URL is provided</div><div class="test-status">passed</div><div class="test-duration">0.006s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">AuthService &gt; getAuth</div><div class="test-title">should configure trustedOrigins from environment</div><div class="test-status">passed</div><div class="test-duration">0.004s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">AuthService &gt; getAuth</div><div class="test-title">should pass email callbacks to auth instance</div><div class="test-status">passed</div><div class="test-duration">0.006s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">AuthService &gt; getAuth</div><div class="test-title">should handle system admin user IDs</div><div class="test-status">passed</div><div class="test-duration">0.008s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">AuthService &gt; userExistsByEmail</div><div class="test-title">returns true when user row found</div><div class="test-status">passed</div><div class="test-duration">0.012s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">AuthService &gt; userExistsByEmail</div><div class="test-title">returns false when no user found</div><div class="test-status">passed</div><div class="test-duration">0.008s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">AuthService &gt; getAuth - mail callback wiring</div><div class="test-title">wires sendResetPasswordEmail to mailerService.sendResetPasswordEmail</div><div class="test-status">passed</div><div class="test-duration">0.009s</div></div></div></div></details><details id="suite-9" class="suite-container" open=""><summary class="suite-info"><div class="suite-path">/home/aidan/COS301/CapStone/UMTAS/apps/backend/src/auth/auth.guard.spec.ts</div><div class="suite-time">0.864s</div></summary><div class="suite-tests"><div class="test-result passed"><div class="test-info"><div class="test-suitename">AuthGuard &gt; canActivate</div><div class="test-title">should allow access to public routes without session</div><div class="test-status">passed</div><div class="test-duration">0.016s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">AuthGuard &gt; canActivate</div><div class="test-title">should throw UnauthorizedException when no session exists</div><div class="test-status">passed</div><div class="test-duration">0.016s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">AuthGuard &gt; canActivate</div><div class="test-title">should attach session to request when valid</div><div class="test-status">passed</div><div class="test-duration">0.005s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">AuthGuard &gt; canActivate</div><div class="test-title">should handle requests with no headers</div><div class="test-status">passed</div><div class="test-duration">0.006s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">AuthGuard &gt; canActivate</div><div class="test-title">should handle array header values correctly</div><div class="test-status">passed</div><div class="test-duration">0.005s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">AuthGuard &gt; canActivate</div><div class="test-title">should throw UnauthorizedException when getSession rejects</div><div class="test-status">passed</div><div class="test-duration">0.01s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">AuthGuard &gt; canActivate</div><div class="test-title">should throw UnauthorizedException when getSession rejects with non-Error</div><div class="test-status">passed</div><div class="test-duration">0.012s</div></div></div></div></details><details id="suite-10" class="suite-container" open=""><summary class="suite-info"><div class="suite-path">/home/aidan/COS301/CapStone/UMTAS/apps/backend/src/health/health.controller.spec.ts</div><div class="suite-time">0.532s</div></summary><div class="suite-tests"><div class="test-result passed"><div class="test-info"><div class="test-suitename">HealthController</div><div class="test-title">should be defined</div><div class="test-status">passed</div><div class="test-duration">0.009s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">HealthController &gt; check</div><div class="test-title">should call healthService.check()</div><div class="test-status">passed</div><div class="test-duration">0.003s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">HealthController &gt; check</div><div class="test-title">should return health status</div><div class="test-status">passed</div><div class="test-duration">0.003s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">HealthController &gt; check</div><div class="test-title">should propagate service errors</div><div class="test-status">passed</div><div class="test-duration">0.005s</div></div></div></div></details><details id="suite-11" class="suite-container" open=""><summary class="suite-info"><div class="suite-path">/home/aidan/COS301/CapStone/UMTAS/apps/backend/src/Timetable/timetable.service.spec.ts</div><div class="suite-time">0.357s</div></summary><div class="suite-tests"><div class="test-result passed"><div class="test-info"><div class="test-suitename">TimetableService &gt; createTimetable</div><div class="test-title">should create a timetable and return it without eventIds when none provided</div><div class="test-status">passed</div><div class="test-duration">0.013s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">TimetableService &gt; getAllTimetables</div><div class="test-title">should return timetables with their linked eventIds grouped correctly</div><div class="test-status">passed</div><div class="test-duration">0.006s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">TimetableService &gt; getTimetableById</div><div class="test-title">should throw NotFoundException when timetable does not exist</div><div class="test-status">passed</div><div class="test-duration">0.018s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">TimetableService &gt; updateTimetable</div><div class="test-title">should throw BadRequestException when no update fields are provided</div><div class="test-status">passed</div><div class="test-duration">0.007s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">TimetableService &gt; deleteTimetable</div><div class="test-title">should throw NotFoundException when timetable does not exist</div><div class="test-status">passed</div><div class="test-duration">0.003s</div></div></div></div></details><details id="suite-12" class="suite-container" open=""><summary class="suite-info"><div class="suite-path">/home/aidan/COS301/CapStone/UMTAS/apps/backend/src/app.controller.spec.ts</div><div class="suite-time">0.526s</div></summary><div class="suite-tests"><div class="test-result passed"><div class="test-info"><div class="test-suitename">AppController &gt; root</div><div class="test-title">should return "Hello World!"</div><div class="test-status">passed</div><div class="test-duration">0.013s</div></div></div></div></details><details id="suite-13" class="suite-container" open=""><summary class="suite-info"><div class="suite-path">/home/aidan/COS301/CapStone/UMTAS/apps/backend/src/auth/auth.google.spec.ts</div><div class="suite-time">0.358s</div></summary><div class="suite-tests"><div class="test-result passed"><div class="test-info"><div class="test-suitename">Google OAuth helpers &gt; mapGoogleProfileToUser</div><div class="test-title">maps google profile fields into Better Auth user data</div><div class="test-status">passed</div><div class="test-duration">0.001s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Google OAuth helpers &gt; mapGoogleProfileToUser</div><div class="test-title">falls back to email prefix when name missing</div><div class="test-status">passed</div><div class="test-duration"> </div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Google OAuth helpers &gt; mapGoogleProfileToUser</div><div class="test-title">falls back to empty string when both name and email missing</div><div class="test-status">passed</div><div class="test-duration">0.007s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Google OAuth helpers &gt; createAuth config gating</div><div class="test-title">disables google provider when client ID/secret missing</div><div class="test-status">passed</div><div class="test-duration">0.003s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Google OAuth helpers &gt; createAuth config gating</div><div class="test-title">enables google provider when client ID/secret provided</div><div class="test-status">passed</div><div class="test-duration">0.001s</div></div></div></div></details><details id="suite-14" class="suite-container" open=""><summary class="suite-info"><div class="suite-path">/home/aidan/COS301/CapStone/UMTAS/apps/backend/src/health/health.service.spec.ts</div><div class="suite-time">0.456s</div></summary><div class="suite-tests"><div class="test-result passed"><div class="test-info"><div class="test-suitename">HealthService</div><div class="test-title">should be defined</div><div class="test-status">passed</div><div class="test-duration">0.008s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">HealthService &gt; check</div><div class="test-title">should return ok status with database service listed</div><div class="test-status">passed</div><div class="test-duration">0.004s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">HealthService &gt; check</div><div class="test-title">should return error status when database check fails</div><div class="test-status">passed</div><div class="test-duration">0.01s</div></div></div></div></details><details id="suite-15" class="suite-container" open=""><summary class="suite-info"><div class="suite-path">/home/aidan/COS301/CapStone/UMTAS/apps/backend/src/auth/fresh-session.guard.spec.ts</div><div class="suite-time">0.277s</div></summary><div class="suite-tests"><div class="test-result passed"><div class="test-info"><div class="test-suitename">FreshSessionGuard</div><div class="test-title">is defined</div><div class="test-status">passed</div><div class="test-duration">0.008s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">FreshSessionGuard</div><div class="test-title">throws UnauthorizedException if no session</div><div class="test-status">passed</div><div class="test-duration">0.015s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">FreshSessionGuard</div><div class="test-title">throws UnauthorizedException if session is older than 10 minutes</div><div class="test-status">passed</div><div class="test-duration">0.005s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">FreshSessionGuard</div><div class="test-title">returns true if session is fresh (under 10 minutes)</div><div class="test-status">passed</div><div class="test-duration">0.004s</div></div></div></div></details><details id="suite-16" class="suite-container" open=""><summary class="suite-info"><div class="suite-path">/home/aidan/COS301/CapStone/UMTAS/apps/backend/src/auth/roles.spec.ts</div><div class="suite-time">0.1s</div></summary><div class="suite-tests"><div class="test-result passed"><div class="test-info"><div class="test-suitename">Role Validators &gt; isAppRole</div><div class="test-title">should accept valid student role</div><div class="test-status">passed</div><div class="test-duration">0.001s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Role Validators &gt; isAppRole</div><div class="test-title">should accept valid uni_admin role</div><div class="test-status">passed</div><div class="test-duration">0.001s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Role Validators &gt; isAppRole</div><div class="test-title">should accept valid sys_admin role</div><div class="test-status">passed</div><div class="test-duration"> </div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Role Validators &gt; isAppRole</div><div class="test-title">should reject invalid roles</div><div class="test-status">passed</div><div class="test-duration">0.001s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Role Validators &gt; isAppRole</div><div class="test-title">should reject non-string values</div><div class="test-status">passed</div><div class="test-duration">0.002s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Role Validators &gt; assertAppRole</div><div class="test-title">should return role when valid</div><div class="test-status">passed</div><div class="test-duration">0.001s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Role Validators &gt; assertAppRole</div><div class="test-title">should throw error for invalid roles</div><div class="test-status">passed</div><div class="test-duration">0.012s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Role Validators &gt; assertAppRole</div><div class="test-title">should throw error for non-string values</div><div class="test-status">passed</div><div class="test-duration">0.005s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Role Validators &gt; assertAppRole</div><div class="test-title">should preserve type safety</div><div class="test-status">passed</div><div class="test-duration">0.001s</div></div></div></div></details><details id="suite-17" class="suite-container" open=""><summary class="suite-info"><div class="suite-path">/home/aidan/COS301/CapStone/UMTAS/apps/backend/src/auth/roles.guard.spec.ts</div><div class="suite-time">0.191s</div></summary><div class="suite-tests"><div class="test-result passed"><div class="test-info"><div class="test-suitename">RolesGuard &gt; canActivate</div><div class="test-title">should allow access when no roles are required</div><div class="test-status">passed</div><div class="test-duration">0.003s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">RolesGuard &gt; canActivate</div><div class="test-title">should read role metadata from the class when handler has none</div><div class="test-status">passed</div><div class="test-duration">0.002s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">RolesGuard &gt; canActivate</div><div class="test-title">should allow access when user has required role</div><div class="test-status">passed</div><div class="test-duration">0.001s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">RolesGuard &gt; canActivate</div><div class="test-title">should deny access when user lacks required role</div><div class="test-status">passed</div><div class="test-duration">0.014s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">RolesGuard &gt; canActivate</div><div class="test-title">should deny access when session is missing from request</div><div class="test-status">passed</div><div class="test-duration">0.002s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">RolesGuard &gt; canActivate</div><div class="test-title">should allow sys_admin to bypass any role restriction</div><div class="test-status">passed</div><div class="test-duration"> </div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">RolesGuard &gt; canActivate</div><div class="test-title">should throw UnauthorizedException when session user has no role</div><div class="test-status">passed</div><div class="test-duration">0.001s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">RolesGuard &gt; canActivate</div><div class="test-title">should allow multiple valid roles</div><div class="test-status">passed</div><div class="test-duration">0.001s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Roles decorator</div><div class="test-title">creates a metadata decorator</div><div class="test-status">passed</div><div class="test-duration">0.001s</div></div></div></div></details><details id="suite-18" class="suite-container" open=""><summary class="suite-info"><div class="suite-path">/home/aidan/COS301/CapStone/UMTAS/apps/backend/src/auth/session.decorator.spec.ts</div><div class="suite-time">0.168s</div></summary><div class="suite-tests"><div class="test-result passed"><div class="test-info"><div class="test-suitename">CurrentSession Decorator</div><div class="test-title">should extract session from request</div><div class="test-status">passed</div><div class="test-duration">0.002s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">CurrentSession Decorator</div><div class="test-title">should handle missing session gracefully</div><div class="test-status">passed</div><div class="test-duration">0.001s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">CurrentSession Decorator</div><div class="test-title">should provide session with all required fields</div><div class="test-status">passed</div><div class="test-duration">0.001s</div></div></div></div></details><details id="suite-19" class="suite-container" open=""><summary class="suite-info"><div class="suite-path">/home/aidan/COS301/CapStone/UMTAS/apps/backend/src/auth/permissions.spec.ts</div><div class="suite-time">0.077s</div></summary><div class="suite-tests"><div class="test-result passed"><div class="test-info"><div class="test-suitename">Permissions &amp; Access Control</div><div class="test-title">defines platform statements</div><div class="test-status">passed</div><div class="test-duration">0.003s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Permissions &amp; Access Control</div><div class="test-title">keeps student limited to timetable actions</div><div class="test-status">passed</div><div class="test-duration">0.003s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Permissions &amp; Access Control</div><div class="test-title">allows lecturer only module update/view and read-only venue/timetable access</div><div class="test-status">passed</div><div class="test-duration">0.002s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Permissions &amp; Access Control</div><div class="test-title">keeps uni_admin off university management</div><div class="test-status">passed</div><div class="test-duration">0.002s</div></div></div><div class="test-result passed"><div class="test-info"><div class="test-suitename">Permissions &amp; Access Control</div><div class="test-title">gives sys_admin university management</div><div class="test-status">passed</div><div class="test-duration">0.001s</div></div></div></div></details></main></body></html>

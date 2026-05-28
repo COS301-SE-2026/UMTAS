@@ -72,6 +72,7 @@
     "eslint-plugin-prettier": "^5.5.5",
     "globals": "^17.6.0",
     "jest": "^29.7.0",
+    "jest-html-reporter": "^4.4.0",
     "prettier": "^3.8.3",
     "source-map-support": "^0.5.21",
     "supertest": "^7.2.2",
@@ -126,6 +127,16 @@
       "!**/redis/**"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "reporters": [
+      "default",
+      [
+        "jest-html-reporter",
+        {
+          "pageTitle": "My Test Report",
+          "outputPath": "./reports/test-report.html"
+        }
+      ]
+    ]
   }
 }
