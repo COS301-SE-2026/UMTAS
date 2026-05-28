@@ -112,7 +112,18 @@
       "node_modules/(?!(better-auth|@better-auth)/)"
     ],
     "collectCoverageFrom": [
-      "**/*.(t|j)s"
+      "**/*.ts",
+      "!**/*.spec.ts",
+      "!**/*.int.ts",
+      "!**/*.module.ts",
+      "!**/main.ts",
+      "!**/swagger-theme.ts",
+      "!**/integration/**",
+      "!**/db/**",
+      "!**/entities/**",
+      "!**/health/**",
+      "!**/mail/**",
+      "!**/redis/**"
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
