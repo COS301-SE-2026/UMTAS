@@ -106,18 +106,14 @@ describe('ModuleService', () => {
       ).rejects.toThrow(BadRequestException);
     });
 
-    // it('should reject missing userId', async () => {
-    //   await expect(
-    //     service.create(
-    //       undefined as any,
-    //       {
-    //         code: 'COS332',
-    //         name: 'Computer Networks',
-    //         styling: '#3B82F6',
-    //       } as any,
-    //     ),
-    //   ).rejects.toThrow(BadRequestException);
-    // });
+    it('should reject for code longer than 10 chars', async () => {
+      await expect(
+        service.create(userId, {
+          code: 'someVeryLongCode',
+          name: 'someName',
+        } as any),
+      ).rejects.toThrow(BadRequestException);
+    });
 
     it('should reject duplicate module code', async () => {
       mockSelectResult([mockModule]);
@@ -177,12 +173,6 @@ describe('ModuleService', () => {
         NotFoundException,
       );
     });
-
-    // it('should reject missing userId', async () => {
-    //   await expect(service.getById(undefined as any, 1)).rejects.toThrow(
-    //     BadRequestException,
-    //   );
-    // });
   });
 
   //Update
@@ -244,11 +234,24 @@ describe('ModuleService', () => {
       ).rejects.toThrow(ConflictException);
     });
 
-    // it('should reject missing userId', async () => {
-    //   await expect(
-    //     service.update(undefined as any, 1, { name: 'Updated' }),
-    //   ).rejects.toThrow(BadRequestException);
-    // });
+    it('should reject if module code longer than 10 chars', async () => {
+      mockSelectResult([mockModule]);
+
+      await expect(
+        service.update(userId, 1, {
+          code: 'SomeVeryLongCode',
+        }),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should reject for no module updated', async () => {
+      mockSelectResult([mockModule]);
+      mockUpdateResult([]);
+
+      await expect(
+        service.update(userId, 1, { name: 'someName' }),
+      ).rejects.toThrow(InternalServerErrorException);
+    });
   });
 
   //deleteById
