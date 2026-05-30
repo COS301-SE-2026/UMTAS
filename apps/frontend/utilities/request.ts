@@ -7,6 +7,13 @@ enum RequestMethod {
   DELETE = "DELETE",
   PATCH = "PATCH",
 }
+export type intTest<PathType, RequestType> = {
+  tName: string;
+  args: {
+    paths?: PathType;
+    body?: RequestType;
+  };
+};
 
 export class RequestBuilder<
   PathType = undefined,
@@ -15,6 +22,7 @@ export class RequestBuilder<
 > {
   private url: string = "";
   private method: RequestMethod = RequestMethod.GET;
+  private arrTests: intTest<PathType, RequestType>[] = [];
   private headers: Record<string, string> = {
     "Content-Type": "application/json",
   };
@@ -48,6 +56,11 @@ export class RequestBuilder<
 
   protected setBearerToken(token: string): this {
     this.headers["Authorization"] = `Bearer ${token}`;
+    return this;
+  }
+
+  protected addIntegrationTest(test: intTest<PathType, RequestType>): this {
+    this.arrTests.push(test);
     return this;
   }
 
