@@ -43,6 +43,8 @@ services:
     networks:
       - gateway
       - internal
+    ports:
+      - "6379:6379"
     command: redis-server --requirepass ${REDIS_PASSWORD}
     volumes:
       - redis_data:/data
@@ -87,6 +89,20 @@ services:
       context: ./apps/solver
       dockerfile: solver.Dockerfile
     image: ${DOCKER_REGISTRY}:solver-${IMAGE_TAG}
+    networks:
+      - gateway
+      - internal
+    profiles:
+      - dev-docker
+      - dev-infra
+      - dev-pglite
+      - server
+
+  pdf-parser:
+    build:
+      context: ./apps/pdf_parser
+      dockerfile: pdf_parser.Dockerfile
+    image: ${DOCKER_REGISTRY}:pdf-parser-${IMAGE_TAG}
     networks:
       - gateway
       - internal

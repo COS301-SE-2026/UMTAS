@@ -48,6 +48,15 @@ services:
       - "traefik.http.routers.solver.tls.certresolver=myresolver"
       - "traefik.http.services.solver.loadbalancer.server.port=8000"
 
+  pdf-parser:
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.pdf-parser.rule=Host(`parser.${DOMAIN}`)"
+      - "traefik.http.routers.pdf-parser.entrypoints=websecure"
+      - "traefik.http.routers.pdf-parser.tls=true"
+      - "traefik.http.routers.pdf-parser.tls.certresolver=myresolver"
+      - "traefik.http.services.pdf-parser.loadbalancer.server.port=8000"
+
   backend:
     labels:
       - "traefik.enable=true"
