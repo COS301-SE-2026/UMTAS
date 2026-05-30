@@ -3,3 +3,4 @@ uvicorn
 pymupdf
 prometheus-fastapi-instrumentator
 redis
+python-multipart

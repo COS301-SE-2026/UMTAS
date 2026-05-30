@@ -9,6 +9,7 @@ COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY main.py swagger_ui.py ./
+COPY parser/ ./parser/
 COPY static/ ./static/
 
 RUN groupadd --system app && useradd --system --gid app app

@@ -1,9 +1,13 @@
-from fastapi import FastAPI
+import os
+import tempfile
+from typing import Any, Dict
+from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from prometheus_fastapi_instrumentator import Instrumentator
 
 from swagger_ui import get_custom_swagger_html
+from parser import UPPDFParser, process_events
 
 app = FastAPI(
     title="UMTAS PDF Parser",
@@ -44,3 +48,58 @@ async def root() -> dict[str, str]:
 @app.get("/health", tags=["Health"], summary="Service health check")
 async def health() -> dict[str, str]:
     return {"status": "ok"}
+
+
+@app.post("/parse", tags=["Parser"], summary="Parse a UP schedule PDF")
+async def parse_schedule(file: UploadFile = File(...)) -> Dict[str, Any]:
+    """
+    Parse a University of Pretoria schedule PDF and return extracted schedule data.
+    """
+    # 1. Validate file extension
+    if not file.filename or not file.filename.lower().endswith('.pdf'):
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid file type. Only PDF files are accepted."
+        )
+
+    temp_file = None
+    try:
+        # 2. Save uploaded content to a temporary file
+        temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
+        content = await file.read()
+        
+        if len(content) == 0:
+            raise HTTPException(
+                status_code=400,
+                detail="Uploaded file is empty."
+            )
+            
+        temp_file.write(content)
+        temp_file.close()
+
+        # 3. Instantiate the UP Parser and parse the document
+        parser = UPPDFParser()
+        result = parser.parse(temp_file.name)
+        
+        # 4. Process/Clean events
+        processed_events = process_events(result['events'])
+
+        return {
+            "events": processed_events,
+            "type": result['type']
+        }
+        
+    except ValueError as e:
+        raise HTTPException(
+            status_code=400,
+            detail=str(e)
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Internal parsing failure: {str(e)}"
+        )
+    finally:
+        # 5. Ensure cleanup of the temporary file
+        if temp_file and os.path.exists(temp_file.name):
+            os.unlink(temp_file.name)
