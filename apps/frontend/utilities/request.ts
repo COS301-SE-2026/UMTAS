@@ -7,12 +7,17 @@ enum RequestMethod {
   DELETE = "DELETE",
   PATCH = "PATCH",
 }
-export type intTest<PathType, RequestType> = {
+export type intTest<
+  PathType = undefined,
+  RequestType = undefined,
+  ResponseType = undefined,
+> = {
   tName: string;
   args: {
     paths?: PathType;
     body?: RequestType;
   };
+  expectedResponse?: ResponseType;
 };
 
 export class RequestBuilder<
@@ -62,6 +67,20 @@ export class RequestBuilder<
   protected addIntegrationTest(test: intTest<PathType, RequestType>): this {
     this.arrTests.push(test);
     return this;
+  }
+  public runTests(suiteTestName: string): void {
+    describe(suiteTestName, () => {
+      this.arrTests.forEach((test) => {
+        it(test.tName, async () => {
+          if (test.expectedResponse == null) {
+            await expect(this.send(test.args)).resolves.toBeDefined();
+          } else {
+            const response = await this.send(test.args);
+            expect(response).toEqual(test.expectedResponse);
+          }
+        });
+      });
+    });
   }
 
   public async send(args: {
