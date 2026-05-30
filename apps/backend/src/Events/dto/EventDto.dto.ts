@@ -130,7 +130,7 @@ export class UpdateEventCriteriaDto {
   })
   @IsOptional()
   @IsEnum(EventType)
-  type?: EventType;
+  type?: EventType | null;
 
   @ApiPropertyOptional({ example: 'Tuesday' })
   @IsOptional()

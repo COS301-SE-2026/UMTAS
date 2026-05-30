@@ -14,15 +14,20 @@ import {
   swaggerFaviconUrl,
 } from './swagger-theme';
 
+import { ValidationPipe } from '@nestjs/common';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from './entities/index';
+
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.useStaticAssets(join(__dirname, '..', 'public'));
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   const port = process.env.PORT ?? 3001;
 
   if (process.env.NODE_ENV !== 'production') {
     const dbService = app.get(DatabaseService);
     if (dbService.dbMode !== DB_MODES.PGLITE) {
-      await migrate(dbService.db as any, {
+      await migrate(dbService.db as NodePgDatabase<typeof schema>, {
         migrationsFolder: join(__dirname, '..', 'drizzle'),
       });
       console.log('[STARTUP] Database migrations applied');
