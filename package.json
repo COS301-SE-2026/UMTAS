@@ -35,7 +35,9 @@
     "docker:build:backend": "docker build -f docker/backend/backend.Dockerfile -t umtas-backend:local .",
     "docker:build:frontend": "docker build -f docker/frontend/frontend.Dockerfile -t umtas-frontend:local .",
     "docker:build:solver": "docker build -f apps/solver/solver.Dockerfile -t umtas-solver:local apps/solver",
-    "docker:build": "pnpm docker:build:backend && pnpm docker:build:frontend && pnpm docker:build:solver"
+    "docker:build": "pnpm docker:build:backend && pnpm docker:build:frontend && pnpm docker:build:solver",
+    "pdf-parser:install": "python3 -m pip install -r apps/pdf_parser/requirements.txt",
+    "pdf-parser:verify": "python3 apps/pdf_parser/verify_up_parser.py"
   },
   "keywords": [],
   "author": "",
