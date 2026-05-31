@@ -61,9 +61,8 @@ def process_events(events: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
             event['summary'] = "Unnamed Event"
             event['isRecurring'] = False
 
-        # 4. Add location mapping if venue is present
-        if 'Venue' in event and event['Venue']:
-            event['location'] = event['Venue']
+        # 4. Add location mapping (defaults to None if Venue is missing or empty)
+        event['location'] = event.get('Venue') if event.get('Venue') else None
 
         processed_events.append(event)
 

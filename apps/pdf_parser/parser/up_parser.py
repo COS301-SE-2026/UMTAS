@@ -84,23 +84,23 @@ class UPPDFParser(BasePDFParser):
                 all_tables.append(table_rows)
         return all_tables
 
-    def _split_multiline_row(self, headers: List[str], row: List[str]) -> List[Dict[str, Any]]:
+    def _split_multiline_row(self, headers: List[str], row: List[str], multiline_headers: set) -> List[Dict[str, Any]]:
         """
         Splits a single raw table row containing multiline text into multiple separate rows.
         Metadata columns (Module, Offered, Group, Lang, Campus, etc.) are treated as single-line
-        replicated fields, while Activity, Day, Time, and Venue are split multiline.
+        replicated fields, while Activity, Day, Time, and Venue are split multiline depending on type.
         """
         headers = [h.strip().replace('\n', ' ') for h in headers]
-        
-        # Identify columns that are split vertically
-        multiline_headers = {'Activity', 'Day', 'Time', 'Venue'}
 
         cell_lists = []
         for col_idx, col_name in enumerate(headers):
             cell_val = row[col_idx]
             if col_name in multiline_headers:
-                cell_lists.append(str(cell_val or "").split('\n'))
+                # Strip leading/trailing newlines to prevent generating trailing empty split events
+                val_str = str(cell_val or "").strip('\n')
+                cell_lists.append(val_str.split('\n'))
             else:
+                # Strip all newlines for row-level metadata to avoid fake empty splits
                 clean_metadata = str(cell_val or "").replace('\n', ' ').strip()
                 clean_metadata = re.sub(r'\s+', ' ', clean_metadata)
                 cell_lists.append([clean_metadata])
@@ -124,7 +124,7 @@ class UPPDFParser(BasePDFParser):
 
         return split_rows
 
-    def _parse_generic_schedule(self, tables: List[List[List[str]]], expected_headers: List[str]) -> List[Dict[str, Any]]:
+    def _parse_generic_schedule(self, tables: List[List[List[str]]], expected_headers: List[str], schedule_type: str) -> List[Dict[str, Any]]:
         """
         Generically parses tables based on expected headers and processes row-splitting.
         """
@@ -135,7 +135,16 @@ class UPPDFParser(BasePDFParser):
 
         raw_headers = tables[0][0]
         headers = [h.strip().replace('\n', ' ') for h in raw_headers]
-        last_seen_values = {h: None for h in headers}
+        
+        # Configure multiline split boundaries dynamically by schedule type
+        if schedule_type == 'lecture':
+            multiline_headers = {'Activity', 'Day', 'Time', 'Venue'}
+        elif schedule_type == 'test':
+            multiline_headers = {'Venue'}
+        else: # exam
+            multiline_headers = set()
+
+        last_seen_row = None
 
         for table in tables:
             start_row_idx = 1 if table == tables[0] else 0
@@ -152,30 +161,44 @@ class UPPDFParser(BasePDFParser):
                 elif len(raw_row) > len(headers):
                     raw_row = raw_row[:len(headers)]
 
-                ffill_cols = {'Module', 'Offered', 'Status'}
-                for idx, col_name in enumerate(headers):
-                    val = raw_row[idx].strip()
-                    if col_name in ffill_cols:
-                        if val != "":
-                            last_seen_values[col_name] = val
-                        else:
-                            raw_row[idx] = last_seen_values[col_name] or ""
+                # Check if this is a continuation row (Module is empty, but we have text in other columns)
+                module_idx = headers.index('Module') if 'Module' in headers else -1
+                module_val = raw_row[module_idx].strip() if module_idx != -1 else ""
+                
+                is_continuation = False
+                if module_val == "" and last_seen_row is not None:
+                    # Check if there is actual content in the row to prevent parsing trailing empty rows
+                    has_content = any(c.strip() != "" for c in raw_row)
+                    if has_content:
+                        is_continuation = True
+                        # Forward-fill all columns except the split/multiline ones
+                        for idx, col_name in enumerate(headers):
+                            if col_name not in multiline_headers:
+                                raw_row[idx] = last_seen_row[idx]
 
-                split_rows = self._split_multiline_row(headers, raw_row)
+                # Update the last seen metadata row
+                if not is_continuation:
+                    last_seen_row = raw_row.copy()
+                else:
+                    last_seen_row = raw_row.copy()
+
+                split_rows = self._split_multiline_row(headers, raw_row, multiline_headers)
                 for s_row in split_rows:
-                    if s_row.get('Module') or s_row.get('Activity') or s_row.get('Day'):
+                    # Only add rows that have a Module AND some actual schedule information
+                    has_schedule_info = any(s_row.get(k) is not None for k in {'Activity', 'Day', 'Time', 'Venue', 'Test', 'Date'})
+                    if s_row.get('Module') and has_schedule_info:
                         events.append(s_row)
 
         return events
 
     def parse_lectures(self, tables: List[List[List[str]]]) -> List[Dict[str, Any]]:
         expected_headers = ['Module', 'Offered', 'Group', 'Lang', 'Activity', 'Day', 'Time', 'Venue', 'Campus', 'Study Prog']
-        return self._parse_generic_schedule(tables, expected_headers)
+        return self._parse_generic_schedule(tables, expected_headers, 'lecture')
 
     def parse_tests(self, tables: List[List[List[str]]]) -> List[Dict[str, Any]]:
         expected_headers = ['Module', 'Test', 'Day', 'Date', 'Time', 'Campus', 'Venue']
-        return self._parse_generic_schedule(tables, expected_headers)
+        return self._parse_generic_schedule(tables, expected_headers, 'test')
 
     def parse_exams(self, tables: List[List[List[str]]]) -> List[Dict[str, Any]]:
         expected_headers = ['Status', 'Module', 'Paper', 'Activity', 'Date', 'Start Time', 'Module Campus', 'Exam Campus', 'Venue', 'Exam Comments']
-        return self._parse_generic_schedule(tables, expected_headers)
+        return self._parse_generic_schedule(tables, expected_headers, 'exam')
