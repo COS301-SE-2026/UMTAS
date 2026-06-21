@@ -2,6 +2,31 @@ import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
 import { generateICS } from "./ICS";
 import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
 
+const events: EventResponse[] = [
+  {
+    event: {
+      code: "COS332",
+      eventID: 1,
+      name: "name",
+      userID: "1",
+      eventCriteria: {
+        type: "lecture",
+        day: "monday",
+        startTime: "14:00",
+        endTime: "15:00",
+      },
+    },
+  },
+];
+const modules: ModuleResponseDto[] = [
+  {
+    moduleCode: "COS332",
+    moduleID: 0,
+    moduleName: "Networks",
+    moduleDescription: "Networks description",
+    userID: "1",
+  },
+];
 function formatBegin(): string[] {
   const lines: string[] = [];
   lines.push("BEGIN:VCALENDAR");
@@ -18,6 +43,7 @@ function formatEnd(): string[] {
   lines.push("END:VCALENDAR");
   return lines;
 }
+
 function formatEventchanges(
   events: EventResponse[],
   modules: ModuleResponseDto[],
@@ -67,6 +93,17 @@ describe("Unit Tests for ICS", () => {
     const lines = [...formatBegin(), ...formatEnd()];
     const testResult = lines.join("\r\n");
     const funcResult = generateICS([], []);
+    expect(testResult === funcResult).toBe(true);
+  });
+
+  it("Correct setup one module one event", () => {
+    const lines = [
+      ...formatBegin(),
+      ...formatEventchanges(events, modules),
+      ...formatEnd(),
+    ];
+    const testResult = lines.join("\r\n");
+    const funcResult = generateICS(events, modules);
     expect(testResult === funcResult).toBe(true);
   });
 });
