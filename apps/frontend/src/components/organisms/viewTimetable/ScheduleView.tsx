@@ -12,12 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/atoms/baseShadcn/select";
-import {
-  getAllWeekStarts,
-  resolveScheduleEvents,
-  generateICS,
-  downloadICS,
-} from "@/lib/scheduleUtils";
+import { getAllWeekStarts, resolveScheduleEvents } from "@/lib/scheduleUtils";
 import {
   getAllModulesBuilder,
   type ModuleResponseDto,
@@ -30,6 +25,7 @@ import {
   getAllTimeTablesBuilder,
   type TimetableResponse,
 } from "@/app/builder/utils/timetables/TimeTableRequests";
+import { downloadICS, generateICS } from "@/lib/ICS-utils/ICS";
 
 interface ScheduleViewProps {
   onEventCountChange: (count: number) => void;
