@@ -23,7 +23,7 @@ export class DatabaseInitService implements OnApplicationBootstrap {
   async onApplicationBootstrap(): Promise<void> {
     const dbMode = this.databaseService.dbMode;
     const shouldSeed = parseSeedFlag(this.configService.get<string>('SEED'));
-    const migrationsFolder = join(__dirname, '..', '..', 'drizzle');
+    const migrationsFolder = join(process.cwd(), 'drizzle');
 
     try {
       if (dbMode === DB_MODES.PGLITE) {

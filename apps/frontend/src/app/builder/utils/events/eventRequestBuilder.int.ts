@@ -16,8 +16,6 @@ import {
   createModuleReq,
 } from "../modules/requestBuilders";
 
-// require("dotenv").config({ path: "../../../../../.env" });
-
 const apiUrl =
   process.env.API_URL ||
   process.env.NEXT_PUBLIC_API_URL ||
@@ -150,4 +148,13 @@ describe("Event Request Builders Integration Tests", () => {
 
     await deleteModuleBuilder.send({ paths: { moduleId } });
   });
+
+  const autoBuilder = new getAllEventsBuilder();
+  autoBuilder.testSignIn();
+  autoBuilder.addIntegrationTest({
+    tName: "should return all events successfully",
+    args: {},
+    expectedResponse: undefined,
+  });
+  autoBuilder.runTests("Testing auto test");
 });

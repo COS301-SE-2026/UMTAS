@@ -27,7 +27,7 @@ export class RequestBuilder<
 > {
   private url: string = "";
   private method: RequestMethod = RequestMethod.GET;
-  private arrTests: intTest<PathType, RequestType>[] = [];
+  private arrTests: intTest<PathType, RequestType, ResponseType>[] = [];
   private headers: Record<string, string> = {
     "Content-Type": "application/json",
   };
@@ -63,8 +63,47 @@ export class RequestBuilder<
     this.headers["Authorization"] = `Bearer ${token}`;
     return this;
   }
+  public async testSignIn() {
+    const apiUrl =
+      process.env.API_URL ||
+      process.env.NEXT_PUBLIC_API_URL ||
+      "http://localhost:3000";
+    const testEmail = process.env.SEED_SYSTEM_ADMIN_EMAIL;
+    const testPassword = process.env.SEED_SYSTEM_ADMIN_PASSWORD;
 
-  protected addIntegrationTest(test: intTest<PathType, RequestType>): this {
+    if (!testEmail || !testPassword) {
+      console.warn("TEST_USER_EMAIL or TEST_USER_PASSWORD not set");
+      return;
+    }
+
+    const response = await fetch(`${apiUrl}/api/auth/sign-in/email`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Origin: apiUrl,
+      },
+      body: JSON.stringify({
+        email: testEmail,
+        password: testPassword,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorBody = await response.text();
+      throw new Error(
+        `Login failed with status ${response.status}: ${errorBody}`,
+      );
+    }
+
+    const cookies = response.headers.getSetCookie();
+    const sessionCookie = cookies.map((c) => c.split(";")[0]).join("; ");
+
+    if (sessionCookie) this.setHeaders({ Cookie: sessionCookie });
+  }
+
+  public addIntegrationTest(
+    test: intTest<PathType, RequestType, ResponseType>,
+  ): this {
     this.arrTests.push(test);
     return this;
   }
@@ -72,7 +111,7 @@ export class RequestBuilder<
     describe(suiteTestName, () => {
       this.arrTests.forEach((test) => {
         it(test.tName, async () => {
-          if (test.expectedResponse == null) {
+          if (test.expectedResponse == undefined) {
             await expect(this.send(test.args)).resolves.toBeDefined();
           } else {
             const response = await this.send(test.args);
