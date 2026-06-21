@@ -27,15 +27,6 @@ export class EventService {
     userId: string,
     dto: CreateEventDto,
   ): Promise<EventResponseDto> {
-    if (!userId) throw new BadRequestException('User ID required');
-
-    if (dto.name && (dto.name.length > 32 || dto.name.length <= 0))
-      throw new BadRequestException('event name should be 1 -> 10 characters');
-    if (dto.code && (dto.code.length > 10 || dto.code.length <= 0))
-      throw new BadRequestException(
-        'event code should be between 1 and 10 characters',
-      );
-
     const criteria = dto.eventCriteria;
 
     this.validateEventTypeCriteria(criteria);
@@ -136,13 +127,6 @@ export class EventService {
     if (!critUpdate && !recUpdate && !nameUpdate && !codeUpdate) {
       throw new BadRequestException('At least one update field required');
     }
-
-    if (dto.name && (dto.name.length > 32 || dto.name.length <= 0))
-      throw new BadRequestException('event name should be 1 -> 10 characters');
-    if (dto.code && (dto.code.length > 10 || dto.code.length <= 0))
-      throw new BadRequestException(
-        'event code should be between 1 and 10 characters',
-      );
 
     return await this.databaseService.db.transaction(
       async (tx: AppDatabase) => {
