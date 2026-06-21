@@ -10,6 +10,7 @@
     "lint": "eslint",
     "test": "jest",
     "test:int": "jest --config jest.int.config.js",
+    "test:int:local": "NODE_OPTIONS=--experimental-vm-modules jest --config jest.int.config.js --runInBand",
     "api:generate": "openapi-typescript http://localhost:3000/api/docs-json -o ./src/lib/api.ts"
   },
   "dependencies": {

@@ -115,7 +115,8 @@ Temporary Items
 .raiden/
 
 # Drizzle
-**/drizzle/meta/
+#**/drizzle/meta/
+# This should not be in ignore so we can share the same journal
 
 working_docs/
 # Local act secrets
