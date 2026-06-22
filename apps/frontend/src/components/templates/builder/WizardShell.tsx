@@ -273,18 +273,18 @@ export function WizardShell() {
     }
   }
 
-  async function handleGenerate(name: string) {
+  async function handleGenerate(name: string, selectedEventIds: number[]) {
     setIsGenerating(true);
     try {
-      const confirmedEventIds = events
-        .filter((e) => e.event.userID)
-        .map((e) => String(e.event.eventID));
-
+      const numbersOnlyEvents = selectedEventIds.map((id) =>
+        parseInt(String(id), 10),
+      );
       const builder = new createTimeTableBuilder();
       await builder.send({
         body: {
           timetableName: name || "Generated Schedule",
-          eventIds: confirmedEventIds,
+          //there is a mismtach between frontend and backend. backend wants number but frontend uses string. this works but a better fix might be needed
+          eventIds: numbersOnlyEvents as unknown as string[],
         },
       });
 

@@ -8,11 +8,12 @@ import { Input } from "@/components/atoms/baseShadcn/input";
 import { Label } from "@/components/atoms/baseShadcn/label";
 import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
 import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
+import { Checkbox } from "@/components/atoms/baseShadcn/checkbox";
 
 interface GenerateStepProps {
   modules: ModuleResponseDto[];
   events: EventResponse[];
-  onGenerate: (name: string) => void;
+  onGenerate: (name: string, selectedEventIds: number[]) => void;
   isGenerating: boolean;
 }
 
@@ -42,6 +43,30 @@ export function GenerateStep({
   isGenerating,
 }: GenerateStepProps) {
   const [timetableName, setTimetableName] = useState("My New Schedule");
+  //only add selected events from the checkbox
+  const [selectedEventIds, setSelectedEventIds] = useState<number[]>(
+    events.map((e) => e.event.eventID),
+  );
+
+  //checkbox logic
+
+  function checkboxLogic(eventId: number, isChecked: boolean) {
+    if (isChecked) {
+      //add the event to the list
+      setSelectedEventIds([...selectedEventIds, eventId]);
+    } else {
+      //add every event that is not the unchecked id
+      const updatedList: number[] = [];
+
+      for (const id of selectedEventIds) {
+        if (id !== eventId) {
+          updatedList.push(id);
+        }
+      }
+
+      setSelectedEventIds(updatedList);
+    }
+  }
 
   function renderModulesSummary() {
     return (
@@ -97,6 +122,9 @@ export function GenerateStep({
         <div className="flex flex-col gap-2">
           {events.map((event) => {
             const criteria = event.event.eventCriteria;
+            const isEventChecked = selectedEventIds.includes(
+              event.event.eventID,
+            );
             const linkedModule = getLinkedModule(
               event.lecture?.moduleID,
               modules,
@@ -109,43 +137,49 @@ export function GenerateStep({
             return (
               <div
                 key={event.event.eventID}
-                className="flex flex-col gap-1 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] px-4 py-4 shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.08)]"
+                className="flex flex-row items-center gap-1 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] px-4 py-4 shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.08)]"
               >
-                <div className="flex items-start justify-between gap-2">
+                <div className="flex flex-col gap-1 flex-1 min-w-0">
                   <p className="text-base font-medium text-[var(--text-primary)]">
                     {criteria?.moduleCode || "Event"}
                   </p>
-                  <span className="text-sm font-mono text-[var(--text-secondary)] flex-shrink-0">
-                    {criteria?.moduleCode || ""}
-                  </span>
+                  <div className="flex flex-wrap items-center gap-2">
+                    {criteria?.day && (
+                      <p className="text-sm text-[var(--text-secondary)]">
+                        {criteria.day}
+                      </p>
+                    )}
+                    {timeString && (
+                      <p className="text-sm text-[var(--text-secondary)]">
+                        {timeString}
+                      </p>
+                    )}
+                    {linkedModule && (
+                      <div className="flex items-center gap-1.5">
+                        <span
+                          className="h-2 w-2 rounded-full flex-shrink-0"
+                          style={{
+                            backgroundColor:
+                              linkedModule.styling || "var(--border)",
+                          }}
+                        />
+                        <p className="text-sm font-mono text-[var(--text-secondary)]">
+                          {linkedModule.moduleCode}
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2">
-                  {criteria?.day && (
-                    <p className="text-sm text-[var(--text-secondary)]">
-                      {criteria.day}
-                    </p>
-                  )}
-                  {timeString && (
-                    <p className="text-sm text-[var(--text-secondary)]">
-                      {timeString}
-                    </p>
-                  )}
-                  {linkedModule && (
-                    <div className="flex items-center gap-1.5">
-                      <span
-                        className="h-2 w-2 rounded-full flex-shrink-0"
-                        style={{
-                          backgroundColor:
-                            linkedModule.styling || "var(--border)",
-                        }}
-                      />
-                      <p className="text-sm font-mono text-[var(--text-secondary)]">
-                        {linkedModule.moduleCode}
-                      </p>
-                    </div>
-                  )}
-                </div>
+                <span className="flex-shrink-0 flex items-center justify-center">
+                  <Checkbox
+                    id={`event-${event.event.eventID}`}
+                    checked={isEventChecked}
+                    onCheckedChange={(checkedState) =>
+                      checkboxLogic(event.event.eventID, checkedState === true)
+                    }
+                  />
+                </span>
               </div>
             );
           })}
@@ -213,7 +247,7 @@ export function GenerateStep({
         type="button"
         size="default"
         disabled={isGenerating}
-        onClick={() => onGenerate(timetableName)}
+        onClick={() => onGenerate(timetableName, selectedEventIds)}
         className="w-full text-sm bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] hover:bg-[var(--btn-primary-hover)] disabled:opacity-40 transition-colors duration-[var(--duration-fast)]"
       >
         {isGenerating ? "Generating..." : "Generate schedule"}
