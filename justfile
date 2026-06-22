@@ -42,23 +42,23 @@ install:
 
 # linting
 lint:
-    turbo run lint
+    phase run --  pnpm turbo run lint
 
 # all tests
 test:
-    turbo run test
+    phase run -- pnpm turbo run test
 
 # unit tests
 test-unit:
-    turbo run test --filter=!./apps/e2e -- --coverage
+    phase run -- pnpm turbo run test --filter=!./apps/e2e -- --coverage
 
 # run production build
 build:
-    turbo run build
+   pnpm turbo run build
 
 # global ci tasks 
 ci:
-    turbo run ci
+   pnpm turbo run ci
 
 # prod server commands 
 
