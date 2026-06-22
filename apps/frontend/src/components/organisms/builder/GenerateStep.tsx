@@ -246,11 +246,16 @@ export function GenerateStep({
       <Button
         type="button"
         size="default"
-        disabled={isGenerating}
+        //only generate when there is at least 1 event
+        disabled={isGenerating || selectedEventIds.length === 0}
         onClick={() => onGenerate(timetableName, selectedEventIds)}
         className="w-full text-sm bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] hover:bg-[var(--btn-primary-hover)] disabled:opacity-40 transition-colors duration-[var(--duration-fast)]"
       >
-        {isGenerating ? "Generating..." : "Generate schedule"}
+        {isGenerating
+          ? "Generating..."
+          : selectedEventIds.length === 0
+            ? "Select at least one event"
+            : "Generate schedule"}
       </Button>
     </div>
   );
