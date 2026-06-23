@@ -1,8 +1,6 @@
 import {
-  integer,
   jsonb,
   pgTable,
-  primaryKey,
   serial,
   uuid,
   varchar,
@@ -17,22 +15,3 @@ export const Event = pgTable('Event', {
   eventCriteria: jsonb('eventCriteria'),
   isRecurring: boolean('isRecurring').notNull().default(false),
 });
-
-export const Timetable = pgTable('Timetable', {
-  timetableID: serial('timetableID').primaryKey(),
-  timetableName: varchar('timetableName', { length: 32 }),
-  userID: uuid('userID').notNull(),
-});
-
-export const EventsToTimetables = pgTable(
-  'EventsToTimetables',
-  {
-    eventID: integer('eventID')
-      .notNull()
-      .references(() => Event.eventID, { onDelete: 'cascade' }),
-    timetableID: integer('timetableID')
-      .notNull()
-      .references(() => Timetable.timetableID, { onDelete: 'cascade' }),
-  },
-  (table) => [primaryKey({ columns: [table.eventID, table.timetableID] })],
-);

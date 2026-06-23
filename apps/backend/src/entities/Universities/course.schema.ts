@@ -1,4 +1,10 @@
-import { pgTable, uuid, varchar, primaryKey } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  uuid,
+  varchar,
+  primaryKey,
+  integer,
+} from 'drizzle-orm/pg-core';
 import { modules } from '../Modules';
 import { University } from './University.schema';
 
@@ -13,7 +19,7 @@ export const Course = pgTable('Course', {
 export const CourseModule = pgTable(
   'CourseModule',
   {
-    ModuleID: uuid('ModuleID')
+    ModuleID: integer('ModuleID')
       .references(() => modules.moduleID, { onDelete: 'cascade' })
       .notNull(),
     CourseID: uuid('CourseID')

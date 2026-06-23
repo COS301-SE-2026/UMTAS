@@ -5,6 +5,7 @@ import {
   uuid,
   varchar,
   primaryKey,
+  integer,
 } from 'drizzle-orm/pg-core';
 import { usersTable } from '../auth';
 
@@ -20,10 +21,23 @@ export const modules = pgTable('Modules', {
 export const ModuleEnrollment = pgTable(
   'ModuleEnrollment',
   {
-    ModuleID: uuid('ModuleID')
+    ModuleID: integer('ModuleID')
       .references(() => modules.moduleID, { onDelete: 'cascade' })
       .notNull(),
-    UserID: uuid('UniversityID')
+    UserID: uuid('UserID')
+      .references(() => usersTable.id, { onDelete: 'cascade' })
+      .notNull(),
+  },
+  (table) => [primaryKey({ columns: [table.ModuleID, table.UserID] })],
+);
+
+export const ModuleTeaches = pgTable(
+  'ModuleTeaches',
+  {
+    ModuleID: integer('ModuleID')
+      .references(() => modules.moduleID, { onDelete: 'cascade' })
+      .notNull(),
+    UserID: uuid('UserID')
       .references(() => usersTable.id, { onDelete: 'cascade' })
       .notNull(),
   },
