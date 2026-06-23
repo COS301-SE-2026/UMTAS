@@ -6,6 +6,16 @@ import { WeeklyGrid } from "@/components/organisms/viewTimetable/WeeklyGrid";
 import { EmptySchedule } from "@/components/organisms/viewTimetable/EmptySchedule";
 import { WeekNavBar } from "@/components/molecules/viewTimetable/WeekNavBar";
 import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogDescription,
+  AlertDialogAction,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogTitle,
+} from "@/components/atoms/baseShadcn/alert-dialog";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -44,7 +54,8 @@ export function ScheduleView({
   const [allModules, setAllModules] = useState<ModuleResponseDto[]>([]);
   const [allEvents, setAllEvents] = useState<EventResponse[]>([]);
   const [timetables, setTimetables] = useState<TimetableResponse[]>([]);
-  const [selectedTimetableId, setSelectedTimetableId] = useState<number>();
+  const [selectedTimetableId, setSelectedTimetableId] = useState<number>(0);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const [isLoading, setIsLoading] = useState(true);
   const [currentWeekIndex, setCurrentWeekIndex] = useState(0);
@@ -178,18 +189,17 @@ export function ScheduleView({
   }
 
   //delete timetable
-  async function deleteTimetableByID() {
+
+  function deleteDialog() {
     if (!selectedTimetableId) {
       return;
     }
 
-    const confirm = window.confirm(
-      "Are you sure you want to delete this timetable?",
-    );
+    setIsDeleteDialogOpen(true);
+  }
 
-    if (!confirm) {
-      return;
-    }
+  async function deleteTimetableByID() {
+    setIsDeleteDialogOpen(false);
 
     try {
       const builder = new deleteTTbyIDBuilder();
@@ -211,7 +221,7 @@ export function ScheduleView({
       }
 
       //console.log("Timetable successfully added");
-    } catch {
+    } catch (error) {
       //console.error("Error with sending delete request");
       alert(
         "An error occured while deleting your timetable. Please refresh and try again.",
@@ -272,12 +282,36 @@ export function ScheduleView({
               <Button
                 type="button"
                 className="h-7 px-3 text-xs bg-[var(--destructive)] text-[var(--text-primary)] border-[var(--border)] hover:opacity-90"
-                onClick={deleteTimetableByID}
+                onClick={deleteDialog}
               >
                 Delete
               </Button>
             </div>
           </div>
+          <AlertDialog
+            open={isDeleteDialogOpen}
+            onOpenChange={setIsDeleteDialogOpen}
+          >
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>
+                  Are you sure you want to delete this timetable?
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  This cannot be undone
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={deleteTimetableByID}
+                  variant="destructive"
+                >
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
           <WeeklyGrid events={resolvedEvents} weekStart={currentWeekStart} />
         </div>
       )}
