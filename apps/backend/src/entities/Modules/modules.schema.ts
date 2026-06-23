@@ -8,6 +8,8 @@ import {
   integer,
 } from 'drizzle-orm/pg-core';
 import { usersTable } from '../auth';
+import { UserTimetable } from '../timetables';
+import { jsonb } from 'drizzle-orm/pg-core';
 
 export const modules = pgTable('Modules', {
   moduleID: serial('moduleID').primaryKey(),
@@ -43,3 +45,16 @@ export const ModuleTeaches = pgTable(
   },
   (table) => [primaryKey({ columns: [table.ModuleID, table.UserID] })],
 );
+
+export const ModuleStyling = pgTable('ModuleStyling', {
+  ModuleID: integer('ModuleID')
+    .references(() => modules.moduleID, { onDelete: 'cascade' })
+    .notNull(),
+  UserTimetableID: uuid('UserTimetableID')
+    .references(() => UserTimetable.TimetableID, { onDelete: 'cascade' })
+    .notNull(),
+  styling: jsonb('styling')
+    .notNull()
+    .$type<{ colour: string }>()
+    .default({ colour: '' }),
+});
