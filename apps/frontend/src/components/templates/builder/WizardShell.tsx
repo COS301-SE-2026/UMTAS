@@ -282,7 +282,6 @@ export function WizardShell() {
       setCurrentStep(currentStep - 1);
     }
   }
-
   async function handleGenerate(name: string, selectedEventIds: number[]) {
     setIsGenerating(true);
     try {
@@ -301,12 +300,11 @@ export function WizardShell() {
 
         const builder = new updateTTbyIDBuilder();
         await builder.send({
-          //type mismtach frontend/backend
           paths: { id: Number(editId) },
           body: {
             timetableName: name || "Updated Schedule",
-            removeEventIds: noNumIds as unknown as string[],
-            addEventIds: numbersOnlyAddIds as unknown as string[],
+            removeEventIds: noNumIds,
+            addEventIds: numbersOnlyAddIds,
           },
         });
       } else {
@@ -314,12 +312,11 @@ export function WizardShell() {
         await builder.send({
           body: {
             timetableName: name || "Generated Schedule",
-            eventIds: finalEvents as unknown as string[],
+            eventIds: finalEvents,
           },
         });
       }
 
-      //forced
       window.location.href = "/schedules";
     } catch (error) {
       console.error("Failed to generate timetable:", error);
