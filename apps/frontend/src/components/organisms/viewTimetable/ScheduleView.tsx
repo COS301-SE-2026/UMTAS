@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Skeleton } from "@/components/atoms/baseShadcn/skeleton";
 import { WeeklyGrid } from "@/components/organisms/viewTimetable/WeeklyGrid";
@@ -25,6 +26,7 @@ import {
 import { getAllWeekStarts, resolveScheduleEvents } from "@/lib/scheduleUtils";
 import {
   getAllModulesBuilder,
+  updateModulesBuilder,
   type ModuleResponseDto,
 } from "@/app/builder/utils/modules/requestBuilders";
 import {
@@ -34,11 +36,14 @@ import {
 import {
   deleteTTbyIDBuilder,
   getAllTimeTablesBuilder,
+  updateTTbyIDBuilder,
   type TimetableResponse,
 } from "@/app/builder/utils/timetables/TimeTableRequests";
 import { downloadICS, generateICS } from "@/lib/ICS-utils/ICS";
 import { Button } from "@/components/atoms/baseShadcn/button";
 import { log, time } from "console";
+import { router } from "better-auth/api";
+import { redirect } from "next/dist/server/api-utils";
 
 interface ScheduleViewProps {
   onEventCountChange: (count: number) => void;
@@ -51,6 +56,7 @@ export function ScheduleView({
   onModuleCountChange,
   onExportReady,
 }: ScheduleViewProps) {
+  const router = useRouter();
   const [allModules, setAllModules] = useState<ModuleResponseDto[]>([]);
   const [allEvents, setAllEvents] = useState<EventResponse[]>([]);
   const [timetables, setTimetables] = useState<TimetableResponse[]>([]);
@@ -99,10 +105,13 @@ export function ScheduleView({
       (tt) => tt.timetable.timetableID === selectedTimetableId,
     );
 
-    if (selectedTT && selectedTT.eventIds) {
-      const activeEventIds = selectedTT.eventIds.map(String);
+    if (selectedTT) {
+      const activeEventIds = (selectedTT.eventIds || []).map((id) =>
+        String(id).trim(),
+      );
+
       const activeEvents = allEvents.filter((e) =>
-        activeEventIds.includes(String(e.event.eventID)),
+        activeEventIds.includes(String(e.event.eventID).trim()),
       );
 
       const activeModuleIds = activeEvents
@@ -223,8 +232,32 @@ export function ScheduleView({
       //console.log("Timetable successfully added");
     } catch (error) {
       //console.error("Error with sending delete request");
+
+      //this alert will be changed once I add the error components
       alert(
         "An error occured while deleting your timetable. Please refresh and try again.",
+      );
+    }
+  }
+
+  //edit timetable
+
+  async function editTimetable() {
+    try {
+      if (!selectedTimetableId) {
+        return;
+      }
+
+      //move back to builder step 3
+      router.push(`/builder?editId=${selectedTimetableId}`);
+
+      console.log("Successfully edited timetable");
+    } catch (error) {
+      console.error("An error occured while editing the timetable", error);
+
+      //this alert will be changed once I add the error components
+      alert(
+        "An error occured while editing your timetable. Please refresh and try again.",
       );
     }
   }
@@ -275,6 +308,7 @@ export function ScheduleView({
               <Button
                 type="button"
                 className="h-7 px-3 text-xs bg-[var(--bg-surface)] text-[var(--text-primary)] border-[var(--border)] hover:opacity-90"
+                onClick={editTimetable}
               >
                 Edit
               </Button>

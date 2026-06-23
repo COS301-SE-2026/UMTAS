@@ -15,6 +15,12 @@ interface GenerateStepProps {
   events: EventResponse[];
   onGenerate: (name: string, selectedEventIds: number[]) => void;
   isGenerating: boolean;
+  //props for editing
+  isEditMode: boolean;
+  timetableName: string;
+  setTimetableName: (name: string) => void;
+  selectedEventIds: number[];
+  setSelectedEventIds: React.Dispatch<React.SetStateAction<number[]>>;
 }
 
 function getLinkedModule(
@@ -41,13 +47,12 @@ export function GenerateStep({
   events,
   onGenerate,
   isGenerating,
+  isEditMode,
+  timetableName,
+  setTimetableName,
+  selectedEventIds,
+  setSelectedEventIds,
 }: GenerateStepProps) {
-  const [timetableName, setTimetableName] = useState("My New Schedule");
-  //only add selected events from the checkbox
-  const [selectedEventIds, setSelectedEventIds] = useState<number[]>(
-    events.map((e) => e.event.eventID),
-  );
-
   //checkbox logic
 
   function checkboxLogic(eventId: number, isChecked: boolean) {
@@ -255,7 +260,9 @@ export function GenerateStep({
           ? "Generating..."
           : selectedEventIds.length === 0
             ? "Select at least one event"
-            : "Generate schedule"}
+            : isEditMode
+              ? "Edit Schedule"
+              : "Generate Schedule"}
       </Button>
     </div>
   );
