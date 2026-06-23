@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { WizardStepper } from "@/components/atoms/builder/WizardStepper";
 import { WizardFooter } from "@/components/atoms/builder/WizardFooter";
 import { ModulesStep } from "@/components/organisms/builder/ModulesStep";
@@ -21,7 +21,11 @@ import {
   updateEventByID,
   type EventResponse,
 } from "@/app/builder/utils/events/eventRequestBuilder";
-import { createTimeTableBuilder } from "@/app/builder/utils/timetables/TimeTableRequests";
+import {
+  createTimeTableBuilder,
+  getTTbyIdBuilder,
+  updateTTbyIDBuilder,
+} from "@/app/builder/utils/timetables/TimeTableRequests";
 
 const Steps = [
   { label: "Modules" },
@@ -39,6 +43,8 @@ function generateId(): string {
 
 export function WizardShell() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const editId = searchParams.get("editId");
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [modules, setModules] = useState<ModuleResponseDto[]>([]);
@@ -46,6 +52,10 @@ export function WizardShell() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [modulesTrigger, setModulesTrigger] = useState(0);
   const [eventsTrigger, setEventsTrigger] = useState(0);
+  const [isInitialLoading, setIsInitialLoading] = useState(!!editId);
+  const [selectedEventIds, setSelectedEventIds] = useState<number[]>([]);
+  const [OGeventId, setOGeventId] = useState<string[]>([]);
+  const [timetableName, setTimetableName] = useState("My New Schedule");
 
   async function handleModuleAdd() {
     try {
@@ -272,23 +282,42 @@ export function WizardShell() {
       setCurrentStep(currentStep - 1);
     }
   }
-
   async function handleGenerate(name: string, selectedEventIds: number[]) {
     setIsGenerating(true);
     try {
-      const numbersOnlyEvents = selectedEventIds.map((id) =>
+      const finalEvents = selectedEventIds.map((id) =>
         parseInt(String(id), 10),
       );
-      const builder = new createTimeTableBuilder();
-      await builder.send({
-        body: {
-          timetableName: name || "Generated Schedule",
-          //there is a mismtach between frontend and backend. backend wants number but frontend uses string. this works but a better fix might be needed
-          eventIds: numbersOnlyEvents,
-        },
-      });
 
-      router.push("/schedules");
+      if (editId) {
+        const noNumIds = OGeventId.map(Number).filter(
+          (id) => !selectedEventIds.includes(id),
+        );
+
+        const numbersOnlyAddIds = selectedEventIds.filter(
+          (id) => !OGeventId.map(Number).includes(id),
+        );
+
+        const builder = new updateTTbyIDBuilder();
+        await builder.send({
+          paths: { id: Number(editId) },
+          body: {
+            timetableName: name || "Updated Schedule",
+            removeEventIds: noNumIds,
+            addEventIds: numbersOnlyAddIds,
+          },
+        });
+      } else {
+        const builder = new createTimeTableBuilder();
+        await builder.send({
+          body: {
+            timetableName: name || "Generated Schedule",
+            eventIds: finalEvents,
+          },
+        });
+      }
+
+      window.location.href = "/schedules";
     } catch (error) {
       console.error("Failed to generate timetable:", error);
       setIsGenerating(false);
@@ -332,7 +361,7 @@ export function WizardShell() {
     return false;
   }
   useEffect(() => {
-    if (currentStep === 0) {
+    if (currentStep === 0 || editId) {
       const fetchModules = async () => {
         try {
           const builder = new getAllModulesBuilder();
@@ -344,22 +373,62 @@ export function WizardShell() {
       };
       fetchModules();
     }
-  }, [currentStep, modulesTrigger]);
+  }, [currentStep, modulesTrigger, editId]);
 
   useEffect(() => {
-    if (currentStep === 1) {
+    if (currentStep === 1 || editId) {
       const fetchEvents = async () => {
         try {
           const builder = new getAllEventsBuilder();
           const response = await builder.send({});
           setEvents(response.events);
+
+          if (!editId) {
+            setSelectedEventIds(response.events.map((e) => e.event.eventID));
+          }
         } catch (error) {
           console.error("Failed to fetch events:", error);
         }
       };
       fetchEvents();
     }
-  }, [currentStep, eventsTrigger]);
+  }, [currentStep, eventsTrigger, editId]);
+
+  useEffect(() => {
+    if (!editId) return;
+
+    async function loadAllEditData() {
+      try {
+        const [timetableRes, modulesRes, eventsRes] = await Promise.all([
+          //prevents opening on step 0 (modules)
+          new getTTbyIdBuilder().send({
+            paths: { id: editId as unknown as number },
+          }),
+          new getAllModulesBuilder().send({}),
+          new getAllEventsBuilder().send({}),
+        ]);
+
+        setModules(modulesRes.modules);
+        setEvents(eventsRes.events);
+
+        setTimetableName(
+          timetableRes.timetable.timetableName || "Updated Schedule",
+        );
+
+        setOGeventId((timetableRes.eventIds || []).map(String));
+        setSelectedEventIds((timetableRes.eventIds || []).map(Number));
+
+        setCompletedSteps([0, 1]);
+        setCurrentStep(2);
+      } catch (error) {
+        console.error("Failed to load timetable dataset for editing:", error);
+      } finally {
+        setIsInitialLoading(false);
+      }
+    }
+
+    loadAllEditData();
+  }, [editId]);
 
   function renderStep() {
     if (currentStep === 0) {
@@ -390,7 +459,20 @@ export function WizardShell() {
         events={events}
         onGenerate={handleGenerate}
         isGenerating={isGenerating}
+        isEditMode={!!editId}
+        timetableName={timetableName}
+        setTimetableName={setTimetableName}
+        selectedEventIds={selectedEventIds}
+        setSelectedEventIds={setSelectedEventIds}
       />
+    );
+  }
+
+  if (isInitialLoading) {
+    return (
+      <div className="flex items-center justify-center p-20 text-[var(--text-secondary)]">
+        Loading timetable
+      </div>
     );
   }
 
