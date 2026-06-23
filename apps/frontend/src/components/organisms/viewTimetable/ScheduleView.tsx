@@ -26,6 +26,7 @@ import {
   type TimetableResponse,
 } from "@/app/builder/utils/timetables/TimeTableRequests";
 import { downloadICS, generateICS } from "@/lib/ICS-utils/ICS";
+import { Button } from "@/components/atoms/baseShadcn/button";
 
 interface ScheduleViewProps {
   onEventCountChange: (count: number) => void;
@@ -210,13 +211,30 @@ export function ScheduleView({
         <EmptySchedule />
       ) : (
         <div className="flex flex-col">
-          <WeekNavBar
-            weekStart={currentWeekStart}
-            currentIndex={currentWeekIndex}
-            totalWeeks={weekStarts.length}
-            onPrev={handlePrevWeek}
-            onNext={handleNextWeek}
-          />
+          <div className="flex flex-row justify-between items-center w-full">
+            <WeekNavBar
+              weekStart={currentWeekStart}
+              currentIndex={currentWeekIndex}
+              totalWeeks={weekStarts.length}
+              onPrev={handlePrevWeek}
+              onNext={handleNextWeek}
+            />
+            <div className="flex flex-row justify-end gap-1">
+              <Button
+                type="button"
+                className="h-7 px-3 text-xs bg-[var(--text-primary)] text-[var(--bg-base)] hover:opacity-90"
+              >
+                Edit
+              </Button>
+
+              <Button
+                type="button"
+                className="h-7 px-3 text-xs bg-[var(--destructive)] text-[var(--bg-base)] hover:opacity-90"
+              >
+                Delete
+              </Button>
+            </div>
+          </div>
           <WeeklyGrid events={resolvedEvents} weekStart={currentWeekStart} />
         </div>
       )}
