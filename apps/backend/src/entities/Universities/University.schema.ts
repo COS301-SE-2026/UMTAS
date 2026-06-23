@@ -6,12 +6,14 @@ import {
   pgEnum,
 } from 'drizzle-orm/pg-core';
 import { usersTable } from '../auth';
-export const RoleType = pgEnum('role', [
+
+export const RoleType = pgEnum('RoleType', [
   'student',
   'UniversityAdmin',
   'SystemAdmin',
   'studentOwned',
 ]); // student owned is == uni admin maybe just to be precise?
+
 export const University = pgTable('University', {
   UniversityID: uuid('UniversityID').defaultRandom().primaryKey(),
   UniversityName: varchar('VenueName', { length: 30 }),
