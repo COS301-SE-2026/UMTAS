@@ -1,2 +1,2 @@
 export * from './events.schema';
-export * from './lecturesEV.schema';
+export * from './UniversityEvent';
