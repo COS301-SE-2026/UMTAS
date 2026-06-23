@@ -1,9 +1,13 @@
 import { pgTable, uuid, varchar, primaryKey } from 'drizzle-orm/pg-core';
 import { modules } from '../Modules';
+import { University } from './University.schema';
 
 export const Course = pgTable('Course', {
   CourseID: uuid('courseID').defaultRandom().primaryKey(),
   CourseName: varchar('courseName', { length: 30 }),
+  UniversityID: uuid('UniversityID') // university owns
+    .references(() => University.UniversityID, { onDelete: 'cascade' })
+    .notNull(),
 });
 
 export const CourseModule = pgTable(
