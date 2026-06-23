@@ -34,7 +34,5 @@ export const EventsToTimetables = pgTable(
       .notNull()
       .references(() => Timetable.timetableID, { onDelete: 'cascade' }),
   },
-  (t) => ({
-    pk: primaryKey({ columns: [t.eventID, t.timetableID] }),
-  }),
+  (table) => [primaryKey({ columns: [table.eventID, table.timetableID] })],
 );
