@@ -222,14 +222,14 @@ export function ScheduleView({
             <div className="flex flex-row justify-end gap-1">
               <Button
                 type="button"
-                className="h-7 px-3 text-xs bg-[var(--text-primary)] text-[var(--bg-base)] hover:opacity-90"
+                className="h-7 px-3 text-xs bg-[var(--bg-surface)] text-[var(--text-primary)] border-[var(--border)] hover:opacity-90"
               >
                 Edit
               </Button>
 
               <Button
                 type="button"
-                className="h-7 px-3 text-xs bg-[var(--destructive)] text-[var(--bg-base)] hover:opacity-90"
+                className="h-7 px-3 text-xs bg-[var(--destructive)] text-[var(--text-primary)] border-[var(--border)] hover:opacity-90"
               >
                 Delete
               </Button>
