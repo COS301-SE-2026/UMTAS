@@ -22,11 +22,13 @@ import {
   type EventResponse,
 } from "@/app/builder/utils/events/eventRequestBuilder";
 import {
+  deleteTTbyIDBuilder,
   getAllTimeTablesBuilder,
   type TimetableResponse,
 } from "@/app/builder/utils/timetables/TimeTableRequests";
 import { downloadICS, generateICS } from "@/lib/ICS-utils/ICS";
 import { Button } from "@/components/atoms/baseShadcn/button";
+import { log, time } from "console";
 
 interface ScheduleViewProps {
   onEventCountChange: (count: number) => void;
@@ -42,7 +44,7 @@ export function ScheduleView({
   const [allModules, setAllModules] = useState<ModuleResponseDto[]>([]);
   const [allEvents, setAllEvents] = useState<EventResponse[]>([]);
   const [timetables, setTimetables] = useState<TimetableResponse[]>([]);
-  const [selectedTimetableId, setSelectedTimetableId] = useState<string>("");
+  const [selectedTimetableId, setSelectedTimetableId] = useState<number>();
 
   const [isLoading, setIsLoading] = useState(true);
   const [currentWeekIndex, setCurrentWeekIndex] = useState(0);
@@ -64,10 +66,8 @@ export function ScheduleView({
 
         if (fetchedTimetables.length > 0) {
           setSelectedTimetableId(
-            String(
-              fetchedTimetables[fetchedTimetables.length - 1].timetable
-                .timetableID,
-            ),
+            fetchedTimetables[fetchedTimetables.length - 1].timetable
+              .timetableID,
           );
         }
       } catch (error) {
@@ -85,7 +85,7 @@ export function ScheduleView({
     }
 
     const selectedTT = timetables.find(
-      (tt) => String(tt.timetable.timetableID) === selectedTimetableId,
+      (tt) => tt.timetable.timetableID === selectedTimetableId,
     );
 
     if (selectedTT && selectedTT.eventIds) {
@@ -177,15 +177,57 @@ export function ScheduleView({
     );
   }
 
+  //delete timetable
+  async function deleteTimetableByID() {
+    if (!selectedTimetableId) {
+      return;
+    }
+
+    const confirm = window.confirm(
+      "Are you sure you want to delete this timetable?",
+    );
+
+    if (!confirm) {
+      return;
+    }
+
+    try {
+      const builder = new deleteTTbyIDBuilder();
+
+      await builder.send({
+        paths: { id: selectedTimetableId },
+      });
+
+      //remove currently selected timetable
+      const remainingTimetables = timetables.filter(
+        (timetable) => timetable.timetable.timetableID !== selectedTimetableId,
+      );
+
+      setTimetables(remainingTimetables);
+
+      if (remainingTimetables.length > 0) {
+        setSelectedTimetableId(remainingTimetables[0].timetable.timetableID);
+        setCurrentWeekIndex(0);
+      }
+
+      //console.log("Timetable successfully added");
+    } catch {
+      //console.error("Error with sending delete request");
+      alert(
+        "An error occured while deleting your timetable. Please refresh and try again.",
+      );
+    }
+  }
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <div className="w-64">
           <Select
-            value={selectedTimetableId}
+            value={String(selectedTimetableId)}
             onValueChange={(newValue) => {
-              setSelectedTimetableId(newValue);
-              setCurrentWeekIndex(0); // Reset the week index here instead!
+              setSelectedTimetableId(Number(newValue));
+              setCurrentWeekIndex(0);
             }}
           >
             <SelectTrigger className="bg-[var(--bg-surface)] border-[var(--border)]">
@@ -230,6 +272,7 @@ export function ScheduleView({
               <Button
                 type="button"
                 className="h-7 px-3 text-xs bg-[var(--destructive)] text-[var(--text-primary)] border-[var(--border)] hover:opacity-90"
+                onClick={deleteTimetableByID}
               >
                 Delete
               </Button>
