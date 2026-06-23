@@ -1,0 +1,16 @@
+apps/backend/src/entities/Universities/course.schema.ts
+  h_8b894b05e4a1b2 3,8-10
+apps/backend/src/entities/Universities/University.schema.ts
+  h_8b894b05e4a1b2 1-4,9-14,19
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.10",
+  "base_commit_sha": "5833a1346acdfdb67ecac33d7981d2ea80472126",
+  "prompts": {},
+  "humans": {
+    "h_8b894b05e4a1b2": {
+      "author": "Wilmar-Smit <u24584216@tuks.co.za>"
+    }
+  }
+}
