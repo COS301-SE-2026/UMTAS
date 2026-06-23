@@ -284,7 +284,7 @@ export function WizardShell() {
         body: {
           timetableName: name || "Generated Schedule",
           //there is a mismtach between frontend and backend. backend wants number but frontend uses string. this works but a better fix might be needed
-          eventIds: numbersOnlyEvents as unknown as string[],
+          eventIds: numbersOnlyEvents,
         },
       });
 
