@@ -3,10 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { DatabaseModule } from '../../db/database.module';
 
 import { DatabaseService } from '../../db/database.service';
-import {
-  EventsToTimetables,
-  Timetable,
-} from '../../entities/Events/events.schema';
+import { EventsToTimetables, Timetable } from '../../entities/index';
 import { Event } from '../../entities/Events/index';
 // import { NotFoundException } from '@nestjs/common';
 import { EventService } from '../../Events/event.service';
