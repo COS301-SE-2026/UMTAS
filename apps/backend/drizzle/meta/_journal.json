@@ -8,6 +8,13 @@
       "when": 1782041652890,
       "tag": "0000_furry_doctor_doom",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1782240394466,
+      "tag": "0001_red_talisman",
+      "breakpoints": true
     }
   ]
 }

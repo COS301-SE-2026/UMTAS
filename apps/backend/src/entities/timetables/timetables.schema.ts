@@ -6,11 +6,11 @@ import {
   integer,
   primaryKey,
 } from 'drizzle-orm/pg-core';
-import { UniversityEvent } from '../Events';
+import { Event } from '../Events';
 import { usersTable } from '../auth';
 
 export const Timetable = pgTable('Timetable', {
-  timetableID: serial('timetableID').primaryKey(),
+  timetableID: serial('timetableID').unique().primaryKey(),
   timetableName: varchar('timetableName', { length: 32 }),
   userID: uuid('userID')
     .references(() => usersTable.id, { onDelete: 'cascade' })
@@ -22,9 +22,9 @@ export const EventsToTimetables = pgTable(
   {
     eventID: integer('eventID')
       .notNull()
-      .references(() => UniversityEvent.UniversityEventID, {
+      .references(() => Event.eventID, {
         onDelete: 'cascade',
-      }), // changed to link specifically to a Uni child event it should not break....
+      }),
     timetableID: integer('timetableID')
       .notNull()
       .references(() => Timetable.timetableID, { onDelete: 'cascade' }),
