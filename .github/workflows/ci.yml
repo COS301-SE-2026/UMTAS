@@ -4,8 +4,11 @@ on:
   push:
     branches:
       - main
-      - dev
+    tags:
+      - "v*"
   pull_request:
+    branches:
+      - main
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -17,12 +20,14 @@ jobs:
   ci:
     name: Lint, Build & Test
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ startsWith(github.ref, 'refs/tags/v') && 'production' || 'staging' }}
     permissions:
       contents: read
       checks: write
     env:
       NEXT_TELEMETRY_DISABLED: 1
-      NEXT_PUBLIC_API_URL: https://api.${{ secrets.PROD_DOMAIN }}
+      NEXT_PUBLIC_API_URL: ${{ startsWith(github.ref, 'refs/tags/v') && format('https://api.{0}', secrets.PROD_DOMAIN) || format('https://staging.api.{0}', secrets.STAGING_DOMAIN) }}
 
     steps:
       - name: Checkout code
