@@ -4,7 +4,7 @@ import { DatabaseModule } from '../../db/database.module';
 import { ModuleService } from '../../Module/module.service';
 
 import { DatabaseService } from '../../db/database.service';
-import { Event, LectureEv } from '../../entities/Events/index';
+import { Event, UniversityEvent } from '../../entities/Events/index';
 // import { NotFoundException } from '@nestjs/common';
 import { EventService } from '../event.service';
 import { EventType } from '../dto/EventDto.dto';
@@ -46,7 +46,7 @@ describe('EventService integration', () => {
 
   beforeEach(async () => {
     await dbService.db.delete(Event);
-    await dbService.db.delete(LectureEv);
+    await dbService.db.delete(UniversityEvent);
   });
 
   afterAll(async () => {

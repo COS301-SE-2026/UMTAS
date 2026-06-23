@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { eq, and } from 'drizzle-orm';
 import { DatabaseService } from '../db/database.service';
-import { Event, LectureEv, modules } from '../entities/index';
+import { Event, UniversityEvent, modules } from '../entities/index';
 import {
   CreateEventDto,
   EventResponseDto,
@@ -71,10 +71,10 @@ export class EventService {
     const r = await this.databaseService.db
       .select({
         event: Event,
-        lecture: LectureEv,
+        lecture: UniversityEvent,
       })
       .from(Event)
-      .leftJoin(LectureEv, eq(LectureEv.eventID, Event.eventID))
+      .leftJoin(UniversityEvent, eq(UniversityEvent.eventID, Event.eventID))
       .where(eq(Event.userID, userId));
 
     return {
@@ -94,10 +94,10 @@ export class EventService {
     const [row] = await this.databaseService.db
       .select({
         event: Event,
-        lecture: LectureEv,
+        lecture: UniversityEvent,
       })
       .from(Event)
-      .leftJoin(LectureEv, eq(LectureEv.eventID, Event.eventID))
+      .leftJoin(UniversityEvent, eq(UniversityEvent.eventID, Event.eventID))
       .where(and(eq(Event.eventID, eventId), eq(Event.userID, userId)))
       .limit(1);
 
@@ -133,10 +133,10 @@ export class EventService {
         const [exRow] = await tx
           .select({
             event: Event,
-            lecture: LectureEv,
+            lecture: UniversityEvent,
           })
           .from(Event)
-          .leftJoin(LectureEv, eq(LectureEv.eventID, Event.eventID))
+          .leftJoin(UniversityEvent, eq(UniversityEvent.eventID, Event.eventID))
           .where(and(eq(Event.eventID, eventId), eq(Event.userID, userId)))
           .limit(1);
 
@@ -234,7 +234,7 @@ export class EventService {
       );
 
     const [lec] = await tx
-      .insert(LectureEv)
+      .insert(UniversityEvent)
       .values({
         moduleID: mod.moduleID,
         eventID: eventID,
@@ -269,11 +269,13 @@ export class EventService {
     tx: AppDatabase,
     eventID: number,
     criteria: NonNullable<CreateEventDto['eventCriteria']>,
-    existingLecture?: typeof LectureEv.$inferSelect | null,
+    existingLecture?: typeof UniversityEvent.$inferSelect | null,
   ) {
     if (!criteria.type) {
       if (existingLecture)
-        await tx.delete(LectureEv).where(eq(LectureEv.eventID, eventID));
+        await tx
+          .delete(UniversityEvent)
+          .where(eq(UniversityEvent.eventID, eventID));
 
       return undefined;
     } //END_type
@@ -296,7 +298,7 @@ export class EventService {
     tx: AppDatabase,
     eventID: number,
     criteria: NonNullable<CreateEventDto['eventCriteria']>,
-    exLecture?: typeof LectureEv.$inferSelect | null,
+    exLecture?: typeof UniversityEvent.$inferSelect | null,
   ) {
     if (!criteria.moduleCode)
       throw new BadRequestException('Lecture events need moduleCode');
@@ -311,12 +313,12 @@ export class EventService {
 
     if (exLecture) {
       const [lecture] = await tx
-        .update(LectureEv)
+        .update(UniversityEvent)
         .set({
           moduleID: mod.moduleID,
           venue: criteria.venue ?? null,
         })
-        .where(eq(LectureEv.eventID, eventID))
+        .where(eq(UniversityEvent.eventID, eventID))
         .returning();
 
       if (!lecture)
@@ -326,7 +328,7 @@ export class EventService {
     } //END_exLecture
 
     const [lecture] = await tx
-      .insert(LectureEv)
+      .insert(UniversityEvent)
       .values({
         moduleID: mod.moduleID,
         eventID,

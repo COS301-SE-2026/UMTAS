@@ -2,7 +2,7 @@ import { integer, pgTable, serial, varchar } from 'drizzle-orm/pg-core';
 import { modules } from '../Modules';
 import { Event } from './events.schema';
 
-export const LectureEv = pgTable('UniversityEvent', {
+export const UniversityEvent = pgTable('UniversityEvent', {
   UniversityEventID: serial('universityEventID').primaryKey(),
   moduleID: integer('moduleID').references(() => modules.moduleID, {
     onDelete: 'cascade',
