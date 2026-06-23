@@ -1,0 +1,25 @@
+apps/backend/src/Timetable/dto/timetable.dto.ts
+  s_d5d22454d2f3d5::t_5b305140cb4719 23,46,57,84
+  s_d5d22454d2f3d5::t_727024cb9271af 2,29
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "0f840ef1e0afd75e558b8f224f4cb05617db2661",
+  "prompts": {},
+  "humans": {
+    "h_8b894b05e4a1b2": {
+      "author": "Wilmar-Smit <u24584216@tuks.co.za>"
+    }
+  },
+  "sessions": {
+    "s_d5d22454d2f3d5": {
+      "agent_id": {
+        "tool": "github-copilot",
+        "id": "cbd1505f-b9ed-4185-886b-59671b3d06a2",
+        "model": "gpt-5-mini"
+      },
+      "human_author": "Wilmar-Smit <u24584216@tuks.co.za>"
+    }
+  }
+}
