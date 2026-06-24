@@ -391,19 +391,17 @@ describe('TimetableService', () => {
         from: jest.fn().mockReturnValue({
           innerJoin: jest.fn().mockReturnValue({
             leftJoin: jest.fn().mockReturnValue({
-              where: jest
-                .fn()
-                .mockResolvedValue([
-                  {
-                    UserTimetable: {
-                      UserTimetableID: 1,
-                      UserID: 'user-1',
-                      TimetableID: 1,
-                    },
-                    timetable: newTimetable,
-                    eventID: 3,
+              where: jest.fn().mockResolvedValue([
+                {
+                  UserTimetable: {
+                    UserTimetableID: 1,
+                    UserID: 'user-1',
+                    TimetableID: 1,
                   },
-                ]),
+                  timetable: newTimetable,
+                  eventID: 3,
+                },
+              ]),
             }),
           }),
         }),
