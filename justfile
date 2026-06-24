@@ -78,18 +78,18 @@ ci:
 prod-db-backup:
     @echo "Creating database backup..."
     mkdir -p ./backups
-    phase run -- docker compose -f docker-compose.prod.yml exec -T postgres sh -lc 'PGPASSWORD="$$POSTGRES_PASSWORD" pg_dump -U "$$POSTGRES_USER" "$$POSTGRES_DB"' > ./backups/prod_backup_$(date +%F_%H%M%S).sql
+    phase run --env production -- docker compose -f docker-compose.prod.yml exec -T postgres sh -lc 'PGPASSWORD="$$POSTGRES_PASSWORD" pg_dump -U "$$POSTGRES_USER" "$$POSTGRES_DB"' > ./backups/prod_backup_$(date +%F_%H%M%S).sql
 
 # start prod to specific release tag
 prod-up release_tag:
-    phase run -- env IMAGE_TAG={{release_tag}} docker compose -f docker-compose.prod.yml up -d --remove-orphans
+    phase run --env production -- env IMAGE_TAG={{release_tag}} docker compose -f docker-compose.prod.yml up -d --remove-orphans
 
 prod-down:
-    phase run -- docker compose -f docker-compose.prod.yml down
+    phase run --env production -- docker compose -f docker-compose.prod.yml down
 
 # execute migrations on prod
 prod-migrate:
-    phase run -- docker compose -f docker-compose.prod.yml exec -T backend pnpm run db:migrate
+    phase run --env production -- docker compose -f docker-compose.prod.yml exec -T backend pnpm run db:migrate
 
 # manual prod deployment
 
@@ -100,7 +100,7 @@ deploy-prod release_tag:
     just prod-migrate
     @echo "Production successfully deployed version {{release_tag}}"
 
-# rollback to specific tag
+# rollback to specific tag 
 rollback-prod previous_tag:
     @echo "Rolling back production to version {{previous_tag}}..."
     just prod-up {{previous_tag}}
