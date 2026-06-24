@@ -26,6 +26,8 @@ jobs:
     permissions:
       contents: read
       checks: write
+    outputs:
+      status: ${{ job.status }}
     env:
       NEXT_TELEMETRY_DISABLED: 1
       NEXT_PUBLIC_API_URL: ${{ startsWith(github.ref, 'refs/tags/v') && format('https://api.{0}', secrets.PROD_DOMAIN) || format('https://staging.api.{0}', secrets.STAGING_DOMAIN) }}
@@ -141,6 +143,8 @@ jobs:
       name: staging
     permissions:
       contents: read
+    outputs:
+      status: ${{ job.status }}
 
     steps:
       - name: Checkout code
@@ -208,6 +212,8 @@ jobs:
       name: production
     permissions:
       contents: read
+    outputs:
+      status: ${{ job.status }}
 
     steps:
       - name: Checkout code
@@ -266,6 +272,7 @@ jobs:
             vigilcs/umtas:solver-${{ steps.tag.outputs.sha }}
           cache-from: type=gha,scope=solver-release
           cache-to: type=gha,mode=max,scope=solver-release
+
   health-check:
     name: Staging Health Check
     runs-on: ubuntu-latest
@@ -274,6 +281,8 @@ jobs:
     environment:
       name: staging
     permissions: {}
+    outputs:
+      status: ${{ job.status }}
 
     steps:
       - name: Wait for Watchtower redeploy
@@ -307,3 +316,23 @@ jobs:
           check "https://staging.${DOMAIN}/api/health"    || failed=1
 
           exit $failed
+
+  notify-staging-ready:
+    name: Notify Staging Success
+    needs: [health-check]
+    if: success()
+    uses: ./.github/workflows/discord-notify.yml
+    with:
+      status: "Success"
+      message: "Staging environment is updated and passing health checks!"
+    secrets: inherit
+
+  notify-ci-failure:
+    name: Notify CI/CD Failure
+    needs: [ci, docker-staging, docker-release]
+    if: failure()
+    uses: ./.github/workflows/discord-notify.yml
+    with:
+      status: "Failure"
+      message: "The pipeline failed during CI or Docker Build. Check the GitHub Actions logs."
+    secrets: inherit
