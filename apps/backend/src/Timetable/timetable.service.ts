@@ -154,7 +154,8 @@ export class TimetableService {
             eq(UserTimetable.TimetableID, Timetable.timetableID),
             eq(Timetable.timetableID, timetableId),
           ),
-        );
+        )
+        .limit(1);
 
       if (!existing)
         throw new NotFoundException(
@@ -210,7 +211,7 @@ export class TimetableService {
     userId: string,
     timetableId: number,
   ): Promise<DeleteTimetableResponseDto> {
-    const [existing] = await this.databaseService.db
+    /* const [existing] = await this.databaseService.db
       .select()
       .from(Timetable)
       .where(
@@ -220,6 +221,20 @@ export class TimetableService {
         ),
       )
       .limit(1);
+      */
+    const [existing] = await this.databaseService.db
+      .select()
+      .from(UserTimetable)
+      .innerJoin(
+        Timetable,
+        eq(UserTimetable.TimetableID, Timetable.timetableID),
+      )
+      .where(
+        and(
+          eq(UserTimetable.UserID, userId),
+          eq(Timetable.timetableID, timetableId),
+        ),
+      );
 
     if (!existing)
       throw new NotFoundException(`Timetable not found for id: ${timetableId}`);
@@ -229,7 +244,7 @@ export class TimetableService {
       .where(
         and(
           eq(Timetable.timetableID, timetableId),
-          eq(Timetable.userID, userId),
+          eq(Timetable.timetableID, existing.Timetable.timetableID),
         ),
       )
       .returning();
