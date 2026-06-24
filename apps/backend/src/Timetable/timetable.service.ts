@@ -40,6 +40,11 @@ export class TimetableService {
         if (!newTimetable)
           throw new InternalServerErrorException('Timetable was not created');
 
+        const [newUserTimetable] = await tx
+          .insert(UserTimetable)
+          .values({ UserID: userId, TimetableID: newTimetable.timetableID })
+          .returning();
+
         const eventIds: number[] = [];
 
         if (dto.eventIds?.length) {
@@ -54,6 +59,7 @@ export class TimetableService {
         }
 
         return {
+          UserTimetableID: newUserTimetable.UserTimetableID,
           timetable: newTimetable,
           ...(eventIds.length ? { eventIds } : {}),
         };
