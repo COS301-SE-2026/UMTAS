@@ -127,7 +127,7 @@ function DashboardContent() {
               University Modular Timetable &amp; Analytics System
             </Badge>
 
-            <h1 className="text-4xl lg:text-5xl font-semibold text-[var(--text-primary)] leading-[1.1] suppressHydrationWarning">
+            <h1 className="text-4xl lg:text-5xl font-semibold text-[var(--text-primary)] leading-[1.1] suppressHydrationWarning={true}">
               {renderGreeting()}
             </h1>
 
