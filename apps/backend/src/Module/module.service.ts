@@ -112,12 +112,15 @@ export class ModuleService {
   //return all
   async getAll(userId: string): Promise<ModuleListResponseDto> {
     const foundModules = await this.dbService.db
-      .select(
-        
-      )
+      .select({
+        moduleID: modules.moduleID,
+        moduleCode: modules.moduleCode,
+        moduleName: modules.moduleName,
+        moduleDescription: modules.moduleDescription
+      })
       .from(modules)
-      .innerJoin(ModuleEnrollment, eq(ModuleEnrollment.UserID, userId))
-      .where();
+      .innerJoin(ModuleEnrollment, eq(ModuleEnrollment.ModuleID, modules.moduleID))
+      .where(eq(ModuleEnrollment.UserID, userId));
 
     return { 
       modules: foundModules 
