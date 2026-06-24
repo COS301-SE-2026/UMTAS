@@ -14,6 +14,8 @@ jobs:
     environment:
       name: production
     permissions: {}
+    outputs:
+      status: ${{ job.status }}
     steps:
       - name: Execute Deployment via SSH
         uses: appleboy/ssh-action@v1.0.3
@@ -24,6 +26,16 @@ jobs:
           script: |
             cd /opt/umtas
             phase run -- just deploy-prod "${{ inputs.release_tag }}"
+
+  notify-deploy:
+    needs: deploy
+    if: always()
+    uses: ./.github/workflows/discord-notify.yml
+    with:
+      status: ${{ needs.deploy.result == 'success' && 'Success' || 'Failure' }}
+      message: "Deployment of ${{ inputs.release_tag }} to production has completed."
+    secrets: inherit
+
   prod-health-check:
     name: Production Health Check
     runs-on: ubuntu-latest
@@ -31,6 +43,8 @@ jobs:
     environment:
       name: production
     permissions: {}
+    outputs:
+      status: ${{ job.status }}
     steps:
       - name: Wait for containers to stabilize
         run: sleep 30
@@ -59,3 +73,11 @@ jobs:
           check "https://${DOMAIN}/api/health"    || failed=1
 
           exit $failed
+  notify-prod-health-check:
+    needs: prod-health-check
+    if: always()
+    uses: ./.github/workflows/discord-notify.yml
+    with:
+      status: ${{ needs.prod-health-check.result == 'success' && 'Success' || 'Failure' }}
+      message: "Deployment of ${{ inputs.release_tag }} to production is healthy and all services are responding as expected."
+    secrets: inherit

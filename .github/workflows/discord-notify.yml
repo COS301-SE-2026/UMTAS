@@ -1,0 +1,24 @@
+name: Notify Discord
+
+on:
+  workflow_call:
+    inputs:
+      message:
+        required: true
+        type: string
+      status:
+        required: true
+        type: string
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Discord Notification
+        uses: appleboy/discord-action@master
+        with:
+          webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
+          webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
+          message: |
+            **Status**: ${{ inputs.status }}
+            **Message**: ${{ inputs.message }}
