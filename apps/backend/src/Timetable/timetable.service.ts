@@ -259,6 +259,7 @@ export class TimetableService {
     userId: string,
     timetableId: number,
   ): Promise<TimetableResponseDto> {
+    /*
     const rows = await this.databaseService.db
       .select({ timetable: Timetable, eventID: EventsToTimetables.eventID })
       .from(Timetable)
@@ -271,17 +272,35 @@ export class TimetableService {
           eq(Timetable.timetableID, timetableId),
           eq(Timetable.userID, userId),
         ),
-      );
+        );*/
+    const rows = await this.databaseService.db
+      .select({
+        UserTimetable: UserTimetable,
+        timetable: Timetable,
+        eventID: EventsToTimetables.eventID,
+      })
+      .from(UserTimetable)
+      .innerJoin(
+        Timetable,
+        eq(Timetable.timetableID, UserTimetable.TimetableID),
+      )
+      .innerJoin(
+        EventsToTimetables,
+        eq(EventsToTimetables.timetableID, Timetable.timetableID),
+      )
+      .where(eq(UserTimetable.UserID, userId));
 
     if (!rows.length)
       throw new NotFoundException(`Timetable not found for id: ${timetableId}`);
 
+    const UserTT = rows[0].UserTimetable;
     const timetable = rows[0].timetable;
     const eventIds = rows
       .filter((r) => r.eventID !== null)
-      .map((r) => r.eventID!);
+      .map((r) => r.eventID);
 
     return {
+      UserTimetableID: UserTT.UserTimetableID,
       timetable,
       ...(eventIds.length ? { eventIds } : {}),
     };
@@ -295,7 +314,7 @@ export class TimetableService {
     const found = await tx
       .select({ eventID: Event.eventID })
       .from(Event)
-      .where(and(inArray(Event.eventID, eventIds), eq(Event.userID, userId)));
+      .where(inArray(Event.eventID, eventIds));
 
     if (found.length !== eventIds.length) {
       const foundSet = new Set(found.map((r) => r.eventID));
