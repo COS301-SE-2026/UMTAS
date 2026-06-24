@@ -22,6 +22,13 @@
       "when": 1782290727419,
       "tag": "0002_pink_menace",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1782319096607,
+      "tag": "0003_CAPATALISED_ROLES_IN_UNIVERSITYROLES_FIXED_FIELD_IN_UNIVERSITY",
+      "breakpoints": true
     }
   ]
 }

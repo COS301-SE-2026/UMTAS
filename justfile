@@ -90,3 +90,20 @@ rollback-prod PREVIOUS_TAG:
     @echo "Rolling back production to version {{PREVIOUS_TAG}}..."
     just prod-server-up {{PREVIOUS_TAG}}
     @echo "Rollback complete. Traefik is routing to {{PREVIOUS_TAG}}"
+
+############################## Backend specific
+
+# generate | example: just generate This_change_to_this_migration
+generate NAME:
+    phase run -- pnpm --filter backend db:generate --name={{NAME}}
+
+# migrate
+migrate:
+    phase run -- pnpm --filter backend db:migrate
+
+# Drizzle studio
+studio:
+    phase run -- pnpm --filter backend db:studio
+
+
+############################## END_Backend specific

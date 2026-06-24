@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString, Length } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, IsUUID, Length } from 'class-validator';
 
 export class CreateModuleDto {
   @ApiProperty({
@@ -20,6 +20,15 @@ export class CreateModuleDto {
   @Length(1, 100)
   name!: string;
 
+  @ApiProperty({
+    example: '550e8400-e29b-41d4-a716-446655440000',
+    description: 'Unique identifier for course (If not provided -> course will be created)',
+    required: false
+  })
+  @IsUUID()
+  @IsOptional()
+  courseID?: string;
+
   @ApiPropertyOptional({
     example: 'Introduction to computer networking concepts',
     description: 'Short module description',
@@ -29,13 +38,13 @@ export class CreateModuleDto {
   @Length(1, 500)
   description?: string;
 
-  @ApiPropertyOptional({
-    example: '#3B82F6',
-    description: 'Optional display styling for the module',
-  })
-  @IsOptional()
-  @IsString()
-  styling?: string;
+  // @ApiPropertyOptional({
+  //   example: '#3B82F6',
+  //   description: 'Optional display styling for the module',
+  // })
+  // @IsOptional()
+  // @IsString()
+  // styling?: string;
 } //create
 
 export class UpdateModuleDto {
@@ -85,19 +94,18 @@ export class ModuleResponseDto {
   @ApiProperty({ example: 'Computer Networks' })
   moduleName!: string;
 
+  //rather include course id than courseName
+  @ApiProperty({ example: '550e8400-e29b-41d4-a716-446655440000'})
+  courseID!: string;
+
   @ApiPropertyOptional({
     example: 'Introduction to computer networking concepts',
     nullable: true,
   })
   moduleDescription?: string | null;
 
-  @ApiProperty({
-    example: '550e8400-e29b-41d4-a716-446655440000',
-  })
-  userID!: string;
-
-  @ApiPropertyOptional({ example: '#3B82F6', nullable: true })
-  styling?: string | null;
+  // @ApiPropertyOptional({ example: '#3B82F6', nullable: true })
+  // styling?: string | null;
 } //Response
 
 export class SingleModuleResponseDto {
