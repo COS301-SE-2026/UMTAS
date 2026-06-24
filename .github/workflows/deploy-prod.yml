@@ -33,7 +33,7 @@ jobs:
     uses: ./.github/workflows/discord-notify.yml
     with:
       status: ${{ needs.deploy.result == 'success' && 'Success' || 'Failure' }}
-      message: "Deployment of ${{ inputs.release_tag }} to production has completed."
+      message: "Deployment of ${{ inputs.release_tag }} to production attempt."
     secrets: inherit
 
   prod-health-check:
@@ -79,5 +79,5 @@ jobs:
     uses: ./.github/workflows/discord-notify.yml
     with:
       status: ${{ needs.prod-health-check.result == 'success' && 'Success' || 'Failure' }}
-      message: "Deployment of ${{ inputs.release_tag }} to production is healthy and all services are responding as expected."
+      message: "Deployment of ${{ inputs.release_tag }} to production health check attempt."
     secrets: inherit
