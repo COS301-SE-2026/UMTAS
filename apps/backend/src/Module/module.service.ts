@@ -16,7 +16,7 @@ import {
   SingleModuleResponseDto,
   UpdateModuleDto,
 } from './dto/module.dto';
-import { University, UniversityRole, Course, CourseModule } from '../entities/index';
+import { University, UniversityRole, Course, CourseModule,  ModuleEnrollment} from '../entities/index';
 
 @Injectable()
 export class ModuleService {
@@ -92,20 +92,36 @@ export class ModuleService {
     if (!courseModule)
       throw new InternalServerErrorException(`CourseModule Join table insert failed for creating module: ${newModule.moduleCode}`);
 
-    return { module: {
-        ...newModule,
-        courseID: course.CourseID
-    } };
+    //enroll student to module if userId provided
+    if (userId) {
+
+      await this.dbService.db
+      .insert(ModuleEnrollment)
+      .values({
+        ModuleID: newModule.moduleID,
+        UserID: userId
+      });
+    }//END_userId
+
+    return {
+      module: newModule,
+      courseID: course.CourseID
+    }
   } //create
 
   //return all
   async getAll(userId: string): Promise<ModuleListResponseDto> {
     const foundModules = await this.dbService.db
-      .select()
+      .select(
+        
+      )
       .from(modules)
-      .where(eq(modules.userID, userId));
+      .innerJoin(ModuleEnrollment, eq(ModuleEnrollment.UserID, userId))
+      .where();
 
-    return { modules: foundModules };
+    return { 
+      modules: foundModules 
+    };
   } //getAll
 
   async getById(userId: string, id: number): Promise<SingleModuleResponseDto> {
@@ -210,7 +226,7 @@ export class ModuleService {
     };
   } //delete
 
-  //Little Helpers
+  //🎅's Little Helpers
   private async createDummyUniversityAndCourse(userId: string){
 
     //Check if user enrolled at university -> if not create dummy uni

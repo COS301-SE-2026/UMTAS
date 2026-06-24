@@ -94,10 +94,6 @@ export class ModuleResponseDto {
   @ApiProperty({ example: 'Computer Networks' })
   moduleName!: string;
 
-  //rather include course id than courseName
-  @ApiProperty({ example: '550e8400-e29b-41d4-a716-446655440000'})
-  courseID!: string;
-
   @ApiPropertyOptional({
     example: 'Introduction to computer networking concepts',
     nullable: true,
@@ -111,9 +107,16 @@ export class ModuleResponseDto {
 export class SingleModuleResponseDto {
   @ApiProperty({ type: ModuleResponseDto })
   module!: ModuleResponseDto;
+
+  //rather include course id than courseName
+  @ApiProperty({ example: '550e8400-e29b-41d4-a716-446655440000'})
+  courseID!: string;
 }
 
 export class ModuleListResponseDto {
+  // @ApiProperty({ example: '550e8400-e29b-41d4-a716-446655440000'})
+  // courseID!: string;
+
   @ApiProperty({ type: [ModuleResponseDto] })
   modules!: ModuleResponseDto[];
 } //list
