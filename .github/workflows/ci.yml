@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - refactor/cicd
     tags:
       - "v*"
   pull_request:
@@ -135,7 +136,7 @@ jobs:
     name: Build & Push Staging Images
     runs-on: ubuntu-latest
     needs: ci
-    if: github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
+    if: github.event_name == 'pull_request' || (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/refactor/cicd'))
     environment:
       name: staging
     permissions:
@@ -269,7 +270,7 @@ jobs:
     name: Staging Health Check
     runs-on: ubuntu-latest
     needs: docker-staging
-    if: github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
+    if: github.event_name == 'pull_request' || (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/refactor/cicd'))
     environment:
       name: staging
     permissions: {}
