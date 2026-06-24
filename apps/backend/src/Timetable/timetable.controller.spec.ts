@@ -11,7 +11,8 @@ import { SessionData } from '../auth/session.decorator';
 const mockSession = { user: { id: 'user-1' } } as SessionData;
 
 const mockTimetable: TimetableResponseDto = {
-  timetable: { timetableID: 1, userID: 'user-1', timetableName: 'Sem 1' },
+  UserTimetableID: '',
+  timetable: { timetableID: 1, timetableName: 'Sem 1' },
 };
 
 const mockService = {

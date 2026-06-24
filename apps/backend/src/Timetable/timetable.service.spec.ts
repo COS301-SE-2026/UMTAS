@@ -44,15 +44,27 @@ describe('TimetableService', () => {
   describe('createTimetable', () => {
     it('should create a timetable and return it without eventIds when none provided', async () => {
       const newTimetable = makeTimetable();
+      const newUserTimetable = {
+        UserTimetableID: 1,
+        UserID: 'user-1',
+        TimetableID: 1,
+      };
 
       dbService.db.transaction.mockImplementation(
         (cb: (tx: any) => Promise<any>) => {
           const mockTx = {
-            insert: jest.fn().mockReturnValue({
-              values: jest.fn().mockReturnValue({
-                returning: jest.fn().mockResolvedValue([newTimetable]),
+            insert: jest
+              .fn()
+              .mockReturnValueOnce({
+                values: jest.fn().mockReturnValue({
+                  returning: jest.fn().mockResolvedValue([newTimetable]),
+                }),
+              })
+              .mockReturnValueOnce({
+                values: jest.fn().mockReturnValue({
+                  returning: jest.fn().mockResolvedValue([newUserTimetable]),
+                }),
               }),
-            }),
           };
           return cb(mockTx);
         },
@@ -70,11 +82,20 @@ describe('TimetableService', () => {
       dbService.db.transaction.mockImplementation(
         (cb: (tx: any) => Promise<any>) => {
           const mockTx = {
-            insert: jest.fn().mockReturnValue({
-              values: jest.fn().mockReturnValue({
-                returning: jest.fn().mockResolvedValue([]),
+            insert: jest
+              .fn()
+              .mockReturnValueOnce({
+                values: jest.fn().mockReturnValue({
+                  returning: jest.fn().mockResolvedValue([]),
+                }),
+              })
+              .mockReturnValueOnce({
+                values: jest.fn().mockReturnValue({
+                  returning: jest
+                    .fn()
+                    .mockResolvedValue([{ UserTimetableID: 1 }]),
+                }),
               }),
-            }),
           };
 
           return cb(mockTx);
@@ -90,13 +111,22 @@ describe('TimetableService', () => {
       dbService.db.transaction.mockImplementation(
         (cb: (tx: any) => Promise<any>) => {
           const mockTx = {
-            insert: jest.fn().mockReturnValue({
-              values: jest.fn().mockReturnValue({
-                returning: jest
-                  .fn()
-                  .mockResolvedValue([{ timetableID: 1, userID: 'user-1' }]),
+            insert: jest
+              .fn()
+              .mockReturnValueOnce({
+                values: jest.fn().mockReturnValue({
+                  returning: jest
+                    .fn()
+                    .mockResolvedValue([{ timetableID: 1, userID: 'user-1' }]),
+                }),
+              })
+              .mockReturnValueOnce({
+                values: jest.fn().mockReturnValue({
+                  returning: jest
+                    .fn()
+                    .mockResolvedValue([{ UserTimetableID: 1 }]),
+                }),
               }),
-            }), //insert
             select: jest.fn().mockReturnValue({
               from: jest.fn().mockReturnValue({
                 where: jest.fn().mockResolvedValue([{ eventID: 1 }]),
@@ -130,8 +160,17 @@ describe('TimetableService', () => {
                 }),
               })
               .mockReturnValueOnce({
-                values: jest.fn().mockResolvedValue([]),
-              }), //insert
+                values: jest.fn().mockReturnValue({
+                  returning: jest
+                    .fn()
+                    .mockResolvedValue([{ UserTimetableID: 1 }]),
+                }),
+              })
+              .mockReturnValueOnce({
+                values: jest.fn().mockReturnValue({
+                  onConflictDoNothing: jest.fn().mockResolvedValue([]),
+                }),
+              }),
 
             select: jest.fn().mockReturnValue({
               from: jest.fn().mockReturnValue({
@@ -157,15 +196,41 @@ describe('TimetableService', () => {
   describe('getAllTimetables', () => {
     it('should return timetables with their linked eventIds grouped correctly', async () => {
       const rows = [
-        { timetable: makeTimetable({ timetableID: 1 }), eventID: 10 },
-        { timetable: makeTimetable({ timetableID: 1 }), eventID: 11 },
-        { timetable: makeTimetable({ timetableID: 2 }), eventID: null },
+        {
+          UserTimetable: {
+            UserTimetableID: 1,
+            UserID: 'user-1',
+            TimetableID: 1,
+          },
+          timetable: makeTimetable({ timetableID: 1 }),
+          eventID: 10,
+        },
+        {
+          UserTimetable: {
+            UserTimetableID: 1,
+            UserID: 'user-1',
+            TimetableID: 1,
+          },
+          timetable: makeTimetable({ timetableID: 1 }),
+          eventID: 11,
+        },
+        {
+          UserTimetable: {
+            UserTimetableID: 2,
+            UserID: 'user-1',
+            TimetableID: 2,
+          },
+          timetable: makeTimetable({ timetableID: 2 }),
+          eventID: null,
+        },
       ];
 
       dbService.db.select.mockReturnValue({
         from: jest.fn().mockReturnValue({
-          leftJoin: jest.fn().mockReturnValue({
-            where: jest.fn().mockResolvedValue(rows),
+          innerJoin: jest.fn().mockReturnValue({
+            leftJoin: jest.fn().mockReturnValue({
+              where: jest.fn().mockResolvedValue(rows),
+            }),
           }),
         }),
       });
@@ -182,8 +247,10 @@ describe('TimetableService', () => {
     it('should throw NotFoundException when timetable does not exist', async () => {
       dbService.db.select.mockReturnValue({
         from: jest.fn().mockReturnValue({
-          leftJoin: jest.fn().mockReturnValue({
-            where: jest.fn().mockResolvedValue([]),
+          innerJoin: jest.fn().mockReturnValue({
+            leftJoin: jest.fn().mockReturnValue({
+              where: jest.fn().mockResolvedValue([]),
+            }),
           }),
         }),
       });
@@ -194,25 +261,42 @@ describe('TimetableService', () => {
     });
 
     it('should return timetable with events with timetable id', async () => {
-      const timetable = {
+      const timetableData = {
         timetableID: 1,
-        userID: 'user-1',
         timetableName: 'Test',
       };
 
       dbService.db.select.mockReturnValue({
         from: jest.fn().mockReturnValue({
-          leftJoin: jest.fn().mockReturnValue({
-            where: jest.fn().mockResolvedValue([
-              { timetable, eventID: 1 },
-              { timetable, eventID: 2 },
-            ]),
+          innerJoin: jest.fn().mockReturnValue({
+            leftJoin: jest.fn().mockReturnValue({
+              where: jest.fn().mockResolvedValue([
+                {
+                  UserTimetable: {
+                    UserTimetableID: 1,
+                    UserID: 'user-1',
+                    TimetableID: 1,
+                  },
+                  timetable: timetableData,
+                  eventID: 1,
+                },
+                {
+                  UserTimetable: {
+                    UserTimetableID: 1,
+                    UserID: 'user-1',
+                    TimetableID: 1,
+                  },
+                  timetable: timetableData,
+                  eventID: 2,
+                },
+              ]),
+            }),
           }),
         }),
       });
 
       const result = await service.getTimetableById('user-1', 1);
-      expect(result.timetable).toEqual(timetable);
+      expect(result.timetable).toEqual(timetableData);
       expect(result.eventIds).toEqual([1, 2]);
     });
   });
@@ -230,8 +314,10 @@ describe('TimetableService', () => {
           const mockTx = {
             select: jest.fn().mockReturnValue({
               from: jest.fn().mockReturnValue({
-                where: jest.fn().mockReturnValue({
-                  limit: jest.fn().mockResolvedValue([]),
+                innerJoin: jest.fn().mockReturnValue({
+                  where: jest.fn().mockReturnValue({
+                    limit: jest.fn().mockResolvedValue([]),
+                  }),
                 }),
               }),
             }),
@@ -260,8 +346,12 @@ describe('TimetableService', () => {
               if (selectCallCount === 1) {
                 return {
                   from: jest.fn().mockReturnValue({
-                    where: jest.fn().mockReturnValue({
-                      limit: jest.fn().mockResolvedValue([timetable]),
+                    innerJoin: jest.fn().mockReturnValue({
+                      where: jest.fn().mockReturnValue({
+                        limit: jest
+                          .fn()
+                          .mockResolvedValue([{ Timetable: timetable }]),
+                      }),
                     }),
                   }),
                 };
@@ -299,10 +389,22 @@ describe('TimetableService', () => {
 
       dbService.db.select.mockReturnValue({
         from: jest.fn().mockReturnValue({
-          leftJoin: jest.fn().mockReturnValue({
-            where: jest
-              .fn()
-              .mockResolvedValue([{ timetable: newTimetable, eventID: 3 }]),
+          innerJoin: jest.fn().mockReturnValue({
+            leftJoin: jest.fn().mockReturnValue({
+              where: jest
+                .fn()
+                .mockResolvedValue([
+                  {
+                    UserTimetable: {
+                      UserTimetableID: 1,
+                      UserID: 'user-1',
+                      TimetableID: 1,
+                    },
+                    timetable: newTimetable,
+                    eventID: 3,
+                  },
+                ]),
+            }),
           }),
         }),
       });
@@ -325,8 +427,12 @@ describe('TimetableService', () => {
           const mockTx = {
             select: jest.fn().mockReturnValue({
               from: jest.fn().mockReturnValue({
-                where: jest.fn().mockReturnValue({
-                  limit: jest.fn().mockResolvedValue([timetable]),
+                innerJoin: jest.fn().mockReturnValue({
+                  where: jest.fn().mockReturnValue({
+                    limit: jest
+                      .fn()
+                      .mockResolvedValue([{ Timetable: timetable }]),
+                  }),
                 }),
               }),
             }),
@@ -354,8 +460,10 @@ describe('TimetableService', () => {
     it('should throw NotFoundException when timetable does not exist', async () => {
       dbService.db.select.mockReturnValue({
         from: jest.fn().mockReturnValue({
-          where: jest.fn().mockReturnValue({
-            limit: jest.fn().mockResolvedValue([]),
+          innerJoin: jest.fn().mockReturnValue({
+            where: jest.fn().mockReturnValue({
+              limit: jest.fn().mockResolvedValue([]),
+            }),
           }),
         }),
       });
@@ -370,8 +478,10 @@ describe('TimetableService', () => {
 
       dbService.db.select.mockReturnValue({
         from: jest.fn().mockReturnValue({
-          where: jest.fn().mockReturnValue({
-            limit: jest.fn().mockResolvedValue([timetable]),
+          innerJoin: jest.fn().mockReturnValue({
+            where: jest.fn().mockReturnValue({
+              limit: jest.fn().mockResolvedValue([{ Timetable: timetable }]),
+            }),
           }),
         }),
       });
@@ -391,8 +501,10 @@ describe('TimetableService', () => {
 
       dbService.db.select.mockReturnValue({
         from: jest.fn().mockReturnValue({
-          where: jest.fn().mockReturnValue({
-            limit: jest.fn().mockResolvedValue([timetable]),
+          innerJoin: jest.fn().mockReturnValue({
+            where: jest.fn().mockReturnValue({
+              limit: jest.fn().mockResolvedValue([{ Timetable: timetable }]),
+            }),
           }),
         }),
       });
