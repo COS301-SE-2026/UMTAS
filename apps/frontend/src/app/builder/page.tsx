@@ -6,12 +6,8 @@ export const metadata = { title: "Builder" };
 
 export default function BuilderPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="h-[calc(100vh-var(--nav-height))] bg-[var(--bg-base)]">
-          <WizardShell />
-        </div>
-      }
-    ></Suspense>
+    <div className="h-[calc(100vh-var(--nav-height))] bg-[var(--bg-base)]">
+      <WizardShell />
+    </div>
   );
 }

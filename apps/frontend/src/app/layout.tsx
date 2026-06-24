@@ -3,6 +3,7 @@ import { DM_Sans } from "next/font/google";
 //import { auth } from "@/../utilities/auth";
 import { AppShellTemplate } from "@/components/templates/app/AppShellTemplate";
 import "./globals.css";
+import { Toaster } from "sonner";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -57,6 +58,8 @@ export default async function RootLayout({
       </head>
       <body className="min-h-full flex flex-col">
         <AppShellTemplate userName={userName}>{children}</AppShellTemplate>
+
+        <Toaster />
       </body>
     </html>
   );
