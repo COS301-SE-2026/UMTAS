@@ -133,7 +133,7 @@ export class TimetableService {
       throw new BadRequestException('At least one update field required');
 
     await this.databaseService.db.transaction(async (tx: AppDatabase) => {
-      const [existing] = await tx
+      /*  const [existing] = await tx
         .select()
         .from(Timetable)
         .where(
@@ -142,7 +142,19 @@ export class TimetableService {
             eq(Timetable.userID, userId),
           ),
         )
-        .limit(1);
+        .limit(1);*/
+
+      const [existing] = await tx
+        .select()
+        .from(UserTimetable)
+        .where(eq(UserTimetable.UserID, userId))
+        .innerJoin(
+          Timetable,
+          and(
+            eq(UserTimetable.TimetableID, Timetable.timetableID),
+            eq(Timetable.timetableID, timetableId),
+          ),
+        );
 
       if (!existing)
         throw new NotFoundException(
@@ -156,7 +168,8 @@ export class TimetableService {
           .where(
             and(
               eq(Timetable.timetableID, timetableId),
-              eq(Timetable.userID, userId),
+              eq(Timetable.timetableID, existing.Timetable.timetableID),
+              eq(UserTimetable.UserID, userId),
             ),
           )
           .returning();
