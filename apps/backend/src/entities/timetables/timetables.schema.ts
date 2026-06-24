@@ -12,9 +12,6 @@ import { usersTable } from '../auth';
 export const Timetable = pgTable('Timetable', {
   timetableID: serial('timetableID').unique().primaryKey(),
   timetableName: varchar('timetableName', { length: 32 }),
-  userID: uuid('userID')
-    .references(() => usersTable.id, { onDelete: 'cascade' })
-    .notNull(),
 });
 
 export const EventsToTimetables = pgTable(

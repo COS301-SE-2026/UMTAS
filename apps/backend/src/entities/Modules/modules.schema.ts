@@ -16,8 +16,6 @@ export const modules = pgTable('Modules', {
   moduleCode: varchar('moduleCode', { length: 10 }).notNull(),
   moduleName: varchar('moduleName', { length: 256 }).notNull(),
   moduleDescription: text('moduleDescription'),
-  styling: varchar('styling', { length: 32 }),
-  userID: uuid('userID').notNull(),
 });
 
 export const ModuleEnrollment = pgTable(

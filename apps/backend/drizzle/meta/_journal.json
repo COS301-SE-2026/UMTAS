@@ -15,6 +15,13 @@
       "when": 1782240394466,
       "tag": "0001_red_talisman",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1782290727419,
+      "tag": "0002_pink_menace",
+      "breakpoints": true
     }
   ]
 }
