@@ -1,0 +1,34 @@
+docs/sas/deployment/DEPLOYMENT_DIAGRAMS.md
+  h_3359569cacef0e 1-13
+docs/srs/FUNCTIONAL_REQUIREMENTS.md
+  h_3359569cacef0e 1-4
+docs/sas/deployment/DEPLOYMENT_REQUIREMENTS.md
+  h_3359569cacef0e 1-15
+docs/srs/NON-FUNCTIONAL_REQUIREMENTS.md
+  h_3359569cacef0e 1-12
+docs/srs/USE_CASES.md
+  h_3359569cacef0e 1-4
+docs/srs/USER_STORIES.md
+  h_3359569cacef0e 1-4
+docs/srs/INTRODUCTION.md
+  h_3359569cacef0e 1-14
+docs/sas/architecture/ARCHITECTURAL_REQUIREMENTS.md
+  h_3359569cacef0e 1-39
+docs/sas/architecture/TECHNOLOGY_REQUIREMENTS.md
+  h_3359569cacef0e 1-4
+docs/sas/architecture/INTRODUCTION.md
+  h_3359569cacef0e 1-14
+docs/srs/DOMAIN_MODEL.md
+  h_3359569cacef0e 1-4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.11",
+  "base_commit_sha": "e134e171ca7a8b66e43a718e7ac9a2791e878886",
+  "prompts": {},
+  "humans": {
+    "h_3359569cacef0e": {
+      "author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}
