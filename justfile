@@ -97,7 +97,6 @@ prod-migrate:
 deploy-prod release_tag:
     just prod-db-backup
     just prod-up {{release_tag}}
-    just prod-migrate
     @echo "Production successfully deployed version {{release_tag}}"
 
 # rollback to specific tag 
