@@ -24,3 +24,38 @@ jobs:
           script: |
             cd /opt/umtas
             phase run -- just deploy-prod "${{ inputs.release_tag }}"
+  prod-health-check:
+    name: Production Health Check
+    runs-on: ubuntu-latest
+    needs: deploy
+    environment:
+      name: production
+    permissions: {}
+    steps:
+      - name: Wait for containers to stabilize
+        run: sleep 30
+
+      - name: Check production health endpoints
+        env:
+          DOMAIN: ${{ secrets.PROD_DOMAIN }}
+        run: |
+          failed=0
+          check() {
+            local url=$1
+            for attempt in 1 2 3 4 5; do
+              status=$(curl -s -L -o /dev/null -w "%{http_code}" --max-time 10 "$url")
+              if [ "$status" = "200" ]; then
+                echo "OK: $url returned HTTP 200"
+                return 0
+              fi
+              echo "Attempt $attempt/5: $url returned HTTP $status"
+              [ "$attempt" -lt 5 ] && sleep 20
+            done
+            return 1
+          }
+
+          check "https://api.${DOMAIN}/health"    || failed=1
+          check "https://solver.${DOMAIN}/health" || failed=1
+          check "https://${DOMAIN}/api/health"    || failed=1
+
+          exit $failed
