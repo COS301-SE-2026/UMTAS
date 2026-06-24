@@ -89,7 +89,7 @@ prod-down:
 
 # execute migrations on prod
 prod-migrate:
-    phase run --env production -- docker compose -f docker-compose.prod.yml exec -T backend pnpm run db:migrate
+    phase run --env production -- docker compose -f docker-compose.prod.yml exec -T backend npx drizzle-kit migrate
 
 # manual prod deployment
 
