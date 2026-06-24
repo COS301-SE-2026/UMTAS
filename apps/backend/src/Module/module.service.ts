@@ -122,22 +122,32 @@ export class ModuleService {
       .innerJoin(ModuleEnrollment, eq(ModuleEnrollment.ModuleID, modules.moduleID))
       .where(eq(ModuleEnrollment.UserID, userId));
 
+    if (!foundModules) throw new NotFoundException('No modules found for user');
+
     return { 
       modules: foundModules 
     };
   } //getAll
 
-  async getById(userId: string, id: number): Promise<SingleModuleResponseDto> {
+  async getById(moduleId: number): Promise<SingleModuleResponseDto> {
     const [module] = await this.dbService.db
-      .select()
+      .select({
+        moduleID: modules.moduleID,
+        moduleCode: modules.moduleCode,
+        moduleName: modules.moduleName,
+        moduleDescription: modules.moduleDescription,
+        courseID: CourseModule.CourseID
+      })
       .from(modules)
-      .where(and(eq(modules.userID, userId), eq(modules.moduleID, id)))
+      .innerJoin(CourseModule, eq(CourseModule.ModuleID, modules.moduleID))
+      .where(eq(modules.moduleID, moduleId))
       .limit(1);
 
     if (!module) throw new NotFoundException('Module not found');
 
     return {
       module,
+      courseID: module.courseID
     };
   } //getById
 
@@ -159,8 +169,7 @@ export class ModuleService {
     if (
       dto.code === undefined &&
       dto.name === undefined &&
-      dto.description === undefined &&
-      dto.styling === undefined
+      dto.description === undefined 
     ) {
       throw new BadRequestException(
         'At least one field is required to update a module',
@@ -195,7 +204,7 @@ export class ModuleService {
         moduleCode: updatedCode ?? module.moduleCode,
         moduleName: dto.name?.trim() ?? module.moduleName,
         moduleDescription: updatedDescription ?? module.moduleDescription,
-        styling: dto.styling ?? module.styling,
+        // styling: dto.styling ?? module.styling,
       })
       .where(and(eq(modules.userID, userId), eq(modules.moduleID, moduleId)))
       .returning();

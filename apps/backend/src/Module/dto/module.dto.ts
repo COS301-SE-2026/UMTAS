@@ -75,13 +75,13 @@ export class UpdateModuleDto {
   @Length(1, 500)
   description?: string;
 
-  @ApiPropertyOptional({
-    example: '#3B82F6',
-    description: 'Updated module styling',
-  })
-  @IsOptional()
-  @IsString()
-  styling?: string;
+  // @ApiPropertyOptional({
+  //   example: '#3B82F6',
+  //   description: 'Updated module styling',
+  // })
+  // @IsOptional()
+  // @IsString()
+  // styling?: string;
 } //udpate
 
 export class ModuleResponseDto {
