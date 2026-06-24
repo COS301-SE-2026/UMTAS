@@ -34,7 +34,7 @@ services:
       retries: 5
 
   minio:
-    image: minio/minio:RELEASE.2023-10-24T21-42-05Z
+    image: minio/minio:RELEASE.2023-10-25T06-33-25Z
     restart: unless-stopped
     networks:
       - gateway
@@ -63,6 +63,7 @@ services:
       - internal
     labels:
       - "traefik.enable=true"
+      - "traefik.docker.network=gateway"
       - "traefik.http.routers.solver-staging.rule=Host(`staging.solver.capstone-vigil.dns.net.za`)"
       - "traefik.http.routers.solver-staging.entrypoints=websecure"
       - "traefik.http.routers.solver-staging.tls=true"
