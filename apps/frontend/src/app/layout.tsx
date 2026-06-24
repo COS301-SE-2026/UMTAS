@@ -4,6 +4,7 @@ import { DM_Sans } from "next/font/google";
 import { AppShellTemplate } from "@/components/templates/app/AppShellTemplate";
 import "./globals.css";
 import { Toaster } from "sonner";
+import Script from "next/script";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -43,7 +44,8 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <head suppressHydrationWarning>
-        <script
+        <Script
+          id="veryUnIqueIDBro"
           dangerouslySetInnerHTML={{
             __html: `
             (function() {
