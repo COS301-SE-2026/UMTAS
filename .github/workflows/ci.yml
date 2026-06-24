@@ -286,12 +286,11 @@ jobs:
           DOMAIN: ${{ secrets.STAGING_DOMAIN }}
         run: |
           failed=0
-
-          check() {
+            check() {
             local url=$1
             local attempt
             for attempt in 1 2 3 4 5; do
-              status=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$url")
+              status=$(curl -s -L -o /dev/null -w "%{http_code}" --max-time 10 "$url")
               if [ "$status" = "200" ]; then
                 echo "OK: $url returned HTTP 200"
                 return 0
@@ -305,6 +304,6 @@ jobs:
 
           check "https://staging.api.${DOMAIN}/health"    || failed=1
           check "https://staging.solver.${DOMAIN}/health" || failed=1
-          check "https://staging.${DOMAIN}"               || failed=1
+          check "https://staging.${DOMAIN}/api/health"    || failed=1
 
           exit $failed
