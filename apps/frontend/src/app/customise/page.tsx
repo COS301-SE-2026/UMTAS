@@ -95,6 +95,7 @@ export const events: EventResponse[] = [
   },
 ];
 
+//from old code
 function EventsPan() {
   return (
     <div className="flex flex-col gap-2">
@@ -124,6 +125,7 @@ function EventsPan() {
   );
 }
 
+//from old code
 function ModulesPan() {
   return (
     <div className="flex flex-col gap-2">
