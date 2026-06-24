@@ -20,6 +20,7 @@ jobs:
       - name: Execute Deployment via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
+          port: ${{ secrets.PROD_SSH_PORT }}
           host: ${{ secrets.PROD_SERVER_IP }}
           username: ${{ secrets.PROD_SSH_USER }}
           key: ${{ secrets.PROD_SSH_KEY }}
