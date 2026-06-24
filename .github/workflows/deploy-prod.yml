@@ -24,8 +24,8 @@ jobs:
           username: ${{ secrets.PROD_SSH_USER }}
           key: ${{ secrets.PROD_SSH_KEY }}
           script: |
-            cd /opt/umtas
-            phase run -- just deploy-prod "${{ inputs.release_tag }}"
+            cd /opt/UMTAS
+            just deploy-prod ${{ inputs.release_tag }}
 
   notify-deploy:
     needs: deploy
