@@ -8,7 +8,12 @@ import { and, eq, inArray } from 'drizzle-orm';
 
 import { DatabaseService } from '../db/database.service';
 import type { AppDatabase } from '../db/database.service';
-import { Event, EventsToTimetables, Timetable } from '../entities/index';
+import {
+  Event,
+  EventsToTimetables,
+  Timetable,
+  UserTimetable,
+} from '../entities/index';
 import {
   CreateTimetableDto,
   DeleteTimetableResponseDto,
@@ -29,7 +34,7 @@ export class TimetableService {
       async (tx: AppDatabase) => {
         const [newTimetable] = await tx
           .insert(Timetable)
-          .values({ userID: userId, timetableName: dto.timetableName ?? null })
+          .values({ timetableName: dto.timetableName ?? null })
           .returning();
 
         if (!newTimetable)
@@ -57,20 +62,41 @@ export class TimetableService {
   } //createTimetable
 
   async getAllTimetables(userId: string): Promise<TimetableListResponseDto> {
-    const rows = await this.databaseService.db
+    /* const rows = await this.databaseService.db
       .select({ timetable: Timetable, eventID: EventsToTimetables.eventID })
       .from(Timetable)
       .leftJoin(
         EventsToTimetables,
         eq(EventsToTimetables.timetableID, Timetable.timetableID),
       )
-      .where(eq(Timetable.userID, userId));
+      .where(eq(Timetable.userID, userId));*/
+
+    const rows = await this.databaseService.db
+      .select({
+        UserTimetable: UserTimetable,
+        timetable: Timetable,
+        eventID: EventsToTimetables.eventID,
+      })
+      .from(UserTimetable)
+      .innerJoin(
+        Timetable,
+        eq(Timetable.timetableID, UserTimetable.TimetableID),
+      )
+      .innerJoin(
+        EventsToTimetables,
+        eq(EventsToTimetables.timetableID, Timetable.timetableID),
+      )
+      .where(eq(UserTimetable.UserID, userId));
 
     const map = new Map<number, TimetableResponseDto>();
 
     for (const row of rows) {
       const id = row.timetable.timetableID;
-      if (!map.has(id)) map.set(id, { timetable: row.timetable });
+      if (!map.has(id))
+        map.set(id, {
+          timetable: row.timetable,
+          UserTimetableID: row.UserTimetable.UserTimetableID,
+        });
       if (row.eventID !== null) {
         const entry = map.get(id)!;
         entry.eventIds = entry.eventIds ?? [];
