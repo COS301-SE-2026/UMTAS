@@ -49,12 +49,15 @@ export class TimetableService {
 
         if (dto.eventIds?.length) {
           await this.validateEventIds(tx, userId, dto.eventIds);
-          await tx.insert(EventsToTimetables).values(
-            dto.eventIds.map((eventID) => ({
-              eventID,
-              timetableID: newTimetable.timetableID,
-            })),
-          );
+          await tx
+            .insert(EventsToTimetables)
+            .values(
+              dto.eventIds.map((eventID) => ({
+                eventID,
+                timetableID: newTimetable.timetableID,
+              })),
+            )
+            .onConflictDoNothing();
           eventIds.push(...dto.eventIds);
         }
 
@@ -88,7 +91,7 @@ export class TimetableService {
         Timetable,
         eq(Timetable.timetableID, UserTimetable.TimetableID),
       )
-      .innerJoin(
+      .leftJoin(
         EventsToTimetables,
         eq(EventsToTimetables.timetableID, Timetable.timetableID),
       )
@@ -147,7 +150,6 @@ export class TimetableService {
       const [existing] = await tx
         .select()
         .from(UserTimetable)
-        .where(eq(UserTimetable.UserID, userId))
         .innerJoin(
           Timetable,
           and(
@@ -155,6 +157,7 @@ export class TimetableService {
             eq(Timetable.timetableID, timetableId),
           ),
         )
+        .where(eq(UserTimetable.UserID, userId))
         .limit(1);
 
       if (!existing)
@@ -168,7 +171,6 @@ export class TimetableService {
           .set({ timetableName: dto.timetableName! })
           .where(
             and(
-              eq(Timetable.timetableID, timetableId),
               eq(Timetable.timetableID, existing.Timetable.timetableID),
               eq(UserTimetable.UserID, userId),
             ),
@@ -234,19 +236,15 @@ export class TimetableService {
           eq(UserTimetable.UserID, userId),
           eq(Timetable.timetableID, timetableId),
         ),
-      );
+      )
+      .limit(1);
 
     if (!existing)
       throw new NotFoundException(`Timetable not found for id: ${timetableId}`);
 
     const [deleted] = await this.databaseService.db
       .delete(Timetable)
-      .where(
-        and(
-          eq(Timetable.timetableID, timetableId),
-          eq(Timetable.timetableID, existing.Timetable.timetableID),
-        ),
-      )
+      .where(eq(Timetable.timetableID, existing.Timetable.timetableID))
       .returning();
 
     if (!deleted)
@@ -284,11 +282,16 @@ export class TimetableService {
         Timetable,
         eq(Timetable.timetableID, UserTimetable.TimetableID),
       )
-      .innerJoin(
+      .leftJoin(
         EventsToTimetables,
         eq(EventsToTimetables.timetableID, Timetable.timetableID),
       )
-      .where(eq(UserTimetable.UserID, userId));
+      .where(
+        and(
+          eq(UserTimetable.UserID, userId),
+          eq(Timetable.timetableID, timetableId),
+        ),
+      );
 
     if (!rows.length)
       throw new NotFoundException(`Timetable not found for id: ${timetableId}`);
@@ -297,7 +300,7 @@ export class TimetableService {
     const timetable = rows[0].timetable;
     const eventIds = rows
       .filter((r) => r.eventID !== null)
-      .map((r) => r.eventID);
+      .map((r) => r.eventID!);
 
     return {
       UserTimetableID: UserTT.UserTimetableID,

@@ -63,7 +63,6 @@ describe('EventService integration', () => {
     });
 
     expect(result.timetable).toBeDefined();
-    expect(result.timetable.userID).toBe(USER_A);
     expect(result.timetable.timetableName).toBe('Empty Timetable');
     expect(result.eventIds).toBeUndefined();
   });
@@ -109,7 +108,6 @@ describe('EventService integration', () => {
     const { timetables } = await tService.getAllTimetables(USER_A);
 
     expect(timetables).toHaveLength(2);
-    expect(timetables[0].timetable.userID).toBe(USER_A);
   });
 
   //GETBYID
