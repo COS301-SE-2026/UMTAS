@@ -52,8 +52,8 @@ export class CourseController {
         return this.service.create(dto);
     }
 
-    //GetAll
-    @Get()
+    //GetAll per universityId
+    @Get(':universityId')
     @Roles('student', 'uni_admin', 'sys_admin')
     @ApiOperation({
         summary: 'Get all courses',
@@ -68,8 +68,10 @@ export class CourseController {
         status: 404,
         description: 'No Courses found'
     })
-    getAll(){
-        return this.service.getAll();
+    getAll(
+        @Param('universityId', ParseUUIDPipe) universityId: string
+    ){
+        return this.service.getAll(universityId);
     }
 
     //GetById

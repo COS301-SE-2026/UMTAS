@@ -11,7 +11,7 @@ import { eq, and } from 'drizzle-orm';
 
 import { DatabaseService } from '../db/database.service';
 import { Course } from 'src/entities';
-import {CreateCourseDto, UpdateCourseDto, CourseSingleResponseDto, CourseListResponseDto, DeleteCourseResponseDto } from './dto/course.dto';
+import {CourseDto, CreateCourseDto, UpdateCourseDto, CourseSingleResponseDto, CourseListResponseDto, DeleteCourseResponseDto } from './dto/course.dto';
 
 @Injectable()
 export class CourseService {
@@ -20,12 +20,32 @@ export class CourseService {
 
     async create(dto: CreateCourseDto): Promise<CourseSingleResponseDto> {
 
-        throw new NotImplementedException('sorry neh');
+        //Check if course already exists
+        const course = await this.duplicateCourseNamePerUniversity(dto.CourseName, dto.UniversityID);
+        if (course) throw new ConflictException(`Course [${dto.CourseName}] already exists for universityID: ${dto.UniversityID}`);
+
+        const [newCourse] = await this.dbService.db
+            .insert(Course)
+            .values({
+                CourseName: dto.CourseName,
+                UniversityID: dto.UniversityID
+            }).returning();
+
+        if (!newCourse) throw new InternalServerErrorException(`Course [${dto.CourseName}] failed to create`);
+
+        return newCourse;
     }//Create
 
-    async getAll(): Promise<CourseListResponseDto> {
+    async getAll(uniId: string): Promise<CourseListResponseDto> {
 
-        throw new NotImplementedException('sorry neh');
+        const courses = await this.dbService.db
+            .select()
+            .from(Course)
+            .where(eq(Course.UniversityID, uniId));
+
+        if (courses.length===0) throw new NotFoundException(`No courses found for universityID: ${uniId}`)
+
+        return {courses};
     }//GetAll
 
     async getById(courseId: string): Promise<CourseSingleResponseDto> {
@@ -44,6 +64,16 @@ export class CourseService {
     }//Delete
 
     //🎅's Little Helpers
+    async duplicateCourseNamePerUniversity(cName: string, uniId: string): Promise<CourseDto> {
+
+        //Find course for university with same name
+        const [course] = await this.dbService.db
+            .select()
+            .from(Course)
+            .where(and(eq(Course.UniversityID, uniId), eq(Course.CourseName, cName))).limit(1);
+
+        return course;
+    }//END_duplicateCourseNamePerUniversity
 
 
 }//UniversityService
