@@ -81,7 +81,7 @@ export class ModuleListResponseDto {
 }
 
 //Delete
-export class DeleteModuleResponseDto extends PickType(ModulesDto, ['moduleName']) {
+export class DeleteModuleResponseDto extends PickType(ModulesDto, ['moduleCode']) {
 
   @ApiProperty({ example: true })
   success!: boolean;

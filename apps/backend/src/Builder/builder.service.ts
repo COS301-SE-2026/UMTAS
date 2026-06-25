@@ -73,7 +73,12 @@ export class BuilderService {
         //Get user course
         const userCourse = await this.doUserUniCourseCheck(userId);
 
-        return await this.moduleService.getAll(userId, userCourse.CourseID);
+        const filters = {
+            userId,
+            courseId: userCourse.CourseID
+        };
+
+        return await this.moduleService.getAll(filters);
     }//END_getAllModules
 
     //Get module by moduleID - no ownership check necessary?
@@ -92,7 +97,7 @@ export class BuilderService {
         if (await this.ownershipCheck(moduleId, userCourse.CourseID)) throw new ForbiddenException(`User [${userId}] does not own module [${moduleId}]`);
 
         //Update any field of module if owned by user
-        return await this.moduleService.update(userId, moduleId, dto);
+        return await this.moduleService.update(moduleId, dto);
     }//END_updateModule
 
     //Delete

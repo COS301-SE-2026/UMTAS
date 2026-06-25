@@ -123,20 +123,25 @@ export class ModuleService {
 
     if (!module) throw new NotFoundException('Module not found');
 
-    return {
-      module
-    };
+    return module;
   } //getById
 
   async update(
     moduleId: string,
-    dto: UpdateModuleDto,
+    dto: UpdateModuleDto
   ): Promise<ModuleSingleResponseDto> {
 
-    //Find module
+    //check that module exists
     const [module] = await this.dbService.db
-      .select()
+      .select({ 
+        moduleID: modules.moduleID,
+        moduleCode: modules.moduleCode,
+        moduleName: modules.moduleName,
+        moduleDescription: modules.moduleDescription,
+        CourseID: CourseModule.CourseID
+      })
       .from(modules)
+      .innerJoin(CourseModule, eq(CourseModule.ModuleID, modules.moduleID))
       .where(eq(modules.moduleID, moduleId))
       .limit(1);
 
@@ -145,37 +150,18 @@ export class ModuleService {
 
     //validate a field is present for update
     if (
-      dto.code === undefined &&
-      dto.name === undefined &&
-      dto.description === undefined 
-    ) {
-      throw new BadRequestException('At least one field is required to update a module');
-    }
+      dto.moduleCode === undefined &&
+      dto.moduleName === undefined &&
+      dto.moduleDescription === undefined 
+    ) throw new BadRequestException('At least one field is required to update a module');
 
-    if (dto.code && dto.code.length > 10)
-      throw new BadRequestException('Module code should be shorter than 10 characters');
+    const updatedCode = dto.moduleCode?.trim().toUpperCase();
+    const updatedName = dto.moduleName?.trim();
+    const updatedDescription = dto.moduleDescription?.trim();
 
-    const updatedCode = dto.code?.trim().toUpperCase();
-    const updatedName = dto.name?.trim();
-    const updatedDescription = dto.description?.trim();
-
-    //Check if duplicate module code exists for same course
-    if (updatedCode && updatedCode !== module.moduleCode) {
-
-      const [existingModule] = await this.dbService.db
-        .select()
-        .from(modules)
-        .innerJoin(CourseModule, eq(modules.moduleID, CourseModule.ModuleID))
-        .where(and(
-          eq(modules.moduleCode, updatedCode), 
-          eq(CourseModule.CourseID, ownership.CourseID)
-        ))
-        .limit(1);
-
-      //If module with same code as updated code already exists in the same course -> throw fit
-      if (existingModule)
-        throw new ConflictException('Duplicate module for new code found');
-    } //duplicate module for new code
+    //If module with same code as updated code already exists in the same course -> throw a fit
+    if (updatedCode && await this.existingModuleCodeForCourse(updatedCode, module.CourseID))
+      throw new ConflictException(`Duplicate module code[${updatedCode}] found for course[${module.CourseID}]`);
 
     //update module
     const [newModule] = await this.dbService.db
@@ -192,9 +178,7 @@ export class ModuleService {
     if (!newModule)
       throw new InternalServerErrorException('Module not updated');
 
-    return {
-      module: newModule
-    };
+    return newModule;
   } //update
 
   async deleteById(moduleId: string): Promise<DeleteModuleResponseDto> {
@@ -214,6 +198,7 @@ export class ModuleService {
       .where(eq(modules.moduleID, moduleId));
 
     return {
+      moduleCode: module.moduleCode,
       success: true
     }
   } //delete
