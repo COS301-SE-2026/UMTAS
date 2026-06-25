@@ -12,7 +12,7 @@ export class CourseDto {
     })
     @IsUUID()
     @IsNotEmpty()
-    courseID!: string;
+    CourseID!: string;
 
     @ApiProperty({
         example: 'BSc Computer Science',
@@ -22,7 +22,7 @@ export class CourseDto {
     @IsNotEmpty()
     @IsString()
     @Length(2, 30)
-    courseName!: string;
+    CourseName!: string;
 
     @ApiProperty({
         example: '550e8400-e29b-41d4-a716-446655440000',
@@ -31,14 +31,14 @@ export class CourseDto {
     })
     @IsUUID()
     @IsNotEmpty()
-    universityID!: string;
+    UniversityID!: string;
 }
 
 //create
-export class CreateCourseDto extends PickType(CourseDto, ['courseName', 'universityID']){}
+export class CreateCourseDto extends PickType(CourseDto, ['CourseName', 'UniversityID']){}
 
 //update
-export class UpdateCourseDto extends PartialType(OmitType(CourseDto, ['courseID'] as const)){}
+export class UpdateCourseDto extends PartialType(OmitType(CourseDto, ['CourseID'] as const)){}
 
 //response
 //Single
@@ -52,4 +52,11 @@ export class CourseListResponseDto {
         description: 'List of courses'
     })
     courses!: CourseDto[];
+}
+
+//Delete
+export class DeleteCourseResponseDto extends PickType(CourseDto, ['CourseName']) {
+
+  @ApiProperty({ example: true })
+  success!: boolean;
 }
