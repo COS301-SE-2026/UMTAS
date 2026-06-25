@@ -93,7 +93,18 @@ export class CourseService {
 
     async delete(courseId: string): Promise<DeleteCourseResponseDto> {
 
-        throw new NotImplementedException('sorry neh');
+        //Check if course exists
+        const course = await this.getById(courseId);
+
+        //delete course
+        await this.dbService.db
+            .delete(Course)
+            .where(eq(Course.CourseID, courseId));
+
+        return {
+            success: true,
+            CourseName: course.CourseName
+        }
     }//Delete
 
     //🎅's Little Helpers
@@ -107,6 +118,5 @@ export class CourseService {
 
         return course;
     }//END_duplicateCourseNamePerUniversity
-
-
+    
 }//UniversityService
