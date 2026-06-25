@@ -5,6 +5,8 @@ import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
 import { EventCard } from "@/components/molecules/builder/EventCard";
 import { ModuleCard } from "@/components/molecules/builder/ModuleCard";
 import { Button } from "@/components/atoms/baseShadcn/button";
+import CustomiseEventPanel from "@/components/atoms/customise/CustomiseEventPanel";
+import CustomiseModulePanel from "@/components/atoms/customise/CustomiseModulePanel";
 
 //some mock data for the static pages
 export const mockModules: ModuleResponseDto[] = [
@@ -94,80 +96,6 @@ export const mockEvents: EventResponse[] = [
     },
   },
 ];
-//from old code
-
-interface EventPanelProps {
-  event: EventResponse;
-  modules: ModuleResponseDto[];
-}
-
-function EventsPan(event: EventPanelProps) {
-  const assignedModule = event.modules.find(
-    (module: ModuleResponseDto) =>
-      module.moduleCode === event.event.event.eventCriteria.moduleCode,
-  );
-  return (
-    <div className="flex flex-col gap-2">
-      <div className="flex items-center gap-2">
-        <button
-          type="button"
-          className="flex flex-1 items-center gap-3 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] px-4 py-4 text-left"
-        >
-          <span
-            className="h-3 w-3 rounded-full flex-shrink-0"
-            style={{
-              backgroundColor: assignedModule?.styling ?? "transparent",
-            }}
-          />
-          <div className="flex-1 min-w-0">
-            <p className="text-base font-medium text-[var(--text-primary)] truncate">
-              {event.event.event.name}
-            </p>
-            <div className="flex flex-wrap items-center gap-2 mt-0.5">
-              <p className="text-sm text-[var(--text-secondary)]">
-                {event.event.event.eventCriteria.startTime}
-              </p>
-              <p className="text-sm font-mono text-[var(--text-secondary)]">
-                {event.event.event.code}
-              </p>
-            </div>
-          </div>
-        </button>
-      </div>
-    </div>
-  );
-}
-
-//from old code
-interface ModulePanelProps {
-  module: ModuleResponseDto;
-}
-
-function ModulesPan(module: ModulePanelProps) {
-  return (
-    <div className="flex flex-col gap-2">
-      <div className="flex items-center gap-2">
-        <button
-          type="button"
-          className="flex flex-1 items-center gap-3 rounded-lg border px-4 py-4 text-left"
-        >
-          <span
-            className="h-3 w-3 rounded-full flex-shrink-0"
-            style={{ backgroundColor: module.module.styling ?? "transparent" }}
-          />
-          <div className="flex-1 min-w-0">
-            <p className="text-base font-medium text-[var(--text-primary)] truncate">
-              {module.module.moduleName}
-            </p>
-            <p className="text-sm font-mono text-[var(--text-secondary)]">
-              {module.module.moduleCode}
-            </p>
-          </div>
-        </button>
-      </div>
-    </div>
-  );
-}
 
 export default function Customise() {
   return (
@@ -193,9 +121,9 @@ export default function Customise() {
             </div>
 
             <div className="flex flex-col gap-2">
-              <ModulesPan module={mockModules[0]} />
-              <ModulesPan module={mockModules[1]} />
-              <ModulesPan module={mockModules[2]} />
+              <CustomiseModulePanel module={mockModules[0]} />
+              <CustomiseModulePanel module={mockModules[1]} />
+              <CustomiseModulePanel module={mockModules[2]} />
             </div>
           </div>
 
@@ -253,9 +181,18 @@ export default function Customise() {
             </div>
 
             <div className="flex flex-col gap-2">
-              <EventsPan event={mockEvents[0]} modules={mockModules} />
-              <EventsPan event={mockEvents[1]} modules={mockModules} />
-              <EventsPan event={mockEvents[2]} modules={mockModules} />
+              <CustomiseEventPanel
+                event={mockEvents[0]}
+                modules={mockModules}
+              />
+              <CustomiseEventPanel
+                event={mockEvents[1]}
+                modules={mockModules}
+              />
+              <CustomiseEventPanel
+                event={mockEvents[2]}
+                modules={mockModules}
+              />
             </div>
           </div>
 
