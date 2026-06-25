@@ -104,6 +104,10 @@ function EventsPan() {
           type="button"
           className="flex flex-1 items-center gap-3 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] px-4 py-4 text-left"
         >
+          <span
+            className="h-3 w-3 rounded-full flex-shrink-0"
+            style={{ backgroundColor: modules[1].styling ?? "transparent" }}
+          />
           <div className="flex-1 min-w-0">
             <p className="text-base font-medium text-[var(--text-primary)] truncate">
               {events[0].event.name}
@@ -132,9 +136,12 @@ function ModulesPan() {
       <div className="flex items-center gap-2">
         <button
           type="button"
-          className="flex flex-1 items-center gap-3 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] px-4 py-4 text-left"
+          className="flex flex-1 items-center gap-3 rounded-lg border px-4 py-4 text-left"
         >
-          <span className="h-3 w-3 rounded-full flex-shrink-0" style={{}} />
+          <span
+            className="h-3 w-3 rounded-full flex-shrink-0"
+            style={{ backgroundColor: modules[0].styling ?? "transparent" }}
+          />
           <div className="flex-1 min-w-0">
             <p className="text-base font-medium text-[var(--text-primary)] truncate">
               {modules[0].moduleName}
@@ -151,59 +158,131 @@ function ModulesPan() {
 
 export default function Customise() {
   return (
-    <>
-      <div className="flex flex-row">
-        <Card className="flex flex-col w-fit m-6">
-          <div className="flex flex-row justify-between p-3">
-            <Card className="flex flex-row">
-              <p>Modules</p>
-              <p>Events</p>
-            </Card>
-            <div className="flex flex-row m-4">
-              <p>Lecture 1 | COS332</p>
-              <p>Save</p>
-              <p>Discard</p>
+    <div className="flex flex-row flex-wrap items-start">
+      <Card className="w-fit m-6 p-4">
+        <div className="flex flex-row gap-6">
+          <div className="flex flex-col gap-2 min-w-[240px]">
+            <div className="flex gap-1 bg-muted p-1 rounded-md mb-1">
+              <Button
+                size="sm"
+                variant="secondary"
+                className="h-7 text-xs flex-1 font-semibold"
+              >
+                Modules
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                className="h-7 text-xs flex-1 text-muted-foreground"
+              >
+                Events
+              </Button>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <ModulesPan />
+              <ModulesPan />
+              <ModulesPan />
             </div>
           </div>
-          <div className="flex flex-row p-4 m-2">
-            <div className="flex flex-col">
+
+          <div className="w-[1px] bg-border self-stretch" />
+
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center justify-between pb-3 border-b min-w-[320px]">
+              <span className="text-sm font-semibold">
+                {modules[0].moduleName} |{" "}
+                <span className="font-mono text-xs font-normal text-muted-foreground">
+                  {modules[0].moduleCode}
+                </span>
+              </span>
+              <div className="flex gap-1.5">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-7 px-3 text-xs"
+                >
+                  Save
+                </Button>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  className="h-7 px-3 text-xs"
+                >
+                  Discard
+                </Button>
+              </div>
+            </div>
+
+            <ModuleCard module={modules[0]} onUpdate={() => {}} />
+          </div>
+        </div>
+      </Card>
+
+      <Card className="w-fit m-6 p-4">
+        <div className="flex flex-row gap-6">
+          <div className="flex flex-col gap-2 min-w-[240px]">
+            <div className="flex gap-1 bg-muted p-1 rounded-md mb-1">
+              <Button
+                size="sm"
+                variant="ghost"
+                className="h-7 text-xs flex-1 text-muted-foreground"
+              >
+                Modules
+              </Button>
+              <Button
+                size="sm"
+                variant="secondary"
+                className="h-7 text-xs flex-1 font-semibold"
+              >
+                Events
+              </Button>
+            </div>
+
+            <div className="flex flex-col gap-2">
               <EventsPan />
               <EventsPan />
               <EventsPan />
               <EventsPan />
             </div>
+          </div>
+
+          <div className="w-[1px] bg-border self-stretch" />
+
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center justify-between pb-3 border-b min-w-[320px]">
+              <span className="text-sm font-semibold">
+                {events[0].event.name} |{" "}
+                <span className="font-mono text-xs font-normal text-muted-foreground">
+                  {events[0].event.code}
+                </span>
+              </span>
+              <div className="flex gap-1.5">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-7 px-3 text-xs"
+                >
+                  Save
+                </Button>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  className="h-7 px-3 text-xs"
+                >
+                  Discard
+                </Button>
+              </div>
+            </div>
+
             <EventCard
               event={events[0]}
               modules={modules}
               onUpdate={() => {}}
             />
           </div>
-        </Card>
-
-        <br />
-
-        <Card className="flex flex-col w-fit m-6 p-3 h-fit">
-          <div className="flex flex-row justify-between p-3">
-            <Card className="flex flex-row">
-              <p>Modules</p>
-              <p>Events</p>
-            </Card>
-            <div className="flex flex-row m-4">
-              <p>Lecture 1 | COS332</p>
-              <p>Save</p>
-              <p>Discard</p>
-            </div>
-          </div>
-          <div className="flex flex-row p-4 m-2">
-            <div className="flex flex-col">
-              <ModulesPan />
-              <ModulesPan />
-              <ModulesPan />
-            </div>
-            <ModuleCard module={modules[0]} onUpdate={() => {}} />
-          </div>
-        </Card>
-      </div>
-    </>
+        </div>
+      </Card>
+    </div>
   );
 }
