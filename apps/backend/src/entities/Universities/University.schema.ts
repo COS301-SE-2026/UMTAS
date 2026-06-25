@@ -16,7 +16,7 @@ export const RoleType = pgEnum('RoleType', [
 
 export const University = pgTable('University', {
   UniversityID: uuid('UniversityID').defaultRandom().primaryKey(),
-  UniversityName: varchar('UniversityName', { length: 30 }),
+  UniversityName: varchar('UniversityName', { length: 30 }).notNull(),
 });
 
 export const UniversityRole = pgTable(
