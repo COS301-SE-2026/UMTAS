@@ -90,14 +90,26 @@ export class DeleteModuleResponseDto extends PickType(ModulesDto, ['moduleName']
 //GetAll filters
 export class ModuleFiltersDto {
 
+  @ApiPropertyOptional({
+    description: 'Filter by user ID - returns modules the user is enrolled in',
+    example: '550e8400-e29b-41d4-a716-446655440000'
+  })
   @IsOptional()
   @IsUUID()
   userId?: string;
 
+  @ApiPropertyOptional({
+    description: 'Filter by course ID - returns all modules in the course',
+    example: '550e8400-e29b-41d4-a716-446655440000'
+  })
   @IsOptional()
   @IsUUID()
   courseId?: string;
 
+  @ApiPropertyOptional({
+    description: 'Filter by university ID - returns all modules across all courses in the university',
+    example: '550e8400-e29b-41d4-a716-446655440000'
+  })
   @IsOptional()
   @IsUUID()
   universityId?: string;

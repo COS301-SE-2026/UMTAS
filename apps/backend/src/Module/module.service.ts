@@ -129,7 +129,6 @@ export class ModuleService {
   } //getById
 
   async update(
-    userId: string,
     moduleId: string,
     dto: UpdateModuleDto,
   ): Promise<ModuleSingleResponseDto> {
