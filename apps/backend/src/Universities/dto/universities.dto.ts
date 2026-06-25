@@ -31,4 +31,14 @@ export class CreateUniversityDto extends PickType(UniversityDto, ['universityNam
 export class UpdateUniversityDto extends PartialType(OmitType(UniversityDto, ['universityID'] as const)) {}
 
 //Response
-export class UniversityResponseDto extends UniversityDto {}
+//Single
+export class UniversitySingleResponseDto extends UniversityDto {}
+
+export class UniversityListResponseDto {
+
+    @ApiProperty ({
+        type: [UniversityDto],
+        description: 'list of universities'
+    })
+    universities!: UniversityDto[];
+}
