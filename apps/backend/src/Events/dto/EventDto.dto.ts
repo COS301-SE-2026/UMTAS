@@ -37,7 +37,7 @@ export class EventCriteriaDto {
   @ApiPropertyOptional({ example: 'COS301' })
   @IsOptional()
   @IsString()
-  @Length(6, 10)
+  @Length(2, 10)
   moduleCode?: string;
 
   @ApiPropertyOptional({ example: 'IT 2-26' })
