@@ -33,36 +33,25 @@ export class ModuleService {
     const code = dto.code?.trim().toUpperCase();
     const name = dto.name?.trim();
     const description = dto.description?.trim();
-    const courseId = dto.courseID?.trim();
     // const styling = dto.styling?.trim();
 
     if (!code || !name)
-      throw new BadRequestException(
-        'Code and name are required for module creation',
-      );
+      throw new BadRequestException('Code and name are required for module creation');
 
     if (code.length > 10)
-      throw new BadRequestException(
-        'Module code should be shorter than 10 characters',
-      );
+      throw new BadRequestException('Module code should be shorter than 10 characters');
 
-    //if (courseID) -> create module | else -> create university if not defined and dummy course
-    //first check if course exists
-    let course;
-      
-    if (!courseId) course = await this.createDummyUniversityAndCourse(userId);
-      else {
-        [course] = await this.dbService.db
-          .select()
-          .from(Course)
-          .where(eq(Course.CourseID, courseId)).limit(1);
-      } 
+    //Firstly check student role
+    //If STUDENT_OWNED -> dummy uni and course should exists, if not -> create
+    if (!userId) throw new BadRequestException('UserId not provided');
+    const course = await this.checkRole(userId);
 
+    //Check if module with same code exists for the same course
     const [existingModule] = await this.dbService.db
       .select()
       .from(modules)
       .innerJoin(CourseModule, eq(modules.moduleID, CourseModule.ModuleID))
-      .where(and(eq(modules.moduleCode, code), eq(course.CourseID, course.CourseID)))
+      .where(and(eq(modules.moduleCode, code), eq(CourseModule.CourseID, course.CourseID)))
       .limit(1);
 
     //If module already exists for course, throw a fit
@@ -92,16 +81,13 @@ export class ModuleService {
     if (!courseModule)
       throw new InternalServerErrorException(`CourseModule Join table insert failed for creating module: ${newModule.moduleCode}`);
 
-    //enroll student to module if userId provided
-    if (userId) {
-
-      await this.dbService.db
-      .insert(ModuleEnrollment)
-      .values({
-        ModuleID: newModule.moduleID,
-        UserID: userId
-      });
-    }//END_userId
+    //Auto enroll student into module
+    await this.dbService.db
+    .insert(ModuleEnrollment)
+    .values({
+      ModuleID: newModule.moduleID,
+      UserID: userId
+    });
 
     return {
       module: newModule,
@@ -239,21 +225,18 @@ export class ModuleService {
   } //delete
 
   //🎅's Little Helpers
-  private async createDummyUniversityAndCourse(userId: string){
+  private async checkRole(userId: string){
 
-    //Check if user enrolled at university -> if not create dummy uni
-    // Create dummy course
-
+    //fetch role
     let [uniRole] = await this.dbService.db
       .select()
       .from(UniversityRole)
-      .where(eq(UniversityRole.UserID, userId))
-      .limit(1);
+      .where(eq(UniversityRole.UserID, userId)).limit(1);
 
-    //If no uniRole defined -> start creation of university for student
+      //If no uniRole exists, means student isn't enrolled at uni -> create dummy uni
     if (!uniRole) {
 
-      //create personalised uni
+      //Create dummy uni
       const [uni] = await this.dbService.db
         .insert(University)
         .values({
@@ -268,15 +251,57 @@ export class ModuleService {
           UniversityID: uni.UniversityID,
           role: 'STUDENT_OWNED'
         }).returning();
-    }//END_if_uni
+    }
 
+    //Role specific behaviour to find course
+    let course;
+    if (uniRole.role=='STUDENT_OWNED') {
+      course = await this.getStudentOwnedCourse(userId);
+    } else if (uniRole.role=="STUDENT"){
+      //This means the student already belongs to a uni and enrolled in a course
+      const [existingCourse] = await this.dbService.db
+        .select()
+        .from(Course)
+        .innerJoin(UniversityRole, eq(Course.UniversityID, UniversityRole.UniversityID))
+        .where(eq(UniversityRole.UserID, userId)).limit(1);
+
+      //if course not found -> throw excpetion
+      if (!existingCourse) throw new BadRequestException('Course not defined for STUDENT.');
+
+      course = existingCourse;
+    } else throw new BadRequestException(`Unsupported role: ${uniRole.role}`);
+
+    return course;
+  }//END_checkRole
+
+  private async getStudentOwnedCourse(userId: string){
+
+    //University will be defined + uniROle for user
+
+    //First check if course already exists
     const [course] = await this.dbService.db
+      .select()
+      .from(Course)
+      .innerJoin(UniversityRole, eq(Course.UniversityID, UniversityRole.UniversityID))
+      .where(eq(UniversityRole.UserID, userId)).limit(1);
+
+      //if already enrolled in course, return course 
+    if (course) return course;
+
+    //fetch uniRole for uniID
+    const [uniRole] = await this.dbService.db
+      .select()
+      .from(UniversityRole)
+      .where(eq(UniversityRole.UserID, userId)).limit(1);
+
+    //create dummy course
+    const [newCourse] = await this.dbService.db
       .insert(Course)
       .values({
         CourseName: `Course for: ${userId.slice(0, 8)}`,
         UniversityID: uniRole.UniversityID
       }).returning();
 
-      return course;
+    return newCourse;
   }//END_ensureBuilderContext
 } //ModuleService

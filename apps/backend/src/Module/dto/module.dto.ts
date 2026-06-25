@@ -20,14 +20,14 @@ export class CreateModuleDto {
   @Length(1, 100)
   name!: string;
 
-  @ApiProperty({
-    example: '550e8400-e29b-41d4-a716-446655440000',
-    description: 'Unique identifier for course (If not provided -> course will be created)',
-    required: false
-  })
-  @IsUUID()
-  @IsOptional()
-  courseID?: string;
+  // @ApiProperty({
+  //   example: '550e8400-e29b-41d4-a716-446655440000',
+  //   description: 'Unique identifier for course (If not provided -> course will be created)',
+  //   required: false
+  // })
+  // @IsUUID()
+  // @IsOptional()
+  // courseID?: string;
 
   @ApiPropertyOptional({
     example: 'Introduction to computer networking concepts',
