@@ -45,7 +45,7 @@ export class UpdateCourseDto extends PartialType(OmitType(CourseDto, ['courseID'
 export class CourseSingleResponseDto extends CourseDto {}
 
 //List
-export class ClassListResponseDto {
+export class CourseListResponseDto {
 
     @ApiProperty({
         type: [CourseDto],

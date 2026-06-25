@@ -34,6 +34,7 @@ export class UpdateUniversityDto extends PartialType(OmitType(UniversityDto, ['u
 //Single
 export class UniversitySingleResponseDto extends UniversityDto {}
 
+//List
 export class UniversityListResponseDto {
 
     @ApiProperty ({
@@ -41,4 +42,11 @@ export class UniversityListResponseDto {
         description: 'list of universities'
     })
     universities!: UniversityDto[];
+}
+
+//Delete
+export class DeleteUniversityResponseDto extends PickType(UniversityDto, ['universityName']) {
+
+  @ApiProperty({ example: true })
+  success!: boolean;
 }
