@@ -14,6 +14,7 @@ import { ModuleModule } from './Module/module.module';
 import { EventModule } from './Events/event.module';
 import { TimetableModule } from './Timetable/timetable.module';
 import { UniversityModule } from './University/university.module';
+import { CourseModule } from './Course/course.module';
 
 @Module({
   imports: [
@@ -27,7 +28,8 @@ import { UniversityModule } from './University/university.module';
     ModuleModule,
     EventModule,
     TimetableModule,
-    UniversityModule
+    UniversityModule,
+    CourseModule
   ],
   controllers: [AppController, AuthController],
   providers: [

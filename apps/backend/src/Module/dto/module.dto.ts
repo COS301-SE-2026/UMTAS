@@ -20,15 +20,6 @@ export class CreateModuleDto {
   @Length(1, 100)
   name!: string;
 
-  // @ApiProperty({
-  //   example: '550e8400-e29b-41d4-a716-446655440000',
-  //   description: 'Unique identifier for course (If not provided -> course will be created)',
-  //   required: false
-  // })
-  // @IsUUID()
-  // @IsOptional()
-  // courseID?: string;
-
   @ApiPropertyOptional({
     example: 'Introduction to computer networking concepts',
     description: 'Short module description',
@@ -37,14 +28,6 @@ export class CreateModuleDto {
   @IsString()
   @Length(1, 500)
   description?: string;
-
-  // @ApiPropertyOptional({
-  //   example: '#3B82F6',
-  //   description: 'Optional display styling for the module',
-  // })
-  // @IsOptional()
-  // @IsString()
-  // styling?: string;
 } //create
 
 export class UpdateModuleDto {

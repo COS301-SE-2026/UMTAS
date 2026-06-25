@@ -36,12 +36,6 @@ export class ModuleService {
     const description = dto.description?.trim();
     // const styling = dto.styling?.trim();
 
-    if (!code || !name)
-      throw new BadRequestException('Code and name are required for module creation');
-
-    if (code.length > 10)
-      throw new BadRequestException('Module code should be shorter than 10 characters');
-
     //Firstly check student role
     //If STUDENT_OWNED -> dummy uni and course should exists, if not -> create
     // if (!userId) throw new BadRequestException('UserId not provided');
