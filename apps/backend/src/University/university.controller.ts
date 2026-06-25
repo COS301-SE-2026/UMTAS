@@ -10,7 +10,7 @@ import {
   Param,
   Patch,
   Delete,
-  ParseIntPipe,
+  ParseUUIDPipe
 } from '@nestjs/common';
 import { ApiBody, ApiResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
@@ -90,7 +90,7 @@ export class UniversityController {
         description: 'University not found'
     })
     getById(
-        @Param('universityId', ParseIntPipe) universityId: number
+        @Param('universityId', ParseUUIDPipe) universityId: string
     ) {
         return this.service.getById(universityId);
     }
@@ -117,7 +117,7 @@ export class UniversityController {
         description: 'University not found'
     })
     update(
-        @Param('universityId', ParseIntPipe) universityId: number,
+        @Param('universityId', ParseUUIDPipe) universityId: string,
         @Body() dto: UpdateUniversityDto
     ) {
         return this.service.update(universityId, dto)
@@ -144,7 +144,7 @@ export class UniversityController {
         description: 'University not found',
     })
     delete(
-        @Param('universityId', ParseIntPipe) universityId: number
+        @Param('universityId', ParseUUIDPipe) universityId: string
     ) {
         return this.service.delete(universityId);
     }

@@ -39,12 +39,26 @@ export class UniversityService {
 
     async getAll(): Promise<UniversityListResponseDto> {
 
-        throw new NotImplementedException('sorry nhe');
+        const universities = await this.dbService.db
+            .select()
+            .from(University);
+
+        if (universities.length===0) throw new NotFoundException('No universities found');
+
+        return {universities};
     }//GetAll
 
-    async getById(uniId: number): Promise<UniversitySingleResponseDto> {
+    async getById(uniId: string): Promise<UniversitySingleResponseDto> {
 
-        throw new NotImplementedException('sorry nhe');
+        //Fetch uni by id
+        const [uni] = this.dbService.db
+            .select()
+            .from(University)
+            .where(eq(University.UniversityID, uniId)).limit(1);
+
+        if (!uni) throw new NotFoundException(`No University found for universityID: ${uniId}`);
+
+        return uni;
     }//getByID
 
     async update(uniId: number, dto: UpdateUniversityDto): Promise<UniversitySingleResponseDto> {

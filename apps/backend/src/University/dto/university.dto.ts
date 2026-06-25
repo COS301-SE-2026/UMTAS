@@ -28,7 +28,7 @@ export class UniversityDto {
 export class CreateUniversityDto extends PickType(UniversityDto, ['UniversityName'] as const) {}
 
 //Update
-export class UpdateUniversityDto extends PartialType(OmitType(UniversityDto, ['universityID'] as const)) {}
+export class UpdateUniversityDto extends PartialType(OmitType(UniversityDto, ['UniversityID'] as const)) {}
 
 //Response
 //Single
