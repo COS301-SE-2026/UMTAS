@@ -7,7 +7,7 @@ import { ModuleCard } from "@/components/molecules/builder/ModuleCard";
 import { Button } from "@/components/atoms/baseShadcn/button";
 
 //some mock data for the static pages
-export const modules: ModuleResponseDto[] = [
+export const mockModules: ModuleResponseDto[] = [
   {
     moduleID: 1,
     userID: "yum1",
@@ -32,7 +32,7 @@ export const modules: ModuleResponseDto[] = [
   },
 ];
 
-export const events: EventResponse[] = [
+export const mockEvents: EventResponse[] = [
   {
     event: {
       eventID: 1,
@@ -94,9 +94,18 @@ export const events: EventResponse[] = [
     },
   },
 ];
-
 //from old code
-function EventsPan() {
+
+interface EventPanelProps {
+  event: EventResponse;
+  modules: ModuleResponseDto[];
+}
+
+function EventsPan(event: EventPanelProps) {
+  const assignedModule = event.modules.find(
+    (module: ModuleResponseDto) =>
+      module.moduleCode === event.event.event.eventCriteria.moduleCode,
+  );
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center gap-2">
@@ -106,20 +115,20 @@ function EventsPan() {
         >
           <span
             className="h-3 w-3 rounded-full flex-shrink-0"
-            style={{ backgroundColor: modules[1].styling ?? "transparent" }}
+            style={{
+              backgroundColor: assignedModule?.styling ?? "transparent",
+            }}
           />
           <div className="flex-1 min-w-0">
             <p className="text-base font-medium text-[var(--text-primary)] truncate">
-              {events[0].event.name}
+              {event.event.event.name}
             </p>
             <div className="flex flex-wrap items-center gap-2 mt-0.5">
-              <p className="text-sm font-mono text-[var(--text-secondary)]">
-                {events[0].event.code}
+              <p className="text-sm text-[var(--text-secondary)]">
+                {event.event.event.eventCriteria.startTime}
               </p>
-              <p className="text-sm text-[var(--text-secondary)]">{""}</p>
-              <p className="text-sm text-[var(--text-secondary)]">{"10:00"}</p>
               <p className="text-sm font-mono text-[var(--text-secondary)]">
-                {"COS301"}
+                {event.event.event.code}
               </p>
             </div>
           </div>
@@ -140,14 +149,14 @@ function ModulesPan() {
         >
           <span
             className="h-3 w-3 rounded-full flex-shrink-0"
-            style={{ backgroundColor: modules[0].styling ?? "transparent" }}
+            style={{ backgroundColor: mockModules[0].styling ?? "transparent" }}
           />
           <div className="flex-1 min-w-0">
             <p className="text-base font-medium text-[var(--text-primary)] truncate">
-              {modules[0].moduleName}
+              {mockModules[0].moduleName}
             </p>
             <p className="text-sm font-mono text-[var(--text-secondary)]">
-              {modules[0].moduleCode}
+              {mockModules[0].moduleCode}
             </p>
           </div>
         </button>
@@ -191,9 +200,9 @@ export default function Customise() {
           <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between pb-3 border-b min-w-[320px]">
               <span className="text-sm font-semibold">
-                {modules[0].moduleName} |{" "}
+                {mockModules[0].moduleName} |{" "}
                 <span className="font-mono text-xs font-normal text-muted-foreground">
-                  {modules[0].moduleCode}
+                  {mockModules[0].moduleCode}
                 </span>
               </span>
               <div className="flex gap-1.5">
@@ -214,7 +223,7 @@ export default function Customise() {
               </div>
             </div>
 
-            <ModuleCard module={modules[0]} onUpdate={() => {}} />
+            <ModuleCard module={mockModules[0]} onUpdate={() => {}} />
           </div>
         </div>
       </Card>
@@ -240,10 +249,9 @@ export default function Customise() {
             </div>
 
             <div className="flex flex-col gap-2">
-              <EventsPan />
-              <EventsPan />
-              <EventsPan />
-              <EventsPan />
+              <EventsPan event={mockEvents[0]} modules={mockModules} />
+              <EventsPan event={mockEvents[1]} modules={mockModules} />
+              <EventsPan event={mockEvents[2]} modules={mockModules} />
             </div>
           </div>
 
@@ -252,9 +260,9 @@ export default function Customise() {
           <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between pb-3 border-b min-w-[320px]">
               <span className="text-sm font-semibold">
-                {events[0].event.name} |{" "}
+                {mockEvents[0].event.name} |{" "}
                 <span className="font-mono text-xs font-normal text-muted-foreground">
-                  {events[0].event.code}
+                  {mockEvents[0].event.code}
                 </span>
               </span>
               <div className="flex gap-1.5">
@@ -276,8 +284,8 @@ export default function Customise() {
             </div>
 
             <EventCard
-              event={events[0]}
-              modules={modules}
+              event={mockEvents[0]}
+              modules={mockModules}
               onUpdate={() => {}}
             />
           </div>
