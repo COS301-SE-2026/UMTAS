@@ -22,7 +22,7 @@ export class UniversityService {
 
         //Check if university already exists
         if (await this.checkDuplicateUniversityName(dto.UniversityName.trim())) 
-            throw new ConflictException(`University [${dto.UniversityName.trim()}] already exists with universityID: ${uni.UniversityID}`);
+            throw new ConflictException(`University [${dto.UniversityName.trim()}] already exists`);
 
         const [newUni] = await this.dbService.db
             .insert(University)
@@ -69,8 +69,8 @@ export class UniversityService {
         const updatedName = dto.UniversityName?.trim();
 
         //check if udpated name already exists
-        if (await this.checkDuplicateUniversityName(updatedName))
-            throw new ConflictException(`University [${dto.UniversityName.trim()}] already exists with universityID: ${uni.UniversityID}`);
+        if (uni.UniversityName===updatedName || await this.checkDuplicateUniversityName(updatedName))
+            throw new ConflictException(`University [${dto.UniversityName.trim()}] already exists.`);
 
         // update university
         const [newUni] = await this.dbService.db
@@ -87,7 +87,18 @@ export class UniversityService {
 
     async delete(uniId: string): Promise<DeleteUniversityResponseDto> {
 
-        throw new NotImplementedException('sorry nhe');
+        //Check if university exists
+        const uni = await this.getById(uniId);
+
+        //Delete university
+        await this.dbService.db
+            .delete(University)
+            .where(eq(University.UniversityID, uniId));
+
+        return {
+            UniversityName: uni.UniversityName,
+            success: true
+        }
     }//Delete
 
     //🎅's Little Helpers

@@ -13,6 +13,7 @@ import { RolesGuard } from './auth/roles.guard';
 import { ModuleModule } from './Module/module.module';
 import { EventModule } from './Events/event.module';
 import { TimetableModule } from './Timetable/timetable.module';
+import { UniversityModule } from './University/university.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { TimetableModule } from './Timetable/timetable.module';
     ModuleModule,
     EventModule,
     TimetableModule,
+    UniversityModule
   ],
   controllers: [AppController, AuthController],
   providers: [
