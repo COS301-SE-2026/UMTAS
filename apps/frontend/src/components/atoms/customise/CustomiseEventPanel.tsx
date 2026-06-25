@@ -4,11 +4,13 @@ import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
 interface EventPanelProps {
   event: EventResponse;
   modules: ModuleResponseDto[];
+  onClick?: () => void;
 }
 
 export default function CustomiseEventPanel({
   event,
   modules,
+  onClick,
 }: EventPanelProps) {
   const assignedModule = modules.find(
     (module: ModuleResponseDto) =>
@@ -19,6 +21,7 @@ export default function CustomiseEventPanel({
       <div className="flex items-center gap-2">
         <button
           type="button"
+          onClick={onClick}
           className="flex flex-1 items-center gap-3 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] px-4 py-4 text-left"
         >
           <span

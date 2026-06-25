@@ -2,14 +2,19 @@ import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
 
 interface ModulePanelProps {
   module: ModuleResponseDto;
+  onClick?: () => void;
 }
 
-export default function CustomiseModulePanel({ module }: ModulePanelProps) {
+export default function CustomiseModulePanel({
+  module,
+  onClick,
+}: ModulePanelProps) {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center gap-2">
         <button
           type="button"
+          onClick={onClick}
           className="flex flex-1 items-center gap-3 rounded-lg border px-4 py-4 text-left"
         >
           <span

@@ -51,14 +51,11 @@ export default function CustomiseShell({
 
             <div className="flex flex-col gap-2">
               {modules.map((module) => (
-                <button
+                <CustomiseModulePanel
+                  module={module}
                   key={module.moduleID}
-                  type="button"
                   onClick={() => setSelectedModuleId(module.moduleID)}
-                  className="text-left w-full"
-                >
-                  <CustomiseModulePanel module={module} />
-                </button>
+                />
               ))}
             </div>
           </div>
@@ -119,13 +116,12 @@ export default function CustomiseShell({
 
             <div className="flex flex-col gap-2">
               {events.map((event) => (
-                <button
+                <CustomiseEventPanel
+                  event={event}
+                  modules={modules}
                   key={event.event.eventID}
-                  type={"button"}
                   onClick={() => setSelectedEventId(event.event.eventID)}
-                >
-                  <CustomiseEventPanel event={event} modules={modules} />
-                </button>
+                />
               ))}
             </div>
           </div>
