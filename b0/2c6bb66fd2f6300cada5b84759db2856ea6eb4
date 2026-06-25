@@ -1,0 +1,27 @@
+mkdocs.yml
+  s_62bd0e227ffd8a::t_ce4c5710493646 64-77
+docs/index.md
+  s_62bd0e227ffd8a::t_0b9b65a5717b83 105
+  s_62bd0e227ffd8a::t_ce4c5710493646 25,27,29,33,35,39,43,45,47,51,53-61,79,83,85,87-104,106-109,113,115-137
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.11",
+  "base_commit_sha": "b02c6bb66fd2f6300cada5b84759db2856ea6eb4",
+  "prompts": {},
+  "humans": {
+    "h_3359569cacef0e": {
+      "author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_62bd0e227ffd8a": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019ef2b1-851e-7e93-877b-2e4c1388ad5f",
+        "model": "gpt-5.5"
+      },
+      "human_author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}
