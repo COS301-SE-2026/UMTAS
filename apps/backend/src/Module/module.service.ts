@@ -24,22 +24,11 @@ export class ModuleService {
   constructor(private readonly dbService: DatabaseService) {}
 
   // Create module
-  // For now no role checking will be done, simply implementing like all students are using builder interface
-  // IF (universityRole==Student && Student isn't enrolled in any course/university): Create university + course for user using uuid of user ensuring modules are still owned by a university belonging to certain course
-  // NOTE: styling not implemented, neither in dto
-  async create(
-    userId: string,
-    dto: CreateModuleDto,
-  ): Promise<SingleModuleResponseDto> {
+  async create(dto: CreateModuleDto): Promise<SingleModuleResponseDto> {
     const code = dto.code?.trim().toUpperCase();
     const name = dto.name?.trim();
+    const courseId = dto.courseID?.trim();
     const description = dto.description?.trim();
-    // const styling = dto.styling?.trim();
-
-    //Firstly check student role
-    //If STUDENT_OWNED -> dummy uni and course should exists, if not -> create
-    // if (!userId) throw new BadRequestException('UserId not provided');
-    const course = await this.checkRole(userId);
 
     //Check if module with same code exists for the same course
     const [existingModule] = await this.dbService.db
@@ -91,7 +80,9 @@ export class ModuleService {
   } //create
 
   //return all
-  async getAll(userId: string): Promise<ModuleListResponseDto> {
+  //Optional courseId: If (courseId)-> fetch all modules for user enrolled in that course
+  //else -> fetch all modules for user across all courses
+  async getAll(userId: string, courseId?: string): Promise<ModuleListResponseDto> {
     const foundModules = await this.dbService.db
       .select({
         moduleID: modules.moduleID,
@@ -110,7 +101,7 @@ export class ModuleService {
     };
   } //getAll
 
-  async getById(moduleId: number): Promise<SingleModuleResponseDto> {
+  async getById(moduleId: string): Promise<SingleModuleResponseDto> {
     const [module] = await this.dbService.db
       .select()
       .from(modules)
@@ -126,7 +117,7 @@ export class ModuleService {
 
   async update(
     userId: string,
-    moduleId: number,
+    moduleId: string,
     dto: UpdateModuleDto,
   ): Promise<SingleModuleResponseDto> {
 
@@ -208,24 +199,7 @@ export class ModuleService {
     };
   } //update
 
-  async deleteById(
-    userId: string,
-    moduleId: number,
-  ): Promise<DeleteModuleResponseDto> {
-
-    //Ownership check -> role==STUDENT_OWNED && module belongs to respective course
-    const [ownership] = await this.dbService.db
-      .select({ CourseID: Course.CourseID })
-      .from(Course)
-      .innerJoin(CourseModule, eq(Course.CourseID, CourseModule.CourseID))
-      .innerJoin(UniversityRole, eq(Course.UniversityID, UniversityRole.UniversityID))
-      .where(and(
-        eq(CourseModule.ModuleID, moduleId),
-        eq(UniversityRole.UserID, userId),
-        eq(UniversityRole.role, 'STUDENT_OWNED')
-      )).limit(1);
-
-    if (!ownership) throw new ForbiddenException(`${userId} doesn't own module: ${moduleId}`);
+  async deleteById(moduleId: string): Promise<DeleteModuleResponseDto> {
 
     //Check that module actually exists
     const [module] = await this.dbService.db

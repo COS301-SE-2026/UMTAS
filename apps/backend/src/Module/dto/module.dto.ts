@@ -20,6 +20,14 @@ export class CreateModuleDto {
   @Length(1, 100)
   name!: string;
 
+  @ApiProperty({ 
+    example: '550e8400-e29b-41d4-a716-446655440000',
+    description: 'CourseID to ensure module belongs to a course'
+  })
+  @IsUUID()
+  @IsNotEmpty()
+  courseID!: string;
+
   @ApiPropertyOptional({
     example: 'Introduction to computer networking concepts',
     description: 'Short module description',
@@ -69,7 +77,7 @@ export class UpdateModuleDto {
 
 export class ModuleResponseDto {
   @ApiProperty({ example: 1 })
-  moduleID!: number;
+  moduleID!: string;
 
   @ApiProperty({ example: 'COS332' })
   moduleCode!: string;

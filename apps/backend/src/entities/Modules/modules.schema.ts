@@ -12,7 +12,7 @@ import { UserTimetable } from '../timetables';
 import { jsonb } from 'drizzle-orm/pg-core';
 
 export const modules = pgTable('Modules', {
-  moduleID: serial('moduleID').primaryKey(),
+  moduleID: uuid('moduleID').defaultRandom().primaryKey(),
   moduleCode: varchar('moduleCode', { length: 10 }).notNull(),
   moduleName: varchar('moduleName', { length: 256 }).notNull(),
   moduleDescription: text('moduleDescription'),

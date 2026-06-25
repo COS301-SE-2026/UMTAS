@@ -5,19 +5,22 @@ import {
   Injectable,
   InternalServerErrorException,
   ForbiddenException,
-  NotImplementedException
+  NotImplementedException,
+  Module
 } from '@nestjs/common';
 import { eq, and } from 'drizzle-orm';
 import { DatabaseService } from '../db/database.service';
 
-import { CreateModuleDto, SingleModuleResponseDto } from '../Module/dto/module.dto';
+import { CreateBuilderModuleDto } from './dto/builder.dto';
+import { CreateModuleDto, SingleModuleResponseDto, ModuleListResponseDto, UpdateModuleDto, DeleteModuleResponseDto } from '../Module/dto/module.dto';
+import { CourseDto } from 'src/Course/dto/course.dto';
 
-import { University, UniversityRole, Course, CourseModule,  ModuleEnrollment} from '../entities/index';
+
+import { University, UniversityRole, Course, CourseModule,  ModuleEnrollment, modules} from '../entities/index';
 
 import { UniversityService } from 'src/University/university.service';
 import { CourseService } from 'src/Course/course.service';
-import { CourseDto } from 'src/Course/dto/course.dto';
-import { UniversityController } from 'src/University/university.controller';
+import { ModuleService } from 'src/Module/module.service';
 
 //Applies only to STUDENT_OWNED role for students
 // When creating user defined modules
@@ -28,25 +31,74 @@ export class BuilderService {
     constructor(
         private readonly dbService: DatabaseService,
         private readonly uniService: UniversityService,
-        private readonly courseService: CourseService
+        private readonly courseService: CourseService,
+        private readonly moduleService: ModuleService
     ) {}
 
-    async createModule(userId: string, dto: CreateModuleDto): Promise<SingleModuleResponseDto> {
-        
-        const code = dto.code?.trim().toUpperCase();
-        const name = dto.name?.trim();
-        const description = dto.description?.trim();
+    //Create User Module
+    //Ensure that user defined university + course exists -> create respective module owned by user course
+    async createModule(userId: string, dto: CreateBuilderModuleDto): Promise<SingleModuleResponseDto> {
 
         const userCourse = await this.doUserUniCourseCheck(userId);
 
-        
-        throw new NotImplementedException("Sorry nhe");
+        //At this stage the user will definitly have a personalised university + course
+
+        //Create module dto mapping
+        const moduleDto: CreateModuleDto = {
+            code: dto.code,
+            name: dto.name,
+            courseID: userCourse.CourseID,
+            description: dto.description
+        };
+
+        //Create actual module
+        const module = await this.moduleService.create(moduleDto);
+
+        return module;
     }//createModule
 
+    //get All USer defined modules
+    async getAllModules(userId: string): Promise<ModuleListResponseDto>{
 
+        //Get user course
+        const userCourse = await this.doUserUniCourseCheck(userId);
 
+        return await this.moduleService.getAll(userId, userCourse.CourseID);
+    }//END_getAllModules
 
+    //Get module by moduleID - no ownership check necessary?
+    async getModuleById(moduleId: string): Promise<SingleModuleResponseDto>{
+        return await this.moduleService.getById(moduleId);
+    }//END_getModuleById
 
+    //Update
+    //User can modify whatever they want on user owned modules
+    async updateModule(userId: string, moduleId: string, dto: UpdateModuleDto): Promise<SingleModuleResponseDto> {
+
+        //Get user owned course
+        const userCourse = await this.doUserUniCourseCheck(userId);
+
+        //IF user doesn't own module -> throw a fit
+        if (await this.ownershipCheck(moduleId, userCourse.CourseID)) throw new ForbiddenException(`User [${userId}] does not own module [${moduleId}]`);
+
+        //Update any field of module if owned by user
+        return await this.moduleService.update(userId, moduleId, dto);
+    }//END_updateModule
+
+    //Delete
+    //User can delete user owned modules
+    async deleteModule(userId: string, moduleId: string): Promise<DeleteModuleResponseDto> {
+
+        //Get user owned course
+        const userCourse = await this.doUserUniCourseCheck(userId);
+
+        //ownership check
+        if (await this.ownershipCheck(moduleId, userCourse.CourseID)) throw new ForbiddenException(`User [${userId}] does not own module [${moduleId}]`);
+
+        return this.moduleService.deleteById(moduleId);
+    }//END_deleteModule
+
+    
 
     //🎅's Little Helpers
 
@@ -71,8 +123,8 @@ export class BuilderService {
 
         if (!course) course = await this.createUserCourse(userId, uniRole.UniversityID);
 
-        throw new NotImplementedException("Sorry nhe");
-    }
+        return course;
+    }//ENDdoUserUniCourseCheck
 
     //Called when user doesn't have a personalised uni to create one
     private async createUserUni(userId: string): Promise<typeof UniversityRole.$inferSelect>{
@@ -106,5 +158,18 @@ export class BuilderService {
 
         return course;
     }//END_createUserCourse
+
+    private async ownershipCheck(moduleId: string, courseId: string): Promise<boolean> {
+
+        //Check module ownership
+        const [module] = await this.dbService.db
+            .select()
+            .from(modules)
+            .innerJoin(CourseModule, eq(CourseModule.ModuleID, modules.moduleID))
+            .where(eq(CourseModule.CourseID, courseId)).limit(1);
+
+        //true if exists | False otherwise
+        return !!module;
+    }
 
 }//BuilderService
