@@ -152,26 +152,58 @@ function ModulesPan() {
 export default function Customise() {
   return (
     <>
-      <Card className="flex flex-row w-fit m-6 p-3">
-        <div className="flex flex-col">
-          <EventsPan />
-          <EventsPan />
-          <EventsPan />
-          <EventsPan />
-        </div>
-        <EventCard event={events[0]} modules={modules} onUpdate={() => {}} />
-      </Card>
+      <div className="flex flex-row">
+        <Card className="flex flex-col w-fit m-6">
+          <div className="flex flex-row justify-between p-3">
+            <Card className="flex flex-row">
+              <p>Modules</p>
+              <p>Events</p>
+            </Card>
+            <div className="flex flex-row m-4">
+              <p>Lecture 1 | COS332</p>
+              <p>Save</p>
+              <p>Discard</p>
+            </div>
+          </div>
+          <div className="flex flex-row p-4 m-2">
+            <div className="flex flex-col">
+              <EventsPan />
+              <EventsPan />
+              <EventsPan />
+              <EventsPan />
+            </div>
+            <EventCard
+              event={events[0]}
+              modules={modules}
+              onUpdate={() => {}}
+            />
+          </div>
+        </Card>
 
-      <br />
+        <br />
 
-      <Card className="flex flex-row w-fit m-6 p-3">
-        <div className="flex flex-col">
-          <ModulesPan />
-          <ModulesPan />
-          <ModulesPan />
-        </div>
-        <ModuleCard module={modules[0]} onUpdate={() => {}} />
-      </Card>
+        <Card className="flex flex-col w-fit m-6 p-3 h-fit">
+          <div className="flex flex-row justify-between p-3">
+            <Card className="flex flex-row">
+              <p>Modules</p>
+              <p>Events</p>
+            </Card>
+            <div className="flex flex-row m-4">
+              <p>Lecture 1 | COS332</p>
+              <p>Save</p>
+              <p>Discard</p>
+            </div>
+          </div>
+          <div className="flex flex-row p-4 m-2">
+            <div className="flex flex-col">
+              <ModulesPan />
+              <ModulesPan />
+              <ModulesPan />
+            </div>
+            <ModuleCard module={modules[0]} onUpdate={() => {}} />
+          </div>
+        </Card>
+      </div>
     </>
   );
 }
