@@ -99,7 +99,7 @@ export class ModuleController {
     @CurrentSession() session: SessionData,
     @Param('moduleId', ParseIntPipe) moduleId: number,
   ) {
-    return this.service.getById(session.user.id, moduleId);
+    return this.service.getById(moduleId);
   }
 
   //Update

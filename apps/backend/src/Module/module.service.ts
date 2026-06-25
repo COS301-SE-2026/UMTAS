@@ -242,16 +242,6 @@ export class ModuleService {
 
     if (!module) throw new NotFoundException(`Module [${moduleId}] not found`);
 
-    // Delete from courseMOdule join table
-    await this.dbService.db
-      .delete(CourseModule)
-      .where(eq(CourseModule.ModuleID, moduleId));
-
-    //remove users module enrollment
-    await this.dbService.db
-      .delete(ModuleEnrollment)
-      .where(eq(ModuleEnrollment.ModuleID, moduleId));
-
     //delete actual module
     await this.dbService.db
       .delete(modules)
@@ -269,7 +259,7 @@ export class ModuleService {
     let [uniRole] = await this.dbService.db
       .select()
       .from(UniversityRole)
-      .where(eq(UniversityRole.UserID, userId)).limit(1);
+      .where(and(eq(UniversityRole.UserID, userId), eq(UniversityRole.role, 'STUDENT_OWNED'))).limit(1);
 
       //If no uniRole exists, means student isn't enrolled at uni -> create dummy uni
     if (!uniRole) {
@@ -334,7 +324,7 @@ export class ModuleService {
     const [uniRole] = await this.dbService.db
       .select()
       .from(UniversityRole)
-      .where(eq(UniversityRole.UserID, userId)).limit(1);
+      .where(and(eq(UniversityRole.UserID, userId), eq(UniversityRole.role, 'STUDENT_OWNED'))).limit(1);
 
     //create dummy course
     const [newCourse] = await this.dbService.db
