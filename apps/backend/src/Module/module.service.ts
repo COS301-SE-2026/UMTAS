@@ -4,6 +4,7 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { eq, and } from 'drizzle-orm';
 
@@ -43,7 +44,7 @@ export class ModuleService {
 
     //Firstly check student role
     //If STUDENT_OWNED -> dummy uni and course should exists, if not -> create
-    if (!userId) throw new BadRequestException('UserId not provided');
+    // if (!userId) throw new BadRequestException('UserId not provided');
     const course = await this.checkRole(userId);
 
     //Check if module with same code exists for the same course
@@ -71,6 +72,7 @@ export class ModuleService {
     if (!newModule)
       throw new InternalServerErrorException('Module not created');
 
+    //Define module for course
     const [courseModule] = await this.dbService.db
       .insert(CourseModule)
       .values({
@@ -90,8 +92,7 @@ export class ModuleService {
     });
 
     return {
-      module: newModule,
-      courseID: course.CourseID
+      module: newModule
     }
   } //create
 
@@ -108,7 +109,7 @@ export class ModuleService {
       .innerJoin(ModuleEnrollment, eq(ModuleEnrollment.ModuleID, modules.moduleID))
       .where(eq(ModuleEnrollment.UserID, userId));
 
-    if (!foundModules) throw new NotFoundException('No modules found for user');
+    if (foundModules.length === 0) throw new NotFoundException('No modules found for user');
 
     return { 
       modules: foundModules 
@@ -117,23 +118,15 @@ export class ModuleService {
 
   async getById(moduleId: number): Promise<SingleModuleResponseDto> {
     const [module] = await this.dbService.db
-      .select({
-        moduleID: modules.moduleID,
-        moduleCode: modules.moduleCode,
-        moduleName: modules.moduleName,
-        moduleDescription: modules.moduleDescription,
-        courseID: CourseModule.CourseID
-      })
+      .select()
       .from(modules)
-      .innerJoin(CourseModule, eq(CourseModule.ModuleID, modules.moduleID))
       .where(eq(modules.moduleID, moduleId))
       .limit(1);
 
     if (!module) throw new NotFoundException('Module not found');
 
     return {
-      module,
-      courseID: module.courseID
+      module
     };
   } //getById
 
@@ -142,64 +135,82 @@ export class ModuleService {
     moduleId: number,
     dto: UpdateModuleDto,
   ): Promise<SingleModuleResponseDto> {
+
+    //Ownership check -> role==STUDENT_OWNED && module belongs to respective course
+    const [ownership] = await this.dbService.db
+      .select({ CourseID: Course.CourseID })
+      .from(Course)
+      .innerJoin(CourseModule, eq(Course.CourseID, CourseModule.CourseID))
+      .innerJoin(UniversityRole, eq(Course.UniversityID, UniversityRole.UniversityID))
+      .where(and(
+        eq(CourseModule.ModuleID, moduleId),
+        eq(UniversityRole.UserID, userId),
+        eq(UniversityRole.role, 'STUDENT_OWNED')
+      )).limit(1);
+
+    if (!ownership) throw new ForbiddenException(`${userId} does not own this module: ${moduleId}`);
+
     //Find module
     const [module] = await this.dbService.db
       .select()
       .from(modules)
-      .where(and(eq(modules.userID, userId), eq(modules.moduleID, moduleId)))
+      .where(eq(modules.moduleID, moduleId))
       .limit(1);
 
     if (!module)
       throw new NotFoundException(`Module id[${moduleId}] not found`);
 
+    //validate a field is present for update
     if (
       dto.code === undefined &&
       dto.name === undefined &&
       dto.description === undefined 
     ) {
-      throw new BadRequestException(
-        'At least one field is required to update a module',
-      );
+      throw new BadRequestException('At least one field is required to update a module');
     }
 
     if (dto.code && dto.code.length > 10)
-      throw new BadRequestException(
-        'Module code should be shorter than 10 characters',
-      );
+      throw new BadRequestException('Module code should be shorter than 10 characters');
 
     const updatedCode = dto.code?.trim().toUpperCase();
+    const updatedName = dto.name?.trim();
     const updatedDescription = dto.description?.trim();
 
+    //Check if duplicate module code exists for same course
     if (updatedCode && updatedCode !== module.moduleCode) {
-      //check for module with same NEW code
-      const [dupModule] = await this.dbService.db
+
+      const [existingModule] = await this.dbService.db
         .select()
         .from(modules)
-        .where(
-          and(eq(modules.userID, userId), eq(modules.moduleCode, updatedCode)),
-        )
+        .innerJoin(CourseModule, eq(modules.moduleID, CourseModule.ModuleID))
+        .where(and(
+          eq(modules.moduleCode, updatedCode), 
+          eq(CourseModule.CourseID, ownership.CourseID)
+        ))
         .limit(1);
 
-      if (dupModule)
+      //If module with same code as updated code already exists in the same course -> throw fit
+      if (existingModule)
         throw new ConflictException('Duplicate module for new code found');
     } //duplicate module for new code
 
+    //update module
     const [newModule] = await this.dbService.db
       .update(modules)
       .set({
         moduleCode: updatedCode ?? module.moduleCode,
-        moduleName: dto.name?.trim() ?? module.moduleName,
+        moduleName: updatedName ?? module.moduleName,
         moduleDescription: updatedDescription ?? module.moduleDescription,
         // styling: dto.styling ?? module.styling,
       })
-      .where(and(eq(modules.userID, userId), eq(modules.moduleID, moduleId)))
+      .where(eq(modules.moduleID, moduleId))
       .returning();
 
     if (!newModule)
       throw new InternalServerErrorException('Module not updated');
 
     return {
-      module: newModule,
+      module: newModule
     };
   } //update
 
@@ -207,21 +218,48 @@ export class ModuleService {
     userId: string,
     moduleId: number,
   ): Promise<DeleteModuleResponseDto> {
+
+    //Ownership check -> role==STUDENT_OWNED && module belongs to respective course
+    const [ownership] = await this.dbService.db
+      .select({ CourseID: Course.CourseID })
+      .from(Course)
+      .innerJoin(CourseModule, eq(Course.CourseID, CourseModule.CourseID))
+      .innerJoin(UniversityRole, eq(Course.UniversityID, UniversityRole.UniversityID))
+      .where(and(
+        eq(CourseModule.ModuleID, moduleId),
+        eq(UniversityRole.UserID, userId),
+        eq(UniversityRole.role, 'STUDENT_OWNED')
+      )).limit(1);
+
+    if (!ownership) throw new ForbiddenException(`${userId} doesn't own module: ${moduleId}`);
+
+    //Check that module actually exists
     const [module] = await this.dbService.db
       .select()
       .from(modules)
-      .where(and(eq(modules.userID, userId), eq(modules.moduleID, moduleId)))
+      .where(eq(modules.moduleID, moduleId))
       .limit(1);
 
     if (!module) throw new NotFoundException(`Module [${moduleId}] not found`);
 
+    // Delete from courseMOdule join table
+    await this.dbService.db
+      .delete(CourseModule)
+      .where(eq(CourseModule.ModuleID, moduleId));
+
+    //remove users module enrollment
+    await this.dbService.db
+      .delete(ModuleEnrollment)
+      .where(eq(ModuleEnrollment.ModuleID, moduleId));
+
+    //delete actual module
     await this.dbService.db
       .delete(modules)
-      .where(and(eq(modules.userID, userId), eq(modules.moduleID, moduleId)));
+      .where(eq(modules.moduleID, moduleId));
 
     return {
-      success: true,
-    };
+      success: true
+    }
   } //delete
 
   //🎅's Little Helpers
@@ -280,7 +318,11 @@ export class ModuleService {
 
     //First check if course already exists
     const [course] = await this.dbService.db
-      .select()
+      .select({
+        CourseID: Course.CourseID,
+        CourseName: Course.CourseName,
+        UniversityID: Course.UniversityID,
+      })
       .from(Course)
       .innerJoin(UniversityRole, eq(Course.UniversityID, UniversityRole.UniversityID))
       .where(eq(UniversityRole.UserID, userId)).limit(1);
