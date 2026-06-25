@@ -139,7 +139,11 @@ function EventsPan(event: EventPanelProps) {
 }
 
 //from old code
-function ModulesPan() {
+interface ModulePanelProps {
+  module: ModuleResponseDto;
+}
+
+function ModulesPan(module: ModulePanelProps) {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center gap-2">
@@ -149,14 +153,14 @@ function ModulesPan() {
         >
           <span
             className="h-3 w-3 rounded-full flex-shrink-0"
-            style={{ backgroundColor: mockModules[0].styling ?? "transparent" }}
+            style={{ backgroundColor: module.module.styling ?? "transparent" }}
           />
           <div className="flex-1 min-w-0">
             <p className="text-base font-medium text-[var(--text-primary)] truncate">
-              {mockModules[0].moduleName}
+              {module.module.moduleName}
             </p>
             <p className="text-sm font-mono text-[var(--text-secondary)]">
-              {mockModules[0].moduleCode}
+              {module.module.moduleCode}
             </p>
           </div>
         </button>
@@ -189,9 +193,9 @@ export default function Customise() {
             </div>
 
             <div className="flex flex-col gap-2">
-              <ModulesPan />
-              <ModulesPan />
-              <ModulesPan />
+              <ModulesPan module={mockModules[0]} />
+              <ModulesPan module={mockModules[1]} />
+              <ModulesPan module={mockModules[2]} />
             </div>
           </div>
 
