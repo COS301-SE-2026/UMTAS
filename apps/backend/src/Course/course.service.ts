@@ -71,10 +71,23 @@ export class CourseService {
             dto.UniversityID===undefined
         ) throw new BadRequestException('At least one field required for update');
 
-        //Check if new name is duplicate for uni id
         const updatedName = dto.CourseName?.trim();
-        if (updatedName && await this.duplicateCourseNamePerUniversity(updatedName, course.UniversityID))
-            throw new ConflictException(`Course ${updatedName} already exists for universityID: ${course.UniversityID}`);
+        const updatedUniversityId = dto.UniversityID?.trim();
+
+        //Check for duplicate name only iuf hame or university   changed
+        if (updatedName || updatedUniversityId){
+            const nameToCheck = updatedName ?? course.CourseName;
+            const universityIdToCheck = updatedUniversityId ?? course.UniversityID;
+
+            //check only if mocing to new uni or changing the name
+            if (updatedUniversityId!==course.UniversityID || updatedName!==course.CourseName) {
+                const duplicate = await this.duplicateCourseNamePerUniversity(nameToCheck, universityIdToCheck);
+                
+                // Make sure its not the same course
+                if (duplicate && duplicate.CourseID!==courseId) 
+                    throw new ConflictException(`Course [${nameToCheck}] already exists for universityID: ${universityIdToCheck}`);
+            }
+        }
 
         //Update course
         const [newCourse] = await this.dbService.db
@@ -118,5 +131,5 @@ export class CourseService {
 
         return course;
     }//END_duplicateCourseNamePerUniversity
-    
-}//UniversityService
+
+}//CourseService
