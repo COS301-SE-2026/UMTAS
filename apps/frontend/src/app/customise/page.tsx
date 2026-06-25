@@ -7,6 +7,8 @@ import { ModuleCard } from "@/components/molecules/builder/ModuleCard";
 import { Button } from "@/components/atoms/baseShadcn/button";
 import CustomiseEventPanel from "@/components/atoms/customise/CustomiseEventPanel";
 import CustomiseModulePanel from "@/components/atoms/customise/CustomiseModulePanel";
+import { CustomiseModuleCard } from "@/components/molecules/customise/CustomiseModuleCard";
+import { CustomiseEventCard } from "@/components/molecules/customise/CustomiseEventCard";
 
 //some mock data for the static pages
 export const mockModules: ModuleResponseDto[] = [
@@ -155,7 +157,7 @@ export default function Customise() {
               </div>
             </div>
 
-            <ModuleCard module={mockModules[0]} onUpdate={() => {}} />
+            <CustomiseModuleCard module={mockModules[0]} onUpdate={() => {}} />
           </div>
         </div>
       </Card>
@@ -224,7 +226,7 @@ export default function Customise() {
               </div>
             </div>
 
-            <EventCard
+            <CustomiseEventCard
               event={mockEvents[0]}
               modules={mockModules}
               onUpdate={() => {}}
