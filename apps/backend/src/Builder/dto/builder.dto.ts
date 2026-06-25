@@ -5,4 +5,4 @@ import { isNotNull } from 'drizzle-orm';
 
 import { CreateModuleDto } from 'src/Module/dto/module.dto';
 
-export class CreateBuilderModuleDto extends PickType(CreateModuleDto, ['code', 'name', 'description']) {}
+export class CreateBuilderModuleDto extends PickType(CreateModuleDto, ['moduleCode', 'moduleName', 'moduleDescription']) {}

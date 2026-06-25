@@ -21,7 +21,7 @@ export const modules = pgTable('Modules', {
 export const ModuleEnrollment = pgTable(
   'ModuleEnrollment',
   {
-    ModuleID: integer('ModuleID')
+    ModuleID: uuid('ModuleID')
       .references(() => modules.moduleID, { onDelete: 'cascade' })
       .notNull(),
     UserID: uuid('UserID')
@@ -34,7 +34,7 @@ export const ModuleEnrollment = pgTable(
 export const ModuleTeaches = pgTable(
   'ModuleTeaches',
   {
-    ModuleID: integer('ModuleID')
+    ModuleID: uuid('ModuleID')
       .references(() => modules.moduleID, { onDelete: 'cascade' })
       .notNull(),
     UserID: uuid('UserID')
@@ -50,9 +50,9 @@ export const ModuleStyling = pgTable(
     ModuleID: integer('ModuleID')
       .references(() => modules.moduleID, { onDelete: 'cascade' })
       .notNull(),
+      //should belong to user not userTimetable
     UserTimetableID: uuid('UserTimetableID')
-      .references(() => UserTimetable.UserTimetableID, { onDelete: 'cascade' })
-      .notNull(),
+      .references(() => UserTimetable.UserTimetableID, { onDelete: 'cascade' }),
     styling: jsonb('styling')
       .notNull()
       .$type<{ colour: string }>()

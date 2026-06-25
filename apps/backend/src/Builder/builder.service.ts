@@ -12,11 +12,11 @@ import { eq, and } from 'drizzle-orm';
 import { DatabaseService } from '../db/database.service';
 
 import { CreateBuilderModuleDto } from './dto/builder.dto';
-import { CreateModuleDto, SingleModuleResponseDto, ModuleListResponseDto, UpdateModuleDto, DeleteModuleResponseDto } from '../Module/dto/module.dto';
+import { CreateModuleDto, ModuleSingleResponseDto, ModuleListResponseDto, UpdateModuleDto, DeleteModuleResponseDto } from '../Module/dto/module.dto';
 import { CourseDto } from 'src/Course/dto/course.dto';
 
 
-import { University, UniversityRole, Course, CourseModule,  ModuleEnrollment, modules} from '../entities/index';
+import { UniversityRole, Course, CourseModule, modules, ModuleEnrollment} from '../entities/index';
 
 import { UniversityService } from 'src/University/university.service';
 import { CourseService } from 'src/Course/course.service';
@@ -37,7 +37,7 @@ export class BuilderService {
 
     //Create User Module
     //Ensure that user defined university + course exists -> create respective module owned by user course
-    async createModule(userId: string, dto: CreateBuilderModuleDto): Promise<SingleModuleResponseDto> {
+    async createModule(userId: string, dto: CreateBuilderModuleDto): Promise<ModuleSingleResponseDto> {
 
         const userCourse = await this.doUserUniCourseCheck(userId);
 
@@ -45,14 +45,24 @@ export class BuilderService {
 
         //Create module dto mapping
         const moduleDto: CreateModuleDto = {
-            code: dto.code,
-            name: dto.name,
+            moduleCode: dto.moduleCode,
+            moduleName: dto.moduleName,
             courseID: userCourse.CourseID,
-            description: dto.description
+            moduleDescription: dto.moduleDescription
         };
 
         //Create actual module
         const module = await this.moduleService.create(moduleDto);
+
+        //Enroll Student to their module
+        const [enrollment] = await this.dbService.db
+            .insert(ModuleEnrollment)
+            .values({
+                ModuleID: module.moduleID,
+                UserID: userId
+            }).returning();
+
+        if (!enrollment) throw new InternalServerErrorException(`User [${userId}] was not enrolled to module [${module.moduleID}]`);
 
         return module;
     }//createModule
@@ -67,13 +77,13 @@ export class BuilderService {
     }//END_getAllModules
 
     //Get module by moduleID - no ownership check necessary?
-    async getModuleById(moduleId: string): Promise<SingleModuleResponseDto>{
+    async getModuleById(moduleId: string): Promise<ModuleSingleResponseDto>{
         return await this.moduleService.getById(moduleId);
     }//END_getModuleById
 
     //Update
     //User can modify whatever they want on user owned modules
-    async updateModule(userId: string, moduleId: string, dto: UpdateModuleDto): Promise<SingleModuleResponseDto> {
+    async updateModule(userId: string, moduleId: string, dto: UpdateModuleDto): Promise<ModuleSingleResponseDto> {
 
         //Get user owned course
         const userCourse = await this.doUserUniCourseCheck(userId);
@@ -98,7 +108,7 @@ export class BuilderService {
         return this.moduleService.deleteById(moduleId);
     }//END_deleteModule
 
-    
+
 
     //🎅's Little Helpers
 
@@ -170,6 +180,6 @@ export class BuilderService {
 
         //true if exists | False otherwise
         return !!module;
-    }
+    }//END_ownershipCheck
 
 }//BuilderService

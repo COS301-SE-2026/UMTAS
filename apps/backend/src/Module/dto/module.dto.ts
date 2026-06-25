@@ -1,7 +1,18 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional, IsString, IsUUID, Length } from 'class-validator';
+import {PartialType, PickType, OmitType} from '@nestjs/swagger';
 
-export class CreateModuleDto {
+//Base class
+export class ModulesDto {
+
+  @ApiProperty({ 
+    example: '550e8400-e29b-41d4-a716-446655440000',
+    description: 'Unique identifier for a module'
+  })
+  @IsUUID()
+  @IsNotEmpty()
+  moduleID!: string;
+
   @ApiProperty({
     example: 'COS332',
     description: 'Module code used by the university',
@@ -9,7 +20,7 @@ export class CreateModuleDto {
   @IsString()
   @IsNotEmpty()
   @Length(2, 10)
-  code!: string;
+  moduleCode!: string;
 
   @ApiProperty({
     example: 'Computer Networks',
@@ -18,15 +29,7 @@ export class CreateModuleDto {
   @IsString()
   @IsNotEmpty()
   @Length(1, 100)
-  name!: string;
-
-  @ApiProperty({ 
-    example: '550e8400-e29b-41d4-a716-446655440000',
-    description: 'CourseID to ensure module belongs to a course'
-  })
-  @IsUUID()
-  @IsNotEmpty()
-  courseID!: string;
+  moduleName!: string;
 
   @ApiPropertyOptional({
     example: 'Introduction to computer networking concepts',
@@ -35,36 +38,23 @@ export class CreateModuleDto {
   @IsOptional()
   @IsString()
   @Length(1, 500)
-  description?: string;
-} //create
+  moduleDescription?: string | null;
+}//ModuleDto
 
-export class UpdateModuleDto {
-  @ApiPropertyOptional({
-    example: 'COS332',
-    description: 'Updated module code',
-  })
-  @IsOptional()
-  @IsString()
-  @Length(2, 10)
-  code?: string;
+//Create
+export class CreateModuleDto extends PickType(ModulesDto, ['moduleCode', 'moduleName', 'moduleDescription']) {
 
-  @ApiPropertyOptional({
-    example: 'Computer Networks',
-    description: 'Updated module name',
+  @ApiProperty({ 
+    example: '550e8400-e29b-41d4-a716-446655440000',
+    description: 'CourseID to ensure module belongs to a course'
   })
-  @IsOptional()
-  @IsString()
-  @Length(1, 100)
-  name?: string;
+  @IsUUID()
+  @IsNotEmpty()
+  courseID!: string;
+}//CreateModuleDto
 
-  @ApiPropertyOptional({
-    example: 'Introduction to computer networking concepts',
-    description: 'Updated module description',
-  })
-  @IsOptional()
-  @IsString()
-  @Length(1, 500)
-  description?: string;
+//Update
+export class UpdateModuleDto extends PartialType(OmitType(ModulesDto, ['moduleID'] as const)) {
 
   // @ApiPropertyOptional({
   //   example: '#3B82F6',
@@ -73,42 +63,42 @@ export class UpdateModuleDto {
   // @IsOptional()
   // @IsString()
   // styling?: string;
-} //udpate
 
-export class ModuleResponseDto {
-  @ApiProperty({ example: 1 })
-  moduleID!: string;
+} //update
 
-  @ApiProperty({ example: 'COS332' })
-  moduleCode!: string;
+//Responses
+//Single
+export class ModuleSingleResponseDto extends ModulesDto {}
 
-  @ApiProperty({ example: 'Computer Networks' })
-  moduleName!: string;
+//List
+export class ModuleListResponseDto {
 
-  @ApiPropertyOptional({
-    example: 'Introduction to computer networking concepts',
-    nullable: true,
-  })
-  moduleDescription?: string | null;
-
-  // @ApiPropertyOptional({ example: '#3B82F6', nullable: true })
-  // styling?: string | null;
-} //Response
-
-export class SingleModuleResponseDto {
-  @ApiProperty({ type: ModuleResponseDto })
-  module!: ModuleResponseDto;
+    @ApiProperty({
+        type: [ModulesDto],
+        description: 'List of modules'
+    })
+    modules!: ModulesDto[];
 }
 
-export class ModuleListResponseDto {
-  // @ApiProperty({ example: '550e8400-e29b-41d4-a716-446655440000'})
-  // courseID!: string;
+//Delete
+export class DeleteModuleResponseDto extends PickType(ModulesDto, ['moduleName']) {
 
-  @ApiProperty({ type: [ModuleResponseDto] })
-  modules!: ModuleResponseDto[];
-} //list
-
-export class DeleteModuleResponseDto {
   @ApiProperty({ example: true })
   success!: boolean;
 } //delete
+
+//GetAll filters
+export class ModuleFiltersDto {
+
+  @IsOptional()
+  @IsUUID()
+  userId?: string;
+
+  @IsOptional()
+  @IsUUID()
+  courseId?: string;
+
+  @IsOptional()
+  @IsUUID()
+  universityId?: string;
+}//ModuleFiltersDto

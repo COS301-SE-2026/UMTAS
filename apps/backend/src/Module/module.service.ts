@@ -5,8 +5,9 @@ import {
   Injectable,
   InternalServerErrorException,
   ForbiddenException,
+  NotImplementedException,
 } from '@nestjs/common';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, SQL } from 'drizzle-orm';
 
 import { DatabaseService } from '../db/database.service';
 import { modules } from '../entities/Modules/index';
@@ -14,33 +15,30 @@ import {
   CreateModuleDto,
   DeleteModuleResponseDto,
   ModuleListResponseDto,
-  SingleModuleResponseDto,
+  ModuleSingleResponseDto,
   UpdateModuleDto,
+  ModuleFiltersDto
 } from './dto/module.dto';
 import { University, UniversityRole, Course, CourseModule,  ModuleEnrollment} from '../entities/index';
+import { weightSrvRecords } from 'ioredis/built/cluster/util';
 
+
+//Module service
+//If its user owned modules -> MUST BE HANDLED THROUGH BUILDER SERVICE
 @Injectable()
 export class ModuleService {
   constructor(private readonly dbService: DatabaseService) {}
 
   // Create module
-  async create(dto: CreateModuleDto): Promise<SingleModuleResponseDto> {
-    const code = dto.code?.trim().toUpperCase();
-    const name = dto.name?.trim();
+  async create(dto: CreateModuleDto): Promise<ModuleSingleResponseDto> {
+    const code = dto.moduleCode?.trim().toUpperCase();
+    const name = dto.moduleName?.trim();
     const courseId = dto.courseID?.trim();
-    const description = dto.description?.trim();
+    const description = dto.moduleDescription?.trim();
 
-    //Check if module with same code exists for the same course
-    const [existingModule] = await this.dbService.db
-      .select()
-      .from(modules)
-      .innerJoin(CourseModule, eq(modules.moduleID, CourseModule.ModuleID))
-      .where(and(eq(modules.moduleCode, code), eq(CourseModule.CourseID, course.CourseID)))
-      .limit(1);
-
-    //If module already exists for course, throw a fit
-    if (existingModule)
-      throw new ConflictException(`Module: ${code} already exists`);
+    //If module with same code already exists for course -> throw a fit
+    if (await this.existingModuleCodeForCourse(code, courseId))
+        throw new ConflictException(`Module code [${code}] already exists for course [${courseId}]`);
 
     //Else create new module, ensure that courseModule join table also populated
     const [newModule] = await this.dbService.db
@@ -60,48 +58,63 @@ export class ModuleService {
       .insert(CourseModule)
       .values({
         ModuleID: newModule.moduleID,
-        CourseID: course.CourseID
+        CourseID: courseId
       }).returning();
 
     if (!courseModule)
       throw new InternalServerErrorException(`CourseModule Join table insert failed for creating module: ${newModule.moduleCode}`);
 
-    //Auto enroll student into module
-    await this.dbService.db
-    .insert(ModuleEnrollment)
-    .values({
-      ModuleID: newModule.moduleID,
-      UserID: userId
-    });
-
-    return {
-      module: newModule
-    }
+    return newModule;
   } //create
 
   //return all
   //Optional courseId: If (courseId)-> fetch all modules for user enrolled in that course
   //else -> fetch all modules for user across all courses
-  async getAll(userId: string, courseId?: string): Promise<ModuleListResponseDto> {
+  //userId -> return modules user is enrolled in
+  //courseId -> ignore userId -> return all modules defined for course
+  //universityId -> return all modules defined for a university over all courses
+  async getAll(filters: ModuleFiltersDto): Promise<ModuleListResponseDto> {
+    
+    //define empty conditions array to be added to based of filters
+    const conditions: SQL[] = [];
+
+    //Dynamically add conditions for where clause based of filters
+    //userId
+    if (filters.userId)
+      conditions.push(eq(ModuleEnrollment.UserID, filters.userId));
+
+    //courseId
+    if (filters.courseId)
+      conditions.push(eq(CourseModule.CourseID, filters.courseId));
+
+    //universityId
+    if (filters.universityId)
+      conditions.push(eq(Course.UniversityID, filters.universityId));
+
+    if (conditions.length===0) 
+      throw new BadRequestException('At least one filter is required: userId | courseId | universityId');
+
+    //Build actual query joining Modules -> ModuleEnrollment + CourseModule + Course and then add in dynamic where conditions
     const foundModules = await this.dbService.db
-      .select({
+      .selectDistinct({
         moduleID: modules.moduleID,
         moduleCode: modules.moduleCode,
         moduleName: modules.moduleName,
         moduleDescription: modules.moduleDescription
       })
       .from(modules)
-      .innerJoin(ModuleEnrollment, eq(ModuleEnrollment.ModuleID, modules.moduleID))
-      .where(eq(ModuleEnrollment.UserID, userId));
+      .leftJoin(ModuleEnrollment, eq(ModuleEnrollment.ModuleID, modules.moduleID))
+      .leftJoin(CourseModule, eq(CourseModule.ModuleID, modules.moduleID))
+      .leftJoin(Course, eq(Course.CourseID, CourseModule.CourseID))
+      .where(and(...conditions));
 
-    if (foundModules.length === 0) throw new NotFoundException('No modules found for user');
+    if (foundModules.length===0)
+      throw new NotFoundException(`No matching modules found for filters: ${filters}`);
 
-    return { 
-      modules: foundModules 
-    };
+    return {modules: foundModules};
   } //getAll
 
-  async getById(moduleId: string): Promise<SingleModuleResponseDto> {
+  async getById(moduleId: string): Promise<ModuleSingleResponseDto> {
     const [module] = await this.dbService.db
       .select()
       .from(modules)
@@ -119,21 +132,7 @@ export class ModuleService {
     userId: string,
     moduleId: string,
     dto: UpdateModuleDto,
-  ): Promise<SingleModuleResponseDto> {
-
-    //Ownership check -> role==STUDENT_OWNED && module belongs to respective course
-    const [ownership] = await this.dbService.db
-      .select({ CourseID: Course.CourseID })
-      .from(Course)
-      .innerJoin(CourseModule, eq(Course.CourseID, CourseModule.CourseID))
-      .innerJoin(UniversityRole, eq(Course.UniversityID, UniversityRole.UniversityID))
-      .where(and(
-        eq(CourseModule.ModuleID, moduleId),
-        eq(UniversityRole.UserID, userId),
-        eq(UniversityRole.role, 'STUDENT_OWNED')
-      )).limit(1);
-
-    if (!ownership) throw new ForbiddenException(`${userId} does not own this module: ${moduleId}`);
+  ): Promise<ModuleSingleResponseDto> {
 
     //Find module
     const [module] = await this.dbService.db
@@ -201,7 +200,7 @@ export class ModuleService {
 
   async deleteById(moduleId: string): Promise<DeleteModuleResponseDto> {
 
-    //Check that module actually exists
+    //Check that module actually exists - Is this necessary???
     const [module] = await this.dbService.db
       .select()
       .from(modules)
@@ -220,88 +219,22 @@ export class ModuleService {
     }
   } //delete
 
+
+  
   //🎅's Little Helpers
-  private async checkRole(userId: string){
 
-    //fetch role
-    let [uniRole] = await this.dbService.db
+  //Check if a module already exists for the course
+  private async existingModuleCodeForCourse(moduleCode: string, courseId: string): Promise<boolean> {
+
+    const [existingModule] = await this.dbService.db
       .select()
-      .from(UniversityRole)
-      .where(and(eq(UniversityRole.UserID, userId), eq(UniversityRole.role, 'STUDENT_OWNED'))).limit(1);
+      .from(modules)
+      .innerJoin(CourseModule, eq(modules.moduleID, CourseModule.ModuleID))
+      .where(and(eq(modules.moduleCode, moduleCode), eq(CourseModule.CourseID, courseId)))
+      .limit(1);
 
-      //If no uniRole exists, means student isn't enrolled at uni -> create dummy uni
-    if (!uniRole) {
+    //If module code exists for course, return true
+    return !!existingModule;
+  }//END_existingModuleForCourse
 
-      //Create dummy uni
-      const [uni] = await this.dbService.db
-        .insert(University)
-        .values({
-          UniversityName: `user_${userId.slice(0, 8)}`
-        }).returning();
-
-      //create unirole for user to join to university
-      [uniRole] = await this.dbService.db
-        .insert(UniversityRole)
-        .values({
-          UserID: userId,
-          UniversityID: uni.UniversityID,
-          role: 'STUDENT_OWNED'
-        }).returning();
-    }
-
-    //Role specific behaviour to find course
-    let course;
-    if (uniRole.role=='STUDENT_OWNED') {
-      course = await this.getStudentOwnedCourse(userId);
-    } else if (uniRole.role=="STUDENT"){
-      //This means the student already belongs to a uni and enrolled in a course
-      const [existingCourse] = await this.dbService.db
-        .select()
-        .from(Course)
-        .innerJoin(UniversityRole, eq(Course.UniversityID, UniversityRole.UniversityID))
-        .where(eq(UniversityRole.UserID, userId)).limit(1);
-
-      //if course not found -> throw excpetion
-      if (!existingCourse) throw new BadRequestException('Course not defined for STUDENT.');
-
-      course = existingCourse;
-    } else throw new BadRequestException(`Unsupported role: ${uniRole.role}`);
-
-    return course;
-  }//END_checkRole
-
-  private async getStudentOwnedCourse(userId: string){
-
-    //University will be defined + uniROle for user
-
-    //First check if course already exists
-    const [course] = await this.dbService.db
-      .select({
-        CourseID: Course.CourseID,
-        CourseName: Course.CourseName,
-        UniversityID: Course.UniversityID,
-      })
-      .from(Course)
-      .innerJoin(UniversityRole, eq(Course.UniversityID, UniversityRole.UniversityID))
-      .where(eq(UniversityRole.UserID, userId)).limit(1);
-
-      //if already enrolled in course, return course 
-    if (course) return course;
-
-    //fetch uniRole for uniID
-    const [uniRole] = await this.dbService.db
-      .select()
-      .from(UniversityRole)
-      .where(and(eq(UniversityRole.UserID, userId), eq(UniversityRole.role, 'STUDENT_OWNED'))).limit(1);
-
-    //create dummy course
-    const [newCourse] = await this.dbService.db
-      .insert(Course)
-      .values({
-        CourseName: `Course for: ${userId.slice(0, 8)}`,
-        UniversityID: uniRole.UniversityID
-      }).returning();
-
-    return newCourse;
-  }//END_ensureBuilderContext
 } //ModuleService

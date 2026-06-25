@@ -2,8 +2,9 @@ import { ModuleService } from './module.service';
 import {
   CreateModuleDto,
   DeleteModuleResponseDto,
+  ModuleFiltersDto,
   ModuleListResponseDto,
-  SingleModuleResponseDto,
+  ModuleSingleResponseDto,
   UpdateModuleDto,
 } from './dto/module.dto';
 import {
@@ -15,6 +16,9 @@ import {
   Patch,
   Delete,
   ParseIntPipe,
+  ParseUUIDPipe,
+  Query,
+  BadRequestException,
 } from '@nestjs/common';
 import { ApiBody, ApiResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
@@ -36,7 +40,7 @@ export class ModuleController {
   @ApiResponse({
     status: 201,
     description: 'Module created successfully',
-    type: SingleModuleResponseDto,
+    type: ModuleSingleResponseDto,
   })
   @ApiResponse({
     status: 400,
@@ -48,9 +52,8 @@ export class ModuleController {
   })
   createModule(
     @Body() dto: CreateModuleDto,
-    @CurrentSession() session: SessionData,
   ) {
-    return this.service.create(session.user.id, dto);
+    return this.service.create(dto);
   }
 
   //Get all
@@ -70,8 +73,11 @@ export class ModuleController {
     status: 400,
     description: 'Invalid request',
   })
-  getAll(@CurrentSession() session: SessionData) {
-    return this.service.getAll(session.user.id);
+  getAll(
+    @CurrentSession() session: SessionData,
+    @Query() filters: ModuleFiltersDto
+  ) {
+    return this.service.getAll(filters);
   }
 
   //Get by id
@@ -85,7 +91,7 @@ export class ModuleController {
   @ApiResponse({
     status: 200,
     description: 'Module returned successfully',
-    type: SingleModuleResponseDto,
+    type: ModuleSingleResponseDto,
   })
   @ApiResponse({
     status: 400,
@@ -97,7 +103,7 @@ export class ModuleController {
   })
   getById(
     @CurrentSession() session: SessionData,
-    @Param('moduleId', ParseIntPipe) moduleId: number,
+    @Param('moduleId', ParseUUIDPipe) moduleId: string,
   ) {
     return this.service.getById(moduleId);
   }
@@ -105,7 +111,7 @@ export class ModuleController {
   //Update
   // @Public()
   @Patch(':moduleId')
-  @Roles('student', 'uni_admin', 'sys_admin')
+  @Roles('uni_admin', 'sys_admin')
   @ApiOperation({
     summary: 'Update a module',
     operationId: 'updateModule',
@@ -114,7 +120,7 @@ export class ModuleController {
   @ApiResponse({
     status: 200,
     description: 'Module updated successfully',
-    type: SingleModuleResponseDto,
+    type: ModuleSingleResponseDto,
   })
   @ApiResponse({
     status: 400,
@@ -130,8 +136,8 @@ export class ModuleController {
   })
   update(
     @CurrentSession() session: SessionData,
-    @Param('moduleId', ParseIntPipe) moduleId: number,
-    @Body() dto: UpdateModuleDto,
+    @Param('moduleId', ParseUUIDPipe) moduleId: string,
+    @Body() dto: UpdateModuleDto
   ) {
     return this.service.update(session.user.id, moduleId, dto);
   }
@@ -157,9 +163,8 @@ export class ModuleController {
     description: 'Module not found',
   })
   delete(
-    @CurrentSession() session: SessionData,
-    @Param('moduleId', ParseIntPipe) moduleId: number,
+    @Param('moduleId', ParseUUIDPipe) moduleId: string
   ) {
-    return this.service.deleteById(session.user.id, moduleId);
+    return this.service.deleteById(moduleId);
   }
 } //ModuleController

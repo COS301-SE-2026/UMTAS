@@ -19,7 +19,7 @@ export const Course = pgTable('Course', {
 export const CourseModule = pgTable(
   'CourseModule',
   {
-    ModuleID: integer('ModuleID')
+    ModuleID: uuid('ModuleID')
       .references(() => modules.moduleID, { onDelete: 'cascade' })
       .notNull(),
     CourseID: uuid('CourseID')
