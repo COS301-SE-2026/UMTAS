@@ -1,6 +1,6 @@
-import { UniversityService } from "../university.service";
+import { UniversityService } from "./university.service";
 
-import { CreateUniversityDto, UpdateUniversityDto, UniversitySingleResponseDto, UniversityListResponseDto, DeleteUniversityResponseDto } from './university.dto';
+import { CreateUniversityDto, UpdateUniversityDto, UniversitySingleResponseDto, UniversityListResponseDto, DeleteUniversityResponseDto } from './dto/university.dto';
 
 import {
   Post,
@@ -43,7 +43,7 @@ export class UniversityController {
         status: 409,
         description: 'University already exists'
     })
-    createUniversity(
+    create(
         @Body() dto: CreateUniversityDto
     ) {
         return this.service.create(dto);

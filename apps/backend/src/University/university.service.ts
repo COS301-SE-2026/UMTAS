@@ -11,7 +11,7 @@ import { eq, and } from 'drizzle-orm';
 
 import { DatabaseService } from '../db/database.service';
 import { University } from 'src/entities';
-import { CreateUniversityDto, UpdateUniversityDto, UniversitySingleResponseDto, UniversityListResponseDto, DeleteUniversityResponseDto } from './university.dto';
+import { CreateUniversityDto, UpdateUniversityDto, UniversitySingleResponseDto, UniversityListResponseDto, DeleteUniversityResponseDto } from './dto/university.dto';
 
 @Injectable()
 export class UniversityService {
@@ -20,7 +20,21 @@ export class UniversityService {
 
     async create(dto: CreateUniversityDto): Promise<UniversitySingleResponseDto> {
 
-        throw new NotImplementedException('sorry nhe');
+        //Check if university already exists
+        const [uni] = await this.dbService.db
+            .select()
+            .from(University)
+            .where(eq(University.UniversityName, dto.UniversityName)).limit(1);
+
+        if (uni) throw new ConflictException(`University [${dto.UniversityName}] already exists with universityID: ${uni.UniversityID}`);
+
+        const [newUni] = await this.dbService.db
+            .insert(University)
+            .values({
+                UniversityName: dto.UniversityName
+            }).returning();
+
+        return newUni;
     }//Create
 
     async getAll(): Promise<UniversityListResponseDto> {

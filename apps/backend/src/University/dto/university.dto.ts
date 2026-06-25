@@ -11,7 +11,7 @@ export class UniversityDto {
     })
     @IsUUID()
     @IsNotEmpty()
-    universityID!: string;
+    UniversityID!: string;
 
     @ApiProperty({
         example: 'University of Pretoria',
@@ -21,11 +21,11 @@ export class UniversityDto {
     @IsNotEmpty()
     @IsString()
     @Length(2, 30)
-    universityName!: string;
+    UniversityName!: string;
 }//UniversityDto
 
 //Create
-export class CreateUniversityDto extends PickType(UniversityDto, ['universityName'] as const) {}
+export class CreateUniversityDto extends PickType(UniversityDto, ['UniversityName'] as const) {}
 
 //Update
 export class UpdateUniversityDto extends PartialType(OmitType(UniversityDto, ['universityID'] as const)) {}
@@ -45,7 +45,7 @@ export class UniversityListResponseDto {
 }
 
 //Delete
-export class DeleteUniversityResponseDto extends PickType(UniversityDto, ['universityName']) {
+export class DeleteUniversityResponseDto extends PickType(UniversityDto, ['UniversityName']) {
 
   @ApiProperty({ example: true })
   success!: boolean;
