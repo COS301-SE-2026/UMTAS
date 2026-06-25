@@ -50,12 +50,45 @@ export class CourseService {
 
     async getById(courseId: string): Promise<CourseSingleResponseDto> {
 
-        throw new NotImplementedException('sorry neh');
+        const [course] = await this.dbService.db
+            .select()
+            .from(Course)
+            .where(eq(Course.CourseID, courseId)).limit(1);
+
+        if (!course) throw new NotFoundException(`No course found for CourseID: ${courseId}`)
+
+        return course;
     }//getByID
 
     async update(courseId: string, dto: UpdateCourseDto): Promise<CourseSingleResponseDto> {
 
-        throw new NotImplementedException('sorry neh');
+        //check if course exists
+        const course = await this.getById(courseId);
+
+        //Check that atleast one update field provided
+        if (
+            dto.CourseName===undefined &&
+            dto.UniversityID===undefined
+        ) throw new BadRequestException('At least one field required for update');
+
+        //Check if new name is duplicate for uni id
+        const updatedName = dto.CourseName?.trim();
+        if (updatedName && await this.duplicateCourseNamePerUniversity(updatedName, course.UniversityID))
+            throw new ConflictException(`Course ${updatedName} already exists for universityID: ${course.UniversityID}`);
+
+        //Update course
+        const [newCourse] = await this.dbService.db
+            .update(Course)
+            .set({
+                CourseName: updatedName ?? course.CourseName,
+                UniversityID: dto.UniversityID ?? course.UniversityID
+            })
+            .where(eq(Course.CourseID, courseId)).returning();
+
+        //update failed
+        if (!newCourse) throw new InternalServerErrorException(`Failed to update course`);
+
+        return newCourse;
     }//update
 
     async delete(courseId: string): Promise<DeleteCourseResponseDto> {
