@@ -68,15 +68,16 @@ export class UniversityService {
         //get updated fields
         const updatedName = dto.UniversityName?.trim();
 
-        //check if udpated name already exists
-        if (uni.UniversityName===updatedName || await this.checkDuplicateUniversityName(updatedName))
-            throw new ConflictException(`University [${dto.UniversityName.trim()}] already exists.`);
+        //check if updated name is the same || already exists on another university
+        if (updatedName && updatedName!==uni.UniversityName) 
+            if (await this.checkDuplicateUniversityName(updatedName))
+                throw new ConflictException(`University [${dto.UniversityName.trim()}] already exists.`);
 
         // update university
         const [newUni] = await this.dbService.db
             .update(University)
             .set({
-                UniversityName: updatedName ?? University.UniversityName
+                UniversityName: updatedName ?? uni.UniversityName
             })
             .where(eq(University.UniversityID, uniId)).returning();
 
@@ -109,9 +110,7 @@ export class UniversityService {
             .from(University)
             .where(eq(University.UniversityName, uniName)).limit(1);
 
-        if (uni) return true;
-
-        return false;
+        return !!uni;
     }//END_checkDuplicateUniversityName
 
 }//UniversityService
