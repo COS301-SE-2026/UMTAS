@@ -30,6 +30,7 @@ jobs:
 
   notify-deploy:
     needs: deploy
+    permissions: {}
     if: always()
     uses: ./.github/workflows/discord-notify.yml
     with:
@@ -76,6 +77,7 @@ jobs:
           exit $failed
   notify-prod-health-check:
     needs: prod-health-check
+    permissions: {}
     if: always()
     uses: ./.github/workflows/discord-notify.yml
     with:
