@@ -104,3 +104,6 @@ rollback-prod previous_tag:
     @echo "Rolling back production to version {{previous_tag}}..."
     just prod-up {{previous_tag}}
     @echo "Rollback complete. Production is now running {{previous_tag}}"
+
+docs:
+    mkdocs serve
