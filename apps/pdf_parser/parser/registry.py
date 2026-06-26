@@ -1,11 +1,9 @@
-from typing import Dict, Type
-
 from .base_parser import BasePDFParser
 from .models import ParserError
 from .adapters.up_parser import UPPDFParser
 
 
-PARSER_REGISTRY: Dict[str, Type[BasePDFParser]] = {
+PARSER_REGISTRY: dict[str, type[BasePDFParser]] = {
     "up": UPPDFParser,
 }
 
