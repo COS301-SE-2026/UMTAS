@@ -17,17 +17,19 @@ import {
   AlertDialogCancel,
 } from "@/components/atoms/baseShadcn/alert-dialog";
 import { Button } from "@/components/atoms/baseShadcn/button";
-import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
+import {
+  deleteModulesById,
+  ModuleResponseDto,
+} from "@/app/builder/utils/modules/requestBuilders";
+import { useMutation } from "@tanstack/react-query";
+import {
+  addModuleMut,
+  removeModuleMut,
+  updateModuleMut,
+} from "@/components/templates/builder/Queries/moduleQueries";
 
 interface ModulesStepProps {
   modules: ModuleResponseDto[];
-  onAdd: () => void;
-  onUpdate: (
-    id: number,
-    field: keyof Omit<ModuleResponseDto, "moduleID" | "userID"> | "confirm",
-    value: string,
-  ) => void | Promise<void>;
-  onRemove: (id: number) => void;
 }
 
 function validateModule(module: ModuleResponseDto) {
@@ -54,22 +56,17 @@ function isModuleComplete(module: ModuleResponseDto) {
   return !!(module.moduleCode && module.moduleName && module.styling);
 }
 
-export function ModulesStep({
-  modules,
-  onAdd,
-  onUpdate,
-  onRemove,
-}: ModulesStepProps) {
+export function ModulesStep({ modules }: ModulesStepProps) {
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [errorMap, setErrorMap] = useState<Record<number, ModuleErrors>>({});
   const [isDirty, setIsDirty] = useState(false);
   const [showGuard, setShowGuard] = useState(false);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
   const [snapshot, setSnapshot] = useState<ModuleResponseDto | null>(null);
-  const [isAdding, setIsAdding] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
   const [isConfirming, setIsConfirming] = useState(false);
-
+  const addModule = useMutation(addModuleMut());
+  const deleteModule = useMutation(removeModuleMut());
+  const updateModule = useMutation(updateModuleMut());
   function requestNavigation(action: () => void) {
     if (isDirty) {
       setPendingAction(() => action);
@@ -81,9 +78,7 @@ export function ModulesStep({
 
   function handleGuardConfirm() {
     if (snapshot) {
-      onUpdate(snapshot.moduleID, "moduleCode", snapshot.moduleCode);
-      onUpdate(snapshot.moduleID, "moduleName", snapshot.moduleName);
-      onUpdate(snapshot.moduleID, "styling", snapshot.styling || "");
+      // need to confirm what this does
     }
     setIsDirty(false);
     setShowGuard(false);
@@ -131,7 +126,16 @@ export function ModulesStep({
 
     setIsConfirming(true);
     try {
-      await onUpdate(id, "confirm", "");
+      updateModule.mutate({
+        moduleID: id,
+        module: {
+          name: lectureModule.moduleName,
+          code: lectureModule.moduleCode,
+          dsc: lectureModule.moduleDescription || undefined,
+          styling: lectureModule.styling || undefined,
+        },
+      });
+
       setErrorMap((prev) => {
         const next = { ...prev };
         delete next[id];
@@ -145,48 +149,6 @@ export function ModulesStep({
     } finally {
       setIsConfirming(false);
     }
-  }
-
-  function handleAdd() {
-    if (isAdding) return;
-
-    function doAdd() {
-      setIsAdding(true);
-      onAdd();
-      setTimeout(() => setIsAdding(false), 500);
-      setIsDirty(false);
-      setSnapshot(null);
-    }
-    requestNavigation(doAdd);
-  }
-
-  function handleRemove(id: number) {
-    if (isDeleting) return;
-
-    if (selectedId === id) {
-      setSelectedId(null);
-      setIsDirty(false);
-      setSnapshot(null);
-    }
-
-    setIsDeleting(true);
-    onRemove(id);
-    setTimeout(() => setIsDeleting(false), 500);
-
-    setErrorMap((prev) => {
-      const next = { ...prev };
-      delete next[id];
-      return next;
-    });
-  }
-
-  function handleUpdate(
-    id: number,
-    field: keyof Omit<ModuleResponseDto, "moduleID" | "userID">,
-    value: string,
-  ) {
-    setIsDirty(true);
-    onUpdate(id, field, value);
   }
 
   function renderEmptyState() {
@@ -245,8 +207,8 @@ export function ModulesStep({
             type="button"
             variant="ghost"
             size="icon"
-            onClick={() => handleRemove(module.moduleID)}
-            disabled={isDeleting}
+            onClick={() => deleteModule.mutate(selectedId)}
+            disabled={deleteModule.isPending}
             aria-label={"Remove module " + (index + 1)}
             className="h-10 w-10 flex-shrink-0 border border-[var(--border)] text-[var(--text-secondary)] transition-colors duration-[var(--duration-fast)] hover:border-[var(--error-text)] hover:text-[var(--error-text)] hover:bg-transparent disabled:opacity-50 disabled:cursor-not-allowed"
           >
@@ -257,11 +219,7 @@ export function ModulesStep({
         {/* inline edit form */}
         {isSelected && (
           <div className="flex flex-col gap-2 pl-2">
-            <ModuleCard
-              module={module}
-              onUpdate={handleUpdate}
-              errors={errors}
-            />
+            <ModuleCard module={module} onUpdate={() => {}} errors={errors} />
             {/* confirm button */}
             <Button
               type="button"
@@ -322,14 +280,14 @@ export function ModulesStep({
 
       <button
         type="button"
-        onClick={handleAdd}
-        disabled={isAdding}
+        onClick={() => addModule.mutate}
+        disabled={addModule.isPending}
         className="mt-4 flex w-full items-center gap-3 rounded-lg border border-dashed border-[var(--border)] px-4 py-4 text-left text-base text-[var(--text-secondary)] transition-colors duration-[var(--duration-fast)] hover:border-[var(--text-secondary)] hover:text-[var(--text-primary)] disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border border-dashed border-[var(--border)]">
           <Plus size={16} strokeWidth={1.5} />
         </span>
-        {isAdding ? "Adding..." : "Add module"}
+        {addModule.isPending ? "Adding..." : "Add module"}
       </button>
     </div>
   );
