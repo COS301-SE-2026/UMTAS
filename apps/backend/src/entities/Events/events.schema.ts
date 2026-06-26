@@ -1,9 +1,41 @@
-import { jsonb, pgTable, serial, varchar, boolean } from 'drizzle-orm/pg-core';
+import { jsonb, pgTable, uuid, varchar, boolean } from 'drizzle-orm/pg-core';
+import { usersTable } from '../auth';
+import { Venue } from '../Universities';
+import { modules } from '../Modules';
 
 export const Event = pgTable('Event', {
-  eventID: serial('eventID').primaryKey(),
+  eventID: uuid('eventID').primaryKey(),
   eventName: varchar('eventName', { length: 32 }),
   eventCode: varchar('eventCode', { length: 10 }),
   eventCriteria: jsonb('eventCriteria'),
   isRecurring: boolean('isRecurring').notNull().default(false),
 });
+
+//Personal owned
+export const PeronsalEvent = pgTable('PersonalEvent', {
+  PersonalEventID: uuid('universityEventID').primaryKey(),
+  UserID: uuid('UserID').references(() => usersTable.id, {
+    onDelete: 'cascade',
+  }),
+  eventID: uuid('eventID').references(() => Event.eventID, {
+    onDelete: 'cascade',
+  }),
+});
+
+//University owned
+export const UniversityEvent = pgTable('UniversityEvent', {
+  UniversityEventID: uuid('universityEventID').primaryKey(),
+  moduleID: uuid('moduleID').references(() => modules.moduleID, {
+    onDelete: 'cascade',
+  }),
+  eventID: uuid('eventID').references(() => Event.eventID, {
+    onDelete: 'cascade',
+  }),
+  venue: varchar('venue', { length: 30 }),
+  VenueID: uuid('VenueID').references(() => Venue.VenueID, {
+    onDelete: 'cascade',
+  }),
+});
+
+
+

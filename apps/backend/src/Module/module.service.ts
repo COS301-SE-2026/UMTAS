@@ -19,8 +19,7 @@ import {
   UpdateModuleDto,
   ModuleFiltersDto
 } from './dto/module.dto';
-import { University, UniversityRole, Course, CourseModule,  ModuleEnrollment} from '../entities/index';
-import { weightSrvRecords } from 'ioredis/built/cluster/util';
+import { Course, CourseModule,  ModuleEnrollment} from '../entities/index';
 
 
 //Module service
