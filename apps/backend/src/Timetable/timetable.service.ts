@@ -42,13 +42,16 @@ export class TimetableService {
 
         const [newUserTimetable] = await tx
           .insert(UserTimetable)
-          .values({ UserID: userId, TimetableID: newTimetable.timetableID })
+          .values({ 
+            UserID: userId, 
+            TimetableID: newTimetable.timetableID
+          })
           .returning();
 
-        const eventIds: number[] = [];
+        const eventIds: string[] = [];
 
         if (dto.eventIds?.length) {
-          await this.validateEventIds(tx, userId, dto.eventIds);
+          await this.validateEventIds(tx, dto.eventIds);
           await tx
             .insert(EventsToTimetables)
             .values(
@@ -97,35 +100,41 @@ export class TimetableService {
       )
       .where(eq(UserTimetable.UserID, userId));
 
-    const map = new Map<number, TimetableResponseDto>();
+    const map = new Map<string, {
+      timetable: typeof Timetable.$inferSelect;
+      UserTimetableID: string;
+      eventIds?: string[];
+    }>();
 
     for (const row of rows) {
       const id = row.timetable.timetableID;
+
       if (!map.has(id))
         map.set(id, {
           timetable: row.timetable,
           UserTimetableID: row.UserTimetable.UserTimetableID,
         });
+
       if (row.eventID !== null) {
         const entry = map.get(id)!;
         entry.eventIds = entry.eventIds ?? [];
         entry.eventIds.push(row.eventID);
       }
-    }
+    }//END_row
 
     return { timetables: Array.from(map.values()) };
   } //getAllTimetables
 
   async getTimetableById(
     userId: string,
-    timetableId: number,
+    timetableId: string,
   ): Promise<TimetableResponseDto> {
     return this.fetchTimetableWithEvents(userId, timetableId);
   } //getTimetableById
 
   async updateTimetable(
     userId: string,
-    timetableId: number,
+    timetableId: string,
     dto: UpdateTimetableDto,
   ): Promise<TimetableResponseDto> {
     const hasName = dto.timetableName !== undefined;
@@ -182,7 +191,7 @@ export class TimetableService {
       }
 
       if (hasAdd) {
-        await this.validateEventIds(tx, userId, dto.addEventIds!);
+        await this.validateEventIds(tx, dto.addEventIds!);
         await tx
           .insert(EventsToTimetables)
           .values(
@@ -211,7 +220,7 @@ export class TimetableService {
 
   async deleteTimetable(
     userId: string,
-    timetableId: number,
+    timetableId: string,
   ): Promise<DeleteTimetableResponseDto> {
     /* const [existing] = await this.databaseService.db
       .select()
@@ -255,7 +264,7 @@ export class TimetableService {
 
   private async fetchTimetableWithEvents(
     userId: string,
-    timetableId: number,
+    timetableId: string,
   ): Promise<TimetableResponseDto> {
     /*
     const rows = await this.databaseService.db
@@ -311,8 +320,7 @@ export class TimetableService {
 
   private async validateEventIds(
     tx: AppDatabase,
-    userId: string,
-    eventIds: number[],
+    eventIds: string[],
   ): Promise<void> {
     const found = await tx
       .select({ eventID: Event.eventID })

@@ -89,7 +89,7 @@ export class TimetableController {
   @ApiResponse({ status: 404, description: 'Timetable not found' })
   getTimetableById(
     @CurrentSession() session: SessionData,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseIntPipe) id: string,
   ): Promise<TimetableResponseDto> {
     return this.service.getTimetableById(session.user.id, id);
   } //getTimetableById
@@ -115,7 +115,7 @@ export class TimetableController {
   @ApiResponse({ status: 500, description: 'Timetable was not updated' })
   updateTimetable(
     @CurrentSession() session: SessionData,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseIntPipe) id: string,
     @Body() dto: UpdateTimetableDto,
   ): Promise<TimetableResponseDto> {
     return this.service.updateTimetable(session.user.id, id, dto);
@@ -137,7 +137,7 @@ export class TimetableController {
   @ApiResponse({ status: 500, description: 'Timetable was not deleted' })
   deleteTimetable(
     @CurrentSession() session: SessionData,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseIntPipe) id: string,
   ): Promise<DeleteTimetableResponseDto> {
     return this.service.deleteTimetable(session.user.id, id);
   } //deleteTimetable

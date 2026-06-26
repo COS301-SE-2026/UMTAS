@@ -1,6 +1,5 @@
 import {
   pgTable,
-  serial,
   varchar,
   uuid,
   integer,
@@ -10,19 +9,19 @@ import { Event } from '../Events';
 import { usersTable } from '../auth';
 
 export const Timetable = pgTable('Timetable', {
-  timetableID: serial('timetableID').unique().primaryKey(),
+  timetableID: uuid('timetableID').unique().primaryKey().defaultRandom(),
   timetableName: varchar('timetableName', { length: 32 }),
 });
 
 export const EventsToTimetables = pgTable(
   'EventsToTimetables',
   {
-    eventID: integer('eventID')
+    eventID: uuid('eventID')
       .notNull()
       .references(() => Event.eventID, {
         onDelete: 'cascade',
       }),
-    timetableID: integer('timetableID')
+    timetableID: uuid('timetableID')
       .notNull()
       .references(() => Timetable.timetableID, { onDelete: 'cascade' }),
   },
@@ -34,7 +33,7 @@ export const UserTimetable = pgTable('UserTimetable', {
   UserID: uuid('UserID')
     .references(() => usersTable.id, { onDelete: 'cascade' })
     .notNull(),
-  TimetableID: integer('TimetableID')
+  TimetableID: uuid('TimetableID')
     .references(() => Timetable.timetableID)
     .notNull(),
 });

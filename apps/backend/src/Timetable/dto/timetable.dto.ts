@@ -27,7 +27,7 @@ export class CreateTimetableDto {
   @IsArray()
   @IsInt({ each: true })
   @ArrayUnique()
-  eventIds?: number[];
+  eventIds?: string[];
 } //CreateTimetableDto
 
 export class UpdateTimetableDto {
@@ -48,7 +48,7 @@ export class UpdateTimetableDto {
   @IsArray()
   @IsInt({ each: true })
   @ArrayUnique()
-  addEventIds?: number[];
+  addEventIds?: string[];
 
   @ApiPropertyOptional({
     example: [1, 2],
@@ -58,20 +58,20 @@ export class UpdateTimetableDto {
   @IsArray()
   @IsInt({ each: true })
   @ArrayUnique()
-  removeEventIds?: number[];
+  removeEventIds?: string[];
 } //UpdateTimetableDto
 
 export class TimetableDto {
-  @ApiProperty({ example: 1 })
-  timetableID!: number;
+  @ApiProperty({ example: "someId" })
+  timetableID!: string;
 
   @ApiPropertyOptional({ example: 'Semester 1', nullable: true })
   timetableName?: string | null;
 } //TimetableDto
 
 export class UserTimetableDto {
-  @ApiProperty({ example: 1 })
-  timetableID!: number;
+  @ApiProperty({ example: "someId" })
+  timetableID!: string;
 
   @ApiProperty({
     type: String,
@@ -91,7 +91,7 @@ export class TimetableResponseDto {
     example: [1, 2, 3],
     description: 'IDs of events linked to this timetable',
   })
-  eventIds?: number[];
+  eventIds?: string[];
 } //TimetableResponseDto
 
 export class TimetableListResponseDto {
