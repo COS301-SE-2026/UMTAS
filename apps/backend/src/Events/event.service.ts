@@ -3,67 +3,87 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  NotImplementedException,
 } from '@nestjs/common';
 import { eq, and } from 'drizzle-orm';
 import { DatabaseService } from '../db/database.service';
-import { Event, UniversityEvent, modules } from '../entities/index';
+import { Event, UniversityEvent, PersonalEvent } from '../entities/index';
 import {
   CreateEventDto,
-  EventResponseDto,
+  EventSingleResponseDto,
   EventType,
   EventListResponseDto,
   UpdateEventDto,
   DeleteResponseDto,
   EventCriteriaDto,
+  EventDto,
 } from './dto/EventDto.dto';
 
 import { AppDatabase } from '../db/database.service';
 
 @Injectable()
 export class EventService {
-  constructor(private readonly databaseService: DatabaseService) {}
+  constructor(private readonly dbService: DatabaseService) {}
 
+  //Create
+  //If moduleID provided in eventCriteria: make university owned
+  //If userID provided in eventCriteria: make userOwned
   async createEvent(
     userId: string,
     dto: CreateEventDto,
-  ): Promise<EventResponseDto> {
+  ): Promise<EventSingleResponseDto> {
+    //Validate that eventCriteria is of valid shape based of type
     const criteria = dto.eventCriteria;
-
     this.validateEventTypeCriteria(criteria);
 
-    return await this.databaseService.db.transaction(
-      async (tx: AppDatabase) => {
-        const [newEvent] = await tx
-          .insert(Event)
-          .values({
-            userID: userId,
-            eventName: dto.name ?? null,
-            eventCode: dto.code ?? null,
-            eventCriteria: dto.eventCriteria ?? null,
-            isRecurring: dto.isRecurring ?? false,
-          })
-          .returning();
+    //Based of type from eventCriteria ->
+      //personal -> create userOwned event
+      //if moduleID provided -> create university Owned
+    let event: EventDto;
+    switch (criteria.type){
 
-        if (!newEvent)
-          throw new InternalServerErrorException('Event was not created');
+      case EventType.PERSONAL:
+        event = await this.createPersonalEvent(userId, dto);
+        return;
 
-        const mappedEvent = {
-          ...newEvent,
-          name: newEvent.eventName ?? undefined,
-          code: newEvent.eventCode ?? undefined,
-        } as EventResponseDto['event'];
+    }//END_switch
 
-        if (criteria.type !== EventType.LECTURE) return { event: mappedEvent };
 
-        const lecture = await this.createLectureForEvent(
-          tx,
-          newEvent.eventID,
-          criteria,
-        );
 
-        return { event: mappedEvent, lecture };
-      },
-    );
+    throw new NotImplementedException("sorry nhe");
+    // return await this.databaseService.db.transaction(
+    //   async (tx: AppDatabase) => {
+    //     const [newEvent] = await tx
+    //       .insert(Event)
+    //       .values({
+    //         userID: userId,
+    //         eventName: dto.name ?? null,
+    //         eventCode: dto.code ?? null,
+    //         eventCriteria: dto.eventCriteria ?? null,
+    //         isRecurring: dto.isRecurring ?? false,
+    //       })
+    //       .returning();
+
+    //     if (!newEvent)
+    //       throw new InternalServerErrorException('Event was not created');
+
+    //     const mappedEvent = {
+    //       ...newEvent,
+    //       name: newEvent.eventName ?? undefined,
+    //       code: newEvent.eventCode ?? undefined,
+    //     } as EventSingleResponseDto['event'];
+
+    //     if (criteria.type !== EventType.LECTURE) return { event: mappedEvent };
+
+    //     const lecture = await this.createLectureForEvent(
+    //       tx,
+    //       newEvent.eventID,
+    //       criteria,
+    //     );
+
+    //     return { event: mappedEvent, lecture };
+    //   },
+    // );
   } //createEvent
 
   //getAllEvents
@@ -83,14 +103,14 @@ export class EventService {
           ...r.event,
           name: r.event.eventName ?? undefined,
           code: r.event.eventCode ?? undefined,
-        } as EventResponseDto['event'],
+        } as EventSingleResponseDto['event'],
         ...(r.lecture ? { lecture: r.lecture } : {}),
       })),
     };
   } //getAllEvents
 
   //getById
-  async getById(userId: string, eventId: number): Promise<EventResponseDto> {
+  async getById(userId: string, eventId: number): Promise<EventSingleResponseDto> {
     const [row] = await this.databaseService.db
       .select({
         event: Event,
@@ -108,7 +128,7 @@ export class EventService {
         ...row.event,
         name: row.event.eventName ?? undefined,
         code: row.event.eventCode ?? undefined,
-      } as EventResponseDto['event'],
+      } as EventSingleResponseDto['event'],
       ...(row.lecture ? { lecture: row.lecture } : {}),
     };
   } //getById
@@ -117,7 +137,7 @@ export class EventService {
     userId: string,
     eventId: number,
     dto: UpdateEventDto,
-  ): Promise<EventResponseDto> {
+  ): Promise<EventSingleResponseDto> {
     const critUpdate =
       dto.eventCriteria && Object.keys(dto.eventCriteria).length > 0;
     const recUpdate = dto.isRecurring !== undefined;
@@ -174,7 +194,7 @@ export class EventService {
           ...updatedEvent,
           name: updatedEvent.eventName ?? undefined,
           code: updatedEvent.eventCode ?? undefined,
-        } as EventResponseDto['event'];
+        } as EventSingleResponseDto['event'];
 
         const lecture = await this.syncSubtypeForEvent(
           tx,
@@ -216,7 +236,10 @@ export class EventService {
   } //delete
 
   //=======================================================
-  //Helpers
+  //🎅's Little Helpers
+
+
+
   private async createLectureForEvent(
     tx: AppDatabase,
     eventID: number,
@@ -247,8 +270,11 @@ export class EventService {
     return lec;
   } //createLectureForEvent
 
+  //Validate EventCriteria
+  //If 
   private validateEventTypeCriteria(
     criteria: Partial<CreateEventDto['eventCriteria']>,
+    userID?: string
   ) {
     if (!criteria) throw new BadRequestException('Criteria required');
 
@@ -256,8 +282,13 @@ export class EventService {
 
     switch (criteria.type) {
       case EventType.LECTURE:
-        if (!criteria.moduleCode)
+        if (!criteria.moduleID)
           throw new BadRequestException('Lecture events need a moduleCode');
+        return;
+
+      case EventType.PERSONAL:
+        if (!userID) 
+          throw new BadRequestException('UserID required for personal event');
         return;
 
       default:
@@ -341,4 +372,28 @@ export class EventService {
 
     return lecture;
   } //upsertLecture
+
+
+  //Specialised event creation functions
+  //Personal
+  private async createPersonalEvent(userId: string, dto: CreateEventDto): Promise<EventDto>{
+
+    const eventName = dto.eventName ?? `event_${userId.slice(0,20)}`;
+    const eventCode = dto.eventCode ?? `user_${userId.slice(0,5)}`;
+    const isRec = dto.isRecurring ?? false;
+
+    const [event] = await this.dbService.db
+      .insert(Event)
+      .values({
+        eventName: eventName,
+        eventCode: eventCode,
+        eventCriteria: dto.eventCriteria,
+        isRecurring: isRec
+      }).returning();
+
+      if (!event) throw new InternalServerErrorException('Failed to create personal event');
+
+      return event;
+  }//createPersonalEvent
+
 } //EventService

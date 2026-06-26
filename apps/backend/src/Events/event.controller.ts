@@ -28,40 +28,61 @@ import { CurrentSession } from '../auth/session.decorator';
 export class EventController {
   constructor(private readonly service: EventService) {}
 
-  @Post()
-  @Roles('student')
-  @ApiOperation({
-    summary: 'Create an event',
-    operationId: 'createEvent',
-  })
-  @ApiBody({ type: CreateEventDto })
-  @ApiResponse({
-    status: 201,
-    description: 'Event created successfully',
-    type: EventResponseDto,
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Missing or invalid event payload',
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'No active session',
-  })
-  @ApiResponse({
-    status: 403,
-    description: 'Insufficient permissions',
-  })
-  @ApiResponse({
-    status: 500,
-    description: 'Event was not created',
-  })
-  createEvent(
+  // @Post()
+  // @Roles('student')
+  // @ApiOperation({
+  //   summary: 'Create an event',
+  //   operationId: 'createEvent',
+  // })
+  // @ApiBody({ type: CreateEventDto })
+  // @ApiResponse({
+  //   status: 201,
+  //   description: 'Event created successfully',
+  //   type: EventResponseDto,
+  // })
+  // @ApiResponse({
+  //   status: 400,
+  //   description: 'Missing or invalid event payload',
+  // })
+  // @ApiResponse({
+  //   status: 401,
+  //   description: 'No active session',
+  // })
+  // @ApiResponse({
+  //   status: 403,
+  //   description: 'Insufficient permissions',
+  // })
+  // @ApiResponse({
+  //   status: 500,
+  //   description: 'Event was not created',
+  // })
+  // createEvent(
+  //   @CurrentSession() session: SessionData,
+  //   @Body() dto: CreateEventDto,
+  // ): Promise<EventResponseDto> {
+  //   return this.service.createEvent(session.user.id, dto);
+  // }
+
+  //Create Personal Event
+  @Post('personal')
+  createPersonalEvent(
     @CurrentSession() session: SessionData,
-    @Body() dto: CreateEventDto,
+    @Body() dto: CreateEventDto
   ): Promise<EventResponseDto> {
-    return this.service.createEvent(session.user.id, dto);
-  }
+
+    return this.service.createPersonalEvent(session.user.id,dto);
+  }//END_CreatePersonalEvent
+
+  //Create University Owned event
+  @Post('/university/:moduleId')
+  createUniversityEvent(
+    @Param('moduleId') moduleId: string,
+    @Body() dto: CreateEventDto
+  ): Promise<EventResponseDto> {
+
+    return this.service.createUniversityEvent(moduleId, dto);
+  }//END_CreateUniversityEvent
+
 
   //get All
   @Get()

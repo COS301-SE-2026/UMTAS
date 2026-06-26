@@ -3,16 +3,18 @@ import { usersTable } from '../auth';
 import { Venue } from '../Universities';
 import { modules } from '../Modules';
 
+import type { EventCriteria } from 'src/Events/dto/event.types';
+
 export const Event = pgTable('Event', {
-  eventID: uuid('eventID').primaryKey(),
-  eventName: varchar('eventName', { length: 32 }),
+  eventID: uuid('eventID').primaryKey().defaultRandom(),
+  eventName: varchar('eventName', { length: 32 }).notNull(),
   eventCode: varchar('eventCode', { length: 10 }),
-  eventCriteria: jsonb('eventCriteria'),
+  eventCriteria: jsonb('eventCriteria').$type<EventCriteria>(),
   isRecurring: boolean('isRecurring').notNull().default(false),
 });
 
 //Personal owned
-export const PeronsalEvent = pgTable('PersonalEvent', {
+export const PersonalEvent = pgTable('PersonalEvent', {
   PersonalEventID: uuid('universityEventID').primaryKey(),
   UserID: uuid('UserID').references(() => usersTable.id, {
     onDelete: 'cascade',
