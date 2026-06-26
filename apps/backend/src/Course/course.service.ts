@@ -12,13 +12,20 @@ import { eq, and } from 'drizzle-orm';
 import { DatabaseService } from '../db/database.service';
 import { Course } from 'src/entities';
 import {CourseDto, CreateCourseDto, UpdateCourseDto, CourseSingleResponseDto, CourseListResponseDto, DeleteCourseResponseDto } from './dto/course.dto';
+import { UniversityService } from 'src/University/university.service';
 
 @Injectable()
 export class CourseService {
 
-    constructor(private readonly dbService: DatabaseService) {}
+    constructor(
+        private readonly dbService: DatabaseService,
+        private readonly uniService: UniversityService
+    ) {}
 
     async create(dto: CreateCourseDto): Promise<CourseSingleResponseDto> {
+
+        //Check if university exists
+        await this.uniService.getById(dto.UniversityID);
 
         //Check if course already exists
         const course = await this.duplicateCourseNamePerUniversity(dto.CourseName, dto.UniversityID);
@@ -36,6 +43,7 @@ export class CourseService {
         return newCourse;
     }//Create
 
+    //get all courses for a university
     async getAll(uniId: string): Promise<CourseListResponseDto> {
 
         const courses = await this.dbService.db
@@ -61,6 +69,9 @@ export class CourseService {
     }//getByID
 
     async update(courseId: string, dto: UpdateCourseDto): Promise<CourseSingleResponseDto> {
+
+        //Check if uni exists if uni to be updated
+        if (dto.UniversityID) await this.uniService.getById(dto.UniversityID);
 
         //check if course exists
         const course = await this.getById(courseId);

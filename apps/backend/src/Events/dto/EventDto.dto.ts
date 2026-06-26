@@ -27,6 +27,32 @@ export class EventCriteriaDto {
   endTime!: string;
 } //EventCriteriaDto
 
+//update criteria
+export class UpdateEventCriteriaDto {
+  @ApiPropertyOptional({
+    enum: EventType,
+    example: EventType.UNIVERSITY
+  })
+  @IsOptional()
+  @IsEnum(EventType)
+  type?: EventType;
+
+  @ApiPropertyOptional({ example: 'Monday' })
+  @IsOptional()
+  @IsString()
+  day?: string;
+
+  @ApiPropertyOptional({ example: '08:30' })
+  @IsOptional()
+  @IsString()
+  startTime?: string;
+
+  @ApiPropertyOptional({ example: '10:20' })
+  @IsOptional()
+  @IsString()
+  endTime?: string;
+}
+
 export class EventDto {
 
   @ApiProperty({ 
@@ -94,7 +120,17 @@ export class CreateEventDto extends PickType(EventDto, ['eventName', 'eventCode'
 
 
 //Update Event
-export class UpdateEventDto extends PartialType(OmitType(EventDto, ['eventID'] as const)) {}
+export class UpdateEventDto extends PartialType(OmitType(EventDto, ['eventID', 'eventCriteria'] as const)) {
+
+  @ApiPropertyOptional({
+    type: UpdateEventCriteriaDto,
+    description: 'Partial event criteria for update'
+  })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => UpdateEventCriteriaDto)
+  eventCriteria?: UpdateEventCriteriaDto;
+}
 
 //Responses
   //Single

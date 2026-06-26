@@ -29,6 +29,13 @@
       "when": 1782319096607,
       "tag": "0003_CAPATALISED_ROLES_IN_UNIVERSITYROLES_FIXED_FIELD_IN_UNIVERSITY",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1782487505735,
+      "tag": "0004_schema_updated_together_with_backend",
+      "breakpoints": true
     }
   ]
 }

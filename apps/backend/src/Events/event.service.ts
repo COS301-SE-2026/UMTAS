@@ -109,6 +109,9 @@ export class EventService {
       .where(eq(Event.eventID, eventId))
       .limit(1);
 
+    if (!event)
+      throw new InternalServerErrorException(`Event[${eventId}] not found`);
+
     return {event: this.mapEventToDto(event)};
   } //getById
 
@@ -129,27 +132,31 @@ export class EventService {
     const updatedEvent = await this.dbService.db.transaction(
       async (tx: AppDatabase) => {
         //Check that event exists        
-        const existingEvent = await this.getById(eventId);
+        const [existingEvent] = await tx
+          .select()
+          .from(Event)
+          .where(eq(Event.eventID, eventId))
+          .limit(1);
 
         if (!existingEvent)
           throw new NotFoundException(`Event not found for eventId: ${eventId}`);
 
         //Fetch existing criteria
-        const existingCriteria = existingEvent.event.eventCriteria ?? {};
+        const existingCriteria = existingEvent.eventCriteria ?? {};
 
         //overwrite existing fields if defined in dto
         const mergedCriteria = {
           ...existingCriteria,
           ...dto.eventCriteria
-        };
+        } as EventCriteriaDto;
 
         const [event] = await tx
           .update(Event)
           .set({
-            eventName: dto.eventName?.trim() ?? existingEvent.event.eventName,
-            eventCode: dto.eventCode?.trim() ?? existingEvent.event.eventCode,
+            eventName: dto.eventName?.trim() ?? existingEvent.eventName,
+            eventCode: dto.eventCode?.trim() ?? existingEvent.eventCode,
             eventCriteria: mergedCriteria,
-            isRecurring: dto.isRecurring ?? existingEvent.event.isRecurring
+            isRecurring: dto.isRecurring ?? existingEvent.isRecurring
           })
           .where(eq(Event.eventID, eventId))
           .returning();

@@ -20,13 +20,17 @@ import {
   ModuleFiltersDto
 } from './dto/module.dto';
 import { Course, CourseModule,  ModuleEnrollment} from '../entities/index';
+import { CourseService } from 'src/Course/course.service';
 
 
 //Module service
 //If its user owned modules -> MUST BE HANDLED THROUGH BUILDER SERVICE
 @Injectable()
 export class ModuleService {
-  constructor(private readonly dbService: DatabaseService) {}
+  constructor(
+    private readonly dbService: DatabaseService,
+    private readonly courseService: CourseService
+  ) {}
 
   // Create module
   async create(dto: CreateModuleDto): Promise<ModuleSingleResponseDto> {
@@ -35,6 +39,9 @@ export class ModuleService {
     const courseId = dto.courseID?.trim();
     const description = dto.moduleDescription?.trim();
 
+    //Check that course exists
+    await this.courseService.getById(courseId);
+    
     //If module with same code already exists for course -> throw a fit
     if (await this.existingModuleCodeForCourse(code, courseId))
         throw new ConflictException(`Module code [${code}] already exists for course [${courseId}]`);

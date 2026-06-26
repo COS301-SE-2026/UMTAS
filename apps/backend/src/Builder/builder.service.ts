@@ -83,6 +83,7 @@ export class BuilderService {
 
     //Get module by moduleID - no ownership check necessary?
     async getModuleById(moduleId: string): Promise<ModuleSingleResponseDto>{
+        
         return await this.moduleService.getById(moduleId);
     }//END_getModuleById
 
@@ -94,7 +95,7 @@ export class BuilderService {
         const userCourse = await this.doUserUniCourseCheck(userId);
 
         //IF user doesn't own module -> throw a fit
-        if (await this.ownershipCheck(moduleId, userCourse.CourseID)) throw new ForbiddenException(`User [${userId}] does not own module [${moduleId}]`);
+        if (!await this.ownershipCheck(moduleId, userCourse.CourseID)) throw new ForbiddenException(`User [${userId}] does not own module [${moduleId}]`);
 
         //Update any field of module if owned by user
         return await this.moduleService.update(moduleId, dto);
@@ -108,7 +109,7 @@ export class BuilderService {
         const userCourse = await this.doUserUniCourseCheck(userId);
 
         //ownership check
-        if (await this.ownershipCheck(moduleId, userCourse.CourseID)) throw new ForbiddenException(`User [${userId}] does not own module [${moduleId}]`);
+        if (!await this.ownershipCheck(moduleId, userCourse.CourseID)) throw new ForbiddenException(`User [${userId}] does not own module [${moduleId}]`);
 
         return this.moduleService.deleteById(moduleId);
     }//END_deleteModule
@@ -181,7 +182,7 @@ export class BuilderService {
             .select()
             .from(modules)
             .innerJoin(CourseModule, eq(CourseModule.ModuleID, modules.moduleID))
-            .where(eq(CourseModule.CourseID, courseId)).limit(1);
+            .where(and(eq(modules.moduleID, moduleId), eq(CourseModule.CourseID, courseId))).limit(1);
 
         //true if exists | False otherwise
         return !!module;

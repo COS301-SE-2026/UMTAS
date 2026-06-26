@@ -7,7 +7,8 @@ import {
   ParseIntPipe,
   Patch,
   Delete,
-  Query
+  Query,
+  ParseUUIDPipe
 } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
@@ -131,7 +132,7 @@ export class EventController {
     description: 'Event not found',
   })
   getById(
-    @Param('id', ParseIntPipe) id: string,
+    @Param('id', ParseUUIDPipe) id: string,
   ): Promise<EventSingleResponseDto> {
     return this.service.getById(id);
   } //get by id
@@ -170,7 +171,7 @@ export class EventController {
     description: 'Event was not updated',
   })
   updateEvent(
-    @Param('id', ParseIntPipe) id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateEventDto
   ): Promise<EventSingleResponseDto> {
     return this.service.updateEvent(id, dto);
@@ -205,7 +206,7 @@ export class EventController {
     description: 'Event was not deleted',
   })
   deleteEvent(
-    @Param('id', ParseIntPipe) id: string
+    @Param('id', ParseUUIDPipe) id: string
   ): Promise<DeleteResponseDto> {
     return this.service.deleteEvent(id);
   }
