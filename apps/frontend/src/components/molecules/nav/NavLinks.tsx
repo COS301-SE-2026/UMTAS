@@ -3,6 +3,7 @@ import { NavLink } from "@/components/atoms/nav/NavLink";
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Home" },
   { href: "/builder", label: "Build Schedule" },
+  { href: "/customise", label: "Customisation" },
   { href: "/schedules", label: "My Schedules" },
 ] as const;
 
