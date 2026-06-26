@@ -15,7 +15,7 @@ export const Event = pgTable('Event', {
 
 //Personal owned
 export const PersonalEvent = pgTable('PersonalEvent', {
-  PersonalEventID: uuid('universityEventID').primaryKey(),
+  PersonalEventID: uuid('PersonalEventID').primaryKey().defaultRandom(),
   UserID: uuid('UserID').references(() => usersTable.id, {
     onDelete: 'cascade',
   }),
@@ -26,14 +26,13 @@ export const PersonalEvent = pgTable('PersonalEvent', {
 
 //University owned
 export const UniversityEvent = pgTable('UniversityEvent', {
-  UniversityEventID: uuid('universityEventID').primaryKey(),
+  UniversityEventID: uuid('universityEventID').primaryKey().defaultRandom(),
   moduleID: uuid('moduleID').references(() => modules.moduleID, {
     onDelete: 'cascade',
   }),
   eventID: uuid('eventID').references(() => Event.eventID, {
     onDelete: 'cascade',
   }),
-  venue: varchar('venue', { length: 30 }),
   VenueID: uuid('VenueID').references(() => Venue.VenueID, {
     onDelete: 'cascade',
   }),

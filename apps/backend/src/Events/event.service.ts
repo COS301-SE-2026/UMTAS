@@ -5,13 +5,13 @@ import {
   NotFoundException,
   NotImplementedException,
 } from '@nestjs/common';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, SQL } from 'drizzle-orm';
 import { DatabaseService } from '../db/database.service';
-import { Event, UniversityEvent, PersonalEvent } from '../entities/index';
+import { Event, UniversityEvent, PersonalEvent, Course } from '../entities/index';
 import {
   CreateEventDto,
   EventSingleResponseDto,
-  EventType,
+  EventFiltersDto,
   EventListResponseDto,
   UpdateEventDto,
   DeleteResponseDto,
@@ -26,374 +26,212 @@ export class EventService {
   constructor(private readonly dbService: DatabaseService) {}
 
   //Create
-  //If moduleID provided in eventCriteria: make university owned
-  //If userID provided in eventCriteria: make userOwned
-  async createEvent(
-    userId: string,
-    dto: CreateEventDto,
-  ): Promise<EventSingleResponseDto> {
-    //Validate that eventCriteria is of valid shape based of type
-    const criteria = dto.eventCriteria;
-    this.validateEventTypeCriteria(criteria);
+  //Personal
+  async createPersonalEvent(userId: string, dto: CreateEventDto): Promise<EventSingleResponseDto> {
 
-    //Based of type from eventCriteria ->
-      //personal -> create userOwned event
-      //if moduleID provided -> create university Owned
-    let event: EventDto;
-    switch (criteria.type){
+    //Create Event
+    const event = await this.createEvent(dto, userId);
+    
+    //Create PersonalEvent table entry
+    const [persEvent] = await this.dbService.db
+      .insert(PersonalEvent)
+      .values({
+        UserID: userId,
+        eventID: event.eventID
+      }).returning();
 
-      case EventType.PERSONAL:
-        event = await this.createPersonalEvent(userId, dto);
-        return;
+    if (!persEvent) throw new InternalServerErrorException(`Failed to create personalEvent relationship for User[${userId}] | Event[${event.eventID}]`);
 
-    }//END_switch
+    return {event};
+  }//END_createPersonalEvent
 
+  //University owned
+  async createUniversityEvent(moduleId: string, dto: CreateEventDto): Promise<EventSingleResponseDto> {
 
+    //Create Event
+    const event = await this.createEvent(dto);
 
-    throw new NotImplementedException("sorry nhe");
-    // return await this.databaseService.db.transaction(
-    //   async (tx: AppDatabase) => {
-    //     const [newEvent] = await tx
-    //       .insert(Event)
-    //       .values({
-    //         userID: userId,
-    //         eventName: dto.name ?? null,
-    //         eventCode: dto.code ?? null,
-    //         eventCriteria: dto.eventCriteria ?? null,
-    //         isRecurring: dto.isRecurring ?? false,
-    //       })
-    //       .returning();
+    //Create University Event table entry
+    const [uniEvent] = await this.dbService.db
+      .insert(UniversityEvent)
+      .values({
+        moduleID: moduleId,
+        eventID: event.eventID
+      }).returning();
 
-    //     if (!newEvent)
-    //       throw new InternalServerErrorException('Event was not created');
+    if (!uniEvent) throw new InternalServerErrorException(`Failed to create University event for module[${moduleId}] | event[${event.eventID}]`);
 
-    //     const mappedEvent = {
-    //       ...newEvent,
-    //       name: newEvent.eventName ?? undefined,
-    //       code: newEvent.eventCode ?? undefined,
-    //     } as EventSingleResponseDto['event'];
-
-    //     if (criteria.type !== EventType.LECTURE) return { event: mappedEvent };
-
-    //     const lecture = await this.createLectureForEvent(
-    //       tx,
-    //       newEvent.eventID,
-    //       criteria,
-    //     );
-
-    //     return { event: mappedEvent, lecture };
-    //   },
-    // );
-  } //createEvent
-
+    return {event};
+  }//END_createUniversityEvent
+  //END_Create
+  
   //getAllEvents
-  async getAllEvents(userId: string): Promise<EventListResponseDto> {
-    const r = await this.databaseService.db
-      .select({
-        event: Event,
-        lecture: UniversityEvent,
+  async getAllEvents(filters: EventFiltersDto): Promise<EventListResponseDto> {
+    
+    const conditions: SQL[] = [];
+
+    //Personal events
+    if (filters.userId)
+      conditions.push(eq(PersonalEvent.UserID, filters.userId));
+
+    //University Owned events
+    if (filters.moduleId)
+      conditions.push(eq(UniversityEvent.moduleID, filters.moduleId));
+
+    if (conditions.length===0)
+      throw new BadRequestException('At least one filter required for getAll');
+
+    const events = await this.dbService.db
+      .selectDistinct({
+        eventID: Event.eventID,
+        eventName: Event.eventName,
+        eventCode: Event.eventCode,
+        eventCriteria: Event.eventCriteria,
+        isRecurring: Event.isRecurring
       })
       .from(Event)
       .leftJoin(UniversityEvent, eq(UniversityEvent.eventID, Event.eventID))
-      .where(eq(Event.userID, userId));
+      .leftJoin(PersonalEvent, eq(PersonalEvent.eventID, Event.eventID))
+      .where(and(...conditions));
 
-    return {
-      events: r.map((r) => ({
-        event: {
-          ...r.event,
-          name: r.event.eventName ?? undefined,
-          code: r.event.eventCode ?? undefined,
-        } as EventSingleResponseDto['event'],
-        ...(r.lecture ? { lecture: r.lecture } : {}),
-      })),
-    };
+    if (events.length===0)
+      throw new NotFoundException(`No events found for [${filters}]`);
+
+    return {events: events.map((event) => this.mapEventToDto(event))};
   } //getAllEvents
 
-  //getById
-  async getById(userId: string, eventId: number): Promise<EventSingleResponseDto> {
-    const [row] = await this.databaseService.db
-      .select({
-        event: Event,
-        lecture: UniversityEvent,
-      })
+  //getById - Shouldn't be changing again
+  async getById(eventId: string): Promise<EventSingleResponseDto> {
+    
+    const [event] = await this.dbService.db
+      .select()
       .from(Event)
-      .leftJoin(UniversityEvent, eq(UniversityEvent.eventID, Event.eventID))
-      .where(and(eq(Event.eventID, eventId), eq(Event.userID, userId)))
+      .where(eq(Event.eventID, eventId))
       .limit(1);
 
-    if (!row) throw new NotFoundException(`Event not found for id: ${eventId}`);
-
-    return {
-      event: {
-        ...row.event,
-        name: row.event.eventName ?? undefined,
-        code: row.event.eventCode ?? undefined,
-      } as EventSingleResponseDto['event'],
-      ...(row.lecture ? { lecture: row.lecture } : {}),
-    };
+    return {event: this.mapEventToDto(event)};
   } //getById
 
-  async updateEvent(
-    userId: string,
-    eventId: number,
-    dto: UpdateEventDto,
-  ): Promise<EventSingleResponseDto> {
+  async updateEvent(eventId: string,dto: UpdateEventDto):
+   Promise<EventSingleResponseDto> {
+
+    //Check that at least one field is provided
     const critUpdate =
       dto.eventCriteria && Object.keys(dto.eventCriteria).length > 0;
     const recUpdate = dto.isRecurring !== undefined;
-    const nameUpdate = dto.name !== undefined;
-    const codeUpdate = dto.code !== undefined;
+    const nameUpdate = dto.eventName !== undefined;
+    const codeUpdate = dto.eventCode !== undefined;
 
-    if (!critUpdate && !recUpdate && !nameUpdate && !codeUpdate) {
+    if (!critUpdate && !recUpdate && !nameUpdate && !codeUpdate) 
       throw new BadRequestException('At least one update field required');
-    }
+    //END_field presence check
 
-    return await this.databaseService.db.transaction(
+    const updatedEvent = await this.dbService.db.transaction(
       async (tx: AppDatabase) => {
-        const [exRow] = await tx
-          .select({
-            event: Event,
-            lecture: UniversityEvent,
-          })
-          .from(Event)
-          .leftJoin(UniversityEvent, eq(UniversityEvent.eventID, Event.eventID))
-          .where(and(eq(Event.eventID, eventId), eq(Event.userID, userId)))
-          .limit(1);
+        //Check that event exists        
+        const existingEvent = await this.getById(eventId);
 
-        if (!exRow)
-          throw new NotFoundException(
-            `Event not found for eventId: ${eventId}`,
-          );
+        if (!existingEvent)
+          throw new NotFoundException(`Event not found for eventId: ${eventId}`);
 
-        const exCriteria = exRow.event.eventCriteria ?? {};
+        //Fetch existing criteria
+        const existingCriteria = existingEvent.event.eventCriteria ?? {};
 
+        //overwrite existing fields if defined in dto
         const mergedCriteria = {
-          ...exCriteria,
-          ...dto.eventCriteria,
+          ...existingCriteria,
+          ...dto.eventCriteria
         };
 
-        if (mergedCriteria.type === null) delete mergedCriteria.type;
-
-        this.validateEventTypeCriteria(mergedCriteria);
-
-        const [updatedEvent] = await tx
+        const [event] = await tx
           .update(Event)
           .set({
-            ...(nameUpdate ? { eventName: dto.name?.trim() || null } : {}),
-            ...(codeUpdate ? { eventCode: dto.code?.trim() || null } : {}),
-            ...(critUpdate ? { eventCriteria: mergedCriteria } : {}),
-            ...(recUpdate ? { isRecurring: dto.isRecurring } : {}),
+            eventName: dto.eventName?.trim() ?? existingEvent.event.eventName,
+            eventCode: dto.eventCode?.trim() ?? existingEvent.event.eventCode,
+            eventCriteria: mergedCriteria,
+            isRecurring: dto.isRecurring ?? existingEvent.event.isRecurring
           })
-          .where(and(eq(Event.eventID, eventId), eq(Event.userID, userId)))
+          .where(eq(Event.eventID, eventId))
           .returning();
 
-        if (!updatedEvent)
-          throw new InternalServerErrorException('Event not updated');
+        if (!event)
+          throw new InternalServerErrorException(`Event[${eventId}] not updated`);
 
-        const mappedEvent = {
-          ...updatedEvent,
-          name: updatedEvent.eventName ?? undefined,
-          code: updatedEvent.eventCode ?? undefined,
-        } as EventSingleResponseDto['event'];
-
-        const lecture = await this.syncSubtypeForEvent(
-          tx,
-          updatedEvent.eventID,
-          mergedCriteria as EventCriteriaDto,
-          exRow.lecture,
-        );
-
-        return {
-          event: mappedEvent,
-          ...(lecture ? { lecture } : {}),
-        };
-      },
+        return event;
+      }//END_transaction
     );
-  } //udpate
 
-  async deleteEvent(
-    userId: string,
-    eventId: number,
-  ): Promise<DeleteResponseDto> {
-    const [existingEvent] = await this.databaseService.db
-      .select()
-      .from(Event)
-      .where(and(eq(Event.eventID, eventId), eq(Event.userID, userId)))
-      .limit(1);
+    return {event: this.mapEventToDto(updatedEvent)};
+  } //update
 
-    if (!existingEvent)
-      throw new NotFoundException(`Event not found for id: ${eventId}`);
+  //Delete event
+  async deleteEvent(eventId: string):
+   Promise<DeleteResponseDto> {
+ 
+    //fetch event
+    const existingEvent = await this.getById(eventId);
 
-    const [delEvent] = await this.databaseService.db
+    if (!existingEvent) throw new NotFoundException(`Event [${eventId}] doesn't exist`);
+
+    await this.dbService.db
       .delete(Event)
-      .where(and(eq(Event.eventID, eventId), eq(Event.userID, userId)))
-      .returning();
+      .where(eq(Event.eventID, eventId));
 
-    if (!delEvent)
-      throw new InternalServerErrorException('Event was not deleted');
-
-    return { success: true };
+    return {
+      eventName: existingEvent.event.eventName,
+      eventCode: existingEvent.event.eventCode,
+      success: true
+    };
   } //delete
 
   //=======================================================
   //🎅's Little Helpers
 
+  //Create simple event entity
+  private async createEvent(dto: CreateEventDto, userId?: string): Promise<EventDto> {
 
+    //Define fields
+    const eventCriteria = dto.eventCriteria;
 
-  private async createLectureForEvent(
-    tx: AppDatabase,
-    eventID: number,
-    criteria: NonNullable<CreateEventDto['eventCriteria']>,
-  ) {
-    const [mod] = await tx
-      .select()
-      .from(modules)
-      .where(eq(modules.moduleCode, criteria.moduleCode!))
-      .limit(1);
+    let eventName;
+    let eventCode;
+    let isRec;
 
-    if (!mod)
-      throw new NotFoundException(
-        `Module not found for code: ${criteria.moduleCode}`,
-      );
+    if (userId) {//Implies personal event fields are being created
 
-    const [lec] = await tx
-      .insert(UniversityEvent)
-      .values({
-        moduleID: mod.moduleID,
-        eventID: eventID,
-        venue: criteria.venue ?? null,
-      })
-      .returning();
+      eventName = dto.eventName ?? `Event_${userId.slice(0,20)}`;
+      eventCode = dto.eventCode ?? `Pers_Event`;
+      isRec = dto.isRecurring ?? false;//Personal events might not recur
+    } else {//Create University event fields
 
-    if (!lec) throw new InternalServerErrorException('Lecture not created');
-
-    return lec;
-  } //createLectureForEvent
-
-  //Validate EventCriteria
-  //If 
-  private validateEventTypeCriteria(
-    criteria: Partial<CreateEventDto['eventCriteria']>,
-    userID?: string
-  ) {
-    if (!criteria) throw new BadRequestException('Criteria required');
-
-    if (!criteria.type) return;
-
-    switch (criteria.type) {
-      case EventType.LECTURE:
-        if (!criteria.moduleID)
-          throw new BadRequestException('Lecture events need a moduleCode');
-        return;
-
-      case EventType.PERSONAL:
-        if (!userID) 
-          throw new BadRequestException('UserID required for personal event');
-        return;
-
-      default:
-        throw new BadRequestException(`Unsupported event type`);
-    }
-  } //validateEvetTypeCriteria
-
-  private async syncSubtypeForEvent(
-    tx: AppDatabase,
-    eventID: number,
-    criteria: NonNullable<CreateEventDto['eventCriteria']>,
-    existingLecture?: typeof UniversityEvent.$inferSelect | null,
-  ) {
-    if (!criteria.type) {
-      if (existingLecture)
-        await tx
-          .delete(UniversityEvent)
-          .where(eq(UniversityEvent.eventID, eventID));
-
-      return undefined;
-    } //END_type
-
-    switch (criteria.type) {
-      case EventType.LECTURE:
-        return await this.upsertLectureForEvent(
-          tx,
-          eventID,
-          criteria,
-          existingLecture,
-        );
-
-      default:
-        throw new BadRequestException(`Unsupported event type`);
-    }
-  } //sync
-
-  private async upsertLectureForEvent(
-    tx: AppDatabase,
-    eventID: number,
-    criteria: NonNullable<CreateEventDto['eventCriteria']>,
-    exLecture?: typeof UniversityEvent.$inferSelect | null,
-  ) {
-    if (!criteria.moduleCode)
-      throw new BadRequestException('Lecture events need moduleCode');
-
-    const [mod] = await tx
-      .select()
-      .from(modules)
-      .where(eq(modules.moduleCode, criteria.moduleCode))
-      .limit(1);
-
-    if (!mod) throw new NotFoundException(`Module not found for code`);
-
-    if (exLecture) {
-      const [lecture] = await tx
-        .update(UniversityEvent)
-        .set({
-          moduleID: mod.moduleID,
-          venue: criteria.venue ?? null,
-        })
-        .where(eq(UniversityEvent.eventID, eventID))
-        .returning();
-
-      if (!lecture)
-        throw new InternalServerErrorException('Lecture was not updated');
-
-      return lecture;
-    } //END_exLecture
-
-    const [lecture] = await tx
-      .insert(UniversityEvent)
-      .values({
-        moduleID: mod.moduleID,
-        eventID,
-        venue: criteria.venue ?? null,
-      })
-      .returning();
-
-    if (!lecture)
-      throw new InternalServerErrorException('Lecture was not created');
-
-    return lecture;
-  } //upsertLecture
-
-
-  //Specialised event creation functions
-  //Personal
-  private async createPersonalEvent(userId: string, dto: CreateEventDto): Promise<EventDto>{
-
-    const eventName = dto.eventName ?? `event_${userId.slice(0,20)}`;
-    const eventCode = dto.eventCode ?? `user_${userId.slice(0,5)}`;
-    const isRec = dto.isRecurring ?? false;
+      eventName = dto.eventName ?? `Event_For_Uni}`;
+      eventCode = dto.eventCode ?? `Uni_Event`;
+      isRec = dto.isRecurring ?? true;//University events usually recur
+    }//END_if-else
 
     const [event] = await this.dbService.db
       .insert(Event)
       .values({
         eventName: eventName,
         eventCode: eventCode,
-        eventCriteria: dto.eventCriteria,
+        eventCriteria: eventCriteria,
         isRecurring: isRec
       }).returning();
 
-      if (!event) throw new InternalServerErrorException('Failed to create personal event');
+      if (!event) throw new InternalServerErrorException(`Failed to create event Name[${eventName}] | Code[${eventCode}]`);
+    
+      return this.mapEventToDto(event);
+  }//END_createEvent
 
-      return event;
-  }//createPersonalEvent
+  //Map an event to the DTO - idk why this is even necessary but I kept getting type errors when returning an event which is literally fetched straight from the database
+  private mapEventToDto(event: typeof Event.$inferSelect): EventDto {
 
+    return {
+      eventID: event.eventID,
+      eventName: event.eventName,
+      eventCode: event.eventCode ?? undefined,
+      eventCriteria: event.eventCriteria as EventCriteriaDto,
+      isRecurring: event.isRecurring
+    };
+  }//END_mapEventToDto
 } //EventService

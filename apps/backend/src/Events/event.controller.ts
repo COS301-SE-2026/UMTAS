@@ -12,10 +12,10 @@ import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import {
   CreateEventDto,
-  EventResponseDto,
+  EventSingleResponseDto,
   EventListResponseDto,
   UpdateEventDto,
-  DeleteResponseDto,
+  DeleteResponseDto
 } from './dto/EventDto.dto';
 
 import { EventService } from './event.service';
@@ -68,9 +68,9 @@ export class EventController {
   createPersonalEvent(
     @CurrentSession() session: SessionData,
     @Body() dto: CreateEventDto
-  ): Promise<EventResponseDto> {
+  ): Promise<EventSingleResponseDto> {
 
-    return this.service.createPersonalEvent(session.user.id,dto);
+    return this.service.createPersonalEvent(session.user.id, dto);
   }//END_CreatePersonalEvent
 
   //Create University Owned event
@@ -78,7 +78,7 @@ export class EventController {
   createUniversityEvent(
     @Param('moduleId') moduleId: string,
     @Body() dto: CreateEventDto
-  ): Promise<EventResponseDto> {
+  ): Promise<EventSingleResponseDto> {
 
     return this.service.createUniversityEvent(moduleId, dto);
   }//END_CreateUniversityEvent

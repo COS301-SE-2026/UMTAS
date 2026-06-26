@@ -36,23 +36,6 @@ export class EventDto {
   @IsUUID()
   eventID!: string;
 
-  @ApiPropertyOptional({
-    example: 'event name',
-    required: true,
-    description: 'Descriptive name for the event'
-  })
-  @IsString()
-  @Length(1, 32)
-  eventName!: string;
-
-  @ApiPropertyOptional({
-    example: 'lec1',
-  })
-  @IsOptional()
-  @IsString()
-  @Length(1, 10)
-  eventCode?: string | null;
-
   @ApiProperty({ 
     type: EventCriteriaDto,
     description: 'Defines the additional information to attach to event entity'
@@ -61,6 +44,24 @@ export class EventDto {
   @ValidateNested()
   @Type(() => EventCriteriaDto)
   eventCriteria!: EventCriteriaDto;
+
+  @ApiPropertyOptional({
+    example: 'event name',
+    required: true,
+    description: 'Descriptive name for the event'
+  })
+  @IsOptional()
+  @IsString()
+  @Length(1, 32)
+  eventName?: string;
+
+  @ApiPropertyOptional({
+    example: 'lec1',
+  })
+  @IsOptional()
+  @IsString()
+  @Length(1, 10)
+  eventCode?: string | null;
 
   @ApiPropertyOptional({ 
     example: true, 
@@ -74,7 +75,7 @@ export class EventDto {
 }//EventDto
 
 //Create Event
-class CreateEventDto extends PickType(EventDto, ['eventName', 'eventCode', 'eventCriteria', 'isRecurring'] as const) {}
+export class CreateEventDto extends PickType(EventDto, ['eventName', 'eventCode', 'eventCriteria', 'isRecurring'] as const) {}
 
   // //Personal
   // export class CreatePersonalEventDto extends CreateEventDto {}
@@ -124,3 +125,23 @@ export class DeleteResponseDto extends PickType(EventDto, ['eventName', 'eventCo
   })
   success!: boolean;
 } //DeleteResponseDto
+
+//GetAll filters
+export class EventFiltersDto {
+
+  @ApiPropertyOptional({
+    description: 'Filter by user ID - return all personal events',
+    example: '550e8400-e29b-41d4-a716-446655440000'
+  })
+  @IsOptional()
+  @IsUUID()
+  userId?: string;
+
+  @ApiPropertyOptional({
+    description: 'Filter by module ID - returns all events for module',
+    example: '550e8400-e29b-41d4-a716-446655440000'
+  })
+  @IsOptional()
+  @IsUUID()
+  moduleId?: string;
+}//ModuleFiltersDto
