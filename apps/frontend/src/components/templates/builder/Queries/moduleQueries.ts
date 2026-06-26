@@ -17,8 +17,7 @@ export function getAllModulesQ() {
 export function addModuleMut() {
   return mutationOptions({
     mutationFn: async () => {
-      console.log("req sent");
-      const nextNum = Math.round(Math.random() * 10);
+      const nextNum = Math.round(Math.random() * 1000);
       const builder = new createModulesBuilder();
       return await builder.send({
         body: {
@@ -29,7 +28,6 @@ export function addModuleMut() {
       });
     },
     onSuccess: () => {
-      console.log("req was successful");
       getQueryClient().invalidateQueries({
         queryKey: getAllModulesQ().queryKey,
       });
