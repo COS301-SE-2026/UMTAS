@@ -3,7 +3,6 @@ default:
 
 # combine dev into easy to use profile
 dev:
-    just dev-infra
     just sync
     just both
 
@@ -33,6 +32,19 @@ sync:
     pnpm install
     phase run -- pnpm --filter backend db:generate
     phase run -- pnpm --filter backend db:migrate
+
+# shared proxy stack
+proxy-up:
+    phase run -- docker compose -f docker-compose.traefik.yml up -d --remove-orphans
+
+proxy-down:
+    phase run -- docker compose -f docker-compose.traefik.yml down
+
+staging-up:
+    phase run -- docker compose -f docker-compose.staging.yml up -d --remove-orphans
+
+staging-down:
+    phase run -- docker compose -f docker-compose.staging.yml down
 
 # cicd for runners
 
@@ -66,25 +78,28 @@ ci:
 prod-db-backup:
     @echo "Creating database backup..."
     mkdir -p ./backups
-    docker compose -f docker-compose.yml -f docker-compose.prod.yml exec -T postgres pg_dumpall -U postgres > ./backups/prod_backup_$(date +%F_%H%M%S).sql
+    phase run --env production -- docker compose -f docker-compose.prod.yml exec -T postgres sh -lc 'PGPASSWORD="$$POSTGRES_PASSWORD" pg_dump -U "$$POSTGRES_USER" "$$POSTGRES_DB"' > ./backups/prod_backup_$(date +%F_%H%M%S).sql
 
-# start prod to specific tag
-prod-server-up TAG="latest":
-    TAG={{TAG}} docker compose -f docker-compose.yml -f docker-compose.prod.yml --profile server up -d
+# start prod to specific release tag
+prod-up release_tag:
+    phase run --env production -- env IMAGE_TAG={{release_tag}} docker compose -f docker-compose.prod.yml up -d --remove-orphans
+
+prod-down:
+    phase run --env production -- docker compose -f docker-compose.prod.yml down
 
 # execute migrations on prod
 prod-migrate:
-    docker compose -f docker-compose.yml -f docker-compose.prod.yml exec -T backend pnpm run db:migrate
+    phase run --env production -- docker compose -f docker-compose.prod.yml exec -T backend npx drizzle-kit migrate
 
 # manual prod deployment
 
 # deploy specific version
-deploy-prod TAG:
+deploy-prod release_tag:
     just prod-db-backup
-    just prod-server-up {{TAG}}
-    just prod-migrate
-    @echo "Production successfully deployed version {{TAG}}"
+    just prod-up {{release_tag}}
+    @echo "Production successfully deployed version {{release_tag}}"
 
+<<<<<<< HEAD
 # rollback to specific tag
 rollback-prod PREVIOUS_TAG:
     @echo "Rolling back production to version {{PREVIOUS_TAG}}..."
@@ -107,3 +122,13 @@ studio:
 
 
 ############################## END_Backend specific
+=======
+# rollback to specific tag 
+rollback-prod previous_tag:
+    @echo "Rolling back production to version {{previous_tag}}..."
+    just prod-up {{previous_tag}}
+    @echo "Rollback complete. Production is now running {{previous_tag}}"
+
+docs:
+    mkdocs serve
+>>>>>>> origin/dev

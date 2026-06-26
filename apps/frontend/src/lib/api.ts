@@ -769,9 +769,9 @@ export interface components {
     UpdateEventCriteriaDto: {
       /**
        * @example lecture
-       * @enum {string}
+       * @enum {string|null}
        */
-      type?: "lecture";
+      type?: "lecture" | null;
       /** @example Tuesday */
       day?: string;
       /** @example 10:30 */
@@ -817,7 +817,7 @@ export interface components {
        *       3
        *     ]
        */
-      eventIds?: string[];
+      eventIds?: number[];
     };
     TimetableDto: {
       /** @example 1 */
@@ -837,7 +837,7 @@ export interface components {
        *       3
        *     ]
        */
-      eventIds?: string[];
+      eventIds?: number[];
     };
     TimetableListResponseDto: {
       /** @description List of timetables with their linked event IDs */
@@ -856,7 +856,7 @@ export interface components {
        *       5
        *     ]
        */
-      addEventIds?: string[];
+      addEventIds?: number[];
       /**
        * @description Event IDs to unlink from the timetable
        * @example [
@@ -864,7 +864,7 @@ export interface components {
        *       2
        *     ]
        */
-      removeEventIds?: string[];
+      removeEventIds?: number[];
     };
     DeleteTimetableResponseDto: {
       /** @example true */

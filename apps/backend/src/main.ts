@@ -24,15 +24,15 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   const port = process.env.PORT ?? 3001;
 
-  if (process.env.NODE_ENV !== 'production') {
-    const dbService = app.get(DatabaseService);
-    if (dbService.dbMode !== DB_MODES.PGLITE) {
-      await migrate(dbService.db as NodePgDatabase<typeof schema>, {
-        migrationsFolder: join(__dirname, '..', 'drizzle'),
-      });
-      console.log('[STARTUP] Database migrations applied');
-    }
+  // if (process.env.NODE_ENV !== 'production') {
+  const dbService = app.get(DatabaseService);
+  if (dbService.dbMode !== DB_MODES.PGLITE) {
+    await migrate(dbService.db as NodePgDatabase<typeof schema>, {
+      migrationsFolder: join(__dirname, '..', 'drizzle'),
+    });
+    console.log('[STARTUP] Database migrations applied');
   }
+  // }
 
   app.enableCors({
     origin: [

@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { string } from 'better-auth';
+import { Type } from 'class-transformer';
 import {
   IsOptional,
   IsString,
@@ -20,11 +20,13 @@ export class CreateTimetableDto {
   timetableName?: string;
 
   @ApiPropertyOptional({
+    type: [Number],
     example: [1, 2, 3],
     description: 'Event IDs to attach on creation',
   })
   @IsOptional()
   @IsArray()
+  @Type(() => Number)
   @IsInt({ each: true })
   @ArrayUnique()
   eventIds?: string[];
@@ -41,6 +43,7 @@ export class UpdateTimetableDto {
   timetableName?: string;
 
   @ApiPropertyOptional({
+    type: [Number],
     example: [4, 5],
     description: 'Event IDs to link to the timetable',
   })
@@ -51,6 +54,7 @@ export class UpdateTimetableDto {
   addEventIds?: string[];
 
   @ApiPropertyOptional({
+    type: [Number],
     example: [1, 2],
     description: 'Event IDs to unlink from the timetable',
   })
@@ -88,6 +92,7 @@ export class TimetableResponseDto {
   timetable!: TimetableDto;
 
   @ApiPropertyOptional({
+    type: [Number],
     example: [1, 2, 3],
     description: 'IDs of events linked to this timetable',
   })

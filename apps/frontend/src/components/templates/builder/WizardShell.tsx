@@ -1,19 +1,13 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { WizardStepper } from "@/components/atoms/builder/WizardStepper";
 import { WizardFooter } from "@/components/atoms/builder/WizardFooter";
 import { ModulesStep } from "@/components/organisms/builder/ModulesStep";
 import { EventsStep } from "@/components/organisms/builder/EventsStep";
 import { GenerateStep } from "@/components/organisms/builder/GenerateStep";
-import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
-import {
-  createModulesBuilder,
-  getAllModulesBuilder,
-  deleteModulesById,
-  updateModulesBuilder,
-} from "@/app/builder/utils/modules/requestBuilders";
+import { getAllModulesBuilder } from "@/app/builder/utils/modules/requestBuilders";
 import {
   getAllEventsBuilder,
   createEventsBuilder,
@@ -21,7 +15,15 @@ import {
   updateEventByID,
   type EventResponse,
 } from "@/app/builder/utils/events/eventRequestBuilder";
-import { createTimeTableBuilder } from "@/app/builder/utils/timetables/TimeTableRequests";
+import {
+  createTimeTableBuilder,
+  getTTbyIdBuilder,
+  updateTTbyIDBuilder,
+} from "@/app/builder/utils/timetables/TimeTableRequests";
+
+import { getAllModulesQ } from "./Queries/moduleQueries";
+import { getQueryClient } from "@/components/tanstack/getQueryClient";
+import { useQuery } from "@tanstack/react-query";
 
 const Steps = [
   { label: "Modules" },
@@ -39,78 +41,24 @@ function generateId(): string {
 
 export function WizardShell() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const editId = searchParams.get("editId");
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
-  const [modules, setModules] = useState<ModuleResponseDto[]>([]);
+
+  const {
+    data: modules = [],
+    isLoading: modLoading,
+    isError: modError,
+  } = useQuery(getAllModulesQ());
+
   const [events, setEvents] = useState<EventResponse[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [modulesTrigger, setModulesTrigger] = useState(0);
   const [eventsTrigger, setEventsTrigger] = useState(0);
-
-  async function handleModuleAdd() {
-    try {
-      const nextNum = modules.length + 1;
-      const builder = new createModulesBuilder();
-      await builder.send({
-        body: {
-          code: `MOD-${nextNum}`,
-          name: `Module ${nextNum}`,
-          styling: "#3B82F6",
-        },
-      });
-      setModulesTrigger((prev) => prev + 1);
-    } catch (error) {
-      console.error("Failed to create module:", error);
-    }
-  }
-
-  async function handleModuleUpdate(
-    id: number,
-    field: keyof Omit<ModuleResponseDto, "moduleID" | "userID"> | "confirm",
-    value: string,
-  ) {
-    if (field === "confirm") {
-      const targetModule = modules.find((m) => m.moduleID === id);
-      if (!targetModule) return;
-
-      try {
-        const builder = new updateModulesBuilder();
-        await builder.send({
-          paths: { moduleId: id },
-          body: {
-            code: targetModule.moduleCode,
-            name: targetModule.moduleName,
-            styling: targetModule.styling || undefined,
-          },
-        });
-        setModulesTrigger((prev) => prev + 1);
-      } catch (error) {
-        console.error("Failed to update module:", error);
-      }
-      return;
-    }
-
-    setModules((prev) =>
-      prev.map((m) => {
-        if (m.moduleID === id) {
-          return { ...m, [field]: value };
-        }
-        return m;
-      }),
-    );
-  }
-
-  async function handleModuleRemove(id: number) {
-    try {
-      const builder = new deleteModulesById();
-      await builder.send({
-        paths: { moduleId: id },
-      });
-      setModulesTrigger((prev) => prev + 1);
-    } catch (error) {
-      console.error("Failed to delete module:", error);
-    }
-  }
+  const [isInitialLoading, setIsInitialLoading] = useState(!!editId);
+  const [selectedEventIds, setSelectedEventIds] = useState<number[]>([]);
+  const [OGeventId, setOGeventId] = useState<string[]>([]);
+  const [timetableName, setTimetableName] = useState("My New Schedule");
 
   function handleEventAdd() {
     const newEventId = Number(generateId());
@@ -272,23 +220,42 @@ export function WizardShell() {
       setCurrentStep(currentStep - 1);
     }
   }
-
   async function handleGenerate(name: string, selectedEventIds: number[]) {
     setIsGenerating(true);
     try {
-      const numbersOnlyEvents = selectedEventIds.map((id) =>
+      const finalEvents = selectedEventIds.map((id) =>
         parseInt(String(id), 10),
       );
-      const builder = new createTimeTableBuilder();
-      await builder.send({
-        body: {
-          timetableName: name || "Generated Schedule",
-          //there is a mismtach between frontend and backend. backend wants number but frontend uses string. this works but a better fix might be needed
-          eventIds: numbersOnlyEvents as unknown as string[],
-        },
-      });
 
-      router.push("/schedules");
+      if (editId) {
+        const noNumIds = OGeventId.map(Number).filter(
+          (id) => !selectedEventIds.includes(id),
+        );
+
+        const numbersOnlyAddIds = selectedEventIds.filter(
+          (id) => !OGeventId.map(Number).includes(id),
+        );
+
+        const builder = new updateTTbyIDBuilder();
+        await builder.send({
+          paths: { id: Number(editId) },
+          body: {
+            timetableName: name || "Updated Schedule",
+            removeEventIds: noNumIds,
+            addEventIds: numbersOnlyAddIds,
+          },
+        });
+      } else {
+        const builder = new createTimeTableBuilder();
+        await builder.send({
+          body: {
+            timetableName: name || "Generated Schedule",
+            eventIds: finalEvents,
+          },
+        });
+      }
+
+      window.location.href = "/schedules";
     } catch (error) {
       console.error("Failed to generate timetable:", error);
       setIsGenerating(false);
@@ -331,46 +298,69 @@ export function WizardShell() {
     }
     return false;
   }
-  useEffect(() => {
-    if (currentStep === 0) {
-      const fetchModules = async () => {
-        try {
-          const builder = new getAllModulesBuilder();
-          const response = await builder.send({});
-          setModules(response.modules);
-        } catch (error) {
-          console.error("Failed to fetch modules:", error);
-        }
-      };
-      fetchModules();
-    }
-  }, [currentStep, modulesTrigger]);
 
   useEffect(() => {
-    if (currentStep === 1) {
+    if (currentStep === 1 || editId) {
       const fetchEvents = async () => {
         try {
           const builder = new getAllEventsBuilder();
           const response = await builder.send({});
           setEvents(response.events);
+
+          if (!editId) {
+            setSelectedEventIds(response.events.map((e) => e.event.eventID));
+          }
         } catch (error) {
           console.error("Failed to fetch events:", error);
         }
       };
       fetchEvents();
     }
-  }, [currentStep, eventsTrigger]);
+  }, [currentStep, eventsTrigger, editId]);
+
+  useEffect(() => {
+    if (!editId) return;
+
+    async function loadAllEditData() {
+      try {
+        const [timetableRes, modulesRes, eventsRes] = await Promise.all([
+          //prevents opening on step 0 (modules)
+          new getTTbyIdBuilder().send({
+            paths: { id: editId as unknown as number },
+          }),
+          new getAllModulesBuilder().send({}),
+          new getAllEventsBuilder().send({}),
+        ]);
+
+        getQueryClient().setQueryData(
+          getAllModulesQ().queryKey,
+          modulesRes.modules,
+        );
+
+        setEvents(eventsRes.events);
+
+        setTimetableName(
+          timetableRes.timetable.timetableName || "Updated Schedule",
+        );
+
+        setOGeventId((timetableRes.eventIds || []).map(String));
+        setSelectedEventIds((timetableRes.eventIds || []).map(Number));
+
+        setCompletedSteps([0, 1]);
+        setCurrentStep(2);
+      } catch (error) {
+        console.error("Failed to load timetable dataset for editing:", error);
+      } finally {
+        setIsInitialLoading(false);
+      }
+    }
+
+    loadAllEditData();
+  }, [editId]);
 
   function renderStep() {
     if (currentStep === 0) {
-      return (
-        <ModulesStep
-          modules={modules}
-          onAdd={handleModuleAdd}
-          onUpdate={handleModuleUpdate}
-          onRemove={handleModuleRemove}
-        />
-      );
+      return <ModulesStep modules={modules} />;
     }
     if (currentStep === 1) {
       return (
@@ -390,7 +380,20 @@ export function WizardShell() {
         events={events}
         onGenerate={handleGenerate}
         isGenerating={isGenerating}
+        isEditMode={!!editId}
+        timetableName={timetableName}
+        setTimetableName={setTimetableName}
+        selectedEventIds={selectedEventIds}
+        setSelectedEventIds={setSelectedEventIds}
       />
+    );
+  }
+
+  if (isInitialLoading) {
+    return (
+      <div className="flex items-center justify-center p-20 text-[var(--text-secondary)]">
+        Loading timetable
+      </div>
     );
   }
 

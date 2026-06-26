@@ -120,7 +120,7 @@ describe("TimetableRequest Integration test", () => {
     const createdTimetable = await timetableBuilder.send({
       body: {
         timetableName: "Integration Test Timetable",
-        eventIds: [String(eventId)],
+        eventIds: [eventId],
       },
     });
 
