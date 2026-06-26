@@ -40,7 +40,7 @@ Distributing the system across subdomains routed by a single reverse proxy enabl
     Currently, our entire infrastructure (API, database, storage, solver) shares one server. A hardware or OS failure results in total system downtime, which is one of the main reasons why multiple ingress controllers would ultimately just shift the point of failure on one server. 
     
     **Plan:** We are planning to move to a two server architecture. 
-    **Redundancy:** Depending on client feedback and resources having a multi-server architecture is one of the main points that could give us not just software redundancy but software redundancy.
+    **Redundancy:** Depending on client feedback and resources having a multi-server architecture is one of the main points that could give us not just software redundancy but hardware redundancy.
 
 ??? failure "Single Ingress Controller"
     
