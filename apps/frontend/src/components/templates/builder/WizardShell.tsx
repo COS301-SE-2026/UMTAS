@@ -7,13 +7,7 @@ import { WizardFooter } from "@/components/atoms/builder/WizardFooter";
 import { ModulesStep } from "@/components/organisms/builder/ModulesStep";
 import { EventsStep } from "@/components/organisms/builder/EventsStep";
 import { GenerateStep } from "@/components/organisms/builder/GenerateStep";
-import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
-import {
-  createModulesBuilder,
-  getAllModulesBuilder,
-  deleteModulesById,
-  updateModulesBuilder,
-} from "@/app/builder/utils/modules/requestBuilders";
+import { getAllModulesBuilder } from "@/app/builder/utils/modules/requestBuilders";
 import {
   getAllEventsBuilder,
   createEventsBuilder,
@@ -26,6 +20,10 @@ import {
   getTTbyIdBuilder,
   updateTTbyIDBuilder,
 } from "@/app/builder/utils/timetables/TimeTableRequests";
+
+import { getAllModulesQ } from "./Queries/moduleQueries";
+import { getQueryClient } from "@/components/tanstack/getQueryClient";
+import { useQuery } from "@tanstack/react-query";
 
 const Steps = [
   { label: "Modules" },
@@ -47,80 +45,20 @@ export function WizardShell() {
   const editId = searchParams.get("editId");
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
-  const [modules, setModules] = useState<ModuleResponseDto[]>([]);
+
+  const {
+    data: modules = [],
+    isLoading: modLoading,
+    isError: modError,
+  } = useQuery(getAllModulesQ());
+
   const [events, setEvents] = useState<EventResponse[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [modulesTrigger, setModulesTrigger] = useState(0);
   const [eventsTrigger, setEventsTrigger] = useState(0);
   const [isInitialLoading, setIsInitialLoading] = useState(!!editId);
   const [selectedEventIds, setSelectedEventIds] = useState<number[]>([]);
   const [OGeventId, setOGeventId] = useState<string[]>([]);
   const [timetableName, setTimetableName] = useState("My New Schedule");
-
-  async function handleModuleAdd() {
-    try {
-      const nextNum = modules.length + 1;
-      const builder = new createModulesBuilder();
-      await builder.send({
-        body: {
-          code: `MOD-${nextNum}`,
-          name: `Module ${nextNum}`,
-          styling: "#3B82F6",
-        },
-      });
-      setModulesTrigger((prev) => prev + 1);
-    } catch (error) {
-      console.error("Failed to create module:", error);
-    }
-  }
-
-  async function handleModuleUpdate(
-    id: number,
-    field: keyof Omit<ModuleResponseDto, "moduleID" | "userID"> | "confirm",
-    value: string,
-  ) {
-    if (field === "confirm") {
-      const targetModule = modules.find((m) => m.moduleID === id);
-      if (!targetModule) return;
-
-      try {
-        const builder = new updateModulesBuilder();
-        await builder.send({
-          paths: { moduleId: id },
-          body: {
-            code: targetModule.moduleCode,
-            name: targetModule.moduleName,
-            styling: targetModule.styling || undefined,
-          },
-        });
-        setModulesTrigger((prev) => prev + 1);
-      } catch (error) {
-        console.error("Failed to update module:", error);
-      }
-      return;
-    }
-
-    setModules((prev) =>
-      prev.map((m) => {
-        if (m.moduleID === id) {
-          return { ...m, [field]: value };
-        }
-        return m;
-      }),
-    );
-  }
-
-  async function handleModuleRemove(id: number) {
-    try {
-      const builder = new deleteModulesById();
-      await builder.send({
-        paths: { moduleId: id },
-      });
-      setModulesTrigger((prev) => prev + 1);
-    } catch (error) {
-      console.error("Failed to delete module:", error);
-    }
-  }
 
   function handleEventAdd() {
     const newEventId = Number(generateId());
@@ -360,20 +298,6 @@ export function WizardShell() {
     }
     return false;
   }
-  useEffect(() => {
-    if (currentStep === 0 || editId) {
-      const fetchModules = async () => {
-        try {
-          const builder = new getAllModulesBuilder();
-          const response = await builder.send({});
-          setModules(response.modules);
-        } catch (error) {
-          console.error("Failed to fetch modules:", error);
-        }
-      };
-      fetchModules();
-    }
-  }, [currentStep, modulesTrigger, editId]);
 
   useEffect(() => {
     if (currentStep === 1 || editId) {
@@ -408,7 +332,11 @@ export function WizardShell() {
           new getAllEventsBuilder().send({}),
         ]);
 
-        setModules(modulesRes.modules);
+        getQueryClient().setQueryData(
+          getAllModulesQ().queryKey,
+          modulesRes.modules,
+        );
+
         setEvents(eventsRes.events);
 
         setTimetableName(
@@ -432,14 +360,7 @@ export function WizardShell() {
 
   function renderStep() {
     if (currentStep === 0) {
-      return (
-        <ModulesStep
-          modules={modules}
-          onAdd={handleModuleAdd}
-          onUpdate={handleModuleUpdate}
-          onRemove={handleModuleRemove}
-        />
-      );
+      return <ModulesStep modules={modules} />;
     }
     if (currentStep === 1) {
       return (
