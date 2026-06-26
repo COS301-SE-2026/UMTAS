@@ -7,8 +7,6 @@ import {
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
 import { mutationOptions, queryOptions } from "@tanstack/react-query";
 
-import { randomInt } from "node:crypto";
-
 export function getAllModulesQ() {
   return queryOptions({
     queryKey: ["modules"] as const,
@@ -19,7 +17,8 @@ export function getAllModulesQ() {
 export function addModuleMut() {
   return mutationOptions({
     mutationFn: async () => {
-      const nextNum = randomInt(999);
+      console.log("req sent");
+      const nextNum = Math.round(Math.random() * 10);
       const builder = new createModulesBuilder();
       return await builder.send({
         body: {
@@ -30,10 +29,12 @@ export function addModuleMut() {
       });
     },
     onSuccess: () => {
+      console.log("req was successful");
       getQueryClient().invalidateQueries({
         queryKey: getAllModulesQ().queryKey,
       });
     },
+    onError: (err) => console.error("mutation failed", err),
   });
 }
 
@@ -54,6 +55,7 @@ export function removeModuleMut() {
         queryKey: getAllModulesQ().queryKey,
       });
     },
+    onError: (err) => console.error("mutation failed", err),
   });
 }
 
@@ -80,5 +82,6 @@ export function updateModuleMut() {
         queryKey: getAllModulesQ().queryKey,
       });
     },
+    onError: (err) => console.error("mutation failed", err),
   });
 }

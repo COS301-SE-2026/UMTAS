@@ -17,16 +17,15 @@ import {
   AlertDialogCancel,
 } from "@/components/atoms/baseShadcn/alert-dialog";
 import { Button } from "@/components/atoms/baseShadcn/button";
-import {
-  deleteModulesById,
-  ModuleResponseDto,
-} from "@/app/builder/utils/modules/requestBuilders";
+import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
 import { useMutation } from "@tanstack/react-query";
 import {
   addModuleMut,
+  getAllModulesQ,
   removeModuleMut,
   updateModuleMut,
 } from "@/components/templates/builder/Queries/moduleQueries";
+import { getQueryClient } from "@/components/tanstack/getQueryClient";
 
 interface ModulesStepProps {
   modules: ModuleResponseDto[];
@@ -62,8 +61,7 @@ export function ModulesStep({ modules }: ModulesStepProps) {
   const [isDirty, setIsDirty] = useState(false);
   const [showGuard, setShowGuard] = useState(false);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
-  const [snapshot, setSnapshot] = useState<ModuleResponseDto | null>(null);
-  const [isConfirming, setIsConfirming] = useState(false);
+
   const addModule = useMutation(addModuleMut());
   const deleteModule = useMutation(removeModuleMut());
   const updateModule = useMutation(updateModuleMut());
@@ -76,13 +74,26 @@ export function ModulesStep({ modules }: ModulesStepProps) {
     action();
   }
 
+  function handleModuleUpdate(
+    id: number,
+    field: keyof ModuleResponseDto,
+    value: string,
+  ) {
+    setIsDirty(true);
+
+    getQueryClient().setQueryData(
+      getAllModulesQ().queryKey,
+      (old?: ModuleResponseDto[]) => {
+        return old?.map((mod) =>
+          mod.moduleID === id ? { ...mod, [field]: value } : mod,
+        );
+      },
+    );
+  }
   function handleGuardConfirm() {
-    if (snapshot) {
-      // need to confirm what this does
-    }
     setIsDirty(false);
     setShowGuard(false);
-    setSnapshot(null);
+
     if (pendingAction) {
       pendingAction();
       setPendingAction(null);
@@ -102,9 +113,6 @@ export function ModulesStep({ modules }: ModulesStepProps) {
 
     function doSelect() {
       const selected = modules.find((m) => m.moduleID === id);
-      if (selected) {
-        setSnapshot({ ...selected });
-      }
       setSelectedId(id);
       setIsDirty(false);
     }
@@ -113,7 +121,7 @@ export function ModulesStep({ modules }: ModulesStepProps) {
   }
 
   async function handleConfirm(id: number) {
-    if (isConfirming) return;
+    if (updateModule.isPending) return;
     const lectureModule = modules.find((m) => m.moduleID === id);
     if (!lectureModule) return;
 
@@ -124,7 +132,6 @@ export function ModulesStep({ modules }: ModulesStepProps) {
       return;
     }
 
-    setIsConfirming(true);
     try {
       updateModule.mutate({
         moduleID: id,
@@ -142,12 +149,9 @@ export function ModulesStep({ modules }: ModulesStepProps) {
         return next;
       });
       setIsDirty(false);
-      setSnapshot(null);
       setSelectedId(null);
     } catch (error) {
       console.error("Failed to confirm module:", error);
-    } finally {
-      setIsConfirming(false);
     }
   }
 
@@ -207,7 +211,7 @@ export function ModulesStep({ modules }: ModulesStepProps) {
             type="button"
             variant="ghost"
             size="icon"
-            onClick={() => deleteModule.mutate(selectedId)}
+            onClick={() => deleteModule.mutate(module.moduleID)}
             disabled={deleteModule.isPending}
             aria-label={"Remove module " + (index + 1)}
             className="h-10 w-10 flex-shrink-0 border border-[var(--border)] text-[var(--text-secondary)] transition-colors duration-[var(--duration-fast)] hover:border-[var(--error-text)] hover:text-[var(--error-text)] hover:bg-transparent disabled:opacity-50 disabled:cursor-not-allowed"
@@ -219,18 +223,22 @@ export function ModulesStep({ modules }: ModulesStepProps) {
         {/* inline edit form */}
         {isSelected && (
           <div className="flex flex-col gap-2 pl-2">
-            <ModuleCard module={module} onUpdate={() => {}} errors={errors} />
+            <ModuleCard
+              module={module}
+              onUpdate={handleModuleUpdate}
+              errors={errors}
+            />
             {/* confirm button */}
             <Button
               type="button"
               variant="outline"
               onClick={() => handleConfirm(module.moduleID)}
-              disabled={isConfirming}
+              disabled={updateModule.isPending}
               aria-label="Confirm module"
               className="w-full gap-2 border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-primary)] transition-colors duration-[var(--duration-fast)] hover:bg-[var(--bg-elevated)] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <CheckCircle size={16} strokeWidth={1.5} />
-              {isConfirming ? "Confirming..." : "Confirm"}
+              {updateModule.isPending ? "Confirming..." : "Confirm"}
             </Button>
           </div>
         )}
@@ -280,7 +288,7 @@ export function ModulesStep({ modules }: ModulesStepProps) {
 
       <button
         type="button"
-        onClick={() => addModule.mutate}
+        onClick={() => addModule.mutate()}
         disabled={addModule.isPending}
         className="mt-4 flex w-full items-center gap-3 rounded-lg border border-dashed border-[var(--border)] px-4 py-4 text-left text-base text-[var(--text-secondary)] transition-colors duration-[var(--duration-fast)] hover:border-[var(--text-secondary)] hover:text-[var(--text-primary)] disabled:opacity-50 disabled:cursor-not-allowed"
       >
