@@ -12,6 +12,20 @@ Staging and Production share the same host infrastructure to optimise costs but 
 !!! success "3 Distinct Environments"
     Three distinct environments are defined. The `main` branch automatically deploys to the Staging environment via Watchtower, while Production requires a manual trigger via github actions.
 
+## GitHub Environments
+
+To strictly control our CI/CD pipelines, approvals, and context, UMTAS maps the deployment pipeline to three distinct **GitHub Environments**:`Staging`, and `Production`. These environments act as gatekeepers for our deployment workflows.
+
+
+* **Staging:** Tied directly to the `main` branch. Merges to `main` trigger GitHub Actions to build and push the `latest` Docker images, which are then autonomously picked up by Watchtower on the server.
+* **Production:** Heavily protected to prevent accidental deployments. Deployments to this environment are triggered manually via GitHub Actions and require explicit approval. This guarantees that live user data is only ever touched during planned release windows.
+
+### Github Environments
+
+<figure markdown="span">
+  <img src="../gh.png" alt="GitHub Environment Secrets" width="800">
+  <figcaption>Fig 2. Screenshot of our Environment Parity on Github</figcaption>
+</figure>
 
 ### Environment Configurations
 
