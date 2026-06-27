@@ -38,6 +38,7 @@ plugins:
   - git-revision-date-localized:
       enable_creation_date: true
       type: timeago
+      fallback_to_build_date: true
 
 markdown_extensions:
   - md_in_html
@@ -61,28 +62,29 @@ markdown_extensions:
 nav:
   - Home: index.md
   - Marking Guide: management/Marking-Guide.md
-  - Requirements (SRS):
-      - 4.1.1 Introduction: requirements/Introduction.md
-      - 4.1.2 Domain Model: requirements/Domain-Model.md
-      - 4.1.3 User Stories: requirements/User-Stories.md
-      - 4.1.4 Use Cases: requirements/Use-Cases.md
-      - 4.1.5 Functional Requirements: requirements/Functional-Requirements.md
-      - 4.1.6 Quality Requirements: requirements/Quality-Requirements.md
-      - 4.1.7 Architectural Requirements: requirements/Architectural-Requirements.md
-      - 4.1.8 Technology Requirements: requirements/Technology-Requirements.md
-      - 4.1.9 Traceability Matrix: requirements/Traceability-Matrix.md
-      - 4.1.10 API Service Contracts: requirements/API-Service-Contracts.md
+  - SRS:
+      - Introduction: srs/INTRODUCTION.md
+      - User Stories: srs/USER_STORIES.md
+      - Use Cases: srs/USE_CASES.md
+      - Functional Requirements: srs/FUNCTIONAL_REQUIREMENTS.md
+      - Non-Functional Requirements: srs/NON-FUNCTIONAL_REQUIREMENTS.md
+      - Domain Model: srs/DOMAIN_MODEL.md
+  - SAS:
+      - Introduction: sas/architecture/INTRODUCTION.md
+      - Architectural Requirements: sas/architecture/ARCHITECTURAL_REQUIREMENTS.md
+      - Architectural Patterns: sas/architecture/ARCHITECTURAL_PATTERNS.md
+      - Design Patterns: sas/architecture/DESIGN_PATTERNS.md
+      - Constraints: sas/architecture/CONSTRAINTS.md
+      - Architectural Diagram: sas/architecture/ARCHITECTURAL_DIAGRAM.md
+      - Quality Requirement Mapping: sas/architecture/QUALITY_REQUIREMENT_MAPPING.md
+      - Technology Requirements: sas/architecture/TECHNOLOGY_REQUIREMENTS.md
+      - API Contracts: sas/architecture/API_CONTRACTS.md
+      - Deployment Requirements: sas/deployment/DEPLOYMENT_REQUIREMENTS.md
+      - Deployment Diagrams: sas/deployment/DEPLOYMENT_DIAGRAMS.md
+      - CI/CD Pipeline Diagram: sas/deployment/CICD_PIPELINE_DIAGRAM.md
   - Design Specifications:
       - 4.2.1 Brand Style: design/Brand-Style.md
       - 4.2.2 Wireframes: design/Wireframes.md
-  - DevOps & Deployment:
-      - Live Accessible System: DevOps/LiveAccesibleSystem.md
-      - Environment Parity: DevOps/EnvironmentParity.md
-      - Infrastructure As Code: DevOps/InfrastructureAsCode.md
-      - Secrets Management: DevOps/SecretsManagement.md
-      - Rollback Strategy: DevOps/RollBackStrategy.md
-      - Deployment Diagram: DevOps/DeploymentDiagram.md
-      - Pipeline Diagram: DevOps/PipelineDiagram.md
   - API Reference: api/API-Reference.md
   - Developer Portal:
       - Overview: developer-guides/index.md

@@ -1,0 +1,20 @@
+# Quality Requirement Mapping
+
+## Scope
+
+The SRS defines quality targets. This page maps the five Demo 2 targets to architectural
+mechanisms without introducing new target values.
+
+## Traceability Table
+
+| Requirement | Quantified Target | Architectural Mechanisms | Affected Components | Verification Evidence | Trade-offs / Residual Risk |
+|---|---|---|---|---|---|
+| [NFR-PERF-001](../../srs/NON-FUNCTIONAL_REQUIREMENTS.md) | At least 95% of interactive requests complete within 2 seconds at 500 concurrent authenticated users; timetable generation completes or reports no solution within 60 seconds | Solution cache, queue-backed asynchronous work, and extracted stateless parser and solver services | Frontend, Core API, cache, solver, job-processing boundary | 500-user load test, p95 browser-to-server timing, and solver duration report | Queueing improves user-facing responsiveness but adds eventual-completion complexity |
+| [NFR-SEC-001](../../srs/NON-FUNCTIONAL_REQUIREMENTS.md) | TLS 1.2+ for sensitive traffic; AES-256-equivalent protection for persisted secrets and tokens; MFA for administrative accounts; global and workspace authorization on protected operations | Single ingress boundary, Core-owned authentication and RBAC, server-managed OAuth, encrypted secret storage, and validation at integration boundaries | Ingress, Core API, auth layer, adapters, frontend | Transport/configuration inspection, MFA acceptance test, authorization tests, secret scanning | Centralized auth simplifies policy but increases blast radius if that boundary is flawed |
+| [NFR-MAINT-001](../../srs/NON-FUNCTIONAL_REQUIREMENTS.md) | An approved backward-compatible fix or small feature is releasable within 2 hours; changed functions remain at cyclomatic complexity 10 or less unless reviewed | Adapter boundaries, stable solver strategy contract, Core-owned orchestration boundary, and automated delivery workflow | Core API, adapters, frontend, solver, delivery pipeline | Timed release exercise, static analysis, complexity review, architecture conformance review | Abstractions must stay tied to real variation points to avoid unnecessary complexity |
+| [NFR-TEST-001](../../srs/NON-FUNCTIONAL_REQUIREMENTS.md) | At least 80% line and branch coverage for first-party code; unit, integration, and E2E suites for the five counted features run unattended | Dependency injection, adapter fixtures, solver strategy tests, explicit queue boundaries, and browser E2E coverage | Core API, frontend, parser boundary, solver boundary, local and CI tooling | Coverage report plus unattended unit, integration, and E2E results | Mock-heavy tests can drift if real-boundary integration and E2E coverage are too thin |
+| [NFR-USA-001](../../srs/NON-FUNCTIONAL_REQUIREMENTS.md) | At least 85% of representative first-time users complete each tested core task within 5 minutes; Demo 2 journeys meet WCAG 2.2 AA with no critical violations | Shared UI primitives, theme configuration, role-specific surfaces, browser-first delivery, and explicit asynchronous job-state feedback | Frontend, Core API status endpoints, auth flows | Ten-participant task study, satisfaction results, automated accessibility audit, and keyboard review | Theme flexibility can create inconsistency if design tokens are not governed |
+
+## Follow-up Gaps
+
+- CI security gates, public URL verification, and observability dashboards are not evidenced here.
