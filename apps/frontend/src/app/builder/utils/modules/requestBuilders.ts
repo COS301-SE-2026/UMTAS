@@ -6,29 +6,29 @@ import {
 import { paths, components } from "@/lib/api";
 
 type createModuleReq =
-  paths["/modules"]["post"]["requestBody"]["content"]["application/json"];
+  paths["/builder"]["post"]["requestBody"]["content"]["application/json"];
 type createModuleRes =
-  paths["/modules"]["post"]["responses"]["201"]["content"]["application/json"];
+  paths["/builder"]["post"]["responses"]["201"]["content"]["application/json"];
 type deleteModulesByIdRes =
-  paths["/modules/{moduleId}"]["delete"]["responses"]["200"]["content"]["application/json"];
+  paths["/builder/{moduleId}"]["delete"]["responses"]["200"]["content"]["application/json"];
 type deleteModulesByIdPath =
-  paths["/modules/{moduleId}"]["delete"]["parameters"]["path"];
+  paths["/builder/{moduleId}"]["delete"]["parameters"]["path"];
 type getAllModulesRes =
-  paths["/modules"]["get"]["responses"]["200"]["content"]["application/json"];
+  paths["/builder"]["get"]["responses"]["200"]["content"]["application/json"];
 type getModuleByIdReq =
-  paths["/modules/{moduleId}"]["get"]["parameters"]["path"];
+  paths["/builder/{moduleId}"]["get"]["parameters"]["path"];
 type getModuleByIdRes =
-  paths["/modules/{moduleId}"]["get"]["responses"]["200"]["content"]["application/json"];
+  paths["/builder/{moduleId}"]["get"]["responses"]["200"]["content"]["application/json"];
 type updateModuleByIdBody =
-  paths["/modules/{moduleId}"]["patch"]["requestBody"]["content"]["application/json"];
+  paths["/builder/{moduleId}"]["patch"]["requestBody"]["content"]["application/json"];
 
 type updateModuleByIdPath =
-  paths["/modules/{moduleId}"]["patch"]["parameters"]["path"];
+  paths["/builder/{moduleId}"]["patch"]["parameters"]["path"];
 
 type updateModuleByIdRes =
-  paths["/modules/{moduleId}"]["patch"]["responses"]["200"]["content"]["application/json"];
+  paths["/builder/{moduleId}"]["patch"]["responses"]["200"]["content"]["application/json"];
 
-export type ModuleResponseDto = components["schemas"]["ModuleResponseDto"];
+export type ModuleResponseDto = components["schemas"]["CreateBuilderModuleDto"];
 
 export class createModulesBuilder extends RequestBuilder<
   undefined,
@@ -37,7 +37,7 @@ export class createModulesBuilder extends RequestBuilder<
 > {
   constructor() {
     super();
-    this.setUrl("/modules").setMethod(RequestMethod.POST);
+    this.setUrl("/builder").setMethod(RequestMethod.POST);
   }
 }
 
@@ -48,7 +48,7 @@ export class getAllModulesBuilder extends RequestBuilder<
 > {
   constructor() {
     super();
-    this.setUrl("/modules").setMethod(RequestMethod.GET);
+    this.setUrl("/builder").setMethod(RequestMethod.GET);
   }
 }
 
@@ -59,7 +59,7 @@ export class getModulesByIdBuilder extends RequestBuilder<
 > {
   constructor() {
     super();
-    this.setUrl("/modules/{moduleId}").setMethod(RequestMethod.GET);
+    this.setUrl("/builder/{moduleId}").setMethod(RequestMethod.GET);
   }
 }
 
@@ -70,7 +70,7 @@ export class updateModulesBuilder extends RequestBuilder<
 > {
   constructor() {
     super();
-    this.setUrl("/modules/{moduleId}").setMethod(RequestMethod.PATCH);
+    this.setUrl("/builder/{moduleId}").setMethod(RequestMethod.PATCH);
   }
 }
 
@@ -81,7 +81,7 @@ export class deleteModulesById extends RequestBuilder<
 > {
   constructor() {
     super();
-    this.setUrl("/modules/{moduleId}").setMethod(RequestMethod.DELETE);
+    this.setUrl("/builder/{moduleId}").setMethod(RequestMethod.DELETE);
   }
 }
 

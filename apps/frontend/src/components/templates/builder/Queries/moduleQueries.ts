@@ -21,9 +21,10 @@ export function addModuleMut() {
       const builder = new createModulesBuilder();
       return await builder.send({
         body: {
-          code: `MOD-${nextNum}`,
-          name: `Module ${nextNum}`,
+          moduleCode: `MOD-${nextNum}`,
+          moduleName: `Module ${nextNum}`,
           styling: "#3B82F6",
+          moduleDescription: "",
         },
       });
     },
@@ -38,7 +39,7 @@ export function addModuleMut() {
 
 export function removeModuleMut() {
   return mutationOptions({
-    mutationFn: async (moduleID: number | null) => {
+    mutationFn: async (moduleID: string | null) => {
       if (moduleID == null) {
         return;
       }
@@ -60,7 +61,7 @@ export function removeModuleMut() {
 export function updateModuleMut() {
   return mutationOptions({
     mutationFn: async (vars: {
-      moduleID: number;
+      moduleID: string;
       module: { code?: string; dsc?: string; name?: string; styling?: string };
     }) => {
       return new updateModulesBuilder().send({
@@ -68,10 +69,10 @@ export function updateModuleMut() {
           moduleId: vars.moduleID,
         },
         body: {
-          code: vars.module.code,
-          description: vars.module.dsc,
-          name: vars.module.name,
-          styling: vars.module.styling,
+          moduleCode: vars.module.code,
+          moduleDescription: vars.module.dsc,
+          moduleName: vars.module.name,
+          // : vars.module.styling,
         },
       });
     },
