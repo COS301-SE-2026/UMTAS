@@ -168,7 +168,7 @@ export class ModuleService {
     const updatedDescription = dto.moduleDescription?.trim();
 
     //If module with same code as updated code already exists in the same course -> throw a fit
-    if (updatedCode && await this.existingModuleCodeForCourse(updatedCode, module.CourseID))
+    if (updatedCode && await this.existingModuleCodeForCourse(updatedCode, module.CourseID,moduleId))
       throw new ConflictException(`Duplicate module code[${updatedCode}] found for course[${module.CourseID}]`);
 
     //update module
@@ -216,7 +216,7 @@ export class ModuleService {
   //🎅's Little Helpers
 
   //Check if a module already exists for the course
-  private async existingModuleCodeForCourse(moduleCode: string, courseId: string): Promise<boolean> {
+  private async existingModuleCodeForCourse(moduleCode: string, courseId: string,moduleID ?: string): Promise<boolean> {
 
     const [existingModule] = await this.dbService.db
       .select()
@@ -226,7 +226,13 @@ export class ModuleService {
       .limit(1);
 
     //If module code exists for course, return true
-    return !!existingModule;
+    if (moduleID == undefined)
+      return !!existingModule;
+
+    else if (existingModule != undefined && existingModule.Modules.moduleID != moduleID)
+      return true;
+    else
+      return false
   }//END_existingModuleForCourse
 
   //Set module styling

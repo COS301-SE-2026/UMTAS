@@ -28,7 +28,8 @@ type updateModuleByIdPath =
 type updateModuleByIdRes =
   paths["/builder/{moduleId}"]["patch"]["responses"]["200"]["content"]["application/json"];
 
-export type ModuleResponseDto = components["schemas"]["CreateBuilderModuleDto"];
+export type ModuleResponseDto =
+  components["schemas"]["ModuleSingleResponseDto"];
 
 export class createModulesBuilder extends RequestBuilder<
   undefined,

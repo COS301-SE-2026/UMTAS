@@ -14,7 +14,7 @@ export interface ModuleErrors {
 interface ModuleCardProps {
   module: ModuleResponseDto;
   onUpdate: (
-    id: number,
+    id: string,
     field: keyof Omit<ModuleResponseDto, "moduleID" | "userID">,
     value: string,
   ) => void;

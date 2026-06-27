@@ -24,7 +24,7 @@ export function addModuleMut() {
           moduleCode: `MOD-${nextNum}`,
           moduleName: `Module ${nextNum}`,
           styling: "#3B82F6",
-          moduleDescription: "",
+          moduleDescription: "Fill in",
         },
       });
     },

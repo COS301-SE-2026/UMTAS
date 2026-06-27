@@ -43,21 +43,23 @@ function validateModule(module: ModuleResponseDto) {
     errors.moduleName = "Name is required";
     hasErrors = true;
   }
+  /*
   if (!module.styling) {
     errors.styling = "Colour is required";
     hasErrors = true;
   }
+  */
 
   return { errors, hasErrors };
 }
 
 function isModuleComplete(module: ModuleResponseDto) {
-  return !!(module.moduleCode && module.moduleName && module.styling);
+  return !!(module.moduleCode && module.moduleName )//&& module.styling);
 }
 
 export function ModulesStep({ modules }: ModulesStepProps) {
-  const [selectedId, setSelectedId] = useState<number | null>(null);
-  const [errorMap, setErrorMap] = useState<Record<number, ModuleErrors>>({});
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [errorMap, setErrorMap] = useState<Record<string, ModuleErrors>>({});
   const [isDirty, setIsDirty] = useState(false);
   const [showGuard, setShowGuard] = useState(false);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
@@ -75,7 +77,7 @@ export function ModulesStep({ modules }: ModulesStepProps) {
   }
 
   function handleModuleUpdate(
-    id: number,
+    id: string,
     field: keyof ModuleResponseDto,
     value: string,
   ) {
@@ -105,7 +107,7 @@ export function ModulesStep({ modules }: ModulesStepProps) {
     setPendingAction(null);
   }
 
-  function handleSelect(id: number) {
+  function handleSelect(id: string) {
     if (selectedId === id) {
       setSelectedId(null);
       return;
@@ -120,7 +122,7 @@ export function ModulesStep({ modules }: ModulesStepProps) {
     requestNavigation(doSelect);
   }
 
-  async function handleConfirm(id: number) {
+  async function handleConfirm(id: string) {
     if (updateModule.isPending) return;
     const lectureModule = modules.find((m) => m.moduleID === id);
     if (!lectureModule) return;
@@ -139,7 +141,7 @@ export function ModulesStep({ modules }: ModulesStepProps) {
           name: lectureModule.moduleName,
           code: lectureModule.moduleCode,
           dsc: lectureModule.moduleDescription || undefined,
-          styling: lectureModule.styling || undefined,
+         // styling: lectureModule.styling || undefined,
         },
       });
 
@@ -183,10 +185,12 @@ export function ModulesStep({ modules }: ModulesStepProps) {
             onClick={() => handleSelect(module.moduleID)}
             className="flex flex-1 items-center gap-3 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] px-4 py-4 text-left transition-colors duration-[var(--duration-fast)] hover:bg-[var(--bg-elevated)] shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.08)]"
           >
-            <span
-              className="h-3 w-3 rounded-full flex-shrink-0"
-              style={{ backgroundColor: module.styling || "var(--border)" }}
-            />
+            {/*
+              <span
+                className="h-3 w-3 rounded-full flex-shrink-0"
+                style={{ backgroundColor: module.styling || "var(--border)" }}
+              />
+              */}
             <div className="flex-1 min-w-0">
               <p className="text-base font-medium text-[var(--text-primary)] truncate">
                 {module.moduleName || "Module " + (index + 1)}
