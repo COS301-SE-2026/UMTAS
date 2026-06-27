@@ -141,7 +141,7 @@ export class BuilderController {
 
   // Delete
   @Delete(':moduleId')
-  @Roles('uni_admin', 'sys_admin')
+  @Roles("student",'uni_admin', 'sys_admin')
   @ApiOperation({
     summary: 'Delete a module by ID',
     description: 'STUDENT_OWNED so student is allowed to delete the module if they own it',
