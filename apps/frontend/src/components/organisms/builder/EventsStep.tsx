@@ -7,7 +7,7 @@ import {
   type EventErrors,
 } from "@/components/molecules/builder/EventCard";
 import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
-import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
+import { EventCriteria, EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -20,6 +20,8 @@ import {
 } from "@/components/atoms/baseShadcn/alert-dialog";
 import { Alert, AlertDescription } from "@/components/atoms/baseShadcn/alert";
 import { Button } from "@/components/atoms/baseShadcn/button";
+import { addUniEventMut, removeEventMut, updateEventMut } from "@/components/templates/builder/Queries/eventQueries";
+import { useMutation } from "@tanstack/react-query";
 
 interface EventsStepProps {
   events: EventResponse[];
@@ -102,6 +104,9 @@ export function EventsStep({
   const [showGuard, setShowGuard] = useState(false);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
 
+  const addEvent = useMutation(addUniEventMut());
+  const deleteEvent = useMutation(removeEventMut());
+  const updateEvent = useMutation(updateEventMut());
 
   function requestNavigation(action: () => void) {
     if (isDirty) {
@@ -168,7 +173,17 @@ export function EventsStep({
       delete next[id];
       return next;
     });
-    onUpdate(id, "confirm", ""); // here add the update mutator
+    updateEvent.mutate({
+      body: {
+        isRecurring: false,
+        eventCode: event.eventCode,
+        eventCriteria: event.eventCriteria,
+        eventName : event.eventName
+      },
+      path: {
+        id:id
+      }
+    })
     setIsDirty(false);
     setSelectedId(null);
   }
@@ -183,10 +198,39 @@ export function EventsStep({
       delete next[id];
       return next;
     });
-    onRemove(id); // add the delete here 
+
+    deleteEvent.mutate(id)
+  }
+  function onUpdate(
+    id: string,
+    field: keyof EventResponse | keyof EventCriteria,
+    value: string | boolean
+  ) {
+    events = events.map((event) => {
+      
+      if (event.eventID !== id) return event;
+
+      if (field in event) {
+        return { ...event, [field]: value };
+      }
+      
+      if (event.eventCriteria) {
+        return {
+          ...event,
+          eventCriteria: {
+            ...event.eventCriteria,
+            [field]: value,
+          },
+        };
+      }
+
+      return event;
+    });
   }
 
-  function handleUpdate(id: number, field: string, value: string | boolean) {
+
+
+  function handleUpdate(id: string, field: keyof EventResponse, value: string | boolean) {
     setIsDirty(true);
     onUpdate(id, field, value); // this should be a local update dont send update until confirm
   }
@@ -251,9 +295,9 @@ export function EventsStep({
                     {event.eventCode}
                   </p>
                 )}
-                {criteria?.day && (
+                {criteria?.date && (
                   <p className="text-sm text-[var(--text-secondary)]">
-                    {criteria.day}
+                    {criteria.date}
                   </p>
                 )}
                 {criteria?.startTime && criteria?.endTime && (

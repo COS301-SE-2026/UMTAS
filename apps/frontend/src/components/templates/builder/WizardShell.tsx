@@ -24,6 +24,7 @@ import {
 import { getAllModulesQ } from "./Queries/moduleQueries";
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
 import { useQuery } from "@tanstack/react-query";
+import { getAllEventsQ } from "./Queries/eventQueries";
 
 const Steps = [
   { label: "Modules" },
@@ -51,15 +52,14 @@ export function WizardShell() {
     isLoading: modLoading,
     isError: modError,
   } = useQuery(getAllModulesQ());
+  const { data: events = [] } = useQuery(getAllEventsQ());
 
-  const [events, setEvents] = useState<EventResponse[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [eventsTrigger, setEventsTrigger] = useState(0);
+
   const [isInitialLoading, setIsInitialLoading] = useState(!!editId);
   const [selectedEventIds, setSelectedEventIds] = useState<number[]>([]);
   const [OGeventId, setOGeventId] = useState<string[]>([]);
   const [timetableName, setTimetableName] = useState("My New Schedule");
-
 
   function handleStepClick(index: number) {
     setCurrentStep(index);
@@ -163,7 +163,6 @@ export function WizardShell() {
   }
   */
 
-
   useEffect(() => {
     if (!editId) return;
 
@@ -183,7 +182,10 @@ export function WizardShell() {
           modulesRes.modules,
         );
 
-        setEvents(eventsRes.events);
+        getQueryClient().setQueryData(
+          getAllEventsQ().queryKey,
+          eventsRes.events,
+        );
 
         setTimetableName(
           timetableRes.timetable.timetableName || "Updated Schedule",
