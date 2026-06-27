@@ -1,5 +1,5 @@
 import { BuilderService } from './builder.service';
-import { CreateBuilderModuleDto } from './dto/builder.dto';
+import { CreateBuilderModuleDto, UpdateBuilderDto } from './dto/builder.dto';
 import {
   Post,
   Body,
@@ -99,14 +99,15 @@ export class BuilderController {
     description: 'Module not found'
   })
   getById(
+    @CurrentSession() session: SessionData,
     @Param('moduleId', ParseUUIDPipe) moduleId: string
   ) {
-    return this.service.getModuleById(moduleId);
+    return this.service.getModuleById(moduleId, session.user.id);
   }
 
   //Update
   @Patch(':moduleId')
-  @Roles('uni_admin', 'sys_admin')
+  @Roles('student', 'uni_admin', 'sys_admin')
   @ApiOperation({
     summary: 'Update a module that the student owns',
     description: 'STUDENT_OWNED so they can update any field of the module',
@@ -133,7 +134,7 @@ export class BuilderController {
   update(
     @CurrentSession() session: SessionData,
     @Param('moduleId', ParseUUIDPipe) moduleId: string,
-    @Body() dto: UpdateModuleDto
+    @Body() dto: UpdateBuilderDto
   ) {
     return this.service.updateModule(session.user.id, moduleId, dto);
   }

@@ -33,7 +33,7 @@ export class ModuleController {
 
   //Create
   @Post()
-  @Roles('uni_admin', 'sys_admin')
+  @Roles('student', 'uni_admin', 'sys_admin')
   @ApiOperation({ 
     summary: 'Create a module',
     description: 'Create a new module and link to appropriate course'
@@ -144,7 +144,7 @@ export class ModuleController {
 
   //Update
   @Patch(':moduleId')
-  @Roles('uni_admin', 'sys_admin')
+  @Roles('student', 'uni_admin', 'sys_admin')
   @ApiOperation({
     summary: 'Update a module',
     description: 'Update a modules | STUDENT_OWNED needs to go through Builder Service',
@@ -177,7 +177,7 @@ export class ModuleController {
 
   // Delete
   @Delete(':moduleId')
-  @Roles('uni_admin', 'sys_admin')
+  @Roles('student', 'uni_admin', 'sys_admin')
   @ApiOperation({
     summary: 'Delete a module by ID',
     description: 'Deletes a module | STUDENT_OWNED needs to go through Builder Service',

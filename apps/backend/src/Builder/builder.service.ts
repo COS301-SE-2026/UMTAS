@@ -11,12 +11,12 @@ import {
 import { eq, and } from 'drizzle-orm';
 import { DatabaseService } from '../db/database.service';
 
-import { CreateBuilderModuleDto } from './dto/builder.dto';
+import { BuilderListResponseDto, BuilderSingleResponseDto, CreateBuilderModuleDto, UpdateBuilderDto } from './dto/builder.dto';
 import { CreateModuleDto, ModuleSingleResponseDto, ModuleListResponseDto, UpdateModuleDto, DeleteModuleResponseDto } from '../Module/dto/module.dto';
 import { CourseDto } from 'src/Course/dto/course.dto';
 
 
-import { UniversityRole, Course, CourseModule, modules, ModuleEnrollment} from '../entities/index';
+import { UniversityRole, Course, CourseModule, modules, ModuleEnrollment, ModuleStyling} from '../entities/index';
 
 import { UniversityService } from 'src/University/university.service';
 import { CourseService } from 'src/Course/course.service';
@@ -37,7 +37,7 @@ export class BuilderService {
 
     //Create User Module
     //Ensure that user defined university + course exists -> create respective module owned by user course
-    async createModule(userId: string, dto: CreateBuilderModuleDto): Promise<ModuleSingleResponseDto> {
+    async createModule(userId: string, dto: CreateBuilderModuleDto): Promise<CreateBuilderModuleDto> {
 
         const userCourse = await this.doUserUniCourseCheck(userId);
 
@@ -52,8 +52,17 @@ export class BuilderService {
         };
 
         //Create actual module
-        const module = await this.moduleService.create(moduleDto);
+        let module = await this.moduleService.create(moduleDto);
 
+        if (dto.styling) {
+            const styling = await this.moduleService.setStyling(module.moduleID, userId, dto.styling);
+
+            if (!styling) throw new InternalServerErrorException(`Module styling failed to be created`);
+
+            //add styling to the module object
+            module = module = { ...module, ...styling };
+        }
+            
         //Enroll Student to their module
         const [enrollment] = await this.dbService.db
             .insert(ModuleEnrollment)
@@ -68,7 +77,7 @@ export class BuilderService {
     }//createModule
 
     //get All USer defined modules
-    async getAllModules(userId: string): Promise<ModuleListResponseDto>{
+    async getAllModules(userId: string): Promise<BuilderListResponseDto>{
 
         //Get user course
         const userCourse = await this.doUserUniCourseCheck(userId);
@@ -78,18 +87,49 @@ export class BuilderService {
             courseId: userCourse.CourseID
         };
 
-        return await this.moduleService.getAll(filters);
+        const modulesResponse = await this.moduleService.getAll(filters);
+
+        if (modulesResponse && modulesResponse.modules && modulesResponse.modules.length>0) {
+            // get styling for modules
+            const modulesWithStyling = await Promise.all(
+
+                modulesResponse.modules.map(async (module) => {
+
+                    const styling = await this.moduleService.getStyling(module.moduleID, userId);
+                    return {
+                        ...module,
+                        styling: styling.styling.colour || 'niksi'
+                    };
+                })
+            );
+
+            return {
+                ...modulesResponse,
+                modules: modulesWithStyling
+            }
+        }
+
+        return modulesResponse;
     }//END_getAllModules
 
     //Get module by moduleID - no ownership check necessary?
-    async getModuleById(moduleId: string): Promise<ModuleSingleResponseDto>{
+    async getModuleById(moduleId: string, userId: string): Promise<BuilderSingleResponseDto>{
         
-        return await this.moduleService.getById(moduleId);
+        const module =  await this.moduleService.getById(moduleId);
+
+        const styling = await this.moduleService.getStyling(moduleId, userId);
+
+        const colour = styling.styling?.colour || undefined;
+
+        return {
+            ...module, 
+            styling: colour
+        }
     }//END_getModuleById
 
     //Update
     //User can modify whatever they want on user owned modules
-    async updateModule(userId: string, moduleId: string, dto: UpdateModuleDto): Promise<ModuleSingleResponseDto> {
+    async updateModule(userId: string, moduleId: string, dto: UpdateBuilderDto): Promise<BuilderSingleResponseDto> {
 
         //Get user owned course
         const userCourse = await this.doUserUniCourseCheck(userId);
@@ -98,7 +138,23 @@ export class BuilderService {
         if (!await this.ownershipCheck(moduleId, userCourse.CourseID)) throw new ForbiddenException(`User [${userId}] does not own module [${moduleId}]`);
 
         //Update any field of module if owned by user
-        return await this.moduleService.update(moduleId, dto);
+        let module;
+
+        if (dto.styling) {
+            const styling = await this.moduleService.setStyling(moduleId, userId, dto.styling);
+
+            if (!styling) throw new InternalServerErrorException(`Module styling failed to be created`);
+
+            //add styling to the module object
+            return {
+                ...module,
+                styling: styling.styling.colour ?? dto.styling
+            };
+        } else {
+            module = await this.moduleService.update(moduleId, dto);
+        }
+
+        return module;
     }//END_updateModule
 
     //Delete

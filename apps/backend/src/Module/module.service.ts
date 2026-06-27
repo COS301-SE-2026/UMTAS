@@ -10,7 +10,7 @@ import {
 import { eq, and, SQL } from 'drizzle-orm';
 
 import { DatabaseService } from '../db/database.service';
-import { modules } from '../entities/Modules/index';
+import { modules, ModuleStyling } from '../entities/Modules/index';
 import {
   CreateModuleDto,
   DeleteModuleResponseDto,
@@ -86,9 +86,11 @@ export class ModuleService {
 
     //Dynamically add conditions for where clause based of filters
     //userId
-    if (filters.userId)
-      conditions.push(eq(ModuleEnrollment.UserID, filters.userId));
+    if (filters.userId) {
 
+      conditions.push(eq(ModuleEnrollment.UserID, filters.userId));
+    }
+      
     //courseId
     if (filters.courseId)
       conditions.push(eq(CourseModule.CourseID, filters.courseId));
@@ -227,4 +229,50 @@ export class ModuleService {
     return !!existingModule;
   }//END_existingModuleForCourse
 
+  //Set module styling
+  async setStyling(moduleId: string, userId: string, styling: string){
+
+    const styleJson = { colour: styling };
+
+    //Check if styling already exists for module+user
+    let [modStyle] = await this.dbService.db
+      .select()
+      .from(ModuleStyling)
+      .where(and(eq(ModuleStyling.ModuleID, moduleId), eq(ModuleStyling.UserID, userId)))
+      .limit(1);
+
+    if (!modStyle) {
+
+      //Create style entry
+      [modStyle] = await this.dbService.db
+        .insert(ModuleStyling)
+        .values({
+          ModuleID: moduleId,
+          UserID: userId,
+          styling: styleJson
+        }).returning();
+    } else {
+
+      //Update styling
+      [modStyle] = await this.dbService.db
+        .update(ModuleStyling)
+        .set({
+          styling: styleJson
+        }).returning();
+    }
+
+    return modStyle;
+  }//END_setStyling
+
+  //Get module styling
+  async getStyling(moduleId: string, userId: string){
+
+    const [styling] = await this.dbService.db
+      .select()
+      .from(ModuleStyling)
+      .where(and(eq(ModuleStyling.ModuleID, moduleId), eq(ModuleStyling.UserID, userId)))
+      .limit(1);
+
+    return styling;
+  }
 } //ModuleService
