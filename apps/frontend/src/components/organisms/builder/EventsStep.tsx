@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Plus, Trash2, CheckCircle, Inbox, AlertCircle } from "lucide-react";
 import {
   EventCard,
@@ -116,14 +116,18 @@ export function EventsStep({
   const [showGuard, setShowGuard] = useState(false);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
 
-  const [eventsAdded, setEventsAdded] = useState<boolean[]>([]);
+  const [eventsAdded, setEventsAdded] = useState<
+    { eventID: string; created: boolean }[]
+  >([]);
+
   // a local construct to add an empty event
   function addEmptyEvent() {
+    const nextNum = Math.round(Math.random() * 1000);
     getQueryClient().setQueryData(
       getAllEventsQ().queryKey,
       (oldEvents: EventResponse[] | undefined) => {
         const emptyEvent: EventResponse = {
-          eventID: "",
+          eventID: `TEMP_${nextNum}`,
           eventCode: "",
           isRecurring: false,
           eventName: "",
@@ -138,6 +142,16 @@ export function EventsStep({
       },
     );
   }
+
+  useEffect(() => {
+    if (events) {
+      const mapped = events.map((e) => ({
+        eventID: e.eventID,
+        created: e.eventID.startsWith("TEMP") ? false : true,
+      }));
+      setEventsAdded(mapped);
+    }
+  }, [events]);
 
   const addEvent = useMutation(addUniEventMut());
   const deleteEvent = useMutation(removeEventMut());
@@ -208,17 +222,34 @@ export function EventsStep({
       delete next[id];
       return next;
     });
-    updateEvent.mutate({
-      body: {
-        isRecurring: false,
-        eventCode: event.eventCode,
-        eventCriteria: event.eventCriteria,
-        eventName: event.eventName,
-      },
-      path: {
-        id: id,
-      },
-    });
+
+    const iscreated = eventsAdded.find(
+      (event) => event.eventID === id,
+    )?.created;
+
+    if (iscreated) {
+      updateEvent.mutate({
+        body: {
+          isRecurring: false,
+          eventCode: event.eventCode,
+          eventCriteria: event.eventCriteria,
+          eventName: event.eventName,
+        },
+        path: {
+          id: id,
+        },
+      });
+    } else {
+      addEvent.mutate({
+        path: { moduleId: "" },
+        body: {
+          eventCriteria: event.eventCriteria,
+          eventCode: event.eventCode,
+          eventName: event.eventName,
+          isRecurring: false,
+        },
+      });
+    }
     setIsDirty(false);
     setSelectedId(null);
   }
