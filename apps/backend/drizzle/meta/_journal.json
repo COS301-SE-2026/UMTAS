@@ -8,6 +8,13 @@
       "when": 1782555741304,
       "tag": "0000_oval_molten_man",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1782556936609,
+      "tag": "0001_hallow_mensies",
+      "breakpoints": true
     }
   ]
 }

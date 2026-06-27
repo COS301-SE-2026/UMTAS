@@ -51,12 +51,12 @@ export const ModuleStyling = pgTable(
       .references(() => modules.moduleID, { onDelete: 'cascade' })
       .notNull(),
       //should belong to user not userTimetable
-    UserTimetableID: uuid('UserTimetableID')
-      .references(() => UserTimetable.UserTimetableID, { onDelete: 'cascade' }),
+    UserID: uuid('UserID')
+      .references(() => usersTable.id, { onDelete: 'cascade' }),
     styling: jsonb('styling')
       .notNull()
       .$type<{ colour: string }>()
       .default({ colour: '' }),
   },
-  (table) => [primaryKey({ columns: [table.ModuleID, table.UserTimetableID] })],
+  (table) => [primaryKey({ columns: [table.ModuleID, table.UserID] })],
 );
