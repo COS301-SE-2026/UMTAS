@@ -911,8 +911,8 @@ export interface components {
         EventCriteriaDto: {
             /** @enum {string} */
             type?: "university" | "personal";
-            /** @example Monday */
-            day: string;
+            /** @example yyyy-mm-dd */
+            date: string;
             /** @example 08:30 */
             startTime: string;
             /** @example 10:20 */
@@ -971,8 +971,8 @@ export interface components {
              * @enum {string}
              */
             type?: "university" | "personal";
-            /** @example Monday */
-            day?: string;
+            /** @example yyyy-mm-dd */
+            date?: string;
             /** @example 08:30 */
             startTime?: string;
             /** @example 10:20 */

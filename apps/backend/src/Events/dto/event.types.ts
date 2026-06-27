@@ -7,7 +7,7 @@ export enum EventType {
 export interface EventCriteria {
 
     type: EventType,
-    day: string,
+    date: string,
     startTime: string,
     endTime: string
 }//EventCriteria

@@ -14,9 +14,9 @@ export class EventCriteriaDto {
   @IsEnum(EventType)
   type!: EventType;
 
-  @ApiProperty({ example: 'Monday' })
+  @ApiProperty({ example: 'yyyy-mm-dd' })
   @IsString()
-  day!: string;
+  date!: string;
 
   @ApiProperty({ example: '08:30' })
   @IsString()
@@ -37,10 +37,10 @@ export class UpdateEventCriteriaDto {
   @IsEnum(EventType)
   type?: EventType;
 
-  @ApiPropertyOptional({ example: 'Monday' })
+  @ApiPropertyOptional({ example: 'yyyy-mm-dd' })
   @IsOptional()
   @IsString()
-  day?: string;
+  date?: string;
 
   @ApiPropertyOptional({ example: '08:30' })
   @IsOptional()

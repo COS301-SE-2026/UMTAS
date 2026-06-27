@@ -21,13 +21,13 @@ export type getAllEventsRes =
 
 export type EventResponse = getAllEventsRes["events"][number];
 
-type getEventByIDPath = paths["/events/{id}"]["get"]["parameters"]["path"];
+export type getEventByIDPath = paths["/events/{id}"]["get"]["parameters"]["path"];
 export type getEventByIDRes =
   paths["/events/{id}"]["get"]["responses"]["200"]["content"]["application/json"];
 
-type updateEventByIdPath = paths["/events/{id}"]["patch"]["parameters"]["path"];
+export type updateEventByIdPath = paths["/events/{id}"]["patch"]["parameters"]["path"];
 
-type updateEventByIdBody =
+export type updateEventByIdBody =
   paths["/events/{id}"]["patch"]["requestBody"]["content"]["application/json"];
 export type updateEventByIdRes =
   paths["/events/{id}"]["patch"]["responses"]["200"]["content"]["application/json"];

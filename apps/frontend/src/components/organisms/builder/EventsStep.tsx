@@ -36,11 +36,11 @@ function validateEvent(event: EventResponse): {
 
   const criteria = event.eventCriteria;
 
-  if (!event.name?.trim()) {
+  if (!event.eventName?.trim()) {
     errors.name = "Name is required";
     hasErrors = true;
   }
-  if (!event.event.code?.trim()) {
+  if (!event.eventCode?.trim()) {
     errors.code = "Code is required";
     hasErrors = true;
   }
@@ -60,7 +60,7 @@ function validateEvent(event: EventResponse): {
     errors.time = "Start time must be before end time";
     hasErrors = true;
   }
-  if (criteria?.type === "lecture" && !event.lecture?.moduleID) {
+  if (criteria?.type === "university" )//&& !event.lecture?.moduleID) {
     errors.moduleId = "A module must be assigned to a lecture";
     hasErrors = true;
   }
