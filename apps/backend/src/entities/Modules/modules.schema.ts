@@ -47,7 +47,7 @@ export const ModuleTeaches = pgTable(
 export const ModuleStyling = pgTable(
   'ModuleStyling',
   {
-    ModuleID: integer('ModuleID')
+    ModuleID: uuid('ModuleID')
       .references(() => modules.moduleID, { onDelete: 'cascade' })
       .notNull(),
       //should belong to user not userTimetable

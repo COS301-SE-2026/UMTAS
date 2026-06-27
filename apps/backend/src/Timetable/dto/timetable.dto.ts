@@ -85,7 +85,7 @@ export class UserTimetableDto {
 } //TimetableDto
 
 export class TimetableResponseDto {
-  @ApiProperty({ type: string })
+  @ApiProperty({ type: String })
   UserTimetableID!: string;
 
   @ApiProperty({ type: TimetableDto })

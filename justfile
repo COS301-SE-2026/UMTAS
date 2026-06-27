@@ -99,7 +99,6 @@ deploy-prod release_tag:
     just prod-up {{release_tag}}
     @echo "Production successfully deployed version {{release_tag}}"
 
-<<<<<<< HEAD
 # rollback to specific tag
 rollback-prod PREVIOUS_TAG:
     @echo "Rolling back production to version {{PREVIOUS_TAG}}..."
@@ -122,13 +121,3 @@ studio:
 
 
 ############################## END_Backend specific
-=======
-# rollback to specific tag 
-rollback-prod previous_tag:
-    @echo "Rolling back production to version {{previous_tag}}..."
-    just prod-up {{previous_tag}}
-    @echo "Rollback complete. Production is now running {{previous_tag}}"
-
-docs:
-    mkdocs serve
->>>>>>> origin/dev

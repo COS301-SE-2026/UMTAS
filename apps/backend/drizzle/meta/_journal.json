@@ -5,36 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1782041652890,
-      "tag": "0000_furry_doctor_doom",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1782240394466,
-      "tag": "0001_red_talisman",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1782290727419,
-      "tag": "0002_pink_menace",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1782319096607,
-      "tag": "0003_CAPATALISED_ROLES_IN_UNIVERSITYROLES_FIXED_FIELD_IN_UNIVERSITY",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1782487505735,
-      "tag": "0004_schema_updated_together_with_backend",
+      "when": 1782555741304,
+      "tag": "0000_oval_molten_man",
       "breakpoints": true
     }
   ]
