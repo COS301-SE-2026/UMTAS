@@ -94,9 +94,8 @@ export class EventService {
       .leftJoin(PersonalEvent, eq(PersonalEvent.eventID, Event.eventID))
       .where(and(...conditions));
 
-    if (events.length===0)
-      throw new NotFoundException(`No events found for [${filters}]`);
-
+    console.log(events);
+   
     return {events: events.map((event) => this.mapEventToDto(event))};
   } //getAllEvents
 

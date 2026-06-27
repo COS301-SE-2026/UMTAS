@@ -86,8 +86,8 @@ export function EventCard({
 
     return (
       <Select
-        value={String(event.eventCriteria?.moduleID || "")}
-        onValueChange={(v) => onUpdate(event.eventID, "", v)}
+        value={String(event.eventCriteria?.moduleID)}
+        onValueChange={(v) => onUpdate(event.eventID, "moduleID", v)}
       >
         <SelectTrigger
           className={getInputClass(!!errors?.moduleId) + " w-full"}
@@ -238,7 +238,7 @@ export function EventCard({
             Event type
           </Label>
           <EventTypeDropdown
-            value={(event.eventCriteria?.type as EventType) || "lecture"}
+            value={(event.eventCriteria?.type as EventType) || "uni"}
             onChange={(v) => onUpdate(event.eventID, "type", v)}
           />
         </div>

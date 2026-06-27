@@ -72,11 +72,11 @@ function validateEvent(event: EventResponse): valEvent {
     errors.time = "Start time must be before end time";
     hasErrors = true;
   }
-  if (criteria?.type === "university") {
-    //&& !event.lecture?.moduleID) {
-    errors.moduleId = "A module must be assigned to a lecture";
-    hasErrors = true;
-  }
+  // if (criteria?.type !== "university") {
+  //   //&& !event.lecture?.moduleID) {
+  //   errors.moduleId = "A module must be assigned to a lecture";
+  //hasErrors = true;
+  // }
 
   return { errors, hasErrors };
 }
@@ -98,7 +98,9 @@ function getLinkedModuleName(
   event: EventResponse,
   modules: ModuleResponseDto[],
 ) {
-  const found = modules.find((m) => m.moduleID === ""); // TODO add module event.lecture?.moduleID);
+  const found = modules.find(
+    (m) => m.moduleID === event.eventCriteria.moduleID,
+  ); // TODO add module event.lecture?.moduleID);
   if (found) {
     return found.moduleCode + " - " + found.moduleName;
   }
@@ -241,7 +243,7 @@ export function EventsStep({
       });
     } else {
       addEvent.mutate({
-        path: { moduleId: "" },
+        path: { moduleId: event.eventCriteria.moduleID ||"" },
         body: {
           eventCriteria: event.eventCriteria,
           eventCode: event.eventCode,
@@ -264,33 +266,16 @@ export function EventsStep({
       delete next[id];
       return next;
     });
-
-    deleteEvent.mutate(id);
-  }
-  function onUpdate(
-    id: string,
-    field: keyof EventResponse | keyof EventCriteria,
-    value: string | boolean,
-  ) {
-    events = events.map((event) => {
-      if (event.eventID !== id) return event;
-
-      if (field in event) {
-        return { ...event, [field]: value };
-      }
-
-      if (event.eventCriteria) {
-        return {
-          ...event,
-          eventCriteria: {
-            ...event.eventCriteria,
-            [field]: value,
-          },
-        };
-      }
-
-      return event;
-    });
+    if (!id.startsWith("TEMP")) {
+      deleteEvent.mutate(id);
+    }
+    getQueryClient().setQueryData(
+      getAllEventsQ().queryKey,
+      (OldEvents: EventResponse[] | undefined) => {
+        if (!OldEvents) return [];
+        return OldEvents.filter((e) => e.eventID !== id);
+      },
+    );
   }
 
   function handleUpdate(
@@ -299,7 +284,25 @@ export function EventsStep({
     value: string | boolean,
   ) {
     setIsDirty(true);
-    onUpdate(id, field, value); // this should be a local update dont send update until confirm
+    getQueryClient().setQueryData(
+      getAllEventsQ().queryKey,
+      (oldEvents: EventResponse[] | undefined) => {
+        if (!oldEvents) return [];
+
+        return oldEvents.map((event) =>
+          event.eventID === id
+            ? {
+                ...event,
+                ...(field in event
+                  ? { [field]: value }
+                  : {
+                      eventCriteria: { ...event.eventCriteria, [field]: value },
+                    }),
+              }
+            : event,
+        );
+      },
+    );
   }
 
   function renderEmptyState() {

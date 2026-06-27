@@ -8,7 +8,7 @@ import {
   Patch,
   Delete,
   Query,
-  ParseUUIDPipe
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
@@ -18,7 +18,7 @@ import {
   EventListResponseDto,
   UpdateEventDto,
   DeleteResponseDto,
-  EventFiltersDto
+  EventFiltersDto,
 } from './dto/EventDto.dto';
 
 import { EventService } from './event.service';
@@ -70,22 +70,19 @@ export class EventController {
   @Post('personal')
   createPersonalEvent(
     @CurrentSession() session: SessionData,
-    @Body() dto: CreateEventDto
+    @Body() dto: CreateEventDto,
   ): Promise<EventSingleResponseDto> {
-
     return this.service.createPersonalEvent(session.user.id, dto);
-  }//END_CreatePersonalEvent
+  } //END_CreatePersonalEvent
 
   //Create University Owned event
   @Post('/university/:moduleId')
   createUniversityEvent(
     @Param('moduleId') moduleId: string,
-    @Body() dto: CreateEventDto
+    @Body() dto: CreateEventDto,
   ): Promise<EventSingleResponseDto> {
-
     return this.service.createUniversityEvent(moduleId, dto);
-  }//END_CreateUniversityEvent
-
+  } //END_CreateUniversityEvent
 
   //get All
   @Get()
@@ -108,12 +105,14 @@ export class EventController {
     description: 'Insufficient permissions',
   })
   getAllEvents(
-     @Query() filters: EventFiltersDto
+    @CurrentSession() session: SessionData,
+    @Query() filters: EventFiltersDto,
   ): Promise<EventListResponseDto> {
-    return this.service.getAllEvents(filters);
+    return this.service.getAllEvents({
+      userId: session.user.id,
+      moduleId: filters.moduleId,
+    });
   } //getAllEvents
-
-
 
   //get by id
   @Get(':id')
@@ -172,7 +171,7 @@ export class EventController {
   })
   updateEvent(
     @Param('id', ParseUUIDPipe) id: string,
-    @Body() dto: UpdateEventDto
+    @Body() dto: UpdateEventDto,
   ): Promise<EventSingleResponseDto> {
     return this.service.updateEvent(id, dto);
   }
@@ -206,7 +205,7 @@ export class EventController {
     description: 'Event was not deleted',
   })
   deleteEvent(
-    @Param('id', ParseUUIDPipe) id: string
+    @Param('id', ParseUUIDPipe) id: string,
   ): Promise<DeleteResponseDto> {
     return this.service.deleteEvent(id);
   }

@@ -24,10 +24,13 @@ export function addUniEventMut() {
       path: CreateEventPath;
       body: CreateEventBody;
     }) => {
-      return new createEventsBuilder().send({
+      console.log("Sent create event request Path", vars.path);
+
+      const result = new createEventsBuilder().send({
         paths: vars.path,
         body: vars.body,
       });
+      console.log("result", await result);
     },
     onSuccess: () => {
       getQueryClient().invalidateQueries({

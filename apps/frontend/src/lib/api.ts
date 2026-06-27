@@ -917,6 +917,8 @@ export interface components {
             startTime: string;
             /** @example 10:20 */
             endTime: string;
+            /** Format: uuid */
+            moduleID?: string;
         };
         CreateEventDto: {
             /** @description Defines the additional information to attach to event entity */

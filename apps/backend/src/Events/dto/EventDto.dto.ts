@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { ValidateNested, IsNotEmpty, IsOptional, IsString, IsUUID, Length, IsBoolean, IsEnum, IsJSON } from 'class-validator';
+import { ValidateNested, IsNotEmpty, IsOptional, IsString, IsUUID, Length, IsBoolean, IsEnum, IsJSON, isUUID } from 'class-validator';
 import {PartialType, PickType, OmitType, IntersectionType} from '@nestjs/swagger';
 import {Type} from 'class-transformer';
 import { EventType } from './event.types';
@@ -25,6 +25,12 @@ export class EventCriteriaDto {
   @ApiProperty({ example: '10:20' })
   @IsString()
   endTime!: string;
+
+  @ApiProperty({ type: String })
+  @IsOptional()
+  @IsUUID()
+  moduleID?:string
+  
 } //EventCriteriaDto
 
 //update criteria
