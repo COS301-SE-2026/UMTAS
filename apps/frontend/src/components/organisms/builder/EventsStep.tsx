@@ -28,11 +28,12 @@ interface EventsStepProps {
   modules: ModuleResponseDto[];
   onGoToModules: () => void;
 }
-
-function validateEvent(event: EventResponse): {
+interface valEvent  {
   errors: EventErrors;
   hasErrors: boolean;
-} {
+}
+
+function validateEvent(event: EventResponse): valEvent {
   const errors: EventErrors = {};
   let hasErrors = false;
 
@@ -46,7 +47,7 @@ function validateEvent(event: EventResponse): {
     errors.code = "Code is required";
     hasErrors = true;
   }
-  if (!criteria?.day) {
+  if (!criteria?.date) {
     errors.date = "Date is required";
     hasErrors = true;
   }
@@ -62,7 +63,7 @@ function validateEvent(event: EventResponse): {
     errors.time = "Start time must be before end time";
     hasErrors = true;
   }
-  if (criteria?.type === "university" )//&& !event.lecture?.moduleID) {
+  if (criteria?.type === "university" ){//&& !event.lecture?.moduleID) {
     errors.moduleId = "A module must be assigned to a lecture";
     hasErrors = true;
   }
@@ -74,7 +75,7 @@ function isEventComplete(event: EventResponse) {
   const criteria = event.eventCriteria;
   if (!event.eventName) return false;
   if (!event.eventCode) return false;
-  if (!criteria?.day) return false;
+  if (!criteria?.date) return false;
   if (!criteria?.startTime) return false;
   if (!criteria?.endTime) return false;
   if (criteria?.type === "university")// TODO add module && event.eventCriteria.moduleID)
@@ -207,13 +208,13 @@ export function EventsStep({
     value: string | boolean
   ) {
     events = events.map((event) => {
-      
+
       if (event.eventID !== id) return event;
 
       if (field in event) {
         return { ...event, [field]: value };
       }
-      
+
       if (event.eventCriteria) {
         return {
           ...event,
@@ -230,7 +231,7 @@ export function EventsStep({
 
 
 
-  function handleUpdate(id: string, field: keyof EventResponse, value: string | boolean) {
+  function handleUpdate(id: string, field: keyof EventResponse | keyof EventCriteria, value: string | boolean) {
     setIsDirty(true);
     onUpdate(id, field, value); // this should be a local update dont send update until confirm
   }

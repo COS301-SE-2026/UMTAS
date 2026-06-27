@@ -1,4 +1,6 @@
 import {
+  CreateEventBody,
+  CreateEventPath,
   createEventsBuilder,
   deleteEventById,
   getAllEventsBuilder,
@@ -18,21 +20,13 @@ export function getAllEventsQ() {
 
 export function addUniEventMut() {
   return mutationOptions({
-    mutationFn: async () => {
-      const today = new Date();
-      const nextNum = Math.round(Math.random() * 1000);
+    mutationFn: async (vars: {
+      path: CreateEventPath;
+      body: CreateEventBody;
+    }) => {
       return new createEventsBuilder().send({
-        body: {
-          eventCriteria: {
-            date: today.toISOString().split("T")[0],
-            type: "university",
-            startTime: "",
-            endTime: "",
-          },
-          eventName: "Event",
-          eventCode: `EVE-${nextNum}`,
-          isRecurring: false,
-        },
+        paths: vars.path,
+        body: vars.body,
       });
     },
     onSuccess: () => {
