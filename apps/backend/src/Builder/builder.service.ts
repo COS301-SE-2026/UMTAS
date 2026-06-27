@@ -146,9 +146,15 @@ export class BuilderService {
     private async createUserUni(userId: string): Promise<typeof UniversityRole.$inferSelect>{
 
         //Create custom university
-        const uni = await this.uniService.create({
-            UniversityName: `user_${userId.slice(0, 25)}`
-        });
+        const uniName = `user_${userId.slice(0, 25)}`;
+
+        //Check if uni already exists
+        let uni = await this.uniService.getByName(uniName);
+
+        if (!uni)
+            uni = await this.uniService.create({
+                UniversityName: uniName
+            });
 
         //Create role linking user to university with STUDENT_OWNED role
         const [uniRole] = await this.dbService.db

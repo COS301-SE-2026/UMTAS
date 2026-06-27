@@ -103,7 +103,20 @@ export class UniversityService {
     }//Delete
 
     //🎅's Little Helpers
-    private async checkDuplicateUniversityName(uniName: string): Promise<boolean>{
+
+    //get a university by name
+    async getByName(uniName: string): Promise<UniversitySingleResponseDto> {
+
+        const [uni] = await this.dbService.db
+            .select()
+            .from(University)
+            .where(eq(University.UniversityName, uniName.trim()))
+            .limit(1);
+
+        return uni;
+    }
+
+    async checkDuplicateUniversityName(uniName: string): Promise<boolean>{
 
         const [uni] = await this.dbService.db
             .select()

@@ -51,19 +51,28 @@ export class CreateModuleDto extends PickType(ModulesDto, ['moduleCode', 'module
   @IsUUID()
   @IsNotEmpty()
   courseID!: string;
+
+  @ApiProperty({
+    example: '#3B82F6',
+    type: String,
+    description: 'String to define color for the module'
+  })
+  @IsString()
+  @IsOptional()
+  styling?: string;
 }//CreateModuleDto
 
 //Update
 export class UpdateModuleDto extends PartialType(OmitType(ModulesDto, ['moduleID'] as const)) {
 
-  // @ApiPropertyOptional({
-  //   example: '#3B82F6',
-  //   description: 'Updated module styling',
-  // })
-  // @IsOptional()
-  // @IsString()
-  // styling?: string;
-
+  @ApiProperty({
+    example: '#3B82F6',
+    type: String,
+    description: 'String to define color for the module'
+  })
+  @IsString()
+  @IsOptional()
+  styling?: string;
 } //update
 
 //Responses
