@@ -1,32 +1,45 @@
 # Architectural Constraints
 
+## Scope
+
+This page records limitations and restrictions that shape the architecture. It does not repeat every
+quality target from the SRS or every deployment mechanism from the deployment section. Design choices
+such as Traefik, queue-backed processing, and stateless workers are treated as architectural responses
+to these constraints.
+
 ## Constraints Table
 
 | ID | Category | Constraint | Source / Rationale | Architectural Impact | Verification | Compliance Status |
 |---|---|---|---|---|---|---|
-| AC-01 | External integration | The system shall integrate with Google Calendar and follow Google's OAuth 2.0 authorization model. | Client and feature requirements | Requires server-managed OAuth flow, token lifecycle handling, and calendar export boundary in the Core | Calendar export test flow and OAuth conformance review | Documented, implementation evidence still required |
-| AC-02 | Language boundary | The scheduling service shall expose an HTTP API because it runs outside the main TypeScript application boundary. | Approved split between TypeScript Core and Python solver | Favors a simple service contract and self-documenting API over language-specific RPC | API contract tests and OpenAPI inspection | Documented |
-| AC-03 | External data format | The first supported timetable PDF format shall be the University of Pretoria layout. | Project scope for initial delivery | Requires adapter-based parsing and contract tests against UP samples | Parse test fixtures and acceptance test using UP PDFs | Documented |
-| AC-04 | Runtime environment | All major services shall be containerisable and runnable on a Linux host. | Deployment and team operations context | Drives stateless service boundaries, container-first local setup, and reverse-proxy ingress | Container build and deployment smoke tests | Documented |
-| AC-05 | Network and ingress | Public traffic shall enter through a single reverse-proxy boundary that handles HTTPS and routing. | Security and deployment planning | Centralises TLS termination, routing policy, and horizontal scaling strategy | HTTPS endpoint verification and ingress health checks | Documented |
-| AC-06 | Access surface | The system shall be delivered as a browser-based web application, not a native mobile app. | Client and course scope | Frontend must support responsive layouts and accessible browser flows | Cross-browser and responsive UI testing | Documented |
-| AC-07 | Delivery model | Demo 2 shall be publicly reachable via a non-local URL. Local-only demos are not acceptable. | Demo 2 instructions | Requires at least one non-local deployed environment and documented access path | Public URL verification on demo day | Partially evidenced; final Demo 2 URL not recorded here |
-| AC-08 | Reproducibility | A fresh clone of the main branch shall be deployable from documented instructions without click-ops. | Demo 2 instructions | Requires scripted infrastructure, environment documentation, and versioned deployment assets | Fresh-clone deployment test | Planned, evidence gap remains |
-| AC-09 | Secrets handling | Credentials, API keys, and connection strings shall not be committed to the repository. | Demo 2 instructions and standard security practice | Requires environment-based configuration and secret injection in CI and runtime | Secret scan and repo review | Documented |
-| AC-10 | Failure recovery | A worker crash during PDF parsing or timetable generation shall not silently lose the job. | Explicit reliability concern in SAS prompts and queue-based design | Requires durable job-state handling, retries, and dead-letter or failure visibility | Crash simulation and retry-path test | Documented |
-| AC-11 | Tenant isolation | Custom-university workspaces shall remain private to the owning student in Demo 2. | Current Q&A decisions for custom mode | Requires tenant-scoped writes, auth checks, and separation of supported vs custom workspaces | Authorization tests across tenant boundaries | Documented, final RBAC evidence pending |
-| AC-12 | Monorepo operations | The repository shall support a single team workflow across frontend, backend, and Python services. | Team setup and developer-experience plans | Drives workspace tooling, shared scripts, and container-assisted local development | Fresh-dev bootstrap test | Documented |
-| AC-13 | Future simulation scale | The architecture shall permit solver and parser capacity to grow independently toward large-scale `20,000+` simulation workloads without redesigning the Core API. | Deferred Tyto workload has already shaped system boundaries | Requires queue buffering, stateless workers, and independently scalable compute sidecars | Queue-depth load test and multi-worker scale test | Architectural target, not yet proven |
-| AC-14 | Environment separation | The Demo 2 brief expects development, staging, and production to be distinguishable. | Demo 2 instructions and deployment checklist | Prevents treating the integration branch as an undocumented substitute for staging | Environment inventory and non-local URL verification | Known compliance gap: no separate staging evidence in this workspace |
+| AC-01 | Client architecture | UMTAS shall use a Core-and-Adapter architecture where university-specific connectors can be added without changing Core scheduling logic. | Client proposal: "Core-and-Adapter Pattern" and modular university-agnostic platform goal | Requires a stable canonical timetable model, adapter boundary, parser contracts, and Core-owned orchestration | Adapter contract tests and architecture conformance review | Documented |
+| AC-02 | External data availability | The system shall not depend on a live university API during development; the first supported ingestion path shall handle offline/static timetable sources. | Client proposal constraints and current UP timetable source reality | Requires a PDF adapter path, fixture-driven parser tests, and import flows that can run without university network access | UP PDF parse fixtures and acceptance test against static samples | Documented |
+| AC-03 | Initial format scope | The first supported timetable PDF format shall be the University of Pretoria layout. | Client proposal and project scope for initial delivery | Keeps adapter implementation focused while preserving the ability to add other university adapters later | Parse test fixtures and acceptance test using UP PDFs | Documented |
+| AC-04 | Calendar provider access | Google Calendar integration shall use OAuth 2.0 and request write-only calendar access; it shall not read existing student calendar events. | Client proposal constraint and Google OAuth provider model | Requires server-managed OAuth flow, token lifecycle handling, least-privilege scopes, and calendar export isolation in the Core | OAuth scope review and calendar export integration test | Documented, implementation evidence still required |
+| AC-05 | Privacy and compliance | Individual student schedules shall never be visible to university administrators, and analytics data shall be anonymised before it reaches admin-facing aggregation. | Client proposal: privacy-first architecture, POPIA/GDPR compliance, and admin aggregate-only visibility | Requires tenant and role authorization, anonymisation boundary, aggregate-only analytics schemas, and UUID dissociation before admin metrics | Authorization tests, anonymisation tests, and deliberate re-identification review | Documented, final RBAC evidence pending |
+| AC-06 | Simulation scale | The architecture shall sustain or simulate 20,000+ concurrent scheduling users as a primary client scale driver. | Client proposal: horizontal scalability and Simulation Scale success criterion | Requires async processing, queue buffering, stateless API and compute services, independent parser/solver scaling, and load-testable simulation tooling | Locust or equivalent load test, queue-depth test, and multi-worker scale test | Architectural target, not yet proven |
+| AC-07 | Simulation service reuse | The synthetic-user simulation service shall be delivered as a standalone, documented module reusable by Tyto outside this project. | Client proposal: decoupled simulation service and delivery requirements | Requires a separate service boundary, documented configuration, exportable stress-test profiles, and limited coupling to UMTAS internals | Service README/runbook review and standalone smoke test | Documented |
+| AC-08 | Runtime environment | The deployed system shall run on a Tyto-provided Ubuntu server and all major services shall be fully Dockerised/containerisable. | Client proposal and university reproducibility requirement | Drives Linux-compatible services, Docker Compose/deployment assets, environment-based configuration, and container-first handoff | Container build, Ubuntu deployment smoke test, and fresh-clone deployment runbook test | Documented |
+| AC-09 | Network and ingress | Public traffic shall enter through a single reverse-proxy boundary that terminates HTTPS before routing raw HTTP to internal services. | Team deployment decision supporting Docker scaling, central TLS handling, and simpler internal service communication | Centralises TLS termination, routing policy, service discovery, and horizontal scaling behind Traefik | HTTPS endpoint verification, Traefik routing review, and internal-network inspection | Documented |
+| AC-10 | Public Demo 2 deployment | Demo 2 shall be reachable through a public non-local URL, and main shall deploy to at least one non-local environment automatically. | Demo 2 instructions | Requires CI/CD integration, externally reachable hosting, and documented deployment target | Public URL verification and pipeline run evidence | Partially evidenced; final Demo 2 URL not recorded here |
+| AC-11 | Reproducible handoff | A fresh clone of main shall be deployable from repository instructions without click-ops. | Demo 2 instructions and client deployment runbook requirement | Requires versioned deployment assets, `.env.example`, scripted setup, and a Tyto sysadmin runbook | Fresh-clone deployment test | Planned, evidence gap remains |
+| AC-12 | Secrets handling | Credentials, API keys, OAuth secrets, and connection strings shall not be committed to the repository. | Demo 2 instructions and standard security practice | Requires environment-based configuration, secret injection in CI/runtime, and documented variable inventory | Secret scan and repository review | Documented |
+| AC-13 | API documentation | Backend endpoints shall be documented using OpenAPI 3.0. | Client proposal delivery requirement for adapter authors and future integrations | Requires schema-backed API contracts and reviewable integration documentation | OpenAPI inspection and API contract tests | Documented, complete checked-in inventory still pending |
+| AC-14 | Environment separation | Development, staging, and production environments shall be distinguishable for Demo 2. | Demo 2 deployment requirements | Prevents treating a local setup or integration branch as an undocumented staging substitute | Environment inventory and non-local URL verification | Known compliance gap: separate staging evidence not recorded here |
 
 ## High-Impact Constraints
 
-`AC-02`, `AC-04`, `AC-05`, `AC-08`, `AC-10`, and `AC-14` shape the architecture most strongly.
-They keep orchestration in the Core, move expensive work off the request path, require
-reproducible deployment, and leave staging as an explicit gap. `AC-11` also drives tenant-scoped
-authorization for custom workspaces.
+`AC-01`, `AC-05`, `AC-06`, `AC-08`, `AC-09`, `AC-11`, and `AC-13` shape the architecture most
+strongly. Together they explain the Core-and-Adapter split, async worker boundary, stateless compute
+services, Docker-based deployment model, single Traefik ingress, and schema-first API documentation.
 
-## Scope Qualification
+## Constraint Boundaries
 
-The `20,000+` workload is a future scale driver, not a Demo 2 runtime promise. It justifies
-asynchronous processing and extracted compute, but it has not been demonstrated in this workspace.
+- The `20,000+` workload is a client scale driver and simulation success criterion, not a claim that
+  Demo 2 production traffic will contain 20,000 real users.
+- Dockerisation is both a university reproducibility expectation and a client handoff requirement for
+  the Tyto Ubuntu server.
+- Traefik is the chosen implementation of the single-ingress constraint. The architectural constraint
+  is centralised HTTPS termination and routing; the technology choice is documented in the technology
+  and deployment sections.
+- Worker crash recovery, retries, and dead-letter visibility are reliability mechanisms. They belong
+  primarily in the quality mapping unless a client or course source makes them a hard constraint.
