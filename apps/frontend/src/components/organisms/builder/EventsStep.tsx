@@ -7,7 +7,10 @@ import {
   type EventErrors,
 } from "@/components/molecules/builder/EventCard";
 import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
-import { EventCriteria, EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
+import {
+  EventCriteria,
+  EventResponse,
+} from "@/app/builder/utils/events/eventRequestBuilder";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -20,15 +23,21 @@ import {
 } from "@/components/atoms/baseShadcn/alert-dialog";
 import { Alert, AlertDescription } from "@/components/atoms/baseShadcn/alert";
 import { Button } from "@/components/atoms/baseShadcn/button";
-import { addUniEventMut, removeEventMut, updateEventMut } from "@/components/templates/builder/Queries/eventQueries";
+import {
+  addUniEventMut,
+  getAllEventsQ,
+  removeEventMut,
+  updateEventMut,
+} from "@/components/templates/builder/Queries/eventQueries";
 import { useMutation } from "@tanstack/react-query";
+import { getQueryClient } from "@/components/tanstack/getQueryClient";
 
 interface EventsStepProps {
   events: EventResponse[];
   modules: ModuleResponseDto[];
   onGoToModules: () => void;
 }
-interface valEvent  {
+interface valEvent {
   errors: EventErrors;
   hasErrors: boolean;
 }
@@ -63,7 +72,8 @@ function validateEvent(event: EventResponse): valEvent {
     errors.time = "Start time must be before end time";
     hasErrors = true;
   }
-  if (criteria?.type === "university" ){//&& !event.lecture?.moduleID) {
+  if (criteria?.type === "university") {
+    //&& !event.lecture?.moduleID) {
     errors.moduleId = "A module must be assigned to a lecture";
     hasErrors = true;
   }
@@ -78,7 +88,8 @@ function isEventComplete(event: EventResponse) {
   if (!criteria?.date) return false;
   if (!criteria?.startTime) return false;
   if (!criteria?.endTime) return false;
-  if (criteria?.type === "university")// TODO add module && event.eventCriteria.moduleID)
+  if (criteria?.type === "university")
+    // TODO add module && event.eventCriteria.moduleID)
     return false;
   return true;
 }
@@ -104,6 +115,29 @@ export function EventsStep({
   const [isDirty, setIsDirty] = useState(false);
   const [showGuard, setShowGuard] = useState(false);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
+
+  const [eventsAdded, setEventsAdded] = useState<boolean[]>([]);
+  // a local construct to add an empty event
+  function addEmptyEvent() {
+    getQueryClient().setQueryData(
+      getAllEventsQ().queryKey,
+      (oldEvents: EventResponse[] | undefined) => {
+        const emptyEvent: EventResponse = {
+          eventID: "",
+          eventCode: "",
+          isRecurring: false,
+          eventName: "",
+          eventCriteria: {
+            type: "university",
+            date: "",
+            endTime: "",
+            startTime: "",
+          },
+        };
+        return [...(oldEvents ?? []), emptyEvent];
+      },
+    );
+  }
 
   const addEvent = useMutation(addUniEventMut());
   const deleteEvent = useMutation(removeEventMut());
@@ -179,12 +213,12 @@ export function EventsStep({
         isRecurring: false,
         eventCode: event.eventCode,
         eventCriteria: event.eventCriteria,
-        eventName : event.eventName
+        eventName: event.eventName,
       },
       path: {
-        id:id
-      }
-    })
+        id: id,
+      },
+    });
     setIsDirty(false);
     setSelectedId(null);
   }
@@ -200,15 +234,14 @@ export function EventsStep({
       return next;
     });
 
-    deleteEvent.mutate(id)
+    deleteEvent.mutate(id);
   }
   function onUpdate(
     id: string,
     field: keyof EventResponse | keyof EventCriteria,
-    value: string | boolean
+    value: string | boolean,
   ) {
     events = events.map((event) => {
-
       if (event.eventID !== id) return event;
 
       if (field in event) {
@@ -229,9 +262,11 @@ export function EventsStep({
     });
   }
 
-
-
-  function handleUpdate(id: string, field: keyof EventResponse | keyof EventCriteria, value: string | boolean) {
+  function handleUpdate(
+    id: string,
+    field: keyof EventResponse | keyof EventCriteria,
+    value: string | boolean,
+  ) {
     setIsDirty(true);
     onUpdate(id, field, value); // this should be a local update dont send update until confirm
   }
@@ -287,8 +322,7 @@ export function EventsStep({
           >
             <div className="flex-1 min-w-0">
               <p className="text-base font-medium text-[var(--text-primary)] truncate">
-                {event.eventName ||
-                  "Event " + (index + 1)}
+                {event.eventName || "Event " + (index + 1)}
               </p>
               <div className="flex flex-wrap items-center gap-2 mt-0.5">
                 {event.eventCode && (
@@ -370,7 +404,7 @@ export function EventsStep({
     return (
       <button
         type="button"
-        onClick={onAdd} // adds an event card
+        onClick={addEmptyEvent} // adds an event card
         className="mt-4 flex w-full items-center gap-3 rounded-lg border border-dashed border-[var(--border)] px-4 py-4 text-left text-base text-[var(--text-secondary)] transition-colors duration-[var(--duration-fast)] hover:border-[var(--text-secondary)] hover:text-[var(--text-primary)]"
       >
         <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border border-dashed border-[var(--border)]">
