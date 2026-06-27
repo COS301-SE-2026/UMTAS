@@ -57,6 +57,11 @@ export class UpdateEventCriteriaDto {
   @IsOptional()
   @IsString()
   endTime?: string;
+
+  @ApiProperty({ type: String })
+  @IsOptional()
+  @IsUUID()
+  moduleID?:string
 }
 
 export class EventDto {

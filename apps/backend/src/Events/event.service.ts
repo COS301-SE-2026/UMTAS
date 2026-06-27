@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { eq, and, SQL } from 'drizzle-orm';
 import { DatabaseService } from '../db/database.service';
-import { Event, UniversityEvent, PersonalEvent, Course } from '../entities/index';
+import { Event, UniversityEvent, PersonalEvent, Course, ModuleEnrollment } from '../entities/index';
 import {
   CreateEventDto,
   EventSingleResponseDto,
@@ -20,6 +20,7 @@ import {
 } from './dto/EventDto.dto';
 
 import { AppDatabase } from '../db/database.service';
+import { EventModule } from './event.module';
 
 @Injectable()
 export class EventService {
@@ -70,14 +71,15 @@ export class EventService {
     
     const conditions: SQL[] = [];
 
-    //Personal events
     if (filters.userId)
-      conditions.push(eq(PersonalEvent.UserID, filters.userId));
-
+     { conditions.push(eq(ModuleEnrollment.UserID, filters.userId));}
+/*
     //University Owned events
-    if (filters.moduleId)
-      conditions.push(eq(UniversityEvent.moduleID, filters.moduleId));
+else    if (filters.moduleId)
+      {conditions.push(eq(UniversityEvent.moduleID, filters.moduleId));}
+*/
 
+    
     if (conditions.length===0)
       throw new BadRequestException('At least one filter required for getAll');
 
@@ -90,11 +92,12 @@ export class EventService {
         isRecurring: Event.isRecurring
       })
       .from(Event)
+      .innerJoin(ModuleEnrollment,eq(ModuleEnrollment.UserID,filters.userId ||""))
       .leftJoin(UniversityEvent, eq(UniversityEvent.eventID, Event.eventID))
-      .leftJoin(PersonalEvent, eq(PersonalEvent.eventID, Event.eventID))
+      // .leftJoin(PersonalEvent, eq(PersonalEvent.eventID, Event.eventID))
       .where(and(...conditions));
 
-    console.log(events);
+  
    
     return {events: events.map((event) => this.mapEventToDto(event))};
   } //getAllEvents
@@ -148,7 +151,7 @@ export class EventService {
           ...existingCriteria,
           ...dto.eventCriteria
         } as EventCriteriaDto;
-
+        
         const [event] = await tx
           .update(Event)
           .set({
@@ -159,6 +162,15 @@ export class EventService {
           })
           .where(eq(Event.eventID, eventId))
           .returning();
+
+        if (dto.eventCriteria?.moduleID)
+        {
+          await tx.update(UniversityEvent)
+            .set({
+              moduleID: dto.eventCriteria.moduleID
+            })
+            .where(eq(UniversityEvent.eventID,eventId))
+        }
 
         if (!event)
           throw new InternalServerErrorException(`Event[${eventId}] not updated`);
