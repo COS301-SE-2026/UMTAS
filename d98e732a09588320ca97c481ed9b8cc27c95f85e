@@ -1,0 +1,18 @@
+docs/srs/NON-FUNCTIONAL_REQUIREMENTS.md
+  h_3359569cacef0e 2
+docs/sas/architecture/TECHNOLOGY_REQUIREMENTS.md
+  h_3359569cacef0e 1-2
+docs/sas/architecture/QUALITY_REQUIREMENT_MAPPING.md
+  h_3359569cacef0e 1-2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "d98e732a09588320ca97c481ed9b8cc27c95f85e",
+  "prompts": {},
+  "humans": {
+    "h_3359569cacef0e": {
+      "author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}

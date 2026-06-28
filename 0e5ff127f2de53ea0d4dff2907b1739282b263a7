@@ -1,0 +1,14 @@
+apps/pdf_parser/parser/adapters/up_parser.py
+  h_3359569cacef0e 1-258
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "0e5ff127f2de53ea0d4dff2907b1739282b263a7",
+  "prompts": {},
+  "humans": {
+    "h_3359569cacef0e": {
+      "author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}
