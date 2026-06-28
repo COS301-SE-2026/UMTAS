@@ -73,34 +73,22 @@ export class ModuleService {
     return newModule;
   } //create
 
-  //return all
-  //Optional courseId: If (courseId)-> fetch all modules for user enrolled in that course
-  //else -> fetch all modules for user across all courses
-  //userId -> return modules user is enrolled in
-  //courseId -> ignore userId -> return all modules defined for course
-  //universityId -> return all modules defined for a university over all courses
-  async getAll(filters: ModuleFiltersDto): Promise<ModuleListResponseDto> {
+  //return all modules
+  //courseId -> Return all modules for course
+  //universityId -> Return all modules for university
+  //else -> return all modules user is enrolled in
+  async getAll(userId: string, filters: ModuleFiltersDto): Promise<ModuleListResponseDto> {
     
     //define empty conditions array to be added to based of filters
     const conditions: SQL[] = [];
 
     //Dynamically add conditions for where clause based of filters
-    //userId
-    if (filters.userId) {
-
-      conditions.push(eq(ModuleEnrollment.UserID, filters.userId));
-    }
-      
-    //courseId
-    if (filters.courseId)
-      conditions.push(eq(CourseModule.CourseID, filters.courseId));
-
-    //universityId
-    if (filters.universityId)
+    if (filters.universityId)//universityId
       conditions.push(eq(Course.UniversityID, filters.universityId));
-
-    if (conditions.length===0) 
-      throw new BadRequestException('At least one filter is required: userId | courseId | universityId');
+    else if (filters.courseId)//courseId
+      conditions.push(eq(CourseModule.CourseID, filters.courseId));
+    else //userId
+      conditions.push(eq(ModuleEnrollment.UserID, userId));
 
     //Build actual query joining Modules -> ModuleEnrollment + CourseModule + Course and then add in dynamic where conditions
     const foundModules = await this.dbService.db
@@ -115,9 +103,6 @@ export class ModuleService {
       .leftJoin(CourseModule, eq(CourseModule.ModuleID, modules.moduleID))
       .leftJoin(Course, eq(Course.CourseID, CourseModule.CourseID))
       .where(and(...conditions));
-
-    if (foundModules.length===0)
-      throw new NotFoundException(`No matching modules found for filters: ${filters}`);
 
     return {modules: foundModules};
   } //getAll
@@ -168,7 +153,7 @@ export class ModuleService {
     const updatedDescription = dto.moduleDescription?.trim();
 
     //If module with same code as updated code already exists in the same course -> throw a fit
-    if (updatedCode && await this.existingModuleCodeForCourse(updatedCode, module.CourseID,moduleId))
+    if (updatedCode && await this.existingModuleCodeForCourse(updatedCode, module.CourseID))
       throw new ConflictException(`Duplicate module code[${updatedCode}] found for course[${module.CourseID}]`);
 
     //update module
@@ -178,7 +163,6 @@ export class ModuleService {
         moduleCode: updatedCode ?? module.moduleCode,
         moduleName: updatedName ?? module.moduleName,
         moduleDescription: updatedDescription ?? module.moduleDescription,
-        // styling: dto.styling ?? module.styling,
       })
       .where(eq(modules.moduleID, moduleId))
       .returning();
@@ -216,7 +200,7 @@ export class ModuleService {
   //🎅's Little Helpers
 
   //Check if a module already exists for the course
-  private async existingModuleCodeForCourse(moduleCode: string, courseId: string,moduleID ?: string): Promise<boolean> {
+  private async existingModuleCodeForCourse(moduleCode: string, courseId: string): Promise<boolean> {
 
     const [existingModule] = await this.dbService.db
       .select()
@@ -225,14 +209,8 @@ export class ModuleService {
       .where(and(eq(modules.moduleCode, moduleCode), eq(CourseModule.CourseID, courseId)))
       .limit(1);
 
-    //If module code exists for course, return true
-    if (moduleID == undefined)
-      return !!existingModule;
-
-    else if (existingModule != undefined && existingModule.Modules.moduleID != moduleID)
-      return true;
-    else
-      return false
+    //If module exists with moduleCode for course, return true else false
+    return !!existingModule;
   }//END_existingModuleForCourse
 
   //Set module styling

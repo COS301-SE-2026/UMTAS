@@ -45,7 +45,7 @@ export class UpdateEventCriteriaDto extends PartialType(EventCriteriaDto) {}
 export class EventDto {
 
   @ApiProperty({ 
-    example: '550e8400-e29b-41d4-a716-446655440000',
+    example: '00000000-0000-0000-0000-000000000000',
     description: 'Unique identifier for an event'
   })
   @IsUUID()
@@ -140,7 +140,7 @@ export class EventFiltersDto {
 
   @ApiPropertyOptional({
     description: 'Filter by module ID - returns all events for module',
-    example: '550e8400-e29b-41d4-a716-446655440000'
+    example: '00000000-0000-0000-0000-000000000000'
   })
   @IsOptional()
   @IsUUID()

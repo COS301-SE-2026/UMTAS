@@ -6,7 +6,7 @@ import {PartialType, PickType, OmitType} from '@nestjs/swagger';
 export class ModulesDto {
 
   @ApiProperty({ 
-    example: '550e8400-e29b-41d4-a716-446655440000',
+    example: '00000000-0000-0000-0000-000000000000',
     description: 'Unique identifier for a module'
   })
   @IsUUID()
@@ -45,7 +45,7 @@ export class ModulesDto {
 export class CreateModuleDto extends PickType(ModulesDto, ['moduleCode', 'moduleName', 'moduleDescription']) {
 
   @ApiProperty({ 
-    example: '550e8400-e29b-41d4-a716-446655440000',
+    example: '00000000-0000-0000-0000-000000000000',
     description: 'CourseID to ensure module belongs to a course'
   })
   @IsUUID()
@@ -84,16 +84,8 @@ export class DeleteModuleResponseDto extends PickType(ModulesDto, ['moduleCode']
 export class ModuleFiltersDto {
 
   @ApiPropertyOptional({
-    description: 'Filter by user ID - returns modules the user is enrolled in',
-    example: '550e8400-e29b-41d4-a716-446655440000'
-  })
-  @IsOptional()
-  @IsUUID()
-  userId?: string;
-
-  @ApiPropertyOptional({
     description: 'Filter by course ID - returns all modules in the course',
-    example: '550e8400-e29b-41d4-a716-446655440000'
+    example: '00000000-0000-0000-0000-000000000000'
   })
   @IsOptional()
   @IsUUID()
@@ -101,7 +93,7 @@ export class ModuleFiltersDto {
 
   @ApiPropertyOptional({
     description: 'Filter by university ID - returns all modules across all courses in the university',
-    example: '550e8400-e29b-41d4-a716-446655440000'
+    example: '00000000-0000-0000-0000-000000000000'
   })
   @IsOptional()
   @IsUUID()

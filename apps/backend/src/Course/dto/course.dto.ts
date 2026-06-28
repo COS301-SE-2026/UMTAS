@@ -6,7 +6,7 @@ import { isNotNull } from 'drizzle-orm';
 export class CourseDto {
 
     @ApiProperty({
-        example: '550e8400-e29b-41d4-a716-446655440000',
+        example: '00000000-0000-0000-0000-000000000000',
         description: 'Unique identifier for a course',
         required: true
     })
@@ -25,7 +25,7 @@ export class CourseDto {
     CourseName!: string;
 
     @ApiProperty({
-        example: '550e8400-e29b-41d4-a716-446655440000',
+        example: '00000000-0000-0000-0000-000000000000',
         description: 'Unique identifier for a university',
         required: true
     })

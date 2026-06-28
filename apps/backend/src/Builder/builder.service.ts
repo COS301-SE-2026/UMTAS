@@ -87,7 +87,7 @@ export class BuilderService {
             courseId: userCourse.CourseID
         };
 
-        const modulesResponse = await this.moduleService.getAll(filters);
+        const modulesResponse = await this.moduleService.getAll(userId, filters);
 
         if (modulesResponse && modulesResponse.modules && modulesResponse.modules.length>0) {
             // get styling for modules

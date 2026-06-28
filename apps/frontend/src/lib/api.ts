@@ -851,7 +851,7 @@ export interface components {
             /**
              * Format: uuid
              * @description CourseID to ensure module belongs to a course
-             * @example 550e8400-e29b-41d4-a716-446655440000
+             * @example 00000000-0000-0000-0000-000000000000
              */
             courseID: string;
         };
@@ -859,7 +859,7 @@ export interface components {
             /**
              * Format: uuid
              * @description Unique identifier for a module
-             * @example 550e8400-e29b-41d4-a716-446655440000
+             * @example 00000000-0000-0000-0000-000000000000
              */
             moduleID: string;
             /**
@@ -941,7 +941,7 @@ export interface components {
             /**
              * Format: uuid
              * @description Unique identifier for an event
-             * @example 550e8400-e29b-41d4-a716-446655440000
+             * @example 00000000-0000-0000-0000-000000000000
              */
             eventID: string;
             /** @description Defines the additional information to attach to event entity */
@@ -1088,7 +1088,7 @@ export interface components {
             /**
              * Format: uuid
              * @description Unique identifier for a university
-             * @example 550e8400-e29b-41d4-a716-446655440000
+             * @example 00000000-0000-0000-0000-000000000000
              */
             UniversityID: string;
             /**
@@ -1101,7 +1101,7 @@ export interface components {
             /**
              * Format: uuid
              * @description Unique identifier for a university
-             * @example 550e8400-e29b-41d4-a716-446655440000
+             * @example 00000000-0000-0000-0000-000000000000
              */
             UniversityID: string;
             /**
@@ -1139,7 +1139,7 @@ export interface components {
             /**
              * Format: uuid
              * @description Unique identifier for a university
-             * @example 550e8400-e29b-41d4-a716-446655440000
+             * @example 00000000-0000-0000-0000-000000000000
              */
             UniversityID: string;
         };
@@ -1147,7 +1147,7 @@ export interface components {
             /**
              * Format: uuid
              * @description Unique identifier for a course
-             * @example 550e8400-e29b-41d4-a716-446655440000
+             * @example 00000000-0000-0000-0000-000000000000
              */
             CourseID: string;
             /**
@@ -1158,7 +1158,7 @@ export interface components {
             /**
              * Format: uuid
              * @description Unique identifier for a university
-             * @example 550e8400-e29b-41d4-a716-446655440000
+             * @example 00000000-0000-0000-0000-000000000000
              */
             UniversityID: string;
         };
@@ -1166,7 +1166,7 @@ export interface components {
             /**
              * Format: uuid
              * @description Unique identifier for a course
-             * @example 550e8400-e29b-41d4-a716-446655440000
+             * @example 00000000-0000-0000-0000-000000000000
              */
             CourseID: string;
             /**
@@ -1177,7 +1177,7 @@ export interface components {
             /**
              * Format: uuid
              * @description Unique identifier for a university
-             * @example 550e8400-e29b-41d4-a716-446655440000
+             * @example 00000000-0000-0000-0000-000000000000
              */
             UniversityID: string;
         };
@@ -1194,7 +1194,7 @@ export interface components {
             /**
              * Format: uuid
              * @description Unique identifier for a university
-             * @example 550e8400-e29b-41d4-a716-446655440000
+             * @example 00000000-0000-0000-0000-000000000000
              */
             UniversityID?: string;
         };

@@ -29,7 +29,7 @@ describe('ModuleService', () => {
     moduleDescription: 'Networks module'
   };
 
-  const userId = '550e8400-e29b-41d4-a716-446655440000';
+  const userId = '00000000-0000-0000-0000-000000000000';
 
   beforeEach(() => {
     jest.clearAllMocks();

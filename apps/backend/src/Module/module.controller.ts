@@ -79,40 +79,10 @@ export class ModuleController {
     description: 'No modules found matching the filters'
   })
   getAll(
+    @CurrentSession() session: SessionData,
     @Query() filters: ModuleFiltersDto
   ) {
-    return this.service.getAll(filters);
-  }
-
-  //get all for user
-  @Get('user')
-  @Roles('student', 'uni_admin', 'sys_admin')
-  @ApiOperation({
-    summary: 'Get all modules for user',
-    description: 'Returns all modules the for user with filters optionally added.'
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Modules returned successfully',
-    type: ModuleListResponseDto
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'No modules found for the user'
-  })
-  getAllForUser(
-    @CurrentSession() session: SessionData,
-    @Query('courseId') courseId?: string,
-    @Query('universityId') universityId?: string
-  ) {
-    // Build filters with userId automatically injected
-    const filters: ModuleFiltersDto = {
-      userId: session.user.id,
-      courseId: courseId,
-      universityId: universityId
-    };
-    
-    return this.service.getAll(filters);
+    return this.service.getAll(session.user.id, filters);
   }
 
   //Get by id

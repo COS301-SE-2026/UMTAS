@@ -15,12 +15,12 @@ describe('ModuleController', () => {
     moduleName: 'Computer Networks',
     moduleDescription: 'Networks module',
     styling: '#3B82F6',
-    userID: '550e8400-e29b-41d4-a716-446655440000',
+    userID: '00000000-0000-0000-0000-000000000000',
   };
 
   const session: SessionData = {
     user: {
-      id: '550e8400-e29b-41d4-a716-446655440000',
+      id: '00000000-0000-0000-0000-000000000000',
       name: 'Test User',
       email: 'test@example.com',
       emailVerified: false,
@@ -32,7 +32,7 @@ describe('ModuleController', () => {
     session: {
       id: 'sess-1',
       token: 'tok',
-      userId: '550e8400-e29b-41d4-a716-446655440000',
+      userId: '00000000-0000-0000-0000-000000000000',
       expiresAt: new Date(Date.now() + 1000 * 60 * 60).toISOString(),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
