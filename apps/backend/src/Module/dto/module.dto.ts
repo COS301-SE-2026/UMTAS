@@ -50,7 +50,7 @@ export class ModulesDto {
 }//ModuleDto
 
 //Create
-export class CreateModuleDto extends PickType(ModulesDto, ['moduleCode', 'moduleName', 'moduleDescription']) {
+export class CreateModuleDto extends PickType(ModulesDto, ['moduleCode', 'moduleName', 'moduleDescription', 'styling']) {
 
   @ApiProperty({ 
     example: '00000000-0000-0000-0000-000000000000',

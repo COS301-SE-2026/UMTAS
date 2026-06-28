@@ -52,16 +52,7 @@ export class BuilderService {
         };
 
         //Create actual module
-        let module = await this.moduleService.create(moduleDto);
-
-        if (dto.styling) {
-            const styling = await this.moduleService.setStyling(module.moduleID, userId, dto.styling);
-
-            if (!styling) throw new InternalServerErrorException(`Module styling failed to be created`);
-
-            //add styling to the module object
-            module = module = { ...module, ...styling };
-        }
+        let module = await this.moduleService.create(userId, moduleDto);
             
         //Enroll Student to their module
         const [enrollment] = await this.dbService.db
@@ -73,7 +64,10 @@ export class BuilderService {
 
         if (!enrollment) throw new InternalServerErrorException(`User [${userId}] was not enrolled to module [${module.moduleID}]`);
 
-        return module;
+        return {
+            ...module,
+            courseID: dto.courseID
+        };
     }//createModule
 
     //get All USer defined modules
@@ -83,76 +77,30 @@ export class BuilderService {
         const userCourse = await this.doUserUniCourseCheck(userId);
 
         const filters = {
-            userId,
             courseId: userCourse.CourseID
         };
 
         const modulesResponse = await this.moduleService.getAll(userId, filters);
 
-        if (modulesResponse && modulesResponse.modules && modulesResponse.modules.length>0) {
-            // get styling for modules
-            const modulesWithStyling = await Promise.all(
-
-                modulesResponse.modules.map(async (module) => {
-
-                    const styling = await this.moduleService.getStyling(module.moduleID, userId);
-                    return {
-                        ...module,
-                        styling: styling.styling.colour || 'niksi'
-                    };
-                })
-            );
-
-            return {
-                ...modulesResponse,
-                modules: modulesWithStyling
-            }
-        }
-
         return modulesResponse;
     }//END_getAllModules
 
     //Get module by moduleID - no ownership check necessary?
-    async getModuleById(moduleId: string, userId: string): Promise<BuilderSingleResponseDto>{
+    async getModuleById(userId: string, moduleId: string): Promise<BuilderSingleResponseDto>{
         
-        const module =  await this.moduleService.getById(moduleId);
-
-        const styling = await this.moduleService.getStyling(moduleId, userId);
-
-        const colour = styling.styling?.colour || undefined;
-
-        return {
-            ...module, 
-            styling: colour
-        }
+        return await this.moduleService.getById(userId, moduleId);
     }//END_getModuleById
 
     //Update
     //User can modify whatever they want on user owned modules
     async updateModule(userId: string, moduleId: string, dto: UpdateBuilderDto): Promise<BuilderSingleResponseDto> {
 
-        //Get user owned course
-        const userCourse = await this.doUserUniCourseCheck(userId);
-
         //IF user doesn't own module -> throw a fit
-        if (!await this.ownershipCheck(moduleId, userCourse.CourseID)) throw new ForbiddenException(`User [${userId}] does not own module [${moduleId}]`);
+        if (!await this.moduleService.moduleOwnershipCheck(userId, moduleId)) 
+            throw new ForbiddenException(`User [${userId}] does not own module [${moduleId}]`);
 
         //Update any field of module if owned by user
-        let module;
-
-        if (dto.styling) {
-            const styling = await this.moduleService.setStyling(moduleId, userId, dto.styling);
-
-            if (!styling) throw new InternalServerErrorException(`Module styling failed to be created`);
-
-            //add styling to the module object
-            return {
-                ...module,
-                styling: styling.styling.colour ?? dto.styling
-            };
-        } else {
-            module = await this.moduleService.update(moduleId, dto);
-        }
+        let module = await this.moduleService.update(userId, moduleId, dto);
 
         return module;
     }//END_updateModule
@@ -161,11 +109,9 @@ export class BuilderService {
     //User can delete user owned modules
     async deleteModule(userId: string, moduleId: string): Promise<DeleteModuleResponseDto> {
 
-        //Get user owned course
-        const userCourse = await this.doUserUniCourseCheck(userId);
-
-        //ownership check
-        if (!await this.ownershipCheck(moduleId, userCourse.CourseID)) throw new ForbiddenException(`User [${userId}] does not own module [${moduleId}]`);
+        //IF user doesn't own module -> throw a fit
+        if (!await this.moduleService.moduleOwnershipCheck(userId, moduleId)) 
+            throw new ForbiddenException(`User [${userId}] does not own module [${moduleId}]`);
 
         return this.moduleService.deleteById(moduleId);
     }//END_deleteModule
@@ -236,18 +182,4 @@ export class BuilderService {
 
         return course;
     }//END_createUserCourse
-
-    private async ownershipCheck(moduleId: string, courseId: string): Promise<boolean> {
-
-        //Check module ownership
-        const [module] = await this.dbService.db
-            .select()
-            .from(modules)
-            .innerJoin(CourseModule, eq(CourseModule.ModuleID, modules.moduleID))
-            .where(and(eq(modules.moduleID, moduleId), eq(CourseModule.CourseID, courseId))).limit(1);
-
-        //true if exists | False otherwise
-        return !!module;
-    }//END_ownershipCheck
-
 }//BuilderService

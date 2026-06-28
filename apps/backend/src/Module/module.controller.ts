@@ -53,9 +53,10 @@ export class ModuleController {
     description: 'Module code already exists for course'
   })
   createModule(
+    @CurrentSession() session: SessionData,
     @Body() dto: CreateModuleDto
   ) {
-    return this.service.create(dto);
+    return this.service.create(session.user.id, dto);
   }
 
   //Get all

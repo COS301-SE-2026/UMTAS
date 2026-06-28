@@ -34,7 +34,7 @@ export class ModuleService {
   ) {}
 
   // Create module
-  async create(dto: CreateModuleDto): Promise<ModuleSingleResponseDto> {
+  async create(userId: string, dto: CreateModuleDto): Promise<ModuleSingleResponseDto> {
     const code = dto.moduleCode?.trim().toUpperCase();
     const name = dto.moduleName?.trim();
     const courseId = dto.courseID?.trim();
@@ -70,6 +70,17 @@ export class ModuleService {
 
     if (!courseModule)
       throw new InternalServerErrorException(`CourseModule Join table insert failed for creating module: ${newModule.moduleCode}`);
+
+    //Styling
+    if (dto.styling){
+
+      const styling = await this.setStyling(newModule.moduleID, userId, dto.styling.colour);
+
+      return {
+        ...newModule,
+        styling: styling.styling
+      };
+    }
 
     return newModule;
   } //create
@@ -293,6 +304,9 @@ export class ModuleService {
           styling: styleJson
         }).returning();
     }
+
+    if (!modStyle) 
+      throw new InternalServerErrorException(`Module styling ceased to exist`);
 
     return modStyle;
   }//END_setStyling

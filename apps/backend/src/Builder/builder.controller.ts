@@ -102,7 +102,7 @@ export class BuilderController {
     @CurrentSession() session: SessionData,
     @Param('moduleId', ParseUUIDPipe) moduleId: string
   ) {
-    return this.service.getModuleById(moduleId, session.user.id);
+    return this.service.getModuleById(session.user.id, moduleId);
   }
 
   //Update
