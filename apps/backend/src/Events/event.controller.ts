@@ -25,6 +25,7 @@ import { EventService } from './event.service';
 import { Roles } from '../auth/roles.guard';
 import type { SessionData } from '../auth/session.decorator';
 import { CurrentSession } from '../auth/session.decorator';
+import { UserTimetableDto } from 'src/Timetable/dto/timetable.dto';
 
 @ApiTags('Events')
 @Controller('events')
@@ -90,9 +91,8 @@ export class EventController {
     @CurrentSession() session: SessionData,
     @Query() filters: EventFiltersDto,
   ): Promise<EventListResponseDto> {
-    return this.service.getAllEvents({
-      userId: session.user.id,
-      moduleId: filters.moduleId,
+    return this.service.getAllEvents(session.user.id, {
+      moduleId: filters.moduleId
     });
   } //getAllEvents
 

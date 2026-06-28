@@ -107,6 +107,10 @@ rollback-prod PREVIOUS_TAG:
 
 ############################## Backend specific
 
+#Docker cleanup
+dockerClean:
+    phase run -- pnpm --filter backend docker:clean
+
 # generate | example: just generate This_change_to_this_migration
 generate NAME:
     phase run -- pnpm --filter backend db:generate --name={{NAME}}
@@ -119,5 +123,12 @@ migrate:
 studio:
     phase run -- pnpm --filter backend db:studio
 
+# Connect to db
+db_sql:
+    docker exec -it umtas-postgres-1 psql -U umtas_dev_user -d umtas_db
+
+#Migration problem solution
+# DROP SCHEMA public CASCADE; CREATE SCHEMA public; then quite
+# then you can delete all migrations and meta from drizzle and regenerate and migrate
 
 ############################## END_Backend specific

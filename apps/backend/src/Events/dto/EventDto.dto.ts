@@ -155,14 +155,6 @@ export class DeleteResponseDto extends PickType(EventDto, ['eventName', 'eventCo
 export class EventFiltersDto {
 
   @ApiPropertyOptional({
-    description: 'Filter by user ID - return all personal events',
-    example: '550e8400-e29b-41d4-a716-446655440000'
-  })
-  @IsOptional()
-  @IsUUID()
-  userId?: string;
-
-  @ApiPropertyOptional({
     description: 'Filter by module ID - returns all events for module',
     example: '550e8400-e29b-41d4-a716-446655440000'
   })

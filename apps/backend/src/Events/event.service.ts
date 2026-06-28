@@ -1,11 +1,12 @@
 import {
   BadRequestException,
+  filterLogLevels,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
   NotImplementedException,
 } from '@nestjs/common';
-import { eq, and, SQL } from 'drizzle-orm';
+import { eq, and, SQL, getTableColumns } from 'drizzle-orm';
 import { DatabaseService } from '../db/database.service';
 import { Event, UniversityEvent, PersonalEvent, Course, ModuleEnrollment, Venue, EventVenue } from '../entities/index';
 import {
@@ -45,39 +46,18 @@ export class EventService {
   }//END_Create
   
   //getAllEvents
-  async getAllEvents(filters: EventFiltersDto): Promise<EventListResponseDto> {
-    
-    const conditions: SQL[] = [];
+  async getAllEvents(userId: string, filters: EventFiltersDto): Promise<EventListResponseDto> {
+    //moduleId -> Return events for that module
+    //Else -> Return events for modules that user is enrolled in
 
-    if (filters.userId)
-     { conditions.push(eq(ModuleEnrollment.UserID, filters.userId));}
-/*
-    //University Owned events
-else    if (filters.moduleId)
-      {conditions.push(eq(UniversityEvent.moduleID, filters.moduleId));}
-*/
+    let events;
 
-    
-    if (conditions.length===0)
-      throw new BadRequestException('At least one filter required for getAll');
+    if (filters.moduleId) // Events for a module
+      events = await this.getEventsByModule(filters.moduleId);
+    else //No moduleId provided, filter only by user
+      events = await this.getEventsByUser(userId);
 
-    const events = await this.dbService.db
-      .selectDistinct({
-        eventID: Event.eventID,
-        eventName: Event.eventName,
-        eventCode: Event.eventCode,
-        eventCriteria: Event.eventCriteria,
-        isRecurring: Event.isRecurring
-      })
-      .from(Event)
-      .innerJoin(ModuleEnrollment,eq(ModuleEnrollment.UserID,filters.userId ||""))
-      .leftJoin(UniversityEvent, eq(UniversityEvent.eventID, Event.eventID))
-      // .leftJoin(PersonalEvent, eq(PersonalEvent.eventID, Event.eventID))
-      .where(and(...conditions));
-
-  
-   
-    return {events: events.map((event) => this.mapEventToDto(event))};
+    return {events};
   } //getAllEvents
 
   //getById - Shouldn't be changing again
@@ -291,6 +271,31 @@ else    if (filters.moduleId)
     
       return this.mapEventToDto(event);
   }//END_createEvent
+
+  //Get event for module
+  private async getEventsByModule(moduleId: string){
+
+    const events = await this.dbService.db
+      .select(getTableColumns(Event))
+      .from(Event)
+      .innerJoin(UniversityEvent, eq(UniversityEvent.eventID, Event.eventID))
+      .where(eq(UniversityEvent.moduleID, moduleId));
+
+    return events;
+  }//END_getEventsByModule
+
+  //Get events for modules user is enrolled in
+  private async getEventsByUser(userId: string){
+
+    const events = await this.dbService.db
+      .select(getTableColumns(Event))
+      .from(Event)
+      .innerJoin(UniversityEvent, eq(UniversityEvent.eventID, Event.eventID))
+      .innerJoin(ModuleEnrollment, eq(ModuleEnrollment.ModuleID, UniversityEvent.moduleID))
+      .where(eq(ModuleEnrollment.UserID, userId));
+
+    return events;
+  }//END_getEventsByUser
 
   //Map an event to the DTO - idk why this is even necessary but I kept getting type errors when returning an event which is literally fetched straight from the database
   private mapEventToDto(event: typeof Event.$inferSelect): EventDto {
