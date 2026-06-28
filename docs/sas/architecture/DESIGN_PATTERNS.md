@@ -35,11 +35,3 @@ Strong Demo 2 solver strategies:
 
 Both strategies return results through the same solver boundary so the Core API and browser
 workflow do not depend on the specific solving algorithm.
-
-## Pattern Rules
-
-- Do not use patterns as decoration; each pattern must protect a real boundary or variation point.
-- Adapter changes must preserve the canonical timetable structures consumed by the Core API and
-  solver.
-- Strategy changes must preserve the solver request and response contract.
-- New design patterns should be added only when they are stronger than a plain implementation detail.

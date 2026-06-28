@@ -62,10 +62,3 @@ stay behind the Core API.
 
 Bidirectional calendar reconciliation and full external university API integration are outside the
 Demo 2 contract scope unless separately implemented and documented in Swagger.
-
-## Related Pages
-
-- [Architectural Requirements](./ARCHITECTURAL_REQUIREMENTS.md)
-- [Architectural Patterns](./ARCHITECTURAL_PATTERNS.md)
-- [Technology Requirements](./TECHNOLOGY_REQUIREMENTS.md)
-- [Deployment Requirements](../deployment/DEPLOYMENT_REQUIREMENTS.md)

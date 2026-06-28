@@ -1,10 +1,5 @@
 # Architectural Diagram
 
-## Scope
-
-This technology-neutral logical view shows responsibilities, boundaries, and communication
-direction without naming products or deployment platforms.
-
 ```mermaid
 flowchart TB
     subgraph Clients["Client Tier"]
@@ -110,8 +105,3 @@ flowchart TB
 6. The compute service returns a normalized result or structured error.
 7. The worker persists the result and terminal job state through the Core boundary.
 8. The browser polls the Core API for status and retrieves the completed result.
-
-## Accuracy Note
-
-Demo 2 uses one path: Core-owned queue orchestration plus synchronous parser and solver compute
-contracts. Contract details and evidence gaps are in [API Contracts](./API_CONTRACTS.md).

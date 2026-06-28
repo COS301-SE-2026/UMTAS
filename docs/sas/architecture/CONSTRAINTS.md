@@ -1,12 +1,5 @@
 # Architectural Constraints
 
-## Scope
-
-This page records limitations and restrictions that shape the architecture. It does not repeat every
-quality target from the SRS or every deployment mechanism from the deployment section. Design choices
-such as Traefik, queue-backed processing, and stateless workers are treated as architectural responses
-to these constraints.
-
 ## Constraints Table
 
 | ID | Category | Constraint | Source / Rationale | Architectural Impact | Verification | Compliance Status |

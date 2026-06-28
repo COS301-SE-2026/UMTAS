@@ -41,5 +41,3 @@ The documented delivery path is:
 
 Production uses public HTTPS ingress to route to frontend, Core API, worker, parser, and solver
 containers. Database, cache, object storage, and observability services stay internal.
-
-The [SRS](../../srs/index.md) remains authoritative for behavior and quantified quality targets.

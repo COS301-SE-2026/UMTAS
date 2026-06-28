@@ -2,11 +2,6 @@ PLACEHOLDER FILE WILMAR FILL THIS IN
 
 # Quality Requirement Mapping
 
-## Scope
-
-The SRS defines quality targets. This page maps the five Demo 2 targets to architectural
-mechanisms without introducing new target values.
-
 ## Traceability Table
 
 | Requirement | Quantified Target | Architectural Mechanisms | Affected Components | Verification Evidence | Trade-offs / Residual Risk |
@@ -16,7 +11,3 @@ mechanisms without introducing new target values.
 | [NFR-MAINT-001](../../srs/NON-FUNCTIONAL_REQUIREMENTS.md) | An approved backward-compatible fix or small feature is releasable within 2 hours; changed functions remain at cyclomatic complexity 10 or less unless reviewed | Adapter boundaries, stable solver strategy contract, Core-owned orchestration boundary, and automated delivery workflow | Core API, adapters, frontend, solver, delivery pipeline | Timed release exercise, static analysis, complexity review, architecture conformance review | Abstractions must stay tied to real variation points to avoid unnecessary complexity |
 | [NFR-TEST-001](../../srs/NON-FUNCTIONAL_REQUIREMENTS.md) | At least 80% line and branch coverage for first-party code; unit, integration, and E2E suites for the five counted features run unattended | Dependency injection, adapter fixtures, solver strategy tests, explicit queue boundaries, and browser E2E coverage | Core API, frontend, parser boundary, solver boundary, local and CI tooling | Coverage report plus unattended unit, integration, and E2E results | Mock-heavy tests can drift if real-boundary integration and E2E coverage are too thin |
 | [NFR-USA-001](../../srs/NON-FUNCTIONAL_REQUIREMENTS.md) | At least 85% of representative first-time users complete each tested core task within 5 minutes; Demo 2 journeys meet WCAG 2.2 AA with no critical violations | Shared UI primitives, theme configuration, role-specific surfaces, browser-first delivery, and explicit asynchronous job-state feedback | Frontend, Core API status endpoints, auth flows | Ten-participant task study, satisfaction results, automated accessibility audit, and keyboard review | Theme flexibility can create inconsistency if design tokens are not governed |
-
-## Follow-up Gaps
-
-- CI security gates, public URL verification, and observability dashboards are not evidenced here.

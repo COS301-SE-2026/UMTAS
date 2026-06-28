@@ -67,14 +67,3 @@ real variation point, privacy boundary, or scaling concern.
   of the five Demo 2 feature commitments.
 - Technology-specific deployment choices are recorded in the technology and deployment sections.
 - Quantified quality targets remain in the SRS and are mapped in the quality requirement section.
-
-## Related Pages
-
-- [Architectural Patterns](./ARCHITECTURAL_PATTERNS.md)
-- [Design Patterns](./DESIGN_PATTERNS.md)
-- [Constraints](./CONSTRAINTS.md)
-- [Architectural Diagram](./ARCHITECTURAL_DIAGRAM.md)
-- [Quality Requirement Mapping](./QUALITY_REQUIREMENT_MAPPING.md)
-- [Technology Requirements](./TECHNOLOGY_REQUIREMENTS.md)
-- [API Contracts](./API_CONTRACTS.md)
-- [Deployment Requirements](../deployment/DEPLOYMENT_REQUIREMENTS.md)

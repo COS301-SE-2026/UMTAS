@@ -1,10 +1,5 @@
 # Architectural Patterns
 
-## Scope
-
-This page records architecture-scale patterns. Code-level patterns are in
-[Design Patterns](./DESIGN_PATTERNS.md).
-
 ## Pattern Summary
 
 | Pattern | Components | Architectural Purpose |
