@@ -147,9 +147,13 @@ export class EventService {
   } //update
 
   //Delete event
-  async deleteEvent(eventId: string):
+  async deleteEvent(userId: string, role: string, eventId: string):
    Promise<DeleteResponseDto> {
  
+    //Ownership check
+    if (role==='student' && await this.ownershipCheck(userId, eventId)) 
+      throw new ForbiddenException(`User[${userId}][${role}] cannot update event they don't own`);
+
     //fetch event
     const existingEvent = await this.getById(eventId);
 

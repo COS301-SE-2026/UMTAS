@@ -25,7 +25,6 @@ import { EventService } from './event.service';
 import { Roles } from '../auth/roles.guard';
 import type { SessionData } from '../auth/session.decorator';
 import { CurrentSession } from '../auth/session.decorator';
-import { UserTimetableDto } from 'src/Timetable/dto/timetable.dto';
 
 @ApiTags('Events')
 @Controller('events')
@@ -97,7 +96,7 @@ export class EventController {
   } //getAllEvents
 
   //get by id
-  @Get(':id')
+  @Get(':eventId')
   @Roles('student')
   @ApiOperation({
     summary: 'Get event by ID',
@@ -113,9 +112,9 @@ export class EventController {
     description: 'Event not found',
   })
   getById(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('eventId', ParseUUIDPipe) eventId: string,
   ): Promise<EventSingleResponseDto> {
-    return this.service.getById(id);
+    return this.service.getById(eventId);
   } //get by id
 
   //update
@@ -154,7 +153,7 @@ export class EventController {
   updateEvent(
     @CurrentSession() session: SessionData,
     @Param('id', ParseUUIDPipe) eventId: string,
-    @Body() dto: UpdateEventDto,
+    @Body() dto: UpdateEventDto
   ): Promise<EventSingleResponseDto> {
     return this.service.updateEvent(session.user.id, session.user.role, eventId, dto);
   }
@@ -188,8 +187,9 @@ export class EventController {
     description: 'Event was not deleted',
   })
   deleteEvent(
-    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentSession() session: SessionData,
+    @Param('id', ParseUUIDPipe) eventId: string
   ): Promise<DeleteResponseDto> {
-    return this.service.deleteEvent(id);
+    return this.service.deleteEvent(session.user.id, session.user.role, eventId);
   }
 } //EventController
