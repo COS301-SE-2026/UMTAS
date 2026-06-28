@@ -39,6 +39,14 @@ export class ModulesDto {
   @IsString()
   @Length(1, 500)
   moduleDescription?: string | null;
+
+  @ApiPropertyOptional({
+    example: { colour: '#3B82F6' },
+    type: () => Object,
+    description: 'Module styling',
+    additionalProperties: true
+  })
+  styling?: { colour: string } | null;
 }//ModuleDto
 
 //Create
@@ -54,9 +62,16 @@ export class CreateModuleDto extends PickType(ModulesDto, ['moduleCode', 'module
 }//CreateModuleDto
 
 //Update
-export class UpdateModuleDto extends PartialType(OmitType(ModulesDto, ['moduleID'] as const)) {
+export class UpdateModuleDto extends PartialType(OmitType(ModulesDto, ['moduleID', 'styling'] as const)) {
 
-
+  @ApiProperty({
+    example: '#3B82F6',
+    type: String,
+    description: 'String to define color for the module'
+  })
+  @IsString()
+  @IsOptional()
+  styling?: string;
 } //update
 
 //Responses
@@ -98,4 +113,6 @@ export class ModuleFiltersDto {
   @IsOptional()
   @IsUUID()
   universityId?: string;
+
+
 }//ModuleFiltersDto

@@ -7,7 +7,7 @@ import {
   ForbiddenException,
   NotImplementedException,
 } from '@nestjs/common';
-import { eq, and, SQL } from 'drizzle-orm';
+import { eq, and, SQL, getTableColumns } from 'drizzle-orm';
 
 import { DatabaseService } from '../db/database.service';
 import { modules, ModuleStyling } from '../entities/Modules/index';
@@ -21,6 +21,7 @@ import {
 } from './dto/module.dto';
 import { Course, CourseModule,  ModuleEnrollment, University, UniversityRole} from '../entities/index';
 import { CourseService } from 'src/Course/course.service';
+import { equal } from 'assert';
 
 
 //Module service
@@ -93,12 +94,14 @@ export class ModuleService {
     //Build actual query joining Modules -> ModuleEnrollment + CourseModule + Course and then add in dynamic where conditions
     const foundModules = await this.dbService.db
       .selectDistinct({
-        moduleID: modules.moduleID,
-        moduleCode: modules.moduleCode,
-        moduleName: modules.moduleName,
-        moduleDescription: modules.moduleDescription
+        ...getTableColumns(modules),
+        styling: ModuleStyling.styling
       })
       .from(modules)
+      .leftJoin(ModuleStyling, and(
+        eq(ModuleStyling.UserID, userId),
+        eq(ModuleStyling.ModuleID, modules.moduleID)
+      ))
       .leftJoin(ModuleEnrollment, eq(ModuleEnrollment.ModuleID, modules.moduleID))
       .leftJoin(CourseModule, eq(CourseModule.ModuleID, modules.moduleID))
       .leftJoin(Course, eq(Course.CourseID, CourseModule.CourseID))
@@ -107,10 +110,17 @@ export class ModuleService {
     return {modules: foundModules};
   } //getAll
 
-  async getById(moduleId: string): Promise<ModuleSingleResponseDto> {
+  async getById(userId: string, moduleId: string): Promise<ModuleSingleResponseDto> {
     const [module] = await this.dbService.db
-      .select()
+      .select({
+        ...getTableColumns(modules),
+        styling: ModuleStyling.styling
+      })
       .from(modules)
+      .leftJoin(ModuleStyling, and(
+        eq(ModuleStyling.UserID, userId),
+        eq(ModuleStyling.ModuleID, modules.moduleID)
+      ))
       .where(eq(modules.moduleID, moduleId))
       .limit(1);
 
@@ -120,6 +130,7 @@ export class ModuleService {
   } //getById
 
   async update(
+    userId: string,
     moduleId: string,
     dto: UpdateModuleDto
   ): Promise<ModuleSingleResponseDto> {
@@ -131,10 +142,15 @@ export class ModuleService {
         moduleCode: modules.moduleCode,
         moduleName: modules.moduleName,
         moduleDescription: modules.moduleDescription,
-        CourseID: CourseModule.CourseID
+        CourseID: CourseModule.CourseID,
+        styling: ModuleStyling.styling
       })
       .from(modules)
       .innerJoin(CourseModule, eq(CourseModule.ModuleID, modules.moduleID))
+      .leftJoin(ModuleStyling, and(
+        eq(ModuleStyling.ModuleID, modules.moduleID), 
+        eq(ModuleStyling.UserID, userId)
+      ))
       .where(eq(modules.moduleID, moduleId))
       .limit(1);
 
@@ -145,32 +161,65 @@ export class ModuleService {
     if (
       dto.moduleCode === undefined &&
       dto.moduleName === undefined &&
-      dto.moduleDescription === undefined 
+      dto.moduleDescription === undefined &&
+      dto.styling ===undefined
     ) throw new BadRequestException('At least one field is required to update a module');
 
-    const updatedCode = dto.moduleCode?.trim().toUpperCase();
-    const updatedName = dto.moduleName?.trim();
-    const updatedDescription = dto.moduleDescription?.trim();
-
     //If module with same code as updated code already exists in the same course -> throw a fit
-    if (updatedCode && await this.existingModuleCodeForCourse(updatedCode, module.CourseID))
-      throw new ConflictException(`Duplicate module code[${updatedCode}] found for course[${module.CourseID}]`);
+    if (dto.moduleCode){
 
-    //update module
-    const [newModule] = await this.dbService.db
-      .update(modules)
-      .set({
-        moduleCode: updatedCode ?? module.moduleCode,
-        moduleName: updatedName ?? module.moduleName,
-        moduleDescription: updatedDescription ?? module.moduleDescription,
-      })
-      .where(eq(modules.moduleID, moduleId))
-      .returning();
+      const updatedCode = dto.moduleCode?.trim().toUpperCase();
+      if (await this.existingModuleCodeForCourse(updatedCode, module.CourseID))
+        throw new ConflictException(`Duplicate module code[${updatedCode}] found for course[${module.CourseID}]`);
+    }//END_moduleCode update check
+      
+    //Build fields to update if present
+    const updateFields: Partial<typeof modules.$inferInsert> = {};
+    if (dto.moduleCode) updateFields.moduleCode = dto.moduleCode.trim().toUpperCase();
+    if (dto.moduleName) updateFields.moduleName = dto.moduleName.trim();
+    if (dto.moduleDescription) updateFields.moduleDescription = dto.moduleDescription.trim();
 
-    if (!newModule)
-      throw new InternalServerErrorException('Module not updated');
 
-    return newModule;
+    //if fields defined to be updated -> update module
+    let newModule = module;
+    if (Object.keys(updateFields).length>0){
+
+      const [result] = await this.dbService.db
+        .update(modules)
+        .set(updateFields)
+        .where(eq(modules.moduleID, moduleId)).returning();
+
+      if (!result)
+        throw new InternalServerErrorException('Module not updated');
+
+      //CourseID not updateable field for now, might change
+      newModule = {
+        ...result,
+        CourseID: module.CourseID,
+        styling: module.styling
+      };
+    }//END_updateFields presence check
+      
+
+    //Styling update - any user can update styling as it doesn't influence module
+    let newStyling: { colour: string } | null = null;
+    if (dto.styling){
+
+      await this.setStyling(moduleId, userId, dto.styling);
+
+      newStyling = {colour: dto.styling};
+    } else {//Keep original styling - is this really necessary?
+      
+      newStyling = module.styling || null;
+    }
+
+    return {
+      moduleID: newModule.moduleID,
+      moduleCode: newModule.moduleCode,
+      moduleName: newModule.moduleName,
+      moduleDescription: newModule.moduleDescription,
+      styling: newStyling
+    };
   } //update
 
   async deleteById(moduleId: string): Promise<DeleteModuleResponseDto> {

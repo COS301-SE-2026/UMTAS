@@ -107,9 +107,10 @@ export class ModuleController {
     description: 'Module not found'
   })
   getById(
+    @CurrentSession() session: SessionData,
     @Param('moduleId', ParseUUIDPipe) moduleId: string
   ) {
-    return this.service.getById(moduleId);
+    return this.service.getById(session.user.id, moduleId);
   }
 
   //Update
@@ -139,10 +140,11 @@ export class ModuleController {
     description: 'Duplicate module code detected for course'
   })
   update(
+    @CurrentSession() session: SessionData,
     @Param('moduleId', ParseUUIDPipe) moduleId: string,
     @Body() dto: UpdateModuleDto
   ) {
-    return this.service.update(moduleId, dto);
+    return this.service.update(session.user.id, moduleId, dto);
   }
 
   // Delete
