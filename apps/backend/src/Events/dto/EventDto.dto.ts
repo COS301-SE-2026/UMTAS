@@ -92,22 +92,6 @@ export class EventDto {
 //Create Event
 export class CreateEventDto extends PickType(EventDto, ['eventName', 'eventCode', 'eventCriteria', 'isRecurring'] as const) {}
 
-  // //Personal
-  // export class CreatePersonalEventDto extends CreateEventDto {}
-
-  // //University owned
-  // export class CreateUniversityEventDto extends CreateEventDto {
-
-  //   @ApiProperty({
-  //     description: 'Module to which the event belongs'
-  //   })
-  //   @IsUUID()
-  //   moduleID!: string;
-
-  //   //venue
-  // }//CreateUniversityEventDto
-
-
 //Update Event
 export class UpdateEventDto extends PartialType(OmitType(EventDto, ['eventID', 'eventCriteria'] as const)) {
 

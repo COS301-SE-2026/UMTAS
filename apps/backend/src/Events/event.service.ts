@@ -1,14 +1,16 @@
 import {
   BadRequestException,
   filterLogLevels,
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
+  Module,
   NotFoundException,
   NotImplementedException,
 } from '@nestjs/common';
 import { eq, and, SQL, getTableColumns } from 'drizzle-orm';
 import { DatabaseService } from '../db/database.service';
-import { Event, UniversityEvent, PersonalEvent, Course, ModuleEnrollment, Venue, EventVenue } from '../entities/index';
+import { Event, UniversityEvent, PersonalEvent, modules, ModuleEnrollment, Venue, EventVenue, CourseModule, Course } from '../entities/index';
 import {
   CreateEventDto,
   EventSingleResponseDto,
@@ -75,7 +77,7 @@ export class EventService {
     return {event: this.mapEventToDto(event)};
   } //getById
 
-  async updateEvent(eventId: string,dto: UpdateEventDto):
+  async updateEvent(userId: string, role: string, eventId: string, dto: UpdateEventDto):
    Promise<EventSingleResponseDto> {
 
     //Check that at least one field is provided
@@ -89,14 +91,17 @@ export class EventService {
       throw new BadRequestException('At least one update field required');
     //END_field presence check
 
+    //Ownership check
+    //Student can update event if its created from a module that is STUDENT_OWNED
+    //If module isn't STUDENT_OWNED user needs to be admin/lecturer
+    if (role==='student' && await this.ownershipCheck(userId, eventId)) 
+      throw new ForbiddenException(`User[${userId}][${role}] cannot update event they don't own`);
+    //If not a student, no ownership check necessary
+
     const updatedEvent = await this.dbService.db.transaction(
       async (tx: AppDatabase) => {
         //Check that event exists        
-        const [existingEvent] = await tx
-          .select()
-          .from(Event)
-          .where(eq(Event.eventID, eventId))
-          .limit(1);
+        const existingEvent = (await this.getById(eventId)).event;
 
         if (!existingEvent)
           throw new NotFoundException(`Event not found for eventId: ${eventId}`);
@@ -110,6 +115,7 @@ export class EventService {
           ...dto.eventCriteria
         } as EventCriteriaDto;
         
+        //Update actual event entity
         const [event] = await tx
           .update(Event)
           .set({
@@ -296,6 +302,23 @@ export class EventService {
 
     return events;
   }//END_getEventsByUser
+
+  //Check if user owns event through module
+  private async ownershipCheck(userId: string, eventId: string): Promise<boolean>{
+
+    //Get module from which event is created
+    const [module] = await this.dbService.db
+      .select({
+        moduleId: modules.moduleID
+      })
+      .from(modules)
+      .innerJoin(UniversityEvent, eq(UniversityEvent.moduleID, modules.moduleID))
+      .where(eq(UniversityEvent.eventID, eventId))
+      .limit(1);
+
+    //Do ownership check on module
+    return await this.moduleService.moduleOwnershipCheck(userId, module.moduleId);
+  }//END_ownershipCheck
 
   //Map an event to the DTO - idk why this is even necessary but I kept getting type errors when returning an event which is literally fetched straight from the database
   private mapEventToDto(event: typeof Event.$inferSelect): EventDto {

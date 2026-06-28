@@ -152,10 +152,11 @@ export class EventController {
     description: 'Event was not updated',
   })
   updateEvent(
-    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentSession() session: SessionData,
+    @Param('id', ParseUUIDPipe) eventId: string,
     @Body() dto: UpdateEventDto,
   ): Promise<EventSingleResponseDto> {
-    return this.service.updateEvent(id, dto);
+    return this.service.updateEvent(session.user.id, session.user.role, eventId, dto);
   }
 
   //delete

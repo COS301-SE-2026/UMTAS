@@ -19,7 +19,7 @@ import {
   UpdateModuleDto,
   ModuleFiltersDto
 } from './dto/module.dto';
-import { Course, CourseModule,  ModuleEnrollment, University} from '../entities/index';
+import { Course, CourseModule,  ModuleEnrollment, University, UniversityRole} from '../entities/index';
 import { CourseService } from 'src/Course/course.service';
 
 
@@ -296,5 +296,27 @@ export class ModuleService {
       .limit(1);
 
     return uni;
+  }
+
+  async moduleOwnershipCheck(userId: string, moduleId: string): Promise<boolean> {
+    //Returns true if module is owned by user, false otherwise
+    //IF STUDENT_OWNED, and module belongs to course that belongs to university of STUDENT_OWNED UniversityRole entity, then student owns module
+    const [module] = await this.dbService.db
+      .select({
+        moduleId: modules.moduleID
+      })
+      .from(modules)
+      .innerJoin(CourseModule, eq(CourseModule.ModuleID, modules.moduleID))
+      .innerJoin(Course, eq(Course.CourseID, CourseModule.CourseID))
+      .innerJoin(University, eq(University.UniversityID, Course.UniversityID))
+      .innerJoin(UniversityRole, eq(UniversityRole.UniversityID, University.UniversityID))
+      .where(and(
+        eq(modules.moduleID, moduleId),
+        eq(UniversityRole.role, 'STUDENT_OWNED'),
+        eq(UniversityRole.UserID, userId)
+      ))
+      .limit(1);
+
+      return !!module;
   }
 } //ModuleService
