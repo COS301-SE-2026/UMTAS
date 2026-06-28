@@ -34,36 +34,9 @@ export class EventCriteriaDto {
 } //EventCriteriaDto
 
 //update criteria
-export class UpdateEventCriteriaDto {
-  @ApiPropertyOptional({
-    enum: EventType,
-    example: EventType.UNIVERSITY
-  })
-  @IsOptional()
-  @IsEnum(EventType)
-  type?: EventType;
+export class UpdateEventCriteriaDto extends PartialType(EventCriteriaDto) {}
 
-  @ApiPropertyOptional({ example: 'yyyy-mm-dd' })
-  @IsOptional()
-  @IsString()
-  date?: string;
-
-  @ApiPropertyOptional({ example: '08:30' })
-  @IsOptional()
-  @IsString()
-  startTime?: string;
-
-  @ApiPropertyOptional({ example: '10:20' })
-  @IsOptional()
-  @IsString()
-  endTime?: string;
-
-  @ApiProperty({ type: String })
-  @IsOptional()
-  @IsUUID()
-  moduleID?:string
-}
-
+//Base Event class
 export class EventDto {
 
   @ApiProperty({ 
