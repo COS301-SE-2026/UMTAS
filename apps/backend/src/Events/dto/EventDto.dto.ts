@@ -29,8 +29,13 @@ export class EventCriteriaDto {
   @ApiProperty({ type: String })
   @IsOptional()
   @IsUUID()
-  moduleID?:string
-  
+  moduleID?:string;
+
+  @ApiPropertyOptional({ example: 'IT 2-26' })
+  @IsOptional()
+  @IsString()
+  @Length(1, 30)
+  venue?: string;
 } //EventCriteriaDto
 
 //update criteria

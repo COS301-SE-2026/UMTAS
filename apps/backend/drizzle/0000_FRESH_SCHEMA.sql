@@ -87,9 +87,9 @@ CREATE TABLE "ModuleEnrollment" (
 --> statement-breakpoint
 CREATE TABLE "ModuleStyling" (
 	"ModuleID" uuid NOT NULL,
-	"UserTimetableID" uuid,
+	"UserID" uuid,
 	"styling" jsonb DEFAULT '{"colour":""}'::jsonb NOT NULL,
-	CONSTRAINT "ModuleStyling_ModuleID_UserTimetableID_pk" PRIMARY KEY("ModuleID","UserTimetableID")
+	CONSTRAINT "ModuleStyling_ModuleID_UserID_pk" PRIMARY KEY("ModuleID","UserID")
 );
 --> statement-breakpoint
 CREATE TABLE "ModuleTeaches" (
@@ -160,14 +160,15 @@ CREATE TABLE "UniversityRole" (
 );
 --> statement-breakpoint
 CREATE TABLE "EventVenue" (
+	"EventID" uuid NOT NULL,
 	"VenueID" uuid NOT NULL,
-	"UniversityID" uuid NOT NULL,
-	CONSTRAINT "EventVenue_UniversityID_VenueID_pk" PRIMARY KEY("UniversityID","VenueID")
+	CONSTRAINT "EventVenue_EventID_VenueID_pk" PRIMARY KEY("EventID","VenueID")
 );
 --> statement-breakpoint
 CREATE TABLE "Venue" (
-	"VenueID" uuid PRIMARY KEY NOT NULL,
-	"VenueName" varchar(30)
+	"VenueID" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"VenueName" varchar(30),
+	"UniversityID" uuid NOT NULL
 );
 --> statement-breakpoint
 ALTER TABLE "account" ADD CONSTRAINT "account_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -180,7 +181,7 @@ ALTER TABLE "UniversityEvent" ADD CONSTRAINT "UniversityEvent_VenueID_Venue_Venu
 ALTER TABLE "ModuleEnrollment" ADD CONSTRAINT "ModuleEnrollment_ModuleID_Modules_moduleID_fk" FOREIGN KEY ("ModuleID") REFERENCES "public"."Modules"("moduleID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "ModuleEnrollment" ADD CONSTRAINT "ModuleEnrollment_UserID_user_id_fk" FOREIGN KEY ("UserID") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "ModuleStyling" ADD CONSTRAINT "ModuleStyling_ModuleID_Modules_moduleID_fk" FOREIGN KEY ("ModuleID") REFERENCES "public"."Modules"("moduleID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "ModuleStyling" ADD CONSTRAINT "ModuleStyling_UserTimetableID_UserTimetable_UserTimetableID_fk" FOREIGN KEY ("UserTimetableID") REFERENCES "public"."UserTimetable"("UserTimetableID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "ModuleStyling" ADD CONSTRAINT "ModuleStyling_UserID_user_id_fk" FOREIGN KEY ("UserID") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "ModuleTeaches" ADD CONSTRAINT "ModuleTeaches_ModuleID_Modules_moduleID_fk" FOREIGN KEY ("ModuleID") REFERENCES "public"."Modules"("moduleID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "ModuleTeaches" ADD CONSTRAINT "ModuleTeaches_UserID_user_id_fk" FOREIGN KEY ("UserID") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "EventsToTimetables" ADD CONSTRAINT "EventsToTimetables_eventID_Event_eventID_fk" FOREIGN KEY ("eventID") REFERENCES "public"."Event"("eventID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -194,8 +195,9 @@ ALTER TABLE "CourseModule" ADD CONSTRAINT "CourseModule_ModuleID_Modules_moduleI
 ALTER TABLE "CourseModule" ADD CONSTRAINT "CourseModule_CourseID_Course_courseID_fk" FOREIGN KEY ("CourseID") REFERENCES "public"."Course"("courseID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "UniversityRole" ADD CONSTRAINT "UniversityRole_UserID_user_id_fk" FOREIGN KEY ("UserID") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "UniversityRole" ADD CONSTRAINT "UniversityRole_UniversityID_University_UniversityID_fk" FOREIGN KEY ("UniversityID") REFERENCES "public"."University"("UniversityID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "EventVenue" ADD CONSTRAINT "EventVenue_EventID_Event_eventID_fk" FOREIGN KEY ("EventID") REFERENCES "public"."Event"("eventID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "EventVenue" ADD CONSTRAINT "EventVenue_VenueID_Venue_VenueID_fk" FOREIGN KEY ("VenueID") REFERENCES "public"."Venue"("VenueID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "EventVenue" ADD CONSTRAINT "EventVenue_UniversityID_University_UniversityID_fk" FOREIGN KEY ("UniversityID") REFERENCES "public"."University"("UniversityID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "Venue" ADD CONSTRAINT "Venue_UniversityID_University_UniversityID_fk" FOREIGN KEY ("UniversityID") REFERENCES "public"."University"("UniversityID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 CREATE UNIQUE INDEX "account_provider_account_unique" ON "account" USING btree ("providerId","accountId");--> statement-breakpoint
 CREATE INDEX "account_user_id_idx" ON "account" USING btree ("userId");--> statement-breakpoint
 CREATE UNIQUE INDEX "rate_limit_key_unique" ON "rateLimit" USING btree ("key");--> statement-breakpoint

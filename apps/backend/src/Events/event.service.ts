@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { eq, and, SQL } from 'drizzle-orm';
 import { DatabaseService } from '../db/database.service';
-import { Event, UniversityEvent, PersonalEvent, Course, ModuleEnrollment } from '../entities/index';
+import { Event, UniversityEvent, PersonalEvent, Course, ModuleEnrollment, Venue, EventVenue } from '../entities/index';
 import {
   CreateEventDto,
   EventSingleResponseDto,
@@ -20,51 +20,29 @@ import {
 } from './dto/EventDto.dto';
 
 import { AppDatabase } from '../db/database.service';
-import { EventModule } from './event.module';
+import { ModuleService } from 'src/Module/module.service';
 
 @Injectable()
 export class EventService {
-  constructor(private readonly dbService: DatabaseService) {}
+  constructor(
+    private readonly dbService: DatabaseService,
+    private readonly moduleService: ModuleService
+  ) {}
 
   //Create
-  //Personal
-  async createPersonalEvent(userId: string, dto: CreateEventDto): Promise<EventSingleResponseDto> {
+  async create(userId: string, dto: CreateEventDto): Promise<EventSingleResponseDto> {
+
+    const moduleId = dto.eventCriteria.moduleID;
 
     //Create Event
-    const event = await this.createEvent(dto, userId);
-    
-    //Create PersonalEvent table entry
-    const [persEvent] = await this.dbService.db
-      .insert(PersonalEvent)
-      .values({
-        UserID: userId,
-        eventID: event.eventID
-      }).returning();
+    let event;
+    if (moduleId) 
+      event = await this.createUniversityEvent(moduleId, dto);
+    else
+      event = await this.createPersonalEvent(userId, dto);
 
-    if (!persEvent) throw new InternalServerErrorException(`Failed to create personalEvent relationship for User[${userId}] | Event[${event.eventID}]`);
-
-    return {event};
-  }//END_createPersonalEvent
-
-  //University owned
-  async createUniversityEvent(moduleId: string, dto: CreateEventDto): Promise<EventSingleResponseDto> {
-
-    //Create Event
-    const event = await this.createEvent(dto);
-
-    //Create University Event table entry
-    const [uniEvent] = await this.dbService.db
-      .insert(UniversityEvent)
-      .values({
-        moduleID: moduleId,
-        eventID: event.eventID
-      }).returning();
-
-    if (!uniEvent) throw new InternalServerErrorException(`Failed to create University event for module[${moduleId}] | event[${event.eventID}]`);
-
-    return {event};
-  }//END_createUniversityEvent
-  //END_Create
+    return event;
+  }//END_Create
   
   //getAllEvents
   async getAllEvents(filters: EventFiltersDto): Promise<EventListResponseDto> {
@@ -205,6 +183,79 @@ else    if (filters.moduleId)
   //=======================================================
   //🎅's Little Helpers
 
+  //Create Personal Event helper
+  async createPersonalEvent(userId: string, dto: CreateEventDto): Promise<EventDto> {
+    //Create Personal Event
+      //Create Event entity
+      //-> Create PersonalEvent join table entity
+      //Currently no venue
+
+    //Create Event
+    const event = await this.createEvent(dto, userId);
+    
+    //Create PersonalEvent table entry
+    const [persEvent] = await this.dbService.db
+      .insert(PersonalEvent)
+      .values({
+        UserID: userId,
+        eventID: event.eventID
+      }).returning();
+
+    if (!persEvent) throw new InternalServerErrorException(`Failed to create personalEvent relationship for User[${userId}] | Event[${event.eventID}]`);
+
+    return event;
+  }//END_createPersonalEvent
+
+  //Create University Owned Event helper
+  async createUniversityEvent(moduleId: string, dto: CreateEventDto): Promise<EventDto> {
+
+    //Create University event
+      //Create Event entity
+      //-> Create UniversityEvent JOin table entity
+      //-> If venue present -> Create venue entity and link through EventVenue
+
+    const event = await this.createEvent(dto);
+
+    //-> Create UniversityEvent JOin table entity
+    const [uniEvent] = await this.dbService.db
+      .insert(UniversityEvent)
+      .values({
+        moduleID: moduleId,
+        eventID: event.eventID
+      }).returning();
+
+    if (!uniEvent) throw new InternalServerErrorException(`Failed to create University event for module[${moduleId}] | event[${event.eventID}]`);
+
+    //-> If venue present
+    //Get university ID through module
+    const uni = await this.moduleService.getUniForModule(moduleId);
+
+    const venueName = dto.eventCriteria.venue ?? `[${event.eventName}]_venue`;
+
+    const [venue] = await this.dbService.db
+      .insert(Venue)
+      .values({
+        VenueName: venueName,
+        UniversityID: uni.UniversityID
+      }).returning();
+
+    if (!venue) 
+      throw new InternalServerErrorException(`Failed to create venue[${venueName}] for event[${event.eventName}]`);
+
+    //-> Create venue entity and link through EventVenue
+    const [eventVenue] = await this.dbService.db
+      .insert(EventVenue)
+      .values({
+        EventID: event.eventID,
+        VenueID: venue.VenueID
+      }).returning();
+
+    if (!eventVenue)
+      throw new InternalServerErrorException(`Failed to create EventVenue relation for Event[${event.eventID}] - Venue[${Venue.VenueID}]`);
+
+    return event;
+  }//END_createUniversityEvent
+  
   //Create simple event entity
   private async createEvent(dto: CreateEventDto, userId?: string): Promise<EventDto> {
 

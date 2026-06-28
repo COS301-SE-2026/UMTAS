@@ -1,5 +1,5 @@
 {
-  "id": "30122ae4-c7e4-48dd-ac49-84c0fc1338f5",
+  "id": "0b184837-9ae1-4c2d-b737-9b8853810b3d",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -780,8 +780,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "UserTimetableID": {
-          "name": "UserTimetableID",
+        "UserID": {
+          "name": "UserID",
           "type": "uuid",
           "primaryKey": false,
           "notNull": false
@@ -809,26 +809,26 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "ModuleStyling_UserTimetableID_UserTimetable_UserTimetableID_fk": {
-          "name": "ModuleStyling_UserTimetableID_UserTimetable_UserTimetableID_fk",
+        "ModuleStyling_UserID_user_id_fk": {
+          "name": "ModuleStyling_UserID_user_id_fk",
           "tableFrom": "ModuleStyling",
-          "tableTo": "UserTimetable",
+          "tableTo": "user",
           "columnsFrom": [
-            "UserTimetableID"
+            "UserID"
           ],
           "columnsTo": [
-            "UserTimetableID"
+            "id"
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {
-        "ModuleStyling_ModuleID_UserTimetableID_pk": {
-          "name": "ModuleStyling_ModuleID_UserTimetableID_pk",
+        "ModuleStyling_ModuleID_UserID_pk": {
+          "name": "ModuleStyling_ModuleID_UserID_pk",
           "columns": [
             "ModuleID",
-            "UserTimetableID"
+            "UserID"
           ]
         }
       },
@@ -1386,14 +1386,14 @@
       "name": "EventVenue",
       "schema": "",
       "columns": {
-        "VenueID": {
-          "name": "VenueID",
+        "EventID": {
+          "name": "EventID",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
-        "UniversityID": {
-          "name": "UniversityID",
+        "VenueID": {
+          "name": "VenueID",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
@@ -1401,6 +1401,19 @@
       },
       "indexes": {},
       "foreignKeys": {
+        "EventVenue_EventID_Event_eventID_fk": {
+          "name": "EventVenue_EventID_Event_eventID_fk",
+          "tableFrom": "EventVenue",
+          "tableTo": "Event",
+          "columnsFrom": [
+            "EventID"
+          ],
+          "columnsTo": [
+            "eventID"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
         "EventVenue_VenueID_Venue_VenueID_fk": {
           "name": "EventVenue_VenueID_Venue_VenueID_fk",
           "tableFrom": "EventVenue",
@@ -1413,26 +1426,13 @@
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
-        },
-        "EventVenue_UniversityID_University_UniversityID_fk": {
-          "name": "EventVenue_UniversityID_University_UniversityID_fk",
-          "tableFrom": "EventVenue",
-          "tableTo": "University",
-          "columnsFrom": [
-            "UniversityID"
-          ],
-          "columnsTo": [
-            "UniversityID"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {
-        "EventVenue_UniversityID_VenueID_pk": {
-          "name": "EventVenue_UniversityID_VenueID_pk",
+        "EventVenue_EventID_VenueID_pk": {
+          "name": "EventVenue_EventID_VenueID_pk",
           "columns": [
-            "UniversityID",
+            "EventID",
             "VenueID"
           ]
         }
@@ -1450,17 +1450,38 @@
           "name": "VenueID",
           "type": "uuid",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "gen_random_uuid()"
         },
         "VenueName": {
           "name": "VenueName",
           "type": "varchar(30)",
           "primaryKey": false,
           "notNull": false
+        },
+        "UniversityID": {
+          "name": "UniversityID",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "Venue_UniversityID_University_UniversityID_fk": {
+          "name": "Venue_UniversityID_University_UniversityID_fk",
+          "tableFrom": "Venue",
+          "tableTo": "University",
+          "columnsFrom": [
+            "UniversityID"
+          ],
+          "columnsTo": [
+            "UniversityID"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},

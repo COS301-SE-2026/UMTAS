@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1782555741304,
-      "tag": "0000_oval_molten_man",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1782556936609,
-      "tag": "0001_hallow_mensies",
+      "when": 1782632019178,
+      "tag": "0000_FRESH_SCHEMA",
       "breakpoints": true
     }
   ]

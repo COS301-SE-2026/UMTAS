@@ -19,7 +19,7 @@ import {
   UpdateModuleDto,
   ModuleFiltersDto
 } from './dto/module.dto';
-import { Course, CourseModule,  ModuleEnrollment} from '../entities/index';
+import { Course, CourseModule,  ModuleEnrollment, University} from '../entities/index';
 import { CourseService } from 'src/Course/course.service';
 
 
@@ -280,5 +280,21 @@ export class ModuleService {
       .limit(1);
 
     return styling;
+  }
+
+  //Get University that owns module
+  async getUniForModule(moduleId: string) {
+
+    const [uni] = await this.dbService.db
+      .select({
+        UniversityID: University.UniversityID
+      })
+      .from(University)
+      .innerJoin(Course, eq(Course.UniversityID, University.UniversityID))
+      .innerJoin(CourseModule, eq(Course.CourseID, CourseModule.CourseID))
+      .where(eq(CourseModule.ModuleID, moduleId))
+      .limit(1);
+
+    return uni;
   }
 } //ModuleService
