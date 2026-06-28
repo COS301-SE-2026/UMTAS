@@ -74,14 +74,6 @@ export class TimetableService {
   } //createTimetable
 
   async getAllTimetables(userId: string): Promise<TimetableListResponseDto> {
-    /* const rows = await this.databaseService.db
-      .select({ timetable: Timetable, eventID: EventsToTimetables.eventID })
-      .from(Timetable)
-      .leftJoin(
-        EventsToTimetables,
-        eq(EventsToTimetables.timetableID, Timetable.timetableID),
-      )
-      .where(eq(Timetable.userID, userId));*/
 
     const rows = await this.databaseService.db
       .select({
@@ -145,16 +137,6 @@ export class TimetableService {
       throw new BadRequestException('At least one update field required');
 
     await this.databaseService.db.transaction(async (tx: AppDatabase) => {
-      /*  const [existing] = await tx
-        .select()
-        .from(Timetable)
-        .where(
-          and(
-            eq(Timetable.timetableID, timetableId),
-            eq(Timetable.userID, userId),
-          ),
-        )
-        .limit(1);*/
 
       const [existing] = await tx
         .select()
@@ -222,17 +204,7 @@ export class TimetableService {
     userId: string,
     timetableId: string,
   ): Promise<DeleteTimetableResponseDto> {
-    /* const [existing] = await this.databaseService.db
-      .select()
-      .from(Timetable)
-      .where(
-        and(
-          eq(Timetable.timetableID, timetableId),
-          eq(Timetable.userID, userId),
-        ),
-      )
-      .limit(1);
-      */
+
     const [existing] = await this.databaseService.db
       .select()
       .from(UserTimetable)
@@ -266,20 +238,7 @@ export class TimetableService {
     userId: string,
     timetableId: string,
   ): Promise<TimetableResponseDto> {
-    /*
-    const rows = await this.databaseService.db
-      .select({ timetable: Timetable, eventID: EventsToTimetables.eventID })
-      .from(Timetable)
-      .leftJoin(
-        EventsToTimetables,
-        eq(EventsToTimetables.timetableID, Timetable.timetableID),
-      )
-      .where(
-        and(
-          eq(Timetable.timetableID, timetableId),
-          eq(Timetable.userID, userId),
-        ),
-        );*/
+
     const rows = await this.databaseService.db
       .select({
         UserTimetable: UserTimetable,
@@ -318,6 +277,7 @@ export class TimetableService {
     };
   } //fetchTimetableWithEvents
 
+  //🎅's little helpers
   private async validateEventIds(
     tx: AppDatabase,
     eventIds: string[],

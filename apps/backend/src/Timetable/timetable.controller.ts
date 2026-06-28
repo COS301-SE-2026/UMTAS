@@ -33,9 +33,10 @@ import type { SessionData } from '../auth/session.decorator';
 export class TimetableController {
   constructor(private readonly service: TimetableService) {}
 
+
   @Post()
   @ApiOperation({
-    summary: 'Create a timetable',
+    summary: 'Create a timetable - user owned',
     operationId: 'createTimetable',
   })
   @ApiBody({ type: CreateTimetableDto })
@@ -55,7 +56,9 @@ export class TimetableController {
     @Body() dto: CreateTimetableDto,
   ): Promise<TimetableResponseDto> {
     return this.service.createTimetable(session.user.id, dto);
-  } //createTimetable
+  } //CreateTimetable - Template timetable
+
+
 
   @Get()
   @ApiOperation({

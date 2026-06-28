@@ -5,7 +5,7 @@ import { isNotNull } from 'drizzle-orm';
 
 import { CreateModuleDto, ModulesDto, ModuleSingleResponseDto, UpdateModuleDto } from 'src/Module/dto/module.dto';
 
-export class CreateBuilderModuleDto extends CreateModuleDto {
+export class CreateBuilderModuleDto extends OmitType(CreateModuleDto, ['courseID']) {
 
 }
 

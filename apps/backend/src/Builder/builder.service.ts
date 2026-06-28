@@ -65,8 +65,7 @@ export class BuilderService {
         if (!enrollment) throw new InternalServerErrorException(`User [${userId}] was not enrolled to module [${module.moduleID}]`);
 
         return {
-            ...module,
-            courseID: dto.courseID
+            ...module
         };
     }//createModule
 
