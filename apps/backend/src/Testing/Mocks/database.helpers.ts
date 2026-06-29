@@ -69,3 +69,8 @@ export function mockDeleteResult(mockDb: any, result: unknown=undefined){
 export function mockSequentialResults(mockFn: jest.Mock, results: unknown[][]){
     results.forEach((result) => mockFn.mockReturnValueOnce(createDbChain(result)));
 }
+
+//transactions
+export function mockTransaction(mockDb: any){
+    mockDb.transaction.mockImplementation((callback: any)=> callback(mockDb));
+}

@@ -23,7 +23,7 @@ import {
 } from './dto/EventDto.dto';
 
 import { AppDatabase } from '../db/database.service';
-import { ModuleService } from 'src/Module/module.service';
+import { ModuleService } from '../Module/module.service';
 
 @Injectable()
 export class EventService {
@@ -44,7 +44,7 @@ export class EventService {
     else
       event = await this.createPersonalEvent(userId, dto);
 
-    return event;
+    return {event};
   }//END_Create
   
   //getAllEvents
@@ -94,7 +94,7 @@ export class EventService {
     //Ownership check
     //Student can update event if its created from a module that is STUDENT_OWNED
     //If module isn't STUDENT_OWNED user needs to be admin/lecturer
-    if (role==='student' && await this.ownershipCheck(userId, eventId)) 
+    if (role==='student' && !await this.ownershipCheck(userId, eventId)) 
       throw new ForbiddenException(`User[${userId}][${role}] cannot update event they don't own`);
     //If not a student, no ownership check necessary
 
@@ -151,7 +151,7 @@ export class EventService {
    Promise<DeleteResponseDto> {
  
     //Ownership check
-    if (role==='student' && await this.ownershipCheck(userId, eventId)) 
+    if (role==='student' && !await this.ownershipCheck(userId, eventId)) 
       throw new ForbiddenException(`User[${userId}][${role}] cannot update event they don't own`);
 
     //fetch event

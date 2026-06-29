@@ -1,6 +1,7 @@
 import { randomUUID } from "crypto";
 import { modules, CourseModule, ModuleEnrollment, ModuleStyling } from "src/entities";
 import { courseId } from "../constants.spec";
+import { ModuleService } from "../../Module/module.service";
 
 export const baseDto = {
     moduleCode: 'COS332',
@@ -9,6 +10,20 @@ export const baseDto = {
     courseID: courseId
 };
 
+export function createMockModuleService() {
+
+    const mockModuleService: Partial<jest.Mocked<ModuleService>> = {
+        getUniForModule: jest.fn(),
+        moduleOwnershipCheck: jest.fn()
+    };
+
+    return {
+        mockModuleService,
+        reset: ()=>{
+            Object.values(mockModuleService).forEach((fn: any)=>fn.mockReset());
+        }
+    };
+}//END_createMockModuleService
 
 type Module = typeof modules.$inferSelect;
 
