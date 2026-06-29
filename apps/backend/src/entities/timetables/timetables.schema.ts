@@ -34,6 +34,6 @@ export const UserTimetable = pgTable('UserTimetable', {
     .references(() => usersTable.id, { onDelete: 'cascade' })
     .notNull(),
   TimetableID: uuid('TimetableID')
-    .references(() => Timetable.timetableID)
+    .references(() => Timetable.timetableID, { onDelete: 'cascade' })
     .notNull(),
 });

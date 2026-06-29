@@ -161,10 +161,7 @@ export class TimetableService {
           .update(Timetable)
           .set({ timetableName: dto.timetableName! })
           .where(
-            and(
               eq(Timetable.timetableID, existing.Timetable.timetableID),
-              eq(UserTimetable.UserID, userId),
-            ),
           )
           .returning();
 
