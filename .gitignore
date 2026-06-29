@@ -126,3 +126,4 @@ working_docs/
 apps/frontend/junit.xml
 
 .pnpm-store/
+apps/preference-solver/compile_commands.json
