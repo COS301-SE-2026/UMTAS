@@ -7,19 +7,13 @@ import { WizardFooter } from "@/components/atoms/builder/WizardFooter";
 import { ModulesStep } from "@/components/organisms/builder/ModulesStep";
 import { EventsStep } from "@/components/organisms/builder/EventsStep";
 import { GenerateStep } from "@/components/organisms/builder/GenerateStep";
-import { getAllModulesBuilder } from "@/app/builder/utils/modules/requestBuilders";
+
 import {
-  getAllEventsBuilder,
-  createEventsBuilder,
-  deleteEventById,
-  updateEventByID,
-  type EventResponse,
-} from "@/app/builder/utils/events/eventRequestBuilder";
-import {
-  createTimeTableBuilder,
-  getTTbyIdBuilder,
-  updateTTbyIDBuilder,
-} from "@/app/builder/utils/timetables/TimeTableRequests";
+  addTimetableMut,
+  updateTimetableMut,
+  getTimetableByIdQ
+} from "./Queries/timetableQueries";
+import { useMutation } from "@tanstack/react-query";
 
 import { getAllModulesQ } from "./Queries/moduleQueries";
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
@@ -53,11 +47,13 @@ export function WizardShell() {
     isError: modError,
   } = useQuery(getAllModulesQ());
   const { data: events = [] } = useQuery(getAllEventsQ());
+  const { mutateAsync: addTimetable } = useMutation(addTimetableMut());
+  const { mutateAsync: updateTimetable } = useMutation(updateTimetableMut());
 
   const [isGenerating, setIsGenerating] = useState(false);
 
   const [isInitialLoading, setIsInitialLoading] = useState(!!editId);
-  const [selectedEventIds, setSelectedEventIds] = useState<number[]>([]);
+  const [selectedEventIds, setSelectedEventIds] = useState<string[]>([]);
   const [OGeventId, setOGeventId] = useState<string[]>([]);
   const [timetableName, setTimetableName] = useState("My New Schedule");
 
@@ -82,25 +78,22 @@ export function WizardShell() {
       setCurrentStep(currentStep - 1);
     }
   }
-  async function handleGenerate(name: string, selectedEventIds: number[]) {
+  async function handleGenerate(name: string, selectedEventIds: string[]) {
     setIsGenerating(true);
     try {
-      const finalEvents = selectedEventIds.map((id) =>
-        parseInt(String(id), 10),
-      );
+      const finalEvents = selectedEventIds.map((id) => id);
 
       if (editId) {
-        const noNumIds = OGeventId.map(Number).filter(
+        const noNumIds = OGeventId.filter(
           (id) => !selectedEventIds.includes(id),
         );
 
         const numbersOnlyAddIds = selectedEventIds.filter(
-          (id) => !OGeventId.map(Number).includes(id),
+          (id) => !OGeventId.includes(id),
         );
 
-        const builder = new updateTTbyIDBuilder();
-        await builder.send({
-          paths: { id: editId },
+        await updateTimetable({
+          path: { id: editId },
           body: {
             timetableName: name || "Updated Schedule",
             removeEventIds: noNumIds,
@@ -108,8 +101,7 @@ export function WizardShell() {
           },
         });
       } else {
-        const builder = new createTimeTableBuilder();
-        await builder.send({
+        await addTimetable({
           body: {
             timetableName: name || "Generated Schedule",
             eventIds: finalEvents,
@@ -117,7 +109,7 @@ export function WizardShell() {
         });
       }
 
-      window.location.href = "/schedules";
+      router.push("/schedules");
     } catch (error) {
       console.error("Failed to generate timetable:", error);
       setIsGenerating(false);
@@ -168,31 +160,20 @@ export function WizardShell() {
 
     async function loadAllEditData() {
       try {
-        const [timetableRes, modulesRes, eventsRes] = await Promise.all([
-          //prevents opening on step 0 (modules)
-          new getTTbyIdBuilder().send({
-            paths: { id: editId! },
-          }),
-          new getAllModulesBuilder().send({}),
-          new getAllEventsBuilder().send({}),
+        const queryClient = getQueryClient();
+
+        const [timetableRes, modulesData, eventsData] = await Promise.all([
+          queryClient.fetchQuery(getTimetableByIdQ(editId!)),
+          queryClient.fetchQuery(getAllModulesQ()),
+          queryClient.fetchQuery(getAllEventsQ()),
         ]);
-
-        getQueryClient().setQueryData(
-          getAllModulesQ().queryKey,
-          modulesRes.modules,
-        );
-
-        getQueryClient().setQueryData(
-          getAllEventsQ().queryKey,
-          eventsRes.events,
-        );
 
         setTimetableName(
           timetableRes.timetable.timetableName || "Updated Schedule",
         );
 
         setOGeventId((timetableRes.eventIds || []).map(String));
-        setSelectedEventIds((timetableRes.eventIds || []).map(Number));
+        setSelectedEventIds((timetableRes.eventIds || []).map(String));
 
         setCompletedSteps([0, 1]);
         setCurrentStep(2);

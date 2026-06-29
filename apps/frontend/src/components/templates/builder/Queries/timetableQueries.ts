@@ -6,6 +6,7 @@ import {
   createTimeTableBody,
   updateTTbyIDBody,
   updateTTbyIDPath,
+  getTTbyIdBuilder
 } from "@/app/builder/utils/timetables/TimeTableRequests";
 
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
@@ -17,6 +18,13 @@ export function getAllTimetablesQ() {
     queryKey: ["timetables"] as const,
     queryFn: async () =>
       (await new getAllTimeTablesBuilder().send({})).timetables,
+  });
+}
+
+export function getTimetableByIdQ(id: string) {
+  return queryOptions({
+    queryKey: ["timetables", "detail", id] as const,
+    queryFn: async () => await new getTTbyIdBuilder().send({ paths: { id } }),
   });
 }
 
