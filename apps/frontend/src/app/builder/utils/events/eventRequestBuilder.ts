@@ -6,14 +6,14 @@ import {
 import { paths } from "@/lib/api";
 
 export type CreateEventPath =
-  paths["/events/university/{moduleId}"]["post"]["parameters"]["path"];
+  paths["/events"]["post"]["parameters"]["path"];
 
 export type CreateEventBody =
-  paths["/events/university/{moduleId}"]["post"]["requestBody"]["content"]["application/json"];
+  paths["/events"]["post"]["requestBody"]["content"]["application/json"];
 export type EventCriteria = CreateEventBody["eventCriteria"];
 
 export type createEventRes =
-  paths["/events/university/{moduleId}"]["post"]["responses"]["201"]["content"]["application/json"];
+  paths["/events"]["post"]["responses"]["201"]["content"]["application/json"];
 
 export type getallEventsReq = paths["/events"]["get"]["parameters"]["query"];
 export type getAllEventsRes =
@@ -21,9 +21,9 @@ export type getAllEventsRes =
 
 export type EventResponse = getAllEventsRes["events"][number];
 
-export type getEventByIDPath = paths["/events/{id}"]["get"]["parameters"]["path"];
+export type getEventByIDPath = paths["/events/{eventId}"]["get"]["parameters"]["path"];
 export type getEventByIDRes =
-  paths["/events/{id}"]["get"]["responses"]["200"]["content"]["application/json"];
+  paths["/events/{eventId}"]["get"]["responses"]["200"]["content"]["application/json"];
 
 export type updateEventByIdPath = paths["/events/{id}"]["patch"]["parameters"]["path"];
 
@@ -44,7 +44,7 @@ export class createEventsBuilder extends RequestBuilder<
 > {
   constructor() {
     super();
-    this.setUrl("/events/university/{moduleId}").setMethod(RequestMethod.POST);
+    this.setUrl("/events").setMethod(RequestMethod.POST);
   }
 }
 
