@@ -51,6 +51,6 @@ clean c:
 clean_lib:
 	rm -rf $(LIB_DIR)
     
-run r:
+run r: $(TARGET)
 	./$(TARGET)
 

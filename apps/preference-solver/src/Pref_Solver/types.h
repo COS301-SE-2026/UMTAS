@@ -92,7 +92,7 @@ struct EventChromosome
         }
     }
 
-    EventChromosome &operator=(EventChromosome &chrom)
+    EventChromosome &operator=(const EventChromosome &chrom)
     {
         if (this == &chrom)
         {
@@ -100,7 +100,7 @@ struct EventChromosome
         }
         this->events.resize(chrom.events.size());
         int index = 0;
-        for (EventGA &event : chrom.events)
+        for (EventGA event : chrom.events)
         {
             this->events[index++] = event;
         }
