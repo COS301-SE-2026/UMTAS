@@ -18,5 +18,4 @@ private:
     static std::unordered_map<string, int> &setModuleData(const std::vector<ModuleGA> &modules);
     static EventChromosome &CreateEventChromosome(std::vector<EventGA> &events);
     static EventChromosome StartGA(GA_DATA &data);
-    static bool init_genes(EventChromosome &chrom, const GA_DATA &data);
 };

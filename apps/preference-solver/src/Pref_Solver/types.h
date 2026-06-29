@@ -1,6 +1,7 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include "../../lib/openGA.hpp"
 using std::cout;
 using std::endl;
 using std::string;
@@ -75,6 +76,7 @@ struct GA_DATA
 struct EventChromosome
 {
     std::vector<EventGA> events;
+    int targetTime;
     EventChromosome()
     {
     }
@@ -103,4 +105,8 @@ struct EventChromosome
         }
         return *this;
     }
+};
+struct ChromMiddleCost
+{
+    double penalty_score;
 };

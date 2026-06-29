@@ -37,6 +37,33 @@ EventChromosome GA_PREF::StartGA(GA_DATA &data)
 {
 }
 
-bool init_genes(EventChromosome &chrom, const GA_DATA &data)
+void init_genes(
+    EventChromosome &p,
+    const std::function<double(void)> &rnd01)
 {
+    for (auto event : p.events)
+    {
+        if (rnd01() >= 0.5)
+        {
+            event.is_active = true;
+        }
+    }
 }
+
+bool eval_solution(
+    const EventChromosome &p,
+    ChromMiddleCost &c)
+{
+    
+}
+
+EventChromosome mutate(
+    const EventChromosome &p,
+    const std::function<double(void)> &rnd01,
+    double mutation_rate,
+    double shrink_scale);
+
+EventChromosome crossover(
+    const EventChromosome &X1,
+    const EventChromosome &X2,
+    const std::function<double(void)> &rnd01);
