@@ -302,7 +302,9 @@ export class ModuleService {
         .update(ModuleStyling)
         .set({
           styling: styleJson
-        }).returning();
+        })
+        .where(and(eq(ModuleStyling.ModuleID, moduleId), eq(ModuleStyling.UserID, userId)))
+        .returning();
     }
 
     if (!modStyle) 
