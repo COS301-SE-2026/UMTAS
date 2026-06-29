@@ -1,9 +1,10 @@
-CXX := g++
-CFLAGS := -Wall -Wextra -I$(LIB_DIR)
-
-SRC_DIR :=src
+SRC_DIR := src
 BUILD_DIR := build
-LIB_DIR :=$(BUILD_DIR)/lib
+LIB_DIR := lib
+
+CXX := g++
+CFLAGS := -Wall -Wextra -I $(LIB_DIR)
+
 
 SRC_FILES := $(wildcard $(SRC_DIR)/*.cpp)
 OBJS := $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SRC_FILES))
@@ -17,10 +18,11 @@ TARGET := $(BUILD_DIR)/app
 all :$(TARGET)
 
 $(TARGET):$(OBJS)
+	@mkdir -p $(BUILD_DIR)
 	$(CXX) $(CFLAGS) -o $@ $^
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
-	@mkdir -p $(SRC_DIR)
+	@mkdir -p $(BUILD_DIR)
 	$(CXX) $(CFLAGS) -c $< -o $@
 
 clean c:
@@ -38,4 +40,7 @@ $(OPEN_GA_HEADER):
 	rm -rf $(LIB_DIR)/openGA-1.0.5 $(LIB_DIR)/openGA.zip
 	
 download d: $(OPEN_GA_HEADER)
-	
+
+bear : clean 
+	bear -- make all
+    
