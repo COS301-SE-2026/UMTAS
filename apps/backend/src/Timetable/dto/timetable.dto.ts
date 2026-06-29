@@ -4,9 +4,9 @@ import {
   IsOptional,
   IsString,
   IsArray,
-  IsInt,
   ArrayUnique,
   Length,
+  IsUUID,
 } from 'class-validator';
 
 export class CreateTimetableDto {
@@ -20,14 +20,13 @@ export class CreateTimetableDto {
   timetableName?: string;
 
   @ApiPropertyOptional({
-    type: [Number],
-    example: [1, 2, 3],
+    type: [String],
+    example: ['00000000-0000-0000-0000-000000000000'],
     description: 'Event IDs to attach on creation',
   })
   @IsOptional()
   @IsArray()
-  @Type(() => Number)
-  @IsInt({ each: true })
+  @IsUUID( 'all', { each: true })
   @ArrayUnique()
   eventIds?: string[];
 } //CreateTimetableDto
@@ -43,24 +42,24 @@ export class UpdateTimetableDto {
   timetableName?: string;
 
   @ApiPropertyOptional({
-    type: [Number],
-    example: [4, 5],
+    type: [String],
+    example: ['00000000-0000-0000-0000-000000000000'],
     description: 'Event IDs to link to the timetable',
   })
   @IsOptional()
   @IsArray()
-  @IsInt({ each: true })
+  @IsUUID('all', { each: true })
   @ArrayUnique()
   addEventIds?: string[];
 
   @ApiPropertyOptional({
-    type: [Number],
-    example: [1, 2],
+    type: [String],
+    example: ['00000000-0000-0000-0000-000000000000'],
     description: 'Event IDs to unlink from the timetable',
   })
   @IsOptional()
   @IsArray()
-  @IsInt({ each: true })
+  @IsUUID('all', { each: true })
   @ArrayUnique()
   removeEventIds?: string[];
 } //UpdateTimetableDto
@@ -92,8 +91,8 @@ export class TimetableResponseDto {
   timetable!: TimetableDto;
 
   @ApiPropertyOptional({
-    type: [Number],
-    example: [1, 2, 3],
+    type: [String],
+    example: ['00000000-0000-0000-0000-000000000000'],
     description: 'IDs of events linked to this timetable',
   })
   eventIds?: string[];
