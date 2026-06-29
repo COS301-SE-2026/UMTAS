@@ -62,17 +62,7 @@ export class CreateModuleDto extends PickType(ModulesDto, ['moduleCode', 'module
 }//CreateModuleDto
 
 //Update
-export class UpdateModuleDto extends PartialType(OmitType(ModulesDto, ['moduleID', 'styling'] as const)) {
-
-  @ApiProperty({
-    example: '#3B82F6',
-    type: String,
-    description: 'String to define color for the module'
-  })
-  @IsString()
-  @IsOptional()
-  styling?: string;
-} //update
+export class UpdateModuleDto extends PartialType(OmitType(ModulesDto, ['moduleID'] as const)) {} //update
 
 //Responses
 //Single
