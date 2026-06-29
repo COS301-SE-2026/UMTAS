@@ -57,16 +57,28 @@ struct ModuleGA
     int number_Occur;
 };
 
-struct GA_Data
+struct API_DATA
 {
     std::vector<ModuleGA> modules;
     std::vector<EventGA> events;
     int targetTime;
 };
 
+struct GA_DATA
+{
+    std::vector<ModuleGA> modules;
+    std::vector<EventGA> events;
+    int targetTime;
+    std::unordered_map<string, int> moduleCounts;
+};
+
 struct EventChromosome
 {
     std::vector<EventGA> events;
+    EventChromosome()
+    {
+    }
+
     EventChromosome(EventChromosome &chrom)
     {
         this->events.resize(chrom.events.size());

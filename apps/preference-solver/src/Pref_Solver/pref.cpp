@@ -1,21 +1,12 @@
 #include "pref.h"
 
-GA_PREF::GA_PREF(GA_Data &data)
+GA_PREF::GA_PREF()
 {
-    this->targetTime = data.targetTime;
-    try
-    {
-        setModuleData(data.modules);
-        CreateEventChromosome(data.events);
-    }
-    catch (const std::exception &e)
-    {
-        std::cerr << e.what() << '\n';
-    }
 }
 
-bool GA_PREF::setModuleData(std::vector<ModuleGA> modules)
+std::unordered_map<string, int> &GA_PREF::setModuleData(const std::vector<ModuleGA> &modules)
 {
+    std::unordered_map<string, int> numOccurences;
     for (const ModuleGA &module : modules)
     {
         if (numOccurences.find(module.moduleCode) != numOccurences.end())
@@ -27,16 +18,25 @@ bool GA_PREF::setModuleData(std::vector<ModuleGA> modules)
             numOccurences.insert({module.moduleCode, module.number_Occur});
         }
     }
-    return true;
+    return numOccurences;
 }
 // makes a chromosome to be used that has all events false.
-bool GA_PREF::CreateEventChromosome(std::vector<EventGA> events)
+EventChromosome &GA_PREF::CreateEventChromosome(std::vector<EventGA> &events)
 {
-    this->copyChromosome.events.resize(events.size());
+    EventChromosome copyChromosome;
     int index = 0;
     for (EventGA &event : events)
     {
         event.is_active = false;
         copyChromosome.events[index++] = event;
     }
+    return copyChromosome;
+}
+
+EventChromosome GA_PREF::StartGA(GA_DATA &data)
+{
+}
+
+bool init_genes(EventChromosome &chrom, const GA_DATA &data)
+{
 }

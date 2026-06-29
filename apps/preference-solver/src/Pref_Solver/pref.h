@@ -11,15 +11,12 @@ using std::string;
 class GA_PREF
 {
 private:
-    int targetTime;
-    std::unordered_map<string, int> numOccurences;
-    EventChromosome copyChromosome;
-    // finds how many times module code should occcur
-
 public:
-    GA_PREF(GA_Data &data);
+    GA_PREF();
 
 private:
-    bool setModuleData(std::vector<ModuleGA> modules);
-    bool CreateEventChromosome(std::vector<EventGA> events);
+    static std::unordered_map<string, int> &setModuleData(const std::vector<ModuleGA> &modules);
+    static EventChromosome &CreateEventChromosome(std::vector<EventGA> &events);
+    static EventChromosome StartGA(GA_DATA &data);
+    static bool init_genes(EventChromosome &chrom, const GA_DATA &data);
 };
