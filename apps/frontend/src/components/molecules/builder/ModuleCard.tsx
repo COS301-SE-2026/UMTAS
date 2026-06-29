@@ -93,7 +93,7 @@ export function ModuleCard({ module, onUpdate, errors }: ModuleCardProps) {
             Colour
           </Label>
           <ColourPicker
-            value={module.styling || ""}
+            value={(module.styling as any)?.colour || ""}
             onChange={(colour) => onUpdate(module.moduleID, "styling", colour)}
           />
           {errors?.styling && (

@@ -54,7 +54,7 @@ function validateModule(module: ModuleResponseDto) {
 }
 
 function isModuleComplete(module: ModuleResponseDto) {
-  return !!(module.moduleCode && module.moduleName )//&& module.styling);
+  return !!(module.moduleCode && module.moduleName); //&& module.styling);
 }
 
 export function ModulesStep({ modules }: ModulesStepProps) {
@@ -124,11 +124,10 @@ export function ModulesStep({ modules }: ModulesStepProps) {
 
   async function handleConfirm(id: string) {
     if (updateModule.isPending) return;
-    const lectureModule = modules.find((m) => m.moduleID === id);
-    if (!lectureModule) return;
+    const uniModule = modules.find((m) => m.moduleID === id);
+    if (!uniModule) return;
 
-    const { errors: validationErrors, hasErrors } =
-      validateModule(lectureModule);
+    const { errors: validationErrors, hasErrors } = validateModule(uniModule);
     if (hasErrors) {
       setErrorMap((prev) => ({ ...prev, [id]: validationErrors }));
       return;
@@ -138,10 +137,13 @@ export function ModulesStep({ modules }: ModulesStepProps) {
       updateModule.mutate({
         moduleID: id,
         module: {
-          name: lectureModule.moduleName,
-          code: lectureModule.moduleCode,
-          dsc: lectureModule.moduleDescription || undefined,
-         // styling: lectureModule.styling || undefined,
+          name: uniModule.moduleName,
+          code: uniModule.moduleCode,
+          dsc: uniModule.moduleDescription || undefined,
+          //ugly fix until I find something better
+          styling: uniModule.styling?.colour
+            ? JSON.stringify({ colour: uniModule.styling.colour })
+            : undefined,
         },
       });
 
@@ -172,6 +174,7 @@ export function ModulesStep({ modules }: ModulesStepProps) {
   }
 
   function renderModuleRow(module: ModuleResponseDto, index: number) {
+    //console.log("module styling: ", module.moduleCode, module.styling);
     const isComplete = isModuleComplete(module);
     const isSelected = selectedId === module.moduleID;
     const errors = errorMap[module.moduleID];
@@ -185,12 +188,13 @@ export function ModulesStep({ modules }: ModulesStepProps) {
             onClick={() => handleSelect(module.moduleID)}
             className="flex flex-1 items-center gap-3 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] px-4 py-4 text-left transition-colors duration-[var(--duration-fast)] hover:bg-[var(--bg-elevated)] shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.08)]"
           >
-            {/*
-              <span
-                className="h-3 w-3 rounded-full flex-shrink-0"
-                style={{ backgroundColor: module.styling || "var(--border)" }}
-              />
-              */}
+            <span
+              className="h-3 w-3 rounded-full flex-shrink-0"
+              style={{
+                backgroundColor: (module.styling as any) || "var(--border)",
+              }}
+            />
+
             <div className="flex-1 min-w-0">
               <p className="text-base font-medium text-[var(--text-primary)] truncate">
                 {module.moduleName || "Module " + (index + 1)}
