@@ -100,7 +100,7 @@ export function WizardShell() {
 
         const builder = new updateTTbyIDBuilder();
         await builder.send({
-          paths: { id: Number(editId) },
+          paths: { id: editId },
           body: {
             timetableName: name || "Updated Schedule",
             removeEventIds: noNumIds,
@@ -171,7 +171,7 @@ export function WizardShell() {
         const [timetableRes, modulesRes, eventsRes] = await Promise.all([
           //prevents opening on step 0 (modules)
           new getTTbyIdBuilder().send({
-            paths: { id: editId as unknown as number },
+            paths: { id: editId! },
           }),
           new getAllModulesBuilder().send({}),
           new getAllEventsBuilder().send({}),
