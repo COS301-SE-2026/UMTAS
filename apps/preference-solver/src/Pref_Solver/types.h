@@ -82,11 +82,11 @@ struct EventChromosome
     {
     }
 
-    EventChromosome(EventChromosome &chrom)
+    EventChromosome(const EventChromosome &chrom)
     {
         this->events.resize(chrom.events.size());
         int index = 0;
-        for (EventGA &event : chrom.events)
+        for (EventGA event : chrom.events)
         {
             this->events[index++] = event;
         }
