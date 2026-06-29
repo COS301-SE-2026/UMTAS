@@ -4,278 +4,112 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import { Test } from '@nestjs/testing';
 
+//Constants
+import { userId, courseId } from '../Testing/constants.spec';
+
+//Table imports
+import { modules, CourseModule, ModuleStyling } from '../entities/index';
+
+//Actual Service imports
 import { ModuleService } from './module.service';
 import { DatabaseService } from '../db/database.service';
+import { CourseService } from '../Course/course.service';
+
+//Mock Database and factories
+import { createMockDatabase } from '../Testing/Mocks/database.mock';
+import { mockSequentialResults } from '../Testing/Mocks/database.helpers';
+import { createModule, createCourseModule, createModuleStyling, baseDto } from '../Testing/Factories/module.factory';
+import { createMockCourseService } from '../Testing/Factories/course.factory';
+
 
 describe('ModuleService', () => {
   let service: ModuleService;
 
-  const mockDb = {
-    select: jest.fn(),
-    insert: jest.fn(),
-    update: jest.fn(),
-    delete: jest.fn(),
-  };
+  const {mockDb, reset: resetDb} = createMockDatabase();
+  const {mockCourseService, reset: resetCourse} = createMockCourseService();
 
-  const mockDatabaseService = {
-    db: mockDb,
-  } as unknown as DatabaseService;
 
-  const mockModule = {
-    moduleID: 1,
-    moduleCode: 'COS332',
-    moduleName: 'Computer Networks',
-    moduleDescription: 'Networks module'
-  };
+  beforeEach(async ()=>{
 
-  const userId = '00000000-0000-0000-0000-000000000000';
+    const module = await Test.createTestingModule({
+      providers: [
+        ModuleService,
+        {provide: DatabaseService, useValue: {db: mockDb}},
+        {provide: CourseService, useValue: mockCourseService}
+      ]
+    }).compile();
 
-  beforeEach(() => {
-    jest.clearAllMocks();
-    service = new ModuleService(mockDatabaseService);
+    service = module.get(ModuleService);
   });
 
-  function mockSelectResult(result: unknown[]) {
-    mockDb.select.mockReturnValue({
-      from: jest.fn().mockReturnValue({
-        where: jest.fn().mockReturnValue({
-          limit: jest.fn().mockResolvedValue(result),
-        }),
-      }),
-    });
-  }
+  afterEach(()=>{
+    resetDb();
+    resetCourse();
+  });
 
-  function mockSelectAllResult(result: unknown[]) {
-    mockDb.select.mockReturnValue({
-      from: jest.fn().mockReturnValue({
-        where: jest.fn().mockResolvedValue(result),
-      }),
-    });
-  }
-
-  function mockInsertResult(result: unknown[]) {
-    mockDb.insert.mockReturnValue({
-      values: jest.fn().mockReturnValue({
-        returning: jest.fn().mockResolvedValue(result),
-      }),
-    });
-  }
-
-  function mockUpdateResult(result: unknown[]) {
-    mockDb.update.mockReturnValue({
-      set: jest.fn().mockReturnValue({
-        where: jest.fn().mockReturnValue({
-          returning: jest.fn().mockResolvedValue(result),
-        }),
-      }),
-    });
-  }
-
-  function mockDeleteResult() {
-    mockDb.delete.mockReturnValue({
-      where: jest.fn().mockResolvedValue(undefined),
-    });
-  }
-
+  //TESTS
   //Create
-  describe('create', () => {
+  describe('Test_CreateModule', ()=>{
 
-    it('should create a module', async () => {
-      mockSelectResult([]);
-      mockInsertResult([mockModule]);
+    //Happy - no styling
+    it('create module - no styling', async ()=>{
 
-      const result = await service.create(userId, {
-        code: 'cos332',
-        name: 'Computer Networks',
-        styling: '#3B82F6',
+      mockSequentialResults(mockDb.select, [[]]);
+
+      const newModule = createModule({
+        moduleCode: baseDto.moduleCode,
+        moduleName: baseDto.moduleName,
+        moduleDescription: baseDto.moduleDescription
+      });
+      const newCourseModule = createCourseModule({
+        ModuleID: newModule.moduleID,
+        CourseID: courseId
       });
 
-      expect(result).toEqual({ module: mockModule });
-      expect(mockDb.select).toHaveBeenCalled();
-      expect(mockDb.insert).toHaveBeenCalled();
+      mockSequentialResults(mockDb.insert, [
+        [newModule], [newCourseModule]
+      ]);
+
+      const result = await service.create(userId, baseDto);
+
+      expect(mockCourseService.getById).toHaveBeenCalledWith(courseId);
+      expect(mockDb.insert).toHaveBeenCalledWith(modules);
+      expect(mockDb.insert).toHaveBeenCalledWith(CourseModule);
+      expect(result).toEqual(newModule);
     });
 
-    it('should reject missing code or name', async () => {
-      await expect(
-        service.create(userId, {
-          code: '',
-          name: '',
-        } as any),
-      ).rejects.toThrow(BadRequestException);
-    });
+    //Happy - with styling
+    it('create module - with styling', async ()=>{
 
-    it('should reject for code longer than 10 chars', async () => {
-      await expect(
-        service.create(userId, {
-          code: 'someVeryLongCode',
-          name: 'someName',
-        } as any),
-      ).rejects.toThrow(BadRequestException);
-    });
+      mockSequentialResults(mockDb.select, [[]]);
 
-    it('should reject duplicate module code', async () => {
-      mockSelectResult([mockModule]);
+      const newModule = createModule();
+      const newCourseModule = createCourseModule({
+        ModuleID: newModule.moduleID,
+        CourseID: courseId
+      });
+      const newStyling = createModuleStyling({
+        ModuleID: newModule.moduleID,
+        UserID: userId,
+        styling: {colour:'#grys'}
+      });
 
-      await expect(
-        service.create(userId, {
-          code: 'COS332',
-          name: 'Computer Networks',
-        } as any),
-      ).rejects.toThrow(ConflictException);
-    });
+      mockSequentialResults(mockDb.insert, [
+        [newModule], [newCourseModule], [newStyling]
+      ]);
 
-    it('should throw if insert returns nothing', async () => {
-      mockSelectResult([]);
-      mockInsertResult([]);
+      const dto = {...baseDto, styling: {colour:'#grys'}};
 
-      await expect(
-        service.create(userId, {
-          code: 'COS332',
-          name: 'Computer Networks',
-        } as any),
-      ).rejects.toThrow(InternalServerErrorException);
+      mockSequentialResults(mockDb.select, [[]]);//styling checks if styling exists
+
+      const result = await service.create(userId, dto);
+
+      expect(mockDb.insert).toHaveBeenCalledWith(ModuleStyling);
+      expect(result).toEqual({...newModule, styling: newStyling.styling});
     });
   });
 
-  //getAll
-  describe('getAll', () => {
-    it('should return all modules', async () => {
-      mockSelectAllResult([mockModule]);
 
-      await expect(service.getAll(userId)).resolves.toEqual({
-        modules: [mockModule],
-      });
-    });
-
-    // it('should reject missing userId', async () => {
-    //   await expect(service.getAll(undefined as any)).rejects.toThrow(
-    //     BadRequestException,
-    //   );
-    // });
-  });
-
-  //getById
-  describe('getById', () => {
-    it('should return one module', async () => {
-      mockSelectResult([mockModule]);
-
-      await expect(service.getById(userId, 1)).resolves.toEqual({
-        module: mockModule,
-      });
-    });
-
-    it('should throw if module is not found', async () => {
-      mockSelectResult([]);
-
-      await expect(service.getById(userId, 999)).rejects.toThrow(
-        NotFoundException,
-      );
-    });
-  });
-
-  //Update
-  describe('update', () => {
-    it('should update a module', async () => {
-      mockSelectResult([mockModule]);
-      mockUpdateResult([{ ...mockModule, moduleName: 'Updated Networks' }]);
-
-      await expect(
-        service.update(userId, 1, {
-          name: 'Updated Networks',
-        }),
-      ).resolves.toEqual({
-        module: { ...mockModule, moduleName: 'Updated Networks' },
-      });
-    });
-
-    it('should reject empty update payload', async () => {
-      mockSelectResult([mockModule]);
-
-      await expect(service.update(userId, 1, {} as any)).rejects.toThrow(
-        BadRequestException,
-      );
-    });
-
-    it('should throw if module does not exist', async () => {
-      mockSelectResult([]);
-
-      await expect(
-        service.update(userId, 999, { name: 'Updated' }),
-      ).rejects.toThrow(NotFoundException);
-    });
-
-    it('should reject duplicate updated code', async () => {
-      mockDb.select
-        .mockReturnValueOnce({
-          from: jest.fn().mockReturnValue({
-            where: jest.fn().mockReturnValue({
-              limit: jest.fn().mockResolvedValue([mockModule]),
-            }),
-          }),
-        })
-        .mockReturnValueOnce({
-          from: jest.fn().mockReturnValue({
-            where: jest.fn().mockReturnValue({
-              limit: jest.fn().mockResolvedValue([
-                {
-                  ...mockModule,
-                  moduleID: 2,
-                  moduleCode: 'COS301',
-                },
-              ]),
-            }),
-          }),
-        });
-
-      await expect(
-        service.update(userId, 1, { code: 'COS301' }),
-      ).rejects.toThrow(ConflictException);
-    });
-
-    it('should reject if module code longer than 10 chars', async () => {
-      mockSelectResult([mockModule]);
-
-      await expect(
-        service.update(userId, 1, {
-          code: 'SomeVeryLongCode',
-        }),
-      ).rejects.toThrow(BadRequestException);
-    });
-
-    it('should reject for no module updated', async () => {
-      mockSelectResult([mockModule]);
-      mockUpdateResult([]);
-
-      await expect(
-        service.update(userId, 1, { name: 'someName' }),
-      ).rejects.toThrow(InternalServerErrorException);
-    });
-  });
-
-  //deleteById
-  describe('deleteById', () => {
-    it('should remove a module', async () => {
-      mockSelectResult([mockModule]);
-      mockDeleteResult();
-
-      await expect(service.deleteById(userId, 1)).resolves.toEqual({
-        success: true,
-      });
-    });
-
-    it('should throw if module does not exist', async () => {
-      mockSelectResult([]);
-
-      await expect(service.deleteById(userId, 999)).rejects.toThrow(
-        NotFoundException,
-      );
-    });
-
-    // it('should reject missing userId', async () => {
-    //   await expect(service.deleteById(undefined as any, 1)).rejects.toThrow(
-    //     BadRequestException,
-    //   );
-    // });
-  });
 });

@@ -114,5 +114,7 @@ export class ModuleFiltersDto {
   @IsUUID()
   universityId?: string;
 
+  //Filter by code using wildcard
+
 
 }//ModuleFiltersDto

@@ -9,7 +9,9 @@ export interface EventCriteria {
     type: EventType,
     date: string,
     startTime: string,
-    endTime: string
+    endTime: string,
+    venue: string,
+    moduleID: string
 }//EventCriteria
 
 export interface UniversityEventCriteria extends EventCriteria {

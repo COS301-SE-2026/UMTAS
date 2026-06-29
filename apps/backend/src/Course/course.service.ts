@@ -10,9 +10,9 @@ import {
 import { eq, and } from 'drizzle-orm';
 
 import { DatabaseService } from '../db/database.service';
-import { Course } from 'src/entities';
+import { Course } from '../entities';
 import {CourseDto, CreateCourseDto, UpdateCourseDto, CourseSingleResponseDto, CourseListResponseDto, DeleteCourseResponseDto } from './dto/course.dto';
-import { UniversityService } from 'src/University/university.service';
+import { UniversityService } from '../University/university.service';
 
 @Injectable()
 export class CourseService {

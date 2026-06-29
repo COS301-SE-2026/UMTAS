@@ -5,23 +5,25 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { EventService } from './event.service';
-import { DatabaseService } from '../db/database.service';
 import {
-  EventType,
   EventCriteriaDto,
   CreateEventDto,
   UpdateEventDto,
 } from './dto/EventDto.dto';
+import { EventType } from './dto/event.types';
 
-const userId = '00000000-0000-0000-0000-000000000000';
+import { mockDatabaseService } from 'src/Testing/Mocks/database.mock';
+import * as constants from '../Testing/constants.spec';
 
-// Mock factoris - helpers for test data
+import {}
+
+// Mock factories - helpers for test data
 function makeEventCriteria(
   overrides: Partial<EventCriteriaDto> = {},
 ): EventCriteriaDto {
   return {
-    type: undefined,
-    day: 'Monday',
+    type: EventType.PERSONAL,
+    date: 'yyyy-mm-dd',
     startTime: '08:30',
     endTime: '10:20',
     ...overrides,
@@ -30,32 +32,27 @@ function makeEventCriteria(
 
 function makeEvent(overrides: Record<string, unknown> = {}) {
   return {
-    eventID: 1,
-    userID: userId,
+    eventID: constants.eventId,
     eventCriteria: makeEventCriteria(),
-    ...overrides,
-  };
-}
-
-function makeLecture(overrides: Record<string, unknown> = {}) {
-  return {
-    lectureID: 10,
-    eventID: 1,
-    moduleID: 99,
-    venue: 'Room A',
-    ...overrides,
+    ...overrides
   };
 }
 
 function makeModule() {
-  return { moduleID: 99, moduleCode: 'CS101' };
+  return { moduleID: constants.moduleId, moduleCode: 'COS332' };
 }
 
 describe('EventService', () => {
   let service: EventService;
+
+
+
   let dbService: { db: jest.Mocked<any> };
 
   beforeEach(async () => {
+
+    jest.clearAllMocks();
+    service = new EventService(mockDatabaseService, mockModuleService);
     dbService = {
       db: {
         select: jest.fn(),

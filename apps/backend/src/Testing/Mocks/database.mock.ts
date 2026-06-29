@@ -7,6 +7,7 @@ export function createMockDatabase() {
 
     const mockDb = {
         select: jest.fn(),
+        selectDistinct: jest.fn(),
         insert: jest.fn(),
         update: jest.fn(),
         delete: jest.fn(),
@@ -16,6 +17,8 @@ export function createMockDatabase() {
 
     return {
         mockDb,
-        reset: ()=>{jest.clearAllMocks();}
+        reset: ()=>{
+            Object.values(mockDb).forEach((fn: any) => fn.mockReset());
+        }
     };
 }//END_createMockDatabase
