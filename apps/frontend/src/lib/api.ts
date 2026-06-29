@@ -882,10 +882,14 @@ export interface components {
              */
             moduleDescription?: string | null;
             /**
-             * @description String to define color for the module
-             * @example #3B82F6
+             * @description Module styling
+             * @example {
+             *       "colour": "#3B82F6"
+             *     }
              */
-            styling?: string;
+            styling?: {
+                [key: string]: unknown;
+            } | null;
         };
         DeleteModuleResponseDto: {
             /**
@@ -1088,12 +1092,10 @@ export interface components {
             /**
              * @description Event IDs to attach on creation
              * @example [
-             *       1,
-             *       2,
-             *       3
+             *       "00000000-0000-0000-0000-000000000000"
              *     ]
              */
-            eventIds?: number[];
+            eventIds?: string[];
         };
         TimetableDto: {
             /** @example someId */
@@ -1107,12 +1109,10 @@ export interface components {
             /**
              * @description IDs of events linked to this timetable
              * @example [
-             *       1,
-             *       2,
-             *       3
+             *       "00000000-0000-0000-0000-000000000000"
              *     ]
              */
-            eventIds?: number[];
+            eventIds?: string[];
         };
         TimetableListResponseDto: {
             /** @description List of timetables with their linked event IDs */
@@ -1127,19 +1127,17 @@ export interface components {
             /**
              * @description Event IDs to link to the timetable
              * @example [
-             *       4,
-             *       5
+             *       "00000000-0000-0000-0000-000000000000"
              *     ]
              */
-            addEventIds?: number[];
+            addEventIds?: string[];
             /**
              * @description Event IDs to unlink from the timetable
              * @example [
-             *       1,
-             *       2
+             *       "00000000-0000-0000-0000-000000000000"
              *     ]
              */
-            removeEventIds?: number[];
+            removeEventIds?: string[];
         };
         DeleteTimetableResponseDto: {
             /** @example true */
@@ -2061,7 +2059,7 @@ export interface operations {
             };
         };
     };
-    getModuleById: {
+    deleteModule: {
         parameters: {
             query?: never;
             header?: never;
@@ -2072,13 +2070,13 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Module returned successfully */
+            /** @description Module deleted successfully */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ModuleSingleResponseDto"];
+                    "application/json": components["schemas"]["DeleteModuleResponseDto"];
                 };
             };
             /** @description Invalid module ID */
@@ -2090,6 +2088,53 @@ export interface operations {
             };
             /** @description Module not found */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    updateModule: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                moduleId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateModuleDto"];
+            };
+        };
+        responses: {
+            /** @description Module updated successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModuleSingleResponseDto"];
+                };
+            };
+            /** @description Invalid update payload or module ID */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Module not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Duplicate module code detected for course */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -2962,7 +3007,7 @@ export interface operations {
             };
         };
     };
-    deleteModule: {
+    getModuleById: {
         parameters: {
             query?: never;
             header?: never;
@@ -2973,13 +3018,13 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Module deleted successfully */
+            /** @description Module returned successfully */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["DeleteModuleResponseDto"];
+                    "application/json": components["schemas"]["ModuleSingleResponseDto"];
                 };
             };
             /** @description Invalid module ID */
@@ -2991,53 +3036,6 @@ export interface operations {
             };
             /** @description Module not found */
             404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    updateModule: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                moduleId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateModuleDto"];
-            };
-        };
-        responses: {
-            /** @description Module updated successfully */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ModuleSingleResponseDto"];
-                };
-            };
-            /** @description Invalid update payload or module ID */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Module not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Duplicate module code detected for course */
-            409: {
                 headers: {
                     [name: string]: unknown;
                 };
