@@ -78,7 +78,7 @@ export function resolveScheduleEvents(
       );
       resolved.push({
         id: String(event.eventID),
-        name: criteria?.moduleID || "",
+        name: event.eventName || "Untitled Event",
         code: criteria?.moduleID || "",
         date: criteria?.date || "",
         startTime: criteria?.startTime || "",
