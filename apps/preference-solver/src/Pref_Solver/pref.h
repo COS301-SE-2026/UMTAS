@@ -12,11 +12,12 @@ class GA_PREF
 {
 private:
     int targetTime;
-    std::unordered_map<string, int> numOccurences; 
+    std::unordered_map<string, int> numOccurences;
     // finds how many times module code should occcur
 
 public:
-    GA_PREF(GA_Data data)
-    {
-    }
+    GA_PREF(GA_Data &data);
+
+private:
+    bool setModuleData(GA_Data &data);
 };
