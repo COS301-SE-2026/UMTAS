@@ -3,7 +3,7 @@ BUILD_DIR := build
 LIB_DIR := lib
 
 CXX := g++
-CFLAGS := -Wall -Wextra -I $(LIB_DIR)
+CFLAGS :=  -I $(LIB_DIR)
 
 
 SRC_FILES := $(wildcard $(SRC_DIR)/*.cpp)

@@ -1,7 +1,7 @@
 #include <string>
 #include <iostream>
 #include <vector>
-#include "../../lib/openGA.hpp"
+#include "openGA.hpp"
 using std::cout;
 using std::endl;
 using std::string;
@@ -26,6 +26,9 @@ struct EventGA
     int event_start;
     int event_end;
     bool is_active;
+    EventGA()
+    {
+    }
 
     EventGA(const EventGA &event)
     {
@@ -56,21 +59,19 @@ struct ModuleGA
 {
     string moduleCode;
     int number_Occur;
+    ModuleGA()
+    {
+    }
 };
 
 struct API_DATA
 {
+    API_DATA()
+    {
+    }
     std::vector<ModuleGA> modules;
     std::vector<EventGA> events;
     int targetTime;
-};
-
-struct GA_DATA
-{
-    std::vector<ModuleGA> modules;
-    std::vector<EventGA> events;
-    int targetTime;
-    std::unordered_map<string, int> moduleCounts;
 };
 
 struct EventChromosome
