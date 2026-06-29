@@ -25,13 +25,36 @@ struct EventGA
     int event_start;
     int event_end;
     bool is_active;
+
+    EventGA(const EventGA &event)
+    {
+        this->eventDay = event.eventDay;
+        this->eventID = event.eventID;
+        this->event_start = event.event_start;
+        this->event_end = event.event_end;
+        this->is_active = event.is_active;
+        this->moduleCode = event.moduleCode;
+    }
+    EventGA &operator=(const EventGA &event)
+    {
+        if (this == &event)
+        {
+            return *this;
+        }
+        this->eventDay = event.eventDay;
+        this->eventID = event.eventID;
+        this->event_start = event.event_start;
+        this->event_end = event.event_end;
+        this->is_active = event.is_active;
+        this->moduleCode = event.moduleCode;
+        return *this;
+    }
 };
 
 struct ModuleGA
 {
     string moduleCode;
     int number_Occur;
-    
 };
 
 struct GA_Data
@@ -44,4 +67,28 @@ struct GA_Data
 struct EventChromosome
 {
     std::vector<EventGA> events;
+    EventChromosome(EventChromosome &chrom)
+    {
+        this->events.resize(chrom.events.size());
+        int index = 0;
+        for (EventGA &event : chrom.events)
+        {
+            this->events[index++] = event;
+        }
+    }
+
+    EventChromosome &operator=(EventChromosome &chrom)
+    {
+        if (this == &chrom)
+        {
+            return *this;
+        }
+        this->events.resize(chrom.events.size());
+        int index = 0;
+        for (EventGA &event : chrom.events)
+        {
+            this->events[index++] = event;
+        }
+        return *this;
+    }
 };

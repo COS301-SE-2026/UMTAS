@@ -37,6 +37,6 @@ bool GA_PREF::CreateEventChromosome(std::vector<EventGA> events)
     for (EventGA &event : events)
     {
         event.is_active = false;
-        copyChromosome.events[index] = event;
+        copyChromosome.events[index++] = event;
     }
 }
