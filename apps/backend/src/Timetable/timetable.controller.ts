@@ -4,7 +4,6 @@ import {
   Delete,
   Get,
   Param,
-  ParseIntPipe,
   Patch,
   Post,
 } from '@nestjs/common';
@@ -82,7 +81,7 @@ export class TimetableController {
     summary: 'Get timetable by ID',
     operationId: 'getTimetableById',
   })
-  @ApiParam({ name: 'id', type: Number, description: 'Timetable ID' })
+  @ApiParam({ name: 'id', type: String, description: 'Timetable ID' })
   @ApiResponse({
     status: 200,
     description: 'Timetable fetched successfully',
@@ -92,7 +91,7 @@ export class TimetableController {
   @ApiResponse({ status: 404, description: 'Timetable not found' })
   getTimetableById(
     @CurrentSession() session: SessionData,
-    @Param('id', ParseIntPipe) id: string,
+    @Param('id') id: string,
   ): Promise<TimetableResponseDto> {
     return this.service.getTimetableById(session.user.id, id);
   } //getTimetableById
@@ -102,7 +101,7 @@ export class TimetableController {
     summary: 'Update a timetable',
     operationId: 'updateTimetable',
   })
-  @ApiParam({ name: 'id', type: Number, description: 'Timetable ID' })
+  @ApiParam({ name: 'id', type: String, description: 'Timetable ID' })
   @ApiBody({ type: UpdateTimetableDto })
   @ApiResponse({
     status: 200,
@@ -118,7 +117,7 @@ export class TimetableController {
   @ApiResponse({ status: 500, description: 'Timetable was not updated' })
   updateTimetable(
     @CurrentSession() session: SessionData,
-    @Param('id', ParseIntPipe) id: string,
+    @Param('id') id: string,
     @Body() dto: UpdateTimetableDto,
   ): Promise<TimetableResponseDto> {
     return this.service.updateTimetable(session.user.id, id, dto);
@@ -129,7 +128,7 @@ export class TimetableController {
     summary: 'Delete a timetable',
     operationId: 'deleteTimetable',
   })
-  @ApiParam({ name: 'id', type: Number, description: 'Timetable ID' })
+  @ApiParam({ name: 'id', type: String, description: 'Timetable ID' })
   @ApiResponse({
     status: 200,
     description: 'Timetable deleted successfully',
@@ -140,7 +139,7 @@ export class TimetableController {
   @ApiResponse({ status: 500, description: 'Timetable was not deleted' })
   deleteTimetable(
     @CurrentSession() session: SessionData,
-    @Param('id', ParseIntPipe) id: string,
+    @Param('id') id: string,
   ): Promise<DeleteTimetableResponseDto> {
     return this.service.deleteTimetable(session.user.id, id);
   } //deleteTimetable
