@@ -43,18 +43,17 @@ function validateModule(module: ModuleResponseDto) {
     errors.moduleName = "Name is required";
     hasErrors = true;
   }
-  /*
+  
   if (!module.styling) {
     errors.styling = "Colour is required";
     hasErrors = true;
   }
-  */
 
   return { errors, hasErrors };
 }
 
 function isModuleComplete(module: ModuleResponseDto) {
-  return !!(module.moduleCode && module.moduleName); //&& module.styling);
+  return !!(module.moduleCode && module.moduleName && module.styling); //&& module.styling);
 }
 
 export function ModulesStep({ modules }: ModulesStepProps) {
