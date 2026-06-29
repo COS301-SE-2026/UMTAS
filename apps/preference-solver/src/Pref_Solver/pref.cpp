@@ -5,7 +5,8 @@ GA_PREF::GA_PREF(GA_Data &data)
     this->targetTime = data.targetTime;
     try
     {
-        setModuleData(data);
+        setModuleData(data.modules);
+        CreateEventChromosome(data.events);
     }
     catch (const std::exception &e)
     {
@@ -13,9 +14,9 @@ GA_PREF::GA_PREF(GA_Data &data)
     }
 }
 
-bool GA_PREF::setModuleData(GA_Data &data)
+bool GA_PREF::setModuleData(std::vector<ModuleGA> modules)
 {
-    for (const ModuleGA &module : data.modules)
+    for (const ModuleGA &module : modules)
     {
         if (numOccurences.find(module.moduleCode) != numOccurences.end())
         {
@@ -25,5 +26,17 @@ bool GA_PREF::setModuleData(GA_Data &data)
         {
             numOccurences.insert({module.moduleCode, module.number_Occur});
         }
+    }
+    return true;
+}
+// makes a chromosome to be used that has all events false.
+bool GA_PREF::CreateEventChromosome(std::vector<EventGA> events)
+{
+    this->copyChromosome.events.resize(events.size());
+    int index = 0;
+    for (EventGA &event : events)
+    {
+        event.is_active = false;
+        copyChromosome.events[index] = event;
     }
 }

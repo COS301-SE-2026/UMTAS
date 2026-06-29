@@ -31,15 +31,17 @@ struct ModuleGA
 {
     string moduleCode;
     int number_Occur;
-    std::vector<EventGA> events;
+    
 };
 
 struct GA_Data
 {
     std::vector<ModuleGA> modules;
+    std::vector<EventGA> events;
     int targetTime;
 };
 
 struct EventChromosome
 {
+    std::vector<EventGA> events;
 };
