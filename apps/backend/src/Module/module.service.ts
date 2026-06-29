@@ -216,9 +216,9 @@ export class ModuleService {
     let newStyling: { colour: string } | null = null;
     if (dto.styling){
 
-      await this.setStyling(moduleId, userId, dto.styling);
+      newStyling = (await this.setStyling(moduleId, userId, dto.styling.colour)).styling;
 
-      newStyling = {colour: dto.styling};
+      newStyling = {colour: dto.styling.colour};
     } else {//Keep original styling - is this really necessary?
       
       newStyling = module.styling || null;
@@ -304,7 +304,9 @@ export class ModuleService {
         .update(ModuleStyling)
         .set({
           styling: styleJson
-        }).returning();
+        })
+        .where(and(eq(ModuleStyling.ModuleID, moduleId), eq(ModuleStyling.UserID, userId)))
+        .returning();
     }
 
     if (!modStyle) 
