@@ -1,0 +1,16 @@
+apps/preference-solver/src/Pref_Solver/pref.h
+  h_8b894b05e4a1b2 19-22
+apps/preference-solver/src/Pref_Solver/pref.cpp
+  h_8b894b05e4a1b2 1-29
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "9e7f538726734631a433636d895d00913a6fd400",
+  "prompts": {},
+  "humans": {
+    "h_8b894b05e4a1b2": {
+      "author": "Wilmar-Smit <u24584216@tuks.co.za>"
+    }
+  }
+}
