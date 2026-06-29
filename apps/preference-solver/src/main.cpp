@@ -1,5 +1,23 @@
 #include "../lib/openGA.hpp"
 #include "Pref_Solver/types.h"
+
+void init_genes(
+    EventChromosome &p,
+    const std::function<double(void)> &rnd01);
+bool eval_solution(
+    const EventChromosome &p,
+    ChromMiddleCost &c);
+
+EventChromosome mutate(
+    const EventChromosome &p,
+    const std::function<double(void)> &rnd01,
+    double shrink_scale);
+
+EventChromosome crossover(
+    const EventChromosome &X1,
+    const EventChromosome &X2,
+    const std::function<double(void)> &rnd01);
+
 int main()
 {
     typedef EA::Genetic<EventChromosome, ChromMiddleCost> GA_type;
@@ -18,7 +36,7 @@ void init_genes(
     const std::function<double(void)> &rnd01)
 {
     // a variable will be updated to set the chromosome to follow the chosen structure.
-    for (auto event : p.events)
+    for (auto &event : p.events)
     {
         if (rnd01() >= 0.5)
         {
@@ -31,7 +49,8 @@ bool eval_solution(
     const EventChromosome &p,
     ChromMiddleCost &c)
 {
-    return c.penalty_score;
+    c.penalty_score = 0;
+    return true;
 }
 
 EventChromosome mutate(
@@ -64,13 +83,13 @@ EventChromosome crossover(
 
     child.events.resize(X1.events.size());
     float r = rnd01();
-    int crossOverPt = child.events.size() / r;
+    int crossOverPt = r * child.events.size();
 
     if (crossOverPt == child.events.size())
     {
         --crossOverPt;
     }
-    else if (crossover == 0)
+    else if (crossOverPt == 0)
     {
         ++crossOverPt;
     }
@@ -81,5 +100,10 @@ EventChromosome crossover(
         {
             child.events[i].is_active = X1.events[i].is_active;
         }
+        else
+        {
+            child.events[i].is_active = X2.events[i].is_active;
+        }
     }
+    return child;
 }
