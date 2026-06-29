@@ -13,12 +13,12 @@ import {ModuleService} from '../Module/module.service';
 
 //Mock Database and factories
 import { createMockDatabase } from '../Testing/Mocks/database.mock';
-import { mockDeleteResult, mockInsertResult, mockSelectResult, mockSequentialResults } from '../Testing/Mocks/database.helpers';
-import {createEvent,createEventForModule, createEventVenue, createPersonalEvent, createUniversityEvent, createVenue} from '../Testing/Factories/event.factory';
+import { mockDeleteResult, mockInsertResult, mockSelectResult, mockSequentialResults, mockTransaction } from '../Testing/Mocks/database.helpers';
+import {createEvent, createEventVenue, createVenue, createUniversityEvent, createCreateEventDto} from '../Testing/Factories/event.factory';
 import { createMockModuleService } from "../Testing/Factories/module.factory";
 import { createModule } from "../Testing/Factories/module.factory";
-import { CreateEventDto } from "./dto/EventDto.dto";
 import { EventType } from "./dto/event.types";
+import { UpdateEventDto } from "./dto/EventDto.dto";
 
 describe ('EventService', ()=>{
 
@@ -56,22 +56,9 @@ describe ('EventService', ()=>{
     it('should create a simple university event', async ()=>{
 
       //Arrange
-      const module = createModule({moduleID: moduleId});
-      const createEventDto: CreateEventDto = {
-        eventName: 'Lecture1',
-        eventCode: 'Lec1',
-        eventCriteria: {
-          type: EventType.UNIVERSITY,
-          date: 'yyyy-mm-dd',
-          startTime: '08:30',
-          endTime: '10:20',
-          moduleID: moduleId,
-          venue: 'IT 2-23'
-        },
-        isRecurring: true        
-      };
+      const newEvent = createEvent(EventType.UNIVERSITY, {}, {moduleID: moduleId});
+      const createEventDto = createCreateEventDto(newEvent);
 
-      const newEvent = createEventForModule(moduleId);
       const uniEvent = createUniversityEvent({
         moduleID: moduleId, 
         eventID: newEvent.eventID});
@@ -102,14 +89,105 @@ describe ('EventService', ()=>{
 
     it('should return all events for module', async ()=>{
 
-      const event = createEventForModule(moduleId);
-      const uniEvent = createUniversityEvent({moduleID: moduleId});
+      const type = EventType.UNIVERSITY;
+      const events = [
+        createEvent(type, {}, {moduleID: moduleId}),
+        createEvent(type, {}, {moduleID: moduleId})
+      ];
+
+      mockSelectResult(mockDb, events);
+
+      const result = await service.getAllEvents(userId, {moduleId});
+
+      expect(result).toMatchObject({events});
+    });
+  });
+
+  //GetById
+  describe('Test_GetEventById', ()=>{
+
+    it('should return event by eventId', async ()=>{
+
+      const event = createEvent();
 
       mockSelectResult(mockDb, [event]);
 
-      const result = await service.getAllEvents(userId, {moduleId: moduleId});
+      const result = await service.getById(event.eventID);
 
-      expect(result).toMatchObject({events: [event]});
+      expect(result).toMatchObject({event});
+    });
+  });
+
+  //Update
+  describe('Test_UpdateEvent', ()=>{
+
+    it('should update all event fields', async ()=>{
+
+      //Arrange
+      const oldEvent = createEvent();
+      const updateDto: UpdateEventDto = {
+        eventName: 'NewName',
+        eventCode: 'newCode',
+        isRecurring: false,
+        eventCriteria: {
+          date: 'dd-mm-yyyy',
+          startTime: '20:00',
+          endTime: '21:00',
+          venue: 'Chemistry building'
+        }
+      };
+      const updatedEvent = createEvent(EventType.UNIVERSITY, {
+        eventName: updateDto.eventName,
+        eventCode: updateDto.eventCode,
+        isRecurring: updateDto.isRecurring
+      }, {
+        date: updateDto.eventCriteria?.date,
+        startTime: updateDto.eventCriteria?.startTime,
+        endTime: updateDto.eventCriteria?.endTime,
+        venue: updateDto.eventCriteria?.venue
+      });
+
+      mockSelectResult(mockDb, [oldEvent]);
+      
+      mockDb.transaction.mockImplementation(async (callback: any)=>{
+
+        const tx = {
+          update: jest.fn().mockReturnThis(),
+          set: jest.fn().mockReturnThis(),
+          where: jest.fn().mockReturnThis(),
+          returning: jest.fn().mockResolvedValue([updatedEvent])
+        };
+
+        return callback(tx);
+      });
+
+      //Act
+      const result = await service.updateEvent(userId, 'uni_admin', oldEvent.eventID, updateDto);
+
+      //Assert
+      expect(result).toMatchObject({event: updatedEvent});
+    })
+  });
+
+
+  //Delete
+  describe('Test_DeleteEvent', ()=>{
+
+    it('should delete event - admin', async ()=>{
+
+      const event = createEvent();
+
+      mockSelectResult(mockDb, [event]);
+      mockDeleteResult(mockDb, undefined);
+
+      const result = await service.deleteEvent(userId, 'uni_admin', event.eventID);
+
+      //Assert
+      expect(result).toMatchObject({
+        eventName: event.eventName,
+        eventCode: event.eventCode,
+        success: true
+      });
     });
   });
 
