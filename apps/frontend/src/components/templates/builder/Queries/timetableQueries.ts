@@ -1,10 +1,11 @@
 import {
   getAllTimeTablesBuilder,
-  getTTbyIdBuilder,
   updateTTbyIDBuilder,
   deleteTTbyIDBuilder,
   createTimeTableBuilder,
   createTimeTableBody,
+  updateTTbyIDBody,
+  updateTTbyIDPath,
 } from "@/app/builder/utils/timetables/TimeTableRequests";
 
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
@@ -38,17 +39,49 @@ export function addTimetableMut() {
   });
 }
 
-// export function removeTimetableMut(){
-//     return mutationOptions({
-//         mutationFn: async (timeTableId : string | null) =>{
-//             if (timeTableId == null){
-//                 return;
-//             }
-//             return new deleteTTbyIDBuilder().send({
-//                 paths: {
-//                     id : timeTableId,
-//                 }
-//             })
-//         }
-//     })
-// }
+export function removeTimetableMut() {
+  return mutationOptions({
+    mutationFn: async (timeTableId: string | null) => {
+      if (timeTableId == null) {
+        return;
+      }
+      return new deleteTTbyIDBuilder().send({
+        paths: {
+          id: timeTableId,
+        },
+      });
+    },
+
+    onSuccess: () => {
+      getQueryClient().invalidateQueries({
+        queryKey: getAllTimetablesQ().queryKey,
+      });
+    },
+
+    onError: (error) => {
+      console.error("error when deleting timetable", error);
+    },
+  });
+}
+
+export function updateTimetableMut() {
+  return mutationOptions({
+    mutationFn: async (vars: {
+      path: updateTTbyIDPath;
+      body: updateTTbyIDBody;
+    }) => {
+      return new updateTTbyIDBuilder().send({
+        paths: vars.path,
+        body: vars.body,
+      });
+    },
+
+    onSuccess: () => {
+      getQueryClient().invalidateQueries({
+        queryKey: getAllTimetablesQ().queryKey,
+      });
+    },
+
+    onError: (error) => console.error("error while updating timetable", error),
+  });
+}
