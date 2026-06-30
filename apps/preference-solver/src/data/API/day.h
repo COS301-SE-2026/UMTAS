@@ -1,7 +1,7 @@
 enum Day
 {
     MONDAY,
-    TUEDAY,
+    TUESDAY,
     WEDNESDAY,
     THURSDAY,
     FRIDAY,

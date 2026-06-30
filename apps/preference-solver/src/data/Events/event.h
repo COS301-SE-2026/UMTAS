@@ -2,6 +2,7 @@
 #include "../API/day.h"
 #include <iostream>
 #include <string>
+#include <vector>
 using nlohmann::json;
 using std::cout;
 using std::endl;
@@ -15,7 +16,8 @@ struct EventGA {
   bool is_active;
   EventGA &operator=(const EventGA &event);
   EventGA(json eventsJson);
-
+  static std::vector<EventGA> initArray(json eventReq);
+  static const string GROUPING_KEY;
   static const string DAY_KEY;
   static const string EVENT_ID;
   static const string MODULE_CODE;
