@@ -86,7 +86,7 @@ describe("Event Request Builders Integration Tests", () => {
       moduleCode: moduleCode,
       moduleName: "Event Test Module",
       moduleDescription: "Module created for event integration test",
-      styling: {colour:""},
+      styling: { colour: "" },
     };
 
     const createdModule = await moduleBuilder.send({ body: mockModule });

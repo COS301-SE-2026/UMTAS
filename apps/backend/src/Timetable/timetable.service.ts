@@ -42,9 +42,9 @@ export class TimetableService {
 
         const [newUserTimetable] = await tx
           .insert(UserTimetable)
-          .values({ 
-            UserID: userId, 
-            TimetableID: newTimetable.timetableID
+          .values({
+            UserID: userId,
+            TimetableID: newTimetable.timetableID,
           })
           .returning();
 
@@ -74,7 +74,6 @@ export class TimetableService {
   } //createTimetable
 
   async getAllTimetables(userId: string): Promise<TimetableListResponseDto> {
-
     const rows = await this.databaseService.db
       .select({
         UserTimetable: UserTimetable,
@@ -92,11 +91,14 @@ export class TimetableService {
       )
       .where(eq(UserTimetable.UserID, userId));
 
-    const map = new Map<string, {
-      timetable: typeof Timetable.$inferSelect;
-      UserTimetableID: string;
-      eventIds?: string[];
-    }>();
+    const map = new Map<
+      string,
+      {
+        timetable: typeof Timetable.$inferSelect;
+        UserTimetableID: string;
+        eventIds?: string[];
+      }
+    >();
 
     for (const row of rows) {
       const id = row.timetable.timetableID;
@@ -112,7 +114,7 @@ export class TimetableService {
         entry.eventIds = entry.eventIds ?? [];
         entry.eventIds.push(row.eventID);
       }
-    }//END_row
+    } //END_row
 
     return { timetables: Array.from(map.values()) };
   } //getAllTimetables
@@ -137,7 +139,6 @@ export class TimetableService {
       throw new BadRequestException('At least one update field required');
 
     await this.databaseService.db.transaction(async (tx: AppDatabase) => {
-
       const [existing] = await tx
         .select()
         .from(UserTimetable)
@@ -160,9 +161,7 @@ export class TimetableService {
         const [updated] = await tx
           .update(Timetable)
           .set({ timetableName: dto.timetableName! })
-          .where(
-              eq(Timetable.timetableID, existing.Timetable.timetableID),
-          )
+          .where(eq(Timetable.timetableID, existing.Timetable.timetableID))
           .returning();
 
         if (!updated)
@@ -201,7 +200,6 @@ export class TimetableService {
     userId: string,
     timetableId: string,
   ): Promise<DeleteTimetableResponseDto> {
-
     const [existing] = await this.databaseService.db
       .select()
       .from(UserTimetable)
@@ -235,7 +233,6 @@ export class TimetableService {
     userId: string,
     timetableId: string,
   ): Promise<TimetableResponseDto> {
-
     const rows = await this.databaseService.db
       .select({
         UserTimetable: UserTimetable,

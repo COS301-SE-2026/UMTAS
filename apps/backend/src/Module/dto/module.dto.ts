@@ -1,13 +1,18 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString, IsUUID, Length } from 'class-validator';
-import {PartialType, PickType, OmitType} from '@nestjs/swagger';
+import {
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Length,
+} from 'class-validator';
+import { PartialType, PickType, OmitType } from '@nestjs/swagger';
 
 //Base class
 export class ModulesDto {
-
-  @ApiProperty({ 
+  @ApiProperty({
     example: '00000000-0000-0000-0000-000000000000',
-    description: 'Unique identifier for a module'
+    description: 'Unique identifier for a module',
   })
   @IsUUID()
   @IsNotEmpty()
@@ -44,10 +49,10 @@ export class ModulesDto {
     example: { colour: '#3B82F6' },
     type: () => StylingDto,
     description: 'Module styling',
-    additionalProperties: true
+    additionalProperties: true,
   })
   styling?: { colour: string } | null;
-}//ModuleDto
+} //ModuleDto
 
 class StylingDto {
   @ApiProperty({ example: '#3B82F6' })
@@ -55,19 +60,25 @@ class StylingDto {
 }
 
 //Create
-export class CreateModuleDto extends PickType(ModulesDto, ['moduleCode', 'moduleName', 'moduleDescription', 'styling']) {
-
-  @ApiProperty({ 
+export class CreateModuleDto extends PickType(ModulesDto, [
+  'moduleCode',
+  'moduleName',
+  'moduleDescription',
+  'styling',
+]) {
+  @ApiProperty({
     example: '00000000-0000-0000-0000-000000000000',
-    description: 'CourseID to ensure module belongs to a course'
+    description: 'CourseID to ensure module belongs to a course',
   })
   @IsUUID()
   @IsNotEmpty()
   courseID!: string;
-}//CreateModuleDto
+} //CreateModuleDto
 
 //Update
-export class UpdateModuleDto extends PartialType(OmitType(ModulesDto, ['moduleID'] as const)) {} //update
+export class UpdateModuleDto extends PartialType(
+  OmitType(ModulesDto, ['moduleID'] as const),
+) {} //update
 
 //Responses
 //Single
@@ -75,41 +86,39 @@ export class ModuleSingleResponseDto extends ModulesDto {}
 
 //List
 export class ModuleListResponseDto {
-
-    @ApiProperty({
-        type: [ModuleSingleResponseDto],
-        description: 'List of modules'
-    })
-    modules!: ModuleSingleResponseDto[];
+  @ApiProperty({
+    type: [ModuleSingleResponseDto],
+    description: 'List of modules',
+  })
+  modules!: ModuleSingleResponseDto[];
 }
 
 //Delete
-export class DeleteModuleResponseDto extends PickType(ModulesDto, ['moduleCode']) {
-
+export class DeleteModuleResponseDto extends PickType(ModulesDto, [
+  'moduleCode',
+]) {
   @ApiProperty({ example: true })
   success!: boolean;
 } //delete
 
 //GetAll filters
 export class ModuleFiltersDto {
-
   @ApiPropertyOptional({
     description: 'Filter by course ID - returns all modules in the course',
-    example: '00000000-0000-0000-0000-000000000000'
+    example: '00000000-0000-0000-0000-000000000000',
   })
   @IsOptional()
   @IsUUID()
   courseId?: string;
 
   @ApiPropertyOptional({
-    description: 'Filter by university ID - returns all modules across all courses in the university',
-    example: '00000000-0000-0000-0000-000000000000'
+    description:
+      'Filter by university ID - returns all modules across all courses in the university',
+    example: '00000000-0000-0000-0000-000000000000',
   })
   @IsOptional()
   @IsUUID()
   universityId?: string;
 
   //Filter by code using wildcard
-
-
-}//ModuleFiltersDto
+} //ModuleFiltersDto

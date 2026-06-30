@@ -84,7 +84,7 @@ export function resolveScheduleEvents(
         startTime: criteria?.startTime || "",
         endTime: criteria?.endTime || "",
         isRecurring,
-        accentColour: (uniModule?.styling as any)?.colour || null,
+        accentColour: uniModule?.styling?.colour || null,
         subLabel: uniModule ? uniModule.moduleCode : null,
       });
       continue;

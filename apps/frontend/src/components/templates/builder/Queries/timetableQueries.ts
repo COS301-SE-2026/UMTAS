@@ -6,7 +6,7 @@ import {
   createTimeTableBody,
   updateTTbyIDBody,
   updateTTbyIDPath,
-  getTTbyIdBuilder
+  getTTbyIdBuilder,
 } from "@/app/builder/utils/timetables/TimeTableRequests";
 
 import { getQueryClient } from "@/components/tanstack/getQueryClient";

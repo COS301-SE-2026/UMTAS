@@ -13,7 +13,7 @@ describe("GenerateStep props testing", () => {
         isEditMode={true}
         timetableName="Timetable"
         setTimetableName={jest.fn()}
-        selectedEventIds={[1]}
+        selectedEventIds={[""]}
         setSelectedEventIds={jest.fn()}
       />,
     );

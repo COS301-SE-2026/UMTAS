@@ -4,126 +4,136 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
-  ForbiddenException,
-  NotImplementedException,
 } from '@nestjs/common';
-import { eq, and } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 
 import { DatabaseService } from '../db/database.service';
 import { University } from '../entities';
-import { CreateUniversityDto, UpdateUniversityDto, UniversitySingleResponseDto, UniversityListResponseDto, DeleteUniversityResponseDto } from './dto/university.dto';
+import {
+  CreateUniversityDto,
+  UpdateUniversityDto,
+  UniversitySingleResponseDto,
+  UniversityListResponseDto,
+  DeleteUniversityResponseDto,
+} from './dto/university.dto';
 
 @Injectable()
 export class UniversityService {
+  constructor(private readonly dbService: DatabaseService) {}
 
-    constructor(private readonly dbService: DatabaseService) {}
+  async create(dto: CreateUniversityDto): Promise<UniversitySingleResponseDto> {
+    //Check if university already exists
+    if (await this.checkDuplicateUniversityName(dto.UniversityName.trim()))
+      throw new ConflictException(
+        `University [${dto.UniversityName.trim()}] already exists`,
+      );
 
-    async create(dto: CreateUniversityDto): Promise<UniversitySingleResponseDto> {
+    const [newUni] = await this.dbService.db
+      .insert(University)
+      .values({
+        UniversityName: dto.UniversityName,
+      })
+      .returning();
 
-        //Check if university already exists
-        if (await this.checkDuplicateUniversityName(dto.UniversityName.trim())) 
-            throw new ConflictException(`University [${dto.UniversityName.trim()}] already exists`);
+    return newUni;
+  } //Create
 
-        const [newUni] = await this.dbService.db
-            .insert(University)
-            .values({
-                UniversityName: dto.UniversityName
-            }).returning();
+  async getAll(): Promise<UniversityListResponseDto> {
+    const universities = await this.dbService.db.select().from(University);
 
-        return newUni;
-    }//Create
+    if (universities.length === 0)
+      throw new NotFoundException('No universities found');
 
-    async getAll(): Promise<UniversityListResponseDto> {
+    return { universities };
+  } //GetAll
 
-        const universities = await this.dbService.db
-            .select()
-            .from(University);
+  async getById(uniId: string): Promise<UniversitySingleResponseDto> {
+    //Fetch uni by id
+    const [uni] = await this.dbService.db
+      .select()
+      .from(University)
+      .where(eq(University.UniversityID, uniId))
+      .limit(1);
 
-        if (universities.length===0) throw new NotFoundException('No universities found');
+    if (!uni)
+      throw new NotFoundException(
+        `No University found for universityID: ${uniId}`,
+      );
 
-        return {universities};
-    }//GetAll
+    return uni;
+  } //getByID
 
-    async getById(uniId: string): Promise<UniversitySingleResponseDto> {
+  async update(
+    uniId: string,
+    dto: UpdateUniversityDto,
+  ): Promise<UniversitySingleResponseDto> {
+    //verify University exists
+    const uni = await this.getById(uniId);
 
-        //Fetch uni by id
-        const [uni] = await this.dbService.db
-            .select()
-            .from(University)
-            .where(eq(University.UniversityID, uniId)).limit(1);
+    //Verify atleast one field provided for update
+    if (dto.UniversityName === undefined)
+      throw new BadRequestException('At least one field required for update');
 
-        if (!uni) throw new NotFoundException(`No University found for universityID: ${uniId}`);
+    //get updated fields
+    const updatedName = dto.UniversityName?.trim();
 
-        return uni;
-    }//getByID
+    //check if updated name is the same || already exists on another university
+    if (updatedName && updatedName !== uni.UniversityName)
+      if (await this.checkDuplicateUniversityName(updatedName))
+        throw new ConflictException(
+          `University [${dto.UniversityName.trim()}] already exists.`,
+        );
 
-    async update(uniId: string, dto: UpdateUniversityDto): Promise<UniversitySingleResponseDto> {
+    // update university
+    const [newUni] = await this.dbService.db
+      .update(University)
+      .set({
+        UniversityName: updatedName ?? uni.UniversityName,
+      })
+      .where(eq(University.UniversityID, uniId))
+      .returning();
 
-        //verify University exists
-        const uni = await this.getById(uniId);
+    if (!newUni)
+      throw new InternalServerErrorException('University not updated');
 
-        //Verify atleast one field provided for update
-        if (dto.UniversityName===undefined) throw new BadRequestException('At least one field required for update');
+    return newUni;
+  } //update
 
-        //get updated fields
-        const updatedName = dto.UniversityName?.trim();
+  async delete(uniId: string): Promise<DeleteUniversityResponseDto> {
+    //Check if university exists
+    const uni = await this.getById(uniId);
 
-        //check if updated name is the same || already exists on another university
-        if (updatedName && updatedName!==uni.UniversityName) 
-            if (await this.checkDuplicateUniversityName(updatedName))
-                throw new ConflictException(`University [${dto.UniversityName.trim()}] already exists.`);
+    //Delete university
+    await this.dbService.db
+      .delete(University)
+      .where(eq(University.UniversityID, uniId));
 
-        // update university
-        const [newUni] = await this.dbService.db
-            .update(University)
-            .set({
-                UniversityName: updatedName ?? uni.UniversityName
-            })
-            .where(eq(University.UniversityID, uniId)).returning();
+    return {
+      UniversityName: uni.UniversityName,
+      success: true,
+    };
+  } //Delete
 
-        if (!newUni) throw new InternalServerErrorException('University not updated');
+  //🎅's Little Helpers
 
-        return newUni;
-    }//update
+  //get a university by name
+  async getByName(uniName: string): Promise<UniversitySingleResponseDto> {
+    const [uni] = await this.dbService.db
+      .select()
+      .from(University)
+      .where(eq(University.UniversityName, uniName.trim()))
+      .limit(1);
 
-    async delete(uniId: string): Promise<DeleteUniversityResponseDto> {
+    return uni;
+  }
 
-        //Check if university exists
-        const uni = await this.getById(uniId);
+  async checkDuplicateUniversityName(uniName: string): Promise<boolean> {
+    const [uni] = await this.dbService.db
+      .select()
+      .from(University)
+      .where(eq(University.UniversityName, uniName))
+      .limit(1);
 
-        //Delete university
-        await this.dbService.db
-            .delete(University)
-            .where(eq(University.UniversityID, uniId));
-
-        return {
-            UniversityName: uni.UniversityName,
-            success: true
-        }
-    }//Delete
-
-    //🎅's Little Helpers
-
-    //get a university by name
-    async getByName(uniName: string): Promise<UniversitySingleResponseDto> {
-
-        const [uni] = await this.dbService.db
-            .select()
-            .from(University)
-            .where(eq(University.UniversityName, uniName.trim()))
-            .limit(1);
-
-        return uni;
-    }
-
-    async checkDuplicateUniversityName(uniName: string): Promise<boolean>{
-
-        const [uni] = await this.dbService.db
-            .select()
-            .from(University)
-            .where(eq(University.UniversityName, uniName)).limit(1);
-
-        return !!uni;
-    }//END_checkDuplicateUniversityName
-
-}//UniversityService
+    return !!uni;
+  } //END_checkDuplicateUniversityName
+} //UniversityService

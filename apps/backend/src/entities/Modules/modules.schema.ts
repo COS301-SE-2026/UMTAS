@@ -1,12 +1,4 @@
-import {
-  pgTable,
-  serial,
-  text,
-  uuid,
-  varchar,
-  primaryKey,
-  integer,
-} from 'drizzle-orm/pg-core';
+import { pgTable, text, uuid, varchar, primaryKey } from 'drizzle-orm/pg-core';
 import { usersTable } from '../auth';
 import { jsonb } from 'drizzle-orm/pg-core';
 
@@ -49,9 +41,10 @@ export const ModuleStyling = pgTable(
     ModuleID: uuid('ModuleID')
       .references(() => modules.moduleID, { onDelete: 'cascade' })
       .notNull(),
-      //should belong to user not userTimetable
-    UserID: uuid('UserID')
-      .references(() => usersTable.id, { onDelete: 'cascade' }),
+    //should belong to user not userTimetable
+    UserID: uuid('UserID').references(() => usersTable.id, {
+      onDelete: 'cascade',
+    }),
     styling: jsonb('styling')
       .notNull()
       .$type<{ colour: string }>()

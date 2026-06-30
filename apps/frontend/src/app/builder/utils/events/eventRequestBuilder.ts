@@ -5,9 +5,6 @@ import {
 
 import { paths } from "@/lib/api";
 
-export type CreateEventPath =
-  paths["/events"]["post"]["parameters"]["path"];
-
 export type CreateEventBody =
   paths["/events"]["post"]["requestBody"]["content"]["application/json"];
 export type EventCriteria = CreateEventBody["eventCriteria"];
@@ -21,11 +18,13 @@ export type getAllEventsRes =
 
 export type EventResponse = getAllEventsRes["events"][number];
 
-export type getEventByIDPath = paths["/events/{eventId}"]["get"]["parameters"]["path"];
+export type getEventByIDPath =
+  paths["/events/{eventId}"]["get"]["parameters"]["path"];
 export type getEventByIDRes =
   paths["/events/{eventId}"]["get"]["responses"]["200"]["content"]["application/json"];
 
-export type updateEventByIdPath = paths["/events/{id}"]["patch"]["parameters"]["path"];
+export type updateEventByIdPath =
+  paths["/events/{id}"]["patch"]["parameters"]["path"];
 
 export type updateEventByIdBody =
   paths["/events/{id}"]["patch"]["requestBody"]["content"]["application/json"];
@@ -38,7 +37,7 @@ export type deleteEventByIdRes =
   paths["/events/{id}"]["delete"]["responses"]["200"]["content"]["application/json"];
 
 export class createEventsBuilder extends RequestBuilder<
-  CreateEventPath,
+  undefined,
   CreateEventBody,
   createEventRes
 > {

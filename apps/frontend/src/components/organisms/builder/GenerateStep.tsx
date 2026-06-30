@@ -95,8 +95,7 @@ export function GenerateStep({
                 <span
                   className="h-3 w-3 rounded-full flex-shrink-0"
                   style={{
-                    backgroundColor:
-                      (module.styling as any)?.colour || "var(--border)",
+                    backgroundColor: module.styling?.colour || "var(--border)",
                   }}
                 />
                 <div className="flex-1 min-w-0">
@@ -166,7 +165,7 @@ export function GenerateStep({
                           className="h-2 w-2 rounded-full flex-shrink-0"
                           style={{
                             backgroundColor:
-                              (linkedModule.styling as any) || "var(--border)",
+                              linkedModule.styling?.colour || "var(--border)",
                           }}
                         />
                         <p className="text-sm font-mono text-[var(--text-secondary)]">

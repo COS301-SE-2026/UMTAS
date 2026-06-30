@@ -11,7 +11,7 @@ import { GenerateStep } from "@/components/organisms/builder/GenerateStep";
 import {
   addTimetableMut,
   updateTimetableMut,
-  getTimetableByIdQ
+  getTimetableByIdQ,
 } from "./Queries/timetableQueries";
 import { useMutation } from "@tanstack/react-query";
 

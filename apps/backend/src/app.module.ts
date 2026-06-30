@@ -31,7 +31,7 @@ import { BuilderModule } from './Builder/builder.module';
     TimetableModule,
     UniversityModule,
     CourseModule,
-    BuilderModule
+    BuilderModule,
   ],
   controllers: [AppController, AuthController],
   providers: [

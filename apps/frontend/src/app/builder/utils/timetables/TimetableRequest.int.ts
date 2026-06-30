@@ -80,7 +80,7 @@ describe("TimetableRequest Integration test", () => {
       moduleCode: moduleCode,
       moduleName: "test module",
       moduleDescription: "for testing",
-      styling: {colour:""},
+      styling: { colour: "" },
     };
 
     const createdModule = await mBuilder.send({
@@ -104,7 +104,7 @@ describe("TimetableRequest Integration test", () => {
           endTime: "09:00",
           type: "university",
           venue: "IT 2-26",
-          moduleID:moduleId,
+          moduleID: moduleId,
         },
       },
     });

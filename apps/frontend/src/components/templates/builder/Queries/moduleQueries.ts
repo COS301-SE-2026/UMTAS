@@ -24,7 +24,7 @@ export function addModuleMut() {
         body: {
           moduleCode: `MOD-${nextNum}`,
           moduleName: `Module ${nextNum}`,
-          styling: {colour : "#3B82F6"},
+          styling: { colour: "#3B82F6" },
           moduleDescription: "Fill in",
         },
       });
@@ -73,7 +73,7 @@ export function updateModuleMut() {
           moduleCode: vars.module.moduleCode,
           moduleDescription: vars.module.moduleDescription,
           moduleName: vars.module.moduleName,
-          styling: vars.module.styling ,
+          styling: vars.module.styling,
         },
       });
     },

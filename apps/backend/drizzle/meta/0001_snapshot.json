@@ -132,12 +132,8 @@
           "name": "account_userId_user_id_fk",
           "tableFrom": "account",
           "tableTo": "user",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -314,12 +310,8 @@
           "name": "session_userId_user_id_fk",
           "tableFrom": "session",
           "tableTo": "user",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -603,12 +595,8 @@
           "name": "PersonalEvent_UserID_user_id_fk",
           "tableFrom": "PersonalEvent",
           "tableTo": "user",
-          "columnsFrom": [
-            "UserID"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["UserID"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -616,12 +604,8 @@
           "name": "PersonalEvent_eventID_Event_eventID_fk",
           "tableFrom": "PersonalEvent",
           "tableTo": "Event",
-          "columnsFrom": [
-            "eventID"
-          ],
-          "columnsTo": [
-            "eventID"
-          ],
+          "columnsFrom": ["eventID"],
+          "columnsTo": ["eventID"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -668,12 +652,8 @@
           "name": "UniversityEvent_moduleID_Modules_moduleID_fk",
           "tableFrom": "UniversityEvent",
           "tableTo": "Modules",
-          "columnsFrom": [
-            "moduleID"
-          ],
-          "columnsTo": [
-            "moduleID"
-          ],
+          "columnsFrom": ["moduleID"],
+          "columnsTo": ["moduleID"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -681,12 +661,8 @@
           "name": "UniversityEvent_eventID_Event_eventID_fk",
           "tableFrom": "UniversityEvent",
           "tableTo": "Event",
-          "columnsFrom": [
-            "eventID"
-          ],
-          "columnsTo": [
-            "eventID"
-          ],
+          "columnsFrom": ["eventID"],
+          "columnsTo": ["eventID"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -694,12 +670,8 @@
           "name": "UniversityEvent_VenueID_Venue_VenueID_fk",
           "tableFrom": "UniversityEvent",
           "tableTo": "Venue",
-          "columnsFrom": [
-            "VenueID"
-          ],
-          "columnsTo": [
-            "VenueID"
-          ],
+          "columnsFrom": ["VenueID"],
+          "columnsTo": ["VenueID"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -733,12 +705,8 @@
           "name": "ModuleEnrollment_ModuleID_Modules_moduleID_fk",
           "tableFrom": "ModuleEnrollment",
           "tableTo": "Modules",
-          "columnsFrom": [
-            "ModuleID"
-          ],
-          "columnsTo": [
-            "moduleID"
-          ],
+          "columnsFrom": ["ModuleID"],
+          "columnsTo": ["moduleID"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -746,12 +714,8 @@
           "name": "ModuleEnrollment_UserID_user_id_fk",
           "tableFrom": "ModuleEnrollment",
           "tableTo": "user",
-          "columnsFrom": [
-            "UserID"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["UserID"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -759,10 +723,7 @@
       "compositePrimaryKeys": {
         "ModuleEnrollment_ModuleID_UserID_pk": {
           "name": "ModuleEnrollment_ModuleID_UserID_pk",
-          "columns": [
-            "ModuleID",
-            "UserID"
-          ]
+          "columns": ["ModuleID", "UserID"]
         }
       },
       "uniqueConstraints": {},
@@ -800,12 +761,8 @@
           "name": "ModuleStyling_ModuleID_Modules_moduleID_fk",
           "tableFrom": "ModuleStyling",
           "tableTo": "Modules",
-          "columnsFrom": [
-            "ModuleID"
-          ],
-          "columnsTo": [
-            "moduleID"
-          ],
+          "columnsFrom": ["ModuleID"],
+          "columnsTo": ["moduleID"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -813,12 +770,8 @@
           "name": "ModuleStyling_UserID_user_id_fk",
           "tableFrom": "ModuleStyling",
           "tableTo": "user",
-          "columnsFrom": [
-            "UserID"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["UserID"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -826,10 +779,7 @@
       "compositePrimaryKeys": {
         "ModuleStyling_ModuleID_UserID_pk": {
           "name": "ModuleStyling_ModuleID_UserID_pk",
-          "columns": [
-            "ModuleID",
-            "UserID"
-          ]
+          "columns": ["ModuleID", "UserID"]
         }
       },
       "uniqueConstraints": {},
@@ -860,12 +810,8 @@
           "name": "ModuleTeaches_ModuleID_Modules_moduleID_fk",
           "tableFrom": "ModuleTeaches",
           "tableTo": "Modules",
-          "columnsFrom": [
-            "ModuleID"
-          ],
-          "columnsTo": [
-            "moduleID"
-          ],
+          "columnsFrom": ["ModuleID"],
+          "columnsTo": ["moduleID"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -873,12 +819,8 @@
           "name": "ModuleTeaches_UserID_user_id_fk",
           "tableFrom": "ModuleTeaches",
           "tableTo": "user",
-          "columnsFrom": [
-            "UserID"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["UserID"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -886,10 +828,7 @@
       "compositePrimaryKeys": {
         "ModuleTeaches_ModuleID_UserID_pk": {
           "name": "ModuleTeaches_ModuleID_UserID_pk",
-          "columns": [
-            "ModuleID",
-            "UserID"
-          ]
+          "columns": ["ModuleID", "UserID"]
         }
       },
       "uniqueConstraints": {},
@@ -958,12 +897,8 @@
           "name": "EventsToTimetables_eventID_Event_eventID_fk",
           "tableFrom": "EventsToTimetables",
           "tableTo": "Event",
-          "columnsFrom": [
-            "eventID"
-          ],
-          "columnsTo": [
-            "eventID"
-          ],
+          "columnsFrom": ["eventID"],
+          "columnsTo": ["eventID"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -971,12 +906,8 @@
           "name": "EventsToTimetables_timetableID_Timetable_timetableID_fk",
           "tableFrom": "EventsToTimetables",
           "tableTo": "Timetable",
-          "columnsFrom": [
-            "timetableID"
-          ],
-          "columnsTo": [
-            "timetableID"
-          ],
+          "columnsFrom": ["timetableID"],
+          "columnsTo": ["timetableID"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -984,10 +915,7 @@
       "compositePrimaryKeys": {
         "EventsToTimetables_eventID_timetableID_pk": {
           "name": "EventsToTimetables_eventID_timetableID_pk",
-          "columns": [
-            "eventID",
-            "timetableID"
-          ]
+          "columns": ["eventID", "timetableID"]
         }
       },
       "uniqueConstraints": {},
@@ -1020,9 +948,7 @@
         "Timetable_timetableID_unique": {
           "name": "Timetable_timetableID_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "timetableID"
-          ]
+          "columns": ["timetableID"]
         }
       },
       "policies": {},
@@ -1059,12 +985,8 @@
           "name": "UserTimetable_UserID_user_id_fk",
           "tableFrom": "UserTimetable",
           "tableTo": "user",
-          "columnsFrom": [
-            "UserID"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["UserID"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1072,12 +994,8 @@
           "name": "UserTimetable_TimetableID_Timetable_timetableID_fk",
           "tableFrom": "UserTimetable",
           "tableTo": "Timetable",
-          "columnsFrom": [
-            "TimetableID"
-          ],
-          "columnsTo": [
-            "timetableID"
-          ],
+          "columnsFrom": ["TimetableID"],
+          "columnsTo": ["timetableID"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1119,12 +1037,8 @@
           "name": "AcademicCalendar_UniversityID_University_UniversityID_fk",
           "tableFrom": "AcademicCalendar",
           "tableTo": "University",
-          "columnsFrom": [
-            "UniversityID"
-          ],
-          "columnsTo": [
-            "UniversityID"
-          ],
+          "columnsFrom": ["UniversityID"],
+          "columnsTo": ["UniversityID"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1166,12 +1080,8 @@
           "name": "RestrictedDates_CalendarID_AcademicCalendar_CalendarID_fk",
           "tableFrom": "RestrictedDates",
           "tableTo": "AcademicCalendar",
-          "columnsFrom": [
-            "CalendarID"
-          ],
-          "columnsTo": [
-            "CalendarID"
-          ],
+          "columnsFrom": ["CalendarID"],
+          "columnsTo": ["CalendarID"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1212,12 +1122,8 @@
           "name": "Course_UniversityID_University_UniversityID_fk",
           "tableFrom": "Course",
           "tableTo": "University",
-          "columnsFrom": [
-            "UniversityID"
-          ],
-          "columnsTo": [
-            "UniversityID"
-          ],
+          "columnsFrom": ["UniversityID"],
+          "columnsTo": ["UniversityID"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1251,12 +1157,8 @@
           "name": "CourseModule_ModuleID_Modules_moduleID_fk",
           "tableFrom": "CourseModule",
           "tableTo": "Modules",
-          "columnsFrom": [
-            "ModuleID"
-          ],
-          "columnsTo": [
-            "moduleID"
-          ],
+          "columnsFrom": ["ModuleID"],
+          "columnsTo": ["moduleID"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1264,12 +1166,8 @@
           "name": "CourseModule_CourseID_Course_courseID_fk",
           "tableFrom": "CourseModule",
           "tableTo": "Course",
-          "columnsFrom": [
-            "CourseID"
-          ],
-          "columnsTo": [
-            "courseID"
-          ],
+          "columnsFrom": ["CourseID"],
+          "columnsTo": ["courseID"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1277,10 +1175,7 @@
       "compositePrimaryKeys": {
         "CourseModule_CourseID_ModuleID_pk": {
           "name": "CourseModule_CourseID_ModuleID_pk",
-          "columns": [
-            "CourseID",
-            "ModuleID"
-          ]
+          "columns": ["CourseID", "ModuleID"]
         }
       },
       "uniqueConstraints": {},
@@ -1345,12 +1240,8 @@
           "name": "UniversityRole_UserID_user_id_fk",
           "tableFrom": "UniversityRole",
           "tableTo": "user",
-          "columnsFrom": [
-            "UserID"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["UserID"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1358,12 +1249,8 @@
           "name": "UniversityRole_UniversityID_University_UniversityID_fk",
           "tableFrom": "UniversityRole",
           "tableTo": "University",
-          "columnsFrom": [
-            "UniversityID"
-          ],
-          "columnsTo": [
-            "UniversityID"
-          ],
+          "columnsFrom": ["UniversityID"],
+          "columnsTo": ["UniversityID"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1371,10 +1258,7 @@
       "compositePrimaryKeys": {
         "UniversityRole_UniversityID_UserID_pk": {
           "name": "UniversityRole_UniversityID_UserID_pk",
-          "columns": [
-            "UniversityID",
-            "UserID"
-          ]
+          "columns": ["UniversityID", "UserID"]
         }
       },
       "uniqueConstraints": {},
@@ -1405,12 +1289,8 @@
           "name": "EventVenue_EventID_Event_eventID_fk",
           "tableFrom": "EventVenue",
           "tableTo": "Event",
-          "columnsFrom": [
-            "EventID"
-          ],
-          "columnsTo": [
-            "eventID"
-          ],
+          "columnsFrom": ["EventID"],
+          "columnsTo": ["eventID"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1418,12 +1298,8 @@
           "name": "EventVenue_VenueID_Venue_VenueID_fk",
           "tableFrom": "EventVenue",
           "tableTo": "Venue",
-          "columnsFrom": [
-            "VenueID"
-          ],
-          "columnsTo": [
-            "VenueID"
-          ],
+          "columnsFrom": ["VenueID"],
+          "columnsTo": ["VenueID"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1431,10 +1307,7 @@
       "compositePrimaryKeys": {
         "EventVenue_EventID_VenueID_pk": {
           "name": "EventVenue_EventID_VenueID_pk",
-          "columns": [
-            "EventID",
-            "VenueID"
-          ]
+          "columns": ["EventID", "VenueID"]
         }
       },
       "uniqueConstraints": {},
@@ -1472,12 +1345,8 @@
           "name": "Venue_UniversityID_University_UniversityID_fk",
           "tableFrom": "Venue",
           "tableTo": "University",
-          "columnsFrom": [
-            "UniversityID"
-          ],
-          "columnsTo": [
-            "UniversityID"
-          ],
+          "columnsFrom": ["UniversityID"],
+          "columnsTo": ["UniversityID"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1505,12 +1374,7 @@
     "public.RoleType": {
       "name": "RoleType",
       "schema": "public",
-      "values": [
-        "STUDENT",
-        "UNIVERSITY_ADMIN",
-        "SYSTEM_ADMIN",
-        "STUDENT_OWNED"
-      ]
+      "values": ["STUDENT", "UNIVERSITY_ADMIN", "SYSTEM_ADMIN", "STUDENT_OWNED"]
     }
   },
   "schemas": {},
