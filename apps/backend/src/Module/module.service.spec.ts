@@ -176,7 +176,7 @@ describe('ModuleService', () => {
       mockSequentialResults(mockDb.update, [[updatedResultObject]]);
       mockSequentialResults(mockDb.insert, [[stylingObject]]);
 
-      const result = await service.update(userId, existing.moduleID, {styling: kleur});
+      const result = await service.update(userId, existing.moduleID, {styling: {colour: kleur}});
 
       expect(result).toMatchObject({...resultObject, styling: {colour: kleur}});
     });
@@ -202,7 +202,7 @@ describe('ModuleService', () => {
       mockSequentialResults(mockDb.update, [[updatedStylingObject]]);
 
       //Act
-      const result = await service.update(userId, existing.moduleID, {styling: kleur});
+      const result = await service.update(userId, existing.moduleID, {styling: {colour: kleur}});
 
       //Assert
       expect(result).toMatchObject({...existing, styling: {colour: kleur}});
