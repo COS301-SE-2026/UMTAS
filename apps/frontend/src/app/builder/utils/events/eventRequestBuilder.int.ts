@@ -16,8 +16,6 @@ import {
   createModuleReq,
 } from "../modules/requestBuilders";
 
-// require("dotenv").config({ path: "../../../../../.env" });
-
 const apiUrl =
   process.env.API_URL ||
   process.env.NEXT_PUBLIC_API_URL ||
@@ -85,29 +83,29 @@ describe("Event Request Builders Integration Tests", () => {
     auth(moduleBuilder);
 
     const mockModule: createModuleReq = {
-      code: moduleCode,
-      name: "Event Test Module",
-      description: "Module created for event integration test",
-      styling: "#00FF00",
+      moduleCode: moduleCode,
+      moduleName: "Event Test Module",
+      moduleDescription: "Module created for event integration test",
+      styling: { colour: "" },
     };
 
     const createdModule = await moduleBuilder.send({ body: mockModule });
-    const moduleId = createdModule.module.moduleID;
+    const moduleId = createdModule.moduleID;
 
     const createBuilder = new createEventsBuilder();
     auth(createBuilder);
 
     const eventBody: CreateEventBody = {
-      name: "Lifecycle Test Event",
-      code: `TEST-code`,
+      eventName: "Lifecycle Test Event",
+      eventCode: `TEST-code`,
       isRecurring: false,
       eventCriteria: {
-        day: "monday",
+        date: "monday",
         startTime: "08:00",
         endTime: "09:00",
-        type: "lecture",
+        type: "university",
         venue: "IT 2-26",
-        moduleCode: moduleCode,
+        moduleID: moduleId,
       },
     };
 
@@ -119,10 +117,10 @@ describe("Event Request Builders Integration Tests", () => {
     const getBuilder = new getEventByIDBuilder();
     auth(getBuilder);
 
-    const found = await getBuilder.send({ paths: { id: eventId } });
+    const found = await getBuilder.send({ paths: { eventId: eventId } });
 
     expect(found.event.eventID).toBe(eventId);
-    expect(found.event.name).toBe(eventBody.name);
+    expect(found.event.eventName).toBe(eventBody.eventName);
 
     const updateBuilder = new updateEventByID();
     auth(updateBuilder);
@@ -130,12 +128,12 @@ describe("Event Request Builders Integration Tests", () => {
     const updated = await updateBuilder.send({
       paths: { id: eventId },
       body: {
-        name: "Updated Lifecycle Event",
+        eventName: "Updated Lifecycle Event",
         isRecurring: false,
       },
     });
 
-    expect(updated.event.name).toBe("Updated Lifecycle Event");
+    expect(updated.event.eventName).toBe("Updated Lifecycle Event");
 
     const deleteBuilder = new deleteEventById();
     auth(deleteBuilder);
@@ -150,4 +148,13 @@ describe("Event Request Builders Integration Tests", () => {
 
     await deleteModuleBuilder.send({ paths: { moduleId } });
   });
+
+  const autoBuilder = new getAllEventsBuilder();
+  autoBuilder.testSignIn();
+  autoBuilder.addIntegrationTest({
+    tName: "should return all events successfully",
+    args: {},
+    expectedResponse: undefined,
+  });
+  autoBuilder.runTests("Testing auto test");
 });

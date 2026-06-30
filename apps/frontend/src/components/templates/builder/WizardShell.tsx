@@ -1,27 +1,24 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { WizardStepper } from "@/components/atoms/builder/WizardStepper";
 import { WizardFooter } from "@/components/atoms/builder/WizardFooter";
 import { ModulesStep } from "@/components/organisms/builder/ModulesStep";
 import { EventsStep } from "@/components/organisms/builder/EventsStep";
 import { GenerateStep } from "@/components/organisms/builder/GenerateStep";
-import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
+
 import {
-  createModulesBuilder,
-  getAllModulesBuilder,
-  deleteModulesById,
-  updateModulesBuilder,
-} from "@/app/builder/utils/modules/requestBuilders";
-import {
-  getAllEventsBuilder,
-  createEventsBuilder,
-  deleteEventById,
-  updateEventByID,
-  type EventResponse,
-} from "@/app/builder/utils/events/eventRequestBuilder";
-import { createTimeTableBuilder } from "@/app/builder/utils/timetables/TimeTableRequests";
+  addTimetableMut,
+  updateTimetableMut,
+  getTimetableByIdQ,
+} from "./Queries/timetableQueries";
+import { useMutation } from "@tanstack/react-query";
+
+import { getAllModulesQ } from "./Queries/moduleQueries";
+import { getQueryClient } from "@/components/tanstack/getQueryClient";
+import { useQuery } from "@tanstack/react-query";
+import { getAllEventsQ } from "./Queries/eventQueries";
 
 const Steps = [
   { label: "Modules" },
@@ -39,217 +36,26 @@ function generateId(): string {
 
 export function WizardShell() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const editId = searchParams.get("editId");
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
-  const [modules, setModules] = useState<ModuleResponseDto[]>([]);
-  const [events, setEvents] = useState<EventResponse[]>([]);
+
+  const {
+    data: modules = [],
+    isLoading: modLoading,
+    isError: modError,
+  } = useQuery(getAllModulesQ());
+  const { data: events = [] } = useQuery(getAllEventsQ());
+  const { mutateAsync: addTimetable } = useMutation(addTimetableMut());
+  const { mutateAsync: updateTimetable } = useMutation(updateTimetableMut());
+
   const [isGenerating, setIsGenerating] = useState(false);
-  const [modulesTrigger, setModulesTrigger] = useState(0);
-  const [eventsTrigger, setEventsTrigger] = useState(0);
 
-  async function handleModuleAdd() {
-    try {
-      const nextNum = modules.length + 1;
-      const builder = new createModulesBuilder();
-      await builder.send({
-        body: {
-          code: `MOD-${nextNum}`,
-          name: `Module ${nextNum}`,
-          styling: "#3B82F6",
-        },
-      });
-      setModulesTrigger((prev) => prev + 1);
-    } catch (error) {
-      console.error("Failed to create module:", error);
-    }
-  }
-
-  async function handleModuleUpdate(
-    id: number,
-    field: keyof Omit<ModuleResponseDto, "moduleID" | "userID"> | "confirm",
-    value: string,
-  ) {
-    if (field === "confirm") {
-      const targetModule = modules.find((m) => m.moduleID === id);
-      if (!targetModule) return;
-
-      try {
-        const builder = new updateModulesBuilder();
-        await builder.send({
-          paths: { moduleId: id },
-          body: {
-            code: targetModule.moduleCode,
-            name: targetModule.moduleName,
-            styling: targetModule.styling || undefined,
-          },
-        });
-        setModulesTrigger((prev) => prev + 1);
-      } catch (error) {
-        console.error("Failed to update module:", error);
-      }
-      return;
-    }
-
-    setModules((prev) =>
-      prev.map((m) => {
-        if (m.moduleID === id) {
-          return { ...m, [field]: value };
-        }
-        return m;
-      }),
-    );
-  }
-
-  async function handleModuleRemove(id: number) {
-    try {
-      const builder = new deleteModulesById();
-      await builder.send({
-        paths: { moduleId: id },
-      });
-      setModulesTrigger((prev) => prev + 1);
-    } catch (error) {
-      console.error("Failed to delete module:", error);
-    }
-  }
-
-  function handleEventAdd() {
-    const newEventId = Number(generateId());
-    setEvents((prev) => [
-      ...prev,
-      {
-        event: {
-          eventID: newEventId,
-          userID: "",
-          name: "",
-          code: "",
-          eventCriteria: {
-            day: "",
-            startTime: "",
-            endTime: "",
-            type: "lecture",
-            moduleCode: "",
-            venue: "",
-          },
-          isRecurring: false,
-        },
-      },
-    ]);
-  }
-
-  async function handleEventUpdate(
-    id: number,
-    field: string,
-    value: string | boolean,
-  ) {
-    if (field === "confirm") {
-      const targetEvent = events.find((e) => e.event.eventID === id);
-      if (!targetEvent) return;
-
-      try {
-        const payload = {
-          name: targetEvent.event.name,
-          code: targetEvent.event.code,
-          eventCriteria: {
-            day: targetEvent.event.eventCriteria.day,
-            startTime: targetEvent.event.eventCriteria.startTime,
-            endTime: targetEvent.event.eventCriteria.endTime,
-            type: targetEvent.event.eventCriteria.type || "lecture",
-            moduleCode: targetEvent.event.eventCriteria.moduleCode,
-            venue: targetEvent.event.eventCriteria.venue,
-          },
-          isRecurring: targetEvent.event.isRecurring || false,
-        };
-
-        if (!targetEvent.event.userID) {
-          const builder = new createEventsBuilder();
-          await builder.send({ body: payload });
-        } else {
-          const builder = new updateEventByID();
-          await builder.send({
-            paths: { id },
-            body: payload,
-          });
-        }
-        setEventsTrigger((prev) => prev + 1);
-      } catch (error) {
-        console.error("Failed to update/create event:", error);
-      }
-      return;
-    }
-
-    setEvents((prev) =>
-      prev.map((e) => {
-        if (e.event.eventID === id) {
-          if (field === "name" || field === "code") {
-            return {
-              ...e,
-              event: {
-                ...e.event,
-                [field]: value,
-              },
-            };
-          }
-
-          if (field === "moduleId") {
-            const selectedModule = modules.find(
-              (m) => m.moduleID === Number(value),
-            );
-            return {
-              ...e,
-              event: {
-                ...e.event,
-                eventCriteria: {
-                  ...e.event.eventCriteria,
-                  moduleCode: selectedModule?.moduleCode || "",
-                },
-              },
-              lecture: {
-                ...e.lecture,
-                lectureID: e.lecture?.lectureID || 0,
-                eventID: id,
-                moduleID: Number(value),
-              },
-            };
-          }
-
-          const fieldMap: Record<string, string> = {
-            date: "day",
-          };
-          const criteriaField = fieldMap[field] || field;
-
-          return {
-            ...e,
-            event: {
-              ...e.event,
-              eventCriteria: {
-                ...e.event.eventCriteria,
-                [criteriaField]: value,
-              },
-            },
-          };
-        }
-        return e;
-      }),
-    );
-  }
-
-  async function handleEventRemove(id: number) {
-    const targetEvent = events.find((e) => e.event.eventID === id);
-    if (targetEvent && !targetEvent.event.userID) {
-      setEvents((prev) => prev.filter((e) => e.event.eventID !== id));
-      return;
-    }
-
-    try {
-      const builder = new deleteEventById();
-      await builder.send({
-        paths: { id },
-      });
-      setEventsTrigger((prev) => prev + 1);
-    } catch (error) {
-      console.error("Failed to delete event:", error);
-    }
-  }
+  const [isInitialLoading, setIsInitialLoading] = useState(!!editId);
+  const [selectedEventIds, setSelectedEventIds] = useState<string[]>([]);
+  const [OGeventId, setOGeventId] = useState<string[]>([]);
+  const [timetableName, setTimetableName] = useState("My New Schedule");
 
   function handleStepClick(index: number) {
     setCurrentStep(index);
@@ -272,21 +78,36 @@ export function WizardShell() {
       setCurrentStep(currentStep - 1);
     }
   }
-
-  async function handleGenerate(name: string) {
+  async function handleGenerate(name: string, selectedEventIds: string[]) {
     setIsGenerating(true);
     try {
-      const confirmedEventIds = events
-        .filter((e) => e.event.userID)
-        .map((e) => String(e.event.eventID));
+      const finalEvents = selectedEventIds.map((id) => id);
 
-      const builder = new createTimeTableBuilder();
-      await builder.send({
-        body: {
-          timetableName: name || "Generated Schedule",
-          eventIds: confirmedEventIds,
-        },
-      });
+      if (editId) {
+        const noNumIds = OGeventId.filter(
+          (id) => !selectedEventIds.includes(id),
+        );
+
+        const numbersOnlyAddIds = selectedEventIds.filter(
+          (id) => !OGeventId.includes(id),
+        );
+
+        await updateTimetable({
+          path: { id: editId },
+          body: {
+            timetableName: name || "Updated Schedule",
+            removeEventIds: noNumIds,
+            addEventIds: numbersOnlyAddIds,
+          },
+        });
+      } else {
+        await addTimetable({
+          body: {
+            timetableName: name || "Generated Schedule",
+            eventIds: finalEvents,
+          },
+        });
+      }
 
       router.push("/schedules");
     } catch (error) {
@@ -306,10 +127,11 @@ export function WizardShell() {
     return handleBack;
   }
 
+  /*
   function isNextDisabled() {
     if (currentStep === 0) {
       const hasValidModule = modules.some(
-        (m) => m.moduleCode && m.moduleName && m.styling,
+        (m) => m.moduleCode && m.moduleName //&& m.styling,
       );
       return !hasValidModule;
     }
@@ -331,55 +153,49 @@ export function WizardShell() {
     }
     return false;
   }
-  useEffect(() => {
-    if (currentStep === 0) {
-      const fetchModules = async () => {
-        try {
-          const builder = new getAllModulesBuilder();
-          const response = await builder.send({});
-          setModules(response.modules);
-        } catch (error) {
-          console.error("Failed to fetch modules:", error);
-        }
-      };
-      fetchModules();
-    }
-  }, [currentStep, modulesTrigger]);
+  */
 
   useEffect(() => {
-    if (currentStep === 1) {
-      const fetchEvents = async () => {
-        try {
-          const builder = new getAllEventsBuilder();
-          const response = await builder.send({});
-          setEvents(response.events);
-        } catch (error) {
-          console.error("Failed to fetch events:", error);
-        }
-      };
-      fetchEvents();
+    if (!editId) return;
+
+    async function loadAllEditData() {
+      try {
+        const queryClient = getQueryClient();
+
+        const [timetableRes, modulesData, eventsData] = await Promise.all([
+          queryClient.fetchQuery(getTimetableByIdQ(editId!)),
+          queryClient.fetchQuery(getAllModulesQ()),
+          queryClient.fetchQuery(getAllEventsQ()),
+        ]);
+
+        setTimetableName(
+          timetableRes.timetable.timetableName || "Updated Schedule",
+        );
+
+        setOGeventId((timetableRes.eventIds || []).map(String));
+        setSelectedEventIds((timetableRes.eventIds || []).map(String));
+
+        setCompletedSteps([0, 1]);
+        setCurrentStep(2);
+      } catch (error) {
+        console.error("Failed to load timetable dataset for editing:", error);
+      } finally {
+        setIsInitialLoading(false);
+      }
     }
-  }, [currentStep, eventsTrigger]);
+
+    loadAllEditData();
+  }, [editId]);
 
   function renderStep() {
     if (currentStep === 0) {
-      return (
-        <ModulesStep
-          modules={modules}
-          onAdd={handleModuleAdd}
-          onUpdate={handleModuleUpdate}
-          onRemove={handleModuleRemove}
-        />
-      );
+      return <ModulesStep modules={modules} />;
     }
     if (currentStep === 1) {
       return (
         <EventsStep
           events={events}
           modules={modules}
-          onAdd={handleEventAdd}
-          onUpdate={handleEventUpdate}
-          onRemove={handleEventRemove}
           onGoToModules={() => setCurrentStep(0)}
         />
       );
@@ -390,7 +206,20 @@ export function WizardShell() {
         events={events}
         onGenerate={handleGenerate}
         isGenerating={isGenerating}
+        isEditMode={!!editId}
+        timetableName={timetableName}
+        setTimetableName={setTimetableName}
+        selectedEventIds={selectedEventIds}
+        setSelectedEventIds={setSelectedEventIds}
       />
+    );
+  }
+
+  if (isInitialLoading) {
+    return (
+      <div className="flex items-center justify-center p-20 text-[var(--text-secondary)]">
+        Loading timetable
+      </div>
     );
   }
 
@@ -413,7 +242,7 @@ export function WizardShell() {
         onBack={getBackHandler()}
         onNext={handleNext}
         nextLabel={getNextLabel()}
-        nextDisabled={isNextDisabled()}
+        nextDisabled={false}
       />
     </div>
   );

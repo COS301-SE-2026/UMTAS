@@ -3,9 +3,9 @@ import {
   IsOptional,
   IsString,
   IsArray,
-  IsInt,
   ArrayUnique,
   Length,
+  IsUUID,
 } from 'class-validator';
 
 export class CreateTimetableDto {
@@ -19,14 +19,15 @@ export class CreateTimetableDto {
   timetableName?: string;
 
   @ApiPropertyOptional({
-    example: [1, 2, 3],
+    type: [String],
+    example: ['00000000-0000-0000-0000-000000000000'],
     description: 'Event IDs to attach on creation',
   })
   @IsOptional()
   @IsArray()
-  @IsInt({ each: true })
+  @IsUUID('all', { each: true })
   @ArrayUnique()
-  eventIds?: number[];
+  eventIds?: string[];
 } //CreateTimetableDto
 
 export class UpdateTimetableDto {
@@ -40,46 +41,60 @@ export class UpdateTimetableDto {
   timetableName?: string;
 
   @ApiPropertyOptional({
-    example: [4, 5],
+    type: [String],
+    example: ['00000000-0000-0000-0000-000000000000'],
     description: 'Event IDs to link to the timetable',
   })
   @IsOptional()
   @IsArray()
-  @IsInt({ each: true })
+  @IsUUID('all', { each: true })
   @ArrayUnique()
-  addEventIds?: number[];
+  addEventIds?: string[];
 
   @ApiPropertyOptional({
-    example: [1, 2],
+    type: [String],
+    example: ['00000000-0000-0000-0000-000000000000'],
     description: 'Event IDs to unlink from the timetable',
   })
   @IsOptional()
   @IsArray()
-  @IsInt({ each: true })
+  @IsUUID('all', { each: true })
   @ArrayUnique()
-  removeEventIds?: number[];
+  removeEventIds?: string[];
 } //UpdateTimetableDto
 
 export class TimetableDto {
-  @ApiProperty({ example: 1 })
-  timetableID!: number;
-
-  @ApiProperty({ example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' })
-  userID!: string;
+  @ApiProperty({ example: 'someId' })
+  timetableID!: string;
 
   @ApiPropertyOptional({ example: 'Semester 1', nullable: true })
   timetableName?: string | null;
 } //TimetableDto
 
+export class UserTimetableDto {
+  @ApiProperty({ example: 'someId' })
+  timetableID!: string;
+
+  @ApiProperty({
+    type: String,
+    example: '00000000-0000-0000-0000-000000000000',
+  })
+  UserTimetableID!: string;
+} //TimetableDto
+
 export class TimetableResponseDto {
+  @ApiProperty({ type: String })
+  UserTimetableID!: string;
+
   @ApiProperty({ type: TimetableDto })
   timetable!: TimetableDto;
 
   @ApiPropertyOptional({
-    example: [1, 2, 3],
+    type: [String],
+    example: ['00000000-0000-0000-0000-000000000000'],
     description: 'IDs of events linked to this timetable',
   })
-  eventIds?: number[];
+  eventIds?: string[];
 } //TimetableResponseDto
 
 export class TimetableListResponseDto {

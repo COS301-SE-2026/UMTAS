@@ -5,9 +5,9 @@ import {
 
 import { paths } from "@/lib/api";
 
-type createTimeTableBody =
+export type createTimeTableBody =
   paths["/timetables"]["post"]["requestBody"]["content"]["application/json"];
-type createTimeTableRes =
+export type createTimeTableRes =
   paths["/timetables"]["post"]["responses"]["201"]["content"]["application/json"];
 
 export type getAllTimeTablesRes =
@@ -19,14 +19,14 @@ type getTTbyIdPath = paths["/timetables/{id}"]["get"]["parameters"]["path"];
 type getTTbyIdRes =
   paths["/timetables/{id}"]["get"]["responses"]["200"]["content"]["application/json"];
 
-type updateTTbyIDPath =
+export type updateTTbyIDPath =
   paths["/timetables/{id}"]["patch"]["parameters"]["path"];
-type updateTTbyIDBody =
+export type updateTTbyIDBody =
   paths["/timetables/{id}"]["patch"]["requestBody"]["content"]["application/json"];
 type updateTTbyIDBodyRes =
   paths["/timetables/{id}"]["patch"]["responses"]["200"]["content"]["application/json"];
 
-type deleteTTbyIDPath =
+export type deleteTTbyIDPath =
   paths["/timetables/{id}"]["delete"]["parameters"]["path"];
 
 type deleteTTbyIDRes =

@@ -8,16 +8,23 @@ import { Input } from "@/components/atoms/baseShadcn/input";
 import { Label } from "@/components/atoms/baseShadcn/label";
 import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
 import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
+import { Checkbox } from "@/components/atoms/baseShadcn/checkbox";
 
 interface GenerateStepProps {
   modules: ModuleResponseDto[];
   events: EventResponse[];
-  onGenerate: (name: string) => void;
+  onGenerate: (name: string, selectedEventIds: string[]) => void;
   isGenerating: boolean;
+  //props for editing
+  isEditMode: boolean;
+  timetableName: string;
+  setTimetableName: (name: string) => void;
+  selectedEventIds: string[];
+  setSelectedEventIds: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 function getLinkedModule(
-  moduleID: number | null | undefined,
+  moduleID: string | null | undefined,
   modules: ModuleResponseDto[],
 ) {
   if (!moduleID) return null;
@@ -40,8 +47,31 @@ export function GenerateStep({
   events,
   onGenerate,
   isGenerating,
+  isEditMode,
+  timetableName,
+  setTimetableName,
+  selectedEventIds,
+  setSelectedEventIds,
 }: GenerateStepProps) {
-  const [timetableName, setTimetableName] = useState("My New Schedule");
+  //checkbox logic
+
+  function checkboxLogic(eventId: string, isChecked: boolean) {
+    if (isChecked) {
+      //add the event to the list
+      setSelectedEventIds([...selectedEventIds, eventId]);
+    } else {
+      //add every event that is not the unchecked id
+      const updatedList: string[] = [];
+
+      for (const id of selectedEventIds) {
+        if (id !== eventId) {
+          updatedList.push(id);
+        }
+      }
+
+      setSelectedEventIds(updatedList);
+    }
+  }
 
   function renderModulesSummary() {
     return (
@@ -64,7 +94,9 @@ export function GenerateStep({
               >
                 <span
                   className="h-3 w-3 rounded-full flex-shrink-0"
-                  style={{ backgroundColor: module.styling || "var(--border)" }}
+                  style={{
+                    backgroundColor: module.styling?.colour || "var(--border)",
+                  }}
                 />
                 <div className="flex-1 min-w-0">
                   <p className="text-base text-[var(--text-primary)] truncate">
@@ -96,9 +128,10 @@ export function GenerateStep({
 
         <div className="flex flex-col gap-2">
           {events.map((event) => {
-            const criteria = event.event.eventCriteria;
+            const criteria = event.eventCriteria;
+            const isEventChecked = selectedEventIds.includes(event.eventID);
             const linkedModule = getLinkedModule(
-              event.lecture?.moduleID,
+              event.eventCriteria?.moduleID,
               modules,
             );
             const timeString = formatTime(
@@ -108,44 +141,50 @@ export function GenerateStep({
 
             return (
               <div
-                key={event.event.eventID}
-                className="flex flex-col gap-1 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] px-4 py-4 shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.08)]"
+                key={event.eventID}
+                className="flex flex-row items-center gap-1 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] px-4 py-4 shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.08)]"
               >
-                <div className="flex items-start justify-between gap-2">
+                <div className="flex flex-col gap-1 flex-1 min-w-0">
                   <p className="text-base font-medium text-[var(--text-primary)]">
-                    {criteria?.moduleCode || "Event"}
+                    {criteria?.moduleID || "Event"}
                   </p>
-                  <span className="text-sm font-mono text-[var(--text-secondary)] flex-shrink-0">
-                    {criteria?.moduleCode || ""}
-                  </span>
+                  <div className="flex flex-wrap items-center gap-2">
+                    {criteria?.date && (
+                      <p className="text-sm text-[var(--text-secondary)]">
+                        {criteria.date}
+                      </p>
+                    )}
+                    {timeString && (
+                      <p className="text-sm text-[var(--text-secondary)]">
+                        {timeString}
+                      </p>
+                    )}
+                    {linkedModule && (
+                      <div className="flex items-center gap-1.5">
+                        <span
+                          className="h-2 w-2 rounded-full flex-shrink-0"
+                          style={{
+                            backgroundColor:
+                              linkedModule.styling?.colour || "var(--border)",
+                          }}
+                        />
+                        <p className="text-sm font-mono text-[var(--text-secondary)]">
+                          {linkedModule.moduleCode}
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2">
-                  {criteria?.day && (
-                    <p className="text-sm text-[var(--text-secondary)]">
-                      {criteria.day}
-                    </p>
-                  )}
-                  {timeString && (
-                    <p className="text-sm text-[var(--text-secondary)]">
-                      {timeString}
-                    </p>
-                  )}
-                  {linkedModule && (
-                    <div className="flex items-center gap-1.5">
-                      <span
-                        className="h-2 w-2 rounded-full flex-shrink-0"
-                        style={{
-                          backgroundColor:
-                            linkedModule.styling || "var(--border)",
-                        }}
-                      />
-                      <p className="text-sm font-mono text-[var(--text-secondary)]">
-                        {linkedModule.moduleCode}
-                      </p>
-                    </div>
-                  )}
-                </div>
+                <span className="flex-shrink-0 flex items-center justify-center">
+                  <Checkbox
+                    id={`event-${event.eventID}`}
+                    checked={isEventChecked}
+                    onCheckedChange={(checkedState) =>
+                      checkboxLogic(event.eventID, checkedState === true)
+                    }
+                  />
+                </span>
               </div>
             );
           })}
@@ -212,11 +251,18 @@ export function GenerateStep({
       <Button
         type="button"
         size="default"
-        disabled={isGenerating}
-        onClick={() => onGenerate(timetableName)}
+        //only generate when there is at least 1 event
+        disabled={isGenerating || selectedEventIds.length === 0}
+        onClick={() => onGenerate(timetableName, selectedEventIds)}
         className="w-full text-sm bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] hover:bg-[var(--btn-primary-hover)] disabled:opacity-40 transition-colors duration-[var(--duration-fast)]"
       >
-        {isGenerating ? "Generating..." : "Generate schedule"}
+        {isGenerating
+          ? "Generating..."
+          : selectedEventIds.length === 0
+            ? "Select at least one event"
+            : isEditMode
+              ? "Edit Schedule"
+              : "Generate Schedule"}
       </Button>
     </div>
   );

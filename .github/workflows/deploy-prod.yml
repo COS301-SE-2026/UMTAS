@@ -1,0 +1,86 @@
+name: Deploy Production Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Release tag to deploy,eg V1.0.0"
+        required: true
+        type: string
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+    permissions: {}
+    outputs:
+      status: ${{ job.status }}
+    steps:
+      - name: Execute Deployment via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          port: ${{ secrets.PROD_SSH_PORT }}
+          host: ${{ secrets.PROD_SERVER_IP }}
+          username: ${{ secrets.PROD_SSH_USER }}
+          key: ${{ secrets.PROD_SSH_KEY }}
+          script: |
+            cd /opt/UMTAS
+            just deploy-prod ${{ inputs.release_tag }}
+
+  notify-deploy:
+    needs: deploy
+    permissions: {}
+    if: always()
+    uses: ./.github/workflows/discord-notify.yml
+    with:
+      status: ${{ needs.deploy.result == 'success' && 'Success' || 'Failure' }}
+      message: "Deployment of ${{ inputs.release_tag }} to production attempt."
+    secrets: inherit
+
+  prod-health-check:
+    name: Production Health Check
+    runs-on: ubuntu-latest
+    needs: deploy
+    environment:
+      name: production
+    permissions: {}
+    outputs:
+      status: ${{ job.status }}
+    steps:
+      - name: Wait for containers to stabilize
+        run: sleep 30
+
+      - name: Check production health endpoints
+        env:
+          DOMAIN: ${{ secrets.PROD_DOMAIN }}
+        run: |
+          failed=0
+          check() {
+            local url=$1
+            for attempt in 1 2 3 4 5; do
+              status=$(curl -s -L -o /dev/null -w "%{http_code}" --max-time 10 "$url")
+              if [ "$status" = "200" ]; then
+                echo "OK: $url returned HTTP 200"
+                return 0
+              fi
+              echo "Attempt $attempt/5: $url returned HTTP $status"
+              [ "$attempt" -lt 5 ] && sleep 20
+            done
+            return 1
+          }
+
+          check "https://api.${DOMAIN}/health"    || failed=1
+          check "https://solver.${DOMAIN}/health" || failed=1
+          check "https://${DOMAIN}/api/health"    || failed=1
+
+          exit $failed
+  notify-prod-health-check:
+    needs: prod-health-check
+    permissions: {}
+    if: always()
+    uses: ./.github/workflows/discord-notify.yml
+    with:
+      status: ${{ needs.prod-health-check.result == 'success' && 'Success' || 'Failure' }}
+      message: "Deployment of ${{ inputs.release_tag }} to production health check attempt."
+    secrets: inherit

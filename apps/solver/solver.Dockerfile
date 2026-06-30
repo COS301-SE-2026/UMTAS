@@ -10,6 +10,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY main.py ./
 
+COPY . ./
+
 RUN groupadd --system app && useradd --system --gid app app
 USER app
 

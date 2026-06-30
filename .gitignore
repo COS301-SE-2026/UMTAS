@@ -115,7 +115,8 @@ Temporary Items
 .raiden/
 
 # Drizzle
-**/drizzle/meta/
+#**/drizzle/meta/
+# This should not be in ignore so we can share the same journal
 
 working_docs/
 
@@ -137,3 +138,5 @@ apps/frontend/junit.xml
 
 
 .pnpm-store/
+.pnpm-store/
+.zed/
