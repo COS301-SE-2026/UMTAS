@@ -177,7 +177,7 @@ export class ModuleService {
     ) throw new BadRequestException('At least one field is required to update a module');
 
     //If module with same code as updated code already exists in the same course -> throw a fit
-    if (dto.moduleCode){
+    if (dto.moduleCode && dto.moduleCode!==module.moduleCode){
 
       const updatedCode = dto.moduleCode?.trim().toUpperCase();
       if (await this.existingModuleCodeForCourse(updatedCode, module.CourseID))
