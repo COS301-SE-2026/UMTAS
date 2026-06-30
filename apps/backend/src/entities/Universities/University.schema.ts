@@ -9,10 +9,15 @@ import { usersTable } from '../auth';
 
 export const RoleType = pgEnum('RoleType', [
   'STUDENT',
-  'UNIVERSITY_ADMIN',
-  'SYSTEM_ADMIN',
   'STUDENT_OWNED',
+  'UNIVERSITY_ADMIN',
+  'UNIVERSITY_ADMIN_PENDING',
+  'LECTURER',
+  'LECTURER_PENDING',
+  'SYSTEM_ADMIN',
 ]); // student owned is == uni admin maybe just to be precise?
+
+export type RoleTypeType = (typeof RoleType.enumValues)[number];
 
 export const University = pgTable('University', {
   UniversityID: uuid('UniversityID').defaultRandom().primaryKey(),
