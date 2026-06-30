@@ -1,6 +1,5 @@
 #include "../lib/openGA.hpp"
-#include "Pref_Solver/types.h"
-
+/*
 void init_genes(
     EventChromosome &p,
     const std::function<double(void)> &rnd01);
@@ -137,4 +136,9 @@ void SO_report_generation(
     const EventChromosome &best_genes)
 {
     std::cout << "Generation " << generation_number << std::endl;
+}
+*/
+
+int main(){
+    
 }

@@ -1,7 +1,6 @@
 #include <string>
 #include <iostream>
 #include <vector>
-#include "openGA.hpp"
 using std::cout;
 using std::endl;
 using std::string;
@@ -66,9 +65,7 @@ struct ModuleGA
 
 struct API_DATA
 {
-    API_DATA()
-    {
-    }
+    API_DATA(string);
     std::vector<ModuleGA> modules;
     std::vector<EventGA> events;
     int targetTime;
