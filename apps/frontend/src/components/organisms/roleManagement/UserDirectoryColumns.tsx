@@ -3,6 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 
 export type user = {
+  id: string;
   name: string;
   email: string;
   role: "Student" | "Lecturer" | "Uni Admin";
