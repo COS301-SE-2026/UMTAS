@@ -48,7 +48,8 @@ export class BuilderService {
             moduleCode: dto.moduleCode,
             moduleName: dto.moduleName,
             courseID: userCourse.CourseID,
-            moduleDescription: dto.moduleDescription
+          moduleDescription: dto.moduleDescription,
+          styling : dto.styling
         };
 
         //Create actual module

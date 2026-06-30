@@ -797,6 +797,10 @@ export interface components {
              */
             role?: "student" | "uni_admin" | "sys_admin";
         };
+        StylingDto: {
+            /** @example #3B82F6 */
+            colour: string;
+        };
         CreateModuleDto: {
             /**
              * @description Module code used by the university
@@ -819,9 +823,9 @@ export interface components {
              *       "colour": "#3B82F6"
              *     }
              */
-            styling?: {
+            styling?: ({
                 [key: string]: unknown;
-            } | null;
+            } & components["schemas"]["StylingDto"]) | null;
             /**
              * Format: uuid
              * @description CourseID to ensure module belongs to a course
@@ -857,9 +861,9 @@ export interface components {
              *       "colour": "#3B82F6"
              *     }
              */
-            styling?: {
+            styling?: ({
                 [key: string]: unknown;
-            } | null;
+            } & components["schemas"]["StylingDto"]) | null;
         };
         ModuleListResponseDto: {
             /** @description List of modules */
@@ -887,9 +891,9 @@ export interface components {
              *       "colour": "#3B82F6"
              *     }
              */
-            styling?: {
+            styling?: ({
                 [key: string]: unknown;
-            } | null;
+            } & components["schemas"]["StylingDto"]) | null;
         };
         DeleteModuleResponseDto: {
             /**
@@ -1218,9 +1222,9 @@ export interface components {
              *       "colour": "#3B82F6"
              *     }
              */
-            styling?: {
+            styling?: ({
                 [key: string]: unknown;
-            } | null;
+            } & components["schemas"]["StylingDto"]) | null;
         };
     };
     responses: never;
@@ -2052,6 +2056,42 @@ export interface operations {
             };
             /** @description Module code already exists for course */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getModuleById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                moduleId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Module returned successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModuleSingleResponseDto"];
+                };
+            };
+            /** @description Invalid module ID */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Module not found */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -3036,6 +3076,89 @@ export interface operations {
             };
             /** @description Module not found */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    deleteModule: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                moduleId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Module deleted successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeleteModuleResponseDto"];
+                };
+            };
+            /** @description Invalid module ID */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Module not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    updateModule: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                moduleId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateModuleDto"];
+            };
+        };
+        responses: {
+            /** @description Module updated successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModuleSingleResponseDto"];
+                };
+            };
+            /** @description Invalid update payload or module ID */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Module not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Duplicate module code detected for course */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };

@@ -2,6 +2,7 @@ import {
   createModulesBuilder,
   deleteModulesById,
   getAllModulesBuilder,
+  updateModuleByIdBody,
   updateModulesBuilder,
 } from "@/app/builder/utils/modules/requestBuilders";
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
@@ -62,17 +63,17 @@ export function updateModuleMut() {
   return mutationOptions({
     mutationFn: async (vars: {
       moduleID: string;
-      module: { code?: string; dsc?: string; name?: string; styling?: string };
+      module: updateModuleByIdBody;
     }) => {
       return new updateModulesBuilder().send({
         paths: {
           moduleId: vars.moduleID,
         },
         body: {
-          moduleCode: vars.module.code,
-          moduleDescription: vars.module.dsc,
-          moduleName: vars.module.name,
-          // : vars.module.styling,
+          moduleCode: vars.module.moduleCode,
+          moduleDescription: vars.module.moduleDescription,
+          moduleName: vars.module.moduleName,
+          styling: vars.module.styling ,
         },
       });
     },

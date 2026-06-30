@@ -43,7 +43,7 @@ function validateModule(module: ModuleResponseDto) {
     errors.moduleName = "Name is required";
     hasErrors = true;
   }
-  
+
   if (!module.styling) {
     errors.styling = "Colour is required";
     hasErrors = true;
@@ -75,13 +75,14 @@ export function ModulesStep({ modules }: ModulesStepProps) {
     action();
   }
 
-  function handleModuleUpdate(
+  function handleModuleUpdate<K extends keyof ModuleResponseDto>(
     id: string,
-    field: keyof ModuleResponseDto,
-    value: string,
+    field: K,
+    value: ModuleResponseDto[K],
   ) {
     setIsDirty(true);
-
+    console.log(id, field, value);
+  
     getQueryClient().setQueryData(
       getAllModulesQ().queryKey,
       (old?: ModuleResponseDto[]) => {
@@ -91,6 +92,7 @@ export function ModulesStep({ modules }: ModulesStepProps) {
       },
     );
   }
+
   function handleGuardConfirm() {
     setIsDirty(false);
     setShowGuard(false);
@@ -135,15 +137,7 @@ export function ModulesStep({ modules }: ModulesStepProps) {
     try {
       updateModule.mutate({
         moduleID: id,
-        module: {
-          name: uniModule.moduleName,
-          code: uniModule.moduleCode,
-          dsc: uniModule.moduleDescription || undefined,
-          //ugly fix until I find something better
-          styling: uniModule.styling?.colour
-            ? JSON.stringify({ colour: uniModule.styling.colour })
-            : undefined,
-        },
+        module: uniModule
       });
 
       setErrorMap((prev) => {
@@ -190,7 +184,7 @@ export function ModulesStep({ modules }: ModulesStepProps) {
             <span
               className="h-3 w-3 rounded-full flex-shrink-0"
               style={{
-                backgroundColor: (module.styling as any) || "var(--border)",
+                backgroundColor: (module?.styling?.colour ) || "var(--border)",
               }}
             />
 

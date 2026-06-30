@@ -53,7 +53,7 @@ export class ModuleService {
       .values({
         moduleCode: code,
         moduleName: name,
-        moduleDescription: description
+        moduleDescription: description,
       })
       .returning();
 
@@ -73,7 +73,7 @@ export class ModuleService {
 
     //Styling
     if (dto.styling){
-
+      console.log("we got here")
       const styling = await this.setStyling(newModule.moduleID, userId, dto.styling.colour);
 
       return {

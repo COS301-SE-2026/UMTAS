@@ -42,12 +42,17 @@ export class ModulesDto {
 
   @ApiPropertyOptional({
     example: { colour: '#3B82F6' },
-    type: () => Object,
+    type: () => StylingDto,
     description: 'Module styling',
     additionalProperties: true
   })
   styling?: { colour: string } | null;
 }//ModuleDto
+
+class StylingDto {
+  @ApiProperty({ example: '#3B82F6' })
+  colour!: string;
+}
 
 //Create
 export class CreateModuleDto extends PickType(ModulesDto, ['moduleCode', 'moduleName', 'moduleDescription', 'styling']) {
