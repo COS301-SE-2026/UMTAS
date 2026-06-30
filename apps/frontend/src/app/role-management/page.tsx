@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import RoleManagementTemplate from "@/components/templates/roleManagement/roleManagementTemplate";
 
