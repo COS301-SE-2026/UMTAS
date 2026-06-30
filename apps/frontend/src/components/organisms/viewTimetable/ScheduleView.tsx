@@ -24,26 +24,21 @@ import {
   SelectValue,
 } from "@/components/atoms/baseShadcn/select";
 import { getAllWeekStarts, resolveScheduleEvents } from "@/lib/scheduleUtils";
-import {
-  getAllModulesBuilder,
-  updateModulesBuilder,
-  type ModuleResponseDto,
-} from "@/app/builder/utils/modules/requestBuilders";
-import {
-  getAllEventsBuilder,
-  type EventResponse,
-} from "@/app/builder/utils/events/eventRequestBuilder";
-import {
-  deleteTTbyIDBuilder,
-  getAllTimeTablesBuilder,
-  updateTTbyIDBuilder,
-  type TimetableResponse,
-} from "@/app/builder/utils/timetables/TimeTableRequests";
+
 import { downloadICS, generateICS } from "@/lib/ICS-utils/ICS";
 import { Button } from "@/components/atoms/baseShadcn/button";
+
+import { useQuery } from "@tanstack/react-query";
+
+import { getAllTimetablesQ } from "@/components/templates/builder/Queries/timetableQueries";
+
 import { log, time } from "console";
 import { router } from "better-auth/api";
 import { redirect } from "next/dist/server/api-utils";
+import { getAllEventsQ } from "@/components/templates/builder/Queries/eventQueries";
+import { getAllModulesQ } from "@/components/templates/builder/Queries/moduleQueries";
+import { removeTimetableMut } from "@/components/templates/builder/Queries/timetableQueries";
+import { useMutation } from "@tanstack/react-query";
 
 interface ScheduleViewProps {
   onEventCountChange: (count: number) => void;
@@ -57,45 +52,27 @@ export function ScheduleView({
   onExportReady,
 }: ScheduleViewProps) {
   const router = useRouter();
-  const [allModules, setAllModules] = useState<ModuleResponseDto[]>([]);
-  const [allEvents, setAllEvents] = useState<EventResponse[]>([]);
-  const [timetables, setTimetables] = useState<TimetableResponse[]>([]);
-  const [selectedTimetableId, setSelectedTimetableId] = useState<number>(0);
+  const [selectedTimetableId, setSelectedTimetableId] = useState<string>("");
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-
-  const [isLoading, setIsLoading] = useState(true);
   const [currentWeekIndex, setCurrentWeekIndex] = useState(0);
 
+  const { data: allModules = [], isLoading: isLoadingModules } =
+    useQuery(getAllModulesQ());
+  const { data: allEvents = [], isLoading: isLoadingEvents } =
+    useQuery(getAllEventsQ());
+  const { data: timetables = [], isLoading: isLoadingTimetables } =
+    useQuery(getAllTimetablesQ());
+  const { mutate: deleteTimetable } = useMutation(removeTimetableMut());
+
+  const isLoading = isLoadingModules || isLoadingEvents || isLoadingTimetables;
+
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const [modulesRes, eventsRes, timetablesRes] = await Promise.all([
-          new getAllModulesBuilder().send({}),
-          new getAllEventsBuilder().send({}),
-          new getAllTimeTablesBuilder().send({}),
-        ]);
-
-        setAllModules(modulesRes.modules);
-        setAllEvents(eventsRes.events);
-
-        const fetchedTimetables = timetablesRes.timetables || [];
-        setTimetables(fetchedTimetables);
-
-        if (fetchedTimetables.length > 0) {
-          setSelectedTimetableId(
-            fetchedTimetables[fetchedTimetables.length - 1].timetable
-              .timetableID,
-          );
-        }
-      } catch (error) {
-        console.error("Failed to fetch schedule data:", error);
-      } finally {
-        setIsLoading(false);
-      }
+    if (timetables.length > 0 && !selectedTimetableId) {
+      setSelectedTimetableId(
+        String(timetables[timetables.length - 1].timetable.timetableID),
+      );
     }
-    fetchData();
-  }, []);
-
+  }, [timetables, selectedTimetableId]);
   const { events, modules } = useMemo(() => {
     if (!selectedTimetableId) {
       return { events: [], modules: [] };
@@ -111,11 +88,11 @@ export function ScheduleView({
       );
 
       const activeEvents = allEvents.filter((e) =>
-        activeEventIds.includes(String(e.event.eventID).trim()),
+        activeEventIds.includes(String(e.eventID).trim()),
       );
 
       const activeModuleIds = activeEvents
-        .map((e) => e.lecture?.moduleID)
+        .map((e) => e.eventCriteria?.moduleID)
         .filter(Boolean);
 
       const activeModules = allModules.filter((m) =>
@@ -210,34 +187,18 @@ export function ScheduleView({
   async function deleteTimetableByID() {
     setIsDeleteDialogOpen(false);
 
-    try {
-      const builder = new deleteTTbyIDBuilder();
+    if (!selectedTimetableId) return;
 
-      await builder.send({
-        paths: { id: selectedTimetableId },
-      });
-
-      //remove currently selected timetable
-      const remainingTimetables = timetables.filter(
-        (timetable) => timetable.timetable.timetableID !== selectedTimetableId,
-      );
-
-      setTimetables(remainingTimetables);
-
-      if (remainingTimetables.length > 0) {
-        setSelectedTimetableId(remainingTimetables[0].timetable.timetableID);
+    deleteTimetable(selectedTimetableId, {
+      onSuccess: () => {
+        setSelectedTimetableId("");
         setCurrentWeekIndex(0);
-      }
+      },
 
-      //console.log("Timetable successfully added");
-    } catch (error) {
-      //console.error("Error with sending delete request");
-
-      //this alert will be changed once I add the error components
-      alert(
-        "An error occured while deleting your timetable. Please refresh and try again.",
-      );
-    }
+      onError: (error) => {
+        console.error("error while deleting timetable", error);
+      },
+    });
   }
 
   //edit timetable
@@ -269,7 +230,7 @@ export function ScheduleView({
           <Select
             value={String(selectedTimetableId)}
             onValueChange={(newValue) => {
-              setSelectedTimetableId(Number(newValue));
+              setSelectedTimetableId(newValue);
               setCurrentWeekIndex(0);
             }}
           >

@@ -39,7 +39,7 @@ describe("getAllModulesBuilder", () => {
     console.log("Fetch called with:", (global.fetch as jest.Mock).mock.calls);
 
     expect(global.fetch).toHaveBeenCalledWith(
-      apiUrl + "/modules",
+      apiUrl + "/builder",
       expect.objectContaining({ method: "GET" }),
     );
   });
@@ -61,11 +61,11 @@ describe("getModulesByIdBuilder", () => {
   it("should correctly hit the parameter listed endpoint", async () => {
     const builder = new getModulesByIdBuilder();
 
-    await builder.send({ paths: { moduleId: 123 } });
+    await builder.send({ paths: { moduleId: "str" } });
     console.log("Fetch called with:", (global.fetch as jest.Mock).mock.calls);
 
     expect(global.fetch).toHaveBeenCalledWith(
-      apiUrl + "/modules/123",
+      apiUrl + "/builder/str",
       expect.objectContaining({ method: "GET" }),
     );
   });
@@ -87,13 +87,13 @@ describe("createModulesBuilder", () => {
   it("should hit the /modules endpoint with POST", async () => {
     const builder = new createModulesBuilder();
     const mockBody: createModuleReq = {
-      name: "New Module",
-      code: "CS101",
+      moduleName: "New Module",
+      moduleCode: "CS101",
     };
     await builder.send({ body: mockBody });
 
     expect(global.fetch).toHaveBeenCalledWith(
-      apiUrl + "/modules",
+      apiUrl + "/builder",
       expect.objectContaining({
         method: "POST",
         body: JSON.stringify(mockBody),
@@ -117,15 +117,15 @@ describe("updateModulesBuilder", () => {
 
   it("should hit the /modules/{moduleId} endpoint with PATCH", async () => {
     const builder = new updateModulesBuilder();
-    const mockPath: updateModuleByIdPath = { moduleId: 123 };
-    const mockBody: updateModuleByIdBody = { name: "Updated Module" };
+    const mockPath: updateModuleByIdPath = { moduleId: "str" };
+    const mockBody: updateModuleByIdBody = { moduleName: "Updated Module" };
     await builder.send({
       paths: mockPath,
       body: mockBody,
     });
 
     expect(global.fetch).toHaveBeenCalledWith(
-      apiUrl + "/modules/123",
+      apiUrl + "/builder/str",
       expect.objectContaining({
         method: "PATCH",
         body: JSON.stringify(mockBody),
@@ -149,11 +149,11 @@ describe("deleteModulesById", () => {
 
   it("should hit the /modules/{moduleId} endpoint with DELETE", async () => {
     const builder = new deleteModulesById();
-    const mockPath: deleteModulesByIdPath = { moduleId: 123 };
+    const mockPath: deleteModulesByIdPath = { moduleId: "str" };
     await builder.send({ paths: mockPath });
 
     expect(global.fetch).toHaveBeenCalledWith(
-      apiUrl + "/modules/123",
+      apiUrl + "/builder/str",
       expect.objectContaining({
         method: "DELETE",
       }),

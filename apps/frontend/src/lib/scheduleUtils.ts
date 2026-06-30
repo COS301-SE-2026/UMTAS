@@ -45,11 +45,12 @@ export function formatWeekRange(weekStart: Date): string {
   return startStr + " - " + endStr;
 }
 
+//check that date does the same as .day
 export function getAllWeekStarts(events: EventResponse[]): Date[] {
   const weekStartSet = new Set<string>();
 
   for (const event of events) {
-    const day = event.event.eventCriteria?.day;
+    const day = event.eventCriteria?.date;
     if (!day) {
       continue;
     }
@@ -68,33 +69,33 @@ export function resolveScheduleEvents(
   const resolved: ScheduleEvent[] = [];
 
   for (const event of events) {
-    const criteria = event.event.eventCriteria;
+    const criteria = event.eventCriteria;
     const isRecurring = false; // Temporarily disabled
 
-    if (criteria?.type === "lecture") {
-      const lectureModule = modules.find(
-        (m) => m.moduleID === event.lecture?.moduleID,
+    if (criteria?.type === "university") {
+      const uniModule = modules.find(
+        (m) => m.moduleID === event.eventCriteria?.moduleID,
       );
       resolved.push({
-        id: String(event.event.eventID),
-        name: criteria?.moduleCode || "",
-        code: criteria?.moduleCode || "",
-        date: criteria?.day || "",
+        id: String(event.eventID),
+        name: event.eventName || "Untitled Event",
+        code: criteria?.moduleID || "",
+        date: criteria?.date || "",
         startTime: criteria?.startTime || "",
         endTime: criteria?.endTime || "",
         isRecurring,
-        accentColour: lectureModule ? lectureModule.styling || null : null,
-        subLabel: lectureModule ? lectureModule.moduleCode : null,
+        accentColour: (uniModule?.styling as any)?.colour || null,
+        subLabel: uniModule ? uniModule.moduleCode : null,
       });
       continue;
     }
 
     // future event types
     resolved.push({
-      id: String(event.event.eventID),
-      name: criteria?.moduleCode || "",
-      code: criteria?.moduleCode || "",
-      date: criteria?.day || "",
+      id: String(event.eventID),
+      name: criteria?.moduleID || "",
+      code: criteria?.moduleID || "",
+      date: criteria?.date || "",
       startTime: criteria?.startTime || "",
       endTime: criteria?.endTime || "",
       isRecurring,

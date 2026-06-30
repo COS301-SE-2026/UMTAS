@@ -1,40 +1,42 @@
-import {
-  integer,
-  jsonb,
-  pgTable,
-  primaryKey,
-  serial,
-  uuid,
-  varchar,
-  boolean,
-} from 'drizzle-orm/pg-core';
+import { jsonb, pgTable, uuid, varchar, boolean } from 'drizzle-orm/pg-core';
+import { usersTable } from '../auth';
+import { Venue } from '../Universities';
+import { modules } from '../Modules';
+
+import type { EventCriteria } from 'src/Events/dto/event.types';
 
 export const Event = pgTable('Event', {
-  userID: uuid('userID').notNull(),
-  eventID: serial('eventID').primaryKey(),
-  eventName: varchar('eventName', { length: 32 }),
+  eventID: uuid('eventID').primaryKey().defaultRandom(),
+  eventName: varchar('eventName', { length: 32 }).notNull(),
   eventCode: varchar('eventCode', { length: 10 }),
-  eventCriteria: jsonb('eventCriteria'),
+  eventCriteria: jsonb('eventCriteria').$type<EventCriteria>(),
   isRecurring: boolean('isRecurring').notNull().default(false),
 });
 
-export const Timetable = pgTable('Timetable', {
-  timetableID: serial('timetableID').primaryKey(),
-  timetableName: varchar('timetableName', { length: 32 }),
-  userID: uuid('userID').notNull(),
+//Personal owned
+export const PersonalEvent = pgTable('PersonalEvent', {
+  PersonalEventID: uuid('PersonalEventID').primaryKey().defaultRandom(),
+  UserID: uuid('UserID').references(() => usersTable.id, {
+    onDelete: 'cascade',
+  }),
+  eventID: uuid('eventID').references(() => Event.eventID, {
+    onDelete: 'cascade',
+  }),
 });
 
-export const EventsToTimetables = pgTable(
-  'EventsToTimetables',
-  {
-    eventID: integer('eventID')
-      .notNull()
-      .references(() => Event.eventID, { onDelete: 'cascade' }),
-    timetableID: integer('timetableID')
-      .notNull()
-      .references(() => Timetable.timetableID, { onDelete: 'cascade' }),
-  },
-  (t) => ({
-    pk: primaryKey({ columns: [t.eventID, t.timetableID] }),
+//University owned
+export const UniversityEvent = pgTable('UniversityEvent', {
+  UniversityEventID: uuid('universityEventID').primaryKey().defaultRandom(),
+  moduleID: uuid('moduleID').references(() => modules.moduleID, {
+    onDelete: 'cascade',
   }),
-);
+  eventID: uuid('eventID').references(() => Event.eventID, {
+    onDelete: 'cascade',
+  }),
+  VenueID: uuid('VenueID').references(() => Venue.VenueID, {
+    onDelete: 'cascade',
+  }),
+});
+
+
+

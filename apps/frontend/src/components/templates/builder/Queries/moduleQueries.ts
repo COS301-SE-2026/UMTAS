@@ -2,6 +2,7 @@ import {
   createModulesBuilder,
   deleteModulesById,
   getAllModulesBuilder,
+  updateModuleByIdBody,
   updateModulesBuilder,
 } from "@/app/builder/utils/modules/requestBuilders";
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
@@ -21,9 +22,10 @@ export function addModuleMut() {
       const builder = new createModulesBuilder();
       return await builder.send({
         body: {
-          code: `MOD-${nextNum}`,
-          name: `Module ${nextNum}`,
-          styling: "#3B82F6",
+          moduleCode: `MOD-${nextNum}`,
+          moduleName: `Module ${nextNum}`,
+          styling: {colour : "#3B82F6"},
+          moduleDescription: "Fill in",
         },
       });
     },
@@ -38,7 +40,7 @@ export function addModuleMut() {
 
 export function removeModuleMut() {
   return mutationOptions({
-    mutationFn: async (moduleID: number | null) => {
+    mutationFn: async (moduleID: string | null) => {
       if (moduleID == null) {
         return;
       }
@@ -60,18 +62,18 @@ export function removeModuleMut() {
 export function updateModuleMut() {
   return mutationOptions({
     mutationFn: async (vars: {
-      moduleID: number;
-      module: { code?: string; dsc?: string; name?: string; styling?: string };
+      moduleID: string;
+      module: updateModuleByIdBody;
     }) => {
       return new updateModulesBuilder().send({
         paths: {
           moduleId: vars.moduleID,
         },
         body: {
-          code: vars.module.code,
-          description: vars.module.dsc,
-          name: vars.module.name,
-          styling: vars.module.styling,
+          moduleCode: vars.module.moduleCode,
+          moduleDescription: vars.module.moduleDescription,
+          moduleName: vars.module.moduleName,
+          styling: vars.module.styling ,
         },
       });
     },

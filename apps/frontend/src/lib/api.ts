@@ -4,2248 +4,3166 @@
  */
 
 export interface paths {
-  "/": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AppController_getHello"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: operations["AppController_getHello"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/auth/sign-up/email": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/auth/sign-up/email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Register with email and password */
+        post: operations["signUpEmail"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    /** Register with email and password */
-    post: operations["signUpEmail"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/auth/sign-in/email": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/auth/sign-in/email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Sign in with email and password */
+        post: operations["signInEmail"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    /** Sign in with email and password */
-    post: operations["signInEmail"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/auth/sign-out": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/auth/sign-out": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Sign out and invalidate the current session */
+        post: operations["signOut"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    /** Sign out and invalidate the current session */
-    post: operations["signOut"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/auth/session": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/auth/session": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get the current user session */
+        get: operations["getSession"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Get the current user session */
-    get: operations["getSession"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/auth/list-sessions": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/auth/list-sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List all active sessions for the current user */
+        get: operations["listSessions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** List all active sessions for the current user */
-    get: operations["listSessions"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/auth/revoke-session": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/auth/revoke-session": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Terminate a specific session by ID */
+        post: operations["revokeSession"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    /** Terminate a specific session by ID */
-    post: operations["revokeSession"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/auth/send-verification-email": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/auth/send-verification-email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Send a verification email to the signed-in user */
+        post: operations["sendVerificationEmail"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    /** Send a verification email to the signed-in user */
-    post: operations["sendVerificationEmail"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/auth/verify-email": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/auth/verify-email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Verify email address using the code from the verification email */
+        post: operations["verifyEmail"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    /** Verify email address using the code from the verification email */
-    post: operations["verifyEmail"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/auth/forget-password": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/auth/forget-password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Request a password reset email */
+        post: operations["forgetPassword"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    /** Request a password reset email */
-    post: operations["forgetPassword"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/auth/reset-password": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/auth/reset-password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reset password using the token from the reset email */
+        post: operations["resetPassword"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    /** Reset password using the token from the reset email */
-    post: operations["resetPassword"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/auth/change-password": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/auth/change-password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Change password for the signed-in user */
+        post: operations["changePassword"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    /** Change password for the signed-in user */
-    post: operations["changePassword"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/auth/callback/google": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/auth/callback/google": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Google OAuth callback
+         * @description Handles the redirect from Google after OAuth authorisation. Not intended to be called directly - Google redirects the browser here automatically.
+         */
+        get: operations["googleOAuthCallback"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /**
-     * Google OAuth callback
-     * @description Handles the redirect from Google after OAuth authorisation. Not intended to be called directly - Google redirects the browser here automatically.
-     */
-    get: operations["googleOAuthCallback"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/auth/link-account/google": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/auth/link-account/google": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Link a Google account to the current user */
+        post: operations["linkGoogleAccount"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    /** Link a Google account to the current user */
-    post: operations["linkGoogleAccount"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/auth/admin/create-user": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/auth/admin/create-user": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create a new user - requires sys_admin role */
+        post: operations["adminCreateUser"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    /** Create a new user - requires sys_admin role */
-    post: operations["adminCreateUser"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/auth/admin/impersonate-user": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/auth/admin/impersonate-user": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Impersonate a user - requires sys_admin role */
+        post: operations["adminImpersonateUser"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    /** Impersonate a user - requires sys_admin role */
-    post: operations["adminImpersonateUser"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/auth/admin/ban-user": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/auth/admin/ban-user": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Ban a user - requires sys_admin role */
+        post: operations["adminBanUser"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    /** Ban a user - requires sys_admin role */
-    post: operations["adminBanUser"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/api/auth/admin/update-user": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/api/auth/admin/update-user": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Update a user's details - requires sys_admin role */
+        post: operations["adminUpdateUser"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get?: never;
-    put?: never;
-    /** Update a user's details - requires sys_admin role */
-    post: operations["adminUpdateUser"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/health": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/health": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["HealthController_live"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: operations["HealthController_live"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/health/check": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/health/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["HealthController_check"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    get: operations["HealthController_check"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/modules": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/modules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get all modules with filters
+         * @description Filter by userId(enrolled) | courseId(course owned) | universityId(modules for university over all courses). At least one filter required
+         */
+        get: operations["ModuleController_getAll"];
+        put?: never;
+        /**
+         * Create a module
+         * @description Create a new module and link to appropriate course
+         */
+        post: operations["ModuleController_createModule"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Get all modules for the current user */
-    get: operations["getModules"];
-    put?: never;
-    /** Create a module */
-    post: operations["ModuleController_createModule"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/modules/{moduleId}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/modules/{moduleId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a module by ID
+         * @description Return a module from its moduleID
+         */
+        get: operations["getModuleById"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete a module by ID
+         * @description Deletes a module | STUDENT_OWNED needs to go through Builder Service
+         */
+        delete: operations["deleteModule"];
+        options?: never;
+        head?: never;
+        /**
+         * Update a module
+         * @description Update a modules | STUDENT_OWNED needs to go through Builder Service
+         */
+        patch: operations["updateModule"];
+        trace?: never;
     };
-    /** Get a module by ID */
-    get: operations["getModuleById"];
-    put?: never;
-    post?: never;
-    /** Delete a module by ID */
-    delete: operations["deleteModule"];
-    options?: never;
-    head?: never;
-    /** Update a module */
-    patch: operations["updateModule"];
-    trace?: never;
-  };
-  "/events": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/Courses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create a Course */
+        post: operations["createCourse"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Get all events */
-    get: operations["getAllEvents"];
-    put?: never;
-    /** Create an event */
-    post: operations["createEvent"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/events/{id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/Courses/university/{universityId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get all courses */
+        get: operations["getCourses"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Get event by ID */
-    get: operations["getEventById"];
-    put?: never;
-    post?: never;
-    /** Delete an event */
-    delete: operations["deleteEvent"];
-    options?: never;
-    head?: never;
-    /** Update an event */
-    patch: operations["updateEvent"];
-    trace?: never;
-  };
-  "/timetables": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/Courses/{CourseId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** get a Course by ID */
+        get: operations["getCourseById"];
+        put?: never;
+        post?: never;
+        /** Delete Course by Course ID */
+        delete: operations["deleteCourse"];
+        options?: never;
+        head?: never;
+        /** Update an Course */
+        patch: operations["updateCourse"];
+        trace?: never;
     };
-    /** Get all timetables */
-    get: operations["getAllTimetables"];
-    put?: never;
-    /** Create a timetable */
-    post: operations["createTimetable"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/timetables/{id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
+    "/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get all events */
+        get: operations["getAllEvents"];
+        put?: never;
+        /** Create an event */
+        post: operations["createEvent"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
     };
-    /** Get timetable by ID */
-    get: operations["getTimetableById"];
-    put?: never;
-    post?: never;
-    /** Delete a timetable */
-    delete: operations["deleteTimetable"];
-    options?: never;
-    head?: never;
-    /** Update a timetable */
-    patch: operations["updateTimetable"];
-    trace?: never;
-  };
+    "/events/{eventId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get event by ID */
+        get: operations["getEventById"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/events/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete an event */
+        delete: operations["deleteEvent"];
+        options?: never;
+        head?: never;
+        /** Update an event */
+        patch: operations["updateEvent"];
+        trace?: never;
+    };
+    "/timetables": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get all timetables */
+        get: operations["getAllTimetables"];
+        put?: never;
+        /** Create a timetable - user owned */
+        post: operations["createTimetable"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/timetables/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get timetable by ID */
+        get: operations["getTimetableById"];
+        put?: never;
+        post?: never;
+        /** Delete a timetable */
+        delete: operations["deleteTimetable"];
+        options?: never;
+        head?: never;
+        /** Update a timetable */
+        patch: operations["updateTimetable"];
+        trace?: never;
+    };
+    "/universities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get all universities */
+        get: operations["getUniversities"];
+        put?: never;
+        /** Create a University */
+        post: operations["UniversityController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/universities/{universityId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** get a university by ID */
+        get: operations["getUniversityById"];
+        put?: never;
+        post?: never;
+        /** Delete university by university ID */
+        delete: operations["deleteUniversity"];
+        options?: never;
+        head?: never;
+        /** Update an university */
+        patch: operations["updateUniversity"];
+        trace?: never;
+    };
+    "/builder": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get all modules a user is enrolled in with their course
+         * @description Filter by userId(enrolled) | courseId(course owned) | universityId(modules for university over all courses). At least one filter required
+         */
+        get: operations["BuilderController_getAll"];
+        put?: never;
+        /**
+         * Create a user defined module
+         * @description Create a new module and link to appropriate course and automatically enroll student into module
+         */
+        post: operations["BuilderController_createModule"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/builder/{moduleId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a module by ID
+         * @description Return a module from its moduleID
+         */
+        get: operations["getModuleById"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete a module by ID
+         * @description STUDENT_OWNED so student is allowed to delete the module if they own it
+         */
+        delete: operations["deleteModule"];
+        options?: never;
+        head?: never;
+        /**
+         * Update a module that the student owns
+         * @description STUDENT_OWNED so they can update any field of the module
+         */
+        patch: operations["updateModule"];
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-  schemas: {
-    SignUpEmailDto: {
-      /**
-       * @description Valid email address
-       * @default system-admin@local.umtas
-       * @example system-admin@local.umtas
-       */
-      email: string;
-      /**
-       * @description Minimum 8, maximum 128 characters
-       * @default Admin@UMTAS2024!
-       * @example Admin@UMTAS2024!
-       */
-      password: string;
-      /**
-       * @description Full name of the user
-       * @default System Admin
-       * @example System Admin
-       */
-      name: string;
+    schemas: {
+        SignUpEmailDto: {
+            /**
+             * @description Valid email address
+             * @default system-admin@local.umtas
+             * @example system-admin@local.umtas
+             */
+            email: string;
+            /**
+             * @description Minimum 8, maximum 128 characters
+             * @default Admin@UMTAS2024!
+             * @example Admin@UMTAS2024!
+             */
+            password: string;
+            /**
+             * @description Full name of the user
+             * @default System Admin
+             * @example System Admin
+             */
+            name: string;
+        };
+        SignInEmailDto: {
+            /**
+             * @default system-admin@local.umtas
+             * @example system-admin@local.umtas
+             */
+            email: string;
+            /**
+             * @default Admin@UMTAS2024!
+             * @example Admin@UMTAS2024!
+             */
+            password: string;
+        };
+        RevokeSessionDto: {
+            /**
+             * @description ID of the session to terminate
+             * @default b2c3d4e5-f6a7-8901-bcde-f12345678901
+             * @example b2c3d4e5-f6a7-8901-bcde-f12345678901
+             */
+            sessionId: string;
+        };
+        VerifyEmailDto: {
+            /**
+             * @description Verification code from the email link
+             * @default abc123def456
+             * @example abc123def456
+             */
+            code: string;
+            /**
+             * @default system-admin@local.umtas
+             * @example system-admin@local.umtas
+             */
+            email: string;
+        };
+        ForgetPasswordDto: {
+            /**
+             * @default system-admin@local.umtas
+             * @example system-admin@local.umtas
+             */
+            email: string;
+        };
+        ResetPasswordDto: {
+            /**
+             * @description Token from the password reset email
+             * @default reset-token-from-email-link
+             * @example reset-token-from-email-link
+             */
+            token: string;
+            /**
+             * @default new-secure-password
+             * @example new-secure-password
+             */
+            newPassword: string;
+        };
+        ChangePasswordDto: {
+            /**
+             * @default current-password
+             * @example current-password
+             */
+            currentPassword: string;
+            /**
+             * @default new-secure-password
+             * @example new-secure-password
+             */
+            newPassword: string;
+        };
+        LinkGoogleAccountDto: {
+            /**
+             * @description Authorization code from the Google OAuth flow
+             * @default 4/0AX4XfWj...
+             * @example 4/0AX4XfWj...
+             */
+            code: string;
+            /**
+             * @description OAuth state parameter
+             * @default state-string
+             * @example state-string
+             */
+            state: string;
+        };
+        AdminCreateUserDto: {
+            /**
+             * @default system-admin@local.umtas
+             * @example system-admin@local.umtas
+             */
+            email: string;
+            /**
+             * @default Admin@UMTAS2024!
+             * @example Admin@UMTAS2024!
+             */
+            password: string;
+            /**
+             * @default System Admin
+             * @example System Admin
+             */
+            name: string;
+            /**
+             * @default student
+             * @example student
+             * @enum {string}
+             */
+            role: "student" | "uni_admin" | "sys_admin";
+        };
+        AdminImpersonateUserDto: {
+            /**
+             * @description UUID of the user to impersonate
+             * @default a1b2c3d4-e5f6-7890-abcd-ef1234567890
+             * @example a1b2c3d4-e5f6-7890-abcd-ef1234567890
+             */
+            userId: string;
+        };
+        AdminBanUserDto: {
+            /**
+             * @description UUID of the user to ban
+             * @default a1b2c3d4-e5f6-7890-abcd-ef1234567890
+             * @example a1b2c3d4-e5f6-7890-abcd-ef1234567890
+             */
+            userId: string;
+            /**
+             * @default Violation of terms of service
+             * @example Violation of terms of service
+             */
+            reason: string;
+            /**
+             * @description Ban expiry datetime. Omit or set null for a permanent ban.
+             * @example 2026-02-01T00:00:00Z
+             */
+            banExpiresAt?: string | null;
+        };
+        AdminUpdateUserDto: {
+            /**
+             * @description UUID of the user to update
+             * @default a1b2c3d4-e5f6-7890-abcd-ef1234567890
+             * @example a1b2c3d4-e5f6-7890-abcd-ef1234567890
+             */
+            userId: string;
+            /** @example New Name */
+            name?: string;
+            /** @example newemail@example.com */
+            email?: string;
+            /**
+             * @example student
+             * @enum {string}
+             */
+            role?: "student" | "uni_admin" | "sys_admin";
+        };
+        StylingDto: {
+            /** @example #3B82F6 */
+            colour: string;
+        };
+        CreateModuleDto: {
+            /**
+             * @description Module code used by the university
+             * @example COS332
+             */
+            moduleCode: string;
+            /**
+             * @description Name of the module
+             * @example Computer Networks
+             */
+            moduleName: string;
+            /**
+             * @description Short module description
+             * @example Introduction to computer networking concepts
+             */
+            moduleDescription?: string | null;
+            /**
+             * @description Module styling
+             * @example {
+             *       "colour": "#3B82F6"
+             *     }
+             */
+            styling?: ({
+                [key: string]: unknown;
+            } & components["schemas"]["StylingDto"]) | null;
+            /**
+             * Format: uuid
+             * @description CourseID to ensure module belongs to a course
+             * @example 00000000-0000-0000-0000-000000000000
+             */
+            courseID: string;
+        };
+        ModuleSingleResponseDto: {
+            /**
+             * Format: uuid
+             * @description Unique identifier for a module
+             * @example 00000000-0000-0000-0000-000000000000
+             */
+            moduleID: string;
+            /**
+             * @description Module code used by the university
+             * @example COS332
+             */
+            moduleCode: string;
+            /**
+             * @description Name of the module
+             * @example Computer Networks
+             */
+            moduleName: string;
+            /**
+             * @description Short module description
+             * @example Introduction to computer networking concepts
+             */
+            moduleDescription?: string | null;
+            /**
+             * @description Module styling
+             * @example {
+             *       "colour": "#3B82F6"
+             *     }
+             */
+            styling?: ({
+                [key: string]: unknown;
+            } & components["schemas"]["StylingDto"]) | null;
+        };
+        ModuleListResponseDto: {
+            /** @description List of modules */
+            modules: components["schemas"]["ModuleSingleResponseDto"][];
+        };
+        UpdateModuleDto: {
+            /**
+             * @description Module code used by the university
+             * @example COS332
+             */
+            moduleCode?: string;
+            /**
+             * @description Name of the module
+             * @example Computer Networks
+             */
+            moduleName?: string;
+            /**
+             * @description Short module description
+             * @example Introduction to computer networking concepts
+             */
+            moduleDescription?: string | null;
+            /**
+             * @description Module styling
+             * @example {
+             *       "colour": "#3B82F6"
+             *     }
+             */
+            styling?: ({
+                [key: string]: unknown;
+            } & components["schemas"]["StylingDto"]) | null;
+        };
+        DeleteModuleResponseDto: {
+            /**
+             * @description Module code used by the university
+             * @example COS332
+             */
+            moduleCode: string;
+            /** @example true */
+            success: Record<string, never>;
+        };
+        CreateCourseDto: {
+            /**
+             * @description Name of the course
+             * @example BSc Computer Science
+             */
+            CourseName: string;
+            /**
+             * Format: uuid
+             * @description Unique identifier for a university
+             * @example 00000000-0000-0000-0000-000000000000
+             */
+            UniversityID: string;
+        };
+        CourseSingleResponseDto: {
+            /**
+             * Format: uuid
+             * @description Unique identifier for a course
+             * @example 00000000-0000-0000-0000-000000000000
+             */
+            CourseID: string;
+            /**
+             * @description Name of the course
+             * @example BSc Computer Science
+             */
+            CourseName: string;
+            /**
+             * Format: uuid
+             * @description Unique identifier for a university
+             * @example 00000000-0000-0000-0000-000000000000
+             */
+            UniversityID: string;
+        };
+        CourseDto: {
+            /**
+             * Format: uuid
+             * @description Unique identifier for a course
+             * @example 00000000-0000-0000-0000-000000000000
+             */
+            CourseID: string;
+            /**
+             * @description Name of the course
+             * @example BSc Computer Science
+             */
+            CourseName: string;
+            /**
+             * Format: uuid
+             * @description Unique identifier for a university
+             * @example 00000000-0000-0000-0000-000000000000
+             */
+            UniversityID: string;
+        };
+        CourseListResponseDto: {
+            /** @description List of courses */
+            courses: components["schemas"]["CourseDto"][];
+        };
+        UpdateCourseDto: {
+            /**
+             * @description Name of the course
+             * @example BSc Computer Science
+             */
+            CourseName?: string;
+            /**
+             * Format: uuid
+             * @description Unique identifier for a university
+             * @example 00000000-0000-0000-0000-000000000000
+             */
+            UniversityID?: string;
+        };
+        DeleteCourseResponseDto: {
+            /**
+             * @description Name of the course
+             * @example BSc Computer Science
+             */
+            CourseName: string;
+            /** @example true */
+            success: Record<string, never>;
+        };
+        EventCriteriaDto: {
+            /** @enum {string} */
+            type?: "university" | "personal";
+            /** @example yyyy-mm-dd */
+            date: string;
+            /** @example 08:30 */
+            startTime: string;
+            /** @example 10:20 */
+            endTime: string;
+            /** Format: uuid */
+            moduleID?: string;
+            /** @example IT 2-26 */
+            venue?: string;
+        };
+        CreateEventDto: {
+            /** @description Defines the additional information to attach to event entity */
+            eventCriteria: components["schemas"]["EventCriteriaDto"];
+            /**
+             * @description Descriptive name for the event
+             * @example event name
+             */
+            eventName?: string;
+            /** @example lec1 */
+            eventCode?: string | null;
+            /**
+             * @description Is the event recurring or not
+             * @default true
+             * @example true
+             */
+            isRecurring: boolean;
+        };
+        EventDto: {
+            /**
+             * Format: uuid
+             * @description Unique identifier for an event
+             * @example 00000000-0000-0000-0000-000000000000
+             */
+            eventID: string;
+            /** @description Defines the additional information to attach to event entity */
+            eventCriteria: components["schemas"]["EventCriteriaDto"];
+            /**
+             * @description Descriptive name for the event
+             * @example event name
+             */
+            eventName?: string;
+            /** @example lec1 */
+            eventCode?: string | null;
+            /**
+             * @description Is the event recurring or not
+             * @default true
+             * @example true
+             */
+            isRecurring: boolean;
+        };
+        EventSingleResponseDto: {
+            event: components["schemas"]["EventDto"];
+        };
+        EventListResponseDto: {
+            /** @description List of events */
+            events: components["schemas"]["EventDto"][];
+        };
+        UpdateEventCriteriaDto: {
+            /** @enum {string} */
+            type?: "university" | "personal";
+            /** @example yyyy-mm-dd */
+            date?: string;
+            /** @example 08:30 */
+            startTime?: string;
+            /** @example 10:20 */
+            endTime?: string;
+            /** Format: uuid */
+            moduleID?: string;
+            /** @example IT 2-26 */
+            venue?: string;
+        };
+        UpdateEventDto: {
+            /**
+             * @description Descriptive name for the event
+             * @example event name
+             */
+            eventName?: string;
+            /** @example lec1 */
+            eventCode?: string | null;
+            /**
+             * @description Is the event recurring or not
+             * @default true
+             * @example true
+             */
+            isRecurring: boolean;
+            /** @description Partial event criteria for update */
+            eventCriteria?: components["schemas"]["UpdateEventCriteriaDto"];
+        };
+        DeleteResponseDto: {
+            /**
+             * @description Descriptive name for the event
+             * @example event name
+             */
+            eventName?: string;
+            /** @example lec1 */
+            eventCode?: string | null;
+            /**
+             * @default true
+             * @example true
+             */
+            success: Record<string, never>;
+        };
+        CreateTimetableDto: {
+            /**
+             * @description Display name for the timetable
+             * @example Semester 1
+             */
+            timetableName?: string;
+            /**
+             * @description Event IDs to attach on creation
+             * @example [
+             *       "00000000-0000-0000-0000-000000000000"
+             *     ]
+             */
+            eventIds?: string[];
+        };
+        TimetableDto: {
+            /** @example someId */
+            timetableID: string;
+            /** @example Semester 1 */
+            timetableName?: string | null;
+        };
+        TimetableResponseDto: {
+            UserTimetableID: string;
+            timetable: components["schemas"]["TimetableDto"];
+            /**
+             * @description IDs of events linked to this timetable
+             * @example [
+             *       "00000000-0000-0000-0000-000000000000"
+             *     ]
+             */
+            eventIds?: string[];
+        };
+        TimetableListResponseDto: {
+            /** @description List of timetables with their linked event IDs */
+            timetables: components["schemas"]["TimetableResponseDto"][];
+        };
+        UpdateTimetableDto: {
+            /**
+             * @description Updated display name for the timetable
+             * @example Semester 2
+             */
+            timetableName?: string;
+            /**
+             * @description Event IDs to link to the timetable
+             * @example [
+             *       "00000000-0000-0000-0000-000000000000"
+             *     ]
+             */
+            addEventIds?: string[];
+            /**
+             * @description Event IDs to unlink from the timetable
+             * @example [
+             *       "00000000-0000-0000-0000-000000000000"
+             *     ]
+             */
+            removeEventIds?: string[];
+        };
+        DeleteTimetableResponseDto: {
+            /** @example true */
+            success: Record<string, never>;
+        };
+        CreateUniversityDto: {
+            /**
+             * @description Name of the university
+             * @example University of Pretoria
+             */
+            UniversityName: string;
+        };
+        UniversitySingleResponseDto: {
+            /**
+             * Format: uuid
+             * @description Unique identifier for a university
+             * @example 00000000-0000-0000-0000-000000000000
+             */
+            UniversityID: string;
+            /**
+             * @description Name of the university
+             * @example University of Pretoria
+             */
+            UniversityName: string;
+        };
+        UniversityDto: {
+            /**
+             * Format: uuid
+             * @description Unique identifier for a university
+             * @example 00000000-0000-0000-0000-000000000000
+             */
+            UniversityID: string;
+            /**
+             * @description Name of the university
+             * @example University of Pretoria
+             */
+            UniversityName: string;
+        };
+        UniversityListResponseDto: {
+            /** @description list of universities */
+            universities: components["schemas"]["UniversityDto"][];
+        };
+        UpdateUniversityDto: {
+            /**
+             * @description Name of the university
+             * @example University of Pretoria
+             */
+            UniversityName?: string;
+        };
+        DeleteUniversityResponseDto: {
+            /**
+             * @description Name of the university
+             * @example University of Pretoria
+             */
+            UniversityName: string;
+            /** @example true */
+            success: Record<string, never>;
+        };
+        CreateBuilderModuleDto: {
+            /**
+             * @description Module code used by the university
+             * @example COS332
+             */
+            moduleCode: string;
+            /**
+             * @description Name of the module
+             * @example Computer Networks
+             */
+            moduleName: string;
+            /**
+             * @description Short module description
+             * @example Introduction to computer networking concepts
+             */
+            moduleDescription?: string | null;
+            /**
+             * @description Module styling
+             * @example {
+             *       "colour": "#3B82F6"
+             *     }
+             */
+            styling?: ({
+                [key: string]: unknown;
+            } & components["schemas"]["StylingDto"]) | null;
+        };
     };
-    SignInEmailDto: {
-      /**
-       * @default system-admin@local.umtas
-       * @example system-admin@local.umtas
-       */
-      email: string;
-      /**
-       * @default Admin@UMTAS2024!
-       * @example Admin@UMTAS2024!
-       */
-      password: string;
-    };
-    RevokeSessionDto: {
-      /**
-       * @description ID of the session to terminate
-       * @default b2c3d4e5-f6a7-8901-bcde-f12345678901
-       * @example b2c3d4e5-f6a7-8901-bcde-f12345678901
-       */
-      sessionId: string;
-    };
-    VerifyEmailDto: {
-      /**
-       * @description Verification code from the email link
-       * @default abc123def456
-       * @example abc123def456
-       */
-      code: string;
-      /**
-       * @default system-admin@local.umtas
-       * @example system-admin@local.umtas
-       */
-      email: string;
-    };
-    ForgetPasswordDto: {
-      /**
-       * @default system-admin@local.umtas
-       * @example system-admin@local.umtas
-       */
-      email: string;
-    };
-    ResetPasswordDto: {
-      /**
-       * @description Token from the password reset email
-       * @default reset-token-from-email-link
-       * @example reset-token-from-email-link
-       */
-      token: string;
-      /**
-       * @default new-secure-password
-       * @example new-secure-password
-       */
-      newPassword: string;
-    };
-    ChangePasswordDto: {
-      /**
-       * @default current-password
-       * @example current-password
-       */
-      currentPassword: string;
-      /**
-       * @default new-secure-password
-       * @example new-secure-password
-       */
-      newPassword: string;
-    };
-    LinkGoogleAccountDto: {
-      /**
-       * @description Authorization code from the Google OAuth flow
-       * @default 4/0AX4XfWj...
-       * @example 4/0AX4XfWj...
-       */
-      code: string;
-      /**
-       * @description OAuth state parameter
-       * @default state-string
-       * @example state-string
-       */
-      state: string;
-    };
-    AdminCreateUserDto: {
-      /**
-       * @default system-admin@local.umtas
-       * @example system-admin@local.umtas
-       */
-      email: string;
-      /**
-       * @default Admin@UMTAS2024!
-       * @example Admin@UMTAS2024!
-       */
-      password: string;
-      /**
-       * @default System Admin
-       * @example System Admin
-       */
-      name: string;
-      /**
-       * @default student
-       * @example student
-       * @enum {string}
-       */
-      role: "student" | "uni_admin" | "sys_admin";
-    };
-    AdminImpersonateUserDto: {
-      /**
-       * @description UUID of the user to impersonate
-       * @default a1b2c3d4-e5f6-7890-abcd-ef1234567890
-       * @example a1b2c3d4-e5f6-7890-abcd-ef1234567890
-       */
-      userId: string;
-    };
-    AdminBanUserDto: {
-      /**
-       * @description UUID of the user to ban
-       * @default a1b2c3d4-e5f6-7890-abcd-ef1234567890
-       * @example a1b2c3d4-e5f6-7890-abcd-ef1234567890
-       */
-      userId: string;
-      /**
-       * @default Violation of terms of service
-       * @example Violation of terms of service
-       */
-      reason: string;
-      /**
-       * @description Ban expiry datetime. Omit or set null for a permanent ban.
-       * @example 2026-02-01T00:00:00Z
-       */
-      banExpiresAt?: string | null;
-    };
-    AdminUpdateUserDto: {
-      /**
-       * @description UUID of the user to update
-       * @default a1b2c3d4-e5f6-7890-abcd-ef1234567890
-       * @example a1b2c3d4-e5f6-7890-abcd-ef1234567890
-       */
-      userId: string;
-      /** @example New Name */
-      name?: string;
-      /** @example newemail@example.com */
-      email?: string;
-      /**
-       * @example student
-       * @enum {string}
-       */
-      role?: "student" | "uni_admin" | "sys_admin";
-    };
-    CreateModuleDto: {
-      /**
-       * @description Module code used by the university
-       * @example COS332
-       */
-      code: string;
-      /**
-       * @description Name of the module
-       * @example Computer Networks
-       */
-      name: string;
-      /**
-       * @description Short module description
-       * @example Introduction to computer networking concepts
-       */
-      description?: string;
-      /**
-       * @description Optional display styling for the module
-       * @example #3B82F6
-       */
-      styling?: string;
-    };
-    ModuleResponseDto: {
-      /** @example 1 */
-      moduleID: number;
-      /** @example COS332 */
-      moduleCode: string;
-      /** @example Computer Networks */
-      moduleName: string;
-      /** @example Introduction to computer networking concepts */
-      moduleDescription?: string | null;
-      /** @example 550e8400-e29b-41d4-a716-446655440000 */
-      userID: string;
-      /** @example #3B82F6 */
-      styling?: string | null;
-    };
-    SingleModuleResponseDto: {
-      module: components["schemas"]["ModuleResponseDto"];
-    };
-    ModuleListResponseDto: {
-      modules: components["schemas"]["ModuleResponseDto"][];
-    };
-    UpdateModuleDto: {
-      /**
-       * @description Updated module code
-       * @example COS332
-       */
-      code?: string;
-      /**
-       * @description Updated module name
-       * @example Computer Networks
-       */
-      name?: string;
-      /**
-       * @description Updated module description
-       * @example Introduction to computer networking concepts
-       */
-      description?: string;
-      /**
-       * @description Updated module styling
-       * @example #3B82F6
-       */
-      styling?: string;
-    };
-    DeleteModuleResponseDto: {
-      /** @example true */
-      success: Record<string, never>;
-    };
-    EventCriteriaDto: {
-      /**
-       * @example lecture
-       * @enum {string|null}
-       */
-      type?: "lecture" | null;
-      /** @example Monday */
-      day: string;
-      /** @example 08:30 */
-      startTime: string;
-      /** @example 10:20 */
-      endTime: string;
-      /** @example COS301 */
-      moduleCode?: string;
-      /** @example IT 2-26 */
-      venue?: string;
-    };
-    CreateEventDto: {
-      /** @example event name */
-      name?: string;
-      /** @example lec1 */
-      code?: string;
-      /** @description Criteria for an event */
-      eventCriteria: components["schemas"]["EventCriteriaDto"];
-      /**
-       * @default false
-       * @example false
-       */
-      isRecurring: boolean;
-    };
-    EventDto: {
-      /** @example 1 */
-      eventID: number;
-      /** @example a1b2c3d4-e5f6-7890-abcd-ef1234567890 */
-      userID: string;
-      /** @example event name */
-      name?: string;
-      /** @example lec1 */
-      code?: string;
-      eventCriteria: components["schemas"]["EventCriteriaDto"];
-      /** @example true */
-      isRecurring?: boolean;
-    };
-    LectureResponseDto: {
-      /** @example 1 */
-      lectureID: number;
-      /** @example 12 */
-      moduleID: number | null;
-      /** @example 1 */
-      eventID: number | null;
-      /** @example IT 2-26 */
-      venue?: string | null;
-    };
-    EventResponseDto: {
-      /**
-       * @example {
-       *       "eventID": 1,
-       *       "userID": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-       *       "name": "eventnameidk",
-       *       "code": "lec1",
-       *       "eventCriteria": {
-       *         "day": "Monday",
-       *         "startTime": "08:30",
-       *         "endTime": "10:20"
-       *       }
-       *     }
-       */
-      event: components["schemas"]["EventDto"];
-      lecture?: components["schemas"]["LectureResponseDto"];
-    };
-    EventListResponseDto: {
-      /** @description List of events with optional lecture details */
-      events: components["schemas"]["EventResponseDto"][];
-    };
-    UpdateEventCriteriaDto: {
-      /**
-       * @example lecture
-       * @enum {string|null}
-       */
-      type?: "lecture" | null;
-      /** @example Tuesday */
-      day?: string;
-      /** @example 10:30 */
-      startTime?: string;
-      /** @example 12:20 */
-      endTime?: string;
-      /** @example COS301 */
-      moduleCode?: string;
-      /** @example IT 2-26 */
-      venue?: string;
-    };
-    UpdateEventDto: {
-      /** @example event name */
-      name?: string;
-      /** @example lec1 */
-      code?: string;
-      /** @description Event update criteria */
-      eventCriteria?: components["schemas"]["UpdateEventCriteriaDto"];
-      /**
-       * @default false
-       * @example false
-       */
-      isRecurring: boolean;
-    };
-    DeleteResponseDto: {
-      /**
-       * @default true
-       * @example true
-       */
-      success: Record<string, never>;
-    };
-    CreateTimetableDto: {
-      /**
-       * @description Display name for the timetable
-       * @example Semester 1
-       */
-      timetableName?: string;
-      /**
-       * @description Event IDs to attach on creation
-       * @example [
-       *       1,
-       *       2,
-       *       3
-       *     ]
-       */
-      eventIds?: number[];
-    };
-    TimetableDto: {
-      /** @example 1 */
-      timetableID: number;
-      /** @example a1b2c3d4-e5f6-7890-abcd-ef1234567890 */
-      userID: string;
-      /** @example Semester 1 */
-      timetableName?: string | null;
-    };
-    TimetableResponseDto: {
-      timetable: components["schemas"]["TimetableDto"];
-      /**
-       * @description IDs of events linked to this timetable
-       * @example [
-       *       1,
-       *       2,
-       *       3
-       *     ]
-       */
-      eventIds?: number[];
-    };
-    TimetableListResponseDto: {
-      /** @description List of timetables with their linked event IDs */
-      timetables: components["schemas"]["TimetableResponseDto"][];
-    };
-    UpdateTimetableDto: {
-      /**
-       * @description Updated display name for the timetable
-       * @example Semester 2
-       */
-      timetableName?: string;
-      /**
-       * @description Event IDs to link to the timetable
-       * @example [
-       *       4,
-       *       5
-       *     ]
-       */
-      addEventIds?: number[];
-      /**
-       * @description Event IDs to unlink from the timetable
-       * @example [
-       *       1,
-       *       2
-       *     ]
-       */
-      removeEventIds?: number[];
-    };
-    DeleteTimetableResponseDto: {
-      /** @example true */
-      success: Record<string, never>;
-    };
-  };
-  responses: never;
-  parameters: never;
-  requestBodies: never;
-  headers: never;
-  pathItems: never;
+    responses: never;
+    parameters: never;
+    requestBodies: never;
+    headers: never;
+    pathItems: never;
 }
 export type $defs = Record<string, never>;
 export interface operations {
-  AppController_getHello: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": string;
-        };
-      };
-    };
-  };
-  signUpEmail: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["SignUpEmailDto"];
-      };
-    };
-    responses: {
-      /** @description Registration successful. Sets the umtas-session cookie. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Invalid email format or password too weak (min 8 characters) */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Email already registered */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Rate limited - max 100 requests per 60 seconds */
-      429: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  signInEmail: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["SignInEmailDto"];
-      };
-    };
-    responses: {
-      /** @description Sign-in successful. Sets the umtas-session cookie. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Email not verified - must verify before signing in */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Invalid email or password */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Rate limited */
-      429: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  signOut: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Signed out. The umtas-session cookie is cleared. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description No active session */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-    };
-  };
-  getSession: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Active session returned. Returns null if no session exists. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description No active session */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-    };
-  };
-  listSessions: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Array of active sessions for this user */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-    };
-  };
-  revokeSession: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["RevokeSessionDto"];
-      };
-    };
-    responses: {
-      /** @description Session revoked */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Session not found */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-    };
-  };
-  sendVerificationEmail: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Verification email sent */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Email already verified */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Rate limited */
-      429: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  verifyEmail: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["VerifyEmailDto"];
-      };
-    };
-    responses: {
-      /** @description Email verified. User is signed in automatically. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Invalid or expired verification code, or email not found */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-    };
-  };
-  forgetPassword: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["ForgetPasswordDto"];
-      };
-    };
-    responses: {
-      /** @description Reset email sent. Always returns 200 - does not reveal whether the email exists. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Rate limited */
-      429: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  resetPassword: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["ResetPasswordDto"];
-      };
-    };
-    responses: {
-      /** @description Password reset. User is signed in automatically. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Invalid or expired reset token, or new password too weak */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-    };
-  };
-  changePassword: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["ChangePasswordDto"];
-      };
-    };
-    responses: {
-      /** @description Password changed successfully */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Incorrect current password or new password too weak */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-    };
-  };
-  googleOAuthCallback: {
-    parameters: {
-      query: {
-        /** @description OAuth state parameter set by BetterAuth */
-        state: unknown;
-        /** @description Authorization code issued by Google */
-        code: unknown;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Redirect to the frontend app. Sets the umtas-session cookie. */
-      302: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Invalid or expired OAuth code */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-    };
-  };
-  linkGoogleAccount: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["LinkGoogleAccountDto"];
-      };
-    };
-    responses: {
-      /** @description Google account linked */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Account already linked or invalid OAuth code */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description The Google account email is already in use by another account */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-    };
-  };
-  adminCreateUser: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["AdminCreateUserDto"];
-      };
-    };
-    responses: {
-      /** @description User created */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Insufficient permissions (sys_admin required) */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Email already registered */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-    };
-  };
-  adminImpersonateUser: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["AdminImpersonateUserDto"];
-      };
-    };
-    responses: {
-      /** @description Impersonation successful. Sets a new session cookie. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Insufficient permissions (sys_admin required) */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-    };
-  };
-  adminBanUser: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["AdminBanUserDto"];
-      };
-    };
-    responses: {
-      /** @description User banned */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Insufficient permissions (sys_admin required) */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description User not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-    };
-  };
-  adminUpdateUser: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["AdminUpdateUserDto"];
-      };
-    };
-    responses: {
-      /** @description User updated */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Unauthorized */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description Insufficient permissions (sys_admin required) */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description User not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description New email already in use */
-      422: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-    };
-  };
-  HealthController_live: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  HealthController_check: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  getModules: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Modules returned successfully */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["ModuleListResponseDto"];
-        };
-      };
-      /** @description Invalid request */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  ModuleController_createModule: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["CreateModuleDto"];
-      };
-    };
-    responses: {
-      /** @description Module created successfully */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["SingleModuleResponseDto"];
-        };
-      };
-      /** @description Missing or invalid module payload */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Module code already exists */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  getModuleById: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        moduleId: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Module returned successfully */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["SingleModuleResponseDto"];
-        };
-      };
-      /** @description Invalid module ID */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Module not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  deleteModule: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        moduleId: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Module deleted successfully */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["DeleteModuleResponseDto"];
-        };
-      };
-      /** @description Invalid module ID */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Module not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  updateModule: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        moduleId: number;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["UpdateModuleDto"];
-      };
-    };
-    responses: {
-      /** @description Module updated successfully */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["SingleModuleResponseDto"];
-        };
-      };
-      /** @description Invalid update payload or module ID */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Module not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Duplicate module code detected */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  getAllEvents: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Events fetched successfully */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["EventListResponseDto"];
-        };
-      };
-      /** @description No active session */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Insufficient permissions */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  createEvent: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["CreateEventDto"];
-      };
-    };
-    responses: {
-      /** @description Event created successfully */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["EventResponseDto"];
-        };
-      };
-      /** @description Missing or invalid event payload */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description No active session */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Insufficient permissions */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Event was not created */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  getEventById: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Event fetched successfully */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["EventResponseDto"];
-        };
-      };
-      /** @description Event not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  deleteEvent: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Event deleted successfully */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["DeleteResponseDto"];
-        };
-      };
-      /** @description No active session */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Insufficient permissions */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Event not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Event was not deleted */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  updateEvent: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["UpdateEventDto"];
-      };
-    };
-    responses: {
-      /** @description Event updated successfully */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["EventResponseDto"];
-        };
-      };
-      /** @description Missing or invalid update payload */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description No active session */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Insufficient permissions */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Event or referenced module not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Event was not updated */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  getAllTimetables: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Timetables fetched successfully */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["TimetableListResponseDto"];
-        };
-      };
-      /** @description No active session */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  createTimetable: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["CreateTimetableDto"];
-      };
-    };
-    responses: {
-      /** @description Timetable created successfully */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["TimetableResponseDto"];
-        };
-      };
-      /** @description Missing or invalid request payload */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description No active session */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Timetable was not created */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  getTimetableById: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description Timetable ID */
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Timetable fetched successfully */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["TimetableResponseDto"];
-        };
-      };
-      /** @description No active session */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Timetable not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  deleteTimetable: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description Timetable ID */
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Timetable deleted successfully */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["DeleteTimetableResponseDto"];
-        };
-      };
-      /** @description No active session */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Timetable not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Timetable was not deleted */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  updateTimetable: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description Timetable ID */
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["UpdateTimetableDto"];
-      };
-    };
-    responses: {
-      /** @description Timetable updated successfully */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["TimetableResponseDto"];
-        };
-      };
-      /** @description Missing or invalid update payload */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description No active session */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Timetable not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Timetable was not updated */
-      500: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
+    AppController_getHello: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string;
+                };
+            };
+        };
+    };
+    signUpEmail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SignUpEmailDto"];
+            };
+        };
+        responses: {
+            /** @description Registration successful. Sets the umtas-session cookie. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Invalid email format or password too weak (min 8 characters) */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Email already registered */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Rate limited - max 100 requests per 60 seconds */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    signInEmail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SignInEmailDto"];
+            };
+        };
+        responses: {
+            /** @description Sign-in successful. Sets the umtas-session cookie. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Email not verified - must verify before signing in */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Invalid email or password */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    signOut: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Signed out. The umtas-session cookie is cleared. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description No active session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    getSession: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Active session returned. Returns null if no session exists. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description No active session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    listSessions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Array of active sessions for this user */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    revokeSession: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RevokeSessionDto"];
+            };
+        };
+        responses: {
+            /** @description Session revoked */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Session not found */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    sendVerificationEmail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Verification email sent */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Email already verified */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    verifyEmail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VerifyEmailDto"];
+            };
+        };
+        responses: {
+            /** @description Email verified. User is signed in automatically. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Invalid or expired verification code, or email not found */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    forgetPassword: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ForgetPasswordDto"];
+            };
+        };
+        responses: {
+            /** @description Reset email sent. Always returns 200 - does not reveal whether the email exists. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Rate limited */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    resetPassword: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResetPasswordDto"];
+            };
+        };
+        responses: {
+            /** @description Password reset. User is signed in automatically. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Invalid or expired reset token, or new password too weak */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    changePassword: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChangePasswordDto"];
+            };
+        };
+        responses: {
+            /** @description Password changed successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Incorrect current password or new password too weak */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    googleOAuthCallback: {
+        parameters: {
+            query: {
+                /** @description OAuth state parameter set by BetterAuth */
+                state: unknown;
+                /** @description Authorization code issued by Google */
+                code: unknown;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Redirect to the frontend app. Sets the umtas-session cookie. */
+            302: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid or expired OAuth code */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    linkGoogleAccount: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LinkGoogleAccountDto"];
+            };
+        };
+        responses: {
+            /** @description Google account linked */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Account already linked or invalid OAuth code */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description The Google account email is already in use by another account */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    adminCreateUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdminCreateUserDto"];
+            };
+        };
+        responses: {
+            /** @description User created */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Insufficient permissions (sys_admin required) */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Email already registered */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    adminImpersonateUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdminImpersonateUserDto"];
+            };
+        };
+        responses: {
+            /** @description Impersonation successful. Sets a new session cookie. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Insufficient permissions (sys_admin required) */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    adminBanUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdminBanUserDto"];
+            };
+        };
+        responses: {
+            /** @description User banned */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Insufficient permissions (sys_admin required) */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description User not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    adminUpdateUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdminUpdateUserDto"];
+            };
+        };
+        responses: {
+            /** @description User updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Insufficient permissions (sys_admin required) */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description User not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description New email already in use */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    HealthController_live: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    HealthController_check: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ModuleController_getAll: {
+        parameters: {
+            query?: {
+                /** @description Filter by course ID - returns all modules in the course */
+                courseId?: string;
+                /** @description Filter by university ID - returns all modules across all courses in the university */
+                universityId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Modules returned successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModuleListResponseDto"];
+                };
+            };
+            /** @description Invalid request - at least one filter required */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No modules found matching the filters */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ModuleController_createModule: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateModuleDto"];
+            };
+        };
+        responses: {
+            /** @description Module created successfully */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModuleSingleResponseDto"];
+                };
+            };
+            /** @description Missing or invalid module payload */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Module code already exists for course */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getModuleById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                moduleId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Module returned successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModuleSingleResponseDto"];
+                };
+            };
+            /** @description Invalid module ID */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Module not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    deleteModule: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                moduleId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Module deleted successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeleteModuleResponseDto"];
+                };
+            };
+            /** @description Invalid module ID */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Module not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    updateModule: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                moduleId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateModuleDto"];
+            };
+        };
+        responses: {
+            /** @description Module updated successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModuleSingleResponseDto"];
+                };
+            };
+            /** @description Invalid update payload or module ID */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Module not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Duplicate module code detected for course */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    createCourse: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateCourseDto"];
+            };
+        };
+        responses: {
+            /** @description Course created successfully */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CourseSingleResponseDto"];
+                };
+            };
+            /** @description Missing or invalid course payload */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Course already exists */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getCourses: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                universityId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Courses returned successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CourseListResponseDto"];
+                };
+            };
+            /** @description No Courses found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getCourseById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                CourseId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Course returned successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CourseSingleResponseDto"];
+                };
+            };
+            /** @description Invalid Course ID */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Course not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    deleteCourse: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                CourseId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Course deleted successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeleteCourseResponseDto"];
+                };
+            };
+            /** @description Invalid Course ID */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Course not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    updateCourse: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                CourseId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateCourseDto"];
+            };
+        };
+        responses: {
+            /** @description Course updated successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CourseSingleResponseDto"];
+                };
+            };
+            /** @description Invalid update payload or CourseId */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Course not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getAllEvents: {
+        parameters: {
+            query?: {
+                /** @description Filter by module ID - returns all events for module */
+                moduleId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Events fetched successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EventListResponseDto"];
+                };
+            };
+            /** @description No active session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    createEvent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateEventDto"];
+            };
+        };
+        responses: {
+            /** @description Event created successfully */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EventSingleResponseDto"];
+                };
+            };
+            /** @description Missing or invalid event payload */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No active session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Event was not created */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getEventById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                eventId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Event fetched successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EventSingleResponseDto"];
+                };
+            };
+            /** @description Event not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    deleteEvent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Event deleted successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeleteResponseDto"];
+                };
+            };
+            /** @description No active session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Event not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Event was not deleted */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    updateEvent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateEventDto"];
+            };
+        };
+        responses: {
+            /** @description Event updated successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EventSingleResponseDto"];
+                };
+            };
+            /** @description Missing or invalid update payload */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No active session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Insufficient permissions */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Event or referenced module not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Event was not updated */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getAllTimetables: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Timetables fetched successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TimetableListResponseDto"];
+                };
+            };
+            /** @description No active session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    createTimetable: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateTimetableDto"];
+            };
+        };
+        responses: {
+            /** @description Timetable created successfully */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TimetableResponseDto"];
+                };
+            };
+            /** @description Missing or invalid request payload */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No active session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Timetable was not created */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getTimetableById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Timetable ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Timetable fetched successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TimetableResponseDto"];
+                };
+            };
+            /** @description No active session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Timetable not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    deleteTimetable: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Timetable ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Timetable deleted successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeleteTimetableResponseDto"];
+                };
+            };
+            /** @description No active session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Timetable not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Timetable was not deleted */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    updateTimetable: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Timetable ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateTimetableDto"];
+            };
+        };
+        responses: {
+            /** @description Timetable updated successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TimetableResponseDto"];
+                };
+            };
+            /** @description Missing or invalid update payload */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No active session */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Timetable not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Timetable was not updated */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getUniversities: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Universities returned successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UniversityListResponseDto"];
+                };
+            };
+            /** @description No universities found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    UniversityController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateUniversityDto"];
+            };
+        };
+        responses: {
+            /** @description University created successfully */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UniversitySingleResponseDto"];
+                };
+            };
+            /** @description Missing or invalid university payload */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description University already exists */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getUniversityById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                universityId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description University returned successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UniversitySingleResponseDto"];
+                };
+            };
+            /** @description Invalid University ID */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description University not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    deleteUniversity: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                universityId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description University deleted successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeleteUniversityResponseDto"];
+                };
+            };
+            /** @description Invalid university ID */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description University not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    updateUniversity: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                universityId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateUniversityDto"];
+            };
+        };
+        responses: {
+            /** @description University updated successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UniversitySingleResponseDto"];
+                };
+            };
+            /** @description Invlaid update payload or universityId */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description University not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    BuilderController_getAll: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Modules returned successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModuleListResponseDto"];
+                };
+            };
+            /** @description Invalid request - at least one filter required */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No modules found matching the filters */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    BuilderController_createModule: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateBuilderModuleDto"];
+            };
+        };
+        responses: {
+            /** @description Module created successfully */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModuleSingleResponseDto"];
+                };
+            };
+            /** @description Missing or invalid module payload */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Module code already exists for course */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getModuleById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                moduleId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Module returned successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModuleSingleResponseDto"];
+                };
+            };
+            /** @description Invalid module ID */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Module not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    deleteModule: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                moduleId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Module deleted successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeleteModuleResponseDto"];
+                };
+            };
+            /** @description Invalid module ID */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Module not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    updateModule: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                moduleId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateModuleDto"];
+            };
+        };
+        responses: {
+            /** @description Module updated successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ModuleSingleResponseDto"];
+                };
+            };
+            /** @description Invalid update payload or module ID */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Module not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Duplicate module code detected for course */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
 }
