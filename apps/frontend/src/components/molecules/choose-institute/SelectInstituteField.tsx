@@ -43,7 +43,10 @@ export function SelectInstituteField({
           ))}
         </SelectContent>
       </Select>
-      <NotSupportedLink onClick={onNotSupportedClick} />
+      <div className="flex justify-center w-full">
+        {" "}
+        <NotSupportedLink onClick={onNotSupportedClick} />
+      </div>
     </div>
   );
 }

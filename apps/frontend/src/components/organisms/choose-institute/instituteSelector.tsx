@@ -61,16 +61,14 @@ export function InstituteSelector({
         value={selectedInstitute}
         onChange={setSelectedInstitute}
         onNotSupportedClick={() => {
-          /* add functionality here */
+          /* werk hierso haha */
         }}
       />
 
-      {/* 1 */}
       {!roleWasPassedIn && (
         <SelectRoleField value={selectedRole} onChange={setSelectedRole} />
       )}
 
-      {/* 3 */}
       {isNotApproved && selectedInstitute && (
         <ApprovalStatus
           status={approvalStatus}
@@ -80,7 +78,6 @@ export function InstituteSelector({
         />
       )}
 
-      {/* 2 */}
       {isApproved && selectedInstitute && (
         <ApprovalStatus
           status={approvalStatus}
