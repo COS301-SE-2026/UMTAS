@@ -21,7 +21,7 @@ export function SelectRoleField({ value, onChange }: SelectRoleFieldProps) {
     <div className="flex flex-col gap-2">
       <Label htmlFor="role-select">Select Role</Label>
       <Select value={value} onValueChange={onChange}>
-        <SelectTrigger id="role-select">
+        <SelectTrigger id="role-select" className="w-full">
           <SelectValue placeholder="Select a role" />
         </SelectTrigger>
         <SelectContent>

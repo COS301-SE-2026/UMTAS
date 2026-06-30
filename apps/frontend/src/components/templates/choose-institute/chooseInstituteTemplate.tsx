@@ -1,4 +1,6 @@
 "use client";
+
+import { useRouter } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -8,23 +10,26 @@ import {
 import { InstituteSelector } from "@/components/organisms/choose-institute/instituteSelector";
 
 export function ChooseInstituteTemplate({
-  passedrole,
+  passedRole,
 }: {
-  passedrole?: string;
+  passedRole?: string;
 }) {
-  const handleSelection = (instituteId: string, role: string) => {
-    role = role.toLowerCase();
-    instituteId = instituteId.toLowerCase();
-  };
+  const router = useRouter();
+
+  function handleSelection(instituteId: string, role: string) {
+    router.push(
+      `/builder?institute=${instituteId.toLowerCase()}&role=${role.toLowerCase()}`,
+    );
+  }
 
   return (
-    <Card>
+    <Card className="mx-auto w-full md:w-1/2">
       <CardHeader>
         <CardTitle>Choose Institute</CardTitle>
       </CardHeader>
       <CardContent>
         <InstituteSelector
-          passedrole={passedrole}
+          passedRole={passedRole}
           onInstituteSelected={handleSelection}
         />
       </CardContent>

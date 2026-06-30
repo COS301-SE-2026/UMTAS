@@ -13,6 +13,8 @@ export function ApprovalStatus({
   status,
   universityName,
 }: ApprovalStatusProps) {
+  if (status === null) return null;
+
   if (status === "approved") {
     return (
       <Alert variant="success">
@@ -23,7 +25,9 @@ export function ApprovalStatus({
         </AlertDescription>
       </Alert>
     );
-  } else if (status === "rejected") {
+  }
+
+  if (status === "rejected") {
     return (
       <Alert variant="destructive">
         <AlertTitle>Role rejected</AlertTitle>
@@ -33,15 +37,15 @@ export function ApprovalStatus({
         </AlertDescription>
       </Alert>
     );
-  } else if (status === "pending") {
-    return (
-      <Alert variant="default">
-        <AlertTitle>Role not yet approved</AlertTitle>
-        <AlertDescription>
-          Your role has not yet been approved for {universityName}. Please wait
-          for the approval process to complete.
-        </AlertDescription>
-      </Alert>
-    );
   }
+
+  return (
+    <Alert variant="default">
+      <AlertTitle>Role not yet approved</AlertTitle>
+      <AlertDescription>
+        Your role has not yet been approved for {universityName}. Please wait
+        for the approval process to complete.
+      </AlertDescription>
+    </Alert>
+  );
 }

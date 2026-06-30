@@ -30,9 +30,9 @@ export function SelectInstituteField({
 }: SelectInstituteFieldProps) {
   return (
     <div className="flex flex-col gap-2">
-      <label htmlFor="institute-select">Select Institute</label>
+      <Label htmlFor="institute-select">Select Institute</Label>
       <Select value={value} onValueChange={onChange}>
-        <SelectTrigger id="institute-select">
+        <SelectTrigger id="institute-select" className="w-full">
           <SelectValue placeholder="Select an institute" />
         </SelectTrigger>
         <SelectContent>
@@ -42,8 +42,8 @@ export function SelectInstituteField({
             </SelectItem>
           ))}
         </SelectContent>
-        <NotSupportedLink onClick={onNotSupportedClick} />
       </Select>
+      <NotSupportedLink onClick={onNotSupportedClick} />
     </div>
   );
 }

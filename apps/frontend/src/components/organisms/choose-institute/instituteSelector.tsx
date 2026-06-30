@@ -1,55 +1,100 @@
 "use client";
 
-import React, { useState, useCallback, JSX } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { ApprovalStatus } from "@/components/molecules/choose-institute/ApprovalStatus";
 import { SelectInstituteField } from "@/components/molecules/choose-institute/SelectInstituteField";
 import { SelectRoleField } from "@/components/molecules/choose-institute/SelectRoleField";
+import { Button } from "@/components/atoms/baseShadcn/button";
 
 interface InstituteSelectorProps {
   onInstituteSelected: (instituteId: string, role: string) => void;
-  passedrole?: string; //will probably need to change as well, just waiting for willie
+  passedRole?: string;
 }
 
-export const InstituteSelector: React.FC<InstituteSelectorProps> = ({
-  passedrole,
+export function InstituteSelector({
+  passedRole,
   onInstituteSelected,
-}) => {
-  //mock for now, will be replaced with actual data from the backend when we link it up
+}: InstituteSelectorProps) {
   const institutes = [
-    { id: "1", name: "University of Cape Town" },
-    { id: "2", name: "Stellenbosch University" },
+    { id: "1", name: "UCT" },
+    { id: "2", name: "Stellies" },
   ];
-  const roles = "Student"; //will change with dto
 
-  const handleNotSupported = () => {};
-  const handleInstituteChange = (instituteId: string) => {
-    setSelectedInstitute(instituteId);
-  };
   const [selectedInstitute, setSelectedInstitute] = useState("");
+  const [selectedRole, setSelectedRole] = useState("Student");
 
-  const [selectedRole, setSelectedRole] = useState(passedrole || "");
-  const handleRoleChange = (role: string) => {
-    setSelectedRole(role);
-  };
+  // mock for now(sorry johan)
+  const [approvalStatus] = useState<"approved" | "pending" | "rejected" | null>(
+    passedRole ? "pending" : null,
+  );
 
-  const [approvalStatus, setApprovalStatus] = useState<
-    "approved" | "pending" | "rejected" | null
-  >(null);
+  const roleWasPassedIn = Boolean(passedRole);
+  const isApproved = roleWasPassedIn && approvalStatus === "approved";
+  const isNotApproved =
+    roleWasPassedIn && approvalStatus !== "approved" && approvalStatus !== null;
+
+  //1: no role passed in -> free role choice which defaults to student
+  //2: approved -> role is locked to the passed-in role
+  //3: not approved -> role is forced to student, but user is informed that their role is not yet approved
+  const finalRole = !roleWasPassedIn
+    ? selectedRole
+    : isApproved
+      ? passedRole!
+      : "Student";
+
+  const canConfirm = selectedInstitute !== "";
+
+  function handleConfirm() {
+    onInstituteSelected(selectedInstitute, finalRole);
+  }
 
   return (
-    <div className="flex flex-col gap-6">
+    <form
+      className="flex flex-col gap-6"
+      onSubmit={(e) => {
+        e.preventDefault();
+        handleConfirm();
+      }}
+    >
       <SelectInstituteField
         institutes={institutes}
         value={selectedInstitute}
-        onChange={handleInstituteChange}
-        onNotSupportedClick={handleNotSupported}
+        onChange={setSelectedInstitute}
+        onNotSupportedClick={() => {
+          /* add functionality here */
+        }}
       />
-      <SelectRoleField value={selectedRole} onChange={handleRoleChange} />
-      <ApprovalStatus
-        status={approvalStatus}
-        universityName="University of Pretoria"
-      />
-    </div>
+
+      {/* 1 */}
+      {!roleWasPassedIn && (
+        <SelectRoleField value={selectedRole} onChange={setSelectedRole} />
+      )}
+
+      {/* 3 */}
+      {isNotApproved && selectedInstitute && (
+        <ApprovalStatus
+          status={approvalStatus}
+          universityName={
+            institutes.find((i) => i.id === selectedInstitute)?.name ?? ""
+          }
+        />
+      )}
+
+      {/* 2 */}
+      {isApproved && selectedInstitute && (
+        <ApprovalStatus
+          status={approvalStatus}
+          universityName={
+            institutes.find((i) => i.id === selectedInstitute)?.name ?? ""
+          }
+        />
+      )}
+
+      <div className="mt-2 flex justify-end gap-3 border-t pt-4">
+        <Button type="submit" disabled={!canConfirm}>
+          {isNotApproved ? "Continue as Student" : "Confirm"}
+        </Button>
+      </div>
+    </form>
   );
-};
+}
