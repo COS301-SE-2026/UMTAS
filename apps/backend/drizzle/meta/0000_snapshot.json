@@ -1,5 +1,5 @@
 {
-  "id": "eed023d1-7209-46c0-b47f-d2118660c7cb",
+  "id": "0b184837-9ae1-4c2d-b737-9b8853810b3d",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -524,23 +524,18 @@
       "name": "Event",
       "schema": "",
       "columns": {
-        "userID": {
-          "name": "userID",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
         "eventID": {
           "name": "eventID",
-          "type": "serial",
+          "type": "uuid",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "gen_random_uuid()"
         },
         "eventName": {
           "name": "eventName",
           "type": "varchar(32)",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "eventCode": {
           "name": "eventCode",
@@ -570,19 +565,328 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.PersonalEvent": {
+      "name": "PersonalEvent",
+      "schema": "",
+      "columns": {
+        "PersonalEventID": {
+          "name": "PersonalEventID",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "UserID": {
+          "name": "UserID",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "eventID": {
+          "name": "eventID",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "PersonalEvent_UserID_user_id_fk": {
+          "name": "PersonalEvent_UserID_user_id_fk",
+          "tableFrom": "PersonalEvent",
+          "tableTo": "user",
+          "columnsFrom": ["UserID"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "PersonalEvent_eventID_Event_eventID_fk": {
+          "name": "PersonalEvent_eventID_Event_eventID_fk",
+          "tableFrom": "PersonalEvent",
+          "tableTo": "Event",
+          "columnsFrom": ["eventID"],
+          "columnsTo": ["eventID"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.UniversityEvent": {
+      "name": "UniversityEvent",
+      "schema": "",
+      "columns": {
+        "universityEventID": {
+          "name": "universityEventID",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "moduleID": {
+          "name": "moduleID",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "eventID": {
+          "name": "eventID",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "VenueID": {
+          "name": "VenueID",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "UniversityEvent_moduleID_Modules_moduleID_fk": {
+          "name": "UniversityEvent_moduleID_Modules_moduleID_fk",
+          "tableFrom": "UniversityEvent",
+          "tableTo": "Modules",
+          "columnsFrom": ["moduleID"],
+          "columnsTo": ["moduleID"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "UniversityEvent_eventID_Event_eventID_fk": {
+          "name": "UniversityEvent_eventID_Event_eventID_fk",
+          "tableFrom": "UniversityEvent",
+          "tableTo": "Event",
+          "columnsFrom": ["eventID"],
+          "columnsTo": ["eventID"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "UniversityEvent_VenueID_Venue_VenueID_fk": {
+          "name": "UniversityEvent_VenueID_Venue_VenueID_fk",
+          "tableFrom": "UniversityEvent",
+          "tableTo": "Venue",
+          "columnsFrom": ["VenueID"],
+          "columnsTo": ["VenueID"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ModuleEnrollment": {
+      "name": "ModuleEnrollment",
+      "schema": "",
+      "columns": {
+        "ModuleID": {
+          "name": "ModuleID",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "UserID": {
+          "name": "UserID",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "ModuleEnrollment_ModuleID_Modules_moduleID_fk": {
+          "name": "ModuleEnrollment_ModuleID_Modules_moduleID_fk",
+          "tableFrom": "ModuleEnrollment",
+          "tableTo": "Modules",
+          "columnsFrom": ["ModuleID"],
+          "columnsTo": ["moduleID"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "ModuleEnrollment_UserID_user_id_fk": {
+          "name": "ModuleEnrollment_UserID_user_id_fk",
+          "tableFrom": "ModuleEnrollment",
+          "tableTo": "user",
+          "columnsFrom": ["UserID"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "ModuleEnrollment_ModuleID_UserID_pk": {
+          "name": "ModuleEnrollment_ModuleID_UserID_pk",
+          "columns": ["ModuleID", "UserID"]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ModuleStyling": {
+      "name": "ModuleStyling",
+      "schema": "",
+      "columns": {
+        "ModuleID": {
+          "name": "ModuleID",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "UserID": {
+          "name": "UserID",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "styling": {
+          "name": "styling",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{\"colour\":\"\"}'::jsonb"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "ModuleStyling_ModuleID_Modules_moduleID_fk": {
+          "name": "ModuleStyling_ModuleID_Modules_moduleID_fk",
+          "tableFrom": "ModuleStyling",
+          "tableTo": "Modules",
+          "columnsFrom": ["ModuleID"],
+          "columnsTo": ["moduleID"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "ModuleStyling_UserID_user_id_fk": {
+          "name": "ModuleStyling_UserID_user_id_fk",
+          "tableFrom": "ModuleStyling",
+          "tableTo": "user",
+          "columnsFrom": ["UserID"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "ModuleStyling_ModuleID_UserID_pk": {
+          "name": "ModuleStyling_ModuleID_UserID_pk",
+          "columns": ["ModuleID", "UserID"]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ModuleTeaches": {
+      "name": "ModuleTeaches",
+      "schema": "",
+      "columns": {
+        "ModuleID": {
+          "name": "ModuleID",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "UserID": {
+          "name": "UserID",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "ModuleTeaches_ModuleID_Modules_moduleID_fk": {
+          "name": "ModuleTeaches_ModuleID_Modules_moduleID_fk",
+          "tableFrom": "ModuleTeaches",
+          "tableTo": "Modules",
+          "columnsFrom": ["ModuleID"],
+          "columnsTo": ["moduleID"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "ModuleTeaches_UserID_user_id_fk": {
+          "name": "ModuleTeaches_UserID_user_id_fk",
+          "tableFrom": "ModuleTeaches",
+          "tableTo": "user",
+          "columnsFrom": ["UserID"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "ModuleTeaches_ModuleID_UserID_pk": {
+          "name": "ModuleTeaches_ModuleID_UserID_pk",
+          "columns": ["ModuleID", "UserID"]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.Modules": {
+      "name": "Modules",
+      "schema": "",
+      "columns": {
+        "moduleID": {
+          "name": "moduleID",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "moduleCode": {
+          "name": "moduleCode",
+          "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "moduleName": {
+          "name": "moduleName",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "moduleDescription": {
+          "name": "moduleDescription",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.EventsToTimetables": {
       "name": "EventsToTimetables",
       "schema": "",
       "columns": {
         "eventID": {
           "name": "eventID",
-          "type": "integer",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
         "timetableID": {
           "name": "timetableID",
-          "type": "integer",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": true
         }
@@ -625,77 +929,116 @@
       "columns": {
         "timetableID": {
           "name": "timetableID",
-          "type": "serial",
+          "type": "uuid",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "gen_random_uuid()"
         },
         "timetableName": {
           "name": "timetableName",
           "type": "varchar(32)",
           "primaryKey": false,
           "notNull": false
-        },
-        "userID": {
-          "name": "userID",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
         }
       },
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "Timetable_timetableID_unique": {
+          "name": "Timetable_timetableID_unique",
+          "nullsNotDistinct": false,
+          "columns": ["timetableID"]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.LectureEv": {
-      "name": "LectureEv",
+    "public.UserTimetable": {
+      "name": "UserTimetable",
       "schema": "",
       "columns": {
-        "lectureID": {
-          "name": "lectureID",
-          "type": "serial",
+        "UserTimetableID": {
+          "name": "UserTimetableID",
+          "type": "uuid",
           "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "UserID": {
+          "name": "UserID",
+          "type": "uuid",
+          "primaryKey": false,
           "notNull": true
         },
-        "moduleID": {
-          "name": "moduleID",
-          "type": "integer",
+        "TimetableID": {
+          "name": "TimetableID",
+          "type": "uuid",
           "primaryKey": false,
-          "notNull": false
-        },
-        "eventID": {
-          "name": "eventID",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "venue": {
-          "name": "venue",
-          "type": "varchar(30)",
-          "primaryKey": false,
-          "notNull": false
+          "notNull": true
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "LectureEv_moduleID_Modules_moduleID_fk": {
-          "name": "LectureEv_moduleID_Modules_moduleID_fk",
-          "tableFrom": "LectureEv",
-          "tableTo": "Modules",
-          "columnsFrom": ["moduleID"],
-          "columnsTo": ["moduleID"],
+        "UserTimetable_UserID_user_id_fk": {
+          "name": "UserTimetable_UserID_user_id_fk",
+          "tableFrom": "UserTimetable",
+          "tableTo": "user",
+          "columnsFrom": ["UserID"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "LectureEv_eventID_Event_eventID_fk": {
-          "name": "LectureEv_eventID_Event_eventID_fk",
-          "tableFrom": "LectureEv",
-          "tableTo": "Event",
-          "columnsFrom": ["eventID"],
-          "columnsTo": ["eventID"],
+        "UserTimetable_TimetableID_Timetable_timetableID_fk": {
+          "name": "UserTimetable_TimetableID_Timetable_timetableID_fk",
+          "tableFrom": "UserTimetable",
+          "tableTo": "Timetable",
+          "columnsFrom": ["TimetableID"],
+          "columnsTo": ["timetableID"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.AcademicCalendar": {
+      "name": "AcademicCalendar",
+      "schema": "",
+      "columns": {
+        "CalendarID": {
+          "name": "CalendarID",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "UniversityID": {
+          "name": "UniversityID",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "CreationDate": {
+          "name": "CreationDate",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "AcademicCalendar_UniversityID_University_UniversityID_fk": {
+          "name": "AcademicCalendar_UniversityID_University_UniversityID_fk",
+          "tableFrom": "AcademicCalendar",
+          "tableTo": "University",
+          "columnsFrom": ["UniversityID"],
+          "columnsTo": ["UniversityID"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -706,49 +1049,308 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.Modules": {
-      "name": "Modules",
+    "public.RestrictedDates": {
+      "name": "RestrictedDates",
       "schema": "",
       "columns": {
-        "moduleID": {
-          "name": "moduleID",
-          "type": "serial",
+        "RestrictionID": {
+          "name": "RestrictionID",
+          "type": "uuid",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "gen_random_uuid()"
         },
-        "moduleCode": {
-          "name": "moduleCode",
-          "type": "varchar(10)",
+        "CalendarID": {
+          "name": "CalendarID",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
-        "moduleName": {
-          "name": "moduleName",
-          "type": "varchar(256)",
+        "Details": {
+          "name": "Details",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'{\"dateStart\":\"\"}'::jsonb"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "RestrictedDates_CalendarID_AcademicCalendar_CalendarID_fk": {
+          "name": "RestrictedDates_CalendarID_AcademicCalendar_CalendarID_fk",
+          "tableFrom": "RestrictedDates",
+          "tableTo": "AcademicCalendar",
+          "columnsFrom": ["CalendarID"],
+          "columnsTo": ["CalendarID"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.Course": {
+      "name": "Course",
+      "schema": "",
+      "columns": {
+        "courseID": {
+          "name": "courseID",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "courseName": {
+          "name": "courseName",
+          "type": "varchar(30)",
           "primaryKey": false,
           "notNull": true
         },
-        "moduleDescription": {
-          "name": "moduleDescription",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "styling": {
-          "name": "styling",
-          "type": "varchar(32)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "userID": {
-          "name": "userID",
+        "UniversityID": {
+          "name": "UniversityID",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
         }
       },
       "indexes": {},
+      "foreignKeys": {
+        "Course_UniversityID_University_UniversityID_fk": {
+          "name": "Course_UniversityID_University_UniversityID_fk",
+          "tableFrom": "Course",
+          "tableTo": "University",
+          "columnsFrom": ["UniversityID"],
+          "columnsTo": ["UniversityID"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.CourseModule": {
+      "name": "CourseModule",
+      "schema": "",
+      "columns": {
+        "ModuleID": {
+          "name": "ModuleID",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "CourseID": {
+          "name": "CourseID",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "CourseModule_ModuleID_Modules_moduleID_fk": {
+          "name": "CourseModule_ModuleID_Modules_moduleID_fk",
+          "tableFrom": "CourseModule",
+          "tableTo": "Modules",
+          "columnsFrom": ["ModuleID"],
+          "columnsTo": ["moduleID"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "CourseModule_CourseID_Course_courseID_fk": {
+          "name": "CourseModule_CourseID_Course_courseID_fk",
+          "tableFrom": "CourseModule",
+          "tableTo": "Course",
+          "columnsFrom": ["CourseID"],
+          "columnsTo": ["courseID"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "CourseModule_CourseID_ModuleID_pk": {
+          "name": "CourseModule_CourseID_ModuleID_pk",
+          "columns": ["CourseID", "ModuleID"]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.University": {
+      "name": "University",
+      "schema": "",
+      "columns": {
+        "UniversityID": {
+          "name": "UniversityID",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "UniversityName": {
+          "name": "UniversityName",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
       "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.UniversityRole": {
+      "name": "UniversityRole",
+      "schema": "",
+      "columns": {
+        "UserID": {
+          "name": "UserID",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "UniversityID": {
+          "name": "UniversityID",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "role": {
+          "name": "role",
+          "type": "RoleType",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'STUDENT'"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "UniversityRole_UserID_user_id_fk": {
+          "name": "UniversityRole_UserID_user_id_fk",
+          "tableFrom": "UniversityRole",
+          "tableTo": "user",
+          "columnsFrom": ["UserID"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "UniversityRole_UniversityID_University_UniversityID_fk": {
+          "name": "UniversityRole_UniversityID_University_UniversityID_fk",
+          "tableFrom": "UniversityRole",
+          "tableTo": "University",
+          "columnsFrom": ["UniversityID"],
+          "columnsTo": ["UniversityID"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "UniversityRole_UniversityID_UserID_pk": {
+          "name": "UniversityRole_UniversityID_UserID_pk",
+          "columns": ["UniversityID", "UserID"]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.EventVenue": {
+      "name": "EventVenue",
+      "schema": "",
+      "columns": {
+        "EventID": {
+          "name": "EventID",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "VenueID": {
+          "name": "VenueID",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "EventVenue_EventID_Event_eventID_fk": {
+          "name": "EventVenue_EventID_Event_eventID_fk",
+          "tableFrom": "EventVenue",
+          "tableTo": "Event",
+          "columnsFrom": ["EventID"],
+          "columnsTo": ["eventID"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "EventVenue_VenueID_Venue_VenueID_fk": {
+          "name": "EventVenue_VenueID_Venue_VenueID_fk",
+          "tableFrom": "EventVenue",
+          "tableTo": "Venue",
+          "columnsFrom": ["VenueID"],
+          "columnsTo": ["VenueID"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "EventVenue_EventID_VenueID_pk": {
+          "name": "EventVenue_EventID_VenueID_pk",
+          "columns": ["EventID", "VenueID"]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.Venue": {
+      "name": "Venue",
+      "schema": "",
+      "columns": {
+        "VenueID": {
+          "name": "VenueID",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "VenueName": {
+          "name": "VenueName",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "UniversityID": {
+          "name": "UniversityID",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "Venue_UniversityID_University_UniversityID_fk": {
+          "name": "Venue_UniversityID_University_UniversityID_fk",
+          "tableFrom": "Venue",
+          "tableTo": "University",
+          "columnsFrom": ["UniversityID"],
+          "columnsTo": ["UniversityID"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -756,7 +1358,25 @@
       "isRLSEnabled": false
     }
   },
-  "enums": {},
+  "enums": {
+    "public.RestrictionType": {
+      "name": "RestrictionType",
+      "schema": "public",
+      "values": [
+        "DATE-SWAP",
+        "PUBLIC-HOLIDAY",
+        "RECESS",
+        "CLOSURE",
+        "EXAM-PERIOD",
+        "DAY-SWAP"
+      ]
+    },
+    "public.RoleType": {
+      "name": "RoleType",
+      "schema": "public",
+      "values": ["STUDENT", "UNIVERSITY_ADMIN", "SYSTEM_ADMIN", "STUDENT_OWNED"]
+    }
+  },
   "schemas": {},
   "sequences": {},
   "roles": {},

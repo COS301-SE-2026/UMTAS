@@ -1,13 +1,24 @@
 "use client";
 
-import React, { useState } from "react";
-import { Plus, Trash2, CheckCircle, Inbox, AlertCircle } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import {
+  Plus,
+  Trash2,
+  CheckCircle,
+  Inbox,
+  AlertCircle,
+  AwardIcon,
+  ArrowUpWideNarrow,
+} from "lucide-react";
 import {
   EventCard,
   type EventErrors,
 } from "@/components/molecules/builder/EventCard";
 import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
-import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
+import {
+  EventCriteria,
+  EventResponse,
+} from "@/app/builder/utils/events/eventRequestBuilder";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -20,34 +31,40 @@ import {
 } from "@/components/atoms/baseShadcn/alert-dialog";
 import { Alert, AlertDescription } from "@/components/atoms/baseShadcn/alert";
 import { Button } from "@/components/atoms/baseShadcn/button";
+import {
+  addUniEventMut,
+  getAllEventsQ,
+  removeEventMut,
+  updateEventMut,
+} from "@/components/templates/builder/Queries/eventQueries";
+import { useMutation } from "@tanstack/react-query";
+import { getQueryClient } from "@/components/tanstack/getQueryClient";
 
 interface EventsStepProps {
   events: EventResponse[];
   modules: ModuleResponseDto[];
-  onAdd: () => void;
-  onUpdate: (id: number, field: string, value: string | boolean) => void;
-  onRemove: (id: number) => void;
   onGoToModules: () => void;
 }
-
-function validateEvent(event: EventResponse): {
+interface valEvent {
   errors: EventErrors;
   hasErrors: boolean;
-} {
+}
+
+function validateEvent(event: EventResponse): valEvent {
   const errors: EventErrors = {};
   let hasErrors = false;
 
-  const criteria = event.event.eventCriteria;
+  const criteria = event.eventCriteria;
 
-  if (!event.event.name?.trim()) {
+  if (!event.eventName?.trim()) {
     errors.name = "Name is required";
     hasErrors = true;
   }
-  if (!event.event.code?.trim()) {
+  if (!event.eventCode?.trim()) {
     errors.code = "Code is required";
     hasErrors = true;
   }
-  if (!criteria?.day) {
+  if (!criteria?.date) {
     errors.date = "Date is required";
     hasErrors = true;
   }
@@ -63,22 +80,25 @@ function validateEvent(event: EventResponse): {
     errors.time = "Start time must be before end time";
     hasErrors = true;
   }
-  if (criteria?.type === "lecture" && !event.lecture?.moduleID) {
-    errors.moduleId = "A module must be assigned to a lecture";
-    hasErrors = true;
-  }
+  // if (criteria?.type !== "university") {
+  //   //&& !event.lecture?.moduleID) {
+  //   errors.moduleId = "A module must be assigned to a lecture";
+  //hasErrors = true;
+  // }
 
   return { errors, hasErrors };
 }
 
 function isEventComplete(event: EventResponse) {
-  const criteria = event.event.eventCriteria;
-  if (!event.event.name) return false;
-  if (!event.event.code) return false;
-  if (!criteria?.day) return false;
+  const criteria = event.eventCriteria;
+  if (!event.eventName) return false;
+  if (!event.eventCode) return false;
+  if (!criteria?.date) return false;
   if (!criteria?.startTime) return false;
   if (!criteria?.endTime) return false;
-  if (criteria?.type === "lecture" && !event.lecture?.moduleID) return false;
+  if (criteria?.type === "university")
+    // TODO add module && event.eventCriteria.moduleID)
+    return false;
   return true;
 }
 
@@ -86,7 +106,9 @@ function getLinkedModuleName(
   event: EventResponse,
   modules: ModuleResponseDto[],
 ) {
-  const found = modules.find((m) => m.moduleID === event.lecture?.moduleID);
+  const found = modules.find(
+    (m) => m.moduleID === event.eventCriteria.moduleID,
+  ); // TODO add module event.lecture?.moduleID);
   if (found) {
     return found.moduleCode + " - " + found.moduleName;
   }
@@ -96,17 +118,52 @@ function getLinkedModuleName(
 export function EventsStep({
   events,
   modules,
-  onAdd,
-  onUpdate,
-  onRemove,
   onGoToModules,
 }: EventsStepProps) {
-  const [selectedId, setSelectedId] = useState<number | null>(null);
-  const [errorMap, setErrorMap] = useState<Record<number, EventErrors>>({});
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [errorMap, setErrorMap] = useState<Record<string, EventErrors>>({});
   const [isDirty, setIsDirty] = useState(false);
   const [showGuard, setShowGuard] = useState(false);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
-  const [snapshot, setSnapshot] = useState<EventResponse | null>(null);
+
+  const [eventsAdded, setEventsAdded] = useState<
+    { eventID: string; created: boolean }[]
+  >([]);
+
+  // a local construct to add an empty event
+  function addEmptyEvent() {
+    const nextNum = Math.round(Math.random() * 1000);
+    const newEvents = getQueryClient().setQueryData(
+      getAllEventsQ().queryKey,
+      (oldEvents: EventResponse[] | undefined) => {
+        const emptyEvent: EventResponse = {
+          eventID: `TEMP_${nextNum}`,
+          eventCode: "",
+          isRecurring: false,
+          eventName: "",
+          eventCriteria: {
+            type: "university",
+            date: "",
+            endTime: "",
+            startTime: "",
+          },
+        };
+        return [...(oldEvents ?? []), emptyEvent];
+      },
+    );
+
+    if (newEvents) {
+      const mapped = newEvents.map((e) => ({
+        eventID: e.eventID,
+        created: !e.eventID.startsWith("TEMP"),
+      }));
+      setEventsAdded(mapped);
+    }
+  }
+
+  const addEvent = useMutation(addUniEventMut());
+  const deleteEvent = useMutation(removeEventMut());
+  const updateEvent = useMutation(updateEventMut());
 
   function requestNavigation(action: () => void) {
     if (isDirty) {
@@ -118,6 +175,7 @@ export function EventsStep({
   }
 
   function handleGuardConfirm() {
+    /*
     if (snapshot) {
       const id = snapshot.event.eventID;
       const crit = snapshot.event.eventCriteria;
@@ -128,10 +186,9 @@ export function EventsStep({
       onUpdate(id, "endTime", crit?.endTime || "");
       onUpdate(id, "type", crit?.type || "lecture");
       onUpdate(id, "moduleId", String(snapshot.lecture?.moduleID || ""));
-    }
+    }*/
     setIsDirty(false);
     setShowGuard(false);
-    setSnapshot(null);
     if (pendingAction) {
       pendingAction();
       setPendingAction(null);
@@ -143,17 +200,14 @@ export function EventsStep({
     setPendingAction(null);
   }
 
-  function handleSelect(id: number) {
+  function handleSelect(id: string) {
     if (selectedId === id) {
       setSelectedId(null);
       return;
     }
 
     function doSelect() {
-      const selected = events.find((e) => e.event.eventID === id);
-      if (selected) {
-        setSnapshot({ ...selected });
-      }
+      const selected = events.find((e) => e.eventID === id);
       setSelectedId(id);
       setIsDirty(false);
     }
@@ -161,8 +215,8 @@ export function EventsStep({
     requestNavigation(doSelect);
   }
 
-  function handleConfirm(id: number) {
-    const event = events.find((e) => e.event.eventID === id);
+  async function handleConfirm(id: string) {
+    const event = events.find((e) => e.eventID === id);
     if (!event) return;
 
     const { errors: validationErrors, hasErrors } = validateEvent(event);
@@ -176,29 +230,95 @@ export function EventsStep({
       delete next[id];
       return next;
     });
-    onUpdate(id, "confirm", "");
+
+    const iscreated = eventsAdded.find((event) => event.eventID === id);
+
+    if (iscreated?.created) {
+      updateEvent.mutate({
+        body: {
+          isRecurring: false,
+          eventCode: event.eventCode,
+          eventCriteria: event.eventCriteria,
+          eventName: event.eventName,
+        },
+        path: {
+          id: id,
+        },
+      });
+    } else {
+      const result = addEvent.mutateAsync({
+        body: {
+          eventCriteria: event.eventCriteria,
+          eventCode: event.eventCode,
+          eventName: event.eventName,
+          isRecurring: false,
+        },
+      });
+      const newID = (await result).event.eventID;
+      if (events) {
+        const mapped = eventsAdded.map((event) => {
+          if (event.eventID === id) {
+            return {
+              eventID: newID,
+              created: true,
+            };
+          }
+          return event;
+        });
+        setEventsAdded(mapped);
+      }
+    }
     setIsDirty(false);
-    setSnapshot(null);
     setSelectedId(null);
   }
 
-  function handleRemove(id: number) {
+  function handleRemove(id: string) {
     if (selectedId === id) {
       setSelectedId(null);
       setIsDirty(false);
-      setSnapshot(null);
     }
     setErrorMap((prev) => {
       const next = { ...prev };
       delete next[id];
       return next;
     });
-    onRemove(id);
+    if (!id.startsWith("TEMP")) {
+      deleteEvent.mutate(id);
+    }
+    getQueryClient().setQueryData(
+      getAllEventsQ().queryKey,
+      (OldEvents: EventResponse[] | undefined) => {
+        if (!OldEvents) return [];
+        return OldEvents.filter((e) => e.eventID !== id);
+      },
+    );
   }
 
-  function handleUpdate(id: number, field: string, value: string | boolean) {
+  function handleUpdate(
+    id: string,
+    field: keyof EventResponse | keyof EventCriteria,
+    value: string | boolean,
+  ) {
     setIsDirty(true);
-    onUpdate(id, field, value);
+    getQueryClient().setQueryData(
+      getAllEventsQ().queryKey,
+      (oldEvents: EventResponse[] | undefined) => {
+        if (!oldEvents) return [];
+
+        return oldEvents.map((event) =>
+          event.eventID === id
+            ? {
+                ...event,
+                ...(field in event
+                  ? { [field]: value }
+                  : {
+                      eventCriteria: { ...event.eventCriteria, [field]: value },
+                    }),
+              }
+            : event,
+        );
+      },
+    );
   }
 
   function renderEmptyState() {
@@ -236,35 +356,33 @@ export function EventsStep({
 
   function renderEventRow(event: EventResponse, index: number) {
     const isComplete = isEventComplete(event);
-    const isSelected = selectedId === event.event.eventID;
-    const errors = errorMap[event.event.eventID];
+    const isSelected = selectedId === event.eventID;
+    const errors = errorMap[event.eventID];
     const moduleName = getLinkedModuleName(event, modules);
-    const criteria = event.event.eventCriteria;
+    const criteria = event.eventCriteria;
 
     return (
-      <div key={event.event.eventID} className="flex flex-col gap-2">
+      <div key={event.eventID} className="flex flex-col gap-2">
         {/* summary row */}
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={() => handleSelect(event.event.eventID)}
+            onClick={() => handleSelect(event.eventID)}
             className="flex flex-1 items-center gap-3 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] px-4 py-4 text-left transition-colors duration-[var(--duration-fast)] hover:bg-[var(--bg-elevated)] shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.08)]"
           >
             <div className="flex-1 min-w-0">
               <p className="text-base font-medium text-[var(--text-primary)] truncate">
-                {event.event.name ||
-                  criteria?.moduleCode ||
-                  "Event " + (index + 1)}
+                {event.eventName || "Event " + (index + 1)}
               </p>
               <div className="flex flex-wrap items-center gap-2 mt-0.5">
-                {event.event.code && (
+                {event.eventCode && (
                   <p className="text-sm font-mono text-[var(--text-secondary)]">
-                    {event.event.code}
+                    {event.eventCode}
                   </p>
                 )}
-                {criteria?.day && (
+                {criteria?.date && (
                   <p className="text-sm text-[var(--text-secondary)]">
-                    {criteria.day}
+                    {criteria.date}
                   </p>
                 )}
                 {criteria?.startTime && criteria?.endTime && (
@@ -293,7 +411,7 @@ export function EventsStep({
             type="button"
             variant="ghost"
             size="icon"
-            onClick={() => handleRemove(event.event.eventID)}
+            onClick={() => handleRemove(event.eventID)}
             aria-label={"Remove event " + (index + 1)}
             className="h-10 w-10 flex-shrink-0 border border-[var(--border)] text-[var(--text-secondary)] transition-colors duration-[var(--duration-fast)] hover:border-[var(--error-text)] hover:text-[var(--error-text)] hover:bg-transparent"
           >
@@ -315,7 +433,7 @@ export function EventsStep({
             <Button
               type="button"
               variant="outline"
-              onClick={() => handleConfirm(event.event.eventID)}
+              onClick={() => handleConfirm(event.eventID)}
               aria-label="Confirm event"
               className="w-full gap-2 border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-primary)] transition-colors duration-[var(--duration-fast)] hover:bg-[var(--bg-elevated)]"
             >
@@ -336,7 +454,7 @@ export function EventsStep({
     return (
       <button
         type="button"
-        onClick={onAdd}
+        onClick={addEmptyEvent} // adds an event card
         className="mt-4 flex w-full items-center gap-3 rounded-lg border border-dashed border-[var(--border)] px-4 py-4 text-left text-base text-[var(--text-secondary)] transition-colors duration-[var(--duration-fast)] hover:border-[var(--text-secondary)] hover:text-[var(--text-primary)]"
       >
         <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border border-dashed border-[var(--border)]">

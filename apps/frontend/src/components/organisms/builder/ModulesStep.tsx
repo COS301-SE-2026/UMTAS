@@ -43,6 +43,7 @@ function validateModule(module: ModuleResponseDto) {
     errors.moduleName = "Name is required";
     hasErrors = true;
   }
+
   if (!module.styling) {
     errors.styling = "Colour is required";
     hasErrors = true;
@@ -52,12 +53,12 @@ function validateModule(module: ModuleResponseDto) {
 }
 
 function isModuleComplete(module: ModuleResponseDto) {
-  return !!(module.moduleCode && module.moduleName && module.styling);
+  return !!(module.moduleCode && module.moduleName && module.styling); //&& module.styling);
 }
 
 export function ModulesStep({ modules }: ModulesStepProps) {
-  const [selectedId, setSelectedId] = useState<number | null>(null);
-  const [errorMap, setErrorMap] = useState<Record<number, ModuleErrors>>({});
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [errorMap, setErrorMap] = useState<Record<string, ModuleErrors>>({});
   const [isDirty, setIsDirty] = useState(false);
   const [showGuard, setShowGuard] = useState(false);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
@@ -74,12 +75,13 @@ export function ModulesStep({ modules }: ModulesStepProps) {
     action();
   }
 
-  function handleModuleUpdate(
-    id: number,
-    field: keyof ModuleResponseDto,
-    value: string,
+  function handleModuleUpdate<K extends keyof ModuleResponseDto>(
+    id: string,
+    field: K,
+    value: ModuleResponseDto[K],
   ) {
     setIsDirty(true);
+    console.log(id, field, value);
 
     getQueryClient().setQueryData(
       getAllModulesQ().queryKey,
@@ -90,6 +92,7 @@ export function ModulesStep({ modules }: ModulesStepProps) {
       },
     );
   }
+
   function handleGuardConfirm() {
     setIsDirty(false);
     setShowGuard(false);
@@ -105,7 +108,7 @@ export function ModulesStep({ modules }: ModulesStepProps) {
     setPendingAction(null);
   }
 
-  function handleSelect(id: number) {
+  function handleSelect(id: string) {
     if (selectedId === id) {
       setSelectedId(null);
       return;
@@ -120,13 +123,12 @@ export function ModulesStep({ modules }: ModulesStepProps) {
     requestNavigation(doSelect);
   }
 
-  async function handleConfirm(id: number) {
+  async function handleConfirm(id: string) {
     if (updateModule.isPending) return;
-    const lectureModule = modules.find((m) => m.moduleID === id);
-    if (!lectureModule) return;
+    const uniModule = modules.find((m) => m.moduleID === id);
+    if (!uniModule) return;
 
-    const { errors: validationErrors, hasErrors } =
-      validateModule(lectureModule);
+    const { errors: validationErrors, hasErrors } = validateModule(uniModule);
     if (hasErrors) {
       setErrorMap((prev) => ({ ...prev, [id]: validationErrors }));
       return;
@@ -135,12 +137,7 @@ export function ModulesStep({ modules }: ModulesStepProps) {
     try {
       updateModule.mutate({
         moduleID: id,
-        module: {
-          name: lectureModule.moduleName,
-          code: lectureModule.moduleCode,
-          dsc: lectureModule.moduleDescription || undefined,
-          styling: lectureModule.styling || undefined,
-        },
+        module: uniModule,
       });
 
       setErrorMap((prev) => {
@@ -170,6 +167,7 @@ export function ModulesStep({ modules }: ModulesStepProps) {
   }
 
   function renderModuleRow(module: ModuleResponseDto, index: number) {
+    //console.log("module styling: ", module.moduleCode, module.styling);
     const isComplete = isModuleComplete(module);
     const isSelected = selectedId === module.moduleID;
     const errors = errorMap[module.moduleID];
@@ -185,8 +183,11 @@ export function ModulesStep({ modules }: ModulesStepProps) {
           >
             <span
               className="h-3 w-3 rounded-full flex-shrink-0"
-              style={{ backgroundColor: module.styling || "var(--border)" }}
+              style={{
+                backgroundColor: module?.styling?.colour || "var(--border)",
+              }}
             />
+
             <div className="flex-1 min-w-0">
               <p className="text-base font-medium text-[var(--text-primary)] truncate">
                 {module.moduleName || "Module " + (index + 1)}

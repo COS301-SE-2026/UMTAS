@@ -4,18 +4,20 @@ import {
   Controller,
   Post,
   Get,
-  ParseIntPipe,
   Patch,
   Delete,
+  Query,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import {
   CreateEventDto,
-  EventResponseDto,
+  EventSingleResponseDto,
   EventListResponseDto,
   UpdateEventDto,
   DeleteResponseDto,
+  EventFiltersDto,
 } from './dto/EventDto.dto';
 
 import { EventService } from './event.service';
@@ -29,7 +31,7 @@ export class EventController {
   constructor(private readonly service: EventService) {}
 
   @Post()
-  @Roles('student')
+  @Roles('student', 'uni_admin', 'sys_admin')
   @ApiOperation({
     summary: 'Create an event',
     operationId: 'createEvent',
@@ -38,7 +40,7 @@ export class EventController {
   @ApiResponse({
     status: 201,
     description: 'Event created successfully',
-    type: EventResponseDto,
+    type: EventSingleResponseDto,
   })
   @ApiResponse({
     status: 400,
@@ -59,8 +61,8 @@ export class EventController {
   createEvent(
     @CurrentSession() session: SessionData,
     @Body() dto: CreateEventDto,
-  ): Promise<EventResponseDto> {
-    return this.service.createEvent(session.user.id, dto);
+  ): Promise<EventSingleResponseDto> {
+    return this.service.create(session.user.id, dto);
   }
 
   //get All
@@ -85,12 +87,15 @@ export class EventController {
   })
   getAllEvents(
     @CurrentSession() session: SessionData,
+    @Query() filters: EventFiltersDto,
   ): Promise<EventListResponseDto> {
-    return this.service.getAllEvents(session.user.id);
+    return this.service.getAllEvents(session.user.id, {
+      moduleId: filters.moduleId,
+    });
   } //getAllEvents
 
   //get by id
-  @Get(':id')
+  @Get(':eventId')
   @Roles('student')
   @ApiOperation({
     summary: 'Get event by ID',
@@ -99,17 +104,16 @@ export class EventController {
   @ApiResponse({
     status: 200,
     description: 'Event fetched successfully',
-    type: EventResponseDto,
+    type: EventSingleResponseDto,
   })
   @ApiResponse({
     status: 404,
     description: 'Event not found',
   })
   getById(
-    @CurrentSession() session: SessionData,
-    @Param('id', ParseIntPipe) id: number,
-  ): Promise<EventResponseDto> {
-    return this.service.getById(session.user.id, id);
+    @Param('eventId', ParseUUIDPipe) eventId: string,
+  ): Promise<EventSingleResponseDto> {
+    return this.service.getById(eventId);
   } //get by id
 
   //update
@@ -123,7 +127,7 @@ export class EventController {
   @ApiResponse({
     status: 200,
     description: 'Event updated successfully',
-    type: EventResponseDto,
+    type: EventSingleResponseDto,
   })
   @ApiResponse({
     status: 400,
@@ -147,10 +151,15 @@ export class EventController {
   })
   updateEvent(
     @CurrentSession() session: SessionData,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) eventId: string,
     @Body() dto: UpdateEventDto,
-  ): Promise<EventResponseDto> {
-    return this.service.updateEvent(session.user.id, id, dto);
+  ): Promise<EventSingleResponseDto> {
+    return this.service.updateEvent(
+      session.user.id,
+      session.user.role,
+      eventId,
+      dto,
+    );
   }
 
   //delete
@@ -183,8 +192,12 @@ export class EventController {
   })
   deleteEvent(
     @CurrentSession() session: SessionData,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) eventId: string,
   ): Promise<DeleteResponseDto> {
-    return this.service.deleteEvent(session.user.id, id);
+    return this.service.deleteEvent(
+      session.user.id,
+      session.user.role,
+      eventId,
+    );
   }
 } //EventController

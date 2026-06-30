@@ -8,7 +8,12 @@ import { and, eq, inArray } from 'drizzle-orm';
 
 import { DatabaseService } from '../db/database.service';
 import type { AppDatabase } from '../db/database.service';
-import { Event, EventsToTimetables, Timetable } from '../entities/index';
+import {
+  Event,
+  EventsToTimetables,
+  Timetable,
+  UserTimetable,
+} from '../entities/index';
 import {
   CreateTimetableDto,
   DeleteTimetableResponseDto,
@@ -29,26 +34,38 @@ export class TimetableService {
       async (tx: AppDatabase) => {
         const [newTimetable] = await tx
           .insert(Timetable)
-          .values({ userID: userId, timetableName: dto.timetableName ?? null })
+          .values({ timetableName: dto.timetableName ?? null })
           .returning();
 
         if (!newTimetable)
           throw new InternalServerErrorException('Timetable was not created');
 
-        const eventIds: number[] = [];
+        const [newUserTimetable] = await tx
+          .insert(UserTimetable)
+          .values({
+            UserID: userId,
+            TimetableID: newTimetable.timetableID,
+          })
+          .returning();
+
+        const eventIds: string[] = [];
 
         if (dto.eventIds?.length) {
-          await this.validateEventIds(tx, userId, dto.eventIds);
-          await tx.insert(EventsToTimetables).values(
-            dto.eventIds.map((eventID) => ({
-              eventID,
-              timetableID: newTimetable.timetableID,
-            })),
-          );
+          await this.validateEventIds(tx, dto.eventIds);
+          await tx
+            .insert(EventsToTimetables)
+            .values(
+              dto.eventIds.map((eventID) => ({
+                eventID,
+                timetableID: newTimetable.timetableID,
+              })),
+            )
+            .onConflictDoNothing();
           eventIds.push(...dto.eventIds);
         }
 
         return {
+          UserTimetableID: newUserTimetable.UserTimetableID,
           timetable: newTimetable,
           ...(eventIds.length ? { eventIds } : {}),
         };
@@ -58,39 +75,60 @@ export class TimetableService {
 
   async getAllTimetables(userId: string): Promise<TimetableListResponseDto> {
     const rows = await this.databaseService.db
-      .select({ timetable: Timetable, eventID: EventsToTimetables.eventID })
-      .from(Timetable)
+      .select({
+        UserTimetable: UserTimetable,
+        timetable: Timetable,
+        eventID: EventsToTimetables.eventID,
+      })
+      .from(UserTimetable)
+      .innerJoin(
+        Timetable,
+        eq(Timetable.timetableID, UserTimetable.TimetableID),
+      )
       .leftJoin(
         EventsToTimetables,
         eq(EventsToTimetables.timetableID, Timetable.timetableID),
       )
-      .where(eq(Timetable.userID, userId));
+      .where(eq(UserTimetable.UserID, userId));
 
-    const map = new Map<number, TimetableResponseDto>();
+    const map = new Map<
+      string,
+      {
+        timetable: typeof Timetable.$inferSelect;
+        UserTimetableID: string;
+        eventIds?: string[];
+      }
+    >();
 
     for (const row of rows) {
       const id = row.timetable.timetableID;
-      if (!map.has(id)) map.set(id, { timetable: row.timetable });
+
+      if (!map.has(id))
+        map.set(id, {
+          timetable: row.timetable,
+          UserTimetableID: row.UserTimetable.UserTimetableID,
+        });
+
       if (row.eventID !== null) {
         const entry = map.get(id)!;
         entry.eventIds = entry.eventIds ?? [];
         entry.eventIds.push(row.eventID);
       }
-    }
+    } //END_row
 
     return { timetables: Array.from(map.values()) };
   } //getAllTimetables
 
   async getTimetableById(
     userId: string,
-    timetableId: number,
+    timetableId: string,
   ): Promise<TimetableResponseDto> {
     return this.fetchTimetableWithEvents(userId, timetableId);
   } //getTimetableById
 
   async updateTimetable(
     userId: string,
-    timetableId: number,
+    timetableId: string,
     dto: UpdateTimetableDto,
   ): Promise<TimetableResponseDto> {
     const hasName = dto.timetableName !== undefined;
@@ -103,13 +141,15 @@ export class TimetableService {
     await this.databaseService.db.transaction(async (tx: AppDatabase) => {
       const [existing] = await tx
         .select()
-        .from(Timetable)
-        .where(
+        .from(UserTimetable)
+        .innerJoin(
+          Timetable,
           and(
+            eq(UserTimetable.TimetableID, Timetable.timetableID),
             eq(Timetable.timetableID, timetableId),
-            eq(Timetable.userID, userId),
           ),
         )
+        .where(eq(UserTimetable.UserID, userId))
         .limit(1);
 
       if (!existing)
@@ -121,12 +161,7 @@ export class TimetableService {
         const [updated] = await tx
           .update(Timetable)
           .set({ timetableName: dto.timetableName! })
-          .where(
-            and(
-              eq(Timetable.timetableID, timetableId),
-              eq(Timetable.userID, userId),
-            ),
-          )
+          .where(eq(Timetable.timetableID, existing.Timetable.timetableID))
           .returning();
 
         if (!updated)
@@ -134,7 +169,7 @@ export class TimetableService {
       }
 
       if (hasAdd) {
-        await this.validateEventIds(tx, userId, dto.addEventIds!);
+        await this.validateEventIds(tx, dto.addEventIds!);
         await tx
           .insert(EventsToTimetables)
           .values(
@@ -163,15 +198,19 @@ export class TimetableService {
 
   async deleteTimetable(
     userId: string,
-    timetableId: number,
+    timetableId: string,
   ): Promise<DeleteTimetableResponseDto> {
     const [existing] = await this.databaseService.db
       .select()
-      .from(Timetable)
+      .from(UserTimetable)
+      .innerJoin(
+        Timetable,
+        eq(UserTimetable.TimetableID, Timetable.timetableID),
+      )
       .where(
         and(
+          eq(UserTimetable.UserID, userId),
           eq(Timetable.timetableID, timetableId),
-          eq(Timetable.userID, userId),
         ),
       )
       .limit(1);
@@ -181,12 +220,7 @@ export class TimetableService {
 
     const [deleted] = await this.databaseService.db
       .delete(Timetable)
-      .where(
-        and(
-          eq(Timetable.timetableID, timetableId),
-          eq(Timetable.userID, userId),
-        ),
-      )
+      .where(eq(Timetable.timetableID, existing.Timetable.timetableID))
       .returning();
 
     if (!deleted)
@@ -197,45 +231,55 @@ export class TimetableService {
 
   private async fetchTimetableWithEvents(
     userId: string,
-    timetableId: number,
+    timetableId: string,
   ): Promise<TimetableResponseDto> {
     const rows = await this.databaseService.db
-      .select({ timetable: Timetable, eventID: EventsToTimetables.eventID })
-      .from(Timetable)
+      .select({
+        UserTimetable: UserTimetable,
+        timetable: Timetable,
+        eventID: EventsToTimetables.eventID,
+      })
+      .from(UserTimetable)
+      .innerJoin(
+        Timetable,
+        eq(Timetable.timetableID, UserTimetable.TimetableID),
+      )
       .leftJoin(
         EventsToTimetables,
         eq(EventsToTimetables.timetableID, Timetable.timetableID),
       )
       .where(
         and(
+          eq(UserTimetable.UserID, userId),
           eq(Timetable.timetableID, timetableId),
-          eq(Timetable.userID, userId),
         ),
       );
 
     if (!rows.length)
       throw new NotFoundException(`Timetable not found for id: ${timetableId}`);
 
+    const UserTT = rows[0].UserTimetable;
     const timetable = rows[0].timetable;
     const eventIds = rows
       .filter((r) => r.eventID !== null)
       .map((r) => r.eventID!);
 
     return {
+      UserTimetableID: UserTT.UserTimetableID,
       timetable,
       ...(eventIds.length ? { eventIds } : {}),
     };
   } //fetchTimetableWithEvents
 
+  //🎅's little helpers
   private async validateEventIds(
     tx: AppDatabase,
-    userId: string,
-    eventIds: number[],
+    eventIds: string[],
   ): Promise<void> {
     const found = await tx
       .select({ eventID: Event.eventID })
       .from(Event)
-      .where(and(inArray(Event.eventID, eventIds), eq(Event.userID, userId)));
+      .where(inArray(Event.eventID, eventIds));
 
     if (found.length !== eventIds.length) {
       const foundSet = new Set(found.map((r) => r.eventID));

@@ -99,11 +99,36 @@ deploy-prod release_tag:
     just prod-up {{release_tag}}
     @echo "Production successfully deployed version {{release_tag}}"
 
-# rollback to specific tag 
-rollback-prod previous_tag:
-    @echo "Rolling back production to version {{previous_tag}}..."
-    just prod-up {{previous_tag}}
-    @echo "Rollback complete. Production is now running {{previous_tag}}"
+# rollback to specific tag
+rollback-prod PREVIOUS_TAG:
+    @echo "Rolling back production to version {{PREVIOUS_TAG}}..."
+    just prod-server-up {{PREVIOUS_TAG}}
+    @echo "Rollback complete. Traefik is routing to {{PREVIOUS_TAG}}"
 
-docs:
-    mkdocs serve
+############################## Backend specific
+
+#Docker cleanup
+dockerClean:
+    phase run -- pnpm --filter backend docker:clean
+
+# generate | example: just generate This_change_to_this_migration
+generate NAME:
+    phase run -- pnpm --filter backend db:generate --name={{NAME}}
+
+# migrate
+migrate:
+    phase run -- pnpm --filter backend db:migrate
+
+# Drizzle studio
+studio:
+    phase run -- pnpm --filter backend db:studio
+
+# Connect to db
+db_sql:
+    docker exec -it umtas-postgres-1 psql -U umtas_dev_user -d umtas_db
+
+#Migration problem solution
+# DROP SCHEMA public CASCADE; CREATE SCHEMA public; then quite
+# then you can delete all migrations and meta from drizzle and regenerate and migrate
+
+############################## END_Backend specific

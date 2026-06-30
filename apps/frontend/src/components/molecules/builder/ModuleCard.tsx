@@ -13,10 +13,10 @@ export interface ModuleErrors {
 
 interface ModuleCardProps {
   module: ModuleResponseDto;
-  onUpdate: (
-    id: number,
-    field: keyof Omit<ModuleResponseDto, "moduleID" | "userID">,
-    value: string,
+  onUpdate: <K extends keyof Omit<ModuleResponseDto, "moduleID" | "userID">>(
+    id: string,
+    field: K,
+    value: ModuleResponseDto[K],
   ) => void;
   errors?: ModuleErrors;
 }
@@ -93,9 +93,15 @@ export function ModuleCard({ module, onUpdate, errors }: ModuleCardProps) {
             Colour
           </Label>
           <ColourPicker
-            value={module.styling || ""}
-            onChange={(colour) => onUpdate(module.moduleID, "styling", colour)}
+            value={module.styling?.colour ?? "var(--border)"}
+            onChange={(colour) =>
+              onUpdate(module.moduleID, "styling", {
+                ...module.styling,
+                colour,
+              })
+            }
           />
+
           {errors?.styling && (
             <p className="text-sm text-[var(--error-text)]">{errors.styling}</p>
           )}

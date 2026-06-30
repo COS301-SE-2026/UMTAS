@@ -19,7 +19,7 @@ export default function CustomiseModulePanel({
         >
           <span
             className="h-3 w-3 rounded-full flex-shrink-0"
-            style={{ backgroundColor: module.styling ?? "transparent" }}
+            style={{ backgroundColor: module.styling?.colour ?? "transparent" }}
           />
           <div className="flex-1 min-w-0">
             <p className="text-base font-medium text-[var(--text-primary)] truncate">

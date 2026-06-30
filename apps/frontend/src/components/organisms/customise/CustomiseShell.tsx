@@ -16,17 +16,17 @@ export default function CustomiseShell({
   events,
   modules,
 }: CustomiseShellProps) {
-  const [selectedModuleId, setSelectedModuleId] = useState<number>(
+  const [selectedModuleId, setSelectedModuleId] = useState<string>(
     modules[0]?.moduleID,
   );
   const activeModule =
     modules.find((m) => m.moduleID === selectedModuleId) || modules[0];
 
-  const [selectedEventId, setSelectedEventId] = useState<number>(
-    events[0]?.event.eventID,
+  const [selectedEventId, setSelectedEventId] = useState<string>(
+    events[0]?.eventID,
   );
   const activeEvent =
-    events.find((e) => e.event.eventID === selectedEventId) || events[0];
+    events.find((e) => e.eventID === selectedEventId) || events[0];
   return (
     <div className="flex flex-row flex-wrap items-start">
       <Card className="w-fit m-6 p-4">
@@ -119,8 +119,8 @@ export default function CustomiseShell({
                 <CustomiseEventPanel
                   event={event}
                   modules={modules}
-                  key={event.event.eventID}
-                  onClick={() => setSelectedEventId(event.event.eventID)}
+                  key={event.eventID}
+                  onClick={() => setSelectedEventId(event.eventID)}
                 />
               ))}
             </div>
@@ -131,10 +131,10 @@ export default function CustomiseShell({
           <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between pb-3 border-b min-w-[320px]">
               <span className="text-sm font-semibold">
-                {activeEvent.event.name}
+                {activeEvent.eventName}
                 {" | "}
                 <span className="font-mono text-xs font-normal text-muted-foreground">
-                  {activeEvent.event.code}
+                  {activeEvent.eventCode}
                 </span>
               </span>
               <div className="flex gap-1.5">
