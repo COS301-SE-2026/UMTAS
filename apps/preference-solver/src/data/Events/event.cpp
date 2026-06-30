@@ -1,5 +1,8 @@
 #include "event.h"
-#include <ctime>
+#include "nlohmann/json.hpp"
+#include <sstream>
+#include <string>
+
 #include <stdexcept>
 static const string GROUPING_KEY = "events";
 const string EventGA::DAY_KEY = "day";
@@ -9,23 +12,42 @@ const string EventGA::EVENT_START = "startTime";
 const string EventGA::EVENT_END = "endTime";
 
 Day dayHelper(string);
+int timeHelper(string);
+bool typeCheckHelper(string key, json &obj);
+
 EventGA::EventGA(json eventsJson) {
-  if (eventsJson.contains(DAY_KEY) && eventsJson[DAY_KEY].is_string()) {
-    this->eventDay = dayHelper(eventsJson[DAY_KEY]);
-  } else {
-    throw std::runtime_error(DAY_KEY + "is not defined or is not a string");
+  try {
+    if (typeCheckHelper(DAY_KEY, eventsJson)) {
+      this->eventDay = dayHelper(eventsJson[DAY_KEY]);
+    }
+
+    if (typeCheckHelper(EVENT_ID, eventsJson)) {
+      this->eventID = eventsJson[EVENT_ID];
+    }
+
+    if (typeCheckHelper(MODULE_CODE, eventsJson)) {
+      this->moduleCode = eventsJson[MODULE_CODE];
+    }
+
+    if (typeCheckHelper(EVENT_START, eventsJson)) {
+      this->event_start = timeHelper(eventsJson[EVENT_START]);
+    }
+    if (typeCheckHelper(EVENT_END, eventsJson)) {
+      this->event_end = timeHelper(eventsJson[EVENT_END]);
+    }
+  } catch (std::runtime_error &e) {
+    throw std::runtime_error(e.what());
   }
-  if (eventsJson.contains(EVENT_ID) && eventsJson[EVENT_ID].is_string()) {
-    this->eventDay = eventsJson[EVENT_ID];
+  this->is_active = false;
+}
+bool typeCheckHelper(string key, json &obj) {
+  if (obj.contains(key) && obj[key].is_string()) {
+    return true;
   } else {
-    throw std::runtime_error(EVENT_ID + "is not defined or is not a string");
-  }
-  if (eventsJson.contains(MODULE_CODE) && eventsJson[MODULE_CODE].is_string()) {
-    this->eventDay = eventsJson[MODULE_CODE];
-  } else {
-    throw std::runtime_error(EVENT_ID + "is not defined or is not a string");
+    throw std::runtime_error(key + "is not defined or is not a string");
   }
 }
+
 Day dayHelper(string day) {
   if (day == "monday") {
     return Day::MONDAY;
@@ -46,17 +68,28 @@ Day dayHelper(string day) {
   }
 }
 
+int timeHelper(const std::string &time) {
+  int hours, minutes;
+  char colon;
+  std::istringstream iss(time);
+  iss >> hours >> colon >> minutes; // time format hh:mm
+  return hours * 60 + minutes;
+}
+
 std::vector<EventGA> EventGA::initArray(json eventJson) {
   std::vector<EventGA> retEvents;
-
-  if (eventJson.is_array()) {
-    for (auto &event : eventJson) {
-      retEvents.push_back(EventGA(event));
+  try {
+    if (eventJson.is_array()) {
+      for (auto &event : eventJson) {
+        retEvents.push_back(EventGA(event));
+      }
+      return retEvents;
+    } else {
+      throw std::runtime_error("key:" + GROUPING_KEY +
+                               " Is not an array init Events");
     }
-    return retEvents;
-  } else {
-    throw std::runtime_error("key:" + GROUPING_KEY +
-                             " Is not an array init Events");
+  } catch (const std::runtime_error &e) {
+    throw std::runtime_error(e.what());
   }
 }
 
