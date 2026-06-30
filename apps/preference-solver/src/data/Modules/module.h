@@ -3,8 +3,10 @@
 using std::cout;
 using std::endl;
 using std::string;
+
 struct ModuleGA {
+  static const string key;
   string moduleCode;
   int number_Occur;
-  ModuleGA();
+  ModuleGA(string json);
 };

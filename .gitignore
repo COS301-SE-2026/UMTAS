@@ -127,3 +127,4 @@ apps/frontend/junit.xml
 
 .pnpm-store/
 apps/preference-solver/compile_commands.json
+apps/preference-solver/.cache/clangd/index/
