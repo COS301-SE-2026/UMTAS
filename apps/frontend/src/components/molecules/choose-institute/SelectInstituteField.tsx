@@ -28,20 +28,22 @@ export function SelectInstituteField({
   onChange,
   onNotSupportedClick,
 }: SelectInstituteFieldProps) {
-  <div className="flex flex-col gap-2">
-    <label htmlFor="institute-select">Select Institute</label>
-    <Select value={value} onValueChange={onChange}>
-      <SelectTrigger id="institute-select">
-        <SelectValue placeholder="Select an institute" />
-      </SelectTrigger>
-      <SelectContent>
-        {institutes.map((institute) => (
-          <SelectItem key={institute.id} value={institute.id}>
-            {institute.name}
-          </SelectItem>
-        ))}
-      </SelectContent>
-      <NotSupportedLink onClick={onNotSupportedClick} />
-    </Select>
-  </div>;
+  return (
+    <div className="flex flex-col gap-2">
+      <label htmlFor="institute-select">Select Institute</label>
+      <Select value={value} onValueChange={onChange}>
+        <SelectTrigger id="institute-select">
+          <SelectValue placeholder="Select an institute" />
+        </SelectTrigger>
+        <SelectContent>
+          {institutes.map((institute) => (
+            <SelectItem key={institute.id} value={institute.id}>
+              {institute.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+        <NotSupportedLink onClick={onNotSupportedClick} />
+      </Select>
+    </div>
+  );
 }

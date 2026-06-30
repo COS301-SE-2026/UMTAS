@@ -5,7 +5,7 @@ import {
 } from "@/components/atoms/baseShadcn/alert";
 
 interface ApprovalStatusProps {
-  status: "approved" | "pending" | "rejected";
+  status: "approved" | "pending" | "rejected" | null;
   universityName: string;
 }
 
