@@ -189,15 +189,15 @@ export function EventCard({
           >
             Venue
           </Label>
-          {/*<Input
-            id={"event-venue-" + event.eventID}
-            value={event.eventCriteria?.venue || ""}
-            onChange={(e) =>
-              onUpdate(event.eventID, "venue", e.target.value)
-            }
-            placeholder="e.g. IT 2-26"
-            className={getInputClass(!!errors?.venue)}
-          />*/}
+          {
+            <Input
+              id={"event-venue-" + event.eventID}
+              value={event.eventCriteria?.venue || ""}
+              onChange={(e) => onUpdate(event.eventID, "venue", e.target.value)}
+              placeholder="e.g. IT 2-26"
+              className={getInputClass(!!errors?.venue)}
+            />
+          }
           {errors?.venue && (
             <p className="text-sm text-[var(--error-text)]">{errors.venue}</p>
           )}

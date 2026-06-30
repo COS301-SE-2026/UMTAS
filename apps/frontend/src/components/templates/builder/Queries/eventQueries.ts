@@ -24,6 +24,7 @@ export function addUniEventMut() {
         body: vars.body,
       });
       console.log("result", await result);
+      return result;
     },
     onSuccess: () => {
       getQueryClient().invalidateQueries({
