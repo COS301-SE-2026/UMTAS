@@ -5,7 +5,7 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 
 import { DatabaseService } from '../db/database.service';
 import { RoleTypeType, University, UniversityRole } from '../entities';
