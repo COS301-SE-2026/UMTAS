@@ -32,6 +32,7 @@ std::vector<ModuleGA> ModuleGA::innitModules(json &modulesArr) {
     }
     return retModules;
   } else {
-    throw std::runtime_error("key:" + GROUPING_KEY + " Is not an array init Modules");
+    throw std::runtime_error("key:" + GROUPING_KEY +
+                             " Is not an array init Modules");
   }
 }

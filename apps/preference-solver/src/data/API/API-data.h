@@ -13,4 +13,5 @@ struct API_DATA {
   std::vector<ModuleGA> modules;
   std::vector<EventGA> events;
   int targetTime;
+  static const string TARGET_TIME_KEY;
 };

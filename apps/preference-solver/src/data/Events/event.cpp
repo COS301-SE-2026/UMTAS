@@ -76,7 +76,7 @@ int timeHelper(const std::string &time) {
   return hours * 60 + minutes;
 }
 
-std::vector<EventGA> EventGA::initArray(json eventJson) {
+std::vector<EventGA> EventGA::initEvents(json eventJson) {
   std::vector<EventGA> retEvents;
   try {
     if (eventJson.is_array()) {
