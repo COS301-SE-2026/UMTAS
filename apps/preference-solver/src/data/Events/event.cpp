@@ -1,7 +1,11 @@
 #include "event.h"
-EventGA::EventGA(string json) {
-    
-}
+const string EventGA::DAY_KEY = "day";
+const string EventGA::EVENT_ID = "eventID";
+const string EventGA::MODULE_CODE = "moduleCode";
+const string EventGA::EVENT_START = "event_start";
+const string EventGA::EVENT_END = "event_end";
+
+EventGA::EventGA(json eventsJson) {}
 
 EventGA &EventGA::operator=(const EventGA &event) {
   if (this == &event) {

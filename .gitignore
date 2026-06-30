@@ -119,12 +119,30 @@ Temporary Items
 # This should not be in ignore so we can share the same journal
 
 working_docs/
+
+
 # Local act secrets
 .secrets
 
+
+
+
+
 .pnpm-store/
+
+
 apps/frontend/junit.xml
 
+<<<<<<< HEAD
 .pnpm-store/
 apps/preference-solver/compile_commands.json
 apps/preference-solver/.cache/clangd/index/
+=======
+
+
+
+
+.pnpm-store/
+.pnpm-store/
+.zed/
+>>>>>>> origin/dev

@@ -17,7 +17,7 @@ export interface ModuleErrors {
 interface ModuleCardProps {
   module: ModuleResponseDto;
   onUpdate: (
-    id: number,
+    id: string,
     field: keyof Omit<ModuleResponseDto, "moduleID" | "userID">,
     value: string,
   ) => void;
@@ -110,7 +110,7 @@ export function CustomiseModuleCard({
             Colour
           </Label>
           <ColourPicker
-            value={module.styling || ""}
+            value={module.styling?.colour || ""}
             onChange={(colour) => onUpdate(module.moduleID, "styling", colour)}
           />
           {errors?.styling && (
