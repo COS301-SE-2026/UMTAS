@@ -20,7 +20,7 @@ import {
   ModuleFiltersDto
 } from './dto/module.dto';
 import { Course, CourseModule,  ModuleEnrollment, University, UniversityRole} from '../entities/index';
-import { CourseService } from 'src/Course/course.service';
+import { CourseService } from '../Course/course.service';
 import { equal } from 'assert';
 
 
@@ -254,6 +254,8 @@ export class ModuleService {
       success: true
     }
   } //delete
+
+  //SUbscribe user to module -> moduleEnrollment
 
 
   

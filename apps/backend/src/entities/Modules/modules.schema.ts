@@ -8,7 +8,6 @@ import {
   integer,
 } from 'drizzle-orm/pg-core';
 import { usersTable } from '../auth';
-import { UserTimetable } from '../timetables';
 import { jsonb } from 'drizzle-orm/pg-core';
 
 export const modules = pgTable('Modules', {

@@ -1,850 +1,195 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import {
-  BadRequestException,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
-import { EventService } from './event.service';
-import { DatabaseService } from '../db/database.service';
-import {
-  EventType,
-  EventCriteriaDto,
-  CreateEventDto,
-  UpdateEventDto,
-} from './dto/EventDto.dto';
+import { Test } from "@nestjs/testing";
 
-const userId = '00000000-0000-0000-0000-000000000000';
+//Constants
+import { userId, moduleId, uniId } from '../Testing/constants.spec';
 
-// Mock factoris - helpers for test data
-function makeEventCriteria(
-  overrides: Partial<EventCriteriaDto> = {},
-): EventCriteriaDto {
-  return {
-    type: undefined,
-    day: 'Monday',
-    startTime: '08:30',
-    endTime: '10:20',
-    ...overrides,
-  };
-}
+//Table imports
+import { Event, UniversityEvent, PersonalEvent, modules } from '../entities/index';
 
-function makeEvent(overrides: Record<string, unknown> = {}) {
-  return {
-    eventID: 1,
-    userID: userId,
-    eventCriteria: makeEventCriteria(),
-    ...overrides,
-  };
-}
+//Actual Service imports
+import { DatabaseService } from "../db/database.service";
+import { EventService } from "./event.service";
+import {ModuleService} from '../Module/module.service';
 
-function makeLecture(overrides: Record<string, unknown> = {}) {
-  return {
-    lectureID: 10,
-    eventID: 1,
-    moduleID: 99,
-    venue: 'Room A',
-    ...overrides,
-  };
-}
+//Mock Database and factories
+import { createMockDatabase } from '../Testing/Mocks/database.mock';
+import { mockDeleteResult, mockInsertResult, mockSelectResult, mockSequentialResults, mockTransaction } from '../Testing/Mocks/database.helpers';
+import {createEvent, createEventVenue, createVenue, createUniversityEvent, createCreateEventDto} from '../Testing/Factories/event.factory';
+import { createMockModuleService } from "../Testing/Factories/module.factory";
+import { createModule } from "../Testing/Factories/module.factory";
+import { EventType } from "./dto/event.types";
+import { UpdateEventDto } from "./dto/EventDto.dto";
 
-function makeModule() {
-  return { moduleID: 99, moduleCode: 'CS101' };
-}
+describe ('EventService', ()=>{
 
-describe('EventService', () => {
   let service: EventService;
-  let dbService: { db: jest.Mocked<any> };
 
-  beforeEach(async () => {
-    dbService = {
-      db: {
-        select: jest.fn(),
-        insert: jest.fn(),
-        update: jest.fn(),
-        delete: jest.fn(),
-        transaction: jest.fn(),
-      },
-    };
-    const module: TestingModule = await Test.createTestingModule({
+  const {mockDb, reset: resetDb} = createMockDatabase();
+  const {mockModuleService, reset: resetModule} = createMockModuleService();
+
+  const existingEvent = createEvent();
+  const resultEvent = { ...existingEvent };
+
+  beforeEach(async ()=>{
+
+    const module = await Test.createTestingModule({
       providers: [
         EventService,
-        { provide: DatabaseService, useValue: dbService },
-      ],
+        {provide: DatabaseService, useValue: {db: mockDb}},
+        {provide: ModuleService, useValue: mockModuleService}
+      ]
     }).compile();
-    service = module.get<EventService>(EventService);
+
+    service = module.get(EventService);
   });
 
-  describe('createEvent', () => {
-    it('should throw BadRequestException when LECTURE type lacks moduleCode', async () => {
-      const dto: CreateEventDto = {
-        eventCriteria: makeEventCriteria({ type: EventType.LECTURE }),
-      };
-      await expect(service.createEvent(userId, dto)).rejects.toThrow(
-        BadRequestException,
-      );
-    });
+  afterEach(()=>{
+    resetDb();
+    resetModule();
+  });
 
-    it('should create generic event successfully', async () => {
-      const newEvent = makeEvent();
-      dbService.db.transaction.mockImplementation(
-        (cb: (tx: any) => Promise<any>) => {
-          // setup mock tx for insert
-          const mckTx = {
-            insert: jest.fn().mockReturnValue({
-              values: jest.fn().mockReturnValue({
-                returning: jest.fn().mockResolvedValue([newEvent]),
-              }),
-            }),
-          };
-          return cb(mckTx);
-        },
-      );
 
-      const dto: CreateEventDto = { eventCriteria: makeEventCriteria() };
-      const result = await service.createEvent(userId, dto);
-      expect(result.event).toEqual(newEvent);
-    });
+  //TESTS
+  //Create
+  describe('Test_CreateEvent', ()=>{
 
-    it('should throw InternalServerErrorException on faild insert', async () => {
-      dbService.db.transaction.mockImplementation(
-        (cb: (tx: any) => Promise<any>) => {
-          const mockTx = {
-            insert: jest.fn().mockReturnValue({
-              values: jest.fn().mockReturnValue({
-                returning: jest.fn().mockResolvedValue([]),
-              }),
-            }),
-          };
-          return cb(mockTx);
-        },
-      );
+    it('should create a simple university event', async ()=>{
 
-      const dto: CreateEventDto = { eventCriteria: makeEventCriteria() };
-      await expect(service.createEvent(userId, dto)).rejects.toThrow(
-        InternalServerErrorException,
-      );
-    });
+      //Arrange
+      const newEvent = createEvent(EventType.UNIVERSITY, {}, {moduleID: moduleId});
+      const createEventDto = createCreateEventDto(newEvent);
 
-    it('should create LECTURE event with module lookup', async () => {
-      const newEvent = makeEvent({
-        eventCriteria: makeEventCriteria({
-          type: EventType.LECTURE,
-          moduleCode: 'CS101',
-        }),
+      const uniEvent = createUniversityEvent({
+        moduleID: moduleId, 
+        eventID: newEvent.eventID});
+      const venue = createVenue({
+        VenueName: newEvent.eventCriteria!.venue
       });
-      const lecture = makeLecture();
-
-      dbService.db.transaction.mockImplementation(
-        (cb: (tx: any) => Promise<any>) => {
-          const mockTx = {
-            insert: jest
-              .fn()
-              .mockReturnValueOnce({
-                values: jest.fn().mockReturnValue({
-                  returning: jest.fn().mockResolvedValue([newEvent]),
-                }),
-              })
-              .mockReturnValueOnce({
-                values: jest.fn().mockReturnValue({
-                  returning: jest.fn().mockResolvedValue([lecture]),
-                }),
-              }),
-            select: jest.fn().mockReturnValue({
-              from: jest.fn().mockReturnValue({
-                where: jest.fn().mockReturnValue({
-                  limit: jest.fn().mockResolvedValue([makeModule()]),
-                }),
-              }),
-            }),
-          };
-          return cb(mockTx);
-        },
-      );
-
-      const dto: CreateEventDto = {
-        eventCriteria: makeEventCriteria({
-          type: EventType.LECTURE,
-          moduleCode: 'CS101',
-        }),
-      };
-      const result = await service.createEvent(userId, dto);
-      expect(result.lecture).toEqual(lecture);
-    });
-
-    it('should throw NotFoundException when module not found', async () => {
-      const newEvent = makeEvent({
-        eventCriteria: makeEventCriteria({
-          type: EventType.LECTURE,
-          moduleCode: 'UNKNOWN',
-        }),
+      const eventVenue = createEventVenue({
+        VenueID: venue.VenueID,
+        EventID: newEvent.eventID
       });
 
-      dbService.db.transaction.mockImplementation(
-        (cb: (tx: any) => Promise<any>) => {
-          const mockTx = {
-            insert: jest.fn().mockReturnValue({
-              values: jest.fn().mockReturnValue({
-                returning: jest.fn().mockResolvedValue([newEvent]),
-              }),
-            }),
-            select: jest.fn().mockReturnValue({
-              from: jest.fn().mockReturnValue({
-                where: jest.fn().mockReturnValue({
-                  limit: jest.fn().mockResolvedValue([]),
-                }),
-              }),
-            }),
-          };
-          return cb(mockTx);
-        },
-      );
+      mockSequentialResults(mockDb.insert, [
+        [newEvent], [uniEvent], [venue], [eventVenue]
+      ]);
+      mockModuleService.getUniForModule?.mockResolvedValue({UniversityID: uniId});
 
-      const dto: CreateEventDto = {
-        eventCriteria: makeEventCriteria({
-          type: EventType.LECTURE,
-          moduleCode: 'UNKNOWN',
-        }),
-      };
-      await expect(service.createEvent(userId, dto)).rejects.toThrow(
-        NotFoundException,
-      );
+
+      const result = await service.create(userId, createEventDto);
+
+      expect(mockDb.insert).toHaveBeenCalledTimes(4);
+      expect(mockModuleService.getUniForModule).toHaveBeenCalledWith(moduleId);
+      expect(result.event).toMatchObject(newEvent);
     });
+  });
 
-    it('should throw BadRequestException for missing eventCriteria', async () => {
-      const dto: CreateEventDto = { eventCriteria: undefined as any };
-      await expect(service.createEvent(userId, dto)).rejects.toThrow(
-        BadRequestException,
-      );
-    });
+  //GetAll
+  describe('Test_GetAllEvents', ()=>{
 
-    it('should throw for lecture insert failure', async () => {
-      const newEvent = makeEvent({
-        eventCriteria: makeEventCriteria({
-          type: EventType.LECTURE,
-          moduleCode: 'code',
-        }),
-      });
+    it('should return all events for module', async ()=>{
 
-      dbService.db.transaction.mockImplementation(
-        (cb: (tx: any) => Promise<any>) => {
-          const mockTx = {
-            insert: jest
-              .fn()
-              .mockReturnValueOnce({
-                values: jest.fn().mockReturnValue({
-                  returning: jest.fn().mockResolvedValue([newEvent]),
-                }),
-              })
-              .mockReturnValueOnce({
-                values: jest.fn().mockReturnValue({
-                  returning: jest.fn().mockResolvedValue([]),
-                }),
-              }), //insert
-
-            select: jest.fn().mockReturnValue({
-              from: jest.fn().mockReturnValue({
-                where: jest.fn().mockReturnValue({
-                  limit: jest.fn().mockResolvedValue([makeModule()]),
-                }),
-              }),
-            }), //seect
-          };
-          return cb(mockTx);
-        },
-      );
-
-      const dto: CreateEventDto = {
-        eventCriteria: makeEventCriteria({
-          type: EventType.LECTURE,
-          moduleCode: 'code',
-        }),
-      };
-
-      await expect(service.createEvent(userId, dto)).rejects.toThrow(
-        InternalServerErrorException,
-      );
-    });
-  }); //createEvent - Done
-
-  describe('getAllEvents', () => {
-    it('should retrun events list', async () => {
-      const rows = [
-        { event: makeEvent({ eventID: 1 }), lecture: makeLecture() },
-        { event: makeEvent({ eventID: 2 }), lecture: null },
+      const type = EventType.UNIVERSITY;
+      const events = [
+        createEvent(type, {}, {moduleID: moduleId}),
+        createEvent(type, {}, {moduleID: moduleId})
       ];
-      dbService.db.select.mockReturnValue({
-        from: jest.fn().mockReturnValue({
-          leftJoin: jest.fn().mockReturnValue({
-            where: jest.fn().mockResolvedValue(rows),
-          }),
-        }),
-      });
 
-      const result = await service.getAllEvents(userId);
-      expect(result.events).toHaveLength(2);
-    });
-  }); //getAll - Done
+      mockSelectResult(mockDb, events);
 
-  describe('getById', () => {
-    it('should throw NotFoundException when event not found', async () => {
-      dbService.db.select.mockReturnValue({
-        from: jest.fn().mockReturnValue({
-          leftJoin: jest.fn().mockReturnValue({
-            where: jest.fn().mockReturnValue({
-              limit: jest.fn().mockResolvedValue([]),
-            }),
-          }),
-        }),
-      });
+      const result = await service.getAllEvents(userId, {moduleId});
 
-      await expect(service.getById(userId, 999)).rejects.toThrow(
-        NotFoundException,
-      );
-    });
-
-    it('should return event with lecture', async () => {
-      const row = { event: makeEvent(), lecture: makeLecture() };
-      dbService.db.select.mockReturnValue({
-        from: jest.fn().mockReturnValue({
-          leftJoin: jest.fn().mockReturnValue({
-            where: jest.fn().mockReturnValue({
-              limit: jest.fn().mockResolvedValue([row]),
-            }),
-          }),
-        }),
-      });
-
-      const result = await service.getById(userId, 1);
-      expect(result.lecture).toEqual(row.lecture);
-    });
-
-    it('should return event without lecture', async () => {
-      const mEvent = makeEvent({ eventID: 1 });
-      const mRow = { event: mEvent, lecture: null };
-
-      dbService.db.select.mockReturnValue({
-        from: jest.fn().mockReturnValue({
-          leftJoin: jest.fn().mockReturnValue({
-            where: jest.fn().mockReturnValue({
-              limit: jest.fn().mockResolvedValue([mRow]),
-            }),
-          }),
-        }),
-      });
-
-      const result = await service.getById(userId, 1);
-      expect(result.event).toBeDefined();
-      expect(result.lecture).toBeUndefined();
-    });
-  }); //getByid - Done
-
-  describe('updateEvent', () => {
-    it('should throw BadRequestException for missing eventCriteria', async () => {
-      await expect(service.updateEvent(userId, 1, {} as any)).rejects.toThrow(
-        BadRequestException,
-      );
-    });
-
-    it('should throw NotFoundExeception when event not found', async () => {
-      dbService.db.transaction.mockImplementation(
-        (cb: (tx: any) => Promise<any>) => {
-          const mockTx = {
-            select: jest.fn().mockReturnValue({
-              from: jest.fn().mockReturnValue({
-                leftJoin: jest.fn().mockReturnValue({
-                  where: jest.fn().mockReturnValue({
-                    limit: jest.fn().mockResolvedValue([]),
-                  }),
-                }),
-              }),
-            }),
-          };
-          return cb(mockTx);
-        },
-      );
-
-      await expect(
-        service.updateEvent(userId, 1, {
-          eventCriteria: { venue: 'Hall B' },
-        }),
-      ).rejects.toThrow(NotFoundException);
-    });
-
-    it('should update event successfuly', async () => {
-      const existingEvent = makeEvent();
-      const updatedEvent = makeEvent({
-        eventCriteria: makeEventCriteria({ venue: 'Lab 2' }),
-      });
-
-      dbService.db.transaction.mockImplementation(
-        (cb: (tx: any) => Promise<any>) => {
-          const mockTx = {
-            select: jest.fn().mockReturnValue({
-              from: jest.fn().mockReturnValue({
-                leftJoin: jest.fn().mockReturnValue({
-                  where: jest.fn().mockReturnValue({
-                    limit: jest
-                      .fn()
-                      .mockResolvedValue([
-                        { event: existingEvent, lecture: null },
-                      ]),
-                  }),
-                }),
-              }),
-            }),
-            update: jest.fn().mockReturnValue({
-              set: jest.fn().mockReturnValue({
-                where: jest.fn().mockReturnValue({
-                  returning: jest.fn().mockResolvedValue([updatedEvent]),
-                }),
-              }),
-            }),
-            delete: jest.fn().mockReturnValue({
-              where: jest.fn().mockResolvedValue([]),
-            }),
-          };
-          return cb(mockTx);
-        },
-      );
-
-      const result = await service.updateEvent(userId, 1, {
-        eventCriteria: { venue: 'Lab 2' },
-      });
-      expect(result.event).toEqual(updatedEvent);
-    });
-
-    it('should throw InternalServerErrorException on failed update', async () => {
-      const existingEvent = makeEvent();
-
-      dbService.db.transaction.mockImplementation(
-        (cb: (tx: any) => Promise<any>) => {
-          const mockTx = {
-            select: jest.fn().mockReturnValue({
-              from: jest.fn().mockReturnValue({
-                leftJoin: jest.fn().mockReturnValue({
-                  where: jest.fn().mockReturnValue({
-                    limit: jest
-                      .fn()
-                      .mockResolvedValue([
-                        { event: existingEvent, lecture: null },
-                      ]),
-                  }),
-                }),
-              }),
-            }),
-            update: jest.fn().mockReturnValue({
-              set: jest.fn().mockReturnValue({
-                where: jest.fn().mockReturnValue({
-                  returning: jest.fn().mockResolvedValue([]),
-                }),
-              }),
-            }),
-          };
-          return cb(mockTx);
-        },
-      );
-
-      await expect(
-        service.updateEvent(userId, 1, {
-          eventCriteria: { venue: 'Somewhere' },
-        }),
-      ).rejects.toThrow(InternalServerErrorException);
-    });
-
-    it('should update name and code with non existing eventCriteria', async () => {
-      const exEvent = makeEvent({ eventCriteria: undefined });
-      const exLecture = null;
-      const updatedEvent = {
-        ...exEvent,
-        eventName: 'NewEventName',
-        eventCode: 'NewCode',
-      };
-
-      //Mock Transaction
-      dbService.db.transaction.mockImplementation(
-        (cb: (tx: any) => Promise<any>) => {
-          const mockTx = {
-            select: jest.fn().mockReturnValue({
-              from: jest.fn().mockReturnValue({
-                leftJoin: jest.fn().mockReturnValue({
-                  where: jest.fn().mockReturnValue({
-                    limit: jest
-                      .fn()
-                      .mockResolvedValue([
-                        { event: exEvent, lecture: exLecture },
-                      ]),
-                  }),
-                }),
-              }),
-            }),
-
-            update: jest.fn().mockReturnValue({
-              set: jest.fn().mockReturnValue({
-                where: jest.fn().mockReturnValue({
-                  returning: jest.fn().mockResolvedValue([updatedEvent]),
-                }),
-              }),
-            }),
-
-            delete: jest.fn(),
-          };
-          return cb(mockTx);
-        },
-      );
-
-      const dto: UpdateEventDto = {
-        name: 'NewEventName',
-        code: 'NewCode',
-      };
-
-      const result = await service.updateEvent(userId, 1, dto);
-
-      expect(result.event.name).toBe('NewEventName');
-      expect(result.event.code).toBe('NewCode');
-    });
-
-    it('should trim to null, delete type if null, update recurring', async () => {
-      const exEvent = makeEvent({
-        eventCriteria: undefined,
-        isRecurring: false,
-      });
-      const exLecture = null;
-      const updatedEvent = {
-        ...exEvent,
-        eventName: null,
-        eventCode: null,
-        isRecurring: true,
-        eventCriteria: {},
-      };
-
-      dbService.db.transaction.mockImplementation(
-        (cb: (tx: any) => Promise<any>) => {
-          const mockTx = {
-            select: jest.fn().mockReturnValue({
-              from: jest.fn().mockReturnValue({
-                leftJoin: jest.fn().mockReturnValue({
-                  where: jest.fn().mockReturnValue({
-                    limit: jest
-                      .fn()
-                      .mockResolvedValue([
-                        { event: exEvent, lecture: exLecture },
-                      ]),
-                  }),
-                }),
-              }),
-            }), //select
-
-            update: jest.fn().mockReturnValue({
-              set: jest.fn().mockImplementation((updateObj) => {
-                expect(updateObj).toEqual({
-                  eventName: null,
-                  eventCode: null,
-                  isRecurring: true,
-                  eventCriteria: {},
-                });
-                return {
-                  where: jest.fn().mockReturnValue({
-                    returning: jest.fn().mockResolvedValue([updatedEvent]),
-                  }),
-                };
-              }),
-            }), //update
-
-            delete: jest.fn().mockReturnValue({
-              where: jest.fn().mockResolvedValue([updatedEvent]),
-            }),
-          };
-          return cb(mockTx);
-        },
-      );
-
-      const dto: UpdateEventDto = {
-        name: '   ',
-        code: '   ',
-        isRecurring: true,
-        eventCriteria: { type: null },
-      };
-
-      const result = await service.updateEvent(userId, 1, dto);
-
-      expect(result.event.name).toBeUndefined();
-      expect(result.event.code).toBeUndefined();
-      expect(result.event.isRecurring).toBe(true);
-    });
-
-    it('should upsert lecture, no pre-existing lecture, insert fail', async () => {
-      const exEvent = makeEvent();
-
-      const runWith = (lectureInsertResult: any[]) => {
-        dbService.db.transaction.mockImplementation(
-          (cb: (tx: any) => Promise<any>) => {
-            let selectCallCount = 0;
-
-            const mockTx = {
-              select: jest.fn().mockImplementation(() => {
-                if (++selectCallCount === 1) {
-                  return {
-                    from: jest.fn().mockReturnValue({
-                      leftJoin: jest.fn().mockReturnValue({
-                        where: jest.fn().mockReturnValue({
-                          limit: jest
-                            .fn()
-                            .mockResolvedValue([
-                              { event: exEvent, lecture: null },
-                            ]),
-                        }),
-                      }),
-                    }),
-                  };
-                }
-                return {
-                  from: jest.fn().mockReturnValue({
-                    where: jest.fn().mockReturnValue({
-                      limit: jest.fn().mockResolvedValue([makeModule()]),
-                    }),
-                  }),
-                };
-              }), //select
-
-              update: jest.fn().mockReturnValue({
-                set: jest.fn().mockReturnValue({
-                  where: jest.fn().mockReturnValue({
-                    returning: jest.fn().mockResolvedValue([exEvent]),
-                  }),
-                }),
-              }), //update
-
-              insert: jest.fn().mockReturnValue({
-                values: jest.fn().mockReturnValue({
-                  returning: jest.fn().mockResolvedValue(lectureInsertResult),
-                }),
-              }),
-            };
-            return cb(mockTx);
-          },
-        );
-      };
-
-      const dto = {
-        eventCriteria: { type: EventType.LECTURE, moduleCode: 'code' },
-      };
-      const newLecture = makeLecture();
-
-      runWith([newLecture]);
-      await expect(service.updateEvent(userId, 1, dto)).resolves.toMatchObject({
-        lecture: newLecture,
-      });
-
-      runWith([]);
-      await expect(service.updateEvent(userId, 1, dto)).rejects.toThrow(
-        InternalServerErrorException,
-      );
-    });
-
-    it('should upsert lecture, pre-existing lecture, update fail', async () => {
-      const exLecture = makeLecture();
-      const exEvent = makeEvent({
-        eventCriteria: makeEventCriteria({
-          type: EventType.LECTURE,
-          moduleCode: 'code',
-        }),
-      });
-
-      const runWith = (lectureUpdateResult: any[]) => {
-        dbService.db.transaction.mockImplementation(
-          (cb: (tx: any) => Promise<any>) => {
-            let selectCallCount = 0;
-
-            const mockTx = {
-              select: jest.fn().mockImplementation(() => {
-                if (++selectCallCount === 1) {
-                  return {
-                    from: jest.fn().mockReturnValue({
-                      leftJoin: jest.fn().mockReturnValue({
-                        where: jest.fn().mockReturnValue({
-                          limit: jest
-                            .fn()
-                            .mockResolvedValue([
-                              { event: exEvent, lecture: exLecture },
-                            ]),
-                        }),
-                      }),
-                    }),
-                  };
-                }
-                return {
-                  from: jest.fn().mockReturnValue({
-                    where: jest.fn().mockReturnValue({
-                      limit: jest.fn().mockResolvedValue([makeModule()]),
-                    }),
-                  }),
-                };
-              }), //select
-
-              update: jest
-                .fn()
-                .mockReturnValueOnce({
-                  set: jest.fn().mockReturnValue({
-                    where: jest.fn().mockReturnValue({
-                      returning: jest.fn().mockResolvedValue([exEvent]),
-                    }),
-                  }),
-                })
-                .mockReturnValueOnce({
-                  set: jest.fn().mockReturnValue({
-                    where: jest.fn().mockReturnValue({
-                      returning: jest
-                        .fn()
-                        .mockResolvedValue(lectureUpdateResult),
-                    }),
-                  }),
-                }), //update
-            };
-
-            return cb(mockTx);
-          },
-        );
-      };
-
-      const dto = {
-        eventCriteria: {
-          type: EventType.LECTURE,
-          moduleCode: 'code',
-          venue: 'Lab 3',
-        },
-      };
-      const updatedLecture = { ...exLecture, venue: 'Lab 3' };
-
-      runWith([updatedLecture]);
-      await expect(service.updateEvent(userId, 1, dto)).resolves.toMatchObject({
-        lecture: updatedLecture,
-      });
-
-      runWith([]);
-      await expect(service.updateEvent(userId, 1, dto)).rejects.toThrow(
-        InternalServerErrorException,
-      );
-    });
-
-    it('should throw NotFoundException if module not found for lecture in upsert', async () => {
-      const exEvent = makeEvent();
-      let selectCallCount = 0;
-
-      dbService.db.transaction.mockImplementation(
-        (cb: (tx: any) => Promise<any>) => {
-          const mockTx = {
-            select: jest.fn().mockImplementation(() => {
-              if (++selectCallCount === 1) {
-                return {
-                  from: jest.fn().mockReturnValue({
-                    leftJoin: jest.fn().mockReturnValue({
-                      where: jest.fn().mockReturnValue({
-                        limit: jest
-                          .fn()
-                          .mockResolvedValue([
-                            { event: exEvent, lecture: null },
-                          ]),
-                      }),
-                    }),
-                  }),
-                };
-              }
-              return {
-                from: jest.fn().mockReturnValue({
-                  where: jest.fn().mockReturnValue({
-                    limit: jest.fn().mockResolvedValue([]),
-                  }),
-                }),
-              };
-            }), //select
-
-            update: jest.fn().mockReturnValue({
-              set: jest.fn().mockReturnValue({
-                where: jest.fn().mockReturnValue({
-                  returning: jest.fn().mockResolvedValue([exEvent]),
-                }),
-              }),
-            }),
-          };
-
-          return cb(mockTx);
-        },
-      );
-
-      await expect(
-        service.updateEvent(userId, 1, {
-          eventCriteria: { type: EventType.LECTURE, moduleCode: 'UNKNOWN' },
-        }),
-      ).rejects.toThrow(NotFoundException);
-    });
-  }); //update
-
-  describe('deleteEvnt', () => {
-    it('should throw NotFoundException when event not found', async () => {
-      dbService.db.select.mockReturnValue({
-        from: jest.fn().mockReturnValue({
-          where: jest.fn().mockReturnValue({
-            limit: jest.fn().mockResolvedValue([]),
-          }),
-        }),
-      });
-
-      await expect(service.deleteEvent(userId, 999)).rejects.toThrow(
-        NotFoundException,
-      );
-    });
-
-    it('should delete event successfully', async () => {
-      const existingEvent = makeEvent();
-      let selectCallCount = 0;
-
-      dbService.db.select.mockImplementation(() => ({
-        from: jest.fn().mockReturnValue({
-          where: jest.fn().mockReturnValue({
-            limit: jest
-              .fn()
-              .mockResolvedValue(
-                selectCallCount++ === 0 ? [existingEvent] : [],
-              ),
-          }),
-        }),
-      }));
-
-      dbService.db.delete.mockReturnValue({
-        where: jest.fn().mockReturnValue({
-          returning: jest.fn().mockResolvedValue([existingEvent]),
-        }),
-      });
-
-      const result = await service.deleteEvent(userId, 1);
-      expect(result).toEqual({ success: true });
-    });
-
-    it('should throw InternalServerErrorException on failed delete', async () => {
-      const existingEvent = makeEvent();
-      let selectCallCount = 0;
-
-      dbService.db.select.mockImplementation(() => ({
-        from: jest.fn().mockReturnValue({
-          where: jest.fn().mockReturnValue({
-            limit: jest
-              .fn()
-              .mockResolvedValue(
-                selectCallCount++ === 0 ? [existingEvent] : [],
-              ),
-          }),
-        }),
-      }));
-
-      dbService.db.delete.mockReturnValue({
-        where: jest.fn().mockReturnValue({
-          returning: jest.fn().mockResolvedValue([]),
-        }),
-      });
-
-      await expect(service.deleteEvent(userId, 1)).rejects.toThrow(
-        InternalServerErrorException,
-      );
+      expect(result).toMatchObject({events});
     });
   });
+
+  //GetById
+  describe('Test_GetEventById', ()=>{
+
+    it('should return event by eventId', async ()=>{
+
+      const event = createEvent();
+
+      mockSelectResult(mockDb, [event]);
+
+      const result = await service.getById(event.eventID);
+
+      expect(result).toMatchObject({event});
+    });
+  });
+
+  //Update
+  describe('Test_UpdateEvent', ()=>{
+
+    it('should update all event fields', async ()=>{
+
+      //Arrange
+      const oldEvent = createEvent();
+      const updateDto: UpdateEventDto = {
+        eventName: 'NewName',
+        eventCode: 'newCode',
+        isRecurring: false,
+        eventCriteria: {
+          date: 'dd-mm-yyyy',
+          startTime: '20:00',
+          endTime: '21:00',
+          venue: 'Chemistry building'
+        }
+      };
+      const updatedEvent = createEvent(EventType.UNIVERSITY, {
+        eventName: updateDto.eventName,
+        eventCode: updateDto.eventCode,
+        isRecurring: updateDto.isRecurring
+      }, {
+        date: updateDto.eventCriteria?.date,
+        startTime: updateDto.eventCriteria?.startTime,
+        endTime: updateDto.eventCriteria?.endTime,
+        venue: updateDto.eventCriteria?.venue
+      });
+
+      mockSelectResult(mockDb, [oldEvent]);
+      
+      mockDb.transaction.mockImplementation(async (callback: any)=>{
+
+        const tx = {
+          update: jest.fn().mockReturnThis(),
+          set: jest.fn().mockReturnThis(),
+          where: jest.fn().mockReturnThis(),
+          returning: jest.fn().mockResolvedValue([updatedEvent])
+        };
+
+        return callback(tx);
+      });
+
+      //Act
+      const result = await service.updateEvent(userId, 'uni_admin', oldEvent.eventID, updateDto);
+
+      //Assert
+      expect(result).toMatchObject({event: updatedEvent});
+    })
+  });
+
+
+  //Delete
+  describe('Test_DeleteEvent', ()=>{
+
+    it('should delete event - admin', async ()=>{
+
+      const event = createEvent();
+
+      mockSelectResult(mockDb, [event]);
+      mockDeleteResult(mockDb, undefined);
+
+      const result = await service.deleteEvent(userId, 'uni_admin', event.eventID);
+
+      //Assert
+      expect(result).toMatchObject({
+        eventName: event.eventName,
+        eventCode: event.eventCode,
+        success: true
+      });
+    });
+  });
+
 });
+

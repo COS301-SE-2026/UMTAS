@@ -10,7 +10,7 @@ import {
 import { eq, and } from 'drizzle-orm';
 
 import { DatabaseService } from '../db/database.service';
-import { University } from 'src/entities';
+import { University } from '../entities';
 import { CreateUniversityDto, UpdateUniversityDto, UniversitySingleResponseDto, UniversityListResponseDto, DeleteUniversityResponseDto } from './dto/university.dto';
 
 @Injectable()
