@@ -9,7 +9,7 @@ import {
   SelectValue,
 } from "@/components/atoms/baseShadcn/select";
 
-const roles = ["Student", "Lecturer", "University_admin"]; //will change with dto
+const roles = ["student", "Lecturer", "University_admin"]; //will change with dto
 
 interface SelectRoleFieldProps {
   value: string; //todo: adjust when willie tells me to

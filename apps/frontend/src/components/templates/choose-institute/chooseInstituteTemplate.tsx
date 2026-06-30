@@ -18,6 +18,7 @@ export function ChooseInstituteTemplate({
 
   function handleSelection(instituteId: string, role: string) {
     router.push(
+      //update to specific route later on
       `/builder?institute=${instituteId.toLowerCase()}&role=${role.toLowerCase()}`,
     );
   }
