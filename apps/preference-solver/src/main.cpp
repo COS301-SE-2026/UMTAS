@@ -1,4 +1,5 @@
 #include "../lib/openGA.hpp"
+#include "data/API/API-data.h"
 /*
 void init_genes(
     EventChromosome &p,
@@ -17,7 +18,8 @@ EventChromosome crossover(
     const EventChromosome &X2,
     const std::function<double(void)> &rnd01);
 
-double calculate_SO_total_fitness(const EA::ChromosomeType<EventChromosome, ChromMiddleCost> &c);
+double calculate_SO_total_fitness(const EA::ChromosomeType<EventChromosome,
+ChromMiddleCost> &c);
 
 void SO_report_generation(
     int generation_number,
@@ -29,7 +31,8 @@ EventChromosome copyChrom;
 int main()
 {
     typedef EA::Genetic<EventChromosome, ChromMiddleCost> GA_type;
-    typedef EA::GenerationType<EventChromosome, ChromMiddleCost> Generation_Type;
+    typedef EA::GenerationType<EventChromosome, ChromMiddleCost>
+Generation_Type;
 
     GA_type gaEngine;
     gaEngine.init_genes = init_genes;
@@ -48,9 +51,8 @@ void init_genes(
     EventChromosome &p,
     const std::function<double(void)> &rnd01)
 {
-    // a variable will be updated to set the chromosome to follow the chosen structure.
-    p = copyChrom;
-    for (auto &event : p.events)
+    // a variable will be updated to set the chromosome to follow the chosen
+structure. p = copyChrom; for (auto &event : p.events)
     {
         if (rnd01() >= 0.5)
         {
@@ -124,7 +126,8 @@ EventChromosome crossover(
     }
     return child;
 }
-double calculate_SO_total_fitness(const EA::ChromosomeType<EventChromosome, ChromMiddleCost> &c)
+double calculate_SO_total_fitness(const EA::ChromosomeType<EventChromosome,
+ChromMiddleCost> &c)
 {
 
     return -c.middle_costs.penalty_score;
@@ -139,6 +142,7 @@ void SO_report_generation(
 }
 */
 
-int main(){
-    
+int main() {
+  string inputData = "";
+  API_DATA data(inputData);
 }
