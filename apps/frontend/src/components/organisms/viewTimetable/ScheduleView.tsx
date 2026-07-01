@@ -254,6 +254,8 @@ export function ScheduleView({
       setOGeventId((timetableRes.eventIds || []).map(String));
       setSelectedEventIds((timetableRes.eventIds || []).map(String));
 
+      setIsGenerating(false);
+
       setViewMode("Generate");
     } catch (error) {
       console.error("edit timetable error", error);
