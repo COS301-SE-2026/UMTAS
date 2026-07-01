@@ -6,7 +6,7 @@ import CustomiseShell from "@/components/organisms/customise/CustomiseShell";
 //some mock data for the static pages
 const mockModules: ModuleResponseDto[] = [
   {
-    moduleID: "2",
+    moduleID: "1",
     moduleCode: "COS301",
     moduleName: "Software Eng",
     styling: { colour: "" },
@@ -18,7 +18,7 @@ const mockModules: ModuleResponseDto[] = [
     styling: { colour: "" },
   },
   {
-    moduleID: "2",
+    moduleID: "3",
     moduleCode: "COS301",
     moduleName: "Software Eng",
     styling: { colour: "" },
@@ -27,7 +27,7 @@ const mockModules: ModuleResponseDto[] = [
 const mockEvents: EventResponse[] = [
   {
     isRecurring: false,
-    eventID: "",
+    eventID: "1",
     eventName: "COS301 Lecture 1",
     eventCode: "301-L1",
     eventCriteria: {
@@ -40,7 +40,7 @@ const mockEvents: EventResponse[] = [
   },
   {
     isRecurring: false,
-    eventID: "",
+    eventID: "2",
     eventName: "COS301 Lecture 1",
     eventCode: "301-L1",
     eventCriteria: {
@@ -53,7 +53,7 @@ const mockEvents: EventResponse[] = [
   },
   {
     isRecurring: false,
-    eventID: "",
+    eventID: "3",
     eventName: "COS301 Lecture 1",
     eventCode: "301-L1",
     eventCriteria: {

@@ -201,17 +201,26 @@ export function WizardShell() {
       );
     }
     return (
-      <GenerateStep
-        modules={modules}
-        events={events}
-        onGenerate={handleGenerate}
-        isGenerating={isGenerating}
-        isEditMode={!!editId}
-        timetableName={timetableName}
-        setTimetableName={setTimetableName}
-        selectedEventIds={selectedEventIds}
-        setSelectedEventIds={setSelectedEventIds}
-      />
+      // <GenerateStep
+      //   modules={modules}
+      //   events={events}
+      //   onGenerate={handleGenerate}
+      //   isGenerating={isGenerating}
+      //   isEditMode={!!editId}
+      //   timetableName={timetableName}
+      //   setTimetableName={setTimetableName}
+      //   selectedEventIds={selectedEventIds}
+      //   setSelectedEventIds={setSelectedEventIds}
+      // />
+      <>
+        <p
+          onClick={() => {
+            router.push("/schedules");
+          }}
+        >
+          Generate step moved to schedules (temp message)
+        </p>
+      </>
     );
   }
 
