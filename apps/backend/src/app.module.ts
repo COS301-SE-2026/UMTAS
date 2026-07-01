@@ -16,6 +16,7 @@ import { TimetableModule } from './Timetable/timetable.module';
 import { UniversityModule } from './University/university.module';
 import { CourseModule } from './Course/course.module';
 import { BuilderModule } from './Builder/builder.module';
+import { AttendanceModule } from './Attendance/attendance.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { BuilderModule } from './Builder/builder.module';
     UniversityModule,
     CourseModule,
     BuilderModule,
+    AttendanceModule,
   ],
   controllers: [AppController, AuthController],
   providers: [
