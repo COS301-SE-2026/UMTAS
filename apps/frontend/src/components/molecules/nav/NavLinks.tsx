@@ -5,6 +5,7 @@ const NAV_ITEMS = [
   { href: "/builder", label: "Build Schedule" },
   { href: "/customise", label: "Customisation" },
   { href: "/schedules", label: "My Schedules" },
+  { href: "/choose-institute", label: "Choose Institute" },
 ] as const;
 
 export function NavLinks() {
