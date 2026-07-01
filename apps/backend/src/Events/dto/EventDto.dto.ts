@@ -1,14 +1,22 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { ValidateNested, IsNotEmpty, IsOptional, IsString, IsUUID, Length, IsBoolean, IsEnum, IsJSON, isUUID } from 'class-validator';
-import {PartialType, PickType, OmitType, IntersectionType} from '@nestjs/swagger';
-import {Type} from 'class-transformer';
+import {
+  ValidateNested,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Length,
+  IsBoolean,
+  IsEnum,
+} from 'class-validator';
+import { PartialType, PickType, OmitType } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import { EventType } from './event.types';
-
 
 //Event Criteria
 export class EventCriteriaDto {
   @ApiPropertyOptional({
-    enum: EventType
+    enum: EventType,
   })
   @IsNotEmpty()
   @IsEnum(EventType)
@@ -29,7 +37,7 @@ export class EventCriteriaDto {
   @ApiProperty({ type: String })
   @IsOptional()
   @IsUUID()
-  moduleID?:string;
+  moduleID?: string;
 
   @ApiPropertyOptional({ example: 'IT 2-26' })
   @IsOptional()
@@ -43,17 +51,16 @@ export class UpdateEventCriteriaDto extends PartialType(EventCriteriaDto) {}
 
 //Base Event class
 export class EventDto {
-
-  @ApiProperty({ 
+  @ApiProperty({
     example: '00000000-0000-0000-0000-000000000000',
-    description: 'Unique identifier for an event'
+    description: 'Unique identifier for an event',
   })
   @IsUUID()
   eventID!: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     type: EventCriteriaDto,
-    description: 'Defines the additional information to attach to event entity'
+    description: 'Defines the additional information to attach to event entity',
   })
   @IsOptional()
   @ValidateNested()
@@ -63,7 +70,7 @@ export class EventDto {
   @ApiPropertyOptional({
     example: 'event name',
     required: true,
-    description: 'Descriptive name for the event'
+    description: 'Descriptive name for the event',
   })
   @IsOptional()
   @IsString()
@@ -78,26 +85,32 @@ export class EventDto {
   @Length(1, 10)
   eventCode?: string | null;
 
-  @ApiPropertyOptional({ 
-    example: true, 
+  @ApiPropertyOptional({
+    example: true,
     type: Boolean,
     default: true,
-    description: 'Is the event recurring or not'
+    description: 'Is the event recurring or not',
   })
   @IsOptional()
   @IsBoolean()
   isRecurring?: boolean;
-}//EventDto
+} //EventDto
 
 //Create Event
-export class CreateEventDto extends PickType(EventDto, ['eventName', 'eventCode', 'eventCriteria', 'isRecurring'] as const) {}
+export class CreateEventDto extends PickType(EventDto, [
+  'eventName',
+  'eventCode',
+  'eventCriteria',
+  'isRecurring',
+] as const) {}
 
 //Update Event
-export class UpdateEventDto extends PartialType(OmitType(EventDto, ['eventID', 'eventCriteria'] as const)) {
-
+export class UpdateEventDto extends PartialType(
+  OmitType(EventDto, ['eventID', 'eventCriteria'] as const),
+) {
   @ApiPropertyOptional({
     type: UpdateEventCriteriaDto,
-    description: 'Partial event criteria for update'
+    description: 'Partial event criteria for update',
   })
   @IsOptional()
   @ValidateNested()
@@ -106,43 +119,42 @@ export class UpdateEventDto extends PartialType(OmitType(EventDto, ['eventID', '
 }
 
 //Responses
-  //Single
-  export class EventSingleResponseDto {
+//Single
+export class EventSingleResponseDto {
+  @ApiProperty({
+    type: EventDto,
+  })
+  event!: EventDto;
+} //EventSingleResponse
 
-    @ApiProperty({
-      type: EventDto,
-    })
-    event!: EventDto;
-  }//EventSingleResponse
-
-  //List
-  export class EventListResponseDto {
-
-    @ApiProperty({
-        type: [EventDto],
-        description: 'List of events'
-    })
-    events!: EventDto[];
-  }
+//List
+export class EventListResponseDto {
+  @ApiProperty({
+    type: [EventDto],
+    description: 'List of events',
+  })
+  events!: EventDto[];
+}
 
 //Delete
-export class DeleteResponseDto extends PickType(EventDto, ['eventName', 'eventCode']) {
-
+export class DeleteResponseDto extends PickType(EventDto, [
+  'eventName',
+  'eventCode',
+]) {
   @ApiProperty({
     example: true,
-    default: true
+    default: true,
   })
   success!: boolean;
 } //DeleteResponseDto
 
 //GetAll filters
 export class EventFiltersDto {
-
   @ApiPropertyOptional({
     description: 'Filter by module ID - returns all events for module',
-    example: '00000000-0000-0000-0000-000000000000'
+    example: '00000000-0000-0000-0000-000000000000',
   })
   @IsOptional()
   @IsUUID()
   moduleId?: string;
-}//ModuleFiltersDto
+} //ModuleFiltersDto

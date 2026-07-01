@@ -7,7 +7,7 @@ import { ModuleService } from 'src/Module/module.service';
 
 @Module({
   controllers: [BuilderController],
-  providers: [BuilderService, UniversityService, CourseService, ModuleService ],
+  providers: [BuilderService, UniversityService, CourseService, ModuleService],
   exports: [BuilderService],
 })
 export class BuilderModule {}

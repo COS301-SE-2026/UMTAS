@@ -76,7 +76,7 @@ describe("Request Builders Integration Tests", () => {
         moduleCode: moduleCode,
         moduleName: "Lifecycle Test Module",
         moduleDescription: "Created by integration test",
-        styling: {colour:""},
+        styling: { colour: "" },
       };
 
       const createResult = await createBuilder.send({ body: mockModule });
@@ -99,7 +99,7 @@ describe("Request Builders Integration Tests", () => {
 
       const updateBody: updateModuleByIdBody = {
         moduleName: "Updated Lifecycle Name",
-        styling: {colour:"00FF"},
+        styling: { colour: "00FF" },
       };
 
       const updateResult = await updateBuilder.send({

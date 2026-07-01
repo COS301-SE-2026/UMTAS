@@ -4,7 +4,6 @@ import {
   Controller,
   Post,
   Get,
-  ParseIntPipe,
   Patch,
   Delete,
   Query,
@@ -91,7 +90,7 @@ export class EventController {
     @Query() filters: EventFiltersDto,
   ): Promise<EventListResponseDto> {
     return this.service.getAllEvents(session.user.id, {
-      moduleId: filters.moduleId
+      moduleId: filters.moduleId,
     });
   } //getAllEvents
 
@@ -153,9 +152,14 @@ export class EventController {
   updateEvent(
     @CurrentSession() session: SessionData,
     @Param('id', ParseUUIDPipe) eventId: string,
-    @Body() dto: UpdateEventDto
+    @Body() dto: UpdateEventDto,
   ): Promise<EventSingleResponseDto> {
-    return this.service.updateEvent(session.user.id, session.user.role, eventId, dto);
+    return this.service.updateEvent(
+      session.user.id,
+      session.user.role,
+      eventId,
+      dto,
+    );
   }
 
   //delete
@@ -188,8 +192,12 @@ export class EventController {
   })
   deleteEvent(
     @CurrentSession() session: SessionData,
-    @Param('id', ParseUUIDPipe) eventId: string
+    @Param('id', ParseUUIDPipe) eventId: string,
   ): Promise<DeleteResponseDto> {
-    return this.service.deleteEvent(session.user.id, session.user.role, eventId);
+    return this.service.deleteEvent(
+      session.user.id,
+      session.user.role,
+      eventId,
+    );
   }
 } //EventController

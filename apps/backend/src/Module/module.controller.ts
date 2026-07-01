@@ -15,10 +15,8 @@ import {
   Param,
   Patch,
   Delete,
-  ParseIntPipe,
   ParseUUIDPipe,
   Query,
-  BadRequestException,
 } from '@nestjs/common';
 import { ApiBody, ApiResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
@@ -34,27 +32,27 @@ export class ModuleController {
   //Create
   @Post()
   @Roles('student', 'uni_admin', 'sys_admin')
-  @ApiOperation({ 
+  @ApiOperation({
     summary: 'Create a module',
-    description: 'Create a new module and link to appropriate course'
-   })
+    description: 'Create a new module and link to appropriate course',
+  })
   @ApiBody({ type: CreateModuleDto })
   @ApiResponse({
     status: 201,
     description: 'Module created successfully',
-    type: ModuleSingleResponseDto
+    type: ModuleSingleResponseDto,
   })
   @ApiResponse({
     status: 400,
-    description: 'Missing or invalid module payload'
+    description: 'Missing or invalid module payload',
   })
   @ApiResponse({
     status: 409,
-    description: 'Module code already exists for course'
+    description: 'Module code already exists for course',
   })
   createModule(
     @CurrentSession() session: SessionData,
-    @Body() dto: CreateModuleDto
+    @Body() dto: CreateModuleDto,
   ) {
     return this.service.create(session.user.id, dto);
   }
@@ -64,24 +62,25 @@ export class ModuleController {
   @Roles('student', 'uni_admin', 'sys_admin')
   @ApiOperation({
     summary: 'Get all modules with filters',
-    description: 'Filter by userId(enrolled) | courseId(course owned) | universityId(modules for university over all courses). At least one filter required'
+    description:
+      'Filter by userId(enrolled) | courseId(course owned) | universityId(modules for university over all courses). At least one filter required',
   })
   @ApiResponse({
     status: 200,
     description: 'Modules returned successfully',
-    type: ModuleListResponseDto
+    type: ModuleListResponseDto,
   })
   @ApiResponse({
     status: 400,
-    description: 'Invalid request - at least one filter required'
+    description: 'Invalid request - at least one filter required',
   })
   @ApiResponse({
     status: 404,
-    description: 'No modules found matching the filters'
+    description: 'No modules found matching the filters',
   })
   getAll(
     @CurrentSession() session: SessionData,
-    @Query() filters: ModuleFiltersDto
+    @Query() filters: ModuleFiltersDto,
   ) {
     return this.service.getAll(session.user.id, filters);
   }
@@ -92,24 +91,24 @@ export class ModuleController {
   @ApiOperation({
     summary: 'Get a module by ID',
     description: 'Return a module from its moduleID',
-    operationId: 'getModuleById'
+    operationId: 'getModuleById',
   })
   @ApiResponse({
     status: 200,
     description: 'Module returned successfully',
-    type: ModuleSingleResponseDto
+    type: ModuleSingleResponseDto,
   })
   @ApiResponse({
     status: 400,
-    description: 'Invalid module ID'
+    description: 'Invalid module ID',
   })
   @ApiResponse({
     status: 404,
-    description: 'Module not found'
+    description: 'Module not found',
   })
   getById(
     @CurrentSession() session: SessionData,
-    @Param('moduleId', ParseUUIDPipe) moduleId: string
+    @Param('moduleId', ParseUUIDPipe) moduleId: string,
   ) {
     return this.service.getById(session.user.id, moduleId);
   }
@@ -119,31 +118,32 @@ export class ModuleController {
   @Roles('student', 'uni_admin', 'sys_admin')
   @ApiOperation({
     summary: 'Update a module',
-    description: 'Update a modules | STUDENT_OWNED needs to go through Builder Service',
-    operationId: 'updateModule'
+    description:
+      'Update a modules | STUDENT_OWNED needs to go through Builder Service',
+    operationId: 'updateModule',
   })
   @ApiBody({ type: UpdateModuleDto })
   @ApiResponse({
     status: 200,
     description: 'Module updated successfully',
-    type: ModuleSingleResponseDto
+    type: ModuleSingleResponseDto,
   })
   @ApiResponse({
     status: 400,
-    description: 'Invalid update payload or module ID'
+    description: 'Invalid update payload or module ID',
   })
   @ApiResponse({
     status: 404,
-    description: 'Module not found'
+    description: 'Module not found',
   })
   @ApiResponse({
     status: 409,
-    description: 'Duplicate module code detected for course'
+    description: 'Duplicate module code detected for course',
   })
   update(
     @CurrentSession() session: SessionData,
     @Param('moduleId', ParseUUIDPipe) moduleId: string,
-    @Body() dto: UpdateModuleDto
+    @Body() dto: UpdateModuleDto,
   ) {
     return this.service.update(session.user.id, moduleId, dto);
   }
@@ -153,25 +153,24 @@ export class ModuleController {
   @Roles('student', 'uni_admin', 'sys_admin')
   @ApiOperation({
     summary: 'Delete a module by ID',
-    description: 'Deletes a module | STUDENT_OWNED needs to go through Builder Service',
-    operationId: 'deleteModule'
+    description:
+      'Deletes a module | STUDENT_OWNED needs to go through Builder Service',
+    operationId: 'deleteModule',
   })
   @ApiResponse({
     status: 200,
     description: 'Module deleted successfully',
-    type: DeleteModuleResponseDto
+    type: DeleteModuleResponseDto,
   })
   @ApiResponse({
     status: 400,
-    description: 'Invalid module ID'
+    description: 'Invalid module ID',
   })
   @ApiResponse({
     status: 404,
-    description: 'Module not found'
+    description: 'Module not found',
   })
-  delete(
-    @Param('moduleId', ParseUUIDPipe) moduleId: string
-  ) {
+  delete(@Param('moduleId', ParseUUIDPipe) moduleId: string) {
     return this.service.deleteById(moduleId);
   }
 } //ModuleController

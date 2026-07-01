@@ -1,7 +1,15 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Plus, Trash2, CheckCircle, Inbox, AlertCircle } from "lucide-react";
+import {
+  Plus,
+  Trash2,
+  CheckCircle,
+  Inbox,
+  AlertCircle,
+  AwardIcon,
+  ArrowUpWideNarrow,
+} from "lucide-react";
 import {
   EventCard,
   type EventErrors,
@@ -125,7 +133,7 @@ export function EventsStep({
   // a local construct to add an empty event
   function addEmptyEvent() {
     const nextNum = Math.round(Math.random() * 1000);
-    getQueryClient().setQueryData(
+    const newEvents = getQueryClient().setQueryData(
       getAllEventsQ().queryKey,
       (oldEvents: EventResponse[] | undefined) => {
         const emptyEvent: EventResponse = {
@@ -143,17 +151,15 @@ export function EventsStep({
         return [...(oldEvents ?? []), emptyEvent];
       },
     );
-  }
 
-  useEffect(() => {
-    if (events) {
-      const mapped = events.map((e) => ({
+    if (newEvents) {
+      const mapped = newEvents.map((e) => ({
         eventID: e.eventID,
-        created: e.eventID.startsWith("TEMP") ? false : true,
+        created: !e.eventID.startsWith("TEMP"),
       }));
       setEventsAdded(mapped);
     }
-  }, [events]);
+  }
 
   const addEvent = useMutation(addUniEventMut());
   const deleteEvent = useMutation(removeEventMut());
@@ -209,7 +215,7 @@ export function EventsStep({
     requestNavigation(doSelect);
   }
 
-  function handleConfirm(id: string) {
+  async function handleConfirm(id: string) {
     const event = events.find((e) => e.eventID === id);
     if (!event) return;
 
@@ -225,11 +231,9 @@ export function EventsStep({
       return next;
     });
 
-    const iscreated = eventsAdded.find(
-      (event) => event.eventID === id,
-    )?.created;
+    const iscreated = eventsAdded.find((event) => event.eventID === id);
 
-    if (iscreated) {
+    if (iscreated?.created) {
       updateEvent.mutate({
         body: {
           isRecurring: false,
@@ -242,8 +246,7 @@ export function EventsStep({
         },
       });
     } else {
-      addEvent.mutate({
-        path: { moduleId: event.eventCriteria.moduleID ||"" },
+      const result = addEvent.mutateAsync({
         body: {
           eventCriteria: event.eventCriteria,
           eventCode: event.eventCode,
@@ -251,6 +254,19 @@ export function EventsStep({
           isRecurring: false,
         },
       });
+      const newID = (await result).event.eventID;
+      if (events) {
+        const mapped = eventsAdded.map((event) => {
+          if (event.eventID === id) {
+            return {
+              eventID: newID,
+              created: true,
+            };
+          }
+          return event;
+        });
+        setEventsAdded(mapped);
+      }
     }
     setIsDirty(false);
     setSelectedId(null);

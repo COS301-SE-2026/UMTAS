@@ -1,10 +1,4 @@
-import {
-  pgTable,
-  varchar,
-  uuid,
-  integer,
-  primaryKey,
-} from 'drizzle-orm/pg-core';
+import { pgTable, varchar, uuid, primaryKey } from 'drizzle-orm/pg-core';
 import { Event } from '../Events';
 import { usersTable } from '../auth';
 

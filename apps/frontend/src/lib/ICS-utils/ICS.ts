@@ -15,29 +15,29 @@ export function generateICS(
   lines.push("X-WR-TIMEZONE:Africa/Johannesburg");
 
   for (const event of events) {
-    const criteria = event.event.eventCriteria;
-    if (!criteria?.day || !criteria?.startTime || !criteria?.endTime) {
+    const criteria = event.eventCriteria;
+    if (!criteria?.date || !criteria?.startTime || !criteria?.endTime) {
       continue;
     }
 
     const lectureModule = modules.find(
-      (m) => m.moduleID === event.lecture?.moduleID,
+      (m) => m.moduleID === event.eventCriteria.moduleID,
     );
     const moduleName = lectureModule ? lectureModule.moduleName : "";
-    const dateStr = criteria.day.replace(/-/g, "");
+    const dateStr = criteria.date.replace(/-/g, "");
     const startStr = criteria.startTime.replace(":", "") + "00";
     const endStr = criteria.endTime.replace(":", "") + "00";
-    const uid = event.event.eventID + "@umtas.vigil";
+    const uid = event.eventID + "@umtas.vigil";
     const isRecurring = false; // Temporarily disabled
 
     lines.push("BEGIN:VEVENT");
     lines.push("UID:" + uid);
     lines.push("DTSTART;TZID=Africa/Johannesburg:" + dateStr + "T" + startStr);
     lines.push("DTEND;TZID=Africa/Johannesburg:" + dateStr + "T" + endStr);
-    lines.push("SUMMARY:" + (criteria.moduleCode || "Event"));
+    lines.push("SUMMARY:" + (criteria.moduleID || "Event"));
     lines.push(
       "DESCRIPTION:" +
-        (criteria.moduleCode || "") +
+        (criteria.moduleID || "") +
         (moduleName ? " - " + moduleName : ""),
     );
 

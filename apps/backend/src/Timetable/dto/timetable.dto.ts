@@ -1,5 +1,4 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
 import {
   IsOptional,
   IsString,
@@ -26,7 +25,7 @@ export class CreateTimetableDto {
   })
   @IsOptional()
   @IsArray()
-  @IsUUID( 'all', { each: true })
+  @IsUUID('all', { each: true })
   @ArrayUnique()
   eventIds?: string[];
 } //CreateTimetableDto
@@ -65,7 +64,7 @@ export class UpdateTimetableDto {
 } //UpdateTimetableDto
 
 export class TimetableDto {
-  @ApiProperty({ example: "someId" })
+  @ApiProperty({ example: 'someId' })
   timetableID!: string;
 
   @ApiPropertyOptional({ example: 'Semester 1', nullable: true })
@@ -73,7 +72,7 @@ export class TimetableDto {
 } //TimetableDto
 
 export class UserTimetableDto {
-  @ApiProperty({ example: "someId" })
+  @ApiProperty({ example: 'someId' })
   timetableID!: string;
 
   @ApiProperty({

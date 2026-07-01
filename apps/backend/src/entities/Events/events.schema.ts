@@ -37,6 +37,3 @@ export const UniversityEvent = pgTable('UniversityEvent', {
     onDelete: 'cascade',
   }),
 });
-
-
-

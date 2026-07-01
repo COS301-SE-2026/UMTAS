@@ -1,10 +1,4 @@
-import {
-  pgTable,
-  uuid,
-  varchar,
-  primaryKey,
-  integer,
-} from 'drizzle-orm/pg-core';
+import { pgTable, uuid, varchar, primaryKey } from 'drizzle-orm/pg-core';
 import { modules } from '../Modules';
 import { University } from './University.schema';
 

@@ -82,7 +82,7 @@ export function ModulesStep({ modules }: ModulesStepProps) {
   ) {
     setIsDirty(true);
     console.log(id, field, value);
-  
+
     getQueryClient().setQueryData(
       getAllModulesQ().queryKey,
       (old?: ModuleResponseDto[]) => {
@@ -137,7 +137,7 @@ export function ModulesStep({ modules }: ModulesStepProps) {
     try {
       updateModule.mutate({
         moduleID: id,
-        module: uniModule
+        module: uniModule,
       });
 
       setErrorMap((prev) => {
@@ -184,7 +184,7 @@ export function ModulesStep({ modules }: ModulesStepProps) {
             <span
               className="h-3 w-3 rounded-full flex-shrink-0"
               style={{
-                backgroundColor: (module?.styling?.colour ) || "var(--border)",
+                backgroundColor: module?.styling?.colour || "var(--border)",
               }}
             />
 

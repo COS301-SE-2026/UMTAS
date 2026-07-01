@@ -11,10 +11,10 @@ import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
 
 interface ModuleFormPanelProps {
   module: ModuleResponseDto;
-  onUpdate: (
-    id: number,
-    field: keyof Omit<ModuleResponseDto, "moduleID" | "userID">,
-    value: string,
+  onUpdate: <K extends keyof Omit<ModuleResponseDto, "moduleID" | "userID">>(
+    id: string,
+    field: K,
+    value: ModuleResponseDto[K],
   ) => void;
   onClose: () => void;
   onDone: () => void;

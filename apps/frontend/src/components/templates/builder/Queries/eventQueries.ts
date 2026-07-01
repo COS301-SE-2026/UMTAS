@@ -1,6 +1,5 @@
 import {
   CreateEventBody,
-  CreateEventPath,
   createEventsBuilder,
   deleteEventById,
   getAllEventsBuilder,
@@ -20,17 +19,12 @@ export function getAllEventsQ() {
 
 export function addUniEventMut() {
   return mutationOptions({
-    mutationFn: async (vars: {
-      path: CreateEventPath;
-      body: CreateEventBody;
-    }) => {
-      console.log("Sent create event request Path", vars.path);
-
+    mutationFn: async (vars: { body: CreateEventBody }) => {
       const result = new createEventsBuilder().send({
-        paths: vars.path,
         body: vars.body,
       });
       console.log("result", await result);
+      return result;
     },
     onSuccess: () => {
       getQueryClient().invalidateQueries({

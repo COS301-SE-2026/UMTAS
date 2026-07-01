@@ -1,22 +1,24 @@
 import {
-  NotFoundException,
-  BadRequestException,
-  ConflictException,
   Injectable,
   InternalServerErrorException,
   ForbiddenException,
-  NotImplementedException,
-  Module
 } from '@nestjs/common';
 import { eq, and } from 'drizzle-orm';
 import { DatabaseService } from '../db/database.service';
 
-import { BuilderListResponseDto, BuilderSingleResponseDto, CreateBuilderModuleDto, UpdateBuilderDto } from './dto/builder.dto';
-import { CreateModuleDto, ModuleSingleResponseDto, ModuleListResponseDto, UpdateModuleDto, DeleteModuleResponseDto } from '../Module/dto/module.dto';
+import {
+  BuilderListResponseDto,
+  BuilderSingleResponseDto,
+  CreateBuilderModuleDto,
+  UpdateBuilderDto,
+} from './dto/builder.dto';
+import {
+  CreateModuleDto,
+  DeleteModuleResponseDto,
+} from '../Module/dto/module.dto';
 import { CourseDto } from 'src/Course/dto/course.dto';
 
-
-import { UniversityRole, Course, CourseModule, modules, ModuleEnrollment, ModuleStyling} from '../entities/index';
+import { UniversityRole, Course, ModuleEnrollment } from '../entities/index';
 
 import { UniversityService } from 'src/University/university.service';
 import { CourseService } from 'src/Course/course.service';
@@ -27,159 +29,185 @@ import { ModuleService } from 'src/Module/module.service';
 // modules defined in this class should belong to user owned university and course
 @Injectable()
 export class BuilderService {
+  constructor(
+    private readonly dbService: DatabaseService,
+    private readonly uniService: UniversityService,
+    private readonly courseService: CourseService,
+    private readonly moduleService: ModuleService,
+  ) {}
 
-    constructor(
-        private readonly dbService: DatabaseService,
-        private readonly uniService: UniversityService,
-        private readonly courseService: CourseService,
-        private readonly moduleService: ModuleService
-    ) {}
+  //Create User Module
+  //Ensure that user defined university + course exists -> create respective module owned by user course
+  async createModule(
+    userId: string,
+    dto: CreateBuilderModuleDto,
+  ): Promise<CreateBuilderModuleDto> {
+    const userCourse = await this.doUserUniCourseCheck(userId);
 
-    //Create User Module
-    //Ensure that user defined university + course exists -> create respective module owned by user course
-    async createModule(userId: string, dto: CreateBuilderModuleDto): Promise<CreateBuilderModuleDto> {
+    //At this stage the user will definitly have a personalised university + course
 
-        const userCourse = await this.doUserUniCourseCheck(userId);
+    //Create module dto mapping
+    const moduleDto: CreateModuleDto = {
+      moduleCode: dto.moduleCode,
+      moduleName: dto.moduleName,
+      courseID: userCourse.CourseID,
+      moduleDescription: dto.moduleDescription,
+      styling: dto.styling,
+    };
 
-        //At this stage the user will definitly have a personalised university + course
+    //Create actual module
+    const module = await this.moduleService.create(userId, moduleDto);
 
-        //Create module dto mapping
-        const moduleDto: CreateModuleDto = {
-            moduleCode: dto.moduleCode,
-            moduleName: dto.moduleName,
-            courseID: userCourse.CourseID,
-          moduleDescription: dto.moduleDescription,
-          styling : dto.styling
-        };
+    //Enroll Student to their module
+    const [enrollment] = await this.dbService.db
+      .insert(ModuleEnrollment)
+      .values({
+        ModuleID: module.moduleID,
+        UserID: userId,
+      })
+      .returning();
 
-        //Create actual module
-        let module = await this.moduleService.create(userId, moduleDto);
-            
-        //Enroll Student to their module
-        const [enrollment] = await this.dbService.db
-            .insert(ModuleEnrollment)
-            .values({
-                ModuleID: module.moduleID,
-                UserID: userId
-            }).returning();
+    if (!enrollment)
+      throw new InternalServerErrorException(
+        `User [${userId}] was not enrolled to module [${module.moduleID}]`,
+      );
 
-        if (!enrollment) throw new InternalServerErrorException(`User [${userId}] was not enrolled to module [${module.moduleID}]`);
+    return {
+      ...module,
+    };
+  } //createModule
 
-        return {
-            ...module
-        };
-    }//createModule
+  //get All USer defined modules
+  async getAllModules(userId: string): Promise<BuilderListResponseDto> {
+    //Get user course
+    const userCourse = await this.doUserUniCourseCheck(userId);
 
-    //get All USer defined modules
-    async getAllModules(userId: string): Promise<BuilderListResponseDto>{
+    const filters = {
+      courseId: userCourse.CourseID,
+    };
 
-        //Get user course
-        const userCourse = await this.doUserUniCourseCheck(userId);
+    const modulesResponse = await this.moduleService.getAll(userId, filters);
 
-        const filters = {
-            courseId: userCourse.CourseID
-        };
+    return modulesResponse;
+  } //END_getAllModules
 
-        const modulesResponse = await this.moduleService.getAll(userId, filters);
+  //Get module by moduleID - no ownership check necessary?
+  async getModuleById(
+    userId: string,
+    moduleId: string,
+  ): Promise<BuilderSingleResponseDto> {
+    return await this.moduleService.getById(userId, moduleId);
+  } //END_getModuleById
 
-        return modulesResponse;
-    }//END_getAllModules
+  //Update
+  //User can modify whatever they want on user owned modules
+  async updateModule(
+    userId: string,
+    moduleId: string,
+    dto: UpdateBuilderDto,
+  ): Promise<BuilderSingleResponseDto> {
+    //IF user doesn't own module -> throw a fit
+    if (!(await this.moduleService.moduleOwnershipCheck(userId, moduleId)))
+      throw new ForbiddenException(
+        `User [${userId}] does not own module [${moduleId}]`,
+      );
 
-    //Get module by moduleID - no ownership check necessary?
-    async getModuleById(userId: string, moduleId: string): Promise<BuilderSingleResponseDto>{
-        
-        return await this.moduleService.getById(userId, moduleId);
-    }//END_getModuleById
+    //Update any field of module if owned by user
+    const module = await this.moduleService.update(userId, moduleId, dto);
 
-    //Update
-    //User can modify whatever they want on user owned modules
-    async updateModule(userId: string, moduleId: string, dto: UpdateBuilderDto): Promise<BuilderSingleResponseDto> {
+    return module;
+  } //END_updateModule
 
-        //IF user doesn't own module -> throw a fit
-        if (!await this.moduleService.moduleOwnershipCheck(userId, moduleId)) 
-            throw new ForbiddenException(`User [${userId}] does not own module [${moduleId}]`);
+  //Delete
+  //User can delete user owned modules
+  async deleteModule(
+    userId: string,
+    moduleId: string,
+  ): Promise<DeleteModuleResponseDto> {
+    //IF user doesn't own module -> throw a fit
+    if (!(await this.moduleService.moduleOwnershipCheck(userId, moduleId)))
+      throw new ForbiddenException(
+        `User [${userId}] does not own module [${moduleId}]`,
+      );
 
-        //Update any field of module if owned by user
-        let module = await this.moduleService.update(userId, moduleId, dto);
+    return this.moduleService.deleteById(moduleId);
+  } //END_deleteModule
 
-        return module;
-    }//END_updateModule
+  //🎅's Little Helpers
 
-    //Delete
-    //User can delete user owned modules
-    async deleteModule(userId: string, moduleId: string): Promise<DeleteModuleResponseDto> {
+  //Check if user has personal uni and course | Return course
+  private async doUserUniCourseCheck(userId: string): Promise<CourseDto> {
+    //Get user university role entry for uniID
+    let [uniRole] = await this.dbService.db
+      .select()
+      .from(UniversityRole)
+      .where(
+        and(
+          eq(UniversityRole.UserID, userId),
+          eq(UniversityRole.role, 'STUDENT_OWNED'),
+        ),
+      )
+      .limit(1);
 
-        //IF user doesn't own module -> throw a fit
-        if (!await this.moduleService.moduleOwnershipCheck(userId, moduleId)) 
-            throw new ForbiddenException(`User [${userId}] does not own module [${moduleId}]`);
+    //If user does not yet have a university role -> this implies they dont have a personalised university
+    if (!uniRole) uniRole = await this.createUserUni(userId);
 
-        return this.moduleService.deleteById(moduleId);
-    }//END_deleteModule
+    //Check for course -> if not found -> create user course
+    let [course] = await this.dbService.db
+      .select()
+      .from(Course)
+      .where(eq(Course.UniversityID, uniRole.UniversityID))
+      .limit(1);
 
+    if (!course)
+      course = await this.createUserCourse(userId, uniRole.UniversityID);
 
+    return course;
+  } //ENDdoUserUniCourseCheck
 
-    //🎅's Little Helpers
+  //Called when user doesn't have a personalised uni to create one
+  private async createUserUni(
+    userId: string,
+  ): Promise<typeof UniversityRole.$inferSelect> {
+    //Create custom university
+    const uniName = `user_${userId.slice(0, 25)}`;
 
-    //Check if user has personal uni and course | Return course
-    private async doUserUniCourseCheck(userId: string): Promise<CourseDto>{
+    //Check if uni already exists
+    let uni = await this.uniService.getByName(uniName);
 
-        //Get user university role entry for uniID
-        let [uniRole] = await this.dbService.db
-            .select()
-            .from(UniversityRole)
-            .where(and(eq(UniversityRole.UserID, userId), eq(UniversityRole.role, 'STUDENT_OWNED')))
-            .limit(1);
+    if (!uni)
+      uni = await this.uniService.create({
+        UniversityName: uniName,
+      });
 
-        //If user does not yet have a university role -> this implies they dont have a personalised university
-        if (!uniRole) uniRole = await this.createUserUni(userId);
+    //Create role linking user to university with STUDENT_OWNED role
+    const [uniRole] = await this.dbService.db
+      .insert(UniversityRole)
+      .values({
+        UserID: userId,
+        UniversityID: uni.UniversityID,
+        role: 'STUDENT_OWNED',
+      })
+      .returning();
 
-        //Check for course -> if not found -> create user course
-        let [course] = await this.dbService.db
-            .select()
-            .from(Course)
-            .where(eq(Course.UniversityID, uniRole.UniversityID)).limit(1);
+    if (!uniRole)
+      throw new InternalServerErrorException(
+        `Failed to create university role for user: ${userId}`,
+      );
 
-        if (!course) course = await this.createUserCourse(userId, uniRole.UniversityID);
+    return uniRole;
+  } //createUserUni
 
-        return course;
-    }//ENDdoUserUniCourseCheck
+  //Called when user has personalised uni but not course for some reason :'(
+  private async createUserCourse(
+    userId: string,
+    uniId: string,
+  ): Promise<CourseDto> {
+    const course = await this.courseService.create({
+      CourseName: `user_${userId.slice(0, 25)}`,
+      UniversityID: uniId,
+    });
 
-    //Called when user doesn't have a personalised uni to create one
-    private async createUserUni(userId: string): Promise<typeof UniversityRole.$inferSelect>{
-
-        //Create custom university
-        const uniName = `user_${userId.slice(0, 25)}`;
-
-        //Check if uni already exists
-        let uni = await this.uniService.getByName(uniName);
-
-        if (!uni)
-            uni = await this.uniService.create({
-                UniversityName: uniName
-            });
-
-        //Create role linking user to university with STUDENT_OWNED role
-        const [uniRole] = await this.dbService.db
-            .insert(UniversityRole)
-            .values({
-                UserID: userId,
-                UniversityID: uni.UniversityID,
-                role: 'STUDENT_OWNED'
-            }).returning();
-
-        if (!uniRole) throw new InternalServerErrorException(`Failed to create university role for user: ${userId}`);
-
-        return uniRole;
-    }//createUserUni
-
-    //Called when user has personalised uni but not course for some reason :'(
-    private async createUserCourse(userId: string, uniId: string): Promise<CourseDto> {
-
-        const course = await this.courseService.create({
-            CourseName: `user_${userId.slice(0, 25)}`,
-            UniversityID: uniId
-        });
-
-        return course;
-    }//END_createUserCourse
-}//BuilderService
+    return course;
+  } //END_createUserCourse
+} //BuilderService

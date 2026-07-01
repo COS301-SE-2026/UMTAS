@@ -68,9 +68,9 @@ export function ScheduleView({
 
   useEffect(() => {
     if (timetables.length > 0 && !selectedTimetableId) {
-      setSelectedTimetableId(
-        String(timetables[timetables.length - 1].timetable.timetableID),
-      );
+      // setSelectedTimetableId(
+      // String(timetables[timetables.length - 1].timetable.timetableID),
+      //);
     }
   }, [timetables, selectedTimetableId]);
   const { events, modules } = useMemo(() => {
