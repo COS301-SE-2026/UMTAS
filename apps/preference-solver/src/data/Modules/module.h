@@ -10,14 +10,14 @@ using std::string;
 struct ModuleGA {
   static const string GROUPING_KEY;
   static const string MODULE_CODE_KEY;
-  static const string OCCURENCE_KEY;
+  static const string OCCUR_ARRAY_KEY;
   static const string TYPE_KEY;
   static const string OCCUR_KEY;
   string moduleCode;
   // hash map for the number of occurences for each type of event
   std::unordered_map<string, int> number_Occur;
-  ModuleGA(json module);
+  ModuleGA(const json& module);
   static std::vector<ModuleGA> innitModules(const json &modulesArr);
   // sets the number of occurences for a module specifcally a type
-  void handleOccurences(json types);
+  void handleOccurences(const json& types);
 };
