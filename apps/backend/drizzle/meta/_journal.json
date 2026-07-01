@@ -43,6 +43,13 @@
       "when": 1782835206554,
       "tag": "0005_UPDATED_EVENT_ATTENDANCE_TABLE_TO_HAVE_PRIMARYKEY",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1782905287580,
+      "tag": "0006_elite_talon",
+      "breakpoints": true
     }
   ]
 }
