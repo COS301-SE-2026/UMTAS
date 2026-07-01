@@ -1,5 +1,6 @@
 #include "GA.h"
 #include "../../lib/openGA.hpp"
+#include <string>
 #include <unordered_map>
 
 std::unordered_map<string, int> modulesMap;
@@ -14,7 +15,20 @@ EventChromosome copyChrom;
 GA_Handler::GA_Handler(API_DATA data) {
   this->initData = data;
   copyChrom = EventChromosome(data);
+  InitMap();
   InitGA();
+}
+void GA_Handler::InitMap() {
+  for (ModuleGA module : this->initData.modules) {
+    for (auto &itr : modulesMap) {
+      string key = module.moduleCode + ":" + itr.first;
+      // key events can easily access
+      int val = itr.second;
+
+      modulesMap.insert({key, val});
+      tempMap.insert({key, 0}); // will be be changed individually.
+    }
+  }
 }
 void GA_Handler::InitGA() {
 
@@ -51,7 +65,6 @@ void init_genes(EventChromosome &p, const std::function<double(void)> &rnd01) {
     }
   }
 }
-
 
 EventChromosome mutate(const EventChromosome &p,
                        const std::function<double(void)> &rnd01,
@@ -100,18 +113,31 @@ EventChromosome crossover(const EventChromosome &X1, const EventChromosome &X2,
   return child;
 }
 
+bool eval_solution(const EventChromosome &p, ChromMiddleCost &c) {
+  // this is our function that disallows non functioning solutions
+  // May be useful may not be it depends
+  // IF we only allow valid solutions -> GA may stall
+  // IF we allow bad ones -> could mutate into good solution
+  // CURRENT PLAN -> remove invalid ones being C(n) & P(n)
+}
+
 double calculate_SO_total_fitness(
     const EA::ChromosomeType<EventChromosome, ChromMiddleCost> &c) {
-        // this is our heuristic
-    }
-bool eval_solution(const EventChromosome &p, ChromMiddleCost &c) {
-    // this is our function that disallows non functioning solutions
-    // May be useful may not be it depends
-    // IF we only allow valid solutions -> GA may stall 
-    // IF we allow bad ones -> could mutate into good solution
+  // this is our heuristic
+  // O(n) & V(n)
+  // V(n) -> gives us the actual heuristic
+  // O(n) -> decreases value based on number of conflicts
+
+  // IDEA
+  // V(n) -> gives a double
+  // O(n) -> gives an int for number of collisions
+  // O(n) * V(n) -> higher score
+  // This function in GA minimises.
 }
-    
+
 void SO_report_generation(
     int generation_number,
     const EA::GenerationType<EventChromosome, ChromMiddleCost> &last_generation,
     const EventChromosome &best_genes) {}
+
+bool CountPattern(EventChromosome chrom) {}

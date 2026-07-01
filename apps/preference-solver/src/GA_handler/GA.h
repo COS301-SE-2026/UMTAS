@@ -8,6 +8,7 @@ private:
   API_DATA initData;
   GA_type gaEngine;
   void InitGA();
+  void InitMap();
 
 public:
   GA_Handler(API_DATA);
