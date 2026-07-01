@@ -147,7 +147,7 @@ export function GenerateStep({
               >
                 <div className="flex flex-col gap-1 flex-1 min-w-0">
                   <p className="text-base font-medium text-[var(--text-primary)]">
-                    {criteria?.moduleID || "Event"}
+                    {event.eventName || "Event"}
                   </p>
                   <div className="flex flex-wrap items-center gap-2">
                     {criteria?.date && (
