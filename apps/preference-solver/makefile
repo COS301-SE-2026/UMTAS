@@ -4,6 +4,7 @@ LIB_DIR := lib
 
 CXX := g++ -std=c++17
 CFLAGS :=  -I $(LIB_DIR)
+LDFLAGS := -Wl,--allow-multiple-definition
 
 
 SRC_FILES := $(wildcard $(SRC_DIR)/*.cpp)\
@@ -12,6 +13,7 @@ SRC_FILES := $(wildcard $(SRC_DIR)/*.cpp)\
 			 $(wildcard $(SRC_DIR)/data/GA-data/*.cpp)\
 			 $(wildcard $(SRC_DIR)/data/Modules/*.cpp)\
 			 $(wildcard $(SRC_DIR)/filecreator/*.cpp)\
+			 $(wildcard $(SRC_DIR)/GA_handler/*.cpp)\
 				
 OBJS := $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SRC_FILES))
 
@@ -27,7 +29,7 @@ all :$(TARGET)
 
 $(TARGET):$(OBJS)
 	@mkdir -p $(BUILD_DIR)
-	$(CXX) $(CFLAGS) -o $@ $^
+	$(CXX) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
 	@mkdir -p $(dir $@)

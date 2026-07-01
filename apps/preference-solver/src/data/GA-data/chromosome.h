@@ -7,8 +7,7 @@ struct EventChromosome {
   int numCollision = 0;
   EventChromosome() {};
   EventChromosome(API_DATA &data);
-  EventChromosome(const EventChromosome &chrom);
-  EventChromosome &operator=(const EventChromosome &chrom);
+
 };
 struct ChromMiddleCost {
   double penalty_score = 0;

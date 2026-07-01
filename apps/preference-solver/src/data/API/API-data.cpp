@@ -32,7 +32,7 @@ API_DATA::API_DATA(const json &reqData) {
     else
       throw std::runtime_error(TARGET_TIME_KEY +
                                " is not defined or is not an integer");
-
+    
   } catch (const json::parse_error &e) {
     // this is for errors casued by library misuse
     throw std::runtime_error(string("Json error: ") + e.what());
