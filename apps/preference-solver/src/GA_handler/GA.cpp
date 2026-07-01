@@ -3,6 +3,8 @@
 #include <cmath>
 #include <cstdlib>
 #include <filesystem>
+#include <iostream>
+#include <ostream>
 #include <sstream>
 #include <unordered_map>
 #include <vector>
@@ -255,4 +257,11 @@ void resetCollision() {
 void SO_report_generation(
     int generation_number,
     const EA::GenerationType<EventChromosome, ChromMiddleCost> &last_generation,
-    const EventChromosome &best_genes) {}
+    const EventChromosome &best_genes) {
+  auto &bestChrom =
+      last_generation.chromosomes[last_generation.best_chromosome_index];
+
+  std::cout << "Generation" << generation_number << std::endl;
+  std::cout << "Best fitness" << bestChrom.total_cost;
+  std::cout << "Collisions" << bestChrom.genes.numCollision;
+}
