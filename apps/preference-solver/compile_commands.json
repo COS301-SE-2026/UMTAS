@@ -1,0 +1,16 @@
+[
+  {
+    "file": "src/main.cpp",
+    "arguments": [
+      "/usr/bin/g++",
+      "-I",
+      "lib",
+      "-c",
+      "src/main.cpp",
+      "-o",
+      "build/main.o"
+    ],
+    "directory": "/home/smiwil/Documents/UMTAS/apps/preference-solver",
+    "output": "build/main.o"
+  }
+]

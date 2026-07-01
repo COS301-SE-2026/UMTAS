@@ -18,13 +18,14 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "test": "jest",
+    "test": "clear && jest",
     "test:int": "docker compose -f ./docker-compose.int.yml up --build --abort-on-container-exit --exit-code-from backend-int",
     "test:int:local": "NODE_OPTIONS=--experimental-vm-modules jest --config jest.int.config.ts --runInBand",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "docker:clean": "docker-compose down -v && docker network prune -f"
   },
   "dependencies": {
     "@better-auth/redis-storage": "^1.6.11",

@@ -75,6 +75,14 @@ nav:
   - Design Specifications:
       - 4.2.1 Brand Style: design/Brand-Style.md
       - 4.2.2 Wireframes: design/Wireframes.md
+  - DevOps & Deployment:
+      - Live Accessible System: DevOps/LiveAccesibleSystem.md
+      - Environment Parity: DevOps/EnvironmentParity.md
+      - Infrastructure As Code: DevOps/InfrastructureAsCode.md
+      - Secrets Management: DevOps/SecretsManagement.md
+      - Rollback Strategy: DevOps/RollBackStrategy.md
+      - Deployment Diagram: DevOps/DeploymentDiagram.md
+      - Pipeline Diagram: DevOps/PipelineDiagram.md
   - API Reference: api/API-Reference.md
   - Developer Portal:
       - Overview: developer-guides/index.md
