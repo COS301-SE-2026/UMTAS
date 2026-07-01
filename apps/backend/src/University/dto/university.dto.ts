@@ -1,6 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsUUID, Length } from 'class-validator';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Length,
+} from 'class-validator';
 import { PartialType, PickType, OmitType } from '@nestjs/swagger';
+import { RoleType, RoleTypeType } from '../../entities/index';
 
 export class UniversityDto {
   @ApiProperty({
@@ -21,6 +29,16 @@ export class UniversityDto {
   @IsString()
   @Length(2, 30)
   UniversityName!: string;
+
+  @ApiProperty({
+    enum: RoleType.enumValues,
+    example: 'STUDENT',
+    description: 'Role current user has for university',
+    required: false,
+  })
+  @IsOptional()
+  @IsEnum(RoleType.enumValues)
+  role?: RoleTypeType | null;
 } //UniversityDto
 
 //Create
@@ -30,7 +48,7 @@ export class CreateUniversityDto extends PickType(UniversityDto, [
 
 //Update
 export class UpdateUniversityDto extends PartialType(
-  OmitType(UniversityDto, ['UniversityID'] as const),
+  OmitType(UniversityDto, ['UniversityID', 'role'] as const),
 ) {}
 
 //Response
@@ -49,6 +67,31 @@ export class UniversityListResponseDto {
 //Delete
 export class DeleteUniversityResponseDto extends PickType(UniversityDto, [
   'UniversityName',
+]) {
+  @ApiProperty({ example: true })
+  success!: boolean;
+}
+
+//Apply for uni role
+export class ApplyForUniRoleDto extends PickType(UniversityDto, [
+  'UniversityID',
+  'role',
+]) {}
+
+//Approve users role
+export class ApproveUsersRoleDto extends PickType(UniversityDto, [
+  'UniversityID',
+]) {
+  @ApiProperty({
+    example: '00000000-0000-0000-0000-000000000000',
+    required: true,
+  })
+  @IsUUID()
+  userId!: string;
+}
+
+export class ApprovedUserRoleResponse extends PickType(ApproveUsersRoleDto, [
+  'userId',
 ]) {
   @ApiProperty({ example: true })
   success!: boolean;
