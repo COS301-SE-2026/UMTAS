@@ -1,38 +1,17 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { WizardStepper } from "@/components/atoms/builder/WizardStepper";
 import { WizardFooter } from "@/components/atoms/builder/WizardFooter";
 import { ModulesStep } from "@/components/organisms/builder/ModulesStep";
 import { EventsStep } from "@/components/organisms/builder/EventsStep";
-import { GenerateStep } from "@/components/organisms/builder/GenerateStep";
-
-import {
-  addTimetableMut,
-  updateTimetableMut,
-  getTimetableByIdQ,
-} from "./Queries/timetableQueries";
-import { useMutation } from "@tanstack/react-query";
 
 import { getAllModulesQ } from "./Queries/moduleQueries";
-import { getQueryClient } from "@/components/tanstack/getQueryClient";
 import { useQuery } from "@tanstack/react-query";
 import { getAllEventsQ } from "./Queries/eventQueries";
 
-const Steps = [
-  { label: "Modules" },
-  { label: "Events" },
-  { label: "Generate" },
-];
-
-function generateId(): string {
-  const crypto = window.crypto;
-  const array = new Uint32Array(1);
-  crypto.getRandomValues(array);
-
-  return array[0].toString();
-}
+const Steps = [{ label: "Modules" }, { label: "Events" }];
 
 export function WizardShell() {
   const router = useRouter();
@@ -47,21 +26,20 @@ export function WizardShell() {
     isError: modError,
   } = useQuery(getAllModulesQ());
   const { data: events = [] } = useQuery(getAllEventsQ());
-  const { mutateAsync: addTimetable } = useMutation(addTimetableMut());
-  const { mutateAsync: updateTimetable } = useMutation(updateTimetableMut());
-
-  const [isGenerating, setIsGenerating] = useState(false);
 
   const [isInitialLoading, setIsInitialLoading] = useState(!!editId);
-  const [selectedEventIds, setSelectedEventIds] = useState<string[]>([]);
-  const [OGeventId, setOGeventId] = useState<string[]>([]);
-  const [timetableName, setTimetableName] = useState("My New Schedule");
 
   function handleStepClick(index: number) {
     setCurrentStep(index);
   }
 
   function handleNext() {
+    if (currentStep === Steps.length - 1) {
+      //how we track between pages
+      router.push("/schedules?action=new");
+      return;
+    }
+
     if (currentStep < Steps.length - 1) {
       setCompletedSteps((prev) => {
         if (prev.includes(currentStep)) {
@@ -78,47 +56,10 @@ export function WizardShell() {
       setCurrentStep(currentStep - 1);
     }
   }
-  async function handleGenerate(name: string, selectedEventIds: string[]) {
-    setIsGenerating(true);
-    try {
-      const finalEvents = selectedEventIds.map((id) => id);
-
-      if (editId) {
-        const noNumIds = OGeventId.filter(
-          (id) => !selectedEventIds.includes(id),
-        );
-
-        const numbersOnlyAddIds = selectedEventIds.filter(
-          (id) => !OGeventId.includes(id),
-        );
-
-        await updateTimetable({
-          path: { id: editId },
-          body: {
-            timetableName: name || "Updated Schedule",
-            removeEventIds: noNumIds,
-            addEventIds: numbersOnlyAddIds,
-          },
-        });
-      } else {
-        await addTimetable({
-          body: {
-            timetableName: name || "Generated Schedule",
-            eventIds: finalEvents,
-          },
-        });
-      }
-
-      router.push("/schedules");
-    } catch (error) {
-      console.error("Failed to generate timetable:", error);
-      setIsGenerating(false);
-    }
-  }
 
   function getNextLabel() {
     if (currentStep === 0) return "Next: Events";
-    if (currentStep === 1) return "Next: Generate";
+    if (currentStep === 1) return "Create Timetable";
     return "Generate";
   }
 
@@ -155,38 +96,6 @@ export function WizardShell() {
   }
   */
 
-  useEffect(() => {
-    if (!editId) return;
-
-    async function loadAllEditData() {
-      try {
-        const queryClient = getQueryClient();
-
-        const [timetableRes, modulesData, eventsData] = await Promise.all([
-          queryClient.fetchQuery(getTimetableByIdQ(editId!)),
-          queryClient.fetchQuery(getAllModulesQ()),
-          queryClient.fetchQuery(getAllEventsQ()),
-        ]);
-
-        setTimetableName(
-          timetableRes.timetable.timetableName || "Updated Schedule",
-        );
-
-        setOGeventId((timetableRes.eventIds || []).map(String));
-        setSelectedEventIds((timetableRes.eventIds || []).map(String));
-
-        setCompletedSteps([0, 1]);
-        setCurrentStep(2);
-      } catch (error) {
-        console.error("Failed to load timetable dataset for editing:", error);
-      } finally {
-        setIsInitialLoading(false);
-      }
-    }
-
-    loadAllEditData();
-  }, [editId]);
-
   function renderStep() {
     if (currentStep === 0) {
       return <ModulesStep modules={modules} />;
@@ -201,24 +110,14 @@ export function WizardShell() {
       );
     }
     return (
-      // <GenerateStep
-      //   modules={modules}
-      //   events={events}
-      //   onGenerate={handleGenerate}
-      //   isGenerating={isGenerating}
-      //   isEditMode={!!editId}
-      //   timetableName={timetableName}
-      //   setTimetableName={setTimetableName}
-      //   selectedEventIds={selectedEventIds}
-      //   setSelectedEventIds={setSelectedEventIds}
-      // />
       <>
         <p
           onClick={() => {
             router.push("/schedules");
           }}
         >
-          Generate step moved to schedules (temp message)
+          Generate step moved to schedules (temp message, this should not be
+          visible)
         </p>
       </>
     );
