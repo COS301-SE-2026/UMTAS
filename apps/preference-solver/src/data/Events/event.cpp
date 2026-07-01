@@ -4,7 +4,7 @@
 #include <string>
 
 #include <stdexcept>
-static const string GROUPING_KEY = "events";
+const string EventGA::GROUPING_KEY = "events";
 const string EventGA::DAY_KEY = "day";
 const string EventGA::EVENT_ID = "eventID";
 const string EventGA::MODULE_CODE = "moduleCode";
@@ -12,7 +12,7 @@ const string EventGA::EVENT_START = "startTime";
 const string EventGA::EVENT_END = "endTime";
 const string EventGA::EVENT_TYPE = "EventType";
 
-int timeHelper(string);
+int timeHelper(const std::string &);
 bool typeCheckHelper(string key, json &obj);
 
 EventGA::EventGA(json eventsJson) {
@@ -85,7 +85,7 @@ bool typeCheckHelper(string key, json &obj) {
   }
 }
 
-int timeHelper(const std::string &time) {
+int timeHelper(const string &time) {
   int hours, minutes;
   char colon;
   std::istringstream iss(time);

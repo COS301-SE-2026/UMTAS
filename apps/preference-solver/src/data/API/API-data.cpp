@@ -4,15 +4,30 @@
 
 const string API_DATA::TARGET_TIME_KEY = "targetTime";
 
-API_DATA::API_DATA(const json& reqData) {
+API_DATA::API_DATA(const json &reqData) {
+  if (reqData.empty()) {
+    throw std::runtime_error("Input json is empty");
+  }
+
   try {
-    this->modules =
-        ModuleGA::innitModules(reqData[ModuleGA::GROUPING_KEY].get<json>());
+    if (reqData.contains(ModuleGA::GROUPING_KEY) &&
+        reqData[ModuleGA::GROUPING_KEY].is_array())
+      this->modules = ModuleGA::innitModules(reqData[ModuleGA::GROUPING_KEY]);
+    else {
+      throw std::runtime_error("Key: " + ModuleGA::GROUPING_KEY +
+                               " is not provided or is not an array");
+    }
 
-    this->events =
-        EventGA::initEvents(reqData[EventGA::GROUPING_KEY].get<json>());
+    if (reqData.contains(EventGA::GROUPING_KEY) &&
+        reqData[EventGA::GROUPING_KEY].is_array())
+      this->events = EventGA::initEvents(reqData[EventGA::GROUPING_KEY]);
+    else {
+      throw std::runtime_error("Key: " + EventGA::GROUPING_KEY +
+                               " is not provided or is not an array");
+    }
 
-    if (reqData.contains(TARGET_TIME_KEY) && reqData.is_number_integer())
+    if (reqData.contains(TARGET_TIME_KEY) &&
+        reqData[TARGET_TIME_KEY].is_number_integer())
       this->targetTime = reqData[TARGET_TIME_KEY].get<int>();
     else
       throw std::runtime_error(TARGET_TIME_KEY +

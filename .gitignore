@@ -146,3 +146,5 @@ apps/preference-solver/.cache/clangd/index/
 .pnpm-store/
 .zed/
 >>>>>>> origin/dev
+apps/preference-solver/GA_TEST_DIR/
+apps/preference-solver/GA_BIN

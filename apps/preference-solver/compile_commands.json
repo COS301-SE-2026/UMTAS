@@ -15,6 +15,51 @@
     "output": "build/main.o"
   },
   {
+    "file": "src/data/API/API-data.cpp",
+    "arguments": [
+      "/usr/bin/g++",
+      "-std=c++17",
+      "-I",
+      "lib",
+      "-c",
+      "src/data/API/API-data.cpp",
+      "-o",
+      "build/data/API/API-data.o"
+    ],
+    "directory": "/home/smiwil/Documents/UMTAS/apps/preference-solver",
+    "output": "build/data/API/API-data.o"
+  },
+  {
+    "file": "src/data/Events/event.cpp",
+    "arguments": [
+      "/usr/bin/g++",
+      "-std=c++17",
+      "-I",
+      "lib",
+      "-c",
+      "src/data/Events/event.cpp",
+      "-o",
+      "build/data/Events/event.o"
+    ],
+    "directory": "/home/smiwil/Documents/UMTAS/apps/preference-solver",
+    "output": "build/data/Events/event.o"
+  },
+  {
+    "file": "src/data/Modules/module.cpp",
+    "arguments": [
+      "/usr/bin/g++",
+      "-std=c++17",
+      "-I",
+      "lib",
+      "-c",
+      "src/data/Modules/module.cpp",
+      "-o",
+      "build/data/Modules/module.o"
+    ],
+    "directory": "/home/smiwil/Documents/UMTAS/apps/preference-solver",
+    "output": "build/data/Modules/module.o"
+  },
+  {
     "file": "src/filecreator/filecreator.cpp",
     "arguments": [
       "/usr/bin/g++",

@@ -7,10 +7,10 @@ CFLAGS :=  -I $(LIB_DIR)
 
 
 SRC_FILES := $(wildcard $(SRC_DIR)/*.cpp)\
-			 $(wildcard $(SRC_DIR)/API/*.cpp)\
-			 $(wildcard $(SRC_DIR)/Events/*.cpp)\
-			 $(wildcard $(SRC_DIR)/GA-data/*.cpp)\
-			 $(wildcard $(SRC_DIR)/Modules/*.cpp)\
+			 $(wildcard $(SRC_DIR)/data/API/*.cpp)\
+			 $(wildcard $(SRC_DIR)/data/Events/*.cpp)\
+			 $(wildcard $(SRC_DIR)/data/GA-data/*.cpp)\
+			 $(wildcard $(SRC_DIR)/data/Modules/*.cpp)\
 			 $(wildcard $(SRC_DIR)/filecreator/*.cpp)\
 				
 OBJS := $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SRC_FILES))
