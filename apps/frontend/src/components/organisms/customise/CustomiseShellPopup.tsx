@@ -137,7 +137,7 @@ export default function Customise() {
     <div className="p-8">
       <AlertDialog>
         <AlertDialogTrigger asChild>
-          <Button variant="outline">Open Customise Settings</Button>
+          <Button variant="outline">Customise Modules and Events</Button>
         </AlertDialogTrigger>
 
         <AlertDialogContent className="w-max max-w-[95vw] p-6">

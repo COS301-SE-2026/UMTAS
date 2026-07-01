@@ -9,6 +9,7 @@ import { Label } from "@/components/atoms/baseShadcn/label";
 import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
 import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
 import { Checkbox } from "@/components/atoms/baseShadcn/checkbox";
+import CustomiseShellPopup from "@/components/organisms/customise/CustomiseShellPopup";
 
 interface GenerateStepProps {
   modules: ModuleResponseDto[];
@@ -247,7 +248,7 @@ export function GenerateStep({
       </div>
 
       <div className="mb-8">{renderContent()}</div>
-
+      <CustomiseShellPopup />
       <Button
         type="button"
         size="default"
