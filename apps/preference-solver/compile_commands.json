@@ -1,16 +1,17 @@
 [
   {
-    "file": "src/main.cpp",
+    "file": "src/filecreator/filecreator.cpp",
     "arguments": [
       "/usr/bin/g++",
+      "-std=c++17",
       "-I",
       "lib",
       "-c",
-      "src/main.cpp",
+      "src/filecreator/filecreator.cpp",
       "-o",
-      "build/main.o"
+      "build/filecreator/filecreator.o"
     ],
     "directory": "/home/smiwil/Documents/UMTAS/apps/preference-solver",
-    "output": "build/main.o"
+    "output": "build/filecreator/filecreator.o"
   }
 ]

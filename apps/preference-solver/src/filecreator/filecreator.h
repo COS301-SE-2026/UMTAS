@@ -3,23 +3,25 @@
 // create an output file output.js
 // have that read by the job / notify it somehow through cli.
 #include "../../lib/nlohmann/json.hpp"
+#include <filesystem>
 #include <string>
+
 using nlohmann::json;
 using std::string;
 
 class FileCreator {
 private:
   //  should store path based on job provided
-  string job;
+  std::filesystem::path path;
 
   // valid init is based on the correct setup for GA
-  bool validInit;
 
 public:
   // looks for the job dir
   // checks input exists
   // creates output.json
-  FileCreator(string job);
+  FileCreator(string path);
   // creates a json object based on the known input.json
-  json returnJson();
+  json inputJson();
+  void outputJson(json outputJson);
 };

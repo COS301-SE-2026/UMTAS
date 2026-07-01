@@ -2,11 +2,11 @@ SRC_DIR := src
 BUILD_DIR := build
 LIB_DIR := lib
 
-CXX := g++
+CXX := g++ -std=c++17
 CFLAGS :=  -I $(LIB_DIR)
 
 
-SRC_FILES := $(wildcard $(SRC_DIR)/*.cpp)
+SRC_FILES := $(wildcard $(SRC_DIR)/**/*.cpp)
 OBJS := $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SRC_FILES))
 
 OPEN_GA_URL:= https://github.com/Arash-codedev/openGA/archive/v1.0.5.zip
