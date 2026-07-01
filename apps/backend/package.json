@@ -28,6 +28,7 @@
     "docker:clean": "docker-compose down -v && docker network prune -f"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.940.0",
     "@better-auth/redis-storage": "^1.6.11",
     "@electric-sql/pglite": "^0.4.5",
     "@nestjs/axios": "^4.0.1",
