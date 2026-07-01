@@ -6,7 +6,13 @@ CXX := g++ -std=c++17
 CFLAGS :=  -I $(LIB_DIR)
 
 
-SRC_FILES := $(wildcard $(SRC_DIR)/**/*.cpp)
+SRC_FILES := $(wildcard $(SRC_DIR)/*.cpp)\
+			 $(wildcard $(SRC_DIR)/API/*.cpp)\
+			 $(wildcard $(SRC_DIR)/Events/*.cpp)\
+			 $(wildcard $(SRC_DIR)/GA-data/*.cpp)\
+			 $(wildcard $(SRC_DIR)/Modules/*.cpp)\
+			 $(wildcard $(SRC_DIR)/filecreator/*.cpp)\
+				
 OBJS := $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SRC_FILES))
 
 OPEN_GA_URL:= https://github.com/Arash-codedev/openGA/archive/v1.0.5.zip
@@ -15,7 +21,7 @@ OPEN_GA_HEADER:= $(LIB_DIR)/openGA.hpp
 JSON_URL := https://github.com/nlohmann/json/releases/download/v3.11.3/json.hpp
 JSON_HEADER := $(LIB_DIR)/nlohmann/json.hpp
 
-TARGET := $(BUILD_DIR)/app
+TARGET := GA_BIN
 
 all :$(TARGET)
 
@@ -24,7 +30,7 @@ $(TARGET):$(OBJS)
 	$(CXX) $(CFLAGS) -o $@ $^
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
-	@mkdir -p $(BUILD_DIR)
+	@mkdir -p $(dir $@)
 	$(CXX) $(CFLAGS) -c $< -o $@
 
 

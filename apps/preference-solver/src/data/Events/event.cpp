@@ -10,15 +10,15 @@ const string EventGA::EVENT_ID = "eventID";
 const string EventGA::MODULE_CODE = "moduleCode";
 const string EventGA::EVENT_START = "startTime";
 const string EventGA::EVENT_END = "endTime";
+const string EventGA::EVENT_TYPE = "EventType";
 
-Day dayHelper(string);
 int timeHelper(string);
 bool typeCheckHelper(string key, json &obj);
 
 EventGA::EventGA(json eventsJson) {
   try {
     if (typeCheckHelper(DAY_KEY, eventsJson)) {
-      this->eventDay = dayHelper(eventsJson[DAY_KEY].get<string>());
+      this->eventDay = eventsJson[DAY_KEY].get<string>();
     }
 
     if (typeCheckHelper(EVENT_ID, eventsJson)) {
@@ -35,6 +35,10 @@ EventGA::EventGA(json eventsJson) {
     if (typeCheckHelper(EVENT_END, eventsJson)) {
       this->event_end = timeHelper(eventsJson[EVENT_END].get<string>());
     }
+    if (typeCheckHelper(EVENT_TYPE, eventsJson)) {
+      this->eventType = eventsJson[EVENT_TYPE];
+    }
+
   } catch (std::runtime_error &e) {
     throw std::runtime_error(e.what());
   }
@@ -78,26 +82,6 @@ bool typeCheckHelper(string key, json &obj) {
     return true;
   } else {
     throw std::runtime_error(key + "is not defined or is not a string");
-  }
-}
-
-Day dayHelper(string day) {
-  if (day == "monday") {
-    return Day::MONDAY;
-  } else if (day == "tuesday") {
-    return Day::TUESDAY;
-  } else if (day == "wednesday") {
-    return Day::WEDNESDAY;
-  } else if (day == "thursday") {
-    return Day::THURSDAY;
-  } else if (day == "friday") {
-    return Day::FRIDAY;
-  } else if (day == "saturday") {
-    return Day::SATURDAY;
-  } else if (day == "sunday") {
-    return Day::SUNDAY;
-  } else {
-    throw std::runtime_error(day + " is not one of the accepted days");
   }
 }
 

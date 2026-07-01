@@ -1,5 +1,4 @@
 #include "../../../lib/nlohmann/json.hpp"
-#include "../API/day.h"
 #include <iostream>
 #include <string>
 #include <vector>
@@ -8,9 +7,10 @@ using std::cout;
 using std::endl;
 using std::string;
 struct EventGA {
-  Day eventDay;
+  string eventDay;
   string eventID;
   string moduleCode;
+  string eventType;
   int event_start;
   int event_end;
   bool is_active;
@@ -23,5 +23,6 @@ struct EventGA {
   static const string MODULE_CODE;
   static const string EVENT_START;
   static const string EVENT_END;
+  static const string EVENT_TYPE;
   // automatically sets is active to false
 };

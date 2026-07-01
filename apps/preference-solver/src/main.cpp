@@ -1,5 +1,12 @@
 #include "../lib/openGA.hpp"
 #include "data/API/API-data.h"
+#include "filecreator/filecreator.h"
+#include "nlohmann/json.hpp"
+#include <exception>
+#include <iostream>
+#include <ostream>
+
+using nlohmann::json;
 /*
 void init_genes(
     EventChromosome &p,
@@ -143,10 +150,19 @@ void SO_report_generation(
 */
 
 int main() {
-// args will be provided for a filepath.
-  string inputData = "";
-  API_DATA data(inputData);
+  // args will be provided for a filepath.
+  try {
+    FileCreator FC("GA_TEST_DIR");
+
+    json input = FC.inputJson();
+
+    FC.outputJson(input);
+
+  } catch (std::exception &e) {
+    std::cout << e.what() << std::endl;
+    return 1;
+  }
   return 0;
 }
-// plan going forward is for the copy chromosome creation from json 
+// plan going forward is for the copy chromosome creation from json
 // global variable to pass through the copy chromosome.

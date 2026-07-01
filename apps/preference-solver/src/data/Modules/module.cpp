@@ -4,7 +4,17 @@
 
 const string ModuleGA::GROUPING_KEY = "modules";
 const string ModuleGA::MODULE_CODE_KEY = "moduleCode";
-const string ModuleGA::OCCURENCE_KEY = "moduleOccurence";
+const string ModuleGA::OCCURENCE_KEY = "typeOccurence";
+const string ModuleGA::TYPE_KEY = "EventType";
+const string ModuleGA::OCCUR_KEY = "numberOccur";
+/*
+ typeOccurence :[
+ {
+    type : string
+    numberOccur : int
+ }
+ ]
+ */
 
 ModuleGA::ModuleGA(json module) {
   if (module.contains(MODULE_CODE_KEY) && module[MODULE_CODE_KEY].is_string()) {
@@ -23,7 +33,7 @@ ModuleGA::ModuleGA(json module) {
   }
 }
 
-std::vector<ModuleGA> ModuleGA::innitModules(json &modulesArr) {
+std::vector<ModuleGA> ModuleGA::innitModules(const json &modulesArr) {
   std::vector<ModuleGA> retModules;
 
   if (modulesArr.is_array()) {
