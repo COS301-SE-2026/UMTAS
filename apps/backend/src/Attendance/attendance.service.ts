@@ -69,10 +69,7 @@ export class AttendanceService {
   ): Promise<AttendanceListResponse> {
     const conditions: SQL[] = [];
 
-    if (
-      filters === undefined ||
-      (filters !== undefined && Object.keys(filters).length === 0)
-    ) {
+    if (!filters || Object.keys(filters).length === 0) {
       //No filters to apply
       //default to filter by userId
       conditions.push(eq(EventAttendance.UserID, userId));
