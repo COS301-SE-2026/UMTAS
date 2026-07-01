@@ -29,6 +29,20 @@
       "when": 1782813392063,
       "tag": "0003_UNIROLES_UPDATED_AGAIN",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1782831137033,
+      "tag": "0004_EVENT_ATTENDANCE_JOIN_TABLE_CREATED",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1782835206554,
+      "tag": "0005_UPDATED_EVENT_ATTENDANCE_TABLE_TO_HAVE_PRIMARYKEY",
+      "breakpoints": true
     }
   ]
 }
