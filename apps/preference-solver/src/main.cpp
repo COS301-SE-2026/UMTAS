@@ -1,29 +1,6 @@
 
 /*
-void init_genes(
-    EventChromosome &p,
-    const std::function<double(void)> &rnd01);
-bool eval_solution(
-    const EventChromosome &p,
-    ChromMiddleCost &c);
 
-EventChromosome mutate(
-    const EventChromosome &p,
-    const std::function<double(void)> &rnd01,
-    double shrink_scale);
-
-EventChromosome crossover(
-    const EventChromosome &X1,
-    const EventChromosome &X2,
-    const std::function<double(void)> &rnd01);
-
-double calculate_SO_total_fitness(const EA::ChromosomeType<EventChromosome,
-ChromMiddleCost> &c);
-
-void SO_report_generation(
-    int generation_number,
-    const EA::GenerationType<EventChromosome, ChromMiddleCost> &last_generation,
-    const EventChromosome &best_genes);
 
 EventChromosome copyChrom;
 
@@ -148,14 +125,15 @@ void SO_report_generation(
 #include <iostream>
 #include <ostream>
 
+
+
 using nlohmann::json;
 int main() {
   // args will be provided for a filepath.
   try {
     FileCreator FC("GA_TEST_DIR");
 
-    API_DATA data(FC.inputJson());
-    
+    API_DATA data = API_DATA(FC.inputJson());
 
   } catch (std::exception &e) {
     std::cout << e.what() << std::endl;

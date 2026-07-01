@@ -3,6 +3,7 @@
 struct EventChromosome {
   std::vector<EventGA> events;
   int targetTime;
+  EventChromosome(){};
   EventChromosome(API_DATA &data);
   EventChromosome(const EventChromosome &chrom);
   EventChromosome &operator=(const EventChromosome &chrom);

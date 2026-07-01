@@ -9,7 +9,8 @@ using std::endl;
 using std::string;
 using json = nlohmann::json;
 struct API_DATA {
-  API_DATA(const json& reqData);
+  API_DATA(const json &reqData);
+  API_DATA() {};
   std::vector<ModuleGA> modules;
   std::vector<EventGA> events;
   int targetTime;
