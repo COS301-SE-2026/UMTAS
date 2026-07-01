@@ -15,6 +15,20 @@
       "when": 1782737654732,
       "tag": "0001_OnDeleteCascadeUpdated",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1782811991272,
+      "tag": "0002_ADDED_ROLES_FOR_UNIVERSITYROLE",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1782813392063,
+      "tag": "0003_UNIROLES_UPDATED_AGAIN",
+      "breakpoints": true
     }
   ]
 }
