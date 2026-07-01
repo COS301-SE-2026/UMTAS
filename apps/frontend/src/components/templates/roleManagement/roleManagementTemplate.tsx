@@ -1,4 +1,5 @@
-import UserDirectory from "@/components/organisms/roleManagement/UserDirectory";
+import UserDirectoryCard from "@/components/organisms/roleManagement/UserDirectory";
+import PendingApplicationsCard from "@/components/organisms/roleManagement/PendingApplications";
 import {
   Tabs,
   TabsContent,
@@ -25,11 +26,11 @@ export default async function RoleManagementTemplate() {
         </TabsList>
         <TabsContent value="User Directory">
           {" "}
-          <UserDirectory />
+          <UserDirectoryCard />
         </TabsContent>
         <TabsContent value="Pending Applications">
           {" "}
-          <UserDirectory />
+          <PendingApplicationsCard />
         </TabsContent>
       </Tabs>
     </div>
