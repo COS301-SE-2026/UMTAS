@@ -1,6 +1,6 @@
 from collections import Counter
 
-from .conftest import parse_fixture
+from .conftest import find_event, parse_fixture
 
 
 def test_semester_test_fixture_preserves_venue_alternatives(up_parser):
@@ -8,9 +8,7 @@ def test_semester_test_fixture_preserves_venue_alternatives(up_parser):
 
     assert Counter(event["sectionLabel"] for event in events) == {"Test1": 8, "Test2": 5}
 
-    cos333_test1 = next(
-        event for event in events if event["moduleCode"] == "COS333" and event["sectionLabel"] == "Test1"
-    )
+    cos333_test1 = find_event(events, "COS333", "Test1")
     assert cos333_test1["venues"] == [
         "IT Open Bronze Lab",
         "IT Open Copper Lab",

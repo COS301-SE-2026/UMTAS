@@ -16,3 +16,10 @@ def up_parser():
 
 def parse_fixture(parser, filename):
     return parser.parse(str(FIXTURE_DIR / filename))
+
+
+def find_event(events, module_code, section_label):
+    for event in events:
+        if event["moduleCode"] == module_code and event["sectionLabel"] == section_label:
+            return event
+    raise AssertionError(f"Could not find event {module_code} {section_label}")

@@ -1,31 +1,39 @@
-import pytest
-
 from .conftest import parse_fixture
 
 
-@pytest.mark.parametrize(
-    ("filename", "expected_type", "expected_rows"),
-    [
-        ("LECTURES_S1.pdf", "lecture", 22),
-        ("LECTURES_S2.pdf", "lecture", 22),
-        ("LECTURES_BOTH.pdf", "lecture", 42),
-        ("SEM_TESTS_S1.pdf", "test", 24),
-        ("SEM_TESTS_S2.pdf", "test", 11),
-        ("SEM_TESTS_BOTH.pdf", "test", 43),
-        ("EXAMS_S1.pdf", "exam", 3),
-        ("EXAMS_S2.pdf", "exam", 3),
-        ("EXAMS_BOTH.pdf", "exam", 6),
-    ],
-)
-def test_up_fixtures_detect_schedule_type_and_row_count(
-    up_parser, filename, expected_type, expected_rows
-):
-    result = parse_fixture(up_parser, filename)
+ACTUAL_UP_FIXTURES = [
+    {"filename": "LECTURES_S1.pdf", "expected_type": "lecture", "expected_rows": 22},
+    {"filename": "LECTURES_S2.pdf", "expected_type": "lecture", "expected_rows": 22},
+    {"filename": "LECTURES_BOTH.pdf", "expected_type": "lecture", "expected_rows": 42},
+    {"filename": "SEM_TESTS_S1.pdf", "expected_type": "test", "expected_rows": 24},
+    {"filename": "SEM_TESTS_S2.pdf", "expected_type": "test", "expected_rows": 11},
+    {"filename": "SEM_TESTS_BOTH.pdf", "expected_type": "test", "expected_rows": 43},
+    {"filename": "EXAMS_S1.pdf", "expected_type": "exam", "expected_rows": 3},
+    {"filename": "EXAMS_S2.pdf", "expected_type": "exam", "expected_rows": 3},
+    {"filename": "EXAMS_BOTH.pdf", "expected_type": "exam", "expected_rows": 6},
+]
 
-    event_types = {event["type"] for event in result["events"]}
-    if expected_type == "lecture":
-        assert event_types <= {"lecture", "tutorial", "prac"}
-    else:
-        assert event_types == {expected_type}
-    assert len(result["events"]) <= expected_rows
-    assert result.keys() == {"modules", "events", "warnings"}
+
+def test_up_fixtures_detect_schedule_type_and_row_count(up_parser):
+    for fixture in ACTUAL_UP_FIXTURES:
+        result = parse_fixture(up_parser, fixture["filename"])
+        event_types = set()
+        for event in result["events"]:
+            event_types.add(event["type"])
+
+        if fixture["expected_type"] == "lecture":
+            assert event_types <= {"lecture", "tutorial", "prac"}
+        else:
+            assert event_types == {fixture["expected_type"]}
+
+        assert len(result["events"]) <= fixture["expected_rows"]
+        assert result.keys() == {"modules", "events", "warnings"}
+
+
+def test_actual_up_pdf_fixtures_parse_to_non_empty_contract(up_parser):
+    for fixture in ACTUAL_UP_FIXTURES:
+        result = parse_fixture(up_parser, fixture["filename"])
+
+        assert result["modules"]
+        assert result["events"]
+        assert result["warnings"] == []
