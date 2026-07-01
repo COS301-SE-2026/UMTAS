@@ -14,8 +14,8 @@ export default function CustomiseShell({
 }: CustomiseShellProps) {
   return (
     <div className="flex flex-row flex-wrap items-start">
-      <CustomiseEventShell events={events} modules={modules} />
       <CustomiseModuleShell modules={modules} events={events} />
+      <CustomiseEventShell events={events} modules={modules} />
     </div>
   );
 }

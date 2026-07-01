@@ -1,7 +1,7 @@
 "use client";
 import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
 import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
-import CustomiseShell from "@/components/organisms/customise/CustomiseShell";
+import CustomiseShell from "@/components/templates/customise/CustomiseShell";
 
 //some mock data for the static pages
 const mockModules: ModuleResponseDto[] = [
