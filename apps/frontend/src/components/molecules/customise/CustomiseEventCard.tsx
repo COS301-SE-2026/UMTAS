@@ -15,7 +15,10 @@ import type { TimeSlot } from "@/components/atoms/builder/TimeSlotSelect";
 import { EventTypeDropdown } from "@/components/atoms/builder/eventDropdown";
 import type { EventType } from "@/components/atoms/builder/eventDropdown";
 import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
-import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
+import {
+  EventResponse,
+  EventCriteria,
+} from "@/app/builder/utils/events/eventRequestBuilder";
 
 //NOTE
 //copied from event card and changed slightly for customisation
@@ -32,7 +35,11 @@ export interface EventErrors {
 interface EventCardProps {
   event: EventResponse;
   modules: ModuleResponseDto[];
-  onUpdate: (id: string, field: string, value: string | boolean) => void;
+  onUpdate: (
+    id: string,
+    field: keyof EventResponse | keyof EventCriteria,
+    value: string | boolean,
+  ) => void;
   onGoToModules?: () => void;
   errors?: EventErrors;
 }
@@ -83,7 +90,7 @@ export function CustomiseEventCard({
     return (
       <Select
         value={String(event.eventCriteria?.moduleID || "")}
-        onValueChange={(v) => onUpdate(event.eventID, "moduleId", v)}
+        onValueChange={(v) => onUpdate(event.eventID, "moduleID", v)}
       >
         <SelectTrigger
           className={getInputClass(!!errors?.moduleId) + " w-full"}
@@ -147,7 +154,9 @@ export function CustomiseEventCard({
             <Input
               id={"event-name-" + event.eventID}
               value={event.eventName || ""}
-              onChange={(e) => onUpdate(event.eventID, "name", e.target.value)}
+              onChange={(e) =>
+                onUpdate(event.eventID, "eventName", e.target.value)
+              }
               placeholder="e.g. COS301 Lecture Group A"
               className={getInputClass(!!errors?.name)}
             />
@@ -166,7 +175,9 @@ export function CustomiseEventCard({
             <Input
               id={"event-code-" + event.eventID}
               value={event.eventCode || ""}
-              onChange={(e) => onUpdate(event.eventID, "code", e.target.value)}
+              onChange={(e) =>
+                onUpdate(event.eventID, "eventCode", e.target.value)
+              }
               placeholder="e.g. COS301-LEC-A"
               maxLength={20}
               className={getInputClass(!!errors?.code)}

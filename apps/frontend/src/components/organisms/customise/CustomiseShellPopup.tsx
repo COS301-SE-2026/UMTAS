@@ -1,6 +1,4 @@
 "use client";
-import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
-import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
 import CustomiseShell from "@/components/templates/customise/CustomiseShell";
 import { Button } from "@/components/atoms/baseShadcn/button";
 import {
@@ -12,127 +10,17 @@ import {
   AlertDialogCancel,
 } from "@/components/atoms/customise/alert-dialog-customise";
 
-//some mock data for the static pages
-const mockModules: ModuleResponseDto[] = [
-  {
-    moduleID: "1",
-    moduleCode: "COS301",
-    moduleName: "Software Eng",
-    styling: { colour: "" },
-  },
-  {
-    moduleID: "2",
-    moduleCode: "COS301",
-    moduleName: "Software Eng",
-    styling: { colour: "" },
-  },
-  {
-    moduleID: "3",
-    moduleCode: "COS301",
-    moduleName: "Software Eng",
-    styling: { colour: "" },
-  },
-  {
-    moduleID: "4",
-    moduleCode: "COS301",
-    moduleName: "Software Eng",
-    styling: { colour: "" },
-  },
-  {
-    moduleID: "5",
-    moduleCode: "COS301",
-    moduleName: "Software Eng",
-    styling: { colour: "" },
-  },
-  {
-    moduleID: "6",
-    moduleCode: "COS301",
-    moduleName: "Software Eng",
-    styling: { colour: "" },
-  },
-];
-const mockEvents: EventResponse[] = [
-  {
-    isRecurring: false,
-    eventID: "1",
-    eventName: "COS301 Lecture 1",
-    eventCode: "301-L1",
-    eventCriteria: {
-      date: "Monday",
-      startTime: "08:30",
-      endTime: "10:00",
-      type: "university",
-      moduleID: "COS301",
-    },
-  },
-  {
-    isRecurring: false,
-    eventID: "2",
-    eventName: "COS301 Lecture 1",
-    eventCode: "301-L1",
-    eventCriteria: {
-      date: "Monday",
-      startTime: "08:30",
-      endTime: "10:00",
-      type: "university",
-      moduleID: "COS301",
-    },
-  },
-  {
-    isRecurring: false,
-    eventID: "3",
-    eventName: "COS301 Lecture 1",
-    eventCode: "301-L1",
-    eventCriteria: {
-      date: "Monday",
-      startTime: "08:30",
-      endTime: "10:00",
-      type: "university",
-      moduleID: "COS301",
-    },
-  },
-  {
-    isRecurring: false,
-    eventID: "4",
-    eventName: "COS301 Lecture 1",
-    eventCode: "301-L1",
-    eventCriteria: {
-      date: "Monday",
-      startTime: "08:30",
-      endTime: "10:00",
-      type: "university",
-      moduleID: "COS301",
-    },
-  },
-  {
-    isRecurring: false,
-    eventID: "5",
-    eventName: "COS302 Lecture 1",
-    eventCode: "301-L1",
-    eventCriteria: {
-      date: "Monday",
-      startTime: "08:30",
-      endTime: "10:00",
-      type: "university",
-      moduleID: "COS301",
-    },
-  },
-  {
-    isRecurring: false,
-    eventID: "6",
-    eventName: "COS301 Lecture 1",
-    eventCode: "301-L1",
-    eventCriteria: {
-      date: "Monday",
-      startTime: "08:30",
-      endTime: "10:00",
-      type: "university",
-      moduleID: "COS301",
-    },
-  },
-];
+import { useQuery } from "@tanstack/react-query";
+import { getAllModulesQ } from "@/components/templates/builder/Queries/moduleQueries";
+import { getAllEventsQ } from "@/components/templates/builder/Queries/eventQueries";
 
-export default function Customise() {
+export default function CustomiseShellPopup() {
+  const { data: modules, isLoading: modulesLoading } =
+    useQuery(getAllModulesQ());
+  const { data: events, isLoading: eventsLoading } = useQuery(getAllEventsQ());
+
+  const isLoading = modulesLoading || eventsLoading;
+
   return (
     <div className="p-8">
       <AlertDialog>
@@ -143,13 +31,17 @@ export default function Customise() {
         <AlertDialogContent className="w-max max-w-[95vw] p-6">
           <AlertDialogHeader className="flex flex-row justify-between items-center border-b pb-2">
             <AlertDialogTitle className="text-xl font-bold">
-              Customise Panel
+              Customise your Events and Modules
             </AlertDialogTitle>
             <AlertDialogCancel className="mt-0">Close</AlertDialogCancel>
           </AlertDialogHeader>
 
           <div className="py-4 overflow-auto max-h-[80vh]">
-            <CustomiseShell events={mockEvents} modules={mockModules} />
+            {isLoading ? (
+              <p className="text-sm text-muted-foreground">Loading...</p>
+            ) : (
+              <CustomiseShell events={events ?? []} modules={modules ?? []} />
+            )}
           </div>
         </AlertDialogContent>
       </AlertDialog>
