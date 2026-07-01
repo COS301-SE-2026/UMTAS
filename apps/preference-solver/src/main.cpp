@@ -146,3 +146,5 @@ int main() {
   string inputData = "";
   API_DATA data(inputData);
 }
+// plan going forward is for the copy chromosome creation from json 
+// global variable to pass through the copy chromosome.

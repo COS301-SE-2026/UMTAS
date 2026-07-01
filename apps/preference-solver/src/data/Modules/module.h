@@ -13,5 +13,5 @@ struct ModuleGA {
   string moduleCode;
   int number_Occur;
   ModuleGA(json module);
-  static std::vector<ModuleGA> innitModules(json &modulesArr);
+  static std::vector<ModuleGA> innitModules(const json &modulesArr);
 };
