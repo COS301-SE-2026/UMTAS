@@ -51,7 +51,7 @@ void init_genes(EventChromosome &p, const std::function<double(void)> &rnd01) {
     }
   }
 }
-bool eval_solution(const EventChromosome &p, ChromMiddleCost &c) {}
+
 
 EventChromosome mutate(const EventChromosome &p,
                        const std::function<double(void)> &rnd01,
@@ -67,15 +67,50 @@ EventChromosome mutate(const EventChromosome &p,
       }
     }
     return newChrom;
+  } else {
+    // fall back shouldnt happen
+    return copyChrom;
   }
 }
 
 EventChromosome crossover(const EventChromosome &X1, const EventChromosome &X2,
-                          const std::function<double(void)> &rnd01);
+                          const std::function<double(void)> &rnd01)
+
+{
+
+  EventChromosome child;
+
+  child.events.resize(X1.events.size());
+  float r = rnd01();
+  int crossOverPt = r * child.events.size();
+
+  if (crossOverPt == child.events.size()) {
+    --crossOverPt;
+  } else if (crossOverPt == 0) {
+    ++crossOverPt;
+  }
+
+  for (int i = 0; i < child.events.size(); i++) {
+    if (i < crossOverPt) {
+      child.events[i].is_active = X1.events[i].is_active;
+    } else {
+      child.events[i].is_active = X2.events[i].is_active;
+    }
+  }
+  return child;
+}
 
 double calculate_SO_total_fitness(
-    const EA::ChromosomeType<EventChromosome, ChromMiddleCost> &c) {}
-
+    const EA::ChromosomeType<EventChromosome, ChromMiddleCost> &c) {
+        // this is our heuristic
+    }
+bool eval_solution(const EventChromosome &p, ChromMiddleCost &c) {
+    // this is our function that disallows non functioning solutions
+    // May be useful may not be it depends
+    // IF we only allow valid solutions -> GA may stall 
+    // IF we allow bad ones -> could mutate into good solution
+}
+    
 void SO_report_generation(
     int generation_number,
     const EA::GenerationType<EventChromosome, ChromMiddleCost> &last_generation,
