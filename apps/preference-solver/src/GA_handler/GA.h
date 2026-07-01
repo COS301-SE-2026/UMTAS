@@ -7,6 +7,7 @@ class GA_Handler {
 private:
   API_DATA initData;
   GA_type gaEngine;
+
   void InitGA();
   void InitMap();
 
@@ -40,3 +41,6 @@ void SO_report_generation(
     int generation_number,
     const EA::GenerationType<EventChromosome, ChromMiddleCost> &last_generation,
     const EventChromosome &best_genes);
+
+bool CountPattern(EventChromosome chrom);
+void resetTemp();

@@ -3,6 +3,9 @@
 #include <string>
 #include <unordered_map>
 
+// used for short circuit of c(n)
+int RequiredEvents = 0;
+
 std::unordered_map<string, int> modulesMap;
 std::unordered_map<string, int> tempMap;
 // makes a key of module:event -> occurences
@@ -24,6 +27,8 @@ void GA_Handler::InitMap() {
       string key = module.moduleCode + ":" + itr.first;
       // key events can easily access
       int val = itr.second;
+      // used for easy short circuit of C(n)
+      RequiredEvents += val;
 
       modulesMap.insert({key, val});
       tempMap.insert({key, 0}); // will be be changed individually.
@@ -77,6 +82,11 @@ EventChromosome mutate(const EventChromosome &p,
     for (int i = 0; i < newChrom.events.size(); i++) {
       if (rnd01() < mutatePer) {
         newChrom.events[i].is_active = !newChrom.events[i].is_active;
+        if (newChrom.events[i].is_active) {
+          newChrom.numActive++;
+        } else {
+          newChrom.numActive--;
+        }
       }
     }
     return newChrom;
@@ -102,14 +112,19 @@ EventChromosome crossover(const EventChromosome &X1, const EventChromosome &X2,
   } else if (crossOverPt == 0) {
     ++crossOverPt;
   }
-
+  int isActive = 0;
   for (int i = 0; i < child.events.size(); i++) {
     if (i < crossOverPt) {
       child.events[i].is_active = X1.events[i].is_active;
+      if (child.events[i].is_active)
+        isActive++;
     } else {
       child.events[i].is_active = X2.events[i].is_active;
+      if (child.events[i].is_active)
+        isActive++;
     }
   }
+  child.numActive = isActive;
   return child;
 }
 
@@ -140,4 +155,27 @@ void SO_report_generation(
     const EA::GenerationType<EventChromosome, ChromMiddleCost> &last_generation,
     const EventChromosome &best_genes) {}
 
-bool CountPattern(EventChromosome chrom) {}
+bool CountPattern(EventChromosome chrom) {
+  // C(n)
+  if (RequiredEvents < chrom.numActive) {
+    return false;
+  }
+  // P(n)
+
+  for (EventGA event : chrom.events) {
+    string key = event.moduleCode + ":" + event.eventType;
+
+    tempMap[key]++;
+    if (modulesMap[key] < tempMap[key]) {
+      resetTemp();
+      return false;
+    }
+  }
+  return true;
+}
+
+void resetTemp() {
+  for (auto &itr : tempMap) {
+    itr.second = 0;
+  }
+}
