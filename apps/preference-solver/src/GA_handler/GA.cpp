@@ -1,7 +1,9 @@
 #include "GA.h"
 #include "../../lib/openGA.hpp"
+#include <cmath>
+#include <cstdlib>
+#include <filesystem>
 #include <sstream>
-#include <string>
 #include <unordered_map>
 #include <vector>
 
@@ -150,28 +152,6 @@ bool eval_solution(const EventChromosome &p, ChromMiddleCost &c) {
   return CountPattern(p);
   // we dont need middle cost
 }
-
-double calculate_SO_total_fitness(
-    const EA::ChromosomeType<EventChromosome, ChromMiddleCost> &c) {
-  // this is our heuristic
-  // O(n) & V(n)
-  // V(n) -> gives us the actual heuristic
-  // O(n) -> decreases value based on number of conflicts
-
-  // IDEA
-  // V(n) -> gives a double
-  // O(n) -> gives an int for number of collisions
-  // O(n) * V(n) -> higher score
-  // This function in GA minimises.
-
-  
-}
-
-void SO_report_generation(
-    int generation_number,
-    const EA::GenerationType<EventChromosome, ChromMiddleCost> &last_generation,
-    const EventChromosome &best_genes) {}
-
 bool CountPattern(EventChromosome chrom) {
   // C(n)
   if (RequiredEvents < chrom.numActive) {
@@ -196,7 +176,44 @@ void resetTemp() {
   }
 }
 
-double Overlap_Heuristic(EventChromosome event) {}
+double calculate_SO_total_fitness(
+    const EA::ChromosomeType<EventChromosome, ChromMiddleCost> &c) {
+  // this is our heuristic
+  // O(n) & V(n)
+  // V(n) -> gives us the actual heuristic
+  // O(n) -> decreases value based on number of conflicts
+
+  // IDEA
+  // V(n) -> gives a double
+  // O(n) -> gives an int for number of collisions
+  // O(n) * V(n) -> higher score
+  // This function in GA minimises.
+
+  return Overlap_Heuristic(c.genes);
+}
+double Overlap_Heuristic(EventChromosome eventChrom) {
+  int numberOfPts = eventChrom.events.size();
+  double mean = 0;
+
+  for (EventGA event : eventChrom.events) {
+    std::vector<string> slots = slotEval(event.event_start, event.event_end);
+    for (string slot : slots) {
+      string eventKey = event.eventDay + ":" + slot;
+      if (collisionCheck.find(eventKey)->second) {
+        eventChrom.numCollision++;
+      }
+    }
+    mean += event.event_start;
+  }
+  mean /= numberOfPts;
+  double sum = 0;
+  for (EventGA event : eventChrom.events) {
+    sum += std::fabs(event.event_start - mean);
+  }
+  double MAD = (1 / (double)numberOfPts) * sum;
+  int collCount = eventChrom.numCollision;
+  return MAD * collCount;
+}
 
 std::vector<string> slotEval(int timeStart, int timeEnd) {
   // takes a time and puts it into the slots of the day listed from every 30
@@ -235,3 +252,7 @@ void resetCollision() {
     itr.second = false;
   }
 }
+void SO_report_generation(
+    int generation_number,
+    const EA::GenerationType<EventChromosome, ChromMiddleCost> &last_generation,
+    const EventChromosome &best_genes) {}
