@@ -9,9 +9,14 @@ import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
 interface CustomiseShellProps {
   events: EventResponse[];
   modules: ModuleResponseDto[];
+  onViewModeChange?: (tab: "Modules" | "Events") => void;
 }
 
-export default function EventsShell({ events, modules }: CustomiseShellProps) {
+export default function EventsShell({
+  events,
+  modules,
+  onViewModeChange,
+}: CustomiseShellProps) {
   const [selectedEventId, setSelectedEventId] = useState<string>(
     events[0]?.eventID,
   );
@@ -27,6 +32,7 @@ export default function EventsShell({ events, modules }: CustomiseShellProps) {
               size="sm"
               variant="ghost"
               className="h-7 text-xs flex-1 text-muted-foreground"
+              onClick={() => onViewModeChange?.("Modules")}
             >
               Modules
             </Button>

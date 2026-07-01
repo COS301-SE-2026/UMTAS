@@ -2,6 +2,15 @@
 import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
 import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
 import CustomiseShell from "@/components/templates/customise/CustomiseShell";
+import { Button } from "@/components/atoms/baseShadcn/button";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+  AlertDialogCancel,
+} from "@/components/atoms/customise/alert-dialog-customise";
 
 //some mock data for the static pages
 const mockModules: ModuleResponseDto[] = [
@@ -67,5 +76,26 @@ const mockEvents: EventResponse[] = [
 ];
 
 export default function Customise() {
-  return <CustomiseShell events={mockEvents} modules={mockModules} />;
+  return (
+    <div className="p-8">
+      <AlertDialog>
+        <AlertDialogTrigger asChild>
+          <Button variant="outline">Open Customise Settings</Button>
+        </AlertDialogTrigger>
+
+        <AlertDialogContent className="w-max max-w-[95vw] p-6">
+          <AlertDialogHeader className="flex flex-row justify-between items-center border-b pb-2">
+            <AlertDialogTitle className="text-xl font-bold">
+              Customise Panel
+            </AlertDialogTitle>
+            <AlertDialogCancel className="mt-0">Close</AlertDialogCancel>
+          </AlertDialogHeader>
+
+          <div className="py-4 overflow-auto max-h-[80vh]">
+            <CustomiseShell events={mockEvents} modules={mockModules} />
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
 }
