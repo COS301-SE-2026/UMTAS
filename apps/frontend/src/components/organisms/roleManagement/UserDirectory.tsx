@@ -6,10 +6,8 @@ import { DataTable } from "@/components/molecules/roleManagement/DataTable";
 
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/atoms/baseShadcn/card";
