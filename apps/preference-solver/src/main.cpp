@@ -143,8 +143,10 @@ void SO_report_generation(
 */
 
 int main() {
+// args will be provided for a filepath.
   string inputData = "";
   API_DATA data(inputData);
+  return 0;
 }
 // plan going forward is for the copy chromosome creation from json 
 // global variable to pass through the copy chromosome.

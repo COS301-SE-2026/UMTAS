@@ -4,9 +4,8 @@
 
 const string API_DATA::TARGET_TIME_KEY = "targetTime";
 
-API_DATA::API_DATA(string jsonStr) {
+API_DATA::API_DATA(json reqData) {
   try {
-    json reqData = json::parse(jsonStr);
     this->modules =
         ModuleGA::innitModules(reqData[ModuleGA::GROUPING_KEY].get<json>());
 
