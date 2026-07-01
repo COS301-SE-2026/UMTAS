@@ -45,7 +45,7 @@ export default function EventsShell({
             </Button>
           </div>
 
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 max-h-[360px] overflow-y-auto pr-1">
             {events.map((event) => (
               <CustomiseEventPanel
                 event={event}

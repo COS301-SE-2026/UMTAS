@@ -32,6 +32,24 @@ const mockModules: ModuleResponseDto[] = [
     moduleName: "Software Eng",
     styling: { colour: "" },
   },
+  {
+    moduleID: "4",
+    moduleCode: "COS301",
+    moduleName: "Software Eng",
+    styling: { colour: "" },
+  },
+  {
+    moduleID: "5",
+    moduleCode: "COS301",
+    moduleName: "Software Eng",
+    styling: { colour: "" },
+  },
+  {
+    moduleID: "6",
+    moduleCode: "COS301",
+    moduleName: "Software Eng",
+    styling: { colour: "" },
+  },
 ];
 const mockEvents: EventResponse[] = [
   {
@@ -63,6 +81,45 @@ const mockEvents: EventResponse[] = [
   {
     isRecurring: false,
     eventID: "3",
+    eventName: "COS301 Lecture 1",
+    eventCode: "301-L1",
+    eventCriteria: {
+      date: "Monday",
+      startTime: "08:30",
+      endTime: "10:00",
+      type: "university",
+      moduleID: "COS301",
+    },
+  },
+  {
+    isRecurring: false,
+    eventID: "4",
+    eventName: "COS301 Lecture 1",
+    eventCode: "301-L1",
+    eventCriteria: {
+      date: "Monday",
+      startTime: "08:30",
+      endTime: "10:00",
+      type: "university",
+      moduleID: "COS301",
+    },
+  },
+  {
+    isRecurring: false,
+    eventID: "5",
+    eventName: "COS302 Lecture 1",
+    eventCode: "301-L1",
+    eventCriteria: {
+      date: "Monday",
+      startTime: "08:30",
+      endTime: "10:00",
+      type: "university",
+      moduleID: "COS301",
+    },
+  },
+  {
+    isRecurring: false,
+    eventID: "6",
     eventName: "COS301 Lecture 1",
     eventCode: "301-L1",
     eventCriteria: {
