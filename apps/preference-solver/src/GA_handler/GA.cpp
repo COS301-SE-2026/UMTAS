@@ -1,13 +1,17 @@
 #include "GA.h"
 #include "../../lib/openGA.hpp"
+#include <sstream>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 // used for short circuit of c(n)
 int RequiredEvents = 0;
 
 std::unordered_map<string, int> modulesMap;
 std::unordered_map<string, int> tempMap;
+std::unordered_map<string, bool> collisionCheck;
+
 // makes a key of module:event -> occurences
 // also have a local structure that will do the same however its meant to be
 // overwritten
@@ -19,7 +23,16 @@ GA_Handler::GA_Handler(API_DATA data) {
   this->initData = data;
   copyChrom = EventChromosome(data);
   InitMap();
+  InitOverlap();
   InitGA();
+}
+void GA_Handler::InitOverlap() {
+  std::vector<string> slots = slotEval(420, 1140);
+  // 420 -> 7:00
+  // 1140 -> 19:00
+  for (auto &itr : slots) {
+    collisionCheck.insert({itr, false});
+  }
 }
 void GA_Handler::InitMap() {
   for (ModuleGA module : this->initData.modules) {
@@ -134,6 +147,8 @@ bool eval_solution(const EventChromosome &p, ChromMiddleCost &c) {
   // IF we only allow valid solutions -> GA may stall
   // IF we allow bad ones -> could mutate into good solution
   // CURRENT PLAN -> remove invalid ones being C(n) & P(n)
+  return CountPattern(p);
+  // we dont need middle cost
 }
 
 double calculate_SO_total_fitness(
@@ -148,6 +163,8 @@ double calculate_SO_total_fitness(
   // O(n) -> gives an int for number of collisions
   // O(n) * V(n) -> higher score
   // This function in GA minimises.
+
+  
 }
 
 void SO_report_generation(
@@ -161,7 +178,6 @@ bool CountPattern(EventChromosome chrom) {
     return false;
   }
   // P(n)
-
   for (EventGA event : chrom.events) {
     string key = event.moduleCode + ":" + event.eventType;
 
@@ -177,5 +193,45 @@ bool CountPattern(EventChromosome chrom) {
 void resetTemp() {
   for (auto &itr : tempMap) {
     itr.second = 0;
+  }
+}
+
+double Overlap_Heuristic(EventChromosome event) {}
+
+std::vector<string> slotEval(int timeStart, int timeEnd) {
+  // takes a time and puts it into the slots of the day listed from every 30
+  // minutes.
+  timeStart = roundDownSlot(timeStart);
+  timeEnd = roundUpSlot(timeEnd);
+
+  std::vector<string> slots;
+  for (int time = timeStart; time < timeEnd; time += 30) {
+    string timeKey = timeSlot(time);
+    slots.push_back(timeKey);
+  }
+  return slots;
+}
+
+string timeSlot(int time) {
+  std::stringstream hourSS;
+  std::stringstream minSS;
+  int hour = time / 60;
+  int min = time % 60;
+  hourSS << hour;
+  minSS << min;
+  return hourSS.str() + ":" + minSS.str();
+}
+int roundDownSlot(int time) {
+  return (time / 30) * 30;
+  // is int math
+}
+int roundUpSlot(int time) {
+  return ((time + 29) / 30) * 30;
+  // uses int math
+}
+
+void resetCollision() {
+  for (auto &itr : collisionCheck) {
+    itr.second = false;
   }
 }

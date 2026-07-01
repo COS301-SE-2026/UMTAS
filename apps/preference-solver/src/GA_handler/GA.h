@@ -10,6 +10,7 @@ private:
 
   void InitGA();
   void InitMap();
+  void InitOverlap();
 
 public:
   GA_Handler(API_DATA);
@@ -42,5 +43,12 @@ void SO_report_generation(
     const EA::GenerationType<EventChromosome, ChromMiddleCost> &last_generation,
     const EventChromosome &best_genes);
 
+double Overlap_Heuristic(EventChromosome event);
+
 bool CountPattern(EventChromosome chrom);
 void resetTemp();
+void resetCollision();
+int roundDownSlot(int time);
+int roundUpSlot(int time);
+string timeSlot(int time);
+std::vector<string> slotEval(int timeStart, int timeEnd);
