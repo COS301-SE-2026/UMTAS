@@ -67,9 +67,9 @@ void GA_Handler::InitGA() {
 
   // DD setup
   gaEngine.problem_mode = EA::GA_MODE::SOGA;
-  gaEngine.generation_max = 100;
-  gaEngine.population = 100;
-  gaEngine.multi_threading = false;
+  gaEngine.generation_max = 50;
+  gaEngine.population = 20;
+  gaEngine.multi_threading = true;
   gaEngine.crossover_fraction = 0.7;
   gaEngine.mutation_rate = 0.1;
   gaEngine.verbose = false;
@@ -165,7 +165,7 @@ bool eval_solution(const EventChromosome &p, ChromMiddleCost &c) {
 bool CountPattern(EventChromosome chrom) {
   // C(n)
   if (RequiredEvents != chrom.numActive) {
-      
+
     return false;
   }
 
@@ -185,12 +185,10 @@ bool CountPattern(EventChromosome chrom) {
   }
 
   for (auto itr : tempMap) {
-  
-    if (itr.second != modulesMap[itr.first])
-    {
-             return false;
+
+    if (itr.second != modulesMap[itr.first]) {
+      return false;
     }
-     
   }
 
   resetTemp();
@@ -218,12 +216,12 @@ double calculate_SO_total_fitness(
 
   return Overlap_Heuristic(c.genes);
 }
-double Overlap_Heuristic( EventChromosome eventChrom) {
+double Overlap_Heuristic(EventChromosome eventChrom) {
 
   int numberOfPts = 0;
   int target = eventChrom.targetTime;
   double sum = 0;
-  for (const EventGA& event : eventChrom.events) {
+  for (const EventGA &event : eventChrom.events) {
 
     if (event.is_active) {
       numberOfPts++;
@@ -233,21 +231,20 @@ double Overlap_Heuristic( EventChromosome eventChrom) {
         string eventKey = event.eventDay + ":" + slot;
         if (collisionCheck.find(eventKey)->second) {
           eventChrom.numCollision++;
-        }
-        else {
-            collisionCheck.find(eventKey)->second = true;
+        } else {
+          collisionCheck.find(eventKey)->second = true;
         }
       }
       sum += std::fabs(event.event_start - target);
     }
   }
-
+  resetCollision();
   double MAD = (1 / (double)numberOfPts) * sum;
-  int collCount = eventChrom.numCollision+1;
+  int collCount = eventChrom.numCollision + 1;
   if (collCount == 0)
     return MAD;
   else
-    return MAD * collCount;
+    return MAD * collCount/2;
 }
 
 std::vector<string> slotEval(int timeStart, int timeEnd) {
@@ -295,5 +292,25 @@ void SO_report_generation(
       last_generation.chromosomes[last_generation.best_chromosome_index];
 
   std::cout << "Generation " << generation_number << std::endl;
-  std::cout << "Best fitness " << bestChrom.total_cost << std::endl;  
+  std::cout << "Best fitness " << bestChrom.total_cost << std::endl;
+  int numCollision = 0;
+
+  for (const EventGA &event : bestChrom.genes.events) {
+
+    if (event.is_active) {
+
+      std::vector<string> slots = slotEval(event.event_start, event.event_end);
+      for (string slot : slots) {
+
+        string eventKey = event.eventDay + ":" + slot;
+        if (collisionCheck.find(eventKey)->second) {
+            numCollision++;
+        } else {
+          collisionCheck.find(eventKey)->second = true;
+        }
+      }
+    }
+  }
+
+    std::cout << "Number of collisions " << numCollision<< std::endl;
 }
