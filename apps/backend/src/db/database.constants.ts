@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 export const DB_MODES = {
   PGLITE: 'PGLITE',
   DATABASE: 'DATABASE',
@@ -5,11 +7,23 @@ export const DB_MODES = {
 
 export type DbMode = (typeof DB_MODES)[keyof typeof DB_MODES];
 
-export function parseDbMode(value: string | undefined): DbMode {
-  const normalized = (value ?? DB_MODES.DATABASE).trim().toUpperCase();
+const dbModeSchema = z
+  .string()
+  .trim()
+  .toUpperCase()
+  .pipe(z.enum([DB_MODES.PGLITE, DB_MODES.DATABASE]));
 
-  if (normalized === DB_MODES.PGLITE || normalized === DB_MODES.DATABASE) {
-    return normalized;
+const seedFlagSchema = z
+  .string()
+  .trim()
+  .toUpperCase()
+  .pipe(z.enum(['TRUE', 'FALSE', '']));
+
+export function parseDbMode(value: string | undefined): DbMode {
+  const result = dbModeSchema.safeParse(value ?? DB_MODES.DATABASE);
+
+  if (result.success) {
+    return result.data;
   }
 
   throw new Error(
@@ -18,15 +32,11 @@ export function parseDbMode(value: string | undefined): DbMode {
 }
 
 export function parseSeedFlag(value: string | undefined): boolean {
-  const normalized = (value ?? 'FALSE').trim().toUpperCase();
+  const result = seedFlagSchema.safeParse(value ?? 'FALSE');
 
-  if (normalized === 'TRUE') {
-    return true;
+  if (!result.success) {
+    throw new Error(`Invalid SEED: ${String(value)}. Expected TRUE or FALSE`);
   }
 
-  if (normalized === 'FALSE' || normalized.length === 0) {
-    return false;
-  }
-
-  throw new Error(`Invalid SEED: ${String(value)}. Expected TRUE or FALSE`);
+  return result.data === 'TRUE';
 }
