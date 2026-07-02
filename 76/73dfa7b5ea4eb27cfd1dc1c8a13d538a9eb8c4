@@ -1,0 +1,32 @@
+apps/backend/src/db/database.constants.ts
+  s_d35bf1b4ee7de6::t_bfe66dcf116dff 1-2,10-21,23,25-26,35,37-38,41
+apps/backend/src/jobs/queue.config.spec.ts
+  s_d35bf1b4ee7de6::t_a38e9925f74195 1-56
+apps/backend/src/jobs/queue.config.ts
+  s_d35bf1b4ee7de6::t_1cf91c1acfb974 1-158
+apps/backend/src/jobs/queue.constants.ts
+  s_d35bf1b4ee7de6::t_56310596456ad6 1-7
+apps/backend/src/storage/storage.module.ts
+  s_d35bf1b4ee7de6::t_bf10d95af64bbc 1-10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.5",
+  "base_commit_sha": "7673dfa7b5ea4eb27cfd1dc1c8a13d538a9eb8c4",
+  "prompts": {},
+  "humans": {
+    "h_3359569cacef0e": {
+      "author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_d35bf1b4ee7de6": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f2182-56d5-7cf2-a196-883850d0f487",
+        "model": "gpt-5.5"
+      },
+      "human_author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}
