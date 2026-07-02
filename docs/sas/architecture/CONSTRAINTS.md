@@ -18,21 +18,3 @@
 | AC-12 | Secrets handling | Credentials, API keys, OAuth secrets, and connection strings shall not be committed to the repository. | Demo 2 instructions and standard security practice | Requires environment-based configuration, secret injection in CI/runtime, and documented variable inventory | Secret scan and repository review | Documented |
 | AC-13 | API documentation | Backend endpoints shall be documented using OpenAPI 3.0. | Client proposal delivery requirement for adapter authors and future integrations | Requires schema-backed API contracts and reviewable integration documentation | OpenAPI inspection and API contract tests | Documented, complete checked-in inventory still pending |
 | AC-14 | Environment separation | Development, staging, and production environments shall be distinguishable for Demo 2. | Demo 2 deployment requirements | Prevents treating a local setup or integration branch as an undocumented staging substitute | Environment inventory and non-local URL verification | Known compliance gap: separate staging evidence not recorded here |
-
-## High-Impact Constraints
-
-`AC-01`, `AC-05`, `AC-06`, `AC-08`, `AC-09`, `AC-11`, and `AC-13` shape the architecture most
-strongly. Together they explain the Core-and-Adapter split, async worker boundary, stateless compute
-services, Docker-based deployment model, single Traefik ingress, and schema-first API documentation.
-
-## Constraint Boundaries
-
-- The `20,000+` workload is a client scale driver and simulation success criterion, not a claim that
-  Demo 2 production traffic will contain 20,000 real users.
-- Dockerisation is both a university reproducibility expectation and a client handoff requirement for
-  the Tyto Ubuntu server.
-- Traefik is the chosen implementation of the single-ingress constraint. The architectural constraint
-  is centralised HTTPS termination and routing; the technology choice is documented in the technology
-  and deployment sections.
-- Worker crash recovery, retries, and dead-letter visibility are reliability mechanisms. They belong
-  primarily in the quality mapping unless a client or course source makes them a hard constraint.

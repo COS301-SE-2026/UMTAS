@@ -1,24 +1,5 @@
 # Architectural Requirements
 
-## Purpose
-
-Architectural requirements define what the UMTAS architecture must provide at a structural level.
-A requirement describes a required capability; a constraint describes a limitation or condition that
-shapes how that capability is delivered.
-
-This section is self-contained. Supporting detail is expanded in the linked pages for patterns,
-constraints, diagrams, quality mapping, API contracts, technology choices, and deployment.
-
-## Architectural Scope
-
-UMTAS is a browser-based client-server system with a central Core API and extracted parser and solver
-compute services. It is not a set of independent data-owning microservices. The Core API remains the
-authoritative boundary for authentication, authorization, orchestration, domain rules, persistence,
-and user-visible job state.
-
-Parser, solver, adapter, analytics, and simulation boundaries are separated only where they protect a
-real variation point, privacy boundary, or scaling concern.
-
 ## Architecture Requirements
 
 | ID | Requirement | Architectural Response |
@@ -58,12 +39,3 @@ real variation point, privacy boundary, or scaling concern.
 | Internal service calls | Worker-to-parser and worker-to-solver HTTP calls |
 | Polling-based completion | Browser reads of Core job states: `queued`, `running`, `succeeded`, `failed` |
 | Adapter-mediated integration | University source variation and provider-specific integration behavior |
-
-## Scope Notes
-
-- Extracted parser and solver services do not own independent domain databases, so UMTAS is not
-  documented as a full microservice architecture.
-- Simulation is documented because it is a client architectural requirement, not because it is part
-  of the five Demo 2 feature commitments.
-- Technology-specific deployment choices are recorded in the technology and deployment sections.
-- Quantified quality targets remain in the SRS and are mapped in the quality requirement section.
