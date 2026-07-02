@@ -1,6 +1,7 @@
 import {
   CreateBucketCommand,
   HeadBucketCommand,
+  PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3';
 import {
@@ -18,7 +19,9 @@ import {
 } from './storage.config';
 
 export interface ObjectStorageClient {
-  send(command: HeadBucketCommand | CreateBucketCommand): Promise<unknown>;
+  send(
+    command: HeadBucketCommand | CreateBucketCommand | PutObjectCommand,
+  ): Promise<unknown>;
 }
 
 export const OBJECT_STORAGE_CLIENT = Symbol('OBJECT_STORAGE_CLIENT');
@@ -71,6 +74,28 @@ export class ObjectStorageService implements OnModuleInit {
 
       throw error;
     }
+  }
+
+  async putObject(options: {
+    key: string;
+    body: Buffer | Uint8Array;
+    contentType?: string;
+  }): Promise<{ bucket: string; key: string }> {
+    if (!this.config.bucket) {
+      throw new Error('Object storage bucket is not configured');
+    }
+
+    await this.client.send(
+      new PutObjectCommand({
+        Bucket: this.config.bucket,
+        Key: options.key,
+        Body: options.body,
+        ContentLength: options.body.byteLength,
+        ContentType: options.contentType,
+      }),
+    );
+
+    return { bucket: this.config.bucket, key: options.key };
   }
 
   private async createBucket(): Promise<void> {
