@@ -201,8 +201,8 @@ function assertExactKeys(
     throw new BadRequestException(`${label} must be an object`);
   }
 
-  const actualKeys = Object.keys(value).sort();
-  const expected = expectedKeys.slice().sort();
+  const actualKeys = Object.keys(value).sort((a, b) => a.localeCompare(b));
+  const expected = expectedKeys.slice().sort((a, b) => a.localeCompare(b));
 
   if (!hasSameKeys(actualKeys, expected)) {
     throw new BadRequestException(
