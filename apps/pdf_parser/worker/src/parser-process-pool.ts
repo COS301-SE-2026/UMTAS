@@ -2,6 +2,7 @@ import { spawn, type ChildProcessWithoutNullStreams } from "node:child_process";
 import { createInterface, type Interface } from "node:readline";
 import { WorkerExecutionError, type WorkerLogger } from "bullmq-worker-core";
 import type { PdfParserResult } from "shared-types";
+import { z } from "zod";
 import type { ParserExecutor, PdfParseRequest } from "./contracts.js";
 import { validatePdfParserResult } from "./validation.js";
 
@@ -14,25 +15,26 @@ export interface ParserProcessPoolOptions {
   logger?: WorkerLogger;
 }
 
-interface ParserWorkerCompletedResponse {
-  requestId: string;
-  status: "completed";
-  result: unknown;
-}
+const parserWorkerErrorSchema = z.strictObject({
+  code: z.string(),
+  message: z.string(),
+  details: z.record(z.string(), z.unknown()).optional(),
+});
 
-interface ParserWorkerFailedResponse {
-  requestId: string;
-  status: "failed";
-  error: {
-    code: string;
-    message: string;
-    details?: Record<string, unknown>;
-  };
-}
+const ParserWorkerResponseSchema = z.discriminatedUnion("status", [
+  z.strictObject({
+    requestId: z.string(),
+    status: z.literal("completed"),
+    result: z.unknown(),
+  }),
+  z.strictObject({
+    requestId: z.string(),
+    status: z.literal("failed"),
+    error: parserWorkerErrorSchema,
+  }),
+]);
 
-type ParserWorkerResponse =
-  | ParserWorkerCompletedResponse
-  | ParserWorkerFailedResponse;
+type ParserWorkerResponse = z.infer<typeof ParserWorkerResponseSchema>;
 
 interface PendingParse {
   request: PdfParseRequest;
@@ -185,19 +187,22 @@ export class ParserProcessPool implements ParserExecutor {
       return;
     }
 
-    if (!isParserWorkerResponse(response)) {
+    const parsedResponse = ParserWorkerResponseSchema.safeParse(response);
+    if (!parsedResponse.success) {
       this.restartChild(
         child,
         new WorkerExecutionError(
           "PARSER_PROTOCOL_ERROR",
           "Parser worker response payload was invalid.",
-          { response },
+          { response, issues: parsedResponse.error.issues },
         ),
       );
       return;
     }
 
-    if (response.requestId !== pending.request.requestId) {
+    const workerResponse: ParserWorkerResponse = parsedResponse.data;
+
+    if (workerResponse.requestId !== pending.request.requestId) {
       this.restartChild(
         child,
         new WorkerExecutionError(
@@ -205,7 +210,7 @@ export class ParserProcessPool implements ParserExecutor {
           "Parser worker response requestId did not match the active request.",
           {
             expectedRequestId: pending.request.requestId,
-            actualRequestId: response.requestId,
+            actualRequestId: workerResponse.requestId,
           },
         ),
       );
@@ -216,27 +221,18 @@ export class ParserProcessPool implements ParserExecutor {
     child.jobsProcessed += 1;
     pending.removeAbortListener?.();
 
-    if (response.status === "completed") {
+    if (workerResponse.status === "completed") {
       try {
-        pending.resolve(validatePdfParserResult(response.result));
+        pending.resolve(validatePdfParserResult(workerResponse.result));
       } catch (error) {
         pending.reject(error);
       }
-    } else if (response.status === "failed") {
-      const errorDetails = buildParserWorkerErrorDetails(response.error);
+    } else if (workerResponse.status === "failed") {
       pending.reject(
         new WorkerExecutionError(
-          response.error.code,
-          response.error.message,
-          errorDetails,
-        ),
-      );
-    } else {
-      pending.reject(
-        new WorkerExecutionError(
-          "PARSER_PROTOCOL_ERROR",
-          "Parser worker response status was unsupported.",
-          { response },
+          workerResponse.error.code,
+          workerResponse.error.message,
+          { ...workerResponse.error.details },
         ),
       );
     }
@@ -360,54 +356,4 @@ export class ParserProcessPool implements ParserExecutor {
       }, 1_000).unref();
     });
   }
-}
-
-function isParserWorkerResponse(value: unknown): value is ParserWorkerResponse {
-  if (!isRecord(value) || typeof value.requestId !== "string") {
-    return false;
-  }
-
-  if (value.status === "completed") {
-    return Object.hasOwn(value, "result");
-  }
-
-  if (value.status === "failed") {
-    return isParserWorkerError(value.error);
-  }
-
-  return false;
-}
-
-function isParserWorkerError(
-  value: unknown,
-): value is ParserWorkerFailedResponse["error"] {
-  if (
-    !isRecord(value) ||
-    typeof value.code !== "string" ||
-    typeof value.message !== "string"
-  ) {
-    return false;
-  }
-
-  return value.details === undefined || isRecord(value.details);
-}
-
-function buildParserWorkerErrorDetails(
-  error: ParserWorkerFailedResponse["error"],
-): Record<string, unknown> {
-  const details: Record<string, unknown> = {};
-
-  if (!error.details) {
-    return details;
-  }
-
-  for (const key of Object.keys(error.details)) {
-    details[key] = error.details[key];
-  }
-
-  return details;
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
