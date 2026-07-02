@@ -48,8 +48,6 @@ export default async function statsPage() {
               <HeatMapTemplate />
               <HeatMapTemplate />
               <HeatMapTemplate />
-              <HeatMapTemplate />
-              <HeatMapTemplate />
             </div>
           </TabsContent>
 
@@ -81,15 +79,11 @@ export default async function statsPage() {
           <TabsContent value="enrollment">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
               <HeatMapTemplate />
-
-              <HeatMapTemplate />
             </div>
           </TabsContent>
 
           <TabsContent value="resources">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
-              <HeatMapTemplate />
-
               <HeatMapTemplate />
             </div>
           </TabsContent>
