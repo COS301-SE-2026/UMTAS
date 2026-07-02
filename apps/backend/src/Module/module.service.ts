@@ -188,6 +188,7 @@ export class ModuleService {
     const [module] = await this.dbService.db
       .select({
         ...getTableColumns(modules),
+        styling: ModuleStyling.styling,
       })
       .from(modules)
       .leftJoin(
@@ -230,35 +231,41 @@ export class ModuleService {
     )
       updateFields.moduleDescription = dto.moduleDescription.trim();
 
+    let newModule = oldModule;
     //If no updateFields - return module early
-    if (Object.keys(updateFields).length === 0) return oldModule;
+    if (Object.keys(updateFields).length === 0 && !dto.styling)
+      return oldModule;
+    else if (Object.keys(updateFields).length > 0) {
+      //update module
+      const [nuweModule] = await this.dbService.db
+        .update(modules)
+        .set(updateFields)
+        .where(eq(modules.moduleID, moduleId))
+        .returning();
 
-    //update module
-    const [newModule] = await this.dbService.db
-      .update(modules)
-      .set(updateFields)
-      .where(eq(modules.moduleID, moduleId))
-      .returning();
+      if (!nuweModule)
+        throw new InternalServerErrorException('Module failed to update');
 
-    if (!newModule)
-      throw new InternalServerErrorException('Module failed to update');
+      newModule = nuweModule;
+    }
 
-    //check for styling update
-    console.log(`CreateModule: dto.styling: ${JSON.stringify(dto.styling)}`);
-    //Styling update - any user can update styling as it doesn't influence module
-    // let newStyling: { colour: string } | null = null;
-    // if (dto.styling) {
-    //   newStyling = (await this.setStyling(moduleId, userId, dto.styling.colour))
-    //     .styling;
+    // Styling update - any user can update styling as it doesn't influence module
+    let newStyling: { colour: string } | null = null;
+    if (dto.styling) {
+      newStyling = (await this.setStyling(moduleId, userId, dto.styling.colour))
+        .styling;
 
-    //   newStyling = { colour: dto.styling.colour };
-    // } else {
-    //   //Keep original styling - is this really necessary?
+      newStyling = { colour: dto.styling.colour };
+    } else {
+      //Keep original styling - is this really necessary?
 
-    //   newStyling = oldModule.styling || null;
-    // }
+      newStyling = oldModule.styling || null;
+    }
 
-    return await this.getById(userId, moduleId);
+    return {
+      ...newModule,
+      styling: newStyling,
+    };
   } //update
 
   async deleteById(moduleId: string): Promise<DeleteModuleResponseDto> {

@@ -12,6 +12,13 @@ import {
 import { PartialType, PickType, OmitType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 
+class StylingDto {
+  @ApiProperty({ example: '#3B82F6' })
+  @IsString()
+  @IsNotEmpty()
+  colour!: string;
+}
+
 //Base class
 export class ModulesDto {
   @ApiProperty({
@@ -49,19 +56,18 @@ export class ModulesDto {
   @Length(1, 500)
   moduleDescription?: string | null;
 
-  @ApiPropertyOptional({
-    example: { colour: '#3B82F6' },
-    type: () => StylingDto,
-    description: 'Module styling',
-    additionalProperties: true,
+  @ApiProperty({
+    description: 'Styling to be used for a Module',
+    example: {
+      colour: 'FFFFF',
+    },
+    type: StylingDto,
   })
-  styling?: { colour: string } | null;
+  @IsObject()
+  @ValidateNested()
+  @Type(() => StylingDto)
+  styling?: StylingDto | null;
 } //ModuleDto
-
-class StylingDto {
-  @ApiProperty({ example: '#3B82F6' })
-  colour!: string;
-}
 
 //Create
 export class CreateModuleDto extends PickType(ModulesDto, [

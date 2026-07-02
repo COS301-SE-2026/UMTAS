@@ -9,6 +9,7 @@ import {
 
 export class CreateBuilderModuleDto extends OmitType(CreateModuleDto, [
   'CourseID',
+  'ModuleGroupingID',
 ]) {}
 
 //Update
