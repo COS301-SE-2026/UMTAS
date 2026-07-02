@@ -1,12 +1,15 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsNotEmpty,
+  IsObject,
   IsOptional,
   IsString,
   IsUUID,
   Length,
+  ValidateNested,
 } from 'class-validator';
 import { PartialType, PickType, OmitType } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 
 //Base class
 export class ModulesDto {
@@ -122,3 +125,26 @@ export class ModuleFiltersDto {
 
   //Filter by code using wildcard
 } //ModuleFiltersDto
+
+export class ModuleStylingResponseDto {
+  @ApiProperty({
+    description: 'Describes the state of the success response',
+    example: 'Suceess',
+    type: String,
+  })
+  message!: string;
+}
+
+export class ModuleStylingBodyDto {
+  @ApiProperty({
+    description: 'Styling to be used for a Module',
+    example: {
+      colour: 'FFFFF',
+    },
+    type: StylingDto,
+  })
+  @IsObject()
+  @ValidateNested()
+  @Type(() => StylingDto)
+  styling!: StylingDto;
+}
