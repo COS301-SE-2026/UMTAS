@@ -28,7 +28,8 @@ export interface PdfParseS3Config {
 }
 
 const executionModeSchema = z.enum(["cli", "process-pool"]);
-const DEFAULT_EXECUTION_MODE: PdfParseExecutionMode = "process-pool";
+const DEFAULT_EXECUTION_MODE: PdfParseExecutionMode = "cli";
+const argsSchema = z.array(z.string());
 
 export function buildPdfParseWorkerConfig(
   readEnv: EnvReader = (key) => process.env[key],
@@ -57,11 +58,12 @@ export function buildPdfParseWorkerConfig(
     callbackBaseUrl: callbackBaseUrl,
     executionMode: executionMode,
     cliCommand: readEnv("PDF_PARSE_CLI_COMMAND") ?? "python3",
-    cliArgs: splitArgs(readEnv("PDF_PARSE_CLI_ARGS") ?? "-m parser_cli"),
+    cliArgs: readArgs(readEnv("PDF_PARSE_CLI_ARGS"), ["-m", "parser_cli"]),
     workerCommand: readEnv("PDF_PARSE_WORKER_COMMAND") ?? "python3",
-    workerArgs: splitArgs(
-      readEnv("PDF_PARSE_WORKER_ARGS") ?? "-m parser_worker",
-    ),
+    workerArgs: readArgs(readEnv("PDF_PARSE_WORKER_ARGS"), [
+      "-m",
+      "parser_worker",
+    ]),
     processPoolSize: readPositiveInt(readEnv("PDF_PARSE_PROCESS_POOL_SIZE"), 4),
     processMaxJobs: readPositiveInt(readEnv("PDF_PARSE_PROCESS_MAX_JOBS"), 500),
     s3: buildPdfParseS3Config(readEnv),
@@ -85,11 +87,39 @@ export function buildPdfParseCallbackUrl(
   return `${baseUrl.replace(/\/+$/, "")}/${encodeURIComponent(jobId)}/callback`;
 }
 
-export function splitArgs(value: string): string[] {
-  return value
-    .trim()
-    .split(/\s+/)
-    .filter((part) => part.length > 0);
+export function readArgs(
+  value: string | undefined,
+  defaultArgs: string[],
+): string[] {
+  if (value === undefined) {
+    return defaultArgs;
+  }
+
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return [];
+  }
+
+  if (trimmed.startsWith("[")) {
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(trimmed);
+    } catch (error) {
+      throw new Error(
+        `Parser args JSON was invalid: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
+    }
+
+    const result = argsSchema.safeParse(parsed);
+    if (!result.success) {
+      throw new Error("Parser args JSON must be an array of strings.");
+    }
+    return result.data;
+  }
+
+  return trimmed.split(/\s+/);
 }
 
 function readExecutionMode(value: string | undefined): PdfParseExecutionMode {
