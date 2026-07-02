@@ -1,5 +1,4 @@
 #include "GA.h"
-#include <cinttypes>
 #include <cmath>
 #include <iostream>
 #include <ostream>
@@ -13,6 +12,7 @@ int RequiredEvents = 0;
 std::unordered_map<string, int> modulesMap;
 std::unordered_map<string, int> tempMap;
 std::unordered_map<string, bool> collisionCheck;
+std::unordered_map<string, eventsOccurring> mutationMap;
 
 // makes a key of module:event -> occurences
 // also have a local structure that will do the same however its meant to be
@@ -27,6 +27,7 @@ GA_Handler::GA_Handler(API_DATA data) {
   copyChrom = EventChromosome(data);
   InitMap();
   InitOverlap();
+  InitMutationMap();
   InitGA();
 }
 void GA_Handler::InitOverlap() {
@@ -99,29 +100,35 @@ void init_genes(EventChromosome &p, const std::function<double(void)> &rnd01) {
 EventChromosome mutate(const EventChromosome &p,
                        const std::function<double(void)> &rnd01,
                        double shrink_scale) {
-    // needs to be fundamentally re-written to only mutate ones that are able to mutate
-    // this being ones with multiple options thus another data structure 
   int size = p.events.size();
-  if (size > 0) {
-    double mutatePer = 0.5;
-    EventChromosome newChrom = p;
+  EventChromosome nChrom = p;
+  while (true) {
+    int index = (int)(std::floor(rnd01() * 1000)) % size;
+    
 
-    newChrom.numActive = 0;
-    for (int i = 0; i < newChrom.events.size(); i++) {
-      if (rnd01() < mutatePer) {
-        newChrom.events[i].is_active = !newChrom.events[i].is_active;
-        if (newChrom.events[i].is_active) {
-          newChrom.numActive++;
-        } else {
-          newChrom.numActive--;
-        }
-        break;
-      }
+    string modCode = nChrom.events[index].moduleCode;
+    int mapSize = mutationMap.find(modCode)->second.indices.size();
+
+    if (mapSize > 1) {
+      int swapIndex = (int)(std::floor(rnd01() * 1000)) % mapSize;
+      nChrom.events[index].is_active = false;
+      swapIndex = mutationMap.find(modCode)->second.indices[swapIndex];
+      nChrom.events[swapIndex].is_active = true;
+      return nChrom;
     }
-    return newChrom;
-  } else {
-    // fall back shouldnt happen
-    return copyChrom;
+  }
+}
+void GA_Handler::InitMutationMap() {
+  for (int i = 0; i < copyChrom.events.size(); i++) {
+    if (mutationMap.find(copyChrom.events[i].moduleCode) != mutationMap.end()) {
+      mutationMap[copyChrom.events[i].moduleCode].indices.push_back(i);
+    } else {
+      mutationMap.insert({copyChrom.events[i].moduleCode,
+                          eventsOccurring(copyChrom.events[i].eventType,
+                                          copyChrom.events[i].moduleCode)});
+      mutationMap.find(copyChrom.events[i].moduleCode)
+          ->second.indices.push_back(i);
+    }
   }
 }
 
