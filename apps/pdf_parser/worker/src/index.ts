@@ -4,7 +4,6 @@ import {
   type WorkerHostOptions,
 } from "bullmq-worker-core";
 import type { PdfParseJobData } from "shared-types";
-import type { ParserExecutor } from "./contracts.js";
 import {
   buildPdfParseCallbackUrl,
   buildPdfParseWorkerConfig,
@@ -14,10 +13,6 @@ import {
   CliParserExecutor,
   type CliParserExecutorOptions,
 } from "./parser-executor.js";
-import {
-  ParserProcessPool,
-  type ParserProcessPoolOptions,
-} from "./parser-process-pool.js";
 import { PdfParseProcessor } from "./pdf-parse.processor.js";
 import { S3PdfStorageClient } from "./storage.js";
 
@@ -65,7 +60,6 @@ worker.on("failed", (job, error) => {
 
 const shutdown = async () => {
   await worker.close();
-  await parserExecutor.close?.();
 };
 
 process.on("SIGTERM", () => {
@@ -86,32 +80,17 @@ process.on("SIGINT", () => {
     });
 });
 
-function createParserExecutor(config: PdfParseWorkerConfig): ParserExecutor {
-  if (config.executionMode === "cli") {
-    const options: CliParserExecutorOptions = {
-      command: config.cliCommand,
-      args: config.cliArgs,
-    };
-
-    if (config.cliCwd) {
-      options.cwd = config.cliCwd;
-    }
-
-    return new CliParserExecutor(options);
-  }
-
-  const options: ParserProcessPoolOptions = {
-    size: config.processPoolSize,
-    command: config.workerCommand,
-    args: config.workerArgs,
-    maxJobsPerProcess: config.processMaxJobs,
+function createParserExecutor(config: PdfParseWorkerConfig): CliParserExecutor {
+  const options: CliParserExecutorOptions = {
+    command: config.cliCommand,
+    args: config.cliArgs,
   };
 
   if (config.cliCwd) {
     options.cwd = config.cliCwd;
   }
 
-  return new ParserProcessPool(options);
+  return new CliParserExecutor(options);
 }
 
 function readCallbackJobId(

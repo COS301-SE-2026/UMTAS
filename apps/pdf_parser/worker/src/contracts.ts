@@ -1,7 +1,5 @@
 import type { PdfParseJobData, PdfParserResult } from "shared-types";
 
-export type PdfParseExecutionMode = "cli" | "process-pool";
-
 export interface PdfParseRequest {
   requestId: string;
   adapterKey: string;
