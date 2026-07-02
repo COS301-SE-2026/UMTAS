@@ -43,7 +43,7 @@ void SO_report_generation(
     const EA::GenerationType<EventChromosome, ChromMiddleCost> &last_generation,
     const EventChromosome &best_genes);
 
-double Overlap_Heuristic(EventChromosome event);
+double Overlap_Heuristic( EventChromosome event);
 
 bool CountPattern(EventChromosome chrom);
 void resetTemp();

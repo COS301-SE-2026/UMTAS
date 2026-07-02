@@ -38,7 +38,7 @@ EventGA::EventGA(json eventsJson) {
     if (typeCheckHelper(EVENT_TYPE, eventsJson)) {
 
       this->eventType = eventsJson[EVENT_TYPE];
-              cout<<"in the init of event"<<eventType <<endl;
+      
     }
 
   } catch (std::runtime_error &e) {
