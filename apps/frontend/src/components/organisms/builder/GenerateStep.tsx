@@ -9,6 +9,7 @@ import { Label } from "@/components/atoms/baseShadcn/label";
 import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
 import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
 import { Checkbox } from "@/components/atoms/baseShadcn/checkbox";
+import CustomiseShellPopup from "@/components/organisms/customise/CustomiseShellPopup";
 
 interface GenerateStepProps {
   modules: ModuleResponseDto[];
@@ -146,7 +147,7 @@ export function GenerateStep({
               >
                 <div className="flex flex-col gap-1 flex-1 min-w-0">
                   <p className="text-base font-medium text-[var(--text-primary)]">
-                    {criteria?.moduleID || "Event"}
+                    {event.eventName || "Event"}
                   </p>
                   <div className="flex flex-wrap items-center gap-2">
                     {criteria?.date && (
@@ -247,7 +248,7 @@ export function GenerateStep({
       </div>
 
       <div className="mb-8">{renderContent()}</div>
-
+      <CustomiseShellPopup />
       <Button
         type="button"
         size="default"

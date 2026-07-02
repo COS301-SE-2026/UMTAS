@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/atoms/baseShadcn/skeleton";
 import { WeeklyGrid } from "@/components/organisms/viewTimetable/WeeklyGrid";
 import { EmptySchedule } from "@/components/organisms/viewTimetable/EmptySchedule";
 import { WeekNavBar } from "@/components/molecules/viewTimetable/WeekNavBar";
+import { GenerateStep } from "@/components/organisms/builder/GenerateStep";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -30,11 +31,16 @@ import { Button } from "@/components/atoms/baseShadcn/button";
 
 import { useQuery } from "@tanstack/react-query";
 
-import { getAllTimetablesQ } from "@/components/templates/builder/Queries/timetableQueries";
+import {
+  getAllTimetablesQ,
+  getTimetableByIdQ,
+  addTimetableMut,
+  updateTimetableMut,
+} from "@/components/templates/builder/Queries/timetableQueries";
+import { getQueryClient } from "@/components/tanstack/getQueryClient";
 
-import { log, time } from "console";
-import { router } from "better-auth/api";
-import { redirect } from "next/dist/server/api-utils";
+import { useSearchParams } from "next/navigation";
+
 import { getAllEventsQ } from "@/components/templates/builder/Queries/eventQueries";
 import { getAllModulesQ } from "@/components/templates/builder/Queries/moduleQueries";
 import { removeTimetableMut } from "@/components/templates/builder/Queries/timetableQueries";
@@ -55,6 +61,21 @@ export function ScheduleView({
   const [selectedTimetableId, setSelectedTimetableId] = useState<string>("");
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [currentWeekIndex, setCurrentWeekIndex] = useState(0);
+  //most of these are straight copied and pasted from wizard shell
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [viewMode, setViewMode] = useState<"Generate" | "Timetable">(
+    "Timetable",
+  );
+  const isEditMode = !!selectedTimetableId;
+  const [timetableName, setTimetableName] = useState("My New Schedule");
+  const [selectedEventIds, setSelectedEventIds] = useState<string[]>([]);
+  const [OGeventId, setOGeventId] = useState<string[]>([]);
+  const editId = selectedTimetableId;
+  const searchParams = useSearchParams();
+  const actionChecker = searchParams.get("action");
+
+  const { mutateAsync: addTimetable } = useMutation(addTimetableMut());
+  const { mutateAsync: updateTimetable } = useMutation(updateTimetableMut());
 
   const { data: allModules = [], isLoading: isLoadingModules } =
     useQuery(getAllModulesQ());
@@ -68,11 +89,24 @@ export function ScheduleView({
 
   useEffect(() => {
     if (timetables.length > 0 && !selectedTimetableId) {
-      // setSelectedTimetableId(
-      // String(timetables[timetables.length - 1].timetable.timetableID),
-      //);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSelectedTimetableId(
+        String(timetables[timetables.length - 1].timetable.timetableID),
+      );
     }
   }, [timetables, selectedTimetableId]);
+
+  //this useEffect is the "memory" between the builder and schedules
+  useEffect(() => {
+    if (actionChecker === "new") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSelectedTimetableId("");
+      setViewMode("Generate");
+
+      router.replace("/schedules");
+    }
+  }, [actionChecker, router]);
+
   const { events, modules } = useMemo(() => {
     if (!selectedTimetableId) {
       return { events: [], modules: [] };
@@ -158,7 +192,8 @@ export function ScheduleView({
     return renderLoadingSkeleton();
   }
 
-  if (timetables.length === 0) {
+  //NB check viewMode otherwise the generate step does not show on this page
+  if (timetables.length === 0 && viewMode !== "Generate") {
     return (
       <div className="flex flex-col items-center gap-4 py-20 text-center">
         <p className="text-base text-[var(--text-secondary)]">
@@ -174,7 +209,7 @@ export function ScheduleView({
     );
   }
 
-  //delete timetable
+  //delete timetable (works)
 
   function deleteDialog() {
     if (!selectedTimetableId) {
@@ -201,115 +236,184 @@ export function ScheduleView({
     });
   }
 
-  //edit timetable
+  //edit timetable (broken currently)
 
   async function editTimetable() {
+    if (!selectedTimetableId) return;
+
     try {
-      if (!selectedTimetableId) {
-        return;
-      }
-
-      //move back to builder step 3
-      router.push(`/builder?editId=${selectedTimetableId}`);
-
-      console.log("Successfully edited timetable");
-    } catch (error) {
-      console.error("An error occured while editing the timetable", error);
-
-      //this alert will be changed once I add the error components
-      alert(
-        "An error occured while editing your timetable. Please refresh and try again.",
+      const queryClient = getQueryClient();
+      const timetableRes = await queryClient.fetchQuery(
+        getTimetableByIdQ(selectedTimetableId),
       );
+
+      setTimetableName(
+        timetableRes.timetable.timetableName || "Updated Schedule",
+      );
+
+      setOGeventId((timetableRes.eventIds || []).map(String));
+      setSelectedEventIds((timetableRes.eventIds || []).map(String));
+
+      setIsGenerating(false);
+
+      setViewMode("Generate");
+    } catch (error) {
+      console.error("edit timetable error", error);
     }
   }
 
-  return (
-    <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between">
-        <div className="w-64">
-          <Select
-            value={String(selectedTimetableId)}
-            onValueChange={(newValue) => {
-              setSelectedTimetableId(newValue);
-              setCurrentWeekIndex(0);
-            }}
-          >
-            <SelectTrigger className="bg-[var(--bg-surface)] border-[var(--border)]">
-              <SelectValue placeholder="Select a timetable" />
-            </SelectTrigger>
-            <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)]">
-              {timetables.map((tt) => (
-                <SelectItem
-                  key={tt.timetable.timetableID}
-                  value={String(tt.timetable.timetableID)}
-                  className="text-[var(--text-primary)]"
-                >
-                  {tt.timetable.timetableName ||
-                    `Timetable ${tt.timetable.timetableID}`}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
+  //the functions below are copied, pasted and slightly changed from the wizard shell. you'll see wizard shell is a lot shorter
+  async function handleGenerate(name: string, selectedEventIds: string[]) {
+    setIsGenerating(true);
+    try {
+      const finalEvents = selectedEventIds.map((id) => id);
 
-      {!currentWeekStart || events.length === 0 ? (
-        <EmptySchedule />
-      ) : (
-        <div className="flex flex-col">
-          <div className="flex flex-row justify-between items-center w-full">
-            <WeekNavBar
-              weekStart={currentWeekStart}
-              currentIndex={currentWeekIndex}
-              totalWeeks={weekStarts.length}
-              onPrev={handlePrevWeek}
-              onNext={handleNextWeek}
-            />
-            <div className="flex flex-row justify-end gap-1">
-              <Button
-                type="button"
-                className="h-7 px-3 text-xs bg-[var(--bg-surface)] text-[var(--text-primary)] border-[var(--border)] hover:opacity-90"
-                onClick={editTimetable}
-              >
-                Edit
-              </Button>
+      if (editId) {
+        const noNumIds = OGeventId.filter(
+          (id) => !selectedEventIds.includes(id),
+        );
 
-              <Button
-                type="button"
-                className="h-7 px-3 text-xs bg-[var(--destructive)] text-[var(--text-primary)] border-[var(--border)] hover:opacity-90"
-                onClick={deleteDialog}
-              >
-                Delete
-              </Button>
-            </div>
+        const numbersOnlyAddIds = selectedEventIds.filter(
+          (id) => !OGeventId.includes(id),
+        );
+
+        await updateTimetable({
+          path: { id: editId },
+          body: {
+            timetableName: name || "Updated Schedule",
+            removeEventIds: noNumIds,
+            addEventIds: numbersOnlyAddIds,
+          },
+        });
+      } else {
+        await addTimetable({
+          body: {
+            timetableName: name || "Generated Schedule",
+            eventIds: finalEvents,
+          },
+        });
+      }
+
+      const queryClient = getQueryClient();
+
+      await queryClient.invalidateQueries({
+        queryKey: getAllTimetablesQ().queryKey,
+      });
+
+      setViewMode("Timetable");
+    } catch (error) {
+      console.error("Failed to generate timetable:", error);
+      setIsGenerating(false);
+    }
+  }
+
+  function renderView() {
+    if (viewMode === "Generate") {
+      return (
+        <GenerateStep
+          modules={allModules}
+          events={allEvents}
+          onGenerate={handleGenerate}
+          isGenerating={isGenerating}
+          isEditMode={isEditMode}
+          timetableName={timetableName}
+          setTimetableName={setTimetableName}
+          selectedEventIds={selectedEventIds}
+          setSelectedEventIds={setSelectedEventIds}
+        />
+      );
+    }
+
+    return (
+      <div className="flex flex-col gap-6">
+        <div className="flex items-center justify-between">
+          <div className="w-64">
+            <Select
+              value={String(selectedTimetableId)}
+              onValueChange={(newValue) => {
+                setSelectedTimetableId(newValue);
+                setCurrentWeekIndex(0);
+              }}
+            >
+              <SelectTrigger className="bg-[var(--bg-surface)] border-[var(--border)]">
+                <SelectValue placeholder="Select a timetable" />
+              </SelectTrigger>
+              <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)]">
+                {timetables.map((tt) => (
+                  <SelectItem
+                    key={tt.timetable.timetableID}
+                    value={String(tt.timetable.timetableID)}
+                    className="text-[var(--text-primary)]"
+                  >
+                    {tt.timetable.timetableName ||
+                      `Timetable ${tt.timetable.timetableID}`}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-          <AlertDialog
-            open={isDeleteDialogOpen}
-            onOpenChange={setIsDeleteDialogOpen}
-          >
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>
-                  Are you sure you want to delete this timetable?
-                </AlertDialogTitle>
-                <AlertDialogDescription>
-                  This cannot be undone
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={deleteTimetableByID}
-                  variant="destructive"
+        </div>
+
+        {!currentWeekStart || events.length === 0 ? (
+          <EmptySchedule />
+        ) : (
+          <div className="flex flex-col">
+            <div className="flex flex-row justify-between items-center w-full">
+              <WeekNavBar
+                weekStart={currentWeekStart}
+                currentIndex={currentWeekIndex}
+                totalWeeks={weekStarts.length}
+                onPrev={handlePrevWeek}
+                onNext={handleNextWeek}
+              />
+              <div className="flex flex-row justify-end gap-1">
+                <Button
+                  type="button"
+                  className="h-7 px-3 text-xs bg-[var(--bg-surface)] text-[var(--text-primary)] border-[var(--border)] hover:opacity-90"
+                  onClick={editTimetable}
+                >
+                  Edit
+                </Button>
+
+                <Button
+                  type="button"
+                  className="h-7 px-3 text-xs bg-[var(--destructive)] text-[var(--text-primary)] border-[var(--border)] hover:opacity-90"
+                  onClick={deleteDialog}
                 >
                   Delete
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-          <WeeklyGrid events={resolvedEvents} weekStart={currentWeekStart} />
-        </div>
-      )}
-    </div>
-  );
+                </Button>
+              </div>
+            </div>
+            <AlertDialog
+              open={isDeleteDialogOpen}
+              onOpenChange={setIsDeleteDialogOpen}
+            >
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    Are you sure you want to delete this timetable?
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This cannot be undone
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={deleteTimetableByID}
+                    variant="destructive"
+                  >
+                    Delete
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+            <WeeklyGrid events={resolvedEvents} weekStart={currentWeekStart} />
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return <>{renderView()}</>;
 }
