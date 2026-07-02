@@ -1,9 +1,9 @@
 #include "GA.h"
+#include <cinttypes>
 #include <cmath>
 #include <iostream>
 #include <ostream>
 #include <sstream>
-#include <string>
 #include <unordered_map>
 #include <vector>
 
@@ -19,6 +19,7 @@ std::unordered_map<string, bool> collisionCheck;
 // overwritten
 
 EventChromosome copyChrom;
+EventChromosome solChrom;
 // this will be overwritten
 
 GA_Handler::GA_Handler(API_DATA data) {
@@ -68,14 +69,15 @@ void GA_Handler::InitGA() {
   // DD setup
   gaEngine.problem_mode = EA::GA_MODE::SOGA;
   gaEngine.generation_max = 50;
-  gaEngine.population = 20;
-  gaEngine.multi_threading = true;
+  gaEngine.population = 5;
+  gaEngine.multi_threading = false;
   gaEngine.crossover_fraction = 0.7;
-  gaEngine.mutation_rate = 0.1;
+  gaEngine.mutation_rate = 0.9;
   gaEngine.verbose = false;
 }
 
 EventChromosome GA_Handler::findSolution() {
+  std::cout << "Starting GA" << std::endl;
   gaEngine.solve();
   int index = gaEngine.last_generation.best_chromosome_index;
   return gaEngine.last_generation.chromosomes[index].genes;
@@ -83,21 +85,25 @@ EventChromosome GA_Handler::findSolution() {
 
 void init_genes(EventChromosome &p, const std::function<double(void)> &rnd01) {
   p = copyChrom;
-  for (auto &event : p.events) {
-    if (rnd01() >= 0.5) {
+  for (EventGA &event : p.events) {
+    string key = event.moduleCode + ":" + event.eventType;
+    if (modulesMap[key] > tempMap[key]) {
+      tempMap.find(key)->second++;
       event.is_active = true;
       p.numActive++;
     }
   }
+  resetTemp();
 }
 
 EventChromosome mutate(const EventChromosome &p,
                        const std::function<double(void)> &rnd01,
                        double shrink_scale) {
-
+    // needs to be fundamentally re-written to only mutate ones that are able to mutate
+    // this being ones with multiple options thus another data structure 
   int size = p.events.size();
   if (size > 0) {
-    double mutatePer = 1 / (double)size;
+    double mutatePer = 0.5;
     EventChromosome newChrom = p;
 
     newChrom.numActive = 0;
@@ -109,6 +115,7 @@ EventChromosome mutate(const EventChromosome &p,
         } else {
           newChrom.numActive--;
         }
+        break;
       }
     }
     return newChrom;
@@ -165,7 +172,6 @@ bool eval_solution(const EventChromosome &p, ChromMiddleCost &c) {
 bool CountPattern(EventChromosome chrom) {
   // C(n)
   if (RequiredEvents != chrom.numActive) {
-
     return false;
   }
 
@@ -231,6 +237,7 @@ double Overlap_Heuristic(EventChromosome eventChrom) {
         string eventKey = event.eventDay + ":" + slot;
         if (collisionCheck.find(eventKey)->second) {
           eventChrom.numCollision++;
+          break;
         } else {
           collisionCheck.find(eventKey)->second = true;
         }
@@ -241,10 +248,7 @@ double Overlap_Heuristic(EventChromosome eventChrom) {
   resetCollision();
   double MAD = (1 / (double)numberOfPts) * sum;
   int collCount = eventChrom.numCollision + 1;
-  if (collCount == 0)
-    return MAD;
-  else
-    return MAD * collCount/2;
+  return MAD * collCount;
 }
 
 std::vector<string> slotEval(int timeStart, int timeEnd) {
@@ -304,13 +308,17 @@ void SO_report_generation(
 
         string eventKey = event.eventDay + ":" + slot;
         if (collisionCheck.find(eventKey)->second) {
-            numCollision++;
+          numCollision++;
+
+          std::cout << "event " << event.moduleCode << " Type "
+                    << event.eventType << " Collision" << std::endl;
+          break;
         } else {
           collisionCheck.find(eventKey)->second = true;
         }
       }
     }
   }
-
-    std::cout << "Number of collisions " << numCollision<< std::endl;
+  resetCollision();
+  std::cout << "Number of collisions " << numCollision << std::endl;
 }
