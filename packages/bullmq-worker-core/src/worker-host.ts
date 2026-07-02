@@ -84,14 +84,16 @@ export async function processWorkerJob<TJobData>(
     await cleanupTempDir(tempDir);
     return payload;
   } catch (error) {
-    if (isFinalAttempt(job)) {
-      await options.callbackClient.post(callbackUrl, toFailurePayload(error));
-    }
-
-    if (!options.keepFailedTemp) {
-      await cleanupTempDir(tempDir);
-    } else {
-      logger.warn("Keeping failed worker temp directory", { jobId, tempDir });
+    try {
+      if (isFinalAttempt(job)) {
+        await options.callbackClient.post(callbackUrl, toFailurePayload(error));
+      }
+    } finally {
+      if (!options.keepFailedTemp) {
+        await cleanupTempDir(tempDir);
+      } else {
+        logger.warn("Keeping failed worker temp directory", { jobId, tempDir });
+      }
     }
 
     throw error;
