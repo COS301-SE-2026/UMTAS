@@ -1,0 +1,12 @@
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.8",
+  "base_commit_sha": "6de2da703a1a4046f2178862174a633bd8af0bad",
+  "prompts": {},
+  "humans": {
+    "h_8b894b05e4a1b2": {
+      "author": "Wilmar-Smit <u24584216@tuks.co.za>"
+    }
+  }
+}

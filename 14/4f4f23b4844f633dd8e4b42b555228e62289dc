@@ -1,0 +1,26 @@
+apps/backend/src/storage/object-storage.service.spec.ts
+  s_3296829e0ded14::t_6852c9d1e1474d 1-83
+packages/bullmq-worker-core/src/tests/run-cli.test.ts
+  h_3359569cacef0e 1-74
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.5",
+  "base_commit_sha": "144f4f23b4844f633dd8e4b42b555228e62289dc",
+  "prompts": {},
+  "humans": {
+    "h_3359569cacef0e": {
+      "author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_3296829e0ded14": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f217f-0f36-73f2-81e7-204f4fb009d8",
+        "model": "gpt-5.5"
+      },
+      "human_author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}
