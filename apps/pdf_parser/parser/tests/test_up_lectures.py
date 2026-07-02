@@ -1,5 +1,7 @@
 from collections import Counter
 
+from parser.adapters.up_lectures import activity_code
+
 from .conftest import parse_fixture
 
 
@@ -45,3 +47,7 @@ def test_lecture_processing_normalises_times_days_recurrence_and_locations(up_pa
     assert all(event["day"] in {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday"} for event in events)
     assert all(event["isRecurring"] is True for event in events)
     assert all(event["startTime"] < event["endTime"] for event in events)
+
+
+def test_lecture_title_uses_activity_code(up_parser):
+    assert activity_code("P2 Practical") == "P2"

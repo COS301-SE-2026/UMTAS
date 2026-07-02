@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { buildPdfParseWorkerConfig, readArgs } from "../config.js";
+import {
+  buildPdfParseWorkerConfig,
+  readArgs,
+  validatePdfParseWorkerConfig,
+} from "../config.js";
 
 test("buildPdfParseWorkerConfig uses CLI parser settings", () => {
   const config = buildPdfParseWorkerConfig(() => undefined);
@@ -15,4 +19,23 @@ test("readArgs accepts JSON string arrays for arguments with spaces", () => {
     "--label",
     "UP 2026",
   ]);
+});
+
+test("validatePdfParseWorkerConfig requires callback token at startup", () => {
+  const config = buildPdfParseWorkerConfig((key) => {
+    if (key === "MINIO_BUCKET") {
+      return "umtas-uploads";
+    }
+
+    if (key === "WORKER_CALLBACK_TOKEN") {
+      return "  ";
+    }
+
+    return undefined;
+  });
+
+  assert.throws(
+    () => validatePdfParseWorkerConfig(config),
+    /WORKER_CALLBACK_TOKEN is required/,
+  );
 });

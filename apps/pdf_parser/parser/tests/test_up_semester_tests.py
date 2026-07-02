@@ -21,3 +21,11 @@ def test_semester_test_fixture_preserves_venue_alternatives(up_parser):
     assert cos333_test1["startTime"] == "12:30"
     assert cos333_test1["endTime"] == "14:00"
     assert cos333_test1["isRecurring"] is False
+    assert cos333_test1["title"] == "COS333 Semester Test 1"
+
+
+def test_semester_test_titles_are_numbered_per_module(up_parser):
+    events = parse_fixture(up_parser, "SEM_TESTS_BOTH.pdf")["events"]
+    cos333_titles = [event["title"] for event in events if event["moduleCode"] == "COS333"]
+
+    assert cos333_titles == ["COS333 Semester Test 1", "COS333 Semester Test 2"]

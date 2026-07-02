@@ -8,6 +8,7 @@ import {
   buildPdfParseCallbackUrl,
   buildPdfParseWorkerConfig,
   type PdfParseWorkerConfig,
+  validatePdfParseWorkerConfig,
 } from "./config.js";
 import {
   CliParserExecutor,
@@ -17,10 +18,7 @@ import { PdfParseProcessor } from "./pdf-parse.processor.js";
 import { S3PdfStorageClient } from "./storage.js";
 
 const config = buildPdfParseWorkerConfig();
-
-if (!config.s3.bucket) {
-  throw new Error("MINIO_BUCKET is required.");
-}
+validatePdfParseWorkerConfig(config);
 
 const parserExecutor = createParserExecutor(config);
 

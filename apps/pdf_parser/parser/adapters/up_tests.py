@@ -62,7 +62,7 @@ def test_rows_to_events(parser, rows: list[TestRow]) -> list[dict]:
                 module_code_value=module,
                 event_type="test",
                 section_label=section_label,
-                title=f"{module} {section_label}",
+                title="",
                 day=clean_cell(row.day),
                 date=date,
                 start_time=start_time,
@@ -73,4 +73,9 @@ def test_rows_to_events(parser, rows: list[TestRow]) -> list[dict]:
             )
         for venue in clean_lines(row.venue):
             parser._append_unique(grouped[key]["venues"], venue)
+    test_counts_by_module: dict[str, int] = {}
+    for event in grouped.values():
+        module = event["moduleCode"]
+        test_counts_by_module[module] = test_counts_by_module.get(module, 0) + 1
+        event["title"] = f"{module} Semester Test {test_counts_by_module[module]}"
     return list(grouped.values())
