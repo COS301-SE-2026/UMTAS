@@ -50,7 +50,7 @@ export function createEvent(
 
 export function createCreateEventDto(event: EventEntity): CreateEventDto {
   const { ...dto } = event;
-  return dto as CreateEventDto;
+  return dto;
 } ///END_createCreateEventDto
 
 type UniversityEvent = typeof UniversityEvent.$inferSelect;
