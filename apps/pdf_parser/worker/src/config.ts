@@ -1,22 +1,15 @@
 import {
   buildCommonWorkerConfig,
-  readPositiveInt,
   type CommonWorkerConfig,
   type EnvReader,
 } from "bullmq-worker-core";
 import { z } from "zod";
-import type { PdfParseExecutionMode } from "./contracts.js";
 
 export interface PdfParseWorkerConfig extends CommonWorkerConfig {
   callbackBaseUrl: string;
-  executionMode: PdfParseExecutionMode;
   cliCommand: string;
   cliArgs: string[];
-  workerCommand: string;
-  workerArgs: string[];
   cliCwd?: string;
-  processPoolSize: number;
-  processMaxJobs: number;
   s3: PdfParseS3Config;
 }
 
@@ -27,8 +20,6 @@ export interface PdfParseS3Config {
   secretAccessKey?: string;
 }
 
-const executionModeSchema = z.enum(["cli", "process-pool"]);
-const DEFAULT_EXECUTION_MODE: PdfParseExecutionMode = "cli";
 const argsSchema = z.array(z.string());
 
 export function buildPdfParseWorkerConfig(
@@ -42,7 +33,6 @@ export function buildPdfParseWorkerConfig(
     timeoutEnv: "PDF_PARSE_TIMEOUT_MS",
     defaultTimeoutMs: 60_000,
   });
-  const executionMode = readExecutionMode(readEnv("PDF_PARSE_EXECUTION_MODE"));
   const cliCwd = readEnv("PDF_PARSE_CLI_CWD");
   const callbackBaseUrl =
     readEnv("PDF_PARSE_CALLBACK_URL") ??
@@ -56,16 +46,8 @@ export function buildPdfParseWorkerConfig(
     keepFailedTemp: common.keepFailedTemp,
     callbackToken: common.callbackToken,
     callbackBaseUrl: callbackBaseUrl,
-    executionMode: executionMode,
     cliCommand: readEnv("PDF_PARSE_CLI_COMMAND") ?? "python3",
     cliArgs: readArgs(readEnv("PDF_PARSE_CLI_ARGS"), ["-m", "parser_cli"]),
-    workerCommand: readEnv("PDF_PARSE_WORKER_COMMAND") ?? "python3",
-    workerArgs: readArgs(readEnv("PDF_PARSE_WORKER_ARGS"), [
-      "-m",
-      "parser_worker",
-    ]),
-    processPoolSize: readPositiveInt(readEnv("PDF_PARSE_PROCESS_POOL_SIZE"), 4),
-    processMaxJobs: readPositiveInt(readEnv("PDF_PARSE_PROCESS_MAX_JOBS"), 500),
     s3: buildPdfParseS3Config(readEnv),
   };
 
@@ -120,11 +102,6 @@ export function readArgs(
   }
 
   return trimmed.split(/\s+/);
-}
-
-function readExecutionMode(value: string | undefined): PdfParseExecutionMode {
-  const result = executionModeSchema.safeParse(value);
-  return result.success ? result.data : DEFAULT_EXECUTION_MODE;
 }
 
 function buildPdfParseS3Config(readEnv: EnvReader): PdfParseS3Config {
