@@ -69,6 +69,18 @@ export function buildPdfParseCallbackUrl(
   return `${baseUrl.replace(/\/+$/, "")}/${encodeURIComponent(jobId)}/callback`;
 }
 
+export function validatePdfParseWorkerConfig(
+  config: PdfParseWorkerConfig,
+): void {
+  if (!config.s3.bucket.trim()) {
+    throw new Error("MINIO_BUCKET is required.");
+  }
+
+  if (!config.callbackToken.trim()) {
+    throw new Error("WORKER_CALLBACK_TOKEN is required.");
+  }
+}
+
 export function readArgs(
   value: string | undefined,
   defaultArgs: string[],

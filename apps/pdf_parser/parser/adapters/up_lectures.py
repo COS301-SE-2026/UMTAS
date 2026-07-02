@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import re
 from typing import ClassVar
 
 from ..models import ParserError
@@ -100,7 +101,7 @@ def lecture_rows_to_events(parser, rows: list[LectureRow]) -> list[dict]:
                     module_code_value=module,
                     event_type=event_type,
                     section_label=section_label,
-                    title=f"{module} {section_label}",
+                    title=f"{module} {activity_code(activity)}",
                     day=days[index],
                     date=None,
                     start_time=start_time,
@@ -111,6 +112,13 @@ def lecture_rows_to_events(parser, rows: list[LectureRow]) -> list[dict]:
                 )
             parser._append_unique(grouped[key]["venues"], venues[index])
     return list(grouped.values())
+
+
+def activity_code(activity: str) -> str:
+    value = clean_cell(activity)
+    match = re.match(r"[A-Za-z]+\d+[A-Za-z0-9]*", value)
+    return match.group(0) if match else value
+
 
 def lecture_type(activity: str) -> str:
     first = clean_cell(activity)[:1].upper()
