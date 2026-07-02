@@ -1,0 +1,14 @@
+apps/backend/src/Module/dto/module.dto.ts
+  h_8b894b05e4a1b2 146-148
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.8",
+  "base_commit_sha": "ed88c07f45580d8dd0f0688d62d06450efc2f9e8",
+  "prompts": {},
+  "humans": {
+    "h_8b894b05e4a1b2": {
+      "author": "Wilmar-Smit <u24584216@tuks.co.za>"
+    }
+  }
+}
