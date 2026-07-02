@@ -38,7 +38,6 @@ EventGA::EventGA(json eventsJson) {
     if (typeCheckHelper(EVENT_TYPE, eventsJson)) {
 
       this->eventType = eventsJson[EVENT_TYPE];
-      
     }
 
   } catch (std::runtime_error &e) {
@@ -80,4 +79,31 @@ int timeHelper(const string &time) {
   std::istringstream iss(time);
   iss >> hours >> colon >> minutes; // time format hh:mm
   return hours * 60 + minutes;
+}
+
+json EventGA::returnJson() {
+  json jsonObj;
+  return {{DAY_KEY, this->eventDay},
+          {EVENT_ID, this->eventID},
+          {EVENT_START, minutesToTime(this->event_start)},
+          {EVENT_END, minutesToTime(this->event_end)},
+          {MODULE_CODE, this->moduleCode},
+          {EVENT_TYPE, this->eventType}};
+}
+
+std::string minutesToTime(int minutesAfterMidnight) {
+  int hours = minutesAfterMidnight / 60;
+  int minutes = minutesAfterMidnight % 60;
+  string hourPad = "";
+  string minPad = "";
+  if (hours < 10) {
+    hourPad = '0';
+  }
+  if (minutes < 10) {
+    minPad = '0';
+  }
+  std::ostringstream oss;
+  oss << hourPad << hours << ":" << minPad << minutes;
+
+  return oss.str();
 }

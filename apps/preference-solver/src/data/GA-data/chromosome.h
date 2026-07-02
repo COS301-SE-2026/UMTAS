@@ -7,7 +7,8 @@ struct EventChromosome {
   int numCollision = 0;
   EventChromosome() {};
   EventChromosome(API_DATA &data);
-
+  // a json that contains only the events array?
+  json returnJson();
 };
 struct ChromMiddleCost {
   double penalty_score = 0;
