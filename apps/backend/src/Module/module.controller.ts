@@ -5,6 +5,8 @@ import {
   ModuleFiltersDto,
   ModuleListResponseDto,
   ModuleSingleResponseDto,
+  ModuleStylingBodyDto,
+  ModuleStylingResponseDto,
   UpdateModuleDto,
 } from './dto/module.dto';
 import {
@@ -172,5 +174,32 @@ export class ModuleController {
   })
   delete(@Param('moduleId', ParseUUIDPipe) moduleId: string) {
     return this.service.deleteById(moduleId);
+  }
+
+  @Post('/styling/:moduleId')
+  @Roles('lecturer', 'sys_admin', 'uni_admin', 'student')
+  @ApiOperation({
+    summary: 'Update a module styling',
+    description: 'Updates a module styling exactly for just a user',
+    operationId: 'updateStyling',
+  })
+  @ApiBody({
+    type: ModuleStylingBodyDto,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Module styling updated successfully',
+    type: ModuleStylingResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Module not found',
+  })
+  updateStyling(
+    @CurrentSession() session: SessionData,
+    @Param('moduleId', ParseUUIDPipe) moduleId: string,
+    @Body() dto: ModuleStylingBodyDto,
+  ) {
+    return this.service.updateStylingService(session.user.id, moduleId, dto);
   }
 } //ModuleController

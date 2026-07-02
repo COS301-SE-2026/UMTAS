@@ -1,8 +1,10 @@
-"use client";
-
 import React from "react";
-// import {table}  from "@/components/atoms/baseShadcn/table";
+import RoleManagementTemplate from "@/components/templates/roleManagement/roleManagementTemplate";
 
 export default function RoleManagementPage() {
-  return <div>Role Management Page</div>;
+  return (
+    <div className="flex flex-col gap-4">
+      <RoleManagementTemplate />
+    </div>
+  );
 }

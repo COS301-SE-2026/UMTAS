@@ -14,6 +14,8 @@ import {
   ModuleSingleResponseDto,
   UpdateModuleDto,
   ModuleFiltersDto,
+  ModuleStylingResponseDto,
+  ModuleStylingBodyDto,
 } from './dto/module.dto';
 
 //ENtities
@@ -410,5 +412,29 @@ export class ModuleService {
       .limit(1);
 
     return !!module;
+  }
+
+  async updateStylingService(
+    userID: string,
+    moduleID: string,
+    dto: ModuleStylingBodyDto,
+  ): Promise<ModuleStylingResponseDto> {
+    const module = await this.getById(userID, moduleID);
+
+    const updatedStyling = await this.setStyling(
+      moduleID,
+      userID,
+      dto.styling.colour,
+    );
+    console.log(updatedStyling);
+    if (updatedStyling) {
+      return {
+        message: `Successfully updated the module ${module.moduleCode} updated to ${updatedStyling.styling.colour}`,
+      };
+    } else {
+      throw new InternalServerErrorException(
+        `Module styling not updated for ${module.moduleCode}`,
+      );
+    }
   }
 } //ModuleService
