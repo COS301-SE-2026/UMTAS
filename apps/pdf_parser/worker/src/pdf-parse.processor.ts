@@ -6,10 +6,7 @@ import type {
 } from "bullmq-worker-core";
 import type { PdfParseJobData } from "shared-types";
 import type { ParserExecutor, PdfStorageClient } from "./contracts.js";
-import {
-  validatePdfParseJobData,
-  validatePdfParserResult,
-} from "./validation.js";
+import { validatePdfParseJobData } from "./validation.js";
 
 export interface PdfParseProcessorOptions {
   storageClient: PdfStorageClient;
@@ -54,7 +51,7 @@ export class PdfParseProcessor implements WorkerProcessor<PdfParseJobData> {
 
     return {
       status: "completed",
-      result: validatePdfParserResult(result),
+      result,
     };
   }
 }
