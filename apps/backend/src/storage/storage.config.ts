@@ -1,4 +1,5 @@
 import type { S3ClientConfig } from '@aws-sdk/client-s3';
+import { z } from 'zod';
 
 export type EnvReader = (key: string) => string | undefined;
 
@@ -11,6 +12,11 @@ export interface ObjectStorageConfig {
 }
 
 const MINIO_SIGNING_REGION = 'us-east-1';
+const truthyStringSchema = z
+  .string()
+  .trim()
+  .toLowerCase()
+  .pipe(z.enum(['1', 'true', 'yes', 'on']));
 
 export function buildObjectStorageConfig(
   readEnv: EnvReader,
@@ -68,5 +74,5 @@ function readBoolean(value: string | undefined, fallback: boolean): boolean {
     return fallback;
   }
 
-  return ['1', 'true', 'yes', 'on'].includes(value.toLowerCase());
+  return truthyStringSchema.safeParse(value).success;
 }

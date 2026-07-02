@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 export type EnvReader = (key: string) => string | undefined;
 
 export interface WorkerRedisConnectionConfig {
@@ -31,14 +33,22 @@ export interface CommonWorkerConfigOptions {
   tempRootEnv?: string;
 }
 
+const DEFAULT_REDIS_URL = "redis://localhost:6379";
+const DEFAULT_REDIS_PORT = 6379;
+const positiveIntSchema = z.coerce.number().int().positive();
+const nonNegativeIntSchema = z.coerce.number().int().nonnegative();
+const truthyStringSchema = z
+  .string()
+  .trim()
+  .toLowerCase()
+  .pipe(z.enum(["1", "true", "yes", "on"]));
+
 export function buildCommonWorkerConfig(
   readEnv: EnvReader,
   options: CommonWorkerConfigOptions,
 ): CommonWorkerConfig {
   const redisUrl =
-    readEnv("BULLMQ_REDIS_URL") ??
-    readEnv("REDIS_URL") ??
-    "redis://localhost:6379";
+    readEnv("BULLMQ_REDIS_URL") ?? readEnv("REDIS_URL") ?? DEFAULT_REDIS_URL;
 
   const tempRoot = readEnv(options.tempRootEnv ?? "WORKER_TEMP_ROOT");
 
@@ -83,8 +93,9 @@ export function parseRedisUrl(redisUrl: string): WorkerRedisConnectionConfig {
     config.password = decodeURIComponent(url.password);
   }
 
-  if (db) {
-    config.db = Number(db);
+  const parsedDb = nonNegativeIntSchema.safeParse(db);
+  if (parsedDb.success) {
+    config.db = parsedDb.data;
   }
 
   if (url.protocol === "rediss:") {
@@ -95,27 +106,16 @@ export function parseRedisUrl(redisUrl: string): WorkerRedisConnectionConfig {
 }
 
 function parseRedisPort(url: URL): number {
-  if (!url.port) {
-    return 6379;
-  }
-
-  return Number(url.port);
+  const parsedPort = positiveIntSchema.safeParse(url.port);
+  return parsedPort.success ? parsedPort.data : DEFAULT_REDIS_PORT;
 }
 
 export function readPositiveInt(
   value: string | undefined,
   fallback: number,
 ): number {
-  if (!value) {
-    return fallback;
-  }
-
-  const parsed = Number.parseInt(value, 10);
-  if (Number.isFinite(parsed) && parsed > 0) {
-    return parsed;
-  }
-
-  return fallback;
+  const result = positiveIntSchema.safeParse(value);
+  return result.success ? result.data : fallback;
 }
 
 export function readBoolean(
@@ -126,5 +126,5 @@ export function readBoolean(
     return fallback;
   }
 
-  return ["1", "true", "yes", "on"].includes(value.toLowerCase());
+  return truthyStringSchema.safeParse(value).success;
 }
