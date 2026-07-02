@@ -2,6 +2,8 @@ import {
   BadRequestException,
   Injectable,
   InternalServerErrorException,
+  forwardRef,
+  Inject,
 } from '@nestjs/common';
 
 import crypto from 'crypto';
@@ -31,6 +33,7 @@ import {
 export class GroupingService {
   constructor(
     private readonly dbService: DatabaseService,
+    @Inject(forwardRef(() => CourseService))
     private readonly courseService: CourseService,
   ) {}
 

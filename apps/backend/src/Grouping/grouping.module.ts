@@ -1,9 +1,9 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { CourseModule } from '../Course/course.module';
 import { GroupingService } from './grouping.service';
 
 @Module({
-  imports: [CourseModule],
+  imports: [forwardRef(() => CourseModule)],
   //   controllers: [ModuleController],
   providers: [GroupingService],
   exports: [GroupingService],
