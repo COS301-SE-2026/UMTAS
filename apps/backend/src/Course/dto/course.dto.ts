@@ -13,16 +13,6 @@ export class CourseDto {
   CourseID!: string;
 
   @ApiProperty({
-    example: 'BSc Computer Science',
-    description: 'Name of the course',
-    required: true,
-  })
-  @IsNotEmpty()
-  @IsString()
-  @Length(2, 30)
-  CourseName!: string;
-
-  @ApiProperty({
     example: '00000000-0000-0000-0000-000000000000',
     description: 'Unique identifier for a university',
     required: true,
@@ -30,12 +20,41 @@ export class CourseDto {
   @IsUUID()
   @IsNotEmpty()
   UniversityID!: string;
+
+  @ApiProperty({
+    example: '00000000-0000-0000-0000-000000000000',
+    description: 'Unique identifier for a group of modules',
+    required: false,
+  })
+  @IsUUID()
+  GroupID?: string | null;
+
+  @ApiProperty({
+    example: 'Computer Science',
+    description: 'Name of the course',
+    required: true,
+  })
+  @IsNotEmpty()
+  @IsString()
+  @Length(1, 30)
+  CourseName!: string;
+
+  @ApiProperty({
+    example: 'Bachelor of Science',
+    description: 'Degree that course belongs to',
+    required: false,
+  })
+  @IsString()
+  @Length(1, 30)
+  Degree?: string | null;
 }
 
 //create
 export class CreateCourseDto extends PickType(CourseDto, [
-  'CourseName',
   'UniversityID',
+  'GroupID',
+  'CourseName',
+  'Degree',
 ]) {}
 
 //update
@@ -63,3 +82,8 @@ export class DeleteCourseResponseDto extends PickType(CourseDto, [
   @ApiProperty({ example: true })
   success!: boolean;
 }
+
+//getAll filters
+export class CourseFilters extends PartialType(
+  PickType(CourseDto, ['UniversityID', 'Degree']),
+) {}
