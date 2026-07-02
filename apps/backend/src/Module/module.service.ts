@@ -111,6 +111,7 @@ export class ModuleService {
         `Failed to group module[${newModule.moduleID}] to group [${groupId}]`,
       );
 
+    console.log(`CreateModule: dto.styling: ${JSON.stringify(dto.styling)}`);
     //Styling
     if (dto.styling) {
       const styling = await this.setStyling(
@@ -239,6 +240,21 @@ export class ModuleService {
 
     if (!newModule)
       throw new InternalServerErrorException('Module failed to update');
+
+    //check for styling update
+    console.log(`CreateModule: dto.styling: ${JSON.stringify(dto.styling)}`);
+    //Styling update - any user can update styling as it doesn't influence module
+    // let newStyling: { colour: string } | null = null;
+    // if (dto.styling) {
+    //   newStyling = (await this.setStyling(moduleId, userId, dto.styling.colour))
+    //     .styling;
+
+    //   newStyling = { colour: dto.styling.colour };
+    // } else {
+    //   //Keep original styling - is this really necessary?
+
+    //   newStyling = oldModule.styling || null;
+    // }
 
     return await this.getById(userId, moduleId);
   } //update
