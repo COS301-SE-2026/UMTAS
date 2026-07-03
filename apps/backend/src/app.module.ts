@@ -21,6 +21,7 @@ import { PdfParserModule } from './pdf-parser/pdf-parser.module';
 import { SolverModule } from './solver/solver.module';
 import { StorageModule } from './storage/storage.module';
 import { AttendanceModule } from './Attendance/attendance.module';
+import { GroupingModule } from './Grouping/grouping.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { AttendanceModule } from './Attendance/attendance.module';
     PdfParserModule,
     SolverModule,
     AttendanceModule,
+    GroupingModule,
   ],
   controllers: [AppController, AuthController],
   providers: [

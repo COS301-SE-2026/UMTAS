@@ -1,11 +1,10 @@
 import {
   NotFoundException,
-  BadRequestException,
   ConflictException,
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, SQL } from 'drizzle-orm';
 
 import { DatabaseService } from '../db/database.service';
 import { Course } from '../entities';
@@ -16,35 +15,45 @@ import {
   CourseSingleResponseDto,
   CourseListResponseDto,
   DeleteCourseResponseDto,
+  CourseFilters,
 } from './dto/course.dto';
+
+//Services
 import { UniversityService } from '../University/university.service';
+import { GroupingService } from '../Grouping/grouping.service';
 
 @Injectable()
 export class CourseService {
   constructor(
     private readonly dbService: DatabaseService,
     private readonly uniService: UniversityService,
+    private readonly groupingService: GroupingService,
   ) {}
 
   async create(dto: CreateCourseDto): Promise<CourseSingleResponseDto> {
     //Check if university exists
     await this.uniService.getById(dto.UniversityID);
 
+    //Check that ModuleGrouping actually exists
+    if (dto.GroupID) await this.groupingService.getById(dto.GroupID);
+
     //Check if course already exists
     const course = await this.duplicateCourseNamePerUniversity(
       dto.CourseName,
       dto.UniversityID,
     );
-    if (course)
-      throw new ConflictException(
-        `Course [${dto.CourseName}] already exists for universityID: ${dto.UniversityID}`,
-      );
+    //If course already exists for the university with that name, return early
+    if (course) return course;
 
+    //Create new Course
+    //Check if GroupID / Degree given and not null
     const [newCourse] = await this.dbService.db
       .insert(Course)
       .values({
-        CourseName: dto.CourseName,
         UniversityID: dto.UniversityID,
+        CourseName: dto.CourseName,
+        ...(dto.GroupID ? { GroupID: dto.GroupID } : {}),
+        ...(dto.Degree ? { Degree: dto.Degree } : {}),
       })
       .returning();
 
@@ -57,16 +66,19 @@ export class CourseService {
   } //Create
 
   //get all courses for a university
-  async getAll(uniId: string): Promise<CourseListResponseDto> {
+  //Filters: CourseFilters
+  //No filters return all courses in database
+  async getAll(filters: CourseFilters): Promise<CourseListResponseDto> {
+    const conditions: SQL[] = [];
+
+    if (filters.UniversityID)
+      conditions.push(eq(Course.UniversityID, filters.UniversityID));
+    if (filters.Degree) conditions.push(eq(Course.Degree, filters.Degree));
+
     const courses = await this.dbService.db
       .select()
       .from(Course)
-      .where(eq(Course.UniversityID, uniId));
-
-    if (courses.length === 0)
-      throw new NotFoundException(
-        `No courses found for universityID: ${uniId}`,
-      );
+      .where(and(...conditions));
 
     return { courses };
   } //GetAll
@@ -88,49 +100,53 @@ export class CourseService {
     courseId: string,
     dto: UpdateCourseDto,
   ): Promise<CourseSingleResponseDto> {
-    //Check if uni exists if uni to be updated
+    //If uni declared - check if uni exists
     if (dto.UniversityID) await this.uniService.getById(dto.UniversityID);
 
-    //check if course exists
-    const course = await this.getById(courseId);
+    //if groupId defined - check if group exists
+    if (dto.GroupID) await this.groupingService.getById(dto.GroupID);
 
-    //Check that atleast one update field provided
-    if (dto.CourseName === undefined && dto.UniversityID === undefined)
-      throw new BadRequestException('At least one field required for update');
+    //check if course exists - getbyid will throw if it doesn't exist
+    const oldCourse = await this.getById(courseId);
 
-    const updatedName = dto.CourseName?.trim();
-    const updatedUniversityId = dto.UniversityID?.trim();
-
-    //Check for duplicate name only iuf hame or university   changed
-    if (updatedName || updatedUniversityId) {
-      const nameToCheck = updatedName ?? course.CourseName;
-      const universityIdToCheck = updatedUniversityId ?? course.UniversityID;
-
-      //check only if mocing to new uni or changing the name
-      if (
-        updatedUniversityId !== course.UniversityID ||
-        updatedName !== course.CourseName
-      ) {
-        const duplicate = await this.duplicateCourseNamePerUniversity(
-          nameToCheck,
-          universityIdToCheck,
-        );
-
-        // Make sure its not the same course
-        if (duplicate && duplicate.CourseID !== courseId)
-          throw new ConflictException(
-            `Course [${nameToCheck}] already exists for universityID: ${universityIdToCheck}`,
-          );
-      }
+    //get fields to update
+    const updateFields: Partial<typeof Course.$inferSelect> = {};
+    if (dto.UniversityID && dto.UniversityID !== oldCourse.UniversityID) {
+      updateFields.UniversityID = dto.UniversityID;
+      //set to old course name so if university change the name check still takes place
+      updateFields.CourseName = oldCourse.CourseName;
     }
+    if (dto.GroupID && dto.GroupID !== oldCourse.GroupID)
+      updateFields.GroupID = dto.GroupID;
+    if (dto.CourseName && dto.CourseName !== oldCourse.CourseName)
+      updateFields.CourseName = dto.CourseName;
+    if (dto.Degree && dto.Degree !== oldCourse.Degree)
+      updateFields.Degree = dto.Degree;
+
+    //If nothing sent to update - return old course
+    if (Object.keys(updateFields).length === 0) return oldCourse;
+
+    //If name update -> check for duplicate
+    //If uni update -> check for duplicate name at new uni
+    //If new name and uni -> check for duplicate newName at new uni
+    if (updateFields.CourseName) {
+      const uniId = updateFields.UniversityID ?? oldCourse.UniversityID;
+
+      const duplicate = await this.duplicateCourseNamePerUniversity(
+        updateFields.CourseName,
+        uniId,
+      );
+
+      if (duplicate)
+        throw new ConflictException(
+          `Course[${updateFields.CourseName}] already exists for university[${uniId}]`,
+        );
+    } //END_Duplicate check
 
     //Update course
     const [newCourse] = await this.dbService.db
       .update(Course)
-      .set({
-        CourseName: updatedName ?? course.CourseName,
-        UniversityID: dto.UniversityID ?? course.UniversityID,
-      })
+      .set(updateFields)
       .where(eq(Course.CourseID, courseId))
       .returning();
 
@@ -142,14 +158,14 @@ export class CourseService {
   } //update
 
   async delete(courseId: string): Promise<DeleteCourseResponseDto> {
-    //Check if course exists
-    const course = await this.getById(courseId);
-
     //delete course
-    await this.dbService.db.delete(Course).where(eq(Course.CourseID, courseId));
+    const [course] = await this.dbService.db
+      .delete(Course)
+      .where(eq(Course.CourseID, courseId))
+      .returning();
 
     return {
-      success: true,
+      success: !!course,
       CourseName: course.CourseName,
     };
   } //Delete

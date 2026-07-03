@@ -1,1 +1,0 @@
-ALTER TABLE "Event" ALTER COLUMN "eventCriteria" SET NOT NULL;

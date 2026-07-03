@@ -6,6 +6,7 @@ import {
   CourseSingleResponseDto,
   CourseListResponseDto,
   DeleteCourseResponseDto,
+  CourseFilters,
 } from './dto/course.dto';
 
 import {
@@ -17,6 +18,7 @@ import {
   Patch,
   Delete,
   ParseUUIDPipe,
+  Query,
 } from '@nestjs/common';
 import { ApiBody, ApiResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
@@ -70,8 +72,8 @@ export class CourseController {
     status: 404,
     description: 'No Courses found',
   })
-  getAll(@Param('universityId', ParseUUIDPipe) universityId: string) {
-    return this.service.getAll(universityId);
+  getAll(@Query() filters: CourseFilters): Promise<CourseListResponseDto> {
+    return this.service.getAll(filters);
   }
 
   //GetById
