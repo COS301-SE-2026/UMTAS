@@ -19,6 +19,7 @@ export const Event = pgTable('Event', {
   eventCode: varchar('eventCode', { length: 10 }),
   eventCriteria: jsonb('eventCriteria').$type<EventCriteria>().notNull(),
   isRecurring: boolean('isRecurring').notNull().default(false),
+  validated: boolean('validated').notNull().default(true),
 });
 
 //Personal owned

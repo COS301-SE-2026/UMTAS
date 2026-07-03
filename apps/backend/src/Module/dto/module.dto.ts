@@ -67,6 +67,14 @@ export class ModulesDto {
   @ValidateNested()
   @Type(() => StylingDto)
   styling?: StylingDto | null;
+
+  @ApiProperty({
+    example: true,
+    description: 'Whether the module has been approved by a university admin',
+  })
+  @IsOptional()
+  @IsBoolean()
+  validated?: boolean;
 } //ModuleDto
 
 //Create
@@ -75,6 +83,7 @@ export class CreateModuleDto extends PickType(ModulesDto, [
   'moduleName',
   'moduleDescription',
   'styling',
+  'validated',
 ]) {
   @ApiProperty({
     example: '00000000-0000-0000-0000-000000000000',

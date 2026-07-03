@@ -95,8 +95,15 @@ export class EventService {
     const recUpdate = dto.isRecurring !== undefined;
     const nameUpdate = dto.eventName !== undefined;
     const codeUpdate = dto.eventCode !== undefined;
+    const validatedUpdate = dto.validated !== undefined;
 
-    if (!critUpdate && !recUpdate && !nameUpdate && !codeUpdate)
+    if (
+      !critUpdate &&
+      !recUpdate &&
+      !nameUpdate &&
+      !codeUpdate &&
+      !validatedUpdate
+    )
       throw new BadRequestException('At least one update field required');
     //END_field presence check
 
@@ -136,6 +143,7 @@ export class EventService {
             eventCode: dto.eventCode?.trim() ?? existingEvent.eventCode,
             eventCriteria: mergedCriteria,
             isRecurring: dto.isRecurring ?? existingEvent.isRecurring,
+            validated: dto.validated ?? existingEvent.validated,
           })
           .where(eq(Event.eventID, eventId))
           .returning();
@@ -322,6 +330,7 @@ export class EventService {
         eventCode: eventCode,
         eventCriteria: eventCriteria,
         isRecurring: isRec,
+        ...(dto.validated === undefined ? {} : { validated: dto.validated }),
       })
       .returning();
 
@@ -392,6 +401,7 @@ export class EventService {
       eventCode: event.eventCode ?? undefined,
       eventCriteria: event.eventCriteria,
       isRecurring: event.isRecurring,
+      validated: event.validated,
     };
   } //END_mapEventToDto
 } //EventService
