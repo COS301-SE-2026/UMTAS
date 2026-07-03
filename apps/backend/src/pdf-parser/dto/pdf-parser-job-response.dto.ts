@@ -24,6 +24,12 @@ export class PdfParserJobResponseDto {
   @ApiPropertyOptional({ type: 'object', additionalProperties: true })
   error?: WorkerCallbackError;
 
+  @ApiPropertyOptional({
+    example: '00000000-0000-0000-0000-000000000000',
+    nullable: true,
+  })
+  moduleGroupingId?: string | null;
+
   @ApiProperty({ example: '2026-07-02T10:15:30.000Z' })
   createdAt!: string;
 
@@ -49,6 +55,12 @@ export class PdfParserLookupResponseDto {
 
   @ApiPropertyOptional({ enum: ['queued', 'completed', 'failed'] })
   status?: 'queued' | 'completed' | 'failed';
+
+  @ApiPropertyOptional({
+    example: '00000000-0000-0000-0000-000000000000',
+    nullable: true,
+  })
+  moduleGroupingId?: string | null;
 
   @ApiPropertyOptional({ example: true })
   resultAvailable?: boolean;
