@@ -1,6 +1,6 @@
 {
-  "id": "fa751f5a-0648-4aad-90b5-058fff3e8d75",
-  "prevId": "f08ec77a-31cc-4d6d-94e1-fd5f36deb230",
+  "id": "2446dd43-8336-4198-9e8e-73e4c8cb7b9e",
+  "prevId": "e36ab0d8-624b-48cf-ab94-4e3e2fcc1dbb",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -547,7 +547,7 @@
           "name": "eventCriteria",
           "type": "jsonb",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "isRecurring": {
           "name": "isRecurring",
@@ -559,71 +559,6 @@
       },
       "indexes": {},
       "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.EventAttendance": {
-      "name": "EventAttendance",
-      "schema": "",
-      "columns": {
-        "attendanceID": {
-          "name": "attendanceID",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "eventID": {
-          "name": "eventID",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "UserID": {
-          "name": "UserID",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "eventDate": {
-          "name": "eventDate",
-          "type": "date",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "state": {
-          "name": "state",
-          "type": "AttendanceState",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'NOT_ATTENDING'"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "EventAttendance_eventID_Event_eventID_fk": {
-          "name": "EventAttendance_eventID_Event_eventID_fk",
-          "tableFrom": "EventAttendance",
-          "tableTo": "Event",
-          "columnsFrom": ["eventID"],
-          "columnsTo": ["eventID"],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "EventAttendance_UserID_user_id_fk": {
-          "name": "EventAttendance_UserID_user_id_fk",
-          "tableFrom": "EventAttendance",
-          "tableTo": "user",
-          "columnsFrom": ["UserID"],
-          "columnsTo": ["id"],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -1161,36 +1096,24 @@
       "name": "Course",
       "schema": "",
       "columns": {
-        "CourseID": {
-          "name": "CourseID",
+        "courseID": {
+          "name": "courseID",
           "type": "uuid",
           "primaryKey": true,
           "notNull": true,
           "default": "gen_random_uuid()"
+        },
+        "courseName": {
+          "name": "courseName",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": true
         },
         "UniversityID": {
           "name": "UniversityID",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
-        },
-        "GroupID": {
-          "name": "GroupID",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "CourseName": {
-          "name": "CourseName",
-          "type": "varchar(30)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "Degree": {
-          "name": "Degree",
-          "type": "varchar(30)",
-          "primaryKey": false,
-          "notNull": false
         }
       },
       "indexes": {},
@@ -1202,15 +1125,6 @@
           "columnsFrom": ["UniversityID"],
           "columnsTo": ["UniversityID"],
           "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "Course_GroupID_ModuleGrouping_GroupID_fk": {
-          "name": "Course_GroupID_ModuleGrouping_GroupID_fk",
-          "tableFrom": "Course",
-          "tableTo": "ModuleGrouping",
-          "columnsFrom": ["GroupID"],
-          "columnsTo": ["GroupID"],
-          "onDelete": "set null",
           "onUpdate": "no action"
         }
       },
@@ -1224,151 +1138,47 @@
       "name": "CourseModule",
       "schema": "",
       "columns": {
-        "CourseModuleID": {
-          "name": "CourseModuleID",
+        "ModuleID": {
+          "name": "ModuleID",
           "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
+          "primaryKey": false,
+          "notNull": true
         },
         "CourseID": {
           "name": "CourseID",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
-        },
-        "GroupModuleID": {
-          "name": "GroupModuleID",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "Core": {
-          "name": "Core",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
-        },
-        "SemesterOfStudy": {
-          "name": "SemesterOfStudy",
-          "type": "varchar(30)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "YearOfStudy": {
-          "name": "YearOfStudy",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "CourseModule_CourseID_Course_CourseID_fk": {
-          "name": "CourseModule_CourseID_Course_CourseID_fk",
+        "CourseModule_ModuleID_Modules_moduleID_fk": {
+          "name": "CourseModule_ModuleID_Modules_moduleID_fk",
           "tableFrom": "CourseModule",
-          "tableTo": "Course",
-          "columnsFrom": ["CourseID"],
-          "columnsTo": ["CourseID"],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "CourseModule_GroupModuleID_GroupModules_GroupModuleID_fk": {
-          "name": "CourseModule_GroupModuleID_GroupModules_GroupModuleID_fk",
-          "tableFrom": "CourseModule",
-          "tableTo": "GroupModules",
-          "columnsFrom": ["GroupModuleID"],
-          "columnsTo": ["GroupModuleID"],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.GroupModules": {
-      "name": "GroupModules",
-      "schema": "",
-      "columns": {
-        "GroupModuleID": {
-          "name": "GroupModuleID",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "GroupID": {
-          "name": "GroupID",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "ModuleID": {
-          "name": "ModuleID",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "GroupModules_GroupID_ModuleGrouping_GroupID_fk": {
-          "name": "GroupModules_GroupID_ModuleGrouping_GroupID_fk",
-          "tableFrom": "GroupModules",
-          "tableTo": "ModuleGrouping",
-          "columnsFrom": ["GroupID"],
-          "columnsTo": ["GroupID"],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "GroupModules_ModuleID_Modules_moduleID_fk": {
-          "name": "GroupModules_ModuleID_Modules_moduleID_fk",
-          "tableFrom": "GroupModules",
           "tableTo": "Modules",
           "columnsFrom": ["ModuleID"],
           "columnsTo": ["moduleID"],
           "onDelete": "cascade",
           "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.ModuleGrouping": {
-      "name": "ModuleGrouping",
-      "schema": "",
-      "columns": {
-        "GroupID": {
-          "name": "GroupID",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
         },
-        "hash": {
-          "name": "hash",
-          "type": "varchar(64)",
-          "primaryKey": false,
-          "notNull": true
+        "CourseModule_CourseID_Course_courseID_fk": {
+          "name": "CourseModule_CourseID_Course_courseID_fk",
+          "tableFrom": "CourseModule",
+          "tableTo": "Course",
+          "columnsFrom": ["CourseID"],
+          "columnsTo": ["courseID"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
         }
       },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "ModuleGrouping_hash_unique": {
-          "name": "ModuleGrouping_hash_unique",
-          "nullsNotDistinct": false,
-          "columns": ["hash"]
+      "compositePrimaryKeys": {
+        "CourseModule_CourseID_ModuleID_pk": {
+          "name": "CourseModule_CourseID_ModuleID_pk",
+          "columns": ["CourseID", "ModuleID"]
         }
       },
+      "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -1549,11 +1359,6 @@
     }
   },
   "enums": {
-    "public.AttendanceState": {
-      "name": "AttendanceState",
-      "schema": "public",
-      "values": ["ATTENDING", "NOT_ATTENDING"]
-    },
     "public.RestrictionType": {
       "name": "RestrictionType",
       "schema": "public",
@@ -1571,12 +1376,11 @@
       "schema": "public",
       "values": [
         "STUDENT",
-        "STUDENT_OWNED",
         "UNIVERSITY_ADMIN",
-        "UNIVERSITY_ADMIN_PENDING",
-        "LECTURER",
+        "SYSTEM_ADMIN",
+        "STUDENT_OWNED",
         "LECTURER_PENDING",
-        "SYSTEM_ADMIN"
+        "UNIVERSITY_ADMIN_PENDING"
       ]
     }
   },

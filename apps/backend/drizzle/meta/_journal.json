@@ -5,29 +5,36 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1782912184549,
-      "tag": "0000_NEW_SCHEMA_WITH_GROUPING_FOR_MODULES",
+      "when": 1782632019178,
+      "tag": "0000_FRESH_SCHEMA",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
-      "when": 1782912553922,
-      "tag": "0001_ADDED_GROUPNAME_TO_MODULEGROUPING",
+      "when": 1782737654732,
+      "tag": "0001_OnDeleteCascadeUpdated",
       "breakpoints": true
     },
     {
       "idx": 2,
       "version": "7",
-      "when": 1782979184040,
-      "tag": "0002_ADDED_HASH_FIELD_TO_MODULE_GROUPING",
+      "when": 1782811991272,
+      "tag": "0002_ADDED_ROLES_FOR_UNIVERSITYROLE",
       "breakpoints": true
     },
     {
       "idx": 3,
       "version": "7",
-      "when": 1782998744029,
-      "tag": "0003_HASH_FIELD_ADDED_TO_MODULE_GROUPING",
+      "when": 1782813392063,
+      "tag": "0003_UNIROLES_UPDATED_AGAIN",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1783084619553,
+      "tag": "0004_PDF_PARSE_GROUPING_AND_VALIDATION",
       "breakpoints": true
     }
   ]

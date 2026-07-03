@@ -1,6 +1,6 @@
 {
-  "id": "122f947f-7eb6-42c4-904c-c8e7d88365af",
-  "prevId": "2446dd43-8336-4198-9e8e-73e4c8cb7b9e",
+  "id": "8f5499a3-3840-45aa-9872-8922f770fbd4",
+  "prevId": "122f947f-7eb6-42c4-904c-c8e7d88365af",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -547,7 +547,7 @@
           "name": "eventCriteria",
           "type": "jsonb",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "isRecurring": {
           "name": "isRecurring",
@@ -555,10 +555,82 @@
           "primaryKey": false,
           "notNull": true,
           "default": false
+        },
+        "validated": {
+          "name": "validated",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
         }
       },
       "indexes": {},
       "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.EventAttendance": {
+      "name": "EventAttendance",
+      "schema": "",
+      "columns": {
+        "attendanceID": {
+          "name": "attendanceID",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "eventID": {
+          "name": "eventID",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "UserID": {
+          "name": "UserID",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "eventDate": {
+          "name": "eventDate",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "state": {
+          "name": "state",
+          "type": "AttendanceState",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'NOT_ATTENDING'"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "EventAttendance_eventID_Event_eventID_fk": {
+          "name": "EventAttendance_eventID_Event_eventID_fk",
+          "tableFrom": "EventAttendance",
+          "tableTo": "Event",
+          "columnsFrom": ["eventID"],
+          "columnsTo": ["eventID"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "EventAttendance_UserID_user_id_fk": {
+          "name": "EventAttendance_UserID_user_id_fk",
+          "tableFrom": "EventAttendance",
+          "tableTo": "user",
+          "columnsFrom": ["UserID"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -864,10 +936,275 @@
           "type": "text",
           "primaryKey": false,
           "notNull": false
+        },
+        "validated": {
+          "name": "validated",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
         }
       },
       "indexes": {},
       "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.PARSE_JOB": {
+      "name": "PARSE_JOB",
+      "schema": "",
+      "columns": {
+        "JobID": {
+          "name": "JobID",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "UserID": {
+          "name": "UserID",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "UniversityID": {
+          "name": "UniversityID",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "AdapterKey": {
+          "name": "AdapterKey",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "FileKey": {
+          "name": "FileKey",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ClientPdfStreamHash": {
+          "name": "ClientPdfStreamHash",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "PdfStreamHash": {
+          "name": "PdfStreamHash",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "FingerprintAlgorithm": {
+          "name": "FingerprintAlgorithm",
+          "type": "varchar(128)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "StreamCount": {
+          "name": "StreamCount",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "GroupID": {
+          "name": "GroupID",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "Status": {
+          "name": "Status",
+          "type": "varchar(32)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'queued'"
+        },
+        "Result": {
+          "name": "Result",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ErrorCode": {
+          "name": "ErrorCode",
+          "type": "varchar(128)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ErrorMessage": {
+          "name": "ErrorMessage",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ErrorDetails": {
+          "name": "ErrorDetails",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "CreatedAt": {
+          "name": "CreatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "UpdatedAt": {
+          "name": "UpdatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "CompletedAt": {
+          "name": "CompletedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "FailedAt": {
+          "name": "FailedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "parse_job_user_id_idx": {
+          "name": "parse_job_user_id_idx",
+          "columns": [
+            {
+              "expression": "UserID",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "parse_job_status_idx": {
+          "name": "parse_job_status_idx",
+          "columns": [
+            {
+              "expression": "Status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "parse_job_group_id_idx": {
+          "name": "parse_job_group_id_idx",
+          "columns": [
+            {
+              "expression": "GroupID",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "parse_job_created_at_idx": {
+          "name": "parse_job_created_at_idx",
+          "columns": [
+            {
+              "expression": "CreatedAt",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "parse_job_duplicate_unique": {
+          "name": "parse_job_duplicate_unique",
+          "columns": [
+            {
+              "expression": "UserID",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "UniversityID",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "AdapterKey",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "FingerprintAlgorithm",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "PdfStreamHash",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "PARSE_JOB_UserID_user_id_fk": {
+          "name": "PARSE_JOB_UserID_user_id_fk",
+          "tableFrom": "PARSE_JOB",
+          "tableTo": "user",
+          "columnsFrom": ["UserID"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "PARSE_JOB_UniversityID_University_UniversityID_fk": {
+          "name": "PARSE_JOB_UniversityID_University_UniversityID_fk",
+          "tableFrom": "PARSE_JOB",
+          "tableTo": "University",
+          "columnsFrom": ["UniversityID"],
+          "columnsTo": ["UniversityID"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "PARSE_JOB_GroupID_ModuleGrouping_GroupID_fk": {
+          "name": "PARSE_JOB_GroupID_ModuleGrouping_GroupID_fk",
+          "tableFrom": "PARSE_JOB",
+          "tableTo": "ModuleGrouping",
+          "columnsFrom": ["GroupID"],
+          "columnsTo": ["GroupID"],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -1103,17 +1440,29 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
+        "UniversityID": {
+          "name": "UniversityID",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "GroupID": {
+          "name": "GroupID",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
         "courseName": {
           "name": "courseName",
           "type": "varchar(30)",
           "primaryKey": false,
           "notNull": true
         },
-        "UniversityID": {
-          "name": "UniversityID",
-          "type": "uuid",
+        "Degree": {
+          "name": "Degree",
+          "type": "varchar(30)",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         }
       },
       "indexes": {},
@@ -1125,6 +1474,15 @@
           "columnsFrom": ["UniversityID"],
           "columnsTo": ["UniversityID"],
           "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "Course_GroupID_ModuleGrouping_GroupID_fk": {
+          "name": "Course_GroupID_ModuleGrouping_GroupID_fk",
+          "tableFrom": "Course",
+          "tableTo": "ModuleGrouping",
+          "columnsFrom": ["GroupID"],
+          "columnsTo": ["GroupID"],
+          "onDelete": "set null",
           "onUpdate": "no action"
         }
       },
@@ -1179,6 +1537,89 @@
         }
       },
       "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.GroupModules": {
+      "name": "GroupModules",
+      "schema": "",
+      "columns": {
+        "GroupModuleID": {
+          "name": "GroupModuleID",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "GroupID": {
+          "name": "GroupID",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ModuleID": {
+          "name": "ModuleID",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "GroupModules_GroupID_ModuleGrouping_GroupID_fk": {
+          "name": "GroupModules_GroupID_ModuleGrouping_GroupID_fk",
+          "tableFrom": "GroupModules",
+          "tableTo": "ModuleGrouping",
+          "columnsFrom": ["GroupID"],
+          "columnsTo": ["GroupID"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "GroupModules_ModuleID_Modules_moduleID_fk": {
+          "name": "GroupModules_ModuleID_Modules_moduleID_fk",
+          "tableFrom": "GroupModules",
+          "tableTo": "Modules",
+          "columnsFrom": ["ModuleID"],
+          "columnsTo": ["moduleID"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ModuleGrouping": {
+      "name": "ModuleGrouping",
+      "schema": "",
+      "columns": {
+        "GroupID": {
+          "name": "GroupID",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "Hash": {
+          "name": "Hash",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "ModuleGrouping_Hash_unique": {
+          "name": "ModuleGrouping_Hash_unique",
+          "nullsNotDistinct": false,
+          "columns": ["Hash"]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -1359,6 +1800,11 @@
     }
   },
   "enums": {
+    "public.AttendanceState": {
+      "name": "AttendanceState",
+      "schema": "public",
+      "values": ["ATTENDING", "NOT_ATTENDING"]
+    },
     "public.RestrictionType": {
       "name": "RestrictionType",
       "schema": "public",
