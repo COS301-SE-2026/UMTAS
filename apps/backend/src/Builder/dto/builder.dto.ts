@@ -5,7 +5,7 @@ import {
   CreateModuleDto,
   ModuleSingleResponseDto,
   UpdateModuleDto,
-} from 'src/Module/dto/module.dto';
+} from '../../Module/dto/module.dto';
 
 export class CreateBuilderModuleDto extends OmitType(CreateModuleDto, [
   'CourseID',

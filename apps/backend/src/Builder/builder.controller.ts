@@ -21,7 +21,7 @@ import {
   ModuleListResponseDto,
   UpdateModuleDto,
   DeleteModuleResponseDto,
-} from 'src/Module/dto/module.dto';
+} from '../Module/dto/module.dto';
 
 @ApiTags('Builder')
 @Controller('builder')
