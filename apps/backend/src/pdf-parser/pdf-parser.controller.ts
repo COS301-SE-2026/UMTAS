@@ -5,6 +5,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  InternalServerErrorException,
   NotFoundException,
   Param,
   Post,
@@ -23,18 +24,27 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { randomUUID } from 'node:crypto';
-import type { PdfParserCallbackPayload } from 'shared-types';
-import { PdfParserCallbackPayloadSchema } from 'shared-types';
+import type { PdfParserCallbackPayload, PdfParserResult } from 'shared-types';
+import {
+  PDF_STREAM_FINGERPRINT_ALGORITHM_VERSION,
+  PdfParserCallbackPayloadSchema,
+} from 'shared-types';
 import { Public } from '../auth/auth.guard';
+import { CurrentSession, type SessionData } from '../auth/session.decorator';
 import { QueueProducerService } from '../jobs/queue-producer.service';
 import { WorkerCallbackAuthGuard } from '../jobs/worker-callback-auth.guard';
 import { ObjectStorageService } from '../storage/object-storage.service';
 import { PdfParserCallbackDto } from './dto/pdf-parser-callback.dto';
 import {
   PdfParserJobResponseDto,
+  PdfParserLookupResponseDto,
   PdfParserUploadResponseDto,
 } from './dto/pdf-parser-job-response.dto';
-import { PdfParserJobStoreService } from './pdf-parser-job-store.service';
+import { PdfParserFingerprintService } from './pdf-parser-fingerprint.service';
+import {
+  PdfParserJobStoreService,
+  type PdfParserJobRecord,
+} from './pdf-parser-job-store.service';
 
 @ApiTags('PDF Parser')
 @Controller('pdf-parser')
@@ -43,9 +53,65 @@ export class PdfParserController {
     private readonly queueProducer: QueueProducerService,
     private readonly storage: ObjectStorageService,
     private readonly jobStore: PdfParserJobStoreService,
+    private readonly fingerprintService: PdfParserFingerprintService,
   ) {}
 
-  @Public()
+  @Post('jobs/lookup')
+  @ApiOperation({
+    summary: 'Look up an existing PDF parser job by PDF stream fingerprint',
+    description:
+      'Checks for an existing parser job scoped to the authenticated user, selected university, parser adapter, and backend-supported fingerprint algorithm.',
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      required: [
+        'universityId',
+        'adapterKey',
+        'fingerprintAlgorithm',
+        'pdfStreamHash',
+      ],
+      properties: {
+        universityId: { type: 'string', format: 'uuid' },
+        adapterKey: { type: 'string', default: 'up' },
+        fingerprintAlgorithm: {
+          type: 'string',
+          default: PDF_STREAM_FINGERPRINT_ALGORITHM_VERSION,
+        },
+        pdfStreamHash: { type: 'string', minLength: 64, maxLength: 64 },
+        streamCount: { type: 'number' },
+      },
+    },
+  })
+  @ApiOkResponse({ type: PdfParserLookupResponseDto })
+  async lookupDuplicate(
+    @CurrentSession() session: SessionData,
+    @Body() body: PdfParserLookupRequestBody,
+  ): Promise<PdfParserLookupResponseDto> {
+    const request = validateLookupRequest(body);
+    const duplicate = await this.jobStore.findDuplicate({
+      userId: session.user.id,
+      universityId: request.universityId,
+      adapterKey: request.adapterKey,
+      fingerprintAlgorithm: request.fingerprintAlgorithm,
+      pdfStreamHash: request.pdfStreamHash,
+      statuses: ['queued', 'completed'],
+    });
+
+    if (!duplicate) {
+      return { duplicate: false };
+    }
+
+    return {
+      duplicate: true,
+      jobId: duplicate.jobId,
+      status: duplicate.status,
+      moduleGroupingId: duplicate.moduleGroupingId,
+      resultAvailable: duplicate.status === 'completed' && !!duplicate.result,
+      statusUrl: `/pdf-parser/jobs/${duplicate.jobId}`,
+    };
+  }
+
   @Post('jobs/upload')
   @UseInterceptors(
     FileInterceptor('file', {
@@ -55,13 +121,13 @@ export class PdfParserController {
   @ApiOperation({
     summary: 'Upload a timetable PDF and enqueue it for parsing',
     description:
-      'Temporary backend-only test endpoint. Results are stored in memory until database persistence is implemented.',
+      'Uploads a PDF, recomputes the backend stream-payload fingerprint, persists the parse job, and enqueues it for worker parsing.',
   })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
       type: 'object',
-      required: ['file'],
+      required: ['file', 'universityId'],
       properties: {
         file: {
           type: 'string',
@@ -73,60 +139,210 @@ export class PdfParserController {
           default: 'up',
           description: 'Parser adapter key. Only "up" is currently supported.',
         },
+        universityId: {
+          type: 'string',
+          format: 'uuid',
+          description: 'Selected university for duplicate scoping.',
+        },
+        fingerprintAlgorithm: {
+          type: 'string',
+          default: PDF_STREAM_FINGERPRINT_ALGORITHM_VERSION,
+          description: 'Client-computed fingerprint algorithm, if available.',
+        },
+        clientPdfStreamHash: {
+          type: 'string',
+          description: 'Client-computed PDF stream hash for diagnostics only.',
+        },
+        streamCount: {
+          type: 'number',
+          description: 'Client-observed PDF stream count for diagnostics only.',
+        },
       },
     },
   })
   @ApiAcceptedResponse({ type: PdfParserUploadResponseDto })
   @HttpCode(HttpStatus.ACCEPTED)
   async uploadAndEnqueue(
+    @CurrentSession() session: SessionData,
     @UploadedFile() file: UploadedPdfFile | undefined,
     @Body('adapterKey') adapterKeyInput?: string,
+    @Body('universityId') universityIdInput?: string,
+    @Body('fingerprintAlgorithm') fingerprintAlgorithmInput?: string,
+    @Body('clientPdfStreamHash') clientPdfStreamHashInput?: string,
   ): Promise<PdfParserUploadResponseDto> {
     validateUploadedPdf(file);
 
     const adapterKey = normalizeAdapterKey(adapterKeyInput);
+    const universityId = validateUuid(universityIdInput, 'universityId');
+    const clientPdfStreamHash = normalizeOptionalHexHash(
+      clientPdfStreamHashInput,
+      'clientPdfStreamHash',
+    );
+    validateOptionalClientAlgorithm(fingerprintAlgorithmInput);
+    const fingerprint = this.fingerprintService.computeOrThrow(file.buffer);
+
+    const duplicate = await this.jobStore.findDuplicate({
+      userId: session.user.id,
+      universityId,
+      adapterKey,
+      fingerprintAlgorithm: fingerprint.algorithmVersion,
+      pdfStreamHash: fingerprint.hash,
+      statuses: ['queued', 'completed'],
+    });
+
+    if (duplicate) {
+      return toUploadResponse(duplicate);
+    }
+
     const jobId = `pdf-parse-${randomUUID()}`;
     const fileKey = buildFileKey(jobId, file.originalname);
-
-    await this.storage.putObject({
-      key: fileKey,
-      body: file.buffer,
-      contentType: file.mimetype || 'application/pdf',
-    });
-
-    const record = this.jobStore.createQueuedJob({
+    const preparedJob = await this.prepareUploadJob({
       jobId,
+      userId: session.user.id,
+      universityId,
       fileKey,
       adapterKey,
+      clientPdfStreamHash,
+      pdfStreamHash: fingerprint.hash,
+      fingerprintAlgorithm: fingerprint.algorithmVersion,
+      streamCount: fingerprint.streamCount,
     });
 
-    await this.queueProducer.enqueuePdfParseJob({
-      jobId,
-      fileKey,
-      adapterKey,
-    });
+    if (preparedJob.kind === 'existing') {
+      return toUploadResponse(preparedJob.record);
+    }
+
+    const record = preparedJob.record;
+    const storageFileKey = record.fileKey ?? fileKey;
+
+    try {
+      await this.storage.putObject({
+        key: storageFileKey,
+        body: file.buffer,
+        contentType: file.mimetype || 'application/pdf',
+      });
+    } catch (error) {
+      await this.jobStore.markInfrastructureFailure(record.jobId, {
+        code: 'PDF_PARSE_UPLOAD_FAILED',
+        message: 'PDF parser upload could not be stored',
+        details: {
+          cause: error instanceof Error ? error.message : String(error),
+        },
+      });
+      throw new InternalServerErrorException(
+        'PDF parser upload could not be stored',
+      );
+    }
+
+    try {
+      await this.queueProducer.enqueuePdfParseJob({
+        jobId: record.jobId,
+        fileKey: storageFileKey,
+        adapterKey,
+      });
+    } catch (error) {
+      await this.jobStore.markInfrastructureFailure(record.jobId, {
+        code: 'PDF_PARSE_ENQUEUE_FAILED',
+        message: 'PDF parser job could not be enqueued',
+        details: {
+          cause: error instanceof Error ? error.message : String(error),
+        },
+      });
+      throw new InternalServerErrorException(
+        'PDF parser job could not be enqueued',
+      );
+    }
 
     return {
-      ...record,
-      statusUrl: `/pdf-parser/jobs/${jobId}`,
+      jobId: record.jobId,
+      fileKey: record.fileKey,
+      adapterKey: record.adapterKey,
+      status: record.status,
+      result: record.result,
+      error: record.error,
+      moduleGroupingId: record.moduleGroupingId,
+      createdAt: record.createdAt,
+      updatedAt: record.updatedAt,
+      statusUrl: `/pdf-parser/jobs/${record.jobId}`,
     };
   }
 
-  @Public()
+  private async prepareUploadJob(
+    input: PrepareUploadJobInput,
+  ): Promise<PreparedUploadJob> {
+    try {
+      return {
+        kind: 'pending',
+        record: await this.jobStore.createQueuedJob(input),
+      };
+    } catch (error) {
+      const duplicate = await this.jobStore.findDuplicate({
+        userId: input.userId,
+        universityId: input.universityId,
+        adapterKey: input.adapterKey,
+        fingerprintAlgorithm: input.fingerprintAlgorithm,
+        pdfStreamHash: input.pdfStreamHash,
+      });
+
+      if (!duplicate) {
+        throw error;
+      }
+
+      if (duplicate.status !== 'failed') {
+        return { kind: 'existing', record: duplicate };
+      }
+
+      return {
+        kind: 'pending',
+        record: await this.jobStore.retryFailedDuplicate({
+          jobId: duplicate.jobId,
+          fileKey: input.fileKey,
+          adapterKey: input.adapterKey,
+          clientPdfStreamHash: input.clientPdfStreamHash,
+          pdfStreamHash: input.pdfStreamHash,
+          fingerprintAlgorithm: input.fingerprintAlgorithm,
+          streamCount: input.streamCount,
+        }),
+      };
+    }
+  }
+
   @Get('jobs/:jobId')
   @ApiOperation({
-    summary: 'Get temporary PDF parser job status and result',
+    summary: 'Get PDF parser job status and result metadata',
     description:
-      'Temporary in-memory status endpoint for local Swagger testing. Data is lost when the backend restarts.',
+      'Reads persisted parser job status scoped to the authenticated user.',
   })
   @ApiOkResponse({ type: PdfParserJobResponseDto })
-  getJob(@Param('jobId') jobId: string): PdfParserJobResponseDto {
-    const job = this.jobStore.findJob(jobId);
+  async getJob(
+    @CurrentSession() session: SessionData,
+    @Param('jobId') jobId: string,
+  ): Promise<PdfParserJobResponseDto> {
+    const job = await this.jobStore.findJob(jobId, { userId: session.user.id });
     if (!job) {
       throw new NotFoundException(`PDF parser job not found: ${jobId}`);
     }
 
     return job;
+  }
+
+  @Get('jobs/:jobId/result')
+  @ApiOperation({
+    summary: 'Get completed PDF parser result',
+    description:
+      'Returns persisted import candidates only for completed jobs owned by the authenticated user.',
+  })
+  @ApiOkResponse({ type: Object })
+  async getJobResult(
+    @CurrentSession() session: SessionData,
+    @Param('jobId') jobId: string,
+  ): Promise<PdfParserResult> {
+    const job = await this.jobStore.findJob(jobId, { userId: session.user.id });
+    if (!job || job.status !== 'completed' || !job.result) {
+      throw new NotFoundException(`PDF parser result not found: ${jobId}`);
+    }
+
+    return job.result;
   }
 
   @Public()
@@ -135,14 +351,13 @@ export class PdfParserController {
   @UseGuards(WorkerCallbackAuthGuard)
   @ApiOperation({ summary: 'Receive final PDF parser worker callback' })
   @HttpCode(HttpStatus.ACCEPTED)
-  receiveCallback(
+  async receiveCallback(
     @Param('jobId') jobId: string,
     @Body() body: PdfParserCallbackDto,
-  ) {
+  ): Promise<{ accepted: true; jobId: string }> {
     const callback = validatePdfParserCallback(body);
-    this.jobStore.recordCallback(jobId, callback);
+    await this.jobStore.recordCallback(jobId, callback);
 
-    // TODO: Persist parser job status and surface import candidates to the UI.
     return { accepted: true, jobId };
   }
 }
@@ -153,6 +368,29 @@ interface UploadedPdfFile {
   buffer: Buffer;
   size: number;
 }
+
+interface PdfParserLookupRequestBody {
+  universityId?: unknown;
+  adapterKey?: unknown;
+  fingerprintAlgorithm?: unknown;
+  pdfStreamHash?: unknown;
+}
+
+interface PrepareUploadJobInput {
+  jobId: string;
+  userId: string;
+  universityId: string;
+  fileKey: string;
+  adapterKey: string;
+  clientPdfStreamHash?: string;
+  pdfStreamHash: string;
+  fingerprintAlgorithm: string;
+  streamCount: number;
+}
+
+type PreparedUploadJob =
+  | { kind: 'pending'; record: PdfParserJobRecord }
+  | { kind: 'existing'; record: PdfParserJobRecord };
 
 function validateUploadedPdf(
   file: UploadedPdfFile | undefined,
@@ -172,6 +410,23 @@ function validateUploadedPdf(
   }
 }
 
+function toUploadResponse(
+  record: PdfParserJobRecord,
+): PdfParserUploadResponseDto {
+  return {
+    jobId: record.jobId,
+    fileKey: record.fileKey,
+    adapterKey: record.adapterKey,
+    status: record.status,
+    result: record.result,
+    error: record.error,
+    moduleGroupingId: record.moduleGroupingId,
+    createdAt: record.createdAt,
+    updatedAt: record.updatedAt,
+    statusUrl: `/pdf-parser/jobs/${record.jobId}`,
+  };
+}
+
 function normalizeAdapterKey(adapterKeyInput: string | undefined): string {
   const adapterKey = adapterKeyInput?.trim() || 'up';
   if (adapterKey !== 'up') {
@@ -179,6 +434,80 @@ function normalizeAdapterKey(adapterKeyInput: string | undefined): string {
   }
 
   return adapterKey;
+}
+
+function validateLookupRequest(body: PdfParserLookupRequestBody): {
+  universityId: string;
+  adapterKey: string;
+  fingerprintAlgorithm: string;
+  pdfStreamHash: string;
+} {
+  const adapterKey =
+    typeof body.adapterKey === 'string'
+      ? normalizeAdapterKey(body.adapterKey)
+      : normalizeAdapterKey(undefined);
+  const universityId = validateUuid(body.universityId, 'universityId');
+  const fingerprintAlgorithm = validateFingerprintAlgorithm(
+    body.fingerprintAlgorithm,
+  );
+  const pdfStreamHash = normalizeRequiredHexHash(
+    body.pdfStreamHash,
+    'pdfStreamHash',
+  );
+
+  return {
+    universityId,
+    adapterKey,
+    fingerprintAlgorithm,
+    pdfStreamHash,
+  };
+}
+
+function validateFingerprintAlgorithm(value: unknown): string {
+  if (value !== PDF_STREAM_FINGERPRINT_ALGORITHM_VERSION) {
+    throw new BadRequestException(
+      `Unsupported fingerprint algorithm: ${String(value)}`,
+    );
+  }
+
+  return value;
+}
+
+function validateOptionalClientAlgorithm(value: unknown): void {
+  if (value === undefined || value === null || value === '') {
+    return;
+  }
+
+  validateFingerprintAlgorithm(value);
+}
+
+function validateUuid(value: unknown, fieldName: string): string {
+  if (typeof value !== 'string' || !UUID_PATTERN.test(value.trim())) {
+    throw new BadRequestException(`${fieldName} must be a UUID`);
+  }
+
+  return value.trim();
+}
+
+function normalizeRequiredHexHash(value: unknown, fieldName: string): string {
+  if (typeof value !== 'string' || !HEX_SHA_256_PATTERN.test(value.trim())) {
+    throw new BadRequestException(
+      `${fieldName} must be a 64-character hex hash`,
+    );
+  }
+
+  return value.trim().toLowerCase();
+}
+
+function normalizeOptionalHexHash(
+  value: unknown,
+  fieldName: string,
+): string | undefined {
+  if (value === undefined || value === null || value === '') {
+    return undefined;
+  }
+
+  return normalizeRequiredHexHash(value, fieldName);
 }
 
 function buildFileKey(jobId: string, originalName: string): string {
@@ -204,3 +533,7 @@ function validatePdfParserCallback(
     issues: result.error.issues,
   });
 }
+
+const HEX_SHA_256_PATTERN = /^[0-9a-f]{64}$/i;
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
