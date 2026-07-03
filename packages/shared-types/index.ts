@@ -136,7 +136,9 @@ export function extractPdfStreamPayloads(
   let cursor = 0;
 
   while (cursor < bytes.length) {
-    const streamMarker = indexOfAscii(bytes, "stream", cursor);
+    const streamMarker = indexOfPdfKeyword(bytes, "stream", cursor, {
+      requireLineEndingAfter: true,
+    });
     if (streamMarker === -1) {
       break;
     }
@@ -144,7 +146,7 @@ export function extractPdfStreamPayloads(
     let payloadStart = streamMarker + "stream".length;
     payloadStart = skipSingleLineEnding(bytes, payloadStart);
 
-    const endMarker = indexOfAscii(bytes, "endstream", payloadStart);
+    const endMarker = indexOfPdfKeyword(bytes, "endstream", payloadStart);
     if (endMarker === -1) {
       break;
     }
@@ -188,10 +190,11 @@ export function computePdfStreamFingerprint(
   };
 }
 
-function indexOfAscii(
+function indexOfPdfKeyword(
   bytes: Uint8Array,
   needle: string,
   fromIndex: number,
+  options: { requireLineEndingAfter?: boolean } = {},
 ): number {
   const firstByte = needle.charCodeAt(0);
   const maxStart = bytes.length - needle.length;
@@ -209,12 +212,55 @@ function indexOfAscii(
       }
     }
 
-    if (matches) {
+    if (matches && hasPdfKeywordBoundaries(bytes, index, needle, options)) {
       return index;
     }
   }
 
   return -1;
+}
+
+function hasPdfKeywordBoundaries(
+  bytes: Uint8Array,
+  index: number,
+  keyword: string,
+  options: { requireLineEndingAfter?: boolean },
+): boolean {
+  const afterIndex = index + keyword.length;
+  if (!isPdfDelimiter(bytes[index - 1])) {
+    return false;
+  }
+
+  if (options.requireLineEndingAfter) {
+    return bytes[afterIndex] === 10 || bytes[afterIndex] === 13;
+  }
+
+  return isPdfDelimiter(bytes[afterIndex]);
+}
+
+function isPdfDelimiter(byte: number | undefined): boolean {
+  if (byte === undefined) {
+    return true;
+  }
+
+  return (
+    byte === 0 ||
+    byte === 9 ||
+    byte === 10 ||
+    byte === 12 ||
+    byte === 13 ||
+    byte === 32 ||
+    byte === 37 ||
+    byte === 40 ||
+    byte === 41 ||
+    byte === 47 ||
+    byte === 60 ||
+    byte === 62 ||
+    byte === 91 ||
+    byte === 93 ||
+    byte === 123 ||
+    byte === 125
+  );
 }
 
 function skipSingleLineEnding(bytes: Uint8Array, index: number): number {

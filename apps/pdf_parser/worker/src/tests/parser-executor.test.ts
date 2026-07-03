@@ -72,6 +72,48 @@ test("CliParserExecutor converts structured parser failures to worker execution 
     (error) =>
       error instanceof WorkerExecutionError &&
       error.code === "UNKNOWN_ADAPTER" &&
-      error.details.stderr === "diagnostic",
+      error.details.stderr === "diagnostic" &&
+      assert.deepEqual(error.details.parserDetails, { adapterKey: "bad" }) ===
+        undefined,
+  );
+});
+
+test("CliParserExecutor keeps parser details from overwriting worker error metadata", async () => {
+  const executor = new CliParserExecutor({
+    command: "python3",
+    args: ["-m", "parser_cli"],
+    runCliFn: async () => ({
+      exitCode: 2,
+      stdout: JSON.stringify({
+        code: "PARSER_FAILED",
+        message: "Parser failed.",
+        details: {
+          stderr: "parser stderr field",
+          exitCode: 0,
+          reason: "bad pdf",
+        },
+      }),
+      stderr: "real stderr",
+      timedOut: false,
+    }),
+  });
+
+  await assert.rejects(
+    () =>
+      executor.parsePdf({
+        requestId: "parse-1",
+        adapterKey: "up",
+        filePath: "/tmp/input.pdf",
+        abortSignal: new AbortController().signal,
+      }),
+    (error) =>
+      error instanceof WorkerExecutionError &&
+      error.details.stderr === "real stderr" &&
+      error.details.exitCode === 2 &&
+      assert.deepEqual(error.details.parserDetails, {
+        stderr: "parser stderr field",
+        exitCode: 0,
+        reason: "bad pdf",
+      }) === undefined,
   );
 });
