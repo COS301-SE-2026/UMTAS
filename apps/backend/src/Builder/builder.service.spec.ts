@@ -22,6 +22,7 @@ import { mockDbResult, mockSequentialResults } from '../Testing/Mocks';
 
 //Factories
 import { createModule } from '../Testing/Factories';
+import { ForbiddenException } from '@nestjs/common';
 
 describe('BuilderService', () => {
   let service: BuilderService;
@@ -57,6 +58,8 @@ describe('BuilderService', () => {
   }); //END_afterEach
 
   //TESTS
+
+  //Create
   describe('Test_Create', () => {
     it('should create userOwned: university | course | module', async () => {
       //ARRANGE
@@ -121,5 +124,218 @@ describe('BuilderService', () => {
       });
       expect(result).toMatchObject(moduleDto);
     });
-  });
+
+    it('should create userOwned: module || university and course already defined', async () => {
+      //Arrange
+      mockSequentialResults(mockDb.select, [
+        [
+          {
+            //uniRole
+            UserID: userId,
+            UniversityID: uniId,
+            role: 'STUDENT_OWNED',
+          },
+        ],
+      ]);
+      mockCourseService.getAll!.mockResolvedValue({
+        courses: [
+          {
+            CourseID: courseId,
+            CourseName: 'somename',
+            UniversityID: uniId,
+          },
+        ],
+      });
+      const moduleDto = createModule({
+        moduleID: moduleId,
+      });
+      const createModuleDto = {
+        moduleCode: moduleDto.moduleCode,
+        moduleName: moduleDto.moduleName,
+        moduleDescription: moduleDto.moduleDescription,
+        styling: { colour: 'black' },
+      };
+      mockModuleService.create!.mockResolvedValue({
+        ...createModuleDto,
+        moduleID: moduleId,
+      });
+      mockDbResult(mockDb.insert, [
+        {
+          //moduleEnrollment
+          ModuleID: moduleId,
+          UserID: userId,
+        },
+      ]);
+
+      //Act
+      const result = await service.createModule(userId, createModuleDto);
+
+      //Assert
+      expect(mockCourseService.getAll).toHaveBeenCalledWith({
+        UniversityID: uniId,
+      });
+      expect(mockModuleService.create).toHaveBeenCalledWith(userId, {
+        ...createModuleDto,
+        CourseID: courseId,
+      });
+      expect(result).toMatchObject({
+        ...moduleDto,
+        styling: createModuleDto.styling,
+      });
+    });
+  }); //END_Test_Create
+
+  //GetAll
+  describe('Test_GetAll', () => {
+    it('should return empty array of modules', async () => {
+      mockSequentialResults(mockDb.select, [
+        [
+          {
+            //UniRole
+            UserID: userId,
+            UniversityID: uniId,
+            role: 'STUDENT_OWNED',
+          },
+        ],
+      ]);
+      mockCourseService.getAll!.mockResolvedValue({
+        courses: [
+          {
+            CourseID: courseId,
+            CourseName: 'somename',
+            UniversityID: uniId,
+          },
+        ],
+      });
+      mockModuleService.getAll!.mockResolvedValue({ modules: [] });
+
+      const result = await service.getAllModules(userId);
+
+      expect(mockCourseService.getAll).toHaveBeenCalledWith({
+        UniversityID: uniId,
+      });
+      expect(result).toMatchObject({ modules: [] });
+    });
+
+    it('should return array of modules', async () => {
+      mockSequentialResults(mockDb.select, [
+        [
+          {
+            //UniRole
+            UserID: userId,
+            UniversityID: uniId,
+            role: 'STUDENT_OWNED',
+          },
+        ],
+      ]);
+      mockCourseService.getAll!.mockResolvedValue({
+        courses: [
+          {
+            CourseID: courseId,
+            CourseName: 'somename',
+            UniversityID: uniId,
+          },
+        ],
+      });
+      const module1 = createModule();
+      const module2 = createModule();
+
+      mockModuleService.getAll!.mockResolvedValue({
+        modules: [module1, module2],
+      });
+
+      const result = await service.getAllModules(userId);
+
+      expect(mockCourseService.getAll).toHaveBeenCalledWith({
+        UniversityID: uniId,
+      });
+      expect(result).toMatchObject({ modules: [module1, module2] });
+    });
+  }); //END_Test_GetAll
+
+  //getById
+  describe('Test_GetById', () => {
+    it('should return module by id', async () => {
+      //Arrange
+      const module = createModule();
+
+      mockModuleService.getById!.mockResolvedValue(module);
+
+      //Act
+      const result = await service.getModuleById(userId, module.moduleID);
+
+      //Assert
+      expect(result).toMatchObject(module);
+    });
+  }); //END_Test_GetById
+
+  //Update
+  describe('Test_Update', () => {
+    it('should fail if user is trying to update module they do not own', async () => {
+      mockModuleService.moduleOwnershipCheck!.mockResolvedValue(false);
+
+      await expect(service.updateModule(userId, moduleId, {})).rejects.toThrow(
+        ForbiddenException,
+      );
+    });
+
+    it('should update module that user owns', async () => {
+      mockModuleService.moduleOwnershipCheck!.mockResolvedValue(true);
+
+      const module = createModule({ moduleID: moduleId });
+      const updateModuleDto = {
+        moduleCode: module.moduleCode,
+        moduleName: module.moduleName,
+        moduleDescription: module.moduleDescription,
+        styling: { colour: 'black' },
+      };
+      const newModule = createModule({
+        moduleCode: updateModuleDto.moduleCode,
+        moduleName: updateModuleDto.moduleName,
+        moduleDescription: updateModuleDto.moduleDescription,
+      });
+
+      mockModuleService.update!.mockResolvedValue({
+        ...newModule,
+        styling: updateModuleDto.styling,
+      });
+
+      const result = await service.updateModule(
+        userId,
+        moduleId,
+        updateModuleDto,
+      );
+
+      expect(result).toMatchObject({
+        ...newModule,
+        styling: updateModuleDto.styling,
+      });
+    });
+  }); //END_Test_Update
+
+  //Delete
+  describe('Test_Delete', () => {
+    it('should throw if user does not own module', async () => {
+      mockModuleService.moduleOwnershipCheck!.mockResolvedValue(false);
+
+      await expect(service.deleteModule(userId, moduleId)).rejects.toThrow(
+        ForbiddenException,
+      );
+    });
+
+    it('should delete module that user owns', async () => {
+      mockModuleService.moduleOwnershipCheck!.mockResolvedValue(true);
+      mockModuleService.deleteById!.mockResolvedValue({
+        moduleCode: 'someCode',
+        success: true,
+      });
+
+      const result = await service.deleteModule(userId, moduleId);
+
+      expect(result).toMatchObject({
+        moduleCode: 'someCode',
+        success: true,
+      });
+    });
+  }); //END_Test_Delete
 }); //END_BuilderService

@@ -136,7 +136,7 @@ export class GroupingService {
     const oldGroup = await this.getById(groupId);
 
     //If hash not new - return early
-    if (hash !== oldGroup.Hash) return oldGroup;
+    if (hash === oldGroup.Hash) return oldGroup;
 
     //update hash
     await this.dbService.db
