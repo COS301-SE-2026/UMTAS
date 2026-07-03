@@ -19,8 +19,6 @@ export function createMockUniversityService() {
 
   return {
     mockUniversityService,
-    reset: () => {
-      Object.values(mockUniversityService).forEach((fn: any) => fn.mockReset());
-    },
+    reset: () => jest.clearAllMocks(),
   };
 } //END_createMockUniversityService

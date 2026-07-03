@@ -1,7 +1,7 @@
 //What the mock db returns on each function
 
-export function createDbChain(result: any) {
-  const chain: any = {};
+export function createDbChain<T>(result: T) {
+  const chain = {} as Record<string, jest.Mock>;
 
   const chainable = [
     'from',
@@ -20,57 +20,51 @@ export function createDbChain(result: any) {
     chain[method] = jest.fn(() => chain);
   });
 
-  chain.then = jest.fn((resolve: any, reject?: any) =>
-    Promise.resolve(result).then(resolve, reject),
+  chain.then = jest.fn(
+    (resolve: (value: T) => any, reject?: (reason: any) => any) =>
+      Promise.resolve(result).then(resolve, reject),
   );
-  chain.catch = jest.fn((reject: any) => Promise.resolve(result).catch(reject));
-  chain.finally = jest.fn((cb: any) => Promise.resolve(result).finally(cb));
+
+  chain.catch = jest.fn((reject: (reason: any) => any) =>
+    Promise.resolve(result).catch(reject),
+  );
+
+  chain.finally = jest.fn((cb: () => void) =>
+    Promise.resolve(result).finally(cb),
+  );
 
   return chain;
 } //END_createDbChain
 
-//select().from.where()
-export function mockSelectAllResult(mockDb: any, result: unknown[]) {
-  mockDb.select.mockReturnValue({
-    from: jest.fn().mockReturnValue({
-      where: jest.fn().mockResolvedValue(result),
-    }),
-  });
-} //mockSelectAllResult
+//generic function to mock any chainable function on database
+//ex: mockDbResult(mockDb.select, [{something: 'something else'}])
+export const mockDbResult = (mockFn: jest.Mock, result: unknown[]) => {
+  mockFn.mockReturnValue(createDbChain(result));
+};
 
-// select().from().where().limit()
-export function mockSelectResult(mockDb: any, result: unknown[]) {
-  mockDb.select.mockReturnValue(createDbChain(result));
-} //END_mockSelectResult
-
-//Select distinct
-export function mockSelectDistinctResult(mockDb: any, result: unknown[]) {
-  mockDb.selectDistinct.mockReturnValue(createDbChain(result));
-}
-
-//insert().values().returning()
-export function mockInsertResult(mockDb: any, result: unknown[]) {
-  mockDb.insert.mockReturnValue(createDbChain(result));
-} //END_mockInsertResult
-
-//update().set().where().returning()
-export function mockUpdateResult(mockDb: any, result: unknown[]) {
-  mockDb.update.mockReturnValue(createDbChain(result));
-} //END_mockUpdateResult
-
-//delete().where()
-export function mockDeleteResult(mockDb: any, result: unknown = undefined) {
-  mockDb.delete.mockReturnValue(createDbChain(result));
-} //END_mockDeleteResult
-
+//generic Sequential result
 //methods called more than once with their respective results
-export function mockSequentialResults(mockFn: jest.Mock, results: unknown[][]) {
+export const mockSequentialResults = <T>(mockFn: jest.Mock, results: T[][]) => {
   results.forEach((result) =>
     mockFn.mockReturnValueOnce(createDbChain(result)),
   );
-}
+};
 
-//transactions
-export function mockTransaction(mockDb: any) {
-  mockDb.transaction.mockImplementation((callback: any) => callback(mockDb));
-}
+// //transactions
+export const mockTransaction = (mockDb: { transaction: jest.Mock }) => {
+  mockDb.transaction.mockImplementation(
+    (callback: (tx: typeof mockDb) => unknown) => {
+      return callback(mockDb);
+    },
+  );
+};
+//ex:
+//  mockDb.insert.mockReturnValue(createDbChain([{something: 'somethingElse'}]));
+//  mockDb.update.mockReturnValue(createDbChain([{something: 'somethingElse}]));
+//  await service.thatMethodInQuestion();
+//  expect(mockDb.insert).toHaveBeenCalled();
+//
+
+// export function mockTransaction(mockDb: any) {
+//   mockDb.transaction.mockImplementation((callback: any) => callback(mockDb));
+// }

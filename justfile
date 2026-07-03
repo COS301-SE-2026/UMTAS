@@ -107,6 +107,10 @@ rollback-prod PREVIOUS_TAG:
 
 ############################## Backend specific
 
+#lint-staged
+lintBack:
+    pnpm run lint-staged
+
 #Docker cleanup
 dockerClean:
     phase run -- pnpm --filter backend docker:clean

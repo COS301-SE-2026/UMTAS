@@ -16,13 +16,13 @@ import {
   CreateModuleDto,
   DeleteModuleResponseDto,
 } from '../Module/dto/module.dto';
-import { CourseDto } from 'src/Course/dto/course.dto';
+import { CourseDto } from '../Course/dto/course.dto';
 
 import { UniversityRole, ModuleEnrollment } from '../entities/index';
 
-import { UniversityService } from 'src/University/university.service';
-import { CourseService } from 'src/Course/course.service';
-import { ModuleService } from 'src/Module/module.service';
+import { UniversityService } from '../University/university.service';
+import { CourseService } from '../Course/course.service';
+import { ModuleService } from '../Module/module.service';
 
 //Applies only to STUDENT_OWNED role for students
 // When creating user defined modules
@@ -151,7 +151,7 @@ export class BuilderService {
     if (!uniRole) uniRole = await this.createUserUni(userId);
 
     //Check for course -> if not found -> create user course
-    const courses = await this.courseService.getAll({
+    const { courses } = await this.courseService.getAll({
       UniversityID: uniRole.UniversityID,
     });
 

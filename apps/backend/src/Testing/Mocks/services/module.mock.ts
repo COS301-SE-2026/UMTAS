@@ -18,8 +18,6 @@ export function createMockModuleService() {
 
   return {
     mockModuleService,
-    reset: () => {
-      Object.values(mockModuleService).forEach((fn: any) => fn.mockReset());
-    },
+    reset: () => jest.clearAllMocks(),
   };
 } //END_createMockModuleService

@@ -1,10 +1,10 @@
-// import { randomUUID } from 'crypto';
-// import {
-//   modules,
-//   CourseModule,
-//   ModuleEnrollment,
-//   ModuleStyling,
-// } from 'src/entities';
+import { randomUUID } from 'crypto';
+import {
+  modules,
+  //   CourseModule,
+  //   ModuleEnrollment,
+  //   ModuleStyling,
+} from 'src/entities';
 // import { courseId } from '../constants.spec';
 // import { ModuleService } from '../../Module/module.service';
 
@@ -29,19 +29,19 @@
 //   };
 // } //END_createMockModuleService
 
-// type Module = typeof modules.$inferSelect;
+type Module = typeof modules.$inferSelect;
 
-// //create a module
-// export function createModule(overrides: Partial<Module> = {}): Module {
-//   return {
-//     moduleID: randomUUID(),
-//     moduleCode: 'COS332',
-//     moduleName: 'Networks',
-//     moduleDescription: 'About Networks',
+//create a module
+export function createModule(overrides: Partial<Module> = {}): Module {
+  return {
+    moduleID: randomUUID(),
+    moduleCode: 'COS332',
+    moduleName: 'Networks',
+    moduleDescription: 'About Networks',
 
-//     ...overrides,
-//   };
-// } //END_createModule
+    ...overrides,
+  };
+} //END_createModule
 
 // type CourseModule = typeof CourseModule.$inferSelect;
 // //Create a course owned module - the join table
