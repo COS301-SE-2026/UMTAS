@@ -68,8 +68,10 @@ export async function processWorkerJob<TJobData>(
   const abortController = new AbortController();
   const callbackUrl = resolveCallbackUrl(options, job);
 
+  let payload: WorkerCallbackPayload;
+
   try {
-    const payload = await withWorkerTimeout(
+    payload = await withWorkerTimeout(
       options.processor.process({
         data: job.data,
         tempDir,
@@ -79,10 +81,6 @@ export async function processWorkerJob<TJobData>(
       options.timeoutMs,
       abortController,
     );
-
-    await options.callbackClient.post(callbackUrl, payload);
-    await cleanupTempDir(tempDir);
-    return payload;
   } catch (error) {
     try {
       if (isFinalAttempt(job)) {
@@ -98,6 +96,14 @@ export async function processWorkerJob<TJobData>(
 
     throw error;
   }
+
+  try {
+    await options.callbackClient.post(callbackUrl, payload);
+  } finally {
+    await cleanupTempDir(tempDir);
+  }
+
+  return payload;
 }
 
 export function isFinalAttempt(job: WorkerJobLike<unknown>): boolean {

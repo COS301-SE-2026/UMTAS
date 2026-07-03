@@ -98,3 +98,42 @@ test("processWorkerJob sends final failure callbacks and preserves failed temp d
     },
   });
 });
+
+test("processWorkerJob does not send a failure callback when success callback delivery fails", async () => {
+  const postedPayloads: WorkerCallbackPayload[] = [];
+  const payload: WorkerCallbackPayload = {
+    status: "completed",
+    result: { parsed: true },
+  };
+
+  await assert.rejects(
+    () =>
+      processWorkerJob(
+        {
+          id: "parse-3",
+          data: { jobId: "parse-3" },
+          attemptsMade: 2,
+          opts: { attempts: 3 },
+        },
+        {
+          timeoutMs: 1_000,
+          keepFailedTemp: false,
+          callbackUrl: "http://backend.test/callback",
+          createTempDir: async () => "/tmp/umtas-parse-3",
+          cleanupTempDir: async () => {},
+          callbackClient: {
+            post: async (_url, postedPayload) => {
+              postedPayloads.push(postedPayload);
+              throw new Error("backend unavailable");
+            },
+          },
+          processor: {
+            process: async () => payload,
+          },
+        },
+      ),
+    /backend unavailable/,
+  );
+
+  assert.deepEqual(postedPayloads, [payload]);
+});
