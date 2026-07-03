@@ -37,3 +37,24 @@ export class PdfParserUploadResponseDto extends PdfParserJobResponseDto {
   })
   statusUrl!: string;
 }
+
+export class PdfParserLookupResponseDto {
+  @ApiProperty({ example: true })
+  duplicate!: boolean;
+
+  @ApiPropertyOptional({
+    example: 'pdf-parse-2d82d1ff-fb51-4c67-80cf-61d88c12d596',
+  })
+  jobId?: string;
+
+  @ApiPropertyOptional({ enum: ['queued', 'completed', 'failed'] })
+  status?: 'queued' | 'completed' | 'failed';
+
+  @ApiPropertyOptional({ example: true })
+  resultAvailable?: boolean;
+
+  @ApiPropertyOptional({
+    example: '/pdf-parser/jobs/pdf-parse-2d82d1ff-fb51-4c67-80cf-61d88c12d596',
+  })
+  statusUrl?: string;
+}
