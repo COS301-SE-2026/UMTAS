@@ -101,11 +101,16 @@ function buildParserErrorDetails(
   errorPayload: ParserErrorPayload,
   result: CliResult,
 ): Record<string, unknown> {
-  return {
-    ...errorPayload.details,
+  const details: Record<string, unknown> = {
     stderr: result.stderr,
     exitCode: result.exitCode,
   };
+
+  if (errorPayload.details) {
+    details.parserDetails = errorPayload.details;
+  }
+
+  return details;
 }
 
 function parseParserResultJson(stdout: string, stderr: string): unknown {
