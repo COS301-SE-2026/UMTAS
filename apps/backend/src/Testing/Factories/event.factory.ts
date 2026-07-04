@@ -40,6 +40,7 @@ export function createEvent(
     eventCode: 'Lec1',
     isRecurring: false,
     validated: true,
+    ImportKey: null,
     eventCriteria: createEventCriteria(type, eventCriteriaOverrides),
   };
 

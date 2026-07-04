@@ -75,7 +75,7 @@ export class ParserResultImporter {
     db: AppDatabase,
     moduleIds: string[],
   ): Promise<string> {
-    const sortedModuleIds = [...new Set(moduleIds)].sort();
+    const sortedModuleIds = uniqueSortedValues(moduleIds);
     const hash =
       sortedModuleIds.length > 0 ? hashModuleIds(sortedModuleIds) : null;
 
@@ -87,6 +87,11 @@ export class ParserResultImporter {
         .limit(1);
 
       if (existingGroup) {
+        await this.assertGroupModulesMatch(
+          db,
+          existingGroup.GroupID,
+          sortedModuleIds,
+        );
         return existingGroup.GroupID;
       }
     }
@@ -94,7 +99,27 @@ export class ParserResultImporter {
     const [group] = await db
       .insert(ModuleGrouping)
       .values(hash ? { Hash: hash } : {})
+      .onConflictDoNothing({
+        target: ModuleGrouping.Hash,
+      })
       .returning();
+
+    if (!group && hash) {
+      const [conflictingGroup] = await db
+        .select()
+        .from(ModuleGrouping)
+        .where(eq(ModuleGrouping.Hash, hash))
+        .limit(1);
+
+      if (conflictingGroup) {
+        await this.assertGroupModulesMatch(
+          db,
+          conflictingGroup.GroupID,
+          sortedModuleIds,
+        );
+        return conflictingGroup.GroupID;
+      }
+    }
 
     if (!group) {
       throw new ConflictException(
@@ -103,14 +128,75 @@ export class ParserResultImporter {
     }
 
     if (sortedModuleIds.length > 0) {
-      await db.insert(GroupModules).values(
-        sortedModuleIds.map((moduleId) => ({
-          GroupID: group.GroupID,
-          ModuleID: moduleId,
-        })),
-      );
+      for (const moduleId of sortedModuleIds) {
+        await db
+          .insert(GroupModules)
+          .values({
+            GroupID: group.GroupID,
+            ModuleID: moduleId,
+          })
+          .onConflictDoNothing({
+            target: [GroupModules.GroupID, GroupModules.ModuleID],
+          });
+      }
     }
 
     return group.GroupID;
   }
+
+  private async assertGroupModulesMatch(
+    db: AppDatabase,
+    groupId: string,
+    sortedModuleIds: string[],
+  ): Promise<void> {
+    const rows = await db
+      .select({
+        moduleId: GroupModules.ModuleID,
+      })
+      .from(GroupModules)
+      .where(eq(GroupModules.GroupID, groupId));
+
+    const existingModuleIds: string[] = [];
+    for (const row of rows) {
+      existingModuleIds.push(row.moduleId);
+    }
+    existingModuleIds.sort();
+
+    if (!sameStringList(existingModuleIds, sortedModuleIds)) {
+      throw new ConflictException(
+        'PDF parser module grouping hash does not match group membership',
+      );
+    }
+  }
+}
+
+function uniqueSortedValues(values: string[]): string[] {
+  const seen = new Set<string>();
+  const uniqueValues: string[] = [];
+
+  for (const value of values) {
+    if (seen.has(value)) {
+      continue;
+    }
+
+    seen.add(value);
+    uniqueValues.push(value);
+  }
+
+  uniqueValues.sort();
+  return uniqueValues;
+}
+
+function sameStringList(left: string[], right: string[]): boolean {
+  if (left.length !== right.length) {
+    return false;
+  }
+
+  for (let index = 0; index < left.length; index += 1) {
+    if (left[index] !== right[index]) {
+      return false;
+    }
+  }
+
+  return true;
 }
