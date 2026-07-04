@@ -10,7 +10,7 @@ import type {
   PdfParserResult,
   WorkerCallbackError,
 } from 'shared-types';
-import { DatabaseService } from '../db/database.service';
+import { DatabaseService, type AppDatabase } from '../db/database.service';
 import { parseJob, type ParseJob } from '../entities';
 import { ParserResultImporter } from './parser-result-importer.service';
 
@@ -43,22 +43,28 @@ export class PdfParserJobStoreService {
     pdfStreamHash: string;
     statuses?: PdfParserJobStatus[];
   }): Promise<PdfParserJobRecord | undefined> {
-    const filters = [
-      eq(parseJob.UserID, input.userId),
-      eq(parseJob.UniversityID, input.universityId),
-      eq(parseJob.AdapterKey, input.adapterKey),
-      eq(parseJob.FingerprintAlgorithm, input.fingerprintAlgorithm),
-      eq(parseJob.PdfStreamHash, input.pdfStreamHash),
-    ];
-
-    if (input.statuses && input.statuses.length > 0) {
-      filters.push(inArray(parseJob.Status, input.statuses));
-    }
+    const duplicateCriteria =
+      input.statuses && input.statuses.length > 0
+        ? and(
+            eq(parseJob.UserID, input.userId),
+            eq(parseJob.UniversityID, input.universityId),
+            eq(parseJob.AdapterKey, input.adapterKey),
+            eq(parseJob.FingerprintAlgorithm, input.fingerprintAlgorithm),
+            eq(parseJob.PdfStreamHash, input.pdfStreamHash),
+            inArray(parseJob.Status, input.statuses),
+          )
+        : and(
+            eq(parseJob.UserID, input.userId),
+            eq(parseJob.UniversityID, input.universityId),
+            eq(parseJob.AdapterKey, input.adapterKey),
+            eq(parseJob.FingerprintAlgorithm, input.fingerprintAlgorithm),
+            eq(parseJob.PdfStreamHash, input.pdfStreamHash),
+          );
 
     const [row] = await this.databaseService.db
       .select()
       .from(parseJob)
-      .where(and(...filters))
+      .where(duplicateCriteria)
       .limit(1);
 
     return row ? mapParseJob(row) : undefined;
@@ -174,41 +180,41 @@ export class PdfParserJobStoreService {
     jobId: string,
     callback: PdfParserCallbackPayload,
   ): Promise<PdfParserJobRecord> {
-    const existing = await this.findPersistedJob(jobId);
-    if (!existing) {
-      throw new NotFoundException(`PDF parser job not found: ${jobId}`);
-    }
-
-    if (existing.Status === callback.status) {
-      const existingRecord = mapParseJob(existing);
-      if (callbackMatchesExisting(existingRecord, callback)) {
-        if (
-          callback.status === 'completed' &&
-          callback.result &&
-          !existing.GroupID
-        ) {
-          const updated = await this.linkCompletedJobToDomainRecords(
-            existing,
-            callback.result,
-          );
-          return mapParseJob(updated);
-        }
-
-        return existingRecord;
+    const row = await this.databaseService.db.transaction(async (tx) => {
+      const existing = await this.findPersistedJobForUpdate(tx, jobId);
+      if (!existing) {
+        throw new NotFoundException(`PDF parser job not found: ${jobId}`);
       }
 
-      throw new ConflictException(
-        `PDF parser job already has a different ${callback.status} callback`,
-      );
-    }
+      if (existing.Status === callback.status) {
+        const existingRecord = mapParseJob(existing);
+        if (callbackMatchesExisting(existingRecord, callback)) {
+          if (
+            callback.status === 'completed' &&
+            callback.result &&
+            !existing.GroupID
+          ) {
+            return this.linkCompletedJobToDomainRecords(
+              tx,
+              existing,
+              callback.result,
+            );
+          }
 
-    if (existing.Status === 'completed' || existing.Status === 'failed') {
-      throw new ConflictException(
-        `PDF parser job is already ${existing.Status}`,
-      );
-    }
+          return existing;
+        }
 
-    const row = await this.databaseService.db.transaction(async (tx) => {
+        throw new ConflictException(
+          `PDF parser job already has a different ${callback.status} callback`,
+        );
+      }
+
+      if (existing.Status === 'completed' || existing.Status === 'failed') {
+        throw new ConflictException(
+          `PDF parser job is already ${existing.Status}`,
+        );
+      }
+
       const now = new Date();
       const moduleGroupingId =
         callback.status === 'completed' && callback.result
@@ -232,17 +238,74 @@ export class PdfParserJobStoreService {
           CompletedAt: callback.status === 'completed' ? now : null,
           FailedAt: callback.status === 'failed' ? now : null,
         })
-        .where(eq(parseJob.JobID, existing.JobID))
+        .where(
+          and(
+            eq(parseJob.JobID, existing.JobID),
+            eq(parseJob.Status, existing.Status),
+          ),
+        )
         .returning();
+
+      if (!updated) {
+        throw new ConflictException(
+          `PDF parser job changed while recording callback: ${jobId}`,
+        );
+      }
 
       return updated;
     });
 
-    if (!row) {
-      throw new NotFoundException(`PDF parser job not found: ${jobId}`);
+    return mapParseJob(row);
+  }
+
+  private async findPersistedJobForUpdate(
+    db: AppDatabase,
+    jobId: string,
+  ): Promise<ParseJob | undefined> {
+    const jobUuid = parsePublicJobId(jobId);
+    const [row] = await db
+      .select()
+      .from(parseJob)
+      .where(eq(parseJob.JobID, jobUuid))
+      .limit(1)
+      .for('update');
+
+    return row;
+  }
+
+  private async linkCompletedJobToDomainRecords(
+    db: AppDatabase,
+    existing: ParseJob,
+    result: PdfParserResult,
+  ): Promise<ParseJob> {
+    const moduleGroupingId = await this.parserResultImporter.importResult(
+      db,
+      existing,
+      result,
+    );
+    const [updated] = await db
+      .update(parseJob)
+      .set({
+        GroupID: moduleGroupingId,
+        UpdatedAt: new Date(),
+      })
+      .where(
+        and(
+          eq(parseJob.JobID, existing.JobID),
+          eq(parseJob.Status, existing.Status),
+        ),
+      )
+      .returning();
+
+    if (!updated) {
+      throw new ConflictException(
+        `PDF parser job changed while linking parser result: ${toPublicJobId(
+          existing.JobID,
+        )}`,
+      );
     }
 
-    return mapParseJob(row);
+    return updated;
   }
 
   async findJob(
@@ -273,48 +336,6 @@ export class PdfParserJobStoreService {
       .limit(1);
 
     return row ? mapParseJob(row) : undefined;
-  }
-
-  private async findPersistedJob(jobId: string): Promise<ParseJob | undefined> {
-    const jobUuid = parsePublicJobId(jobId);
-    const [row] = await this.databaseService.db
-      .select()
-      .from(parseJob)
-      .where(eq(parseJob.JobID, jobUuid))
-      .limit(1);
-
-    return row;
-  }
-
-  private async linkCompletedJobToDomainRecords(
-    existing: ParseJob,
-    result: PdfParserResult,
-  ): Promise<ParseJob> {
-    const row = await this.databaseService.db.transaction(async (tx) => {
-      const moduleGroupingId = await this.parserResultImporter.importResult(
-        tx,
-        existing,
-        result,
-      );
-      const [updated] = await tx
-        .update(parseJob)
-        .set({
-          GroupID: moduleGroupingId,
-          UpdatedAt: new Date(),
-        })
-        .where(eq(parseJob.JobID, existing.JobID))
-        .returning();
-
-      return updated;
-    });
-
-    if (!row) {
-      throw new NotFoundException(
-        `PDF parser job not found: ${toPublicJobId(existing.JobID)}`,
-      );
-    }
-
-    return row;
   }
 }
 

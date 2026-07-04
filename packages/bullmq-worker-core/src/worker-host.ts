@@ -99,10 +99,22 @@ export async function processWorkerJob<TJobData>(
 
   try {
     await options.callbackClient.post(callbackUrl, payload);
-  } finally {
-    await cleanupTempDir(tempDir);
+  } catch (error) {
+    try {
+      if (isFinalAttempt(job)) {
+        await options.callbackClient.post(
+          callbackUrl,
+          toCallbackDeliveryFailurePayload(error),
+        );
+      }
+    } finally {
+      await cleanupTempDir(tempDir);
+    }
+
+    throw error;
   }
 
+  await cleanupTempDir(tempDir);
   return payload;
 }
 
@@ -132,6 +144,18 @@ export function toFailurePayload(error: unknown): WorkerCallbackPayload {
     code: "WORKER_FAILED",
     message: "Worker job failed",
     details: { error },
+  });
+}
+
+export function toCallbackDeliveryFailurePayload(
+  error: unknown,
+): WorkerCallbackPayload {
+  return failurePayload({
+    code: "WORKER_CALLBACK_DELIVERY_FAILED",
+    message: "Worker completed parsing but could not deliver success callback",
+    details: {
+      cause: error instanceof Error ? error.message : String(error),
+    },
   });
 }
 
