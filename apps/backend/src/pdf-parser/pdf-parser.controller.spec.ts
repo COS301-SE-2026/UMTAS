@@ -1,13 +1,10 @@
 import { Test } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
-import type { PdfStreamFingerprintResult } from 'shared-types';
 import { IS_PUBLIC_KEY } from '../auth/auth.guard';
 import type { SessionData } from '../auth/session.decorator';
-import { QueueProducerService } from '../jobs/queue-producer.service';
 import { WorkerCallbackAuthGuard } from '../jobs/worker-callback-auth.guard';
-import { ObjectStorageService } from '../storage/object-storage.service';
+import { PdfParseSubmission } from './pdf-parse-submission';
 import { PdfParserController } from './pdf-parser.controller';
-import { PdfParserFingerprintService } from './pdf-parser-fingerprint.service';
 import {
   PdfParserJobStoreService,
   type PdfParserJobRecord,
@@ -37,34 +34,25 @@ describe('PdfParserController auth metadata', () => {
 });
 
 describe('PdfParserController', () => {
-  let queueProducer: MockQueueProducer;
-  let storage: MockObjectStorage;
   let jobStore: MockPdfParserJobStore;
-  let fingerprintService: MockPdfParserFingerprintService;
+  let submission: MockPdfParseSubmission;
   let controller: PdfParserController;
 
   beforeEach(async () => {
-    queueProducer = { enqueuePdfParseJob: jest.fn().mockResolvedValue({}) };
-    storage = { putObject: jest.fn().mockResolvedValue({}) };
     jobStore = {
       findDuplicate: jest.fn().mockResolvedValue(undefined),
-      createQueuedJob: jest.fn().mockResolvedValue(queuedRecord),
-      retryFailedDuplicate: jest.fn().mockResolvedValue(retriedRecord),
-      markInfrastructureFailure: jest.fn().mockResolvedValue(undefined),
       findJob: jest.fn().mockResolvedValue(queuedRecord),
       recordCallback: jest.fn().mockResolvedValue(completedRecord),
     };
-    fingerprintService = {
-      computeOrThrow: jest.fn().mockReturnValue(fingerprint),
+    submission = {
+      submit: jest.fn().mockResolvedValue(uploadResponse),
     };
 
     const moduleRef = await Test.createTestingModule({
       controllers: [PdfParserController],
       providers: [
-        { provide: QueueProducerService, useValue: queueProducer },
-        { provide: ObjectStorageService, useValue: storage },
         { provide: PdfParserJobStoreService, useValue: jobStore },
-        { provide: PdfParserFingerprintService, useValue: fingerprintService },
+        { provide: PdfParseSubmission, useValue: submission },
         {
           provide: WorkerCallbackAuthGuard,
           useValue: { canActivate: jest.fn() },
@@ -104,173 +92,94 @@ describe('PdfParserController', () => {
     });
   });
 
-  it('recomputes the backend hash during upload and keeps a mismatching client hash diagnostic only', async () => {
-    await controller.uploadAndEnqueue(
-      session,
-      uploadedPdf,
-      'up',
-      universityId,
-      'pdf-stream-payload-sha256-v1',
-      'f'.repeat(64),
-    );
+  it('validates upload inputs and delegates submission', async () => {
+    await expect(
+      controller.uploadAndEnqueue(
+        session,
+        uploadedPdf,
+        ' up ',
+        universityId,
+        'pdf-stream-payload-sha256-v1',
+        'F'.repeat(64),
+      ),
+    ).resolves.toEqual(uploadResponse);
 
-    expect(jobStore.findDuplicate).toHaveBeenCalledWith({
+    expect(submission.submit).toHaveBeenCalledWith({
       userId,
       universityId,
       adapterKey: 'up',
-      fingerprintAlgorithm: fingerprint.algorithmVersion,
-      pdfStreamHash: fingerprint.hash,
-      statuses: ['queued', 'completed'],
+      clientPdfStreamHash: 'f'.repeat(64),
+      file: {
+        originalName: uploadedPdf.originalname,
+        mimetype: uploadedPdf.mimetype,
+        buffer: uploadedPdf.buffer,
+      },
     });
-    expect(jobStore.createQueuedJob).toHaveBeenCalledWith(
-      expect.objectContaining({
-        userId,
-        universityId,
-        clientPdfStreamHash: 'f'.repeat(64),
-        pdfStreamHash: fingerprint.hash,
-        streamCount: fingerprint.streamCount,
-      }),
-    );
   });
 
-  it('returns an existing duplicate upload without storing or enqueueing another job', async () => {
-    jobStore.findDuplicate.mockResolvedValue(completedRecord);
+  it('rejects unsupported upload adapters before submission', async () => {
+    await expect(
+      controller.uploadAndEnqueue(
+        session,
+        uploadedPdf,
+        'other',
+        universityId,
+        undefined,
+        undefined,
+      ),
+    ).rejects.toThrow('Only the "up" PDF adapter is supported');
 
+    expect(submission.submit).not.toHaveBeenCalled();
+  });
+
+  it('rejects uploads without PDF magic bytes', async () => {
+    await expect(
+      controller.uploadAndEnqueue(
+        session,
+        {
+          originalname: 'not-a-pdf.pdf',
+          mimetype: 'application/pdf',
+          buffer: Buffer.from('not a pdf'),
+          size: 9,
+        },
+        'up',
+        universityId,
+        undefined,
+        undefined,
+      ),
+    ).rejects.toThrow('Uploaded file must be a PDF');
+
+    expect(submission.submit).not.toHaveBeenCalled();
+  });
+
+  it('rejects invalid client fingerprint diagnostics before submission', async () => {
     await expect(
       controller.uploadAndEnqueue(
         session,
         uploadedPdf,
         'up',
         universityId,
-        undefined,
-        undefined,
+        'pdf-stream-payload-sha256-v1',
+        'not-a-hash',
       ),
-    ).resolves.toEqual({
-      jobId: completedRecord.jobId,
-      fileKey: completedRecord.fileKey,
-      adapterKey: completedRecord.adapterKey,
-      status: completedRecord.status,
-      result: completedRecord.result,
-      error: completedRecord.error,
-      createdAt: completedRecord.createdAt,
-      updatedAt: completedRecord.updatedAt,
-      statusUrl: `/pdf-parser/jobs/${completedRecord.jobId}`,
-    });
+    ).rejects.toThrow('clientPdfStreamHash must be a 64-character hex hash');
 
-    expect(storage.putObject).not.toHaveBeenCalled();
-    expect(jobStore.createQueuedJob).not.toHaveBeenCalled();
-    expect(queueProducer.enqueuePdfParseJob).not.toHaveBeenCalled();
+    expect(submission.submit).not.toHaveBeenCalled();
   });
 
-  it('creates the persisted job before enqueueing the BullMQ job', async () => {
-    const calls: string[] = [];
-    jobStore.createQueuedJob.mockImplementation(async () => {
-      calls.push('create');
-      return queuedRecord;
-    });
-    storage.putObject.mockImplementation(async () => {
-      calls.push('store');
-      return {};
-    });
-    queueProducer.enqueuePdfParseJob.mockImplementation(async () => {
-      calls.push('enqueue');
-      return {};
-    });
-
-    await controller.uploadAndEnqueue(
-      session,
-      uploadedPdf,
-      'up',
-      universityId,
-      undefined,
-      undefined,
-    );
-
-    expect(calls).toEqual(['create', 'store', 'enqueue']);
-  });
-
-  it('retries a failed duplicate upload instead of returning the failed job', async () => {
-    jobStore.createQueuedJob.mockRejectedValue(new Error('duplicate key'));
-    jobStore.findDuplicate
-      .mockResolvedValueOnce(undefined)
-      .mockResolvedValueOnce(failedRecord);
-
+  it('rejects unsupported client fingerprint algorithms before submission', async () => {
     await expect(
       controller.uploadAndEnqueue(
         session,
         uploadedPdf,
         'up',
         universityId,
-        undefined,
-        undefined,
-      ),
-    ).resolves.toEqual(
-      expect.objectContaining({
-        jobId: retriedRecord.jobId,
-        status: 'queued',
-      }),
-    );
-
-    expect(jobStore.retryFailedDuplicate).toHaveBeenCalledWith(
-      expect.objectContaining({
-        jobId: failedRecord.jobId,
-        adapterKey: 'up',
-        pdfStreamHash,
-      }),
-    );
-    expect(storage.putObject).toHaveBeenCalledWith(
-      expect.objectContaining({ key: retriedRecord.fileKey }),
-    );
-    expect(queueProducer.enqueuePdfParseJob).toHaveBeenCalledWith({
-      jobId: retriedRecord.jobId,
-      fileKey: retriedRecord.fileKey,
-      adapterKey: 'up',
-    });
-  });
-
-  it('marks the reserved job failed when object storage fails', async () => {
-    storage.putObject.mockRejectedValue(new Error('storage down'));
-
-    await expect(
-      controller.uploadAndEnqueue(
-        session,
-        uploadedPdf,
-        'up',
-        universityId,
-        undefined,
+        'unknown',
         undefined,
       ),
-    ).rejects.toThrow('PDF parser upload could not be stored');
+    ).rejects.toThrow('Unsupported fingerprint algorithm: unknown');
 
-    expect(jobStore.markInfrastructureFailure).toHaveBeenCalledWith(
-      queuedRecord.jobId,
-      expect.objectContaining({
-        code: 'PDF_PARSE_UPLOAD_FAILED',
-      }),
-    );
-    expect(queueProducer.enqueuePdfParseJob).not.toHaveBeenCalled();
-  });
-
-  it('marks the persisted job failed when enqueueing fails', async () => {
-    queueProducer.enqueuePdfParseJob.mockRejectedValue(new Error('redis down'));
-
-    await expect(
-      controller.uploadAndEnqueue(
-        session,
-        uploadedPdf,
-        'up',
-        universityId,
-        undefined,
-        undefined,
-      ),
-    ).rejects.toThrow('PDF parser job could not be enqueued');
-
-    expect(jobStore.markInfrastructureFailure).toHaveBeenCalledWith(
-      expect.stringMatching(/^pdf-parse-/),
-      expect.objectContaining({
-        code: 'PDF_PARSE_ENQUEUE_FAILED',
-      }),
-    );
+    expect(submission.submit).not.toHaveBeenCalled();
   });
 
   it('persists completed worker callbacks through the store', async () => {
@@ -329,32 +238,15 @@ describe('PdfParserController', () => {
 const userId = '11111111-1111-4111-8111-111111111111';
 const universityId = '22222222-2222-4222-8222-222222222222';
 const pdfStreamHash = 'a'.repeat(64);
-type MockQueueProducer = {
-  enqueuePdfParseJob: jest.Mock;
-};
-
-type MockObjectStorage = {
-  putObject: jest.Mock;
-};
 
 type MockPdfParserJobStore = {
   findDuplicate: jest.Mock;
-  createQueuedJob: jest.Mock;
-  retryFailedDuplicate: jest.Mock;
-  markInfrastructureFailure: jest.Mock;
   findJob: jest.Mock;
   recordCallback: jest.Mock;
 };
 
-type MockPdfParserFingerprintService = {
-  computeOrThrow: jest.Mock;
-};
-
-const fingerprint: Extract<PdfStreamFingerprintResult, { ok: true }> = {
-  ok: true,
-  hash: pdfStreamHash,
-  streamCount: 1,
-  algorithmVersion: 'pdf-stream-payload-sha256-v1',
+type MockPdfParseSubmission = {
+  submit: jest.Mock;
 };
 
 const session: SessionData = {
@@ -381,8 +273,10 @@ const session: SessionData = {
 const uploadedPdf = {
   originalname: 'Timetable PDF.pdf',
   mimetype: 'application/pdf',
-  buffer: Buffer.from('stream\npayload\nendstream'),
-  size: 24,
+  buffer: Buffer.from(
+    '%PDF-1.7\n1 0 obj\n<< /Length 7 >>\nstream\npayload\nendstream\nendobj\n',
+  ),
+  size: 67,
 };
 
 const queuedRecord: PdfParserJobRecord = {
@@ -405,27 +299,15 @@ const completedRecord: PdfParserJobRecord = {
   updatedAt: queuedRecord.updatedAt,
 };
 
-const failedRecord: PdfParserJobRecord = {
-  jobId: 'pdf-parse-44444444-4444-4444-8444-444444444444',
-  fileKey:
-    'uploads/pdf-parser/pdf-parse-44444444-4444-4444-8444-444444444444/timetable-pdf.pdf',
-  adapterKey: 'up',
-  status: 'failed',
-  error: {
-    code: 'PARSER_FAILED',
-    message: 'Parser failed',
-    details: {},
-  },
+const uploadResponse = {
+  jobId: queuedRecord.jobId,
+  fileKey: queuedRecord.fileKey,
+  adapterKey: queuedRecord.adapterKey,
+  status: queuedRecord.status,
+  result: queuedRecord.result,
+  error: queuedRecord.error,
+  moduleGroupingId: queuedRecord.moduleGroupingId,
   createdAt: queuedRecord.createdAt,
   updatedAt: queuedRecord.updatedAt,
-};
-
-const retriedRecord: PdfParserJobRecord = {
-  jobId: failedRecord.jobId,
-  fileKey:
-    'uploads/pdf-parser/pdf-parse-55555555-5555-4555-8555-555555555555/timetable-pdf.pdf',
-  adapterKey: 'up',
-  status: 'queued',
-  createdAt: failedRecord.createdAt,
-  updatedAt: failedRecord.updatedAt,
+  statusUrl: `/pdf-parser/jobs/${queuedRecord.jobId}`,
 };

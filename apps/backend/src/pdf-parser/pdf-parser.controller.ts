@@ -5,7 +5,6 @@ import {
   Get,
   HttpCode,
   HttpStatus,
-  InternalServerErrorException,
   NotFoundException,
   Param,
   Post,
@@ -23,7 +22,6 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { randomUUID } from 'node:crypto';
 import type { PdfParserCallbackPayload, PdfParserResult } from 'shared-types';
 import {
   PDF_STREAM_FINGERPRINT_ALGORITHM_VERSION,
@@ -31,29 +29,22 @@ import {
 } from 'shared-types';
 import { Public } from '../auth/auth.guard';
 import { CurrentSession, type SessionData } from '../auth/session.decorator';
-import { QueueProducerService } from '../jobs/queue-producer.service';
 import { WorkerCallbackAuthGuard } from '../jobs/worker-callback-auth.guard';
-import { ObjectStorageService } from '../storage/object-storage.service';
 import { PdfParserCallbackDto } from './dto/pdf-parser-callback.dto';
 import {
   PdfParserJobResponseDto,
   PdfParserLookupResponseDto,
   PdfParserUploadResponseDto,
 } from './dto/pdf-parser-job-response.dto';
-import { PdfParserFingerprintService } from './pdf-parser-fingerprint.service';
-import {
-  PdfParserJobStoreService,
-  type PdfParserJobRecord,
-} from './pdf-parser-job-store.service';
+import { PdfParseSubmission } from './pdf-parse-submission';
+import { PdfParserJobStoreService } from './pdf-parser-job-store.service';
 
 @ApiTags('PDF Parser')
 @Controller('pdf-parser')
 export class PdfParserController {
   constructor(
-    private readonly queueProducer: QueueProducerService,
-    private readonly storage: ObjectStorageService,
     private readonly jobStore: PdfParserJobStoreService,
-    private readonly fingerprintService: PdfParserFingerprintService,
+    private readonly submission: PdfParseSubmission,
   ) {}
 
   @Post('jobs/lookup')
@@ -179,132 +170,18 @@ export class PdfParserController {
       'clientPdfStreamHash',
     );
     validateOptionalClientAlgorithm(fingerprintAlgorithmInput);
-    const fingerprint = this.fingerprintService.computeOrThrow(file.buffer);
 
-    const duplicate = await this.jobStore.findDuplicate({
+    return this.submission.submit({
       userId: session.user.id,
       universityId,
-      adapterKey,
-      fingerprintAlgorithm: fingerprint.algorithmVersion,
-      pdfStreamHash: fingerprint.hash,
-      statuses: ['queued', 'completed'],
-    });
-
-    if (duplicate) {
-      return toUploadResponse(duplicate);
-    }
-
-    const jobId = `pdf-parse-${randomUUID()}`;
-    const fileKey = buildFileKey(jobId, file.originalname);
-    const preparedJob = await this.prepareUploadJob({
-      jobId,
-      userId: session.user.id,
-      universityId,
-      fileKey,
       adapterKey,
       clientPdfStreamHash,
-      pdfStreamHash: fingerprint.hash,
-      fingerprintAlgorithm: fingerprint.algorithmVersion,
-      streamCount: fingerprint.streamCount,
+      file: {
+        originalName: file.originalname,
+        mimetype: file.mimetype,
+        buffer: file.buffer,
+      },
     });
-
-    if (preparedJob.kind === 'existing') {
-      return toUploadResponse(preparedJob.record);
-    }
-
-    const record = preparedJob.record;
-    const storageFileKey = record.fileKey ?? fileKey;
-
-    try {
-      await this.storage.putObject({
-        key: storageFileKey,
-        body: file.buffer,
-        contentType: file.mimetype || 'application/pdf',
-      });
-    } catch (error) {
-      await this.jobStore.markInfrastructureFailure(record.jobId, {
-        code: 'PDF_PARSE_UPLOAD_FAILED',
-        message: 'PDF parser upload could not be stored',
-        details: {
-          cause: error instanceof Error ? error.message : String(error),
-        },
-      });
-      throw new InternalServerErrorException(
-        'PDF parser upload could not be stored',
-      );
-    }
-
-    try {
-      await this.queueProducer.enqueuePdfParseJob({
-        jobId: record.jobId,
-        fileKey: storageFileKey,
-        adapterKey,
-      });
-    } catch (error) {
-      await this.jobStore.markInfrastructureFailure(record.jobId, {
-        code: 'PDF_PARSE_ENQUEUE_FAILED',
-        message: 'PDF parser job could not be enqueued',
-        details: {
-          cause: error instanceof Error ? error.message : String(error),
-        },
-      });
-      throw new InternalServerErrorException(
-        'PDF parser job could not be enqueued',
-      );
-    }
-
-    return {
-      jobId: record.jobId,
-      fileKey: record.fileKey,
-      adapterKey: record.adapterKey,
-      status: record.status,
-      result: record.result,
-      error: record.error,
-      moduleGroupingId: record.moduleGroupingId,
-      createdAt: record.createdAt,
-      updatedAt: record.updatedAt,
-      statusUrl: `/pdf-parser/jobs/${record.jobId}`,
-    };
-  }
-
-  private async prepareUploadJob(
-    input: PrepareUploadJobInput,
-  ): Promise<PreparedUploadJob> {
-    try {
-      return {
-        kind: 'pending',
-        record: await this.jobStore.createQueuedJob(input),
-      };
-    } catch (error) {
-      const duplicate = await this.jobStore.findDuplicate({
-        userId: input.userId,
-        universityId: input.universityId,
-        adapterKey: input.adapterKey,
-        fingerprintAlgorithm: input.fingerprintAlgorithm,
-        pdfStreamHash: input.pdfStreamHash,
-      });
-
-      if (!duplicate) {
-        throw error;
-      }
-
-      if (duplicate.status !== 'failed') {
-        return { kind: 'existing', record: duplicate };
-      }
-
-      return {
-        kind: 'pending',
-        record: await this.jobStore.retryFailedDuplicate({
-          jobId: duplicate.jobId,
-          fileKey: input.fileKey,
-          adapterKey: input.adapterKey,
-          clientPdfStreamHash: input.clientPdfStreamHash,
-          pdfStreamHash: input.pdfStreamHash,
-          fingerprintAlgorithm: input.fingerprintAlgorithm,
-          streamCount: input.streamCount,
-        }),
-      };
-    }
   }
 
   @Get('jobs/:jobId')
@@ -376,22 +253,6 @@ interface PdfParserLookupRequestBody {
   pdfStreamHash?: unknown;
 }
 
-interface PrepareUploadJobInput {
-  jobId: string;
-  userId: string;
-  universityId: string;
-  fileKey: string;
-  adapterKey: string;
-  clientPdfStreamHash?: string;
-  pdfStreamHash: string;
-  fingerprintAlgorithm: string;
-  streamCount: number;
-}
-
-type PreparedUploadJob =
-  | { kind: 'pending'; record: PdfParserJobRecord }
-  | { kind: 'existing'; record: PdfParserJobRecord };
-
 function validateUploadedPdf(
   file: UploadedPdfFile | undefined,
 ): asserts file is UploadedPdfFile {
@@ -403,6 +264,10 @@ function validateUploadedPdf(
     throw new BadRequestException('PDF file is empty');
   }
 
+  if (!hasPdfMagicBytes(file.buffer)) {
+    throw new BadRequestException('Uploaded file must be a PDF');
+  }
+
   const hasPdfMimeType = file.mimetype === 'application/pdf';
   const hasPdfFileName = /\.pdf$/i.test(file.originalname);
   if (!hasPdfMimeType && !hasPdfFileName) {
@@ -410,21 +275,15 @@ function validateUploadedPdf(
   }
 }
 
-function toUploadResponse(
-  record: PdfParserJobRecord,
-): PdfParserUploadResponseDto {
-  return {
-    jobId: record.jobId,
-    fileKey: record.fileKey,
-    adapterKey: record.adapterKey,
-    status: record.status,
-    result: record.result,
-    error: record.error,
-    moduleGroupingId: record.moduleGroupingId,
-    createdAt: record.createdAt,
-    updatedAt: record.updatedAt,
-    statusUrl: `/pdf-parser/jobs/${record.jobId}`,
-  };
+function hasPdfMagicBytes(buffer: Buffer): boolean {
+  return (
+    buffer.length >= 5 &&
+    buffer[0] === 37 &&
+    buffer[1] === 80 &&
+    buffer[2] === 68 &&
+    buffer[3] === 70 &&
+    buffer[4] === 45
+  );
 }
 
 function normalizeAdapterKey(adapterKeyInput: string | undefined): string {
@@ -508,16 +367,6 @@ function normalizeOptionalHexHash(
   }
 
   return normalizeRequiredHexHash(value, fieldName);
-}
-
-function buildFileKey(jobId: string, originalName: string): string {
-  const safeName = originalName
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9.-]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-
-  return `uploads/pdf-parser/${jobId}/${safeName || 'input.pdf'}`;
 }
 
 function validatePdfParserCallback(
