@@ -1,28 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ApprovalStatus } from "@/components/molecules/choose-institute/ApprovalStatus";
 import { SelectInstituteField } from "@/components/molecules/choose-institute/SelectInstituteField";
 import { SelectRoleField } from "@/components/molecules/choose-institute/SelectRoleField";
 import { Button } from "@/components/atoms/baseShadcn/button";
+import { uniDto } from "@/components/templates/choose-institute/queries/builders";
+import { useQuery } from "@tanstack/react-query";
+import { getAllUni } from "@/components/templates/choose-institute/queries/UserRoleQueries";
 
-interface InstituteSelectorProps {
-  onInstituteSelected: (instituteId: string, role: string) => void;
-  passedRole?: string;
-}
+export function InstituteSelector() {
+  const [selectedInstitute, setSelectedInstitute] = useState<uniDto>();
 
-export function InstituteSelector({
-  passedRole,
-  onInstituteSelected,
-}: InstituteSelectorProps) {
-  const institutes = [
-    { id: "1", name: "UCT" },
-    { id: "2", name: "Stellies" },
-  ];
+  const { data: uniList, isLoading: uniLoading } = useQuery(getAllUni());
 
-  const [selectedInstitute, setSelectedInstitute] = useState("");
-  const [selectedRole, setSelectedRole] = useState("Student");
-
+  /*
   // mock for now(sorry johan)
   const [approvalStatus] = useState<"approved" | "pending" | "rejected" | null>(
     passedRole ? "pending" : null,
@@ -43,10 +35,16 @@ export function InstituteSelector({
       : "Student";
 
   const canConfirm = selectedInstitute !== "";
+*/
+  function updateSelectedUni(id: string) {
+    const nUni = uniList?.universities.find((uni) => uni.UniversityID === id);
+    setSelectedInstitute(nUni);
+  }
 
   function handleConfirm() {
-    onInstituteSelected(selectedInstitute, finalRole);
+    //
   }
+  useEffect(() => {}, [selectedInstitute]);
 
   return (
     <form
@@ -57,39 +55,30 @@ export function InstituteSelector({
       }}
     >
       <SelectInstituteField
-        institutes={institutes}
-        value={selectedInstitute}
-        onChange={setSelectedInstitute}
+        institutes={uniList?.universities || []}
+        value={selectedInstitute?.UniversityName || ""}
+        onChange={updateSelectedUni}
         onNotSupportedClick={() => {
           /* werk hierso haha */
         }}
       />
 
-      {!roleWasPassedIn && (
+      {/*!roleWasPassedIn && (
         <SelectRoleField value={selectedRole} onChange={setSelectedRole} />
-      )}
+      )*/}
 
-      {isNotApproved && selectedInstitute && (
+      {/*      {isNotApproved && selectedInstitute && (
         <ApprovalStatus
-          status={approvalStatus}
-          universityName={
-            institutes.find((i) => i.id === selectedInstitute)?.name ?? ""
-          }
+          status={selectedInstitute.role || "pending"}
+          universityName={selectedInstitute.UniversityName}
         />
-      )}
+      )*/}
 
-      {isApproved && selectedInstitute && (
-        <ApprovalStatus
-          status={approvalStatus}
-          universityName={
-            institutes.find((i) => i.id === selectedInstitute)?.name ?? ""
-          }
-        />
-      )}
+      {selectedInstitute && <ApprovalStatus uni={selectedInstitute} />}
 
       <div className="mt-2 flex justify-end gap-3 border-t pt-4">
-        <Button type="submit" disabled={!canConfirm}>
-          {isNotApproved ? "Continue as Student" : "Confirm"}
+        <Button type="submit" disabled={!false}>
+          {true ? "Continue as Student" : "Confirm"}
         </Button>
       </div>
     </form>

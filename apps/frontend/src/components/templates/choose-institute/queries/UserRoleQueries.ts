@@ -1,4 +1,5 @@
-import { queryOptions, useQuery } from "@tanstack/react-query";
+import { queryOptions } from "@tanstack/react-query";
+import { getallUnisBuilder } from "./builders";
 
 /*
 export function useUserRole() {
@@ -18,6 +19,9 @@ export function useUserRole() {
 export function getAllUni() {
   return queryOptions({
     queryKey: ["university"],
-    queryFn: async () => {},
+    queryFn: async () => {
+      const result = new getallUnisBuilder().send({});
+      return result;
+    },
   });
 }

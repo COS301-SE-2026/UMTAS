@@ -3,16 +3,13 @@ import {
   AlertDescription,
   AlertTitle,
 } from "@/components/atoms/baseShadcn/alert";
+import { uniDto } from "@/components/templates/choose-institute/queries/builders";
 
 interface ApprovalStatusProps {
-  status: "approved" | "pending" | "rejected" | null;
-  universityName: string;
+  uni: uniDto;
 }
-
-export function ApprovalStatus({
-  status,
-  universityName,
-}: ApprovalStatusProps) {
+// so this goes and provides access control
+export function ApprovalStatus({ uni }: ApprovalStatusProps) {
   if (status === null) return null;
 
   if (status === "approved") {
@@ -20,8 +17,8 @@ export function ApprovalStatus({
       <Alert variant="success">
         <AlertTitle>Role approved</AlertTitle>
         <AlertDescription>
-          Your role has been approved for {universityName}. You can now access
-          the university&apos;s resources.
+          Your role has been approved for {uni.UniversityName}. You can now
+          access the university&apos;s resources.
         </AlertDescription>
       </Alert>
     );
@@ -32,8 +29,8 @@ export function ApprovalStatus({
       <Alert variant="destructive">
         <AlertTitle>Role rejected</AlertTitle>
         <AlertDescription>
-          Your role has been rejected for {universityName}. Please contact the
-          university for more information.
+          Your role has been rejected for {uni.UniversityName}. Please contact
+          the university for more information.
         </AlertDescription>
       </Alert>
     );
@@ -43,8 +40,8 @@ export function ApprovalStatus({
     <Alert variant="default">
       <AlertTitle>Role not yet approved</AlertTitle>
       <AlertDescription>
-        Your role has not yet been approved for {universityName}. Please wait
-        for the approval process to complete.
+        Your role has not yet been approved for {uni.UniversityName}. Please
+        wait for the approval process to complete.
       </AlertDescription>
     </Alert>
   );

@@ -9,16 +9,12 @@ import {
   SelectValue,
 } from "@/components/atoms/baseShadcn/select";
 import { NotSupportedLink } from "@/components/atoms/choose-institute/NotSupportedLink";
-
-interface Institute {
-  id: string;
-  name: string;
-}
+import { uniDto } from "@/components/templates/choose-institute/queries/builders";
 
 interface SelectInstituteFieldProps {
-  institutes: Institute[];
+  institutes: uniDto[];
   value: string;
-  onChange: (value: string) => void;
+  onChange: (id: string) => void;
   onNotSupportedClick: () => void;
 }
 
@@ -37,8 +33,11 @@ export function SelectInstituteField({
         </SelectTrigger>
         <SelectContent>
           {institutes.map((institute) => (
-            <SelectItem key={institute.id} value={institute.id}>
-              {institute.name}
+            <SelectItem
+              key={institute.UniversityID}
+              value={institute.UniversityID}
+            >
+              {institute.UniversityName}
             </SelectItem>
           ))}
         </SelectContent>
