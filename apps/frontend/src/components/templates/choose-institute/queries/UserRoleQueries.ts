@@ -1,5 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
+import { queryOptions, useQuery } from "@tanstack/react-query";
 
+/*
 export function useUserRole() {
   return useQuery({
     queryKey: ["userRole"],
@@ -10,5 +11,13 @@ export function useUserRole() {
       }
       return response.json();
     },
+  });
+}
+*/
+
+export function getAllUni() {
+  return queryOptions({
+    queryKey: ["university"],
+    queryFn: async () => {},
   });
 }
