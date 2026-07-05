@@ -17,6 +17,7 @@ import { UniversityModule } from './University/university.module';
 import { CourseModule } from './Course/course.module';
 import { BuilderModule } from './Builder/builder.module';
 import { AttendanceModule } from './Attendance/attendance.module';
+import { GroupingModule } from './Grouping/grouping.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { AttendanceModule } from './Attendance/attendance.module';
     CourseModule,
     BuilderModule,
     AttendanceModule,
+    GroupingModule,
   ],
   controllers: [AppController, AuthController],
   providers: [

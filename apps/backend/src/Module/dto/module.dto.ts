@@ -6,10 +6,18 @@ import {
   IsString,
   IsUUID,
   Length,
+  IsBoolean,
   ValidateNested,
 } from 'class-validator';
 import { PartialType, PickType, OmitType } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
+
+class StylingDto {
+  @ApiProperty({ example: '#3B82F6' })
+  @IsString()
+  @IsNotEmpty()
+  colour!: string;
+}
 
 //Base class
 export class ModulesDto {
@@ -48,19 +56,18 @@ export class ModulesDto {
   @Length(1, 500)
   moduleDescription?: string | null;
 
-  @ApiPropertyOptional({
-    example: { colour: '#3B82F6' },
-    type: () => StylingDto,
-    description: 'Module styling',
-    additionalProperties: true,
+  @ApiProperty({
+    description: 'Styling to be used for a Module',
+    example: {
+      colour: 'FFFFF',
+    },
+    type: StylingDto,
   })
-  styling?: { colour: string } | null;
+  @IsObject()
+  @ValidateNested()
+  @Type(() => StylingDto)
+  styling?: StylingDto | null;
 } //ModuleDto
-
-class StylingDto {
-  @ApiProperty({ example: '#3B82F6' })
-  colour!: string;
-}
 
 //Create
 export class CreateModuleDto extends PickType(ModulesDto, [
@@ -71,11 +78,17 @@ export class CreateModuleDto extends PickType(ModulesDto, [
 ]) {
   @ApiProperty({
     example: '00000000-0000-0000-0000-000000000000',
-    description: 'CourseID to ensure module belongs to a course',
+    description: 'ModuleGroupingID to identify group the module belongs to',
   })
   @IsUUID()
-  @IsNotEmpty()
-  courseID!: string;
+  ModuleGroupingID?: string;
+
+  @ApiProperty({
+    example: '00000000-0000-0000-0000-000000000000',
+    description: 'CourseID module belongs to',
+  })
+  @IsUUID()
+  CourseID?: string;
 } //CreateModuleDto
 
 //Update
@@ -107,14 +120,6 @@ export class DeleteModuleResponseDto extends PickType(ModulesDto, [
 //GetAll filters
 export class ModuleFiltersDto {
   @ApiPropertyOptional({
-    description: 'Filter by course ID - returns all modules in the course',
-    example: '00000000-0000-0000-0000-000000000000',
-  })
-  @IsOptional()
-  @IsUUID()
-  courseId?: string;
-
-  @ApiPropertyOptional({
     description:
       'Filter by university ID - returns all modules across all courses in the university',
     example: '00000000-0000-0000-0000-000000000000',
@@ -123,7 +128,35 @@ export class ModuleFiltersDto {
   @IsUUID()
   universityId?: string;
 
+  @ApiPropertyOptional({
+    description: 'Filter by course ID - returns all modules in the course',
+    example: '00000000-0000-0000-0000-000000000000',
+  })
+  @IsOptional()
+  @IsUUID()
+  courseId?: string;
+
+  @ApiProperty({
+    example: '00000000-0000-0000-0000-000000000000',
+    description: 'Filter by ModuleGrouping ID',
+  })
+  @IsUUID()
+  GroupID?: string;
+
   //Filter by code using wildcard
+  @ApiProperty({
+    example: 'COS',
+    description: 'Filter by code, makes use of wildcard search',
+  })
+  @IsString()
+  moduleCode?: string;
+
+  @ApiProperty({
+    example: false,
+    description: 'Choose to filter modules based of current user enrollments',
+  })
+  @IsBoolean()
+  userEnrollment?: boolean;
 } //ModuleFiltersDto
 
 export class ModuleStylingResponseDto {

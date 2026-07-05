@@ -1,2 +1,0 @@
-ALTER TABLE "EventAttendance" DROP CONSTRAINT "EventAttendance_eventID_UserID_eventDate_pk";--> statement-breakpoint
-ALTER TABLE "EventAttendance" ADD COLUMN "attendanceID" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL;

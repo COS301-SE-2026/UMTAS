@@ -1,13 +1,14 @@
 import { Module } from '@nestjs/common';
 import { BuilderController } from './builder.controller';
 import { BuilderService } from './builder.service';
-import { UniversityService } from 'src/University/university.service';
-import { CourseService } from 'src/Course/course.service';
-import { ModuleService } from 'src/Module/module.service';
+import { UniversityModule } from 'src/University/university.module';
+import { CourseModule } from 'src/Course/course.module';
+import { ModuleModule } from 'src/Module/module.module';
 
 @Module({
+  imports: [UniversityModule, CourseModule, ModuleModule],
   controllers: [BuilderController],
-  providers: [BuilderService, UniversityService, CourseService, ModuleService],
+  providers: [BuilderService],
   exports: [BuilderService],
 })
 export class BuilderModule {}

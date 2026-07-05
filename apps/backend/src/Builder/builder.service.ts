@@ -16,13 +16,13 @@ import {
   CreateModuleDto,
   DeleteModuleResponseDto,
 } from '../Module/dto/module.dto';
-import { CourseDto } from 'src/Course/dto/course.dto';
+import { CourseDto } from '../Course/dto/course.dto';
 
-import { UniversityRole, Course, ModuleEnrollment } from '../entities/index';
+import { UniversityRole, ModuleEnrollment } from '../entities/index';
 
-import { UniversityService } from 'src/University/university.service';
-import { CourseService } from 'src/Course/course.service';
-import { ModuleService } from 'src/Module/module.service';
+import { UniversityService } from '../University/university.service';
+import { CourseService } from '../Course/course.service';
+import { ModuleService } from '../Module/module.service';
 
 //Applies only to STUDENT_OWNED role for students
 // When creating user defined modules
@@ -50,7 +50,7 @@ export class BuilderService {
     const moduleDto: CreateModuleDto = {
       moduleCode: dto.moduleCode,
       moduleName: dto.moduleName,
-      courseID: userCourse.CourseID,
+      CourseID: userCourse.CourseID,
       moduleDescription: dto.moduleDescription,
       styling: dto.styling,
     };
@@ -72,9 +72,7 @@ export class BuilderService {
         `User [${userId}] was not enrolled to module [${module.moduleID}]`,
       );
 
-    return {
-      ...module,
-    };
+    return module;
   } //createModule
 
   //get All USer defined modules
@@ -153,12 +151,11 @@ export class BuilderService {
     if (!uniRole) uniRole = await this.createUserUni(userId);
 
     //Check for course -> if not found -> create user course
-    let [course] = await this.dbService.db
-      .select()
-      .from(Course)
-      .where(eq(Course.UniversityID, uniRole.UniversityID))
-      .limit(1);
+    const { courses } = await this.courseService.getAll({
+      UniversityID: uniRole.UniversityID,
+    });
 
+    let course = courses[0];
     if (!course)
       course = await this.createUserCourse(userId, uniRole.UniversityID);
 

@@ -301,7 +301,9 @@ export class UniversityService {
   //🎅's Little Helpers
 
   //get a university by name
-  async getByName(uniName: string): Promise<UniversitySingleResponseDto> {
+  async getByName(
+    uniName: string,
+  ): Promise<UniversitySingleResponseDto | null> {
     const [uni] = await this.dbService.db
       .select()
       .from(University)
