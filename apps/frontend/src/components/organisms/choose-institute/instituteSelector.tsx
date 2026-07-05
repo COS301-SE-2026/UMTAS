@@ -11,7 +11,7 @@ import { getAllUni } from "@/components/templates/choose-institute/queries/UserR
 
 export function InstituteSelector() {
   const [selectedInstitute, setSelectedInstitute] = useState<uniDto>();
-
+  const [selectedRole, setSelectedRole] = useState("");
   const { data: uniList, isLoading: uniLoading } = useQuery(getAllUni());
 
   /*
@@ -63,9 +63,9 @@ export function InstituteSelector() {
         }}
       />
 
-      {/*!roleWasPassedIn && (
+      {selectedInstitute?.role === undefined && (
         <SelectRoleField value={selectedRole} onChange={setSelectedRole} />
-      )*/}
+      )}
 
       {/*      {isNotApproved && selectedInstitute && (
         <ApprovalStatus
