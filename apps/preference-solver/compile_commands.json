@@ -3,6 +3,7 @@
     "file": "src/main.cpp",
     "arguments": [
       "/usr/bin/g++",
+      "-std=c++17",
       "-I",
       "lib",
       "-c",
@@ -12,5 +13,95 @@
     ],
     "directory": "/home/smiwil/Documents/UMTAS/apps/preference-solver",
     "output": "build/main.o"
+  },
+  {
+    "file": "src/data/API/API-data.cpp",
+    "arguments": [
+      "/usr/bin/g++",
+      "-std=c++17",
+      "-I",
+      "lib",
+      "-c",
+      "src/data/API/API-data.cpp",
+      "-o",
+      "build/data/API/API-data.o"
+    ],
+    "directory": "/home/smiwil/Documents/UMTAS/apps/preference-solver",
+    "output": "build/data/API/API-data.o"
+  },
+  {
+    "file": "src/data/Events/event.cpp",
+    "arguments": [
+      "/usr/bin/g++",
+      "-std=c++17",
+      "-I",
+      "lib",
+      "-c",
+      "src/data/Events/event.cpp",
+      "-o",
+      "build/data/Events/event.o"
+    ],
+    "directory": "/home/smiwil/Documents/UMTAS/apps/preference-solver",
+    "output": "build/data/Events/event.o"
+  },
+  {
+    "file": "src/data/GA-data/chromosome.cpp",
+    "arguments": [
+      "/usr/bin/g++",
+      "-std=c++17",
+      "-I",
+      "lib",
+      "-c",
+      "src/data/GA-data/chromosome.cpp",
+      "-o",
+      "build/data/GA-data/chromosome.o"
+    ],
+    "directory": "/home/smiwil/Documents/UMTAS/apps/preference-solver",
+    "output": "build/data/GA-data/chromosome.o"
+  },
+  {
+    "file": "src/data/Modules/module.cpp",
+    "arguments": [
+      "/usr/bin/g++",
+      "-std=c++17",
+      "-I",
+      "lib",
+      "-c",
+      "src/data/Modules/module.cpp",
+      "-o",
+      "build/data/Modules/module.o"
+    ],
+    "directory": "/home/smiwil/Documents/UMTAS/apps/preference-solver",
+    "output": "build/data/Modules/module.o"
+  },
+  {
+    "file": "src/filecreator/filecreator.cpp",
+    "arguments": [
+      "/usr/bin/g++",
+      "-std=c++17",
+      "-I",
+      "lib",
+      "-c",
+      "src/filecreator/filecreator.cpp",
+      "-o",
+      "build/filecreator/filecreator.o"
+    ],
+    "directory": "/home/smiwil/Documents/UMTAS/apps/preference-solver",
+    "output": "build/filecreator/filecreator.o"
+  },
+  {
+    "file": "src/GA_handler/GA.cpp",
+    "arguments": [
+      "/usr/bin/g++",
+      "-std=c++17",
+      "-I",
+      "lib",
+      "-c",
+      "src/GA_handler/GA.cpp",
+      "-o",
+      "build/GA_handler/GA.o"
+    ],
+    "directory": "/home/smiwil/Documents/UMTAS/apps/preference-solver",
+    "output": "build/GA_handler/GA.o"
   }
 ]

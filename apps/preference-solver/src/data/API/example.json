@@ -1,0 +1,26 @@
+{
+  "modules": [
+    {
+      "moduleCode": "CS101",
+      "typeOccurence": [
+        {
+          "EventType": "Lecture1",
+          "numberOccur": 1
+        }
+      ]
+    }
+  ],
+
+  "events": [
+    {
+      "day": "Monday",
+      "eventID": "CS101-L1-A",
+      "moduleCode": "CS101",
+      "startTime": "08:00",
+      "endTime": "09:30",
+      "EventType": "Lecture1"
+    }
+  ],
+
+  "targetTime": 420
+}
