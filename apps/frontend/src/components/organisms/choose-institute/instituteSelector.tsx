@@ -14,6 +14,7 @@ import {
   applyMutator,
   getAllUni,
 } from "@/components/templates/choose-institute/queries/UserRoleQueries";
+import { UserDetails } from "@/lib/userclass/userClass";
 
 export function InstituteSelector() {
   const [selectedInstitute, setSelectedInstitute] = useState<uniDto>();
@@ -28,7 +29,7 @@ export function InstituteSelector() {
   }
 
   function handleConfirm() {
-    //
+    UserDetails.getInstance().storeUniDetails(selectedInstitute);
   }
   const applyDisabled = !selectedInstitute || !selectedRole;
 
@@ -61,7 +62,7 @@ export function InstituteSelector() {
       {selectedInstitute && <ApprovalStatus uni={selectedInstitute} />}
 
       <div className="mt-2 flex justify-end gap-3 border-t pt-4">
-        <Button type="submit" disabled={!false}>
+        <Button type="submit" disabled={applyDisabled}>
           {true ? "Continue as Student" : "Confirm"}
         </Button>
       </div>
