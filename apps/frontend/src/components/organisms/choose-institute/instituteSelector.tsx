@@ -5,39 +5,24 @@ import { ApprovalStatus } from "@/components/molecules/choose-institute/Approval
 import { SelectInstituteField } from "@/components/molecules/choose-institute/SelectInstituteField";
 import { SelectRoleField } from "@/components/molecules/choose-institute/SelectRoleField";
 import { Button } from "@/components/atoms/baseShadcn/button";
-import { uniDto } from "@/components/templates/choose-institute/queries/builders";
-import { useQuery } from "@tanstack/react-query";
-import { getAllUni } from "@/components/templates/choose-institute/queries/UserRoleQueries";
+import {
+  uniDto,
+  uniDtoRoles,
+} from "@/components/templates/choose-institute/queries/builders";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  applyMutator,
+  getAllUni,
+} from "@/components/templates/choose-institute/queries/UserRoleQueries";
 
 export function InstituteSelector() {
   const [selectedInstitute, setSelectedInstitute] = useState<uniDto>();
+
   const [selectedRole, setSelectedRole] = useState("");
   const { data: uniList, isLoading: uniLoading } = useQuery(getAllUni());
+  const applyMut = useMutation(applyMutator());
 
-  /*
-  // mock for now(sorry johan)
-  const [approvalStatus] = useState<"approved" | "pending" | "rejected" | null>(
-    passedRole ? "pending" : null,
-  );
-
-  const roleWasPassedIn = Boolean(passedRole);
-  const isApproved = roleWasPassedIn && approvalStatus === "approved";
-  const isNotApproved =
-    roleWasPassedIn && approvalStatus !== "approved" && approvalStatus !== null;
-
-  //1: no role passed in -> free role choice which defaults to student
-  //2: approved -> role is locked to the passed-in role
-  //3: not approved -> role is forced to student, but user is informed that their role is not yet approved
-  const finalRole = !roleWasPassedIn
-    ? selectedRole
-    : isApproved
-      ? passedRole!
-      : "Student";
-
-  const canConfirm = selectedInstitute !== "";
-*/
   function updateSelectedUni(id: string) {
-    console.log("update uni func ran ", id);
     const nUni = uniList?.universities.find((uni) => uni.UniversityID === id);
     setSelectedInstitute(nUni);
   }
@@ -45,6 +30,7 @@ export function InstituteSelector() {
   function handleConfirm() {
     //
   }
+  const applyDisabled = !selectedInstitute || !selectedRole;
 
   return (
     <form
@@ -63,10 +49,7 @@ export function InstituteSelector() {
         }}
       />
 
-      {selectedInstitute?.role === undefined ||
-        (selectedInstitute?.role === null && (
-          <SelectRoleField value={selectedRole} onChange={setSelectedRole} />
-        ))}
+      <SelectRoleField value={selectedRole} onChange={setSelectedRole} />
 
       {/*      {isNotApproved && selectedInstitute && (
         <ApprovalStatus
@@ -83,7 +66,16 @@ export function InstituteSelector() {
         </Button>
       </div>
       <div className="mt-2 flex justify-end gap-3 border-t pt-4">
-        <Button type="submit" onClick={() => {}}>
+        <Button
+          type="submit"
+          disabled={applyDisabled}
+          onClick={() => {
+            applyMut.mutate({
+              UniversityID: selectedInstitute?.UniversityID || "",
+              role: selectedRole as uniDtoRoles,
+            });
+          }}
+        >
           {"Apply for role"}
         </Button>
       </div>

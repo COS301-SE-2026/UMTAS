@@ -32,6 +32,6 @@ export class applyUniBuilder extends RequestBuilder<
 > {
   constructor() {
     super();
-    this.setUrl("/universities/apply").setMethod(RequestMethod.GET);
+    this.setUrl("/universities/apply").setMethod(RequestMethod.POST);
   }
 }
