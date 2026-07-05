@@ -28,11 +28,12 @@ export function ApprovalStatus({ uni }: ApprovalStatusProps) {
   } else if (
     uni.role === "LECTURER_PENDING" ||
     uni.role === "UNIVERSITY_ADMIN_PENDING" ||
-    uni.role === undefined
+    uni.role === undefined ||
+    uni.role === null
   )
     return (
       <Alert variant="default">
-        <AlertTitle>Role not yet approved</AlertTitle>
+        <AlertTitle>Role not yet approved </AlertTitle>
         <AlertDescription>
           Your role has not yet been approved for {uni.UniversityName}. Please
           wait for the approval process to complete.
@@ -42,7 +43,7 @@ export function ApprovalStatus({ uni }: ApprovalStatusProps) {
 
   return (
     <Alert variant="destructive">
-      <AlertTitle>Role rejected</AlertTitle>
+      <AlertTitle>Role rejected {uni.role}</AlertTitle>
       <AlertDescription>
         Your role has been rejected for {uni.UniversityName}. Please contact the
         university for more information.

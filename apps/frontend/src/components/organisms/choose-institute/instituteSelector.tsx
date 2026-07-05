@@ -63,9 +63,10 @@ export function InstituteSelector() {
         }}
       />
 
-      {selectedInstitute?.role === undefined && (
-        <SelectRoleField value={selectedRole} onChange={setSelectedRole} />
-      )}
+      {selectedInstitute?.role === undefined ||
+        (selectedInstitute?.role == null && (
+          <SelectRoleField value={selectedRole} onChange={setSelectedRole} />
+        ))}
 
       {/*      {isNotApproved && selectedInstitute && (
         <ApprovalStatus
