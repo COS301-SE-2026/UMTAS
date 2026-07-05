@@ -70,7 +70,7 @@ void GA_Handler::InitGA() {
   // DD setup
   gaEngine.problem_mode = EA::GA_MODE::SOGA;
   gaEngine.generation_max = 50;
-  gaEngine.population = 5;
+  gaEngine.population = 50;
   gaEngine.multi_threading = false;
   gaEngine.crossover_fraction = 0.7;
   gaEngine.mutation_rate = 0.9;
