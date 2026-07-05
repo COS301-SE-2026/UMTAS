@@ -5,16 +5,19 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 
 import { DatabaseService } from '../db/database.service';
-import { University } from '../entities';
+import { RoleTypeType, University, UniversityRole } from '../entities';
 import {
   CreateUniversityDto,
   UpdateUniversityDto,
   UniversitySingleResponseDto,
   UniversityListResponseDto,
   DeleteUniversityResponseDto,
+  ApplyForUniRoleDto,
+  ApprovedUserRoleResponse,
+  ApproveUsersRoleDto,
 } from './dto/university.dto';
 
 @Injectable()
@@ -38,8 +41,24 @@ export class UniversityService {
     return newUni;
   } //Create
 
-  async getAll(): Promise<UniversityListResponseDto> {
-    const universities = await this.dbService.db.select().from(University);
+  //GetAll
+  //Return all universities
+  //Join with the universityRole to see what role the user has for the university
+  async getAll(userId: string): Promise<UniversityListResponseDto> {
+    const universities = await this.dbService.db
+      .select({
+        UniversityID: University.UniversityID,
+        UniversityName: University.UniversityName,
+        role: UniversityRole.role,
+      })
+      .from(University)
+      .leftJoin(
+        UniversityRole,
+        and(
+          eq(UniversityRole.UniversityID, University.UniversityID),
+          eq(UniversityRole.UserID, userId),
+        ),
+      );
 
     if (universities.length === 0)
       throw new NotFoundException('No universities found');
@@ -113,6 +132,171 @@ export class UniversityService {
       success: true,
     };
   } //Delete
+
+  async getUsersRole(userId: string, uniId: string) {
+    const [uniRole] = await this.dbService.db
+      .select()
+      .from(UniversityRole)
+      .where(
+        and(
+          eq(UniversityRole.UserID, userId),
+          eq(UniversityRole.UniversityID, uniId),
+        ),
+      )
+      .limit(1);
+
+    if (!uniRole)
+      throw new BadRequestException(
+        `No role found for user[${userId}] for university[${uniId}]`,
+      );
+
+    return {
+      UniversityID: uniRole.UniversityID,
+      userId: uniRole.UserID,
+      role: uniRole.role,
+    };
+  } //END_getUsersRole
+
+  async applyForUniRole(
+    userId: string,
+    dto: ApplyForUniRoleDto,
+  ): Promise<UniversitySingleResponseDto> {
+    //Check that uni exists
+    const uni = await this.getById(dto.UniversityID);
+
+    if (!uni)
+      throw new BadRequestException(
+        `University[${dto.UniversityID}] does not exist`,
+      );
+
+    const uniId = uni.UniversityID;
+
+    //Check if role given
+    //No role given - default to student
+    let role: RoleTypeType;
+    switch (dto.role) {
+      case 'UNIVERSITY_ADMIN':
+        role = 'UNIVERSITY_ADMIN_PENDING';
+        break;
+      case 'LECTURER':
+        role = 'LECTURER_PENDING';
+        break;
+      case 'STUDENT':
+        role = 'STUDENT';
+        break;
+      default:
+        role = 'STUDENT';
+    }
+
+    //Check current role for uni
+    const [uniRole] = await this.dbService.db
+      .select()
+      .from(UniversityRole)
+      .where(
+        and(
+          eq(UniversityRole.UserID, userId),
+          eq(UniversityRole.UniversityID, uniId),
+        ),
+      )
+      .limit(1);
+
+    let newUniRole;
+    if (!uniRole) {
+      //User has not applied for a role previously
+      [newUniRole] = await this.dbService.db
+        .insert(UniversityRole)
+        .values({
+          UserID: userId,
+          UniversityID: uniId,
+          role,
+        })
+        .returning();
+    } else {
+      //If already existing role and already has that role -> return early
+      if (uniRole.role === role) return { ...uni, role: uniRole.role };
+
+      //User already has a role, apply for new role, by updating uniRole entity
+      [newUniRole] = await this.dbService.db
+        .update(UniversityRole)
+        .set({
+          role,
+        })
+        .where(
+          and(
+            eq(UniversityRole.UserID, userId),
+            eq(UniversityRole.UniversityID, uniId),
+          ),
+        )
+        .returning();
+    }
+
+    if (!newUniRole)
+      throw new InternalServerErrorException(
+        `Failed to apply for role[${role}]`,
+      );
+
+    return {
+      ...uni,
+      role: newUniRole.role,
+    };
+  } //END_applyForUniRole
+
+  async approveUserRole(
+    dto: ApproveUsersRoleDto,
+  ): Promise<ApprovedUserRoleResponse> {
+    //get role
+    const [usersRole] = await this.dbService.db
+      .select()
+      .from(UniversityRole)
+      .where(
+        and(
+          eq(UniversityRole.UserID, dto.userId),
+          eq(UniversityRole.UniversityID, dto.UniversityID),
+        ),
+      )
+      .limit(1);
+
+    if (!usersRole)
+      throw new BadRequestException(
+        `No role found for user[${dto.userId}] for university[${dto.UniversityID}]`,
+      );
+
+    let role: RoleTypeType;
+    switch (usersRole.role) {
+      case 'UNIVERSITY_ADMIN_PENDING':
+        role = 'UNIVERSITY_ADMIN';
+        break;
+      case 'LECTURER_PENDING':
+        role = 'LECTURER';
+        break;
+      default:
+        throw new BadRequestException(
+          `User[${dto.userId}] doesn't have a role to approve`,
+        );
+    }
+
+    //update role
+    const [newRole] = await this.dbService.db
+      .update(UniversityRole)
+      .set({ role })
+      .where(
+        and(
+          eq(UniversityRole.UserID, dto.userId),
+          eq(UniversityRole.UniversityID, dto.UniversityID),
+        ),
+      )
+      .returning();
+
+    if (!newRole)
+      throw new InternalServerErrorException(
+        `Failed to udpate role for user[${dto.userId}]`,
+      );
+
+    return {
+      userId: dto.userId,
+      success: true,
+    };
+  } //approveUserRole
 
   //🎅's Little Helpers
 

@@ -1,4 +1,12 @@
-import { jsonb, pgTable, uuid, varchar, boolean } from 'drizzle-orm/pg-core';
+import {
+  jsonb,
+  pgTable,
+  uuid,
+  varchar,
+  boolean,
+  pgEnum,
+  date,
+} from 'drizzle-orm/pg-core';
 import { usersTable } from '../auth';
 import { Venue } from '../Universities';
 import { modules } from '../Modules';
@@ -9,7 +17,7 @@ export const Event = pgTable('Event', {
   eventID: uuid('eventID').primaryKey().defaultRandom(),
   eventName: varchar('eventName', { length: 32 }).notNull(),
   eventCode: varchar('eventCode', { length: 10 }),
-  eventCriteria: jsonb('eventCriteria').$type<EventCriteria>(),
+  eventCriteria: jsonb('eventCriteria').$type<EventCriteria>().notNull(),
   isRecurring: boolean('isRecurring').notNull().default(false),
 });
 
@@ -36,4 +44,27 @@ export const UniversityEvent = pgTable('UniversityEvent', {
   VenueID: uuid('VenueID').references(() => Venue.VenueID, {
     onDelete: 'cascade',
   }),
+});
+
+export const AttendanceState = pgEnum('AttendanceState', [
+  'ATTENDING',
+  'NOT_ATTENDING',
+]);
+
+export type AttendanceStateType = (typeof AttendanceState.enumValues)[number];
+
+export const EventAttendance = pgTable('EventAttendance', {
+  AttendanceID: uuid('attendanceID').primaryKey().defaultRandom(),
+  eventID: uuid('eventID')
+    .references(() => Event.eventID, {
+      onDelete: 'cascade',
+    })
+    .notNull(),
+  UserID: uuid('UserID')
+    .references(() => usersTable.id, {
+      onDelete: 'cascade',
+    })
+    .notNull(),
+  eventDate: date('eventDate').notNull(),
+  state: AttendanceState('state').notNull().default('NOT_ATTENDING'),
 });

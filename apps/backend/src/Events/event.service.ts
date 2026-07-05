@@ -23,7 +23,6 @@ import {
   EventListResponseDto,
   UpdateEventDto,
   DeleteResponseDto,
-  EventCriteriaDto,
   EventDto,
 } from './dto/EventDto.dto';
 
@@ -45,7 +44,7 @@ export class EventService {
     const moduleId = dto.eventCriteria.moduleID;
 
     //Create Event
-    let event;
+    let event: EventDto;
     if (moduleId) event = await this.createUniversityEvent(moduleId, dto);
     else event = await this.createPersonalEvent(userId, dto);
 
@@ -60,7 +59,7 @@ export class EventService {
     //moduleId -> Return events for that module
     //Else -> Return events for modules that user is enrolled in
 
-    let events;
+    let events: EventDto[];
 
     if (filters.moduleId)
       // Events for a module
@@ -189,6 +188,12 @@ export class EventService {
     };
   } //delete
 
+  //Attendance methods
+
+  //Create attendance
+
+  //END_Attendance methods
+
   //=======================================================
   //🎅's Little Helpers
 
@@ -292,9 +297,9 @@ export class EventService {
     //Define fields
     const eventCriteria = dto.eventCriteria;
 
-    let eventName;
-    let eventCode;
-    let isRec;
+    let eventName: string;
+    let eventCode: string;
+    let isRec: boolean;
 
     if (userId) {
       //Implies personal event fields are being created
@@ -329,7 +334,7 @@ export class EventService {
   } //END_createEvent
 
   //Get event for module
-  private async getEventsByModule(moduleId: string) {
+  private async getEventsByModule(moduleId: string): Promise<EventDto[]> {
     const events = await this.dbService.db
       .select(getTableColumns(Event))
       .from(Event)
@@ -340,7 +345,7 @@ export class EventService {
   } //END_getEventsByModule
 
   //Get events for modules user is enrolled in
-  private async getEventsByUser(userId: string) {
+  private async getEventsByUser(userId: string): Promise<EventDto[]> {
     const events = await this.dbService.db
       .select(getTableColumns(Event))
       .from(Event)
@@ -385,7 +390,7 @@ export class EventService {
       eventID: event.eventID,
       eventName: event.eventName,
       eventCode: event.eventCode ?? undefined,
-      eventCriteria: event.eventCriteria as EventCriteriaDto,
+      eventCriteria: event.eventCriteria,
       isRecurring: event.isRecurring,
     };
   } //END_mapEventToDto

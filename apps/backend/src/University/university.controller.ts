@@ -6,6 +6,9 @@ import {
   UniversitySingleResponseDto,
   UniversityListResponseDto,
   DeleteUniversityResponseDto,
+  ApplyForUniRoleDto,
+  ApproveUsersRoleDto,
+  ApprovedUserRoleResponse,
 } from './dto/university.dto';
 
 import {
@@ -20,8 +23,8 @@ import {
 } from '@nestjs/common';
 import { ApiBody, ApiResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
-// import { CurrentSession } from '../auth/session.decorator';
-// import type { SessionData } from '../auth/session.decorator';
+import { CurrentSession } from '../auth/session.decorator';
+import type { SessionData } from '../auth/session.decorator';
 import { Roles } from 'src/auth/roles.guard';
 
 @ApiTags('Universities')
@@ -67,8 +70,8 @@ export class UniversityController {
     status: 404,
     description: 'No universities found',
   })
-  getAll() {
-    return this.service.getAll();
+  getAll(@CurrentSession() session: SessionData) {
+    return this.service.getAll(session.user.id);
   }
 
   //GetById
@@ -91,8 +94,37 @@ export class UniversityController {
     status: 404,
     description: 'University not found',
   })
-  getById(@Param('universityId', ParseUUIDPipe) universityId: string) {
+  getById(
+    @CurrentSession() session: SessionData,
+    @Param('universityId', ParseUUIDPipe) universityId: string,
+  ) {
     return this.service.getById(universityId);
+  }
+
+  //GetById
+  @Get('/role/:universityId')
+  @Roles('student', 'uni_admin', 'sys_admin')
+  @ApiOperation({
+    summary: 'get a users role by universityID',
+    operationId: 'getUserRoleByUniID',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Role returned successfully',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid University ID',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'University not found',
+  })
+  getUsersRoleByUni(
+    @CurrentSession() session: SessionData,
+    @Param('universityId', ParseUUIDPipe) universityId: string,
+  ) {
+    return this.service.getUsersRole(session.user.id, universityId);
   }
 
   //Update
@@ -145,5 +177,76 @@ export class UniversityController {
   })
   delete(@Param('universityId', ParseUUIDPipe) universityId: string) {
     return this.service.delete(universityId);
+  }
+
+  //Apply for univeristy role
+  @Post('apply')
+  @Roles('student', 'uni_admin', 'sys_admin')
+  @ApiOperation({
+    summary: 'Apply for a role at a specific university',
+    operationId: 'applyForUniverstiyRole',
+    description:
+      'Apply for a specific role at a university. Valid: STUDENT, LECTURER, UNIVERSITY_ADMIN',
+  })
+  @ApiBody({
+    type: ApplyForUniRoleDto,
+    description: 'University ID and role to apply for',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Role application successful',
+    type: UniversitySingleResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid request body or university does not exist',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'University not found',
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'User already has this role at the university',
+  })
+  applyForRole(
+    @CurrentSession() session: SessionData,
+    @Body() dto: ApplyForUniRoleDto,
+  ) {
+    return this.service.applyForUniRole(session.user.id, dto);
+  }
+
+  //Approve a users role if PENDING
+  @Post('approve')
+  @Roles('student', 'uni_admin', 'sys_admin')
+  @ApiOperation({
+    summary: 'Approve a users role for a university',
+    operationId: 'approveUsersRole',
+    description:
+      'Approve a users role at university, will only approve if role is PENDING else throws probleme',
+  })
+  @ApiBody({
+    type: ApproveUsersRoleDto,
+    description: 'University ID and User ID for user to approve',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Role approval successful',
+    type: ApprovedUserRoleResponse,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid request body or universityRole does not exist',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'UniversityRole not found',
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'User already has an approved role',
+  })
+  approveUserRole(@Body() dto: ApproveUsersRoleDto) {
+    return this.service.approveUserRole(dto);
   }
 } //UniversityController

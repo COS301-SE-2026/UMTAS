@@ -252,6 +252,12 @@ importers:
       "@tanstack/react-query":
         specifier: ^5.101.1
         version: 5.101.1(react@19.2.4)
+      "@tanstack/react-table":
+        specifier: ^8.21.3
+        version: 8.21.3(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      apexcharts:
+        specifier: ^5.15.2
+        version: 5.15.2
       better-auth:
         specifier: ^1.6.11
         version: 1.6.11(@opentelemetry/api@1.9.1)(drizzle-kit@0.31.10)(drizzle-orm@0.45.2(@electric-sql/pglite@0.4.5)(@opentelemetry/api@1.9.1)(@types/pg@8.20.0)(kysely@0.28.17)(pg@8.21.0)(postgres@3.4.9))(next@16.2.4(@babel/core@7.29.0)(@opentelemetry/api@1.9.1)(@playwright/test@1.60.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(pg@8.21.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -276,6 +282,9 @@ importers:
       react:
         specifier: 19.2.4
         version: 19.2.4
+      react-apexcharts:
+        specifier: ^2.1.1
+        version: 2.1.1(apexcharts@5.15.2)(react@19.2.4)
       react-dom:
         specifier: 19.2.4
         version: 19.2.4(react@19.2.4)
@@ -4754,6 +4763,23 @@ packages:
     peerDependencies:
       react: ^18 || ^19
 
+  "@tanstack/react-table@8.21.3":
+    resolution:
+      {
+        integrity: sha512-5nNMTSETP4ykGegmVkhjcS8tTLW6Vl4axfEGQN3v0zdHYbK4UfoqfPChclTrJ4EoK9QynqAu9oUf8VEmrpZ5Ww==,
+      }
+    engines: { node: ">=12" }
+    peerDependencies:
+      react: ">=16.8"
+      react-dom: ">=16.8"
+
+  "@tanstack/table-core@8.21.3":
+    resolution:
+      {
+        integrity: sha512-ldZXEhOBb8Is7xLs01fR3YEc3DERiz5silj8tnGkFZytt1abEvl/GhUmCE0PMLaMPTa3Jk4HbKmRlHmu+gCftg==,
+      }
+    engines: { node: ">=12" }
+
   "@testing-library/dom@10.4.1":
     resolution:
       {
@@ -5855,6 +5881,12 @@ packages:
         integrity: sha512-KMReFUr0B4t+D+OBkjR3KYqvocp2XaSzO55UcB6mgQMd3KbcE+mWTyvVV7D/zsdEbNnV6acZUutkiHQXvTr1Rw==,
       }
     engines: { node: ">= 8" }
+
+  apexcharts@5.15.2:
+    resolution:
+      {
+        integrity: sha512-qbd+ehDiRxo++wAqaGLmJcd683ktulTqoku4WYYyQ3XOgJIn4yhOQGV27KcdK7c2yhwxblyh4mgMm8ukI0wC0Q==,
+      }
 
   append-field@1.0.0:
     resolution:
@@ -12241,6 +12273,15 @@ packages:
       }
     hasBin: true
 
+  react-apexcharts@2.1.1:
+    resolution:
+      {
+        integrity: sha512-aV25n+1ZdAzRG0KhODVC48K8WbhMKBAr3yWSeaaBqM1ySn22kSSKblsNCUvlwegsT+cdMLuOrK9xGZb+IK+OkQ==,
+      }
+    peerDependencies:
+      apexcharts: ">=5.10.1"
+      react: ">=16.8.0"
+
   react-dom@19.2.4:
     resolution:
       {
@@ -17292,6 +17333,14 @@ snapshots:
       "@tanstack/query-core": 5.101.1
       react: 19.2.4
 
+  "@tanstack/react-table@8.21.3(react-dom@19.2.4(react@19.2.4))(react@19.2.4)":
+    dependencies:
+      "@tanstack/table-core": 8.21.3
+      react: 19.2.4
+      react-dom: 19.2.4(react@19.2.4)
+
+  "@tanstack/table-core@8.21.3": {}
+
   "@testing-library/dom@10.4.1":
     dependencies:
       "@babel/code-frame": 7.29.0
@@ -17966,6 +18015,8 @@ snapshots:
     dependencies:
       normalize-path: 3.0.0
       picomatch: 2.3.2
+
+  apexcharts@5.15.2: {}
 
   append-field@1.0.0: {}
 
@@ -23073,6 +23124,12 @@ snapshots:
       minimist: 1.2.8
       strip-json-comments: 2.0.1
     optional: true
+
+  react-apexcharts@2.1.1(apexcharts@5.15.2)(react@19.2.4):
+    dependencies:
+      apexcharts: 5.15.2
+      prop-types: 15.8.1
+      react: 19.2.4
 
   react-dom@19.2.4(react@19.2.4):
     dependencies:

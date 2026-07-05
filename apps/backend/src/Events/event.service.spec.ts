@@ -66,7 +66,7 @@ describe('EventService', () => {
         eventID: newEvent.eventID,
       });
       const venue = createVenue({
-        VenueName: newEvent.eventCriteria!.venue,
+        VenueName: newEvent.eventCriteria.venue,
       });
       const eventVenue = createEventVenue({
         VenueID: venue.VenueID,
@@ -154,7 +154,7 @@ describe('EventService', () => {
 
       mockSelectResult(mockDb, [oldEvent]);
 
-      mockDb.transaction.mockImplementation(async (callback: any) => {
+      mockDb.transaction.mockImplementation((callback: (tx: any) => any) => {
         const tx = {
           update: jest.fn().mockReturnThis(),
           set: jest.fn().mockReturnThis(),
