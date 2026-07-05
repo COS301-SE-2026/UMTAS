@@ -136,28 +136,35 @@ export function extractPdfStreamPayloads(
   let cursor = 0;
 
   while (cursor < bytes.length) {
-    const streamMarker = indexOfPdfKeyword(bytes, "stream", cursor, {
-      requireLineEndingAfter: true,
-    });
-    if (streamMarker === -1) {
+    const objectMarker = indexOfPdfKeyword(bytes, "obj", cursor);
+    if (objectMarker === -1) {
       break;
     }
 
-    let payloadStart = streamMarker + "stream".length;
-    payloadStart = skipSingleLineEnding(bytes, payloadStart);
-
-    const endMarker = indexOfPdfKeyword(bytes, "endstream", payloadStart);
-    if (endMarker === -1) {
-      break;
+    if (!hasObjectNumberPrefix(bytes, objectMarker)) {
+      cursor = objectMarker + "obj".length;
+      continue;
     }
 
-    const payloadEnd = stripSingleTrailingLineEnding(
+    const objectEnd = indexOfPdfKeyword(
       bytes,
-      payloadStart,
-      endMarker,
+      "endobj",
+      objectMarker + "obj".length,
     );
-    payloads.push({ payload: bytes.subarray(payloadStart, payloadEnd) });
-    cursor = endMarker + "endstream".length;
+    if (objectEnd === -1) {
+      break;
+    }
+
+    const payload = extractObjectStreamPayload(
+      bytes,
+      objectMarker + "obj".length,
+      objectEnd,
+    );
+    if (payload) {
+      payloads.push(payload);
+    }
+
+    cursor = objectEnd + "endobj".length;
   }
 
   return payloads;
@@ -220,6 +227,299 @@ function indexOfPdfKeyword(
   return -1;
 }
 
+function hasObjectNumberPrefix(
+  bytes: Uint8Array,
+  objectMarker: number,
+): boolean {
+  let cursor = objectMarker - 1;
+  cursor = skipWhitespaceBackward(bytes, cursor);
+  const generationEnd = cursor + 1;
+  cursor = skipDigitsBackward(bytes, cursor);
+  const generationStart = cursor + 1;
+
+  cursor = skipWhitespaceBackward(bytes, cursor);
+  const objectNumberEnd = cursor + 1;
+  cursor = skipDigitsBackward(bytes, cursor);
+  const objectNumberStart = cursor + 1;
+
+  return generationStart < generationEnd && objectNumberStart < objectNumberEnd;
+}
+
+function extractObjectStreamPayload(
+  bytes: Uint8Array,
+  objectBodyStart: number,
+  objectEnd: number,
+): PdfStreamPayload | undefined {
+  const dictionaryStart = indexOfAsciiSequence(bytes, "<<", objectBodyStart);
+  if (dictionaryStart === -1 || dictionaryStart >= objectEnd) {
+    return undefined;
+  }
+
+  const dictionaryEnd = findDictionaryEnd(bytes, dictionaryStart, objectEnd);
+  if (dictionaryEnd === -1) {
+    return undefined;
+  }
+
+  const payloadLength = parseDirectLength(
+    bytes,
+    dictionaryStart,
+    dictionaryEnd,
+  );
+  if (payloadLength === undefined) {
+    return undefined;
+  }
+
+  const streamMarker = indexOfPdfKeyword(bytes, "stream", dictionaryEnd, {
+    requireLineEndingAfter: true,
+  });
+  if (streamMarker === -1 || streamMarker >= objectEnd) {
+    return undefined;
+  }
+
+  const payloadStart = skipSingleLineEnding(
+    bytes,
+    streamMarker + "stream".length,
+  );
+  const payloadEnd = payloadStart + payloadLength;
+  if (payloadEnd > objectEnd) {
+    return undefined;
+  }
+
+  if (!hasEndstreamAtPayloadBoundary(bytes, payloadEnd, objectEnd)) {
+    return undefined;
+  }
+
+  return { payload: bytes.subarray(payloadStart, payloadEnd) };
+}
+
+function findDictionaryEnd(
+  bytes: Uint8Array,
+  dictionaryStart: number,
+  limit: number,
+): number {
+  let depth = 0;
+  let cursor = dictionaryStart;
+
+  while (cursor + 1 < limit) {
+    if (bytes[cursor] === 60 && bytes[cursor + 1] === 60) {
+      depth += 1;
+      cursor += 2;
+      continue;
+    }
+
+    if (bytes[cursor] === 62 && bytes[cursor + 1] === 62) {
+      depth -= 1;
+      cursor += 2;
+      if (depth === 0) {
+        return cursor;
+      }
+      continue;
+    }
+
+    cursor += 1;
+  }
+
+  return -1;
+}
+
+function parseDirectLength(
+  bytes: Uint8Array,
+  dictionaryStart: number,
+  dictionaryEnd: number,
+): number | undefined {
+  let cursor = dictionaryStart;
+
+  while (cursor < dictionaryEnd) {
+    const lengthMarker = indexOfAsciiSequence(bytes, "/Length", cursor);
+    if (lengthMarker === -1 || lengthMarker >= dictionaryEnd) {
+      return undefined;
+    }
+
+    if (!isPdfDelimiter(bytes[lengthMarker + "/Length".length])) {
+      cursor = lengthMarker + "/Length".length;
+      continue;
+    }
+
+    cursor = skipWhitespaceForward(
+      bytes,
+      lengthMarker + "/Length".length,
+      dictionaryEnd,
+    );
+    const numberStart = cursor;
+    cursor = skipDigitsForward(bytes, cursor, dictionaryEnd);
+    if (numberStart === cursor) {
+      return undefined;
+    }
+
+    if (isIndirectReferenceSuffix(bytes, cursor, dictionaryEnd)) {
+      return undefined;
+    }
+
+    const value = parseAsciiInteger(bytes, numberStart, cursor);
+    if (!Number.isSafeInteger(value) || value < 0) {
+      return undefined;
+    }
+
+    return value;
+  }
+
+  return undefined;
+}
+
+function isIndirectReferenceSuffix(
+  bytes: Uint8Array,
+  afterFirstNumber: number,
+  limit: number,
+): boolean {
+  let cursor = skipWhitespaceForward(bytes, afterFirstNumber, limit);
+  const secondNumberStart = cursor;
+  cursor = skipDigitsForward(bytes, cursor, limit);
+  if (secondNumberStart === cursor) {
+    return false;
+  }
+
+  cursor = skipWhitespaceForward(bytes, cursor, limit);
+  return bytes[cursor] === 82 && isPdfDelimiter(bytes[cursor + 1]);
+}
+
+function hasEndstreamAtPayloadBoundary(
+  bytes: Uint8Array,
+  payloadEnd: number,
+  objectEnd: number,
+): boolean {
+  const marker = skipSingleLineEnding(bytes, payloadEnd);
+  if (marker >= objectEnd) {
+    return false;
+  }
+
+  return matchesPdfKeywordAt(bytes, "endstream", marker);
+}
+
+function matchesPdfKeywordAt(
+  bytes: Uint8Array,
+  keyword: string,
+  index: number,
+): boolean {
+  const maxStart = bytes.length - keyword.length;
+  if (index < 0 || index > maxStart) {
+    return false;
+  }
+
+  for (let keywordIndex = 0; keywordIndex < keyword.length; keywordIndex += 1) {
+    if (bytes[index + keywordIndex] !== keyword.charCodeAt(keywordIndex)) {
+      return false;
+    }
+  }
+
+  return hasPdfKeywordBoundaries(bytes, index, keyword, {});
+}
+
+function indexOfAsciiSequence(
+  bytes: Uint8Array,
+  needle: string,
+  fromIndex: number,
+): number {
+  const firstByte = needle.charCodeAt(0);
+  const maxStart = bytes.length - needle.length;
+
+  for (let index = fromIndex; index <= maxStart; index += 1) {
+    if (bytes[index] !== firstByte) {
+      continue;
+    }
+
+    let matches = true;
+    for (let needleIndex = 1; needleIndex < needle.length; needleIndex += 1) {
+      if (bytes[index + needleIndex] !== needle.charCodeAt(needleIndex)) {
+        matches = false;
+        break;
+      }
+    }
+
+    if (matches) {
+      return index;
+    }
+  }
+
+  return -1;
+}
+
+function skipWhitespaceForward(
+  bytes: Uint8Array,
+  index: number,
+  limit: number,
+): number {
+  let cursor = index;
+  while (cursor < limit && isPdfWhitespace(bytes[cursor])) {
+    cursor += 1;
+  }
+
+  return cursor;
+}
+
+function skipWhitespaceBackward(bytes: Uint8Array, index: number): number {
+  let cursor = index;
+  while (cursor >= 0 && isPdfWhitespace(bytes[cursor])) {
+    cursor -= 1;
+  }
+
+  return cursor;
+}
+
+function skipDigitsForward(
+  bytes: Uint8Array,
+  index: number,
+  limit: number,
+): number {
+  let cursor = index;
+  while (cursor < limit && isAsciiDigit(bytes[cursor])) {
+    cursor += 1;
+  }
+
+  return cursor;
+}
+
+function skipDigitsBackward(bytes: Uint8Array, index: number): number {
+  let cursor = index;
+  while (cursor >= 0 && isAsciiDigit(bytes[cursor])) {
+    cursor -= 1;
+  }
+
+  return cursor;
+}
+
+function parseAsciiInteger(
+  bytes: Uint8Array,
+  start: number,
+  end: number,
+): number {
+  let value = 0;
+  for (let cursor = start; cursor < end; cursor += 1) {
+    const byte = bytes[cursor];
+    if (byte === undefined || !isAsciiDigit(byte)) {
+      return Number.NaN;
+    }
+
+    value = value * 10 + byte - 48;
+  }
+
+  return value;
+}
+
+function isPdfWhitespace(byte: number | undefined): boolean {
+  return (
+    byte === 0 ||
+    byte === 9 ||
+    byte === 10 ||
+    byte === 12 ||
+    byte === 13 ||
+    byte === 32
+  );
+}
+
+function isAsciiDigit(byte: number | undefined): boolean {
+  return byte !== undefined && byte >= 48 && byte <= 57;
+}
+
 function hasPdfKeywordBoundaries(
   bytes: Uint8Array,
   index: number,
@@ -273,22 +573,6 @@ function skipSingleLineEnding(bytes: Uint8Array, index: number): number {
   }
 
   return index;
-}
-
-function stripSingleTrailingLineEnding(
-  bytes: Uint8Array,
-  start: number,
-  end: number,
-): number {
-  if (end - start >= 2 && bytes[end - 2] === 13 && bytes[end - 1] === 10) {
-    return end - 2;
-  }
-
-  if (end > start && (bytes[end - 1] === 10 || bytes[end - 1] === 13)) {
-    return end - 1;
-  }
-
-  return end;
 }
 
 function encodeUint64BigEndian(value: number): Uint8Array {
