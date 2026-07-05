@@ -37,6 +37,7 @@ export function InstituteSelector() {
   const canConfirm = selectedInstitute !== "";
 */
   function updateSelectedUni(id: string) {
+    console.log("update uni func ran ", id);
     const nUni = uniList?.universities.find((uni) => uni.UniversityID === id);
     setSelectedInstitute(nUni);
   }
@@ -44,7 +45,6 @@ export function InstituteSelector() {
   function handleConfirm() {
     //
   }
-  useEffect(() => {}, [selectedInstitute]);
 
   return (
     <form
@@ -56,7 +56,7 @@ export function InstituteSelector() {
     >
       <SelectInstituteField
         institutes={uniList?.universities || []}
-        value={selectedInstitute?.UniversityName || ""}
+        value={selectedInstitute?.UniversityID || ""}
         onChange={updateSelectedUni}
         onNotSupportedClick={() => {
           /* werk hierso haha */

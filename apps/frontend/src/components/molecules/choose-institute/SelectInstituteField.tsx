@@ -27,7 +27,7 @@ export function SelectInstituteField({
   return (
     <div className="flex flex-col gap-2">
       <Label htmlFor="institute-select">Select Institute</Label>
-      <Select value={value} onValueChange={onChange}>
+      <Select value={value} onValueChange={(id) => onChange(id)}>
         <SelectTrigger id="institute-select" className="w-full">
           <SelectValue placeholder="Select an institute" />
         </SelectTrigger>

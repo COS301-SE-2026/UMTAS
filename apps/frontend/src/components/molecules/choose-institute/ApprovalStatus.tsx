@@ -10,9 +10,12 @@ interface ApprovalStatusProps {
 }
 // so this goes and provides access control
 export function ApprovalStatus({ uni }: ApprovalStatusProps) {
-  if (status === null) return null;
-
-  if (status === "approved") {
+  if (
+    uni.role === "LECTURER" ||
+    uni.role === "STUDENT" ||
+    uni.role === "UNIVERSITY_ADMIN" ||
+    uni.role === "STUDENT_OWNED"
+  ) {
     return (
       <Alert variant="success">
         <AlertTitle>Role approved</AlertTitle>
@@ -22,26 +25,27 @@ export function ApprovalStatus({ uni }: ApprovalStatusProps) {
         </AlertDescription>
       </Alert>
     );
-  }
-
-  if (status === "rejected") {
+  } else if (
+    uni.role === "LECTURER_PENDING" ||
+    uni.role === "UNIVERSITY_ADMIN_PENDING" ||
+    uni.role === undefined
+  )
     return (
-      <Alert variant="destructive">
-        <AlertTitle>Role rejected</AlertTitle>
+      <Alert variant="default">
+        <AlertTitle>Role not yet approved</AlertTitle>
         <AlertDescription>
-          Your role has been rejected for {uni.UniversityName}. Please contact
-          the university for more information.
+          Your role has not yet been approved for {uni.UniversityName}. Please
+          wait for the approval process to complete.
         </AlertDescription>
       </Alert>
     );
-  }
 
   return (
-    <Alert variant="default">
-      <AlertTitle>Role not yet approved</AlertTitle>
+    <Alert variant="destructive">
+      <AlertTitle>Role rejected</AlertTitle>
       <AlertDescription>
-        Your role has not yet been approved for {uni.UniversityName}. Please
-        wait for the approval process to complete.
+        Your role has been rejected for {uni.UniversityName}. Please contact the
+        university for more information.
       </AlertDescription>
     </Alert>
   );
