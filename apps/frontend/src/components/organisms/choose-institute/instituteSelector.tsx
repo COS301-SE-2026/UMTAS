@@ -64,7 +64,7 @@ export function InstituteSelector() {
       />
 
       {selectedInstitute?.role === undefined ||
-        (selectedInstitute?.role == null && (
+        (selectedInstitute?.role === null && (
           <SelectRoleField value={selectedRole} onChange={setSelectedRole} />
         ))}
 
@@ -80,6 +80,11 @@ export function InstituteSelector() {
       <div className="mt-2 flex justify-end gap-3 border-t pt-4">
         <Button type="submit" disabled={!false}>
           {true ? "Continue as Student" : "Confirm"}
+        </Button>
+      </div>
+      <div className="mt-2 flex justify-end gap-3 border-t pt-4">
+        <Button type="submit" onClick={() => {}}>
+          {"Apply for role"}
         </Button>
       </div>
     </form>

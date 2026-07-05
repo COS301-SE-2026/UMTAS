@@ -36,7 +36,7 @@ export function ApprovalStatus({ uni }: ApprovalStatusProps) {
         <AlertTitle>Role not yet approved </AlertTitle>
         <AlertDescription>
           Your role has not yet been approved for {uni.UniversityName}. Please
-          wait for the approval process to complete.
+          wait for the approval process to complete or apply for a role.
         </AlertDescription>
       </Alert>
     );
