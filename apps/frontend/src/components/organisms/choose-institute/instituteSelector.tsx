@@ -29,7 +29,7 @@ export function InstituteSelector() {
   }
 
   function handleConfirm() {
-    UserDetails.getInstance().storeUniDetails(selectedInstitute);
+    UserDetails.storeUniDetails(selectedInstitute);
   }
   const applyDisabled = !selectedInstitute || !selectedRole;
 

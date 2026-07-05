@@ -5,31 +5,29 @@
 import { uniDto } from "@/components/templates/choose-institute/queries/builders";
 
 export class UserDetails {
-  private static instance: UserDetails;
-  private uniKey = "universityDetails";
-  private constructor() {
-    console.log("User initialized");
+  private static uniKey = "universityDetails";
+  private static checkWindow() {
+    if (typeof window !== "undefined") {
+      return true;
+    } else return false;
   }
 
-  public static getInstance(): UserDetails {
-    if (!this.instance) {
-      this.instance = new UserDetails();
-    }
-    return this.instance;
-  }
-  public storeUniDetails(details?: uniDto) {
-    if (!details) return;
-
+  public static storeUniDetails(details?: uniDto) {
+    if (!details || !this.checkWindow()) return;
     const data = JSON.stringify(details);
     localStorage.setItem(this.uniKey, data);
     console.log("University stored", details);
   }
-  public getUniDetails(): uniDto | undefined {
+  public static getUniDetails(): uniDto | undefined {
+    if (!this.checkWindow()) return undefined;
+
     const storedItem = localStorage.getItem(this.uniKey);
+
     if (storedItem) {
       const data = JSON.parse(storedItem);
       return data as uniDto;
     }
+
     return undefined;
   }
 }
