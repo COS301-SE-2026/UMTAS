@@ -6,7 +6,7 @@ import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { admin } from 'better-auth/plugins/admin';
 import { redisStorage } from '@better-auth/redis-storage';
 import * as appSchema from '../db/schema';
-import { isAppRole } from './roles';
+import { isRole } from './roles';
 import { getRedisClient } from '../redis/redis';
 import { ac, student, lecturer, uniAdmin, sysAdmin } from './permissions';
 
@@ -363,7 +363,7 @@ export function createAuth(input: CreateAuthInput): AuthInstance {
             const actorRole = userObj?.role;
             const requestedRole = data.role;
 
-            if (requestedRole !== undefined && !isAppRole(requestedRole)) {
+            if (requestedRole !== undefined && !isRole(requestedRole)) {
               throw new APIError('BAD_REQUEST', {
                 message: 'Invalid role value provided',
               });
