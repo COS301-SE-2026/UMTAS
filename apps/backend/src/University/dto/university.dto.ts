@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsBoolean,
+  IsEmail,
   IsEnum,
   IsNotEmpty,
   IsOptional,
@@ -103,6 +104,12 @@ export class GetRolesDto {
     example: '00000000-0000-0000-0000-000000000000',
   })
   UserID!: string;
+
+  @ApiProperty({
+    example: 'xxx@umtas.com',
+  })
+  @IsEmail()
+  Email!: string;
 
   @ApiProperty({
     format: 'uuid',

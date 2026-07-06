@@ -9,7 +9,12 @@ import {
 import { eq, and, ne, or } from 'drizzle-orm';
 
 import { DatabaseService } from '../db/database.service';
-import { RoleTypeType, University, UniversityRole } from '../entities';
+import {
+  RoleTypeType,
+  University,
+  UniversityRole,
+  usersTable,
+} from '../entities';
 import {
   CreateUniversityDto,
   UpdateUniversityDto,
@@ -336,8 +341,14 @@ export class UniversityService {
     }
 
     const applications = await this.dbService.db
-      .select()
+      .select({
+        UserID: usersTable.id,
+        Email: usersTable.email,
+        UniversityID: UniversityRole.UniversityID,
+        role: UniversityRole.role,
+      })
       .from(UniversityRole)
+      .innerJoin(usersTable, eq(UniversityRole.UserID, usersTable.id))
       .where(
         and(
           eq(UniversityRole.UniversityID, UniID),

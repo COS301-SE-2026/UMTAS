@@ -15,13 +15,6 @@ import {
 } from "@/components/atoms/baseShadcn/dropdown-menu";
 import { getSingleApplication } from "@/app/role-management/queries/builder";
 
-export type user = {
-  id: string;
-  name: string;
-  email: string;
-  role: "Student" | "Lecturer" | "Uni Admin";
-};
-
 export const columns: ColumnDef<getSingleApplication>[] = [
   {
     id: "select",
