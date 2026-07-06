@@ -22,7 +22,6 @@ import {
   GetRolesDto,
   GetRoleFilterDto,
 } from './dto/university.dto';
-import { uniId } from 'src/Testing/constants.spec';
 
 @Injectable()
 export class UniversityService {
@@ -325,6 +324,7 @@ export class UniversityService {
       .limit(1);
 
     // fail state no role || role not sys admin / uni admin
+
     if (
       !role ||
       !role.UniversityRole ||
@@ -340,7 +340,7 @@ export class UniversityService {
       .from(UniversityRole)
       .where(
         and(
-          eq(UniversityRole.UniversityID, uniId),
+          eq(UniversityRole.UniversityID, UniID),
           dto.pending
             ? or(
                 eq(UniversityRole.role, 'LECTURER_PENDING'),
@@ -349,7 +349,6 @@ export class UniversityService {
             : undefined,
         ),
       );
-
     return applications;
   }
 

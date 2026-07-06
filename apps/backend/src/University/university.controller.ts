@@ -183,9 +183,7 @@ export class UniversityController {
 
   @Post('applications/:universityID')
   @Roles('uni_admin', 'sys_admin')
-  @ApiBody({
-    type: GetRoleFilterDto,
-  })
+  @ApiBody({ type: () => GetRoleFilterDto })
   @ApiOperation({
     summary: 'Get all applications for a specific university',
     operationId: 'getAllApplications',

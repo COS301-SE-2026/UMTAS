@@ -10,7 +10,6 @@ import {
 } from 'class-validator';
 import { PartialType, PickType, OmitType } from '@nestjs/swagger';
 import { RoleType, RoleTypeType } from '../../entities/index';
-import { Type } from 'class-transformer';
 
 export class UniversityDto {
   @ApiProperty({
@@ -98,28 +97,24 @@ export class ApprovedUserRoleResponse extends PickType(ApproveUsersRoleDto, [
   @ApiProperty({ example: true })
   success!: boolean;
 }
-
 export class GetRolesDto {
   @ApiProperty({
     format: 'uuid',
     example: '00000000-0000-0000-0000-000000000000',
   })
-  @Type(() => String)
   UserID!: string;
 
   @ApiProperty({
     format: 'uuid',
     example: '00000000-0000-0000-0000-000000000000',
   })
-  @Type(() => String)
   UniversityID!: string;
 
   @ApiProperty({
-    enum: RoleType,
+    enum: RoleType.enumValues,
     nullable: true,
     example: 'LECTURER_PENDING',
   })
-  @Type(() => RoleType)
   role!: RoleTypeType | null;
 }
 
