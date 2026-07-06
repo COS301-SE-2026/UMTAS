@@ -1,0 +1,46 @@
+mkdocs.yml
+  h_3359569cacef0e 41,65-84
+docs/sas/deployment/CICD_PIPELINE_DIAGRAM.md
+  s_116043b471534a::t_663b5036d0b00b 1
+docs/sas/deployment/DEPLOYMENT_DIAGRAMS.md
+  s_116043b471534a::t_01fb453a2d6e2f 1
+docs/sas/deployment/DEPLOYMENT_REQUIREMENTS.md
+  s_116043b471534a::t_6213bfe56fd6dc 1
+docs/srs/DOMAIN_MODEL.md
+  s_116043b471534a::t_fd889c360b4fd5 1
+docs/srs/FUNCTIONAL_REQUIREMENTS.md
+  s_116043b471534a::t_9cb508011f8dc2 1
+docs/srs/INTRODUCTION.md
+  s_116043b471534a::t_78545cb69ff8f2 1
+docs/srs/NON-FUNCTIONAL_REQUIREMENTS.md
+  s_116043b471534a::t_2cc2bce22b590c 1
+docs/srs/Traceability-Matrix.md
+  s_116043b471534a::t_9f9ffdcd7d5e32 1
+docs/srs/USER_STORIES.md
+  s_116043b471534a::t_994473d2ca0acf 1
+docs/srs/USE_CASES.md
+  s_116043b471534a::t_083524ff1a30f5 1
+docs/srs/index.md
+  s_116043b471534a::t_4dea0245fda542 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "69403ffe09abcbf3ce393484456bb979c2f23426",
+  "prompts": {},
+  "humans": {
+    "h_3359569cacef0e": {
+      "author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_116043b471534a": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f04ce-0c09-77e2-bfac-6955c2e7dd29",
+        "model": "gpt-5.5"
+      },
+      "human_author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}

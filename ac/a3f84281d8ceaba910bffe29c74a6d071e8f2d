@@ -1,0 +1,18 @@
+apps/pdf_parser/worker/src/index.ts
+  h_3359569cacef0e 11,21
+packages/bullmq-worker-core/src/worker-host.ts
+  h_3359569cacef0e 87,89-93,96
+apps/pdf_parser/worker/src/config.ts
+  h_3359569cacef0e 72-83
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.5",
+  "base_commit_sha": "aca3f84281d8ceaba910bffe29c74a6d071e8f2d",
+  "prompts": {},
+  "humans": {
+    "h_3359569cacef0e": {
+      "author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}

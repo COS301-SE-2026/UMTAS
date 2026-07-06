@@ -1,0 +1,14 @@
+apps/frontend/src/app/builder/utils/modules/requestBuilders.ts
+  h_8b894b05e4a1b2 9,11,13,15,17,19,21,23
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "a2b89cb5ed01382db560138152bfa21849470890",
+  "prompts": {},
+  "humans": {
+    "h_8b894b05e4a1b2": {
+      "author": "Wilmar-Smit <u24584216@tuks.co.za>"
+    }
+  }
+}

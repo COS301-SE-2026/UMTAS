@@ -1,0 +1,14 @@
+apps/parser/parser/helpers.py
+  h_3359569cacef0e 1-52
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "09b84cb14e7d4d1b0fb492b79f7c27002d6220c8",
+  "prompts": {},
+  "humans": {
+    "h_3359569cacef0e": {
+      "author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}

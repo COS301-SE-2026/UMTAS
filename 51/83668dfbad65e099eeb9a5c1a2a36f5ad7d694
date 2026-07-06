@@ -1,0 +1,14 @@
+apps/backend/src/entities/timetables/timetables.schema.ts
+  h_8b894b05e4a1b2 9-10,15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.10",
+  "base_commit_sha": "5183668dfbad65e099eeb9a5c1a2a36f5ad7d694",
+  "prompts": {},
+  "humans": {
+    "h_8b894b05e4a1b2": {
+      "author": "Wilmar-Smit <u24584216@tuks.co.za>"
+    }
+  }
+}

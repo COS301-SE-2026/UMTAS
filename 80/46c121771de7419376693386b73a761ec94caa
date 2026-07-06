@@ -1,0 +1,14 @@
+apps/parser/parser/data_processor.py
+  h_3359569cacef0e 4,6-9,11-19,22,25,27,30-31,36,39,43-59,61
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "8046c121771de7419376693386b73a761ec94caa",
+  "prompts": {},
+  "humans": {
+    "h_3359569cacef0e": {
+      "author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}

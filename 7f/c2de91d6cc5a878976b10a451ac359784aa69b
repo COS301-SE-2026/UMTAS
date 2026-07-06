@@ -1,0 +1,26 @@
+pnpm-workspace.yaml
+  h_3359569cacef0e 3
+pnpm-lock.yaml
+  s_2cd932eb1dc532::t_b079b02c2c6289 77-79,333,339,351,359-390,453-578,4605-4646,6473-6478,14555-14719,15896,15911,15918,15925,15946,15953,15960,16023,16059,16095,16106,16254,16264,17518-17550,17835,17839,17862,17900,17964,17969,17973,17983,18677-18678,19053,19059,19688,19693-19694,19720,19731,19735,19741,19745,19756,20926,20928,20932,20935,20983,21009,21014,21040,21045,21070,21076-21106,21217,21232,21303,21368,21423,21522,21531,21559,21592,21598,21600,21603,24329,24334
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.5",
+  "base_commit_sha": "7fc2de91d6cc5a878976b10a451ac359784aa69b",
+  "prompts": {},
+  "humans": {
+    "h_3359569cacef0e": {
+      "author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_2cd932eb1dc532": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f1d58-2acc-7373-afd6-52b3f949ac96",
+        "model": "gpt-5.5"
+      },
+      "human_author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}
