@@ -133,6 +133,11 @@ working_docs/
 
 apps/frontend/junit.xml
 
+<<<<<<< HEAD
+.pnpm-store/
+apps/preference-solver/compile_commands.json
+apps/preference-solver/.cache/clangd/index/
+=======
 
 
 
@@ -140,3 +145,6 @@ apps/frontend/junit.xml
 .pnpm-store/
 .pnpm-store/
 .zed/
+>>>>>>> origin/dev
+apps/preference-solver/GA_TEST_DIR/
+apps/preference-solver/GA_BIN

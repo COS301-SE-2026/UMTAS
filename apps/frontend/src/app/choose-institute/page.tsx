@@ -3,7 +3,7 @@ import { ChooseInstituteTemplate } from "@/components/templates/choose-institute
 export default async function ChooseInstitutePage() {
   return (
     <div className="flex flex-col gap-4">
-      <ChooseInstituteTemplate passedRole="student" />
+      <ChooseInstituteTemplate />
     </div>
   );
 }

@@ -5,7 +5,7 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, ne } from 'drizzle-orm';
 
 import { DatabaseService } from '../db/database.service';
 import { RoleTypeType, University, UniversityRole } from '../entities';
@@ -57,6 +57,7 @@ export class UniversityService {
         and(
           eq(UniversityRole.UniversityID, University.UniversityID),
           eq(UniversityRole.UserID, userId),
+          ne(UniversityRole.role, 'STUDENT_OWNED'),
         ),
       );
 
@@ -301,7 +302,9 @@ export class UniversityService {
   //🎅's Little Helpers
 
   //get a university by name
-  async getByName(uniName: string): Promise<UniversitySingleResponseDto> {
+  async getByName(
+    uniName: string,
+  ): Promise<UniversitySingleResponseDto | null> {
     const [uni] = await this.dbService.db
       .select()
       .from(University)
