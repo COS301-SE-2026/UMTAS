@@ -35,8 +35,9 @@ export default function SchedulesPage() {
           <ScheduleView
             onEventCountChange={setEventCount}
             onModuleCountChange={setModuleCount}
-            onExportReady={handleExportReady}
+            onExportReady={() => {}}
           />
+          {/* move the download button down its breaking handleExportReady */}
         </div>
       </div>
     </div>
