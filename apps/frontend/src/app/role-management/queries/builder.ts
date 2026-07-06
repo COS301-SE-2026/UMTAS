@@ -21,3 +21,19 @@ export class getAllApplicationsBuilder extends RequestBuilder<
     );
   }
 }
+
+export type approveApplications = paths["/universities/approve"]["post"];
+export type approveApplicationsBody =
+  approveApplications["requestBody"]["content"]["application/json"];
+export type approveApplicationsRes = approveApplications["responses"]["201"];
+
+export class approveBuilder extends RequestBuilder<
+  undefined,
+  approveApplicationsBody,
+  approveApplicationsRes
+> {
+  constructor() {
+    super();
+    this.setUrl("/universities/approve").setMethod(RequestMethod.POST);
+  }
+}
