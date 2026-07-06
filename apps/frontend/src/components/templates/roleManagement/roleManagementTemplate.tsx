@@ -25,23 +25,7 @@ export default function RoleManagementTemplate() {
         <p className="text-sm text-[var(--text-secondary)]">
           Manage user roles and approve pending applications.
         </p>
-
-        <Tabs defaultValue="User Directory" className="w-full">
-          <TabsList>
-            <TabsTrigger value="User Directory">User Directory</TabsTrigger>
-            <TabsTrigger value="Pending Applications">
-              Pending Applications
-            </TabsTrigger>
-          </TabsList>
-          <TabsContent value="User Directory">
-            {" "}
-            <UserDirectoryCard />
-          </TabsContent>
-          <TabsContent value="Pending Applications">
-            {" "}
-            <PendingApplicationsCard />
-          </TabsContent>
-        </Tabs>
+        <UserDirectoryCard />
       </div>
     );
   } else {
@@ -55,3 +39,22 @@ export default function RoleManagementTemplate() {
     );
   }
 }
+
+/*
+<Tabs defaultValue="User Directory" className="w-full">
+  <TabsList>
+    <TabsTrigger value="User Directory">User Directory</TabsTrigger>
+    <TabsTrigger value="Pending Applications">
+      Pending Applications
+    </TabsTrigger>
+  </TabsList>
+  <TabsContent value="User Directory">
+    {" "}
+    <UserDirectoryCard />
+  </TabsContent>
+  <TabsContent value="Pending Applications">
+    {" "}
+    <PendingApplicationsCard />
+  </TabsContent>
+</Tabs>
+*/

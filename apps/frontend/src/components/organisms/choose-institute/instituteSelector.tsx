@@ -29,6 +29,8 @@ export function InstituteSelector() {
     UserDetails.storeUniDetails(selectedInstitute);
   }
   const applyDisabled = !selectedInstitute || !selectedRole;
+  const uniDisabeled =
+    selectedInstitute == null && selectedInstitute == undefined;
 
   return (
     <form
@@ -59,8 +61,8 @@ export function InstituteSelector() {
       {selectedInstitute && <ApprovalStatus uni={selectedInstitute} />}
 
       <div className="mt-2 flex justify-end gap-3 border-t pt-4">
-        <Button type="submit" disabled={applyDisabled}>
-          {true ? "Continue as Student" : "Confirm"}
+        <Button type="submit" disabled={uniDisabeled}>
+          continue as {selectedInstitute?.role ?? "student"}
         </Button>
       </div>
       <div className="mt-2 flex justify-end gap-3 border-t pt-4">

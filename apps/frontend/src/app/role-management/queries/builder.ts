@@ -1,13 +1,16 @@
-import { paths } from "@/lib/api";
+import { components, paths } from "@/lib/api";
 import { RequestBuilder, RequestMethod } from "../../../../utilities/request";
 
 export type getAllApplications =
   paths["/universities/applications/{universityID}"]["post"];
 
 export type getAllApplicationsPath = getAllApplications["parameters"]["path"];
-export type getAllApplicationsRes = getAllApplications["responses"]["200"];
+export type getAllApplicationsRes =
+  getAllApplications["responses"]["200"]["content"]["application/json"];
 export type getAllApplicationsBody =
   getAllApplications["requestBody"]["content"]["application/json"];
+
+export type getSingleApplication = components["schemas"]["GetRolesDto"];
 
 export class getAllApplicationsBuilder extends RequestBuilder<
   getAllApplicationsPath,
