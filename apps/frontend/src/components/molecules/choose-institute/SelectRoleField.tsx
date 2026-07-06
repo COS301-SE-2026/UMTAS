@@ -8,8 +8,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/atoms/baseShadcn/select";
+import { uniDtoRoles } from "@/components/templates/choose-institute/queries/builders";
 
-const roles = ["student", "Lecturer", "University_admin"]; //will change with dto
+const roles: uniDtoRoles[] = ["LECTURER", "STUDENT", "UNIVERSITY_ADMIN"];
 
 interface SelectRoleFieldProps {
   value: string; //todo: adjust when willie tells me to
@@ -26,7 +27,7 @@ export function SelectRoleField({ value, onChange }: SelectRoleFieldProps) {
         </SelectTrigger>
         <SelectContent>
           {roles.map((role) => (
-            <SelectItem key={role} value={role}>
+            <SelectItem key={role} value={role || ""}>
               {role}
             </SelectItem>
           ))}
