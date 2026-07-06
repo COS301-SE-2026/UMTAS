@@ -8,8 +8,11 @@ import {
   TabsTrigger,
 } from "@/components/atoms/baseShadcn/tabs";
 import { UserDetails } from "@/lib/userclass/userClass";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/atoms/baseShadcn/button";
 
 export default function RoleManagementTemplate() {
+  const router = useRouter();
   const UniDetails = UserDetails.getUniDetails();
   const ViableRole = UniDetails?.role === "UNIVERSITY_ADMIN";
 
@@ -42,6 +45,13 @@ export default function RoleManagementTemplate() {
       </div>
     );
   } else {
-    return <div>You do not have permisions to view this page.</div>;
+    return (
+      <div>
+        You do not have permisions to view this page
+        <Button onClick={() => router.push("/dashboard")}>
+          {"Navigate to home"}
+        </Button>
+      </div>
+    );
   }
 }

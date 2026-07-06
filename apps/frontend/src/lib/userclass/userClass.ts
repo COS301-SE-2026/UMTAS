@@ -2,7 +2,7 @@
 // basically a singleton to fetch data
 // Store current university dto with all the localstorage handled
 
-import { uniDto } from "@/components/templates/choose-institute/queries/builders";
+import { uniDto } from "@/app/choose-institute/queries/builders";
 
 export class UserDetails {
   private static uniKey = "universityDetails";

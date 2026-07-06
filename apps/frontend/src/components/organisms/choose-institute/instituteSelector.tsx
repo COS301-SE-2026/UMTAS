@@ -1,19 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ApprovalStatus } from "@/components/molecules/choose-institute/ApprovalStatus";
 import { SelectInstituteField } from "@/components/molecules/choose-institute/SelectInstituteField";
 import { SelectRoleField } from "@/components/molecules/choose-institute/SelectRoleField";
 import { Button } from "@/components/atoms/baseShadcn/button";
-import {
-  uniDto,
-  uniDtoRoles,
-} from "@/components/templates/choose-institute/queries/builders";
+import { uniDto, uniDtoRoles } from "@/app/choose-institute/queries/builders";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   applyMutator,
   getAllUni,
-} from "@/components/templates/choose-institute/queries/UserRoleQueries";
+} from "@/app/choose-institute/queries/UserRoleQueries";
 import { UserDetails } from "@/lib/userclass/userClass";
 
 export function InstituteSelector() {
