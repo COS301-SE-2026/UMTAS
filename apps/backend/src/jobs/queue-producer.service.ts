@@ -19,9 +19,7 @@ export class QueueProducerService {
   ) {}
 
   enqueuePdfParseJob(data: PdfParseJobData): Promise<Job<PdfParseJobData>> {
-    return this.pdfParseQueue.add(PDF_PARSE_JOB_NAME, data, {
-      jobId: data.jobId,
-    });
+    return this.pdfParseQueue.add(PDF_PARSE_JOB_NAME, data);
   }
 
   enqueueTimetableSolveJob(

@@ -63,6 +63,7 @@ export class ModulesDto {
     },
     type: StylingDto,
   })
+  @IsOptional()
   @IsObject()
   @ValidateNested()
   @Type(() => StylingDto)
@@ -85,17 +86,19 @@ export class CreateModuleDto extends PickType(ModulesDto, [
   'styling',
   'validated',
 ]) {
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: '00000000-0000-0000-0000-000000000000',
     description: 'ModuleGroupingID to identify group the module belongs to',
   })
+  @IsOptional()
   @IsUUID()
   ModuleGroupingID?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: '00000000-0000-0000-0000-000000000000',
     description: 'CourseID module belongs to',
   })
+  @IsOptional()
   @IsUUID()
   CourseID?: string;
 } //CreateModuleDto
@@ -145,25 +148,28 @@ export class ModuleFiltersDto {
   @IsUUID()
   courseId?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: '00000000-0000-0000-0000-000000000000',
     description: 'Filter by ModuleGrouping ID',
   })
+  @IsOptional()
   @IsUUID()
   GroupID?: string;
 
   //Filter by code using wildcard
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: 'COS',
     description: 'Filter by code, makes use of wildcard search',
   })
+  @IsOptional()
   @IsString()
   moduleCode?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: false,
     description: 'Choose to filter modules based of current user enrollments',
   })
+  @IsOptional()
   @IsBoolean()
   userEnrollment?: boolean;
 } //ModuleFiltersDto

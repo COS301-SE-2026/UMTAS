@@ -4,7 +4,12 @@ LIB_DIR := lib
 
 CXX := g++ -std=c++17
 CFLAGS :=  -I $(LIB_DIR)
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Darwin)
+LDFLAGS :=
+else
 LDFLAGS := -Wl,--allow-multiple-definition
+endif
 
 
 SRC_FILES := $(wildcard $(SRC_DIR)/*.cpp)\
@@ -27,20 +32,21 @@ TARGET := GA_BIN
 
 all :$(TARGET)
 
-$(TARGET):$(OBJS)
+$(TARGET): $(OPEN_GA_HEADER) $(JSON_HEADER) $(OBJS)
 	@mkdir -p $(BUILD_DIR)
-	$(CXX) $(CFLAGS) $(LDFLAGS) -o $@ $^
+	$(CXX) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS)
 
-$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp $(OPEN_GA_HEADER) $(JSON_HEADER)
 	@mkdir -p $(dir $@)
 	$(CXX) $(CFLAGS) -c $< -o $@
 
 
-$(OPEN_GA_HEADER):
+$(OPEN_GA_HEADER): makefile
 	@mkdir -p $(LIB_DIR)
 	curl -L $(OPEN_GA_URL) -o $(LIB_DIR)/openGA.zip
 	unzip -q $(LIB_DIR)/openGA.zip -d $(LIB_DIR)
 	cp $(LIB_DIR)/openGA-1.0.5/src/openGA.hpp $(OPEN_GA_HEADER)
+	perl -0pi -e 's/std::mutex mtx_rand;/inline std::mutex mtx_rand;/' $(OPEN_GA_HEADER)
 	rm -rf $(LIB_DIR)/openGA-1.0.5 $(LIB_DIR)/openGA.zip
 
 $(JSON_HEADER):
@@ -61,4 +67,3 @@ clean_lib:
     
 run r: $(TARGET)
 	./$(TARGET)
-
