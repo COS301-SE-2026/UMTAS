@@ -10,6 +10,7 @@ import { eq, and, ne, or } from 'drizzle-orm';
 
 import { DatabaseService } from '../db/database.service';
 import {
+  RoleType,
   RoleTypeType,
   University,
   UniversityRole,
@@ -27,6 +28,7 @@ import {
   GetRolesDto,
   GetRoleFilterDto,
 } from './dto/university.dto';
+import { notExists } from 'drizzle-orm';
 
 @Injectable()
 export class UniversityService {
@@ -65,7 +67,20 @@ export class UniversityService {
         and(
           eq(UniversityRole.UniversityID, University.UniversityID),
           eq(UniversityRole.UserID, userId),
-          ne(UniversityRole.role, 'STUDENT_OWNED'),
+        ),
+      )
+      .where(
+        // show no universities if anyone has a rule student owned to it.
+        notExists(
+          this.dbService.db
+            .select()
+            .from(UniversityRole)
+            .where(
+              and(
+                eq(UniversityRole.UniversityID, University.UniversityID),
+                eq(UniversityRole.role, RoleType.enumValues[1]),
+              ),
+            ),
         ),
       );
 

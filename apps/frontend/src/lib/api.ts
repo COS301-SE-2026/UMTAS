@@ -1268,6 +1268,11 @@ export interface components {
        */
       UserID: string;
       /**
+       * Format: email
+       * @example xxx@umtas.com
+       */
+      Email: string;
+      /**
        * Format: uuid
        * @example 00000000-0000-0000-0000-000000000000
        */
