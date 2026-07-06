@@ -6,7 +6,7 @@ import {
   InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { eq, and, ne } from 'drizzle-orm';
+import { eq, and, ne, or } from 'drizzle-orm';
 
 import { DatabaseService } from '../db/database.service';
 import { RoleTypeType, University, UniversityRole } from '../entities';
@@ -20,6 +20,7 @@ import {
   ApprovedUserRoleResponse,
   ApproveUsersRoleDto,
   GetRolesDto,
+  GetRoleFilterDto,
 } from './dto/university.dto';
 import { uniId } from 'src/Testing/constants.spec';
 
@@ -305,6 +306,7 @@ export class UniversityService {
   async getAllApplications(
     userID: string,
     UniID: string,
+    dto: GetRoleFilterDto,
   ): Promise<GetRolesDto[]> {
     // validate permision (extra check)
     const [role] = await this.dbService.db
@@ -339,8 +341,12 @@ export class UniversityService {
       .where(
         and(
           eq(UniversityRole.UniversityID, uniId),
-          eq(UniversityRole.role, 'LECTURER_PENDING'),
-          eq(UniversityRole.role, 'UNIVERSITY_ADMIN_PENDING'),
+          dto.pending
+            ? or(
+                eq(UniversityRole.role, 'LECTURER_PENDING'),
+                eq(UniversityRole.role, 'UNIVERSITY_ADMIN_PENDING'),
+              )
+            : undefined,
         ),
       );
 

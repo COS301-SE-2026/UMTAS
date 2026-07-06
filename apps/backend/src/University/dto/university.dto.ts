@@ -1,5 +1,6 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
+  IsBoolean,
   IsEnum,
   IsNotEmpty,
   IsOptional,
@@ -122,10 +123,14 @@ export class GetRolesDto {
   role!: RoleTypeType | null;
 }
 
-/*
-const applications: {
-    UserID: string;
-    UniversityID: string;
-    role: "STUDENT" | "STUDENT_OWNED" | "UNIVERSITY_ADMIN" | "UNIVERSITY_ADMIN_PENDING" | "LECTURER" | "LECTURER_PENDING" | "SYSTEM_ADMIN";
-}[]
-*/
+export class GetRoleFilterDto {
+  @ApiPropertyOptional({
+    type: Boolean,
+    description:
+      'True for only pending applications, false for all roles for uni',
+    example: false,
+  })
+  @IsOptional()
+  @IsBoolean()
+  pending?: boolean;
+}

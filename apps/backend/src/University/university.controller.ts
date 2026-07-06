@@ -9,6 +9,7 @@ import {
   ApplyForUniRoleDto,
   ApproveUsersRoleDto,
   ApprovedUserRoleResponse,
+  GetRoleFilterDto,
 } from './dto/university.dto';
 
 import {
@@ -179,8 +180,11 @@ export class UniversityController {
     return this.service.delete(universityId);
   }
 
-  @Get('applications/:universityID')
+  @Post('applications/:universityID')
   @Roles('uni_admin', 'sys_admin')
+  @ApiBody({
+    type: GetRoleFilterDto,
+  })
   @ApiOperation({
     summary: 'Get all applications for a specific university',
     operationId: 'getAllApplications',
@@ -188,8 +192,9 @@ export class UniversityController {
   getAllApplications(
     @CurrentSession() session: SessionData,
     @Param('universityID', ParseUUIDPipe) universityId: string,
+    @Body() dto: GetRoleFilterDto,
   ) {
-    return this.service.getAllApplications(session.user.id, universityId);
+    return this.service.getAllApplications(session.user.id, universityId, dto);
   }
 
   //Apply for univeristy role
