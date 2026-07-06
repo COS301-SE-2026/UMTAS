@@ -10,6 +10,7 @@ import {
   ApproveUsersRoleDto,
   ApprovedUserRoleResponse,
   GetRoleFilterDto,
+  GetRolesDto,
 } from './dto/university.dto';
 
 import {
@@ -188,6 +189,16 @@ export class UniversityController {
   @ApiOperation({
     summary: 'Get all applications for a specific university',
     operationId: 'getAllApplications',
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'Unauthorized',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Success',
+    type: GetRolesDto,
+    isArray: true,
   })
   getAllApplications(
     @CurrentSession() session: SessionData,
