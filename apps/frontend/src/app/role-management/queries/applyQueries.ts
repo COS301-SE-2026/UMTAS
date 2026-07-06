@@ -1,16 +1,19 @@
-import { queryOptions } from "@tanstack/react-query";
+import { mutationOptions, queryOptions } from "@tanstack/react-query";
 import {
   getAllApplicationsBuilder,
   getAllApplicationsPath,
   getAllApplicationsBody,
+  approveBuilder,
+  approveApplicationsBody,
 } from "./builder";
+import { getQueryClient } from "@/components/tanstack/getQueryClient";
 
-export function getAllUni(
-  path: getAllApplicationsPath,
-  body: getAllApplicationsBody,
+export function getAllApplicationsQ(
+  path?: getAllApplicationsPath,
+  body?: getAllApplicationsBody,
 ) {
   return queryOptions({
-    queryKey: ["role-applications", body.pending], // caches a pending and non pending
+    queryKey: ["role-applications", body?.pending], // caches a pending and non pending
     queryFn: async () => {
       const result = new getAllApplicationsBuilder().send({
         paths: path,
@@ -18,5 +21,22 @@ export function getAllUni(
       });
       return result;
     },
+  });
+}
+
+export function ApproveMutator() {
+  return mutationOptions({
+    mutationFn: async (body: approveApplicationsBody) => {
+      const builder = new approveBuilder();
+      return builder.send({
+        body: body,
+      });
+    },
+    onSuccess: () => {
+      getQueryClient().invalidateQueries({
+        queryKey: getAllApplicationsQ().queryKey,
+      });
+    },
+    onError: (err) => console.error("mutation failed", err),
   });
 }
