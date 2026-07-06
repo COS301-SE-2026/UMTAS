@@ -26,7 +26,7 @@ describe('QueueProducerService', () => {
     service = new QueueProducerService(pdfParseQueue, timetableSolveQueue);
   });
 
-  it('enqueues PDF parse payloads with the backend job id as BullMQ jobId', async () => {
+  it('enqueues PDF parse payloads without using the backend job id as BullMQ jobId', async () => {
     const payload: PdfParseJobData = {
       jobId: 'parse-1',
       fileKey: 'uploads/parse-1.pdf',
@@ -35,9 +35,7 @@ describe('QueueProducerService', () => {
 
     await service.enqueuePdfParseJob(payload);
 
-    expect(pdfParseAdd).toHaveBeenCalledWith(PDF_PARSE_JOB_NAME, payload, {
-      jobId: 'parse-1',
-    });
+    expect(pdfParseAdd).toHaveBeenCalledWith(PDF_PARSE_JOB_NAME, payload);
   });
 
   it('enqueues timetable solve payloads with the backend job id as BullMQ jobId', async () => {
