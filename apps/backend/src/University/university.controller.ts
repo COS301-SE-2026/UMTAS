@@ -36,7 +36,7 @@ export class UniversityController {
 
   //Create
   @Post()
-  @Roles('user')
+  @Roles('sys_admin')
   @ApiOperation({ summary: 'Create a University' })
   @ApiBody({ type: CreateUniversityDto })
   @ApiResponse({
@@ -58,7 +58,7 @@ export class UniversityController {
 
   //GetAll
   @Get()
-  @Roles('user', 'sys_admin')
+  @Roles('user')
   @ApiOperation({
     summary: 'Get all universities',
     operationId: 'getUniversities',
@@ -78,7 +78,7 @@ export class UniversityController {
 
   //GetById
   @Get(':universityId')
-  @Roles('student', 'uni_admin', 'sys_admin')
+  @Roles('user')
   @ApiOperation({
     summary: 'get a university by ID',
     operationId: 'getUniversityById',
@@ -105,7 +105,7 @@ export class UniversityController {
 
   //GetById
   @Get('/role/:universityId')
-  @Roles('student', 'uni_admin', 'sys_admin')
+  @Roles('user')
   @ApiOperation({
     summary: 'get a users role by universityID',
     operationId: 'getUserRoleByUniID',
@@ -159,7 +159,7 @@ export class UniversityController {
 
   //Delete
   @Delete(':universityId')
-  @Roles('sys_admin') //should uni_admin's be allowed to delete - feel like a sour lecturer will be an aass and just delete his uni
+  @Roles('uni_admin', 'sys_admin') //should uni_admin's be allowed to delete - feel like a sour lecturer will be an aass and just delete his uni
   @ApiOperation({
     summary: 'Delete university by university ID',
     operationId: 'deleteUniversity',
@@ -208,7 +208,7 @@ export class UniversityController {
 
   //Apply for univeristy role
   @Post('apply')
-  @Roles('student', 'uni_admin', 'sys_admin')
+  @Roles('user', 'uni_admin', 'sys_admin')
   @ApiOperation({
     summary: 'Apply for a role at a specific university',
     operationId: 'applyForUniverstiyRole',
@@ -245,7 +245,7 @@ export class UniversityController {
 
   //Approve a users role if PENDING
   @Post('approve')
-  @Roles('user', 'uni_admin', 'sys_admin')
+  @Roles('uni_admin', 'sys_admin')
   @ApiOperation({
     summary: 'Approve a users role for a university',
     operationId: 'approveUsersRole',

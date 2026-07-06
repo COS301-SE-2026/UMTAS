@@ -31,7 +31,7 @@ export class EventController {
   constructor(private readonly service: EventService) {}
 
   @Post()
-  @Roles('student', 'uni_admin', 'sys_admin')
+  @Roles('user', 'student', 'uni_admin')
   @ApiOperation({
     summary: 'Create an event',
     operationId: 'createEvent',
@@ -67,7 +67,7 @@ export class EventController {
 
   //get All
   @Get()
-  @Roles('student')
+  @Roles('user', 'student', 'uni_admin')
   @ApiOperation({
     summary: 'Get all events',
     operationId: 'getAllEvents',
@@ -96,7 +96,7 @@ export class EventController {
 
   //get by id
   @Get(':eventId')
-  @Roles('student')
+  @Roles('user', 'student')
   @ApiOperation({
     summary: 'Get event by ID',
     operationId: 'getEventById',
@@ -118,7 +118,7 @@ export class EventController {
 
   //update
   @Patch(':id')
-  @Roles('student')
+  @Roles('user', 'student')
   @ApiOperation({
     summary: 'Update an event',
     operationId: 'updateEvent',
@@ -164,7 +164,7 @@ export class EventController {
 
   //delete
   @Delete(':id')
-  @Roles('student')
+  @Roles('user', 'student')
   @ApiOperation({
     summary: 'Delete an event',
     operationId: 'deleteEvent',
