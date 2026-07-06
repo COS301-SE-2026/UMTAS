@@ -3,7 +3,12 @@ import { ConfigService } from '@nestjs/config';
 import { eq } from 'drizzle-orm';
 import { hashPassword } from 'better-auth/crypto';
 import { DatabaseService } from './database.service';
-import { usersTable, accountsTable } from '../entities/index';
+import {
+  usersTable,
+  accountsTable,
+  University,
+  UniversityRole,
+} from '../entities/index';
 import { AuthSeed } from './seeds/auth.seed';
 
 interface SeedTask {
@@ -25,9 +30,13 @@ export class DatabaseSeedService {
         name: 'default-system-admin',
         run: () => this.seedDefaultSystemAdmin(),
       },
+      // {
+      //   name: 'auth-seed',
+      //  run: () => this.seedAuthTestData(),
+      //},
       {
-        name: 'auth-seed',
-        run: () => this.seedAuthTestData(),
+        name: 'uni-seed',
+        run: () => this.seedUniVersity(),
       },
     ];
 
@@ -54,7 +63,11 @@ export class DatabaseSeedService {
       );
     }
 
-    this.seedTasks = selectedTasks;
+    if (selectedTasks.length > 0) {
+      console.log('Michael i disabled this since not all seeds ran ');
+    }
+
+    this.seedTasks = allSeedTasks;
   }
 
   async seed(): Promise<void> {
@@ -76,7 +89,6 @@ export class DatabaseSeedService {
   }
 
   private async seedDefaultSystemAdmin(): Promise<void> {
-    const seedUserId = '00000000-0000-0000-0000-000000000001'; //admin uuid
     const seedName =
       this.configService.get<string>('SEED_SYSTEM_ADMIN_NAME') ??
       'System Admin';
@@ -100,13 +112,17 @@ export class DatabaseSeedService {
 
     const hashedPassword = await hashPassword(seedPassword);
 
-    await this.dbService.db.insert(usersTable).values({
-      id: seedUserId,
-      name: seedName,
-      email: seedEmail,
-      role: 'sys_admin',
-      emailVerified: true,
-    });
+    const [resAdmin] = await this.dbService.db
+      .insert(usersTable)
+      .values({
+        name: seedName,
+        email: seedEmail,
+        role: 'sys_admin',
+        emailVerified: true,
+      })
+      .returning();
+
+    const seedUserId = resAdmin.id;
 
     await this.dbService.db.insert(accountsTable).values({
       id: `${seedUserId}-account`,
@@ -122,5 +138,31 @@ export class DatabaseSeedService {
   private async seedAuthTestData(): Promise<void> {
     const authSeed = new AuthSeed();
     await authSeed.run(this.dbService);
+  }
+
+  private async seedUniVersity(): Promise<void> {
+    const [uniSeed] = await this.dbService.db
+      .insert(University)
+      .values({
+        UniversityName: 'University of Pretoria',
+      })
+      .returning();
+
+    const [uniAdmin] = await this.dbService.db
+      .select()
+      .from(usersTable)
+      .where(
+        eq(
+          usersTable.name,
+          this.configService.get<string>('SEED_SYSTEM_ADMIN_NAME') ??
+            'System Admin',
+        ),
+      );
+
+    await this.dbService.db.insert(UniversityRole).values({
+      UniversityID: uniSeed.UniversityID,
+      UserID: uniAdmin.id,
+      role: 'UNIVERSITY_ADMIN',
+    });
   }
 }

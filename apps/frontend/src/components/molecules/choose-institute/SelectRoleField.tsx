@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/atoms/baseShadcn/select";
-import { uniDtoRoles } from "@/components/templates/choose-institute/queries/builders";
+import { uniDtoRoles } from "@/app/choose-institute/queries/builders";
 
 const roles: uniDtoRoles[] = ["LECTURER", "STUDENT", "UNIVERSITY_ADMIN"];
 
