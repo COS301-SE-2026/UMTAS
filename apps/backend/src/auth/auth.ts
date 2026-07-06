@@ -6,9 +6,10 @@ import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { admin } from 'better-auth/plugins/admin';
 import { redisStorage } from '@better-auth/redis-storage';
 import * as appSchema from '../db/schema';
-import { isRole } from './roles';
+import { isRole, UniRole } from './roles';
 import { getRedisClient } from '../redis/redis';
-import { ac, student, lecturer, uniAdmin, sysAdmin } from './permissions';
+import { ac, sysAdmin, user } from './permissions';
+import { SessionData } from './session.decorator';
 
 export type AppDatabase =
   | NodePgDatabase<typeof appSchema>
@@ -40,6 +41,52 @@ export interface AuthSession {
     impersonatedBy?: string | null;
     createdAt: Date;
     updatedAt: Date;
+  };
+  uniId?: string;
+  uniRole?: UniRole;
+}
+
+export function normalizeSession(raw: AuthSession): SessionData {
+  const toIso = (v: unknown): string | undefined => {
+    if (v == null) return undefined;
+    if (typeof v === 'string') return v;
+    if (typeof v === 'number') return new Date(v).toISOString();
+    if (v instanceof Date) return v.toISOString();
+    if (typeof v === 'object' && v !== null && 'toISOString' in v) {
+      const maybeDate = v as { toISOString?: unknown };
+      if (typeof maybeDate.toISOString === 'function') {
+        return (maybeDate.toISOString as () => string)();
+      }
+    }
+    return undefined;
+  };
+
+  return {
+    ...raw,
+    user: {
+      ...raw.user,
+      role: raw.user.role === 'sys_admin' ? 'sys_admin' : 'user',
+      image: raw.user.image ?? undefined,
+      banned: raw.user.banned ?? false,
+      banReason: raw.user.banReason ?? undefined,
+      banExpires: toIso(raw.user.banExpires),
+      createdAt: toIso(raw.user.createdAt) ?? new Date().toISOString(),
+      updatedAt: toIso(raw.user.updatedAt) ?? new Date().toISOString(),
+    },
+    session: (() => {
+      const s = raw.session ?? ({} as AuthSession['session']);
+      return {
+        ...s,
+        expiresAt: toIso(s.expiresAt) ?? new Date().toISOString(),
+        createdAt: toIso(s.createdAt) ?? new Date().toISOString(),
+        updatedAt: toIso(s.updatedAt) ?? new Date().toISOString(),
+        ipAddress: s.ipAddress ?? undefined,
+        userAgent: s.userAgent ?? undefined,
+        impersonatedBy: s.impersonatedBy ?? undefined,
+      };
+    })(),
+    uniId: raw.uniId,
+    uniRole: raw.uniRole,
   };
 }
 
@@ -329,14 +376,12 @@ export function createAuth(input: CreateAuthInput): AuthInstance {
     plugins: [
       admin({
         ac,
-        defaultRole: 'student',
+        defaultRole: 'user',
         adminRoles: ['sys_admin'],
         adminUserIds: systemAdminUserIds,
         roles: {
-          student,
-          lecturer,
-          uni_admin: uniAdmin,
           sys_admin: sysAdmin,
+          user: user,
         },
       }),
     ],

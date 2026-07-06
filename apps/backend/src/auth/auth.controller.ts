@@ -1,5 +1,6 @@
 import {
   All,
+  Body,
   Controller,
   Get,
   Logger,
@@ -33,10 +34,15 @@ import {
   LinkGoogleAccountDto,
   ResetPasswordDto,
   RevokeSessionDto,
+  SelectUniversityDto,
   SignInEmailDto,
   SignUpEmailDto,
   VerifyEmailDto,
 } from './auth.dto';
+import { Roles } from './roles.guard';
+import { CurrentSession } from './session.decorator';
+import type { SessionData } from './session.decorator';
+import type { Response } from 'express';
 
 const USER_EXAMPLE = {
   id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
@@ -674,6 +680,30 @@ export class AuthController {
     @Res() res: ServerResponse,
   ): Promise<void> {
     return this.handleRequest(req, res);
+  }
+
+  //Select a university
+  @Post('select-university')
+  @ApiCookieAuth('umtas-session')
+  @ApiOperation({ summary: 'Select current university' })
+  @ApiResponse({
+    status: 200,
+    description: 'Selected university session returned.',
+  })
+  @Roles('user', 'sys_admin')
+  async selectUniversity(
+    @CurrentSession() session: SessionData,
+    @Body() dto: SelectUniversityDto,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<SessionData> {
+    const selected = this.authService.selectUniversity(session, dto.uniId);
+
+    res.cookie('umtas-uni-id', dto.uniId, {
+      path: '/',
+      sameSite: 'lax',
+    });
+
+    return selected;
   }
 
   // ─── Catch-all for internal BetterAuth routes ─────────────────────────────────

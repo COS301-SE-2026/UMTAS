@@ -1,12 +1,20 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  OnModuleInit,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { eq } from 'drizzle-orm';
+import { and, eq, ne } from 'drizzle-orm';
 import { MailerService } from '../mail/mailer.service';
 import * as appSchema from '../db/schema';
 import { createRedisClient } from '../redis/redis';
 import type { AuthInstance } from './auth';
 import { DatabaseService } from '../db/database.service';
 import { createAuth } from './auth';
+
+import { UniRole } from './roles';
+import { SessionData } from './session.decorator';
 
 @Injectable()
 export class AuthService implements OnModuleInit {
@@ -140,4 +148,60 @@ export class AuthService implements OnModuleInit {
 
     return this.authInstance;
   }
+
+  async getUniversityRole(userId: string, uniId: string): Promise<UniRole> {
+    //check that uni exists
+    const [uni] = await this.databaseService.db
+      .select()
+      .from(appSchema.University)
+      .where(eq(appSchema.University.UniversityID, uniId))
+      .limit(1);
+
+    if (!uni)
+      throw new BadRequestException(`University[${uniId}] does not exist`);
+
+    const [roleRow] = await this.databaseService.db
+      .select()
+      .from(appSchema.UniversityRole)
+      .where(
+        and(
+          eq(appSchema.UniversityRole.UserID, userId),
+          eq(appSchema.UniversityRole.UniversityID, uniId),
+          ne(appSchema.UniversityRole.role, 'STUDENT_OWNED'),
+        ),
+      )
+      .limit(1);
+
+    if (!roleRow) {
+      return 'student';
+    }
+
+    switch (roleRow.role) {
+      case 'UNIVERSITY_ADMIN':
+        return 'uni_admin';
+      case 'UNIVERSITY_ADMIN_PENDING':
+        return 'uni_admin_pending';
+      case 'LECTURER':
+        return 'lecturer';
+      case 'LECTURER_PENDING':
+        return 'lecturer_pending';
+      case 'STUDENT':
+      default:
+        return 'student';
+    }
+  } //END_getUniversityRole
+
+  async selectUniversity(
+    session: SessionData,
+    uniId: string,
+  ): Promise<SessionData> {
+    if (!uniId) throw new BadRequestException(`Probleempie: uniId[${uniId}]`);
+    const uniRole = await this.getUniversityRole(session.user.id, uniId);
+
+    return {
+      ...session,
+      uniId,
+      uniRole,
+    };
+  } //END_selectUniversity
 }

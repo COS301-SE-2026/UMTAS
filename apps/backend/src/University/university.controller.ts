@@ -34,7 +34,7 @@ export class UniversityController {
 
   //Create
   @Post()
-  @Roles('uni_admin', 'sys_admin')
+  @Roles('user')
   @ApiOperation({ summary: 'Create a University' })
   @ApiBody({ type: CreateUniversityDto })
   @ApiResponse({
@@ -56,7 +56,7 @@ export class UniversityController {
 
   //GetAll
   @Get()
-  @Roles('student', 'uni_admin', 'sys_admin')
+  @Roles('user', 'sys_admin')
   @ApiOperation({
     summary: 'Get all universities',
     operationId: 'getUniversities',
@@ -218,7 +218,7 @@ export class UniversityController {
 
   //Approve a users role if PENDING
   @Post('approve')
-  @Roles('student', 'uni_admin', 'sys_admin')
+  @Roles('user', 'uni_admin', 'sys_admin')
   @ApiOperation({
     summary: 'Approve a users role for a university',
     operationId: 'approveUsersRole',

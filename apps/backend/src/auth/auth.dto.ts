@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsUUID } from 'class-validator';
 
 export class SignUpEmailDto {
   @ApiProperty({
@@ -8,7 +9,7 @@ export class SignUpEmailDto {
     default: 'system-admin@local.umtas',
     required: true,
   })
-  email: string;
+  email!: string;
 
   @ApiProperty({
     type: String,
@@ -19,7 +20,7 @@ export class SignUpEmailDto {
     maxLength: 128,
     required: true,
   })
-  password: string;
+  password!: string;
 
   @ApiProperty({
     type: String,
@@ -28,7 +29,7 @@ export class SignUpEmailDto {
     default: 'System Admin',
     required: true,
   })
-  name: string;
+  name!: string;
 }
 
 export class SignInEmailDto {
@@ -36,10 +37,10 @@ export class SignInEmailDto {
     example: 'system-admin@local.umtas',
     default: 'system-admin@local.umtas',
   })
-  email: string;
+  email!: string;
 
   @ApiProperty({ example: 'Admin@UMTAS2024!', default: 'Admin@UMTAS2024!' })
-  password: string;
+  password!: string;
 }
 
 export class RevokeSessionDto {
@@ -48,7 +49,7 @@ export class RevokeSessionDto {
     default: 'b2c3d4e5-f6a7-8901-bcde-f12345678901',
     description: 'ID of the session to terminate',
   })
-  sessionId: string;
+  sessionId!: string;
 }
 
 export class VerifyEmailDto {
@@ -57,13 +58,13 @@ export class VerifyEmailDto {
     default: 'abc123def456',
     description: 'Verification code from the email link',
   })
-  code: string;
+  code!: string;
 
   @ApiProperty({
     example: 'system-admin@local.umtas',
     default: 'system-admin@local.umtas',
   })
-  email: string;
+  email!: string;
 }
 
 export class ForgetPasswordDto {
@@ -71,7 +72,7 @@ export class ForgetPasswordDto {
     example: 'system-admin@local.umtas',
     default: 'system-admin@local.umtas',
   })
-  email: string;
+  email!: string;
 }
 
 export class ResetPasswordDto {
@@ -80,7 +81,7 @@ export class ResetPasswordDto {
     default: 'reset-token-from-email-link',
     description: 'Token from the password reset email',
   })
-  token: string;
+  token!: string;
 
   @ApiProperty({
     example: 'new-secure-password',
@@ -88,7 +89,7 @@ export class ResetPasswordDto {
     minLength: 8,
     maxLength: 128,
   })
-  newPassword: string;
+  newPassword!: string;
 }
 
 export class ChangePasswordDto {
@@ -96,7 +97,7 @@ export class ChangePasswordDto {
     example: 'current-password',
     default: 'current-password',
   })
-  currentPassword: string;
+  currentPassword!: string;
 
   @ApiProperty({
     example: 'new-secure-password',
@@ -104,7 +105,7 @@ export class ChangePasswordDto {
     minLength: 8,
     maxLength: 128,
   })
-  newPassword: string;
+  newPassword!: string;
 }
 
 export class LinkGoogleAccountDto {
@@ -113,14 +114,14 @@ export class LinkGoogleAccountDto {
     default: '4/0AX4XfWj...',
     description: 'Authorization code from the Google OAuth flow',
   })
-  code: string;
+  code!: string;
 
   @ApiProperty({
     example: 'state-string',
     default: 'state-string',
     description: 'OAuth state parameter',
   })
-  state: string;
+  state!: string;
 }
 
 export class AdminCreateUserDto {
@@ -128,7 +129,7 @@ export class AdminCreateUserDto {
     example: 'system-admin@local.umtas',
     default: 'system-admin@local.umtas',
   })
-  email: string;
+  email!: string;
 
   @ApiProperty({
     example: 'Admin@UMTAS2024!',
@@ -136,17 +137,17 @@ export class AdminCreateUserDto {
     minLength: 8,
     maxLength: 128,
   })
-  password: string;
+  password!: string;
 
   @ApiProperty({ example: 'System Admin', default: 'System Admin' })
-  name: string;
+  name?: string;
 
   @ApiProperty({
-    enum: ['student', 'uni_admin', 'sys_admin'],
-    example: 'student',
-    default: 'student',
+    enum: ['user', 'sys_admin'],
+    example: 'user',
+    default: 'user',
   })
-  role: 'student' | 'uni_admin' | 'sys_admin';
+  role?: 'user' | 'sys_admin';
 }
 
 export class AdminBanUserDto {
@@ -155,13 +156,13 @@ export class AdminBanUserDto {
     default: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
     description: 'UUID of the user to ban',
   })
-  userId: string;
+  userId!: string;
 
   @ApiProperty({
     example: 'Violation of terms of service',
     default: 'Violation of terms of service',
   })
-  reason: string;
+  reason!: string;
 
   @ApiPropertyOptional({
     example: '2026-02-01T00:00:00Z',
@@ -177,7 +178,7 @@ export class AdminUpdateUserDto {
     default: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
     description: 'UUID of the user to update',
   })
-  userId: string;
+  userId!: string;
 
   @ApiPropertyOptional({ example: 'New Name' })
   name?: string;
@@ -198,5 +199,14 @@ export class AdminImpersonateUserDto {
     default: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
     description: 'UUID of the user to impersonate',
   })
-  userId: string;
+  userId!: string;
+}
+
+export class SelectUniversityDto {
+  @ApiProperty({
+    example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+    description: 'University ID selected by the user',
+  })
+  @IsUUID()
+  uniId!: string;
 }

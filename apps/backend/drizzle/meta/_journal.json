@@ -29,6 +29,20 @@
       "when": 1782998744029,
       "tag": "0003_HASH_FIELD_ADDED_TO_MODULE_GROUPING",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1783346843378,
+      "tag": "0004_sad_supreme_intelligence",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1783349674671,
+      "tag": "0005_violet_vulcan",
+      "breakpoints": true
     }
   ]
 }
