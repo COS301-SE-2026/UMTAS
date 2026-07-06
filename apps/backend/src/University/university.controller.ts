@@ -179,6 +179,19 @@ export class UniversityController {
     return this.service.delete(universityId);
   }
 
+  @Get('applications/:universityID')
+  @Roles('uni_admin', 'sys_admin')
+  @ApiOperation({
+    summary: 'Get all applications for a specific university',
+    operationId: 'getAllApplications',
+  })
+  getAllApplications(
+    @CurrentSession() session: SessionData,
+    @Param('universityID', ParseUUIDPipe) universityId: string,
+  ) {
+    return this.service.getAllApplications(session.user.id, universityId);
+  }
+
   //Apply for univeristy role
   @Post('apply')
   @Roles('student', 'uni_admin', 'sys_admin')
