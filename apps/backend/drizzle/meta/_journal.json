@@ -36,6 +36,13 @@
       "when": 1783084619553,
       "tag": "0004_PDF_PARSE_GROUPING_AND_VALIDATION",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1783428000000,
+      "tag": "0005_add_modules_module_code_unique",
+      "breakpoints": true
     }
   ]
 }
