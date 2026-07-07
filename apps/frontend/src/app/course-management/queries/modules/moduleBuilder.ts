@@ -4,7 +4,8 @@ export type moduleDTO = components["schemas"]["ModuleSingleResponseDto"];
 export type getAllModules = paths["/modules"]["get"];
 
 export type getAllModulesQueries = getAllModules["parameters"]["query"];
-export type getAllModulesRes = getAllModules["responses"]["200"];
+export type getAllModulesRes =
+  getAllModules["responses"]["200"]["content"]["application/json"]["modules"];
 
 export async function fetchAllCoursesRequest(queries: getAllModulesQueries) {
   const baseUrl =
