@@ -1,0 +1,22 @@
+apps/backend/src/auth/auth.service.ts
+  h_84e82529bd05a5 2,5,8,16-18,151-206
+apps/backend/src/University/university.controller.ts
+  h_84e82529bd05a5 37,59,221
+apps/backend/src/auth/auth.dto.ts
+  h_84e82529bd05a5 2,12,23,32,40,43,52,61,67,75,84,92,100,108,117,124,132,140,143,146-148,150,159,165,181,202-208,210-211
+apps/backend/src/auth/auth.controller.ts
+  h_84e82529bd05a5 45,685-696
+apps/backend/src/auth/auth.guard.ts
+  h_84e82529bd05a5 70,73-81,83,86,89,94,97
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "46c50e4b06401df13438252965bbe7a30d12a22f",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}
