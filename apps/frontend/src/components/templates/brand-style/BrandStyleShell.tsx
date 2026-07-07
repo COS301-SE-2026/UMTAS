@@ -16,7 +16,7 @@ export default function BrandStyleShell() {
           <a className="brand-nav-link">Motion Tokens</a>
           <a className="brand-nav-link">Icons</a>
           <a className="brand-nav-link">Components</a>
-          <a className="hover: cursor-pointer block">Mode switching</a>
+          <a className="brand-nav-link">Mode switching</a>
           <a className="brand-nav-link">Accessibility</a>
           <a className="brand-nav-link">Responsiveness</a>
         </div>
