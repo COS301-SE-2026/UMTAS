@@ -1,0 +1,12 @@
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.5",
+  "base_commit_sha": "06f414cf8198754ef2b195f02fe34ae2cb1f7f37",
+  "prompts": {},
+  "humans": {
+    "h_3359569cacef0e": {
+      "author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}
