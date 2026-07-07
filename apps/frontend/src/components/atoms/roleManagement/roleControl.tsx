@@ -26,6 +26,7 @@ function PendingElement({ row }: pageProps) {
           approveMut.mutate({
             UniversityID: row.UniversityID,
             userId: row.UserID,
+            isApproved: true,
           })
         }
       >
@@ -36,6 +37,7 @@ function PendingElement({ row }: pageProps) {
           approveMut.mutate({
             UniversityID: row.UniversityID,
             userId: row.UserID,
+            isApproved: false,
           })
         }
       >

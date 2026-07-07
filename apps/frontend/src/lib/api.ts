@@ -1205,6 +1205,7 @@ export interface components {
         | "LECTURER"
         | "LECTURER_PENDING"
         | "SYSTEM_ADMIN"
+        | "REJECTED"
         | null;
     };
     UniversityDto: {
@@ -1232,6 +1233,7 @@ export interface components {
         | "LECTURER"
         | "LECTURER_PENDING"
         | "SYSTEM_ADMIN"
+        | "REJECTED"
         | null;
     };
     UniversityListResponseDto: {
@@ -1291,6 +1293,7 @@ export interface components {
         | "LECTURER"
         | "LECTURER_PENDING"
         | "SYSTEM_ADMIN"
+        | "REJECTED"
         | null;
     };
     ApplyForUniRoleDto: {
@@ -1313,6 +1316,7 @@ export interface components {
         | "LECTURER"
         | "LECTURER_PENDING"
         | "SYSTEM_ADMIN"
+        | "REJECTED"
         | null;
     };
     ApproveUsersRoleDto: {
@@ -1327,6 +1331,23 @@ export interface components {
        * @example 00000000-0000-0000-0000-000000000000
        */
       userId: string;
+      /** @description will be accecpted on true, rejected on false */
+      isApproved: boolean;
+      /**
+       * @description role will be set to this if provided unless null
+       * @example LECTURER_PENDING
+       * @enum {string|null}
+       */
+      provdedRole?:
+        | "STUDENT"
+        | "STUDENT_OWNED"
+        | "UNIVERSITY_ADMIN"
+        | "UNIVERSITY_ADMIN_PENDING"
+        | "LECTURER"
+        | "LECTURER_PENDING"
+        | "SYSTEM_ADMIN"
+        | "REJECTED"
+        | null;
     };
     ApprovedUserRoleResponse: {
       /**

@@ -286,17 +286,26 @@ export class UniversityService {
       );
 
     let role: RoleTypeType;
-    switch (usersRole.role) {
-      case 'UNIVERSITY_ADMIN_PENDING':
-        role = 'UNIVERSITY_ADMIN';
-        break;
-      case 'LECTURER_PENDING':
-        role = 'LECTURER';
-        break;
-      default:
-        throw new BadRequestException(
-          `User[${dto.userId}] doesn't have a role to approve`,
-        );
+    if (dto.provdedRole === undefined || dto.provdedRole == null) {
+      switch (usersRole.role) {
+        case 'UNIVERSITY_ADMIN_PENDING':
+          role = 'UNIVERSITY_ADMIN';
+          break;
+        case 'LECTURER_PENDING':
+          role = 'LECTURER';
+          break;
+        default:
+          throw new BadRequestException(
+            `User[${dto.userId}] doesn't have a role to approve`,
+          );
+      }
+    } else {
+      role = dto.provdedRole;
+    }
+
+    // will have a frontend notification to show this off
+    if (!dto.isApproved) {
+      role = 'REJECTED';
     }
 
     //update role

@@ -15,6 +15,7 @@ export const RoleType = pgEnum('RoleType', [
   'LECTURER',
   'LECTURER_PENDING',
   'SYSTEM_ADMIN',
+  'REJECTED',
 ]); // student owned is == uni admin maybe just to be precise?
 
 export type RoleTypeType = (typeof RoleType.enumValues)[number];
