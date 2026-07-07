@@ -51,6 +51,12 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+@layer utilities {
+  .brand-nav-link {
+    @apply block text-sm text-[var(--text-secondary)] transition-all duration-[var(--duration-fast)] cursor-pointer hover:font-bold hover:text-[var(--text-primary)];
+  }
+}
+
 :root {
   --bg-base: #ffffff;
   --bg-surface: #f4f4f5;
