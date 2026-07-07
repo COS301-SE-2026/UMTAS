@@ -1,9 +1,9 @@
 #ifndef CP_H
 #define CP_H
 
-#include <vector>
-
 #include "../data/API/API-data.h"
+
+#include <vector>
 
 // CPModelBuilder, BoolVar, LinearExpr
 #include "ortools/sat/cp_model.h"
@@ -76,7 +76,7 @@ class CP_SOLVER {
         std::vector<EventGA> solve();
 
         //Run CP-solver in mode to return all possible feasible solutions
-        std::vector<std::vector<EventGA>> solveAll();
+        // std::vector<std::vector<EventGA>> solveAll();
 
         //Takes in bool vector and returns vector of events chosen as active
         std::vector<EventGA> applySolution(const std::vector<bool>& boolVec);

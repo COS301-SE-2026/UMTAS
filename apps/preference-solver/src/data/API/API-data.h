@@ -20,4 +20,4 @@ struct API_DATA {
   static const string TARGET_TIME_KEY;
 };
 
-#endif
+#endif//END_API_DATA_H

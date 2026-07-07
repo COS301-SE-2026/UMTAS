@@ -25,7 +25,8 @@ int main() {
     CP_SOLVER engine(data);
     std::vector<EventGA> result = engine.solve();
 
-    // FC.outputJson(result.returnJson());
+    json output = EventGA::returnJsonVector(result);
+    FC.outputJson(output);
   } else {
     //Run GA solver
 

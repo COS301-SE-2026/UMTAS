@@ -19,7 +19,8 @@ struct EventGA {
   bool is_active;
   EventGA(json eventsJson);
   EventGA() {};
-  json returnJson();
+  json returnJson() const;
+  static json returnJsonVector(const std::vector<EventGA>& events);
 
   static std::vector<EventGA> initEvents(const json &eventReq);
   static const string GROUPING_KEY;
@@ -32,5 +33,4 @@ struct EventGA {
   // automatically sets is active to false
 };
   std::string minutesToTime(int minutesAfterMidnight);
-
 #endif

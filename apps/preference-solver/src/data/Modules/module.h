@@ -25,4 +25,4 @@ struct ModuleGA {
   void handleOccurences(const json& types);
 };
 
-#ifndef
+#endif

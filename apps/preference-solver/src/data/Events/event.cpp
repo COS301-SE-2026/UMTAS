@@ -81,7 +81,7 @@ int timeHelper(const string &time) {
   return hours * 60 + minutes;
 }
 
-json EventGA::returnJson() {
+json EventGA::returnJson() const{
   json jsonObj;
   return {{DAY_KEY, this->eventDay},
           {EVENT_ID, this->eventID},
@@ -90,6 +90,15 @@ json EventGA::returnJson() {
           {MODULE_CODE, this->moduleCode},
           {EVENT_TYPE, this->eventType}};
 }
+
+json EventGA::returnJsonVector(const std::vector<EventGA>& events) {
+
+  json arr = json::array();
+  for (const auto& e : events) {
+      arr.push_back(e.returnJson());
+  }
+  return arr;
+};
 
 std::string minutesToTime(int minutesAfterMidnight) {
   int hours = minutesAfterMidnight / 60;

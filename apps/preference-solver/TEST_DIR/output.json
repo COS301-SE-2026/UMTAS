@@ -1,0 +1,130 @@
+[
+  {
+    "EventType": "P1",
+    "day": "Wednesday",
+    "endTime": "09:20",
+    "eventID": "ID",
+    "moduleCode": "COS301",
+    "startTime": "07:30"
+  },
+  {
+    "EventType": "P2",
+    "day": "Friday",
+    "endTime": "08:20",
+    "eventID": "ID",
+    "moduleCode": "COS301",
+    "startTime": "07:30"
+  },
+  {
+    "EventType": "L1",
+    "day": "Monday",
+    "endTime": "12:20",
+    "eventID": "ID",
+    "moduleCode": "COS301",
+    "startTime": "11:30"
+  },
+  {
+    "EventType": "L2",
+    "day": "Tuesday",
+    "endTime": "14:20",
+    "eventID": "ID",
+    "moduleCode": "COS301",
+    "startTime": "13:30"
+  },
+  {
+    "EventType": "L1",
+    "day": "Tuesday",
+    "endTime": "11:20",
+    "eventID": "ID",
+    "moduleCode": "COS314",
+    "startTime": "10:30"
+  },
+  {
+    "EventType": "L2",
+    "day": "Wednesday",
+    "endTime": "11:20",
+    "eventID": "ID",
+    "moduleCode": "COS314",
+    "startTime": "10:30"
+  },
+  {
+    "EventType": "P1",
+    "day": "Thursday",
+    "endTime": "17:20",
+    "eventID": "ID",
+    "moduleCode": "COS314",
+    "startTime": "14:30"
+  },
+  {
+    "EventType": "L1",
+    "day": "Monday",
+    "endTime": "13:20",
+    "eventID": "ID",
+    "moduleCode": "COS332",
+    "startTime": "12:30"
+  },
+  {
+    "EventType": "L2",
+    "day": "Wednesday",
+    "endTime": "15:20",
+    "eventID": "ID",
+    "moduleCode": "COS332",
+    "startTime": "14:30"
+  },
+  {
+    "EventType": "P1",
+    "day": "Tuesday",
+    "endTime": "17:20",
+    "eventID": "ID",
+    "moduleCode": "COS332",
+    "startTime": "14:30"
+  },
+  {
+    "EventType": "L1",
+    "day": "Tuesday",
+    "endTime": "09:20",
+    "eventID": "ID",
+    "moduleCode": "COS333",
+    "startTime": "08:30"
+  },
+  {
+    "EventType": "L2",
+    "day": "Friday",
+    "endTime": "12:20",
+    "eventID": "ID",
+    "moduleCode": "COS333",
+    "startTime": "11:30"
+  },
+  {
+    "EventType": "P1",
+    "day": "Friday",
+    "endTime": "17:20",
+    "eventID": "ID",
+    "moduleCode": "COS333",
+    "startTime": "14:30"
+  },
+  {
+    "EventType": "L1",
+    "day": "Monday",
+    "endTime": "11:20",
+    "eventID": "ID",
+    "moduleCode": "COS344",
+    "startTime": "10:30"
+  },
+  {
+    "EventType": "L2",
+    "day": "Thursday",
+    "endTime": "10:20",
+    "eventID": "ID",
+    "moduleCode": "COS344",
+    "startTime": "09:30"
+  },
+  {
+    "EventType": "P1",
+    "day": "Monday",
+    "endTime": "17:20",
+    "eventID": "ID",
+    "moduleCode": "COS344",
+    "startTime": "14:30"
+  }
+]
