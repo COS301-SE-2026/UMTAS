@@ -1,4 +1,3 @@
-import { find, isString } from 'lodash';
 import type { JobsOptions, QueueOptions } from 'bullmq';
 import type { RedisOptions } from 'ioredis';
 import { z } from 'zod';
@@ -148,8 +147,14 @@ function readFirstConfiguredValue(
   keys: string[],
   fallback: string,
 ): string {
-  const values = keys.map((key) => readEnv(key));
-  return find(values, isString) ?? fallback;
+  for (const key of keys) {
+    const value = readEnv(key);
+    if (typeof value === 'string') {
+      return value;
+    }
+  }
+
+  return fallback;
 }
 
 function readPositiveInt(value: string | undefined, fallback: number): number {
