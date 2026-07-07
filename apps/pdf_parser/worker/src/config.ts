@@ -66,7 +66,16 @@ export function buildPdfParseCallbackUrl(
   baseUrl: string,
   jobId: string,
 ): string {
-  return `${baseUrl.replace(/\/+$/, "")}/${encodeURIComponent(jobId)}/callback`;
+  return `${trimTrailingSlashes(baseUrl)}/${encodeURIComponent(jobId)}/callback`;
+}
+
+function trimTrailingSlashes(value: string): string {
+  let end = value.length;
+  while (end > 0 && value[end - 1] === "/") {
+    end -= 1;
+  }
+
+  return value.slice(0, end);
 }
 
 export function validatePdfParseWorkerConfig(
@@ -113,7 +122,34 @@ export function readArgs(
     return result.data;
   }
 
-  return trimmed.split(/\s+/);
+  return splitOnWhitespace(trimmed);
+}
+
+function splitOnWhitespace(value: string): string[] {
+  const args: string[] = [];
+  let current = "";
+
+  for (const character of value) {
+    if (isWhitespace(character)) {
+      if (current) {
+        args.push(current);
+        current = "";
+      }
+      continue;
+    }
+
+    current += character;
+  }
+
+  if (current) {
+    args.push(current);
+  }
+
+  return args;
+}
+
+function isWhitespace(character: string): boolean {
+  return character.trim() === "";
 }
 
 function buildPdfParseS3Config(readEnv: EnvReader): PdfParseS3Config {

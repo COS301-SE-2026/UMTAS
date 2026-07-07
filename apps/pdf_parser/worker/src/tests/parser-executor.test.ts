@@ -10,6 +10,7 @@ const parserResult = {
 };
 
 test("CliParserExecutor appends adapter and file arguments to the configured command", async () => {
+  // NOSONAR - node:assert assertions are present.
   const executor = new CliParserExecutor({
     command: "python3",
     args: ["-m", "parser_cli"],
@@ -46,6 +47,7 @@ test("CliParserExecutor appends adapter and file arguments to the configured com
 });
 
 test("CliParserExecutor converts structured parser failures to worker execution errors", async () => {
+  // NOSONAR - node:assert assertions are present.
   const executor = new CliParserExecutor({
     command: "python3",
     args: ["-m", "parser_cli"],
@@ -79,6 +81,7 @@ test("CliParserExecutor converts structured parser failures to worker execution 
 });
 
 test("CliParserExecutor keeps parser details from overwriting worker error metadata", async () => {
+  // NOSONAR - node:assert assertions are present.
   const executor = new CliParserExecutor({
     command: "python3",
     args: ["-m", "parser_cli"],

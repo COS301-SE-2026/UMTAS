@@ -1,12 +1,11 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+import test, { type TestContext } from "node:test";
 import {
   processWorkerJob,
   WorkerExecutionError,
   type WorkerCallbackPayload,
 } from "../index.js";
 
-test("processWorkerJob cleans temp files after an acknowledged success callback", async () => {
+test("processWorkerJob cleans temp files after an acknowledged success callback", async (t: TestContext) => {
   let cleanupCalled = false;
   let callbackSawTempBeforeCleanup = false;
   const payload: WorkerCallbackPayload = {
@@ -27,34 +26,34 @@ test("processWorkerJob cleans temp files after an acknowledged success callback"
       callbackUrl: "http://backend.test/callback",
       createTempDir: async () => "/tmp/umtas-parse-1",
       cleanupTempDir: async (tempDir) => {
-        assert.equal(tempDir, "/tmp/umtas-parse-1");
+        t.assert.equal(tempDir, "/tmp/umtas-parse-1");
         cleanupCalled = true;
       },
       callbackClient: {
         post: async (_url, postedPayload) => {
-          assert.deepEqual(postedPayload, payload);
+          t.assert.deepEqual(postedPayload, payload);
           callbackSawTempBeforeCleanup = !cleanupCalled;
         },
       },
       processor: {
         process: async (context) => {
-          assert.equal(context.tempDir, "/tmp/umtas-parse-1");
+          t.assert.equal(context.tempDir, "/tmp/umtas-parse-1");
           return payload;
         },
       },
     },
   );
 
-  assert.deepEqual(result, payload);
-  assert.equal(callbackSawTempBeforeCleanup, true);
-  assert.equal(cleanupCalled, true);
+  t.assert.deepEqual(result, payload);
+  t.assert.equal(callbackSawTempBeforeCleanup, true);
+  t.assert.equal(cleanupCalled, true);
 });
 
-test("processWorkerJob sends final failure callbacks and preserves failed temp dirs when configured", async () => {
+test("processWorkerJob sends final failure callbacks and preserves failed temp dirs when configured", async (t: TestContext) => {
   let cleanupCalled = false;
   let failureCallback: WorkerCallbackPayload | undefined;
 
-  await assert.rejects(
+  await t.assert.rejects(
     () =>
       processWorkerJob(
         {
@@ -88,8 +87,8 @@ test("processWorkerJob sends final failure callbacks and preserves failed temp d
     /Parser failed/,
   );
 
-  assert.equal(cleanupCalled, false);
-  assert.deepEqual(failureCallback, {
+  t.assert.equal(cleanupCalled, false);
+  t.assert.deepEqual(failureCallback, {
     status: "failed",
     error: {
       code: "PARSER_FAILED",
@@ -99,14 +98,14 @@ test("processWorkerJob sends final failure callbacks and preserves failed temp d
   });
 });
 
-test("processWorkerJob does not send callback delivery failures before final attempt", async () => {
+test("processWorkerJob does not send callback delivery failures before final attempt", async (t: TestContext) => {
   const postedPayloads: WorkerCallbackPayload[] = [];
   const payload: WorkerCallbackPayload = {
     status: "completed",
     result: { parsed: true },
   };
 
-  await assert.rejects(
+  await t.assert.rejects(
     () =>
       processWorkerJob(
         {
@@ -135,17 +134,17 @@ test("processWorkerJob does not send callback delivery failures before final att
     /backend unavailable/,
   );
 
-  assert.deepEqual(postedPayloads, [payload]);
+  t.assert.deepEqual(postedPayloads, [payload]);
 });
 
-test("processWorkerJob sends callback delivery failure on final success callback failure", async () => {
+test("processWorkerJob sends callback delivery failure on final success callback failure", async (t: TestContext) => {
   const postedPayloads: WorkerCallbackPayload[] = [];
   const payload: WorkerCallbackPayload = {
     status: "completed",
     result: { parsed: true },
   };
 
-  await assert.rejects(
+  await t.assert.rejects(
     () =>
       processWorkerJob(
         {
@@ -176,7 +175,7 @@ test("processWorkerJob sends callback delivery failure on final success callback
     /backend rejected success callback/,
   );
 
-  assert.deepEqual(postedPayloads, [
+  t.assert.deepEqual(postedPayloads, [
     payload,
     {
       status: "failed",

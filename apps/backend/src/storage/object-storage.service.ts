@@ -119,15 +119,15 @@ function isMissingBucketError(error: unknown): boolean {
   return (
     errorDetails.$metadata?.httpStatusCode === 404 ||
     (typeof errorDetails.name === 'string' &&
-      MISSING_BUCKET_ERROR_NAMES.includes(errorDetails.name))
+      MISSING_BUCKET_ERROR_NAMES.has(errorDetails.name))
   );
 }
 
-const MISSING_BUCKET_ERROR_NAMES = [
+const MISSING_BUCKET_ERROR_NAMES = new Set([
   'NotFound',
   'NoSuchBucket',
   'NotFoundError',
-];
+]);
 
 function isObject(value: unknown): value is object {
   return typeof value === 'object' && value !== null;

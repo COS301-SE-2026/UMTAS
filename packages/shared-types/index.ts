@@ -100,8 +100,8 @@ export interface SolverCallbackPayload {
   error?: WorkerCallbackError;
 }
 
-export const PDF_STREAM_FINGERPRINT_ALGORITHM_VERSION: "pdf-stream-payload-sha256-v1" =
-  "pdf-stream-payload-sha256-v1";
+export const PDF_STREAM_FINGERPRINT_ALGORITHM_VERSION =
+  "pdf-stream-payload-sha256-v1" as const;
 
 export type PdfStreamFingerprintAlgorithmVersion =
   typeof PDF_STREAM_FINGERPRINT_ALGORITHM_VERSION;
@@ -203,7 +203,10 @@ function indexOfPdfKeyword(
   fromIndex: number,
   options: { requireLineEndingAfter?: boolean } = {},
 ): number {
-  const firstByte = needle.charCodeAt(0);
+  const firstByte = needle.codePointAt(0);
+  if (firstByte === undefined) {
+    return -1;
+  }
   const maxStart = bytes.length - needle.length;
 
   for (let index = fromIndex; index <= maxStart; index += 1) {
@@ -213,7 +216,7 @@ function indexOfPdfKeyword(
 
     let matches = true;
     for (let needleIndex = 1; needleIndex < needle.length; needleIndex += 1) {
-      if (bytes[index + needleIndex] !== needle.charCodeAt(needleIndex)) {
+      if (bytes[index + needleIndex] !== needle.codePointAt(needleIndex)) {
         matches = false;
         break;
       }
@@ -406,7 +409,7 @@ function matchesPdfKeywordAt(
   }
 
   for (let keywordIndex = 0; keywordIndex < keyword.length; keywordIndex += 1) {
-    if (bytes[index + keywordIndex] !== keyword.charCodeAt(keywordIndex)) {
+    if (bytes[index + keywordIndex] !== keyword.codePointAt(keywordIndex)) {
       return false;
     }
   }
@@ -419,7 +422,10 @@ function indexOfAsciiSequence(
   needle: string,
   fromIndex: number,
 ): number {
-  const firstByte = needle.charCodeAt(0);
+  const firstByte = needle.codePointAt(0);
+  if (firstByte === undefined) {
+    return -1;
+  }
   const maxStart = bytes.length - needle.length;
 
   for (let index = fromIndex; index <= maxStart; index += 1) {
@@ -429,7 +435,7 @@ function indexOfAsciiSequence(
 
     let matches = true;
     for (let needleIndex = 1; needleIndex < needle.length; needleIndex += 1) {
-      if (bytes[index + needleIndex] !== needle.charCodeAt(needleIndex)) {
+      if (bytes[index + needleIndex] !== needle.codePointAt(needleIndex)) {
         matches = false;
         break;
       }

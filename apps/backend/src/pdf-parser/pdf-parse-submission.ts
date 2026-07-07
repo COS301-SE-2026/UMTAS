@@ -202,11 +202,52 @@ function toUploadResponse(
 }
 
 function buildFileKey(jobId: string, originalName: string): string {
-  const safeName = originalName
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9.-]+/g, '-')
-    .replace(/^-+|-+$/g, '');
+  const dashedName = toDashedFileName(originalName.trim().toLowerCase());
+  const safeName = trimBoundaryDashes(dashedName);
 
   return `uploads/pdf-parser/${jobId}/${safeName || 'input.pdf'}`;
+}
+
+function toDashedFileName(value: string): string {
+  let output = '';
+  let lastWasDash = false;
+
+  for (const character of value) {
+    if (isSafeFileNameCharacter(character)) {
+      output += character;
+      lastWasDash = false;
+      continue;
+    }
+
+    if (!lastWasDash) {
+      output += '-';
+      lastWasDash = true;
+    }
+  }
+
+  return output;
+}
+
+function isSafeFileNameCharacter(character: string): boolean {
+  return (
+    (character >= 'a' && character <= 'z') ||
+    (character >= '0' && character <= '9') ||
+    character === '.' ||
+    character === '-'
+  );
+}
+
+function trimBoundaryDashes(value: string): string {
+  let start = 0;
+  let end = value.length;
+
+  while (start < end && value[start] === '-') {
+    start += 1;
+  }
+
+  while (end > start && value[end - 1] === '-') {
+    end -= 1;
+  }
+
+  return value.slice(start, end);
 }

@@ -1,5 +1,6 @@
 import {
   boolean,
+  jsonb,
   pgTable,
   text,
   uuid,
@@ -8,7 +9,6 @@ import {
   uniqueIndex,
 } from 'drizzle-orm/pg-core';
 import { usersTable } from '../auth';
-import { jsonb } from 'drizzle-orm/pg-core';
 
 export const modules = pgTable(
   'Modules',

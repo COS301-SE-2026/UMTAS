@@ -156,11 +156,9 @@ export class ParserResultImporter {
       .from(GroupModules)
       .where(eq(GroupModules.GroupID, groupId));
 
-    const existingModuleIds: string[] = [];
-    for (const row of rows) {
-      existingModuleIds.push(row.moduleId);
-    }
-    existingModuleIds.sort();
+    const existingModuleIds = rows
+      .map((row) => row.moduleId)
+      .sort(compareStrings);
 
     if (!sameStringList(existingModuleIds, sortedModuleIds)) {
       throw new ConflictException(
@@ -171,20 +169,11 @@ export class ParserResultImporter {
 }
 
 function uniqueSortedValues(values: string[]): string[] {
-  const seen = new Set<string>();
-  const uniqueValues: string[] = [];
+  return Array.from(new Set(values)).sort(compareStrings);
+}
 
-  for (const value of values) {
-    if (seen.has(value)) {
-      continue;
-    }
-
-    seen.add(value);
-    uniqueValues.push(value);
-  }
-
-  uniqueValues.sort();
-  return uniqueValues;
+function compareStrings(left: string, right: string): number {
+  return left.localeCompare(right);
 }
 
 function sameStringList(left: string[], right: string[]): boolean {

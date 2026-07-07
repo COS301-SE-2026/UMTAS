@@ -1,20 +1,19 @@
-import assert from "node:assert/strict";
-import test from "node:test";
+import test, { type TestContext } from "node:test";
 import { parseCliJson, runCli } from "../run-cli.js";
 
-test("runCli captures stdout and stderr without rejecting on exit failure", async () => {
+test("runCli captures stdout and stderr without rejecting on exit failure", async (t: TestContext) => {
   const result = await runCli(process.execPath, [
     "-e",
     'process.stdout.write("out\\n"); process.stderr.write("err\\n"); process.exit(7);',
   ]);
 
-  assert.equal(result.exitCode, 7);
-  assert.equal(result.stdout, "out\n");
-  assert.equal(result.stderr, "err\n");
-  assert.equal(result.timedOut, false);
+  t.assert.equal(result.exitCode, 7);
+  t.assert.equal(result.stdout, "out\n");
+  t.assert.equal(result.stderr, "err\n");
+  t.assert.equal(result.timedOut, false);
 });
 
-test("runCli kills a process that exceeds its timeout", async () => {
+test("runCli kills a process that exceeds its timeout", async (t: TestContext) => {
   const startedAt = Date.now();
 
   const result = await runCli(
@@ -23,12 +22,12 @@ test("runCli kills a process that exceeds its timeout", async () => {
     { timeoutMs: 50 },
   );
 
-  assert.equal(result.timedOut, true);
-  assert.notEqual(result.exitCode, 0);
-  assert.ok(Date.now() - startedAt < 900);
+  t.assert.equal(result.timedOut, true);
+  t.assert.notEqual(result.exitCode, 0);
+  t.assert.ok(Date.now() - startedAt < 900);
 });
 
-test("runCli treats an aborted process as timed out", async () => {
+test("runCli treats an aborted process as timed out", async (t: TestContext) => {
   const controller = new AbortController();
   setTimeout(() => controller.abort(), 50);
 
@@ -38,18 +37,18 @@ test("runCli treats an aborted process as timed out", async () => {
     { abortSignal: controller.signal },
   );
 
-  assert.equal(result.timedOut, true);
-  assert.notEqual(result.exitCode, 0);
+  t.assert.equal(result.timedOut, true);
+  t.assert.notEqual(result.exitCode, 0);
 });
 
-test("runCli rejects when the command cannot be spawned", async () => {
-  await assert.rejects(
+test("runCli rejects when the command cannot be spawned", async (t: TestContext) => {
+  await t.assert.rejects(
     runCli("definitely-not-a-real-umtas-command", []),
     /ENOENT/,
   );
 });
 
-test("parseCliJson parses stdout as JSON", () => {
+test("parseCliJson parses stdout as JSON", (t: TestContext) => {
   const parsed = parseCliJson<{ ok: boolean }>({
     exitCode: 0,
     stdout: '{"ok":true}',
@@ -57,11 +56,11 @@ test("parseCliJson parses stdout as JSON", () => {
     timedOut: false,
   });
 
-  assert.deepEqual(parsed, { ok: true });
+  t.assert.deepEqual(parsed, { ok: true });
 });
 
-test("parseCliJson reports invalid JSON output", () => {
-  assert.throws(
+test("parseCliJson reports invalid JSON output", (t: TestContext) => {
+  t.assert.throws(
     () =>
       parseCliJson({
         exitCode: 0,

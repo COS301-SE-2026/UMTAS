@@ -12,7 +12,8 @@ export class SolverCallbackDto implements SolverCallbackPayload {
   @ApiPropertyOptional({
     type: 'object',
     additionalProperties: true,
-    description: 'TODO: replace with the final solver output contract.',
+    description:
+      'Temporary payload shape until the solver output contract is final.',
   })
   @IsOptional()
   @IsObject()

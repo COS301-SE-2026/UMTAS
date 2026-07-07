@@ -3,6 +3,7 @@ import test from "node:test";
 import { HttpCallbackClient } from "../callback-client.js";
 
 test("HttpCallbackClient retries failed callback posts with backoff", async () => {
+  // NOSONAR - node:assert assertions are present.
   const delays: number[] = [];
   let calls = 0;
   const client = new HttpCallbackClient({

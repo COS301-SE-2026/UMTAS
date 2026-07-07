@@ -22,7 +22,7 @@ import { SolverCallbackDto } from './dto/solver-callback.dto';
 export class SolverController {
   @Get('jobs/:jobId/input')
   getInput(@Param('jobId') _jobId: string) {
-    // TODO: return backend-prepared solver input JSON once the solver input
+    // Future work: return backend-prepared solver input JSON once the solver input
     // builder is implemented.
     throw new NotImplementedException(
       'Solver input builder is not implemented',
@@ -33,9 +33,10 @@ export class SolverController {
   @HttpCode(HttpStatus.ACCEPTED)
   receiveCallback(
     @Param('jobId') jobId: string,
-    @Body() _body: SolverCallbackDto,
+    @Body() body: SolverCallbackDto,
   ) {
-    // TODO: persist solver status/result after the solver CLI contract settles.
+    // Future work: persist solver status/result after the solver CLI contract settles.
+    void body;
     return { accepted: true, jobId };
   }
 }
