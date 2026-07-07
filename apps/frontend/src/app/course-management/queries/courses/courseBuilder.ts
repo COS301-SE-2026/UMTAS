@@ -56,3 +56,35 @@ export async function fetchAllCoursesRequest(queries: fetchAllCoursesQueries) {
     return data as fetchAllCourseRes;
   }
 }
+
+export type updateCourse = paths["/Courses/{CourseId}"]["patch"];
+export type updateCoursePath = updateCourse["parameters"]["path"];
+export type updateCourseBody =
+  updateCourse["requestBody"]["content"]["application/json"];
+export type updateCourseRes =
+  updateCourse["responses"]["200"]["content"]["application/json"];
+
+export class updateCourseBuilder extends RequestBuilder<
+  updateCoursePath,
+  updateCourseBody,
+  updateCourseRes
+> {
+  constructor() {
+    super();
+    this.setUrl("/Courses/{CourseId}").setMethod(RequestMethod.PATCH);
+  }
+}
+
+export type deleteCourse = paths["/Courses/{CourseId}"]["delete"];
+export type deleteCoursePath = deleteCourse["parameters"]["path"];
+export type deleteCourseRes = deleteCourse["responses"]["200"];
+export class deleteCourseBuilder extends RequestBuilder<
+  deleteCoursePath,
+  undefined,
+  deleteCourseRes
+> {
+  constructor() {
+    super();
+    this.setUrl("/Courses/{CourseId}").setMethod(RequestMethod.DELETE);
+  }
+}
