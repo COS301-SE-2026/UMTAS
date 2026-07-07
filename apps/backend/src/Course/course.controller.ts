@@ -20,7 +20,13 @@ import {
   ParseUUIDPipe,
   Query,
 } from '@nestjs/common';
-import { ApiBody, ApiResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiResponse,
+  ApiOperation,
+  ApiTags,
+  ApiQuery,
+} from '@nestjs/swagger';
 
 // import { CurrentSession } from '../auth/session.decorator';
 // import type { SessionData } from '../auth/session.decorator';
@@ -63,6 +69,12 @@ export class CourseController {
     summary: 'Get all courses',
     operationId: 'getCourses',
   })
+  @ApiQuery({
+    name: 'Degree',
+    required: false,
+    type: String,
+    description: 'Filter by Degree',
+  })
   @ApiResponse({
     status: 200,
     description: 'Courses returned successfully',
@@ -72,8 +84,11 @@ export class CourseController {
     status: 404,
     description: 'No Courses found',
   })
-  getAll(@Query() filters: CourseFilters): Promise<CourseListResponseDto> {
-    return this.service.getAll(filters);
+  getAll(
+    @Param('universityId', ParseUUIDPipe) uniId: string,
+    @Query() filters: Omit<CourseFilters, 'UniversityID'>,
+  ): Promise<CourseListResponseDto> {
+    return this.service.getAll({ ...filters, UniversityID: uniId });
   }
 
   //GetById
