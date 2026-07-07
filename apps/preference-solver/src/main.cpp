@@ -6,6 +6,7 @@
 #include <ostream>
 #include <sstream>
 #include <string>
+#include "CP_SOLVER/CP.h"
 
 const std::string solver = "CP"; //GA
 
@@ -21,6 +22,10 @@ int main() {
   if (solver=="CP"){
     //Run CP solver
     
+    CP_SOLVER engine(data);
+    std::vector<EventGA> result = engine.solve();
+
+    // FC.outputJson(result.returnJson());
   } else {
     //Run GA solver
 

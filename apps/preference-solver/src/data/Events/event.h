@@ -1,3 +1,6 @@
+#ifndef EVENT_H
+#define EVENT_H
+
 #include "../../../lib/nlohmann/json.hpp"
 #include <iostream>
 #include <string>
@@ -29,3 +32,5 @@ struct EventGA {
   // automatically sets is active to false
 };
   std::string minutesToTime(int minutesAfterMidnight);
+
+#endif

@@ -1,3 +1,5 @@
+#ifndef FILECREATOR_H
+#define FILECREATOR_H
 // this class will
 // search for the directory based on job provided
 // create an output file output.js
@@ -25,3 +27,5 @@ public:
   json inputJson();
   void outputJson(json outputJson);
 };
+
+#endif

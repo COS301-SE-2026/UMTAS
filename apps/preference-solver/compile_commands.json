@@ -3,6 +3,7 @@
     "arguments": [
       "/usr/bin/g++",
       "-std=c++17",
+      "-DOR_PROTO_DLL=",
       "-I",
       "lib",
       "-I",
@@ -20,6 +21,7 @@
     "arguments": [
       "/usr/bin/g++",
       "-std=c++17",
+      "-DOR_PROTO_DLL=",
       "-I",
       "lib",
       "-I",
@@ -37,6 +39,7 @@
     "arguments": [
       "/usr/bin/g++",
       "-std=c++17",
+      "-DOR_PROTO_DLL=",
       "-I",
       "lib",
       "-I",
@@ -54,6 +57,7 @@
     "arguments": [
       "/usr/bin/g++",
       "-std=c++17",
+      "-DOR_PROTO_DLL=",
       "-I",
       "lib",
       "-I",
@@ -71,6 +75,7 @@
     "arguments": [
       "/usr/bin/g++",
       "-std=c++17",
+      "-DOR_PROTO_DLL=",
       "-I",
       "lib",
       "-I",
@@ -88,6 +93,7 @@
     "arguments": [
       "/usr/bin/g++",
       "-std=c++17",
+      "-DOR_PROTO_DLL=",
       "-I",
       "lib",
       "-I",
@@ -105,6 +111,7 @@
     "arguments": [
       "/usr/bin/g++",
       "-std=c++17",
+      "-DOR_PROTO_DLL=",
       "-I",
       "lib",
       "-I",
@@ -117,5 +124,23 @@
     "directory": "/home/aidan/COS301/CapStone/UMTAS/apps/preference-solver",
     "file": "/home/aidan/COS301/CapStone/UMTAS/apps/preference-solver/src/GA_handler/GA.cpp",
     "output": "/home/aidan/COS301/CapStone/UMTAS/apps/preference-solver/build/GA_handler/GA.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-std=c++17",
+      "-DOR_PROTO_DLL=",
+      "-I",
+      "lib",
+      "-I",
+      "lib/or-tools/include",
+      "-c",
+      "-o",
+      "build/CP_SOLVER/CP.o",
+      "src/CP_SOLVER/CP.cpp"
+    ],
+    "directory": "/home/aidan/COS301/CapStone/UMTAS/apps/preference-solver",
+    "file": "/home/aidan/COS301/CapStone/UMTAS/apps/preference-solver/src/CP_SOLVER/CP.cpp",
+    "output": "/home/aidan/COS301/CapStone/UMTAS/apps/preference-solver/build/CP_SOLVER/CP.o"
   }
 ]

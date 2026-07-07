@@ -1,3 +1,6 @@
+#ifndef GA_H
+#define GA_H
+
 #include "../../lib/openGA.hpp"
 #include "../data/GA-data/chromosome.h"
 #include <vector>
@@ -60,3 +63,5 @@ struct eventsOccurring {
 // on mutation -> pick current event -> if number of occurrences > 1
 // then we do another check we pick a random chromosome index that != current
 // and flip that.
+
+#endif

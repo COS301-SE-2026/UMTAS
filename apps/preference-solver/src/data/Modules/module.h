@@ -1,3 +1,6 @@
+#ifndef MODULE_H
+#define MODULE_H
+
 #include "../../../lib/nlohmann/json.hpp"
 #include <iostream>
 #include <string>
@@ -21,3 +24,5 @@ struct ModuleGA {
   // sets the number of occurences for a module specifcally a type
   void handleOccurences(const json& types);
 };
+
+#ifndef

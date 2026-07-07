@@ -1,3 +1,6 @@
+#ifndef CHROMOSOME_H
+#define CHROMOSOME_H
+
 #include "../API/API-data.h"
 #include <vector>
 struct EventChromosome {
@@ -14,3 +17,5 @@ struct ChromMiddleCost {
   double penalty_score = 0;
   ChromMiddleCost() {};
 };
+
+#endif

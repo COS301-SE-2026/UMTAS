@@ -5,7 +5,7 @@ LIB_DIR := lib
 CXX := g++ -std=c++17
 ORTOOLS_ROOT ?= $(LIB_DIR)/or-tools
 
-CFLAGS :=  -I $(LIB_DIR) -I $(ORTOOLS_ROOT)/include
+CFLAGS :=  -DOR_PROTO_DLL= -I ${LIB_DIR} -I ${ORTOOLS_ROOT}/include
 LDFLAGS := -Wl,--allow-multiple-definition -L $(ORTOOLS_ROOT)/lib -Wl,-rpath,$(ORTOOLS_ROOT)/lib
 LDLIBS := -lortools -pthread
 
@@ -16,6 +16,7 @@ SRC_FILES := $(wildcard $(SRC_DIR)/*.cpp)\
 			 $(wildcard $(SRC_DIR)/data/Modules/*.cpp)\
 			 $(wildcard $(SRC_DIR)/filecreator/*.cpp)\
 			 $(wildcard $(SRC_DIR)/GA_handler/*.cpp)\
+			 $(wildcard $(SRC_DIR)/CP_SOLVER/*.cpp)
 				
 OBJS := $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SRC_FILES))
 

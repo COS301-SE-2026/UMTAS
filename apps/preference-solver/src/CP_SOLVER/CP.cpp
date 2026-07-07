@@ -1,4 +1,4 @@
-#include "CP.h";
+#include "CP.h"
 
 //Constr
 CP_SOLVER::CP_SOLVER(API_DATA& data):
@@ -6,7 +6,20 @@ CP_SOLVER::CP_SOLVER(API_DATA& data):
 
     //Create bool vector for events
     this->selectEvent = this->createSelectEventVector(data.events);
+
+    //Create rules for solver
+    createRules();
 };
+
+//Create + assign rules to model
+void CP_SOLVER::createRules(){
+
+    //Each event needs to be selected numOccurance of times - not more not less :)
+    occuranceRule();
+
+    //No overlaps of events on the same day
+    overlapRule();
+};//END_createRules
 
 //createSelectEventVector
 std::vector<BoolVar> CP_SOLVER::createSelectEventVector(const std::vector<EventGA>& inVec){
@@ -22,16 +35,50 @@ std::vector<BoolVar> CP_SOLVER::createSelectEventVector(const std::vector<EventG
     return out;
 };//END_createSelectEventVector
 
-//Create + assign rules to model
-void CP_SOLVER::createRules(){
+//applySolution
+std::vector<EventGA> CP_SOLVER::applySolution(const std::vector<bool>& boolVec){
 
-    //Each event needs to be selected numOccurance of times - not more not less :)
-    occuranceRule();
+    std::vector<EventGA> out;
 
-    //No overlaps of events on the same day
+    for (int i=0; i<boolVec.size(); i++)
+        if (boolVec[i]) 
+            out.push_back(events[i]);
 
+    return out;
+};//END_applySolution
 
-};//END_createRules
+//========== Solving
+std::vector<EventGA> CP_SOLVER::solve(){
+    // Run the solver
+    CpSolverResponse response = Solve(model.Build());
+
+    std::cout<<"Solve: "<<std::endl;
+
+    // Check if solution found
+    if (response.status()==CpSolverStatus::OPTIMAL ||
+        response.status()==CpSolverStatus::FEASIBLE) {
+
+        std::cout << "Solution found!" << std::endl;
+
+        //SImple bool vector to get events selected
+        std::vector<bool> boolVec;
+        boolVec.reserve(selectEvent.size());
+
+        //iterate through selectedEvents and get selected events
+        for (int i=0; i<selectEvent.size(); i++) {
+
+            bool chosen = SolutionBooleanValue(response, selectEvent[i]);
+            boolVec.push_back(chosen);
+            std::cout<<"Event "<<i<<" chosen? "<<chosen<<std::endl;
+        }//END_i
+
+        // Convert bool vector into actual events
+        return applySolution(boolVec);
+    } else {
+        std::cout << "No solution found." << std::endl;
+        return {};
+    }//END_if-else
+};//END_solve
 
 
 //🎅's little helpers
@@ -40,10 +87,7 @@ void CP_SOLVER::createRules(){
 bool timeOverlap(const int start1, const int end1, const int start2, const int end2){
 
     //Time is an int of minutes from 00:00
-    // if (end1<)
-
-
-    return ((start2>=start1 && end2<=end1));
+    return (start1 < end2) && (start2 < end1);
 };//END_timeOverlap
 
 //RULE HELPERTJIES
@@ -83,13 +127,18 @@ void CP_SOLVER::overlapRule() {
     //any two events that happen at the same time on the same day cannot both be chosen
 
     for (int i=0; i<events.size(); i++){
-        for (int j=0; j<events.size(); j++){
+        for (int j=i+1; j<events.size(); j++){
+
+            const auto& event1 = events[i];
+            const auto& event2 = events[j];
 
             //check if events overlap -> day | time
-            // if ((events[i].eventDay==events[j].eventDay) && ())
+            if (
+                (event1.eventDay==event2.eventDay) && 
+                (timeOverlap(event1.event_start, event1.event_end, event2.event_start, event2.event_end))
+            ) model.AddBoolOr({selectEvent[i].Not(), selectEvent[j].Not()});
         }//END_j
     }//END_i
-
 };//END_overlapRule
 
 

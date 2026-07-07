@@ -1,3 +1,6 @@
+#ifndef API_DATA_H
+#define API_DATA_H
+
 #include "../../../lib/nlohmann/json.hpp"
 #include "../Events/event.h"
 #include "../Modules/module.h"
@@ -16,3 +19,5 @@ struct API_DATA {
   int targetTime;
   static const string TARGET_TIME_KEY;
 };
+
+#endif
