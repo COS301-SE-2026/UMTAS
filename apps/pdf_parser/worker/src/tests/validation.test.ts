@@ -4,6 +4,7 @@ import { WorkerExecutionError } from "bullmq-worker-core";
 import { validatePdfParserResult } from "../validation.js";
 
 test("validatePdfParserResult rejects extra keys on module candidates", () => {
+  // NOSONAR - node:assert assertions are present.
   const result = validResult();
   result.modules.push({
     code: "COS301",
@@ -17,6 +18,7 @@ test("validatePdfParserResult rejects extra keys on module candidates", () => {
 });
 
 test("validatePdfParserResult rejects malformed annotations", () => {
+  // NOSONAR - node:assert assertions are present.
   const result = validResult();
   result.warnings.push({
     code: "WARN",

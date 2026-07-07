@@ -33,6 +33,7 @@ const parserResult: PdfParserResult = {
 };
 
 test("PdfParseProcessor downloads the PDF then parses and returns callback payload", async () => {
+  // NOSONAR - node:assert assertions are present.
   const calls: string[] = [];
   const storageClient: PdfStorageClient = {
     downloadFile: async (fileKey, destinationPath) => {

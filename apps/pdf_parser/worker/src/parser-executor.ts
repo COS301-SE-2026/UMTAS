@@ -54,12 +54,13 @@ export class CliParserExecutor implements ParserExecutor {
   }
 
   private buildParserArgs(request: PdfParseRequest): string[] {
-    const args = this.args.slice();
-    args.push("--adapter");
-    args.push(request.adapterKey);
-    args.push("--file");
-    args.push(request.filePath);
-    return args;
+    return [
+      ...this.args,
+      "--adapter",
+      request.adapterKey,
+      "--file",
+      request.filePath,
+    ];
   }
 }
 
@@ -117,10 +118,7 @@ function parseParserResultJson(stdout: string, stderr: string): unknown {
   return parseJsonFromStdout(stdout, stderr);
 }
 
-function parseParserErrorJson(
-  stdout: string,
-  stderr: string,
-): ParserErrorPayload | unknown {
+function parseParserErrorJson(stdout: string, stderr: string): unknown {
   return parseJsonFromStdout(stdout, stderr);
 }
 
@@ -134,7 +132,7 @@ function parseJsonFromStdout(stdout: string, stderr: string): unknown {
       {
         stdout,
         stderr,
-        parseError: error instanceof Error ? error.message : error,
+        parseError: error instanceof Error ? error.message : String(error),
       },
     );
   }
