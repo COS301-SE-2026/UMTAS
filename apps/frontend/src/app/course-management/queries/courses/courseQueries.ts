@@ -4,6 +4,7 @@ import {
   createCoursesBuilder,
   deleteCourseBuilder,
   deleteCoursePath,
+  fetchAllCoursePath,
   fetchAllCoursesQueries,
   fetchAllCoursesRequest,
   updateCourseBody,
@@ -12,11 +13,16 @@ import {
 } from "./courseBuilder";
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
 
-export function getAllCoursesQ(queries?: fetchAllCoursesQueries) {
+export function getAllCoursesQ(
+  path?: fetchAllCoursePath,
+  queries?: fetchAllCoursesQueries,
+) {
   return queryOptions({
     queryKey: ["courses"],
     queryFn: async () => {
-      return fetchAllCoursesRequest(queries);
+      const result = await fetchAllCoursesRequest(path, queries);
+      console.log(result, "i ran");
+      return result;
     },
   });
 }

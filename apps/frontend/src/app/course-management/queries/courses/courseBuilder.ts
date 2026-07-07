@@ -3,6 +3,8 @@ import {
   RequestBuilder,
   RequestMethod,
 } from "../../../../../utilities/request";
+import { url } from "node:inspector/promises";
+
 export type CourseDTO = components["schemas"]["CourseDto"];
 
 export type createCourses = paths["/Courses"]["post"];
@@ -26,30 +28,41 @@ export type fetchAllCourses =
 export type fetchAllCoursesQueries = fetchAllCourses["parameters"]["query"];
 export type fetchAllCourseRes =
   fetchAllCourses["responses"]["200"]["content"]["application/json"];
+export type fetchAllCoursePath = fetchAllCourses["parameters"]["path"];
 
-export async function fetchAllCoursesRequest(queries: fetchAllCoursesQueries) {
+export async function fetchAllCoursesRequest(
+  path?: fetchAllCoursePath,
+  queries?: fetchAllCoursesQueries,
+) {
+  if (!path) {
+    throw new Error("Invalid course fetch, no universityID provided");
+  }
+
   const baseUrl =
     (typeof window === "undefined"
       ? process.env.API_URL
       : process.env.NEXT_PUBLIC_API_URL) || "http://localhost:3000";
 
-  const path: keyof paths = "/Courses/university/{universityId}";
+  const Urlpath = `/Courses/university/${path.universityId}`;
 
   const searchParams = new URLSearchParams();
-  if (queries?.UniversityID) {
-    searchParams.append("UniversityID", queries.UniversityID);
-  }
+
   if (queries?.Degree) {
     searchParams.append("Degree", queries.Degree);
   }
   const queryStr = searchParams.toString();
-  const URL = queryStr ? `${baseUrl}${path}?${queryStr}` : baseUrl + path;
+  let URL = baseUrl + Urlpath;
+  if (queries?.Degree) {
+    URL += queryStr;
+  }
+  console.log(URL);
 
   const response = await fetch(URL, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include",
   });
 
   if (!response.ok) {

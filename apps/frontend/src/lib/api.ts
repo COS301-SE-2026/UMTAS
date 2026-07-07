@@ -2652,13 +2652,13 @@ export interface operations {
   getCourses: {
     parameters: {
       query?: {
-        /** @description Unique identifier for a university */
-        UniversityID?: string;
-        /** @description Degree that course belongs to */
-        Degree?: string | null;
+        /** @description Filter by Degree */
+        Degree?: string;
       };
       header?: never;
-      path?: never;
+      path: {
+        universityId: string;
+      };
       cookie?: never;
     };
     requestBody?: never;
