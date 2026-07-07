@@ -3,7 +3,7 @@ import {
   AlertDescription,
   AlertTitle,
 } from "@/components/atoms/baseShadcn/alert";
-import { uniDto } from "@/components/templates/choose-institute/queries/builders";
+import { uniDto } from "@/app/choose-institute/queries/builders";
 
 interface ApprovalStatusProps {
   uni: uniDto;

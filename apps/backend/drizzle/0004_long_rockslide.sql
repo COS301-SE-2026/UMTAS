@@ -1,0 +1,1 @@
+ALTER TYPE "public"."RoleType" ADD VALUE 'REJECTED';

@@ -1,0 +1,1 @@
+ALTER TABLE "ModuleGrouping" ADD COLUMN "GroupName" varchar(30) DEFAULT 'Jy he ietsie vergeet';

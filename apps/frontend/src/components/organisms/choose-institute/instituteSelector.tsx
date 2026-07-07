@@ -1,19 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ApprovalStatus } from "@/components/molecules/choose-institute/ApprovalStatus";
 import { SelectInstituteField } from "@/components/molecules/choose-institute/SelectInstituteField";
 import { SelectRoleField } from "@/components/molecules/choose-institute/SelectRoleField";
 import { Button } from "@/components/atoms/baseShadcn/button";
-import {
-  uniDto,
-  uniDtoRoles,
-} from "@/components/templates/choose-institute/queries/builders";
+import { uniDto, uniDtoRoles } from "@/app/choose-institute/queries/builders";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   applyMutator,
   getAllUni,
-} from "@/components/templates/choose-institute/queries/UserRoleQueries";
+} from "@/app/choose-institute/queries/UserRoleQueries";
+import { UserDetails } from "@/lib/userclass/userClass";
 
 export function InstituteSelector() {
   const [selectedInstitute, setSelectedInstitute] = useState<uniDto>();
@@ -28,9 +26,11 @@ export function InstituteSelector() {
   }
 
   function handleConfirm() {
-    //
+    UserDetails.storeUniDetails(selectedInstitute);
   }
   const applyDisabled = !selectedInstitute || !selectedRole;
+  const uniDisabeled =
+    selectedInstitute == null && selectedInstitute == undefined;
 
   return (
     <form
@@ -61,8 +61,8 @@ export function InstituteSelector() {
       {selectedInstitute && <ApprovalStatus uni={selectedInstitute} />}
 
       <div className="mt-2 flex justify-end gap-3 border-t pt-4">
-        <Button type="submit" disabled={!false}>
-          {true ? "Continue as Student" : "Confirm"}
+        <Button type="submit" disabled={uniDisabeled}>
+          continue as {selectedInstitute?.role ?? "student"}
         </Button>
       </div>
       <div className="mt-2 flex justify-end gap-3 border-t pt-4">
