@@ -6,7 +6,7 @@ import {
   InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { eq, and, ne, or } from 'drizzle-orm';
+import { eq, and, or } from 'drizzle-orm';
 
 import { DatabaseService } from '../db/database.service';
 import {
@@ -357,6 +357,7 @@ export class UniversityService {
 
     const applications = await this.dbService.db
       .select({
+        Name: usersTable.name,
         UserID: usersTable.id,
         Email: usersTable.email,
         UniversityID: UniversityRole.UniversityID,

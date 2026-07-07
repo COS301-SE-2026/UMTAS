@@ -39,7 +39,7 @@ export const columns: ColumnDef<getSingleApplication>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "name",
+    accessorKey: "Name",
     header: "Name",
   },
   {

@@ -112,6 +112,12 @@ export class GetRolesDto {
   Email!: string;
 
   @ApiProperty({
+    example: 'John Doe',
+  })
+  @IsString()
+  Name!: string;
+
+  @ApiProperty({
     format: 'uuid',
     example: '00000000-0000-0000-0000-000000000000',
   })

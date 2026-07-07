@@ -1272,6 +1272,8 @@ export interface components {
        * @example xxx@umtas.com
        */
       Email: string;
+      /** @example John Doe */
+      Name: string;
       /**
        * Format: uuid
        * @example 00000000-0000-0000-0000-000000000000
