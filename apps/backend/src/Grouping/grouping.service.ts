@@ -144,6 +144,7 @@ export class GroupingService {
       .set({
         Hash: hash,
       })
+      .where(eq(ModuleGrouping.GroupID, groupId))
       .returning();
 
     //return updated group with modules

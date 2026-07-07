@@ -4,6 +4,7 @@ import type { ParsedEventCandidate } from 'shared-types';
 import type { AppDatabase } from '../db/database.service';
 import type { EventCriteria } from '../Events/dto/event.types';
 import { EventType } from '../Events/dto/event.types';
+import { EventImportKeyService } from '../Events/event-import-key.service';
 import { Event, EventVenue, UniversityEvent, Venue } from '../entities';
 import type { ModuleRecord } from './module-resolver.service';
 import {
@@ -15,6 +16,7 @@ interface ImportedEventShape {
   eventName: string;
   eventCode: string;
   eventCriteria: EventCriteria;
+  importKey: string;
 }
 
 interface EventCriteriaInput {
@@ -25,6 +27,8 @@ interface EventCriteriaInput {
 
 @Injectable()
 export class EventImporter {
+  constructor(private readonly eventImportKeyService: EventImportKeyService) {}
+
   async createMissingEvents(
     db: AppDatabase,
     universityId: string,
@@ -56,36 +60,74 @@ export class EventImporter {
       );
       const primaryVenueId = venueIds[0];
 
-      const [event] = await db
-        .insert(Event)
+      const event = await this.createOrFindEvent(
+        db,
+        eventShape,
+        parsedEvent.isRecurring,
+      );
+
+      await db
+        .insert(UniversityEvent)
         .values({
-          eventName: eventShape.eventName,
-          eventCode: eventShape.eventCode,
-          eventCriteria: eventShape.eventCriteria,
-          isRecurring: parsedEvent.isRecurring,
-          validated: false,
+          moduleID: module.moduleID,
+          eventID: event.eventID,
+          VenueID: primaryVenueId,
         })
-        .returning();
-
-      if (!event) {
-        throw new ConflictException('PDF parser event could not be created');
-      }
-
-      await db.insert(UniversityEvent).values({
-        moduleID: module.moduleID,
-        eventID: event.eventID,
-        VenueID: primaryVenueId,
-      });
+        .onConflictDoNothing({
+          target: [UniversityEvent.moduleID, UniversityEvent.eventID],
+        });
 
       if (venueIds.length > 0) {
-        await db.insert(EventVenue).values(
-          venueIds.map((venueId) => ({
-            EventID: event.eventID,
-            VenueID: venueId,
-          })),
-        );
+        for (const venueId of venueIds) {
+          await db
+            .insert(EventVenue)
+            .values({
+              EventID: event.eventID,
+              VenueID: venueId,
+            })
+            .onConflictDoNothing({
+              target: [EventVenue.EventID, EventVenue.VenueID],
+            });
+        }
       }
     }
+  }
+
+  private async createOrFindEvent(
+    db: AppDatabase,
+    eventShape: ImportedEventShape,
+    isRecurring: boolean,
+  ): Promise<typeof Event.$inferSelect> {
+    const [inserted] = await db
+      .insert(Event)
+      .values({
+        eventName: eventShape.eventName,
+        eventCode: eventShape.eventCode,
+        eventCriteria: eventShape.eventCriteria,
+        isRecurring,
+        validated: false,
+        ImportKey: eventShape.importKey,
+      })
+      .onConflictDoNothing({
+        target: Event.ImportKey,
+      })
+      .returning();
+
+    if (inserted) {
+      return inserted;
+    }
+
+    const [existing] = await db
+      .select()
+      .from(Event)
+      .where(eq(Event.ImportKey, eventShape.importKey))
+      .limit(1);
+
+    if (!existing) {
+      throw new ConflictException('PDF parser event could not be resolved');
+    }
+
+    return existing;
   }
 
   private async findExistingEvent(
@@ -139,10 +181,26 @@ export class EventImporter {
           VenueName: name,
           UniversityID: universityId,
         })
+        .onConflictDoNothing({
+          target: [Venue.UniversityID, Venue.VenueName],
+        })
         .returning();
 
       if (venue) {
         ids.push(venue.VenueID);
+        continue;
+      }
+
+      const [conflictingVenue] = await db
+        .select()
+        .from(Venue)
+        .where(
+          and(eq(Venue.UniversityID, universityId), eq(Venue.VenueName, name)),
+        )
+        .limit(1);
+
+      if (conflictingVenue) {
+        ids.push(conflictingVenue.VenueID);
       }
     }
 
@@ -154,21 +212,30 @@ export class EventImporter {
     parsedEvent: ParsedEventCandidate,
   ): ImportedEventShape {
     const primaryVenue = parsedEvent.venues[0]?.trim();
+    const eventName = truncateForColumn(
+      parsedEvent.title.trim() ||
+        `${normalizeModuleCode(parsedEvent.moduleCode)} ${parsedEvent.type}`,
+      32,
+    );
+    const eventCode = truncateForColumn(
+      parsedEvent.sectionLabel.trim() || parsedEvent.type,
+      10,
+    );
+    const eventCriteria = this.buildEventCriteria({
+      moduleId,
+      parsedEvent,
+      primaryVenue,
+    });
 
     return {
-      eventName: truncateForColumn(
-        parsedEvent.title.trim() ||
-          `${normalizeModuleCode(parsedEvent.moduleCode)} ${parsedEvent.type}`,
-        32,
-      ),
-      eventCode: truncateForColumn(
-        parsedEvent.sectionLabel.trim() || parsedEvent.type,
-        10,
-      ),
-      eventCriteria: this.buildEventCriteria({
-        moduleId,
-        parsedEvent,
-        primaryVenue,
+      eventName,
+      eventCode,
+      eventCriteria,
+      importKey: this.eventImportKeyService.buildForModuleEvent({
+        moduleId: moduleId,
+        eventName: eventName,
+        eventCode: eventCode,
+        eventCriteria: eventCriteria,
       }),
     };
   }

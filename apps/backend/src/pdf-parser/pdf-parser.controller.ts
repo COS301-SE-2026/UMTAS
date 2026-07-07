@@ -215,7 +215,7 @@ export class PdfParserController {
     @Param('jobId') jobId: string,
   ): Promise<PdfParserResult> {
     const job = await this.jobStore.findJob(jobId, { userId: session.user.id });
-    if (!job || job.status !== 'completed' || !job.result) {
+    if (job?.status !== 'completed' || !job.result) {
       throw new NotFoundException(`PDF parser result not found: ${jobId}`);
     }
 

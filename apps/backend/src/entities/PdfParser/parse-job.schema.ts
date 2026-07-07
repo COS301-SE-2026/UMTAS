@@ -11,7 +11,7 @@ import {
 } from 'drizzle-orm/pg-core';
 import type { PdfParserResult } from 'shared-types';
 import { usersTable } from '../auth';
-import { University } from '../Universities';
+import { ModuleGrouping, University } from '../Universities';
 
 export const parseJob = pgTable(
   'PARSE_JOB',
@@ -31,6 +31,9 @@ export const parseJob = pgTable(
       length: 128,
     }).notNull(),
     StreamCount: integer('StreamCount').notNull(),
+    GroupID: uuid('GroupID').references(() => ModuleGrouping.GroupID, {
+      onDelete: 'set null',
+    }),
     Status: varchar('Status', { length: 32 }).notNull().default('queued'),
     Result: jsonb('Result').$type<PdfParserResult | null>(),
     ErrorCode: varchar('ErrorCode', { length: 128 }),
@@ -48,6 +51,7 @@ export const parseJob = pgTable(
   (table) => ({
     userIndex: index('parse_job_user_id_idx').on(table.UserID),
     statusIndex: index('parse_job_status_idx').on(table.Status),
+    groupIndex: index('parse_job_group_id_idx').on(table.GroupID),
     createdAtIndex: index('parse_job_created_at_idx').on(table.CreatedAt),
     duplicateUniqueIndex: uniqueIndex('parse_job_duplicate_unique').on(
       table.UserID,

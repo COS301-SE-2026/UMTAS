@@ -9,7 +9,7 @@ describe('PdfParserFingerprintService', () => {
     (lineEnding) => {
       const result = service.compute(
         bytes(
-          `1 0 obj${lineEnding}stream${lineEnding}payload${lineEnding}endstream`,
+          `1 0 obj${lineEnding}<< /Length 7 >>${lineEnding}stream${lineEnding}payload${lineEnding}endstream${lineEnding}endobj`,
         ),
       );
 
@@ -24,7 +24,9 @@ describe('PdfParserFingerprintService', () => {
 
   it('hashes multiple streams in file order with length separators', () => {
     const result = service.compute(
-      bytes('stream\nab\nendstream stream\nc\nendstream'),
+      bytes(
+        '%PDF-1.7\n1 0 obj\n<< /Length 2 >>\nstream\nab\nendstream\nendobj\n2 0 obj\n<< /Length 1 >>\nstream\nc\nendstream\nendobj\n',
+      ),
     );
 
     expect(result).toMatchObject({
@@ -38,12 +40,12 @@ describe('PdfParserFingerprintService', () => {
   it('ignores changes outside stream payloads', () => {
     const first = service.compute(
       bytes(
-        'stream\npayload\nendstream trailer <</ID [<one>]>> /CreationDate (A)',
+        '%PDF-1.7\n1 0 obj\n<< /Length 7 >>\nstream\npayload\nendstream\nendobj\ntrailer <</ID [<one>]>> /CreationDate (A)',
       ),
     );
     const second = service.compute(
       bytes(
-        'stream\npayload\nendstream trailer <</ID [<two>]>> /CreationDate (B)',
+        '%PDF-1.7\n1 0 obj\n<< /Length 7 >>\nstream\npayload\nendstream\nendobj\ntrailer <</ID [<two>]>> /CreationDate (B)',
       ),
     );
 
@@ -51,8 +53,16 @@ describe('PdfParserFingerprintService', () => {
   });
 
   it('changes when stream payload bytes change', () => {
-    const first = service.compute(bytes('stream\npayload\nendstream'));
-    const second = service.compute(bytes('stream\nchanged\nendstream'));
+    const first = service.compute(
+      bytes(
+        '%PDF-1.7\n1 0 obj\n<< /Length 7 >>\nstream\npayload\nendstream\nendobj\n',
+      ),
+    );
+    const second = service.compute(
+      bytes(
+        '%PDF-1.7\n1 0 obj\n<< /Length 7 >>\nstream\nchanged\nendstream\nendobj\n',
+      ),
+    );
 
     expect(first.ok && first.hash).not.toBe(second.ok && second.hash);
   });

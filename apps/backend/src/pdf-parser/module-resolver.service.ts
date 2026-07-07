@@ -42,25 +42,52 @@ export class ModuleResolver {
       return resolved;
     }
 
-    const inserted = await db
-      .insert(modules)
-      .values(
-        missingCandidates.map(([code, candidate]) => ({
-          moduleCode: normalizeModuleCode(code),
-          moduleName: truncateForColumn(candidate.name?.trim() || code, 256),
-          moduleDescription: candidate.metadata
-            ? JSON.stringify(candidate.metadata)
-            : null,
-          validated: false,
-        })),
-      )
-      .returning();
-
-    for (const module of inserted) {
+    for (const entry of missingCandidates) {
+      const code = entry[0];
+      const candidate = entry[1];
+      const module = await this.createOrFindModule(db, code, candidate);
       resolved.set(module.moduleCode, module);
     }
 
     return resolved;
+  }
+
+  private async createOrFindModule(
+    db: AppDatabase,
+    code: string,
+    candidate: ParsedModuleCandidate,
+  ): Promise<ModuleRecord> {
+    const normalizedCode = normalizeModuleCode(code);
+    const [inserted] = await db
+      .insert(modules)
+      .values({
+        moduleCode: normalizedCode,
+        moduleName: truncateForColumn(candidate.name?.trim() || code, 256),
+        moduleDescription: candidate.metadata
+          ? JSON.stringify(candidate.metadata)
+          : null,
+        validated: false,
+      })
+      .onConflictDoNothing({
+        target: modules.moduleCode,
+      })
+      .returning();
+
+    if (inserted) {
+      return inserted;
+    }
+
+    const [existing] = await db
+      .select()
+      .from(modules)
+      .where(eq(modules.moduleCode, normalizedCode))
+      .limit(1);
+
+    if (!existing) {
+      throw new Error(`PDF parser module could not be resolved: ${code}`);
+    }
+
+    return existing;
   }
 
   private async findModulesOwnedByUniversityViaGroupLinks(

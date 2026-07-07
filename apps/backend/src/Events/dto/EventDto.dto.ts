@@ -94,6 +94,14 @@ export class EventDto {
   @IsOptional()
   @IsBoolean()
   isRecurring?: boolean;
+
+  @ApiProperty({
+    example: true,
+    description: 'Whether the event has been approved by a university admin',
+  })
+  @IsOptional()
+  @IsBoolean()
+  validated?: boolean;
 } //EventDto
 
 //Create Event
@@ -102,6 +110,7 @@ export class CreateEventDto extends PickType(EventDto, [
   'eventCode',
   'eventCriteria',
   'isRecurring',
+  'validated',
 ] as const) {}
 
 //Update Event
