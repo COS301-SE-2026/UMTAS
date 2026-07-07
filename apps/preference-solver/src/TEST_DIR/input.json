@@ -1,0 +1,307 @@
+{
+  "modules": [
+    {
+      "moduleCode": "COS301",
+      "typeOccurence": [
+        {
+          "EventType": "L1",
+          "numberOccur": 1
+        },
+        {
+          "EventType": "L2",
+          "numberOccur": 1
+        },
+        {
+          "EventType": "P1",
+          "numberOccur": 1
+        },
+        {
+          "EventType": "P2",
+          "numberOccur": 1
+        }
+      ]
+    },
+    {
+      "moduleCode": "COS314",
+      "typeOccurence": [
+        {
+          "EventType": "L1",
+          "numberOccur": 1
+        },
+        {
+          "EventType": "L2",
+          "numberOccur": 1
+        },
+        {
+          "EventType": "P1",
+          "numberOccur": 1
+        }
+      ]
+    },
+    {
+      "moduleCode": "COS332",
+      "typeOccurence": [
+        {
+          "EventType": "L1",
+          "numberOccur": 1
+        },
+        {
+          "EventType": "L2",
+          "numberOccur": 1
+        },
+        {
+          "EventType": "P1",
+          "numberOccur": 1
+        }
+      ]
+    },
+    {
+      "moduleCode": "COS333",
+      "typeOccurence": [
+        {
+          "EventType": "L1",
+          "numberOccur": 1
+        },
+        {
+          "EventType": "L2",
+          "numberOccur": 1
+        },
+        {
+          "EventType": "P1",
+          "numberOccur": 1
+        }
+      ]
+    },
+    {
+      "moduleCode": "COS344",
+      "typeOccurence": [
+        {
+          "EventType": "L1",
+          "numberOccur": 1
+        },
+        {
+          "EventType": "L2",
+          "numberOccur": 1
+        },
+        {
+          "EventType": "P1",
+          "numberOccur": 1
+        }
+      ]
+    }
+  ],
+
+  "events": [
+    {
+      "day": "Wednesday",
+      "eventID": "ID",
+      "moduleCode": "COS301",
+      "startTime": "07:30",
+      "endTime": "09:20",
+      "EventType": "P1"
+    },
+    {
+      "day": "Friday",
+      "eventID": "ID",
+      "moduleCode": "COS301",
+      "startTime": "07:30",
+      "endTime": "08:20",
+      "EventType": "P2"
+    },
+    {
+      "day": "Friday",
+      "eventID": "ID",
+      "moduleCode": "COS301",
+      "startTime": "07:30",
+      "endTime": "08:20",
+      "EventType": "P2"
+    },
+    {
+      "day": "Monday",
+      "eventID": "ID",
+      "moduleCode": "COS301",
+      "startTime": "11:30",
+      "endTime": "12:20",
+      "EventType": "L1"
+    },
+    {
+      "day": "Tuesday",
+      "eventID": "ID",
+      "moduleCode": "COS301",
+      "startTime": "13:30",
+      "endTime": "14:20",
+      "EventType": "L2"
+    },
+    {
+      "day": "Tuesday",
+      "eventID": "ID",
+      "moduleCode": "COS314",
+      "startTime": "10:30",
+      "endTime": "11:20",
+      "EventType": "L1"
+    },
+    {
+      "day": "Wednesday",
+      "eventID": "ID",
+      "moduleCode": "COS314",
+      "startTime": "10:30",
+      "endTime": "11:20",
+      "EventType": "L2"
+    },
+    {
+      "day": "Thursday",
+      "eventID": "ID",
+      "moduleCode": "COS314",
+      "startTime": "14:30",
+      "endTime": "17:20",
+      "EventType": "P1"
+    },
+    {
+      "day": "Thursday",
+      "eventID": "ID",
+      "moduleCode": "COS314",
+      "startTime": "14:30",
+      "endTime": "17:20",
+      "EventType": "P1"
+    },
+    {
+      "day": "Thursday",
+      "eventID": "ID",
+      "moduleCode": "COS314",
+      "startTime": "14:30",
+      "endTime": "17:20",
+      "EventType": "P1"
+    },
+    {
+      "day": "Monday",
+      "eventID": "ID",
+      "moduleCode": "COS332",
+      "startTime": "12:30",
+      "endTime": "13:20",
+      "EventType": "L1"
+    },
+    {
+      "day": "Wednesday",
+      "eventID": "ID",
+      "moduleCode": "COS332",
+      "startTime": "14:30",
+      "endTime": "15:20",
+      "EventType": "L2"
+    },
+    {
+      "day": "Tuesday",
+      "eventID": "ID",
+      "moduleCode": "COS332",
+      "startTime": "14:30",
+      "endTime": "17:20",
+      "EventType": "P1"
+    },
+    {
+      "day": "Friday",
+      "eventID": "ID",
+      "moduleCode": "COS332",
+      "startTime": "08:30",
+      "endTime": "11:20",
+      "EventType": "P1"
+    },
+    {
+      "day": "Friday",
+      "eventID": "ID",
+      "moduleCode": "COS332",
+      "startTime": "08:30",
+      "endTime": "11:20",
+      "EventType": "P1"
+    },
+    {
+      "day": "Tuesday",
+      "eventID": "ID",
+      "moduleCode": "COS333",
+      "startTime": "08:30",
+      "endTime": "09:20",
+      "EventType": "L1"
+    },
+    {
+      "day": "Friday",
+      "eventID": "ID",
+      "moduleCode": "COS333",
+      "startTime": "11:30",
+      "endTime": "12:20",
+      "EventType": "L2"
+    },
+    {
+      "day": "Monday",
+      "eventID": "ID",
+      "moduleCode": "COS333",
+      "startTime": "14:30",
+      "endTime": "17:20",
+      "EventType": "P1"
+    },
+    {
+      "day": "Monday",
+      "eventID": "ID",
+      "moduleCode": "COS333",
+      "startTime": "14:30",
+      "endTime": "17:20",
+      "EventType": "P1"
+    },
+    {
+      "day": "Monday",
+      "eventID": "ID",
+      "moduleCode": "COS333",
+      "startTime": "14:30",
+      "endTime": "17:20",
+      "EventType": "P1"
+    },
+    {
+      "day": "Friday",
+      "eventID": "ID",
+      "moduleCode": "COS333",
+      "startTime": "14:30",
+      "endTime": "17:20",
+      "EventType": "P1"
+    },
+    {
+      "day": "Friday",
+      "eventID": "ID",
+      "moduleCode": "COS333",
+      "startTime": "14:30",
+      "endTime": "17:20",
+      "EventType": "P1"
+    },
+    {
+      "day": "Friday",
+      "eventID": "ID",
+      "moduleCode": "COS333",
+      "startTime": "14:30",
+      "endTime": "17:20",
+      "EventType": "P1"
+    },
+
+    {
+      "day": "Monday",
+      "eventID": "ID",
+      "moduleCode": "COS344",
+      "startTime": "10:30",
+      "endTime": "11:20",
+      "EventType": "L1"
+    },
+    {
+      "day": "Thursday",
+      "eventID": "ID",
+      "moduleCode": "COS344",
+      "startTime": "09:30",
+      "endTime": "10:20",
+      "EventType": "L2"
+    },
+    {
+      "day": "Monday",
+      "eventID": "ID",
+      "moduleCode": "COS344",
+      "startTime": "14:30",
+      "endTime": "17:20",
+      "EventType": "P1"
+    }
+  ],
+
+  "targetTime": 420
+}

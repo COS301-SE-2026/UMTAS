@@ -7,20 +7,35 @@
 #include <sstream>
 #include <string>
 
+const std::string solver = "CP"; //GA
+
 using nlohmann::json;
+// args will be provided for a filepath.
 int main() {
-  // args will be provided for a filepath.
-  try {
-    FileCreator FC("GA_TEST_DIR");
+  //Specify Input directory - aswell as output
+  FileCreator FC("TEST_DIR");
 
-    API_DATA data = API_DATA(FC.inputJson());
-    GA_Handler engine(data);
-    EventChromosome result = engine.findSolution();
-    FC.outputJson(result.returnJson());
+  //Convert input data to ModuleGA and EventGA objects
+  API_DATA data = API_DATA(FC.inputJson());
 
-  } catch (std::exception &e) {
-    std::cout << e.what() << std::endl;
-    return 1;
+  if (solver=="CP"){
+    //Run CP solver
+    
+  } else {
+    //Run GA solver
+
+    
+    try {
+      
+      GA_Handler engine(data);
+      EventChromosome result = engine.findSolution();
+      FC.outputJson(result.returnJson());
+
+    } catch (std::exception &e) {
+      std::cout << e.what() << std::endl;
+      return 1;
+    }
   }
+
   return 0;
 }
