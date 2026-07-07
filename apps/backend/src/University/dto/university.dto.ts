@@ -1,5 +1,7 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
+  IsBoolean,
+  IsEmail,
   IsEnum,
   IsNotEmpty,
   IsOptional,
@@ -95,4 +97,42 @@ export class ApprovedUserRoleResponse extends PickType(ApproveUsersRoleDto, [
 ]) {
   @ApiProperty({ example: true })
   success!: boolean;
+}
+export class GetRolesDto {
+  @ApiProperty({
+    format: 'uuid',
+    example: '00000000-0000-0000-0000-000000000000',
+  })
+  UserID!: string;
+
+  @ApiProperty({
+    example: 'xxx@umtas.com',
+  })
+  @IsEmail()
+  Email!: string;
+
+  @ApiProperty({
+    format: 'uuid',
+    example: '00000000-0000-0000-0000-000000000000',
+  })
+  UniversityID!: string;
+
+  @ApiProperty({
+    enum: RoleType.enumValues,
+    nullable: true,
+    example: 'LECTURER_PENDING',
+  })
+  role!: RoleTypeType | null;
+}
+
+export class GetRoleFilterDto {
+  @ApiPropertyOptional({
+    type: Boolean,
+    description:
+      'True for only pending applications, false for all roles for uni',
+    example: false,
+  })
+  @IsOptional()
+  @IsBoolean()
+  pending?: boolean;
 }

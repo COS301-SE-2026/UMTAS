@@ -9,7 +9,7 @@ import {
   SelectValue,
 } from "@/components/atoms/baseShadcn/select";
 import { NotSupportedLink } from "@/components/atoms/choose-institute/NotSupportedLink";
-import { uniDto } from "@/components/templates/choose-institute/queries/builders";
+import { uniDto } from "@/app/choose-institute/queries/builders";
 
 interface SelectInstituteFieldProps {
   institutes: uniDto[];

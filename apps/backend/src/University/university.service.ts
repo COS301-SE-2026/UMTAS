@@ -4,11 +4,18 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
+  UnauthorizedException,
 } from '@nestjs/common';
-import { eq, and, ne } from 'drizzle-orm';
+import { eq, and, ne, or } from 'drizzle-orm';
 
 import { DatabaseService } from '../db/database.service';
-import { RoleTypeType, University, UniversityRole } from '../entities';
+import {
+  RoleType,
+  RoleTypeType,
+  University,
+  UniversityRole,
+  usersTable,
+} from '../entities';
 import {
   CreateUniversityDto,
   UpdateUniversityDto,
@@ -18,7 +25,10 @@ import {
   ApplyForUniRoleDto,
   ApprovedUserRoleResponse,
   ApproveUsersRoleDto,
+  GetRolesDto,
+  GetRoleFilterDto,
 } from './dto/university.dto';
+import { notExists } from 'drizzle-orm';
 
 @Injectable()
 export class UniversityService {
@@ -57,7 +67,20 @@ export class UniversityService {
         and(
           eq(UniversityRole.UniversityID, University.UniversityID),
           eq(UniversityRole.UserID, userId),
-          ne(UniversityRole.role, 'STUDENT_OWNED'),
+        ),
+      )
+      .where(
+        // show no universities if anyone has a rule student owned to it.
+        notExists(
+          this.dbService.db
+            .select()
+            .from(UniversityRole)
+            .where(
+              and(
+                eq(UniversityRole.UniversityID, University.UniversityID),
+                eq(UniversityRole.role, RoleType.enumValues[1]),
+              ),
+            ),
         ),
       );
 
@@ -298,6 +321,62 @@ export class UniversityService {
       success: true,
     };
   } //approveUserRole
+
+  async getAllApplications(
+    userID: string,
+    UniID: string,
+    dto: GetRoleFilterDto,
+  ): Promise<GetRolesDto[]> {
+    // validate permision (extra check)
+    const [role] = await this.dbService.db
+      .select()
+      .from(University)
+      .innerJoin(
+        UniversityRole,
+        eq(UniversityRole.UniversityID, University.UniversityID),
+      )
+      .where(
+        and(
+          eq(UniversityRole.UserID, userID),
+          eq(University.UniversityID, UniID),
+        ),
+      )
+      .limit(1);
+
+    // fail state no role || role not sys admin / uni admin
+
+    if (
+      !role ||
+      !role.UniversityRole ||
+      role.UniversityRole.role != 'UNIVERSITY_ADMIN'
+    ) {
+      throw new UnauthorizedException(
+        'User does not have permission to get applications',
+      );
+    }
+
+    const applications = await this.dbService.db
+      .select({
+        UserID: usersTable.id,
+        Email: usersTable.email,
+        UniversityID: UniversityRole.UniversityID,
+        role: UniversityRole.role,
+      })
+      .from(UniversityRole)
+      .innerJoin(usersTable, eq(UniversityRole.UserID, usersTable.id))
+      .where(
+        and(
+          eq(UniversityRole.UniversityID, UniID),
+          dto.pending
+            ? or(
+                eq(UniversityRole.role, 'LECTURER_PENDING'),
+                eq(UniversityRole.role, 'UNIVERSITY_ADMIN_PENDING'),
+              )
+            : undefined,
+        ),
+      );
+    return applications;
+  }
 
   //🎅's Little Helpers
 

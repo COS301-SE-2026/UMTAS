@@ -13,15 +13,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/atoms/baseShadcn/dropdown-menu";
+import { getSingleApplication } from "@/app/role-management/queries/builder";
 
-export type user = {
-  id: string;
-  name: string;
-  email: string;
-  role: "Student" | "Lecturer" | "Uni Admin";
-};
-
-export const columns: ColumnDef<user>[] = [
+export const columns: ColumnDef<getSingleApplication>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -49,7 +43,7 @@ export const columns: ColumnDef<user>[] = [
     header: "Name",
   },
   {
-    accessorKey: "email",
+    accessorKey: "Email",
     header: ({ column }) => {
       return (
         <Button

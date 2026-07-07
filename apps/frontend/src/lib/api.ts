@@ -523,6 +523,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/universities/applications/{universityID}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Get all applications for a specific university */
+    post: operations["getAllApplications"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/universities/apply": {
     parameters: {
       query?: never;
@@ -1236,6 +1253,43 @@ export interface components {
       UniversityName: string;
       /** @example true */
       success: Record<string, never>;
+    };
+    GetRoleFilterDto: {
+      /**
+       * @description True for only pending applications, false for all roles for uni
+       * @example false
+       */
+      pending?: boolean;
+    };
+    GetRolesDto: {
+      /**
+       * Format: uuid
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      UserID: string;
+      /**
+       * Format: email
+       * @example xxx@umtas.com
+       */
+      Email: string;
+      /**
+       * Format: uuid
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      UniversityID: string;
+      /**
+       * @example LECTURER_PENDING
+       * @enum {string|null}
+       */
+      role:
+        | "STUDENT"
+        | "STUDENT_OWNED"
+        | "UNIVERSITY_ADMIN"
+        | "UNIVERSITY_ADMIN_PENDING"
+        | "LECTURER"
+        | "LECTURER_PENDING"
+        | "SYSTEM_ADMIN"
+        | null;
     };
     ApplyForUniRoleDto: {
       /**
@@ -2920,6 +2974,39 @@ export interface operations {
       };
       /** @description University not found */
       404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getAllApplications: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        universityID: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["GetRoleFilterDto"];
+      };
+    };
+    responses: {
+      /** @description Success */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["GetRolesDto"][];
+        };
+      };
+      /** @description Unauthorized */
+      409: {
         headers: {
           [name: string]: unknown;
         };

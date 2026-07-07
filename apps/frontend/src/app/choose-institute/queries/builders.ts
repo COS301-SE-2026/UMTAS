@@ -1,8 +1,5 @@
 import { components, paths } from "@/lib/api";
-import {
-  RequestMethod,
-  RequestBuilder,
-} from "../../../../../utilities/request";
+import { RequestMethod, RequestBuilder } from "../../../../utilities/request";
 
 export type uniDto = components["schemas"]["UniversityDto"];
 export type uniDtoRoles = components["schemas"]["UniversityDto"]["role"];
