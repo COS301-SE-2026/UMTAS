@@ -1,8 +1,9 @@
-import { paths } from "@/lib/api";
+import { components, paths } from "@/lib/api";
 import {
   RequestBuilder,
   RequestMethod,
 } from "../../../../../utilities/request";
+export type CourseDTO = components["schemas"]["CourseDto"];
 
 export type createCourses = paths["/Courses"]["post"];
 
@@ -32,6 +33,8 @@ export async function fetchAllCoursesRequest(queries: fetchAllCoursesQueries) {
       ? process.env.API_URL
       : process.env.NEXT_PUBLIC_API_URL) || "http://localhost:3000";
 
+  const path: keyof paths = "/Courses/university/{universityId}";
+
   const searchParams = new URLSearchParams();
   if (queries?.UniversityID) {
     searchParams.append("UniversityID", queries.UniversityID);
@@ -40,7 +43,7 @@ export async function fetchAllCoursesRequest(queries: fetchAllCoursesQueries) {
     searchParams.append("Degree", queries.Degree);
   }
   const queryStr = searchParams.toString();
-  const URL = queryStr ? `${baseUrl}?${queryStr}` : baseUrl;
+  const URL = queryStr ? `${baseUrl}${path}?${queryStr}` : baseUrl + path;
 
   const response = await fetch(URL, {
     method: "GET",

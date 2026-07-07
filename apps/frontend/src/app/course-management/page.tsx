@@ -1,3 +1,4 @@
+import CourseManagementTemplate from "@/components/templates/course-management/courseManageTemplate";
 import { UserDetails } from "@/lib/userclass/userClass";
 import { useRouter } from "next/navigation";
 
@@ -9,5 +10,9 @@ export default function CourseManagement() {
     router.push("choose-institute");
   }
 
-  return <div></div>;
+  return (
+    <div>
+      <CourseManagementTemplate></CourseManagementTemplate>
+    </div>
+  );
 }

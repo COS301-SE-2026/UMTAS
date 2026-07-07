@@ -154,6 +154,7 @@ export class ModuleFiltersDto {
   @ApiProperty({
     example: false,
     description: 'Choose to filter modules based of current user enrollments',
+    type: Boolean,
   })
   @IsBoolean()
   userEnrollment?: boolean;

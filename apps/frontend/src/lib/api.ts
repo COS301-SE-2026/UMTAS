@@ -998,7 +998,6 @@ export interface components {
        */
       styling?: components["schemas"]["StylingDto"] | null;
     };
-    Object: Record<string, never>;
     ModuleListResponseDto: {
       /** @description List of modules */
       modules: components["schemas"]["ModuleSingleResponseDto"][];
@@ -1592,6 +1591,7 @@ export interface components {
        */
       AttendanceID: string;
     };
+    Object: Record<string, never>;
     AttendanceListResponse: {
       /** @description List of attendance records */
       attendanceList: components["schemas"]["AttendanceSingleResponse"][];
@@ -2388,7 +2388,7 @@ export interface operations {
         /** @description Filter by code, makes use of wildcard search */
         moduleCode?: string;
         /** @description Choose to filter modules based of current user enrollments */
-        userEnrollment?: components["schemas"]["Object"];
+        userEnrollment?: boolean;
       };
       header?: never;
       path?: never;
