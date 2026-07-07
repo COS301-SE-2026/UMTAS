@@ -1,5 +1,11 @@
 import { moduleDTO } from "@/app/course-management/queries/modules/moduleBuilder";
 import {
+  Table as ShadTable,
+  TableCell,
+  TableHeader,
+  TableRow,
+} from "@/components/atoms/baseShadcn/table";
+import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
@@ -21,16 +27,18 @@ export function CourseTable<TData>({ columns, data }: DataTableProps<TData>) {
   });
 
   return (
-    <table>
-      <CourseHeaders table={table} />
-      <CourseTableBody table={table} />
-    </table>
+    <div className="overflow-hidden rounded-md flex justify-center">
+      <ShadTable className="text-center w-3/4 mx-auto border rounded-2xl">
+        <CourseHeaders table={table} />
+        <CourseTableBody table={table} />
+      </ShadTable>
+    </div>
   );
 }
 
 function CourseHeaders<TData>({ table }: { table: Table<TData> }) {
   return (
-    <thead>
+    <TableHeader>
       {table.getHeaderGroups().map((headerGroup) => (
         <tr key={headerGroup.id}>
           {headerGroup.headers.map((header) => (
@@ -40,7 +48,7 @@ function CourseHeaders<TData>({ table }: { table: Table<TData> }) {
           ))}
         </tr>
       ))}
-    </thead>
+    </TableHeader>
   );
 }
 
@@ -54,20 +62,22 @@ function CourseTableBody<TData>({ table }: { table: Table<TData> }) {
 
 function NoRows() {
   return (
-    <tr>
-      <td>there are no rows to display</td>
-    </tr>
+    <TableRow className="">
+      <TableCell></TableCell>
+      <TableCell>there are no rows to display</TableCell>
+      <TableCell></TableCell>
+    </TableRow>
   );
 }
 
 export function CourseTableBodyFull<TData>({ rows }: { rows: Row<TData>[] }) {
   return rows.map((row) => (
-    <tr key={row.id}>
+    <TableRow key={row.id}>
       {row.getVisibleCells().map((cell) => (
-        <td key={cell.id}>
+        <TableCell key={cell.id}>
           {flexRender(cell.column.columnDef.cell, cell.getContext())}
-        </td>
+        </TableCell>
       ))}
-    </tr>
+    </TableRow>
   ));
 }

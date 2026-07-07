@@ -8,7 +8,7 @@ import { CourseTable } from "@/components/organisms/course-management/courseTabl
 import { UserDetails } from "@/lib/userclass/userClass";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-
+import { CourseTableData } from "@/components/organisms/course-management/courseColumns";
 // Will hold all the filters above the table, table is just an entity to hold data local usage
 
 export default function CourseManagementTemplate() {
@@ -39,5 +39,10 @@ export default function CourseManagementTemplate() {
     return <div>Something went wrong :( </div>;
   }
 
-  return <CourseTable columns={courseCols} data={[]}></CourseTable>;
+  const data: CourseTableData[] = courseData.map((course) => ({
+    course,
+    modules: [],
+  }));
+
+  return <CourseTable columns={courseCols} data={data}></CourseTable>;
 }

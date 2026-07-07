@@ -21,7 +21,6 @@ export function getAllCoursesQ(
     queryKey: ["courses"],
     queryFn: async () => {
       const result = await fetchAllCoursesRequest(path, queries);
-      console.log(result, "i ran");
       return result;
     },
   });

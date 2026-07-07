@@ -81,6 +81,7 @@ export class CreateModuleDto extends PickType(ModulesDto, [
     description: 'ModuleGroupingID to identify group the module belongs to',
   })
   @IsUUID()
+  @IsOptional()
   ModuleGroupingID?: string;
 
   @ApiProperty({

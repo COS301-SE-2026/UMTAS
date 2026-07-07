@@ -5,7 +5,7 @@ import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 
 // will be an array of
 // Cours info and an array of all modules
-interface CourseTableData {
+export interface CourseTableData {
   course: CourseDTO;
   modules: moduleDTO[];
   // will be a list of modules filtered by university

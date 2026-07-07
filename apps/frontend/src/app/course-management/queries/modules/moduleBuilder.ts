@@ -7,7 +7,7 @@ export type getAllModulesQueries = getAllModules["parameters"]["query"];
 export type getAllModulesRes =
   getAllModules["responses"]["200"]["content"]["application/json"]["modules"];
 
-export async function fetchAllCoursesRequest(queries: getAllModulesQueries) {
+export async function fetchAllModules(queries: getAllModulesQueries) {
   const baseUrl =
     (typeof window === "undefined"
       ? process.env.API_URL
@@ -50,6 +50,7 @@ export async function fetchAllCoursesRequest(queries: getAllModulesQueries) {
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include",
   });
 
   if (!response.ok) {

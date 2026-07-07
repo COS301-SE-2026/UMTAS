@@ -3,7 +3,6 @@ import {
   RequestBuilder,
   RequestMethod,
 } from "../../../../../utilities/request";
-import { url } from "node:inspector/promises";
 
 export type CourseDTO = components["schemas"]["CourseDto"];
 
@@ -55,7 +54,6 @@ export async function fetchAllCoursesRequest(
   if (queries?.Degree) {
     URL += queryStr;
   }
-  console.log(URL);
 
   const response = await fetch(URL, {
     method: "GET",
@@ -68,8 +66,8 @@ export async function fetchAllCoursesRequest(
   if (!response.ok) {
     throw new Error("Failed to fetch courses");
   } else {
-    const data = await response.json();
-    return data as fetchAllCourseRes;
+    const data: fetchAllCourseRes = await response.json();
+    return data.courses;
   }
 }
 
