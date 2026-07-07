@@ -13,7 +13,7 @@ export function getAllApplicationsQ(
   body?: getAllApplicationsBody,
 ) {
   return queryOptions({
-    queryKey: ["role-applications", body?.pending], // caches a pending and non pending
+    queryKey: ["role-applications"], // caches a pending and non pending
     queryFn: async () => {
       const result = new getAllApplicationsBuilder().send({
         paths: path,

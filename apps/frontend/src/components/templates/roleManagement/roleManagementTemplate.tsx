@@ -15,6 +15,9 @@ export default function RoleManagementTemplate() {
   const router = useRouter();
   const UniDetails = UserDetails.getUniDetails();
   const ViableRole = UniDetails?.role === "UNIVERSITY_ADMIN";
+  if (UniDetails === null) {
+    router.push("choose-institute");
+  }
 
   if (ViableRole) {
     return (

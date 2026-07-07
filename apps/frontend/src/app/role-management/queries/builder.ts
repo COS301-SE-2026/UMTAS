@@ -11,7 +11,23 @@ export type getAllApplicationsBody =
   getAllApplications["requestBody"]["content"]["application/json"];
 
 export type getSingleApplication = components["schemas"]["GetRolesDto"];
-
+export type rolesTypeType = components["schemas"]["GetRolesDto"]["role"];
+export const arrRolesAll: NonNullable<rolesTypeType>[] = [
+  "LECTURER",
+  "LECTURER_PENDING",
+  "REJECTED",
+  "STUDENT",
+  "SYSTEM_ADMIN",
+  "UNIVERSITY_ADMIN_PENDING",
+  "UNIVERSITY_ADMIN",
+];
+export const arrRolesValid: NonNullable<rolesTypeType>[] = [
+  "LECTURER",
+  "REJECTED",
+  "STUDENT",
+  "SYSTEM_ADMIN",
+  "UNIVERSITY_ADMIN",
+];
 export class getAllApplicationsBuilder extends RequestBuilder<
   getAllApplicationsPath,
   getAllApplicationsBody,
