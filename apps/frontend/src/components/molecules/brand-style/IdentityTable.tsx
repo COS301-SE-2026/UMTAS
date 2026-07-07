@@ -9,7 +9,7 @@ export function IdentityTable() {
           </tr>
         </thead>
         <tbody className="divide-y divide-border">
-          <tr className="hover:bg-bg-surface/50 transition-colors duration-[var(--duration-fast)] ease-in-out">
+          <tr className="brand-table-hover">
             <td className="px-4 py-3 font-medium text-[var(--text-primary)]">
               Onboarding / Empty States
             </td>
@@ -17,7 +17,7 @@ export function IdentityTable() {
               Warm, encouraging, action-oriented
             </td>
           </tr>
-          <tr className="hover:bg-bg-surface/50 transition-colors duration-[var(--duration-fast)] ease-in-out">
+          <tr className="brand-table-hover">
             <td className="px-4 py-3 font-medium text-[var(--text-primary)]">
               Informational labels / tooltips
             </td>
@@ -25,7 +25,7 @@ export function IdentityTable() {
               Neutral, precise, no filler
             </td>
           </tr>
-          <tr className="hover:bg-bg-surface/50 transition-colors duration-[var(--duration-fast)] ease-in-out">
+          <tr className="brand-table-hover">
             <td className="px-4 py-3 font-medium text-[var(--text-primary)]">
               Error messages
             </td>
@@ -33,7 +33,7 @@ export function IdentityTable() {
               Honest, calm, tells the user what to do next
             </td>
           </tr>
-          <tr className="hover:bg-bg-surface/50 transition-colors duration-[var(--duration-fast)] ease-in-out">
+          <tr className="brand-table-hover">
             <td className="px-4 py-3 font-medium text-[var(--text-primary)]">
               Success feedback
             </td>
@@ -41,7 +41,7 @@ export function IdentityTable() {
               Brief, affirmative, not over-celebratory
             </td>
           </tr>
-          <tr className="hover:bg-bg-surface/50 transition-colors duration-[var(--duration-fast)] ease-in-out">
+          <tr className="brand-table-hover">
             <td className="px-4 py-3 font-medium text-[var(--text-primary)]">
               Security / Destructive actions
             </td>
