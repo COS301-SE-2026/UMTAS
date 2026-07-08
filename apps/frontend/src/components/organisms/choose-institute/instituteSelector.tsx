@@ -48,8 +48,16 @@ export function InstituteSelector() {
           /* werk hierso haha */
         }}
       />
-
       <SelectRoleField value={selectedRole} onChange={setSelectedRole} />
+      <div className="w-full items-center flex flex-col">
+        <button
+          className="text-xs text-[var(--text-secondary)] underline-offset-2 hover:underline"
+          disabled={selectedRole == ""}
+          onClick={() => setSelectedRole("")}
+        >
+          Clear role
+        </button>
+      </div>
 
       {/*      {isNotApproved && selectedInstitute && (
         <ApprovalStatus
@@ -57,15 +65,12 @@ export function InstituteSelector() {
           universityName={selectedInstitute.UniversityName}
         />
       )*/}
-
       {selectedInstitute && <ApprovalStatus uni={selectedInstitute} />}
-
-      <div className="mt-2 flex justify-end gap-3 border-t pt-4">
+      <div className="mt-2 flex justify-around gap-3 border-t pt-4">
         <Button type="submit" disabled={uniDisabeled}>
           continue as {selectedInstitute?.role ?? "student"}
         </Button>
-      </div>
-      <div className="mt-2 flex justify-end gap-3 border-t pt-4">
+
         <Button
           type="submit"
           disabled={applyDisabled}
