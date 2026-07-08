@@ -1,5 +1,14 @@
-import { IsBoolean, IsUUID, Length } from 'class-validator';
+import {
+  ArrayNotEmpty,
+  IsArray,
+  IsBoolean,
+  IsUUID,
+  Length,
+} from 'class-validator';
 import { PickType } from '@nestjs/swagger';
+
+import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 
 export class ModuleGroupingDto {
   @IsUUID()
@@ -70,3 +79,20 @@ export class DeleteResponseDto extends PickType(ModuleGroupingDto, [
   @IsBoolean()
   success!: boolean;
 } //END_DeleteResponseDto
+
+//Populate Group body
+export class PopulateGroupBodyDto {
+  @ApiProperty({
+    description: 'module array to ad dto the group',
+    type: [String],
+    example: [
+      '10000000-0000-0000-0000-000000000000',
+      '20000000-0000-0000-0000-000000000000',
+    ],
+  })
+  @IsArray({ message: 'modules needs to be an array of UUIDs' })
+  @ArrayNotEmpty({ message: 'modules array should not be empty meneer' })
+  @IsUUID('4', { each: true, message: 'Each module ID should be a UUID' })
+  @Type(() => String)
+  modules!: string[];
+}
