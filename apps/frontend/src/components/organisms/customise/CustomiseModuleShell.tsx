@@ -5,19 +5,25 @@ import CustomiseModulePanel from "@/components/atoms/customise/CustomiseModulePa
 import { CustomiseModuleCard } from "@/components/molecules/customise/CustomiseModuleCard";
 import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
 import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
-import { useMutation } from "@tanstack/react-query";
-import { updateModuleMut } from "@/components/templates/builder/Queries/moduleQueries";
+import { MutateOptions, QueryKey, useMutation } from "@tanstack/react-query";
 import { UserDetails } from "@/lib/userclass/userClass";
+import {
+  updateModQ,
+  updateModStylingQ,
+} from "@/app/course-management/queries/modules/moduleQueries";
+import { getQueryClient } from "@/components/tanstack/getQueryClient";
 
 interface CustomiseShellProps {
   events: EventResponse[];
   modules: ModuleResponseDto[];
   onViewModeChange?: (tab: "Modules" | "Events") => void;
+  invalidateKey?: QueryKey;
 }
 
 export default function ModulesShell({
   modules,
   onViewModeChange,
+  invalidateKey,
 }: CustomiseShellProps) {
   const [selectedModuleId, setSelectedModuleId] = useState<string>(
     modules[0]?.moduleID,
@@ -39,8 +45,28 @@ export default function ModulesShell({
   // used for tracking editablilty
   const canEdit = UserDetails.userCanEdit();
   //mutation for updating
-  const { mutate: saveModule, isPending: isSaving } =
-    useMutation(updateModuleMut());
+  // base options from your factory
+
+  const finalOptions = {
+    ...updateModQ(),
+    onSuccess: () => {
+      getQueryClient().invalidateQueries({
+        queryKey: invalidateKey,
+      });
+    },
+  };
+  const { mutate: saveModule, isPending: isSaving } = useMutation(finalOptions);
+
+  const stylingMutOptions = {
+    ...updateModStylingQ(),
+    onSuccess: () => {
+      getQueryClient().invalidateQueries({
+        queryKey: invalidateKey,
+      });
+    },
+  };
+
+  const { mutate: updateStyling } = useMutation(stylingMutOptions);
 
   //bool check if the module actually changed
   const didModuleChange =
@@ -68,16 +94,26 @@ export default function ModulesShell({
 
   //what gets called in the component
   function handleSave() {
-    if (!tempModule || !canEdit) return;
-    saveModule({
-      moduleID: tempModule.moduleID,
-      module: {
-        moduleCode: tempModule.moduleCode,
-        moduleName: tempModule.moduleName,
-        moduleDescription: tempModule.moduleDescription,
-        styling: tempModule.styling,
-      },
-    });
+    if (!tempModule) return;
+    if (canEdit) {
+      saveModule({
+        path: { moduleId: tempModule.moduleID },
+        body: {
+          moduleCode: tempModule.moduleCode,
+          moduleName: tempModule.moduleName,
+          moduleDescription: tempModule.moduleDescription,
+          styling: tempModule.styling,
+        },
+      });
+    } else {
+      if (tempModule.styling)
+        updateStyling({
+          body: { styling: tempModule.styling },
+          path: {
+            moduleId: tempModule.moduleID,
+          },
+        });
+    }
   }
 
   function handleDiscard() {
@@ -139,7 +175,7 @@ export default function ModulesShell({
                 size="sm"
                 variant="outline"
                 className="h-7 px-3 text-xs"
-                disabled={(!didModuleChange || isSaving) && canEdit}
+                disabled={!didModuleChange || isSaving}
                 onClick={handleSave}
               >
                 Save
@@ -148,7 +184,7 @@ export default function ModulesShell({
                 size="sm"
                 variant="destructive"
                 className="h-7 px-3 text-xs"
-                disabled={!didModuleChange && canEdit}
+                disabled={!didModuleChange}
                 onClick={handleDiscard}
               >
                 Discard

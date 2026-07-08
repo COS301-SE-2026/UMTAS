@@ -43,6 +43,7 @@ export function CustomiseModuleCard({
   }
   // used for tracking editablilty
   const canEdit = UserDetails.userCanEdit();
+
   return (
     <div className="flex flex-col gap-4">
       {/*module general stuff */}
@@ -115,7 +116,9 @@ export function CustomiseModuleCard({
           </Label>
           <ColourPicker
             value={module.styling?.colour || ""}
-            onChange={(colour) => onUpdate(module.moduleID, "styling", colour)}
+            onChange={(colour) => {
+              onUpdate(module.moduleID, "styling", colour);
+            }}
           />
           {errors?.styling && (
             <p className="text-sm text-[var(--error-text)]">{errors.styling}</p>

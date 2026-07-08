@@ -1,4 +1,8 @@
 import { components, paths } from "@/lib/api";
+import {
+  RequestBuilder,
+  RequestMethod,
+} from "../../../../../utilities/request";
 
 export type moduleDTO = components["schemas"]["ModuleSingleResponseDto"];
 export type getAllModules = paths["/modules"]["get"];
@@ -53,11 +57,47 @@ export async function fetchAllModules(queries: getAllModulesQueries) {
     credentials: "include",
   });
 
-  console.log(response);
   if (!response.ok) {
     throw new Error("Failed to fetch courses");
   } else {
     const data = await response.json();
     return data.modules as getAllModulesRes;
+  }
+}
+
+type updateModule = paths["/modules/{moduleId}"]["patch"];
+export type updateModulePath = updateModule["parameters"]["path"];
+export type updateModuleBody =
+  updateModule["requestBody"]["content"]["application/json"];
+export type updateModuleRes =
+  updateModule["responses"]["200"]["content"]["application/json"];
+
+export class updateModuleBuilder extends RequestBuilder<
+  updateModulePath,
+  updateModuleBody,
+  updateModuleRes
+> {
+  constructor() {
+    super();
+    this.setUrl("/modules/{moduleId}").setMethod(RequestMethod.PATCH);
+  }
+}
+
+type updateModStyling = paths["/modules/styling/{moduleId}"]["post"];
+export type updateModStylingPath = updateModStyling["parameters"]["path"];
+export type updateModStylingBody =
+  updateModStyling["requestBody"]["content"]["application/json"];
+export type updateModStylingRes =
+  updateModStyling["responses"]["200"]["content"]["application/json"];
+export type modStylingDTO = components["schemas"]["StylingDto"];
+
+export class updateStylingBuilder extends RequestBuilder<
+  updateModStylingPath,
+  updateModStylingBody,
+  updateModStylingRes
+> {
+  constructor() {
+    super();
+    this.setUrl("/modules/styling/{moduleId}").setMethod(RequestMethod.POST);
   }
 }
