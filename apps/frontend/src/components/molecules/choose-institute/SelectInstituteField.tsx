@@ -9,16 +9,12 @@ import {
   SelectValue,
 } from "@/components/atoms/baseShadcn/select";
 import { NotSupportedLink } from "@/components/atoms/choose-institute/NotSupportedLink";
-
-interface Institute {
-  id: string;
-  name: string;
-}
+import { uniDto } from "@/app/choose-institute/queries/builders";
 
 interface SelectInstituteFieldProps {
-  institutes: Institute[];
+  institutes: uniDto[];
   value: string;
-  onChange: (value: string) => void;
+  onChange: (id: string) => void;
   onNotSupportedClick: () => void;
 }
 
@@ -31,14 +27,17 @@ export function SelectInstituteField({
   return (
     <div className="flex flex-col gap-2">
       <Label htmlFor="institute-select">Select Institute</Label>
-      <Select value={value} onValueChange={onChange}>
+      <Select value={value} onValueChange={(id) => onChange(id)}>
         <SelectTrigger id="institute-select" className="w-full">
           <SelectValue placeholder="Select an institute" />
         </SelectTrigger>
         <SelectContent>
           {institutes.map((institute) => (
-            <SelectItem key={institute.id} value={institute.id}>
-              {institute.name}
+            <SelectItem
+              key={institute.UniversityID}
+              value={institute.UniversityID}
+            >
+              {institute.UniversityName}
             </SelectItem>
           ))}
         </SelectContent>
