@@ -156,4 +156,22 @@ describe('UniversityController', () => {
       expect(result).toEqual(expectedResponse);
     });
   }); // END_TEST_update
+
+  //delete
+  describe('TEST_delete', () => {
+    it('should delete a university', async () => {
+      const universityId = 'uuid-1';
+      const expectedResponse = {
+        UniversityName: 'Test University',
+        success: true,
+      } as const;
+
+      mockUniversityService.delete!.mockResolvedValue(expectedResponse);
+
+      const result = await controller.delete(universityId);
+
+      expect(mockUniversityService.delete).toHaveBeenCalledWith(universityId);
+      expect(result).toEqual(expectedResponse);
+    });
+  }); // END_TEST_delete
 });
