@@ -174,4 +174,58 @@ describe('UniversityController', () => {
       expect(result).toEqual(expectedResponse);
     });
   }); // END_TEST_delete
+
+  //applyForRole
+  describe('TEST_applyForRole', () => {
+    it('should apply for a role at a university', async () => {
+      const applyDto = {
+        UniversityID: 'uuid-1',
+        role: 'STUDENT',
+      } as const;
+      const expectedResponse: UniversitySingleResponseDto = {
+        UniversityName: 'Test University',
+        UniversityID: applyDto.UniversityID,
+      };
+
+      mockUniversityService.applyForUniRole!.mockResolvedValue(
+        expectedResponse,
+      );
+
+      const result = await controller.applyForRole(
+        { user: { id: 'userId' } } as any,
+        applyDto,
+      );
+
+      expect(mockUniversityService.applyForUniRole).toHaveBeenCalledWith(
+        'userId',
+        applyDto,
+      );
+      expect(result).toEqual(expectedResponse);
+    });
+  }); // END_TEST_applyForRole
+
+  //approveUserRole
+  describe('TEST_approveUserRole', () => {
+    it('should approve a user role at a university', async () => {
+      const approveDto = {
+        UniversityID: 'uuid-1',
+        userId: 'userId',
+      } as const;
+      const expectedResponse = {
+        userId: approveDto.userId,
+        success: true,
+      } as const;
+
+      mockUniversityService.approveUserRole!.mockResolvedValue(
+        expectedResponse,
+      );
+
+      const result = await controller.approveUserRole(approveDto);
+
+      expect(mockUniversityService.approveUserRole).toHaveBeenCalledWith(
+        approveDto,
+      );
+      expect(result).toEqual(expectedResponse);
+    });
+  });
 });
