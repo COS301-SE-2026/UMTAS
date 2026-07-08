@@ -1,0 +1,20 @@
+apps/frontend/src/lib/auth-client.ts
+  s_40e7429b7f9ef8::t_b3e706e42b0a85 3-7,9-11,13
+  s_40e7429b7f9ef8::t_a80a4174daaba0 8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "b636cd14033b1622b5d1cdc509912587ad99a1f1",
+  "prompts": {},
+  "sessions": {
+    "s_40e7429b7f9ef8": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f41f0-281e-7412-9332-9c9692a45ca9",
+        "model": "gpt-5.5"
+      },
+      "human_author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}
