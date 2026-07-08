@@ -32,9 +32,9 @@ export default function ModManagementTemplate() {
     })) ?? [];
 
   return (
-    <div className="h-[80vh] items-center flex flex-col ">
+    <div className="h-[80vh] items-center flex flex-col justify-around">
       <Card className="h-1/4 w-1/2 mb-5 text-center">filters go here</Card>
-      <ModuleTable columns={moduleCols} data={data} />;
+      <ModuleTable columns={moduleCols} data={data} />
     </div>
   );
 }

@@ -48,7 +48,7 @@ export function ModuleTable<TData>({ columns, data }: DataTableProps<TData>) {
 
   return (
     <>
-      <div className="h-full w-full overflow-hidden rounded-md items-center flex flex-col ">
+      <div className="h-full w-full  rounded-md items-center flex flex-col ">
         <Card className="w-3/4 h-2/4">
           <ShadTable className="text-center w-full mx-auto overflow-scroll">
             <CourseHeaders table={table} />
@@ -59,7 +59,7 @@ export function ModuleTable<TData>({ columns, data }: DataTableProps<TData>) {
 
       {showModPopup && (
         <Popup>
-          <Card className=" items-center p-10">
+          <div className=" items-center p-5 justify-center w-fit flex flex-col center h-9/10 overflow-scroll">
             <div className="flex flex-row">
               <CustomiseShell
                 modules={[dataState.modules]}
@@ -70,7 +70,7 @@ export function ModuleTable<TData>({ columns, data }: DataTableProps<TData>) {
             <Button className="w-1/10" onClick={() => updateModPopup(false)}>
               close
             </Button>
-          </Card>
+          </div>
         </Popup>
       )}
     </>

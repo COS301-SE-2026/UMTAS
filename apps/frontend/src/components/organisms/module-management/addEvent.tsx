@@ -58,7 +58,7 @@ export default function CreateEventAdmin({ module }: createEventProps) {
   }
 
   return (
-    <Card className="items-center w-1/3">
+    <Card className=" items-center w-1/3 h-[50vh] m-auto">
       <h1>Create Event</h1>
       <StateInput State={event} field="eventName" update={updateEvent} />
       <StateInput State={event} field="eventCode" update={updateEvent} />
