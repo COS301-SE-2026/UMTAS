@@ -64,7 +64,7 @@ export function BrandIdentity() {
 
         <IdentityTable />
 
-        <div className="p-4 pl-10 bg-bg-surface rounded-lg border border-border w-fit">
+        <div className="p-4 pl-8 bg-bg-surface rounded-lg border border-border w-fit">
           <h3 className="text-xl font-semibold uppercase tracking-wider text-[var(--text-primary)] mb-2">
             Rules
           </h3>

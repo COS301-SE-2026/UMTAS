@@ -1,6 +1,7 @@
 "use client";
 
 import { BrandIdentity } from "@/components/organisms/brand-style/BrandIdentity";
+import { ColourSystem } from "@/components/organisms/brand-style/ColourSystem";
 
 export default function BrandStyleShell() {
   return (
@@ -26,11 +27,7 @@ export default function BrandStyleShell() {
             <BrandIdentity />
           </section>
           <section>
-            <h1>Colour System</h1>
-            <h2>Dark Mode Palette</h2>
-            <h2>Light Mode Palette</h2>
-            <h2>Status Colours</h2>
-            <h2>Colour Rules</h2>
+            <ColourSystem />
           </section>
           <section>
             <h1>Typography</h1>
