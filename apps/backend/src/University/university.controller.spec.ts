@@ -11,7 +11,10 @@ import { createMockUniversityService } from '../Testing/Mocks/services';
 
 //Factories
 
-import { CreateUniversityDto } from './dto/university.dto';
+import {
+  CreateUniversityDto,
+  UniversityListResponseDto,
+} from './dto/university.dto';
 
 //DTo's
 import { UniversitySingleResponseDto } from './dto/university.dto';
@@ -59,6 +62,30 @@ describe('UniversityController', () => {
       const result = await controller.create(createDto);
       expect(result).toEqual(expectedResponse);
       expect(mockUniversityService.create).toHaveBeenCalledWith(createDto);
+    });
+  });
+
+  describe('TEST_getAll', () => {
+    it('should return all universities', async () => {
+      const expectedResponse: UniversityListResponseDto = {
+        universities: [
+          {
+            UniversityName: 'Test University 1',
+            UniversityID: 'uuid-1',
+          },
+          {
+            UniversityName: 'Test University 2',
+            UniversityID: 'uuid-2',
+          },
+        ],
+      };
+
+      mockUniversityService.getAll!.mockResolvedValue(expectedResponse);
+
+      const result = await controller.getAll({ user: { id: 'userId' } } as any);
+
+      expect(mockUniversityService.getAll).toHaveBeenCalledWith('userId');
+      expect(result).toEqual(expectedResponse);
     });
   });
 });
