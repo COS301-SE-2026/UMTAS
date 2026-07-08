@@ -26,5 +26,6 @@ export default function ModManagementTemplate() {
         ) ?? [],
     })) ?? [];
 
+  console.log(eventData);
   return <ModuleTable columns={moduleCols} data={data} />;
 }

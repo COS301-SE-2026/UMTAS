@@ -20,6 +20,7 @@ import { Card } from "@/components/atoms/baseShadcn/card";
 import Popup from "@/components/atoms/utility/floatContainer";
 import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
 import { ModuleTableData } from "./ModuleColumns";
+import CreateEventAdmin from "./addEvent";
 
 interface DataTableProps<TData> {
   columns: (ColumnDef<TData, string> | ColumnDef<TData, EventResponse[]>)[];
@@ -58,11 +59,14 @@ export function ModuleTable<TData>({ columns, data }: DataTableProps<TData>) {
 
       {showModPopup && (
         <Popup>
-          <Card className="items-center">
-            <CustomiseShell
-              modules={[dataState.modules]}
-              events={dataState.events}
-            />
+          <Card className="items-center p-10">
+            <div className="flex flex-row">
+              <CustomiseShell
+                modules={[dataState.modules]}
+                events={dataState.events}
+              />
+              <CreateEventAdmin module={dataState.modules} />
+            </div>
             <Button className="w-1/10" onClick={() => updateModPopup(false)}>
               close
             </Button>

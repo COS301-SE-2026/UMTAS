@@ -4,6 +4,7 @@ import {
   EventCriteria,
 } from "@/app/builder/utils/events/eventRequestBuilder";
 import { moduleDTO } from "@/app/course-management/queries/modules/moduleBuilder";
+import { Button } from "@/components/atoms/baseShadcn/button";
 import { Card } from "@/components/atoms/baseShadcn/card";
 import {
   Select,
@@ -14,7 +15,8 @@ import {
 } from "@/components/atoms/baseShadcn/select";
 import { TIMES } from "@/components/atoms/builder/TimeSlotSelect";
 import { InputProps, StateInput } from "@/components/atoms/utility/stateInput";
-import { InputType } from "node:zlib";
+import { addUniEventMut } from "@/components/templates/builder/Queries/eventQueries";
+import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 
 interface createEventProps {
@@ -36,6 +38,7 @@ export default function CreateEventAdmin({ module }: createEventProps) {
     eventCriteria: criteria,
     isRecurring: false,
   });
+  const { mutateAsync: addEvent } = useMutation(addUniEventMut());
 
   function updateEvent(field: keyof CreateEventBody, value: string) {
     setEvent({
@@ -48,10 +51,15 @@ export default function CreateEventAdmin({ module }: createEventProps) {
       ...criteria,
       [field]: value,
     });
+    setEvent({
+      ...event,
+      eventCriteria: criteria,
+    });
   }
 
   return (
-    <Card>
+    <Card className="items-center">
+      <h1>Create Event</h1>
       <StateInput State={event} field="eventName" update={updateEvent} />
       <StateInput State={event} field="eventCode" update={updateEvent} />
       <StateInput
@@ -61,7 +69,7 @@ export default function CreateEventAdmin({ module }: createEventProps) {
         type="date"
       />
       <StateInput State={criteria} field="venue" update={updateCriteria} />
-      <div className="flex flex-row">
+      <div className="flex flex-row space-x-3">
         <TimeSelect
           times={TIMES}
           inputDetails={{
@@ -79,6 +87,31 @@ export default function CreateEventAdmin({ module }: createEventProps) {
           }}
         />
       </div>
+      <Button
+        onClick={async () => {
+          try {
+            await addEvent({ body: event });
+            setCriteria({
+              date: "",
+              endTime: "",
+              venue: "",
+              startTime: "",
+              moduleID: module.moduleID,
+              type: "university",
+            });
+            setEvent({
+              eventName: "",
+              eventCode: "",
+              eventCriteria: criteria,
+              isRecurring: false,
+            });
+          } catch (err) {
+            console.error(err);
+          }
+        }}
+      >
+        Create
+      </Button>
     </Card>
   );
 }
@@ -95,7 +128,7 @@ function TimeSelect<Type>({ times, inputDetails }: TimeSelectProps<Type>) {
       }}
     >
       <SelectTrigger>
-        <SelectValue placeholder="Time"></SelectValue>
+        <SelectValue placeholder={String(inputDetails.field)}></SelectValue>
       </SelectTrigger>
       <SelectContent>
         {times.map((time, idx) => {
