@@ -10,7 +10,7 @@ import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Roles } from '../auth/roles.guard';
 
 @ApiTags('Grouping')
-@Controller('modules')
+@Controller('grouping')
 export class GroupingController {
   constructor(private readonly service: GroupingService) {}
 
