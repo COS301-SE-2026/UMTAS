@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { eq } from 'drizzle-orm';
+import { eq, inArray } from 'drizzle-orm';
 import { hashPassword } from 'better-auth/crypto';
 import { DatabaseService } from './database.service';
 import {
@@ -30,12 +30,12 @@ export class DatabaseSeedService {
         name: 'default-system-admin',
         run: () => this.seedDefaultSystemAdmin(),
       },
-      // {
+      // {//seed users
       //   name: 'auth-seed',
       //  run: () => this.seedAuthTestData(),
       //},
       {
-        name: 'uni-seed',
+        name: 'Seed-Universities',
         run: () => this.seedUniVersity(),
       },
     ];
@@ -141,28 +141,55 @@ export class DatabaseSeedService {
   }
 
   private async seedUniVersity(): Promise<void> {
-    const [uniSeed] = await this.dbService.db
-      .insert(University)
-      .values({
-        UniversityName: 'University of Pretoria',
-      })
-      .returning();
+    //University names to seed
+    const uniNames: string[] = [
+      'University of Pretoria',
+      'North-West University',
+      'University of Cape Town',
+    ];
 
-    const [uniAdmin] = await this.dbService.db
+    //Get Unis that already exists
+    const existingUnis = await this.dbService.db
       .select()
-      .from(usersTable)
-      .where(
-        eq(
-          usersTable.name,
-          this.configService.get<string>('SEED_SYSTEM_ADMIN_NAME') ??
-            'System Admin',
-        ),
-      );
+      .from(University)
+      .where(inArray(University.UniversityName, uniNames));
 
-    await this.dbService.db.insert(UniversityRole).values({
-      UniversityID: uniSeed.UniversityID,
-      UserID: uniAdmin.id,
-      role: 'UNIVERSITY_ADMIN',
-    });
+    //Find missing uni names
+    const existingNames = new Set(
+      existingUnis.map((uni) => uni.UniversityName),
+    );
+    const missingNames = uniNames.filter((name) => !existingNames.has(name));
+
+    //Seed missingNames into University table
+    if (missingNames.length > 0) {
+      //Seed only missing names
+      const [uniSeed] = await this.dbService.db
+        .insert(University)
+        .values(missingNames.map((name) => ({ UniversityName: name })))
+        .returning();
+
+      //if University of pretroia had to be seeded -> seed in uni_admin for it <=================================Might remove later :)
+      if (missingNames.includes(uniNames[0])) {
+        const [uniAdmin] = await this.dbService.db
+          .select()
+          .from(usersTable)
+          .where(
+            eq(
+              usersTable.name,
+              this.configService.get<string>('SEED_SYSTEM_ADMIN_NAME') ??
+                'System Admin',
+            ),
+          );
+
+        await this.dbService.db.insert(UniversityRole).values({
+          UniversityID: uniSeed.UniversityID,
+          UserID: uniAdmin.id,
+          role: 'UNIVERSITY_ADMIN',
+        });
+      }
+    } //END_check for missing names
+    else {
+      this.logger.log(`Universities already seeded`);
+    }
   }
 }
