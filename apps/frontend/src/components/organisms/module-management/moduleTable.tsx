@@ -38,16 +38,37 @@ export function ModuleTable<TData>({ columns, data }: DataTableProps<TData>) {
     modules: { moduleCode: "", moduleID: "", moduleName: "" },
   });
 
+  const [showModPopup, updateModPopup] = useState(false);
+
+  function showUpdateMod(param: ModuleTableData) {
+    updateModPopup(true);
+    setDataState(param);
+  }
+
   return (
     <>
       <div className="h-full w-full overflow-hidden rounded-md items-center flex flex-col ">
         <Card className="w-3/4 h-2/4">
           <ShadTable className="text-center w-full mx-auto overflow-scroll">
             <CourseHeaders table={table} />
-            <CourseTableBody table={table} setPopUp={setDataState} />
+            <CourseTableBody table={table} setPopUp={showUpdateMod} />
           </ShadTable>
         </Card>
       </div>
+
+      {showModPopup && (
+        <Popup>
+          <Card className="items-center">
+            <CustomiseShell
+              modules={[dataState.modules]}
+              events={dataState.events}
+            />
+            <Button className="w-1/10" onClick={() => updateModPopup(false)}>
+              close
+            </Button>
+          </Card>
+        </Popup>
+      )}
     </>
   );
 }

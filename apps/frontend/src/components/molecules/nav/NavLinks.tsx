@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { href: "/choose-institute", label: "Choose Institute" },
   { href: "/course-management", label: "Manage courses" },
   { href: "/role-management", label: "Manage roles" },
+  { href: "/module-management", label: "Manage modules and events" },
 ] as const;
 
 export function NavLinks() {
