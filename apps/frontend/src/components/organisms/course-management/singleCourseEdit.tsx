@@ -1,7 +1,15 @@
-import { CourseDTO } from "@/app/course-management/queries/courses/courseBuilder";
-import { updateCourseQ } from "@/app/course-management/queries/courses/courseQueries";
+import {
+  CourseDTO,
+  createCourses,
+  createCoursesBody,
+} from "@/app/course-management/queries/courses/courseBuilder";
+import {
+  createCourseQ,
+  updateCourseQ,
+} from "@/app/course-management/queries/courses/courseQueries";
 import { Button } from "@/components/atoms/baseShadcn/button";
 import { Input } from "@/components/atoms/baseShadcn/input";
+import { UserDetails } from "@/lib/userclass/userClass";
 import { useMutation } from "@tanstack/react-query";
 import { ReactNode, useState } from "react";
 
@@ -30,6 +38,12 @@ export default function CourseCustimisation({
 
   return (
     <div className=" w-full m-3 justify-center flex flex-col items-center space-y-4">
+      <h1>Edit course</h1>
+      <CourseInput
+        field={"CourseName"}
+        state={{ course: course, updateCourse }}
+      />
+      <CourseInput field={"Degree"} state={{ course: course, updateCourse }} />
       <div className="flex flex-row items-center space-x-4">
         <Button
           onClick={() =>
@@ -40,11 +54,6 @@ export default function CourseCustimisation({
         </Button>
         {children}
       </div>
-      <CourseInput
-        field={"CourseName"}
-        state={{ course: course, updateCourse }}
-      />
-      <CourseInput field={"Degree"} state={{ course: course, updateCourse }} />
     </div>
   );
 }

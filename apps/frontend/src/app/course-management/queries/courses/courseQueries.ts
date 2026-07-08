@@ -26,9 +26,9 @@ export function getAllCoursesQ(
   });
 }
 
-export function createCourseQ(body: createCoursesBody) {
+export function createCourseQ() {
   return mutationOptions({
-    mutationFn: async () => {
+    mutationFn: async (body: createCoursesBody) => {
       return new createCoursesBuilder().send({ body: body });
     },
     onSuccess: () => {
