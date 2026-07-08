@@ -134,4 +134,26 @@ describe('UniversityController', () => {
       expect(result).toEqual(expectedResponse);
     });
   }); // END_TEST_getUsersRoleByUni
+
+  //update
+  describe('TEST_update', () => {
+    it('should update a university', async () => {
+      const universityId = 'uuid-1';
+      const updateDto = { UniversityName: 'Updated University' };
+      const expectedResponse: UniversitySingleResponseDto = {
+        UniversityName: updateDto.UniversityName,
+        UniversityID: universityId,
+      };
+
+      mockUniversityService.update!.mockResolvedValue(expectedResponse);
+
+      const result = await controller.update(universityId, updateDto);
+
+      expect(mockUniversityService.update).toHaveBeenCalledWith(
+        universityId,
+        updateDto,
+      );
+      expect(result).toEqual(expectedResponse);
+    });
+  }); // END_TEST_update
 });
