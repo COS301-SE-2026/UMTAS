@@ -17,6 +17,8 @@ import {
 } from "@tanstack/react-table";
 import { useState } from "react";
 import { CourseTableData } from "./courseColumns";
+import CourseCustimisation from "./singleCourseEdit";
+import { Card } from "@/components/atoms/baseShadcn/card";
 
 interface DataTableProps<TData> {
   columns: (ColumnDef<TData, string> | ColumnDef<TData, moduleDTO[]>)[];
@@ -25,16 +27,19 @@ interface DataTableProps<TData> {
 
 export function CourseTable<TData>({ columns, data }: DataTableProps<TData>) {
   const [showPopUp, setPopUp] = useState(false);
-  const [modules, setModules] = useState<moduleDTO[]>([]);
+  const [dataState, setData] = useState<CourseTableData>({
+    course: { CourseID: "", CourseName: "", UniversityID: "" },
+    modules: [],
+  });
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
 
-  function callPopup(modules: moduleDTO[]) {
+  function callPopup(dataState: CourseTableData) {
     setPopUp(true);
-    setModules(modules);
+    setData(dataState);
   }
 
   return (
@@ -47,10 +52,14 @@ export function CourseTable<TData>({ columns, data }: DataTableProps<TData>) {
       </div>{" "}
       {showPopUp && (
         <div className="fixed w-full inset-0 flex items-center justify-center  bg-opacity-50 z-50">
-          <div className="bg-black border-white  rounded-2xl border">
-            <Button onClick={() => setPopUp(false)}>close</Button>
-            <CustomiseShell modules={modules} events={[]} />
-          </div>
+          <Card className=" justify-center flex flex-col items-center space-y-4">
+            <div className="w-full items-center flex flex-col">
+              <CourseCustimisation data={dataState.course}>
+                <Button onClick={() => setPopUp(false)}>close</Button>
+              </CourseCustimisation>
+            </div>
+            <CustomiseShell modules={dataState.modules} events={[]} />
+          </Card>
         </div>
       )}
     </>
@@ -78,7 +87,7 @@ function CourseTableBody<TData>({
   setPopUp,
 }: {
   table: Table<TData>;
-  setPopUp: (modules: moduleDTO[]) => void;
+  setPopUp: (dataState: CourseTableData) => void;
 }) {
   const rows = table.getRowModel().rows;
   const empty = rows.length === 0;
@@ -98,8 +107,7 @@ function CourseTableBody<TData>({
                 key={cell.id}
                 onClick={() => {
                   const original = row.original as CourseTableData;
-                  console.log(original.modules);
-                  setPopUp(original.modules);
+                  setPopUp(original);
                 }}
               >
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
