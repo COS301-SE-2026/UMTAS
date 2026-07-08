@@ -8,7 +8,8 @@ import {
   accountsTable,
   University,
   UniversityRole,
-  // Course,
+  Course,
+  ModuleGrouping,
 } from '../entities/index';
 // import { AuthSeed } from './seeds/auth.seed';
 import {
@@ -18,8 +19,8 @@ import {
   UserPasswords,
   UserIDs,
   UserUniRoles,
-  // CourseNames,
-  // CourseDegrees,
+  CourseNames,
+  CourseDegrees,
 } from './seeds/constants.seed';
 
 interface SeedTask {
@@ -55,6 +56,11 @@ export class DatabaseSeedService {
         //Seed UniRoles for users
         name: 'Seed-UniRoles-For-UniversityOfPretoria',
         run: () => this.seedUniRolesForUP(),
+      },
+      {
+        //Seed COurses with their moduleGroupings
+        name: 'Seed-Courses-With-Their-Empty-ModuleGroupings',
+        run: () => this.seedCoursesWithModuleGroupings(),
       },
     ];
 
@@ -325,39 +331,66 @@ export class DatabaseSeedService {
     }
   } //END_seedUniRolesForUP
 
-  // private async seedCoursesWithModuleGroupings(): Promise<void>{
-  //   //If course exists -> grouping should exist
-  //   const courseNames = CourseNames;
-  //   const courseDegrees = CourseDegrees;
+  private async seedCoursesWithModuleGroupings(): Promise<void> {
+    //If course exists -> grouping should exist
+    const courseNames = CourseNames;
+    const courseDegrees = CourseDegrees;
 
-  //   //Get UniversityOfPta
-  //   const [uni] = await this.dbService.db
-  //     .select().from(University)
-  //     .where(eq(University.UniversityName, UniversityNames[0])).limit(1);
+    //Get UniversityOfPta
+    const [uni] = await this.dbService.db
+      .select()
+      .from(University)
+      .where(eq(University.UniversityName, UniversityNames[0]))
+      .limit(1);
 
-  //   let courses = courseNames.map((name, index)=>({
-  //     UniversityID: uni.UniversityID,
-  //     CourseName: name,
-  //     Degree: courseDegrees[index]
-  //   }))
+    const courses = courseNames.map((name, index) => ({
+      UniversityID: uni.UniversityID,
+      CourseName: name,
+      Degree: courseDegrees[index],
+    }));
 
-  //   //Get already existing courses
-  //   const existingCourses = await this.dbService.db
-  //     .select().from(Course)
-  //     .where(and(
-  //       eq(Course.UniversityID, uni.UniversityID),
-  //       inArray(Course.CourseName, courseNames),
-  //       inArray(Course.Degree, courseDegrees)
-  //     ));
+    //Get already existing courses
+    const existingCourses = await this.dbService.db
+      .select()
+      .from(Course)
+      .where(
+        and(
+          eq(Course.UniversityID, uni.UniversityID),
+          inArray(Course.CourseName, courseNames),
+          inArray(Course.Degree, courseDegrees),
+        ),
+      );
 
-  //   //Get the missing courses from the existing CourseNames
-  //   const existingCourseNames = new Set(existingCourses.map((course)=>(course.CourseName)));
-  //   let missingCourses = courses.filter((course)=>!existingCourseNames.has(course.CourseName));
+    //Get the missing courses from the existing CourseNames
+    const existingCourseNames = new Set(
+      existingCourses.map((course) => course.CourseName),
+    );
+    const missingCourses = courses.filter(
+      (course) => !existingCourseNames.has(course.CourseName),
+    );
 
-  //   if (missingCourses.length>0){
-  //     //First create GroupID's for the courses
+    if (missingCourses.length > 0) {
+      //First create groups for the courses
+      const groups = await this.dbService.db
+        .insert(ModuleGrouping)
+        .values(
+          missingCourses.map(() => ({
+            Hash: null,
+          })),
+        )
+        .returning();
 
-  //   }
-
-  // }//END_seedCourseWithModuleGrouping
+      //seed in missing courses
+      await this.dbService.db.insert(Course).values(
+        missingCourses.map((course, index) => ({
+          ...course,
+          GroupID: groups[index].GroupID,
+        })),
+      );
+    } else {
+      this.logger.log(
+        `Seed-Courses-With-Their-Empty-ModuleGroupings: No new courses to seed`,
+      );
+    }
+  } //END_seedCourseWithModuleGrouping
 }
