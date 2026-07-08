@@ -32,6 +32,7 @@ function DegreeCol(): ColumnDef<CourseTableData, string> {
     },
   });
 }
+
 function ModulesColumn(): ColumnDef<CourseTableData, moduleDTO[]> {
   return columnCreator.accessor("modules", {
     header: "Course Modules",
@@ -39,7 +40,7 @@ function ModulesColumn(): ColumnDef<CourseTableData, moduleDTO[]> {
       const modules = info.getValue();
       return modules.map((mod) => {
         return (
-          <Badge key={mod.moduleID} className="bg-red-600">
+          <Badge key={mod.moduleID} className="bg-blue-400">
             {mod.moduleCode}
           </Badge>
         );

@@ -997,6 +997,12 @@ export interface components {
        *     }
        */
       styling?: components["schemas"]["StylingDto"] | null;
+      /**
+       * Format: uuid
+       * @description Unique identifier for a module group
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      ModuleGroupingID?: string;
     };
     ModuleListResponseDto: {
       /** @description List of modules */

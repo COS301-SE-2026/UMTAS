@@ -9,14 +9,21 @@ import { UserDetails } from "@/lib/userclass/userClass";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { CourseTableData } from "@/components/organisms/course-management/courseColumns";
+import { getAllModCoursesQ } from "@/app/course-management/queries/modules/moduleQueries";
+import { useState } from "react";
+import { getAllModulesQueries } from "@/app/course-management/queries/modules/moduleBuilder";
 // Will hold all the filters above the table, table is just an entity to hold data local usage
 
 export default function CourseManagementTemplate() {
   const router = useRouter();
   const UniDetails = UserDetails.getUniDetails();
+  const [moduleQueries, setModuleQueries] = useState<getAllModulesQueries>({
+    universityId: UniDetails?.UniversityID,
+  });
 
   if (UniDetails === null) {
     router.push("choose-institute");
+  } else {
   }
 
   const {
@@ -26,6 +33,8 @@ export default function CourseManagementTemplate() {
   } = useQuery(
     getAllCoursesQ({ universityId: UniDetails?.UniversityID ?? "" }),
   );
+
+  const { data: moduleData } = useQuery(getAllModCoursesQ(moduleQueries));
 
   if (isLoading) {
     return (
@@ -39,10 +48,14 @@ export default function CourseManagementTemplate() {
     return <div>Something went wrong :( </div>;
   }
 
-  const data: CourseTableData[] = courseData.map((course) => ({
-    course,
-    modules: [],
-  }));
+  const data: CourseTableData[] = [
+    ...courseData.map((course) => ({
+      course,
+      modules:
+        moduleData?.filter((mod) => mod.ModuleGroupingID === course.GroupID) ??
+        [],
+    })),
+  ];
 
   return <CourseTable columns={courseCols} data={data}></CourseTable>;
 }

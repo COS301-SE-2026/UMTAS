@@ -53,10 +53,11 @@ export async function fetchAllModules(queries: getAllModulesQueries) {
     credentials: "include",
   });
 
+  console.log(response);
   if (!response.ok) {
     throw new Error("Failed to fetch courses");
   } else {
     const data = await response.json();
-    return data as getAllModulesRes;
+    return data.modules as getAllModulesRes;
   }
 }

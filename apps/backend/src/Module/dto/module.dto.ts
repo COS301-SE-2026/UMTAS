@@ -99,7 +99,15 @@ export class UpdateModuleDto extends PartialType(
 
 //Responses
 //Single
-export class ModuleSingleResponseDto extends ModulesDto {}
+export class ModuleSingleResponseDto extends ModulesDto {
+  @ApiProperty({
+    example: '00000000-0000-0000-0000-000000000000',
+    description: 'Unique identifier for a module group',
+  })
+  @IsUUID()
+  @IsOptional()
+  ModuleGroupingID?: string;
+}
 
 //List
 export class ModuleListResponseDto {
@@ -141,6 +149,7 @@ export class ModuleFiltersDto {
     example: '00000000-0000-0000-0000-000000000000',
     description: 'Filter by ModuleGrouping ID',
   })
+  @IsOptional()
   @IsUUID()
   GroupID?: string;
 
@@ -149,6 +158,7 @@ export class ModuleFiltersDto {
     example: 'COS',
     description: 'Filter by code, makes use of wildcard search',
   })
+  @IsOptional()
   @IsString()
   moduleCode?: string;
 
@@ -157,6 +167,7 @@ export class ModuleFiltersDto {
     description: 'Choose to filter modules based of current user enrollments',
     type: Boolean,
   })
+  @IsOptional()
   @IsBoolean()
   userEnrollment?: boolean;
 } //ModuleFiltersDto

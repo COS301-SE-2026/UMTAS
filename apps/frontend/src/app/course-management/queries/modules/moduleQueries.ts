@@ -1,7 +1,7 @@
 import { queryOptions } from "@tanstack/react-query";
 import { fetchAllModules, getAllModulesQueries } from "./moduleBuilder";
 
-export function getAllModulesQ(queries: getAllModulesQueries) {
+export function getAllModCoursesQ(queries: getAllModulesQueries) {
   return queryOptions({
     queryKey: ["Modules", "Courses"],
     queryFn: async () => {
