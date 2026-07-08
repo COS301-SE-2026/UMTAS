@@ -241,14 +241,12 @@ export default function DashboardPage() {
       </Suspense>
       {showSelect && (
         <Popup>
-          <Card className="w-full md:w-1/3 ">
-            <div className="w-full justify-end flex">
-              <Button onClick={() => setShowSelect(false)}>
-                <X />
-              </Button>
-            </div>
+          <div className="w-full md:w-1/3 text-center bg-card  p-5 border rounded-2xl">
             <ChooseInstituteTemplate />
-          </Card>
+            <div className="w-full mt-5 items-center justify-center flex">
+              <Button onClick={() => setShowSelect(false)}>Close</Button>
+            </div>
+          </div>
         </Popup>
       )}
     </>

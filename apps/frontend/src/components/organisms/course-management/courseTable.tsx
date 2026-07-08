@@ -49,11 +49,13 @@ export function CourseTable<TData>({ columns, data }: DataTableProps<TData>) {
 
   return (
     <>
-      <div className="overflow-hidden rounded-md  justify-center">
-        <ShadTable className="text-center w-3/4 mx-auto border rounded-2xl">
-          <CourseHeaders table={table} />
-          <CourseTableBody table={table} setPopUp={callPopup} />
-        </ShadTable>
+      <div className="h-full w-full overflow-hidden rounded-md items-center flex flex-col ">
+        <Card className="w-3/4 h-2/4">
+          <ShadTable className="text-center w-full mx-auto overflow-scroll">
+            <CourseHeaders table={table} />
+            <CourseTableBody table={table} setPopUp={callPopup} />
+          </ShadTable>
+        </Card>
         <div className="w-full items-center flex justify-center mt-5">
           <Button onClick={() => setshowCreatePopUp(true)}>
             {" "}

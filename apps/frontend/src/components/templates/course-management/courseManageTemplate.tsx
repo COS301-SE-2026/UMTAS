@@ -12,6 +12,7 @@ import { CourseTableData } from "@/components/organisms/course-management/course
 import { getAllModCoursesQ } from "@/app/course-management/queries/modules/moduleQueries";
 import { useState } from "react";
 import { getAllModulesQueries } from "@/app/course-management/queries/modules/moduleBuilder";
+import { Card } from "@/components/atoms/baseShadcn/card";
 // Will hold all the filters above the table, table is just an entity to hold data local usage
 
 export default function CourseManagementTemplate() {
@@ -57,5 +58,10 @@ export default function CourseManagementTemplate() {
     })),
   ];
 
-  return <CourseTable columns={courseCols} data={data}></CourseTable>;
+  return (
+    <div className="h-[80vh] items-center flex flex-col ">
+      <Card className="h-1/4 w-1/2 mb-5 text-center">filters go here</Card>
+      <CourseTable columns={courseCols} data={data}></CourseTable>
+    </div>
+  );
 }
