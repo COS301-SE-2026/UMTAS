@@ -1,0 +1,14 @@
+apps/backend/src/db/database-seed.service.ts
+  h_84e82529bd05a5 3,33,38,144-149,151-152,154-155,157-158,161-163,165-168,179,185
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "728e861e22402d3cccea7469d05ef62dc3f33e3c",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}
