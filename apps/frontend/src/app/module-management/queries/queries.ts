@@ -1,10 +1,12 @@
 import { queryOptions } from "@tanstack/react-query";
+import { getAllEventsAdmin } from "./requests";
 
-export function getAllEventsQ(moduleID: string) {
+export function getAllEventsAdminQ(moduleID: string) {
   return queryOptions({
     queryKey: ["events", moduleID] as const,
     queryFn: async () => {
-      const result = "";
+      const result = await getAllEventsAdmin(moduleID);
+      console.log(result);
       return result;
     },
   });
