@@ -173,7 +173,7 @@ export class AuthController {
 
   @Public()
   @ApiTags('Auth Session')
-  @Get('session')
+  @Get('get-session')
   @ApiCookieAuth('umtas-session')
   @ApiOperation({
     summary: 'Get the current user session',
@@ -181,13 +181,8 @@ export class AuthController {
   })
   @ApiResponse({
     status: 200,
-    description: 'Active session returned. Returns null if no session exists.',
-    schema: { example: AUTH_RESPONSE_EXAMPLE },
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'No active session',
-    schema: { example: null },
+    description: 'Active session returned, or null if no session exists.',
+    schema: { nullable: true, example: AUTH_RESPONSE_EXAMPLE },
   })
   async getSession(
     @Req() req: IncomingMessage,

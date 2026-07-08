@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { Suspense, useState, useCallback } from "react";
 import { Separator } from "@/components/atoms/baseShadcn/separator";
 import { ScheduleHeader } from "@/components/molecules/viewTimetable/ScheduleHeader";
 import { ScheduleView } from "@/components/organisms/viewTimetable/ScheduleView";
@@ -32,12 +32,19 @@ export default function SchedulesPage() {
 
       <div className="px-8 py-6">
         <div className="mx-auto max-w-6xl">
-          <ScheduleView
-            onEventCountChange={setEventCount}
-            onModuleCountChange={setModuleCount}
-            onExportReady={() => {}}
-          />
-          {/* move the download button down its breaking handleExportReady */}
+          <Suspense
+            fallback={
+              <div className="py-12 text-sm text-[var(--text-secondary)]">
+                Loading schedule...
+              </div>
+            }
+          >
+            <ScheduleView
+              onEventCountChange={setEventCount}
+              onModuleCountChange={setModuleCount}
+              onExportReady={handleExportReady}
+            />
+          </Suspense>
         </div>
       </div>
     </div>

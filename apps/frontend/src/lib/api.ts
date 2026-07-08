@@ -71,7 +71,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/auth/session": {
+  "/api/auth/get-session": {
     parameters: {
       query?: never;
       header?: never;
@@ -879,11 +879,11 @@ export interface components {
        */
       name: string;
       /**
-       * @default student
-       * @example student
+       * @default user
+       * @example user
        * @enum {string}
        */
-      role: "student" | "uni_admin" | "sys_admin";
+      role: "user" | "sys_admin";
     };
     AdminImpersonateUserDto: {
       /**
@@ -923,10 +923,10 @@ export interface components {
       /** @example newemail@example.com */
       email?: string;
       /**
-       * @example student
+       * @example user
        * @enum {string}
        */
-      role?: "student" | "uni_admin" | "sys_admin";
+      role?: "user" | "sys_admin";
     };
     StylingDto: {
       /** @example #3B82F6 */
@@ -1732,15 +1732,6 @@ export interface operations {
           "application/json": unknown;
         };
       };
-      /** @description No active session */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
     };
   };
   getSession: {
@@ -1752,17 +1743,8 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description Active session returned. Returns null if no session exists. */
+      /** @description Active session returned, or null if no session exists. */
       200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description No active session */
-      401: {
         headers: {
           [name: string]: unknown;
         };
