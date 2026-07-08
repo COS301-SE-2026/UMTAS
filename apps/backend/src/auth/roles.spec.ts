@@ -49,7 +49,15 @@ describe('Role Validators', () => {
     it('should preserve type safety', () => {
       const role = assertRole('student');
       // At runtime, role is guaranteed to be one of the valid types
-      expect(['student', 'uni_admin', 'sys_admin']).toContain(role);
+      expect([
+        'user',
+        'sys_admin',
+        'student',
+        'uni_admin',
+        'lecturer',
+        'uni_admin_pending',
+        'lecturer_pending',
+      ]).toContain(role);
     });
   });
 });

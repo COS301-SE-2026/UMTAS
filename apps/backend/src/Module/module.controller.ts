@@ -61,7 +61,6 @@ export class ModuleController {
 
   //Get all
   @Get()
-  @Roles('user', 'uni_admin')
   @ApiOperation({
     summary: 'Get all modules with filters',
     description:
@@ -89,7 +88,6 @@ export class ModuleController {
 
   //Get by id
   @Get(':moduleId')
-  @Roles('user', 'uni_admin')
   @ApiOperation({
     summary: 'Get a module by ID',
     description: 'Return a module from its moduleID',
@@ -117,7 +115,6 @@ export class ModuleController {
 
   //Update
   @Patch(':moduleId')
-  @Roles('user', 'uni_admin')
   @ApiOperation({
     summary: 'Update a module',
     description:
@@ -177,7 +174,6 @@ export class ModuleController {
   }
 
   @Post('/styling/:moduleId')
-  @Roles('user')
   @ApiOperation({
     summary: 'Update a module styling',
     description: 'Updates a module styling exactly for just a user',

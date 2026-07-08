@@ -10,7 +10,7 @@ describe('CurrentSession Decorator', () => {
         email: 'john@example.com',
         emailVerified: true,
         image: 'https://example.com/avatar.jpg',
-        role: 'student',
+        role: 'user',
         banned: false,
         createdAt: '2024-01-01T00:00:00Z',
         updatedAt: '2024-01-02T00:00:00Z',
@@ -60,7 +60,7 @@ describe('CurrentSession Decorator', () => {
         email: 'jane@example.com',
         emailVerified: true,
         image: null,
-        role: 'uni_admin',
+        role: 'sys_admin',
         banned: false,
         banReason: null,
         banExpires: null,
@@ -89,7 +89,7 @@ describe('CurrentSession Decorator', () => {
     } as unknown as ExecutionContext;
 
     const result = currentSessionFactory(undefined, mockExecutionContext);
-    expect(result!.user.role).toBe('uni_admin');
+    expect(result!.user.role).toBe('sys_admin');
     expect(result!.session.impersonatedBy).toBeNull();
   });
 });

@@ -43,6 +43,13 @@
       "when": 1783349674671,
       "tag": "0005_violet_vulcan",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1783505897441,
+      "tag": "0006_smart_amazoness",
+      "breakpoints": true
     }
   ]
 }
