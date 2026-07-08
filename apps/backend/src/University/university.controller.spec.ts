@@ -64,7 +64,7 @@ describe('UniversityController', () => {
       expect(mockUniversityService.create).toHaveBeenCalledWith(createDto);
     });
   });
-
+  //GetAll
   describe('TEST_getAll', () => {
     it('should return all universities', async () => {
       const expectedResponse: UniversityListResponseDto = {
@@ -87,5 +87,51 @@ describe('UniversityController', () => {
       expect(mockUniversityService.getAll).toHaveBeenCalledWith('userId');
       expect(result).toEqual(expectedResponse);
     });
-  });
+  }); // END_TEST_getAll
+
+  //getbyId
+  describe('TEST_getById', () => {
+    it('should return a university by ID', async () => {
+      const universityId = 'uuid-1';
+      const expectedResponse: UniversitySingleResponseDto = {
+        UniversityName: 'Test University',
+        UniversityID: universityId,
+      };
+
+      mockUniversityService.getById!.mockResolvedValue(expectedResponse);
+
+      const result = await controller.getById(
+        { user: { id: 'userId' } } as any,
+        universityId,
+      );
+
+      expect(mockUniversityService.getById).toHaveBeenCalledWith(universityId);
+      expect(result).toEqual(expectedResponse);
+    });
+  }); // END_TEST_getById
+
+  //getUsersRoleByUni
+  describe('TEST_getUsersRoleByUni', () => {
+    it('should return a user role by university ID', async () => {
+      const UniversityID = 'uuid-1';
+      const expectedResponse = {
+        UniversityID: 'uuid-1',
+        userId: 'userId',
+        role: 'STUDENT',
+      } as const;
+
+      mockUniversityService.getUsersRole!.mockResolvedValue(expectedResponse);
+
+      const result = await controller.getUsersRoleByUni(
+        { user: { id: 'userId' } } as any,
+        UniversityID,
+      );
+
+      expect(mockUniversityService.getUsersRole).toHaveBeenCalledWith(
+        'userId',
+        UniversityID,
+      );
+      expect(result).toEqual(expectedResponse);
+    });
+  }); // END_TEST_getUsersRoleByUni
 });
