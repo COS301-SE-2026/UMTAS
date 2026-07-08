@@ -38,7 +38,7 @@ function eventsCol(): ColumnDef<ModuleTableData, EventResponse[]> {
       const events = info.getValue();
       return events.map((event) => {
         return (
-          <Badge key={event.eventID} className="bg-blue-400">
+          <Badge key={event.eventID} className="bg-blue-400 m-2">
             {event.eventCode}
           </Badge>
         );

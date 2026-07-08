@@ -9,6 +9,7 @@ import { useQueries, useQuery } from "@tanstack/react-query";
 import { UserDetails } from "@/lib/userclass/userClass";
 import { ModuleTable } from "@/components/organisms/module-management/moduleTable";
 import { getAllEventsAdminQ } from "@/app/module-management/queries/queries";
+import { Card } from "@/components/atoms/baseShadcn/card";
 
 // this will do the actual request for modules and filtering, table is static data except for updates
 export default function ModManagementTemplate() {
@@ -30,5 +31,10 @@ export default function ModManagementTemplate() {
       events: eventQueries[idx].data ?? [],
     })) ?? [];
 
-  return <ModuleTable columns={moduleCols} data={data} />;
+  return (
+    <div className="h-[80vh] items-center flex flex-col ">
+      <Card className="h-1/4 w-1/2 mb-5 text-center">filters go here</Card>
+      <ModuleTable columns={moduleCols} data={data} />;
+    </div>
+  );
 }

@@ -59,7 +59,7 @@ export function ModuleTable<TData>({ columns, data }: DataTableProps<TData>) {
 
       {showModPopup && (
         <Popup>
-          <Card className="items-center p-10">
+          <Card className=" items-center p-10">
             <div className="flex flex-row">
               <CustomiseShell
                 modules={[dataState.modules]}
