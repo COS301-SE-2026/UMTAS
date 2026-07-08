@@ -4,6 +4,7 @@ import { Input } from "@/components/atoms/baseShadcn/input";
 import { Label } from "@/components/atoms/baseShadcn/label";
 import { ColourPicker } from "@/components/atoms/builder/colourPicker";
 import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
+import { UserDetails } from "@/lib/userclass/userClass";
 
 //NOTE
 //copied from module card and changed slightly for customisation
@@ -40,7 +41,8 @@ export function CustomiseModuleCard({
     }
     return inputClass;
   }
-
+  // used for tracking editablilty
+  const canEdit = UserDetails.userCanEdit();
   return (
     <div className="flex flex-col gap-4">
       {/*module general stuff */}
@@ -63,6 +65,7 @@ export function CustomiseModuleCard({
               onChange={(e) =>
                 onUpdate(module.moduleID, "moduleCode", e.target.value)
               }
+              readOnly={!canEdit}
               placeholder="e.g. COS301"
               maxLength={10}
               className={getInputClass(!!errors?.moduleCode)}
@@ -88,6 +91,7 @@ export function CustomiseModuleCard({
               onChange={(e) =>
                 onUpdate(module.moduleID, "moduleName", e.target.value)
               }
+              readOnly={!canEdit}
               placeholder="e.g. Software Engineering"
               className={getInputClass(!!errors?.moduleName)}
             />

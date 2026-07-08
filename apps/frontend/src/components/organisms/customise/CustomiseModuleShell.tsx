@@ -7,6 +7,7 @@ import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
 import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
 import { useMutation } from "@tanstack/react-query";
 import { updateModuleMut } from "@/components/templates/builder/Queries/moduleQueries";
+import { UserDetails } from "@/lib/userclass/userClass";
 
 interface CustomiseShellProps {
   events: EventResponse[];
@@ -35,7 +36,8 @@ export default function ModulesShell({
     setPrevSavedModule(savedModule);
     setTempModule(savedModule);
   }
-
+  // used for tracking editablilty
+  const canEdit = UserDetails.userCanEdit();
   //mutation for updating
   const { mutate: saveModule, isPending: isSaving } =
     useMutation(updateModuleMut());
@@ -66,7 +68,7 @@ export default function ModulesShell({
 
   //what gets called in the component
   function handleSave() {
-    if (!tempModule) return;
+    if (!tempModule || !canEdit) return;
     saveModule({
       moduleID: tempModule.moduleID,
       module: {
@@ -137,7 +139,7 @@ export default function ModulesShell({
                 size="sm"
                 variant="outline"
                 className="h-7 px-3 text-xs"
-                disabled={!didModuleChange || isSaving}
+                disabled={(!didModuleChange || isSaving) && canEdit}
                 onClick={handleSave}
               >
                 Save
@@ -146,7 +148,7 @@ export default function ModulesShell({
                 size="sm"
                 variant="destructive"
                 className="h-7 px-3 text-xs"
-                disabled={!didModuleChange}
+                disabled={!didModuleChange && canEdit}
                 onClick={handleDiscard}
               >
                 Discard
