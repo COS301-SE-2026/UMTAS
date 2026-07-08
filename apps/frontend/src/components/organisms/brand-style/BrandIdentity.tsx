@@ -63,6 +63,27 @@ export function BrandIdentity() {
         </div>
 
         <IdentityTable />
+
+        <div className="p-4 pl-10 bg-bg-surface rounded-lg border border-border w-fit">
+          <h3 className="text-xl font-semibold uppercase tracking-wider text-[var(--text-primary)] mb-2">
+            Rules
+          </h3>
+          <ul className="list-disc">
+            <li>
+              No jargon unless domain-specific (e.g. module, venue, timetable
+              slot).
+            </li>
+            <li>Error messages always explain the cause and the fix.</li>
+            <li>
+              Placeholder text is descriptive. e.g. COS301 not Enter something
+              here.
+            </li>
+            <li>
+              Labels are nouns or short noun phrases. Buttons are verbs or verb
+              phrases.
+            </li>
+          </ul>
+        </div>
       </section>
     </div>
   );
