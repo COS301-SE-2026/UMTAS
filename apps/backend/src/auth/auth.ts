@@ -6,7 +6,7 @@ import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { admin } from 'better-auth/plugins/admin';
 import { redisStorage } from '@better-auth/redis-storage';
 import * as appSchema from '../db/schema';
-import { isRole, UniRole } from './roles';
+import { isAppRole, UniRole } from './roles';
 import { getRedisClient } from '../redis/redis';
 import { ac, sysAdmin, user } from './permissions';
 import { SessionData } from './session.decorator';
@@ -408,37 +408,28 @@ export function createAuth(input: CreateAuthInput): AuthInstance {
             const actorRole = userObj?.role;
             const requestedRole = data.role;
 
-            if (requestedRole !== undefined && !isRole(requestedRole)) {
+            if (requestedRole !== undefined && !isAppRole(requestedRole)) {
               throw new APIError('BAD_REQUEST', {
-                message: 'Invalid role value provided',
+                message: 'Invalid app role value provided',
               });
             }
 
-            // sys_admin may assign any valid role, or omit role (defaults to student)
             if (actorRole === 'sys_admin') {
-              return { data };
+              return {
+                data: { ...data, role: requestedRole ?? 'user' },
+              };
             }
 
-            // uni_admin may only assign student or lecturer
-            if (actorRole === 'uni_admin') {
-              const assignable = ['student', 'lecturer'];
-              if (
-                requestedRole !== undefined &&
-                !assignable.includes(requestedRole)
-              ) {
-                throw new APIError('FORBIDDEN', {
-                  message: 'uni_admin can only assign student or lecturer role',
-                });
-              }
-              return {
-                data: { ...data, role: requestedRole ?? 'student' },
-              };
+            if (requestedRole === 'sys_admin') {
+              throw new APIError('FORBIDDEN', {
+                message: 'Only sys_admin can assign sys_admin role',
+              });
             }
 
             return {
               data: {
                 ...data,
-                role: 'student',
+                role: 'user',
               },
             };
           },

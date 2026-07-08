@@ -187,10 +187,10 @@ export class AdminUpdateUserDto {
   email?: string;
 
   @ApiPropertyOptional({
-    enum: ['student', 'uni_admin', 'sys_admin'],
-    example: 'student',
+    enum: ['user', 'sys_admin'],
+    example: 'user',
   })
-  role?: 'student' | 'uni_admin' | 'sys_admin';
+  role?: 'user' | 'sys_admin';
 }
 
 export class AdminImpersonateUserDto {

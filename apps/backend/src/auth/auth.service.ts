@@ -149,7 +149,10 @@ export class AuthService implements OnModuleInit {
     return this.authInstance;
   }
 
-  async getUniversityRole(userId: string, uniId: string): Promise<UniRole> {
+  async getUniversityRole(
+    userId: string,
+    uniId: string,
+  ): Promise<UniRole | undefined> {
     //check that uni exists
     const [uni] = await this.databaseService.db
       .select()
@@ -172,9 +175,7 @@ export class AuthService implements OnModuleInit {
       )
       .limit(1);
 
-    if (!roleRow) {
-      return 'student';
-    }
+    if (!roleRow) return undefined;
 
     switch (roleRow.role) {
       case 'UNIVERSITY_ADMIN':

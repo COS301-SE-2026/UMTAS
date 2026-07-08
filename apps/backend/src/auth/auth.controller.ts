@@ -39,7 +39,6 @@ import {
   SignUpEmailDto,
   VerifyEmailDto,
 } from './auth.dto';
-import { Roles } from './roles.guard';
 import { CurrentSession } from './session.decorator';
 import type { SessionData } from './session.decorator';
 import type { Response } from 'express';
@@ -690,7 +689,6 @@ export class AuthController {
     status: 200,
     description: 'Selected university session returned.',
   })
-  @Roles('user', 'sys_admin')
   async selectUniversity(
     @CurrentSession() session: SessionData,
     @Body() dto: SelectUniversityDto,
