@@ -40,10 +40,16 @@ export function createCourseQ(body: createCoursesBody) {
   });
 }
 
-export function updateCourseQ(body: updateCourseBody, path: updateCoursePath) {
+export function updateCourseQ() {
   return mutationOptions({
-    mutationFn: async () => {
-      return new updateCourseBuilder().send({ body: body, paths: path });
+    mutationFn: async (vars: {
+      body: updateCourseBody;
+      path: updateCoursePath;
+    }) => {
+      return new updateCourseBuilder().send({
+        body: vars.body,
+        paths: vars.path,
+      });
     },
     onSuccess: () => {
       getQueryClient().invalidateQueries({
