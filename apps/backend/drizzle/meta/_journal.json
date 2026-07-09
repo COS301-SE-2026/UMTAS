@@ -50,6 +50,13 @@
       "when": 1783505897441,
       "tag": "0006_smart_amazoness",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1783505897442,
+      "tag": "0007_long_rockslide",
+      "breakpoints": true
     }
   ]
 }

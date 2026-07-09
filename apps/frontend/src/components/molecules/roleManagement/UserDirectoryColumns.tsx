@@ -14,13 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/atoms/baseShadcn/dropdown-menu";
 import { getSingleApplication } from "@/app/role-management/queries/builder";
-
-export type user = {
-  id: string;
-  name: string;
-  email: string;
-  role: "Student" | "Lecturer" | "Uni Admin";
-};
+import RoleControl from "@/components/atoms/roleManagement/roleControl";
 
 export const columns: ColumnDef<getSingleApplication>[] = [
   {
@@ -46,7 +40,7 @@ export const columns: ColumnDef<getSingleApplication>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "name",
+    accessorKey: "Name",
     header: "Name",
   },
   {
@@ -70,20 +64,7 @@ export const columns: ColumnDef<getSingleApplication>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem>Revoke Access</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
+      return <RoleControl row={row.original} />;
     },
   },
 ];

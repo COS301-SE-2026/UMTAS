@@ -79,7 +79,7 @@ export const columns: ColumnDef<application>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem>Approve</DropdownMenuItem>
+            <DropdownMenuItem>Approve </DropdownMenuItem>
             <DropdownMenuItem>Reject</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

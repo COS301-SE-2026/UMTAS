@@ -1,3 +1,4 @@
+"use client";
 import { columns } from "@/components/molecules/roleManagement/UserDirectoryColumns";
 import { DataTable } from "@/components/molecules/roleManagement/DataTable";
 
@@ -11,9 +12,16 @@ import {
 import { getAllApplicationsQ } from "@/app/role-management/queries/applyQueries";
 import { useQuery } from "@tanstack/react-query";
 import { Spinner } from "@/components/atoms/baseShadcn/spinner";
+import { UserDetails } from "@/lib/userclass/userClass";
 
 export default function UserDirectoryCard() {
-  const { data = [], isLoading } = useQuery(getAllApplicationsQ());
+  const Uni = UserDetails.getUniDetails();
+  const { data = [], isLoading } = useQuery(
+    getAllApplicationsQ(
+      { universityID: Uni?.UniversityID || "" },
+      { pending: false },
+    ),
+  );
 
   return (
     <div className="container mx-auto py-10">

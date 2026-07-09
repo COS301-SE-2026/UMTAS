@@ -6,10 +6,16 @@ import {
   InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { eq, and, ne, or } from 'drizzle-orm';
+import { eq, and, or } from 'drizzle-orm';
 
 import { DatabaseService } from '../db/database.service';
-import { RoleTypeType, University, UniversityRole } from '../entities';
+import {
+  RoleType,
+  RoleTypeType,
+  University,
+  UniversityRole,
+  usersTable,
+} from '../entities';
 import {
   CreateUniversityDto,
   UpdateUniversityDto,
@@ -22,6 +28,7 @@ import {
   GetRolesDto,
   GetRoleFilterDto,
 } from './dto/university.dto';
+import { notExists } from 'drizzle-orm';
 
 @Injectable()
 export class UniversityService {
@@ -60,7 +67,20 @@ export class UniversityService {
         and(
           eq(UniversityRole.UniversityID, University.UniversityID),
           eq(UniversityRole.UserID, userId),
-          ne(UniversityRole.role, 'STUDENT_OWNED'),
+        ),
+      )
+      .where(
+        // show no universities if anyone has a rule student owned to it.
+        notExists(
+          this.dbService.db
+            .select()
+            .from(UniversityRole)
+            .where(
+              and(
+                eq(UniversityRole.UniversityID, University.UniversityID),
+                eq(UniversityRole.role, RoleType.enumValues[1]),
+              ),
+            ),
         ),
       );
 
@@ -266,17 +286,26 @@ export class UniversityService {
       );
 
     let role: RoleTypeType;
-    switch (usersRole.role) {
-      case 'UNIVERSITY_ADMIN_PENDING':
-        role = 'UNIVERSITY_ADMIN';
-        break;
-      case 'LECTURER_PENDING':
-        role = 'LECTURER';
-        break;
-      default:
-        throw new BadRequestException(
-          `User[${dto.userId}] doesn't have a role to approve`,
-        );
+    if (dto.provdedRole === undefined || dto.provdedRole == null) {
+      switch (usersRole.role) {
+        case 'UNIVERSITY_ADMIN_PENDING':
+          role = 'UNIVERSITY_ADMIN';
+          break;
+        case 'LECTURER_PENDING':
+          role = 'LECTURER';
+          break;
+        default:
+          throw new BadRequestException(
+            `User[${dto.userId}] doesn't have a role to approve`,
+          );
+      }
+    } else {
+      role = dto.provdedRole;
+    }
+
+    // will have a frontend notification to show this off
+    if (!dto.isApproved) {
+      role = 'REJECTED';
     }
 
     //update role
@@ -336,8 +365,15 @@ export class UniversityService {
     }
 
     const applications = await this.dbService.db
-      .select()
+      .select({
+        Name: usersTable.name,
+        UserID: usersTable.id,
+        Email: usersTable.email,
+        UniversityID: UniversityRole.UniversityID,
+        role: UniversityRole.role,
+      })
       .from(UniversityRole)
+      .innerJoin(usersTable, eq(UniversityRole.UserID, usersTable.id))
       .where(
         and(
           eq(UniversityRole.UniversityID, UniID),
