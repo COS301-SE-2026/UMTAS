@@ -1,0 +1,50 @@
+apps/backend/src/entities/Universities/University.schema.ts
+  s_9ab96c0a9552c8::t_a4bf08491fe580 18
+apps/frontend/src/app/role-management/queries/applyQueries.ts
+  s_9ab96c0a9552c8::t_a4bf08491fe580 16
+apps/frontend/src/components/atoms/roleManagement/roleControl.tsx
+  s_9ab96c0a9552c8::t_a4bf08491fe580 1-115
+apps/frontend/src/app/role-management/queries/builder.ts
+  s_9ab96c0a9552c8::t_a4bf08491fe580 14-30
+apps/backend/drizzle/0007_long_rockslide.sql
+  s_9ab96c0a9552c8::t_dff77e381df2f2 1
+apps/frontend/src/components/molecules/roleManagement/DataTable.tsx
+  s_9ab96c0a9552c8::t_a4bf08491fe580 76,78
+apps/frontend/src/components/organisms/roleManagement/UserDirectory.tsx
+  s_9ab96c0a9552c8::t_a4bf08491fe580 1,15,18-24
+apps/frontend/src/components/templates/roleManagement/roleManagementTemplate.tsx
+  s_9ab96c0a9552c8::t_a4bf08491fe580 18-20
+apps/frontend/src/app/choose-institute/queries/UserRoleQueries.ts
+  s_9ab96c0a9552c8::t_a4bf08491fe580 25
+apps/backend/src/University/university.service.ts
+  s_9ab96c0a9552c8::t_a4bf08491fe580 9,12-18,31,70-83,289-308,368-374,376
+apps/frontend/src/lib/api.ts
+  s_9ab96c0a9552c8::t_a4bf08491fe580 1208,1236,1272-1278,1296,1319,1334-1350
+apps/frontend/src/components/molecules/roleManagement/UserDirectoryColumns.tsx
+  s_9ab96c0a9552c8::t_a4bf08491fe580 17,43,67
+apps/backend/src/University/dto/university.dto.ts
+  s_9ab96c0a9552c8::t_a4bf08491fe580 4,93-108,124-134
+  s_9ab96c0a9552c8::t_e00703347f1b10 135
+apps/frontend/src/components/molecules/roleManagement/PendingApplicationsColumns.tsx
+  s_9ab96c0a9552c8::t_a4bf08491fe580 82
+apps/backend/drizzle/meta/0007_snapshot.json
+  s_9ab96c0a9552c8::t_a235e2be36a4dd 1-1594
+apps/backend/drizzle/meta/_journal.json
+  s_9ab96c0a9552c8::t_efcccf1a8a5b7b 53-59
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "61204c29e3fcabad2cdf61136f1bf5b3be3967ed",
+  "prompts": {},
+  "sessions": {
+    "s_9ab96c0a9552c8": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f46d2-f4a1-7da0-b9f5-c86b673a23f9",
+        "model": "gpt-5.5"
+      },
+      "human_author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}
