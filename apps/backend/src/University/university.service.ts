@@ -145,6 +145,10 @@ export class UniversityService {
   async delete(uniId: string): Promise<DeleteUniversityResponseDto> {
     //Check if university exists
     const uni = await this.getById(uniId);
+    if (!uni)
+      throw new NotFoundException(
+        `No University found for universityID: ${uniId}`,
+      );
 
     //Delete university
     await this.dbService.db

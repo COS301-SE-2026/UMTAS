@@ -2,7 +2,11 @@ import { UniversityService } from './university.service';
 
 import { Test } from '@nestjs/testing';
 
-import { ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 
 //constants
 import { userId, uniId } from '../Testing/constants.spec';
@@ -124,18 +128,6 @@ describe('UniversityService', () => {
   });
 
   describe('Test_UpdateUniversity', () => {
-    // it('should update university name and return updated university', async () => {
-    //   const dto = { UniversityName: 'Updated University Name' };
-    //   const updatedUni = { UniversityID: uniId, UniversityName: dto.UniversityName };
-
-    //   mockDbResult(mockDb.update, [updatedUni]);
-
-    //   const result = await service.update(uniId, dto);
-
-    //   expect(mockDb.update).toHaveBeenCalledWith(University);
-    //   expect(result).toEqual(updatedUni);
-    // });
-
     it('should throw an error if the university does not exist', async () => {
       const dto = { UniversityName: 'Non-existent University' };
 
@@ -146,6 +138,48 @@ describe('UniversityService', () => {
       );
 
       expect(mockDb.update).not.toHaveBeenCalledWith();
+    });
+  });
+
+  describe('Test_DeleteUniversity', () => {
+    it('should throw an error if the university does not exist', async () => {
+      const nonExistentUniId = 'non-existent-uni-id';
+
+      mockDbResult(mockDb.delete, []);
+
+      await expect(service.delete(nonExistentUniId)).rejects.toThrowError(
+        new NotFoundException(
+          `No University found for universityID: ${nonExistentUniId}`,
+        ),
+      );
+
+      expect(mockDb.delete).not.toHaveBeenCalledWith();
+    });
+  });
+
+  describe('Test_getUsersRole', () => {
+    it('should return the user role for a given university', async () => {
+      const mockrecord = { role: 'Admin', UniversityID: uniId, UserID: userId };
+      mockDbResult(mockDb.select, [mockrecord]);
+
+      const result = await service.getUsersRole(userId, uniId);
+
+      expect(mockDb.select).toHaveBeenCalledWith();
+      expect(result).toEqual({
+        UniversityID: uniId,
+        userId: userId,
+        role: 'Admin',
+      });
+    });
+
+    it('should throw BadRequestException if the user has no role for the given university', async () => {
+      mockDbResult(mockDb.select, []);
+
+      await expect(service.getUsersRole(userId, uniId)).rejects.toThrowError(
+        new BadRequestException(
+          `No role found for user[${userId}] for university[${uniId}]`,
+        ),
+      );
     });
   });
 });
