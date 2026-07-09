@@ -2,7 +2,7 @@ import { UniversityService } from './university.service';
 
 import { Test } from '@nestjs/testing';
 
-import { ConflictException } from '@nestjs/common';
+import { ConflictException, NotFoundException } from '@nestjs/common';
 
 //constants
 import { userId, uniId } from '../Testing/constants.spec';
@@ -107,6 +107,45 @@ describe('UniversityService', () => {
         role: UniversityRole.role,
       });
       expect(result).toEqual(mockUniList);
+    });
+    it('should throw NotFoundException if no universities found', async () => {
+      mockDbResult(mockDb.select, []);
+
+      await expect(service.getAll(userId)).rejects.toThrow(
+        new NotFoundException('No universities found'),
+      );
+
+      expect(mockDb.select).toHaveBeenCalledWith({
+        UniversityID: University.UniversityID,
+        UniversityName: University.UniversityName,
+        role: UniversityRole.role,
+      });
+    });
+  });
+
+  describe('Test_UpdateUniversity', () => {
+    // it('should update university name and return updated university', async () => {
+    //   const dto = { UniversityName: 'Updated University Name' };
+    //   const updatedUni = { UniversityID: uniId, UniversityName: dto.UniversityName };
+
+    //   mockDbResult(mockDb.update, [updatedUni]);
+
+    //   const result = await service.update(uniId, dto);
+
+    //   expect(mockDb.update).toHaveBeenCalledWith(University);
+    //   expect(result).toEqual(updatedUni);
+    // });
+
+    it('should throw an error if the university does not exist', async () => {
+      const dto = { UniversityName: 'Non-existent University' };
+
+      mockDbResult(mockDb.update, []);
+
+      await expect(service.update(uniId, dto)).rejects.toThrowError(
+        new NotFoundException(`No University found for universityID: ${uniId}`),
+      );
+
+      expect(mockDb.update).not.toHaveBeenCalledWith();
     });
   });
 });
