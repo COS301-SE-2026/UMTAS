@@ -1,0 +1,16 @@
+apps/backend/src/Grouping/grouping.module.ts
+  h_84e82529bd05a5 4,8
+apps/backend/src/University/university.controller.spec.ts
+  h_84e82529bd05a5 1-4,6-231
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "6839c131a633e4976cc216be33d9325974c5f683",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}

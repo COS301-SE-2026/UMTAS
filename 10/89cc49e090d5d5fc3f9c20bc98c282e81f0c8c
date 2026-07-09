@@ -1,0 +1,18 @@
+apps/backend/src/Grouping/grouping.service.ts
+  h_84e82529bd05a5 147,196
+apps/backend/src/Module/dto/module.dto.ts
+  h_84e82529bd05a5 84,92
+apps/backend/src/Grouping/grouping.controller.ts
+  h_84e82529bd05a5 13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "1089cc49e090d5d5fc3f9c20bc98c282e81f0c8c",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}
