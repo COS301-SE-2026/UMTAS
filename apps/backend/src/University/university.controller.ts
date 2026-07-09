@@ -27,7 +27,7 @@ import { ApiBody, ApiResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { CurrentSession } from '../auth/session.decorator';
 import type { SessionData } from '../auth/session.decorator';
-import { Roles } from 'src/auth/roles.guard';
+import { Roles } from '../auth/roles.guard';
 
 @ApiTags('Universities')
 @Controller('universities')
