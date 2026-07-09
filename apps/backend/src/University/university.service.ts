@@ -44,7 +44,7 @@ export class UniversityService {
     const [newUni] = await this.dbService.db
       .insert(University)
       .values({
-        UniversityName: dto.UniversityName,
+        UniversityName: dto.UniversityName.trim(),
       })
       .returning();
 
