@@ -11,15 +11,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/atoms/baseShadcn/select";
-import { InputProps, StateInput } from "@/components/atoms/utility/stateInput";
+import { StateInput } from "@/components/atoms/utility/stateInput";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { CourseDTO } from "@/app/course-management/queries/courses/courseBuilder";
 import { getAllCoursesQ } from "@/app/course-management/queries/courses/courseQueries";
 import { UserDetails } from "@/lib/userclass/userClass";
 import { Input } from "@/components/atoms/baseShadcn/input";
+interface CreateModuleProps {
+  children?: ReactNode;
+}
 
-export default function CreateModuleAdmin() {
+export default function CreateModuleAdmin({ children }: CreateModuleProps) {
   const [course, updateCourse] = useState<CourseDTO>({
     CourseID: "",
     CourseName: "",
@@ -66,25 +69,29 @@ export default function CreateModuleAdmin() {
         ></Input>
       </div>
       <CourseSelect CourseState={course} updateCourseState={updateCourse} />
-      <Button
-        onClick={async () => {
-          const result = await createModule({
-            ...module,
-            CourseID: course.CourseID,
-          });
-          if (result) {
-            updateMod({
-              moduleCode: "",
-              moduleName: "",
-              moduleDescription: "",
-              CourseID: "", // -> this needs to be set by our standard
-              styling: { colour: "FFFF" },
+      <div className="flex flex-row gap-x-5">
+        <Button
+          onClick={async () => {
+            const result = await createModule({
+              ...module,
+              CourseID: course.CourseID,
             });
-          }
-        }}
-      >
-        create
-      </Button>
+            if (result) {
+              updateMod({
+                moduleCode: "",
+                moduleName: "",
+                moduleDescription: "",
+                CourseID: "", // -> this needs to be set by our standard
+                styling: { colour: "FFFF" },
+              });
+            }
+          }}
+        >
+          create
+        </Button>
+
+        {children}
+      </div>
     </Card>
   );
 }

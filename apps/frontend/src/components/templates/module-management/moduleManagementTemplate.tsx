@@ -50,14 +50,15 @@ export default function ModManagementTemplate() {
       {showCreateModule && (
         <Popup>
           <div className="flex flex-col items-center w-1/3 space-y-5">
-            <CreateModuleAdmin />
-            <Button
-              onClick={() => {
-                updateShowModule(false);
-              }}
-            >
-              Close
-            </Button>
+            <CreateModuleAdmin>
+              <Button
+                onClick={() => {
+                  updateShowModule(false);
+                }}
+              >
+                Close
+              </Button>
+            </CreateModuleAdmin>
           </div>
         </Popup>
       )}
