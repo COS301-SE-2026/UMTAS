@@ -1,0 +1,16 @@
+apps/backend/src/entities/Events/events.schema.ts
+  h_3359569cacef0e 21-22,26,29
+apps/backend/src/Events/dto/EventDto.dto.ts
+  h_3359569cacef0e 2-4,6,8-11,18,20-22,24-26,29,31,36-37,39-40,43,45,47
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "49ecb3839e158853fd69ab86a0e5303297ca56f7",
+  "prompts": {},
+  "humans": {
+    "h_3359569cacef0e": {
+      "author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}
