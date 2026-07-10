@@ -96,6 +96,7 @@ export class ModuleService {
         moduleCode: code,
         moduleName: name,
         moduleDescription: description,
+        ...(dto.validated === undefined ? {} : { validated: dto.validated }),
       })
       .returning();
 
@@ -230,6 +231,8 @@ export class ModuleService {
       dto.moduleDescription.trim() !== oldModule.moduleDescription
     )
       updateFields.moduleDescription = dto.moduleDescription.trim();
+    if (dto.validated !== undefined && dto.validated !== oldModule.validated)
+      updateFields.validated = dto.validated;
 
     let newModule = oldModule;
     //If no updateFields - return module early

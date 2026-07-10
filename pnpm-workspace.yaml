@@ -1,5 +1,6 @@
 packages:
   - "apps/*"
+  - "apps/pdf_parser/worker"
   - "packages/*"
 
 # Allowlist for packages permitted to run lifecycle scripts during install.
