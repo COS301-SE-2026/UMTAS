@@ -70,3 +70,21 @@ export class deleteCourseBuilder extends RequestBuilder<
     this.setUrl("/Courses/{CourseId}").setMethod(RequestMethod.DELETE);
   }
 }
+
+export type addModuleToCourse = paths["/modules/{CourseID}"]["put"];
+export type addModuleToCoursePath = addModuleToCourse["parameters"]["path"];
+export type addModuleToCourseBody =
+  addModuleToCourse["requestBody"]["content"]["application/json"];
+export type addModuleToCourseRes =
+  addModuleToCourse["responses"]["200"]["content"]["application/json"];
+
+export class addModuleToCourseBuilder extends RequestBuilder<
+  addModuleToCoursePath,
+  addModuleToCourseBody,
+  addModuleToCourseRes
+> {
+  constructor() {
+    super();
+    this.setUrl("/modules/{CourseID}").setMethod(RequestMethod.PUT);
+  }
+}

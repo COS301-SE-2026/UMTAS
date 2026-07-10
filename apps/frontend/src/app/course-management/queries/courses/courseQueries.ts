@@ -1,5 +1,8 @@
 import { mutationOptions, queryOptions } from "@tanstack/react-query";
 import {
+  addModuleToCourseBody,
+  addModuleToCourseBuilder,
+  addModuleToCoursePath,
   createCoursesBody,
   createCoursesBuilder,
   deleteCourseBuilder,
@@ -11,7 +14,7 @@ import {
   updateCoursePath,
 } from "./courseBuilder";
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
-import { UserDetails } from "@/lib/userclass/userClass";
+1;
 
 export function getAllCoursesQ(body?: fetchAllCoursesBody) {
   return queryOptions({
@@ -19,7 +22,6 @@ export function getAllCoursesQ(body?: fetchAllCoursesBody) {
     queryFn: async () => {
       const builder = new getAllCoursesBuilder();
       const result = await builder.send({ body: body });
-      console.log(result, "this is get all courses");
       return result.courses;
     },
   });
@@ -32,9 +34,7 @@ export function createCourseQ() {
     },
     onSuccess: () => {
       getQueryClient().invalidateQueries({
-        queryKey: getAllCoursesQ({
-          UniversityID: UserDetails.getUniDetails()?.UniversityID,
-        }).queryKey,
+        queryKey: getAllCoursesQ().queryKey,
       });
     },
     onError: (err) => console.error("mutation failed", err),
@@ -54,9 +54,7 @@ export function updateCourseQ() {
     },
     onSuccess: () => {
       getQueryClient().invalidateQueries({
-        queryKey: getAllCoursesQ({
-          UniversityID: UserDetails.getUniDetails()?.UniversityID,
-        }).queryKey,
+        queryKey: getAllCoursesQ().queryKey,
       });
     },
     onError: (err) => console.error("mutation failed", err),
@@ -70,9 +68,27 @@ export function deleteCourseQ(path: deleteCoursePath) {
     },
     onSuccess: () => {
       getQueryClient().invalidateQueries({
-        queryKey: getAllCoursesQ({
-          UniversityID: UserDetails.getUniDetails()?.UniversityID,
-        }).queryKey,
+        queryKey: getAllCoursesQ().queryKey,
+      });
+    },
+    onError: (err) => console.error("mutation failed", err),
+  });
+}
+
+export function addModuleToCourseQ() {
+  return mutationOptions({
+    mutationFn: async (vars: {
+      path: addModuleToCoursePath;
+      body: addModuleToCourseBody;
+    }) => {
+      return new addModuleToCourseBuilder().send({
+        paths: vars.path,
+        body: vars.body,
+      });
+    },
+    onSuccess: () => {
+      getQueryClient().invalidateQueries({
+        queryKey: getAllCoursesQ().queryKey,
       });
     },
     onError: (err) => console.error("mutation failed", err),

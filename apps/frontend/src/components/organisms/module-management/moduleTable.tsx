@@ -21,6 +21,11 @@ import Popup from "@/components/atoms/utility/floatContainer";
 import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
 import { ModuleTableData } from "./ModuleColumns";
 import CreateEventAdmin from "./addEvent";
+import { UserDetails } from "@/lib/userclass/userClass";
+import { CourseDTO } from "@/app/course-management/queries/courses/courseBuilder";
+import { CourseSelect } from "./selectedCourse";
+import { useMutation } from "@tanstack/react-query";
+import { addModuleToCourseQ } from "@/app/course-management/queries/courses/courseQueries";
 
 interface DataTableProps<TData> {
   columns: (ColumnDef<TData, string> | ColumnDef<TData, EventResponse[]>)[];
@@ -33,13 +38,19 @@ export function ModuleTable<TData>({ columns, data }: DataTableProps<TData>) {
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
-
+  const [selectedCourse, setSelectedCourse] = useState<CourseDTO>({
+    CourseID: "",
+    CourseName: "",
+    UniversityID: UserDetails.getUniDetails()?.UniversityID ?? "",
+  });
   const [dataState, setDataState] = useState<ModuleTableData>({
     events: [],
     modules: { moduleCode: "", moduleID: "", moduleName: "" },
   });
 
   const [showModPopup, updateModPopup] = useState(false);
+
+  const { mutate: addModuleToCourseMut } = useMutation(addModuleToCourseQ());
 
   function showUpdateMod(param: ModuleTableData) {
     updateModPopup(true);
@@ -49,7 +60,7 @@ export function ModuleTable<TData>({ columns, data }: DataTableProps<TData>) {
   return (
     <>
       <div className="h-full w-full  rounded-md items-center flex flex-col ">
-        <Card className="w-3/4 h-2/4">
+        <Card className="w-3/4 h-3/4">
           <ShadTable className="text-center w-full mx-auto overflow-scroll">
             <CourseHeaders table={table} />
             <CourseTableBody table={table} setPopUp={showUpdateMod} />
@@ -61,6 +72,24 @@ export function ModuleTable<TData>({ columns, data }: DataTableProps<TData>) {
         <Popup>
           <div className="w-3/4 items-center p-5 justify-center  flex flex-col center h-9/10 ">
             <div className="flex flex-row">
+              <Card className="w-1/3 justify-center">
+                <CourseSelect
+                  CourseState={selectedCourse}
+                  updateCourseState={setSelectedCourse}
+                >
+                  <Button
+                    onClick={() =>
+                      addModuleToCourseMut({
+                        body: { modules: [dataState.modules.moduleID] },
+                        path: { CourseID: selectedCourse.CourseID },
+                      })
+                    }
+                  >
+                    {" "}
+                    add module to course
+                  </Button>
+                </CourseSelect>
+              </Card>
               <CustomiseShell
                 modules={[dataState.modules]}
                 events={dataState.events}
