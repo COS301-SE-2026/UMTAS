@@ -19,7 +19,7 @@ import {
   parseJob,
   usersTable,
 } from '../entities';
-import { EventImportKeyService } from '../Events/event-import-key.service';
+import { EventImportFingerprintService } from '../Events/event-import-fingerprint.service';
 import { EventImporter } from './event-importer.service';
 import { ModuleResolver } from './module-resolver.service';
 import { ParserResultImporter } from './parser-result-importer.service';
@@ -42,7 +42,7 @@ describe('PdfParserJobStoreService', () => {
       databaseService,
       new ParserResultImporter(
         new ModuleResolver(),
-        new EventImporter(new EventImportKeyService()),
+        new EventImporter(new EventImportFingerprintService()),
       ),
     );
 
@@ -93,8 +93,8 @@ describe('PdfParserJobStoreService', () => {
         events: [
           {
             moduleCode: 'cos101',
-            type: 'lecture',
-            sectionLabel: 'L1',
+            activityType: 'lecture',
+            activityCode: 'L1',
             title: 'COS101 Lecture',
             day: 'Monday',
             date: null,
@@ -373,8 +373,8 @@ const duplicateImportResult: PdfParserResult = {
   events: [
     {
       moduleCode: 'cos103',
-      type: 'lecture',
-      sectionLabel: 'L1',
+      activityType: 'lecture',
+      activityCode: 'L1',
       title: 'COS103 Lecture',
       day: 'Tuesday',
       date: null,

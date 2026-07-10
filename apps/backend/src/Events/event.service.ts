@@ -5,7 +5,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { eq, getTableColumns } from 'drizzle-orm';
+import { eq, getTableColumns, inArray } from 'drizzle-orm';
 import { DatabaseService } from '../db/database.service';
 import {
   Event,
@@ -29,7 +29,7 @@ import {
 
 import { AppDatabase } from '../db/database.service';
 import { ModuleService } from '../Module/module.service';
-import { EventImportKeyService } from './event-import-key.service';
+import { EventImportFingerprintService } from './event-import-fingerprint.service';
 import { EventCriteria } from './dto/event.types';
 
 @Injectable()
@@ -37,7 +37,7 @@ export class EventService {
   constructor(
     private readonly dbService: DatabaseService,
     private readonly moduleService: ModuleService,
-    private readonly eventImportKeyService: EventImportKeyService,
+    private readonly eventImportFingerprintService: EventImportFingerprintService,
   ) {}
 
   //Create
@@ -45,7 +45,7 @@ export class EventService {
     userId: string,
     dto: CreateEventDto,
   ): Promise<EventSingleResponseDto> {
-    const moduleId = dto.eventCriteria.moduleID;
+    const moduleId = dto.eventCriteria.moduleId;
 
     //Create Event
     let event: EventDto;
@@ -84,7 +84,7 @@ export class EventService {
     if (!event)
       throw new InternalServerErrorException(`Event[${eventId}] not found`);
 
-    return { event: this.mapEventToDto(event) };
+    return { event: await this.mapEventToDto(event) };
   } //getById
 
   async updateEvent(
@@ -98,7 +98,8 @@ export class EventService {
       dto.eventCriteria && Object.keys(dto.eventCriteria).length > 0;
     const recUpdate = dto.isRecurring !== undefined;
     const nameUpdate = dto.eventName !== undefined;
-    const codeUpdate = dto.eventCode !== undefined;
+    const codeUpdate = dto.activityCode !== undefined;
+    const activityTypeUpdate = dto.activityType !== undefined;
     const validatedUpdate = dto.validated !== undefined;
 
     if (
@@ -106,6 +107,7 @@ export class EventService {
       !recUpdate &&
       !nameUpdate &&
       !codeUpdate &&
+      !activityTypeUpdate &&
       !validatedUpdate
     )
       throw new BadRequestException('At least one update field required');
@@ -135,34 +137,40 @@ export class EventService {
           dto.eventCriteria,
         );
         const nextEventName = dto.eventName?.trim() ?? existingEvent.eventName;
-        const nextEventCode = dto.eventCode?.trim() ?? existingEvent.eventCode;
-        const nextIsRecurring = dto.isRecurring ?? existingEvent.isRecurring;
+        const nextActivityCode =
+          dto.activityCode?.trim() ?? existingEvent.activityCode;
+        const nextIsRecurring =
+          dto.isRecurring ?? existingEvent.isRecurring ?? false;
         const nextValidated = dto.validated ?? existingEvent.validated;
-        const nextImportKey = this.eventImportKeyService.buildForEvent({
-          eventName: nextEventName ?? '',
-          eventCode: nextEventCode,
-          eventCriteria: mergedCriteria,
-        });
+        const nextActivityType = dto.activityType ?? existingEvent.activityType;
+        this.assertTimingMatchesRecurrence(mergedCriteria, nextIsRecurring);
+        const nextImportFingerprint =
+          this.eventImportFingerprintService.buildForEvent({
+            activityType: nextActivityType,
+            activityCode: nextActivityCode,
+            eventCriteria: mergedCriteria,
+          });
 
         //Update actual event entity
         const [event] = await tx
           .update(Event)
           .set({
             eventName: nextEventName,
-            eventCode: nextEventCode,
+            activityCode: nextActivityCode,
+            activityType: nextActivityType,
             eventCriteria: mergedCriteria,
             isRecurring: nextIsRecurring,
             validated: nextValidated,
-            ImportKey: nextImportKey,
+            importFingerprint: nextImportFingerprint,
           })
           .where(eq(Event.eventID, eventId))
           .returning();
 
-        if (dto.eventCriteria?.moduleID) {
+        if (dto.eventCriteria?.moduleId) {
           await tx
             .update(UniversityEvent)
             .set({
-              moduleID: dto.eventCriteria.moduleID,
+              moduleID: dto.eventCriteria.moduleId,
             })
             .where(eq(UniversityEvent.eventID, eventId));
         }
@@ -176,7 +184,7 @@ export class EventService {
       }, //END_transaction
     );
 
-    return { event: this.mapEventToDto(updatedEvent) };
+    return { event: await this.mapEventToDto(updatedEvent) };
   } //update
 
   //Delete event
@@ -201,7 +209,7 @@ export class EventService {
 
     return {
       eventName: existingEvent.event.eventName,
-      eventCode: existingEvent.event.eventCode,
+      activityCode: existingEvent.event.activityCode,
       success: true,
     };
   } //delete
@@ -228,18 +236,20 @@ export class EventService {
     //Create Event
     const event = await this.createEvent(dto, userId);
 
+    await this.replaceEventVenues(event.eventId, dto.venues);
+
     //Create PersonalEvent table entry
     const [persEvent] = await this.dbService.db
       .insert(PersonalEvent)
       .values({
         UserID: userId,
-        eventID: event.eventID,
+        eventID: event.eventId,
       })
       .returning();
 
     if (!persEvent)
       throw new InternalServerErrorException(
-        `Failed to create personalEvent relationship for User[${userId}] | Event[${event.eventID}]`,
+        `Failed to create personalEvent relationship for User[${userId}] | Event[${event.eventId}]`,
       );
 
     return event;
@@ -257,51 +267,20 @@ export class EventService {
 
     const event = await this.createEvent(dto);
 
+    await this.replaceEventVenues(event.eventId, dto.venues);
+
     //-> Create UniversityEvent JOin table entity
     const [uniEvent] = await this.dbService.db
       .insert(UniversityEvent)
       .values({
         moduleID: moduleId,
-        eventID: event.eventID,
+        eventID: event.eventId,
       })
       .returning();
 
     if (!uniEvent)
       throw new InternalServerErrorException(
-        `Failed to create University event for module[${moduleId}] | event[${event.eventID}]`,
-      );
-
-    //-> If venue present
-    //Get university ID through module
-    const uni = await this.moduleService.getUniForModule(moduleId);
-
-    const venueName = dto.eventCriteria.venue ?? `[${event.eventName}]_venue`;
-
-    const [venue] = await this.dbService.db
-      .insert(Venue)
-      .values({
-        VenueName: venueName,
-        UniversityID: uni.UniversityID,
-      })
-      .returning();
-
-    if (!venue)
-      throw new InternalServerErrorException(
-        `Failed to create venue[${venueName}] for event[${event.eventName}]`,
-      );
-
-    //-> Create venue entity and link through EventVenue
-    const [eventVenue] = await this.dbService.db
-      .insert(EventVenue)
-      .values({
-        EventID: event.eventID,
-        VenueID: venue.VenueID,
-      })
-      .returning();
-
-    if (!eventVenue)
-      throw new InternalServerErrorException(
-        `Failed to create EventVenue relation for Event[${event.eventID}] - Venue[${dto.eventCriteria.venue}]`,
+        `Failed to create University event for module[${moduleId}] | event[${event.eventId}]`,
       );
 
     return event;
@@ -316,34 +295,37 @@ export class EventService {
     const eventCriteria = dto.eventCriteria;
 
     let eventName: string;
-    let eventCode: string;
+    let activityCode: string;
     let isRec: boolean;
 
     if (userId) {
       //Implies personal event fields are being created
 
       eventName = dto.eventName ?? `Event_${userId.slice(0, 20)}`;
-      eventCode = dto.eventCode ?? `Pers_Event`;
+      activityCode = dto.activityCode ?? `Pers_Event`;
       isRec = dto.isRecurring ?? false; //Personal events might not recur
     } else {
       //Create University event fields
 
       eventName = dto.eventName ?? `Event_For_Uni}`;
-      eventCode = dto.eventCode ?? `Uni_Event`;
+      activityCode = dto.activityCode ?? `Uni_Event`;
       isRec = dto.isRecurring ?? true; //University events usually recur
     } //END_if-else
+
+    this.assertTimingMatchesRecurrence(eventCriteria, isRec);
 
     const [event] = await this.dbService.db
       .insert(Event)
       .values({
         eventName: eventName,
-        eventCode: eventCode,
+        activityCode,
+        activityType: dto.activityType ?? null,
         eventCriteria: eventCriteria,
         isRecurring: isRec,
         validated: dto.validated ?? true,
-        ImportKey: this.eventImportKeyService.buildForEvent({
-          eventName: eventName,
-          eventCode: eventCode,
+        importFingerprint: this.eventImportFingerprintService.buildForEvent({
+          activityType: dto.activityType,
+          activityCode,
           eventCriteria: eventCriteria,
         }),
       })
@@ -351,7 +333,7 @@ export class EventService {
 
     if (!event)
       throw new InternalServerErrorException(
-        `Failed to create event Name[${eventName}] | Code[${eventCode}]`,
+        `Failed to create event Name[${eventName}] | Code[${activityCode}]`,
       );
 
     return this.mapEventToDto(event);
@@ -365,7 +347,7 @@ export class EventService {
       .innerJoin(UniversityEvent, eq(UniversityEvent.eventID, Event.eventID))
       .where(eq(UniversityEvent.moduleID, moduleId));
 
-    return events;
+    return Promise.all(events.map((event) => this.mapEventToDto(event)));
   } //END_getEventsByModule
 
   //Get events for modules user is enrolled in
@@ -380,7 +362,7 @@ export class EventService {
       )
       .where(eq(ModuleEnrollment.UserID, userId));
 
-    return events;
+    return Promise.all(events.map((event) => this.mapEventToDto(event)));
   } //END_getEventsByUser
 
   //Check if user owns event through module
@@ -409,16 +391,62 @@ export class EventService {
   } //END_ownershipCheck
 
   //Map an event to the DTO - idk why this is even necessary but I kept getting type errors when returning an event which is literally fetched straight from the database
-  private mapEventToDto(event: typeof Event.$inferSelect): EventDto {
+  private async mapEventToDto(
+    event: typeof Event.$inferSelect,
+  ): Promise<EventDto> {
+    const venues = await this.getEventVenues(event.eventID);
     return {
-      eventID: event.eventID,
+      eventId: event.eventID,
       eventName: event.eventName,
-      eventCode: event.eventCode ?? undefined,
+      activityCode: event.activityCode ?? undefined,
+      activityType: event.activityType as EventDto['activityType'],
       eventCriteria: event.eventCriteria,
       isRecurring: event.isRecurring,
       validated: event.validated,
+      venues,
     };
   } //END_mapEventToDto
+
+  private async getEventVenues(eventId: string): Promise<EventDto['venues']> {
+    const rows = await this.dbService.db
+      .select({ venueId: Venue.VenueID, venueName: Venue.VenueName })
+      .from(EventVenue)
+      .innerJoin(Venue, eq(EventVenue.VenueID, Venue.VenueID))
+      .where(eq(EventVenue.EventID, eventId));
+    return rows.map((row) => ({
+      venueId: row.venueId,
+      venueName: row.venueName ?? '',
+    }));
+  }
+
+  private async replaceEventVenues(
+    eventId: string,
+    venues: EventDto['venues'],
+  ): Promise<void> {
+    if (venues === undefined) return;
+    const venueIds = [...new Set(venues.map(({ venueId }) => venueId))];
+    if (venueIds.length !== venues.length) {
+      throw new BadRequestException('Event venues must not contain duplicates');
+    }
+    if (venueIds.length === 0) return;
+
+    const existing = await this.dbService.db
+      .select({ venueId: Venue.VenueID })
+      .from(Venue)
+      .where(inArray(Venue.VenueID, venueIds));
+    if (existing.length !== venueIds.length) {
+      throw new BadRequestException('One or more venueIds do not exist');
+    }
+
+    await this.dbService.db
+      .insert(EventVenue)
+      .values(
+        venueIds.map((venueId) => ({ EventID: eventId, VenueID: venueId })),
+      )
+      .onConflictDoNothing({
+        target: [EventVenue.EventID, EventVenue.VenueID],
+      });
+  }
 
   private mergeEventCriteria(
     existingCriteria: EventCriteria,
@@ -429,24 +457,41 @@ export class EventService {
     }
 
     const mergedCriteria: EventCriteria = {
-      type: updateCriteria.type ?? existingCriteria.type,
+      eventSource: updateCriteria.eventSource ?? existingCriteria.eventSource,
       date: updateCriteria.date ?? existingCriteria.date,
       startTime: updateCriteria.startTime ?? existingCriteria.startTime,
       endTime: updateCriteria.endTime ?? existingCriteria.endTime,
     };
 
-    if (updateCriteria.moduleID !== undefined) {
-      mergedCriteria.moduleID = updateCriteria.moduleID;
-    } else if (existingCriteria.moduleID !== undefined) {
-      mergedCriteria.moduleID = existingCriteria.moduleID;
+    if (updateCriteria.moduleId !== undefined)
+      mergedCriteria.moduleId = updateCriteria.moduleId;
+    else if (existingCriteria.moduleId !== undefined)
+      mergedCriteria.moduleId = existingCriteria.moduleId;
+    if (updateCriteria.dayOfWeek !== undefined) {
+      mergedCriteria.dayOfWeek = updateCriteria.dayOfWeek;
+      delete mergedCriteria.date;
     }
-
-    if (updateCriteria.venue !== undefined) {
-      mergedCriteria.venue = updateCriteria.venue;
-    } else if (existingCriteria.venue !== undefined) {
-      mergedCriteria.venue = existingCriteria.venue;
+    if (updateCriteria.date !== undefined) {
+      mergedCriteria.date = updateCriteria.date;
+      delete mergedCriteria.dayOfWeek;
     }
 
     return mergedCriteria;
   } //END_mergeEventCriteria
+
+  private assertTimingMatchesRecurrence(
+    criteria: EventCriteria,
+    isRecurring: boolean,
+  ): void {
+    if (isRecurring && (criteria.date !== undefined || !criteria.dayOfWeek)) {
+      throw new BadRequestException(
+        'Recurring events require dayOfWeek and must not include date',
+      );
+    }
+    if (!isRecurring && (criteria.dayOfWeek !== undefined || !criteria.date)) {
+      throw new BadRequestException(
+        'Non-recurring events require date and must not include dayOfWeek',
+      );
+    }
+  }
 } //EventService

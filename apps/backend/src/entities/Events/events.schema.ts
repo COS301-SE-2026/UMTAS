@@ -9,7 +9,6 @@ import {
   uniqueIndex,
 } from 'drizzle-orm/pg-core';
 import { usersTable } from '../auth';
-import { Venue } from '../Universities';
 import { modules } from '../Modules';
 
 import type { EventCriteria } from 'src/Events/dto/event.types';
@@ -19,14 +18,17 @@ export const Event = pgTable(
   {
     eventID: uuid('eventID').primaryKey().defaultRandom(),
     eventName: varchar('eventName', { length: 32 }).notNull(),
-    eventCode: varchar('eventCode', { length: 10 }),
+    activityCode: varchar('eventCode', { length: 10 }),
+    activityType: varchar('activityType', { length: 16 }),
     eventCriteria: jsonb('eventCriteria').$type<EventCriteria>().notNull(),
     isRecurring: boolean('isRecurring').notNull().default(false),
     validated: boolean('validated').notNull().default(true),
-    ImportKey: varchar('ImportKey', { length: 64 }),
+    importFingerprint: varchar('ImportKey', { length: 64 }),
   },
   (table) => ({
-    importKeyUnique: uniqueIndex('event_import_key_unique').on(table.ImportKey),
+    importFingerprintUnique: uniqueIndex('event_import_key_unique').on(
+      table.importFingerprint,
+    ),
   }),
 );
 
@@ -50,9 +52,6 @@ export const UniversityEvent = pgTable(
       onDelete: 'cascade',
     }),
     eventID: uuid('eventID').references(() => Event.eventID, {
-      onDelete: 'cascade',
-    }),
-    VenueID: uuid('VenueID').references(() => Venue.VenueID, {
       onDelete: 'cascade',
     }),
   },

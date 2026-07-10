@@ -16,8 +16,8 @@ const parserResult: PdfParserResult = {
   events: [
     {
       moduleCode: "COS301",
-      type: "lecture",
-      sectionLabel: "P1",
+      activityType: "lecture",
+      activityCode: "P1",
       title: "COS301 P1",
       day: "Monday",
       date: null,

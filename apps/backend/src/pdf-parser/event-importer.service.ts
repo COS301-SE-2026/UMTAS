@@ -3,8 +3,8 @@ import { and, eq } from 'drizzle-orm';
 import type { ParsedEventCandidate } from 'shared-types';
 import type { AppDatabase } from '../db/database.service';
 import type { EventCriteria } from '../Events/dto/event.types';
-import { EventType } from '../Events/dto/event.types';
-import { EventImportKeyService } from '../Events/event-import-key.service';
+import { EventSource } from '../Events/dto/event.types';
+import { EventImportFingerprintService } from '../Events/event-import-fingerprint.service';
 import { Event, EventVenue, UniversityEvent, Venue } from '../entities';
 import type { ModuleRecord } from './module-resolver.service';
 import {
@@ -14,20 +14,22 @@ import {
 
 interface ImportedEventShape {
   eventName: string;
-  eventCode: string;
+  activityType: string;
+  activityCode: string;
   eventCriteria: EventCriteria;
-  importKey: string;
+  importFingerprint: string;
 }
 
 interface EventCriteriaInput {
   moduleId: string;
   parsedEvent: ParsedEventCandidate;
-  primaryVenue?: string;
 }
 
 @Injectable()
 export class EventImporter {
-  constructor(private readonly eventImportKeyService: EventImportKeyService) {}
+  constructor(
+    private readonly eventImportFingerprintService: EventImportFingerprintService,
+  ) {}
 
   async createMissingEvents(
     db: AppDatabase,
@@ -44,22 +46,11 @@ export class EventImporter {
       }
 
       const eventShape = this.buildEventShape(module.moduleID, parsedEvent);
-      const existing = await this.findExistingEvent(
-        db,
-        module.moduleID,
-        eventShape,
-      );
-      if (existing) {
-        continue;
-      }
-
       const venueIds = await this.resolveVenueIds(
         db,
         universityId,
         parsedEvent.venues,
       );
-      const primaryVenueId = venueIds[0];
-
       const event = await this.createOrFindEvent(
         db,
         eventShape,
@@ -71,7 +62,6 @@ export class EventImporter {
         .values({
           moduleID: module.moduleID,
           eventID: event.eventID,
-          VenueID: primaryVenueId,
         })
         .onConflictDoNothing({
           target: [UniversityEvent.moduleID, UniversityEvent.eventID],
@@ -102,14 +92,15 @@ export class EventImporter {
       .insert(Event)
       .values({
         eventName: eventShape.eventName,
-        eventCode: eventShape.eventCode,
+        activityType: eventShape.activityType,
+        activityCode: eventShape.activityCode,
         eventCriteria: eventShape.eventCriteria,
         isRecurring,
         validated: false,
-        ImportKey: eventShape.importKey,
+        importFingerprint: eventShape.importFingerprint,
       })
       .onConflictDoNothing({
-        target: Event.ImportKey,
+        target: Event.importFingerprint,
       })
       .returning();
 
@@ -120,7 +111,7 @@ export class EventImporter {
     const [existing] = await db
       .select()
       .from(Event)
-      .where(eq(Event.ImportKey, eventShape.importKey))
+      .where(eq(Event.importFingerprint, eventShape.importFingerprint))
       .limit(1);
 
     if (!existing) {
@@ -128,23 +119,6 @@ export class EventImporter {
     }
 
     return existing;
-  }
-
-  private async findExistingEvent(
-    db: AppDatabase,
-    moduleId: string,
-    eventShape: ImportedEventShape,
-  ): Promise<typeof Event.$inferSelect | undefined> {
-    const rows = await db
-      .select({
-        event: Event,
-      })
-      .from(Event)
-      .innerJoin(UniversityEvent, eq(UniversityEvent.eventID, Event.eventID))
-      .where(eq(UniversityEvent.moduleID, moduleId));
-
-    return rows.find(({ event }) => this.eventMatchesShape(event, eventShape))
-      ?.event;
   }
 
   private async resolveVenueIds(
@@ -211,64 +185,80 @@ export class EventImporter {
     moduleId: string,
     parsedEvent: ParsedEventCandidate,
   ): ImportedEventShape {
-    const primaryVenue = parsedEvent.venues[0]?.trim();
     const eventName = truncateForColumn(
       parsedEvent.title.trim() ||
-        `${normalizeModuleCode(parsedEvent.moduleCode)} ${parsedEvent.type}`,
+        `${normalizeModuleCode(parsedEvent.moduleCode)} ${parsedEvent.activityType}`,
       32,
     );
-    const eventCode = truncateForColumn(
-      parsedEvent.sectionLabel.trim() || parsedEvent.type,
+    const activityCode = truncateForColumn(
+      parsedEvent.activityCode.trim() || parsedEvent.activityType,
       10,
     );
     const eventCriteria = this.buildEventCriteria({
       moduleId,
       parsedEvent,
-      primaryVenue,
     });
 
     return {
       eventName,
-      eventCode,
+      activityType: parsedEvent.activityType,
+      activityCode,
       eventCriteria,
-      importKey: this.eventImportKeyService.buildForModuleEvent({
-        moduleId: moduleId,
-        eventName: eventName,
-        eventCode: eventCode,
-        eventCriteria: eventCriteria,
-      }),
+      importFingerprint: this.eventImportFingerprintService.buildForModuleEvent(
+        {
+          moduleId: moduleId,
+          activityType: parsedEvent.activityType,
+          activityCode,
+          eventCriteria: eventCriteria,
+          venueNames: parsedEvent.venues,
+        },
+      ),
     };
   }
 
   private buildEventCriteria(input: EventCriteriaInput): EventCriteria {
     const criteria: EventCriteria = {
-      type: EventType.UNIVERSITY,
-      date: input.parsedEvent.date ?? input.parsedEvent.day ?? '',
+      eventSource: EventSource.UNIVERSITY,
       startTime: input.parsedEvent.startTime,
       endTime: input.parsedEvent.endTime,
-      moduleID: input.moduleId,
+      moduleId: input.moduleId,
     };
 
-    if (input.primaryVenue) {
-      criteria.venue = truncateForColumn(input.primaryVenue, 30);
-    }
+    if (input.parsedEvent.isRecurring)
+      criteria.dayOfWeek = normalizeDayOfWeek(input.parsedEvent.day);
+    else criteria.date = input.parsedEvent.date ?? undefined;
 
     return criteria;
   }
+}
 
-  private eventMatchesShape(
-    event: typeof Event.$inferSelect,
-    eventShape: ImportedEventShape,
-  ): boolean {
-    return (
-      event.eventName === eventShape.eventName &&
-      (event.eventCode ?? '') === eventShape.eventCode &&
-      event.eventCriteria.moduleID === eventShape.eventCriteria.moduleID &&
-      event.eventCriteria.date === eventShape.eventCriteria.date &&
-      event.eventCriteria.startTime === eventShape.eventCriteria.startTime &&
-      event.eventCriteria.endTime === eventShape.eventCriteria.endTime &&
-      (event.eventCriteria.venue ?? '') ===
-        (eventShape.eventCriteria.venue ?? '')
+function normalizeDayOfWeek(
+  day: string | null,
+): import('../Events/dto/event.types').DayOfWeek {
+  const value = day?.trim().toLowerCase();
+  const aliases: Record<string, import('../Events/dto/event.types').DayOfWeek> =
+    {
+      mon: 'monday',
+      monday: 'monday',
+      tue: 'tuesday',
+      tues: 'tuesday',
+      tuesday: 'tuesday',
+      wed: 'wednesday',
+      wednesday: 'wednesday',
+      thu: 'thursday',
+      thur: 'thursday',
+      thurs: 'thursday',
+      thursday: 'thursday',
+      fri: 'friday',
+      friday: 'friday',
+      sat: 'saturday',
+      saturday: 'saturday',
+      sun: 'sunday',
+      sunday: 'sunday',
+    };
+  if (!value || !aliases[value])
+    throw new ConflictException(
+      `Parser emitted an invalid weekday: ${day ?? ''}`,
     );
-  }
+  return aliases[value];
 }
