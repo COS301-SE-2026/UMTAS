@@ -89,6 +89,7 @@ export class CreateModuleDto extends PickType(ModulesDto, [
     description: 'CourseID module belongs to',
   })
   @IsUUID()
+  @IsOptional()
   CourseID?: string;
 } //CreateModuleDto
 
@@ -194,3 +195,15 @@ export class ModuleStylingBodyDto {
   @Type(() => StylingDto)
   styling!: StylingDto;
 }
+
+//Enroll response
+export class EnrolResponseDto extends PickType(ModulesDto, ['moduleID']) {
+  UserID!: string;
+
+  @ApiProperty({
+    example:
+      'User successfully enrolled into module[00000000-0000-0000-0000-000000000000]',
+    description: 'Message to describe success/failure of enrollment',
+  })
+  message!: string;
+} //END_EnrolResponseDto

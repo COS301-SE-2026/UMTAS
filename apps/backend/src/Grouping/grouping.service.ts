@@ -193,6 +193,7 @@ export class GroupingService {
 
     //Check if hash already exists -> If it already exists -> delete current group -> return matching group
     const friendHash = await this.checkForMatchingHashGroup(groupId, newHash);
+
     if (friendHash) {
       //Delete current group
       await this.deleteGroup(groupId);
