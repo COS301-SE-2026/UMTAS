@@ -8,6 +8,7 @@ import {
   Length,
   IsBoolean,
   ValidateNested,
+  IsNumber,
 } from 'class-validator';
 import { PartialType, PickType, OmitType } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
@@ -51,6 +52,7 @@ export class ModulesDto {
   @ApiPropertyOptional({
     example: 'Introduction to computer networking concepts',
     description: 'Short module description',
+    nullable: true,
   })
   @IsOptional()
   @IsString()
@@ -69,6 +71,71 @@ export class ModulesDto {
   @Type(() => StylingDto)
   styling?: StylingDto | null;
 } //ModuleDto
+
+export class CourseModuleDto {
+  @ApiProperty({
+    example: '00000000-0000-0000-0000-000000000000',
+    description: 'ID to identify Course Module entry',
+  })
+  @IsUUID('4', { message: 'CourseModuleID: Not in valid UUID format' })
+  @IsNotEmpty()
+  CourseModuleID!: string;
+
+  @ApiProperty({
+    example: '00000000-0000-0000-0000-000000000000',
+    description: 'ID to identify GroupModule entry metadata is for',
+  })
+  @IsUUID('4', { message: 'GroupModuleID: Not in valid UUID format' })
+  @IsNotEmpty()
+  GroupModuleID!: string;
+
+  @ApiProperty({
+    example: '00000000-0000-0000-0000-000000000000',
+    description: 'ID to identify course owning this CourseModule',
+  })
+  @IsUUID('4', { message: 'CourseID: Not in valid UUID format' })
+  @IsNotEmpty()
+  CourseID!: string;
+
+  @ApiPropertyOptional({
+    example: true,
+    default: true,
+    description:
+      'Identifies wether or not module is a core module of the course',
+  })
+  @IsBoolean()
+  @Transform(({ value }) => {
+    if (value === true) return true;
+    else return false;
+  })
+  @IsNotEmpty()
+  Core!: boolean;
+
+  @ApiPropertyOptional({
+    example: 'Semester 1',
+    description:
+      'Identifies which part of the year the module takes part in for the course',
+    nullable: true,
+  })
+  @IsString()
+  @IsOptional()
+  SemesterOfStudy?: string;
+
+  @ApiPropertyOptional({
+    example: 1,
+    description: 'Which year does the module belong to for the course',
+    nullable: true,
+  })
+  @IsNumber()
+  @IsOptional()
+  YearOfStudy?: number;
+} //END_CourseModuleDto
+
+export class CreateCourseModuleDto extends PickType(CourseModuleDto, [
+  'Core',
+  'SemesterOfStudy',
+  'YearOfStudy',
+]) {}
 
 //Create
 export class CreateModuleDto extends PickType(ModulesDto, [
@@ -92,6 +159,17 @@ export class CreateModuleDto extends PickType(ModulesDto, [
   @IsUUID()
   @IsOptional()
   CourseID?: string;
+
+  @ApiProperty({
+    description:
+      'Course Module metadata to be used when module belongs to course',
+    type: CreateCourseModuleDto,
+  })
+  @IsOptional()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => CreateCourseModuleDto)
+  CourseModuleInfo?: CreateCourseModuleDto;
 } //CreateModuleDto
 
 //Update

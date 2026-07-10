@@ -161,7 +161,7 @@ export class ModuleService {
 
     //Build actual query joining Modules -> ModuleEnrollment + CourseModule + Course and then add in dynamic where conditions
     const foundModules = await this.dbService.db
-      .selectDistinct({
+      .selectDistinctOn([modules.moduleID], {
         ...getTableColumns(modules),
         ModuleGroupingID: GroupModules.GroupID,
         CourseID: Course.CourseID,
