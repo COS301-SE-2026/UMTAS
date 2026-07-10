@@ -291,7 +291,7 @@ export class ModuleService {
     await this.getById(userId, moduleId);
 
     //Check if user already enrolled to module
-    let enrollmentStatus = await this.dbService.db
+    const [enrollmentStatus] = await this.dbService.db
       .select()
       .from(ModuleEnrollment)
       .where(
@@ -311,7 +311,7 @@ export class ModuleService {
       };
 
     //Enroll student to module
-    enrollmentStatus = await this.dbService.db
+    const newlyEnrolled = await this.dbService.db
       .insert(ModuleEnrollment)
       .values({
         UserID: userId,
@@ -320,7 +320,7 @@ export class ModuleService {
       .returning();
 
     //Check if enrollment failed
-    if (!enrollmentStatus)
+    if (!newlyEnrolled)
       throw new InternalServerErrorException(
         `Failed to enroll student[${userId}] into module[${moduleId}]`,
       );
