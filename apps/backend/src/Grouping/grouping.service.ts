@@ -11,7 +11,7 @@ import crypto from 'crypto';
 import { eq, and, ne, inArray } from 'drizzle-orm';
 
 //Entities
-import { GroupModules, ModuleGrouping } from '../entities';
+import { Course, GroupModules, ModuleGrouping } from '../entities';
 
 //Services
 import { DatabaseService } from '../db/database.service';
@@ -193,8 +193,14 @@ export class GroupingService {
 
     if (friendHash) {
       //Ensure all courses that made use of old group -> switch to new group
+      await this.dbService.db
+        .update(Course)
+        .set({
+          GroupID: friendHash.GroupID,
+        })
+        .where(eq(Course.GroupID, groupId));
 
-      //Delete current group
+      //Delete old group
       await this.deleteGroup(groupId);
 
       //return friend group
