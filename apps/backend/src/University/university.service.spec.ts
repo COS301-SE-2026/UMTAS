@@ -26,6 +26,7 @@ import {
   University,
   UniversityRole,
 } from '../entities/Universities/University.schema';
+import { ApplyForUniRoleDto } from './dto/university.dto';
 
 describe('UniversityService', () => {
   let service: UniversityService;
@@ -180,6 +181,36 @@ describe('UniversityService', () => {
           `No role found for user[${userId}] for university[${uniId}]`,
         ),
       );
+    });
+  });
+
+  describe('Test_applyforUniRole', () => {
+    it('should return university details with new role if application is successful', async () => {
+      jest.spyOn(service, 'getById').mockResolvedValue({
+        UniversityID: uniId,
+        UniversityName: 'Test Uni',
+        role: 'STUDENT',
+      });
+      const myRoleVariable = 'LECTURER';
+      const dto: ApplyForUniRoleDto = {
+        UniversityID: uniId,
+        role: myRoleVariable,
+      };
+
+      mockDbResult(mockDb.select, [
+        { UniversityID: uniId, UniversityName: 'Test Uni', role: 'STUDENT' },
+      ]);
+
+      mockDbResult(mockDb.update, [
+        {
+          UniversityID: uniId,
+          role: 'LECTURER_PENDING',
+        },
+      ]);
+
+      const result = await service.applyForUniRole(userId, dto);
+      expect(mockDb.update).toHaveBeenCalled();
+      expect(result.role).toEqual('LECTURER_PENDING');
     });
   });
 });
