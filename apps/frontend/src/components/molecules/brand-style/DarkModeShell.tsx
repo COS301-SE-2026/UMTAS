@@ -1,3 +1,46 @@
+"use client";
+
+import { useState } from "react";
+import { Token } from "@/types/BrandStyle";
+import { DarkPalette } from "@/types/BrandStyleData";
+import { Inspector } from "@/components/molecules/brand-style/InspectorGadget";
+
 export function DarkModeShell() {
-  return <>I am dark bro</>;
+  const [selectedToken, setSelectedToken] = useState<Token>(DarkPalette[0]);
+
+  return (
+    <div
+      data-theme="dark"
+      className="grid grid-cols-1 md:grid-cols gap-6 w-full text-left"
+    >
+      <div className="p-4 bg-[var(--bg-base)] border border-[var(--border)] rounded-xl space-y-1 h-fit">
+        {DarkPalette.map((token) => (
+          <div
+            key={token.token}
+            onClick={() => setSelectedToken(token)}
+            className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${
+              selectedToken.token === token.token
+                ? "bg-[var(--bg-elevated)]"
+                : "hover:bg-[var(--bg-surface)]"
+            }`}
+          >
+            <div
+              className="w-6 h-6 rounded-md border border-[var(--border)] flex-shrink-0"
+              style={{ backgroundColor: `var(${token.token})` }}
+            />
+            <div>
+              <p className="text-sm font-medium text-[var(--text-primary)] m-0">
+                {token.label}
+              </p>
+              <p className="text-xs font-mono text-[var(--text-secondary)] m-0">
+                {token.token}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <Inspector token={selectedToken} />
+    </div>
+  );
 }
