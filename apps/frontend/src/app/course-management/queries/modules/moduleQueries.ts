@@ -1,5 +1,7 @@
 import { mutationOptions, queryOptions } from "@tanstack/react-query";
 import {
+  CreateModuleBody,
+  CreateModuleBuilderAdmin,
   fetchAllModules,
   getAllModulesQueries,
   updateModStylingBody,
@@ -40,6 +42,16 @@ export function updateModStylingQ() {
     }) => {
       const builder = new updateStylingBuilder();
       return builder.send({ body: vars.body, paths: vars.path });
+    },
+    onError: (err) => console.error("mutation failed", err),
+  });
+}
+
+export function CreateModuleMutAdmin() {
+  return mutationOptions({
+    mutationFn: async (body: CreateModuleBody) => {
+      const builder = new CreateModuleBuilderAdmin();
+      return builder.send({ body: body });
     },
     onError: (err) => console.error("mutation failed", err),
   });

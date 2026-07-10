@@ -3,6 +3,7 @@ import {
   RequestBuilder,
   RequestMethod,
 } from "../../../../../utilities/request";
+import { createModuleRes } from "@/app/builder/utils/modules/requestBuilders";
 
 export type moduleDTO = components["schemas"]["ModuleSingleResponseDto"];
 export type getAllModules = paths["/modules"]["get"];
@@ -99,5 +100,24 @@ export class updateStylingBuilder extends RequestBuilder<
   constructor() {
     super();
     this.setUrl("/modules/styling/{moduleId}").setMethod(RequestMethod.POST);
+  }
+}
+
+type createModule = paths["/modules"]["post"];
+
+export type CreateModuleBody =
+  createModule["requestBody"]["content"]["application/json"];
+
+export type CreateModuleRes =
+  createModule["responses"]["201"]["content"]["application/json"];
+
+export class CreateModuleBuilderAdmin extends RequestBuilder<
+  undefined,
+  CreateModuleBody,
+  CreateModuleRes
+> {
+  constructor() {
+    super();
+    this.setUrl("/modules").setMethod(RequestMethod.POST);
   }
 }
