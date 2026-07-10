@@ -1,0 +1,23 @@
+{
+  "name": "solver-worker",
+  "version": "1.0.0",
+  "description": "BullMQ timetable solver worker for UMTAS",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "pnpm run build && node dist/index.js",
+    "start": "node dist/index.js",
+    "test": "pnpm run build && node --test \"dist/tests/*.test.js\""
+  },
+  "dependencies": {
+    "bullmq-worker-core": "workspace:*",
+    "shared-types": "workspace:*",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.1",
+    "typescript": "^6.0.3"
+  }
+}

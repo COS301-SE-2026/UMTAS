@@ -1,8 +1,3 @@
-export interface PdfParseJobData {
-  jobId: string;
-  fileKey: string;
-  adapterKey: string;
-}
 import { z } from "zod";
 
 const JsonRecordSchema = z.record(z.string(), z.unknown());
@@ -15,62 +10,6 @@ export const PdfParseJobDataSchema = z.strictObject({
 
 export type PdfParseJobData = z.infer<typeof PdfParseJobDataSchema>;
 
-export interface TimetableSolveJobData {
-  jobId: string;
-  solverKey: string;
-  mode: "feasibility" | "optimization";
-}
-
-export interface ParseAnnotation {
-  code: string;
-  message: string;
-  details: Record<string, unknown>;
-}
-
-export interface ParsedModuleCandidate {
-  code: string;
-  name: string | null;
-  metadata: Record<string, unknown>;
-  warnings: ParseAnnotation[];
-}
-
-export interface ParsedEventCandidate {
-  moduleCode: string;
-  type: "lecture" | "tutorial" | "prac" | "test" | "exam";
-  sectionLabel: string;
-  title: string;
-  day: string | null;
-  date: string | null;
-  startTime: string;
-  endTime: string;
-  venues: string[];
-  isRecurring: boolean;
-  metadata: Record<string, unknown>;
-  warnings: ParseAnnotation[];
-}
-
-export interface PdfParserResult {
-  modules: ParsedModuleCandidate[];
-  events: ParsedEventCandidate[];
-  warnings: ParseAnnotation[];
-}
-
-export interface WorkerCallbackError {
-  code: string;
-  message: string;
-  details?: Record<string, unknown>;
-}
-
-export interface PdfParserCallbackPayload {
-  status: "completed" | "failed";
-  result?: PdfParserResult;
-  error?: WorkerCallbackError;
-}
-
-export interface SolverCallbackPayload {
-  status: "completed" | "failed";
-  result?: Record<string, unknown>;
-  error?: WorkerCallbackError;
 export const ParseAnnotationSchema = z.strictObject({
   code: z.string(),
   message: z.string(),
@@ -88,10 +27,36 @@ export const ParsedModuleCandidateSchema = z.strictObject({
 
 export type ParsedModuleCandidate = z.infer<typeof ParsedModuleCandidateSchema>;
 
+export const ActivityTypeSchema = z.enum([
+  "lecture",
+  "tutorial",
+  "prac",
+  "test",
+  "exam",
+]);
+
+export type ActivityType = z.infer<typeof ActivityTypeSchema>;
+
+export const DayOfWeekSchema = z.enum([
+  "monday",
+  "tuesday",
+  "wednesday",
+  "thursday",
+  "friday",
+  "saturday",
+  "sunday",
+]);
+
+export type DayOfWeek = z.infer<typeof DayOfWeekSchema>;
+
+export const IsoDateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, {
+  message: "Expected an ISO calendar date (YYYY-MM-DD).",
+});
+
 export const ParsedEventCandidateSchema = z.strictObject({
   moduleCode: z.string(),
-  type: z.enum(["lecture", "tutorial", "prac", "test", "exam"]),
-  sectionLabel: z.string(),
+  activityType: ActivityTypeSchema,
+  activityCode: z.string(),
   title: z.string(),
   day: z.string().nullable(),
   date: z.string().nullable(),
@@ -149,11 +114,123 @@ export type PdfParserCallbackPayload = z.infer<
   typeof PdfParserCallbackPayloadSchema
 >;
 
-export interface SolverCallbackPayload {
-  status: "completed" | "failed";
-  result?: Record<string, unknown>;
-  error?: WorkerCallbackError;
+export const SolverEngineSchema = z.enum(["auto", "cp-sat", "ga"]);
+
+export type SolverEngine = z.infer<typeof SolverEngineSchema>;
+
+export const SolverHeuristicPreferenceSchema = z.strictObject({
+  key: z.string().trim().min(1),
+  weight: z.number().finite().optional(),
+  parameters: JsonRecordSchema.optional(),
+});
+
+export type SolverHeuristicPreference = z.infer<
+  typeof SolverHeuristicPreferenceSchema
+>;
+
+export const SolverPreferencesSchema = z.strictObject({
+  heuristics: z.array(SolverHeuristicPreferenceSchema).default([]),
+});
+
+export type SolverPreferences = z.infer<typeof SolverPreferencesSchema>;
+
+export const TimetableSolveJobDataSchema = z.strictObject({
+  jobId: z.string().trim().min(1),
+  solverProfileKey: z.string().trim().min(1),
+  solveMode: z.enum(["feasibility", "optimization"]),
+  engine: SolverEngineSchema.default("auto"),
+});
+
+export interface TimetableSolveJobData {
+  jobId: string;
+  solverProfileKey: string;
+  solveMode: "feasibility" | "optimization";
+  engine?: SolverEngine;
 }
+
+/**
+ * The backend owns the problem model. Heuristics are soft ranking inputs and
+ * never change whether a solution is valid.
+ */
+export const SchedulingEventSchema = z
+  .strictObject({
+    eventId: z.string().trim().min(1),
+    moduleCode: z.string().trim().min(1),
+    activityType: ActivityTypeSchema,
+    activityCode: z.string().trim().min(1),
+    requiredSelections: z.number().int().positive().default(1),
+    date: IsoDateSchema.optional(),
+    dayOfWeek: DayOfWeekSchema.optional(),
+    startTime: z.string().trim().min(1),
+    endTime: z.string().trim().min(1),
+    venues: z
+      .array(
+        z.strictObject({
+          id: z.string().trim().min(1),
+          name: z.string().trim().min(1),
+        }),
+      )
+      .default([]),
+  })
+  .superRefine((event, context) => {
+    if (Boolean(event.date) === Boolean(event.dayOfWeek)) {
+      context.addIssue({
+        code: "custom",
+        message: "Scheduling events require exactly one of date or dayOfWeek.",
+      });
+    }
+  });
+
+export type SchedulingEvent = z.infer<typeof SchedulingEventSchema>;
+
+export const SchedulingProblemSchema = z.strictObject({
+  events: z.array(SchedulingEventSchema),
+});
+
+export type SchedulingProblem = z.infer<typeof SchedulingProblemSchema>;
+
+export const TimetableSolutionSchema = z.strictObject({
+  selectedEventIds: z.array(z.string().trim().min(1)),
+});
+
+export type TimetableSolution = z.infer<typeof TimetableSolutionSchema>;
+
+export const SolverInputSchema = z.strictObject({
+  schedulingProblem: SchedulingProblemSchema,
+  preferences: SolverPreferencesSchema.default({ heuristics: [] }),
+});
+
+export type SolverInput = z.infer<typeof SolverInputSchema>;
+
+export const SolverHeuristicScoreSchema = z.strictObject({
+  key: z.string().trim().min(1),
+  score: z.number().finite(),
+  details: JsonRecordSchema.optional(),
+});
+
+export type SolverHeuristicScore = z.infer<typeof SolverHeuristicScoreSchema>;
+
+export const SolverResultSchema = z.strictObject({
+  engine: z.enum(["cp-sat", "ga"]),
+  timetableSolution: TimetableSolutionSchema,
+  heuristicScores: z.array(SolverHeuristicScoreSchema).default([]),
+  metadata: JsonRecordSchema.default({}),
+});
+
+export type SolverResult = z.infer<typeof SolverResultSchema>;
+
+export const SolverCallbackPayloadSchema = z.discriminatedUnion("status", [
+  z.strictObject({
+    status: z.literal("completed"),
+    result: SolverResultSchema,
+  }),
+  z.strictObject({
+    status: z.literal("failed"),
+    error: WorkerCallbackErrorSchema,
+  }),
+]);
+
+export type SolverCallbackPayload = z.infer<typeof SolverCallbackPayloadSchema>;
 
 export const PDF_STREAM_FINGERPRINT_ALGORITHM_VERSION =
   "pdf-stream-payload-sha256-v1" as const;
