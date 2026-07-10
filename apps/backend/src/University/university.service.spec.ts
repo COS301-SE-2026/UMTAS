@@ -17,7 +17,7 @@ import { createMockDatabase } from '../Testing/Mocks/database.mock';
 import { DatabaseService } from '../db/database.service';
 
 //mock functions on db
-import { mockDbResult } from '../Testing/Mocks';
+import { mockDbResult, mockSequentialResults } from '../Testing/Mocks';
 
 //factories
 // import {createUniversity} from '../Testing/Factories';
@@ -26,7 +26,7 @@ import {
   University,
   UniversityRole,
 } from '../entities/Universities/University.schema';
-import { ApplyForUniRoleDto } from './dto/university.dto';
+import { ApplyForUniRoleDto, ApproveUsersRoleDto } from './dto/university.dto';
 
 describe('UniversityService', () => {
   let service: UniversityService;
@@ -211,6 +211,79 @@ describe('UniversityService', () => {
       const result = await service.applyForUniRole(userId, dto);
       expect(mockDb.update).toHaveBeenCalled();
       expect(result.role).toEqual('LECTURER_PENDING');
+    });
+  });
+
+  describe('Test_approveUserRole', () => {
+    it('should approve user role and return updated role', async () => {
+      const myRoleVariable =
+        'LECTURER_PENDING' as ApproveUsersRoleDto['provdedRole'];
+      const dto = {
+        UniversityID: uniId,
+        userId: userId,
+        isApproved: false,
+        role: myRoleVariable,
+      };
+
+      mockDbResult(mockDb.select, [
+        {
+          UniversityID: uniId,
+          userId: userId,
+          isApproved: false,
+          role: myRoleVariable,
+        },
+      ]);
+
+      mockDbResult(mockDb.update, [
+        {
+          UniversityID: uniId,
+          userId: userId,
+          isApproved: true,
+          role: myRoleVariable,
+        },
+      ]);
+
+      const result = await service.approveUserRole(dto);
+
+      expect(mockDb.update).toHaveBeenCalled();
+      expect(result.success).toEqual(true);
+    });
+  });
+
+  describe('Test_getAllApplications', () => {
+    it('should return all applications for a given university', async () => {
+      const mockAuthResult = [
+        {
+          University: { UniversityID: uniId, UniversityName: 'Test Uni' },
+          UniversityRole: {
+            UserID: userId,
+            UniversityID: uniId,
+            role: 'UNIVERSITY_ADMIN' as const,
+          },
+        },
+      ];
+
+      const mockApplications = [
+        {
+          Name: 'Test User',
+          UserID: userId,
+          Email: 'user@example.com',
+          UniversityID: uniId,
+          role: 'UNIVERSITY_ADMIN_PENDING',
+        },
+      ];
+
+      mockSequentialResults<any>(mockDb.select as jest.Mock, [
+        mockAuthResult,
+        mockApplications,
+      ]);
+
+      const result = await service.getAllApplications(userId, uniId, {
+        pending: true,
+      });
+
+      expect(mockDb.select).toHaveBeenCalledTimes(2);
+      expect(result).toEqual(mockApplications);
     });
   });
 });
