@@ -22,51 +22,20 @@ export class createCoursesBuilder extends RequestBuilder<
     this.setUrl("/Courses").setMethod(RequestMethod.POST);
   }
 }
-export type fetchAllCourses = paths["/Courses"]["get"];
-export type fetchAllCoursesQueries = fetchAllCourses["parameters"]["query"];
-export type fetchAllCourseRes =
+export type fetchAllCourses = paths["/Courses/All"]["post"];
+export type fetchAllCoursesBody =
+  fetchAllCourses["requestBody"]["content"]["application/json"];
+export type fetchAllCoursesRes =
   fetchAllCourses["responses"]["200"]["content"]["application/json"];
-export type fetchAllCoursePath = fetchAllCourses["parameters"]["path"];
 
-export async function fetchAllCoursesRequest(
-  path?: fetchAllCoursePath,
-  queries?: fetchAllCoursesQueries,
-) {
-  if (!path) {
-    throw new Error("Invalid course fetch, no universityID provided");
-  }
-
-  const baseUrl =
-    (typeof window === "undefined"
-      ? process.env.API_URL
-      : process.env.NEXT_PUBLIC_API_URL) || "http://localhost:3000";
-
-  const Urlpath = `/Courses/university/${path.universityId}`;
-
-  const searchParams = new URLSearchParams();
-
-  if (queries?.Degree) {
-    searchParams.append("Degree", queries.Degree);
-  }
-  const queryStr = searchParams.toString();
-  let URL = baseUrl + Urlpath;
-  if (queries?.Degree) {
-    URL += queryStr;
-  }
-
-  const response = await fetch(URL, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch courses");
-  } else {
-    const data: fetchAllCourseRes = await response.json();
-    return data.courses;
+export class getAllCoursesBuilder extends RequestBuilder<
+  undefined,
+  fetchAllCoursesBody,
+  fetchAllCoursesRes
+> {
+  constructor() {
+    super();
+    this.setUrl("/Courses/All").setMethod(RequestMethod.POST);
   }
 }
 

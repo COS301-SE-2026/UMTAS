@@ -440,11 +440,27 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** Get all courses */
-    get: operations["getCourses"];
+    get?: never;
     put?: never;
     /** Create a Course */
     post: operations["createCourse"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/Courses/All": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Get all courses */
+    post: operations["getCourses"];
     delete?: never;
     options?: never;
     head?: never;
@@ -1170,6 +1186,24 @@ export interface components {
        * @example Computer Science
        */
       CourseName: string;
+      /**
+       * @description Degree that course belongs to
+       * @example Bachelor of Science
+       */
+      Degree?: string | null;
+    };
+    CourseFilters: {
+      /**
+       * Format: uuid
+       * @description Unique identifier for a university
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      UniversityID?: string;
+      /**
+       * @description Name of the course
+       * @example Computer Science
+       */
+      CourseName?: string;
       /**
        * @description Degree that course belongs to
        * @example Bachelor of Science
@@ -2773,38 +2807,6 @@ export interface operations {
       };
     };
   };
-  getCourses: {
-    parameters: {
-      query?: {
-        /** @description Filter by Degree */
-        Degree?: string;
-      };
-      header?: never;
-      path: {
-        universityId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Courses returned successfully */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["CourseListResponseDto"];
-        };
-      };
-      /** @description No Courses found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
   createCourse: {
     parameters: {
       query?: never;
@@ -2836,6 +2838,40 @@ export interface operations {
       };
       /** @description Course already exists */
       409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getCourses: {
+    parameters: {
+      query?: {
+        /** @description Filter by Degree */
+        Degree?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CourseFilters"];
+      };
+    };
+    responses: {
+      /** @description Courses returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CourseListResponseDto"];
+        };
+      };
+      /** @description No Courses found */
+      404: {
         headers: {
           [name: string]: unknown;
         };

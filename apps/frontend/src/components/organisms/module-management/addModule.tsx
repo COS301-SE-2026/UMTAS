@@ -114,8 +114,12 @@ interface CourseSelectProps {
 function CourseSelect({ CourseState, updateCourseState }: CourseSelectProps) {
   const [searchName, UpdateSearchName] = useState<string>("");
 
-  const {} = useQuery(getAllCoursesQ());
-  const { data: courseData = [] } = useQuery(getAllCoursesQ());
+  const { data: courseData = [] } = useQuery(
+    getAllCoursesQ({
+      UniversityID: UserDetails.getUniDetails()?.UniversityID ?? "",
+      CourseName: searchName === "" ? undefined : searchName,
+    }),
+  );
 
   return (
     <div className="flex flex-col text-center items-center justify-center space-y-5">

@@ -4,24 +4,23 @@ import {
   createCoursesBuilder,
   deleteCourseBuilder,
   deleteCoursePath,
-  fetchAllCoursePath,
-  fetchAllCoursesQueries,
-  fetchAllCoursesRequest,
+  fetchAllCoursesBody,
+  getAllCoursesBuilder,
   updateCourseBody,
   updateCourseBuilder,
   updateCoursePath,
 } from "./courseBuilder";
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
+import { UserDetails } from "@/lib/userclass/userClass";
 
-export function getAllCoursesQ(
-  path?: fetchAllCoursePath,
-  queries?: fetchAllCoursesQueries,
-) {
+export function getAllCoursesQ(body?: fetchAllCoursesBody) {
   return queryOptions({
-    queryKey: ["courses"],
+    queryKey: ["courses", body],
     queryFn: async () => {
-      const result = await fetchAllCoursesRequest(path, queries);
-      return result;
+      const builder = new getAllCoursesBuilder();
+      const result = await builder.send({ body: body });
+      console.log(result, "this is get all courses");
+      return result.courses;
     },
   });
 }
@@ -33,7 +32,9 @@ export function createCourseQ() {
     },
     onSuccess: () => {
       getQueryClient().invalidateQueries({
-        queryKey: getAllCoursesQ().queryKey,
+        queryKey: getAllCoursesQ({
+          UniversityID: UserDetails.getUniDetails()?.UniversityID,
+        }).queryKey,
       });
     },
     onError: (err) => console.error("mutation failed", err),
@@ -53,7 +54,9 @@ export function updateCourseQ() {
     },
     onSuccess: () => {
       getQueryClient().invalidateQueries({
-        queryKey: getAllCoursesQ().queryKey,
+        queryKey: getAllCoursesQ({
+          UniversityID: UserDetails.getUniDetails()?.UniversityID,
+        }).queryKey,
       });
     },
     onError: (err) => console.error("mutation failed", err),
@@ -67,7 +70,9 @@ export function deleteCourseQ(path: deleteCoursePath) {
     },
     onSuccess: () => {
       getQueryClient().invalidateQueries({
-        queryKey: getAllCoursesQ().queryKey,
+        queryKey: getAllCoursesQ({
+          UniversityID: UserDetails.getUniDetails()?.UniversityID,
+        }).queryKey,
       });
     },
     onError: (err) => console.error("mutation failed", err),
