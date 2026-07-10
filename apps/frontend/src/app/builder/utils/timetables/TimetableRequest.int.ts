@@ -96,20 +96,19 @@ describe("TimetableRequest Integration test", () => {
     const createdEvent = await eventBuilder.send({
       body: {
         eventName: "Timetable Test Event",
-        eventCode: `EVentCode`,
+        activityCode: `EVentCode`,
         isRecurring: false,
         eventCriteria: {
-          date: "monday",
+          date: "2026-02-17",
           startTime: "08:00",
           endTime: "09:00",
-          type: "university",
-          venue: "IT 2-26",
-          moduleID: moduleId,
+          eventSource: "university",
+          moduleId,
         },
       },
     });
 
-    const eventId = createdEvent.event.eventID;
+    const eventId = createdEvent.event.eventId;
 
     expect(eventId).toBeDefined();
 

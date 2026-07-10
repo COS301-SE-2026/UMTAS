@@ -10,16 +10,16 @@ import {
   SelectValue,
 } from "@/components/atoms/baseShadcn/select";
 
-// add more types post demo 1
-export type EventType = "university";
+// Add more sources when personal-event creation is available.
+export type EventSource = "university";
 
-export interface EventOption {
-  value: EventType;
+export interface EventSourceOption {
+  value: EventSource;
   label: string;
   icon: React.ReactNode;
 }
 
-const Event_Types: EventOption[] = [
+const EVENT_SOURCES: EventSourceOption[] = [
   {
     value: "university",
     label: "university",
@@ -27,21 +27,21 @@ const Event_Types: EventOption[] = [
   },
 ];
 
-interface EventTypeDropdownProps {
-  value: EventType | "";
-  onChange: (value: EventType) => void;
+interface EventSourceDropdownProps {
+  value: EventSource | "";
+  onChange: (value: EventSource) => void;
   disabled?: boolean;
 }
 
-export function EventTypeDropdown({
+export function EventSourceDropdown({
   value,
   onChange,
   disabled,
-}: EventTypeDropdownProps) {
+}: EventSourceDropdownProps) {
   return (
     <Select
       value={value}
-      onValueChange={(v) => onChange(v as EventType)}
+      onValueChange={(v) => onChange(v as EventSource)}
       disabled={disabled}
     >
       <SelectTrigger
@@ -51,19 +51,21 @@ export function EventTypeDropdown({
           !value ? "text-[var(--text-secondary)]" : "",
         ].join(" ")}
       >
-        <SelectValue placeholder="Select event type…" />
+        <SelectValue placeholder="Select event source…" />
       </SelectTrigger>
       <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)]">
-        {Event_Types.map((type) => (
+        {EVENT_SOURCES.map((source) => (
           <SelectItem
-            key={type.value}
-            value={type.value}
+            key={source.value}
+            value={source.value}
             className="text-[var(--text-primary)] focus:bg-[var(--bg-elevated)] cursor-pointer"
           >
             <div className="flex items-center gap-2">
-              <span className="text-[var(--text-secondary)]">{type.icon}</span>
+              <span className="text-[var(--text-secondary)]">
+                {source.icon}
+              </span>
               <div className="flex flex-col">
-                <span className="text-sm font-medium">{type.label}</span>
+                <span className="text-sm font-medium">{source.label}</span>
               </div>
             </div>
           </SelectItem>

@@ -122,11 +122,11 @@ export function ScheduleView({
       );
 
       const activeEvents = allEvents.filter((e) =>
-        activeEventIds.includes(String(e.eventID).trim()),
+        activeEventIds.includes(String(e.eventId).trim()),
       );
 
       const activeModuleIds = activeEvents
-        .map((e) => e.eventCriteria?.moduleID)
+        .map((e) => e.eventCriteria?.moduleId)
         .filter(Boolean);
 
       const activeModules = allModules.filter((m) =>
