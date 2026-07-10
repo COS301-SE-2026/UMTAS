@@ -14,64 +14,6 @@ import { PartialType, PickType, OmitType } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import { PopulateGroupBodyDto } from '../../Grouping/dto/grouping.dto';
 
-class StylingDto {
-  @ApiProperty({ example: '#3B82F6' })
-  @IsString()
-  @IsNotEmpty()
-  colour!: string;
-}
-
-//Base class
-export class ModulesDto {
-  @ApiProperty({
-    example: '00000000-0000-0000-0000-000000000000',
-    description: 'Unique identifier for a module',
-  })
-  @IsUUID()
-  @IsNotEmpty()
-  moduleID!: string;
-
-  @ApiProperty({
-    example: 'COS332',
-    description: 'Module code used by the university',
-  })
-  @IsString()
-  @IsNotEmpty()
-  @Length(2, 10)
-  moduleCode!: string;
-
-  @ApiProperty({
-    example: 'Computer Networks',
-    description: 'Name of the module',
-  })
-  @IsString()
-  @IsNotEmpty()
-  @Length(1, 100)
-  moduleName!: string;
-
-  @ApiPropertyOptional({
-    example: 'Introduction to computer networking concepts',
-    description: 'Short module description',
-    nullable: true,
-  })
-  @IsOptional()
-  @IsString()
-  @Length(1, 500)
-  moduleDescription?: string | null;
-
-  @ApiProperty({
-    description: 'Styling to be used for a Module',
-    example: {
-      colour: 'FFFFF',
-    },
-    type: StylingDto,
-  })
-  @IsObject()
-  @ValidateNested()
-  @Type(() => StylingDto)
-  styling?: StylingDto | null;
-} //ModuleDto
-
 export class CourseModuleDto {
   @ApiProperty({
     example: '00000000-0000-0000-0000-000000000000',
@@ -136,6 +78,81 @@ export class CreateCourseModuleDto extends PickType(CourseModuleDto, [
   'SemesterOfStudy',
   'YearOfStudy',
 ]) {}
+
+class StylingDto {
+  @ApiProperty({ example: '#3B82F6' })
+  @IsString()
+  @IsNotEmpty()
+  colour!: string;
+}
+
+//Base class
+export class ModulesDto {
+  @ApiProperty({
+    example: '00000000-0000-0000-0000-000000000000',
+    description: 'Unique identifier for a module',
+  })
+  @IsUUID()
+  @IsNotEmpty()
+  moduleID!: string;
+
+  @ApiProperty({
+    example: 'COS332',
+    description: 'Module code used by the university',
+  })
+  @IsString()
+  @IsNotEmpty()
+  @Length(2, 10)
+  moduleCode!: string;
+
+  @ApiProperty({
+    example: 'Computer Networks',
+    description: 'Name of the module',
+  })
+  @IsString()
+  @IsNotEmpty()
+  @Length(1, 100)
+  moduleName!: string;
+
+  @ApiPropertyOptional({
+    example: 'Introduction to computer networking concepts',
+    description: 'Short module description',
+    nullable: true,
+  })
+  @IsOptional()
+  @IsString()
+  @Length(1, 500)
+  moduleDescription?: string | null;
+
+  @ApiProperty({
+    description: 'Styling to be used for a Module',
+    example: {
+      colour: 'FFFFF',
+    },
+    type: StylingDto,
+  })
+  @IsObject()
+  @ValidateNested()
+  @Type(() => StylingDto)
+  styling?: StylingDto | null;
+
+  @ApiPropertyOptional({
+    description: 'Metadata attached to module when owned by course',
+    example: {
+      CourseModuleID: '00000000-0000-0000-0000-000000000000',
+      GroupModuleID: '00000000-0000-0000-0000-000000000000',
+      CourseID: '00000000-0000-0000-0000-000000000000',
+      core: true,
+      SemesterOfStudy: 'Semester 1',
+      YearOfStudy: 1,
+    },
+  })
+  @IsOptional()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => CourseModuleDto)
+  CourseModuleInfo?: CourseModuleDto;
+} //ModuleDto
 
 //Create
 export class CreateModuleDto extends PickType(ModulesDto, [

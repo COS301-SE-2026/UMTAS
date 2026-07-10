@@ -5,7 +5,7 @@ import {
   InternalServerErrorException,
   BadRequestException,
 } from '@nestjs/common';
-import { eq, and, SQL, getTableColumns, ilike, inArray } from 'drizzle-orm';
+import { eq, ne, and, SQL, getTableColumns, ilike, inArray } from 'drizzle-orm';
 
 import { modules, ModuleStyling } from '../entities/Modules/index';
 import {
@@ -374,12 +374,37 @@ export class ModuleService {
         modules: dto.modules,
       });
     } else {
-      //Populate group for course
-      group = await this.groupingService.populateGroup(
-        course.GroupID,
-        dto.modules,
-      );
-    }
+      //Check if other courses are making use of same group, event if only one
+      const [partnerCourse] = await this.dbService.db
+        .select()
+        .from(Course)
+        .where(
+          and(
+            ne(Course.CourseID, course.CourseID),
+            eq(Course.GroupID, course.GroupID),
+          ),
+        )
+        .limit(1);
+
+      //If Partner course exists -> Create new group as copy and add modules to new group
+      if (partnerCourse) {
+        //Get current groups modules
+        const oldGroup = await this.groupingService.getById(course.GroupID);
+
+        //Create new group with copy of modules + new modules
+        group = await this.groupingService.createModuleGrouping({
+          CourseID: course.CourseID,
+          modules: [...(oldGroup.modules ?? []), ...dto.modules],
+        });
+      } else {
+        //no other course will be influenced, just update modules in group
+        //Populate group for course
+        group = await this.groupingService.populateGroup(
+          course.GroupID,
+          dto.modules,
+        );
+      } //END_partnerCourse Check
+    } //END_group exists for course check
 
     if (!group)
       throw new InternalServerErrorException(
