@@ -47,13 +47,13 @@ export default function CreateEventAdmin({ module }: createEventProps) {
     });
   }
   function updateCriteria(field: keyof EventCriteria, value: string) {
-    setCriteria({
-      ...criteria,
-      [field]: value,
-    });
-    setEvent({
-      ...event,
-      eventCriteria: criteria,
+    setCriteria((prev) => {
+      const updated = { ...prev, [field]: value };
+      setEvent({
+        ...event,
+        eventCriteria: updated,
+      });
+      return updated;
     });
   }
 
@@ -91,20 +91,6 @@ export default function CreateEventAdmin({ module }: createEventProps) {
         onClick={async () => {
           try {
             await addEvent({ body: event });
-            setCriteria({
-              date: "",
-              endTime: "",
-              venue: "",
-              startTime: "",
-              moduleID: module.moduleID,
-              type: "university",
-            });
-            setEvent({
-              eventName: "",
-              eventCode: "",
-              eventCriteria: criteria,
-              isRecurring: false,
-            });
           } catch (err) {
             console.error(err);
           }
