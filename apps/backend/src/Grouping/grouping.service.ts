@@ -54,6 +54,7 @@ export class GroupingService {
 
     //If course provided -> see if exists -> update course to new group
     if (dto.CourseID) {
+      // console.log(`GroupingService: CourseID defined`);
       //get course -> check if it exists
       const course = await this.courseService.getById(dto.CourseID);
 

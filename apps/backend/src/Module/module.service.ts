@@ -375,7 +375,7 @@ export class ModuleService {
       });
     } else {
       //Check if other courses are making use of same group, event if only one
-      const [partnerCourse] = await this.dbService.db
+      const partnerCourses = await this.dbService.db
         .select()
         .from(Course)
         .where(
@@ -383,18 +383,25 @@ export class ModuleService {
             ne(Course.CourseID, course.CourseID),
             eq(Course.GroupID, course.GroupID),
           ),
-        )
-        .limit(1);
+        );
 
       //If Partner course exists -> Create new group as copy and add modules to new group
-      if (partnerCourse) {
+      if (partnerCourses.length > 0) {
+        // console.log(`Partner courses identified. Amount: ${partnerCourses.length}`);
         //Get current groups modules
         const oldGroup = await this.groupingService.getById(course.GroupID);
+
+        const mergedModules: string[] = [
+          ...(oldGroup.modules ?? []),
+          ...dto.modules,
+        ];
+
+        // console.log(`MergedModules: ${JSON.stringify(mergedModules)}`);
 
         //Create new group with copy of modules + new modules
         group = await this.groupingService.createModuleGrouping({
           CourseID: course.CourseID,
-          modules: [...(oldGroup.modules ?? []), ...dto.modules],
+          modules: mergedModules,
         });
       } else {
         //no other course will be influenced, just update modules in group
