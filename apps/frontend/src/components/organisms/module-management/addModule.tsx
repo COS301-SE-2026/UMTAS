@@ -115,14 +115,7 @@ function CourseSelect({ CourseState, updateCourseState }: CourseSelectProps) {
   const [searchName, UpdateSearchName] = useState<string>("");
 
   const {} = useQuery(getAllCoursesQ());
-  const { data: courseData = [] } = useQuery(
-    getAllCoursesQ(
-      {
-        universityId: UserDetails.getUniDetails()?.UniversityID ?? "",
-      },
-      // todo add filter for course name
-    ),
-  );
+  const { data: courseData = [] } = useQuery(getAllCoursesQ());
 
   return (
     <div className="flex flex-col text-center items-center justify-center space-y-5">

@@ -22,8 +22,7 @@ export class createCoursesBuilder extends RequestBuilder<
     this.setUrl("/Courses").setMethod(RequestMethod.POST);
   }
 }
-export type fetchAllCourses =
-  paths["/Courses/university/{universityId}"]["get"];
+export type fetchAllCourses = paths["/Courses"]["get"];
 export type fetchAllCoursesQueries = fetchAllCourses["parameters"]["query"];
 export type fetchAllCourseRes =
   fetchAllCourses["responses"]["200"]["content"]["application/json"];
