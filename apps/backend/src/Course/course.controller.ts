@@ -57,7 +57,7 @@ export class CourseController {
   }
 
   //GetAll per universityId
-  @Get('university/:universityId')
+  @Get('')
   @Roles('student', 'uni_admin', 'sys_admin')
   @ApiOperation({
     summary: 'Get all courses',

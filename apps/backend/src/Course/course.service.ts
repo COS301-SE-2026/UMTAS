@@ -4,7 +4,7 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { eq, and, SQL } from 'drizzle-orm';
+import { eq, and, SQL, ilike } from 'drizzle-orm';
 
 import { DatabaseService } from '../db/database.service';
 import { Course } from '../entities';
@@ -71,6 +71,8 @@ export class CourseService {
   async getAll(filters: CourseFilters): Promise<CourseListResponseDto> {
     const conditions: SQL[] = [];
 
+    if (filters.CourseName)
+      conditions.push(ilike(Course.CourseName, `%${filters.CourseName}%`));
     if (filters.UniversityID)
       conditions.push(eq(Course.UniversityID, filters.UniversityID));
     if (filters.Degree) conditions.push(eq(Course.Degree, filters.Degree));
