@@ -24,16 +24,20 @@ import {
   UpdateEventDto,
   DeleteResponseDto,
   EventDto,
+  UpdateEventCriteriaDto,
 } from './dto/EventDto.dto';
 
 import { AppDatabase } from '../db/database.service';
 import { ModuleService } from '../Module/module.service';
+import { EventImportKeyService } from './event-import-key.service';
+import { EventCriteria } from './dto/event.types';
 
 @Injectable()
 export class EventService {
   constructor(
     private readonly dbService: DatabaseService,
     private readonly moduleService: ModuleService,
+    private readonly eventImportKeyService: EventImportKeyService,
   ) {}
 
   //Create
@@ -95,8 +99,15 @@ export class EventService {
     const recUpdate = dto.isRecurring !== undefined;
     const nameUpdate = dto.eventName !== undefined;
     const codeUpdate = dto.eventCode !== undefined;
+    const validatedUpdate = dto.validated !== undefined;
 
-    if (!critUpdate && !recUpdate && !nameUpdate && !codeUpdate)
+    if (
+      !critUpdate &&
+      !recUpdate &&
+      !nameUpdate &&
+      !codeUpdate &&
+      !validatedUpdate
+    )
       throw new BadRequestException('At least one update field required');
     //END_field presence check
 
@@ -119,23 +130,30 @@ export class EventService {
             `Event not found for eventId: ${eventId}`,
           );
 
-        //Fetch existing criteria
-        const existingCriteria = existingEvent.eventCriteria ?? {};
-
-        //overwrite existing fields if defined in dto
-        const mergedCriteria = {
-          ...existingCriteria,
-          ...dto.eventCriteria,
-        };
+        const mergedCriteria = this.mergeEventCriteria(
+          existingEvent.eventCriteria,
+          dto.eventCriteria,
+        );
+        const nextEventName = dto.eventName?.trim() ?? existingEvent.eventName;
+        const nextEventCode = dto.eventCode?.trim() ?? existingEvent.eventCode;
+        const nextIsRecurring = dto.isRecurring ?? existingEvent.isRecurring;
+        const nextValidated = dto.validated ?? existingEvent.validated;
+        const nextImportKey = this.eventImportKeyService.buildForEvent({
+          eventName: nextEventName ?? '',
+          eventCode: nextEventCode,
+          eventCriteria: mergedCriteria,
+        });
 
         //Update actual event entity
         const [event] = await tx
           .update(Event)
           .set({
-            eventName: dto.eventName?.trim() ?? existingEvent.eventName,
-            eventCode: dto.eventCode?.trim() ?? existingEvent.eventCode,
+            eventName: nextEventName,
+            eventCode: nextEventCode,
             eventCriteria: mergedCriteria,
-            isRecurring: dto.isRecurring ?? existingEvent.isRecurring,
+            isRecurring: nextIsRecurring,
+            validated: nextValidated,
+            ImportKey: nextImportKey,
           })
           .where(eq(Event.eventID, eventId))
           .returning();
@@ -322,6 +340,12 @@ export class EventService {
         eventCode: eventCode,
         eventCriteria: eventCriteria,
         isRecurring: isRec,
+        validated: dto.validated ?? true,
+        ImportKey: this.eventImportKeyService.buildForEvent({
+          eventName: eventName,
+          eventCode: eventCode,
+          eventCriteria: eventCriteria,
+        }),
       })
       .returning();
 
@@ -392,6 +416,37 @@ export class EventService {
       eventCode: event.eventCode ?? undefined,
       eventCriteria: event.eventCriteria,
       isRecurring: event.isRecurring,
+      validated: event.validated,
     };
   } //END_mapEventToDto
+
+  private mergeEventCriteria(
+    existingCriteria: EventCriteria,
+    updateCriteria?: UpdateEventCriteriaDto,
+  ): EventCriteria {
+    if (!updateCriteria) {
+      return existingCriteria;
+    }
+
+    const mergedCriteria: EventCriteria = {
+      type: updateCriteria.type ?? existingCriteria.type,
+      date: updateCriteria.date ?? existingCriteria.date,
+      startTime: updateCriteria.startTime ?? existingCriteria.startTime,
+      endTime: updateCriteria.endTime ?? existingCriteria.endTime,
+    };
+
+    if (updateCriteria.moduleID !== undefined) {
+      mergedCriteria.moduleID = updateCriteria.moduleID;
+    } else if (existingCriteria.moduleID !== undefined) {
+      mergedCriteria.moduleID = existingCriteria.moduleID;
+    }
+
+    if (updateCriteria.venue !== undefined) {
+      mergedCriteria.venue = updateCriteria.venue;
+    } else if (existingCriteria.venue !== undefined) {
+      mergedCriteria.venue = existingCriteria.venue;
+    }
+
+    return mergedCriteria;
+  } //END_mergeEventCriteria
 } //EventService

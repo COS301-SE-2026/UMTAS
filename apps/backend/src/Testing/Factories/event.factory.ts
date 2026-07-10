@@ -39,6 +39,8 @@ export function createEvent(
     eventName: 'Lecture 1',
     eventCode: 'Lec1',
     isRecurring: false,
+    validated: true,
+    ImportKey: null,
     eventCriteria: createEventCriteria(type, eventCriteriaOverrides),
   };
 
