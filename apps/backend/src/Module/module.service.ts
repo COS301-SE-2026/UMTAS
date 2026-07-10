@@ -16,6 +16,7 @@ import {
   ModuleFiltersDto,
   ModuleStylingResponseDto,
   ModuleStylingBodyDto,
+  EnrolResponseDto,
 } from './dto/module.dto';
 
 //ENtities
@@ -282,6 +283,55 @@ export class ModuleService {
   } //delete
 
   //SUbscribe user to module -> moduleEnrollment
+  async enrollToModule(
+    userId: string,
+    moduleId: string,
+  ): Promise<EnrolResponseDto> {
+    //Check if module exists
+    await this.getById(userId, moduleId);
+
+    //Check if user already enrolled to module
+    let enrollmentStatus = await this.dbService.db
+      .select()
+      .from(ModuleEnrollment)
+      .where(
+        and(
+          eq(ModuleEnrollment.UserID, userId),
+          eq(ModuleEnrollment.ModuleID, moduleId),
+        ),
+      )
+      .limit(1);
+
+    //If user already enrolled, return early
+    if (enrollmentStatus)
+      return {
+        moduleID: moduleId,
+        UserID: userId,
+        message: `User[${userId}] already enrolled for module[${moduleId}]`,
+      };
+
+    //Enroll student to module
+    enrollmentStatus = await this.dbService.db
+      .insert(ModuleEnrollment)
+      .values({
+        UserID: userId,
+        ModuleID: moduleId,
+      })
+      .returning();
+
+    //Check if enrollment failed
+    if (!enrollmentStatus)
+      throw new InternalServerErrorException(
+        `Failed to enroll student[${userId}] into module[${moduleId}]`,
+      );
+
+    //return successfull enrollment
+    return {
+      moduleID: moduleId,
+      UserID: userId,
+      message: `Successfully enrolled student[${userId}] into module[${moduleId}]`,
+    };
+  } //END_enrollToModule
 
   //🎅's Little Helpers
 
