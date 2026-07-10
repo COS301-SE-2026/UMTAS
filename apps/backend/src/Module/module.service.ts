@@ -3,8 +3,9 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
+  BadRequestException,
 } from '@nestjs/common';
-import { eq, and, SQL, getTableColumns, ilike } from 'drizzle-orm';
+import { eq, and, SQL, getTableColumns, ilike, inArray } from 'drizzle-orm';
 
 import { modules, ModuleStyling } from '../entities/Modules/index';
 import {
@@ -17,6 +18,8 @@ import {
   ModuleStylingResponseDto,
   ModuleStylingBodyDto,
   EnrolResponseDto,
+  AddModulesToCourseDto,
+  AddModulesToCourseResponseDto,
 } from './dto/module.dto';
 
 //ENtities
@@ -33,6 +36,7 @@ import {
 import { DatabaseService } from '../db/database.service';
 import { CourseService } from '../Course/course.service';
 import { GroupingService } from '../Grouping/grouping.service';
+import { GroupingSingleResponse } from 'src/Grouping/dto/grouping.dto';
 
 //Module service
 //If its user owned modules -> MUST BE HANDLED THROUGH BUILDER SERVICE
@@ -333,6 +337,61 @@ export class ModuleService {
       message: `Successfully enrolled student[${userId}] into module[${moduleId}]`,
     };
   } //END_enrollToModule
+
+  //Add array of modules to course through grouping service
+  async addModulesToCourse(
+    courseId: string,
+    dto: AddModulesToCourseDto,
+  ): Promise<AddModulesToCourseResponseDto> {
+    //Check that course exists
+    const course = await this.courseService.getById(courseId);
+
+    //Check that each module exists
+    const existingModules = await this.dbService.db
+      .select()
+      .from(modules)
+      .where(inArray(modules.moduleID, dto.modules));
+
+    //If existing modules dont match size of specified modules -> throw fit
+    if (existingModules.length !== dto.modules.length) {
+      const existingIDs = new Set(
+        existingModules.map((module) => module.moduleID),
+      );
+      const missingIDs = dto.modules.filter(
+        (module) => !existingIDs.has(module),
+      );
+
+      throw new BadRequestException(
+        `Modules provided do not exist: [${JSON.stringify(missingIDs)}]`,
+      );
+    } //missing modules response
+
+    //Check if course already owns a group
+    let group: GroupingSingleResponse;
+    if (!course.GroupID) {
+      //Create group for course with modules
+      group = await this.groupingService.createModuleGrouping({
+        CourseID: course.CourseID,
+        modules: dto.modules,
+      });
+    } else {
+      //Populate group for course
+      group = await this.groupingService.populateGroup(
+        course.GroupID,
+        dto.modules,
+      );
+    }
+
+    if (!group)
+      throw new InternalServerErrorException(
+        `Failed to populate course's group with modules`,
+      );
+
+    return {
+      CourseID: courseId,
+      modules: dto.modules,
+    };
+  } //END_addModulesToCourse
 
   //🎅's Little Helpers
 

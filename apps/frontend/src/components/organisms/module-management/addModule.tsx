@@ -47,28 +47,39 @@ export default function CreateModuleAdmin({ children }: CreateModuleProps) {
   return (
     <Card className="items-center w-full p-5 space-y-3">
       <h1 className="text-center text-2xl">Create Module</h1>
-      <StateInput State={module} update={UpdateState} field="moduleCode" />
-      <StateInput State={module} update={UpdateState} field={"moduleName"} />
-      <StateInput
-        State={module}
-        update={UpdateState}
-        field={"moduleDescription"}
-        type="text-area"
-      />
-      <div className="flex flex-col w-1/2 space-y-1">
-        <label className="text-sm font-medium text-white">Choose colour</label>
-        <Input
-          type="color"
-          value={module.styling?.colour}
-          onChange={(e) =>
-            updateMod((prev) => ({
-              ...prev,
-              styling: { colour: e.target.value ?? "" },
-            }))
-          }
-        ></Input>
+      <div className="flex flex-row w-full ">
+        <div className="items-center flex flex-col  space-y-3 w-full">
+          <StateInput State={module} update={UpdateState} field="moduleCode" />
+          <StateInput
+            State={module}
+            update={UpdateState}
+            field={"moduleName"}
+          />
+          <StateInput
+            State={module}
+            update={UpdateState}
+            field={"moduleDescription"}
+            type="text-area"
+          />
+          <div className="flex flex-col w-1/2 space-y-1">
+            <label className="text-sm font-medium text-white">
+              Choose colour
+            </label>
+            <input
+              className="w-full"
+              type="color"
+              value={module.styling?.colour}
+              onChange={(e) =>
+                updateMod((prev) => ({
+                  ...prev,
+                  styling: { colour: e.target.value ?? "" },
+                }))
+              }
+            ></input>
+          </div>
+        </div>
+        <CourseSelect CourseState={course} updateCourseState={updateCourse} />
       </div>
-      <CourseSelect CourseState={course} updateCourseState={updateCourse} />
       <div className="flex flex-row gap-x-5">
         <Button
           onClick={async () => {
@@ -114,7 +125,7 @@ function CourseSelect({ CourseState, updateCourseState }: CourseSelectProps) {
   );
 
   return (
-    <div className="flex flex-col text-center items-center justify-center space-y-2">
+    <div className="flex flex-col text-center items-center justify-center space-y-5">
       <label className="text-sm font-medium text-white text-center">
         Search for course
       </label>

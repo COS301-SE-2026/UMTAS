@@ -10,7 +10,8 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { PartialType, PickType, OmitType } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
+import { PopulateGroupBodyDto } from '../../Grouping/dto/grouping.dto';
 
 class StylingDto {
   @ApiProperty({ example: '#3B82F6' })
@@ -165,11 +166,17 @@ export class ModuleFiltersDto {
 
   @ApiProperty({
     example: false,
+    default: false,
     description: 'Choose to filter modules based of current user enrollments',
     type: Boolean,
   })
   @IsOptional()
   @IsBoolean()
+  @IsOptional()
+  @Transform(({ value }) => {
+    if (value === true) return true;
+    else return false;
+  })
   userEnrollment?: boolean;
 } //ModuleFiltersDto
 
@@ -207,3 +214,21 @@ export class EnrolResponseDto extends PickType(ModulesDto, ['moduleID']) {
   })
   message!: string;
 } //END_EnrolResponseDto
+
+//Add array of modules to Course
+export class AddModulesToCourseDto extends PickType(PopulateGroupBodyDto, [
+  'modules',
+]) {} //END_AddModulesToCourseDto
+
+export class AddModulesToCourseResponseDto extends AddModulesToCourseDto {
+  @ApiProperty({
+    description: 'Course to which to add the array of modules',
+    type: String,
+    example: '00000000-0000-0000-0000-000000000000',
+  })
+  @IsNotEmpty({
+    message: `CourseID missing. What you gonna the modules to (facepalm)`,
+  })
+  @IsUUID('4', { message: 'CourseID should be a UUID' })
+  CourseID!: string;
+}
