@@ -4,6 +4,7 @@ import {
   IsBoolean,
   IsUUID,
   Length,
+  IsOptional,
 } from 'class-validator';
 import { PickType } from '@nestjs/swagger';
 
@@ -54,6 +55,18 @@ export class CreateModuleGroupingDto {
   CourseID?: string;
 
   //modules to populate group with
+  @ApiProperty({
+    description: 'module array to ad dto the group',
+    type: [String],
+    example: [
+      '10000000-0000-0000-0000-000000000000',
+      '20000000-0000-0000-0000-000000000000',
+    ],
+  })
+  @IsArray({ message: 'modules needs to be an array of UUIDs' })
+  @IsOptional()
+  @IsUUID('4', { each: true, message: 'Each module ID should be a UUID' })
+  @Type(() => String)
   modules?: string[];
 }
 

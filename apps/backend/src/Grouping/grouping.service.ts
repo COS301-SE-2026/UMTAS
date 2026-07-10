@@ -68,10 +68,7 @@ export class GroupingService {
       newGroup = await this.populateGroup(newGroup.GroupID, dto.modules);
     } //END_modules
 
-    return {
-      ...newGroup,
-      ...(dto.modules ? { modules: dto.modules } : {}),
-    };
+    return newGroup;
   } //END_createModuleGrouping
 
   //getAll groups
@@ -195,6 +192,8 @@ export class GroupingService {
     const friendHash = await this.checkForMatchingHashGroup(groupId, newHash);
 
     if (friendHash) {
+      //Ensure all courses that made use of old group -> switch to new group
+
       //Delete current group
       await this.deleteGroup(groupId);
 

@@ -18,7 +18,6 @@ import {
   Patch,
   Delete,
   ParseUUIDPipe,
-  Query,
 } from '@nestjs/common';
 import { ApiBody, ApiResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
@@ -57,7 +56,7 @@ export class CourseController {
   }
 
   //GetAll per universityId
-  @Get('')
+  @Get()
   @Roles('student', 'uni_admin', 'sys_admin')
   @ApiOperation({
     summary: 'Get all courses',
@@ -72,7 +71,7 @@ export class CourseController {
     status: 404,
     description: 'No Courses found',
   })
-  getAll(@Query() filters: CourseFilters): Promise<CourseListResponseDto> {
+  getAll(@Body() filters: CourseFilters): Promise<CourseListResponseDto> {
     return this.service.getAll(filters);
   }
 
