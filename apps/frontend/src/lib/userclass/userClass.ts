@@ -30,4 +30,11 @@ export class UserDetails {
 
     return undefined;
   }
+
+  public static userCanEdit() {
+    return (
+      UserDetails.getUniDetails()?.role === "LECTURER" ||
+      UserDetails.getUniDetails()?.role === "UNIVERSITY_ADMIN"
+    );
+  }
 }

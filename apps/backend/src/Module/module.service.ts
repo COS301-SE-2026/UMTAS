@@ -71,6 +71,7 @@ export class ModuleService {
 
     if (groupId) {
       //check that module Grouping groupId is valid
+      console.log('This should be null ', groupId);
       await this.groupingService.getById(groupId);
 
       //Check for duplicate moduleCode in ModuleGrouping

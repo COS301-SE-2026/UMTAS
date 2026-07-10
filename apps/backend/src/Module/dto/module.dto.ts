@@ -112,7 +112,15 @@ export class UpdateModuleDto extends PartialType(
 
 //Responses
 //Single
-export class ModuleSingleResponseDto extends ModulesDto {}
+export class ModuleSingleResponseDto extends ModulesDto {
+  @ApiProperty({
+    example: '00000000-0000-0000-0000-000000000000',
+    description: 'Unique identifier for a module group',
+  })
+  @IsUUID()
+  @IsOptional()
+  ModuleGroupingID?: string;
+}
 
 //List
 export class ModuleListResponseDto {
@@ -170,6 +178,7 @@ export class ModuleFiltersDto {
   @ApiPropertyOptional({
     example: false,
     description: 'Choose to filter modules based of current user enrollments',
+    type: Boolean,
   })
   @IsOptional()
   @IsBoolean()
