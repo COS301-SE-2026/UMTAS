@@ -1,0 +1,28 @@
+{
+  "name": "pdf-parser-worker",
+  "version": "1.0.0",
+  "description": "BullMQ PDF parser worker for UMTAS",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "pnpm run build && node dist/index.js",
+    "start": "node dist/index.js",
+    "test": "pnpm --filter pdf-parser-worker... build && node --test \"dist/tests/*.test.js\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.33.2",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.940.0",
+    "bullmq-worker-core": "workspace:*",
+    "shared-types": "workspace:*",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.1",
+    "typescript": "^6.0.3"
+  }
+}
