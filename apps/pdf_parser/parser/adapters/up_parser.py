@@ -6,7 +6,7 @@ from enum import Enum
 import fitz
 
 from ..base_parser import BasePDFParser
-from ..models import EventCandidate, EventType, ModuleCandidate, ParseAnnotation, ParserDetails, ParserError, ParserOutput
+from ..models import ActivityType, EventCandidate, ModuleCandidate, ParseAnnotation, ParserDetails, ParserError, ParserOutput
 from .up_exams import EXAM_COLUMNS, parse_exams
 from .up_lectures import LECTURE_COLUMNS, parse_lectures
 from .up_tests import TEST_COLUMNS, parse_tests
@@ -252,8 +252,8 @@ class UPPDFParser(BasePDFParser):
         self,
         *,
         module_code_value: str,
-        event_type: EventType,
-        section_label: str,
+        activity_type: ActivityType,
+        activity_code: str,
         title: str,
         day: str | None,
         date: str | None,
@@ -266,8 +266,8 @@ class UPPDFParser(BasePDFParser):
     ) -> EventCandidate:
         return {
             "moduleCode": module_code_value,
-            "type": event_type,
-            "sectionLabel": section_label,
+            "activityType": activity_type,
+            "activityCode": activity_code,
             "title": title,
             "day": day,
             "date": date,

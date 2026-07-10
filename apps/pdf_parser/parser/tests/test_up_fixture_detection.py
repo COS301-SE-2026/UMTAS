@@ -19,7 +19,7 @@ def test_up_fixtures_detect_schedule_type_and_row_count(up_parser):
         result = parse_fixture(up_parser, fixture["filename"])
         event_types = set()
         for event in result["events"]:
-            event_types.add(event["type"])
+            event_types.add(event["activityType"])
 
         if fixture["expected_type"] == "lecture":
             assert event_types <= {"lecture", "tutorial", "prac"}
