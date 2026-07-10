@@ -75,7 +75,8 @@ export class CourseService {
       conditions.push(ilike(Course.CourseName, `%${filters.CourseName}%`));
     if (filters.UniversityID)
       conditions.push(eq(Course.UniversityID, filters.UniversityID));
-    if (filters.Degree) conditions.push(eq(Course.Degree, filters.Degree));
+    if (filters.Degree)
+      conditions.push(ilike(Course.Degree, `%${filters.Degree}%`));
 
     const courses = await this.dbService.db
       .select()
