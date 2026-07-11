@@ -11,6 +11,8 @@ import {
   updateModulePath,
   updateStylingBuilder,
 } from "./moduleBuilder";
+import { getQueryClient } from "@/components/tanstack/getQueryClient";
+import { getAllCoursesQ } from "../courses/courseQueries";
 
 export function getAllModCoursesQ(queries?: getAllModulesQueries) {
   return queryOptions({
@@ -52,6 +54,14 @@ export function CreateModuleMutAdmin() {
     mutationFn: async (body: CreateModuleBody) => {
       const builder = new CreateModuleBuilderAdmin();
       return builder.send({ body: body });
+    },
+    onSuccess: () => {
+      getQueryClient().invalidateQueries({
+        queryKey: getAllCoursesQ().queryKey,
+      });
+      getQueryClient().invalidateQueries({
+        queryKey: getAllModCoursesQ().queryKey,
+      });
     },
     onError: (err) => console.error("mutation failed", err),
   });

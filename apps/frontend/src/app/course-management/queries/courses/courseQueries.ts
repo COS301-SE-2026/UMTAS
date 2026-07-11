@@ -14,7 +14,7 @@ import {
   updateCoursePath,
 } from "./courseBuilder";
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
-1;
+import { getAllModCoursesQ } from "../modules/moduleQueries";
 
 export function getAllCoursesQ(body?: fetchAllCoursesBody) {
   return queryOptions({
@@ -89,6 +89,9 @@ export function addModuleToCourseQ() {
     onSuccess: () => {
       getQueryClient().invalidateQueries({
         queryKey: getAllCoursesQ().queryKey,
+      });
+      getQueryClient().invalidateQueries({
+        queryKey: getAllModCoursesQ().queryKey,
       });
     },
     onError: (err) => console.error("mutation failed", err),
