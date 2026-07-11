@@ -1,1 +1,1 @@
-export * from './constants.seed';
+export * from './Constants';

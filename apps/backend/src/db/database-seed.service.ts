@@ -11,17 +11,9 @@ import {
   Course,
   ModuleGrouping,
 } from '../entities/index';
-// import { AuthSeed } from './seeds/auth.seed';
-import {
-  UniversityNames,
-  UserNames,
-  UserEmails,
-  UserPasswords,
-  UserIDs,
-  UserUniRoles,
-  CourseNames,
-  CourseDegrees,
-} from './seeds/constants.seed';
+
+//Import constants
+import * as CONSTANTS from './seeds';
 
 interface SeedTask {
   name: string;
@@ -61,6 +53,10 @@ export class DatabaseSeedService {
         //Seed COurses with their moduleGroupings
         name: 'Seed-Courses-With-Their-Empty-ModuleGroupings',
         run: () => this.seedCoursesWithModuleGroupings(),
+      },
+      {
+        name: 'Seed-Modules-To-Courses-With-CourseModuleData',
+        run: () => this.seedModules(),
       },
     ];
 
@@ -166,7 +162,7 @@ export class DatabaseSeedService {
 
   private async seedUniversity(): Promise<void> {
     //University names to seed
-    const uniNames = UniversityNames;
+    const uniNames = CONSTANTS.UniversityNames;
 
     //Get Unis that already exists
     const existingUnis = await this.dbService.db
@@ -214,10 +210,10 @@ export class DatabaseSeedService {
   } //END_seedUniversity
 
   private async seedUsersAccounts(): Promise<void> {
-    const userIDs = UserIDs;
-    const userNames = UserNames;
-    const userEmails = UserEmails;
-    const userPasswords = UserPasswords;
+    const userIDs = CONSTANTS.UserIDs;
+    const userNames = CONSTANTS.UserNames;
+    const userEmails = CONSTANTS.UserEmails;
+    const userPasswords = CONSTANTS.UserPasswords;
 
     //HashPasswords
     const hashedUserPasswords: string[] = await Promise.all(
@@ -279,7 +275,7 @@ export class DatabaseSeedService {
 
   private async seedUniRolesForUP(): Promise<void> {
     //Select University to give roles to --> University of Pretoria
-    const uniName = UniversityNames[0]; //UP
+    const uniName = CONSTANTS.UniversityNames[0]; //UP
     const [uni] = await this.dbService.db
       .select()
       .from(University)
@@ -287,14 +283,14 @@ export class DatabaseSeedService {
       .limit(1);
 
     //User ID's for which to create roles at UP by their emails
-    const userEmails = UserEmails;
+    const userEmails = CONSTANTS.UserEmails;
     const users = await this.dbService.db
       .select()
       .from(usersTable)
       .where(inArray(usersTable.email, userEmails));
     const userIDs = users.map((user) => user.id);
 
-    const userUniRoles = UserUniRoles;
+    const userUniRoles = CONSTANTS.UserUniRoles;
     //Create role objects that will be used
     const uniRoles = userIDs.map((id, index) => ({
       UserID: id,
@@ -333,14 +329,14 @@ export class DatabaseSeedService {
 
   private async seedCoursesWithModuleGroupings(): Promise<void> {
     //If course exists -> grouping should exist
-    const courseNames = CourseNames;
-    const courseDegrees = CourseDegrees;
+    const courseNames = CONSTANTS.CourseNames;
+    const courseDegrees = CONSTANTS.CourseDegrees;
 
     //Get UniversityOfPta
     const [uni] = await this.dbService.db
       .select()
       .from(University)
-      .where(eq(University.UniversityName, UniversityNames[0]))
+      .where(eq(University.UniversityName, CONSTANTS.UniversityNames[0]))
       .limit(1);
 
     const courses = courseNames.map((name, index) => ({
@@ -393,4 +389,6 @@ export class DatabaseSeedService {
       );
     }
   } //END_seedCourseWithModuleGrouping
+
+  private async seedModules(): Promise<void> {}
 }
