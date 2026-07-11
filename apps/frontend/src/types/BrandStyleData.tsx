@@ -126,6 +126,6 @@ export const StatusColoursList = [
     label: "Warning",
     prefix: "warning",
     lightHex: "#fef3c7",
-    darkHex: "#78350f",
+    darkHex: "#c2410c",
   },
 ];

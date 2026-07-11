@@ -2,6 +2,7 @@
 
 import { BrandIdentity } from "@/components/organisms/brand-style/BrandIdentity";
 import { ColourSystem } from "@/components/organisms/brand-style/ColourSystem";
+import { ComponentSection } from "@/components/molecules/brand-style/ComponentsSection";
 
 export default function BrandStyleShell() {
   return (
@@ -52,6 +53,7 @@ export default function BrandStyleShell() {
           </section>
           <section>
             <h1>Component Standards</h1>
+            <ComponentSection />
           </section>
           <section>
             <h1>Mode Switching</h1>
