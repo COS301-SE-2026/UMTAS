@@ -1,0 +1,24 @@
+apps/backend/src/db/seeds/Constants/Modules/Modules.constants.ts
+  h_84e82529bd05a5 13-16,18-21
+apps/backend/src/db/database-seed.service.ts
+  h_84e82529bd05a5 1,14-17,22,135,516,521,523-562
+apps/backend/src/db/seeds/Constants/Modules/index.ts
+  h_84e82529bd05a5 1
+apps/backend/src/db/seeds/Constants/Modules/CS_1.constants.ts
+  h_84e82529bd05a5 380-385
+apps/backend/src/db/seeds/Constants/Modules/CS_3.constants.ts
+  h_84e82529bd05a5 123-128
+apps/backend/src/db/seeds/Constants/Modules/CS_2.constants.ts
+  h_84e82529bd05a5 154-159
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "11e019ca5823f41a3c30cdc2f174825a969e2415",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}
