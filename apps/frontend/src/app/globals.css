@@ -53,7 +53,7 @@
 
 @layer utilities {
   .brand-nav-link {
-    @apply block text-sm text-[var(--text-secondary)] transition-all duration-[var(--duration-fast)] cursor-pointer hover:font-bold hover:text-[var(--text-primary)];
+    @apply flex flex-row flex-nowrap items-center justify-end gap-2 whitespace-nowrap text-right text-sm text-[var(--text-secondary)] transition-all duration-[var(--duration-fast)] cursor-pointer hover:font-bold hover:text-[var(--text-primary)];
   }
   .brand-table-hover {
     @apply hover:bg-bg-surface/50 transition-colors duration-[var(--duration-fast)] ease-in-out;
