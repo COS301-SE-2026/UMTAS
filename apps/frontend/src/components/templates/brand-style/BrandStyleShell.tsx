@@ -3,6 +3,7 @@
 import { BrandIdentity } from "@/components/organisms/brand-style/BrandIdentity";
 import { ColourSystem } from "@/components/organisms/brand-style/ColourSystem";
 import { ComponentSection } from "@/components/molecules/brand-style/ComponentsSection";
+import { TypographySection } from "@/components/organisms/brand-style/TypographySection";
 
 export default function BrandStyleShell() {
   return (
@@ -31,9 +32,7 @@ export default function BrandStyleShell() {
             <ColourSystem />
           </section>
           <section>
-            <h1>Typography</h1>
-            <h2>Type Scale</h2>
-            <h2>Typography Rules</h2>
+            <TypographySection />
           </section>
           <section>
             <h1>Border Radius</h1>
@@ -52,7 +51,6 @@ export default function BrandStyleShell() {
             <h1>Icons</h1>
           </section>
           <section>
-            <h1>Component Standards</h1>
             <ComponentSection />
           </section>
           <section>
