@@ -1,3 +1,4 @@
+//Disclaimer: I am adding emojies for the logs, as they are easier to differentiate in the logs -> this was not AI, rahter AIdan
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { and, eq, inArray } from 'drizzle-orm';
@@ -10,10 +11,15 @@ import {
   UniversityRole,
   Course,
   ModuleGrouping,
+  modules,
+  GroupModules,
+  CourseModule,
+  ModuleStyling,
 } from '../entities/index';
 
 //Import constants
 import * as CONSTANTS from './seeds';
+import crypto from 'crypto';
 
 interface SeedTask {
   name: string;
@@ -126,7 +132,9 @@ export class DatabaseSeedService {
       .limit(1);
 
     if (existing.length > 0) {
-      this.logger.log(`Seed user already exists (${seedEmail}). Skipping.`);
+      this.logger.log(
+        `Default System admin already exists [${seedEmail}]. Skip👌`,
+      );
       return;
     }
 
@@ -152,7 +160,7 @@ export class DatabaseSeedService {
       password: hashedPassword,
     });
 
-    this.logger.log(`Seeded default system admin user (${seedEmail}).`);
+    this.logger.log(`Seeded default system admin user [${seedEmail}].`);
   }
 
   // private async seedAuthTestData(): Promise<void> {
@@ -172,7 +180,7 @@ export class DatabaseSeedService {
 
     //Find missing uni names
     const existingNames = new Set(
-      existingUnis.map((uni) => uni.UniversityName),
+      existingUnis.map((uni) => uni.UniversityName.trim()),
     );
     const missingNames = uniNames.filter((name) => !existingNames.has(name));
 
@@ -205,7 +213,7 @@ export class DatabaseSeedService {
       }
     } //END_check for missing names
     else {
-      this.logger.log(`Seed-Universities: No new Universities to seed`);
+      this.logger.log(`Universities: No new Universities to seed. Skip👌`);
     }
   } //END_seedUniversity
 
@@ -269,7 +277,7 @@ export class DatabaseSeedService {
         })),
       );
     } else {
-      this.logger.log(`Seed-Users: No new Users to seed`);
+      this.logger.log(`Users: No new Users to seed. Skip👌`);
     }
   } //END_seedUsers
 
@@ -322,7 +330,7 @@ export class DatabaseSeedService {
       await this.dbService.db.insert(UniversityRole).values(missingRoles);
     } else {
       this.logger.log(
-        `Seed-UniRoles-For-UniversityOfPretoria: No new roles to seed for University of Pretoria`,
+        `University Roles: No new roles to seed for ${uniName}. Skip👌`,
       );
     }
   } //END_seedUniRolesForUP
@@ -384,11 +392,197 @@ export class DatabaseSeedService {
         })),
       );
     } else {
-      this.logger.log(
-        `Seed-Courses-With-Their-Empty-ModuleGroupings: No new courses to seed`,
-      );
+      this.logger.log(`Courses: No new courses to seed. Skip👌`);
     }
   } //END_seedCourseWithModuleGrouping
 
-  private async seedModules(): Promise<void> {}
-}
+  private async seedModules(): Promise<void> {
+    await this.seedComputerScienceModules();
+  } //END_seedModules
+
+  private async seedComputerScienceModules(): Promise<void> {
+    //get all modules
+    const seedModules = CONSTANTS.ALL_SEED_MODULES;
+
+    //Get all existing modules
+    const existingModules = await this.dbService.db.select().from(modules);
+
+    //All existing module codes
+    const existingModuleCodes = new Set(
+      existingModules.map((mod) => mod.moduleCode),
+    );
+
+    //Filter to get all missing modules
+    const missingModules = seedModules.filter(
+      (mod) => !existingModuleCodes.has(mod.Code),
+    );
+
+    //if there are modules to be seeded, seed them in
+    if (missingModules.length > 0) {
+      //Get Computer Science course
+      const [course] = await this.dbService.db
+        .select()
+        .from(Course)
+        .where(eq(Course.CourseName, CONSTANTS.CourseNames[0].trim())) //CS
+        .limit(1);
+
+      //enusre course exists
+      if (!course) {
+        this.logger.warn(
+          `Course for [${CONSTANTS.CourseNames[0]}] does not exist`,
+        );
+        return;
+      } //END_!course
+
+      //Have to ensure course has groupID :(
+      if (!course.GroupID) {
+        this.logger.warn(
+          `Course[${JSON.stringify(course)}] does not have a group, be better. Skipping modules seeding for Computer Science`,
+        );
+        return;
+      } //END_!course.GroupID
+
+      let newModules: (typeof modules.$inferSelect)[] = [];
+      await this.dbService.db.transaction(async (t) => {
+        //Create new modules
+        newModules = await t
+          .insert(modules)
+          .values(
+            missingModules.map((mod) => ({
+              moduleCode: mod.Code,
+              moduleName: mod.Name,
+              moduleDescription: mod.Description,
+            })),
+          )
+          .returning();
+
+        if (newModules.length > 0) {
+          //Populate CompSci's group with modules
+          const groupModules = await t
+            .insert(GroupModules)
+            .values(
+              newModules.map((mod) => ({
+                GroupID: course.GroupID,
+                ModuleID: mod.moduleID,
+              })),
+            )
+            .returning();
+
+          //Add courseModule metadata for each
+          await t.insert(CourseModule).values(
+            groupModules.map((gm, index) => ({
+              CourseID: course.CourseID,
+              GroupModuleID: gm.GroupModuleID,
+              Core: missingModules[index].Core,
+              SemesterOfStudy: missingModules[index].SemesterOfStudy,
+              YearOfStudy: missingModules[index].YearOfStudy,
+            })),
+          );
+
+          this.logger.log(
+            `Seeded #[${newModules.length}] modules for [${CONSTANTS.CourseNames[0]}] to group [${course.GroupID}]`,
+          );
+        } else {
+          this.logger.warn(
+            `Seed modules for [${CONSTANTS.CourseNames[0]}] failed to insert newModules`,
+          );
+        } //END_if-else
+      }); //END_transaction
+
+      //Create syling enities for the new modules
+      await this.generateRandomStylingForModules(
+        newModules.map((mod) => mod.moduleID),
+      );
+
+      //update hash for course's group
+      //Get all modules belonging to group
+      const allThaModulesIDs = await this.dbService.db
+        .select({ ModuleID: GroupModules.ModuleID })
+        .from(GroupModules)
+        .where(eq(GroupModules.GroupID, course.GroupID));
+
+      const hashSuccess = await this.updateGroupHash(
+        course.GroupID,
+        allThaModulesIDs.map((mod) => mod.ModuleID),
+      );
+
+      if (hashSuccess)
+        this.logger.log(`Hash update for group[${course.GroupID}] successfull`);
+      else
+        this.logger.warn(
+          `Hash update for group [${course.GroupID}] not a success lol`,
+        );
+    } //END_missingModules.length check
+    else {
+      this.logger.log(
+        `CS Modules: No new modules to be seeded for [${CONSTANTS.CourseNames[0]}]. Skip👌`,
+      );
+    }
+  } //END_seedComputerScienceModules
+
+  //generate random colours for the module ID's specified
+  private async generateRandomStylingForModules(modules: string[]) {
+    //will generate random colours for modules for all users
+
+    //Get all users
+    const users = await this.dbService.db.select().from(usersTable);
+
+    if (users.length === 0 || modules.length === 0)
+      this.logger.warn(`No users / modules to apply seeding for. skippy`);
+
+    //Helper for random colors
+    const genRandomColour = (): string => {
+      const chars = '0123456789ABCDEF';
+      let out = '#';
+
+      for (let i = 0; i < 6; i++) out += chars[Math.floor(Math.random() * 16)];
+
+      return out;
+    }; //END_genRandomColour
+
+    //Create styling objects
+    const stylingObjects: (typeof ModuleStyling.$inferInsert)[] = [];
+
+    for (const user of users) {
+      for (const id of modules) {
+        stylingObjects.push({
+          ModuleID: id,
+          UserID: user.id,
+          styling: { colour: genRandomColour() },
+        });
+      } //END_id
+    } //END_user
+
+    //Insert all styling objects
+    const moduleStylings = await this.dbService.db
+      .insert(ModuleStyling)
+      .values(stylingObjects)
+      .returning();
+
+    this.logger.log(
+      `Styling entries created for [${users.length}]users | [${modules.length}]modules | [${moduleStylings.length}]Total`,
+    );
+  } //END_generateRandomStylingForModules
+
+  //Update hash for moduleGrouping after its been populated
+  private async updateGroupHash(
+    groupId: string,
+    modules: string[],
+  ): Promise<boolean> {
+    //Calculate new hash, based of modules
+    const newHash = crypto
+      .createHash('sha256')
+      .update(JSON.stringify(modules))
+      .digest('base64');
+
+    //update hash
+    const [newGroup] = await this.dbService.db
+      .update(ModuleGrouping)
+      .set({ Hash: newHash })
+      .where(eq(ModuleGrouping.GroupID, groupId))
+      .returning();
+
+    //Return wether it was a success
+    return !!newGroup;
+  }
+} //END_DatabaseSeedService

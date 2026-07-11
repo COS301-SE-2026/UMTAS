@@ -120,3 +120,9 @@ export const ELECTIVE_MODULES_3: SeedModule[] = [
     YearOfStudy: 3,
   },
 ]; //END_ELECTIVE_MODULES_3
+
+export const ALL_SEED_MODULES: SeedModule[] = [
+  ...FUNDAMENTAL_MODULES_3,
+  ...CORE_MODULES_3,
+  ...ELECTIVE_MODULES_3,
+];
