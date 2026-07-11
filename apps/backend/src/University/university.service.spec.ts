@@ -129,6 +129,20 @@ describe('UniversityService', () => {
   });
 
   describe('Test_UpdateUniversity', () => {
+    it('should throw an error if University name is undefined', async () => {
+      jest.spyOn(service, 'getById').mockResolvedValue({
+        UniversityID: '1',
+        UniversityName: 'Old Name',
+      });
+
+      const dto = { UniversityName: undefined };
+
+      await expect(service.update('1', dto)).rejects.toThrow(
+        BadRequestException,
+      );
+      expect(mockDb.update).not.toHaveBeenCalled();
+    });
+
     it('should throw an error if the university does not exist', async () => {
       const dto = { UniversityName: 'Non-existent University' };
 
@@ -139,6 +153,32 @@ describe('UniversityService', () => {
       );
 
       expect(mockDb.update).not.toHaveBeenCalledWith();
+    });
+
+    it('should successfully update the university name if it exists', async () => {
+      jest.spyOn(service, 'getById').mockResolvedValue({
+        UniversityID: uniId,
+        UniversityName: 'ou naam',
+      });
+      jest
+        .spyOn(service, 'checkDuplicateUniversityName')
+        .mockResolvedValue(false);
+
+      (mockDb.update as jest.Mock).mockReturnValue({
+        set: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        returning: jest.fn().mockResolvedValue([
+          {
+            UniversityID: uniId,
+            UniversityName: 'nuwe naam',
+          },
+        ]),
+      } as any);
+
+      const result = await service.update(uniId, {
+        UniversityName: 'nuwe naam',
+      });
+      expect(result.UniversityName).toBe('nuwe naam');
     });
   });
 
