@@ -107,6 +107,12 @@ rollback-prod PREVIOUS_TAG:
 
 ############################## Backend specific
 
+#Too lazy
+resetBack:
+    just dockerClean
+    just sync
+    just back
+
 #lint-staged
 lintBack:
     pnpm run lint-staged
