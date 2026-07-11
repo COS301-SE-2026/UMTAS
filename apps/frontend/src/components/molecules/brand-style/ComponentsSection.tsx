@@ -127,8 +127,8 @@ export const mockScheduleEvents: ScheduleEvent[] = [
 
 export function ComponentSection() {
   return (
-    <div className="p-8 space-y-12 max-w-4xl">
-      <h1 className="text-4xl font-bold tracking-tight text-[var(--text-primary)] mb-2">
+    <div className="space-y-12">
+      <h1 className="text-4xl font-bold tracking-tight text-[var(--text-primary)] mb-8">
         Components Section
       </h1>
       <section className="space-y-4 border p-4 rounded-xl">
@@ -145,7 +145,7 @@ export function ComponentSection() {
         <div className="flex gap-4">
           <Avatar>
             <AvatarImage src="" alt="alt text bro" />
-            <AvatarFallback>Avatar</AvatarFallback>
+            <AvatarFallback>A</AvatarFallback>
           </Avatar>
 
           <Badge variant="default">Primary</Badge>
@@ -319,7 +319,7 @@ export function ComponentSection() {
             Colour Picker
             <ColourPicker value="alt text" onChange={() => {}} />
           </Card>
-          Weekly Grid
+          <h2 className="text-md font-semibold">Weekly Grid</h2>
           <WeeklyGrid events={mockScheduleEvents} weekStart={new Date()} />
         </Card>
       </section>
