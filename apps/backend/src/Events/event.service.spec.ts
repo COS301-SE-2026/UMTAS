@@ -10,7 +10,10 @@ import { ModuleService } from '../Module/module.service';
 
 //Mock Database and factories
 import { createMockDatabase } from '../Testing/Mocks/database.mock';
-import { mockSequentialResults } from '../Testing/Mocks/database.helpers';
+import {
+  mockDbResult,
+  mockSequentialResults,
+} from '../Testing/Mocks/database.helpers';
 import {
   createEvent,
   createEventVenue,
@@ -193,6 +196,26 @@ describe('EventService', () => {
         eventName: event.eventName,
         eventCode: event.eventCode,
         success: true,
+      });
+    });
+  });
+
+  describe('Test_createPersonalEvent', () => {
+    it('should create a personal event', async () => {
+      mockDbResult(mockDb.insert, [createEvent(EventType.PERSONAL)]);
+
+      const result = await service.createPersonalEvent(
+        userId,
+        createCreateEventDto(createEvent(EventType.PERSONAL)),
+      );
+
+      expect(result).toMatchObject({
+        eventCriteria: expect.objectContaining({
+          date: expect.any(String),
+          startTime: expect.any(String),
+          endTime: expect.any(String),
+          type: 'personal',
+        }),
       });
     });
   });
