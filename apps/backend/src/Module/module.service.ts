@@ -20,11 +20,13 @@ import {
   EnrolResponseDto,
   AddModulesToCourseDto,
   AddModulesToCourseResponseDto,
+  CourseModuleDto,
 } from './dto/module.dto';
 
 //ENtities
 import {
   Course,
+  CourseModule,
   GroupModules,
   ModuleEnrollment,
   ModuleGrouping,
@@ -108,17 +110,62 @@ export class ModuleService {
       throw new InternalServerErrorException('Module failed to be created');
 
     //Group module to its group
-    const groupModule = await this.groupingService.populateGroup(groupId, [
+    const moduleGroup = await this.groupingService.populateGroup(groupId, [
       newModule.moduleID,
     ]);
 
     //if grouping failed
-    if (!groupModule)
+    if (!moduleGroup)
       throw new InternalServerErrorException(
         `Failed to group module[${newModule.moduleID}] to group [${groupId}]`,
       );
 
-    console.log(`CreateModule: dto.styling: ${JSON.stringify(dto.styling)}`);
+    // console.log(`CreateModule: dto.styling: ${JSON.stringify(dto.styling)}`);
+
+    //Course Module metadata logic - only when courseId specified
+    let courseModuleInfo: CourseModuleDto | null = null;
+    if (dto.CourseID && dto.CourseModuleInfo) {
+      //Check that necessary fields present -> else default
+      const core = dto.CourseModuleInfo.Core;
+      const semesterOfStudy =
+        dto.CourseModuleInfo.SemesterOfStudy ?? 'No semester specified';
+      const yearOfStudy = dto.CourseModuleInfo.YearOfStudy ?? 0;
+
+      //Fetch GroupModule entry for module to add metadata to
+      const [groupModule] = await this.dbService.db
+        .select()
+        .from(GroupModules)
+        .where(
+          and(
+            eq(GroupModules.GroupID, moduleGroup.GroupID),
+            eq(GroupModules.ModuleID, newModule.moduleID),
+          ),
+        )
+        .limit(1);
+
+      if (!groupModule)
+        throw new InternalServerErrorException(
+          `Couldn't find group module entry in join table :(`,
+        );
+
+      //Add metadata to groupModule entity
+      [courseModuleInfo] = await this.dbService.db
+        .insert(CourseModule)
+        .values({
+          CourseID: dto.CourseID,
+          GroupModuleID: groupModule.GroupModuleID,
+          Core: core,
+          SemesterOfStudy: semesterOfStudy,
+          YearOfStudy: yearOfStudy,
+        })
+        .returning();
+
+      if (!courseModuleInfo)
+        throw new InternalServerErrorException(
+          `Failed to add CourseModule metadata for groupModule entry[${groupModule.GroupModuleID}]`,
+        );
+    } //END_COurseModule metadata logic
+
     //Styling
     if (dto.styling) {
       const styling = await this.setStyling(
@@ -130,10 +177,14 @@ export class ModuleService {
       return {
         ...newModule,
         styling: styling.styling,
+        CourseModuleInfo: courseModuleInfo,
       };
     }
 
-    return newModule;
+    return {
+      ...newModule,
+      CourseModuleInfo: courseModuleInfo,
+    };
   } //create
 
   //return all modules
@@ -166,6 +217,7 @@ export class ModuleService {
         ModuleGroupingID: GroupModules.GroupID,
         CourseID: Course.CourseID,
         styling: ModuleStyling.styling,
+        CourseModuleInfo: getTableColumns(CourseModule),
       })
       .from(modules)
       .leftJoin(
@@ -176,6 +228,10 @@ export class ModuleService {
         ),
       )
       .innerJoin(GroupModules, eq(GroupModules.ModuleID, modules.moduleID))
+      .leftJoin(
+        CourseModule,
+        eq(CourseModule.GroupModuleID, GroupModules.GroupModuleID),
+      )
       .leftJoin(Course, eq(Course.GroupID, GroupModules.GroupID))
       .leftJoin(
         ModuleEnrollment,
@@ -194,8 +250,14 @@ export class ModuleService {
       .select({
         ...getTableColumns(modules),
         styling: ModuleStyling.styling,
+        CourseModuleInfo: getTableColumns(CourseModule),
       })
       .from(modules)
+      .innerJoin(GroupModules, eq(GroupModules.ModuleID, modules.moduleID))
+      .leftJoin(
+        CourseModule,
+        eq(CourseModule.GroupModuleID, GroupModules.GroupModuleID),
+      )
       .leftJoin(
         ModuleStyling,
         and(
@@ -236,9 +298,19 @@ export class ModuleService {
     )
       updateFields.moduleDescription = dto.moduleDescription.trim();
 
+    //Handle courseModule update -> requires courseId
+    let courseModuleInfo: CourseModuleDto | null = null;
+    if (dto.CourseID) {
+      courseModuleInfo = await this.courseModuleUpdate(dto.CourseID, dto);
+    }
+
     let newModule = oldModule;
     //If no updateFields - return module early
-    if (Object.keys(updateFields).length === 0 && !dto.styling)
+    if (
+      Object.keys(updateFields).length === 0 &&
+      !dto.styling &&
+      courseModuleInfo === null
+    )
       return oldModule;
     else if (Object.keys(updateFields).length > 0) {
       //update module
@@ -270,6 +342,7 @@ export class ModuleService {
     return {
       ...newModule,
       styling: newStyling,
+      CourseModuleInfo: courseModuleInfo,
     };
   } //update
 
@@ -585,4 +658,56 @@ export class ModuleService {
       );
     }
   }
+
+  async courseModuleUpdate(
+    courseId: string,
+    dto: UpdateModuleDto,
+  ): Promise<CourseModuleDto> {
+    //Get group module entry that courseMOdule refers to through COurseID
+    const [groupModule] = await this.dbService.db
+      .select()
+      .from(GroupModules)
+      .innerJoin(Course, eq(Course.GroupID, GroupModules.GroupID))
+      .where(eq(Course.CourseID, courseId))
+      .limit(1);
+
+    //Get old courseModuleInfo
+    const [oldCourseModule] = await this.dbService.db
+      .select()
+      .from(CourseModule)
+      .where(
+        eq(CourseModule.GroupModuleID, groupModule.GroupModules.GroupModuleID),
+      )
+      .limit(1);
+
+    //Get updateFields for courseMOdule data
+    const courseUpdateFields: Partial<typeof CourseModule.$inferInsert> = {};
+    if (dto.Core && dto.Core !== oldCourseModule.Core)
+      courseUpdateFields.Core = dto.Core;
+    if (
+      dto.SemesterOfStudy &&
+      dto.SemesterOfStudy !== oldCourseModule.SemesterOfStudy
+    )
+      courseUpdateFields.SemesterOfStudy = dto.SemesterOfStudy;
+    if (dto.YearOfStudy && dto.YearOfStudy !== oldCourseModule.YearOfStudy)
+      courseUpdateFields.YearOfStudy = dto.YearOfStudy;
+
+    //Check if update field present
+    let returnCourseModule = oldCourseModule;
+    if (Object.keys(courseUpdateFields).length > 0) {
+      //Update courseMOdule metadata appropriatly
+      [returnCourseModule] = await this.dbService.db
+        .update(CourseModule)
+        .set(courseUpdateFields)
+        .where(
+          eq(
+            CourseModule.GroupModuleID,
+            groupModule.GroupModules.GroupModuleID,
+          ),
+        )
+        .returning();
+    }
+
+    return returnCourseModule;
+  } //END_courseModuleUpdate
 } //ModuleService

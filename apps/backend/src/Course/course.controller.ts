@@ -55,8 +55,8 @@ export class CourseController {
     return this.service.create(dto);
   }
 
-  //GetAll per universityId
-  @Get()
+  //GetAll per but put method since we use body for filters
+  @Post('getAll')
   @Roles('student', 'uni_admin', 'sys_admin')
   @ApiOperation({
     summary: 'Get all courses',

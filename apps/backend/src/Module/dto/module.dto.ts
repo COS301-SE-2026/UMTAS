@@ -10,7 +10,12 @@ import {
   ValidateNested,
   IsNumber,
 } from 'class-validator';
-import { PartialType, PickType, OmitType } from '@nestjs/swagger';
+import {
+  PartialType,
+  PickType,
+  OmitType,
+  IntersectionType,
+} from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import { PopulateGroupBodyDto } from '../../Grouping/dto/grouping.dto';
 
@@ -61,7 +66,7 @@ export class CourseModuleDto {
   })
   @IsString()
   @IsOptional()
-  SemesterOfStudy?: string;
+  SemesterOfStudy?: string | null;
 
   @ApiPropertyOptional({
     example: 1,
@@ -70,7 +75,7 @@ export class CourseModuleDto {
   })
   @IsNumber()
   @IsOptional()
-  YearOfStudy?: number;
+  YearOfStudy?: number | null;
 } //END_CourseModuleDto
 
 export class CreateCourseModuleDto extends PickType(CourseModuleDto, [
@@ -146,12 +151,13 @@ export class ModulesDto {
       SemesterOfStudy: 'Semester 1',
       YearOfStudy: 1,
     },
+    nullable: true,
   })
   @IsOptional()
   @IsObject()
   @ValidateNested()
   @Type(() => CourseModuleDto)
-  CourseModuleInfo?: CourseModuleDto;
+  CourseModuleInfo?: CourseModuleDto | null;
 } //ModuleDto
 
 //Create
@@ -190,8 +196,9 @@ export class CreateModuleDto extends PickType(ModulesDto, [
 } //CreateModuleDto
 
 //Update
-export class UpdateModuleDto extends PartialType(
-  OmitType(ModulesDto, ['moduleID'] as const),
+export class UpdateModuleDto extends IntersectionType(
+  PartialType(OmitType(ModulesDto, ['moduleID', 'CourseModuleInfo'] as const)),
+  PartialType(OmitType(CourseModuleDto, ['CourseModuleID', 'GroupModuleID'])),
 ) {} //update
 
 //Responses

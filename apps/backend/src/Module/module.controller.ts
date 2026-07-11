@@ -211,6 +211,10 @@ export class ModuleController {
   //Add modules to Course
   @Put(':CourseID')
   @Roles('lecturer', 'uni_admin')
+  @ApiOperation({
+    summary: 'Populate Course with modules array',
+    operationId: 'addModulesToCourse',
+  })
   @ApiResponse({
     status: 200,
     description: 'Successfully populated modules to course',

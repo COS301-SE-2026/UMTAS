@@ -107,6 +107,12 @@ rollback-prod PREVIOUS_TAG:
 
 ############################## Backend specific
 
+#Complete restart of backend, I'm getting lazy
+backendRestart:
+    just dockerClean
+    just sync
+    just back
+
 #lint-staged
 lintBack:
     pnpm run lint-staged
