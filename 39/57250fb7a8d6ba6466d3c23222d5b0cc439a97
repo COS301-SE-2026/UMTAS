@@ -1,0 +1,28 @@
+apps/backend/src/db/seeding/database-seed.service.ts
+  h_84e82529bd05a5 10-14,29-33
+apps/backend/src/db/seeding/base.seed.service.ts
+  h_84e82529bd05a5 4,8-10,27,46,58-60,62,64
+apps/backend/src/app.module.ts
+  h_84e82529bd05a5 7,30
+apps/backend/src/db/database-init.service.ts
+  h_84e82529bd05a5 2,56-57
+apps/backend/src/db/seeding/seed.module.ts
+  h_84e82529bd05a5 8-14
+apps/backend/src/db/seeding/services/users.seed.service.ts
+  h_84e82529bd05a5 40
+apps/backend/src/db/seeding/services/modules.seed.service.ts
+  h_84e82529bd05a5 70-73,84,86,90,99-100,118-119
+apps/backend/src/db/seeding/services/university.seed.service.ts
+  h_84e82529bd05a5 5-6,8,12-15,41,43,54,56
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "3957250fb7a8d6ba6466d3c23222d5b0cc439a97",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}
