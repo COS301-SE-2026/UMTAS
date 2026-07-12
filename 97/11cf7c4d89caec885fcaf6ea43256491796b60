@@ -1,0 +1,24 @@
+justfile
+  h_84e82529bd05a5 110-115
+apps/backend/src/Module/dto/module.dto.ts
+  h_84e82529bd05a5 13,154
+apps/backend/src/Module/module.controller.ts
+  h_84e82529bd05a5 214-217
+apps/backend/src/Module/module.service.ts
+  h_84e82529bd05a5 23,29,113,118,123-168,180,184-187,220,231,305,661-704
+apps/backend/src/Builder/dto/builder.dto.ts
+  h_84e82529bd05a5 13
+apps/backend/src/Course/course.controller.ts
+  h_84e82529bd05a5 58-59
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "9711cf7c4d89caec885fcaf6ea43256491796b60",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}
