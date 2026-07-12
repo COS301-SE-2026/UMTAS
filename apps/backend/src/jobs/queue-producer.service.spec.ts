@@ -41,8 +41,8 @@ describe('QueueProducerService', () => {
   it('enqueues timetable solve payloads with the backend job id as BullMQ jobId', async () => {
     const payload: TimetableSolveJobData = {
       jobId: 'solve-1',
-      solverKey: 'default',
-      mode: 'feasibility',
+      solverProfileKey: 'default',
+      solveMode: 'feasibility',
     };
 
     await service.enqueueTimetableSolveJob(payload);
