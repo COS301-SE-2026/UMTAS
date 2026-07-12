@@ -6,6 +6,7 @@ import { ComponentSection } from "@/components/molecules/brand-style/ComponentsS
 import { TypographySection } from "@/components/organisms/brand-style/TypographySection";
 import { SpacingSection } from "@/components/organisms/brand-style/SpacingSection";
 import { RadiusSection } from "@/components/organisms/brand-style/RadiusSection";
+import { ShadowSection } from "@/components/organisms/brand-style/ShadowSection";
 import {
   Sparkle,
   Aperture,
@@ -28,6 +29,7 @@ export default function BrandStyleShell() {
         <div className="md:col-span-1 md:border-r border-border pr-10">
           <div className="flex flex-col items-end sticky top-31">
             <div className="flex flex-col gap-2 items-start text-[var(--text-secondary)]">
+              <p>NAVIGATION</p>
               <a className="brand-nav-link" href="#identity">
                 <Sparkle size={14} />
                 <span>Brand Identity</span>
@@ -108,7 +110,7 @@ export default function BrandStyleShell() {
             <SpacingSection />
           </section>
           <section id="shadows">
-            <h1>Shadow & Elevation</h1>
+            <ShadowSection />
           </section>
           <section id="motion">
             <h1>Motion Tokens</h1>
