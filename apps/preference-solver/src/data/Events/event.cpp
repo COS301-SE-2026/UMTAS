@@ -1,28 +1,36 @@
 #include "event.h"
 #include "nlohmann/json.hpp"
+#include <cctype>
 #include <sstream>
 #include <string>
 
 #include <stdexcept>
 const string EventGA::GROUPING_KEY = "events";
-const string EventGA::DAY_KEY = "day";
-const string EventGA::EVENT_ID = "eventID";
+const string EventGA::DAY_OF_WEEK_KEY = "dayOfWeek";
+const string EventGA::DATE_KEY = "date";
+const string EventGA::EVENT_ID_KEY = "eventId";
 const string EventGA::MODULE_CODE = "moduleCode";
 const string EventGA::EVENT_START = "startTime";
 const string EventGA::EVENT_END = "endTime";
-const string EventGA::EVENT_TYPE = "EventType";
+const string EventGA::ACTIVITY_TYPE_KEY = "activityType";
+const string EventGA::ACTIVITY_CODE_KEY = "activityCode";
 
 int timeHelper(const std::string &);
 bool typeCheckHelper(string key, json &obj);
 
 EventGA::EventGA(json eventsJson) {
   try {
-    if (typeCheckHelper(DAY_KEY, eventsJson)) {
-      this->eventDay = eventsJson[DAY_KEY].get<string>();
+    if (eventsJson.contains(DAY_OF_WEEK_KEY)) {
+      this->dayOfWeek = eventsJson[DAY_OF_WEEK_KEY].get<string>();
+    } else if (eventsJson.contains(DATE_KEY)) {
+      // A dated event is its own collision bucket.
+      this->dayOfWeek = eventsJson[DATE_KEY].get<string>();
+    } else {
+      throw std::runtime_error("Event requires dayOfWeek or date");
     }
 
-    if (typeCheckHelper(EVENT_ID, eventsJson)) {
-      this->eventID = eventsJson[EVENT_ID].get<string>();
+    if (typeCheckHelper(EVENT_ID_KEY, eventsJson)) {
+      this->eventId = eventsJson[EVENT_ID_KEY].get<string>();
     }
 
     if (typeCheckHelper(MODULE_CODE, eventsJson)) {
@@ -35,9 +43,14 @@ EventGA::EventGA(json eventsJson) {
     if (typeCheckHelper(EVENT_END, eventsJson)) {
       this->event_end = timeHelper(eventsJson[EVENT_END].get<string>());
     }
-    if (typeCheckHelper(EVENT_TYPE, eventsJson)) {
-
-      this->eventType = eventsJson[EVENT_TYPE];
+    if (this->event_end <= this->event_start) {
+      throw std::runtime_error("endTime must be after startTime");
+    }
+    if (typeCheckHelper(ACTIVITY_TYPE_KEY, eventsJson)) {
+      this->activityType = eventsJson[ACTIVITY_TYPE_KEY];
+    }
+    if (typeCheckHelper(ACTIVITY_CODE_KEY, eventsJson)) {
+      this->activityCode = eventsJson[ACTIVITY_CODE_KEY];
     }
 
   } catch (std::runtime_error &e) {
@@ -74,36 +87,20 @@ bool typeCheckHelper(string key, json &obj) {
 }
 
 int timeHelper(const string &time) {
-  int hours, minutes;
-  char colon;
-  std::istringstream iss(time);
-  iss >> hours >> colon >> minutes; // time format hh:mm
+  if (time.size() != 5 || time[2] != ':' ||
+      !std::isdigit(static_cast<unsigned char>(time[0])) ||
+      !std::isdigit(static_cast<unsigned char>(time[1])) ||
+      !std::isdigit(static_cast<unsigned char>(time[3])) ||
+      !std::isdigit(static_cast<unsigned char>(time[4]))) {
+    throw std::runtime_error("Time must use HH:MM format");
+  }
+
+  const int hours = (time[0] - '0') * 10 + (time[1] - '0');
+  const int minutes = (time[3] - '0') * 10 + (time[4] - '0');
+  if (hours > 23 || minutes > 59) {
+    throw std::runtime_error("Time must be between 00:00 and 23:59");
+  }
+
   return hours * 60 + minutes;
 }
 
-json EventGA::returnJson() {
-  json jsonObj;
-  return {{DAY_KEY, this->eventDay},
-          {EVENT_ID, this->eventID},
-          {EVENT_START, minutesToTime(this->event_start)},
-          {EVENT_END, minutesToTime(this->event_end)},
-          {MODULE_CODE, this->moduleCode},
-          {EVENT_TYPE, this->eventType}};
-}
-
-std::string minutesToTime(int minutesAfterMidnight) {
-  int hours = minutesAfterMidnight / 60;
-  int minutes = minutesAfterMidnight % 60;
-  string hourPad = "";
-  string minPad = "";
-  if (hours < 10) {
-    hourPad = '0';
-  }
-  if (minutes < 10) {
-    minPad = '0';
-  }
-  std::ostringstream oss;
-  oss << hourPad << hours << ":" << minPad << minutes;
-
-  return oss.str();
-}

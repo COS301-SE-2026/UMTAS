@@ -1,26 +1,25 @@
 {
-  "modules": [
-    {
-      "moduleCode": "CS101",
-      "typeOccurence": [
-        {
-          "EventType": "Lecture1",
-          "numberOccur": 1
-        }
-      ]
-    }
-  ],
-
-  "events": [
-    {
-      "day": "Monday",
-      "eventID": "CS101-L1-A",
-      "moduleCode": "CS101",
-      "startTime": "08:00",
-      "endTime": "09:30",
-      "EventType": "Lecture1"
-    }
-  ],
-
-  "targetTime": 420
+  "schedulingProblem": {
+    "events": [
+      {
+        "eventId": "CS101-L1-A",
+        "moduleCode": "CS101",
+        "activityType": "lecture",
+        "activityCode": "L1",
+        "requiredSelections": 1,
+        "dayOfWeek": "monday",
+        "startTime": "08:00",
+        "endTime": "09:30",
+        "venues": []
+      }
+    ]
+  },
+  "preferences": {
+    "heuristics": [
+      {
+        "key": "preferred-start-time",
+        "parameters": { "minutesAfterMidnight": 420 }
+      }
+    ]
+  }
 }

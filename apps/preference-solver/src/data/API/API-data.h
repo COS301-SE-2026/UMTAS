@@ -16,3 +16,5 @@ struct API_DATA {
   int targetTime;
   static const string TARGET_TIME_KEY;
 };
+#pragma once
+
