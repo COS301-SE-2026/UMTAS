@@ -5,6 +5,7 @@ import { ColourSystem } from "@/components/organisms/brand-style/ColourSystem";
 import { ComponentSection } from "@/components/molecules/brand-style/ComponentsSection";
 import { TypographySection } from "@/components/organisms/brand-style/TypographySection";
 import { SpacingSection } from "@/components/organisms/brand-style/SpacingSection";
+import { RadiusSection } from "@/components/organisms/brand-style/RadiusSection";
 import {
   Sparkle,
   Aperture,
@@ -101,7 +102,7 @@ export default function BrandStyleShell() {
             <TypographySection />
           </section>
           <section id="border">
-            <h1>Border Radius</h1>
+            <RadiusSection />
           </section>
           <section id="spacing">
             <SpacingSection />
