@@ -37,7 +37,7 @@ export class UserSeedService extends BaseSeedService {
     const existingEmails = await this.exists(
       tx,
       usersTable,
-      'email',
+      usersTable.email,
       userEmails,
     );
 

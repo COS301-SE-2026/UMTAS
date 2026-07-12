@@ -5,13 +5,13 @@ import { ConfigModule } from '@nestjs/config';
 
 //Services
 import { DatabaseSeedService } from './database-seed.service';
-import {
-  CourseSeedService,
-  UniversitySeedService,
-  UserSeedService,
-  UniRolesSeedService,
-  ModuleSeedService,
-} from './services';
+
+//SErvices
+import { UniversitySeedService } from './services/university.seed.service';
+import { UserSeedService } from './services/users.seed.service';
+import { UniRolesSeedService } from './services/universityRoles.seed.service';
+import { CourseSeedService } from './services/courses.seed.service';
+import { ModuleSeedService } from './services/modules.seed.service';
 
 @Module({
   imports: [forwardRef(() => DatabaseModule), ConfigModule],

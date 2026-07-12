@@ -7,7 +7,11 @@ import { DatabaseService } from '../database.service';
 import { usersTable, accountsTable } from '../../entities/index';
 
 //Seed Services
-import * as SeedService from './services';
+import { UniversitySeedService } from './services/university.seed.service';
+import { UserSeedService } from './services/users.seed.service';
+import { UniRolesSeedService } from './services/universityRoles.seed.service';
+import { CourseSeedService } from './services/courses.seed.service';
+import { ModuleSeedService } from './services/modules.seed.service';
 
 interface SeedTask {
   name: string;
@@ -22,11 +26,11 @@ export class DatabaseSeedService {
   constructor(
     private readonly dbService: DatabaseService,
     private readonly configService: ConfigService,
-    private readonly uniSeedService: SeedService.UniversitySeedService,
-    private readonly userSeedService: SeedService.UserSeedService,
-    private readonly uniRoleSeedService: SeedService.UniRolesSeedService,
-    private readonly courseSeedService: SeedService.CourseSeedService,
-    private readonly moduleSeedService: SeedService.ModuleSeedService,
+    private readonly uniSeedService: UniversitySeedService,
+    private readonly userSeedService: UserSeedService,
+    private readonly uniRoleSeedService: UniRolesSeedService,
+    private readonly courseSeedService: CourseSeedService,
+    private readonly moduleSeedService: ModuleSeedService,
   ) {
     const allSeedTasks: SeedTask[] = [
       {

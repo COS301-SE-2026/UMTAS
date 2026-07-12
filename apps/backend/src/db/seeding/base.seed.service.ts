@@ -1,10 +1,13 @@
 //This will be the base ABSTRACT class from which all seeding services will inherit and implement
 import { Injectable, Logger } from '@nestjs/common';
 import { DatabaseService } from '../database.service';
-import { inArray, Table } from 'drizzle-orm';
+import { inArray } from 'drizzle-orm';
 
 //Constants
 import * as CONSTANTS from './Constants';
+import { ConfigService } from '@nestjs/config';
+import { PgColumn } from 'drizzle-orm/pg-core';
+import { PgTable } from 'drizzle-orm/pg-core';
 
 /**COlors to be used for logging cause I'm not allowed emojis :( */
 const Colors = {
@@ -21,7 +24,7 @@ export abstract class BaseSeedService {
   protected readonly logger = new Logger(this.constructor.name);
   protected readonly constants = CONSTANTS;
 
-  constructor() {}
+  constructor(protected readonly configService: ConfigService) {}
 
   /**
    * Seed method that each seeding class will implement
@@ -40,7 +43,7 @@ export abstract class BaseSeedService {
    *
    * @param tx - the transaction is passed to ensure no databaseService calls are made outside the transaction
    * @param table - Drizzles Table type - The table to look in
-   * @param field - Column name to look at in table
+   * @param column - Column from actual table to look at
    * @param values - Array of values to test existance typed from TValue
    *
    * @returns Promise a set of values that exists in the table typed as Set<TValue>
@@ -49,22 +52,18 @@ export abstract class BaseSeedService {
    * const existing = await this.exists(modules, 'moduleID', ['id1', 'id2', ...]);
    * ```
    */
-  protected async exists<
-    TValue extends string | number, //Add any type that might be required, actually only string is useful
-  >(
+  protected async exists<TColumn extends PgColumn>(
     tx: DatabaseService['db'],
-    table: Table,
-    field: keyof Table['_']['columns'],
-    values: TValue[],
-  ): Promise<Set<TValue>> {
-    const col = Table[field];
-
+    table: PgTable,
+    column: TColumn,
+    values: TColumn['_']['data'][],
+  ): Promise<Set<TColumn['_']['data']>> {
     const existing = await tx
-      .select({ val: col })
+      .select({ val: column })
       .from(table)
-      .where(inArray(col, values));
+      .where(inArray(column, values));
 
-    return new Set<TValue>(existing.map((e: { val: TValue }) => e.val));
+    return new Set(existing.map((e) => e.val));
   } //END_existing
 
   /**Helper for logging in seeding tasks

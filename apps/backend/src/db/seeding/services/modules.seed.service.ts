@@ -67,55 +67,56 @@ export class ModuleSeedService extends BaseSeedService {
         return;
       } //END_!course.GroupID
 
-      let newModules: (typeof modules.$inferSelect)[] = [];
-      await tx.transaction(async (t) => {
-        //Create new modules
-        newModules = await t
-          .insert(modules)
+      const groupId = course.GroupID;
+
+      //Create new modules
+      const newModules = await tx
+        .insert(modules)
+        .values(
+          missingModules.map((mod) => ({
+            moduleCode: mod.Code,
+            moduleName: mod.Name,
+            moduleDescription: mod.Description,
+          })),
+        )
+        .returning();
+
+      if (newModules.length > 0) {
+        //Populate CompSci's group with modules
+        const groupModules = await tx
+          .insert(GroupModules)
           .values(
-            missingModules.map((mod) => ({
-              moduleCode: mod.Code,
-              moduleName: mod.Name,
-              moduleDescription: mod.Description,
+            newModules.map((mod) => ({
+              GroupID: groupId,
+              ModuleID: mod.moduleID,
             })),
           )
           .returning();
 
-        if (newModules.length > 0) {
-          //Populate CompSci's group with modules
-          const groupModules: (typeof GroupModules.$inferInsert)[] = await t
-            .insert(GroupModules)
-            .values(
-              newModules.map((mod) => ({
-                GroupID: course.GroupID,
-                ModuleID: mod.moduleID,
-              })),
-            )
-            .returning();
+        this.logResult('GroupModules', groupModules?.length ?? 0);
 
-          this.logResult('GroupModules', groupModules?.length ?? 0);
+        //Add courseModule metadata for each
+        const courseModules = await tx
+          .insert(CourseModule)
+          .values(
+            groupModules.map((gm, index) => ({
+              CourseID: course.CourseID,
+              GroupModuleID: gm.GroupModuleID,
+              Core: missingModules[index].Core,
+              SemesterOfStudy: missingModules[index].SemesterOfStudy,
+              YearOfStudy: missingModules[index].YearOfStudy,
+            })),
+          )
+          .returning();
 
-          //Add courseModule metadata for each
-          const courseModules: (typeof CourseModule.$inferInsert)[] = await t
-            .insert(CourseModule)
-            .values(
-              groupModules.map((gm, index) => ({
-                CourseID: course.CourseID,
-                GroupModuleID: gm.GroupModuleID,
-                Core: missingModules[index].Core,
-                SemesterOfStudy: missingModules[index].SemesterOfStudy,
-                YearOfStudy: missingModules[index].YearOfStudy,
-              })),
-            )
-            .returning();
+        this.logResult('CourseModules', courseModules?.length ?? 0);
+      } else {
+        this.logger.warn(
+          `Seed modules for [${courseName}] failed to insert newModules`,
+        );
+      } //END_if-else
 
-          this.logResult('CourseModules', courseModules?.length ?? 0);
-        } else {
-          this.logger.warn(
-            `Seed modules for [${courseName}] failed to insert newModules`,
-          );
-        } //END_if-else
-      }); //END_transaction
+      this.logResult('Modules', newModules.length);
 
       //Create syling enities for the new modules
       await this.generateRandomStylingForModules(
