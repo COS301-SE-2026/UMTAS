@@ -1,0 +1,36 @@
+apps/backend/src/db/seeding/database-seed.service.ts
+  h_84e82529bd05a5 1-164
+apps/backend/src/db/seeding/services/index.ts
+  h_84e82529bd05a5 1-5
+apps/backend/src/db/database-init.service.ts
+  h_84e82529bd05a5 2,5,10,22,57-58
+apps/backend/src/db/seeding/services/university.seed.service.ts
+  h_84e82529bd05a5 1-56
+apps/backend/src/db/seeding/services/universityRoles.seed.service.ts
+  h_84e82529bd05a5 1-58,60-70
+apps/backend/src/db/seeding/seed.module.ts
+  h_84e82529bd05a5 1-21
+apps/backend/src/db/database.module.ts
+  h_84e82529bd05a5 1,4,8
+apps/backend/src/db/seeding/services/courses.seed.service.ts
+  h_84e82529bd05a5 1-77
+apps/backend/test/e2e/auth.e2e-spec.ts
+  h_84e82529bd05a5 8
+apps/backend/src/db/seeding/base.seed.service.ts
+  h_84e82529bd05a5 1-85
+apps/backend/src/db/seeding/services/users.seed.service.ts
+  h_84e82529bd05a5 1-25,27-77
+apps/backend/src/db/seeding/services/modules.seed.service.ts
+  h_84e82529bd05a5 1-9,16,18,21-28,30,33,47-48,50,53,58,65,71,86,96-97,99-110,112,115,122,128,133-134,140,145-148,152,155,181
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "7a99fe19c41f2ac0d08a18b0f6a898c8dceb1f51",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}
