@@ -4,6 +4,7 @@ import { BrandIdentity } from "@/components/organisms/brand-style/BrandIdentity"
 import { ColourSystem } from "@/components/organisms/brand-style/ColourSystem";
 import { ComponentSection } from "@/components/molecules/brand-style/ComponentsSection";
 import { TypographySection } from "@/components/organisms/brand-style/TypographySection";
+import { SpacingSection } from "@/components/organisms/brand-style/SpacingSection";
 import {
   Sparkle,
   Aperture,
@@ -24,55 +25,68 @@ export default function BrandStyleShell() {
     <div className="mx-auto w-full px-6 py-8">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-12 relative">
         <div className="md:col-span-1 md:border-r border-border pr-10">
-          <div className="flex flex-col gap-2 items-end text-[var(--text-secondary)] sticky top-31">
-            <a className="brand-nav-link" href="#identity">
-              <span>Brand Identity</span>
-              <Sparkle size={14} />
-            </a>
-            <a className="brand-nav-link" href="#colour">
-              <span>Colour System</span>
-              <Aperture size={14} />
-            </a>
-            <a className="brand-nav-link" href="#typography">
-              <span>Typography</span>
-              <TypeIcon size={14} />
-            </a>
-            <a className="brand-nav-link" href="#border">
-              <span>Border Radius</span>
-              <CornerDownRight size={14} />
-            </a>
-            <a className="brand-nav-link" href="#spacing">
-              <span>Spacing & Density</span>
-              <Ruler size={14} />
-            </a>
-            <a className="brand-nav-link" href="#shadows">
-              <span>Shadow & Elevation</span>
-              <Layers size={14} />
-            </a>
-            <a className="brand-nav-link" href="#motion">
-              <span>Motion Tokens</span>
-              <Zap size={14} />
-            </a>
-            <a className="brand-nav-link" href="#icons">
-              <span>Icons</span>
-              <Component size={14} />
-            </a>
-            <a className="brand-nav-link" href="#components">
-              <span>Components</span>
-              <Box size={14} />
-            </a>
-            <a className="brand-nav-link" href="#mode">
-              <span>Mode switching</span>
-              <Moon size={14} />
-            </a>
-            <a className="brand-nav-link" href="#accessibility">
-              <span>Accessibility</span>
-              <Eye size={14} />
-            </a>
-            <a className="brand-nav-link" href="#breakpoints">
-              <span>Responsiveness</span>
-              <Globe size={14} />
-            </a>
+          <div className="flex flex-col items-end sticky top-31">
+            <div className="flex flex-col gap-2 items-start text-[var(--text-secondary)]">
+              <a className="brand-nav-link" href="#identity">
+                <Sparkle size={14} />
+                <span>Brand Identity</span>
+              </a>
+
+              <a className="brand-nav-link" href="#colour">
+                <Aperture size={14} />
+                <span>Colour System</span>
+              </a>
+
+              <a className="brand-nav-link" href="#typography">
+                <TypeIcon size={14} />
+                <span>Typography</span>
+              </a>
+
+              <a className="brand-nav-link" href="#border">
+                <CornerDownRight size={14} />
+                <span>Border Radius</span>
+              </a>
+
+              <a className="brand-nav-link" href="#spacing">
+                <Ruler size={14} />
+                <span>Spacing & Density</span>
+              </a>
+
+              <a className="brand-nav-link" href="#shadows">
+                <Layers size={14} />
+                <span>Shadow & Elevation</span>
+              </a>
+
+              <a className="brand-nav-link" href="#motion">
+                <Zap size={14} />
+                <span>Motion Tokens</span>
+              </a>
+
+              <a className="brand-nav-link" href="#icons">
+                <Component size={14} />
+                <span>Icons</span>
+              </a>
+
+              <a className="brand-nav-link" href="#components">
+                <Box size={14} />
+                <span>Components</span>
+              </a>
+
+              <a className="brand-nav-link" href="#mode">
+                <Moon size={14} />
+                <span>Mode switching</span>
+              </a>
+
+              <a className="brand-nav-link" href="#accessibility">
+                <Eye size={14} />
+                <span>Accessibility</span>
+              </a>
+
+              <a className="brand-nav-link" href="#breakpoints">
+                <Globe size={14} />
+                <span>Responsiveness</span>
+              </a>
+            </div>
           </div>
         </div>
 
@@ -90,7 +104,7 @@ export default function BrandStyleShell() {
             <h1>Border Radius</h1>
           </section>
           <section id="spacing">
-            <h1>Spacing & Density</h1>
+            <SpacingSection />
           </section>
           <section id="shadows">
             <h1>Shadow & Elevation</h1>
