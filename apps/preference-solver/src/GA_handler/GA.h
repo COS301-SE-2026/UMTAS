@@ -10,6 +10,7 @@ class GA_Handler {
 private:
   API_DATA initData;
   GA_type gaEngine;
+  bool optimize;
 
   void InitGA();
   void InitMap();
@@ -17,12 +18,14 @@ private:
   void InitMutationMap();
 
 public:
-  GA_Handler(API_DATA);
+  GA_Handler(API_DATA, bool optimize = true);
   // a global unordered map will be placed for each module and occurences
   EventChromosome findSolution();
 };
 
 void init_genes(EventChromosome &p, const std::function<double(void)> &rnd01);
+void init_genes_randomized(EventChromosome &p,
+                           const std::function<double(void)> &rnd01);
 bool eval_solution(const EventChromosome &p, ChromMiddleCost &c);
 
 EventChromosome mutate(const EventChromosome &p,
@@ -33,6 +36,8 @@ EventChromosome crossover(const EventChromosome &X1, const EventChromosome &X2,
                           const std::function<double(void)> &rnd01);
 
 double calculate_SO_total_fitness(
+    const EA::ChromosomeType<EventChromosome, ChromMiddleCost> &c);
+double calculate_conflict_total_fitness(
     const EA::ChromosomeType<EventChromosome, ChromMiddleCost> &c);
 
 void SO_report_generation(
@@ -53,4 +58,3 @@ std::vector<string> slotEval(int timeStart, int timeEnd);
 struct eventsOccurring {
   std::vector<int> indices;
 };
-

@@ -16,12 +16,14 @@ std::string requirementKey(const EventGA &event) {
 
 }  // namespace
 
-CP_SOLVER::CP_SOLVER(const API_DATA &data) : inputData(data) {
+CP_SOLVER::CP_SOLVER(const API_DATA &data, bool optimize) : inputData(data) {
   selectedEvents.reserve(inputData.events.size());
   for (size_t index = 0; index < inputData.events.size(); ++index) {
     selectedEvents.push_back(model.NewBoolVar());
   }
-  createRules();
+  selectionRules();
+  overlapRules();
+  if (optimize) objectiveRule();
 }
 
 void CP_SOLVER::createRules() {

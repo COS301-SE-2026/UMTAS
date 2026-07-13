@@ -16,6 +16,6 @@ class CP_SOLVER {
   void objectiveRule();
 
  public:
-  explicit CP_SOLVER(const API_DATA &data);
+  explicit CP_SOLVER(const API_DATA &data, bool optimize = true);
   EventChromosome solve();
 };

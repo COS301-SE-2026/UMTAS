@@ -1,4 +1,5 @@
 #include "GA.h"
+#include <algorithm>
 #include <cmath>
 #include <iostream>
 #include <ostream>
@@ -19,7 +20,30 @@ string requirementKey(const EventGA &event) {
 }
 
 EventChromosome copyChrom;
-GA_Handler::GA_Handler(API_DATA data) {
+
+namespace {
+bool eventsOverlap(const EventGA &left, const EventGA &right) {
+  return left.dayOfWeek == right.dayOfWeek &&
+         left.event_start < right.event_end &&
+         right.event_start < left.event_end;
+}
+
+int countConflicts(const EventChromosome &candidate) {
+  int conflicts = 0;
+  for (size_t left = 0; left < candidate.events.size(); ++left) {
+    if (!candidate.events[left].is_active) continue;
+    for (size_t right = left + 1; right < candidate.events.size(); ++right) {
+      if (candidate.events[right].is_active &&
+          eventsOverlap(candidate.events[left], candidate.events[right])) {
+        ++conflicts;
+      }
+    }
+  }
+  return conflicts;
+}
+} // namespace
+
+GA_Handler::GA_Handler(API_DATA data, bool optimize) : optimize(optimize) {
   this->initData = data;
   RequiredEvents = 0;
   modulesMap.clear();
@@ -61,11 +85,12 @@ void GA_Handler::InitMap() {
 void GA_Handler::InitGA() {
 
   // init functions
-  gaEngine.init_genes = init_genes;
+  gaEngine.init_genes = optimize ? init_genes : init_genes_randomized;
   gaEngine.eval_solution = eval_solution;
   gaEngine.mutate = mutate;
   gaEngine.crossover = crossover;
-  gaEngine.calculate_SO_total_fitness = calculate_SO_total_fitness;
+  gaEngine.calculate_SO_total_fitness =
+      optimize ? calculate_SO_total_fitness : calculate_conflict_total_fitness;
   gaEngine.SO_report_generation = SO_report_generation;
   // init functions
 
@@ -98,6 +123,33 @@ void init_genes(EventChromosome &p, const std::function<double(void)> &rnd01) {
     }
   }
   resetTemp();
+}
+
+void init_genes_randomized(EventChromosome &p,
+                           const std::function<double(void)> &rnd01) {
+  p = copyChrom;
+  for (EventGA &event : p.events) event.is_active = false;
+  p.numActive = 0;
+  p.numCollision = 0;
+
+  for (const auto &[key, group] : mutationMap) {
+    const auto requirement = modulesMap.find(key);
+    if (requirement == modulesMap.end()) continue;
+
+    std::vector<int> indices = group.indices;
+    for (size_t remaining = indices.size(); remaining > 1; --remaining) {
+      const size_t selected =
+          static_cast<size_t>(rnd01() * remaining) % remaining;
+      std::swap(indices[selected], indices[remaining - 1]);
+    }
+
+    const size_t selectionCount = std::min(
+        indices.size(), static_cast<size_t>(requirement->second));
+    for (size_t index = 0; index < selectionCount; ++index) {
+      p.events[indices[index]].is_active = true;
+      ++p.numActive;
+    }
+  }
 }
 
 EventChromosome mutate(const EventChromosome &p,
@@ -230,6 +282,12 @@ double calculate_SO_total_fitness(
 
   return Overlap_Heuristic(c.genes);
 }
+
+double calculate_conflict_total_fitness(
+    const EA::ChromosomeType<EventChromosome, ChromMiddleCost> &c) {
+  return countConflicts(c.genes);
+}
+
 double Overlap_Heuristic(EventChromosome eventChrom) {
 
   int numberOfPts = 0;
@@ -257,8 +315,9 @@ double Overlap_Heuristic(EventChromosome eventChrom) {
   resetCollision();
   if (numberOfPts == 0) return 0.0;
   double MAD = (1 / (double)numberOfPts) * sum;
-  int collCount = eventChrom.numCollision + 1;
-  return MAD * collCount;
+  // Conflicts dominate soft time preferences, while preference distance still
+  // ranks equally conflict-free (or equally best-effort) timetables.
+  return MAD + (eventChrom.numCollision * 10000.0);
 }
 
 std::vector<string> slotEval(int timeStart, int timeEnd) {
@@ -334,4 +393,3 @@ void SO_report_generation(
   resetCollision();
   std::cout << "Number of collisions " << numCollision << std::endl;
 }
-

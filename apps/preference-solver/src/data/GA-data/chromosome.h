@@ -11,11 +11,10 @@ struct EventChromosome {
   EventChromosome() {};
   EventChromosome(API_DATA &data);
   bool hasValidSelectionPattern() const;
-  json returnJson();
+  json returnJson(const std::string &solveMode = "optimization");
 };
 struct ChromMiddleCost {
   double penalty_score = 0;
   ChromMiddleCost() {};
 };
 #pragma once
-

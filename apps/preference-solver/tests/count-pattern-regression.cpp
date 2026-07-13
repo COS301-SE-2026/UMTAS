@@ -94,5 +94,15 @@ int main() {
   }
   assert(activeEvents == 2);
   assert(mutated.hasValidSelectionPattern());
-}
 
+  EA::ChromosomeType<EventChromosome, ChromMiddleCost> earlySelection;
+  earlySelection.genes = EventChromosome(mutationData);
+  earlySelection.genes.events[0].is_active = true;
+  earlySelection.genes.events[1].is_active = true;
+  EA::ChromosomeType<EventChromosome, ChromMiddleCost> lateSelection;
+  lateSelection.genes = EventChromosome(mutationData);
+  lateSelection.genes.events[1].is_active = true;
+  lateSelection.genes.events[2].is_active = true;
+  assert(calculate_conflict_total_fitness(earlySelection) == 0.0);
+  assert(calculate_conflict_total_fitness(lateSelection) == 0.0);
+}
