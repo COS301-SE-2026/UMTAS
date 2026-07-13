@@ -5,7 +5,6 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { isString } from 'lodash';
 import type { IncomingHttpHeaders } from 'node:http';
 
 const BEARER_AUTH_SCHEME = 'Bearer';
@@ -13,7 +12,7 @@ const BEARER_AUTH_SCHEME = 'Bearer';
 export function extractBearerToken(
   authorization: IncomingHttpHeaders['authorization'],
 ): string | null {
-  if (!isString(authorization)) {
+  if (typeof authorization !== 'string') {
     return null;
   }
 

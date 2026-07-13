@@ -11,7 +11,7 @@ import {
   Course,
   ModuleGrouping,
 } from '../entities/index';
-// import { AuthSeed } from './seeds/auth.seed';
+import { AuthSeed } from './seeds/auth.seed';
 import {
   UniversityNames,
   UserNames,
@@ -41,6 +41,10 @@ export class DatabaseSeedService {
       {
         name: 'default-system-admin',
         run: () => this.seedDefaultSystemAdmin(),
+      },
+      {
+        name: 'auth-seed',
+        run: () => new AuthSeed().run(this.dbService),
       },
       {
         //Universities
@@ -87,11 +91,7 @@ export class DatabaseSeedService {
       );
     }
 
-    if (selectedTasks.length > 0) {
-      console.log('Michael i disabled this since not all seeds ran ');
-    }
-
-    this.seedTasks = allSeedTasks;
+    this.seedTasks = selectedTasks;
   }
 
   async seed(): Promise<void> {

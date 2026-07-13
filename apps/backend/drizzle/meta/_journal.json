@@ -50,6 +50,13 @@
       "when": 1783889118937,
       "tag": "0006_activity_terminology",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1783925502282,
+      "tag": "0007_abnormal_umar",
+      "breakpoints": true
     }
   ]
 }
