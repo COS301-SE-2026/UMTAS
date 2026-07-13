@@ -136,17 +136,12 @@ export type SolverPreferences = z.infer<typeof SolverPreferencesSchema>;
 
 export const TimetableSolveJobDataSchema = z.strictObject({
   jobId: z.string().trim().min(1),
-  solverProfileKey: z.string().trim().min(1),
+  attemptToken: z.uuid(),
   solveMode: z.enum(["feasibility", "optimization"]),
   engine: SolverEngineSchema.default("auto"),
 });
 
-export interface TimetableSolveJobData {
-  jobId: string;
-  solverProfileKey: string;
-  solveMode: "feasibility" | "optimization";
-  engine?: SolverEngine;
-}
+export type TimetableSolveJobData = z.infer<typeof TimetableSolveJobDataSchema>;
 
 /**
  * The backend owns the problem model. Heuristics are soft ranking inputs and
@@ -210,12 +205,44 @@ export const SolverHeuristicScoreSchema = z.strictObject({
 
 export type SolverHeuristicScore = z.infer<typeof SolverHeuristicScoreSchema>;
 
-export const SolverResultSchema = z.strictObject({
-  engine: z.enum(["cp-sat", "ga"]),
-  timetableSolution: TimetableSolutionSchema,
-  heuristicScores: z.array(SolverHeuristicScoreSchema).default([]),
-  metadata: JsonRecordSchema.default({}),
+export const SolverConflictSchema = z.strictObject({
+  eventIds: z.tuple([z.string().trim().min(1), z.string().trim().min(1)]),
 });
+
+export const SolverResultMetadataSchema = z
+  .object({
+    conflictCount: z.number().int().nonnegative(),
+    conflicts: z.array(SolverConflictSchema),
+    solveMode: z.enum(["feasibility", "optimization"]),
+  })
+  .catchall(z.unknown());
+
+export const SolverResultSchema = z
+  .strictObject({
+    engine: z.enum(["cp-sat", "ga"]),
+    outcome: z.enum(["conflict-free", "best-effort"]),
+    timetableSolution: TimetableSolutionSchema,
+    heuristicScores: z.array(SolverHeuristicScoreSchema).default([]),
+    metadata: SolverResultMetadataSchema,
+  })
+  .superRefine((result, context) => {
+    if (result.metadata.conflictCount !== result.metadata.conflicts.length) {
+      context.addIssue({
+        code: "custom",
+        path: ["metadata", "conflictCount"],
+        message: "conflictCount must equal the number of conflicts.",
+      });
+    }
+    const expectedOutcome =
+      result.metadata.conflictCount === 0 ? "conflict-free" : "best-effort";
+    if (result.outcome !== expectedOutcome) {
+      context.addIssue({
+        code: "custom",
+        path: ["outcome"],
+        message: `outcome must be ${expectedOutcome} for this conflict count.`,
+      });
+    }
+  });
 
 export type SolverResult = z.infer<typeof SolverResultSchema>;
 

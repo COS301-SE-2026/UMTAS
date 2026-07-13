@@ -1268,8 +1268,14 @@
       "columns": {
         "JobID": {
           "name": "JobID",
-          "type": "varchar(255)",
+          "type": "uuid",
           "primaryKey": true,
+          "notNull": true
+        },
+        "UserID": {
+          "name": "UserID",
+          "type": "uuid",
+          "primaryKey": false,
           "notNull": true
         },
         "SolverProfileKey": {
@@ -1289,6 +1295,24 @@
           "type": "varchar(32)",
           "primaryKey": false,
           "notNull": false
+        },
+        "DeduplicationKey": {
+          "name": "DeduplicationKey",
+          "type": "varchar(90)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "AttemptToken": {
+          "name": "AttemptToken",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Input": {
+          "name": "Input",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
         },
         "Status": {
           "name": "Status",
@@ -1335,6 +1359,12 @@
           "notNull": true,
           "default": "now()"
         },
+        "EnqueuedAt": {
+          "name": "EnqueuedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
         "CompletedAt": {
           "name": "CompletedAt",
           "type": "timestamp with time zone",
@@ -1378,9 +1408,40 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
+        },
+        "solver_job_duplicate_unique": {
+          "name": "solver_job_duplicate_unique",
+          "columns": [
+            {
+              "expression": "UserID",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "DeduplicationKey",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
         }
       },
-      "foreignKeys": {},
+      "foreignKeys": {
+        "SOLVER_JOB_UserID_user_id_fk": {
+          "name": "SOLVER_JOB_UserID_user_id_fk",
+          "tableFrom": "SOLVER_JOB",
+          "tableTo": "user",
+          "columnsFrom": ["UserID"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},

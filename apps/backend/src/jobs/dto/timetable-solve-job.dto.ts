@@ -1,12 +1,23 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsIn, IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import type { TimetableSolveJobData } from 'shared-types';
+import {
+  IsIn,
+  IsNotEmpty,
+  IsObject,
+  IsOptional,
+  IsString,
+} from 'class-validator';
+import type { SolverPreferences } from 'shared-types';
 
-export class TimetableSolveJobDto implements TimetableSolveJobData {
-  @ApiProperty({ example: 'solve-job-123' })
+export class TimetableSolveJobDto {
+  @ApiProperty({
+    example: 'legacy-client-id',
+    required: false,
+    deprecated: true,
+  })
+  @IsOptional()
   @IsString()
   @IsNotEmpty()
-  jobId!: string;
+  jobId?: string;
 
   @ApiProperty({ example: 'default' })
   @IsString()
@@ -25,4 +36,9 @@ export class TimetableSolveJobDto implements TimetableSolveJobData {
   @IsOptional()
   @IsIn(['auto', 'cp-sat', 'ga'])
   engine?: 'auto' | 'cp-sat' | 'ga';
+
+  @ApiProperty({ required: false, example: { heuristics: [] } })
+  @IsOptional()
+  @IsObject()
+  preferences?: SolverPreferences;
 }

@@ -9,6 +9,7 @@ import {
   type ActivityType,
   type DayOfWeek,
   type SolverInput,
+  type SolverPreferences,
 } from 'shared-types';
 import { DatabaseService } from '../db/database.service';
 import type { UniversityEventCriteria } from '../Events/dto/event.types';
@@ -36,7 +37,14 @@ export class SolverInputBuilderService {
       throw new NotFoundException(`Solver job not found: ${jobId}`);
     }
 
-    const rows = await this.loadProfileEvents(job.solverProfileKey);
+    return job.input;
+  }
+
+  async buildForProfile(
+    solverProfileKey: string,
+    preferences: SolverPreferences = { heuristics: [] },
+  ): Promise<SolverInput> {
+    const rows = await this.loadProfileEvents(solverProfileKey);
     const eventsById = new Map<string, SolverEventInput>();
 
     for (const row of rows) {
@@ -67,11 +75,11 @@ export class SolverInputBuilderService {
 
     const result = SolverInputSchema.safeParse({
       schedulingProblem: { events: [...eventsById.values()] },
-      preferences: { heuristics: [] },
+      preferences,
     });
     if (!result.success) {
       throw new ConflictException({
-        message: `Solver profile contains invalid scheduling data: ${job.solverProfileKey}`,
+        message: `Solver profile contains invalid scheduling data: ${solverProfileKey}`,
         issues: result.error.issues,
       });
     }

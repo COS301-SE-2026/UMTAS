@@ -28,7 +28,7 @@ import {
 } from './dto/EventDto.dto';
 
 import { AppDatabase } from '../db/database.service';
-import { ModuleService } from '../Module/module.service';
+import type { ModuleService } from '../Module/module.service';
 import { EventImportFingerprintService } from './event-import-fingerprint.service';
 import { EventCriteria } from './dto/event.types';
 
@@ -233,26 +233,22 @@ export class EventService {
     //-> Create PersonalEvent join table entity
     //Currently no venue
 
-    //Create Event
-    const event = await this.createEvent(dto, userId);
+    return this.dbService.db.transaction(async (tx) => {
+      const venueIds = await this.validateVenueIds(tx, dto.venues);
+      const event = await this.createEvent(tx, dto, userId);
+      const [persEvent] = await tx
+        .insert(PersonalEvent)
+        .values({ UserID: userId, eventID: event.eventID })
+        .returning();
 
-    await this.replaceEventVenues(event.eventId, dto.venues);
+      if (!persEvent)
+        throw new InternalServerErrorException(
+          `Failed to create personalEvent relationship for User[${userId}] | Event[${event.eventID}]`,
+        );
 
-    //Create PersonalEvent table entry
-    const [persEvent] = await this.dbService.db
-      .insert(PersonalEvent)
-      .values({
-        UserID: userId,
-        eventID: event.eventId,
-      })
-      .returning();
-
-    if (!persEvent)
-      throw new InternalServerErrorException(
-        `Failed to create personalEvent relationship for User[${userId}] | Event[${event.eventId}]`,
-      );
-
-    return event;
+      await this.insertEventVenues(tx, event.eventID, venueIds);
+      return this.mapEventToDto(event, tx);
+    });
   } //END_createPersonalEvent
 
   //Create University Owned Event helper
@@ -265,32 +261,30 @@ export class EventService {
     //-> Create UniversityEvent JOin table entity
     //-> If venue present -> Create venue entity and link through EventVenue
 
-    const event = await this.createEvent(dto);
+    return this.dbService.db.transaction(async (tx) => {
+      const venueIds = await this.validateVenueIds(tx, dto.venues);
+      const event = await this.createEvent(tx, dto);
+      const [uniEvent] = await tx
+        .insert(UniversityEvent)
+        .values({ moduleID: moduleId, eventID: event.eventID })
+        .returning();
 
-    await this.replaceEventVenues(event.eventId, dto.venues);
+      if (!uniEvent)
+        throw new InternalServerErrorException(
+          `Failed to create University event for module[${moduleId}] | event[${event.eventID}]`,
+        );
 
-    //-> Create UniversityEvent JOin table entity
-    const [uniEvent] = await this.dbService.db
-      .insert(UniversityEvent)
-      .values({
-        moduleID: moduleId,
-        eventID: event.eventId,
-      })
-      .returning();
-
-    if (!uniEvent)
-      throw new InternalServerErrorException(
-        `Failed to create University event for module[${moduleId}] | event[${event.eventId}]`,
-      );
-
-    return event;
+      await this.insertEventVenues(tx, event.eventID, venueIds);
+      return this.mapEventToDto(event, tx);
+    });
   } //END_createUniversityEvent
 
   //Create simple event entity
   private async createEvent(
+    db: AppDatabase,
     dto: CreateEventDto,
     userId?: string,
-  ): Promise<EventDto> {
+  ): Promise<typeof Event.$inferSelect> {
     //Define fields
     const eventCriteria = dto.eventCriteria;
 
@@ -314,7 +308,7 @@ export class EventService {
 
     this.assertTimingMatchesRecurrence(eventCriteria, isRec);
 
-    const [event] = await this.dbService.db
+    const [event] = await db
       .insert(Event)
       .values({
         eventName: eventName,
@@ -336,7 +330,7 @@ export class EventService {
         `Failed to create event Name[${eventName}] | Code[${activityCode}]`,
       );
 
-    return this.mapEventToDto(event);
+    return event;
   } //END_createEvent
 
   //Get event for module
@@ -393,8 +387,9 @@ export class EventService {
   //Map an event to the DTO - idk why this is even necessary but I kept getting type errors when returning an event which is literally fetched straight from the database
   private async mapEventToDto(
     event: typeof Event.$inferSelect,
+    db: AppDatabase = this.dbService.db,
   ): Promise<EventDto> {
-    const venues = await this.getEventVenues(event.eventID);
+    const venues = await this.getEventVenues(event.eventID, db);
     return {
       eventId: event.eventID,
       eventName: event.eventName,
@@ -407,8 +402,11 @@ export class EventService {
     };
   } //END_mapEventToDto
 
-  private async getEventVenues(eventId: string): Promise<EventDto['venues']> {
-    const rows = await this.dbService.db
+  private async getEventVenues(
+    eventId: string,
+    db: AppDatabase = this.dbService.db,
+  ): Promise<EventDto['venues']> {
+    const rows = await db
       .select({ venueId: Venue.VenueID, venueName: Venue.VenueName })
       .from(EventVenue)
       .innerJoin(Venue, eq(EventVenue.VenueID, Venue.VenueID))
@@ -423,14 +421,22 @@ export class EventService {
     eventId: string,
     venues: EventDto['venues'],
   ): Promise<void> {
-    if (venues === undefined) return;
+    const venueIds = await this.validateVenueIds(this.dbService.db, venues);
+    await this.insertEventVenues(this.dbService.db, eventId, venueIds);
+  }
+
+  private async validateVenueIds(
+    db: AppDatabase,
+    venues: EventDto['venues'],
+  ): Promise<string[]> {
+    if (venues === undefined) return [];
     const venueIds = [...new Set(venues.map(({ venueId }) => venueId))];
     if (venueIds.length !== venues.length) {
       throw new BadRequestException('Event venues must not contain duplicates');
     }
-    if (venueIds.length === 0) return;
+    if (venueIds.length === 0) return [];
 
-    const existing = await this.dbService.db
+    const existing = await db
       .select({ venueId: Venue.VenueID })
       .from(Venue)
       .where(inArray(Venue.VenueID, venueIds));
@@ -438,7 +444,16 @@ export class EventService {
       throw new BadRequestException('One or more venueIds do not exist');
     }
 
-    await this.dbService.db
+    return venueIds;
+  }
+
+  private async insertEventVenues(
+    db: AppDatabase,
+    eventId: string,
+    venueIds: string[],
+  ): Promise<void> {
+    if (venueIds.length === 0) return;
+    await db
       .insert(EventVenue)
       .values(
         venueIds.map((venueId) => ({ EventID: eventId, VenueID: venueId })),

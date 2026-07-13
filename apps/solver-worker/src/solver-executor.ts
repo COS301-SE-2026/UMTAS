@@ -16,15 +16,28 @@ import type {
   SolverRunOutcome,
 } from "./contracts.js";
 
-const JsonRecordSchema = z.record(z.string(), z.unknown());
 const SolverCliOutputSchema = z.discriminatedUnion("status", [
   z.strictObject({
     status: z.literal("feasible"),
+    outcome: z.enum(["conflict-free", "best-effort"]),
     timetableSolution: z.strictObject({
       selectedEventIds: z.array(z.string().trim().min(1)),
     }),
     heuristicScores: z.array(SolverHeuristicScoreSchema).default([]),
-    metadata: JsonRecordSchema.default({}),
+    metadata: z
+      .object({
+        conflictCount: z.number().int().nonnegative(),
+        conflicts: z.array(
+          z.strictObject({
+            eventIds: z.tuple([
+              z.string().trim().min(1),
+              z.string().trim().min(1),
+            ]),
+          }),
+        ),
+        solveMode: z.enum(["feasibility", "optimization"]),
+      })
+      .catchall(z.unknown()),
   }),
   z.strictObject({ status: z.literal("infeasible") }),
 ]);
@@ -40,7 +53,8 @@ export interface CliSolverExecutorOptions {
 }
 
 /**
- * CLI protocol: --input <JSON path> --output <JSON path> --engine <cp-sat|ga>.
+ * CLI protocol: --input <JSON path> --output <JSON path> --engine <cp-sat|ga>
+ * --solve-mode <feasibility|optimization>.
  * A feasible output contains a timetableSolution and optional heuristic scores; an
  * infeasible output is exactly { "status": "infeasible" }.
  */
@@ -113,6 +127,7 @@ export class CliSolverExecutor implements SolverExecutor {
     args.push("--input", request.inputPath);
     args.push("--output", request.outputPath);
     args.push("--engine", request.engine);
+    args.push("--solve-mode", request.solveMode);
     return args;
   }
 }
@@ -143,6 +158,7 @@ function toSolverResult(
 ): SolverResult {
   return SolverResultSchema.parse({
     engine,
+    outcome: output.outcome,
     timetableSolution: output.timetableSolution,
     heuristicScores: output.heuristicScores,
     metadata: output.metadata,

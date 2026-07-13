@@ -44,7 +44,13 @@ export class SolverProcessor implements WorkerProcessor<TimetableSolveJobData> {
     const outputPath = path.join(context.tempDir, "output.json");
     await this.writeInputFile(inputPath, JSON.stringify(input));
 
-    const result = await this.solve(inputPath, outputPath, context, job.engine);
+    const result = await this.solve(
+      inputPath,
+      outputPath,
+      context,
+      job.engine,
+      job.solveMode,
+    );
     return { status: "completed", result };
   }
 
@@ -53,17 +59,20 @@ export class SolverProcessor implements WorkerProcessor<TimetableSolveJobData> {
     outputPath: string,
     context: WorkerJobContext<TimetableSolveJobData>,
     requestedEngine: "auto" | "cp-sat" | "ga",
+    solveMode: "feasibility" | "optimization",
   ) {
     const firstEngine = requestedEngine === "ga" ? "ga" : "cp-sat";
     context.logger.info("Running timetable solver", {
       jobId: context.data.jobId,
       engine: firstEngine,
+      solveMode,
     });
 
     const firstResult = await this.solverExecutor.solve({
       inputPath,
       outputPath,
       engine: firstEngine,
+      solveMode,
       abortSignal: context.abortSignal,
     });
     if (firstResult.status === "feasible") return firstResult.result;
@@ -85,6 +94,7 @@ export class SolverProcessor implements WorkerProcessor<TimetableSolveJobData> {
       inputPath,
       outputPath,
       engine: "ga",
+      solveMode,
       abortSignal: context.abortSignal,
     });
     if (fallbackResult.status === "feasible") return fallbackResult.result;
@@ -102,6 +112,7 @@ export class SolverProcessor implements WorkerProcessor<TimetableSolveJobData> {
 function validateJobData(data: TimetableSolveJobData): {
   jobId: string;
   engine: "auto" | "cp-sat" | "ga";
+  solveMode: "feasibility" | "optimization";
 } {
   const result = TimetableSolveJobDataSchema.safeParse(data);
   if (!result.success) {
@@ -112,5 +123,9 @@ function validateJobData(data: TimetableSolveJobData): {
     );
   }
 
-  return { jobId: result.data.jobId, engine: result.data.engine };
+  return {
+    jobId: result.data.jobId,
+    engine: result.data.engine,
+    solveMode: result.data.solveMode,
+  };
 }

@@ -57,8 +57,12 @@ export function buildSolverInputUrl(baseUrl: string, jobId: string): string {
   return `${trimTrailingSlashes(baseUrl)}/${encodeURIComponent(jobId)}/input`;
 }
 
-export function buildSolverCallbackUrl(baseUrl: string, jobId: string): string {
-  return `${trimTrailingSlashes(baseUrl)}/${encodeURIComponent(jobId)}/callback`;
+export function buildSolverCallbackUrl(
+  baseUrl: string,
+  jobId: string,
+  attemptToken: string,
+): string {
+  return `${trimTrailingSlashes(baseUrl)}/${encodeURIComponent(jobId)}/callback?attemptToken=${encodeURIComponent(attemptToken)}`;
 }
 
 function readCliArgs(value: string | undefined): string[] {

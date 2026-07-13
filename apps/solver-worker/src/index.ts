@@ -33,7 +33,11 @@ const workerOptions: WorkerHostOptions<TimetableSolveJobData> = {
   timeoutMs: config.timeoutMs,
   keepFailedTemp: config.keepFailedTemp,
   callbackUrl: (job) =>
-    buildSolverCallbackUrl(config.callbackBaseUrl, job.data.jobId),
+    buildSolverCallbackUrl(
+      config.callbackBaseUrl,
+      job.data.jobId,
+      job.data.attemptToken,
+    ),
   callbackClient: new HttpCallbackClient({ token: config.callbackToken }),
   processor: new SolverProcessor({
     inputClient: new HttpSolverInputClient({

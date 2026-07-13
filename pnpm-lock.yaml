@@ -125,6 +125,9 @@ importers:
       drizzle-orm:
         specifier: ^0.45.2
         version: 0.45.2(@electric-sql/pglite@0.4.5)(@opentelemetry/api@1.9.1)(@types/pg@8.20.0)(kysely@0.28.17)(pg@8.21.0)(postgres@3.4.9)
+      fast-json-stable-stringify:
+        specifier: ^2.1.0
+        version: 2.1.0
       ioredis:
         specifier: ^5.10.1
         version: 5.10.1

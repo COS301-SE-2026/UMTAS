@@ -8,6 +8,7 @@ export interface SolveRequest {
   inputPath: string;
   outputPath: string;
   engine: Exclude<SolverEngine, "auto">;
+  solveMode: "feasibility" | "optimization";
   abortSignal: AbortSignal;
 }
 
