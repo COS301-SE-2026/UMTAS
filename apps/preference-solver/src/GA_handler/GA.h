@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../../lib/openGA.hpp"
 #include "../data/GA-data/chromosome.h"
 #include <vector>
@@ -49,14 +51,6 @@ string timeSlot(int time);
 std::vector<string> slotEval(int timeStart, int timeEnd);
 
 struct eventsOccurring {
-  string eventType;
-  string moduleCode;
   std::vector<int> indices;
-  eventsOccurring(){};
-  eventsOccurring(string type, string code)
-      : eventType(type), moduleCode(code) {}
 };
-// make a map of modulecode
-// on mutation -> pick current event -> if number of occurrences > 1
-// then we do another check we pick a random chromosome index that != current
-// and flip that.
+

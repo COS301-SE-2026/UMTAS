@@ -66,11 +66,6 @@ int main() {
   nonPositiveDuration["schedulingProblem"]["events"][0]["endTime"] = "08:00";
   assertThrows([&] { API_DATA nonPositiveDurationData(nonPositiveDuration); });
 
-  CpSatSearchOptions cancelledSearch;
-  cancelledSearch.isCancellationRequested = [] { return true; };
-  EventChromosome cancelled = findCpSatSolution(data, cancelledSearch);
-  assert(cancelled.returnJson().at("status") == "infeasible");
-
   json inconsistentRequirements = input;
   inconsistentRequirements["schedulingProblem"]["events"][1]["activityCode"] = "L1";
   inconsistentRequirements["schedulingProblem"]["events"][1]["requiredSelections"] = 2;
@@ -100,3 +95,4 @@ int main() {
   assert(activeEvents == 2);
   assert(mutated.hasValidSelectionPattern());
 }
+

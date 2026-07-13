@@ -14,16 +14,18 @@ std::unordered_map<string, int> tempMap;
 std::unordered_map<string, bool> collisionCheck;
 std::unordered_map<string, eventsOccurring> mutationMap;
 
-// makes a key of module:event -> occurences
-// also have a local structure that will do the same however its meant to be
-// overwritten
+string requirementKey(const EventGA &event) {
+  return event.moduleCode + ":" + event.activityCode;
+}
 
 EventChromosome copyChrom;
-EventChromosome solChrom;
-// this will be overwritten
-
 GA_Handler::GA_Handler(API_DATA data) {
   this->initData = data;
+  RequiredEvents = 0;
+  modulesMap.clear();
+  tempMap.clear();
+  collisionCheck.clear();
+  mutationMap.clear();
   copyChrom = EventChromosome(data);
   InitMap();
   InitOverlap();
@@ -43,7 +45,7 @@ void GA_Handler::InitOverlap() {
 }
 void GA_Handler::InitMap() {
   for (ModuleGA module : this->initData.modules) {
-    for (auto &itr : module.number_Occur) {
+    for (auto &itr : module.requiredSelections) {
 
       string key = module.moduleCode + ":" + itr.first;
       // key events can easily access
@@ -78,6 +80,7 @@ void GA_Handler::InitGA() {
 }
 
 EventChromosome GA_Handler::findSolution() {
+  if (copyChrom.events.empty()) return copyChrom;
   std::cout << "Starting GA" << std::endl;
   gaEngine.solve();
   int index = gaEngine.last_generation.best_chromosome_index;
@@ -87,7 +90,7 @@ EventChromosome GA_Handler::findSolution() {
 void init_genes(EventChromosome &p, const std::function<double(void)> &rnd01) {
   p = copyChrom;
   for (EventGA &event : p.events) {
-    string key = event.moduleCode + ":" + event.eventType;
+    string key = requirementKey(event);
     if (modulesMap[key] > tempMap[key]) {
       tempMap.find(key)->second++;
       event.is_active = true;
@@ -102,33 +105,29 @@ EventChromosome mutate(const EventChromosome &p,
                        double shrink_scale) {
   int size = p.events.size();
   EventChromosome nChrom = p;
-  while (true) {
-    int index = (int)(std::floor(rnd01() * 1000)) % size;
-    
+  if (size == 0) return nChrom;
+  const int index = (int)(std::floor(rnd01() * 1000)) % size;
+  const auto group = mutationMap.find(requirementKey(nChrom.events[index]));
+  if (group == mutationMap.end()) return nChrom;
 
-    string modCode = nChrom.events[index].moduleCode;
-    int mapSize = mutationMap.find(modCode)->second.indices.size();
-
-    if (mapSize > 1) {
-      int swapIndex = (int)(std::floor(rnd01() * 1000)) % mapSize;
-      nChrom.events[index].is_active = false;
-      swapIndex = mutationMap.find(modCode)->second.indices[swapIndex];
-      nChrom.events[swapIndex].is_active = true;
-      return nChrom;
-    }
+  std::vector<int> activeIndices;
+  std::vector<int> inactiveIndices;
+  for (const int eventIndex : group->second.indices) {
+    (nChrom.events[eventIndex].is_active ? activeIndices : inactiveIndices)
+        .push_back(eventIndex);
   }
+  if (activeIndices.empty() || inactiveIndices.empty()) return nChrom;
+
+  const auto choose = [&rnd01](const std::vector<int> &indices) {
+    return indices[static_cast<size_t>(rnd01() * indices.size()) % indices.size()];
+  };
+  nChrom.events[choose(activeIndices)].is_active = false;
+  nChrom.events[choose(inactiveIndices)].is_active = true;
+  return nChrom;
 }
 void GA_Handler::InitMutationMap() {
   for (int i = 0; i < copyChrom.events.size(); i++) {
-    if (mutationMap.find(copyChrom.events[i].moduleCode) != mutationMap.end()) {
-      mutationMap[copyChrom.events[i].moduleCode].indices.push_back(i);
-    } else {
-      mutationMap.insert({copyChrom.events[i].moduleCode,
-                          eventsOccurring(copyChrom.events[i].eventType,
-                                          copyChrom.events[i].moduleCode)});
-      mutationMap.find(copyChrom.events[i].moduleCode)
-          ->second.indices.push_back(i);
-    }
+    mutationMap[requirementKey(copyChrom.events[i])].indices.push_back(i);
   }
 }
 
@@ -164,6 +163,7 @@ EventChromosome crossover(const EventChromosome &X1, const EventChromosome &X2,
   child.numCollision = 0;
   child.numActive = isActive;
   child.targetTime = X1.targetTime;
+  child.requiredSelections = X1.requiredSelections;
   return child;
 }
 
@@ -186,7 +186,7 @@ bool CountPattern(EventChromosome chrom) {
   for (EventGA event : chrom.events) {
 
     if (event.is_active) {
-      string key = event.moduleCode + ":" + event.eventType;
+      string key = requirementKey(event);
 
       tempMap.find(key)->second++;
 
@@ -200,6 +200,7 @@ bool CountPattern(EventChromosome chrom) {
   for (auto itr : tempMap) {
 
     if (itr.second != modulesMap[itr.first]) {
+      resetTemp();
       return false;
     }
   }
@@ -241,18 +242,20 @@ double Overlap_Heuristic(EventChromosome eventChrom) {
       std::vector<string> slots = slotEval(event.event_start, event.event_end);
       for (string slot : slots) {
 
-        string eventKey = event.eventDay + ":" + slot;
-        if (collisionCheck.find(eventKey)->second) {
+        string eventKey = event.dayOfWeek + ":" + slot;
+        bool &hasCollision = collisionCheck[eventKey];
+        if (hasCollision) {
           eventChrom.numCollision++;
           break;
         } else {
-          collisionCheck.find(eventKey)->second = true;
+          hasCollision = true;
         }
       }
       sum += std::fabs(event.event_start - target);
     }
   }
   resetCollision();
+  if (numberOfPts == 0) return 0.0;
   double MAD = (1 / (double)numberOfPts) * sum;
   int collCount = eventChrom.numCollision + 1;
   return MAD * collCount;
@@ -313,15 +316,17 @@ void SO_report_generation(
       std::vector<string> slots = slotEval(event.event_start, event.event_end);
       for (string slot : slots) {
 
-        string eventKey = event.eventDay + ":" + slot;
-        if (collisionCheck.find(eventKey)->second) {
+        string eventKey = event.dayOfWeek + ":" + slot;
+        bool &hasCollision = collisionCheck[eventKey];
+        if (hasCollision) {
           numCollision++;
 
           std::cout << "event " << event.moduleCode << " Type "
-                    << event.eventType << " Collision" << std::endl;
+                    << event.activityType << " " << event.activityCode
+                    << " Collision" << std::endl;
           break;
         } else {
-          collisionCheck.find(eventKey)->second = true;
+          hasCollision = true;
         }
       }
     }
@@ -329,3 +334,4 @@ void SO_report_generation(
   resetCollision();
   std::cout << "Number of collisions " << numCollision << std::endl;
 }
+
