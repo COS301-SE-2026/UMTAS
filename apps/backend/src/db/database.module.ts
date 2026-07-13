@@ -1,11 +1,12 @@
-import { Global, Module } from '@nestjs/common';
+import { forwardRef, Global, Module } from '@nestjs/common';
 import { DatabaseInitService } from './database-init.service';
 import { DatabaseService } from './database.service';
-import { DatabaseSeedService } from './database-seed.service';
+import { SeedModule } from './seeding/seed.module';
 
 @Global()
 @Module({
-  providers: [DatabaseService, DatabaseInitService, DatabaseSeedService],
-  exports: [DatabaseService, DatabaseSeedService],
+  imports: [forwardRef(() => SeedModule)],
+  providers: [DatabaseService, DatabaseInitService],
+  exports: [DatabaseService],
 })
 export class DatabaseModule {}
