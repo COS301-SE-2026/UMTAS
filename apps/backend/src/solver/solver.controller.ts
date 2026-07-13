@@ -5,9 +5,10 @@ import {
   Get,
   HttpCode,
   HttpStatus,
-  InternalServerErrorException,
   NotFoundException,
   Param,
+  ParseUUIDPipe,
+  Query,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -20,20 +21,21 @@ import {
 } from '@nestjs/swagger';
 import {
   SolverCallbackPayloadSchema,
-  TimetableSolveJobDataSchema,
+  SolverPreferencesSchema,
   type SolverCallbackPayload,
   type SolverInput,
   type SolverResult,
-  type TimetableSolveJobData,
 } from 'shared-types';
 import { Public } from '../auth/auth.guard';
+import { CurrentSession, type SessionData } from '../auth/session.decorator';
 import { WorkerCallbackAuthGuard } from '../jobs/worker-callback-auth.guard';
-import { QueueProducerService } from '../jobs/queue-producer.service';
 import { TimetableSolveJobDto } from '../jobs/dto/timetable-solve-job.dto';
 import { SolverCallbackDto } from './dto/solver-callback.dto';
 import { SolverJobResponseDto } from './dto/solver-job-response.dto';
 import { SolverInputBuilderService } from './solver-input-builder.service';
 import { SolverJobStoreService } from './solver-job-store.service';
+import type { SolverJobRecord } from './solver-job-store.service';
+import { SolverSubmissionService } from './solver-submission.service';
 
 @ApiTags('Solver')
 @ApiBearerAuth('bearer')
@@ -41,8 +43,8 @@ import { SolverJobStoreService } from './solver-job-store.service';
 export class SolverController {
   constructor(
     private readonly jobStore: SolverJobStoreService,
-    private readonly queueProducer: QueueProducerService,
     private readonly inputBuilder: SolverInputBuilderService,
+    private readonly submission: SolverSubmissionService,
   ) {}
 
   @Post('jobs')
@@ -60,42 +62,25 @@ export class SolverController {
     },
   })
   async submitAndEnqueue(
+    @CurrentSession() session: SessionData,
     @Body() job: TimetableSolveJobDto,
-  ): Promise<{ accepted: true; jobId: string }> {
+  ): Promise<{
+    accepted: true;
+    jobId: string;
+    status: 'queued' | 'completed' | 'failed';
+    result?: SolverResult;
+  }> {
     const validatedJob = validateTimetableSolveJob(job);
-    const persistedJob = {
-      jobId: validatedJob.jobId,
-      solverProfileKey: validatedJob.solverProfileKey,
-      solveMode: validatedJob.solveMode,
-      requestedEngine: validatedJob.engine,
+    const record = await this.submission.submit({
+      userId: session.user.id,
+      ...validatedJob,
+    });
+    return {
+      accepted: true,
+      jobId: record.jobId,
+      status: record.status,
+      result: record.result,
     };
-
-    try {
-      await this.jobStore.createQueuedJob(persistedJob);
-    } catch (createError) {
-      try {
-        await this.jobStore.retryFailedJob(persistedJob);
-      } catch {
-        throw createError;
-      }
-    }
-
-    try {
-      await this.queueProducer.enqueueTimetableSolveJob(validatedJob);
-    } catch (error) {
-      await this.jobStore.markInfrastructureFailure(validatedJob.jobId, {
-        code: 'SOLVER_ENQUEUE_FAILED',
-        message: 'Solver job could not be enqueued',
-        details: {
-          cause: error instanceof Error ? error.message : String(error),
-        },
-      });
-      throw new InternalServerErrorException(
-        'Solver job could not be enqueued',
-      );
-    }
-
-    return { accepted: true, jobId: validatedJob.jobId };
   }
 
   @Get('jobs/:jobId/input')
@@ -112,20 +97,26 @@ export class SolverController {
     summary: 'Get solver job status and persisted result metadata',
   })
   @ApiOkResponse({ type: SolverJobResponseDto })
-  async getJob(@Param('jobId') jobId: string): Promise<SolverJobResponseDto> {
-    const job = await this.jobStore.findJob(jobId);
+  async getJob(
+    @CurrentSession() session: SessionData,
+    @Param('jobId') jobId: string,
+  ): Promise<SolverJobResponseDto> {
+    const job = await this.jobStore.findJob(jobId, { userId: session.user.id });
     if (!job) {
       throw new NotFoundException(`Solver job not found: ${jobId}`);
     }
 
-    return job;
+    return toJobResponse(job);
   }
 
   @Get('jobs/:jobId/result')
   @ApiOperation({ summary: 'Get a completed solver result' })
   @ApiOkResponse({ type: Object })
-  async getJobResult(@Param('jobId') jobId: string): Promise<SolverResult> {
-    const job = await this.jobStore.findJob(jobId);
+  async getJobResult(
+    @CurrentSession() session: SessionData,
+    @Param('jobId') jobId: string,
+  ): Promise<SolverResult> {
+    const job = await this.jobStore.findJob(jobId, { userId: session.user.id });
     if (job?.status !== 'completed' || !job.result) {
       throw new NotFoundException(`Solver result not found: ${jobId}`);
     }
@@ -140,26 +131,57 @@ export class SolverController {
   @ApiOperation({ summary: 'Receive final solver worker callback' })
   async receiveCallback(
     @Param('jobId') jobId: string,
+    @Query('attemptToken', new ParseUUIDPipe()) attemptToken: string,
     @Body() body: SolverCallbackDto,
   ): Promise<{ accepted: true; jobId: string }> {
     const callback = validateSolverCallback(body);
-    await this.jobStore.recordCallback(jobId, callback);
+    await this.jobStore.recordCallback(jobId, attemptToken, callback);
 
     return { accepted: true, jobId };
   }
 }
 
-function validateTimetableSolveJob(
-  job: TimetableSolveJobDto,
-): TimetableSolveJobData {
-  const result = TimetableSolveJobDataSchema.safeParse(job);
-  if (result.success) {
-    return result.data;
+function toJobResponse(job: SolverJobRecord): SolverJobResponseDto {
+  return {
+    jobId: job.jobId,
+    solverProfileKey: job.solverProfileKey,
+    solveMode: job.solveMode,
+    requestedEngine: job.requestedEngine,
+    status: job.status,
+    result: job.result,
+    error: job.error,
+    createdAt: job.createdAt,
+    updatedAt: job.updatedAt,
+    completedAt: job.completedAt,
+    failedAt: job.failedAt,
+  };
+}
+
+function validateTimetableSolveJob(job: TimetableSolveJobDto): {
+  solverProfileKey: string;
+  solveMode: 'feasibility' | 'optimization';
+  engine: 'auto' | 'cp-sat' | 'ga';
+  preferences: ReturnType<typeof SolverPreferencesSchema.parse>;
+} {
+  const result = SolverPreferencesSchema.safeParse(job.preferences ?? {});
+  const solverProfileKey = job.solverProfileKey?.trim();
+  const validMode =
+    job.solveMode === 'feasibility' || job.solveMode === 'optimization';
+  const engine = job.engine ?? 'auto';
+  const validEngine =
+    engine === 'auto' || engine === 'cp-sat' || engine === 'ga';
+  if (result.success && solverProfileKey && validMode && validEngine) {
+    return {
+      solverProfileKey,
+      solveMode: job.solveMode,
+      engine,
+      preferences: result.data,
+    };
   }
 
   throw new BadRequestException({
     message: 'Timetable solve job did not match the shared queue contract',
-    issues: result.error.issues,
+    issues: result.success ? [] : result.error.issues,
   });
 }
 

@@ -3,10 +3,13 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, isNull, lte } from 'drizzle-orm';
+import { randomUUID } from 'node:crypto';
 import { isDeepStrictEqual } from 'node:util';
 import type {
   SolverCallbackPayload,
+  SolverInput,
+  SolverPreferences,
   SolverResult,
   WorkerCallbackError,
 } from 'shared-types';
@@ -17,89 +20,173 @@ export type SolverJobStatus = 'queued' | 'completed' | 'failed';
 
 export interface SolverJobRecord {
   jobId: string;
+  userId: string;
   solverProfileKey: string;
   solveMode: 'feasibility' | 'optimization';
   requestedEngine?: 'auto' | 'cp-sat' | 'ga';
+  deduplicationKey: string;
+  attemptToken: string;
+  input: SolverInput;
+  preferences: SolverPreferences;
   status: SolverJobStatus;
   result?: SolverResult;
   error?: WorkerCallbackError;
   createdAt: string;
   updatedAt: string;
+  enqueuedAt?: string;
   completedAt?: string;
   failedAt?: string;
+}
+
+export interface ReserveSolverJobInput {
+  userId: string;
+  solverProfileKey: string;
+  solveMode: 'feasibility' | 'optimization';
+  requestedEngine?: 'auto' | 'cp-sat' | 'ga';
+  deduplicationKey: string;
+  solverInput: SolverInput;
+}
+
+export interface ReserveSolverJobResult {
+  kind: 'reserved' | 'reused';
+  record: SolverJobRecord;
 }
 
 @Injectable()
 export class SolverJobStoreService {
   constructor(private readonly databaseService: DatabaseService) {}
 
-  async createQueuedJob(input: {
-    jobId: string;
-    solverProfileKey: string;
-    solveMode: 'feasibility' | 'optimization';
-    requestedEngine?: 'auto' | 'cp-sat' | 'ga';
-  }): Promise<SolverJobRecord> {
-    const now = new Date();
-    const [row] = await this.databaseService.db
-      .insert(solverJob)
-      .values({
-        JobID: input.jobId,
-        SolverProfileKey: input.solverProfileKey,
-        SolveMode: input.solveMode,
-        RequestedEngine: input.requestedEngine,
-        Status: 'queued',
-        CreatedAt: now,
-        UpdatedAt: now,
-      })
-      .returning();
+  async reserveOrReuse(
+    input: ReserveSolverJobInput,
+  ): Promise<ReserveSolverJobResult> {
+    const result = await this.databaseService.db.transaction(async (tx) => {
+      const now = new Date();
+      const [inserted] = await tx
+        .insert(solverJob)
+        .values({
+          JobID: randomUUID(),
+          UserID: input.userId,
+          SolverProfileKey: input.solverProfileKey,
+          SolveMode: input.solveMode,
+          RequestedEngine: input.requestedEngine,
+          DeduplicationKey: input.deduplicationKey,
+          AttemptToken: randomUUID(),
+          Input: input.solverInput,
+          Status: 'queued',
+          CreatedAt: now,
+          UpdatedAt: now,
+        })
+        .onConflictDoNothing({
+          target: [solverJob.UserID, solverJob.DeduplicationKey],
+        })
+        .returning();
 
-    if (!row) {
-      throw new ConflictException('Solver job could not be created');
-    }
+      if (inserted) {
+        return { kind: 'reserved' as const, row: inserted };
+      }
 
-    return mapSolverJob(row);
+      const duplicate = await this.findPersistedDuplicate(tx, input);
+      if (!duplicate) {
+        throw new ConflictException(
+          'Solver job conflict could not be resolved',
+        );
+      }
+
+      const staleReservation = isStaleReservation(duplicate, now);
+      if (duplicate.Status !== 'failed' && !staleReservation) {
+        return { kind: 'reused' as const, row: duplicate };
+      }
+
+      const reclaimCriteria = staleReservation
+        ? and(
+            eq(solverJob.JobID, duplicate.JobID),
+            eq(solverJob.AttemptToken, duplicate.AttemptToken),
+            eq(solverJob.Status, 'queued'),
+            isNull(solverJob.EnqueuedAt),
+            lte(
+              solverJob.UpdatedAt,
+              new Date(now.getTime() - SOLVER_RESERVATION_STALE_AFTER_MS),
+            ),
+          )
+        : and(
+            eq(solverJob.JobID, duplicate.JobID),
+            eq(solverJob.AttemptToken, duplicate.AttemptToken),
+            eq(solverJob.Status, 'failed'),
+          );
+
+      const [retried] = await tx
+        .update(solverJob)
+        .set({
+          Input: input.solverInput,
+          // Preserve ambiguous queue-write identity so BullMQ can deduplicate
+          // recovery. Confirmed failed attempts get a fresh execution ID.
+          AttemptToken: staleReservation
+            ? duplicate.AttemptToken
+            : randomUUID(),
+          Status: 'queued',
+          Result: null,
+          ErrorCode: null,
+          ErrorMessage: null,
+          ErrorDetails: null,
+          UpdatedAt: new Date(),
+          EnqueuedAt: null,
+          CompletedAt: null,
+          FailedAt: null,
+        })
+        .where(reclaimCriteria)
+        .returning();
+
+      if (retried) {
+        return { kind: 'reserved' as const, row: retried };
+      }
+
+      const raced = await this.findPersistedDuplicate(tx, input);
+      if (raced && raced.Status !== 'failed') {
+        return { kind: 'reused' as const, row: raced };
+      }
+
+      throw new ConflictException('Solver job changed while reserving a retry');
+    });
+
+    return {
+      kind: result.kind,
+      record: mapSolverJob(result.row),
+    };
   }
 
-  async retryFailedJob(input: {
-    jobId: string;
-    solverProfileKey: string;
-    solveMode: 'feasibility' | 'optimization';
-    requestedEngine?: 'auto' | 'cp-sat' | 'ga';
-  }): Promise<SolverJobRecord> {
+  async markEnqueued(
+    jobId: string,
+    attemptToken: string,
+  ): Promise<SolverJobRecord> {
+    const jobUuid = parsePublicSolverJobId(jobId);
     const now = new Date();
     const [row] = await this.databaseService.db
       .update(solverJob)
-      .set({
-        SolverProfileKey: input.solverProfileKey,
-        SolveMode: input.solveMode,
-        RequestedEngine: input.requestedEngine,
-        Status: 'queued',
-        Result: null,
-        ErrorCode: null,
-        ErrorMessage: null,
-        ErrorDetails: null,
-        UpdatedAt: now,
-        CompletedAt: null,
-        FailedAt: null,
-      })
+      .set({ EnqueuedAt: now, UpdatedAt: now })
       .where(
-        and(eq(solverJob.JobID, input.jobId), eq(solverJob.Status, 'failed')),
+        and(
+          eq(solverJob.JobID, jobUuid),
+          eq(solverJob.AttemptToken, attemptToken),
+          eq(solverJob.Status, 'queued'),
+          isNull(solverJob.EnqueuedAt),
+        ),
       )
       .returning();
 
-    if (!row) {
-      throw new ConflictException(
-        `Solver job is not available for retry: ${input.jobId}`,
-      );
-    }
+    if (row) return mapSolverJob(row);
 
-    return mapSolverJob(row);
+    const current = await this.findJob(jobId);
+    if (current) return current;
+
+    throw new NotFoundException(`Solver job not found: ${jobId}`);
   }
 
   async markInfrastructureFailure(
     jobId: string,
+    attemptToken: string,
     error: WorkerCallbackError,
   ): Promise<SolverJobRecord> {
+    const jobUuid = parsePublicSolverJobId(jobId);
     const now = new Date();
     const [row] = await this.databaseService.db
       .update(solverJob)
@@ -111,11 +198,20 @@ export class SolverJobStoreService {
         UpdatedAt: now,
         FailedAt: now,
       })
-      .where(and(eq(solverJob.JobID, jobId), eq(solverJob.Status, 'queued')))
+      .where(
+        and(
+          eq(solverJob.JobID, jobUuid),
+          eq(solverJob.AttemptToken, attemptToken),
+          eq(solverJob.Status, 'queued'),
+        ),
+      )
       .returning();
 
     if (!row) {
-      throw new NotFoundException(`Queued solver job not found: ${jobId}`);
+      const current = await this.findJob(jobId);
+      if (current) return current;
+
+      throw new NotFoundException(`Solver job not found: ${jobId}`);
     }
 
     return mapSolverJob(row);
@@ -123,12 +219,20 @@ export class SolverJobStoreService {
 
   async recordCallback(
     jobId: string,
+    attemptToken: string,
     callback: SolverCallbackPayload,
   ): Promise<SolverJobRecord> {
+    const jobUuid = parsePublicSolverJobId(jobId);
     const row = await this.databaseService.db.transaction(async (tx) => {
-      const existing = await this.findPersistedJobForUpdate(tx, jobId);
+      const existing = await this.findPersistedJobForUpdate(tx, jobUuid);
       if (!existing) {
         throw new NotFoundException(`Solver job not found: ${jobId}`);
+      }
+
+      if (existing.AttemptToken !== attemptToken) {
+        throw new ConflictException(
+          `Solver callback does not match the active attempt: ${jobId}`,
+        );
       }
 
       if (existing.Status === callback.status) {
@@ -163,6 +267,7 @@ export class SolverJobStoreService {
         .where(
           and(
             eq(solverJob.JobID, existing.JobID),
+            eq(solverJob.AttemptToken, attemptToken),
             eq(solverJob.Status, existing.Status),
           ),
         )
@@ -180,29 +285,73 @@ export class SolverJobStoreService {
     return mapSolverJob(row);
   }
 
-  async findJob(jobId: string): Promise<SolverJobRecord | undefined> {
+  async findJob(
+    jobId: string,
+    scope?: { userId: string },
+  ): Promise<SolverJobRecord | undefined> {
+    const jobUuid = parsePublicSolverJobId(jobId);
+    const criteria = scope
+      ? and(eq(solverJob.JobID, jobUuid), eq(solverJob.UserID, scope.userId))
+      : eq(solverJob.JobID, jobUuid);
     const [row] = await this.databaseService.db
       .select()
       .from(solverJob)
-      .where(eq(solverJob.JobID, jobId))
+      .where(criteria)
       .limit(1);
 
     return row ? mapSolverJob(row) : undefined;
   }
 
-  private async findPersistedJobForUpdate(
+  private async findPersistedDuplicate(
     db: AppDatabase,
-    jobId: string,
+    input: Pick<ReserveSolverJobInput, 'userId' | 'deduplicationKey'>,
   ): Promise<SolverJob | undefined> {
     const [row] = await db
       .select()
       .from(solverJob)
-      .where(eq(solverJob.JobID, jobId))
+      .where(
+        and(
+          eq(solverJob.UserID, input.userId),
+          eq(solverJob.DeduplicationKey, input.deduplicationKey),
+        ),
+      )
+      .limit(1);
+
+    return row;
+  }
+
+  private async findPersistedJobForUpdate(
+    db: AppDatabase,
+    jobUuid: string,
+  ): Promise<SolverJob | undefined> {
+    const [row] = await db
+      .select()
+      .from(solverJob)
+      .where(eq(solverJob.JobID, jobUuid))
       .limit(1)
       .for('update');
 
     return row;
   }
+}
+
+export function parsePublicSolverJobId(jobId: string): string {
+  const trimmed = jobId.trim();
+  const uuid = trimmed.startsWith(SOLVER_JOB_PREFIX)
+    ? trimmed.slice(SOLVER_JOB_PREFIX.length)
+    : trimmed;
+
+  if (!UUID_PATTERN.test(uuid)) {
+    throw new NotFoundException(`Solver job not found: ${jobId}`);
+  }
+
+  return uuid;
+}
+
+export function toPublicSolverJobId(jobId: string): string {
+  return jobId.startsWith(SOLVER_JOB_PREFIX)
+    ? jobId
+    : `${SOLVER_JOB_PREFIX}${jobId}`;
 }
 
 function mapSolverJob(row: SolverJob): SolverJobRecord {
@@ -216,15 +365,21 @@ function mapSolverJob(row: SolverJob): SolverJobRecord {
       : undefined;
 
   return {
-    jobId: row.JobID,
+    jobId: toPublicSolverJobId(row.JobID),
+    userId: row.UserID,
     solverProfileKey: row.SolverProfileKey,
     solveMode: parseSolveMode(row.SolveMode),
     requestedEngine: parseRequestedEngine(row.RequestedEngine),
+    deduplicationKey: row.DeduplicationKey,
+    attemptToken: row.AttemptToken,
+    input: row.Input,
+    preferences: row.Input.preferences,
     status: parseSolverJobStatus(row.Status),
     result: row.Result ?? undefined,
     error,
     createdAt: row.CreatedAt.toISOString(),
     updatedAt: row.UpdatedAt.toISOString(),
+    enqueuedAt: row.EnqueuedAt?.toISOString(),
     completedAt: row.CompletedAt?.toISOString(),
     failedAt: row.FailedAt?.toISOString(),
   };
@@ -268,4 +423,18 @@ function parseRequestedEngine(
   if (value === 'auto' || value === 'cp-sat' || value === 'ga') return value;
 
   throw new ConflictException(`Unsupported solver job engine: ${value}`);
+}
+
+const SOLVER_JOB_PREFIX = 'solve-';
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+export const SOLVER_RESERVATION_STALE_AFTER_MS = 60_000;
+
+function isStaleReservation(row: SolverJob, now: Date): boolean {
+  return (
+    row.Status === 'queued' &&
+    row.EnqueuedAt === null &&
+    row.UpdatedAt.getTime() <= now.getTime() - SOLVER_RESERVATION_STALE_AFTER_MS
+  );
 }
