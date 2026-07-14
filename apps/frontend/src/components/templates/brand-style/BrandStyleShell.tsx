@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import { Link } from "@/types/BrandStyle";
 import { BrandIdentity } from "@/components/organisms/brand-style/BrandIdentity";
 import { ColourSystem } from "@/components/organisms/brand-style/ColourSystem";
 import { ComponentSection } from "@/components/molecules/brand-style/ComponentsSection";
@@ -22,7 +24,24 @@ import {
   Globe,
 } from "lucide-react";
 
+const Links: Link[] = [
+  { id: "identity", label: "Brand Identity", Icon: Sparkle },
+  { id: "colour", label: "Colour System", Icon: Aperture },
+  { id: "typography", label: "Typography", Icon: TypeIcon },
+  { id: "border", label: "Border Radius", Icon: CornerDownRight },
+  { id: "spacing", label: "Spacing & Density", Icon: Ruler },
+  { id: "shadows", label: "Shadow & Elevation", Icon: Layers },
+  { id: "motion", label: "Motion Tokens", Icon: Zap },
+  { id: "icons", label: "Icons", Icon: Component },
+  { id: "components", label: "Components", Icon: Box },
+  { id: "mode", label: "Mode switching", Icon: Moon },
+  { id: "accessibility", label: "Accessibility", Icon: Eye },
+  { id: "breakpoints", label: "Responsiveness", Icon: Globe },
+];
+
 export default function BrandStyleShell() {
+  const [selectedNav, setSelectedNav] = useState("identity");
+
   return (
     <div className="mx-auto w-full px-6 py-8">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-12 relative">
@@ -30,65 +49,26 @@ export default function BrandStyleShell() {
           <div className="flex flex-col items-end sticky top-31">
             <div className="flex flex-col gap-2 items-start text-[var(--text-secondary)]">
               <p>NAVIGATION</p>
-              <a className="brand-nav-link" href="#identity">
-                <Sparkle size={14} />
-                <span>Brand Identity</span>
-              </a>
-
-              <a className="brand-nav-link" href="#colour">
-                <Aperture size={14} />
-                <span>Colour System</span>
-              </a>
-
-              <a className="brand-nav-link" href="#typography">
-                <TypeIcon size={14} />
-                <span>Typography</span>
-              </a>
-
-              <a className="brand-nav-link" href="#border">
-                <CornerDownRight size={14} />
-                <span>Border Radius</span>
-              </a>
-
-              <a className="brand-nav-link" href="#spacing">
-                <Ruler size={14} />
-                <span>Spacing & Density</span>
-              </a>
-
-              <a className="brand-nav-link" href="#shadows">
-                <Layers size={14} />
-                <span>Shadow & Elevation</span>
-              </a>
-
-              <a className="brand-nav-link" href="#motion">
-                <Zap size={14} />
-                <span>Motion Tokens</span>
-              </a>
-
-              <a className="brand-nav-link" href="#icons">
-                <Component size={14} />
-                <span>Icons</span>
-              </a>
-
-              <a className="brand-nav-link" href="#components">
-                <Box size={14} />
-                <span>Components</span>
-              </a>
-
-              <a className="brand-nav-link" href="#mode">
-                <Moon size={14} />
-                <span>Mode switching</span>
-              </a>
-
-              <a className="brand-nav-link" href="#accessibility">
-                <Eye size={14} />
-                <span>Accessibility</span>
-              </a>
-
-              <a className="brand-nav-link" href="#breakpoints">
-                <Globe size={14} />
-                <span>Responsiveness</span>
-              </a>
+              {Links.map((link) => {
+                const isActive = selectedNav === link.id;
+                return (
+                  <a
+                    key={link.id}
+                    href={`#${link.id}`}
+                    onClick={() => setSelectedNav(link.id)}
+                    className={`rounded-md flex flex-row flex-nowrap items-center justify-start gap-3 whitespace-nowrap w-full px-3 py-2 transition-all 
+                      duration-[var(--duration-fast)] cursor-pointer text-sm
+                      ${
+                        isActive
+                          ? "font-bold text-[var(--text-primary)] bg-[var(--bg-surface)] border-l-[3px] border-[var(--text-primary)]"
+                          : "font-normal text-[var(--text-secondary)] border-l-[3px] border-transparent hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)]/50"
+                      }`}
+                  >
+                    <link.Icon size={14} className="shrink-0" />
+                    <span>{link.label}</span>
+                  </a>
+                );
+              })}
             </div>
           </div>
         </div>

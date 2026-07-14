@@ -1,7 +1,14 @@
 import type { ComponentType } from "react";
-import type { LucideProps } from "lucide-react";
+import type { LucideProps, LucideIcon } from "lucide-react";
 
 export type ThemeMode = "light" | "dark";
+
+//for nav section
+export interface Link {
+  id: string;
+  label: string;
+  Icon: LucideIcon;
+}
 
 //general attributes for the different sections
 export interface Token {
