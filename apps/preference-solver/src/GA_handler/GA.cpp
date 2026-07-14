@@ -3,7 +3,6 @@
 #include <cmath>
 #include <iostream>
 #include <ostream>
-#include <sstream>
 #include <unordered_map>
 #include <vector>
 
@@ -12,7 +11,6 @@ int RequiredEvents = 0;
 
 std::unordered_map<string, int> modulesMap;
 std::unordered_map<string, int> tempMap;
-std::unordered_map<string, bool> collisionCheck;
 std::unordered_map<string, eventsOccurring> mutationMap;
 
 string requirementKey(const EventGA &event) {
@@ -48,24 +46,12 @@ GA_Handler::GA_Handler(API_DATA data, bool optimize) : optimize(optimize) {
   RequiredEvents = 0;
   modulesMap.clear();
   tempMap.clear();
-  collisionCheck.clear();
   mutationMap.clear();
   copyChrom = EventChromosome(data);
   InitMap();
-  InitOverlap();
   InitMutationMap();
+  hasSufficientAlternatives = HasSufficientAlternatives();
   InitGA();
-}
-void GA_Handler::InitOverlap() {
-  std::vector<string> slots = slotEval(420, 1140);
-  // 420 -> 7:00
-  // 1140 -> 19:00
-  std::vector<string> days = {"Monday", "Tuesday",  "Wednesday", "Thursday",
-                              "Friday", "Saturday", "Sunday"};
-  for (string day : days)
-    for (auto &itr : slots) {
-      collisionCheck.insert({day + ":" + itr, false});
-    }
 }
 void GA_Handler::InitMap() {
   for (ModuleGA module : this->initData.modules) {
@@ -105,6 +91,7 @@ void GA_Handler::InitGA() {
 }
 
 EventChromosome GA_Handler::findSolution() {
+  if (!hasSufficientAlternatives) return copyChrom;
   if (copyChrom.events.empty()) return copyChrom;
   std::cout << "Starting GA" << std::endl;
   gaEngine.solve();
@@ -181,6 +168,20 @@ void GA_Handler::InitMutationMap() {
   for (int i = 0; i < copyChrom.events.size(); i++) {
     mutationMap[requirementKey(copyChrom.events[i])].indices.push_back(i);
   }
+}
+
+bool GA_Handler::HasSufficientAlternatives() const {
+  for (const auto &[requirement, requiredSelections] : modulesMap) {
+    const auto alternatives = mutationMap.find(requirement);
+    const size_t available = alternatives == mutationMap.end()
+                                 ? 0
+                                 : alternatives->second.indices.size();
+    if (requiredSelections < 0 ||
+        available < static_cast<size_t>(requiredSelections)) {
+      return false;
+    }
+  }
+  return true;
 }
 
 EventChromosome crossover(const EventChromosome &X1, const EventChromosome &X2,
@@ -297,65 +298,14 @@ double Overlap_Heuristic(EventChromosome eventChrom) {
 
     if (event.is_active) {
       numberOfPts++;
-      std::vector<string> slots = slotEval(event.event_start, event.event_end);
-      for (string slot : slots) {
-
-        string eventKey = event.dayOfWeek + ":" + slot;
-        bool &hasCollision = collisionCheck[eventKey];
-        if (hasCollision) {
-          eventChrom.numCollision++;
-          break;
-        } else {
-          hasCollision = true;
-        }
-      }
       sum += std::fabs(event.event_start - target);
     }
   }
-  resetCollision();
   if (numberOfPts == 0) return 0.0;
   double MAD = (1 / (double)numberOfPts) * sum;
   // Conflicts dominate soft time preferences, while preference distance still
   // ranks equally conflict-free (or equally best-effort) timetables.
-  return MAD + (eventChrom.numCollision * 10000.0);
-}
-
-std::vector<string> slotEval(int timeStart, int timeEnd) {
-  // takes a time and puts it into the slots of the day listed from every 30
-  // minutes.
-  timeStart = roundDownSlot(timeStart);
-  timeEnd = roundUpSlot(timeEnd);
-
-  std::vector<string> slots;
-  for (int time = timeStart; time < timeEnd; time += 30) {
-    string timeKey = timeSlot(time);
-    slots.push_back(timeKey);
-  }
-  return slots;
-}
-
-string timeSlot(int time) {
-  std::stringstream hourSS;
-  std::stringstream minSS;
-  int hour = time / 60;
-  int min = time % 60;
-  hourSS << hour;
-  minSS << min;
-  return hourSS.str() + ":" + minSS.str();
-}
-int roundDownSlot(int time) {
-  return (time / 30) * 30;
-  // is int math
-}
-int roundUpSlot(int time) {
-  return ((time + 29) / 30) * 30;
-  // uses int math
-}
-
-void resetCollision() {
-  for (auto &itr : collisionCheck) {
-    itr.second = false;
-  }
+  return MAD + (countConflicts(eventChrom) * 10000.0);
 }
 void SO_report_generation(
     int generation_number,
@@ -366,30 +316,6 @@ void SO_report_generation(
 
   std::cout << "Generation " << generation_number << std::endl;
   std::cout << "Best fitness " << bestChrom.total_cost << std::endl;
-  int numCollision = 0;
-
-  for (const EventGA &event : bestChrom.genes.events) {
-
-    if (event.is_active) {
-
-      std::vector<string> slots = slotEval(event.event_start, event.event_end);
-      for (string slot : slots) {
-
-        string eventKey = event.dayOfWeek + ":" + slot;
-        bool &hasCollision = collisionCheck[eventKey];
-        if (hasCollision) {
-          numCollision++;
-
-          std::cout << "event " << event.moduleCode << " Type "
-                    << event.activityType << " " << event.activityCode
-                    << " Collision" << std::endl;
-          break;
-        } else {
-          hasCollision = true;
-        }
-      }
-    }
-  }
-  resetCollision();
-  std::cout << "Number of collisions " << numCollision << std::endl;
+  std::cout << "Number of collisions " << countConflicts(bestChrom.genes)
+            << std::endl;
 }

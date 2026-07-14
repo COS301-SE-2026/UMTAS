@@ -11,11 +11,12 @@ private:
   API_DATA initData;
   GA_type gaEngine;
   bool optimize;
+  bool hasSufficientAlternatives;
 
   void InitGA();
   void InitMap();
-  void InitOverlap();
   void InitMutationMap();
+  bool HasSufficientAlternatives() const;
 
 public:
   GA_Handler(API_DATA, bool optimize = true);
@@ -49,11 +50,6 @@ double Overlap_Heuristic(EventChromosome event);
 
 bool CountPattern(EventChromosome chrom);
 void resetTemp();
-void resetCollision();
-int roundDownSlot(int time);
-int roundUpSlot(int time);
-string timeSlot(int time);
-std::vector<string> slotEval(int timeStart, int timeEnd);
 
 struct eventsOccurring {
   std::vector<int> indices;

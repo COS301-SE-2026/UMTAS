@@ -1,0 +1,44 @@
+{
+  "schedulingProblem": {
+    "events": [
+      {
+        "eventId": "FIXED-L1-A",
+        "moduleCode": "FIXED",
+        "activityType": "lecture",
+        "activityCode": "L1",
+        "requiredSelections": 1,
+        "dayOfWeek": "monday",
+        "startTime": "08:00",
+        "endTime": "08:10"
+      },
+      {
+        "eventId": "CS101-L1-PREFERRED",
+        "moduleCode": "CS101",
+        "activityType": "lecture",
+        "activityCode": "L1",
+        "requiredSelections": 1,
+        "dayOfWeek": "monday",
+        "startTime": "08:20",
+        "endTime": "08:30"
+      },
+      {
+        "eventId": "CS101-L1-OTHER",
+        "moduleCode": "CS101",
+        "activityType": "lecture",
+        "activityCode": "L1",
+        "requiredSelections": 1,
+        "dayOfWeek": "monday",
+        "startTime": "09:00",
+        "endTime": "09:10"
+      }
+    ]
+  },
+  "preferences": {
+    "heuristics": [
+      {
+        "key": "preferred-start-time",
+        "parameters": { "minutesAfterMidnight": 500 }
+      }
+    ]
+  }
+}

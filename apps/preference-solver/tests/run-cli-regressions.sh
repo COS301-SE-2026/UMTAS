@@ -131,6 +131,36 @@ assert_json_not_contains "$tmp_dir/ga-avoidable-conflict.json" '"CS101-L1-A"'
 assert_json_contains "$tmp_dir/ga-optimization.json" '"CS101-L1-B"'
 assert_json_contains "$tmp_dir/ga-optimization.json" '"solveMode": "optimization"'
 
+node - "$tmp_dir/insufficient-alternatives.json" <<'NODE'
+const { spawnSync } = require("node:child_process");
+const outputPath = process.argv[2];
+const result = spawnSync(
+  "./GA_BIN",
+  [
+    "--input", "tests/fixtures/insufficient-alternatives.json",
+    "--output", outputPath,
+    "--engine", "ga",
+    "--solve-mode", "optimization",
+  ],
+  { encoding: "utf8", timeout: 1000 },
+);
+if (result.error?.code === "ETIMEDOUT") {
+  console.error("GA did not reject an impossible selection count promptly");
+  process.exit(1);
+}
+if (result.status !== 0) {
+  process.stdout.write(result.stdout);
+  process.stderr.write(result.stderr);
+  process.exit(result.status ?? 1);
+}
+NODE
+assert_json_contains "$tmp_dir/insufficient-alternatives.json" '"status": "infeasible"'
+
+./GA_BIN --input tests/fixtures/exact-interval-overlap.json --output "$tmp_dir/exact-interval-overlap.json" --engine ga --solve-mode optimization
+assert_json_contains "$tmp_dir/exact-interval-overlap.json" '"CS101-L1-PREFERRED"'
+assert_json_not_contains "$tmp_dir/exact-interval-overlap.json" '"CS101-L1-OTHER"'
+assert_json_contains "$tmp_dir/exact-interval-overlap.json" '"conflictCount": 0'
+
 ./GA_BIN --input tests/fixtures/dated-events.json --output "$tmp_dir/dated.json" --engine ga --solve-mode optimization
 assert_json_contains "$tmp_dir/dated.json" '"status": "feasible"'
 assert_json_contains "$tmp_dir/dated.json" '"outcome": "conflict-free"'
