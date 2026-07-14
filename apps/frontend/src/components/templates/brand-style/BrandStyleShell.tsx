@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "@/types/BrandStyle";
 import { BrandIdentity } from "@/components/organisms/brand-style/BrandIdentity";
 import { ColourSystem } from "@/components/organisms/brand-style/ColourSystem";
@@ -41,6 +41,48 @@ const Links: Link[] = [
 
 export default function BrandStyleShell() {
   const [selectedNav, setSelectedNav] = useState("identity");
+
+  //I use the way the old brand style did "section viewing"
+
+  //store the observer
+  const observerRef = useRef<IntersectionObserver | null>(null);
+
+  useEffect(() => {
+    //here we disconnect old observers to prevent issues with dupes
+    if (observerRef.current) {
+      observerRef.current.disconnect();
+    }
+
+    //here is where new observers are made and are set to the "observed" sections
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            //this handles the actual styling that happens when you are in that section
+            setSelectedNav(entry.target.id);
+          }
+        }
+      },
+      //this is more or less mapped to the top-middle of the screen
+      // where users usually read (just to make it feel more natural)
+      { rootMargin: "-30% 0px -65% 0px" },
+    );
+
+    //this loop checks "is this link section currently being observed"
+    for (const link of Links) {
+      const linkElementA = document.getElementById(link.id);
+      if (linkElementA && observerRef.current) {
+        observerRef.current.observe(linkElementA);
+      }
+    }
+
+    //disconnects observers once they are "finished" (moved past that section or clicked on another link)
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, []);
 
   return (
     <div className="mx-auto w-full px-6 py-8">
