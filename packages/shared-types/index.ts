@@ -49,24 +49,99 @@ export const DayOfWeekSchema = z.enum([
 
 export type DayOfWeek = z.infer<typeof DayOfWeekSchema>;
 
-export const IsoDateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, {
-  message: "Expected an ISO calendar date (YYYY-MM-DD).",
+const ParsedDayAliasSchema = z.enum([
+  "mon",
+  "monday",
+  "tue",
+  "tues",
+  "tuesday",
+  "wed",
+  "wednesday",
+  "thu",
+  "thur",
+  "thurs",
+  "thursday",
+  "fri",
+  "friday",
+  "sat",
+  "saturday",
+  "sun",
+  "sunday",
+]);
+
+const parsedDayAliases = {
+  mon: "monday",
+  monday: "monday",
+  tue: "tuesday",
+  tues: "tuesday",
+  tuesday: "tuesday",
+  wed: "wednesday",
+  wednesday: "wednesday",
+  thu: "thursday",
+  thur: "thursday",
+  thurs: "thursday",
+  thursday: "thursday",
+  fri: "friday",
+  friday: "friday",
+  sat: "saturday",
+  saturday: "saturday",
+  sun: "sunday",
+  sunday: "sunday",
+} as const satisfies Record<z.infer<typeof ParsedDayAliasSchema>, DayOfWeek>;
+
+export const ParsedDayOfWeekSchema = z
+  .string()
+  .trim()
+  .toLowerCase()
+  .pipe(ParsedDayAliasSchema)
+  .transform((day) => parsedDayAliases[day]);
+
+const TimeOfDaySchema = z.string().regex(/^(?:[01]\d|2[0-3]):[0-5]\d$/, {
+  message: "Expected a time in HH:mm format.",
 });
 
-export const ParsedEventCandidateSchema = z.strictObject({
+export const IsoDateSchema = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/, {
+    message: "Expected an ISO calendar date (YYYY-MM-DD).",
+  })
+  .refine(
+    (value) => {
+      const date = new Date(`${value}T00:00:00.000Z`);
+      return (
+        !Number.isNaN(date.getTime()) &&
+        date.toISOString().slice(0, 10) === value
+      );
+    },
+    { message: "Expected a real ISO calendar date." },
+  );
+
+const ParsedEventCandidateBaseShape = {
   moduleCode: z.string(),
   activityType: ActivityTypeSchema,
   activityCode: z.string(),
   title: z.string(),
-  day: z.string().nullable(),
-  date: z.string().nullable(),
   startTime: z.string(),
   endTime: z.string(),
   venues: z.array(z.string()),
-  isRecurring: z.boolean(),
   metadata: JsonRecordSchema,
   warnings: z.array(ParseAnnotationSchema),
-});
+};
+
+export const ParsedEventCandidateSchema = z.discriminatedUnion("isRecurring", [
+  z.strictObject({
+    ...ParsedEventCandidateBaseShape,
+    day: ParsedDayOfWeekSchema,
+    date: z.null(),
+    isRecurring: z.literal(true),
+  }),
+  z.strictObject({
+    ...ParsedEventCandidateBaseShape,
+    day: z.null(),
+    date: IsoDateSchema,
+    isRecurring: z.literal(false),
+  }),
+]);
 
 export type ParsedEventCandidate = z.infer<typeof ParsedEventCandidateSchema>;
 
@@ -86,29 +161,16 @@ export const WorkerCallbackErrorSchema = z.strictObject({
 
 export type WorkerCallbackError = z.infer<typeof WorkerCallbackErrorSchema>;
 
-export const PdfParserCallbackPayloadSchema = z
-  .strictObject({
-    status: z.enum(["completed", "failed"]),
-    result: PdfParserResultSchema.optional(),
-    error: WorkerCallbackErrorSchema.optional(),
-  })
-  .superRefine((payload, context) => {
-    if (payload.status === "completed" && !payload.result) {
-      context.addIssue({
-        code: "custom",
-        path: ["result"],
-        message: "Completed parser callbacks require result.",
-      });
-    }
-
-    if (payload.status === "failed" && !payload.error) {
-      context.addIssue({
-        code: "custom",
-        path: ["error"],
-        message: "Failed parser callbacks require error.",
-      });
-    }
-  });
+export const PdfParserCallbackPayloadSchema = z.discriminatedUnion("status", [
+  z.strictObject({
+    status: z.literal("completed"),
+    result: PdfParserResultSchema,
+  }),
+  z.strictObject({
+    status: z.literal("failed"),
+    error: WorkerCallbackErrorSchema,
+  }),
+]);
 
 export type PdfParserCallbackPayload = z.infer<
   typeof PdfParserCallbackPayloadSchema
@@ -156,8 +218,8 @@ export const SchedulingEventSchema = z
     requiredSelections: z.number().int().positive().default(1),
     date: IsoDateSchema.optional(),
     dayOfWeek: DayOfWeekSchema.optional(),
-    startTime: z.string().trim().min(1),
-    endTime: z.string().trim().min(1),
+    startTime: TimeOfDaySchema,
+    endTime: TimeOfDaySchema,
     venues: z
       .array(
         z.strictObject({
@@ -172,6 +234,14 @@ export const SchedulingEventSchema = z
       context.addIssue({
         code: "custom",
         message: "Scheduling events require exactly one of date or dayOfWeek.",
+      });
+    }
+
+    if (event.startTime >= event.endTime) {
+      context.addIssue({
+        code: "custom",
+        path: ["endTime"],
+        message: "endTime must be later than startTime.",
       });
     }
   });

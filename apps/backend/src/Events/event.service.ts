@@ -5,7 +5,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { eq, getTableColumns, inArray } from 'drizzle-orm';
+import { and, eq, getTableColumns, inArray } from 'drizzle-orm';
 import { DatabaseService } from '../db/database.service';
 import {
   Event,
@@ -15,6 +15,11 @@ import {
   ModuleEnrollment,
   Venue,
   EventVenue,
+  Course,
+  GroupModules,
+  parseJob,
+  usersTable,
+  UniversityRole,
 } from '../entities/index';
 import {
   CreateEventDto,
@@ -49,7 +54,8 @@ export class EventService {
 
     //Create Event
     let event: EventDto;
-    if (moduleId) event = await this.createUniversityEvent(moduleId, dto);
+    if (moduleId)
+      event = await this.createUniversityEvent(userId, moduleId, dto);
     else event = await this.createPersonalEvent(userId, dto);
 
     return { event };
@@ -253,6 +259,7 @@ export class EventService {
 
   //Create University Owned Event helper
   async createUniversityEvent(
+    userId: string,
     moduleId: string,
     dto: CreateEventDto,
   ): Promise<EventDto> {
@@ -261,8 +268,36 @@ export class EventService {
     //-> Create UniversityEvent JOin table entity
     //-> If venue present -> Create venue entity and link through EventVenue
 
+    if (dto.activityType === undefined) {
+      throw new BadRequestException(
+        'activityType is required for university events',
+      );
+    }
+
     return this.dbService.db.transaction(async (tx) => {
-      const venueIds = await this.validateVenueIds(tx, dto.venues);
+      const moduleUniversityIds = await this.getModuleUniversityIds(
+        tx,
+        moduleId,
+      );
+      if (moduleUniversityIds.length === 0) {
+        throw new BadRequestException(
+          `Module[${moduleId}] does not belong to a university`,
+        );
+      }
+
+      const universityId = await this.resolveAuthorizedModuleUniversity(
+        tx,
+        userId,
+        moduleId,
+        moduleUniversityIds,
+        dto.venues,
+      );
+
+      const venueIds = await this.validateVenueIds(
+        tx,
+        dto.venues,
+        universityId,
+      );
       const event = await this.createEvent(tx, dto);
       const [uniEvent] = await tx
         .insert(UniversityEvent)
@@ -278,6 +313,121 @@ export class EventService {
       return this.mapEventToDto(event, tx);
     });
   } //END_createUniversityEvent
+
+  private async getModuleUniversityIds(
+    db: AppDatabase,
+    moduleId: string,
+  ): Promise<string[]> {
+    const courseLinks = await db
+      .select({ universityId: Course.UniversityID })
+      .from(GroupModules)
+      .innerJoin(Course, eq(Course.GroupID, GroupModules.GroupID))
+      .where(eq(GroupModules.ModuleID, moduleId));
+    const parserLinks = await db
+      .select({ universityId: parseJob.UniversityID })
+      .from(GroupModules)
+      .innerJoin(parseJob, eq(parseJob.GroupID, GroupModules.GroupID))
+      .where(eq(GroupModules.ModuleID, moduleId));
+
+    return Array.from(
+      new Set(
+        [...courseLinks, ...parserLinks].map(
+          ({ universityId }) => universityId,
+        ),
+      ),
+    ).sort();
+  }
+
+  private async resolveAuthorizedModuleUniversity(
+    db: AppDatabase,
+    userId: string,
+    moduleId: string,
+    moduleUniversityIds: string[],
+    venues: EventDto['venues'],
+  ): Promise<string> {
+    const [user] = await db
+      .select({ role: usersTable.role })
+      .from(usersTable)
+      .where(eq(usersTable.id, userId))
+      .limit(1);
+    const [enrollment] = await db
+      .select({ moduleId: ModuleEnrollment.ModuleID })
+      .from(ModuleEnrollment)
+      .where(
+        and(
+          eq(ModuleEnrollment.UserID, userId),
+          eq(ModuleEnrollment.ModuleID, moduleId),
+        ),
+      )
+      .limit(1);
+    const ownedParserLinks = await db
+      .select({ universityId: parseJob.UniversityID })
+      .from(GroupModules)
+      .innerJoin(parseJob, eq(parseJob.GroupID, GroupModules.GroupID))
+      .where(
+        and(eq(GroupModules.ModuleID, moduleId), eq(parseJob.UserID, userId)),
+      );
+    const universityRoles = await db
+      .select({
+        universityId: UniversityRole.UniversityID,
+        role: UniversityRole.role,
+      })
+      .from(UniversityRole)
+      .where(
+        and(
+          eq(UniversityRole.UserID, userId),
+          inArray(UniversityRole.UniversityID, moduleUniversityIds),
+        ),
+      );
+    const roleAuthorizedUniversityIds = universityRoles
+      .filter(
+        ({ role }) =>
+          (user?.role === 'uni_admin' && role === 'UNIVERSITY_ADMIN') ||
+          (user?.role === 'student' && role === 'STUDENT_OWNED'),
+      )
+      .map(({ universityId }) => universityId);
+
+    const authorizedUniversityIds =
+      user?.role === 'sys_admin'
+        ? moduleUniversityIds
+        : Array.from(
+            new Set([
+              ...(user?.role === 'student' && enrollment
+                ? moduleUniversityIds
+                : []),
+              ...(user?.role === 'student'
+                ? ownedParserLinks.map(({ universityId }) => universityId)
+                : []),
+              ...roleAuthorizedUniversityIds,
+            ]),
+          ).sort();
+    if (authorizedUniversityIds.length === 0) {
+      throw new ForbiddenException(
+        `User[${userId}] cannot create university events for this module`,
+      );
+    }
+
+    if (venues && venues.length > 0) {
+      const venueIds = Array.from(
+        new Set(venues.map(({ venueId }) => venueId)),
+      );
+      const venueUniversities = await db
+        .select({ universityId: Venue.UniversityID })
+        .from(Venue)
+        .where(inArray(Venue.VenueID, venueIds));
+      const requestedUniversityIds = Array.from(
+        new Set(venueUniversities.map(({ universityId }) => universityId)),
+      );
+      if (
+        requestedUniversityIds.length === 1 &&
+        authorizedUniversityIds.includes(requestedUniversityIds[0])
+      ) {
+        return requestedUniversityIds[0];
+      }
+    }
+
+    return authorizedUniversityIds[0];
+  }
 
   //Create simple event entity
   private async createEvent(
@@ -428,6 +578,7 @@ export class EventService {
   private async validateVenueIds(
     db: AppDatabase,
     venues: EventDto['venues'],
+    universityId?: string,
   ): Promise<string[]> {
     if (venues === undefined) return [];
     const venueIds = [...new Set(venues.map(({ venueId }) => venueId))];
@@ -439,8 +590,20 @@ export class EventService {
     const existing = await db
       .select({ venueId: Venue.VenueID })
       .from(Venue)
-      .where(inArray(Venue.VenueID, venueIds));
+      .where(
+        and(
+          inArray(Venue.VenueID, venueIds),
+          universityId === undefined
+            ? undefined
+            : eq(Venue.UniversityID, universityId),
+        ),
+      );
     if (existing.length !== venueIds.length) {
+      if (universityId !== undefined) {
+        throw new BadRequestException(
+          'One or more venueIds do not belong to the module university',
+        );
+      }
       throw new BadRequestException('One or more venueIds do not exist');
     }
 

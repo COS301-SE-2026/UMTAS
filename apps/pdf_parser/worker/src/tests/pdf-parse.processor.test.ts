@@ -19,7 +19,7 @@ const parserResult: PdfParserResult = {
       activityType: "lecture",
       activityCode: "P1",
       title: "COS301 P1",
-      day: "Monday",
+      day: "monday",
       date: null,
       startTime: "08:30",
       endTime: "09:20",

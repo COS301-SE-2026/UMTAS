@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { IS_PUBLIC_KEY } from '../auth/auth.guard';
 import type { SessionData } from '../auth/session.decorator';
 import { WorkerCallbackAuthGuard } from '../jobs/worker-callback-auth.guard';
+import type { PdfParserCallbackDto } from './dto/pdf-parser-callback.dto';
 import { PdfParseSubmission } from './pdf-parse-submission';
 import { PdfParserController } from './pdf-parser.controller';
 import {
@@ -196,6 +197,89 @@ describe('PdfParserController', () => {
       status: 'completed',
       result,
     });
+  });
+
+  it('accepts a valid non-recurring parsed event before persistence', async () => {
+    const result = {
+      modules: [],
+      events: [
+        {
+          moduleCode: 'COS101',
+          activityType: 'test' as const,
+          activityCode: 'T1',
+          title: 'COS101 Test',
+          day: null,
+          date: '2026-03-17',
+          startTime: '08:30',
+          endTime: '09:20',
+          venues: [],
+          isRecurring: false as const,
+          metadata: {},
+          warnings: [],
+        },
+      ],
+      warnings: [],
+    };
+
+    await expect(
+      controller.receiveCallback(queuedRecord.jobId, {
+        status: 'completed',
+        result,
+      }),
+    ).resolves.toEqual({ accepted: true, jobId: queuedRecord.jobId });
+
+    expect(jobStore.recordCallback).toHaveBeenCalledWith(queuedRecord.jobId, {
+      status: 'completed',
+      result,
+    });
+  });
+
+  it('rejects incomplete parsed recurrence data before persistence', async () => {
+    const callback = {
+      status: 'completed',
+      result: {
+        modules: [],
+        events: [
+          {
+            moduleCode: 'COS101',
+            activityType: 'lecture',
+            activityCode: 'L1',
+            title: 'COS101 Lecture',
+            day: null,
+            date: null,
+            startTime: '08:30',
+            endTime: '09:20',
+            venues: [],
+            isRecurring: true,
+            metadata: {},
+            warnings: [],
+          },
+        ],
+        warnings: [],
+      },
+    } as unknown as PdfParserCallbackDto;
+
+    await expect(
+      controller.receiveCallback(queuedRecord.jobId, callback),
+    ).rejects.toThrow(
+      'PDF parser callback did not match the shared parser contract',
+    );
+
+    expect(jobStore.recordCallback).not.toHaveBeenCalled();
+  });
+
+  it('rejects contradictory callback status payloads before persistence', async () => {
+    await expect(
+      controller.receiveCallback(queuedRecord.jobId, {
+        status: 'completed',
+        result: { modules: [], events: [], warnings: [] },
+        error: { code: 'PARSE_FAILED', message: 'bad pdf' },
+      }),
+    ).rejects.toThrow(
+      'PDF parser callback did not match the shared parser contract',
+    );
+
+    expect(jobStore.recordCallback).not.toHaveBeenCalled();
   });
 
   it('persists failed worker callbacks through the store', async () => {

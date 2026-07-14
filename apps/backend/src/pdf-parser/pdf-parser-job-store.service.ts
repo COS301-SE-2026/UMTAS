@@ -217,22 +217,24 @@ export class PdfParserJobStoreService {
 
       const now = new Date();
       const moduleGroupingId =
-        callback.status === 'completed' && callback.result
+        callback.status === 'completed'
           ? await this.parserResultImporter.importResult(
               tx,
               existing,
               callback.result,
             )
           : null;
+      const result = callback.status === 'completed' ? callback.result : null;
+      const error = callback.status === 'failed' ? callback.error : null;
 
       const [updated] = await tx
         .update(parseJob)
         .set({
           Status: callback.status,
-          Result: callback.result ?? null,
-          ErrorCode: callback.error?.code ?? null,
-          ErrorMessage: callback.error?.message ?? null,
-          ErrorDetails: callback.error?.details ?? null,
+          Result: result,
+          ErrorCode: error?.code ?? null,
+          ErrorMessage: error?.message ?? null,
+          ErrorDetails: error?.details ?? null,
           GroupID: moduleGroupingId ?? existing.GroupID ?? null,
           UpdatedAt: now,
           CompletedAt: callback.status === 'completed' ? now : null,

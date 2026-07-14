@@ -8,6 +8,7 @@ import {
 import { Type } from 'class-transformer';
 import {
   IsBoolean,
+  IsDefined,
   IsEnum,
   IsISO8601,
   IsOptional,
@@ -96,13 +97,25 @@ export class EventDto {
 
 export class CreateEventDto extends PickType(EventDto, [
   'eventName',
-  'activityType',
   'activityCode',
   'eventCriteria',
   'venues',
   'isRecurring',
   'validated',
-] as const) {}
+] as const) {
+  @ApiPropertyOptional({
+    enum: ActivityTypeSchema.options,
+    description: 'Required when eventCriteria.moduleId is provided.',
+  })
+  @ValidateIf(
+    (value: CreateEventDto) =>
+      value.activityType !== undefined ||
+      value.eventCriteria?.moduleId !== undefined,
+  )
+  @IsDefined()
+  @IsEnum(ActivityTypeSchema.options)
+  activityType?: (typeof ActivityTypeSchema.options)[number];
+}
 export class UpdateEventDto extends PartialType(
   OmitType(EventDto, ['eventId', 'eventCriteria', 'venues'] as const),
 ) {
