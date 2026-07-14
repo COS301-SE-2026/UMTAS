@@ -16,6 +16,8 @@ test("CliSolverExecutor uses the file-based solver CLI contract", async () => {
         "/tmp/output.json",
         "--engine",
         "cp-sat",
+        "--solve-mode",
+        "feasibility",
       ]);
       assert.ok(options);
       assert.ok(options.abortSignal);
@@ -24,9 +26,14 @@ test("CliSolverExecutor uses the file-based solver CLI contract", async () => {
     readOutputFile: async () =>
       JSON.stringify({
         status: "feasible",
+        outcome: "conflict-free",
         timetableSolution: { selectedEventIds: [] },
         heuristicScores: [],
-        metadata: {},
+        metadata: {
+          conflictCount: 0,
+          conflicts: [],
+          solveMode: "feasibility",
+        },
       }),
   });
 
@@ -34,6 +41,7 @@ test("CliSolverExecutor uses the file-based solver CLI contract", async () => {
     inputPath: "/tmp/input.json",
     outputPath: "/tmp/output.json",
     engine: "cp-sat",
+    solveMode: "feasibility",
     abortSignal: new AbortController().signal,
   });
 
@@ -41,9 +49,14 @@ test("CliSolverExecutor uses the file-based solver CLI contract", async () => {
     status: "feasible",
     result: {
       engine: "cp-sat",
+      outcome: "conflict-free",
       timetableSolution: { selectedEventIds: [] },
       heuristicScores: [],
-      metadata: {},
+      metadata: {
+        conflictCount: 0,
+        conflicts: [],
+        solveMode: "feasibility",
+      },
     },
   });
 });
@@ -65,6 +78,7 @@ test("CliSolverExecutor returns an infeasible CLI outcome without treating it as
     inputPath: "/tmp/input.json",
     outputPath: "/tmp/output.json",
     engine: "ga",
+    solveMode: "optimization",
     abortSignal: new AbortController().signal,
   });
 

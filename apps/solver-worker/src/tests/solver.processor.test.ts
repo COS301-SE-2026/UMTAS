@@ -11,9 +11,10 @@ const input: SolverInput = {
 
 const cpSatResult: SolverResult = {
   engine: "cp-sat",
+  outcome: "conflict-free",
   timetableSolution: { selectedEventIds: [] },
   heuristicScores: [],
-  metadata: {},
+  metadata: { conflictCount: 0, conflicts: [], solveMode: "optimization" },
 };
 
 test("SolverProcessor stages input and runs CP-SAT for an auto job", async () => {
@@ -34,18 +35,47 @@ test("SolverProcessor stages input and runs CP-SAT for an auto job", async () =>
   assert.deepEqual(calls, [
     "input:solve-1",
     'write:/tmp/solve-1/input.json:{"schedulingProblem":{"events":[]},"preferences":{"heuristics":[]}}',
-    "solve:cp-sat:/tmp/solve-1/input.json:/tmp/solve-1/output.json",
+    "solve:cp-sat:/tmp/solve-1/input.json:/tmp/solve-1/output.json:optimization",
   ]);
   assert.deepEqual(payload, { status: "completed", result: cpSatResult });
+});
+
+test("SolverProcessor passes feasibility mode to the selected engine", async () => {
+  const calls: string[] = [];
+  const feasibilityResult: SolverResult = {
+    engine: "cp-sat",
+    outcome: "conflict-free",
+    timetableSolution: { selectedEventIds: [] },
+    heuristicScores: [],
+    metadata: { conflictCount: 0, conflicts: [], solveMode: "feasibility" },
+  };
+  const processor = new SolverProcessor({
+    inputClient: inputClient(calls),
+    solverExecutor: executor(calls, {
+      status: "feasible",
+      result: feasibilityResult,
+    }),
+    writeInputFile: async () => {},
+  });
+
+  const payload = await processor.process(context("cp-sat", "feasibility"));
+
+  assert.match(calls.at(-1) ?? "", /:feasibility$/);
+  assert.deepEqual(payload, { status: "completed", result: feasibilityResult });
 });
 
 test("SolverProcessor falls back to GA only after CP-SAT is infeasible", async () => {
   const calls: string[] = [];
   const gaResult: SolverResult = {
     engine: "ga",
+    outcome: "best-effort",
     timetableSolution: { selectedEventIds: [] },
     heuristicScores: [],
-    metadata: {},
+    metadata: {
+      conflictCount: 1,
+      conflicts: [{ eventIds: ["event-a", "event-b"] }],
+      solveMode: "optimization",
+    },
   };
   const outcomes = [
     { status: "infeasible" } as const,
@@ -55,7 +85,7 @@ test("SolverProcessor falls back to GA only after CP-SAT is infeasible", async (
     inputClient: inputClient(calls),
     solverExecutor: {
       solve: async (request) => {
-        calls.push(`solve:${request.engine}`);
+        calls.push(`solve:${request.engine}:${request.solveMode}`);
         const outcome = outcomes.shift();
         assert.ok(outcome);
         return outcome;
@@ -66,7 +96,11 @@ test("SolverProcessor falls back to GA only after CP-SAT is infeasible", async (
 
   const payload = await processor.process(context("auto"));
 
-  assert.deepEqual(calls, ["input:solve-1", "solve:cp-sat", "solve:ga"]);
+  assert.deepEqual(calls, [
+    "input:solve-1",
+    "solve:cp-sat:optimization",
+    "solve:ga:optimization",
+  ]);
   assert.deepEqual(payload, { status: "completed", result: gaResult });
 });
 
@@ -86,19 +120,22 @@ function executor(
   return {
     solve: async (request) => {
       calls.push(
-        `solve:${request.engine}:${request.inputPath}:${request.outputPath}`,
+        `solve:${request.engine}:${request.inputPath}:${request.outputPath}:${request.solveMode}`,
       );
       return outcome;
     },
   };
 }
 
-function context(engine: "auto" | "cp-sat" | "ga") {
+function context(
+  engine: "auto" | "cp-sat" | "ga",
+  solveMode: "feasibility" | "optimization" = "optimization",
+) {
   return {
     data: {
       jobId: "solve-1",
-      solverProfileKey: "default",
-      solveMode: "optimization" as const,
+      attemptToken: "11111111-1111-4111-8111-111111111111",
+      solveMode,
       engine,
     },
     tempDir: "/tmp/solve-1",
