@@ -44,18 +44,19 @@ export function ShadowSection() {
         {shadowsTokens.map((shadowToken) => (
           <div key={shadowToken.level} className="flex flex-col gap-4">
             <Card
-              className="h-32 bg-[var(--bg-surface)] border-[var(--border)]"
+              className="h-32 bg-[var(--bg-surface)] border-[var(--border)] p-6"
               style={{ boxShadow: shadowToken.shadow }}
-            />
-
-            <div>
-              <p className="text-[14px] font-medium text-[var(--text-primary)] leading-[1.3] m-0">
-                {shadowToken.level}
-              </p>
-              <p className="text-[12px] text-[var(--text-secondary)] mt-1 mb-3">
-                {shadowToken.usage}
-              </p>
-            </div>
+            >
+              {" "}
+              <div>
+                <p className="text-[14px] font-medium text-[var(--text-primary)] leading-[1.3] m-0">
+                  {shadowToken.level}
+                </p>
+                <p className="text-[12px] text-[var(--text-secondary)] mt-1 mb-3">
+                  {shadowToken.usage}
+                </p>
+              </div>
+            </Card>
           </div>
         ))}
       </div>
