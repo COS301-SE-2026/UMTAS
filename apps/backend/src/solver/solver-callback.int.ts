@@ -1,6 +1,7 @@
 import { ValidationPipe, type INestApplication } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Test } from '@nestjs/testing';
+import { eq } from 'drizzle-orm';
 import { migrate as migratePglite } from 'drizzle-orm/pglite/migrator';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
 import { join } from 'node:path';
@@ -8,11 +9,18 @@ import type { TimetableSolveJobData } from 'shared-types';
 import request from 'supertest';
 import type * as schema from '../db/schema';
 import { DatabaseService } from '../db/database.service';
+import { solverJob, usersTable } from '../entities';
 import { WorkerCallbackAuthGuard } from '../jobs/worker-callback-auth.guard';
 import { QueueProducerService } from '../jobs/queue-producer.service';
 import { SolverController } from './solver.controller';
 import { SolverInputBuilderService } from './solver-input-builder.service';
-import { SolverJobStoreService } from './solver-job-store.service';
+import {
+  SOLVER_RESERVATION_STALE_AFTER_MS,
+  SolverJobStoreService,
+  parsePublicSolverJobId,
+} from './solver-job-store.service';
+import { SolverFingerprintService } from './solver-fingerprint.service';
+import { SolverSubmissionService } from './solver-submission.service';
 
 describe('Solver callback endpoint (PGLite)', () => {
   let app: INestApplication;
@@ -20,6 +28,7 @@ describe('Solver callback endpoint (PGLite)', () => {
   let jobStore: SolverJobStoreService;
   let enqueueError: Error | undefined;
   let enqueueCalls: TimetableSolveJobData[] = [];
+  const attemptTokens = new Map<string, string>();
   const queueProducer = {
     enqueueTimetableSolveJob: async (job: TimetableSolveJobData) => {
       enqueueCalls.push(job);
@@ -37,6 +46,8 @@ describe('Solver callback endpoint (PGLite)', () => {
       providers: [
         SolverJobStoreService,
         SolverInputBuilderService,
+        SolverFingerprintService,
+        SolverSubmissionService,
         {
           provide: QueueProducerService,
           useValue: queueProducer,
@@ -58,8 +69,28 @@ describe('Solver callback endpoint (PGLite)', () => {
     await migratePglite(toPgliteDatabase(databaseService), {
       migrationsFolder: join(process.cwd(), 'drizzle'),
     });
+    await databaseService.db.insert(usersTable).values({
+      id: userId,
+      name: 'Solver User',
+      email: 'solver-user@example.com',
+      emailVerified: true,
+      role: 'student',
+      banned: false,
+      createdAt: new Date('2026-07-13T00:00:00Z'),
+      updatedAt: new Date('2026-07-13T00:00:00Z'),
+    });
 
     app = moduleRef.createNestApplication();
+    app.use(
+      (
+        request: { session?: unknown },
+        _response: unknown,
+        next: () => void,
+      ) => {
+        request.session = { user: { id: userId } };
+        next();
+      },
+    );
     app.useGlobalPipes(
       new ValidationPipe({ whitelist: true, transform: true }),
     );
@@ -89,7 +120,7 @@ describe('Solver callback endpoint (PGLite)', () => {
     expect(enqueueCalls).toEqual([]);
   });
 
-  it('allows the same job ID to be resubmitted after enqueue failure', async () => {
+  it('retries an ambiguous enqueue with the same queue identity after lease expiry', async () => {
     enqueueError = new Error('Redis unavailable');
     const payload = {
       jobId: 'solve-enqueue-retry',
@@ -103,62 +134,94 @@ describe('Solver callback endpoint (PGLite)', () => {
       .send(payload)
       .expect(500);
 
-    await request(app.getHttpServer())
+    const firstAttempt = enqueueCalls[0];
+    await databaseService.db
+      .update(solverJob)
+      .set({
+        UpdatedAt: new Date(Date.now() - SOLVER_RESERVATION_STALE_AFTER_MS - 1),
+      })
+      .where(eq(solverJob.JobID, parsePublicSolverJobId(firstAttempt.jobId)));
+
+    const response = await request(app.getHttpServer())
       .post('/solver/jobs')
       .send(payload)
-      .expect(202, { accepted: true, jobId: 'solve-enqueue-retry' });
+      .expect(202);
 
-    expect(enqueueCalls.at(-1)).toEqual({
-      ...payload,
-      solverProfileKey: 'default',
+    expect(response.body).toMatchObject({
+      accepted: true,
+      status: 'queued',
     });
+    expect(response.body.jobId).toMatch(/^solve-/);
+    expect(enqueueCalls).toHaveLength(2);
+    expect(enqueueCalls[1]).toMatchObject({
+      jobId: enqueueCalls[0]?.jobId,
+      solveMode: 'optimization',
+      engine: 'auto',
+    });
+    expect(enqueueCalls[1]?.attemptToken).toBe(firstAttempt.attemptToken);
+
+    await request(app.getHttpServer())
+      .post(`/solver/jobs/${response.body.jobId}/callback`)
+      .query({ attemptToken: firstAttempt.attemptToken })
+      .set('Authorization', `Bearer ${workerToken}`)
+      .send({
+        status: 'failed',
+        error: { code: 'SOLVER_FAILED', message: 'delayed callback' },
+      })
+      .expect(202);
+    await request(app.getHttpServer())
+      .get(`/solver/jobs/${response.body.jobId}`)
+      .expect(200)
+      .expect(({ body }) => expect(body.status).toBe('failed'));
   });
 
   it('persists successful callbacks and accepts equivalent retries idempotently', async () => {
-    await createQueuedJob('solve-completed');
+    const jobId = await createQueuedJob('a');
 
-    await callback('solve-completed', {
+    await callback(jobId, {
       status: 'completed',
       result: completedResult,
-    }).expect(202, { accepted: true, jobId: 'solve-completed' });
+    }).expect(202, { accepted: true, jobId });
 
-    await callback('solve-completed', {
+    await callback(jobId, {
       status: 'completed',
       result: {
-        metadata: {},
+        metadata: completedResult.metadata,
         heuristicScores: [],
         timetableSolution: { selectedEventIds: [] },
         engine: 'cp-sat',
+        outcome: 'conflict-free',
       },
-    }).expect(202, { accepted: true, jobId: 'solve-completed' });
+    }).expect(202, { accepted: true, jobId });
 
     await expect(
-      jobStore.recordCallback('solve-completed', {
+      jobStore.recordCallback(jobId, attemptTokens.get(jobId)!, {
         status: 'completed',
         result: {
           engine: 'cp-sat',
+          outcome: 'conflict-free',
           timetableSolution: { selectedEventIds: ['different'] },
           heuristicScores: [],
-          metadata: {},
+          metadata: completedResult.metadata,
         },
       }),
     ).rejects.toThrow('different completed callback');
   });
 
   it('persists failed callbacks with structured worker error details', async () => {
-    await createQueuedJob('solve-failed');
+    const jobId = await createQueuedJob('b');
 
-    await callback('solve-failed', {
+    await callback(jobId, {
       status: 'failed',
       error: {
         code: 'SOLVER_FAILED',
         message: 'solver exited 1',
         details: { exitCode: 1, stderr: 'infeasible input' },
       },
-    }).expect(202, { accepted: true, jobId: 'solve-failed' });
+    }).expect(202, { accepted: true, jobId });
 
     await expect(
-      jobStore.recordCallback('solve-failed', {
+      jobStore.recordCallback(jobId, attemptTokens.get(jobId)!, {
         status: 'failed',
         error: {
           code: 'SOLVER_FAILED',
@@ -183,32 +246,32 @@ describe('Solver callback endpoint (PGLite)', () => {
       error: { code: 'SOLVER_FAILED', message: 'missing' },
     }).expect(404);
 
-    await createQueuedJob('solve-invalid-transition');
-    await callback('solve-invalid-transition', {
+    const jobId = await createQueuedJob('c');
+    await callback(jobId, {
       status: 'failed',
       error: { code: 'SOLVER_FAILED', message: 'first failure' },
     }).expect(202);
-    await callback('solve-invalid-transition', {
+    await callback(jobId, {
       status: 'completed',
       result: completedResult,
     }).expect(409);
   });
 
   it('rejects invalid worker tokens before recording callbacks', async () => {
-    await createQueuedJob('solve-invalid-token');
+    const jobId = await createQueuedJob('d');
 
     await request(app.getHttpServer())
-      .post('/solver/jobs/solve-invalid-token/callback')
+      .post(`/solver/jobs/${jobId}/callback`)
       .set('Authorization', 'Bearer wrong-token')
       .send({ status: 'completed', result: completedResult })
       .expect(401);
   });
 
   it('serves worker input and exposes persisted status and results', async () => {
-    await createQueuedJob('solve-readable');
+    const jobId = await createQueuedJob('e');
 
     await request(app.getHttpServer())
-      .get('/solver/jobs/solve-readable/input')
+      .get(`/solver/jobs/${jobId}/input`)
       .set('Authorization', `Bearer ${workerToken}`)
       .expect(200, {
         schedulingProblem: { events: [] },
@@ -216,54 +279,73 @@ describe('Solver callback endpoint (PGLite)', () => {
       });
 
     await request(app.getHttpServer())
-      .get('/solver/jobs/solve-readable/input')
+      .get(`/solver/jobs/${jobId}/input`)
       .set('Authorization', 'Bearer wrong-token')
       .expect(401);
 
-    await callback('solve-readable', {
+    await callback(jobId, {
       status: 'completed',
       result: completedResult,
     }).expect(202);
 
     await request(app.getHttpServer())
-      .get('/solver/jobs/solve-readable')
+      .get(`/solver/jobs/${jobId}`)
       .expect(200)
       .expect(({ body }) => {
         expect(body).toMatchObject({
-          jobId: 'solve-readable',
+          jobId,
           status: 'completed',
           result: completedResult,
         });
       });
 
     await request(app.getHttpServer())
-      .get('/solver/jobs/solve-readable/result')
+      .get(`/solver/jobs/${jobId}/result`)
       .expect(200, completedResult);
   });
 
   function callback(jobId: string, payload: object) {
+    const attemptToken = attemptTokens.get(jobId) ?? unknownAttemptToken;
     return request(app.getHttpServer())
       .post(`/solver/jobs/${jobId}/callback`)
+      .query({ attemptToken })
       .set('Authorization', `Bearer ${workerToken}`)
       .send(payload);
   }
 
-  function createQueuedJob(jobId: string) {
-    return jobStore.createQueuedJob({
-      jobId,
+  async function createQueuedJob(keySeed: string): Promise<string> {
+    const reservation = await jobStore.reserveOrReuse({
+      userId,
       solverProfileKey: 'default',
       solveMode: 'optimization',
       requestedEngine: 'auto',
+      deduplicationKey: `solver-semantic-sha256-v1:${keySeed.repeat(64)}`,
+      solverInput: {
+        schedulingProblem: { events: [] },
+        preferences: { heuristics: [] },
+      },
     });
+    attemptTokens.set(
+      reservation.record.jobId,
+      reservation.record.attemptToken,
+    );
+    return reservation.record.jobId;
   }
 });
 
 const workerToken = 'test-worker-callback-token';
+const unknownAttemptToken = '99999999-9999-4999-8999-999999999999';
+const userId = '11111111-1111-4111-8111-111111111111';
 const completedResult = {
   engine: 'cp-sat',
+  outcome: 'conflict-free',
   timetableSolution: { selectedEventIds: [] },
   heuristicScores: [],
-  metadata: {},
+  metadata: {
+    conflictCount: 0,
+    conflicts: [],
+    solveMode: 'optimization' as const,
+  },
 };
 
 function toPgliteDatabase(
