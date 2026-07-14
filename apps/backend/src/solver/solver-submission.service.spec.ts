@@ -26,6 +26,11 @@ describe('SolverSubmissionService semantic deduplication', () => {
     harness.store.markEnqueued.mockResolvedValue(queued);
 
     await expect(harness.service.submit(request())).resolves.toBe(queued);
+    expect(harness.inputBuilder.buildForProfile).toHaveBeenCalledWith(
+      request().userId,
+      'default',
+      { heuristics: [] },
+    );
     expect(harness.store.reserveOrReuse).toHaveBeenCalledWith({
       userId: request().userId,
       solverProfileKey: 'default',
@@ -80,6 +85,7 @@ describe('SolverSubmissionService semantic deduplication', () => {
     return {
       store,
       queue,
+      inputBuilder,
       service: new SolverSubmissionService(
         store as never,
         queue as never,

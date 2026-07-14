@@ -27,6 +27,7 @@ export class SolverSubmissionService {
 
   async submit(input: SolverSubmissionInput): Promise<SolverJobRecord> {
     const solverInput = await this.inputBuilder.buildForProfile(
+      input.userId,
       input.solverProfileKey,
       input.preferences,
     );
