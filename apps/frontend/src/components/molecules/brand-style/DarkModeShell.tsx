@@ -9,10 +9,7 @@ export function DarkModeShell() {
   const [selectedToken, setSelectedToken] = useState<Token>(DarkPalette[0]);
 
   return (
-    <div
-      data-theme="dark"
-      className="grid grid-cols-1 md:grid-cols gap-6 w-full text-left"
-    >
+    <div className="grid grid-cols-1 md:grid-cols gap-6 w-full text-left">
       <div className="p-4 bg-[var(--bg-base)] border border-[var(--border)] rounded-xl space-y-1 h-fit">
         {DarkPalette.map((token) => (
           <div
@@ -26,7 +23,7 @@ export function DarkModeShell() {
           >
             <div
               className="w-6 h-6 rounded-md border border-[var(--border)] flex-shrink-0"
-              style={{ backgroundColor: `var(${token.token})` }}
+              style={{ backgroundColor: token.hex }}
             />
             <div>
               <p className="text-sm font-medium text-[var(--text-primary)] m-0">
