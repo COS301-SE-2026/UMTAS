@@ -33,7 +33,6 @@ import {
   SelectValue,
 } from "@/components/atoms/baseShadcn/select";
 import { Label } from "@/components/atoms/baseShadcn/label";
-import { Separator } from "@/components/atoms/baseShadcn/separator";
 import {
   Sheet,
   SheetContent,
@@ -127,11 +126,11 @@ export const mockScheduleEvents: ScheduleEvent[] = [
 
 export function ComponentSection() {
   return (
-    <div className="space-y-12">
+    <div className="w-full mt-8 mb-8">
       <h1 className="text-4xl font-bold tracking-tight text-[var(--text-primary)] mb-8">
         Components Section
       </h1>
-      <section className="space-y-4 border p-4 rounded-xl">
+      <section className="space-y-4 border p-4 rounded-xl mb-8">
         <h2 className="text-lg font-semibold">Buttons</h2>
         <div className="flex gap-4">
           <Button variant="default">Primary Action</Button>
@@ -140,7 +139,7 @@ export function ComponentSection() {
           <Button variant="destructive">Destructive</Button>
         </div>
       </section>
-      <section className="space-y-4 border p-4 rounded-xl">
+      <section className="space-y-4 border p-4 rounded-xl mb-8">
         <h2 className="text-lg font-semibold">Badges</h2>
         <div className="flex gap-4">
           <Avatar>
@@ -154,7 +153,7 @@ export function ComponentSection() {
         </div>
       </section>
 
-      <section className="space-y-4 border p-4 rounded-xl">
+      <section className="space-y-4 border p-4 rounded-xl mb-8">
         <h2 className="text-lg font-semibold">Forms and Input</h2>
         <div className="grid grid-cols-2 gap-6">
           <div className="space-y-2">
@@ -205,9 +204,7 @@ export function ComponentSection() {
         </div>
       </section>
 
-      <Separator />
-
-      <section className="space-y-4 border p-4 rounded-xl">
+      <section className="space-y-4 border p-4 rounded-xl mb-8">
         <h2 className="text-lg font-semibold">Layouts and Overlays</h2>
 
         <div className="flex items-start gap-6">
@@ -274,7 +271,7 @@ export function ComponentSection() {
         </div>
       </section>
 
-      <section className="space-y-4 border p-4 rounded-xl">
+      <section className="space-y-4 border p-4 rounded-xl mb-8">
         <h2 className="text-lg font-semibold">Data Tables and Tabs</h2>
 
         <Tabs defaultValue="tab1" className="w-full">
@@ -312,7 +309,7 @@ export function ComponentSection() {
           </TabsContent>
         </Tabs>
       </section>
-      <section className="space-y-4">
+      <section className="space-y-4 mb-8 mt-8">
         <Card className="p-4">
           <h2 className="text-lg font-semibold">Domain Specific</h2>
           <Card className="p-4">

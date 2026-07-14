@@ -9,6 +9,10 @@ import { TypographySection } from "@/components/organisms/brand-style/Typography
 import { SpacingSection } from "@/components/organisms/brand-style/SpacingSection";
 import { RadiusSection } from "@/components/organisms/brand-style/RadiusSection";
 import { ShadowSection } from "@/components/organisms/brand-style/ShadowSection";
+import { MotionSection } from "@/components/organisms/brand-style/MotionTokenSection";
+import { AccessibilitySection } from "@/components/organisms/brand-style/AccessibilitySection";
+import { IconsSection } from "@/components/organisms/brand-style/IconsSection";
+import { BreakpointSection } from "@/components/organisms/brand-style/BreakpointsSection";
 import {
   Sparkle,
   Aperture,
@@ -34,7 +38,6 @@ const Links: Link[] = [
   { id: "motion", label: "Motion Tokens", Icon: Zap },
   { id: "icons", label: "Icons", Icon: Component },
   { id: "components", label: "Components", Icon: Box },
-  { id: "mode", label: "Mode switching", Icon: Moon },
   { id: "accessibility", label: "Accessibility", Icon: Eye },
   { id: "breakpoints", label: "Responsiveness", Icon: Globe },
 ];
@@ -84,6 +87,36 @@ export default function BrandStyleShell() {
     };
   }, []);
 
+  //how animations are handled (uses same api as observing which section is being viewed)
+  useEffect(() => {
+    const animationObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.remove("opacity-0", "translate-y-6");
+            entry.target.classList.add("opacity-100", "translate-y-0");
+            animationObserver.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.05 },
+    );
+
+    const sections = document.querySelectorAll("section");
+    sections.forEach((section) => {
+      section.classList.add(
+        "opacity-0",
+        "translate-y-6",
+        "transition-all",
+        "duration-[600ms]",
+        "ease-[cubic-bezier(0.4,0,0.2,1)]",
+      );
+      animationObserver.observe(section);
+    });
+
+    return () => animationObserver.disconnect();
+  }, []);
+
   return (
     <div className="mx-auto w-full px-6 py-8">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-12 relative">
@@ -116,48 +149,53 @@ export default function BrandStyleShell() {
         </div>
 
         <div className="md:col-span-3">
-          <section id="identity" className="max-w-6xl">
+          <section id="identity" className="brand-card">
             <BrandIdentity />
           </section>
-          <section id="colour">
+          <section
+            id="colour"
+            className="w-full mb-8 border border-[var(--border)] rounded-2xl px-8"
+          >
             <ColourSystem />
           </section>
-          <section id="typography">
+          <section id="typography" className="brand-card">
             <TypographySection />
           </section>
-          <section id="border">
+          <section
+            id="border"
+            className="w-full  mb-8 border border-[var(--border)] rounded-2xl px-8"
+          >
             <RadiusSection />
           </section>
-          <section id="spacing">
+          <section id="spacing" className="brand-card">
             <SpacingSection />
           </section>
-          <section id="shadows">
+          <section
+            id="shadows"
+            className="w-full  mb-8 border border-[var(--border)] rounded-2xl px-8"
+          >
             <ShadowSection />
           </section>
-          <section id="motion">
-            <h1>Motion Tokens</h1>
-            <h2>Duration Tokens</h2>
-            <h2>Easing</h2>
-            <h2>Motion Rules</h2>
+          <section id="motion" className="brand-card">
+            <MotionSection />
           </section>
-          <section id="icons">
-            <h1>Icons</h1>
+          <section
+            id="icons"
+            className="w-full  mb-8 border border-[var(--border)] rounded-2xl px-8"
+          >
+            <IconsSection />
           </section>
-          <section id="components">
+          <section id="components" className="brand-card">
             <ComponentSection />
           </section>
-          <section id="mode">
-            <h1>Mode Switching</h1>
+          <section
+            id="accessibility"
+            className="w-full  mb-8 border border-[var(--border)] rounded-2xl px-8"
+          >
+            <AccessibilitySection />
           </section>
-          <section id="accessibility">
-            <h1>Accessibility</h1>
-            <h2>Colour Contrast</h2>
-            <h2>Keyboard Navigation</h2>
-            <h2>Semantics</h2>
-            <h2>Motion</h2>
-          </section>
-          <section id="breakpoints">
-            <h1>Responsive Breakpoints</h1>
+          <section id="breakpoints" className="brand-card">
+            <BreakpointSection />
           </section>
         </div>
       </div>
