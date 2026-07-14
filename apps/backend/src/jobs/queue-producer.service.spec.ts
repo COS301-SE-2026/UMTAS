@@ -38,11 +38,12 @@ describe('QueueProducerService', () => {
     expect(pdfParseAdd).toHaveBeenCalledWith(PDF_PARSE_JOB_NAME, payload);
   });
 
-  it('enqueues timetable solve payloads with the backend job id as BullMQ jobId', async () => {
+  it('uses the attempt token as the idempotent solver execution ID', async () => {
     const payload: TimetableSolveJobData = {
       jobId: 'solve-1',
-      solverProfileKey: 'default',
+      attemptToken: '11111111-1111-4111-8111-111111111111',
       solveMode: 'feasibility',
+      engine: 'auto',
     };
 
     await service.enqueueTimetableSolveJob(payload);
@@ -50,7 +51,7 @@ describe('QueueProducerService', () => {
     expect(timetableSolveAdd).toHaveBeenCalledWith(
       TIMETABLE_SOLVE_JOB_NAME,
       payload,
-      { jobId: 'solve-1' },
+      { jobId: payload.attemptToken },
     );
   });
 });

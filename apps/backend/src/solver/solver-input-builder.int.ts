@@ -22,7 +22,6 @@ import { SolverJobStoreService } from './solver-job-store.service';
 
 describe('Solver input builder (PGLite)', () => {
   let databaseService: DatabaseService;
-  let jobStore: SolverJobStoreService;
   let builder: SolverInputBuilderService;
 
   beforeAll(async () => {
@@ -39,7 +38,6 @@ describe('Solver input builder (PGLite)', () => {
     }).compile();
 
     databaseService = moduleRef.get(DatabaseService);
-    jobStore = moduleRef.get(SolverJobStoreService);
     builder = moduleRef.get(SolverInputBuilderService);
     await migratePglite(toPgliteDatabase(databaseService), {
       migrationsFolder: join(process.cwd(), 'drizzle'),
@@ -100,14 +98,7 @@ describe('Solver input builder (PGLite)', () => {
       EventID: eventId,
       VenueID: venueId,
     });
-    await jobStore.createQueuedJob({
-      jobId: 'solve-grouped-input',
-      solverProfileKey: groupId,
-      solveMode: 'optimization',
-      requestedEngine: 'cp-sat',
-    });
-
-    await expect(builder.build('solve-grouped-input')).resolves.toEqual({
+    await expect(builder.buildForProfile(groupId)).resolves.toEqual({
       schedulingProblem: {
         events: [
           {
@@ -132,14 +123,9 @@ describe('Solver input builder (PGLite)', () => {
       NotFoundException,
     );
 
-    await jobStore.createQueuedJob({
-      jobId: 'solve-bad-profile',
-      solverProfileKey: 'not-a-profile',
-      solveMode: 'optimization',
-    });
-    await expect(builder.build('solve-bad-profile')).rejects.toBeInstanceOf(
-      ConflictException,
-    );
+    await expect(
+      builder.buildForProfile('not-a-profile'),
+    ).rejects.toBeInstanceOf(ConflictException);
   });
 });
 

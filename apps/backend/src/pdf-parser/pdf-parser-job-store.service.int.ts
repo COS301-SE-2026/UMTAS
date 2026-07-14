@@ -138,17 +138,19 @@ describe('PdfParserJobStoreService', () => {
     const [storedEvent] = await databaseService.db.select().from(Event);
     expect(storedEvent).toMatchObject({
       eventName: 'COS101 Lecture',
-      eventCode: 'L1',
+      activityCode: 'L1',
+      activityType: 'lecture',
       isRecurring: true,
       validated: false,
     });
     expect(storedEvent.eventCriteria).toMatchObject({
-      moduleID: storedModule.moduleID,
-      date: 'Monday',
+      moduleId: storedModule.moduleID,
+      dayOfWeek: 'monday',
       startTime: '08:30',
       endTime: '09:20',
-      venue: 'IT 2-26',
     });
+    expect(storedEvent.eventCriteria).not.toHaveProperty('date');
+    expect(storedEvent.eventCriteria).not.toHaveProperty('venue');
 
     const [universityEvent] = await databaseService.db
       .select()
