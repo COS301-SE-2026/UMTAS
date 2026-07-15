@@ -23,12 +23,12 @@ export default function EventsShell({
   onViewModeChange,
 }: CustomiseShellProps) {
   const [selectedEventId, setSelectedEventId] = useState<string>(
-    events[0]?.eventId,
+    events[0]?.eventID,
   );
 
   //mostly same logic copy and pasted from modules shell
   const savedEvent =
-    events.find((e) => e.eventId === selectedEventId) || events[0];
+    events.find((e) => e.eventID === selectedEventId) || events[0];
 
   //this keeps track of what has been changed
   const [tempEvent, setTempEvent] = useState<EventResponse>(savedEvent);
@@ -90,10 +90,10 @@ export default function EventsShell({
   function handleSave() {
     if (!tempEvent) return;
     saveEvent({
-      path: { id: tempEvent.eventId },
+      path: { id: tempEvent.eventID },
       body: {
         eventName: tempEvent.eventName,
-        activityCode: tempEvent.activityCode,
+        eventCode: tempEvent.eventCode,
         eventCriteria: tempEvent.eventCriteria,
         isRecurring: tempEvent.isRecurring,
       },
@@ -110,7 +110,7 @@ export default function EventsShell({
     modules: ModuleResponseDto[],
   ) {
     const found = modules.find(
-      (module) => module.moduleID === event.eventCriteria?.moduleId,
+      (module) => module.moduleID === event.eventCriteria?.moduleID,
     );
     if (!found) {
       return null;
@@ -145,8 +145,8 @@ export default function EventsShell({
               <CustomiseEventPanel
                 event={event}
                 modules={modules}
-                key={event.eventId}
-                onClick={() => setSelectedEventId(event.eventId)}
+                key={event.eventID}
+                onClick={() => setSelectedEventId(event.eventID)}
               />
             ))}
           </div>

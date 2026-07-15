@@ -97,19 +97,20 @@ describe("Event Request Builders Integration Tests", () => {
 
     const eventBody: CreateEventBody = {
       eventName: "Lifecycle Test Event",
-      activityCode: `TEST-code`,
+      eventCode: `TEST-code`,
       isRecurring: false,
       eventCriteria: {
-        date: "2026-02-17",
+        date: "monday",
         startTime: "08:00",
         endTime: "09:00",
-        eventSource: "university",
-        moduleId,
+        type: "university",
+        venue: "IT 2-26",
+        moduleID: moduleId,
       },
     };
 
     const created = await createBuilder.send({ body: eventBody });
-    const eventId = created.event.eventId;
+    const eventId = created.event.eventID;
 
     expect(eventId).toBeDefined();
 
@@ -118,7 +119,7 @@ describe("Event Request Builders Integration Tests", () => {
 
     const found = await getBuilder.send({ paths: { eventId: eventId } });
 
-    expect(found.event.eventId).toBe(eventId);
+    expect(found.event.eventID).toBe(eventId);
     expect(found.event.eventName).toBe(eventBody.eventName);
 
     const updateBuilder = new updateEventByID();

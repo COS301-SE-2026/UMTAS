@@ -65,7 +65,7 @@ export class getEventByIDBuilder extends RequestBuilder<
 > {
   constructor() {
     super();
-    this.setUrl("/events/{eventId}").setMethod(RequestMethod.GET);
+    this.setUrl("/events/{id}").setMethod(RequestMethod.GET);
   }
 }
 
