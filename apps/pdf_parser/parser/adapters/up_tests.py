@@ -55,15 +55,17 @@ def test_rows_to_events(parser, rows: list[TestRow]) -> list[dict]:
         module = module_code(row.module)
         date = parse_pdf_date(row.date)
         start_time, end_time = parse_time_range(row.time)
-        section_label = clean_cell(row.test)
-        key = (module, section_label, date, start_time, end_time)
+        activity_code = clean_cell(row.test)
+        key = (module, activity_code, date, start_time, end_time)
         if key not in grouped:
             grouped[key] = parser._event(
                 module_code_value=module,
-                event_type="test",
-                section_label=section_label,
-                title=f"{module} {section_label}",
-                day=clean_cell(row.day),
+                activity_type="test",
+                activity_code=activity_code,
+                title="",
+                # The PDF weekday is display-only for a dated test. A dated
+                # event must never carry a recurring weekday in the contract.
+                day=None,
                 date=date,
                 start_time=start_time,
                 end_time=end_time,
@@ -73,4 +75,9 @@ def test_rows_to_events(parser, rows: list[TestRow]) -> list[dict]:
             )
         for venue in clean_lines(row.venue):
             parser._append_unique(grouped[key]["venues"], venue)
+    test_counts_by_module: dict[str, int] = {}
+    for event in grouped.values():
+        module = event["moduleCode"]
+        test_counts_by_module[module] = test_counts_by_module.get(module, 0) + 1
+        event["title"] = f"{module} Semester Test {test_counts_by_module[module]}"
     return list(grouped.values())

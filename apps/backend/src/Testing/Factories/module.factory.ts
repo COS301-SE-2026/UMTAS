@@ -38,6 +38,7 @@ export function createModule(overrides: Partial<Module> = {}): Module {
     moduleCode: 'COS332',
     moduleName: 'Networks',
     moduleDescription: 'About Networks',
+    validated: false,
 
     ...overrides,
   };

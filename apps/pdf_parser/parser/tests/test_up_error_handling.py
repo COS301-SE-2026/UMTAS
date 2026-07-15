@@ -261,11 +261,11 @@ def test_parser_result_rejects_missing_module_fields():
 
 def test_parser_result_rejects_bad_event_fields():
     test_cases = [
-        {"expected_code": "INVALID_EVENT_TYPE", "changes": {"type": "wrong"}},
+        {"expected_code": "INVALID_EVENT_TYPE", "changes": {"activityType": "wrong"}},
         {"expected_code": "INVALID_TIME", "changes": {"startTime": "7:30"}},
         {
             "expected_code": "INVALID_DATE",
-            "changes": {"type": "test", "date": "17 MAR 2026"},
+            "changes": {"activityType": "test", "date": "17 MAR 2026"},
         },
         {
             "expected_code": "INVALID_RECURRING_EVENT",
@@ -280,11 +280,11 @@ def test_parser_result_rejects_bad_event_fields():
     for test_case in test_cases:
         event = {
             "moduleCode": "COS301",
-            "type": "lecture",
-            "sectionLabel": "L1",
+            "activityType": "lecture",
+            "activityCode": "L1",
             "title": "COS301 L1",
-            "day": "Monday",
-            "date": None,
+                "day": None,
+                "date": "2026-03-17",
             "startTime": "07:30",
             "endTime": "08:20",
             "venues": [],

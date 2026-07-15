@@ -53,15 +53,15 @@ def test_parser_cli_emits_normalised_lecture_candidates():
         event
         for event in payload["events"]
         if event["moduleCode"] == "COS301"
-        and event["type"] == "prac"
-        and event["sectionLabel"] == "P2"
+        and event["activityType"] == "prac"
+        and event["activityCode"] == "P2"
         and event["day"] == "Friday"
         and event["startTime"] == "07:30"
     )
     assert cos301_p2 == {
         "moduleCode": "COS301",
-        "type": "prac",
-        "sectionLabel": "P2",
+        "activityType": "prac",
+        "activityCode": "P2",
         "title": "COS301 P2",
         "day": "Friday",
         "date": None,
@@ -89,13 +89,14 @@ def test_parser_cli_emits_normalised_semester_test_candidates():
     cos333_test1 = next(
         event
         for event in payload["events"]
-        if event["moduleCode"] == "COS333" and event["sectionLabel"] == "Test1"
+        if event["moduleCode"] == "COS333" and event["activityCode"] == "Test1"
     )
-    assert cos333_test1["type"] == "test"
-    assert cos333_test1["day"] == "Tuesday"
+    assert cos333_test1["activityType"] == "test"
+    assert cos333_test1["day"] is None
     assert cos333_test1["date"] == "2026-03-17"
     assert cos333_test1["startTime"] == "12:30"
     assert cos333_test1["endTime"] == "14:00"
+    assert cos333_test1["title"] == "COS333 Semester Test 1"
     assert cos333_test1["isRecurring"] is False
     assert cos333_test1["venues"] == [
         "IT Open Bronze Lab",
@@ -116,8 +117,9 @@ def test_parser_cli_emits_exam_times_and_missing_venue_warnings():
     assert payload.keys() == {"modules", "events", "warnings"}
 
     cos314 = next(event for event in payload["events"] if event["moduleCode"] == "COS314")
-    assert cos314["type"] == "exam"
-    assert cos314["sectionLabel"] == "Paper 1"
+    assert cos314["activityType"] == "exam"
+    assert cos314["activityCode"] == "Paper 1"
+    assert cos314["title"] == "COS314 Paper 1"
     assert cos314["date"] == "2026-06-05"
     assert cos314["startTime"] == "11:15"
     assert cos314["endTime"] == "14:15"

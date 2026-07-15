@@ -1,13 +1,16 @@
 packages:
   - "apps/*"
+  - "apps/pdf_parser/worker"
   - "packages/*"
 
 # Allowlist for packages permitted to run lifecycle scripts during install.
-# Per-package onlyBuiltDependencies entries must be consistent with this list.
 allowBuilds:
-  "0": "@nestjs/core"
-  "1": "@swc/core"
-  "2": esbuild
-  "3": msgpackr-extract
-  "4": sharp
-  "5": unrs-resolver
+  "@nestjs/core": true
+  "@scarf/scarf": false
+  "@swc/core": true
+  esbuild: true
+  msw: false
+  msgpackr-extract: true
+  napi-postinstall: true
+  sharp: true
+  unrs-resolver: true

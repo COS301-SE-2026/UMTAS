@@ -997,8 +997,13 @@ export interface components {
        *     }
        */
       styling?: components["schemas"]["StylingDto"] | null;
+      /**
+       * Format: uuid
+       * @description Unique identifier for a module group
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      ModuleGroupingID?: string;
     };
-    Object: Record<string, never>;
     ModuleListResponseDto: {
       /** @description List of modules */
       modules: components["schemas"]["ModuleSingleResponseDto"][];
@@ -1592,6 +1597,7 @@ export interface components {
        */
       AttendanceID: string;
     };
+    Object: Record<string, never>;
     AttendanceListResponse: {
       /** @description List of attendance records */
       attendanceList: components["schemas"]["AttendanceSingleResponse"][];
@@ -2370,7 +2376,7 @@ export interface operations {
         /** @description Filter by code, makes use of wildcard search */
         moduleCode?: string;
         /** @description Choose to filter modules based of current user enrollments */
-        userEnrollment?: components["schemas"]["Object"];
+        userEnrollment?: boolean;
       };
       header?: never;
       path?: never;
@@ -2634,13 +2640,13 @@ export interface operations {
   getCourses: {
     parameters: {
       query?: {
-        /** @description Unique identifier for a university */
-        UniversityID?: string;
-        /** @description Degree that course belongs to */
-        Degree?: string | null;
+        /** @description Filter by Degree */
+        Degree?: string;
       };
       header?: never;
-      path?: never;
+      path: {
+        universityId: string;
+      };
       cookie?: never;
     };
     requestBody?: never;

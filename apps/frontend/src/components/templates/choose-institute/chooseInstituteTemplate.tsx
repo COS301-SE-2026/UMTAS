@@ -8,7 +8,7 @@ import { InstituteSelector } from "@/components/organisms/choose-institute/insti
 
 export function ChooseInstituteTemplate() {
   return (
-    <Card className="mx-auto w-full md:w-1/2">
+    <Card className="mx-auto w-full md:w-3/4">
       <CardHeader>
         <CardTitle>Choose Institute</CardTitle>
       </CardHeader>

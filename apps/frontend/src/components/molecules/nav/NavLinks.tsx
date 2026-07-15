@@ -8,6 +8,8 @@ const NAV_ITEMS = [
   { href: "/builder", label: "Event Builder" },
   { href: "/schedules", label: "My Schedules" },
   { href: "/choose-institute", label: "Choose Institute" },
+  { href: "/course-management", label: "Manage courses" },
+  { href: "/role-management", label: "Manage roles" },
 ] as const;
 
 export function NavLinks() {
