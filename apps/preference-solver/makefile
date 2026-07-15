@@ -25,7 +25,8 @@ CFLAGS ?= -std=c++17 -DOR_PROTO_DLL= -I$(LIB_DIR) $(DEPENDENCY_CFLAGS) \
 	$(call dependency_include,PROTOBUF)
 LDFLAGS ?= $(if $(strip $(DEPENDENCY_LIBS)),$(DEPENDENCY_LIBS),\
 	$(call dependency_lib,ORTOOLS) -lortools $(call dependency_lib,ABSEIL) \
-	-labsl_raw_hash_set -labsl_raw_logging_internal) \
+	-labsl_raw_hash_set -labsl_raw_logging_internal \
+	-labsl_log_internal_check_op -labsl_log_internal_message) \
 	$(call dependency_rpath,ORTOOLS) $(call dependency_rpath,ABSEIL)
 
 

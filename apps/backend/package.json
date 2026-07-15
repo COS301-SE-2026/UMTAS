@@ -32,6 +32,7 @@
     "@better-auth/redis-storage": "^1.6.11",
     "@electric-sql/pglite": "^0.4.5",
     "@nestjs/axios": "^4.0.1",
+    "@nestjs-modules/mailer": "^2.3.6",
     "@nestjs/bullmq": "^11.0.4",
     "@nestjs/common": "^11.1.21",
     "@nestjs/config": "^4.0.4",

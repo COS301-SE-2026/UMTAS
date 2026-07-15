@@ -24,9 +24,9 @@ export function buildSolverWorkerConfig(
     defaultTimeoutMs: 300_000,
   });
   const callbackBaseUrl =
-    readEnv("SOLVER_CALLBACK_URL") ?? "http://localhost:3001/solver/jobs";
+    readEnv("SOLVER_CALLBACK_URL") ?? "http://localhost:3000/solver/jobs";
   const inputBaseUrl =
-    readEnv("SOLVER_INPUT_URL") ?? "http://localhost:3001/solver/jobs";
+    readEnv("SOLVER_INPUT_URL") ?? "http://localhost:3000/solver/jobs";
   const config: SolverWorkerConfig = {
     queueName: common.queueName,
     connection: common.connection,
