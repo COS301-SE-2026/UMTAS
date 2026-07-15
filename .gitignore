@@ -44,7 +44,6 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
 lib64/
 parts/
 sdist/
@@ -59,10 +58,6 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-!apps/*/src/lib/
-!apps/preference-solver/lib/
-!apps/preference-solver/lib/**
-
 # Environment variables
 .env
 .env.test
@@ -137,6 +132,7 @@ site/
 apps/frontend/junit.xml
 .zed/
 apps/preference-solver/.cache/
+apps/preference-solver/lib/
 apps/preference-solver/GA_TEST_DIR/
 apps/preference-solver/GA_BIN
 apps/preference-solver/TEST_DIR/input.json
