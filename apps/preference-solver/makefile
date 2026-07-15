@@ -25,7 +25,8 @@ CFLAGS ?= -std=c++17 -DOR_PROTO_DLL= -I$(LIB_DIR) $(DEPENDENCY_CFLAGS) \
 	$(call dependency_include,PROTOBUF)
 LDFLAGS ?= $(if $(strip $(DEPENDENCY_LIBS)),$(DEPENDENCY_LIBS),\
 	$(call dependency_lib,ORTOOLS) -lortools $(call dependency_lib,ABSEIL) \
-	-labsl_raw_hash_set -labsl_raw_logging_internal) \
+	-labsl_raw_hash_set -labsl_raw_logging_internal \
+	-labsl_log_internal_check_op -labsl_log_internal_message) \
 	$(call dependency_rpath,ORTOOLS) $(call dependency_rpath,ABSEIL)
 
 
@@ -47,30 +48,47 @@ JSON_HEADER := $(LIB_DIR)/nlohmann/json.hpp
 
 TARGET := GA_BIN
 COUNT_PATTERN_TEST := $(BUILD_DIR)/count-pattern-regression
+DEPENDENCY_HEADERS := $(OPEN_GA_HEADER) $(JSON_HEADER)
+
+.PHONY: all download d bear clean c clean_lib run r test
 
 all :$(TARGET)
 
-$(TARGET):$(OBJS)
+$(TARGET): $(OBJS) | $(DEPENDENCY_HEADERS)
 	@mkdir -p $(BUILD_DIR)
 	$(CXX) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
-$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp $(DEPENDENCY_HEADERS)
 	@mkdir -p $(dir $@)
 	$(CXX) $(CFLAGS) -c $< -o $@
 
 
 $(OPEN_GA_HEADER):
+	@echo "Downloading OpenGA v1.0.5 header..."
 	@mkdir -p $(LIB_DIR)
-	curl -L $(OPEN_GA_URL) -o $(LIB_DIR)/openGA.zip
-	unzip -q $(LIB_DIR)/openGA.zip -d $(LIB_DIR)
-	cp $(LIB_DIR)/openGA-1.0.5/src/openGA.hpp $(OPEN_GA_HEADER)
-	rm -rf $(LIB_DIR)/openGA-1.0.5 $(LIB_DIR)/openGA.zip
+	@set -eu; \
+		archive="$(LIB_DIR)/openGA.zip.tmp"; \
+		extract_dir="$(LIB_DIR)/.openGA-download"; \
+		trap 'rm -rf "$$archive" "$$extract_dir"' EXIT; \
+		rm -rf "$$archive" "$$extract_dir"; \
+		curl --fail --location --show-error --silent "$(OPEN_GA_URL)" -o "$$archive"; \
+		mkdir -p "$$extract_dir"; \
+		unzip -q "$$archive" -d "$$extract_dir"; \
+		cp "$$extract_dir/openGA-1.0.5/src/openGA.hpp" "$(OPEN_GA_HEADER)"
 
 $(JSON_HEADER):
-	@mkdir -p $(LIB_DIR)/nlohmann
-	curl -L $(JSON_URL) -o $(JSON_HEADER)
+	@echo "Downloading nlohmann/json v3.11.3 header..."
+	@mkdir -p $(dir $(JSON_HEADER))
+	@set -eu; \
+		temporary_header="$(JSON_HEADER).tmp"; \
+		trap 'rm -f "$$temporary_header"' EXIT; \
+		curl --fail --location --show-error --silent "$(JSON_URL)" -o "$$temporary_header"; \
+		mv "$$temporary_header" "$(JSON_HEADER)"
 	
-download d: clean_lib  $(OPEN_GA_HEADER) $(JSON_HEADER) 
+download: clean_lib
+	$(MAKE) $(DEPENDENCY_HEADERS)
+
+d: download
 
 bear : clean 
 	bear -- make all
@@ -85,7 +103,7 @@ clean_lib:
 run r: $(TARGET)
 	./$(TARGET)
 
-$(COUNT_PATTERN_TEST): $(filter-out $(BUILD_DIR)/main.o,$(OBJS)) tests/count-pattern-regression.cpp
+$(COUNT_PATTERN_TEST): $(DEPENDENCY_HEADERS) $(filter-out $(BUILD_DIR)/main.o,$(OBJS)) tests/count-pattern-regression.cpp
 	$(CXX) $(CFLAGS) -o $@ tests/count-pattern-regression.cpp $(filter-out $(BUILD_DIR)/main.o,$(OBJS)) $(LDFLAGS)
 
 test: $(TARGET) $(COUNT_PATTERN_TEST)

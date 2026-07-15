@@ -33,7 +33,7 @@ import {
 } from './dto/EventDto.dto';
 
 import { AppDatabase } from '../db/database.service';
-import type { ModuleService } from '../Module/module.service';
+import { ModuleService } from '../Module/module.service';
 import { EventImportFingerprintService } from './event-import-fingerprint.service';
 import { EventCriteria } from './dto/event.types';
 
