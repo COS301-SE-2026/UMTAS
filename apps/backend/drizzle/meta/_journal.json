@@ -5,8 +5,71 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1782041652890,
-      "tag": "0000_furry_doctor_doom",
+      "when": 1782912184549,
+      "tag": "0000_NEW_SCHEMA_WITH_GROUPING_FOR_MODULES",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1782912553922,
+      "tag": "0001_ADDED_GROUPNAME_TO_MODULEGROUPING",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1782979184040,
+      "tag": "0002_ADDED_HASH_FIELD_TO_MODULE_GROUPING",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1782998744029,
+      "tag": "0003_HASH_FIELD_ADDED_TO_MODULE_GROUPING",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1783346843378,
+      "tag": "0004_sad_supreme_intelligence",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1783349674671,
+      "tag": "0005_violet_vulcan",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1783505897441,
+      "tag": "0006_smart_amazoness",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1783505897442,
+      "tag": "0007_long_rockslide",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1783432425095,
+      "tag": "0005_clean_iceman",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1784110649365,
+      "tag": "0006_sad_mephistopheles",
       "breakpoints": true
     }
   ]

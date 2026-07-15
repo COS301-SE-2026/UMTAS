@@ -73,15 +73,15 @@ describe("Request Builders Integration Tests", () => {
       if (sessionCookie) createBuilder.setHeaders({ Cookie: sessionCookie });
 
       const mockModule: createModuleReq = {
-        code: moduleCode,
-        name: "Lifecycle Test Module",
-        description: "Created by integration test",
-        styling: "#00FF00",
+        moduleCode: moduleCode,
+        moduleName: "Lifecycle Test Module",
+        moduleDescription: "Created by integration test",
+        styling: { colour: "" },
       };
 
       const createResult = await createBuilder.send({ body: mockModule });
       console.log("Create Response:", JSON.stringify(createResult, null, 2));
-      const moduleId = createResult.module.moduleID;
+      const moduleId = createResult.moduleID;
       expect(moduleId).toBeDefined();
 
       // get by id
@@ -90,16 +90,16 @@ describe("Request Builders Integration Tests", () => {
 
       const getResult = await getBuilder.send({ paths: { moduleId } });
       console.log("Get Response:", JSON.stringify(getResult, null, 2));
-      expect(getResult.module.moduleID).toBe(moduleId);
-      expect(getResult.module.moduleCode).toBe(mockModule.code);
+      expect(getResult.moduleID).toBe(moduleId);
+      expect(getResult.moduleCode).toBe(mockModule.moduleCode);
 
       // update
       const updateBuilder = new updateModulesBuilder();
       if (sessionCookie) updateBuilder.setHeaders({ Cookie: sessionCookie });
 
       const updateBody: updateModuleByIdBody = {
-        name: "Updated Lifecycle Name",
-        styling: "#0000FF",
+        moduleName: "Updated Lifecycle Name",
+        styling: { colour: "00FF" },
       };
 
       const updateResult = await updateBuilder.send({
@@ -107,8 +107,8 @@ describe("Request Builders Integration Tests", () => {
         body: updateBody,
       });
       console.log("Update Response:", JSON.stringify(updateResult, null, 2));
-      expect(updateResult.module.moduleName).toBe(updateBody.name);
-      expect(updateResult.module.styling).toBe(updateBody.styling);
+      expect(updateResult.moduleName).toBe(updateBody.moduleName);
+      expect(updateResult.styling).toBe(updateBody.styling);
 
       // delete
       const deleteBuilder = new deleteModulesById();

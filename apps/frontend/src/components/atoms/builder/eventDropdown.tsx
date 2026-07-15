@@ -11,7 +11,7 @@ import {
 } from "@/components/atoms/baseShadcn/select";
 
 // add more types post demo 1
-export type EventType = "lecture";
+export type EventType = "university";
 
 export interface EventOption {
   value: EventType;
@@ -21,8 +21,8 @@ export interface EventOption {
 
 const Event_Types: EventOption[] = [
   {
-    value: "lecture",
-    label: "Lecture",
+    value: "university",
+    label: "university",
     icon: <BookOpen size={15} />,
   },
 ];

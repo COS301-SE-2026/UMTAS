@@ -4,22 +4,23 @@ import {
   Controller,
   Post,
   Get,
-  ParseIntPipe,
   Patch,
   Delete,
+  Query,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import {
   CreateEventDto,
-  EventResponseDto,
+  EventSingleResponseDto,
   EventListResponseDto,
   UpdateEventDto,
   DeleteResponseDto,
+  EventFiltersDto,
 } from './dto/EventDto.dto';
 
 import { EventService } from './event.service';
-import { Roles } from '../auth/roles.guard';
 import type { SessionData } from '../auth/session.decorator';
 import { CurrentSession } from '../auth/session.decorator';
 
@@ -29,7 +30,6 @@ export class EventController {
   constructor(private readonly service: EventService) {}
 
   @Post()
-  @Roles('student')
   @ApiOperation({
     summary: 'Create an event',
     operationId: 'createEvent',
@@ -38,7 +38,7 @@ export class EventController {
   @ApiResponse({
     status: 201,
     description: 'Event created successfully',
-    type: EventResponseDto,
+    type: EventSingleResponseDto,
   })
   @ApiResponse({
     status: 400,
@@ -59,13 +59,12 @@ export class EventController {
   createEvent(
     @CurrentSession() session: SessionData,
     @Body() dto: CreateEventDto,
-  ): Promise<EventResponseDto> {
-    return this.service.createEvent(session.user.id, dto);
+  ): Promise<EventSingleResponseDto> {
+    return this.service.create(session.user.id, dto);
   }
 
   //get All
   @Get()
-  @Roles('student')
   @ApiOperation({
     summary: 'Get all events',
     operationId: 'getAllEvents',
@@ -85,13 +84,15 @@ export class EventController {
   })
   getAllEvents(
     @CurrentSession() session: SessionData,
+    @Query() filters: EventFiltersDto,
   ): Promise<EventListResponseDto> {
-    return this.service.getAllEvents(session.user.id);
+    return this.service.getAllEvents(session.user.id, {
+      moduleId: filters.moduleId,
+    });
   } //getAllEvents
 
   //get by id
-  @Get(':id')
-  @Roles('student')
+  @Get(':eventId')
   @ApiOperation({
     summary: 'Get event by ID',
     operationId: 'getEventById',
@@ -99,22 +100,20 @@ export class EventController {
   @ApiResponse({
     status: 200,
     description: 'Event fetched successfully',
-    type: EventResponseDto,
+    type: EventSingleResponseDto,
   })
   @ApiResponse({
     status: 404,
     description: 'Event not found',
   })
   getById(
-    @CurrentSession() session: SessionData,
-    @Param('id', ParseIntPipe) id: number,
-  ): Promise<EventResponseDto> {
-    return this.service.getById(session.user.id, id);
+    @Param('eventId', ParseUUIDPipe) eventId: string,
+  ): Promise<EventSingleResponseDto> {
+    return this.service.getById(eventId);
   } //get by id
 
   //update
   @Patch(':id')
-  @Roles('student')
   @ApiOperation({
     summary: 'Update an event',
     operationId: 'updateEvent',
@@ -123,7 +122,7 @@ export class EventController {
   @ApiResponse({
     status: 200,
     description: 'Event updated successfully',
-    type: EventResponseDto,
+    type: EventSingleResponseDto,
   })
   @ApiResponse({
     status: 400,
@@ -147,15 +146,19 @@ export class EventController {
   })
   updateEvent(
     @CurrentSession() session: SessionData,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) eventId: string,
     @Body() dto: UpdateEventDto,
-  ): Promise<EventResponseDto> {
-    return this.service.updateEvent(session.user.id, id, dto);
+  ): Promise<EventSingleResponseDto> {
+    return this.service.updateEvent(
+      session.user.id,
+      session.user.role,
+      eventId,
+      dto,
+    );
   }
 
   //delete
   @Delete(':id')
-  @Roles('student')
   @ApiOperation({
     summary: 'Delete an event',
     operationId: 'deleteEvent',
@@ -183,8 +186,12 @@ export class EventController {
   })
   deleteEvent(
     @CurrentSession() session: SessionData,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) eventId: string,
   ): Promise<DeleteResponseDto> {
-    return this.service.deleteEvent(session.user.id, id);
+    return this.service.deleteEvent(
+      session.user.id,
+      session.user.role,
+      eventId,
+    );
   }
 } //EventController

@@ -13,6 +13,15 @@ import { RolesGuard } from './auth/roles.guard';
 import { ModuleModule } from './Module/module.module';
 import { EventModule } from './Events/event.module';
 import { TimetableModule } from './Timetable/timetable.module';
+import { UniversityModule } from './University/university.module';
+import { CourseModule } from './Course/course.module';
+import { BuilderModule } from './Builder/builder.module';
+import { JobsModule } from './jobs/jobs.module';
+import { PdfParserModule } from './pdf-parser/pdf-parser.module';
+import { SolverModule } from './solver/solver.module';
+import { StorageModule } from './storage/storage.module';
+import { AttendanceModule } from './Attendance/attendance.module';
+import { GroupingModule } from './Grouping/grouping.module';
 
 @Module({
   imports: [
@@ -26,6 +35,15 @@ import { TimetableModule } from './Timetable/timetable.module';
     ModuleModule,
     EventModule,
     TimetableModule,
+    UniversityModule,
+    CourseModule,
+    BuilderModule,
+    StorageModule,
+    JobsModule,
+    PdfParserModule,
+    SolverModule,
+    AttendanceModule,
+    GroupingModule,
   ],
   controllers: [AppController, AuthController],
   providers: [

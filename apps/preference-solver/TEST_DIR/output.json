@@ -1,0 +1,8 @@
+{
+  "heuristicScores": [],
+  "metadata": {},
+  "status": "feasible",
+  "timetableSolution": {
+    "selectedEventIds": ["CS101-L1-A"]
+  }
+}
