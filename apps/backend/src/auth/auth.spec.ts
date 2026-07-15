@@ -401,47 +401,47 @@ describe('createAuth - databaseHooks', () => {
   });
 
   describe('user.create.before', () => {
-    it('defaults role to student when no role provided and no actor', async () => {
+    it('defaults role to user when no role provided and no actor', async () => {
       const hooks = getHooks();
       const result = await hooks.user.create.before({ email: 'x@x.com' }, null);
-      expect(result.data.role).toBe('student');
+      expect(result.data.role).toBe('user');
     });
 
-    it('sys_admin passes data through unchanged (no role override)', async () => {
+    it('defaults sys_admin-created users to user when no role is provided', async () => {
       const hooks = getHooks();
       const result = await hooks.user.create.before(
         { email: 'x@x.com' },
         makeCtx('sys_admin'),
       );
-      // sys_admin returns { data } unchanged - input had no role, so output has no role
-      expect(result.data.role).toBeUndefined();
+      expect(result.data.role).toBe('user');
     });
 
-    it('allows sys_admin to assign any valid role', async () => {
+    it('allows sys_admin to assign sys_admin role', async () => {
       const hooks = getHooks();
       const result = await hooks.user.create.before(
-        { email: 'x@x.com', role: 'uni_admin' },
+        { email: 'x@x.com', role: 'sys_admin' },
         makeCtx('sys_admin'),
       );
-      expect(result.data.role).toBe('uni_admin');
+      expect(result.data.role).toBe('sys_admin');
     });
 
-    it('allows uni_admin to assign lecturer', async () => {
+    it('rejects university roles on auth users', async () => {
       const hooks = getHooks();
-      const result = await hooks.user.create.before(
-        { email: 'x@x.com', role: 'lecturer' },
-        makeCtx('uni_admin'),
-      );
-      expect(result.data.role).toBe('lecturer');
+      await expect(
+        hooks.user.create.before(
+          { email: 'x@x.com', role: 'lecturer' },
+          makeCtx('sys_admin'),
+        ),
+      ).rejects.toThrow('Invalid app role value provided');
     });
 
-    it('defaults uni_admin create to student when no role provided', async () => {
+    it('defaults uni_admin create to user when no role provided', async () => {
       const hooks = getHooks();
       const result = await hooks.user.create.before(
         { email: 'x@x.com' },
         makeCtx('uni_admin'),
       );
-      expect(result.data.role).toBe('student');
+      expect(result.data.role).toBe('user');
     });
 
     it('throws FORBIDDEN when uni_admin tries to assign sys_admin', async () => {
@@ -451,14 +451,14 @@ describe('createAuth - databaseHooks', () => {
           { email: 'x@x.com', role: 'sys_admin' },
           makeCtx('uni_admin'),
         ),
-      ).rejects.toThrow('uni_admin can only assign student or lecturer role');
+      ).rejects.toThrow('Only sys_admin can assign sys_admin role');
     });
 
     it('throws BAD_REQUEST for invalid role string', async () => {
       const hooks = getHooks();
       await expect(
         hooks.user.create.before({ email: 'x@x.com', role: 'hacker' }, null),
-      ).rejects.toThrow('Invalid role value provided');
+      ).rejects.toThrow('Invalid app role value provided');
     });
   });
 

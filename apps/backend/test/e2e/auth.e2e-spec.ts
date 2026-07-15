@@ -123,19 +123,22 @@ describe('Auth e2e', () => {
   });
 
   describe('Session Management', () => {
-    test('GET /session with no cookie → 401', async () => {
-      const res = await request(app.getHttpServer()).get('/api/auth/session');
-      expect(res.status).toBe(401);
+    test('GET /get-session with no cookie → 200 null', async () => {
+      const res = await request(app.getHttpServer()).get(
+        '/api/auth/get-session',
+      );
+      expect(res.status).toBe(200);
+      expect(res.body).toBeNull();
     });
 
-    test('GET /session with valid cookie → 200', async () => {
+    test('GET /get-session with valid cookie → 200', async () => {
       const agent = request.agent(app.getHttpServer());
       await agent.post('/api/auth/sign-in/email').send({
         email: TEST_AUTH_DATA.users.student.email,
         password: TEST_PASSWORD,
       });
 
-      const res = await agent.get('/api/auth/session');
+      const res = await agent.get('/api/auth/get-session');
       expect(res.status).toBe(200);
       expect(res.body.user).toBeDefined();
     });
@@ -148,8 +151,9 @@ describe('Auth e2e', () => {
       });
 
       await agent.post('/api/auth/sign-out');
-      const sessionRes = await agent.get('/api/auth/session');
-      expect(sessionRes.status).toBe(401);
+      const sessionRes = await agent.get('/api/auth/get-session');
+      expect(sessionRes.status).toBe(200);
+      expect(sessionRes.body).toBeNull();
     }, 20000);
 
     test('list-sessions and revoke-session', async () => {

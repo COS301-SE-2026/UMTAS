@@ -10,7 +10,7 @@ export function createUser(overrides: Partial<AppUser> = {}): AppUser {
     email: 'testuser@some.com',
     emailVerified: true,
     image: null,
-    role: 'student',
+    role: 'user',
     banned: false,
     banReason: null,
     banExpires: null,

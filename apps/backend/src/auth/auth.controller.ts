@@ -1,5 +1,6 @@
 import {
   All,
+  Body,
   Controller,
   Get,
   Logger,
@@ -33,10 +34,14 @@ import {
   LinkGoogleAccountDto,
   ResetPasswordDto,
   RevokeSessionDto,
+  SelectUniversityDto,
   SignInEmailDto,
   SignUpEmailDto,
   VerifyEmailDto,
 } from './auth.dto';
+import { CurrentSession } from './session.decorator';
+import type { SessionData } from './session.decorator';
+import type { Response } from 'express';
 
 const USER_EXAMPLE = {
   id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
@@ -168,7 +173,7 @@ export class AuthController {
 
   @Public()
   @ApiTags('Auth Session')
-  @Get('session')
+  @Get('get-session')
   @ApiCookieAuth('umtas-session')
   @ApiOperation({
     summary: 'Get the current user session',
@@ -176,13 +181,8 @@ export class AuthController {
   })
   @ApiResponse({
     status: 200,
-    description: 'Active session returned. Returns null if no session exists.',
-    schema: { example: AUTH_RESPONSE_EXAMPLE },
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'No active session',
-    schema: { example: null },
+    description: 'Active session returned, or null if no session exists.',
+    schema: { nullable: true, example: AUTH_RESPONSE_EXAMPLE },
   })
   async getSession(
     @Req() req: IncomingMessage,
@@ -674,6 +674,29 @@ export class AuthController {
     @Res() res: ServerResponse,
   ): Promise<void> {
     return this.handleRequest(req, res);
+  }
+
+  //Select a university
+  @Post('select-university')
+  @ApiCookieAuth('umtas-session')
+  @ApiOperation({ summary: 'Select current university' })
+  @ApiResponse({
+    status: 200,
+    description: 'Selected university session returned.',
+  })
+  async selectUniversity(
+    @CurrentSession() session: SessionData,
+    @Body() dto: SelectUniversityDto,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<SessionData> {
+    const selected = this.authService.selectUniversity(session, dto.uniId);
+
+    res.cookie('umtas-uni-id', dto.uniId, {
+      path: '/',
+      sameSite: 'lax',
+    });
+
+    return selected;
   }
 
   // ─── Catch-all for internal BetterAuth routes ─────────────────────────────────
