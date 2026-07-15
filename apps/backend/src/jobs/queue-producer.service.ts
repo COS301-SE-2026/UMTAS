@@ -26,7 +26,7 @@ export class QueueProducerService {
     data: TimetableSolveJobData,
   ): Promise<Job<TimetableSolveJobData>> {
     return this.timetableSolveQueue.add(TIMETABLE_SOLVE_JOB_NAME, data, {
-      jobId: data.jobId,
+      jobId: data.attemptToken,
     });
   }
 }

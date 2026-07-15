@@ -79,8 +79,8 @@ def lecture_rows_to_events(parser, rows: list[LectureRow]) -> list[dict]:
 
         for index, activity in enumerate(activities):
             start_time, end_time = parse_time_range(times[index])
-            event_type = lecture_type(activity)
-            section_label = activity
+            activity_type = activity_type_for_code(activity)
+            parsed_activity_code = activity
             metadata = {
                 "group": clean_cell(row.group),
                 "semester": clean_cell(row.offered),
@@ -89,8 +89,8 @@ def lecture_rows_to_events(parser, rows: list[LectureRow]) -> list[dict]:
             }
             key = (
                 module,
-                event_type,
-                section_label,
+                activity_type,
+                parsed_activity_code,
                 days[index],
                 start_time,
                 end_time,
@@ -99,8 +99,8 @@ def lecture_rows_to_events(parser, rows: list[LectureRow]) -> list[dict]:
             if key not in grouped:
                 grouped[key] = parser._event(
                     module_code_value=module,
-                    event_type=event_type,
-                    section_label=section_label,
+                    activity_type=activity_type,
+                    activity_code=parsed_activity_code,
                     title=f"{module} {activity_code(activity)}",
                     day=days[index],
                     date=None,
@@ -120,7 +120,7 @@ def activity_code(activity: str) -> str:
     return match.group(0) if match else value
 
 
-def lecture_type(activity: str) -> str:
+def activity_type_for_code(activity: str) -> str:
     first = clean_cell(activity)[:1].upper()
     if first == "T":
         return "tutorial"

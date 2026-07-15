@@ -7,7 +7,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import type { PdfParserCallbackPayload } from 'shared-types';
+import type { PdfParserResult } from 'shared-types';
 
 export class WorkerCallbackErrorDto {
   @ApiProperty({ example: 'PARSER_FAILED' })
@@ -24,7 +24,7 @@ export class WorkerCallbackErrorDto {
   details?: Record<string, unknown>;
 }
 
-export class PdfParserCallbackDto implements PdfParserCallbackPayload {
+export class PdfParserCallbackDto {
   @ApiProperty({ enum: ['completed', 'failed'] })
   @IsIn(['completed', 'failed'])
   status!: 'completed' | 'failed';
@@ -32,7 +32,7 @@ export class PdfParserCallbackDto implements PdfParserCallbackPayload {
   @ApiPropertyOptional({ type: 'object', additionalProperties: true })
   @IsOptional()
   @IsObject()
-  result?: PdfParserCallbackPayload['result'];
+  result?: PdfParserResult;
 
   @ApiPropertyOptional({ type: () => WorkerCallbackErrorDto })
   @IsOptional()

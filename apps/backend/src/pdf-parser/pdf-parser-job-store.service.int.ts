@@ -19,7 +19,7 @@ import {
   parseJob,
   usersTable,
 } from '../entities';
-import { EventImportKeyService } from '../Events/event-import-key.service';
+import { EventImportFingerprintService } from '../Events/event-import-fingerprint.service';
 import { EventImporter } from './event-importer.service';
 import { ModuleResolver } from './module-resolver.service';
 import { ParserResultImporter } from './parser-result-importer.service';
@@ -42,7 +42,7 @@ describe('PdfParserJobStoreService', () => {
       databaseService,
       new ParserResultImporter(
         new ModuleResolver(),
-        new EventImporter(new EventImportKeyService()),
+        new EventImporter(new EventImportFingerprintService()),
       ),
     );
 
@@ -93,10 +93,10 @@ describe('PdfParserJobStoreService', () => {
         events: [
           {
             moduleCode: 'cos101',
-            type: 'lecture',
-            sectionLabel: 'L1',
+            activityType: 'lecture',
+            activityCode: 'L1',
             title: 'COS101 Lecture',
-            day: 'Monday',
+            day: 'monday',
             date: null,
             startTime: '08:30',
             endTime: '09:20',
@@ -138,17 +138,19 @@ describe('PdfParserJobStoreService', () => {
     const [storedEvent] = await databaseService.db.select().from(Event);
     expect(storedEvent).toMatchObject({
       eventName: 'COS101 Lecture',
-      eventCode: 'L1',
+      activityCode: 'L1',
+      activityType: 'lecture',
       isRecurring: true,
       validated: false,
     });
     expect(storedEvent.eventCriteria).toMatchObject({
-      moduleID: storedModule.moduleID,
-      date: 'Monday',
+      moduleId: storedModule.moduleID,
+      dayOfWeek: 'monday',
       startTime: '08:30',
       endTime: '09:20',
-      venue: 'IT 2-26',
     });
+    expect(storedEvent.eventCriteria).not.toHaveProperty('date');
+    expect(storedEvent.eventCriteria).not.toHaveProperty('venue');
 
     const [universityEvent] = await databaseService.db
       .select()
@@ -373,10 +375,10 @@ const duplicateImportResult: PdfParserResult = {
   events: [
     {
       moduleCode: 'cos103',
-      type: 'lecture',
-      sectionLabel: 'L1',
+      activityType: 'lecture',
+      activityCode: 'L1',
       title: 'COS103 Lecture',
-      day: 'Tuesday',
+      day: 'tuesday',
       date: null,
       startTime: '10:30',
       endTime: '11:20',

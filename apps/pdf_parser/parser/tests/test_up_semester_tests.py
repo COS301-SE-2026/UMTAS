@@ -6,7 +6,7 @@ from .conftest import find_event, parse_fixture
 def test_semester_test_fixture_preserves_venue_alternatives(up_parser):
     events = parse_fixture(up_parser, "SEM_TESTS_BOTH.pdf")["events"]
 
-    assert Counter(event["sectionLabel"] for event in events) == {"Test1": 8, "Test2": 5}
+    assert Counter(event["activityCode"] for event in events) == {"Test1": 8, "Test2": 5}
 
     cos333_test1 = find_event(events, "COS333", "Test1")
     assert cos333_test1["venues"] == [

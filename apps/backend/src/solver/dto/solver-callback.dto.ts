@@ -1,10 +1,10 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsIn, IsObject, IsOptional, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
-import type { SolverCallbackPayload } from 'shared-types';
+import type { SolverResult } from 'shared-types';
 import { WorkerCallbackErrorDto } from '../../pdf-parser/dto/pdf-parser-callback.dto';
 
-export class SolverCallbackDto implements SolverCallbackPayload {
+export class SolverCallbackDto {
   @ApiProperty({ enum: ['completed', 'failed'] })
   @IsIn(['completed', 'failed'])
   status!: 'completed' | 'failed';
@@ -12,12 +12,11 @@ export class SolverCallbackDto implements SolverCallbackPayload {
   @ApiPropertyOptional({
     type: 'object',
     additionalProperties: true,
-    description:
-      'Temporary payload shape until the solver output contract is final.',
+    description: 'A valid timetable solution and its soft-heuristic scores.',
   })
   @IsOptional()
   @IsObject()
-  result?: Record<string, unknown>;
+  result?: SolverResult;
 
   @ApiPropertyOptional({ type: () => WorkerCallbackErrorDto })
   @IsOptional()

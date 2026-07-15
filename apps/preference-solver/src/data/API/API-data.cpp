@@ -2,7 +2,7 @@
 #include "nlohmann/json.hpp"
 #include <stdexcept>
 
-const string API_DATA::TARGET_TIME_KEY = "targetTime";
+const string API_DATA::TARGET_TIME_KEY = "preferences";
 
 API_DATA::API_DATA(const json &reqData) {
   if (reqData.empty()) {
@@ -10,28 +10,40 @@ API_DATA::API_DATA(const json &reqData) {
   }
 
   try {
-    if (reqData.contains(ModuleGA::GROUPING_KEY) &&
-        reqData[ModuleGA::GROUPING_KEY].is_array())
-      this->modules = ModuleGA::innitModules(reqData[ModuleGA::GROUPING_KEY]);
+    if (reqData.contains("schedulingProblem") &&
+        reqData["schedulingProblem"].contains(EventGA::GROUPING_KEY) &&
+        reqData["schedulingProblem"][EventGA::GROUPING_KEY].is_array()) {
+      const json& events = reqData["schedulingProblem"][EventGA::GROUPING_KEY];
+      this->events = EventGA::initEvents(events);
+      json modulesByCode = json::object();
+      for (const auto& event : events) {
+        const string moduleCode = event["moduleCode"].get<string>();
+        if (!modulesByCode.contains(moduleCode)) {
+          modulesByCode[moduleCode] = {{"moduleCode", moduleCode}, {"activityRequirements", json::array()}};
+        }
+        modulesByCode[moduleCode]["activityRequirements"].push_back({
+          {"activityCode", event["activityCode"]},
+          {"requiredSelections", event.value("requiredSelections", 1)}
+        });
+      }
+      json modules = json::array();
+      for (auto& entry : modulesByCode.items()) modules.push_back(entry.value());
+      this->modules = ModuleGA::innitModules(modules);
+    }
     else {
-      throw std::runtime_error("Key: " + ModuleGA::GROUPING_KEY +
-                               " is not provided or is not an array");
+      throw std::runtime_error("schedulingProblem.events is not provided or is not an array");
     }
 
-    if (reqData.contains(EventGA::GROUPING_KEY) &&
-        reqData[EventGA::GROUPING_KEY].is_array())
-      this->events = EventGA::initEvents(reqData[EventGA::GROUPING_KEY]);
-    else {
-      throw std::runtime_error("Key: " + EventGA::GROUPING_KEY +
-                               " is not provided or is not an array");
+    this->targetTime = 420;
+    if (reqData.contains(TARGET_TIME_KEY) && reqData[TARGET_TIME_KEY].contains("heuristics")) {
+      for (const auto& preference : reqData[TARGET_TIME_KEY]["heuristics"]) {
+        if (preference.value("key", "") == "preferred-start-time" &&
+            preference.contains("parameters") &&
+            preference["parameters"].contains("minutesAfterMidnight")) {
+          this->targetTime = preference["parameters"]["minutesAfterMidnight"].get<int>();
+        }
+      }
     }
-
-    if (reqData.contains(TARGET_TIME_KEY) &&
-        reqData[TARGET_TIME_KEY].is_number_integer())
-      this->targetTime = reqData[TARGET_TIME_KEY].get<int>();
-    else
-      throw std::runtime_error(TARGET_TIME_KEY +
-                               " is not defined or is not an integer");
     
   } catch (const json::parse_error &e) {
     // this is for errors casued by library misuse
@@ -42,3 +54,4 @@ API_DATA::API_DATA(const json &reqData) {
     throw std::runtime_error(string("Could not create API_DATA: ") + e.what());
   }
 }
+

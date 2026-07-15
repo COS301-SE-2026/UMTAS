@@ -14,10 +14,11 @@ struct ModuleGA {
   static const string TYPE_KEY;
   static const string OCCUR_KEY;
   string moduleCode;
-  // hash map for the number of occurences for each type of event
-  std::unordered_map<string, int> number_Occur;
+  // Required selections keyed by activityCode within this module.
+  std::unordered_map<string, int> requiredSelections;
   ModuleGA(const json& module);
   static std::vector<ModuleGA> innitModules(const json &modulesArr);
-  // sets the number of occurences for a module specifcally a type
-  void handleOccurences(const json& types);
+  void handleActivityRequirements(const json& requirements);
 };
+#pragma once
+

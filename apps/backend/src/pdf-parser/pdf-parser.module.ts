@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { EventImportKeyService } from '../Events/event-import-key.service';
+import { EventImportFingerprintService } from '../Events/event-import-fingerprint.service';
 import { JobsModule } from '../jobs/jobs.module';
 import { StorageModule } from '../storage/storage.module';
 import { EventImporter } from './event-importer.service';
@@ -14,7 +14,7 @@ import { PdfParserJobStoreService } from './pdf-parser-job-store.service';
   imports: [JobsModule, StorageModule],
   controllers: [PdfParserController],
   providers: [
-    EventImportKeyService,
+    EventImportFingerprintService,
     EventImporter,
     ModuleResolver,
     ParserResultImporter,
