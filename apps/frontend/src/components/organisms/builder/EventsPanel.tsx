@@ -43,15 +43,13 @@ export function EventsPanel({
           const criteria = event.eventCriteria;
           return (
             <StepPill
-              key={event.eventId}
+              key={event.eventID}
               icon={<CalendarDays size={15} />}
-              label={criteria?.moduleId || "Event " + (index + 1)}
+              label={criteria?.moduleID || "Event " + (index + 1)}
               summary={criteria?.date || undefined}
-              isActive={selectedEventId === event.eventId}
-              isComplete={
-                !!(criteria?.eventSource && event.eventCriteria?.moduleId)
-              }
-              onClick={() => onEventSelect(event.eventId)}
+              isActive={selectedEventId === event.eventID}
+              isComplete={!!(criteria?.type && event.eventCriteria?.moduleID)}
+              onClick={() => onEventSelect(event.eventID)}
             />
           );
         })}

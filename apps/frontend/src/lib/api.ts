@@ -1365,24 +1365,17 @@ export interface components {
     };
     EventCriteriaDto: {
       /** @enum {string} */
-      eventSource: "university" | "personal";
-      /** @example 2026-02-17 */
-      date?: string;
-      /** @enum {string} */
-      dayOfWeek?:
-        | "monday"
-        | "tuesday"
-        | "wednesday"
-        | "thursday"
-        | "friday"
-        | "saturday"
-        | "sunday";
+      type?: "university" | "personal";
+      /** @example yyyy-mm-dd */
+      date: string;
       /** @example 08:30 */
       startTime: string;
       /** @example 10:20 */
       endTime: string;
       /** Format: uuid */
-      moduleId?: string;
+      moduleID?: string;
+      /** @example IT 2-26 */
+      venue?: string;
     };
     CreateEventDto: {
       /** @description Defines the additional information to attach to event entity */
@@ -1392,16 +1385,14 @@ export interface components {
        * @example event name
        */
       eventName?: string;
-      activityType?: "lecture" | "tutorial" | "prac" | "test" | "exam";
-      /** @example L1 */
-      activityCode?: string | null;
-      venues?: components["schemas"]["VenueDto"][];
+      /** @example lec1 */
+      eventCode?: string | null;
       /**
        * @description Is the event recurring or not
        * @default true
        * @example true
        */
-      isRecurring?: boolean;
+      isRecurring: boolean;
     };
     EventDto: {
       /**
@@ -1409,7 +1400,7 @@ export interface components {
        * @description Unique identifier for an event
        * @example 00000000-0000-0000-0000-000000000000
        */
-      eventId: string;
+      eventID: string;
       /** @description Defines the additional information to attach to event entity */
       eventCriteria: components["schemas"]["EventCriteriaDto"];
       /**
@@ -1417,16 +1408,14 @@ export interface components {
        * @example event name
        */
       eventName?: string;
-      activityType?: "lecture" | "tutorial" | "prac" | "test" | "exam";
-      /** @example L1 */
-      activityCode?: string | null;
-      venues?: components["schemas"]["VenueDto"][];
+      /** @example lec1 */
+      eventCode?: string | null;
       /**
        * @description Is the event recurring or not
        * @default true
        * @example true
        */
-      isRecurring?: boolean;
+      isRecurring: boolean;
     };
     EventSingleResponseDto: {
       event: components["schemas"]["EventDto"];
@@ -1437,7 +1426,7 @@ export interface components {
     };
     UpdateEventCriteriaDto: {
       /** @enum {string} */
-      eventSource?: "university" | "personal";
+      type?: "university" | "personal";
       /** @example yyyy-mm-dd */
       date?: string;
       /** @example 08:30 */
@@ -1445,15 +1434,9 @@ export interface components {
       /** @example 10:20 */
       endTime?: string;
       /** Format: uuid */
-      dayOfWeek?:
-        | "monday"
-        | "tuesday"
-        | "wednesday"
-        | "thursday"
-        | "friday"
-        | "saturday"
-        | "sunday";
-      moduleId?: string;
+      moduleID?: string;
+      /** @example IT 2-26 */
+      venue?: string;
     };
     UpdateEventDto: {
       /**
@@ -1461,15 +1444,14 @@ export interface components {
        * @example event name
        */
       eventName?: string;
-      activityType?: "lecture" | "tutorial" | "prac" | "test" | "exam";
-      /** @example L1 */
-      activityCode?: string | null;
+      /** @example lec1 */
+      eventCode?: string | null;
       /**
        * @description Is the event recurring or not
        * @default true
        * @example true
        */
-      isRecurring?: boolean;
+      isRecurring: boolean;
       /** @description Partial event criteria for update */
       eventCriteria?: components["schemas"]["UpdateEventCriteriaDto"];
     };
@@ -1479,17 +1461,13 @@ export interface components {
        * @example event name
        */
       eventName?: string;
-      /** @example L1 */
-      activityCode?: string | null;
+      /** @example lec1 */
+      eventCode?: string | null;
       /**
        * @default true
        * @example true
        */
       success: Record<string, never>;
-    };
-    VenueDto: {
-      venueId: string;
-      venueName: string;
     };
     CreateTimetableDto: {
       /**

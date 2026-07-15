@@ -130,9 +130,9 @@ export function GenerateStep({
         <div className="flex flex-col gap-2">
           {events.map((event) => {
             const criteria = event.eventCriteria;
-            const isEventChecked = selectedEventIds.includes(event.eventId);
+            const isEventChecked = selectedEventIds.includes(event.eventID);
             const linkedModule = getLinkedModule(
-              event.eventCriteria?.moduleId,
+              event.eventCriteria?.moduleID,
               modules,
             );
             const timeString = formatTime(
@@ -142,7 +142,7 @@ export function GenerateStep({
 
             return (
               <div
-                key={event.eventId}
+                key={event.eventID}
                 className="flex flex-row items-center gap-1 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] px-4 py-4 shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.08)]"
               >
                 <div className="flex flex-col gap-1 flex-1 min-w-0">
@@ -179,10 +179,10 @@ export function GenerateStep({
 
                 <span className="flex-shrink-0 flex items-center justify-center">
                   <Checkbox
-                    id={`event-${event.eventId}`}
+                    id={`event-${event.eventID}`}
                     checked={isEventChecked}
                     onCheckedChange={(checkedState) =>
-                      checkboxLogic(event.eventId, checkedState === true)
+                      checkboxLogic(event.eventID, checkedState === true)
                     }
                   />
                 </span>

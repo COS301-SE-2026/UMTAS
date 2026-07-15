@@ -72,14 +72,14 @@ export function resolveScheduleEvents(
     const criteria = event.eventCriteria;
     const isRecurring = false; // Temporarily disabled
 
-    if (criteria?.eventSource === "university") {
+    if (criteria?.type === "university") {
       const uniModule = modules.find(
-        (m) => m.moduleID === event.eventCriteria?.moduleId,
+        (m) => m.moduleID === event.eventCriteria?.moduleID,
       );
       resolved.push({
-        id: String(event.eventId),
+        id: String(event.eventID),
         name: event.eventName || "Untitled Event",
-        code: criteria?.moduleId || "",
+        code: criteria?.moduleID || "",
         date: criteria?.date || "",
         startTime: criteria?.startTime || "",
         endTime: criteria?.endTime || "",
@@ -92,9 +92,9 @@ export function resolveScheduleEvents(
 
     // future event types
     resolved.push({
-      id: String(event.eventId),
-      name: criteria?.moduleId || "",
-      code: criteria?.moduleId || "",
+      id: String(event.eventID),
+      name: criteria?.moduleID || "",
+      code: criteria?.moduleID || "",
       date: criteria?.date || "",
       startTime: criteria?.startTime || "",
       endTime: criteria?.endTime || "",

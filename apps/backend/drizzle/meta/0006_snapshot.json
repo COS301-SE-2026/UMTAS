@@ -1,5 +1,5 @@
 {
-  "id": "caec0116-1410-4a4c-980c-b4588dc1a107",
+  "id": "30de478b-af66-47d1-ab72-a4c9c9f0b663",
   "prevId": "5947f1d1-1e1b-411d-b341-4e5d8d615822",
   "version": "7",
   "dialect": "postgresql",
@@ -1253,6 +1253,192 @@
           "columnsFrom": ["GroupID"],
           "columnsTo": ["GroupID"],
           "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.SOLVER_JOB": {
+      "name": "SOLVER_JOB",
+      "schema": "",
+      "columns": {
+        "JobID": {
+          "name": "JobID",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "UserID": {
+          "name": "UserID",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "SolverProfileKey": {
+          "name": "SolverProfileKey",
+          "type": "varchar(128)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "SolveMode": {
+          "name": "SolveMode",
+          "type": "varchar(32)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "RequestedEngine": {
+          "name": "RequestedEngine",
+          "type": "varchar(32)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "DeduplicationKey": {
+          "name": "DeduplicationKey",
+          "type": "varchar(90)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "AttemptToken": {
+          "name": "AttemptToken",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Input": {
+          "name": "Input",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Status": {
+          "name": "Status",
+          "type": "varchar(32)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'queued'"
+        },
+        "Result": {
+          "name": "Result",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ErrorCode": {
+          "name": "ErrorCode",
+          "type": "varchar(128)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ErrorMessage": {
+          "name": "ErrorMessage",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ErrorDetails": {
+          "name": "ErrorDetails",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "CreatedAt": {
+          "name": "CreatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "UpdatedAt": {
+          "name": "UpdatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "EnqueuedAt": {
+          "name": "EnqueuedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "CompletedAt": {
+          "name": "CompletedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "FailedAt": {
+          "name": "FailedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "solver_job_status_idx": {
+          "name": "solver_job_status_idx",
+          "columns": [
+            {
+              "expression": "Status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "solver_job_created_at_idx": {
+          "name": "solver_job_created_at_idx",
+          "columns": [
+            {
+              "expression": "CreatedAt",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "solver_job_duplicate_unique": {
+          "name": "solver_job_duplicate_unique",
+          "columns": [
+            {
+              "expression": "UserID",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "DeduplicationKey",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "SOLVER_JOB_UserID_user_id_fk": {
+          "name": "SOLVER_JOB_UserID_user_id_fk",
+          "tableFrom": "SOLVER_JOB",
+          "tableTo": "user",
+          "columnsFrom": ["UserID"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },

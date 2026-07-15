@@ -60,7 +60,7 @@ function validateEvent(event: EventResponse): valEvent {
     errors.name = "Name is required";
     hasErrors = true;
   }
-  if (!event.activityCode?.trim()) {
+  if (!event.eventCode?.trim()) {
     errors.code = "Code is required";
     hasErrors = true;
   }
@@ -92,11 +92,12 @@ function validateEvent(event: EventResponse): valEvent {
 function isEventComplete(event: EventResponse) {
   const criteria = event.eventCriteria;
   if (!event.eventName) return false;
-  if (!event.activityCode) return false;
+  if (!event.eventCode) return false;
   if (!criteria?.date) return false;
   if (!criteria?.startTime) return false;
   if (!criteria?.endTime) return false;
-  if (criteria?.eventSource === "university" && !criteria.moduleId)
+  if (criteria?.type === "university")
+    // TODO add module && event.eventCriteria.moduleID)
     return false;
   return true;
 }
@@ -106,7 +107,7 @@ function getLinkedModuleName(
   modules: ModuleResponseDto[],
 ) {
   const found = modules.find(
-    (m) => m.moduleID === event.eventCriteria.moduleId,
+    (m) => m.moduleID === event.eventCriteria.moduleID,
   ); // TODO add module event.lecture?.moduleID);
   if (found) {
     return found.moduleCode + " - " + found.moduleName;
@@ -126,7 +127,7 @@ export function EventsStep({
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
 
   const [eventsAdded, setEventsAdded] = useState<
-    { eventId: string; created: boolean }[]
+    { eventID: string; created: boolean }[]
   >([]);
 
   // a local construct to add an empty event
@@ -136,12 +137,12 @@ export function EventsStep({
       getAllEventsQ().queryKey,
       (oldEvents: EventResponse[] | undefined) => {
         const emptyEvent: EventResponse = {
-          eventId: `TEMP_${nextNum}`,
-          activityCode: "",
+          eventID: `TEMP_${nextNum}`,
+          eventCode: "",
           isRecurring: false,
           eventName: "",
           eventCriteria: {
-            eventSource: "university",
+            type: "university",
             date: "",
             endTime: "",
             startTime: "",
@@ -153,8 +154,8 @@ export function EventsStep({
 
     if (newEvents) {
       const mapped = newEvents.map((e) => ({
-        eventId: e.eventId,
-        created: !e.eventId.startsWith("TEMP"),
+        eventID: e.eventID,
+        created: !e.eventID.startsWith("TEMP"),
       }));
       setEventsAdded(mapped);
     }
@@ -206,7 +207,7 @@ export function EventsStep({
     }
 
     function doSelect() {
-      const selected = events.find((e) => e.eventId === id);
+      const selected = events.find((e) => e.eventID === id);
       setSelectedId(id);
       setIsDirty(false);
     }
@@ -215,7 +216,7 @@ export function EventsStep({
   }
 
   async function handleConfirm(id: string) {
-    const event = events.find((e) => e.eventId === id);
+    const event = events.find((e) => e.eventID === id);
     if (!event) return;
 
     const { errors: validationErrors, hasErrors } = validateEvent(event);
@@ -230,13 +231,13 @@ export function EventsStep({
       return next;
     });
 
-    const iscreated = eventsAdded.find((event) => event.eventId === id);
+    const iscreated = eventsAdded.find((event) => event.eventID === id);
 
     if (iscreated?.created) {
       updateEvent.mutate({
         body: {
           isRecurring: false,
-          activityCode: event.activityCode,
+          eventCode: event.eventCode,
           eventCriteria: event.eventCriteria,
           eventName: event.eventName,
         },
@@ -248,17 +249,17 @@ export function EventsStep({
       const result = addEvent.mutateAsync({
         body: {
           eventCriteria: event.eventCriteria,
-          activityCode: event.activityCode,
+          eventCode: event.eventCode,
           eventName: event.eventName,
           isRecurring: false,
         },
       });
-      const newID = (await result).event.eventId;
+      const newID = (await result).event.eventID;
       if (events) {
         const mapped = eventsAdded.map((event) => {
-          if (event.eventId === id) {
+          if (event.eventID === id) {
             return {
-              eventId: newID,
+              eventID: newID,
               created: true,
             };
           }
@@ -288,7 +289,7 @@ export function EventsStep({
       getAllEventsQ().queryKey,
       (OldEvents: EventResponse[] | undefined) => {
         if (!OldEvents) return [];
-        return OldEvents.filter((e) => e.eventId !== id);
+        return OldEvents.filter((e) => e.eventID !== id);
       },
     );
   }
@@ -305,7 +306,7 @@ export function EventsStep({
         if (!oldEvents) return [];
 
         return oldEvents.map((event) =>
-          event.eventId === id
+          event.eventID === id
             ? {
                 ...event,
                 ...(field in event
@@ -355,18 +356,18 @@ export function EventsStep({
 
   function renderEventRow(event: EventResponse, index: number) {
     const isComplete = isEventComplete(event);
-    const isSelected = selectedId === event.eventId;
-    const errors = errorMap[event.eventId];
+    const isSelected = selectedId === event.eventID;
+    const errors = errorMap[event.eventID];
     const moduleName = getLinkedModuleName(event, modules);
     const criteria = event.eventCriteria;
 
     return (
-      <div key={event.eventId} className="flex flex-col gap-2">
+      <div key={event.eventID} className="flex flex-col gap-2">
         {/* summary row */}
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={() => handleSelect(event.eventId)}
+            onClick={() => handleSelect(event.eventID)}
             className="flex flex-1 items-center gap-3 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] px-4 py-4 text-left transition-colors duration-[var(--duration-fast)] hover:bg-[var(--bg-elevated)] shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.08)]"
           >
             <div className="flex-1 min-w-0">
@@ -374,9 +375,9 @@ export function EventsStep({
                 {event.eventName || "Event " + (index + 1)}
               </p>
               <div className="flex flex-wrap items-center gap-2 mt-0.5">
-                {event.activityCode && (
+                {event.eventCode && (
                   <p className="text-sm font-mono text-[var(--text-secondary)]">
-                    {event.activityCode}
+                    {event.eventCode}
                   </p>
                 )}
                 {criteria?.date && (
@@ -410,7 +411,7 @@ export function EventsStep({
             type="button"
             variant="ghost"
             size="icon"
-            onClick={() => handleRemove(event.eventId)}
+            onClick={() => handleRemove(event.eventID)}
             aria-label={"Remove event " + (index + 1)}
             className="h-10 w-10 flex-shrink-0 border border-[var(--border)] text-[var(--text-secondary)] transition-colors duration-[var(--duration-fast)] hover:border-[var(--error-text)] hover:text-[var(--error-text)] hover:bg-transparent"
           >
@@ -432,7 +433,7 @@ export function EventsStep({
             <Button
               type="button"
               variant="outline"
-              onClick={() => handleConfirm(event.eventId)}
+              onClick={() => handleConfirm(event.eventID)}
               aria-label="Confirm event"
               className="w-full gap-2 border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-primary)] transition-colors duration-[var(--duration-fast)] hover:bg-[var(--bg-elevated)]"
             >
