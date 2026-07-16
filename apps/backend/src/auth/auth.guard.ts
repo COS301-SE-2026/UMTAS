@@ -10,6 +10,8 @@ import { Reflector } from '@nestjs/core';
 import type { IncomingMessage } from 'node:http';
 import { AuthService } from './auth.service';
 import type { SessionData } from './session.decorator';
+import type { AuthSession } from './auth';
+import { normalizeSession } from './auth';
 
 // Decorator to mark routes as public (no auth required)
 export const IS_PUBLIC_KEY = 'isPublic';
@@ -51,7 +53,8 @@ export class AuthGuard implements CanActivate {
     let session: SessionData | null;
     try {
       const result = await auth.api.getSession({ headers });
-      session = result as SessionData | null;
+      const rawSession = result as AuthSession | null;
+      session = rawSession ? normalizeSession(rawSession) : null;
     } catch (error) {
       this.logger.error(
         'Session fetch failed',
@@ -63,6 +66,37 @@ export class AuthGuard implements CanActivate {
     if (!session) {
       throw new UnauthorizedException('No active session');
     }
+
+    // If user selected uni -> enrich header with it and role
+    const hUniId =
+      headers.get('x-umtas-uni-id') ?? headers.get('x-umtas-uni') ?? null;
+
+    const cookieValue = headers.get('cookie') ?? '';
+    const cookieUniId = cookieValue
+      .split(';')
+      .map((cookie) => cookie.trim())
+      .find((cookie) => cookie.startsWith('umtas-uni-id='))
+      ?.split('=')[1];
+
+    const uniId = hUniId || cookieUniId || null;
+
+    if (uniId) {
+      try {
+        if (!session.uniRole || session.uniId !== uniId) {
+          const uniRole = await this.authService.getUniversityRole(
+            session.user.id,
+            uniId,
+          );
+          // attach to session for downstream guards
+          session.uniId = uniId;
+          session.uniRole = uniRole;
+        }
+      } catch {
+        this.logger.warn(
+          `Failed enrichment of session with uniRole for uni[${hUniId}] user[${session.user.id}]`,
+        );
+      }
+    } //END_hUniId
 
     // Attach session to request so controllers can access it
     req.session = session;

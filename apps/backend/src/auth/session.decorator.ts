@@ -1,5 +1,6 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import type { RequestWithSession } from './auth.guard';
+import type { UniRole, AppRole } from './roles';
 
 export interface SessionData {
   user: {
@@ -8,7 +9,7 @@ export interface SessionData {
     email: string;
     emailVerified: boolean;
     image?: string;
-    role: string;
+    role: AppRole;
     banned: boolean;
     banReason?: string;
     banExpires?: string;
@@ -26,6 +27,8 @@ export interface SessionData {
     createdAt: string;
     updatedAt: string;
   };
+  uniId?: string;
+  uniRole?: UniRole;
 }
 
 export const currentSessionFactory = (

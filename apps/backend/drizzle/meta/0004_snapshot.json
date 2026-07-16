@@ -1,5 +1,5 @@
 {
-  "id": "40821212-da43-4d12-a359-511b579f2b42",
+  "id": "120855ab-e2e6-4a16-8abc-f2bb3101444c",
   "prevId": "5c53b236-b677-4ad1-9cf2-58c88fdc2283",
   "version": "7",
   "dialect": "postgresql",
@@ -1373,6 +1373,63 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.SelectedUniversity": {
+      "name": "SelectedUniversity",
+      "schema": "",
+      "columns": {
+        "UserID": {
+          "name": "UserID",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "UniversityID": {
+          "name": "UniversityID",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "role": {
+          "name": "role",
+          "type": "RoleType",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'STUDENT'"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "SelectedUniversity_UserID_user_id_fk": {
+          "name": "SelectedUniversity_UserID_user_id_fk",
+          "tableFrom": "SelectedUniversity",
+          "tableTo": "user",
+          "columnsFrom": ["UserID"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "SelectedUniversity_UniversityID_University_UniversityID_fk": {
+          "name": "SelectedUniversity_UniversityID_University_UniversityID_fk",
+          "tableFrom": "SelectedUniversity",
+          "tableTo": "University",
+          "columnsFrom": ["UniversityID"],
+          "columnsTo": ["UniversityID"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "SelectedUniversity_UserID_pk": {
+          "name": "SelectedUniversity_UserID_pk",
+          "columns": ["UserID"]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.University": {
       "name": "University",
       "schema": "",
@@ -1576,8 +1633,7 @@
         "UNIVERSITY_ADMIN_PENDING",
         "LECTURER",
         "LECTURER_PENDING",
-        "SYSTEM_ADMIN",
-        "REJECTED"
+        "SYSTEM_ADMIN"
       ]
     }
   },

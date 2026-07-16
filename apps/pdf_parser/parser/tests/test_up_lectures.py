@@ -1,5 +1,7 @@
 from collections import Counter
 
+from parser.adapters.up_lectures import activity_code
+
 from .conftest import parse_fixture
 
 
@@ -22,7 +24,7 @@ def test_lecture_fixture_preserves_multiline_rows_and_metadata(up_parser):
         event
         for event in events
         if event["moduleCode"] == "COS301"
-        and event["sectionLabel"] == "P2"
+        and event["activityCode"] == "P2"
         and event["day"] == "Friday"
         and event["startTime"] == "07:30"
     ]
@@ -36,7 +38,7 @@ def test_lecture_processing_normalises_times_days_recurrence_and_locations(up_pa
 
     first = events[0]
     assert first["moduleCode"] == "COS301"
-    assert first["sectionLabel"] == "P1"
+    assert first["activityCode"] == "P1"
     assert first["title"] == "COS301 P1"
     assert first["startTime"] == "07:30"
     assert first["endTime"] == "09:20"
@@ -45,3 +47,7 @@ def test_lecture_processing_normalises_times_days_recurrence_and_locations(up_pa
     assert all(event["day"] in {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday"} for event in events)
     assert all(event["isRecurring"] is True for event in events)
     assert all(event["startTime"] < event["endTime"] for event in events)
+
+
+def test_lecture_title_uses_activity_code(up_parser):
+    assert activity_code("P2 Practical") == "P2"

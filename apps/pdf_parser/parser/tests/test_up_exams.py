@@ -22,7 +22,7 @@ def test_exam_fixture_preserves_final_and_preliminary_rows(up_parser):
         }
     ]
     assert all(event["isRecurring"] is False for event in events)
-    assert all(event["title"].endswith("Paper 1") for event in events)
+    assert all(event["title"] == f"{event['moduleCode']} Paper 1" for event in events)
 
 
 def test_processor_accepts_exam_header_with_double_spaced_start_time(up_parser):

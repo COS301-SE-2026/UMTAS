@@ -1,8 +1,9 @@
 import { SessionData } from '../../auth/session.decorator';
+import { AppRole } from '../../auth/roles';
 
 export function createMockSession(
   userId: string,
-  role: string = 'student',
+  role: AppRole = 'user',
 ): SessionData {
   const now = new Date().toISOString();
 

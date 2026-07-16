@@ -45,6 +45,11 @@ services:
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     volumes:
       - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=gateway"
@@ -55,20 +60,81 @@ services:
       - "traefik.http.services.minio-staging.loadbalancer.server.port=9001"
       - "com.centurylinklabs.watchtower.enable=true"
 
-  solver:
-    image: ${DOCKER_REGISTRY:-vigilcs/umtas}:solver-staging-${IMAGE_TAG:-latest}
+  pdf-parser-worker:
+    image: ${DOCKER_REGISTRY:-vigilcs/umtas}:pdf-parser-worker-staging-${IMAGE_TAG:-latest}
     restart: unless-stopped
+    init: true
     networks:
-      - gateway
       - internal
+    environment:
+      BULLMQ_REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
+      PDF_PARSE_QUEUE_NAME: ${PDF_PARSE_QUEUE_NAME:-pdf.parse}
+      PDF_PARSE_CONCURRENCY: ${PDF_PARSE_CONCURRENCY:-2}
+      PDF_PARSE_TIMEOUT_MS: ${PDF_PARSE_TIMEOUT_MS:-60000}
+      PDF_PARSE_CALLBACK_URL: http://backend:${BACKEND_PORT}/pdf-parser/jobs
+      WORKER_CALLBACK_TOKEN: ${WORKER_CALLBACK_TOKEN}
+      WORKER_TOPOLOGY: container
+      WORKER_KEEP_FAILED_TEMP: ${WORKER_KEEP_FAILED_TEMP:-false}
+      WORKER_TEMP_ROOT: /tmp/worker-jobs
+      MINIO_BUCKET: ${MINIO_BUCKET:-umtas-uploads}
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      PDF_PARSE_CLI_COMMAND: python3
+      PDF_PARSE_CLI_ARGS: -m parser_cli
+      PDF_PARSE_CLI_CWD: /app/python
+    depends_on:
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    tmpfs:
+      - /tmp/worker-jobs:size=2G,mode=1770,uid=1000,gid=1000
+    stop_grace_period: 90s
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2G
+        reservations:
+          cpus: "0.25"
+          memory: 256M
     labels:
-      - "traefik.enable=true"
-      - "traefik.docker.network=gateway"
-      - "traefik.http.routers.solver-staging.rule=Host(`staging.solver.capstone-vigil.dns.net.za`)"
-      - "traefik.http.routers.solver-staging.entrypoints=websecure"
-      - "traefik.http.routers.solver-staging.tls=true"
-      - "traefik.http.routers.solver-staging.tls.certresolver=myresolver"
-      - "traefik.http.services.solver-staging.loadbalancer.server.port=8000"
+      - "com.centurylinklabs.watchtower.enable=true"
+
+  solver-worker:
+    image: ${DOCKER_REGISTRY:-vigilcs/umtas}:solver-worker-staging-${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    init: true
+    networks:
+      - internal
+    environment:
+      BULLMQ_REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
+      TIMETABLE_SOLVE_QUEUE_NAME: ${TIMETABLE_SOLVE_QUEUE_NAME:-timetable.solve}
+      SOLVER_CONCURRENCY: ${SOLVER_CONCURRENCY:-1}
+      SOLVER_TIMEOUT_MS: ${SOLVER_TIMEOUT_MS:-300000}
+      SOLVER_INPUT_URL: http://backend:${BACKEND_PORT}/solver/jobs
+      SOLVER_CALLBACK_URL: http://backend:${BACKEND_PORT}/solver/jobs
+      WORKER_CALLBACK_TOKEN: ${WORKER_CALLBACK_TOKEN}
+      WORKER_TOPOLOGY: container
+      WORKER_KEEP_FAILED_TEMP: ${WORKER_KEEP_FAILED_TEMP:-false}
+      WORKER_TEMP_ROOT: /tmp/worker-jobs
+      SOLVER_CLI_COMMAND: /app/bin/solver-cli
+    depends_on:
+      redis:
+        condition: service_healthy
+    tmpfs:
+      - /tmp/worker-jobs:size=4G,mode=1770,uid=1000,gid=1000
+    stop_grace_period: 330s
+    deploy:
+      resources:
+        limits:
+          cpus: "4.0"
+          memory: 4G
+        reservations:
+          cpus: "0.5"
+          memory: 512M
+    labels:
       - "com.centurylinklabs.watchtower.enable=true"
 
   backend:
@@ -97,7 +163,20 @@ services:
       - NEXT_PUBLIC_API_URL=https://${STG_API_DOMAIN}/api
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
-      - REDIS_URL=${REDIS_URL}
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379
+      - BULLMQ_REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379
+      - PDF_PARSE_QUEUE_NAME=${PDF_PARSE_QUEUE_NAME:-pdf.parse}
+      - TIMETABLE_SOLVE_QUEUE_NAME=${TIMETABLE_SOLVE_QUEUE_NAME:-timetable.solve}
+      - PDF_PARSE_ATTEMPTS=${PDF_PARSE_ATTEMPTS:-3}
+      - PDF_PARSE_BACKOFF_DELAY_MS=${PDF_PARSE_BACKOFF_DELAY_MS:-5000}
+      - TIMETABLE_SOLVE_ATTEMPTS=${TIMETABLE_SOLVE_ATTEMPTS:-2}
+      - TIMETABLE_SOLVE_BACKOFF_DELAY_MS=${TIMETABLE_SOLVE_BACKOFF_DELAY_MS:-10000}
+      - WORKER_CALLBACK_TOKEN=${WORKER_CALLBACK_TOKEN}
+      - MINIO_BUCKET=${MINIO_BUCKET:-umtas-uploads}
+      - MINIO_ENDPOINT=http://minio:9000
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
+      - MINIO_CREATE_BUCKET_ON_STARTUP=${MINIO_CREATE_BUCKET_ON_STARTUP:-true}
       - SYSTEM_ADMIN_USER_IDS=${SYSTEM_ADMIN_USER_IDS}
       - SMTP_HOST=${SMTP_HOST:-mailhog}
       - SMTP_PORT=${SMTP_PORT:-1025}

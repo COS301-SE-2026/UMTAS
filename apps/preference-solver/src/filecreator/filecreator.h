@@ -25,3 +25,4 @@ public:
   json inputJson();
   void outputJson(json outputJson);
 };
+

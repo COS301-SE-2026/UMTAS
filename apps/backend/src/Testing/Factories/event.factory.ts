@@ -6,22 +6,21 @@ import {
   Venue,
   EventVenue,
 } from '../../entities/index';
-import { EventCriteria, EventType } from '../../Events/dto/event.types';
+import { EventCriteria, EventSource } from '../../Events/dto/event.types';
 import { CreateEventDto } from '../../Events/dto/EventDto.dto';
 
 export function createEventCriteria(
-  type: EventType = EventType.UNIVERSITY,
+  eventSource: EventSource = EventSource.UNIVERSITY,
   overrides: Partial<EventCriteria> = {},
 ): EventCriteria {
   const base: EventCriteria = {
-    type,
+    eventSource,
     date: 'yyyy-mm-dd',
     startTime: '08:30',
     endTime: '10:20',
 
-    ...(type === EventType.UNIVERSITY && {
-      moduleID: randomUUID(),
-      venue: 'IT 2-26',
+    ...(eventSource === EventSource.UNIVERSITY && {
+      moduleId: randomUUID(),
     }),
   };
 
@@ -30,16 +29,19 @@ export function createEventCriteria(
 
 type EventEntity = typeof Event.$inferSelect;
 export function createEvent(
-  type: EventType = EventType.UNIVERSITY,
+  eventSource: EventSource = EventSource.UNIVERSITY,
   overrides: Partial<EventEntity> = {},
   eventCriteriaOverrides: Partial<EventCriteria> = {},
 ): EventEntity {
   const base: EventEntity = {
     eventID: randomUUID(),
     eventName: 'Lecture 1',
-    eventCode: 'Lec1',
+    activityCode: 'Lec1',
+    activityType: 'lecture',
     isRecurring: false,
-    eventCriteria: createEventCriteria(type, eventCriteriaOverrides),
+    validated: true,
+    importFingerprint: null,
+    eventCriteria: createEventCriteria(eventSource, eventCriteriaOverrides),
   };
 
   return {
@@ -49,8 +51,14 @@ export function createEvent(
 } //END_createEvent
 
 export function createCreateEventDto(event: EventEntity): CreateEventDto {
-  const { ...dto } = event;
-  return dto;
+  return {
+    eventName: event.eventName,
+    activityCode: event.activityCode ?? undefined,
+    activityType: event.activityType as CreateEventDto['activityType'],
+    eventCriteria: event.eventCriteria,
+    isRecurring: event.isRecurring,
+    validated: event.validated,
+  };
 } ///END_createCreateEventDto
 
 type UniversityEvent = typeof UniversityEvent.$inferSelect;
@@ -61,7 +69,6 @@ export function createUniversityEvent(
     UniversityEventID: randomUUID(),
     moduleID: randomUUID(),
     eventID: randomUUID(),
-    VenueID: randomUUID(),
 
     ...overrides,
   };

@@ -255,7 +255,7 @@ describe('AuthController - handleRequest error path', () => {
 
     const req = {
       method: 'GET',
-      url: '/api/auth/session',
+      url: '/api/auth/get-session',
       headers: {},
     } as unknown as IncomingMessage;
 

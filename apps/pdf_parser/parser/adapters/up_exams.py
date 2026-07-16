@@ -84,7 +84,7 @@ def exam_rows_to_events(parser, rows: list[ExamRow]) -> list[dict]:
 def normalise_exam_row(parser, row: dict[str, str]) -> dict:
     module = module_code(row.get("Module", ""))
     paper = clean_cell(row.get("Paper", "")) or "1"
-    section_label = f"Paper {paper}"
+    activity_code = f"Paper {paper}"
     date = parse_pdf_date(row.get("Date", ""))
     start_value = row.get("Start Time") or row.get("Start  Time") or ""
     start_time, end_time = parse_time_range(start_value, default_hours=3)
@@ -100,9 +100,9 @@ def normalise_exam_row(parser, row: dict[str, str]) -> dict:
         )
     return parser._event(
         module_code_value=module,
-        event_type="exam",
-        section_label=section_label,
-        title=f"{module} {section_label}",
+        activity_type="exam",
+        activity_code=activity_code,
+        title=f"{module} {activity_code}",
         day=None,
         date=date,
         start_time=start_time,

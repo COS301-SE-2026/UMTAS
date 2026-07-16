@@ -20,7 +20,7 @@ describe("auth redirect helper", () => {
     expect(sanitizeAuthRedirectTarget("https://example.com")).toBeNull();
     expect(sanitizeAuthRedirectTarget("//example.com")).toBeNull();
     expect(sanitizeAuthRedirectTarget("/login")).toBeNull();
-    expect(sanitizeAuthRedirectTarget("/api/auth/session")).toBeNull();
+    expect(sanitizeAuthRedirectTarget("/api/auth/get-session")).toBeNull();
   });
 
   it("reads a stored redirect target when no query param is present", () => {
