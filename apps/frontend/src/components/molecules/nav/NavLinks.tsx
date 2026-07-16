@@ -5,6 +5,7 @@ import { NavLink } from "@/components/atoms/nav/NavLink";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Home" },
+  { href: "/solver", label: "Upload PDF" },
   { href: "/builder", label: "Event Builder" },
   { href: "/schedules", label: "My Schedules" },
   { href: "/choose-institute", label: "Choose Institute" },
