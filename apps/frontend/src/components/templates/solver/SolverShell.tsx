@@ -2,6 +2,8 @@
 
 import { WizardStepper } from "@/components/atoms/builder/WizardStepper";
 import SolverUpload from "@/components/organisms/solver/SolverUpload";
+import SolverReview from "@/components/organisms/solver/SolverReview";
+import SolverPreferences from "@/components/organisms/solver/SolverPreferences";
 
 export default function SolverShell() {
   return (
@@ -20,8 +22,12 @@ export default function SolverShell() {
         <div>
           <SolverUpload />
         </div>
-        <div>Review</div>
-        <div>Preferences</div>
+        <div>
+          <SolverReview />
+        </div>
+        <div>
+          <SolverPreferences />
+        </div>
       </div>
     </>
   );
