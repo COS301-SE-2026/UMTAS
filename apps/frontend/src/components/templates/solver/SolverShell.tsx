@@ -48,7 +48,7 @@ const events: EventResponse[] = [
     eventID: "3",
     isRecurring: false,
     eventCode: "COS333",
-    eventName: "Software Engineering",
+    eventName: "Programming Languages",
   },
 ];
 
