@@ -6,7 +6,6 @@ export default function Solver() {
       <div>
         <SolverShell />
       </div>
-      Solver page goes here
     </>
   );
 }

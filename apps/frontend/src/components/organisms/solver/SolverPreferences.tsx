@@ -14,13 +14,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/atoms/baseShadcn/dropdown-menu";
-import { Trash } from "lucide-react";
+import { Trash, LucidePlusCircle } from "lucide-react";
 import { Slider } from "@/components/atoms/baseShadcn/slider";
 import { useState } from "react";
+import PreferenceSection from "@/components/molecules/solver/PreferencesCard";
 
 export default function SolverPreferences() {
-  const [sliderValue, setSliderValue] = useState([0]);
-
   return (
     <>
       <Card className="shadow-lg border-[var(--border)] rounded-xl bg-[var(--bg-surface)] w-md">
@@ -43,63 +42,17 @@ export default function SolverPreferences() {
             </div>
           </div>
           <div className="space-y-4">
-            <strong>Preferences</strong>
-            <Card className="flex flex-row px-2 items-center w-sm">
-              <div className="flex flex-row items-center justify-between p-1 w-full">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline">Select Preference</Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem>Morning Classes</DropdownMenuItem>
-                    <DropdownMenuItem>No Friday Slots</DropdownMenuItem>
-                    <DropdownMenuItem>Grouped Modules</DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                <div className="w-32 flex items-center relative">
-                  <Slider
-                    value={sliderValue}
-                    onValueChange={setSliderValue}
-                    max={5}
-                    step={1}
-                  />
-                  <span className="font-medium text-[var(--text-secondary)] pl-4">
-                    {sliderValue[0]}
-                  </span>
-                </div>
-                <Button variant={"outline"} className="w-fit">
-                  <Trash />
-                </Button>
-              </div>
-            </Card>
-            <Card className="flex flex-row px-2 items-center w-sm">
-              <div className="flex flex-row items-center justify-between p-1 w-full">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline">Select Preference</Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem>Morning Classes</DropdownMenuItem>
-                    <DropdownMenuItem>No Friday Slots</DropdownMenuItem>
-                    <DropdownMenuItem>Grouped Modules</DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                <div className="w-32 flex items-center relative">
-                  <Slider
-                    value={sliderValue}
-                    onValueChange={setSliderValue}
-                    max={5}
-                    step={1}
-                  />
-                  <span className="font-medium text-[var(--text-secondary)] pl-4">
-                    {sliderValue[0]}
-                  </span>
-                </div>
-                <Button variant={"outline"} className="w-fit">
-                  <Trash />
-                </Button>
-              </div>
-            </Card>
+            <div className="flex flex-row items-center justify-between">
+              <strong>Preferences</strong>
+              <LucidePlusCircle strokeWidth={1.1} />
+            </div>
+            <PreferenceSection
+              DropdownItems={[
+                "Prefer mornings",
+                "Prefer evenings",
+                "Prefer large gaps",
+              ]}
+            />
           </div>
           <Button type="button">View Timetable</Button>
         </CardContent>
