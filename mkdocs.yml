@@ -61,16 +61,16 @@ markdown_extensions:
 
 nav:
   - Home: index.md
-  - Marking Guide: management/Marking-Guide.md
   - SRS:
-      - Introduction: srs/INTRODUCTION.md
+      - Overview: srs/index.md
       - User Stories: srs/USER_STORIES.md
       - Use Cases: srs/USE_CASES.md
       - Functional Requirements: srs/FUNCTIONAL_REQUIREMENTS.md
       - Non-Functional Requirements: srs/NON-FUNCTIONAL_REQUIREMENTS.md
       - Domain Model: srs/DOMAIN_MODEL.md
+      - Traceability Matrix: srs/Traceability-Matrix.md
   - SAS:
-      - Introduction: sas/architecture/INTRODUCTION.md
+      - Overview: sas/index.md
       - Architectural Requirements: sas/architecture/ARCHITECTURAL_REQUIREMENTS.md
       - Architectural Patterns: sas/architecture/ARCHITECTURAL_PATTERNS.md
       - Design Patterns: sas/architecture/DESIGN_PATTERNS.md
@@ -83,11 +83,11 @@ nav:
       - Deployment Diagrams: sas/deployment/DEPLOYMENT_DIAGRAMS.md
       - CI/CD Pipeline Diagram: sas/deployment/CICD_PIPELINE_DIAGRAM.md
   - Design Specifications:
-      - 4.2.1 Brand Style: design/Brand-Style.md
-      - 4.2.2 Wireframes: design/Wireframes.md
-  - API Reference: api/API-Reference.md
+      - Brand Style: design/Brand-Style.md
+      - Wireframes: design/Wireframes.md
   - Developer Portal:
       - Overview: developer-guides/index.md
+      - API Reference: api/API-Reference.md
       - Repo Setup: developer-guides/Repo-Setup-Guide.md
       - Git Strategy: developer-guides/git-strategy-guide.md
       - Master Dev Guide: developer-guides/master-development-guide.md
@@ -98,5 +98,6 @@ nav:
       - Unit Testing: developer-guides/unit-testing-guide.md
       - Integration Testing: developer-guides/integration-testing-guide.md
       - Local CI/CD: developer-guides/local-cicd-guide.md
-  - Management:
+  - Admin:
+      - Marking Guide: management/Marking-Guide.md
       - Team Profiles: management/Team-Profiles.md

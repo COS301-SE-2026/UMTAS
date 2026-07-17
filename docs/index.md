@@ -36,13 +36,13 @@ Get up and running with the UMTAS platform in minutes.
 
 <div class="grid cards" markdown>
 
--   :material-presentation-play:{ .lg .middle } __Demo 1 Deliverables__
+-   :material-presentation-play:{ .lg .middle } __Demo 2 Deliverables__
 
     ---
 
-    Access the complete Requirements Specification (SRS), Design Specs, and Marking Guide.
+    Navigate directly to the documentation assessed for Demo 2.
 
-    [:octicons-arrow-right-24: Marking Guide](management/Marking-Guide.md)
+    [:octicons-arrow-right-24: Open Marking Guide](management/Marking-Guide.md)
 
 -   :material-library-shelves:{ .lg .middle } __Documentation & Guides__
 
@@ -114,7 +114,7 @@ The platform is built using a modern, high-performance stack designed for scale 
 
     ---
 
-    ![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi&logoColor=white) ![Google OR-Tools](https://img.shields.io/badge/google%20ortools-4285F4?style=for-the-badge&logo=google&logoColor=white)
+    ![Google OR-Tools](https://img.shields.io/badge/google%20ortools-4285F4?style=for-the-badge&logo=google&logoColor=white)
     ![PyMuPDF](https://img.shields.io/badge/pymupdf-41454a?style=for-the-badge&logo=python&logoColor=white) ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
 
 -   __:material-layers: Infra & DevOps__
