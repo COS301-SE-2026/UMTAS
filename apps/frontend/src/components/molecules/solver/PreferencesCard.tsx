@@ -14,10 +14,12 @@ import { useState } from "react";
 
 interface PreferencesCardProps {
   DropdownItems: string[];
+  onDelete: () => void;
 }
 
 export default function PreferencesCard({
   DropdownItems,
+  onDelete,
 }: PreferencesCardProps) {
   const [sliderValue, setSliderValue] = useState([0]);
 
@@ -45,7 +47,7 @@ export default function PreferencesCard({
             {sliderValue[0]}
           </span>
         </div>
-        <Button variant={"outline"} className="w-fit">
+        <Button variant={"outline"} className="w-fit" onClick={onDelete}>
           <Trash />
         </Button>
       </div>
