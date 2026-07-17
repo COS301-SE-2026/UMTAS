@@ -52,6 +52,14 @@ Get up and running with the UMTAS platform in minutes.
 
     [:octicons-arrow-right-24: Browse Guides](developer-guides/index.md)
 
+-   :material-server-network:{ .lg .middle } __Software Architecture__
+
+    ---
+
+    Review the system architecture, technology decisions, API contracts, and deployment documentation.
+
+    [:octicons-arrow-right-24: Open SAS](sas/index.md)
+
 -   :material-book-open-page-variant:{ .lg .middle } __API Reference__
 
     ---

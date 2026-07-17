@@ -18,7 +18,7 @@ To strictly control our CI/CD pipelines, approvals, and context, UMTAS maps the 
 ### Github Environments
 
 <figure markdown="span">
-  <img src="../gh.png" alt="GitHub Environment Secrets" width="800">
+  <img src="gh.png" alt="GitHub Environment Secrets" width="800">
   <figcaption>Fig 2. Screenshot of our Environment Parity on Github</figcaption>
 </figure>
 

@@ -79,9 +79,15 @@ nav:
       - Quality Requirement Mapping: sas/architecture/QUALITY_REQUIREMENT_MAPPING.md
       - Technology Requirements: sas/architecture/TECHNOLOGY_REQUIREMENTS.md
       - API Contracts: sas/architecture/API_CONTRACTS.md
-      - Deployment Requirements: sas/deployment/DEPLOYMENT_REQUIREMENTS.md
-      - Deployment Diagrams: sas/deployment/DEPLOYMENT_DIAGRAMS.md
-      - CI/CD Pipeline Diagram: sas/deployment/CICD_PIPELINE_DIAGRAM.md
+      - Deployment:
+          - Overview: sas/deployment/index.md
+          - Live, Accessible System: sas/deployment/LiveAccessibleSystem.md
+          - Environment Parity: sas/deployment/EnvironmentParity.md
+          - Infrastructure as Code: sas/deployment/InfrastructureAsCode.md
+          - Secrets Management: sas/deployment/SecretsManagement.md
+          - Rollback Strategy: sas/deployment/RollBackStrategy.md
+          - Deployment Diagram: sas/deployment/DeploymentDiagram.md
+          - CI/CD Pipeline Diagram: sas/deployment/PipelineDiagram.md
   - Design Specifications:
       - Brand Style: design/Brand-Style.md
       - Wireframes: design/Wireframes.md
