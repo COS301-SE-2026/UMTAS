@@ -1,0 +1,37 @@
+sequenceDiagram
+    actor User
+    participant Frontend
+    participant API as Core API
+    participant DB as Relational Database
+    participant Storage as Blob Storage
+    participant Queue as Message Queue
+    participant Worker as PDF Parser Worker
+    participant CLI as PDF Parser
+
+    User->>Frontend: Select and upload timetable PDF
+    Frontend->>API: POST /pdf-parser/jobs/upload
+    API->>API: Validate PDF and compute fingerprint
+    API->>DB: Create queued parseJob
+    API->>Storage: Store PDF
+    API->>Queue: Enqueue pdf.parse job
+    API-->>Frontend: 202 Accepted with jobId
+
+    Queue-->>Worker: Deliver parse job
+    Worker->>Storage: Download PDF
+    Worker->>CLI: Parse PDF with registered adapter
+    CLI-->>Worker: Normalized parser result
+    Worker->>API: POST /pdf-parser/jobs/:jobId/callback
+    API->>DB: Persist timetable data and completed status
+    API-->>Worker: 202 Accepted
+
+    loop Until parse job completes
+        Frontend->>API: GET /pdf-parser/jobs/:jobId
+        API->>DB: Read parseJob status
+        DB-->>API: Completed status
+        API-->>Frontend: Job status and result metadata
+    end
+    Frontend->>API: GET /pdf-parser/jobs/:jobId/result
+    API->>DB: Read parser result
+    DB-->>API: Normalized parser result
+    API-->>Frontend: 200 OK
+    Frontend-->>User: Display imported timetable data

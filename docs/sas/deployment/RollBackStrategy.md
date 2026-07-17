@@ -1,10 +1,5 @@
 # Rollback Strategy
 
-!!! abstract "Section Brief"
-    Documents how a failed deployment is handled to ensure high availability. UMTAS employs a strict Re-deploy-Previous-Tag strategy to minimise system downtime in the event of a critical failure.
-
----
-
 ## Overview
 
 Using deterministic image tags rather than `latest` in production allows for instant container swaps. Because a database backup is run prior to every new deployment, the system is protected against destructive migrations, ensuring zero data loss upon rollback.

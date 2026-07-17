@@ -1,10 +1,5 @@
 # Secrets Management
 
-!!! abstract "Section Brief"
-    Credentials, API keys, and connection strings must not be committed to the repository. This section defines the strategy to mitigate such actions.
-
----
-
 ## Overview
 
 The UMTAS repository utilises Phase as our centralised secrets manager. **All** project secrets are saved exclusively on Phase. They are stored in a secure, encrypted vault rather than `.env` files scattered across local machines, ensuring plain-text secrets remain strictly inaccessible in resting files.
