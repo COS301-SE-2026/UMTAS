@@ -92,14 +92,14 @@ export default function SolverShell() {
           { label: "Preferences" },
         ]}
       />
-      <div className="flex flex-row items-center justify-between">
-        <div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto px-4 mt-8">
+        <div className="flex justify-center">
           <SolverUpload />
         </div>
-        <div>
+        <div className="flex justify-center">
           <SolverReview events={events} modules={modules} />
         </div>
-        <div>
+        <div className="flex justify-center">
           <SolverPreferences />
         </div>
       </div>
