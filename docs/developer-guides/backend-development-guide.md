@@ -8,7 +8,7 @@
 ## :material-auto-fix: Workflow (Red-Green-Refactor)
 
 1.  **Sync**: Pull latest from `dev` and create a feature branch.
-2.  **Service**: Identify the owner (NestJS Core or FastAPI Solver).
+2.  **Service**: Identify the owner (NestJS Core, parser worker, solver worker, Python parser, or C++ solver).
 3.  **Red**: Write a failing unit/integration test in **Jest** or **pytest**.
 4.  **Green**: Implement the logic. Use **PGLite** for ephemeral DB tests.
 5.  **Refactor**: Clean up the code while keeping tests green.
@@ -22,9 +22,9 @@
 | Component         | Technology                                                                                                   | Role                                      |
 | :---------------- | :----------------------------------------------------------------------------------------------------------- | :---------------------------------------- |
 | **API Framework** | ![NestJS](https://img.shields.io/badge/nestjs-%23E0234E.svg?style=for-the-badge&logo=nestjs&logoColor=white) | Main core API & business logic            |
-| **Data Access**   | ![DrizzleORM](https://img.shields.io/badge/drizzle-C5F74F?style=for-the-badge&logo=drizzle&logoColor=black)  | Typesafe DB modeling & migrations         |
+| **Data Access**   | ![DrizzleORM](https://img.shields.io/badge/drizzle-C5F74F.svg?style=for-the-badge&logo=drizzle&logoColor=black)  | Type-safe DB modelling and migrations     |
 | **Job Queue**     | ![BullMQ](https://img.shields.io/badge/bullmq-FF4500?style=for-the-badge&logo=bullmq&logoColor=white)        | Async jobs (PDF Parsing, Solver triggers) |
-| **Solver API**    | ![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi&logoColor=white)     | High-performance Python bridge            |
+| **Compute workers** | BullMQ workers with Python and C++ CLIs | PDF parsing and timetable solving outside request paths |
 | **Auth**          | ![OAuth 2.0](https://img.shields.io/badge/oauth%202.0-eb5424?style=for-the-badge&logo=auth0&logoColor=white) | Session management & Google OAuth2        |
 
 ---
@@ -44,7 +44,7 @@
 ## :material-database: Database Strategy
 
 === "DrizzleORM (Default)"
-    Use Drizzle for all core entity management. Ensure schemas are located in `packages/database/schema`.
+    Use Drizzle for all core entity management. Schemas are located in `apps/backend/src/entities`.
 
     ```typescript
     export const users = pgTable('users', {

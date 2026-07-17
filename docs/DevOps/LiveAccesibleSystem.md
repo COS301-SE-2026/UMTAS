@@ -1,10 +1,5 @@
 # Live, Accessible System
 
-!!! abstract "Section Brief"
-    The UMTAS software suite is fully deployed to a public-facing Virtual Private Server instance.This section discusses our various staging and deployment domains accessible via the links below.
-
----
-
 ## Overview
 
 Distributing the system across subdomains routed by a single reverse proxy enables clean, decoupled access to our production and staging environments.We are restricted to a single server, hence we are using a single ingress controller for routing any traffic to prod/staging.

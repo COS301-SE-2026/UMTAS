@@ -1,10 +1,5 @@
 # Environment Parity
 
-!!! abstract "Section Brief"
-    To guarantee deployment reliability, UMTAS strictly enforces environment parity. This section details the separation between Development, Staging, and Production environments. Please refer to [Secrets Management](./SecretsManagement.md) for more info related to handling environment variables.
-
----
-
 ## Overview
 
 Staging and Production share the same host infrastructure to optimise costs but are completely isolated via Docker networks. This co-location ensures the staging environment flawlessly mirrors the production environment's OS and architecture. If a feature works in staging, it is guaranteed to work in production. As mentioned previously the plan is to expand to a multi-server architecture post demo 2.
@@ -74,4 +69,3 @@ To strictly control our CI/CD pipelines, approvals, and context, UMTAS maps the 
     | **Brand Style**| `https://brand.capstone-vigil.dns.net.za` | 80/443 -> 6767 |
 
 ---
-
