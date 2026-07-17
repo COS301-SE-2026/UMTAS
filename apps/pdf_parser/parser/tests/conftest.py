@@ -18,8 +18,8 @@ def parse_fixture(parser, filename):
     return parser.parse(str(FIXTURE_DIR / filename))
 
 
-def find_event(events, module_code, section_label):
+def find_event(events, module_code, activity_code):
     for event in events:
-        if event["moduleCode"] == module_code and event["sectionLabel"] == section_label:
+        if event["moduleCode"] == module_code and event["activityCode"] == activity_code:
             return event
-    raise AssertionError(f"Could not find event {module_code} {section_label}")
+    raise AssertionError(f"Could not find event {module_code} {activity_code}")

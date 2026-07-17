@@ -6,14 +6,14 @@
 
 const string ModuleGA::GROUPING_KEY = "modules";
 const string ModuleGA::MODULE_CODE_KEY = "moduleCode";
-const string ModuleGA::OCCUR_ARRAY_KEY = "typeOccurence";
-const string ModuleGA::TYPE_KEY = "EventType";
-const string ModuleGA::OCCUR_KEY = "numberOccur";
+const string ModuleGA::OCCUR_ARRAY_KEY = "activityRequirements";
+const string ModuleGA::TYPE_KEY = "activityCode";
+const string ModuleGA::OCCUR_KEY = "requiredSelections";
 /*
- typeOccurence :[
+ activityRequirements: [
  {
-    type : string
-    numberOccur : int
+    activityCode: string
+    requiredSelections: int
  }
  ]
  */
@@ -27,7 +27,7 @@ ModuleGA::ModuleGA(const json& module) {
   }
 
   if (module.contains(OCCUR_ARRAY_KEY) && module[OCCUR_ARRAY_KEY].is_array()) {
-    this->handleOccurences(module[OCCUR_ARRAY_KEY]);
+    this->handleActivityRequirements(module[OCCUR_ARRAY_KEY]);
   } else {
     throw std::runtime_error(
         OCCUR_ARRAY_KEY + "is not defined or is not an array of json objects");
@@ -48,26 +48,33 @@ std::vector<ModuleGA> ModuleGA::innitModules(const json &modulesArr) {
   }
 }
 
-void ModuleGA::handleOccurences(const json& types) {
-  // finds the array of entries in the occurences object adds key value pairs.
-  //    type : string
-  //    numberOccur : int
+void ModuleGA::handleActivityRequirements(const json& requirements) {
+  // Build the requirement count for each activity code.
 
-  for (auto &obj : types) {
-    string type;
-    int occur;
+  for (auto &obj : requirements) {
+    string activityCode;
+    int selections;
     if (obj.contains(TYPE_KEY) && obj[TYPE_KEY].is_string())
-      type = obj[TYPE_KEY].get<string>();
+      activityCode = obj[TYPE_KEY].get<string>();
     else
       throw std::runtime_error("key:" + TYPE_KEY +
                                " Is either not defined or not a string");
 
     if (obj.contains(OCCUR_KEY) && obj[OCCUR_KEY].is_number_integer())
-      occur = obj[OCCUR_KEY].get<int>();
+      selections = obj[OCCUR_KEY].get<int>();
     else
       throw std::runtime_error("key:" + OCCUR_KEY +
                                " Is either not defined or not a string");
 
-    this->number_Occur.insert({type, occur});
+    const auto existing = this->requiredSelections.find(activityCode);
+    if (existing != this->requiredSelections.end()) {
+      if (existing->second != selections) {
+        throw std::runtime_error("Inconsistent requiredSelections for activityCode " +
+                                 activityCode);
+      }
+      continue;
+    }
+    this->requiredSelections.insert({activityCode, selections});
   }
 }
+

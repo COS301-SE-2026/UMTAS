@@ -70,7 +70,7 @@ export class CourseService {
   //No filters return all courses in database
   async getAll(filters: CourseFilters): Promise<CourseListResponseDto> {
     const conditions: SQL[] = [];
-
+    console.log('Get all');
     if (filters.UniversityID)
       conditions.push(eq(Course.UniversityID, filters.UniversityID));
     if (filters.Degree) conditions.push(eq(Course.Degree, filters.Degree));

@@ -1,21 +1,35 @@
-export enum EventType {
+import type { ActivityType } from 'shared-types';
+
+export enum EventSource {
   UNIVERSITY = 'university',
   PERSONAL = 'personal',
-} //EventType
+}
+
+export type DayOfWeek =
+  | 'monday'
+  | 'tuesday'
+  | 'wednesday'
+  | 'thursday'
+  | 'friday'
+  | 'saturday'
+  | 'sunday';
 
 export interface EventCriteria {
-  type: EventType;
-  date: string;
+  eventSource: EventSource;
+  date?: string;
+  dayOfWeek?: DayOfWeek;
   startTime: string;
   endTime: string;
-  venue?: string;
-  moduleID?: string;
-} //EventCriteria
+  moduleId?: string;
+}
 
 export interface UniversityEventCriteria extends EventCriteria {
-  type: EventType.UNIVERSITY;
-} //LectureEventCriteria
+  eventSource: EventSource.UNIVERSITY;
+  moduleId: string;
+  activityType: ActivityType;
+  activityRequirements?: Record<string, { requiredSelections: number }>;
+}
 
 export interface PersonalEventCriteria extends EventCriteria {
-  type: EventType.PERSONAL;
+  eventSource: EventSource.PERSONAL;
 }

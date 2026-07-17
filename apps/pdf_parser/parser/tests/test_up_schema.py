@@ -158,13 +158,13 @@ def test_lecture_multiline_row_produces_multiple_events(up_parser):
         ]
     )
 
-    assert [(event["sectionLabel"], event["day"], event["venues"]) for event in events] == [
+    assert [(event["activityCode"], event["day"], event["venues"]) for event in events] == [
         ("L1", "Monday", ["Room 1"]),
         ("L2", "Wednesday", ["Room 2"]),
     ]
 
 
-def test_lecture_event_type_is_extracted_from_section_label(up_parser):
+def test_lecture_activity_type_is_extracted_from_activity_code(up_parser):
     events = lecture_rows_to_events(
         up_parser,
         [
@@ -183,7 +183,7 @@ def test_lecture_event_type_is_extracted_from_section_label(up_parser):
         ],
     )
 
-    assert [(event["sectionLabel"], event["type"]) for event in events] == [
+    assert [(event["activityCode"], event["activityType"]) for event in events] == [
         ("L1", "lecture"),
         ("T1", "tutorial"),
         ("P1", "prac"),

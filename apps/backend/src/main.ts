@@ -22,7 +22,7 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.useStaticAssets(join(__dirname, '..', 'public'));
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
-  const port = process.env.PORT ?? 3001;
+  const port = process.env.PORT ?? 3000;
 
   // if (process.env.NODE_ENV !== 'production') {
   const dbService = app.get(DatabaseService);

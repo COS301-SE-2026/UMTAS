@@ -19,10 +19,12 @@ import {
   EventResponse,
   EventCriteria,
 } from "@/app/builder/utils/events/eventRequestBuilder";
+import { UserDetails } from "@/lib/userclass/userClass";
 
 //NOTE
 //copied from event card and changed slightly for customisation
-
+// used for tracking editablilty
+const canEdit = UserDetails.userCanEdit();
 export interface EventErrors {
   name?: string;
   code?: string;
@@ -91,6 +93,7 @@ export function CustomiseEventCard({
       <Select
         value={String(event.eventCriteria?.moduleID || "")}
         onValueChange={(v) => onUpdate(event.eventID, "moduleID", v)}
+        disabled={!canEdit}
       >
         <SelectTrigger
           className={getInputClass(!!errors?.moduleId) + " w-full"}
@@ -152,6 +155,7 @@ export function CustomiseEventCard({
               Name
             </Label>
             <Input
+              readOnly={!canEdit}
               id={"event-name-" + event.eventID}
               value={event.eventName || ""}
               onChange={(e) =>
@@ -173,6 +177,7 @@ export function CustomiseEventCard({
               Code
             </Label>
             <Input
+              readOnly={!canEdit}
               id={"event-code-" + event.eventID}
               value={event.eventCode || ""}
               onChange={(e) =>
@@ -195,6 +200,7 @@ export function CustomiseEventCard({
               Venue
             </Label>
             <Input
+              readOnly={!canEdit}
               id={"event-venue-" + event.eventID}
               value={event.eventCriteria?.venue || ""}
               onChange={(e) => onUpdate(event.eventID, "venue", e.target.value)}
@@ -222,6 +228,7 @@ export function CustomiseEventCard({
               Date
             </Label>
             <Input
+              readOnly={!canEdit}
               id={"event-date-" + event.eventID}
               type="date"
               value={event.eventCriteria?.date || ""}
@@ -254,6 +261,7 @@ export function CustomiseEventCard({
               Event type
             </Label>
             <EventTypeDropdown
+              disabled={canEdit}
               value={(event.eventCriteria?.type as EventType) || "lecture"}
               onChange={(v) => onUpdate(event.eventID, "type", v)}
             />

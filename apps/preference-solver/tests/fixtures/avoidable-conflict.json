@@ -1,0 +1,39 @@
+{
+  "schedulingProblem": {
+    "events": [
+      {
+        "eventId": "CS101-L1-A",
+        "moduleCode": "CS101",
+        "activityType": "lecture",
+        "activityCode": "L1",
+        "requiredSelections": 1,
+        "dayOfWeek": "monday",
+        "startTime": "08:00",
+        "endTime": "09:00"
+      },
+      {
+        "eventId": "CS101-L1-B",
+        "moduleCode": "CS101",
+        "activityType": "lecture",
+        "activityCode": "L1",
+        "requiredSelections": 1,
+        "dayOfWeek": "tuesday",
+        "startTime": "08:00",
+        "endTime": "09:00"
+      },
+      {
+        "eventId": "CS101-T1-A",
+        "moduleCode": "CS101",
+        "activityType": "tutorial",
+        "activityCode": "T1",
+        "requiredSelections": 1,
+        "dayOfWeek": "monday",
+        "startTime": "08:30",
+        "endTime": "09:30"
+      }
+    ]
+  },
+  "preferences": {
+    "heuristics": []
+  }
+}

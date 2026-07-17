@@ -1,8 +1,8 @@
 #include "GA.h"
+#include <algorithm>
 #include <cmath>
 #include <iostream>
 #include <ostream>
-#include <sstream>
 #include <unordered_map>
 #include <vector>
 
@@ -11,39 +11,51 @@ int RequiredEvents = 0;
 
 std::unordered_map<string, int> modulesMap;
 std::unordered_map<string, int> tempMap;
-std::unordered_map<string, bool> collisionCheck;
 std::unordered_map<string, eventsOccurring> mutationMap;
 
-// makes a key of module:event -> occurences
-// also have a local structure that will do the same however its meant to be
-// overwritten
+string requirementKey(const EventGA &event) {
+  return event.moduleCode + ":" + event.activityCode;
+}
 
 EventChromosome copyChrom;
-EventChromosome solChrom;
-// this will be overwritten
 
-GA_Handler::GA_Handler(API_DATA data) {
+namespace {
+bool eventsOverlap(const EventGA &left, const EventGA &right) {
+  return left.dayOfWeek == right.dayOfWeek &&
+         left.event_start < right.event_end &&
+         right.event_start < left.event_end;
+}
+
+int countConflicts(const EventChromosome &candidate) {
+  int conflicts = 0;
+  for (size_t left = 0; left < candidate.events.size(); ++left) {
+    if (!candidate.events[left].is_active) continue;
+    for (size_t right = left + 1; right < candidate.events.size(); ++right) {
+      if (candidate.events[right].is_active &&
+          eventsOverlap(candidate.events[left], candidate.events[right])) {
+        ++conflicts;
+      }
+    }
+  }
+  return conflicts;
+}
+} // namespace
+
+GA_Handler::GA_Handler(API_DATA data, bool optimize) : optimize(optimize) {
   this->initData = data;
+  RequiredEvents = 0;
+  modulesMap.clear();
+  tempMap.clear();
+  mutationMap.clear();
   copyChrom = EventChromosome(data);
   InitMap();
-  InitOverlap();
   InitMutationMap();
+  hasSufficientAlternatives = HasSufficientAlternatives();
   InitGA();
-}
-void GA_Handler::InitOverlap() {
-  std::vector<string> slots = slotEval(420, 1140);
-  // 420 -> 7:00
-  // 1140 -> 19:00
-  std::vector<string> days = {"Monday", "Tuesday",  "Wednesday", "Thursday",
-                              "Friday", "Saturday", "Sunday"};
-  for (string day : days)
-    for (auto &itr : slots) {
-      collisionCheck.insert({day + ":" + itr, false});
-    }
 }
 void GA_Handler::InitMap() {
   for (ModuleGA module : this->initData.modules) {
-    for (auto &itr : module.number_Occur) {
+    for (auto &itr : module.requiredSelections) {
 
       string key = module.moduleCode + ":" + itr.first;
       // key events can easily access
@@ -59,11 +71,12 @@ void GA_Handler::InitMap() {
 void GA_Handler::InitGA() {
 
   // init functions
-  gaEngine.init_genes = init_genes;
+  gaEngine.init_genes = optimize ? init_genes : init_genes_randomized;
   gaEngine.eval_solution = eval_solution;
   gaEngine.mutate = mutate;
   gaEngine.crossover = crossover;
-  gaEngine.calculate_SO_total_fitness = calculate_SO_total_fitness;
+  gaEngine.calculate_SO_total_fitness =
+      optimize ? calculate_SO_total_fitness : calculate_conflict_total_fitness;
   gaEngine.SO_report_generation = SO_report_generation;
   // init functions
 
@@ -78,6 +91,8 @@ void GA_Handler::InitGA() {
 }
 
 EventChromosome GA_Handler::findSolution() {
+  if (!hasSufficientAlternatives) return copyChrom;
+  if (copyChrom.events.empty()) return copyChrom;
   std::cout << "Starting GA" << std::endl;
   gaEngine.solve();
   int index = gaEngine.last_generation.best_chromosome_index;
@@ -87,7 +102,7 @@ EventChromosome GA_Handler::findSolution() {
 void init_genes(EventChromosome &p, const std::function<double(void)> &rnd01) {
   p = copyChrom;
   for (EventGA &event : p.events) {
-    string key = event.moduleCode + ":" + event.eventType;
+    string key = requirementKey(event);
     if (modulesMap[key] > tempMap[key]) {
       tempMap.find(key)->second++;
       event.is_active = true;
@@ -97,39 +112,76 @@ void init_genes(EventChromosome &p, const std::function<double(void)> &rnd01) {
   resetTemp();
 }
 
+void init_genes_randomized(EventChromosome &p,
+                           const std::function<double(void)> &rnd01) {
+  p = copyChrom;
+  for (EventGA &event : p.events) event.is_active = false;
+  p.numActive = 0;
+  p.numCollision = 0;
+
+  for (const auto &[key, group] : mutationMap) {
+    const auto requirement = modulesMap.find(key);
+    if (requirement == modulesMap.end()) continue;
+
+    std::vector<int> indices = group.indices;
+    for (size_t remaining = indices.size(); remaining > 1; --remaining) {
+      const size_t selected =
+          static_cast<size_t>(rnd01() * remaining) % remaining;
+      std::swap(indices[selected], indices[remaining - 1]);
+    }
+
+    const size_t selectionCount = std::min(
+        indices.size(), static_cast<size_t>(requirement->second));
+    for (size_t index = 0; index < selectionCount; ++index) {
+      p.events[indices[index]].is_active = true;
+      ++p.numActive;
+    }
+  }
+}
+
 EventChromosome mutate(const EventChromosome &p,
                        const std::function<double(void)> &rnd01,
                        double shrink_scale) {
   int size = p.events.size();
   EventChromosome nChrom = p;
-  while (true) {
-    int index = (int)(std::floor(rnd01() * 1000)) % size;
-    
+  if (size == 0) return nChrom;
+  const int index = (int)(std::floor(rnd01() * 1000)) % size;
+  const auto group = mutationMap.find(requirementKey(nChrom.events[index]));
+  if (group == mutationMap.end()) return nChrom;
 
-    string modCode = nChrom.events[index].moduleCode;
-    int mapSize = mutationMap.find(modCode)->second.indices.size();
-
-    if (mapSize > 1) {
-      int swapIndex = (int)(std::floor(rnd01() * 1000)) % mapSize;
-      nChrom.events[index].is_active = false;
-      swapIndex = mutationMap.find(modCode)->second.indices[swapIndex];
-      nChrom.events[swapIndex].is_active = true;
-      return nChrom;
-    }
+  std::vector<int> activeIndices;
+  std::vector<int> inactiveIndices;
+  for (const int eventIndex : group->second.indices) {
+    (nChrom.events[eventIndex].is_active ? activeIndices : inactiveIndices)
+        .push_back(eventIndex);
   }
+  if (activeIndices.empty() || inactiveIndices.empty()) return nChrom;
+
+  const auto choose = [&rnd01](const std::vector<int> &indices) {
+    return indices[static_cast<size_t>(rnd01() * indices.size()) % indices.size()];
+  };
+  nChrom.events[choose(activeIndices)].is_active = false;
+  nChrom.events[choose(inactiveIndices)].is_active = true;
+  return nChrom;
 }
 void GA_Handler::InitMutationMap() {
   for (int i = 0; i < copyChrom.events.size(); i++) {
-    if (mutationMap.find(copyChrom.events[i].moduleCode) != mutationMap.end()) {
-      mutationMap[copyChrom.events[i].moduleCode].indices.push_back(i);
-    } else {
-      mutationMap.insert({copyChrom.events[i].moduleCode,
-                          eventsOccurring(copyChrom.events[i].eventType,
-                                          copyChrom.events[i].moduleCode)});
-      mutationMap.find(copyChrom.events[i].moduleCode)
-          ->second.indices.push_back(i);
+    mutationMap[requirementKey(copyChrom.events[i])].indices.push_back(i);
+  }
+}
+
+bool GA_Handler::HasSufficientAlternatives() const {
+  for (const auto &[requirement, requiredSelections] : modulesMap) {
+    const auto alternatives = mutationMap.find(requirement);
+    const size_t available = alternatives == mutationMap.end()
+                                 ? 0
+                                 : alternatives->second.indices.size();
+    if (requiredSelections < 0 ||
+        available < static_cast<size_t>(requiredSelections)) {
+      return false;
     }
   }
+  return true;
 }
 
 EventChromosome crossover(const EventChromosome &X1, const EventChromosome &X2,
@@ -164,6 +216,7 @@ EventChromosome crossover(const EventChromosome &X1, const EventChromosome &X2,
   child.numCollision = 0;
   child.numActive = isActive;
   child.targetTime = X1.targetTime;
+  child.requiredSelections = X1.requiredSelections;
   return child;
 }
 
@@ -186,7 +239,7 @@ bool CountPattern(EventChromosome chrom) {
   for (EventGA event : chrom.events) {
 
     if (event.is_active) {
-      string key = event.moduleCode + ":" + event.eventType;
+      string key = requirementKey(event);
 
       tempMap.find(key)->second++;
 
@@ -200,6 +253,7 @@ bool CountPattern(EventChromosome chrom) {
   for (auto itr : tempMap) {
 
     if (itr.second != modulesMap[itr.first]) {
+      resetTemp();
       return false;
     }
   }
@@ -229,6 +283,12 @@ double calculate_SO_total_fitness(
 
   return Overlap_Heuristic(c.genes);
 }
+
+double calculate_conflict_total_fitness(
+    const EA::ChromosomeType<EventChromosome, ChromMiddleCost> &c) {
+  return countConflicts(c.genes);
+}
+
 double Overlap_Heuristic(EventChromosome eventChrom) {
 
   int numberOfPts = 0;
@@ -238,62 +298,14 @@ double Overlap_Heuristic(EventChromosome eventChrom) {
 
     if (event.is_active) {
       numberOfPts++;
-      std::vector<string> slots = slotEval(event.event_start, event.event_end);
-      for (string slot : slots) {
-
-        string eventKey = event.eventDay + ":" + slot;
-        if (collisionCheck.find(eventKey)->second) {
-          eventChrom.numCollision++;
-          break;
-        } else {
-          collisionCheck.find(eventKey)->second = true;
-        }
-      }
       sum += std::fabs(event.event_start - target);
     }
   }
-  resetCollision();
+  if (numberOfPts == 0) return 0.0;
   double MAD = (1 / (double)numberOfPts) * sum;
-  int collCount = eventChrom.numCollision + 1;
-  return MAD * collCount;
-}
-
-std::vector<string> slotEval(int timeStart, int timeEnd) {
-  // takes a time and puts it into the slots of the day listed from every 30
-  // minutes.
-  timeStart = roundDownSlot(timeStart);
-  timeEnd = roundUpSlot(timeEnd);
-
-  std::vector<string> slots;
-  for (int time = timeStart; time < timeEnd; time += 30) {
-    string timeKey = timeSlot(time);
-    slots.push_back(timeKey);
-  }
-  return slots;
-}
-
-string timeSlot(int time) {
-  std::stringstream hourSS;
-  std::stringstream minSS;
-  int hour = time / 60;
-  int min = time % 60;
-  hourSS << hour;
-  minSS << min;
-  return hourSS.str() + ":" + minSS.str();
-}
-int roundDownSlot(int time) {
-  return (time / 30) * 30;
-  // is int math
-}
-int roundUpSlot(int time) {
-  return ((time + 29) / 30) * 30;
-  // uses int math
-}
-
-void resetCollision() {
-  for (auto &itr : collisionCheck) {
-    itr.second = false;
-  }
+  // Conflicts dominate soft time preferences, while preference distance still
+  // ranks equally conflict-free (or equally best-effort) timetables.
+  return MAD + (countConflicts(eventChrom) * 10000.0);
 }
 void SO_report_generation(
     int generation_number,
@@ -304,28 +316,6 @@ void SO_report_generation(
 
   std::cout << "Generation " << generation_number << std::endl;
   std::cout << "Best fitness " << bestChrom.total_cost << std::endl;
-  int numCollision = 0;
-
-  for (const EventGA &event : bestChrom.genes.events) {
-
-    if (event.is_active) {
-
-      std::vector<string> slots = slotEval(event.event_start, event.event_end);
-      for (string slot : slots) {
-
-        string eventKey = event.eventDay + ":" + slot;
-        if (collisionCheck.find(eventKey)->second) {
-          numCollision++;
-
-          std::cout << "event " << event.moduleCode << " Type "
-                    << event.eventType << " Collision" << std::endl;
-          break;
-        } else {
-          collisionCheck.find(eventKey)->second = true;
-        }
-      }
-    }
-  }
-  resetCollision();
-  std::cout << "Number of collisions " << numCollision << std::endl;
+  std::cout << "Number of collisions " << countConflicts(bestChrom.genes)
+            << std::endl;
 }

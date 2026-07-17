@@ -1,4 +1,11 @@
-import { pgTable, uuid, varchar, integer, boolean } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  uuid,
+  varchar,
+  integer,
+  boolean,
+  uniqueIndex,
+} from 'drizzle-orm/pg-core';
 import { modules } from '../Modules';
 import { University } from './University.schema';
 
@@ -23,15 +30,24 @@ export const Course = pgTable('Course', {
 });
 
 //Join table defining modules grouped together to ModuleGrouping
-export const GroupModules = pgTable('GroupModules', {
-  GroupModuleID: uuid('GroupModuleID').primaryKey().defaultRandom(),
-  GroupID: uuid('GroupID')
-    .references(() => ModuleGrouping.GroupID, { onDelete: 'cascade' })
-    .notNull(),
-  ModuleID: uuid('ModuleID')
-    .references(() => modules.moduleID, { onDelete: 'cascade' })
-    .notNull(),
-});
+export const GroupModules = pgTable(
+  'GroupModules',
+  {
+    GroupModuleID: uuid('GroupModuleID').primaryKey().defaultRandom(),
+    GroupID: uuid('GroupID')
+      .references(() => ModuleGrouping.GroupID, { onDelete: 'cascade' })
+      .notNull(),
+    ModuleID: uuid('ModuleID')
+      .references(() => modules.moduleID, { onDelete: 'cascade' })
+      .notNull(),
+  },
+  (table) => ({
+    groupModuleUnique: uniqueIndex('group_modules_group_module_unique').on(
+      table.GroupID,
+      table.ModuleID,
+    ),
+  }),
+);
 
 //Metadata for specific module in a grouping when course is defined
 export const CourseModule = pgTable('CourseModule', {
