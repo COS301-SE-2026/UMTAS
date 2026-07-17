@@ -1,41 +1,40 @@
 # Architectural Requirements
 
-## Architecture Requirements
+## Requirements
 
-| ID | Requirement | Architectural Response |
+| **ID** | **Requirement** | **Implemented response** |
 |---|---|---|
-| AR-01 | UMTAS shall use a client-server architecture for all user-facing workflows. | Browsers call the Core API only, never queues, compute services, databases, object storage, or providers directly. |
-| AR-02 | UMTAS shall use a Core-and-Adapter architecture for university-specific timetable sources. | PDF and future API adapters translate external formats into canonical UMTAS timetable structures. |
-| AR-03 | The Core API shall remain the orchestration and policy boundary. | Auth, authorization, validation, persistence coordination, calendar orchestration, job creation, and job-state exposure stay in the Core. |
-| AR-04 | Long-running parse and solve work shall run asynchronously. | The Core creates jobs; workers call parser or solver services and persist terminal results for browser polling. |
-| AR-05 | Parser and solver services shall be stateless compute services. | They receive bounded requests, return results, and do not own persistent domain state. |
-| AR-06 | University analytics shall be privacy-first. | Admin dashboards use anonymised or aggregate metrics, not individual student schedules. |
-| AR-07 | The architecture shall support the client-stated 20,000+ user scale target. | Browser traffic, Core API instances, queue workers, parser services, and solver services must be horizontally scalable. |
-| AR-08 | Backend integration points shall be OpenAPI-first. | Core API and integration boundaries must be documented with OpenAPI 3.0-compatible contracts. |
-| AR-09 | Calendar integration shall be isolated behind the Core API. | OAuth handling, token storage, Google Calendar writes, and `.ics` export generation are Core-owned concerns. |
-| AR-10 | The architecture shall document a reusable simulation-service boundary. | Simulation is a client requirement for Tyto reuse; full implementation is outside the Demo 2 feature scope. |
+| **AR-1** | User workflows shall use a client-server boundary. | Browsers call the Core API rather than internal data or compute services. |
+| **AR-2** | University-specific import formats shall use adapters. | The parser selects the University of Pretoria adapter and returns canonical candidates. |
+| **AR-3** | The Core API shall own policy and persistent application state. | The Core validates requests, stores domain and job records, and coordinates workers. |
+| **AR-4** | PDF parsing and timetable solving shall run asynchronously. | The Core enqueues BullMQ jobs and exposes status and result endpoints. |
+| **AR-5** | Parser and solver compute shall remain stateless. | Workers use temporary files and return terminal results through callbacks. |
+| **AR-6** | Worker callbacks shall be authenticated. | Parser and solver callbacks require a configured bearer token. |
+| **AR-7** | Browser, queue, callback, and command-line boundaries shall use explicit contracts. | Swagger DTOs, shared schemas, and worker contracts define the implemented boundaries. |
+| **AR-8** | Solver engines shall remain independently selectable. | Requests select CP-SAT, genetic search, or automatic CP-SAT-first fallback. |
+| **AR-9** | Imported academic data shall preserve a validation state. | Parser-created modules and events are stored with `validated` set to false. |
+| **AR-10** | Long-running components shall scale independently. | Core, parser-worker, and solver-worker containers have separate runtime and concurrency controls. |
 
-## Major Components
+## State Ownership
 
-| Component | Responsibility | State Ownership |
+| **Component** | **Responsibility** | **State** |
 |---|---|---|
-| Browser clients | Student, lecturer, admin, and public-entry workflows | None |
-| Core API | Auth, policy, orchestration, persistence coordination, calendar integration, and job state | Authoritative application state |
-| Core-owned workers | Queued parse and solve execution | None |
-| PDF parser service | Supported university PDF extraction and normalization | None |
-| Solver service | Clash-free or preference-ranked timetable generation | None |
-| University adapters | Source-specific format translation | None |
-| Analytics boundary | Aggregate venue and demand metrics | Aggregate analytics state |
-| Simulation boundary | Synthetic load and reusable stress-test profiles | Separate simulation data |
-| Platform services | Database, cache, queue backing, object storage, ingress, and observability | Infrastructure state |
-| External providers | OAuth identity, Google Calendar, and future university systems | External state |
+| Browser Client | User workflows, local iCalendar generation, and job polling | Browser state only |
+| Core API | Policy, orchestration, persistence, and validation | Authoritative application state |
+| PDF Parser Worker | Execute queued PDF parsing jobs | Temporary files only |
+| Timetable Solver Worker | Execute queued timetable solving jobs | Temporary files only |
+| PostgreSQL | Domain, authentication, and job records | Persistent relational state |
+| Redis and BullMQ | Coordinate asynchronous jobs | Operational queue state |
+| Object Storage | Store uploaded PDFs | Persistent object state |
 
-## Communication Requirements
+## Communication
 
-| Communication Style | Required Use |
+| **Style** | **Use** |
 |---|---|
-| Synchronous request-response | Auth, timetable management, calendar operations, admin actions, analytics reads, and job-status reads |
-| Queue-backed async processing | PDF parsing, timetable solving, and other long-running work |
-| Internal service calls | Worker-to-parser and worker-to-solver HTTP calls |
-| Polling-based completion | Browser reads of Core job states: `queued`, `running`, `succeeded`, `failed` |
-| Adapter-mediated integration | University source variation and provider-specific integration behavior |
+| Synchronous request-response | Authentication, domain operations, job submission, status, and results |
+| Asynchronous job processing | PDF parsing and timetable solving |
+| Local command-line invocation | Worker-to-parser and worker-to-solver execution |
+| Authenticated callback | Terminal worker result to the Core API |
+| Polling | Browser reads of queued, completed, and failed jobs |
+
+Calendar providers, lecturer availability, analytics, and simulation remain future architectural concerns.

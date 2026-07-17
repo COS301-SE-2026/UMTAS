@@ -1,28 +1,18 @@
 # Design Patterns
 
-## Adapter
+## Adapter Pattern: University Format Isolation
 
-UMTAS uses adapters where external university formats differ from the internal timetable model.
-Adapters translate source-specific payloads into canonical UMTAS course, module, event, venue, and
-calendar structures before Core processing.
+University-specific parsers implement a common interface and return canonical module and event candidates. The parser registry currently maps the University of Pretoria key to its adapter.
 
-- `UP PDF Adapter`: extracts supported UP timetable PDF content and normalizes it into UMTAS
-  timetable structures.
-- `University API Adapter`: normalizes external university API responses into the same canonical
-  structures used by the Core API and solver.
+Source-specific table detection remains outside the Core API. Adding another university format does not require a new queue or callback contract.
 
-This pattern supports maintainability and integrability: adding or changing one university source
-does not require the Core timetable model or solver contract to change.
+## Strategy Pattern: Independent Solver Engines
 
-## Strategy
+CP-SAT and genetic search are independent engines behind one command-line contract. The requested engine is selected at runtime.
 
-UMTAS uses the Strategy pattern in the scheduling solver because different timetable-generation
-approaches must be selectable behind one solver contract.
+Automatic mode follows this sequence:
 
-- `CP-SAT No-Conflict Strategy`: uses OR-Tools CP-SAT to select timetable options that satisfy hard
-  no-clash constraints.
-- `Genetic Algorithm Search Strategy`: searches for usable timetable combinations when a
-  strict no-conflict solution is unavailable or when soft conflict tolerance is required.
-
-Both strategies return results through the same solver boundary so the Core API and browser
-workflow do not depend on the specific solving algorithm.
+1. Run CP-SAT.
+2. Return its conflict-free result when feasible.
+3. Start a fresh genetic search when CP-SAT reports infeasibility.
+4. Return the genetic result as best effort when conflicts remain.
