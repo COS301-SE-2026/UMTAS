@@ -11,7 +11,7 @@ import {
 
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
 import { mutationOptions, queryOptions } from "@tanstack/react-query";
-import { validators } from "tailwind-merge";
+// import { validators } from "tailwind-merge";
 
 export function getAllTimetablesQ() {
   return queryOptions({

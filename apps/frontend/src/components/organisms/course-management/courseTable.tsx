@@ -11,7 +11,6 @@ import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
-  Row,
   Table,
   useReactTable,
 } from "@tanstack/react-table";
