@@ -55,7 +55,7 @@ if (config.tempRoot) workerOptions.tempRoot = config.tempRoot;
 
 const worker = createWorkerHost(workerOptions);
 
-const checkHealthPort = process.env.HEALTH_PORT_SOLVER_WORKER; //just need to check with michael if this approach is correct
+const checkHealthPort = process.env.HEALTH_PORT_SOLVER_WORKER || 8082; //just need to check with michael if this approach is correct
 
 const healthServer = http.createServer((req, res) => {
   if (req.method === "GET" && req.url === "/health") {
@@ -77,8 +77,8 @@ const healthServer = http.createServer((req, res) => {
   }
 });
 
-healthServer.listen(checkHealthPort, () => {
-  console.log(`Health check server running on: ${checkHealthPort}`);
+healthServer.listen(checkHealthPort, "0.0.0.0", () => {
+  console.log(`Health check server running on port: ${checkHealthPort}`);
 });
 
 worker.on("completed", (job) => {

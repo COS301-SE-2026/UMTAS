@@ -58,7 +58,7 @@ ENV NODE_ENV=production \
     PDF_PARSE_CLI_COMMAND=python3 \
     PDF_PARSE_CLI_ARGS="-m parser_cli" \
     PDF_PARSE_CLI_CWD=/app/python \
-    WORKER_TEMP_ROOT=/tmp/umtas-worker
+    WORKER_TEMP_ROOT=/tmp/umtas-worker \
     HEALTH_PORT_PDF_PARSER=8082
 
 EXPOSE 8082

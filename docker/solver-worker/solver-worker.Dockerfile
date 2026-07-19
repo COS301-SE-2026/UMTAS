@@ -99,7 +99,7 @@ WORKDIR /app
 ENV NODE_ENV=production \
     LD_LIBRARY_PATH=/app/lib \
     SOLVER_CLI_COMMAND=/app/bin/solver-cli \
-    WORKER_TEMP_ROOT=/tmp/umtas-worker
+    WORKER_TEMP_ROOT=/tmp/umtas-worker \
     HEALTH_PORT_SOLVER_WORKER=8081
 
 EXPOSE 8081
