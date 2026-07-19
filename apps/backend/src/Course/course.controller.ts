@@ -145,7 +145,7 @@ export class CourseController {
 
   //Delete
   @Delete(':CourseId')
-  @SystemAdmin() //should uni_admin's be allowed to delete
+  // @SystemAdmin() //should uni_admin's be allowed to delete
   @ApiOperation({
     summary: 'Delete Course by Course ID',
     operationId: 'deleteCourse',
