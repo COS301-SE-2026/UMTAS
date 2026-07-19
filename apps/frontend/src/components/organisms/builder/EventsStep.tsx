@@ -1,15 +1,7 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import {
-  Plus,
-  Trash2,
-  CheckCircle,
-  Inbox,
-  AlertCircle,
-  AwardIcon,
-  ArrowUpWideNarrow,
-} from "lucide-react";
+import { useState } from "react";
+import { Plus, Trash2, CheckCircle, Inbox, AlertCircle } from "lucide-react";
 import {
   EventCard,
   type EventErrors,

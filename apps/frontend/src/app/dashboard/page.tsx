@@ -7,7 +7,6 @@ import {
   SlidersHorizontal,
   Download,
   ExternalLink,
-  X,
 } from "lucide-react";
 import { useSession } from "@/../utilities/auth-client";
 import { Card, CardContent } from "@/components/atoms/baseShadcn/card";
@@ -17,7 +16,6 @@ import { Button } from "@/components/atoms/baseShadcn/button";
 import { PageSkeleton } from "@/components/atoms/nav/PageSkeleton";
 import Link from "next/link";
 import Popup from "@/components/atoms/utility/floatContainer";
-import ChooseInstitutePage from "../choose-institute/page";
 import { ChooseInstituteTemplate } from "@/components/templates/choose-institute/chooseInstituteTemplate";
 
 const Features = [

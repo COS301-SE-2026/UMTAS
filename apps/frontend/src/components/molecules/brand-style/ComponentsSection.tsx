@@ -62,7 +62,6 @@ import {
 import { Textarea } from "@/components/atoms/baseShadcn/textarea";
 import { Toggle } from "@/components/atoms/baseShadcn/toggle";
 import { ColourPicker } from "@/components/atoms/builder/colourPicker";
-import { ScheduleView } from "@/components/organisms/viewTimetable/ScheduleView";
 import { WeeklyGrid } from "@/components/organisms/viewTimetable/WeeklyGrid";
 import type { ScheduleEvent } from "@/types/schedule";
 

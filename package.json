@@ -77,9 +77,15 @@
     "lodash": "^4.18.1"
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx,mjs,cjs,json,md,yml,yaml,css,scss}": "prettier --write",
-    "apps/frontend/src/**/*.{ts,tsx}": "eslint --fix --config apps/frontend/eslint.config.mjs",
-    "apps/backend/src/**/*.ts": "eslint --fix --config apps/backend/eslint.config.mjs",
+    "apps/frontend/src/**/*.{ts,tsx}": [
+      "eslint --fix --config apps/frontend/eslint.config.mjs",
+      "prettier --write"
+    ],
+    "apps/backend/src/**/*.ts": [
+      "eslint --fix --config apps/backend/eslint.config.mjs",
+      "prettier --write"
+    ],
+    "*.{js,jsx,mjs,cjs,json,md,yml,yaml,css,scss}": "prettier --write",
     "**/*": "secretlint"
   }
 }

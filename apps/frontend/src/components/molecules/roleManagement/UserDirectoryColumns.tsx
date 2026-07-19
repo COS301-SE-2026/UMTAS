@@ -6,13 +6,6 @@ import { ArrowUpDown } from "lucide-react";
 import { Checkbox } from "@/components/atoms/baseShadcn/checkbox";
 
 import { Button } from "@/components/atoms/baseShadcn/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from "@/components/atoms/baseShadcn/dropdown-menu";
 import { getSingleApplication } from "@/app/role-management/queries/builder";
 import RoleControl from "@/components/atoms/roleManagement/roleControl";
 
