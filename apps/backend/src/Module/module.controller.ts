@@ -2,6 +2,7 @@ import { ModuleService } from './module.service';
 import {
   CreateModuleDto,
   DeleteModuleResponseDto,
+  EnrolResponseDto,
   ModuleFiltersDto,
   ModuleListResponseDto,
   ModuleSingleResponseDto,
@@ -172,6 +173,34 @@ export class ModuleController {
   delete(@Param('moduleId', ParseUUIDPipe) moduleId: string) {
     return this.service.deleteById(moduleId);
   }
+
+  //Enrol to module
+  @Post(':moduleId')
+  @Roles('student')
+  @ApiOperation({
+    summary: 'Enrol student to module',
+    operationId: 'enrolStudentToModule',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Student successfully enrolled student into module',
+    type: EnrolResponseDto,
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Student already enrolled into module',
+    type: EnrolResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Module not found',
+  })
+  enrol(
+    @CurrentSession() session: SessionData,
+    @Param('moduleId', ParseUUIDPipe) moduleId: string,
+  ) {
+    return this.service.enrollToModule(session.user.id, moduleId);
+  } //END_enrol
 
   @Post('/styling/:moduleId')
   @ApiOperation({
