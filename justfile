@@ -70,6 +70,17 @@ test:
 # unit tests
 test-unit:
     phase run -- pnpm turbo run test --filter=!./apps/e2e -- --coverage
+    pnpm workers:test
+
+test-integration:
+    phase run -- pnpm --filter backend exec jest --config jest.int.config.ts
+    phase run -- pnpm --filter frontend exec jest --config jest.int.config.js
+    pnpm workers:smoke
+
+test-e2e:
+    phase run -- pnpm --filter backend run test:e2e
+    pnpm workers:e2e
+    phase run -- pnpm --filter e2e exec playwright test
 
 # run production build
 build:

@@ -21,6 +21,6 @@
     ]
   },
   "extensionsToTreatAsEsm": [".ts"],
-  "setupFilesAfterEnv": ["<rootDir>/jest.setup.cjs"],
+  "setupFilesAfterEnv": ["<rootDir>/../jest.setup.cjs"],
   "transformIgnorePatterns": ["node_modules/(?!(better-auth|@better-auth)/)"]
 }
