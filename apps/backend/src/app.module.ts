@@ -17,6 +17,10 @@ import { TimetableModule } from './Timetable/timetable.module';
 import { UniversityModule } from './University/university.module';
 import { CourseModule } from './Course/course.module';
 import { BuilderModule } from './Builder/builder.module';
+import { JobsModule } from './jobs/jobs.module';
+import { PdfParserModule } from './pdf-parser/pdf-parser.module';
+import { SolverModule } from './solver/solver.module';
+import { StorageModule } from './storage/storage.module';
 import { AttendanceModule } from './Attendance/attendance.module';
 import { GroupingModule } from './Grouping/grouping.module';
 
@@ -36,6 +40,10 @@ import { GroupingModule } from './Grouping/grouping.module';
     UniversityModule,
     CourseModule,
     BuilderModule,
+    StorageModule,
+    JobsModule,
+    PdfParserModule,
+    SolverModule,
     AttendanceModule,
     GroupingModule,
   ],

@@ -1,5 +1,11 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsUUID, Length } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Length,
+} from 'class-validator';
 import { PartialType, PickType, OmitType } from '@nestjs/swagger';
 
 export class CourseDto {
@@ -21,11 +27,11 @@ export class CourseDto {
   @IsNotEmpty()
   UniversityID!: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: '00000000-0000-0000-0000-000000000000',
     description: 'Unique identifier for a group of modules',
-    required: false,
   })
+  @IsOptional()
   @IsUUID()
   GroupID?: string | null;
 
@@ -39,11 +45,11 @@ export class CourseDto {
   @Length(1, 30)
   CourseName!: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: 'Bachelor of Science',
     description: 'Degree that course belongs to',
-    required: false,
   })
+  @IsOptional()
   @IsString()
   @Length(1, 30)
   Degree?: string | null;

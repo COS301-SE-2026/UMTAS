@@ -7,7 +7,7 @@ TIME_RE = re.compile(r"^\d{2}:\d{2}$")
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 ParserDetails = dict[str, object]
-EventType = Literal["lecture", "tutorial", "prac", "test", "exam"]
+ActivityType = Literal["lecture", "tutorial", "prac", "test", "exam"]
 
 
 class ParseAnnotation(TypedDict):
@@ -25,8 +25,8 @@ class ModuleCandidate(TypedDict):
 
 class EventCandidate(TypedDict):
     moduleCode: str
-    type: EventType
-    sectionLabel: str
+    activityType: ActivityType
+    activityCode: str
     title: str
     day: Optional[str]
     date: Optional[str]
@@ -71,8 +71,8 @@ def validate_parser_result(result: ParserOutput) -> None:
             event,
             [
                 "moduleCode",
-                "type",
-                "sectionLabel",
+                "activityType",
+                "activityCode",
                 "title",
                 "startTime",
                 "endTime",
@@ -83,14 +83,20 @@ def validate_parser_result(result: ParserOutput) -> None:
             ],
             "event",
         )
-        if event["type"] not in EVENT_TYPES:
-            raise ParserError("INVALID_EVENT_TYPE", "Parser emitted an unsupported event type.", {"type": event["type"]})
+        if event["activityType"] not in EVENT_TYPES:
+            raise ParserError("INVALID_EVENT_TYPE", "Parser emitted an unsupported event type.", {"activityType": event["activityType"]})
         if not TIME_RE.match(event["startTime"]) or not TIME_RE.match(event["endTime"]):
             raise ParserError("INVALID_TIME", "Parser emitted a time outside HH:mm format.", {"event": event})
         if event.get("date") is not None and not DATE_RE.match(event["date"]):
             raise ParserError("INVALID_DATE", "Parser emitted a date outside YYYY-MM-DD format.", {"event": event})
         if event["isRecurring"] and not event.get("day"):
             raise ParserError("INVALID_RECURRING_EVENT", "Recurring parser events must include a day.", {"event": event})
+        if event["isRecurring"] and event.get("date") is not None:
+            raise ParserError("INVALID_RECURRING_EVENT", "Recurring parser events must not include a date.", {"event": event})
+        if not event["isRecurring"] and not event.get("date"):
+            raise ParserError("INVALID_DATED_EVENT", "Non-recurring parser events must include a date.", {"event": event})
+        if not event["isRecurring"] and event.get("day") is not None:
+            raise ParserError("INVALID_DATED_EVENT", "Non-recurring parser events must not include a weekday.", {"event": event})
         if not isinstance(event["venues"], list):
             raise ParserError("INVALID_VENUES", "Parser event venues must be an array.", {"event": event})
 

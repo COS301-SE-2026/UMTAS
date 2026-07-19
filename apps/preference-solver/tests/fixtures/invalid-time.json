@@ -1,0 +1,17 @@
+{
+  "schedulingProblem": {
+    "events": [
+      {
+        "eventId": "CS101-L1-A",
+        "moduleCode": "CS101",
+        "activityType": "lecture",
+        "activityCode": "L1",
+        "requiredSelections": 1,
+        "dayOfWeek": "monday",
+        "startTime": "8:00",
+        "endTime": "09:00"
+      }
+    ]
+  },
+  "preferences": { "heuristics": [] }
+}

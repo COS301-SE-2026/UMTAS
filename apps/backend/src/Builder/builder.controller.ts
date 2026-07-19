@@ -14,7 +14,6 @@ import { ApiBody, ApiResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { CurrentSession } from '../auth/session.decorator';
 import type { SessionData } from '../auth/session.decorator';
-import { Roles } from '../auth/roles.guard';
 
 import {
   ModuleSingleResponseDto,
@@ -30,7 +29,6 @@ export class BuilderController {
 
   //Create
   @Post()
-  @Roles('student', 'uni_admin', 'sys_admin')
   @ApiOperation({
     summary: 'Create a user defined module',
     description:
@@ -59,7 +57,6 @@ export class BuilderController {
 
   //Get all
   @Get()
-  @Roles('student', 'uni_admin', 'sys_admin')
   @ApiOperation({
     summary: 'Get all modules a user is enrolled in with their course',
     description:
@@ -84,7 +81,6 @@ export class BuilderController {
 
   //Get by id
   @Get(':moduleId')
-  @Roles('student', 'uni_admin', 'sys_admin')
   @ApiOperation({
     summary: 'Get a module by ID',
     description: 'Return a module from its moduleID',
@@ -112,7 +108,6 @@ export class BuilderController {
 
   //Update
   @Patch(':moduleId')
-  @Roles('student', 'uni_admin', 'sys_admin')
   @ApiOperation({
     summary: 'Update a module that the student owns',
     description: 'STUDENT_OWNED so they can update any field of the module',
@@ -146,7 +141,6 @@ export class BuilderController {
 
   // Delete
   @Delete(':moduleId')
-  @Roles('student', 'uni_admin', 'sys_admin')
   @ApiOperation({
     summary: 'Delete a module by ID',
     description:

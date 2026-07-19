@@ -136,6 +136,7 @@ export class ModulesDto {
     },
     type: StylingDto,
   })
+  @IsOptional()
   @IsObject()
   @ValidateNested()
   @Type(() => StylingDto)
@@ -158,6 +159,13 @@ export class ModulesDto {
   @ValidateNested()
   @Type(() => CourseModuleDto)
   CourseModuleInfo?: CourseModuleDto | null;
+  @ApiProperty({
+    example: true,
+    description: 'Whether the module has been approved by a university admin',
+  })
+  @IsOptional()
+  @IsBoolean()
+  validated?: boolean;
 } //ModuleDto
 
 //Create
@@ -166,19 +174,22 @@ export class CreateModuleDto extends PickType(ModulesDto, [
   'moduleName',
   'moduleDescription',
   'styling',
+  'validated',
 ]) {
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: '00000000-0000-0000-0000-000000000000',
     description: 'ModuleGroupingID to identify group the module belongs to',
   })
+  @IsOptional()
   @IsUUID()
   @IsOptional()
   ModuleGroupingID?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: '00000000-0000-0000-0000-000000000000',
     description: 'CourseID module belongs to',
   })
+  @IsOptional()
   @IsUUID()
   @IsOptional()
   CourseID?: string;
@@ -203,7 +214,15 @@ export class UpdateModuleDto extends IntersectionType(
 
 //Responses
 //Single
-export class ModuleSingleResponseDto extends ModulesDto {}
+export class ModuleSingleResponseDto extends ModulesDto {
+  @ApiProperty({
+    example: '00000000-0000-0000-0000-000000000000',
+    description: 'Unique identifier for a module group',
+  })
+  @IsUUID()
+  @IsOptional()
+  ModuleGroupingID?: string;
+}
 
 //List
 export class ModuleListResponseDto {
@@ -241,7 +260,7 @@ export class ModuleFiltersDto {
   @IsUUID()
   courseId?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: '00000000-0000-0000-0000-000000000000',
     description: 'Filter by ModuleGrouping ID',
   })
@@ -250,7 +269,7 @@ export class ModuleFiltersDto {
   GroupID?: string;
 
   //Filter by code using wildcard
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: 'COS',
     description: 'Filter by code, makes use of wildcard search',
   })
@@ -258,11 +277,13 @@ export class ModuleFiltersDto {
   @IsString()
   moduleCode?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: false,
     default: false,
     description: 'Choose to filter modules based of current user enrollments',
+    type: Boolean,
   })
+  @IsOptional()
   @IsBoolean()
   @IsOptional()
   @Transform(({ value }) => {

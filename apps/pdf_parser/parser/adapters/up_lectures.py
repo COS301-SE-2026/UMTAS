@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import re
 from typing import ClassVar
 
 from ..models import ParserError
@@ -78,8 +79,8 @@ def lecture_rows_to_events(parser, rows: list[LectureRow]) -> list[dict]:
 
         for index, activity in enumerate(activities):
             start_time, end_time = parse_time_range(times[index])
-            event_type = lecture_type(activity)
-            section_label = activity
+            activity_type = activity_type_for_code(activity)
+            parsed_activity_code = activity
             metadata = {
                 "group": clean_cell(row.group),
                 "semester": clean_cell(row.offered),
@@ -88,8 +89,8 @@ def lecture_rows_to_events(parser, rows: list[LectureRow]) -> list[dict]:
             }
             key = (
                 module,
-                event_type,
-                section_label,
+                activity_type,
+                parsed_activity_code,
                 days[index],
                 start_time,
                 end_time,
@@ -98,9 +99,9 @@ def lecture_rows_to_events(parser, rows: list[LectureRow]) -> list[dict]:
             if key not in grouped:
                 grouped[key] = parser._event(
                     module_code_value=module,
-                    event_type=event_type,
-                    section_label=section_label,
-                    title=f"{module} {section_label}",
+                    activity_type=activity_type,
+                    activity_code=parsed_activity_code,
+                    title=f"{module} {activity_code(activity)}",
                     day=days[index],
                     date=None,
                     start_time=start_time,
@@ -112,7 +113,14 @@ def lecture_rows_to_events(parser, rows: list[LectureRow]) -> list[dict]:
             parser._append_unique(grouped[key]["venues"], venues[index])
     return list(grouped.values())
 
-def lecture_type(activity: str) -> str:
+
+def activity_code(activity: str) -> str:
+    value = clean_cell(activity)
+    match = re.match(r"[A-Za-z]+\d+[A-Za-z0-9]*", value)
+    return match.group(0) if match else value
+
+
+def activity_type_for_code(activity: str) -> str:
     first = clean_cell(activity)[:1].upper()
     if first == "T":
         return "tutorial"

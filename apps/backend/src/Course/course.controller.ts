@@ -19,11 +19,17 @@ import {
   Delete,
   ParseUUIDPipe,
 } from '@nestjs/common';
-import { ApiBody, ApiResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiResponse,
+  ApiOperation,
+  ApiTags,
+  ApiQuery,
+} from '@nestjs/swagger';
 
 // import { CurrentSession } from '../auth/session.decorator';
 // import type { SessionData } from '../auth/session.decorator';
-import { Roles } from 'src/auth/roles.guard';
+import { Roles, SystemAdmin } from 'src/auth/roles.guard';
 
 @ApiTags('Courses')
 @Controller('Courses')
@@ -32,7 +38,7 @@ export class CourseController {
 
   //Create
   @Post()
-  @Roles('uni_admin', 'sys_admin')
+  @Roles('uni_admin')
   @ApiOperation({
     summary: 'Create a Course',
     operationId: 'createCourse',
@@ -57,10 +63,16 @@ export class CourseController {
 
   //GetAll per but put method since we use body for filters
   @Post('getAll')
-  @Roles('student', 'uni_admin', 'sys_admin')
+  @Roles('student', 'uni_admin')
   @ApiOperation({
     summary: 'Get all courses',
     operationId: 'getCourses',
+  })
+  @ApiQuery({
+    name: 'Degree',
+    required: false,
+    type: String,
+    description: 'Filter by Degree',
   })
   @ApiResponse({
     status: 200,
@@ -77,7 +89,7 @@ export class CourseController {
 
   //GetById
   @Get(':CourseId')
-  @Roles('student', 'uni_admin', 'sys_admin')
+  @Roles('student', 'uni_admin')
   @ApiOperation({
     summary: 'get a Course by ID',
     operationId: 'getCourseById',
@@ -101,7 +113,7 @@ export class CourseController {
 
   //Update
   @Patch(':CourseId')
-  @Roles('uni_admin', 'sys_admin')
+  @Roles('uni_admin')
   @ApiOperation({
     summary: 'Update an Course',
     operationId: 'updateCourse',
@@ -129,7 +141,7 @@ export class CourseController {
 
   //Delete
   @Delete(':CourseId')
-  @Roles('sys_admin') //should uni_admin's be allowed to delete
+  @SystemAdmin() //should uni_admin's be allowed to delete
   @ApiOperation({
     summary: 'Delete Course by Course ID',
     operationId: 'deleteCourse',

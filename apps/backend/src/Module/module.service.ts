@@ -78,6 +78,7 @@ export class ModuleService {
 
     if (groupId) {
       //check that module Grouping groupId is valid
+      console.log('This should be null ', groupId);
       await this.groupingService.getById(groupId);
 
       //Check for duplicate moduleCode in ModuleGrouping
@@ -103,6 +104,7 @@ export class ModuleService {
         moduleCode: code,
         moduleName: name,
         moduleDescription: description,
+        ...(dto.validated === undefined ? {} : { validated: dto.validated }),
       })
       .returning();
 
@@ -297,6 +299,8 @@ export class ModuleService {
       dto.moduleDescription.trim() !== oldModule.moduleDescription
     )
       updateFields.moduleDescription = dto.moduleDescription.trim();
+    if (dto.validated !== undefined && dto.validated !== oldModule.validated)
+      updateFields.validated = dto.validated;
 
     //Handle courseModule update -> requires courseId
     let courseModuleInfo: CourseModuleDto | null = null;

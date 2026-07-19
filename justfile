@@ -3,7 +3,7 @@ default:
 
 # combine dev into easy to use profile
 dev:
-    just sync
+    just dev-infra
     just both
 
 # Umtas local dev commands
@@ -20,18 +20,25 @@ front:
 both:
     phase run -- pnpm --parallel --filter backend --filter frontend run dev
 
-# spin up local versions 
+# spin up local versions
 dev-infra:
-   phase run -- docker compose up -d postgres redis minio solver mailhog
+    WORKER_BACKEND_URL=http://host.docker.internal:3000 phase run -- docker compose --profile dev-infra up -d --build postgres redis minio mailhog pdf-parser-worker solver-worker
 
 # compelete reset
 sync:
-    phase run -- docker compose down -v
     just dev-infra
     sleep 5
     pnpm install
-    phase run -- pnpm --filter backend db:generate
     phase run -- pnpm --filter backend db:migrate
+
+# Safe reset keeps local volumes and migration sources.
+reset:
+    just sync
+
+# Explicitly destroy local data before rebuilding the development stack.
+reset-volumes:
+    phase run -- docker compose down -v
+    just sync
 
 # shared proxy stack
 proxy-up:
@@ -41,10 +48,10 @@ proxy-down:
     phase run -- docker compose -f docker-compose.traefik.yml down
 
 staging-up:
-    phase run -- docker compose -f docker-compose.staging.yml up -d --remove-orphans
+    phase run --env staging -- docker compose -f docker-compose.staging.yml up -d --remove-orphans
 
 staging-down:
-    phase run -- docker compose -f docker-compose.staging.yml down
+    phase run --env staging -- docker compose -f docker-compose.staging.yml down
 
 # cicd for runners
 
@@ -66,13 +73,17 @@ test-unit:
 
 # run production build
 build:
-   pnpm turbo run build
+    pnpm turbo run build
 
-# global ci tasks 
+# global ci tasks
 ci:
-   pnpm turbo run ci
+    pnpm turbo run ci
 
-# prod server commands 
+# Full local release gate: config, tests, image smoke, Compose E2E, and audit.
+validate:
+    pnpm validate
+
+# prod server commands
 
 # db backup
 prod-db-backup:
@@ -82,7 +93,7 @@ prod-db-backup:
 
 # start prod to specific release tag
 prod-up release_tag:
-    phase run --env production -- env IMAGE_TAG={{release_tag}} docker compose -f docker-compose.prod.yml up -d --remove-orphans
+    IMAGE_TAG={{ release_tag }} phase run --env production -- docker compose -f docker-compose.prod.yml up -d --remove-orphans
 
 prod-down:
     phase run --env production -- docker compose -f docker-compose.prod.yml down
@@ -96,14 +107,96 @@ prod-migrate:
 # deploy specific version
 deploy-prod release_tag:
     just prod-db-backup
-    just prod-up {{release_tag}}
-    @echo "Production successfully deployed version {{release_tag}}"
+    just prod-up {{ release_tag }}
+    @echo "Production successfully deployed version {{ release_tag }}"
 
 # rollback to specific tag
 rollback-prod PREVIOUS_TAG:
-    @echo "Rolling back production to version {{PREVIOUS_TAG}}..."
-    just prod-server-up {{PREVIOUS_TAG}}
-    @echo "Rollback complete. Traefik is routing to {{PREVIOUS_TAG}}"
+    @echo "Rolling back production to version {{ PREVIOUS_TAG }}..."
+    just prod-up {{ PREVIOUS_TAG }}
+    @echo "Rollback complete. Traefik is routing to {{ PREVIOUS_TAG }}"
+
+############################## Worker operations
+
+# Build the PDF parser worker image
+pdf-worker-build:
+    pnpm docker:build:pdf-parser-worker
+
+# Start/stop/restart the PDF parser worker for native backend development
+pdf-worker-up:
+    WORKER_BACKEND_URL=http://host.docker.internal:3000 phase run -- docker compose up -d pdf-parser-worker
+
+pdf-worker-down:
+    docker compose stop pdf-parser-worker
+
+pdf-worker-restart:
+    WORKER_BACKEND_URL=http://host.docker.internal:3000 phase run -- docker compose up -d --force-recreate pdf-parser-worker
+
+pdf-worker-logs:
+    docker compose logs -f pdf-parser-worker
+
+pdf-worker-status:
+    docker compose ps pdf-parser-worker
+
+# Run the PDF worker natively after verifying its Python dependency
+pdf-worker-native:
+    python3 -c "import fitz"
+    phase run -- sh -c 'BULLMQ_REDIS_URL="redis://:${REDIS_PASSWORD}@127.0.0.1:6379" MINIO_ENDPOINT=http://127.0.0.1:9000 PDF_PARSE_CALLBACK_URL=http://127.0.0.1:3000/pdf-parser/jobs PDF_PARSE_CLI_CWD={{ justfile_directory() }}/apps/pdf_parser WORKER_TOPOLOGY=native exec pnpm --filter pdf-parser-worker dev'
+
+# Build the solver worker image
+solver-worker-build:
+    pnpm docker:build:solver-worker
+
+# Start/stop/restart the solver worker for native backend development
+solver-worker-up:
+    WORKER_BACKEND_URL=http://host.docker.internal:3000 phase run -- docker compose up -d solver-worker
+
+solver-worker-down:
+    docker compose stop solver-worker
+
+solver-worker-restart:
+    WORKER_BACKEND_URL=http://host.docker.internal:3000 phase run -- docker compose up -d --force-recreate solver-worker
+
+solver-worker-logs:
+    docker compose logs -f solver-worker
+
+solver-worker-status:
+    docker compose ps solver-worker
+
+# Run the solver worker natively after verifying the C++ executable
+solver-worker-native:
+    test -x {{ justfile_directory() }}/apps/preference-solver/GA_BIN
+    phase run -- sh -c 'BULLMQ_REDIS_URL="redis://:${REDIS_PASSWORD}@127.0.0.1:6379" SOLVER_INPUT_URL=http://127.0.0.1:3000/solver/jobs SOLVER_CALLBACK_URL=http://127.0.0.1:3000/solver/jobs SOLVER_CLI_COMMAND={{ justfile_directory() }}/apps/preference-solver/GA_BIN WORKER_TOPOLOGY=native exec pnpm --filter solver-worker dev'
+
+# Validate every Compose model with its matching Phase environment
+compose-validate-local:
+    phase run -- docker compose --profile dev-infra config --quiet
+
+compose-validate-staging:
+    phase run --env staging -- docker compose -f docker-compose.staging.yml config --quiet
+
+compose-validate-prod:
+    phase run --env production -- docker compose -f docker-compose.prod.yml config --quiet
+
+compose-validate: compose-validate-local compose-validate-staging compose-validate-prod
+
+worker-images-build:
+    pnpm docker:build:workers:native
+
+worker-tests:
+    pnpm workers:test
+
+worker-smoke:
+    pnpm workers:smoke
+
+worker-e2e:
+    pnpm workers:e2e
+
+docker-build-native:
+    pnpm docker:build:all:native
+
+docker-build-multiarch image_tag registry="vigilcs/umtas":
+    DOCKER_REGISTRY={{ registry }} IMAGE_TAG={{ image_tag }} pnpm docker:build:all:multiarch
 
 ############################## Backend specific
 
@@ -117,13 +210,13 @@ backendRestart:
 lintBack:
     pnpm run lint-staged
 
-#Docker cleanup
+# Docker cleanup
 dockerClean:
     phase run -- pnpm --filter backend docker:clean
 
 # generate | example: just generate This_change_to_this_migration
 generate NAME:
-    phase run -- pnpm --filter backend db:generate --name={{NAME}}
+    phase run -- pnpm --filter backend db:generate --name={{ NAME }}
 
 # migrate
 migrate:

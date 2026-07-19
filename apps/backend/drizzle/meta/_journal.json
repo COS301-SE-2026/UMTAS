@@ -5,36 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1782912184549,
-      "tag": "0000_NEW_SCHEMA_WITH_GROUPING_FOR_MODULES",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1782912553922,
-      "tag": "0001_ADDED_GROUPNAME_TO_MODULEGROUPING",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1782979184040,
-      "tag": "0002_ADDED_HASH_FIELD_TO_MODULE_GROUPING",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1782998744029,
-      "tag": "0003_HASH_FIELD_ADDED_TO_MODULE_GROUPING",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1783417040601,
-      "tag": "0004_long_rockslide",
+      "when": 1784456101343,
+      "tag": "0000_NEW_MIGRATION_AFTER_MIGRATION_FAILED_UNKONOWN",
       "breakpoints": true
     }
   ]

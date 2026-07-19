@@ -28,7 +28,7 @@ describe('BuilderController', () => {
   const { mockBuilderService, reset: resetBuilder } =
     createMockBuilderService();
 
-  const mockSession = createMockSession(userId, 'student');
+  const mockSession = createMockSession(userId, 'user');
 
   //Before
   beforeEach(async () => {
