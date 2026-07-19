@@ -44,7 +44,7 @@ RUN set -ex; \
       *) echo "Unsupported TARGETARCH: ${TARGETARCH}. Supported: amd64, arm64" >&2; exit 64 ;; \
     esac; \
     apt-get update \
-    && apt-get install --yes --no-install-recommends build-essential ca-certificates curl pkg-config \
+    && apt-get install --yes --no-install-recommends build-essential ca-certificates curl pkg-config unzip \
     && rm -rf /var/lib/apt/lists/* \
     && curl --fail --location --retry 3 "${ORTOOLS_URL}" --output /tmp/ortools.tar.gz \
     && echo "${ORTOOLS_SHA256}  /tmp/ortools.tar.gz" | sha256sum --check --strict \
@@ -56,6 +56,9 @@ RUN set -ex; \
 COPY apps/preference-solver /workspace/apps/preference-solver
 WORKDIR /workspace/apps/preference-solver
 ENV LD_LIBRARY_PATH=/opt/ortools/lib
+#Download first
+RUN make download && \
+    sed -i 's/std::mutex mtx_rand;/inline std::mutex mtx_rand;/g' lib/openGA.hpp
 RUN make clean \
     && make --jobs="$(nproc)" \
       ORTOOLS_PREFIX=/opt/ortools \
@@ -90,7 +93,7 @@ LABEL org.opencontainers.image.title="UMTAS solver worker" \
       io.umtas.base-image.update-policy="Track patched Node 22 bookworm-slim releases"
 
 RUN apt-get update \
-    && apt-get install --yes --no-install-recommends dumb-init libgomp1 \
+    && apt-get install --yes --no-install-recommends build-essential ca-certificates curl pkg-config unzip \
     && rm -rf /var/lib/apt/lists/* \
     && mkdir -p /app/bin /app/lib /tmp/umtas-worker \
     && chown -R node:node /app /tmp/umtas-worker

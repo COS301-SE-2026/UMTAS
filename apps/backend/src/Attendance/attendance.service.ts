@@ -4,7 +4,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { DatabaseService } from '../db/database.service';
+import { AppDatabase, DatabaseService } from '../db/database.service';
 import { eq, and, SQL } from 'drizzle-orm';
 
 import { EventService } from '../Events/event.service';
@@ -29,21 +29,28 @@ export class AttendanceService {
   async createAttendance(
     userId: string,
     dto: CreateAttendanceDto,
+    tx?: AppDatabase,
   ): Promise<AttendanceSingleResponse> {
+    if (!tx) {
+      return this.dbService.db.transaction(async (t: AppDatabase) => {
+        return this.createAttendance(userId, dto, t);
+      }); //END_transaction
+    } //END_transaction precencer check
+
     const eventId = dto.eventID;
     const date = dto.eventDate;
     const state = dto.state;
     //Check if attendance record already exists
-    if (await this.checkIfAttendanceExists(userId, eventId, date))
+    if (await this.checkIfAttendanceExists(userId, eventId, date, tx))
       throw new ConflictException(
         `Attendance record already exists | User[${userId}] | event[${eventId}] | date[${date}]`,
       );
 
     //Check that event actually exists - will throw if doesnt exist
-    await this.eventService.getById(eventId);
+    await this.eventService.getById(eventId, tx);
 
     //Create attendance record
-    const [attendance] = await this.dbService.db
+    const [attendance] = await tx
       .insert(EventAttendance)
       .values({
         eventID: eventId,
@@ -66,7 +73,14 @@ export class AttendanceService {
   async getAllAttendanceRecords(
     userId: string,
     filters?: AttendanceFilters,
+    tx?: AppDatabase,
   ): Promise<AttendanceListResponse> {
+    if (!tx) {
+      return this.dbService.db.transaction(async (t: AppDatabase) => {
+        return this.getAllAttendanceRecords(userId, filters, t);
+      }); //END_transaction
+    } //END_transaction precencer check
+
     const conditions: SQL[] = [];
 
     if (!filters || Object.keys(filters).length === 0) {
@@ -85,7 +99,7 @@ export class AttendanceService {
     }
 
     //get all Attendance records
-    const attendance = await this.dbService.db
+    const attendance = await tx
       .select()
       .from(EventAttendance)
       .where(and(...conditions));
@@ -97,8 +111,13 @@ export class AttendanceService {
 
   //basically getById
   //get specific attendance record
-  async getById(eventAttendanceId: string): Promise<AttendanceSingleResponse> {
-    const [attendance] = await this.dbService.db
+  async getById(
+    eventAttendanceId: string,
+    tx?: AppDatabase,
+  ): Promise<AttendanceSingleResponse> {
+    const db = tx ?? this.dbService.db;
+
+    const [attendance] = await db
       .select()
       .from(EventAttendance)
       .where(eq(EventAttendance.AttendanceID, eventAttendanceId))
@@ -116,9 +135,16 @@ export class AttendanceService {
   async updateAttendanceRecord(
     eventAttendanceId: string,
     dto: UpdateAttendanceDto,
+    tx?: AppDatabase,
   ): Promise<AttendanceSingleResponse> {
+    if (!tx) {
+      return this.dbService.db.transaction(async (t: AppDatabase) => {
+        return this.updateAttendanceRecord(eventAttendanceId, dto, t);
+      }); //END_transaction
+    } //END_transaction precencer check
+
     //Get + check that attendance record exists
-    const oldAttendance = await this.getById(eventAttendanceId);
+    const oldAttendance = await this.getById(eventAttendanceId, tx);
 
     const updateFields: Partial<typeof EventAttendance.$inferSelect> = {};
     if (dto.eventDate && dto.eventDate !== oldAttendance.eventDate)
@@ -129,7 +155,7 @@ export class AttendanceService {
     //if nothing to update - return early - exception?
     if (Object.keys(updateFields).length === 0) return oldAttendance;
 
-    const [newAttendance] = await this.dbService.db
+    const [newAttendance] = await tx
       .update(EventAttendance)
       .set(updateFields)
       .where(eq(EventAttendance.AttendanceID, eventAttendanceId))
@@ -146,12 +172,15 @@ export class AttendanceService {
   //delete attendance record - basically NOT_STATED
   async deleteAttendance(
     eventAttendanceId: string,
+    tx?: AppDatabase,
   ): Promise<deleteAttendanceResponse> {
+    const db = tx ?? this.dbService.db;
+
     //Get + check that attendance record exists
-    await this.getById(eventAttendanceId);
+    // await this.getById(eventAttendanceId, db); dont think this is necessary
 
     //Delete attendance record
-    await this.dbService.db
+    await db
       .delete(EventAttendance)
       .where(eq(EventAttendance.AttendanceID, eventAttendanceId));
 
@@ -167,8 +196,11 @@ export class AttendanceService {
     userId: string,
     eventId: string,
     date: string,
+    tx?: AppDatabase,
   ): Promise<AttendanceSingleResponse> {
-    const [attendance] = await this.dbService.db
+    const db = tx ?? this.dbService.db;
+
+    const [attendance] = await db
       .select()
       .from(EventAttendance)
       .where(
@@ -188,8 +220,11 @@ export class AttendanceService {
     userId: string,
     eventId: string,
     date: string,
+    tx?: AppDatabase,
   ): Promise<boolean> {
-    const attendance = await this.findAttendance(eventId, userId, date);
+    const db = tx ?? this.dbService.db;
+
+    const attendance = await this.findAttendance(eventId, userId, date, db);
 
     return !!attendance;
   } //END_checkIfAttendanceExists
