@@ -29,7 +29,7 @@ import {
 
 // import { CurrentSession } from '../auth/session.decorator';
 // import type { SessionData } from '../auth/session.decorator';
-import { Roles } from '../auth/roles.guard';
+import { Roles, SystemAdmin } from 'src/auth/roles.guard';
 
 @ApiTags('Courses')
 @Controller('Courses')
