@@ -199,7 +199,7 @@ export function EventsStep({
     }
 
     function doSelect() {
-      const selected = events.find((e) => e.eventID === id);
+      // const selected = events.find((e) => e.eventID === id);
       setSelectedId(id);
       setIsDirty(false);
     }

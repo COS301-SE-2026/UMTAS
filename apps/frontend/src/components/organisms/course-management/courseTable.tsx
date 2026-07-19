@@ -18,7 +18,6 @@ import { useState } from "react";
 import { CourseTableData } from "./courseColumns";
 import CourseCustimisation from "./singleCourseEdit";
 import { Card } from "@/components/atoms/baseShadcn/card";
-import { CourseDTO } from "@/app/course-management/queries/courses/courseBuilder";
 import { CreateCourse } from "./createCourse";
 import Popup from "@/components/atoms/utility/floatContainer";
 
@@ -34,7 +33,7 @@ export function CourseTable<TData>({ columns, data }: DataTableProps<TData>) {
     course: { CourseID: "", CourseName: "", UniversityID: "" },
     modules: [],
   });
-
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data,
     columns,
