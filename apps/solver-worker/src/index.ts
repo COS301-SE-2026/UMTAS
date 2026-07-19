@@ -17,6 +17,8 @@ import {
 } from "./solver-executor.js";
 import { SolverProcessor } from "./solver.processor.js";
 
+import { exec } from "node:child_process";
+
 import http from "node:http";
 
 const config = buildSolverWorkerConfig();
@@ -57,10 +59,20 @@ const checkHealthPort = process.env.HEALTH_PORT; //just need to check with micha
 
 const healthServer = http.createServer((req, res) => {
   if (req.method === "GET" && req.url === "/health") {
-    res.writeHead(200, { "Content-Type": "Application/json" });
-    res.end(JSON.stringify({ status: "healthy" }));
+    exec("preference-solver --health", (error, stdout, stderr) => {
+      if (error) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(
+          JSON.stringify({ status: "unhealthy", details: error.message }),
+        ); //changed to async so we dont block any of the bullmq threads
+        return;
+      }
+
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ status: "healthy" }));
+    });
   } else {
-    res.writeHead(404, { "Content-Type": "Application/json" });
+    res.writeHead(404, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ status: "not found" }));
   }
 });
