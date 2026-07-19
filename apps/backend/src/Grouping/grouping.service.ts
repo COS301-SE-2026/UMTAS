@@ -14,7 +14,7 @@ import { eq, and, ne, inArray } from 'drizzle-orm';
 import { Course, GroupModules, ModuleGrouping } from '../entities';
 
 //Services
-import { DatabaseService } from '../db/database.service';
+import { AppDatabase, DatabaseService } from '../db/database.service';
 import { CourseService } from '../Course/course.service';
 
 import {
@@ -42,12 +42,16 @@ export class GroupingService {
   //modules[] -> create new grouping and populate with modules -> otherwise null hash
   async createModuleGrouping(
     dto: CreateModuleGroupingDto,
+    tx?: DatabaseService['db'],
   ): Promise<GroupingSingleResponse> {
+    if (!tx) {
+      return this.dbService.db.transaction(async (t: AppDatabase) => {
+        return this.createModuleGrouping(dto, t);
+      }); //END_transaction
+    } //END_transaction precencer check
+
     //Create new group
-    let [newGroup] = await this.dbService.db
-      .insert(ModuleGrouping)
-      .values({})
-      .returning();
+    let [newGroup] = await tx.insert(ModuleGrouping).values({}).returning();
 
     if (!newGroup)
       throw new InternalServerErrorException(`Failed to create new Group`);
@@ -56,25 +60,31 @@ export class GroupingService {
     if (dto.CourseID) {
       // console.log(`GroupingService: CourseID defined`);
       //get course -> check if it exists
-      const course = await this.courseService.getById(dto.CourseID);
+      const course = await this.courseService.getById(dto.CourseID, tx);
 
       //Update course to new group
-      await this.courseService.update(course.CourseID, {
-        GroupID: newGroup.GroupID,
-      });
+      await this.courseService.update(
+        course.CourseID,
+        {
+          GroupID: newGroup.GroupID,
+        },
+        tx,
+      );
     } //END_CourseID
 
     if (dto.modules) {
       //if array of moduleId's provided -> create join table entries for modules to new group
-      newGroup = await this.populateGroup(newGroup.GroupID, dto.modules);
+      newGroup = await this.populateGroup(newGroup.GroupID, dto.modules, tx);
     } //END_modules
 
     return newGroup;
   } //END_createModuleGrouping
 
   //getAll groups
-  async getAll(): Promise<GroupingListResponseDto> {
-    const groups = await this.dbService.db
+  async getAll(tx?: DatabaseService['db']): Promise<GroupingListResponseDto> {
+    const db = tx ?? this.dbService.db;
+
+    const groups = await db
       .select({
         GroupID: ModuleGrouping.GroupID,
         Hash: ModuleGrouping.Hash,
@@ -103,14 +113,19 @@ export class GroupingService {
   } //END_getAll
 
   //Get group by id
-  async getById(groupId: string): Promise<GroupingSingleResponse> {
-    const [group] = await this.dbService.db
+  async getById(
+    groupId: string,
+    tx?: DatabaseService['db'],
+  ): Promise<GroupingSingleResponse> {
+    const db = tx ?? this.dbService.db;
+
+    const [group] = await db
       .select()
       .from(ModuleGrouping)
       .where(eq(ModuleGrouping.GroupID, groupId))
       .limit(1);
 
-    const modules = await this.dbService.db
+    const modules = await db
       .select({
         ModuleID: GroupModules.ModuleID,
       })
@@ -129,15 +144,22 @@ export class GroupingService {
   async updateGroup(
     groupId: string,
     hash: string,
+    tx?: DatabaseService['db'],
   ): Promise<GroupingSingleResponse> {
+    if (!tx) {
+      return this.dbService.db.transaction(async (t: AppDatabase) => {
+        return this.updateGroup(groupId, hash, t);
+      }); //END_transaction
+    } //END_transaction precencer check
+
     //get old group - existance check
-    const oldGroup = await this.getById(groupId);
+    const oldGroup = await this.getById(groupId, tx);
 
     //If hash not new - return early
     if (hash === oldGroup.Hash) return oldGroup;
 
     //update hash
-    await this.dbService.db
+    await tx
       .update(ModuleGrouping)
       .set({
         Hash: hash,
@@ -146,12 +168,17 @@ export class GroupingService {
       .returning();
 
     //return updated group with modules
-    return await this.getById(groupId);
+    return await this.getById(groupId, tx);
   } //END_updateGroup
 
   //Delete entire group -- database ensures GroupModule entries cascaded
-  async deleteGroup(groupId: string): Promise<DeleteResponseDto> {
-    const [deletedGroup] = await this.dbService.db
+  async deleteGroup(
+    groupId: string,
+    tx?: DatabaseService['db'],
+  ): Promise<DeleteResponseDto> {
+    const db = tx ?? this.dbService.db;
+
+    const [deletedGroup] = await db
       .delete(ModuleGrouping)
       .where(eq(ModuleGrouping.GroupID, groupId))
       .returning();
@@ -168,9 +195,16 @@ export class GroupingService {
   async populateGroup(
     groupId: string,
     modules: string[],
+    tx?: DatabaseService['db'],
   ): Promise<GroupingSingleResponse> {
+    if (!tx) {
+      return this.dbService.db.transaction(async (t: AppDatabase) => {
+        return this.populateGroup(groupId, modules, t);
+      }); //END_transaction
+    } //END_transaction precencer check
+
     //fetch group
-    const group = await this.getById(groupId);
+    const group = await this.getById(groupId, tx);
 
     const oldModules = group.modules || [];
 
@@ -190,11 +224,15 @@ export class GroupingService {
       .digest('base64');
 
     //Check if hash already exists -> If it already exists -> delete current group -> return matching group
-    const friendHash = await this.checkForMatchingHashGroup(groupId, newHash);
+    const friendHash = await this.checkForMatchingHashGroup(
+      groupId,
+      newHash,
+      tx,
+    );
 
     if (friendHash) {
       //Ensure all courses that made use of old group -> switch to new group
-      await this.dbService.db
+      await tx
         .update(Course)
         .set({
           GroupID: friendHash.GroupID,
@@ -202,14 +240,14 @@ export class GroupingService {
         .where(eq(Course.GroupID, groupId));
 
       //Delete old group
-      await this.deleteGroup(groupId);
+      await this.deleteGroup(groupId, tx);
 
       //return friend group
       return friendHash;
     } //END_friendHash
     else {
       //No duplicate hash -> populate current group with newModules
-      await this.dbService.db.insert(GroupModules).values(
+      await tx.insert(GroupModules).values(
         newModules.map((moduleId) => ({
           GroupID: groupId,
           ModuleID: moduleId,
@@ -217,7 +255,7 @@ export class GroupingService {
       );
     }
 
-    const newGroup = await this.updateGroup(groupId, newHash);
+    const newGroup = await this.updateGroup(groupId, newHash, tx);
 
     return newGroup;
   } //END_populateGroup
@@ -226,8 +264,9 @@ export class GroupingService {
   private async checkForMatchingHashGroup(
     currGroupId: string,
     hash: string,
+    tx: DatabaseService['db'],
   ): Promise<ModuleGroupingDto | null> {
-    const [friendHash] = await this.dbService.db
+    const [friendHash] = await tx
       .select()
       .from(ModuleGrouping)
       .where(
@@ -242,9 +281,13 @@ export class GroupingService {
   } //END_checkForMatchingHashGroup
 
   //Remove provided modules from group
-  async removeModulesFromGroup(groupId: string, modules: string[]) {
+  async removeModulesFromGroup(
+    groupId: string,
+    modules: string[],
+    tx: DatabaseService['db'],
+  ) {
     //remove modules in array from group
-    await this.dbService.db
+    await tx
       .delete(GroupModules)
       .where(
         and(

@@ -513,9 +513,16 @@ export class EventService {
   private async ownershipCheck(
     userId: string,
     eventId: string,
+    tx?: AppDatabase,
   ): Promise<boolean> {
+    if (!tx) {
+      return this.dbService.db.transaction(async (t: AppDatabase) => {
+        return this.ownershipCheck(userId, eventId, t);
+      }); //END_transaction
+    } //END_transaction precencer check
+
     //Get module from which event is created
-    const [module] = await this.dbService.db
+    const [module] = await tx
       .select({
         moduleId: modules.moduleID,
       })
@@ -531,6 +538,7 @@ export class EventService {
     return await this.moduleService.moduleOwnershipCheck(
       userId,
       module.moduleId,
+      tx,
     );
   } //END_ownershipCheck
 

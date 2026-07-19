@@ -35,7 +35,7 @@ import {
 } from '../entities/index';
 
 //Services
-import { DatabaseService } from '../db/database.service';
+import { AppDatabase, DatabaseService } from '../db/database.service';
 import { CourseService } from '../Course/course.service';
 import { GroupingService } from '../Grouping/grouping.service';
 import { GroupingSingleResponse } from 'src/Grouping/dto/grouping.dto';
@@ -55,7 +55,14 @@ export class ModuleService {
   async create(
     userId: string,
     dto: CreateModuleDto,
+    tx?: AppDatabase,
   ): Promise<ModuleSingleResponseDto> {
+    if (!tx) {
+      return this.dbService.db.transaction(async (t: AppDatabase) => {
+        return this.create(userId, dto, t);
+      }); //END_transaction
+    } //END_transaction precencer check
+
     const code = dto.moduleCode?.trim().toUpperCase();
     const name = dto.moduleName?.trim();
     const description = dto.moduleDescription?.trim();
@@ -65,13 +72,16 @@ export class ModuleService {
     //if courseId provided and doesn't exist -> throw fit
     if (courseId) {
       //get course
-      const course = await this.courseService.getById(courseId);
+      const course = await this.courseService.getById(courseId, tx);
 
       //If group defined for course -> continue | else -> create group for course
       if (!course.GroupID) {
-        const newGroup = await this.groupingService.createModuleGrouping({
-          CourseID: courseId,
-        });
+        const newGroup = await this.groupingService.createModuleGrouping(
+          {
+            CourseID: courseId,
+          },
+          tx,
+        );
         groupId = newGroup.GroupID;
       } else groupId = course.GroupID;
     } //END_courseId
@@ -79,10 +89,10 @@ export class ModuleService {
     if (groupId) {
       //check that module Grouping groupId is valid
       console.log('This should be null ', groupId);
-      await this.groupingService.getById(groupId);
+      await this.groupingService.getById(groupId, tx);
 
       //Check for duplicate moduleCode in ModuleGrouping
-      if (await this.existingModuleCodeForModuleGrouping(code, groupId))
+      if (await this.existingModuleCodeForModuleGrouping(code, groupId, tx))
         throw new ConflictException(
           `Module code [${code}] already exists for ModuleGrouping[${groupId}]`,
         );
@@ -92,13 +102,14 @@ export class ModuleService {
       //-> Create new group for module
       const moduleGrouping = await this.groupingService.createModuleGrouping(
         {},
+        tx,
       );
 
       groupId = moduleGrouping.GroupID;
     } //END_if-else
 
     //Create new module
-    const [newModule] = await this.dbService.db
+    const [newModule] = await tx
       .insert(modules)
       .values({
         moduleCode: code,
@@ -112,9 +123,11 @@ export class ModuleService {
       throw new InternalServerErrorException('Module failed to be created');
 
     //Group module to its group
-    const moduleGroup = await this.groupingService.populateGroup(groupId, [
-      newModule.moduleID,
-    ]);
+    const moduleGroup = await this.groupingService.populateGroup(
+      groupId,
+      [newModule.moduleID],
+      tx,
+    );
 
     //if grouping failed
     if (!moduleGroup)
@@ -134,7 +147,7 @@ export class ModuleService {
       const yearOfStudy = dto.CourseModuleInfo.YearOfStudy ?? 0;
 
       //Fetch GroupModule entry for module to add metadata to
-      const [groupModule] = await this.dbService.db
+      const [groupModule] = await tx
         .select()
         .from(GroupModules)
         .where(
@@ -151,7 +164,7 @@ export class ModuleService {
         );
 
       //Add metadata to groupModule entity
-      [courseModuleInfo] = await this.dbService.db
+      [courseModuleInfo] = await tx
         .insert(CourseModule)
         .values({
           CourseID: dto.CourseID,
@@ -174,6 +187,7 @@ export class ModuleService {
         newModule.moduleID,
         userId,
         dto.styling.colour,
+        tx,
       );
 
       return {
@@ -196,7 +210,10 @@ export class ModuleService {
   async getAll(
     userId: string,
     filters: ModuleFiltersDto,
+    tx?: DatabaseService['db'],
   ): Promise<ModuleListResponseDto> {
+    const db = tx ?? this.dbService.db;
+
     //define empty conditions array to be added to based of filters
     const conditions: SQL[] = [];
 
@@ -213,7 +230,7 @@ export class ModuleService {
       conditions.push(eq(ModuleEnrollment.UserID, userId));
 
     //Build actual query joining Modules -> ModuleEnrollment + CourseModule + Course and then add in dynamic where conditions
-    const foundModules = await this.dbService.db
+    const foundModules = await db
       .selectDistinctOn([modules.moduleID], {
         ...getTableColumns(modules),
         ModuleGroupingID: GroupModules.GroupID,
@@ -247,8 +264,11 @@ export class ModuleService {
   async getById(
     userId: string,
     moduleId: string,
+    tx?: DatabaseService['db'],
   ): Promise<ModuleSingleResponseDto> {
-    const [module] = await this.dbService.db
+    const db = tx ?? this.dbService.db;
+
+    const [module] = await db
       .select({
         ...getTableColumns(modules),
         styling: ModuleStyling.styling,
@@ -281,9 +301,16 @@ export class ModuleService {
     userId: string,
     moduleId: string,
     dto: UpdateModuleDto,
+    tx?: DatabaseService['db'],
   ): Promise<ModuleSingleResponseDto> {
+    if (!tx) {
+      return this.dbService.db.transaction(async (t: AppDatabase) => {
+        return this.update(userId, moduleId, dto, t);
+      }); //END_transaction
+    } //END_transaction precencer check
+
     //check that module exists
-    const oldModule = await this.getById(userId, moduleId);
+    const oldModule = await this.getById(userId, moduleId, tx);
 
     //Define update fields
     const updateFields: Partial<typeof modules.$inferInsert> = {};
@@ -305,7 +332,7 @@ export class ModuleService {
     //Handle courseModule update -> requires courseId
     let courseModuleInfo: CourseModuleDto | null = null;
     if (dto.CourseID) {
-      courseModuleInfo = await this.courseModuleUpdate(dto.CourseID, dto);
+      courseModuleInfo = await this.courseModuleUpdate(dto.CourseID, dto, tx);
     }
 
     let newModule = oldModule;
@@ -318,7 +345,7 @@ export class ModuleService {
       return oldModule;
     else if (Object.keys(updateFields).length > 0) {
       //update module
-      const [nuweModule] = await this.dbService.db
+      const [nuweModule] = await tx
         .update(modules)
         .set(updateFields)
         .where(eq(modules.moduleID, moduleId))
@@ -333,8 +360,9 @@ export class ModuleService {
     // Styling update - any user can update styling as it doesn't influence module
     let newStyling: { colour: string } | null = null;
     if (dto.styling) {
-      newStyling = (await this.setStyling(moduleId, userId, dto.styling.colour))
-        .styling;
+      newStyling = (
+        await this.setStyling(moduleId, userId, dto.styling.colour, tx)
+      ).styling;
 
       newStyling = { colour: dto.styling.colour };
     } else {
@@ -350,9 +378,14 @@ export class ModuleService {
     };
   } //update
 
-  async deleteById(moduleId: string): Promise<DeleteModuleResponseDto> {
+  async deleteById(
+    moduleId: string,
+    tx?: DatabaseService['db'],
+  ): Promise<DeleteModuleResponseDto> {
+    const db = tx ?? this.dbService.db;
+
     //delete actual module
-    const [module] = await this.dbService.db
+    const [module] = await db
       .delete(modules)
       .where(eq(modules.moduleID, moduleId))
       .returning();
@@ -367,12 +400,19 @@ export class ModuleService {
   async enrollToModule(
     userId: string,
     moduleId: string,
+    tx?: DatabaseService['db'],
   ): Promise<EnrolResponseDto> {
+    if (!tx) {
+      return this.dbService.db.transaction(async (t: AppDatabase) => {
+        return this.enrollToModule(userId, moduleId, t);
+      }); //END_transaction
+    } //END_transaction precencer check
+
     //Check if module exists
-    await this.getById(userId, moduleId);
+    await this.getById(userId, moduleId, tx);
 
     //Check if user already enrolled to module
-    const [enrollmentStatus] = await this.dbService.db
+    const [enrollmentStatus] = await tx
       .select()
       .from(ModuleEnrollment)
       .where(
@@ -392,7 +432,7 @@ export class ModuleService {
       };
 
     //Enroll student to module
-    const newlyEnrolled = await this.dbService.db
+    const newlyEnrolled = await tx
       .insert(ModuleEnrollment)
       .values({
         UserID: userId,
@@ -418,12 +458,19 @@ export class ModuleService {
   async addModulesToCourse(
     courseId: string,
     dto: AddModulesToCourseDto,
+    tx?: DatabaseService['db'],
   ): Promise<AddModulesToCourseResponseDto> {
+    if (!tx) {
+      return this.dbService.db.transaction(async (t: AppDatabase) => {
+        return this.addModulesToCourse(courseId, dto, t);
+      }); //END_transaction
+    } //END_transaction precencer check
+
     //Check that course exists
-    const course = await this.courseService.getById(courseId);
+    const course = await this.courseService.getById(courseId, tx);
 
     //Check that each module exists
-    const existingModules = await this.dbService.db
+    const existingModules = await tx
       .select()
       .from(modules)
       .where(inArray(modules.moduleID, dto.modules));
@@ -446,13 +493,16 @@ export class ModuleService {
     let group: GroupingSingleResponse;
     if (!course.GroupID) {
       //Create group for course with modules
-      group = await this.groupingService.createModuleGrouping({
-        CourseID: course.CourseID,
-        modules: dto.modules,
-      });
+      group = await this.groupingService.createModuleGrouping(
+        {
+          CourseID: course.CourseID,
+          modules: dto.modules,
+        },
+        tx,
+      );
     } else {
       //Check if other courses are making use of same group, event if only one
-      const partnerCourses = await this.dbService.db
+      const partnerCourses = await tx
         .select()
         .from(Course)
         .where(
@@ -466,7 +516,7 @@ export class ModuleService {
       if (partnerCourses.length > 0) {
         // console.log(`Partner courses identified. Amount: ${partnerCourses.length}`);
         //Get current groups modules
-        const oldGroup = await this.groupingService.getById(course.GroupID);
+        const oldGroup = await this.groupingService.getById(course.GroupID, tx);
 
         const mergedModules: string[] = [
           ...(oldGroup.modules ?? []),
@@ -476,16 +526,20 @@ export class ModuleService {
         // console.log(`MergedModules: ${JSON.stringify(mergedModules)}`);
 
         //Create new group with copy of modules + new modules
-        group = await this.groupingService.createModuleGrouping({
-          CourseID: course.CourseID,
-          modules: mergedModules,
-        });
+        group = await this.groupingService.createModuleGrouping(
+          {
+            CourseID: course.CourseID,
+            modules: mergedModules,
+          },
+          tx,
+        );
       } else {
         //no other course will be influenced, just update modules in group
         //Populate group for course
         group = await this.groupingService.populateGroup(
           course.GroupID,
           dto.modules,
+          tx,
         );
       } //END_partnerCourse Check
     } //END_group exists for course check
@@ -508,8 +562,9 @@ export class ModuleService {
   private async existingModuleCodeForModuleGrouping(
     moduleCode: string,
     groupId: string,
+    tx: DatabaseService['db'],
   ): Promise<boolean> {
-    const [existingModule] = await this.dbService.db
+    const [existingModule] = await tx
       .select()
       .from(modules)
       .innerJoin(GroupModules, eq(GroupModules.ModuleID, modules.moduleID))
@@ -530,11 +585,21 @@ export class ModuleService {
   } //END_existingModuleForCourse
 
   //Set module styling
-  async setStyling(moduleId: string, userId: string, styling: string) {
+  async setStyling(
+    moduleId: string,
+    userId: string,
+    styling: string,
+    tx?: DatabaseService['db'],
+  ) {
+    if (!tx) {
+      return this.dbService.db.transaction(async (t: AppDatabase) => {
+        return this.setStyling(moduleId, userId, styling, t);
+      }); //END_transaction
+    } //END_transaction precencer check
     const styleJson = { colour: styling };
 
     //Check if styling already exists for module+user
-    let [modStyle] = await this.dbService.db
+    let [modStyle] = await tx
       .select()
       .from(ModuleStyling)
       .where(
@@ -547,7 +612,7 @@ export class ModuleService {
 
     if (!modStyle) {
       //Create style entry
-      [modStyle] = await this.dbService.db
+      [modStyle] = await tx
         .insert(ModuleStyling)
         .values({
           ModuleID: moduleId,
@@ -557,7 +622,7 @@ export class ModuleService {
         .returning();
     } else {
       //Update styling
-      [modStyle] = await this.dbService.db
+      [modStyle] = await tx
         .update(ModuleStyling)
         .set({
           styling: styleJson,
@@ -578,8 +643,14 @@ export class ModuleService {
   } //END_setStyling
 
   //Get module styling
-  async getStyling(moduleId: string, userId: string) {
-    const [styling] = await this.dbService.db
+  async getStyling(
+    moduleId: string,
+    userId: string,
+    tx?: DatabaseService['db'],
+  ) {
+    const db = tx ?? this.dbService.db;
+
+    const [styling] = await db
       .select()
       .from(ModuleStyling)
       .where(
@@ -595,8 +666,10 @@ export class ModuleService {
 
   //For external use ===========
   //Get University that owns module
-  async getUniForModule(moduleId: string) {
-    const [uni] = await this.dbService.db
+  async getUniForModule(moduleId: string, tx?: DatabaseService['db']) {
+    const db = tx ?? this.dbService.db;
+
+    const [uni] = await db
       .select({
         UniversityID: University.UniversityID,
       })
@@ -612,10 +685,11 @@ export class ModuleService {
   async moduleOwnershipCheck(
     userId: string,
     moduleId: string,
+    tx: DatabaseService['db'],
   ): Promise<boolean> {
     //Returns true if module is owned by user, false otherwise
     //IF STUDENT_OWNED, and module belongs to course that belongs to university of STUDENT_OWNED UniversityRole entity, then student owns module
-    const [module] = await this.dbService.db
+    const [module] = await tx
       .select({
         moduleId: modules.moduleID,
       })
@@ -643,13 +717,21 @@ export class ModuleService {
     userID: string,
     moduleID: string,
     dto: ModuleStylingBodyDto,
+    tx?: DatabaseService['db'],
   ): Promise<ModuleStylingResponseDto> {
-    const module = await this.getById(userID, moduleID);
+    if (!tx) {
+      return this.dbService.db.transaction(async (t: AppDatabase) => {
+        return this.updateStylingService(userID, moduleID, dto, t);
+      }); //END_transaction
+    } //END_transaction precencer check
+
+    const module = await this.getById(userID, moduleID, tx);
 
     const updatedStyling = await this.setStyling(
       moduleID,
       userID,
       dto.styling.colour,
+      tx,
     );
     console.log(updatedStyling);
     if (updatedStyling) {
@@ -666,9 +748,16 @@ export class ModuleService {
   async courseModuleUpdate(
     courseId: string,
     dto: UpdateModuleDto,
+    tx?: DatabaseService['db'],
   ): Promise<CourseModuleDto> {
+    if (!tx) {
+      return this.dbService.db.transaction(async (t: AppDatabase) => {
+        return this.courseModuleUpdate(courseId, dto, t);
+      }); //END_transaction
+    } //END_transaction precencer check
+
     //Get group module entry that courseMOdule refers to through COurseID
-    const [groupModule] = await this.dbService.db
+    const [groupModule] = await tx
       .select()
       .from(GroupModules)
       .innerJoin(Course, eq(Course.GroupID, GroupModules.GroupID))
@@ -676,7 +765,7 @@ export class ModuleService {
       .limit(1);
 
     //Get old courseModuleInfo
-    const [oldCourseModule] = await this.dbService.db
+    const [oldCourseModule] = await tx
       .select()
       .from(CourseModule)
       .where(
@@ -700,7 +789,7 @@ export class ModuleService {
     let returnCourseModule = oldCourseModule;
     if (Object.keys(courseUpdateFields).length > 0) {
       //Update courseMOdule metadata appropriatly
-      [returnCourseModule] = await this.dbService.db
+      [returnCourseModule] = await tx
         .update(CourseModule)
         .set(courseUpdateFields)
         .where(
