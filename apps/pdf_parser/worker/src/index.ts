@@ -23,7 +23,7 @@ validatePdfParseWorkerConfig(config);
 
 const parserExecutor = createParserExecutor(config);
 
-const checkHealthPort = process.env.HEALTH_PORT; //just need to check with michael if this approach is correct
+const checkHealthPort = process.env.HEALTH_PORT_PDF_PARSER; //just need to check with michael if this approach is correct
 
 const healthServer = http.createServer((req, res) => {
   if (req.method === "GET" && req.url === "/health") {

@@ -90,7 +90,7 @@ LABEL org.opencontainers.image.title="UMTAS solver worker" \
       io.umtas.base-image.update-policy="Track patched Node 22 bookworm-slim releases"
 
 RUN apt-get update \
-    && apt-get install --yes --no-install-recommends dumb-init libgomp1 \
+    && apt-get install --yes --no-install-recommends dumb-init libgomp1 curl \
     && rm -rf /var/lib/apt/lists/* \
     && mkdir -p /app/bin /app/lib /tmp/umtas-worker \
     && chown -R node:node /app /tmp/umtas-worker
@@ -100,11 +100,17 @@ ENV NODE_ENV=production \
     LD_LIBRARY_PATH=/app/lib \
     SOLVER_CLI_COMMAND=/app/bin/solver-cli \
     WORKER_TEMP_ROOT=/tmp/umtas-worker
+    HEALTH_PORT_SOLVER_WORKER=8081
+
+EXPOSE 8081
 
 COPY --from=node-build --chown=node:node /deploy/ /app/
 COPY --from=solver-build --chown=node:node /out/bin/solver-cli /app/bin/solver-cli
 COPY --from=solver-build /out/lib/ /app/lib/
 COPY --from=solver-build --chown=node:node /out/image-smoke-ok /app/.image-smoke-ok
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD curl -f http://localhost:8080/health || exit 1
 
 USER node
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
