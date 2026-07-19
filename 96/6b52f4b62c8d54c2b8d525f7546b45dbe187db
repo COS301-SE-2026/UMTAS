@@ -1,0 +1,24 @@
+docker/solver-worker/solver-worker.Dockerfile
+  h_84e82529bd05a5 1-114
+apps/backend/src/db/database-seed.service.ts
+  h_84e82529bd05a5 1-396
+apps/backend/src/db/database-seed.service.spec.ts
+  h_84e82529bd05a5 1-66
+apps/backend/src/Course/course.controller.ts
+  h_84e82529bd05a5 26-27,32,71-76,144
+apps/backend/src/Module/dto/module.dto.ts
+  h_84e82529bd05a5 139,162-168,177,179,183,188,192,218-224,263,272,280,284,286
+justfile
+  h_84e82529bd05a5 6,25,34-41,51,54,82-84,86,96,111,115-199
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "966b52f4b62c8d54c2b8d525f7546b45dbe187db",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}
