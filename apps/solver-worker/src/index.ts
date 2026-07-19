@@ -17,6 +17,8 @@ import {
 } from "./solver-executor.js";
 import { SolverProcessor } from "./solver.processor.js";
 
+import http from "node:http";
+
 const config = buildSolverWorkerConfig();
 validateSolverWorkerConfig(config);
 
@@ -51,6 +53,22 @@ if (config.tempRoot) workerOptions.tempRoot = config.tempRoot;
 
 const worker = createWorkerHost(workerOptions);
 
+const checkHealthPort = process.env.HEALTH_PORT; //just need to check with michael if this approach is correct
+
+const healthServer = http.createServer((req, res) => {
+  if (req.method === "GET" && req.url === "/health") {
+    res.writeHead(200, { "Content-Type": "Application/json" });
+    res.end(JSON.stringify({ status: "healthy" }));
+  } else {
+    res.writeHead(404, { "Content-Type": "Application/json" });
+    res.end(JSON.stringify({ status: "not found" }));
+  }
+});
+
+healthServer.listen(checkHealthPort, () => {
+  console.log(`Health check server running on: ${checkHealthPort}`);
+});
+
 worker.on("completed", (job) => {
   console.info("Solver job completed", { jobId: job.id });
 });
@@ -59,6 +77,9 @@ worker.on("failed", (job, error) => {
 });
 
 async function shutdown(): Promise<void> {
+  await new Promise<void>((resolve) => {
+    healthServer.close(() => resolve());
+  });
   await worker.close();
 }
 
