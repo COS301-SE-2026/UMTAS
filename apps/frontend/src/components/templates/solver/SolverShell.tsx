@@ -6,12 +6,14 @@ import SolverReview from "@/components/organisms/solver/SolverReview";
 import SolverPreferences from "@/components/organisms/solver/SolverPreferences";
 import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
 import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
+import { useState } from "react";
+import { SolverLock } from "@/components/organisms/solver/SolverLock";
 
 const events: EventResponse[] = [
   {
     eventCriteria: {
       date: "2026/06/07",
-      endTime: "9:00",
+      endTime: "11:00",
       startTime: "10:00",
       moduleID: "301",
       type: "university",
@@ -25,7 +27,7 @@ const events: EventResponse[] = [
   {
     eventCriteria: {
       date: "2026/06/07",
-      endTime: "9:00",
+      endTime: "11:00",
       startTime: "10:00",
       moduleID: "332",
       type: "university",
@@ -39,8 +41,8 @@ const events: EventResponse[] = [
   {
     eventCriteria: {
       date: "2026/06/07",
-      endTime: "9:00",
-      startTime: "10:00",
+      endTime: "10:00",
+      startTime: "9:00",
       moduleID: "333",
       type: "university",
       venue: "IT-2-24",
@@ -80,27 +82,52 @@ const modules: ModuleResponseDto[] = [
 ];
 
 export default function SolverShell() {
+  const [currentStep, setCurrentStep] = useState(0);
+  const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  const [comingFromStep, setComingFromStep] = useState<number | null>(null);
+
+  function handleStepCompleted(fromStep: number) {
+    setComingFromStep(fromStep);
+    setCompletedSteps((previous) => [...previous, fromStep]);
+
+    //the actual async call should happen here wilmar instead of a timeout
+    setTimeout(() => {
+      setCurrentStep(fromStep + 1);
+      setComingFromStep(null);
+    }, 676);
+  }
   return (
     <>
       <WizardStepper
-        completedSteps={[]}
-        currentStep={0}
-        onStepClick={() => {}}
+        completedSteps={completedSteps}
+        currentStep={currentStep}
+        onStepClick={setCurrentStep}
         steps={[
           { label: "Upload" },
           { label: "Review" },
           { label: "Preferences" },
         ]}
       />
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto px-4 mt-8">
-        <div className="flex justify-center">
-          <SolverUpload />
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-16 max-w-10xl mx-auto px-6 pt-6">
+        <div className="flex justify-center h-fit">
+          <SolverUpload onComplete={() => handleStepCompleted(0)} />
         </div>
-        <div className="flex justify-center">
-          <SolverReview events={events} modules={modules} />
+
+        <div className="flex justify-center h-fit">
+          <SolverLock locked={currentStep < 1} loading={comingFromStep === 0}>
+            <SolverReview
+              events={events}
+              modules={modules}
+              onComplete={() => handleStepCompleted(1)}
+            />
+          </SolverLock>
         </div>
+
         <div className="flex justify-center">
-          <SolverPreferences />
+          <SolverLock locked={currentStep < 2} loading={comingFromStep === 1}>
+            <SolverPreferences />
+          </SolverLock>
         </div>
       </div>
     </>

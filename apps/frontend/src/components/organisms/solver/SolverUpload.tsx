@@ -11,7 +11,11 @@ import {
 } from "@/components/atoms/baseShadcn/card";
 import { Input } from "@/components/atoms/baseShadcn/input";
 
-export default function SolverUpload() {
+interface SolverUploadProps {
+  onComplete: () => void;
+}
+
+export default function SolverUpload({ onComplete }: SolverUploadProps) {
   //connects to the upload part
   const uploadFileRef = useRef<HTMLInputElement>(null);
 
@@ -50,7 +54,7 @@ export default function SolverUpload() {
           />
         </div>
 
-        <Button type="button" className="w-fit">
+        <Button type="button" className="w-fit" onClick={onComplete}>
           Review
         </Button>
       </CardContent>

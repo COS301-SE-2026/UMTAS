@@ -6,6 +6,13 @@ import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
 import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
 import { Button } from "@/components/atoms/baseShadcn/button";
 import { useState } from "react";
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/atoms/customise/alert-dialog-customise";
 
 interface SolverReviewProps {
   modules: ModuleResponseDto[];
@@ -91,20 +98,41 @@ export default function SolverReviewCard({
               onClick={() => handleSelect(event)}
             />
 
-            {isSelected && tempEvent && (
-              <div className="pl-4 space-y-2">
-                <NoPermissionsEventCard
-                  event={tempEvent}
-                  modules={modules}
-                  onUpdate={handleUpdate}
-                />
+            <AlertDialog
+              open={isSelected}
+              onOpenChange={(open) => {
+                if (!open) {
+                  setSelectedEvent(null);
+                  setTempEvent(null);
+                }
+              }}
+            >
+              <AlertDialogContent className="w-max max-w-[95vw] p-6">
+                <AlertDialogHeader className="flex flex-row justify-between items-center border-b pb-2">
+                  <AlertDialogTitle className="text-xl font-bold">
+                    Review your Events
+                  </AlertDialogTitle>
+                  <AlertDialogCancel className="mt-0">Close</AlertDialogCancel>
+                </AlertDialogHeader>
+
+                <div className="py-4 overflow-auto max-h-[80vh]">
+                  <div className="pl-4 space-y-2">
+                    {tempEvent && (
+                      <NoPermissionsEventCard
+                        event={tempEvent}
+                        modules={modules}
+                        onUpdate={handleUpdate}
+                      />
+                    )}
+                  </div>
+                </div>
                 <div className="flex gap-2">
                   <Button
                     size="sm"
                     disabled={!eventChange}
                     onClick={handleSave}
                   >
-                    Save
+                    Save & Close
                   </Button>
                   <Button
                     size="sm"
@@ -114,11 +142,11 @@ export default function SolverReviewCard({
                       setTempEvent(selectedEvent);
                     }}
                   >
-                    Discard
+                    Discard & Close
                   </Button>
                 </div>
-              </div>
-            )}
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         );
       })}

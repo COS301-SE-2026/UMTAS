@@ -18,11 +18,14 @@ import { Trash, LucidePlusCircle } from "lucide-react";
 import { Slider } from "@/components/atoms/baseShadcn/slider";
 import { useState } from "react";
 import PreferenceSection from "@/components/molecules/solver/PreferencesCard";
+import { useRouter } from "next/navigation";
 
 export default function SolverPreferences() {
   const [iconClicked, setIconClicked] = useState(false);
   const [sections, setSections] = useState([0]);
   const [currentMode, setCurrentMode] = useState("Feasibility");
+
+  const router = useRouter();
 
   function handleAdd() {
     setSections((prev) => [...prev, Date.now()]);
@@ -107,7 +110,14 @@ export default function SolverPreferences() {
             </div>
           </div>
           {solveMode(currentMode)}
-          <Button type="button">View Timetable</Button>
+          <Button
+            type="button"
+            onClick={() => {
+              router.push("/schedules");
+            }}
+          >
+            View Timetable
+          </Button>
         </CardContent>
       </Card>
     </>

@@ -15,11 +15,13 @@ import React, { useState } from "react";
 interface SolverReviewProps {
   modules: ModuleResponseDto[];
   events: EventResponse[];
+  onComplete: () => void;
 }
 
 export default function SolverReview({
   events: initialEvents,
   modules,
+  onComplete,
 }: SolverReviewProps) {
   const [events, setEvents] = useState<EventResponse[]>(initialEvents);
   return (
@@ -37,7 +39,9 @@ export default function SolverReview({
             modules={modules}
             onUpdateEvents={setEvents}
           />
-          <Button type="button">Set Preferences</Button>
+          <Button type="button" onClick={onComplete}>
+            Set Preferences
+          </Button>
         </CardContent>
       </Card>
     </>

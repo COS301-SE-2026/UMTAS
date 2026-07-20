@@ -85,7 +85,7 @@ export function NoPermissionsEventCard({
           onClick={onGoToModules}
           className="text-sm underline text-[var(--text-secondary)] text-left transition-colors duration-[var(--duration-fast)] hover:text-[var(--text-primary)]"
         >
-          No modules yet, go back to Step 1 to create some.
+          No modules found.
         </button>
       );
     }
@@ -140,7 +140,7 @@ export function NoPermissionsEventCard({
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="grid grid-cols-3 gap-4">
       {/*name, code en venue*/}
       <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4">
         <div className="flex flex-col gap-4">
