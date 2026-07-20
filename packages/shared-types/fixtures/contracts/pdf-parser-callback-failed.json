@@ -1,0 +1,8 @@
+{
+  "status": "failed",
+  "error": {
+    "code": "PARSER_INVALID_DOCUMENT",
+    "message": "The PDF did not match the selected adapter.",
+    "details": {}
+  }
+}

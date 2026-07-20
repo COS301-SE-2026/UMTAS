@@ -1,0 +1,7 @@
+{
+  "pdf-result-extra-key.json": "PdfParserResultSchema",
+  "pdf-result-invalid-time.json": "PdfParserResultSchema",
+  "solver-input-both-date-and-day.json": "SolverInputSchema",
+  "solver-input-zero-selections.json": "SolverInputSchema",
+  "solver-result-conflict-mismatch.json": "SolverResultSchema"
+}
