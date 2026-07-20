@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       release_tag:
-        description: "Release tag to deploy,eg V1.0.0"
+        description: "Release tag to deploy,eg v1.0.0"
         required: true
         type: string
 
@@ -26,7 +26,7 @@ jobs:
           key: ${{ secrets.PROD_SSH_KEY }}
           script: |
             cd /opt/UMTAS
-            just deploy-prod ${{ inputs.release_tag }}
+            just deploy-prod "${{ inputs.release_tag }}"
 
   notify-deploy:
     needs: deploy
