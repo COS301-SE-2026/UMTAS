@@ -26,6 +26,84 @@ export function HelpCommandPalette() {
 
   const pages: HelpPageGroup[] = [
     {
+      heading: "Application Pages",
+      id: "app-pages",
+      items: [
+        {
+          id: "dashboard",
+          children: "Dashboard",
+          icon: "HomeIcon",
+          href: "/dashboard",
+        },
+        {
+          id: "builder",
+          children: "Timetable Builder",
+          icon: "CalendarIcon",
+          href: "/builder",
+        },
+        {
+          id: "schedules",
+          children: "Schedules",
+          icon: "ClockIcon",
+          href: "/schedules",
+        },
+        {
+          id: "course-management",
+          children: "Course Management",
+          icon: "AcademicCapIcon",
+          href: "/course-management",
+        },
+        {
+          id: "role-management",
+          children: "Role Management",
+          icon: "UserGroupIcon",
+          href: "/role-management",
+        },
+        // {
+        //   id: "choose-institute",
+        //   children: "Choose Institute",
+        //   icon: "BuildingOfficeIcon",
+        //   href: "/choose-institute",
+        // },
+        // {
+        //   id: "brand-style",
+        //   children: "Brand Style",
+        //   icon: "SwatchIcon",
+        //   href: "/brand-style",
+        // },
+      ],
+    },
+    {
+      heading: "Authentication",
+      id: "auth",
+      items: [
+        {
+          id: "login",
+          children: "Login",
+          icon: "ArrowRightOnRectangleIcon",
+          href: "/login",
+        },
+        {
+          id: "register",
+          children: "Register",
+          icon: "UserPlusIcon",
+          href: "/register",
+        },
+        {
+          id: "forgot-password",
+          children: "Forgot Password",
+          icon: "KeyIcon",
+          href: "/forgot-password",
+        },
+        {
+          id: "reset-password",
+          children: "Reset Password",
+          icon: "ArrowPathIcon",
+          href: "/reset-password",
+        },
+      ],
+    },
+    {
       heading: "Help & Resources",
       id: "resources",
       items: [
