@@ -98,8 +98,7 @@ export class UniversityService {
         ),
       );
 
-    if (universities.length === 0)
-      throw new NotFoundException('No universities found');
+    if (universities.length === 0) return { universities: [] };
 
     return { universities };
   } //GetAll
@@ -198,9 +197,9 @@ export class UniversityService {
     userId: string,
     uniId: string,
     tx?: DatabaseService['db'],
-  ) {
+  ): Promise<typeof UniversityRole.$inferSelect> {
     if (!tx) {
-      return await this.dbService.db.transaction(async (t: AppDatabase) => {
+      return await this.dbService.db.transaction((t: AppDatabase) => {
         return this.getUsersRole(userId, uniId, t);
       });
     } //END_tx precence check
@@ -223,7 +222,7 @@ export class UniversityService {
 
     return {
       UniversityID: uniRole.UniversityID,
-      userId: uniRole.UserID,
+      UserID: uniRole.UserID,
       role: uniRole.role,
     };
   } //END_getUsersRole
@@ -278,7 +277,7 @@ export class UniversityService {
       )
       .limit(1);
 
-    let newUniRole;
+    let newUniRole: typeof UniversityRole.$inferSelect;
     if (!uniRole) {
       //User has not applied for a role previously
       [newUniRole] = await tx

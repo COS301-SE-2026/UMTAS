@@ -1,7 +1,7 @@
 //What the mock db returns on each function
 
-// import { DeepMockProxy } from "jest-mock-extended";
-// import { AppDatabase } from "../../db/database.service";
+import { DeepMockProxy } from 'jest-mock-extended';
+import { AppDatabase } from '../../db/database.service';
 
 export function createDbChain<T>(result: T) {
   const chain = {} as Record<string, jest.Mock>;
@@ -53,126 +53,88 @@ export const mockSequentialResults = <T>(mockFn: jest.Mock, results: T[][]) => {
   );
 };
 
-// //transactions
-// export const mockTransaction = (mockDb: DeepMockProxy<AppDatabase>) => {
-//   mockDb.transaction.mockImplementation(
-//     (callback: (tx: AppDatabase) => unknown) =>
-//       callback(mockDb) as ReturnType<AppDatabase['transaction']>,
-//   );
-// }; //END_mockTransaction
+//transactions
+export const mockTransaction = (
+  mockDb: DeepMockProxy<AppDatabase>,
+  ops?: {
+    select?: unknown[][];
+    insert?: unknown[][];
+    update?: unknown[][];
+    delete?: unknown[][];
+  },
+) => {
+  // Mock the transaction to execute the callback immediately
+  (mockDb.transaction as unknown as jest.Mock).mockImplementation(
+    (callback: (tx: AppDatabase) => unknown) => {
+      // Setup chainable methods on the transaction mock
+      if (ops?.select) {
+        // For select operations, mock the chain
+        const mockSelect = jest.fn();
+        ops.select.forEach((result, index) => {
+          if (index === 0) {
+            mockSelect.mockReturnValueOnce(createDbChain(result));
+          } else {
+            mockSelect.mockReturnValueOnce(createDbChain(result));
+          }
+        });
+        // If there are more calls than results, repeat the last result
+        if (ops.select.length > 0) {
+          const lastResult = ops.select[ops.select.length - 1];
+          mockSelect.mockReturnValue(createDbChain(lastResult));
+        }
+        (mockDb.select as unknown as jest.Mock) = mockSelect;
+      }
 
-//Operation
-// export interface TxOperationResults {
-//   select?: unknown[][];
-//   insert?: unknown[][];
-//   update?: unknown[][];
-//   delete?: unknown[][];
-// }
+      if (ops?.insert) {
+        const mockInsert = jest.fn();
+        ops.insert.forEach((result, index) => {
+          if (index === 0) {
+            mockInsert.mockReturnValueOnce(createDbChain(result));
+          } else {
+            mockInsert.mockReturnValueOnce(createDbChain(result));
+          }
+        });
+        if (ops.insert.length > 0) {
+          const lastResult = ops.insert[ops.insert.length - 1];
+          mockInsert.mockReturnValue(createDbChain(lastResult));
+        }
+        (mockDb.insert as unknown as jest.Mock) = mockInsert;
+      }
 
-// const DB_VERBS = ['select', 'insert', 'update', 'delete'] as const;
-// type DbVerb = (typeof DB_VERBS)[number];
+      if (ops?.update) {
+        const mockUpdate = jest.fn();
+        ops.update.forEach((result, index) => {
+          if (index === 0) {
+            mockUpdate.mockReturnValueOnce(createDbChain(result));
+          } else {
+            mockUpdate.mockReturnValueOnce(createDbChain(result));
+          }
+        });
+        if (ops.update.length > 0) {
+          const lastResult = ops.update[ops.update.length - 1];
+          mockUpdate.mockReturnValue(createDbChain(lastResult));
+        }
+        (mockDb.update as unknown as jest.Mock) = mockUpdate;
+      }
 
-// export const mockTransactionOps = (
-//   mockDb: DeepMockProxy<AppDatabase>,
-//   ops: TxOperationResults,
-// ): DeepMockProxy<AppDatabase> => {
-//   mockTransaction(mockDb);
+      if (ops?.delete) {
+        const mockDelete = jest.fn();
+        ops.delete.forEach((result, index) => {
+          if (index === 0) {
+            mockDelete.mockReturnValueOnce(createDbChain(result));
+          } else {
+            mockDelete.mockReturnValueOnce(createDbChain(result));
+          }
+        });
+        if (ops.delete.length > 0) {
+          const lastResult = ops.delete[ops.delete.length - 1];
+          mockDelete.mockReturnValue(createDbChain(lastResult));
+        }
+        (mockDb.delete as unknown as jest.Mock) = mockDelete;
+      }
 
-//   DB_VERBS.forEach((verb: DbVerb) => {
-//     const results = ops[verb];
-//     if (!results) return;
-//     mockSequentialResults(mockDb[verb] as unknown as jest.Mock, results);
-//   });
-
-//   return mockDb;
-// }; //END_mockTransactionOps
-
-// //Tables
-// export interface TableResultQueue {
-//   table: unknown; // eg. Venue, Event
-//   results: unknown[][]; // sequential results
-// }
-
-// export interface TxTableResults {
-//   select?: TableResultQueue[];
-//   insert?: TableResultQueue[];
-//   update?: TableResultQueue[];
-//   delete?: TableResultQueue[];
-// }
-
-// const buildTableQueueMap = (
-//   entries: TableResultQueue[],
-// ): Map<unknown, unknown[][]> => {
-//   const map = new Map<unknown, unknown[][]>();
-//   entries.forEach(({ table, results }) => {
-//     // clone the array so shift() below doesn't mutate the caller's literal
-//     map.set(table, [...results]);
-//   });
-//   return map;
-// };
-
-// const nextResultForTable = (
-//   queueMap: Map<unknown, unknown[][]>,
-//   table: unknown,
-// ): unknown[] => {
-//   const queue = queueMap.get(table);
-//   if (!queue || queue.length === 0) {
-//     throw new Error(
-//       'mockDbByTable: no more mocked results queued for this table. ' +
-//         'Add another entry to the relevant results array, or check the ' +
-//         'table reference matches the one imported in the service.',
-//     );
-//   }
-//   return queue.shift() as unknown[];
-// };
-
-// //Select needs a from
-// export const mockSelectByTable = (
-//   mockDb: DeepMockProxy<AppDatabase>,
-//   entries: TableResultQueue[],
-// ) => {
-//   const queueMap = buildTableQueueMap(entries);
-
-//   (mockDb.select as unknown as jest.Mock).mockImplementation(() => {
-//     const pending = {} as Record<string, jest.Mock>;
-//     pending.from = jest.fn((table: unknown) =>
-//       createDbChain(nextResultForTable(queueMap, table)),
-//     );
-//     return pending;
-//   });
-// };
-
-// //INSERT/UPDATE?DELETE
-// const mockVerbByTable = (mockFn: jest.Mock, entries: TableResultQueue[]) => {
-//   const queueMap = buildTableQueueMap(entries);
-//   mockFn.mockImplementation((table: unknown) =>
-//     createDbChain(nextResultForTable(queueMap, table)),
-//   );
-// };
-
-// export const mockInsertByTable = (
-//   mockDb: DeepMockProxy<AppDatabase>,
-//   entries: TableResultQueue[],
-// ) => mockVerbByTable(mockDb.insert as unknown as jest.Mock, entries);
-
-// export const mockUpdateByTable = (
-//   mockDb: DeepMockProxy<AppDatabase>,
-//   entries: TableResultQueue[],
-// ) => mockVerbByTable(mockDb.update as unknown as jest.Mock, entries);
-
-// export const mockDeleteByTable = (
-//   mockDb: DeepMockProxy<AppDatabase>,
-//   entries: TableResultQueue[],
-// ) => mockVerbByTable(mockDb.delete as unknown as jest.Mock, entries);
-
-// export const mockTransactionByTable = (
-//   mockDb: DeepMockProxy<AppDatabase>,
-//   ops: TxTableResults,
-// ): DeepMockProxy<AppDatabase> => {
-//   mockTransaction(mockDb);
-//   if (ops.select) mockSelectByTable(mockDb, ops.select);
-//   if (ops.insert) mockInsertByTable(mockDb, ops.insert);
-//   if (ops.update) mockUpdateByTable(mockDb, ops.update);
-//   if (ops.delete) mockDeleteByTable(mockDb, ops.delete);
-//   return mockDb;
-// }; //END_mockTransactionByTable
+      // Execute the callback with the mocked transaction
+      return callback(mockDb);
+    },
+  );
+}; //END_mockTransaction
