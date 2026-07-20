@@ -44,7 +44,7 @@ RUN set -ex; \
       *) echo "Unsupported TARGETARCH: ${TARGETARCH}. Supported: amd64, arm64" >&2; exit 64 ;; \
     esac; \
     apt-get update \
-    && apt-get install --yes --no-install-recommends build-essential ca-certificates curl pkg-config \
+    && apt-get install --yes --no-install-recommends build-essential ca-certificates curl pkg-config unzip \
     && rm -rf /var/lib/apt/lists/* \
     && curl --fail --location --retry 3 "${ORTOOLS_URL}" --output /tmp/ortools.tar.gz \
     && echo "${ORTOOLS_SHA256}  /tmp/ortools.tar.gz" | sha256sum --check --strict \
@@ -57,6 +57,8 @@ COPY apps/preference-solver /workspace/apps/preference-solver
 WORKDIR /workspace/apps/preference-solver
 ENV LD_LIBRARY_PATH=/opt/ortools/lib
 RUN make clean \
+    && make lib/openGA.hpp \
+    && sed -i 's/std::mutex mtx_rand;/inline std::mutex mtx_rand;/' lib/openGA.hpp \
     && make --jobs="$(nproc)" \
       ORTOOLS_PREFIX=/opt/ortools \
       ABSEIL_PREFIX=/opt/ortools \
@@ -110,7 +112,7 @@ COPY --from=solver-build /out/lib/ /app/lib/
 COPY --from=solver-build --chown=node:node /out/image-smoke-ok /app/.image-smoke-ok
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD curl -f http://localhost:8080/health || exit 1
+  CMD curl -f http://localhost:8081/health || exit 1
 
 USER node
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]

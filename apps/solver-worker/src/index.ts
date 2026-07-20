@@ -77,7 +77,7 @@ const healthServer = http.createServer((req, res) => {
   }
 });
 
-healthServer.listen(checkHealthPort, "0.0.0.0", () => {
+healthServer.listen(checkHealthPort, () => {
   console.log(`Health check server running on port: ${checkHealthPort}`);
 });
 
