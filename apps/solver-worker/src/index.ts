@@ -59,7 +59,9 @@ const checkHealthPort = process.env.HEALTH_PORT_SOLVER_WORKER || 8082; //just ne
 
 const healthServer = http.createServer((req, res) => {
   if (req.method === "GET" && req.url === "/health") {
-    exec("preference-solver --health", (error, stdout, stderr) => {
+const solverCommand = process.env.SOLVER_CLI_COMMAND || "/app/bin/solver-cli";
+
+exec(`${solverCommand} --health`, (error, stdout, stderr) => {
       if (error) {
         res.writeHead(500, { "Content-Type": "application/json" });
         res.end(
