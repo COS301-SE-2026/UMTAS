@@ -11,6 +11,7 @@ import CustomiseEventPanel from "@/components/atoms/customise/CustomiseEventPane
 import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
 import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
 import { Button } from "@/components/atoms/baseShadcn/button";
+import SolverReviewCard from "@/components/molecules/solver/SolverReviewCard";
 
 interface SolverReviewProps {
   modules: ModuleResponseDto[];
@@ -28,15 +29,7 @@ export default function SolverReview({ events, modules }: SolverReviewProps) {
           Review your parsed activities before moving to preferences
         </CardDescription>
         <CardContent className="space-y-4">
-          {events?.map((event) => {
-            return (
-              <CustomiseEventPanel
-                key={event.eventID}
-                event={event}
-                modules={modules}
-              />
-            );
-          }) || <p>No event found</p>}
+          <SolverReviewCard events={events} modules={modules} />
           <Button type="button">Set Preferences</Button>
         </CardContent>
       </Card>
