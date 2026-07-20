@@ -60,7 +60,7 @@ function validateEvent(event: EventResponse): valEvent {
     errors.name = "Name is required";
     hasErrors = true;
   }
-  if (!event.eventCode?.trim()) {
+  if (!event.activityCode?.trim()) {
     errors.code = "Code is required";
     hasErrors = true;
   }
@@ -92,11 +92,11 @@ function validateEvent(event: EventResponse): valEvent {
 function isEventComplete(event: EventResponse) {
   const criteria = event.eventCriteria;
   if (!event.eventName) return false;
-  if (!event.eventCode) return false;
+  if (!event.activityCode) return false;
   if (!criteria?.date) return false;
   if (!criteria?.startTime) return false;
   if (!criteria?.endTime) return false;
-  if (criteria?.type === "university")
+  if (event.activityType != undefined)
     // TODO add module && event.eventCriteria.moduleID)
     return false;
   return true;
@@ -107,7 +107,7 @@ function getLinkedModuleName(
   modules: ModuleResponseDto[],
 ) {
   const found = modules.find(
-    (m) => m.moduleID === event.eventCriteria.moduleID,
+    (m) => m.moduleID === event.eventCriteria.moduleId,
   ); // TODO add module event.lecture?.moduleID);
   if (found) {
     return found.moduleCode + " - " + found.moduleName;
@@ -137,15 +137,16 @@ export function EventsStep({
       getAllEventsQ().queryKey,
       (oldEvents: EventResponse[] | undefined) => {
         const emptyEvent: EventResponse = {
-          eventID: `TEMP_${nextNum}`,
-          eventCode: "",
-          isRecurring: false,
+          eventId: `TEMP_${nextNum}`,
+          activityCode: "",
           eventName: "",
+          activityType: "lecture",
           eventCriteria: {
-            type: "university",
             date: "",
             endTime: "",
             startTime: "",
+            eventSource: "university",
+            dayOfWeek: "monday", // add functionality here
           },
         };
         return [...(oldEvents ?? []), emptyEvent];
@@ -154,8 +155,8 @@ export function EventsStep({
 
     if (newEvents) {
       const mapped = newEvents.map((e) => ({
-        eventID: e.eventID,
-        created: !e.eventID.startsWith("TEMP"),
+        eventID: e.eventId,
+        created: !e.eventId.startsWith("TEMP"),
       }));
       setEventsAdded(mapped);
     }
@@ -207,7 +208,7 @@ export function EventsStep({
     }
 
     function doSelect() {
-      const selected = events.find((e) => e.eventID === id);
+      const selected = events.find((e) => e.eventId === id);
       setSelectedId(id);
       setIsDirty(false);
     }
@@ -216,7 +217,7 @@ export function EventsStep({
   }
 
   async function handleConfirm(id: string) {
-    const event = events.find((e) => e.eventID === id);
+    const event = events.find((e) => e.eventId === id);
     if (!event) return;
 
     const { errors: validationErrors, hasErrors } = validateEvent(event);
@@ -236,8 +237,7 @@ export function EventsStep({
     if (iscreated?.created) {
       updateEvent.mutate({
         body: {
-          isRecurring: false,
-          eventCode: event.eventCode,
+          activityCode: event.activityCode,
           eventCriteria: event.eventCriteria,
           eventName: event.eventName,
         },
@@ -249,12 +249,11 @@ export function EventsStep({
       const result = addEvent.mutateAsync({
         body: {
           eventCriteria: event.eventCriteria,
-          eventCode: event.eventCode,
+          activityCode: event.activityCode,
           eventName: event.eventName,
-          isRecurring: false,
         },
       });
-      const newID = (await result).event.eventID;
+      const newID = (await result).event.eventId;
       if (events) {
         const mapped = eventsAdded.map((event) => {
           if (event.eventID === id) {
@@ -289,7 +288,7 @@ export function EventsStep({
       getAllEventsQ().queryKey,
       (OldEvents: EventResponse[] | undefined) => {
         if (!OldEvents) return [];
-        return OldEvents.filter((e) => e.eventID !== id);
+        return OldEvents.filter((e) => e.eventId !== id);
       },
     );
   }
@@ -306,7 +305,7 @@ export function EventsStep({
         if (!oldEvents) return [];
 
         return oldEvents.map((event) =>
-          event.eventID === id
+          event.eventId === id
             ? {
                 ...event,
                 ...(field in event
@@ -356,18 +355,18 @@ export function EventsStep({
 
   function renderEventRow(event: EventResponse, index: number) {
     const isComplete = isEventComplete(event);
-    const isSelected = selectedId === event.eventID;
-    const errors = errorMap[event.eventID];
+    const isSelected = selectedId === event.eventId;
+    const errors = errorMap[event.eventId];
     const moduleName = getLinkedModuleName(event, modules);
     const criteria = event.eventCriteria;
 
     return (
-      <div key={event.eventID} className="flex flex-col gap-2">
+      <div key={event.eventId} className="flex flex-col gap-2">
         {/* summary row */}
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={() => handleSelect(event.eventID)}
+            onClick={() => handleSelect(event.eventId)}
             className="flex flex-1 items-center gap-3 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] px-4 py-4 text-left transition-colors duration-[var(--duration-fast)] hover:bg-[var(--bg-elevated)] shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.08)]"
           >
             <div className="flex-1 min-w-0">
@@ -375,9 +374,9 @@ export function EventsStep({
                 {event.eventName || "Event " + (index + 1)}
               </p>
               <div className="flex flex-wrap items-center gap-2 mt-0.5">
-                {event.eventCode && (
+                {event.activityCode && (
                   <p className="text-sm font-mono text-[var(--text-secondary)]">
-                    {event.eventCode}
+                    {event.activityCode}
                   </p>
                 )}
                 {criteria?.date && (
@@ -411,7 +410,7 @@ export function EventsStep({
             type="button"
             variant="ghost"
             size="icon"
-            onClick={() => handleRemove(event.eventID)}
+            onClick={() => handleRemove(event.eventId)}
             aria-label={"Remove event " + (index + 1)}
             className="h-10 w-10 flex-shrink-0 border border-[var(--border)] text-[var(--text-secondary)] transition-colors duration-[var(--duration-fast)] hover:border-[var(--error-text)] hover:text-[var(--error-text)] hover:bg-transparent"
           >
@@ -433,7 +432,7 @@ export function EventsStep({
             <Button
               type="button"
               variant="outline"
-              onClick={() => handleConfirm(event.eventID)}
+              onClick={() => handleConfirm(event.eventId)}
               aria-label="Confirm event"
               className="w-full gap-2 border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-primary)] transition-colors duration-[var(--duration-fast)] hover:bg-[var(--bg-elevated)]"
             >

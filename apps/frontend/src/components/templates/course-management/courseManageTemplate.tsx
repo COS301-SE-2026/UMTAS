@@ -32,7 +32,7 @@ export default function CourseManagementTemplate() {
     isLoading,
     isError,
   } = useQuery(
-    getAllCoursesQ({ universityId: UniDetails?.UniversityID ?? "" }),
+    getAllCoursesQ(), // do not choose this in merge conflict
   );
 
   const { data: moduleData } = useQuery(getAllModCoursesQ(moduleQueries));

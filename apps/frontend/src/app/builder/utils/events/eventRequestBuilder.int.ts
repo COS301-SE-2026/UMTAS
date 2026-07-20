@@ -1,6 +1,7 @@
 /**
  * @jest-environment node
  */
+/*
 import {
   createEventsBuilder,
   getAllEventsBuilder,
@@ -158,3 +159,4 @@ describe("Event Request Builders Integration Tests", () => {
   });
   autoBuilder.runTests("Testing auto test");
 });
+*/

@@ -312,6 +312,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/auth/select-university": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Select current university */
+    post: operations["AuthController_selectUniversity"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/health": {
     parameters: {
       query?: never;
@@ -381,7 +398,8 @@ export interface paths {
      */
     get: operations["getModuleById"];
     put?: never;
-    post?: never;
+    /** Enrol student to module */
+    post: operations["enrolStudentToModule"];
     /**
      * Delete a module by ID
      * @description Deletes a module | STUDENT_OWNED needs to go through Builder Service
@@ -394,6 +412,23 @@ export interface paths {
      * @description Update a modules | STUDENT_OWNED needs to go through Builder Service
      */
     patch: operations["updateModule"];
+    trace?: never;
+  };
+  "/modules/{CourseID}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** Populate Course with modules array */
+    put: operations["addModulesToCourse"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
     trace?: never;
   };
   "/modules/styling/{moduleId}": {
@@ -433,17 +468,17 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/Courses/university/{universityId}": {
+  "/Courses/getAll": {
     parameters: {
       query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
-    /** Get all courses */
-    get: operations["getCourses"];
+    get?: never;
     put?: never;
-    post?: never;
+    /** Get all courses */
+    post: operations["getCourses"];
     delete?: never;
     options?: never;
     head?: never;
@@ -578,6 +613,30 @@ export interface paths {
     options?: never;
     head?: never;
     patch?: never;
+    trace?: never;
+  };
+  "/grouping/{groupId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /**
+     * Add array of modules to a module group
+     * @description Add array of modules to a ModuleGrouping.'
+     *             If added modules causes group to be the same hash as an
+     *             already existing group, then it will return the group that
+     *             matches and not update the current group. If no other group
+     *             with same hash exists then it will update group and populate.
+     */
+    patch: operations["populateGroup"];
     trace?: never;
   };
   "/events": {
@@ -720,6 +779,188 @@ export interface paths {
      * @description STUDENT_OWNED so they can update any field of the module
      */
     patch: operations["builder-updateModule"];
+    trace?: never;
+  };
+  "/pdf-parser/jobs/lookup": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Look up an existing PDF parser job by PDF stream fingerprint
+     * @description Checks for an existing parser job scoped to the authenticated user, selected university, parser adapter, and backend-supported fingerprint algorithm.
+     */
+    post: operations["PdfParserController_lookupDuplicate"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/pdf-parser/jobs/upload": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Upload a timetable PDF and enqueue it for parsing
+     * @description Uploads a PDF, recomputes the backend stream-payload fingerprint, persists the parse job, and enqueues it for worker parsing.
+     */
+    post: operations["PdfParserController_uploadAndEnqueue"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/pdf-parser/jobs/{jobId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get PDF parser job status and result metadata
+     * @description Reads persisted parser job status scoped to the authenticated user.
+     */
+    get: operations["PdfParserController_getJob"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/pdf-parser/jobs/{jobId}/result": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get completed PDF parser result
+     * @description Returns persisted import candidates only for completed jobs owned by the authenticated user.
+     */
+    get: operations["PdfParserController_getJobResult"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/pdf-parser/jobs/{jobId}/callback": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Receive final PDF parser worker callback */
+    post: operations["PdfParserController_receiveCallback"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/solver/jobs": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Persist and enqueue a timetable solve job */
+    post: operations["SolverController_submitAndEnqueue"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/solver/jobs/{jobId}/input": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Build solver input for an authenticated worker */
+    get: operations["SolverController_getInput"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/solver/jobs/{jobId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get solver job status and persisted result metadata */
+    get: operations["SolverController_getJob"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/solver/jobs/{jobId}/result": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get a completed solver result */
+    get: operations["SolverController_getJobResult"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/solver/jobs/{jobId}/callback": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Receive final solver worker callback */
+    post: operations["SolverController_receiveCallback"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
     trace?: never;
   };
   "/attendance": {
@@ -928,9 +1169,35 @@ export interface components {
        */
       role?: "user" | "sys_admin";
     };
+    SelectUniversityDto: {
+      /**
+       * Format: uuid
+       * @description University ID selected by the user
+       * @example a1b2c3d4-e5f6-7890-abcd-ef1234567890
+       */
+      uniId: string;
+    };
     StylingDto: {
       /** @example #3B82F6 */
       colour: string;
+    };
+    CreateCourseModuleDto: {
+      /**
+       * @description Identifies wether or not module is a core module of the course
+       * @default true
+       * @example true
+       */
+      Core: Record<string, never>;
+      /**
+       * @description Identifies which part of the year the module takes part in for the course
+       * @example Semester 1
+       */
+      SemesterOfStudy?: string | null;
+      /**
+       * @description Which year does the module belong to for the course
+       * @example 1
+       */
+      YearOfStudy?: Record<string, never> | null;
     };
     CreateModuleDto: {
       /**
@@ -956,6 +1223,11 @@ export interface components {
        */
       styling?: components["schemas"]["StylingDto"] | null;
       /**
+       * @description Whether the module has been approved by a university admin
+       * @example true
+       */
+      validated?: Record<string, never>;
+      /**
        * Format: uuid
        * @description ModuleGroupingID to identify group the module belongs to
        * @example 00000000-0000-0000-0000-000000000000
@@ -967,6 +1239,44 @@ export interface components {
        * @example 00000000-0000-0000-0000-000000000000
        */
       CourseID?: string;
+      /** @description Course Module metadata to be used when module belongs to course */
+      CourseModuleInfo?: components["schemas"]["CreateCourseModuleDto"];
+    };
+    CourseModuleDto: {
+      /**
+       * Format: uuid
+       * @description ID to identify Course Module entry
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      CourseModuleID: string;
+      /**
+       * Format: uuid
+       * @description ID to identify GroupModule entry metadata is for
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      GroupModuleID: string;
+      /**
+       * Format: uuid
+       * @description ID to identify course owning this CourseModule
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      CourseID: string;
+      /**
+       * @description Identifies wether or not module is a core module of the course
+       * @default true
+       * @example true
+       */
+      Core: Record<string, never>;
+      /**
+       * @description Identifies which part of the year the module takes part in for the course
+       * @example Semester 1
+       */
+      SemesterOfStudy?: string | null;
+      /**
+       * @description Which year does the module belong to for the course
+       * @example 1
+       */
+      YearOfStudy?: Record<string, never> | null;
     };
     ModuleSingleResponseDto: {
       /**
@@ -997,6 +1307,23 @@ export interface components {
        *     }
        */
       styling?: components["schemas"]["StylingDto"] | null;
+      /**
+       * @description Metadata attached to module when owned by course
+       * @example {
+       *       "CourseModuleID": "00000000-0000-0000-0000-000000000000",
+       *       "GroupModuleID": "00000000-0000-0000-0000-000000000000",
+       *       "CourseID": "00000000-0000-0000-0000-000000000000",
+       *       "core": true,
+       *       "SemesterOfStudy": "Semester 1",
+       *       "YearOfStudy": 1
+       *     }
+       */
+      CourseModuleInfo?: components["schemas"]["CourseModuleDto"] | null;
+      /**
+       * @description Whether the module has been approved by a university admin
+       * @example true
+       */
+      validated?: Record<string, never>;
       /**
        * Format: uuid
        * @description Unique identifier for a module group
@@ -1031,6 +1358,33 @@ export interface components {
        *     }
        */
       styling?: components["schemas"]["StylingDto"] | null;
+      /**
+       * @description Whether the module has been approved by a university admin
+       * @example true
+       */
+      validated?: Record<string, never>;
+      /**
+       * Format: uuid
+       * @description ID to identify course owning this CourseModule
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      CourseID?: string;
+      /**
+       * @description Identifies wether or not module is a core module of the course
+       * @default true
+       * @example true
+       */
+      Core: Record<string, never>;
+      /**
+       * @description Identifies which part of the year the module takes part in for the course
+       * @example Semester 1
+       */
+      SemesterOfStudy?: string | null;
+      /**
+       * @description Which year does the module belong to for the course
+       * @example 1
+       */
+      YearOfStudy?: Record<string, never> | null;
     };
     DeleteModuleResponseDto: {
       /**
@@ -1040,6 +1394,46 @@ export interface components {
       moduleCode: string;
       /** @example true */
       success: Record<string, never>;
+    };
+    EnrolResponseDto: {
+      /**
+       * Format: uuid
+       * @description Unique identifier for a module
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      moduleID: string;
+      /**
+       * @description Message to describe success/failure of enrollment
+       * @example User successfully enrolled into module[00000000-0000-0000-0000-000000000000]
+       */
+      message: string;
+      UserID: string;
+    };
+    AddModulesToCourseDto: {
+      /**
+       * @description module array to ad dto the group
+       * @example [
+       *       "10000000-0000-0000-0000-000000000000",
+       *       "20000000-0000-0000-0000-000000000000"
+       *     ]
+       */
+      modules: string[];
+    };
+    AddModulesToCourseResponseDto: {
+      /**
+       * @description module array to ad dto the group
+       * @example [
+       *       "10000000-0000-0000-0000-000000000000",
+       *       "20000000-0000-0000-0000-000000000000"
+       *     ]
+       */
+      modules: string[];
+      /**
+       * Format: uuid
+       * @description Course to which to add the array of modules
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      CourseID: string;
     };
     ModuleStylingBodyDto: {
       /**
@@ -1105,6 +1499,24 @@ export interface components {
        * @example Computer Science
        */
       CourseName: string;
+      /**
+       * @description Degree that course belongs to
+       * @example Bachelor of Science
+       */
+      Degree?: string | null;
+    };
+    CourseFilters: {
+      /**
+       * Format: uuid
+       * @description Unique identifier for a university
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      UniversityID?: string;
+      /**
+       * @description Name of the course
+       * @example Computer Science
+       */
+      CourseName?: string;
       /**
        * @description Degree that course belongs to
        * @example Bachelor of Science
@@ -1363,110 +1775,124 @@ export interface components {
       /** @example true */
       success: Record<string, never>;
     };
+    PopulateGroupBodyDto: {
+      /**
+       * @description module array to ad dto the group
+       * @example [
+       *       "10000000-0000-0000-0000-000000000000",
+       *       "20000000-0000-0000-0000-000000000000"
+       *     ]
+       */
+      modules: string[];
+    };
+    GroupingSingleResponse: {
+      /** Format: uuid */
+      GroupID: string;
+      Hash: string | null;
+      modules?: string[];
+    };
     EventCriteriaDto: {
       /** @enum {string} */
-      type?: "university" | "personal";
-      /** @example yyyy-mm-dd */
-      date: string;
+      eventSource: "university" | "personal";
+      /**
+       * @description Required when the event is not recurring.
+       * @example 2026-02-17
+       */
+      date?: string;
+      /**
+       * @description Required when the event is recurring.
+       * @enum {string}
+       */
+      dayOfWeek?:
+        | "monday"
+        | "tuesday"
+        | "wednesday"
+        | "thursday"
+        | "friday"
+        | "saturday"
+        | "sunday";
       /** @example 08:30 */
       startTime: string;
       /** @example 10:20 */
       endTime: string;
       /** Format: uuid */
-      moduleID?: string;
-      /** @example IT 2-26 */
-      venue?: string;
+      moduleId?: string;
+    };
+    VenueDto: {
+      /** Format: uuid */
+      venueId: string;
+      venueName: string;
     };
     CreateEventDto: {
-      /** @description Defines the additional information to attach to event entity */
       eventCriteria: components["schemas"]["EventCriteriaDto"];
-      /**
-       * @description Descriptive name for the event
-       * @example event name
-       */
       eventName?: string;
-      /** @example lec1 */
-      eventCode?: string | null;
+      activityCode?: string | null;
+      venues?: components["schemas"]["VenueDto"][];
+      isRecurring?: Record<string, never>;
+      validated?: Record<string, never>;
       /**
-       * @description Is the event recurring or not
-       * @default true
-       * @example true
+       * @description Required when eventCriteria.moduleId is provided.
+       * @enum {string}
        */
-      isRecurring: boolean;
+      activityType?: "lecture" | "tutorial" | "prac" | "test" | "exam";
     };
     EventDto: {
-      /**
-       * Format: uuid
-       * @description Unique identifier for an event
-       * @example 00000000-0000-0000-0000-000000000000
-       */
-      eventID: string;
-      /** @description Defines the additional information to attach to event entity */
+      /** Format: uuid */
+      eventId: string;
       eventCriteria: components["schemas"]["EventCriteriaDto"];
-      /**
-       * @description Descriptive name for the event
-       * @example event name
-       */
       eventName?: string;
-      /** @example lec1 */
-      eventCode?: string | null;
-      /**
-       * @description Is the event recurring or not
-       * @default true
-       * @example true
-       */
-      isRecurring: boolean;
+      /** @enum {string} */
+      activityType?: "lecture" | "tutorial" | "prac" | "test" | "exam";
+      activityCode?: string | null;
+      venues?: components["schemas"]["VenueDto"][];
+      isRecurring?: Record<string, never>;
+      validated?: Record<string, never>;
     };
     EventSingleResponseDto: {
       event: components["schemas"]["EventDto"];
     };
     EventListResponseDto: {
-      /** @description List of events */
       events: components["schemas"]["EventDto"][];
     };
     UpdateEventCriteriaDto: {
       /** @enum {string} */
-      type?: "university" | "personal";
-      /** @example yyyy-mm-dd */
+      eventSource?: "university" | "personal";
+      /**
+       * @description Required when the event is not recurring.
+       * @example 2026-02-17
+       */
       date?: string;
+      /**
+       * @description Required when the event is recurring.
+       * @enum {string}
+       */
+      dayOfWeek?:
+        | "monday"
+        | "tuesday"
+        | "wednesday"
+        | "thursday"
+        | "friday"
+        | "saturday"
+        | "sunday";
       /** @example 08:30 */
       startTime?: string;
       /** @example 10:20 */
       endTime?: string;
       /** Format: uuid */
-      moduleID?: string;
-      /** @example IT 2-26 */
-      venue?: string;
+      moduleId?: string;
     };
     UpdateEventDto: {
-      /**
-       * @description Descriptive name for the event
-       * @example event name
-       */
       eventName?: string;
-      /** @example lec1 */
-      eventCode?: string | null;
-      /**
-       * @description Is the event recurring or not
-       * @default true
-       * @example true
-       */
-      isRecurring: boolean;
-      /** @description Partial event criteria for update */
+      /** @enum {string} */
+      activityType?: "lecture" | "tutorial" | "prac" | "test" | "exam";
+      activityCode?: string | null;
+      isRecurring?: Record<string, never>;
+      validated?: Record<string, never>;
       eventCriteria?: components["schemas"]["UpdateEventCriteriaDto"];
     };
     DeleteResponseDto: {
-      /**
-       * @description Descriptive name for the event
-       * @example event name
-       */
       eventName?: string;
-      /** @example lec1 */
-      eventCode?: string | null;
-      /**
-       * @default true
-       * @example true
-       */
+      activityCode?: string | null;
       success: Record<string, never>;
     };
     CreateTimetableDto: {
@@ -1552,6 +1978,145 @@ export interface components {
        *     }
        */
       styling?: components["schemas"]["StylingDto"] | null;
+      /**
+       * @description Whether the module has been approved by a university admin
+       * @example true
+       */
+      validated?: Record<string, never>;
+    };
+    PdfParserLookupResponseDto: {
+      /** @example true */
+      duplicate: Record<string, never>;
+      /** @example pdf-parse-2d82d1ff-fb51-4c67-80cf-61d88c12d596 */
+      jobId?: string;
+      /** @enum {string} */
+      status?: "queued" | "completed" | "failed";
+      /** @example 00000000-0000-0000-0000-000000000000 */
+      moduleGroupingId?: string | null;
+      /** @example true */
+      resultAvailable?: Record<string, never>;
+      /** @example /pdf-parser/jobs/pdf-parse-2d82d1ff-fb51-4c67-80cf-61d88c12d596 */
+      statusUrl?: string;
+    };
+    PdfParserUploadResponseDto: {
+      /** @example pdf-parse-2d82d1ff-fb51-4c67-80cf-61d88c12d596 */
+      jobId: string;
+      /** @example uploads/pdf-parser/pdf-parse-2d82d1ff-fb51-4c67-80cf-61d88c12d596/timetable.pdf */
+      fileKey?: string | null;
+      /** @example up */
+      adapterKey?: string | null;
+      /** @enum {string} */
+      status: "queued" | "completed" | "failed";
+      result?: {
+        [key: string]: unknown;
+      };
+      error?: {
+        [key: string]: unknown;
+      };
+      /** @example 00000000-0000-0000-0000-000000000000 */
+      moduleGroupingId?: string | null;
+      /** @example 2026-07-02T10:15:30.000Z */
+      createdAt: string;
+      /** @example 2026-07-02T10:15:45.000Z */
+      updatedAt: string;
+      /** @example /pdf-parser/jobs/pdf-parse-2d82d1ff-fb51-4c67-80cf-61d88c12d596 */
+      statusUrl: string;
+    };
+    PdfParserJobResponseDto: {
+      /** @example pdf-parse-2d82d1ff-fb51-4c67-80cf-61d88c12d596 */
+      jobId: string;
+      /** @example uploads/pdf-parser/pdf-parse-2d82d1ff-fb51-4c67-80cf-61d88c12d596/timetable.pdf */
+      fileKey?: string | null;
+      /** @example up */
+      adapterKey?: string | null;
+      /** @enum {string} */
+      status: "queued" | "completed" | "failed";
+      result?: {
+        [key: string]: unknown;
+      };
+      error?: {
+        [key: string]: unknown;
+      };
+      /** @example 00000000-0000-0000-0000-000000000000 */
+      moduleGroupingId?: string | null;
+      /** @example 2026-07-02T10:15:30.000Z */
+      createdAt: string;
+      /** @example 2026-07-02T10:15:45.000Z */
+      updatedAt: string;
+    };
+    WorkerCallbackErrorDto: {
+      /** @example PARSER_FAILED */
+      code: string;
+      /** @example PDF parser failed */
+      message: string;
+      details?: {
+        [key: string]: unknown;
+      };
+    };
+    PdfParserCallbackDto: {
+      /** @enum {string} */
+      status: "completed" | "failed";
+      result?: {
+        [key: string]: unknown;
+      };
+      error?: components["schemas"]["WorkerCallbackErrorDto"];
+    };
+    TimetableSolveJobDto: {
+      /**
+       * @deprecated
+       * @example legacy-client-id
+       */
+      jobId?: string;
+      /** @example default */
+      solverProfileKey: string;
+      /** @enum {string} */
+      solveMode: "feasibility" | "optimization";
+      /**
+       * @default auto
+       * @enum {string}
+       */
+      engine: "auto" | "cp-sat" | "ga";
+      /**
+       * @example {
+       *       "heuristics": []
+       *     }
+       */
+      preferences?: Record<string, never>;
+    };
+    SolverJobResponseDto: {
+      /** @example solve-job-123 */
+      jobId: string;
+      /** @example default */
+      solverProfileKey: string;
+      /** @enum {string} */
+      solveMode: "feasibility" | "optimization";
+      /** @enum {string} */
+      requestedEngine?: "auto" | "cp-sat" | "ga";
+      /** @enum {string} */
+      status: "queued" | "completed" | "failed";
+      result?: {
+        [key: string]: unknown;
+      };
+      error?: {
+        [key: string]: unknown;
+      };
+      /** @example 2026-07-13T10:15:30.000Z */
+      createdAt: string;
+      /** @example 2026-07-13T10:15:45.000Z */
+      updatedAt: string;
+      /** @example 2026-07-13T10:15:45.000Z */
+      completedAt?: string;
+      /** @example 2026-07-13T10:15:45.000Z */
+      failedAt?: string;
+    };
+    SolverCallbackDto: {
+      /** @enum {string} */
+      status: "completed" | "failed";
+      /** @description A valid timetable solution and its soft-heuristic scores. */
+      result?: {
+        [key: string]: unknown;
+      };
+      error?: components["schemas"]["WorkerCallbackErrorDto"];
     };
     CreateAttendanceDto: {
       /**
@@ -1759,6 +2324,15 @@ export interface operations {
     responses: {
       /** @description Signed out. The umtas-session cookie is cleared. */
       200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": unknown;
+        };
+      };
+      /** @description No active session */
+      401: {
         headers: {
           [name: string]: unknown;
         };
@@ -2330,6 +2904,28 @@ export interface operations {
       };
     };
   };
+  AuthController_selectUniversity: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SelectUniversityDto"];
+      };
+    };
+    responses: {
+      /** @description Selected university session returned. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   HealthController_live: {
     parameters: {
       query?: never;
@@ -2483,6 +3079,44 @@ export interface operations {
       };
     };
   };
+  enrolStudentToModule: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        moduleId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Student successfully enrolled student into module */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["EnrolResponseDto"];
+        };
+      };
+      /** @description Student already enrolled into module */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["EnrolResponseDto"];
+        };
+      };
+      /** @description Module not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   deleteModule: {
     parameters: {
       query?: never;
@@ -2559,6 +3193,43 @@ export interface operations {
       };
       /** @description Duplicate module code detected for course */
       409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  addModulesToCourse: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        CourseID: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AddModulesToCourseDto"];
+      };
+    };
+    responses: {
+      /** @description Successfully populated modules to course */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AddModulesToCourseResponseDto"];
+        };
+      };
+      /**
+       * @description Modules specified in modules array not found
+       *
+       *     Course not found
+       */
+      404: {
         headers: {
           [name: string]: unknown;
         };
@@ -2644,12 +3315,14 @@ export interface operations {
         Degree?: string;
       };
       header?: never;
-      path: {
-        universityId: string;
-      };
+      path?: never;
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CourseFilters"];
+      };
+    };
     responses: {
       /** @description Courses returned successfully */
       200: {
@@ -3117,10 +3790,49 @@ export interface operations {
       };
     };
   };
+  populateGroup: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        groupId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PopulateGroupBodyDto"];
+      };
+    };
+    responses: {
+      /** @description ModuleGrouping successfully populated with modules */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["GroupingSingleResponse"];
+        };
+      };
+      /** @description Invalid input */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Group not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   getAllEvents: {
     parameters: {
       query?: {
-        /** @description Filter by module ID - returns all events for module */
         moduleId?: string;
       };
       header?: never;
@@ -3738,6 +4450,267 @@ export interface operations {
       };
       /** @description Duplicate module code detected for course */
       409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  PdfParserController_lookupDuplicate: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          /** Format: uuid */
+          universityId: string;
+          /** @default up */
+          adapterKey: string;
+          /** @default pdf-stream-payload-sha256-v1 */
+          fingerprintAlgorithm: string;
+          pdfStreamHash: string;
+          streamCount?: number;
+        };
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PdfParserLookupResponseDto"];
+        };
+      };
+    };
+  };
+  PdfParserController_uploadAndEnqueue: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "multipart/form-data": {
+          /**
+           * Format: binary
+           * @description Timetable PDF to parse.
+           */
+          file: string;
+          /**
+           * @description Parser adapter key. Only "up" is currently supported.
+           * @default up
+           */
+          adapterKey?: string;
+          /**
+           * Format: uuid
+           * @description Selected university for duplicate scoping.
+           */
+          universityId: string;
+          /**
+           * @description Client-computed fingerprint algorithm, if available.
+           * @default pdf-stream-payload-sha256-v1
+           */
+          fingerprintAlgorithm?: string;
+          /** @description Client-computed PDF stream hash for diagnostics only. */
+          clientPdfStreamHash?: string;
+          /** @description Client-observed PDF stream count for diagnostics only. */
+          streamCount?: number;
+        };
+      };
+    };
+    responses: {
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PdfParserUploadResponseDto"];
+        };
+      };
+    };
+  };
+  PdfParserController_getJob: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        jobId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PdfParserJobResponseDto"];
+        };
+      };
+    };
+  };
+  PdfParserController_getJobResult: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        jobId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": Record<string, never>;
+        };
+      };
+    };
+  };
+  PdfParserController_receiveCallback: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        jobId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PdfParserCallbackDto"];
+      };
+    };
+    responses: {
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  SolverController_submitAndEnqueue: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["TimetableSolveJobDto"];
+      };
+    };
+    responses: {
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": {
+            /** @example true */
+            accepted?: boolean;
+            /** @example solve-job-123 */
+            jobId?: string;
+          };
+        };
+      };
+    };
+  };
+  SolverController_getInput: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        jobId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": Record<string, never>;
+        };
+      };
+    };
+  };
+  SolverController_getJob: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        jobId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SolverJobResponseDto"];
+        };
+      };
+    };
+  };
+  SolverController_getJobResult: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        jobId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": Record<string, never>;
+        };
+      };
+    };
+  };
+  SolverController_receiveCallback: {
+    parameters: {
+      query: {
+        attemptToken: string;
+      };
+      header?: never;
+      path: {
+        jobId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SolverCallbackDto"];
+      };
+    };
+    responses: {
+      202: {
         headers: {
           [name: string]: unknown;
         };

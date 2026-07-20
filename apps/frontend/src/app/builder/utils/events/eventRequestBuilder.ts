@@ -3,8 +3,10 @@ import {
   RequestMethod,
 } from "../../../../../utilities/request";
 
-import { paths } from "@/lib/api";
+import { components, paths } from "@/lib/api";
 
+export type EventDto = components["schemas"]["EventDto"];
+export type ActivityTypesEvents = EventDto["activityType"];
 export type CreateEventBody =
   paths["/events"]["post"]["requestBody"]["content"]["application/json"];
 export type EventCriteria = CreateEventBody["eventCriteria"];

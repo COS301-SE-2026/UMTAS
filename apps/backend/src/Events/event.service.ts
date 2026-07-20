@@ -56,7 +56,6 @@ export class EventService {
         return this.create(userId, dto, t);
       }); //END_transaction
     } //END_transaction precencer check
-
     const moduleId = dto.eventCriteria.moduleId;
 
     //Create Event

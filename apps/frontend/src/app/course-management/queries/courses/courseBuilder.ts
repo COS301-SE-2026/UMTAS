@@ -22,8 +22,7 @@ export class createCoursesBuilder extends RequestBuilder<
     this.setUrl("/Courses").setMethod(RequestMethod.POST);
   }
 }
-export type fetchAllCourses =
-  paths["/Courses/university/{universityId}"]["get"];
+export type fetchAllCourses = paths["/Courses/getAll"]["post"];
 export type fetchAllCoursesQueries = fetchAllCourses["parameters"]["query"];
 export type fetchAllCourseRes =
   fetchAllCourses["responses"]["200"]["content"]["application/json"];
@@ -42,7 +41,7 @@ export async function fetchAllCoursesRequest(
       ? process.env.API_URL
       : process.env.NEXT_PUBLIC_API_URL) || "http://localhost:3000";
 
-  const Urlpath = `/Courses/university/${path.universityId}`;
+  const Urlpath = `/Courses/university/`;
 
   const searchParams = new URLSearchParams();
 
