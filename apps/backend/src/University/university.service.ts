@@ -216,7 +216,7 @@ export class UniversityService {
       .limit(1);
 
     if (!uniRole)
-      throw new BadRequestException(
+      throw new NotFoundException(
         `No role found for user[${userId}] for university[${uniId}]`,
       );
 
@@ -241,10 +241,10 @@ export class UniversityService {
     //Check that uni exists
     const uni = await this.getById(dto.UniversityID, tx);
 
-    if (!uni)
-      throw new BadRequestException(
-        `University[${dto.UniversityID}] does not exist`,
-      );
+    // if (!uni)
+    //   throw new BadRequestException(
+    //     `University[${dto.UniversityID}] does not exist`,
+    //   );
 
     const uniId = uni.UniversityID;
 
@@ -290,7 +290,7 @@ export class UniversityService {
         .returning();
     } else {
       //If already existing role and already has that role -> return early
-      if (uniRole.role === role) return { ...uni, role: uniRole.role };
+      if (uniRole.role === dto.role) return { ...uni, role: uniRole.role };
 
       //User already has a role, apply for new role, by updating uniRole entity
       [newUniRole] = await tx
@@ -329,21 +329,7 @@ export class UniversityService {
     } //END_tx precence check
 
     //get role
-    const [usersRole] = await tx
-      .select()
-      .from(UniversityRole)
-      .where(
-        and(
-          eq(UniversityRole.UserID, dto.userId),
-          eq(UniversityRole.UniversityID, dto.UniversityID),
-        ),
-      )
-      .limit(1);
-
-    if (!usersRole)
-      throw new BadRequestException(
-        `No role found for user[${dto.userId}] for university[${dto.UniversityID}]`,
-      );
+    const usersRole = await this.getUsersRole(dto.userId, dto.UniversityID, tx);
 
     let role: RoleTypeType;
     if (dto.provdedRole === undefined || dto.provdedRole == null) {
