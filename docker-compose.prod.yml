@@ -86,7 +86,7 @@ services:
       test: ["CMD", "curl", "-f", "http://localhost:8082/health"]
       interval: 30s
       timeout: 5s
-      retries: 3s
+      retries: 3
 
     depends_on:
       redis:
