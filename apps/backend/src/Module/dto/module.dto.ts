@@ -8,9 +8,81 @@ import {
   Length,
   IsBoolean,
   ValidateNested,
+  IsNumber,
 } from 'class-validator';
-import { PartialType, PickType, OmitType } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import {
+  PartialType,
+  PickType,
+  OmitType,
+  IntersectionType,
+} from '@nestjs/swagger';
+import { Transform, Type } from 'class-transformer';
+import { PopulateGroupBodyDto } from '../../Grouping/dto/grouping.dto';
+
+export class CourseModuleDto {
+  @ApiProperty({
+    example: '00000000-0000-0000-0000-000000000000',
+    description: 'ID to identify Course Module entry',
+  })
+  @IsUUID('4', { message: 'CourseModuleID: Not in valid UUID format' })
+  @IsNotEmpty()
+  CourseModuleID!: string;
+
+  @ApiProperty({
+    example: '00000000-0000-0000-0000-000000000000',
+    description: 'ID to identify GroupModule entry metadata is for',
+  })
+  @IsUUID('4', { message: 'GroupModuleID: Not in valid UUID format' })
+  @IsNotEmpty()
+  GroupModuleID!: string;
+
+  @ApiProperty({
+    example: '00000000-0000-0000-0000-000000000000',
+    description: 'ID to identify course owning this CourseModule',
+  })
+  @IsUUID('4', { message: 'CourseID: Not in valid UUID format' })
+  @IsNotEmpty()
+  CourseID!: string;
+
+  @ApiPropertyOptional({
+    example: true,
+    default: true,
+    description:
+      'Identifies wether or not module is a core module of the course',
+  })
+  @IsBoolean()
+  @Transform(({ value }) => {
+    if (value === true) return true;
+    else return false;
+  })
+  @IsNotEmpty()
+  Core!: boolean;
+
+  @ApiPropertyOptional({
+    example: 'Semester 1',
+    description:
+      'Identifies which part of the year the module takes part in for the course',
+    nullable: true,
+  })
+  @IsString()
+  @IsOptional()
+  SemesterOfStudy?: string | null;
+
+  @ApiPropertyOptional({
+    example: 1,
+    description: 'Which year does the module belong to for the course',
+    nullable: true,
+  })
+  @IsNumber()
+  @IsOptional()
+  YearOfStudy?: number | null;
+} //END_CourseModuleDto
+
+export class CreateCourseModuleDto extends PickType(CourseModuleDto, [
+  'Core',
+  'SemesterOfStudy',
+  'YearOfStudy',
+]) {}
 
 class StylingDto {
   @ApiProperty({ example: '#3B82F6' })
@@ -50,6 +122,7 @@ export class ModulesDto {
   @ApiPropertyOptional({
     example: 'Introduction to computer networking concepts',
     description: 'Short module description',
+    nullable: true,
   })
   @IsOptional()
   @IsString()
@@ -69,6 +142,23 @@ export class ModulesDto {
   @Type(() => StylingDto)
   styling?: StylingDto | null;
 
+  @ApiPropertyOptional({
+    description: 'Metadata attached to module when owned by course',
+    example: {
+      CourseModuleID: '00000000-0000-0000-0000-000000000000',
+      GroupModuleID: '00000000-0000-0000-0000-000000000000',
+      CourseID: '00000000-0000-0000-0000-000000000000',
+      core: true,
+      SemesterOfStudy: 'Semester 1',
+      YearOfStudy: 1,
+    },
+    nullable: true,
+  })
+  @IsOptional()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => CourseModuleDto)
+  CourseModuleInfo?: CourseModuleDto | null;
   @ApiProperty({
     example: true,
     description: 'Whether the module has been approved by a university admin',
@@ -103,11 +193,23 @@ export class CreateModuleDto extends PickType(ModulesDto, [
   @IsUUID()
   @IsOptional()
   CourseID?: string;
+
+  @ApiProperty({
+    description:
+      'Course Module metadata to be used when module belongs to course',
+    type: CreateCourseModuleDto,
+  })
+  @IsOptional()
+  @IsObject()
+  @ValidateNested()
+  @Type(() => CreateCourseModuleDto)
+  CourseModuleInfo?: CreateCourseModuleDto;
 } //CreateModuleDto
 
 //Update
-export class UpdateModuleDto extends PartialType(
-  OmitType(ModulesDto, ['moduleID'] as const),
+export class UpdateModuleDto extends IntersectionType(
+  PartialType(OmitType(ModulesDto, ['moduleID', 'CourseModuleInfo'] as const)),
+  PartialType(OmitType(CourseModuleDto, ['CourseModuleID', 'GroupModuleID'])),
 ) {} //update
 
 //Responses
@@ -177,11 +279,17 @@ export class ModuleFiltersDto {
 
   @ApiPropertyOptional({
     example: false,
+    default: false,
     description: 'Choose to filter modules based of current user enrollments',
     type: Boolean,
   })
   @IsOptional()
   @IsBoolean()
+  @IsOptional()
+  @Transform(({ value }) => {
+    if (value === true) return true;
+    else return false;
+  })
   userEnrollment?: boolean;
 } //ModuleFiltersDto
 
@@ -206,4 +314,34 @@ export class ModuleStylingBodyDto {
   @ValidateNested()
   @Type(() => StylingDto)
   styling!: StylingDto;
+}
+
+//Enroll response
+export class EnrolResponseDto extends PickType(ModulesDto, ['moduleID']) {
+  UserID!: string;
+
+  @ApiProperty({
+    example:
+      'User successfully enrolled into module[00000000-0000-0000-0000-000000000000]',
+    description: 'Message to describe success/failure of enrollment',
+  })
+  message!: string;
+} //END_EnrolResponseDto
+
+//Add array of modules to Course
+export class AddModulesToCourseDto extends PickType(PopulateGroupBodyDto, [
+  'modules',
+]) {} //END_AddModulesToCourseDto
+
+export class AddModulesToCourseResponseDto extends AddModulesToCourseDto {
+  @ApiProperty({
+    description: 'Course to which to add the array of modules',
+    type: String,
+    example: '00000000-0000-0000-0000-000000000000',
+  })
+  @IsNotEmpty({
+    message: `CourseID missing. What you gonna the modules to (facepalm)`,
+  })
+  @IsUUID('4', { message: 'CourseID should be a UUID' })
+  CourseID!: string;
 }

@@ -200,7 +200,13 @@ docker-build-multiarch image_tag registry="vigilcs/umtas":
 
 ############################## Backend specific
 
-# lint-staged
+#Complete restart of backend, I'm getting lazy
+backendRestart:
+    just dockerClean
+    just sync
+    just back
+
+#lint-staged
 lintBack:
     pnpm run lint-staged
 

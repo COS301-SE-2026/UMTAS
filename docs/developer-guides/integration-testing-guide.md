@@ -14,10 +14,11 @@
     ```
     Each test file gets a fresh in-memory Postgres - no Docker needed.
 
-=== "Microservices (FastAPI)"
+=== "Worker and Process Contracts"
     ```
-    apps/solver/tests/
-      test_contract.py   ← NestJS ↔ FastAPI contract tests
+    apps/solver-worker/src/tests/
+    apps/pdf_parser/worker/src/tests/
+    packages/shared-types/tests/
     ```
 
 ---
@@ -27,7 +28,7 @@
 | Layer             | Tool                                                                                                                | Focus                                    |
 | :---------------- | :------------------------------------------------------------------------------------------------------------------ | :--------------------------------------- |
 | **API → DB**      | ![Jest](https://img.shields.io/badge/-jest-%23C21325?style=for-the-badge&logo=jest&logoColor=white) + **PGLite**   | Controller, Service, and ORM integration |
-| **Microservices** | ![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi&logoColor=white)           | NestJS ↔ FastAPI contracts               |
+| **Worker contracts** | Jest and shared schemas | Queue, command-line, callback, and process contracts |
 
 ---
 

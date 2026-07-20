@@ -91,5 +91,5 @@ export class DeleteCourseResponseDto extends PickType(CourseDto, [
 
 //getAll filters
 export class CourseFilters extends PartialType(
-  PickType(CourseDto, ['UniversityID', 'Degree']),
+  PickType(CourseDto, ['CourseName', 'UniversityID', 'Degree']),
 ) {}

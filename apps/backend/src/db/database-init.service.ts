@@ -1,8 +1,9 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
+import { ModuleRef } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { sql } from 'drizzle-orm';
 import { DatabaseService } from './database.service';
-import { DatabaseSeedService } from './database-seed.service';
+import { DatabaseSeedService } from './seeding/database-seed.service';
 import { migrate as migrateNodePg } from 'drizzle-orm/node-postgres/migrator';
 import { migrate as migratePglite } from 'drizzle-orm/pglite/migrator';
 import { join } from 'node:path';
@@ -17,7 +18,7 @@ export class DatabaseInitService implements OnApplicationBootstrap {
   constructor(
     private readonly databaseService: DatabaseService,
     private readonly configService: ConfigService,
-    private readonly databaseSeedService: DatabaseSeedService,
+    private readonly moduleRef: ModuleRef,
   ) {}
 
   async onApplicationBootstrap(): Promise<void> {
@@ -51,8 +52,12 @@ export class DatabaseInitService implements OnApplicationBootstrap {
       }
       this.logger.log('Database migrations applied successfully');
 
+      // console.log(`Hallo: ${shouldSeed}`);
       if (shouldSeed) {
-        await this.databaseSeedService.seed();
+        const seedService = this.moduleRef.get(DatabaseSeedService, {
+          strict: false,
+        });
+        await seedService.seed();
       }
     } catch (error) {
       this.logger.error('Failed to run database migrations', error);

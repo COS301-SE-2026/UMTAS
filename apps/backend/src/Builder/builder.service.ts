@@ -4,7 +4,7 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { eq, and } from 'drizzle-orm';
-import { DatabaseService } from '../db/database.service';
+import { AppDatabase, DatabaseService } from '../db/database.service';
 
 import {
   BuilderListResponseDto,
@@ -42,51 +42,59 @@ export class BuilderService {
     userId: string,
     dto: CreateBuilderModuleDto,
   ): Promise<CreateBuilderModuleDto> {
-    const userCourse = await this.doUserUniCourseCheck(userId);
+    return await this.dbService.db.transaction(async (tx: AppDatabase) => {
+      const userCourse = await this.doUserUniCourseCheck(userId, tx);
 
-    //At this stage the user will definitly have a personalised university + course
+      //At this stage the user will definitly have a personalised university + course
 
-    //Create module dto mapping
-    const moduleDto: CreateModuleDto = {
-      moduleCode: dto.moduleCode,
-      moduleName: dto.moduleName,
-      CourseID: userCourse.CourseID,
-      moduleDescription: dto.moduleDescription,
-      styling: dto.styling,
-    };
+      //Create module dto mapping
+      const moduleDto: CreateModuleDto = {
+        moduleCode: dto.moduleCode,
+        moduleName: dto.moduleName,
+        CourseID: userCourse.CourseID,
+        moduleDescription: dto.moduleDescription,
+        styling: dto.styling,
+      };
 
-    //Create actual module
-    const module = await this.moduleService.create(userId, moduleDto);
+      //Create actual module
+      const module = await this.moduleService.create(userId, moduleDto, tx);
 
-    //Enroll Student to their module
-    const [enrollment] = await this.dbService.db
-      .insert(ModuleEnrollment)
-      .values({
-        ModuleID: module.moduleID,
-        UserID: userId,
-      })
-      .returning();
+      //Enroll Student to their module
+      const [enrollment] = await tx
+        .insert(ModuleEnrollment)
+        .values({
+          ModuleID: module.moduleID,
+          UserID: userId,
+        })
+        .returning();
 
-    if (!enrollment)
-      throw new InternalServerErrorException(
-        `User [${userId}] was not enrolled to module [${module.moduleID}]`,
-      );
+      if (!enrollment)
+        throw new InternalServerErrorException(
+          `User [${userId}] was not enrolled to module [${module.moduleID}]`,
+        );
 
-    return module;
+      return module;
+    }); //END_transaction
   } //createModule
 
   //get All USer defined modules
   async getAllModules(userId: string): Promise<BuilderListResponseDto> {
-    //Get user course
-    const userCourse = await this.doUserUniCourseCheck(userId);
+    return await this.dbService.db.transaction(async (tx: AppDatabase) => {
+      //Get user course
+      const userCourse = await this.doUserUniCourseCheck(userId, tx);
 
-    const filters = {
-      courseId: userCourse.CourseID,
-    };
+      const filters = {
+        courseId: userCourse.CourseID,
+      };
 
-    const modulesResponse = await this.moduleService.getAll(userId, filters);
+      const modulesResponse = await this.moduleService.getAll(
+        userId,
+        filters,
+        tx,
+      );
 
-    return modulesResponse;
+      return modulesResponse;
+    }); //END_transaction
   } //END_getAllModules
 
   //Get module by moduleID - no ownership check necessary?
@@ -104,16 +112,20 @@ export class BuilderService {
     moduleId: string,
     dto: UpdateBuilderDto,
   ): Promise<BuilderSingleResponseDto> {
-    //IF user doesn't own module -> throw a fit
-    if (!(await this.moduleService.moduleOwnershipCheck(userId, moduleId)))
-      throw new ForbiddenException(
-        `User [${userId}] does not own module [${moduleId}]`,
-      );
+    return this.dbService.db.transaction(async (tx: AppDatabase) => {
+      //IF user doesn't own module -> throw a fit
+      if (
+        !(await this.moduleService.moduleOwnershipCheck(userId, moduleId, tx))
+      )
+        throw new ForbiddenException(
+          `User [${userId}] does not own module [${moduleId}]`,
+        );
 
-    //Update any field of module if owned by user
-    const module = await this.moduleService.update(userId, moduleId, dto);
+      //Update any field of module if owned by user
+      const module = await this.moduleService.update(userId, moduleId, dto, tx);
 
-    return module;
+      return module;
+    }); //END_transaction
   } //END_updateModule
 
   //Delete
@@ -122,21 +134,28 @@ export class BuilderService {
     userId: string,
     moduleId: string,
   ): Promise<DeleteModuleResponseDto> {
-    //IF user doesn't own module -> throw a fit
-    if (!(await this.moduleService.moduleOwnershipCheck(userId, moduleId)))
-      throw new ForbiddenException(
-        `User [${userId}] does not own module [${moduleId}]`,
-      );
+    return this.dbService.db.transaction(async (tx: AppDatabase) => {
+      //IF user doesn't own module -> throw a fit
+      if (
+        !(await this.moduleService.moduleOwnershipCheck(userId, moduleId, tx))
+      )
+        throw new ForbiddenException(
+          `User [${userId}] does not own module [${moduleId}]`,
+        );
 
-    return this.moduleService.deleteById(moduleId);
+      return this.moduleService.deleteById(moduleId);
+    }); //END_transaction
   } //END_deleteModule
 
   //🎅's Little Helpers
 
   //Check if user has personal uni and course | Return course
-  private async doUserUniCourseCheck(userId: string): Promise<CourseDto> {
+  private async doUserUniCourseCheck(
+    userId: string,
+    tx: DatabaseService['db'],
+  ): Promise<CourseDto> {
     //Get user university role entry for uniID
-    let [uniRole] = await this.dbService.db
+    let [uniRole] = await tx
       .select()
       .from(UniversityRole)
       .where(
@@ -148,16 +167,19 @@ export class BuilderService {
       .limit(1);
 
     //If user does not yet have a university role -> this implies they dont have a personalised university
-    if (!uniRole) uniRole = await this.createUserUni(userId);
+    if (!uniRole) uniRole = await this.createUserUni(userId, tx);
 
     //Check for course -> if not found -> create user course
-    const { courses } = await this.courseService.getAll({
-      UniversityID: uniRole.UniversityID,
-    });
+    const { courses } = await this.courseService.getAll(
+      {
+        UniversityID: uniRole.UniversityID,
+      },
+      tx,
+    );
 
     let course = courses[0];
     if (!course)
-      course = await this.createUserCourse(userId, uniRole.UniversityID);
+      course = await this.createUserCourse(userId, uniRole.UniversityID, tx);
 
     return course;
   } //ENDdoUserUniCourseCheck
@@ -165,20 +187,24 @@ export class BuilderService {
   //Called when user doesn't have a personalised uni to create one
   private async createUserUni(
     userId: string,
+    tx: DatabaseService['db'],
   ): Promise<typeof UniversityRole.$inferSelect> {
     //Create custom university
     const uniName = `user_${userId.slice(0, 25)}`;
 
     //Check if uni already exists
-    let uni = await this.uniService.getByName(uniName);
+    let uni = await this.uniService.getByName(uniName, tx);
 
     if (!uni)
-      uni = await this.uniService.create({
-        UniversityName: uniName,
-      });
+      uni = await this.uniService.create(
+        {
+          UniversityName: uniName,
+        },
+        tx,
+      );
 
     //Create role linking user to university with STUDENT_OWNED role
-    const [uniRole] = await this.dbService.db
+    const [uniRole] = await tx
       .insert(UniversityRole)
       .values({
         UserID: userId,
@@ -199,11 +225,15 @@ export class BuilderService {
   private async createUserCourse(
     userId: string,
     uniId: string,
+    tx: DatabaseService['db'],
   ): Promise<CourseDto> {
-    const course = await this.courseService.create({
-      CourseName: `user_${userId.slice(0, 25)}`,
-      UniversityID: uniId,
-    });
+    const course = await this.courseService.create(
+      {
+        CourseName: `user_${userId.slice(0, 25)}`,
+        UniversityID: uniId,
+      },
+      tx,
+    );
 
     return course;
   } //END_createUserCourse

@@ -1,7 +1,10 @@
 import { ModuleService } from './module.service';
 import {
+  AddModulesToCourseDto,
+  AddModulesToCourseResponseDto,
   CreateModuleDto,
   DeleteModuleResponseDto,
+  EnrolResponseDto,
   ModuleFiltersDto,
   ModuleListResponseDto,
   ModuleSingleResponseDto,
@@ -19,6 +22,7 @@ import {
   Delete,
   ParseUUIDPipe,
   Query,
+  Put,
 } from '@nestjs/common';
 import { ApiBody, ApiResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
@@ -171,6 +175,61 @@ export class ModuleController {
   })
   delete(@Param('moduleId', ParseUUIDPipe) moduleId: string) {
     return this.service.deleteById(moduleId);
+  }
+
+  //Enrol to module
+  @Post(':moduleId')
+  @Roles('student')
+  @ApiOperation({
+    summary: 'Enrol student to module',
+    operationId: 'enrolStudentToModule',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Student successfully enrolled student into module',
+    type: EnrolResponseDto,
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Student already enrolled into module',
+    type: EnrolResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Module not found',
+  })
+  enrol(
+    @CurrentSession() session: SessionData,
+    @Param('moduleId', ParseUUIDPipe) moduleId: string,
+  ) {
+    return this.service.enrollToModule(session.user.id, moduleId);
+  } //END_enrol
+
+  //Add modules to Course
+  @Put(':CourseID')
+  @Roles('lecturer', 'uni_admin')
+  @ApiOperation({
+    summary: 'Populate Course with modules array',
+    operationId: 'addModulesToCourse',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Successfully populated modules to course',
+    type: AddModulesToCourseResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Course not found',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Modules specified in modules array not found',
+  })
+  addModulesToCourse(
+    @Param('CourseID', ParseUUIDPipe) courseId: string,
+    @Body() dto: AddModulesToCourseDto,
+  ) {
+    return this.service.addModulesToCourse(courseId, dto);
   }
 
   @Post('/styling/:moduleId')
