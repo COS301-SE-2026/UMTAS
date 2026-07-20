@@ -91,7 +91,10 @@ export class EventDto {
   @ValidateNested({ each: true })
   @Type(() => VenueDto)
   venues?: VenueDto[];
-  @ApiPropertyOptional() @IsOptional() @IsBoolean() isRecurring?: boolean;
+  @ApiPropertyOptional({ type: Boolean })
+  @IsOptional()
+  @IsBoolean()
+  isRecurring?: boolean;
   @ApiPropertyOptional() @IsOptional() @IsBoolean() validated?: boolean;
 }
 
@@ -107,11 +110,13 @@ export class CreateEventDto extends PickType(EventDto, [
     enum: ActivityTypeSchema.options,
     description: 'Required when eventCriteria.moduleId is provided.',
   })
-  @ValidateIf(
-    (value: CreateEventDto) =>
+  @ValidateIf((value: CreateEventDto) => {
+    console.log(value);
+    return (
       value.activityType !== undefined ||
-      value.eventCriteria?.moduleId !== undefined,
-  )
+      value.eventCriteria?.moduleId !== undefined
+    );
+  })
   @IsDefined()
   @IsEnum(ActivityTypeSchema.options)
   activityType?: (typeof ActivityTypeSchema.options)[number];

@@ -146,7 +146,8 @@ export function EventsStep({
             endTime: "",
             startTime: "",
             eventSource: "university",
-            dayOfWeek: "monday", // add functionality here
+            moduleId: "",
+            //     dayOfWeek: "monday", // add functionality here
           },
         };
         return [...(oldEvents ?? []), emptyEvent];
@@ -359,7 +360,6 @@ export function EventsStep({
     const errors = errorMap[event.eventId];
     const moduleName = getLinkedModuleName(event, modules);
     const criteria = event.eventCriteria;
-
     return (
       <div key={event.eventId} className="flex flex-col gap-2">
         {/* summary row */}

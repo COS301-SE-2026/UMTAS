@@ -116,7 +116,7 @@ export function EventCard({
   }
 
   function renderModuleSection() {
-    if (event.activityType !== undefined) {
+    if (event.eventCriteria.eventSource !== "university") {
       return null;
     }
 
@@ -241,10 +241,11 @@ export function EventCard({
           </Label>
           <EventTypeDropdown
             value={event.activityType || "lecture"}
-            onChange={(v) => onUpdate(event.eventId, "activityType", v || "")}
+            onChange={(v) =>
+              onUpdate(event.eventId, "activityType", v || "lecture")
+            }
           />
         </div>
-
         {renderModuleSection()}
       </div>
     </div>

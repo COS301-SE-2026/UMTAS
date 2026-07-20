@@ -20,6 +20,11 @@ export function getAllEventsQ() {
 export function addUniEventMut() {
   return mutationOptions({
     mutationFn: async (vars: { body: CreateEventBody }) => {
+      console.log(vars.body);
+      vars.body.eventCriteria.eventSource = "university";
+      vars.body.isRecurring = false;
+      if (vars.body.activityType == undefined)
+        vars.body.activityType = "lecture";
       const result = new createEventsBuilder().send({
         body: vars.body,
       });

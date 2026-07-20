@@ -60,7 +60,6 @@ export class EventController {
     @CurrentSession() session: SessionData,
     @Body() dto: CreateEventDto,
   ): Promise<EventSingleResponseDto> {
-    console.log('controller got here');
     return this.service.create(session.user.id, dto);
   }
 
