@@ -113,12 +113,12 @@ export function HelpCommandPalette() {
           icon: "QuestionMarkCircleIcon",
           href: "/faq",
         },
-        {
-          id: "tutorials",
-          children: "Tutorials",
-          icon: "PlayIcon",
-          href: "/tutorials",
-        },
+        // {
+        //   id: "tutorials",
+        //   children: "Tutorials",
+        //   icon: "PlayIcon",
+        //   href: "/tutorials",
+        // },
         {
           id: "help-centre",
           children: "Help Centre",
