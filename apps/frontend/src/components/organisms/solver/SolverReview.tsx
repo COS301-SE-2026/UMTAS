@@ -2,23 +2,26 @@
 
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
   CardHeader,
 } from "@/components/atoms/baseShadcn/card";
-import CustomiseEventPanel from "@/components/atoms/customise/CustomiseEventPanel";
 import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
 import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
 import { Button } from "@/components/atoms/baseShadcn/button";
 import SolverReviewCard from "@/components/molecules/solver/SolverReviewCard";
+import React, { useState } from "react";
 
 interface SolverReviewProps {
   modules: ModuleResponseDto[];
   events: EventResponse[];
 }
 
-export default function SolverReview({ events, modules }: SolverReviewProps) {
+export default function SolverReview({
+  events: initialEvents,
+  modules,
+}: SolverReviewProps) {
+  const [events, setEvents] = useState<EventResponse[]>(initialEvents);
   return (
     <>
       <Card className="shadow-lg border-[var(--border)] rounded-xl bg-[var(--bg-surface)]">
@@ -29,7 +32,11 @@ export default function SolverReview({ events, modules }: SolverReviewProps) {
           Review your parsed activities before moving to preferences
         </CardDescription>
         <CardContent className="space-y-4">
-          <SolverReviewCard events={events} modules={modules} />
+          <SolverReviewCard
+            events={events}
+            modules={modules}
+            onUpdateEvents={setEvents}
+          />
           <Button type="button">Set Preferences</Button>
         </CardContent>
       </Card>
