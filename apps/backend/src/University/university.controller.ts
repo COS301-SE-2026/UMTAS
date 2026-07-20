@@ -58,6 +58,7 @@ export class UniversityController {
 
   //GetAll
   @Get()
+  @Roles()
   @ApiOperation({
     summary: 'Get all universities',
     operationId: 'getUniversities',
@@ -77,6 +78,7 @@ export class UniversityController {
 
   //GetById
   @Get(':universityId')
+  @Roles()
   @ApiOperation({
     summary: 'get a university by ID',
     operationId: 'getUniversityById',
@@ -103,6 +105,7 @@ export class UniversityController {
 
   //GetById
   @Get('/role/:universityId')
+  @Roles()
   @ApiOperation({
     summary: 'get a users role by universityID',
     operationId: 'getUserRoleByUniID',
@@ -156,7 +159,7 @@ export class UniversityController {
 
   //Delete
   @Delete(':universityId')
-  @Roles('uni_admin') //should uni_admin's be allowed to delete - feel like a sour lecturer will be an aass and just delete his uni
+  @SystemAdmin()
   @ApiOperation({
     summary: 'Delete university by university ID',
     operationId: 'deleteUniversity',
