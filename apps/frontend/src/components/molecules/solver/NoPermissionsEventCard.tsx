@@ -92,6 +92,7 @@ export function NoPermissionsEventCard({
 
     return (
       <Select
+        disabled
         value={String(event.eventCriteria?.moduleId || "")}
         onValueChange={(v) => onUpdate(event.eventId, "moduleId", v)}
       >
@@ -155,6 +156,7 @@ export function NoPermissionsEventCard({
               Name
             </Label>
             <Input
+              readOnly
               id={"event-name-" + event.eventId}
               value={event.eventName || ""}
               onChange={(e) =>
@@ -176,6 +178,7 @@ export function NoPermissionsEventCard({
               Code
             </Label>
             <Input
+              readOnly
               id={"event-code-" + event.eventId}
               value={event.activityCode || ""}
               onChange={(e) =>
@@ -225,6 +228,7 @@ export function NoPermissionsEventCard({
               Date
             </Label>
             <Input
+              readOnly
               id={"event-date-" + event.eventId}
               type="date"
               value={event.eventCriteria?.date || ""}
@@ -237,6 +241,7 @@ export function NoPermissionsEventCard({
           </div>
 
           <TimeSlotSelect
+            disabled={true}
             value={timeSlotValue}
             onChange={handleTimeChange}
             onRemove={() => {}}
@@ -257,6 +262,7 @@ export function NoPermissionsEventCard({
               Event type
             </Label>
             <EventTypeDropdown
+              disabled
               value={(event.activityType as EventType) || "lecture"}
               onChange={(v) => onUpdate(event.eventId, "activityType", v || "")}
             />
