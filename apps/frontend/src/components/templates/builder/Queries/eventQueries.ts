@@ -13,13 +13,18 @@ import { mutationOptions, queryOptions } from "@tanstack/react-query";
 export function getAllEventsQ() {
   return queryOptions({
     queryKey: ["events"] as const,
-    queryFn: async () => (await new getAllEventsBuilder().send({})).events,
+    queryFn: async () => {
+      const result = (await new getAllEventsBuilder().send({})).events;
+      console.log(result, "Sent event ");
+      return result;
+    },
   });
 }
 
 export function addUniEventMut() {
   return mutationOptions({
     mutationFn: async (vars: { body: CreateEventBody }) => {
+      console.log(vars.body);
       const result = new createEventsBuilder().send({
         body: vars.body,
       });

@@ -28,7 +28,7 @@ interface TimeSlotSelectProps {
 
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 
-const TIMES: string[] = [];
+export const TIMES: string[] = [];
 for (let h = 7; h <= 20; h++) {
   TIMES.push(`${String(h).padStart(2, "0")}:00`);
   if (h < 20) TIMES.push(`${String(h).padStart(2, "0")}:30`);
