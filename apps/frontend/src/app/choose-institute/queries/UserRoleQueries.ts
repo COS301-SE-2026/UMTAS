@@ -17,6 +17,26 @@ export function useUserRole() {
 }
 */
 
+export function selectUniMutator() {
+  return mutationOptions({
+    mutationFn: async (body: { uniId: string }) => {
+      const response = await fetch("/api/auth/select-university", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to set university after user selected");
+      }
+
+      return response.json();
+    },
+  });
+}
+
 export function getAllUni() {
   return queryOptions({
     queryKey: ["university"],

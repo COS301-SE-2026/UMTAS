@@ -10,6 +10,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   applyMutator,
   getAllUni,
+  selectUniMutator,
 } from "@/app/choose-institute/queries/UserRoleQueries";
 import { UserDetails } from "@/lib/userclass/userClass";
 
@@ -19,10 +20,23 @@ export function InstituteSelector() {
   const [selectedRole, setSelectedRole] = useState("");
   const { data: uniList, isLoading: uniLoading } = useQuery(getAllUni());
   const applyMut = useMutation(applyMutator());
+  const selectUniMut = useMutation(selectUniMutator());
 
   function updateSelectedUni(id: string) {
     const nUni = uniList?.universities.find((uni) => uni.UniversityID === id);
     setSelectedInstitute(nUni);
+
+    if (id) {
+      selectUniMut.mutate(
+        { uniId: id },
+        {
+          onSuccess: (response) =>
+            console.log("University selected for user", response),
+          onError: (error) =>
+            console.error("Could not select university for user", error),
+        },
+      );
+    }
   }
 
   function handleConfirm() {

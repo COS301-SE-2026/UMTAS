@@ -14,7 +14,9 @@ import { Button } from "@/components/atoms/baseShadcn/button";
 export default function RoleManagementTemplate() {
   const router = useRouter();
   const UniDetails = UserDetails.getUniDetails();
-  const ViableRole = UniDetails?.role === "UNIVERSITY_ADMIN";
+  //remove pending after testing is completed
+  const ViableRole =
+    UniDetails?.role === "UNIVERSITY_ADMIN" || "UNIVERSITY_ADMIN_PENDING";
   if (UniDetails === null) {
     router.push("choose-institute");
   }
