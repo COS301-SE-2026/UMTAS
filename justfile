@@ -71,12 +71,12 @@ test:
 test-unit:
     phase run -- pnpm turbo run test --filter=!./apps/e2e -- --coverage
     pnpm workers:test
-
+# integration tests
 test-integration:
     phase run -- pnpm --filter backend exec jest --config jest.int.config.ts
     phase run -- pnpm --filter frontend exec jest --config jest.int.config.js
     pnpm workers:smoke
-
+# e2e tests
 test-e2e:
     phase run -- pnpm --filter backend run test:e2e
     pnpm workers:e2e
