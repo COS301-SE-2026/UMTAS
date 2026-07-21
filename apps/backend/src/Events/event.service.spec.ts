@@ -11,7 +11,8 @@
 // //Mock Database and factories
 // import { createMockDatabase } from '../Testing/Mocks/database.mock';
 // import {
-//   mockDbResult,
+//   mockDeleteResult,
+//   mockSelectResult,
 //   mockSequentialResults,
 // } from '../Testing/Mocks/database.helpers';
 // import {
@@ -72,7 +73,7 @@
 //         EventID: newEvent.eventID,
 //       });
 
-//       mockSequentialResults<any>(mockDb.insert, [
+//       mockSequentialResults(mockDb.insert, [
 //         [newEvent],
 //         [uniEvent],
 //         [venue],
@@ -99,7 +100,7 @@
 //         createEvent(type, {}, { moduleID: moduleId }),
 //       ];
 
-//       mockSequentialResults(mockDb.select, [events]);
+//       mockSelectResult(mockDb, events);
 
 //       const result = await service.getAllEvents(userId, { moduleId });
 
@@ -110,9 +111,9 @@
 //   //GetById
 //   describe('Test_GetEventById', () => {
 //     it('should return event by eventId', async () => {
-//       const event = createEvent() as any;
+//       const event = createEvent();
 
-//       mockSequentialResults(mockDb.select, [[event]]);
+//       mockSelectResult(mockDb, [event]);
 
 //       const result = await service.getById(event.eventID);
 
@@ -124,7 +125,7 @@
 //   describe('Test_UpdateEvent', () => {
 //     it('should update all event fields', async () => {
 //       //Arrange
-//       const oldEvent = createEvent() as any;
+//       const oldEvent = createEvent();
 //       const updateDto: UpdateEventDto = {
 //         eventName: 'NewName',
 //         eventCode: 'newCode',
@@ -151,7 +152,7 @@
 //         },
 //       );
 
-//       mockSequentialResults(mockDb.select, [[oldEvent]]);
+//       mockSelectResult(mockDb, [oldEvent]);
 
 //       mockDb.transaction.mockImplementation((callback: (tx: any) => any) => {
 //         const tx = {
@@ -180,10 +181,10 @@
 //   //Delete
 //   describe('Test_DeleteEvent', () => {
 //     it('should delete event - admin', async () => {
-//       const event = createEvent() as any;
+//       const event = createEvent();
 
-//       mockSequentialResults(mockDb.select, [[event]]);
-//       mockSequentialResults(mockDb.delete, [[]]);
+//       mockSelectResult(mockDb, [event]);
+//       mockDeleteResult(mockDb, undefined);
 
 //       const result = await service.deleteEvent(
 //         userId,
@@ -196,26 +197,6 @@
 //         eventName: event.eventName,
 //         eventCode: event.eventCode,
 //         success: true,
-//       });
-//     });
-//   });
-
-//   describe('Test_createPersonalEvent', () => {
-//     it('should create a personal event', async () => {
-//       mockDbResult(mockDb.insert, [createEvent(EventType.PERSONAL)]);
-
-//       const result = await service.createPersonalEvent(
-//         userId,
-//         createCreateEventDto(createEvent(EventType.PERSONAL)),
-//       );
-
-//       expect(result).toMatchObject({
-//         eventCriteria: expect.objectContaining({
-//           date: expect.any(String),
-//           startTime: expect.any(String),
-//           endTime: expect.any(String),
-//           type: 'personal',
-//         }),
 //       });
 //     });
 //   });

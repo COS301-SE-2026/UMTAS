@@ -18,7 +18,6 @@ import {
   Patch,
   Delete,
   ParseUUIDPipe,
-  Query,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -30,7 +29,7 @@ import {
 
 // import { CurrentSession } from '../auth/session.decorator';
 // import type { SessionData } from '../auth/session.decorator';
-import { Roles } from '../auth/roles.guard';
+import { Roles } from 'src/auth/roles.guard';
 
 @ApiTags('Courses')
 @Controller('Courses')
@@ -62,8 +61,8 @@ export class CourseController {
     return this.service.create(dto);
   }
 
-  //GetAll per universityId
-  @Get('university/:universityId')
+  //GetAll per but put method since we use body for filters
+  @Post('getAll')
   @Roles('student', 'uni_admin')
   @ApiOperation({
     summary: 'Get all courses',
@@ -84,11 +83,8 @@ export class CourseController {
     status: 404,
     description: 'No Courses found',
   })
-  getAll(
-    @Param('universityId', ParseUUIDPipe) uniId: string,
-    @Query() filters: Omit<CourseFilters, 'UniversityID'>,
-  ): Promise<CourseListResponseDto> {
-    return this.service.getAll({ ...filters, UniversityID: uniId });
+  getAll(@Body() filters: CourseFilters): Promise<CourseListResponseDto> {
+    return this.service.getAll(filters);
   }
 
   //GetById

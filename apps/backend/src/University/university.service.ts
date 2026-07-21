@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { eq, and, or } from 'drizzle-orm';
 
-import { DatabaseService } from '../db/database.service';
+import { AppDatabase, DatabaseService } from '../db/database.service';
 import {
   RoleType,
   RoleTypeType,
@@ -34,14 +34,23 @@ import { notExists } from 'drizzle-orm';
 export class UniversityService {
   constructor(private readonly dbService: DatabaseService) {}
 
-  async create(dto: CreateUniversityDto): Promise<UniversitySingleResponseDto> {
+  async create(
+    dto: CreateUniversityDto,
+    tx?: DatabaseService['db'],
+  ): Promise<UniversitySingleResponseDto> {
+    if (!tx) {
+      return await this.dbService.db.transaction(async (t: AppDatabase) => {
+        return this.create(dto, t);
+      });
+    } //END_tx precence check
+
     //Check if university already exists
-    if (await this.checkDuplicateUniversityName(dto.UniversityName.trim()))
+    if (await this.checkDuplicateUniversityName(dto.UniversityName.trim(), tx))
       throw new ConflictException(
         `University [${dto.UniversityName.trim()}] already exists`,
       );
 
-    const [newUni] = await this.dbService.db
+    const [newUni] = await tx
       .insert(University)
       .values({
         UniversityName: dto.UniversityName.trim(),
@@ -54,8 +63,13 @@ export class UniversityService {
   //GetAll
   //Return all universities
   //Join with the universityRole to see what role the user has for the university
-  async getAll(userId: string): Promise<UniversityListResponseDto> {
-    const universities = await this.dbService.db
+  async getAll(
+    userId: string,
+    tx?: DatabaseService['db'],
+  ): Promise<UniversityListResponseDto> {
+    const db = tx ?? this.dbService.db;
+
+    const universities = await db
       .select({
         UniversityID: University.UniversityID,
         UniversityName: University.UniversityName,
@@ -72,7 +86,7 @@ export class UniversityService {
       .where(
         // show no universities if anyone has a rule student owned to it.
         notExists(
-          this.dbService.db
+          db
             .select()
             .from(UniversityRole)
             .where(
@@ -90,9 +104,14 @@ export class UniversityService {
     return { universities };
   } //GetAll
 
-  async getById(uniId: string): Promise<UniversitySingleResponseDto> {
+  async getById(
+    uniId: string,
+    tx?: DatabaseService['db'],
+  ): Promise<UniversitySingleResponseDto> {
+    const db = tx ?? this.dbService.db;
+
     //Fetch uni by id
-    const [uni] = await this.dbService.db
+    const [uni] = await db
       .select()
       .from(University)
       .where(eq(University.UniversityID, uniId))
@@ -109,9 +128,16 @@ export class UniversityService {
   async update(
     uniId: string,
     dto: UpdateUniversityDto,
+    tx?: DatabaseService['db'],
   ): Promise<UniversitySingleResponseDto> {
+    if (!tx) {
+      return await this.dbService.db.transaction(async (t: AppDatabase) => {
+        return this.update(uniId, dto, t);
+      });
+    } //END_tx precence check
+
     //verify University exists
-    const uni = await this.getById(uniId);
+    const uni = await this.getById(uniId, tx);
 
     //Verify atleast one field provided for update
     if (dto.UniversityName === undefined)
@@ -122,13 +148,13 @@ export class UniversityService {
 
     //check if updated name is the same || already exists on another university
     if (updatedName && updatedName !== uni.UniversityName)
-      if (await this.checkDuplicateUniversityName(updatedName))
+      if (await this.checkDuplicateUniversityName(updatedName, tx))
         throw new ConflictException(
           `University [${dto.UniversityName.trim()}] already exists.`,
         );
 
     // update university
-    const [newUni] = await this.dbService.db
+    const [newUni] = await tx
       .update(University)
       .set({
         UniversityName: updatedName ?? uni.UniversityName,
@@ -142,18 +168,25 @@ export class UniversityService {
     return newUni;
   } //update
 
-  async delete(uniId: string): Promise<DeleteUniversityResponseDto> {
+  async delete(
+    uniId: string,
+    tx?: DatabaseService['db'],
+  ): Promise<DeleteUniversityResponseDto> {
+    if (!tx) {
+      return await this.dbService.db.transaction(async (t: AppDatabase) => {
+        return this.delete(uniId, t);
+      });
+    } //END_tx precence check
+
     //Check if university exists
-    const uni = await this.getById(uniId);
+    const uni = await this.getById(uniId, tx);
     if (!uni)
       throw new NotFoundException(
         `No University found for universityID: ${uniId}`,
       );
 
     //Delete university
-    await this.dbService.db
-      .delete(University)
-      .where(eq(University.UniversityID, uniId));
+    await tx.delete(University).where(eq(University.UniversityID, uniId));
 
     return {
       UniversityName: uni.UniversityName,
@@ -161,8 +194,18 @@ export class UniversityService {
     };
   } //Delete
 
-  async getUsersRole(userId: string, uniId: string) {
-    const [uniRole] = await this.dbService.db
+  async getUsersRole(
+    userId: string,
+    uniId: string,
+    tx?: DatabaseService['db'],
+  ) {
+    if (!tx) {
+      return await this.dbService.db.transaction(async (t: AppDatabase) => {
+        return this.getUsersRole(userId, uniId, t);
+      });
+    } //END_tx precence check
+
+    const [uniRole] = await tx
       .select()
       .from(UniversityRole)
       .where(
@@ -188,9 +231,16 @@ export class UniversityService {
   async applyForUniRole(
     userId: string,
     dto: ApplyForUniRoleDto,
+    tx?: DatabaseService['db'],
   ): Promise<UniversitySingleResponseDto> {
+    if (!tx) {
+      return await this.dbService.db.transaction(async (t: AppDatabase) => {
+        return this.applyForUniRole(userId, dto, t);
+      });
+    } //END_tx precence check
+
     //Check that uni exists
-    const uni = await this.getById(dto.UniversityID);
+    const uni = await this.getById(dto.UniversityID, tx);
 
     if (!uni)
       throw new BadRequestException(
@@ -217,7 +267,7 @@ export class UniversityService {
     }
 
     //Check current role for uni
-    const [uniRole] = await this.dbService.db
+    const [uniRole] = await tx
       .select()
       .from(UniversityRole)
       .where(
@@ -231,7 +281,7 @@ export class UniversityService {
     let newUniRole;
     if (!uniRole) {
       //User has not applied for a role previously
-      [newUniRole] = await this.dbService.db
+      [newUniRole] = await tx
         .insert(UniversityRole)
         .values({
           UserID: userId,
@@ -244,7 +294,7 @@ export class UniversityService {
       if (uniRole.role === role) return { ...uni, role: uniRole.role };
 
       //User already has a role, apply for new role, by updating uniRole entity
-      [newUniRole] = await this.dbService.db
+      [newUniRole] = await tx
         .update(UniversityRole)
         .set({
           role,
@@ -271,9 +321,16 @@ export class UniversityService {
 
   async approveUserRole(
     dto: ApproveUsersRoleDto,
+    tx?: DatabaseService['db'],
   ): Promise<ApprovedUserRoleResponse> {
+    if (!tx) {
+      return await this.dbService.db.transaction(async (t: AppDatabase) => {
+        return this.approveUserRole(dto, t);
+      });
+    } //END_tx precence check
+
     //get role
-    const [usersRole] = await this.dbService.db
+    const [usersRole] = await tx
       .select()
       .from(UniversityRole)
       .where(
@@ -313,7 +370,7 @@ export class UniversityService {
     }
 
     //update role
-    const [newRole] = await this.dbService.db
+    const [newRole] = await tx
       .update(UniversityRole)
       .set({ role })
       .where(
@@ -339,9 +396,16 @@ export class UniversityService {
     userID: string,
     UniID: string,
     dto: GetRoleFilterDto,
+    tx?: DatabaseService['db'],
   ): Promise<GetRolesDto[]> {
+    if (!tx) {
+      return await this.dbService.db.transaction(async (t: AppDatabase) => {
+        return this.getAllApplications(userID, UniID, dto, t);
+      });
+    } //END_tx precence check
+
     // validate permision (extra check)
-    const [role] = await this.dbService.db
+    const [role] = await tx
       .select()
       .from(University)
       .innerJoin(
@@ -368,7 +432,7 @@ export class UniversityService {
       );
     }
 
-    const applications = await this.dbService.db
+    const applications = await tx
       .select({
         Name: usersTable.name,
         UserID: usersTable.id,
@@ -397,8 +461,10 @@ export class UniversityService {
   //get a university by name
   async getByName(
     uniName: string,
+    tx?: DatabaseService['db'],
   ): Promise<UniversitySingleResponseDto | null> {
-    const [uni] = await this.dbService.db
+    const db = tx ?? this.dbService.db;
+    const [uni] = await db
       .select()
       .from(University)
       .where(eq(University.UniversityName, uniName.trim()))
@@ -407,8 +473,11 @@ export class UniversityService {
     return uni;
   }
 
-  async checkDuplicateUniversityName(uniName: string): Promise<boolean> {
-    const [uni] = await this.dbService.db
+  async checkDuplicateUniversityName(
+    uniName: string,
+    tx: DatabaseService['db'],
+  ): Promise<boolean> {
+    const [uni] = await tx
       .select()
       .from(University)
       .where(eq(University.UniversityName, uniName))

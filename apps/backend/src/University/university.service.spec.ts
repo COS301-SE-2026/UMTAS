@@ -424,7 +424,10 @@ describe('UniversityService', () => {
       const uniName = 'Existing University';
       mockDbResult(mockDb.select.bind(mockDb), [{ UniversityID: uniId }]);
 
-      const result = await service.checkDuplicateUniversityName(uniName);
+      const result = await service.checkDuplicateUniversityName(
+        uniName,
+        mockDb,
+      );
 
       expect(mockDb.select.bind(mockDb)).toHaveBeenCalled();
       expect(result).toBe(true);

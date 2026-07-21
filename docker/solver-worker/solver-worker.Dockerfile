@@ -56,6 +56,9 @@ RUN set -ex; \
 COPY apps/preference-solver /workspace/apps/preference-solver
 WORKDIR /workspace/apps/preference-solver
 ENV LD_LIBRARY_PATH=/opt/ortools/lib
+#Download first
+RUN make download && \
+    sed -i 's/std::mutex mtx_rand;/inline std::mutex mtx_rand;/g' lib/openGA.hpp
 RUN make clean \
     && make lib/openGA.hpp \
     && sed -i 's/std::mutex mtx_rand;/inline std::mutex mtx_rand;/' lib/openGA.hpp \
@@ -92,7 +95,7 @@ LABEL org.opencontainers.image.title="UMTAS solver worker" \
       io.umtas.base-image.update-policy="Track patched Node 22 bookworm-slim releases"
 
 RUN apt-get update \
-    && apt-get install --yes --no-install-recommends dumb-init libgomp1 curl \
+    && apt-get install --yes --no-install-recommends build-essential ca-certificates curl pkg-config unzip dumb-init libgomp1 \
     && rm -rf /var/lib/apt/lists/* \
     && mkdir -p /app/bin /app/lib /tmp/umtas-worker \
     && chown -R node:node /app /tmp/umtas-worker

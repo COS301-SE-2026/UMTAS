@@ -5,7 +5,7 @@ import request from 'supertest';
 import { AppModule } from '../../src/app.module';
 import { MailerService } from '../../src/mail/mailer.service';
 import { createMockMailer } from '../../test/utils/mailer.mock';
-import { TEST_AUTH_DATA, TEST_PASSWORD } from '../../src/db/seeds/auth.seed';
+import { TEST_AUTH_DATA, TEST_PASSWORD } from 'src/db/seeding/auth.seed';
 
 describe('Auth e2e', () => {
   let app: INestApplication;
