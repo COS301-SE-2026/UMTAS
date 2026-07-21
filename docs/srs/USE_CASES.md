@@ -1,16 +1,34 @@
 ???+ info "Overview"
 
-    | **ID** | **Use case** | **Status** |
-    |:---:|:---:|:---:|
-    | **UC-1** | Access an Account | Implemented |
-    | **UC-2** | Select a University and Manage a Role Application | Implemented |
-    | **UC-3** | Maintain and Validate Academic Data | Implemented |
-    | **UC-4** | Maintain Personal Module Data | Not Implemented |
-    | **UC-5** | Maintain a Personal Timetable | Not Implemented |
-    | **UC-6** | Record Attendance | Not Implemented |
-    | **UC-7** | Import a University of Pretoria PDF | Not Implemented |
-    | **UC-8** | Request a Timetable Solution | Not Implemented |
-    | **UC-9** | Download an iCalendar File | Not Implemented |
+    | **ID** | **Use Case** | **Group** | **Actor** | **Status** |
+    |:---:|:---:|:---:|:---:|:---:|
+    | **UC-AU-01** | Register Account | Authentication | User | |
+    | **UC-AU-02** | Login Account | Authentication | User | |
+    | **UC-AU-03** | Reset Password | Authentication | User | |
+    | **UC-AU-04** | Logout Account | Authentication | User | |
+    | **UC-AU-05** | Delete Account | Authentication | User | |
+    | **UC-LP-01** | Visit Landing Page | Landing Page | Visitor | |
+    | **UC-LP-02** | View Adapter Capabilities | Landing Page | Visitor | |
+    | **UC-LP-03** | View Role Capabilities | Landing Page | Visitor | |
+    | **UC-TC-01** | Create Modules | Timetable Builder | Student, Lecturer, Admin | |
+    | **UC-TC-02** | Create Events | Timetable Builder | Student | |
+    | **UC-TC-03** | Create Timetable | Timetable Builder | Student | |
+    | **UC-TM-01** | View Timetable | Timetable Management | User | |
+    | **UC-TM-02** | Edit Timetable | Timetable Management | User | |
+    | **UC-TM-03** | Delete Timetable | Timetable Management | User | |
+    | **UC-PDF-01** | Import Timetable from PDF | PDF Import | User | |
+    | **UC-PDF-02** | Review Imported Timetable Data | PDF Import | User | |
+    | **UC-API-01** | Import Timetable from API | API Import | User | |
+    | **UC-API-02** | Review API Retrieved Data | API Import | User | |
+    | **UC-EX-01** | Export Timetable as ICS File | Calendar Export | Student | |
+    | **UC-EX-02** | Sync Timetable with Google Calendar | Calendar Export | Student | |
+    | **UC-AN-01** | View Attendance Analytics Dashboard | Analytics Dashboard | Admin, Lecturer | |
+    | **UC-AN-02** | Explore Venue and Booking Analytics | Analytics Dashboard | Admin, Lecturer | |
+    | **UC-AR-01** | Indicate Attendance Intent for Event | Attendance Recording | Student | |
+    | **UC-AR-02** | Unrecord Attendance for Event | Attendance Recording | Student | |
+    | **UC-LA-01** | Manage Event Details | Lecturer Adjustment | Lecturer | |
+    | **UC-LA-02** | Assign Lecturers to Events/Modules | Lecturer Adjustment | Lecturer, Admin | |
+    | **UC-AL-01** | Send Event Change Alerts | Alert System | System | |
 
 ---
 
@@ -119,6 +137,72 @@
         | **Requirements Covered** | R1.2.4.3 \| R1.2.3 |
 
 ---
+??? "Landing Page Use Cases"
+    ### Use Case Table
+    | **ID** | **Use case** | **Actor** |
+    |:---:|:---:|:---:|
+    | **UC-LP-01** | Visit Landing Page | Visitor |
+    | **UC-LP-02** | View Adapter Capabilities | Visitor |
+    | **UC-LP-03** | View Role Capabilities | Visitor |
+
+    ??? "UC-LP-01: Visit Landing Page"
+        ##### High Level
+        ```
+        Visit Landing Page (Actor: Visitor, System: Public Website)
+            TUCBW an unauthenticated visitor navigates to the Umtas website.
+            TUCEW the visitor is shown the landing page and can navigate to the main site, login, or registration.
+        ```
+        ##### Expanded
+        | Field | Detail |
+        | :--- | :--- |
+        | **Actor** | Visitor |
+        | **Precondition** | Visitor is not authenticated |
+        | **Trigger** | Visitor navigates to the Umtas root URL |
+        | **Basic Flow** | 1. Visitor navigates to the site.<br>2. System displays the landing page.<br>3. System presents navigation options to the main site, login, and registration.<br>4. Visitor selects an option or continues browsing the landing page. |
+        | **Alternate Flow** | **A1: Visitor is already authenticated**<br>System redirects the visitor to their dashboard instead of the landing page. |
+        | **Postcondition** | Visitor has access to the landing page and its navigation options |
+        | **Requirements Covered** | R1.1.1 \| R1.1.1.1 |
+
+    ---
+    ??? "UC-LP-02: View Adapter Capabilities"
+        ##### High Level
+        ```
+        View Adapter Capabilities (Actor: Visitor, System: Public Website)
+            TUCBW the visitor views the section of the landing page describing timetable creation methods.
+            TUCEW the visitor understands the purpose of the Builder, PDF upload, and University API adapters.
+        ```
+        ##### Expanded
+        | Field | Detail |
+        | :--- | :--- |
+        | **Actor** | Visitor |
+        | **Precondition** | Visitor is on the landing page |
+        | **Trigger** | Visitor views or scrolls to the adapters section |
+        | **Basic Flow** | 1. System displays the three adapter options (Builder, PDF Upload, University API).<br>2. System explains the functionality of each adapter.<br>3. Visitor reviews the descriptions. |
+        | **Alternate Flow** | **A1: Visitor selects an adapter for more detail**<br>System expands or links to further information about the selected adapter. |
+        | **Postcondition** | Visitor understands the available timetable creation adapters |
+        | **Requirements Covered** | R1.1.2.1 \| R1.1.2.1.1 \| R1.1.2.1.2 \| R1.1.2.1.3 |
+
+    ---
+    ??? "UC-LP-03: View Role Capabilities"
+        ##### High Level
+        ```
+        View Role Capabilities (Actor: Visitor, System: Public Website)
+            TUCBW the visitor views the section of the landing page describing what each user role can do.
+            TUCEW the visitor understands the functionality extended to Students, Admins, Lecturers, and Tyto simulation admins.
+        ```
+        ##### Expanded
+                | Field | Detail |
+                | :--- | :--- |
+                | **Actor** | Visitor |
+                | **Precondition** | Visitor is on the landing page |
+                | **Trigger** | Visitor views or scrolls to the roles section |
+                | **Basic Flow** | 1. System displays the four supported roles.<br>2. System explains the functionality extended to each role.<br>3. Visitor reviews the descriptions. |
+                | **Alternate Flow** | **A1: Visitor selects a role for more detail**<br>System expands or links to further information about the selected role. |
+                | **Postcondition** | Visitor understands the functionality available to each role |
+                | **Requirements Covered** | R1.1.2 \| R1.1.2.2 \| R1.1.2.2.1 \| R1.1.2.2.2 \| R1.1.2.2.3 \| R1.1.2.2.4 |
+
+---
+
 ??? "Timetable Creation Use Cases"
     ### Use Case Table
     | **Use Case ID** | **Use Case Name** | **Actor** |
@@ -386,14 +470,12 @@
         | **Requirements Covered** | R2.5.2 \| R2.5.2.1 |
 
 ---
-??? "Analytics System Use Cases"
+??? "Analytics Dashboard Use Cases"
     ### Use Case Table
     | **Use Case ID** | **Use Case Name** | **Actor** |
-    | :---: | :---: | :---: |
+    |:---:|:---:|:---:|
     | **UC-AN-01** | View Attendance Analytics Dashboard | Admin / Lecturer |
     | **UC-AN-02** | Explore Venue and Booking Analytics | Admin / Lecturer |
-    | **UC-AN-03** | Indicate Attendance Intent for Event | Student |
-    | **UC-AN-04** | Unrecord Attendance for Event | Student |
 
     ??? "UC-AN-01: View Attendance Analytics Dashboard"
         ##### High Level
@@ -411,6 +493,7 @@
         | **Basic Flow** | 1. User navigates to analytics section.<br>2. System prompts user to select a module or dataset.<br>3. User selects a module.<br>4. System retrieves attendance data (submitted, actual, projected).<br>5. System aggregates and processes attendance statistics.<br>6. System displays dashboard with attendance overview and breakdown per time slot.<br>7. User can filter or switch between modules. |
         | **Alternate Flow** | **A1: No data available**<br>System displays empty state indicating no attendance records exist.<br><br>**A2: Module not found or inaccessible**<br>System shows error and returns user to selection screen.<br><br>**A3: Data retrieval failure**<br>System displays error and allows retry. |
         | **Postcondition** | Attendance analytics are displayed for selected module |
+        | **Requirements Covered** | R3.1.1.1 \| R3.1.1.1.1 \| R3.1.1.1.2 \| R3.1.1.1.3 |
 
     ---
     ??? "UC-AN-02: Explore Venue and Booking Analytics"
@@ -429,9 +512,17 @@
         | **Basic Flow** | 1. User selects “Venue & Booking Analytics”.<br>2. System retrieves venue usage data and booking records.<br>3. System generates venue heatmap based on module/event frequency.<br>4. System generates booking trend data over time.<br>5. System displays visualisations (heatmap + trend graphs).<br>6. User applies filters (date range, venue, module). |
         | **Alternate Flow** | **A1: No venue data available**<br>System displays empty heatmap with message.<br><br>**A2: No booking data available**<br>System shows empty trend graph.<br><br>**A3: Data processing failure**<br>System displays error and allows retry. |
         | **Postcondition** | Venue usage and booking analytics are displayed |
+        | **Requirements Covered** | R3.1.1.2 \| R3.1.1.2.1 \| R3.1.1.2.2 \| R3.1.1.2.3 |
 
-    ---
-    ??? "UC-AN-03: Indicate Attendance Intent for Event"
+---
+??? "Attendance Recording Use Cases"
+    ### Use Case Table
+    | **Use Case ID** | **Use Case Name** | **Actor** |
+    |:---:|:---:|:---:|
+    | **UC-AR-01** | Indicate Attendance Intent for Event | Student |
+    | **UC-AR-02** | Unrecord Attendance for Event | Student |
+
+    ??? "UC-AR-01: Indicate Attendance Intent for Event"
         ##### High Level
         ```
         Indicate Attendance Intent for Event (Actor: Student, System: Analytics Engine)
@@ -447,9 +538,10 @@
         | **Basic Flow** | 1. Student navigates to an upcoming event.<br>2. System displays attendance intent options (Will Attend, Will Not Attend, Not Specified).<br>3. Student selects an option.<br>4. System records the student's response.<br>5. System updates projected attendance statistics for the event.<br>6. System confirms the recorded response to the student. |
         | **Alternate Flow** | **A1: Student does not select an option**<br>System defaults response to "Not Specified" and proceeds.<br><br>**A2: Event not found or inaccessible**<br>System shows error and returns student to event list.<br><br>**A3: Data submission failure**<br>System displays error and allows retry. |
         | **Postcondition** | Student's attendance intent is recorded and reflected in analytics |
+        | **Requirements Covered** | R3.1.1.1.1 |
 
     ---
-    ??? "UC-AN-04: Unrecord Attendance for Event"
+    ??? "UC-AR-02: Unrecord Attendance for Event"
         ##### High Level
         ```
         Unrecord Attendance for Event (Actor: Student, System: Analytics Engine)
@@ -465,6 +557,7 @@
         | **Basic Flow** | 1. Student navigates to an event with an existing attendance response.<br>2. System displays the student's current recorded response.<br>3. Student selects the option to unrecord their response.<br>4. System prompts student to confirm the action.<br>5. Student confirms.<br>6. System removes the recorded response.<br>7. System updates projected attendance statistics for the event. |
         | **Alternate Flow** | **A1: Student cancels confirmation**<br>System retains the existing recorded response and returns to event view.<br><br>**A2: No existing response found**<br>System displays message indicating there is no response to unrecord.<br><br>**A3: Data update failure**<br>System displays error and allows retry. |
         | **Postcondition** | Student's attendance response is removed and analytics are updated |
+        | **Requirements Covered** | R3.1.1.1.1 |
 
 ---
 ??? "Lecturer Adjustment System Use Cases"
