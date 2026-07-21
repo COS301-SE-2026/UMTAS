@@ -19,6 +19,8 @@ import {
 import { QueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { UserDetails } from "@/lib/userclass/userClass";
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
+import { Spinner } from "@/components/atoms/baseShadcn/spinner";
+import { CheckSquare } from "lucide-react";
 
 interface SolverUploadProps {
   onComplete: () => void;
@@ -53,13 +55,10 @@ export default function SolverUpload({
   // uploads and starts the timeout function
   async function uploadFile(file: File) {
     // on success of the request
-    console.log("Upload file ran ");
     if (file) {
-      console.log("file selected awaiting hash");
       const result = await fileHash(file);
       if (result.ok) {
         setPdfHash(result.hash);
-        console.log("hash received", result.hash);
       }
     }
   }
@@ -80,7 +79,6 @@ export default function SolverUpload({
     } else {
       // pdf job does not exist for this hash
       // Upload pdf
-      console.log("uploading pdf");
       if (!selectedFile) throw new Error("No selected file");
 
       const result = await UploadPDFmut.mutateAsync({
@@ -129,8 +127,28 @@ export default function SolverUpload({
                 or
               </>
             )}
-            {selectedFile && <>{selectedFile.name}</>}
+            {selectedFile && (
+              <>
+                {selectedFile.name}
+                <br />
+              </>
+            )}
           </p>
+
+          <div className="items-center text-center flex flex-col justify-center">
+            {pdfJobResult?.status === "queued" && (
+              <>
+                {pdfJobResult?.status}
+                <Spinner />
+              </>
+            )}
+            {pdfJobResult?.status === "completed" && (
+              <>
+                {pdfJobResult?.status}
+                <CheckSquare />
+              </>
+            )}
+          </div>
 
           <Button
             variant="outline"

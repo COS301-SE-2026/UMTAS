@@ -37,6 +37,7 @@ export function pollPdfResult(params: PDFjobStatusParams) {
       return result;
     },
     enabled: params.jobId != "",
+    refetchInterval: 0,
   });
 }
 
@@ -51,6 +52,7 @@ export function lookupPdfHash(body: PDFjobLookupBody) {
       return result;
     },
     enabled: body.pdfStreamHash != "" && body.universityId != "",
+    refetchInterval: 0,
   });
 }
 
