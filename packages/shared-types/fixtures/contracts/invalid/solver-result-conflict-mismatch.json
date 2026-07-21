@@ -1,0 +1,11 @@
+{
+  "engine": "ga",
+  "outcome": "conflict-free",
+  "timetableSolution": { "selectedEventIds": ["a", "b"] },
+  "heuristicScores": [],
+  "metadata": {
+    "conflictCount": 1,
+    "conflicts": [],
+    "solveMode": "optimization"
+  }
+}

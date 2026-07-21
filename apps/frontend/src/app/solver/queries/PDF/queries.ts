@@ -1,6 +1,7 @@
 import { mutationOptions, queryOptions } from "@tanstack/react-query";
 import {
-  PDFjobStatus,
+  PDFjobLookupBody,
+  PDFjobLookupBuilder,
   PDFjobStatusBuilder,
   PDFjobStatusParams,
   uploadPDFBody,
@@ -28,3 +29,16 @@ export function pollPdfResult(params: PDFjobStatusParams) {
     },
   });
 }
+
+export function lookupPdfHash(body: PDFjobLookupBody) {
+  return queryOptions({
+    queryKey: ["PDF", body.pdfStreamHash],
+    queryFn: async () => {
+      const builder = new PDFjobLookupBuilder();
+      const result = await builder.send({ body: body });
+      return result;
+    },
+  });
+}
+
+export function fileHash() {}
