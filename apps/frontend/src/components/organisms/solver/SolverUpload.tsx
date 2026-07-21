@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/atoms/baseShadcn/button";
 import {
   Card,
@@ -10,6 +10,14 @@ import {
   CardTitle,
 } from "@/components/atoms/baseShadcn/card";
 import { Input } from "@/components/atoms/baseShadcn/input";
+import {
+  fileHash,
+  lookupPdfHash,
+  pollPdfResult,
+  uploadPDF,
+} from "@/app/solver/queries/PDF/queries";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { UserDetails } from "@/lib/userclass/userClass";
 
 interface SolverUploadProps {
   onComplete: () => void;
@@ -17,21 +25,72 @@ interface SolverUploadProps {
   setModuleGroupID: (input: string | null) => void;
 }
 
-export default function SolverUpload({ onComplete }: SolverUploadProps) {
+export default function SolverUpload({
+  onComplete,
+  moduleGroupID,
+  setModuleGroupID,
+}: SolverUploadProps) {
   //connects to the upload part
   const uploadFileRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [jobID, setJobID] = useState<string | null>(null);
+  const [pdfHash, setPdfHash] = useState<string | null>(null);
+  const [jobId, setJobID] = useState<string | null>(null);
+  const { data: pdfLookupResult, isLoading: pdfLookupLoading } = useQuery(
+    lookupPdfHash({
+      universityId: UserDetails.getUniDetails()?.UniversityID || "",
+      adapterKey: "up",
+      fingerprintAlgorithm: "pdf-stream-payload-sha256-v1",
+      pdfStreamHash: pdfHash || "",
+    }),
+  );
 
+  const { data: pdfJobResult } = useQuery(
+    pollPdfResult({ jobId: jobId || "" }),
+  );
+  const UploadPDFmut = useMutation(uploadPDF());
   // uploads and starts the timeout function
-  async function uploadFile() {
+  async function uploadFile(file: File) {
     // on success of the request
-    if (jobID) pollEvents(jobID);
+    console.log("Upload file ran ");
+    if (file) {
+      console.log("file selected awaiting hash");
+      const result = await fileHash(file);
+      if (result.ok) setPdfHash(result.hash);
+    }
   }
 
-  async function pollEvents(jobID: string | null) {
-    if (jobID) {
-      onComplete();
+  async function pollEvents() {
+    while (!pdfLookupLoading) {
+      if (
+        pdfLookupResult?.jobId &&
+        pdfLookupResult.status === "completed" &&
+        pdfLookupResult.moduleGroupingId
+      ) {
+        // means this pdf does already exist
+        // Module grouping updated
+        setModuleGroupID(pdfLookupResult.moduleGroupingId);
+        onComplete();
+      } else {
+        // pdf job does not exist for this hash
+        // Upload pdf
+        const result = await UploadPDFmut.mutateAsync({
+          file: (await selectedFile?.text()) || "",
+          universityId: UserDetails.getUniDetails()?.UniversityID || "",
+          adapterKey: "up",
+        });
+        const Pollinterval = setInterval(() => {
+          console.log("Polled", pdfJobResult);
+          setJobID(result.jobId);
+          if (
+            pdfJobResult?.status === "completed" &&
+            pdfJobResult.moduleGroupingId
+          ) {
+            clearInterval(Pollinterval);
+            setModuleGroupID(pdfJobResult.moduleGroupingId);
+            onComplete();
+          }
+        }, 500);
+      }
     }
   }
   return (
@@ -74,6 +133,7 @@ export default function SolverUpload({ onComplete }: SolverUploadProps) {
             onChange={(inputFile) => {
               const file = inputFile.target.files?.[0] || null;
               setSelectedFile(file);
+              if (file) uploadFile(file);
             }}
           />
         </div>
@@ -82,7 +142,7 @@ export default function SolverUpload({ onComplete }: SolverUploadProps) {
           type="button"
           className="w-fit"
           onClick={() => {
-            // will only fire once the whole function is correct
+            pollEvents();
           }}
         >
           Review

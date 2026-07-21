@@ -5,14 +5,20 @@ import {
   PDFjobStatusBuilder,
   PDFjobStatusParams,
   uploadPDFBody,
-  uploadPDFbuilder,
+  uploadPdfBuilder,
 } from "./builder";
 
-export function uploadPDF(body: uploadPDFBody) {
+import {
+  computePdfStreamFingerprint,
+  type PdfStreamFingerprintResult,
+  type Sha256Hash,
+} from "shared-types";
+import { createHash } from "node:crypto";
+
+export function uploadPDF() {
   return mutationOptions({
-    mutationFn: async () => {
-      const builder = new uploadPDFbuilder();
-      const result = await builder.send({ body: body });
+    mutationFn: async (body: uploadPDFBody) => {
+      const result = uploadPdfBuilder(body);
       return result;
       // this result will be used to set job id which will cause pollPDFresult to update
     },
@@ -38,7 +44,26 @@ export function lookupPdfHash(body: PDFjobLookupBody) {
       const result = await builder.send({ body: body });
       return result;
     },
+    enabled: body.pdfStreamHash != "" && body.universityId != "",
   });
 }
 
-export function fileHash() {}
+export async function fileHash(
+  file: File,
+): Promise<PdfStreamFingerprintResult> {
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  const result = computePdfStreamFingerprint(bytes, createNodeSha256Hash());
+  return result;
+}
+
+function createNodeSha256Hash(): Sha256Hash {
+  const hash = createHash("sha256");
+  return {
+    update(input) {
+      hash.update(input);
+    },
+    digestHex() {
+      return hash.digest("hex");
+    },
+  };
+}

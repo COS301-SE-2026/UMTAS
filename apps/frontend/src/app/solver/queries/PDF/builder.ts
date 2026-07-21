@@ -3,6 +3,7 @@ import {
   RequestBuilder,
   RequestMethod,
 } from "../../../../../utilities/request";
+import { UserDetails } from "@/lib/userclass/userClass";
 
 export type uploadPDF = paths["/pdf-parser/jobs/upload"]["post"];
 export type uploadPDFBody =
@@ -10,15 +11,27 @@ export type uploadPDFBody =
 export type uploadPDFRes =
   uploadPDF["responses"]["202"]["content"]["application/json"];
 
-export class uploadPDFbuilder extends RequestBuilder<
-  undefined,
-  uploadPDFBody,
-  uploadPDFRes
-> {
-  constructor() {
-    super();
-    this.setUrl("/pdf-parser/jobs/upload").setMethod(RequestMethod.POST);
-  }
+export async function uploadPdfBuilder(
+  body: uploadPDFBody,
+): Promise<uploadPDFRes> {
+  if (!body.file) throw new Error("No file selected");
+
+  const formData = new FormData();
+  formData.append("file", body.file);
+  formData.append("adapterKey", "up");
+  formData.append(
+    "universityId",
+    UserDetails.getUniDetails()?.UniversityID || "",
+  );
+  formData.append("fingerprintAlgorithm", "pdf-stream-payload-sha256-v1");
+
+  const res = await fetch("/pdf-parser/jobs/upload", {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!res.ok) throw new Error("Upload failed");
+  return res.json();
 }
 
 export type PDFjobLookup = paths["/pdf-parser/jobs/lookup"]["post"];
