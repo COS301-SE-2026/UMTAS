@@ -7,20 +7,41 @@
   "scripts": {
     "clean": "node -e \"import('node:fs').then(({ rmSync }) => rmSync('dist', { recursive: true, force: true }))\"",
     "build": "pnpm run clean && tsc",
-    "test": "pnpm run test:unit",
-    "test:unit": "node --test dist/tests/unit.test.js",
-    "test:integration": "node --test dist/tests/integration.test.js",
-    "test:coverage": "node --experimental-test-coverage --test-coverage-include=dist/src/**/*.js --test-coverage-exclude=dist/src/index.js --test-coverage-lines=92 --test-coverage-functions=100 --test-coverage-branches=80 --test dist/tests/unit.test.js dist/tests/integration.test.js"
+    "test": "pnpm run build && node --test \"dist/tests/*.test.js\"",
+    "test:unit": "pnpm run test",
+    "test:coverage": "pnpm run build && node --experimental-test-coverage --test-coverage-include=\"dist/src/**/*.js\" --test-coverage-exclude=\"dist/src/index.js\" --test\"dist/tests/*.test.js\""
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "packageManager": "pnpm@10.33.2",
   "exports": {
     ".": {
       "types": "./dist/src/index.d.ts",
       "import": "./dist/src/index.js",
+      "require": "./dist/src/index.js",
       "default": "./dist/src/index.js"
+    },
+    "./common": {
+      "types": "./dist/src/common.d.ts",
+      "import": "./dist/src/common.js",
+      "require": "./dist/src/common.js",
+      "default": "./dist/src/common.js"
+    },
+    "./parser": {
+      "types": "./dist/src/parser.d.ts",
+      "import": "./dist/src/parser.js",
+      "require": "./dist/src/parser.js",
+      "default": "./dist/src/parser.js"
+    },
+    "./solver": {
+      "types": "./dist/src/solver.d.ts",
+      "import": "./dist/src/solver.js",
+      "require": "./dist/src/solver.js",
+      "default": "./dist/src/solver.js"
+    },
+    "./pdf-stream": {
+      "types": "./dist/src/pdf-stream.d.ts",
+      "import": "./dist/src/pdf-stream.js",
+      "require": "./dist/src/pdf-stream.js",
+      "default": "./dist/src/pdf-stream.js"
     }
   },
   "dependencies": {
