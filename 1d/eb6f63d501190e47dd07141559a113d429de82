@@ -1,0 +1,20 @@
+packages/shared-types/tests/parser-contract.test.ts
+  h_3359569cacef0e 5,127
+packages/shared-types/tests/pdf-stream.test.ts
+  h_3359569cacef0e 2
+packages/shared-types/tests/solver-contract.test.ts
+  h_3359569cacef0e 6
+packages/shared-types/package.json
+  h_3359569cacef0e 19,21-39
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "1deb6f63d501190e47dd07141559a113d429de82",
+  "prompts": {},
+  "humans": {
+    "h_3359569cacef0e": {
+      "author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}
