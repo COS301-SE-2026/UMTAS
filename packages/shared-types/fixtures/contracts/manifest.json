@@ -1,0 +1,16 @@
+{
+  "authority": "shared-types",
+  "fixtures": {
+    "pdf-parse-job.json": "PdfParseJobDataSchema",
+    "pdf-parser-result.json": "PdfParserResultSchema",
+    "pdf-parser-callback-completed.json": "PdfParserCallbackPayloadSchema",
+    "pdf-parser-callback-failed.json": "PdfParserCallbackPayloadSchema",
+    "timetable-solve-job.json": "TimetableSolveJobDataSchema",
+    "solver-input.json": "SolverInputSchema",
+    "solver-cli-output-feasible.json": "SolverCliOutputSchema",
+    "solver-cli-output-infeasible.json": "SolverCliOutputSchema",
+    "solver-result.json": "SolverResultSchema",
+    "solver-callback-completed.json": "SolverCallbackPayloadSchema",
+    "solver-callback-failed.json": "SolverCallbackPayloadSchema"
+  }
+}

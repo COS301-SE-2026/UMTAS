@@ -1,0 +1,8 @@
+{
+  "status": "failed",
+  "error": {
+    "code": "SOLVER_INFEASIBLE",
+    "message": "No feasible timetable exists.",
+    "details": {}
+  }
+}
