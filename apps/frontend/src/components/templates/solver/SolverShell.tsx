@@ -82,16 +82,18 @@ export default function SolverShell() {
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [comingFromStep, setComingFromStep] = useState<number | null>(null);
+  const [moduleGroupingID, setModuleGroupingID] = useState<string | null>(null);
 
   function handleStepCompleted(fromStep: number) {
     setComingFromStep(fromStep);
     setCompletedSteps((previous) => [...previous, fromStep]);
 
-    //the actual async call should happen here wilmar instead of a timeout
-    setTimeout(() => {
-      setCurrentStep(fromStep + 1);
-      setComingFromStep(null);
-    }, 676);
+    // will run the get all modules builder once a pdf is uploaded.
+    // module grouping id will be set to null in the pdf parse element
+    // that element will then do the requests to upload and poll
+    // once the group id is not null then this page will run the query to send
+    // for modules and events
+    // will automatically be done using the get modules query
   }
   return (
     <>
@@ -108,7 +110,11 @@ export default function SolverShell() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-16 max-w-10xl mx-auto px-6 pt-6">
         <div className="flex justify-center h-fit">
-          <SolverUpload onComplete={() => handleStepCompleted(0)} />
+          <SolverUpload
+            onComplete={() => handleStepCompleted(0)}
+            moduleGroupID={moduleGroupingID}
+            setModuleGroupID={setModuleGroupingID}
+          />
         </div>
 
         <div className="flex justify-center h-fit">
