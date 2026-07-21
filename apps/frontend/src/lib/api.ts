@@ -381,7 +381,8 @@ export interface paths {
      */
     get: operations["getModuleById"];
     put?: never;
-    post?: never;
+    /** Enrol student to module */
+    post: operations["enrolStudentToModule"];
     /**
      * Delete a module by ID
      * @description Deletes a module | STUDENT_OWNED needs to go through Builder Service
@@ -394,6 +395,22 @@ export interface paths {
      * @description Update a modules | STUDENT_OWNED needs to go through Builder Service
      */
     patch: operations["updateModule"];
+    trace?: never;
+  };
+  "/modules/{CourseID}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put: operations["ModuleController_addModulesToCourse"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
     trace?: never;
   };
   "/modules/styling/{moduleId}": {
@@ -433,17 +450,17 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/Courses/university/{universityId}": {
+  "/Courses/All": {
     parameters: {
       query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
-    /** Get all courses */
-    get: operations["getCourses"];
+    get?: never;
     put?: never;
-    post?: never;
+    /** Get all courses */
+    post: operations["getCourses"];
     delete?: never;
     options?: never;
     head?: never;
@@ -578,6 +595,30 @@ export interface paths {
     options?: never;
     head?: never;
     patch?: never;
+    trace?: never;
+  };
+  "/grouping/{groupId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /**
+     * Add array of modules to a module group
+     * @description Add array of modules to a ModuleGrouping.'
+     *             If added modules causes group to be the same hash as an
+     *             already existing group, then it will return the group that
+     *             matches and not update the current group. If no other group
+     *             with same hash exists then it will update group and populate.
+     */
+    patch: operations["populateGroup"];
     trace?: never;
   };
   "/events": {
@@ -1041,6 +1082,46 @@ export interface components {
       /** @example true */
       success: Record<string, never>;
     };
+    EnrolResponseDto: {
+      /**
+       * Format: uuid
+       * @description Unique identifier for a module
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      moduleID: string;
+      /**
+       * @description Message to describe success/failure of enrollment
+       * @example User successfully enrolled into module[00000000-0000-0000-0000-000000000000]
+       */
+      message: string;
+      UserID: string;
+    };
+    AddModulesToCourseDto: {
+      /**
+       * @description module array to ad dto the group
+       * @example [
+       *       "10000000-0000-0000-0000-000000000000",
+       *       "20000000-0000-0000-0000-000000000000"
+       *     ]
+       */
+      modules: string[];
+    };
+    AddModulesToCourseResponseDto: {
+      /**
+       * @description module array to ad dto the group
+       * @example [
+       *       "10000000-0000-0000-0000-000000000000",
+       *       "20000000-0000-0000-0000-000000000000"
+       *     ]
+       */
+      modules: string[];
+      /**
+       * Format: uuid
+       * @description Course to which to add the array of modules
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      CourseID: string;
+    };
     ModuleStylingBodyDto: {
       /**
        * @description Styling to be used for a Module
@@ -1105,6 +1186,24 @@ export interface components {
        * @example Computer Science
        */
       CourseName: string;
+      /**
+       * @description Degree that course belongs to
+       * @example Bachelor of Science
+       */
+      Degree?: string | null;
+    };
+    CourseFilters: {
+      /**
+       * Format: uuid
+       * @description Unique identifier for a university
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      UniversityID?: string;
+      /**
+       * @description Name of the course
+       * @example Computer Science
+       */
+      CourseName?: string;
       /**
        * @description Degree that course belongs to
        * @example Bachelor of Science
@@ -1362,6 +1461,22 @@ export interface components {
       userId: string;
       /** @example true */
       success: Record<string, never>;
+    };
+    PopulateGroupBodyDto: {
+      /**
+       * @description module array to ad dto the group
+       * @example [
+       *       "10000000-0000-0000-0000-000000000000",
+       *       "20000000-0000-0000-0000-000000000000"
+       *     ]
+       */
+      modules: string[];
+    };
+    GroupingSingleResponse: {
+      /** Format: uuid */
+      GroupID: string;
+      Hash: string | null;
+      modules?: string[];
     };
     EventCriteriaDto: {
       /** @enum {string} */
@@ -2483,6 +2598,44 @@ export interface operations {
       };
     };
   };
+  enrolStudentToModule: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        moduleId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Student successfully enrolled student into module */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["EnrolResponseDto"];
+        };
+      };
+      /** @description Student already enrolled into module */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["EnrolResponseDto"];
+        };
+      };
+      /** @description Module not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   deleteModule: {
     parameters: {
       query?: never;
@@ -2559,6 +2712,43 @@ export interface operations {
       };
       /** @description Duplicate module code detected for course */
       409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  ModuleController_addModulesToCourse: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        CourseID: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AddModulesToCourseDto"];
+      };
+    };
+    responses: {
+      /** @description Successfully populated modules to course */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AddModulesToCourseResponseDto"];
+        };
+      };
+      /**
+       * @description Modules specified in modules array not found
+       *
+       *     Course not found
+       */
+      404: {
         headers: {
           [name: string]: unknown;
         };
@@ -2644,12 +2834,14 @@ export interface operations {
         Degree?: string;
       };
       header?: never;
-      path: {
-        universityId: string;
-      };
+      path?: never;
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CourseFilters"];
+      };
+    };
     responses: {
       /** @description Courses returned successfully */
       200: {
@@ -3110,6 +3302,46 @@ export interface operations {
       };
       /** @description User already has an approved role */
       409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  populateGroup: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        groupId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PopulateGroupBodyDto"];
+      };
+    };
+    responses: {
+      /** @description ModuleGrouping successfully populated with modules */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["GroupingSingleResponse"];
+        };
+      };
+      /** @description Invalid input */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Group not found */
+      404: {
         headers: {
           [name: string]: unknown;
         };

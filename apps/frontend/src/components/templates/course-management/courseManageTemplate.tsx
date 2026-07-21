@@ -32,7 +32,7 @@ export default function CourseManagementTemplate() {
     isLoading,
     isError,
   } = useQuery(
-    getAllCoursesQ({ universityId: UniDetails?.UniversityID ?? "" }),
+    getAllCoursesQ({ UniversityID: UniDetails?.UniversityID ?? "" }),
   );
 
   const { data: moduleData } = useQuery(getAllModCoursesQ(moduleQueries));

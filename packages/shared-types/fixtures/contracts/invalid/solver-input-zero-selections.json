@@ -1,0 +1,18 @@
+{
+  "schedulingProblem": {
+    "events": [
+      {
+        "eventId": "event-1",
+        "moduleCode": "COS101",
+        "activityType": "lecture",
+        "activityCode": "L1",
+        "requiredSelections": 0,
+        "dayOfWeek": "monday",
+        "startTime": "08:00",
+        "endTime": "09:00",
+        "venues": []
+      }
+    ]
+  },
+  "preferences": { "heuristics": [] }
+}

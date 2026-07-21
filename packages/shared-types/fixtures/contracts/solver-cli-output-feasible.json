@@ -1,0 +1,11 @@
+{
+  "status": "feasible",
+  "outcome": "conflict-free",
+  "timetableSolution": { "selectedEventIds": ["event-cos101-l1"] },
+  "heuristicScores": [],
+  "metadata": {
+    "conflictCount": 0,
+    "conflicts": [],
+    "solveMode": "optimization"
+  }
+}

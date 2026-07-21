@@ -1,0 +1,37 @@
+{
+  "schedulingProblem": {
+    "events": [
+      {
+        "eventId": "event-cos101-l1",
+        "moduleCode": "COS101",
+        "activityType": "lecture",
+        "activityCode": "L1",
+        "requiredSelections": 1,
+        "dayOfWeek": "monday",
+        "startTime": "08:30",
+        "endTime": "09:20",
+        "venues": [{ "id": "venue-it-2-26", "name": "IT 2-26" }]
+      },
+      {
+        "eventId": "event-cos101-e1",
+        "moduleCode": "COS101",
+        "activityType": "exam",
+        "activityCode": "E1",
+        "requiredSelections": 1,
+        "date": "2026-11-10",
+        "startTime": "09:00",
+        "endTime": "11:00",
+        "venues": []
+      }
+    ]
+  },
+  "preferences": {
+    "heuristics": [
+      {
+        "key": "preferred-start-time",
+        "weight": 1,
+        "parameters": { "time": "09:00" }
+      }
+    ]
+  }
+}

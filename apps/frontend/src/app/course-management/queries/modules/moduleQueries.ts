@@ -1,5 +1,7 @@
 import { mutationOptions, queryOptions } from "@tanstack/react-query";
 import {
+  CreateModuleBody,
+  CreateModuleBuilderAdmin,
   fetchAllModules,
   getAllModulesQueries,
   updateModStylingBody,
@@ -9,6 +11,8 @@ import {
   updateModulePath,
   updateStylingBuilder,
 } from "./moduleBuilder";
+import { getQueryClient } from "@/components/tanstack/getQueryClient";
+import { getAllCoursesQ } from "../courses/courseQueries";
 
 export function getAllModCoursesQ(queries?: getAllModulesQueries) {
   return queryOptions({
@@ -40,6 +44,24 @@ export function updateModStylingQ() {
     }) => {
       const builder = new updateStylingBuilder();
       return builder.send({ body: vars.body, paths: vars.path });
+    },
+    onError: (err) => console.error("mutation failed", err),
+  });
+}
+
+export function CreateModuleMutAdmin() {
+  return mutationOptions({
+    mutationFn: async (body: CreateModuleBody) => {
+      const builder = new CreateModuleBuilderAdmin();
+      return builder.send({ body: body });
+    },
+    onSuccess: () => {
+      getQueryClient().invalidateQueries({
+        queryKey: getAllCoursesQ().queryKey,
+      });
+      getQueryClient().invalidateQueries({
+        queryKey: getAllModCoursesQ().queryKey,
+      });
     },
     onError: (err) => console.error("mutation failed", err),
   });
