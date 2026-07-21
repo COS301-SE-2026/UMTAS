@@ -4,6 +4,7 @@ import {
   PDFjobLookupBuilder,
   PDFjobStatusBuilder,
   PDFjobStatusParams,
+  tempUploadPDFbody,
   uploadPDFBody,
   uploadPdfBuilder,
 } from "./builder";
@@ -17,7 +18,7 @@ import { createHash } from "node:crypto";
 
 export function uploadPDF() {
   return mutationOptions({
-    mutationFn: async (body: uploadPDFBody) => {
+    mutationFn: async (body: tempUploadPDFbody) => {
       const result = uploadPdfBuilder(body);
       return result;
       // this result will be used to set job id which will cause pollPDFresult to update
@@ -27,21 +28,26 @@ export function uploadPDF() {
 
 export function pollPdfResult(params: PDFjobStatusParams) {
   return queryOptions({
-    queryKey: ["PDF", params.jobId],
+    queryKey: ["PDF"],
     queryFn: async () => {
+      console.log("poll result ran with builder and job id ", params.jobId);
       const builder = new PDFjobStatusBuilder();
       const result = await builder.send({ paths: params });
+      console.log(result, "Result of polling ");
       return result;
     },
+    enabled: params.jobId != "",
   });
 }
 
 export function lookupPdfHash(body: PDFjobLookupBody) {
   return queryOptions({
-    queryKey: ["PDF", body.pdfStreamHash],
+    queryKey: ["PDF"],
     queryFn: async () => {
+      console.log("Lookup ran");
       const builder = new PDFjobLookupBuilder();
       const result = await builder.send({ body: body });
+      console.log(result);
       return result;
     },
     enabled: body.pdfStreamHash != "" && body.universityId != "",

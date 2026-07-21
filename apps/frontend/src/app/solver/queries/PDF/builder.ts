@@ -8,13 +8,27 @@ import { UserDetails } from "@/lib/userclass/userClass";
 export type uploadPDF = paths["/pdf-parser/jobs/upload"]["post"];
 export type uploadPDFBody =
   uploadPDF["requestBody"]["content"]["multipart/form-data"];
+export type tempUploadPDFbody = {
+  file: File | Blob;
+  adapterKey?: string;
+  universityId: string;
+  fingerprintAlgorithm?: string;
+  clientPdfStreamHash?: string;
+  streamCount?: number;
+};
+
 export type uploadPDFRes =
   uploadPDF["responses"]["202"]["content"]["application/json"];
 
 export async function uploadPdfBuilder(
-  body: uploadPDFBody,
+  body: tempUploadPDFbody,
 ): Promise<uploadPDFRes> {
   if (!body.file) throw new Error("No file selected");
+
+  const baseUrl =
+    (typeof window === "undefined"
+      ? process.env.API_URL
+      : process.env.NEXT_PUBLIC_API_URL) || "http://localhost:3000";
 
   const formData = new FormData();
   formData.append("file", body.file);
@@ -25,9 +39,10 @@ export async function uploadPdfBuilder(
   );
   formData.append("fingerprintAlgorithm", "pdf-stream-payload-sha256-v1");
 
-  const res = await fetch("/pdf-parser/jobs/upload", {
+  const res = await fetch(`${baseUrl}/pdf-parser/jobs/upload`, {
     method: "POST",
     body: formData,
+    credentials: "include",
   });
 
   if (!res.ok) throw new Error("Upload failed");
@@ -66,6 +81,6 @@ export class PDFjobStatusBuilder extends RequestBuilder<
 > {
   constructor() {
     super();
-    this.setUrl("/solver/jobs/{jobId}").setMethod(RequestMethod.POST);
+    this.setUrl("/pdf-parser/jobs/{jobId}").setMethod(RequestMethod.GET);
   }
 }

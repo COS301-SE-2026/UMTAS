@@ -16,8 +16,9 @@ import {
   pollPdfResult,
   uploadPDF,
 } from "@/app/solver/queries/PDF/queries";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { QueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { UserDetails } from "@/lib/userclass/userClass";
+import { getQueryClient } from "@/components/tanstack/getQueryClient";
 
 interface SolverUploadProps {
   onComplete: () => void;
@@ -35,6 +36,7 @@ export default function SolverUpload({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [pdfHash, setPdfHash] = useState<string | null>(null);
   const [jobId, setJobID] = useState<string | null>(null);
+
   const { data: pdfLookupResult, isLoading: pdfLookupLoading } = useQuery(
     lookupPdfHash({
       universityId: UserDetails.getUniDetails()?.UniversityID || "",
@@ -55,44 +57,57 @@ export default function SolverUpload({
     if (file) {
       console.log("file selected awaiting hash");
       const result = await fileHash(file);
-      if (result.ok) setPdfHash(result.hash);
+      if (result.ok) {
+        setPdfHash(result.hash);
+        console.log("hash received", result.hash);
+      }
     }
   }
 
   async function pollEvents() {
-    while (!pdfLookupLoading) {
-      if (
-        pdfLookupResult?.jobId &&
-        pdfLookupResult.status === "completed" &&
-        pdfLookupResult.moduleGroupingId
-      ) {
-        // means this pdf does already exist
-        // Module grouping updated
-        setModuleGroupID(pdfLookupResult.moduleGroupingId);
-        onComplete();
-      } else {
-        // pdf job does not exist for this hash
-        // Upload pdf
-        const result = await UploadPDFmut.mutateAsync({
-          file: (await selectedFile?.text()) || "",
-          universityId: UserDetails.getUniDetails()?.UniversityID || "",
-          adapterKey: "up",
+    while (pdfLookupLoading) {
+      // wait for it to finalize
+    }
+    if (
+      pdfLookupResult?.jobId &&
+      pdfLookupResult.status === "completed" &&
+      pdfLookupResult.moduleGroupingId
+    ) {
+      // means this pdf does already exist
+      // Module grouping updated
+      setModuleGroupID(pdfLookupResult.moduleGroupingId);
+      onComplete();
+    } else {
+      // pdf job does not exist for this hash
+      // Upload pdf
+      console.log("uploading pdf");
+      if (!selectedFile) throw new Error("No selected file");
+
+      const result = await UploadPDFmut.mutateAsync({
+        file: await selectedFile,
+        universityId: UserDetails.getUniDetails()?.UniversityID || "",
+        adapterKey: "up",
+      });
+      const Pollinterval = setInterval(async () => {
+        console.log("Polled", pdfJobResult);
+        await setJobID(result.jobId);
+        getQueryClient().invalidateQueries({
+          queryKey: pollPdfResult({
+            jobId: jobId || "",
+          }).queryKey,
         });
-        const Pollinterval = setInterval(() => {
-          console.log("Polled", pdfJobResult);
-          setJobID(result.jobId);
-          if (
-            pdfJobResult?.status === "completed" &&
-            pdfJobResult.moduleGroupingId
-          ) {
-            clearInterval(Pollinterval);
-            setModuleGroupID(pdfJobResult.moduleGroupingId);
-            onComplete();
-          }
-        }, 500);
-      }
+        if (
+          pdfJobResult?.status === "completed" &&
+          pdfJobResult.moduleGroupingId
+        ) {
+          clearInterval(Pollinterval);
+          setModuleGroupID(pdfJobResult.moduleGroupingId);
+          onComplete();
+        }
+      }, 5000);
     }
   }
+
   return (
     <Card className="shadow-lg border-[var(--border)] rounded-xl bg-[var(--bg-surface)]">
       <CardHeader>
