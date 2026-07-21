@@ -32,16 +32,12 @@ export async function fetchAllCoursesRequest(
   path?: fetchAllCoursePath,
   queries?: fetchAllCoursesQueries,
 ) {
-  if (!path) {
-    throw new Error("Invalid course fetch, no universityID provided");
-  }
-
   const baseUrl =
     (typeof window === "undefined"
       ? process.env.API_URL
       : process.env.NEXT_PUBLIC_API_URL) || "http://localhost:3000";
 
-  const Urlpath = `/Courses/university/`;
+  const Urlpath = `/Courses/getAll`;
 
   const searchParams = new URLSearchParams();
 
@@ -51,11 +47,11 @@ export async function fetchAllCoursesRequest(
   const queryStr = searchParams.toString();
   let URL = baseUrl + Urlpath;
   if (queries?.Degree) {
-    URL += queryStr;
+    URL += "?" + queryStr;
   }
 
   const response = await fetch(URL, {
-    method: "GET",
+    method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
@@ -63,7 +59,10 @@ export async function fetchAllCoursesRequest(
   });
 
   if (!response.ok) {
-    throw new Error("Failed to fetch courses");
+    const errorText = await response.text();
+    throw new Error(
+      `Failed to fetch courses: ${response.status} - ${errorText}`,
+    );
   } else {
     const data: fetchAllCourseRes = await response.json();
     return data.courses;

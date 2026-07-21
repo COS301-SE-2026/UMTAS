@@ -31,9 +31,10 @@ export default function CourseManagementTemplate() {
     data: courseData = [],
     isLoading,
     isError,
-  } = useQuery(
-    getAllCoursesQ(), // do not choose this in merge conflict
-  );
+  } = useQuery({
+    ...getAllCoursesQ(),
+    enabled: !!UniDetails?.UniversityID,
+  });
 
   const { data: moduleData } = useQuery(getAllModCoursesQ(moduleQueries));
 
@@ -46,7 +47,7 @@ export default function CourseManagementTemplate() {
   }
 
   if (isError) {
-    return <div>Something went wrong :( </div>;
+    return <div>Something went wrong :(</div>;
   }
 
   const data: CourseTableData[] = [
