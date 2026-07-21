@@ -1,0 +1,18 @@
+apps/backend/src/University/university.controller.ts
+  h_84e82529bd05a5 30
+apps/backend/src/University/university.service.ts
+  h_84e82529bd05a5 219,244-247,293,332
+apps/backend/src/University/university.service.spec.ts
+  h_84e82529bd05a5 7,41,125,127-130,132-135,137-139,141-142,144-148,152,160,163,165,167-170,172-173,176,178,180,187-193,195-197,199,201,211-215,217,220-225,227,229-231,234-235,237,239-241,244-246,248-254,257,260,262-267,270-274,276-281,283-285,288,290,293,295-297,299-300,302-306,308-310,312-317,319-330,332-342,344-345,347-353,355-371,373-379,381-382,384-389,391-401,404-424,430,433-436,438,441-443,448-473
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "ca9a3f069d925845d7b07fe044c1e3eae9222b8e",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}
