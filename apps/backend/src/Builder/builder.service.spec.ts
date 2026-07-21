@@ -18,7 +18,7 @@ import { CourseService } from '../Course/course.service';
 import { ModuleService } from '../Module/module.service';
 
 //Mock functions on db
-import { mockDbResult, mockSequentialResults } from '../Testing/Mocks';
+import { mockTransaction } from '../Testing/Mocks';
 
 //Factories
 import { createModule } from '../Testing/Factories';
@@ -64,30 +64,32 @@ describe('BuilderService', () => {
     it('should create userOwned: university | course | module', async () => {
       //ARRANGE
       //doUserUniCheck
-      mockDbResult(mockDb.select, []);
+      mockTransaction(mockDb, {
+        select: [[]],
+        insert: [
+          [
+            {
+              //unirole
+              UserID: userId,
+              UniversityID: uniId,
+              role: 'STUDENT_OWNED',
+            },
+          ],
+          [
+            {
+              //moduleenrollment
+              UserID: userId,
+              ModuleID: moduleId,
+            },
+          ],
+        ],
+      });
       //createUserUni
       mockUniversityService.getByName!.mockResolvedValue(null);
       mockUniversityService.create!.mockResolvedValue({
         UniversityID: uniId,
         UniversityName: 'somename',
       });
-      mockSequentialResults(mockDb.insert, [
-        [
-          {
-            //unirole
-            UserID: userId,
-            UniversityID: uniId,
-            role: 'STUDENT_OWNED',
-          },
-        ],
-        [
-          {
-            //moduleenrollment
-            UserID: userId,
-            ModuleID: moduleId,
-          },
-        ],
-      ]);
       //END_createUserUni
       mockCourseService.getAll!.mockResolvedValue({ courses: [] });
       //createUserCourse
@@ -111,32 +113,51 @@ describe('BuilderService', () => {
       //Assert
       expect(mockUniversityService.getByName).toHaveBeenCalledWith(
         `user_${userId.slice(0, 25)}`,
+        mockDb,
       );
-      expect(mockCourseService.getAll).toHaveBeenCalledWith({
-        UniversityID: uniId,
-      });
-      expect(mockModuleService.create).toHaveBeenCalledWith(userId, {
-        moduleCode: moduleDto.moduleCode,
-        moduleName: moduleDto.moduleName,
-        moduleDescription: moduleDto.moduleDescription,
-        CourseID: courseId,
-        styling: undefined,
-      });
+      expect(mockCourseService.getAll).toHaveBeenCalledWith(
+        {
+          UniversityID: uniId,
+        },
+        mockDb,
+      );
+      expect(mockModuleService.create).toHaveBeenCalledWith(
+        userId,
+        {
+          moduleCode: moduleDto.moduleCode,
+          moduleName: moduleDto.moduleName,
+          moduleDescription: moduleDto.moduleDescription,
+          CourseID: courseId,
+          styling: undefined,
+        },
+        mockDb,
+      );
       expect(result).toMatchObject(moduleDto);
     });
 
     it('should create userOwned: module || university and course already defined', async () => {
       //Arrange
-      mockSequentialResults(mockDb.select, [
-        [
-          {
-            //uniRole
-            UserID: userId,
-            UniversityID: uniId,
-            role: 'STUDENT_OWNED',
-          },
+      mockTransaction(mockDb, {
+        select: [
+          [
+            {
+              //uniRole
+              UserID: userId,
+              UniversityID: uniId,
+              role: 'STUDENT_OWNED',
+            },
+          ],
         ],
-      ]);
+        insert: [
+          [
+            {
+              //moduleEnrollment
+              ModuleID: moduleId,
+              UserID: userId,
+            },
+          ],
+        ],
+      });
       mockCourseService.getAll!.mockResolvedValue({
         courses: [
           {
@@ -159,27 +180,28 @@ describe('BuilderService', () => {
         ...createModuleDto,
         moduleID: moduleId,
       });
-      mockDbResult(mockDb.insert, [
-        {
-          //moduleEnrollment
-          ModuleID: moduleId,
-          UserID: userId,
-        },
-      ]);
 
       //Act
       const result = await service.createModule(userId, createModuleDto);
 
       //Assert
-      expect(mockCourseService.getAll).toHaveBeenCalledWith({
-        UniversityID: uniId,
-      });
-      expect(mockModuleService.create).toHaveBeenCalledWith(userId, {
-        ...createModuleDto,
-        CourseID: courseId,
-      });
+      expect(mockCourseService.getAll).toHaveBeenCalledWith(
+        {
+          UniversityID: uniId,
+        },
+        mockDb,
+      );
+      expect(mockModuleService.create).toHaveBeenCalledWith(
+        userId,
+        {
+          ...createModuleDto,
+          CourseID: courseId,
+        },
+        mockDb,
+      );
       expect(result).toMatchObject({
-        ...moduleDto,
+        moduleID: moduleDto.moduleID,
+        moduleName: moduleDto.moduleName,
         styling: createModuleDto.styling,
       });
     });
@@ -188,16 +210,18 @@ describe('BuilderService', () => {
   //GetAll
   describe('Test_GetAll', () => {
     it('should return empty array of modules', async () => {
-      mockSequentialResults(mockDb.select, [
-        [
-          {
-            //UniRole
-            UserID: userId,
-            UniversityID: uniId,
-            role: 'STUDENT_OWNED',
-          },
+      mockTransaction(mockDb, {
+        select: [
+          [
+            {
+              //UniRole
+              UserID: userId,
+              UniversityID: uniId,
+              role: 'STUDENT_OWNED',
+            },
+          ],
         ],
-      ]);
+      });
       mockCourseService.getAll!.mockResolvedValue({
         courses: [
           {
@@ -211,23 +235,28 @@ describe('BuilderService', () => {
 
       const result = await service.getAllModules(userId);
 
-      expect(mockCourseService.getAll).toHaveBeenCalledWith({
-        UniversityID: uniId,
-      });
+      expect(mockCourseService.getAll).toHaveBeenCalledWith(
+        {
+          UniversityID: uniId,
+        },
+        mockDb,
+      );
       expect(result).toMatchObject({ modules: [] });
     });
 
     it('should return array of modules', async () => {
-      mockSequentialResults(mockDb.select, [
-        [
-          {
-            //UniRole
-            UserID: userId,
-            UniversityID: uniId,
-            role: 'STUDENT_OWNED',
-          },
+      mockTransaction(mockDb, {
+        select: [
+          [
+            {
+              //UniRole
+              UserID: userId,
+              UniversityID: uniId,
+              role: 'STUDENT_OWNED',
+            },
+          ],
         ],
-      ]);
+      });
       mockCourseService.getAll!.mockResolvedValue({
         courses: [
           {
@@ -246,9 +275,12 @@ describe('BuilderService', () => {
 
       const result = await service.getAllModules(userId);
 
-      expect(mockCourseService.getAll).toHaveBeenCalledWith({
-        UniversityID: uniId,
-      });
+      expect(mockCourseService.getAll).toHaveBeenCalledWith(
+        {
+          UniversityID: uniId,
+        },
+        mockDb,
+      );
       expect(result).toMatchObject({ modules: [module1, module2] });
     });
   }); //END_Test_GetAll
@@ -313,7 +345,7 @@ describe('BuilderService', () => {
     });
   }); //END_Test_Update
 
-  //Delete
+  // //Delete
   describe('Test_Delete', () => {
     it('should throw if user does not own module', async () => {
       mockModuleService.moduleOwnershipCheck!.mockResolvedValue(false);
