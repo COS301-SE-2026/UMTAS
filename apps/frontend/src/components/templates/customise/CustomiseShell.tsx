@@ -20,7 +20,7 @@ export default function CustomiseShell({
   const [viewMode, setViewMode] = useState<"Modules" | "Events">("Modules");
 
   function renderView() {
-    if (viewMode === "Modules") {
+    if (viewMode === "Modules" || events.length === 0) {
       return (
         <CustomiseModuleShell
           modules={modules}

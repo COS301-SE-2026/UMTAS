@@ -19,7 +19,6 @@ import { useState } from "react";
 import { CourseTableData } from "./courseColumns";
 import CourseCustimisation from "./singleCourseEdit";
 import { Card } from "@/components/atoms/baseShadcn/card";
-import { CourseDTO } from "@/app/course-management/queries/courses/courseBuilder";
 import { CreateCourse } from "./createCourse";
 import Popup from "@/components/atoms/utility/floatContainer";
 
@@ -31,6 +30,7 @@ interface DataTableProps<TData> {
 export function CourseTable<TData>({ columns, data }: DataTableProps<TData>) {
   const [showPopUp, setPopUp] = useState(false);
   const [showCreatePopup, setshowCreatePopUp] = useState(false);
+
   const [dataState, setData] = useState<CourseTableData>({
     course: { CourseID: "", CourseName: "", UniversityID: "" },
     modules: [],
