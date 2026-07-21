@@ -415,12 +415,8 @@ export class EventService {
         ? moduleUniversityIds
         : Array.from(
             new Set([
-              ...(user?.role === 'student' && enrollment
-                ? moduleUniversityIds
-                : []),
-              ...(user?.role === 'student'
-                ? ownedParserLinks.map(({ universityId }) => universityId)
-                : []),
+              ...(enrollment ? moduleUniversityIds : []),
+              ...ownedParserLinks.map(({ universityId }) => universityId),
               ...roleAuthorizedUniversityIds,
             ]),
           ).sort();

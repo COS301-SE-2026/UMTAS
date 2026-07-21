@@ -241,6 +241,7 @@ export function EventsStep({
           activityCode: event.activityCode,
           eventCriteria: event.eventCriteria,
           eventName: event.eventName,
+          activityType: event.activityType,
         },
         path: {
           id: id,
@@ -252,6 +253,7 @@ export function EventsStep({
           eventCriteria: event.eventCriteria,
           activityCode: event.activityCode,
           eventName: event.eventName,
+          activityType: event.activityType,
         },
       });
       const newID = (await result).event.eventId;
