@@ -1,95 +1,118 @@
 # Functional Requirements
+### R1.1 Landing Page Website
 
-## Authentication and Accounts
+- **R1.1.1** The system shall provide a landing page for all users prior to login/register.
+    - **R1.1.1.1** The system shall allow users to visit the main Umtas website through the landing page.
+- **R1.1.2** The landing page shall present system functionalities to entice users.
+    - **R1.1.2.1** The system shall explain the functionality of each of the 3 adaptors to the users
+        - **R1.1.2.1.1** The system shall explain the functionality of the `Builder` adapter
+        - **R1.1.2.1.2** The system shall explain the functionality of the `pdf upload` System
+        - **R1.1.2.1.3** The system shall explain the functionality of the `University API` adapter
+    - **R1.1.2.2** The system shall highlight each users ability through the system
+        - **R1.1.2.2.1** The system shall explain the functionality extended to a Student.
+        - **R1.1.2.2.2** The system shall explain the functionality extended to an Admin.
+        - **R1.1.2.2.3** The system shall explain the functionality extended to a Lecturer.
+        - **R1.1.2.2.4** The system shall explain the functionality extended to a Tyto simulation admin.
 
-| **ID** | **Requirement** |
-|---|---|
-| **FR-1** | The system shall allow a user to register with a supported email address and password. |
-| **FR-2** | The system shall create an authenticated session when a registered user supplies valid credentials. |
-| **FR-3** | The system shall invalidate the active session when an authenticated user signs out. |
-| **FR-4** | The system shall support email verification and password reset. |
-| **FR-5** | The system shall support Google sign-in and account linking. |
-| **FR-6** | The system shall allow an authenticated user to list and revoke their sessions. |
-| **FR-7** | The system shall allow an authenticated user to select a university context. |
+### R1.2 Login and Register System
 
-## Universities and Roles
+- **R1.2.1** The system shall allow users to log in.
+    - **R1.2.1.1** The system shall allow users to login using Oauth
+    - **R1.2.1.1** The system shall allow users to login using "in house" system
+- **R1.2.2** The system shall allow users to register.
+    - **R1.2.2.1** The system shall allow users to register using Oauth
+    - **R1.2.2.1** The system shall allow users to register using "in house" system
+- **R1.2.3** The system shall manage user sessions.
+- **R1.2.4** The system shall allow users manage their account and system state
+    - **R1.2.4.1** The system shall allow users to sign out.
+    - **R1.2.4.2** The system shall allow users to reset their password
+    - **R1.2.4.3** The system shall allow users to delete their account
 
-| **ID** | **Requirement** |
-|---|---|
-| **FR-8** | The system shall list universities available to the authenticated user. |
-| **FR-9** | The system shall return the authenticated user's role for a selected university. |
-| **FR-10** | The system shall allow a user to apply for a student, lecturer, or university-administrator role. |
-| **FR-11** | The system shall allow an authorised university administrator to list and decide university role applications. |
-| **FR-12** | The system shall allow a system administrator to create, update, and delete universities. |
+### R2.1 Timetable Management
+- **R2.1.1** The system shall allow students to view timetables.
+	- **R2.1.1.1** The system shall allow students to view events and modules in a time table.
+	- **R2.1.1.2** The system shall allow students to view the time table in a calendar format.
+		- **R2.1.1.2.1** The system shall allow students to view the time table per week where relevant.
+		- **R2.1.1.2.2** The system shall allow students to view time table details at a higher level such as related statistics.
+	- **R2.1.1.3** The system shall allow students to select individual time tables from a list of stored timetables created by the user.
+- **R2.1.2** The system shall allow students to update timetables.
+	- **R2.1.2.1** The system shall allow students to update timetable modules for owned modules.
+		- **R2.1.2.1.1** The system shall allow students to update timetable module names. 
+		- **R2.1.2.1.1** The system shall allow students to update timetable module codes.
+	- **R2.1.2.2** The system shall allow students to update timetable events listed details for owned events.
+		- **R2.1.2.2.1** The system shall allow students to update timetable event venues.
+		- **R2.1.2.2.2** The system shall allow students to update timetable event times.
+		- **R2.1.2.2.3** The system shall allow students to update timetable event days 
+- **R2.1.3** The system shall allow students to delete timetables which will not effect related events and modules.
 
-## Courses, Modules, and Builder
+### R2.2 Timetable Creation – Builder
+- **R2.2.1** The system shall allow students to create new timetables.
+	- **R2.2.1.1** The system shall allow students to create modules for timetables setting the related details of a module.
+	- **R2.2.1.2** The system shall allow students to create events for timetables setting the related details of module events.
+	- **R2.2.1.3** The system shall allow students to create a timetable from events and modules.
+- **R2.2.2** The system shall allow timetable customisation.
+	- **R2.2.2.1** The system shall allow timetable customisation of name
+	- **R2.2.2.2** The system shall allow timetable customisation of colour
 
-| **ID** | **Requirement** |
-|---|---|
-| **FR-13** | The system shall allow an authorised user to create, update, list, and delete courses. |
-| **FR-14** | The system shall allow an authorised user to create, update, list, and delete modules. |
-| **FR-15** | The system shall allow modules to be organised into reusable groupings. |
-| **FR-16** | The system shall preserve course-to-module metadata, including core status, semester of study, and year of study. |
-| **FR-17** | The system shall allow a student to create, update, list, and delete student-owned modules. |
-| **FR-18** | The system shall allow a user to store personal styling for a module. |
-| **FR-19** | The system shall allow an authorised university administrator to mark imported modules as validated. |
+### R2.3 Timetable Creation – PDF System
 
-## Events and Timetables
+- **R2.3.1** The system shall automate timetable creation using a PDF if provided by a university of all classes if supported.
+	- **R2.3.1.1** The system will create modules based on the provided PDF if they do not exist within the system
+	- **R2.3.1.2** The system will do a module lookup based on the provided PDF if they do exist within the system
+	- **R2.3.1.3** The system will create events based on the provided PDF if they do not exist within the system
+	- **R2.3.1.4** The system will do a event lookup based on the provided PDF if they do exist within the system
+	-  **R2.3.1.5** The system will allow a user to create a timetable based on provided selection of events from the system
+	-  **R2.3.1.5** The system will allow a user to modify colours and other individual user details related to the timetable
+- **R2.3.2** The system shall allow user modification of PDF‑generated timetables.
+	- **R2.3.2.1** The system shall allow users to modify individual related details of a timetable
+	- **R2.3.2.2** The system shall allow users to modify selected events from module list
 
-| **ID** | **Requirement** |
-|---|---|
-| **FR-20** | The system shall allow an authenticated user to create personal events with valid scheduling criteria. |
-| **FR-21** | The system shall allow authorised users to create university events linked to a module. |
-| **FR-22** | The system shall list events visible to the authenticated user and support filtering by module. |
-| **FR-23** | The system shall allow an authorised user to update or delete an event. |
-| **FR-24** | The system shall allow an authorised university administrator to mark imported events as validated. |
-| **FR-25** | The system shall allow a user to create a named timetable containing selected events. |
-| **FR-26** | The system shall list timetables owned by the authenticated user. |
-| **FR-27** | The system shall allow a timetable owner to retrieve, update, or delete a timetable. |
+### R2.4 Timetable Creation – API System
 
-## Attendance
+- **R2.4.1** The system shall automate timetable creation using a university‑provided API (if applicable).
+    - **R2.4.1.1** The system will create modules based on the provided API if they do not exist within the system.
+    - **R2.4.1.2** The system will do a module lookup based on the provided API if they do exist within the system.
+    - **R2.4.1.3** The system will create events based on the provided API if they do not exist within the system.
+    - **R2.4.1.4** The system will do an event lookup based on the provided API if they do exist within the system.
+    - **R2.4.1.5** The system will allow a user to create a timetable based on provided selection of events from the system.
+    - **R2.4.1.6** The system will allow a user to modify colours and other individual user details related to the timetable.
+- **R2.4.2** The system shall allow user customisation of API‑generated timetables. 
+    - **R2.4.2.1** The system shall allow users to modify individual related details of a timetable.
+    - **R2.4.2.2** The system shall allow users to modify selected events from the module list.
 
-| **ID** | **Requirement** |
-|---|---|
-| **FR-28** | The system shall allow a student to record an attendance state for an event on a specific date. |
-| **FR-29** | The system shall allow a student to list, retrieve, update, and delete attendance records. |
+### R2.5 Calendar Exporting
+- **R2.5.1** The system shall allow export of timetables as `.ics` files for calendar import.
+	- **R2.5.1.1** The system shall allow for details of the `.ics` file to be altered by a user such as its summary / name.
+	- **R2.5.1.2** The system shall allow users to modify the event description within the `.ics` file.
+	- **R2.5.1.3** The system shall allow users to update the event location stored in the `.ics` file. 
+	- **R2.5.1.4** The system shall allow users to change the event start and end times in the `.ics` file.
+	- **R2.5.1.5** The system shall allow users to adjust the event status such as confirmed or cancelled.
+	- **R2.5.1.6** The system shall make use of a uuid such that duplicate events are accounted for.
+- **R2.5.2** The system shall allow direct sync with Google Calendar.
+    - **R2.5.2.1** The system shall support creating a Google Calendar instance.
 
-## PDF Import
 
-| **ID** | **Requirement** |
-|---|---|
-| **FR-30** | The system shall accept a PDF of no more than 25 MiB for an authenticated user and selected university. |
-| **FR-31** | The system shall reject an invalid file, university identifier, adapter, or fingerprint with a descriptive error. |
-| **FR-32** | The system shall enqueue valid parsing work and return a job identifier without holding the request open. |
-| **FR-33** | The system shall expose queued, completed, and failed parse states with structured failure details. |
-| **FR-34** | The system shall reuse a matching queued or completed import for the same user and university. |
-| **FR-35** | The system shall import parser output immediately after a successful authenticated worker callback. |
-| **FR-36** | The system shall create or reuse matching modules, events, venues, and a module grouping without duplicating equivalent data. |
-| **FR-37** | The system shall mark newly imported modules and events as unvalidated until administrator approval. |
+### R3.1 Analytics System
 
-## Timetable Solver
+- **R3.1.1** The system will provide statistical analysis tools for admins and lecturers of supported universities.
+    - **R3.1.1.1** The system shall provide statistical analysis tools centred around attendance.
+        - **R3.1.1.1.1** The system shall allow university admins and lecturers to view submitted students for a module time slot.
+        - **R3.1.1.1.2** The system shall allow university admins and lecturers to view actual attendance for a module time slot.
+        - **R3.1.1.1.3** The system shall allow university admins and lecturers to view projected attendance.
+    - **R3.1.1.2** The system shall provide statistical analysis tools centred around visualisation.
+        - **R3.1.1.2.1** The system shall provide statistical heat‑map tools based on venues in the university of logged modules.
+        - **R3.1.1.2.2** The system shall provide statistical graphing tools based on attendance of events for projected, actual, and submitted attendance types.
+        - **R3.1.1.2.3** The system shall provide statistical graphing tools based on bookings of events by date.
 
-| **ID** | **Requirement** |
-|---|---|
-| **FR-38** | The system shall accept a solver profile, solve mode, and engine choice from an authenticated user. |
-| **FR-39** | The system shall support independent CP-SAT and genetic algorithm engines. |
-| **FR-40** | In automatic mode, the system shall run CP-SAT first and run the genetic algorithm only when CP-SAT reports infeasibility. |
-| **FR-41** | The system shall enqueue valid solver work and return a job identifier without holding the request open. |
-| **FR-42** | The system shall expose queued, completed, and failed solver states with structured failure details. |
-| **FR-43** | The system shall reuse an equivalent current solver job for the same user. |
-| **FR-44** | CP-SAT shall return a conflict-free result or report that no feasible result exists. |
-| **FR-45** | Genetic search shall return a single-objective best-effort result and identify any remaining conflicts. |
+### R3.2 Lecturer Adjustment System
+- **R3.2.1** The system will allow lecturers to alter details about their events.  
+    - **R3.2.1.1** The system shall allow lecturers to alter venue location for an event(s).  
+    - **R3.2.1.2** The system shall allow lecturers to alter times for an event(s).  
+    - **R3.2.1.3** The system shall allow lecturers to cancel an event(s).  
+    - **R3.2.1.4** The system shall allow lecturers to add lecturers to events/modules.  
 
-## Calendar Export
-
-| **ID** | **Requirement** |
-|---|---|
-| **FR-46** | The frontend shall generate and download an iCalendar file from the displayed timetable. |
-
-## Future Scope
-
-- Persisted student and lecturer scheduling preferences.
-- Dedicated lecturer, venue, semester, academic-calendar, and invitation workflows.
-- Private university workspaces.
-- Google Calendar, live-feed, and provider-reconciliation workflows.
-- Advanced analytics, Tyto simulation, institutional master scheduling, and persisted audit records.
+### R3.3 Alert System
+- **R3.3.1** The system will send alerts out based on event changes.  
+    - **R3.3.1.1** The system shall send out alerts if venues have changed for an event.  
+    - **R3.3.1.2** The system shall send out alerts if times have changed for an event.  
+    - **R3.3.1.3** The system shall send out alerts if event status has changed, such as a cancellation of the event on a day.  

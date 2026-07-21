@@ -137,7 +137,10 @@ export function ModulesStep({ modules }: ModulesStepProps) {
     try {
       updateModule.mutate({
         moduleID: id,
-        module: uniModule,
+        module: {
+          ...uniModule,
+          Core: {},
+        },
       });
 
       setErrorMap((prev) => {

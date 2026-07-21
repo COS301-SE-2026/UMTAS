@@ -99,6 +99,7 @@ export default function ModulesShell({
       saveModule({
         path: { moduleId: tempModule.moduleID },
         body: {
+          Core: {},
           moduleCode: tempModule.moduleCode,
           moduleName: tempModule.moduleName,
           moduleDescription: tempModule.moduleDescription,

@@ -14,7 +14,7 @@ export default function CustomiseEventPanel({
 }: EventPanelProps) {
   const assignedModule = modules.find(
     (module: ModuleResponseDto) =>
-      module.moduleCode === event.eventCriteria.moduleID,
+      module.moduleCode === event.eventCriteria.moduleId,
   );
   return (
     <div className="flex flex-col gap-2">
@@ -39,7 +39,7 @@ export default function CustomiseEventPanel({
                 {event.eventCriteria.startTime}
               </p>
               <p className="text-sm font-mono text-[var(--text-secondary)]">
-                {event.eventCode}
+                {event.activityCode}
               </p>
             </div>
           </div>
