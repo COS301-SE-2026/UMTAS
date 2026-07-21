@@ -1,0 +1,20 @@
+{
+  "modules": [],
+  "events": [
+    {
+      "moduleCode": "COS101",
+      "activityType": "lecture",
+      "activityCode": "L1",
+      "title": "Lecture",
+      "day": "monday",
+      "date": null,
+      "startTime": "99:00",
+      "endTime": "09:00",
+      "venues": [],
+      "isRecurring": true,
+      "metadata": {},
+      "warnings": []
+    }
+  ],
+  "warnings": []
+}

@@ -8,16 +8,20 @@ dev:
 
 # Umtas local dev commands
 
+[private]
+rebuild-packages:
+    pnpm --filter shared-types run build
+
 # backend + phase injection
-back:
+back: rebuild-packages
     phase run -- pnpm --filter backend run start:dev
 
 # frontend + phase injection
-front:
+front: rebuild-packages
     phase run -- pnpm --filter frontend run dev
 
 # both + phase
-both:
+both: rebuild-packages
     phase run -- pnpm --parallel --filter backend --filter frontend run dev
 
 # spin up local versions

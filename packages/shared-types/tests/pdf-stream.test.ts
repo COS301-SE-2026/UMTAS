@@ -1,7 +1,33 @@
 import test, { type TestContext } from "node:test";
-import { extractPdfStreamPayloads } from "../index.js";
+import {
+  computePdfStreamFingerprint,
+  extractPdfStreamPayloads,
+} from "../src/index.js";
 
 const encoder = new TextEncoder();
+
+test("computePdfStreamFingerprint reports no usable streams", (t) => {
+  const hash = {
+    update() {
+      throw new Error("update should not be called");
+    },
+    digestHex() {
+      throw new Error("digestHex should not be called");
+    },
+  };
+
+  const result = computePdfStreamFingerprint(
+    encoder.encode("not a PDF stream"),
+    hash,
+  );
+
+  t.assert.deepEqual(result, {
+    ok: false,
+    streamCount: 0,
+    algorithmVersion: "pdf-stream-payload-sha256-v1",
+    reason: "NO_STREAMS_FOUND",
+  });
+});
 
 test("extractPdfStreamPayloads ignores stream substrings outside PDF objects", (t: TestContext) => {
   const payloads = extractPdfStreamPayloads(

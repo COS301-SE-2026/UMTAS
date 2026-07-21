@@ -40,7 +40,11 @@ function ModulesColumn(): ColumnDef<CourseTableData, moduleDTO[]> {
       const modules = info.getValue();
       return modules.map((mod) => {
         return (
-          <Badge key={mod.moduleID} className="bg-blue-400">
+          <Badge
+            className="m-2"
+            key={mod.moduleID}
+            style={{ backgroundColor: mod.styling?.colour }}
+          >
             {mod.moduleCode}
           </Badge>
         );

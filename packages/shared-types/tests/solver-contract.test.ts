@@ -3,7 +3,7 @@ import {
   SchedulingEventSchema,
   SolverResultSchema,
   TimetableSolveJobDataSchema,
-} from "../index.js";
+} from "../src/index.js";
 
 const schedulingEvent = {
   eventId: "event-1",
@@ -64,14 +64,59 @@ test("solver result distinguishes conflict-free and best-effort outcomes", (t) =
   t.assert.deepEqual(bestEffort.metadata.conflicts[0]?.eventIds, ["a", "b"]);
 });
 
-test("solver result rejects ordinary feasible metadata that hides conflicts", (t) => {
+test("solver result requires conflictCount to match conflicts", (t) => {
   const result = SolverResultSchema.safeParse({
     engine: "ga",
+    outcome: "best-effort",
     timetableSolution: { selectedEventIds: ["a", "b"] },
     heuristicScores: [],
-    metadata: {},
+    metadata: {
+      conflictCount: 2,
+      conflicts: [{ eventIds: ["a", "b"] }],
+      solveMode: "optimization",
+    },
   });
+
   t.assert.equal(result.success, false);
+});
+
+test("solver result derives outcome from conflict count", (t) => {
+  const result = SolverResultSchema.safeParse({
+    engine: "ga",
+    outcome: "conflict-free",
+    timetableSolution: { selectedEventIds: ["a", "b"] },
+    heuristicScores: [],
+    metadata: {
+      conflictCount: 1,
+      conflicts: [{ eventIds: ["a", "b"] }],
+      solveMode: "optimization",
+    },
+  });
+
+  t.assert.equal(result.success, false);
+});
+
+test("scheduling events require exactly one date representation", (t) => {
+  const neither = {
+    ...schedulingEvent,
+    date: undefined,
+  };
+
+  const both = {
+    ...schedulingEvent,
+    dayOfWeek: "tuesday",
+  };
+
+  t.assert.equal(SchedulingEventSchema.safeParse(neither).success, false);
+  t.assert.equal(SchedulingEventSchema.safeParse(both).success, false);
+});
+
+test("scheduling events apply selection and venue defaults", (t) => {
+  const { venues: _, ...withoutVenues } = schedulingEvent;
+  const event = SchedulingEventSchema.parse(withoutVenues);
+
+  t.assert.equal(event.requiredSelections, 1);
+  t.assert.deepEqual(event.venues, []);
 });
 
 test("scheduling events reject impossible ISO calendar dates", (t) => {

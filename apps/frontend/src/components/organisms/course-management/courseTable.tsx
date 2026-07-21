@@ -29,6 +29,7 @@ interface DataTableProps<TData> {
 export function CourseTable<TData>({ columns, data }: DataTableProps<TData>) {
   const [showPopUp, setPopUp] = useState(false);
   const [showCreatePopup, setshowCreatePopUp] = useState(false);
+
   const [dataState, setData] = useState<CourseTableData>({
     course: { CourseID: "", CourseName: "", UniversityID: "" },
     modules: [],

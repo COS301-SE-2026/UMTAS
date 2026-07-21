@@ -12,6 +12,7 @@ import {
   getAllUni,
 } from "@/app/choose-institute/queries/UserRoleQueries";
 import { UserDetails } from "@/lib/userclass/userClass";
+import { useRouter } from "next/navigation";
 
 export function InstituteSelector() {
   const [selectedInstitute, setSelectedInstitute] = useState<uniDto>();
@@ -34,7 +35,7 @@ export function InstituteSelector() {
   const applyDisabled = !selectedInstitute || !selectedRole;
   const uniDisabeled =
     selectedInstitute == null && selectedInstitute == undefined;
-
+  const router = useRouter();
   return (
     <form
       className="flex flex-col gap-6"
@@ -70,7 +71,11 @@ export function InstituteSelector() {
       )*/}
       {selectedInstitute && <ApprovalStatus uni={selectedInstitute} />}
       <div className="mt-2 flex justify-around gap-3 border-t pt-4">
-        <Button type="submit" disabled={uniDisabeled}>
+        <Button
+          type="submit"
+          disabled={uniDisabeled}
+          onClick={() => router.push("/schedules")}
+        >
           continue as {selectedInstitute?.role ?? "student"}
         </Button>
 
