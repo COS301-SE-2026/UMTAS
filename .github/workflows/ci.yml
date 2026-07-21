@@ -311,11 +311,6 @@ jobs:
       status: ${{ job.status }}
 
     steps:
-      - name: Wait for Watchtower redeploy
-        run: |
-          echo "Waiting 60s for Watchtower to pull and restart containers..."
-          sleep 60
-
       - name: Check staging health endpoints
         env:
           DOMAIN: ${{ secrets.STAGING_DOMAIN }}
@@ -327,13 +322,13 @@ jobs:
             for attempt in 1 2 3 4 5; do
               status=$(curl -s -L -o /dev/null -w "%{http_code}" --max-time 10 "$url")
               if [ "$status" = "200" ]; then
-                echo "OK: $url returned HTTP 200"
+                echo "OK: $url returned HTTP 200 (attempt $attempt/5)"
                 return 0
               fi
               echo "Attempt $attempt/5: $url returned HTTP $status"
               [ "$attempt" -lt 5 ] && sleep 20
             done
-            echo "FAIL: $url did not return HTTP 200 after 5 attempts"
+            echo "FAIL: $url did not return HTTP 200 after 5 attempts :("
             return 1
           }
 
@@ -343,22 +338,12 @@ jobs:
 
           exit $failed
 
-  notify-staging-ready:
-    name: Notify Staging Success
-    needs: [health-check]
-    if: success()
+  notify-status:
+    name: Notify Pipeline Status
+    needs: [ci, docker-check, docker-staging, docker-release, health-check]
+    if: always()
     uses: ./.github/workflows/discord-notify.yml
     with:
-      status: "Success"
-      message: "Staging environment is updated and passing health checks!"
-    secrets: inherit
-
-  notify-ci-failure:
-    name: Notify CI/CD Failure
-    needs: [ci, docker-staging, docker-release]
-    if: failure()
-    uses: ./.github/workflows/discord-notify.yml
-    with:
-      status: "Failure"
-      message: "The pipeline failed during CI or Docker Build. Check the GitHub Actions logs."
+      status: ${{ contains(needs.*.result, 'failure') && 'Failure' || contains(needs.*.result, 'cancelled') && 'Cancelled' || 'Success' }}
+      message: "Pipeline run for ${{ github.ref_name }} (${{ github.event_name }}) — ci: ${{ needs.ci.result }}, docker-check: ${{ needs['docker-check'].result }}, docker-staging: ${{ needs['docker-staging'].result }}, docker-release: ${{ needs['docker-release'].result }}, health-check: ${{ needs['health-check'].result }}."
     secrets: inherit
