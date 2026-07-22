@@ -23,8 +23,21 @@ export function HelpCommandPalette() {
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
-
+  type ExtendedHelpItem = HelpPageItem & { action?: () => void; href?: string };
   const pages: HelpPageGroup[] = [
+    {
+      heading: "Quick Actions",
+      id: "actions",
+      items: [
+        {
+          id: "run-tutorial",
+          children: "Run Tutorial for this Page",
+          icon: "PlayIcon",
+
+          action: () => window.dispatchEvent(new Event("start-tutorial")),
+        },
+      ] as ExtendedHelpItem[],
+    },
     {
       heading: "Application Pages",
       id: "app-pages",
@@ -113,12 +126,6 @@ export function HelpCommandPalette() {
           icon: "QuestionMarkCircleIcon",
           href: "/faq",
         },
-        // {
-        //   id: "tutorials",
-        //   children: "Tutorials",
-        //   icon: "PlayIcon",
-        //   href: "/tutorials",
-        // },
         {
           id: "help-centre",
           children: "Help Centre",
@@ -161,6 +168,10 @@ export function HelpCommandPalette() {
                     onClick={() => {
                       if (rest.href) {
                         router.push(rest.href);
+                        setIsOpen(false);
+                      }
+                      if (rest.action) {
+                        rest.action();
                         setIsOpen(false);
                       }
                     }}

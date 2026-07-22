@@ -4,7 +4,8 @@ export interface HelpPageItem {
   id: string;
   children: string;
   icon: IconName;
-  href: string;
+  href?: string;
+  action?: () => void;
 }
 
 export interface HelpPageGroup {
