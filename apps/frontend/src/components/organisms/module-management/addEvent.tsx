@@ -27,16 +27,16 @@ export default function CreateEventAdmin({ module }: createEventProps) {
   const [criteria, setCriteria] = useState<EventCriteria>({
     date: "",
     endTime: "",
-    venue: "",
+    //venue: "",
     startTime: "",
-    moduleID: module.moduleID,
-    type: "university",
+    moduleId: module.moduleID,
+    eventSource: "university",
   });
   const [event, setEvent] = useState<CreateEventBody>({
     eventName: "",
-    eventCode: "",
+    activityCode: "",
     eventCriteria: criteria,
-    isRecurring: false,
+    isRecurring: {},
   });
   const { mutateAsync: addEvent } = useMutation(addUniEventMut());
 
@@ -61,14 +61,14 @@ export default function CreateEventAdmin({ module }: createEventProps) {
     <Card className=" items-center w-1/3 h-[50vh] m-auto">
       <h1>Create Event</h1>
       <StateInput State={event} field="eventName" update={updateEvent} />
-      <StateInput State={event} field="eventCode" update={updateEvent} />
+      <StateInput State={event} field="activityCode" update={updateEvent} />
       <StateInput
         State={criteria}
         field="date"
         update={updateCriteria}
         type="date"
       />
-      <StateInput State={criteria} field="venue" update={updateCriteria} />
+      {/* <StateInput State={criteria} field="venue" update={updateCriteria} /> */}
       <div className="flex flex-row space-x-3">
         <TimeSelect
           times={TIMES}

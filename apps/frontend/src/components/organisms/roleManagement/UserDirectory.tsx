@@ -24,11 +24,15 @@ export default function UserDirectoryCard() {
   );
 
   return (
-    <div className="container mx-auto py-10">
-      <Card>
+    <div className="container mx-auto">
+      <Card className="bg-[var(--bg-surface)] border-[var(--border)] rounded-xl shadow-sm">
         <CardHeader>
-          <CardTitle>User Directory</CardTitle>
-          <CardDescription>View and manage user information</CardDescription>
+          <h1 className="text-lg font-semibold text-[var(--text-primary)]">
+            Role Management
+          </h1>
+          <p className="text-sm text-[var(--text-secondary)]">
+            Manage user roles and approve pending applications.
+          </p>
         </CardHeader>
         <CardContent>
           {isLoading ? (
