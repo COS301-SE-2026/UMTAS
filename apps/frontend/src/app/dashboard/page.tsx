@@ -30,10 +30,6 @@ const steps = [
     content: "Click here to toggle between light and dark mode.",
   },
   {
-    target: "#sign-out-btn",
-    content: "Click here to sign out of your account.",
-  },
-  {
     target: "#build-schedule-btn",
     content: "Click here to start building your schedule.",
   },
@@ -76,9 +72,21 @@ const Features = [
 ];
 
 const Links = [
-  { label: "Documentation", href: "https://cos301-se-2026.github.io/UMTAS/" },
-  { label: "Brand Style", href: "https://brand.capstone-vigil.dns.net.za/" },
-  { label: "GitHub", href: "https://github.com/COS301-SE-2026/UMTAS" },
+  {
+    label: "Documentation",
+    href: "https://cos301-se-2026.github.io/UMTAS/",
+    id: "documentation-link",
+  },
+  {
+    label: "Brand Style",
+    href: "https://brand.capstone-vigil.dns.net.za/",
+    id: "brand-style-link",
+  },
+  {
+    label: "GitHub",
+    href: "https://github.com/COS301-SE-2026/UMTAS",
+    id: "github-link",
+  },
 ];
 
 const typeLines = [
@@ -180,6 +188,7 @@ function DashboardContent() {
 
             <div className="pt-1">
               <Button
+                id="build-schedule-btn"
                 type="button"
                 onClick={handleBuild}
                 size="default"
@@ -232,6 +241,7 @@ function DashboardContent() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {Links.map((link) => (
               <Link
+                id={link.id}
                 key={link.label}
                 href={link.href}
                 target="_blank"
@@ -254,7 +264,7 @@ function DashboardContent() {
       <div className="py-4 bg-[var(--bg-base)] border-t border-[var(--border)] w-full">
         <div className="max-w-6xl mx-auto px-6 lg:px-8 flex items-center justify-between">
           <p className="text-[10px] lg:text-xs uppercase tracking-[0.06em] text-[var(--text-disabled)] font-medium">
-            Demo 1 - Team Vigil
+            Team Vigil
           </p>
           <Separator
             orientation="vertical"
@@ -275,7 +285,7 @@ export default function DashboardPage() {
     <>
       <Suspense fallback={<PageSkeleton rows={3} />}>
         <DashboardContent />
-        <Tutorial steps={steps} />
+        <Tutorial steps={steps} wait={true} />
       </Suspense>
       {showSelect && (
         <Popup>
