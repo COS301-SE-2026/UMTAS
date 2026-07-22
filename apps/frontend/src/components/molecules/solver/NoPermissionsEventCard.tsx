@@ -59,10 +59,11 @@ export function NoPermissionsEventCard({
     "placeholder:text-[var(--text-disabled)] focus-visible:ring-2 focus-visible:ring-offset-2 " +
     "focus-visible:ring-[var(--ring)] text-sm";
 
+  console.log(event.eventCriteria, "Event being inserted into timeslot");
   const timeSlotValue: TimeSlot = {
     day: "",
     startTime: event.eventCriteria?.startTime || "",
-    endTime: event.eventCriteria?.endTime || "",
+    endTime: event.eventCriteria?.endTime || "no end",
   };
 
   function handleTimeChange(slot: TimeSlot) {
@@ -221,33 +222,60 @@ export function NoPermissionsEventCard({
             Date & Time
           </Label>
           <div className="flex flex-col gap-2">
-            <Label
-              htmlFor={"event-date-" + event.eventId}
-              className="text-sm font-medium text-[var(--text-secondary)]"
-            >
-              Date
-            </Label>
-            <Input
-              readOnly
-              id={"event-date-" + event.eventId}
-              type="date"
-              value={event.eventCriteria?.date || ""}
-              onChange={(e) => onUpdate(event.eventId, "date", e.target.value)}
-              className={getInputClass(!!errors?.date)}
-            />
+            {event.eventCriteria.date && (
+              <>
+                <Label
+                  htmlFor={"event-date-" + event.eventId}
+                  className="text-sm font-medium text-[var(--text-secondary)]"
+                >
+                  Date
+                </Label>
+                <Input
+                  readOnly
+                  id={"event-date-" + event.eventId}
+                  type="date"
+                  value={event.eventCriteria?.date || ""}
+                  onChange={(e) =>
+                    onUpdate(event.eventId, "date", e.target.value)
+                  }
+                  className={getInputClass(!!errors?.date)}
+                />
+              </>
+            )}
+            {event.eventCriteria.dayOfWeek && (
+              <>
+                <Label
+                  htmlFor={"event-date-" + event.eventId}
+                  className="text-sm font-medium text-[var(--text-secondary)]"
+                >
+                  Date
+                </Label>
+                <Input readOnly value={event.eventCriteria.dayOfWeek} />
+              </>
+            )}
             {errors?.date && (
               <p className="text-sm text-[var(--error-text)]">{errors.date}</p>
             )}
           </div>
 
-          <TimeSlotSelect
+          <Label
+            htmlFor={"event-date-" + event.eventId}
+            className="text-sm font-medium text-[var(--text-secondary)]"
+          >
+            Times
+          </Label>
+          <div className="flex flex-row w-full p-2 gap-x-2 justify-around">
+            <Input readOnly value={event.eventCriteria.startTime} />
+            <Input readOnly value={event.eventCriteria.endTime} />
+          </div>
+          {/*<TimeSlotSelect
             disabled={true}
             value={timeSlotValue}
             onChange={handleTimeChange}
-            onRemove={() => {}}
+            onRemove={() => { }}
             error={errors?.time}
             hideDaySelect
-          />
+          />*/}
         </div>
       </div>
 
@@ -261,11 +289,7 @@ export function NoPermissionsEventCard({
             <Label className="text-sm font-medium text-[var(--text-secondary)]">
               Event type
             </Label>
-            <EventTypeDropdown
-              disabled
-              value={(event.activityType as EventType) || "lecture"}
-              onChange={(v) => onUpdate(event.eventId, "activityType", v || "")}
-            />
+            <Input readOnly value={event.activityType} />
           </div>
 
           {renderModuleSection()}

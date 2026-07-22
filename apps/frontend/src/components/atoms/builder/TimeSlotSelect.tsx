@@ -46,6 +46,7 @@ export function TimeSlotSelect({
   hideDaySelect,
   disabled,
 }: TimeSlotSelectProps) {
+  console.log(value);
   return (
     <div className="flex flex-col gap-1">
       <div className="flex flex-wrap items-center gap-1.5">

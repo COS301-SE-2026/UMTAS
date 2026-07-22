@@ -43,10 +43,8 @@ export function lookupPdfHash(body: PDFjobLookupBody) {
   return queryOptions({
     queryKey: ["PDF", body.pdfStreamHash],
     queryFn: async () => {
-      console.log("Lookup ran");
       const builder = new PDFjobLookupBuilder();
       const result = await builder.send({ body: body });
-      console.log(result);
       return result;
     },
     enabled: body.pdfStreamHash != "" && body.universityId != "",

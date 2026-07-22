@@ -21,6 +21,10 @@ import { UserDetails } from "@/lib/userclass/userClass";
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
 import { Spinner } from "@/components/atoms/baseShadcn/spinner";
 import { CheckSquare } from "lucide-react";
+import {
+  PDFjobLookupBuilder,
+  PDFjobStatusBuilder,
+} from "@/app/solver/queries/PDF/builder";
 
 interface SolverUploadProps {
   onComplete: () => void;
@@ -38,60 +42,54 @@ export default function SolverUpload({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [pdfHash, setPdfHash] = useState<string | null>(null);
   const [jobId, setJobID] = useState<string | null>(null);
-
-  const { data: pdfLookupResult, isLoading: pdfLookupLoading } = useQuery({
-    ...lookupPdfHash({
-      universityId: UserDetails.getUniDetails()?.UniversityID || "",
-      adapterKey: "up",
-      fingerprintAlgorithm: "pdf-stream-payload-sha256-v1",
-      pdfStreamHash: pdfHash || "",
-    }),
-  });
+  const [currentlyPolling, SetCurrentlyPolling] = useState<boolean>(false);
 
   const { data: pdfJobResult } = useQuery({
-    ...pollPdfResult({ jobId: jobId || "" }),
+    queryKey: ["PDF", jobId],
+    queryFn: async () => {
+      const builder = new PDFjobStatusBuilder();
+      const result = await builder.send({ paths: { jobId: jobId || "" } });
+      console.log("polled", result);
+      return result;
+    },
+    enabled: jobId != "" && jobId != null && moduleGroupID == null,
+    refetchInterval: 2500,
   });
 
   const UploadPDFmut = useMutation(uploadPDF());
   // uploads and starts the timeout function
   async function uploadFile(file: File) {
-    // on success of the request
-    if (file) {
-      const result = await fileHash(file);
-      if (result.ok) {
-        setPdfHash(result.hash);
-      }
+    if (!file) return;
+
+    const result = await fileHash(file);
+    if (!result.ok) return;
+    await setPdfHash(result.hash);
+    const lookupStatus = await new PDFjobLookupBuilder().send({
+      body: {
+        adapterKey: "up",
+        fingerprintAlgorithm: "pdf-stream-payload-sha256-v1",
+        pdfStreamHash: result.hash,
+        universityId: UserDetails.getUniDetails()?.UniversityID || "",
+      },
+    });
+
+    if (lookupStatus.status === "completed" && lookupStatus.moduleGroupingId) {
+      setModuleGroupID(lookupStatus.moduleGroupingId);
+      onComplete();
     }
   }
 
   async function pollEvents() {
+    SetCurrentlyPolling(true);
     if (!selectedFile) throw new Error("No selected file");
 
-    if (
-      pdfLookupResult?.status === "completed" &&
-      pdfLookupResult.moduleGroupingId
-    ) {
-      setModuleGroupID(pdfLookupResult.moduleGroupingId);
-      onComplete();
-    } else {
-      const interval = setInterval(async () => {
-        await setJobID(result.jobId);
-        if (
-          pdfJobResult?.status === "completed" &&
-          pdfJobResult.moduleGroupingId
-        ) {
-          clearInterval(interval);
-          setModuleGroupID(pdfJobResult.moduleGroupingId);
-          onComplete();
-        }
-      }, 500);
-      const result = await UploadPDFmut.mutateAsync({
-        file: await selectedFile,
-        universityId: UserDetails.getUniDetails()?.UniversityID || "",
-        adapterKey: "up",
-      });
-      await setJobID(result.jobId);
-    }
+    const result = await UploadPDFmut.mutateAsync({
+      file: await selectedFile,
+      universityId: UserDetails.getUniDetails()?.UniversityID || "",
+      adapterKey: "up",
+    });
+    console.log(result.jobId, "PDF uploaded");
+    await setJobID(result.jobId);
   }
 
   return (
@@ -126,15 +124,14 @@ export default function SolverUpload({
           <div className="items-center text-center flex flex-col justify-center">
             {selectedFile && (
               <>
-                {pdfJobResult?.status === "completed" ||
-                pdfLookupResult?.status === "completed" ? (
+                {pdfJobResult?.status === "completed" ? (
                   <>
-                    {pdfJobResult?.status || pdfLookupResult?.status}
+                    {pdfJobResult?.status}
                     <CheckSquare />
                   </>
                 ) : (
                   <>
-                    {pdfJobResult?.status || pdfLookupResult?.status}
+                    {pdfJobResult?.status}
                     <Spinner />
                   </>
                 )}
@@ -156,6 +153,7 @@ export default function SolverUpload({
             className="hidden"
             accept=".pdf"
             onChange={(inputFile) => {
+              setModuleGroupID(null);
               const file = inputFile.target.files?.[0] || null;
               setSelectedFile(file);
               if (file) uploadFile(file);
@@ -164,20 +162,24 @@ export default function SolverUpload({
         </div>
 
         <Button
+          disabled={currentlyPolling}
           type="button"
           className="w-fit"
           onClick={() => {
-            if (pdfLookupResult?.status != "completed") pollEvents();
-            else {
-              if (pdfLookupResult.moduleGroupingId) {
-                setModuleGroupID(pdfLookupResult?.moduleGroupingId);
-                onComplete();
-              }
-            }
+            if (pdfJobResult?.status != "completed") pollEvents();
           }}
         >
-          {pdfLookupResult?.status === "completed" && <>continue</>}
-          {pdfLookupResult?.status !== "completed" && <>upload</>}
+          {pdfJobResult?.status === "completed" && !currentlyPolling && (
+            <>continue</>
+          )}
+          {pdfJobResult?.status !== "completed" && !currentlyPolling && (
+            <>upload</>
+          )}
+          {(currentlyPolling || pdfJobResult?.status === "queued") && (
+            <>
+              waiting for updates <br /> <Spinner />
+            </>
+          )}
         </Button>
       </CardContent>
     </Card>

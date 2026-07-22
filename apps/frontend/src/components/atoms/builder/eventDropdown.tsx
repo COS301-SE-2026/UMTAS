@@ -54,6 +54,7 @@ export function EventTypeDropdown({
   onChange,
   disabled,
 }: EventTypeDropdownProps) {
+  console.log(value);
   return (
     <Select
       value={value}

@@ -6,7 +6,6 @@ export function getAllEventsAdminQ(moduleID: string) {
     queryKey: ["events", moduleID] as const,
     queryFn: async () => {
       const result = await getAllEventsAdmin(moduleID);
-      console.log(result);
       return result;
     },
   });
