@@ -590,7 +590,7 @@ export class ModuleService {
     userId: string,
     styling: string,
     tx?: DatabaseService['db'],
-  ) {
+  ): Promise<typeof ModuleStyling.$inferSelect> {
     if (!tx) {
       return this.dbService.db.transaction(async (t: AppDatabase) => {
         return this.setStyling(moduleId, userId, styling, t);
