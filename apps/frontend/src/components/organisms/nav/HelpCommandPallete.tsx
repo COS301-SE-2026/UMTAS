@@ -132,6 +132,7 @@ export function HelpCommandPalette() {
   return (
     <>
       <Button
+        id="help-command-palette-btn"
         variant="default"
         size="icon"
         onClick={() => setIsOpen((prev) => !prev)}
