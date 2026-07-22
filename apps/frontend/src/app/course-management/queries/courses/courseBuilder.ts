@@ -22,7 +22,7 @@ export class createCoursesBuilder extends RequestBuilder<
     this.setUrl("/Courses").setMethod(RequestMethod.POST);
   }
 }
-export type fetchAllCourses = paths["/Courses/All"]["post"];
+export type fetchAllCourses = paths["/Courses/getAll"]["post"];
 export type fetchAllCoursesBody =
   fetchAllCourses["requestBody"]["content"]["application/json"];
 export type fetchAllCoursesRes =
@@ -35,7 +35,7 @@ export class getAllCoursesBuilder extends RequestBuilder<
 > {
   constructor() {
     super();
-    this.setUrl("/Courses/All").setMethod(RequestMethod.POST);
+    this.setUrl("/Courses/getAll").setMethod(RequestMethod.POST);
   }
 }
 

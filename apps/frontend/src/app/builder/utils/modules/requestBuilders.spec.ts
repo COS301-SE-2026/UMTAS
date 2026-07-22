@@ -118,7 +118,10 @@ describe("updateModulesBuilder", () => {
   it("should hit the /modules/{moduleId} endpoint with PATCH", async () => {
     const builder = new updateModulesBuilder();
     const mockPath: updateModuleByIdPath = { moduleId: "str" };
-    const mockBody: updateModuleByIdBody = { moduleName: "Updated Module" };
+    const mockBody: updateModuleByIdBody = {
+      moduleName: "Updated Module",
+      Core: {},
+    };
     await builder.send({
       paths: mockPath,
       body: mockBody,
