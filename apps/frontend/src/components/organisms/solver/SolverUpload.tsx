@@ -124,16 +124,20 @@ export default function SolverUpload({
           </p>
 
           <div className="items-center text-center flex flex-col justify-center">
-            {pdfJobResult?.status === "queued" && (
+            {selectedFile && (
               <>
-                {pdfJobResult?.status}
-                <Spinner />
-              </>
-            )}
-            {pdfJobResult?.status === "completed" && (
-              <>
-                {pdfJobResult?.status}
-                <CheckSquare />
+                {pdfJobResult?.status === "completed" ||
+                pdfLookupResult?.status === "completed" ? (
+                  <>
+                    {pdfJobResult?.status || pdfLookupResult?.status}
+                    <CheckSquare />
+                  </>
+                ) : (
+                  <>
+                    {pdfJobResult?.status || pdfLookupResult?.status}
+                    <Spinner />
+                  </>
+                )}
               </>
             )}
           </div>
@@ -160,7 +164,6 @@ export default function SolverUpload({
         </div>
 
         <Button
-          disabled={pdfLookupResult?.status === "completed"}
           type="button"
           className="w-fit"
           onClick={() => {
@@ -173,7 +176,8 @@ export default function SolverUpload({
             }
           }}
         >
-          Upload
+          {pdfLookupResult?.status === "completed" && <>continue</>}
+          {pdfLookupResult?.status !== "completed" && <>upload</>}
         </Button>
       </CardContent>
     </Card>
