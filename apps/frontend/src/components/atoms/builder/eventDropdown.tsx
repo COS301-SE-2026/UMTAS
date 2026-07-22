@@ -9,10 +9,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/atoms/baseShadcn/select";
-import { ActivityTypesEvents } from "@/app/builder/utils/events/eventRequestBuilder";
 
 // add more types post demo 1
-export type EventType = ActivityTypesEvents;
+export type EventType = "university";
 
 export interface EventOption {
   value: EventType;
@@ -22,23 +21,8 @@ export interface EventOption {
 
 const Event_Types: EventOption[] = [
   {
-    value: "lecture",
-    label: "lecture",
-    icon: <BookOpen size={15} />,
-  },
-  {
-    value: "tutorial",
-    label: "tut",
-    icon: <BookOpen size={15} />,
-  },
-  {
-    value: "prac",
-    label: "prac",
-    icon: <BookOpen size={15} />,
-  },
-  {
-    value: "test",
-    label: "test",
+    value: "university",
+    label: "university",
     icon: <BookOpen size={15} />,
   },
 ];
@@ -73,7 +57,7 @@ export function EventTypeDropdown({
         {Event_Types.map((type) => (
           <SelectItem
             key={type.value}
-            value={type.value || ""}
+            value={type.value}
             className="text-[var(--text-primary)] focus:bg-[var(--bg-elevated)] cursor-pointer"
           >
             <div className="flex items-center gap-2">

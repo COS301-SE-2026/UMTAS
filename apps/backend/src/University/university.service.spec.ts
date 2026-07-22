@@ -418,17 +418,16 @@ describe('UniversityService', () => {
       expect(result).toEqual(mockUni);
     });
   });
-  /*
-  describe('Test_checkDuplicateUniversityName', () => {
-    it('should return true if university name already exists', async () => {
-      const uniName = 'Existing University';
-      mockDbResult(mockDb.select, [{ UniversityID: uniId }]);
 
-      const result = await service.checkDuplicateUniversityName(uniName);
+  // describe('Test_checkDuplicateUniversityName', () => {
+  //   it('should return true if university name already exists', async () => {
+  //     const uniName = 'Existing University';
+  //     mockDbResult(mockDb.select, [{ UniversityID: uniId }]);
 
-      expect(mockDb.select).toHaveBeenCalled();
-      expect(result).toBe(true);
-    });
-  });
-  */
+  //     const result = await service.checkDuplicateUniversityName(uniName);
+
+  //     expect(mockDb.select).toHaveBeenCalled();
+  //     expect(result).toBe(true);
+  //   });
+  // });
 });

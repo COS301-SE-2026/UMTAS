@@ -70,11 +70,11 @@ export function updateModuleMut() {
           moduleId: vars.moduleID,
         },
         body: {
-          Core: {},
           moduleCode: vars.module.moduleCode,
           moduleDescription: vars.module.moduleDescription,
           moduleName: vars.module.moduleName,
           styling: vars.module.styling,
+          Core: {},
         },
       });
     },

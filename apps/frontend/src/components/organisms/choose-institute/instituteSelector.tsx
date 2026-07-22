@@ -10,9 +10,9 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   applyMutator,
   getAllUni,
-  selectUniMutator,
 } from "@/app/choose-institute/queries/UserRoleQueries";
 import { UserDetails } from "@/lib/userclass/userClass";
+import { useRouter } from "next/navigation";
 
 export function InstituteSelector() {
   const [selectedInstitute, setSelectedInstitute] = useState<uniDto>();
@@ -20,23 +20,10 @@ export function InstituteSelector() {
   const [selectedRole, setSelectedRole] = useState("");
   const { data: uniList, isLoading: uniLoading } = useQuery(getAllUni());
   const applyMut = useMutation(applyMutator());
-  const selectUniMut = useMutation(selectUniMutator());
 
   function updateSelectedUni(id: string) {
     const nUni = uniList?.universities.find((uni) => uni.UniversityID === id);
     setSelectedInstitute(nUni);
-
-    if (id) {
-      selectUniMut.mutate(
-        { uniId: id },
-        {
-          onSuccess: (response) =>
-            console.log("University selected for user", response),
-          onError: (error) =>
-            console.error("Could not select university for user", error),
-        },
-      );
-    }
   }
 
   function handleConfirm() {
@@ -45,7 +32,7 @@ export function InstituteSelector() {
   const applyDisabled = !selectedInstitute || !selectedRole;
   const uniDisabeled =
     selectedInstitute == null && selectedInstitute == undefined;
-
+  const router = useRouter();
   return (
     <form
       className="flex flex-col gap-6"
@@ -81,7 +68,11 @@ export function InstituteSelector() {
       )*/}
       {selectedInstitute && <ApprovalStatus uni={selectedInstitute} />}
       <div className="mt-2 flex justify-around gap-3 border-t pt-4">
-        <Button type="submit" disabled={uniDisabeled}>
+        <Button
+          type="submit"
+          disabled={uniDisabeled}
+          onClick={() => router.push("/schedules")}
+        >
           continue as {selectedInstitute?.role ?? "student"}
         </Button>
 

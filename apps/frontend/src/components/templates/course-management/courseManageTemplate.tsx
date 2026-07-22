@@ -1,16 +1,16 @@
 "use client";
 import { getAllCoursesQ } from "@/app/course-management/queries/courses/courseQueries";
 import { Spinner } from "@/components/atoms/baseShadcn/spinner";
-import { courseCols } from "@/components/organisms/course-management/courseColumns";
-import { CourseTable } from "@/components/organisms/course-management/courseTable";
 import { UserDetails } from "@/lib/userclass/userClass";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { CourseTableData } from "@/components/organisms/course-management/courseColumns";
 import { getAllModCoursesQ } from "@/app/course-management/queries/modules/moduleQueries";
 import { useState, useEffect, useMemo, Fragment } from "react";
-import { getAllModulesQueries } from "@/app/course-management/queries/modules/moduleBuilder";
-import { Card, CardDescription } from "@/components/atoms/baseShadcn/card";
+import {
+  getAllModulesQueries,
+  moduleDTO,
+} from "@/app/course-management/queries/modules/moduleBuilder";
 import { Input } from "@/components/atoms/baseShadcn/input";
 import { Button } from "@/components/atoms/baseShadcn/button";
 
@@ -30,6 +30,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/atoms/baseShadcn/table";
+import { CourseDTO } from "@/app/course-management/queries/courses/courseBuilder";
 
 export default function CourseManagementTemplate() {
   const router = useRouter();
@@ -69,7 +70,7 @@ export default function CourseManagementTemplate() {
   const availableDegrees = useMemo(() => {
     const degrees = new Set<string>();
 
-    courseData.forEach((course) => {
+    courseData.forEach((course: CourseDTO) => {
       if (course.Degree) {
         degrees.add(course.Degree);
       }
@@ -82,7 +83,7 @@ export default function CourseManagementTemplate() {
     const prefixes = new Set<string>();
     moduleData?.forEach((module) => {
       const parentCourse = courseData.find(
-        (course) => course.GroupID === module.ModuleGroupingID,
+        (course: CourseDTO) => course.GroupID === module.ModuleGroupingID,
       );
 
       const matchesDegree =
@@ -106,7 +107,7 @@ export default function CourseManagementTemplate() {
       : selectedModulePrefix;
 
   const filteredCourses: CourseTableData[] = useMemo(() => {
-    const unfilteredCourses = courseData.map((course) => ({
+    const unfilteredCourses = courseData.map((course: CourseDTO) => ({
       course,
       modules:
         moduleData?.filter(
@@ -114,30 +115,32 @@ export default function CourseManagementTemplate() {
         ) ?? [],
     }));
 
-    return unfilteredCourses.filter(({ course, modules }) => {
-      const matchesDegree =
-        selectedDegree === "All" || course.Degree === selectedDegree;
+    return unfilteredCourses.filter(
+      ({ course, modules }: { course: CourseDTO; modules: moduleDTO[] }) => {
+        const matchesDegree =
+          selectedDegree === "All" || course.Degree === selectedDegree;
 
-      const matchesModulePrefix =
-        effectiveModulePrefix === "All" ||
-        modules.some((module) =>
-          module.moduleCode?.toUpperCase().startsWith(effectiveModulePrefix),
-        );
+        const matchesModulePrefix =
+          effectiveModulePrefix === "All" ||
+          modules.some((module: moduleDTO) =>
+            module.moduleCode?.toUpperCase().startsWith(effectiveModulePrefix),
+          );
 
-      const searchLowercase = searchQuery.toLowerCase();
+        const searchLowercase = searchQuery.toLowerCase();
 
-      const matchesSearch =
-        searchQuery === "" ||
-        course.CourseName?.toLowerCase().includes(searchLowercase) ||
-        course.Degree?.toLowerCase().includes(searchLowercase) ||
-        modules.some(
-          (module) =>
-            module.moduleCode?.toLowerCase().includes(searchLowercase) ||
-            module.moduleName?.toLowerCase().includes(searchLowercase),
-        );
+        const matchesSearch =
+          searchQuery === "" ||
+          course.CourseName?.toLowerCase().includes(searchLowercase) ||
+          course.Degree?.toLowerCase().includes(searchLowercase) ||
+          modules.some(
+            (module: moduleDTO) =>
+              module.moduleCode?.toLowerCase().includes(searchLowercase) ||
+              module.moduleName?.toLowerCase().includes(searchLowercase),
+          );
 
-      return matchesDegree && matchesModulePrefix && matchesSearch;
-    });
+        return matchesDegree && matchesModulePrefix && matchesSearch;
+      },
+    );
   }, [
     courseData,
     moduleData,

@@ -122,7 +122,7 @@ export function CustomiseEventCard({
   }
 
   function renderModuleSection() {
-    if (event.activityType !== undefined) {
+    if (event.eventCriteria?.eventSource !== "university") {
       return null;
     }
 
@@ -199,19 +199,17 @@ export function CustomiseEventCard({
             >
               Venue
             </Label>
-            <Input
+            {/* <Input
               readOnly={!canEdit}
               id={"event-venue-" + event.eventId}
-              value={event?.venues?.[0]?.venueName}
-              onChange={(e) =>
-                onUpdate(event.eventId, "venues", e.target.value)
-              }
+              value={event.eventCriteria?.venue || ""}
+              onChange={(e) => onUpdate(event.eventId, "venue", e.target.value)}
               placeholder="e.g. IT 2-26"
               className={getInputClass(!!errors?.venue)}
             />
             {errors?.venue && (
               <p className="text-sm text-[var(--error-text)]">{errors.venue}</p>
-            )}
+            )} */}
           </div>
         </div>
       </div>
@@ -264,8 +262,10 @@ export function CustomiseEventCard({
             </Label>
             <EventTypeDropdown
               disabled={canEdit}
-              value={event.activityType || "lecture"}
-              onChange={(v) => onUpdate(event.eventId, "activityType", v || "")}
+              value={
+                (event.eventCriteria?.eventSource as EventType) || "lecture"
+              }
+              onChange={(v) => onUpdate(event.eventId, "eventSource", v)}
             />
           </div>
 

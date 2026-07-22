@@ -1,7 +1,6 @@
 /**
  * @jest-environment node
  */
-/*
 import {
   getAllModulesBuilder,
   createModulesBuilder,
@@ -101,6 +100,7 @@ describe("Request Builders Integration Tests", () => {
       const updateBody: updateModuleByIdBody = {
         moduleName: "Updated Lifecycle Name",
         styling: { colour: "00FF" },
+        Core: {},
       };
 
       const updateResult = await updateBuilder.send({
@@ -123,4 +123,3 @@ describe("Request Builders Integration Tests", () => {
     });
   });
 });
-*/

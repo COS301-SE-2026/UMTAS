@@ -1,27 +1,29 @@
 import { mutationOptions, queryOptions } from "@tanstack/react-query";
 import {
+  addModuleToCourseBody,
+  addModuleToCourseBuilder,
+  addModuleToCoursePath,
   createCoursesBody,
   createCoursesBuilder,
   deleteCourseBuilder,
   deleteCoursePath,
-  fetchAllCoursePath,
-  fetchAllCoursesQueries,
-  fetchAllCoursesRequest,
+  fetchAllCoursesBody,
+  getAllCoursesBuilder,
   updateCourseBody,
   updateCourseBuilder,
   updateCoursePath,
 } from "./courseBuilder";
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
+import { getAllModCoursesQ } from "../modules/moduleQueries";
 
-export function getAllCoursesQ(
-  path?: fetchAllCoursePath,
-  queries?: fetchAllCoursesQueries,
-) {
+export function getAllCoursesQ(body?: fetchAllCoursesBody) {
   return queryOptions({
-    queryKey: ["courses"],
+    queryKey: ["courses", body],
     queryFn: async () => {
-      const result = await fetchAllCoursesRequest(path, queries);
-      return result;
+      const builder = new getAllCoursesBuilder();
+      const result = await builder.send({ body: body || {} });
+
+      return result.courses;
     },
   });
 }
@@ -68,6 +70,29 @@ export function deleteCourseQ(path: deleteCoursePath) {
     onSuccess: () => {
       getQueryClient().invalidateQueries({
         queryKey: getAllCoursesQ().queryKey,
+      });
+    },
+    onError: (err) => console.error("mutation failed", err),
+  });
+}
+
+export function addModuleToCourseQ() {
+  return mutationOptions({
+    mutationFn: async (vars: {
+      path: addModuleToCoursePath;
+      body: addModuleToCourseBody;
+    }) => {
+      return new addModuleToCourseBuilder().send({
+        paths: vars.path,
+        body: vars.body,
+      });
+    },
+    onSuccess: () => {
+      getQueryClient().invalidateQueries({
+        queryKey: getAllCoursesQ().queryKey,
+      });
+      getQueryClient().invalidateQueries({
+        queryKey: getAllModCoursesQ().queryKey,
       });
     },
     onError: (err) => console.error("mutation failed", err),

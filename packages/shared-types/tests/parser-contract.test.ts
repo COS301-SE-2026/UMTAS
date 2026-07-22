@@ -2,7 +2,7 @@ import test from "node:test";
 import {
   ParsedEventCandidateSchema,
   PdfParserCallbackPayloadSchema,
-} from "../index.js";
+} from "../src/index.js";
 
 const baseEvent = {
   moduleCode: "COS101",
@@ -122,5 +122,41 @@ test("parser callback status makes result and error mutually exclusive", (t) => 
       result,
     }).success,
     false,
+  );
+});
+
+test("parsed events require startTime before endTime", (t) => {
+  for (const [startTime, endTime] of [
+    ["09:20", "08:30"],
+    ["08:30", "08:30"],
+  ]) {
+    const result = ParsedEventCandidateSchema.safeParse({
+      ...baseEvent,
+      day: "Monday",
+      date: null,
+      isRecurring: true,
+      startTime,
+      endTime,
+    });
+
+    t.assert.equal(result.success, false);
+  }
+});
+
+test("parser callback accepts completed and failed variants", (t) => {
+  t.assert.equal(
+    PdfParserCallbackPayloadSchema.safeParse({
+      status: "completed",
+      result: { modules: [], events: [], warnings: [] },
+    }).success,
+    true,
+  );
+
+  t.assert.equal(
+    PdfParserCallbackPayloadSchema.safeParse({
+      status: "failed",
+      error: { code: "PARSE_FAILED", message: "bad pdf" },
+    }).success,
+    true,
   );
 });
