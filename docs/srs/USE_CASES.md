@@ -7,12 +7,12 @@
     | **UC-AU-03** | Reset Password | [Authentication](#auth-use-cases)  | User |<span class="status-implemented">Implemented</span>|
     | **UC-AU-04** | Logout Account | [Authentication](#auth-use-cases)  | User |<span class="status-implemented">Implemented</span>|
     | **UC-AU-05** | Delete Account | [Authentication](#auth-use-cases)  | User |<span class="status-not-implemented">In Progress</span>|
-    | **UC-LP-01** | Visit Landing Page | [Landing Page](#landing-page-use-cases) | Visitor | |
-    | **UC-LP-02** | View Adapter Capabilities | [Landing Page](#landing-page-use-cases) | Visitor | |
-    | **UC-LP-03** | View Role Capabilities | [Landing Page](#landing-page-use-cases) | Visitor | |
-    | **UC-TC-01** | Create Modules | Timetable Builder | Student, Lecturer, Admin | |
-    | **UC-TC-02** | Create Events | Timetable Builder | Student | |
-    | **UC-TC-03** | Create Timetable | Timetable Builder | Student | |
+    | **UC-LP-01** | Visit Landing Page | [Landing Page](#landing-page-use-cases) | Visitor |<span class="status-implemented">Implemented</span>|
+    | **UC-LP-02** | View Adapter Capabilities | [Landing Page](#landing-page-use-cases) | Visitor |<span class="status-not-implemented">In Progress</span>|
+    | **UC-LP-03** | View Role Capabilities | [Landing Page](#landing-page-use-cases) | Visitor |<span class="status-not-implemented">In Progress</span>|
+    | **UC-TC-01** | Create Modules | [Timetable Creation](#timetable-creation) | User |<span class="status-implemented">Implemented</span>|
+    | **UC-TC-02** | Create Events | [Timetable Creation](#timetable-creation) | User |<span class="status-implemented">Implemented</span>|
+    | **UC-TC-03** | Create Timetable | [Timetable Creation](#timetable-creation) | User |<span class="status-implemented">Implemented</span>|
     | **UC-TM-01** | View Timetable | Timetable Management | User | |
     | **UC-TM-02** | Edit Timetable | Timetable Management | User | |
     | **UC-TM-03** | Delete Timetable | Timetable Management | User | |
@@ -39,7 +39,7 @@
 
     ## **Use Case Table**
     | **ID** | **Use case** | **Actor** |
-    |:---:|:---:|:---:|
+    |:---:|:---:|:---:|CreationCreationCreatcdafgcg
     | **UC-AU-01** | [Register Account](#uc-au-01) | User |
     | **UC-AU-02** | [Login](#uc-au-02) | User |
     | **UC-AU-03** | [Reset Password](#uc-au-03) | User |
@@ -231,18 +231,29 @@
 
 ---
 
-??? "Timetable Creation Use Cases"
-    ### Use Case Table
+??? "**Timetable Creation Use Cases**"
+    <a id="timetable-creation"></a>
+
+    <div align="center">
+
+    ### **Use Case Table**
     | **Use Case ID** | **Use Case Name** | **Actor** |
     | :---: | :---: | :---: |
-    | **UC-TC-01** | Create Modules | Student |
-    | **UC-TC-02** | Create Events | Student |
-    | **UC-TC-03** | Create Timetable | Student |
+    | **UC-TC-01** | [Create Modules](#uc-tc-01) | User |
+    | **UC-TC-02** | [Create Events](#uc-tc-02) | User |
+    | **UC-TC-03** | [Create Timetable](#uc-tc-03) | User |
 
+    </div>
+
+    ??? tip "**Use Case Diagram**"
+        ![Timetable Creation System](../diagrams/requirements/Requirements.svg)
+
+    ---
     ??? "UC-TC-01: Create Modules"
+        <a id="uc-tc-01></a>
         ##### High Level
         ```
-        Create Modules (Actor: Student or Lecturer/Admin, System: Timetable Builder or Internal Module Management)  
+        Create Modules (Actor: User, System: Timetable Builder or Internal Module Management)  
         TUCBW the actor selects "Create Module".  
         TUCEW the system creates and stores the module, linked either to the student’s personalized course or the institution’s official course catalog.
 
@@ -250,17 +261,18 @@
         ##### Expanded
         | Field | Detail |
         | :--- | :--- |
-        | **Actor** | Student, Lecturer, University Admin |
-        | **Precondition** | Actor is authenticated: for students, a personalized timetable is open; for lecturers/admin, access to internal module management is granted |
-        | **Trigger** | Actor selects “Create Module” |
+        | **Actor** | User |
+        | **Precondition** | User is authenticated: for students, a personalized timetable is open; for lecturers/admin, access to internal module management is granted |
+        | **Trigger** | User selects “Create Module” |
         | **Basic Flow (Student)** | 1. System opens module creation form.<br>2. Student enters module name and module code.<br>3. System validates uniqueness of module details within the student’s personalized course.<br>4. System confirms module creation.<br>5. Module is linked to the student’s personalized course. |
-        | **Basic Flow (Lecturer/Admin)** | 1. System opens institutional module creation form.<br>2. Actor enters module details (name, code, description, credits, etc.).<br>3. System validates details against institutional rules.<br>4. Actor selects the appropriate course to link the module.<br>5. System confirms module creation.<br>6. Module is linked to the official course catalog.|
+        | **Basic Flow (Lecturer/Admin)** | 1. System opens institutional module creation form.<br>2. User enters module details (name, code, description, credits, etc.).<br>3. System validates details against institutional rules.<br>4. User selects the appropriate course to link the module.<br>5. System confirms module creation.<br>6. Module is linked to the official course catalog.|
         | **Alternate Flow** | **A1: Duplicate Module Code (Student)**<br>System warns student and prevents duplicate entry.<br><br>**A2: Duplicate Module Code (Lecturer/Admin)**<br>System enforces institutional uniqueness and prevents duplicate entry.<br><br>**A3: Missing Required Fields**<br>System highlights incomplete module data.|
         | **Postcondition** | Module is created and linked either to the student’s personalized course or the institution’s official course catalog. |
         | **Requirements Covered** | R2.2.1.1 |
 
     ---
     ??? "UC-TC-02: Create Events"
+        <a id="uc-tc-02></a>
         ##### High Level
         ```
         Create Events (Actor: User, System: Timetable Builder)  
@@ -280,6 +292,7 @@
 
     ---
     ??? "UC-TC-03: Create Timetable"
+        <a id="uc-tc-03></a>
         ##### High Level
         ```
         Create Timetable (Actor: User, System: Timetable Builder)  
