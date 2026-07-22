@@ -1,7 +1,7 @@
 "use client";
 
 import React, { Suspense, useState, useEffect } from "react";
-import { Joyride } from "react-joyride";
+// import { Joyride } from "react-joyride";
 import { useRouter } from "next/navigation";
 import {
   BookOpen,
@@ -18,6 +18,10 @@ import { PageSkeleton } from "@/components/atoms/nav/PageSkeleton";
 import Link from "next/link";
 import Popup from "@/components/atoms/utility/floatContainer";
 import { ChooseInstituteTemplate } from "@/components/templates/choose-institute/chooseInstituteTemplate";
+// import PageTutorial from "@/components/organisms/nav/Tutorial";
+// import { Step } from "react-joyride";
+
+import Tutorial from "@/components/organisms/nav/Tutorial";
 
 const steps = [
   {
@@ -275,24 +279,11 @@ function DashboardContent() {
 
 export default function DashboardPage() {
   const [showSelect, setShowSelect] = useState(true);
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setMounted(true);
-  }, []);
   return (
     <>
       <Suspense fallback={<PageSkeleton rows={3} />}>
         <DashboardContent />
-
-        {mounted && (
-          <Joyride
-            steps={steps}
-            continuous={true}
-            run={!showSelect}
-            // showSkipButton={true}
-          />
-        )}
+        <Tutorial steps={steps} />
       </Suspense>
       {showSelect && (
         <Popup>

@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import CommandPalette, { getItemIndex, IconName } from "react-cmdk";
+import CommandPalette, { getItemIndex } from "react-cmdk";
 import "react-cmdk/dist/cmdk.css";
-import { HelpPageGroup, HelpPageItem } from "@/types/HelpCommandPallete";
+import { HelpPageGroup } from "@/types/HelpCommandPallete";
 import { MessageCircleQuestionIcon } from "lucide-react";
 import { Button } from "@/components/atoms/baseShadcn/button";
 
@@ -23,21 +23,8 @@ export function HelpCommandPalette() {
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
-  type ExtendedHelpItem = HelpPageItem & { action?: () => void; href?: string };
-  const pages: HelpPageGroup[] = [
-    {
-      heading: "Quick Actions",
-      id: "actions",
-      items: [
-        {
-          id: "run-tutorial",
-          children: "Run Tutorial for this Page",
-          icon: "PlayIcon",
 
-          action: () => window.dispatchEvent(new Event("start-tutorial")),
-        },
-      ] as ExtendedHelpItem[],
-    },
+  const pages: HelpPageGroup[] = [
     {
       heading: "Application Pages",
       id: "app-pages",
@@ -132,6 +119,13 @@ export function HelpCommandPalette() {
           icon: "BookOpenIcon",
           href: "/help",
         },
+        {
+          id: "run-tutorial",
+          children: "Run Tutorial for this Page",
+          icon: "PlayIcon",
+
+          action: () => window.dispatchEvent(new Event("begin-tut")),
+        },
       ],
     },
   ];
@@ -160,20 +154,19 @@ export function HelpCommandPalette() {
           {pages.length ? (
             pages.map((list) => (
               <CommandPalette.List key={list.id} heading={list.heading}>
-                {list.items.map(({ id, ...rest }) => (
+                {list.items.map(({ id, action, href, ...rest }) => (
                   <CommandPalette.ListItem
                     key={id}
-                    index={getItemIndex(pages, id)}
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    index={getItemIndex(pages as any, id)}
                     {...rest}
                     onClick={() => {
-                      if (rest.href) {
-                        router.push(rest.href);
-                        setIsOpen(false);
+                      if (action) {
+                        action();
+                      } else if (href) {
+                        router.push(href);
                       }
-                      if (rest.action) {
-                        rest.action();
-                        setIsOpen(false);
-                      }
+                      setIsOpen(false);
                     }}
                   />
                 ))}
