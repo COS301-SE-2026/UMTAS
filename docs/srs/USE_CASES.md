@@ -1,35 +1,81 @@
 ???+ info "Overview"
 
+    <div align="center">
+
+    ### Authentication
     | **ID** | **Use Case** | **Group** | **Actor** | **Status** |
     |:---:|:---:|:---:|:---:|:---:|
     | **UC-AU-01** | Register Account | [Authentication](#auth-use-cases) | User |<span class="status-implemented">Implemented</span>|
-    | **UC-AU-02** | Login Account | [Authentication](#auth-use-cases)  | User |<span class="status-implemented">Implemented</span>|
-    | **UC-AU-03** | Reset Password | [Authentication](#auth-use-cases)  | User |<span class="status-implemented">Implemented</span>|
-    | **UC-AU-04** | Logout Account | [Authentication](#auth-use-cases)  | User |<span class="status-implemented">Implemented</span>|
-    | **UC-AU-05** | Delete Account | [Authentication](#auth-use-cases)  | User |<span class="status-not-implemented">In Progress</span>|
+    | **UC-AU-02** | Login Account | [Authentication](#auth-use-cases) | User |<span class="status-implemented">Implemented</span>|
+    | **UC-AU-03** | Reset Password | [Authentication](#auth-use-cases) | User |<span class="status-implemented">Implemented</span>|
+    | **UC-AU-04** | Logout Account | [Authentication](#auth-use-cases) | User |<span class="status-implemented">Implemented</span>|
+    | **UC-AU-05** | Delete Account | [Authentication](#auth-use-cases) | User |<span class="status-not-implemented">In Progress</span>|
+
+    ### Landing Page
+    | **ID** | **Use Case** | **Group** | **Actor** | **Status** |
+    |:---:|:---:|:---:|:---:|:---:|
     | **UC-LP-01** | Visit Landing Page | [Landing Page](#landing-page-use-cases) | Visitor |<span class="status-implemented">Implemented</span>|
     | **UC-LP-02** | View Adapter Capabilities | [Landing Page](#landing-page-use-cases) | Visitor |<span class="status-not-implemented">In Progress</span>|
     | **UC-LP-03** | View Role Capabilities | [Landing Page](#landing-page-use-cases) | Visitor |<span class="status-not-implemented">In Progress</span>|
-    | **UC-TC-01** | Create Modules | [Timetable Creation](#timetable-creation) | User |<span class="status-implemented">Implemented</span>|
-    | **UC-TC-02** | Create Events | [Timetable Creation](#timetable-creation) | User |<span class="status-implemented">Implemented</span>|
-    | **UC-TC-03** | Create Timetable | [Timetable Creation](#timetable-creation) | User |<span class="status-implemented">Implemented</span>|
-    | **UC-TM-01** | View Timetable | Timetable Management | User | |
-    | **UC-TM-02** | Edit Timetable | Timetable Management | User | |
-    | **UC-TM-03** | Delete Timetable | Timetable Management | User | |
-    | **UC-PDF-01** | Import Timetable from PDF | PDF Import | User | |
-    | **UC-PDF-02** | Review Imported Timetable Data | PDF Import | User | |
-    | **UC-API-01** | Import Timetable from API | API Import | User | |
-    | **UC-API-02** | Review API Retrieved Data | API Import | User | |
-    | **UC-EX-01** | Export Timetable as ICS File | Calendar Export | Student | |
-    | **UC-EX-02** | Sync Timetable with Google Calendar | Calendar Export | Student | |
-    | **UC-AN-01** | View Attendance Analytics Dashboard | Analytics Dashboard | Admin, Lecturer | |
-    | **UC-AN-02** | Explore Venue and Booking Analytics | Analytics Dashboard | Admin, Lecturer | |
-    | **UC-AR-01** | Indicate Attendance Intent for Event | Attendance Recording | Student | |
-    | **UC-AR-02** | Unrecord Attendance for Event | Attendance Recording | Student | |
-    | **UC-LA-01** | Manage Event Details | Lecturer Adjustment | Lecturer | |
-    | **UC-LA-02** | Assign Lecturers to Events/Modules | Lecturer Adjustment | Lecturer, Admin | |
-    | **UC-AL-01** | Send Event Change Alerts | Alert System | System | |
 
+    ### Timetable Creation
+    | **ID** | **Use Case** | **Group** | **Actor** | **Status** |
+    |:---:|:---:|:---:|:---:|:---:|
+    | **UC-TC-01** | Create Modules | [Timetable Creation](#timetable-creation-id) | User |<span class="status-implemented">Implemented</span>|
+    | **UC-TC-02** | Create Events | [Timetable Creation](#timetable-creation-id) | User |<span class="status-implemented">Implemented</span>|
+    | **UC-TC-03** | Create Timetable | [Timetable Creation](#timetable-creation-id) | User |<span class="status-implemented">Implemented</span>|
+
+    ### Timetable Management
+    | **ID** | **Use Case** | **Group** | **Actor** | **Status** |
+    |:---:|:---:|:---:|:---:|:---:|
+    | **UC-TM-01** | View Timetable | [Timetable Management](#timetable-management-id) | User |<span class="status-implemented">Implemented</span>|
+    | **UC-TM-02** | Edit Timetable | [Timetable Management](#timetable-management-id) | User |<span class="status-implemented">Implemented</span>|
+    | **UC-TM-03** | Delete Timetable | [Timetable Management](#timetable-management-id) | User |<span class="status-implemented">Implemented</span>|
+
+    ### PDF Import
+    | **ID** | **Use Case** | **Group** | **Actor** | **Status** |
+    |:---:|:---:|:---:|:---:|:---:|
+    | **UC-PDF-01** | Import Timetable from PDF | [PDF Import](#pdf-system) | User |<span class="status-implemented">Implemented</span>|
+    | **UC-PDF-02** | Review Imported Timetable Data | [PDF Import](#pdf-system) | User |<span class="status-implemented">Implemented</span>|
+
+    ### API Import
+    | **ID** | **Use Case** | **Group** | **Actor** | **Status** |
+    |:---:|:---:|:---:|:---:|:---:|
+    | **UC-API-01** | Import Timetable from API | [API Import](#api-system) | User |<span class="status-not-implemented">In Progress</span>|
+    | **UC-API-02** | Review API Retrieved Data | [API Import](#api-system) | User |<span class="status-not-implemented">In Progress</span>|
+
+    ### Calendar Export
+    | **ID** | **Use Case** | **Group** | **Actor** | **Status** |
+    |:---:|:---:|:---:|:---:|:---:|
+    | **UC-EX-01** | Export Timetable as ICS File | [Calendar Export](#calendar-exporting-id) | Student |<span class="status-implemented">Implemented</span>|
+    | **UC-EX-02** | Sync Timetable with Google Calendar | [Calendar Export](#calendar-exporting-id) | Student |<span class="status-not-implemented">In Progress</span>|
+
+    ### Analytics Dashboard
+    | **ID** | **Use Case** | **Group** | **Actor** | **Status** |
+    |:---:|:---:|:---:|:---:|:---:|
+    | **UC-AN-01** | View Attendance Analytics Dashboard | [Analytics Dashboard](#analytics-dashboard-id) | Admin, Lecturer |<span class="status-not-implemented">In Progress</span>|
+    | **UC-AN-02** | Explore Venue and Booking Analytics | [Analytics Dashboard](#analytics-dashboard-id) | Admin, Lecturer |<span class="status-not-implemented">In Progress</span>|
+    | **UC-AN-03** | View Lecturer Analytics | [Analytics Dashboard](#analytics-dashboard-id) | Admin, Lecturer |<span class="status-not-implemented">In Progress</span>|
+
+    ### Attendance Recording
+    | **ID** | **Use Case** | **Group** | **Actor** | **Status** |
+    |:---:|:---:|:---:|:---:|:---:|
+    | **UC-AR-01** | Indicate Attendance Intent for Event | [Attendance Recording](#attendance-recording-id) | Student |<span class="status-implemented">Implemented</span>|
+    | **UC-AR-02** | Unrecord Attendance for Event | [Attendance Recording](#attendance-recording-id) | Student |<span class="status-implemented">Implemented</span>|
+
+    ### Lecturer Adjustment
+    | **ID** | **Use Case** | **Group** | **Actor** | **Status** |
+    |:---:|:---:|:---:|:---:|:---:|
+    | **UC-LA-01** | Manage Event Details | [Lecturer Adjustment](#lecturer-adjustment-id) | Lecturer, Admin |<span class="status-implemented">Implemented</span>|
+    | **UC-LA-01** | Manage Module Details | [Lecturer Adjustment](#lecturer-adjustment-id) | Lecturer, Admin |<span class="status-implemented">Implemented</span>|
+    | **UC-LA-02** | Assign Lecturers to Events/Modules | [Lecturer Adjustment](#lecturer-adjustment-id) | Lecturer, Admin |<span class="status-not-implemented">In Progress</span>|
+
+    ### Alert System
+    | **ID** | **Use Case** | **Group** | **Actor** | **Status** |
+    |:---:|:---:|:---:|:---:|:---:|
+    | **UC-AL-01** | Event Change Alerts | [Alert System](#alert-system-id) | User |<span class="status-not-implemented">In Progress</span>|
+
+    </div>
 ---
 
 ??? "**Authentication Use Cases**"
@@ -39,7 +85,7 @@
 
     ## **Use Case Table**
     | **ID** | **Use case** | **Actor** |
-    |:---:|:---:|:---:|CreationCreationCreatcdafgcg
+    |:---:|:---:|:---:|
     | **UC-AU-01** | [Register Account](#uc-au-01) | User |
     | **UC-AU-02** | [Login](#uc-au-02) | User |
     | **UC-AU-03** | [Reset Password](#uc-au-03) | User |
@@ -49,7 +95,7 @@
     </div>
 
     ??? tip "**Use Case Diagram**"
-        ![Authentication System](../diagrams/requirements/Requirements.svg)
+        ![](../diagrams/requirements/Authentication_System.svg)
 
     ---
     ??? "UC-AU-01: Register Account"
@@ -167,7 +213,7 @@
     </div>
 
     ??? tip "**Use Case Diagram**"
-        ![Landing Page](../diagrams/requirements/Requirements.svg)
+        ![](../diagrams/requirements/Landing_Page.svg)
 
     ---
     ??? "UC-LP-01: Visit Landing Page"
@@ -219,20 +265,20 @@
             TUCEW the visitor understands the functionality extended to Students, Admins, Lecturers, and Tyto simulation admins.
         ```
         ##### Expanded
-                | Field | Detail |
-                | :--- | :--- |
-                | **Actor** | Visitor |
-                | **Precondition** | Visitor is on the landing page |
-                | **Trigger** | Visitor views or scrolls to the roles section |
-                | **Basic Flow** | 1. System displays the four supported roles.<br>2. System explains the functionality extended to each role.<br>3. Visitor reviews the descriptions. |
-                | **Alternate Flow** | **A1: Visitor selects a role for more detail**<br>System expands or links to further information about the selected role. |
-                | **Postcondition** | Visitor understands the functionality available to each role |
-                | **Requirements Covered** | R1.1.2 \| R1.1.2.2 \| R1.1.2.2.1 \| R1.1.2.2.2 \| R1.1.2.2.3 \| R1.1.2.2.4 |
+        | Field | Detail |
+        | :--- | :--- |
+        | **Actor** | Visitor |
+        | **Precondition** | Visitor is on the landing page |
+        | **Trigger** | Visitor views or scrolls to the roles section |
+        | **Basic Flow** | 1. System displays the four supported roles.<br>2. System explains the functionality extended to each role.<br>3. Visitor reviews the descriptions. |
+        | **Alternate Flow** | **A1: Visitor selects a role for more detail**<br>System expands or links to further information about the selected role. |
+        | **Postcondition** | Visitor understands the functionality available to each role |
+        | **Requirements Covered** | R1.1.2 \| R1.1.2.2 \| R1.1.2.2.1 \| R1.1.2.2.2 \| R1.1.2.2.3 \| R1.1.2.2.4 |
 
 ---
 
 ??? "**Timetable Creation Use Cases**"
-    <a id="timetable-creation"></a>
+    <a id="timetable-creation-id"></a>
 
     <div align="center">
 
@@ -246,11 +292,11 @@
     </div>
 
     ??? tip "**Use Case Diagram**"
-        ![Timetable Creation System](../diagrams/requirements/Requirements.svg)
+        ![](../diagrams/requirements/Timetable_Creation.svg)
 
     ---
     ??? "UC-TC-01: Create Modules"
-        <a id="uc-tc-01></a>
+        <a id="uc-tc-01"></a>
         ##### High Level
         ```
         Create Modules (Actor: User, System: Timetable Builder or Internal Module Management)  
@@ -272,7 +318,7 @@
 
     ---
     ??? "UC-TC-02: Create Events"
-        <a id="uc-tc-02></a>
+        <a id="uc-tc-02"></a>
         ##### High Level
         ```
         Create Events (Actor: User, System: Timetable Builder)  
@@ -292,7 +338,7 @@
 
     ---
     ??? "UC-TC-03: Create Timetable"
-        <a id="uc-tc-03></a>
+        <a id="uc-tc-03"></a>
         ##### High Level
         ```
         Create Timetable (Actor: User, System: Timetable Builder)  
@@ -311,15 +357,25 @@
         | **Requirements Covered** | R2.2.1 \| R2.2.1.3 |
 
 ---
-??? "Timetable Management Use Cases"
-    ### Use Case Table
+??? "**Timetable Management Use Cases**"
+    <a id="timetable-management-id"></a>
+    <div align="center">
+
+    ### **Use Case Table**
     | **Use Case ID** | **Use Case Name** | **Actor** |
     | :---: | :---: | :---: |
-    | **UC-TM-01** | View Timetable | User |
-    | **UC-TM-02** | Edit Timetable | User |
-    | **UC-TM-03** | Delete Timetable | User |
+    | **UC-TM-01** | [View Timetable](#uc-tm-01) | User |
+    | **UC-TM-02** | [Edit Timetable](#uc-tm-02) | User |
+    | **UC-TM-03** | [Delete Timetable](#uc-tm-03) | User |
 
+    </div>
+
+    ??? tip "**Use Case Diagram**"
+        ![](../diagrams/requirements/Timetable_Management.svg)
+
+    ---
     ??? "UC-TM-01: View Timetable"
+        <a id="uc-tm-01"></a>
         ##### High Level
         ```
         View Timetable (Actor: User, System: Timetable Management)
@@ -339,6 +395,7 @@
 
     ---
     ??? "UC-TM-02: Edit Timetable"
+        <a id="uc-tm-02"></a>
         ##### High Level
         ```
         Edit Timetable (Actor: User, System: Timetable Management)
@@ -358,6 +415,7 @@
 
     ---
     ??? "UC-TM-03: Delete Timetable"
+        <a id="uc-tm-03"></a>
         ##### High Level
         ```
         Delete Timetable (Actor: User, System: Timetable Management)
@@ -376,14 +434,24 @@
         | **Requirements Covered** | R2.1.3 |
 
 ---
-??? "Timetable Creation (PDF System) Use Cases"
-    ### Use Case Table
+??? "**Timetable Creation (PDF System) Use Cases**"
+    <a id="pdf-system"></a>
+    <div align="center">
+
+    ### **Use Case Table**
     | **Use Case ID** | **Use Case Name** | **Actor** |
     | :---: | :---: | :---: |
-    | **UC-PDF-01** | Import Timetable from PDF | User |
-    | **UC-PDF-02** | Review Imported Timetable Data | User |
+    | **UC-PDF-01** | [Import Timetable from PDF](#uc-pdf-01) | User |
+    | **UC-PDF-02** | [Review Imported Timetable Data](#uc-pdf-02) | User |
 
+    </div>
+
+    ??? tip "**Use Case Diagram**"
+        ![](../diagrams/requirements/PDF_System.svg)
+
+    ---
     ??? "UC-PDF-01: Import Timetable from PDF"
+        <a id="uc-pdf-01"></a>
         ##### High Level
         ```
         Import Timetable from PDF (Actor: User, System: PDF Parser)  
@@ -403,6 +471,7 @@
 
     ---
     ??? "UC-PDF-02: Review Imported Timetable Data"
+        <a id="uc-pdf-02"></a>
         ##### High Level
         ```
         Review Imported Timetable Data (Actor: User, System: Timetable Import)  
@@ -421,14 +490,23 @@
         | **Requirements Covered** | R2.3.1.5 \| R2.3.2 \| R2.3.2.1 \| R2.3.2.2 |
 
 ---
-??? "Timetable Creation (API System) Use Cases"
-    ### Use Case Table
+??? "**Timetable Creation (API System) Use Cases**"
+    <a id="api-system"></a>
+    <div align="center">
+    ### **Use Case Table**
     | **Use Case ID** | **Use Case Name** | **Actor** |
     | :---: | :---: | :---: |
-    | **UC-API-01** | Import Timetable from API | User |
-    | **UC-API-02** | Review API Retrieved Data | User |
+    | **UC-API-01** | [Import Timetable from API](#uc-api-01) | User |
+    | **UC-API-02** | [Review API Retrieved Data](#uc-api-02) | User |
 
+    </div>
+
+    ??? tip "**Use Case Diagram**"
+        ![](../diagrams/requirements/API_System.svg)
+
+    ---
     ??? "UC-API-01: Import Timetable from API"
+        <a id="uc-api-01"></a>
         ##### High Level
         ```
         Import Timetable from API (Actor: User, System: API Integration Layer)  
@@ -448,6 +526,7 @@
 
     ---
     ??? "UC-API-02: Review API Retrieved Data"
+        <a id="uc-api-02"></a>
         ##### High Level
         ```
         Review API Retrieved Data (Actor: User, System: Timetable Builder)  
@@ -466,14 +545,24 @@
         | **Requirements Covered** | R2.4.1.5 | R2.4.1.6
 
 ---
-??? "Calendar Exporting Use Cases"
-    ### Use Case Table
+??? "**Calendar Exporting Use Cases**"
+    <a id="calendar-exporting-id"></a>
+    <div align="center">
+
+    ### **Use Case Table**
     | **Use Case ID** | **Use Case Name** | **Actor** |
     | :---: | :---: | :---: |
-    | **UC-EX-01** | Export Timetable as ICS File | Student |
-    | **UC-EX-02** | Sync Timetable with Google Calendar | Student |
+    | **UC-EX-01** | [Export Timetable as ICS File](#uc-ex-01) | Student |
+    | **UC-EX-02** | [Sync Timetable with Google Calendar](#uc-ex-02) | Student |
 
+    </div>
+
+    ??? tip "**Use Case Diagram**"
+        ![](../diagrams/requirements/Calendar_Exporting.svg)
+
+    ---  
     ??? "UC-EX-01: Export Timetable as ICS File"
+        <a id="uc-ex-01">
         ##### High Level
         ```
         Export Timetable as ICS File (Actor: Student, System: Calendar Exporter)  
@@ -493,6 +582,7 @@
 
     ---
     ??? "UC-EX-02: Sync Timetable with Google Calendar"
+        <a id="uc-ex-02">
         ##### High Level
         ```
         Sync Timetable with Google Calendar (Actor: Student, System: Google Calendar Integration)  
@@ -511,14 +601,25 @@
         | **Requirements Covered** | R2.5.2 \| R2.5.2.1 |
 
 ---
-??? "Analytics Dashboard Use Cases"
-    ### Use Case Table
+??? "**Analytics Dashboard Use Cases**"
+    <a id="analytics-dashboard-id"></a>
+    <div align="center">
+
+    ### **Use Case Table**
     | **Use Case ID** | **Use Case Name** | **Actor** |
     |:---:|:---:|:---:|
-    | **UC-AN-01** | View Attendance Analytics Dashboard | Admin / Lecturer |
-    | **UC-AN-02** | Explore Venue and Booking Analytics | Admin / Lecturer |
+    | **UC-AN-01** | [View Attendance Analytics Dashboard](#uc-an-01) | Admin / Lecturer |
+    | **UC-AN-02** | [Explore Venue and Booking Analytics](#uc-an-02) | Admin / Lecturer |
+    | **UC-AN-03** | [View Lecturer Analytics](#uc-an-03) | Admin / Lecturer |
 
+    </div>
+
+    ??? tip "**Use Case Diagram**"
+        ![](../diagrams/requirements/Analytics_Dashboard.svg)
+
+    ---  
     ??? "UC-AN-01: View Attendance Analytics Dashboard"
+        <a id="uc-an-01"></a>
         ##### High Level
         ```
         View Attendance Analytics Dashboard (Actor: University Admin / Lecturer, System: Analytics Engine)  
@@ -538,6 +639,7 @@
 
     ---
     ??? "UC-AN-02: Explore Venue and Booking Analytics"
+        <a id="uc-an-02"></a>
         ##### High Level
         ```
         Explore Venue and Booking Analytics (Actor: University Admin / Lecturer, System: Analytics Engine)  
@@ -555,15 +657,46 @@
         | **Postcondition** | Venue usage and booking analytics are displayed |
         | **Requirements Covered** | R3.1.1.2 \| R3.1.1.2.1 \| R3.1.1.2.2 \| R3.1.1.2.3 |
 
+    ---
+    ??? "UC-AN-03: View Lecturer Analytics"
+        <a id="uc-an-03"></a>
+        ##### High Level
+        ```
+        View Lecturer Analytics (Actor: University Admin / Lecturer, System: Analytics Engine)  
+            TUCBW the user opens the lecturer analytics view for a selected lecturer or set of lecturers.  
+            TUCEW the system displays aggregated performance and workload insights across the lecturer's modules, including attendance trends attributable to their sessions, teaching load, and comparative statistics over time.
+        ```
+        ##### Expanded
+        | Field | Detail |
+        | :--- | :--- |
+        | **Actor** | Admin / Lecturer |
+        | **Precondition** | User is authenticated; Admin has access to lecturer records, or Lecturer is viewing their own restricted analytics |
+        | **Trigger** | User opens the lecturer analytics view |
+        | **Basic Flow** | 1. User navigates to lecturer analytics section.<br>2. System prompts user to select a lecturer or, for a Lecturer actor, defaults to their own profile.<br>3. System retrieves attendance and session data across the lecturer's modules.<br>4. System aggregates statistics (attendance trends, teaching load, module comparison).<br>5. System displays lecturer analytics dashboard with breakdowns by module and time period.<br>6. Admin can switch between lecturers; Lecturer can filter by own modules only. |
+        | **Alternate Flow** | **A1: No data available**<br>System displays empty state indicating no records exist for the selected lecturer.<br><br>**A2: Lecturer not found or inaccessible**<br>System shows error and returns user to selection screen.<br><br>**A3: Data retrieval failure**<br>System displays error and allows retry.<br><br>**A4: Lecturer attempts to view another lecturer's analytics**<br>System denies access and displays a permissions error. |
+        | **Postcondition** | Lecturer analytics are displayed for the selected lecturer(s) |
+        | **Requirements Covered** | R3.1.1.3 \| R3.1.1.3.1 \| R3.1.1.3.2 \| R3.1.1.3.3 |
+
 ---
-??? "Attendance Recording Use Cases"
-    ### Use Case Table
+??? "**Attendance Recording Use Cases**"
+    <a id="attendance-recording-id"></a>
+    <div align="center">
+
+    ### **Use Case Table**
     | **Use Case ID** | **Use Case Name** | **Actor** |
     |:---:|:---:|:---:|
-    | **UC-AR-01** | Indicate Attendance Intent for Event | Student |
-    | **UC-AR-02** | Unrecord Attendance for Event | Student |
+    | **UC-AR-01** | [Indicate Attendance Intent for Event](#uc-ar-01) | Student |
+    | **UC-AR-02** | [Unrecord Attendance for Event](#uc-ar-02) | Student |
 
+    </div>
+
+
+    ??? tip "**Use Case Diagram**"
+        ![](../diagrams/requirements/Attendance_Recording.svg)
+
+    ---  
     ??? "UC-AR-01: Indicate Attendance Intent for Event"
+        <a id="uc-ar-01"></a>
         ##### High Level
         ```
         Indicate Attendance Intent for Event (Actor: Student, System: Analytics Engine)
@@ -583,6 +716,7 @@
 
     ---
     ??? "UC-AR-02: Unrecord Attendance for Event"
+        <a id="uc-ar-02"></a>
         ##### High Level
         ```
         Unrecord Attendance for Event (Actor: Student, System: Analytics Engine)
@@ -601,14 +735,25 @@
         | **Requirements Covered** | R3.1.1.1.1 |
 
 ---
-??? "Lecturer Adjustment System Use Cases"
-    ### Use Case Table
+??? "**Lecturer Adjustment System Use Cases**"
+    <a id="lecturer-adjustment-id"></a>
+    <div align="center">
+
+    ### **Use Case Table**
     | **Use Case ID** | **Use Case Name** | **Actor** |
     | :---: | :---: | :---: |
-    | **UC-LA-01** | Manage Event Details | Lecturer |
-    | **UC-LA-02** | Assign Lecturers to Events/Modules | Lecturer/Admin |
+    | **UC-LA-01** | [Manage Event Details](#uc-la-01) | Lecturer/Admin |
+    | **UC-LA-02** | [Manage Module Details](#uc-la-02) | Lecturer/Admin |
+    | **UC-LA-03** | [Assign Lecturers to Events/Modules](#uc-la-03) | Lecturer/Admin |
 
+    </div>
+
+    ??? tip "**Use Case Diagram**"
+        ![](../diagrams/requirements/Lecturer_Adjustment.svg)
+
+    ---
     ??? "UC-LA-01: Manage Event Details"
+        <a id="uc-la-01"></a>
         ##### High Level
         ```
         Manage Event Details (Actor: Lecturer, System: Scheduling System)  
@@ -626,7 +771,27 @@
         | **Postcondition** | Event details are updated or event is cancelled in the system |
 
     ---
-    ??? "UC-LA-02: Assign Lecturers to Events/Modules"
+    ??? "UC-LA-02: Manage Module Details"
+        <a id="uc-la-02"></a>
+        ##### High Level
+        ```
+        Manage Module Details (Actor: Lecturer, System: Scheduling System)  
+            TUCBW the lecturer selects a module to modify.  
+            TUCEW the system allows the lecturer to update module details such as name, description, or credit value, and persists the changes across the institution's official course catalog and affected timetables.
+        ```
+        ##### Expanded
+        | Field | Detail |
+        | :--- | :--- |
+        | **Actor** | Lecturer |
+        | **Precondition** | Lecturer is authenticated and has permission to modify the selected module |
+        | **Trigger** | Lecturer selects a module and chooses “Edit Module Details” |
+        | **Basic Flow** | 1. System retrieves selected module.<br>2. System displays current module details (name, code, description, credits).<br>3. Lecturer updates one or more fields.<br>4. System validates changes against institutional rules and uniqueness constraints.<br>5. System applies updates to the module.<br>6. System propagates updates to affected timetables and linked events.<br>7. System confirms successful update to lecturer. |
+        | **Alternate Flow** | **A1: Duplicate module code detected**<br>System rejects change and prompts lecturer to choose a different code.<br><br>**A2: Missing required fields**<br>System prevents save until required fields are completed.<br><br>**A3: Update failure**<br>System rejects changes and retains original module state. |
+        | **Postcondition** | Module details are updated in the system |
+
+    ---
+    ??? "UC-LA-03: Assign Lecturers to Events/Modules"
+        <a id="uc-la-03"></a>
         ##### High Level
         ```
         Assign Lecturers to Events/Modules (Actor: Lecturer/Admin, System: Academic Scheduling System)  
@@ -645,22 +810,32 @@
 
 ---
 ??? "Alert System Use Cases"
+    <a id="alert-system-id"></a>
+    <div align="center">
+
     ### Use Case Table
     | **Use Case ID** | **Use Case Name** | **Actor** |
     | :---: | :---: | :---: |
-    | **UC-AL-01** | Send Event Change Alerts | System |
+    | **UC-AL-01** | [Event Change Alerts](#uc-al-01) | User |
 
-    ??? "UC-AL-01: Send Event Change Alerts"
+    </div>
+
+    ??? tip "**Use Case Diagram**"
+        ![](../diagrams/requirements/Alert_System.svg)
+
+    ---
+    ??? "UC-AL-01: Event Change Alerts"
+        <a id="uc-al-01"></a>
         ##### High Level
         ```
-        Send Event Change Alerts (Actor: System, Notification Service)  
-        TUCBW an event is updated, including changes to venue, time, or status (such as cancellation).  
+        Event Change Alerts (Actor: User, Notification Service)  
+        TUCBW an event, linked to the user, is updated, including changes to venue, time, or status (such as cancellation).  
         TUCEW the system automatically generates and sends alerts to affected users, notifying them of the specific changes to the event details and ensuring their schedules remain up to date.
         ```
         ##### Expanded
         | Field | Detail |
         | :--- | :--- |
-        | **Actor** | System |
+        | **Actor** | User |
         | **Precondition** | An event exists and a change has been made (venue, time, or status) |
         | **Trigger** | Lecturer or system updates an event’s details |
         | **Basic Flow** | 1. System detects a change to an event (venue, time, or status).<br>2. System identifies all affected users (students and lecturers linked to the event).<br>3. System determines type of change (venue change, time change, cancellation).<br>4. System generates alert message content based on change type.<br>5. System sends notifications via available channels (in-app/email depending on configuration).<br>6. System logs alert delivery status for audit purposes. |
