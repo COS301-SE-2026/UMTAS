@@ -19,6 +19,7 @@ export function getAllModCoursesQ(queries?: getAllModulesQueries) {
     queryKey: ["Modules", "Courses"],
     queryFn: async () => {
       const result = await fetchAllModules(queries);
+      console.log(result);
       return result;
     },
   });

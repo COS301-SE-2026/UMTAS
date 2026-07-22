@@ -28,20 +28,20 @@ export function uploadPDF() {
 
 export function pollPdfResult(params: PDFjobStatusParams) {
   return queryOptions({
-    queryKey: ["PDF"],
+    queryKey: ["PDF", params.jobId],
     queryFn: async () => {
       const builder = new PDFjobStatusBuilder();
       const result = await builder.send({ paths: params });
       return result;
     },
     enabled: params.jobId != "",
-    refetchInterval: 0,
+    refetchInterval: 500,
   });
 }
 
 export function lookupPdfHash(body: PDFjobLookupBody) {
   return queryOptions({
-    queryKey: ["PDF"],
+    queryKey: ["PDF", body.pdfStreamHash],
     queryFn: async () => {
       console.log("Lookup ran");
       const builder = new PDFjobLookupBuilder();

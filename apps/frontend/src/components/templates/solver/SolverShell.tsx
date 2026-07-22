@@ -8,81 +8,37 @@ import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
 import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
 import { useState } from "react";
 import { SolverLock } from "@/components/organisms/solver/SolverLock";
-
-const events: EventResponse[] = [
-  {
-    eventCriteria: {
-      date: "2026/06/07",
-      endTime: "11:00",
-      startTime: "10:00",
-      moduleId: "301",
-      eventSource: "university",
-    },
-    eventId: "1",
-    isRecurring: false,
-    activityCode: "COS301",
-    eventName: "Software Engineering",
-  },
-  {
-    eventCriteria: {
-      date: "2026/06/07",
-      endTime: "11:00",
-      startTime: "10:00",
-      moduleId: "332",
-      eventSource: "university",
-    },
-    eventId: "2",
-    isRecurring: false,
-    activityCode: "COS332",
-    eventName: "Networks",
-  },
-  {
-    eventCriteria: {
-      date: "2026/06/07",
-      endTime: "10:00",
-      startTime: "9:00",
-      moduleId: "333",
-      eventSource: "university",
-    },
-    eventId: "3",
-    isRecurring: false,
-    activityCode: "COS333",
-    eventName: "Programming Languages",
-  },
-];
-
-const modules: ModuleResponseDto[] = [
-  {
-    moduleCode: "301",
-    moduleID: "COS301",
-    moduleName: "Software Engineering",
-    moduleDescription: "",
-    ModuleGroupingID: "",
-    styling: { colour: "blue" },
-  },
-  {
-    moduleCode: "332",
-    moduleID: "COS332",
-    moduleName: "Networks",
-    moduleDescription: "",
-    ModuleGroupingID: "",
-    styling: { colour: "red" },
-  },
-  {
-    moduleCode: "333",
-    moduleID: "COS333",
-    moduleName: "Programming Languages",
-    moduleDescription: "",
-    ModuleGroupingID: "",
-    styling: { colour: "green" },
-  },
-];
+import { useQueries, useQuery } from "@tanstack/react-query";
+import { getAllModCoursesQ } from "@/app/course-management/queries/modules/moduleQueries";
+import { UserDetails } from "@/lib/userclass/userClass";
+import { getAllEventsAdminQ } from "@/app/module-management/queries/queries";
+import { fetchAllModules } from "@/app/course-management/queries/modules/moduleBuilder";
 
 export default function SolverShell() {
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [comingFromStep, setComingFromStep] = useState<number | null>(null);
   const [moduleGroupingID, setModuleGroupingID] = useState<string | null>(null);
+  const { data: modulesData } = useQuery({
+    queryKey: ["PDF", "MODULES"],
+    queryFn: () => {
+      return fetchAllModules({
+        GroupID: moduleGroupingID || "",
+      });
+    },
+    enabled: moduleGroupingID != null,
+  });
+  const displayMods = modulesData?.filter((mod) => {
+    return mod.ModuleGroupingID == moduleGroupingID;
+  });
+  const eventQueries = useQueries({
+    queries: (displayMods ?? []).map((mod) => ({
+      ...getAllEventsAdminQ(mod.moduleID),
+      enabled: !!mod.moduleID,
+    })),
+  });
+
+  const events: EventResponse[] = eventQueries.map((q) => q.data ?? []).flat();
 
   function handleStepCompleted(fromStep: number) {
     setComingFromStep(fromStep);
@@ -94,6 +50,10 @@ export default function SolverShell() {
     // once the group id is not null then this page will run the query to send
     // for modules and events
     // will automatically be done using the get modules query
+    setTimeout(() => {
+      setCurrentStep(fromStep + 1);
+      setComingFromStep(null);
+    }, 676);
   }
   return (
     <>
@@ -121,7 +81,7 @@ export default function SolverShell() {
           <SolverLock locked={currentStep < 1} loading={comingFromStep === 0}>
             <SolverReview
               events={events}
-              modules={modules}
+              modules={displayMods as ModuleResponseDto[]}
               onComplete={() => handleStepCompleted(1)}
             />
           </SolverLock>

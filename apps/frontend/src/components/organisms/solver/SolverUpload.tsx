@@ -39,18 +39,19 @@ export default function SolverUpload({
   const [pdfHash, setPdfHash] = useState<string | null>(null);
   const [jobId, setJobID] = useState<string | null>(null);
 
-  const { data: pdfLookupResult, isLoading: pdfLookupLoading } = useQuery(
-    lookupPdfHash({
+  const { data: pdfLookupResult, isLoading: pdfLookupLoading } = useQuery({
+    ...lookupPdfHash({
       universityId: UserDetails.getUniDetails()?.UniversityID || "",
       adapterKey: "up",
       fingerprintAlgorithm: "pdf-stream-payload-sha256-v1",
       pdfStreamHash: pdfHash || "",
     }),
-  );
+  });
 
-  const { data: pdfJobResult } = useQuery(
-    pollPdfResult({ jobId: jobId || "" }),
-  );
+  const { data: pdfJobResult } = useQuery({
+    ...pollPdfResult({ jobId: jobId || "" }),
+  });
+
   const UploadPDFmut = useMutation(uploadPDF());
   // uploads and starts the timeout function
   async function uploadFile(file: File) {
@@ -66,27 +67,31 @@ export default function SolverUpload({
   async function pollEvents() {
     if (!selectedFile) throw new Error("No selected file");
 
-    const result = await UploadPDFmut.mutateAsync({
-      file: await selectedFile,
-      universityId: UserDetails.getUniDetails()?.UniversityID || "",
-      adapterKey: "up",
-    });
-    const Pollinterval = setInterval(async () => {
-      console.log("Polled", pdfJobResult);
-      await setJobID(result.jobId);
-      getQueryClient().invalidateQueries({
-        queryKey: ["PDF"],
+    if (
+      pdfLookupResult?.status === "completed" &&
+      pdfLookupResult.moduleGroupingId
+    ) {
+      setModuleGroupID(pdfLookupResult.moduleGroupingId);
+      onComplete();
+    } else {
+      const interval = setInterval(async () => {
+        await setJobID(result.jobId);
+        if (
+          pdfJobResult?.status === "completed" &&
+          pdfJobResult.moduleGroupingId
+        ) {
+          clearInterval(interval);
+          setModuleGroupID(pdfJobResult.moduleGroupingId);
+          onComplete();
+        }
+      }, 500);
+      const result = await UploadPDFmut.mutateAsync({
+        file: await selectedFile,
+        universityId: UserDetails.getUniDetails()?.UniversityID || "",
+        adapterKey: "up",
       });
-
-      if (
-        pdfJobResult?.status === "completed" &&
-        pdfJobResult.moduleGroupingId
-      ) {
-        clearInterval(Pollinterval);
-        setModuleGroupID(pdfJobResult.moduleGroupingId);
-        onComplete();
-      }
-    }, 5000);
+      await setJobID(result.jobId);
+    }
   }
 
   return (
@@ -155,6 +160,7 @@ export default function SolverUpload({
         </div>
 
         <Button
+          disabled={pdfLookupResult?.status === "completed"}
           type="button"
           className="w-fit"
           onClick={() => {

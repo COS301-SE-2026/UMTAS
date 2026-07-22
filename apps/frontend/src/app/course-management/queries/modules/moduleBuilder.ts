@@ -12,7 +12,9 @@ export type getAllModulesQueries = getAllModules["parameters"]["query"];
 export type getAllModulesRes =
   getAllModules["responses"]["200"]["content"]["application/json"]["modules"];
 
-export async function fetchAllModules(queries: getAllModulesQueries) {
+export async function fetchAllModules(
+  queries: getAllModulesQueries,
+): Promise<getAllModulesRes> {
   const baseUrl =
     (typeof window === "undefined"
       ? process.env.API_URL
