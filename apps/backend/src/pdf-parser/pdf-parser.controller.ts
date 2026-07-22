@@ -372,7 +372,10 @@ function normalizeOptionalHexHash(
 function validatePdfParserCallback(
   body: PdfParserCallbackDto,
 ): PdfParserCallbackPayload {
-  const result = PdfParserCallbackPayloadSchema.safeParse(body);
+  const candidate = Object.fromEntries(
+    Object.entries(body).filter(([, value]) => value !== undefined),
+  );
+  const result = PdfParserCallbackPayloadSchema.safeParse(candidate);
   if (result.success) {
     return result.data;
   }
