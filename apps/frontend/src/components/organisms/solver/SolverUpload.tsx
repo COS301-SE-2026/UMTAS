@@ -50,6 +50,23 @@ export default function SolverUpload({
       const builder = new PDFjobStatusBuilder();
       const result = await builder.send({ paths: { jobId: jobId || "" } });
       console.log("polled", result);
+
+      if (
+        result?.moduleGroupingId != null &&
+        moduleGroupID != result.moduleGroupingId
+      ) {
+        console.log("stopped polling");
+        SetCurrentlyPolling(false);
+        setModuleGroupID(result.moduleGroupingId);
+        onComplete();
+      } else if (result?.status === "failed" && jobId !== null) {
+        setJobID(null);
+        setSelectedFile(null);
+        SetCurrentlyPolling(false);
+        setPdfHash(null);
+        getQueryClient().clear();
+      }
+
       return result;
     },
     enabled: jobId != "" && jobId != null && moduleGroupID == null,
@@ -129,11 +146,13 @@ export default function SolverUpload({
                     {pdfJobResult?.status}
                     <CheckSquare />
                   </>
-                ) : (
+                ) : currentlyPolling ? (
                   <>
                     {pdfJobResult?.status}
                     <Spinner />
                   </>
+                ) : (
+                  <></>
                 )}
               </>
             )}
@@ -153,16 +172,24 @@ export default function SolverUpload({
             className="hidden"
             accept=".pdf"
             onChange={(inputFile) => {
-              setModuleGroupID(null);
               const file = inputFile.target.files?.[0] || null;
+              setJobID(null);
+              SetCurrentlyPolling(false);
+              setPdfHash(null);
+              setModuleGroupID(null);
               setSelectedFile(file);
-              if (file) uploadFile(file);
+              getQueryClient().clear();
+              if (file) {
+                uploadFile(file);
+              }
             }}
           />
         </div>
 
         <Button
-          disabled={currentlyPolling}
+          disabled={
+            currentlyPolling || moduleGroupID != null || selectedFile == null
+          }
           type="button"
           className="w-fit"
           onClick={() => {
