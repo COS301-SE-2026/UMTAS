@@ -680,7 +680,7 @@
             </root>
         </mxGraphModel>
     </diagram>
-    <diagram name="Lecturer Adjustment System" id="7s15oQtLkGoP8oQRArAF">
+    <diagram name="Lecturer_Adjustment_System" id="7s15oQtLkGoP8oQRArAF">
         <mxGraphModel dx="2013" dy="704" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="FfiMkC5sTj93e3viTO3N-0"/>
@@ -754,7 +754,7 @@
             </root>
         </mxGraphModel>
     </diagram>
-    <diagram name="Alert System" id="5MfLzqKeAadKMhkfWGVY">
+    <diagram name="Alert_System" id="5MfLzqKeAadKMhkfWGVY">
         <mxGraphModel dx="1780" dy="563" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="cDgQPk8wP_5JtuSqOxDg-0"/>
@@ -814,7 +814,7 @@
             </root>
         </mxGraphModel>
     </diagram>
-    <diagram id="tcdTvLBYFSTLEQ0r9z0J" name="Tyto Simulation">
+    <diagram id="tcdTvLBYFSTLEQ0r9z0J" name="Tyto_Simulation">
         <mxGraphModel dx="930" dy="563" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>

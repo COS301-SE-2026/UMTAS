@@ -2,7 +2,7 @@
 
     <div align="center">
 
-    ### Authentication
+    ## Authentication
     | **ID** | **Use Case** | **Group** | **Actor** | **Status** |
     |:---:|:---:|:---:|:---:|:---:|
     | **UC-AU-01** | Register Account | [Authentication](#auth-use-cases) | User |<span class="status-implemented">Implemented</span>|
@@ -11,70 +11,98 @@
     | **UC-AU-04** | Logout Account | [Authentication](#auth-use-cases) | User |<span class="status-implemented">Implemented</span>|
     | **UC-AU-05** | Delete Account | [Authentication](#auth-use-cases) | User |<span class="status-not-implemented">In Progress</span>|
 
-    ### Landing Page
+    ---
+
+    ## Landing Page
     | **ID** | **Use Case** | **Group** | **Actor** | **Status** |
     |:---:|:---:|:---:|:---:|:---:|
     | **UC-LP-01** | Visit Landing Page | [Landing Page](#landing-page-use-cases) | Visitor |<span class="status-implemented">Implemented</span>|
     | **UC-LP-02** | View Adapter Capabilities | [Landing Page](#landing-page-use-cases) | Visitor |<span class="status-not-implemented">In Progress</span>|
     | **UC-LP-03** | View Role Capabilities | [Landing Page](#landing-page-use-cases) | Visitor |<span class="status-not-implemented">In Progress</span>|
 
-    ### Timetable Creation
+    ---
+    
+    ## Timetable Creation
     | **ID** | **Use Case** | **Group** | **Actor** | **Status** |
     |:---:|:---:|:---:|:---:|:---:|
     | **UC-TC-01** | Create Modules | [Timetable Creation](#timetable-creation-id) | User |<span class="status-implemented">Implemented</span>|
     | **UC-TC-02** | Create Events | [Timetable Creation](#timetable-creation-id) | User |<span class="status-implemented">Implemented</span>|
     | **UC-TC-03** | Create Timetable | [Timetable Creation](#timetable-creation-id) | User |<span class="status-implemented">Implemented</span>|
 
-    ### Timetable Management
+    ---
+    
+    ## Timetable Management
     | **ID** | **Use Case** | **Group** | **Actor** | **Status** |
     |:---:|:---:|:---:|:---:|:---:|
     | **UC-TM-01** | View Timetable | [Timetable Management](#timetable-management-id) | User |<span class="status-implemented">Implemented</span>|
     | **UC-TM-02** | Edit Timetable | [Timetable Management](#timetable-management-id) | User |<span class="status-implemented">Implemented</span>|
     | **UC-TM-03** | Delete Timetable | [Timetable Management](#timetable-management-id) | User |<span class="status-implemented">Implemented</span>|
 
-    ### PDF Import
+    ---
+    
+    ## PDF Import
     | **ID** | **Use Case** | **Group** | **Actor** | **Status** |
     |:---:|:---:|:---:|:---:|:---:|
     | **UC-PDF-01** | Import Timetable from PDF | [PDF Import](#pdf-system) | User |<span class="status-implemented">Implemented</span>|
     | **UC-PDF-02** | Review Imported Timetable Data | [PDF Import](#pdf-system) | User |<span class="status-implemented">Implemented</span>|
 
-    ### API Import
+    ---
+    
+    ## API Import
     | **ID** | **Use Case** | **Group** | **Actor** | **Status** |
     |:---:|:---:|:---:|:---:|:---:|
     | **UC-API-01** | Import Timetable from API | [API Import](#api-system) | User |<span class="status-not-implemented">In Progress</span>|
     | **UC-API-02** | Review API Retrieved Data | [API Import](#api-system) | User |<span class="status-not-implemented">In Progress</span>|
 
-    ### Calendar Export
+    ---
+    
+    ## Calendar Export
     | **ID** | **Use Case** | **Group** | **Actor** | **Status** |
     |:---:|:---:|:---:|:---:|:---:|
     | **UC-EX-01** | Export Timetable as ICS File | [Calendar Export](#calendar-exporting-id) | Student |<span class="status-implemented">Implemented</span>|
     | **UC-EX-02** | Sync Timetable with Google Calendar | [Calendar Export](#calendar-exporting-id) | Student |<span class="status-not-implemented">In Progress</span>|
 
-    ### Analytics Dashboard
+    ---
+    
+    ## Analytics Dashboard
     | **ID** | **Use Case** | **Group** | **Actor** | **Status** |
     |:---:|:---:|:---:|:---:|:---:|
     | **UC-AN-01** | View Attendance Analytics Dashboard | [Analytics Dashboard](#analytics-dashboard-id) | Admin, Lecturer |<span class="status-not-implemented">In Progress</span>|
     | **UC-AN-02** | Explore Venue and Booking Analytics | [Analytics Dashboard](#analytics-dashboard-id) | Admin, Lecturer |<span class="status-not-implemented">In Progress</span>|
     | **UC-AN-03** | View Lecturer Analytics | [Analytics Dashboard](#analytics-dashboard-id) | Admin, Lecturer |<span class="status-not-implemented">In Progress</span>|
 
-    ### Attendance Recording
+    ---
+    
+    ## Attendance Recording
     | **ID** | **Use Case** | **Group** | **Actor** | **Status** |
     |:---:|:---:|:---:|:---:|:---:|
     | **UC-AR-01** | Indicate Attendance Intent for Event | [Attendance Recording](#attendance-recording-id) | Student |<span class="status-implemented">Implemented</span>|
     | **UC-AR-02** | Unrecord Attendance for Event | [Attendance Recording](#attendance-recording-id) | Student |<span class="status-implemented">Implemented</span>|
 
-    ### Lecturer Adjustment
+    ---
+    
+    ## Lecturer Adjustment
     | **ID** | **Use Case** | **Group** | **Actor** | **Status** |
     |:---:|:---:|:---:|:---:|:---:|
     | **UC-LA-01** | Manage Event Details | [Lecturer Adjustment](#lecturer-adjustment-id) | Lecturer, Admin |<span class="status-implemented">Implemented</span>|
     | **UC-LA-01** | Manage Module Details | [Lecturer Adjustment](#lecturer-adjustment-id) | Lecturer, Admin |<span class="status-implemented">Implemented</span>|
     | **UC-LA-02** | Assign Lecturers to Events/Modules | [Lecturer Adjustment](#lecturer-adjustment-id) | Lecturer, Admin |<span class="status-not-implemented">In Progress</span>|
 
-    ### Alert System
+    ---
+    
+    ## Alert System
     | **ID** | **Use Case** | **Group** | **Actor** | **Status** |
     |:---:|:---:|:---:|:---:|:---:|
     | **UC-AL-01** | Event Change Alerts | [Alert System](#alert-system-id) | User |<span class="status-not-implemented">In Progress</span>|
 
+    ---
+    
+    ## Tyto Simulation System
+    | **ID** | **Use Case** | **Group** | **Actor** | **Status** |
+    |:---:|:---:|:---:|:---:|:---:|
+    | **UC-TY-01** | Run Simulation Batch | [Tyto Simulation System](#tyto-simulation-id) | Tyto Administrator |<span class="status-not-implemented">In Progress</span>|
+    | **UC-TY-02** | View Simulation Analytics | [Tyto Simulation System](#tyto-simulation-id) | Tyto Administrator |<span class="status-not-implemented">In Progress</span>|
+    | **UC-TY-03** | Display Stress-Test Results | [Tyto Simulation System](#tyto-simulation-id) | Tyto Administrator |<span class="status-not-implemented">In Progress</span>|
     </div>
 ---
 
@@ -843,11 +871,79 @@
         | **Postcondition** | All affected users are notified of event changes or failure is logged |
 
 ---
+??? "**Tyto Simulation System Use Cases**"
+    <a id="tyto-simulation-id"></a>
+    <div align="center">
 
+    ### **Use Case Table**
+    | **Use Case ID** | **Use Case Name** | **Actor** |
+    |:---:|:---:|:---:|
+    | **UC-TY-01** | [Run Simulation Batch](#uc-ty-01) | Tyto Administrator |
+    | **UC-TY-02** | [View Simulation Analytics](#uc-ty-02) | Tyto Administrator |
+    | **UC-TY-03** | [Display Stress-Test Results](#uc-ty-03) | Tyto Administrator |
 
+    </div>
 
+    ??? tip "**Use Case Diagram**"
+        ![](../diagrams/requirements/Tyto_Simulation.svg)
 
+    ---
+    ??? "UC-TY-01: Run Simulation Batch"
+        <a id="uc-ty-01"></a>
+        ##### High Level
+        ```
+        Run Simulation Batch (Actor: Tyto Administrator, System: Simulation Engine)  
+            TUCBW the administrator initiates a simulation job with defined load parameters.  
+            TUCEW the system generates synthetic users, simulates concurrent timetable requests at scale, and records performance metrics for the batch.
+        ```
+        ##### Expanded
+        | Field | Detail |
+        | :--- | :--- |
+        | **Actor** | Tyto Administrator |
+        | **Precondition** | System is configured for simulation; load parameters (e.g. concurrent user count, duration, module distribution) are defined |
+        | **Trigger** | Administrator initiates a simulation batch |
+        | **Basic Flow** | 1. Administrator configures simulation parameters, including target concurrent user count (up to 20,000).<br>2. System generates synthetic users with randomised modules and preferences.<br>3. System ramps up and simulates concurrent timetable generation requests.<br>4. System monitors resource usage (CPU, memory, DB connections) during the run.<br>5. System records performance metrics (latency, throughput, error rate, failures) throughout execution.<br>6. Simulation batch completes and results are persisted. |
+        | **Alternate Flow** | **A1: Resource overload**<br>System throttles or pauses request generation to prevent cascading failure, logging the throttle event.<br><br>**A2: Simulation failure**<br>System halts the batch, logs the error and partial metrics collected, and notifies the administrator.<br><br>**A3: Invalid parameters**<br>System rejects the configuration and prompts the administrator to correct it before starting. |
+        | **Postcondition** | Simulation batch results and performance metrics are stored for analysis |
 
+    ---
+    ??? "UC-TY-02: View Simulation Analytics"
+        <a id="uc-ty-02"></a>
+        ##### High Level
+        ```
+        View Simulation Analytics (Actor: Tyto Administrator, System: Simulation Engine)  
+            TUCBW the administrator opens the simulation dashboard for a completed batch.  
+            TUCEW the system displays aggregated performance metrics, including latency, throughput, and failure rates, with bottlenecks highlighted.
+        ```
+        ##### Expanded
+        | Field | Detail |
+        | :--- | :--- |
+        | **Actor** | Tyto Administrator |
+        | **Precondition** | At least one simulation batch has completed |
+        | **Trigger** | Administrator opens the simulation analytics dashboard |
+        | **Basic Flow** | 1. Administrator navigates to the simulation dashboard.<br>2. System prompts administrator to select a completed simulation batch.<br>3. System loads recorded performance metrics for the selected batch.<br>4. System displays metrics (latency, throughput, error/failure rates) in aggregate and over time.<br>5. System highlights bottlenecks or anomalies detected during the run.<br>6. Administrator can filter or compare across multiple batches. |
+        | **Alternate Flow** | **A1: No simulation data**<br>System displays an empty state indicating no completed batches exist.<br><br>**A2: Batch not found or inaccessible**<br>System shows an error and returns administrator to the selection screen.<br><br>**A3: Data retrieval failure**<br>System displays an error and allows retry. |
+        | **Postcondition** | Simulation performance insights are displayed for the selected batch |
 
+    ---
+    ??? "UC-TY-03: Display Stress-Test Results"
+        <a id="uc-ty-03"></a>
+        ##### High Level
+        ```
+        Display Stress-Test Results (Actor: Tyto Administrator, System: Simulation Engine)  
+            TUCBW the administrator requests results for a stress test run against a target concurrent load (e.g. 20,000 users).  
+            TUCEW the system presents pass/fail thresholds, breaking points, and degradation curves showing how the system behaved as load increased.
+        ```
+        ##### Expanded
+        | Field | Detail |
+        | :--- | :--- |
+        | **Actor** | Tyto Administrator |
+        | **Precondition** | A stress-test simulation batch has completed and target thresholds (e.g. max acceptable latency, error rate) are defined |
+        | **Trigger** | Administrator opens the stress-test results view |
+        | **Basic Flow** | 1. Administrator selects a completed stress-test batch.<br>2. System retrieves recorded metrics against increasing concurrent load, up to the defined target (e.g. 20,000 users).<br>3. System calculates whether defined performance thresholds were met at each load stage.<br>4. System identifies the breaking point (if any) where latency, error rate, or throughput degraded beyond acceptable limits.<br>5. System displays a pass/fail summary alongside degradation curves and the identified breaking point.<br>6. Administrator can drill into a specific load stage for detailed metrics. |
+        | **Alternate Flow** | **A1: No breaking point reached**<br>System reports that the target concurrent load was sustained within thresholds and marks the test as passed.<br><br>**A2: Threshold not defined**<br>System displays raw metrics only and prompts administrator to define thresholds for pass/fail evaluation.<br><br>**A3: Data retrieval failure**<br>System displays an error and allows retry. |
+        | **Postcondition** | Stress-test pass/fail outcome and degradation analysis are available |
+
+---
 
 
