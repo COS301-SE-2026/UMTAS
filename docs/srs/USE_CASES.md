@@ -2,14 +2,14 @@
 
     | **ID** | **Use Case** | **Group** | **Actor** | **Status** |
     |:---:|:---:|:---:|:---:|:---:|
-    | **UC-AU-01** | Register Account | [Authentication](#auth-use-cases) | User | |
-    | **UC-AU-02** | Login Account | [Authentication](#auth-use-cases)  | User | |
-    | **UC-AU-03** | Reset Password | [Authentication](#auth-use-cases)  | User | |
-    | **UC-AU-04** | Logout Account | [Authentication](#auth-use-cases)  | User | |
-    | **UC-AU-05** | Delete Account | [Authentication](#auth-use-cases)  | User | |
-    | **UC-LP-01** | Visit Landing Page | Landing Page | Visitor | |
-    | **UC-LP-02** | View Adapter Capabilities | Landing Page | Visitor | |
-    | **UC-LP-03** | View Role Capabilities | Landing Page | Visitor | |
+    | **UC-AU-01** | Register Account | [Authentication](#auth-use-cases) | User |<span class="status-implemented">Implemented</span>|
+    | **UC-AU-02** | Login Account | [Authentication](#auth-use-cases)  | User |<span class="status-implemented">Implemented</span>|
+    | **UC-AU-03** | Reset Password | [Authentication](#auth-use-cases)  | User |<span class="status-implemented">Implemented</span>|
+    | **UC-AU-04** | Logout Account | [Authentication](#auth-use-cases)  | User |<span class="status-implemented">Implemented</span>|
+    | **UC-AU-05** | Delete Account | [Authentication](#auth-use-cases)  | User |<span class="status-not-implemented">In Progress</span>|
+    | **UC-LP-01** | Visit Landing Page | [Landing Page](#landing-page-use-cases) | Visitor | |
+    | **UC-LP-02** | View Adapter Capabilities | [Landing Page](#landing-page-use-cases) | Visitor | |
+    | **UC-LP-03** | View Role Capabilities | [Landing Page](#landing-page-use-cases) | Visitor | |
     | **UC-TC-01** | Create Modules | Timetable Builder | Student, Lecturer, Admin | |
     | **UC-TC-02** | Create Events | Timetable Builder | Student | |
     | **UC-TC-03** | Create Timetable | Timetable Builder | Student | |
@@ -152,15 +152,26 @@
         | **Requirements Covered** | R1.2.4.3 \| R1.2.3 |
 
 ---
-??? "Landing Page Use Cases"
-    ### Use Case Table
+??? "**Landing Page Use Cases**"
+    <a id="landing-page-use-cases"></a>
+
+    <div align="center">
+
+    ### **Use Case Table**
     | **ID** | **Use case** | **Actor** |
     |:---:|:---:|:---:|
-    | **UC-LP-01** | Visit Landing Page | Visitor |
-    | **UC-LP-02** | View Adapter Capabilities | Visitor |
-    | **UC-LP-03** | View Role Capabilities | Visitor |
+    | **UC-LP-01** | [Visit Landing Page](#uc-lp-01) | Visitor |
+    | **UC-LP-02** | [View Adapter Capabilities](#uc-lp-02) | Visitor |
+    | **UC-LP-03** | [View Role Capabilities](#uc-lp-03) | Visitor |
 
+    </div>
+
+    ??? tip "**Use Case Diagram**"
+        ![Landing Page](../diagrams/requirements/Requirements.svg)
+
+    ---
     ??? "UC-LP-01: Visit Landing Page"
+        <a id="uc-lp-01"></a>
         ##### High Level
         ```
         Visit Landing Page (Actor: Visitor, System: Public Website)
@@ -180,6 +191,7 @@
 
     ---
     ??? "UC-LP-02: View Adapter Capabilities"
+        <a id="uc-lp-02"></a>
         ##### High Level
         ```
         View Adapter Capabilities (Actor: Visitor, System: Public Website)
@@ -199,6 +211,7 @@
 
     ---
     ??? "UC-LP-03: View Role Capabilities"
+        <a id="uc-lp-03"></a>
         ##### High Level
         ```
         View Role Capabilities (Actor: Visitor, System: Public Website)
