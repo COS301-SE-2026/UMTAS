@@ -1,0 +1,14 @@
+docker-compose.yml
+  h_3359569cacef0e 99,139
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "1cb4f9e24a34139193dd5f1dd79527ba82ff3e5a",
+  "prompts": {},
+  "humans": {
+    "h_3359569cacef0e": {
+      "author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}
