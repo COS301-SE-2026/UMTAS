@@ -58,7 +58,6 @@ pnpm run test:int             # all integration tests
 ## :material-check-decagram: Definition of Done
 
 ??? success "Integration Test Checklist"
-    - [ ] Failing test written before the feature.
     - [ ] Full path covered: Request → Service → DB → Response.
     - [ ] Each test file is fully isolated - no shared state.
     - [ ] External HTTP calls (solver, third-party) are mocked.

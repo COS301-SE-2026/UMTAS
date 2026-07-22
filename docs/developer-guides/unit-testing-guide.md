@@ -1,10 +1,5 @@
 # Unit Testing Guide
 
-!!! info "Write the test first, always."
-    **Red → Green → Refactor.** Never write feature code without a failing test waiting for it.
-
----
-
 ## :material-map-marker: Where Things Live
 
 === "Backend"
@@ -50,7 +45,6 @@ pnpm --filter frontend run test -- --coverage  # frontend with coverage
 ## :material-check-decagram: Definition of Done
 
 ??? success "Unit Test Checklist"
-    - [ ] Failing test written before the feature.
     - [ ] Happy path and edge cases covered.
     - [ ] Test name clearly describes the expected behaviour.
     - [ ] Suite passes locally (`pnpm run test:unit`).
@@ -63,4 +57,3 @@ pnpm --filter frontend run test -- --coverage  # frontend with coverage
 | Context                | Tool                                                                                                         |
 | :--------------------- | :----------------------------------------------------------------------------------------------------------- |
 | **Frontend / Backend** | ![Jest](https://img.shields.io/badge/-jest-%23C21325?style=for-the-badge&logo=jest&logoColor=white)          |
-| **Solver (Python)**    | ![pytest](https://img.shields.io/badge/pytest-%230A9EDC.svg?style=for-the-badge&logo=pytest&logoColor=white) |
