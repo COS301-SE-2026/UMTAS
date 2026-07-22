@@ -115,7 +115,7 @@ export function ModulesStep({ modules }: ModulesStepProps) {
     }
 
     function doSelect() {
-      const selected = modules.find((m) => m.moduleID === id);
+      // const selected = modules.find((m) => m.moduleID === id);
       setSelectedId(id);
       setIsDirty(false);
     }

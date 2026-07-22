@@ -5,7 +5,7 @@
 Using deterministic image tags rather than `latest` in production allows for instant container swaps. Because a database backup is run prior to every new deployment, the system is protected against destructive migrations, ensuring zero data loss upon rollback.
 
 !!! success "Rollbacks"
-    Rollbacks are fully scripted via the Justfile command runner, requiring only a single command and the target previous tag.
+    Rollbacks are fully scripted via the Justfile command runner, requiring only a single command and the target previous tag.We do document the assumption that our rollback only spins up new containers from old image tags.Our future plans include changing our rollback strategy to a blue green deployment.
 
 ### Rollback Procedure
 

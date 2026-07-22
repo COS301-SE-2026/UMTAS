@@ -18,7 +18,10 @@ import { Card } from "@/components/atoms/baseShadcn/card";
 export default function CourseManagementTemplate() {
   const router = useRouter();
   const UniDetails = UserDetails.getUniDetails();
-  const [moduleQueries, setModuleQueries] = useState<getAllModulesQueries>({
+  const [
+    moduleQueries,
+    //setModuleQueries
+  ] = useState<getAllModulesQueries>({
     universityId: UniDetails?.UniversityID,
   });
 

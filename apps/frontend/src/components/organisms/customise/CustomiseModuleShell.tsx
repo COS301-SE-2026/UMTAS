@@ -5,7 +5,7 @@ import CustomiseModulePanel from "@/components/atoms/customise/CustomiseModulePa
 import { CustomiseModuleCard } from "@/components/molecules/customise/CustomiseModuleCard";
 import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
 import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
-import { MutateOptions, QueryKey, useMutation } from "@tanstack/react-query";
+import { QueryKey, useMutation } from "@tanstack/react-query";
 import { UserDetails } from "@/lib/userclass/userClass";
 import {
   updateModQ,

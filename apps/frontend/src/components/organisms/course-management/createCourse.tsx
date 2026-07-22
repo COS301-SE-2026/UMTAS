@@ -1,11 +1,7 @@
-import {
-  CourseDTO,
-  createCoursesBody,
-} from "@/app/course-management/queries/courses/courseBuilder";
+import { createCoursesBody } from "@/app/course-management/queries/courses/courseBuilder";
 import { createCourseQ } from "@/app/course-management/queries/courses/courseQueries";
 import { Button } from "@/components/atoms/baseShadcn/button";
 import { Input } from "@/components/atoms/baseShadcn/input";
-import { useErrorListener } from "@/hooks/errorListener";
 import { UserDetails } from "@/lib/userclass/userClass";
 import { useMutation } from "@tanstack/react-query";
 import { ReactNode, useState } from "react";

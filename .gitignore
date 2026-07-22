@@ -23,6 +23,7 @@ yarn.lock
 .turbo
 .skills
 
+.venv/
 
 # Next.js build output
 .next/

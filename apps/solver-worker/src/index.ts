@@ -17,6 +17,10 @@ import {
 } from "./solver-executor.js";
 import { SolverProcessor } from "./solver.processor.js";
 
+import { exec } from "node:child_process";
+
+import http from "node:http";
+
 const config = buildSolverWorkerConfig();
 validateSolverWorkerConfig(config);
 
@@ -51,6 +55,34 @@ if (config.tempRoot) workerOptions.tempRoot = config.tempRoot;
 
 const worker = createWorkerHost(workerOptions);
 
+const checkHealthPort = process.env.HEALTH_PORT_SOLVER_WORKER || 8082; //just need to check with michael if this approach is correct
+
+const healthServer = http.createServer((req, res) => {
+  if (req.method === "GET" && req.url === "/health") {
+const solverCommand = process.env.SOLVER_CLI_COMMAND || "/app/bin/solver-cli";
+
+exec(`${solverCommand} --health`, (error, stdout, stderr) => {
+      if (error) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(
+          JSON.stringify({ status: "unhealthy", details: error.message }),
+        ); //changed to async so we dont block any of the bullmq threads
+        return;
+      }
+
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ status: "healthy" }));
+    });
+  } else {
+    res.writeHead(404, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({ status: "not found" }));
+  }
+});
+
+healthServer.listen(checkHealthPort, () => {
+  console.log(`Health check server running on port: ${checkHealthPort}`);
+});
+
 worker.on("completed", (job) => {
   console.info("Solver job completed", { jobId: job.id });
 });
@@ -59,6 +91,9 @@ worker.on("failed", (job, error) => {
 });
 
 async function shutdown(): Promise<void> {
+  await new Promise<void>((resolve) => {
+    healthServer.close(() => resolve());
+  });
   await worker.close();
 }
 

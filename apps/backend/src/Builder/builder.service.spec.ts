@@ -64,14 +64,14 @@ describe('BuilderService', () => {
     it('should create userOwned: university | course | module', async () => {
       //ARRANGE
       //doUserUniCheck
-      mockDbResult(mockDb.select, []);
+      mockDbResult(mockDb.select.bind(mockDb), []);
       //createUserUni
       mockUniversityService.getByName!.mockResolvedValue(null);
       mockUniversityService.create!.mockResolvedValue({
         UniversityID: uniId,
         UniversityName: 'somename',
       });
-      mockSequentialResults(mockDb.insert, [
+      mockSequentialResults(mockDb.insert.bind(mockDb), [
         [
           {
             //unirole
@@ -127,7 +127,7 @@ describe('BuilderService', () => {
 
     it('should create userOwned: module || university and course already defined', async () => {
       //Arrange
-      mockSequentialResults(mockDb.select, [
+      mockSequentialResults(mockDb.select.bind(mockDb), [
         [
           {
             //uniRole
@@ -159,7 +159,7 @@ describe('BuilderService', () => {
         ...createModuleDto,
         moduleID: moduleId,
       });
-      mockDbResult(mockDb.insert, [
+      mockDbResult(mockDb.insert.bind(mockDb), [
         {
           //moduleEnrollment
           ModuleID: moduleId,
@@ -188,7 +188,7 @@ describe('BuilderService', () => {
   //GetAll
   describe('Test_GetAll', () => {
     it('should return empty array of modules', async () => {
-      mockSequentialResults(mockDb.select, [
+      mockSequentialResults(mockDb.select.bind(mockDb), [
         [
           {
             //UniRole
@@ -218,7 +218,7 @@ describe('BuilderService', () => {
     });
 
     it('should return array of modules', async () => {
-      mockSequentialResults(mockDb.select, [
+      mockSequentialResults(mockDb.select.bind(mockDb), [
         [
           {
             //UniRole

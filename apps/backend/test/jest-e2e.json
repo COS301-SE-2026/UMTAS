@@ -10,7 +10,8 @@
     "^.+\\.(t|j)sx?$": [
       "ts-jest",
       {
-        "useESM": true
+        "useESM": true,
+        "tsconfig": "<rootDir>/../tsconfig.int.json"
       }
     ],
     "^.+\\.mjs$": [
@@ -21,6 +22,6 @@
     ]
   },
   "extensionsToTreatAsEsm": [".ts"],
-  "setupFilesAfterEnv": ["<rootDir>/jest.setup.cjs"],
+  "setupFilesAfterEnv": ["<rootDir>/jest.setup.ts"],
   "transformIgnorePatterns": ["node_modules/(?!(better-auth|@better-auth)/)"]
 }

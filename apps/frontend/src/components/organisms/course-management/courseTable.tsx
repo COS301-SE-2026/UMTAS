@@ -11,7 +11,6 @@ import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
-  Row,
   Table,
   useReactTable,
 } from "@tanstack/react-table";
@@ -35,7 +34,7 @@ export function CourseTable<TData>({ columns, data }: DataTableProps<TData>) {
     course: { CourseID: "", CourseName: "", UniversityID: "" },
     modules: [],
   });
-
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data,
     columns,

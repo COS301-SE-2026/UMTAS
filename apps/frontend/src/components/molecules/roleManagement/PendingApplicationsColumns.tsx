@@ -68,7 +68,7 @@ export const columns: ColumnDef<application>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => {
+    cell: ({}) => {
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

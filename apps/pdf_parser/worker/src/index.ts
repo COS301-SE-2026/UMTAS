@@ -16,11 +16,28 @@ import {
 } from "./parser-executor.js";
 import { PdfParseProcessor } from "./pdf-parse.processor.js";
 import { S3PdfStorageClient } from "./storage.js";
+import http from "node:http";
 
 const config = buildPdfParseWorkerConfig();
 validatePdfParseWorkerConfig(config);
 
 const parserExecutor = createParserExecutor(config);
+
+const checkHealthPort = process.env.HEALTH_PORT_PDF_PARSER; //just need to check with michael if this approach is correct
+
+const healthServer = http.createServer((req, res) => {
+  if (req.method === "GET" && req.url === "/health") {
+    res.writeHead(200, { "Content-Type": "Application/json" });
+    res.end(JSON.stringify({ status: "healthy" }));
+  } else {
+    res.writeHead(404, { "Content-Type": "Application/json" });
+    res.end(JSON.stringify({ status: "not found" }));
+  }
+});
+
+healthServer.listen(checkHealthPort, () => {
+  console.log(`Health check server running on: ${checkHealthPort}`);
+});
 
 const workerOptions: WorkerHostOptions<PdfParseJobData> = {
   queueName: config.queueName,
@@ -57,6 +74,9 @@ worker.on("failed", (job, error) => {
 });
 
 const shutdown = async () => {
+  await new Promise<void>((resolve, reject) => {
+    healthServer.close(() => resolve());
+  });
   await worker.close();
 };
 
