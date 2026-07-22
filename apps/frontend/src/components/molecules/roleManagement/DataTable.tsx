@@ -31,6 +31,15 @@ import {
   TableRow,
 } from "@/components/atoms/baseShadcn/table";
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/atoms/baseShadcn/select";
+import { useState } from "react";
+
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
@@ -40,14 +49,15 @@ export function DataTable<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    [],
-  );
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = React.useState({});
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = useState({});
 
+  const [globalFilter, setGlobalFilter] = useState("");
+  const [roleFilter, setRoleFilter] = useState("ALL");
+
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data,
     columns,
@@ -59,26 +69,73 @@ export function DataTable<TData, TValue>({
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
+    onGlobalFilterChange: setGlobalFilter,
+    globalFilterFn: (row, columnId, filterValue) => {
+      const searchValue = filterValue.toLowerCase();
+      const name = String(row.getValue("Name") || "").toLowerCase();
+      const email = String(row.getValue("Email") || "").toLowerCase();
+      const role = String(row.getValue("role") || "").toLowerCase();
+      return (
+        name.includes(searchValue) ||
+        email.includes(searchValue) ||
+        role.includes(searchValue)
+      );
+    },
     state: {
       sorting,
       columnFilters,
       columnVisibility,
       rowSelection,
+      globalFilter,
     },
   });
+
+  const availableRoles = React.useMemo(() => {
+    const roles = new Set<string>();
+
+    data.forEach((row) => {
+      const rowData = row as { role?: string };
+      if (rowData.role) roles.add(rowData.role);
+    });
+
+    return Array.from(roles);
+  }, [data]);
+
+  const handleRoleChange = (value: string) => {
+    setRoleFilter(value);
+    const roleColumn = table.getColumn("role");
+    if (roleColumn) {
+      roleColumn.setFilterValue(value === "ALL" ? "" : value);
+    }
+  };
 
   return (
     <div>
       <div className="flex items-center py-4">
         <div className="flex items-center py-4">
-          <Input
-            placeholder="Filter emails..."
-            value={(table.getColumn("Email")?.getFilterValue() as string) ?? ""} //Want to add everything here iwl
-            onChange={(event) =>
-              table.getColumn("Email")?.setFilterValue(event.target.value)
-            }
-            className="max-w-sm"
-          />
+          <div className="flex flex-col md:flex-row items-center justify-between py-4 gap-4">
+            <div className="flex items-center gap-3 w-full md:w-auto">
+              <Input
+                placeholder="Search name, email, or role..."
+                value={globalFilter ?? ""}
+                onChange={(event) => setGlobalFilter(event.target.value)}
+                className="max-w-sm bg-[var(--background)]"
+              />
+              <Select value={roleFilter} onValueChange={handleRoleChange}>
+                <SelectTrigger className="w-[180px] bg-[var(--background)]">
+                  <SelectValue placeholder="Filter Role Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ALL">All Roles</SelectItem>
+                  {availableRoles.map((role) => (
+                    <SelectItem key={role} value={role}>
+                      {role}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

@@ -8,7 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { CourseTableData } from "@/components/organisms/course-management/courseColumns";
 import { getAllModCoursesQ } from "@/app/course-management/queries/modules/moduleQueries";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, Fragment } from "react";
 import { getAllModulesQueries } from "@/app/course-management/queries/modules/moduleBuilder";
 import { Card, CardDescription } from "@/components/atoms/baseShadcn/card";
 import { Input } from "@/components/atoms/baseShadcn/input";
@@ -248,11 +248,8 @@ export default function CourseManagementTemplate() {
               filteredCourses.map(({ course, modules }) => {
                 const isExpanded = possibleCourses[course.CourseID];
                 return (
-                  <>
-                    <TableRow
-                      key={course.CourseID}
-                      className="border-b border-[var(--border)] brand-table-hover"
-                    >
+                  <Fragment key={course.CourseID}>
+                    <TableRow className="border-b border-[var(--border)] brand-table-hover">
                       <TableCell className="p-4 font-medium text-[var(--text-primary)]">
                         {course.CourseName}
                       </TableCell>
@@ -305,7 +302,7 @@ export default function CourseManagementTemplate() {
                         </TableCell>
                       </TableRow>
                     )}
-                  </>
+                  </Fragment>
                 );
               })
             )}
