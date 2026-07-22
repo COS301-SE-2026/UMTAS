@@ -1828,8 +1828,8 @@ export interface components {
       eventName?: string;
       activityCode?: string | null;
       venues?: components["schemas"]["VenueDto"][];
-      isRecurring?: Record<string, never>;
-      validated?: Record<string, never>;
+      isRecurring?: boolean;
+      validated?: boolean;
       /**
        * @description Required when eventCriteria.moduleId is provided.
        * @enum {string}
@@ -1845,8 +1845,8 @@ export interface components {
       activityType?: "lecture" | "tutorial" | "prac" | "test" | "exam";
       activityCode?: string | null;
       venues?: components["schemas"]["VenueDto"][];
-      isRecurring?: Record<string, never>;
-      validated?: Record<string, never>;
+      isRecurring?: boolean;
+      validated?: boolean;
     };
     EventSingleResponseDto: {
       event: components["schemas"]["EventDto"];
@@ -1886,8 +1886,8 @@ export interface components {
       /** @enum {string} */
       activityType?: "lecture" | "tutorial" | "prac" | "test" | "exam";
       activityCode?: string | null;
-      isRecurring?: Record<string, never>;
-      validated?: Record<string, never>;
+      isRecurring?: boolean;
+      validated?: boolean;
       eventCriteria?: components["schemas"]["UpdateEventCriteriaDto"];
     };
     DeleteResponseDto: {
