@@ -1,5 +1,9 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import type { SolverResult, WorkerCallbackError } from 'shared-types';
+import {
+  SolverResultDto,
+  WorkerCallbackErrorDto,
+} from '../../jobs/dto/worker-contract.dto';
 
 export class SolverJobResponseDto {
   @ApiProperty({ example: 'solve-job-123' })
@@ -17,10 +21,10 @@ export class SolverJobResponseDto {
   @ApiProperty({ enum: ['queued', 'completed', 'failed'] })
   status!: 'queued' | 'completed' | 'failed';
 
-  @ApiPropertyOptional({ type: 'object', additionalProperties: true })
+  @ApiPropertyOptional({ type: SolverResultDto })
   result?: SolverResult;
 
-  @ApiPropertyOptional({ type: 'object', additionalProperties: true })
+  @ApiPropertyOptional({ type: WorkerCallbackErrorDto })
   error?: WorkerCallbackError;
 
   @ApiProperty({ example: '2026-07-13T10:15:30.000Z' })

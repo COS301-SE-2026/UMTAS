@@ -30,6 +30,12 @@ import { Public } from '../auth/auth.guard';
 import { CurrentSession, type SessionData } from '../auth/session.decorator';
 import { WorkerCallbackAuthGuard } from '../jobs/worker-callback-auth.guard';
 import { TimetableSolveJobDto } from '../jobs/dto/timetable-solve-job.dto';
+import {
+  AcceptedJobResponseDto,
+  SolverInputDto,
+  SolverResultDto,
+  SolverSubmissionResponseDto,
+} from '../jobs/dto/worker-contract.dto';
 import { SolverCallbackDto } from './dto/solver-callback.dto';
 import { SolverJobResponseDto } from './dto/solver-job-response.dto';
 import { SolverInputBuilderService } from './solver-input-builder.service';
@@ -52,24 +58,11 @@ export class SolverController {
   @ApiOperation({
     summary: 'Persist and enqueue a timetable solve job',
   })
-  @ApiAcceptedResponse({
-    schema: {
-      type: 'object',
-      properties: {
-        accepted: { type: 'boolean', example: true },
-        jobId: { type: 'string', example: 'solve-job-123' },
-      },
-    },
-  })
+  @ApiAcceptedResponse({ type: SolverSubmissionResponseDto })
   async submitAndEnqueue(
     @CurrentSession() session: SessionData,
     @Body() job: TimetableSolveJobDto,
-  ): Promise<{
-    accepted: true;
-    jobId: string;
-    status: 'queued' | 'completed' | 'failed';
-    result?: SolverResult;
-  }> {
+  ): Promise<SolverSubmissionResponseDto> {
     const validatedJob = validateTimetableSolveJob(job);
     const record = await this.submission.submit({
       userId: session.user.id,
@@ -87,7 +80,7 @@ export class SolverController {
   @Public()
   @UseGuards(WorkerCallbackAuthGuard)
   @ApiOperation({ summary: 'Build solver input for an authenticated worker' })
-  @ApiOkResponse({ type: Object })
+  @ApiOkResponse({ type: SolverInputDto })
   getInput(@Param('jobId') jobId: string): Promise<SolverInput> {
     return this.inputBuilder.build(jobId);
   }
@@ -111,7 +104,7 @@ export class SolverController {
 
   @Get('jobs/:jobId/result')
   @ApiOperation({ summary: 'Get a completed solver result' })
-  @ApiOkResponse({ type: Object })
+  @ApiOkResponse({ type: SolverResultDto })
   async getJobResult(
     @CurrentSession() session: SessionData,
     @Param('jobId') jobId: string,
@@ -129,11 +122,12 @@ export class SolverController {
   @UseGuards(WorkerCallbackAuthGuard)
   @HttpCode(HttpStatus.ACCEPTED)
   @ApiOperation({ summary: 'Receive final solver worker callback' })
+  @ApiAcceptedResponse({ type: AcceptedJobResponseDto })
   async receiveCallback(
     @Param('jobId') jobId: string,
     @Query('attemptToken', new ParseUUIDPipe()) attemptToken: string,
     @Body() body: SolverCallbackDto,
-  ): Promise<{ accepted: true; jobId: string }> {
+  ): Promise<AcceptedJobResponseDto> {
     const callback = validateSolverCallback(body);
     await this.jobStore.recordCallback(jobId, attemptToken, callback);
 
