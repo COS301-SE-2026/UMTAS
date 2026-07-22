@@ -853,11 +853,11 @@
         | **Postcondition** | Lecturer assignments are updated for the selected event/module |
 
 ---
-??? "Alert System Use Cases"
+??? "**Alert System Use Cases**"
     <a id="alert-system-id"></a>
     <div align="center">
 
-    ### Use Case Table
+    ### **Use Case Table**
     | **Use Case ID** | **Use Case Name** | **Actor** |
     | :---: | :---: | :---: |
     | **UC-AL-01** | [Event Change Alerts](#uc-al-01) | User |
