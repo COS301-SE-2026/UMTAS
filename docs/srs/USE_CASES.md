@@ -2,11 +2,11 @@
 
     | **ID** | **Use Case** | **Group** | **Actor** | **Status** |
     |:---:|:---:|:---:|:---:|:---:|
-    | **UC-AU-01** | Register Account | Authentication | User | |
-    | **UC-AU-02** | Login Account | Authentication | User | |
-    | **UC-AU-03** | Reset Password | Authentication | User | |
-    | **UC-AU-04** | Logout Account | Authentication | User | |
-    | **UC-AU-05** | Delete Account | Authentication | User | |
+    | **UC-AU-01** | Register Account | [Authentication](#auth-use-cases) | User | |
+    | **UC-AU-02** | Login Account | [Authentication](#auth-use-cases)  | User | |
+    | **UC-AU-03** | Reset Password | [Authentication](#auth-use-cases)  | User | |
+    | **UC-AU-04** | Logout Account | [Authentication](#auth-use-cases)  | User | |
+    | **UC-AU-05** | Delete Account | [Authentication](#auth-use-cases)  | User | |
     | **UC-LP-01** | Visit Landing Page | Landing Page | Visitor | |
     | **UC-LP-02** | View Adapter Capabilities | Landing Page | Visitor | |
     | **UC-LP-03** | View Role Capabilities | Landing Page | Visitor | |
@@ -32,17 +32,28 @@
 
 ---
 
-??? "Authentication Use Cases"
-    ### Use Case Table
+??? "**Authentication Use Cases**"
+    <a id="auth-use-cases"></a>
+
+    <div align="center">
+
+    ## **Use Case Table**
     | **ID** | **Use case** | **Actor** |
     |:---:|:---:|:---:|
-    | **UC-AU-01** | Register Account | User |
-    | **UC-AU-02** | Login | User |
-    | **UC-AU-03** | Reset Password | User |
-    | **UC-AU-04** | Logout | User |
-    | **UC-AU-05** | Delete Account | User |
+    | **UC-AU-01** | [Register Account](#uc-au-01) | User |
+    | **UC-AU-02** | [Login](#uc-au-02) | User |
+    | **UC-AU-03** | [Reset Password](#uc-au-03) | User |
+    | **UC-AU-04** | [Logout](#uc-au-04) | User |
+    | **UC-AU-05** | [Delete Account](#uc-au-05) | User |
 
+    </div>
+
+    ??? tip "**Use Case Diagram**"
+        ![Authentication System](../diagrams/requirements/Requirements.svg)
+
+    ---
     ??? "UC-AU-01: Register Account"
+        <a id="uc-au-01"></a>
         ##### High Level
         ```
         Register Account (Actor: User, System: Authentication)
@@ -62,6 +73,7 @@
 
     ---
     ??? "UC-AU-02: Login Account"
+        <a id="uc-au-02"></a>
         ##### High Level
         ```
         Login Account (Actor: User, System: Authentication)
@@ -81,6 +93,7 @@
 
     ---
     ??? "UC-AU-03: Reset Password"
+        <a id="uc-au-03"></a>
         ##### High Level
         ```
         Reset Password (Actor: User, System: Authentication)
@@ -100,6 +113,7 @@
 
     ---
     ??? "UC-AU-04: Logout Account"
+        <a id="uc-au-04"></a>
         ##### High Level
         ```
         Logout Account (Actor: User, System: Authentication)
@@ -119,6 +133,7 @@
 
     ---
     ??? "UC-AU-05: Delete Account"
+        <a id="uc-au-05"></a>
         ##### High Level
         ```
         Delete Account (Actor: User, System: Authentication)
@@ -627,7 +642,7 @@
         | **Postcondition** | All affected users are notified of event changes or failure is logged |
 
 ---
-![Authentication system use-case diagram](../diagrams/requirements/Authentication-System.svg)
+
 
 
 
