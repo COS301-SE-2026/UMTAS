@@ -1,7 +1,15 @@
 "use client";
 
-import { useState } from "react";
-import { Plus, Trash2, CheckCircle, Inbox, AlertCircle } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import {
+  Plus,
+  Trash2,
+  CheckCircle,
+  Inbox,
+  AlertCircle,
+  AwardIcon,
+  ArrowUpWideNarrow,
+} from "lucide-react";
 import {
   EventCard,
   type EventErrors,
@@ -199,7 +207,7 @@ export function EventsStep({
     }
 
     function doSelect() {
-      // const selected = events.find((e) => e.eventID === id);
+      const selected = events.find((e) => e.eventID === id);
       setSelectedId(id);
       setIsDirty(false);
     }

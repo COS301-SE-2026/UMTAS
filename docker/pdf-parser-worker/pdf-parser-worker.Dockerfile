@@ -47,7 +47,7 @@ LABEL org.opencontainers.image.title="UMTAS PDF parser worker" \
       io.umtas.base-image.update-policy="Track patched Node 22 bookworm-slim releases"
 
 RUN apt-get update \
-    && apt-get install --yes --no-install-recommends dumb-init python3 curl \
+    && apt-get install --yes --no-install-recommends dumb-init python3 \
     && rm -rf /var/lib/apt/lists/* \
     && mkdir -p /app/python /tmp/umtas-worker \
     && chown -R node:node /app /tmp/umtas-worker
@@ -58,18 +58,14 @@ ENV NODE_ENV=production \
     PDF_PARSE_CLI_COMMAND=python3 \
     PDF_PARSE_CLI_ARGS="-m parser_cli" \
     PDF_PARSE_CLI_CWD=/app/python \
-    WORKER_TEMP_ROOT=/tmp/umtas-worker \
-    HEALTH_PORT_PDF_PARSER=8082
+    WORKER_TEMP_ROOT=/tmp/umtas-worker
 
-EXPOSE 8082
 COPY --from=node-build --chown=node:node /deploy/ /app/
 COPY --from=python-deps /opt/pdf-parser-venv /opt/pdf-parser-venv
 COPY --chown=node:node apps/pdf_parser/parser /app/python/parser
 COPY --chown=node:node apps/pdf_parser/parser_cli.py /app/python/parser_cli.py
 
 USER node
-
-HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 CMD curl -f http://localhost:8082/health || exit 1
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 CMD ["node", "/app/dist/index.js"]
 

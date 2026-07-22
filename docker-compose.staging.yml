@@ -83,11 +83,6 @@ services:
       PDF_PARSE_CLI_COMMAND: python3
       PDF_PARSE_CLI_ARGS: -m parser_cli
       PDF_PARSE_CLI_CWD: /app/python
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8082/health"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
     depends_on:
       redis:
         condition: service_healthy
@@ -125,11 +120,6 @@ services:
       WORKER_KEEP_FAILED_TEMP: ${WORKER_KEEP_FAILED_TEMP:-false}
       WORKER_TEMP_ROOT: /tmp/worker-jobs
       SOLVER_CLI_COMMAND: /app/bin/solver-cli
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8081/health"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
     depends_on:
       redis:
         condition: service_healthy

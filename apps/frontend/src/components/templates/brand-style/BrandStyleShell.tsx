@@ -23,6 +23,7 @@ import {
   Zap,
   Component,
   Box,
+  Moon,
   Eye,
   Globe,
 } from "lucide-react";

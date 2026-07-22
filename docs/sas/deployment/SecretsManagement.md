@@ -9,8 +9,6 @@ To support our deployment pipeline, we have configured distinct environments on 
 !!! success "How does Phase work?"
     Phase CLI is integrated into the Justfile for runtime injection across local development, staging, and production deployments.
 
-    [Phase Docs](https://docs.phase.dev/)
-
 ### Secrets Injection Flow
 
 | Environment | Just Command Examples | Underlying Phase Command | Behaviour |

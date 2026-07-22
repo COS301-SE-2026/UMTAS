@@ -18,10 +18,7 @@ export function InstituteSelector() {
   const [selectedInstitute, setSelectedInstitute] = useState<uniDto>();
 
   const [selectedRole, setSelectedRole] = useState("");
-  const {
-    data: uniList,
-    // isLoading: uniLoading
-  } = useQuery(getAllUni());
+  const { data: uniList, isLoading: uniLoading } = useQuery(getAllUni());
   const applyMut = useMutation(applyMutator());
 
   function updateSelectedUni(id: string) {

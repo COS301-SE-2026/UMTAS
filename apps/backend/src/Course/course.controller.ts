@@ -29,7 +29,7 @@ import {
 
 // import { CurrentSession } from '../auth/session.decorator';
 // import type { SessionData } from '../auth/session.decorator';
-import { Roles } from 'src/auth/roles.guard';
+import { Roles, SystemAdmin } from 'src/auth/roles.guard';
 
 @ApiTags('Courses')
 @Controller('Courses')
@@ -141,7 +141,7 @@ export class CourseController {
 
   //Delete
   @Delete(':CourseId')
-  // @SystemAdmin() //should uni_admin's be allowed to delete
+  @SystemAdmin() //should uni_admin's be allowed to delete
   @ApiOperation({
     summary: 'Delete Course by Course ID',
     operationId: 'deleteCourse',

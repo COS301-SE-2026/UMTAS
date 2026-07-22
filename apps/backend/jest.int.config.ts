@@ -16,16 +16,6 @@ const config: Config = {
     MIGRATIONS_PATH: '<rootDir>/drizzle', // resolves to apps/backend/drizzle
   },
 
-  transform: {
-    '^.+\\.(t|j)sx?$': [
-      'ts-jest',
-      {
-        useESM: true,
-        tsconfig: '<rootDir>/tsconfig.json',
-      },
-    ],
-  },
-
   transformIgnorePatterns: ['node_modules/(?!(better-auth)/)'],
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1',

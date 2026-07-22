@@ -20,7 +20,6 @@ jobs:
         with:
           webhook_id: ${{ secrets.DISCORD_WEBHOOK_ID }}
           webhook_token: ${{ secrets.DISCORD_WEBHOOK_TOKEN }}
-          color: ${{ inputs.status == 'Success' && '#2ECC71' || inputs.status == 'Cancelled' && '#95A5A6' || '#E74C3C' }}
           message: |
             **Status**: ${{ inputs.status }}
             **Message**: ${{ inputs.message }}

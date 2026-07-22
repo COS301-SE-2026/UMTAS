@@ -6,7 +6,6 @@ import "./globals.css";
 import { Toaster } from "sonner";
 import Script from "next/script";
 import TanstackProvider from "@/components/tanstack/tanstackProvider";
-import { HelpCommandPalette } from "@/components/organisms/nav/HelpCommandPallete";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -66,7 +65,6 @@ export default async function RootLayout({
         </AppShellTemplate>
 
         <Toaster />
-        <HelpCommandPalette />
       </body>
     </html>
   );
