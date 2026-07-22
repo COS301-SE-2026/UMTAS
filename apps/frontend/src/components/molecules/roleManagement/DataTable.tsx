@@ -111,8 +111,8 @@ export function DataTable<TData, TValue>({
 
   return (
     <div>
-      <div className="flex items-center py-4">
-        <div className="flex items-center py-4">
+      <div className="flex items-center">
+        <div className="flex items-center">
           <div className="flex flex-col md:flex-row items-center justify-between py-4 gap-4">
             <div className="flex items-center gap-3 w-full md:w-auto">
               <Input

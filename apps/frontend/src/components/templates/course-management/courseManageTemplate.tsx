@@ -165,58 +165,63 @@ export default function CourseManagementTemplate() {
   if (isCourseError) {
     return (
       <div className="text-destructive text-center py-20">
-        Something went wrong :(
+        Something went wrong
       </div>
     );
   }
 
   return (
     <div className="h-[80vh] items-center flex flex-col gap-6 w-full px-6">
-      <Card className="w-full max-w-5xl p-6 flex flex-col md:flex-row gap-4 items-center bg-[var(--bg-surface)] border-[var(--border)] rounded-xl shadow-sm">
-        <div className="w-full md:flex-1">
-          <Input
-            placeholder="Search courses, degrees, or module codes/names..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-[var(--background)]"
-          />
-        </div>
-        <div className="flex flex-wrap gap-3 w-full md:w-auto">
-          <Select value={selectedDegree} onValueChange={setSelectedDegree}>
-            <SelectTrigger className="w-[180px] bg-[var(--background)]">
-              <SelectValue placeholder="Filter Degree" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="All">All Degrees</SelectItem>
-              {availableDegrees.map((degree) => (
-                <SelectItem key={degree} value={degree}>
-                  {degree}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Select
-            value={effectiveModulePrefix}
-            onValueChange={setSelectedModulePrefix}
-          >
-            <SelectTrigger className="w-sm bg-[var(--background)]">
-              <SelectValue placeholder="Filter Module Type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="All">All Module Types</SelectItem>
-              {availableModulePrefixes.map((prefix) => (
-                <SelectItem key={prefix} value={prefix}>
-                  {prefix}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <CardDescription></CardDescription>
-      </Card>
-
       <div className="w-full max-w-6xl overflow-auto border border-[var(--border)] rounded-xl bg-[var(--bg-surface)] shadow-sm">
+        <h1 className="text-lg font-semibold text-[var(--text-primary)] pl-4 pt-4">
+          Course Management
+        </h1>
+        <p className="text-sm text-[var(--text-secondary)] pl-4 pt-2 pb-2">
+          Search and filter courses, degrees and modules.
+        </p>
+        <div className="flex flex-col md:flex-row gap-4 p-5 border-b border-[var(--border)] items-center justify-between bg-[var(--bg-surface)]">
+          <div className="w-full md:max-w-sm flex-1">
+            <Input
+              placeholder="Search courses, degrees, or module codes/names..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-[var(--background)]"
+            />
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+            <Select value={selectedDegree} onValueChange={setSelectedDegree}>
+              <SelectTrigger className="w-[180px] bg-[var(--background)]">
+                <SelectValue placeholder="Filter Degree" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="All">All Degrees</SelectItem>
+                {availableDegrees.map((degree) => (
+                  <SelectItem key={degree} value={degree}>
+                    {degree}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select
+              value={effectiveModulePrefix}
+              onValueChange={setSelectedModulePrefix}
+            >
+              <SelectTrigger className="w-[180px] bg-[var(--background)]">
+                <SelectValue placeholder="Filter Module Type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="All">All Module Types</SelectItem>
+                {availableModulePrefixes.map((prefix) => (
+                  <SelectItem key={prefix} value={prefix}>
+                    {prefix}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
         <Table>
           <TableHeader>
             <TableRow className="border-b border-[var(--border)]">
