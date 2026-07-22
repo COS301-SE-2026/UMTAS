@@ -64,29 +64,6 @@ Welcome to the UMTAS Developer Portal. Here you will find everything you need to
 
     [:octicons-arrow-right-24: Testing Policy](testing-policy.md)
 
--   :material-flask:{ .lg .middle } __Unit Testing__
-
-    ---
-
-    Writing fast, isolated tests with Jest.
-
-    [:octicons-arrow-right-24: Unit Testing Guide](unit-testing-guide.md)
-
--   :material-flask:{ .lg .middle } __Integration Testing__
-
-    ---
-
-    Cross-service communication and database verification.
-
-    [:octicons-arrow-right-24: Integration Testing Guide](integration-testing-guide.md)
-
--   :material-monitor-screenshot:{ .lg .middle } __E2E Testing__
-
-    ---
-
-    Full user-flow testing in a real browser with Playwright.
-
-    [:octicons-arrow-right-24: E2E Testing Guide](e2e-testing-guide.md)
 
 </div>
 
