@@ -1,203 +1,252 @@
-// import { Test } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
 
-// //Constants
-// import { userId, moduleId, uniId } from '../Testing/constants.spec';
+//Constants
+import { userId, moduleId, uniId } from '../Testing/constants.spec';
 
-// //Actual Service imports
-// import { DatabaseService } from '../db/database.service';
-// import { EventService } from './event.service';
-// import { ModuleService } from '../Module/module.service';
+//Actual Service imports
+import { DatabaseService } from '../db/database.service';
+import { EventService } from './event.service';
+import { ModuleService } from '../Module/module.service';
+import { EventImportFingerprintService } from './event-import-fingerprint.service';
 
-// //Mock Database and factories
-// import { createMockDatabase } from '../Testing/Mocks/database.mock';
-// import {
-//   mockDeleteResult,
-//   mockSelectResult,
-//   mockSequentialResults,
-// } from '../Testing/Mocks/database.helpers';
-// import {
-//   createEvent,
-//   createEventVenue,
-//   createVenue,
-//   createUniversityEvent,
-//   createCreateEventDto,
-// } from '../Testing/Factories/event.factory';
-// import { createMockModuleService } from '../Testing/Factories/module.factory';
-// import { EventType } from './dto/event.types';
-// import { UpdateEventDto } from './dto/EventDto.dto';
+//Mocks
+import {
+  createMockDatabase,
+  mockSequentialResults,
+  mockTransaction,
+} from '../Testing/Mocks/';
+import {
+  createMockModuleService,
+  createMockEventImportFingerprintService,
+} from '../Testing/Mocks/services/';
 
-// describe('EventService', () => {
-//   let service: EventService;
+//Factories
+import {
+  createEvent,
+  createUniversityEvent,
+  createPersonalEvent,
+  createCreateEventDto,
+} from '../Testing/Factories/';
 
-//   const { mockDb, reset: resetDb } = createMockDatabase();
-//   const { mockModuleService, reset: resetModule } = createMockModuleService();
+import { EventSource } from './dto/event.types';
+import { UpdateEventDto } from './dto/EventDto.dto';
 
-//   beforeEach(async () => {
-//     const module = await Test.createTestingModule({
-//       providers: [
-//         EventService,
-//         { provide: DatabaseService, useValue: { db: mockDb } },
-//         { provide: ModuleService, useValue: mockModuleService },
-//       ],
-//     }).compile();
+describe('EventService', () => {
+  let service: EventService;
 
-//     service = module.get(EventService);
-//   });
+  const { mockDb, reset: resetDb } = createMockDatabase();
+  const { mockModuleService, reset: resetModule } = createMockModuleService();
+  const { mockEventFingerprintService, reset: resetEventFingerprint } =
+    createMockEventImportFingerprintService();
 
-//   afterEach(() => {
-//     resetDb();
-//     resetModule();
-//   });
+  beforeEach(async () => {
+    const module = await Test.createTestingModule({
+      providers: [
+        EventService,
+        { provide: DatabaseService, useValue: { db: mockDb } },
+        { provide: ModuleService, useValue: mockModuleService },
+        {
+          provide: EventImportFingerprintService,
+          useValue: mockEventFingerprintService,
+        },
+      ],
+    }).compile();
 
-//   //TESTS
-//   //Create
-//   describe('Test_CreateEvent', () => {
-//     it('should create a simple university event', async () => {
-//       //Arrange
-//       const newEvent = createEvent(
-//         EventType.UNIVERSITY,
-//         {},
-//         { moduleID: moduleId },
-//       );
-//       const createEventDto = createCreateEventDto(newEvent);
+    service = module.get(EventService);
+  });
 
-//       const uniEvent = createUniversityEvent({
-//         moduleID: moduleId,
-//         eventID: newEvent.eventID,
-//       });
-//       const venue = createVenue({
-//         VenueName: newEvent.eventCriteria.venue,
-//       });
-//       const eventVenue = createEventVenue({
-//         VenueID: venue.VenueID,
-//         EventID: newEvent.eventID,
-//       });
+  afterEach(() => {
+    resetDb();
+    resetModule();
+    resetEventFingerprint();
+  });
 
-//       mockSequentialResults(mockDb.insert, [
-//         [newEvent],
-//         [uniEvent],
-//         [venue],
-//         [eventVenue],
-//       ]);
-//       mockModuleService.getUniForModule?.mockResolvedValue({
-//         UniversityID: uniId,
-//       });
+  //TESTS
+  //Create
+  describe('Test_CreateEvent', () => {
+    it('should create a simple university event', async () => {
+      //Arrange
+      const newEvent = createEvent(EventSource.UNIVERSITY, {}, { moduleId });
+      const createEventDto = createCreateEventDto(newEvent);
 
-//       const result = await service.create(userId, createEventDto);
+      const uniEvent = createUniversityEvent({
+        moduleID: moduleId,
+        eventID: newEvent.eventID,
+      });
 
-//       expect(mockDb.insert).toHaveBeenCalledTimes(4);
-//       expect(mockModuleService.getUniForModule).toHaveBeenCalledWith(moduleId);
-//       expect(result.event).toMatchObject(newEvent);
-//     });
-//   });
+      mockTransaction(mockDb, {
+        select: [
+          [{ universityId: uniId }],
+          [],
+          [{ role: 'sys_admin' }],
+          [],
+          [],
+          [],
+          [],
+        ],
+        insert: [[newEvent], [uniEvent]],
+      });
 
-//   //GetAll
-//   describe('Test_GetAllEvents', () => {
-//     it('should return all events for module', async () => {
-//       const type = EventType.UNIVERSITY;
-//       const events = [
-//         createEvent(type, {}, { moduleID: moduleId }),
-//         createEvent(type, {}, { moduleID: moduleId }),
-//       ];
+      //Act
+      const result = await service.create(userId, createEventDto);
 
-//       mockSelectResult(mockDb, events);
+      //Assert
+      expect(result.event).toMatchObject({
+        eventId: newEvent.eventID,
+        eventName: newEvent.eventName,
+        activityCode: newEvent.activityCode,
+        activityType: newEvent.activityType,
+        eventCriteria: newEvent.eventCriteria,
+        isRecurring: newEvent.isRecurring,
+        validated: newEvent.validated,
+      });
+    });
+  });
 
-//       const result = await service.getAllEvents(userId, { moduleId });
+  //GetAll
+  describe('Test_GetAllEvents', () => {
+    it('should return all events for module', async () => {
+      const type = EventSource.UNIVERSITY;
+      const events = [
+        createEvent(type, {}, { moduleId }),
+        createEvent(type, {}, { moduleId }),
+      ];
 
-//       expect(result).toMatchObject({ events });
-//     });
-//   });
+      mockTransaction(mockDb, {
+        select: [events, [], []],
+      });
 
-//   //GetById
-//   describe('Test_GetEventById', () => {
-//     it('should return event by eventId', async () => {
-//       const event = createEvent();
+      const result = await service.getAllEvents(userId, { moduleId });
 
-//       mockSelectResult(mockDb, [event]);
+      expect(result.events).toMatchObject([
+        { eventId: events[0].eventID, eventName: events[0].eventName },
+        { eventId: events[1].eventID, eventName: events[1].eventName },
+      ]);
+    });
+  });
 
-//       const result = await service.getById(event.eventID);
+  //GetById
+  describe('Test_GetEventById', () => {
+    it('should return event by eventId', async () => {
+      const event = createEvent();
 
-//       expect(result).toMatchObject({ event });
-//     });
-//   });
+      mockSequentialResults(mockDb.select, [[event], []]);
 
-//   //Update
-//   describe('Test_UpdateEvent', () => {
-//     it('should update all event fields', async () => {
-//       //Arrange
-//       const oldEvent = createEvent();
-//       const updateDto: UpdateEventDto = {
-//         eventName: 'NewName',
-//         eventCode: 'newCode',
-//         isRecurring: false,
-//         eventCriteria: {
-//           date: 'dd-mm-yyyy',
-//           startTime: '20:00',
-//           endTime: '21:00',
-//           venue: 'Chemistry building',
-//         },
-//       };
-//       const updatedEvent = createEvent(
-//         EventType.UNIVERSITY,
-//         {
-//           eventName: updateDto.eventName,
-//           eventCode: updateDto.eventCode,
-//           isRecurring: updateDto.isRecurring,
-//         },
-//         {
-//           date: updateDto.eventCriteria?.date,
-//           startTime: updateDto.eventCriteria?.startTime,
-//           endTime: updateDto.eventCriteria?.endTime,
-//           venue: updateDto.eventCriteria?.venue,
-//         },
-//       );
+      const result = await service.getById(event.eventID);
 
-//       mockSelectResult(mockDb, [oldEvent]);
+      expect(result.event).toMatchObject({
+        eventId: event.eventID,
+        eventName: event.eventName,
+        activityCode: event.activityCode,
+        activityType: event.activityType,
+        eventCriteria: event.eventCriteria,
+        isRecurring: event.isRecurring,
+        validated: event.validated,
+      });
+    });
+  });
 
-//       mockDb.transaction.mockImplementation((callback: (tx: any) => any) => {
-//         const tx = {
-//           update: jest.fn().mockReturnThis(),
-//           set: jest.fn().mockReturnThis(),
-//           where: jest.fn().mockReturnThis(),
-//           returning: jest.fn().mockResolvedValue([updatedEvent]),
-//         };
+  //Update
+  describe('Test_UpdateEvent', () => {
+    it('should update all event fields', async () => {
+      //Arrange
+      const oldEvent = createEvent();
+      const updateDto: UpdateEventDto = {
+        eventName: 'NewName',
+        activityCode: 'newCode',
+        isRecurring: false,
+        eventCriteria: {
+          date: 'dd-mm-yyyy',
+          startTime: '20:00',
+          endTime: '21:00',
+        },
+      };
+      const updatedEvent = createEvent(
+        EventSource.UNIVERSITY,
+        {
+          eventName: updateDto.eventName,
+          activityCode: updateDto.activityCode,
+          isRecurring: updateDto.isRecurring,
+        },
+        {
+          date: updateDto.eventCriteria?.date,
+          startTime: updateDto.eventCriteria?.startTime,
+          endTime: updateDto.eventCriteria?.endTime,
+        },
+      );
 
-//         return callback(tx);
-//       });
+      mockSequentialResults(mockDb.select, [[oldEvent], [], []]);
 
-//       //Act
-//       const result = await service.updateEvent(
-//         userId,
-//         'uni_admin',
-//         oldEvent.eventID,
-//         updateDto,
-//       );
+      mockTransaction(mockDb, {
+        update: [[updatedEvent]],
+      });
 
-//       //Assert
-//       expect(result).toMatchObject({ event: updatedEvent });
-//     });
-//   });
+      //Act
+      const result = await service.updateEvent(
+        userId,
+        'uni_admin',
+        oldEvent.eventID,
+        updateDto,
+      );
 
-//   //Delete
-//   describe('Test_DeleteEvent', () => {
-//     it('should delete event - admin', async () => {
-//       const event = createEvent();
+      //Assert
+      expect(result.event).toMatchObject({
+        eventId: updatedEvent.eventID,
+        eventName: updatedEvent.eventName,
+        activityCode: updatedEvent.activityCode,
+        isRecurring: updatedEvent.isRecurring,
+      });
+    });
+  });
 
-//       mockSelectResult(mockDb, [event]);
-//       mockDeleteResult(mockDb, undefined);
+  //Delete
+  describe('Test_DeleteEvent', () => {
+    it('should delete event - admin', async () => {
+      const event = createEvent();
 
-//       const result = await service.deleteEvent(
-//         userId,
-//         'uni_admin',
-//         event.eventID,
-//       );
+      mockTransaction(mockDb, {
+        select: [[event], []],
+        delete: [[]],
+      });
 
-//       //Assert
-//       expect(result).toMatchObject({
-//         eventName: event.eventName,
-//         eventCode: event.eventCode,
-//         success: true,
-//       });
-//     });
-//   });
-// });
+      const result = await service.deleteEvent(
+        userId,
+        'uni_admin',
+        event.eventID,
+      );
+
+      //Assert
+      expect(result).toMatchObject({
+        eventName: event.eventName,
+        activityCode: event.activityCode,
+        success: true,
+      });
+    });
+  });
+
+  describe('Test_createPersonalEvent', () => {
+    it('should create a personal event', async () => {
+      const newEvent = createEvent(EventSource.PERSONAL);
+      const personalEvent = createPersonalEvent({ eventID: newEvent.eventID });
+
+      mockTransaction(mockDb, {
+        insert: [[newEvent], [personalEvent]],
+        select: [[]],
+      });
+
+      const result = await service.createPersonalEvent(
+        userId,
+        createCreateEventDto(newEvent),
+      );
+
+      expect(result).toMatchObject({
+        eventCriteria: expect.objectContaining({
+          eventSource: 'personal',
+          date: expect.any(String),
+          startTime: expect.any(String),
+          endTime: expect.any(String),
+        }),
+      });
+    });
+  });
+});
