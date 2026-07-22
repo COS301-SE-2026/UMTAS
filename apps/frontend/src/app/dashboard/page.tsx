@@ -21,22 +21,30 @@ import { ChooseInstituteTemplate } from "@/components/templates/choose-institute
 
 const steps = [
   {
+    target: "#theme-toggle-btn",
+    content: "Click here to toggle between light and dark mode.",
+  },
+  {
+    target: "#sign-out-btn",
+    content: "Click here to sign out of your account.",
+  },
+  {
     target: "#build-schedule-btn",
     content: "Click here to start building your schedule.",
   },
   {
     target: "#documentation-link",
-    content: "Click here to view the documentation.",
+    content: "Click here to view the UMTAS documentation.",
   },
 
   {
     target: "#brand-style-link",
-    content: "Click here to view the brand style guide.",
+    content: "Click here to view the UMTAS brand style guide.",
   },
 
   {
     target: "#github-link",
-    content: "Click here to view the GitHub repository.",
+    content: "Click here to view the UMTAS GitHub repository.",
   },
 
   {
