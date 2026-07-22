@@ -6,10 +6,11 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
+    "prebuild": "pnpm --filter shared-types build && pnpm --filter bullmq-worker-core build",
     "build": "tsc",
     "dev": "pnpm run build && node dist/index.js",
     "start": "node dist/index.js",
-    "test": "pnpm --filter pdf-parser-worker... build && node --test \"dist/tests/*.test.js\""
+    "test": "pnpm run build && node --test \"dist/tests/*.test.js\""
   },
   "keywords": [],
   "author": "",

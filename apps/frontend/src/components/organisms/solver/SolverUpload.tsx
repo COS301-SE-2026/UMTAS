@@ -64,46 +64,29 @@ export default function SolverUpload({
   }
 
   async function pollEvents() {
-    while (pdfLookupLoading) {
-      // wait for it to finalize
-    }
-    if (
-      pdfLookupResult?.jobId &&
-      pdfLookupResult.status === "completed" &&
-      pdfLookupResult.moduleGroupingId
-    ) {
-      // means this pdf does already exist
-      // Module grouping updated
-      setModuleGroupID(pdfLookupResult.moduleGroupingId);
-      onComplete();
-    } else {
-      // pdf job does not exist for this hash
-      // Upload pdf
-      if (!selectedFile) throw new Error("No selected file");
+    if (!selectedFile) throw new Error("No selected file");
 
-      const result = await UploadPDFmut.mutateAsync({
-        file: await selectedFile,
-        universityId: UserDetails.getUniDetails()?.UniversityID || "",
-        adapterKey: "up",
+    const result = await UploadPDFmut.mutateAsync({
+      file: await selectedFile,
+      universityId: UserDetails.getUniDetails()?.UniversityID || "",
+      adapterKey: "up",
+    });
+    const Pollinterval = setInterval(async () => {
+      console.log("Polled", pdfJobResult);
+      await setJobID(result.jobId);
+      getQueryClient().invalidateQueries({
+        queryKey: ["PDF"],
       });
-      const Pollinterval = setInterval(async () => {
-        console.log("Polled", pdfJobResult);
-        await setJobID(result.jobId);
-        getQueryClient().invalidateQueries({
-          queryKey: pollPdfResult({
-            jobId: jobId || "",
-          }).queryKey,
-        });
-        if (
-          pdfJobResult?.status === "completed" &&
-          pdfJobResult.moduleGroupingId
-        ) {
-          clearInterval(Pollinterval);
-          setModuleGroupID(pdfJobResult.moduleGroupingId);
-          onComplete();
-        }
-      }, 5000);
-    }
+
+      if (
+        pdfJobResult?.status === "completed" &&
+        pdfJobResult.moduleGroupingId
+      ) {
+        clearInterval(Pollinterval);
+        setModuleGroupID(pdfJobResult.moduleGroupingId);
+        onComplete();
+      }
+    }, 5000);
   }
 
   return (
@@ -175,10 +158,16 @@ export default function SolverUpload({
           type="button"
           className="w-fit"
           onClick={() => {
-            pollEvents();
+            if (pdfLookupResult?.status != "completed") pollEvents();
+            else {
+              if (pdfLookupResult.moduleGroupingId) {
+                setModuleGroupID(pdfLookupResult?.moduleGroupingId);
+                onComplete();
+              }
+            }
           }}
         >
-          Review
+          Upload
         </Button>
       </CardContent>
     </Card>

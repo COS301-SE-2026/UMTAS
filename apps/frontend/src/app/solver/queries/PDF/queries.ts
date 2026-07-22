@@ -30,10 +30,8 @@ export function pollPdfResult(params: PDFjobStatusParams) {
   return queryOptions({
     queryKey: ["PDF"],
     queryFn: async () => {
-      console.log("poll result ran with builder and job id ", params.jobId);
       const builder = new PDFjobStatusBuilder();
       const result = await builder.send({ paths: params });
-      console.log(result, "Result of polling ");
       return result;
     },
     enabled: params.jobId != "",
