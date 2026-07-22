@@ -22,6 +22,8 @@ export function createEventCriteria(
     ...(eventSource === EventSource.UNIVERSITY && {
       moduleId: randomUUID(),
     }),
+
+    ...overrides,
   };
 
   return { ...base, ...overrides };
@@ -36,8 +38,8 @@ export function createEvent(
   const base: EventEntity = {
     eventID: randomUUID(),
     eventName: 'Lecture 1',
-    activityCode: 'Lec1',
     activityType: 'lecture',
+    activityCode: 'Lec1',
     isRecurring: false,
     validated: true,
     importFingerprint: null,

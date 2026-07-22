@@ -46,7 +46,7 @@ export class AttendanceController {
 
   //GetAllAttendance records - with filters
   @Get()
-  @Roles('student')
+  @Roles('student', 'lecturer', 'uni_admin')
   @ApiOperation({
     summary: 'Get all attendance records for user or with filters',
     operationId: 'getAllAttendance',
@@ -65,7 +65,7 @@ export class AttendanceController {
 
   //get by attendanceID
   @Get(':attendanceId')
-  @Roles('student')
+  @Roles('student', 'lecturer', 'uni_admin')
   @ApiOperation({
     summary: 'Get attendance record by attendanceID',
     operationId: 'getAttendanceById',

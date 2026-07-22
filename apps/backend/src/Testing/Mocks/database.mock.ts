@@ -1,13 +1,16 @@
 //Mocks the actual database used by the API
 //Basically replaces DatabaseService
-import { mock } from 'jest-mock-extended';
-import { DatabaseService } from '../../db/database.service';
+import { DeepMockProxy, mockClear, mockDeep } from 'jest-mock-extended';
+import { AppDatabase } from '../../db/database.service';
 
-export function createMockDatabase() {
-  const mockDb = mock<DatabaseService['db']>();
+export function createMockDatabase(): {
+  mockDb: DeepMockProxy<AppDatabase>;
+  reset: () => void;
+} {
+  const mockDb = mockDeep<AppDatabase>();
 
   return {
     mockDb,
-    reset: () => jest.clearAllMocks(),
+    reset: () => mockClear(mockDb),
   };
 } //END_createMockDatabase
