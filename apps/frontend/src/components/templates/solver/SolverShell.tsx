@@ -6,11 +6,9 @@ import SolverReview from "@/components/organisms/solver/SolverReview";
 import SolverPreferences from "@/components/organisms/solver/SolverPreferences";
 import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
 import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { SolverLock } from "@/components/organisms/solver/SolverLock";
 import { useQueries, useQuery } from "@tanstack/react-query";
-import { getAllModCoursesQ } from "@/app/course-management/queries/modules/moduleQueries";
-import { UserDetails } from "@/lib/userclass/userClass";
 import { getAllEventsAdminQ } from "@/app/module-management/queries/queries";
 import { fetchAllModules } from "@/app/course-management/queries/modules/moduleBuilder";
 

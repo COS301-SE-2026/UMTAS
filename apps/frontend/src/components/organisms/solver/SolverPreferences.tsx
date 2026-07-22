@@ -8,14 +8,7 @@ import {
   CardDescription,
   CardHeader,
 } from "@/components/atoms/baseShadcn/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/atoms/baseShadcn/dropdown-menu";
-import { Trash, LucidePlusCircle } from "lucide-react";
-import { Slider } from "@/components/atoms/baseShadcn/slider";
+import { LucidePlusCircle } from "lucide-react";
 import { useState } from "react";
 import PreferenceSection from "@/components/molecules/solver/PreferencesCard";
 import { useRouter } from "next/navigation";
@@ -107,6 +100,7 @@ export default function SolverPreferences() {
               >
                 Optimisation
               </Button>
+              <Button>upload and create timetable</Button>
             </div>
           </div>
           {solveMode(currentMode)}
