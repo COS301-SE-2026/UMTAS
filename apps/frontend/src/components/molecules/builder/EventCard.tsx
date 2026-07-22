@@ -60,8 +60,8 @@ export function EventCard({
   };
 
   function handleTimeChange(slot: TimeSlot) {
-    onUpdate(event.eventID, "startTime", slot.startTime);
-    onUpdate(event.eventID, "endTime", slot.endTime);
+    onUpdate(event.eventId, "startTime", slot.startTime);
+    onUpdate(event.eventId, "endTime", slot.endTime);
   }
 
   function getInputClass(hasError: boolean) {
@@ -86,8 +86,8 @@ export function EventCard({
 
     return (
       <Select
-        value={String(event.eventCriteria?.moduleID)}
-        onValueChange={(v) => onUpdate(event.eventID, "moduleID", v)}
+        value={String(event.eventCriteria?.moduleId)}
+        onValueChange={(v) => onUpdate(event.eventId, "moduleId", v)}
       >
         <SelectTrigger
           className={getInputClass(!!errors?.moduleId) + " w-full"}
@@ -116,7 +116,7 @@ export function EventCard({
   }
 
   function renderModuleSection() {
-    if (event.eventCriteria?.type !== "university") {
+    if (event.eventCriteria?.eventSource !== "university") {
       return null;
     }
 
@@ -139,16 +139,16 @@ export function EventCard({
         {/* name */}
         <div className="flex flex-col gap-2">
           <Label
-            htmlFor={"event-name-" + event.eventID}
+            htmlFor={"event-name-" + event.eventId}
             className="text-sm font-medium text-[var(--text-secondary)]"
           >
             Name
           </Label>
           <Input
-            id={"event-name-" + event.eventID}
+            id={"event-name-" + event.eventId}
             value={event.eventName || ""}
             onChange={(e) =>
-              onUpdate(event.eventID, "eventName", e.target.value)
+              onUpdate(event.eventId, "eventName", e.target.value)
             }
             placeholder="e.g. COS301 Lecture Group A"
             className={getInputClass(!!errors?.name)}
@@ -161,16 +161,16 @@ export function EventCard({
         {/* code */}
         <div className="flex flex-col gap-2">
           <Label
-            htmlFor={"event-code-" + event.eventID}
+            htmlFor={"event-code-" + event.eventId}
             className="text-sm font-medium text-[var(--text-secondary)]"
           >
             Code
           </Label>
           <Input
-            id={"event-code-" + event.eventID}
-            value={event.eventCode || ""}
+            id={"event-code-" + event.eventId}
+            value={event.activityCode || ""}
             onChange={(e) =>
-              onUpdate(event.eventID, "eventCode", e.target.value)
+              onUpdate(event.eventId, "activityCode", e.target.value)
             }
             placeholder="e.g. COS301-LEC-A"
             maxLength={20}
@@ -184,38 +184,38 @@ export function EventCard({
         {/* venue */}
         <div className="flex flex-col gap-2">
           <Label
-            htmlFor={"event-venue-" + event.eventID}
+            htmlFor={"event-venue-" + event.eventId}
             className="text-sm font-medium text-[var(--text-secondary)]"
           >
             Venue
           </Label>
           {
-            <Input
-              id={"event-venue-" + event.eventID}
-              value={event.eventCriteria?.venue || ""}
-              onChange={(e) => onUpdate(event.eventID, "venue", e.target.value)}
-              placeholder="e.g. IT 2-26"
-              className={getInputClass(!!errors?.venue)}
-            />
+            // <Input
+            //   id={"event-venue-" + event.eventId}
+            //   value={event.eventCriteria?.venue || ""}
+            //   onChange={(e) => onUpdate(event.eventId, "venue", e.target.value)}
+            //   placeholder="e.g. IT 2-26"
+            //   className={getInputClass(!!errors?.venue)}
+            // />
           }
-          {errors?.venue && (
+          {/* {errors?.venue && (
             <p className="text-sm text-[var(--error-text)]">{errors.venue}</p>
-          )}
+          )} */}
         </div>
 
         {/* date - mapped to day */}
         <div className="flex flex-col gap-2">
           <Label
-            htmlFor={"event-date-" + event.eventID}
+            htmlFor={"event-date-" + event.eventId}
             className="text-sm font-medium text-[var(--text-secondary)]"
           >
             Date
           </Label>
           <Input
-            id={"event-date-" + event.eventID}
+            id={"event-date-" + event.eventId}
             type="date"
             value={event.eventCriteria?.date || ""}
-            onChange={(e) => onUpdate(event.eventID, "date", e.target.value)}
+            onChange={(e) => onUpdate(event.eventId, "date", e.target.value)}
             className={getInputClass(!!errors?.date)}
           />
           {errors?.date && (
@@ -238,8 +238,8 @@ export function EventCard({
             Event type
           </Label>
           <EventTypeDropdown
-            value={(event.eventCriteria?.type as EventType) || "uni"}
-            onChange={(v) => onUpdate(event.eventID, "type", v)}
+            value={(event.eventCriteria?.eventSource as EventType) || "uni"}
+            onChange={(v) => onUpdate(event.eventId, "eventSource", v)}
           />
         </div>
 
