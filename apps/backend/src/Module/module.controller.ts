@@ -37,7 +37,7 @@ export class ModuleController {
 
   //Create
   @Post()
-  @Roles('uni_admin')
+  @Roles('lecturer', 'uni_admin')
   @ApiOperation({
     summary: 'Create a module',
     description: 'Create a new module and link to appropriate course',
@@ -65,6 +65,7 @@ export class ModuleController {
 
   //Get all
   @Get()
+  @Roles()
   @ApiOperation({
     summary: 'Get all modules with filters',
     description:
@@ -92,6 +93,7 @@ export class ModuleController {
 
   //Get by id
   @Get(':moduleId')
+  @Roles()
   @ApiOperation({
     summary: 'Get a module by ID',
     description: 'Return a module from its moduleID',
@@ -119,6 +121,7 @@ export class ModuleController {
 
   //Update
   @Patch(':moduleId')
+  @Roles('lecturer', 'uni_admin')
   @ApiOperation({
     summary: 'Update a module',
     description:
@@ -153,7 +156,7 @@ export class ModuleController {
 
   // Delete
   @Delete(':moduleId')
-  @Roles('uni_admin')
+  @Roles('lecturer', 'uni_admin')
   @ApiOperation({
     summary: 'Delete a module by ID',
     description:
@@ -191,7 +194,7 @@ export class ModuleController {
   })
   @ApiResponse({
     status: 201,
-    description: 'Student already enrolled into module',
+    description: 'Unenrolled user from module',
     type: EnrolResponseDto,
   })
   @ApiResponse({
@@ -233,6 +236,7 @@ export class ModuleController {
   }
 
   @Post('/styling/:moduleId')
+  @Roles()
   @ApiOperation({
     summary: 'Update a module styling',
     description: 'Updates a module styling exactly for just a user',
