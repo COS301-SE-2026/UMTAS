@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, CSSProperties } from "react";
 import { Token } from "@/types/BrandStyle";
 import { LightPalette } from "@/types/BrandStyleData";
 import { Inspector } from "@/components/molecules/brand-style/InspectorGadget";

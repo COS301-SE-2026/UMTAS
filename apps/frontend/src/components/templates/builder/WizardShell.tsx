@@ -22,15 +22,12 @@ export function WizardShell() {
 
   const {
     data: modules = [],
-    // isLoading: modLoading,
-    // isError: modError,
+    isLoading: modLoading,
+    isError: modError,
   } = useQuery(getAllModulesQ());
   const { data: events = [] } = useQuery(getAllEventsQ());
 
-  const [
-    isInitialLoading,
-    //setIsInitialLoading
-  ] = useState(!!editId);
+  const [isInitialLoading, setIsInitialLoading] = useState(!!editId);
 
   function handleStepClick(index: number) {
     setCurrentStep(index);

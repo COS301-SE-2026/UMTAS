@@ -1,5 +1,12 @@
 "use client";
 import UserDirectoryCard from "@/components/organisms/roleManagement/UserDirectory";
+import PendingApplicationsCard from "@/components/organisms/roleManagement/PendingApplications";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/atoms/baseShadcn/tabs";
 import { UserDetails } from "@/lib/userclass/userClass";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/atoms/baseShadcn/button";
