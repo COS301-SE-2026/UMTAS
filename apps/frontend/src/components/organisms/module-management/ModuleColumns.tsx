@@ -40,12 +40,12 @@ function eventsCol(): ColumnDef<ModuleTableData, EventResponse[]> {
         return (
           <Badge
             className="m-2"
-            key={event.eventID}
+            key={event.eventId}
             style={{
               backgroundColor: info.row.original.modules.styling?.colour,
             }}
           >
-            {event.eventCode}
+            {event.activityCode}
           </Badge>
         );
       });

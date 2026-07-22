@@ -11,12 +11,6 @@ using nlohmann::json;
 
 int main(int argc, char *argv[]) {
   try {
-
-    if (argc > 1 && std::string(argv[1]) == "--health") {//will need to verify if this approach works willie
-        std::cout << "Healthy" << std::endl;
-        return 0;
-    }
-
     std::string inputPath;
     std::string outputPath;
     std::string engine = "cp-sat";

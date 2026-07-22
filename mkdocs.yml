@@ -83,6 +83,7 @@ nav:
           - Overview: sas/deployment/index.md
           - Live, Accessible System: sas/deployment/LiveAccessibleSystem.md
           - Environment Parity: sas/deployment/EnvironmentParity.md
+          - Infrastructure as Code: sas/deployment/InfrastructureAsCode.md
           - Secrets Management: sas/deployment/SecretsManagement.md
           - Rollback Strategy: sas/deployment/RollBackStrategy.md
           - Deployment Diagram: sas/deployment/DeploymentDiagram.md

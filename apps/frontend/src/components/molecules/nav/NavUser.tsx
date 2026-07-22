@@ -37,7 +37,6 @@ export function NavUser({ name: nameProp }: NavUserProps) {
           </div>
 
           <Button
-            id="sign-out-btn"
             variant="ghost"
             size="sm"
             onClick={handleSignOut}

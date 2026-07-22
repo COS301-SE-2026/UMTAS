@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useState } from "react";
 import { Button } from "@/components/atoms/baseShadcn/button";
 import { Separator } from "@/components/atoms/baseShadcn/separator";
 import { Skeleton } from "@/components/atoms/baseShadcn/skeleton";
@@ -129,9 +130,9 @@ export function GenerateStep({
         <div className="flex flex-col gap-2">
           {events.map((event) => {
             const criteria = event.eventCriteria;
-            const isEventChecked = selectedEventIds.includes(event.eventID);
+            const isEventChecked = selectedEventIds.includes(event.eventId);
             const linkedModule = getLinkedModule(
-              event.eventCriteria?.moduleID,
+              event.eventCriteria?.moduleId,
               modules,
             );
             const timeString = formatTime(
@@ -141,7 +142,7 @@ export function GenerateStep({
 
             return (
               <div
-                key={event.eventID}
+                key={event.eventId}
                 className="flex flex-row items-center gap-1 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] px-4 py-4 shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.08)]"
               >
                 <div className="flex flex-col gap-1 flex-1 min-w-0">
@@ -178,10 +179,10 @@ export function GenerateStep({
 
                 <span className="flex-shrink-0 flex items-center justify-center">
                   <Checkbox
-                    id={`event-${event.eventID}`}
+                    id={`event-${event.eventId}`}
                     checked={isEventChecked}
                     onCheckedChange={(checkedState) =>
-                      checkboxLogic(event.eventID, checkedState === true)
+                      checkboxLogic(event.eventId, checkedState === true)
                     }
                   />
                 </span>

@@ -74,17 +74,6 @@ test:
 # unit tests
 test-unit:
     phase run -- pnpm turbo run test --filter=!./apps/e2e -- --coverage
-    pnpm workers:test
-# integration tests
-test-integration:
-    phase run -- pnpm --filter backend exec jest --config jest.int.config.ts
-    phase run -- pnpm --filter frontend exec jest --config jest.int.config.js
-    pnpm workers:smoke
-# e2e tests
-test-e2e:
-    phase run -- pnpm --filter backend run test:e2e
-    pnpm workers:e2e
-    phase run -- pnpm --filter e2e exec playwright test
 
 # run production build
 build:
@@ -135,14 +124,14 @@ rollback-prod PREVIOUS_TAG:
 
 # Build the PDF parser worker image
 pdf-worker-build:
-       phase run --  pnpm docker:build:pdf-parser-worker
+    pnpm docker:build:pdf-parser-worker
 
 # Start/stop/restart the PDF parser worker for native backend development
 pdf-worker-up:
     WORKER_BACKEND_URL=http://host.docker.internal:3000 phase run -- docker compose up -d pdf-parser-worker
 
 pdf-worker-down:
-       phase run --  docker compose stop pdf-parser-worker
+    docker compose stop pdf-parser-worker
 
 pdf-worker-restart:
     WORKER_BACKEND_URL=http://host.docker.internal:3000 phase run -- docker compose up -d --force-recreate pdf-parser-worker
@@ -160,7 +149,7 @@ pdf-worker-native:
 
 # Build the solver worker image
 solver-worker-build:
-       phase run --  pnpm docker:build:solver-worker
+    pnpm docker:build:solver-worker
 
 # Start/stop/restart the solver worker for native backend development
 solver-worker-up:

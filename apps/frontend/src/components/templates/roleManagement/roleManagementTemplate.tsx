@@ -1,5 +1,12 @@
 "use client";
 import UserDirectoryCard from "@/components/organisms/roleManagement/UserDirectory";
+import PendingApplicationsCard from "@/components/organisms/roleManagement/PendingApplications";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/atoms/baseShadcn/tabs";
 import { UserDetails } from "@/lib/userclass/userClass";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/atoms/baseShadcn/button";
@@ -15,12 +22,6 @@ export default function RoleManagementTemplate() {
   if (ViableRole) {
     return (
       <div className="container mx-auto py-10">
-        <h1 className="text-lg font-semibold text-[var(--text-primary)]">
-          Role Management
-        </h1>
-        <p className="text-sm text-[var(--text-secondary)]">
-          Manage user roles and approve pending applications.
-        </p>
         <UserDirectoryCard />
       </div>
     );

@@ -32,7 +32,7 @@ export default function SolverReviewCard({
   const [tempEvent, setTempEvent] = useState<EventResponse | null>(null);
 
   const handleSelect = (event: EventResponse) => {
-    if (selectedEvent?.eventID === event.eventID) {
+    if (selectedEvent?.eventId === event.eventId) {
       setSelectedEvent(null);
       setTempEvent(null);
     } else {
@@ -73,7 +73,7 @@ export default function SolverReviewCard({
 
     onUpdateEvents((previousEvents) => {
       const updatedEvents = previousEvents.map((event) =>
-        event.eventID === tempEvent.eventID ? tempEvent : event,
+        event.eventId === tempEvent.eventId ? tempEvent : event,
       );
 
       return updatedEvents;
@@ -86,12 +86,12 @@ export default function SolverReviewCard({
   return (
     <>
       {events.map((event) => {
-        const isSelected = selectedEvent?.eventID === event.eventID;
+        const isSelected = selectedEvent?.eventId === event.eventId;
         const eventChange =
           tempEvent && JSON.stringify(tempEvent) !== JSON.stringify(event);
 
         return (
-          <div key={event.eventID} className="space-y-2 border-b pb-4">
+          <div key={event.eventId} className="space-y-2 border-b pb-4">
             <CustomiseEventPanel
               event={isSelected && tempEvent ? tempEvent : event}
               modules={modules}

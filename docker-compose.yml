@@ -98,8 +98,6 @@ services:
       - internal
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    ports:
-      - "8082:8082"
     environment:
       BULLMQ_REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
       PDF_PARSE_QUEUE_NAME: ${PDF_PARSE_QUEUE_NAME:-pdf.parse}
@@ -116,11 +114,6 @@ services:
       PDF_PARSE_CLI_COMMAND: python3
       PDF_PARSE_CLI_ARGS: -m parser_cli
       PDF_PARSE_CLI_CWD: /app/python
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8082/health"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
     depends_on:
       redis:
         condition: service_healthy
@@ -144,8 +137,6 @@ services:
       - internal
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    ports:
-      - "8081:8081"
     environment:
       BULLMQ_REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
       TIMETABLE_SOLVE_QUEUE_NAME: ${TIMETABLE_SOLVE_QUEUE_NAME:-timetable.solve}
@@ -160,11 +151,6 @@ services:
     depends_on:
       redis:
         condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8081/health"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
     stop_grace_period: 330s
     profiles:
       - dev-docker

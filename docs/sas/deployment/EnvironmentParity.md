@@ -2,14 +2,14 @@
 
 ## Overview
 
-Staging and Production share the same host infrastructure to optimise costs but are completely isolated via Docker networks. This co-location ensures the staging environment flawlessly mirrors the production environment's OS and architecture. If a feature works in staging, it is guaranteed to work in production. As mentioned previously the plan is to expand to a multi-server architecture post demo 2.This architecture would be required to ensure we have both hardware and software fallbacks as a goal.
+Staging and Production share the same host infrastructure to optimise costs but are completely isolated via Docker networks. This co-location ensures the staging environment flawlessly mirrors the production environment's OS and architecture. If a feature works in staging, it is guaranteed to work in production. As mentioned previously the plan is to expand to a multi-server architecture post demo 2.
 
 !!! success "3 Distinct Environments"
     Three distinct environments are defined. The `main` branch automatically deploys to the Staging environment via Watchtower, while Production requires a manual trigger via github actions.
 
 ## GitHub Environments
 
-To strictly control our CI/CD pipelines, approvals, and context, UMTAS maps the deployment pipeline to two distinct **GitHub Environments**:`Staging`, and `Production`. These environments act as gatekeepers for our deployment workflows.
+To strictly control our CI/CD pipelines, approvals, and context, UMTAS maps the deployment pipeline to three distinct **GitHub Environments**:`Staging`, and `Production`. These environments act as gatekeepers for our deployment workflows.
 
 
 * **Staging:** Tied directly to the `main` branch. Merges to `main` trigger GitHub Actions to build and push the `latest` Docker images, which are then autonomously picked up by Watchtower on the server.
@@ -18,19 +18,11 @@ To strictly control our CI/CD pipelines, approvals, and context, UMTAS maps the 
 ### Github Environments
 
 <figure markdown="span">
-  <img src="../gh.png" alt="GitHub Environment Secrets" width="800">
+  <img src="gh.png" alt="GitHub Environment Secrets" width="800">
   <figcaption>Fig 2. Screenshot of our Environment Parity on Github</figcaption>
 </figure>
 
 ### Environment Configurations
-
-#### Just File
-
-We are using `just` as an alternative to `make` for project specific commands. It was a lot easier to set up compared to make, especially for such a big project with mutliple apps.
-
-Below is a link to their documentation site:
-
-[Just System Guide](https://just.systems/man/en/)
 
 === "Development"
 

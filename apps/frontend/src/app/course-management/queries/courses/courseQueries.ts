@@ -21,7 +21,8 @@ export function getAllCoursesQ(body?: fetchAllCoursesBody) {
     queryKey: ["courses", body],
     queryFn: async () => {
       const builder = new getAllCoursesBuilder();
-      const result = await builder.send({ body: body });
+      const result = await builder.send({ body: body || {} });
+
       return result.courses;
     },
   });
