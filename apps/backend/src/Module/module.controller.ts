@@ -178,7 +178,7 @@ export class ModuleController {
   }
 
   //Enrol to module
-  @Post(':moduleId')
+  @Get('enroll/:moduleId')
   @Roles('student')
   @ApiOperation({
     summary: 'Enrol student to module',

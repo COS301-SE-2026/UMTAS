@@ -9,7 +9,7 @@ type createJobBody =
   paths["/solver/jobs"]["post"]["requestBody"]["content"]["application/json"];
 type createJobRes =
   paths["/solver/jobs"]["post"]["responses"]["202"]["content"]["application/json"];
-export class createJobBuilder extends RequestBuilder<
+export class createSolverJobBuilder extends RequestBuilder<
   undefined,
   createJobBody,
   createJobRes
@@ -21,10 +21,10 @@ export class createJobBuilder extends RequestBuilder<
 }
 
 export type enrollToModPath =
-  paths["/modules/{moduleId}"]["post"]["parameters"]["path"];
+  paths["/modules/enroll/{moduleId}"]["get"]["parameters"]["path"];
 
 export type enrollToModRes =
-  paths["/modules/{moduleId}"]["post"]["responses"]["200"]["content"]["application/json"];
+  paths["/modules/enroll/{moduleId}"]["get"]["responses"]["200"]["content"]["application/json"];
 export class enrollModBuilder extends RequestBuilder<
   enrollToModPath,
   undefined,
@@ -32,7 +32,7 @@ export class enrollModBuilder extends RequestBuilder<
 > {
   constructor() {
     super();
-    this.setUrl("/modules/{moduleId}").setMethod(RequestMethod.GET);
+    this.setUrl("/modules/enroll/{moduleId}").setMethod(RequestMethod.GET);
   }
 }
 
@@ -50,5 +50,20 @@ export class getSolverOutputBuilder extends RequestBuilder<
   constructor() {
     super();
     this.setUrl("/solver/jobs/{jobId}/result").setMethod(RequestMethod.GET);
+  }
+}
+
+export type pollSolverOutputPath =
+  paths["/solver/jobs/{jobId}"]["get"]["parameters"]["path"];
+export type pollSolverOutputRes =
+  paths["/solver/jobs/{jobId}"]["get"]["responses"]["200"]["content"]["application/json"];
+export class pollSolverOutputBuilder extends RequestBuilder<
+  pollSolverOutputPath,
+  undefined,
+  pollSolverOutputRes
+> {
+  constructor() {
+    super();
+    this.setUrl("/solver/jobs/{jobId}").setMethod(RequestMethod.GET);
   }
 }

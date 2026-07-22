@@ -3,7 +3,6 @@
 import { Button } from "@/components/atoms/baseShadcn/button";
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
   CardHeader,
@@ -12,11 +11,67 @@ import { LucidePlusCircle } from "lucide-react";
 import { useState } from "react";
 import PreferenceSection from "@/components/molecules/solver/PreferencesCard";
 import { useRouter } from "next/navigation";
+import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
+import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
+import {
+  createSolverJobBuilder,
+  enrollModBuilder,
+  pollSolverOutputBuilder,
+} from "@/app/solver/queries/Solver/builder";
 
-export default function SolverPreferences() {
+type solverProps = {
+  modules: ModuleResponseDto[];
+  events: EventResponse[];
+};
+
+export default function SolverPreferences({ modules, events }: solverProps) {
   const [iconClicked, setIconClicked] = useState(false);
   const [sections, setSections] = useState([0]);
-  const [currentMode, setCurrentMode] = useState("Feasibility");
+  const [currentMode, setCurrentMode] = useState<
+    "feasibility" | "optimization"
+  >("feasibility");
+
+  async function enrollUser() {
+    const builder = new enrollModBuilder();
+    await Promise.allSettled(
+      modules.map(async (mod) => {
+        const result = await builder.send({
+          paths: {
+            moduleId: mod.moduleID,
+          },
+        });
+        return result;
+      }),
+    );
+    await solveForUsersModules();
+  }
+  async function solveForUsersModules() {
+    // uses enrolled modules to create a solved output
+    const builder = new createSolverJobBuilder();
+    const result = await builder.send({
+      body: {
+        engine: currentMode === "feasibility" ? "cp-sat" : "ga",
+        solveMode: currentMode,
+        solverProfileKey: "default",
+      },
+    });
+    if (result.jobId != undefined) {
+      const pollInterval = setInterval(async () => {
+        const pollBuilder = new pollSolverOutputBuilder();
+        const resultOfPoll = await pollBuilder.send({
+          paths: {
+            jobId: result.jobId || "",
+          },
+        });
+        if (resultOfPoll.status === "completed") {
+          clearInterval(pollInterval);
+          console.log("Poll closed result finished", resultOfPoll.result);
+        } else {
+          console.log("Poll still continues", resultOfPoll);
+        }
+      }, 2500);
+    }
+  }
 
   const router = useRouter();
 
@@ -29,7 +84,7 @@ export default function SolverPreferences() {
   }
 
   function solveMode(mode: string) {
-    if (mode === "Feasibility") {
+    if (mode === "feasibility") {
       return <></>;
     }
 
@@ -87,7 +142,7 @@ export default function SolverPreferences() {
               <Button
                 variant={"outline"}
                 onClick={() => {
-                  setCurrentMode("Feasibility");
+                  setCurrentMode("feasibility");
                 }}
               >
                 Feasibility
@@ -95,12 +150,12 @@ export default function SolverPreferences() {
               <Button
                 variant={"outline"}
                 onClick={() => {
-                  setCurrentMode("Optimisation");
+                  setCurrentMode("optimization");
                 }}
               >
                 Optimisation
               </Button>
-              <Button>upload and create timetable</Button>
+              <Button onClick={enrollUser}>upload and create timetable</Button>
             </div>
           </div>
           {solveMode(currentMode)}

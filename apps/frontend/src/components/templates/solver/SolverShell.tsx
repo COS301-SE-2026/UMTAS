@@ -91,7 +91,10 @@ export default function SolverShell() {
 
         <div className="flex justify-center">
           <SolverLock locked={currentStep < 2} loading={comingFromStep === 1}>
-            <SolverPreferences />
+            <SolverPreferences
+              modules={displayMods as ModuleResponseDto[]}
+              events={events}
+            />
           </SolverLock>
         </div>
       </div>
