@@ -32,6 +32,26 @@ import {
 } from "@/components/atoms/baseShadcn/table";
 import { CourseDTO } from "@/app/course-management/queries/courses/courseBuilder";
 
+import Tutorial from "@/components/organisms/nav/Tutorial";
+const steps = [
+  {
+    target: "#input-search-courses-degrees-modules",
+    content: "Search for courses by name, degree, or module code.",
+  },
+  {
+    target: "#select-all-degrees",
+    content: "Filter results by degree program.",
+  },
+  {
+    target: "#select-all-module",
+    content: "Filter results by module type.",
+  },
+  {
+    target: "#btn-view-modules",
+    content: "View the modules available for the selected course.",
+  },
+];
+
 export default function CourseManagementTemplate() {
   const router = useRouter();
   const UniDetails = UserDetails.getUniDetails();
@@ -174,149 +194,161 @@ export default function CourseManagementTemplate() {
   }
 
   return (
-    <div className="h-[80vh] items-center flex flex-col gap-6 w-full px-6">
-      <div className="w-full max-w-6xl overflow-auto border border-[var(--border)] rounded-xl bg-[var(--bg-surface)] shadow-sm">
-        <h1 className="text-lg font-semibold text-[var(--text-primary)] pl-4 pt-4">
-          Course Management
-        </h1>
-        <p className="text-sm text-[var(--text-secondary)] pl-4 pt-2 pb-2">
-          Search and filter courses, degrees and modules.
-        </p>
-        <div className="flex flex-col md:flex-row gap-4 p-5 border-b border-[var(--border)] items-center justify-between bg-[var(--bg-surface)]">
-          <div className="w-full md:max-w-sm flex-1">
-            <Input
-              placeholder="Search courses, degrees, or module codes/names..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-[var(--background)]"
-            />
-          </div>
+    <>
+      <Tutorial steps={steps} />
 
-          <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-            <Select value={selectedDegree} onValueChange={setSelectedDegree}>
-              <SelectTrigger className="w-[180px] bg-[var(--background)]">
-                <SelectValue placeholder="Filter Degree" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="All">All Degrees</SelectItem>
-                {availableDegrees.map((degree) => (
-                  <SelectItem key={degree} value={degree}>
-                    {degree}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+      <div className="h-[80vh] items-center flex flex-col gap-6 w-full px-6">
+        <div className="w-full max-w-6xl overflow-auto border border-[var(--border)] rounded-xl bg-[var(--bg-surface)] shadow-sm">
+          <h1 className="text-lg font-semibold text-[var(--text-primary)] pl-4 pt-4">
+            Course Management
+          </h1>
+          <p className="text-sm text-[var(--text-secondary)] pl-4 pt-2 pb-2">
+            Search and filter courses, degrees and modules.
+          </p>
+          <div className="flex flex-col md:flex-row gap-4 p-5 border-b border-[var(--border)] items-center justify-between bg-[var(--bg-surface)]">
+            <div className="w-full md:max-w-sm flex-1">
+              <Input
+                id="input-search-courses-degrees-modules"
+                placeholder="Search courses, degrees, or module codes/names..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-[var(--background)]"
+              />
+            </div>
 
-            <Select
-              value={effectiveModulePrefix}
-              onValueChange={setSelectedModulePrefix}
-            >
-              <SelectTrigger className="w-[180px] bg-[var(--background)]">
-                <SelectValue placeholder="Filter Module Type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="All">All Module Types</SelectItem>
-                {availableModulePrefixes.map((prefix) => (
-                  <SelectItem key={prefix} value={prefix}>
-                    {prefix}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-        <Table>
-          <TableHeader>
-            <TableRow className="border-b border-[var(--border)]">
-              <TableHead className="p-4 text-[var(--text-primary)] font-bold">
-                Course Name
-              </TableHead>
-              <TableHead className="p-4 text-[var(--text-primary)] font-bold">
-                Degree
-              </TableHead>
-              <TableHead className="p-4 text-[var(--text-primary)] font-bold">
-                Modules Count
-              </TableHead>
-              <TableHead className="p-4 text-right text-[var(--text-primary)] font-bold">
-                Actions
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredCourses.length === 0 ? (
-              <TableRow>
-                <TableCell
-                  colSpan={4}
-                  className="p-8 text-center text-[var(--text-secondary)]"
+            <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+              <Select value={selectedDegree} onValueChange={setSelectedDegree}>
+                <SelectTrigger
+                  id="select-all-degrees"
+                  className="w-[180px] bg-[var(--background)]"
                 >
-                  No courses found matching your filters.
-                </TableCell>
+                  <SelectValue placeholder="Filter Degree" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="All">All Degrees</SelectItem>
+                  {availableDegrees.map((degree) => (
+                    <SelectItem key={degree} value={degree}>
+                      {degree}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Select
+                value={effectiveModulePrefix}
+                onValueChange={setSelectedModulePrefix}
+              >
+                <SelectTrigger
+                  id="select-all-module"
+                  className="w-[180px] bg-[var(--background)]"
+                >
+                  <SelectValue placeholder="Filter Module Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="All">All Module Types</SelectItem>
+                  {availableModulePrefixes.map((prefix) => (
+                    <SelectItem key={prefix} value={prefix}>
+                      {prefix}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <Table>
+            <TableHeader>
+              <TableRow className="border-b border-[var(--border)]">
+                <TableHead className="p-4 text-[var(--text-primary)] font-bold">
+                  Course Name
+                </TableHead>
+                <TableHead className="p-4 text-[var(--text-primary)] font-bold">
+                  Degree
+                </TableHead>
+                <TableHead className="p-4 text-[var(--text-primary)] font-bold">
+                  Modules Count
+                </TableHead>
+                <TableHead className="p-4 text-right text-[var(--text-primary)] font-bold">
+                  Actions
+                </TableHead>
               </TableRow>
-            ) : (
-              filteredCourses.map(({ course, modules }) => {
-                const isExpanded = possibleCourses[course.CourseID];
-                return (
-                  <Fragment key={course.CourseID}>
-                    <TableRow className="border-b border-[var(--border)] brand-table-hover">
-                      <TableCell className="p-4 font-medium text-[var(--text-primary)]">
-                        {course.CourseName}
-                      </TableCell>
-                      <TableCell className="p-4 text-[var(--text-secondary)]">
-                        {course.Degree}
-                      </TableCell>
-                      <TableCell className="p-4 text-[var(--text-secondary)]">
-                        {modules.length} modules
-                      </TableCell>
-                      <TableCell className="p-4 text-right">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => toggleExpand(course.CourseID)}
-                        >
-                          {isExpanded ? "Hide Modules" : "View Modules"}
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                    {isExpanded && (
-                      <TableRow
-                        key={`${course.CourseID}-modules`}
-                        className="bg-[var(--bg-elevated)]/20 border-b border-[var(--border)]"
-                      >
-                        <TableCell colSpan={4} className="p-6 pl-12">
-                          <div className="text-xs font-semibold text-[var(--text-secondary)] mb-3 uppercase tracking-wider">
-                            Associated Modules:
-                          </div>
-                          {modules.length === 0 ? (
-                            <div className="text-sm text-[var(--text-disabled)] italic">
-                              No modules assigned to this course group.
-                            </div>
-                          ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                              {modules.map((module) => (
-                                <div
-                                  key={module.moduleID}
-                                  className="bg-[var(--background)] p-3 border border-[var(--border)] rounded-lg shadow-sm"
-                                >
-                                  <div className="font-bold text-[var(--text-primary)]">
-                                    {module.moduleCode}
-                                  </div>
-                                  <div className="text-[var(--text-secondary)] text-xs mt-1">
-                                    {module.moduleName}
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          )}
+            </TableHeader>
+            <TableBody>
+              {filteredCourses.length === 0 ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={4}
+                    className="p-8 text-center text-[var(--text-secondary)]"
+                  >
+                    No courses found matching your filters.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                filteredCourses.map(({ course, modules }) => {
+                  const isExpanded = possibleCourses[course.CourseID];
+                  return (
+                    <Fragment key={course.CourseID}>
+                      <TableRow className="border-b border-[var(--border)] brand-table-hover">
+                        <TableCell className="p-4 font-medium text-[var(--text-primary)]">
+                          {course.CourseName}
+                        </TableCell>
+                        <TableCell className="p-4 text-[var(--text-secondary)]">
+                          {course.Degree}
+                        </TableCell>
+                        <TableCell className="p-4 text-[var(--text-secondary)]">
+                          {modules.length} modules
+                        </TableCell>
+                        <TableCell className="p-4 text-right">
+                          <Button
+                            id="btn-view-modules"
+                            size="sm"
+                            variant="outline"
+                            onClick={() => toggleExpand(course.CourseID)}
+                          >
+                            {isExpanded ? "Hide Modules" : "View Modules"}
+                          </Button>
                         </TableCell>
                       </TableRow>
-                    )}
-                  </Fragment>
-                );
-              })
-            )}
-          </TableBody>
-        </Table>
+                      {isExpanded && (
+                        <TableRow
+                          key={`${course.CourseID}-modules`}
+                          className="bg-[var(--bg-elevated)]/20 border-b border-[var(--border)]"
+                        >
+                          <TableCell colSpan={4} className="p-6 pl-12">
+                            <div className="text-xs font-semibold text-[var(--text-secondary)] mb-3 uppercase tracking-wider">
+                              Associated Modules:
+                            </div>
+                            {modules.length === 0 ? (
+                              <div className="text-sm text-[var(--text-disabled)] italic">
+                                No modules assigned to this course group.
+                              </div>
+                            ) : (
+                              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                {modules.map((module) => (
+                                  <div
+                                    key={module.moduleID}
+                                    className="bg-[var(--background)] p-3 border border-[var(--border)] rounded-lg shadow-sm"
+                                  >
+                                    <div className="font-bold text-[var(--text-primary)]">
+                                      {module.moduleCode}
+                                    </div>
+                                    <div className="text-[var(--text-secondary)] text-xs mt-1">
+                                      {module.moduleName}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </Fragment>
+                  );
+                })
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
