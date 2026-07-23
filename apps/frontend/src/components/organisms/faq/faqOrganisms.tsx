@@ -12,3 +12,5 @@ const FaqCategorySection = ({ category }: { category: FaqCategory }) => (
     </div>
   </section>
 );
+
+export { FaqCategorySection };
