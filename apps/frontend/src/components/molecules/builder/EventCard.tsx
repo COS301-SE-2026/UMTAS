@@ -24,6 +24,7 @@ export interface EventErrors {
   name?: string;
   code?: string;
   date?: string;
+  dayOfWeek?: string;
   time?: string;
   moduleId?: string;
   venue?: string;
