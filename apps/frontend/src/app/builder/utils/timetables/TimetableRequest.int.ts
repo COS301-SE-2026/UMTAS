@@ -97,7 +97,7 @@ describe("TimetableRequest Integration test", () => {
       body: {
         eventName: "Timetable Test Event",
         activityCode: `EVentCode`,
-        isRecurring: {},
+        isRecurring: false,
         eventCriteria: {
           date: "monday",
           startTime: "08:00",

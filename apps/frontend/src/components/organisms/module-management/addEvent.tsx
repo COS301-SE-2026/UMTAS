@@ -35,7 +35,7 @@ export default function CreateEventAdmin({ module }: createEventProps) {
     eventName: "",
     activityCode: "",
     eventCriteria: criteria,
-    isRecurring: {},
+    isRecurring: false,
   });
   const { mutateAsync: addEvent } = useMutation(addUniEventMut());
 
