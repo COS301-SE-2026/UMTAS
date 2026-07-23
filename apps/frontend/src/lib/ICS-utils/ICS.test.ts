@@ -8,6 +8,7 @@ const events: EventResponse[] = [
     activityCode: "COS332",
     eventId: "",
     eventName: "name",
+    activityType: "lecture",
     eventCriteria: {
       eventSource: "university",
       date: "monday",
