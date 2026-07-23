@@ -31,13 +31,16 @@ export default function SolverReview({
         <CardDescription className="px-6">
           Review your parsed activities before moving to preferences
         </CardDescription>
-        <CardContent className="space-y-4 overflow-auto h-[50vh]">
+        <CardContent
+          id="card-review-stuff"
+          className="space-y-4 overflow-auto h-[50vh]"
+        >
           <SolverReviewCard
             events={events}
             modules={modules}
             onUpdateEvents={() => {}}
           />
-          <Button type="button" onClick={onComplete}>
+          <Button id="btn-confirm-events" type="button" onClick={onComplete}>
             Confirm events
           </Button>
         </CardContent>

@@ -27,6 +27,25 @@ import {
 } from "@/components/templates/builder/Queries/moduleQueries";
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
 
+import Tutorial from "@/components/organisms/nav/Tutorial";
+const baseSteps = [
+  {
+    target: "#btn-add-new-module",
+    content: "Add a new module to the list.",
+  },
+];
+
+const extraSteps = [
+  {
+    target: "#btn-modify-module",
+    content: "Edit the selected module.",
+  },
+  {
+    target: "#btn-delete-module",
+    content: "Remove the selected module.",
+  },
+];
+
 interface ModulesStepProps {
   modules: ModuleResponseDto[];
 }
@@ -62,6 +81,8 @@ export function ModulesStep({ modules }: ModulesStepProps) {
   const [isDirty, setIsDirty] = useState(false);
   const [showGuard, setShowGuard] = useState(false);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
+
+  const steps = modules.length > 0 ? [...extraSteps, ...baseSteps] : baseSteps;
 
   const addModule = useMutation(addModuleMut());
   const deleteModule = useMutation(removeModuleMut());
@@ -179,6 +200,7 @@ export function ModulesStep({ modules }: ModulesStepProps) {
         {/* summary row */}
         <div className="flex items-center gap-2">
           <button
+            id="btn-modify-module"
             type="button"
             onClick={() => handleSelect(module.moduleID)}
             className="flex flex-1 items-center gap-3 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] px-4 py-4 text-left transition-colors duration-[var(--duration-fast)] hover:bg-[var(--bg-elevated)] shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.08)]"
@@ -211,6 +233,7 @@ export function ModulesStep({ modules }: ModulesStepProps) {
 
           {/* trash button on summary row*/}
           <Button
+            id="btn-delete-module"
             type="button"
             variant="ghost"
             size="icon"
@@ -251,6 +274,8 @@ export function ModulesStep({ modules }: ModulesStepProps) {
 
   return (
     <div className="px-8 py-6">
+      <Tutorial steps={steps} wait={true} />
+
       <AlertDialog open={showGuard} onOpenChange={setShowGuard}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -290,6 +315,7 @@ export function ModulesStep({ modules }: ModulesStepProps) {
       </div>
 
       <button
+        id="btn-add-new-module"
         type="button"
         onClick={() => addModule.mutate()}
         disabled={addModule.isPending}
