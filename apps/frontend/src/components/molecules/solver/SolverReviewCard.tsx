@@ -91,7 +91,7 @@ export default function SolverReviewCard({
           tempEvent && JSON.stringify(tempEvent) !== JSON.stringify(event);
 
         return (
-          <div key={event.eventId} className="space-y-2 border-b pb-4">
+          <div key={event.eventId} className="space-y-2 border-b pb-4  ">
             <CustomiseEventPanel
               event={isSelected && tempEvent ? tempEvent : event}
               modules={modules}
