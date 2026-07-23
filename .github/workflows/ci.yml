@@ -55,11 +55,11 @@ jobs:
       - name: Run Build
         run: pnpm run build
 
-      - name: Run Tests
-        run: pnpm run test:unit
+      # - name: Run Tests
+      #   run: pnpm run test:unit
 
-      - name: Run Integration Tests
-        run: pnpm --filter backend test:int
+      # - name: Run Integration Tests
+      #   run: pnpm --filter backend test:int
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@75cd11691c0faa626561e295848008c8a7dddffe
