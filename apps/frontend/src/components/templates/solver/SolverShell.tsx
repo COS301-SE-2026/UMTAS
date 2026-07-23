@@ -87,7 +87,7 @@ export default function SolverShell() {
   }
   return (
     <>
-      <Tutorial steps={steps} />
+      <Tutorial steps={steps} wait={true} />
 
       <WizardStepper
         completedSteps={completedSteps}

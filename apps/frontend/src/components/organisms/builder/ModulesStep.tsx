@@ -274,7 +274,7 @@ export function ModulesStep({ modules }: ModulesStepProps) {
 
   return (
     <div className="px-8 py-6">
-      <Tutorial steps={steps} />
+      <Tutorial steps={steps} wait={true} />
 
       <AlertDialog open={showGuard} onOpenChange={setShowGuard}>
         <AlertDialogContent>

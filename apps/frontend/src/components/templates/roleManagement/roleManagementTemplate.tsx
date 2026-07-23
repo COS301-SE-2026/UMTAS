@@ -58,7 +58,7 @@ export default function RoleManagementTemplate() {
   if (ViableRole) {
     return (
       <div className="container mx-auto py-10">
-        <Tutorial steps={steps} />
+        <Tutorial steps={steps} wait={true} />
         <UserDirectoryCard />
       </div>
     );

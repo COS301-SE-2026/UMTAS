@@ -63,7 +63,7 @@ export function InstituteSelector() {
   const router = useRouter();
   return (
     <>
-      <Tutorial steps={steps} />
+      <Tutorial steps={steps} wait={true} />
 
       <form
         className="flex flex-col gap-6"

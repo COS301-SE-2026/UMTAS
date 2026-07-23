@@ -110,7 +110,7 @@ export default function ModManagementTemplate() {
 
   return (
     <div className="h-[80vh] items-center flex flex-col gap-6 w-full px-6 pt-6">
-      <Tutorial steps={steps} />
+      <Tutorial steps={steps} wait={true} />
 
       <Card className="flex flex-col w-full max-w-6xl border-[var(--border)] rounded-xl bg-[var(--bg-surface)] shadow-sm overflow-hidden h-full">
         <div className="flex flex-col flex-row justify-between items-start items-center pr-5 bg-[var(--bg-surface)]">

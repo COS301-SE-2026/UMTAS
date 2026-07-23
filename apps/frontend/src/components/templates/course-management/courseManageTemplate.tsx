@@ -195,7 +195,7 @@ export default function CourseManagementTemplate() {
 
   return (
     <>
-      <Tutorial steps={steps} />
+      <Tutorial steps={steps} wait={true} />
 
       <div className="h-[80vh] items-center flex flex-col gap-6 w-full px-6">
         <div className="w-full max-w-6xl overflow-auto border border-[var(--border)] rounded-xl bg-[var(--bg-surface)] shadow-sm">
