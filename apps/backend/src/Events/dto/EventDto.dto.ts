@@ -91,8 +91,14 @@ export class EventDto {
   @ValidateNested({ each: true })
   @Type(() => VenueDto)
   venues?: VenueDto[];
-  @ApiPropertyOptional() @IsOptional() @IsBoolean() isRecurring?: boolean;
-  @ApiPropertyOptional() @IsOptional() @IsBoolean() validated?: boolean;
+  @ApiPropertyOptional({ type: Boolean })
+  @IsOptional()
+  @IsBoolean()
+  isRecurring?: boolean;
+  @ApiPropertyOptional({ type: Boolean })
+  @IsOptional()
+  @IsBoolean()
+  validated?: boolean;
 }
 
 export class CreateEventDto extends PickType(EventDto, [

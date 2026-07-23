@@ -139,8 +139,9 @@ export function EventsStep({
         const emptyEvent: EventResponse = {
           eventId: `TEMP_${nextNum}`,
           activityCode: "",
-          isRecurring: {},
+          isRecurring: false,
           eventName: "",
+          activityType: "lecture",
           eventCriteria: {
             eventSource: "university",
             date: "",
@@ -236,7 +237,8 @@ export function EventsStep({
     if (iscreated?.created) {
       updateEvent.mutate({
         body: {
-          isRecurring: {},
+          isRecurring: false,
+          activityType: event.activityType,
           activityCode: event.activityCode,
           eventCriteria: event.eventCriteria,
           eventName: event.eventName,
@@ -249,9 +251,10 @@ export function EventsStep({
       const result = addEvent.mutateAsync({
         body: {
           eventCriteria: event.eventCriteria,
+          activityType: event.activityType || "lecture",
           activityCode: event.activityCode,
           eventName: event.eventName,
-          isRecurring: {},
+          isRecurring: false,
         },
       });
       const newID = (await result).event.eventId;
