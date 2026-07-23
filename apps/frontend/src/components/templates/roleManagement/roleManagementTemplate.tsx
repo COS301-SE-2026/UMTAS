@@ -22,12 +22,6 @@ export default function RoleManagementTemplate() {
   if (ViableRole) {
     return (
       <div className="container mx-auto py-10">
-        <h1 className="text-lg font-semibold text-[var(--text-primary)]">
-          Role Management
-        </h1>
-        <p className="text-sm text-[var(--text-secondary)]">
-          Manage user roles and approve pending applications.
-        </p>
         <UserDirectoryCard />
       </div>
     );

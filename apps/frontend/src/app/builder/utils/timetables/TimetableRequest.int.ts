@@ -1,4 +1,3 @@
-/*
 import {
   createTimeTableBuilder,
   getAllTimeTablesBuilder,
@@ -97,20 +96,20 @@ describe("TimetableRequest Integration test", () => {
     const createdEvent = await eventBuilder.send({
       body: {
         eventName: "Timetable Test Event",
-        eventCode: `EVentCode`,
+        activityCode: `EVentCode`,
         isRecurring: false,
         eventCriteria: {
           date: "monday",
           startTime: "08:00",
           endTime: "09:00",
-          type: "university",
-          venue: "IT 2-26",
-          moduleID: moduleId,
+          eventSource: "university",
+          //venue: "IT 2-26",
+          moduleId: moduleId,
         },
       },
     });
 
-    const eventId = createdEvent.event.eventID;
+    const eventId = createdEvent.event.eventId;
 
     expect(eventId).toBeDefined();
 
@@ -145,4 +144,3 @@ describe("TimetableRequest Integration test", () => {
     });
   });
 });
-*/

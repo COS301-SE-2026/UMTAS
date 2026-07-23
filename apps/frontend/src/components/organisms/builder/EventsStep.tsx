@@ -96,7 +96,7 @@ function isEventComplete(event: EventResponse) {
   if (!criteria?.date) return false;
   if (!criteria?.startTime) return false;
   if (!criteria?.endTime) return false;
-  if (event.activityType != undefined)
+  if (criteria?.eventSource === "university")
     // TODO add module && event.eventCriteria.moduleID)
     return false;
   return true;
@@ -139,15 +139,14 @@ export function EventsStep({
         const emptyEvent: EventResponse = {
           eventId: `TEMP_${nextNum}`,
           activityCode: "",
+          isRecurring: false,
           eventName: "",
           activityType: "lecture",
           eventCriteria: {
+            eventSource: "university",
             date: "",
             endTime: "",
             startTime: "",
-            eventSource: "university",
-            moduleId: "",
-            //     dayOfWeek: "monday", // add functionality here
           },
         };
         return [...(oldEvents ?? []), emptyEvent];
@@ -238,6 +237,8 @@ export function EventsStep({
     if (iscreated?.created) {
       updateEvent.mutate({
         body: {
+          isRecurring: false,
+          activityType: event.activityType,
           activityCode: event.activityCode,
           eventCriteria: event.eventCriteria,
           eventName: event.eventName,
@@ -250,8 +251,10 @@ export function EventsStep({
       const result = addEvent.mutateAsync({
         body: {
           eventCriteria: event.eventCriteria,
+          activityType: event.activityType || "lecture",
           activityCode: event.activityCode,
           eventName: event.eventName,
+          isRecurring: false,
         },
       });
       const newID = (await result).event.eventId;
@@ -360,6 +363,7 @@ export function EventsStep({
     const errors = errorMap[event.eventId];
     const moduleName = getLinkedModuleName(event, modules);
     const criteria = event.eventCriteria;
+
     return (
       <div key={event.eventId} className="flex flex-col gap-2">
         {/* summary row */}

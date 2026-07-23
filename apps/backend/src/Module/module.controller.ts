@@ -59,7 +59,7 @@ export class ModuleController {
   createModule(
     @CurrentSession() session: SessionData,
     @Body() dto: CreateModuleDto,
-  ) {
+  ): Promise<ModuleSingleResponseDto> {
     return this.service.create(session.user.id, dto);
   }
 
@@ -86,7 +86,7 @@ export class ModuleController {
   getAll(
     @CurrentSession() session: SessionData,
     @Query() filters: ModuleFiltersDto,
-  ) {
+  ): Promise<ModuleListResponseDto> {
     return this.service.getAll(session.user.id, filters);
   }
 
@@ -113,7 +113,7 @@ export class ModuleController {
   getById(
     @CurrentSession() session: SessionData,
     @Param('moduleId', ParseUUIDPipe) moduleId: string,
-  ) {
+  ): Promise<ModuleSingleResponseDto> {
     return this.service.getById(session.user.id, moduleId);
   }
 
@@ -147,7 +147,7 @@ export class ModuleController {
     @CurrentSession() session: SessionData,
     @Param('moduleId', ParseUUIDPipe) moduleId: string,
     @Body() dto: UpdateModuleDto,
-  ) {
+  ): Promise<ModuleSingleResponseDto> {
     return this.service.update(session.user.id, moduleId, dto);
   }
 
@@ -173,7 +173,9 @@ export class ModuleController {
     status: 404,
     description: 'Module not found',
   })
-  delete(@Param('moduleId', ParseUUIDPipe) moduleId: string) {
+  delete(
+    @Param('moduleId', ParseUUIDPipe) moduleId: string,
+  ): Promise<DeleteModuleResponseDto> {
     return this.service.deleteById(moduleId);
   }
 
@@ -201,7 +203,7 @@ export class ModuleController {
   enrol(
     @CurrentSession() session: SessionData,
     @Param('moduleId', ParseUUIDPipe) moduleId: string,
-  ) {
+  ): Promise<EnrolResponseDto> {
     return this.service.enrollToModule(session.user.id, moduleId);
   } //END_enrol
 
@@ -228,7 +230,7 @@ export class ModuleController {
   addModulesToCourse(
     @Param('CourseID', ParseUUIDPipe) courseId: string,
     @Body() dto: AddModulesToCourseDto,
-  ) {
+  ): Promise<AddModulesToCourseResponseDto> {
     return this.service.addModulesToCourse(courseId, dto);
   }
 
@@ -254,7 +256,7 @@ export class ModuleController {
     @CurrentSession() session: SessionData,
     @Param('moduleId', ParseUUIDPipe) moduleId: string,
     @Body() dto: ModuleStylingBodyDto,
-  ) {
+  ): Promise<ModuleStylingResponseDto> {
     return this.service.updateStylingService(session.user.id, moduleId, dto);
   }
 } //ModuleController

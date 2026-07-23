@@ -1,5 +1,9 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import type { PdfParserResult, WorkerCallbackError } from 'shared-types';
+import {
+  PdfParserResultDto,
+  WorkerCallbackErrorDto,
+} from '../../jobs/dto/worker-contract.dto';
 
 export class PdfParserJobResponseDto {
   @ApiProperty({ example: 'pdf-parse-2d82d1ff-fb51-4c67-80cf-61d88c12d596' })
@@ -18,10 +22,10 @@ export class PdfParserJobResponseDto {
   @ApiProperty({ enum: ['queued', 'completed', 'failed'] })
   status!: 'queued' | 'completed' | 'failed';
 
-  @ApiPropertyOptional({ type: 'object', additionalProperties: true })
+  @ApiPropertyOptional({ type: PdfParserResultDto })
   result?: PdfParserResult;
 
-  @ApiPropertyOptional({ type: 'object', additionalProperties: true })
+  @ApiPropertyOptional({ type: WorkerCallbackErrorDto })
   error?: WorkerCallbackError;
 
   @ApiPropertyOptional({
@@ -45,7 +49,7 @@ export class PdfParserUploadResponseDto extends PdfParserJobResponseDto {
 }
 
 export class PdfParserLookupResponseDto {
-  @ApiProperty({ example: true })
+  @ApiProperty({ type: Boolean, example: true })
   duplicate!: boolean;
 
   @ApiPropertyOptional({
@@ -62,7 +66,7 @@ export class PdfParserLookupResponseDto {
   })
   moduleGroupingId?: string | null;
 
-  @ApiPropertyOptional({ example: true })
+  @ApiPropertyOptional({ type: Boolean, example: true })
   resultAvailable?: boolean;
 
   @ApiPropertyOptional({

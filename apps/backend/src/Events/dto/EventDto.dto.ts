@@ -95,7 +95,10 @@ export class EventDto {
   @IsOptional()
   @IsBoolean()
   isRecurring?: boolean;
-  @ApiPropertyOptional() @IsOptional() @IsBoolean() validated?: boolean;
+  @ApiPropertyOptional({ type: Boolean })
+  @IsOptional()
+  @IsBoolean()
+  validated?: boolean;
 }
 
 export class CreateEventDto extends PickType(EventDto, [
@@ -110,13 +113,11 @@ export class CreateEventDto extends PickType(EventDto, [
     enum: ActivityTypeSchema.options,
     description: 'Required when eventCriteria.moduleId is provided.',
   })
-  @ValidateIf((value: CreateEventDto) => {
-    console.log(value);
-    return (
+  @ValidateIf(
+    (value: CreateEventDto) =>
       value.activityType !== undefined ||
-      value.eventCriteria?.moduleId !== undefined
-    );
-  })
+      value.eventCriteria?.moduleId !== undefined,
+  )
   @IsDefined()
   @IsEnum(ActivityTypeSchema.options)
   activityType?: (typeof ActivityTypeSchema.options)[number];
@@ -140,7 +141,7 @@ export class DeleteResponseDto extends PickType(EventDto, [
   'eventName',
   'activityCode',
 ] as const) {
-  @ApiProperty() success!: boolean;
+  @ApiProperty({ type: Boolean }) success!: boolean;
 }
 export class EventFiltersDto {
   @ApiPropertyOptional() @IsOptional() @IsUUID() moduleId?: string;

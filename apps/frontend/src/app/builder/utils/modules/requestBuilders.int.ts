@@ -1,7 +1,6 @@
 /**
  * @jest-environment node
  */
-/*
 import {
   getAllModulesBuilder,
   createModulesBuilder,
@@ -123,4 +122,3 @@ describe("Request Builders Integration Tests", () => {
     });
   });
 });
-*/

@@ -26,6 +26,7 @@ import {
   ApprovedUserRoleResponse,
   ApproveUsersRoleDto,
   GetRolesDto,
+  UserUniversityRoleResponseDto,
   GetRoleFilterDto,
 } from './dto/university.dto';
 import { notExists } from 'drizzle-orm';
@@ -198,7 +199,7 @@ export class UniversityService {
     userId: string,
     uniId: string,
     tx?: DatabaseService['db'],
-  ) {
+  ): Promise<UserUniversityRoleResponseDto> {
     if (!tx) {
       return await this.dbService.db.transaction(async (t: AppDatabase) => {
         return this.getUsersRole(userId, uniId, t);

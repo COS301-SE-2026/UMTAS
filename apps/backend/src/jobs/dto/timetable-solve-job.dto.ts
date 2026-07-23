@@ -7,6 +7,7 @@ import {
   IsString,
 } from 'class-validator';
 import type { SolverPreferences } from 'shared-types';
+import { SolverPreferencesDto } from './worker-contract.dto';
 
 export class TimetableSolveJobDto {
   @ApiProperty({
@@ -37,7 +38,11 @@ export class TimetableSolveJobDto {
   @IsIn(['auto', 'cp-sat', 'ga'])
   engine?: 'auto' | 'cp-sat' | 'ga';
 
-  @ApiProperty({ required: false, example: { heuristics: [] } })
+  @ApiProperty({
+    type: SolverPreferencesDto,
+    required: false,
+    example: { heuristics: [] },
+  })
   @IsOptional()
   @IsObject()
   preferences?: SolverPreferences;
