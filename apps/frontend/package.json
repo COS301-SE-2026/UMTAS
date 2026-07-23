@@ -5,7 +5,7 @@
   "packageManager": "pnpm@10.33.2",
   "scripts": {
     "dev": "next dev --port 3001",
-    "build": "next build",
+    "build": "pnpm --filter shared-types build && next build",
     "start": "next start",
     "lint": "eslint",
     "test": "jest",
