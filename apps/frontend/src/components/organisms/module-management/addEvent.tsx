@@ -27,7 +27,6 @@ export default function CreateEventAdmin({ module }: createEventProps) {
   const [criteria, setCriteria] = useState<EventCriteria>({
     date: "",
     endTime: "",
-    //venue: "",
     startTime: "",
     moduleId: module.moduleID,
     eventSource: "university",
@@ -68,7 +67,7 @@ export default function CreateEventAdmin({ module }: createEventProps) {
         update={updateCriteria}
         type="date"
       />
-      {/* <StateInput State={criteria} field="venue" update={updateCriteria} /> */}
+      {/*<StateInput State={criteria} field="venue" update={updateCriteria} />*/}
       <div className="flex flex-row space-x-3">
         <TimeSelect
           times={TIMES}

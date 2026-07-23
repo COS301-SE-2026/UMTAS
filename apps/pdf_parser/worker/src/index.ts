@@ -52,7 +52,15 @@ worker.on("completed", (job) => {
 worker.on("failed", (job, error) => {
   console.error("PDF parse job failed", {
     jobId: job?.id,
-    error: error.message,
+    queueName: job?.queueName,
+    data: job?.data,
+    attemptsMade: job?.attemptsMade,
+    errorName: error?.name,
+    errorMessage: error?.message,
+    errorStack: error?.stack,
+    callbackBaseUrl: config.callbackBaseUrl,
+    callbackToken: config.callbackToken ? "***redacted***" : null,
+    endpointReachable: config.s3.endpoint,
   });
 });
 

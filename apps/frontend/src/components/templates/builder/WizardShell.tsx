@@ -25,7 +25,12 @@ export function WizardShell() {
     isLoading: modLoading,
     isError: modError,
   } = useQuery(getAllModulesQ());
-  const { data: events = [] } = useQuery(getAllEventsQ());
+  const { data: Allevents = [] } = useQuery(getAllEventsQ());
+  const events = Allevents.filter(
+    (event) =>
+      modules.some((mod) => mod.moduleID === event.eventCriteria.moduleId) ||
+      event.eventCriteria.moduleId === "TEMP",
+  );
 
   const [isInitialLoading, setIsInitialLoading] = useState(!!editId);
 
