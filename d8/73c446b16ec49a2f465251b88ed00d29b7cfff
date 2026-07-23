@@ -1,0 +1,26 @@
+apps/frontend/src/components/organisms/builder/EventsStep.tsx
+  h_84e82529bd05a5 511
+apps/frontend/src/components/templates/module-management/moduleManagementTemplate.tsx
+  h_84e82529bd05a5 113
+apps/frontend/src/components/organisms/choose-institute/instituteSelector.tsx
+  h_84e82529bd05a5 66
+apps/frontend/src/components/organisms/builder/ModulesStep.tsx
+  h_84e82529bd05a5 277
+apps/frontend/src/components/templates/roleManagement/roleManagementTemplate.tsx
+  h_84e82529bd05a5 61
+apps/frontend/src/components/templates/solver/SolverShell.tsx
+  h_84e82529bd05a5 90
+apps/frontend/src/components/templates/course-management/courseManageTemplate.tsx
+  h_84e82529bd05a5 198
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "d873c446b16ec49a2f465251b88ed00d29b7cfff",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}
