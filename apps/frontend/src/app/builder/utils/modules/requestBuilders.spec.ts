@@ -120,7 +120,6 @@ describe("updateModulesBuilder", () => {
     const mockPath: updateModuleByIdPath = { moduleId: "str" };
     const mockBody: updateModuleByIdBody = {
       moduleName: "Updated Module",
-      Core: {},
     };
     await builder.send({
       paths: mockPath,

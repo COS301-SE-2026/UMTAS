@@ -30,6 +30,10 @@ import {
 import { Public } from '../auth/auth.guard';
 import { CurrentSession, type SessionData } from '../auth/session.decorator';
 import { WorkerCallbackAuthGuard } from '../jobs/worker-callback-auth.guard';
+import {
+  AcceptedJobResponseDto,
+  PdfParserResultDto,
+} from '../jobs/dto/worker-contract.dto';
 import { PdfParserCallbackDto } from './dto/pdf-parser-callback.dto';
 import {
   PdfParserJobResponseDto,
@@ -209,7 +213,7 @@ export class PdfParserController {
     description:
       'Returns persisted import candidates only for completed jobs owned by the authenticated user.',
   })
-  @ApiOkResponse({ type: Object })
+  @ApiOkResponse({ type: PdfParserResultDto })
   async getJobResult(
     @CurrentSession() session: SessionData,
     @Param('jobId') jobId: string,
@@ -228,10 +232,11 @@ export class PdfParserController {
   @UseGuards(WorkerCallbackAuthGuard)
   @ApiOperation({ summary: 'Receive final PDF parser worker callback' })
   @HttpCode(HttpStatus.ACCEPTED)
+  @ApiAcceptedResponse({ type: AcceptedJobResponseDto })
   async receiveCallback(
     @Param('jobId') jobId: string,
     @Body() body: PdfParserCallbackDto,
-  ): Promise<{ accepted: true; jobId: string }> {
+  ): Promise<AcceptedJobResponseDto> {
     const callback = validatePdfParserCallback(body);
     await this.jobStore.recordCallback(jobId, callback);
 

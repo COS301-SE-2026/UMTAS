@@ -103,7 +103,6 @@ export default function ModulesShell({
           moduleName: tempModule.moduleName,
           moduleDescription: tempModule.moduleDescription,
           styling: tempModule.styling,
-          Core: {},
         },
       });
     } else {

@@ -204,7 +204,7 @@ export function NoPermissionsEventCard({
             {/* <Input
               id={"event-venue-" + event.eventId}
               value={event.eventCriteria?.venue || ""}
-              onChange={(e) => onUpdate(event.eventID, "venue", e.target.value)}
+              onChange={(e) => onUpdate(event.eventId, "venue", e.target.value)}
               placeholder="e.g. IT 2-26"
               className={getInputClass(!!errors?.venue)}
             />

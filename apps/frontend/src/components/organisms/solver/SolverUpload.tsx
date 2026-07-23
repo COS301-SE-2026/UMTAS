@@ -159,6 +159,7 @@ export default function SolverUpload({
           </div>
 
           <Button
+            id="btn-browse-files"
             variant="outline"
             onClick={() => uploadFileRef.current?.click()}
             className="font-mono"
@@ -187,6 +188,7 @@ export default function SolverUpload({
         </div>
 
         <Button
+          id="btn-upload"
           disabled={
             currentlyPolling || moduleGroupID != null || selectedFile == null
           }

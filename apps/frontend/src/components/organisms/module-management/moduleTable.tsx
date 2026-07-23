@@ -141,7 +141,7 @@ function CourseTableBody<TData>({
         </TableRow>
       ) : (
         rows.map((row) => (
-          <TableRow key={row.id}>
+          <TableRow id="row-module-row" key={row.id}>
             {row.getVisibleCells().map((cell) => (
               <TableCell
                 key={cell.id}

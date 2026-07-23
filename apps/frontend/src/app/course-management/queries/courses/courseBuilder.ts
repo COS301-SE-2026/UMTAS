@@ -10,7 +10,8 @@ export type createCourses = paths["/Courses"]["post"];
 
 export type createCoursesBody =
   createCourses["requestBody"]["content"]["application/json"];
-export type createCoursesRes = createCourses["responses"]["201"];
+export type createCoursesRes =
+  createCourses["responses"]["201"]["content"]["application/json"];
 
 export class createCoursesBuilder extends RequestBuilder<
   undefined,
@@ -59,7 +60,8 @@ export class updateCourseBuilder extends RequestBuilder<
 
 export type deleteCourse = paths["/Courses/{CourseId}"]["delete"];
 export type deleteCoursePath = deleteCourse["parameters"]["path"];
-export type deleteCourseRes = deleteCourse["responses"]["200"];
+export type deleteCourseRes =
+  deleteCourse["responses"]["200"]["content"]["application/json"];
 export class deleteCourseBuilder extends RequestBuilder<
   deleteCoursePath,
   undefined,

@@ -79,7 +79,7 @@ const Links = [
   },
   {
     label: "Brand Style",
-    href: "https://brand.capstone-vigil.dns.net.za/",
+    href: "/brand-style",
     id: "brand-style-link",
   },
   {

@@ -141,7 +141,7 @@ export class DeleteResponseDto extends PickType(EventDto, [
   'eventName',
   'activityCode',
 ] as const) {
-  @ApiProperty() success!: boolean;
+  @ApiProperty({ type: Boolean }) success!: boolean;
 }
 export class EventFiltersDto {
   @ApiPropertyOptional() @IsOptional() @IsUUID() moduleId?: string;

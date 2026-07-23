@@ -26,14 +26,13 @@ describe('SolverSubmissionService semantic deduplication', () => {
     harness.store.markEnqueued.mockResolvedValue(queued);
 
     await expect(harness.service.submit(request())).resolves.toBe(queued);
-    expect(harness.inputBuilder.buildForProfile).toHaveBeenCalledWith(
+    expect(harness.inputBuilder.buildForSubmission).toHaveBeenCalledWith(
       request().userId,
-      'default',
+      request().eventIds,
       { heuristics: [] },
     );
     expect(harness.store.reserveOrReuse).toHaveBeenCalledWith({
       userId: request().userId,
-      solverProfileKey: 'default',
       solveMode: 'optimization',
       requestedEngine: 'auto',
       deduplicationKey,
@@ -77,7 +76,7 @@ describe('SolverSubmissionService semantic deduplication', () => {
     };
     const queue = { enqueueTimetableSolveJob: jest.fn() };
     const inputBuilder = {
-      buildForProfile: jest.fn().mockResolvedValue(solverInput),
+      buildForSubmission: jest.fn().mockResolvedValue(solverInput),
     };
     const fingerprintService = {
       compute: jest.fn().mockReturnValue(deduplicationKey),
@@ -100,12 +99,12 @@ const solverInput = {
   schedulingProblem: { events: [] },
   preferences: { heuristics: [] },
 };
-const deduplicationKey = `solver-semantic-sha256-v1:${'a'.repeat(64)}`;
+const deduplicationKey = `solver-semantic-sha256-v2:${'a'.repeat(64)}`;
 
 function request() {
   return {
     userId: '11111111-1111-4111-8111-111111111111',
-    solverProfileKey: 'default',
+    eventIds: ['22222222-2222-4222-8222-222222222222'],
     solveMode: 'optimization' as const,
     engine: 'auto' as const,
     preferences: { heuristics: [] },
@@ -116,7 +115,6 @@ function record(status: 'queued' | 'completed' | 'failed') {
   return {
     jobId: 'solve-22222222-2222-4222-8222-222222222222',
     userId: request().userId,
-    solverProfileKey: 'default',
     solveMode: 'optimization' as const,
     requestedEngine: 'auto' as const,
     deduplicationKey,

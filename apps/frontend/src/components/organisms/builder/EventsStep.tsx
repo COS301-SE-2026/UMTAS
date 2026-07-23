@@ -39,6 +39,25 @@ import {
 } from "@/components/templates/builder/Queries/eventQueries";
 import { useMutation } from "@tanstack/react-query";
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
+import Tutorial from "@/components/organisms/nav/Tutorial";
+
+const baseSteps = [
+  {
+    target: "#btn-add-new-event",
+    content: "Add a new event to the list.",
+  },
+];
+
+const extendedSteps = [
+  {
+    target: "#btn-modify-event",
+    content: "Edit the selected event.",
+  },
+  {
+    target: "#btn-delete-event",
+    content: "Remove the selected event.",
+  },
+];
 
 interface EventsStepProps {
   events: EventResponse[];
@@ -139,6 +158,9 @@ export function EventsStep({
   const [eventsAdded, setEventsAdded] = useState<
     { eventID: string; created: boolean }[]
   >([]);
+
+  const steps =
+    events.length > 0 ? [...extendedSteps, ...baseSteps] : baseSteps;
 
   // a local construct to add an empty event
   function addEmptyEvent() {
@@ -401,6 +423,7 @@ export function EventsStep({
         {/* summary row */}
         <div className="flex items-center gap-2">
           <button
+            id="btn-modify-event"
             type="button"
             onClick={() => handleSelect(event.eventId)}
             className="flex flex-1 items-center gap-3 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] px-4 py-4 text-left transition-colors duration-[var(--duration-fast)] hover:bg-[var(--bg-elevated)] shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.08)]"
@@ -443,6 +466,7 @@ export function EventsStep({
 
           {/* trash button */}
           <Button
+            id="btn-delete-event"
             type="button"
             variant="ghost"
             size="icon"
@@ -488,6 +512,7 @@ export function EventsStep({
 
     return (
       <button
+        id="btn-add-new-event"
         type="button"
         onClick={addEmptyEvent} // adds an event card
         className="mt-4 flex w-full items-center gap-3 rounded-lg border border-dashed border-[var(--border)] px-4 py-4 text-left text-base text-[var(--text-secondary)] transition-colors duration-[var(--duration-fast)] hover:border-[var(--text-secondary)] hover:text-[var(--text-primary)]"
@@ -502,6 +527,7 @@ export function EventsStep({
 
   return (
     <div className="px-8 py-6">
+      <Tutorial steps={steps} wait={true} />
       <AlertDialog open={showGuard} onOpenChange={setShowGuard}>
         <AlertDialogContent>
           <AlertDialogHeader>
