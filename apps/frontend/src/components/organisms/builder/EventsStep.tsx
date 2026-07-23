@@ -41,6 +41,24 @@ import { useMutation } from "@tanstack/react-query";
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
 import Tutorial from "@/components/organisms/nav/Tutorial";
 
+const baseSteps = [
+  {
+    target: "#btn-add-new-event",
+    content: "Add a new event to the list.",
+  },
+];
+
+const extendedSteps = [
+  {
+    target: "#btn-modify-event",
+    content: "Edit the selected event.",
+  },
+  {
+    target: "#btn-delete-event",
+    content: "Remove the selected event.",
+  },
+];
+
 interface EventsStepProps {
   events: EventResponse[];
   modules: ModuleResponseDto[];
@@ -129,6 +147,9 @@ export function EventsStep({
   const [eventsAdded, setEventsAdded] = useState<
     { eventID: string; created: boolean }[]
   >([]);
+
+  const steps =
+    events.length > 0 ? [...extendedSteps, ...baseSteps] : baseSteps;
 
   // a local construct to add an empty event
   function addEmptyEvent() {
@@ -464,21 +485,6 @@ export function EventsStep({
       </div>
     );
   }
-
-  const steps = [
-    {
-      target: "#btn-modify-event",
-      content: "Edit the selected event.",
-    },
-    {
-      target: "#btn-delete-event",
-      content: "Remove the selected event.",
-    },
-    {
-      target: "#btn-add-new-event",
-      content: "Add a new event to the list.",
-    },
-  ];
 
   function renderAddButton() {
     if (modules.length === 0) {

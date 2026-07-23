@@ -28,7 +28,14 @@ import {
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
 
 import Tutorial from "@/components/organisms/nav/Tutorial";
-const steps = [
+const baseSteps = [
+  {
+    target: "#btn-add-new-module",
+    content: "Add a new module to the list.",
+  },
+];
+
+const extraSteps = [
   {
     target: "#btn-modify-module",
     content: "Edit the selected module.",
@@ -36,10 +43,6 @@ const steps = [
   {
     target: "#btn-delete-module",
     content: "Remove the selected module.",
-  },
-  {
-    target: "#btn-add-new-module",
-    content: "Add a new module to the list.",
   },
 ];
 
@@ -78,6 +81,8 @@ export function ModulesStep({ modules }: ModulesStepProps) {
   const [isDirty, setIsDirty] = useState(false);
   const [showGuard, setShowGuard] = useState(false);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
+
+  const steps = modules.length > 0 ? [...extraSteps, ...baseSteps] : baseSteps;
 
   const addModule = useMutation(addModuleMut());
   const deleteModule = useMutation(removeModuleMut());
