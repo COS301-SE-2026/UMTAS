@@ -1,0 +1,20 @@
+apps/frontend/src/components/organisms/solver/SolverUpload.tsx
+  h_84e82529bd05a5 162,191
+apps/frontend/src/components/organisms/solver/SolverReview.tsx
+  h_84e82529bd05a5 34
+apps/frontend/src/components/organisms/solver/SolverPreferences.tsx
+  h_84e82529bd05a5 267,274
+apps/frontend/src/components/templates/solver/SolverShell.tsx
+  h_84e82529bd05a5 15-42,90-91
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "2cfc8f84a440ccb310185289e61644f67475b790",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}
