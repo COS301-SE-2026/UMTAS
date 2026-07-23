@@ -243,15 +243,23 @@ export function EventsStep({
       return next;
     });
 
+    const cleanCriteria = { ...event.eventCriteria };
+
+    if (event.isRecurring) {
+      delete cleanCriteria.date;
+    } else {
+      delete cleanCriteria.dayOfWeek;
+    }
+
     const iscreated = eventsAdded.find((event) => event.eventID === id);
 
     if (iscreated?.created) {
       updateEvent.mutate({
         body: {
-          isRecurring: false,
+          isRecurring: event.isRecurring,
           activityType: event.activityType,
           activityCode: event.activityCode,
-          eventCriteria: event.eventCriteria,
+          eventCriteria: cleanCriteria,
           eventName: event.eventName,
         },
         path: {
@@ -261,11 +269,11 @@ export function EventsStep({
     } else {
       const result = await addEvent.mutateAsync({
         body: {
-          eventCriteria: event.eventCriteria,
+          eventCriteria: cleanCriteria,
           activityType: event.activityType || "lecture",
           activityCode: event.activityCode,
           eventName: event.eventName,
-          isRecurring: false,
+          isRecurring: event.isRecurring,
         },
       });
 

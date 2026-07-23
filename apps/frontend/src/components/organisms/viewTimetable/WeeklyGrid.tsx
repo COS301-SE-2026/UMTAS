@@ -26,7 +26,7 @@ const TimeColWidth = 56;
 
 function getWeekDates(weekStart: Date): Date[] {
   const dates: Date[] = [];
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 7; i++) {
     const d = new Date(weekStart);
     d.setDate(weekStart.getDate() + i);
     dates.push(d);
@@ -35,7 +35,7 @@ function getWeekDates(weekStart: Date): Date[] {
 }
 
 function formatColumnHeader(date: Date): { day: string; date: string } {
-  const days = ["Mon", "Tue", "Wed", "Thu", "Fri"];
+  const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   const dayIndex = date.getDay() === 0 ? 6 : date.getDay() - 1;
   const months = [
     "Jan",
@@ -84,24 +84,28 @@ export function WeeklyGrid({ events, weekStart }: WeeklyGridProps) {
 
   function getEventsForDay(date: Date): ScheduleEvent[] {
     const dateStr = isoDateStr(date);
+    const dayNames = [
+      "monday",
+      "tuesday",
+      "wednesday",
+      "thursday",
+      "friday",
+      "saturday",
+      "sunday",
+    ];
+    const currentDayName = dayNames[date.getDay()];
+
     const result: ScheduleEvent[] = [];
 
     for (const event of events) {
-      if (!event.date) {
-        continue;
-      }
-
-      if (event.date === dateStr) {
-        result.push(event);
-        continue;
-      }
-
       if (event.isRecurring) {
-        const eventDayIndex = getDayIndex(event.date);
-        const cellDayIndex = date.getDay() === 0 ? 6 : date.getDay() - 1;
-        const eventDate = new Date(event.date + "T00:00:00");
-
-        if (eventDayIndex === cellDayIndex && date >= eventDate) {
+        // if isRecurring, check that date of week matches
+        if (event.dayOfWeek === currentDayName) {
+          result.push(event);
+        }
+      } else {
+        // once off event, check that dates match
+        if (event.date === dateStr) {
           result.push(event);
         }
       }
@@ -118,7 +122,7 @@ export function WeeklyGrid({ events, weekStart }: WeeklyGridProps) {
       >
         {/* time label header spacer */}
         <div
-          className="border-b border-[var(--bg-elevated)]"
+          className="sticky top-0 z-30 border-b border-[var(--border)] bg-[var(--bg-surface)]"
           style={{ height: HeaderHeight }}
         />
 
@@ -169,7 +173,7 @@ export function WeeklyGrid({ events, weekStart }: WeeklyGridProps) {
       >
         {/* col headers */}
         <div
-          className="flex flex-col items-center justify-center border-b border-[var(--border)] bg-[var(--bg-elevated)]"
+          className="sticky top-0 z-30 flex flex-col items-center justify-center border-b border-[var(--border)] bg-[var(--bg-elevated)]"
           style={{ height: HeaderHeight }}
         >
           <span className="text-[10px] font-medium uppercase tracking-[0.04em] text-[var(--text-secondary)]">
@@ -217,7 +221,7 @@ export function WeeklyGrid({ events, weekStart }: WeeklyGridProps) {
   }
 
   return (
-    <div className="w-full rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.08)] overflow-hidden">
+    <div className="w-full max-h-[65vh] overflow-y-auto relative rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.08)] custom-scrollbar">
       <div className="flex w-full">
         {renderTimeColumn()}
         {weekDates.map((date) => renderDayColumn(date))}
