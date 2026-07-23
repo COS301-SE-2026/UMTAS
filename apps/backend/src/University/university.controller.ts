@@ -61,7 +61,7 @@ export class UniversityController {
 
   //GetAll
   @Get()
-  @Roles()
+  @Roles('student', 'lecturer', 'uni_admin')
   @ApiOperation({
     summary: 'Get all universities',
     operationId: 'getUniversities',
