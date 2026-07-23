@@ -20,6 +20,7 @@ import {
 } from "@/app/solver/queries/Solver/builder";
 import { createTimeTableBuilder } from "@/app/builder/utils/timetables/TimeTableRequests";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { Spinner } from "@/components/atoms/baseShadcn/spinner";
 
 export type SolverResult = {
   engine: "cp-sat" | (string & {});
@@ -46,8 +47,9 @@ export default function SolverPreferences({ modules, events }: solverProps) {
     "feasibility" | "optimization"
   >("feasibility");
   const [jobID, setJobID] = useState<string | null>(null);
+  const [jobFailed, setJobFailed] = useState<boolean>(false);
 
-  const { data: resultOfPoll } = useQuery({
+  const { data: resultOfPoll, isFetching: pollFetching } = useQuery({
     queryKey: ["solver", "poll"],
     queryFn: async () => {
       const pollBuilder = new pollSolverOutputBuilder();
@@ -126,12 +128,13 @@ export default function SolverPreferences({ modules, events }: solverProps) {
       if (resultOfPoll.status === "completed") {
         createTimeTableMutation.mutate();
       }
-      if (resultOfPoll.status === "failed") {
+      if (resultOfPoll.status === "failed" && jobID != null) {
         setJobID(null);
       }
     }
   }
 
+  handleStatus();
   const router = useRouter();
 
   function handleAdd() {
@@ -180,6 +183,41 @@ export default function SolverPreferences({ modules, events }: solverProps) {
       </>
     );
   }
+  function loadingStatus() {
+    return (
+      enrollUserMutation.isPending ||
+      createJobMutation.isPending ||
+      pollFetching ||
+      createTimeTableMutation.isPending ||
+      resultOfPoll?.status === "queued"
+    );
+  }
+  function dynamicSpinner() {
+    let spinnerText = "";
+
+    if (resultOfPoll !== null && resultOfPoll?.status === "queued") {
+      if (enrollUserMutation.isPending) {
+        spinnerText = "Setting things up...";
+      } else if (createJobMutation.isPending) {
+        spinnerText = "Creating Job";
+      } else if (pollFetching) {
+        spinnerText = "Solving...";
+      } else if (createTimeTableMutation.isPending) {
+        spinnerText = "Creating timetable";
+      } else if (resultOfPoll.status === "queued") {
+        spinnerText = "Solving...";
+      }
+
+      return (
+        <div>
+          {spinnerText}
+          <Spinner />
+        </div>
+      );
+    } else {
+      return <></>;
+    }
+  }
 
   return (
     <>
@@ -191,43 +229,57 @@ export default function SolverPreferences({ modules, events }: solverProps) {
           These are soft preferences. They shape which timetable is picked,
           never making a timetable invalid
         </CardDescription>
+
         <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <strong>
-              <p>Solve mode</p>
-            </strong>
-            <div className="flex flex-row gap-4">
-              {" "}
+          {!loadingStatus() ? (
+            <>
+              <div className="space-y-2">
+                <strong>
+                  <p>Solve mode</p>
+                </strong>
+                <div className="flex flex-row gap-4">
+                  {" "}
+                  <Button
+                    disabled={loadingStatus()}
+                    variant={"outline"}
+                    onClick={() => {
+                      setCurrentMode("feasibility");
+                    }}
+                  >
+                    Feasibility
+                  </Button>
+                  <Button
+                    disabled={loadingStatus()}
+                    variant={"outline"}
+                    onClick={() => {
+                      setCurrentMode("optimization");
+                    }}
+                  >
+                    Optimisation
+                  </Button>
+                </div>
+              </div>
+              {solveMode(currentMode)}
               <Button
-                variant={"outline"}
-                onClick={() => {
-                  setCurrentMode("feasibility");
-                }}
+                disabled={loadingStatus()}
+                type="button"
+                onClick={enrollUser}
               >
-                Feasibility
+                upload and create timetable
               </Button>
               <Button
-                variant={"outline"}
+                disabled={loadingStatus()}
+                type="button"
                 onClick={() => {
-                  setCurrentMode("optimization");
+                  router.push("/schedules");
                 }}
               >
-                Optimisation
+                View Timetable
               </Button>
-            </div>
-          </div>
-          {solveMode(currentMode)}
-          <Button type="button" onClick={enrollUser}>
-            upload and create timetable
-          </Button>
-          <Button
-            type="button"
-            onClick={() => {
-              router.push("/schedules");
-            }}
-          >
-            View Timetable
-          </Button>
+            </>
+          ) : (
+            <>{dynamicSpinner()}</>
+          )}
         </CardContent>
       </Card>
     </>
