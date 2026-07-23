@@ -424,7 +424,9 @@ export class ModuleService {
       .limit(1);
 
     //If user already enrolled, Unenroll them
+
     if (enrollmentStatus) {
+      /*
       await tx
         .delete(ModuleEnrollment)
         .where(
@@ -433,7 +435,7 @@ export class ModuleService {
             eq(ModuleEnrollment.ModuleID, moduleId),
           ),
         );
-
+        */
       return {
         moduleID: moduleId,
         UserID: userId,

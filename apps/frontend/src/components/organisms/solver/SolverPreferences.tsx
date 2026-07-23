@@ -23,20 +23,8 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { Spinner } from "@/components/atoms/baseShadcn/spinner";
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
 import { Tienne } from "next/font/google";
+import { Input } from "@/components/atoms/baseShadcn/input";
 
-export type SolverResult = {
-  engine: "cp-sat" | (string & {});
-  outcome: "conflict-free" | "has-conflicts" | (string & {});
-  metadata: {
-    conflicts: unknown[];
-    solveMode: "feasibility" | "optimization" | (string & {});
-    conflictCount: number;
-  };
-  heuristicScores: unknown[];
-  timetableSolution: {
-    selectedEventIds: string[];
-  };
-};
 type solverProps = {
   modules: ModuleResponseDto[];
   events: EventResponse[];
@@ -53,6 +41,8 @@ export default function SolverPreferences({ modules, events }: solverProps) {
   const [jobFailed, setJobFailed] = useState<boolean>(false);
   const [timetableCreated, setTimetableCreated] = useState<boolean>(false);
   const router = useRouter();
+  const [timetableName, setTimetableName] = useState<string>("");
+
   const { data: resultOfPoll, isFetching: pollFetching } = useQuery({
     queryKey: ["solver", "poll"],
     queryFn: async () => {
@@ -88,10 +78,12 @@ export default function SolverPreferences({ modules, events }: solverProps) {
   const createJobMutation = useMutation({
     mutationFn: async () => {
       const builder = new createSolverJobBuilder();
+      const eventIDS = events.map((event) => event.eventId);
       return await builder.send({
         body: {
-          engine: currentMode === "feasibility" ? "cp-sat" : "ga",
+          engine: "auto",
           solveMode: currentMode,
+          eventIds: eventIDS,
         },
       });
     },
@@ -101,13 +93,13 @@ export default function SolverPreferences({ modules, events }: solverProps) {
     mutationFn: async () => {
       if (resultOfPoll && timetableCreated === false && !pollFetching) {
         setTimetableCreated(true);
-        const typeShiftedResults = resultOfPoll.result as SolverResult;
+        const typeShiftedResults = resultOfPoll.result;
         console.log("Poll closed result finished", resultOfPoll.result);
         const timetableBuilder = new createTimeTableBuilder();
         const resultTT = await timetableBuilder.send({
           body: {
-            eventIds: typeShiftedResults.timetableSolution.selectedEventIds,
-            timetableName: new Date().toLocaleString(),
+            eventIds: typeShiftedResults?.timetableSolution.selectedEventIds,
+            timetableName: timetableName == "" ? "My timetable" : timetableName,
           },
         });
         return resultTT;
@@ -120,9 +112,10 @@ export default function SolverPreferences({ modules, events }: solverProps) {
 
   async function enrollUser() {
     setTimetableCreated(false);
-    enrollUserMutation.mutate();
-    await solveForUsersModules();
+    await enrollUserMutation.mutateAsync();
+    solveForUsersModules();
   }
+
   async function solveForUsersModules() {
     // uses enrolled modules to create a solved output
 
@@ -165,6 +158,9 @@ export default function SolverPreferences({ modules, events }: solverProps) {
   }
 
   function solveMode(mode: string) {
+    if (true) {
+      return <></>;
+    }
     if (mode === "feasibility") {
       return <></>;
     }
@@ -204,7 +200,6 @@ export default function SolverPreferences({ modules, events }: solverProps) {
   }
   function loadingStatus() {
     return (
-      enrollUserMutation.isPending ||
       createJobMutation.isPending ||
       pollFetching ||
       createTimeTableMutation.isPending ||
@@ -215,9 +210,7 @@ export default function SolverPreferences({ modules, events }: solverProps) {
     let spinnerText = "";
 
     if (resultOfPoll !== null && resultOfPoll?.status === "queued") {
-      if (enrollUserMutation.isPending) {
-        spinnerText = "Setting things up...";
-      } else if (createJobMutation.isPending) {
+      if (createJobMutation.isPending) {
         spinnerText = "Creating Job";
       } else if (pollFetching) {
         spinnerText = "Solving...";
@@ -247,6 +240,7 @@ export default function SolverPreferences({ modules, events }: solverProps) {
           <div className="flex flex-row gap-4">
             {" "}
             <Button
+              hidden
               disabled={loadingStatus()}
               variant={"outline"}
               onClick={() => {
@@ -256,6 +250,7 @@ export default function SolverPreferences({ modules, events }: solverProps) {
               Feasibility
             </Button>
             <Button
+              hidden
               disabled={loadingStatus()}
               variant={"outline"}
               onClick={() => {
@@ -267,18 +262,28 @@ export default function SolverPreferences({ modules, events }: solverProps) {
           </div>
         </div>
         {solveMode(currentMode)}
-        <Button disabled={loadingStatus()} type="button" onClick={enrollUser}>
-          upload and create timetable
-        </Button>
-        <Button
-          disabled={loadingStatus()}
-          type="button"
-          onClick={() => {
-            router.push("/schedules");
-          }}
-        >
-          View Timetable
-        </Button>
+        <div className="flex flex-col ">
+          <Input
+            placeholder="Name timetable"
+            value={timetableName}
+            onChange={(e) => {
+              setTimetableName(e.target.value);
+            }}
+          ></Input>
+          <Button disabled={loadingStatus()} type="button" onClick={enrollUser}>
+            upload and create timetable
+          </Button>
+          <Button
+            hidden
+            disabled={loadingStatus()}
+            type="button"
+            onClick={() => {
+              router.push("/schedules");
+            }}
+          >
+            View Timetable
+          </Button>
+        </div>
       </>
     );
   }
