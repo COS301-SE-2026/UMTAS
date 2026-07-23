@@ -74,7 +74,6 @@ export function updateModuleMut() {
           moduleDescription: vars.module.moduleDescription,
           moduleName: vars.module.moduleName,
           styling: vars.module.styling,
-          Core: {},
         },
       });
     },
