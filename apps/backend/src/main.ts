@@ -92,7 +92,7 @@ async function bootstrap() {
   );
   console.log(`[STARTUP] Listening on port ${port}`);
 
-  await app.listen(port);
+  await app.listen(port, '0.0.0.0');
 }
 
 bootstrap().catch((err) => {
