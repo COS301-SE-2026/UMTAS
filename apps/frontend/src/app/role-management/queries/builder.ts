@@ -44,7 +44,8 @@ export class getAllApplicationsBuilder extends RequestBuilder<
 export type approveApplications = paths["/universities/approve"]["post"];
 export type approveApplicationsBody =
   approveApplications["requestBody"]["content"]["application/json"];
-export type approveApplicationsRes = approveApplications["responses"]["201"];
+export type approveApplicationsRes =
+  approveApplications["responses"]["201"]["content"]["application/json"];
 
 export class approveBuilder extends RequestBuilder<
   undefined,
