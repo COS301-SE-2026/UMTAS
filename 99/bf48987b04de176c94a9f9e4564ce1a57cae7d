@@ -1,0 +1,18 @@
+apps/frontend/src/components/templates/roleManagement/roleManagementTemplate.tsx
+  h_84e82529bd05a5 14-49,61
+apps/frontend/src/components/atoms/roleManagement/roleControl.tsx
+  h_84e82529bd05a5 77,92
+apps/frontend/src/components/molecules/roleManagement/DataTable.tsx
+  h_84e82529bd05a5 119,126
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "99bf48987b04de176c94a9f9e4564ce1a57cae7d",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}
