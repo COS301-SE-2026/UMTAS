@@ -24,6 +24,26 @@ import {
   SelectValue,
 } from "@/components/atoms/baseShadcn/select";
 
+import Tutorial from "@/components/organisms/nav/Tutorial";
+const steps = [
+  {
+    target: "#btn-create-module-new",
+    content: "Create a brand new module.",
+  },
+  {
+    target: "#input-search-module-code",
+    content: "Search for a module by code, name, or events.",
+  },
+  {
+    target: "#select-module-prefixes",
+    content: "Filter modules using code prefixes.",
+  },
+  {
+    target: "#row-module-row",
+    content: "Select a module to edit or create events for it.",
+  },
+];
+
 // this will do the actual request for modules and filtering, table is static data except for updates
 export default function ModManagementTemplate() {
   const [showCreateModule, updateShowModule] = useState(false);
@@ -90,6 +110,8 @@ export default function ModManagementTemplate() {
 
   return (
     <div className="h-[80vh] items-center flex flex-col gap-6 w-full px-6 pt-6">
+      <Tutorial steps={steps} />
+
       <Card className="flex flex-col w-full max-w-6xl border-[var(--border)] rounded-xl bg-[var(--bg-surface)] shadow-sm overflow-hidden h-full">
         <div className="flex flex-col flex-row justify-between items-start items-center pr-5 bg-[var(--bg-surface)]">
           <div>
@@ -100,13 +122,18 @@ export default function ModManagementTemplate() {
               Search and filter modules and their events.
             </p>
           </div>
-          <Button onClick={() => updateShowModule(true)} className="mt-4">
+          <Button
+            id="btn-create-module-new"
+            onClick={() => updateShowModule(true)}
+            className="mt-4"
+          >
             Create Module
           </Button>
         </div>
         <div className="flex flex-col flex-row gap-4 p-5 items-center justify-between bg-[var(--bg-surface)]">
           <div className="w-full max-w-sm flex-1">
             <Input
+              id="input-search-module-code"
               placeholder="Search module code, name, or events..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -116,7 +143,10 @@ export default function ModManagementTemplate() {
 
           <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
             <Select value={selectedPrefix} onValueChange={setSelectedPrefix}>
-              <SelectTrigger className="w-[180px] bg-[var(--background)]">
+              <SelectTrigger
+                id="select-module-prefixes"
+                className="w-[180px] bg-[var(--background)]"
+              >
                 <SelectValue placeholder="Filter Prefix" />
               </SelectTrigger>
               <SelectContent>
