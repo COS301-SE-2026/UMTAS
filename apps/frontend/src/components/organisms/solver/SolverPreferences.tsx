@@ -8,7 +8,7 @@ import {
   CardHeader,
 } from "@/components/atoms/baseShadcn/card";
 import { LucidePlusCircle } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PreferenceSection from "@/components/molecules/solver/PreferencesCard";
 import { useRouter } from "next/navigation";
 import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
@@ -21,6 +21,8 @@ import {
 import { createTimeTableBuilder } from "@/app/builder/utils/timetables/TimeTableRequests";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Spinner } from "@/components/atoms/baseShadcn/spinner";
+import { getQueryClient } from "@/components/tanstack/getQueryClient";
+import { Tienne } from "next/font/google";
 
 export type SolverResult = {
   engine: "cp-sat" | (string & {});
@@ -46,9 +48,11 @@ export default function SolverPreferences({ modules, events }: solverProps) {
   const [currentMode, setCurrentMode] = useState<
     "feasibility" | "optimization"
   >("feasibility");
+  const [timeValue, setTimevalue] = useState<number[]>([0]);
   const [jobID, setJobID] = useState<string | null>(null);
   const [jobFailed, setJobFailed] = useState<boolean>(false);
-
+  const [timetableCreated, setTimetableCreated] = useState<boolean>(false);
+  const router = useRouter();
   const { data: resultOfPoll, isFetching: pollFetching } = useQuery({
     queryKey: ["solver", "poll"],
     queryFn: async () => {
@@ -96,7 +100,7 @@ export default function SolverPreferences({ modules, events }: solverProps) {
 
   const createTimeTableMutation = useMutation({
     mutationFn: async () => {
-      if (resultOfPoll) {
+      if (resultOfPoll && timetableCreated === false) {
         const typeShiftedResults = resultOfPoll.result as SolverResult;
         console.log("Poll closed result finished", resultOfPoll.result);
         const timetableBuilder = new createTimeTableBuilder();
@@ -112,6 +116,7 @@ export default function SolverPreferences({ modules, events }: solverProps) {
   });
 
   async function enrollUser() {
+    setTimetableCreated(false);
     enrollUserMutation.mutate();
     await solveForUsersModules();
   }
@@ -120,22 +125,28 @@ export default function SolverPreferences({ modules, events }: solverProps) {
 
     const result = await createJobMutation.mutateAsync();
     if (result) {
+      console.log("New result for solve for users", result);
       setJobID(result.jobId || "");
     }
   }
   function handleStatus() {
-    if (resultOfPoll) {
-      if (resultOfPoll.status === "completed") {
+    if (resultOfPoll != null) {
+      if (resultOfPoll.status === "completed" && timetableCreated == false) {
+        setTimetableCreated(true);
         createTimeTableMutation.mutate();
-      }
-      if (resultOfPoll.status === "failed" && jobID != null) {
+        setJobFailed(false);
         setJobID(null);
+        getQueryClient().setQueryData(["solver", "poll"], null);
+        alert("Timetable successfully created");
+      }
+      if (resultOfPoll.status === "failed" && jobFailed === false) {
+        console.log("set job to failed");
+        setJobFailed(true);
       }
     }
   }
 
   handleStatus();
-  const router = useRouter();
 
   function handleAdd() {
     setSections((prev) => [...prev, Date.now()]);
@@ -159,21 +170,21 @@ export default function SolverPreferences({ modules, events }: solverProps) {
             <LucidePlusCircle
               strokeWidth={iconClicked ? 1.8 : 1.1}
               onClick={() => {
-                handleAdd();
-                setIconClicked(true);
-                setTimeout(() => setIconClicked(false), 150);
+                if (false) {
+                  handleAdd();
+                  setIconClicked(true);
+                  setTimeout(() => setIconClicked(false), 150);
+                }
               }}
               className="transition-all duration-150 cursor-pointer"
             />
           </div>
           {sections.map((id) => (
             <PreferenceSection
+              sliderValue={timeValue}
+              setSliderValue={setTimevalue}
               key={id}
-              DropdownItems={[
-                "Prefer mornings",
-                "Prefer evenings",
-                "Prefer large gaps",
-              ]}
+              DropdownItems={["Time"]}
               onDelete={() => {
                 handleDelete(id);
               }}
@@ -218,6 +229,54 @@ export default function SolverPreferences({ modules, events }: solverProps) {
       return <></>;
     }
   }
+  function ManageSolverOptions() {
+    return (
+      <>
+        <div className="space-y-2">
+          <strong>
+            <p>Solve mode</p>
+          </strong>
+          <div className="flex flex-row gap-4">
+            {" "}
+            <Button
+              disabled={loadingStatus()}
+              variant={"outline"}
+              onClick={() => {
+                setCurrentMode("feasibility");
+              }}
+            >
+              Feasibility
+            </Button>
+            <Button
+              disabled={loadingStatus()}
+              variant={"outline"}
+              onClick={() => {
+                setCurrentMode("optimization");
+              }}
+            >
+              Optimisation
+            </Button>
+          </div>
+        </div>
+        {solveMode(currentMode)}
+        <Button disabled={loadingStatus()} type="button" onClick={enrollUser}>
+          upload and create timetable
+        </Button>
+        <Button
+          disabled={loadingStatus()}
+          type="button"
+          onClick={() => {
+            router.push("/schedules");
+          }}
+        >
+          View Timetable
+        </Button>
+      </>
+    );
+  }
+  function handleError() {
+    return resultOfPoll?.error as { code?: string; message?: string };
+  }
 
   return (
     <>
@@ -231,54 +290,31 @@ export default function SolverPreferences({ modules, events }: solverProps) {
         </CardDescription>
 
         <CardContent className="space-y-4">
-          {!loadingStatus() ? (
+          {jobFailed == false ? (
             <>
-              <div className="space-y-2">
-                <strong>
-                  <p>Solve mode</p>
-                </strong>
-                <div className="flex flex-row gap-4">
-                  {" "}
-                  <Button
-                    disabled={loadingStatus()}
-                    variant={"outline"}
-                    onClick={() => {
-                      setCurrentMode("feasibility");
-                    }}
-                  >
-                    Feasibility
-                  </Button>
-                  <Button
-                    disabled={loadingStatus()}
-                    variant={"outline"}
-                    onClick={() => {
-                      setCurrentMode("optimization");
-                    }}
-                  >
-                    Optimisation
-                  </Button>
-                </div>
-              </div>
-              {solveMode(currentMode)}
-              <Button
-                disabled={loadingStatus()}
-                type="button"
-                onClick={enrollUser}
-              >
-                upload and create timetable
-              </Button>
-              <Button
-                disabled={loadingStatus()}
-                type="button"
-                onClick={() => {
-                  router.push("/schedules");
-                }}
-              >
-                View Timetable
-              </Button>
+              {!loadingStatus() ? (
+                <>{ManageSolverOptions()}</>
+              ) : (
+                <>{dynamicSpinner()}</>
+              )}
             </>
           ) : (
-            <>{dynamicSpinner()}</>
+            <div>
+              <p>
+                Solving failed
+                <br />
+                {handleError().message}
+              </p>
+              <Button
+                onClick={() => {
+                  setJobFailed(false);
+                  setJobID(null);
+                  getQueryClient().setQueryData(["solver", "poll"], null);
+                }}
+              >
+                Confirm
+              </Button>
+            </div>
           )}
         </CardContent>
       </Card>
