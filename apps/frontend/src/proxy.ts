@@ -14,6 +14,9 @@ const PUBLIC_PATHS = [
   "/reset-password",
   "/auth-callback",
   "/api/health",
+  "/faq",
+  "/help",
+  "/brand-style",
 ];
 
 export function proxy(request: NextRequest) {

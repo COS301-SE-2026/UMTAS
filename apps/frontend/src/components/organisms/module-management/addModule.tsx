@@ -10,6 +10,8 @@ import { useMutation } from "@tanstack/react-query";
 import { ReactNode, useState } from "react";
 import { CourseDTO } from "@/app/course-management/queries/courses/courseBuilder";
 import { CourseSelect } from "./selectedCourse";
+import { ColourPicker } from "@/components/atoms/builder/colourPicker";
+import { Separator } from "@/components/atoms/baseShadcn/separator";
 interface CreateModuleProps {
   children?: ReactNode;
 }
@@ -37,10 +39,10 @@ export default function CreateModuleAdmin({ children }: CreateModuleProps) {
   const { mutateAsync: createModule } = useMutation(CreateModuleMutAdmin());
 
   return (
-    <Card className="items-center w-full p-5 space-y-3">
-      <h1 className="text-center text-2xl">Create Module</h1>
-      <div className="flex flex-row w-full ">
-        <div className="items-center flex flex-col  space-y-3 w-full">
+    <Card className="w-fit pl-4 space-y-3">
+      <h1 className="text-2xl">Create Module</h1>
+      <div className="flex flex-row">
+        <div className="flex flex-col space-y-3">
           <StateInput State={module} update={UpdateState} field="moduleCode" />
           <StateInput
             State={module}
@@ -53,23 +55,24 @@ export default function CreateModuleAdmin({ children }: CreateModuleProps) {
             field={"moduleDescription"}
             type="text-area"
           />
-          <div className="flex flex-col w-1/2 space-y-1">
-            <label className="text-sm font-medium text-white">
-              Choose colour
+          <div className="flex flex-col space-y-1">
+            <label className="text-sm font-medium text-[var(--text-primary)]">
+              Choose Colour
             </label>
-            <input
-              className="w-full"
-              type="color"
-              value={module.styling?.colour}
-              onChange={(e) =>
-                updateMod((prev) => ({
-                  ...prev,
-                  styling: { colour: e.target.value ?? "" },
-                }))
-              }
-            ></input>
+            <Card className="p-2">
+              <ColourPicker
+                value={module.styling?.colour ?? "var(--border)"}
+                onChange={(colour) =>
+                  updateMod((prev) => ({
+                    ...prev,
+                    styling: { ...prev.styling, colour },
+                  }))
+                }
+              />
+            </Card>
           </div>
         </div>
+        <Separator orientation="vertical" className="mx-4 h-auto" />
         <CourseSelect CourseState={course} updateCourseState={updateCourse} />
       </div>
       <div className="flex flex-row gap-x-5">
@@ -90,7 +93,7 @@ export default function CreateModuleAdmin({ children }: CreateModuleProps) {
             }
           }}
         >
-          create
+          Create
         </Button>
 
         {children}

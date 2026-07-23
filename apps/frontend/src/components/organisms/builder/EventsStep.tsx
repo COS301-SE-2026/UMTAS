@@ -248,7 +248,7 @@ export function EventsStep({
         },
       });
     } else {
-      const result = addEvent.mutateAsync({
+      const result = await addEvent.mutateAsync({
         body: {
           eventCriteria: event.eventCriteria,
           activityType: event.activityType || "lecture",
@@ -257,7 +257,20 @@ export function EventsStep({
           isRecurring: false,
         },
       });
-      const newID = (await result).event.eventId;
+
+      const newEvent = result.event;
+      const newID = newEvent.eventId;
+
+      getQueryClient().setQueryData(
+        getAllEventsQ().queryKey,
+        (oldEvents: EventResponse[] | undefined) => {
+          if (!oldEvents) return [];
+          return oldEvents.map((event) =>
+            event.eventId === id ? newEvent : event,
+          );
+        },
+      );
+
       if (events) {
         const mapped = eventsAdded.map((event) => {
           if (event.eventID === id) {

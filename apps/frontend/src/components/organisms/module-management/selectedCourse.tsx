@@ -32,8 +32,8 @@ export function CourseSelect({
   );
 
   return (
-    <div className="flex flex-col text-center items-center justify-center space-y-5">
-      <label className="text-sm font-medium text-white text-center">
+    <div className="flex flex-col space-y-5 items-start justify-left pl-4 pr-4 h-fit">
+      <label className="text-sm font-medium text-[var(--text-primary)] text-center">
         Search for course
       </label>
       <Input
@@ -44,7 +44,7 @@ export function CourseSelect({
           UpdateSearchName(e.target.value);
         }}
       />
-      <label className="text-sm font-medium text-white text-center">
+      <label className="text-sm font-medium text-[var(--text-primary)]">
         Select Course
       </label>
       <Select
