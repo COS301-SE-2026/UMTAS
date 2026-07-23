@@ -125,7 +125,6 @@ export function EventsStep({
   const [isDirty, setIsDirty] = useState(false);
   const [showGuard, setShowGuard] = useState(false);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
-
   const [eventsAdded, setEventsAdded] = useState<
     { eventID: string; created: boolean }[]
   >([]);
@@ -147,6 +146,7 @@ export function EventsStep({
             date: "",
             endTime: "",
             startTime: "",
+            moduleId: "TEMP",
           },
         };
         return [...(oldEvents ?? []), emptyEvent];
