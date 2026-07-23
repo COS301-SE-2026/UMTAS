@@ -93,7 +93,7 @@ LABEL org.opencontainers.image.title="UMTAS solver worker" \
       io.umtas.base-image.update-policy="Track patched Node 22 bookworm-slim releases"
 
 RUN apt-get update \
-    && apt-get install --yes --no-install-recommends build-essential ca-certificates curl pkg-config unzip \
+    && apt-get install --yes --no-install-recommends build-essential ca-certificates curl dumb-init pkg-config unzip \
     && rm -rf /var/lib/apt/lists/* \
     && mkdir -p /app/bin /app/lib /tmp/umtas-worker \
     && chown -R node:node /app /tmp/umtas-worker

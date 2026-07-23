@@ -125,7 +125,6 @@ export function EventsStep({
   const [isDirty, setIsDirty] = useState(false);
   const [showGuard, setShowGuard] = useState(false);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
-
   const [eventsAdded, setEventsAdded] = useState<
     { eventID: string; created: boolean }[]
   >([]);
@@ -139,13 +138,15 @@ export function EventsStep({
         const emptyEvent: EventResponse = {
           eventId: `TEMP_${nextNum}`,
           activityCode: "",
-          isRecurring: {},
+          isRecurring: false,
           eventName: "",
+          activityType: "lecture",
           eventCriteria: {
             eventSource: "university",
             date: "",
             endTime: "",
             startTime: "",
+            moduleId: "TEMP",
           },
         };
         return [...(oldEvents ?? []), emptyEvent];
@@ -236,7 +237,8 @@ export function EventsStep({
     if (iscreated?.created) {
       updateEvent.mutate({
         body: {
-          isRecurring: {},
+          isRecurring: false,
+          activityType: event.activityType,
           activityCode: event.activityCode,
           eventCriteria: event.eventCriteria,
           eventName: event.eventName,
@@ -246,15 +248,29 @@ export function EventsStep({
         },
       });
     } else {
-      const result = addEvent.mutateAsync({
+      const result = await addEvent.mutateAsync({
         body: {
           eventCriteria: event.eventCriteria,
+          activityType: event.activityType || "lecture",
           activityCode: event.activityCode,
           eventName: event.eventName,
-          isRecurring: {},
+          isRecurring: false,
         },
       });
-      const newID = (await result).event.eventId;
+
+      const newEvent = result.event;
+      const newID = newEvent.eventId;
+
+      getQueryClient().setQueryData(
+        getAllEventsQ().queryKey,
+        (oldEvents: EventResponse[] | undefined) => {
+          if (!oldEvents) return [];
+          return oldEvents.map((event) =>
+            event.eventId === id ? newEvent : event,
+          );
+        },
+      );
+
       if (events) {
         const mapped = eventsAdded.map((event) => {
           if (event.eventID === id) {

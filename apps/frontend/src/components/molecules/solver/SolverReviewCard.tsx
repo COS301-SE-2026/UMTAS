@@ -91,7 +91,7 @@ export default function SolverReviewCard({
           tempEvent && JSON.stringify(tempEvent) !== JSON.stringify(event);
 
         return (
-          <div key={event.eventId} className="space-y-2 border-b pb-4">
+          <div key={event.eventId} className="space-y-2 border-b pb-4  ">
             <CustomiseEventPanel
               event={isSelected && tempEvent ? tempEvent : event}
               modules={modules}
@@ -107,7 +107,7 @@ export default function SolverReviewCard({
                 }
               }}
             >
-              <AlertDialogContent className="w-max max-w-[95vw] p-6">
+              <AlertDialogContent className="w-max max-w-[50vw] p-6">
                 <AlertDialogHeader className="flex flex-row justify-between items-center border-b pb-2">
                   <AlertDialogTitle className="text-xl font-bold">
                     Review your Events
@@ -115,7 +115,7 @@ export default function SolverReviewCard({
                   <AlertDialogCancel className="mt-0">Close</AlertDialogCancel>
                 </AlertDialogHeader>
 
-                <div className="py-4 overflow-auto max-h-[80vh]">
+                <div className="py-4 overflow-auto max-h-[80vh] ">
                   <div className="pl-4 space-y-2">
                     {tempEvent && (
                       <NoPermissionsEventCard

@@ -398,8 +398,7 @@ export interface paths {
      */
     get: operations["getModuleById"];
     put?: never;
-    /** Enrol student to module */
-    post: operations["enrolStudentToModule"];
+    post?: never;
     /**
      * Delete a module by ID
      * @description Deletes a module | STUDENT_OWNED needs to go through Builder Service
@@ -412,6 +411,23 @@ export interface paths {
      * @description Update a modules | STUDENT_OWNED needs to go through Builder Service
      */
     patch: operations["updateModule"];
+    trace?: never;
+  };
+  "/modules/enroll/{moduleId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Enrol student to module */
+    get: operations["enrolStudentToModule"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
     trace?: never;
   };
   "/modules/{CourseID}": {
@@ -1828,8 +1844,8 @@ export interface components {
       eventName?: string;
       activityCode?: string | null;
       venues?: components["schemas"]["VenueDto"][];
-      isRecurring?: Record<string, never>;
-      validated?: Record<string, never>;
+      isRecurring?: boolean;
+      validated?: boolean;
       /**
        * @description Required when eventCriteria.moduleId is provided.
        * @enum {string}
@@ -1845,8 +1861,8 @@ export interface components {
       activityType?: "lecture" | "tutorial" | "prac" | "test" | "exam";
       activityCode?: string | null;
       venues?: components["schemas"]["VenueDto"][];
-      isRecurring?: Record<string, never>;
-      validated?: Record<string, never>;
+      isRecurring?: boolean;
+      validated?: boolean;
     };
     EventSingleResponseDto: {
       event: components["schemas"]["EventDto"];
@@ -1886,8 +1902,8 @@ export interface components {
       /** @enum {string} */
       activityType?: "lecture" | "tutorial" | "prac" | "test" | "exam";
       activityCode?: string | null;
-      isRecurring?: Record<string, never>;
-      validated?: Record<string, never>;
+      isRecurring?: boolean;
+      validated?: boolean;
       eventCriteria?: components["schemas"]["UpdateEventCriteriaDto"];
     };
     DeleteResponseDto: {
@@ -3079,44 +3095,6 @@ export interface operations {
       };
     };
   };
-  enrolStudentToModule: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        moduleId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Student successfully enrolled student into module */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["EnrolResponseDto"];
-        };
-      };
-      /** @description Student already enrolled into module */
-      201: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["EnrolResponseDto"];
-        };
-      };
-      /** @description Module not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
   deleteModule: {
     parameters: {
       query?: never;
@@ -3193,6 +3171,44 @@ export interface operations {
       };
       /** @description Duplicate module code detected for course */
       409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  enrolStudentToModule: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        moduleId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Student successfully enrolled student into module */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["EnrolResponseDto"];
+        };
+      };
+      /** @description Unenrolled user from module */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["EnrolResponseDto"];
+        };
+      };
+      /** @description Module not found */
+      404: {
         headers: {
           [name: string]: unknown;
         };
