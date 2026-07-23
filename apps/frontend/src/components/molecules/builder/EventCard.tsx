@@ -116,7 +116,7 @@ export function EventCard({
   }
 
   function renderModuleSection() {
-    if (event.eventCriteria.eventSource !== "university") {
+    if (event.eventCriteria?.eventSource !== "university") {
       return null;
     }
 
@@ -190,19 +190,17 @@ export function EventCard({
             Venue
           </Label>
           {
-            <Input
-              id={"event-venue-" + event.eventId}
-              value={event?.venues?.[0]?.venueName}
-              onChange={(e) =>
-                onUpdate(event.eventId, "venues", e.target.value)
-              }
-              placeholder="e.g. IT 2-26"
-              className={getInputClass(!!errors?.venue)}
-            />
+            // <Input
+            //   id={"event-venue-" + event.eventId}
+            //   value={event.eventCriteria?.venue || ""}
+            //   onChange={(e) => onUpdate(event.eventId, "venue", e.target.value)}
+            //   placeholder="e.g. IT 2-26"
+            //   className={getInputClass(!!errors?.venue)}
+            // />
           }
-          {errors?.venue && (
+          {/* {errors?.venue && (
             <p className="text-sm text-[var(--error-text)]">{errors.venue}</p>
-          )}
+          )} */}
         </div>
 
         {/* date - mapped to day */}
@@ -240,12 +238,11 @@ export function EventCard({
             Event type
           </Label>
           <EventTypeDropdown
-            value={event.activityType || "lecture"}
-            onChange={(v) =>
-              onUpdate(event.eventId, "activityType", v || "lecture")
-            }
+            value={(event.eventCriteria?.eventSource as EventType) || "uni"}
+            onChange={(v) => onUpdate(event.eventId, "eventSource", v)}
           />
         </div>
+
         {renderModuleSection()}
       </div>
     </div>

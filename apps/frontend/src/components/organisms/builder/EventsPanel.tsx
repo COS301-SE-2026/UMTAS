@@ -49,7 +49,7 @@ export function EventsPanel({
               summary={criteria?.date || undefined}
               isActive={selectedEventId === event.eventId}
               isComplete={
-                !!(event.activityType && event.eventCriteria?.moduleId)
+                !!(criteria?.eventSource && event.eventCriteria?.moduleId)
               }
               onClick={() => onEventSelect(event.eventId)}
             />

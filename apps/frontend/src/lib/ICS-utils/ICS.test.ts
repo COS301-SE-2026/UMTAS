@@ -1,16 +1,15 @@
-/*
 import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
 import { generateICS } from "./ICS";
 import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
 
 const events: EventResponse[] = [
   {
-    isRecurring: true,
-    eventCode: "COS332",
-    eventID: "",
+    isRecurring: {},
+    activityCode: "COS332",
+    eventId: "",
     eventName: "name",
     eventCriteria: {
-      type: "university",
+      eventSource: "university",
       date: "monday",
       startTime: "14:00",
       endTime: "15:00",
@@ -54,23 +53,23 @@ function formatEventchanges(
     }
 
     const lectureModule = modules.find(
-      (m) => m.moduleID === event.eventCriteria.moduleID,
+      (m) => m.moduleID === event.eventCriteria.moduleId,
     );
     const moduleName = lectureModule ? lectureModule.moduleName : "";
     const dateStr = criteria.date.replace(/-/g, "");
     const startStr = criteria.startTime.replace(":", "") + "00";
     const endStr = criteria.endTime.replace(":", "") + "00";
-    const uid = event.eventID + "@umtas.vigil";
+    const uid = event.eventId + "@umtas.vigil";
     const isRecurring = false; // Temporarily disabled
 
     lines.push("BEGIN:VEVENT");
     lines.push("UID:" + uid);
     lines.push("DTSTART;TZID=Africa/Johannesburg:" + dateStr + "T" + startStr);
     lines.push("DTEND;TZID=Africa/Johannesburg:" + dateStr + "T" + endStr);
-    lines.push("SUMMARY:" + (criteria.moduleID || "Event"));
+    lines.push("SUMMARY:" + (criteria.moduleId || "Event"));
     lines.push(
       "DESCRIPTION:" +
-        (criteria.moduleID || "") +
+        (criteria.moduleId || "") +
         (moduleName ? " - " + moduleName : ""),
     );
 
@@ -105,4 +104,3 @@ describe("Unit Tests for ICS", () => {
     expect(testResult === funcResult).toBe(true);
   });
 });
-*/

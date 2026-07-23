@@ -18,7 +18,21 @@ import {
   enrollModBuilder,
   pollSolverOutputBuilder,
 } from "@/app/solver/queries/Solver/builder";
+import { createTimeTableBuilder } from "@/app/builder/utils/timetables/TimeTableRequests";
 
+export type SolverResult = {
+  engine: "cp-sat" | (string & {});
+  outcome: "conflict-free" | "has-conflicts" | (string & {});
+  metadata: {
+    conflicts: unknown[];
+    solveMode: "feasibility" | "optimization" | (string & {});
+    conflictCount: number;
+  };
+  heuristicScores: unknown[];
+  timetableSolution: {
+    selectedEventIds: string[];
+  };
+};
 type solverProps = {
   modules: ModuleResponseDto[];
   events: EventResponse[];
@@ -65,7 +79,19 @@ export default function SolverPreferences({ modules, events }: solverProps) {
         });
         if (resultOfPoll.status === "completed") {
           clearInterval(pollInterval);
+          const typeShiftedResults = resultOfPoll.result as SolverResult;
           console.log("Poll closed result finished", resultOfPoll.result);
+          const timetableBuilder = new createTimeTableBuilder();
+          const resultTT = await timetableBuilder.send({
+            body: {
+              eventIds: typeShiftedResults.timetableSolution.selectedEventIds,
+              timetableName: new Date().toLocaleString(),
+            },
+          });
+          console.log(resultTT);
+        } else if (resultOfPoll.status === "failed") {
+          clearInterval(pollInterval);
+          console.error(resultOfPoll.error);
         } else {
           console.log("Poll still continues", resultOfPoll);
         }
@@ -155,10 +181,12 @@ export default function SolverPreferences({ modules, events }: solverProps) {
               >
                 Optimisation
               </Button>
-              <Button onClick={enrollUser}>upload and create timetable</Button>
             </div>
           </div>
           {solveMode(currentMode)}
+          <Button type="button" onClick={enrollUser}>
+            upload and create timetable
+          </Button>
           <Button
             type="button"
             onClick={() => {
