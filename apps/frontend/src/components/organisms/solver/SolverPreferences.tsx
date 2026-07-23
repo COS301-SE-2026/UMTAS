@@ -264,13 +264,19 @@ export default function SolverPreferences({ modules, events }: solverProps) {
         {solveMode(currentMode)}
         <div className="flex flex-col ">
           <Input
+            id="input-name-timetable"
             placeholder="Name timetable"
             value={timetableName}
             onChange={(e) => {
               setTimetableName(e.target.value);
             }}
           ></Input>
-          <Button disabled={loadingStatus()} type="button" onClick={enrollUser}>
+          <Button
+            id="btn-upload-and-create-timetable"
+            disabled={loadingStatus()}
+            type="button"
+            onClick={enrollUser}
+          >
             upload and create timetable
           </Button>
           <Button

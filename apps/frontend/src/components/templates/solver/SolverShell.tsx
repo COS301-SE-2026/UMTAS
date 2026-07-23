@@ -12,6 +12,34 @@ import { useQueries, useQuery } from "@tanstack/react-query";
 import { getAllEventsAdminQ } from "@/app/module-management/queries/queries";
 import { fetchAllModules } from "@/app/course-management/queries/modules/moduleBuilder";
 
+import Tutorial from "@/components/organisms/nav/Tutorial";
+const steps = [
+  {
+    target: "#btn-browse-files",
+    content: "Choose your timetable file to upload.",
+  },
+  {
+    target: "#btn-upload",
+    content: "Upload and process the PDF.",
+  },
+  {
+    target: "#card-review-stuff",
+    content: "Review the parsed module events.",
+  },
+  {
+    target: "#btn-confirm-events",
+    content: "Confirm the events after reviewing them.",
+  },
+  {
+    target: "#input-name-timetable",
+    content: "Enter a name for your timetable.",
+  },
+  {
+    target: "#btn-upload-and-create-timetable",
+    content: "Upload the file and create your timetable.",
+  },
+];
+
 export default function SolverShell() {
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
@@ -59,6 +87,8 @@ export default function SolverShell() {
   }
   return (
     <>
+      <Tutorial steps={steps} />
+
       <WizardStepper
         completedSteps={completedSteps}
         currentStep={currentStep}
