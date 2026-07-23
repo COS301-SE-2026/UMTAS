@@ -1020,6 +1020,52 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
   schemas: {
+    AuthUserDto: {
+      /** Format: uuid */
+      id: string;
+      email: string;
+      name: string;
+      emailVerified: boolean;
+      image?: string | null;
+      /** @enum {string} */
+      role: "user" | "sys_admin";
+      banned: boolean;
+      banReason?: string | null;
+      /** Format: date-time */
+      banExpires?: string | null;
+      /** Format: date-time */
+      createdAt: string;
+      /** Format: date-time */
+      updatedAt: string;
+    };
+    AuthSessionDto: {
+      id: string;
+      token: string;
+      /** Format: uuid */
+      userId: string;
+      /** Format: date-time */
+      expiresAt: string;
+      ipAddress?: string | null;
+      userAgent?: string | null;
+      impersonatedBy?: string | null;
+      /** Format: date-time */
+      createdAt: string;
+      /** Format: date-time */
+      updatedAt: string;
+    };
+    AuthEnvelopeDto: {
+      user: components["schemas"]["AuthUserDto"];
+      session: components["schemas"]["AuthSessionDto"];
+      /** Format: uuid */
+      uniId?: string;
+      /** @enum {string} */
+      uniRole?:
+        | "student"
+        | "uni_admin"
+        | "lecturer"
+        | "uni_admin_pending"
+        | "lecturer_pending";
+    };
     SignUpEmailDto: {
       /**
        * @description Valid email address
@@ -1040,6 +1086,27 @@ export interface components {
        */
       name: string;
     };
+    AuthErrorDto: {
+      /** @enum {string} */
+      error:
+        | "ACCOUNT_ALREADY_LINKED"
+        | "EMAIL_ALREADY_IN_USE"
+        | "EMAIL_ALREADY_VERIFIED"
+        | "EMAIL_NOT_VERIFIED"
+        | "INSUFFICIENT_PERMISSIONS"
+        | "INVALID_CODE"
+        | "INVALID_EMAIL"
+        | "INVALID_EMAIL_OR_PASSWORD"
+        | "INVALID_PASSWORD"
+        | "INVALID_TOKEN"
+        | "SESSION_NOT_FOUND"
+        | "UNAUTHORIZED"
+        | "USER_EMAIL_ALREADY_EXISTS"
+        | "USER_NOT_FOUND"
+        | "RATE_LIMITED"
+        | "INTERNAL_SERVER_ERROR";
+      message?: string;
+    };
     SignInEmailDto: {
       /**
        * @default system-admin@local.umtas
@@ -1052,6 +1119,7 @@ export interface components {
        */
       password: string;
     };
+    AuthAcknowledgementDto: Record<string, never>;
     RevokeSessionDto: {
       /**
        * @description ID of the session to terminate
@@ -1142,6 +1210,9 @@ export interface components {
        */
       role: "user" | "sys_admin";
     };
+    AuthUserResponseDto: {
+      user: components["schemas"]["AuthUserDto"];
+    };
     AdminImpersonateUserDto: {
       /**
        * @description UUID of the user to impersonate
@@ -1200,10 +1271,9 @@ export interface components {
     CreateCourseModuleDto: {
       /**
        * @description Identifies wether or not module is a core module of the course
-       * @default true
        * @example true
        */
-      Core: Record<string, never>;
+      Core?: boolean;
       /**
        * @description Identifies which part of the year the module takes part in for the course
        * @example Semester 1
@@ -1213,7 +1283,7 @@ export interface components {
        * @description Which year does the module belong to for the course
        * @example 1
        */
-      YearOfStudy?: Record<string, never> | null;
+      YearOfStudy?: number | null;
     };
     CreateModuleDto: {
       /**
@@ -1242,7 +1312,7 @@ export interface components {
        * @description Whether the module has been approved by a university admin
        * @example true
        */
-      validated?: Record<string, never>;
+      validated?: boolean;
       /**
        * Format: uuid
        * @description ModuleGroupingID to identify group the module belongs to
@@ -1279,10 +1349,9 @@ export interface components {
       CourseID: string;
       /**
        * @description Identifies wether or not module is a core module of the course
-       * @default true
        * @example true
        */
-      Core: Record<string, never>;
+      Core?: boolean;
       /**
        * @description Identifies which part of the year the module takes part in for the course
        * @example Semester 1
@@ -1292,7 +1361,7 @@ export interface components {
        * @description Which year does the module belong to for the course
        * @example 1
        */
-      YearOfStudy?: Record<string, never> | null;
+      YearOfStudy?: number | null;
     };
     ModuleSingleResponseDto: {
       /**
@@ -1339,7 +1408,7 @@ export interface components {
        * @description Whether the module has been approved by a university admin
        * @example true
        */
-      validated?: Record<string, never>;
+      validated?: boolean;
       /**
        * Format: uuid
        * @description Unique identifier for a module group
@@ -1378,7 +1447,7 @@ export interface components {
        * @description Whether the module has been approved by a university admin
        * @example true
        */
-      validated?: Record<string, never>;
+      validated?: boolean;
       /**
        * Format: uuid
        * @description ID to identify course owning this CourseModule
@@ -1387,10 +1456,9 @@ export interface components {
       CourseID?: string;
       /**
        * @description Identifies wether or not module is a core module of the course
-       * @default true
        * @example true
        */
-      Core: Record<string, never>;
+      Core?: boolean;
       /**
        * @description Identifies which part of the year the module takes part in for the course
        * @example Semester 1
@@ -1400,7 +1468,7 @@ export interface components {
        * @description Which year does the module belong to for the course
        * @example 1
        */
-      YearOfStudy?: Record<string, never> | null;
+      YearOfStudy?: number | null;
     };
     DeleteModuleResponseDto: {
       /**
@@ -1409,7 +1477,7 @@ export interface components {
        */
       moduleCode: string;
       /** @example true */
-      success: Record<string, never>;
+      success: boolean;
     };
     EnrolResponseDto: {
       /**
@@ -1604,7 +1672,7 @@ export interface components {
        */
       CourseName: string;
       /** @example true */
-      success: Record<string, never>;
+      success: boolean;
     };
     CreateUniversityDto: {
       /**
@@ -1673,6 +1741,22 @@ export interface components {
       /** @description list of universities */
       universities: components["schemas"]["UniversityDto"][];
     };
+    UserUniversityRoleResponseDto: {
+      /** Format: uuid */
+      UniversityID: string;
+      /** Format: uuid */
+      UserID: string;
+      /** @enum {string} */
+      role:
+        | "STUDENT"
+        | "STUDENT_OWNED"
+        | "UNIVERSITY_ADMIN"
+        | "UNIVERSITY_ADMIN_PENDING"
+        | "LECTURER"
+        | "LECTURER_PENDING"
+        | "SYSTEM_ADMIN"
+        | "REJECTED";
+    };
     UpdateUniversityDto: {
       /**
        * @description Name of the university
@@ -1687,7 +1771,7 @@ export interface components {
        */
       UniversityName: string;
       /** @example true */
-      success: Record<string, never>;
+      success: boolean;
     };
     GetRoleFilterDto: {
       /**
@@ -1789,7 +1873,7 @@ export interface components {
        */
       userId: string;
       /** @example true */
-      success: Record<string, never>;
+      success: boolean;
     };
     PopulateGroupBodyDto: {
       /**
@@ -1804,7 +1888,7 @@ export interface components {
     GroupingSingleResponse: {
       /** Format: uuid */
       GroupID: string;
-      Hash: string | null;
+      Hash?: string | null;
       modules?: string[];
     };
     EventCriteriaDto: {
@@ -1909,7 +1993,7 @@ export interface components {
     DeleteResponseDto: {
       eventName?: string;
       activityCode?: string | null;
-      success: Record<string, never>;
+      success: boolean;
     };
     CreateTimetableDto: {
       /**
@@ -1969,7 +2053,7 @@ export interface components {
     };
     DeleteTimetableResponseDto: {
       /** @example true */
-      success: Record<string, never>;
+      success: boolean;
     };
     CreateBuilderModuleDto: {
       /**
@@ -1998,11 +2082,11 @@ export interface components {
        * @description Whether the module has been approved by a university admin
        * @example true
        */
-      validated?: Record<string, never>;
+      validated?: boolean;
     };
     PdfParserLookupResponseDto: {
       /** @example true */
-      duplicate: Record<string, never>;
+      duplicate: boolean;
       /** @example pdf-parse-2d82d1ff-fb51-4c67-80cf-61d88c12d596 */
       jobId?: string;
       /** @enum {string} */
@@ -2010,9 +2094,91 @@ export interface components {
       /** @example 00000000-0000-0000-0000-000000000000 */
       moduleGroupingId?: string | null;
       /** @example true */
-      resultAvailable?: Record<string, never>;
+      resultAvailable?: boolean;
       /** @example /pdf-parser/jobs/pdf-parse-2d82d1ff-fb51-4c67-80cf-61d88c12d596 */
       statusUrl?: string;
+    };
+    ParseAnnotationDto: {
+      code: string;
+      message: string;
+      details: {
+        [key: string]: unknown;
+      };
+    };
+    RecurringParsedEventCandidateDto: {
+      moduleCode: string;
+      /** @enum {string} */
+      activityType: "lecture" | "tutorial" | "prac" | "test" | "exam";
+      activityCode: string;
+      title: string;
+      /** @example 08:30 */
+      startTime: string;
+      /** @example 10:20 */
+      endTime: string;
+      venues: string[];
+      metadata: {
+        [key: string]: unknown;
+      };
+      warnings: components["schemas"]["ParseAnnotationDto"][];
+      /** @enum {string} */
+      day:
+        | "monday"
+        | "tuesday"
+        | "wednesday"
+        | "thursday"
+        | "friday"
+        | "saturday"
+        | "sunday";
+      date: string | null;
+      /** @enum {boolean} */
+      isRecurring: true;
+    };
+    DatedParsedEventCandidateDto: {
+      moduleCode: string;
+      /** @enum {string} */
+      activityType: "lecture" | "tutorial" | "prac" | "test" | "exam";
+      activityCode: string;
+      title: string;
+      /** @example 08:30 */
+      startTime: string;
+      /** @example 10:20 */
+      endTime: string;
+      venues: string[];
+      metadata: {
+        [key: string]: unknown;
+      };
+      warnings: components["schemas"]["ParseAnnotationDto"][];
+      day: string | null;
+      /** Format: date */
+      date: string;
+      /** @enum {boolean} */
+      isRecurring: false;
+    };
+    ParsedModuleCandidateDto: {
+      code: string;
+      name: string | null;
+      metadata: {
+        [key: string]: unknown;
+      };
+      warnings: components["schemas"]["ParseAnnotationDto"][];
+    };
+    PdfParserResultDto: {
+      modules: components["schemas"]["ParsedModuleCandidateDto"][];
+      events: (
+        | components["schemas"]["RecurringParsedEventCandidateDto"]
+        | components["schemas"]["DatedParsedEventCandidateDto"]
+      )[];
+      warnings: components["schemas"]["ParseAnnotationDto"][];
+    };
+    WorkerCallbackErrorDto: {
+      /** @example WORKER_FAILED */
+      code: string;
+      /** @example Worker failed to process the job */
+      message: string;
+      /** @description Worker-specific diagnostic values. */
+      details?: {
+        [key: string]: unknown;
+      };
     };
     PdfParserUploadResponseDto: {
       /** @example pdf-parse-2d82d1ff-fb51-4c67-80cf-61d88c12d596 */
@@ -2023,12 +2189,8 @@ export interface components {
       adapterKey?: string | null;
       /** @enum {string} */
       status: "queued" | "completed" | "failed";
-      result?: {
-        [key: string]: unknown;
-      };
-      error?: {
-        [key: string]: unknown;
-      };
+      result?: components["schemas"]["PdfParserResultDto"];
+      error?: components["schemas"]["WorkerCallbackErrorDto"];
       /** @example 00000000-0000-0000-0000-000000000000 */
       moduleGroupingId?: string | null;
       /** @example 2026-07-02T10:15:30.000Z */
@@ -2047,12 +2209,8 @@ export interface components {
       adapterKey?: string | null;
       /** @enum {string} */
       status: "queued" | "completed" | "failed";
-      result?: {
-        [key: string]: unknown;
-      };
-      error?: {
-        [key: string]: unknown;
-      };
+      result?: components["schemas"]["PdfParserResultDto"];
+      error?: components["schemas"]["WorkerCallbackErrorDto"];
       /** @example 00000000-0000-0000-0000-000000000000 */
       moduleGroupingId?: string | null;
       /** @example 2026-07-02T10:15:30.000Z */
@@ -2060,62 +2218,133 @@ export interface components {
       /** @example 2026-07-02T10:15:45.000Z */
       updatedAt: string;
     };
-    WorkerCallbackErrorDto: {
-      /** @example PARSER_FAILED */
-      code: string;
-      /** @example PDF parser failed */
-      message: string;
-      details?: {
-        [key: string]: unknown;
-      };
-    };
     PdfParserCallbackDto: {
       /** @enum {string} */
       status: "completed" | "failed";
-      result?: {
+      result?: components["schemas"]["PdfParserResultDto"];
+      error?: components["schemas"]["WorkerCallbackErrorDto"];
+    };
+    AcceptedJobResponseDto: {
+      /** @enum {boolean} */
+      accepted: true;
+      jobId: string;
+    };
+    SolverHeuristicPreferenceDto: {
+      key: string;
+      weight?: number;
+      parameters?: {
         [key: string]: unknown;
       };
-      error?: components["schemas"]["WorkerCallbackErrorDto"];
+    };
+    SolverPreferencesDto: {
+      /** @default [] */
+      heuristics: components["schemas"]["SolverHeuristicPreferenceDto"][];
     };
     TimetableSolveJobDto: {
       /**
-       * @deprecated
-       * @example legacy-client-id
+       * @example [
+       *       "00000000-0000-4000-8000-000000000004"
+       *     ]
        */
-      jobId?: string;
-      /** @example default */
-      solverProfileKey: string;
+      eventIds?: string[];
       /** @enum {string} */
       solveMode: "feasibility" | "optimization";
-      /**
-       * @default auto
-       * @enum {string}
-       */
-      engine: "auto" | "cp-sat" | "ga";
+      /** @enum {string} */
+      engine?: "auto" | "cp-sat" | "ga";
       /**
        * @example {
        *       "heuristics": []
        *     }
        */
-      preferences?: Record<string, never>;
+      preferences?: components["schemas"]["SolverPreferencesDto"];
+    };
+    TimetableSolutionDto: {
+      selectedEventIds: string[];
+    };
+    SolverHeuristicScoreDto: {
+      key: string;
+      score: number;
+      details?: {
+        [key: string]: unknown;
+      };
+    };
+    SolverConflictDto: {
+      eventIds: string[];
+    };
+    SolverResultMetadataDto: {
+      conflictCount: number;
+      conflicts: components["schemas"]["SolverConflictDto"][];
+      /** @enum {string} */
+      solveMode: "feasibility" | "optimization";
+    };
+    SolverResultDto: {
+      /** @enum {string} */
+      engine: "cp-sat" | "ga";
+      /** @enum {string} */
+      outcome: "conflict-free" | "best-effort";
+      timetableSolution: components["schemas"]["TimetableSolutionDto"];
+      /** @default [] */
+      heuristicScores: components["schemas"]["SolverHeuristicScoreDto"][];
+      metadata: {
+        [key: string]: unknown;
+      } & components["schemas"]["SolverResultMetadataDto"];
+    };
+    SolverSubmissionResponseDto: {
+      /** @enum {boolean} */
+      accepted: true;
+      jobId: string;
+      /** @enum {string} */
+      status: "queued" | "completed" | "failed";
+      result?: components["schemas"]["SolverResultDto"];
+    };
+    SchedulingVenueDto: {
+      id: string;
+      name: string;
+    };
+    SchedulingEventDto: {
+      eventId: string;
+      moduleCode: string;
+      /** @enum {string} */
+      activityType: "lecture" | "tutorial" | "prac" | "test" | "exam";
+      activityCode: string;
+      /** @default 1 */
+      requiredSelections: number;
+      /** Format: date */
+      date?: string;
+      /** @enum {string} */
+      dayOfWeek?:
+        | "monday"
+        | "tuesday"
+        | "wednesday"
+        | "thursday"
+        | "friday"
+        | "saturday"
+        | "sunday";
+      /** @example 08:30 */
+      startTime: string;
+      /** @example 10:20 */
+      endTime: string;
+      /** @default [] */
+      venues: components["schemas"]["SchedulingVenueDto"][];
+    };
+    SchedulingProblemDto: {
+      events: components["schemas"]["SchedulingEventDto"][];
+    };
+    SolverInputDto: {
+      schedulingProblem: components["schemas"]["SchedulingProblemDto"];
+      preferences: components["schemas"]["SolverPreferencesDto"];
     };
     SolverJobResponseDto: {
       /** @example solve-job-123 */
       jobId: string;
-      /** @example default */
-      solverProfileKey: string;
       /** @enum {string} */
       solveMode: "feasibility" | "optimization";
       /** @enum {string} */
       requestedEngine?: "auto" | "cp-sat" | "ga";
       /** @enum {string} */
       status: "queued" | "completed" | "failed";
-      result?: {
-        [key: string]: unknown;
-      };
-      error?: {
-        [key: string]: unknown;
-      };
+      result?: components["schemas"]["SolverResultDto"];
+      error?: components["schemas"]["WorkerCallbackErrorDto"];
       /** @example 2026-07-13T10:15:30.000Z */
       createdAt: string;
       /** @example 2026-07-13T10:15:45.000Z */
@@ -2129,9 +2358,7 @@ export interface components {
       /** @enum {string} */
       status: "completed" | "failed";
       /** @description A valid timetable solution and its soft-heuristic scores. */
-      result?: {
-        [key: string]: unknown;
-      };
+      result?: components["schemas"]["SolverResultDto"];
       error?: components["schemas"]["WorkerCallbackErrorDto"];
     };
     CreateAttendanceDto: {
@@ -2178,7 +2405,6 @@ export interface components {
        */
       AttendanceID: string;
     };
-    Object: Record<string, never>;
     AttendanceListResponse: {
       /** @description List of attendance records */
       attendanceList: components["schemas"]["AttendanceSingleResponse"][];
@@ -2201,7 +2427,7 @@ export interface components {
        * @description successfully deleted or not
        * @example true
        */
-      success: Record<string, never>;
+      success: boolean;
     };
   };
   responses: never;
@@ -2250,7 +2476,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthEnvelopeDto"];
         };
       };
       /** @description Invalid email format or password too weak (min 8 characters) */
@@ -2259,7 +2485,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
       /** @description Email already registered */
@@ -2268,7 +2494,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
       /** @description Rate limited - max 100 requests per 60 seconds */
@@ -2276,7 +2502,9 @@ export interface operations {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          "application/json": components["schemas"]["AuthErrorDto"];
+        };
       };
     };
   };
@@ -2299,7 +2527,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthEnvelopeDto"];
         };
       };
       /** @description Email not verified - must verify before signing in */
@@ -2308,7 +2536,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
       /** @description Invalid email or password */
@@ -2317,7 +2545,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
       /** @description Rate limited */
@@ -2325,7 +2553,9 @@ export interface operations {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          "application/json": components["schemas"]["AuthErrorDto"];
+        };
       };
     };
   };
@@ -2344,7 +2574,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthAcknowledgementDto"];
         };
       };
       /** @description No active session */
@@ -2353,7 +2583,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
     };
@@ -2373,7 +2603,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthEnvelopeDto"] | null;
         };
       };
     };
@@ -2393,7 +2623,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthSessionDto"][];
         };
       };
       /** @description Unauthorized */
@@ -2402,7 +2632,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
     };
@@ -2426,7 +2656,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthAcknowledgementDto"];
         };
       };
       /** @description Session not found */
@@ -2435,7 +2665,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
       /** @description Unauthorized */
@@ -2444,7 +2674,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
     };
@@ -2464,7 +2694,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthAcknowledgementDto"];
         };
       };
       /** @description Email already verified */
@@ -2473,7 +2703,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
       /** @description Unauthorized */
@@ -2482,7 +2712,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
       /** @description Rate limited */
@@ -2490,7 +2720,9 @@ export interface operations {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          "application/json": components["schemas"]["AuthErrorDto"];
+        };
       };
     };
   };
@@ -2513,7 +2745,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthEnvelopeDto"];
         };
       };
       /** @description Invalid or expired verification code, or email not found */
@@ -2522,7 +2754,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
     };
@@ -2546,7 +2778,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthAcknowledgementDto"];
         };
       };
       /** @description Rate limited */
@@ -2554,7 +2786,9 @@ export interface operations {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          "application/json": components["schemas"]["AuthErrorDto"];
+        };
       };
     };
   };
@@ -2577,7 +2811,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthEnvelopeDto"];
         };
       };
       /** @description Invalid or expired reset token, or new password too weak */
@@ -2586,7 +2820,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
     };
@@ -2610,7 +2844,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthAcknowledgementDto"];
         };
       };
       /** @description Incorrect current password or new password too weak */
@@ -2619,7 +2853,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
       /** @description Unauthorized */
@@ -2628,7 +2862,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
     };
@@ -2637,9 +2871,9 @@ export interface operations {
     parameters: {
       query: {
         /** @description OAuth state parameter set by BetterAuth */
-        state: unknown;
+        state: string;
         /** @description Authorization code issued by Google */
-        code: unknown;
+        code: string;
       };
       header?: never;
       path?: never;
@@ -2660,7 +2894,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
     };
@@ -2684,7 +2918,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthEnvelopeDto"];
         };
       };
       /** @description Account already linked or invalid OAuth code */
@@ -2693,7 +2927,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
       /** @description Unauthorized */
@@ -2702,7 +2936,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
       /** @description The Google account email is already in use by another account */
@@ -2711,7 +2945,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
     };
@@ -2735,7 +2969,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthUserResponseDto"];
         };
       };
       /** @description Unauthorized */
@@ -2744,7 +2978,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
       /** @description Insufficient permissions (sys_admin required) */
@@ -2753,7 +2987,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
       /** @description Email already registered */
@@ -2762,7 +2996,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
     };
@@ -2786,7 +3020,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthEnvelopeDto"];
         };
       };
       /** @description Unauthorized */
@@ -2795,7 +3029,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
       /** @description Insufficient permissions (sys_admin required) */
@@ -2804,7 +3038,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
     };
@@ -2828,7 +3062,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthUserResponseDto"];
         };
       };
       /** @description Unauthorized */
@@ -2837,7 +3071,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
       /** @description Insufficient permissions (sys_admin required) */
@@ -2846,7 +3080,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
       /** @description User not found */
@@ -2855,7 +3089,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
     };
@@ -2879,7 +3113,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthUserResponseDto"];
         };
       };
       /** @description Unauthorized */
@@ -2888,7 +3122,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
       /** @description Insufficient permissions (sys_admin required) */
@@ -2897,7 +3131,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
       /** @description User not found */
@@ -2906,7 +3140,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
       /** @description New email already in use */
@@ -2915,7 +3149,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
     };
@@ -2938,7 +3172,9 @@ export interface operations {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          "application/json": components["schemas"]["AuthEnvelopeDto"];
+        };
       };
     };
   };
@@ -3663,7 +3899,9 @@ export interface operations {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          "application/json": components["schemas"]["UserUniversityRoleResponseDto"];
+        };
       };
       /** @description Invalid University ID */
       400: {
@@ -4590,7 +4828,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": Record<string, never>;
+          "application/json": components["schemas"]["PdfParserResultDto"];
         };
       };
     };
@@ -4614,7 +4852,9 @@ export interface operations {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          "application/json": components["schemas"]["AcceptedJobResponseDto"];
+        };
       };
     };
   };
@@ -4636,12 +4876,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": {
-            /** @example true */
-            accepted?: boolean;
-            /** @example solve-job-123 */
-            jobId?: string;
-          };
+          "application/json": components["schemas"]["SolverSubmissionResponseDto"];
         };
       };
     };
@@ -4662,7 +4897,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": Record<string, never>;
+          "application/json": components["schemas"]["SolverInputDto"];
         };
       };
     };
@@ -4704,7 +4939,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": Record<string, never>;
+          "application/json": components["schemas"]["SolverResultDto"];
         };
       };
     };
@@ -4730,7 +4965,9 @@ export interface operations {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          "application/json": components["schemas"]["AcceptedJobResponseDto"];
+        };
       };
     };
   };
@@ -4744,7 +4981,7 @@ export interface operations {
         /** @description Is the user attending this event or not */
         state?: "ATTENDING" | "NOT_ATTENDING";
         /** @description Filter by current userId together with other filters */
-        AlsoFilterByUser?: components["schemas"]["Object"];
+        AlsoFilterByUser?: boolean;
       };
       header?: never;
       path?: never;

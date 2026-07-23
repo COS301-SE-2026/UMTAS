@@ -139,7 +139,6 @@ export function ModulesStep({ modules }: ModulesStepProps) {
         moduleID: id,
         module: {
           ...uniModule,
-          Core: {},
         },
       });
 

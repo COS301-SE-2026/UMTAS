@@ -78,7 +78,7 @@ export default function CourseManagementTemplate() {
     isLoading: isCourseLoading,
     isError: isCourseError,
   } = useQuery({
-    ...getAllCoursesQ(),
+    ...getAllCoursesQ({ UniversityID: UniDetails?.UniversityID ?? "" }),
     enabled: !!UniDetails?.UniversityID,
   });
 

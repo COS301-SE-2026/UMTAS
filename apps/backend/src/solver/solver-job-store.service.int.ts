@@ -177,10 +177,9 @@ function toPgliteDatabase(
 const userId = '11111111-1111-4111-8111-111111111111';
 const reservation = {
   userId,
-  solverProfileKey: 'default',
   solveMode: 'optimization' as const,
   requestedEngine: 'auto' as const,
-  deduplicationKey: `solver-semantic-sha256-v1:${'a'.repeat(64)}`,
+  deduplicationKey: `solver-semantic-sha256-v2:${'a'.repeat(64)}`,
   solverInput: {
     schedulingProblem: { events: [] },
     preferences: { heuristics: [] },

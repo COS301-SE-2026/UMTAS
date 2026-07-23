@@ -57,7 +57,7 @@ export class CourseController {
     status: 409,
     description: 'Course already exists',
   })
-  create(@Body() dto: CreateCourseDto) {
+  create(@Body() dto: CreateCourseDto): Promise<CourseSingleResponseDto> {
     return this.service.create(dto);
   }
 
@@ -107,7 +107,9 @@ export class CourseController {
     status: 404,
     description: 'Course not found',
   })
-  getById(@Param('CourseId', ParseUUIDPipe) CourseId: string) {
+  getById(
+    @Param('CourseId', ParseUUIDPipe) CourseId: string,
+  ): Promise<CourseSingleResponseDto> {
     return this.service.getById(CourseId);
   }
 
@@ -135,7 +137,7 @@ export class CourseController {
   update(
     @Param('CourseId', ParseUUIDPipe) CourseId: string,
     @Body() dto: UpdateCourseDto,
-  ) {
+  ): Promise<CourseSingleResponseDto> {
     return this.service.update(CourseId, dto);
   }
 
@@ -159,7 +161,9 @@ export class CourseController {
     status: 404,
     description: 'Course not found',
   })
-  delete(@Param('CourseId', ParseUUIDPipe) CourseId: string) {
+  delete(
+    @Param('CourseId', ParseUUIDPipe) CourseId: string,
+  ): Promise<DeleteCourseResponseDto> {
     return this.service.delete(CourseId);
   }
 } //CourseController

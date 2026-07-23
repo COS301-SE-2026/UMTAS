@@ -1,6 +1,133 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsUUID } from 'class-validator';
 
+export const AUTH_ERROR_CODES = [
+  'ACCOUNT_ALREADY_LINKED',
+  'EMAIL_ALREADY_IN_USE',
+  'EMAIL_ALREADY_VERIFIED',
+  'EMAIL_NOT_VERIFIED',
+  'INSUFFICIENT_PERMISSIONS',
+  'INVALID_CODE',
+  'INVALID_EMAIL',
+  'INVALID_EMAIL_OR_PASSWORD',
+  'INVALID_PASSWORD',
+  'INVALID_TOKEN',
+  'SESSION_NOT_FOUND',
+  'UNAUTHORIZED',
+  'USER_EMAIL_ALREADY_EXISTS',
+  'USER_NOT_FOUND',
+  'RATE_LIMITED',
+  'INTERNAL_SERVER_ERROR',
+] as const;
+
+export type AuthErrorCode = (typeof AUTH_ERROR_CODES)[number];
+
+export class AuthUserDto {
+  @ApiProperty({ type: String, format: 'uuid' })
+  id!: string;
+
+  @ApiProperty({ type: String })
+  email!: string;
+
+  @ApiProperty({ type: String })
+  name!: string;
+
+  @ApiProperty({ type: Boolean })
+  emailVerified!: boolean;
+
+  @ApiPropertyOptional({ type: String, nullable: true })
+  image?: string | null;
+
+  @ApiProperty({ enum: ['user', 'sys_admin'] })
+  role!: 'user' | 'sys_admin';
+
+  @ApiProperty({ type: Boolean })
+  banned!: boolean;
+
+  @ApiPropertyOptional({ type: String, nullable: true })
+  banReason?: string | null;
+
+  @ApiPropertyOptional({ type: String, format: 'date-time', nullable: true })
+  banExpires?: string | null;
+
+  @ApiProperty({ type: String, format: 'date-time' })
+  createdAt!: string;
+
+  @ApiProperty({ type: String, format: 'date-time' })
+  updatedAt!: string;
+}
+
+export class AuthSessionDto {
+  @ApiProperty({ type: String })
+  id!: string;
+
+  @ApiProperty({ type: String })
+  token!: string;
+
+  @ApiProperty({ type: String, format: 'uuid' })
+  userId!: string;
+
+  @ApiProperty({ type: String, format: 'date-time' })
+  expiresAt!: string;
+
+  @ApiPropertyOptional({ type: String, nullable: true })
+  ipAddress?: string | null;
+
+  @ApiPropertyOptional({ type: String, nullable: true })
+  userAgent?: string | null;
+
+  @ApiPropertyOptional({ type: String, nullable: true })
+  impersonatedBy?: string | null;
+
+  @ApiProperty({ type: String, format: 'date-time' })
+  createdAt!: string;
+
+  @ApiProperty({ type: String, format: 'date-time' })
+  updatedAt!: string;
+}
+
+export class AuthEnvelopeDto {
+  @ApiProperty({ type: AuthUserDto })
+  user!: AuthUserDto;
+
+  @ApiProperty({ type: AuthSessionDto })
+  session!: AuthSessionDto;
+
+  @ApiPropertyOptional({ type: String, format: 'uuid' })
+  uniId?: string;
+
+  @ApiPropertyOptional({
+    enum: [
+      'student',
+      'uni_admin',
+      'lecturer',
+      'uni_admin_pending',
+      'lecturer_pending',
+    ],
+  })
+  uniRole?:
+    | 'student'
+    | 'uni_admin'
+    | 'lecturer'
+    | 'uni_admin_pending'
+    | 'lecturer_pending';
+}
+
+export class AuthUserResponseDto {
+  @ApiProperty({ type: AuthUserDto })
+  user!: AuthUserDto;
+}
+
+export class AuthAcknowledgementDto {}
+
+export class AuthErrorDto {
+  @ApiProperty({ enum: AUTH_ERROR_CODES })
+  error!: AuthErrorCode;
+
+  @ApiPropertyOptional({ type: String })
+  message?: string;
+}
+
 export class SignUpEmailDto {
   @ApiProperty({
     type: String,
