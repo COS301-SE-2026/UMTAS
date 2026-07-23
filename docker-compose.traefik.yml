@@ -30,6 +30,15 @@ services:
       - "traefik.http.routers.traefik.tls.certresolver=myresolver"
       - "traefik.http.routers.traefik.middlewares=traefik-auth"
       - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_DASHBOARD_CREDENTIALS}"
+      - "traefik.http.routers.brand-redirect.rule=Host(`brand.capstone-vigil.dns.net.za`)"
+      - "traefik.http.routers.brand-redirect.entrypoints=websecure"
+      - "traefik.http.routers.brand-redirect.tls=true"
+      - "traefik.http.routers.brand-redirect.tls.certresolver=myresolver"
+      - "traefik.http.routers.brand-redirect.service=api@internal"
+      - "traefik.http.routers.brand-redirect.middlewares=brand-redirect-mw"
+      - "traefik.http.middlewares.brand-redirect-mw.redirectregex.regex=^https?://brand.capstone-vigil.dns.net.za/(.*)"
+      - "traefik.http.middlewares.brand-redirect-mw.redirectregex.replacement=https://capstone-vigil.dns.net.za/brand-style/$${1}"
+      - "traefik.http.middlewares.brand-redirect-mw.redirectregex.permanent=true"
 
 networks:
   gateway:
