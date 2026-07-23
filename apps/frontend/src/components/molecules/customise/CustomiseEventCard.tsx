@@ -262,10 +262,8 @@ export function CustomiseEventCard({
             </Label>
             <EventTypeDropdown
               disabled={canEdit}
-              value={
-                (event.eventCriteria?.eventSource as EventType) || "lecture"
-              }
-              onChange={(v) => onUpdate(event.eventId, "eventSource", v)}
+              value={(event.activityType as EventType) || "lecture"}
+              onChange={(v) => onUpdate(event.eventId, "activityType", v)}
             />
           </div>
 

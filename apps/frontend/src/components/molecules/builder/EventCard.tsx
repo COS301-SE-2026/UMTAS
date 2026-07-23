@@ -182,26 +182,26 @@ export function EventCard({
         </div>
 
         {/* venue */}
-        <div className="flex flex-col gap-2">
-          <Label
+        {/* <div className="flex flex-col gap-2"> */}
+        {/* <Label
             htmlFor={"event-venue-" + event.eventId}
             className="text-sm font-medium text-[var(--text-secondary)]"
           >
             Venue
-          </Label>
-          {
-            // <Input
-            //   id={"event-venue-" + event.eventId}
-            //   value={event.eventCriteria?.venue || ""}
-            //   onChange={(e) => onUpdate(event.eventId, "venue", e.target.value)}
-            //   placeholder="e.g. IT 2-26"
-            //   className={getInputClass(!!errors?.venue)}
-            // />
-          }
-          {/* {errors?.venue && (
+          </Label> */}
+        {
+          // <Input
+          //   id={"event-venue-" + event.eventId}
+          //   value={event.eventCriteria?.venue || ""}
+          //   onChange={(e) => onUpdate(event.eventId, "venue", e.target.value)}
+          //   placeholder="e.g. IT 2-26"
+          //   className={getInputClass(!!errors?.venue)}
+          // />
+        }
+        {/* {errors?.venue && (
             <p className="text-sm text-[var(--error-text)]">{errors.venue}</p>
           )} */}
-        </div>
+        {/* </div> */}
 
         {/* date - mapped to day */}
         <div className="flex flex-col gap-2">
@@ -238,8 +238,8 @@ export function EventCard({
             Event type
           </Label>
           <EventTypeDropdown
-            value={(event.eventCriteria?.eventSource as EventType) || "uni"}
-            onChange={(v) => onUpdate(event.eventId, "eventSource", v)}
+            value={(event.activityType as EventType) || "lecture"}
+            onChange={(v) => onUpdate(event.eventId, "activityType", v)}
           />
         </div>
 
