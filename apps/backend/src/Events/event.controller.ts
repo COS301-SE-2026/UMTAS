@@ -23,6 +23,7 @@ import {
 import { EventService } from './event.service';
 import type { SessionData } from '../auth/session.decorator';
 import { CurrentSession } from '../auth/session.decorator';
+import { Roles } from '../auth/roles.guard';
 
 @ApiTags('Events')
 @Controller('events')
@@ -30,6 +31,7 @@ export class EventController {
   constructor(private readonly service: EventService) {}
 
   @Post()
+  @Roles()
   @ApiOperation({
     summary: 'Create an event',
     operationId: 'createEvent',
@@ -65,6 +67,7 @@ export class EventController {
 
   //get All
   @Get()
+  @Roles()
   @ApiOperation({
     summary: 'Get all events',
     operationId: 'getAllEvents',
@@ -93,6 +96,7 @@ export class EventController {
 
   //get by id
   @Get(':eventId')
+  @Roles()
   @ApiOperation({
     summary: 'Get event by ID',
     operationId: 'getEventById',
@@ -114,6 +118,7 @@ export class EventController {
 
   //update
   @Patch(':id')
+  @Roles()
   @ApiOperation({
     summary: 'Update an event',
     operationId: 'updateEvent',
@@ -159,6 +164,7 @@ export class EventController {
 
   //delete
   @Delete(':id')
+  @Roles()
   @ApiOperation({
     summary: 'Delete an event',
     operationId: 'deleteEvent',

@@ -101,8 +101,9 @@ nav:
       - Frontend Development: developer-guides/frontend-development-guide.md
       - Server Setup: developer-guides/Server-Setup-Guide.md
       - Server Operations: developer-guides/server-guide.md
-      - Unit Testing: developer-guides/unit-testing-guide.md
-      - Integration Testing: developer-guides/integration-testing-guide.md
+      - Testing Policy: developer-guides/testing-policy.md
+      # - Unit Testing: developer-guides/unit-testing-guide.md
+      # - Integration Testing: developer-guides/integration-testing-guide.md
       - Local CI/CD: developer-guides/local-cicd-guide.md
   - Admin:
       - Marking Guide: management/Marking-Guide.md

@@ -423,13 +423,23 @@ export class ModuleService {
       )
       .limit(1);
 
-    //If user already enrolled, return early
-    if (enrollmentStatus)
+    //If user already enrolled, Unenroll them
+    if (enrollmentStatus) {
+      await tx
+        .delete(ModuleEnrollment)
+        .where(
+          and(
+            eq(ModuleEnrollment.UserID, userId),
+            eq(ModuleEnrollment.ModuleID, moduleId),
+          ),
+        );
+
       return {
         moduleID: moduleId,
         UserID: userId,
-        message: `User[${userId}] already enrolled for module[${moduleId}]`,
+        message: `Unenrolled User[${userId}] from module[${moduleId}]`,
       };
+    } //Unenroll
 
     //Enroll student to module
     const newlyEnrolled = await tx

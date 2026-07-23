@@ -29,7 +29,7 @@ import {
 
 // import { CurrentSession } from '../auth/session.decorator';
 // import type { SessionData } from '../auth/session.decorator';
-import { Roles, SystemAdmin } from 'src/auth/roles.guard';
+import { Roles } from 'src/auth/roles.guard';
 
 @ApiTags('Courses')
 @Controller('Courses')
@@ -63,7 +63,7 @@ export class CourseController {
 
   //GetAll per but put method since we use body for filters
   @Post('getAll')
-  @Roles('student', 'uni_admin')
+  @Roles()
   @ApiOperation({
     summary: 'Get all courses',
     operationId: 'getCourses',
@@ -89,7 +89,7 @@ export class CourseController {
 
   //GetById
   @Get(':CourseId')
-  @Roles('student', 'uni_admin')
+  @Roles()
   @ApiOperation({
     summary: 'get a Course by ID',
     operationId: 'getCourseById',
@@ -115,7 +115,7 @@ export class CourseController {
 
   //Update
   @Patch(':CourseId')
-  @Roles('uni_admin')
+  @Roles('lecturer', 'uni_admin')
   @ApiOperation({
     summary: 'Update an Course',
     operationId: 'updateCourse',
@@ -143,7 +143,7 @@ export class CourseController {
 
   //Delete
   @Delete(':CourseId')
-  @SystemAdmin() //should uni_admin's be allowed to delete
+  @Roles('uni_admin')
   @ApiOperation({
     summary: 'Delete Course by Course ID',
     operationId: 'deleteCourse',

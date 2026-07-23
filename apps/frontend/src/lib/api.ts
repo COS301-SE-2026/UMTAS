@@ -1745,7 +1745,7 @@ export interface components {
       /** Format: uuid */
       UniversityID: string;
       /** Format: uuid */
-      userId: string;
+      UserID: string;
       /** @enum {string} */
       role:
         | "STUDENT"
@@ -2242,19 +2242,15 @@ export interface components {
     };
     TimetableSolveJobDto: {
       /**
-       * @deprecated
-       * @example legacy-client-id
+       * @example [
+       *       "00000000-0000-4000-8000-000000000004"
+       *     ]
        */
-      jobId?: string;
-      /** @example default */
-      solverProfileKey: string;
+      eventIds?: string[];
       /** @enum {string} */
       solveMode: "feasibility" | "optimization";
-      /**
-       * @default auto
-       * @enum {string}
-       */
-      engine: "auto" | "cp-sat" | "ga";
+      /** @enum {string} */
+      engine?: "auto" | "cp-sat" | "ga";
       /**
        * @example {
        *       "heuristics": []
@@ -2341,8 +2337,6 @@ export interface components {
     SolverJobResponseDto: {
       /** @example solve-job-123 */
       jobId: string;
-      /** @example default */
-      solverProfileKey: string;
       /** @enum {string} */
       solveMode: "feasibility" | "optimization";
       /** @enum {string} */
@@ -3440,7 +3434,7 @@ export interface operations {
           "application/json": components["schemas"]["EnrolResponseDto"];
         };
       };
-      /** @description Student already enrolled into module */
+      /** @description Unenrolled user from module */
       201: {
         headers: {
           [name: string]: unknown;

@@ -99,8 +99,7 @@ export class UniversityService {
         ),
       );
 
-    if (universities.length === 0)
-      throw new NotFoundException('No universities found');
+    if (universities.length === 0) return { universities: [] };
 
     return { universities };
   } //GetAll
@@ -201,7 +200,7 @@ export class UniversityService {
     tx?: DatabaseService['db'],
   ): Promise<UserUniversityRoleResponseDto> {
     if (!tx) {
-      return await this.dbService.db.transaction(async (t: AppDatabase) => {
+      return await this.dbService.db.transaction((t: AppDatabase) => {
         return this.getUsersRole(userId, uniId, t);
       });
     } //END_tx precence check
@@ -218,13 +217,13 @@ export class UniversityService {
       .limit(1);
 
     if (!uniRole)
-      throw new BadRequestException(
+      throw new NotFoundException(
         `No role found for user[${userId}] for university[${uniId}]`,
       );
 
     return {
       UniversityID: uniRole.UniversityID,
-      userId: uniRole.UserID,
+      UserID: uniRole.UserID,
       role: uniRole.role,
     };
   } //END_getUsersRole
@@ -243,10 +242,10 @@ export class UniversityService {
     //Check that uni exists
     const uni = await this.getById(dto.UniversityID, tx);
 
-    if (!uni)
-      throw new BadRequestException(
-        `University[${dto.UniversityID}] does not exist`,
-      );
+    // if (!uni)
+    //   throw new BadRequestException(
+    //     `University[${dto.UniversityID}] does not exist`,
+    //   );
 
     const uniId = uni.UniversityID;
 
@@ -279,7 +278,7 @@ export class UniversityService {
       )
       .limit(1);
 
-    let newUniRole;
+    let newUniRole: typeof UniversityRole.$inferSelect;
     if (!uniRole) {
       //User has not applied for a role previously
       [newUniRole] = await tx
@@ -292,7 +291,7 @@ export class UniversityService {
         .returning();
     } else {
       //If already existing role and already has that role -> return early
-      if (uniRole.role === role) return { ...uni, role: uniRole.role };
+      if (uniRole.role === dto.role) return { ...uni, role: uniRole.role };
 
       //User already has a role, apply for new role, by updating uniRole entity
       [newUniRole] = await tx
@@ -331,21 +330,7 @@ export class UniversityService {
     } //END_tx precence check
 
     //get role
-    const [usersRole] = await tx
-      .select()
-      .from(UniversityRole)
-      .where(
-        and(
-          eq(UniversityRole.UserID, dto.userId),
-          eq(UniversityRole.UniversityID, dto.UniversityID),
-        ),
-      )
-      .limit(1);
-
-    if (!usersRole)
-      throw new BadRequestException(
-        `No role found for user[${dto.userId}] for university[${dto.UniversityID}]`,
-      );
+    const usersRole = await this.getUsersRole(dto.userId, dto.UniversityID, tx);
 
     let role: RoleTypeType;
     if (dto.provdedRole === undefined || dto.provdedRole == null) {

@@ -21,6 +21,7 @@ import {
   UpdateModuleDto,
   DeleteModuleResponseDto,
 } from '../Module/dto/module.dto';
+import { Roles } from '../auth/roles.guard';
 
 @ApiTags('Builder')
 @Controller('builder')
@@ -29,6 +30,7 @@ export class BuilderController {
 
   //Create
   @Post()
+  @Roles()
   @ApiOperation({
     summary: 'Create a user defined module',
     description:
@@ -57,6 +59,7 @@ export class BuilderController {
 
   //Get all
   @Get()
+  @Roles()
   @ApiOperation({
     summary: 'Get all modules a user is enrolled in with their course',
     description:
@@ -83,6 +86,7 @@ export class BuilderController {
 
   //Get by id
   @Get(':moduleId')
+  @Roles()
   @ApiOperation({
     summary: 'Get a module by ID',
     description: 'Return a module from its moduleID',
@@ -110,6 +114,7 @@ export class BuilderController {
 
   //Update
   @Patch(':moduleId')
+  @Roles()
   @ApiOperation({
     summary: 'Update a module that the student owns',
     description: 'STUDENT_OWNED so they can update any field of the module',
@@ -143,6 +148,7 @@ export class BuilderController {
 
   // Delete
   @Delete(':moduleId')
+  @Roles()
   @ApiOperation({
     summary: 'Delete a module by ID',
     description:

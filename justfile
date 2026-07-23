@@ -205,7 +205,7 @@ docker-build-multiarch image_tag registry="vigilcs/umtas":
 ############################## Backend specific
 
 #Complete restart of backend, I'm getting lazy
-backendRestart:
+resetBack:
     just dockerClean
     just sync
     just back

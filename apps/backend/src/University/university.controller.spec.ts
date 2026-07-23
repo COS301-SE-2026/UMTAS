@@ -116,7 +116,7 @@ describe('UniversityController', () => {
       const UniversityID = 'uuid-1';
       const expectedResponse = {
         UniversityID: 'uuid-1',
-        userId: 'userId',
+        UserID: 'userId',
         role: 'STUDENT',
       } as const;
 

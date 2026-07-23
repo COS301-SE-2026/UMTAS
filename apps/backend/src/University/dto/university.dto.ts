@@ -165,7 +165,7 @@ export class UserUniversityRoleResponseDto {
   UniversityID!: string;
 
   @ApiProperty({ type: String, format: 'uuid' })
-  userId!: string;
+  UserID!: string;
 
   @ApiProperty({ enum: RoleType.enumValues })
   role!: RoleTypeType;

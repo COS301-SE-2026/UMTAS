@@ -28,7 +28,7 @@ import { ApiBody, ApiResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { CurrentSession } from '../auth/session.decorator';
 import type { SessionData } from '../auth/session.decorator';
-import { Roles, SystemAdmin } from 'src/auth/roles.guard';
+import { Roles, SystemAdmin } from '../auth/roles.guard';
 
 @ApiTags('Universities')
 @Controller('universities')
@@ -61,6 +61,7 @@ export class UniversityController {
 
   //GetAll
   @Get()
+  @Roles()
   @ApiOperation({
     summary: 'Get all universities',
     operationId: 'getUniversities',
@@ -82,6 +83,7 @@ export class UniversityController {
 
   //GetById
   @Get(':universityId')
+  @Roles()
   @ApiOperation({
     summary: 'get a university by ID',
     operationId: 'getUniversityById',
@@ -108,6 +110,7 @@ export class UniversityController {
 
   //GetById
   @Get('/role/:universityId')
+  @Roles()
   @ApiOperation({
     summary: 'get a users role by universityID',
     operationId: 'getUserRoleByUniID',
@@ -162,7 +165,7 @@ export class UniversityController {
 
   //Delete
   @Delete(':universityId')
-  @Roles('uni_admin') //should uni_admin's be allowed to delete - feel like a sour lecturer will be an aass and just delete his uni
+  @SystemAdmin()
   @ApiOperation({
     summary: 'Delete university by university ID',
     operationId: 'deleteUniversity',
