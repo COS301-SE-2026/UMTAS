@@ -3198,7 +3198,7 @@ export interface operations {
           "application/json": components["schemas"]["EnrolResponseDto"];
         };
       };
-      /** @description Student already enrolled into module */
+      /** @description Unenrolled user from module */
       201: {
         headers: {
           [name: string]: unknown;

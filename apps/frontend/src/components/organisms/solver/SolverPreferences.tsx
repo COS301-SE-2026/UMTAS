@@ -19,6 +19,7 @@ import {
   pollSolverOutputBuilder,
 } from "@/app/solver/queries/Solver/builder";
 import { createTimeTableBuilder } from "@/app/builder/utils/timetables/TimeTableRequests";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 export type SolverResult = {
   engine: "cp-sat" | (string & {});
@@ -44,58 +45,90 @@ export default function SolverPreferences({ modules, events }: solverProps) {
   const [currentMode, setCurrentMode] = useState<
     "feasibility" | "optimization"
   >("feasibility");
+  const [jobID, setJobID] = useState<string | null>(null);
 
-  async function enrollUser() {
-    const builder = new enrollModBuilder();
-    await Promise.allSettled(
-      modules.map(async (mod) => {
-        const result = await builder.send({
-          paths: {
-            moduleId: mod.moduleID,
+  const { data: resultOfPoll } = useQuery({
+    queryKey: ["solver", "poll"],
+    queryFn: async () => {
+      const pollBuilder = new pollSolverOutputBuilder();
+      const resultOfPoll = await pollBuilder.send({
+        paths: {
+          jobId: jobID || "",
+        },
+      });
+      console.log("Polled", resultOfPoll);
+      return resultOfPoll;
+    },
+    enabled: jobID != null && jobID != "",
+    refetchInterval: 2500,
+  });
+
+  const enrollUserMutation = useMutation({
+    mutationFn: async () => {
+      const builder = new enrollModBuilder();
+      return await Promise.allSettled(
+        modules.map(async (mod) => {
+          const result = await builder.send({
+            paths: {
+              moduleId: mod.moduleID,
+            },
+          });
+          return result;
+        }),
+      );
+    },
+  });
+
+  const createJobMutation = useMutation({
+    mutationFn: async () => {
+      const builder = new createSolverJobBuilder();
+      return await builder.send({
+        body: {
+          engine: currentMode === "feasibility" ? "cp-sat" : "ga",
+          solveMode: currentMode,
+          solverProfileKey: "default",
+        },
+      });
+    },
+  });
+
+  const createTimeTableMutation = useMutation({
+    mutationFn: async () => {
+      if (resultOfPoll) {
+        const typeShiftedResults = resultOfPoll.result as SolverResult;
+        console.log("Poll closed result finished", resultOfPoll.result);
+        const timetableBuilder = new createTimeTableBuilder();
+        const resultTT = await timetableBuilder.send({
+          body: {
+            eventIds: typeShiftedResults.timetableSolution.selectedEventIds,
+            timetableName: new Date().toLocaleString(),
           },
         });
-        return result;
-      }),
-    );
+        return resultTT;
+      }
+    },
+  });
+
+  async function enrollUser() {
+    enrollUserMutation.mutate();
     await solveForUsersModules();
   }
   async function solveForUsersModules() {
     // uses enrolled modules to create a solved output
-    const builder = new createSolverJobBuilder();
-    const result = await builder.send({
-      body: {
-        engine: currentMode === "feasibility" ? "cp-sat" : "ga",
-        solveMode: currentMode,
-        solverProfileKey: "default",
-      },
-    });
-    if (result.jobId != undefined) {
-      const pollInterval = setInterval(async () => {
-        const pollBuilder = new pollSolverOutputBuilder();
-        const resultOfPoll = await pollBuilder.send({
-          paths: {
-            jobId: result.jobId || "",
-          },
-        });
-        if (resultOfPoll.status === "completed") {
-          clearInterval(pollInterval);
-          const typeShiftedResults = resultOfPoll.result as SolverResult;
-          console.log("Poll closed result finished", resultOfPoll.result);
-          const timetableBuilder = new createTimeTableBuilder();
-          const resultTT = await timetableBuilder.send({
-            body: {
-              eventIds: typeShiftedResults.timetableSolution.selectedEventIds,
-              timetableName: new Date().toLocaleString(),
-            },
-          });
-          console.log(resultTT);
-        } else if (resultOfPoll.status === "failed") {
-          clearInterval(pollInterval);
-          console.error(resultOfPoll.error);
-        } else {
-          console.log("Poll still continues", resultOfPoll);
-        }
-      }, 2500);
+
+    const result = await createJobMutation.mutateAsync();
+    if (result) {
+      setJobID(result.jobId || "");
+    }
+  }
+  function handleStatus() {
+    if (resultOfPoll) {
+      if (resultOfPoll.status === "completed") {
+        createTimeTableMutation.mutate();
+      }
+      if (resultOfPoll.status === "failed") {
+        setJobID(null);
+      }
     }
   }
 
