@@ -257,10 +257,8 @@ export function NoPermissionsEventCard({
               Event type
             </Label>
             <EventTypeDropdown
-              value={
-                (event.eventCriteria?.eventSource as EventType) || "lecture"
-              }
-              onChange={(v) => onUpdate(event.eventId, "eventSource", v)}
+              value={(event.activityType as EventType) || "lecture"}
+              onChange={(v) => onUpdate(event.eventId, "activityType", v)}
             />
           </div>
 

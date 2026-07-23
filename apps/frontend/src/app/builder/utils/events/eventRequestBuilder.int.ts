@@ -99,6 +99,7 @@ describe("Event Request Builders Integration Tests", () => {
       eventName: "Lifecycle Test Event",
       activityCode: `TEST-code`,
       isRecurring: false,
+      activityType: "lecture",
       eventCriteria: {
         date: "monday",
         startTime: "08:00",
