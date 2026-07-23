@@ -100,7 +100,8 @@ export default function SolverPreferences({ modules, events }: solverProps) {
 
   const createTimeTableMutation = useMutation({
     mutationFn: async () => {
-      if (resultOfPoll && timetableCreated === false) {
+      if (resultOfPoll && timetableCreated === false && !pollFetching) {
+        setTimetableCreated(true);
         const typeShiftedResults = resultOfPoll.result as SolverResult;
         console.log("Poll closed result finished", resultOfPoll.result);
         const timetableBuilder = new createTimeTableBuilder();
@@ -134,15 +135,18 @@ export default function SolverPreferences({ modules, events }: solverProps) {
   }
   async function handleStatus() {
     if (resultOfPoll != null) {
-      if (resultOfPoll.status === "completed" && timetableCreated == false) {
-        setTimetableCreated(true);
+      if (
+        resultOfPoll.status === "completed" &&
+        timetableCreated === false &&
+        !createTimeTableMutation.isPending
+      ) {
         const result = await createTimeTableMutation.mutateAsync();
-        setJobFailed(false);
         setJobID(null);
         getQueryClient().setQueryData(["solver", "poll"], null);
-        alert(
-          `Timetable successfully created ${await result?.timetable.timetableName}`,
-        );
+        if (timetableCreated === false)
+          alert(
+            `Timetable successfully created ${await result?.timetable.timetableName}`,
+          );
       }
       if (resultOfPoll.status === "failed" && jobFailed === false) {
         console.log("set job to failed");
