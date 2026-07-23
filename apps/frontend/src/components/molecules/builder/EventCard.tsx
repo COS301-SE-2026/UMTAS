@@ -19,11 +19,13 @@ import {
   EventCriteria,
   EventResponse,
 } from "@/app/builder/utils/events/eventRequestBuilder";
+import { Switch } from "@/components/atoms/baseShadcn/switch";
 
 export interface EventErrors {
   name?: string;
   code?: string;
   date?: string;
+  dayOfWeek?: string;
   time?: string;
   moduleId?: string;
   venue?: string;
@@ -204,22 +206,78 @@ export function EventCard({
         {/* </div> */}
 
         {/* date - mapped to day */}
+        {/* recurring toggle */}
+        <div className="flex items-center justify-between gap-2 rounded-md border border-[var(--border)] p-3">
+          <div className="space-y-0.5">
+            <Label className="text-sm font-medium text-[var(--text-primary)]">
+              Recurring Weekly
+            </Label>
+            <p className="text-xs text-[var(--text-secondary)]">
+              Does this event repeat every week?
+            </p>
+          </div>
+          <Switch
+            checked={event.isRecurring}
+            onCheckedChange={(checked) =>
+              onUpdate(event.eventId, "isRecurring", checked)
+            }
+          />
+        </div>
+
+        {/* now date/day of week */}
         <div className="flex flex-col gap-2">
           <Label
             htmlFor={"event-date-" + event.eventId}
             className="text-sm font-medium text-[var(--text-secondary)]"
           >
-            Date
+            {event.isRecurring ? "Day of Week" : "Date"}
           </Label>
-          <Input
-            id={"event-date-" + event.eventId}
-            type="date"
-            value={event.eventCriteria?.date || ""}
-            onChange={(e) => onUpdate(event.eventId, "date", e.target.value)}
-            className={getInputClass(!!errors?.date)}
-          />
-          {errors?.date && (
+
+          {event.isRecurring ? (
+            <Select
+              value={event.eventCriteria?.dayOfWeek || ""}
+              onValueChange={(v) => onUpdate(event.eventId, "dayOfWeek", v)}
+            >
+              <SelectTrigger className={getInputClass(!!errors?.dayOfWeek)}>
+                <SelectValue placeholder="Select a day" />
+              </SelectTrigger>
+              <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)]">
+                {[
+                  "monday",
+                  "tuesday",
+                  "wednesday",
+                  "thursday",
+                  "friday",
+                  "saturday",
+                  "sunday",
+                ].map((day) => (
+                  <SelectItem
+                    key={day}
+                    value={day}
+                    className="capitalize text-[var(--text-primary)] focus:bg-[var(--bg-elevated)]"
+                  >
+                    {day}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          ) : (
+            <Input
+              id={"event-date-" + event.eventId}
+              type="date"
+              value={event.eventCriteria?.date || ""}
+              onChange={(e) => onUpdate(event.eventId, "date", e.target.value)}
+              className={getInputClass(!!errors?.date)}
+            />
+          )}
+
+          {errors?.date && !event.isRecurring && (
             <p className="text-sm text-[var(--error-text)]">{errors.date}</p>
+          )}
+          {errors?.dayOfWeek && event.isRecurring && (
+            <p className="text-sm text-[var(--error-text)]">
+              {errors.dayOfWeek}
+            </p>
           )}
         </div>
 

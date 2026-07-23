@@ -20,6 +20,7 @@ import {
   EventCriteria,
 } from "@/app/builder/utils/events/eventRequestBuilder";
 import { UserDetails } from "@/lib/userclass/userClass";
+import { Switch } from "@/components/atoms/baseShadcn/switch";
 
 //NOTE
 //copied from event card and changed slightly for customisation
@@ -29,6 +30,7 @@ export interface EventErrors {
   name?: string;
   code?: string;
   date?: string;
+  dayOfWeek?: string;
   time?: string;
   moduleId?: string;
   venue?: string;
@@ -215,39 +217,80 @@ export function CustomiseEventCard({
       </div>
 
       {/*date and time*/}
-      <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4">
-        <div className="flex flex-col gap-4">
+      {/* isRecurring */}
+      <div className="flex items-center justify-between gap-2 rounded-md border border-[var(--border)] p-3">
+        <div className="space-y-0.5">
           <Label className="text-sm font-medium text-[var(--text-primary)]">
-            Date & Time
+            Recurring Weekly
           </Label>
-          <div className="flex flex-col gap-2">
-            <Label
-              htmlFor={"event-date-" + event.eventId}
-              className="text-sm font-medium text-[var(--text-secondary)]"
-            >
-              Date
-            </Label>
-            <Input
-              readOnly={!canEdit}
-              id={"event-date-" + event.eventId}
-              type="date"
-              value={event.eventCriteria?.date || ""}
-              onChange={(e) => onUpdate(event.eventId, "date", e.target.value)}
-              className={getInputClass(!!errors?.date)}
-            />
-            {errors?.date && (
-              <p className="text-sm text-[var(--error-text)]">{errors.date}</p>
-            )}
-          </div>
-
-          <TimeSlotSelect
-            value={timeSlotValue}
-            onChange={handleTimeChange}
-            onRemove={() => {}}
-            error={errors?.time}
-            hideDaySelect
-          />
+          <p className="text-xs text-[var(--text-secondary)]">
+            Does this event repeat every week?
+          </p>
         </div>
+        <Switch
+          disabled={!canEdit}
+          checked={event.isRecurring}
+          onCheckedChange={(checked) =>
+            onUpdate(event.eventId, "isRecurring", checked)
+          }
+        />
+      </div>
+
+      {/* date/day of week */}
+      <div className="flex flex-col gap-2">
+        <Label
+          htmlFor={"event-date-" + event.eventId}
+          className="text-sm font-medium text-[var(--text-secondary)]"
+        >
+          {event.isRecurring ? "Day of Week" : "Date"}
+        </Label>
+
+        {event.isRecurring ? (
+          <Select
+            disabled={!canEdit}
+            value={event.eventCriteria?.dayOfWeek || ""}
+            onValueChange={(v) => onUpdate(event.eventId, "dayOfWeek", v)}
+          >
+            <SelectTrigger className={getInputClass(!!errors?.dayOfWeek)}>
+              <SelectValue placeholder="Select a day" />
+            </SelectTrigger>
+            <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)]">
+              {[
+                "monday",
+                "tuesday",
+                "wednesday",
+                "thursday",
+                "friday",
+                "saturday",
+                "sunday",
+              ].map((day) => (
+                <SelectItem
+                  key={day}
+                  value={day}
+                  className="capitalize text-[var(--text-primary)] focus:bg-[var(--bg-elevated)]"
+                >
+                  {day}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        ) : (
+          <Input
+            readOnly={!canEdit}
+            id={"event-date-" + event.eventId}
+            type="date"
+            value={event.eventCriteria?.date || ""}
+            onChange={(e) => onUpdate(event.eventId, "date", e.target.value)}
+            className={getInputClass(!!errors?.date)}
+          />
+        )}
+
+        {errors?.date && !event.isRecurring && (
+          <p className="text-sm text-[var(--error-text)]">{errors.date}</p>
+        )}
+        {errors?.dayOfWeek && event.isRecurring && (
+          <p className="text-sm text-[var(--error-text)]">{errors.dayOfWeek}</p>
+        )}
       </div>
 
       {/*event type and module*/}

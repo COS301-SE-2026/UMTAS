@@ -80,10 +80,11 @@ export function resolveScheduleEvents(
         id: String(event.eventId),
         name: event.eventName || "Untitled Event",
         code: criteria?.moduleId || "",
-        date: criteria?.date || "",
+        date: event.eventCriteria?.date,
+        dayOfWeek: event.eventCriteria?.dayOfWeek,
         startTime: criteria?.startTime || "",
         endTime: criteria?.endTime || "",
-        isRecurring,
+        isRecurring: event.isRecurring || false,
         accentColour: uniModule?.styling?.colour || null,
         subLabel: uniModule ? uniModule.moduleCode : null,
       });

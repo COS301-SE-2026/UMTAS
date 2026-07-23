@@ -83,10 +83,20 @@ function validateEvent(event: EventResponse): valEvent {
     errors.code = "Code is required";
     hasErrors = true;
   }
-  if (!criteria?.date) {
-    errors.date = "Date is required";
-    hasErrors = true;
+
+  //conditional validation based on isRecurring
+  if (event.isRecurring) {
+    if (!criteria?.dayOfWeek) {
+      errors.dayOfWeek = "Day of week is required for recurring events";
+      hasErrors = true;
+    }
+  } else {
+    if (!criteria?.date) {
+      errors.date = "Date is required for non-recurring events";
+      hasErrors = true;
+    }
   }
+
   if (!criteria?.startTime || !criteria?.endTime) {
     errors.time = "Start and end time are required";
     hasErrors = true;
@@ -99,11 +109,6 @@ function validateEvent(event: EventResponse): valEvent {
     errors.time = "Start time must be before end time";
     hasErrors = true;
   }
-  // if (criteria?.type !== "university") {
-  //   //&& !event.lecture?.moduleID) {
-  //   errors.moduleId = "A module must be assigned to a lecture";
-  //hasErrors = true;
-  // }
 
   return { errors, hasErrors };
 }
@@ -112,12 +117,18 @@ function isEventComplete(event: EventResponse) {
   const criteria = event.eventCriteria;
   if (!event.eventName) return false;
   if (!event.activityCode) return false;
-  if (!criteria?.date) return false;
   if (!criteria?.startTime) return false;
   if (!criteria?.endTime) return false;
+
+  if (event.isRecurring) {
+    if (!criteria?.dayOfWeek) return false;
+  } else {
+    if (!criteria?.date) return false;
+  }
   if (criteria?.eventSource === "university")
     // TODO add module && event.eventCriteria.moduleID)
     return false;
+
   return true;
 }
 
@@ -254,15 +265,23 @@ export function EventsStep({
       return next;
     });
 
+    const cleanCriteria = { ...event.eventCriteria };
+
+    if (event.isRecurring) {
+      delete cleanCriteria.date;
+    } else {
+      delete cleanCriteria.dayOfWeek;
+    }
+
     const iscreated = eventsAdded.find((event) => event.eventID === id);
 
     if (iscreated?.created) {
       updateEvent.mutate({
         body: {
-          isRecurring: false,
+          isRecurring: event.isRecurring,
           activityType: event.activityType,
           activityCode: event.activityCode,
-          eventCriteria: event.eventCriteria,
+          eventCriteria: cleanCriteria,
           eventName: event.eventName,
         },
         path: {
@@ -272,11 +291,11 @@ export function EventsStep({
     } else {
       const result = await addEvent.mutateAsync({
         body: {
-          eventCriteria: event.eventCriteria,
+          eventCriteria: cleanCriteria,
           activityType: event.activityType || "lecture",
           activityCode: event.activityCode,
           eventName: event.eventName,
-          isRecurring: false,
+          isRecurring: event.isRecurring,
         },
       });
 
