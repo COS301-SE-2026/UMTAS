@@ -74,7 +74,8 @@
   },
   "dependencies": {
     "dotenv": "^16.6.1",
-    "lodash": "^4.18.1"
+    "lodash": "^4.18.1",
+    "shared-types": "workspace:*"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,mjs,cjs,json,md,yml,yaml,css,scss}": "prettier --write",
