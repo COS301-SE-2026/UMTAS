@@ -9,3 +9,5 @@ const FaqItemBlock = ({ item }: { item: FaqItem }) => (
     <AText text={item.answer} />
   </div>
 );
+
+export { FaqItemBlock };
