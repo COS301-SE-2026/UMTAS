@@ -38,7 +38,7 @@ export default function SolverReview({
             onUpdateEvents={() => {}}
           />
           <Button type="button" onClick={onComplete}>
-            Set Preferences
+            Confirm events
           </Button>
         </CardContent>
       </Card>
