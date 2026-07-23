@@ -113,6 +113,9 @@ export default function SolverPreferences({ modules, events }: solverProps) {
         return resultTT;
       }
     },
+    onError: () => {
+      console.error("failed to make timetable");
+    },
   });
 
   async function enrollUser() {
@@ -129,15 +132,17 @@ export default function SolverPreferences({ modules, events }: solverProps) {
       setJobID(result.jobId || "");
     }
   }
-  function handleStatus() {
+  async function handleStatus() {
     if (resultOfPoll != null) {
       if (resultOfPoll.status === "completed" && timetableCreated == false) {
         setTimetableCreated(true);
-        createTimeTableMutation.mutate();
+        const result = await createTimeTableMutation.mutateAsync();
         setJobFailed(false);
         setJobID(null);
         getQueryClient().setQueryData(["solver", "poll"], null);
-        alert("Timetable successfully created");
+        alert(
+          `Timetable successfully created ${await result?.timetable.timetableName}`,
+        );
       }
       if (resultOfPoll.status === "failed" && jobFailed === false) {
         console.log("set job to failed");
