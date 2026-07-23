@@ -7,6 +7,7 @@ interface NotSupportedLinkProps {
 export function NotSupportedLink({ onClick }: NotSupportedLinkProps) {
   return (
     <Link
+      id="link-university-not-supported"
       href="/builder/"
       onClick={onClick}
       className="text-xs text-[var(--text-secondary)] underline-offset-2 hover:underline"
