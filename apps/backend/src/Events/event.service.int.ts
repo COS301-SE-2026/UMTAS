@@ -298,7 +298,7 @@ describe('EventService transactional creation', () => {
     const created = await service.create(userId, dto);
 
     await expect(
-      solverInputBuilder.buildForProfile(userId, 'default'),
+      solverInputBuilder.buildForSubmission(userId),
     ).resolves.toEqual({
       schedulingProblem: {
         events: [

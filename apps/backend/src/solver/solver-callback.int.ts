@@ -106,12 +106,11 @@ describe('Solver callback endpoint (PGLite)', () => {
     enqueueCalls = [];
   });
 
-  it('rejects whitespace-only identifiers before persisting or enqueueing', async () => {
+  it('rejects invalid explicit selections before persisting or enqueueing', async () => {
     await request(app.getHttpServer())
       .post('/solver/jobs')
       .send({
-        jobId: '   ',
-        solverProfileKey: '\t',
+        eventIds: [],
         solveMode: 'optimization',
         engine: 'auto',
       })
@@ -120,11 +119,34 @@ describe('Solver callback endpoint (PGLite)', () => {
     expect(enqueueCalls).toEqual([]);
   });
 
+  it('uses enrollment selection while stripping removed request fields', async () => {
+    const response = await request(app.getHttpServer())
+      .post('/solver/jobs')
+      .send({
+        jobId: 'removed-client-id',
+        solverProfileKey: 'removed-profile',
+        solveMode: 'feasibility',
+      })
+      .expect(202);
+
+    expect(enqueueCalls).toHaveLength(1);
+    expect(enqueueCalls[0]).toEqual({
+      jobId: response.body.jobId,
+      attemptToken: expect.any(String),
+      solveMode: 'feasibility',
+      engine: 'auto',
+    });
+    await request(app.getHttpServer())
+      .get(`/solver/jobs/${response.body.jobId}`)
+      .expect(200)
+      .expect(({ body }) => {
+        expect(body).not.toHaveProperty('solverProfileKey');
+      });
+  });
+
   it('retries an ambiguous enqueue with the same queue identity after lease expiry', async () => {
     enqueueError = new Error('Redis unavailable');
     const payload = {
-      jobId: 'solve-enqueue-retry',
-      solverProfileKey: ' default ',
       solveMode: 'optimization',
       engine: 'auto',
     };
@@ -316,10 +338,9 @@ describe('Solver callback endpoint (PGLite)', () => {
   async function createQueuedJob(keySeed: string): Promise<string> {
     const reservation = await jobStore.reserveOrReuse({
       userId,
-      solverProfileKey: 'default',
       solveMode: 'optimization',
       requestedEngine: 'auto',
-      deduplicationKey: `solver-semantic-sha256-v1:${keySeed.repeat(64)}`,
+      deduplicationKey: `solver-semantic-sha256-v2:${keySeed.repeat(64)}`,
       solverInput: {
         schedulingProblem: { events: [] },
         preferences: { heuristics: [] },
