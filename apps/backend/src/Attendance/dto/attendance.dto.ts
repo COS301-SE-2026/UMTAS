@@ -21,6 +21,7 @@ export class CreateAttendanceDto {
   eventID!: string;
 
   @ApiProperty({
+    type: String,
     example: 'yyyy-mm-dd',
     description: 'Date of event for which attendance is recorded',
   })
@@ -57,6 +58,7 @@ export class AttendanceSingleResponse extends CreateAttendanceDto {
 //List
 export class AttendanceListResponse {
   @ApiProperty({
+    type: [AttendanceSingleResponse],
     description: 'List of attendance records',
   })
   attendanceList!: AttendanceSingleResponse[];
@@ -65,6 +67,7 @@ export class AttendanceListResponse {
 //Delete
 export class deleteAttendanceResponse {
   @ApiProperty({
+    type: Boolean,
     description: 'successfully deleted or not',
     example: true,
   })
@@ -75,6 +78,7 @@ export class deleteAttendanceResponse {
 //Get all filters
 export class AttendanceFilters extends PartialType(CreateAttendanceDto) {
   @ApiProperty({
+    type: Boolean,
     example: false,
     description: 'Filter by current userId together with other filters',
   })

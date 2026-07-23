@@ -45,8 +45,8 @@ export class CourseModuleDto {
   CourseID!: string;
 
   @ApiPropertyOptional({
+    type: Boolean,
     example: true,
-    default: true,
     description:
       'Identifies wether or not module is a core module of the course',
   })
@@ -59,6 +59,7 @@ export class CourseModuleDto {
   Core!: boolean;
 
   @ApiPropertyOptional({
+    type: String,
     example: 'Semester 1',
     description:
       'Identifies which part of the year the module takes part in for the course',
@@ -69,6 +70,7 @@ export class CourseModuleDto {
   SemesterOfStudy?: string | null;
 
   @ApiPropertyOptional({
+    type: Number,
     example: 1,
     description: 'Which year does the module belong to for the course',
     nullable: true,
@@ -160,6 +162,7 @@ export class ModulesDto {
   @Type(() => CourseModuleDto)
   CourseModuleInfo?: CourseModuleDto | null;
   @ApiProperty({
+    type: Boolean,
     example: true,
     description: 'Whether the module has been approved by a university admin',
   })
@@ -237,7 +240,7 @@ export class ModuleListResponseDto {
 export class DeleteModuleResponseDto extends PickType(ModulesDto, [
   'moduleCode',
 ]) {
-  @ApiProperty({ example: true })
+  @ApiProperty({ type: Boolean, example: true })
   success!: boolean;
 } //delete
 

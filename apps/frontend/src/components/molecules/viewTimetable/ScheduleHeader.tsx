@@ -40,6 +40,7 @@ export function ScheduleHeader({
 
         {eventCount > 0 && (
           <Button
+            hidden
             type="button"
             onClick={onExport}
             variant="outline"
