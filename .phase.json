@@ -1,0 +1,8 @@
+{
+  "version": "2",
+  "phaseApp": "UMTAS",
+  "appId": "52af6e8b-5730-493e-96e2-a79efbcc78bc",
+  "defaultEnv": "Development",
+  "envId": "9b4fdef9-326e-45b0-a3d6-bb72ac3e838a",
+  "monorepoSupport": true
+}

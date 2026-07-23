@@ -77,17 +77,17 @@ describe("TimetableRequest Integration test", () => {
     auth(mBuilder);
 
     const mockModule: createModuleReq = {
-      code: moduleCode,
-      name: "test module",
-      description: "for testing",
-      styling: "#939393",
+      moduleCode: moduleCode,
+      moduleName: "test module",
+      moduleDescription: "for testing",
+      styling: { colour: "" },
     };
 
     const createdModule = await mBuilder.send({
       body: mockModule,
     });
 
-    const moduleId = createdModule.module.moduleID;
+    const moduleId = createdModule.moduleID;
 
     // create event
     const eventBuilder = new createEventsBuilder();
@@ -95,21 +95,21 @@ describe("TimetableRequest Integration test", () => {
 
     const createdEvent = await eventBuilder.send({
       body: {
-        name: "Timetable Test Event",
-        code: `EVentCode`,
+        eventName: "Timetable Test Event",
+        activityCode: `EVentCode`,
         isRecurring: false,
         eventCriteria: {
-          day: "monday",
+          date: "monday",
           startTime: "08:00",
           endTime: "09:00",
-          type: "lecture",
-          venue: "IT 2-26",
-          moduleCode,
+          eventSource: "university",
+          //venue: "IT 2-26",
+          moduleId: moduleId,
         },
       },
     });
 
-    const eventId = createdEvent.event.eventID;
+    const eventId = createdEvent.event.eventId;
 
     expect(eventId).toBeDefined();
 
@@ -120,7 +120,7 @@ describe("TimetableRequest Integration test", () => {
     const createdTimetable = await timetableBuilder.send({
       body: {
         timetableName: "Integration Test Timetable",
-        eventIds: [String(eventId)],
+        eventIds: [eventId],
       },
     });
 

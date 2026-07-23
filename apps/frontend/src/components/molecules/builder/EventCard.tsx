@@ -15,7 +15,10 @@ import type { TimeSlot } from "@/components/atoms/builder/TimeSlotSelect";
 import { EventTypeDropdown } from "@/components/atoms/builder/eventDropdown";
 import type { EventType } from "@/components/atoms/builder/eventDropdown";
 import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
-import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
+import {
+  EventCriteria,
+  EventResponse,
+} from "@/app/builder/utils/events/eventRequestBuilder";
 
 export interface EventErrors {
   name?: string;
@@ -29,7 +32,11 @@ export interface EventErrors {
 interface EventCardProps {
   event: EventResponse;
   modules: ModuleResponseDto[];
-  onUpdate: (id: number, field: string, value: string | boolean) => void;
+  onUpdate: (
+    id: string,
+    field: keyof EventResponse | keyof EventCriteria,
+    value: string | boolean,
+  ) => void;
   onGoToModules?: () => void;
   errors?: EventErrors;
 }
@@ -48,13 +55,13 @@ export function EventCard({
 
   const timeSlotValue: TimeSlot = {
     day: "",
-    startTime: event.event.eventCriteria?.startTime || "",
-    endTime: event.event.eventCriteria?.endTime || "",
+    startTime: event.eventCriteria?.startTime || "",
+    endTime: event.eventCriteria?.endTime || "",
   };
 
   function handleTimeChange(slot: TimeSlot) {
-    onUpdate(event.event.eventID, "startTime", slot.startTime);
-    onUpdate(event.event.eventID, "endTime", slot.endTime);
+    onUpdate(event.eventId, "startTime", slot.startTime);
+    onUpdate(event.eventId, "endTime", slot.endTime);
   }
 
   function getInputClass(hasError: boolean) {
@@ -79,8 +86,8 @@ export function EventCard({
 
     return (
       <Select
-        value={String(event.lecture?.moduleID || "")}
-        onValueChange={(v) => onUpdate(event.event.eventID, "moduleId", v)}
+        value={String(event.eventCriteria?.moduleId)}
+        onValueChange={(v) => onUpdate(event.eventId, "moduleId", v)}
       >
         <SelectTrigger
           className={getInputClass(!!errors?.moduleId) + " w-full"}
@@ -109,7 +116,7 @@ export function EventCard({
   }
 
   function renderModuleSection() {
-    if (event.event.eventCriteria?.type !== "lecture") {
+    if (event.eventCriteria?.eventSource !== "university") {
       return null;
     }
 
@@ -132,16 +139,16 @@ export function EventCard({
         {/* name */}
         <div className="flex flex-col gap-2">
           <Label
-            htmlFor={"event-name-" + event.event.eventID}
+            htmlFor={"event-name-" + event.eventId}
             className="text-sm font-medium text-[var(--text-secondary)]"
           >
             Name
           </Label>
           <Input
-            id={"event-name-" + event.event.eventID}
-            value={event.event.name || ""}
+            id={"event-name-" + event.eventId}
+            value={event.eventName || ""}
             onChange={(e) =>
-              onUpdate(event.event.eventID, "name", e.target.value)
+              onUpdate(event.eventId, "eventName", e.target.value)
             }
             placeholder="e.g. COS301 Lecture Group A"
             className={getInputClass(!!errors?.name)}
@@ -154,16 +161,16 @@ export function EventCard({
         {/* code */}
         <div className="flex flex-col gap-2">
           <Label
-            htmlFor={"event-code-" + event.event.eventID}
+            htmlFor={"event-code-" + event.eventId}
             className="text-sm font-medium text-[var(--text-secondary)]"
           >
             Code
           </Label>
           <Input
-            id={"event-code-" + event.event.eventID}
-            value={event.event.code || ""}
+            id={"event-code-" + event.eventId}
+            value={event.activityCode || ""}
             onChange={(e) =>
-              onUpdate(event.event.eventID, "code", e.target.value)
+              onUpdate(event.eventId, "activityCode", e.target.value)
             }
             placeholder="e.g. COS301-LEC-A"
             maxLength={20}
@@ -175,42 +182,40 @@ export function EventCard({
         </div>
 
         {/* venue */}
-        <div className="flex flex-col gap-2">
-          <Label
-            htmlFor={"event-venue-" + event.event.eventID}
+        {/* <div className="flex flex-col gap-2"> */}
+        {/* <Label
+            htmlFor={"event-venue-" + event.eventId}
             className="text-sm font-medium text-[var(--text-secondary)]"
           >
             Venue
-          </Label>
-          <Input
-            id={"event-venue-" + event.event.eventID}
-            value={event.event.eventCriteria?.venue || ""}
-            onChange={(e) =>
-              onUpdate(event.event.eventID, "venue", e.target.value)
-            }
-            placeholder="e.g. IT 2-26"
-            className={getInputClass(!!errors?.venue)}
-          />
-          {errors?.venue && (
+          </Label> */}
+        {
+          // <Input
+          //   id={"event-venue-" + event.eventId}
+          //   value={event.eventCriteria?.venue || ""}
+          //   onChange={(e) => onUpdate(event.eventId, "venue", e.target.value)}
+          //   placeholder="e.g. IT 2-26"
+          //   className={getInputClass(!!errors?.venue)}
+          // />
+        }
+        {/* {errors?.venue && (
             <p className="text-sm text-[var(--error-text)]">{errors.venue}</p>
-          )}
-        </div>
+          )} */}
+        {/* </div> */}
 
         {/* date - mapped to day */}
         <div className="flex flex-col gap-2">
           <Label
-            htmlFor={"event-date-" + event.event.eventID}
+            htmlFor={"event-date-" + event.eventId}
             className="text-sm font-medium text-[var(--text-secondary)]"
           >
             Date
           </Label>
           <Input
-            id={"event-date-" + event.event.eventID}
+            id={"event-date-" + event.eventId}
             type="date"
-            value={event.event.eventCriteria?.day || ""}
-            onChange={(e) =>
-              onUpdate(event.event.eventID, "date", e.target.value)
-            }
+            value={event.eventCriteria?.date || ""}
+            onChange={(e) => onUpdate(event.eventId, "date", e.target.value)}
             className={getInputClass(!!errors?.date)}
           />
           {errors?.date && (
@@ -233,8 +238,8 @@ export function EventCard({
             Event type
           </Label>
           <EventTypeDropdown
-            value={(event.event.eventCriteria?.type as EventType) || "lecture"}
-            onChange={(v) => onUpdate(event.event.eventID, "type", v)}
+            value={(event.activityType as EventType) || "lecture"}
+            onChange={(v) => onUpdate(event.eventId, "activityType", v)}
           />
         </div>
 

@@ -1,5 +1,6 @@
 import {
   All,
+  Body,
   Controller,
   Get,
   Logger,
@@ -12,10 +13,12 @@ import {
   ApiBody,
   ApiCookieAuth,
   ApiExcludeEndpoint,
+  ApiExtraModels,
   ApiOperation,
   ApiQuery,
   ApiResponse,
   ApiTags,
+  getSchemaPath,
 } from '@nestjs/swagger';
 import { toNodeHandler } from 'better-auth/node';
 import type { IncomingMessage, ServerResponse } from 'node:http';
@@ -28,15 +31,24 @@ import {
   AdminCreateUserDto,
   AdminImpersonateUserDto,
   AdminUpdateUserDto,
+  AuthAcknowledgementDto,
+  AuthEnvelopeDto,
+  AuthErrorDto,
+  AuthSessionDto,
+  AuthUserResponseDto,
   ChangePasswordDto,
   ForgetPasswordDto,
   LinkGoogleAccountDto,
   ResetPasswordDto,
   RevokeSessionDto,
+  SelectUniversityDto,
   SignInEmailDto,
   SignUpEmailDto,
   VerifyEmailDto,
 } from './auth.dto';
+import { CurrentSession } from './session.decorator';
+import type { SessionData } from './session.decorator';
+import type { Response } from 'express';
 
 const USER_EXAMPLE = {
   id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
@@ -64,6 +76,7 @@ const SESSION_EXAMPLE = {
 const AUTH_RESPONSE_EXAMPLE = { user: USER_EXAMPLE, session: SESSION_EXAMPLE };
 
 @Controller('api/auth')
+@ApiExtraModels(AuthEnvelopeDto)
 export class AuthController {
   private readonly logger = new Logger(AuthController.name);
 
@@ -82,21 +95,22 @@ export class AuthController {
   @ApiResponse({
     status: 200,
     description: 'Registration successful. Sets the umtas-session cookie.',
-    schema: { example: AUTH_RESPONSE_EXAMPLE },
+    type: AuthEnvelopeDto,
   })
   @ApiResponse({
     status: 400,
     description: 'Invalid email format or password too weak (min 8 characters)',
-    schema: { example: { error: 'INVALID_EMAIL' } },
+    type: AuthErrorDto,
   })
   @ApiResponse({
     status: 422,
     description: 'Email already registered',
-    schema: { example: { error: 'USER_EMAIL_ALREADY_EXISTS' } },
+    type: AuthErrorDto,
   })
   @ApiResponse({
     status: 429,
     description: 'Rate limited - max 100 requests per 60 seconds',
+    type: AuthErrorDto,
   })
   async signUpEmail(
     @Req() req: IncomingMessage,
@@ -118,19 +132,19 @@ export class AuthController {
   @ApiResponse({
     status: 200,
     description: 'Sign-in successful. Sets the umtas-session cookie.',
-    schema: { example: AUTH_RESPONSE_EXAMPLE },
+    type: AuthEnvelopeDto,
   })
   @ApiResponse({
     status: 400,
     description: 'Email not verified - must verify before signing in',
-    schema: { example: { error: 'EMAIL_NOT_VERIFIED' } },
+    type: AuthErrorDto,
   })
   @ApiResponse({
     status: 401,
     description: 'Invalid email or password',
-    schema: { example: { error: 'INVALID_EMAIL_OR_PASSWORD' } },
+    type: AuthErrorDto,
   })
-  @ApiResponse({ status: 429, description: 'Rate limited' })
+  @ApiResponse({ status: 429, description: 'Rate limited', type: AuthErrorDto })
   async signInEmail(
     @Req() req: IncomingMessage,
     @Res() res: ServerResponse,
@@ -150,12 +164,12 @@ export class AuthController {
   @ApiResponse({
     status: 200,
     description: 'Signed out. The umtas-session cookie is cleared.',
-    schema: { example: {} },
+    type: AuthAcknowledgementDto,
   })
   @ApiResponse({
     status: 401,
     description: 'No active session',
-    schema: { example: { error: 'UNAUTHORIZED' } },
+    type: AuthErrorDto,
   })
   async signOut(
     @Req() req: IncomingMessage,
@@ -168,7 +182,7 @@ export class AuthController {
 
   @Public()
   @ApiTags('Auth Session')
-  @Get('session')
+  @Get('get-session')
   @ApiCookieAuth('umtas-session')
   @ApiOperation({
     summary: 'Get the current user session',
@@ -176,13 +190,12 @@ export class AuthController {
   })
   @ApiResponse({
     status: 200,
-    description: 'Active session returned. Returns null if no session exists.',
-    schema: { example: AUTH_RESPONSE_EXAMPLE },
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'No active session',
-    schema: { example: null },
+    description: 'Active session returned, or null if no session exists.',
+    schema: {
+      allOf: [{ $ref: getSchemaPath(AuthEnvelopeDto) }],
+      nullable: true,
+      example: AUTH_RESPONSE_EXAMPLE,
+    },
   })
   async getSession(
     @Req() req: IncomingMessage,
@@ -201,12 +214,12 @@ export class AuthController {
   @ApiResponse({
     status: 200,
     description: 'Array of active sessions for this user',
-    schema: { example: [SESSION_EXAMPLE] },
+    type: [AuthSessionDto],
   })
   @ApiResponse({
     status: 401,
     description: 'Unauthorized',
-    schema: { example: { error: 'UNAUTHORIZED' } },
+    type: AuthErrorDto,
   })
   async listSessions(
     @Req() req: IncomingMessage,
@@ -227,17 +240,17 @@ export class AuthController {
   @ApiResponse({
     status: 200,
     description: 'Session revoked',
-    schema: { example: {} },
+    type: AuthAcknowledgementDto,
   })
   @ApiResponse({
     status: 400,
     description: 'Session not found',
-    schema: { example: { error: 'SESSION_NOT_FOUND' } },
+    type: AuthErrorDto,
   })
   @ApiResponse({
     status: 401,
     description: 'Unauthorized',
-    schema: { example: { error: 'UNAUTHORIZED' } },
+    type: AuthErrorDto,
   })
   async revokeSession(
     @Req() req: IncomingMessage,
@@ -258,19 +271,19 @@ export class AuthController {
   @ApiResponse({
     status: 200,
     description: 'Verification email sent',
-    schema: { example: {} },
+    type: AuthAcknowledgementDto,
   })
   @ApiResponse({
     status: 400,
     description: 'Email already verified',
-    schema: { example: { error: 'EMAIL_ALREADY_VERIFIED' } },
+    type: AuthErrorDto,
   })
   @ApiResponse({
     status: 401,
     description: 'Unauthorized',
-    schema: { example: { error: 'UNAUTHORIZED' } },
+    type: AuthErrorDto,
   })
-  @ApiResponse({ status: 429, description: 'Rate limited' })
+  @ApiResponse({ status: 429, description: 'Rate limited', type: AuthErrorDto })
   async sendVerificationEmail(
     @Req() req: IncomingMessage,
     @Res() res: ServerResponse,
@@ -289,12 +302,12 @@ export class AuthController {
   @ApiResponse({
     status: 200,
     description: 'Email verified. User is signed in automatically.',
-    schema: { example: AUTH_RESPONSE_EXAMPLE },
+    type: AuthEnvelopeDto,
   })
   @ApiResponse({
     status: 400,
     description: 'Invalid or expired verification code, or email not found',
-    schema: { example: { error: 'INVALID_CODE' } },
+    type: AuthErrorDto,
   })
   async verifyEmail(
     @Req() req: IncomingMessage,
@@ -317,9 +330,9 @@ export class AuthController {
     status: 200,
     description:
       'Reset email sent. Always returns 200 - does not reveal whether the email exists.',
-    schema: { example: {} },
+    type: AuthAcknowledgementDto,
   })
-  @ApiResponse({ status: 429, description: 'Rate limited' })
+  @ApiResponse({ status: 429, description: 'Rate limited', type: AuthErrorDto })
   async forgetPassword(
     @Req() req: IncomingMessage,
     @Res() res: ServerResponse,
@@ -401,12 +414,12 @@ export class AuthController {
   @ApiResponse({
     status: 200,
     description: 'Password reset. User is signed in automatically.',
-    schema: { example: AUTH_RESPONSE_EXAMPLE },
+    type: AuthEnvelopeDto,
   })
   @ApiResponse({
     status: 400,
     description: 'Invalid or expired reset token, or new password too weak',
-    schema: { example: { error: 'INVALID_TOKEN' } },
+    type: AuthErrorDto,
   })
   async resetPassword(
     @Req() req: IncomingMessage,
@@ -429,17 +442,17 @@ export class AuthController {
   @ApiResponse({
     status: 200,
     description: 'Password changed successfully',
-    schema: { example: {} },
+    type: AuthAcknowledgementDto,
   })
   @ApiResponse({
     status: 400,
     description: 'Incorrect current password or new password too weak',
-    schema: { example: { error: 'INVALID_PASSWORD' } },
+    type: AuthErrorDto,
   })
   @ApiResponse({
     status: 401,
     description: 'Unauthorized',
-    schema: { example: { error: 'UNAUTHORIZED' } },
+    type: AuthErrorDto,
   })
   async changePassword(
     @Req() req: IncomingMessage,
@@ -461,12 +474,14 @@ export class AuthController {
   })
   @ApiQuery({
     name: 'code',
+    type: String,
     required: true,
     description: 'Authorization code issued by Google',
     example: '4/0AX4XfWj...',
   })
   @ApiQuery({
     name: 'state',
+    type: String,
     required: true,
     description: 'OAuth state parameter set by BetterAuth',
   })
@@ -477,7 +492,7 @@ export class AuthController {
   @ApiResponse({
     status: 400,
     description: 'Invalid or expired OAuth code',
-    schema: { example: { error: 'INVALID_CODE' } },
+    type: AuthErrorDto,
   })
   async googleOAuthCallback(
     @Req() req: IncomingMessage,
@@ -502,23 +517,23 @@ export class AuthController {
   @ApiResponse({
     status: 200,
     description: 'Google account linked',
-    schema: { example: AUTH_RESPONSE_EXAMPLE },
+    type: AuthEnvelopeDto,
   })
   @ApiResponse({
     status: 400,
     description: 'Account already linked or invalid OAuth code',
-    schema: { example: { error: 'ACCOUNT_ALREADY_LINKED' } },
+    type: AuthErrorDto,
   })
   @ApiResponse({
     status: 401,
     description: 'Unauthorized',
-    schema: { example: { error: 'UNAUTHORIZED' } },
+    type: AuthErrorDto,
   })
   @ApiResponse({
     status: 422,
     description:
       'The Google account email is already in use by another account',
-    schema: { example: { error: 'EMAIL_ALREADY_IN_USE' } },
+    type: AuthErrorDto,
   })
   async linkGoogleAccount(
     @Req() req: IncomingMessage,
@@ -544,22 +559,22 @@ export class AuthController {
   @ApiResponse({
     status: 200,
     description: 'User created',
-    schema: { example: { user: USER_EXAMPLE } },
+    type: AuthUserResponseDto,
   })
   @ApiResponse({
     status: 401,
     description: 'Unauthorized',
-    schema: { example: { error: 'UNAUTHORIZED' } },
+    type: AuthErrorDto,
   })
   @ApiResponse({
     status: 403,
     description: 'Insufficient permissions (sys_admin required)',
-    schema: { example: { error: 'INSUFFICIENT_PERMISSIONS' } },
+    type: AuthErrorDto,
   })
   @ApiResponse({
     status: 422,
     description: 'Email already registered',
-    schema: { example: { error: 'USER_EMAIL_ALREADY_EXISTS' } },
+    type: AuthErrorDto,
   })
   async adminCreateUser(
     @Req() req: IncomingMessage,
@@ -580,17 +595,17 @@ export class AuthController {
   @ApiResponse({
     status: 200,
     description: 'Impersonation successful. Sets a new session cookie.',
-    schema: { example: AUTH_RESPONSE_EXAMPLE },
+    type: AuthEnvelopeDto,
   })
   @ApiResponse({
     status: 401,
     description: 'Unauthorized',
-    schema: { example: { error: 'UNAUTHORIZED' } },
+    type: AuthErrorDto,
   })
   @ApiResponse({
     status: 403,
     description: 'Insufficient permissions (sys_admin required)',
-    schema: { example: { error: 'INSUFFICIENT_PERMISSIONS' } },
+    type: AuthErrorDto,
   })
   async adminImpersonateUser(
     @Req() req: IncomingMessage,
@@ -611,22 +626,22 @@ export class AuthController {
   @ApiResponse({
     status: 200,
     description: 'User banned',
-    schema: { example: { user: { ...USER_EXAMPLE, banned: true } } },
+    type: AuthUserResponseDto,
   })
   @ApiResponse({
     status: 401,
     description: 'Unauthorized',
-    schema: { example: { error: 'UNAUTHORIZED' } },
+    type: AuthErrorDto,
   })
   @ApiResponse({
     status: 403,
     description: 'Insufficient permissions (sys_admin required)',
-    schema: { example: { error: 'INSUFFICIENT_PERMISSIONS' } },
+    type: AuthErrorDto,
   })
   @ApiResponse({
     status: 404,
     description: 'User not found',
-    schema: { example: { error: 'USER_NOT_FOUND' } },
+    type: AuthErrorDto,
   })
   async adminBanUser(
     @Req() req: IncomingMessage,
@@ -647,33 +662,57 @@ export class AuthController {
   @ApiResponse({
     status: 200,
     description: 'User updated',
-    schema: { example: { user: USER_EXAMPLE } },
+    type: AuthUserResponseDto,
   })
   @ApiResponse({
     status: 401,
     description: 'Unauthorized',
-    schema: { example: { error: 'UNAUTHORIZED' } },
+    type: AuthErrorDto,
   })
   @ApiResponse({
     status: 403,
     description: 'Insufficient permissions (sys_admin required)',
-    schema: { example: { error: 'INSUFFICIENT_PERMISSIONS' } },
+    type: AuthErrorDto,
   })
   @ApiResponse({
     status: 404,
     description: 'User not found',
-    schema: { example: { error: 'USER_NOT_FOUND' } },
+    type: AuthErrorDto,
   })
   @ApiResponse({
     status: 422,
     description: 'New email already in use',
-    schema: { example: { error: 'EMAIL_ALREADY_IN_USE' } },
+    type: AuthErrorDto,
   })
   async adminUpdateUser(
     @Req() req: IncomingMessage,
     @Res() res: ServerResponse,
   ): Promise<void> {
     return this.handleRequest(req, res);
+  }
+
+  //Select a university
+  @Post('select-university')
+  @ApiCookieAuth('umtas-session')
+  @ApiOperation({ summary: 'Select current university' })
+  @ApiResponse({
+    status: 200,
+    description: 'Selected university session returned.',
+    type: AuthEnvelopeDto,
+  })
+  async selectUniversity(
+    @CurrentSession() session: SessionData,
+    @Body() dto: SelectUniversityDto,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<SessionData> {
+    const selected = this.authService.selectUniversity(session, dto.uniId);
+
+    res.cookie('umtas-uni-id', dto.uniId, {
+      path: '/',
+      sameSite: 'lax',
+    });
+
+    return selected;
   }
 
   // ─── Catch-all for internal BetterAuth routes ─────────────────────────────────

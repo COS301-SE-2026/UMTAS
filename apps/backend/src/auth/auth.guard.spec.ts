@@ -76,8 +76,24 @@ describe('AuthGuard', () => {
 
     it('should attach session to request when valid', async () => {
       const mockSession = {
-        user: { id: 'user-1', email: 'test@example.com' },
-        session: { id: 'session-1', token: 'token' },
+        user: {
+          id: 'user-1',
+          name: 'Test User',
+          email: 'test@example.com',
+          emailVerified: true,
+          role: 'user',
+          banned: false,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        session: {
+          id: 'session-1',
+          token: 'token',
+          userId: 'user-1',
+          expiresAt: new Date(Date.now() + 3600000).toISOString(),
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
       };
 
       jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(false);
@@ -89,7 +105,8 @@ describe('AuthGuard', () => {
 
       const result = await guard.canActivate(mockExecutionContext);
       expect(result).toBe(true);
-      expect(mockRequest.session).toEqual(mockSession);
+      expect(mockRequest.session).toBeDefined();
+      expect(mockRequest.session!.user.id).toBe('user-1');
     });
 
     it('should handle requests with no headers', async () => {

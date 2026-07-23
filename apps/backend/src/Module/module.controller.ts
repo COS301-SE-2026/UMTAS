@@ -1,9 +1,15 @@
 import { ModuleService } from './module.service';
 import {
+  AddModulesToCourseDto,
+  AddModulesToCourseResponseDto,
   CreateModuleDto,
   DeleteModuleResponseDto,
+  EnrolResponseDto,
+  ModuleFiltersDto,
   ModuleListResponseDto,
-  SingleModuleResponseDto,
+  ModuleSingleResponseDto,
+  ModuleStylingBodyDto,
+  ModuleStylingResponseDto,
   UpdateModuleDto,
 } from './dto/module.dto';
 import {
@@ -14,7 +20,9 @@ import {
   Param,
   Patch,
   Delete,
-  ParseIntPipe,
+  ParseUUIDPipe,
+  Query,
+  Put,
 } from '@nestjs/common';
 import { ApiBody, ApiResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
@@ -28,15 +36,17 @@ export class ModuleController {
   constructor(private readonly service: ModuleService) {}
 
   //Create
-  // @Public()
   @Post()
-  @Roles('student', 'uni_admin', 'sys_admin')
-  @ApiOperation({ summary: 'Create a module' })
+  @Roles('lecturer', 'uni_admin')
+  @ApiOperation({
+    summary: 'Create a module',
+    description: 'Create a new module and link to appropriate course',
+  })
   @ApiBody({ type: CreateModuleDto })
   @ApiResponse({
     status: 201,
     description: 'Module created successfully',
-    type: SingleModuleResponseDto,
+    type: ModuleSingleResponseDto,
   })
   @ApiResponse({
     status: 400,
@@ -44,22 +54,22 @@ export class ModuleController {
   })
   @ApiResponse({
     status: 409,
-    description: 'Module code already exists',
+    description: 'Module code already exists for course',
   })
   createModule(
-    @Body() dto: CreateModuleDto,
     @CurrentSession() session: SessionData,
-  ) {
+    @Body() dto: CreateModuleDto,
+  ): Promise<ModuleSingleResponseDto> {
     return this.service.create(session.user.id, dto);
   }
 
   //Get all
-  // @Public()
   @Get()
-  @Roles('student', 'uni_admin', 'sys_admin')
+  @Roles()
   @ApiOperation({
-    summary: 'Get all modules for the current user',
-    operationId: 'getModules',
+    summary: 'Get all modules with filters',
+    description:
+      'Filter by userId(enrolled) | courseId(course owned) | universityId(modules for university over all courses). At least one filter required',
   })
   @ApiResponse({
     status: 200,
@@ -68,24 +78,31 @@ export class ModuleController {
   })
   @ApiResponse({
     status: 400,
-    description: 'Invalid request',
+    description: 'Invalid request - at least one filter required',
   })
-  getAll(@CurrentSession() session: SessionData) {
-    return this.service.getAll(session.user.id);
+  @ApiResponse({
+    status: 404,
+    description: 'No modules found matching the filters',
+  })
+  getAll(
+    @CurrentSession() session: SessionData,
+    @Query() filters: ModuleFiltersDto,
+  ): Promise<ModuleListResponseDto> {
+    return this.service.getAll(session.user.id, filters);
   }
 
   //Get by id
-  // @Public()
   @Get(':moduleId')
-  @Roles('student', 'uni_admin', 'sys_admin')
+  @Roles()
   @ApiOperation({
     summary: 'Get a module by ID',
+    description: 'Return a module from its moduleID',
     operationId: 'getModuleById',
   })
   @ApiResponse({
     status: 200,
     description: 'Module returned successfully',
-    type: SingleModuleResponseDto,
+    type: ModuleSingleResponseDto,
   })
   @ApiResponse({
     status: 400,
@@ -97,24 +114,25 @@ export class ModuleController {
   })
   getById(
     @CurrentSession() session: SessionData,
-    @Param('moduleId', ParseIntPipe) moduleId: number,
-  ) {
+    @Param('moduleId', ParseUUIDPipe) moduleId: string,
+  ): Promise<ModuleSingleResponseDto> {
     return this.service.getById(session.user.id, moduleId);
   }
 
   //Update
-  // @Public()
   @Patch(':moduleId')
-  @Roles('student', 'uni_admin', 'sys_admin')
+  @Roles('lecturer', 'uni_admin')
   @ApiOperation({
     summary: 'Update a module',
+    description:
+      'Update a modules | STUDENT_OWNED needs to go through Builder Service',
     operationId: 'updateModule',
   })
   @ApiBody({ type: UpdateModuleDto })
   @ApiResponse({
     status: 200,
     description: 'Module updated successfully',
-    type: SingleModuleResponseDto,
+    type: ModuleSingleResponseDto,
   })
   @ApiResponse({
     status: 400,
@@ -126,21 +144,23 @@ export class ModuleController {
   })
   @ApiResponse({
     status: 409,
-    description: 'Duplicate module code detected',
+    description: 'Duplicate module code detected for course',
   })
   update(
     @CurrentSession() session: SessionData,
-    @Param('moduleId', ParseIntPipe) moduleId: number,
+    @Param('moduleId', ParseUUIDPipe) moduleId: string,
     @Body() dto: UpdateModuleDto,
-  ) {
+  ): Promise<ModuleSingleResponseDto> {
     return this.service.update(session.user.id, moduleId, dto);
   }
 
-  // @Public()
+  // Delete
   @Delete(':moduleId')
-  @Roles('student', 'uni_admin', 'sys_admin')
+  @Roles('lecturer', 'uni_admin')
   @ApiOperation({
     summary: 'Delete a module by ID',
+    description:
+      'Deletes a module | STUDENT_OWNED needs to go through Builder Service',
     operationId: 'deleteModule',
   })
   @ApiResponse({
@@ -157,9 +177,90 @@ export class ModuleController {
     description: 'Module not found',
   })
   delete(
+    @Param('moduleId', ParseUUIDPipe) moduleId: string,
+  ): Promise<DeleteModuleResponseDto> {
+    return this.service.deleteById(moduleId);
+  }
+
+  //Enrol to module
+  @Get('enroll/:moduleId')
+  @Roles('student')
+  @ApiOperation({
+    summary: 'Enrol student to module',
+    operationId: 'enrolStudentToModule',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Student successfully enrolled student into module',
+    type: EnrolResponseDto,
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Unenrolled user from module',
+    type: EnrolResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Module not found',
+  })
+  enrol(
     @CurrentSession() session: SessionData,
-    @Param('moduleId', ParseIntPipe) moduleId: number,
-  ) {
-    return this.service.deleteById(session.user.id, moduleId);
+    @Param('moduleId', ParseUUIDPipe) moduleId: string,
+  ): Promise<EnrolResponseDto> {
+    return this.service.enrollToModule(session.user.id, moduleId);
+  } //END_enrol
+
+  //Add modules to Course
+  @Put(':CourseID')
+  @Roles('lecturer', 'uni_admin')
+  @ApiOperation({
+    summary: 'Populate Course with modules array',
+    operationId: 'addModulesToCourse',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Successfully populated modules to course',
+    type: AddModulesToCourseResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Course not found',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Modules specified in modules array not found',
+  })
+  addModulesToCourse(
+    @Param('CourseID', ParseUUIDPipe) courseId: string,
+    @Body() dto: AddModulesToCourseDto,
+  ): Promise<AddModulesToCourseResponseDto> {
+    return this.service.addModulesToCourse(courseId, dto);
+  }
+
+  @Post('/styling/:moduleId')
+  @Roles()
+  @ApiOperation({
+    summary: 'Update a module styling',
+    description: 'Updates a module styling exactly for just a user',
+    operationId: 'updateStyling',
+  })
+  @ApiBody({
+    type: ModuleStylingBodyDto,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Module styling updated successfully',
+    type: ModuleStylingResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Module not found',
+  })
+  updateStyling(
+    @CurrentSession() session: SessionData,
+    @Param('moduleId', ParseUUIDPipe) moduleId: string,
+    @Body() dto: ModuleStylingBodyDto,
+  ): Promise<ModuleStylingResponseDto> {
+    return this.service.updateStylingService(session.user.id, moduleId, dto);
   }
 } //ModuleController

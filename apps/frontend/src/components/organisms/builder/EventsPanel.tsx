@@ -9,8 +9,8 @@ interface EventsPanelProps {
   events: EventResponse[];
   onClose: () => void;
   onAdd: () => void;
-  selectedEventId: number | null;
-  onEventSelect: (id: number) => void;
+  selectedEventId: string | null;
+  onEventSelect: (id: string) => void;
 }
 
 export function EventsPanel({
@@ -40,16 +40,18 @@ export function EventsPanel({
     return (
       <div className="space-y-1">
         {events.map((event, index) => {
-          const criteria = event.event.eventCriteria;
+          const criteria = event.eventCriteria;
           return (
             <StepPill
-              key={event.event.eventID}
+              key={event.eventId}
               icon={<CalendarDays size={15} />}
-              label={criteria?.moduleCode || "Event " + (index + 1)}
-              summary={criteria?.day || undefined}
-              isActive={selectedEventId === event.event.eventID}
-              isComplete={!!(criteria?.type && event.lecture?.moduleID)}
-              onClick={() => onEventSelect(event.event.eventID)}
+              label={criteria?.moduleId || "Event " + (index + 1)}
+              summary={criteria?.date || undefined}
+              isActive={selectedEventId === event.eventId}
+              isComplete={
+                !!(criteria?.eventSource && event.eventCriteria?.moduleId)
+              }
+              onClick={() => onEventSelect(event.eventId)}
             />
           );
         })}

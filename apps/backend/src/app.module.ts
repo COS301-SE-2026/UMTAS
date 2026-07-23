@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabaseModule } from './db/database.module';
+// import { SeedModule } from './db/seeding/seed.module';
 import { HealthModule } from './health/health.module';
 import { MailModule } from './mail/mail.module';
 import { AuthController } from './auth/auth.controller';
@@ -13,6 +14,15 @@ import { RolesGuard } from './auth/roles.guard';
 import { ModuleModule } from './Module/module.module';
 import { EventModule } from './Events/event.module';
 import { TimetableModule } from './Timetable/timetable.module';
+import { UniversityModule } from './University/university.module';
+import { CourseModule } from './Course/course.module';
+import { BuilderModule } from './Builder/builder.module';
+import { JobsModule } from './jobs/jobs.module';
+import { PdfParserModule } from './pdf-parser/pdf-parser.module';
+import { SolverModule } from './solver/solver.module';
+import { StorageModule } from './storage/storage.module';
+import { AttendanceModule } from './Attendance/attendance.module';
+import { GroupingModule } from './Grouping/grouping.module';
 
 @Module({
   imports: [
@@ -21,11 +31,21 @@ import { TimetableModule } from './Timetable/timetable.module';
       envFilePath: ['.env', '.env.local', '../../.env', '../../.env.local'],
     }),
     DatabaseModule,
+    // SeedModule,
     HealthModule,
     MailModule,
     ModuleModule,
     EventModule,
     TimetableModule,
+    UniversityModule,
+    CourseModule,
+    BuilderModule,
+    StorageModule,
+    JobsModule,
+    PdfParserModule,
+    SolverModule,
+    AttendanceModule,
+    GroupingModule,
   ],
   controllers: [AppController, AuthController],
   providers: [

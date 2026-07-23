@@ -18,16 +18,17 @@ import {
 } from "@/components/atoms/baseShadcn/alert-dialog";
 import { Button } from "@/components/atoms/baseShadcn/button";
 import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
+import { useMutation } from "@tanstack/react-query";
+import {
+  addModuleMut,
+  getAllModulesQ,
+  removeModuleMut,
+  updateModuleMut,
+} from "@/components/templates/builder/Queries/moduleQueries";
+import { getQueryClient } from "@/components/tanstack/getQueryClient";
 
 interface ModulesStepProps {
   modules: ModuleResponseDto[];
-  onAdd: () => void;
-  onUpdate: (
-    id: number,
-    field: keyof Omit<ModuleResponseDto, "moduleID" | "userID"> | "confirm",
-    value: string,
-  ) => void | Promise<void>;
-  onRemove: (id: number) => void;
 }
 
 function validateModule(module: ModuleResponseDto) {
@@ -42,6 +43,7 @@ function validateModule(module: ModuleResponseDto) {
     errors.moduleName = "Name is required";
     hasErrors = true;
   }
+
   if (!module.styling) {
     errors.styling = "Colour is required";
     hasErrors = true;
@@ -51,25 +53,19 @@ function validateModule(module: ModuleResponseDto) {
 }
 
 function isModuleComplete(module: ModuleResponseDto) {
-  return !!(module.moduleCode && module.moduleName && module.styling);
+  return !!(module.moduleCode && module.moduleName && module.styling); //&& module.styling);
 }
 
-export function ModulesStep({
-  modules,
-  onAdd,
-  onUpdate,
-  onRemove,
-}: ModulesStepProps) {
-  const [selectedId, setSelectedId] = useState<number | null>(null);
-  const [errorMap, setErrorMap] = useState<Record<number, ModuleErrors>>({});
+export function ModulesStep({ modules }: ModulesStepProps) {
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [errorMap, setErrorMap] = useState<Record<string, ModuleErrors>>({});
   const [isDirty, setIsDirty] = useState(false);
   const [showGuard, setShowGuard] = useState(false);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
-  const [snapshot, setSnapshot] = useState<ModuleResponseDto | null>(null);
-  const [isAdding, setIsAdding] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [isConfirming, setIsConfirming] = useState(false);
 
+  const addModule = useMutation(addModuleMut());
+  const deleteModule = useMutation(removeModuleMut());
+  const updateModule = useMutation(updateModuleMut());
   function requestNavigation(action: () => void) {
     if (isDirty) {
       setPendingAction(() => action);
@@ -79,15 +75,28 @@ export function ModulesStep({
     action();
   }
 
+  function handleModuleUpdate<K extends keyof ModuleResponseDto>(
+    id: string,
+    field: K,
+    value: ModuleResponseDto[K],
+  ) {
+    setIsDirty(true);
+    console.log(id, field, value);
+
+    getQueryClient().setQueryData(
+      getAllModulesQ().queryKey,
+      (old?: ModuleResponseDto[]) => {
+        return old?.map((mod) =>
+          mod.moduleID === id ? { ...mod, [field]: value } : mod,
+        );
+      },
+    );
+  }
+
   function handleGuardConfirm() {
-    if (snapshot) {
-      onUpdate(snapshot.moduleID, "moduleCode", snapshot.moduleCode);
-      onUpdate(snapshot.moduleID, "moduleName", snapshot.moduleName);
-      onUpdate(snapshot.moduleID, "styling", snapshot.styling || "");
-    }
     setIsDirty(false);
     setShowGuard(false);
-    setSnapshot(null);
+
     if (pendingAction) {
       pendingAction();
       setPendingAction(null);
@@ -99,7 +108,7 @@ export function ModulesStep({
     setPendingAction(null);
   }
 
-  function handleSelect(id: number) {
+  function handleSelect(id: string) {
     if (selectedId === id) {
       setSelectedId(null);
       return;
@@ -107,9 +116,6 @@ export function ModulesStep({
 
     function doSelect() {
       const selected = modules.find((m) => m.moduleID === id);
-      if (selected) {
-        setSnapshot({ ...selected });
-      }
       setSelectedId(id);
       setIsDirty(false);
     }
@@ -117,76 +123,35 @@ export function ModulesStep({
     requestNavigation(doSelect);
   }
 
-  async function handleConfirm(id: number) {
-    if (isConfirming) return;
-    const lectureModule = modules.find((m) => m.moduleID === id);
-    if (!lectureModule) return;
+  async function handleConfirm(id: string) {
+    if (updateModule.isPending) return;
+    const uniModule = modules.find((m) => m.moduleID === id);
+    if (!uniModule) return;
 
-    const { errors: validationErrors, hasErrors } =
-      validateModule(lectureModule);
+    const { errors: validationErrors, hasErrors } = validateModule(uniModule);
     if (hasErrors) {
       setErrorMap((prev) => ({ ...prev, [id]: validationErrors }));
       return;
     }
 
-    setIsConfirming(true);
     try {
-      await onUpdate(id, "confirm", "");
+      updateModule.mutate({
+        moduleID: id,
+        module: {
+          ...uniModule,
+        },
+      });
+
       setErrorMap((prev) => {
         const next = { ...prev };
         delete next[id];
         return next;
       });
       setIsDirty(false);
-      setSnapshot(null);
       setSelectedId(null);
     } catch (error) {
       console.error("Failed to confirm module:", error);
-    } finally {
-      setIsConfirming(false);
     }
-  }
-
-  function handleAdd() {
-    if (isAdding) return;
-
-    function doAdd() {
-      setIsAdding(true);
-      onAdd();
-      setTimeout(() => setIsAdding(false), 500);
-      setIsDirty(false);
-      setSnapshot(null);
-    }
-    requestNavigation(doAdd);
-  }
-
-  function handleRemove(id: number) {
-    if (isDeleting) return;
-
-    if (selectedId === id) {
-      setSelectedId(null);
-      setIsDirty(false);
-      setSnapshot(null);
-    }
-
-    setIsDeleting(true);
-    onRemove(id);
-    setTimeout(() => setIsDeleting(false), 500);
-
-    setErrorMap((prev) => {
-      const next = { ...prev };
-      delete next[id];
-      return next;
-    });
-  }
-
-  function handleUpdate(
-    id: number,
-    field: keyof Omit<ModuleResponseDto, "moduleID" | "userID">,
-    value: string,
-  ) {
-    setIsDirty(true);
-    onUpdate(id, field, value);
   }
 
   function renderEmptyState() {
@@ -204,6 +169,7 @@ export function ModulesStep({
   }
 
   function renderModuleRow(module: ModuleResponseDto, index: number) {
+    //console.log("module styling: ", module.moduleCode, module.styling);
     const isComplete = isModuleComplete(module);
     const isSelected = selectedId === module.moduleID;
     const errors = errorMap[module.moduleID];
@@ -219,8 +185,11 @@ export function ModulesStep({
           >
             <span
               className="h-3 w-3 rounded-full flex-shrink-0"
-              style={{ backgroundColor: module.styling || "var(--border)" }}
+              style={{
+                backgroundColor: module?.styling?.colour || "var(--border)",
+              }}
             />
+
             <div className="flex-1 min-w-0">
               <p className="text-base font-medium text-[var(--text-primary)] truncate">
                 {module.moduleName || "Module " + (index + 1)}
@@ -245,8 +214,8 @@ export function ModulesStep({
             type="button"
             variant="ghost"
             size="icon"
-            onClick={() => handleRemove(module.moduleID)}
-            disabled={isDeleting}
+            onClick={() => deleteModule.mutate(module.moduleID)}
+            disabled={deleteModule.isPending}
             aria-label={"Remove module " + (index + 1)}
             className="h-10 w-10 flex-shrink-0 border border-[var(--border)] text-[var(--text-secondary)] transition-colors duration-[var(--duration-fast)] hover:border-[var(--error-text)] hover:text-[var(--error-text)] hover:bg-transparent disabled:opacity-50 disabled:cursor-not-allowed"
           >
@@ -259,7 +228,7 @@ export function ModulesStep({
           <div className="flex flex-col gap-2 pl-2">
             <ModuleCard
               module={module}
-              onUpdate={handleUpdate}
+              onUpdate={handleModuleUpdate}
               errors={errors}
             />
             {/* confirm button */}
@@ -267,12 +236,12 @@ export function ModulesStep({
               type="button"
               variant="outline"
               onClick={() => handleConfirm(module.moduleID)}
-              disabled={isConfirming}
+              disabled={updateModule.isPending}
               aria-label="Confirm module"
               className="w-full gap-2 border-[var(--border)] bg-[var(--bg-surface)] text-[var(--text-primary)] transition-colors duration-[var(--duration-fast)] hover:bg-[var(--bg-elevated)] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <CheckCircle size={16} strokeWidth={1.5} />
-              {isConfirming ? "Confirming..." : "Confirm"}
+              {updateModule.isPending ? "Confirming..." : "Confirm"}
             </Button>
           </div>
         )}
@@ -322,14 +291,14 @@ export function ModulesStep({
 
       <button
         type="button"
-        onClick={handleAdd}
-        disabled={isAdding}
+        onClick={() => addModule.mutate()}
+        disabled={addModule.isPending}
         className="mt-4 flex w-full items-center gap-3 rounded-lg border border-dashed border-[var(--border)] px-4 py-4 text-left text-base text-[var(--text-secondary)] transition-colors duration-[var(--duration-fast)] hover:border-[var(--text-secondary)] hover:text-[var(--text-primary)] disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border border-dashed border-[var(--border)]">
           <Plus size={16} strokeWidth={1.5} />
         </span>
-        {isAdding ? "Adding..." : "Add module"}
+        {addModule.isPending ? "Adding..." : "Add module"}
       </button>
     </div>
   );

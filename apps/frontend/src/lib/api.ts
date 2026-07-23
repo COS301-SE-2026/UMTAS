@@ -71,7 +71,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/auth/session": {
+  "/api/auth/get-session": {
     parameters: {
       query?: never;
       header?: never;
@@ -312,6 +312,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/auth/select-university": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Select current university */
+    post: operations["AuthController_selectUniversity"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/health": {
     parameters: {
       query?: never;
@@ -351,10 +368,16 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** Get all modules for the current user */
-    get: operations["getModules"];
+    /**
+     * Get all modules with filters
+     * @description Filter by userId(enrolled) | courseId(course owned) | universityId(modules for university over all courses). At least one filter required
+     */
+    get: operations["ModuleController_getAll"];
     put?: never;
-    /** Create a module */
+    /**
+     * Create a module
+     * @description Create a new module and link to appropriate course
+     */
     post: operations["ModuleController_createModule"];
     delete?: never;
     options?: never;
@@ -369,16 +392,267 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** Get a module by ID */
+    /**
+     * Get a module by ID
+     * @description Return a module from its moduleID
+     */
     get: operations["getModuleById"];
     put?: never;
     post?: never;
-    /** Delete a module by ID */
+    /**
+     * Delete a module by ID
+     * @description Deletes a module | STUDENT_OWNED needs to go through Builder Service
+     */
     delete: operations["deleteModule"];
     options?: never;
     head?: never;
-    /** Update a module */
+    /**
+     * Update a module
+     * @description Update a modules | STUDENT_OWNED needs to go through Builder Service
+     */
     patch: operations["updateModule"];
+    trace?: never;
+  };
+  "/modules/enroll/{moduleId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Enrol student to module */
+    get: operations["enrolStudentToModule"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/modules/{CourseID}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** Populate Course with modules array */
+    put: operations["addModulesToCourse"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/modules/styling/{moduleId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Update a module styling
+     * @description Updates a module styling exactly for just a user
+     */
+    post: operations["updateStyling"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/Courses": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Create a Course */
+    post: operations["createCourse"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/Courses/getAll": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Get all courses */
+    post: operations["getCourses"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/Courses/{CourseId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** get a Course by ID */
+    get: operations["getCourseById"];
+    put?: never;
+    post?: never;
+    /** Delete Course by Course ID */
+    delete: operations["deleteCourse"];
+    options?: never;
+    head?: never;
+    /** Update an Course */
+    patch: operations["updateCourse"];
+    trace?: never;
+  };
+  "/universities": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get all universities */
+    get: operations["getUniversities"];
+    put?: never;
+    /** Create a University */
+    post: operations["UniversityController_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/universities/{universityId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** get a university by ID */
+    get: operations["getUniversityById"];
+    put?: never;
+    post?: never;
+    /** Delete university by university ID */
+    delete: operations["deleteUniversity"];
+    options?: never;
+    head?: never;
+    /** Update an university */
+    patch: operations["updateUniversity"];
+    trace?: never;
+  };
+  "/universities/role/{universityId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** get a users role by universityID */
+    get: operations["getUserRoleByUniID"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/universities/applications/{universityID}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Get all applications for a specific university */
+    post: operations["getAllApplications"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/universities/apply": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Apply for a role at a specific university
+     * @description Apply for a specific role at a university. Valid: STUDENT, LECTURER, UNIVERSITY_ADMIN
+     */
+    post: operations["applyForUniverstiyRole"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/universities/approve": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Approve a users role for a university
+     * @description Approve a users role at university, will only approve if role is PENDING else throws probleme
+     */
+    post: operations["approveUsersRole"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/grouping/{groupId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /**
+     * Add array of modules to a module group
+     * @description Add array of modules to a ModuleGrouping.'
+     *             If added modules causes group to be the same hash as an
+     *             already existing group, then it will return the group that
+     *             matches and not update the current group. If no other group
+     *             with same hash exists then it will update group and populate.
+     */
+    patch: operations["populateGroup"];
     trace?: never;
   };
   "/events": {
@@ -399,7 +673,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/events/{id}": {
+  "/events/{eventId}": {
     parameters: {
       query?: never;
       header?: never;
@@ -408,6 +682,22 @@ export interface paths {
     };
     /** Get event by ID */
     get: operations["getEventById"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/events/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
     put?: never;
     post?: never;
     /** Delete an event */
@@ -428,7 +718,7 @@ export interface paths {
     /** Get all timetables */
     get: operations["getAllTimetables"];
     put?: never;
-    /** Create a timetable */
+    /** Create a timetable - user owned */
     post: operations["createTimetable"];
     delete?: never;
     options?: never;
@@ -455,10 +745,327 @@ export interface paths {
     patch: operations["updateTimetable"];
     trace?: never;
   };
+  "/builder": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get all modules a user is enrolled in with their course
+     * @description Filter by userId(enrolled) | courseId(course owned) | universityId(modules for university over all courses). At least one filter required
+     */
+    get: operations["BuilderController_getAll"];
+    put?: never;
+    /**
+     * Create a user defined module
+     * @description Create a new module and link to appropriate course and automatically enroll student into module
+     */
+    post: operations["BuilderController_createModule"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/builder/{moduleId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get a module by ID
+     * @description Return a module from its moduleID
+     */
+    get: operations["builder-getModuleById"];
+    put?: never;
+    post?: never;
+    /**
+     * Delete a module by ID
+     * @description STUDENT_OWNED so student is allowed to delete the module if they own it
+     */
+    delete: operations["builder-deleteModule"];
+    options?: never;
+    head?: never;
+    /**
+     * Update a module that the student owns
+     * @description STUDENT_OWNED so they can update any field of the module
+     */
+    patch: operations["builder-updateModule"];
+    trace?: never;
+  };
+  "/pdf-parser/jobs/lookup": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Look up an existing PDF parser job by PDF stream fingerprint
+     * @description Checks for an existing parser job scoped to the authenticated user, selected university, parser adapter, and backend-supported fingerprint algorithm.
+     */
+    post: operations["PdfParserController_lookupDuplicate"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/pdf-parser/jobs/upload": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Upload a timetable PDF and enqueue it for parsing
+     * @description Uploads a PDF, recomputes the backend stream-payload fingerprint, persists the parse job, and enqueues it for worker parsing.
+     */
+    post: operations["PdfParserController_uploadAndEnqueue"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/pdf-parser/jobs/{jobId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get PDF parser job status and result metadata
+     * @description Reads persisted parser job status scoped to the authenticated user.
+     */
+    get: operations["PdfParserController_getJob"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/pdf-parser/jobs/{jobId}/result": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get completed PDF parser result
+     * @description Returns persisted import candidates only for completed jobs owned by the authenticated user.
+     */
+    get: operations["PdfParserController_getJobResult"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/pdf-parser/jobs/{jobId}/callback": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Receive final PDF parser worker callback */
+    post: operations["PdfParserController_receiveCallback"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/solver/jobs": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Persist and enqueue a timetable solve job */
+    post: operations["SolverController_submitAndEnqueue"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/solver/jobs/{jobId}/input": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Build solver input for an authenticated worker */
+    get: operations["SolverController_getInput"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/solver/jobs/{jobId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get solver job status and persisted result metadata */
+    get: operations["SolverController_getJob"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/solver/jobs/{jobId}/result": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get a completed solver result */
+    get: operations["SolverController_getJobResult"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/solver/jobs/{jobId}/callback": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Receive final solver worker callback */
+    post: operations["SolverController_receiveCallback"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/attendance": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get all attendance records for user or with filters */
+    get: operations["getAllAttendance"];
+    put?: never;
+    /** Create attendance record for current user for an event */
+    post: operations["createAttendance"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/attendance/{attendanceId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get attendance record by attendanceID */
+    get: operations["getAttendanceById"];
+    put?: never;
+    post?: never;
+    /** Delete an attendance record - effectively making attendance NOT_STATED */
+    delete: operations["deleteAttendance"];
+    options?: never;
+    head?: never;
+    /** Update date or state of attendance */
+    patch: operations["updateAttendance"];
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
   schemas: {
+    AuthUserDto: {
+      /** Format: uuid */
+      id: string;
+      email: string;
+      name: string;
+      emailVerified: boolean;
+      image?: string | null;
+      /** @enum {string} */
+      role: "user" | "sys_admin";
+      banned: boolean;
+      banReason?: string | null;
+      /** Format: date-time */
+      banExpires?: string | null;
+      /** Format: date-time */
+      createdAt: string;
+      /** Format: date-time */
+      updatedAt: string;
+    };
+    AuthSessionDto: {
+      id: string;
+      token: string;
+      /** Format: uuid */
+      userId: string;
+      /** Format: date-time */
+      expiresAt: string;
+      ipAddress?: string | null;
+      userAgent?: string | null;
+      impersonatedBy?: string | null;
+      /** Format: date-time */
+      createdAt: string;
+      /** Format: date-time */
+      updatedAt: string;
+    };
+    AuthEnvelopeDto: {
+      user: components["schemas"]["AuthUserDto"];
+      session: components["schemas"]["AuthSessionDto"];
+      /** Format: uuid */
+      uniId?: string;
+      /** @enum {string} */
+      uniRole?:
+        | "student"
+        | "uni_admin"
+        | "lecturer"
+        | "uni_admin_pending"
+        | "lecturer_pending";
+    };
     SignUpEmailDto: {
       /**
        * @description Valid email address
@@ -479,6 +1086,27 @@ export interface components {
        */
       name: string;
     };
+    AuthErrorDto: {
+      /** @enum {string} */
+      error:
+        | "ACCOUNT_ALREADY_LINKED"
+        | "EMAIL_ALREADY_IN_USE"
+        | "EMAIL_ALREADY_VERIFIED"
+        | "EMAIL_NOT_VERIFIED"
+        | "INSUFFICIENT_PERMISSIONS"
+        | "INVALID_CODE"
+        | "INVALID_EMAIL"
+        | "INVALID_EMAIL_OR_PASSWORD"
+        | "INVALID_PASSWORD"
+        | "INVALID_TOKEN"
+        | "SESSION_NOT_FOUND"
+        | "UNAUTHORIZED"
+        | "USER_EMAIL_ALREADY_EXISTS"
+        | "USER_NOT_FOUND"
+        | "RATE_LIMITED"
+        | "INTERNAL_SERVER_ERROR";
+      message?: string;
+    };
     SignInEmailDto: {
       /**
        * @default system-admin@local.umtas
@@ -491,6 +1119,7 @@ export interface components {
        */
       password: string;
     };
+    AuthAcknowledgementDto: Record<string, never>;
     RevokeSessionDto: {
       /**
        * @description ID of the session to terminate
@@ -575,11 +1204,14 @@ export interface components {
        */
       name: string;
       /**
-       * @default student
-       * @example student
+       * @default user
+       * @example user
        * @enum {string}
        */
-      role: "student" | "uni_admin" | "sys_admin";
+      role: "user" | "sys_admin";
+    };
+    AuthUserResponseDto: {
+      user: components["schemas"]["AuthUserDto"];
     };
     AdminImpersonateUserDto: {
       /**
@@ -619,189 +1251,749 @@ export interface components {
       /** @example newemail@example.com */
       email?: string;
       /**
-       * @example student
+       * @example user
        * @enum {string}
        */
-      role?: "student" | "uni_admin" | "sys_admin";
+      role?: "user" | "sys_admin";
+    };
+    SelectUniversityDto: {
+      /**
+       * Format: uuid
+       * @description University ID selected by the user
+       * @example a1b2c3d4-e5f6-7890-abcd-ef1234567890
+       */
+      uniId: string;
+    };
+    StylingDto: {
+      /** @example #3B82F6 */
+      colour: string;
+    };
+    CreateCourseModuleDto: {
+      /**
+       * @description Identifies wether or not module is a core module of the course
+       * @example true
+       */
+      Core?: boolean;
+      /**
+       * @description Identifies which part of the year the module takes part in for the course
+       * @example Semester 1
+       */
+      SemesterOfStudy?: string | null;
+      /**
+       * @description Which year does the module belong to for the course
+       * @example 1
+       */
+      YearOfStudy?: number | null;
     };
     CreateModuleDto: {
       /**
        * @description Module code used by the university
        * @example COS332
        */
-      code: string;
+      moduleCode: string;
       /**
        * @description Name of the module
        * @example Computer Networks
        */
-      name: string;
+      moduleName: string;
       /**
        * @description Short module description
        * @example Introduction to computer networking concepts
        */
-      description?: string;
-      /**
-       * @description Optional display styling for the module
-       * @example #3B82F6
-       */
-      styling?: string;
-    };
-    ModuleResponseDto: {
-      /** @example 1 */
-      moduleID: number;
-      /** @example COS332 */
-      moduleCode: string;
-      /** @example Computer Networks */
-      moduleName: string;
-      /** @example Introduction to computer networking concepts */
       moduleDescription?: string | null;
-      /** @example 550e8400-e29b-41d4-a716-446655440000 */
-      userID: string;
-      /** @example #3B82F6 */
-      styling?: string | null;
+      /**
+       * @description Styling to be used for a Module
+       * @example {
+       *       "colour": "FFFFF"
+       *     }
+       */
+      styling?: components["schemas"]["StylingDto"] | null;
+      /**
+       * @description Whether the module has been approved by a university admin
+       * @example true
+       */
+      validated?: boolean;
+      /**
+       * Format: uuid
+       * @description ModuleGroupingID to identify group the module belongs to
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      ModuleGroupingID?: string;
+      /**
+       * Format: uuid
+       * @description CourseID module belongs to
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      CourseID?: string;
+      /** @description Course Module metadata to be used when module belongs to course */
+      CourseModuleInfo?: components["schemas"]["CreateCourseModuleDto"];
     };
-    SingleModuleResponseDto: {
-      module: components["schemas"]["ModuleResponseDto"];
+    CourseModuleDto: {
+      /**
+       * Format: uuid
+       * @description ID to identify Course Module entry
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      CourseModuleID: string;
+      /**
+       * Format: uuid
+       * @description ID to identify GroupModule entry metadata is for
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      GroupModuleID: string;
+      /**
+       * Format: uuid
+       * @description ID to identify course owning this CourseModule
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      CourseID: string;
+      /**
+       * @description Identifies wether or not module is a core module of the course
+       * @example true
+       */
+      Core?: boolean;
+      /**
+       * @description Identifies which part of the year the module takes part in for the course
+       * @example Semester 1
+       */
+      SemesterOfStudy?: string | null;
+      /**
+       * @description Which year does the module belong to for the course
+       * @example 1
+       */
+      YearOfStudy?: number | null;
+    };
+    ModuleSingleResponseDto: {
+      /**
+       * Format: uuid
+       * @description Unique identifier for a module
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      moduleID: string;
+      /**
+       * @description Module code used by the university
+       * @example COS332
+       */
+      moduleCode: string;
+      /**
+       * @description Name of the module
+       * @example Computer Networks
+       */
+      moduleName: string;
+      /**
+       * @description Short module description
+       * @example Introduction to computer networking concepts
+       */
+      moduleDescription?: string | null;
+      /**
+       * @description Styling to be used for a Module
+       * @example {
+       *       "colour": "FFFFF"
+       *     }
+       */
+      styling?: components["schemas"]["StylingDto"] | null;
+      /**
+       * @description Metadata attached to module when owned by course
+       * @example {
+       *       "CourseModuleID": "00000000-0000-0000-0000-000000000000",
+       *       "GroupModuleID": "00000000-0000-0000-0000-000000000000",
+       *       "CourseID": "00000000-0000-0000-0000-000000000000",
+       *       "core": true,
+       *       "SemesterOfStudy": "Semester 1",
+       *       "YearOfStudy": 1
+       *     }
+       */
+      CourseModuleInfo?: components["schemas"]["CourseModuleDto"] | null;
+      /**
+       * @description Whether the module has been approved by a university admin
+       * @example true
+       */
+      validated?: boolean;
+      /**
+       * Format: uuid
+       * @description Unique identifier for a module group
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      ModuleGroupingID?: string;
     };
     ModuleListResponseDto: {
-      modules: components["schemas"]["ModuleResponseDto"][];
+      /** @description List of modules */
+      modules: components["schemas"]["ModuleSingleResponseDto"][];
     };
     UpdateModuleDto: {
       /**
-       * @description Updated module code
+       * @description Module code used by the university
        * @example COS332
        */
-      code?: string;
+      moduleCode?: string;
       /**
-       * @description Updated module name
+       * @description Name of the module
        * @example Computer Networks
        */
-      name?: string;
+      moduleName?: string;
       /**
-       * @description Updated module description
+       * @description Short module description
        * @example Introduction to computer networking concepts
        */
-      description?: string;
+      moduleDescription?: string | null;
       /**
-       * @description Updated module styling
-       * @example #3B82F6
+       * @description Styling to be used for a Module
+       * @example {
+       *       "colour": "FFFFF"
+       *     }
        */
-      styling?: string;
+      styling?: components["schemas"]["StylingDto"] | null;
+      /**
+       * @description Whether the module has been approved by a university admin
+       * @example true
+       */
+      validated?: boolean;
+      /**
+       * Format: uuid
+       * @description ID to identify course owning this CourseModule
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      CourseID?: string;
+      /**
+       * @description Identifies wether or not module is a core module of the course
+       * @example true
+       */
+      Core?: boolean;
+      /**
+       * @description Identifies which part of the year the module takes part in for the course
+       * @example Semester 1
+       */
+      SemesterOfStudy?: string | null;
+      /**
+       * @description Which year does the module belong to for the course
+       * @example 1
+       */
+      YearOfStudy?: number | null;
     };
     DeleteModuleResponseDto: {
-      /** @example true */
-      success: Record<string, never>;
-    };
-    EventCriteriaDto: {
       /**
-       * @example lecture
+       * @description Module code used by the university
+       * @example COS332
+       */
+      moduleCode: string;
+      /** @example true */
+      success: boolean;
+    };
+    EnrolResponseDto: {
+      /**
+       * Format: uuid
+       * @description Unique identifier for a module
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      moduleID: string;
+      /**
+       * @description Message to describe success/failure of enrollment
+       * @example User successfully enrolled into module[00000000-0000-0000-0000-000000000000]
+       */
+      message: string;
+      UserID: string;
+    };
+    AddModulesToCourseDto: {
+      /**
+       * @description module array to ad dto the group
+       * @example [
+       *       "10000000-0000-0000-0000-000000000000",
+       *       "20000000-0000-0000-0000-000000000000"
+       *     ]
+       */
+      modules: string[];
+    };
+    AddModulesToCourseResponseDto: {
+      /**
+       * @description module array to ad dto the group
+       * @example [
+       *       "10000000-0000-0000-0000-000000000000",
+       *       "20000000-0000-0000-0000-000000000000"
+       *     ]
+       */
+      modules: string[];
+      /**
+       * Format: uuid
+       * @description Course to which to add the array of modules
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      CourseID: string;
+    };
+    ModuleStylingBodyDto: {
+      /**
+       * @description Styling to be used for a Module
+       * @example {
+       *       "colour": "FFFFF"
+       *     }
+       */
+      styling: components["schemas"]["StylingDto"];
+    };
+    ModuleStylingResponseDto: {
+      /**
+       * @description Describes the state of the success response
+       * @example Suceess
+       */
+      message: string;
+    };
+    CreateCourseDto: {
+      /**
+       * Format: uuid
+       * @description Unique identifier for a university
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      UniversityID: string;
+      /**
+       * Format: uuid
+       * @description Unique identifier for a group of modules
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      GroupID?: string | null;
+      /**
+       * @description Name of the course
+       * @example Computer Science
+       */
+      CourseName: string;
+      /**
+       * @description Degree that course belongs to
+       * @example Bachelor of Science
+       */
+      Degree?: string | null;
+    };
+    CourseSingleResponseDto: {
+      /**
+       * Format: uuid
+       * @description Unique identifier for a course
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      CourseID: string;
+      /**
+       * Format: uuid
+       * @description Unique identifier for a university
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      UniversityID: string;
+      /**
+       * Format: uuid
+       * @description Unique identifier for a group of modules
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      GroupID?: string | null;
+      /**
+       * @description Name of the course
+       * @example Computer Science
+       */
+      CourseName: string;
+      /**
+       * @description Degree that course belongs to
+       * @example Bachelor of Science
+       */
+      Degree?: string | null;
+    };
+    CourseFilters: {
+      /**
+       * Format: uuid
+       * @description Unique identifier for a university
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      UniversityID?: string;
+      /**
+       * @description Name of the course
+       * @example Computer Science
+       */
+      CourseName?: string;
+      /**
+       * @description Degree that course belongs to
+       * @example Bachelor of Science
+       */
+      Degree?: string | null;
+    };
+    CourseDto: {
+      /**
+       * Format: uuid
+       * @description Unique identifier for a course
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      CourseID: string;
+      /**
+       * Format: uuid
+       * @description Unique identifier for a university
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      UniversityID: string;
+      /**
+       * Format: uuid
+       * @description Unique identifier for a group of modules
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      GroupID?: string | null;
+      /**
+       * @description Name of the course
+       * @example Computer Science
+       */
+      CourseName: string;
+      /**
+       * @description Degree that course belongs to
+       * @example Bachelor of Science
+       */
+      Degree?: string | null;
+    };
+    CourseListResponseDto: {
+      /** @description List of courses */
+      courses: components["schemas"]["CourseDto"][];
+    };
+    UpdateCourseDto: {
+      /**
+       * Format: uuid
+       * @description Unique identifier for a university
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      UniversityID?: string;
+      /**
+       * Format: uuid
+       * @description Unique identifier for a group of modules
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      GroupID?: string | null;
+      /**
+       * @description Name of the course
+       * @example Computer Science
+       */
+      CourseName?: string;
+      /**
+       * @description Degree that course belongs to
+       * @example Bachelor of Science
+       */
+      Degree?: string | null;
+    };
+    DeleteCourseResponseDto: {
+      /**
+       * @description Name of the course
+       * @example Computer Science
+       */
+      CourseName: string;
+      /** @example true */
+      success: boolean;
+    };
+    CreateUniversityDto: {
+      /**
+       * @description Name of the university
+       * @example University of Pretoria
+       */
+      UniversityName: string;
+    };
+    UniversitySingleResponseDto: {
+      /**
+       * Format: uuid
+       * @description Unique identifier for a university
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      UniversityID: string;
+      /**
+       * @description Name of the university
+       * @example University of Pretoria
+       */
+      UniversityName: string;
+      /**
+       * @description Role current user has for university
+       * @example STUDENT
        * @enum {string|null}
        */
-      type?: "lecture" | null;
-      /** @example Monday */
-      day: string;
+      role?:
+        | "STUDENT"
+        | "STUDENT_OWNED"
+        | "UNIVERSITY_ADMIN"
+        | "UNIVERSITY_ADMIN_PENDING"
+        | "LECTURER"
+        | "LECTURER_PENDING"
+        | "SYSTEM_ADMIN"
+        | "REJECTED"
+        | null;
+    };
+    UniversityDto: {
+      /**
+       * Format: uuid
+       * @description Unique identifier for a university
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      UniversityID: string;
+      /**
+       * @description Name of the university
+       * @example University of Pretoria
+       */
+      UniversityName: string;
+      /**
+       * @description Role current user has for university
+       * @example STUDENT
+       * @enum {string|null}
+       */
+      role?:
+        | "STUDENT"
+        | "STUDENT_OWNED"
+        | "UNIVERSITY_ADMIN"
+        | "UNIVERSITY_ADMIN_PENDING"
+        | "LECTURER"
+        | "LECTURER_PENDING"
+        | "SYSTEM_ADMIN"
+        | "REJECTED"
+        | null;
+    };
+    UniversityListResponseDto: {
+      /** @description list of universities */
+      universities: components["schemas"]["UniversityDto"][];
+    };
+    UserUniversityRoleResponseDto: {
+      /** Format: uuid */
+      UniversityID: string;
+      /** Format: uuid */
+      UserID: string;
+      /** @enum {string} */
+      role:
+        | "STUDENT"
+        | "STUDENT_OWNED"
+        | "UNIVERSITY_ADMIN"
+        | "UNIVERSITY_ADMIN_PENDING"
+        | "LECTURER"
+        | "LECTURER_PENDING"
+        | "SYSTEM_ADMIN"
+        | "REJECTED";
+    };
+    UpdateUniversityDto: {
+      /**
+       * @description Name of the university
+       * @example University of Pretoria
+       */
+      UniversityName?: string;
+    };
+    DeleteUniversityResponseDto: {
+      /**
+       * @description Name of the university
+       * @example University of Pretoria
+       */
+      UniversityName: string;
+      /** @example true */
+      success: boolean;
+    };
+    GetRoleFilterDto: {
+      /**
+       * @description True for only pending applications, false for all roles for uni
+       * @example false
+       */
+      pending?: boolean;
+    };
+    GetRolesDto: {
+      /**
+       * Format: uuid
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      UserID: string;
+      /**
+       * Format: email
+       * @example xxx@umtas.com
+       */
+      Email: string;
+      /** @example John Doe */
+      Name: string;
+      /**
+       * Format: uuid
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      UniversityID: string;
+      /**
+       * @example LECTURER_PENDING
+       * @enum {string|null}
+       */
+      role:
+        | "STUDENT"
+        | "STUDENT_OWNED"
+        | "UNIVERSITY_ADMIN"
+        | "UNIVERSITY_ADMIN_PENDING"
+        | "LECTURER"
+        | "LECTURER_PENDING"
+        | "SYSTEM_ADMIN"
+        | "REJECTED"
+        | null;
+    };
+    ApplyForUniRoleDto: {
+      /**
+       * Format: uuid
+       * @description Unique identifier for a university
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      UniversityID: string;
+      /**
+       * @description Role current user has for university
+       * @example STUDENT
+       * @enum {string|null}
+       */
+      role?:
+        | "STUDENT"
+        | "STUDENT_OWNED"
+        | "UNIVERSITY_ADMIN"
+        | "UNIVERSITY_ADMIN_PENDING"
+        | "LECTURER"
+        | "LECTURER_PENDING"
+        | "SYSTEM_ADMIN"
+        | "REJECTED"
+        | null;
+    };
+    ApproveUsersRoleDto: {
+      /**
+       * Format: uuid
+       * @description Unique identifier for a university
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      UniversityID: string;
+      /**
+       * Format: uuid
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      userId: string;
+      /** @description will be accecpted on true, rejected on false */
+      isApproved: boolean;
+      /**
+       * @description role will be set to this if provided unless null
+       * @example LECTURER_PENDING
+       * @enum {string|null}
+       */
+      provdedRole?:
+        | "STUDENT"
+        | "STUDENT_OWNED"
+        | "UNIVERSITY_ADMIN"
+        | "UNIVERSITY_ADMIN_PENDING"
+        | "LECTURER"
+        | "LECTURER_PENDING"
+        | "SYSTEM_ADMIN"
+        | "REJECTED"
+        | null;
+    };
+    ApprovedUserRoleResponse: {
+      /**
+       * Format: uuid
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      userId: string;
+      /** @example true */
+      success: boolean;
+    };
+    PopulateGroupBodyDto: {
+      /**
+       * @description module array to ad dto the group
+       * @example [
+       *       "10000000-0000-0000-0000-000000000000",
+       *       "20000000-0000-0000-0000-000000000000"
+       *     ]
+       */
+      modules: string[];
+    };
+    GroupingSingleResponse: {
+      /** Format: uuid */
+      GroupID: string;
+      Hash?: string | null;
+      modules?: string[];
+    };
+    EventCriteriaDto: {
+      /** @enum {string} */
+      eventSource: "university" | "personal";
+      /**
+       * @description Required when the event is not recurring.
+       * @example 2026-02-17
+       */
+      date?: string;
+      /**
+       * @description Required when the event is recurring.
+       * @enum {string}
+       */
+      dayOfWeek?:
+        | "monday"
+        | "tuesday"
+        | "wednesday"
+        | "thursday"
+        | "friday"
+        | "saturday"
+        | "sunday";
       /** @example 08:30 */
       startTime: string;
       /** @example 10:20 */
       endTime: string;
-      /** @example COS301 */
-      moduleCode?: string;
-      /** @example IT 2-26 */
-      venue?: string;
+      /** Format: uuid */
+      moduleId?: string;
+    };
+    VenueDto: {
+      /** Format: uuid */
+      venueId: string;
+      venueName: string;
     };
     CreateEventDto: {
-      /** @example event name */
-      name?: string;
-      /** @example lec1 */
-      code?: string;
-      /** @description Criteria for an event */
       eventCriteria: components["schemas"]["EventCriteriaDto"];
-      /**
-       * @default false
-       * @example false
-       */
-      isRecurring: boolean;
-    };
-    EventDto: {
-      /** @example 1 */
-      eventID: number;
-      /** @example a1b2c3d4-e5f6-7890-abcd-ef1234567890 */
-      userID: string;
-      /** @example event name */
-      name?: string;
-      /** @example lec1 */
-      code?: string;
-      eventCriteria: components["schemas"]["EventCriteriaDto"];
-      /** @example true */
+      eventName?: string;
+      activityCode?: string | null;
+      venues?: components["schemas"]["VenueDto"][];
       isRecurring?: boolean;
-    };
-    LectureResponseDto: {
-      /** @example 1 */
-      lectureID: number;
-      /** @example 12 */
-      moduleID: number | null;
-      /** @example 1 */
-      eventID: number | null;
-      /** @example IT 2-26 */
-      venue?: string | null;
-    };
-    EventResponseDto: {
+      validated?: boolean;
       /**
-       * @example {
-       *       "eventID": 1,
-       *       "userID": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-       *       "name": "eventnameidk",
-       *       "code": "lec1",
-       *       "eventCriteria": {
-       *         "day": "Monday",
-       *         "startTime": "08:30",
-       *         "endTime": "10:20"
-       *       }
-       *     }
-       */
-      event: components["schemas"]["EventDto"];
-      lecture?: components["schemas"]["LectureResponseDto"];
-    };
-    EventListResponseDto: {
-      /** @description List of events with optional lecture details */
-      events: components["schemas"]["EventResponseDto"][];
-    };
-    UpdateEventCriteriaDto: {
-      /**
-       * @example lecture
+       * @description Required when eventCriteria.moduleId is provided.
        * @enum {string}
        */
-      type?: "lecture";
-      /** @example Tuesday */
-      day?: string;
-      /** @example 10:30 */
+      activityType?: "lecture" | "tutorial" | "prac" | "test" | "exam";
+    };
+    EventDto: {
+      /** Format: uuid */
+      eventId: string;
+      eventCriteria: components["schemas"]["EventCriteriaDto"];
+      eventName?: string;
+      /** @enum {string} */
+      activityType?: "lecture" | "tutorial" | "prac" | "test" | "exam";
+      activityCode?: string | null;
+      venues?: components["schemas"]["VenueDto"][];
+      isRecurring?: boolean;
+      validated?: boolean;
+    };
+    EventSingleResponseDto: {
+      event: components["schemas"]["EventDto"];
+    };
+    EventListResponseDto: {
+      events: components["schemas"]["EventDto"][];
+    };
+    UpdateEventCriteriaDto: {
+      /** @enum {string} */
+      eventSource?: "university" | "personal";
+      /**
+       * @description Required when the event is not recurring.
+       * @example 2026-02-17
+       */
+      date?: string;
+      /**
+       * @description Required when the event is recurring.
+       * @enum {string}
+       */
+      dayOfWeek?:
+        | "monday"
+        | "tuesday"
+        | "wednesday"
+        | "thursday"
+        | "friday"
+        | "saturday"
+        | "sunday";
+      /** @example 08:30 */
       startTime?: string;
-      /** @example 12:20 */
+      /** @example 10:20 */
       endTime?: string;
-      /** @example COS301 */
-      moduleCode?: string;
-      /** @example IT 2-26 */
-      venue?: string;
+      /** Format: uuid */
+      moduleId?: string;
     };
     UpdateEventDto: {
-      /** @example event name */
-      name?: string;
-      /** @example lec1 */
-      code?: string;
-      /** @description Event update criteria */
+      eventName?: string;
+      /** @enum {string} */
+      activityType?: "lecture" | "tutorial" | "prac" | "test" | "exam";
+      activityCode?: string | null;
+      isRecurring?: boolean;
+      validated?: boolean;
       eventCriteria?: components["schemas"]["UpdateEventCriteriaDto"];
-      /**
-       * @default false
-       * @example false
-       */
-      isRecurring: boolean;
     };
     DeleteResponseDto: {
-      /**
-       * @default true
-       * @example true
-       */
-      success: Record<string, never>;
+      eventName?: string;
+      activityCode?: string | null;
+      success: boolean;
     };
     CreateTimetableDto: {
       /**
@@ -812,29 +2004,24 @@ export interface components {
       /**
        * @description Event IDs to attach on creation
        * @example [
-       *       1,
-       *       2,
-       *       3
+       *       "00000000-0000-0000-0000-000000000000"
        *     ]
        */
       eventIds?: string[];
     };
     TimetableDto: {
-      /** @example 1 */
-      timetableID: number;
-      /** @example a1b2c3d4-e5f6-7890-abcd-ef1234567890 */
-      userID: string;
+      /** @example someId */
+      timetableID: string;
       /** @example Semester 1 */
       timetableName?: string | null;
     };
     TimetableResponseDto: {
+      UserTimetableID: string;
       timetable: components["schemas"]["TimetableDto"];
       /**
        * @description IDs of events linked to this timetable
        * @example [
-       *       1,
-       *       2,
-       *       3
+       *       "00000000-0000-0000-0000-000000000000"
        *     ]
        */
       eventIds?: string[];
@@ -852,23 +2039,395 @@ export interface components {
       /**
        * @description Event IDs to link to the timetable
        * @example [
-       *       4,
-       *       5
+       *       "00000000-0000-0000-0000-000000000000"
        *     ]
        */
       addEventIds?: string[];
       /**
        * @description Event IDs to unlink from the timetable
        * @example [
-       *       1,
-       *       2
+       *       "00000000-0000-0000-0000-000000000000"
        *     ]
        */
       removeEventIds?: string[];
     };
     DeleteTimetableResponseDto: {
       /** @example true */
-      success: Record<string, never>;
+      success: boolean;
+    };
+    CreateBuilderModuleDto: {
+      /**
+       * @description Module code used by the university
+       * @example COS332
+       */
+      moduleCode: string;
+      /**
+       * @description Name of the module
+       * @example Computer Networks
+       */
+      moduleName: string;
+      /**
+       * @description Short module description
+       * @example Introduction to computer networking concepts
+       */
+      moduleDescription?: string | null;
+      /**
+       * @description Styling to be used for a Module
+       * @example {
+       *       "colour": "FFFFF"
+       *     }
+       */
+      styling?: components["schemas"]["StylingDto"] | null;
+      /**
+       * @description Whether the module has been approved by a university admin
+       * @example true
+       */
+      validated?: boolean;
+    };
+    PdfParserLookupResponseDto: {
+      /** @example true */
+      duplicate: boolean;
+      /** @example pdf-parse-2d82d1ff-fb51-4c67-80cf-61d88c12d596 */
+      jobId?: string;
+      /** @enum {string} */
+      status?: "queued" | "completed" | "failed";
+      /** @example 00000000-0000-0000-0000-000000000000 */
+      moduleGroupingId?: string | null;
+      /** @example true */
+      resultAvailable?: boolean;
+      /** @example /pdf-parser/jobs/pdf-parse-2d82d1ff-fb51-4c67-80cf-61d88c12d596 */
+      statusUrl?: string;
+    };
+    ParseAnnotationDto: {
+      code: string;
+      message: string;
+      details: {
+        [key: string]: unknown;
+      };
+    };
+    RecurringParsedEventCandidateDto: {
+      moduleCode: string;
+      /** @enum {string} */
+      activityType: "lecture" | "tutorial" | "prac" | "test" | "exam";
+      activityCode: string;
+      title: string;
+      /** @example 08:30 */
+      startTime: string;
+      /** @example 10:20 */
+      endTime: string;
+      venues: string[];
+      metadata: {
+        [key: string]: unknown;
+      };
+      warnings: components["schemas"]["ParseAnnotationDto"][];
+      /** @enum {string} */
+      day:
+        | "monday"
+        | "tuesday"
+        | "wednesday"
+        | "thursday"
+        | "friday"
+        | "saturday"
+        | "sunday";
+      date: string | null;
+      /** @enum {boolean} */
+      isRecurring: true;
+    };
+    DatedParsedEventCandidateDto: {
+      moduleCode: string;
+      /** @enum {string} */
+      activityType: "lecture" | "tutorial" | "prac" | "test" | "exam";
+      activityCode: string;
+      title: string;
+      /** @example 08:30 */
+      startTime: string;
+      /** @example 10:20 */
+      endTime: string;
+      venues: string[];
+      metadata: {
+        [key: string]: unknown;
+      };
+      warnings: components["schemas"]["ParseAnnotationDto"][];
+      day: string | null;
+      /** Format: date */
+      date: string;
+      /** @enum {boolean} */
+      isRecurring: false;
+    };
+    ParsedModuleCandidateDto: {
+      code: string;
+      name: string | null;
+      metadata: {
+        [key: string]: unknown;
+      };
+      warnings: components["schemas"]["ParseAnnotationDto"][];
+    };
+    PdfParserResultDto: {
+      modules: components["schemas"]["ParsedModuleCandidateDto"][];
+      events: (
+        | components["schemas"]["RecurringParsedEventCandidateDto"]
+        | components["schemas"]["DatedParsedEventCandidateDto"]
+      )[];
+      warnings: components["schemas"]["ParseAnnotationDto"][];
+    };
+    WorkerCallbackErrorDto: {
+      /** @example WORKER_FAILED */
+      code: string;
+      /** @example Worker failed to process the job */
+      message: string;
+      /** @description Worker-specific diagnostic values. */
+      details?: {
+        [key: string]: unknown;
+      };
+    };
+    PdfParserUploadResponseDto: {
+      /** @example pdf-parse-2d82d1ff-fb51-4c67-80cf-61d88c12d596 */
+      jobId: string;
+      /** @example uploads/pdf-parser/pdf-parse-2d82d1ff-fb51-4c67-80cf-61d88c12d596/timetable.pdf */
+      fileKey?: string | null;
+      /** @example up */
+      adapterKey?: string | null;
+      /** @enum {string} */
+      status: "queued" | "completed" | "failed";
+      result?: components["schemas"]["PdfParserResultDto"];
+      error?: components["schemas"]["WorkerCallbackErrorDto"];
+      /** @example 00000000-0000-0000-0000-000000000000 */
+      moduleGroupingId?: string | null;
+      /** @example 2026-07-02T10:15:30.000Z */
+      createdAt: string;
+      /** @example 2026-07-02T10:15:45.000Z */
+      updatedAt: string;
+      /** @example /pdf-parser/jobs/pdf-parse-2d82d1ff-fb51-4c67-80cf-61d88c12d596 */
+      statusUrl: string;
+    };
+    PdfParserJobResponseDto: {
+      /** @example pdf-parse-2d82d1ff-fb51-4c67-80cf-61d88c12d596 */
+      jobId: string;
+      /** @example uploads/pdf-parser/pdf-parse-2d82d1ff-fb51-4c67-80cf-61d88c12d596/timetable.pdf */
+      fileKey?: string | null;
+      /** @example up */
+      adapterKey?: string | null;
+      /** @enum {string} */
+      status: "queued" | "completed" | "failed";
+      result?: components["schemas"]["PdfParserResultDto"];
+      error?: components["schemas"]["WorkerCallbackErrorDto"];
+      /** @example 00000000-0000-0000-0000-000000000000 */
+      moduleGroupingId?: string | null;
+      /** @example 2026-07-02T10:15:30.000Z */
+      createdAt: string;
+      /** @example 2026-07-02T10:15:45.000Z */
+      updatedAt: string;
+    };
+    PdfParserCallbackDto: {
+      /** @enum {string} */
+      status: "completed" | "failed";
+      result?: components["schemas"]["PdfParserResultDto"];
+      error?: components["schemas"]["WorkerCallbackErrorDto"];
+    };
+    AcceptedJobResponseDto: {
+      /** @enum {boolean} */
+      accepted: true;
+      jobId: string;
+    };
+    SolverHeuristicPreferenceDto: {
+      key: string;
+      weight?: number;
+      parameters?: {
+        [key: string]: unknown;
+      };
+    };
+    SolverPreferencesDto: {
+      /** @default [] */
+      heuristics: components["schemas"]["SolverHeuristicPreferenceDto"][];
+    };
+    TimetableSolveJobDto: {
+      /**
+       * @example [
+       *       "00000000-0000-4000-8000-000000000004"
+       *     ]
+       */
+      eventIds?: string[];
+      /** @enum {string} */
+      solveMode: "feasibility" | "optimization";
+      /** @enum {string} */
+      engine?: "auto" | "cp-sat" | "ga";
+      /**
+       * @example {
+       *       "heuristics": []
+       *     }
+       */
+      preferences?: components["schemas"]["SolverPreferencesDto"];
+    };
+    TimetableSolutionDto: {
+      selectedEventIds: string[];
+    };
+    SolverHeuristicScoreDto: {
+      key: string;
+      score: number;
+      details?: {
+        [key: string]: unknown;
+      };
+    };
+    SolverConflictDto: {
+      eventIds: string[];
+    };
+    SolverResultMetadataDto: {
+      conflictCount: number;
+      conflicts: components["schemas"]["SolverConflictDto"][];
+      /** @enum {string} */
+      solveMode: "feasibility" | "optimization";
+    };
+    SolverResultDto: {
+      /** @enum {string} */
+      engine: "cp-sat" | "ga";
+      /** @enum {string} */
+      outcome: "conflict-free" | "best-effort";
+      timetableSolution: components["schemas"]["TimetableSolutionDto"];
+      /** @default [] */
+      heuristicScores: components["schemas"]["SolverHeuristicScoreDto"][];
+      metadata: {
+        [key: string]: unknown;
+      } & components["schemas"]["SolverResultMetadataDto"];
+    };
+    SolverSubmissionResponseDto: {
+      /** @enum {boolean} */
+      accepted: true;
+      jobId: string;
+      /** @enum {string} */
+      status: "queued" | "completed" | "failed";
+      result?: components["schemas"]["SolverResultDto"];
+    };
+    SchedulingVenueDto: {
+      id: string;
+      name: string;
+    };
+    SchedulingEventDto: {
+      eventId: string;
+      moduleCode: string;
+      /** @enum {string} */
+      activityType: "lecture" | "tutorial" | "prac" | "test" | "exam";
+      activityCode: string;
+      /** @default 1 */
+      requiredSelections: number;
+      /** Format: date */
+      date?: string;
+      /** @enum {string} */
+      dayOfWeek?:
+        | "monday"
+        | "tuesday"
+        | "wednesday"
+        | "thursday"
+        | "friday"
+        | "saturday"
+        | "sunday";
+      /** @example 08:30 */
+      startTime: string;
+      /** @example 10:20 */
+      endTime: string;
+      /** @default [] */
+      venues: components["schemas"]["SchedulingVenueDto"][];
+    };
+    SchedulingProblemDto: {
+      events: components["schemas"]["SchedulingEventDto"][];
+    };
+    SolverInputDto: {
+      schedulingProblem: components["schemas"]["SchedulingProblemDto"];
+      preferences: components["schemas"]["SolverPreferencesDto"];
+    };
+    SolverJobResponseDto: {
+      /** @example solve-job-123 */
+      jobId: string;
+      /** @enum {string} */
+      solveMode: "feasibility" | "optimization";
+      /** @enum {string} */
+      requestedEngine?: "auto" | "cp-sat" | "ga";
+      /** @enum {string} */
+      status: "queued" | "completed" | "failed";
+      result?: components["schemas"]["SolverResultDto"];
+      error?: components["schemas"]["WorkerCallbackErrorDto"];
+      /** @example 2026-07-13T10:15:30.000Z */
+      createdAt: string;
+      /** @example 2026-07-13T10:15:45.000Z */
+      updatedAt: string;
+      /** @example 2026-07-13T10:15:45.000Z */
+      completedAt?: string;
+      /** @example 2026-07-13T10:15:45.000Z */
+      failedAt?: string;
+    };
+    SolverCallbackDto: {
+      /** @enum {string} */
+      status: "completed" | "failed";
+      /** @description A valid timetable solution and its soft-heuristic scores. */
+      result?: components["schemas"]["SolverResultDto"];
+      error?: components["schemas"]["WorkerCallbackErrorDto"];
+    };
+    CreateAttendanceDto: {
+      /**
+       * Format: uuid
+       * @description Unique identifier for an event
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      eventID: string;
+      /**
+       * @description Date of event for which attendance is recorded
+       * @example yyyy-mm-dd
+       */
+      eventDate: string;
+      /**
+       * @description Is the user attending this event or not
+       * @example ATTENDING
+       * @enum {string}
+       */
+      state: "ATTENDING" | "NOT_ATTENDING";
+    };
+    AttendanceSingleResponse: {
+      /**
+       * Format: uuid
+       * @description Unique identifier for an event
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      eventID: string;
+      /**
+       * @description Date of event for which attendance is recorded
+       * @example yyyy-mm-dd
+       */
+      eventDate: string;
+      /**
+       * @description Is the user attending this event or not
+       * @example ATTENDING
+       * @enum {string}
+       */
+      state: "ATTENDING" | "NOT_ATTENDING";
+      /**
+       * Format: uuid
+       * @description Unique identifier for an EventAttendance record
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      AttendanceID: string;
+    };
+    AttendanceListResponse: {
+      /** @description List of attendance records */
+      attendanceList: components["schemas"]["AttendanceSingleResponse"][];
+    };
+    UpdateAttendanceDto: {
+      /**
+       * @description Date of event for which attendance is recorded
+       * @example yyyy-mm-dd
+       */
+      eventDate?: string;
+      /**
+       * @description Is the user attending this event or not
+       * @example ATTENDING
+       * @enum {string}
+       */
+      state?: "ATTENDING" | "NOT_ATTENDING";
+    };
+    deleteAttendanceResponse: {
+      /**
+       * @description successfully deleted or not
+       * @example true
+       */
+      success: boolean;
     };
   };
   responses: never;
@@ -917,7 +2476,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthEnvelopeDto"];
         };
       };
       /** @description Invalid email format or password too weak (min 8 characters) */
@@ -926,7 +2485,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
       /** @description Email already registered */
@@ -935,7 +2494,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
       /** @description Rate limited - max 100 requests per 60 seconds */
@@ -943,7 +2502,9 @@ export interface operations {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          "application/json": components["schemas"]["AuthErrorDto"];
+        };
       };
     };
   };
@@ -966,7 +2527,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthEnvelopeDto"];
         };
       };
       /** @description Email not verified - must verify before signing in */
@@ -975,7 +2536,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
       /** @description Invalid email or password */
@@ -984,7 +2545,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
       /** @description Rate limited */
@@ -992,7 +2553,9 @@ export interface operations {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          "application/json": components["schemas"]["AuthErrorDto"];
+        };
       };
     };
   };
@@ -1011,7 +2574,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthAcknowledgementDto"];
         };
       };
       /** @description No active session */
@@ -1020,7 +2583,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
     };
@@ -1034,22 +2597,13 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description Active session returned. Returns null if no session exists. */
+      /** @description Active session returned, or null if no session exists. */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
-        };
-      };
-      /** @description No active session */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthEnvelopeDto"] | null;
         };
       };
     };
@@ -1069,7 +2623,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthSessionDto"][];
         };
       };
       /** @description Unauthorized */
@@ -1078,7 +2632,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
     };
@@ -1102,7 +2656,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthAcknowledgementDto"];
         };
       };
       /** @description Session not found */
@@ -1111,7 +2665,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
       /** @description Unauthorized */
@@ -1120,7 +2674,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
     };
@@ -1140,7 +2694,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthAcknowledgementDto"];
         };
       };
       /** @description Email already verified */
@@ -1149,7 +2703,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
       /** @description Unauthorized */
@@ -1158,7 +2712,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
       /** @description Rate limited */
@@ -1166,7 +2720,9 @@ export interface operations {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          "application/json": components["schemas"]["AuthErrorDto"];
+        };
       };
     };
   };
@@ -1189,7 +2745,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthEnvelopeDto"];
         };
       };
       /** @description Invalid or expired verification code, or email not found */
@@ -1198,7 +2754,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
     };
@@ -1222,7 +2778,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthAcknowledgementDto"];
         };
       };
       /** @description Rate limited */
@@ -1230,7 +2786,9 @@ export interface operations {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          "application/json": components["schemas"]["AuthErrorDto"];
+        };
       };
     };
   };
@@ -1253,7 +2811,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthEnvelopeDto"];
         };
       };
       /** @description Invalid or expired reset token, or new password too weak */
@@ -1262,7 +2820,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
     };
@@ -1286,7 +2844,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthAcknowledgementDto"];
         };
       };
       /** @description Incorrect current password or new password too weak */
@@ -1295,7 +2853,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
       /** @description Unauthorized */
@@ -1304,7 +2862,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
     };
@@ -1313,9 +2871,9 @@ export interface operations {
     parameters: {
       query: {
         /** @description OAuth state parameter set by BetterAuth */
-        state: unknown;
+        state: string;
         /** @description Authorization code issued by Google */
-        code: unknown;
+        code: string;
       };
       header?: never;
       path?: never;
@@ -1336,7 +2894,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
     };
@@ -1360,7 +2918,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthEnvelopeDto"];
         };
       };
       /** @description Account already linked or invalid OAuth code */
@@ -1369,7 +2927,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
       /** @description Unauthorized */
@@ -1378,7 +2936,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
       /** @description The Google account email is already in use by another account */
@@ -1387,7 +2945,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
     };
@@ -1411,7 +2969,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthUserResponseDto"];
         };
       };
       /** @description Unauthorized */
@@ -1420,7 +2978,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
       /** @description Insufficient permissions (sys_admin required) */
@@ -1429,7 +2987,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
       /** @description Email already registered */
@@ -1438,7 +2996,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
     };
@@ -1462,7 +3020,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthEnvelopeDto"];
         };
       };
       /** @description Unauthorized */
@@ -1471,7 +3029,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
       /** @description Insufficient permissions (sys_admin required) */
@@ -1480,7 +3038,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
     };
@@ -1504,7 +3062,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthUserResponseDto"];
         };
       };
       /** @description Unauthorized */
@@ -1513,7 +3071,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
       /** @description Insufficient permissions (sys_admin required) */
@@ -1522,7 +3080,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
       /** @description User not found */
@@ -1531,7 +3089,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
     };
@@ -1555,7 +3113,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthUserResponseDto"];
         };
       };
       /** @description Unauthorized */
@@ -1564,7 +3122,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
       /** @description Insufficient permissions (sys_admin required) */
@@ -1573,7 +3131,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
       /** @description User not found */
@@ -1582,7 +3140,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
       /** @description New email already in use */
@@ -1591,7 +3149,31 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": unknown;
+          "application/json": components["schemas"]["AuthErrorDto"];
+        };
+      };
+    };
+  };
+  AuthController_selectUniversity: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SelectUniversityDto"];
+      };
+    };
+    responses: {
+      /** @description Selected university session returned. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AuthEnvelopeDto"];
         };
       };
     };
@@ -1630,9 +3212,20 @@ export interface operations {
       };
     };
   };
-  getModules: {
+  ModuleController_getAll: {
     parameters: {
-      query?: never;
+      query?: {
+        /** @description Filter by university ID - returns all modules across all courses in the university */
+        universityId?: string;
+        /** @description Filter by course ID - returns all modules in the course */
+        courseId?: string;
+        /** @description Filter by ModuleGrouping ID */
+        GroupID?: string;
+        /** @description Filter by code, makes use of wildcard search */
+        moduleCode?: string;
+        /** @description Choose to filter modules based of current user enrollments */
+        userEnrollment?: boolean;
+      };
       header?: never;
       path?: never;
       cookie?: never;
@@ -1648,8 +3241,15 @@ export interface operations {
           "application/json": components["schemas"]["ModuleListResponseDto"];
         };
       };
-      /** @description Invalid request */
+      /** @description Invalid request - at least one filter required */
       400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No modules found matching the filters */
+      404: {
         headers: {
           [name: string]: unknown;
         };
@@ -1676,7 +3276,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["SingleModuleResponseDto"];
+          "application/json": components["schemas"]["ModuleSingleResponseDto"];
         };
       };
       /** @description Missing or invalid module payload */
@@ -1686,7 +3286,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Module code already exists */
+      /** @description Module code already exists for course */
       409: {
         headers: {
           [name: string]: unknown;
@@ -1700,7 +3300,7 @@ export interface operations {
       query?: never;
       header?: never;
       path: {
-        moduleId: number;
+        moduleId: string;
       };
       cookie?: never;
     };
@@ -1712,7 +3312,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["SingleModuleResponseDto"];
+          "application/json": components["schemas"]["ModuleSingleResponseDto"];
         };
       };
       /** @description Invalid module ID */
@@ -1736,7 +3336,7 @@ export interface operations {
       query?: never;
       header?: never;
       path: {
-        moduleId: number;
+        moduleId: string;
       };
       cookie?: never;
     };
@@ -1772,7 +3372,7 @@ export interface operations {
       query?: never;
       header?: never;
       path: {
-        moduleId: number;
+        moduleId: string;
       };
       cookie?: never;
     };
@@ -1788,7 +3388,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["SingleModuleResponseDto"];
+          "application/json": components["schemas"]["ModuleSingleResponseDto"];
         };
       };
       /** @description Invalid update payload or module ID */
@@ -1805,8 +3405,678 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Duplicate module code detected */
+      /** @description Duplicate module code detected for course */
       409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  enrolStudentToModule: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        moduleId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Student successfully enrolled student into module */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["EnrolResponseDto"];
+        };
+      };
+      /** @description Unenrolled user from module */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["EnrolResponseDto"];
+        };
+      };
+      /** @description Module not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  addModulesToCourse: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        CourseID: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AddModulesToCourseDto"];
+      };
+    };
+    responses: {
+      /** @description Successfully populated modules to course */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AddModulesToCourseResponseDto"];
+        };
+      };
+      /**
+       * @description Modules specified in modules array not found
+       *
+       *     Course not found
+       */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  updateStyling: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        moduleId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ModuleStylingBodyDto"];
+      };
+    };
+    responses: {
+      /** @description Module styling updated successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ModuleStylingResponseDto"];
+        };
+      };
+      /** @description Module not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  createCourse: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateCourseDto"];
+      };
+    };
+    responses: {
+      /** @description Course created successfully */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CourseSingleResponseDto"];
+        };
+      };
+      /** @description Missing or invalid course payload */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Course already exists */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getCourses: {
+    parameters: {
+      query?: {
+        /** @description Filter by Degree */
+        Degree?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CourseFilters"];
+      };
+    };
+    responses: {
+      /** @description Courses returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CourseListResponseDto"];
+        };
+      };
+      /** @description No Courses found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getCourseById: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        CourseId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Course returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CourseSingleResponseDto"];
+        };
+      };
+      /** @description Invalid Course ID */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Course not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  deleteCourse: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        CourseId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Course deleted successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DeleteCourseResponseDto"];
+        };
+      };
+      /** @description Invalid Course ID */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Course not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  updateCourse: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        CourseId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateCourseDto"];
+      };
+    };
+    responses: {
+      /** @description Course updated successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CourseSingleResponseDto"];
+        };
+      };
+      /** @description Invalid update payload or CourseId */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Course not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getUniversities: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Universities returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["UniversityListResponseDto"];
+        };
+      };
+      /** @description No universities found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  UniversityController_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateUniversityDto"];
+      };
+    };
+    responses: {
+      /** @description University created successfully */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["UniversitySingleResponseDto"];
+        };
+      };
+      /** @description Missing or invalid university payload */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description University already exists */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getUniversityById: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        universityId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description University returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["UniversitySingleResponseDto"];
+        };
+      };
+      /** @description Invalid University ID */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description University not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  deleteUniversity: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        universityId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description University deleted successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DeleteUniversityResponseDto"];
+        };
+      };
+      /** @description Invalid university ID */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description University not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  updateUniversity: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        universityId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateUniversityDto"];
+      };
+    };
+    responses: {
+      /** @description University updated successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["UniversitySingleResponseDto"];
+        };
+      };
+      /** @description Invlaid update payload or universityId */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description University not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getUserRoleByUniID: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        universityId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Role returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["UserUniversityRoleResponseDto"];
+        };
+      };
+      /** @description Invalid University ID */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description University not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getAllApplications: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        universityID: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["GetRoleFilterDto"];
+      };
+    };
+    responses: {
+      /** @description Success */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["GetRolesDto"][];
+        };
+      };
+      /** @description Unauthorized */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  applyForUniverstiyRole: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description University ID and role to apply for */
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ApplyForUniRoleDto"];
+      };
+    };
+    responses: {
+      /** @description Role application successful */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["UniversitySingleResponseDto"];
+        };
+      };
+      /** @description Invalid request body or university does not exist */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description University not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description User already has this role at the university */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  approveUsersRole: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description University ID and User ID for user to approve */
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ApproveUsersRoleDto"];
+      };
+    };
+    responses: {
+      /** @description Role approval successful */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApprovedUserRoleResponse"];
+        };
+      };
+      /** @description Invalid request body or universityRole does not exist */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description UniversityRole not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description User already has an approved role */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  populateGroup: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        groupId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PopulateGroupBodyDto"];
+      };
+    };
+    responses: {
+      /** @description ModuleGrouping successfully populated with modules */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["GroupingSingleResponse"];
+        };
+      };
+      /** @description Invalid input */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Group not found */
+      404: {
         headers: {
           [name: string]: unknown;
         };
@@ -1816,7 +4086,9 @@ export interface operations {
   };
   getAllEvents: {
     parameters: {
-      query?: never;
+      query?: {
+        moduleId?: string;
+      };
       header?: never;
       path?: never;
       cookie?: never;
@@ -1867,7 +4139,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["EventResponseDto"];
+          "application/json": components["schemas"]["EventSingleResponseDto"];
         };
       };
       /** @description Missing or invalid event payload */
@@ -1905,7 +4177,7 @@ export interface operations {
       query?: never;
       header?: never;
       path: {
-        id: number;
+        eventId: string;
       };
       cookie?: never;
     };
@@ -1917,7 +4189,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["EventResponseDto"];
+          "application/json": components["schemas"]["EventSingleResponseDto"];
         };
       };
       /** @description Event not found */
@@ -1934,7 +4206,7 @@ export interface operations {
       query?: never;
       header?: never;
       path: {
-        id: number;
+        id: string;
       };
       cookie?: never;
     };
@@ -1984,7 +4256,7 @@ export interface operations {
       query?: never;
       header?: never;
       path: {
-        id: number;
+        id: string;
       };
       cookie?: never;
     };
@@ -2000,7 +4272,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["EventResponseDto"];
+          "application/json": components["schemas"]["EventSingleResponseDto"];
         };
       };
       /** @description Missing or invalid update payload */
@@ -2118,7 +4390,7 @@ export interface operations {
       header?: never;
       path: {
         /** @description Timetable ID */
-        id: number;
+        id: string;
       };
       cookie?: never;
     };
@@ -2155,7 +4427,7 @@ export interface operations {
       header?: never;
       path: {
         /** @description Timetable ID */
-        id: number;
+        id: string;
       };
       cookie?: never;
     };
@@ -2199,7 +4471,7 @@ export interface operations {
       header?: never;
       path: {
         /** @description Timetable ID */
-        id: number;
+        id: string;
       };
       cookie?: never;
     };
@@ -2245,6 +4517,575 @@ export interface operations {
           [name: string]: unknown;
         };
         content?: never;
+      };
+    };
+  };
+  BuilderController_getAll: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Modules returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ModuleListResponseDto"];
+        };
+      };
+      /** @description Invalid request - at least one filter required */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No modules found matching the filters */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  BuilderController_createModule: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateBuilderModuleDto"];
+      };
+    };
+    responses: {
+      /** @description Module created successfully */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ModuleSingleResponseDto"];
+        };
+      };
+      /** @description Missing or invalid module payload */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Module code already exists for course */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  "builder-getModuleById": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        moduleId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Module returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ModuleSingleResponseDto"];
+        };
+      };
+      /** @description Invalid module ID */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Module not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  "builder-deleteModule": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        moduleId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Module deleted successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DeleteModuleResponseDto"];
+        };
+      };
+      /** @description Invalid module ID */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Module not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  "builder-updateModule": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        moduleId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateModuleDto"];
+      };
+    };
+    responses: {
+      /** @description Module updated successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ModuleSingleResponseDto"];
+        };
+      };
+      /** @description Invalid update payload or module ID */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Module not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Duplicate module code detected for course */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  PdfParserController_lookupDuplicate: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": {
+          /** Format: uuid */
+          universityId: string;
+          /** @default up */
+          adapterKey: string;
+          /** @default pdf-stream-payload-sha256-v1 */
+          fingerprintAlgorithm: string;
+          pdfStreamHash: string;
+          streamCount?: number;
+        };
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PdfParserLookupResponseDto"];
+        };
+      };
+    };
+  };
+  PdfParserController_uploadAndEnqueue: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "multipart/form-data": {
+          /**
+           * Format: binary
+           * @description Timetable PDF to parse.
+           */
+          file: string;
+          /**
+           * @description Parser adapter key. Only "up" is currently supported.
+           * @default up
+           */
+          adapterKey?: string;
+          /**
+           * Format: uuid
+           * @description Selected university for duplicate scoping.
+           */
+          universityId: string;
+          /**
+           * @description Client-computed fingerprint algorithm, if available.
+           * @default pdf-stream-payload-sha256-v1
+           */
+          fingerprintAlgorithm?: string;
+          /** @description Client-computed PDF stream hash for diagnostics only. */
+          clientPdfStreamHash?: string;
+          /** @description Client-observed PDF stream count for diagnostics only. */
+          streamCount?: number;
+        };
+      };
+    };
+    responses: {
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PdfParserUploadResponseDto"];
+        };
+      };
+    };
+  };
+  PdfParserController_getJob: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        jobId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PdfParserJobResponseDto"];
+        };
+      };
+    };
+  };
+  PdfParserController_getJobResult: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        jobId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PdfParserResultDto"];
+        };
+      };
+    };
+  };
+  PdfParserController_receiveCallback: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        jobId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["PdfParserCallbackDto"];
+      };
+    };
+    responses: {
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AcceptedJobResponseDto"];
+        };
+      };
+    };
+  };
+  SolverController_submitAndEnqueue: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["TimetableSolveJobDto"];
+      };
+    };
+    responses: {
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SolverSubmissionResponseDto"];
+        };
+      };
+    };
+  };
+  SolverController_getInput: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        jobId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SolverInputDto"];
+        };
+      };
+    };
+  };
+  SolverController_getJob: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        jobId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SolverJobResponseDto"];
+        };
+      };
+    };
+  };
+  SolverController_getJobResult: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        jobId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SolverResultDto"];
+        };
+      };
+    };
+  };
+  SolverController_receiveCallback: {
+    parameters: {
+      query: {
+        attemptToken: string;
+      };
+      header?: never;
+      path: {
+        jobId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SolverCallbackDto"];
+      };
+    };
+    responses: {
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AcceptedJobResponseDto"];
+        };
+      };
+    };
+  };
+  getAllAttendance: {
+    parameters: {
+      query?: {
+        /** @description Unique identifier for an event */
+        eventID?: string;
+        /** @description Date of event for which attendance is recorded */
+        eventDate?: string;
+        /** @description Is the user attending this event or not */
+        state?: "ATTENDING" | "NOT_ATTENDING";
+        /** @description Filter by current userId together with other filters */
+        AlsoFilterByUser?: boolean;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AttendanceListResponse"];
+        };
+      };
+    };
+  };
+  createAttendance: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateAttendanceDto"];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AttendanceSingleResponse"];
+        };
+      };
+    };
+  };
+  getAttendanceById: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        attendanceId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AttendanceSingleResponse"];
+        };
+      };
+    };
+  };
+  deleteAttendance: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        attendanceId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["deleteAttendanceResponse"];
+        };
+      };
+    };
+  };
+  updateAttendance: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        attendanceId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateAttendanceDto"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AttendanceSingleResponse"];
+        };
       };
     };
   };

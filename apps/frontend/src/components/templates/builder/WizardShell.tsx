@@ -1,261 +1,50 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { WizardStepper } from "@/components/atoms/builder/WizardStepper";
 import { WizardFooter } from "@/components/atoms/builder/WizardFooter";
 import { ModulesStep } from "@/components/organisms/builder/ModulesStep";
 import { EventsStep } from "@/components/organisms/builder/EventsStep";
-import { GenerateStep } from "@/components/organisms/builder/GenerateStep";
-import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
-import {
-  createModulesBuilder,
-  getAllModulesBuilder,
-  deleteModulesById,
-  updateModulesBuilder,
-} from "@/app/builder/utils/modules/requestBuilders";
-import {
-  getAllEventsBuilder,
-  createEventsBuilder,
-  deleteEventById,
-  updateEventByID,
-  type EventResponse,
-} from "@/app/builder/utils/events/eventRequestBuilder";
-import { createTimeTableBuilder } from "@/app/builder/utils/timetables/TimeTableRequests";
 
-const Steps = [
-  { label: "Modules" },
-  { label: "Events" },
-  { label: "Generate" },
-];
+import { getAllModulesQ } from "./Queries/moduleQueries";
+import { useQuery } from "@tanstack/react-query";
+import { getAllEventsQ } from "./Queries/eventQueries";
 
-function generateId(): string {
-  const crypto = window.crypto;
-  const array = new Uint32Array(1);
-  crypto.getRandomValues(array);
-
-  return array[0].toString();
-}
+const Steps = [{ label: "Modules" }, { label: "Events" }];
 
 export function WizardShell() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const editId = searchParams.get("editId");
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
-  const [modules, setModules] = useState<ModuleResponseDto[]>([]);
-  const [events, setEvents] = useState<EventResponse[]>([]);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [modulesTrigger, setModulesTrigger] = useState(0);
-  const [eventsTrigger, setEventsTrigger] = useState(0);
 
-  async function handleModuleAdd() {
-    try {
-      const nextNum = modules.length + 1;
-      const builder = new createModulesBuilder();
-      await builder.send({
-        body: {
-          code: `MOD-${nextNum}`,
-          name: `Module ${nextNum}`,
-          styling: "#3B82F6",
-        },
-      });
-      setModulesTrigger((prev) => prev + 1);
-    } catch (error) {
-      console.error("Failed to create module:", error);
-    }
-  }
+  const {
+    data: modules = [],
+    isLoading: modLoading,
+    isError: modError,
+  } = useQuery(getAllModulesQ());
+  const { data: Allevents = [] } = useQuery(getAllEventsQ());
+  const events = Allevents.filter(
+    (event) =>
+      modules.some((mod) => mod.moduleID === event.eventCriteria.moduleId) ||
+      event.eventCriteria.moduleId === "TEMP",
+  );
 
-  async function handleModuleUpdate(
-    id: number,
-    field: keyof Omit<ModuleResponseDto, "moduleID" | "userID"> | "confirm",
-    value: string,
-  ) {
-    if (field === "confirm") {
-      const targetModule = modules.find((m) => m.moduleID === id);
-      if (!targetModule) return;
-
-      try {
-        const builder = new updateModulesBuilder();
-        await builder.send({
-          paths: { moduleId: id },
-          body: {
-            code: targetModule.moduleCode,
-            name: targetModule.moduleName,
-            styling: targetModule.styling || undefined,
-          },
-        });
-        setModulesTrigger((prev) => prev + 1);
-      } catch (error) {
-        console.error("Failed to update module:", error);
-      }
-      return;
-    }
-
-    setModules((prev) =>
-      prev.map((m) => {
-        if (m.moduleID === id) {
-          return { ...m, [field]: value };
-        }
-        return m;
-      }),
-    );
-  }
-
-  async function handleModuleRemove(id: number) {
-    try {
-      const builder = new deleteModulesById();
-      await builder.send({
-        paths: { moduleId: id },
-      });
-      setModulesTrigger((prev) => prev + 1);
-    } catch (error) {
-      console.error("Failed to delete module:", error);
-    }
-  }
-
-  function handleEventAdd() {
-    const newEventId = Number(generateId());
-    setEvents((prev) => [
-      ...prev,
-      {
-        event: {
-          eventID: newEventId,
-          userID: "",
-          name: "",
-          code: "",
-          eventCriteria: {
-            day: "",
-            startTime: "",
-            endTime: "",
-            type: "lecture",
-            moduleCode: "",
-            venue: "",
-          },
-          isRecurring: false,
-        },
-      },
-    ]);
-  }
-
-  async function handleEventUpdate(
-    id: number,
-    field: string,
-    value: string | boolean,
-  ) {
-    if (field === "confirm") {
-      const targetEvent = events.find((e) => e.event.eventID === id);
-      if (!targetEvent) return;
-
-      try {
-        const payload = {
-          name: targetEvent.event.name,
-          code: targetEvent.event.code,
-          eventCriteria: {
-            day: targetEvent.event.eventCriteria.day,
-            startTime: targetEvent.event.eventCriteria.startTime,
-            endTime: targetEvent.event.eventCriteria.endTime,
-            type: targetEvent.event.eventCriteria.type || "lecture",
-            moduleCode: targetEvent.event.eventCriteria.moduleCode,
-            venue: targetEvent.event.eventCriteria.venue,
-          },
-          isRecurring: targetEvent.event.isRecurring || false,
-        };
-
-        if (!targetEvent.event.userID) {
-          const builder = new createEventsBuilder();
-          await builder.send({ body: payload });
-        } else {
-          const builder = new updateEventByID();
-          await builder.send({
-            paths: { id },
-            body: payload,
-          });
-        }
-        setEventsTrigger((prev) => prev + 1);
-      } catch (error) {
-        console.error("Failed to update/create event:", error);
-      }
-      return;
-    }
-
-    setEvents((prev) =>
-      prev.map((e) => {
-        if (e.event.eventID === id) {
-          if (field === "name" || field === "code") {
-            return {
-              ...e,
-              event: {
-                ...e.event,
-                [field]: value,
-              },
-            };
-          }
-
-          if (field === "moduleId") {
-            const selectedModule = modules.find(
-              (m) => m.moduleID === Number(value),
-            );
-            return {
-              ...e,
-              event: {
-                ...e.event,
-                eventCriteria: {
-                  ...e.event.eventCriteria,
-                  moduleCode: selectedModule?.moduleCode || "",
-                },
-              },
-              lecture: {
-                ...e.lecture,
-                lectureID: e.lecture?.lectureID || 0,
-                eventID: id,
-                moduleID: Number(value),
-              },
-            };
-          }
-
-          const fieldMap: Record<string, string> = {
-            date: "day",
-          };
-          const criteriaField = fieldMap[field] || field;
-
-          return {
-            ...e,
-            event: {
-              ...e.event,
-              eventCriteria: {
-                ...e.event.eventCriteria,
-                [criteriaField]: value,
-              },
-            },
-          };
-        }
-        return e;
-      }),
-    );
-  }
-
-  async function handleEventRemove(id: number) {
-    const targetEvent = events.find((e) => e.event.eventID === id);
-    if (targetEvent && !targetEvent.event.userID) {
-      setEvents((prev) => prev.filter((e) => e.event.eventID !== id));
-      return;
-    }
-
-    try {
-      const builder = new deleteEventById();
-      await builder.send({
-        paths: { id },
-      });
-      setEventsTrigger((prev) => prev + 1);
-    } catch (error) {
-      console.error("Failed to delete event:", error);
-    }
-  }
+  const [isInitialLoading, setIsInitialLoading] = useState(!!editId);
 
   function handleStepClick(index: number) {
     setCurrentStep(index);
   }
 
   function handleNext() {
+    if (currentStep === Steps.length - 1) {
+      //how we track between pages
+      router.push("/schedules?action=new");
+      return;
+    }
+
     if (currentStep < Steps.length - 1) {
       setCompletedSteps((prev) => {
         if (prev.includes(currentStep)) {
@@ -273,31 +62,9 @@ export function WizardShell() {
     }
   }
 
-  async function handleGenerate(name: string) {
-    setIsGenerating(true);
-    try {
-      const confirmedEventIds = events
-        .filter((e) => e.event.userID)
-        .map((e) => String(e.event.eventID));
-
-      const builder = new createTimeTableBuilder();
-      await builder.send({
-        body: {
-          timetableName: name || "Generated Schedule",
-          eventIds: confirmedEventIds,
-        },
-      });
-
-      router.push("/schedules");
-    } catch (error) {
-      console.error("Failed to generate timetable:", error);
-      setIsGenerating(false);
-    }
-  }
-
   function getNextLabel() {
     if (currentStep === 0) return "Next: Events";
-    if (currentStep === 1) return "Next: Generate";
+    if (currentStep === 1) return "Create Timetable";
     return "Generate";
   }
 
@@ -306,10 +73,11 @@ export function WizardShell() {
     return handleBack;
   }
 
+  /*
   function isNextDisabled() {
     if (currentStep === 0) {
       const hasValidModule = modules.some(
-        (m) => m.moduleCode && m.moduleName && m.styling,
+        (m) => m.moduleCode && m.moduleName //&& m.styling,
       );
       return !hasValidModule;
     }
@@ -331,66 +99,40 @@ export function WizardShell() {
     }
     return false;
   }
-  useEffect(() => {
-    if (currentStep === 0) {
-      const fetchModules = async () => {
-        try {
-          const builder = new getAllModulesBuilder();
-          const response = await builder.send({});
-          setModules(response.modules);
-        } catch (error) {
-          console.error("Failed to fetch modules:", error);
-        }
-      };
-      fetchModules();
-    }
-  }, [currentStep, modulesTrigger]);
-
-  useEffect(() => {
-    if (currentStep === 1) {
-      const fetchEvents = async () => {
-        try {
-          const builder = new getAllEventsBuilder();
-          const response = await builder.send({});
-          setEvents(response.events);
-        } catch (error) {
-          console.error("Failed to fetch events:", error);
-        }
-      };
-      fetchEvents();
-    }
-  }, [currentStep, eventsTrigger]);
+  */
 
   function renderStep() {
     if (currentStep === 0) {
-      return (
-        <ModulesStep
-          modules={modules}
-          onAdd={handleModuleAdd}
-          onUpdate={handleModuleUpdate}
-          onRemove={handleModuleRemove}
-        />
-      );
+      return <ModulesStep modules={modules} />;
     }
     if (currentStep === 1) {
       return (
         <EventsStep
           events={events}
           modules={modules}
-          onAdd={handleEventAdd}
-          onUpdate={handleEventUpdate}
-          onRemove={handleEventRemove}
           onGoToModules={() => setCurrentStep(0)}
         />
       );
     }
     return (
-      <GenerateStep
-        modules={modules}
-        events={events}
-        onGenerate={handleGenerate}
-        isGenerating={isGenerating}
-      />
+      <>
+        <p
+          onClick={() => {
+            router.push("/schedules");
+          }}
+        >
+          Generate step moved to schedules (temp message, this should not be
+          visible)
+        </p>
+      </>
+    );
+  }
+
+  if (isInitialLoading) {
+    return (
+      <div className="flex items-center justify-center p-20 text-[var(--text-secondary)]">
+        Loading timetable
+      </div>
     );
   }
 
@@ -413,7 +155,7 @@ export function WizardShell() {
         onBack={getBackHandler()}
         onNext={handleNext}
         nextLabel={getNextLabel()}
-        nextDisabled={isNextDisabled()}
+        nextDisabled={false}
       />
     </div>
   );

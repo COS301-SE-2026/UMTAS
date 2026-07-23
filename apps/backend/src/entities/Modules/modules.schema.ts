@@ -1,10 +1,71 @@
-import { pgTable, serial, text, uuid, varchar } from 'drizzle-orm/pg-core';
+import {
+  boolean,
+  jsonb,
+  pgTable,
+  text,
+  uuid,
+  varchar,
+  primaryKey,
+  uniqueIndex,
+} from 'drizzle-orm/pg-core';
+import { usersTable } from '../auth';
 
-export const modules = pgTable('Modules', {
-  moduleID: serial('moduleID').primaryKey(),
-  moduleCode: varchar('moduleCode', { length: 10 }).notNull(),
-  moduleName: varchar('moduleName', { length: 256 }).notNull(),
-  moduleDescription: text('moduleDescription'),
-  styling: varchar('styling', { length: 32 }),
-  userID: uuid('userID').notNull(),
-});
+export const modules = pgTable(
+  'Modules',
+  {
+    moduleID: uuid('moduleID').defaultRandom().primaryKey(),
+    moduleCode: varchar('moduleCode', { length: 10 }).notNull(),
+    moduleName: varchar('moduleName', { length: 256 }).notNull(),
+    moduleDescription: text('moduleDescription'),
+    validated: boolean('validated').notNull().default(true),
+  },
+  (table) => ({
+    moduleCodeUnique: uniqueIndex('modules_module_code_unique').on(
+      table.moduleCode,
+    ),
+  }),
+);
+
+export const ModuleEnrollment = pgTable(
+  'ModuleEnrollment',
+  {
+    ModuleID: uuid('ModuleID')
+      .references(() => modules.moduleID, { onDelete: 'cascade' })
+      .notNull(),
+    UserID: uuid('UserID')
+      .references(() => usersTable.id, { onDelete: 'cascade' })
+      .notNull(),
+  },
+  (table) => [primaryKey({ columns: [table.ModuleID, table.UserID] })],
+);
+
+export const ModuleTeaches = pgTable(
+  'ModuleTeaches',
+  {
+    ModuleID: uuid('ModuleID')
+      .references(() => modules.moduleID, { onDelete: 'cascade' })
+      .notNull(),
+    UserID: uuid('UserID')
+      .references(() => usersTable.id, { onDelete: 'cascade' })
+      .notNull(),
+  },
+  (table) => [primaryKey({ columns: [table.ModuleID, table.UserID] })],
+);
+
+export const ModuleStyling = pgTable(
+  'ModuleStyling',
+  {
+    ModuleID: uuid('ModuleID')
+      .references(() => modules.moduleID, { onDelete: 'cascade' })
+      .notNull(),
+    //should belong to user not userTimetable
+    UserID: uuid('UserID').references(() => usersTable.id, {
+      onDelete: 'cascade',
+    }),
+    styling: jsonb('styling')
+      .notNull()
+      .$type<{ colour: string }>()
+      .default({ colour: '' }),
+  },
+  (table) => [primaryKey({ columns: [table.ModuleID, table.UserID] })],
+);

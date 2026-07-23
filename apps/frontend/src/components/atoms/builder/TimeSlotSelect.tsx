@@ -24,11 +24,12 @@ interface TimeSlotSelectProps {
   onRemove: () => void;
   error?: string;
   hideDaySelect?: boolean;
+  disabled?: boolean;
 }
 
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 
-const TIMES: string[] = [];
+export const TIMES: string[] = [];
 for (let h = 7; h <= 20; h++) {
   TIMES.push(`${String(h).padStart(2, "0")}:00`);
   if (h < 20) TIMES.push(`${String(h).padStart(2, "0")}:30`);
@@ -43,12 +44,15 @@ export function TimeSlotSelect({
   onRemove,
   error,
   hideDaySelect,
+  disabled,
 }: TimeSlotSelectProps) {
+  console.log(value);
   return (
     <div className="flex flex-col gap-1">
       <div className="flex flex-wrap items-center gap-1.5">
         {!hideDaySelect && (
           <Select
+            disabled={disabled == undefined ? false : disabled}
             value={value.day}
             onValueChange={(v) => onChange({ ...value, day: v })}
           >
@@ -70,6 +74,7 @@ export function TimeSlotSelect({
         )}
 
         <Select
+          disabled={disabled == undefined ? false : disabled}
           value={value.startTime}
           onValueChange={(v) => onChange({ ...value, startTime: v })}
         >
@@ -92,6 +97,7 @@ export function TimeSlotSelect({
         <span className="text-xs text-[var(--text-secondary)]">–</span>
 
         <Select
+          disabled={disabled == undefined ? false : disabled}
           value={value.endTime}
           onValueChange={(v) => onChange({ ...value, endTime: v })}
         >

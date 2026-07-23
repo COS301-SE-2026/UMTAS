@@ -1,12 +1,14 @@
 "use client";
 
 import React, { Suspense, useState, useEffect } from "react";
+// import { Joyride } from "react-joyride";
 import { useRouter } from "next/navigation";
 import {
   BookOpen,
   SlidersHorizontal,
   Download,
   ExternalLink,
+  X,
 } from "lucide-react";
 import { useSession } from "@/../utilities/auth-client";
 import { Card, CardContent } from "@/components/atoms/baseShadcn/card";
@@ -15,7 +17,42 @@ import { Badge } from "@/components/atoms/baseShadcn/badge";
 import { Button } from "@/components/atoms/baseShadcn/button";
 import { PageSkeleton } from "@/components/atoms/nav/PageSkeleton";
 import Link from "next/link";
+import Popup from "@/components/atoms/utility/floatContainer";
+import ChooseInstitutePage from "../choose-institute/page";
+import { ChooseInstituteTemplate } from "@/components/templates/choose-institute/chooseInstituteTemplate";
+// import PageTutorial from "@/components/organisms/nav/Tutorial";
+// import { Step } from "react-joyride";
 
+import Tutorial from "@/components/organisms/nav/Tutorial";
+const steps = [
+  {
+    target: "#theme-toggle-btn",
+    content: "Click here to toggle between light and dark mode.",
+  },
+  {
+    target: "#build-schedule-btn",
+    content: "Click here to start building your schedule.",
+  },
+  {
+    target: "#documentation-link",
+    content: "Click here to view the UMTAS documentation.",
+  },
+
+  {
+    target: "#brand-style-link",
+    content: "Click here to view the UMTAS brand style guide.",
+  },
+
+  {
+    target: "#github-link",
+    content: "Click here to view the UMTAS GitHub repository.",
+  },
+
+  {
+    target: "#help-command-palette-btn",
+    content: "Click here to access Tutorials/Help Menu/FAQ.",
+  },
+];
 const Features = [
   {
     icon: BookOpen,
@@ -35,9 +72,21 @@ const Features = [
 ];
 
 const Links = [
-  { label: "Documentation", href: "https://cos301-se-2026.github.io/UMTAS/" },
-  { label: "Brand Style", href: "https://brand.capstone-vigil.dns.net.za/" },
-  { label: "GitHub", href: "https://github.com/COS301-SE-2026/UMTAS" },
+  {
+    label: "Documentation",
+    href: "https://cos301-se-2026.github.io/UMTAS/",
+    id: "documentation-link",
+  },
+  {
+    label: "Brand Style",
+    href: "/brand-style",
+    id: "brand-style-link",
+  },
+  {
+    label: "GitHub",
+    href: "https://github.com/COS301-SE-2026/UMTAS",
+    id: "github-link",
+  },
 ];
 
 const typeLines = [
@@ -127,7 +176,7 @@ function DashboardContent() {
               University Modular Timetable &amp; Analytics System
             </Badge>
 
-            <h1 className="text-4xl lg:text-5xl font-semibold text-[var(--text-primary)] leading-[1.1] suppressHydrationWarning">
+            <h1 className="text-4xl lg:text-5xl font-semibold text-[var(--text-primary)] leading-[1.1] suppressHydrationWarning={true}">
               {renderGreeting()}
             </h1>
 
@@ -139,6 +188,7 @@ function DashboardContent() {
 
             <div className="pt-1">
               <Button
+                id="build-schedule-btn"
                 type="button"
                 onClick={handleBuild}
                 size="default"
@@ -191,6 +241,7 @@ function DashboardContent() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {Links.map((link) => (
               <Link
+                id={link.id}
                 key={link.label}
                 href={link.href}
                 target="_blank"
@@ -213,7 +264,7 @@ function DashboardContent() {
       <div className="py-4 bg-[var(--bg-base)] border-t border-[var(--border)] w-full">
         <div className="max-w-6xl mx-auto px-6 lg:px-8 flex items-center justify-between">
           <p className="text-[10px] lg:text-xs uppercase tracking-[0.06em] text-[var(--text-disabled)] font-medium">
-            Demo 1 - Team Vigil
+            Team Vigil
           </p>
           <Separator
             orientation="vertical"
@@ -229,9 +280,23 @@ function DashboardContent() {
 }
 
 export default function DashboardPage() {
+  const [showSelect, setShowSelect] = useState(true);
   return (
-    <Suspense fallback={<PageSkeleton rows={3} />}>
-      <DashboardContent />
-    </Suspense>
+    <>
+      <Suspense fallback={<PageSkeleton rows={3} />}>
+        <DashboardContent />
+        <Tutorial steps={steps} wait={true} />
+      </Suspense>
+      {showSelect && (
+        <Popup>
+          <div className="w-full md:w-1/3 text-center bg-card  p-5 border rounded-2xl">
+            <ChooseInstituteTemplate />
+            <div className="w-full mt-5 items-center justify-center flex">
+              <Button onClick={() => setShowSelect(false)}>Close</Button>
+            </div>
+          </div>
+        </Popup>
+      )}
+    </>
   );
 }

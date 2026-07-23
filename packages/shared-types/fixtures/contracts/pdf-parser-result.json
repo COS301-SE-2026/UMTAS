@@ -1,0 +1,41 @@
+{
+  "modules": [
+    {
+      "code": "COS101",
+      "name": "Computer Science 101",
+      "metadata": { "source": "canonical-fixture-v1" },
+      "warnings": []
+    }
+  ],
+  "events": [
+    {
+      "moduleCode": "COS101",
+      "activityType": "lecture",
+      "activityCode": "L1",
+      "title": "COS101 Lecture",
+      "day": "monday",
+      "date": null,
+      "startTime": "08:30",
+      "endTime": "09:20",
+      "venues": ["IT 2-26"],
+      "isRecurring": true,
+      "metadata": {},
+      "warnings": []
+    },
+    {
+      "moduleCode": "COS101",
+      "activityType": "exam",
+      "activityCode": "E1",
+      "title": "COS101 Exam",
+      "day": null,
+      "date": "2026-11-10",
+      "startTime": "09:00",
+      "endTime": "11:00",
+      "venues": ["Exam Hall A"],
+      "isRecurring": false,
+      "metadata": {},
+      "warnings": []
+    }
+  ],
+  "warnings": []
+}

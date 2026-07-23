@@ -61,3 +61,5 @@ export const sysAdmin = ac.newRole({
   parseJob: ['create', 'view'],
   university: ['create', 'update', 'view'],
 });
+
+export const user = ac.newRole({ timetable: ['view'] });

@@ -1,232 +1,148 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
-  IsOptional,
-  IsEnum,
-  IsString,
-  ValidateNested,
-  IsBoolean,
-} from 'class-validator';
+  ApiProperty,
+  ApiPropertyOptional,
+  OmitType,
+  PartialType,
+  PickType,
+} from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { Length } from 'class-validator';
+import {
+  IsBoolean,
+  IsDefined,
+  IsEnum,
+  IsISO8601,
+  IsOptional,
+  IsString,
+  IsUUID,
+  Length,
+  ValidateIf,
+  ValidateNested,
+} from 'class-validator';
+import { ActivityTypeSchema } from 'shared-types';
+import { EventSource, type DayOfWeek } from './event.types';
 
-export enum EventType {
-  LECTURE = 'lecture',
-} //event type
+const DAY_OF_WEEK: DayOfWeek[] = [
+  'monday',
+  'tuesday',
+  'wednesday',
+  'thursday',
+  'friday',
+  'saturday',
+  'sunday',
+];
 
 export class EventCriteriaDto {
-  @ApiPropertyOptional({
-    enum: EventType,
-    example: EventType.LECTURE,
-  })
-  @IsOptional()
-  @IsEnum(EventType)
-  type?: EventType | null;
-
-  @ApiProperty({ example: 'Monday' })
-  @IsString()
-  day!: string;
-
-  @ApiProperty({ example: '08:30' })
-  @IsString()
-  startTime!: string;
-
-  @ApiProperty({ example: '10:20' })
-  @IsString()
-  endTime!: string;
-
-  @ApiPropertyOptional({ example: 'COS301' })
-  @IsOptional()
-  @IsString()
-  @Length(6, 10)
-  moduleCode?: string;
-
-  @ApiPropertyOptional({ example: 'IT 2-26' })
-  @IsOptional()
-  @IsString()
-  venue?: string;
-} //EventCriteriaDto
-
-export class CreateEventDto {
-  @ApiPropertyOptional({
-    example: 'event name',
-  })
-  @IsOptional()
-  @IsString()
-  @Length(1, 32)
-  name?: string;
+  @ApiProperty({ enum: EventSource })
+  @IsEnum(EventSource)
+  eventSource!: EventSource;
 
   @ApiPropertyOptional({
-    example: 'lec1',
+    example: '2026-02-17',
+    description: 'Required when the event is not recurring.',
   })
   @IsOptional()
-  @IsString()
-  @Length(1, 10)
-  code?: string;
+  @IsISO8601({ strict: true })
+  @ValidateIf((value: EventCriteriaDto) => !value.dayOfWeek)
+  date?: string;
 
-  @ApiProperty({
-    type: EventCriteriaDto,
-    description: 'Criteria for an event',
+  @ApiPropertyOptional({
+    enum: DAY_OF_WEEK,
+    description: 'Required when the event is recurring.',
   })
+  @IsOptional()
+  @IsEnum(DAY_OF_WEEK)
+  @ValidateIf((value: EventCriteriaDto) => !value.date)
+  dayOfWeek?: DayOfWeek;
+
+  @ApiProperty({ example: '08:30' }) @IsString() startTime!: string;
+  @ApiProperty({ example: '10:20' }) @IsString() endTime!: string;
+  @ApiPropertyOptional() @IsOptional() @IsUUID() moduleId?: string;
+}
+
+export class UpdateEventCriteriaDto extends PartialType(EventCriteriaDto) {}
+
+export class VenueDto {
+  @ApiProperty() @IsUUID() venueId!: string;
+  @ApiProperty() @IsString() venueName!: string;
+}
+
+export class EventDto {
+  @ApiProperty() @IsUUID() eventId!: string;
+  @ApiProperty({ type: EventCriteriaDto })
   @ValidateNested()
   @Type(() => EventCriteriaDto)
   eventCriteria!: EventCriteriaDto;
-
-  @ApiPropertyOptional({ example: false, default: false, type: Boolean })
-  @IsOptional()
-  @IsBoolean()
-  isRecurring?: boolean;
-} //CreateEventDto
-
-export class EventDto {
-  @ApiProperty({ example: 1 })
-  eventID!: number;
-
-  @ApiProperty({ example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' })
-  userID!: string;
-
-  @ApiPropertyOptional({
-    example: 'event name',
-  })
+  @ApiPropertyOptional()
   @IsOptional()
   @IsString()
   @Length(1, 32)
-  name?: string;
-
-  @ApiPropertyOptional({
-    example: 'lec1',
-  })
+  eventName?: string;
+  @ApiPropertyOptional({ enum: ActivityTypeSchema.options })
+  @IsOptional()
+  @IsEnum(ActivityTypeSchema.options)
+  activityType?: (typeof ActivityTypeSchema.options)[number];
+  @ApiPropertyOptional()
   @IsOptional()
   @IsString()
   @Length(1, 10)
-  code?: string;
-
-  @ApiProperty({ type: EventCriteriaDto })
-  eventCriteria!: EventCriteriaDto;
-
-  @ApiPropertyOptional({ example: true, type: Boolean })
+  activityCode?: string | null;
+  @ApiPropertyOptional({ type: [VenueDto] })
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => VenueDto)
+  venues?: VenueDto[];
+  @ApiPropertyOptional({ type: Boolean })
   @IsOptional()
   @IsBoolean()
   isRecurring?: boolean;
-} //EventDto
+  @ApiPropertyOptional({ type: Boolean })
+  @IsOptional()
+  @IsBoolean()
+  validated?: boolean;
+}
 
-export class LectureResponseDto {
-  @ApiProperty({ example: 1 })
-  lectureID!: number;
-
-  @ApiProperty({ example: 12, nullable: true, type: Number })
-  moduleID!: number | null;
-
-  @ApiProperty({ example: 1, nullable: true, type: Number })
-  eventID!: number | null;
-
-  @ApiPropertyOptional({ example: 'IT 2-26', nullable: true })
-  venue?: string | null;
-} //LectureResponseDto
-
-export class UpdateEventCriteriaDto {
+export class CreateEventDto extends PickType(EventDto, [
+  'eventName',
+  'activityCode',
+  'eventCriteria',
+  'venues',
+  'isRecurring',
+  'validated',
+] as const) {
   @ApiPropertyOptional({
-    enum: EventType,
-    example: EventType.LECTURE,
+    enum: ActivityTypeSchema.options,
+    description: 'Required when eventCriteria.moduleId is provided.',
   })
-  @IsOptional()
-  @IsEnum(EventType)
-  type?: EventType;
-
-  @ApiPropertyOptional({ example: 'Tuesday' })
-  @IsOptional()
-  @IsString()
-  day?: string;
-
-  @ApiPropertyOptional({ example: '10:30' })
-  @IsOptional()
-  @IsString()
-  startTime?: string;
-
-  @ApiPropertyOptional({ example: '12:20' })
-  @IsOptional()
-  @IsString()
-  endTime?: string;
-
-  @ApiPropertyOptional({ example: 'COS301' })
-  @IsOptional()
-  @IsString()
-  moduleCode?: string;
-
-  @ApiPropertyOptional({ example: 'IT 2-26' })
-  @IsOptional()
-  @IsString()
-  venue?: string;
-
-  // @ApiPropertyOptional({ example: true })
-  // @IsOptional()
-  // @IsBoolean()
-  // isRecurring?: boolean;
-} //udpateEventCriteria
-
-export class UpdateEventDto {
-  @ApiPropertyOptional({
-    example: 'event name',
-  })
-  @IsOptional()
-  @IsString()
-  @Length(1, 32)
-  name?: string;
-
-  @ApiPropertyOptional({
-    example: 'lec1',
-  })
-  @IsOptional()
-  @IsString()
-  @Length(1, 10)
-  code?: string;
-
-  @ApiPropertyOptional({
-    type: UpdateEventCriteriaDto,
-    description: 'Event update criteria',
-  })
+  @ValidateIf(
+    (value: CreateEventDto) =>
+      value.activityType !== undefined ||
+      value.eventCriteria?.moduleId !== undefined,
+  )
+  @IsDefined()
+  @IsEnum(ActivityTypeSchema.options)
+  activityType?: (typeof ActivityTypeSchema.options)[number];
+}
+export class UpdateEventDto extends PartialType(
+  OmitType(EventDto, ['eventId', 'eventCriteria', 'venues'] as const),
+) {
+  @ApiPropertyOptional({ type: UpdateEventCriteriaDto })
   @IsOptional()
   @ValidateNested()
   @Type(() => UpdateEventCriteriaDto)
   eventCriteria?: UpdateEventCriteriaDto;
-
-  @ApiPropertyOptional({ example: false, default: false, type: Boolean })
-  @IsOptional()
-  @IsBoolean()
-  isRecurring?: boolean;
-} //Update event
-
-export class EventResponseDto {
-  @ApiProperty({
-    example: {
-      eventID: 1,
-      userID: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
-      name: 'eventnameidk',
-      code: 'lec1',
-      eventCriteria: {
-        day: 'Monday',
-        startTime: '08:30',
-        endTime: '10:20',
-      },
-    },
-  })
-  event!: EventDto;
-
-  @ApiPropertyOptional({ type: LectureResponseDto })
-  lecture?: LectureResponseDto;
-} //event response
-
+}
+export class EventSingleResponseDto {
+  @ApiProperty({ type: EventDto }) event!: EventDto;
+}
 export class EventListResponseDto {
-  @ApiProperty({
-    type: [EventResponseDto],
-    description: 'List of events with optional lecture details',
-  })
-  events!: EventResponseDto[];
-} //event list
-
-export class DeleteResponseDto {
-  @ApiProperty({
-    example: true,
-    default: true,
-  })
-  success!: boolean;
-} //delete response
+  @ApiProperty({ type: [EventDto] }) events!: EventDto[];
+}
+export class DeleteResponseDto extends PickType(EventDto, [
+  'eventName',
+  'activityCode',
+] as const) {
+  @ApiProperty({ type: Boolean }) success!: boolean;
+}
+export class EventFiltersDto {
+  @ApiPropertyOptional() @IsOptional() @IsUUID() moduleId?: string;
+}
