@@ -4,6 +4,7 @@ import {
   ApiPropertyOptional,
   getSchemaPath,
 } from '@nestjs/swagger';
+import { IsObject, IsOptional, IsString } from 'class-validator';
 import type {
   PdfParserResult,
   SolverInput,
@@ -25,9 +26,11 @@ const DAYS_OF_WEEK = [
 
 export class WorkerCallbackErrorDto implements WorkerCallbackError {
   @ApiProperty({ type: String, example: 'WORKER_FAILED' })
+  @IsString()
   code!: string;
 
   @ApiProperty({ type: String, example: 'Worker failed to process the job' })
+  @IsString()
   message!: string;
 
   @ApiPropertyOptional({
@@ -35,6 +38,8 @@ export class WorkerCallbackErrorDto implements WorkerCallbackError {
     additionalProperties: true,
     description: 'Worker-specific diagnostic values.',
   })
+  @IsOptional()
+  @IsObject()
   details?: Record<string, unknown>;
 }
 

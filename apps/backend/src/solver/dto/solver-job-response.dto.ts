@@ -9,9 +9,6 @@ export class SolverJobResponseDto {
   @ApiProperty({ example: 'solve-job-123' })
   jobId!: string;
 
-  @ApiProperty({ example: 'default' })
-  solverProfileKey!: string;
-
   @ApiProperty({ enum: ['feasibility', 'optimization'] })
   solveMode!: 'feasibility' | 'optimization';
 

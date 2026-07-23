@@ -1,38 +1,35 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
+  ArrayNotEmpty,
+  ArrayUnique,
+  IsArray,
   IsIn,
-  IsNotEmpty,
   IsObject,
   IsOptional,
-  IsString,
+  IsUUID,
 } from 'class-validator';
 import type { SolverPreferences } from 'shared-types';
 import { SolverPreferencesDto } from './worker-contract.dto';
 
 export class TimetableSolveJobDto {
   @ApiProperty({
-    example: 'legacy-client-id',
+    type: [String],
     required: false,
-    deprecated: true,
+    example: ['00000000-0000-4000-8000-000000000004'],
   })
   @IsOptional()
-  @IsString()
-  @IsNotEmpty()
-  jobId?: string;
-
-  @ApiProperty({ example: 'default' })
-  @IsString()
-  @IsNotEmpty()
-  solverProfileKey!: string;
+  @IsArray()
+  @ArrayNotEmpty()
+  @ArrayUnique()
+  @IsUUID(undefined, { each: true })
+  eventIds?: string[];
 
   @ApiProperty({ enum: ['feasibility', 'optimization'] })
   @IsIn(['feasibility', 'optimization'])
   solveMode!: 'feasibility' | 'optimization';
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     enum: ['auto', 'cp-sat', 'ga'],
-    required: false,
-    default: 'auto',
   })
   @IsOptional()
   @IsIn(['auto', 'cp-sat', 'ga'])

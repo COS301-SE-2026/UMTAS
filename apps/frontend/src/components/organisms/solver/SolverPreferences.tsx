@@ -52,7 +52,6 @@ export default function SolverPreferences({ modules, events }: solverProps) {
       body: {
         engine: currentMode === "feasibility" ? "cp-sat" : "ga",
         solveMode: currentMode,
-        solverProfileKey: "default",
       },
     });
     if (result.jobId != undefined) {

@@ -138,7 +138,6 @@ export class SolverController {
 function toJobResponse(job: SolverJobRecord): SolverJobResponseDto {
   return {
     jobId: job.jobId,
-    solverProfileKey: job.solverProfileKey,
     solveMode: job.solveMode,
     requestedEngine: job.requestedEngine,
     status: job.status,
@@ -152,21 +151,26 @@ function toJobResponse(job: SolverJobRecord): SolverJobResponseDto {
 }
 
 function validateTimetableSolveJob(job: TimetableSolveJobDto): {
-  solverProfileKey: string;
+  eventIds?: string[];
   solveMode: 'feasibility' | 'optimization';
   engine: 'auto' | 'cp-sat' | 'ga';
   preferences: ReturnType<typeof SolverPreferencesSchema.parse>;
 } {
   const result = SolverPreferencesSchema.safeParse(job.preferences ?? {});
-  const solverProfileKey = job.solverProfileKey?.trim();
+  const validEventIds =
+    job.eventIds === undefined ||
+    (Array.isArray(job.eventIds) &&
+      job.eventIds.length > 0 &&
+      new Set(job.eventIds).size === job.eventIds.length &&
+      job.eventIds.every((eventId) => UUID_PATTERN.test(eventId)));
   const validMode =
     job.solveMode === 'feasibility' || job.solveMode === 'optimization';
   const engine = job.engine ?? 'auto';
   const validEngine =
     engine === 'auto' || engine === 'cp-sat' || engine === 'ga';
-  if (result.success && solverProfileKey && validMode && validEngine) {
+  if (result.success && validEventIds && validMode && validEngine) {
     return {
-      solverProfileKey,
+      ...(job.eventIds === undefined ? {} : { eventIds: [...job.eventIds] }),
       solveMode: job.solveMode,
       engine,
       preferences: result.data,
@@ -178,6 +182,9 @@ function validateTimetableSolveJob(job: TimetableSolveJobDto): {
     issues: result.success ? [] : result.error.issues,
   });
 }
+
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function validateSolverCallback(
   body: SolverCallbackDto,
