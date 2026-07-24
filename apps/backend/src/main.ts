@@ -23,6 +23,7 @@ async function bootstrap() {
   app.useStaticAssets(join(__dirname, '..', 'public'));
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   const port = process.env.PORT ?? 3000;
+  console.log(`[STARTUP] Starting UMTAS API on port ${port}...`);
 
   // if (process.env.NODE_ENV !== 'production') {
   const dbService = app.get(DatabaseService);
