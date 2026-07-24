@@ -118,7 +118,7 @@ export function InstituteSelector() {
             disabled={uniDisabeled}
             onClick={() => router.push("/schedules")}
           >
-            continue as {selectedInstitute?.role ?? "student"}
+            Continue as {selectedInstitute?.role ?? "Student"}
           </Button>
 
           <Button

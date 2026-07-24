@@ -10,7 +10,6 @@ import { eq, and, or } from 'drizzle-orm';
 
 import { AppDatabase, DatabaseService } from '../db/database.service';
 import {
-  RoleType,
   RoleTypeType,
   University,
   UniversityRole,
@@ -29,7 +28,6 @@ import {
   UserUniversityRoleResponseDto,
   GetRoleFilterDto,
 } from './dto/university.dto';
-import { notExists } from 'drizzle-orm';
 
 @Injectable()
 export class UniversityService {
@@ -64,40 +62,38 @@ export class UniversityService {
   //GetAll
   //Return all universities
   //Join with the universityRole to see what role the user has for the university
-  async getAll(
-    userId: string,
-    tx?: DatabaseService['db'],
-  ): Promise<UniversityListResponseDto> {
+  async getAll(tx?: DatabaseService['db']): Promise<UniversityListResponseDto> {
     const db = tx ?? this.dbService.db;
 
     const universities = await db
       .select({
         UniversityID: University.UniversityID,
         UniversityName: University.UniversityName,
-        role: UniversityRole.role,
       })
-      .from(University)
-      .leftJoin(
-        UniversityRole,
-        and(
-          eq(UniversityRole.UniversityID, University.UniversityID),
-          eq(UniversityRole.UserID, userId),
-        ),
-      )
-      .where(
-        // show no universities if anyone has a rule student owned to it.
-        notExists(
-          db
-            .select()
-            .from(UniversityRole)
-            .where(
-              and(
-                eq(UniversityRole.UniversityID, University.UniversityID),
-                eq(UniversityRole.role, RoleType.enumValues[1]),
-              ),
-            ),
-        ),
-      );
+      .from(University);
+    //@Aidan - this is where you f***ed up
+    // .leftJoin(
+    //   UniversityRole,
+    //   and(
+    //     eq(UniversityRole.UniversityID, University.UniversityID),
+    //     eq(UniversityRole.UserID, userId),
+    //   ),
+    // );
+
+    // .where(
+    //   // show no universities if anyone has a rule student owned to it.
+    //   notExists(
+    //     db
+    //       .select()
+    //       .from(UniversityRole)
+    //       .where(
+    //         and(
+    //           eq(UniversityRole.UniversityID, University.UniversityID),
+    //           eq(UniversityRole.role, RoleType.enumValues[1]),
+    //         ),
+    //       ),
+    //   ),
+    // );
 
     if (universities.length === 0) return { universities: [] };
 

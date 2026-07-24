@@ -100,7 +100,7 @@ export function CustomiseEventCard({
         <SelectTrigger
           className={getInputClass(!!errors?.moduleId) + " w-full"}
         >
-          <SelectValue placeholder="Select a module" />
+          <SelectValue placeholder="Select a Module" />
         </SelectTrigger>
         <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)]">
           {modules.map((m) => {
@@ -252,7 +252,7 @@ export function CustomiseEventCard({
             onValueChange={(v) => onUpdate(event.eventId, "dayOfWeek", v)}
           >
             <SelectTrigger className={getInputClass(!!errors?.dayOfWeek)}>
-              <SelectValue placeholder="Select a day" />
+              <SelectValue placeholder="Select a Day" />
             </SelectTrigger>
             <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)]">
               {[

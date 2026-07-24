@@ -29,6 +29,7 @@ import { ApiBody, ApiResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CurrentSession } from '../auth/session.decorator';
 import type { SessionData } from '../auth/session.decorator';
 import { Roles, SystemAdmin } from '../auth/roles.guard';
+import { Public } from 'src/auth/auth.guard';
 
 @ApiTags('Universities')
 @Controller('universities')
@@ -61,7 +62,7 @@ export class UniversityController {
 
   //GetAll
   @Get()
-  @Roles('student', 'lecturer', 'uni_admin')
+  @Public()
   @ApiOperation({
     summary: 'Get all universities',
     operationId: 'getUniversities',
@@ -75,10 +76,8 @@ export class UniversityController {
     status: 404,
     description: 'No universities found',
   })
-  getAll(
-    @CurrentSession() session: SessionData,
-  ): Promise<UniversityListResponseDto> {
-    return this.service.getAll(session.user.id);
+  getAll(): Promise<UniversityListResponseDto> {
+    return this.service.getAll();
   }
 
   //GetById

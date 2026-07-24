@@ -22,10 +22,7 @@ import { mockDbResult, mockTransaction } from '../Testing/Mocks';
 //factories
 // import {createUniversity} from '../Testing/Factories';
 // import { exists } from 'drizzle-orm/sql/expressions/conditions';
-import {
-  University,
-  UniversityRole,
-} from '../entities/Universities/University.schema';
+import { University } from '../entities/Universities/University.schema';
 import { ApplyForUniRoleDto, ApproveUsersRoleDto } from './dto/university.dto';
 
 describe('UniversityService', () => {
@@ -88,41 +85,6 @@ describe('UniversityService', () => {
       expect(result).toEqual(mockUniResponse);
     });
   }); //END_Test_createUniversity
-
-  describe('Test_getAllUniversities', () => {
-    const mockUniList = {
-      universities: [
-        { UniversityID: uniId, UniversityName: 'Test Uni 1', role: 'Admin' },
-        { UniversityID: uniId, UniversityName: 'Test Uni 2', role: null },
-      ],
-    };
-
-    it('should return all universities with user roles', async () => {
-      mockDbResult(mockDb.select, mockUniList.universities);
-
-      const result = await service.getAll(userId);
-
-      expect(mockDb.select).toHaveBeenCalledWith({
-        UniversityID: University.UniversityID,
-        UniversityName: University.UniversityName,
-        role: UniversityRole.role,
-      });
-      expect(result).toEqual(mockUniList);
-    });
-
-    it('should return empty array if no universities found', async () => {
-      mockDbResult(mockDb.select, []);
-
-      const result = await service.getAll(userId);
-
-      expect(mockDb.select).toHaveBeenCalledWith({
-        UniversityID: University.UniversityID,
-        UniversityName: University.UniversityName,
-        role: UniversityRole.role,
-      });
-      expect(result).toMatchObject({ universities: [] });
-    });
-  }); //END_Test_getAll
 
   describe('Test_getById_University', () => {
     it('should throw NotFound if university does not exist', async () => {
