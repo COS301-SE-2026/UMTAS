@@ -6,7 +6,7 @@ import {
   InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { eq, and, or } from 'drizzle-orm';
+import { eq, and, or, notLike } from 'drizzle-orm';
 
 import { AppDatabase, DatabaseService } from '../db/database.service';
 import {
@@ -70,7 +70,8 @@ export class UniversityService {
         UniversityID: University.UniversityID,
         UniversityName: University.UniversityName,
       })
-      .from(University);
+      .from(University)
+      .where(notLike(University.UniversityName, 'user%'));
     //@Aidan - this is where you f***ed up
     // .leftJoin(
     //   UniversityRole,
