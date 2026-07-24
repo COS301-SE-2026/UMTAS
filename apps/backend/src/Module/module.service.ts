@@ -424,7 +424,9 @@ export class ModuleService {
       .limit(1);
 
     //If user already enrolled, Unenroll them
+
     if (enrollmentStatus) {
+      /*
       await tx
         .delete(ModuleEnrollment)
         .where(
@@ -433,7 +435,7 @@ export class ModuleService {
             eq(ModuleEnrollment.ModuleID, moduleId),
           ),
         );
-
+        */
       return {
         moduleID: moduleId,
         UserID: userId,
@@ -600,7 +602,7 @@ export class ModuleService {
     userId: string,
     styling: string,
     tx?: DatabaseService['db'],
-  ) {
+  ): Promise<typeof ModuleStyling.$inferSelect> {
     if (!tx) {
       return this.dbService.db.transaction(async (t: AppDatabase) => {
         return this.setStyling(moduleId, userId, styling, t);

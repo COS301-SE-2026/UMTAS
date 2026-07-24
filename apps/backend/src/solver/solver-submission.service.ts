@@ -10,7 +10,7 @@ import {
 
 export interface SolverSubmissionInput {
   userId: string;
-  solverProfileKey: string;
+  eventIds?: string[];
   solveMode: 'feasibility' | 'optimization';
   engine: SolverEngine;
   preferences: SolverPreferences;
@@ -26,20 +26,18 @@ export class SolverSubmissionService {
   ) {}
 
   async submit(input: SolverSubmissionInput): Promise<SolverJobRecord> {
-    const solverInput = await this.inputBuilder.buildForProfile(
+    const solverInput = await this.inputBuilder.buildForSubmission(
       input.userId,
-      input.solverProfileKey,
+      input.eventIds,
       input.preferences,
     );
     const deduplicationKey = this.fingerprintService.compute({
-      solverProfileKey: input.solverProfileKey,
       solveMode: input.solveMode,
       engine: input.engine,
       solverInput,
     });
     const reservation = await this.jobStore.reserveOrReuse({
       userId: input.userId,
-      solverProfileKey: input.solverProfileKey,
       solveMode: input.solveMode,
       requestedEngine: input.engine,
       deduplicationKey,

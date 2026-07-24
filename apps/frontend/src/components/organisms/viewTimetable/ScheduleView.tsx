@@ -60,7 +60,7 @@ export function ScheduleView({
   const router = useRouter();
   const [selectedTimetableId, setSelectedTimetableId] = useState<string>("");
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [currentWeekIndex, setCurrentWeekIndex] = useState(0);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   //most of these are straight copied and pasted from wizard shell
   const [isGenerating, setIsGenerating] = useState(false);
   const [viewMode, setViewMode] = useState<"Generate" | "Timetable">(
@@ -139,7 +139,6 @@ export function ScheduleView({
     return { events: [], modules: [] };
   }, [selectedTimetableId, timetables, allEvents, allModules]);
 
-  const weekStarts = useMemo(() => getAllWeekStarts(events), [events]);
   const resolvedEvents = useMemo(
     () => resolveScheduleEvents(events, modules),
     [events, modules],
@@ -158,18 +157,30 @@ export function ScheduleView({
   useEffect(() => {
     onExportReady(doExport);
   }, [doExport, onExportReady]);
-  const currentWeekStart = weekStarts[currentWeekIndex] ?? null;
+
+  const currentWeekStart = useMemo(() => {
+    const date = new Date(selectedDate);
+    const day = date.getDay();
+    const dateDifference = date.getDate() - day + (day === 0 ? -6 : 1); //adj if day is sun
+    date.setDate(dateDifference);
+    date.setHours(0, 0, 0, 0);
+    return date;
+  }, [selectedDate]);
 
   function handlePrevWeek() {
-    if (currentWeekIndex > 0) {
-      setCurrentWeekIndex(currentWeekIndex - 1);
-    }
+    setSelectedDate((prev) => {
+      const date = new Date(prev);
+      date.setDate(date.getDate() - 7);
+      return date;
+    });
   }
 
   function handleNextWeek() {
-    if (currentWeekIndex < weekStarts.length - 1) {
-      setCurrentWeekIndex(currentWeekIndex + 1);
-    }
+    setSelectedDate((prev) => {
+      const date = new Date(prev);
+      date.setDate(date.getDate() + 7);
+      return date;
+    });
   }
 
   function renderLoadingSkeleton() {
@@ -227,7 +238,7 @@ export function ScheduleView({
     deleteTimetable(selectedTimetableId, {
       onSuccess: () => {
         setSelectedTimetableId("");
-        setCurrentWeekIndex(0);
+        setSelectedDate(new Date());
       },
 
       onError: (error) => {
@@ -325,18 +336,18 @@ export function ScheduleView({
     }
 
     return (
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <div className="w-64">
             <Select
               value={String(selectedTimetableId)}
               onValueChange={(newValue) => {
                 setSelectedTimetableId(newValue);
-                setCurrentWeekIndex(0);
+                setSelectedDate(new Date());
               }}
             >
               <SelectTrigger className="bg-[var(--bg-surface)] border-[var(--border)]">
-                <SelectValue placeholder="Select a timetable" />
+                <SelectValue placeholder="Select a Timetable" />
               </SelectTrigger>
               <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)]">
                 {timetables.map((tt) => (
@@ -360,9 +371,9 @@ export function ScheduleView({
           <div className="flex flex-col">
             <div className="flex flex-row justify-between items-center w-full">
               <WeekNavBar
+                selectedDate={selectedDate}
+                onDateChange={setSelectedDate}
                 weekStart={currentWeekStart}
-                currentIndex={currentWeekIndex}
-                totalWeeks={weekStarts.length}
                 onPrev={handlePrevWeek}
                 onNext={handleNextWeek}
               />

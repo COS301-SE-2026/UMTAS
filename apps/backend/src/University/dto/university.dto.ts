@@ -10,7 +10,8 @@ import {
   Length,
 } from 'class-validator';
 import { PartialType, PickType, OmitType } from '@nestjs/swagger';
-import { RoleType, RoleTypeType } from '../../entities/index';
+import { RoleType } from '../../entities/index';
+import type { RoleTypeType } from '../../entities/index';
 
 export class UniversityDto {
   @ApiProperty({
@@ -70,7 +71,7 @@ export class UniversityListResponseDto {
 export class DeleteUniversityResponseDto extends PickType(UniversityDto, [
   'UniversityName',
 ]) {
-  @ApiProperty({ example: true })
+  @ApiProperty({ type: Boolean, example: true })
   success!: boolean;
 }
 
@@ -111,7 +112,7 @@ export class ApproveUsersRoleDto extends PickType(UniversityDto, [
 export class ApprovedUserRoleResponse extends PickType(ApproveUsersRoleDto, [
   'userId',
 ]) {
-  @ApiProperty({ example: true })
+  @ApiProperty({ type: Boolean, example: true })
   success!: boolean;
 }
 export class GetRolesDto {
@@ -157,4 +158,15 @@ export class GetRoleFilterDto {
   @IsOptional()
   @IsBoolean()
   pending?: boolean;
+}
+
+export class UserUniversityRoleResponseDto {
+  @ApiProperty({ type: String, format: 'uuid' })
+  UniversityID!: string;
+
+  @ApiProperty({ type: String, format: 'uuid' })
+  UserID!: string;
+
+  @ApiProperty({ enum: RoleType.enumValues })
+  role!: RoleTypeType;
 }

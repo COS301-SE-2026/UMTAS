@@ -100,7 +100,7 @@ export function NoPermissionsEventCard({
         <SelectTrigger
           className={getInputClass(!!errors?.moduleId) + " w-full"}
         >
-          <SelectValue placeholder="Select a module" />
+          <SelectValue placeholder="Select a Module" />
         </SelectTrigger>
         <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)]">
           {modules.map((m) => {
@@ -204,7 +204,7 @@ export function NoPermissionsEventCard({
             {/* <Input
               id={"event-venue-" + event.eventId}
               value={event.eventCriteria?.venue || ""}
-              onChange={(e) => onUpdate(event.eventID, "venue", e.target.value)}
+              onChange={(e) => onUpdate(event.eventId, "venue", e.target.value)}
               placeholder="e.g. IT 2-26"
               className={getInputClass(!!errors?.venue)}
             />

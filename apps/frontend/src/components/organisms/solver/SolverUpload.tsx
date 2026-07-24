@@ -159,6 +159,7 @@ export default function SolverUpload({
           </div>
 
           <Button
+            id="btn-browse-files"
             variant="outline"
             onClick={() => uploadFileRef.current?.click()}
             className="font-mono"
@@ -187,6 +188,7 @@ export default function SolverUpload({
         </div>
 
         <Button
+          id="btn-upload"
           disabled={
             currentlyPolling || moduleGroupID != null || selectedFile == null
           }
@@ -197,14 +199,14 @@ export default function SolverUpload({
           }}
         >
           {pdfJobResult?.status === "completed" && !currentlyPolling && (
-            <>continue</>
+            <>Continue</>
           )}
           {pdfJobResult?.status !== "completed" && !currentlyPolling && (
-            <>upload</>
+            <>Upload</>
           )}
           {(currentlyPolling || pdfJobResult?.status === "queued") && (
             <>
-              waiting for updates <br /> <Spinner />
+              Waiting for Updates <br /> <Spinner />
             </>
           )}
         </Button>

@@ -136,12 +136,12 @@ function CourseTableBody<TData>({
       {empty ? (
         <TableRow className="">
           <TableCell></TableCell>
-          <TableCell>there are no rows to display</TableCell>
+          <TableCell>There are no rows to display</TableCell>
           <TableCell></TableCell>
         </TableRow>
       ) : (
         rows.map((row) => (
-          <TableRow key={row.id}>
+          <TableRow id="row-module-row" key={row.id}>
             {row.getVisibleCells().map((cell) => (
               <TableCell
                 key={cell.id}

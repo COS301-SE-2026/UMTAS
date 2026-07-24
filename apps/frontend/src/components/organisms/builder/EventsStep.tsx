@@ -39,6 +39,25 @@ import {
 } from "@/components/templates/builder/Queries/eventQueries";
 import { useMutation } from "@tanstack/react-query";
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
+import Tutorial from "@/components/organisms/nav/Tutorial";
+
+const baseSteps = [
+  {
+    target: "#btn-add-new-event",
+    content: "Add a new event to the list.",
+  },
+];
+
+const extendedSteps = [
+  {
+    target: "#btn-modify-event",
+    content: "Edit the selected event.",
+  },
+  {
+    target: "#btn-delete-event",
+    content: "Remove the selected event.",
+  },
+];
 
 interface EventsStepProps {
   events: EventResponse[];
@@ -64,10 +83,20 @@ function validateEvent(event: EventResponse): valEvent {
     errors.code = "Code is required";
     hasErrors = true;
   }
-  if (!criteria?.date) {
-    errors.date = "Date is required";
-    hasErrors = true;
+
+  //conditional validation based on isRecurring
+  if (event.isRecurring) {
+    if (!criteria?.dayOfWeek) {
+      errors.dayOfWeek = "Day of week is required for recurring events";
+      hasErrors = true;
+    }
+  } else {
+    if (!criteria?.date) {
+      errors.date = "Date is required for non-recurring events";
+      hasErrors = true;
+    }
   }
+
   if (!criteria?.startTime || !criteria?.endTime) {
     errors.time = "Start and end time are required";
     hasErrors = true;
@@ -80,11 +109,6 @@ function validateEvent(event: EventResponse): valEvent {
     errors.time = "Start time must be before end time";
     hasErrors = true;
   }
-  // if (criteria?.type !== "university") {
-  //   //&& !event.lecture?.moduleID) {
-  //   errors.moduleId = "A module must be assigned to a lecture";
-  //hasErrors = true;
-  // }
 
   return { errors, hasErrors };
 }
@@ -93,12 +117,18 @@ function isEventComplete(event: EventResponse) {
   const criteria = event.eventCriteria;
   if (!event.eventName) return false;
   if (!event.activityCode) return false;
-  if (!criteria?.date) return false;
   if (!criteria?.startTime) return false;
   if (!criteria?.endTime) return false;
+
+  if (event.isRecurring) {
+    if (!criteria?.dayOfWeek) return false;
+  } else {
+    if (!criteria?.date) return false;
+  }
   if (criteria?.eventSource === "university")
     // TODO add module && event.eventCriteria.moduleID)
     return false;
+
   return true;
 }
 
@@ -128,6 +158,9 @@ export function EventsStep({
   const [eventsAdded, setEventsAdded] = useState<
     { eventID: string; created: boolean }[]
   >([]);
+
+  const steps =
+    events.length > 0 ? [...extendedSteps, ...baseSteps] : baseSteps;
 
   // a local construct to add an empty event
   function addEmptyEvent() {
@@ -232,15 +265,23 @@ export function EventsStep({
       return next;
     });
 
+    const cleanCriteria = { ...event.eventCriteria };
+
+    if (event.isRecurring) {
+      delete cleanCriteria.date;
+    } else {
+      delete cleanCriteria.dayOfWeek;
+    }
+
     const iscreated = eventsAdded.find((event) => event.eventID === id);
 
     if (iscreated?.created) {
       updateEvent.mutate({
         body: {
-          isRecurring: false,
+          isRecurring: event.isRecurring,
           activityType: event.activityType,
           activityCode: event.activityCode,
-          eventCriteria: event.eventCriteria,
+          eventCriteria: cleanCriteria,
           eventName: event.eventName,
         },
         path: {
@@ -250,11 +291,11 @@ export function EventsStep({
     } else {
       const result = await addEvent.mutateAsync({
         body: {
-          eventCriteria: event.eventCriteria,
+          eventCriteria: cleanCriteria,
           activityType: event.activityType || "lecture",
           activityCode: event.activityCode,
           eventName: event.eventName,
-          isRecurring: false,
+          isRecurring: event.isRecurring,
         },
       });
 
@@ -382,6 +423,7 @@ export function EventsStep({
         {/* summary row */}
         <div className="flex items-center gap-2">
           <button
+            id="btn-modify-event"
             type="button"
             onClick={() => handleSelect(event.eventId)}
             className="flex flex-1 items-center gap-3 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] px-4 py-4 text-left transition-colors duration-[var(--duration-fast)] hover:bg-[var(--bg-elevated)] shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.08)]"
@@ -424,6 +466,7 @@ export function EventsStep({
 
           {/* trash button */}
           <Button
+            id="btn-delete-event"
             type="button"
             variant="ghost"
             size="icon"
@@ -469,6 +512,7 @@ export function EventsStep({
 
     return (
       <button
+        id="btn-add-new-event"
         type="button"
         onClick={addEmptyEvent} // adds an event card
         className="mt-4 flex w-full items-center gap-3 rounded-lg border border-dashed border-[var(--border)] px-4 py-4 text-left text-base text-[var(--text-secondary)] transition-colors duration-[var(--duration-fast)] hover:border-[var(--text-secondary)] hover:text-[var(--text-primary)]"
@@ -483,6 +527,7 @@ export function EventsStep({
 
   return (
     <div className="px-8 py-6">
+      <Tutorial steps={steps} wait={true} />
       <AlertDialog open={showGuard} onOpenChange={setShowGuard}>
         <AlertDialogContent>
           <AlertDialogHeader>

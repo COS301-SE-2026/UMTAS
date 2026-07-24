@@ -41,7 +41,7 @@ export class BuilderService {
   async createModule(
     userId: string,
     dto: CreateBuilderModuleDto,
-  ): Promise<CreateBuilderModuleDto> {
+  ): Promise<BuilderSingleResponseDto> {
     return await this.dbService.db.transaction(async (tx: AppDatabase) => {
       const userCourse = await this.doUserUniCourseCheck(userId, tx);
 

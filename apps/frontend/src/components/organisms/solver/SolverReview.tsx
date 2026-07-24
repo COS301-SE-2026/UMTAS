@@ -26,19 +26,22 @@ export default function SolverReview({
     <>
       <Card className="shadow-lg border-[var(--border)] rounded-xl bg-[var(--bg-surface)]">
         <CardHeader className="text-xl font-bold text-[var(--text-primary)]">
-          Review your activities
+          Review your Activities
         </CardHeader>
         <CardDescription className="px-6">
           Review your parsed activities before moving to preferences
         </CardDescription>
-        <CardContent className="space-y-4 overflow-auto h-[50vh]">
+        <CardContent
+          id="card-review-stuff"
+          className="space-y-4 overflow-auto h-[50vh]"
+        >
           <SolverReviewCard
             events={events}
             modules={modules}
             onUpdateEvents={() => {}}
           />
-          <Button type="button" onClick={onComplete}>
-            Set Preferences
+          <Button id="btn-confirm-events" type="button" onClick={onComplete}>
+            Confirm Events
           </Button>
         </CardContent>
       </Card>

@@ -30,6 +30,12 @@ import { Public } from '../auth/auth.guard';
 import { CurrentSession, type SessionData } from '../auth/session.decorator';
 import { WorkerCallbackAuthGuard } from '../jobs/worker-callback-auth.guard';
 import { TimetableSolveJobDto } from '../jobs/dto/timetable-solve-job.dto';
+import {
+  AcceptedJobResponseDto,
+  SolverInputDto,
+  SolverResultDto,
+  SolverSubmissionResponseDto,
+} from '../jobs/dto/worker-contract.dto';
 import { SolverCallbackDto } from './dto/solver-callback.dto';
 import { SolverJobResponseDto } from './dto/solver-job-response.dto';
 import { SolverInputBuilderService } from './solver-input-builder.service';
@@ -52,24 +58,11 @@ export class SolverController {
   @ApiOperation({
     summary: 'Persist and enqueue a timetable solve job',
   })
-  @ApiAcceptedResponse({
-    schema: {
-      type: 'object',
-      properties: {
-        accepted: { type: 'boolean', example: true },
-        jobId: { type: 'string', example: 'solve-job-123' },
-      },
-    },
-  })
+  @ApiAcceptedResponse({ type: SolverSubmissionResponseDto })
   async submitAndEnqueue(
     @CurrentSession() session: SessionData,
     @Body() job: TimetableSolveJobDto,
-  ): Promise<{
-    accepted: true;
-    jobId: string;
-    status: 'queued' | 'completed' | 'failed';
-    result?: SolverResult;
-  }> {
+  ): Promise<SolverSubmissionResponseDto> {
     const validatedJob = validateTimetableSolveJob(job);
     const record = await this.submission.submit({
       userId: session.user.id,
@@ -87,7 +80,7 @@ export class SolverController {
   @Public()
   @UseGuards(WorkerCallbackAuthGuard)
   @ApiOperation({ summary: 'Build solver input for an authenticated worker' })
-  @ApiOkResponse({ type: Object })
+  @ApiOkResponse({ type: SolverInputDto })
   getInput(@Param('jobId') jobId: string): Promise<SolverInput> {
     return this.inputBuilder.build(jobId);
   }
@@ -111,7 +104,7 @@ export class SolverController {
 
   @Get('jobs/:jobId/result')
   @ApiOperation({ summary: 'Get a completed solver result' })
-  @ApiOkResponse({ type: Object })
+  @ApiOkResponse({ type: SolverResultDto })
   async getJobResult(
     @CurrentSession() session: SessionData,
     @Param('jobId') jobId: string,
@@ -129,11 +122,12 @@ export class SolverController {
   @UseGuards(WorkerCallbackAuthGuard)
   @HttpCode(HttpStatus.ACCEPTED)
   @ApiOperation({ summary: 'Receive final solver worker callback' })
+  @ApiAcceptedResponse({ type: AcceptedJobResponseDto })
   async receiveCallback(
     @Param('jobId') jobId: string,
     @Query('attemptToken', new ParseUUIDPipe()) attemptToken: string,
     @Body() body: SolverCallbackDto,
-  ): Promise<{ accepted: true; jobId: string }> {
+  ): Promise<AcceptedJobResponseDto> {
     const callback = validateSolverCallback(body);
     await this.jobStore.recordCallback(jobId, attemptToken, callback);
 
@@ -144,7 +138,6 @@ export class SolverController {
 function toJobResponse(job: SolverJobRecord): SolverJobResponseDto {
   return {
     jobId: job.jobId,
-    solverProfileKey: job.solverProfileKey,
     solveMode: job.solveMode,
     requestedEngine: job.requestedEngine,
     status: job.status,
@@ -158,21 +151,26 @@ function toJobResponse(job: SolverJobRecord): SolverJobResponseDto {
 }
 
 function validateTimetableSolveJob(job: TimetableSolveJobDto): {
-  solverProfileKey: string;
+  eventIds?: string[];
   solveMode: 'feasibility' | 'optimization';
   engine: 'auto' | 'cp-sat' | 'ga';
   preferences: ReturnType<typeof SolverPreferencesSchema.parse>;
 } {
   const result = SolverPreferencesSchema.safeParse(job.preferences ?? {});
-  const solverProfileKey = job.solverProfileKey?.trim();
+  const validEventIds =
+    job.eventIds === undefined ||
+    (Array.isArray(job.eventIds) &&
+      job.eventIds.length > 0 &&
+      new Set(job.eventIds).size === job.eventIds.length &&
+      job.eventIds.every((eventId) => UUID_PATTERN.test(eventId)));
   const validMode =
     job.solveMode === 'feasibility' || job.solveMode === 'optimization';
   const engine = job.engine ?? 'auto';
   const validEngine =
     engine === 'auto' || engine === 'cp-sat' || engine === 'ga';
-  if (result.success && solverProfileKey && validMode && validEngine) {
+  if (result.success && validEventIds && validMode && validEngine) {
     return {
-      solverProfileKey,
+      ...(job.eventIds === undefined ? {} : { eventIds: [...job.eventIds] }),
       solveMode: job.solveMode,
       engine,
       preferences: result.data,
@@ -184,6 +182,9 @@ function validateTimetableSolveJob(job: TimetableSolveJobDto): {
     issues: result.success ? [] : result.error.issues,
   });
 }
+
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function validateSolverCallback(
   body: SolverCallbackDto,
