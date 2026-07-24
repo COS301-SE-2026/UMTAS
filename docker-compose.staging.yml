@@ -211,24 +211,24 @@ services:
       - "traefik.http.services.frontend-staging.loadbalancer.server.port=${FRONTEND_PORT}"
       - "com.centurylinklabs.watchtower.enable=true"
 
-  watchtower:
-    image: containrrr/watchtower
-    restart: always
-    networks:
-      - gateway
-      - internal
-    environment:
-      - DOCKER_API_VERSION=1.44
-      - REPO_USER=${DOCKERHUB_USERNAME}
-      - REPO_PASS=${DOCKERHUB_TOKEN}
-      - WATCHTOWER_NOTIFICATION_URL=${WATCHTOWER_DISCORD_URL}
-      - WATCHTOWER_NOTIFICATIONS_LEVEL=info
-      - WATCHTOWER_HTTP_API_METRICS=true
-      - WATCHTOWER_HTTP_API_TOKEN=${WATCHTOWER_HTTP_API_TOKEN}
-      - WATCHTOWER_LABEL_ENABLE=true
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    command: --schedule "0/30 * * * * *" --cleanup
+  # watchtower:
+  #   image: containrrr/watchtower
+  #   restart: always
+  #   networks:
+  #     - gateway
+  #     - internal
+  #   environment:
+  #     - DOCKER_API_VERSION=1.44
+  #     - REPO_USER=${DOCKERHUB_USERNAME}
+  #     - REPO_PASS=${DOCKERHUB_TOKEN}
+  #     - WATCHTOWER_NOTIFICATION_URL=${WATCHTOWER_DISCORD_URL}
+  #     - WATCHTOWER_NOTIFICATIONS_LEVEL=info
+  #     - WATCHTOWER_HTTP_API_METRICS=true
+  #     - WATCHTOWER_HTTP_API_TOKEN=${WATCHTOWER_HTTP_API_TOKEN}
+  #     - WATCHTOWER_LABEL_ENABLE=true
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #   command: --schedule "0/30 * * * * *" --cleanup
 
 networks:
   gateway:
