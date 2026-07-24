@@ -11,6 +11,7 @@ import {
   ApprovedUserRoleResponse,
   GetRoleFilterDto,
   GetRolesDto,
+  UserUniversityRoleResponseDto,
 } from './dto/university.dto';
 
 import {
@@ -52,13 +53,15 @@ export class UniversityController {
     status: 409,
     description: 'University already exists',
   })
-  create(@Body() dto: CreateUniversityDto) {
+  create(
+    @Body() dto: CreateUniversityDto,
+  ): Promise<UniversitySingleResponseDto> {
     return this.service.create(dto);
   }
 
   //GetAll
   @Get()
-  @Roles()
+  @Roles('student', 'lecturer', 'uni_admin')
   @ApiOperation({
     summary: 'Get all universities',
     operationId: 'getUniversities',
@@ -72,7 +75,9 @@ export class UniversityController {
     status: 404,
     description: 'No universities found',
   })
-  getAll(@CurrentSession() session: SessionData) {
+  getAll(
+    @CurrentSession() session: SessionData,
+  ): Promise<UniversityListResponseDto> {
     return this.service.getAll(session.user.id);
   }
 
@@ -99,7 +104,7 @@ export class UniversityController {
   getById(
     @CurrentSession() session: SessionData,
     @Param('universityId', ParseUUIDPipe) universityId: string,
-  ) {
+  ): Promise<UniversitySingleResponseDto> {
     return this.service.getById(universityId);
   }
 
@@ -113,6 +118,7 @@ export class UniversityController {
   @ApiResponse({
     status: 200,
     description: 'Role returned successfully',
+    type: UserUniversityRoleResponseDto,
   })
   @ApiResponse({
     status: 400,
@@ -125,7 +131,7 @@ export class UniversityController {
   getUsersRoleByUni(
     @CurrentSession() session: SessionData,
     @Param('universityId', ParseUUIDPipe) universityId: string,
-  ) {
+  ): Promise<UserUniversityRoleResponseDto> {
     return this.service.getUsersRole(session.user.id, universityId);
   }
 
@@ -153,7 +159,7 @@ export class UniversityController {
   update(
     @Param('universityId', ParseUUIDPipe) universityId: string,
     @Body() dto: UpdateUniversityDto,
-  ) {
+  ): Promise<UniversitySingleResponseDto> {
     return this.service.update(universityId, dto);
   }
 
@@ -177,7 +183,9 @@ export class UniversityController {
     status: 404,
     description: 'University not found',
   })
-  delete(@Param('universityId', ParseUUIDPipe) universityId: string) {
+  delete(
+    @Param('universityId', ParseUUIDPipe) universityId: string,
+  ): Promise<DeleteUniversityResponseDto> {
     return this.service.delete(universityId);
   }
 
@@ -202,7 +210,7 @@ export class UniversityController {
     @CurrentSession() session: SessionData,
     @Param('universityID', ParseUUIDPipe) universityId: string,
     @Body() dto: GetRoleFilterDto,
-  ) {
+  ): Promise<GetRolesDto[]> {
     return this.service.getAllApplications(session.user.id, universityId, dto);
   }
 
@@ -238,7 +246,7 @@ export class UniversityController {
   applyForRole(
     @CurrentSession() session: SessionData,
     @Body() dto: ApplyForUniRoleDto,
-  ) {
+  ): Promise<UniversitySingleResponseDto> {
     return this.service.applyForUniRole(session.user.id, dto);
   }
 
@@ -272,7 +280,9 @@ export class UniversityController {
     status: 409,
     description: 'User already has an approved role',
   })
-  approveUserRole(@Body() dto: ApproveUsersRoleDto) {
+  approveUserRole(
+    @Body() dto: ApproveUsersRoleDto,
+  ): Promise<ApprovedUserRoleResponse> {
     return this.service.approveUserRole(dto);
   }
 } //UniversityController

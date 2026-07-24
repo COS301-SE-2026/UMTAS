@@ -98,7 +98,8 @@ describe("Event Request Builders Integration Tests", () => {
     const eventBody: CreateEventBody = {
       eventName: "Lifecycle Test Event",
       activityCode: `TEST-code`,
-      isRecurring: {},
+      isRecurring: false,
+      activityType: "lecture",
       eventCriteria: {
         date: "monday",
         startTime: "08:00",
@@ -129,7 +130,7 @@ describe("Event Request Builders Integration Tests", () => {
       paths: { id: eventId },
       body: {
         eventName: "Updated Lifecycle Event",
-        isRecurring: {},
+        isRecurring: false,
       },
     });
 

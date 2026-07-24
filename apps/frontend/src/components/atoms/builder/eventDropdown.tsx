@@ -11,7 +11,7 @@ import {
 } from "@/components/atoms/baseShadcn/select";
 
 // add more types post demo 1
-export type EventType = "university";
+export type EventType = "lecture" | "tutorial" | "prac" | "exam" | "test";
 
 export interface EventOption {
   value: EventType;
@@ -21,8 +21,28 @@ export interface EventOption {
 
 const Event_Types: EventOption[] = [
   {
-    value: "university",
-    label: "university",
+    value: "lecture",
+    label: "Lecture",
+    icon: <BookOpen size={15} />,
+  },
+  {
+    value: "tutorial",
+    label: "Tutorial",
+    icon: <BookOpen size={15} />,
+  },
+  {
+    value: "prac",
+    label: "Practical",
+    icon: <BookOpen size={15} />,
+  },
+  {
+    value: "exam",
+    label: "Exam",
+    icon: <BookOpen size={15} />,
+  },
+  {
+    value: "test",
+    label: "Test",
     icon: <BookOpen size={15} />,
   },
 ];
@@ -38,6 +58,7 @@ export function EventTypeDropdown({
   onChange,
   disabled,
 }: EventTypeDropdownProps) {
+  console.log(value);
   return (
     <Select
       value={value}

@@ -19,7 +19,6 @@ export async function getAllEventsAdmin(
 
   const queryStr = searchParams.toString();
   const URL = queryStr ? `${baseUrl}${path}?${queryStr}` : baseUrl + path;
-  console.log(URL);
   const response = await fetch(URL, {
     method: "GET",
     headers: {

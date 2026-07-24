@@ -10,7 +10,6 @@ import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
 import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
 import { Button } from "@/components/atoms/baseShadcn/button";
 import SolverReviewCard from "@/components/molecules/solver/SolverReviewCard";
-import React, { useState } from "react";
 
 interface SolverReviewProps {
   modules: ModuleResponseDto[];
@@ -19,11 +18,10 @@ interface SolverReviewProps {
 }
 
 export default function SolverReview({
-  events: initialEvents,
+  events,
   modules,
   onComplete,
 }: SolverReviewProps) {
-  const [events, setEvents] = useState<EventResponse[]>(initialEvents);
   return (
     <>
       <Card className="shadow-lg border-[var(--border)] rounded-xl bg-[var(--bg-surface)]">
@@ -33,14 +31,17 @@ export default function SolverReview({
         <CardDescription className="px-6">
           Review your parsed activities before moving to preferences
         </CardDescription>
-        <CardContent className="space-y-4">
+        <CardContent
+          id="card-review-stuff"
+          className="space-y-4 overflow-auto h-[50vh]"
+        >
           <SolverReviewCard
             events={events}
             modules={modules}
-            onUpdateEvents={setEvents}
+            onUpdateEvents={() => {}}
           />
-          <Button type="button" onClick={onComplete}>
-            Set Preferences
+          <Button id="btn-confirm-events" type="button" onClick={onComplete}>
+            Confirm events
           </Button>
         </CardContent>
       </Card>

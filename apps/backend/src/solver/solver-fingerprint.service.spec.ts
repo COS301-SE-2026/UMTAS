@@ -17,23 +17,25 @@ describe('SolverFingerprintService', () => {
     const baseline = service.compute(request());
     const changedEvent = request();
     changedEvent.solverInput.schedulingProblem.events[0].startTime = '09:00';
+    const changedEventSet = request();
+    changedEventSet.solverInput.schedulingProblem.events.pop();
     const changedPreference = request();
     changedPreference.solverInput.preferences.heuristics[0].weight = 2;
 
     expect(service.compute(changedEvent)).not.toBe(baseline);
+    expect(service.compute(changedEventSet)).not.toBe(baseline);
     expect(service.compute(changedPreference)).not.toBe(baseline);
   });
 
   it('returns one versioned deduplication key', () => {
     expect(service.compute(request())).toMatch(
-      /^solver-semantic-sha256-v1:[0-9a-f]{64}$/,
+      /^solver-semantic-sha256-v2:[0-9a-f]{64}$/,
     );
   });
 });
 
 function request() {
   return {
-    solverProfileKey: 'default',
     solveMode: 'optimization' as const,
     engine: 'auto' as const,
     solverInput: {

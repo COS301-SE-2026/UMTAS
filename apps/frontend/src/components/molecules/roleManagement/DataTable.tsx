@@ -116,13 +116,17 @@ export function DataTable<TData, TValue>({
           <div className="flex flex-col md:flex-row items-center justify-between py-4 gap-4">
             <div className="flex items-center gap-3 w-full md:w-auto">
               <Input
+                id="input-search-name-email-role"
                 placeholder="Search name, email, or role..."
                 value={globalFilter ?? ""}
                 onChange={(event) => setGlobalFilter(event.target.value)}
                 className="max-w-sm bg-[var(--background)]"
               />
               <Select value={roleFilter} onValueChange={handleRoleChange}>
-                <SelectTrigger className="w-[180px] bg-[var(--background)]">
+                <SelectTrigger
+                  id="select-all-roles"
+                  className="w-[180px] bg-[var(--background)]"
+                >
                   <SelectValue placeholder="Filter Role Type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -139,7 +143,11 @@ export function DataTable<TData, TValue>({
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
+            <Button
+              id="btn-columns-to-show"
+              variant="outline"
+              className="ml-auto"
+            >
               Columns
             </Button>
           </DropdownMenuTrigger>
@@ -192,7 +200,7 @@ export function DataTable<TData, TValue>({
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell id="select-the-row-in-table" key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext(),
@@ -222,6 +230,7 @@ export function DataTable<TData, TValue>({
 
         <div className="flex items-center space-x-2">
           <Button
+            id="btn-role-previous"
             variant="outline"
             size="sm"
             onClick={() => table.previousPage()}
@@ -230,6 +239,7 @@ export function DataTable<TData, TValue>({
             Previous
           </Button>
           <Button
+            id="btn-role-next"
             variant="outline"
             size="sm"
             onClick={() => table.nextPage()}

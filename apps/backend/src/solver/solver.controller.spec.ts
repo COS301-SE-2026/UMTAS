@@ -61,8 +61,6 @@ describe('SolverController', () => {
 
     await expect(
       controller.submitAndEnqueue(session, {
-        jobId: 'ignored-client-id',
-        solverProfileKey: 'default',
         solveMode: 'optimization',
         engine: 'auto',
       }),
@@ -75,26 +73,61 @@ describe('SolverController', () => {
 
     expect(submission.submit).toHaveBeenCalledWith({
       userId: 'user-1',
-      solverProfileKey: 'default',
       solveMode: 'optimization',
       engine: 'auto',
       preferences: { heuristics: [] },
     });
   });
 
-  it('rejects whitespace-only solver profiles', async () => {
-    await expect(
-      controller.submitAndEnqueue(session, {
-        solverProfileKey: '\t',
-        solveMode: 'optimization',
-        engine: 'auto',
-      }),
-    ).rejects.toThrow(
-      'Timetable solve job did not match the shared queue contract',
-    );
+  it('forwards an explicit event selection unchanged', async () => {
+    submission.submit.mockResolvedValue({
+      jobId: 'solve-backend-id',
+      status: 'queued',
+    });
+    const eventIds = [
+      '00000000-0000-4000-8000-000000000004',
+      '00000000-0000-4000-8000-000000000005',
+    ];
 
-    expect(submission.submit).not.toHaveBeenCalled();
+    await controller.submitAndEnqueue(session, {
+      eventIds,
+      solveMode: 'feasibility',
+    });
+
+    expect(submission.submit).toHaveBeenCalledWith({
+      userId: 'user-1',
+      eventIds,
+      solveMode: 'feasibility',
+      engine: 'auto',
+      preferences: { heuristics: [] },
+    });
   });
+
+  it.each([
+    [[]],
+    [['not-a-uuid']],
+    [
+      [
+        '00000000-0000-4000-8000-000000000004',
+        '00000000-0000-4000-8000-000000000004',
+      ],
+    ],
+  ])(
+    'rejects malformed explicit event IDs before submission',
+    async (eventIds) => {
+      await expect(
+        controller.submitAndEnqueue(session, {
+          eventIds,
+          solveMode: 'optimization',
+          engine: 'auto',
+        }),
+      ).rejects.toThrow(
+        'Timetable solve job did not match the shared queue contract',
+      );
+
+      expect(submission.submit).not.toHaveBeenCalled();
+    },
+  );
 
   it('validates and persists completed worker callbacks through the store', async () => {
     await expect(
@@ -117,7 +150,6 @@ describe('SolverController', () => {
   it('returns persisted job status and completed results', async () => {
     const job = {
       jobId: 'solve-1',
-      solverProfileKey: 'default',
       solveMode: 'optimization',
       status: 'completed',
       result: completedResult,

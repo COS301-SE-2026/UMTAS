@@ -8,76 +8,35 @@ import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
 import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
 import { useState } from "react";
 import { SolverLock } from "@/components/organisms/solver/SolverLock";
+import { useQueries, useQuery } from "@tanstack/react-query";
+import { getAllEventsAdminQ } from "@/app/module-management/queries/queries";
+import { fetchAllModules } from "@/app/course-management/queries/modules/moduleBuilder";
 
-const events: EventResponse[] = [
+import Tutorial from "@/components/organisms/nav/Tutorial";
+const steps = [
   {
-    eventCriteria: {
-      date: "2026/06/07",
-      endTime: "11:00",
-      startTime: "10:00",
-      moduleId: "301",
-      eventSource: "university",
-      //venue: "IT-2-26",
-    },
-    eventId: "1",
-    isRecurring: {},
-    activityCode: "COS301",
-    eventName: "Software Engineering",
+    target: "#btn-browse-files",
+    content: "Choose your timetable file to upload.",
   },
   {
-    eventCriteria: {
-      date: "2026/06/07",
-      endTime: "11:00",
-      startTime: "10:00",
-      moduleId: "332",
-      eventSource: "university",
-      //venue: "IT-2-27",
-    },
-    eventId: "2",
-    isRecurring: {},
-    activityCode: "COS332",
-    eventName: "Networks",
+    target: "#btn-upload",
+    content: "Upload and process the PDF.",
   },
   {
-    eventCriteria: {
-      date: "2026/06/07",
-      endTime: "10:00",
-      startTime: "9:00",
-      moduleId: "333",
-      eventSource: "university",
-      //venue: "IT-2-24",
-    },
-    eventId: "3",
-    isRecurring: {},
-    activityCode: "COS333",
-    eventName: "Programming Languages",
-  },
-];
-
-const modules: ModuleResponseDto[] = [
-  {
-    moduleCode: "301",
-    moduleID: "COS301",
-    moduleName: "Software Engineering",
-    moduleDescription: "",
-    ModuleGroupingID: "",
-    styling: { colour: "blue" },
+    target: "#card-review-stuff",
+    content: "Review the parsed module events.",
   },
   {
-    moduleCode: "332",
-    moduleID: "COS332",
-    moduleName: "Networks",
-    moduleDescription: "",
-    ModuleGroupingID: "",
-    styling: { colour: "red" },
+    target: "#btn-confirm-events",
+    content: "Confirm the events after reviewing them.",
   },
   {
-    moduleCode: "333",
-    moduleID: "COS333",
-    moduleName: "Programming Languages",
-    moduleDescription: "",
-    ModuleGroupingID: "",
-    styling: { colour: "green" },
+    target: "#input-name-timetable",
+    content: "Enter a name for your timetable.",
+  },
+  {
+    target: "#btn-upload-and-create-timetable",
+    content: "Upload the file and create your timetable.",
   },
 ];
 
@@ -85,19 +44,51 @@ export default function SolverShell() {
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [comingFromStep, setComingFromStep] = useState<number | null>(null);
+  const [moduleGroupingID, setModuleGroupingID] = useState<string | null>(null);
+  const { data: modulesData } = useQuery({
+    queryKey: ["PDF", "MODULES"],
+    queryFn: () => {
+      return fetchAllModules({
+        GroupID: moduleGroupingID || "",
+      });
+    },
+    enabled: moduleGroupingID != null,
+  });
+  const displayMods = modulesData?.filter((mod) => {
+    return mod.ModuleGroupingID == moduleGroupingID;
+  });
+  const eventQueries = useQueries({
+    queries: (displayMods ?? []).map((mod) => ({
+      ...getAllEventsAdminQ(mod.moduleID),
+      enabled: !!mod.moduleID,
+    })),
+  });
+
+  const events: EventResponse[] = eventQueries.map((q) => q.data ?? []).flat();
 
   function handleStepCompleted(fromStep: number) {
     setComingFromStep(fromStep);
     setCompletedSteps((previous) => [...previous, fromStep]);
 
-    //the actual async call should happen here wilmar instead of a timeout
+    // will run the get all modules builder once a pdf is uploaded.
+    // module grouping id will be set to null in the pdf parse element
+    // that element will then do the requests to upload and poll
+    // once the group id is not null then this page will run the query to send
+    // for modules and events
+    // will automatically be done using the get modules query
     setTimeout(() => {
       setCurrentStep(fromStep + 1);
       setComingFromStep(null);
     }, 676);
   }
+
+  if (moduleGroupingID == null && currentStep != 0) {
+    setCurrentStep(0);
+  }
   return (
     <>
+      <Tutorial steps={steps} wait={true} />
+
       <WizardStepper
         completedSteps={completedSteps}
         currentStep={currentStep}
@@ -111,14 +102,18 @@ export default function SolverShell() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-16 max-w-10xl mx-auto px-6 pt-6">
         <div className="flex justify-center h-fit">
-          <SolverUpload onComplete={() => handleStepCompleted(0)} />
+          <SolverUpload
+            onComplete={() => handleStepCompleted(0)}
+            moduleGroupID={moduleGroupingID}
+            setModuleGroupID={setModuleGroupingID}
+          />
         </div>
 
         <div className="flex justify-center h-fit">
           <SolverLock locked={currentStep < 1} loading={comingFromStep === 0}>
             <SolverReview
               events={events}
-              modules={modules}
+              modules={displayMods as ModuleResponseDto[]}
               onComplete={() => handleStepCompleted(1)}
             />
           </SolverLock>
@@ -126,7 +121,10 @@ export default function SolverShell() {
 
         <div className="flex justify-center">
           <SolverLock locked={currentStep < 2} loading={comingFromStep === 1}>
-            <SolverPreferences />
+            <SolverPreferences
+              modules={displayMods as ModuleResponseDto[]}
+              events={events}
+            />
           </SolverLock>
         </div>
       </div>

@@ -16,7 +16,7 @@ export type AppDatabase =
   | PgliteDatabase<typeof appSchema>;
 type Database = AppDatabase;
 
-export type AuthInstance = ReturnType<typeof betterAuth>;
+export type AuthInstance = ReturnType<typeof createAuth>;
 export interface AuthSession {
   user: {
     id: string;
@@ -171,7 +171,7 @@ interface CreateAuthInput {
   redisUrl?: string;
 }
 
-export function createAuth(input: CreateAuthInput): AuthInstance {
+export function createAuth(input: CreateAuthInput) {
   const {
     db,
     dbProvider,
@@ -198,10 +198,6 @@ export function createAuth(input: CreateAuthInput): AuthInstance {
     );
   }
 
-  // Type cast needed: BetterAuth's admin plugin extends the user schema at
-  // runtime (adds banned/role fields) but the generic type system can't
-  // represent this as assignable to the base Auth<BetterAuthOptions>.
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return betterAuth({
     secondaryStorage: redisClient
       ? redisStorage({
@@ -506,5 +502,5 @@ export function createAuth(input: CreateAuthInput): AuthInstance {
         },
       },
     },
-  }) as any;
+  });
 }

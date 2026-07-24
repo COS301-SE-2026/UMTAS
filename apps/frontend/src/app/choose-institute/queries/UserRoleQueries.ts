@@ -1,5 +1,11 @@
 import { mutationOptions, queryOptions } from "@tanstack/react-query";
-import { applyBody, applyUniBuilder, getallUnisBuilder } from "./builders";
+import {
+  applyBody,
+  applyUniBuilder,
+  getallUnisBuilder,
+  selectUniBody,
+  selectUniBuilder,
+} from "./builders";
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
 
 /*
@@ -16,6 +22,15 @@ export function useUserRole() {
   });
 }
 */
+
+export function selectUniMutator() {
+  return mutationOptions({
+    mutationFn: async (body: selectUniBody) => {
+      const builder = new selectUniBuilder();
+      return builder.send({ body });
+    },
+  });
+}
 
 export function getAllUni() {
   return queryOptions({

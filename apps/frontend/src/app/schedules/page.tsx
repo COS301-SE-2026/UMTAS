@@ -10,15 +10,15 @@ export default function SchedulesPage() {
   const [moduleCount, setModuleCount] = useState(0);
   const [exportFn, setExportFn] = useState<(() => void) | null>(null);
 
-  function handleExport() {
-    if (exportFn) {
-      exportFn();
-    }
-  }
+  const exportRef = React.useRef<(() => void) | null>(null);
 
   const handleExportReady = useCallback((fn: () => void) => {
-    setExportFn(() => fn);
+    exportRef.current = fn;
   }, []);
+
+  function handleExport() {
+    exportRef.current?.();
+  }
 
   return (
     <div className="bg-[var(--bg-base)] flex flex-col min-h-[calc(100vh-56px)]">

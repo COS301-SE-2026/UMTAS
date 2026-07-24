@@ -21,7 +21,6 @@ export type SolverJobStatus = 'queued' | 'completed' | 'failed';
 export interface SolverJobRecord {
   jobId: string;
   userId: string;
-  solverProfileKey: string;
   solveMode: 'feasibility' | 'optimization';
   requestedEngine?: 'auto' | 'cp-sat' | 'ga';
   deduplicationKey: string;
@@ -40,7 +39,6 @@ export interface SolverJobRecord {
 
 export interface ReserveSolverJobInput {
   userId: string;
-  solverProfileKey: string;
   solveMode: 'feasibility' | 'optimization';
   requestedEngine?: 'auto' | 'cp-sat' | 'ga';
   deduplicationKey: string;
@@ -66,7 +64,6 @@ export class SolverJobStoreService {
         .values({
           JobID: randomUUID(),
           UserID: input.userId,
-          SolverProfileKey: input.solverProfileKey,
           SolveMode: input.solveMode,
           RequestedEngine: input.requestedEngine,
           DeduplicationKey: input.deduplicationKey,
@@ -367,7 +364,6 @@ function mapSolverJob(row: SolverJob): SolverJobRecord {
   return {
     jobId: toPublicSolverJobId(row.JobID),
     userId: row.UserID,
-    solverProfileKey: row.SolverProfileKey,
     solveMode: parseSolveMode(row.SolveMode),
     requestedEngine: parseRequestedEngine(row.RequestedEngine),
     deduplicationKey: row.DeduplicationKey,

@@ -56,29 +56,14 @@ Welcome to the UMTAS Developer Portal. Here you will find everything you need to
 
     [:octicons-arrow-right-24: Frontend Guide](frontend-development-guide.md)
 
--   :material-test-tube:{ .lg .middle } __Unit Testing__
+-   :material-test-tube:{ .lg .middle } __Testing Policy__
 
     ---
 
-    Writing fast, isolated tests with Jest and pytest.
+    Document outlining the policies for testing across the project.
 
-    [:octicons-arrow-right-24: Testing Guide](unit-testing-guide.md)
+    [:octicons-arrow-right-24: Testing Policy](testing-policy.md)
 
--   :material-flask:{ .lg .middle } __Integration Testing__
-
-    ---
-
-    Cross-service communication and database verification.
-
-    [:octicons-arrow-right-24: Integration Guide](integration-testing-guide.md)
-
--   :material-monitor-screenshot:{ .lg .middle } __E2E Testing__
-
-    ---
-
-    Full user-flow testing in a real browser with Playwright.
-
-    [:octicons-arrow-right-24: E2E Guide](e2e-testing-guide.md)
 
 </div>
 

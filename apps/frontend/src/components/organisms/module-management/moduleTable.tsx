@@ -70,9 +70,9 @@ export function ModuleTable<TData>({ columns, data }: DataTableProps<TData>) {
 
       {showModPopup && (
         <Popup>
-          <div className="w-3/4 items-center p-5 justify-center  flex flex-col center h-9/10 ">
-            <div className="flex flex-row">
-              <Card className="w-1/3 justify-center">
+          <div className="w-3/4 items-center p-5 justify-center flex flex-col center h-9/10 bg-[var(--bg-surface)] h-fit">
+            <div className="flex flex-row items-center">
+              <Card className="w-fit h-fit">
                 <CourseSelect
                   CourseState={selectedCourse}
                   updateCourseState={setSelectedCourse}
@@ -86,7 +86,7 @@ export function ModuleTable<TData>({ columns, data }: DataTableProps<TData>) {
                     }
                   >
                     {" "}
-                    add module to course
+                    Add Module to Course
                   </Button>
                 </CourseSelect>
               </Card>
@@ -97,7 +97,7 @@ export function ModuleTable<TData>({ columns, data }: DataTableProps<TData>) {
               <CreateEventAdmin module={dataState.modules} />
             </div>
             <Button className="w-1/10" onClick={() => updateModPopup(false)}>
-              close
+              Close
             </Button>
           </div>
         </Popup>
@@ -141,7 +141,7 @@ function CourseTableBody<TData>({
         </TableRow>
       ) : (
         rows.map((row) => (
-          <TableRow key={row.id}>
+          <TableRow id="row-module-row" key={row.id}>
             {row.getVisibleCells().map((cell) => (
               <TableCell
                 key={cell.id}
