@@ -209,7 +209,8 @@ jobs:
     needs: docker-staging
     if: github.event_name == 'push' || github.ref == 'refs/heads/main'
     environment:
-      name: staging
+      name: production
+    permissions: {}
     steps:
       - name: Execute deployment on server
         uses: appleboy/ssh-action@v1.0.3
