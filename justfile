@@ -52,7 +52,7 @@ proxy-down:
     phase run -- docker compose -f docker-compose.traefik.yml down
 
 staging-up:
-    phase run --env staging -- docker compose -f docker-compose.staging.yml up -d --remove-orphans
+    phase run --env staging -- docker compose -f docker-compose.staging.yml up -d --remove-orphans --pull always
 
 staging-down:
     phase run --env staging -- docker compose -f docker-compose.staging.yml down
