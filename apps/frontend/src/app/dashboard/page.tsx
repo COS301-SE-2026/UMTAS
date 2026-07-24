@@ -148,19 +148,11 @@ function TypewriterLine() {
 
 function DashboardContent() {
   const router = useRouter();
-  const { data: session } = useSession();
-  const userName = session?.user?.name ?? null;
-
   function handleBuild() {
     router.push("/builder");
   }
 
-  function renderGreeting() {
-    if (userName) {
-      return "Welcome back, " + userName.split(" ")[0] + ".";
-    }
-    return "Welcome to UMTAS.";
-  }
+  //Wilmar has DICTACTED this shall no longer exist.
 
   return (
     <div className="flex flex-col w-full">
@@ -176,8 +168,8 @@ function DashboardContent() {
               University Modular Timetable &amp; Analytics System
             </Badge>
 
-            <h1 className="text-4xl lg:text-5xl font-semibold text-[var(--text-primary)] leading-[1.1] suppressHydrationWarning={true}">
-              {renderGreeting()}
+            <h1 className="text-4xl lg:text-5xl font-semibold text-[var(--text-primary)] leading-[1.1]">
+              Welcome back.
             </h1>
 
             <p className="text-base lg:text-lg text-[var(--text-secondary)] leading-relaxed max-w-sm">

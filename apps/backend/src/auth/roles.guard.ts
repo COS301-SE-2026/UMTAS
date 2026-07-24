@@ -57,7 +57,11 @@ export class RolesGuard implements CanActivate {
       throw new ForbiddenException('Insufficient permissions');
     }
 
-    if (requiredUniRoles === undefined) return true;
+    if (
+      (requiredUniRoles && requiredUniRoles.length === 0) ||
+      requiredUniRoles === undefined
+    )
+      return true;
 
     const rolesToCheck =
       requiredUniRoles.length > 0 ? requiredUniRoles : ['student'];

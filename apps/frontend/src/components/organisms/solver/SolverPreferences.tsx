@@ -234,7 +234,7 @@ export default function SolverPreferences({ modules, events }: solverProps) {
     return (
       <>
         <div className="space-y-2">
-          <strong>
+          <strong hidden>
             <p>Solve mode</p>
           </strong>
           <div className="flex flex-row gap-4">
@@ -262,7 +262,7 @@ export default function SolverPreferences({ modules, events }: solverProps) {
           </div>
         </div>
         {solveMode(currentMode)}
-        <div className="flex flex-col ">
+        <div className="flex flex-col gap-y-2">
           <Input
             id="input-name-timetable"
             placeholder="Name timetable"
@@ -277,7 +277,7 @@ export default function SolverPreferences({ modules, events }: solverProps) {
             type="button"
             onClick={enrollUser}
           >
-            upload and create timetable
+            Upload and Create Timetable
           </Button>
           <Button
             hidden
@@ -320,7 +320,7 @@ export default function SolverPreferences({ modules, events }: solverProps) {
           ) : (
             <div>
               <p>
-                Solving failed
+                Solving Failed
                 <br />
                 {handleError().message}
               </p>

@@ -75,7 +75,7 @@ function RoleSelectElement({ row }: pageProps) {
         }}
       >
         <SelectTrigger id="select-role-for-the-user">
-          <SelectValue placeholder="select a role"></SelectValue>
+          <SelectValue placeholder="Select a Role"></SelectValue>
         </SelectTrigger>
 
         <SelectContent>
