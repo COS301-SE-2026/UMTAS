@@ -1,0 +1,20 @@
+apps/backend/src/University/university.controller.ts
+  h_84e82529bd05a5 32,65,80,82
+apps/frontend/src/components/molecules/nav/NavLinks.tsx
+  h_84e82529bd05a5 12-14
+apps/backend/src/University/university.service.ts
+  h_84e82529bd05a5 65,68,76,79-80,82-83
+apps/backend/src/auth/roles.guard.ts
+  h_84e82529bd05a5 60
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "e10ab7e0a0a6accf2eddaa444ece84f48d60770c",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}
