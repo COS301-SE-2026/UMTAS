@@ -184,7 +184,7 @@ jobs:
           file: docker/frontend/frontend.Dockerfile
           push: true
           build-args: |
-            NEXT_PUBLIC_API_URL=https://staging.api.capstone-vigil.dns.net.za/api
+            NEXT_PUBLIC_API_URL=https://staging.api.capstone-vigil.dns.net.za
             API_URL=https://staging.api.capstone-vigil.dns.net.za
           tags: |
             vigilcs/umtas:frontend-staging-${{ steps.tag.outputs.latest }}
