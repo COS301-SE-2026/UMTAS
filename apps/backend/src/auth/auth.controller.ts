@@ -501,6 +501,9 @@ export class AuthController {
     if (!this.hasGoogleOAuth()) {
       throw new NotFoundException('Google OAuth is not configured');
     }
+    this.logger.log(
+      `Callback cookies: ${JSON.stringify(req.headers.cookie ?? 'NONE')}`,
+    );
     this.logger.log('Google OAuth callback received');
     return this.handleRequest(req, res);
   }
@@ -736,6 +739,35 @@ export class AuthController {
       const nodeHandler = toNodeHandler(auth.handler);
 
       this.logger.log(`Auth request: ${req.method} ${req.url}`);
+
+      const incomingCookie = req.headers.cookie;
+      if (incomingCookie) {
+        const cookieNames = incomingCookie
+          .split(';')
+          .map((c) => c.trim().split('=')[0])
+          .join(', ');
+        this.logger.log(` incoming cookie names: ${cookieNames}`);
+      } else {
+        this.logger.log(` incoming cookies: NONE`);
+      }
+
+      const originalSetHeader = res.setHeader.bind(res);
+      res.setHeader = (
+        name: string,
+        value: string | number | readonly string[],
+      ) => {
+        if (name.toLowerCase() === 'set-cookie') {
+          const cookies = Array.isArray(value) ? value : [String(value)];
+          for (const c of cookies) {
+            const [nameValue, ...attrs] = c.split(';');
+            const cookieName = nameValue.split('=')[0];
+            this.logger.log(
+              ` Set-Cookie: ${cookieName}; ${attrs.map((a) => a.trim()).join('; ')}`,
+            );
+          }
+        }
+        return originalSetHeader(name, value);
+      };
 
       await nodeHandler(req, res);
 
