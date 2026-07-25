@@ -738,19 +738,26 @@ export class AuthController {
       const auth = this.authService.getAuth();
       const nodeHandler = toNodeHandler(auth.handler);
 
-      this.logger.log(`Auth request: ${req.method} ${req.url}`);
+      this.logger.log(`━━━ Auth request: ${req.method} ${req.url}`);
 
+      // Where the request came from — tells us if it's cross-origin
+      this.logger.log(`  Host: ${req.headers.host ?? 'none'}`);
+      this.logger.log(`  Origin: ${req.headers.origin ?? 'none'}`);
+      this.logger.log(`  Referer: ${req.headers.referer ?? 'none'}`);
+
+      // Incoming cookie names (not values — those are secrets)
       const incomingCookie = req.headers.cookie;
       if (incomingCookie) {
         const cookieNames = incomingCookie
           .split(';')
           .map((c) => c.trim().split('=')[0])
           .join(', ');
-        this.logger.log(` incoming cookie names: ${cookieNames}`);
+        this.logger.log(`  Incoming cookie names: ${cookieNames}`);
       } else {
-        this.logger.log(` incoming cookies: NONE`);
+        this.logger.log(`  Incoming cookies: NONE`);
       }
 
+      // Log every Set-Cookie as it's written (name + attributes only)
       const originalSetHeader = res.setHeader.bind(res);
       res.setHeader = (
         name: string,
@@ -762,7 +769,7 @@ export class AuthController {
             const [nameValue, ...attrs] = c.split(';');
             const cookieName = nameValue.split('=')[0];
             this.logger.log(
-              ` Set-Cookie: ${cookieName}; ${attrs.map((a) => a.trim()).join('; ')}`,
+              `  Set-Cookie: ${cookieName}; ${attrs.map((a) => a.trim()).join('; ')}`,
             );
           }
         }
@@ -770,6 +777,18 @@ export class AuthController {
       };
 
       await nodeHandler(req, res);
+
+      // What we sent back
+      const location = res.getHeader('location');
+      this.logger.log(
+        `  Response status: ${res.statusCode}${location ? ` -> redirect to ${String(location)}` : ''}`,
+      );
+      this.logger.log(
+        `  CORS allow-origin: ${String(res.getHeader('access-control-allow-origin') ?? 'none')}`,
+      );
+      this.logger.log(
+        `  CORS allow-credentials: ${String(res.getHeader('access-control-allow-credentials') ?? 'none')}`,
+      );
 
       if (res.statusCode >= 400) {
         this.logger.warn(
