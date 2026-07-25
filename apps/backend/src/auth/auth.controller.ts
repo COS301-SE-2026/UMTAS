@@ -740,12 +740,10 @@ export class AuthController {
 
       this.logger.log(`━━━ Auth request: ${req.method} ${req.url}`);
 
-      // Where the request came from — tells us if it's cross-origin
       this.logger.log(`  Host: ${req.headers.host ?? 'none'}`);
       this.logger.log(`  Origin: ${req.headers.origin ?? 'none'}`);
       this.logger.log(`  Referer: ${req.headers.referer ?? 'none'}`);
 
-      // Incoming cookie names (not values — those are secrets)
       const incomingCookie = req.headers.cookie;
       if (incomingCookie) {
         const cookieNames = incomingCookie
@@ -757,7 +755,6 @@ export class AuthController {
         this.logger.log(`  Incoming cookies: NONE`);
       }
 
-      // Log every Set-Cookie as it's written (name + attributes only)
       const originalSetHeader = res.setHeader.bind(res);
       res.setHeader = (
         name: string,
@@ -778,7 +775,6 @@ export class AuthController {
 
       await nodeHandler(req, res);
 
-      // What we sent back
       const location = res.getHeader('location');
       this.logger.log(
         `  Response status: ${res.statusCode}${location ? ` -> redirect to ${String(location)}` : ''}`,
