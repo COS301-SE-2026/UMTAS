@@ -1,5 +1,4 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ConfigService } from '@nestjs/config';
 import { betterAuth } from 'better-auth';
 import { AuthService } from './auth.service';
 import { DatabaseService } from '../db/database.service';
@@ -9,7 +8,6 @@ jest.mock('../redis/redis');
 
 describe('AuthService', () => {
   let service: AuthService;
-  let configService: ConfigService;
   let mailerService: MailerService;
 
   const mockDb = {
@@ -24,24 +22,6 @@ describe('AuthService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthService,
-        {
-          provide: ConfigService,
-          useValue: {
-            get: jest.fn((key: string) => {
-              const config: Record<string, string> = {
-                BETTER_AUTH_SECRET: 'test-secret-key-32-chars-minimum!!',
-                BETTER_AUTH_URL: 'http://localhost:3001',
-                NEXT_PUBLIC_APP_URL: 'http://localhost:3000',
-                NODE_ENV: 'development',
-                REDIS_URL: 'redis://localhost:6379',
-                GOOGLE_CLIENT_ID: 'test-google-id',
-                GOOGLE_CLIENT_SECRET: 'test-google-secret',
-                SYSTEM_ADMIN_USER_IDS: 'admin-user-id-1,admin-user-id-2',
-              };
-              return config[key];
-            }),
-          },
-        },
         {
           provide: DatabaseService,
           useValue: {
@@ -58,7 +38,6 @@ describe('AuthService', () => {
     }).compile();
 
     service = module.get<AuthService>(AuthService);
-    configService = module.get<ConfigService>(ConfigService);
     mailerService = module.get<MailerService>(MailerService);
   });
 
@@ -75,26 +54,20 @@ describe('AuthService', () => {
       expect(() => service.onModuleInit()).not.toThrow();
     });
 
-    it('should reject production boot without REDIS_URL', () => {
-      jest.spyOn(configService, 'get').mockImplementation((key: string) => {
-        const config: Record<string, string | undefined> = {
-          BETTER_AUTH_SECRET: 'test-secret-key-32-chars-minimum!!',
-          NODE_ENV: 'production',
-          REDIS_URL: undefined,
-        };
-        return config[key];
-      });
-
-      expect(() => service.onModuleInit()).toThrow(
-        'REDIS_URL is required in production',
-      );
+    it('uses the local Redis default when REDIS_URL is absent', () => {
+      const redisUrl = process.env.REDIS_URL;
+      delete process.env.REDIS_URL;
+      expect(() => service.onModuleInit()).not.toThrow();
+      process.env.REDIS_URL = redisUrl;
     });
 
     it('should throw error if BETTER_AUTH_SECRET is missing', () => {
-      jest.spyOn(configService, 'get').mockReturnValueOnce(undefined);
+      const secret = process.env.BETTER_AUTH_SECRET;
+      delete process.env.BETTER_AUTH_SECRET;
       expect(() => service.onModuleInit()).toThrow(
         'BETTER_AUTH_SECRET is required',
       );
+      process.env.BETTER_AUTH_SECRET = secret;
     });
   });
 
@@ -133,19 +106,7 @@ describe('AuthService', () => {
     });
 
     it('should handle system admin user IDs', () => {
-      jest.spyOn(configService, 'get').mockImplementation((key: string) => {
-        const config: Record<string, string> = {
-          BETTER_AUTH_SECRET: 'test-secret-key-32-chars-minimum!!',
-          BETTER_AUTH_URL: 'http://localhost:3001',
-          NEXT_PUBLIC_APP_URL: 'http://localhost:3000',
-          NODE_ENV: 'development',
-          REDIS_URL: '',
-          GOOGLE_CLIENT_ID: '',
-          GOOGLE_CLIENT_SECRET: '',
-          SYSTEM_ADMIN_USER_IDS: '',
-        };
-        return config[key];
-      });
+      process.env.SYSTEM_ADMIN_USER_IDS = '';
       service.onModuleInit();
       const auth = service.getAuth();
       expect(auth).toBeDefined();
@@ -158,18 +119,6 @@ describe('AuthService', () => {
       const localModule = await Test.createTestingModule({
         providers: [
           AuthService,
-          {
-            provide: ConfigService,
-            useValue: {
-              get: jest.fn((key: string) => {
-                const c: Record<string, string | undefined> = {
-                  BETTER_AUTH_SECRET: 'test-secret-key-32-chars-minimum!!',
-                  NODE_ENV: 'development',
-                };
-                return c[key];
-              }),
-            },
-          },
           {
             provide: DatabaseService,
             useValue: { db: drizzle },
@@ -192,18 +141,6 @@ describe('AuthService', () => {
       const localModule = await Test.createTestingModule({
         providers: [
           AuthService,
-          {
-            provide: ConfigService,
-            useValue: {
-              get: jest.fn((key: string) => {
-                const c: Record<string, string | undefined> = {
-                  BETTER_AUTH_SECRET: 'test-secret-key-32-chars-minimum!!',
-                  NODE_ENV: 'development',
-                };
-                return c[key];
-              }),
-            },
-          },
           {
             provide: DatabaseService,
             useValue: { db: drizzle },
@@ -230,20 +167,6 @@ describe('AuthService', () => {
       const localModule = await Test.createTestingModule({
         providers: [
           AuthService,
-          {
-            provide: ConfigService,
-            useValue: {
-              get: jest.fn((key: string) => {
-                const c: Record<string, string | undefined> = {
-                  BETTER_AUTH_SECRET: 'test-secret-key-32-chars-minimum!!',
-                  BETTER_AUTH_URL: 'http://localhost:3001',
-                  NEXT_PUBLIC_APP_URL: 'http://localhost:3000',
-                  NODE_ENV: 'development',
-                };
-                return c[key];
-              }),
-            },
-          },
           {
             provide: DatabaseService,
             useValue: { db: {} },

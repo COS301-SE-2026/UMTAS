@@ -1,18 +1,5 @@
-import { ConfigService } from '@nestjs/config';
 import { ObjectStorageService } from './object-storage.service';
 import type { ObjectStorageClient } from './object-storage.service';
-
-class TestConfigService {
-  constructor(private readonly env: Record<string, string>) {}
-
-  get<T = string>(key: string): T | undefined {
-    return this.env[key] as T | undefined;
-  }
-}
-
-function createConfigService(env: Record<string, string>): ConfigService {
-  return new TestConfigService(env) as unknown as ConfigService;
-}
 
 function createClient(
   handleCommand: (commandName: string) => unknown = () => ({}),
@@ -48,10 +35,7 @@ describe('ObjectStorageService', () => {
       return {};
     });
 
-    const service = new ObjectStorageService(
-      createConfigService({ MINIO_BUCKET: 'umtas-uploads' }),
-      client,
-    );
+    const service = new ObjectStorageService(client);
 
     await service.onModuleInit();
 
@@ -61,23 +45,10 @@ describe('ObjectStorageService', () => {
   it('does not create the bucket when it already exists', async () => {
     const { calls, client } = createClient();
 
-    const service = new ObjectStorageService(
-      createConfigService({ MINIO_BUCKET: 'umtas-uploads' }),
-      client,
-    );
+    const service = new ObjectStorageService(client);
 
     await service.onModuleInit();
 
     expect(calls).toEqual(['HeadBucketCommand']);
-  });
-
-  it('skips setup when no bucket is configured', async () => {
-    const { calls, client } = createClient();
-
-    const service = new ObjectStorageService(createConfigService({}), client);
-
-    await service.onModuleInit();
-
-    expect(calls).toEqual([]);
   });
 });

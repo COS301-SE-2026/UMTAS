@@ -5,7 +5,7 @@ import { APIError, betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { admin } from 'better-auth/plugins/admin';
 import { redisStorage } from '@better-auth/redis-storage';
-import * as appSchema from '../db/schema';
+import * as appSchema from '../entities';
 import { isAppRole, UniRole } from './roles';
 import { getRedisClient } from '../redis/redis';
 import { ac, sysAdmin, user } from './permissions';
