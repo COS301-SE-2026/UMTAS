@@ -1,7 +1,7 @@
 import { Test } from '@nestjs/testing';
 
 //Constants
-import { groupId } from '../Testing/constants.spec';
+import { courseId, groupId } from '../Testing/constants.spec';
 
 //Actual Services
 import { CourseService } from './course.service';
@@ -198,4 +198,30 @@ describe('CourseService', () => {
       expect(result).toMatchObject({ courses: courses });
     });
   }); //END_Test_GetAll
+
+  describe('Test_GetById', () => {
+    //UnHappy - throw if course doesnt exist
+    it('should throw if the course does not exist', async () => {
+      //Arrange
+      mockDbResult(mockDb.select, []);
+
+      //Act + Assert
+      await expect(service.getById(courseId)).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+
+    //Happy - return the course by id
+    it('should return the course by id', async () => {
+      //Arrange
+      const course = createCourse();
+      mockDbResult(mockDb.select, [course]);
+
+      //Act
+      const result = await service.getById(course.CourseID);
+
+      //Assert
+      expect(result).toMatchObject(course);
+    });
+  }); //END_Test_GetById
 }); //END_CourseService
