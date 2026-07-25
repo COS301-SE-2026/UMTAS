@@ -6,14 +6,20 @@ import {
 } from "@/components/atoms/baseShadcn/card";
 import { InstituteSelector } from "@/components/organisms/choose-institute/instituteSelector";
 
-export function ChooseInstituteTemplate() {
+interface ChooseInstituteTemplateProps {
+  onClose?: () => void;
+}
+
+export function ChooseInstituteTemplate({
+  onClose,
+}: ChooseInstituteTemplateProps) {
   return (
-    <Card className="mx-auto w-full md:w-3/4">
+    <Card className="mx-auto max-w-lg bg-[var(--bg-surface)]">
       <CardHeader>
         <CardTitle>Choose Institute</CardTitle>
       </CardHeader>
       <CardContent>
-        <InstituteSelector />
+        <InstituteSelector onClose={onClose} />
       </CardContent>
     </Card>
   );

@@ -8,7 +8,6 @@ const NAV_ITEMS = [
   { href: "/solver", label: "Upload PDF" },
   { href: "/builder", label: "Event Builder" },
   { href: "/schedules", label: "My Schedules" },
-  { href: "/choose-institute", label: "Choose Institute" },
   { href: "/course-management", label: "Manage Courses" },
   { href: "/role-management", label: "Manage Roles" },
   { href: "/module-management", label: "Manage Modules & Events" },
