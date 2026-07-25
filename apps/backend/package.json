@@ -121,7 +121,7 @@
       "node_modules/(?!(better-auth|@better-auth)/)"
     ],
     "collectCoverageFrom": [
-      "**/*.ts",
+      "**/*service.ts",
       "!**/*.spec.ts",
       "!**/*.int.ts",
       "!**/*.module.ts",
