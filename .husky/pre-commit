@@ -17,5 +17,6 @@ fi
 
 if echo "$STAGED_TS" | grep -q 'apps/backend/'; then
   echo "Running backend type check..."
-  pnpm -C apps/backend exec tsc --noEmit
+  pnpm -C apps/backend exec tsc -p tsconfig.build.json --noEmit
+  pnpm -C apps/backend exec tsc -p tsconfig.int.json --noEmit
 fi

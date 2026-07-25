@@ -1,3 +1,8 @@
+process.env.DB_MODE = 'PGLITE';
+process.env.BETTER_AUTH_SECRET = 'test-secret-key-32-chars-minimum!!';
+process.env.BETTER_AUTH_URL = 'http://localhost:3001';
+process.env.NEXT_PUBLIC_APP_URL = 'http://localhost:3000';
+process.env.REDIS_URL = 'redis://localhost:6379';
 process.env.WORKER_CALLBACK_TOKEN = 'secret';
 
 jest.mock('better-auth', () => {
