@@ -88,7 +88,7 @@ export class ModuleService {
 
     if (groupId) {
       //check that module Grouping groupId is valid
-      console.log('This should be null ', groupId);
+      // console.log('This should be null ', groupId);
       await this.groupingService.getById(groupId, tx);
 
       //Check for duplicate moduleCode in ModuleGrouping
@@ -129,11 +129,11 @@ export class ModuleService {
       tx,
     );
 
-    //if grouping failed
-    if (!moduleGroup)
-      throw new InternalServerErrorException(
-        `Failed to group module[${newModule.moduleID}] to group [${groupId}]`,
-      );
+    //if grouping failed -- removed this check, should be handled by grouping service
+    // if (!moduleGroup)
+    //   throw new InternalServerErrorException(
+    //     `Failed to group module[${newModule.moduleID}] to group [${groupId}]`,
+    //   );
 
     // console.log(`CreateModule: dto.styling: ${JSON.stringify(dto.styling)}`);
 
@@ -577,7 +577,7 @@ export class ModuleService {
     tx: DatabaseService['db'],
   ): Promise<boolean> {
     const [existingModule] = await tx
-      .select()
+      .select({ moduleCode: modules.moduleCode })
       .from(modules)
       .innerJoin(GroupModules, eq(GroupModules.ModuleID, modules.moduleID))
       .innerJoin(

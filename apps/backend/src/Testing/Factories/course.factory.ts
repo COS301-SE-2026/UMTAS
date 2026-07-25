@@ -1,28 +1,19 @@
-// import { randomUUID } from 'crypto';
-// import { Course } from 'src/entities';
-// import { CourseService } from 'src/Course/course.service';
+import { randomUUID } from 'crypto';
+import { Course } from '../../entities';
 
-// export function createMockCourseService() {
-//   const mockCourseService: Partial<jest.Mocked<CourseService>> = {
-//     getById: jest.fn(),
-//   };
+const COURSE_NAME: string = 'BSc Computer Science';
+const DEGREE: string = 'Bachelor of Science';
 
-//   return {
-//     mockCourseService,
-//     reset: () => {
-//       Object.values(mockCourseService).forEach((fn: any) => fn.mockReset());
-//     },
-//   };
-// } //END_createMockCourseService
+type Course = typeof Course.$inferSelect;
 
-// type Course = typeof Course.$inferSelect;
+export function createCourse(overrides: Partial<Course> = {}): Course {
+  return {
+    CourseID: randomUUID(),
+    UniversityID: randomUUID(),
+    GroupID: null,
+    CourseName: COURSE_NAME,
+    Degree: DEGREE,
 
-// export function createCourse(overrides: Partial<Course> = {}): Course {
-//   return {
-//     CourseID: randomUUID(),
-//     CourseName: 'BSc Computer Science',
-//     UniversityID: randomUUID(),
-
-//     ...overrides,
-//   };
-// } //END_createCourse
+    ...overrides,
+  };
+} //END_createCourse
