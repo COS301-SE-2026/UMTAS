@@ -1,1 +1,0 @@
-ALTER TABLE "SOLVER_JOB" DROP COLUMN "SolverProfileKey";

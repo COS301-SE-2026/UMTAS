@@ -100,7 +100,7 @@ export function NoPermissionsEventCard({
         <SelectTrigger
           className={getInputClass(!!errors?.moduleId) + " w-full"}
         >
-          <SelectValue placeholder="Select a module" />
+          <SelectValue placeholder="Select a Module" />
         </SelectTrigger>
         <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)]">
           {modules.map((m) => {

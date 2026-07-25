@@ -9,9 +9,9 @@ const NAV_ITEMS = [
   { href: "/builder", label: "Event Builder" },
   { href: "/schedules", label: "My Schedules" },
   { href: "/choose-institute", label: "Choose Institute" },
-  { href: "/course-management", label: "Manage courses" },
-  { href: "/role-management", label: "Manage roles" },
-  { href: "/module-management", label: "Manage modules and events" },
+  { href: "/course-management", label: "Manage Courses" },
+  { href: "/role-management", label: "Manage Roles" },
+  { href: "/module-management", label: "Manage Modules & Events" },
 ] as const;
 
 export function NavLinks() {

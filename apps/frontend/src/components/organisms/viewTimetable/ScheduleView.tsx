@@ -347,7 +347,7 @@ export function ScheduleView({
               }}
             >
               <SelectTrigger className="bg-[var(--bg-surface)] border-[var(--border)]">
-                <SelectValue placeholder="Select a timetable" />
+                <SelectValue placeholder="Select a Timetable" />
               </SelectTrigger>
               <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)]">
                 {timetables.map((tt) => (

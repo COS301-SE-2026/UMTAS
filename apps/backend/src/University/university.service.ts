@@ -6,11 +6,10 @@ import {
   InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { eq, and, or } from 'drizzle-orm';
+import { eq, and, or, notLike } from 'drizzle-orm';
 
 import { AppDatabase, DatabaseService } from '../db/database.service';
 import {
-  RoleType,
   RoleTypeType,
   University,
   UniversityRole,
@@ -29,7 +28,6 @@ import {
   UserUniversityRoleResponseDto,
   GetRoleFilterDto,
 } from './dto/university.dto';
-import { notExists } from 'drizzle-orm';
 
 @Injectable()
 export class UniversityService {
@@ -70,6 +68,7 @@ export class UniversityService {
   ): Promise<UniversityListResponseDto> {
     const db = tx ?? this.dbService.db;
 
+    console.log(`Hierso: ${userId}`);
     const universities = await db
       .select({
         UniversityID: University.UniversityID,
@@ -84,20 +83,25 @@ export class UniversityService {
           eq(UniversityRole.UserID, userId),
         ),
       )
-      .where(
-        // show no universities if anyone has a rule student owned to it.
-        notExists(
-          db
-            .select()
-            .from(UniversityRole)
-            .where(
-              and(
-                eq(UniversityRole.UniversityID, University.UniversityID),
-                eq(UniversityRole.role, RoleType.enumValues[1]),
-              ),
-            ),
-        ),
-      );
+      .where(notLike(University.UniversityName, 'user%'));
+
+    console.log(`Meneer: ${JSON.stringify(universities)}`);
+    //@Aidan - this is where you f***ed up
+
+    // .where(
+    //   // show no universities if anyone has a rule student owned to it.
+    //   notExists(
+    //     db
+    //       .select()
+    //       .from(UniversityRole)
+    //       .where(
+    //         and(
+    //           eq(UniversityRole.UniversityID, University.UniversityID),
+    //           eq(UniversityRole.role, RoleType.enumValues[1]),
+    //         ),
+    //       ),
+    //   ),
+    // );
 
     if (universities.length === 0) return { universities: [] };
 
