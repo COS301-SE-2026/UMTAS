@@ -49,15 +49,5 @@ providers:
 certificatesResolvers:
   myresolver:
     acme:
-      caServer: https://acme-v02.api.letsencrypt.org/directory
-      email: vigil.cs2025@gmail.com
       storage: /letsencrypt/acme.json
-      httpChallenge:
-        entryPoint: web
-  lestaging:
-    acme:
-      caServer: https://acme-staging-v02.api.letsencrypt.org/directory
-      email: vigil.cs2025@gmail.com
-      storage: /letsencrypt/acme-staging.json
-      httpChallenge:
-        entryPoint: web
+      tlsChallenge: {}
