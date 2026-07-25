@@ -5,7 +5,7 @@ import { buildSolverCallbackUrl } from "../config.js";
 test("solver callback URLs identify the queued attempt", () => {
   assert.equal(
     buildSolverCallbackUrl(
-      "http://backend.test/solver/jobs/",
+      "http://backend.test/",
       "solve-1",
       "11111111-1111-4111-8111-111111111111",
     ),
