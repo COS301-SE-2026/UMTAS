@@ -1,0 +1,14 @@
+apps/backend/src/mail/mailer.service.spec.ts
+  h_3359569cacef0e 1-49
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "b070fd6a017f79696d5ae2f1c20a5689bb010985",
+  "prompts": {},
+  "humans": {
+    "h_3359569cacef0e": {
+      "author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}
