@@ -1,0 +1,16 @@
+docs/srs/USE_CASES.md
+  h_84e82529bd05a5 3,5,16,18,26-27,36-37,46-47,55-56,64-65,73-74,83-84,92-93,102-103,110-111,119-121
+docs/stylesheets/extra.css
+  h_84e82529bd05a5 93-138,140-146,150-156
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "3d09dfb7cdaef81ef9b8e64e5cb6be69b49d5b87",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}

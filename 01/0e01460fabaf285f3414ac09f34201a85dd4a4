@@ -1,0 +1,18 @@
+apps/backend/src/Module/module.controller.ts
+  h_84e82529bd05a5 40,68,96,124,159,197,239
+apps/backend/src/University/university.controller.ts
+  h_84e82529bd05a5 61,81,108,162
+apps/backend/src/Events/event.controller.ts
+  h_84e82529bd05a5 26,34,70,99,121,167
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "010e01460fabaf285f3414ac09f34201a85dd4a4",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}

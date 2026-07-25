@@ -1,0 +1,14 @@
+apps/backend/src/Module/module.service.ts
+  h_84e82529bd05a5 426-434,440
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "f44e77bd1e8b68c5c5323bf75456ffd10618ef79",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}

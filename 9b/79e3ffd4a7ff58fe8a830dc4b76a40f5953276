@@ -1,0 +1,14 @@
+apps/backend/src/Course/course.service.ts
+  h_84e82529bd05a5 79
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "9b79e3ffd4a7ff58fe8a830dc4b76a40f5953276",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}

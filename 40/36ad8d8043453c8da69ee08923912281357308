@@ -1,0 +1,46 @@
+apps/frontend/src/components/molecules/customise/CustomiseEventCard.tsx
+  h_3359569cacef0e 103,255
+apps/frontend/src/components/organisms/viewTimetable/ScheduleView.tsx
+  h_3359569cacef0e 350
+apps/backend/src/University/university.service.ts
+  h_3359569cacef0e 74-94
+apps/frontend/src/components/organisms/choose-institute/instituteSelector.tsx
+  h_3359569cacef0e 121
+apps/frontend/src/components/molecules/choose-institute/SelectRoleField.tsx
+  h_3359569cacef0e 26
+apps/frontend/src/components/atoms/roleManagement/roleControl.tsx
+  h_3359569cacef0e 78
+apps/frontend/src/app/dashboard/page.tsx
+  h_3359569cacef0e 155,171-172
+docs/diagrams/architecture/Architecture.drawio
+  s_19b9494ceaead2::t_ab1e74065d0a73 1-371
+apps/frontend/src/components/molecules/choose-institute/SelectInstituteField.tsx
+  h_3359569cacef0e 32
+apps/frontend/src/components/molecules/builder/EventCard.tsx
+  h_3359569cacef0e 97,242
+apps/frontend/src/components/molecules/solver/NoPermissionsEventCard.tsx
+  h_3359569cacef0e 103
+apps/backend/src/University/university.controller.ts
+  h_3359569cacef0e 32,65
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "4036ad8d8043453c8da69ee08923912281357308",
+  "prompts": {},
+  "humans": {
+    "h_3359569cacef0e": {
+      "author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_19b9494ceaead2": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f9039-6ec0-7492-b04f-c7164233d1a5",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}

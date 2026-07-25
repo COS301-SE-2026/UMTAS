@@ -1,0 +1,26 @@
+apps/preference-solver/src/data/Modules/module.h
+  h_84e82529bd05a5 28
+apps/preference-solver/src/data/API/API-data.h
+  h_84e82529bd05a5 23
+apps/preference-solver/src/data/Events/event.h
+  h_84e82529bd05a5 22-23
+apps/preference-solver/src/main.cpp
+  h_84e82529bd05a5 28-29
+apps/preference-solver/src/data/Events/event.cpp
+  h_84e82529bd05a5 84,94-102
+apps/preference-solver/TEST_DIR/output.json
+  h_84e82529bd05a5 1-130
+apps/preference-solver/src/CP_SOLVER/CP.h
+  h_84e82529bd05a5 6,79
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "8f5e50dfe80f3b0ceeceb490b68e80d6e4d684e4",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}

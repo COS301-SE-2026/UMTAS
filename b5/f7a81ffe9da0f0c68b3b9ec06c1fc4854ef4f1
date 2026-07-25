@@ -1,0 +1,51 @@
+apps/frontend/src/components/molecules/customise/CustomiseEventCard.tsx
+  s_fb27ff8ef71806::t_1b6d2de480a3f4 15-16,68-69,94-95,125,152,159,162,174,181-182,184,194-213,225,232,235,253,257,261,263,265-266
+apps/frontend/src/components/atoms/builder/eventDropdown.tsx
+  s_fb27ff8ef71806::t_1b6d2de480a3f4 13-14,16-17,22,30-32,36,40,44,54,57,59-60,64,66
+apps/frontend/src/components/atoms/customise/CustomiseEventPanel.tsx
+  s_fb27ff8ef71806::t_1b6d2de480a3f4 17,42
+apps/frontend/src/app/builder/utils/events/eventRequestBuilder.int.ts
+  s_fb27ff8ef71806::t_1b6d2de480a3f4 100,103,106-108,113,122
+apps/frontend/src/lib/ICS-utils/ICS.test.ts
+  s_fb27ff8ef71806::t_1b6d2de480a3f4 8-9,12-13,56,62,69,72
+apps/frontend/src/lib/ICS-utils/ICS.ts
+  s_fb27ff8ef71806::t_1b6d2de480a3f4 24,30,37,40
+apps/backend/drizzle/0006_sad_mephistopheles.sql
+  s_fb27ff8ef71806::t_014a3db38e68c3 1-29
+apps/frontend/src/lib/api.ts
+  s_fb27ff8ef71806::t_1b6d2de480a3f4 1368-1370,1376-1378,1388-1389,1395,1403,1411-1412,1418,1429,1437-1439,1447-1448,1454,1464-1465
+apps/frontend/src/components/organisms/builder/EventsPanel.tsx
+  s_fb27ff8ef71806::t_1b6d2de480a3f4 46,48,50-52
+apps/frontend/src/components/organisms/builder/GenerateStep.tsx
+  s_fb27ff8ef71806::t_1b6d2de480a3f4 133,135,145,182,185
+apps/frontend/src/components/organisms/customise/CustomiseEventShell.tsx
+  s_fb27ff8ef71806::t_1b6d2de480a3f4 26,31,93,96,113,148-149
+apps/frontend/src/app/builder/utils/timetables/TimetableRequest.int.ts
+  s_fb27ff8ef71806::t_1b6d2de480a3f4 99,102,105-107,112
+apps/frontend/src/app/builder/utils/events/eventRequestBuilder.ts
+  s_fb27ff8ef71806::t_1b6d2de480a3f4 68
+apps/frontend/src/components/organisms/viewTimetable/ScheduleView.tsx
+  s_fb27ff8ef71806::t_1b6d2de480a3f4 125,129
+apps/frontend/src/components/molecules/builder/EventCard.tsx
+  s_fb27ff8ef71806::t_1b6d2de480a3f4 15-16,63-64,89-90,119,142,148,151,164,170-171,173,184-205,209,215,218,235,238,240-242
+apps/frontend/src/components/organisms/builder/EventsStep.tsx
+  s_fb27ff8ef71806::t_1b6d2de480a3f4 63,95,99-100,110,130,140-141,145,157-158,210,219,234,240,252,257,260,262,292,309,359-360,365,370,378,380,414,436
+apps/frontend/src/lib/scheduleUtils.ts
+  s_fb27ff8ef71806::t_1b6d2de480a3f4 75,77,80,82,95-97
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "b5f7a81ffe9da0f0c68b3b9ec06c1fc4854ef4f1",
+  "prompts": {},
+  "sessions": {
+    "s_fb27ff8ef71806": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f6540-57ad-7e21-be40-e5bf2f722bbc",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}
