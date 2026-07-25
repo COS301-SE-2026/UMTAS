@@ -130,14 +130,14 @@ export class CourseService {
       });
     } //END_tx precence check
 
+    //check if course exists - getbyid will throw if it doesn't exist
+    const oldCourse = await this.getById(courseId, tx);
+
     //If uni declared - check if uni exists
     if (dto.UniversityID) await this.uniService.getById(dto.UniversityID, tx);
 
     //if groupId defined - check if group exists
     if (dto.GroupID) await this.groupingService.getById(dto.GroupID, tx);
-
-    //check if course exists - getbyid will throw if it doesn't exist
-    const oldCourse = await this.getById(courseId, tx);
 
     //get fields to update
     const updateFields: Partial<typeof Course.$inferSelect> = {};
