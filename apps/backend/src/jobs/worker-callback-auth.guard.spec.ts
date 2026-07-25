@@ -1,5 +1,4 @@
 import { ExecutionContext, UnauthorizedException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import {
   WorkerCallbackAuthGuard,
   extractBearerToken,
@@ -22,9 +21,7 @@ describe('worker callback auth helpers', () => {
 
 describe('WorkerCallbackAuthGuard', () => {
   it('allows requests with the configured bearer token', () => {
-    const guard = new WorkerCallbackAuthGuard({
-      get: jest.fn().mockReturnValue('secret'),
-    } as unknown as ConfigService);
+    const guard = new WorkerCallbackAuthGuard();
 
     expect(guard.canActivate(contextWithAuthorization('Bearer secret'))).toBe(
       true,
@@ -32,9 +29,7 @@ describe('WorkerCallbackAuthGuard', () => {
   });
 
   it('rejects requests with a missing or invalid token', () => {
-    const guard = new WorkerCallbackAuthGuard({
-      get: jest.fn().mockReturnValue('secret'),
-    } as unknown as ConfigService);
+    const guard = new WorkerCallbackAuthGuard();
 
     expect(() =>
       guard.canActivate(contextWithAuthorization('Bearer wrong')),

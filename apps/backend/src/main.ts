@@ -1,4 +1,5 @@
 import { NestFactory } from '@nestjs/core';
+import 'dotenv/config';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { collectDefaultMetrics, register } from 'prom-client';

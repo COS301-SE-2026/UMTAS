@@ -1,3 +1,5 @@
+process.env.WORKER_CALLBACK_TOKEN = 'secret';
+
 jest.mock('better-auth', () => {
   class APIError extends Error {
     constructor(
