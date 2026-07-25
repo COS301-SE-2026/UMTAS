@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { IS_PUBLIC_KEY } from '../auth/auth.guard';
 import type { SessionData } from '../auth/session.decorator';
 import { WorkerCallbackAuthGuard } from '../jobs/worker-callback-auth.guard';
-import type { PdfParserCallbackDto } from './dto/pdf-parser-callback.dto';
+import { PdfParserCallbackDto } from './dto/pdf-parser-callback.dto';
 import { PdfParseSubmission } from './pdf-parse-submission';
 import { PdfParserController } from './pdf-parser.controller';
 import {
@@ -193,6 +193,23 @@ describe('PdfParserController', () => {
       }),
     ).resolves.toEqual({ accepted: true, jobId: queuedRecord.jobId });
 
+    expect(jobStore.recordCallback).toHaveBeenCalledWith(queuedRecord.jobId, {
+      status: 'completed',
+      result,
+    });
+  });
+
+  it('accepts transformed DTOs with undefined optional callback fields', async () => {
+    const result = { modules: [], events: [], warnings: [] };
+    const callback = new PdfParserCallbackDto();
+    callback.status = 'completed';
+    callback.result = result;
+
+    await expect(
+      controller.receiveCallback(queuedRecord.jobId, callback),
+    ).resolves.toEqual({ accepted: true, jobId: queuedRecord.jobId });
+
+    expect(Object.keys(callback)).toEqual(['status', 'result', 'error']);
     expect(jobStore.recordCallback).toHaveBeenCalledWith(queuedRecord.jobId, {
       status: 'completed',
       result,

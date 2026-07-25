@@ -18,7 +18,6 @@ export const solverJob = pgTable(
     UserID: uuid('UserID')
       .notNull()
       .references(() => usersTable.id, { onDelete: 'cascade' }),
-    SolverProfileKey: varchar('SolverProfileKey', { length: 128 }).notNull(),
     SolveMode: varchar('SolveMode', { length: 32 }).notNull(),
     RequestedEngine: varchar('RequestedEngine', { length: 32 }),
     DeduplicationKey: varchar('DeduplicationKey', { length: 90 }).notNull(),

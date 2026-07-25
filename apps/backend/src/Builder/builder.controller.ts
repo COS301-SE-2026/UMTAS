@@ -53,7 +53,7 @@ export class BuilderController {
   createModule(
     @CurrentSession() session: SessionData,
     @Body() dto: CreateBuilderModuleDto,
-  ) {
+  ): Promise<ModuleSingleResponseDto> {
     return this.service.createModule(session.user.id, dto);
   }
 
@@ -78,7 +78,9 @@ export class BuilderController {
     status: 404,
     description: 'No modules found matching the filters',
   })
-  getAll(@CurrentSession() session: SessionData) {
+  getAll(
+    @CurrentSession() session: SessionData,
+  ): Promise<ModuleListResponseDto> {
     return this.service.getAllModules(session.user.id);
   }
 
@@ -106,7 +108,7 @@ export class BuilderController {
   getById(
     @CurrentSession() session: SessionData,
     @Param('moduleId', ParseUUIDPipe) moduleId: string,
-  ) {
+  ): Promise<ModuleSingleResponseDto> {
     return this.service.getModuleById(session.user.id, moduleId);
   }
 
@@ -140,7 +142,7 @@ export class BuilderController {
     @CurrentSession() session: SessionData,
     @Param('moduleId', ParseUUIDPipe) moduleId: string,
     @Body() dto: UpdateBuilderDto,
-  ) {
+  ): Promise<ModuleSingleResponseDto> {
     return this.service.updateModule(session.user.id, moduleId, dto);
   }
 
@@ -169,7 +171,7 @@ export class BuilderController {
   delete(
     @CurrentSession() session: SessionData,
     @Param('moduleId', ParseUUIDPipe) moduleId: string,
-  ) {
+  ): Promise<DeleteModuleResponseDto> {
     return this.service.deleteModule(session.user.id, moduleId);
   }
 } //BuilderController

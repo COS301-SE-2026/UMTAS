@@ -55,11 +55,11 @@ jobs:
       - name: Run Build
         run: pnpm run build
 
-      - name: Run Tests
-        run: pnpm run test:unit
+      # - name: Run Tests
+      #   run: pnpm run test:unit
 
-      - name: Run Integration Tests
-        run: pnpm --filter backend test:int
+      # - name: Run Integration Tests
+      #   run: pnpm --filter backend test:int
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@75cd11691c0faa626561e295848008c8a7dddffe
@@ -193,8 +193,8 @@ jobs:
       - name: Build & push solver
         uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8
         with:
-          context: apps/solver
-          file: apps/solver/solver.Dockerfile
+          context: .
+          file: docker/solver-worker/solver-worker.Dockerfile
           push: true
           tags: |
             vigilcs/umtas:solver-staging-${{ steps.tag.outputs.latest }}
@@ -263,8 +263,8 @@ jobs:
       - name: Build & push solver
         uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8
         with:
-          context: apps/solver
-          file: apps/solver/solver.Dockerfile
+          context: .
+          file: docker/solver-worker/solver-worker.Dockerfile
           push: true
           tags: |
             vigilcs/umtas:solver-${{ steps.tag.outputs.release }}

@@ -23,7 +23,7 @@ export function SelectRoleField({ value, onChange }: SelectRoleFieldProps) {
       <Label htmlFor="role-select">Select Role</Label>
       <Select value={value} onValueChange={onChange}>
         <SelectTrigger id="role-select" className="w-full">
-          <SelectValue placeholder="Select a role" />
+          <SelectValue placeholder="Select a Role" />
         </SelectTrigger>
         <SelectContent>
           {roles.map((role) => (

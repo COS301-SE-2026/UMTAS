@@ -106,6 +106,6 @@ export class TimetableListResponseDto {
 } //TimetableListResponseDto
 
 export class DeleteTimetableResponseDto {
-  @ApiProperty({ example: true })
+  @ApiProperty({ type: Boolean, example: true })
   success!: boolean;
 } //DeleteTimetableResponseDto

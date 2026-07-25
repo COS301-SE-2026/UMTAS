@@ -85,7 +85,7 @@ export class CourseListResponseDto {
 export class DeleteCourseResponseDto extends PickType(CourseDto, [
   'CourseName',
 ]) {
-  @ApiProperty({ example: true })
+  @ApiProperty({ type: Boolean, example: true })
   success!: boolean;
 }
 

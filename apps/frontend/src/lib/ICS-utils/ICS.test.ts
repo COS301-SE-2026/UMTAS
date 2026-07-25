@@ -4,10 +4,11 @@ import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
 
 const events: EventResponse[] = [
   {
-    isRecurring: {},
+    isRecurring: false,
     activityCode: "COS332",
     eventId: "",
     eventName: "name",
+    activityType: "lecture",
     eventCriteria: {
       eventSource: "university",
       date: "monday",

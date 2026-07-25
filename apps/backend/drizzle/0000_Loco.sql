@@ -142,7 +142,6 @@ CREATE TABLE "PARSE_JOB" (
 CREATE TABLE "SOLVER_JOB" (
 	"JobID" uuid PRIMARY KEY NOT NULL,
 	"UserID" uuid NOT NULL,
-	"SolverProfileKey" varchar(128) NOT NULL,
 	"SolveMode" varchar(32) NOT NULL,
 	"RequestedEngine" varchar(32),
 	"DeduplicationKey" varchar(90) NOT NULL,

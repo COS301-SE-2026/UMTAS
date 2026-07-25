@@ -1,5 +1,5 @@
 {
-  "id": "d064ff8e-b101-4183-a742-d477e0e7f43a",
+  "id": "36d2ea84-ff86-457f-978a-dfb4361f5ce2",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -1275,12 +1275,6 @@
         "UserID": {
           "name": "UserID",
           "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "SolverProfileKey": {
-          "name": "SolverProfileKey",
-          "type": "varchar(128)",
           "primaryKey": false,
           "notNull": true
         },

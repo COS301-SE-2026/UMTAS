@@ -19,11 +19,13 @@ import {
   EventCriteria,
   EventResponse,
 } from "@/app/builder/utils/events/eventRequestBuilder";
+import { Switch } from "@/components/atoms/baseShadcn/switch";
 
 export interface EventErrors {
   name?: string;
   code?: string;
   date?: string;
+  dayOfWeek?: string;
   time?: string;
   moduleId?: string;
   venue?: string;
@@ -92,7 +94,7 @@ export function EventCard({
         <SelectTrigger
           className={getInputClass(!!errors?.moduleId) + " w-full"}
         >
-          <SelectValue placeholder="Select a module" />
+          <SelectValue placeholder="Select a Module" />
         </SelectTrigger>
         <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)]">
           {modules.map((m) => {
@@ -182,44 +184,100 @@ export function EventCard({
         </div>
 
         {/* venue */}
-        <div className="flex flex-col gap-2">
-          <Label
+        {/* <div className="flex flex-col gap-2"> */}
+        {/* <Label
             htmlFor={"event-venue-" + event.eventId}
             className="text-sm font-medium text-[var(--text-secondary)]"
           >
             Venue
-          </Label>
-          {
-            // <Input
-            //   id={"event-venue-" + event.eventId}
-            //   value={event.eventCriteria?.venue || ""}
-            //   onChange={(e) => onUpdate(event.eventId, "venue", e.target.value)}
-            //   placeholder="e.g. IT 2-26"
-            //   className={getInputClass(!!errors?.venue)}
-            // />
-          }
-          {/* {errors?.venue && (
+          </Label> */}
+        {
+          // <Input
+          //   id={"event-venue-" + event.eventId}
+          //   value={event.eventCriteria?.venue || ""}
+          //   onChange={(e) => onUpdate(event.eventId, "venue", e.target.value)}
+          //   placeholder="e.g. IT 2-26"
+          //   className={getInputClass(!!errors?.venue)}
+          // />
+        }
+        {/* {errors?.venue && (
             <p className="text-sm text-[var(--error-text)]">{errors.venue}</p>
           )} */}
-        </div>
+        {/* </div> */}
 
         {/* date - mapped to day */}
+        {/* recurring toggle */}
+        <div className="flex items-center justify-between gap-2 rounded-md border border-[var(--border)] p-3">
+          <div className="space-y-0.5">
+            <Label className="text-sm font-medium text-[var(--text-primary)]">
+              Recurring Weekly
+            </Label>
+            <p className="text-xs text-[var(--text-secondary)]">
+              Does this event repeat every week?
+            </p>
+          </div>
+          <Switch
+            checked={event.isRecurring}
+            onCheckedChange={(checked) =>
+              onUpdate(event.eventId, "isRecurring", checked)
+            }
+          />
+        </div>
+
+        {/* now date/day of week */}
         <div className="flex flex-col gap-2">
           <Label
             htmlFor={"event-date-" + event.eventId}
             className="text-sm font-medium text-[var(--text-secondary)]"
           >
-            Date
+            {event.isRecurring ? "Day of Week" : "Date"}
           </Label>
-          <Input
-            id={"event-date-" + event.eventId}
-            type="date"
-            value={event.eventCriteria?.date || ""}
-            onChange={(e) => onUpdate(event.eventId, "date", e.target.value)}
-            className={getInputClass(!!errors?.date)}
-          />
-          {errors?.date && (
+
+          {event.isRecurring ? (
+            <Select
+              value={event.eventCriteria?.dayOfWeek || ""}
+              onValueChange={(v) => onUpdate(event.eventId, "dayOfWeek", v)}
+            >
+              <SelectTrigger className={getInputClass(!!errors?.dayOfWeek)}>
+                <SelectValue placeholder="Select a Day" />
+              </SelectTrigger>
+              <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)]">
+                {[
+                  "monday",
+                  "tuesday",
+                  "wednesday",
+                  "thursday",
+                  "friday",
+                  "saturday",
+                  "sunday",
+                ].map((day) => (
+                  <SelectItem
+                    key={day}
+                    value={day}
+                    className="capitalize text-[var(--text-primary)] focus:bg-[var(--bg-elevated)]"
+                  >
+                    {day}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          ) : (
+            <Input
+              id={"event-date-" + event.eventId}
+              type="date"
+              value={event.eventCriteria?.date || ""}
+              onChange={(e) => onUpdate(event.eventId, "date", e.target.value)}
+              className={getInputClass(!!errors?.date)}
+            />
+          )}
+
+          {errors?.date && !event.isRecurring && (
             <p className="text-sm text-[var(--error-text)]">{errors.date}</p>
+          )}
+          {errors?.dayOfWeek && event.isRecurring && (
+            <p className="text-sm text-[var(--error-text)]">
+              {errors.dayOfWeek}
+            </p>
           )}
         </div>
 
@@ -238,8 +296,8 @@ export function EventCard({
             Event type
           </Label>
           <EventTypeDropdown
-            value={(event.eventCriteria?.eventSource as EventType) || "uni"}
-            onChange={(v) => onUpdate(event.eventId, "eventSource", v)}
+            value={(event.activityType as EventType) || "lecture"}
+            onChange={(v) => onUpdate(event.eventId, "activityType", v)}
           />
         </div>
 
