@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { BaseSeedService } from '../base.seed.service';
 
-import { DatabaseService } from 'src/db/database.service';
+import { DatabaseService } from '../../database.service';
 import { eq } from 'drizzle-orm';
 
 import crypto from 'crypto';
@@ -15,7 +15,7 @@ import {
   CourseModule,
   usersTable,
   ModuleStyling,
-} from 'src/entities';
+} from '../../../entities';
 
 @Injectable()
 export class ModuleSeedService extends BaseSeedService {

@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { BaseSeedService } from '../base.seed.service';
 
-import { DatabaseService } from 'src/db/database.service';
+import { DatabaseService } from '../../database.service';
 import { eq, inArray, and } from 'drizzle-orm';
 
 //Tables
-import { Course, ModuleGrouping, University } from 'src/entities';
+import { Course, ModuleGrouping, University } from '../../../entities';
 
 @Injectable()
 export class CourseSeedService extends BaseSeedService {

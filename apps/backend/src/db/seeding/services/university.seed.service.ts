@@ -1,18 +1,12 @@
 import { Injectable } from '@nestjs/common';
 
-import { DatabaseService } from 'src/db/database.service';
+import { DatabaseService } from '../../database.service';
 import { BaseSeedService } from '../base.seed.service';
-import { University, UniversityRole, usersTable } from 'src/entities';
+import { University, UniversityRole, usersTable } from '../../../entities';
 import { eq } from 'drizzle-orm';
-
-import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UniversitySeedService extends BaseSeedService {
-  constructor(protected readonly configService: ConfigService) {
-    super(configService);
-  }
-
   async seed(tx: DatabaseService['db']): Promise<void> {
     //University names to seed
     const uniNames = this.constants.UniversityNames;
@@ -45,9 +39,8 @@ export class UniversitySeedService extends BaseSeedService {
           .from(usersTable)
           .where(
             eq(
-              usersTable.name,
-              this.configService.get<string>('SEED_SYSTEM_ADMIN_NAME') ??
-                'System Admin',
+              usersTable.email,
+              process.env.SEED_SYSTEM_ADMIN_EMAIL ?? 'system-admin@local.umtas',
             ),
           );
 

@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { BaseSeedService } from '../base.seed.service';
 
-import { DatabaseService } from 'src/db/database.service';
+import { DatabaseService } from '../../database.service';
 
 //hashing
 import { hashPassword } from 'better-auth/crypto';
 
 //Tables
-import { accountsTable, usersTable } from 'src/entities';
+import { accountsTable, usersTable } from '../../../entities';
 
 @Injectable()
 export class UserSeedService extends BaseSeedService {
