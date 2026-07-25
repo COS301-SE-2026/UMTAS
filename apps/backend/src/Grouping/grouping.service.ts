@@ -183,7 +183,7 @@ export class GroupingService {
       .returning();
 
     return {
-      GroupID: deletedGroup.GroupID,
+      GroupID: deletedGroup?.GroupID,
       success: !!deletedGroup,
     };
   } //END_deleteGroup

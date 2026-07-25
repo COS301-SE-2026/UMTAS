@@ -260,4 +260,35 @@ describe('GroupingService', () => {
       expect(mockDb.update).toHaveBeenCalled();
     });
   }); //END_Test_updateGroup
+
+  //Delete
+  describe('Test_deleteGroup', () => {
+    //UnHappy - success = false
+    it('should return false if delete failed', async () => {
+      //Arrange
+      mockDbResult(mockDb.delete, []);
+
+      //Act
+      const result = await service.deleteGroup(groupId);
+
+      //Assert
+      expect(result.success).toEqual(false);
+    });
+
+    //Happy - return success=true
+    it('should return success and GroupId', async () => {
+      //Arrange
+      const group = createGroup();
+      mockDbResult(mockDb.delete, [group]);
+
+      //Act
+      const result = await service.deleteGroup(groupId);
+
+      //Assert
+      expect(result).toMatchObject({
+        GroupID: group.GroupID,
+        success: true,
+      });
+    });
+  }); //END_Test_deleteGroup
 });
