@@ -68,7 +68,7 @@ export class UniversityService {
   ): Promise<UniversityListResponseDto> {
     const db = tx ?? this.dbService.db;
 
-    console.log(`Hierso: ${userId}`);
+    // console.log(`Hierso: ${userId}`);
     const universities = await db
       .select({
         UniversityID: University.UniversityID,
@@ -85,7 +85,7 @@ export class UniversityService {
       )
       .where(notLike(University.UniversityName, 'user%'));
 
-    console.log(`Meneer: ${JSON.stringify(universities)}`);
+    // console.log(`Meneer: ${JSON.stringify(universities)}`);
     //@Aidan - this is where you f***ed up
 
     // .where(
