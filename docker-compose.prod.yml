@@ -228,19 +228,19 @@ services:
       - "traefik.http.routers.frontend-prod.tls.certresolver=myresolver"
       - "traefik.http.services.frontend-prod.loadbalancer.server.port=${FRONTEND_PORT}"
 
-  brand-style:
-    image: vigilcs/umtas-brand-style:latest
-    restart: unless-stopped
-    networks:
-      - gateway
-    labels:
-      - "traefik.enable=true"
-      - "traefik.docker.network=gateway"
-      - "traefik.http.routers.brand-style-prod.rule=Host(`brand.${DOMAIN}`)"
-      - "traefik.http.routers.brand-style-prod.entrypoints=websecure"
-      - "traefik.http.routers.brand-style-prod.tls=true"
-      - "traefik.http.routers.brand-style-prod.tls.certresolver=myresolver"
-      - "traefik.http.services.brand-style-prod.loadbalancer.server.port=6767"
+  # brand-style:
+  #   image: vigilcs/umtas-brand-style:latest
+  #   restart: unless-stopped
+  #   networks:
+  #     - gateway
+  #   labels:
+  #     - "traefik.enable=true"
+  #     - "traefik.docker.network=gateway"
+  #     - "traefik.http.routers.brand-style-prod.rule=Host(`brand.${DOMAIN}`)"
+  #     - "traefik.http.routers.brand-style-prod.entrypoints=websecure"
+  #     - "traefik.http.routers.brand-style-prod.tls=true"
+  #     - "traefik.http.routers.brand-style-prod.tls.certresolver=myresolver"
+  #     - "traefik.http.services.brand-style-prod.loadbalancer.server.port=6767"
 
   grafana:
     image: grafana/grafana:10.4.3
