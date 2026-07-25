@@ -9,8 +9,8 @@ COPY apps/frontend/package.json ./apps/frontend/
 RUN pnpm install --frozen-lockfile
 
 FROM deps AS build
-# ARG API_URL=http://backend:8000
-# ENV API_URL=${API_URL}
+ARG API_URL
+ENV API_URL=${API_URL}
 # ARG NEXT_PUBLIC_API_URL=http://localhost:3001
 # ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 COPY packages/shared-types/ ./packages/shared-types/
