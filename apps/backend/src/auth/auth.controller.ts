@@ -729,7 +729,6 @@ export class AuthController {
   ): Promise<void> {
     return this.handleRequest(req, res);
   }
-
   private async handleRequest(
     req: IncomingMessage,
     res: ServerResponse,
@@ -738,128 +737,18 @@ export class AuthController {
       const auth = this.authService.getAuth();
       const nodeHandler = toNodeHandler(auth.handler);
 
-      const isGetSession = req.url?.includes('/get-session');
-      const isCallback = req.url?.includes('/callback');
-
-      this.logger.log(`━━━ ${req.method} ${req.url}`);
-
-      const cookieMap = new Map<string, string>();
-      if (req.headers.cookie) {
-        for (const pair of req.headers.cookie.split(';')) {
-          const idx = pair.indexOf('=');
-          if (idx > -1) {
-            cookieMap.set(
-              pair.slice(0, idx).trim(),
-              pair.slice(idx + 1).trim(),
-            );
-          }
-        }
-      }
-
-      if (isGetSession || isCallback) {
-        if (cookieMap.size === 0) {
-          this.logger.warn(`  No cookies received`);
-        } else {
-          const authCookies = [...cookieMap.entries()].filter(
-            ([name]) => name.includes('session') || name.includes('oauth'),
-          );
-          if (authCookies.length === 0) {
-            this.logger.warn(
-              `  No auth cookies present. Got: ${[...cookieMap.keys()].join(', ')}`,
-            );
-          }
-          for (const [name, value] of authCookies) {
-            this.logger.log(`  Cookie ${name}: len=${value.length}`);
-          }
-        }
-      }
-
-      const originalSetHeader = res.setHeader.bind(res);
-      res.setHeader = (
-        name: string,
-        value: string | number | readonly string[],
-      ) => {
-        if (name.toLowerCase() === 'set-cookie') {
-          const cookies = Array.isArray(value) ? value : [String(value)];
-          for (const c of cookies) {
-            const [nameValue, ...attrs] = c.split(';');
-            const cookieName = nameValue.split('=')[0];
-            const valuePart = nameValue.split('=').slice(1).join('=');
-            this.logger.log(
-              `  Set-Cookie: ${cookieName} (len=${valuePart.length}); ${attrs
-                .map((a) => a.trim())
-                .join('; ')}`,
-            );
-          }
-        }
-        return originalSetHeader(name, value);
-      };
-
-      let capturedBody = '';
-      if (isGetSession) {
-        const originalWrite = res.write.bind(res);
-        const originalEnd = res.end.bind(res);
-        const appendChunk = (chunk: unknown) => {
-          if (Buffer.isBuffer(chunk)) capturedBody += chunk.toString('utf8');
-          else if (typeof chunk === 'string') capturedBody += chunk;
-        };
-        res.write = ((chunk: unknown, ...args: unknown[]) => {
-          appendChunk(chunk);
-          return (originalWrite as (...a: unknown[]) => boolean)(
-            chunk,
-            ...args,
-          );
-        }) as typeof res.write;
-        res.end = ((chunk: unknown, ...args: unknown[]) => {
-          appendChunk(chunk);
-          return (originalEnd as (...a: unknown[]) => ServerResponse)(
-            chunk,
-            ...args,
-          );
-        }) as typeof res.end;
-      }
-
       await nodeHandler(req, res);
-
-      if (isGetSession) {
-        const body = capturedBody.trim();
-
-        const isNullSession = body === '' || body === 'null' || body === '{}';
-        if (isNullSession) {
-          this.logger.warn(
-            `  get-session: NULL SESSION (status ${res.statusCode}, body=${body || 'EMPTY'}) ` +
-              `— cookie present=${[...cookieMap.keys()].some((k) =>
-                k.includes('session'),
-              )}. Cookie sent but did not validate.`,
-          );
-        } else {
-          this.logger.log(
-            `  get-session: VALID (status ${res.statusCode}, ${body.length} bytes)`,
-          );
-        }
-      } else {
-        const location = res.getHeader('location');
-        this.logger.log(
-          `  Status ${res.statusCode}${
-            location ? ` -> ${String(location)}` : ''
-          }`,
-        );
-      }
-
-      if (res.statusCode >= 400) {
-        this.logger.warn(
-          `  FAILED: ${req.method} ${req.url} -> ${res.statusCode}`,
-        );
-      }
     } catch (error) {
-      this.logger.error(
-        `Auth handler exception: ${error instanceof Error ? error.message : String(error)}`,
-        error instanceof Error ? error.stack : undefined,
-      );
       if (!res.headersSent) {
         res.statusCode = 500;
         res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify({ error: 'Internal server error' }));
+        res.end(
+          JSON.stringify({
+            error: 'Internal server error',
+            errorDetails:
+              error instanceof Error ? error.message : String(error),
+          }),
+        );
       }
     }
   }
