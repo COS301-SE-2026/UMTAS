@@ -276,7 +276,8 @@ jobs:
           file: docker/frontend/frontend.Dockerfile
           push: true
           build-args: |
-            NEXT_PUBLIC_API_URL=https://api.${{ secrets.PROD_DOMAIN }}
+            NEXT_PUBLIC_API_URL=https://api.capstone-vigil.dns.net.za
+            API_URL=https://api.capstone-vigil.dns.net.za
           tags: |
             vigilcs/umtas:frontend-${{ steps.tag.outputs.release }}
             vigilcs/umtas:frontend-${{ steps.tag.outputs.sha }}
