@@ -11,7 +11,10 @@ import { GroupingService } from '../Grouping/grouping.service';
 
 //Mock Database and factories
 import { createMockDatabase } from '../Testing/Mocks/database.mock';
-import { mockTransaction } from '../Testing/Mocks/database.helpers';
+import {
+  mockDbResult,
+  mockTransaction,
+} from '../Testing/Mocks/database.helpers';
 import {
   createCourse,
   createCourseDto,
@@ -32,7 +35,7 @@ import {
 } from '@nestjs/common';
 
 //DTO's
-import {} from './dto/course.dto';
+import { CourseFilters } from './dto/course.dto';
 
 describe('CourseService', () => {
   let service: CourseService;
@@ -162,4 +165,37 @@ describe('CourseService', () => {
       expect(mockUniversityService.getById).toHaveBeenCalled();
     });
   }); //END_Test_Create
+
+  describe('Test_GetAll', () => {
+    //UnHappy - return empty array of courses
+    it('should return empty array of courses if none found', async () => {
+      //Arrange
+      mockDbResult(mockDb.select, []);
+
+      //Act
+      const result = await service.getAll({});
+
+      //Assert
+      expect(result).toMatchObject({ courses: [] });
+    });
+
+    //Happy - return array of courses
+    it('should return array of courses', async () => {
+      //Arrange
+      const courses = [createCourse(), createCourse()];
+      mockDbResult(mockDb.select, courses);
+
+      const filters: CourseFilters = {
+        CourseName: 'someName',
+        UniversityID: 'someID',
+        Degree: 'someDegree',
+      };
+
+      //Act
+      const result = await service.getAll(filters);
+
+      //Assert
+      expect(result).toMatchObject({ courses: courses });
+    });
+  }); //END_Test_GetAll
 }); //END_CourseService

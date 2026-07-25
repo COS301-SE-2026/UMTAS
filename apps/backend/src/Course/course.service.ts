@@ -97,6 +97,7 @@ export class CourseService {
       .from(Course)
       .where(and(...conditions));
 
+    console.log(`Here: ${JSON.stringify(courses)}`);
     return { courses };
   } //GetAll
 
