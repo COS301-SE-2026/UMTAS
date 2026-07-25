@@ -17,9 +17,9 @@ services:
       - ${DOCKER_SOCK:-/var/run/docker.sock}:/var/run/docker.sock:ro
       - letsencrypt_data:/letsencrypt
       - ./infra/traefik/traefik.yml:/etc/traefik/traefik.yml:ro
-    command:
-      - "--certificatesresolvers.myresolver.acme.email=${LETSENCRYPT_EMAIL}"
-      - "--certificatesresolvers.myresolver.acme.caserver=${ACME_CA_SERVER:-https://acme-v02.api.letsencrypt.org/directory}"
+    # command:
+    #   - "--certificatesresolvers.myresolver.acme.email=${LETSENCRYPT_EMAIL}"
+    #   - "--certificatesresolvers.myresolver.acme.caserver=${ACME_CA_SERVER:-https://acme-v02.api.letsencrypt.org/directory}"
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=gateway"
