@@ -33,13 +33,14 @@ import {
   createMockGroupingService,
 } from '../Testing/Mocks/services';
 import {
+  BadRequestException,
   ConflictException,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 
 //DTO's
-import { UpdateModuleDto } from './dto/module.dto';
+import { AddModulesToCourseDto, UpdateModuleDto } from './dto/module.dto';
 
 describe('ModuleService', () => {
   let service: ModuleService;
@@ -438,7 +439,7 @@ describe('ModuleService', () => {
       const course = createCourse();
       const dto: UpdateModuleDto = {
         CourseID: course.CourseID,
-        Core: false,
+        Core: true,
         SemesterOfStudy: 'semester 2',
         YearOfStudy: 3,
       };
@@ -541,4 +542,122 @@ describe('ModuleService', () => {
       });
     });
   }); //END_Test_deleteModule
+
+  //Enroll to module
+  describe('Test_enrollToModule', () => {
+    //UnHappy - module not found
+    it('should throw if module not found', async () => {
+      //Arrange
+      mockTransaction(mockDb, {
+        select: [[]], //getById
+      });
+
+      //Act + Assert
+      await expect(service.enrollToModule(userId, 'someID')).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+
+    //UnHappy - enrollment failed
+    it('should throw if enrollment failed', async () => {
+      //Arrange
+      const module = createModule();
+      mockTransaction(mockDb, {
+        select: [
+          [module], //getById
+          [], //select.from(ModuleEnrollment)
+        ],
+        insert: [[]], //enrollment failed
+      });
+
+      //Act + Assert
+      await expect(
+        service.enrollToModule(userId, module.moduleID),
+      ).rejects.toThrow(InternalServerErrorException);
+    });
+
+    //Happy - student already enrolled
+    it('should return that user already enrolled', async () => {
+      //Arrange
+      const module = createModule();
+
+      mockTransaction(mockDb, {
+        select: [
+          [module], //getById
+          [{ ModuleID: module.moduleID, UserID: userId }],
+        ],
+      });
+
+      //Act
+      const result = await service.enrollToModule(userId, module.moduleID);
+
+      //Assert
+      expect(result.message).toEqual(
+        `User[${userId}] already enrolled in module[${module.moduleID}]`,
+      );
+    });
+
+    //happy - should enroll student to module
+    it('should enroll user to module', async () => {
+      //Arrange
+      const module = createModule();
+
+      mockTransaction(mockDb, {
+        select: [
+          [module], //getById
+          [], //select.from(Moduleenrollment)
+        ],
+        insert: [[{ ModuleID: module.moduleID, UserID: userId }]],
+      });
+
+      //Act
+      const result = await service.enrollToModule(userId, module.moduleID);
+
+      //Assert
+      expect(result).toMatchObject({
+        moduleID: module.moduleID,
+        UserID: userId,
+        message: `Successfully enrolled student[${userId}] into module[${module.moduleID}]`,
+      });
+    });
+  }); //END_Test_enrollToModule
+
+  //Add modules to course
+  describe('Test_addModulesToCourse', () => {
+    //UnHappy - throw if course doesn't exist
+    it('should throw if course does not exist', async () => {
+      //Arrange
+      mockCourseService.getById?.mockRejectedValue(new NotFoundException());
+      const dto: AddModulesToCourseDto = {
+        modules: ['someID'],
+      };
+
+      //Act + Assert
+      await expect(service.addModulesToCourse('someID', dto)).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+
+    //UnHappy - throw modules that dont exist
+    it('should throw if certain modules dont exist', async () => {
+      //Arrange
+      const dto: AddModulesToCourseDto = {
+        modules: ['someID'],
+      };
+      const course = createCourse();
+      mockCourseService.getById?.mockResolvedValue(course);
+
+      mockTransaction(mockDb, {
+        select: [[]],
+      });
+
+      //Act + Assert
+      await expect(
+        service.addModulesToCourse(course.CourseID, dto),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    //Happy - add modules to course
+    it('should add modules to the courses group', async () => {});
+  }); //END_Test_addModulesToCourse
 });

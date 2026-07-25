@@ -423,28 +423,17 @@ export class ModuleService {
       )
       .limit(1);
 
-    //If user already enrolled, Unenroll them
-
+    //If already enrolled, return
     if (enrollmentStatus) {
-      /*
-      await tx
-        .delete(ModuleEnrollment)
-        .where(
-          and(
-            eq(ModuleEnrollment.UserID, userId),
-            eq(ModuleEnrollment.ModuleID, moduleId),
-          ),
-        );
-        */
       return {
         moduleID: moduleId,
         UserID: userId,
-        message: `Unenrolled User[${userId}] from module[${moduleId}]`,
+        message: `User[${userId}] already enrolled in module[${moduleId}]`,
       };
     } //Unenroll
 
     //Enroll student to module
-    const newlyEnrolled = await tx
+    const [newlyEnrolled] = await tx
       .insert(ModuleEnrollment)
       .values({
         UserID: userId,
