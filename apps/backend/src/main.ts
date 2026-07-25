@@ -92,6 +92,7 @@ async function bootstrap() {
     `[STARTUP] Swagger docs available at http://localhost:${port}/api/docs`,
   );
   console.log(`[STARTUP] Listening on port ${port}`);
+  console.log(process.env); // everything
 
   await app.listen(port, '0.0.0.0');
 }
