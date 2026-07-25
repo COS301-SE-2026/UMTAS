@@ -28,7 +28,7 @@ jobs:
             cd /opt/UMTAS
             docker compose -f docker-compose.prod.yml pull
             just prod-down
-            just deploy-prod ${{ inputs.release_tag }}
+            just prod-up ${{ inputs.release_tag }}
 
   notify-deploy:
     needs: deploy
