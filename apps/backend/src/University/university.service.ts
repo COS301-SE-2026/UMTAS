@@ -4,7 +4,6 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { eq, and, or, notLike } from 'drizzle-orm';
 
@@ -85,26 +84,6 @@ export class UniversityService {
       )
       .where(notLike(University.UniversityName, 'user%'));
 
-    // console.log(`Meneer: ${JSON.stringify(universities)}`);
-    //@Aidan - this is where you f***ed up
-
-    // .where(
-    //   // show no universities if anyone has a rule student owned to it.
-    //   notExists(
-    //     db
-    //       .select()
-    //       .from(UniversityRole)
-    //       .where(
-    //         and(
-    //           eq(UniversityRole.UniversityID, University.UniversityID),
-    //           eq(UniversityRole.role, RoleType.enumValues[1]),
-    //         ),
-    //       ),
-    //   ),
-    // );
-
-    if (universities.length === 0) return { universities: [] };
-
     return { universities };
   } //GetAll
 
@@ -182,19 +161,15 @@ export class UniversityService {
       });
     } //END_tx precence check
 
-    //Check if university exists
-    const uni = await this.getById(uniId, tx);
-    if (!uni)
-      throw new NotFoundException(
-        `No University found for universityID: ${uniId}`,
-      );
-
     //Delete university
-    await tx.delete(University).where(eq(University.UniversityID, uniId));
+    const [uni] = await tx
+      .delete(University)
+      .where(eq(University.UniversityID, uniId))
+      .returning();
 
     return {
-      UniversityName: uni.UniversityName,
-      success: true,
+      UniversityName: uni?.UniversityName,
+      success: !!uni,
     };
   } //Delete
 
@@ -394,34 +369,6 @@ export class UniversityService {
       });
     } //END_tx precence check
 
-    // validate permision (extra check)
-    const [role] = await tx
-      .select()
-      .from(University)
-      .innerJoin(
-        UniversityRole,
-        eq(UniversityRole.UniversityID, University.UniversityID),
-      )
-      .where(
-        and(
-          eq(UniversityRole.UserID, userID),
-          eq(University.UniversityID, UniID),
-        ),
-      )
-      .limit(1);
-
-    // fail state no role || role not sys admin / uni admin
-
-    if (
-      !role ||
-      !role.UniversityRole ||
-      role.UniversityRole.role != 'UNIVERSITY_ADMIN'
-    ) {
-      throw new UnauthorizedException(
-        'User does not have permission to get applications',
-      );
-    }
-
     const applications = await tx
       .select({
         Name: usersTable.name,
@@ -443,6 +390,7 @@ export class UniversityService {
             : undefined,
         ),
       );
+
     return applications;
   }
 
@@ -460,7 +408,7 @@ export class UniversityService {
       .where(eq(University.UniversityName, uniName.trim()))
       .limit(1);
 
-    return uni;
+    return uni ? uni : null;
   }
 
   async checkDuplicateUniversityName(
