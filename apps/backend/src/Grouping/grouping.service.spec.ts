@@ -10,7 +10,10 @@ import { CourseService } from '../Course/course.service';
 
 //Mock Database and factories
 import { createMockDatabase } from '../Testing/Mocks/database.mock';
-import { mockTransaction } from '../Testing/Mocks/database.helpers';
+import {
+  mockDbResult,
+  mockTransaction,
+} from '../Testing/Mocks/database.helpers';
 import {
   createCourse,
   createGroup,
@@ -123,5 +126,43 @@ describe('GroupingService', () => {
   }); //END_Test_createModuleGrouping
 
   //GetAll
-  describe('Test_GetAll', () => {});
+  describe('Test_GetAll', () => {
+    //UnHappy - should return empty array if none found
+    it('should return empty array if no groups found', async () => {
+      //Arrange
+      mockDbResult(mockDb.select, []);
+
+      //Act
+      const result = await service.getAll();
+
+      //Assert
+      expect(result).toMatchObject({ groups: [] });
+    });
+
+    //Happy - should return array of groups with modules
+    it('should return array of groups with their modules', async () => {
+      //Arrange
+      const mockResults = [
+        { GroupID: 'g1', Hash: 'h1', ModuleID: 'm1' },
+        { GroupID: 'g1', Hash: 'h1', ModuleID: 'm2' },
+        { GroupID: 'g2', Hash: 'h2', ModuleID: 'm3' },
+      ];
+
+      mockDbResult(mockDb.select, mockResults);
+
+      //Act
+      const result = await service.getAll();
+
+      //Assert
+      expect(result.groups).toHaveLength(2);
+
+      const g1 = result.groups.find((g) => g.GroupID === 'g1');
+      expect(g1?.modules).toEqual(['m1', 'm2']);
+      expect(g1?.Hash).toBe('h1');
+
+      const g2 = result.groups.find((g) => g.GroupID === 'g2');
+      expect(g2?.modules).toEqual(['m3']);
+      expect(g2?.Hash).toBe('h2');
+    });
+  }); //END_Test_GetAll
 });
