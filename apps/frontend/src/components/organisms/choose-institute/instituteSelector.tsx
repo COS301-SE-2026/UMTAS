@@ -125,6 +125,7 @@ export function InstituteSelector({ onClose }: InstituteSelectorProps) {
                 disabled={uniDisabeled}
                 onClick={(e) => {
                   e.stopPropagation();
+                  handleConfirm();
                   router.push("/schedules");
                   onClose?.();
                 }}
@@ -142,6 +143,7 @@ export function InstituteSelector({ onClose }: InstituteSelectorProps) {
                 disabled={applyDisabled}
                 onClick={(e) => {
                   e.stopPropagation();
+                  handleConfirm();
                   applyMut.mutate({
                     UniversityID: selectedInstitute?.UniversityID || "",
                     role: selectedRole as uniDtoRoles,
