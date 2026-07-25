@@ -49,11 +49,6 @@ describe('ModuleService', () => {
   const { mockGroupingService, reset: resetGrouping } =
     createMockGroupingService();
 
-  // const existing = createModule();
-  // const resultObject = { ...existing, styling: null };
-
-  let setStylingSpy: jest.SpyInstance;
-
   beforeEach(async () => {
     const module = await Test.createTestingModule({
       providers: [
@@ -65,16 +60,12 @@ describe('ModuleService', () => {
     }).compile();
 
     service = module.get(ModuleService);
-
-    setStylingSpy = jest.spyOn(service, 'setStyling');
   });
 
   afterEach(() => {
     resetDb();
     resetCourse();
     resetGrouping();
-
-    setStylingSpy.mockRestore();
   });
 
   //TESTS
@@ -89,7 +80,7 @@ describe('ModuleService', () => {
       mockTransaction(mockDb, {});
 
       //Act + assert
-      await expect(await service.create(userId, dto)).rejects.toThrow(
+      await expect(service.create(userId, dto)).rejects.toThrow(
         NotFoundException,
       );
       expect(mockCourseService.getById).toHaveBeenCalled();
@@ -519,21 +510,35 @@ describe('ModuleService', () => {
     });
   }); //END_Test_updateModule
 
-  // //Delete
-  // describe('Test_deleteModule', () => {
-  //   it('should delete module that exists', async () => {
-  //     //Arrange
-  //     mockSelectResult(mockDb, [existing]);
-  //     mockDeleteResult(mockDb);
+  //Delete
+  describe('Test_deleteModule', () => {
+    //UnHappy - module not found
+    it(`should return success as false if no module deleted`, async () => {
+      //Arrange
+      mockDbResult(mockDb.delete, []);
 
-  //     //Act
-  //     const result = await service.deleteById(existing.moduleID);
+      //Act
+      const result = await service.deleteById('someID');
 
-  //     //Assert
-  //     expect(result).toMatchObject({
-  //       moduleCode: existing.moduleCode,
-  //       success: true,
-  //     });
-  //   });
-  // });//END_Test_deleteModule
+      //Assert
+      expect(result.success).toEqual(false);
+    });
+
+    //Happy - succesfully deleted a module
+    it('should return module code and success if deleted', async () => {
+      //Arrange
+      const module = createModule();
+
+      mockDbResult(mockDb.delete, [module]);
+
+      //Act
+      const result = await service.deleteById(module.moduleID);
+
+      //Assert
+      expect(result).toMatchObject({
+        moduleCode: module.moduleCode,
+        success: true,
+      });
+    });
+  }); //END_Test_deleteModule
 });

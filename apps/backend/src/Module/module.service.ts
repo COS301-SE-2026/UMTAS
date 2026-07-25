@@ -391,7 +391,7 @@ export class ModuleService {
       .returning();
 
     return {
-      moduleCode: module.moduleCode,
+      moduleCode: module?.moduleCode,
       success: !!module,
     };
   } //delete
