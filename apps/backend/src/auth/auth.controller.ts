@@ -738,21 +738,40 @@ export class AuthController {
       const auth = this.authService.getAuth();
       const nodeHandler = toNodeHandler(auth.handler);
 
-      this.logger.log(`━━━ Auth request: ${req.method} ${req.url}`);
+      const isGetSession = req.url?.includes('/get-session');
+      const isCallback = req.url?.includes('/callback');
 
-      this.logger.log(`  Host: ${req.headers.host ?? 'none'}`);
-      this.logger.log(`  Origin: ${req.headers.origin ?? 'none'}`);
-      this.logger.log(`  Referer: ${req.headers.referer ?? 'none'}`);
+      this.logger.log(`━━━ ${req.method} ${req.url}`);
 
-      const incomingCookie = req.headers.cookie;
-      if (incomingCookie) {
-        const cookieNames = incomingCookie
-          .split(';')
-          .map((c) => c.trim().split('=')[0])
-          .join(', ');
-        this.logger.log(`  Incoming cookie names: ${cookieNames}`);
-      } else {
-        this.logger.log(`  Incoming cookies: NONE`);
+      const cookieMap = new Map<string, string>();
+      if (req.headers.cookie) {
+        for (const pair of req.headers.cookie.split(';')) {
+          const idx = pair.indexOf('=');
+          if (idx > -1) {
+            cookieMap.set(
+              pair.slice(0, idx).trim(),
+              pair.slice(idx + 1).trim(),
+            );
+          }
+        }
+      }
+
+      if (isGetSession || isCallback) {
+        if (cookieMap.size === 0) {
+          this.logger.warn(`  No cookies received`);
+        } else {
+          const authCookies = [...cookieMap.entries()].filter(
+            ([name]) => name.includes('session') || name.includes('oauth'),
+          );
+          if (authCookies.length === 0) {
+            this.logger.warn(
+              `  No auth cookies present. Got: ${[...cookieMap.keys()].join(', ')}`,
+            );
+          }
+          for (const [name, value] of authCookies) {
+            this.logger.log(`  Cookie ${name}: len=${value.length}`);
+          }
+        }
       }
 
       const originalSetHeader = res.setHeader.bind(res);
@@ -765,25 +784,24 @@ export class AuthController {
           for (const c of cookies) {
             const [nameValue, ...attrs] = c.split(';');
             const cookieName = nameValue.split('=')[0];
+            const valuePart = nameValue.split('=').slice(1).join('=');
             this.logger.log(
-              `  Set-Cookie: ${cookieName}; ${attrs.map((a) => a.trim()).join('; ')}`,
+              `  Set-Cookie: ${cookieName} (len=${valuePart.length}); ${attrs
+                .map((a) => a.trim())
+                .join('; ')}`,
             );
           }
         }
         return originalSetHeader(name, value);
       };
 
-      const isGetSession = req.url?.includes('/get-session');
       let capturedBody = '';
       if (isGetSession) {
         const originalWrite = res.write.bind(res);
         const originalEnd = res.end.bind(res);
         const appendChunk = (chunk: unknown) => {
-          if (Buffer.isBuffer(chunk)) {
-            capturedBody += chunk.toString('utf8');
-          } else if (typeof chunk === 'string') {
-            capturedBody += chunk;
-          }
+          if (Buffer.isBuffer(chunk)) capturedBody += chunk.toString('utf8');
+          else if (typeof chunk === 'string') capturedBody += chunk;
         };
         res.write = ((chunk: unknown, ...args: unknown[]) => {
           appendChunk(chunk);
@@ -804,25 +822,33 @@ export class AuthController {
       await nodeHandler(req, res);
 
       if (isGetSession) {
+        const body = capturedBody.trim();
+
+        const isNullSession = body === '' || body === 'null' || body === '{}';
+        if (isNullSession) {
+          this.logger.warn(
+            `  get-session: NULL SESSION (status ${res.statusCode}, body=${body || 'EMPTY'}) ` +
+              `— cookie present=${[...cookieMap.keys()].some((k) =>
+                k.includes('session'),
+              )}. Cookie sent but did not validate.`,
+          );
+        } else {
+          this.logger.log(
+            `  get-session: VALID (status ${res.statusCode}, ${body.length} bytes)`,
+          );
+        }
+      } else {
+        const location = res.getHeader('location');
         this.logger.log(
-          `  get-session BODY: ${capturedBody.length ? capturedBody.slice(0, 300) : 'EMPTY'}`,
+          `  Status ${res.statusCode}${
+            location ? ` -> ${String(location)}` : ''
+          }`,
         );
       }
 
-      const location = res.getHeader('location');
-      this.logger.log(
-        `  Response status: ${res.statusCode}${location ? ` -> redirect to ${String(location)}` : ''}`,
-      );
-      this.logger.log(
-        `  CORS allow-origin: ${String(res.getHeader('access-control-allow-origin') ?? 'none')}`,
-      );
-      this.logger.log(
-        `  CORS allow-credentials: ${String(res.getHeader('access-control-allow-credentials') ?? 'none')}`,
-      );
-
       if (res.statusCode >= 400) {
         this.logger.warn(
-          `Auth request failed: ${req.method} ${req.url} -> Status ${res.statusCode}`,
+          `  FAILED: ${req.method} ${req.url} -> ${res.statusCode}`,
         );
       }
     } catch (error) {
