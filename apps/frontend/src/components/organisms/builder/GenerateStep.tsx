@@ -174,6 +174,9 @@ export function GenerateStep({
                         </p>
                       </div>
                     )}
+                    <p className="text-sm font-mono text-[var(--text-secondary)] uppercase">
+                      {event.activityType}
+                    </p>
                   </div>
                 </div>
 
