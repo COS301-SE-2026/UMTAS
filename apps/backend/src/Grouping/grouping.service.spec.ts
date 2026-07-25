@@ -243,7 +243,7 @@ describe('GroupingService', () => {
       //Assert
       const group = createGroup({ GroupID: groupId });
       const newGroup = createGroup({ GroupID: groupId, Hash: 'NEWHASH' });
-      console.log(`HEre: ${JSON.stringify(newGroup)}`);
+
       mockTransaction(mockDb, {
         select: [
           [group], //getByid
@@ -291,4 +291,84 @@ describe('GroupingService', () => {
       });
     });
   }); //END_Test_deleteGroup
+
+  //PopulateGroup
+  describe('Test_populateGroup', () => {
+    //Happy - no new modules to add -> return old group
+    it('should return old group if no new modules to add', async () => {
+      //Arrange
+      const group = createGroup();
+
+      mockTransaction(mockDb, {
+        select: [
+          [group],
+          [{ ModuleID: moduleId }], //getbyId
+        ],
+      });
+
+      //Act
+      const result = await service.populateGroup(group.GroupID, [moduleId]);
+
+      //Assert
+      expect(result).toMatchObject({
+        ...group,
+        modules: [moduleId],
+      });
+      expect(mockDb.update).not.toHaveBeenCalled();
+    });
+
+    //populate group with module
+    it('should return old group if no new modules to add', async () => {
+      //Arrange
+      const group = createGroup();
+
+      mockTransaction(mockDb, {
+        select: [
+          [group],
+          [], //getbyId
+          [], //checkFormatchingHashGroup
+        ],
+      });
+
+      const spy = jest.spyOn(service, 'updateGroup').mockResolvedValue({
+        ...group,
+        Hash: 'NEWHASH',
+      });
+
+      //Act
+      const result = await service.populateGroup(group.GroupID, [moduleId]);
+
+      //Assert
+      expect(result).toMatchObject({
+        ...group,
+        Hash: 'NEWHASH',
+      });
+      expect(spy).toHaveBeenCalled();
+    });
+
+    //friendHash identified - migrate courses
+    it('should update courses that used old group to the new group', async () => {
+      //Arrange
+      const group = createGroup();
+      const matchingGroup = createGroup({ Hash: 'original' });
+
+      mockTransaction(mockDb, {
+        select: [
+          [group],
+          [], //getbyId
+          [matchingGroup], //checkFormatchingHashGroup
+        ],
+      });
+
+      const spy = jest.spyOn(service, 'deleteGroup');
+
+      //Act
+      const result = await service.populateGroup(group.GroupID, [moduleId]);
+
+      //Assert
+      expect(result).toMatchObject(matchingGroup);
+      expect(mockDb.update).toHaveBeenCalled();
+      expect(spy).toHaveBeenCalled();
+    });
+  }); //END_Test_populateGroup
 });
