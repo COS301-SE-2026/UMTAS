@@ -1,7 +1,7 @@
 import { Test } from '@nestjs/testing';
 
 //Constants
-import { userId, courseId } from '../Testing/constants.spec';
+import { userId, courseId, uniId, groupId } from '../Testing/constants.spec';
 
 //Table imports
 // import { modules, CourseModule, ModuleStyling } from '../entities/index';
@@ -14,7 +14,10 @@ import { GroupingService } from '../Grouping/grouping.service';
 
 //Mock Database and factories
 import { createMockDatabase } from '../Testing/Mocks/database.mock';
-import { mockTransaction } from '../Testing/Mocks/database.helpers';
+import {
+  mockDbResult,
+  mockTransaction,
+} from '../Testing/Mocks/database.helpers';
 import {
   createModule,
   createModuleDto,
@@ -286,16 +289,42 @@ describe('ModuleService', () => {
     });
   }); //END_Test_CreateModule
 
-  //getAll
-  // describe('Test_GetAll', () => {
-  //   it('return all modules for a courseId', async () => {
-  //     mockSequentialResults(mockDb.selectDistinct, [[resultObject]]);
+  // getAll
+  describe('Test_GetAll', () => {
+    //Should return empty array of modules
+    it('should return empty array of modules if none found', async () => {
+      //Arrange
+      mockDbResult(mockDb.selectDistinctOn, []);
 
-  //     const result = await service.getAll(userId, { courseId });
+      //Act
+      const result = await service.getAll(userId, {});
 
-  //     expect(result).toEqual({ modules: [resultObject] });
-  //   });
-  // });//END_Test_GetAll
+      //Assert
+      expect(result).toMatchObject({ modules: [] });
+    });
+
+    //Should return array with modules in them
+    it('should return array of modules found', async () => {
+      //Arrange
+      const module1 = createModule();
+      const module2 = createModule();
+
+      mockDbResult(mockDb.selectDistinctOn, [module1, module2]);
+
+      //Act
+      const result = await service.getAll(userId, {
+        universityId: uniId,
+        courseId,
+        GroupID: groupId,
+        moduleCode: 'someCode',
+        userEnrollment: true,
+      });
+
+      //Assert
+      expect(result).toMatchObject({ modules: [module1, module2] });
+    });
+  }); //END_Test_GetAll
+
   // //END_getAll
 
   // //getById
