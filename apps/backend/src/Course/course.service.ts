@@ -56,7 +56,6 @@ export class CourseService {
     if (course) return course;
 
     //Create new Course
-    //Check if GroupID / Degree given and not null
     const [newCourse] = await tx
       .insert(Course)
       .values({
