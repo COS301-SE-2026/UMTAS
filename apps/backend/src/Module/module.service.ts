@@ -770,7 +770,9 @@ export class ModuleService {
 
     //Get group module entry that courseMOdule refers to through COurseID
     const [groupModule] = await tx
-      .select()
+      .select({
+        GroupModuleID: GroupModules.GroupModuleID,
+      })
       .from(GroupModules)
       .innerJoin(Course, eq(Course.GroupID, GroupModules.GroupID))
       .where(eq(Course.CourseID, courseId))
@@ -780,9 +782,7 @@ export class ModuleService {
     const [oldCourseModule] = await tx
       .select()
       .from(CourseModule)
-      .where(
-        eq(CourseModule.GroupModuleID, groupModule.GroupModules.GroupModuleID),
-      )
+      .where(eq(CourseModule.GroupModuleID, groupModule.GroupModuleID))
       .limit(1);
 
     //Get updateFields for courseMOdule data
@@ -804,12 +804,7 @@ export class ModuleService {
       [returnCourseModule] = await tx
         .update(CourseModule)
         .set(courseUpdateFields)
-        .where(
-          eq(
-            CourseModule.GroupModuleID,
-            groupModule.GroupModules.GroupModuleID,
-          ),
-        )
+        .where(eq(CourseModule.GroupModuleID, groupModule.GroupModuleID))
         .returning();
     }
 

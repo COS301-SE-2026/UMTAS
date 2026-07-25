@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto';
-import { modules } from '../../entities';
-import { CreateModuleDto } from '../../Module/dto/module.dto';
+import { modules, ModuleStyling } from '../../entities';
+import { CourseModuleDto, CreateModuleDto } from '../../Module/dto/module.dto';
 
 type Module = typeof modules.$inferSelect;
 
@@ -35,3 +35,28 @@ export function createModuleDto(
     ...overrides,
   };
 } //END_createModuleDto
+
+export function createCourseModule(
+  overrides: Partial<CourseModuleDto> = {},
+): CourseModuleDto {
+  return {
+    CourseModuleID: randomUUID(),
+    GroupModuleID: randomUUID(),
+    CourseID: randomUUID(),
+    Core: false,
+
+    ...overrides,
+  };
+} //END_createCourseModule
+
+export function createModuleStyling(
+  overrides: Partial<typeof ModuleStyling.$inferSelect> = {},
+): typeof ModuleStyling.$inferSelect {
+  return {
+    ModuleID: randomUUID(),
+    UserID: randomUUID(),
+    styling: { colour: '#FFFFFF' },
+
+    ...overrides,
+  };
+} //END_createModuleStyling
