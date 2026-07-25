@@ -202,4 +202,62 @@ describe('GroupingService', () => {
       expect(mockDb.select).toHaveBeenCalledTimes(2);
     });
   }); //END_Test_getById
+
+  //Update
+  describe('Test_updateGroup', () => {
+    //UnHappy - throw if group does not exist
+    it('should throw if group does not exist', async () => {
+      //Arrange
+      mockTransaction(mockDb, {
+        select: [
+          [], //getByid
+        ],
+      });
+
+      //Act + Assert
+      await expect(service.updateGroup(groupId, 'someHash')).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+
+    //Happy - return old group if nothing to update
+    it('should return early with old group if nothing to update', async () => {
+      //Assert
+      const group = createGroup({ Hash: 'someHash' });
+      mockTransaction(mockDb, {
+        select: [
+          [group], //getByid
+        ],
+      });
+
+      //Act
+      const result = await service.updateGroup(group.GroupID, group.Hash!);
+
+      //Assert
+      expect(result).toMatchObject(group);
+      expect(mockDb.update).not.toHaveBeenCalled();
+    });
+
+    //Happy - update the groups hash to new hash
+    it('should update the groups hash', async () => {
+      //Assert
+      const group = createGroup({ GroupID: groupId });
+      const newGroup = createGroup({ GroupID: groupId, Hash: 'NEWHASH' });
+      console.log(`HEre: ${JSON.stringify(newGroup)}`);
+      mockTransaction(mockDb, {
+        select: [
+          [group], //getByid
+          [newGroup], //second getById
+        ],
+        update: [[newGroup]],
+      });
+
+      //Act
+      const result = await service.updateGroup(groupId, newGroup.Hash!);
+
+      //Assert
+      expect(result).toMatchObject(newGroup);
+      expect(mockDb.update).toHaveBeenCalled();
+    });
+  }); //END_Test_updateGroup
 });
