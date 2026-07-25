@@ -325,19 +325,32 @@ describe('ModuleService', () => {
     });
   }); //END_Test_GetAll
 
-  // //END_getAll
+  //getById
+  describe('Test_getById', () => {
+    //UnHappy - should throw if module not found
+    it('should throw if module not found', async () => {
+      //Arrange
+      mockDbResult(mockDb.select, []);
 
-  // //getById
-  // describe('Test_getById', () => {
-  //   it('should return module by id', async () => {
-  //     mockSequentialResults(mockDb.select, [[resultObject]]);
+      //Act + Assert
+      await expect(service.getById(userId, 'someId')).rejects.toThrow(
+        NotFoundException,
+      );
+    });
 
-  //     const result = await service.getById(userId, existing.moduleID);
+    //Happy - should return module successfully
+    it('should return module by id', async () => {
+      //Arrange
+      const module = createModule();
+      mockDbResult(mockDb.select, [module]);
 
-  //     expect(result).toEqual(resultObject);
-  //   });
-  // });//END_Test_getById
-  // //END_getById
+      //Act
+      const result = await service.getById(userId, module.moduleID);
+
+      //Assert
+      expect(result).toMatchObject(module);
+    });
+  }); //END_Test_getById
 
   // //Update
   // describe('Test_updateModule', () => {
