@@ -773,7 +773,41 @@ export class AuthController {
         return originalSetHeader(name, value);
       };
 
+      const isGetSession = req.url?.includes('/get-session');
+      let capturedBody = '';
+      if (isGetSession) {
+        const originalWrite = res.write.bind(res);
+        const originalEnd = res.end.bind(res);
+        const appendChunk = (chunk: unknown) => {
+          if (Buffer.isBuffer(chunk)) {
+            capturedBody += chunk.toString('utf8');
+          } else if (typeof chunk === 'string') {
+            capturedBody += chunk;
+          }
+        };
+        res.write = ((chunk: unknown, ...args: unknown[]) => {
+          appendChunk(chunk);
+          return (originalWrite as (...a: unknown[]) => boolean)(
+            chunk,
+            ...args,
+          );
+        }) as typeof res.write;
+        res.end = ((chunk: unknown, ...args: unknown[]) => {
+          appendChunk(chunk);
+          return (originalEnd as (...a: unknown[]) => ServerResponse)(
+            chunk,
+            ...args,
+          );
+        }) as typeof res.end;
+      }
+
       await nodeHandler(req, res);
+
+      if (isGetSession) {
+        this.logger.log(
+          `  get-session BODY: ${capturedBody.length ? capturedBody.slice(0, 300) : 'EMPTY'}`,
+        );
+      }
 
       const location = res.getHeader('location');
       this.logger.log(
