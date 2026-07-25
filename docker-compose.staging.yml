@@ -199,6 +199,7 @@ services:
     restart: unless-stopped
     networks:
       - gateway
+      - internal
     environment:
       - PORT=${FRONTEND_PORT}
       - API_URL=http://backend:${BACKEND_PORT}
