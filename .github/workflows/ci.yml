@@ -303,8 +303,8 @@ jobs:
           file: docker/solver-worker/solver-worker.Dockerfile
           push: true
           tags: |
-            vigilcs/umtas:solver-${{ steps.tag.outputs.release }}
-            vigilcs/umtas:solver-${{ steps.tag.outputs.sha }}
+            vigilcs/umtas:solver-worker-${{ steps.tag.outputs.release }}
+            vigilcs/umtas:solver-worker-${{ steps.tag.outputs.sha }}
           cache-from: type=gha,scope=solver-release
           cache-to: type=gha,mode=max,scope=solver-release
 
@@ -315,7 +315,7 @@ jobs:
           file: docker/pdf-parser-worker/pdf-parser-worker.Dockerfile
           push: true
           tags: |
-            vigilcs/umtas:pdf-parser-worker-${{ steps.tag.outputs.latest }}
+            vigilcs/umtas:pdf-parser-worker-${{ steps.tag.outputs.release }}
             vigilcs/umtas:pdf-parser-worker-${{ steps.tag.outputs.sha }}
           cache-from: type=gha,scope=pdf-parser-release
           cache-to: type=gha,mode=max,scope=pdf-parser-release
