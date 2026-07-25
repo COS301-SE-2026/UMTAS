@@ -1,0 +1,14 @@
+apps/backend/src/Grouping/grouping.service.spec.ts
+  h_84e82529bd05a5 206-262
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "c0320619452fc659c8058122d6dd7ad3a8da581d",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}
