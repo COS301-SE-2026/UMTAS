@@ -97,7 +97,6 @@ export class CourseService {
       .from(Course)
       .where(and(...conditions));
 
-    console.log(`Here: ${JSON.stringify(courses)}`);
     return { courses };
   } //GetAll
 
@@ -201,7 +200,7 @@ export class CourseService {
 
     return {
       success: !!course,
-      CourseName: course.CourseName,
+      CourseName: course?.CourseName,
     };
   } //Delete
 

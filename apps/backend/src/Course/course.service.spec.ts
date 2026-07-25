@@ -410,4 +410,34 @@ describe('CourseService', () => {
       expect(mockUniversityService.getById).toHaveBeenCalled();
     });
   }); //END_Test_Update
+
+  describe('Test_Delete', () => {
+    //UnHappy - should return success=false
+    it('should return success as false if delete failed', async () => {
+      //Arrange
+      mockDbResult(mockDb.delete, []);
+
+      //Act
+      const result = await service.delete(courseId);
+
+      //Assert
+      expect(result.success).toEqual(false);
+    });
+
+    //Happy - return success true and course name
+    it('should return success and course name if deleted', async () => {
+      //Arrange
+      const course = createCourse();
+      mockDbResult(mockDb.delete, [course]);
+
+      //Act
+      const result = await service.delete(courseId);
+
+      //Assert
+      expect(result).toMatchObject({
+        success: true,
+        CourseName: course.CourseName,
+      });
+    });
+  }); //END_Test_Delete
 }); //END_CourseService
