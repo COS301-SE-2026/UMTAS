@@ -116,35 +116,42 @@ export function InstituteSelector({ onClose }: InstituteSelectorProps) {
       )*/}
         {selectedInstitute && <ApprovalStatus uni={selectedInstitute} />}
         <div className="flex flex-col mt-2 justify-around gap-3 border-t pt-4">
-          <div className="flex gap-4">
-            <Button
-              id="btn-continue-as-role"
-              type="button"
-              disabled={uniDisabeled}
-              onClick={(e) => {
-                e.stopPropagation();
-                router.push("/schedules");
-                onClose?.();
-              }}
-            >
-              Continue as {selectedInstitute?.role ?? "Student"}
-            </Button>
+          <div className="flex justify-center items-center gap-4 w-full">
+            <div className="flex-1 flex justify-end">
+              <Button
+                id="btn-continue-as-role"
+                type="submit"
+                variant={"outline"}
+                disabled={uniDisabeled}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  router.push("/schedules");
+                  onClose?.();
+                }}
+              >
+                Continue as {selectedInstitute?.role ?? "Student"}
+              </Button>
+            </div>
 
-            <Button
-              id="btn-apply-for-role"
-              type="button"
-              disabled={applyDisabled}
-              onClick={(e) => {
-                e.stopPropagation();
-                applyMut.mutate({
-                  UniversityID: selectedInstitute?.UniversityID || "",
-                  role: selectedRole as uniDtoRoles,
-                });
-                onClose?.();
-              }}
-            >
-              {"Apply for role"}
-            </Button>
+            <p className="text-sm text-muted-foreground">or</p>
+            <div className="flex-1 flex justify-start">
+              <Button
+                id="btn-apply-for-role"
+                type="submit"
+                variant={"outline"}
+                disabled={applyDisabled}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  applyMut.mutate({
+                    UniversityID: selectedInstitute?.UniversityID || "",
+                    role: selectedRole as uniDtoRoles,
+                  });
+                  onClose?.();
+                }}
+              >
+                {"Apply for role"}
+              </Button>
+            </div>
           </div>
 
           <div className="w-full flex items-center justify-center mt-2">

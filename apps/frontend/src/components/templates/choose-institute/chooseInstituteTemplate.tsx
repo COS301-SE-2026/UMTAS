@@ -14,7 +14,7 @@ export function ChooseInstituteTemplate({
   onClose,
 }: ChooseInstituteTemplateProps) {
   return (
-    <Card className="mx-auto max-w-lg bg-[var(--bg-surface)]">
+    <Card className="mx-auto min-w-md bg-[var(--bg-surface)]">
       <CardHeader>
         <CardTitle>Choose Institute</CardTitle>
       </CardHeader>
