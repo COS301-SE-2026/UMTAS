@@ -1,7 +1,7 @@
 import { Test } from '@nestjs/testing';
 
 //Constants
-import {} from '../Testing/constants.spec';
+import { groupId, moduleId } from '../Testing/constants.spec';
 
 //Actual Services
 import { GroupingService } from './grouping.service';
@@ -12,6 +12,7 @@ import { CourseService } from '../Course/course.service';
 import { createMockDatabase } from '../Testing/Mocks/database.mock';
 import {
   mockDbResult,
+  mockSequentialResults,
   mockTransaction,
 } from '../Testing/Mocks/database.helpers';
 import {
@@ -25,7 +26,10 @@ import {
 import { createMockCourseService } from '../Testing/Mocks/services';
 
 //Exceptions
-import { InternalServerErrorException } from '@nestjs/common';
+import {
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 
 //DTO's
 import {} from './dto/grouping.dto';
@@ -165,4 +169,37 @@ describe('GroupingService', () => {
       expect(g2?.Hash).toBe('h2');
     });
   }); //END_Test_GetAll
+
+  //GetById
+  describe('Test_getById', () => {
+    //UnHappy - throw if no group found
+    it('should throw if no group found for id', async () => {
+      //Arrange
+      mockDbResult(mockDb.select, []);
+
+      //Act + Assert
+      await expect(service.getById(groupId)).rejects.toThrow(NotFoundException);
+    });
+
+    //Happy - should return group with modules for the group
+    it('should return group with its modules', async () => {
+      //Arrange
+      const group = createGroup();
+
+      mockSequentialResults(mockDb.select, [
+        [group],
+        [{ ModuleID: moduleId }],
+      ] as any);
+
+      //Act
+      const result = await service.getById(group.GroupID);
+
+      //Assert
+      expect(result).toMatchObject({
+        ...group,
+        modules: [moduleId],
+      });
+      expect(mockDb.select).toHaveBeenCalledTimes(2);
+    });
+  }); //END_Test_getById
 });
