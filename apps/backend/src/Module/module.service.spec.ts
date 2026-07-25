@@ -658,6 +658,85 @@ describe('ModuleService', () => {
     });
 
     //Happy - add modules to course
-    it('should add modules to the courses group', async () => {});
+    it('should add modules to the courses group', async () => {
+      const course = createCourse({ GroupID: groupId });
+      const modules = [createModule(), createModule()];
+      const dto: AddModulesToCourseDto = {
+        modules: [modules[0].moduleID, modules[1].moduleID],
+      };
+
+      mockCourseService.getById?.mockResolvedValue(course);
+
+      mockTransaction(mockDb, {
+        select: [
+          modules, //existingModules
+          [], //partnerCourse
+        ],
+      });
+
+      mockGroupingService.populateGroup?.mockResolvedValue({
+        GroupID: groupId,
+        Hash: 'someHash',
+        modules: [modules[0].moduleID, modules[1].moduleID],
+      });
+
+      //Act
+      const result = await service.addModulesToCourse(course.CourseID, dto);
+
+      //Assert
+      expect(result).toMatchObject({
+        CourseID: course.CourseID,
+        ...dto,
+      });
+
+      expect(mockCourseService.getById).toHaveBeenCalled();
+      expect(mockGroupingService.populateGroup).toHaveBeenCalled();
+    });
+
+    //Happy - add modules to course creating new group
+    it('should add modules to new group since other course uses old group', async () => {
+      const course = createCourse({ GroupID: groupId });
+      const partnerCourse = createCourse({ GroupID: groupId });
+      const modules = [createModule(), createModule()];
+      const dto: AddModulesToCourseDto = {
+        modules: [modules[0].moduleID, modules[1].moduleID],
+      };
+
+      mockCourseService.getById?.mockResolvedValue(course);
+
+      mockTransaction(mockDb, {
+        select: [
+          modules, //existingModules
+          [partnerCourse], //partnerCourse
+        ],
+      });
+
+      mockGroupingService.getById?.mockResolvedValue({
+        GroupID: groupId,
+        Hash: 'someHash',
+        modules: [],
+      });
+
+      const newGroup = createGroup();
+
+      mockGroupingService.createModuleGrouping?.mockResolvedValue({
+        GroupID: newGroup.GroupID,
+        Hash: 'someHash',
+        modules: dto.modules,
+      });
+
+      //Act
+      const result = await service.addModulesToCourse(course.CourseID, dto);
+
+      //Assert
+      expect(result).toMatchObject({
+        CourseID: course.CourseID,
+        ...dto,
+      });
+
+      expect(mockCourseService.getById).toHaveBeenCalled();
+      expect(mockGroupingService.getById).toHaveBeenCalled();
+      expect(mockGroupingService.createModuleGrouping).toHaveBeenCalled();
+    });
   }); //END_Test_addModulesToCourse
 });
