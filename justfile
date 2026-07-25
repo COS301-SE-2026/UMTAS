@@ -238,4 +238,10 @@ db_sql:
 # DROP SCHEMA public CASCADE; CREATE SCHEMA public; then quite
 # then you can delete all migrations and meta from drizzle and regenerate and migrate
 
+
+
+# Backend testing
+# unit test
+backend-unit:
+    phase run -- pnpm --filter backend test --coverage
 ############################## END_Backend specific
