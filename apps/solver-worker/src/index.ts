@@ -5,7 +5,6 @@ import {
   type WorkerHostOptions,
 } from "bullmq-worker-core";
 import type { TimetableSolveJobData } from "shared-types";
-import { buildSolverCallbackUrl, buildSolverInputUrl } from "./config.js";
 import { HttpSolverInputClient } from "./input-client.js";
 import {
   CliSolverExecutor,
@@ -76,4 +75,20 @@ function requiredEnv(name: string): string {
   const value = process.env[name];
   if (!value) throw new Error(`${name} is required.`);
   return value;
+}
+
+function solverJobsUrl(backendUrl: string): string {
+  return `${backendUrl.replace(/\/+$/u, "")}/solver/jobs`;
+}
+
+function buildSolverInputUrl(backendUrl: string, jobId: string): string {
+  return `${solverJobsUrl(backendUrl)}/${encodeURIComponent(jobId)}/input`;
+}
+
+function buildSolverCallbackUrl(
+  backendUrl: string,
+  jobId: string,
+  attemptToken: string,
+): string {
+  return `${solverJobsUrl(backendUrl)}/${encodeURIComponent(jobId)}/callback?attemptToken=${encodeURIComponent(attemptToken)}`;
 }
