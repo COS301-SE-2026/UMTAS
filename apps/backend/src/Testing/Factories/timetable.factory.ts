@@ -44,7 +44,7 @@ export function createCreateTimetableDto(
 } //END_createCreateTimetableDto
 
 export function createUpdateTimetableDto(
-  overrides: Partial<UpdateTimetableDto>,
+  overrides: Partial<UpdateTimetableDto> = {},
 ): UpdateTimetableDto {
   return {
     timetableName: TIMETABLE_NAME,

@@ -17,6 +17,7 @@ import {
   createCreateTimetableDto,
   createEvent,
   createTimetable,
+  createUpdateTimetableDto,
   createUserTimetable,
 } from '../Testing/Factories/';
 
@@ -275,4 +276,149 @@ describe('Timetable Service', () => {
       expect(mockDb.select).toHaveBeenCalled();
     });
   }); //END_Test_getTimetableById
+
+  //Update
+  describe('Test_updateTimetable', () => {
+    //UnHappy - timetable doesn't exist
+    it('should throw if timetable does not exist', async () => {
+      //Arrange
+      mockTransaction(mockDb, {
+        select: [
+          [], //UserTimetable
+        ],
+      });
+
+      const dto = createUpdateTimetableDto();
+
+      //Act + Assert
+      await expect(
+        service.updateTimetable(userId, timetableId, dto),
+      ).rejects.toThrow(NotFoundException);
+    });
+
+    //UnHappy - Update failed
+    it('should throw if update failed', async () => {
+      //Arrange
+      const timetable = createTimetable();
+      const userTimetable = createUserTimetable();
+
+      const dbResponse = {
+        UserTimetable: userTimetable,
+        Timetable: timetable,
+      };
+
+      mockTransaction(mockDb, {
+        select: [
+          [dbResponse], //UserTimetable
+        ],
+        update: [[]], //update failed
+      });
+
+      const dto = createUpdateTimetableDto();
+
+      //Act + Assert
+      await expect(
+        service.updateTimetable(userId, timetableId, dto),
+      ).rejects.toThrow(InternalServerErrorException);
+    });
+
+    //Happy - update timetable name
+    it('should update the timetables name', async () => {
+      //Arrange
+      const timetable = createTimetable();
+      const userTimetable = createUserTimetable();
+      const dto = createUpdateTimetableDto({
+        timetableName: 'newName',
+        addEventIds: [],
+        removeEventIds: [],
+      });
+      const updatedTimetable = createTimetable(dto);
+      const event = createEvent();
+
+      const dbResponse = {
+        UserTimetable: userTimetable,
+        Timetable: timetable,
+      };
+
+      const fetchResult = {
+        UserTimetable: userTimetable,
+        timetable: updatedTimetable,
+        eventID: event.eventID,
+      };
+
+      const expected: TimetableResponseDto = {
+        UserTimetableID: userTimetable.UserTimetableID,
+        timetable: updatedTimetable,
+        eventIds: [event.eventID],
+      };
+
+      mockTransaction(mockDb, {
+        select: [
+          [dbResponse], //UserTimetable
+          [fetchResult], //fetchTimetableWithEvents
+        ],
+        update: [[updatedTimetable]], //update failed
+      });
+
+      //Act
+      const result = await service.updateTimetable(userId, timetableId, dto);
+
+      //Assert
+      expect(result).toMatchObject(expected);
+      expect(mockDb.select).toHaveBeenCalledTimes(2);
+      expect(mockDb.update).toHaveBeenCalled();
+    });
+
+    //Happy - add and remove events
+    it('should insert and delete eventIds', async () => {
+      //Arrange
+      const timetable = createTimetable();
+      const userTimetable = createUserTimetable();
+      const eventToDelete = createEvent();
+      const eventToAdd = createEvent();
+
+      const dto = createUpdateTimetableDto({
+        timetableName: undefined,
+        addEventIds: [eventToAdd.eventID],
+        removeEventIds: [eventToDelete.eventID],
+      });
+
+      const dbResponse = {
+        UserTimetable: userTimetable,
+        Timetable: timetable,
+      };
+
+      const fetchResult = {
+        UserTimetable: userTimetable,
+        timetable,
+        eventID: eventToAdd.eventID,
+      };
+
+      const expected: TimetableResponseDto = {
+        UserTimetableID: userTimetable.UserTimetableID,
+        timetable,
+        eventIds: [eventToAdd.eventID],
+      };
+
+      mockTransaction(mockDb, {
+        select: [
+          [dbResponse], //UserTimetable
+          [{ eventID: eventToAdd.eventID }], //validateEventIds
+          [fetchResult], //fetchTimetableWithEvents
+        ],
+        insert: [[]], //hasAdd
+        delete: [[]], //hasRemove
+      });
+
+      //Act
+      const result = await service.updateTimetable(userId, timetableId, dto);
+
+      //Assert
+      expect(result).toMatchObject(expected);
+      expect(mockDb.select).toHaveBeenCalledTimes(3);
+      expect(mockDb.update).not.toHaveBeenCalled();
+      expect(mockDb.insert).toHaveBeenCalled();
+      expect(mockDb.delete).toHaveBeenCalled();
+    });
+  }); //END_Test_updateTimetable
 }); //END_Timetable Service
