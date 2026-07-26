@@ -1,0 +1,16 @@
+apps/backend/test/jest.setup.ts
+  h_84e82529bd05a5 71-155
+apps/backend/jest.config.ts
+  h_84e82529bd05a5 1-45
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "82d23f646f7d9dc7f3ddfbf9791b6dbcc085f0fb",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}
