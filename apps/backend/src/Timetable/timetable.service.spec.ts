@@ -26,6 +26,7 @@ import {} from '../Testing/Mocks/services';
 
 //Exceptions
 import {
+  BadRequestException,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
@@ -62,7 +63,7 @@ describe('Timetable Service', () => {
     //UnHappy - throw if insert failed
     it('should throw if Timetable insert failed', async () => {
       //Arrange
-      const dto = createCreateTimetableDto();
+      const dto = createCreateTimetableDto({ timetableName: undefined });
 
       mockTransaction(mockDb, {
         insert: [
@@ -322,6 +323,17 @@ describe('Timetable Service', () => {
       ).rejects.toThrow(InternalServerErrorException);
     });
 
+    //UnHappy - no fields to update
+    it('should throw if no fields to update', async () => {
+      //Arrange
+      const dto = {};
+
+      //Act + Assert
+      await expect(
+        service.updateTimetable(userId, timetableId, dto),
+      ).rejects.toThrow(BadRequestException);
+    });
+
     //Happy - update timetable name
     it('should update the timetables name', async () => {
       //Arrange
@@ -421,4 +433,66 @@ describe('Timetable Service', () => {
       expect(mockDb.delete).toHaveBeenCalled();
     });
   }); //END_Test_updateTimetable
+
+  //Delete
+  describe('Test_deleteTimetable', () => {
+    //UnHappy - timetable doesn't exist
+    it('should throw if timetable does not exist', async () => {
+      //Arrange
+      mockDbResult(mockDb.select, []);
+
+      //Act + Assert
+      await expect(
+        service.deleteTimetable(userId, timetableId),
+      ).rejects.toThrow(NotFoundException);
+      expect(mockDb.select).toHaveBeenCalled();
+    });
+
+    //UnHappy - failed to delete
+    it('should throw if the timetable failed to delete', async () => {
+      //Arrange
+      const userTimetable = createUserTimetable();
+      const timetable = createTimetable();
+
+      mockDbResult(mockDb.select, [
+        {
+          UserTimetable: userTimetable,
+          Timetable: timetable,
+        },
+      ]);
+
+      mockDbResult(mockDb.delete, []);
+
+      //Act + Assert
+      await expect(
+        service.deleteTimetable(userId, timetableId),
+      ).rejects.toThrow(InternalServerErrorException);
+      expect(mockDb.select).toHaveBeenCalled();
+      expect(mockDb.delete).toHaveBeenCalled();
+    });
+
+    //Happy - return success with successfull deletion
+    it('should return success if delete succeeded', async () => {
+      //Arrange
+      const userTimetable = createUserTimetable();
+      const timetable = createTimetable();
+
+      mockDbResult(mockDb.select, [
+        {
+          UserTimetable: userTimetable,
+          Timetable: timetable,
+        },
+      ]);
+
+      mockDbResult(mockDb.delete, [timetable]);
+
+      //Act
+      const result = await service.deleteTimetable(userId, timetableId);
+
+      //Assert
+      expect(result).toMatchObject({ success: true });
+      expect(mockDb.select).toHaveBeenCalled();
+      expect(mockDb.delete).toHaveBeenCalled();
+    });
+  });
 }); //END_Timetable Service
