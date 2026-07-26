@@ -26,7 +26,9 @@ jobs:
           key: ${{ secrets.PROD_SSH_KEY }}
           script: |
             cd /opt/UMTAS
-            just deploy-prod ${{ inputs.release_tag }}
+            docker compose -f docker-compose.prod.yml pull
+            just prod-down
+            just prod-up ${{ inputs.release_tag }}
 
   notify-deploy:
     needs: deploy

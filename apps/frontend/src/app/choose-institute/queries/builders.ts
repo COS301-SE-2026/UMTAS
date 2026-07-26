@@ -32,3 +32,20 @@ export class applyUniBuilder extends RequestBuilder<
     this.setUrl("/universities/apply").setMethod(RequestMethod.POST);
   }
 }
+
+export type selectUniBody =
+  paths["/api/auth/select-university"]["post"]["requestBody"]["content"]["application/json"];
+
+export type selectUniRes =
+  paths["/api/auth/select-university"]["post"]["responses"]["200"]["content"]["application/json"];
+
+export class selectUniBuilder extends RequestBuilder<
+  undefined,
+  selectUniBody,
+  selectUniRes
+> {
+  constructor() {
+    super();
+    this.setUrl("/api/auth/select-university").setMethod(RequestMethod.POST);
+  }
+}

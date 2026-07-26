@@ -29,7 +29,7 @@ export function SelectInstituteField({
       <Label htmlFor="institute-select">Select Institute</Label>
       <Select value={value} onValueChange={(id) => onChange(id)}>
         <SelectTrigger id="institute-select" className="w-full">
-          <SelectValue placeholder="Select an institute" />
+          <SelectValue placeholder="Select an Institute" />
         </SelectTrigger>
         <SelectContent>
           {institutes.map((institute) => (

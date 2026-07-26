@@ -501,6 +501,9 @@ export class AuthController {
     if (!this.hasGoogleOAuth()) {
       throw new NotFoundException('Google OAuth is not configured');
     }
+    this.logger.log(
+      `Callback cookies: ${JSON.stringify(req.headers.cookie ?? 'NONE')}`,
+    );
     this.logger.log('Google OAuth callback received');
     return this.handleRequest(req, res);
   }
@@ -726,7 +729,6 @@ export class AuthController {
   ): Promise<void> {
     return this.handleRequest(req, res);
   }
-
   private async handleRequest(
     req: IncomingMessage,
     res: ServerResponse,
@@ -735,24 +737,18 @@ export class AuthController {
       const auth = this.authService.getAuth();
       const nodeHandler = toNodeHandler(auth.handler);
 
-      this.logger.log(`Auth request: ${req.method} ${req.url}`);
-
       await nodeHandler(req, res);
-
-      if (res.statusCode >= 400) {
-        this.logger.warn(
-          `Auth request failed: ${req.method} ${req.url} -> Status ${res.statusCode}`,
-        );
-      }
     } catch (error) {
-      this.logger.error(
-        `Auth handler exception: ${error instanceof Error ? error.message : String(error)}`,
-        error instanceof Error ? error.stack : undefined,
-      );
       if (!res.headersSent) {
         res.statusCode = 500;
         res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify({ error: 'Internal server error' }));
+        res.end(
+          JSON.stringify({
+            error: 'Internal server error',
+            errorDetails:
+              error instanceof Error ? error.message : String(error),
+          }),
+        );
       }
     }
   }

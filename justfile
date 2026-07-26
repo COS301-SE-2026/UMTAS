@@ -46,16 +46,16 @@ reset-volumes:
 
 # shared proxy stack
 proxy-up:
-    phase run -- docker compose -f docker-compose.traefik.yml up -d --remove-orphans
+  phase run --env staging -- docker compose -p umtas-proxy -f docker-compose.traefik.yml up 
 
 proxy-down:
-    phase run -- docker compose -f docker-compose.traefik.yml down
+   phase run --env staging  -- docker compose -p umtas-proxy -f docker-compose.traefik.yml down
 
 staging-up:
-    phase run --env staging -- docker compose -f docker-compose.staging.yml up -d --remove-orphans
+    phase run --env staging -- docker compose -p umtas-staging -f docker-compose.staging.yml up -d --remove-orphans 
 
 staging-down:
-    phase run --env staging -- docker compose -f docker-compose.staging.yml down
+    phase run --env staging -- docker compose -p umtas-staging -f docker-compose.staging.yml down
 
 # cicd for runners
 
@@ -97,10 +97,10 @@ prod-db-backup:
 
 # start prod to specific release tag
 prod-up release_tag:
-    IMAGE_TAG={{ release_tag }} phase run --env production -- docker compose -f docker-compose.prod.yml up -d --remove-orphans
+    IMAGE_TAG={{ release_tag }} phase run --env production -- docker compose -p umtas-prod -f docker-compose.prod.yml up -d --remove-orphans
 
-prod-down:
-    phase run --env production -- docker compose -f docker-compose.prod.yml down
+prod-down release_tag:
+     IMAGE_TAG={{ release_tag }} phase run --env production -- docker compose -p umtas-prod -f docker-compose.prod.yml down
 
 # execute migrations on prod
 prod-migrate:

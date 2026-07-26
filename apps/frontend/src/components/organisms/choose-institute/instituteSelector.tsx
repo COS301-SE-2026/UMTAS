@@ -10,6 +10,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   applyMutator,
   getAllUni,
+  selectUniMutator,
 } from "@/app/choose-institute/queries/UserRoleQueries";
 import { UserDetails } from "@/lib/userclass/userClass";
 import { useRouter } from "next/navigation";
@@ -48,16 +49,27 @@ export function InstituteSelector() {
   const [selectedRole, setSelectedRole] = useState("");
   const { data: uniList, isLoading: uniLoading } = useQuery(getAllUni());
   const applyMut = useMutation(applyMutator());
+  const selectUniMut = useMutation(selectUniMutator());
 
   function updateSelectedUni(id: string) {
     const nUni = uniList?.universities.find((uni) => uni.UniversityID === id);
     setSelectedInstitute(nUni);
+
+    if (id) {
+      selectUniMut.mutate(
+        { uniId: id },
+        {
+          onError: (error) => console.error("Failed to select role:", error),
+        },
+      );
+    }
   }
 
   function handleConfirm() {
     UserDetails.storeUniDetails(selectedInstitute);
   }
-  const applyDisabled = !selectedInstitute || !selectedRole;
+  const applyDisabled =
+    !selectedInstitute || !selectedRole || selectUniMut.isPending;
   const uniDisabeled =
     selectedInstitute == null && selectedInstitute == undefined;
   const router = useRouter();
@@ -106,7 +118,7 @@ export function InstituteSelector() {
             disabled={uniDisabeled}
             onClick={() => router.push("/schedules")}
           >
-            continue as {selectedInstitute?.role ?? "student"}
+            Continue as {selectedInstitute?.role ?? "Student"}
           </Button>
 
           <Button

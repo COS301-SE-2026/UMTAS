@@ -136,7 +136,7 @@ function CourseTableBody<TData>({
       {empty ? (
         <TableRow className="">
           <TableCell></TableCell>
-          <TableCell>there are no rows to display</TableCell>
+          <TableCell>There are no rows to display</TableCell>
           <TableCell></TableCell>
         </TableRow>
       ) : (

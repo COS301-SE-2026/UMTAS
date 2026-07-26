@@ -199,14 +199,14 @@ export default function SolverUpload({
           }}
         >
           {pdfJobResult?.status === "completed" && !currentlyPolling && (
-            <>continue</>
+            <>Continue</>
           )}
           {pdfJobResult?.status !== "completed" && !currentlyPolling && (
-            <>upload</>
+            <>Upload</>
           )}
           {(currentlyPolling || pdfJobResult?.status === "queued") && (
             <>
-              waiting for updates <br /> <Spinner />
+              Waiting for Updates <br /> <Spinner />
             </>
           )}
         </Button>
