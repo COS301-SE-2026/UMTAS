@@ -11,7 +11,7 @@ import {
   CreateEventDto,
   EventSingleResponseDto,
 } from '../../Events/dto/EventDto.dto';
-import { ActivityType, ActivityTypeSchema } from 'shared-types';
+import { ActivityType } from 'shared-types';
 
 export function createEventCriteria(
   eventSource: EventSource = EventSource.UNIVERSITY,
@@ -20,7 +20,6 @@ export function createEventCriteria(
   const base: EventCriteria = {
     eventSource,
     date: 'yyyy-mm-dd',
-    dayOfWeek: 'monday',
     startTime: '08:30',
     endTime: '10:20',
 
@@ -43,7 +42,7 @@ export function createEvent(
   const base: EventEntity = {
     eventID: randomUUID(),
     eventName: 'Lecture 1',
-    activityType: ActivityTypeSchema[0],
+    activityType: 'lecture',
     activityCode: 'Lec1',
     isRecurring: false,
     validated: true,

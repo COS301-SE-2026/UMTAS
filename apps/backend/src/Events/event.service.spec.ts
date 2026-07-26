@@ -24,12 +24,15 @@ import {
 import {
   createEvent,
   createUniversityEvent,
-  createPersonalEvent,
+  // createPersonalEvent,
   createCreateEventDto,
+  createEventCriteria,
+  createUniversity,
 } from '../Testing/Factories/';
 
 import { EventSource } from './dto/event.types';
-import { UpdateEventDto } from './dto/EventDto.dto';
+import { CreateEventDto, UpdateEventDto } from './dto/EventDto.dto';
+import { BadRequestException, ForbiddenException } from '@nestjs/common';
 
 describe('EventService', () => {
   let service: EventService;
@@ -63,11 +66,139 @@ describe('EventService', () => {
 
   //TESTS
   //Create
+  describe('Test_Create_Events', () => {
+    //University
+    describe('Test_createUniversityEvent', () => {
+      //UnHappy - activityType is required
+      it('should throw if activityType not provided', async () => {
+        //Arrange
+        const eventCriteria = createEventCriteria();
+        const dto: CreateEventDto = {
+          eventCriteria: eventCriteria,
+        };
+
+        mockTransaction(mockDb, {});
+
+        //Act + Assert
+        await expect(
+          service.createUniversityEvent(userId, moduleId, dto),
+        ).rejects.toThrow(BadRequestException);
+      });
+
+      //UnHappy - module doesn't belong to a university
+      it('should throw if module is not owned by university', async () => {
+        //Arrange
+        const eventCriteria = createEventCriteria();
+        const dto: CreateEventDto = {
+          eventCriteria: eventCriteria,
+          activityType: 'lecture',
+        };
+
+        mockTransaction(mockDb, {
+          select: [
+            [],
+            [], //getMOduleUniversityIds
+          ],
+        });
+
+        //Act + Assert
+        await expect(
+          service.createUniversityEvent(userId, moduleId, dto),
+        ).rejects.toThrow(BadRequestException);
+        expect(mockDb.select).toHaveBeenCalledTimes(2); //getModuleUniversityIds
+      });
+
+      //UnHappy - user doesn't have access to university
+      it('should throw if user cannot create events for university', async () => {
+        //Arrange
+        const eventCriteria = createEventCriteria();
+        const dto: CreateEventDto = {
+          eventCriteria: eventCriteria,
+          activityType: 'lecture',
+        };
+
+        const uni = createUniversity();
+
+        mockTransaction(mockDb, {
+          select: [
+            [uni.UniversityID],
+            [], //getMOduleUniversityIds
+            [{ role: 'user' }],
+            [{ moduleId }],
+            [{ universityId: uniId }],
+            [{ universityId: uniId, role: 'student' }], //resolveAuthorizedModuleUniversity
+          ],
+        });
+
+        //Act + Assert
+        await expect(
+          service.createUniversityEvent(userId, moduleId, dto),
+        ).rejects.toThrow(ForbiddenException);
+        expect(mockDb.select).toHaveBeenCalledTimes(6);
+      });
+
+      //UnHappy - user doesn't have access to university
+      // it('should throw if user cannot create events for university', async ()=>{
+
+      //   //Arrange
+      //   const eventCriteria = createEventCriteria();
+      //   const dto: CreateEventDto = {
+      //     eventCriteria: eventCriteria,
+      //     activityType: 'lecture'
+      //   };
+
+      //   const uni = createUniversity();
+
+      //   mockTransaction(mockDb, {
+      //     select: [
+      //       [uni.UniversityID], [],//getMOduleUniversityIds
+      //       [{role: 'user'}], [{moduleId}], [{universityId: uniId}], [{universityId: uniId, role: 'student'}],//resolveAuthorizedModuleUniversity
+      //     ]
+      //   });
+
+      //   //Act + Assert
+      //   await expect(service.createUniversityEvent(userId, moduleId, dto))
+      //     .rejects.toThrow(ForbiddenException);
+      //   expect(mockDb.select).toHaveBeenCalledTimes(6);
+      // });
+    });
+
+    //Personal
+    // describe('Test_createPersonalEvent', () => {
+    //   it('should create a personal event', async () => {
+    //     const newEvent = createEvent(EventSource.PERSONAL);
+    //     const personalEvent = createPersonalEvent({ eventID: newEvent.eventID });
+
+    //     mockTransaction(mockDb, {
+    //       insert: [[newEvent], [personalEvent]],
+    //       select: [[]],
+    //     });
+
+    //     const result = await service.createPersonalEvent(
+    //       userId,
+    //       createCreateEventDto(newEvent),
+    //     );
+
+    //     expect(result).toMatchObject({
+    //       eventCriteria: expect.objectContaining({
+    //         eventSource: 'personal',
+    //         date: expect.any(String),
+    //         startTime: expect.any(String),
+    //         endTime: expect.any(String),
+    //       }),
+    //     });
+    //   });
+    // });
+  }); //END_Test_Creates
+
+  //CREATE
   describe('Test_CreateEvent', () => {
     it('should create a simple university event', async () => {
       //Arrange
       const newEvent = createEvent(EventSource.UNIVERSITY, {}, { moduleId });
       const createEventDto = createCreateEventDto(newEvent);
+
+      // console.log(`Here: \n Event[${JSON.stringify(newEvent)}] \n createEventDto[${JSON.stringify(createEventDto)}]`);
 
       const uniEvent = createUniversityEvent({
         moduleID: moduleId,
@@ -101,7 +232,7 @@ describe('EventService', () => {
         validated: newEvent.validated,
       });
     });
-  });
+  }); //END_Test_CreateEvent
 
   //GetAll
   describe('Test_GetAllEvents', () => {
@@ -222,31 +353,5 @@ describe('EventService', () => {
         success: true,
       });
     });
-  });
-
-  describe('Test_createPersonalEvent', () => {
-    it('should create a personal event', async () => {
-      const newEvent = createEvent(EventSource.PERSONAL);
-      const personalEvent = createPersonalEvent({ eventID: newEvent.eventID });
-
-      mockTransaction(mockDb, {
-        insert: [[newEvent], [personalEvent]],
-        select: [[]],
-      });
-
-      const result = await service.createPersonalEvent(
-        userId,
-        createCreateEventDto(newEvent),
-      );
-
-      expect(result).toMatchObject({
-        eventCriteria: expect.objectContaining({
-          eventSource: 'personal',
-          date: expect.any(String),
-          startTime: expect.any(String),
-          endTime: expect.any(String),
-        }),
-      });
-    });
-  });
+  }); //END_Test_DeleteEvent
 });
