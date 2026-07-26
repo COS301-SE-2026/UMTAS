@@ -1,0 +1,14 @@
+apps/backend/src/Timetable/timetable.service.spec.ts
+  h_84e82529bd05a5 29,66,326-335,436-496
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "12e883066c955b9c26c07869a35d95ec2635eb31",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}
