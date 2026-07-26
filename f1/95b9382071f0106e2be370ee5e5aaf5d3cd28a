@@ -1,0 +1,14 @@
+.husky/pre-commit
+  h_3359569cacef0e 20-21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "f195b9382071f0106e2be370ee5e5aaf5d3cd28a",
+  "prompts": {},
+  "humans": {
+    "h_3359569cacef0e": {
+      "author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}
