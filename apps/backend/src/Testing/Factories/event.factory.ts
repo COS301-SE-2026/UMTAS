@@ -7,7 +7,11 @@ import {
   EventVenue,
 } from '../../entities/index';
 import { EventCriteria, EventSource } from '../../Events/dto/event.types';
-import { CreateEventDto } from '../../Events/dto/EventDto.dto';
+import {
+  CreateEventDto,
+  EventSingleResponseDto,
+} from '../../Events/dto/EventDto.dto';
+import { ActivityType, ActivityTypeSchema } from 'shared-types';
 
 export function createEventCriteria(
   eventSource: EventSource = EventSource.UNIVERSITY,
@@ -16,6 +20,7 @@ export function createEventCriteria(
   const base: EventCriteria = {
     eventSource,
     date: 'yyyy-mm-dd',
+    dayOfWeek: 'monday',
     startTime: '08:30',
     endTime: '10:20',
 
@@ -38,7 +43,7 @@ export function createEvent(
   const base: EventEntity = {
     eventID: randomUUID(),
     eventName: 'Lecture 1',
-    activityType: 'lecture',
+    activityType: ActivityTypeSchema[0],
     activityCode: 'Lec1',
     isRecurring: false,
     validated: true,
@@ -51,6 +56,25 @@ export function createEvent(
     ...overrides,
   };
 } //END_createEvent
+
+export function createEventSingleResponse(
+  overrides: Partial<EventEntity> = {},
+  eventCriteriaOverrides: Partial<EventCriteria> = {},
+): EventSingleResponseDto {
+  const event = createEvent(
+    EventSource.UNIVERSITY,
+    overrides,
+    eventCriteriaOverrides,
+  );
+
+  return {
+    event: {
+      eventId: randomUUID(),
+      ...event,
+      activityType: (event.activityType ?? 'lecture') as ActivityType,
+    },
+  };
+} //END_createEventSingleResponse
 
 export function createCreateEventDto(event: EventEntity): CreateEventDto {
   return {
