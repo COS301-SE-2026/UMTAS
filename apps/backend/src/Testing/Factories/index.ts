@@ -6,3 +6,4 @@ export * from './university.factory';
 export * from './event.factory';
 export * from './grouping.factory';
 export * from './attendance.factory';
+export * from './timetable.factory';
