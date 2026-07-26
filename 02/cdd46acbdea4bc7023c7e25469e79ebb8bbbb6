@@ -1,0 +1,18 @@
+apps/backend/src/Attendance/attendance.service.spec.ts
+  h_84e82529bd05a5 1-149
+apps/backend/src/Testing/Factories/event.factory.ts
+  h_84e82529bd05a5 10-11,60-76
+apps/backend/src/Attendance/attendance.service.ts
+  h_84e82529bd05a5 42-46,197-207
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "02cdd46acbdea4bc7023c7e25469e79ebb8bbbb6",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}
