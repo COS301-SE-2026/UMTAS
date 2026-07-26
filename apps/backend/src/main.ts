@@ -23,6 +23,7 @@ async function bootstrap() {
   app.useStaticAssets(join(__dirname, '..', 'public'));
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   const port = process.env.PORT ?? 3000;
+  console.log(`[STARTUP] Starting UMTAS API on port ${port}...`);
 
   // if (process.env.NODE_ENV !== 'production') {
   const dbService = app.get(DatabaseService);
@@ -91,8 +92,9 @@ async function bootstrap() {
     `[STARTUP] Swagger docs available at http://localhost:${port}/api/docs`,
   );
   console.log(`[STARTUP] Listening on port ${port}`);
+  // console.log(process.env); // everything
 
-  await app.listen(port);
+  await app.listen(port, '0.0.0.0');
 }
 
 bootstrap().catch((err) => {
