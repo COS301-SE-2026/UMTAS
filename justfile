@@ -46,10 +46,10 @@ reset-volumes:
 
 # shared proxy stack
 proxy-up:
-    phase run -- docker compose -f docker-compose.traefik.yml up 
+    docker compose -f docker-compose.traefik.yml up 
 
 proxy-down:
-    phase run -- docker compose -f docker-compose.traefik.yml down
+    docker compose -f docker-compose.traefik.yml down
 
 staging-up:
     phase run --env staging -- docker compose -f docker-compose.staging.yml up -d --remove-orphans 
