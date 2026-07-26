@@ -1,0 +1,16 @@
+apps/backend/src/Timetable/timetable.service.spec.ts
+  h_84e82529bd05a5 4,27,30,33-36,167-168,170-172,174-271
+apps/backend/src/Testing/constants.spec.ts
+  h_84e82529bd05a5 8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "5b7ba5c2d9a8e8ade5890ddd79541f458f0a56c1",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}
