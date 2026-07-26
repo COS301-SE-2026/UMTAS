@@ -179,16 +179,14 @@ export class AttendanceService {
   ): Promise<deleteAttendanceResponse> {
     const db = tx ?? this.dbService.db;
 
-    //Get + check that attendance record exists
-    // await this.getById(eventAttendanceId, db); dont think this is necessary
-
     //Delete attendance record
-    await db
+    const [result] = await db
       .delete(EventAttendance)
-      .where(eq(EventAttendance.AttendanceID, eventAttendanceId));
+      .where(eq(EventAttendance.AttendanceID, eventAttendanceId))
+      .returning();
 
     return {
-      success: true,
+      success: !!result,
     };
   } //END_deleteAttendance
 

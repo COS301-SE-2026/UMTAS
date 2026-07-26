@@ -18,6 +18,7 @@ import {
   createAttendance,
   createAttendanceDto,
   createEventSingleResponse,
+  createUpdateAttendanceDto,
 } from '../Testing/Factories/';
 
 //Mock Services
@@ -33,6 +34,7 @@ import {
 import {
   AttendanceFilters,
   AttendanceListResponse,
+  deleteAttendanceResponse,
 } from './dto/attendance.dto';
 
 describe('Attendance Service', () => {
@@ -232,4 +234,117 @@ describe('Attendance Service', () => {
       expect(mockDb.select).toHaveBeenCalled();
     });
   }); //END_Test_getById
+
+  //update
+  describe('Test_updateAttendanceRecord', () => {
+    //UnHappy - doesn't exist
+    it('should throw if attendance record does not exist', async () => {
+      //Arrange
+      const dto = createUpdateAttendanceDto();
+      const spy = jest
+        .spyOn(service, 'getById')
+        .mockRejectedValue(new NotFoundException());
+
+      //Act + Assert
+      await expect(
+        service.updateAttendanceRecord(attendanceId, dto),
+      ).rejects.toThrow(NotFoundException);
+      expect(spy).toHaveBeenCalled();
+    });
+
+    //UnHappy - nothing to update
+    it('should return early if nothing to update', async () => {
+      //Arrange
+      const dto = createUpdateAttendanceDto();
+      const attendance = createAttendance(dto);
+      const spy = jest.spyOn(service, 'getById').mockResolvedValue(attendance);
+
+      mockTransaction(mockDb, {});
+
+      //Act
+      const result = await service.updateAttendanceRecord(attendanceId, dto);
+
+      //Assert
+      expect(result).toMatchObject(attendance);
+      expect(spy).toHaveBeenCalled();
+      expect(mockDb.update).not.toHaveBeenCalled();
+    });
+
+    //UnHappy - update failed
+    it('should return early if nothing to update', async () => {
+      //Arrange
+      const dto = createUpdateAttendanceDto();
+      const attendance = createAttendance();
+      const spy = jest.spyOn(service, 'getById').mockResolvedValue(attendance);
+
+      mockTransaction(mockDb, {
+        update: [[]], //update failed
+      });
+
+      //Act + Assert
+      await expect(
+        service.updateAttendanceRecord(attendanceId, dto),
+      ).rejects.toThrow(InternalServerErrorException);
+      expect(spy).toHaveBeenCalled();
+      expect(mockDb.update).toHaveBeenCalled();
+    });
+
+    //Happy - udpate every field of the attendance record
+    it('should update each field of the attendance entry', async () => {
+      //Arrange
+      const dto = createUpdateAttendanceDto();
+      console.log(`Here: [${JSON.stringify(dto)}]`);
+      const attendance = createAttendance();
+      const spy = jest.spyOn(service, 'getById').mockResolvedValue(attendance);
+
+      const newAttendance = createAttendance(dto);
+      mockTransaction(mockDb, {
+        update: [[newAttendance]], //update
+      });
+
+      //Act
+      const result = await service.updateAttendanceRecord(attendanceId, dto);
+
+      //Assert
+      expect(result).toMatchObject(newAttendance);
+      expect(spy).toHaveBeenCalled();
+      expect(mockDb.update).toHaveBeenCalled();
+    });
+  }); //END_Test_updateAttendanceRecord
+
+  //Delete
+  describe('Test_deleteAttendance', () => {
+    //UnHappy - success = false
+    it('should return success as false if failed', async () => {
+      //Arrange
+      const expected: deleteAttendanceResponse = {
+        success: false,
+      };
+      mockDbResult(mockDb.delete, []);
+
+      //Act
+      const result = await service.deleteAttendance(attendanceId);
+
+      //Assert
+      expect(result).toMatchObject(expected);
+      expect(mockDb.delete).toHaveBeenCalled();
+    });
+
+    //Happy - success = true
+    it('should return success as true if deleted', async () => {
+      //Arrange
+      const expected: deleteAttendanceResponse = {
+        success: true,
+      };
+      const attendance = createAttendance();
+      mockDbResult(mockDb.delete, [attendance]);
+
+      //Act
+      const result = await service.deleteAttendance(attendanceId);
+
+      //Assert
+      expect(result).toMatchObject(expected);
+      expect(mockDb.delete).toHaveBeenCalled();
+    });
+  });
 }); //END_Attendance Service

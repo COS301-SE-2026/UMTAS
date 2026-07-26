@@ -4,7 +4,10 @@ import {
   AttendanceState,
   AttendanceStateType,
 } from '../../entities';
-import { CreateAttendanceDto } from '../../Attendance/dto/attendance.dto';
+import {
+  CreateAttendanceDto,
+  UpdateAttendanceDto,
+} from '../../Attendance/dto/attendance.dto';
 
 const DATE: string = '2026-01-02';
 const STATE: AttendanceStateType = AttendanceState[0];
@@ -36,3 +39,14 @@ export function createAttendanceDto(
     ...overrides,
   };
 } //END_createAttendanceDto
+
+export function createUpdateAttendanceDto(
+  overrides: Partial<UpdateAttendanceDto> = {},
+): UpdateAttendanceDto {
+  return {
+    eventDate: 'newDate',
+    state: 'ATTENDING',
+
+    ...overrides,
+  };
+} //END_createUpdateAttendanceDto
