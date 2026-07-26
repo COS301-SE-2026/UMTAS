@@ -1,7 +1,7 @@
 import { Test } from '@nestjs/testing';
 
 //Constants
-import { userId } from '../Testing/constants.spec';
+import { timetableId, userId } from '../Testing/constants.spec';
 
 //Actual Services
 import { TimetableService } from './timetable.service';
@@ -9,7 +9,10 @@ import { DatabaseService } from '../db/database.service';
 
 //Mock Database and factories
 import { createMockDatabase } from '../Testing/Mocks/database.mock';
-import { mockTransaction } from '../Testing/Mocks/database.helpers';
+import {
+  mockDbResult,
+  mockTransaction,
+} from '../Testing/Mocks/database.helpers';
 import {
   createCreateTimetableDto,
   createEvent,
@@ -21,10 +24,16 @@ import {
 import {} from '../Testing/Mocks/services';
 
 //Exceptions
-import { InternalServerErrorException } from '@nestjs/common';
+import {
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 
 //DTO's
-import { TimetableResponseDto } from './dto/timetable.dto';
+import {
+  TimetableListResponseDto,
+  TimetableResponseDto,
+} from './dto/timetable.dto';
 
 describe('Timetable Service', () => {
   let service: TimetableService;
@@ -153,4 +162,117 @@ describe('Timetable Service', () => {
   }); //END_Test_createTimetable
 
   //GetAll
+  describe('Test_getAllTimetables', () => {
+    //UnHappy - return empty timetables
+    it('should return empty timetables if none found', async () => {
+      //Arrange
+      mockDbResult(mockDb.select, []);
+
+      const expected: TimetableListResponseDto = {
+        timetables: [],
+      };
+
+      //Act
+      const result = await service.getAllTimetables(userId);
+
+      //Assert
+      expect(result).toMatchObject(expected);
+      expect(mockDb.select).toHaveBeenCalled();
+    });
+
+    //Happy - return timetables
+    it('should return timetables found for user', async () => {
+      //Arrange
+      const timetable1 = createTimetable();
+      const timetable2 = createTimetable();
+
+      const userTimetable1 = createUserTimetable();
+      const userTimetable2 = createUserTimetable();
+
+      const event = createEvent();
+
+      const dbResponse = [
+        {
+          UserTimetable: userTimetable1,
+          timetable: timetable1,
+          eventID: event.eventID,
+        },
+        {
+          UserTimetable: userTimetable2,
+          timetable: timetable2,
+          eventID: event.eventID,
+        },
+      ];
+      mockDbResult(mockDb.select, dbResponse);
+
+      const expected: TimetableListResponseDto = {
+        timetables: [
+          {
+            timetable: timetable1,
+            UserTimetableID: userTimetable1.UserTimetableID,
+            eventIds: [event.eventID],
+          },
+          {
+            timetable: timetable2,
+            UserTimetableID: userTimetable2.UserTimetableID,
+            eventIds: [event.eventID],
+          },
+        ],
+      };
+
+      //Act
+      const result = await service.getAllTimetables(userId);
+
+      //Assert
+      expect(result).toMatchObject(expected);
+      expect(mockDb.select).toHaveBeenCalled();
+    });
+  }); //END_Test_getAllTimetables
+
+  //GetById
+  describe('Test_getTimetableById', () => {
+    //UnHappy - no timetable found
+    it('should throw if no timetable found', async () => {
+      //Arrange
+      mockDbResult(mockDb.select, []);
+
+      //Act + Assert
+      await expect(
+        service.getTimetableById(userId, timetableId),
+      ).rejects.toThrow(NotFoundException);
+      expect(mockDb.select).toHaveBeenCalled();
+    });
+
+    //Happy - return timetable with event ids
+    it('should return timetable with eventIds', async () => {
+      //Arrange
+      const timetable = createTimetable();
+      const userTimetable = createUserTimetable();
+      const event = createEvent();
+
+      const dbResult = {
+        UserTimetable: userTimetable,
+        timetable,
+        eventID: event.eventID,
+      };
+
+      mockDbResult(mockDb.select, [dbResult]);
+
+      const expected: TimetableResponseDto = {
+        UserTimetableID: userTimetable.UserTimetableID,
+        timetable,
+        eventIds: [event.eventID],
+      };
+
+      //Act
+      const result = await service.getTimetableById(
+        userId,
+        timetable.timetableID,
+      );
+
+      //Assert
+      expect(result).toMatchObject(expected);
+      expect(mockDb.select).toHaveBeenCalled();
+    });
+  }); //END_Test_getTimetableById
 }); //END_Timetable Service
