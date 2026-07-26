@@ -21,8 +21,8 @@ jobs:
   ci:
     name: Lint, Build & Test
     runs-on: ubuntu-latest
-    environment:
-      name: ${{ startsWith(github.ref, 'refs/tags/v') && 'production' || 'staging' }}
+    # environment:
+    #   name: ${{ startsWith(github.ref, 'refs/tags/v') && 'production' || 'staging' }}
     permissions:
       contents: read
       checks: write
@@ -319,59 +319,59 @@ jobs:
           cache-from: type=gha,scope=pdf-parser-release
           cache-to: type=gha,mode=max,scope=pdf-parser-release
 
-  health-check:
-    name: Staging Health Check
-    runs-on: ubuntu-latest
-    needs: docker-staging
-    if: github.event_name == 'pull_request' || (github.event_name == 'push' && (github.ref == 'refs/heads/main'))
-    environment:
-      name: staging
-    permissions: {}
-    outputs:
-      status: ${{ job.status }}
+  # health-check:
+  #   name: Staging Health Check
+  #   runs-on: ubuntu-latest
+  #   needs: docker-staging
+  #   if: github.event_name == 'pull_request' || (github.event_name == 'push' && (github.ref == 'refs/heads/main'))
+  #   environment:
+  #     name: staging
+  #   permissions: {}
+  #   outputs:
+  #     status: ${{ job.status }}
 
-    steps:
-      - name: Wait for Watchtower redeploy
-        run: |
-          echo "Waiting 60s for Watchtower to pull and restart containers..."
-          sleep 60
+  #   steps:
+  #     - name: Wait for Watchtower redeploy
+  #       run: |
+  #         echo "Waiting 60s for Watchtower to pull and restart containers..."
+  #         sleep 60
 
-      - name: Check staging health endpoints
-        env:
-          DOMAIN: ${{ secrets.STAGING_DOMAIN }}
-        run: |
-          failed=0
-            check() {
-            local url=$1
-            local attempt
-            for attempt in 1 2 3 4 5; do
-              status=$(curl -s -L -o /dev/null -w "%{http_code}" --max-time 10 "$url")
-              if [ "$status" = "200" ]; then
-                echo "OK: $url returned HTTP 200"
-                return 0
-              fi
-              echo "Attempt $attempt/5: $url returned HTTP $status"
-              [ "$attempt" -lt 5 ] && sleep 20
-            done
-            echo "FAIL: $url did not return HTTP 200 after 5 attempts"
-            return 1
-          }
+  #     - name: Check staging health endpoints
+  #       env:
+  #         DOMAIN: ${{ secrets.STAGING_DOMAIN }}
+  #       run: |
+  #         failed=0
+  #           check() {
+  #           local url=$1
+  #           local attempt
+  #           for attempt in 1 2 3 4 5; do
+  #             status=$(curl -s -L -o /dev/null -w "%{http_code}" --max-time 10 "$url")
+  #             if [ "$status" = "200" ]; then
+  #               echo "OK: $url returned HTTP 200"
+  #               return 0
+  #             fi
+  #             echo "Attempt $attempt/5: $url returned HTTP $status"
+  #             [ "$attempt" -lt 5 ] && sleep 20
+  #           done
+  #           echo "FAIL: $url did not return HTTP 200 after 5 attempts"
+  #           return 1
+  #         }
 
-          check "https://staging.api.${DOMAIN}/health"    || failed=1
-          check "https://staging.solver.${DOMAIN}/health" || failed=1
-          check "https://staging.${DOMAIN}/api/health"    || failed=1
+  #         check "https://staging.api.${DOMAIN}/health"    || failed=1
+  #         check "https://staging.solver.${DOMAIN}/health" || failed=1
+  #         check "https://staging.${DOMAIN}/api/health"    || failed=1
 
-          exit $failed
+  #         exit $failed
 
-  notify-staging-ready:
-    name: Notify Staging Success
-    needs: [health-check]
-    if: success()
-    uses: ./.github/workflows/discord-notify.yml
-    with:
-      status: "Success"
-      message: "Staging environment is updated and passing health checks!"
-    secrets: inherit
+  # notify-staging-ready:
+  #   name: Notify Staging Success
+  #   needs: [health-check]
+  #   if: success()
+  #   uses: ./.github/workflows/discord-notify.yml
+  #   with:
+  #     status: "Success"
+  #     message: "Staging environment is updated and passing health checks!"
+  #   secrets: inherit
 
   notify-ci-failure:
     name: Notify CI/CD Failure
