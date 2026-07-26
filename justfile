@@ -99,8 +99,8 @@ prod-db-backup:
 prod-up release_tag:
     IMAGE_TAG={{ release_tag }} phase run --env production -- docker compose -f docker-compose.prod.yml up -d --remove-orphans
 
-prod-down:
-    phase run --env production -- docker compose -f docker-compose.prod.yml down
+prod-down release_tag:
+     IMAGE_TAG={{ release_tag }} phase run --env production -- docker compose -f docker-compose.prod.yml down
 
 # execute migrations on prod
 prod-migrate:
