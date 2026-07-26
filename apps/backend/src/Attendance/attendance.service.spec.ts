@@ -1,7 +1,7 @@
 import { Test } from '@nestjs/testing';
 
 //Constants
-import { userId } from '../Testing/constants.spec';
+import { attendanceId, userId } from '../Testing/constants.spec';
 
 //Actual Services
 import { AttendanceService } from './attendance.service';
@@ -10,7 +10,10 @@ import { EventService } from '../Events/event.service';
 
 //Mock Database and factories
 import { createMockDatabase } from '../Testing/Mocks/database.mock';
-import { mockTransaction } from '../Testing/Mocks/database.helpers';
+import {
+  mockDbResult,
+  mockTransaction,
+} from '../Testing/Mocks/database.helpers';
 import {
   createAttendance,
   createAttendanceDto,
@@ -27,7 +30,10 @@ import {
 } from '@nestjs/common';
 
 //DTO's
-import {} from './dto/attendance.dto';
+import {
+  AttendanceFilters,
+  AttendanceListResponse,
+} from './dto/attendance.dto';
 
 describe('Attendance Service', () => {
   let service: AttendanceService;
@@ -145,5 +151,85 @@ describe('Attendance Service', () => {
   });
 
   //getAll
-  describe('Test_getAllAttendanceRecords', () => {}); //END_Test_getAllAttendanceRecords
+  describe('Test_getAllAttendanceRecords', () => {
+    //UnHappy - return empty array of attendanceList if none found
+    it('should return empty attendanceList', async () => {
+      //Arrange
+      const expected: AttendanceListResponse = {
+        attendanceList: [],
+      };
+
+      mockTransaction(mockDb, {
+        select: [
+          [], //no attendance records
+        ],
+      });
+
+      //Act
+      const result = await service.getAllAttendanceRecords(userId);
+
+      //Assert
+      expect(result).toMatchObject(expected);
+      expect(mockDb.select).toHaveBeenCalled();
+    });
+
+    //Happy - return records
+    it('should return attendanceList with records', async () => {
+      //Arrange
+      const a1 = createAttendance();
+      const a2 = createAttendance();
+      const expected: AttendanceListResponse = {
+        attendanceList: [a1, a2],
+      };
+
+      const dto: AttendanceFilters = {
+        eventID: 'someID',
+        eventDate: 'someDate',
+        state: 'ATTENDING',
+        AlsoFilterByUser: true,
+      };
+
+      mockTransaction(mockDb, {
+        select: [
+          [a1, a2], //records exist
+        ],
+      });
+
+      //Act
+      const result = await service.getAllAttendanceRecords(userId, dto);
+
+      //Assert
+      expect(result).toMatchObject(expected);
+      expect(mockDb.select).toHaveBeenCalled();
+    });
+  }); //END_Test_getAllAttendanceRecords
+
+  //getById
+  describe('Test_getById', () => {
+    //UnHappy - throw if not found
+    it('should throw if attendance does not exist', async () => {
+      //Arrange
+      mockDbResult(mockDb.select, []);
+
+      //Act + Assert
+      await expect(service.getById(attendanceId)).rejects.toThrow(
+        NotFoundException,
+      );
+      expect(mockDb.select).toHaveBeenCalled();
+    });
+
+    //Happy - return record
+    it('should successfully return attendance entry by ID', async () => {
+      //Arrange
+      const attendance = createAttendance();
+      mockDbResult(mockDb.select, [attendance]);
+
+      //Act
+      const result = await service.getById(attendanceId);
+
+      //Assert
+      expect(result).toMatchObject(attendance);
+      expect(mockDb.select).toHaveBeenCalled();
+    });
+  }); //END_Test_getById
 }); //END_Attendance Service
