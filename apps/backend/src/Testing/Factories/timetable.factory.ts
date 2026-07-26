@@ -1,5 +1,5 @@
 import { randomUUID } from 'crypto';
-import { Timetable } from '../../entities';
+import { Timetable, UserTimetable } from '../../entities';
 import {
   CreateTimetableDto,
   UpdateTimetableDto,
@@ -17,6 +17,20 @@ export function createTimetable(overrides: Partial<Timetable> = {}): Timetable {
     ...overrides,
   };
 } //END_createTimetable
+
+type UserTimetable = typeof UserTimetable.$inferSelect;
+
+export function createUserTimetable(
+  overrides: Partial<UserTimetable> = {},
+): UserTimetable {
+  return {
+    UserTimetableID: randomUUID(),
+    UserID: randomUUID(),
+    TimetableID: randomUUID(),
+
+    ...overrides,
+  };
+} //END_createUserTimetable
 
 export function createCreateTimetableDto(
   overrides: Partial<CreateTimetableDto> = {},
