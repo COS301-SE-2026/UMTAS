@@ -1,0 +1,16 @@
+apps/backend/src/Testing/Mocks/services/index.ts
+  h_84e82529bd05a5 7
+apps/backend/src/Testing/Mocks/services/event.mock.ts
+  h_84e82529bd05a5 1-16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "2198edac4172b34a37b5ab0c0d49adb778b6be5f",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}
