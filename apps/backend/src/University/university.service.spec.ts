@@ -6,6 +6,7 @@ import {
   ConflictException,
   NotFoundException,
   BadRequestException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 
 //constants
@@ -13,17 +14,21 @@ import { userId, uniId } from '../Testing/constants.spec';
 
 //mock services
 import { createMockDatabase } from '../Testing/Mocks/database.mock';
-// import {createMockUniversityService} from '../Testing/Mocks/services';
 import { DatabaseService } from '../db/database.service';
 
 //mock functions on db
 import { mockDbResult, mockTransaction } from '../Testing/Mocks';
 
 //factories
-// import {createUniversity} from '../Testing/Factories';
-// import { exists } from 'drizzle-orm/sql/expressions/conditions';
+import { createUniversity } from '../Testing/Factories';
 import { University } from '../entities/Universities/University.schema';
-import { ApplyForUniRoleDto, ApproveUsersRoleDto } from './dto/university.dto';
+
+//DTO's
+import {
+  ApplyForUniRoleDto,
+  ApproveUsersRoleDto,
+  GetRoleFilterDto,
+} from './dto/university.dto';
 
 describe('UniversityService', () => {
   let service: UniversityService;
@@ -86,6 +91,33 @@ describe('UniversityService', () => {
     });
   }); //END_Test_createUniversity
 
+  describe('Test_getAll_University', () => {
+    //unHappy - return empty array of universities
+    it('should return an empty array of universities', async () => {
+      //Arrange
+      mockDbResult(mockDb.select, []);
+
+      //Act
+      const result = await service.getAll(userId);
+
+      //Assert
+      expect(result).toMatchObject({ universities: [] });
+    });
+
+    //Happy - return array of universities
+    it('should return an array of universities', async () => {
+      //Arrange
+      const universities = [createUniversity(), createUniversity()];
+      mockDbResult(mockDb.select, universities);
+
+      //Act
+      const result = await service.getAll(userId);
+
+      //Assert
+      expect(result).toMatchObject({ universities: universities });
+    });
+  }); //END_Test_getAll_University
+
   describe('Test_getById_University', () => {
     it('should throw NotFound if university does not exist', async () => {
       //Arrange
@@ -110,6 +142,7 @@ describe('UniversityService', () => {
   }); //END_Test_getById
 
   describe('Test_UpdateUniversity', () => {
+    //UnHappy
     it('should throw an error if University name is undefined', async () => {
       //Arrange
       jest.spyOn(service, 'getById').mockResolvedValue({
@@ -126,6 +159,7 @@ describe('UniversityService', () => {
       expect(mockDb.update).not.toHaveBeenCalled();
     });
 
+    //UnHappy
     it('should throw an error if the university does not exist', async () => {
       //Arrange
       const dto = { UniversityName: 'Non-existent University' };
@@ -141,6 +175,50 @@ describe('UniversityService', () => {
       );
       expect(mockDb.update).not.toHaveBeenCalledWith();
       expect(spioen).toHaveBeenCalledWith(uniId, mockDb);
+    });
+
+    //UnHappy
+    it('should throw an error if the new university name already exists', async () => {
+      //Arrange
+      jest.spyOn(service, 'getById').mockResolvedValue({
+        UniversityID: uniId,
+        UniversityName: 'ou naam',
+      });
+      jest
+        .spyOn(service, 'checkDuplicateUniversityName')
+        .mockResolvedValue(true);
+
+      //Act + Assert
+      await expect(
+        service.update(uniId, { UniversityName: 'nuwe naam' }),
+      ).rejects.toThrow(ConflictException);
+      expect(service.getById).toHaveBeenCalledTimes(1);
+      expect(service.checkDuplicateUniversityName).toHaveBeenCalledTimes(1);
+    });
+
+    //UnHappy - throw if update failed
+    it('should throw if update failed', async () => {
+      //Arrange
+      jest.spyOn(service, 'getById').mockResolvedValue({
+        UniversityID: uniId,
+        UniversityName: 'ou naam',
+      });
+      jest
+        .spyOn(service, 'checkDuplicateUniversityName')
+        .mockResolvedValue(false);
+
+      mockTransaction(mockDb, {
+        update: [[]], //update failed
+      });
+
+      //Act + assert
+      await expect(
+        service.update(uniId, { UniversityName: 'nuwe naam' }),
+      ).rejects.toThrow(InternalServerErrorException);
+
+      //Assert
+      expect(service.getById).toHaveBeenCalledTimes(1);
+      expect(service.checkDuplicateUniversityName).toHaveBeenCalledTimes(1);
     });
 
     it('should successfully update the university name if it exists', async () => {
@@ -168,63 +246,38 @@ describe('UniversityService', () => {
       expect(service.getById).toHaveBeenCalledTimes(1);
       expect(service.checkDuplicateUniversityName).toHaveBeenCalledTimes(1);
     });
-
-    it('should throw an error if the new university name already exists', async () => {
-      //Arrange
-      jest.spyOn(service, 'getById').mockResolvedValue({
-        UniversityID: uniId,
-        UniversityName: 'ou naam',
-      });
-      jest
-        .spyOn(service, 'checkDuplicateUniversityName')
-        .mockResolvedValue(true);
-
-      //Act + Assert
-      await expect(
-        service.update(uniId, { UniversityName: 'nuwe naam' }),
-      ).rejects.toThrow(ConflictException);
-      expect(service.getById).toHaveBeenCalledTimes(1);
-      expect(service.checkDuplicateUniversityName).toHaveBeenCalledTimes(1);
-    });
   }); //END_Test_updateUniversity
 
   describe('Test_DeleteUniversity', () => {
-    it('should throw an error if the university does not exist', async () => {
+    //UnHappy - delete failed
+    it('should return success=false if delete failed', async () => {
       //Arrange
-      const spioen = jest.spyOn(service, 'getById');
       mockTransaction(mockDb, {
-        select: [[]],
-      });
-
-      //Act + Assert
-      await expect(service.delete(uniId)).rejects.toThrow(NotFoundException);
-      expect(spioen).toHaveBeenCalledTimes(1);
-      expect(mockDb.delete).not.toHaveBeenCalled();
-    });
-
-    it('should successfully delete the university if it exists', async () => {
-      //Arrange
-      const spioen = jest.spyOn(service, 'getById');
-      const uniToDelete = {
-        UniversityID: uniId,
-        UniversityName: 'Deleted University',
-      };
-      const mockDeletedUni = {
-        UniversityName: uniToDelete.UniversityName,
-        success: true,
-      };
-      mockTransaction(mockDb, {
-        select: [[uniToDelete]], //getById
-        delete: [[uniToDelete]],
+        delete: [[]], //Delete failed
       });
 
       //Act
-      const result = await service.delete(uniId);
+      const result = await service.delete('someid');
 
       //Assert
-      expect(result).toMatchObject(mockDeletedUni);
-      expect(spioen).toHaveBeenCalledTimes(1);
-      expect(mockDb.delete).toHaveBeenCalledWith(University);
+      expect(result.success).toEqual(false);
+    });
+
+    it('should return universityName and success=true if deleted', async () => {
+      //Arrange
+      const uni = createUniversity();
+      mockTransaction(mockDb, {
+        delete: [[uni]], //Delete failed
+      });
+
+      //Act
+      const result = await service.delete('someid');
+
+      //Assert
+      expect(result).toMatchObject({
+        UniversityName: uni.UniversityName,
+        success: true,
+      });
     });
   }); //END_Test_DeleteUniversity
 
@@ -434,59 +487,88 @@ describe('UniversityService', () => {
     });
   });
 
-  // describe('Test_getAllApplications', () => {
-  //   it('should return all applications for a given university', async () => {
-  //     const mockAuthResult = [
-  //       {
-  //         University: { UniversityID: uniId, UniversityName: 'Test Uni' },
-  //         UniversityRole: {
-  //           UserID: userId,
-  //           UniversityID: uniId,
-  //           role: 'UNIVERSITY_ADMIN' as const,
-  //         },
-  //       },
-  //     ];
+  describe('Test_getAllApplications', () => {
+    //UnHappy - return empty array
+    it('should return empty array of applications', async () => {
+      //Arrange
+      const dto: GetRoleFilterDto = {
+        pending: true,
+      };
+      mockTransaction(mockDb, {
+        select: [[]],
+      });
 
-  //     const mockApplications = [
-  //       {
-  //         Name: 'Test User',
-  //         UserID: userId,
-  //         Email: 'user@example.com',
-  //         UniversityID: uniId,
-  //         role: 'UNIVERSITY_ADMIN_PENDING',
-  //       },
-  //     ];
+      //Act
+      const result = await service.getAllApplications(userId, uniId, dto);
 
-  //     mockTransaction(mockDb, {
-  //       select: [
-  //         [mockAuthResult],//role
-  //          [mockApplications]//applications
-  //         ]
-  //     });
+      //Assert
+      expect(result).toEqual([]);
+    });
 
-  //     const result = await service.getAllApplications(userId, uniId, {
-  //       pending: true,
-  //     });
+    //Happy - return the applications
+    it('should return all applications for a given university', async () => {
+      //Arrange
 
-  //     expect(mockDb.select).toHaveBeenCalledTimes(2);
-  //     expect(result).toEqual(mockApplications);
-  //   });
-  // });
+      const mockApplications = [
+        {
+          Name: 'Test User',
+          UserID: userId,
+          Email: 'user@example.com',
+          UniversityID: uniId,
+          role: 'UNIVERSITY_ADMIN_PENDING',
+        },
+      ];
 
-  // describe('Test_getByName', () => {
-  //   it('should return university details if found by name', async () => {
-  //     const uniName = 'Test University';
-  //     const mockUni = {
-  //       UniversityID: uniId,
-  //       UniversityName: uniName,
-  //     };
+      mockTransaction(mockDb, {
+        select: [
+          mockApplications, //applications
+        ],
+      });
 
-  //     mockDbResult(mockDb.select, [mockUni]);
+      //Act
+      const result = await service.getAllApplications(userId, uniId, {
+        pending: true,
+      });
 
-  //     const result = await service.getByName(uniName);
+      //Assert
+      expect(mockDb.select).toHaveBeenCalledTimes(1);
+      expect(result).toEqual(mockApplications);
+    });
+  }); //END_Test_getAllApplications
 
-  //     expect(mockDb.select).toHaveBeenCalled();
-  //     expect(result).toEqual(mockUni);
-  //   });
-  // });
+  describe('Test_getByName', () => {
+    //UnHappy - uni not found - return null
+    it('should return null if uni not found', async () => {
+      //Arrange
+      const uniName = 'Test University';
+
+      mockDbResult(mockDb.select, []);
+
+      //Act
+      const result = await service.getByName(uniName);
+
+      //Assert
+      expect(mockDb.select).toHaveBeenCalled();
+      expect(result).toEqual(null);
+    });
+
+    //Happy - return uni by name
+    it('should return university details if found by name', async () => {
+      //Arrange
+      const uniName = 'Test University';
+      const mockUni = {
+        UniversityID: uniId,
+        UniversityName: uniName,
+      };
+
+      mockDbResult(mockDb.select, [mockUni]);
+
+      //Act
+      const result = await service.getByName(uniName);
+
+      //Assert
+      expect(mockDb.select).toHaveBeenCalled();
+      expect(result).toEqual(mockUni);
+    });
+  }); //END_Test_getByName
 });

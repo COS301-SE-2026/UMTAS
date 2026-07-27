@@ -3,11 +3,12 @@ import { InjectQueue } from '@nestjs/bullmq';
 import type { Job, Queue } from 'bullmq';
 import type { PdfParseJobData, TimetableSolveJobData } from 'shared-types';
 import {
-  PDF_PARSE_JOB_NAME,
   PDF_PARSE_QUEUE_TOKEN,
-  TIMETABLE_SOLVE_JOB_NAME,
   TIMETABLE_SOLVE_QUEUE_TOKEN,
 } from './queue.constants';
+
+const PDF_PARSE_JOB_NAME = 'parse-pdf';
+const TIMETABLE_SOLVE_JOB_NAME = 'solve-timetable';
 
 @Injectable()
 export class QueueProducerService {

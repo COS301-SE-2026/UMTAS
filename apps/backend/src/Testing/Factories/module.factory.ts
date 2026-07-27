@@ -1,85 +1,62 @@
 import { randomUUID } from 'crypto';
-import {
-  modules,
-  //   CourseModule,
-  //   ModuleEnrollment,
-  //   ModuleStyling,
-} from 'src/entities';
-// import { courseId } from '../constants.spec';
-// import { ModuleService } from '../../Module/module.service';
-
-// export const baseDto = {
-//   moduleCode: 'COS332',
-//   moduleName: 'Networks and stuff',
-//   moduleDescription: 'Networks for the dweebs',
-//   courseID: courseId,
-// };
-
-// export function createMockModuleService() {
-//   const mockModuleService: Partial<jest.Mocked<ModuleService>> = {
-//     getUniForModule: jest.fn(),
-//     moduleOwnershipCheck: jest.fn(),
-//   };
-
-//   return {
-//     mockModuleService,
-//     reset: () => {
-//       Object.values(mockModuleService).forEach((fn: any) => fn.mockReset());
-//     },
-//   };
-// } //END_createMockModuleService
+import { modules, ModuleStyling } from '../../entities';
+import { CourseModuleDto, CreateModuleDto } from '../../Module/dto/module.dto';
 
 type Module = typeof modules.$inferSelect;
+
+const MODULE_CODE: string = 'COS332';
+const MODULE_NAME: string = 'Networks';
+const MODULE_DESCRIPTION: string = 'It is about networks, duh';
+const STYLING: { colour: string } = { colour: `#TEST` };
 
 //create a module
 export function createModule(overrides: Partial<Module> = {}): Module {
   return {
     moduleID: randomUUID(),
-    moduleCode: 'COS332',
-    moduleName: 'Networks',
-    moduleDescription: 'About Networks',
+    moduleCode: MODULE_CODE,
+    moduleName: MODULE_NAME,
+    moduleDescription: MODULE_DESCRIPTION,
     validated: false,
 
     ...overrides,
   };
 } //END_createModule
 
-// type CourseModule = typeof CourseModule.$inferSelect;
-// //Create a course owned module - the join table
-// export function createCourseModule(
-//   overrides: Partial<CourseModule> = {},
-// ): CourseModule {
-//   return {
-//     ModuleID: randomUUID(),
-//     CourseID: randomUUID(),
+export function createModuleDto(
+  overrides: Partial<CreateModuleDto> = {},
+): CreateModuleDto {
+  return {
+    moduleCode: MODULE_CODE,
+    moduleName: MODULE_NAME,
+    moduleDescription: MODULE_DESCRIPTION,
+    styling: STYLING,
+    validated: true,
 
-//     ...overrides,
-//   };
-// } //END_CourseModule
+    ...overrides,
+  };
+} //END_createModuleDto
 
-// type ModuleEnrollment = typeof ModuleEnrollment.$inferSelect;
-// //Enroll use to module
-// export function createModuleEnrollment(
-//   overrides: Partial<ModuleEnrollment> = {},
-// ): ModuleEnrollment {
-//   return {
-//     ModuleID: randomUUID(),
-//     UserID: randomUUID(),
+export function createCourseModule(
+  overrides: Partial<CourseModuleDto> = {},
+): CourseModuleDto {
+  return {
+    CourseModuleID: randomUUID(),
+    GroupModuleID: randomUUID(),
+    CourseID: randomUUID(),
+    Core: false,
 
-//     ...overrides,
-//   };
-// } //END_createModuleEnrollment
+    ...overrides,
+  };
+} //END_createCourseModule
 
-// type ModuleStyling = typeof ModuleStyling.$inferSelect;
+export function createModuleStyling(
+  overrides: Partial<typeof ModuleStyling.$inferSelect> = {},
+): typeof ModuleStyling.$inferSelect {
+  return {
+    ModuleID: randomUUID(),
+    UserID: randomUUID(),
+    styling: { colour: '#FFFFFF' },
 
-// export function createModuleStyling(
-//   overrides: Partial<ModuleStyling> = {},
-// ): ModuleStyling {
-//   return {
-//     ModuleID: randomUUID(),
-//     UserID: randomUUID(),
-//     styling: { colour: '#FFFFFF' },
-
-//     ...overrides,
-//   };
-// } //END_createModuleStyling
+    ...overrides,
+  };
+} //END_createModuleStyling
