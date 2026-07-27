@@ -139,7 +139,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: ci
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    # remove
     environment:
       name: staging
     permissions:
@@ -221,7 +220,6 @@ jobs:
     name: Deploy to Staging
     needs: docker-staging
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    # remove
     environment:
       name: production
     permissions: {}

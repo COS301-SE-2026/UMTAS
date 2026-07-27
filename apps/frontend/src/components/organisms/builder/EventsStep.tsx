@@ -380,7 +380,7 @@ export function EventsStep({
 
   function renderEmptyState() {
     return (
-      <div className="flex flex-col items-center gap-3 py-16 text-center">
+      <div className="flex flex-col items-center gap-3 py-32 text-center">
         <div className="flex h-12 w-12 items-center justify-center rounded-full border border-[var(--border)] text-[var(--text-secondary)]">
           <Inbox size={20} strokeWidth={1.5} />
         </div>
@@ -472,9 +472,13 @@ export function EventsStep({
             size="icon"
             onClick={() => handleRemove(event.eventId)}
             aria-label={"Remove event " + (index + 1)}
-            className="h-10 w-10 flex-shrink-0 border border-[var(--border)] text-[var(--text-secondary)] transition-colors duration-[var(--duration-fast)] hover:border-[var(--error-text)] hover:text-[var(--error-text)] hover:bg-transparent"
+            className="h-10 w-10 flex-shrink-0 border border-[var(--error-text)] text-[var(--text-secondary)] transition-colors duration-[var(--duration-fast)] hover:border-[var(--error-text)] hover:text-[var(--error-text)] hover:bg-[var(--error-bg)]"
           >
-            <Trash2 size={16} strokeWidth={1.5} />
+            <Trash2
+              size={16}
+              strokeWidth={1.5}
+              className="text-[var(--error-text)]"
+            />
           </Button>
         </div>
 
@@ -515,12 +519,12 @@ export function EventsStep({
         id="btn-add-new-event"
         type="button"
         onClick={addEmptyEvent} // adds an event card
-        className="mt-4 flex w-full items-center gap-3 rounded-lg border border-dashed border-[var(--border)] px-4 py-4 text-left text-base text-[var(--text-secondary)] transition-colors duration-[var(--duration-fast)] hover:border-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+        className="flex w-fit items-center gap-3 rounded-lg border border-dashed border-[var(--border)] px-2 py-2 text-left text-base text-[var(--text-secondary)] transition-colors duration-[var(--duration-fast)] hover:border-[var(--text-secondary)] hover:text-[var(--text-primary)] disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border border-dashed border-[var(--border)]">
           <Plus size={16} strokeWidth={1.5} />
         </span>
-        Add event
+        Add Event
       </button>
     );
   }
@@ -547,18 +551,21 @@ export function EventsStep({
         </AlertDialogContent>
       </AlertDialog>
 
-      <div className="mb-5">
-        <h2 className="text-lg font-semibold text-[var(--text-primary)]">
-          Events
-        </h2>
-        <p className="text-base text-[var(--text-secondary)] mt-1">
-          {events.length === 0
-            ? "Add the events you want to schedule."
-            : events.length +
-              " event" +
-              (events.length !== 1 ? "s" : "") +
-              " added."}
-        </p>
+      <div className="flex flex-row items-center justify-between mb-5">
+        <div>
+          <h2 className="text-lg font-semibold text-[var(--text-primary)]">
+            Events
+          </h2>
+          <p className="text-base text-[var(--text-secondary)] mt-1">
+            {events.length === 0
+              ? "Add the events you want to schedule."
+              : events.length +
+                " event" +
+                (events.length !== 1 ? "s" : "") +
+                " added."}
+          </p>
+        </div>
+        {renderAddButton()}
       </div>
 
       {modules.length === 0 && renderNoModulesWarning()}
@@ -567,8 +574,6 @@ export function EventsStep({
         {events.length === 0 && renderEmptyState()}
         {events.map((event, index) => renderEventRow(event, index))}
       </div>
-
-      {renderAddButton()}
     </div>
   );
 }

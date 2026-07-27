@@ -1,27 +1,19 @@
 "use client";
 
 import React, { Suspense, useState, useEffect } from "react";
-// import { Joyride } from "react-joyride";
 import { useRouter } from "next/navigation";
 import {
   BookOpen,
   SlidersHorizontal,
   Download,
   ExternalLink,
-  X,
 } from "lucide-react";
-import { useSession } from "@/../utilities/auth-client";
 import { Card, CardContent } from "@/components/atoms/baseShadcn/card";
 import { Separator } from "@/components/atoms/baseShadcn/separator";
 import { Badge } from "@/components/atoms/baseShadcn/badge";
 import { Button } from "@/components/atoms/baseShadcn/button";
 import { PageSkeleton } from "@/components/atoms/nav/PageSkeleton";
 import Link from "next/link";
-import Popup from "@/components/atoms/utility/floatContainer";
-import ChooseInstitutePage from "../choose-institute/page";
-import { ChooseInstituteTemplate } from "@/components/templates/choose-institute/chooseInstituteTemplate";
-// import PageTutorial from "@/components/organisms/nav/Tutorial";
-// import { Step } from "react-joyride";
 
 import Tutorial from "@/components/organisms/nav/Tutorial";
 const steps = [
@@ -272,23 +264,12 @@ function DashboardContent() {
 }
 
 export default function DashboardPage() {
-  const [showSelect, setShowSelect] = useState(true);
   return (
     <>
       <Suspense fallback={<PageSkeleton rows={3} />}>
         <DashboardContent />
         <Tutorial steps={steps} wait={true} />
       </Suspense>
-      {showSelect && (
-        <Popup>
-          <div className="w-full md:w-1/3 text-center bg-card  p-5 border rounded-2xl">
-            <ChooseInstituteTemplate />
-            <div className="w-full mt-5 items-center justify-center flex">
-              <Button onClick={() => setShowSelect(false)}>Close</Button>
-            </div>
-          </div>
-        </Popup>
-      )}
     </>
   );
 }
