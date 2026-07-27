@@ -23,8 +23,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/atoms/baseShadcn/select";
+import { useRouter } from "next/navigation";
 
 import Tutorial from "@/components/organisms/nav/Tutorial";
+import NotFound from "@/app/not-found";
 const steps = [
   {
     target: "#btn-create-module-new",
@@ -107,6 +109,19 @@ export default function ModManagementTemplate() {
       return modulesMatch && matchesSearch;
     });
   }, [data, foundPrefixForModule, searchQuery]);
+
+  const UniDetails = UserDetails.getUniDetails();
+  const ViableRole = UniDetails?.role === "UNIVERSITY_ADMIN";
+  const router = useRouter();
+
+  if (UniDetails === null) {
+    router.push("/dashboard");
+  }
+
+  if (!ViableRole) {
+    return <NotFound />;
+    //console.log("account not admin");
+  }
 
   return (
     <div className="h-[80vh] items-center flex flex-col gap-6 w-full px-6 pt-6">

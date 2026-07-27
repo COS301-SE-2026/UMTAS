@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/atoms/baseShadcn/button";
 
 import Tutorial from "@/components/organisms/nav/Tutorial";
+import NotFound from "@/app/not-found";
 const steps = [
   {
     target: "#input-search-name-email-role",
@@ -51,8 +52,9 @@ export default function RoleManagementTemplate() {
   const router = useRouter();
   const UniDetails = UserDetails.getUniDetails();
   const ViableRole = UniDetails?.role === "UNIVERSITY_ADMIN";
+  //console.log(UniDetails);
   if (UniDetails === null) {
-    router.push("choose-institute");
+    router.push("/dashboard");
   }
 
   if (ViableRole) {
@@ -63,14 +65,7 @@ export default function RoleManagementTemplate() {
       </div>
     );
   } else {
-    return (
-      <div>
-        You do not have permisions to view this page
-        <Button onClick={() => router.push("/dashboard")}>
-          {"Navigate to home"}
-        </Button>
-      </div>
-    );
+    return <NotFound />;
   }
 }
 

@@ -33,6 +33,7 @@ import {
 import { CourseDTO } from "@/app/course-management/queries/courses/courseBuilder";
 
 import Tutorial from "@/components/organisms/nav/Tutorial";
+import NotFound from "@/app/not-found";
 const steps = [
   {
     target: "#input-search-courses-degrees-modules",
@@ -65,6 +66,12 @@ export default function CourseManagementTemplate() {
   const [possibleCourses, setPossibleCourses] = useState<
     Record<string, boolean>
   >({});
+
+  const ViableRole = UniDetails?.role === "UNIVERSITY_ADMIN";
+
+  if (UniDetails === null) {
+    router.push("/dashboard");
+  }
 
   //forces you to pick an institude if you havent already
   useEffect(() => {
@@ -191,6 +198,11 @@ export default function CourseManagementTemplate() {
         Something went wrong
       </div>
     );
+  }
+
+  if (!ViableRole) {
+    return <NotFound />;
+    //console.log("account not admin");
   }
 
   return (
