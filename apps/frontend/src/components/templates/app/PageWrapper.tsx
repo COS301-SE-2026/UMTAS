@@ -14,7 +14,7 @@ export function PageWrapper({
     <main
       className={cn("min-h-[calc(100dvh-3.5rem)] bg-[--bg-base]", className)}
     >
-      <div className={cn("max-w-0.9 px-0 sm:px-0 pt-8 pb-16", innerClassName)}>
+      <div className={cn("max-w-0.9 px-0 sm:px-0 pt-4 pb-16", innerClassName)}>
         {children}
       </div>
     </main>

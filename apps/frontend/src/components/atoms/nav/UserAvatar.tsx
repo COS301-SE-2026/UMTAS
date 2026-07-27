@@ -1,4 +1,8 @@
 import { cn } from "@/../utilities/utils";
+import { useState } from "react";
+import Popup from "../utility/floatContainer";
+import { ChooseInstituteTemplate } from "@/components/templates/choose-institute/chooseInstituteTemplate";
+import { Button } from "../baseShadcn/button";
 
 interface UserAvatarProps {
   name?: string | null;
@@ -15,6 +19,7 @@ function getInitials(name: string): string {
 }
 
 export function UserAvatar({ name, className }: UserAvatarProps) {
+  const [selectAvatar, setSelectAvatar] = useState<boolean>(false);
   const initials = name ? getInitials(name) : "U";
 
   return (
@@ -26,9 +31,21 @@ export function UserAvatar({ name, className }: UserAvatarProps) {
         "bg-[--bg-elevated] border border-[--border]",
         "text-[--text-primary] text-xs font-semibold",
         "select-none shrink-0",
+        "cursor-pointer",
         className,
       )}
+      onClick={() => {
+        setSelectAvatar(true);
+      }}
     >
+      {selectAvatar && (
+        <Popup>
+          <div className="w-fit text-center">
+            <ChooseInstituteTemplate onClose={() => setSelectAvatar(false)} />
+            <div className="w-full mt-5 items-center justify-center flex"></div>
+          </div>
+        </Popup>
+      )}
       {initials}
     </span>
   );

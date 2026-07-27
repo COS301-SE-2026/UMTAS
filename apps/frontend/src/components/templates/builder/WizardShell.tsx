@@ -144,19 +144,20 @@ export function WizardShell() {
         completedSteps={completedSteps}
         onStepClick={handleStepClick}
       />
+      <div className="mx-auto flex flex-col w-full max-w-2xl mb-4">
+        <WizardFooter
+          onBack={getBackHandler()}
+          onNext={handleNext}
+          nextLabel={getNextLabel()}
+          nextDisabled={false}
+        />
+      </div>
 
-      <div className="flex-1 overflow-y-auto bg-[var(--bg-base)] px-6 py-20">
-        <div className="mx-auto w-full max-w-2xl rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.08)]">
+      <div className="flex-1 overflow-y-auto bg-[var(--bg-base)]">
+        <div className="mx-auto w-full min-h-150 max-w-2xl rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.08)]">
           {renderStep()}
         </div>
       </div>
-
-      <WizardFooter
-        onBack={getBackHandler()}
-        onNext={handleNext}
-        nextLabel={getNextLabel()}
-        nextDisabled={false}
-      />
     </div>
   );
 }
