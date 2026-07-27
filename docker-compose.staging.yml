@@ -211,6 +211,7 @@ services:
       - "traefik.http.routers.backend-staging.tls.certresolver=myresolver"
       - "traefik.http.services.backend-staging.loadbalancer.server.port=${BACKEND_PORT}"
       - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.http.routers.backend-staging.priority=100"
 
   frontend:
     image: ${DOCKER_REGISTRY:-vigilcs/umtas}:frontend-staging-${IMAGE_TAG:-latest}
@@ -233,6 +234,7 @@ services:
       - "traefik.http.routers.frontend-staging.tls.certresolver=myresolver"
       - "traefik.http.services.frontend-staging.loadbalancer.server.port=${FRONTEND_PORT}"
       - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.http.routers.frontend-staging.priority=1"
 
   # watchtower:
   #   image: containrrr/watchtower

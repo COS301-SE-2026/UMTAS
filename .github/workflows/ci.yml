@@ -186,7 +186,6 @@ jobs:
           push: true
           build-args: |
             NEXT_PUBLIC_API_URL=https://staging.capstone-vigil.dns.net.za/api
-            API_URL=https://staging.capstone-vigil.dns.net.za/api
           tags: |
             vigilcs/umtas:frontend-staging-${{ steps.tag.outputs.latest }}
             vigilcs/umtas:frontend-staging-${{ steps.tag.outputs.sha }}

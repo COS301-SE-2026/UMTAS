@@ -20,7 +20,10 @@ import * as schema from './entities/index';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
-
+  app.use((req: Request, _res: Response, next: () => void) => {
+    console.log('REQ:', req.method, req.originalUrl);
+    next();
+  });
   app.setGlobalPrefix('api', {
     exclude: ['metrics'],
   });
