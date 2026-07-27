@@ -358,7 +358,7 @@ export function createAuth(input: CreateAuthInput) {
       cookiePrefix: process.env.COOKIE_PREFIX ?? 'umtas',
       defaultCookieAttributes: {
         sameSite: 'lax',
-        domain: process.env.COOKIE_DOMAIN,
+        path: '/',
       },
       ipAddress: {
         ipAddressHeaders: ['x-forwarded-for', 'x-real-ip'],
