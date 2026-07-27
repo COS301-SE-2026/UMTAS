@@ -5,7 +5,9 @@ services:
     image: postgres:15-alpine
     restart: unless-stopped
     networks:
-      - internal
+      internal:
+        aliases:
+          - postgres-staging
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
@@ -23,7 +25,9 @@ services:
     image: redis:7-alpine
     restart: unless-stopped
     networks:
-      - internal
+      internal:
+        aliases:
+          - redis-staging
     command: redis-server --requirepass ${REDIS_PASSWORD}
     volumes:
       - redis_data:/data
@@ -37,8 +41,10 @@ services:
     image: minio/minio:RELEASE.2023-10-25T06-33-25Z
     restart: unless-stopped
     networks:
-      - gateway
-      - internal
+      gateway:
+      internal:
+        aliases:
+          - minio-staging
     command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
@@ -67,17 +73,17 @@ services:
     networks:
       - internal
     environment:
-      BULLMQ_REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
+      BULLMQ_REDIS_URL: redis://:${REDIS_PASSWORD}@redis-staging:6379
       PDF_PARSE_QUEUE_NAME: ${PDF_PARSE_QUEUE_NAME:-pdf.parse}
       PDF_PARSE_CONCURRENCY: ${PDF_PARSE_CONCURRENCY:-2}
       PDF_PARSE_TIMEOUT_MS: ${PDF_PARSE_TIMEOUT_MS:-60000}
-      PDF_PARSE_CALLBACK_URL: http://backend:${BACKEND_PORT}/pdf-parser/jobs
+      PDF_PARSE_CALLBACK_URL: http://backend-staging:${BACKEND_PORT}/pdf-parser/jobs
       WORKER_CALLBACK_TOKEN: ${WORKER_CALLBACK_TOKEN}
       WORKER_TOPOLOGY: container
       WORKER_KEEP_FAILED_TEMP: ${WORKER_KEEP_FAILED_TEMP:-false}
       WORKER_TEMP_ROOT: /tmp/worker-jobs
       MINIO_BUCKET: ${MINIO_BUCKET:-umtas-uploads}
-      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ENDPOINT: http://minio-staging:9000
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
       PDF_PARSE_CLI_COMMAND: python3
@@ -109,12 +115,12 @@ services:
     networks:
       - internal
     environment:
-      BULLMQ_REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
+      BULLMQ_REDIS_URL: redis://:${REDIS_PASSWORD}@redis-staging:6379
       TIMETABLE_SOLVE_QUEUE_NAME: ${TIMETABLE_SOLVE_QUEUE_NAME:-timetable.solve}
       SOLVER_CONCURRENCY: ${SOLVER_CONCURRENCY:-1}
       SOLVER_TIMEOUT_MS: ${SOLVER_TIMEOUT_MS:-300000}
-      SOLVER_INPUT_URL: http://backend:${BACKEND_PORT}/solver/jobs
-      SOLVER_CALLBACK_URL: http://backend:${BACKEND_PORT}/solver/jobs
+      SOLVER_INPUT_URL: http://backend-staging:${BACKEND_PORT}/solver/jobs
+      SOLVER_CALLBACK_URL: http://backend-staging:${BACKEND_PORT}/solver/jobs
       WORKER_CALLBACK_TOKEN: ${WORKER_CALLBACK_TOKEN}
       WORKER_TOPOLOGY: container
       WORKER_KEEP_FAILED_TEMP: ${WORKER_KEEP_FAILED_TEMP:-false}
@@ -141,8 +147,17 @@ services:
     image: ${DOCKER_REGISTRY:-vigilcs/umtas}:backend-staging-${IMAGE_TAG:-latest}
     restart: unless-stopped
     networks:
-      - gateway
-      - internal
+      gateway:
+      internal:
+        aliases:
+          - backend-staging
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
     environment:
       - PORT=${BACKEND_PORT}
       - NODE_ENV=staging
@@ -156,15 +171,16 @@ services:
       - SEED_TEST_PASSWORD=${SEED_TEST_PASSWORD}
       - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
       - BETTER_AUTH_URL=https://${STG_API_DOMAIN}
-      - COOKIE_DOMAIN=.${STG_APP_DOMAIN}
-      - BETTER_AUTH_TRUSTED_ORIGINS=https://${STG_APP_DOMAIN}
+      - COOKIE_DOMAIN=${COOKIE_DOMAIN}
+      - COOKIE_PREFIX=${COOKIE_PREFIX}
+      - BETTER_AUTH_TRUSTED_ORIGINS=https://${STG_APP_DOMAIN},http://backend-staging:${BACKEND_PORT},https://${STG_API_DOMAIN}
       - CORS_ORIGIN=https://${STG_APP_DOMAIN}
       - NEXT_PUBLIC_APP_URL=https://${STG_APP_DOMAIN}
-      - NEXT_PUBLIC_API_URL=https://${STG_API_DOMAIN}/api
+      - NEXT_PUBLIC_API_URL=https://${STG_API_DOMAIN}
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
-      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379
-      - BULLMQ_REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis-staging:6379
+      - BULLMQ_REDIS_URL=redis://:${REDIS_PASSWORD}@redis-staging:6379
       - PDF_PARSE_QUEUE_NAME=${PDF_PARSE_QUEUE_NAME:-pdf.parse}
       - TIMETABLE_SOLVE_QUEUE_NAME=${TIMETABLE_SOLVE_QUEUE_NAME:-timetable.solve}
       - PDF_PARSE_ATTEMPTS=${PDF_PARSE_ATTEMPTS:-3}
@@ -173,7 +189,7 @@ services:
       - TIMETABLE_SOLVE_BACKOFF_DELAY_MS=${TIMETABLE_SOLVE_BACKOFF_DELAY_MS:-10000}
       - WORKER_CALLBACK_TOKEN=${WORKER_CALLBACK_TOKEN}
       - MINIO_BUCKET=${MINIO_BUCKET:-umtas-uploads}
-      - MINIO_ENDPOINT=http://minio:9000
+      - MINIO_ENDPOINT=http://minio-staging:9000
       - MINIO_ROOT_USER=${MINIO_ROOT_USER}
       - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
       - MINIO_CREATE_BUCKET_ON_STARTUP=${MINIO_CREATE_BUCKET_ON_STARTUP:-true}
@@ -198,12 +214,16 @@ services:
     image: ${DOCKER_REGISTRY:-vigilcs/umtas}:frontend-staging-${IMAGE_TAG:-latest}
     restart: unless-stopped
     networks:
-      - gateway
+      gateway:
+      internal:
+        aliases:
+          - frontend-staging
     environment:
       - PORT=${FRONTEND_PORT}
-      - API_URL=http://backend:${BACKEND_PORT}
+      - API_URL=http://backend-staging:${BACKEND_PORT}
     labels:
       - "traefik.enable=true"
+      - "traefik.docker.network=gateway"
       - "traefik.http.routers.frontend-staging.rule=Host(`staging.capstone-vigil.dns.net.za`)"
       - "traefik.http.routers.frontend-staging.entrypoints=websecure"
       - "traefik.http.routers.frontend-staging.tls=true"
@@ -211,24 +231,24 @@ services:
       - "traefik.http.services.frontend-staging.loadbalancer.server.port=${FRONTEND_PORT}"
       - "com.centurylinklabs.watchtower.enable=true"
 
-  watchtower:
-    image: containrrr/watchtower
-    restart: always
-    networks:
-      - gateway
-      - internal
-    environment:
-      - DOCKER_API_VERSION=1.44
-      - REPO_USER=${DOCKERHUB_USERNAME}
-      - REPO_PASS=${DOCKERHUB_TOKEN}
-      - WATCHTOWER_NOTIFICATION_URL=${WATCHTOWER_DISCORD_URL}
-      - WATCHTOWER_NOTIFICATIONS_LEVEL=info
-      - WATCHTOWER_HTTP_API_METRICS=true
-      - WATCHTOWER_HTTP_API_TOKEN=${WATCHTOWER_HTTP_API_TOKEN}
-      - WATCHTOWER_LABEL_ENABLE=true
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-    command: --schedule "0/30 * * * * *" --cleanup
+  # watchtower:
+  #   image: containrrr/watchtower
+  #   restart: always
+  #   networks:
+  #     - gateway
+  #     - internal
+  #   environment:
+  #     - DOCKER_API_VERSION=1.44
+  #     - REPO_USER=${DOCKERHUB_USERNAME}
+  #     - REPO_PASS=${DOCKERHUB_TOKEN}
+  #     - WATCHTOWER_NOTIFICATION_URL=${WATCHTOWER_DISCORD_URL}
+  #     - WATCHTOWER_NOTIFICATIONS_LEVEL=info
+  #     - WATCHTOWER_HTTP_API_METRICS=true
+  #     - WATCHTOWER_HTTP_API_TOKEN=${WATCHTOWER_HTTP_API_TOKEN}
+  #     - WATCHTOWER_LABEL_ENABLE=true
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #   command: --schedule "0/30 * * * * *" --cleanup
 
 networks:
   gateway:

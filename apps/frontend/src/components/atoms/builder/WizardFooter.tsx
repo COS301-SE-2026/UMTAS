@@ -39,16 +39,16 @@ export function WizardFooter({
 
   return (
     <div className="border-t border-[var(--border)] bg-[var(--bg-base)]">
-      <Separator />
-      <div className="flex items-center justify-between px-8 py-4">
+      <div className="flex items-center justify-between pt-4">
         <div>{renderBackButton()}</div>
 
         <Button
           type="button"
           size="default"
+          variant={"outline"}
           disabled={nextDisabled}
           onClick={onNext}
-          className="flex items-center gap-2 text-sm bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] hover:bg-[var(--btn-primary-hover)] disabled:opacity-40 transition-colors duration-[var(--duration-fast)]"
+          className="flex items-center gap-2 text-sm"
         >
           {nextLabel}
           <MoveRight size={16} strokeWidth={1.5} />

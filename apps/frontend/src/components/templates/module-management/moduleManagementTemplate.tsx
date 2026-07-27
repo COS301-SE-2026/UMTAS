@@ -122,13 +122,13 @@ export default function ModManagementTemplate() {
               Search and filter modules and their events.
             </p>
           </div>
-          <Button
+          {/* <Button
             id="btn-create-module-new"
             onClick={() => updateShowModule(true)}
             className="mt-4"
           >
             Create Module
-          </Button>
+          </Button> */}
         </div>
         <div className="flex flex-col flex-row gap-4 p-5 items-center justify-between bg-[var(--bg-surface)]">
           <div className="w-full max-w-sm flex-1">

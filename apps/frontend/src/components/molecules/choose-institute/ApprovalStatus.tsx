@@ -17,7 +17,7 @@ export function ApprovalStatus({ uni }: ApprovalStatusProps) {
     uni.role === "STUDENT_OWNED"
   ) {
     return (
-      <Alert variant="success">
+      <Alert variant="success" className="max-w-md">
         <AlertTitle>Role approved</AlertTitle>
         <AlertDescription>
           Your role has been approved for {uni.UniversityName}. You can now
@@ -32,7 +32,7 @@ export function ApprovalStatus({ uni }: ApprovalStatusProps) {
     uni.role === null
   )
     return (
-      <Alert variant="default">
+      <Alert variant="default" className="max-w-md">
         <AlertTitle>Role not yet approved </AlertTitle>
         <AlertDescription>
           Your role has not yet been approved for {uni.UniversityName}. Please
@@ -42,7 +42,7 @@ export function ApprovalStatus({ uni }: ApprovalStatusProps) {
     );
 
   return (
-    <Alert variant="destructive">
+    <Alert variant="destructive" className="max-w-md">
       <AlertTitle>Role rejected {uni.role}</AlertTitle>
       <AlertDescription>
         Your role has been rejected for {uni.UniversityName}. Please contact the

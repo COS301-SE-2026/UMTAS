@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const SESSION_COOKIE_NAME =
-  process.env.NODE_ENV === "production"
-    ? "__Secure-umtas.session_token"
-    : "umtas.session_token";
+const cookiePrefix = process.env.COOKIE_PREFIX ?? "umtas";
+
+const useSecureCookies = ["production", "staging"].includes(
+  process.env.NODE_ENV ?? "",
+);
+
+const SESSION_COOKIE_NAME = `${cookiePrefix}.session_token`;
 
 const PUBLIC_PATHS = [
   "/login",
@@ -11,7 +14,6 @@ const PUBLIC_PATHS = [
   "/forgot-password",
   "/verify-pending",
   "/verify-email",
-  "/reset-password",
   "/auth-callback",
   "/api/health",
   "/faq",
