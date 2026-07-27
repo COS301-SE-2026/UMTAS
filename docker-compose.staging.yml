@@ -203,7 +203,9 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=gateway"
-      - "traefik.http.routers.backend-staging.rule=Host(`staging.api.capstone-vigil.dns.net.za`)"
+      - "traefik.http.routers.backend-staging.rule=Host(`staging.capstone-vigil.dns.net.za`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.umtas-backend.middlewares=api-stripprefix"
+      - "traefik.http.middlewares.api-stripprefix.stripprefix.prefixes=/api"
       - "traefik.http.routers.backend-staging.entrypoints=websecure"
       - "traefik.http.routers.backend-staging.tls=true"
       - "traefik.http.routers.backend-staging.tls.certresolver=myresolver"
