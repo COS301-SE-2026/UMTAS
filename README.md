@@ -213,7 +213,7 @@ This is a **pnpm monorepo** managed by Turborepo. All applications, shared packa
 ```
 UMTAS/
 ├── apps/
-│   ├── backend/              # NestJS API — controllers, services, DrizzleORM, BullMQ
+│   ├── backend/              # NestJS API - controllers, services, DrizzleORM, BullMQ
 │   │   └── src/
 │   │       ├── auth/         # BetterAuth, JWT, RBAC
 │   │       ├── Events/       # Event scheduling domain
@@ -221,12 +221,12 @@ UMTAS/
 │   │       ├── Timetable/    # Timetable CRUD & generation
 │   │       ├── mail/         # Transactional email
 │   │       └── db/           # Drizzle schema & migrations
-│   ├── frontend/             # Next.js — App Router, Tailwind, Shadcn/UI
+│   ├── frontend/             # Next.js - App Router, Tailwind, Shadcn/UI
 │   │   └── src/
 │   │       ├── app/          # Route segments
 │   │       ├── components/   # Shared UI components
 │   │       └── lib/          # Utilities & API client
-│   ├── solver/               # FastAPI — OR-Tools CP-SAT constraint solver
+│   ├── solver/               # FastAPI - OR-Tools CP-SAT constraint solver
 │   │   ├── main.py
 │   │   └── swagger_ui.py
 │   └── e2e/                  # Playwright end-to-end tests

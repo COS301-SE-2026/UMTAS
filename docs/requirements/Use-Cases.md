@@ -151,7 +151,7 @@ This section defines the primary use cases for the UMTAS platform. Use cases are
 | **Postcondition** | Timetable removed |
 | **Requirements Covered** | R2.1.3 |
 
-??? failure "UC-ST-06: Set Scheduling Preferences · :material-close-circle:{ style=\"color: #e53935\" } — Not Implemented"
+??? failure "UC-ST-06: Set Scheduling Preferences · :material-close-circle:{ style=\"color: #e53935\" } - Not Implemented"
 
     | Field | Detail |
     | :--- | :--- |
@@ -163,7 +163,7 @@ This section defines the primary use cases for the UMTAS platform. Use cases are
     | **Postcondition** | Preferences stored and applied during next generation |
     | **Requirements Covered** | R2.2.3 |
 
-??? failure "UC-ST-07: Resolve Constraint Violations · :material-close-circle:{ style=\"color: #e53935\" } — Not Implemented"
+??? failure "UC-ST-07: Resolve Constraint Violations · :material-close-circle:{ style=\"color: #e53935\" } - Not Implemented"
 
     | Field | Detail |
     | :--- | :--- |
@@ -204,7 +204,7 @@ This section defines the primary use cases for the UMTAS platform. Use cases are
 | **Postcondition** | Valid .ics file downloaded |
 | **Requirements Covered** | R2.5.1 |
 
-??? failure "UC-EX-01: Export Timetable to Google Calendar · :material-close-circle:{ style=\"color: #e53935\" } — Not Implemented"
+??? failure "UC-EX-01: Export Timetable to Google Calendar · :material-close-circle:{ style=\"color: #e53935\" } - Not Implemented"
 
     | Field | Detail |
     | :--- | :--- |
