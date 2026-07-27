@@ -165,13 +165,13 @@ services:
       - SEED_SYSTEM_ADMIN_PASSWORD=${SEED_SYSTEM_ADMIN_PASSWORD}
       - SEED_TEST_PASSWORD=${SEED_TEST_PASSWORD}
       - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
-      - BETTER_AUTH_URL=https://${PROD_API_DOMAIN}
-      - COOKIE_DOMAIN=${COOKIE_DOMAIN}
+      - BETTER_AUTH_URL
+      - COOKIE_DOMAIN
       - COOKIE_PREFIX=${COOKIE_PREFIX}
-      - BETTER_AUTH_TRUSTED_ORIGINS=https://${PROD_APP_DOMAIN},https://${PROD_API_DOMAIN},http://backend-prod:${BACKEND_PORT}
-      - CORS_ORIGIN=https://${PROD_APP_DOMAIN}
-      - NEXT_PUBLIC_APP_URL=https://${PROD_APP_DOMAIN}
-      - NEXT_PUBLIC_API_URL=https://${PROD_API_DOMAIN}
+      - BETTER_AUTH_TRUSTED_ORIGINS
+      - CORS_ORIGIN
+      - NEXT_PUBLIC_APP_URL
+      - NEXT_PUBLIC_API_URL
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
       - REDIS_URL=redis://:${REDIS_PASSWORD}@redis-prod:6379
@@ -182,7 +182,7 @@ services:
       - PDF_PARSE_BACKOFF_DELAY_MS=${PDF_PARSE_BACKOFF_DELAY_MS:-5000}
       - TIMETABLE_SOLVE_ATTEMPTS=${TIMETABLE_SOLVE_ATTEMPTS:-2}
       - TIMETABLE_SOLVE_BACKOFF_DELAY_MS=${TIMETABLE_SOLVE_BACKOFF_DELAY_MS:-10000}
-      - WORKER_CALLBACK_TOKEN=${WORKER_CALLBACK_TOKEN:?WORKER_CALLBACK_TOKEN must be set in production}
+      - WORKER_CALLBACK_TOKEN=${WORKER_CALLBACK_TOKEN}
       - MINIO_BUCKET=${MINIO_BUCKET:-umtas-uploads}
       - MINIO_ENDPOINT=http://minio-prod:9000
       - MINIO_ROOT_USER=${MINIO_ROOT_USER}
@@ -194,15 +194,19 @@ services:
       - SMTP_SECURE=${SMTP_SECURE:-false}
       - SMTP_USER=${SMTP_USER:-}
       - SMTP_PASS=${SMTP_PASS:-}
-      - SMTP_FROM=${SMTP_FROM:-UMTAS <noreply@${DOMAIN}>}
+      - SMTP_FROM=${SMTP_FROM:-UMTAS <noreply@${PROD_APP_DOMAIN}>}
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=gateway"
-      - "traefik.http.routers.backend-prod.rule=Host(`${PROD_API_DOMAIN}`)"
+      - "traefik.http.routers.backend-prod.rule=Host(`capstone-vigil.dns.net.za`) && PathPrefix(`/api`)"
+      # - "traefik.http.routers.umtas-prod.middlewares=api-stripprefix"
+      # - "traefik.http.middlewares.api-stripprefix.stripprefix.prefixes=/api"
       - "traefik.http.routers.backend-prod.entrypoints=websecure"
       - "traefik.http.routers.backend-prod.tls=true"
       - "traefik.http.routers.backend-prod.tls.certresolver=myresolver"
       - "traefik.http.services.backend-prod.loadbalancer.server.port=${BACKEND_PORT}"
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.http.routers.backend-prod.priority=100"
 
   frontend:
     image: ${DOCKER_REGISTRY:-vigilcs/umtas}:frontend-${IMAGE_TAG:?IMAGE_TAG is required}
@@ -217,8 +221,7 @@ services:
     environment:
       - PORT=${FRONTEND_PORT}
       - API_URL=http://backend-prod:${BACKEND_PORT}
-      - NEXT_PUBLIC_APP_URL=https://${PROD_APP_DOMAIN}
-      - NEXT_PUBLIC_API_URL=https://${PROD_API_DOMAIN}
+      - COOKIE_PREFIX=umtas-production
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=gateway"
