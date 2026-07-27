@@ -9,9 +9,12 @@ import {
 import { EventCriteria, EventSource } from '../../Events/dto/event.types';
 import {
   CreateEventDto,
+  EventDto,
   EventSingleResponseDto,
 } from '../../Events/dto/EventDto.dto';
 import { ActivityType } from 'shared-types';
+
+const EVENT_NAME: string = 'TestEvent';
 
 export function createEventCriteria(
   eventSource: EventSource = EventSource.UNIVERSITY,
@@ -55,6 +58,27 @@ export function createEvent(
     ...overrides,
   };
 } //END_createEvent
+
+export function createEventDto(
+  overrides: Partial<EventDto>,
+  eventCriteriaOverrides: Partial<EventCriteria>,
+): EventDto {
+  return {
+    eventId: randomUUID(),
+    eventCriteria: createEventCriteria(
+      EventSource.UNIVERSITY,
+      eventCriteriaOverrides,
+    ),
+    eventName: EVENT_NAME,
+    activityType: 'exam',
+    activityCode: 'examCode',
+    venues: [],
+    isRecurring: false,
+    validated: true,
+
+    ...overrides,
+  };
+} //END_createEventDto
 
 export function createEventSingleResponse(
   overrides: Partial<EventEntity> = {},

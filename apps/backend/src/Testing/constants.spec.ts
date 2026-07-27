@@ -6,3 +6,4 @@ export const uniId = 'a1b2c3d4-e5f6-7890-abcd-ef1234567890';
 export const groupId = 'groupId_for_testing';
 export const attendanceId = 'attendanceId_for_testing';
 export const timetableId = 'timteableId_for_testing';
+export const venueId = 'venueId_for_testing';
