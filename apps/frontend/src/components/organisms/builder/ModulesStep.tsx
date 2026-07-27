@@ -200,6 +200,7 @@ export function ModulesStep({ modules }: ModulesStepProps) {
         {/* summary row */}
         <div className="flex items-center gap-2">
           <button
+            data-testid="open-module-btn"
             id="btn-modify-module"
             type="button"
             onClick={() => handleSelect(module.moduleID)}
@@ -233,6 +234,7 @@ export function ModulesStep({ modules }: ModulesStepProps) {
 
           {/* trash button on summary row*/}
           <Button
+            data-testid="btn-delete-module"
             id="btn-delete-module"
             type="button"
             variant="ghost"
@@ -260,6 +262,7 @@ export function ModulesStep({ modules }: ModulesStepProps) {
             />
             {/* confirm button */}
             <Button
+              data-testid="mod-Confirm-Btn"
               type="button"
               variant="outline"
               onClick={() => handleConfirm(module.moduleID)}
@@ -315,6 +318,7 @@ export function ModulesStep({ modules }: ModulesStepProps) {
         </div>
 
         <button
+          data-testid="btn-add-new-Module"
           id="btn-add-new-module"
           type="button"
           onClick={() => addModule.mutate()}
