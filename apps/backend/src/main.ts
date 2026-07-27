@@ -20,6 +20,10 @@ import * as schema from './entities/index';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+  app.setGlobalPrefix('api', {
+    exclude: ['metrics'],
+  });
   app.set('trust proxy', 1);
   app.useStaticAssets(join(__dirname, '..', 'public'));
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
