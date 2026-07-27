@@ -1,0 +1,56 @@
+docs/srs/Use_Cases/Landing_Page.md
+  h_84e82529bd05a5 1-76
+docs/srs/Use_Cases/Analytics_Dashboard.md
+  h_84e82529bd05a5 1-75
+docs/srs/Use_Cases/University_Role.md
+  h_84e82529bd05a5 1-76
+docs/srs/Use_Cases/Attendance_Recording.md
+  h_84e82529bd05a5 1-55
+docs/srs/Use_Cases/Timetable_Creation_API.md
+  h_84e82529bd05a5 1-53
+docs/srs/Use_Cases/Alert_System.md
+  h_84e82529bd05a5 1-32
+docs/srs/Use_Cases/Tyto_Simulation.md
+  h_84e82529bd05a5 1-72
+docs/srs/Use_Cases/Course_Management.md
+  h_84e82529bd05a5 1-76
+mkdocs.yml
+  h_84e82529bd05a5 42
+docs/srs/Use_Cases/Timetable_Creation.md
+  h_84e82529bd05a5 1-78
+docs/srs/Use_Cases/Lecturer_Adjustment.md
+  h_84e82529bd05a5 1-72
+docs/srs/Use_Cases/Timetable_Management.md
+  h_84e82529bd05a5 1-75
+docs/srs/Use_Cases/Traceability_Matrix/Traceability_Matrix.drawio
+  h_84e82529bd05a5 1-942
+docs/srs/Use_Cases/Authentication.md
+  h_84e82529bd05a5 1-161
+docs/srs/FUNCTIONAL_REQUIREMENTS.md
+  h_84e82529bd05a5 23,26
+docs/srs/Use_Cases/Events_Management.md
+  h_84e82529bd05a5 1-76
+requirements.txt
+  h_84e82529bd05a5 10
+docs/srs/Use_Cases/Timetable_Creation_PDF.md
+  h_84e82529bd05a5 1-75
+docs/srs/Use_Cases/Calendar_Exporting.md
+  h_84e82529bd05a5 1-54
+docs/srs/Use_Cases/Module_Management.md
+  h_84e82529bd05a5 1-76
+docs/srs/USE_CASES.md
+  h_84e82529bd05a5 7-17,26-27,32-33,36-49,52-74,173-174,177-179,181-182,185-186,189-190,193-194,197-198,201-202,205-206,209-210,213-214,217-218,221-222,225-226,229-230,234
+docs/diagrams/requirements/Requirements.drawio
+  h_84e82529bd05a5 3,7,338,342-343,345,351,354,357,360,363,372,390-391,393-394,396,399,402,411-416,770,774,777,783,786,789,792,795,804,813,820,823,830,881-937,941-1099
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "fc246143fa14cb7073ca4a1b98baf05b9e270ca1",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}
