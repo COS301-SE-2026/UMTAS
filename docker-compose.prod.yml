@@ -76,7 +76,7 @@ services:
       PDF_PARSE_QUEUE_NAME: ${PDF_PARSE_QUEUE_NAME:-pdf.parse}
       PDF_PARSE_CONCURRENCY: ${PDF_PARSE_CONCURRENCY:-2}
       PDF_PARSE_TIMEOUT_MS: ${PDF_PARSE_TIMEOUT_MS:-60000}
-      PDF_PARSE_CALLBACK_URL: http://backend-prod:${BACKEND_PORT}/pdf-parser/jobs
+      PDF_PARSE_CALLBACK_URL: http://backend-prod:${BACKEND_PORT}/api/pdf-parser/jobs
       WORKER_CALLBACK_TOKEN: ${WORKER_CALLBACK_TOKEN:?WORKER_CALLBACK_TOKEN must be set in production}
       WORKER_TOPOLOGY: container
       WORKER_KEEP_FAILED_TEMP: ${WORKER_KEEP_FAILED_TEMP:-false}
@@ -116,8 +116,8 @@ services:
       TIMETABLE_SOLVE_QUEUE_NAME: ${TIMETABLE_SOLVE_QUEUE_NAME:-timetable.solve}
       SOLVER_CONCURRENCY: ${SOLVER_CONCURRENCY:-1}
       SOLVER_TIMEOUT_MS: ${SOLVER_TIMEOUT_MS:-300000}
-      SOLVER_INPUT_URL: http://backend-prod:${BACKEND_PORT}/solver/jobs
-      SOLVER_CALLBACK_URL: http://backend-prod:${BACKEND_PORT}/solver/jobs
+      SOLVER_INPUT_URL: http://backend-prod:${BACKEND_PORT}/api/solver/jobs
+      SOLVER_CALLBACK_URL: http://backend-prod:${BACKEND_PORT}/api/solver/jobs
       WORKER_CALLBACK_TOKEN: ${WORKER_CALLBACK_TOKEN:?WORKER_CALLBACK_TOKEN must be set in production}
       WORKER_TOPOLOGY: container
       WORKER_KEEP_FAILED_TEMP: ${WORKER_KEEP_FAILED_TEMP:-false}
