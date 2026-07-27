@@ -223,6 +223,7 @@ services:
     environment:
       - PORT=${FRONTEND_PORT}
       - API_URL=http://backend-staging:${BACKEND_PORT}
+      - COOKIE_PREFIX=umtas-staging
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=gateway"
