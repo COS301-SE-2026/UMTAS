@@ -24,9 +24,7 @@ async function bootstrap() {
     console.log('REQ:', req.method, req.originalUrl);
     next();
   });
-  app.setGlobalPrefix('api', {
-    exclude: ['metrics'],
-  });
+
   app.set('trust proxy', 1);
   app.useStaticAssets(join(__dirname, '..', 'public'));
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
