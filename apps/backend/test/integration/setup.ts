@@ -1,8 +1,6 @@
-import { fileURLToPath } from 'node:url';
+import { resolve } from 'node:path';
 
 process.env.NODE_ENV = 'test';
 process.env.DB_MODE = 'PGLITE';
 process.env.SEED = 'false';
-process.env.MIGRATIONS_PATH ??= fileURLToPath(
-  new URL('../../drizzle', import.meta.url),
-);
+process.env.MIGRATIONS_PATH ??= resolve(process.cwd(), 'drizzle');
