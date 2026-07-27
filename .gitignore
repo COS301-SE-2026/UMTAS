@@ -142,3 +142,4 @@ apps/preference-solver/compile_commands.json
 apps/pdf_parser/**/*.pdf
 !apps/pdf_parser/**/fixtures/*.pdf
 !apps/pdf_parser/up_test_pdfs/SEM_TESTS_S2.pdf
+!apps/pdf_parser/up_test_pdfs/CONFLICT_FALLBACK.pdf

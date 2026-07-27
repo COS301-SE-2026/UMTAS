@@ -19,8 +19,13 @@
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "clear && jest",
+    "test:controller-flow": "NODE_ENV=test DB_MODE=PGLITE NODE_OPTIONS=--experimental-vm-modules jest --config jest.int.config.ts --runInBand",
     "test:int": "docker compose -f ./docker-compose.int.yml up --build --abort-on-container-exit --exit-code-from backend-int",
-    "test:int:local": "NODE_OPTIONS=--experimental-vm-modules jest --config jest.int.config.ts --runInBand",
+    "test:int:local": "pnpm test:controller-flow",
+    "test:integration:pdf-solver": "node --import tsx test/integration/pdf-solver/scripts/run-pdf-solver-integration.ts",
+    "test:integration:pdf-solver:typecheck": "tsc -p test/integration/pdf-solver/tsconfig.json --noEmit",
+    "fixture:pdf-solver": "node --import tsx test/integration/pdf-solver/scripts/pdf-solver-fixture.ts --regenerate",
+    "fixture:pdf-solver:verify": "node --import tsx test/integration/pdf-solver/scripts/pdf-solver-fixture.ts",
     "test:watch": "jest --watch",
     "test:cov": "clear && jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
@@ -35,7 +40,6 @@
     "@nestjs/axios": "^4.0.1",
     "@nestjs/bullmq": "^11.0.4",
     "@nestjs/common": "^11.1.21",
-    "@nestjs/config": "^4.0.4",
     "@nestjs/core": "^11.1.21",
     "@nestjs/platform-express": "^11.1.21",
     "@nestjs/swagger": "^11.4.3",
@@ -57,8 +61,7 @@
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
     "shared-types": "workspace:*",
-    "swagger-ui-express": "^5.0.1",
-    "zod": "^4.4.3"
+    "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.5",
@@ -88,6 +91,7 @@
     "ts-jest": "^29.4.10",
     "ts-loader": "^9.5.7",
     "ts-node": "^10.9.2",
+    "tsx": "^4.22.3",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.59.4"
@@ -101,17 +105,23 @@
     "rootDir": "src",
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
-      "^.+\\.(t|j)s$": [
+      "^.+\\.tsx?$": [
         "ts-jest",
         {
-          "useESM": true
+          "tsconfig": {
+            "module": "CommonJS",
+            "moduleResolution": "Node",
+            "target": "ES2022",
+            "esModuleInterop": true,
+            "allowSyntheticDefaultImports": true,
+            "resolvePackageJsonExports": false,
+            "resolvePackageJsonImports": false
+          }
         }
       ]
     },
-    "extensionsToTreatAsEsm": [
-      ".ts"
-    ],
     "moduleNameMapper": {
+      "^shared-types$": "<rootDir>/../../../packages/shared-types/src/index.ts",
       "^(\\.{1,2}/.*)\\.js$": "$1"
     },
     "setupFilesAfterEnv": [
@@ -121,7 +131,7 @@
       "node_modules/(?!(better-auth|@better-auth)/)"
     ],
     "collectCoverageFrom": [
-      "**/*service.ts",
+      "**/*.ts",
       "!**/*.spec.ts",
       "!**/*.int.ts",
       "!**/*.module.ts",

@@ -1,8 +1,27 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
+    // ts-jest's ESM preset requires ESM output even though the backend package
+    // itself is emitted through NodeNext's package-sensitive mode.
     "module": "ESNext",
-    "moduleResolution": "NodeNext",
-    "esModuleInterop": true
-  }
+    "moduleResolution": "Bundler",
+    "declaration": false,
+    "incremental": false,
+    "types": ["jest", "node"]
+  },
+  "include": [
+    "src/**/*.ts",
+    "test/integration/setup.ts",
+    "test/integration/framework/**/*.ts",
+    "test/integration/steps/**/*.ts",
+    "test/integration/support/**/*.ts",
+    "test/integration/**/*.flow.int.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "src/**/*.spec.ts",
+    "src/**/*.int.ts",
+    "test/integration/pdf-solver"
+  ]
 }
