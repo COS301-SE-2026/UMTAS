@@ -6,7 +6,7 @@ const useSecureCookies = ["production", "staging"].includes(
   process.env.NODE_ENV ?? "",
 );
 
-const SESSION_COOKIE_NAME = `${cookiePrefix}.session_token`;
+const SESSION_COOKIE_NAME = `${useSecureCookies ? "__Secure-" : ""}${cookiePrefix}.session_token`;
 
 const PUBLIC_PATHS = [
   "/login",

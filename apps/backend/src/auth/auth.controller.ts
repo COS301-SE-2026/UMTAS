@@ -201,6 +201,8 @@ export class AuthController {
     @Req() req: IncomingMessage,
     @Res() res: ServerResponse,
   ): Promise<void> {
+    console.log('GET-SESSION IN:', req.headers.cookie);
+    res.on('finish', () => console.log('GET-SESSION OUT:', res.statusCode));
     return this.handleRequest(req, res);
   }
 
@@ -505,6 +507,14 @@ export class AuthController {
       `Callback cookies: ${JSON.stringify(req.headers.cookie ?? 'NONE')}`,
     );
     this.logger.log('Google OAuth callback received');
+    res.on('finish', () =>
+      console.log(
+        'SET-COOKIE:',
+        res.getHeader('set-cookie'),
+        '| LOC:',
+        res.getHeader('location'),
+      ),
+    );
     return this.handleRequest(req, res);
   }
 
