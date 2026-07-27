@@ -2,12 +2,13 @@ import { Injectable, Logger } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
 import { hashPassword } from 'better-auth/crypto';
 import type { AppDatabase } from '../database.service';
-import { accountsTable, usersTable } from '../../entities';
+import { usersTable } from '../../entities';
 import { CourseSeedService } from './services/courses.seed.service';
 import { ModuleSeedService } from './services/modules.seed.service';
 import { UniversitySeedService } from './services/university.seed.service';
 import { UniRolesSeedService } from './services/universityRoles.seed.service';
 import { UserSeedService } from './services/users.seed.service';
+import { SeedPersistenceService } from './seed-persistence.service';
 
 @Injectable()
 export class DatabaseSeedService {
@@ -19,6 +20,7 @@ export class DatabaseSeedService {
     private readonly universityRolesSeedService: UniRolesSeedService,
     private readonly courseSeedService: CourseSeedService,
     private readonly moduleSeedService: ModuleSeedService,
+    private readonly persistence: SeedPersistenceService,
   ) {}
 
   async seed(db: AppDatabase): Promise<void> {
@@ -64,23 +66,24 @@ export class DatabaseSeedService {
 
     if (existing) return;
 
-    const [user] = await db
-      .insert(usersTable)
-      .values({
+    const [user] = await this.persistence.insertUsers(db, [
+      {
         name,
         email,
         role: 'sys_admin',
         emailVerified: true,
-      })
-      .returning();
+      },
+    ]);
 
-    await db.insert(accountsTable).values({
-      id: `${user.id}-account`,
-      userId: user.id,
-      accountId: user.id,
-      providerId: 'credential',
-      password: await hashPassword(password),
-    });
+    await this.persistence.insertAccounts(db, [
+      {
+        id: `${user.id}-account`,
+        userId: user.id,
+        accountId: user.id,
+        providerId: 'credential',
+        password: await hashPassword(password),
+      },
+    ]);
     this.logger.log(`Seeded system admin ${email}`);
   }
 }

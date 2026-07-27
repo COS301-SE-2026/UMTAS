@@ -15,32 +15,32 @@ type NestImport =
   | Promise<DynamicModule>
   | ForwardReference;
 
-export type ServiceIntegrationTestOptions = {
+export type ControllerFlowIntegrationTestOptions = {
   imports?: NestImport[];
   controllers: Type<unknown>[];
   providers?: Provider[];
 };
 
-export type ServiceIntegrationTest = {
+export type ControllerFlowIntegrationTest = {
   readonly db: PgliteDatabase<typeof schema>;
   get<T>(controller: Type<T>): T;
   close(): Promise<void>;
 };
 
 /**
- * Creates the only supported backend integration-test shape:
+ * Creates the supported controller-flow integration-test shape:
  * real controllers and services backed by a fresh, migrated PGLite database.
  *
  * The test owns scenario setup. Insert prerequisite rows through `db`, create
  * DTO instances in the test, then invoke one or more controllers through
  * `get()`.
  */
-export async function createServiceIntegrationTest(
-  options: ServiceIntegrationTestOptions,
-): Promise<ServiceIntegrationTest> {
+export async function createControllerFlowIntegrationTest(
+  options: ControllerFlowIntegrationTestOptions,
+): Promise<ControllerFlowIntegrationTest> {
   if (options.controllers.length === 0) {
     throw new Error(
-      'A service integration test must exercise at least one controller',
+      'A controller-flow integration test must exercise at least one controller',
     );
   }
 
@@ -55,10 +55,7 @@ export async function createServiceIntegrationTest(
         ...(options.providers ?? []),
         {
           provide: DatabaseService,
-          useValue: {
-            db: database.db,
-            dbMode: 'PGLITE',
-          } as DatabaseService,
+          useValue: database.databaseService,
         },
       ],
     }).compile();
@@ -73,18 +70,21 @@ export async function createServiceIntegrationTest(
         if (closed) return;
         closed = true;
         await moduleRef?.close();
-        await database.close();
       },
     };
   } catch (error) {
-    await moduleRef?.close();
-    await database.close();
+    if (moduleRef) {
+      await moduleRef.close();
+    } else {
+      await database.close();
+    }
     throw error;
   }
 }
 
 type FreshDatabase = {
   readonly db: PgliteDatabase<typeof schema>;
+  readonly databaseService: DatabaseService;
   close(): Promise<void>;
 };
 
@@ -100,15 +100,22 @@ async function createFreshDatabase(): Promise<FreshDatabase> {
   }
 
   const databaseService = new DatabaseService();
-  await databaseService.onApplicationBootstrap();
+  try {
+    await databaseService.onApplicationBootstrap();
+  } catch (error) {
+    await databaseService.onModuleDestroy();
+    throw error;
+  }
 
   if (!databaseService.pglite) {
+    await databaseService.onModuleDestroy();
     throw new Error('PGLite did not initialize');
   }
 
   let closed = false;
   return {
-    db: databaseService.db,
+    db: databaseService.db as PgliteDatabase<typeof schema>,
+    databaseService,
     async close(): Promise<void> {
       if (closed) return;
       closed = true;
