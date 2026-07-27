@@ -1,8 +1,10 @@
 import { moduleDTO } from "@/app/course-management/queries/modules/moduleBuilder";
 import { Button } from "@/components/atoms/baseShadcn/button";
 import {
-  Table as ShadTable,
+  Table,
+  TableBody,
   TableCell,
+  TableHead,
   TableHeader,
   TableRow,
 } from "@/components/atoms/baseShadcn/table";
@@ -11,8 +13,7 @@ import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
-  Row,
-  Table,
+  Table as TanstackTable,
   useReactTable,
 } from "@tanstack/react-table";
 import { useState } from "react";
@@ -38,11 +39,13 @@ export function ModuleTable<TData>({ columns, data }: DataTableProps<TData>) {
     columns,
     getCoreRowModel: getCoreRowModel(),
   });
+
   const [selectedCourse, setSelectedCourse] = useState<CourseDTO>({
     CourseID: "",
     CourseName: "",
     UniversityID: UserDetails.getUniDetails()?.UniversityID ?? "",
   });
+
   const [dataState, setDataState] = useState<ModuleTableData>({
     events: [],
     modules: { moduleCode: "", moduleID: "", moduleName: "" },
@@ -59,14 +62,10 @@ export function ModuleTable<TData>({ columns, data }: DataTableProps<TData>) {
 
   return (
     <>
-      <div className="h-full w-full  rounded-md items-center flex flex-col ">
-        <Card className="w-3/4 h-3/4">
-          <ShadTable className="text-center w-full mx-auto overflow-scroll">
-            <CourseHeaders table={table} />
-            <CourseTableBody table={table} setPopUp={showUpdateMod} />
-          </ShadTable>
-        </Card>
-      </div>
+      <Table>
+        <CourseHeaders table={table} />
+        <CourseTableBody table={table} setPopUp={showUpdateMod} />
+      </Table>
 
       {showModPopup && (
         <Popup>
@@ -106,17 +105,23 @@ export function ModuleTable<TData>({ columns, data }: DataTableProps<TData>) {
   );
 }
 
-function CourseHeaders<TData>({ table }: { table: Table<TData> }) {
+function CourseHeaders<TData>({ table }: { table: TanstackTable<TData> }) {
   return (
     <TableHeader>
       {table.getHeaderGroups().map((headerGroup) => (
-        <tr key={headerGroup.id}>
+        <TableRow
+          key={headerGroup.id}
+          className="border-b border-[var(--border)]"
+        >
           {headerGroup.headers.map((header) => (
-            <th key={header.id}>
+            <TableHead
+              key={header.id}
+              className="p-4 text-[var(--text-primary)] font-bold"
+            >
               {flexRender(header.column.columnDef.header, header.getContext())}
-            </th>
+            </TableHead>
           ))}
-        </tr>
+        </TableRow>
       ))}
     </TableHeader>
   );
@@ -126,25 +131,34 @@ function CourseTableBody<TData>({
   table,
   setPopUp,
 }: {
-  table: Table<TData>;
+  table: TanstackTable<TData>;
   setPopUp: (dataState: ModuleTableData) => void;
 }) {
   const rows = table.getRowModel().rows;
   const empty = rows.length === 0;
+
   return (
-    <tbody>
+    <TableBody>
       {empty ? (
-        <TableRow className="">
-          <TableCell></TableCell>
-          <TableCell>There are no rows to display</TableCell>
-          <TableCell></TableCell>
+        <TableRow>
+          <TableCell
+            colSpan={3}
+            className="p-8 text-center text-[var(--text-secondary)]"
+          >
+            No modules found matching your filters
+          </TableCell>
         </TableRow>
       ) : (
         rows.map((row) => (
-          <TableRow id="row-module-row" key={row.id}>
-            {row.getVisibleCells().map((cell) => (
+          <TableRow
+            id="row-module-row"
+            key={row.id}
+            className="border-b border-[var(--border)] brand-table-hover cursor-pointer"
+          >
+            {row.getVisibleCells().map((cell, index) => (
               <TableCell
                 key={cell.id}
+                className={`p-4 ${index === 0 ? "font-medium text-[var(--text-primary)]" : "text-[var(--text-secondary)]"}`}
                 onClick={() => {
                   const original = row.original as ModuleTableData;
                   setPopUp(original);
@@ -156,6 +170,6 @@ function CourseTableBody<TData>({
           </TableRow>
         ))
       )}
-    </tbody>
+    </TableBody>
   );
 }

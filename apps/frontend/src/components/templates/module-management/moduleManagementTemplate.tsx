@@ -9,7 +9,6 @@ import { useQueries, useQuery } from "@tanstack/react-query";
 import { UserDetails } from "@/lib/userclass/userClass";
 import { ModuleTable } from "@/components/organisms/module-management/moduleTable";
 import { getAllEventsAdminQ } from "@/app/module-management/queries/queries";
-import { Card } from "@/components/atoms/baseShadcn/card";
 import { useState } from "react";
 import CreateModuleAdmin from "@/components/organisms/module-management/addModule";
 import Popup from "@/components/atoms/utility/floatContainer";
@@ -46,7 +45,6 @@ const steps = [
   },
 ];
 
-// this will do the actual request for modules and filtering, table is static data except for updates
 export default function ModManagementTemplate() {
   const [showCreateModule, updateShowModule] = useState(false);
   const { data: modData } = useQuery(
@@ -120,36 +118,33 @@ export default function ModManagementTemplate() {
 
   if (!ViableRole) {
     return <NotFound />;
-    //console.log("account not admin");
   }
 
   return (
     <div className="h-[80vh] items-center flex flex-col gap-6 w-full px-6 pt-6">
       <Tutorial steps={steps} wait={true} />
 
-      <Card className="flex flex-col w-full max-w-6xl border-[var(--border)] rounded-xl bg-[var(--bg-surface)] shadow-sm overflow-hidden h-full">
-        <div className="flex flex-col flex-row justify-between items-start items-center pr-5 bg-[var(--bg-surface)]">
-          <div>
-            <h1 className="text-lg font-semibold text-[var(--text-primary)] pl-5 pt-5">
-              Module Management
-            </h1>
-            <p className="text-sm text-[var(--text-secondary)] pl-5 pt-2 pb-5">
-              Search and filter modules and their events.
-            </p>
-          </div>
-          {/* <Button
-            id="btn-create-module-new"
-            onClick={() => updateShowModule(true)}
-            className="mt-4"
-          >
-            Create Module
-          </Button> */}
-        </div>
-        <div className="flex flex-col flex-row gap-4 p-5 items-center justify-between bg-[var(--bg-surface)]">
-          <div className="w-full max-w-sm flex-1">
+      <div className="w-full max-w-6xl overflow-auto border border-[var(--border)] rounded-xl bg-[var(--bg-surface)] shadow-sm">
+        <h1 className="text-lg font-semibold text-[var(--text-primary)] pl-4 pt-4">
+          Module Management
+        </h1>
+        <p className="text-sm text-[var(--text-secondary)] pl-4 pt-2 pb-2">
+          Search and filter modules and their events.
+        </p>
+
+        {/* <Button
+          id="btn-create-module-new"
+          onClick={() => updateShowModule(true)}
+          className="ml-4 mt-2"
+        >
+          Create Module
+        </Button> */}
+
+        <div className="flex flex-col md:flex-row gap-4 p-5 border-b border-[var(--border)] items-center justify-between bg-[var(--bg-surface)]">
+          <div className="w-full md:max-w-sm flex-1">
             <Input
               id="input-search-module-code"
-              placeholder="Search module code, name, or events..."
+              placeholder="Search module code, name or events..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-[var(--background)]"
@@ -175,10 +170,10 @@ export default function ModManagementTemplate() {
             </Select>
           </div>
         </div>
-        <div className="flex-1 overflow-auto bg-[var(--bg-surface)]">
-          <ModuleTable columns={moduleCols} data={filteredModules} />
-        </div>
-      </Card>
+
+        <ModuleTable columns={moduleCols} data={filteredModules} />
+      </div>
+
       {showCreateModule && (
         <Popup>
           <div className="flex flex-col items-center w-full max-w-5xl space-y-5">
