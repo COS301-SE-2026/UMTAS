@@ -1,84 +1,81 @@
 import { Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bullmq';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import type { RedisOptions } from 'ioredis';
 import {
-  BACKEND_QUEUE_CONFIG,
   PDF_PARSE_QUEUE_TOKEN,
   TIMETABLE_SOLVE_QUEUE_TOKEN,
 } from './queue.constants';
-import {
-  BackendQueueConfig,
-  buildBullRootOptions,
-  buildQueueConfig,
-} from './queue.config';
 import { QueueProducerService } from './queue-producer.service';
 import { WorkerCallbackAuthGuard } from './worker-callback-auth.guard';
 
-const queueConfigProvider = {
-  provide: BACKEND_QUEUE_CONFIG,
-  inject: [ConfigService],
-  useFactory: buildBackendQueueConfig,
-};
+const redisUrl = process.env.REDIS_URL ?? 'redis://localhost:6379';
+const pdfParseQueueName =
+  process.env.PDF_PARSE_QUEUE_NAME ?? PDF_PARSE_QUEUE_TOKEN;
+const pdfParseAttempts = Number(process.env.PDF_PARSE_QUEUE_ATTEMPTS ?? 3);
+const pdfParseBackoffDelayMs = Number(
+  process.env.PDF_PARSE_QUEUE_BACKOFF_DELAY_MS ?? 5_000,
+);
+const timetableSolveQueueName =
+  process.env.SOLVER_QUEUE_NAME ?? TIMETABLE_SOLVE_QUEUE_TOKEN;
+const timetableSolveAttempts = Number(process.env.SOLVER_QUEUE_ATTEMPTS ?? 2);
+const timetableSolveBackoffDelayMs = Number(
+  process.env.SOLVER_QUEUE_BACKOFF_DELAY_MS ?? 10_000,
+);
 
-function buildBackendQueueConfig(
-  configService: ConfigService,
-): BackendQueueConfig {
-  return buildQueueConfig((key) => configService.get<string>(key));
-}
-
-function buildBullRootOptionsFromConfigService(configService: ConfigService) {
-  const config = buildBackendQueueConfig(configService);
-  return buildBullRootOptions(config);
-}
-
-function buildPdfParseQueueOptions(configService: ConfigService) {
-  const config = buildBackendQueueConfig(configService);
-  return {
-    name: config.pdfParse.name,
-    defaultJobOptions: config.pdfParse.defaultJobOptions,
-  };
-}
-
-function buildTimetableSolveQueueOptions(configService: ConfigService) {
-  const config = buildBackendQueueConfig(configService);
-  return {
-    name: config.timetableSolve.name,
-    defaultJobOptions: config.timetableSolve.defaultJobOptions,
-  };
-}
+const connection = redisOptionsFromUrl(redisUrl);
+const removeOnComplete = { age: 86_400, count: 1_000 };
+const removeOnFail = { age: 604_800, count: 5_000 };
 
 @Module({
   imports: [
-    ConfigModule,
-    BullModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: buildBullRootOptionsFromConfigService,
+    BullModule.forRoot({
+      connection,
     }),
-    BullModule.registerQueueAsync(
+    BullModule.registerQueue(
       {
-        name: PDF_PARSE_QUEUE_TOKEN,
-        imports: [ConfigModule],
-        inject: [ConfigService],
-        useFactory: buildPdfParseQueueOptions,
+        name: pdfParseQueueName,
+        defaultJobOptions: {
+          attempts: pdfParseAttempts,
+          backoff: {
+            type: 'exponential',
+            delay: pdfParseBackoffDelayMs,
+          },
+          removeOnComplete,
+          removeOnFail,
+        },
       },
       {
-        name: TIMETABLE_SOLVE_QUEUE_TOKEN,
-        imports: [ConfigModule],
-        inject: [ConfigService],
-        useFactory: buildTimetableSolveQueueOptions,
+        name: timetableSolveQueueName,
+        defaultJobOptions: {
+          attempts: timetableSolveAttempts,
+          backoff: {
+            type: 'exponential',
+            delay: timetableSolveBackoffDelayMs,
+          },
+          removeOnComplete,
+          removeOnFail,
+        },
       },
     ),
   ],
-  providers: [
-    queueConfigProvider,
-    QueueProducerService,
-    WorkerCallbackAuthGuard,
-  ],
-  exports: [
-    BACKEND_QUEUE_CONFIG,
-    QueueProducerService,
-    WorkerCallbackAuthGuard,
-  ],
+  providers: [QueueProducerService, WorkerCallbackAuthGuard],
+  exports: [QueueProducerService, WorkerCallbackAuthGuard],
 })
 export class JobsModule {}
+
+function redisOptionsFromUrl(redisUrl: string): RedisOptions {
+  const url = new URL(redisUrl);
+  const db = url.pathname.slice(1);
+  const connection: RedisOptions = {
+    host: url.hostname,
+    port: Number(url.port || 6379),
+    maxRetriesPerRequest: null,
+  };
+
+  if (url.username) connection.username = decodeURIComponent(url.username);
+  if (url.password) connection.password = decodeURIComponent(url.password);
+  if (db) connection.db = Number(db);
+  if (url.protocol === 'rediss:') connection.tls = {};
+
+  return connection;
+}

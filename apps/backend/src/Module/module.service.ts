@@ -88,7 +88,7 @@ export class ModuleService {
 
     if (groupId) {
       //check that module Grouping groupId is valid
-      console.log('This should be null ', groupId);
+      // console.log('This should be null ', groupId);
       await this.groupingService.getById(groupId, tx);
 
       //Check for duplicate moduleCode in ModuleGrouping
@@ -129,11 +129,11 @@ export class ModuleService {
       tx,
     );
 
-    //if grouping failed
-    if (!moduleGroup)
-      throw new InternalServerErrorException(
-        `Failed to group module[${newModule.moduleID}] to group [${groupId}]`,
-      );
+    //if grouping failed -- removed this check, should be handled by grouping service
+    // if (!moduleGroup)
+    //   throw new InternalServerErrorException(
+    //     `Failed to group module[${newModule.moduleID}] to group [${groupId}]`,
+    //   );
 
     // console.log(`CreateModule: dto.styling: ${JSON.stringify(dto.styling)}`);
 
@@ -391,7 +391,7 @@ export class ModuleService {
       .returning();
 
     return {
-      moduleCode: module.moduleCode,
+      moduleCode: module?.moduleCode,
       success: !!module,
     };
   } //delete
@@ -423,28 +423,17 @@ export class ModuleService {
       )
       .limit(1);
 
-    //If user already enrolled, Unenroll them
-
+    //If already enrolled, return
     if (enrollmentStatus) {
-      /*
-      await tx
-        .delete(ModuleEnrollment)
-        .where(
-          and(
-            eq(ModuleEnrollment.UserID, userId),
-            eq(ModuleEnrollment.ModuleID, moduleId),
-          ),
-        );
-        */
       return {
         moduleID: moduleId,
         UserID: userId,
-        message: `Unenrolled User[${userId}] from module[${moduleId}]`,
+        message: `User[${userId}] already enrolled in module[${moduleId}]`,
       };
     } //Unenroll
 
     //Enroll student to module
-    const newlyEnrolled = await tx
+    const [newlyEnrolled] = await tx
       .insert(ModuleEnrollment)
       .values({
         UserID: userId,
@@ -577,7 +566,7 @@ export class ModuleService {
     tx: DatabaseService['db'],
   ): Promise<boolean> {
     const [existingModule] = await tx
-      .select()
+      .select({ moduleCode: modules.moduleCode })
       .from(modules)
       .innerJoin(GroupModules, eq(GroupModules.ModuleID, modules.moduleID))
       .innerJoin(
@@ -770,7 +759,9 @@ export class ModuleService {
 
     //Get group module entry that courseMOdule refers to through COurseID
     const [groupModule] = await tx
-      .select()
+      .select({
+        GroupModuleID: GroupModules.GroupModuleID,
+      })
       .from(GroupModules)
       .innerJoin(Course, eq(Course.GroupID, GroupModules.GroupID))
       .where(eq(Course.CourseID, courseId))
@@ -780,9 +771,7 @@ export class ModuleService {
     const [oldCourseModule] = await tx
       .select()
       .from(CourseModule)
-      .where(
-        eq(CourseModule.GroupModuleID, groupModule.GroupModules.GroupModuleID),
-      )
+      .where(eq(CourseModule.GroupModuleID, groupModule.GroupModuleID))
       .limit(1);
 
     //Get updateFields for courseMOdule data
@@ -804,12 +793,7 @@ export class ModuleService {
       [returnCourseModule] = await tx
         .update(CourseModule)
         .set(courseUpdateFields)
-        .where(
-          eq(
-            CourseModule.GroupModuleID,
-            groupModule.GroupModules.GroupModuleID,
-          ),
-        )
+        .where(eq(CourseModule.GroupModuleID, groupModule.GroupModuleID))
         .returning();
     }
 
