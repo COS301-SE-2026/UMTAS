@@ -34,8 +34,8 @@ export function proxy(request: NextRequest) {
   const isPublicPath = PUBLIC_PATHS.some((path) => pathname.startsWith(path));
   const isAuthApiPath = pathname.startsWith("/api/auth");
   const isHealthApiPath = pathname.startsWith("/api/health");
-
-  if (isPublicPath || isAuthApiPath || isHealthApiPath)
+  const isApiRoute = pathname.startsWith("/api");
+  if (isPublicPath || isAuthApiPath || isHealthApiPath || isApiRoute)
     return NextResponse.next();
 
   const sessionCookie = request.cookies.get(SESSION_COOKIE_NAME);
