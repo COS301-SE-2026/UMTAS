@@ -1,5 +1,4 @@
 import {
-  ConflictException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -40,11 +39,15 @@ export class AttendanceService {
     const eventId = dto.eventID;
     const date = dto.eventDate;
     const state = dto.state;
-    //Check if attendance record already exists
-    if (await this.checkIfAttendanceExists(userId, eventId, date, tx))
-      throw new ConflictException(
-        `Attendance record already exists | User[${userId}] | event[${eventId}] | date[${date}]`,
-      );
+
+    //Check if attendance record already exists - return early
+    const existingAttendance = await this.findAttendance(
+      userId,
+      eventId,
+      date,
+      tx,
+    );
+    if (existingAttendance) return existingAttendance;
 
     //Check that event actually exists - will throw if doesnt exist
     await this.eventService.getById(eventId, tx);
@@ -176,22 +179,38 @@ export class AttendanceService {
   ): Promise<deleteAttendanceResponse> {
     const db = tx ?? this.dbService.db;
 
-    //Get + check that attendance record exists
-    // await this.getById(eventAttendanceId, db); dont think this is necessary
-
     //Delete attendance record
-    await db
+    const [result] = await db
       .delete(EventAttendance)
-      .where(eq(EventAttendance.AttendanceID, eventAttendanceId));
+      .where(eq(EventAttendance.AttendanceID, eventAttendanceId))
+      .returning();
 
     return {
-      success: true,
+      success: !!result,
     };
   } //END_deleteAttendance
 
   //🎅's Little Helpers
 
-  //Get a specific attendance record by userid, eventid and the date
+  /**
+   * Retrieve a specific attendance record for a user at a given event and date.
+   *
+   * @param userId - ID of the user to verify
+   * @param eventId - ID of the event to check
+   * @param date - Date of the attendance entry
+   * @param tx - Optional transaction instance
+   *
+   * @returns An AttendanceSingleResponse object if found, otherwise undefined
+   *
+   * @remarks
+   * Limits the query to one record. Useful for checking a single attendance entry.
+   *
+   * @example
+   * ```ts
+   * const existing = await findAttendance("user123", "event456", "2026-07-26");
+   * console.log(existing); // AttendanceSingleResponse or undefined
+   * ```
+   */
   private async findAttendance(
     userId: string,
     eventId: string,
@@ -214,18 +233,4 @@ export class AttendanceService {
 
     return attendance;
   } //END_getSpecificAttendance
-
-  //check if attendance record exists
-  private async checkIfAttendanceExists(
-    userId: string,
-    eventId: string,
-    date: string,
-    tx?: AppDatabase,
-  ): Promise<boolean> {
-    const db = tx ?? this.dbService.db;
-
-    const attendance = await this.findAttendance(eventId, userId, date, db);
-
-    return !!attendance;
-  } //END_checkIfAttendanceExists
 } //END_AttendanceService

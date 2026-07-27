@@ -43,7 +43,11 @@ const steps = [
   },
 ];
 
-export function InstituteSelector() {
+interface InstituteSelectorProps {
+  onClose?: () => void;
+}
+
+export function InstituteSelector({ onClose }: InstituteSelectorProps) {
   const [selectedInstitute, setSelectedInstitute] = useState<uniDto>();
 
   const [selectedRole, setSelectedRole] = useState("");
@@ -111,29 +115,59 @@ export function InstituteSelector() {
         />
       )*/}
         {selectedInstitute && <ApprovalStatus uni={selectedInstitute} />}
-        <div className="mt-2 flex justify-around gap-3 border-t pt-4">
-          <Button
-            id="btn-continue-as-role"
-            type="submit"
-            disabled={uniDisabeled}
-            onClick={() => router.push("/schedules")}
-          >
-            Continue as {selectedInstitute?.role ?? "Student"}
-          </Button>
+        <div className="flex flex-col mt-2 justify-around gap-3 border-t pt-4">
+          <div className="flex justify-center items-center gap-4 w-full">
+            <div className="flex-1 flex justify-end">
+              <Button
+                id="btn-continue-as-role"
+                type="submit"
+                variant={"outline"}
+                disabled={uniDisabeled}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleConfirm();
+                  router.push("/schedules");
+                  onClose?.();
+                }}
+              >
+                Continue as {selectedInstitute?.role ?? "Student"}
+              </Button>
+            </div>
 
-          <Button
-            id="btn-apply-for-role"
-            type="submit"
-            disabled={applyDisabled}
-            onClick={() => {
-              applyMut.mutate({
-                UniversityID: selectedInstitute?.UniversityID || "",
-                role: selectedRole as uniDtoRoles,
-              });
-            }}
-          >
-            {"Apply for role"}
-          </Button>
+            <p className="text-sm text-muted-foreground">or</p>
+            <div className="flex-1 flex justify-start">
+              <Button
+                id="btn-apply-for-role"
+                type="submit"
+                variant={"outline"}
+                disabled={applyDisabled}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleConfirm();
+                  applyMut.mutate({
+                    UniversityID: selectedInstitute?.UniversityID || "",
+                    role: selectedRole as uniDtoRoles,
+                  });
+                  onClose?.();
+                }}
+              >
+                {"Apply for role"}
+              </Button>
+            </div>
+          </div>
+
+          <div className="w-full flex items-center justify-center mt-2">
+            <Button
+              type="button"
+              variant="default"
+              onClick={(e) => {
+                onClose?.();
+                e.stopPropagation();
+              }}
+            >
+              Close
+            </Button>
+          </div>
         </div>
       </form>
     </>

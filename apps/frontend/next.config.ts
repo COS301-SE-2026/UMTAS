@@ -7,17 +7,13 @@ const nextConfig: NextConfig = {
     console.log(
       "[next.config] API_URL =",
       process.env.API_URL,
-      "→ target =",
+      "target =",
       target,
     );
     return [
       {
-        source: "/api/auth",
-        destination: `${target}/api/auth`,
-      },
-      {
-        source: "/api/auth/:path*",
-        destination: `${target}/api/auth/:path*`,
+        source: "/api/:path*",
+        destination: `${target}/api/:path*`,
       },
     ];
   },

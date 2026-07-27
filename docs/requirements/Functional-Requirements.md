@@ -58,7 +58,7 @@ The following functional requirements describe the high-level capabilities of th
 - **R2.2.1** :material-check-circle:{ style="color: #4caf50" } The system shall allow students to create new timetables.  
 - **R2.2.3** :material-circle-half-full:{ style="color: #ff9800" } The system shall allow timetable customisation.  
 
-??? failure "R2.2.2 — Not Implemented"
+??? failure "R2.2.2 - Not Implemented"
 
     - **R2.2.2** :material-close-circle:{ style="color: #e53935" } The system shall provide semester control for timetables.  
 
@@ -71,7 +71,7 @@ The following functional requirements describe the high-level capabilities of th
 
 - **R2.5.1** :material-check-circle:{ style="color: #4caf50" } The system shall allow export of timetables as `.ics` files for calendar import.  
 
-??? failure "R2.5.2 — Not Implemented"
+??? failure "R2.5.2 - Not Implemented"
 
     - **R2.5.2** :material-close-circle:{ style="color: #e53935" } The system shall allow direct sync with Google Calendar.  
       - **R2.5.2.1** :material-close-circle:{ style="color: #e53935" } The system shall support creating a Google Calendar instance.  

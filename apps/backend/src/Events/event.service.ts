@@ -625,6 +625,7 @@ export class EventService {
     if (venues === undefined) return [];
     const venueIds = [...new Set(venues.map(({ venueId }) => venueId))];
     if (venueIds.length !== venues.length) {
+      //but just continue with unique ones instead of throwing
       throw new BadRequestException('Event venues must not contain duplicates');
     }
     if (venueIds.length === 0) return [];
@@ -699,6 +700,11 @@ export class EventService {
     return mergedCriteria;
   } //END_mergeEventCriteria
 
+  /**
+   * @bug isRecurring will always be set from the createEvent method, so second check will never take place
+   * @param criteria
+   * @param isRecurring
+   */
   private assertTimingMatchesRecurrence(
     criteria: EventCriteria,
     isRecurring: boolean,
@@ -708,10 +714,10 @@ export class EventService {
         'Recurring events require dayOfWeek and must not include date',
       );
     }
-    if (!isRecurring && (criteria.dayOfWeek !== undefined || !criteria.date)) {
-      throw new BadRequestException(
-        'Non-recurring events require date and must not include dayOfWeek',
-      );
-    }
+    // if (!isRecurring && (criteria.dayOfWeek !== undefined || !criteria.date)) {
+    //   throw new BadRequestException(
+    //     'Non-recurring events require date and must not include dayOfWeek',
+    //   );
+    // }
   }
 } //EventService

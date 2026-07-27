@@ -76,7 +76,11 @@ services:
       PDF_PARSE_QUEUE_NAME: ${PDF_PARSE_QUEUE_NAME:-pdf.parse}
       PDF_PARSE_CONCURRENCY: ${PDF_PARSE_CONCURRENCY:-2}
       PDF_PARSE_TIMEOUT_MS: ${PDF_PARSE_TIMEOUT_MS:-60000}
+<<<<<<< feat/health-points
+      PDF_PARSE_CALLBACK_URL: http://backend-prod:${BACKEND_PORT}/api/pdf-parser/jobs
+=======
       PDF_PARSE_CALLBACK_URL: http://backend-prod:${BACKEND_PORT}/pdf-parser/jobs
+>>>>>>> dev
       WORKER_CALLBACK_TOKEN: ${WORKER_CALLBACK_TOKEN:?WORKER_CALLBACK_TOKEN must be set in production}
       WORKER_TOPOLOGY: container
       WORKER_KEEP_FAILED_TEMP: ${WORKER_KEEP_FAILED_TEMP:-false}
@@ -116,8 +120,13 @@ services:
       TIMETABLE_SOLVE_QUEUE_NAME: ${TIMETABLE_SOLVE_QUEUE_NAME:-timetable.solve}
       SOLVER_CONCURRENCY: ${SOLVER_CONCURRENCY:-1}
       SOLVER_TIMEOUT_MS: ${SOLVER_TIMEOUT_MS:-300000}
+<<<<<<< feat/health-points
+      SOLVER_INPUT_URL: http://backend-prod:${BACKEND_PORT}/api/solver/jobs
+      SOLVER_CALLBACK_URL: http://backend-prod:${BACKEND_PORT}/api/solver/jobs
+=======
       SOLVER_INPUT_URL: http://backend-prod:${BACKEND_PORT}/solver/jobs
       SOLVER_CALLBACK_URL: http://backend-prod:${BACKEND_PORT}/solver/jobs
+>>>>>>> dev
       WORKER_CALLBACK_TOKEN: ${WORKER_CALLBACK_TOKEN:?WORKER_CALLBACK_TOKEN must be set in production}
       WORKER_TOPOLOGY: container
       WORKER_KEEP_FAILED_TEMP: ${WORKER_KEEP_FAILED_TEMP:-false}
@@ -165,6 +174,15 @@ services:
       - SEED_SYSTEM_ADMIN_PASSWORD=${SEED_SYSTEM_ADMIN_PASSWORD}
       - SEED_TEST_PASSWORD=${SEED_TEST_PASSWORD}
       - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
+<<<<<<< feat/health-points
+      - BETTER_AUTH_URL
+      - COOKIE_DOMAIN
+      - COOKIE_PREFIX=${COOKIE_PREFIX}
+      - BETTER_AUTH_TRUSTED_ORIGINS
+      - CORS_ORIGIN
+      - NEXT_PUBLIC_APP_URL
+      - NEXT_PUBLIC_API_URL
+=======
       - BETTER_AUTH_URL=https://${PROD_API_DOMAIN}
       - COOKIE_DOMAIN=${COOKIE_DOMAIN}
       - COOKIE_PREFIX=${COOKIE_PREFIX}
@@ -172,6 +190,7 @@ services:
       - CORS_ORIGIN=https://${PROD_APP_DOMAIN}
       - NEXT_PUBLIC_APP_URL=https://${PROD_APP_DOMAIN}
       - NEXT_PUBLIC_API_URL=https://${PROD_API_DOMAIN}
+>>>>>>> dev
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
       - REDIS_URL=redis://:${REDIS_PASSWORD}@redis-prod:6379
@@ -194,15 +213,23 @@ services:
       - SMTP_SECURE=${SMTP_SECURE:-false}
       - SMTP_USER=${SMTP_USER:-}
       - SMTP_PASS=${SMTP_PASS:-}
-      - SMTP_FROM=${SMTP_FROM:-UMTAS <noreply@${DOMAIN}>}
+      - SMTP_FROM=${SMTP_FROM:-UMTAS <noreply@${PROD_APP_DOMAIN}>}
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=gateway"
+<<<<<<< feat/health-points
+      - "traefik.http.routers.backend-prod.rule=Host(`capstone-vigil.dns.net.za`) && PathPrefix(`/api`)"
+      # - "traefik.http.routers.umtas-prod.middlewares=api-stripprefix"
+      # - "traefik.http.middlewares.api-stripprefix.stripprefix.prefixes=/api"
+=======
       - "traefik.http.routers.backend-prod.rule=Host(`${PROD_API_DOMAIN}`)"
+>>>>>>> dev
       - "traefik.http.routers.backend-prod.entrypoints=websecure"
       - "traefik.http.routers.backend-prod.tls=true"
       - "traefik.http.routers.backend-prod.tls.certresolver=myresolver"
       - "traefik.http.services.backend-prod.loadbalancer.server.port=${BACKEND_PORT}"
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.http.routers.backend-prod.priority=100"
 
   frontend:
     image: ${DOCKER_REGISTRY:-vigilcs/umtas}:frontend-${IMAGE_TAG:?IMAGE_TAG is required}
@@ -217,8 +244,12 @@ services:
     environment:
       - PORT=${FRONTEND_PORT}
       - API_URL=http://backend-prod:${BACKEND_PORT}
+<<<<<<< feat/health-points
+      - COOKIE_PREFIX=umtas-production
+=======
       - NEXT_PUBLIC_APP_URL=https://${PROD_APP_DOMAIN}
       - NEXT_PUBLIC_API_URL=https://${PROD_API_DOMAIN}
+>>>>>>> dev
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=gateway"

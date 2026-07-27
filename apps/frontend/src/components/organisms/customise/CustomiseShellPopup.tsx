@@ -22,10 +22,10 @@ export default function CustomiseShellPopup() {
   const isLoading = modulesLoading || eventsLoading;
 
   return (
-    <div className="p-8">
+    <div className="">
       <AlertDialog>
         <AlertDialogTrigger asChild>
-          <Button variant="outline">Customise Modules and Events</Button>
+          <Button variant="outline">Customise</Button>
         </AlertDialogTrigger>
 
         <AlertDialogContent className="w-max max-w-[95vw] p-6">

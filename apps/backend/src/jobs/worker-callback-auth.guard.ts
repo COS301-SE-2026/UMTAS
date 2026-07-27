@@ -4,7 +4,6 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import type { IncomingHttpHeaders } from 'node:http';
 
 const BEARER_AUTH_SCHEME = 'Bearer';
@@ -37,16 +36,12 @@ export function isValidWorkerCallbackAuth(
 
 @Injectable()
 export class WorkerCallbackAuthGuard implements CanActivate {
-  constructor(private readonly configService: ConfigService) {}
-
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest<{
       headers: IncomingHttpHeaders;
     }>();
 
-    const expectedToken = this.configService.get<string>(
-      'WORKER_CALLBACK_TOKEN',
-    );
+    const expectedToken = process.env.WORKER_CALLBACK_TOKEN;
     if (
       !isValidWorkerCallbackAuth(request.headers.authorization, expectedToken)
     ) {

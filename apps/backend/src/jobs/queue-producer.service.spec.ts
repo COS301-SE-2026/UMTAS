@@ -1,10 +1,6 @@
 import type { Queue } from 'bullmq';
 import type { PdfParseJobData, TimetableSolveJobData } from 'shared-types';
 import { QueueProducerService } from './queue-producer.service';
-import {
-  PDF_PARSE_JOB_NAME,
-  TIMETABLE_SOLVE_JOB_NAME,
-} from './queue.constants';
 
 describe('QueueProducerService', () => {
   const pdfParseAdd = jest.fn();
@@ -35,7 +31,7 @@ describe('QueueProducerService', () => {
 
     await service.enqueuePdfParseJob(payload);
 
-    expect(pdfParseAdd).toHaveBeenCalledWith(PDF_PARSE_JOB_NAME, payload);
+    expect(pdfParseAdd).toHaveBeenCalledWith('parse-pdf', payload);
   });
 
   it('uses the attempt token as the idempotent solver execution ID', async () => {
@@ -48,10 +44,8 @@ describe('QueueProducerService', () => {
 
     await service.enqueueTimetableSolveJob(payload);
 
-    expect(timetableSolveAdd).toHaveBeenCalledWith(
-      TIMETABLE_SOLVE_JOB_NAME,
-      payload,
-      { jobId: payload.attemptToken },
-    );
+    expect(timetableSolveAdd).toHaveBeenCalledWith('solve-timetable', payload, {
+      jobId: payload.attemptToken,
+    });
   });
 });
