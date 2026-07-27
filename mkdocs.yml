@@ -39,6 +39,7 @@ plugins:
       enable_creation_date: true
       type: timeago
       fallback_to_build_date: true
+  - include-markdown
 
 markdown_extensions:
   - md_in_html

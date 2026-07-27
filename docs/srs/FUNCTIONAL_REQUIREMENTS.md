@@ -20,10 +20,10 @@
 
 - **R1.2.1** The system shall allow users to log in.
     - **R1.2.1.1** The system shall allow users to login using Oauth
-    - **R1.2.1.1** The system shall allow users to login using "in house" system
+    - **R1.2.1.2** The system shall allow users to login using "in house" system
 - **R1.2.2** The system shall allow users to register.
     - **R1.2.2.1** The system shall allow users to register using Oauth
-    - **R1.2.2.1** The system shall allow users to register using "in house" system
+    - **R1.2.2.2** The system shall allow users to register using "in house" system
 - **R1.2.3** The system shall manage user sessions.
 - **R1.2.4** The system shall allow users manage their account and system state
     - **R1.2.4.1** The system shall allow users to sign out.
@@ -131,15 +131,6 @@
   - **4.1.3.1** The system will shall allow updates to a courses name
   - **4.1.3.1** The system will shall allow updates to a courses degree
   - **4.1.3.3** The system will shall allow modules to be added to courses
-
-### FR 4.2 Module management for university admins
-- **R4.1.1** The system shall provide tools to create modules for universities using the API system or PDF system
-- **R4.1.2** The system shall provide tools to delete modules from universities
-using the API system or PDF system
-- **R4.1.3** The system shall provide tools to modify modules for universities
-  - **4.1.3.1** The system will shall allow updates to a module name
-  - **4.1.3.1** The system will shall allow updates to a module Code
-  - **4.1.3.3** The system will shall allow events to be added to modules
 
 ### FR 4.2 Module management for university admins
 - **R4.2.1** The system shall provide tools to create modules for universities using the API system or PDF system
