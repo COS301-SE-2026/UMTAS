@@ -423,6 +423,7 @@ export function EventsStep({
         {/* summary row */}
         <div className="flex items-center gap-2">
           <button
+            data-testid="event-open-btn"
             id="btn-modify-event"
             type="button"
             onClick={() => handleSelect(event.eventId)}
@@ -494,6 +495,7 @@ export function EventsStep({
             />
 
             <Button
+              data-testid="event-Confirm-Btn"
               type="button"
               variant="outline"
               onClick={() => handleConfirm(event.eventId)}
@@ -516,6 +518,7 @@ export function EventsStep({
 
     return (
       <button
+        data-testid="event-add-btn"
         id="btn-add-new-event"
         type="button"
         onClick={addEmptyEvent} // adds an event card
@@ -570,7 +573,7 @@ export function EventsStep({
 
       {modules.length === 0 && renderNoModulesWarning()}
 
-      <div className="flex flex-col gap-3">
+      <div data-testid="builder-event-div" className="flex flex-col gap-3">
         {events.length === 0 && renderEmptyState()}
         {events.map((event, index) => renderEventRow(event, index))}
       </div>
