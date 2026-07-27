@@ -60,12 +60,13 @@ export default async function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col">
-        <AppShellTemplate userName={userName}>
-          <TanstackProvider>{children}</TanstackProvider>
-        </AppShellTemplate>
-        <HelpCommandPalette />
+        <TanstackProvider>
+          <AppShellTemplate userName={userName}>{children}</AppShellTemplate>
 
-        <Toaster />
+          <HelpCommandPalette />
+
+          <Toaster />
+        </TanstackProvider>
       </body>
     </html>
   );

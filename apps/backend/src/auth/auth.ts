@@ -197,6 +197,9 @@ export function createAuth(input: CreateAuthInput) {
       'Redis URL configured but client initialization failed. Rate limiting and session storage require Redis in production.',
     );
   }
+  const useSecureCookies = ['production', 'staging'].includes(
+    process.env.NODE_ENV ?? '',
+  );
 
   return betterAuth({
     secondaryStorage: redisClient
@@ -351,8 +354,8 @@ export function createAuth(input: CreateAuthInput) {
     },
     advanced: {
       disableCSRFCheck: false,
-      useSecureCookies: isProduction,
-      cookiePrefix: 'umtas',
+      useSecureCookies: useSecureCookies,
+      cookiePrefix: process.env.COOKIE_PREFIX ?? 'umtas',
       defaultCookieAttributes: {
         sameSite: 'lax',
         domain: process.env.COOKIE_DOMAIN,

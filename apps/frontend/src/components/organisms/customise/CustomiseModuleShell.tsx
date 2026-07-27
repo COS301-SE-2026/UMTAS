@@ -148,7 +148,7 @@ export default function ModulesShell({
             </Button>
           </div>
 
-          <div className="flex flex-col gap-2 max-h-[280px] overflow-y-auto pr-1">
+          <div className="flex flex-col gap-2 [280px]max-h- overflow-y-auto pr-1">
             {modules.map((module) => (
               <CustomiseModulePanel
                 module={module}

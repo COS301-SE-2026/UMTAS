@@ -67,7 +67,6 @@ export class UniversityService {
   ): Promise<UniversityListResponseDto> {
     const db = tx ?? this.dbService.db;
 
-    // console.log(`Hierso: ${userId}`);
     const universities = await db
       .select({
         UniversityID: University.UniversityID,

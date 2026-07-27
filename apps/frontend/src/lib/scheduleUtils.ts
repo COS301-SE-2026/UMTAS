@@ -87,6 +87,7 @@ export function resolveScheduleEvents(
         isRecurring: event.isRecurring || false,
         accentColour: uniModule?.styling?.colour || null,
         subLabel: uniModule ? uniModule.moduleCode : null,
+        type: event.activityType || null,
       });
       continue;
     }

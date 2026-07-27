@@ -7,34 +7,37 @@ services:
     restart: always
     security_opt:
       - no-new-privileges:true
-    user: "0:0"
     networks:
       - gateway
     ports:
       - "80:80"
       - "443:443"
-      - "8025:8025"
     volumes:
       - ${DOCKER_SOCK:-/var/run/docker.sock}:/var/run/docker.sock:ro
       - letsencrypt_data:/letsencrypt
       - ./infra/traefik/traefik.yml:/etc/traefik/traefik.yml:ro
-    command:
-      - "--certificatesresolvers.myresolver.acme.email=${LETSENCRYPT_EMAIL}"
-      - "--certificatesresolvers.myresolver.acme.caserver=${ACME_CA_SERVER:-https://acme-v02.api.letsencrypt.org/directory}"
+    healthcheck:
+      test: ["CMD", "traefik", "healthcheck", "--ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.traefik.rule=Host(`traefik.${DOMAIN}`)"
-      - "traefik.http.routers.traefik.service=api@internal"
+      - "traefik.docker.network=gateway"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.capstone-vigil.dns.net.za`)"
       - "traefik.http.routers.traefik.entrypoints=websecure"
+      - "traefik.http.routers.traefik.service=api@internal"
       - "traefik.http.routers.traefik.tls=true"
       - "traefik.http.routers.traefik.tls.certresolver=myresolver"
       - "traefik.http.routers.traefik.middlewares=traefik-auth"
       - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_DASHBOARD_CREDENTIALS}"
       - "traefik.http.routers.brand-redirect.rule=Host(`brand.capstone-vigil.dns.net.za`)"
       - "traefik.http.routers.brand-redirect.entrypoints=websecure"
+      - "traefik.http.routers.brand-redirect.priority=100"
+      - "traefik.http.routers.brand-redirect.service=noop@internal"
       - "traefik.http.routers.brand-redirect.tls=true"
       - "traefik.http.routers.brand-redirect.tls.certresolver=myresolver"
-      - "traefik.http.routers.brand-redirect.service=api@internal"
       - "traefik.http.routers.brand-redirect.middlewares=brand-redirect-mw"
       - "traefik.http.middlewares.brand-redirect-mw.redirectregex.regex=^https?://brand.capstone-vigil.dns.net.za/(.*)"
       - "traefik.http.middlewares.brand-redirect-mw.redirectregex.replacement=https://capstone-vigil.dns.net.za/brand-style/$${1}"

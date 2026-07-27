@@ -50,6 +50,12 @@ export function EventBlock({ event }: EventBlockProps) {
         {event.name}
       </p>
 
+      {event.type && (
+        <span className="text-[10px] font-medium uppercase tracking-[0.04em] text-[var(--text-secondary)] truncate">
+          {event.type}
+        </span>
+      )}
+
       {event.subLabel && (
         <span className="text-[10px] font-medium uppercase tracking-[0.04em] text-[var(--text-secondary)] truncate">
           {event.subLabel}

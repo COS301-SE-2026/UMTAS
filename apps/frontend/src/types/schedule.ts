@@ -9,4 +9,5 @@ export interface ScheduleEvent {
   isRecurring: boolean;
   accentColour: string | null;
   subLabel: string | null;
+  type?: string | null;
 }
