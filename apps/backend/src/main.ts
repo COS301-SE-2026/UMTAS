@@ -20,6 +20,7 @@ import * as schema from './entities/index';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  app.set('trust proxy', 1);
   app.useStaticAssets(join(__dirname, '..', 'public'));
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   const port = process.env.PORT ?? 3000;
@@ -61,7 +62,7 @@ async function bootstrap() {
     })
     .addBearerAuth(undefined, 'bearer')
     .addServer(`http://localhost:${port}`, 'Local development')
-    .addServer('https://api.capstone-vigil.dns.net.za', 'Production')
+    .addServer('https://capstone-vigil.dns.net.za', 'Production')
     .addTag('Health', 'System health checks')
     .addTag('Auth Email', 'Email-based authentication and account management')
     .addTag('Auth Google', 'Google OAuth and account linking')
