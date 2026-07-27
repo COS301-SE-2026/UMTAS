@@ -202,7 +202,15 @@ export class AuthController {
     @Res() res: ServerResponse,
   ): Promise<void> {
     console.log('GET-SESSION IN:', req.headers.cookie);
-    res.on('finish', () => console.log('GET-SESSION OUT:', res.statusCode));
+    const end = res.end.bind(res);
+    res.end = ((c?: any, ...r: any[]) => {
+      console.log(
+        'GET-SESSION OUT:',
+        res.statusCode,
+        c?.toString()?.slice(0, 120),
+      );
+      return end(c, ...r);
+    }) as typeof res.end;
     return this.handleRequest(req, res);
   }
 
