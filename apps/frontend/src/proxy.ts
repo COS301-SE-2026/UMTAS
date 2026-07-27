@@ -6,7 +6,7 @@ const useSecureCookies = ["production", "staging"].includes(
   process.env.NODE_ENV ?? "",
 );
 
-const SESSION_COOKIE_NAME = `${cookiePrefix}.session_token`;
+const SESSION_COOKIE_NAME = `${useSecureCookies ? "__Secure-" : ""}${cookiePrefix}.session_token`;
 
 const PUBLIC_PATHS = [
   "/login",
@@ -23,12 +23,19 @@ const PUBLIC_PATHS = [
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-
+  console.log(
+    "PROXY:",
+    pathname,
+    "looking for",
+    SESSION_COOKIE_NAME,
+    "found:",
+    !!request.cookies.get(SESSION_COOKIE_NAME)?.value,
+  );
   const isPublicPath = PUBLIC_PATHS.some((path) => pathname.startsWith(path));
   const isAuthApiPath = pathname.startsWith("/api/auth");
   const isHealthApiPath = pathname.startsWith("/api/health");
-
-  if (isPublicPath || isAuthApiPath || isHealthApiPath)
+  const isApiRoute = pathname.startsWith("/api");
+  if (isPublicPath || isAuthApiPath || isHealthApiPath || isApiRoute)
     return NextResponse.next();
 
   const sessionCookie = request.cookies.get(SESSION_COOKIE_NAME);
