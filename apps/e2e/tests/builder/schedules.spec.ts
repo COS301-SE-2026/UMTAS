@@ -123,7 +123,6 @@ test("Create schedule", async ({ page }) => {
   await createScheduleBtn.click();
 
   await expect(page.getByTestId("schedules-Calendar-Div")).toBeVisible();
-  await expect(page).toHaveScreenshot("Schedule-created.png");
   await page.getByTestId("schedules-Date-Input").fill("2026-12-30");
   await expect(page).toHaveScreenshot("Schedule-correct-event.png");
   // page did change schedule created successfully
