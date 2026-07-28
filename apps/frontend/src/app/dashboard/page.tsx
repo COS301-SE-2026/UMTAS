@@ -16,6 +16,8 @@ import { PageSkeleton } from "@/components/atoms/nav/PageSkeleton";
 import Link from "next/link";
 
 import Tutorial from "@/components/organisms/nav/Tutorial";
+import { useSession } from "@/lib/auth-client";
+import { UserGreeting } from "@/components/atoms/dashboard/UserGreeting";
 const steps = [
   {
     target: "#theme-toggle-btn",
@@ -145,6 +147,19 @@ function DashboardContent() {
   }
 
   //Wilmar has DICTACTED this shall no longer exist.
+  //johan has overwritten wilmar's dictatorship
+
+  const { data: session, isPending } = useSession();
+
+  if (isPending) {
+    return (
+      <div className="flex flex-col w-full min-h-[60vh] items-center justify-center">
+        <PageSkeleton rows={3} />
+      </div>
+    );
+  }
+
+  const userName = session?.user?.name ?? null;
 
   return (
     <div className="flex flex-col w-full">
@@ -161,7 +176,7 @@ function DashboardContent() {
             </Badge>
 
             <h1 className="text-4xl lg:text-5xl font-semibold text-[var(--text-primary)] leading-[1.1]">
-              Welcome back.
+              Welcome {userName ? userName.split(" ")[0] : "Back"}.
             </h1>
 
             <p className="text-base lg:text-lg text-[var(--text-secondary)] leading-relaxed max-w-sm">
