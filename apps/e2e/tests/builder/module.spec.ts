@@ -17,10 +17,15 @@ test("Create and update module", async ({ page }) => {
   const moduleNameInput = module.getByTestId("mod-Name-Input").first();
   await moduleNameInput.fill("AA");
 
-  //assertions
   await page.getByTestId("mod-Confirm-Btn").first().click();
-  await expect(moduleBtn).toContainText("AA");
-  await expect(moduleBtn).toContainText("AA");
+
+  const updatedModuleBtn = page
+    .getByTestId("open-module-btn")
+    .filter({ has: page.locator("p", { hasText: "AA" }) })
+    .first();
+
+  await expect(updatedModuleBtn).toBeVisible();
+  await expect(updatedModuleBtn).toContainText("AA");
 });
 
 test("Add Event", async ({ page }) => {
@@ -60,9 +65,13 @@ test("Add Event", async ({ page }) => {
 
   await expect(event.getByTestId("event-Type-Select")).toHaveText("Lecture");
 });
-
 test("Delete module", async ({ page }) => {
-  await page.goto("/builder");
+  page.goto("/builder");
+  const targetModule = page
+    .getByTestId("open-module-btn")
+    .filter({ has: page.locator("p", { hasText: "AA" }) })
+    .first();
+
   await page.getByTestId("btn-delete-module").first().click();
-  await expect(page.getByTestId("open-module-btn").first()).not.toBeVisible();
+  await expect(targetModule).not.toBeVisible();
 });
