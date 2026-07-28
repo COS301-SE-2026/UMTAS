@@ -55,7 +55,6 @@ export function InstituteSelector({ onClose }: InstituteSelectorProps) {
   const { data: uniList, isLoading: uniLoading } = useQuery(getAllUni());
   const applyMut = useMutation(applyMutator());
   const selectUniMut = useMutation(selectUniMutator());
-  console.log(uniList);
 
   function updateSelectedUni(id: string) {
     const nUni = uniList?.universities.find((uni) => uni.UniversityID === id);
@@ -72,10 +71,7 @@ export function InstituteSelector({ onClose }: InstituteSelectorProps) {
   }
 
   function handleConfirm() {
-    if (
-      selectedInstitute?.role === undefined &&
-      selectedInstitute?.UniversityID
-    ) {
+    if (selectedInstitute?.role === null && selectedInstitute?.UniversityID) {
       applyMut.mutate({
         UniversityID: selectedInstitute?.UniversityID,
         role: "STUDENT",
