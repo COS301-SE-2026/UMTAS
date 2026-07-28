@@ -32,31 +32,31 @@
 
 # FR 2 
 
-### R2.1 Timetable Management
-- **R2.1.1** The system shall allow students to view timetables.
-	- **R2.1.1.1** The system shall allow students to view events and modules in a time table.
-	- **R2.1.1.2** The system shall allow students to view the time table in a calendar format.
-		- **R2.1.1.2.1** The system shall allow students to view the time table per week where relevant.
-		- **R2.1.1.2.2** The system shall allow students to view time table details at a higher level such as related statistics.
-	- **R2.1.1.3** The system shall allow students to select individual time tables from a list of stored timetables created by the user.
-- **R2.1.2** The system shall allow students to update timetables.
-	- **R2.1.2.1** The system shall allow students to update timetable modules for owned modules.
-		- **R2.1.2.1.1** The system shall allow students to update timetable module names. 
-		- **R2.1.2.1.1** The system shall allow students to update timetable module codes.
-	- **R2.1.2.2** The system shall allow students to update timetable events listed details for owned events.
-		- **R2.1.2.2.1** The system shall allow students to update timetable event venues.
-		- **R2.1.2.2.2** The system shall allow students to update timetable event times.
-		- **R2.1.2.2.3** The system shall allow students to update timetable event days 
-- **R2.1.3** The system shall allow students to delete timetables which will not effect related events and modules.
-
 ### R2.2 Timetable Creation – Builder
-- **R2.2.1** The system shall allow students to create new timetables.
-	- **R2.2.1.1** The system shall allow students to create modules for timetables setting the related details of a module.
-	- **R2.2.1.2** The system shall allow students to create events for timetables setting the related details of module events.
-	- **R2.2.1.3** The system shall allow students to create a timetable from events and modules.
-- **R2.2.2** The system shall allow timetable customisation.
-	- **R2.2.2.1** The system shall allow timetable customisation of name
-	- **R2.2.2.2** The system shall allow timetable customisation of colour
+- **R2.2.1** The system shall allow users to create new timetables.
+	- **R2.2.1.1** The system shall allow users to create modules for timetables setting the related details of a module.
+	- **R2.2.1.2** The system shall allow users to create events for timetables setting the related details of module events.
+	- **R2.2.1.3** The system shall allow users to create a timetable from events and modules.
+
+### R2.1 Timetable Management
+- **R2.1.1** The system shall allow users to view timetables.
+	- **R2.1.1.1** The system shall allow users to view events and modules in a time table.
+	- **R2.1.1.2** The system shall allow users to view the time table in a calendar format.
+		- **R2.1.1.2.1** The system shall allow users to view the time table per week where relevant.
+		- **R2.1.1.2.2** The system shall allow users to view time table details at a higher level such as related statistics.
+	- **R2.1.1.3** The system shall allow users to select individual time tables from a list of stored timetables created by the user.
+- **R2.1.2** The system shall allow users to update timetables.
+	- **R2.1.2.1** The system shall allow users to update timetable modules for owned modules.
+		- **R2.1.2.1.1** The system shall allow users to update timetable module names. 
+		- **R2.1.2.1.2** The system shall allow users to update timetable module codes.
+	- **R2.1.2.2** The system shall allow users to update timetable events listed details for owned events.
+		- **R2.1.2.2.1** The system shall allow users to update timetable event venues.
+		- **R2.1.2.2.2** The system shall allow users to update timetable event times.
+		- **R2.1.2.2.3** The system shall allow users to update timetable event days 
+- **R2.1.3** The system shall allow users to delete timetables which will not effect related events and modules.
+- **R2.1.4** The system shall allow timetable customisation.
+	- **R2.1.4.1** The system shall allow timetable customisation of name
+	- **R2.1.4.2** The system shall allow timetable customisation of colour
 
 ### R2.3 Timetable Creation – PDF System
 

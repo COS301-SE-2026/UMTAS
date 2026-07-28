@@ -90,7 +90,8 @@
     | **UC-TM-01** | View Timetable | [Timetable Management](#timetable-management-id) | User |<span class="status-implemented">Implemented</span>|
     | **UC-TM-02** | Edit Timetable | [Timetable Management](#timetable-management-id) | User |<span class="status-implemented">Implemented</span>|
     | **UC-TM-03** | Delete Timetable | [Timetable Management](#timetable-management-id) | User |<span class="status-implemented">Implemented</span>|
-    
+    | **UC-TM-04** | Customise Timetable | [Timetable Management](#timetable-management-id) | User |<span class="status-implemented">Implemented</span>|
+
     </div>
     <div class="uc-table" markdown>
 
