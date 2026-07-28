@@ -34,7 +34,7 @@ test("Add Event", async ({ page }) => {
   const addEvent = page.getByTestId("event-add-btn");
   await addEvent.click();
   let eventContainer = page.getByTestId("builder-event-div");
-  await eventContainer.getByTestId("event-open-btn").click();
+  await eventContainer.getByTestId("event-open-btn").first().click();
 
   let event = eventContainer.getByTestId("event-card-div").first();
   await expect(event).toBeVisible();
@@ -52,7 +52,7 @@ test("Add Event", async ({ page }) => {
   await page.getByTestId("event-Confirm-Btn").first().click();
 
   eventContainer = await page.getByTestId("builder-event-div");
-  await eventContainer.getByTestId("event-open-btn").click();
+  await eventContainer.getByTestId("event-open-btn").first().click();
   event = await eventContainer.getByTestId("event-card-div").first();
 
   await expect(event).toBeVisible();
@@ -65,6 +65,43 @@ test("Add Event", async ({ page }) => {
 
   await expect(event.getByTestId("event-Type-Select")).toHaveText("Lecture");
 });
+
+test("Update event", async ({ page }) => {
+  await page.goto("/builder");
+  await page.getByTestId("builder-Next-Step").click();
+  let eventContainer = page.getByTestId("builder-event-div");
+  await eventContainer.getByTestId("event-open-btn").first().click();
+
+  let event = eventContainer.getByTestId("event-card-div").first();
+  await expect(event).toBeVisible();
+  await event.getByTestId("event-Name-Input").fill("AA");
+  await event.getByTestId("event-Code-Input").fill("AA");
+  await event.getByTestId("event-Date-Input").fill("2026-12-30");
+  await event.getByTestId("event-TimeStart-Select").click();
+  await page.getByRole("option", { name: "08:00" }).click();
+  await event.getByTestId("event-TimeEnd-Select").click();
+  await page.getByRole("option", { name: "08:30" }).click();
+  await event.getByTestId("event-Type-Select").click();
+  await page.getByRole("option").last().click();
+  await event.getByTestId("event-Module-Select").click();
+  await page.getByRole("option").last().click();
+  await page.getByTestId("event-Confirm-Btn").first().click();
+
+  eventContainer = await page.getByTestId("builder-event-div");
+  await eventContainer.getByTestId("event-open-btn").first().click();
+  event = await eventContainer.getByTestId("event-card-div").first();
+
+  await expect(event).toBeVisible();
+  await expect(event.getByTestId("event-Name-Input")).toHaveValue("AA");
+  await expect(event.getByTestId("event-Code-Input")).toHaveValue("AA");
+  await expect(event.getByTestId("event-Date-Input")).toHaveValue("2026-12-30");
+
+  await expect(event.getByTestId("event-TimeStart-Select")).toHaveText("08:00");
+  await expect(event.getByTestId("event-TimeEnd-Select")).toHaveText("08:30");
+
+  await expect(event.getByTestId("event-Type-Select")).toHaveText("Test");
+});
+
 test("Delete module", async ({ page }) => {
   page.goto("/builder");
   const targetModule = page

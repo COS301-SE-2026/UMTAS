@@ -155,49 +155,33 @@ export function EventsStep({
   const [isDirty, setIsDirty] = useState(false);
   const [showGuard, setShowGuard] = useState(false);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
-  const [eventsAdded, setEventsAdded] = useState<
-    { eventID: string; created: boolean }[]
-  >([]);
 
   const steps =
     events.length > 0 ? [...extendedSteps, ...baseSteps] : baseSteps;
 
-  // a local construct to add an empty event
-  function addEmptyEvent() {
-    const nextNum = Math.round(Math.random() * 1000);
-    const newEvents = getQueryClient().setQueryData(
-      getAllEventsQ().queryKey,
-      (oldEvents: EventResponse[] | undefined) => {
-        const emptyEvent: EventResponse = {
-          eventId: `TEMP_${nextNum}`,
-          activityCode: "",
-          isRecurring: false,
-          eventName: "",
-          activityType: "lecture",
-          eventCriteria: {
-            eventSource: "university",
-            date: "",
-            endTime: "",
-            startTime: "",
-            moduleId: "TEMP",
-          },
-        };
-        return [...(oldEvents ?? []), emptyEvent];
-      },
-    );
-
-    if (newEvents) {
-      const mapped = newEvents.map((e) => ({
-        eventID: e.eventId,
-        created: !e.eventId.startsWith("TEMP"),
-      }));
-      setEventsAdded(mapped);
-    }
-  }
-
   const addEvent = useMutation(addUniEventMut());
   const deleteEvent = useMutation(removeEventMut());
   const updateEvent = useMutation(updateEventMut());
+
+  // a local construct to add an empty event
+  function addNewEvent() {
+    addEvent.mutate({
+      body: {
+        activityCode: "L1",
+        isRecurring: false,
+        eventName: "Name",
+        activityType: "lecture",
+        eventCriteria: {
+          eventSource: "university",
+          date: new Date().toISOString().split("T")[0],
+          endTime: "07:00",
+          startTime: "07:30",
+          moduleId: modules[0].moduleID,
+        },
+        validated: true,
+      },
+    });
+  }
 
   function requestNavigation(action: () => void) {
     if (isDirty) {
@@ -273,58 +257,19 @@ export function EventsStep({
       delete cleanCriteria.dayOfWeek;
     }
 
-    const iscreated = eventsAdded.find((event) => event.eventID === id);
+    updateEvent.mutate({
+      body: {
+        isRecurring: event.isRecurring,
+        activityType: event.activityType,
+        activityCode: event.activityCode,
+        eventCriteria: cleanCriteria,
+        eventName: event.eventName,
+      },
+      path: {
+        id: id,
+      },
+    });
 
-    if (iscreated?.created) {
-      updateEvent.mutate({
-        body: {
-          isRecurring: event.isRecurring,
-          activityType: event.activityType,
-          activityCode: event.activityCode,
-          eventCriteria: cleanCriteria,
-          eventName: event.eventName,
-        },
-        path: {
-          id: id,
-        },
-      });
-    } else {
-      const result = await addEvent.mutateAsync({
-        body: {
-          eventCriteria: cleanCriteria,
-          activityType: event.activityType || "lecture",
-          activityCode: event.activityCode,
-          eventName: event.eventName,
-          isRecurring: event.isRecurring,
-        },
-      });
-
-      const newEvent = result.event;
-      const newID = newEvent.eventId;
-
-      getQueryClient().setQueryData(
-        getAllEventsQ().queryKey,
-        (oldEvents: EventResponse[] | undefined) => {
-          if (!oldEvents) return [];
-          return oldEvents.map((event) =>
-            event.eventId === id ? newEvent : event,
-          );
-        },
-      );
-
-      if (events) {
-        const mapped = eventsAdded.map((event) => {
-          if (event.eventID === id) {
-            return {
-              eventID: newID,
-              created: true,
-            };
-          }
-          return event;
-        });
-        setEventsAdded(mapped);
-      }
-    }
     setIsDirty(false);
     setSelectedId(null);
   }
@@ -521,7 +466,7 @@ export function EventsStep({
         data-testid="event-add-btn"
         id="btn-add-new-event"
         type="button"
-        onClick={addEmptyEvent} // adds an event card
+        onClick={addNewEvent} // adds an event card
         className="flex w-fit items-center gap-3 rounded-lg border border-dashed border-[var(--border)] px-2 py-2 text-left text-base text-[var(--text-secondary)] transition-colors duration-[var(--duration-fast)] hover:border-[var(--text-secondary)] hover:text-[var(--text-primary)] disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border border-dashed border-[var(--border)]">
