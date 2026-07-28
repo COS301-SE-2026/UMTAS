@@ -64,7 +64,6 @@ export class RequestBuilder<
   protected setUrl(url: ApiPath): this {
     this.url = createUrl(url);
 
-    console.log(this.url); // remove this
     if (this.url.includes("/api/api")) {
     }
     if (typeof window === "undefined") {
