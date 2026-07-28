@@ -336,7 +336,7 @@ export function ScheduleView({
     }
 
     return (
-      <div className="flex flex-col gap-3">
+      <div data-testid="schedules-Calendar-Div" className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <div className="w-64">
             <Select

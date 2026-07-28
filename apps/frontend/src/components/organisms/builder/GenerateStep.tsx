@@ -182,6 +182,7 @@ export function GenerateStep({
 
                 <span className="flex-shrink-0 flex items-center justify-center">
                   <Checkbox
+                    data-testid="schedule-Timetable-Checkbox"
                     id={`event-${event.eventId}`}
                     checked={isEventChecked}
                     onCheckedChange={(checkedState) =>
@@ -224,7 +225,10 @@ export function GenerateStep({
   }
 
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-4 border rounded-xl border-[var(--border)] bg-[var(--bg-surface)]">
+    <div
+      data-testid="create-Schedule-Div"
+      className="mx-auto w-full max-w-2xl px-4 py-4 border rounded-xl border-[var(--border)] bg-[var(--bg-surface)]"
+    >
       <div className="mb-8">
         <h2 className="text-lg font-semibold text-[var(--text-primary)]">
           Review and generate
@@ -242,6 +246,7 @@ export function GenerateStep({
           Schedule Name
         </Label>
         <Input
+          data-testid="schedule-Timetable-Input"
           id="timetable-name"
           value={timetableName}
           onChange={(e) => setTimetableName(e.target.value)}
@@ -253,6 +258,7 @@ export function GenerateStep({
       {renderContent()}
       <div className="flex justify-center mt-8">
         <Button
+          data-testid="schedules-Create-Btn"
           type="button"
           size="default"
           //only generate when there is at least 1 event
