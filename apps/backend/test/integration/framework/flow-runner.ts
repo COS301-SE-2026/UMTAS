@@ -1,45 +1,40 @@
 import {
   FlowStepError,
   type FlowDefinition,
-  type FlowRunResult,
+  type FlowKey,
   type FlowRuntime,
   type StepContext,
-  type StepDiagnostic,
-  type StepExecution,
 } from './contracts';
-import { FlowState } from './flow-state';
-import { SeedCollector } from './seed/seed-manifest';
+import type { TestActor } from './http-test-client';
 
 export async function runIntegrationFlow<TPlan>(
   definition: FlowDefinition<TPlan>,
   runtime: FlowRuntime,
-): Promise<FlowRunResult> {
-  const state = new FlowState();
-  const actors = new Map<string, ReturnType<FlowRuntime['createActor']>>();
-  const executions: StepExecution[] = [];
-  const collector = new SeedCollector();
-  let primaryFailure: unknown;
+): Promise<void> {
+  const outputs = new Map<object, unknown>();
+  const actors = new Map<string, TestActor>();
+  let primaryFailure: Error | undefined;
 
   try {
-    validateStepNames(definition);
-    await runtime.initialize?.();
-    for (const step of definition.steps) {
-      await step.baseSeed({ plan: definition.plan, seed: collector });
+    validateSteps(definition);
+    const seed = definition.seed;
+    if (seed) {
+      await runtime.database.transaction(
+        async (database: FlowRuntime['database']) => {
+          await seed({
+            plan: definition.plan,
+            database,
+            publish: <T>(key: FlowKey<T>, value: T) =>
+              publishOutput(outputs, key, value),
+          });
+        },
+      );
     }
-    const manifest = collector.manifest();
-    manifest.validateStepProducers(definition.steps.map((step) => step.name));
-    manifest.validateStepOutputs(definition.steps);
-    const seeded = await manifest.persist(runtime.database);
-    for (const [key, value] of seeded) state.publish(key, value, 'seed');
 
     for (const [index, step] of definition.steps.entries()) {
-      const startedAt = performance.now();
       const context: StepContext<TPlan> = {
         plan: definition.plan,
         runtime,
-        state,
-        stepName: step.name,
-        stepIndex: index,
         actor(name) {
           let actor = actors.get(name);
           if (!actor) {
@@ -48,110 +43,64 @@ export async function runIntegrationFlow<TPlan>(
           }
           return actor;
         },
-        require<T>(key: string): T {
-          return state.require<T>(key, step.name);
+        require<T>(key: FlowKey<T>): T {
+          if (!outputs.has(key)) {
+            throw new Error(
+              `Step "${step.name}" requires missing flow output "${key.name}"`,
+            );
+          }
+          return outputs.get(key) as T;
         },
       };
 
       try {
         const output = await step.run(context);
         if (step.outputKey) {
-          state.publish(step.outputKey, output, step.name);
+          publishOutput(outputs, step.outputKey, output);
         }
-        executions.push({
-          index,
-          name: step.name,
-          elapsedMs: performance.now() - startedAt,
-          status: 'passed',
-        });
       } catch (error) {
-        executions.push({
-          index,
-          name: step.name,
-          elapsedMs: performance.now() - startedAt,
-          status: 'failed',
-        });
-        throw new FlowStepError(definition.name, step.name, index, error, {
-          executions,
-          outputs: state.snapshot(),
-          seedManifest: manifest.summary(),
-          step: await collectDiagnostics('step', step.diagnostics),
-          runtime: await collectDiagnostics('runtime', runtime.diagnostics),
-          actors: Object.fromEntries(
-            [...actors].map(([name, actor]) => [
-              name,
-              actor.request.lastExchange(),
-            ]),
-          ),
-        });
+        throw new FlowStepError(definition.name, step.name, index, error);
       }
     }
-
-    return {
-      flowName: definition.name,
-      seedManifest: collector.manifest(),
-      executions,
-      outputs: state.snapshot(),
-    };
   } catch (error) {
-    primaryFailure = error;
-    throw error;
-  } finally {
-    state.clear();
-    try {
-      await runtime.close();
-    } catch (cleanupFailure) {
-      if (primaryFailure === undefined) throw cleanupFailure;
-      attachCleanupFailure(primaryFailure, cleanupFailure);
-    }
+    primaryFailure = errorFromUnknown(error);
   }
+
+  try {
+    await runtime.reset();
+  } catch (cleanupFailure) {
+    const resetFailure = errorFromUnknown(cleanupFailure);
+    if (!primaryFailure) throw resetFailure;
+    throw new AggregateError(
+      [primaryFailure, resetFailure],
+      `${primaryFailure.message}; flow reset failed: ${resetFailure.message}`,
+      { cause: primaryFailure },
+    );
+  }
+
+  if (primaryFailure) throw primaryFailure;
 }
 
-function validateStepNames<TPlan>(definition: FlowDefinition<TPlan>): void {
-  const names = new Set<string>();
+function publishOutput<T>(
+  outputs: Map<object, unknown>,
+  key: FlowKey<T>,
+  value: T,
+): T {
+  if (outputs.has(key)) {
+    throw new Error(`Flow output "${key.name}" was published more than once`);
+  }
+  outputs.set(key, value);
+  return value;
+}
+
+function validateSteps<TPlan>(definition: FlowDefinition<TPlan>): void {
   for (const step of definition.steps) {
     if (!step.name.trim()) {
       throw new Error(`Flow "${definition.name}" contains an unnamed step`);
     }
-    if (names.has(step.name)) {
-      throw new Error(
-        `Flow "${definition.name}" contains duplicate step name "${step.name}"`,
-      );
-    }
-    names.add(step.name);
   }
 }
 
-async function collectDiagnostics(
-  source: string,
-  collect: (() => StepDiagnostic | Promise<StepDiagnostic>) | undefined,
-): Promise<StepDiagnostic | undefined> {
-  if (!collect) return undefined;
-  try {
-    return await collect();
-  } catch (error) {
-    return {
-      collectionFailure: {
-        source,
-        message: error instanceof Error ? error.message : String(error),
-      },
-    };
-  }
-}
-
-function attachCleanupFailure(
-  primaryFailure: unknown,
-  cleanupFailure: unknown,
-): void {
-  if (primaryFailure instanceof FlowStepError) {
-    primaryFailure.cleanupFailure = cleanupFailure;
-    return;
-  }
-  if (primaryFailure instanceof Error) {
-    Object.defineProperty(primaryFailure, 'cleanupFailure', {
-      configurable: true,
-      enumerable: true,
-      value: cleanupFailure,
-    });
-  }
+function errorFromUnknown(error: unknown): Error {
+  return error instanceof Error ? error : new Error(String(error));
 }

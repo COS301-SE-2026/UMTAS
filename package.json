@@ -6,8 +6,7 @@
   "scripts": {
     "test": "turbo run test",
     "test:unit": "turbo run test --filter=!./apps/e2e -- --coverage",
-    "test:integration": "pnpm --filter backend test:controller-flow",
-    "test:integration:pdf-solver": "pnpm --filter backend test:integration:pdf-solver",
+    "test:integration": "pnpm --filter backend test:integration",
     "fixture:pdf-solver": "pnpm --filter backend fixture:pdf-solver",
     "fixture:pdf-solver:verify": "pnpm --filter backend fixture:pdf-solver:verify",
     "dev": "turbo run dev --filter=!pdf-parser-worker --filter=!solver-worker",
@@ -53,7 +52,7 @@
     "docker:build:all:multiarch": "DOCKER_PLATFORMS=${DOCKER_PLATFORMS:-linux/amd64,linux/arm64}; test -n \"${IMAGE_TAG:-}\" || { echo 'IMAGE_TAG is required' >&2; exit 2; }; docker buildx build --platform \"$DOCKER_PLATFORMS\" -f docker/backend/backend.Dockerfile -t \"${DOCKER_REGISTRY:-vigilcs/umtas}:backend-${IMAGE_TAG}\" --push . && docker buildx build --platform \"$DOCKER_PLATFORMS\" -f docker/frontend/frontend.Dockerfile -t \"${DOCKER_REGISTRY:-vigilcs/umtas}:frontend-${IMAGE_TAG}\" --push . && docker buildx build --platform \"$DOCKER_PLATFORMS\" -f docker/pdf-parser-worker/pdf-parser-worker.Dockerfile -t \"${DOCKER_REGISTRY:-vigilcs/umtas}:pdf-parser-worker-${IMAGE_TAG}\" --push . && docker buildx build --platform \"$DOCKER_PLATFORMS\" -f docker/solver-worker/solver-worker.Dockerfile -t \"${DOCKER_REGISTRY:-vigilcs/umtas}:solver-worker-${IMAGE_TAG}\" --push .",
     "docker:smoke:pdf-parser-worker": "docker run --rm --entrypoint sh ${DOCKER_REGISTRY:-vigilcs/umtas}:pdf-parser-worker-${IMAGE_TAG:-latest} -c 'test -f /app/.image-smoke-ok'",
     "docker:smoke:solver-worker": "docker run --rm --entrypoint sh ${DOCKER_REGISTRY:-vigilcs/umtas}:solver-worker-${IMAGE_TAG:-latest} -c 'test -f /app/.image-smoke-ok && /app/bin/solver-cli --input /dev/null --output /tmp/out --engine invalid >/dev/null 2>&1; test $? -ne 0'",
-    "docker:config": "docker compose config --quiet && IMAGE_TAG=${IMAGE_TAG:-validation} docker compose -f docker-compose.staging.yml config --quiet && IMAGE_TAG=${IMAGE_TAG:-validation} docker compose -f docker-compose.prod.yml config --quiet",
+    "docker:config": "docker compose config --quiet && docker compose -f apps/backend/test/integration-runner/integration.compose.yml config --quiet && IMAGE_TAG=${IMAGE_TAG:-validation} docker compose -f docker-compose.staging.yml config --quiet && IMAGE_TAG=${IMAGE_TAG:-validation} docker compose -f docker-compose.prod.yml config --quiet",
     "docker:build": "pnpm docker:build:all:native"
   },
   "keywords": [],

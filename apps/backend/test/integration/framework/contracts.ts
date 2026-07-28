@@ -1,78 +1,62 @@
 import type { AppDatabase } from '../../../src/db/database.service';
-import type { UniRole } from '../../../src/auth/roles';
-import type { SessionData } from '../../../src/auth/session.decorator';
-import type { HttpTestClient, TestActor } from './http-test-client';
-import type { FlowState } from './flow-state';
-import type { SeedCollector, SeedManifest } from './seed/seed-manifest';
+import type { TestActor } from './http-test-client';
 
-export type StepDiagnostic = Readonly<Record<string, unknown>>;
+declare const flowKeyValue: unique symbol;
 
-export type StepExecution = {
-  readonly index: number;
+export type FlowKey<T> = {
   readonly name: string;
-  readonly elapsedMs: number;
-  readonly status: 'passed' | 'failed';
+  readonly [flowKeyValue]?: T;
 };
+
+export function flowKey<T>(name: string): FlowKey<T> {
+  return { name };
+}
 
 export interface FlowRuntime {
   readonly database: AppDatabase;
-  readonly http: HttpTestClient;
   createActor(name: string): TestActor;
-  authenticateMockActor?(
-    actor: TestActor,
-    session: SessionData,
-    universityRoles?: Readonly<Record<string, UniRole>>,
-  ): TestActor;
-  initialize?(): Promise<void>;
-  diagnostics?(): Promise<StepDiagnostic>;
-  close(): Promise<void>;
+  reset(): Promise<void>;
 }
 
-export type SeedDeclarationContext<TPlan> = {
+export type FlowSeedContext<TPlan> = {
   readonly plan: TPlan;
-  readonly seed: SeedCollector;
+  readonly database: AppDatabase;
+  publish<T>(key: FlowKey<T>, value: T): T;
 };
 
 export type StepContext<TPlan> = {
   readonly plan: TPlan;
   readonly runtime: FlowRuntime;
-  readonly state: FlowState;
-  readonly stepName: string;
-  readonly stepIndex: number;
   actor(name: string): TestActor;
-  require<T>(key: string): T;
+  require<T>(key: FlowKey<T>): T;
 };
 
 export interface IntegrationStep<TPlan, TOutput = void> {
   readonly name: string;
-  readonly outputKey?: string;
-  baseSeed(context: SeedDeclarationContext<TPlan>): void | Promise<void>;
+  readonly outputKey?: FlowKey<TOutput>;
   run(context: StepContext<TPlan>): Promise<TOutput>;
-  diagnostics?(): StepDiagnostic | Promise<StepDiagnostic>;
 }
+
+export type OutputIntegrationStep<TPlan, TOutput> = IntegrationStep<
+  TPlan,
+  TOutput
+> & {
+  readonly outputKey: FlowKey<TOutput>;
+};
 
 export type FlowDefinition<TPlan> = {
   readonly name: string;
   readonly plan: TPlan;
+  readonly seed?: (context: FlowSeedContext<TPlan>) => void | Promise<void>;
   readonly steps: readonly IntegrationStep<TPlan, unknown>[];
 };
 
-export type FlowRunResult = {
-  readonly flowName: string;
-  readonly seedManifest: SeedManifest;
-  readonly executions: readonly StepExecution[];
-  readonly outputs: Readonly<Record<string, { producer: string }>>;
-};
-
 export class FlowStepError extends Error {
-  cleanupFailure?: unknown;
-
   constructor(
     readonly flowName: string,
     readonly stepName: string,
     readonly stepIndex: number,
     readonly cause: unknown,
-    readonly details: StepDiagnostic,
   ) {
     super(
       `Flow "${flowName}" failed at step ${stepIndex + 1} "${stepName}": ${cause instanceof Error ? cause.message : String(cause)}`,

@@ -73,6 +73,7 @@ letsencrypt/
 # Testing
 coverage/
 .nyc_output/
+**/test-results/
 
 # macOS
 .DS_Store
