@@ -1,4 +1,3 @@
-import { moduleDTO } from "@/app/course-management/queries/modules/moduleBuilder";
 import { Button } from "@/components/atoms/baseShadcn/button";
 import {
   Table,
@@ -8,7 +7,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/atoms/baseShadcn/table";
-import CustomiseShell from "@/components/templates/customise/CustomiseShell";
 import {
   ColumnDef,
   flexRender,
@@ -27,6 +25,7 @@ import { CourseDTO } from "@/app/course-management/queries/courses/courseBuilder
 import { CourseSelect } from "./selectedCourse";
 import { useMutation } from "@tanstack/react-query";
 import { addModuleToCourseQ } from "@/app/course-management/queries/courses/courseQueries";
+import EditModuleEvent from "./editModuleEvent";
 
 interface DataTableProps<TData> {
   columns: (ColumnDef<TData, string> | ColumnDef<TData, EventResponse[]>)[];
@@ -34,6 +33,7 @@ interface DataTableProps<TData> {
 }
 
 export function ModuleTable<TData>({ columns, data }: DataTableProps<TData>) {
+  "use no memo";
   const table = useReactTable({
     data,
     columns,
@@ -53,11 +53,23 @@ export function ModuleTable<TData>({ columns, data }: DataTableProps<TData>) {
 
   const [showModPopup, updateModPopup] = useState(false);
 
-  const { mutate: addModuleToCourseMut } = useMutation(addModuleToCourseQ());
+  const {
+    mutate: addModuleToCourseMut,
+    isPending,
+    isSuccess,
+    isError,
+    reset,
+  } = useMutation(addModuleToCourseQ());
 
   function showUpdateMod(param: ModuleTableData) {
     updateModPopup(true);
     setDataState(param);
+    setSelectedCourse({
+      CourseID: "",
+      CourseName: "",
+      UniversityID: UserDetails.getUniDetails()?.UniversityID ?? "",
+    });
+    reset();
   }
 
   return (
@@ -69,35 +81,44 @@ export function ModuleTable<TData>({ columns, data }: DataTableProps<TData>) {
 
       {showModPopup && (
         <Popup>
-          <div className="w-3/4 items-center p-5 justify-center flex flex-col center h-9/10 bg-[var(--bg-surface)] h-fit">
-            <div className="flex flex-row items-center">
-              <Card className="w-fit h-fit">
-                <CourseSelect
-                  CourseState={selectedCourse}
-                  updateCourseState={setSelectedCourse}
+          <div className="w-full h-full flex flex-col items-center justify-center p-4">
+            <EditModuleEvent
+              data={dataState}
+              onClose={() => updateModPopup(false)}
+            />
+
+            <Card className="w-full max-w-2xl mt-4 p-4 border-[var(--border)] bg-[var(--bg-surface)] shadow-md">
+              <CourseSelect
+                CourseState={selectedCourse}
+                updateCourseState={setSelectedCourse}
+              >
+                <Button
+                  disabled={!selectedCourse.CourseID || isPending || isSuccess}
+                  onClick={() => {
+                    reset();
+                    addModuleToCourseMut({
+                      body: { modules: [dataState.modules.moduleID] },
+                      path: { CourseID: selectedCourse.CourseID },
+                    });
+                  }}
+                  className={`w-full mt-4 ${
+                    isSuccess
+                      ? "bg-[var(--success-bg)] text-[var(--success-text)]"
+                      : isError
+                        ? "bg-[var(--error-bg)] text-[var(--error-text)]"
+                        : ""
+                  }`}
                 >
-                  <Button
-                    onClick={() =>
-                      addModuleToCourseMut({
-                        body: { modules: [dataState.modules.moduleID] },
-                        path: { CourseID: selectedCourse.CourseID },
-                      })
-                    }
-                  >
-                    {" "}
-                    Add Module to Course
-                  </Button>
-                </CourseSelect>
-              </Card>
-              <CustomiseShell
-                modules={[dataState.modules]}
-                events={dataState.events}
-              />
-              <CreateEventAdmin module={dataState.modules} />
-            </div>
-            <Button className="w-1/10" onClick={() => updateModPopup(false)}>
-              Close
-            </Button>
+                  {isPending
+                    ? "Adding.."
+                    : isSuccess
+                      ? "Successfully Added Module to Course"
+                      : isError
+                        ? "Failed to Add Module To Course"
+                        : "Add Module to Course"}
+                </Button>
+              </CourseSelect>
+            </Card>
           </div>
         </Popup>
       )}
