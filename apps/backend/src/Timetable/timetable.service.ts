@@ -48,6 +48,11 @@ export class TimetableService {
           })
           .returning();
 
+        if (!newUserTimetable)
+          throw new InternalServerErrorException(
+            'User Timetable insert failed',
+          );
+
         const eventIds: string[] = [];
 
         if (dto.eventIds?.length) {

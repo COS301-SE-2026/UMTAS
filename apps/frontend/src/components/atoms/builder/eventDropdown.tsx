@@ -66,6 +66,7 @@ export function EventTypeDropdown({
       disabled={disabled}
     >
       <SelectTrigger
+        data-testid="event-Type-Select"
         className={[
           "h-10 w-full bg-[var(--bg-elevated)] border-[var(--border)]",
           "text-[var(--text-primary)] focus:ring-1 focus:ring-[var(--text-primary)]",

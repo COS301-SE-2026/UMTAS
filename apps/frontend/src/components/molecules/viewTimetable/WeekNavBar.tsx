@@ -38,28 +38,27 @@ export function WeekNavBar({
         <span className="text-sm font-medium text-[var(--text-primary)] px-2 whitespace-nowrap">
           {formatWeekRange(weekStart)}
         </span>
-
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          onClick={onNext}
-          className="h-8 w-8 shrink-0 border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
-        >
-          <ChevronRight size={16} strokeWidth={1.5} />
-        </Button>
+        <input
+          type="date"
+          value={dateString}
+          onChange={(e) => {
+            if (e.target.value) {
+              onDateChange(new Date(e.target.value));
+            }
+          }}
+          className="h-8 rounded-md border border-[var(--border)] bg-transparent px-2 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--ring)]"
+        />
       </div>
 
-      <input
-        type="date"
-        value={dateString}
-        onChange={(e) => {
-          if (e.target.value) {
-            onDateChange(new Date(e.target.value));
-          }
-        }}
-        className="h-8 w-full sm:w-auto rounded-md border border-[var(--border)] bg-transparent px-2 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--ring)]"
-      />
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        onClick={onNext}
+        className="h-8 w-8 border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+      >
+        <ChevronRight size={16} strokeWidth={1.5} />
+      </Button>
     </div>
   );
 }

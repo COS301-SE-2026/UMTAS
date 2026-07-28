@@ -15,6 +15,7 @@ import {
 import { UserDetails } from "@/lib/userclass/userClass";
 
 import Tutorial from "@/components/organisms/nav/Tutorial";
+import { University } from "lucide-react";
 const steps = [
   {
     target: "#institute-select",
@@ -77,6 +78,12 @@ export function InstituteSelector({ onClose }: InstituteSelectorProps) {
   }
 
   function handleConfirm() {
+    if (selectedInstitute?.role === null && selectedInstitute?.UniversityID) {
+      applyMut.mutate({
+        UniversityID: selectedInstitute?.UniversityID,
+        role: "STUDENT",
+      });
+    }
     UserDetails.storeUniDetails(selectedInstitute);
   }
 

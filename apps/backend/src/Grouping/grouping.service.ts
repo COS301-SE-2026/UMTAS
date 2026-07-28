@@ -1,5 +1,5 @@
 import {
-  BadRequestException,
+  NotFoundException,
   Injectable,
   InternalServerErrorException,
   forwardRef,
@@ -125,15 +125,14 @@ export class GroupingService {
       .where(eq(ModuleGrouping.GroupID, groupId))
       .limit(1);
 
+    if (!group) throw new NotFoundException(`Group[${groupId}] does not exist`);
+
     const modules = await db
       .select({
         ModuleID: GroupModules.ModuleID,
       })
       .from(GroupModules)
       .where(eq(GroupModules.GroupID, groupId));
-
-    if (!group)
-      throw new BadRequestException(`Group[${groupId}] does not exist`);
 
     return {
       ...group,
@@ -184,7 +183,7 @@ export class GroupingService {
       .returning();
 
     return {
-      GroupID: deletedGroup.GroupID,
+      GroupID: deletedGroup?.GroupID,
       success: !!deletedGroup,
     };
   } //END_deleteGroup

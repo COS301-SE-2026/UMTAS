@@ -186,6 +186,7 @@ export function GenerateStep({
 
                 <span className="flex-shrink-0 flex items-center justify-center">
                   <Checkbox
+                    data-testid="schedule-Timetable-Checkbox"
                     id={`event-${event.eventId}`}
                     checked={isEventChecked}
                     onCheckedChange={(checkedState) =>
@@ -228,9 +229,40 @@ export function GenerateStep({
   }
 
   return (
-    <div>
-      <div className="mx-auto w-full max-w-2xl px-4 py-4">
+    <div
+      data-testid="create-Schedule-Div"
+      className="mx-auto w-full max-w-2xl px-4 py-4 border rounded-xl border-[var(--border)] bg-[var(--bg-surface)]"
+    >
+      <div className="mb-8">
+        <h2 className="text-lg font-semibold text-[var(--text-primary)]">
+          Review and generate
+        </h2>
+        <p className="text-base text-[var(--text-secondary)] mt-1">
+          Check your events before generating your schedule.
+        </p>
+      </div>
+
+      <div className="mb-6 flex flex-col gap-2">
+        <Label
+          htmlFor="timetable-name"
+          className="text-sm font-medium text-[var(--text-secondary)]"
+        >
+          Schedule Name
+        </Label>
+        <Input
+          data-testid="schedule-Timetable-Input"
+          id="timetable-name"
+          value={timetableName}
+          onChange={(e) => setTimetableName(e.target.value)}
+          placeholder="e.g. Semester 1, 2024"
+          className="bg-[var(--bg-surface)] border-[var(--border)] text-[var(--text-primary)] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--ring)]"
+        />
+      </div>
+
+      {renderContent()}
+      <div className="flex justify-center mt-8">
         <Button
+          data-testid="schedules-Create-Btn"
           type="button"
           variant="ghost"
           size="default"

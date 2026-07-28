@@ -78,7 +78,10 @@ export function TimeSlotSelect({
           value={value.startTime}
           onValueChange={(v) => onChange({ ...value, startTime: v })}
         >
-          <SelectTrigger className={`${triggerClass} w-[84px]`}>
+          <SelectTrigger
+            data-testid="event-TimeStart-Select"
+            className={`${triggerClass} w-[84px]`}
+          >
             <SelectValue placeholder="Start" />
           </SelectTrigger>
           <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)] max-h-44">
@@ -101,7 +104,10 @@ export function TimeSlotSelect({
           value={value.endTime}
           onValueChange={(v) => onChange({ ...value, endTime: v })}
         >
-          <SelectTrigger className={`${triggerClass} w-[84px]`}>
+          <SelectTrigger
+            data-testid="event-TimeEnd-Select"
+            className={`${triggerClass} w-[84px]`}
+          >
             <SelectValue placeholder="End" />
           </SelectTrigger>
           <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)] max-h-44">

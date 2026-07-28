@@ -217,6 +217,7 @@ export class UniversityController {
 
   //Apply for univeristy role
   @Post('apply')
+  @Roles()
   @ApiOperation({
     summary: 'Apply for a role at a specific university',
     operationId: 'applyForUniverstiyRole',
