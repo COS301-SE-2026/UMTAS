@@ -12,7 +12,7 @@
     </div>
 
     ??? tip "**Use Case Diagram**"
-        ![](../diagrams/requirements/Lecturer_Adjustment.svg)
+        ![](../../diagrams/requirements/Lecturer_Adjustment.svg)
 
     ---
     ??? "UC-LA-01: Manage Event Details"
@@ -20,8 +20,8 @@
         ##### High Level
         ```
         Manage Event Details (Actor: Lecturer, System: Scheduling System)  
-        TUCBW the lecturer selects one or more events to modify.  
-        TUCEW the system allows the lecturer to update event details such as venue location, time, or cancel the event, and persists the changes in the timetable system while updating affected schedules.
+            TUCBW the lecturer selects one or more events to modify.  
+            TUCEW the system allows the lecturer to update event details such as venue location, time, or cancel the event, and persists the changes in the timetable system while updating affected schedules.
         ```
         ##### Expanded
         | Field | Detail |
@@ -58,8 +58,8 @@
         ##### High Level
         ```
         Assign Lecturers to Events/Modules (Actor: Lecturer/Admin, System: Academic Scheduling System)  
-        TUCBW the lecturer selects an event or module and chooses to assign additional lecturers.  
-        TUCEW the system updates the event/module with the assigned lecturers and ensures the changes are reflected across the scheduling and visibility systems.
+            TUCBW the lecturer selects an event or module and chooses to assign additional lecturers.  
+            TUCEW the system updates the event/module with the assigned lecturers and ensures the changes are reflected across the scheduling and visibility systems.
         ```
         ##### Expanded
         | Field | Detail |

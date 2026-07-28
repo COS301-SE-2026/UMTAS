@@ -21,16 +21,16 @@
         ##### High Level
         ```
         Create Event (Actor: University Admin, System: Event Management)
-        TUCBW a uni_admin creates an event via the API, PDF upload, or interface.
-        TUCEW a new event is created and available for the module.
+            TUCBW a uni_admin creates an event via the API, PDF upload, or interface.
+            TUCEW a new event is created and available for the module.
         ```
         ##### Expanded
         | Field | Detail |
         | :--- | :--- |
         | **Actor** | University Admin |
         | **Precondition** | Actor is an approved uni_admin for the university |
-        | **Trigger** | Uni_admin initiates event creation via API, PDF, or interface |
-        | **Basic Flow** | 1. Uni_admin selects an event creation method (API, PDF, or interface).<br>2. Uni_admin provides or uploads the event name, code, type, date, day of week, and times.<br>3. System validates the submitted details.<br>4. System creates the event for the module.<br>5. System confirms successful creation. |
+        | **Trigger** | Uni_admin initiates event creation via API, PDF, or builder |
+        | **Basic Flow** | 1. Uni_admin selects an event creation method (API, PDF, or builder).<br>2. Uni_admin provides or uploads the event name, code, type, date, day of week, and times.<br>3. System validates the submitted details.<br>4. System creates the event for the module.<br>5. System confirms successful creation. |
         | **Alternate Flow** | **A1: Duplicate Event**<br>System informs the uni_admin that an event with that code already exists for the module.<br><br>**A2: Invalid PDF/API Data**<br>System rejects the submission and reports which fields failed validation. |
         | **Postcondition** | Event is created and available under the module |
         | **Requirements Covered** | R4.3.1 |
@@ -41,8 +41,8 @@
         ##### High Level
         ```
         Delete Event (Actor: University Admin, System: Event Management)
-        TUCBW a uni_admin selects "Delete" on an existing event.
-        TUCEW the event is permanently removed from the module.
+            TUCBW a uni_admin selects "Delete" on an existing event.
+            TUCEW the event is permanently removed from the module.
         ```
         ##### Expanded
         | Field | Detail |

@@ -74,12 +74,12 @@
 
     <div class="uc-table" markdown>
 
-    ## Timetable Creation
+    ## Timetable Builder
     | **ID** | **Use Case** | **Group** | **Actor** | **Status** |
     |:---:|:---:|:---:|:---:|:---:|
-    | **UC-TC-01** | Create Modules | [Timetable Creation](#timetable-creation-id) | User |<span class="status-implemented">Implemented</span>|
-    | **UC-TC-02** | Create Events | [Timetable Creation](#timetable-creation-id) | User |<span class="status-implemented">Implemented</span>|
-    | **UC-TC-03** | Create Timetable | [Timetable Creation](#timetable-creation-id) | User |<span class="status-implemented">Implemented</span>|
+    | **UC-TC-01** | Create Modules | [Timetable Builder](#timetable-builder-id) | User |<span class="status-implemented">Implemented</span>|
+    | **UC-TC-02** | Create Events | [Timetable Builder](#timetable-builder-id) | User |<span class="status-implemented">Implemented</span>|
+    | **UC-TC-03** | Create Timetable | [Timetable Builder](#timetable-builder-id) | User |<span class="status-implemented">Implemented</span>|
     
     </div>
     <div class="uc-table" markdown>
@@ -99,7 +99,8 @@
     |:---:|:---:|:---:|:---:|:---:|
     | **UC-PDF-01** | Import Timetable from PDF | [PDF Import](#pdf-system) | User |<span class="status-implemented">Implemented</span>|
     | **UC-PDF-02** | Review Imported Timetable Data | [PDF Import](#pdf-system) | User |<span class="status-implemented">Implemented</span>|
-    
+    | **UC-PDF-02** | Verify Imported Data | [PDF Import](#pdf-system) | University Admin |<span class="status-implemented">Implemented</span>|   
+
     </div>
     <div class="uc-table" markdown>
 
@@ -194,8 +195,8 @@
 {% include-markdown "srs/Use_Cases/Events_Management.md" %}
 
 ---
-<!-- Timetable Creation -->
-{% include-markdown "srs/Use_Cases/Timetable_Creation.md" %}
+<!-- Timetable Builder -->
+{% include-markdown "srs/Use_Cases/Timetable_Builder.md" %}
 
 ---
 <!-- Timetable Management -->

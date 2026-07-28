@@ -10,7 +10,7 @@
     </div>
 
     ??? tip "**Use Case Diagram**"
-        ![](../diagrams/requirements/Alert_System.svg)
+        ![](../../diagrams/requirements/Alert_System.svg)
 
     ---
     ??? "UC-AL-01: Event Change Alerts"

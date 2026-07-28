@@ -1,5 +1,5 @@
-??? "**Timetable Creation Use Cases**"
-    <a id="timetable-creation-id"></a>
+??? "**Timetable Builder Use Cases**"
+    <a id="timetable-builder-id"></a>
 
     <div align="center">
 
@@ -13,17 +13,16 @@
     </div>
 
     ??? tip "**Use Case Diagram**"
-        ![](../../diagrams/requirements/Timetable_Creation.svg)
+        ![](../../diagrams/requirements/Timetable_Builder.svg)
 
     ---
     ??? "UC-TC-01: Create Modules"
         <a id="uc-tc-01"></a>
         ##### High Level
         ```
-        Create Modules (Actor: User, System: Timetable Builder or Internal Module Management)  
-        TUCBW the actor selects "Create Module".  
-        TUCEW the system creates and stores the module, linked either to the student’s personalized course or the institution’s official course catalog.
-
+        Create Modules (Actor: User, System: Timetable Builder)  
+            TUCBW the actor selects "Create Module".  
+            TUCEW the system creates and stores the module, linked either to the student’s personalized course or the institution’s official course catalog.
         ```
         ##### Expanded
         | Field | Detail |
@@ -43,8 +42,8 @@
         ##### High Level
         ```
         Create Events (Actor: User, System: Timetable Builder)  
-        TUCBW the user adds an event linked to a module and provides event details.  
-        TUCEW the system creates and stores the event within the timetable under the relevant module.
+            TUCBW the user adds an event linked to a module and provides event details.  
+            TUCEW the system creates and stores the event within the timetable under the relevant module.
         ```
         ##### Expanded
         | Field | Detail |
@@ -63,8 +62,8 @@
         ##### High Level
         ```
         Create Timetable (Actor: User, System: Timetable Builder)  
-        TUCBW the user starts a new timetable creation process and selects or defines required components.  
-        TUCEW the system creates a new timetable containing the selected modules and events and stores it under the user’s account.
+            TUCBW the user starts a new timetable creation process and selects or defines required components.  
+            TUCEW the system creates a new timetable containing the selected modules and events and stores it under the user’s account.
         ```
         ##### Expanded
         | Field | Detail |

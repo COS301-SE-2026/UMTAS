@@ -11,7 +11,7 @@
     </div>
 
     ??? tip "**Use Case Diagram**"
-        ![](../diagrams/requirements/Calendar_Exporting.svg)
+        ![](../../diagrams/requirements/Calendar_Exporting.svg)
 
     ---  
     ??? "UC-EX-01: Export Timetable as ICS File"

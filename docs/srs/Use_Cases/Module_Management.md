@@ -21,16 +21,16 @@
         ##### High Level
         ```
         Create Module (Actor: University Admin, System: Module Management)
-        TUCBW a uni_admin creates a module via the API, PDF upload, or interface.
-        TUCEW a new module is created and available for the university.
+            TUCBW a uni_admin creates a module via the API, PDF upload, or interface.
+            TUCEW a new module is created and available for the university.
         ```
         ##### Expanded
         | Field | Detail |
         | :--- | :--- |
         | **Actor** | University Admin |
         | **Precondition** | Actor is an approved uni_admin for the university |
-        | **Trigger** | Uni_admin initiates module creation via API, PDF, or interface |
-        | **Basic Flow** | 1. Uni_admin selects a module creation method (API, PDF, or interface).<br>2. Uni_admin provides or uploads the module name and code.<br>3. System validates the submitted details.<br>4. System creates the module for the university.<br>5. System confirms successful creation. |
+        | **Trigger** | Uni_admin initiates module creation via API, PDF, or builder |
+        | **Basic Flow** | 1. Uni_admin selects a module creation method (API, PDF, or builder).<br>2. Uni_admin provides or uploads the module name and code.<br>3. System validates the submitted details.<br>4. System creates the module for the university.<br>5. System confirms successful creation. |
         | **Alternate Flow** | **A1: Duplicate Module**<br>System informs the uni_admin that a module with that code already exists for the university.<br><br>**A2: Invalid PDF/API Data**<br>System rejects the submission and reports which fields failed validation. |
         | **Postcondition** | Module is created and available under the university |
         | **Requirements Covered** | R4.2.1 |
@@ -41,8 +41,8 @@
         ##### High Level
         ```
         Delete Module (Actor: University Admin, System: Module Management)
-        TUCBW a uni_admin selects "Delete" on an existing module.
-        TUCEW the module is permanently removed from the university.
+            TUCBW a uni_admin selects "Delete" on an existing module.
+            TUCEW the module is permanently removed from the university.
         ```
         ##### Expanded
         | Field | Detail |
@@ -61,8 +61,8 @@
         ##### High Level
         ```
         Modify Module (Actor: University Admin, System: Module Management)
-        TUCBW a uni_admin selects "Edit" on an existing module.
-        TUCEW the module's name, code, or events are updated.
+            TUCBW a uni_admin selects "Edit" on an existing module.
+            TUCEW the module's name, code, or events are updated.
         ```
         ##### Expanded
         | Field | Detail |

@@ -12,7 +12,7 @@
     </div>
 
     ??? tip "**Use Case Diagram**"
-        ![](../diagrams/requirements/Analytics_Dashboard.svg)
+        ![](../../diagrams/requirements/Analytics_Dashboard.svg)
 
     ---  
     ??? "UC-AN-01: View Attendance Analytics Dashboard"
@@ -20,8 +20,8 @@
         ##### High Level
         ```
         View Attendance Analytics Dashboard (Actor: University Admin / Lecturer, System: Analytics Engine)  
-        TUCBW the user opens the analytics dashboard for a selected module or dataset.  
-        TUCEW the system displays aggregated attendance insights, including submitted students, actual attendance, and projected attendance for the selected context, with interactive breakdowns by time slot.
+            TUCBW the user opens the analytics dashboard for a selected module or dataset.  
+            TUCEW the system displays aggregated attendance insights, including submitted students, actual attendance, and projected attendance for the selected context, with interactive breakdowns by time slot.
         ```
         ##### Expanded
         | Field | Detail |
@@ -40,8 +40,8 @@
         ##### High Level
         ```
         Explore Venue and Booking Analytics (Actor: University Admin / Lecturer, System: Analytics Engine)  
-        TUCBW the user selects spatial or temporal usage analytics within the system.  
-        TUCEW the system presents venue heatmaps and booking trend visualisations over time, allowing the user to explore usage patterns across locations and dates.
+            TUCBW the user selects spatial or temporal usage analytics within the system.  
+            TUCEW the system presents venue heatmaps and booking trend visualisations over time, allowing the user to explore usage patterns across locations and dates.
         ```
         ##### Expanded
         | Field | Detail |

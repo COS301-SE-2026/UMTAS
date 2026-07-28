@@ -12,7 +12,7 @@
 
 
     ??? tip "**Use Case Diagram**"
-        ![](../diagrams/requirements/Attendance_Recording.svg)
+        ![](../../diagrams/requirements/Attendance_Recording.svg)
 
     ---  
     ??? "UC-AR-01: Indicate Attendance Intent for Event"

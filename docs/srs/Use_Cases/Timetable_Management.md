@@ -12,7 +12,7 @@
     </div>
 
     ??? tip "**Use Case Diagram**"
-        ![](../diagrams/requirements/Timetable_Management.svg)
+        ![](../../diagrams/requirements/Timetable_Management.svg)
 
     ---
     ??? "UC-TM-01: View Timetable"
@@ -20,8 +20,8 @@
         ##### High Level
         ```
         View Timetable (Actor: User, System: Timetable Management)
-        TUCBW the user opens the timetable section and selects a saved timetable.
-        TUCEW the system displays the selected timetable, including modules and events, and supports calendar, weekly, and summary views.
+            TUCBW the user opens the timetable section and selects a saved timetable.
+            TUCEW the system displays the selected timetable, including modules and events, and supports calendar, weekly, and summary views.
         ```
         ##### Expanded
         | Field | Detail |
@@ -40,8 +40,8 @@
         ##### High Level
         ```
         Edit Timetable (Actor: User, System: Timetable Management)
-        TUCBW the user selects a timetable and enters edit mode.
-        TUCEW the system allows modification of modules and events, including names, codes, times, venues, and days, and saves the updated timetable.
+            TUCBW the user selects a timetable and enters edit mode.
+            TUCEW the system allows modification of modules and events, including names, codes, times, venues, and days, and saves the updated timetable.
         ```
         ##### Expanded
         | Field | Detail |
@@ -60,8 +60,8 @@
         ##### High Level
         ```
         Delete Timetable (Actor: User, System: Timetable Management)
-        TUCBW the user selects a timetable and confirms deletion.
-        TUCEW the system removes the timetable without affecting related modules or events.
+            TUCBW the user selects a timetable and confirms deletion.
+            TUCEW the system removes the timetable without affecting related modules or events.
         ```
         ##### Expanded
         | Field | Detail |

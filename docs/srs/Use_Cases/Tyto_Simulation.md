@@ -12,7 +12,7 @@
     </div>
 
     ??? tip "**Use Case Diagram**"
-        ![](../diagrams/requirements/Tyto_Simulation.svg)
+        ![](../../diagrams/requirements/Tyto_Simulation.svg)
 
     ---
     ??? "UC-TY-01: Run Simulation Batch"

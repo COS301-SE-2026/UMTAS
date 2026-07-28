@@ -10,7 +10,7 @@
     </div>
 
     ??? tip "**Use Case Diagram**"
-        ![](../diagrams/requirements/API_System.svg)
+        ![](../../diagrams/requirements/API_System.svg)
 
     ---
     ??? "UC-API-01: Import Timetable from API"
