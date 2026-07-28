@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - feat/health-points
+      - fix/scrub-url
     tags:
       - "v*"
   pull_request:
@@ -138,7 +139,7 @@ jobs:
     name: Build & Push Staging Images
     runs-on: ubuntu-latest
     needs: ci
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' || github.ref == 'refs/heads/main'
     environment:
       name: staging
     permissions:
@@ -219,7 +220,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Deploy to Staging
     needs: docker-staging
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' || github.ref == 'refs/heads/main'
     environment:
       name: production
     permissions: {}
