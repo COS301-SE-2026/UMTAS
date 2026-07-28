@@ -387,6 +387,7 @@ export function ScheduleView({
                 </Button>
 
                 <Button
+                  data-testid="schedules-Delete-Btn"
                   type="button"
                   className="h-7 px-3 text-xs bg-[var(--destructive)] text-[var(--text-primary)] border-[var(--border)] hover:opacity-90"
                   onClick={deleteDialog}
@@ -411,6 +412,7 @@ export function ScheduleView({
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
                   <AlertDialogAction
+                    data-testid="Schedules-ConfirmDelete-Btn"
                     onClick={deleteTimetableByID}
                     variant="destructive"
                   >

@@ -129,6 +129,13 @@ test("Create schedule", async ({ page }) => {
   // page did change schedule created successfully
 });
 
+test("Delete schedule", async ({ page }) => {
+  await page.goto("/schedules");
+  await page.getByTestId("schedules-Delete-Btn").click();
+  await page.getByTestId("Schedules-ConfirmDelete-Btn").click();
+  await expect(page).toHaveScreenshot("Schedules-deleted.png");
+});
+
 test("Delete module", async ({ page }) => {
   await page.goto("/builder");
   const targetModule = page
