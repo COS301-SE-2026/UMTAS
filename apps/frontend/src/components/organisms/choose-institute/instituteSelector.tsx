@@ -16,6 +16,7 @@ import { UserDetails } from "@/lib/userclass/userClass";
 import { useRouter } from "next/navigation";
 
 import Tutorial from "@/components/organisms/nav/Tutorial";
+import { University } from "lucide-react";
 const steps = [
   {
     target: "#institute-select",
@@ -54,6 +55,7 @@ export function InstituteSelector({ onClose }: InstituteSelectorProps) {
   const { data: uniList, isLoading: uniLoading } = useQuery(getAllUni());
   const applyMut = useMutation(applyMutator());
   const selectUniMut = useMutation(selectUniMutator());
+  console.log(uniList);
 
   function updateSelectedUni(id: string) {
     const nUni = uniList?.universities.find((uni) => uni.UniversityID === id);
@@ -70,6 +72,15 @@ export function InstituteSelector({ onClose }: InstituteSelectorProps) {
   }
 
   function handleConfirm() {
+    if (
+      selectedInstitute?.role === undefined &&
+      selectedInstitute?.UniversityID
+    ) {
+      applyMut.mutate({
+        UniversityID: selectedInstitute?.UniversityID,
+        role: "STUDENT",
+      });
+    }
     UserDetails.storeUniDetails(selectedInstitute);
   }
   const applyDisabled =

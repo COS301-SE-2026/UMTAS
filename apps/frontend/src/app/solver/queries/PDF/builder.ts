@@ -5,7 +5,7 @@ import {
 } from "../../../../../utilities/request";
 import { UserDetails } from "@/lib/userclass/userClass";
 
-export type uploadPDF = paths["/pdf-parser/jobs/upload"]["post"];
+export type uploadPDF = paths["/api/pdf-parser/jobs/upload"]["post"];
 export type uploadPDFBody =
   uploadPDF["requestBody"]["content"]["multipart/form-data"];
 export type tempUploadPDFbody = {
@@ -49,7 +49,7 @@ export async function uploadPdfBuilder(
   return res.json();
 }
 
-export type PDFjobLookup = paths["/pdf-parser/jobs/lookup"]["post"];
+export type PDFjobLookup = paths["/api/pdf-parser/jobs/lookup"]["post"];
 export type PDFjobLookupBody =
   PDFjobLookup["requestBody"]["content"]["application/json"];
 export type PDFjobLookupRes =
@@ -67,7 +67,7 @@ export class PDFjobLookupBuilder extends RequestBuilder<
   }
 }
 
-export type PDFjobStatus = paths["/pdf-parser/jobs/{jobId}"]["get"];
+export type PDFjobStatus = paths["/api/pdf-parser/jobs/{jobId}"]["get"];
 export type PDFjobStatusParams = PDFjobStatus["parameters"]["path"];
 
 export type PDFjobStatusRes =
