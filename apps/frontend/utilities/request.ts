@@ -8,7 +8,8 @@ export function createUrl(url: string) {
       : process.env.NEXT_PUBLIC_API_URL) || "http://localhost:3000";
   const cleanBase = baseUrl.replace(/\/$/, "");
   const cleanPath = (url as string).replace(/^\//, "");
-  if (!url.includes("/api")) {
+
+  if (!cleanBase.includes("/api")) {
     return `${cleanBase + "/api"}/${cleanPath}`;
   } else {
     return `${cleanBase}/${cleanPath}`;
@@ -63,8 +64,11 @@ export class RequestBuilder<
   protected setUrl(url: ApiPath): this {
     this.url = createUrl(url);
 
-    // Automatically set Origin header in Node.js environments for CORS/CSRF
+    console.log(this.url); // remove this
+    if (this.url.includes("/api/api")) {
+    }
     if (typeof window === "undefined") {
+      // Automatically set Origin header in Node.js environments for CORS/CSRF
       this.headers["Origin"] = cleanBase();
     }
 
