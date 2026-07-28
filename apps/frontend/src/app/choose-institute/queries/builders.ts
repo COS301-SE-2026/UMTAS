@@ -4,7 +4,7 @@ import { RequestMethod, RequestBuilder } from "../../../../utilities/request";
 export type uniDto = components["schemas"]["UniversityDto"];
 export type uniDtoRoles = components["schemas"]["UniversityDto"]["role"];
 export type getallUnis =
-  paths["/universities"]["get"]["responses"]["200"]["content"]["application/json"];
+  paths["/api/universities"]["get"]["responses"]["200"]["content"]["application/json"];
 
 export class getallUnisBuilder extends RequestBuilder<
   undefined,
@@ -18,9 +18,9 @@ export class getallUnisBuilder extends RequestBuilder<
 }
 
 export type applyRes =
-  paths["/universities/apply"]["post"]["responses"]["201"]["content"]["application/json"];
+  paths["/api/universities/apply"]["post"]["responses"]["201"]["content"]["application/json"];
 export type applyBody =
-  paths["/universities/apply"]["post"]["requestBody"]["content"]["application/json"];
+  paths["/api/universities/apply"]["post"]["requestBody"]["content"]["application/json"];
 
 export class applyUniBuilder extends RequestBuilder<
   undefined,
@@ -46,6 +46,6 @@ export class selectUniBuilder extends RequestBuilder<
 > {
   constructor() {
     super();
-    this.setUrl("/api/auth/select-university").setMethod(RequestMethod.POST);
+    this.setUrl("/auth/select-university").setMethod(RequestMethod.POST);
   }
 }

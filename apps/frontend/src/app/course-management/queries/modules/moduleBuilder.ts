@@ -6,7 +6,7 @@ import {
 import { createModuleRes } from "@/app/builder/utils/modules/requestBuilders";
 
 export type moduleDTO = components["schemas"]["ModuleSingleResponseDto"];
-export type getAllModules = paths["/modules"]["get"];
+export type getAllModules = paths["/api/modules"]["get"];
 
 export type getAllModulesQueries = getAllModules["parameters"]["query"];
 export type getAllModulesRes =
@@ -20,7 +20,7 @@ export async function fetchAllModules(
       ? process.env.API_URL
       : process.env.NEXT_PUBLIC_API_URL) || "http://localhost:3000";
 
-  const path: keyof paths = "/modules";
+  const path = "/api/modules";
 
   const searchParams = new URLSearchParams();
 
@@ -68,7 +68,7 @@ export async function fetchAllModules(
   }
 }
 
-type updateModule = paths["/modules/{moduleId}"]["patch"];
+type updateModule = paths["/api/modules/{moduleId}"]["patch"];
 export type updateModulePath = updateModule["parameters"]["path"];
 export type updateModuleBody =
   updateModule["requestBody"]["content"]["application/json"];
@@ -86,7 +86,7 @@ export class updateModuleBuilder extends RequestBuilder<
   }
 }
 
-type updateModStyling = paths["/modules/styling/{moduleId}"]["post"];
+type updateModStyling = paths["/api/modules/styling/{moduleId}"]["post"];
 export type updateModStylingPath = updateModStyling["parameters"]["path"];
 export type updateModStylingBody =
   updateModStyling["requestBody"]["content"]["application/json"];
@@ -105,7 +105,7 @@ export class updateStylingBuilder extends RequestBuilder<
   }
 }
 
-type createModule = paths["/modules"]["post"];
+type createModule = paths["/api/modules"]["post"];
 
 export type CreateModuleBody =
   createModule["requestBody"]["content"]["application/json"];
