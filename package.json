@@ -7,8 +7,6 @@
     "test": "turbo run test",
     "test:unit": "turbo run test --filter=!./apps/e2e -- --coverage",
     "test:integration": "pnpm --filter backend test:integration",
-    "fixture:pdf-solver": "pnpm --filter backend fixture:pdf-solver",
-    "fixture:pdf-solver:verify": "pnpm --filter backend fixture:pdf-solver:verify",
     "dev": "turbo run dev --filter=!pdf-parser-worker --filter=!solver-worker",
     "dev:infra": "WORKER_BACKEND_URL=http://host.docker.internal:3000 docker compose --profile dev-infra up -d postgres redis minio mailhog pdf-parser-worker solver-worker",
     "dev:monitor": "docker compose --profile dev-docker --profile monitoring up --build",

@@ -1,3 +1,4 @@
+import { writeFile } from "node:fs/promises";
 import {
   HttpCallbackClient,
   createWorkerHost,
@@ -54,6 +55,7 @@ const workerOptions: WorkerHostOptions<PdfParseJobData> = {
 if (tempRoot) workerOptions.tempRoot = tempRoot;
 
 const worker = createWorkerHost<PdfParseJobData>(workerOptions);
+void markWorkerReady();
 
 worker.on("completed", (job) => {
   console.info("PDF parse job completed", { jobId: job.id });
@@ -76,6 +78,15 @@ worker.on("failed", (job, error) => {
 
 process.on("SIGTERM", handleShutdown);
 process.on("SIGINT", handleShutdown);
+
+async function markWorkerReady(): Promise<void> {
+  await worker.waitUntilReady();
+  const readyFile = process.env.WORKER_READY_FILE;
+  if (readyFile) {
+    await writeFile(readyFile, "ready\n");
+  }
+  console.info("PDF parser worker ready", { queueName });
+}
 
 function handleShutdown(): void {
   worker

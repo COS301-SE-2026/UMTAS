@@ -21,8 +21,6 @@
     "test": "clear && jest",
     "test:integration": "node --import tsx test/integration-runner/run.ts",
     "test:integration:typecheck": "tsc -p test/integration-runner/tsconfig.json --noEmit",
-    "fixture:pdf-solver": "node --import tsx test/fixtures/pdf-solver-fixture.ts --regenerate",
-    "fixture:pdf-solver:verify": "node --import tsx test/fixtures/pdf-solver-fixture.ts",
     "test:watch": "jest --watch",
     "test:cov": "clear && jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
