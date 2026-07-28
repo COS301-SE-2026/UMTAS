@@ -1,5 +1,7 @@
 import { paths } from "@/lib/api";
 import {
+  ApiPath,
+  createUrl,
   RequestBuilder,
   RequestMethod,
 } from "../../../../../utilities/request";
@@ -39,10 +41,9 @@ export async function uploadPdfBuilder(
   );
   formData.append("fingerprintAlgorithm", "pdf-stream-payload-sha256-v1");
 
-  let path = "/pdf-parser/jobs/upload";
-  if (!baseUrl.includes("/api")) path = "/api" + path;
+  const path: ApiPath = "/pdf-parser/jobs/upload";
 
-  const res = await fetch(`${baseUrl}${path}`, {
+  const res = await fetch(createUrl(path), {
     method: "POST",
     body: formData,
     credentials: "include",
