@@ -13,7 +13,9 @@ export async function getAllEventsAdmin(
       ? process.env.API_URL
       : process.env.NEXT_PUBLIC_API_URL) || "http://localhost:3000";
 
-  const path = "/api/events";
+  let path = "/events";
+
+  if (!baseUrl.includes("/api")) path = "/api" + path;
 
   const searchParams = new URLSearchParams({ moduleId });
 

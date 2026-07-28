@@ -39,7 +39,10 @@ export async function uploadPdfBuilder(
   );
   formData.append("fingerprintAlgorithm", "pdf-stream-payload-sha256-v1");
 
-  const res = await fetch(`${baseUrl}/api/pdf-parser/jobs/upload`, {
+  let path = "/pdf-parser/jobs/upload";
+  if (!baseUrl.includes("/api")) path = "/api" + path;
+
+  const res = await fetch(`${baseUrl}${path}`, {
     method: "POST",
     body: formData,
     credentials: "include",

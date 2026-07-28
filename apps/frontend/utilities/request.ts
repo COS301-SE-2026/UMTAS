@@ -44,7 +44,11 @@ export class RequestBuilder<
         : process.env.NEXT_PUBLIC_API_URL) || "http://localhost:3000";
     const cleanBase = baseUrl.replace(/\/$/, "");
     const cleanPath = (url as string).replace(/^\//, "");
-    this.url = `${cleanBase + "/api"}/${cleanPath}`;
+    if (!url.includes("/api")) {
+      this.url = `${cleanBase + "/api"}/${cleanPath}`;
+    } else {
+      this.url = `${cleanBase}/${cleanPath}`;
+    }
 
     // Automatically set Origin header in Node.js environments for CORS/CSRF
     if (typeof window === "undefined") {
