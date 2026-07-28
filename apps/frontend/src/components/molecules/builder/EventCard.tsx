@@ -92,6 +92,7 @@ export function EventCard({
         onValueChange={(v) => onUpdate(event.eventId, "moduleId", v)}
       >
         <SelectTrigger
+          data-testid="event-Module-Select"
           className={getInputClass(!!errors?.moduleId) + " w-full"}
         >
           <SelectValue placeholder="Select a Module" />
@@ -136,7 +137,10 @@ export function EventCard({
   }
 
   return (
-    <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.08)]">
+    <div
+      data-testid="event-card-div"
+      className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.08)]"
+    >
       <div className="flex flex-col gap-4 p-4">
         {/* name */}
         <div className="flex flex-col gap-2">
@@ -147,6 +151,7 @@ export function EventCard({
             Name
           </Label>
           <Input
+            data-testid="event-Name-Input"
             id={"event-name-" + event.eventId}
             value={event.eventName || ""}
             onChange={(e) =>
@@ -169,6 +174,7 @@ export function EventCard({
             Code
           </Label>
           <Input
+            data-testid="event-Code-Input"
             id={"event-code-" + event.eventId}
             value={event.activityCode || ""}
             onChange={(e) =>
@@ -263,6 +269,7 @@ export function EventCard({
             </Select>
           ) : (
             <Input
+              data-testid="event-Date-Input"
               id={"event-date-" + event.eventId}
               type="date"
               value={event.eventCriteria?.date || ""}

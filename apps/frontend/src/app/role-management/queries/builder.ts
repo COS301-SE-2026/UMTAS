@@ -2,7 +2,7 @@ import { components, paths } from "@/lib/api";
 import { RequestBuilder, RequestMethod } from "../../../../utilities/request";
 
 export type getAllApplications =
-  paths["/universities/applications/{universityID}"]["post"];
+  paths["/api/universities/applications/{universityID}"]["post"];
 
 export type getAllApplicationsPath = getAllApplications["parameters"]["path"];
 export type getAllApplicationsRes =
@@ -41,7 +41,7 @@ export class getAllApplicationsBuilder extends RequestBuilder<
   }
 }
 
-export type approveApplications = paths["/universities/approve"]["post"];
+export type approveApplications = paths["/api/universities/approve"]["post"];
 export type approveApplicationsBody =
   approveApplications["requestBody"]["content"]["application/json"];
 export type approveApplicationsRes =

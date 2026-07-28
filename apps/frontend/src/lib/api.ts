@@ -4,7 +4,7 @@
  */
 
 export interface paths {
-  "/": {
+  "/api": {
     parameters: {
       query?: never;
       header?: never;
@@ -329,7 +329,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/health": {
+  "/api/health": {
     parameters: {
       query?: never;
       header?: never;
@@ -345,7 +345,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/health/check": {
+  "/api/health/check": {
     parameters: {
       query?: never;
       header?: never;
@@ -361,7 +361,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/modules": {
+  "/api/modules": {
     parameters: {
       query?: never;
       header?: never;
@@ -385,7 +385,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/modules/{moduleId}": {
+  "/api/modules/{moduleId}": {
     parameters: {
       query?: never;
       header?: never;
@@ -413,7 +413,7 @@ export interface paths {
     patch: operations["updateModule"];
     trace?: never;
   };
-  "/modules/enroll/{moduleId}": {
+  "/api/modules/enroll/{moduleId}": {
     parameters: {
       query?: never;
       header?: never;
@@ -430,7 +430,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/modules/{CourseID}": {
+  "/api/modules/{CourseID}": {
     parameters: {
       query?: never;
       header?: never;
@@ -447,7 +447,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/modules/styling/{moduleId}": {
+  "/api/modules/styling/{moduleId}": {
     parameters: {
       query?: never;
       header?: never;
@@ -467,7 +467,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/Courses": {
+  "/api/Courses": {
     parameters: {
       query?: never;
       header?: never;
@@ -484,7 +484,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/Courses/getAll": {
+  "/api/Courses/getAll": {
     parameters: {
       query?: never;
       header?: never;
@@ -501,7 +501,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/Courses/{CourseId}": {
+  "/api/Courses/{CourseId}": {
     parameters: {
       query?: never;
       header?: never;
@@ -520,7 +520,7 @@ export interface paths {
     patch: operations["updateCourse"];
     trace?: never;
   };
-  "/universities": {
+  "/api/universities": {
     parameters: {
       query?: never;
       header?: never;
@@ -538,7 +538,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/universities/{universityId}": {
+  "/api/universities/{universityId}": {
     parameters: {
       query?: never;
       header?: never;
@@ -557,7 +557,7 @@ export interface paths {
     patch: operations["updateUniversity"];
     trace?: never;
   };
-  "/universities/role/{universityId}": {
+  "/api/universities/role/{universityId}": {
     parameters: {
       query?: never;
       header?: never;
@@ -574,7 +574,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/universities/applications/{universityID}": {
+  "/api/universities/applications/{universityID}": {
     parameters: {
       query?: never;
       header?: never;
@@ -591,7 +591,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/universities/apply": {
+  "/api/universities/apply": {
     parameters: {
       query?: never;
       header?: never;
@@ -611,7 +611,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/universities/approve": {
+  "/api/universities/approve": {
     parameters: {
       query?: never;
       header?: never;
@@ -631,7 +631,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/grouping/{groupId}": {
+  "/api/grouping/{groupId}": {
     parameters: {
       query?: never;
       header?: never;
@@ -655,7 +655,7 @@ export interface paths {
     patch: operations["populateGroup"];
     trace?: never;
   };
-  "/events": {
+  "/api/events": {
     parameters: {
       query?: never;
       header?: never;
@@ -673,7 +673,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/events/{eventId}": {
+  "/api/events/{eventId}": {
     parameters: {
       query?: never;
       header?: never;
@@ -690,7 +690,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/events/{id}": {
+  "/api/events/{id}": {
     parameters: {
       query?: never;
       header?: never;
@@ -708,7 +708,7 @@ export interface paths {
     patch: operations["updateEvent"];
     trace?: never;
   };
-  "/timetables": {
+  "/api/timetables": {
     parameters: {
       query?: never;
       header?: never;
@@ -726,7 +726,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/timetables/{id}": {
+  "/api/timetables/{id}": {
     parameters: {
       query?: never;
       header?: never;
@@ -745,7 +745,7 @@ export interface paths {
     patch: operations["updateTimetable"];
     trace?: never;
   };
-  "/builder": {
+  "/api/builder": {
     parameters: {
       query?: never;
       header?: never;
@@ -769,7 +769,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/builder/{moduleId}": {
+  "/api/builder/{moduleId}": {
     parameters: {
       query?: never;
       header?: never;
@@ -797,7 +797,7 @@ export interface paths {
     patch: operations["builder-updateModule"];
     trace?: never;
   };
-  "/pdf-parser/jobs/lookup": {
+  "/api/pdf-parser/jobs/lookup": {
     parameters: {
       query?: never;
       header?: never;
@@ -817,7 +817,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/pdf-parser/jobs/upload": {
+  "/api/pdf-parser/jobs/upload": {
     parameters: {
       query?: never;
       header?: never;
@@ -837,7 +837,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/pdf-parser/jobs/{jobId}": {
+  "/api/pdf-parser/jobs/{jobId}": {
     parameters: {
       query?: never;
       header?: never;
@@ -857,7 +857,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/pdf-parser/jobs/{jobId}/result": {
+  "/api/pdf-parser/jobs/{jobId}/result": {
     parameters: {
       query?: never;
       header?: never;
@@ -877,7 +877,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/pdf-parser/jobs/{jobId}/callback": {
+  "/api/pdf-parser/jobs/{jobId}/callback": {
     parameters: {
       query?: never;
       header?: never;
@@ -894,7 +894,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/solver/jobs": {
+  "/api/solver/jobs": {
     parameters: {
       query?: never;
       header?: never;
@@ -911,7 +911,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/solver/jobs/{jobId}/input": {
+  "/api/solver/jobs/{jobId}/input": {
     parameters: {
       query?: never;
       header?: never;
@@ -928,7 +928,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/solver/jobs/{jobId}": {
+  "/api/solver/jobs/{jobId}": {
     parameters: {
       query?: never;
       header?: never;
@@ -945,7 +945,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/solver/jobs/{jobId}/result": {
+  "/api/solver/jobs/{jobId}/result": {
     parameters: {
       query?: never;
       header?: never;
@@ -962,7 +962,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/solver/jobs/{jobId}/callback": {
+  "/api/solver/jobs/{jobId}/callback": {
     parameters: {
       query?: never;
       header?: never;
@@ -979,7 +979,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/attendance": {
+  "/api/attendance": {
     parameters: {
       query?: never;
       header?: never;
@@ -997,7 +997,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/attendance/{attendanceId}": {
+  "/api/attendance/{attendanceId}": {
     parameters: {
       query?: never;
       header?: never;

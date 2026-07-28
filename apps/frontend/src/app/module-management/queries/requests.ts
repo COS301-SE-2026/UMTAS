@@ -1,6 +1,6 @@
 import { paths } from "@/lib/api";
 
-type getAllEvents = paths["/events"]["get"];
+type getAllEvents = paths["/api/events"]["get"];
 export type getAllEventsQueries = getAllEvents["parameters"]["query"];
 export type getAllEventsRes =
   getAllEvents["responses"]["200"]["content"]["application/json"]["events"];
@@ -13,7 +13,7 @@ export async function getAllEventsAdmin(
       ? process.env.API_URL
       : process.env.NEXT_PUBLIC_API_URL) || "http://localhost:3000";
 
-  const path: keyof paths = "/events";
+  const path = "/api/events";
 
   const searchParams = new URLSearchParams({ moduleId });
 
