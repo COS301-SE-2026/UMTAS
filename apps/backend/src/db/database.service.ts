@@ -5,7 +5,7 @@ import {
   OnModuleDestroy,
   Optional,
 } from '@nestjs/common';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 import { sql } from 'drizzle-orm';
 import { drizzle as drizzleNodePg } from 'drizzle-orm/node-postgres';
 import { migrate as migrateNodePg } from 'drizzle-orm/node-postgres/migrator';
@@ -92,7 +92,10 @@ export class DatabaseService
   }
 
   private async migrate(): Promise<void> {
-    const migrationsFolder = join(process.cwd(), 'drizzle');
+    const configuredMigrationsPath = process.env.MIGRATIONS_PATH;
+    const migrationsFolder = configuredMigrationsPath
+      ? resolve(configuredMigrationsPath)
+      : join(process.cwd(), 'drizzle');
 
     if (this.dbMode === DB_MODES.PGLITE) {
       await migratePglite(this.db as PgliteDatabase<Record<string, unknown>>, {

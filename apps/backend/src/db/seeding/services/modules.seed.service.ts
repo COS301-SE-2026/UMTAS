@@ -12,13 +12,17 @@ import {
   ModuleGrouping,
   modules,
   GroupModules,
-  CourseModule,
   usersTable,
   ModuleStyling,
 } from '../../../entities';
+import { SeedPersistenceService } from '../seed-persistence.service';
 
 @Injectable()
 export class ModuleSeedService extends BaseSeedService {
+  constructor(private readonly persistence: SeedPersistenceService) {
+    super();
+  }
+
   async seed(tx: DatabaseService['db']): Promise<void> {
     await this.seedComputerScienceModules(tx);
   } //END_seed
@@ -70,44 +74,38 @@ export class ModuleSeedService extends BaseSeedService {
       const groupId = course.GroupID;
 
       //Create new modules
-      const newModules = await tx
-        .insert(modules)
-        .values(
-          missingModules.map((mod) => ({
-            moduleCode: mod.Code,
-            moduleName: mod.Name,
-            moduleDescription: mod.Description,
-          })),
-        )
-        .returning();
+      const newModules = await this.persistence.insertModules(
+        tx,
+        missingModules.map((mod) => ({
+          moduleCode: mod.Code,
+          moduleName: mod.Name,
+          moduleDescription: mod.Description,
+        })),
+      );
 
       if (newModules.length > 0) {
         //Populate CompSci's group with modules
-        const groupModules = await tx
-          .insert(GroupModules)
-          .values(
-            newModules.map((mod) => ({
-              GroupID: groupId,
-              ModuleID: mod.moduleID,
-            })),
-          )
-          .returning();
+        const groupModules = await this.persistence.insertGroupModules(
+          tx,
+          newModules.map((mod) => ({
+            GroupID: groupId,
+            ModuleID: mod.moduleID,
+          })),
+        );
 
         this.logResult('GroupModules', groupModules?.length ?? 0);
 
         //Add courseModule metadata for each
-        const courseModules = await tx
-          .insert(CourseModule)
-          .values(
-            groupModules.map((gm, index) => ({
-              CourseID: course.CourseID,
-              GroupModuleID: gm.GroupModuleID,
-              Core: missingModules[index].Core,
-              SemesterOfStudy: missingModules[index].SemesterOfStudy,
-              YearOfStudy: missingModules[index].YearOfStudy,
-            })),
-          )
-          .returning();
+        const courseModules = await this.persistence.insertCourseModules(
+          tx,
+          groupModules.map((gm, index) => ({
+            CourseID: course.CourseID,
+            GroupModuleID: gm.GroupModuleID,
+            Core: missingModules[index].Core,
+            SemesterOfStudy: missingModules[index].SemesterOfStudy,
+            YearOfStudy: missingModules[index].YearOfStudy,
+          })),
+        );
 
         this.logResult('CourseModules', courseModules?.length ?? 0);
       } else {
@@ -179,10 +177,10 @@ export class ModuleSeedService extends BaseSeedService {
     } //END_user
 
     //Insert all styling objects
-    const moduleStylings = await tx
-      .insert(ModuleStyling)
-      .values(stylingObjects)
-      .returning();
+    const moduleStylings = await this.persistence.insertModuleStylings(
+      tx,
+      stylingObjects,
+    );
 
     this.logResult('ModuleStyling', moduleStylings.length);
   } //END_generateRandomStylingForModules

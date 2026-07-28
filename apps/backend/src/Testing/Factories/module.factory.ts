@@ -7,7 +7,7 @@ type Module = typeof modules.$inferSelect;
 const MODULE_CODE: string = 'COS332';
 const MODULE_NAME: string = 'Networks';
 const MODULE_DESCRIPTION: string = 'It is about networks, duh';
-const STYLING: { colour: string } = { colour: `#TEST` };
+const STYLING: { colour: string } = { colour: '#3366CC' };
 
 //create a module
 export function createModule(overrides: Partial<Module> = {}): Module {

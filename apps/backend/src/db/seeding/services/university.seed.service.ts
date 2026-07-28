@@ -2,11 +2,16 @@ import { Injectable } from '@nestjs/common';
 
 import { DatabaseService } from '../../database.service';
 import { BaseSeedService } from '../base.seed.service';
-import { University, UniversityRole, usersTable } from '../../../entities';
+import { University, usersTable } from '../../../entities';
 import { eq } from 'drizzle-orm';
+import { SeedPersistenceService } from '../seed-persistence.service';
 
 @Injectable()
 export class UniversitySeedService extends BaseSeedService {
+  constructor(private readonly persistence: SeedPersistenceService) {
+    super();
+  }
+
   async seed(tx: DatabaseService['db']): Promise<void> {
     //University names to seed
     const uniNames = this.constants.UniversityNames;
@@ -24,10 +29,10 @@ export class UniversitySeedService extends BaseSeedService {
     //Seed missingNames into University table
     if (missingNames.length > 0) {
       //Seed only missing names
-      const uniSeed = await tx
-        .insert(University)
-        .values(missingNames.map((name) => ({ UniversityName: name })))
-        .returning();
+      const uniSeed = await this.persistence.insertUniversities(
+        tx,
+        missingNames.map((name) => ({ UniversityName: name })),
+      );
 
       //Log amount of Unis successfully seeded
       this.logResult('Universities', uniSeed.length);
@@ -44,11 +49,13 @@ export class UniversitySeedService extends BaseSeedService {
             ),
           );
 
-        await tx.insert(UniversityRole).values({
-          UniversityID: uniSeed[0].UniversityID,
-          UserID: uniAdmin.id,
-          role: 'UNIVERSITY_ADMIN',
-        });
+        await this.persistence.insertUniversityRoles(tx, [
+          {
+            UniversityID: uniSeed[0].UniversityID,
+            UserID: uniAdmin.id,
+            role: 'UNIVERSITY_ADMIN',
+          },
+        ]);
       }
     } //END_check for missing names
     else {

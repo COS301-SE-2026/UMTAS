@@ -5,10 +5,15 @@ import { DatabaseService } from '../../database.service';
 import { eq, inArray, and } from 'drizzle-orm';
 
 //Tables
-import { Course, ModuleGrouping, University } from '../../../entities';
+import { Course, University } from '../../../entities';
+import { SeedPersistenceService } from '../seed-persistence.service';
 
 @Injectable()
 export class CourseSeedService extends BaseSeedService {
+  constructor(private readonly persistence: SeedPersistenceService) {
+    super();
+  }
+
   async seed(tx: DatabaseService['db']): Promise<void> {
     //If course exists -> grouping should exist
     const courseNames = this.constants.CourseNames;
@@ -49,25 +54,21 @@ export class CourseSeedService extends BaseSeedService {
 
     if (missingCourses.length > 0) {
       //First create groups for the courses
-      const groups = await tx
-        .insert(ModuleGrouping)
-        .values(
-          missingCourses.map(() => ({
-            Hash: null,
-          })),
-        )
-        .returning();
+      const groups = await this.persistence.insertGroupings(
+        tx,
+        missingCourses.map(() => ({
+          Hash: null,
+        })),
+      );
 
       //seed in missing courses
-      const courses = await tx
-        .insert(Course)
-        .values(
-          missingCourses.map((course, index) => ({
-            ...course,
-            GroupID: groups[index].GroupID,
-          })),
-        )
-        .returning();
+      const courses = await this.persistence.insertCourses(
+        tx,
+        missingCourses.map((course, index) => ({
+          ...course,
+          GroupID: groups[index].GroupID,
+        })),
+      );
 
       this.logResult('Courses', courses.length);
     } else {
