@@ -2,5 +2,5 @@
 
 
 <figure markdown="span">
-  <img src="../deployment/CICD.svg" alt="CICD Diagram" width="800">
+  <img src="../CICD.svg" alt="CICD Diagram" width="800">
 </figure>
