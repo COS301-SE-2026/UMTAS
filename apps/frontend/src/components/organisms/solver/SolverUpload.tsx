@@ -110,7 +110,7 @@ export default function SolverUpload({
   }
 
   return (
-    <Card className="shadow-lg border-[var(--border)] rounded-xl bg-[var(--bg-surface)]">
+    <Card className="shadow-lg border-[var(--border)] rounded-xl bg-[var(--bg-surface)] w-full h-full flex flex-col">
       <CardHeader>
         <CardTitle className="text-xl font-bold text-[var(--text-primary)]">
           Upload your timetable PDF
@@ -120,7 +120,7 @@ export default function SolverUpload({
         Upload your PDF file here to start the timetable creation process
       </CardDescription>
 
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-6 flex-1">
         <div className="border-2 border-dashed border-[var(--border)] rounded-lg p-20 flex flex-col items-center justify-center gap-4 bg-[var(--bg-base)] text-[var(--text-secondary)]">
           <p className="text-sm text-center font-mono leading-relaxed">
             {!selectedFile && (
