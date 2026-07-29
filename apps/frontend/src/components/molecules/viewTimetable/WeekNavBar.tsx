@@ -23,19 +23,19 @@ export function WeekNavBar({
   const dateString = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, "0")}-${String(selectedDate.getDate()).padStart(2, "0")}`;
 
   return (
-    <div className="flex items-center gap-3 mb-4">
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        onClick={onPrev}
-        className="h-8 w-8 border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
-      >
-        <ChevronLeft size={16} strokeWidth={1.5} />
-      </Button>
+    <div className="flex flex-col sm:flex-row items-center gap-3 mb-4">
+      <div className="flex items-center gap-3">
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={onPrev}
+          className="h-8 w-8 shrink-0 border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+        >
+          <ChevronLeft size={16} strokeWidth={1.5} />
+        </Button>
 
-      <div className="flex items-center gap-3 px-2">
-        <span className="text-sm font-medium text-[var(--text-primary)]">
+        <span className="text-sm font-medium text-[var(--text-primary)] px-2 whitespace-nowrap">
           {formatWeekRange(weekStart)}
         </span>
         <input

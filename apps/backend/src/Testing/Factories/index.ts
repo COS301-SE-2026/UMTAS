@@ -6,6 +6,7 @@ export * from './jobs.factory';
 export * from './module.factory';
 export * from './relationships.factory';
 export * from './session.factory';
-export * from './timetable.factory';
 export * from './user.factory';
 export * from './university.factory';
+export * from './attendance.factory';
+export * from './timetable.factory';

@@ -75,7 +75,7 @@ const SESSION_EXAMPLE = {
 
 const AUTH_RESPONSE_EXAMPLE = { user: USER_EXAMPLE, session: SESSION_EXAMPLE };
 
-@Controller('api/auth')
+@Controller('auth')
 @ApiExtraModels(AuthEnvelopeDto)
 export class AuthController {
   private readonly logger = new Logger(AuthController.name);
@@ -201,6 +201,16 @@ export class AuthController {
     @Req() req: IncomingMessage,
     @Res() res: ServerResponse,
   ): Promise<void> {
+    console.log('GET-SESSION IN:', req.headers.cookie);
+    const end = res.end.bind(res);
+    res.end = ((c?: any, ...r: any[]) => {
+      console.log(
+        'GET-SESSION OUT:',
+        res.statusCode,
+        c?.toString()?.slice(0, 120),
+      );
+      return end(c, ...r);
+    }) as typeof res.end;
     return this.handleRequest(req, res);
   }
 
@@ -501,7 +511,18 @@ export class AuthController {
     if (!this.hasGoogleOAuth()) {
       throw new NotFoundException('Google OAuth is not configured');
     }
+    this.logger.log(
+      `Callback cookies: ${JSON.stringify(req.headers.cookie ?? 'NONE')}`,
+    );
     this.logger.log('Google OAuth callback received');
+    res.on('finish', () =>
+      console.log(
+        'SET-COOKIE:',
+        res.getHeader('set-cookie'),
+        '| LOC:',
+        res.getHeader('location'),
+      ),
+    );
     return this.handleRequest(req, res);
   }
 
@@ -726,7 +747,6 @@ export class AuthController {
   ): Promise<void> {
     return this.handleRequest(req, res);
   }
-
   private async handleRequest(
     req: IncomingMessage,
     res: ServerResponse,
@@ -735,24 +755,18 @@ export class AuthController {
       const auth = this.authService.getAuth();
       const nodeHandler = toNodeHandler(auth.handler);
 
-      this.logger.log(`Auth request: ${req.method} ${req.url}`);
-
       await nodeHandler(req, res);
-
-      if (res.statusCode >= 400) {
-        this.logger.warn(
-          `Auth request failed: ${req.method} ${req.url} -> Status ${res.statusCode}`,
-        );
-      }
     } catch (error) {
-      this.logger.error(
-        `Auth handler exception: ${error instanceof Error ? error.message : String(error)}`,
-        error instanceof Error ? error.stack : undefined,
-      );
       if (!res.headersSent) {
         res.statusCode = 500;
         res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify({ error: 'Internal server error' }));
+        res.end(
+          JSON.stringify({
+            error: 'Internal server error',
+            errorDetails:
+              error instanceof Error ? error.message : String(error),
+          }),
+        );
       }
     }
   }

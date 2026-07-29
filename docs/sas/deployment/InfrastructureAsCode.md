@@ -14,4 +14,3 @@ Managing infrastructure as code through Docker Compose ensures strict reproducib
 | **Traefik v3.6** | Reverse Proxy & SSL Termination | Global Ingress(For now) |
 | **Docker Compose** | Declarative Orchestration | All Environments |
 | **Justfile** | Automation & Task Runner | CI/CD & Local Dev |
-| **Watchtower** | Automated Image Pulling & Restarts | Staging Only |

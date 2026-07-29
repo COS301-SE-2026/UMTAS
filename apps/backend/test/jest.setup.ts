@@ -73,4 +73,89 @@ jest.mock('better-auth/crypto', () => ({
   verifyPassword: jest.fn(() => Promise.resolve(true)),
 }));
 
+jest.mock('shared-types', () => ({
+  ActivityType: {
+    LECTURE: 'lecture',
+    TUTORIAL: 'tutorial',
+    PRAC: 'prac',
+    TEST: 'test',
+    EXAM: 'exam',
+  },
+  ActivityTypeSchema: {
+    options: ['lecture', 'tutorial', 'prac', 'test', 'exam'],
+    parse: (data: any) => data,
+    safeParse: (data: any) => ({ success: true, data }),
+  },
+  EventSource: {
+    UNIVERSITY: 'university',
+    PERSONAL: 'personal',
+  },
+  SolverPreferences: {
+    parse: (data: any) => data,
+  },
+  SolverInput: {
+    parse: (data: any) => data,
+  },
+  SolverResult: {
+    parse: (data: any) => data,
+  },
+  PdfParserResult: {
+    parse: (data: any) => data,
+  },
+  PdfParseJobData: {
+    parse: (data: any) => data,
+  },
+  TimetableSolveJobData: {
+    parse: (data: any) => data,
+  },
+  WorkerCallbackError: {
+    parse: (data: any) => data,
+  },
+  ParsedEventCandidate: {
+    parse: (data: any) => data,
+  },
+  ParsedModuleCandidate: {
+    parse: (data: any) => data,
+  },
+  PdfParserCallbackPayload: {
+    parse: (data: any) => data,
+  },
+  SolverCallbackPayload: {
+    parse: (data: any) => data,
+  },
+  PdfStreamFingerprintResult: {
+    parse: (data: any) => data,
+  },
+  Sha256Hash: {
+    parse: (data: any) => data,
+  },
+  computePdfStreamFingerprint: jest.fn(),
+  PDF_STREAM_FINGERPRINT_ALGORITHM_VERSION: '1',
+  PdfParserCallbackPayloadSchema: {
+    parse: (data: any) => data,
+  },
+  SolverCallbackPayloadSchema: {
+    parse: (data: any) => data,
+  },
+  SolverPreferencesSchema: {
+    parse: (data: any) => data,
+  },
+  SolverInputSchema: {
+    parse: (data: any) => data,
+  },
+  SolverEngine: {
+    CP_SAT: 'CP_SAT',
+    GA: 'GA',
+  },
+  DayOfWeek: {
+    MONDAY: 'monday',
+    TUESDAY: 'tuesday',
+    WEDNESDAY: 'wednesday',
+    THURSDAY: 'thursday',
+    FRIDAY: 'friday',
+    SATURDAY: 'saturday',
+    SUNDAY: 'sunday',
+  },
+}));
+
 export {};

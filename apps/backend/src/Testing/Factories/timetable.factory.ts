@@ -1,12 +1,42 @@
-import { randomUUID } from 'node:crypto';
+import { randomUUID } from 'crypto';
 import { Timetable } from '../../entities';
+import {
+  CreateTimetableDto,
+  UpdateTimetableDto,
+} from '../../Timetable/dto/timetable.dto';
 
-export function createTimetable(
-  overrides: Partial<typeof Timetable.$inferInsert> = {},
-): typeof Timetable.$inferInsert {
+const TIMETABLE_NAME: string = 'TEST_TIMETABLE_NAME';
+
+type Timetable = typeof Timetable.$inferSelect;
+
+export function createTimetable(overrides: Partial<Timetable> = {}): Timetable {
   return {
     timetableID: randomUUID(),
-    timetableName: 'Integration Timetable',
+    timetableName: TIMETABLE_NAME,
+
     ...overrides,
   };
-}
+} //END_createTimetable
+
+export function createCreateTimetableDto(
+  overrides: Partial<CreateTimetableDto> = {},
+): CreateTimetableDto {
+  return {
+    timetableName: TIMETABLE_NAME,
+    eventIds: [randomUUID(), randomUUID()],
+
+    ...overrides,
+  };
+} //END_createCreateTimetableDto
+
+export function createUpdateTimetableDto(
+  overrides: Partial<UpdateTimetableDto> = {},
+): UpdateTimetableDto {
+  return {
+    timetableName: TIMETABLE_NAME,
+    addEventIds: [randomUUID()],
+    removeEventIds: [randomUUID()],
+
+    ...overrides,
+  };
+} //END_createUpdateTimetableDto

@@ -16,9 +16,20 @@ import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+  app.setGlobalPrefix('api', {
+    exclude: ['metrics'],
+  });
+  app.use((req: Request, _res: Response, next: () => void) => {
+    console.log('REQ:', req.method, req.originalUrl);
+    next();
+  });
+
+  app.set('trust proxy', 1);
   app.useStaticAssets(join(__dirname, '..', 'public'));
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   const port = process.env.PORT ?? 3000;
+  console.log(`[STARTUP] Starting UMTAS API on port ${port}...`);
 
   app.enableCors({
     origin: [
@@ -46,7 +57,7 @@ async function bootstrap() {
     })
     .addBearerAuth(undefined, 'bearer')
     .addServer(`http://localhost:${port}`, 'Local development')
-    .addServer('https://api.capstone-vigil.dns.net.za', 'Production')
+    .addServer('https://capstone-vigil.dns.net.za', 'Production')
     .addTag('Health', 'System health checks')
     .addTag('Auth Email', 'Email-based authentication and account management')
     .addTag('Auth Google', 'Google OAuth and account linking')
@@ -77,8 +88,9 @@ async function bootstrap() {
     `[STARTUP] Swagger docs available at http://localhost:${port}/api/docs`,
   );
   console.log(`[STARTUP] Listening on port ${port}`);
+  // console.log(process.env); // everything
 
-  await app.listen(port);
+  await app.listen(port, '0.0.0.0');
 }
 
 bootstrap().catch((err) => {

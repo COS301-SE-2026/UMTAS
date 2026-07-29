@@ -336,7 +336,7 @@ export function ScheduleView({
     }
 
     return (
-      <div className="flex flex-col gap-3">
+      <div data-testid="schedules-Calendar-Div" className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <div className="w-64">
             <Select
@@ -369,7 +369,7 @@ export function ScheduleView({
           <EmptySchedule />
         ) : (
           <div className="flex flex-col">
-            <div className="flex flex-row justify-between items-center w-full">
+            <div className="flex flex-col md:flex-row justify-between items-center w-full gap-2 md:gap-0">
               <WeekNavBar
                 selectedDate={selectedDate}
                 onDateChange={setSelectedDate}
@@ -377,7 +377,7 @@ export function ScheduleView({
                 onPrev={handlePrevWeek}
                 onNext={handleNextWeek}
               />
-              <div className="flex flex-row justify-end gap-1">
+              <div className="flex flex-row justify-center md:justify-end w-full md:w-auto gap-2 mb-4 md:mb-0">
                 <Button
                   type="button"
                   className="h-7 px-3 text-xs bg-[var(--bg-surface)] text-[var(--text-primary)] border-[var(--border)] hover:opacity-90"
@@ -387,6 +387,7 @@ export function ScheduleView({
                 </Button>
 
                 <Button
+                  data-testid="schedules-Delete-Btn"
                   type="button"
                   className="h-7 px-3 text-xs bg-[var(--destructive)] text-[var(--text-primary)] border-[var(--border)] hover:opacity-90"
                   onClick={deleteDialog}
@@ -411,6 +412,7 @@ export function ScheduleView({
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
                   <AlertDialogAction
+                    data-testid="Schedules-ConfirmDelete-Btn"
                     onClick={deleteTimetableByID}
                     variant="destructive"
                   >

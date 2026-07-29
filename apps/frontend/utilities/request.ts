@@ -1,5 +1,34 @@
 import { paths } from "../src/lib/api";
 
+// url is something like /universities
+export function createUrl(url: string) {
+  const baseUrl =
+    (typeof window === "undefined"
+      ? process.env.API_URL
+      : process.env.NEXT_PUBLIC_API_URL) || "http://localhost:3000";
+  const cleanBase = baseUrl.replace(/\/$/, "");
+  const cleanPath = (url as string).replace(/^\//, "");
+
+  if (!cleanBase.includes("/api")) {
+    return `${cleanBase + "/api"}/${cleanPath}`;
+  } else {
+    return `${cleanBase}/${cleanPath}`;
+  }
+}
+
+export function cleanBase() {
+  const baseUrl =
+    (typeof window === "undefined"
+      ? process.env.API_URL
+      : process.env.NEXT_PUBLIC_API_URL) || "http://localhost:3000";
+  return baseUrl.replace(/\/$/, "");
+}
+
+type SwaggerPathKeys = Extract<keyof paths, string>;
+export type ApiPath = SwaggerPathKeys extends `/api${infer Rest}`
+  ? Rest
+  : SwaggerPathKeys;
+
 enum RequestMethod {
   GET = "GET",
   POST = "POST",
@@ -32,18 +61,14 @@ export class RequestBuilder<
     "Content-Type": "application/json",
   };
 
-  protected setUrl(url: keyof paths): this {
-    const baseUrl =
-      (typeof window === "undefined"
-        ? process.env.API_URL
-        : process.env.NEXT_PUBLIC_API_URL) || "http://localhost:3000";
-    const cleanBase = baseUrl.replace(/\/$/, "");
-    const cleanPath = (url as string).replace(/^\//, "");
-    this.url = `${cleanBase}/${cleanPath}`;
+  protected setUrl(url: ApiPath): this {
+    this.url = createUrl(url);
 
-    // Automatically set Origin header in Node.js environments for CORS/CSRF
+    if (this.url.includes("/api/api")) {
+    }
     if (typeof window === "undefined") {
-      this.headers["Origin"] = cleanBase;
+      // Automatically set Origin header in Node.js environments for CORS/CSRF
+      this.headers["Origin"] = cleanBase();
     }
 
     return this;
@@ -76,7 +101,7 @@ export class RequestBuilder<
       return;
     }
 
-    const response = await fetch(`${apiUrl}/api/auth/sign-in/email`, {
+    const response = await fetch(`${createUrl("/auth/sign-in/email")}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

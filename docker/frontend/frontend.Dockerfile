@@ -9,9 +9,7 @@ COPY apps/frontend/package.json ./apps/frontend/
 RUN pnpm install --frozen-lockfile
 
 FROM deps AS build
-ARG API_URL=http://backend:8000
-ENV API_URL=${API_URL}
-ARG NEXT_PUBLIC_API_URL=http://localhost:3001
+ARG NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 COPY packages/shared-types/ ./packages/shared-types/
 COPY apps/frontend/ ./apps/frontend/
@@ -22,11 +20,12 @@ FROM node:22-alpine AS runtime
 WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
 COPY --from=build /app/apps/frontend/.next/standalone ./
 COPY --from=build /app/apps/frontend/.next/static ./apps/frontend/.next/static
 COPY --from=build /app/apps/frontend/public ./apps/frontend/public
 EXPOSE 3000
 USER node
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
-  CMD ["node", "-e", "const os=require('os');const ip=Object.values(os.networkInterfaces()).flat().find((a)=>a.family==='IPv4'&&!a.internal)?.address;if(!ip) process.exit(1);require('http').get('http://'+ip+':'+process.env.PORT+'/api/health',r=>process.exit(r.statusCode>=200&&r.statusCode<300?0:1)).on('error',()=>process.exit(1))"]
+  CMD ["node", "-e", "require('http').get('http://127.0.0.1:'+process.env.PORT+'/login',r=>process.exit(r.statusCode<400?0:1)).on('error',()=>process.exit(1))"]
 CMD ["node", "apps/frontend/server.js"]

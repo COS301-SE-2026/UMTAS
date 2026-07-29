@@ -50,9 +50,11 @@ export function createEventVenueRecord(
   };
 }
 
+type UserTimetableRecord = typeof UserTimetable.$inferSelect;
+
 export function createUserTimetable(
-  overrides: Partial<typeof UserTimetable.$inferInsert> = {},
-): typeof UserTimetable.$inferInsert {
+  overrides: Partial<UserTimetableRecord> = {},
+): UserTimetableRecord {
   return {
     UserTimetableID: randomUUID(),
     UserID: randomUUID(),

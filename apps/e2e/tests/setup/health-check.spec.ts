@@ -9,7 +9,7 @@ test.describe("Full Stack Health Check", () => {
   });
 
   test("backend health endpoint is reachable", async ({ request }) => {
-    const response = await request.get("http://localhost:3000/health");
+    const response = await request.get("http://localhost:3000/api/health");
     expect(response.ok()).toBeTruthy();
     const data = await response.json();
     expect(data).toEqual({ status: "ok" });

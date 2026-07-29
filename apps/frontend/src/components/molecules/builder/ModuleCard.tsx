@@ -35,7 +35,10 @@ export function ModuleCard({ module, onUpdate, errors }: ModuleCardProps) {
   }
 
   return (
-    <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.08)]">
+    <div
+      data-testid="mod-container-div"
+      className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.08)]"
+    >
       {/* fields */}
       <div className="grid grid-cols-1 gap-4 p-4 sm:grid-cols-2">
         {/* module code */}
@@ -47,6 +50,7 @@ export function ModuleCard({ module, onUpdate, errors }: ModuleCardProps) {
             Code
           </Label>
           <Input
+            data-testid="mod-Code-Input"
             id={"module-code-" + module.moduleID}
             value={module.moduleCode}
             onChange={(e) =>
@@ -72,6 +76,7 @@ export function ModuleCard({ module, onUpdate, errors }: ModuleCardProps) {
             Name
           </Label>
           <Input
+            data-testid="mod-Name-Input"
             id={"module-name-" + module.moduleID}
             value={module.moduleName}
             onChange={(e) =>
