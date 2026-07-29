@@ -13,7 +13,11 @@ COPY packages/shared-types/ ./packages/shared-types/
 COPY apps/backend/ ./apps/backend/
 RUN pnpm --filter=shared-types build
 RUN pnpm --filter=backend build
-RUN pnpm --filter=backend deploy --prod --legacy /deploy && cp -r apps/backend/dist /deploy/dist && cp -r apps/backend/drizzle /deploy/drizzle
+RUN pnpm --filter=backend deploy --prod --legacy /deploy \
+    && cp -r apps/backend/dist /deploy/dist \
+    && cp -r apps/backend/drizzle /deploy/drizzle \
+    && mkdir -p /deploy/src/mail \
+    && cp -r apps/backend/src/mail/templates /deploy/src/mail/templates
 
 FROM node:22-alpine AS runtime
 WORKDIR /app

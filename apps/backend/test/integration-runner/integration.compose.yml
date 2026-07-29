@@ -13,15 +13,19 @@ services:
   postgres:
     image: postgres:15-alpine
     environment:
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME:-umtas_integration}
+      POSTGRES_USER: ${DB_USER:-umtas_integration}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-integration-postgres-password}
     volumes:
       - postgres-data:/var/lib/postgresql/data
     networks:
       - integration
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U ${DB_USER} -d ${DB_NAME}']
+      test:
+        [
+          'CMD-SHELL',
+          'pg_isready -U ${DB_USER:-umtas_integration} -d ${DB_NAME:-umtas_integration}',
+        ]
       interval: 2s
       timeout: 3s
       retries: 30
@@ -31,13 +35,20 @@ services:
     command:
       - redis-server
       - --requirepass
-      - ${REDIS_PASSWORD}
+      - ${REDIS_PASSWORD:-integration-redis-password}
     volumes:
       - redis-data:/data
     networks:
       - integration
     healthcheck:
-      test: ['CMD', 'redis-cli', '-a', '${REDIS_PASSWORD}', 'ping']
+      test:
+        [
+          'CMD',
+          'redis-cli',
+          '-a',
+          '${REDIS_PASSWORD:-integration-redis-password}',
+          'ping',
+        ]
       interval: 2s
       timeout: 3s
       retries: 30
@@ -46,8 +57,8 @@ services:
     image: minio/minio:RELEASE.2023-10-25T06-33-25Z
     command: server /data
     environment:
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-integration-minio}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-integration-minio-password}
     volumes:
       - minio-data:/data
     networks:
@@ -71,18 +82,18 @@ services:
       PORT: '3000'
       NODE_ENV: test
       DB_MODE: DATABASE
-      DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
+      DATABASE_URL: postgresql://${DB_USER:-umtas_integration}:${DB_PASSWORD:-integration-postgres-password}@postgres:5432/${DB_NAME:-umtas_integration}
       SEED: 'FALSE'
-      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-integration-better-auth-secret-at-least-32-characters}
       BETTER_AUTH_URL: http://backend:3000/api/auth
       BETTER_AUTH_TRUSTED_ORIGINS: http://backend:3000
       CORS_ORIGIN: http://backend:3000
       NEXT_PUBLIC_APP_URL: http://backend:3000
-      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
-      WORKER_CALLBACK_TOKEN: ${WORKER_CALLBACK_TOKEN}
+      REDIS_URL: redis://:${REDIS_PASSWORD:-integration-redis-password}@redis:6379
+      WORKER_CALLBACK_TOKEN: ${WORKER_CALLBACK_TOKEN:-integration-worker-callback-token}
       MINIO_ENDPOINT: http://minio:9000
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-integration-minio}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-integration-minio-password}
       MINIO_BUCKET: umtas-uploads
       SMTP_HOST: mailhog
       SMTP_PORT: '1025'
@@ -117,12 +128,12 @@ services:
     init: true
     environment:
       NODE_ENV: test
-      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
+      REDIS_URL: redis://:${REDIS_PASSWORD:-integration-redis-password}@redis:6379
       WORKER_BACKEND_URL: http://backend:3000
-      WORKER_CALLBACK_TOKEN: ${WORKER_CALLBACK_TOKEN}
+      WORKER_CALLBACK_TOKEN: ${WORKER_CALLBACK_TOKEN:-integration-worker-callback-token}
       MINIO_ENDPOINT: http://minio:9000
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-integration-minio}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-integration-minio-password}
       MINIO_BUCKET: umtas-uploads
       PDF_PARSE_CLI_COMMAND: python3
       PDF_PARSE_CLI_CWD: /app/python
@@ -156,9 +167,9 @@ services:
     init: true
     environment:
       NODE_ENV: test
-      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
+      REDIS_URL: redis://:${REDIS_PASSWORD:-integration-redis-password}@redis:6379
       WORKER_BACKEND_URL: http://backend:3000
-      WORKER_CALLBACK_TOKEN: ${WORKER_CALLBACK_TOKEN}
+      WORKER_CALLBACK_TOKEN: ${WORKER_CALLBACK_TOKEN:-integration-worker-callback-token}
       SOLVER_CLI_COMMAND: /app/bin/solver-cli
       WORKER_READY_FILE: /tmp/umtas-worker/solver-ready
     networks:
@@ -191,12 +202,12 @@ services:
       DB_MODE: DATABASE
       FULL_STACK_BACKEND_URL: http://backend:3000
       FULL_STACK_MAILHOG_URL: http://mailhog:8025
-      DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
-      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
-      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      DATABASE_URL: postgresql://${DB_USER:-umtas_integration}:${DB_PASSWORD:-integration-postgres-password}@postgres:5432/${DB_NAME:-umtas_integration}
+      REDIS_URL: redis://:${REDIS_PASSWORD:-integration-redis-password}@redis:6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-integration-redis-password}
       MINIO_ENDPOINT: http://minio:9000
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-integration-minio}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-integration-minio-password}
       MINIO_BUCKET: umtas-uploads
     volumes:
       - ./test-results:/workspace/apps/backend/test/integration-runner/test-results
