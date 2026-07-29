@@ -15,6 +15,11 @@
     ??? tip "**Use Case Diagram**"
         ![](../../diagrams/requirements/Timetable_Management.svg)
 
+    ??? warning "**Traceability Matrix**"
+        <div align="center">
+        ![](./Traceability_Matrix/FR2_1.svg)
+        </div>
+
     ---
     ??? "UC-TM-01: View Timetable"
         <a id="uc-tm-01"></a>

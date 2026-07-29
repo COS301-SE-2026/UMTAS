@@ -15,6 +15,11 @@
     ??? tip "**Use Case Diagram**"
         ![](../../diagrams/requirements/University_Role.svg)
 
+    ??? warning "**Traceability Matrix**"
+        <div align="center">
+        ![](./Traceability_Matrix/FR4_4.svg)
+        </div>
+
     ---
     ??? "UC-UNI-01: Apply for Role"
         <a id="uc-uni-01"></a>

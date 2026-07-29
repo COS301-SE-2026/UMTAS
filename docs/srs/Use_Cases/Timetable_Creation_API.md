@@ -12,6 +12,11 @@
     ??? tip "**Use Case Diagram**"
         ![](../../diagrams/requirements/API_System.svg)
 
+    ??? warning "**Traceability Matrix**"
+        <div align="center">
+        ![](./Traceability_Matrix/FR2_4.svg)
+        </div>
+
     ---
     ??? "UC-API-01: Import Timetable from API"
         <a id="uc-api-01"></a>

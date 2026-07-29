@@ -15,6 +15,11 @@
     ??? tip "**Use Case Diagram**"
         ![](../../diagrams/requirements/Module_Management.svg)
 
+    ??? warning "**Traceability Matrix**"
+        <div align="center">
+        ![](./Traceability_Matrix/FR4_2.svg)
+        </div>
+
     ---
     ??? "UC-MM-01: Create Module"
         <a id="uc-mm-01"></a>

@@ -15,6 +15,11 @@
     ??? tip "**Use Case Diagram**"
         ![](../../diagrams/requirements/Timetable_Builder.svg)
 
+    ??? warning "**Traceability Matrix**"
+        <div align="center">
+        ![](./Traceability_Matrix/FR2_2.svg)
+        </div>
+
     ---
     ??? "UC-TC-01: Create Modules"
         <a id="uc-tc-01"></a>

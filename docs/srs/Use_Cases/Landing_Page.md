@@ -15,6 +15,11 @@
     ??? tip "**Use Case Diagram**"
         ![](../../diagrams/requirements/Landing_Page.svg)
 
+    ??? warning "**Traceability Matrix**"
+        <div align="center">
+        ![](./Traceability_Matrix/FR1_1.svg)
+        </div>
+
     ---
     ??? "UC-LP-01: Visit Landing Page"
         <a id="uc-lp-01"></a>

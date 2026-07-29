@@ -14,6 +14,11 @@
     ??? tip "**Use Case Diagram**"
         ![](../../diagrams/requirements/PDF_System.svg)
 
+    ??? warning "**Traceability Matrix**"
+        <div align="center">
+        ![](./Traceability_Matrix/FR2_3.svg)
+        </div>
+
     ---
     ??? "UC-PDF-01: Import Timetable from PDF"
         <a id="uc-pdf-01"></a>

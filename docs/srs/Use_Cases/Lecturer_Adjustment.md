@@ -14,6 +14,11 @@
     ??? tip "**Use Case Diagram**"
         ![](../../diagrams/requirements/Lecturer_Adjustment.svg)
 
+    ??? warning "**Traceability Matrix**"
+        <div align="center">
+        ![](./Traceability_Matrix/FR3_2.svg)
+        </div>
+
     ---
     ??? "UC-LA-01: Manage Event Details"
         <a id="uc-la-01"></a>

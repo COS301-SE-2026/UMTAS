@@ -14,6 +14,11 @@
     ??? tip "**Use Case Diagram**"
         ![](../../diagrams/requirements/Analytics_Dashboard.svg)
 
+    ??? warning "**Traceability Matrix**"
+        <div align="center">
+        ![](./Traceability_Matrix/FR3_1.svg)
+        </div>
+
     ---  
     ??? "UC-AN-01: View Attendance Analytics Dashboard"
         <a id="uc-an-01"></a>

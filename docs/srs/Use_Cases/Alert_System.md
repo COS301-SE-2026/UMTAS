@@ -12,6 +12,11 @@
     ??? tip "**Use Case Diagram**"
         ![](../../diagrams/requirements/Alert_System.svg)
 
+    ??? warning "**Traceability Matrix**"
+        <div align="center">
+        ![](./Traceability_Matrix/FR3_3.svg)
+        </div>
+
     ---
     ??? "UC-AL-01: Event Change Alerts"
         <a id="uc-al-01"></a>

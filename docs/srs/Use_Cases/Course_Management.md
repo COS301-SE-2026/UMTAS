@@ -15,6 +15,11 @@
     ??? tip "**Use Case Diagram**"
         ![](../../diagrams/requirements/Course_Management.svg)
 
+    ??? warning "**Traceability Matrix**"
+        <div align="center">
+        ![](./Traceability_Matrix/FR4_1.svg)
+        </div>
+
     ---
     ??? "UC-CM-01: Create Course"
         <a id="uc-cm-01"></a>

@@ -15,6 +15,11 @@
     ??? tip "**Use Case Diagram**"
         ![](../../diagrams/requirements/Event_Management.svg)
 
+    ??? warning "**Traceability Matrix**"
+        <div align="center">
+        ![](./Traceability_Matrix/FR4_3.svg)
+        </div>
+
     ---
     ??? "UC-EM-01: Create Event"
         <a id="uc-em-01"></a>

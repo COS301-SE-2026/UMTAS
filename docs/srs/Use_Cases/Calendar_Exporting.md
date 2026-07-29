@@ -13,6 +13,11 @@
     ??? tip "**Use Case Diagram**"
         ![](../../diagrams/requirements/Calendar_Exporting.svg)
 
+    ??? warning "**Traceability Matrix**"
+        <div align="center">
+        ![](./Traceability_Matrix/FR2_5.svg)
+        </div>
+
     ---  
     ??? "UC-EX-01: Export Timetable as ICS File"
         <a id="uc-ex-01">

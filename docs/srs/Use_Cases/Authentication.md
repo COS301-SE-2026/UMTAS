@@ -19,6 +19,10 @@
     ??? tip "**Use Case Diagram**"
         ![](../../diagrams/requirements/Authentication_System.svg)
 
+    ??? warning "**Traceability Matrix**"
+        <div align="center">
+        ![](./Traceability_Matrix/FR1_2.svg)
+        </div>
     ---
     ??? "UC-AU-01: Register Account"
         <a id="uc-au-01"></a>
