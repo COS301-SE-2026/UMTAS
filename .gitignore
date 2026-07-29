@@ -72,6 +72,7 @@ docker-compose.override.yml
 letsencrypt/
 # Testing
 coverage/
+apps/backend/coverage/integration/
 .nyc_output/
 **/test-results/
 

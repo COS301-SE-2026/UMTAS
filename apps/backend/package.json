@@ -41,6 +41,7 @@
     "@nestjs/terminus": "^11.1.1",
     "better-auth": "^1.6.11",
     "bullmq": "^5.76.10",
+    "c8": "^12.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.15.1",
     "drizzle-orm": "^0.45.2",

@@ -1,14 +1,20 @@
 import { spawn } from 'node:child_process';
+import { chmod, mkdir, rm } from 'node:fs/promises';
 import path from 'node:path';
 
 const RUNNER_DIRECTORY = __dirname;
 const COMPOSE_FILE = path.join(RUNNER_DIRECTORY, 'integration.compose.yml');
+const COVERAGE_DIRECTORY = path.resolve(
+  RUNNER_DIRECTORY,
+  '../../coverage/integration',
+);
 const PROJECT_NAME = `umtas-integration-${process.pid}`;
 
 async function main(): Promise<void> {
   let failure: Error | undefined;
 
   try {
+    await prepareCoverageDirectory();
     const exitCode = await compose([
       'up',
       '--build',
@@ -27,6 +33,15 @@ async function main(): Promise<void> {
   }
 
   if (failure) throw failure;
+}
+
+async function prepareCoverageDirectory(): Promise<void> {
+  await rm(COVERAGE_DIRECTORY, { recursive: true, force: true });
+  await mkdir(COVERAGE_DIRECTORY, { recursive: true });
+
+  // The backend runs as the unprivileged `node` user. A permissive mode is
+  // needed because its container UID can differ from the host/CI runner UID.
+  await chmod(COVERAGE_DIRECTORY, 0o777);
 }
 
 function compose(args: readonly string[]): Promise<number> {

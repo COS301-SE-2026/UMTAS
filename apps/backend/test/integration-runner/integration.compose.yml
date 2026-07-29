@@ -78,6 +78,23 @@ services:
     build:
       context: ../../../..
       dockerfile: docker/backend/backend.Dockerfile
+    init: true
+    command:
+      [
+        './node_modules/.bin/c8',
+        '--temp-directory',
+        '/coverage/tmp',
+        '--reports-dir',
+        '/coverage',
+        '--reporter',
+        'text',
+        '--reporter',
+        'html',
+        '--reporter',
+        'lcov',
+        'node',
+        'dist/main',
+      ]
     environment:
       PORT: '3000'
       NODE_ENV: test
@@ -99,6 +116,8 @@ services:
       SMTP_PORT: '1025'
       SMTP_SECURE: 'false'
       SMTP_FROM: UMTAS Full Stack <noreply@test.umtas.local>
+    volumes:
+      - ../../coverage/integration:/coverage
     networks:
       - integration
     depends_on:

@@ -244,4 +244,9 @@ db_sql:
 # unit test
 backend-unit:
     phase run -- pnpm --filter backend test --coverage
+
+# full-stack integration tests with backend c8 coverage
+backend-integration-coverage:
+    pnpm test:integration
+    @echo "Coverage report: {{ justfile_directory() }}/apps/backend/coverage/integration/index.html"
 ############################## END_Backend specific

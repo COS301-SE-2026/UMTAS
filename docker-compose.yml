@@ -106,6 +106,7 @@ services:
       MINIO_ENDPOINT: http://minio:9000
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_BUCKET: ${MINIO_BUCKET:-umtas-uploads}
       PDF_PARSE_CLI_COMMAND: python3
       PDF_PARSE_CLI_CWD: /app/python
     depends_on:
@@ -177,6 +178,7 @@ services:
       - MINIO_ENDPOINT=http://minio:9000
       - MINIO_ROOT_USER=${MINIO_ROOT_USER}
       - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
+      - MINIO_BUCKET=${MINIO_BUCKET:-umtas-uploads}
       - SYSTEM_ADMIN_USER_IDS=${SYSTEM_ADMIN_USER_IDS}
       - SMTP_HOST=${SMTP_HOST:-mailhog}
       - SMTP_PORT=${SMTP_PORT:-1025}
