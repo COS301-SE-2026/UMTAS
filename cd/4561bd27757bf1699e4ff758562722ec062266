@@ -1,0 +1,42 @@
+docs/srs/Use_Cases/Traceability_Matrix/Traceability_Matrix.drawio
+  h_84e82529bd05a5 3,313
+docs/srs/Use_Cases/Calendar_Exporting.md
+  h_84e82529bd05a5 16-20
+docs/srs/Use_Cases/Authentication.md
+  h_84e82529bd05a5 22-25
+docs/srs/Use_Cases/Course_Management.md
+  h_84e82529bd05a5 18-22
+docs/srs/Use_Cases/University_Role.md
+  h_84e82529bd05a5 18-22
+docs/srs/Use_Cases/Landing_Page.md
+  h_84e82529bd05a5 18-22
+docs/srs/Use_Cases/Module_Management.md
+  h_84e82529bd05a5 18-22
+docs/srs/Use_Cases/Timetable_Management.md
+  h_84e82529bd05a5 18-22
+docs/srs/Use_Cases/Events_Management.md
+  h_84e82529bd05a5 18-22
+docs/srs/Use_Cases/Timetable_Creation_PDF.md
+  h_84e82529bd05a5 17-21
+docs/srs/Use_Cases/Timetable_Builder.md
+  h_84e82529bd05a5 18-22
+docs/srs/Use_Cases/Alert_System.md
+  h_84e82529bd05a5 15-19
+docs/srs/Use_Cases/Lecturer_Adjustment.md
+  h_84e82529bd05a5 17-21
+docs/srs/Use_Cases/Timetable_Creation_API.md
+  h_84e82529bd05a5 15-19
+docs/srs/Use_Cases/Analytics_Dashboard.md
+  h_84e82529bd05a5 17-21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "cd4561bd27757bf1699e4ff758562722ec062266",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}
