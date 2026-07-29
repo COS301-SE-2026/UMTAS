@@ -46,6 +46,7 @@ import { getAllModulesQ } from "@/components/templates/builder/Queries/moduleQue
 import { removeTimetableMut } from "@/components/templates/builder/Queries/timetableQueries";
 import { useMutation } from "@tanstack/react-query";
 import { fetchAllModules } from "@/app/course-management/queries/modules/moduleBuilder";
+import { UserDetails } from "@/lib/userclass/userClass";
 
 interface ScheduleViewProps {
   onEventCountChange: (count: number) => void;
