@@ -33,11 +33,19 @@
          <lastmod>2026-07-29</lastmod>
     </url>
     <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/dev/developer-guides/e2e-testing-guide/</loc>
+         <lastmod>2026-07-29</lastmod>
+    </url>
+    <url>
          <loc>https://cos301-se-2026.github.io/UMTAS/dev/developer-guides/frontend-development-guide/</loc>
          <lastmod>2026-07-29</lastmod>
     </url>
     <url>
          <loc>https://cos301-se-2026.github.io/UMTAS/dev/developer-guides/git-strategy-guide/</loc>
+         <lastmod>2026-07-29</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/dev/developer-guides/integration-testing-guide/</loc>
          <lastmod>2026-07-29</lastmod>
     </url>
     <url>
@@ -57,7 +65,7 @@
          <lastmod>2026-07-29</lastmod>
     </url>
     <url>
-         <loc>https://cos301-se-2026.github.io/UMTAS/dev/diagrams/</loc>
+         <loc>https://cos301-se-2026.github.io/UMTAS/dev/developer-guides/unit-testing-guide/</loc>
          <lastmod>2026-07-29</lastmod>
     </url>
     <url>
@@ -169,30 +177,6 @@
          <lastmod>2026-07-29</lastmod>
     </url>
     <url>
-         <loc>https://cos301-se-2026.github.io/UMTAS/dev/diagrams/requirements/Authentication-System/</loc>
-         <lastmod>2026-07-29</lastmod>
-    </url>
-    <url>
-         <loc>https://cos301-se-2026.github.io/UMTAS/dev/diagrams/requirements/Calender-Integration-System/</loc>
-         <lastmod>2026-07-29</lastmod>
-    </url>
-    <url>
-         <loc>https://cos301-se-2026.github.io/UMTAS/dev/diagrams/requirements/Timetable-Import-System/</loc>
-         <lastmod>2026-07-29</lastmod>
-    </url>
-    <url>
-         <loc>https://cos301-se-2026.github.io/UMTAS/dev/diagrams/requirements/Timetable-Management-System/</loc>
-         <lastmod>2026-07-29</lastmod>
-    </url>
-    <url>
-         <loc>https://cos301-se-2026.github.io/UMTAS/dev/diagrams/requirements/Tyto-Simulation-System/</loc>
-         <lastmod>2026-07-29</lastmod>
-    </url>
-    <url>
-         <loc>https://cos301-se-2026.github.io/UMTAS/dev/diagrams/requirements/University-Analytics-System/</loc>
-         <lastmod>2026-07-29</lastmod>
-    </url>
-    <url>
          <loc>https://cos301-se-2026.github.io/UMTAS/dev/diagrams/security/Auth-Flow/</loc>
          <lastmod>2026-07-29</lastmod>
     </url>
@@ -233,10 +217,6 @@
          <lastmod>2026-07-29</lastmod>
     </url>
     <url>
-         <loc>https://cos301-se-2026.github.io/UMTAS/dev/requirements/Functional-Requirements/</loc>
-         <lastmod>2026-07-29</lastmod>
-    </url>
-    <url>
          <loc>https://cos301-se-2026.github.io/UMTAS/dev/requirements/Introduction/</loc>
          <lastmod>2026-07-29</lastmod>
     </url>
@@ -246,14 +226,6 @@
     </url>
     <url>
          <loc>https://cos301-se-2026.github.io/UMTAS/dev/requirements/Technology-Requirements/</loc>
-         <lastmod>2026-07-29</lastmod>
-    </url>
-    <url>
-         <loc>https://cos301-se-2026.github.io/UMTAS/dev/requirements/Traceability-Matrix/</loc>
-         <lastmod>2026-07-29</lastmod>
-    </url>
-    <url>
-         <loc>https://cos301-se-2026.github.io/UMTAS/dev/requirements/Use-Cases/</loc>
          <lastmod>2026-07-29</lastmod>
     </url>
     <url>
@@ -354,6 +326,70 @@
     </url>
     <url>
          <loc>https://cos301-se-2026.github.io/UMTAS/dev/srs/USE_CASES/</loc>
+         <lastmod>2026-07-29</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/dev/srs/Use_Cases/Alert_System/</loc>
+         <lastmod>2026-07-29</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/dev/srs/Use_Cases/Analytics_Dashboard/</loc>
+         <lastmod>2026-07-29</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/dev/srs/Use_Cases/Attendance_Recording/</loc>
+         <lastmod>2026-07-29</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/dev/srs/Use_Cases/Authentication/</loc>
+         <lastmod>2026-07-29</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/dev/srs/Use_Cases/Calendar_Exporting/</loc>
+         <lastmod>2026-07-29</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/dev/srs/Use_Cases/Course_Management/</loc>
+         <lastmod>2026-07-29</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/dev/srs/Use_Cases/Events_Management/</loc>
+         <lastmod>2026-07-29</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/dev/srs/Use_Cases/Landing_Page/</loc>
+         <lastmod>2026-07-29</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/dev/srs/Use_Cases/Lecturer_Adjustment/</loc>
+         <lastmod>2026-07-29</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/dev/srs/Use_Cases/Module_Management/</loc>
+         <lastmod>2026-07-29</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/dev/srs/Use_Cases/Timetable_Builder/</loc>
+         <lastmod>2026-07-29</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/dev/srs/Use_Cases/Timetable_Creation_API/</loc>
+         <lastmod>2026-07-29</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/dev/srs/Use_Cases/Timetable_Creation_PDF/</loc>
+         <lastmod>2026-07-29</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/dev/srs/Use_Cases/Timetable_Management/</loc>
+         <lastmod>2026-07-29</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/dev/srs/Use_Cases/Tyto_Simulation/</loc>
+         <lastmod>2026-07-29</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/dev/srs/Use_Cases/University_Role/</loc>
          <lastmod>2026-07-29</lastmod>
     </url>
 </urlset>
