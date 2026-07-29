@@ -550,12 +550,13 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
 
 <br>
 
-<table>
+<div align="center">
+<table width="720">
   <tr>
     <td width="140" align="center" valign="top">
       <img src="docs/assets/images/team/framed/Wilmar_smit_PFP_circle.svg" width="120" alt="Wilmar Smit">
     </td>
-    <td valign="top">
+    <td width="580" align="left" valign="top">
       <strong>Wilmar Smit</strong> &nbsp;-&nbsp; Team Lead &amp; Integration Lead<br><br>
       <details>
         <summary>About</summary>
@@ -565,16 +566,14 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
       <br>
       <a href="https://www.linkedin.com/in/wilmar-smit-3b11842a3/"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
       <a href="https://github.com/wilmar-smit"><img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"></a>
+      <br><br>
     </td>
   </tr>
-</table>
-
-<table>
   <tr>
-    <td width="140" align="center" valign="top">
+    <td align="center" valign="top">
       <img src="docs/assets/images/team/framed/Michael_Tomlinson_PFP_circle.svg" width="120" alt="Michael Tomlinson">
     </td>
-    <td valign="top">
+    <td align="left" valign="top">
       <strong>Michael Tomlinson</strong> &nbsp;-&nbsp; Lead Developer &amp; System Architect<br><br>
       <details>
         <summary>About</summary>
@@ -584,16 +583,14 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
       <br>
       <a href="https://www.linkedin.com/in/michael-tomlinson-089511274/"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
       <a href="https://github.com/michaeltomlinsontuks"><img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"></a>
+      <br><br>
     </td>
   </tr>
-</table>
-
-<table>
   <tr>
-    <td width="140" align="center" valign="top">
+    <td align="center" valign="top">
       <img src="docs/assets/images/team/framed/Johan_Coetzer_PFP_circle.svg" width="120" alt="Johan Coetzer">
     </td>
-    <td valign="top">
+    <td align="left" valign="top">
       <strong>Johan Coetzer</strong> &nbsp;-&nbsp; Frontend Lead &amp; Full-Stack Developer<br><br>
       <details>
         <summary>About</summary>
@@ -603,16 +600,14 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
       <br>
       <a href="https://www.linkedin.com/in/johan-coetzer-01bb26401"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
       <a href="https://github.com/jcoet-gh"><img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"></a>
+      <br><br>
     </td>
   </tr>
-</table>
-
-<table>
   <tr>
-    <td width="140" align="center" valign="top">
+    <td align="center" valign="top">
       <img src="docs/assets/images/team/framed/Marcel_Stoltz_PFP_circle.svg" width="120" alt="Marcel Stoltz">
     </td>
-    <td valign="top">
+    <td align="left" valign="top">
       <strong>Marcel Stoltz</strong> &nbsp;-&nbsp; DevOps Lead &amp; Backend Specialist<br><br>
       <details>
         <summary>About</summary>
@@ -622,16 +617,14 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
       <br>
       <a href="https://www.linkedin.com/in/marcel-stoltz/"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
       <a href="https://github.com/marcelstoltz00"><img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"></a>
+      <br><br>
     </td>
   </tr>
-</table>
-
-<table>
   <tr>
-    <td width="140" align="center" valign="top">
+    <td align="center" valign="top">
       <img src="docs/assets/images/team/framed/Aidan_Dawson_PFP_circle.svg" width="120" alt="Aidan Dawson">
     </td>
-    <td valign="top">
+    <td align="left" valign="top">
       <strong>Aidan Dawson</strong> &nbsp;-&nbsp; Backend Developer &amp; Integration<br><br>
       <details>
         <summary>About</summary>
@@ -641,10 +634,11 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
       <br>
       <a href="https://www.linkedin.com/in/aidan-dawson-3514692ba"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
       <a href="https://github.com/sdcreek240"><img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"></a>
+      <br><br>
     </td>
   </tr>
 </table>
-
+</div>
 <!-- ---
 
 <div align="center">
