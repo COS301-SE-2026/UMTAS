@@ -1,6 +1,6 @@
 <mxfile host="Electron">
   <diagram id="hxHDplKE-u44oVRr9mpd" name="System-Overview">
-    <mxGraphModel dx="1338" dy="870" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+    <mxGraphModel dx="1605" dy="1044" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -377,7 +377,12 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="future-google-calendar-edge" edge="1" parent="1" source="HslSJj7kDVjQqgx8sG7l-9" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#999999;dashed=1;endArrow=classic;fontSize=9;fontColor=#666666;" target="future-google-calendar" value="">
-          <mxGeometry relative="1" as="geometry" />
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1520" y="438.81" />
+              <mxPoint x="1520" y="521.5" />
+            </Array>
+          </mxGeometry>
         </mxCell>
       </root>
     </mxGraphModel>
