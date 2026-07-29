@@ -117,7 +117,7 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 <br>
 
 <details>
-<summary><strong>Requirements & Architecture</strong> &nbsp;-&nbsp; 10 documents</summary>
+<summary><strong>Requirements & Architecture</strong> &nbsp;-&nbsp;</summary>
 <br>
 <div align="center">
 
@@ -136,7 +136,7 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 </details>
 
 <details>
-<summary><strong>Design Specifications</strong> &nbsp;-&nbsp; 2 documents</summary>
+<summary><strong>Design Specifications</strong> &nbsp;-&nbsp;</summary>
 <br>
 <div align="center">
 
@@ -166,7 +166,7 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 </details>
 
 <details>
-<summary><strong>Reference</strong> &nbsp;-&nbsp; 2 documents</summary>
+<summary><strong>Reference</strong> &nbsp;-&nbsp; </summary>
 <br>
 <div align="center">
 
@@ -245,7 +245,7 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 </details>
 
 <details>
-<summary><strong>SAS - Deployment Diagram</strong> &nbsp;-&nbsp; 10 marks &nbsp;&middot;&nbsp; 8 documents</summary>
+<summary><strong>SAS - Deployment Diagram</strong> &nbsp;-&nbsp; 10 marks &nbsp;&middot;&nbsp;</summary>
 <br>
 <div align="center">
 
@@ -262,7 +262,7 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 </details>
 
 <details>
-<summary><strong>Coding Standards Document</strong> &nbsp;-&nbsp; 10 marks &nbsp;&middot;&nbsp; 4 documents</summary>
+<summary><strong>Coding Standards Document</strong> &nbsp;-&nbsp; 10 marks &nbsp;&middot;&nbsp;</summary>
 <br>
 <div align="center">
 
@@ -295,7 +295,14 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 </details>
 
 <details>
-<summary><strong>Updated Brand Style Guide</strong> &nbsp;-&nbsp; 5
+<summary><strong>Updated Brand Style Guide</strong> &nbsp;-&nbsp; 5 marks</summary>
+<br>
+<div align="center">
+
+[![Updated Brand Style Guide](https://img.shields.io/badge/Brand_Style_Guide-52525b?style=for-the-badge)](https://brand.capstone-vigil.dns.net.za/)
+
+</div>
+</details>
 
 <div align="center">
 
