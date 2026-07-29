@@ -73,6 +73,8 @@ jobs:
         uses: codecov/codecov-action@75cd11691c0faa626561e295848008c8a7dddffe
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          files: apps/backend/coverage/lcov.info,apps/backend/coverage/integration/lcov.info
+          disable_search: true
 
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
