@@ -1,259 +1,742 @@
-// import { Test } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
 
-// //Constants
-// import { userId, courseId } from '../Testing/constants.spec';
+//Constants
+import { userId, courseId, uniId, groupId } from '../Testing/constants.spec';
 
-// //Table imports
+//Table imports
 // import { modules, CourseModule, ModuleStyling } from '../entities/index';
 
-// //Actual Service imports
-// import { ModuleService } from './module.service';
-// import { DatabaseService } from '../db/database.service';
-// import { CourseService } from '../Course/course.service';
+//Actual Service imports
+import { ModuleService } from './module.service';
+import { DatabaseService } from '../db/database.service';
+import { CourseService } from '../Course/course.service';
+import { GroupingService } from '../Grouping/grouping.service';
 
-// //Mock Database and factories
-// import { createMockDatabase } from '../Testing/Mocks/database.mock';
-// import {
-//   mockDeleteResult,
-//   mockSelectResult,
-//   mockSequentialResults,
-// } from '../Testing/Mocks/database.helpers';
-// import {
-//   createModule,
-//   createCourseModule,
-//   createModuleStyling,
-//   baseDto,
-// } from '../Testing/Factories/module.factory';
-// import { createMockCourseService } from '../Testing/Factories/course.factory';
+//Mock Database and factories
+import { createMockDatabase } from '../Testing/Mocks/database.mock';
+import {
+  mockDbResult,
+  mockTransaction,
+} from '../Testing/Mocks/database.helpers';
+import {
+  createModule,
+  createModuleDto,
+  createCourse,
+  createGroup,
+  createCourseModule,
+  createModuleStyling,
+} from '../Testing/Factories/';
 
-// describe('ModuleService', () => {
-//   let service: ModuleService;
+//Mock Services
+import {
+  createMockCourseService,
+  createMockGroupingService,
+} from '../Testing/Mocks/services';
+import {
+  BadRequestException,
+  ConflictException,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 
-//   const { mockDb, reset: resetDb } = createMockDatabase();
-//   const { mockCourseService, reset: resetCourse } = createMockCourseService();
+//DTO's
+import { AddModulesToCourseDto, UpdateModuleDto } from './dto/module.dto';
 
-//   const existing = createModule();
-//   const resultObject = { ...existing, styling: null };
+describe('ModuleService', () => {
+  let service: ModuleService;
 
-//   let setStylingSpy: jest.SpyInstance;
+  const { mockDb, reset: resetDb } = createMockDatabase();
+  const { mockCourseService, reset: resetCourse } = createMockCourseService();
+  const { mockGroupingService, reset: resetGrouping } =
+    createMockGroupingService();
 
-//   beforeEach(async () => {
-//     const module = await Test.createTestingModule({
-//       providers: [
-//         ModuleService,
-//         { provide: DatabaseService, useValue: { db: mockDb } },
-//         { provide: CourseService, useValue: mockCourseService },
-//       ],
-//     }).compile();
+  beforeEach(async () => {
+    const module = await Test.createTestingModule({
+      providers: [
+        ModuleService,
+        { provide: DatabaseService, useValue: { db: mockDb } },
+        { provide: CourseService, useValue: mockCourseService },
+        { provide: GroupingService, useValue: mockGroupingService },
+      ],
+    }).compile();
 
-//     service = module.get(ModuleService);
+    service = module.get(ModuleService);
+  });
 
-//     setStylingSpy = jest.spyOn(service, 'setStyling');
-//   });
+  afterEach(() => {
+    resetDb();
+    resetCourse();
+    resetGrouping();
+  });
 
-//   afterEach(() => {
-//     resetDb();
-//     resetCourse();
+  //TESTS
+  //Create
+  describe('Test_CreateModule', () => {
+    //UnHappy - if course provided and doesnt exist
+    it(`should throw if course provided doesn't exist`, async () => {
+      //Arrange
+      mockCourseService.getById?.mockRejectedValue(new NotFoundException());
+      const dto = createModuleDto({ CourseID: 'nonExistentCourse' });
 
-//     setStylingSpy.mockRestore();
-//   });
+      mockTransaction(mockDb, {});
 
-//   //TESTS
-//   //Create
-//   describe('Test_CreateModule', () => {
-//     //Happy - no styling
-//     it('create module - no styling', async () => {
-//       mockSequentialResults(mockDb.select, [[]]);
+      //Act + assert
+      await expect(service.create(userId, dto)).rejects.toThrow(
+        NotFoundException,
+      );
+      expect(mockCourseService.getById).toHaveBeenCalled();
+      expect(mockCourseService.getById).rejects.toThrow(NotFoundException);
+    });
 
-//       const newModule = createModule({
-//         moduleCode: baseDto.moduleCode,
-//         moduleName: baseDto.moduleName,
-//         moduleDescription: baseDto.moduleDescription,
-//       });
-//       const newCourseModule = createCourseModule({
-//         ModuleID: newModule.moduleID,
-//         CourseID: courseId,
-//       });
+    //UnHappy - duplicate module code for module grouping
+    it(`should throw if module code already exists for that moduleGrouping`, async () => {
+      //Arrange
+      const group = createGroup();
+      const course = createCourse({ GroupID: group.GroupID });
+      // const module = createModule();
+      const dto = createModuleDto({ CourseID: course.CourseID });
 
-//       mockSequentialResults(mockDb.insert, [[newModule], [newCourseModule]]);
+      mockCourseService.getById?.mockResolvedValue(course);
 
-//       const result = await service.create(userId, baseDto);
+      mockGroupingService.getById?.mockResolvedValue(group);
 
-//       expect(mockCourseService.getById).toHaveBeenCalledWith(courseId);
-//       expect(mockDb.insert).toHaveBeenCalledWith(modules);
-//       expect(mockDb.insert).toHaveBeenCalledWith(CourseModule);
-//       expect(result).toEqual(newModule);
-//       expect(setStylingSpy).not.toHaveBeenCalled();
-//     });
+      mockTransaction(mockDb, {
+        select: [[{ moduleCode: dto.moduleCode }]], //existingModuleCodeFormoduleGrouping
+      });
 
-//     //Happy - with styling
-//     it('create module - with styling', async () => {
-//       mockSequentialResults(mockDb.select, [[]]);
+      //Act + Assert
+      await expect(service.create(userId, dto)).rejects.toThrow(
+        ConflictException,
+      );
+      expect(mockCourseService.getById).toHaveBeenCalled();
+      expect(mockGroupingService.getById).toHaveBeenCalled();
+    });
 
-//       const newModule = createModule();
-//       const newCourseModule = createCourseModule({
-//         ModuleID: newModule.moduleID,
-//         CourseID: courseId,
-//       });
-//       const newStyling = createModuleStyling({
-//         ModuleID: newModule.moduleID,
-//         UserID: userId,
-//         styling: { colour: '#grys' },
-//       });
+    //UnHappy - failed to create new module
+    it('should throw if insert into modules table failed', async () => {
+      //Arrange
+      // const module = createModule();
+      const dto = createModuleDto();
 
-//       mockSequentialResults(mockDb.insert, [
-//         [newModule],
-//         [newCourseModule],
-//         [newStyling],
-//       ]);
+      const group = createGroup();
+      mockGroupingService.createModuleGrouping?.mockResolvedValue(group);
 
-//       const dto = { ...baseDto, styling: { colour: '#grys' } };
+      mockTransaction(mockDb, {
+        insert: [[]], //create
+      });
 
-//       mockSequentialResults(mockDb.select, [[]]); //styling checks if styling exists
+      //Act + Assert
+      await expect(service.create(userId, dto)).rejects.toThrow(
+        InternalServerErrorException,
+      );
+      expect(mockGroupingService.createModuleGrouping).toHaveBeenCalled();
+    });
 
-//       const result = await service.create(userId, dto);
+    //UnHappy - CourseModule create but no join entry for module to moduleGrouping exists
+    it('should throw if no GroupModule entry exists for group + module', async () => {
+      //Arrange
+      const dto = createModuleDto({
+        CourseID: courseId,
+        CourseModuleInfo: {
+          Core: true,
+          SemesterOfStudy: 'Semester 1',
+          YearOfStudy: 1,
+        },
+      });
 
-//       expect(mockDb.insert).toHaveBeenCalledWith(ModuleStyling);
-//       expect(result).toEqual({ ...newModule, styling: newStyling.styling });
-//       expect(setStylingSpy).toHaveBeenCalled();
-//     });
-//   });
-//   //END_Create
+      const course = createCourse();
+      mockCourseService.getById?.mockResolvedValue(course); //groupID will be null
 
-//   //getAll
-//   describe('Test_GetAll', () => {
-//     it('return all modules for a courseId', async () => {
-//       mockSequentialResults(mockDb.selectDistinct, [[resultObject]]);
+      const module = createModule();
+      const group = createGroup();
+      mockGroupingService.createModuleGrouping?.mockResolvedValue(group);
+      mockGroupingService.getById?.mockResolvedValue(group);
+      mockGroupingService.populateGroup?.mockResolvedValue({
+        ...group,
+        modules: [module.moduleID],
+      });
 
-//       const result = await service.getAll(userId, { courseId });
+      mockTransaction(mockDb, {
+        select: [
+          [], //existingModuleCodeForModuleGrouping
+          [], //groupModule
+        ],
+        insert: [[module]],
+      });
 
-//       expect(result).toEqual({ modules: [resultObject] });
-//     });
-//   });
-//   //END_getAll
+      //Act + Assert
+      await expect(service.create(userId, dto)).rejects.toThrow(
+        InternalServerErrorException,
+      );
 
-//   //getById
-//   describe('Test_getById', () => {
-//     it('should return module by id', async () => {
-//       mockSequentialResults(mockDb.select, [[resultObject]]);
+      expect(mockCourseService.getById).toHaveBeenCalled();
+      expect(mockGroupingService.createModuleGrouping).toHaveBeenCalled();
+      expect(mockGroupingService.getById).toHaveBeenCalled();
+      expect(mockGroupingService.populateGroup).toHaveBeenCalled();
+    });
 
-//       const result = await service.getById(userId, existing.moduleID);
+    //UnHappy - CourseModule create but the metadata insert failed
+    it('should throw if courseModule info insert failed', async () => {
+      //Arrange
+      const dto = createModuleDto({
+        CourseID: courseId,
+        CourseModuleInfo: {
+          Core: true,
+          SemesterOfStudy: 'Semester 1',
+          YearOfStudy: 1,
+        },
+      });
 
-//       expect(result).toEqual(resultObject);
-//     });
-//   });
-//   //END_getById
+      const course = createCourse();
+      mockCourseService.getById?.mockResolvedValue(course); //groupID will be null
 
-//   //Update
-//   describe('Test_updateModule', () => {
-//     it('should update fields - no styling', async () => {
-//       const updatedModule = createModule({
-//         moduleName: 'NewModuleName',
-//         moduleCode: 'NewModuleCode',
-//         moduleDescription: 'newModuleDescription',
-//       });
+      const module = createModule();
+      const group = createGroup();
+      mockGroupingService.createModuleGrouping?.mockResolvedValue(group);
+      mockGroupingService.getById?.mockResolvedValue(group);
+      mockGroupingService.populateGroup?.mockResolvedValue({
+        ...group,
+        modules: [module.moduleID],
+      });
 
-//       const updatedResultObject = { ...resultObject, ...updatedModule };
+      mockTransaction(mockDb, {
+        select: [
+          [], //existingModuleCodeForModuleGrouping
+          [
+            {
+              GroupModuleID: 'testId',
+              GroupID: group.GroupID,
+              ModuleID: module.moduleID,
+            },
+          ], //groupModule
+        ],
+        insert: [[module], []],
+      });
 
-//       mockSequentialResults(mockDb.select, [
-//         [{ ...resultObject, CourseID: courseId }],
-//         [],
-//       ]);
-//       mockSequentialResults(mockDb.update, [[updatedResultObject]]);
+      //Act + Assert
+      await expect(service.create(userId, dto)).rejects.toThrow(
+        InternalServerErrorException,
+      );
 
-//       const result = await service.update(
-//         userId,
-//         existing.moduleID,
-//         updatedModule,
-//       );
+      expect(mockCourseService.getById).toHaveBeenCalled();
+      expect(mockGroupingService.createModuleGrouping).toHaveBeenCalled();
+      expect(mockGroupingService.getById).toHaveBeenCalled();
+      expect(mockGroupingService.populateGroup).toHaveBeenCalled();
+    });
 
-//       expect(result).toMatchObject(updatedResultObject);
-//       expect(setStylingSpy).not.toHaveBeenCalled();
-//     });
+    //Happy - course provided but with no group
+    it('should create group for course and create module', async () => {
+      //Arrange
+      const dto = createModuleDto({ CourseID: courseId, styling: null });
 
-//     //Update only styling - create stylling entity
-//     it('should update only the styling for a module - styling is initially null', async () => {
-//       const kleur = 'grys';
+      const course = createCourse();
+      mockCourseService.getById?.mockResolvedValue(course); //groupID will be null
 
-//       const updatedResultObject = {
-//         ...resultObject,
-//         styling: { colour: kleur },
-//       };
+      const module = createModule();
+      const group = createGroup();
+      mockGroupingService.createModuleGrouping?.mockResolvedValue(group);
+      mockGroupingService.getById?.mockResolvedValue(group);
+      mockGroupingService.populateGroup?.mockResolvedValue({
+        ...group,
+        modules: [module.moduleID],
+      });
 
-//       const stylingObject = createModuleStyling({ styling: { colour: kleur } });
+      mockTransaction(mockDb, {
+        select: [[]], //existingModuleCodeForModuleGrouping
+        insert: [[module]],
+      });
 
-//       mockSequentialResults(mockDb.select, [
-//         [{ ...resultObject, CourseID: courseId }],
-//         [],
-//         [],
-//       ]);
-//       mockSequentialResults(mockDb.update, [[updatedResultObject]]);
-//       mockSequentialResults(mockDb.insert, [[stylingObject]]);
+      //Act
+      const result = await service.create(userId, dto);
 
-//       const result = await service.update(userId, existing.moduleID, {
-//         styling: { colour: kleur },
-//       });
+      //Assert
+      expect(mockCourseService.getById).toHaveBeenCalled();
+      expect(mockGroupingService.createModuleGrouping).toHaveBeenCalled();
+      expect(mockGroupingService.getById).toHaveBeenCalled();
+      expect(mockGroupingService.populateGroup).toHaveBeenCalled();
 
-//       expect(result).toMatchObject({
-//         ...resultObject,
-//         styling: { colour: kleur },
-//       });
-//       expect(setStylingSpy).toHaveBeenCalled();
-//     });
+      expect(result).toMatchObject(module);
+    });
 
-//     //Update styling - update styling entity
-//     it('should update only styling for a module - styling already defined', async () => {
-//       //Arrange
-//       const kleur = 'grys';
+    //Happy - no course/group provided -> create group and module
+    it('should create group and module if no course/group provided', async () => {
+      //Arrange
+      const module = createModule();
+      const dto = createModuleDto();
 
-//       const existingStylingObject = createModuleStyling({
-//         ModuleID: existing.moduleID,
-//         UserID: userId,
-//         styling: { colour: 'oldColour' },
-//       });
+      const group = createGroup();
+      mockGroupingService.createModuleGrouping?.mockResolvedValue(group);
+      mockGroupingService.populateGroup?.mockResolvedValue({
+        ...group,
+        modules: [module.moduleID],
+      });
 
-//       const updatedStylingObject = {
-//         ...existingStylingObject,
-//         styling: { colour: kleur },
-//       };
+      mockTransaction(mockDb, {
+        insert: [[module]], //create
+      });
 
-//       mockSequentialResults(
-//         mockDb.select,
-//         [
-//           [{ ...existing, CourseID: courseId }], //module exists
-//           [existingStylingObject],
-//         ], //styling entity exists
-//       );
-//       mockSequentialResults(mockDb.update, [[updatedStylingObject]]);
+      //Act
+      const result = await service.create(userId, dto);
 
-//       //Act
-//       const result = await service.update(userId, existing.moduleID, {
-//         styling: { colour: kleur },
-//       });
+      //Assert
+      expect(mockGroupingService.createModuleGrouping).toHaveBeenCalled();
+      expect(mockGroupingService.populateGroup).toHaveBeenCalled();
 
-//       //Assert
-//       expect(result).toMatchObject({ ...existing, styling: { colour: kleur } });
-//       expect(setStylingSpy).toHaveBeenCalled();
-//     });
-//   });
-//   //END_Update
+      expect(result).toMatchObject(module);
+    });
+  }); //END_Test_CreateModule
 
-//   //Delete
-//   describe('Test_deleteModule', () => {
-//     it('should delete module that exists', async () => {
-//       //Arrange
-//       mockSelectResult(mockDb, [existing]);
-//       mockDeleteResult(mockDb);
+  // getAll
+  describe('Test_GetAll', () => {
+    //Should return empty array of modules
+    it('should return empty array of modules if none found', async () => {
+      //Arrange
+      mockDbResult(mockDb.selectDistinctOn, []);
 
-//       //Act
-//       const result = await service.deleteById(existing.moduleID);
+      //Act
+      const result = await service.getAll(userId, {});
 
-//       //Assert
-//       expect(result).toMatchObject({
-//         moduleCode: existing.moduleCode,
-//         success: true,
-//       });
-//     });
-//   });
-//   //END_DELETE
-// });
+      //Assert
+      expect(result).toMatchObject({ modules: [] });
+    });
+
+    //Should return array with modules in them
+    it('should return array of modules found', async () => {
+      //Arrange
+      const module1 = createModule();
+      const module2 = createModule();
+
+      mockDbResult(mockDb.selectDistinctOn, [module1, module2]);
+
+      //Act
+      const result = await service.getAll(userId, {
+        universityId: uniId,
+        courseId,
+        GroupID: groupId,
+        moduleCode: 'someCode',
+        userEnrollment: true,
+      });
+
+      //Assert
+      expect(result).toMatchObject({ modules: [module1, module2] });
+    });
+  }); //END_Test_GetAll
+
+  //getById
+  describe('Test_getById', () => {
+    //UnHappy - should throw if module not found
+    it('should throw if module not found', async () => {
+      //Arrange
+      mockDbResult(mockDb.select, []);
+
+      //Act + Assert
+      await expect(service.getById(userId, 'someId')).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+
+    //Happy - should return module successfully
+    it('should return module by id', async () => {
+      //Arrange
+      const module = createModule();
+      mockDbResult(mockDb.select, [module]);
+
+      //Act
+      const result = await service.getById(userId, module.moduleID);
+
+      //Assert
+      expect(result).toMatchObject(module);
+    });
+  }); //END_Test_getById
+
+  // //Update
+  describe('Test_updateModule', () => {
+    //UnHappy - module doesnt exist
+    it('should throw if module does not exist', async () => {
+      //Arrange
+      mockTransaction(mockDb, {
+        select: [[]],
+      });
+
+      //Act + Assert
+      await expect(
+        service.update(userId, 'someId', { moduleCode: 'newCode' }),
+      ).rejects.toThrow(NotFoundException);
+    });
+
+    //UnHappy - failed to update
+    it('should throw if update failed', async () => {
+      //Arrange
+      const oldModule = createModule();
+      const dto: UpdateModuleDto = {
+        moduleCode: 'newCode',
+        moduleName: 'newName',
+        moduleDescription: 'newDescription',
+        validated: true,
+      };
+
+      mockTransaction(mockDb, {
+        select: [[oldModule]],
+        update: [[]], //update fails
+      });
+
+      //Act + Assert
+      await expect(service.update(userId, 'someid', dto)).rejects.toThrow(
+        InternalServerErrorException,
+      );
+    });
+
+    //Happy - nothing to update, return old module
+    it('should return old module if nothing to update', async () => {
+      //Arrange
+      const module = createModule();
+      const dto: UpdateModuleDto = {
+        moduleCode: module.moduleCode,
+        moduleName: module.moduleName,
+        moduleDescription: module.moduleDescription,
+        validated: module.validated,
+      };
+
+      mockTransaction(mockDb, {
+        select: [[module]],
+      });
+
+      //Act
+      const result = await service.update(userId, module.moduleID, dto);
+
+      //Assert
+      expect(result).toMatchObject(module);
+    });
+
+    //Happy - update all fields of a module
+    it('should successfully update all fields of a module', async () => {
+      //Arrange
+      const oldModule = createModule();
+      const dto: UpdateModuleDto = {
+        moduleCode: 'newCode',
+        moduleName: 'newName',
+        moduleDescription: 'newDescription',
+        validated: true,
+      };
+      const newModule = createModule(dto);
+
+      mockTransaction(mockDb, {
+        select: [[oldModule]],
+        update: [[newModule]],
+      });
+
+      //Act
+      const result = await service.update(userId, oldModule.moduleID, dto);
+
+      //Assert
+      expect(result).toMatchObject(newModule);
+    });
+
+    //Happy - update all courseModule fields for module for course
+    it('should udpate courseModule metadata for module', async () => {
+      //Arrange
+      const module = createModule();
+      const course = createCourse();
+      const dto: UpdateModuleDto = {
+        CourseID: course.CourseID,
+        Core: true,
+        SemesterOfStudy: 'semester 2',
+        YearOfStudy: 3,
+      };
+
+      const groupModuleId = 'someID';
+
+      const oldCourseModule = createCourseModule({
+        GroupModuleID: groupModuleId,
+        CourseID: course.CourseID,
+      });
+      const newCourseModule = createCourseModule(dto);
+      mockTransaction(mockDb, {
+        select: [
+          [module], //getByid
+          [{ GroupModuleID: groupModuleId }], //select.from(GroupModules)
+          [oldCourseModule], //select.from(CourseModule)
+        ],
+        update: [
+          [newCourseModule], //update(CourseModule)
+        ],
+      });
+
+      //Act
+      const result = await service.update(userId, module.moduleID, dto);
+
+      //Assert
+      expect(result).toMatchObject({
+        ...module,
+        CourseModuleInfo: { ...newCourseModule },
+      });
+    });
+
+    //Happy - update the styling of the module
+    it('should update just the styling of the module', async () => {
+      //Arrange
+      const module = createModule();
+      const dto: UpdateModuleDto = {
+        styling: { colour: '#NEW' },
+      };
+
+      const oldStyling = createModuleStyling({
+        ModuleID: module.moduleID,
+        UserID: userId,
+      });
+      const newStyling = createModuleStyling({
+        ModuleID: module.moduleID,
+        UserID: userId,
+        styling: { colour: '#NEW' },
+      });
+
+      mockTransaction(mockDb, {
+        select: [
+          [module], //getById
+          [oldStyling], //setStyling
+        ],
+        update: [
+          [newStyling], //setStyling
+        ],
+      });
+
+      //Act
+      const result = await service.update(userId, module.moduleID, dto);
+
+      //Assert
+      expect(result).toMatchObject({
+        ...module,
+        styling: dto.styling,
+      });
+    });
+  }); //END_Test_updateModule
+
+  //Delete
+  describe('Test_deleteModule', () => {
+    //UnHappy - module not found
+    it(`should return success as false if no module deleted`, async () => {
+      //Arrange
+      mockDbResult(mockDb.delete, []);
+
+      //Act
+      const result = await service.deleteById('someID');
+
+      //Assert
+      expect(result.success).toEqual(false);
+    });
+
+    //Happy - succesfully deleted a module
+    it('should return module code and success if deleted', async () => {
+      //Arrange
+      const module = createModule();
+
+      mockDbResult(mockDb.delete, [module]);
+
+      //Act
+      const result = await service.deleteById(module.moduleID);
+
+      //Assert
+      expect(result).toMatchObject({
+        moduleCode: module.moduleCode,
+        success: true,
+      });
+    });
+  }); //END_Test_deleteModule
+
+  //Enroll to module
+  describe('Test_enrollToModule', () => {
+    //UnHappy - module not found
+    it('should throw if module not found', async () => {
+      //Arrange
+      mockTransaction(mockDb, {
+        select: [[]], //getById
+      });
+
+      //Act + Assert
+      await expect(service.enrollToModule(userId, 'someID')).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+
+    //UnHappy - enrollment failed
+    it('should throw if enrollment failed', async () => {
+      //Arrange
+      const module = createModule();
+      mockTransaction(mockDb, {
+        select: [
+          [module], //getById
+          [], //select.from(ModuleEnrollment)
+        ],
+        insert: [[]], //enrollment failed
+      });
+
+      //Act + Assert
+      await expect(
+        service.enrollToModule(userId, module.moduleID),
+      ).rejects.toThrow(InternalServerErrorException);
+    });
+
+    //Happy - student already enrolled
+    it('should return that user already enrolled', async () => {
+      //Arrange
+      const module = createModule();
+
+      mockTransaction(mockDb, {
+        select: [
+          [module], //getById
+          [{ ModuleID: module.moduleID, UserID: userId }],
+        ],
+      });
+
+      //Act
+      const result = await service.enrollToModule(userId, module.moduleID);
+
+      //Assert
+      expect(result.message).toEqual(
+        `User[${userId}] already enrolled in module[${module.moduleID}]`,
+      );
+    });
+
+    //happy - should enroll student to module
+    it('should enroll user to module', async () => {
+      //Arrange
+      const module = createModule();
+
+      mockTransaction(mockDb, {
+        select: [
+          [module], //getById
+          [], //select.from(Moduleenrollment)
+        ],
+        insert: [[{ ModuleID: module.moduleID, UserID: userId }]],
+      });
+
+      //Act
+      const result = await service.enrollToModule(userId, module.moduleID);
+
+      //Assert
+      expect(result).toMatchObject({
+        moduleID: module.moduleID,
+        UserID: userId,
+        message: `Successfully enrolled student[${userId}] into module[${module.moduleID}]`,
+      });
+    });
+  }); //END_Test_enrollToModule
+
+  //Add modules to course
+  describe('Test_addModulesToCourse', () => {
+    //UnHappy - throw if course doesn't exist
+    it('should throw if course does not exist', async () => {
+      //Arrange
+      mockCourseService.getById?.mockRejectedValue(new NotFoundException());
+      const dto: AddModulesToCourseDto = {
+        modules: ['someID'],
+      };
+
+      //Act + Assert
+      await expect(service.addModulesToCourse('someID', dto)).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+
+    //UnHappy - throw modules that dont exist
+    it('should throw if certain modules dont exist', async () => {
+      //Arrange
+      const dto: AddModulesToCourseDto = {
+        modules: ['someID'],
+      };
+      const course = createCourse();
+      mockCourseService.getById?.mockResolvedValue(course);
+
+      mockTransaction(mockDb, {
+        select: [[]],
+      });
+
+      //Act + Assert
+      await expect(
+        service.addModulesToCourse(course.CourseID, dto),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    //Happy - add modules to course
+    it('should add modules to the courses group', async () => {
+      const course = createCourse({ GroupID: groupId });
+      const modules = [createModule(), createModule()];
+      const dto: AddModulesToCourseDto = {
+        modules: [modules[0].moduleID, modules[1].moduleID],
+      };
+
+      mockCourseService.getById?.mockResolvedValue(course);
+
+      mockTransaction(mockDb, {
+        select: [
+          modules, //existingModules
+          [], //partnerCourse
+        ],
+      });
+
+      mockGroupingService.populateGroup?.mockResolvedValue({
+        GroupID: groupId,
+        Hash: 'someHash',
+        modules: [modules[0].moduleID, modules[1].moduleID],
+      });
+
+      //Act
+      const result = await service.addModulesToCourse(course.CourseID, dto);
+
+      //Assert
+      expect(result).toMatchObject({
+        CourseID: course.CourseID,
+        ...dto,
+      });
+
+      expect(mockCourseService.getById).toHaveBeenCalled();
+      expect(mockGroupingService.populateGroup).toHaveBeenCalled();
+    });
+
+    //Happy - add modules to course creating new group
+    it('should add modules to new group since other course uses old group', async () => {
+      const course = createCourse({ GroupID: groupId });
+      const partnerCourse = createCourse({ GroupID: groupId });
+      const modules = [createModule(), createModule()];
+      const dto: AddModulesToCourseDto = {
+        modules: [modules[0].moduleID, modules[1].moduleID],
+      };
+
+      mockCourseService.getById?.mockResolvedValue(course);
+
+      mockTransaction(mockDb, {
+        select: [
+          modules, //existingModules
+          [partnerCourse], //partnerCourse
+        ],
+      });
+
+      mockGroupingService.getById?.mockResolvedValue({
+        GroupID: groupId,
+        Hash: 'someHash',
+        modules: [],
+      });
+
+      const newGroup = createGroup();
+
+      mockGroupingService.createModuleGrouping?.mockResolvedValue({
+        GroupID: newGroup.GroupID,
+        Hash: 'someHash',
+        modules: dto.modules,
+      });
+
+      //Act
+      const result = await service.addModulesToCourse(course.CourseID, dto);
+
+      //Assert
+      expect(result).toMatchObject({
+        CourseID: course.CourseID,
+        ...dto,
+      });
+
+      expect(mockCourseService.getById).toHaveBeenCalled();
+      expect(mockGroupingService.getById).toHaveBeenCalled();
+      expect(mockGroupingService.createModuleGrouping).toHaveBeenCalled();
+    });
+  }); //END_Test_addModulesToCourse
+});

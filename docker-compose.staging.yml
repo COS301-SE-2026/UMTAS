@@ -77,7 +77,7 @@ services:
       PDF_PARSE_QUEUE_NAME: ${PDF_PARSE_QUEUE_NAME:-pdf.parse}
       PDF_PARSE_CONCURRENCY: ${PDF_PARSE_CONCURRENCY:-2}
       PDF_PARSE_TIMEOUT_MS: ${PDF_PARSE_TIMEOUT_MS:-60000}
-      PDF_PARSE_CALLBACK_URL: http://backend-staging:${BACKEND_PORT}/pdf-parser/jobs
+      PDF_PARSE_CALLBACK_URL: http://backend-staging:${BACKEND_PORT}/api/pdf-parser/jobs
       WORKER_CALLBACK_TOKEN: ${WORKER_CALLBACK_TOKEN}
       WORKER_TOPOLOGY: container
       WORKER_KEEP_FAILED_TEMP: ${WORKER_KEEP_FAILED_TEMP:-false}
@@ -119,8 +119,8 @@ services:
       TIMETABLE_SOLVE_QUEUE_NAME: ${TIMETABLE_SOLVE_QUEUE_NAME:-timetable.solve}
       SOLVER_CONCURRENCY: ${SOLVER_CONCURRENCY:-1}
       SOLVER_TIMEOUT_MS: ${SOLVER_TIMEOUT_MS:-300000}
-      SOLVER_INPUT_URL: http://backend-staging:${BACKEND_PORT}/solver/jobs
-      SOLVER_CALLBACK_URL: http://backend-staging:${BACKEND_PORT}/solver/jobs
+      SOLVER_INPUT_URL: http://backend-staging:${BACKEND_PORT}/api/solver/jobs
+      SOLVER_CALLBACK_URL: http://backend-staging:${BACKEND_PORT}/api/solver/jobs
       WORKER_CALLBACK_TOKEN: ${WORKER_CALLBACK_TOKEN}
       WORKER_TOPOLOGY: container
       WORKER_KEEP_FAILED_TEMP: ${WORKER_KEEP_FAILED_TEMP:-false}
@@ -170,13 +170,13 @@ services:
       - SEED_SYSTEM_ADMIN_PASSWORD=${SEED_SYSTEM_ADMIN_PASSWORD}
       - SEED_TEST_PASSWORD=${SEED_TEST_PASSWORD}
       - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET}
-      - BETTER_AUTH_URL=https://${STG_API_DOMAIN}
-      - COOKIE_DOMAIN=${COOKIE_DOMAIN}
+      - BETTER_AUTH_URL
+      - COOKIE_DOMAIN
       - COOKIE_PREFIX=${COOKIE_PREFIX}
-      - BETTER_AUTH_TRUSTED_ORIGINS=https://${STG_APP_DOMAIN},http://backend-staging:${BACKEND_PORT},https://${STG_API_DOMAIN}
-      - CORS_ORIGIN=https://${STG_APP_DOMAIN}
-      - NEXT_PUBLIC_APP_URL=https://${STG_APP_DOMAIN}
-      - NEXT_PUBLIC_API_URL=https://${STG_API_DOMAIN}
+      - BETTER_AUTH_TRUSTED_ORIGINS
+      - CORS_ORIGIN
+      - NEXT_PUBLIC_APP_URL
+      - NEXT_PUBLIC_API_URL
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
       - REDIS_URL=redis://:${REDIS_PASSWORD}@redis-staging:6379
@@ -203,12 +203,15 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=gateway"
-      - "traefik.http.routers.backend-staging.rule=Host(`staging.api.capstone-vigil.dns.net.za`)"
+      - "traefik.http.routers.backend-staging.rule=Host(`staging.capstone-vigil.dns.net.za`) && PathPrefix(`/api`)"
+      # - "traefik.http.routers.umtas-staging.middlewares=api-stripprefix"
+      # - "traefik.http.middlewares.api-stripprefix.stripprefix.prefixes=/api"
       - "traefik.http.routers.backend-staging.entrypoints=websecure"
       - "traefik.http.routers.backend-staging.tls=true"
       - "traefik.http.routers.backend-staging.tls.certresolver=myresolver"
       - "traefik.http.services.backend-staging.loadbalancer.server.port=${BACKEND_PORT}"
       - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.http.routers.backend-staging.priority=100"
 
   frontend:
     image: ${DOCKER_REGISTRY:-vigilcs/umtas}:frontend-staging-${IMAGE_TAG:-latest}
@@ -221,6 +224,7 @@ services:
     environment:
       - PORT=${FRONTEND_PORT}
       - API_URL=http://backend-staging:${BACKEND_PORT}
+      - COOKIE_PREFIX=umtas-staging
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=gateway"
@@ -230,6 +234,7 @@ services:
       - "traefik.http.routers.frontend-staging.tls.certresolver=myresolver"
       - "traefik.http.services.frontend-staging.loadbalancer.server.port=${FRONTEND_PORT}"
       - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.http.routers.frontend-staging.priority=1"
 
   # watchtower:
   #   image: containrrr/watchtower

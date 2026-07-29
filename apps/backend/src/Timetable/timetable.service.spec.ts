@@ -1,521 +1,498 @@
-// import { Test, TestingModule } from '@nestjs/testing';
-// import {
-//   BadRequestException,
-//   InternalServerErrorException,
-//   NotFoundException,
-// } from '@nestjs/common';
-// import { TimetableService } from './timetable.service';
-// import { DatabaseService } from '../db/database.service';
+import { Test } from '@nestjs/testing';
 
-// function makeTimetable(overrides: Record<string, unknown> = {}) {
-//   return {
-//     timetableID: 1,
-//     userID: 'user-1',
-//     timetableName: 'Sem 1',
-//     ...overrides,
-//   };
-// }
+//Constants
+import { timetableId, userId } from '../Testing/constants.spec';
 
-// describe('TimetableService', () => {
-//   let service: TimetableService;
-//   let dbService: { db: jest.Mocked<any> };
+//Actual Services
+import { TimetableService } from './timetable.service';
+import { DatabaseService } from '../db/database.service';
 
-//   beforeEach(async () => {
-//     dbService = {
-//       db: {
-//         select: jest.fn(),
-//         insert: jest.fn(),
-//         update: jest.fn(),
-//         delete: jest.fn(),
-//         transaction: jest.fn(),
-//       },
-//     };
+//Mock Database and factories
+import { createMockDatabase } from '../Testing/Mocks/database.mock';
+import {
+  mockDbResult,
+  mockTransaction,
+} from '../Testing/Mocks/database.helpers';
+import {
+  createCreateTimetableDto,
+  createEvent,
+  createTimetable,
+  createUpdateTimetableDto,
+  createUserTimetable,
+} from '../Testing/Factories/';
 
-//     const module: TestingModule = await Test.createTestingModule({
-//       providers: [
-//         TimetableService,
-//         { provide: DatabaseService, useValue: dbService },
-//       ],
-//     }).compile();
+//Mock Services
+import {} from '../Testing/Mocks/services';
 
-//     service = module.get<TimetableService>(TimetableService);
-//   });
+//Exceptions
+import {
+  BadRequestException,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 
-//   describe('createTimetable', () => {
-//     it('should create a timetable and return it without eventIds when none provided', async () => {
-//       const newTimetable = makeTimetable();
-//       const newUserTimetable = {
-//         UserTimetableID: 1,
-//         UserID: 'user-1',
-//         TimetableID: 1,
-//       };
+//DTO's
+import {
+  TimetableListResponseDto,
+  TimetableResponseDto,
+} from './dto/timetable.dto';
 
-//       dbService.db.transaction.mockImplementation(
-//         (cb: (tx: any) => Promise<any>) => {
-//           const mockTx = {
-//             insert: jest
-//               .fn()
-//               .mockReturnValueOnce({
-//                 values: jest.fn().mockReturnValue({
-//                   returning: jest.fn().mockResolvedValue([newTimetable]),
-//                 }),
-//               })
-//               .mockReturnValueOnce({
-//                 values: jest.fn().mockReturnValue({
-//                   returning: jest.fn().mockResolvedValue([newUserTimetable]),
-//                 }),
-//               }),
-//           };
-//           return cb(mockTx);
-//         },
-//       );
+describe('Timetable Service', () => {
+  let service: TimetableService;
 
-//       const result = await service.createTimetable('user-1', {
-//         timetableName: 'Sem 1',
-//       });
+  const { mockDb, reset: resetDb } = createMockDatabase();
 
-//       expect(result.timetable).toEqual(newTimetable);
-//       expect(result.eventIds).toBeUndefined();
-//     });
+  beforeEach(async () => {
+    const module = await Test.createTestingModule({
+      providers: [
+        TimetableService,
+        { provide: DatabaseService, useValue: { db: mockDb } },
+      ],
+    }).compile();
 
-//     it('should throw InternalServerException for timetable not created', async () => {
-//       dbService.db.transaction.mockImplementation(
-//         (cb: (tx: any) => Promise<any>) => {
-//           const mockTx = {
-//             insert: jest
-//               .fn()
-//               .mockReturnValueOnce({
-//                 values: jest.fn().mockReturnValue({
-//                   returning: jest.fn().mockResolvedValue([]),
-//                 }),
-//               })
-//               .mockReturnValueOnce({
-//                 values: jest.fn().mockReturnValue({
-//                   returning: jest
-//                     .fn()
-//                     .mockResolvedValue([{ UserTimetableID: 1 }]),
-//                 }),
-//               }),
-//           };
+    service = module.get(TimetableService);
+  });
 
-//           return cb(mockTx);
-//         },
-//       );
+  afterEach(() => {
+    resetDb();
+  });
 
-//       await expect(
-//         service.createTimetable('user-1', { timetableName: 'testy' }),
-//       ).rejects.toThrow(InternalServerErrorException);
-//     });
+  //TESTS
+  //CREATE
+  describe('Test_createTimetable', () => {
+    //UnHappy - throw if insert failed
+    it('should throw if Timetable insert failed', async () => {
+      //Arrange
+      const dto = createCreateTimetableDto({ timetableName: undefined });
 
-//     it('should throw if eventIds dont exist', async () => {
-//       dbService.db.transaction.mockImplementation(
-//         (cb: (tx: any) => Promise<any>) => {
-//           const mockTx = {
-//             insert: jest
-//               .fn()
-//               .mockReturnValueOnce({
-//                 values: jest.fn().mockReturnValue({
-//                   returning: jest
-//                     .fn()
-//                     .mockResolvedValue([{ timetableID: 1, userID: 'user-1' }]),
-//                 }),
-//               })
-//               .mockReturnValueOnce({
-//                 values: jest.fn().mockReturnValue({
-//                   returning: jest
-//                     .fn()
-//                     .mockResolvedValue([{ UserTimetableID: 1 }]),
-//                 }),
-//               }),
-//             select: jest.fn().mockReturnValue({
-//               from: jest.fn().mockReturnValue({
-//                 where: jest.fn().mockResolvedValue([{ eventID: 1 }]),
-//               }),
-//             }), //select
-//           };
+      mockTransaction(mockDb, {
+        insert: [
+          [], //Insert Failed
+        ],
+      });
 
-//           return cb(mockTx);
-//         },
-//       );
+      //Act + Assert
+      await expect(service.createTimetable(userId, dto)).rejects.toThrow(
+        InternalServerErrorException,
+      );
+      expect(mockDb.insert).toHaveBeenCalledTimes(1);
+    });
 
-//       await expect(
-//         service.createTimetable('user-1', {
-//           timetableName: 'Test',
-//           eventIds: [1, 2, 3],
-//         }),
-//       ).rejects.toThrow(NotFoundException);
-//     });
+    //UnHappy - throw if UserTimetable insert failed
+    it('should throw if UserTimetable insert failed', async () => {
+      //Arrange
+      const dto = createCreateTimetableDto();
+      const timetable = createTimetable();
+      mockTransaction(mockDb, {
+        insert: [
+          [timetable], //Timetable
+          [], //UserTimetable insert failed
+        ],
+      });
 
-//     it('should create timetable if all events are valid', async () => {
-//       dbService.db.transaction.mockImplementation(
-//         (cb: (tx: any) => Promise<any>) => {
-//           const mockTx = {
-//             insert: jest
-//               .fn()
-//               .mockReturnValueOnce({
-//                 values: jest.fn().mockReturnValue({
-//                   returning: jest
-//                     .fn()
-//                     .mockResolvedValue([{ timetableID: 1, userID: 'user-1' }]),
-//                 }),
-//               })
-//               .mockReturnValueOnce({
-//                 values: jest.fn().mockReturnValue({
-//                   returning: jest
-//                     .fn()
-//                     .mockResolvedValue([{ UserTimetableID: 1 }]),
-//                 }),
-//               })
-//               .mockReturnValueOnce({
-//                 values: jest.fn().mockReturnValue({
-//                   onConflictDoNothing: jest.fn().mockResolvedValue([]),
-//                 }),
-//               }),
+      //Act + Assert
+      await expect(service.createTimetable(userId, dto)).rejects.toThrow(
+        InternalServerErrorException,
+      );
+      expect(mockDb.insert).toHaveBeenCalledTimes(2);
+    });
 
-//             select: jest.fn().mockReturnValue({
-//               from: jest.fn().mockReturnValue({
-//                 where: jest
-//                   .fn()
-//                   .mockResolvedValue([{ eventID: 1 }, { eventID: 2 }]),
-//               }),
-//             }), //select
-//           };
+    //Happy - create empty timetable
+    it('should create an empty timetable', async () => {
+      //Arrange
+      const dto = createCreateTimetableDto({ eventIds: [] });
+      const timetable = createTimetable({ timetableName: dto.timetableName });
+      const userTimetable = createUserTimetable({
+        UserID: userId,
+        TimetableID: timetable.timetableID,
+      });
 
-//           return cb(mockTx);
-//         },
-//       );
+      mockTransaction(mockDb, {
+        insert: [
+          [timetable], //Timetable
+          [userTimetable], //UserTimetable insert failed
+        ],
+      });
 
-//       const timetable = await service.createTimetable('user-1', {
-//         eventIds: [1, 2],
-//       });
+      const expected: TimetableResponseDto = {
+        UserTimetableID: userTimetable.UserTimetableID,
+        timetable: timetable,
+      };
 
-//       expect(timetable.eventIds).toEqual([1, 2]);
-//     });
-//   }); //create - done
+      //Act
+      const result = await service.createTimetable(userId, dto);
 
-//   describe('getAllTimetables', () => {
-//     it('should return timetables with their linked eventIds grouped correctly', async () => {
-//       const rows = [
-//         {
-//           UserTimetable: {
-//             UserTimetableID: 1,
-//             UserID: 'user-1',
-//             TimetableID: 1,
-//           },
-//           timetable: makeTimetable({ timetableID: 1 }),
-//           eventID: 10,
-//         },
-//         {
-//           UserTimetable: {
-//             UserTimetableID: 1,
-//             UserID: 'user-1',
-//             TimetableID: 1,
-//           },
-//           timetable: makeTimetable({ timetableID: 1 }),
-//           eventID: 11,
-//         },
-//         {
-//           UserTimetable: {
-//             UserTimetableID: 2,
-//             UserID: 'user-1',
-//             TimetableID: 2,
-//           },
-//           timetable: makeTimetable({ timetableID: 2 }),
-//           eventID: null,
-//         },
-//       ];
+      //Act + Assert
+      expect(result).toMatchObject(expected);
+      expect(mockDb.insert).toHaveBeenCalledTimes(2);
+    });
 
-//       dbService.db.select.mockReturnValue({
-//         from: jest.fn().mockReturnValue({
-//           innerJoin: jest.fn().mockReturnValue({
-//             leftJoin: jest.fn().mockReturnValue({
-//               where: jest.fn().mockResolvedValue(rows),
-//             }),
-//           }),
-//         }),
-//       });
+    //Happy - create timetable with events
+    it('should create a timetable with an event', async () => {
+      //Arrange
+      const event = createEvent();
+      const dto = createCreateTimetableDto({ eventIds: [event.eventID] });
+      const timetable = createTimetable({ timetableName: dto.timetableName });
+      const userTimetable = createUserTimetable({
+        UserID: userId,
+        TimetableID: timetable.timetableID,
+      });
 
-//       const result = await service.getAllTimetables('user-1');
+      mockTransaction(mockDb, {
+        select: [[event]],
+        insert: [
+          [timetable], //Timetable
+          [userTimetable], //UserTimetable insert failed
+          [{ eventID: event.eventID, timetableID: timetable.timetableID }],
+        ],
+      });
 
-//       expect(result.timetables).toHaveLength(2);
-//       expect(result.timetables[0].eventIds).toEqual([10, 11]);
-//       expect(result.timetables[1].eventIds).toBeUndefined();
-//     });
-//   }); //get all done
+      const expected: TimetableResponseDto = {
+        UserTimetableID: userTimetable.UserTimetableID,
+        timetable: timetable,
+        eventIds: [event.eventID],
+      };
 
-//   describe('getTimetableById', () => {
-//     it('should throw NotFoundException when timetable does not exist', async () => {
-//       dbService.db.select.mockReturnValue({
-//         from: jest.fn().mockReturnValue({
-//           innerJoin: jest.fn().mockReturnValue({
-//             leftJoin: jest.fn().mockReturnValue({
-//               where: jest.fn().mockResolvedValue([]),
-//             }),
-//           }),
-//         }),
-//       });
+      //Act
+      const result = await service.createTimetable(userId, dto);
 
-//       await expect(service.getTimetableById('user-1', 999)).rejects.toThrow(
-//         NotFoundException,
-//       );
-//     });
+      //Act + Assert
+      expect(result).toMatchObject(expected);
+      expect(mockDb.insert).toHaveBeenCalledTimes(3);
+      expect(mockDb.select).toHaveBeenCalled();
+    });
+  }); //END_Test_createTimetable
 
-//     it('should return timetable with events with timetable id', async () => {
-//       const timetableData = {
-//         timetableID: 1,
-//         timetableName: 'Test',
-//       };
+  //GetAll
+  describe('Test_getAllTimetables', () => {
+    //UnHappy - return empty timetables
+    it('should return empty timetables if none found', async () => {
+      //Arrange
+      mockDbResult(mockDb.select, []);
 
-//       dbService.db.select.mockReturnValue({
-//         from: jest.fn().mockReturnValue({
-//           innerJoin: jest.fn().mockReturnValue({
-//             leftJoin: jest.fn().mockReturnValue({
-//               where: jest.fn().mockResolvedValue([
-//                 {
-//                   UserTimetable: {
-//                     UserTimetableID: 1,
-//                     UserID: 'user-1',
-//                     TimetableID: 1,
-//                   },
-//                   timetable: timetableData,
-//                   eventID: 1,
-//                 },
-//                 {
-//                   UserTimetable: {
-//                     UserTimetableID: 1,
-//                     UserID: 'user-1',
-//                     TimetableID: 1,
-//                   },
-//                   timetable: timetableData,
-//                   eventID: 2,
-//                 },
-//               ]),
-//             }),
-//           }),
-//         }),
-//       });
+      const expected: TimetableListResponseDto = {
+        timetables: [],
+      };
 
-//       const result = await service.getTimetableById('user-1', 1);
-//       expect(result.timetable).toEqual(timetableData);
-//       expect(result.eventIds).toEqual([1, 2]);
-//     });
-//   });
+      //Act
+      const result = await service.getAllTimetables(userId);
 
-//   describe('updateTimetable', () => {
-//     it('should throw BadRequestException when no update fields are provided', async () => {
-//       await expect(service.updateTimetable('user-1', 1, {})).rejects.toThrow(
-//         BadRequestException,
-//       );
-//     });
+      //Assert
+      expect(result).toMatchObject(expected);
+      expect(mockDb.select).toHaveBeenCalled();
+    });
 
-//     it('should throw NotFoundException if there is o timetable to update', async () => {
-//       dbService.db.transaction.mockImplementation(
-//         (cb: (tx: any) => Promise<any>) => {
-//           const mockTx = {
-//             select: jest.fn().mockReturnValue({
-//               from: jest.fn().mockReturnValue({
-//                 innerJoin: jest.fn().mockReturnValue({
-//                   where: jest.fn().mockReturnValue({
-//                     limit: jest.fn().mockResolvedValue([]),
-//                   }),
-//                 }),
-//               }),
-//             }),
-//           };
+    //Happy - return timetables
+    it('should return timetables found for user', async () => {
+      //Arrange
+      const timetable1 = createTimetable();
+      const timetable2 = createTimetable();
 
-//           return cb(mockTx);
-//         },
-//       );
+      const userTimetable1 = createUserTimetable();
+      const userTimetable2 = createUserTimetable();
 
-//       await expect(
-//         service.updateTimetable('user-1', 1, { timetableName: 'hallo' }),
-//       ).rejects.toThrow(NotFoundException);
-//     });
+      const event = createEvent();
 
-//     it('should update name, and remove event, and add event', async () => {
-//       const timetable = makeTimetable();
-//       const newTimetable = makeTimetable({ timetableName: 'newName' });
+      const dbResponse = [
+        {
+          UserTimetable: userTimetable1,
+          timetable: timetable1,
+          eventID: event.eventID,
+        },
+        {
+          UserTimetable: userTimetable2,
+          timetable: timetable2,
+          eventID: event.eventID,
+        },
+      ];
+      mockDbResult(mockDb.select, dbResponse);
 
-//       dbService.db.transaction.mockImplementation(
-//         (cb: (tx: any) => Promise<any>) => {
-//           let selectCallCount = 0;
+      const expected: TimetableListResponseDto = {
+        timetables: [
+          {
+            timetable: timetable1,
+            UserTimetableID: userTimetable1.UserTimetableID,
+            eventIds: [event.eventID],
+          },
+          {
+            timetable: timetable2,
+            UserTimetableID: userTimetable2.UserTimetableID,
+            eventIds: [event.eventID],
+          },
+        ],
+      };
 
-//           const mockTx = {
-//             select: jest.fn().mockImplementation(() => {
-//               selectCallCount++;
-//               if (selectCallCount === 1) {
-//                 return {
-//                   from: jest.fn().mockReturnValue({
-//                     innerJoin: jest.fn().mockReturnValue({
-//                       where: jest.fn().mockReturnValue({
-//                         limit: jest
-//                           .fn()
-//                           .mockResolvedValue([{ Timetable: timetable }]),
-//                       }),
-//                     }),
-//                   }),
-//                 };
-//               }
+      //Act
+      const result = await service.getAllTimetables(userId);
 
-//               return {
-//                 from: jest.fn().mockReturnValue({
-//                   where: jest.fn().mockResolvedValue([{ eventID: 3 }]),
-//                 }),
-//               };
-//             }), //select
+      //Assert
+      expect(result).toMatchObject(expected);
+      expect(mockDb.select).toHaveBeenCalled();
+    });
+  }); //END_Test_getAllTimetables
 
-//             update: jest.fn().mockReturnValue({
-//               set: jest.fn().mockReturnValue({
-//                 where: jest.fn().mockReturnValue({
-//                   returning: jest.fn().mockResolvedValue([newTimetable]),
-//                 }),
-//               }),
-//             }), //udpate
+  //GetById
+  describe('Test_getTimetableById', () => {
+    //UnHappy - no timetable found
+    it('should throw if no timetable found', async () => {
+      //Arrange
+      mockDbResult(mockDb.select, []);
 
-//             insert: jest.fn().mockReturnValue({
-//               values: jest.fn().mockReturnValue({
-//                 onConflictDoNothing: jest.fn().mockResolvedValue([]),
-//               }),
-//             }), //insert
+      //Act + Assert
+      await expect(
+        service.getTimetableById(userId, timetableId),
+      ).rejects.toThrow(NotFoundException);
+      expect(mockDb.select).toHaveBeenCalled();
+    });
 
-//             delete: jest.fn().mockReturnValue({
-//               where: jest.fn().mockResolvedValue([]),
-//             }),
-//           };
+    //Happy - return timetable with event ids
+    it('should return timetable with eventIds', async () => {
+      //Arrange
+      const timetable = createTimetable();
+      const userTimetable = createUserTimetable();
+      const event = createEvent();
 
-//           return cb(mockTx);
-//         },
-//       );
+      const dbResult = {
+        UserTimetable: userTimetable,
+        timetable,
+        eventID: event.eventID,
+      };
 
-//       dbService.db.select.mockReturnValue({
-//         from: jest.fn().mockReturnValue({
-//           innerJoin: jest.fn().mockReturnValue({
-//             leftJoin: jest.fn().mockReturnValue({
-//               where: jest.fn().mockResolvedValue([
-//                 {
-//                   UserTimetable: {
-//                     UserTimetableID: 1,
-//                     UserID: 'user-1',
-//                     TimetableID: 1,
-//                   },
-//                   timetable: newTimetable,
-//                   eventID: 3,
-//                 },
-//               ]),
-//             }),
-//           }),
-//         }),
-//       });
+      mockDbResult(mockDb.select, [dbResult]);
 
-//       const result = await service.updateTimetable('user-1', 1, {
-//         timetableName: 'newName',
-//         addEventIds: [3],
-//         removeEventIds: [1],
-//       });
+      const expected: TimetableResponseDto = {
+        UserTimetableID: userTimetable.UserTimetableID,
+        timetable,
+        eventIds: [event.eventID],
+      };
 
-//       expect(result.timetable.timetableName).toBe('newName');
-//       expect(result.eventIds).toEqual([3]);
-//     });
+      //Act
+      const result = await service.getTimetableById(
+        userId,
+        timetable.timetableID,
+      );
 
-//     it('should throw InternalServerException when timetable not updated', async () => {
-//       const timetable = makeTimetable();
+      //Assert
+      expect(result).toMatchObject(expected);
+      expect(mockDb.select).toHaveBeenCalled();
+    });
+  }); //END_Test_getTimetableById
 
-//       dbService.db.transaction.mockImplementation(
-//         (cb: (tx: any) => Promise<any>) => {
-//           const mockTx = {
-//             select: jest.fn().mockReturnValue({
-//               from: jest.fn().mockReturnValue({
-//                 innerJoin: jest.fn().mockReturnValue({
-//                   where: jest.fn().mockReturnValue({
-//                     limit: jest
-//                       .fn()
-//                       .mockResolvedValue([{ Timetable: timetable }]),
-//                   }),
-//                 }),
-//               }),
-//             }),
+  //Update
+  describe('Test_updateTimetable', () => {
+    //UnHappy - timetable doesn't exist
+    it('should throw if timetable does not exist', async () => {
+      //Arrange
+      mockTransaction(mockDb, {
+        select: [
+          [], //UserTimetable
+        ],
+      });
 
-//             update: jest.fn().mockReturnValue({
-//               set: jest.fn().mockReturnValue({
-//                 where: jest.fn().mockReturnValue({
-//                   returning: jest.fn().mockResolvedValue([]),
-//                 }),
-//               }),
-//             }),
-//           };
+      const dto = createUpdateTimetableDto();
 
-//           return cb(mockTx);
-//         },
-//       );
+      //Act + Assert
+      await expect(
+        service.updateTimetable(userId, timetableId, dto),
+      ).rejects.toThrow(NotFoundException);
+    });
 
-//       await expect(
-//         service.updateTimetable('user-1', 1, { timetableName: 'newName' }),
-//       ).rejects.toThrow(InternalServerErrorException);
-//     });
-//   });
+    //UnHappy - Update failed
+    it('should throw if update failed', async () => {
+      //Arrange
+      const timetable = createTimetable();
+      const userTimetable = createUserTimetable();
 
-//   describe('deleteTimetable', () => {
-//     it('should throw NotFoundException when timetable does not exist', async () => {
-//       dbService.db.select.mockReturnValue({
-//         from: jest.fn().mockReturnValue({
-//           innerJoin: jest.fn().mockReturnValue({
-//             where: jest.fn().mockReturnValue({
-//               limit: jest.fn().mockResolvedValue([]),
-//             }),
-//           }),
-//         }),
-//       });
+      const dbResponse = {
+        UserTimetable: userTimetable,
+        Timetable: timetable,
+      };
 
-//       await expect(service.deleteTimetable('user-1', 999)).rejects.toThrow(
-//         NotFoundException,
-//       );
-//     });
+      mockTransaction(mockDb, {
+        select: [
+          [dbResponse], //UserTimetable
+        ],
+        update: [[]], //update failed
+      });
 
-//     it('should delete timetable', async () => {
-//       const timetable = makeTimetable();
+      const dto = createUpdateTimetableDto();
 
-//       dbService.db.select.mockReturnValue({
-//         from: jest.fn().mockReturnValue({
-//           innerJoin: jest.fn().mockReturnValue({
-//             where: jest.fn().mockReturnValue({
-//               limit: jest.fn().mockResolvedValue([{ Timetable: timetable }]),
-//             }),
-//           }),
-//         }),
-//       });
+      //Act + Assert
+      await expect(
+        service.updateTimetable(userId, timetableId, dto),
+      ).rejects.toThrow(InternalServerErrorException);
+    });
 
-//       dbService.db.delete.mockReturnValue({
-//         where: jest.fn().mockReturnValue({
-//           returning: jest.fn().mockResolvedValue([timetable]),
-//         }),
-//       });
+    //UnHappy - no fields to update
+    it('should throw if no fields to update', async () => {
+      //Arrange
+      const dto = {};
 
-//       const result = await service.deleteTimetable('user-1', 1);
-//       expect(result).toEqual({ success: true });
-//     });
+      //Act + Assert
+      await expect(
+        service.updateTimetable(userId, timetableId, dto),
+      ).rejects.toThrow(BadRequestException);
+    });
 
-//     it('should throw InternalServerException for timetable not deleted', async () => {
-//       const timetable = makeTimetable();
+    //Happy - update timetable name
+    it('should update the timetables name', async () => {
+      //Arrange
+      const timetable = createTimetable();
+      const userTimetable = createUserTimetable();
+      const dto = createUpdateTimetableDto({
+        timetableName: 'newName',
+        addEventIds: [],
+        removeEventIds: [],
+      });
+      const updatedTimetable = createTimetable(dto);
+      const event = createEvent();
 
-//       dbService.db.select.mockReturnValue({
-//         from: jest.fn().mockReturnValue({
-//           innerJoin: jest.fn().mockReturnValue({
-//             where: jest.fn().mockReturnValue({
-//               limit: jest.fn().mockResolvedValue([{ Timetable: timetable }]),
-//             }),
-//           }),
-//         }),
-//       });
+      const dbResponse = {
+        UserTimetable: userTimetable,
+        Timetable: timetable,
+      };
 
-//       dbService.db.delete.mockReturnValue({
-//         where: jest.fn().mockReturnValue({
-//           returning: jest.fn().mockResolvedValue([]),
-//         }),
-//       });
+      const fetchResult = {
+        UserTimetable: userTimetable,
+        timetable: updatedTimetable,
+        eventID: event.eventID,
+      };
 
-//       await expect(service.deleteTimetable('user-1', 1)).rejects.toThrow(
-//         InternalServerErrorException,
-//       );
-//     });
-//   });
-// });
+      const expected: TimetableResponseDto = {
+        UserTimetableID: userTimetable.UserTimetableID,
+        timetable: updatedTimetable,
+        eventIds: [event.eventID],
+      };
+
+      mockTransaction(mockDb, {
+        select: [
+          [dbResponse], //UserTimetable
+          [fetchResult], //fetchTimetableWithEvents
+        ],
+        update: [[updatedTimetable]], //update failed
+      });
+
+      //Act
+      const result = await service.updateTimetable(userId, timetableId, dto);
+
+      //Assert
+      expect(result).toMatchObject(expected);
+      expect(mockDb.select).toHaveBeenCalledTimes(2);
+      expect(mockDb.update).toHaveBeenCalled();
+    });
+
+    //Happy - add and remove events
+    it('should insert and delete eventIds', async () => {
+      //Arrange
+      const timetable = createTimetable();
+      const userTimetable = createUserTimetable();
+      const eventToDelete = createEvent();
+      const eventToAdd = createEvent();
+
+      const dto = createUpdateTimetableDto({
+        timetableName: undefined,
+        addEventIds: [eventToAdd.eventID],
+        removeEventIds: [eventToDelete.eventID],
+      });
+
+      const dbResponse = {
+        UserTimetable: userTimetable,
+        Timetable: timetable,
+      };
+
+      const fetchResult = {
+        UserTimetable: userTimetable,
+        timetable,
+        eventID: eventToAdd.eventID,
+      };
+
+      const expected: TimetableResponseDto = {
+        UserTimetableID: userTimetable.UserTimetableID,
+        timetable,
+        eventIds: [eventToAdd.eventID],
+      };
+
+      mockTransaction(mockDb, {
+        select: [
+          [dbResponse], //UserTimetable
+          [{ eventID: eventToAdd.eventID }], //validateEventIds
+          [fetchResult], //fetchTimetableWithEvents
+        ],
+        insert: [[]], //hasAdd
+        delete: [[]], //hasRemove
+      });
+
+      //Act
+      const result = await service.updateTimetable(userId, timetableId, dto);
+
+      //Assert
+      expect(result).toMatchObject(expected);
+      expect(mockDb.select).toHaveBeenCalledTimes(3);
+      expect(mockDb.update).not.toHaveBeenCalled();
+      expect(mockDb.insert).toHaveBeenCalled();
+      expect(mockDb.delete).toHaveBeenCalled();
+    });
+  }); //END_Test_updateTimetable
+
+  //Delete
+  describe('Test_deleteTimetable', () => {
+    //UnHappy - timetable doesn't exist
+    it('should throw if timetable does not exist', async () => {
+      //Arrange
+      mockDbResult(mockDb.select, []);
+
+      //Act + Assert
+      await expect(
+        service.deleteTimetable(userId, timetableId),
+      ).rejects.toThrow(NotFoundException);
+      expect(mockDb.select).toHaveBeenCalled();
+    });
+
+    //UnHappy - failed to delete
+    it('should throw if the timetable failed to delete', async () => {
+      //Arrange
+      const userTimetable = createUserTimetable();
+      const timetable = createTimetable();
+
+      mockDbResult(mockDb.select, [
+        {
+          UserTimetable: userTimetable,
+          Timetable: timetable,
+        },
+      ]);
+
+      mockDbResult(mockDb.delete, []);
+
+      //Act + Assert
+      await expect(
+        service.deleteTimetable(userId, timetableId),
+      ).rejects.toThrow(InternalServerErrorException);
+      expect(mockDb.select).toHaveBeenCalled();
+      expect(mockDb.delete).toHaveBeenCalled();
+    });
+
+    //Happy - return success with successfull deletion
+    it('should return success if delete succeeded', async () => {
+      //Arrange
+      const userTimetable = createUserTimetable();
+      const timetable = createTimetable();
+
+      mockDbResult(mockDb.select, [
+        {
+          UserTimetable: userTimetable,
+          Timetable: timetable,
+        },
+      ]);
+
+      mockDbResult(mockDb.delete, [timetable]);
+
+      //Act
+      const result = await service.deleteTimetable(userId, timetableId);
+
+      //Assert
+      expect(result).toMatchObject({ success: true });
+      expect(mockDb.select).toHaveBeenCalled();
+      expect(mockDb.delete).toHaveBeenCalled();
+    });
+  });
+}); //END_Timetable Service

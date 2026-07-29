@@ -75,7 +75,7 @@ const SESSION_EXAMPLE = {
 
 const AUTH_RESPONSE_EXAMPLE = { user: USER_EXAMPLE, session: SESSION_EXAMPLE };
 
-@Controller('api/auth')
+@Controller('auth')
 @ApiExtraModels(AuthEnvelopeDto)
 export class AuthController {
   private readonly logger = new Logger(AuthController.name);
@@ -201,6 +201,16 @@ export class AuthController {
     @Req() req: IncomingMessage,
     @Res() res: ServerResponse,
   ): Promise<void> {
+    console.log('GET-SESSION IN:', req.headers.cookie);
+    const end = res.end.bind(res);
+    res.end = ((c?: any, ...r: any[]) => {
+      console.log(
+        'GET-SESSION OUT:',
+        res.statusCode,
+        c?.toString()?.slice(0, 120),
+      );
+      return end(c, ...r);
+    }) as typeof res.end;
     return this.handleRequest(req, res);
   }
 
@@ -505,6 +515,14 @@ export class AuthController {
       `Callback cookies: ${JSON.stringify(req.headers.cookie ?? 'NONE')}`,
     );
     this.logger.log('Google OAuth callback received');
+    res.on('finish', () =>
+      console.log(
+        'SET-COOKIE:',
+        res.getHeader('set-cookie'),
+        '| LOC:',
+        res.getHeader('location'),
+      ),
+    );
     return this.handleRequest(req, res);
   }
 
