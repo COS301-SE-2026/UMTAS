@@ -1,0 +1,16 @@
+apps/backend/src/Events/event.service.spec.ts
+  h_84e82529bd05a5 141,149,181,219,259,301,366
+apps/backend/src/Events/event.service.ts
+  h_84e82529bd05a5 8,413-415
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "1f10fd03aea4a87ae063b9bd32286c7c20edab7a",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}
