@@ -54,7 +54,6 @@ worker.on("failed", (job, error) => {
     jobId: job?.id,
     queueName: job?.queueName,
     data: job?.data,
-    attemptsMade: job?.attemptsMade,
     errorName: error?.name,
     errorMessage: error?.message,
     errorStack: error?.stack,
