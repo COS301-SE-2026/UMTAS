@@ -5,7 +5,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { and, eq, getTableColumns, inArray } from 'drizzle-orm';
+import { and, eq, getTableColumns, ilike, inArray } from 'drizzle-orm';
 import { DatabaseService } from '../db/database.service';
 import {
   Event,
@@ -410,7 +410,12 @@ export class EventService {
         uniName: University.UniversityName,
       })
       .from(University)
-      .where(inArray(University.UniversityID, moduleUniversityIds))
+      .where(
+        and(
+          inArray(University.UniversityID, moduleUniversityIds),
+          ilike(University.UniversityName, `%user%`),
+        ),
+      )
       .limit(1);
 
     const roleAuthorizedUniversityIds = universityRoles
