@@ -31,9 +31,13 @@ const DB_MODES = {
 type DbMode = (typeof DB_MODES)[keyof typeof DB_MODES];
 
 function parseDbMode(value: string | undefined): DbMode {
-  const mode = value ?? DB_MODES.DATABASE;
+  const mode = (value ?? DB_MODES.DATABASE).trim().toUpperCase();
   if (mode === DB_MODES.PGLITE || mode === DB_MODES.DATABASE) return mode;
   throw new Error(`Invalid DB_MODE: ${mode}`);
+}
+
+function isSeedEnabled(value: string | undefined): boolean {
+  return value?.trim().toUpperCase() === 'TRUE';
 }
 
 @Injectable()
@@ -72,7 +76,7 @@ export class DatabaseService
       await this.migrate();
       this.logger.log('Database migrations applied successfully');
 
-      if (process.env.SEED === 'TRUE') {
+      if (isSeedEnabled(process.env.SEED)) {
         await this.seedService?.seed(this.db);
       }
     } catch (error) {

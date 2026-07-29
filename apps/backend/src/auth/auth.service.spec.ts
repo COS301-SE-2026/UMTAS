@@ -54,6 +54,24 @@ describe('AuthService', () => {
       expect(() => service.onModuleInit()).not.toThrow();
     });
 
+    it('uses secure cookies in staging without enabling production checks', () => {
+      const nodeEnv = process.env.NODE_ENV;
+      process.env.NODE_ENV = 'staging';
+      (betterAuth as jest.Mock).mockClear();
+
+      try {
+        service.onModuleInit();
+        service.getAuth();
+        const calls = (betterAuth as jest.Mock).mock.calls as Array<
+          [Record<string, { useSecureCookies?: boolean }>]
+        >;
+        expect(calls.at(-1)?.[0].advanced.useSecureCookies).toBe(true);
+      } finally {
+        if (nodeEnv === undefined) delete process.env.NODE_ENV;
+        else process.env.NODE_ENV = nodeEnv;
+      }
+    });
+
     it('uses the local Redis default when REDIS_URL is absent', () => {
       const redisUrl = process.env.REDIS_URL;
       delete process.env.REDIS_URL;

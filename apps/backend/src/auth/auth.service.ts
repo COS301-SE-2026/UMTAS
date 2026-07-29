@@ -67,7 +67,9 @@ export class AuthService implements OnModuleInit {
       .split(',')
       .map((s: string) => s.trim())
       .filter(Boolean);
-    const isProduction = process.env.NODE_ENV === 'production';
+    const environment = process.env.NODE_ENV?.trim().toLowerCase();
+    const isProduction = environment === 'production';
+    const useSecureCookies = isProduction || environment === 'staging';
     const redisUrl = process.env.REDIS_URL ?? 'redis://localhost:6379';
 
     // PGlite is PostgreSQL-compatible, so both PGlite and Postgres use the 'pg'
@@ -89,6 +91,7 @@ export class AuthService implements OnModuleInit {
       googleClientSecret,
       systemAdminUserIds,
       isProduction,
+      useSecureCookies,
       redisUrl,
       logger: this.logger,
       sendResetPasswordEmail: async ({ email, url, name }) => {

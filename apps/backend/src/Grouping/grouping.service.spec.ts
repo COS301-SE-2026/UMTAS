@@ -1,7 +1,7 @@
 import { Test } from '@nestjs/testing';
 
 //Constants
-import { groupId, moduleId } from '../Testing/constants.spec';
+import { groupId, moduleId } from '../Testing/constants';
 
 //Actual Services
 import { GroupingService } from './grouping.service';

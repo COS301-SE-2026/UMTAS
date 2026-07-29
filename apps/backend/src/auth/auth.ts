@@ -156,6 +156,7 @@ interface CreateAuthInput {
   googleClientSecret?: string;
   systemAdminUserIds?: string[];
   isProduction: boolean;
+  useSecureCookies?: boolean;
   logger: LoggerService;
   appURL?: string;
   sendResetPasswordEmail: (input: {
@@ -183,6 +184,7 @@ export function createAuth(input: CreateAuthInput) {
     googleClientSecret,
     systemAdminUserIds,
     isProduction,
+    useSecureCookies = isProduction,
     logger,
     sendResetPasswordEmail,
     sendVerificationEmail,
@@ -197,10 +199,6 @@ export function createAuth(input: CreateAuthInput) {
       'Redis URL configured but client initialization failed. Rate limiting and session storage require Redis in production.',
     );
   }
-  const useSecureCookies = ['production', 'staging'].includes(
-    process.env.NODE_ENV ?? '',
-  );
-
   return betterAuth({
     secondaryStorage: redisClient
       ? redisStorage({

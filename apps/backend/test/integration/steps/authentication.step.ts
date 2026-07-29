@@ -34,7 +34,7 @@ export function authenticationStep<TPlan>(
       const actor = context.actor('student');
       await authenticateRealActor(actor, plan, plan.resolveVerificationRequest);
 
-      const response = await actor.request.get('/api/auth/get-session');
+      const response = await actor.request.get('/auth/get-session');
       expectStatus(response, 200, 'fetch authenticated session');
       expectObject(response.body, 'fetch authenticated session');
       const user =

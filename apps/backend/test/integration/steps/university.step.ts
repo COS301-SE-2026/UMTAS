@@ -54,12 +54,9 @@ export function studentUniversitySelectionStep<TPlan>(
       assert.equal(application.body.UniversityID, university.UniversityID);
       assert.equal(application.body.role, 'STUDENT');
 
-      const selected = await student.request.post(
-        '/api/auth/select-university',
-        {
-          json: { uniId: university.UniversityID },
-        },
-      );
+      const selected = await student.request.post('/auth/select-university', {
+        json: { uniId: university.UniversityID },
+      });
       expectStatus(selected, [200, 201], 'select university');
       expectObject(selected.body, 'select university');
       assert.equal(selected.body.uniId, university.UniversityID);

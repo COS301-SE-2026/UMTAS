@@ -129,6 +129,7 @@ export class TestActor {
 }
 
 export function createFetchHttpTransport(baseUrl: string): HttpTransport {
+  const normalizedBaseUrl = `${baseUrl.replace(/\/+$/u, '')}/`;
   return async (input) => {
     const headers = new Headers(input.headers);
     let body: BodyInit | undefined;
@@ -151,14 +152,17 @@ export function createFetchHttpTransport(baseUrl: string): HttpTransport {
       headers.set('content-type', 'application/json');
       body = JSON.stringify(input.json);
     }
-    const response = await fetch(new URL(input.path, baseUrl), {
-      method: input.method,
-      headers,
-      body,
-      signal: input.timeoutMs
-        ? AbortSignal.timeout(input.timeoutMs)
-        : undefined,
-    });
+    const response = await fetch(
+      new URL(input.path.replace(/^\/+/u, ''), normalizedBaseUrl),
+      {
+        method: input.method,
+        headers,
+        body,
+        signal: input.timeoutMs
+          ? AbortSignal.timeout(input.timeoutMs)
+          : undefined,
+      },
+    );
     const text = await response.text();
     let parsed: unknown = text;
     if (text) {

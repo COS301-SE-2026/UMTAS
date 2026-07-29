@@ -19,7 +19,9 @@ export type IntegrationHarness = FlowRuntime & {
 };
 
 export function createIntegrationHarness(): IntegrationHarness {
-  const backendUrl = process.env.FULL_STACK_BACKEND_URL ?? DEFAULT_BACKEND_URL;
+  const backendUrl = integrationApiUrl(
+    process.env.FULL_STACK_BACKEND_URL ?? DEFAULT_BACKEND_URL,
+  );
   const pool = new Pool({
     connectionString: requiredEnv('DATABASE_URL'),
   });
@@ -66,6 +68,16 @@ export function createIntegrationHarness(): IntegrationHarness {
       }
     },
   };
+}
+
+function integrationApiUrl(backendUrl: string): string {
+  const url = new URL(backendUrl);
+  const pathSegments = url.pathname.split('/').filter(Boolean);
+  if (pathSegments.at(-1) !== 'api') pathSegments.push('api');
+  url.pathname = `/${pathSegments.join('/')}/`;
+  url.search = '';
+  url.hash = '';
+  return url.toString();
 }
 
 function requiredEnv(name: string): string {

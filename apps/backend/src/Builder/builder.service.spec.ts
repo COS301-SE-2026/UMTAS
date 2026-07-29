@@ -3,7 +3,7 @@ import { BuilderService } from './builder.service';
 import { Test } from '@nestjs/testing';
 
 //Constants
-import { userId, moduleId, uniId, courseId } from '../Testing/constants.spec';
+import { userId, moduleId, uniId, courseId } from '../Testing/constants';
 
 //Mock services
 import { createMockDatabase } from '../Testing/Mocks/database.mock';

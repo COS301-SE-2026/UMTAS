@@ -19,7 +19,7 @@ export async function authenticateRealActor(
 ): Promise<TestActor> {
   const signUp = await actor.request.post<{
     user?: { id?: string; email?: string };
-  }>('/api/auth/sign-up/email', { json: input });
+  }>('/auth/sign-up/email', { json: input });
   assertStatus(signUp.status, [200, 201], 'sign up');
 
   const verification = await resolveVerificationRequest(input);
@@ -33,7 +33,7 @@ export async function authenticateRealActor(
 
   const signIn = await actor.request.post<{
     user?: { id?: string; email?: string };
-  }>('/api/auth/sign-in/email', {
+  }>('/auth/sign-in/email', {
     json: { email: input.email, password: input.password },
   });
   assertStatus(signIn.status, [200, 201], 'sign in');

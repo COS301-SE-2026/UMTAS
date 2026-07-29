@@ -30,7 +30,7 @@ export function studentAuthenticationStep<TPlan extends StudentPlan>() {
     password: plan.password,
     name: plan.name,
     resolveVerificationRequest: async () => ({
-      path: `/api/auth/verify-email?token=${encodeURIComponent(
+      path: `/auth/verify-email?token=${encodeURIComponent(
         await waitForVerificationToken(plan.email, AUTH_EMAIL_TIMEOUT_MS),
       )}`,
     }),
