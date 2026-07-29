@@ -66,7 +66,6 @@ worker.on("failed", (job, error) => {
     jobId: job?.id,
     queueName: job?.queueName,
     data: job?.data,
-    attemptsMade: job?.attemptsMade,
     errorName: error?.name,
     errorMessage: error?.message,
     errorStack: error?.stack,
@@ -130,5 +129,5 @@ function readCallbackJobId(
 }
 
 function buildPdfParseCallbackUrl(backendUrl: string, jobId: string): string {
-  return `${backendUrl.replace(/\/+$/u, "")}/pdf-parser/jobs/${encodeURIComponent(jobId)}/callback`;
+  return `${backendUrl.replace(/\/+$/u, "")}/api/pdf-parser/jobs/${encodeURIComponent(jobId)}/callback`;
 }

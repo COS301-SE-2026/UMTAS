@@ -89,7 +89,7 @@ function requiredEnv(name: string): string {
 }
 
 function solverJobsUrl(backendUrl: string): string {
-  return `${backendUrl.replace(/\/+$/u, "")}/solver/jobs`;
+  return `${backendUrl.replace(/\/+$/u, "")}/api/solver/jobs`;
 }
 
 function buildSolverInputUrl(backendUrl: string, jobId: string): string {
