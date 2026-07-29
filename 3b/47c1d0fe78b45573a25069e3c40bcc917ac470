@@ -1,0 +1,18 @@
+apps/frontend/src/components/organisms/nav/HelpCommandPallete.tsx
+  h_84e82529bd05a5 11-63,190-195,203-206
+apps/frontend/src/components/organisms/nav/Tutorial.tsx
+  h_84e82529bd05a5 9,13,28-29,47
+apps/frontend/src/types/HelpCommandPallete.ts
+  h_84e82529bd05a5 9-10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "3b47c1d0fe78b45573a25069e3c40bcc917ac470",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}
