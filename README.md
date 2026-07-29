@@ -27,18 +27,18 @@ _Built by: Wilmar Smit, Michael Tomlinson, Johan Coetzer, Marcel Stoltz, & Aidan
 [![Docs](https://img.shields.io/github/actions/workflow/status/COS301-SE-2026/UMTAS/deploy-docs.yml?branch=dev&style=for-the-badge&logo=readthedocs&logoColor=white&label=Docs)](https://cos301-se-2026.github.io/UMTAS/)
 [![Issues](https://img.shields.io/github/issues/COS301-SE-2026/UMTAS?style=for-the-badge&logo=github&logoColor=white&labelColor=1e293b&color=1d4ed8)](https://github.com/COS301-SE-2026/UMTAS/issues)
 [![Last Commit](https://img.shields.io/github/last-commit/COS301-SE-2026/UMTAS/dev?style=for-the-badge&logo=git&logoColor=white&labelColor=1e293b&color=1d4ed8)](https://github.com/COS301-SE-2026/UMTAS/commits/dev)
-[![CI](https://img.shields.io/github/actions/workflow/status/COS301-SE-2026/UMTAS/ci.yml?branch=dev&style=for-the-badge&logo=githubactions&logoColor=white&label=CI)](https://github.com/COS301-SE-2026/UMTAS/actions/workflows/ci.yml)
+
+<!-- [![CI](https://img.shields.io/github/actions/workflow/status/COS301-SE-2026/UMTAS/ci.yml?branch=dev&style=for-the-badge&logo=githubactions&logoColor=white&label=CI)](https://github.com/COS301-SE-2026/UMTAS/actions/workflows/ci.yml)
 [![Coverage](https://img.shields.io/codecov/c/github/COS301-SE-2026/UMTAS/dev?style=for-the-badge&logo=codecov&logoColor=white&label=Coverage)](https://codecov.io/gh/COS301-SE-2026/UMTAS)
-[![Quality Gate](https://img.shields.io/sonar/quality_gate/COS301-SE-2026_UMTAS?server=https%3A%2F%2Fsonarcloud.io&style=for-the-badge&logo=sonarcloud&logoColor=white)](https://sonarcloud.io/dashboard?id=COS301-SE-2026_UMTAS)
+[![Quality Gate](https://img.shields.io/sonar/quality_gate/COS301-SE-2026_UMTAS?server=https%3A%2F%2Fsonarcloud.io&style=for-the-badge&logo=sonarcloud&logoColor=white)](https://sonarcloud.io/dashboard?id=COS301-SE-2026_UMTAS) -->
+
 [![Uptime](https://img.shields.io/uptimerobot/ratio/m803102764-591e06f9f3d70c1a4b161f6f?style=for-the-badge&logo=uptimerobot&logoColor=white&label=Uptime+30d&color=1d4ed8)](https://dashboard.uptimerobot.com/monitors/803102764)
 
 <!-- Platform & Tooling -->
 
 [![pnpm](https://img.shields.io/badge/pnpm-monorepo-F69220?style=for-the-badge&logo=pnpm&logoColor=white)](https://pnpm.io/)
 [![Node](https://img.shields.io/badge/Node-%3E%3D20-16a34a?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
-[![Turborepo](https://img.shields.io/badge/Turborepo-workspace-000000?style=for-the-badge&logo=turborepo&logoColor=white)](https://turborepo.com/)
 [![Docker Pulls](https://img.shields.io/docker/pulls/vigilcs/umtas?style=for-the-badge&logo=docker&logoColor=white&label=Docker+Pulls&color=0db7ed)](https://hub.docker.com/u/vigilcs)
-[![Release](https://img.shields.io/badge/Release-pre--release-3f3f46?style=for-the-badge&logo=github&logoColor=white)](https://github.com/COS301-SE-2026/UMTAS/releases)
 
 <br>
 
@@ -56,11 +56,11 @@ _Built by: Wilmar Smit, Michael Tomlinson, Johan Coetzer, Marcel Stoltz, & Aidan
 
 <!-- Documentation Links -->
 
-[![Functional Requirements](<https://img.shields.io/badge/Functional_Requirements_(SRS)-View_Document-14532d?style=for-the-badge&logo=googledocs&logoColor=white>)](https://cos301-se-2026.github.io/UMTAS/requirements/Introduction/)
 [![Full Documentation](https://img.shields.io/badge/Full_Documentation-Visit_Site-14532d?style=for-the-badge&logo=readthedocs&logoColor=white)](https://cos301-se-2026.github.io/UMTAS/)
 [![Brand Style Guide](https://img.shields.io/badge/Brand_Style_Guide-Visit_Site-14532d?style=for-the-badge&logo=materialdesign&logoColor=white)](https://brand.capstone-vigil.dns.net.za/)
 [![Project Board](https://img.shields.io/badge/Project_Board-View_on_GitHub-14532d?style=for-the-badge&logo=github&logoColor=white)](https://github.com/orgs/COS301-SE-2026/projects/31)
 [![Issue Tracker](https://img.shields.io/badge/Issue_Tracker-GitHub_Issues-14532d?style=for-the-badge&logo=github&logoColor=white)](https://github.com/COS301-SE-2026/UMTAS/issues)
+[![capstone-vigil.dns.net.za](https://img.shields.io/badge/capstone--vigil.dns.net.za-Visit_Website-14532d?style=for-the-badge&logo=vercel&logoColor=white)](https://capstone-vigil.dns.net.za/)
 
 </div>
 
@@ -92,6 +92,210 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 </table>
 
 ---
+
+<div align="center">
+
+## <img src="https://api.iconify.design/mdi/bookshelf.svg?color=%233B82F6" width="24" height="24" valign="middle"> Documentation
+
+</div>
+
+<br>
+
+### <img src="https://api.iconify.design/mdi/numeric-1-circle.svg?color=%2314532d" width="20" height="20" valign="middle"> Demo 1
+
+<details>
+<summary>Show Demo 1 documentation</summary>
+
+<div align="center">
+
+[![capstone-vigil.dns.net.za](https://img.shields.io/badge/capstone--vigil.dns.net.za-Visit_Website-14532d?style=for-the-badge&logo=vercel&logoColor=white)](https://capstone-vigil.dns.net.za/)
+[![cos301-se-2026.github.io/UMTAS](https://img.shields.io/badge/cos301--se--2026.github.io%2FUMTAS-Visit_Docs-18181b?style=for-the-badge&logo=readthedocs&logoColor=white)](https://cos301-se-2026.github.io/UMTAS/demo1/)
+[![brand.capstone-vigil.dns.net.za](https://img.shields.io/badge/brand.capstone--vigil.dns.net.za-Visit_Brand_Site-14532d?style=for-the-badge&logo=materialdesign&logoColor=white)](https://brand.capstone-vigil.dns.net.za/)
+
+</div>
+
+<br>
+
+<details>
+<summary><strong>Requirements & Architecture</strong> &nbsp;-&nbsp; 10 documents</summary>
+<br>
+<div align="center">
+
+[![Introduction](https://img.shields.io/badge/Introduction-14532d?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo1/requirements/Introduction/)
+[![Domain Model](https://img.shields.io/badge/Domain_Model-14532d?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo1/requirements/Domain-Model/)
+[![User Stories](https://img.shields.io/badge/User_Stories-14532d?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo1/requirements/User-Stories/)
+[![Use Cases](https://img.shields.io/badge/Use_Cases-14532d?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo1/requirements/Use-Cases/)
+[![Functional Requirements](https://img.shields.io/badge/Functional_Requirements-14532d?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo1/requirements/Functional-Requirements/)
+[![Quality Requirements](https://img.shields.io/badge/Quality_Requirements-14532d?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo1/requirements/Quality-Requirements/)
+[![Architectural Requirements](https://img.shields.io/badge/Architectural_Requirements-14532d?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo1/requirements/Architectural-Requirements/)
+[![Technology Requirements](https://img.shields.io/badge/Technology_Requirements-14532d?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo1/requirements/Technology-Requirements/)
+[![Traceability Matrix](https://img.shields.io/badge/Traceability_Matrix-14532d?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo1/requirements/Traceability-Matrix/)
+[![API Service Contracts](https://img.shields.io/badge/API_Service_Contracts-14532d?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo1/requirements/API-Service-Contracts/)
+
+</div>
+</details>
+
+<details>
+<summary><strong>Design Specifications</strong> &nbsp;-&nbsp; 2 documents</summary>
+<br>
+<div align="center">
+
+[![Brand Style Guide](https://img.shields.io/badge/Brand_Style_Guide-14532d?style=for-the-badge)](https://brand.capstone-vigil.dns.net.za/)
+[![Wireframes](https://img.shields.io/badge/Wireframes-78350f?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo1/design/Wireframes/)
+
+</div>
+</details>
+
+<details>
+<summary><strong>Developer Guides</strong> &nbsp;-&nbsp; 10 guides</summary>
+<br>
+<div align="center">
+
+[![Repo Setup](https://img.shields.io/badge/Repo_Setup-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo1/developer-guides/Repo-Setup-Guide/)
+[![Git Strategy](https://img.shields.io/badge/Git_Strategy-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo1/developer-guides/git-strategy-guide/)
+[![Master Dev Guide](https://img.shields.io/badge/Master_Dev_Guide-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo1/developer-guides/master-development-guide/)
+[![Backend Development](https://img.shields.io/badge/Backend_Development-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo1/developer-guides/backend-development-guide/)
+[![Frontend Development](https://img.shields.io/badge/Frontend_Development-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo1/developer-guides/frontend-development-guide/)
+[![Server Setup](https://img.shields.io/badge/Server_Setup-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo1/developer-guides/Server-Setup-Guide/)
+[![Server Operations](https://img.shields.io/badge/Server_Operations-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo1/developer-guides/server-guide/)
+[![Unit Testing](https://img.shields.io/badge/Unit_Testing-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo1/developer-guides/unit-testing-guide/)
+[![Integration Testing](https://img.shields.io/badge/Integration_Testing-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo1/developer-guides/integration-testing-guide/)
+[![Local CI/CD](https://img.shields.io/badge/Local_CI%2FCD-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo1/developer-guides/local-cicd-guide/)
+
+</div>
+</details>
+
+<details>
+<summary><strong>Reference</strong> &nbsp;-&nbsp; 2 documents</summary>
+<br>
+<div align="center">
+
+[![API Reference](https://img.shields.io/badge/API_Reference-52525b?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo1/api/API-Reference/)
+[![Team Profiles](https://img.shields.io/badge/Team_Profiles-52525b?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo1/management/Team-Profiles/)
+
+</div>
+</details>
+
+</details>
+
+<br>
+
+### <img src="https://api.iconify.design/mdi/numeric-2-circle.svg?color=%231d4ed8" width="20" height="20" valign="middle"> Demo 2
+
+<br>
+
+<details>
+<summary><strong>SRS - Updated Functional Requirements</strong> &nbsp;-&nbsp; 5 marks</summary>
+<br>
+<div align="center">
+
+[![Functional Requirements](https://img.shields.io/badge/Functional_Requirements-1d4ed8?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/srs/FUNCTIONAL_REQUIREMENTS/)
+
+</div>
+</details>
+
+<details>
+<summary><strong>SRS - Updated Use Cases and Use Case Diagrams</strong> &nbsp;-&nbsp; 10 marks</summary>
+<br>
+<div align="center">
+
+[![Use Cases and Diagrams](https://img.shields.io/badge/Use_Cases_and_Diagrams-1d4ed8?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/srs/USE_CASES/)
+
+</div>
+</details>
+
+<details>
+<summary><strong>SRS - Updated Domain Model</strong> &nbsp;-&nbsp; 5 marks</summary>
+<br>
+<div align="center">
+
+[![Domain Model](https://img.shields.io/badge/Domain_Model-1d4ed8?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/srs/DOMAIN_MODEL/)
+
+</div>
+</details>
+
+<details>
+<summary><strong>SRS - Non-Functional Requirements</strong> &nbsp;-&nbsp; 10 marks</summary>
+<br>
+<div align="center">
+
+[![Non-Functional Requirements](https://img.shields.io/badge/Non--Functional_Requirements-1d4ed8?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/srs/NON-FUNCTIONAL_REQUIREMENTS/)
+
+</div>
+</details>
+
+<details>
+<summary><strong>SAS - Architectural Requirements</strong> &nbsp;-&nbsp; 20 marks</summary>
+<br>
+<div align="center">
+
+[![Architectural Requirements](https://img.shields.io/badge/Architectural_Requirements-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/sas/architecture/ARCHITECTURAL_REQUIREMENTS/)
+
+</div>
+</details>
+
+<details>
+<summary><strong>SAS - Architecture Diagram</strong> &nbsp;-&nbsp; 10 marks</summary>
+<br>
+<div align="center">
+
+[![Architecture Diagram](https://img.shields.io/badge/Architecture_Diagram-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/sas/architecture/ARCHITECTURAL_DIAGRAM/)
+
+</div>
+</details>
+
+<details>
+<summary><strong>SAS - Deployment Diagram</strong> &nbsp;-&nbsp; 10 marks &nbsp;&middot;&nbsp; 8 documents</summary>
+<br>
+<div align="center">
+
+[![Deployment Overview](https://img.shields.io/badge/Deployment_Overview-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/sas/deployment/)
+[![Live System](https://img.shields.io/badge/Live_System-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/sas/deployment/LiveAccessibleSystem/)
+[![Environment Parity](https://img.shields.io/badge/Environment_Parity-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/sas/deployment/EnvironmentParity/)
+[![Infrastructure as Code](https://img.shields.io/badge/Infrastructure_as_Code-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/sas/deployment/InfrastructureAsCode/)
+[![Secrets Management](https://img.shields.io/badge/Secrets_Management-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/sas/deployment/SecretsManagement/)
+[![Rollback Strategy](https://img.shields.io/badge/Rollback_Strategy-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/sas/deployment/RollBackStrategy/)
+[![Deployment Diagram](https://img.shields.io/badge/Deployment_Diagram-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/sas/deployment/DeploymentDiagram/)
+[![CI/CD Pipeline](https://img.shields.io/badge/CI%2FCD_Pipeline-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/sas/deployment/PipelineDiagram/)
+
+</div>
+</details>
+
+<details>
+<summary><strong>Coding Standards Document</strong> &nbsp;-&nbsp; 10 marks &nbsp;&middot;&nbsp; 4 documents</summary>
+<br>
+<div align="center">
+
+[![Master Development Guide](https://img.shields.io/badge/Master_Development_Guide-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/developer-guides/master-development-guide/)
+[![Backend Standards](https://img.shields.io/badge/Backend_Standards-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/developer-guides/backend-development-guide/)
+[![Frontend Standards](https://img.shields.io/badge/Frontend_Standards-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/developer-guides/frontend-development-guide/)
+[![Git Standards](https://img.shields.io/badge/Git_Standards-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/developer-guides/git-strategy-guide/)
+
+</div>
+</details>
+
+<details>
+<summary><strong>Testing Policy Document</strong> &nbsp;-&nbsp; 10 marks</summary>
+<br>
+<div align="center">
+
+[![Testing Policy Document](https://img.shields.io/badge/Testing_Policy_Document-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/developer-guides/testing-policy/)
+
+</div>
+</details>
+
+<details>
+<summary><strong>User Manual Document</strong> &nbsp;-&nbsp; 5 marks</summary>
+<br>
+<div align="center">
+
+[![UMTAS Documentation](https://img.shields.io/badge/UMTAS_Documentation-52525b?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/)
+
+</div>
+</details>
+
+<details>
+<summary><strong>Updated Brand Style Guide</strong> &nbsp;-&nbsp; 5
 
 <div align="center">
 
@@ -196,7 +400,7 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 
 </details>
 
----
+<!-- ---
 
 <div align="center">
 
@@ -245,7 +449,7 @@ UMTAS/
 └── pnpm-workspace.yaml       # Workspace package declarations
 ```
 
-</details>
+</details> -->
 
 ---
 
@@ -263,13 +467,13 @@ UMTAS/
 <img src="docs/diagrams/architecture/Architecture.svg" alt="UMTAS System Architecture" width="900">
 </div>
 
-The system follows a **Service-Oriented Architecture**. The Next.js frontend communicates exclusively with the NestJS API Core, which enforces JWT authentication and RBAC before dispatching long-running work (PDF parsing, constraint solving) to stateless workers via a BullMQ job queue. The FastAPI solver and PDF parser run as independently scalable services. All traffic is routed through Traefik with TLS termination.
+The system follows a **Service-Oriented Architecture**. The Next.js frontend communicates exclusively with the NestJS API Core, which enforces authentication and RBAC before dispatching long-running work (PDF parsing, constraint solving) to stateless workers via a BullMQ job queue. The FastAPI solver and PDF parser run as independently scalable services. All traffic is routed through Traefik with TLS termination.
 
 </details>
 
 ---
 
-<div align="center">
+<!-- <div align="center">
 
 ## <img src="https://api.iconify.design/mdi/infinity.svg?color=%233B82F6" width="24" height="24" valign="middle"> CI/CD Pipeline
 
@@ -284,8 +488,7 @@ The system follows a **Service-Oriented Architecture**. The Next.js frontend com
 </div>
 
 </details>
-
----
+-->
 
 <div align="center">
 
@@ -407,7 +610,7 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
       <details>
         <summary>About</summary>
         <br>
-        Third-year CS student and Software Developer Intern at Tyto Insights (Skunkworks). Leads the DevOps and infrastructure workstream, specialising in Docker environments and automated deployment pipelines. Ensures the NestJS backend and PostgreSQL services are optimised for high-performance delivery. Previous work at Gendac provides backend versatility across the stack.
+        Third-year CS student and Software Developer Intern at Tyto Insights (Skunkworks). Leads the DevOps and infrastructure workstream, specialising in Docker environments and automated deployment pipelines. Ensures the NestJS backend and PostgreSQL services are optimised for high-performance delivery.
       </details>
       <br>
       <a href="https://www.linkedin.com/in/marcel-stoltz/"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"></a>
@@ -435,7 +638,7 @@ Team Vigil comprises five University of Pretoria Computer Science students with 
   </tr>
 </table>
 
----
+<!-- ---
 
 <div align="center">
 
@@ -501,83 +704,7 @@ Adds Grafana, Prometheus, and Loki to the stack for local observability testing.
 
 </details>
 
----
-
-<div align="center">
-
-## <img src="https://api.iconify.design/mdi/bookshelf.svg?color=%233B82F6" width="24" height="24" valign="middle"> Documentation
-
-</div>
-
-<div align="center">
-
-[![capstone-vigil.dns.net.za](https://img.shields.io/badge/capstone--vigil.dns.net.za-Visit_Website-14532d?style=for-the-badge&logo=vercel&logoColor=white)](https://capstone-vigil.dns.net.za/)
-[![cos301-se-2026.github.io/UMTAS](https://img.shields.io/badge/cos301--se--2026.github.io%2FUMTAS-Visit_Docs-18181b?style=for-the-badge&logo=readthedocs&logoColor=white)](https://cos301-se-2026.github.io/UMTAS/)
-[![brand.capstone-vigil.dns.net.za](https://img.shields.io/badge/brand.capstone--vigil.dns.net.za-Visit_Brand_Site-14532d?style=for-the-badge&logo=materialdesign&logoColor=white)](https://brand.capstone-vigil.dns.net.za/)
-
-</div>
-
-<br>
-
-<details>
-<summary><strong>Requirements & Architecture</strong> &nbsp;-&nbsp; 10 documents</summary>
-<br>
-<div align="center">
-
-[![Introduction](https://img.shields.io/badge/Introduction-14532d?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/requirements/Introduction/)
-[![Domain Model](https://img.shields.io/badge/Domain_Model-14532d?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/requirements/Domain-Model/)
-[![User Stories](https://img.shields.io/badge/User_Stories-14532d?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/requirements/User-Stories/)
-[![Use Cases](https://img.shields.io/badge/Use_Cases-14532d?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/requirements/Use-Cases/)
-[![Functional Requirements](https://img.shields.io/badge/Functional_Requirements-14532d?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/requirements/Functional-Requirements/)
-[![Quality Requirements](https://img.shields.io/badge/Quality_Requirements-14532d?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/requirements/Quality-Requirements/)
-[![Architectural Requirements](https://img.shields.io/badge/Architectural_Requirements-14532d?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/requirements/Architectural-Requirements/)
-[![Technology Requirements](https://img.shields.io/badge/Technology_Requirements-14532d?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/requirements/Technology-Requirements/)
-[![Traceability Matrix](https://img.shields.io/badge/Traceability_Matrix-14532d?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/requirements/Traceability-Matrix/)
-[![API Service Contracts](https://img.shields.io/badge/API_Service_Contracts-14532d?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/requirements/API-Service-Contracts/)
-
-</div>
-</details>
-
-<details>
-<summary><strong>Design Specifications</strong> &nbsp;-&nbsp; 2 documents</summary>
-<br>
-<div align="center">
-
-[![Brand Style Guide](https://img.shields.io/badge/Brand_Style_Guide-14532d?style=for-the-badge)](https://brand.capstone-vigil.dns.net.za/)
-[![Wireframes](https://img.shields.io/badge/Wireframes-78350f?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/design/Wireframes/)
-
-</div>
-</details>
-
-<details>
-<summary><strong>Developer Guides</strong> &nbsp;-&nbsp; 10 guides</summary>
-<br>
-<div align="center">
-
-[![Repo Setup](https://img.shields.io/badge/Repo_Setup-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/developer-guides/Repo-Setup-Guide/)
-[![Git Strategy](https://img.shields.io/badge/Git_Strategy-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/developer-guides/git-strategy-guide/)
-[![Master Dev Guide](https://img.shields.io/badge/Master_Dev_Guide-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/developer-guides/master-development-guide/)
-[![Backend Development](https://img.shields.io/badge/Backend_Development-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/developer-guides/backend-development-guide/)
-[![Frontend Development](https://img.shields.io/badge/Frontend_Development-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/developer-guides/frontend-development-guide/)
-[![Server Setup](https://img.shields.io/badge/Server_Setup-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/developer-guides/Server-Setup-Guide/)
-[![Server Operations](https://img.shields.io/badge/Server_Operations-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/developer-guides/server-guide/)
-[![Unit Testing](https://img.shields.io/badge/Unit_Testing-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/developer-guides/unit-testing-guide/)
-[![Integration Testing](https://img.shields.io/badge/Integration_Testing-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/developer-guides/integration-testing-guide/)
-[![Local CI/CD](https://img.shields.io/badge/Local_CI%2FCD-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/developer-guides/local-cicd-guide/)
-
-</div>
-</details>
-
-<details>
-<summary><strong>Reference</strong> &nbsp;-&nbsp; 2 documents</summary>
-<br>
-<div align="center">
-
-[![API Reference](https://img.shields.io/badge/API_Reference-52525b?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/api/API-Reference/)
-[![Team Profiles](https://img.shields.io/badge/Team_Profiles-52525b?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/management/Team-Profiles/)
-
-</div>
-</details>
+--- -->
 
 ---
 
