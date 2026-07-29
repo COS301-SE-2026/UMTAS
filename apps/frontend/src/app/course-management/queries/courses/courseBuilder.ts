@@ -6,7 +6,7 @@ import {
 
 export type CourseDTO = components["schemas"]["CourseDto"];
 
-export type createCourses = paths["/Courses"]["post"];
+export type createCourses = paths["/api/Courses"]["post"];
 
 export type createCoursesBody =
   createCourses["requestBody"]["content"]["application/json"];
@@ -23,7 +23,7 @@ export class createCoursesBuilder extends RequestBuilder<
     this.setUrl("/Courses").setMethod(RequestMethod.POST);
   }
 }
-export type fetchAllCourses = paths["/Courses/getAll"]["post"];
+export type fetchAllCourses = paths["/api/Courses/getAll"]["post"];
 export type fetchAllCoursesBody =
   fetchAllCourses["requestBody"]["content"]["application/json"];
 export type fetchAllCoursesRes =
@@ -40,7 +40,7 @@ export class getAllCoursesBuilder extends RequestBuilder<
   }
 }
 
-export type updateCourse = paths["/Courses/{CourseId}"]["patch"];
+export type updateCourse = paths["/api/Courses/{CourseId}"]["patch"];
 export type updateCoursePath = updateCourse["parameters"]["path"];
 export type updateCourseBody =
   updateCourse["requestBody"]["content"]["application/json"];
@@ -58,7 +58,7 @@ export class updateCourseBuilder extends RequestBuilder<
   }
 }
 
-export type deleteCourse = paths["/Courses/{CourseId}"]["delete"];
+export type deleteCourse = paths["/api/Courses/{CourseId}"]["delete"];
 export type deleteCoursePath = deleteCourse["parameters"]["path"];
 export type deleteCourseRes =
   deleteCourse["responses"]["200"]["content"]["application/json"];
@@ -73,7 +73,7 @@ export class deleteCourseBuilder extends RequestBuilder<
   }
 }
 
-export type addModuleToCourse = paths["/modules/{CourseID}"]["put"];
+export type addModuleToCourse = paths["/api/modules/{CourseID}"]["put"];
 export type addModuleToCoursePath = addModuleToCourse["parameters"]["path"];
 export type addModuleToCourseBody =
   addModuleToCourse["requestBody"]["content"]["application/json"];

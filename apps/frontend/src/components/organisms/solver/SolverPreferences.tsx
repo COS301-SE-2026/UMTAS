@@ -8,7 +8,7 @@ import {
   CardHeader,
 } from "@/components/atoms/baseShadcn/card";
 import { LucidePlusCircle } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import PreferenceSection from "@/components/molecules/solver/PreferencesCard";
 import { useRouter } from "next/navigation";
 import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
@@ -22,8 +22,13 @@ import { createTimeTableBuilder } from "@/app/builder/utils/timetables/TimeTable
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Spinner } from "@/components/atoms/baseShadcn/spinner";
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
-import { Tienne } from "next/font/google";
 import { Input } from "@/components/atoms/baseShadcn/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "@/components/atoms/baseShadcn/dialog";
 
 type solverProps = {
   modules: ModuleResponseDto[];
@@ -42,6 +47,7 @@ export default function SolverPreferences({ modules, events }: solverProps) {
   const [timetableCreated, setTimetableCreated] = useState<boolean>(false);
   const router = useRouter();
   const [timetableName, setTimetableName] = useState<string>("");
+  const [showDialog, setShowDialog] = useState(false);
 
   const { data: resultOfPoll, isFetching: pollFetching } = useQuery({
     queryKey: ["solver", "poll"],
@@ -135,10 +141,9 @@ export default function SolverPreferences({ modules, events }: solverProps) {
         const result = await createTimeTableMutation.mutateAsync();
         setJobID(null);
         getQueryClient().setQueryData(["solver", "poll"], null);
-        if (timetableCreated === false)
-          alert(
-            `Timetable successfully created ${await result?.timetable.timetableName}`,
-          );
+        if (timetableCreated === false) {
+          setShowDialog(true);
+        }
       }
       if (resultOfPoll.status === "failed" && jobFailed === false) {
         console.log("set job to failed");
@@ -276,6 +281,7 @@ export default function SolverPreferences({ modules, events }: solverProps) {
             disabled={loadingStatus()}
             type="button"
             onClick={enrollUser}
+            className="mt-8"
           >
             Upload and Create Timetable
           </Button>
@@ -296,10 +302,43 @@ export default function SolverPreferences({ modules, events }: solverProps) {
   function handleError() {
     return resultOfPoll?.error as { code?: string; message?: string };
   }
+  function TimetableCreatedDialog() {
+    return (
+      <>
+        <Dialog open={showDialog}>
+          <DialogContent>
+            <DialogTitle>Successfully created</DialogTitle>
+            <DialogDescription>
+              {timetableName} an be found in your schedules
+            </DialogDescription>
+
+            <div className="flex flex-col p-5 space-y-5">
+              <Button
+                onClick={() => {
+                  setShowDialog(false);
+                  router.push("/schedules");
+                }}
+              >
+                View Schedules
+              </Button>
+              <Button
+                onClick={() => {
+                  setShowDialog(false);
+                }}
+              >
+                Close
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </>
+    );
+  }
 
   return (
     <>
-      <Card className="shadow-lg border-[var(--border)] rounded-xl bg-[var(--bg-surface)] w-md">
+      {TimetableCreatedDialog()}
+      <Card className="shadow-lg border-[var(--border)] rounded-xl bg-[var(--bg-surface)] w-md h-fit">
         <CardHeader className="text-xl font-bold text-[var(--text-primary)]">
           Set your preferences
         </CardHeader>

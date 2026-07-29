@@ -36,7 +36,7 @@ export function buildPdfParseWorkerConfig(
   const cliCwd = readEnv("PDF_PARSE_CLI_CWD");
   const callbackBaseUrl =
     readEnv("PDF_PARSE_CALLBACK_URL") ??
-    "http://localhost:3000/pdf-parser/jobs";
+    "http://localhost:3000/api/pdf-parser/jobs";
 
   const config: PdfParseWorkerConfig = {
     queueName: common.queueName,
