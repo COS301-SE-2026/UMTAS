@@ -49,10 +49,25 @@ import { fetchAllModules } from "@/app/course-management/queries/modules/moduleB
 import { UserDetails } from "@/lib/userclass/userClass";
 
 import Tutorial from "@/components/organisms/nav/Tutorial";
-const steps = [
+const emptySteps = [
   {
     target: "#ref-go-to-builder",
     content: "Go to the builder page to create a schedule",
+  },
+];
+
+const steps = [
+  {
+    target: "#select-timetable",
+    content: "Select your schedule here.",
+  },
+  {
+    target: "#btn-edit",
+    content: "Edit your schedule here.",
+  },
+  {
+    target: "#btn-delete",
+    content: "Delete your schedule.",
   },
 ];
 
@@ -224,7 +239,7 @@ export function ScheduleView({
   if (timetables.length === 0 && viewMode !== "Generate") {
     return (
       <div className="flex flex-col items-center gap-4 py-20 text-center">
-        <Tutorial steps={steps} wait={true} />
+        <Tutorial steps={emptySteps} wait={true} />
 
         <p className="text-base text-[var(--text-secondary)]">
           No timetables found.
@@ -357,6 +372,8 @@ export function ScheduleView({
 
     return (
       <>
+        <Tutorial steps={steps} wait={true} />
+
         <div
           data-testid="schedules-Calendar-Div"
           className="flex flex-col gap-3"
@@ -370,7 +387,10 @@ export function ScheduleView({
                   setSelectedDate(new Date());
                 }}
               >
-                <SelectTrigger className="bg-[var(--bg-surface)] border-[var(--border)]">
+                <SelectTrigger
+                  id="select-timetable"
+                  className="bg-[var(--bg-surface)] border-[var(--border)]"
+                >
                   <SelectValue placeholder="Select a Timetable" />
                 </SelectTrigger>
                 <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)]">
@@ -403,6 +423,7 @@ export function ScheduleView({
                 />
                 <div className="flex flex-row justify-center md:justify-end w-full md:w-auto gap-2 mb-4 md:mb-0">
                   <Button
+                    id="btn-edit"
                     type="button"
                     className="h-7 px-3 text-xs bg-[var(--bg-surface)] text-[var(--text-primary)] border-[var(--border)] hover:opacity-90"
                     onClick={editTimetable}
@@ -411,6 +432,7 @@ export function ScheduleView({
                   </Button>
 
                   <Button
+                    id="btn-delete"
                     data-testid="schedules-Delete-Btn"
                     type="button"
                     className="h-7 px-3 text-xs bg-[var(--destructive)] text-[var(--text-primary)] border-[var(--border)] hover:opacity-90"

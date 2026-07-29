@@ -26,6 +26,10 @@ const baseSteps = [
     target: "#btn-customise-schedule",
     content: "Customise your events and modules.",
   },
+  {
+    target: "#btn-create-schedule",
+    content: "Create your schedule.",
+  },
 ];
 
 const extendedSteps: typeof baseSteps = [];
@@ -305,6 +309,7 @@ export function GenerateStep({
         {renderContent()}
         <div className="flex justify-center mt-8">
           <Button
+            id="btn-create-schedule"
             data-testid="schedules-Create-Btn"
             type="button"
             size="default"
