@@ -94,6 +94,7 @@ nav:
       - Wireframes: design/Wireframes.md
   - Developer Portal:
       - Overview: developer-guides/index.md
+      - Coding Standards: developer-guides/coding-standards.md
       - API Reference: api/API-Reference.md
       - Repo Setup: developer-guides/Repo-Setup-Guide.md
       - Git Strategy: developer-guides/git-strategy-guide.md
