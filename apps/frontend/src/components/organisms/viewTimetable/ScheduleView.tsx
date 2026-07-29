@@ -45,6 +45,7 @@ import { getAllEventsQ } from "@/components/templates/builder/Queries/eventQueri
 import { getAllModulesQ } from "@/components/templates/builder/Queries/moduleQueries";
 import { removeTimetableMut } from "@/components/templates/builder/Queries/timetableQueries";
 import { useMutation } from "@tanstack/react-query";
+import { fetchAllModules } from "@/app/course-management/queries/modules/moduleBuilder";
 
 interface ScheduleViewProps {
   onEventCountChange: (count: number) => void;
@@ -77,8 +78,15 @@ export function ScheduleView({
   const { mutateAsync: addTimetable } = useMutation(addTimetableMut());
   const { mutateAsync: updateTimetable } = useMutation(updateTimetableMut());
 
-  const { data: allModules = [], isLoading: isLoadingModules } =
-    useQuery(getAllModulesQ());
+  const { data: allModules = [], isLoading: isLoadingModules } = useQuery({
+    queryKey: ["Modules", "Courses"],
+    queryFn: async () => {
+      const result = await fetchAllModules({
+        userEnrollment: true,
+      });
+      return result;
+    },
+  });
   const { data: allEvents = [], isLoading: isLoadingEvents } =
     useQuery(getAllEventsQ());
   const { data: timetables = [], isLoading: isLoadingTimetables } =
