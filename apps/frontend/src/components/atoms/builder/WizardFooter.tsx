@@ -43,6 +43,7 @@ export function WizardFooter({
         <div>{renderBackButton()}</div>
 
         <Button
+          id="next-button"
           data-testid="builder-Next-Step"
           type="button"
           size="default"

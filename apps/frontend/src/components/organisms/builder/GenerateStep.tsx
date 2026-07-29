@@ -13,6 +13,23 @@ import CustomiseShellPopup from "@/components/organisms/customise/CustomiseShell
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 
+import Tutorial from "@/components/organisms/nav/Tutorial";
+
+let eventAdded = false;
+
+const baseSteps = [
+  {
+    target: "#timetable-name",
+    content: "Name your schedule.",
+  },
+  {
+    target: "#btn-customise-schedule",
+    content: "Customise your events and modules.",
+  },
+];
+
+const extendedSteps: typeof baseSteps = [];
+
 interface GenerateStepProps {
   modules: ModuleResponseDto[];
   events: EventResponse[];
@@ -144,6 +161,16 @@ export function GenerateStep({
               criteria?.endTime || "",
             );
 
+            if (!eventAdded && event) {
+              //Add step for event
+              extendedSteps.push({
+                target: `#event-${event.eventId}`,
+                content: "Select event to be added to schedule.",
+              });
+
+              eventAdded = true;
+            }
+
             return (
               <div
                 key={event.eventId}
@@ -228,8 +255,11 @@ export function GenerateStep({
     );
   }
 
+  const steps = [...baseSteps, ...extendedSteps];
   return (
     <div>
+      <Tutorial steps={steps} wait={true} />
+
       <div className="mx-auto w-full max-w-2xl flex justify-left pb-4">
         <Button
           data-testid="schedules-Create-Btn"

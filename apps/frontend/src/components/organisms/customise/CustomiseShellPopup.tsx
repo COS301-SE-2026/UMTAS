@@ -25,7 +25,9 @@ export default function CustomiseShellPopup() {
     <div className="">
       <AlertDialog>
         <AlertDialogTrigger asChild>
-          <Button variant="outline">Customise</Button>
+          <Button id="btn-customise-schedule" variant="outline">
+            Customise
+          </Button>
         </AlertDialogTrigger>
 
         <AlertDialogContent className="w-max max-w-[95vw] p-6">

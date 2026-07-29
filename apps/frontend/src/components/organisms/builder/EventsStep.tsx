@@ -39,12 +39,17 @@ import {
 } from "@/components/templates/builder/Queries/eventQueries";
 import { useMutation } from "@tanstack/react-query";
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
+
 import Tutorial from "@/components/organisms/nav/Tutorial";
 
 const baseSteps = [
   {
     target: "#btn-add-new-event",
     content: "Add a new event to the list.",
+  },
+  {
+    target: "#next-button",
+    content: "Click here to go to the schedules page to create your timetable.",
   },
 ];
 
