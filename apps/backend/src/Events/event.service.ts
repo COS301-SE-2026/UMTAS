@@ -20,6 +20,7 @@ import {
   parseJob,
   usersTable,
   UniversityRole,
+  University,
 } from '../entities/index';
 import {
   CreateEventDto,
@@ -369,6 +370,7 @@ export class EventService {
     moduleUniversityIds: string[],
     venues: EventDto['venues'],
   ): Promise<string> {
+    // console.log(`resolveAuthorizedModuleUniversity: userId[${userId}] | moduleId[${moduleId}] | moduleUniversityIds[${moduleUniversityIds}] | venues[${JSON.stringify(venues)}]`);
     const [user] = await db
       .select({ role: usersTable.role })
       .from(usersTable)
@@ -403,6 +405,14 @@ export class EventService {
           inArray(UniversityRole.UniversityID, moduleUniversityIds),
         ),
       );
+    const [personalUni] = await db
+      .select({
+        uniName: University.UniversityName,
+      })
+      .from(University)
+      .where(inArray(University.UniversityID, moduleUniversityIds))
+      .limit(1);
+
     const roleAuthorizedUniversityIds = universityRoles
       .filter(
         ({ role }) =>
@@ -412,7 +422,7 @@ export class EventService {
       .map(({ universityId }) => universityId);
 
     const authorizedUniversityIds =
-      user?.role === 'sys_admin'
+      user?.role === 'sys_admin' || personalUni
         ? moduleUniversityIds
         : Array.from(
             new Set([
@@ -426,6 +436,7 @@ export class EventService {
             ]),
           ).sort();
     if (authorizedUniversityIds.length === 0) {
+      // console.log(`ThrowPart: ${JSON.stringify(authorizedUniversityIds)}`);///removeeeeeeeeeeeeeeeeeee
       throw new ForbiddenException(
         `User[${userId}] cannot create university events for this module`,
       );
