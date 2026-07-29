@@ -10,8 +10,6 @@ import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
 import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
 import { Checkbox } from "@/components/atoms/baseShadcn/checkbox";
 import CustomiseShellPopup from "@/components/organisms/customise/CustomiseShellPopup";
-import { ArrowLeft } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 interface GenerateStepProps {
   modules: ModuleResponseDto[];
@@ -56,8 +54,6 @@ export function GenerateStep({
   selectedEventIds,
   setSelectedEventIds,
 }: GenerateStepProps) {
-  const router = useRouter();
-
   //checkbox logic
 
   function checkboxLogic(eventId: string, isChecked: boolean) {
@@ -229,53 +225,55 @@ export function GenerateStep({
   }
 
   return (
-    <div>
-      <div className="mx-auto w-full max-w-2xl flex justify-left pb-4">
+    <div
+      data-testid="create-Schedule-Div"
+      className="mx-auto w-full max-w-2xl px-4 py-4 border rounded-xl border-[var(--border)] bg-[var(--bg-surface)]"
+    >
+      <div className="mb-8">
+        <h2 className="text-lg font-semibold text-[var(--text-primary)]">
+          Review and generate
+        </h2>
+        <p className="text-base text-[var(--text-secondary)] mt-1">
+          Check your events before generating your schedule.
+        </p>
+      </div>
+
+      <div className="mb-6 flex flex-col gap-2">
+        <Label
+          htmlFor="timetable-name"
+          className="text-sm font-medium text-[var(--text-secondary)]"
+        >
+          Schedule Name
+        </Label>
+        <Input
+          data-testid="schedule-Timetable-Input"
+          id="timetable-name"
+          value={timetableName}
+          onChange={(e) => setTimetableName(e.target.value)}
+          placeholder="e.g. Semester 1, 2024"
+          className="bg-[var(--bg-surface)] border-[var(--border)] text-[var(--text-primary)] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--ring)]"
+        />
+      </div>
+
+      {renderContent()}
+      <div className="flex justify-center mt-8">
         <Button
           data-testid="schedules-Create-Btn"
           type="button"
-          variant="ghost"
           size="default"
-          onClick={() => {
-            router.push("/builder");
-          }}
-          className="flex items-center gap-2 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-[var(--duration-fast)]"
+          //only generate when there is at least 1 event
+          disabled={isGenerating || selectedEventIds.length === 0}
+          onClick={() => onGenerate(timetableName, selectedEventIds)}
+          className="w-fit px-4 text-sm bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] hover:bg-[var(--btn-primary-hover)] disabled:opacity-40 transition-colors duration-[var(--duration-fast)]"
         >
-          <ArrowLeft size={16} strokeWidth={1.5} />
-          Back
+          {isGenerating
+            ? "Generating..."
+            : selectedEventIds.length === 0
+              ? "Select at least one event"
+              : isEditMode
+                ? "Edit Schedule"
+                : "Generate Schedule"}
         </Button>
-      </div>
-      <div
-        data-testid="create-Schedule-Div"
-        className="mx-auto w-full max-w-2xl px-4 py-4 border rounded-xl border-[var(--border)] bg-[var(--bg-surface)] min-h-150"
-      >
-        <div className="mb-8">
-          <h2 className="text-lg font-semibold text-[var(--text-primary)]">
-            Review and generate
-          </h2>
-          <p className="text-base text-[var(--text-secondary)] mt-1">
-            Check your events before generating your schedule.
-          </p>
-        </div>
-
-        <div className="mb-6 flex flex-col gap-2">
-          <Label
-            htmlFor="timetable-name"
-            className="text-sm font-medium text-[var(--text-secondary)]"
-          >
-            Schedule Name
-          </Label>
-          <Input
-            data-testid="schedule-Timetable-Input"
-            id="timetable-name"
-            value={timetableName}
-            onChange={(e) => setTimetableName(e.target.value)}
-            placeholder="e.g. Semester 1, 2024"
-            className="bg-[var(--bg-surface)] border-[var(--border)] text-[var(--text-primary)] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--ring)]"
-          />
-        </div>
-
-        {renderContent()}
       </div>
     </div>
   );
