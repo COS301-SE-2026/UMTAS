@@ -32,7 +32,7 @@
         | **Basic Flow** | 1. User navigates to analytics section.<br>2. System prompts user to select a module or dataset.<br>3. User selects a module.<br>4. System retrieves attendance data (submitted, actual, projected).<br>5. System aggregates and processes attendance statistics.<br>6. System displays dashboard with attendance overview and breakdown per time slot.<br>7. User can filter or switch between modules. |
         | **Alternate Flow** | **A1: No data available**<br>System displays empty state indicating no attendance records exist.<br><br>**A2: Module not found or inaccessible**<br>System shows error and returns user to selection screen.<br><br>**A3: Data retrieval failure**<br>System displays error and allows retry. |
         | **Postcondition** | Attendance analytics are displayed for selected module |
-        | **Requirements Covered** | R3.1.1.1 \| R3.1.1.1.1 \| R3.1.1.1.2 \| R3.1.1.1.3 |
+        | **Requirements Covered** | R3.1.1 \| R3.1.1.1 \| R3.1.1.1.1 \| R3.1.1.1.2 \| R3.1.1.1.3 |
 
     ---
     ??? "UC-AN-02: Explore Venue and Booking Analytics"
@@ -52,7 +52,7 @@
         | **Basic Flow** | 1. User selects “Venue & Booking Analytics”.<br>2. System retrieves venue usage data and booking records.<br>3. System generates venue heatmap based on module/event frequency.<br>4. System generates booking trend data over time.<br>5. System displays visualisations (heatmap + trend graphs).<br>6. User applies filters (date range, venue, module). |
         | **Alternate Flow** | **A1: No venue data available**<br>System displays empty heatmap with message.<br><br>**A2: No booking data available**<br>System shows empty trend graph.<br><br>**A3: Data processing failure**<br>System displays error and allows retry. |
         | **Postcondition** | Venue usage and booking analytics are displayed |
-        | **Requirements Covered** | R3.1.1.2 \| R3.1.1.2.1 \| R3.1.1.2.2 \| R3.1.1.2.3 |
+        | **Requirements Covered** | R3.1.1 \| R3.1.1.2 \| R3.1.1.2.1 \| R3.1.1.2.2 \| R3.1.1.2.3 |
 
     ---
     ??? "UC-AN-03: View Lecturer Analytics"
@@ -72,4 +72,4 @@
         | **Basic Flow** | 1. User navigates to lecturer analytics section.<br>2. System prompts user to select a lecturer or, for a Lecturer actor, defaults to their own profile.<br>3. System retrieves attendance and session data across the lecturer's modules.<br>4. System aggregates statistics (attendance trends, teaching load, module comparison).<br>5. System displays lecturer analytics dashboard with breakdowns by module and time period.<br>6. Admin can switch between lecturers; Lecturer can filter by own modules only. |
         | **Alternate Flow** | **A1: No data available**<br>System displays empty state indicating no records exist for the selected lecturer.<br><br>**A2: Lecturer not found or inaccessible**<br>System shows error and returns user to selection screen.<br><br>**A3: Data retrieval failure**<br>System displays error and allows retry.<br><br>**A4: Lecturer attempts to view another lecturer's analytics**<br>System denies access and displays a permissions error. |
         | **Postcondition** | Lecturer analytics are displayed for the selected lecturer(s) |
-        | **Requirements Covered** | R3.1.1.3 \| R3.1.1.3.1 \| R3.1.1.3.2 \| R3.1.1.3.3 |
+        | **Requirements Covered** | R3.1.1 \| R3.1.1.3 \| R3.1.1.3.1 \| R3.1.1.3.2 \| R3.1.1.3.3 \| R3.1.1.3.4 |

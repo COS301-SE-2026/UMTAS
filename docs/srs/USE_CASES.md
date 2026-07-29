@@ -82,6 +82,7 @@
     | **UC-TC-03** | Create Timetable | [Timetable Builder](#timetable-builder-id) | User |<span class="status-implemented">Implemented</span>|
     
     </div>
+    
     <div class="uc-table" markdown>
 
     ## Timetable Management

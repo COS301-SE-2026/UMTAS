@@ -72,4 +72,4 @@
         | **Basic Flow** | 1. System displays the staged modules and events imported from the PDF.<br>2. Uni_admin reviews the extracted data against the source document.<br>3. Uni_admin corrects or confirms flagged fields.<br>4. Uni_admin approves the verified data.<br>5. System commits the verified modules/events to the university's records.<br>6. System confirms successful verification. |
         | **Alternate Flow** | **A1: Data Rejected**<br>Uni_admin rejects the staged import and system discards the data without committing it.<br><br>**A2: Partial Verification**<br>Uni_admin approves only a subset of the staged data, and system commits only the approved entries. |
         | **Postcondition** | Verified modules/events are committed to the university's records, or the import is discarded |
-        | **Requirements Covered** | TBD |
+        | **Requirements Covered** | R2.3.1.2 \| R2.3.1.4 \| R2.3.1.6 |

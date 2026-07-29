@@ -75,7 +75,7 @@
         | **Postcondition** | Timetable is removed from system |
         | **Requirements Covered** | R2.1.3 |
 
----
+    ---
     ??? "UC-TM-04: Customise Timetable"
         <a id="uc-tm-04"></a>
         ##### High Level

@@ -50,4 +50,4 @@
         | **Basic Flow** | 1. System displays retrieved modules and events.<br>2. User reviews imported data.<br>3. User selects modules/events to include in timetable.<br>4. System validates selections.<br>5. System creates timetable from selected data.<br>6. System stores timetable under user profile.<br>7. System confirms successful creation. |
         | **Alternate Flow** | **A1: No items selected**<br>System prevents timetable creation and requests selection.<br><br>**A2: Data inconsistency detected**<br>System highlights conflicting or missing fields.<br><br>**A3: User cancels import**<br>System discards staged dataset without saving. |
         | **Postcondition** | Timetable is created and stored in system |
-        | **Requirements Covered** | R2.4.1.5 | R2.4.1.6
+        | **Requirements Covered** | R2.4.1.5 \| R2.4.1.6 \| R2.4.2 \| R2.4.2.1 \| R2.4.2.2 |
