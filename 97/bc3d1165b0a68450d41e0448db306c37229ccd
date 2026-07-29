@@ -1,0 +1,239 @@
+apps/frontend/src/components/organisms/customise/CustomiseModuleShell.tsx
+  s_45cd50f25f393e::t_6d373b4482e5a2 151
+apps/frontend/src/app/layout.tsx
+  s_45cd50f25f393e::t_6d373b4482e5a2 63-64,66-69
+apps/frontend/src/components/organisms/builder/EventsStep.tsx
+  s_45cd50f25f393e::t_6d373b4482e5a2 166-185,260-271,328,371,421,423-427,443,466,469-470,475,502-516,521
+apps/frontend/src/app/module-management/page.tsx
+  s_45cd50f25f393e::t_6d373b4482e5a2 1-2,4-11
+docs/design/Brand-Style.md
+  s_45cd50f25f393e::t_6d373b4482e5a2 3
+docs/sas/deployment/LiveAccessibleSystem.md
+  s_45cd50f25f393e::t_6d373b4482e5a2 15,21,23
+apps/backend/src/Attendance/attendance.service.spec.ts
+  s_45cd50f25f393e::t_6d373b4482e5a2 1-350
+apps/backend/src/Events/event.service.spec.ts
+  s_45cd50f25f393e::t_6d373b4482e5a2 4-10,34-37,41-46,80-400,407-408,441,562
+apps/frontend/src/components/organisms/customise/CustomiseShellPopup.tsx
+  s_45cd50f25f393e::t_6d373b4482e5a2 25,28
+apps/frontend/src/components/organisms/solver/SolverPreferences.tsx
+  s_45cd50f25f393e::t_6d373b4482e5a2 279,303
+apps/frontend/src/components/templates/module-management/moduleManagementTemplate.tsx
+  s_45cd50f25f393e::t_6d373b4482e5a2 25,28,111-122,127-144,147,173-176
+apps/backend/src/Testing/Factories/attendance.factory.ts
+  s_45cd50f25f393e::t_6d373b4482e5a2 1-52
+docker-compose.prod.yml
+  s_45cd50f25f393e::t_6d373b4482e5a2 8-10,28-30,44-47,77,79,110,132-142,153-159,162-164,173,177-179,184-185,191-196,199-200,203-204,210-222,228-231,234,241
+  s_45cd50f25f393e::t_956e41316eb0a1 75-76,108-109
+apps/frontend/src/components/molecules/builder/EventCard.tsx
+  s_45cd50f25f393e::t_6d373b4482e5a2 95,140-143,154,177,272
+apps/frontend/src/components/organisms/choose-institute/instituteSelector.tsx
+  s_45cd50f25f393e::t_6d373b4482e5a2 18,46-48,50-51,53-54,59-62,71-73,81-86,89,92,104-109,131-189
+apps/frontend/src/types/schedule.ts
+  s_45cd50f25f393e::t_6d373b4482e5a2 12
+docs/diagrams/domain/Domain.svg
+  s_45cd50f25f393e::t_6d373b4482e5a2 1-4
+docs/diagrams/domain/DomainAttributes.drawio
+  s_45cd50f25f393e::t_6d373b4482e5a2 1-592
+docs/management/Marking-Guide.md
+  s_45cd50f25f393e::t_6d373b4482e5a2 7-13
+apps/backend/src/Testing/Mocks/services/event.mock.ts
+  s_45cd50f25f393e::t_6d373b4482e5a2 1-16
+apps/frontend/src/components/molecules/choose-institute/ApprovalStatus.tsx
+  s_45cd50f25f393e::t_6d373b4482e5a2 20,35,45
+apps/frontend/src/components/organisms/course-management/editCourse.tsx
+  s_45cd50f25f393e::t_6d373b4482e5a2 1-81
+apps/frontend/src/components/organisms/module-management/moduleTable.tsx
+  s_45cd50f25f393e::t_6d373b4482e5a2 3-4,6,14,28,36,42,48,56-62,67-72,77-80,84-110,112-121,129,133-136,138-141,143,145,155,160,162,164-170,174-179,182,194
+docker/frontend/frontend.Dockerfile
+  s_45cd50f25f393e::t_6d373b4482e5a2 12,23,30
+apps/backend/src/Testing/Factories/event.factory.ts
+  s_45cd50f25f393e::t_6d373b4482e5a2 10-17,62-100
+  s_45cd50f25f393e::t_58dc3c17cfe4b1 101
+apps/backend/src/Timetable/timetable.service.spec.ts
+  s_45cd50f25f393e::t_6d373b4482e5a2 1-498
+apps/frontend/src/proxy.ts
+  s_45cd50f25f393e::t_6d373b4482e5a2 3-9,26-33,37-38
+README.md
+  s_45cd50f25f393e::t_6d373b4482e5a2 216,224,229
+justfile
+  s_45cd50f25f393e::t_6d373b4482e5a2 49,52,55,58,100,102-103
+apps/backend/src/Testing/Mocks/services/index.ts
+  s_45cd50f25f393e::t_6d373b4482e5a2 7
+apps/frontend/src/components/atoms/builder/WizardFooter.tsx
+  s_45cd50f25f393e::t_6d373b4482e5a2 42,46,49,52
+apps/frontend/src/app/dashboard/page.tsx
+  s_45cd50f25f393e::t_6d373b4482e5a2 19-20,150-162,179
+apps/backend/src/auth/auth.controller.ts
+  s_45cd50f25f393e::t_6d373b4482e5a2 78,204-213,514-516,518-525,763-769
+apps/e2e/playwright.config.ts
+  s_45cd50f25f393e::t_6d373b4482e5a2 32-34,37-41
+  s_45cd50f25f393e::t_c15568e87c5bb8 31
+.github/workflows/ci.yml
+  s_45cd50f25f393e::t_6d373b4482e5a2 7-8,25-26,34,37-38,40-43,45-46,48-49,51-52,54-55,57-58,134,142,188,195-229,231-238,268,290,304-305,309-319
+apps/frontend/src/components/molecules/viewTimetable/ScheduleHeader.tsx
+  s_45cd50f25f393e::t_6d373b4482e5a2 30
+docs/requirements/Use-Cases.md
+  s_45cd50f25f393e::t_6d373b4482e5a2 154,166,207
+.github/workflows/deploy-prod.yml
+  s_45cd50f25f393e::t_6d373b4482e5a2 29-31
+apps/frontend/src/lib/api.ts
+  s_45cd50f25f393e::t_6d373b4482e5a2 7,332,348,364,388,416,433,450,470,487,504,523,541,560,577,594,614,634,658,676,693,711,729,748,772,800,820,840,860,880,897,914,931,948,965,982,1000
+docs/sas/deployment/PipelineDiagram.md
+  s_45cd50f25f393e::t_6d373b4482e5a2 1-6
+apps/frontend/src/components/organisms/roleManagement/UserDirectory.tsx
+  s_45cd50f25f393e::t_6d373b4482e5a2 17-25
+docs/srs/DOMAIN_MODEL.md
+  s_45cd50f25f393e::t_6d373b4482e5a2 3-156
+apps/frontend/src/app/solver/queries/Solver/builder.ts
+  s_45cd50f25f393e::t_6d373b4482e5a2 9,11,24,27,40,43,57,59
+apps/frontend/src/components/templates/builder/WizardShell.tsx
+  s_45cd50f25f393e::t_6d373b4482e5a2 140,147-154,156-157
+apps/e2e/tests/setup/auth.setup.ts
+  s_45cd50f25f393e::t_6d373b4482e5a2 1-17
+apps/frontend/src/components/organisms/module-management/editModuleEvent.tsx
+  s_45cd50f25f393e::t_6d373b4482e5a2 1-232
+apps/frontend/src/components/atoms/builder/TimeSlotSelect.tsx
+  s_45cd50f25f393e::t_6d373b4482e5a2 81-84,107-110
+apps/frontend/src/lib/scheduleUtils.ts
+  s_45cd50f25f393e::t_6d373b4482e5a2 90
+docs/srs/FUNCTIONAL_REQUIREMENTS.md
+  s_45cd50f25f393e::t_6d373b4482e5a2 3-166
+apps/frontend/src/app/course-management/queries/modules/moduleBuilder.ts
+  s_45cd50f25f393e::t_6d373b4482e5a2 3,10,19,49,67,85,104
+docker-compose.traefik.yml
+  s_45cd50f25f393e::t_6d373b4482e5a2 19-24,27-28,30,37-38
+apps/frontend/src/components/atoms/dashboard/UserGreeting.tsx
+  s_45cd50f25f393e::t_6d373b4482e5a2 1-14
+apps/backend/src/Testing/constants.spec.ts
+  s_45cd50f25f393e::t_6d373b4482e5a2 7-9
+apps/frontend/src/components/molecules/builder/ModuleCard.tsx
+  s_45cd50f25f393e::t_6d373b4482e5a2 38-41,53,79
+apps/frontend/src/components/organisms/builder/GenerateStep.tsx
+  s_45cd50f25f393e::t_6d373b4482e5a2 13-14,59-60,127,129-130,181-183,189,224-225,232-242,244-246,248-250,252-279
+apps/backend/src/Attendance/attendance.service.ts
+  s_45cd50f25f393e::t_6d373b4482e5a2 43-50,183,185-186,189,195-213
+  s_45cd50f25f393e::t_1d7491604cd5cc 42
+apps/backend/src/Timetable/timetable.service.ts
+  s_45cd50f25f393e::t_6d373b4482e5a2 51-55
+.gitignore
+  s_45cd50f25f393e::t_6d373b4482e5a2 146
+apps/frontend/src/app/course-management/queries/courses/courseBuilder.ts
+  s_45cd50f25f393e::t_6d373b4482e5a2 9,26,43,61,76
+apps/frontend/src/app/builder/utils/events/eventRequestBuilder.ts
+  s_45cd50f25f393e::t_6d373b4482e5a2 9,13,15-16,18,23,25,28,31,33,36,38
+apps/frontend/next.config.ts
+  s_45cd50f25f393e::t_6d373b4482e5a2 6-12,15-16
+apps/frontend/src/components/atoms/builder/eventDropdown.tsx
+  s_45cd50f25f393e::t_6d373b4482e5a2 69
+apps/frontend/src/components/molecules/roleManagement/UserDirectoryColumns.tsx
+  s_45cd50f25f393e::t_6d373b4482e5a2 58,60-64
+apps/e2e/tsconfig.json
+  s_45cd50f25f393e::t_6d373b4482e5a2 1-9
+apps/e2e/tests/setup/health-check.spec.ts
+  s_45cd50f25f393e::t_6d373b4482e5a2 1-17
+apps/frontend/src/components/organisms/builder/ModulesStep.tsx
+  s_45cd50f25f393e::t_6d373b4482e5a2 180,203,237,245,247-251,265,283,305-332
+apps/frontend/src/components/organisms/solver/SolverLock.tsx
+  s_45cd50f25f393e::t_6d373b4482e5a2 16-34,37-39
+apps/frontend/src/components/templates/roleManagement/roleManagementTemplate.tsx
+  s_45cd50f25f393e::t_6d373b4482e5a2 6,46,48,53,56,59
+apps/backend/jest.config.ts
+  s_45cd50f25f393e::t_6d373b4482e5a2 1-45
+docs/sas/deployment/CICD.svg
+  s_45cd50f25f393e::t_6d373b4482e5a2 1-4
+apps/frontend/src/app/builder/utils/modules/requestBuilders.ts
+  s_45cd50f25f393e::t_6d373b4482e5a2 9,11,13,15,17,19,21,23,26,29
+apps/e2e/tests/builder/schedules.spec.ts
+  s_45cd50f25f393e::t_6d373b4482e5a2 1-147
+apps/backend/src/Events/event.service.ts
+  s_45cd50f25f393e::t_6d373b4482e5a2 628,703-707,717-721
+apps/frontend/src/components/templates/app/PageWrapper.tsx
+  s_45cd50f25f393e::t_6d373b4482e5a2 17
+apps/frontend/src/components/molecules/viewTimetable/EventBlock.tsx
+  s_45cd50f25f393e::t_6d373b4482e5a2 53-58
+docs/sas/deployment/CICD.drawio
+  s_45cd50f25f393e::t_6d373b4482e5a2 1-542
+apps/backend/src/Testing/Factories/relationships.factory.ts
+  h_3359569cacef0e 53-54,56
+apps/backend/src/main.ts
+  s_45cd50f25f393e::t_6d373b4482e5a2 19-28,32,60,91,93
+docker-compose.staging.yml
+  s_45cd50f25f393e::t_956e41316eb0a1 76-77,111-112
+  s_45cd50f25f393e::t_6d373b4482e5a2 8-10,28-30,44-47,80,137-147,158-164,167,169,182-184,190,196-199,202-203,206,213,215-232
+apps/backend/src/Testing/Factories/timetable.factory.ts
+  s_45cd50f25f393e::t_6d373b4482e5a2 1,3-6,8-12,15-39,42
+apps/frontend/src/app/solver/queries/PDF/builder.ts
+  s_45cd50f25f393e::t_6d373b4482e5a2 3-4,10,44-46,56,74
+apps/frontend/src/components/molecules/roleManagement/DataTable.tsx
+  s_45cd50f25f393e::t_6d373b4482e5a2 113-155,157-179,185-188,190,192-195,214,216-231,238,247-272
+apps/frontend/src/components/molecules/nav/NavLinks.tsx
+  s_45cd50f25f393e::t_6d373b4482e5a2 5-6,8,13-15,19,23-39,43
+apps/frontend/src/components/organisms/nav/TopNavBar.tsx
+  s_45cd50f25f393e::t_6d373b4482e5a2 1-3,7-8,19-36,42-47,50-53,55-56
+apps/frontend/src/components/templates/choose-institute/chooseInstituteTemplate.tsx
+  s_45cd50f25f393e::t_6d373b4482e5a2 9-15,17,22
+apps/backend/src/Testing/Mocks/database.helpers.ts
+  s_45cd50f25f393e::t_6d373b4482e5a2 20
+apps/backend/src/Testing/Factories/index.ts
+  s_45cd50f25f393e::t_6d373b4482e5a2 11
+  h_3359569cacef0e 12
+apps/frontend/src/app/builder/utils/timetables/TimeTableRequests.ts
+  s_45cd50f25f393e::t_6d373b4482e5a2 9,11,14,18,20,23,25,27,30,33
+docker/backend/backend.Dockerfile
+  s_45cd50f25f393e::t_6d373b4482e5a2 30
+apps/frontend/src/components/atoms/nav/UserAvatar.tsx
+  s_45cd50f25f393e::t_6d373b4482e5a2 2-5,22,34,37-39,41-48
+apps/frontend/src/app/role-management/queries/builder.ts
+  s_45cd50f25f393e::t_6d373b4482e5a2 5,44
+apps/frontend/src/components/atoms/builder/WizardStepper.tsx
+  s_45cd50f25f393e::t_6d373b4482e5a2 62
+apps/frontend/src/components/templates/course-management/courseManageTemplate.tsx
+  s_45cd50f25f393e::t_6d373b4482e5a2 36,70-75,203-206
+  s_45cd50f25f393e::t_95f386948bb3b2 207
+apps/frontend/src/components/organisms/viewTimetable/ScheduleView.tsx
+  s_45cd50f25f393e::t_6d373b4482e5a2 339,372,380,390,415
+apps/backend/src/auth/auth.ts
+  s_45cd50f25f393e::t_6d373b4482e5a2 200-202,357-358,361
+apps/frontend/src/components/molecules/viewTimetable/WeekNavBar.tsx
+  s_45cd50f25f393e::t_6d373b4482e5a2 26-36,38
+apps/backend/test/jest.setup.ts
+  s_45cd50f25f393e::t_6d373b4482e5a2 76-160
+apps/frontend/src/components/templates/solver/SolverShell.tsx
+  s_45cd50f25f393e::t_6d373b4482e5a2 103-104,112,122
+apps/frontend/utilities/request.ts
+  s_45cd50f25f393e::t_6d373b4482e5a2 3-31,64-65,67-68,70-71,104
+docs/requirements/Functional-Requirements.md
+  s_45cd50f25f393e::t_6d373b4482e5a2 61,74
+docs/sas/deployment/EnvironmentParity.md
+  s_45cd50f25f393e::t_6d373b4482e5a2 8,12,15,39,45-46,51,53,59-60,65
+apps/frontend/src/app/choose-institute/queries/builders.ts
+  s_45cd50f25f393e::t_6d373b4482e5a2 7,21,23,49
+apps/frontend/src/app/module-management/queries/requests.ts
+  s_45cd50f25f393e::t_6d373b4482e5a2 2,4,12,17
+infra/traefik/traefik.yml
+  s_45cd50f25f393e::t_6d373b4482e5a2 12-13
+apps/frontend/src/app/page.tsx
+  s_45cd50f25f393e::t_6d373b4482e5a2 3,7-10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "97bc3d1165b0a68450d41e0448db306c37229ccd",
+  "prompts": {},
+  "humans": {
+    "h_3359569cacef0e": {
+      "author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_45cd50f25f393e": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019facea-055d-7343-a892-d8c3decac6d6",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}
