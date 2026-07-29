@@ -109,7 +109,10 @@ export default function ModManagementTemplate() {
   }, [data, foundPrefixForModule, searchQuery]);
 
   const UniDetails = UserDetails.getUniDetails();
-  const ViableRole = UniDetails?.role === "UNIVERSITY_ADMIN";
+  const ViableRole =
+    UniDetails?.role === "UNIVERSITY_ADMIN" ||
+    UniDetails?.role === "LECTURER" ||
+    UniDetails?.role === "STUDENT";
   const router = useRouter();
 
   if (UniDetails === null) {

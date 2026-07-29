@@ -12,12 +12,21 @@ import {
 } from "@/components/atoms/baseShadcn/tabs";
 import { useMutation } from "@tanstack/react-query";
 
-import { updateModQ } from "@/app/course-management/queries/modules/moduleQueries";
+import {
+  updateModQ,
+  updateModStylingQ,
+} from "@/app/course-management/queries/modules/moduleQueries";
 import { updateEventMut } from "@/components/templates/builder/Queries/eventQueries";
 
 import { ModuleTableData } from "@/components/organisms/module-management/ModuleColumns";
 import { CustomiseModuleCard } from "@/components/molecules/customise/CustomiseModuleCard";
 import { CustomiseEventCard } from "@/components/molecules/customise/CustomiseEventCard";
+import { UserDetails } from "@/lib/userclass/userClass";
+import {
+  updateModStylingBody,
+  updateModStylingPath,
+  updateStylingBuilder,
+} from "@/app/course-management/queries/modules/moduleBuilder";
 
 export default function EditModuleEvent({
   data,
@@ -36,6 +45,16 @@ export default function EditModuleEvent({
 
   const updateModuleMutResult = useMutation(updateModQ());
   const updateEventMutResult = useMutation(updateEventMut());
+  const updateStylingMut = useMutation({
+    mutationFn: async (vars: {
+      body: updateModStylingBody;
+      path: updateModStylingPath;
+    }) => {
+      const builder = new updateStylingBuilder();
+      return builder.send({ body: vars.body, paths: vars.path });
+    },
+    onError: (err) => console.error("mutation failed", err),
+  });
 
   const isPending =
     updateModuleMutResult.isPending || updateEventMutResult.isPending;
@@ -85,31 +104,42 @@ export default function EditModuleEvent({
   const handleSave = async () => {
     setFeedback(null);
     try {
-      await updateModuleMutResult.mutateAsync({
-        path: {
-          moduleId: moduleState.moduleID,
-        },
-        body: {
-          moduleCode: moduleState.moduleCode,
-          moduleName: moduleState.moduleName,
-          moduleDescription: moduleState.moduleDescription || undefined,
-          styling: moduleState.styling,
-        },
-      });
-
-      for (const event of eventsState) {
-        await updateEventMutResult.mutateAsync({
-          path: { id: event.eventId },
+      if (UserDetails.getUniDetails()?.role === "UNIVERSITY_ADMIN") {
+        await updateModuleMutResult.mutateAsync({
+          path: {
+            moduleId: moduleState.moduleID,
+          },
           body: {
-            eventName: event.eventName,
-            activityCode: event.activityCode,
-            activityType: event.activityType,
-            isRecurring: event.isRecurring,
-            eventCriteria: event.eventCriteria,
+            moduleCode: moduleState.moduleCode,
+            moduleName: moduleState.moduleName,
+            moduleDescription: moduleState.moduleDescription || undefined,
+            styling: moduleState.styling,
           },
         });
-      }
 
+        for (const event of eventsState) {
+          await updateEventMutResult.mutateAsync({
+            path: { id: event.eventId },
+            body: {
+              eventName: event.eventName,
+              activityCode: event.activityCode,
+              activityType: event.activityType,
+              isRecurring: event.isRecurring,
+              eventCriteria: event.eventCriteria,
+            },
+          });
+        }
+      } else {
+        if (moduleState.styling)
+          updateStylingMut.mutate({
+            body: {
+              styling: moduleState.styling,
+            },
+            path: {
+              moduleId: moduleState.moduleID,
+            },
+          });
+      }
       setFeedback({ type: "success", message: "Changes saved successfully!" });
 
       setTimeout(() => {
