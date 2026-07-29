@@ -153,7 +153,7 @@ function DashboardContent() {
   //johan has overwritten wilmar's dictatorship
   //To any curious reader since johan over wrote my dictatorship it stopped working again
 
-  const { data: session, isPending } = useSession();
+  const { isPending } = useSession();
   if (showSelectUni === true && UserDetails.getUniDetails()?.role) {
     SetSelectUni(false);
   }
@@ -165,8 +165,6 @@ function DashboardContent() {
       </div>
     );
   }
-
-  const userName = session?.user?.name ?? null;
 
   return (
     <>
@@ -198,7 +196,7 @@ function DashboardContent() {
               </Badge>
 
               <h1 className="text-4xl lg:text-5xl font-semibold text-[var(--text-primary)] leading-[1.1]">
-                Welcome {userName ? userName.split(" ")[0] : "Back"}.
+                Welcome.
               </h1>
 
               <p className="text-base lg:text-lg text-[var(--text-secondary)] leading-relaxed max-w-sm">
