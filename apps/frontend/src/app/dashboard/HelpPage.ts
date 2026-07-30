@@ -19,7 +19,6 @@ const steps: HelpStep[] = [
   },
 ];
 
-export const dashboardHelpPage: HelpPageSection = createHelpPage(page, {
-  roles: "all",
+export const HelpPage: HelpPageSection = createHelpPage(page, {
   steps,
 });
