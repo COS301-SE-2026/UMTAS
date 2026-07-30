@@ -1,21 +1,7 @@
 # Functional Requirements
 
 # FR 1 
-### R1.1 Landing Page Website
-
-- **R1.1.1** The system shall provide a landing page for all users prior to login/register.
-    - **R1.1.1.1** The system shall allow users to visit the main Umtas website through the landing page.
-- **R1.1.2** The landing page shall present system functionalities to entice users.
-    - **R1.1.2.1** The system shall explain the functionality of each of the 3 adaptors to the users
-        - **R1.1.2.1.1** The system shall explain the functionality of the `Builder` adapter
-        - **R1.1.2.1.2** The system shall explain the functionality of the `pdf upload` adapter
-        - **R1.1.2.1.3** The system shall explain the functionality of the `University API` adapter
-    - **R1.1.2.2** The system shall highlight each users ability through the system
-        - **R1.1.2.2.1** The system shall explain the functionality extended to a Student.
-        - **R1.1.2.2.2** The system shall explain the functionality extended to an Admin.
-        - **R1.1.2.2.3** The system shall explain the functionality extended to a Lecturer.
-        - **R1.1.2.2.4** The system shall explain the functionality extended to a Tyto simulation admin.
-
+ 
 ### R1.2 Login and Register System
 
 - **R1.2.1** The system shall allow users to log in.
@@ -95,6 +81,16 @@
 	- **R2.5.1.6** The system shall make use of a uuid such that duplicate events are accounted for.
 - **R2.5.2** The system shall allow direct sync with Google Calendar.
 	- **R2.5.2.1** The system shall support creating a Google Calendar instance.
+
+### R2.6 Solver System
+
+- **R2.6.1** The system shall automatically attempt to solve for a schedule using the CP-SAT solver once a finalised set of events is received, notifying the User once a valid timetable is produced.
+    - **R2.6.1.1** The system shall enforce a selection rule as a hard constraint.
+    - **R2.6.1.2** The system shall enforce an overlap rule as a hard constraint, preventing events from clashing.
+    - **R2.6.1.3** The system shall optimise the schedule to centralise events around a User-given target time.
+- **R2.6.2** The system shall automatically invoke the GA solver to generate a best-effort schedule when the CP-SAT solver cannot find a feasible solution, notifying the User once produced.
+    - **R2.6.2.1** The system shall optimise the schedule to centralise events around a User-given target time.
+    - **R2.6.2.2** The system shall apply selection, crossover, and mutation operators across generations to improve candidate schedules.
 
 # FR 3
 
