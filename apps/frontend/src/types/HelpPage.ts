@@ -10,7 +10,7 @@ export interface HelpPageSection {
   pageName: string;
   category: string;
   description: string;
-  pageImage: {
+  pageImage?: {
     url: string;
     altText?: string;
     imageDescription?: string;
