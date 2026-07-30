@@ -39,7 +39,7 @@ const config: Config = {
   ],
   coverageDirectory: '../coverage',
   testEnvironment: 'node',
-  coverageReporters: ['html'],
+  coverageReporters: ['text', 'html', 'lcov'],
 };
 
 export default config;

@@ -10,12 +10,12 @@ const basicLinks = [
   { href: "/solver", label: "Upload PDF" },
   { href: "/builder", label: "Event Builder" },
   { href: "/schedules", label: "My Schedules" },
+  { href: "/module-management", label: "Manage Modules & Events" },
 ];
 
 const extraAdminLinks = [
   { href: "/course-management", label: "Manage Courses" },
   { href: "/role-management", label: "Manage Roles" },
-  { href: "/module-management", label: "Manage Modules & Events" },
 ];
 
 export function NavLinks() {

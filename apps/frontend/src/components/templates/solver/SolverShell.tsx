@@ -13,6 +13,10 @@ import { getAllEventsAdminQ } from "@/app/module-management/queries/queries";
 import { fetchAllModules } from "@/app/course-management/queries/modules/moduleBuilder";
 
 import Tutorial from "@/components/organisms/nav/Tutorial";
+import { UserDetails } from "@/lib/userclass/userClass";
+import { useRouter } from "next/navigation";
+import Popup from "@/components/atoms/utility/floatContainer";
+import { ChooseInstituteTemplate } from "../choose-institute/chooseInstituteTemplate";
 const steps = [
   {
     target: "#btn-browse-files",
@@ -41,10 +45,12 @@ const steps = [
 ];
 
 export default function SolverShell() {
+  const [showSelectUni, SetSelectUni] = useState<boolean>(true);
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [comingFromStep, setComingFromStep] = useState<number | null>(null);
   const [moduleGroupingID, setModuleGroupingID] = useState<string | null>(null);
+  const router = useRouter();
   const { data: modulesData } = useQuery({
     queryKey: ["PDF", "MODULES"],
     queryFn: () => {
@@ -63,7 +69,9 @@ export default function SolverShell() {
       enabled: !!mod.moduleID,
     })),
   });
-
+  if (showSelectUni === true && UserDetails.getUniDetails()?.role) {
+    SetSelectUni(false);
+  }
   const events: EventResponse[] = eventQueries.map((q) => q.data ?? []).flat();
 
   function handleStepCompleted(fromStep: number) {
@@ -85,6 +93,7 @@ export default function SolverShell() {
   if (moduleGroupingID == null && currentStep != 0) {
     setCurrentStep(0);
   }
+
   return (
     <>
       <Tutorial steps={steps} wait={true} />
@@ -100,16 +109,29 @@ export default function SolverShell() {
         ]}
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-16 max-w-10xl mx-auto px-6 pt-6">
-        <div className="flex justify-center h-fit">
+      {showSelectUni && (
+        <Popup>
+          <div className="w-fit text-center">
+            <ChooseInstituteTemplate
+              onClose={() => {
+                if (UserDetails.getUniDetails()?.role) {
+                  SetSelectUni(false);
+                }
+              }}
+            />
+            <div className="w-full mt-5 items-center justify-center flex"></div>
+          </div>
+        </Popup>
+      )}
+      <div className="flex flex-wrap justify-center gap-8 xl:gap-16 w-full max-w-[1920px] mx-auto px-4 md:px-6 pt-6">
+        <div className="flex w-120 h-110 justify-center">
           <SolverUpload
             onComplete={() => handleStepCompleted(0)}
             moduleGroupID={moduleGroupingID}
             setModuleGroupID={setModuleGroupingID}
           />
         </div>
-
-        <div className="flex justify-center h-fit">
+        <div className="flex w-120 h-110 justify-center">
           <SolverLock locked={currentStep < 1} loading={comingFromStep === 0}>
             <SolverReview
               events={events}
@@ -118,8 +140,7 @@ export default function SolverShell() {
             />
           </SolverLock>
         </div>
-
-        <div className="flex justify-center">
+        <div className="flex w-120 h-110 justify-center">
           <SolverLock locked={currentStep < 2} loading={comingFromStep === 1}>
             <SolverPreferences
               modules={displayMods as ModuleResponseDto[]}

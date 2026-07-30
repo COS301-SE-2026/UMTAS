@@ -5,42 +5,16 @@ import {
   type CliResult,
 } from "bullmq-worker-core";
 import {
-  SolverHeuristicScoreSchema,
+  SolverCliOutputSchema,
   SolverResultSchema,
+  type SolverCliOutput,
   type SolverResult,
 } from "shared-types";
-import { z } from "zod";
 import type {
   SolveRequest,
   SolverExecutor,
   SolverRunOutcome,
 } from "./contracts.js";
-
-const SolverCliOutputSchema = z.discriminatedUnion("status", [
-  z.strictObject({
-    status: z.literal("feasible"),
-    outcome: z.enum(["conflict-free", "best-effort"]),
-    timetableSolution: z.strictObject({
-      selectedEventIds: z.array(z.string().trim().min(1)),
-    }),
-    heuristicScores: z.array(SolverHeuristicScoreSchema).default([]),
-    metadata: z
-      .object({
-        conflictCount: z.number().int().nonnegative(),
-        conflicts: z.array(
-          z.strictObject({
-            eventIds: z.tuple([
-              z.string().trim().min(1),
-              z.string().trim().min(1),
-            ]),
-          }),
-        ),
-        solveMode: z.enum(["feasibility", "optimization"]),
-      })
-      .catchall(z.unknown()),
-  }),
-  z.strictObject({ status: z.literal("infeasible") }),
-]);
 
 export type RunCliFn = typeof runCli;
 
@@ -150,10 +124,7 @@ function assertSuccessfulExecution(result: CliResult): void {
 }
 
 function toSolverResult(
-  output: Extract<
-    z.infer<typeof SolverCliOutputSchema>,
-    { status: "feasible" }
-  >,
+  output: Extract<SolverCliOutput, { status: "feasible" }>,
   engine: "cp-sat" | "ga",
 ): SolverResult {
   return SolverResultSchema.parse({

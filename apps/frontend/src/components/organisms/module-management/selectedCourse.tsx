@@ -32,39 +32,46 @@ export function CourseSelect({
   );
 
   return (
-    <div className="flex flex-col space-y-5 items-start justify-left pl-4 pr-4 h-fit">
-      <label className="text-sm font-medium text-[var(--text-primary)] text-center">
-        Search for course
-      </label>
-      <Input
-        className="text-center"
-        placeholder="Search for course"
-        value={searchName}
-        onChange={(e) => {
-          UpdateSearchName(e.target.value);
-        }}
-      />
-      <label className="text-sm font-medium text-[var(--text-primary)]">
-        Select Course
-      </label>
-      <Select
-        value={CourseState.CourseID}
-        onValueChange={(courseId) => {
-          const course = courseData.find((c) => c.CourseID === courseId);
-          if (course) updateCourseState(course);
-        }}
-      >
-        <SelectTrigger>
-          <SelectValue placeholder="Select course" />
-        </SelectTrigger>
-        <SelectContent>
-          {courseData.map((course) => (
-            <SelectItem key={course.CourseID} value={course.CourseID}>
-              {course.CourseName}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+    <div className="flex flex-col h-fit w-full">
+      <div className="flex gap-4 w-full">
+        <div className="flex-1 flex flex-col space-y-2">
+          <label className="text-sm font-medium text-[var(--text-primary)]">
+            Search for course
+          </label>
+          <Input
+            className="text-left"
+            placeholder="Search for course"
+            value={searchName}
+            onChange={(e) => {
+              UpdateSearchName(e.target.value);
+            }}
+          />
+        </div>
+
+        <div className="flex-1 flex flex-col space-y-2">
+          <label className="text-sm font-medium text-[var(--text-primary)]">
+            Select Course
+          </label>
+          <Select
+            value={CourseState.CourseID}
+            onValueChange={(courseId) => {
+              const course = courseData.find((c) => c.CourseID === courseId);
+              if (course) updateCourseState(course);
+            }}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select course" />
+            </SelectTrigger>
+            <SelectContent>
+              {courseData.map((course) => (
+                <SelectItem key={course.CourseID} value={course.CourseID}>
+                  {course.CourseName}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
       {children}
     </div>
   );

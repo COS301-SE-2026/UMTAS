@@ -3,6 +3,8 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
+  forwardRef,
+  Inject,
 } from '@nestjs/common';
 import { eq, and, SQL, ilike } from 'drizzle-orm';
 
@@ -22,12 +24,18 @@ import {
 import { UniversityService } from '../University/university.service';
 import { GroupingService } from '../Grouping/grouping.service';
 
+type GroupingServiceDependency = Pick<
+  GroupingService,
+  'getById' | 'createModuleGrouping'
+>;
+
 @Injectable()
 export class CourseService {
   constructor(
     private readonly dbService: DatabaseService,
     private readonly uniService: UniversityService,
-    private readonly groupingService: GroupingService,
+    @Inject(forwardRef(() => GroupingService))
+    private readonly groupingService: GroupingServiceDependency,
   ) {}
 
   async create(

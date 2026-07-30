@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - feat/health-points
     tags:
       - "v*"
   pull_request:
@@ -41,8 +40,8 @@ jobs:
         with:
           node-version: 22
 
-      - name: Setup Just
-        uses: extractions/setup-just@v2
+      # - name: Setup Just
+      #   uses: extractions/setup-just@v2
 
       - name: Enable Corepack (pnpm)
         run: corepack enable pnpm
@@ -53,19 +52,26 @@ jobs:
       - name: Run Linter
         run: pnpm run lint
 
-      # - name: Run Build
-      #   run: pnpm run build
+      - name: Run Build
+        run: pnpm run build
 
-      # - name: Run Tests
-      #   run: pnpm run test:unit
+      - name: Run Unit Tests
+        run: |
+          pnpm --filter shared-types test
+          pnpm --filter bullmq-worker-core test
+          pnpm --filter solver-worker test
+          pnpm --filter pdf-parser-worker test
+          pnpm --filter backend exec jest --coverage --runInBand
 
-      # - name: Run Integration Tests
-      #   run: pnpm --filter backend test:int
+      - name: Run Full-Stack Integration Tests
+        run: pnpm test:integration
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@75cd11691c0faa626561e295848008c8a7dddffe
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          files: apps/backend/coverage/lcov.info,apps/backend/coverage/integration/lcov.info
+          disable_search: true
 
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}

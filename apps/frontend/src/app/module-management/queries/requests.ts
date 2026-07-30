@@ -1,4 +1,5 @@
 import { paths } from "@/lib/api";
+import { ApiPath, createUrl } from "../../../../utilities/request";
 
 type getAllEvents = paths["/api/events"]["get"];
 export type getAllEventsQueries = getAllEvents["parameters"]["query"];
@@ -8,17 +9,12 @@ export type getAllEventsRes =
 export async function getAllEventsAdmin(
   moduleId: string,
 ): Promise<getAllEventsRes> {
-  const baseUrl =
-    (typeof window === "undefined"
-      ? process.env.API_URL
-      : process.env.NEXT_PUBLIC_API_URL) || "http://localhost:3000";
-
-  const path = "/api/events";
+  const path: ApiPath = "/events";
 
   const searchParams = new URLSearchParams({ moduleId });
 
   const queryStr = searchParams.toString();
-  const URL = queryStr ? `${baseUrl}${path}?${queryStr}` : baseUrl + path;
+  const URL = queryStr ? `${createUrl(path)}?${queryStr}` : createUrl(path);
   const response = await fetch(URL, {
     method: "GET",
     headers: {

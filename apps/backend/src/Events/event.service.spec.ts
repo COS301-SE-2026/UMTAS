@@ -7,7 +7,7 @@ import {
   uniId,
   venueId,
   eventId,
-} from '../Testing/constants.spec';
+} from '../Testing/constants';
 
 //Actual Service imports
 import { DatabaseService } from '../db/database.service';
@@ -137,7 +137,8 @@ describe('EventService', () => {
             [{ role: 'user' }],
             [{ moduleId }],
             [{ universityId: uniId }],
-            [{ universityId: uniId, role: 'student' }], //resolveAuthorizedModuleUniversity
+            [{ universityId: uniId, role: 'student' }],
+            [], //resolveAuthorizedModuleUniversity
           ],
         });
 
@@ -145,7 +146,7 @@ describe('EventService', () => {
         await expect(
           service.createUniversityEvent(userId, moduleId, dto),
         ).rejects.toThrow(ForbiddenException);
-        expect(mockDb.select).toHaveBeenCalledTimes(6);
+        expect(mockDb.select).toHaveBeenCalledTimes(7);
       });
 
       //UnHappy - venues don't exist
@@ -177,7 +178,7 @@ describe('EventService', () => {
         await expect(
           service.createUniversityEvent(userId, moduleId, dto),
         ).rejects.toThrow(BadRequestException);
-        expect(mockDb.select).toHaveBeenCalledTimes(8);
+        expect(mockDb.select).toHaveBeenCalledTimes(9);
       });
 
       //UnHappy - assertTiminMatchesRecurrence
@@ -215,7 +216,7 @@ describe('EventService', () => {
             'Recurring events require dayOfWeek and must not include date',
           ),
         );
-        expect(mockDb.select).toHaveBeenCalledTimes(8);
+        expect(mockDb.select).toHaveBeenCalledTimes(9);
       });
 
       //UnHappy - insert failed
@@ -255,7 +256,7 @@ describe('EventService', () => {
         await expect(
           service.createUniversityEvent(userId, moduleId, dto),
         ).rejects.toThrow(InternalServerErrorException);
-        expect(mockDb.select).toHaveBeenCalledTimes(8);
+        expect(mockDb.select).toHaveBeenCalledTimes(9);
         expect(mockDb.insert).toHaveBeenCalledTimes(1);
       });
 
@@ -297,7 +298,7 @@ describe('EventService', () => {
         await expect(
           service.createUniversityEvent(userId, moduleId, dto),
         ).rejects.toThrow(InternalServerErrorException);
-        expect(mockDb.select).toHaveBeenCalledTimes(8);
+        expect(mockDb.select).toHaveBeenCalledTimes(9);
         expect(mockDb.insert).toHaveBeenCalledTimes(2);
       });
 
@@ -362,7 +363,7 @@ describe('EventService', () => {
 
         //Act + Assert
         expect(result).toMatchObject(expected);
-        expect(mockDb.select).toHaveBeenCalledTimes(7);
+        expect(mockDb.select).toHaveBeenCalledTimes(8);
         expect(mockDb.insert).toHaveBeenCalledTimes(2);
       });
     });

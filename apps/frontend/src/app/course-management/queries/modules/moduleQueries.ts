@@ -13,12 +13,15 @@ import {
 } from "./moduleBuilder";
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
 import { getAllCoursesQ } from "../courses/courseQueries";
+import { UserDetails } from "@/lib/userclass/userClass";
 
 export function getAllModCoursesQ(queries?: getAllModulesQueries) {
   return queryOptions({
     queryKey: ["Modules", "Courses"],
     queryFn: async () => {
-      const result = await fetchAllModules(queries);
+      const result = await fetchAllModules({
+        userEnrollment: true,
+      });
       return result;
     },
   });

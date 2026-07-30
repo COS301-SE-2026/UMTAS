@@ -110,76 +110,89 @@ export function DataTable<TData, TValue>({
   };
 
   return (
-    <div>
-      <div className="flex items-center">
-        <div className="flex items-center">
-          <div className="flex flex-col md:flex-row items-center justify-between py-4 gap-4">
-            <div className="flex items-center gap-3 w-full md:w-auto">
-              <Input
-                id="input-search-name-email-role"
-                placeholder="Search name, email, or role..."
-                value={globalFilter ?? ""}
-                onChange={(event) => setGlobalFilter(event.target.value)}
-                className="max-w-sm bg-[var(--background)]"
-              />
-              <Select value={roleFilter} onValueChange={handleRoleChange}>
-                <SelectTrigger
-                  id="select-all-roles"
-                  className="w-[180px] bg-[var(--background)]"
+    <div className="h-[80vh] items-center flex flex-col gap-6 w-full px-6">
+      <div className="w-full max-w-6xl overflow-auto border border-[var(--border)] rounded-xl bg-[var(--bg-surface)] shadow-sm">
+        <h1 className="text-lg font-semibold text-[var(--text-primary)] pl-4 pt-4">
+          Role Management
+        </h1>
+        <p className="text-sm text-[var(--text-secondary)] pl-4 pt-2 pb-2">
+          Search and filter names, emails and roles
+        </p>
+        <div className="flex flex-col md:flex-row gap-4 p-5 border-b border-[var(--border)] items-center justify-between bg-[var(--bg-surface)]">
+          <div className="w-full md:max-w-sm flex-1">
+            <Input
+              id="input-search-name-email-role"
+              placeholder="Search names, emails or roles..."
+              value={globalFilter ?? ""}
+              onChange={(event) => setGlobalFilter(event.target.value)}
+              className="w-full bg-[var(--background)]"
+            />
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+            <Select value={roleFilter} onValueChange={handleRoleChange}>
+              <SelectTrigger
+                id="select-all-roles"
+                className="w-[180px] bg-[var(--background)]"
+              >
+                <SelectValue placeholder="Filter Role Type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ALL">All Roles</SelectItem>
+                {availableRoles.map((role) => (
+                  <SelectItem key={role} value={role}>
+                    {role}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  id="btn-columns-to-show"
+                  variant="outline"
+                  className="ml-auto bg-[var(--background)]"
                 >
-                  <SelectValue placeholder="Filter Role Type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ALL">All Roles</SelectItem>
-                  {availableRoles.map((role) => (
-                    <SelectItem key={role} value={role}>
-                      {role}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+                  Columns
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {table
+                  .getAllColumns()
+                  .filter((column) => column.getCanHide())
+                  .map((column) => {
+                    return (
+                      <DropdownMenuCheckboxItem
+                        key={column.id}
+                        className="capitalize"
+                        checked={column.getIsVisible()}
+                        onCheckedChange={(value) =>
+                          column.toggleVisibility(!!value)
+                        }
+                      >
+                        {column.id}
+                      </DropdownMenuCheckboxItem>
+                    );
+                  })}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              id="btn-columns-to-show"
-              variant="outline"
-              className="ml-auto"
-            >
-              Columns
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-      <div className="overflow-hidden rounded-md border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow
+                key={headerGroup.id}
+                className="border-b border-[var(--border)]"
+              >
                 {headerGroup.headers.map((header) => {
+                  const isActions = header.id.toLowerCase() === "actions";
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead
+                      key={header.id}
+                      className={`p-4 text-[var(--text-primary)] font-bold ${isActions ? "text-right" : ""}`}
+                    >
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -198,22 +211,31 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  className="border-b border-[var(--border)] brand-table-hover"
                 >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell id="select-the-row-in-table" key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
-                    </TableCell>
-                  ))}
+                  {row.getVisibleCells().map((cell) => {
+                    const isActions =
+                      cell.column.id.toLowerCase() === "actions";
+                    return (
+                      <TableCell
+                        id="select-the-row-in-table"
+                        key={cell.id}
+                        className={`p-4 text-[var(--text-primary)] ${isActions ? "text-right" : ""}`}
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )}
+                      </TableCell>
+                    );
+                  })}
                 </TableRow>
               ))
             ) : (
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center"
+                  className="p-8 text-center text-[var(--text-secondary)]"
                 >
                   No results.
                 </TableCell>
@@ -221,32 +243,33 @@ export function DataTable<TData, TValue>({
             )}
           </TableBody>
         </Table>
-      </div>
-      <div className="flex items-center justify-between py-4">
-        <div className="text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
-        </div>
 
-        <div className="flex items-center space-x-2">
-          <Button
-            id="btn-role-previous"
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            id="btn-role-next"
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
+        <div className="flex items-center justify-between p-4 border-t border-[var(--border)] bg-[var(--bg-surface)]">
+          <div className="text-sm text-muted-foreground">
+            {table.getFilteredSelectedRowModel().rows.length} of{" "}
+            {table.getFilteredRowModel().rows.length} row(s) selected.
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <Button
+              id="btn-role-previous"
+              variant="outline"
+              size="sm"
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+            >
+              Previous
+            </Button>
+            <Button
+              id="btn-role-next"
+              variant="outline"
+              size="sm"
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+            >
+              Next
+            </Button>
+          </div>
         </div>
       </div>
     </div>

@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "declaration": false,
+    "incremental": false,
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "noEmit": true,
+    "strict": true,
+    "types": ["jest", "node"]
+  },
+  "include": ["../integration/**/*.ts", "./**/*.ts"],
+  "exclude": ["../../src/**/*.spec.ts", "../../src/**/*.int.ts"]
+}

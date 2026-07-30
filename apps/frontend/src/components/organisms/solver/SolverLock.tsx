@@ -1,7 +1,6 @@
 "use client";
 
 import { Lock, Loader2 } from "lucide-react";
-import { cn } from "@/../utilities/utils";
 
 interface CardLockOverlayProps {
   locked: boolean;
@@ -14,26 +13,28 @@ export function SolverLock({
   loading,
   children,
 }: CardLockOverlayProps) {
-  return (
-    <div className="relative">
-      <div
-        className={cn(
-          "transition-all duration-300",
-          locked && "pointer-events-none blur-md",
+  if (locked) {
+    return (
+      <div className="flex h-full w-full flex-col items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] p-6 shadow-sm transition-all duration-300">
+        {loading ? (
+          <div className="flex flex-col items-center gap-4">
+            <Loader2 className="h-8 w-8 animate-spin text-[var(--text-secondary)]" />
+            <p className="text-sm font-medium text-[var(--text-secondary)]">
+              Loading...
+            </p>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-4 text-center opacity-70">
+            <div className="rounded-full bg-[var(--bg-elevated)] p-4">
+              <Lock className="h-6 w-6 text-[var(--text-disabled)]" />
+            </div>
+            <p className="text-sm font-medium text-[var(--text-secondary)]">
+              Complete the previous step to unlock
+            </p>
+          </div>
         )}
-      >
-        {children}
       </div>
-
-      {locked && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 rounded-xl bg-[var(--bg-base)]/40">
-          {loading ? (
-            <Loader2 className="h-6 w-6 animate-spin text-[var(--text-secondary)]" />
-          ) : (
-            <Lock className="h-6 w-6 text-[var(--text-disabled)]" />
-          )}
-        </div>
-      )}
-    </div>
-  );
+    );
+  }
+  return <>{children}</>;
 }

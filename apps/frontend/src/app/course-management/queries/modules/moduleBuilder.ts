@@ -1,9 +1,9 @@
 import { components, paths } from "@/lib/api";
 import {
+  createUrl,
   RequestBuilder,
   RequestMethod,
 } from "../../../../../utilities/request";
-import { createModuleRes } from "@/app/builder/utils/modules/requestBuilders";
 
 export type moduleDTO = components["schemas"]["ModuleSingleResponseDto"];
 export type getAllModules = paths["/api/modules"]["get"];
@@ -15,12 +15,7 @@ export type getAllModulesRes =
 export async function fetchAllModules(
   queries: getAllModulesQueries,
 ): Promise<getAllModulesRes> {
-  const baseUrl =
-    (typeof window === "undefined"
-      ? process.env.API_URL
-      : process.env.NEXT_PUBLIC_API_URL) || "http://localhost:3000";
-
-  const path = "/api/modules";
+  const path = "/modules";
 
   const searchParams = new URLSearchParams();
 
@@ -50,7 +45,7 @@ export async function fetchAllModules(
   }
 
   const queryStr = searchParams.toString();
-  const URL = queryStr ? `${baseUrl}${path}?${queryStr}` : baseUrl + path;
+  const URL = queryStr ? `${createUrl(path)}?${queryStr}` : createUrl(path);
 
   const response = await fetch(URL, {
     method: "GET",

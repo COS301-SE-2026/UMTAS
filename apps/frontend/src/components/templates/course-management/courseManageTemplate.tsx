@@ -33,6 +33,8 @@ import {
 import { CourseDTO } from "@/app/course-management/queries/courses/courseBuilder";
 
 import Tutorial from "@/components/organisms/nav/Tutorial";
+import NotFound from "@/app/not-found";
+import { AddCoursePopup } from "@/components/organisms/course-management/AddCoursePopup";
 const steps = [
   {
     target: "#input-search-courses-degrees-modules",
@@ -65,6 +67,13 @@ export default function CourseManagementTemplate() {
   const [possibleCourses, setPossibleCourses] = useState<
     Record<string, boolean>
   >({});
+  const [showAddCourse, setShowAddCourse] = useState(false);
+
+  const ViableRole = UniDetails?.role === "UNIVERSITY_ADMIN";
+
+  if (UniDetails === null) {
+    router.push("/dashboard");
+  }
 
   //forces you to pick an institude if you havent already
   useEffect(() => {
@@ -193,6 +202,11 @@ export default function CourseManagementTemplate() {
     );
   }
 
+  if (!ViableRole) {
+    return <NotFound />;
+    //console.log("account not admin");
+  }
+
   return (
     <>
       <Tutorial steps={steps} wait={true} />
@@ -253,6 +267,10 @@ export default function CourseManagementTemplate() {
                   ))}
                 </SelectContent>
               </Select>
+              <Button onClick={() => setShowAddCourse(true)}>Add Course</Button>
+              {showAddCourse && (
+                <AddCoursePopup onClose={() => setShowAddCourse(false)} />
+              )}
             </div>
           </div>
           <Table>

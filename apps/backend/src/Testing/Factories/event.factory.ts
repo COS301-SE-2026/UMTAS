@@ -22,7 +22,7 @@ export function createEventCriteria(
 ): EventCriteria {
   const base: EventCriteria = {
     eventSource,
-    date: 'yyyy-mm-dd',
+    date: '2026-01-12',
     startTime: '08:30',
     endTime: '10:20',
 
@@ -140,7 +140,7 @@ type Venue = typeof Venue.$inferSelect;
 export function createVenue(overrides: Partial<Venue> = {}): Venue {
   return {
     VenueID: randomUUID(),
-    VenueName: 'venueNaampie',
+    VenueName: 'Test Venue',
     UniversityID: randomUUID(),
 
     ...overrides,

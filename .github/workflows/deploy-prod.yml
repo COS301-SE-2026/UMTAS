@@ -7,6 +7,10 @@ on:
         description: "Release tag to deploy,eg V1.0.0"
         required: true
         type: string
+      old_tag:
+        description: "Old release tag to remove,eg V1.0.0"
+        required: true
+        type: string
 
 jobs:
   deploy:
@@ -27,7 +31,7 @@ jobs:
           script: |
             cd /opt/UMTAS
             docker compose -f docker-compose.prod.yml pull
-            just prod-down
+            just prod-down ${{ inputs.old_tag }}
             just prod-up ${{ inputs.release_tag }}
 
   notify-deploy:

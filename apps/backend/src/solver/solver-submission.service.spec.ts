@@ -1,3 +1,8 @@
+import {
+  createSolverInput,
+  createSolverJobRecord,
+  createSolverSubmissionInput,
+} from '../Testing/Factories';
 import { SolverSubmissionService } from './solver-submission.service';
 
 describe('SolverSubmissionService semantic deduplication', () => {
@@ -5,34 +10,36 @@ describe('SolverSubmissionService semantic deduplication', () => {
     'returns a reused %s job without enqueueing',
     async (status) => {
       const harness = createHarness();
-      const existing = record(status);
+      const existing = createRecord(status);
       harness.store.reserveOrReuse.mockResolvedValue({
         kind: 'reused',
         record: existing,
       });
 
-      await expect(harness.service.submit(request())).resolves.toBe(existing);
+      await expect(harness.service.submit(submissionInput)).resolves.toBe(
+        existing,
+      );
       expect(harness.queue.enqueueTimetableSolveJob).not.toHaveBeenCalled();
     },
   );
 
   it('enqueues a newly reserved job using only the worker contract', async () => {
     const harness = createHarness();
-    const queued = record('queued');
+    const queued = createRecord('queued');
     harness.store.reserveOrReuse.mockResolvedValue({
       kind: 'reserved',
       record: queued,
     });
     harness.store.markEnqueued.mockResolvedValue(queued);
 
-    await expect(harness.service.submit(request())).resolves.toBe(queued);
+    await expect(harness.service.submit(submissionInput)).resolves.toBe(queued);
     expect(harness.inputBuilder.buildForSubmission).toHaveBeenCalledWith(
-      request().userId,
-      request().eventIds,
+      submissionInput.userId,
+      submissionInput.eventIds,
       { heuristics: [] },
     );
     expect(harness.store.reserveOrReuse).toHaveBeenCalledWith({
-      userId: request().userId,
+      userId: submissionInput.userId,
       solveMode: 'optimization',
       requestedEngine: 'auto',
       deduplicationKey,
@@ -52,7 +59,7 @@ describe('SolverSubmissionService semantic deduplication', () => {
 
   it('leaves ambiguous enqueue failures unacknowledged for recovery', async () => {
     const harness = createHarness();
-    const queued = record('queued');
+    const queued = createRecord('queued');
     harness.store.reserveOrReuse.mockResolvedValue({
       kind: 'reserved',
       record: queued,
@@ -61,12 +68,60 @@ describe('SolverSubmissionService semantic deduplication', () => {
       new Error('Redis unavailable'),
     );
 
-    await expect(harness.service.submit(request())).rejects.toThrow(
+    await expect(harness.service.submit(submissionInput)).rejects.toThrow(
       'Solver job could not be enqueued',
     );
     expect(harness.store.markInfrastructureFailure).not.toHaveBeenCalled();
     expect(harness.store.markEnqueued).not.toHaveBeenCalled();
   });
+
+  it('uses auto when a reserved legacy record has no requested engine', async () => {
+    const harness = createHarness();
+    const queued = {
+      ...createRecord('queued'),
+      requestedEngine: undefined,
+    };
+    harness.store.reserveOrReuse.mockResolvedValue({
+      kind: 'reserved',
+      record: queued,
+    });
+    harness.store.markEnqueued.mockResolvedValue(queued);
+    await harness.service.submit(submissionInput);
+    expect(harness.queue.enqueueTimetableSolveJob).toHaveBeenCalledWith(
+      expect.objectContaining({ engine: 'auto' }),
+    );
+  });
+
+  it.each([
+    ['input builder', 'inputBuilder', 'buildForSubmission'],
+    ['fingerprint', 'fingerprintService', 'compute'],
+    ['reservation', 'store', 'reserveOrReuse'],
+  ] as const)(
+    'propagates %s failure and makes no unintended later calls',
+    async (_label, collaborator, method) => {
+      const harness = createHarness();
+      const failure = new Error(`${collaborator} failed`);
+      const target = harness[collaborator] as unknown as Record<
+        string,
+        jest.Mock
+      >;
+      target[method].mockImplementationOnce(() => {
+        throw failure;
+      });
+
+      await expect(harness.service.submit(submissionInput)).rejects.toBe(
+        failure,
+      );
+      if (collaborator === 'inputBuilder') {
+        expect(harness.fingerprintService.compute).not.toHaveBeenCalled();
+        expect(harness.store.reserveOrReuse).not.toHaveBeenCalled();
+      }
+      if (collaborator !== 'store') {
+        expect(harness.queue.enqueueTimetableSolveJob).not.toHaveBeenCalled();
+      }
+      expect(harness.store.markEnqueued).not.toHaveBeenCalled();
+    },
+  );
 
   function createHarness() {
     const store = {
@@ -85,6 +140,7 @@ describe('SolverSubmissionService semantic deduplication', () => {
       store,
       queue,
       inputBuilder,
+      fingerprintService,
       service: new SolverSubmissionService(
         store as never,
         queue as never,
@@ -95,34 +151,23 @@ describe('SolverSubmissionService semantic deduplication', () => {
   }
 });
 
-const solverInput = {
-  schedulingProblem: { events: [] },
-  preferences: { heuristics: [] },
-};
+const solverInput = createSolverInput();
 const deduplicationKey = `solver-semantic-sha256-v2:${'a'.repeat(64)}`;
 
-function request() {
-  return {
-    userId: '11111111-1111-4111-8111-111111111111',
-    eventIds: ['22222222-2222-4222-8222-222222222222'],
-    solveMode: 'optimization' as const,
-    engine: 'auto' as const,
-    preferences: { heuristics: [] },
-  };
-}
+const submissionInput = createSolverSubmissionInput({
+  userId: '11111111-1111-4111-8111-111111111111',
+  eventIds: ['22222222-2222-4222-8222-222222222222'],
+});
 
-function record(status: 'queued' | 'completed' | 'failed') {
-  return {
+function createRecord(status: 'queued' | 'completed' | 'failed') {
+  return createSolverJobRecord({
     jobId: 'solve-22222222-2222-4222-8222-222222222222',
-    userId: request().userId,
-    solveMode: 'optimization' as const,
-    requestedEngine: 'auto' as const,
+    userId: submissionInput.userId,
     deduplicationKey,
     attemptToken: '33333333-3333-4333-8333-333333333333',
     input: solverInput,
-    preferences: solverInput.preferences,
     status,
     createdAt: '2026-07-13T00:00:00.000Z',
     updatedAt: '2026-07-13T00:00:00.000Z',
-  };
+  });
 }

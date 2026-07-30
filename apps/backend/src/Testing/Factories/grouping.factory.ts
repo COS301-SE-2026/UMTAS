@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto';
 import { ModuleGrouping } from '../../entities';
-import { CreateModuleGroupingDto } from 'src/Grouping/dto/grouping.dto';
+import { CreateModuleGroupingDto } from '../../Grouping/dto/grouping.dto';
 
 type Group = typeof ModuleGrouping.$inferSelect;
 

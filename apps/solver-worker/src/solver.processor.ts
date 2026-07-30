@@ -75,7 +75,16 @@ export class SolverProcessor implements WorkerProcessor<TimetableSolveJobData> {
       solveMode,
       abortSignal: context.abortSignal,
     });
-    if (firstResult.status === "feasible") return firstResult.result;
+    if (firstResult.status === "feasible") {
+      this.logEngineResult(context, firstEngine, firstResult.result);
+      return firstResult.result;
+    }
+
+    context.logger.info("SOLVER_ENGINE_RESULT", {
+      jobId: context.data.jobId,
+      engine: firstEngine,
+      status: "infeasible",
+    });
 
     if (requestedEngine !== "auto") {
       throw new WorkerExecutionError(
@@ -90,6 +99,12 @@ export class SolverProcessor implements WorkerProcessor<TimetableSolveJobData> {
     context.logger.info("CP-SAT was infeasible; falling back to GA", {
       jobId: context.data.jobId,
     });
+    context.logger.info("SOLVER_ENGINE_FALLBACK", {
+      jobId: context.data.jobId,
+      fromEngine: "cp-sat",
+      toEngine: "ga",
+      reason: "infeasible",
+    });
     const fallbackResult = await this.solverExecutor.solve({
       inputPath,
       outputPath,
@@ -97,7 +112,16 @@ export class SolverProcessor implements WorkerProcessor<TimetableSolveJobData> {
       solveMode,
       abortSignal: context.abortSignal,
     });
-    if (fallbackResult.status === "feasible") return fallbackResult.result;
+    if (fallbackResult.status === "feasible") {
+      this.logEngineResult(context, "ga", fallbackResult.result);
+      return fallbackResult.result;
+    }
+
+    context.logger.info("SOLVER_ENGINE_RESULT", {
+      jobId: context.data.jobId,
+      engine: "ga",
+      status: "infeasible",
+    });
 
     throw new WorkerExecutionError(
       "SOLVER_INFEASIBLE",
@@ -106,6 +130,19 @@ export class SolverProcessor implements WorkerProcessor<TimetableSolveJobData> {
         engines: ["cp-sat", "ga"],
       },
     );
+  }
+
+  private logEngineResult(
+    context: WorkerJobContext<TimetableSolveJobData>,
+    engine: "cp-sat" | "ga",
+    result: { outcome: string },
+  ): void {
+    context.logger.info("SOLVER_ENGINE_RESULT", {
+      jobId: context.data.jobId,
+      engine,
+      status: "feasible",
+      outcome: result.outcome,
+    });
   }
 }
 

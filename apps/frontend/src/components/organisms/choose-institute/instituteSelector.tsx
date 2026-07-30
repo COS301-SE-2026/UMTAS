@@ -13,7 +13,6 @@ import {
   selectUniMutator,
 } from "@/app/choose-institute/queries/UserRoleQueries";
 import { UserDetails } from "@/lib/userclass/userClass";
-import { useRouter } from "next/navigation";
 
 import Tutorial from "@/components/organisms/nav/Tutorial";
 import { University } from "lucide-react";
@@ -50,12 +49,16 @@ interface InstituteSelectorProps {
 
 export function InstituteSelector({ onClose }: InstituteSelectorProps) {
   const [selectedInstitute, setSelectedInstitute] = useState<uniDto>();
-
   const [selectedRole, setSelectedRole] = useState("");
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
   const { data: uniList, isLoading: uniLoading } = useQuery(getAllUni());
   const applyMut = useMutation(applyMutator());
   const selectUniMut = useMutation(selectUniMutator());
-  console.log(uniList);
+
+  function triggerSuccessAndClose(msg: string) {
+    setSuccessMessage(msg);
+  }
 
   function updateSelectedUni(id: string) {
     const nUni = uniList?.universities.find((uni) => uni.UniversityID === id);
@@ -65,6 +68,9 @@ export function InstituteSelector({ onClose }: InstituteSelectorProps) {
       selectUniMut.mutate(
         { uniId: id },
         {
+          onSuccess: () => {
+            triggerSuccessAndClose("Institute successfully selected!");
+          },
           onError: (error) => console.error("Failed to select role:", error),
         },
       );
@@ -72,10 +78,7 @@ export function InstituteSelector({ onClose }: InstituteSelectorProps) {
   }
 
   function handleConfirm() {
-    if (
-      selectedInstitute?.role === undefined &&
-      selectedInstitute?.UniversityID
-    ) {
+    if (selectedInstitute?.role === null && selectedInstitute?.UniversityID) {
       applyMut.mutate({
         UniversityID: selectedInstitute?.UniversityID,
         role: "STUDENT",
@@ -83,11 +86,10 @@ export function InstituteSelector({ onClose }: InstituteSelectorProps) {
     }
     UserDetails.storeUniDetails(selectedInstitute);
   }
+
   const applyDisabled =
     !selectedInstitute || !selectedRole || selectUniMut.isPending;
-  const uniDisabeled =
-    selectedInstitute == null && selectedInstitute == undefined;
-  const router = useRouter();
+
   return (
     <>
       <Tutorial steps={steps} wait={true} />
@@ -99,6 +101,12 @@ export function InstituteSelector({ onClose }: InstituteSelectorProps) {
           handleConfirm();
         }}
       >
+        {successMessage && (
+          <div className="p-2 text-sm text-[var(--success-text)] bg-[var(--success-bg)] rounded-md text-center font-medium">
+            {successMessage}
+          </div>
+        )}
+
         <SelectInstituteField
           institutes={uniList?.universities || []}
           value={selectedInstitute?.UniversityID || ""}
@@ -119,26 +127,21 @@ export function InstituteSelector({ onClose }: InstituteSelectorProps) {
           </button>
         </div>
 
-        {/*      {isNotApproved && selectedInstitute && (
-        <ApprovalStatus
-          status={selectedInstitute.role || "pending"}
-          universityName={selectedInstitute.UniversityName}
-        />
-      )*/}
         {selectedInstitute && <ApprovalStatus uni={selectedInstitute} />}
         <div className="flex flex-col mt-2 justify-around gap-3 border-t pt-4">
           <div className="flex justify-center items-center gap-4 w-full">
             <div className="flex-1 flex justify-end">
               <Button
                 id="btn-continue-as-role"
-                type="submit"
+                type="button"
                 variant={"outline"}
-                disabled={uniDisabeled}
                 onClick={(e) => {
                   e.stopPropagation();
                   handleConfirm();
-                  router.push("/schedules");
-                  onClose?.();
+                  triggerSuccessAndClose("Successfully continued!");
+                  setTimeout(() => {
+                    onClose?.();
+                  }, 1700);
                 }}
               >
                 Continue as {selectedInstitute?.role ?? "Student"}
@@ -149,17 +152,28 @@ export function InstituteSelector({ onClose }: InstituteSelectorProps) {
             <div className="flex-1 flex justify-start">
               <Button
                 id="btn-apply-for-role"
-                type="submit"
+                type="button"
                 variant={"outline"}
                 disabled={applyDisabled}
                 onClick={(e) => {
                   e.stopPropagation();
                   handleConfirm();
-                  applyMut.mutate({
-                    UniversityID: selectedInstitute?.UniversityID || "",
-                    role: selectedRole as uniDtoRoles,
-                  });
-                  onClose?.();
+                  applyMut.mutate(
+                    {
+                      UniversityID: selectedInstitute?.UniversityID || "",
+                      role: selectedRole as uniDtoRoles,
+                    },
+                    {
+                      onSuccess: () => {
+                        triggerSuccessAndClose(
+                          "Application submitted successfully!",
+                        );
+                      },
+                    },
+                  );
+                  setTimeout(() => {
+                    onClose?.();
+                  }, 1700);
                 }}
               >
                 {"Apply for role"}

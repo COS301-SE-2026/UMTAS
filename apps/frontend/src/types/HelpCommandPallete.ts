@@ -6,6 +6,8 @@ export interface HelpPageItem {
   icon: IconName;
   href?: string;
   action?: () => void;
+  closeOnSelect?: boolean;
+  "data-tour"?: string;
 }
 
 export interface HelpPageGroup {
