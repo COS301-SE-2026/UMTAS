@@ -58,4 +58,23 @@ describe('PdfParserFingerprintService', () => {
       BadRequestException,
     );
   });
+
+  it('delegates empty Uint8Array input without making filesystem calls', () => {
+    const expected: PdfStreamFingerprintResult = {
+      ok: false,
+      streamCount: 0,
+      algorithmVersion: 'pdf-stream-payload-sha256-v1',
+      reason: 'NO_STREAMS_FOUND',
+    };
+    computeFingerprintMock.mockReturnValue(expected);
+    const input = new Uint8Array();
+    expect(service.compute(input)).toBe(expected);
+    expect(computeFingerprintMock).toHaveBeenCalledWith(
+      input,
+      expect.objectContaining({
+        update: expect.any(Function),
+        digestHex: expect.any(Function),
+      }),
+    );
+  });
 });

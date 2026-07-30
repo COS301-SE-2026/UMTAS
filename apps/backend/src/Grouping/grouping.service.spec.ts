@@ -186,10 +186,7 @@ describe('GroupingService', () => {
       //Arrange
       const group = createGroup();
 
-      mockSequentialResults(mockDb.select, [
-        [group],
-        [{ ModuleID: moduleId }],
-      ] as any);
+      mockSequentialResults(mockDb.select, [[group], [{ ModuleID: moduleId }]]);
 
       //Act
       const result = await service.getById(group.GroupID);
