@@ -1,7 +1,7 @@
 import { Test } from '@nestjs/testing';
 
 //Constants
-import { groupId, moduleId } from '../Testing/constants.spec';
+import { groupId, moduleId } from '../Testing/constants';
 
 //Actual Services
 import { GroupingService } from './grouping.service';
@@ -186,10 +186,7 @@ describe('GroupingService', () => {
       //Arrange
       const group = createGroup();
 
-      mockSequentialResults(mockDb.select, [
-        [group],
-        [{ ModuleID: moduleId }],
-      ] as any);
+      mockSequentialResults(mockDb.select, [[group], [{ ModuleID: moduleId }]]);
 
       //Act
       const result = await service.getById(group.GroupID);

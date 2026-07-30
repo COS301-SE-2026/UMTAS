@@ -16,31 +16,29 @@ const mockHelpStep2: HelpStep = {
 };
 
 const mockHelpSection: HelpPageSection = {
+  title: "",
+  roles: [],
   id: "123",
-  category: "Getting started",
   description: "Learn cool stuff",
   pageName: "Builder",
   pageImage: {
     url: "cool builder link",
     altText: "Builder",
-    imageDescription: "builder layout cool",
   },
   steps: [mockHelpStep1, mockHelpStep2],
-  relatedPageIds: ["1"],
 };
 
 const mockHelpSection2: HelpPageSection = {
   id: "124",
-  category: "Getting started",
+  title: "",
+  roles: [],
   description: "Learn the funnnn of setting up your timetable.",
   pageName: "Builder for noobs",
   pageImage: {
     url: "cool link",
     altText: "alt alt",
-    imageDescription: "very descriptive",
   },
   steps: [mockHelpStep1, mockHelpStep2],
-  relatedPageIds: ["2"],
 };
 
 export default function TutorialPage() {

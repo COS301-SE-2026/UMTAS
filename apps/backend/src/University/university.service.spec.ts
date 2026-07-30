@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 
 //constants
-import { userId, uniId } from '../Testing/constants.spec';
+import { userId, uniId } from '../Testing/constants';
 
 //mock services
 import { createMockDatabase } from '../Testing/Mocks/database.mock';

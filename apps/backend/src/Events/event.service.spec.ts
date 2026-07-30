@@ -7,7 +7,7 @@ import {
   uniId,
   venueId,
   eventId,
-} from '../Testing/constants.spec';
+} from '../Testing/constants';
 
 //Actual Service imports
 import { DatabaseService } from '../db/database.service';

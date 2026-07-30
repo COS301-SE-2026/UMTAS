@@ -1,14 +1,10 @@
 import { NestFactory } from '@nestjs/core';
-import 'dotenv/config';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { collectDefaultMetrics, register } from 'prom-client';
 import type { Request, Response } from 'express';
 import { join } from 'path';
-import { migrate } from 'drizzle-orm/node-postgres/migrator';
 import { AppModule } from './app.module';
-import { DatabaseService } from './db/database.service';
-import { DB_MODES } from './db/database.constants';
 import {
   swaggerCustomCss,
   swaggerCustomJs,
@@ -16,11 +12,10 @@ import {
 } from './swagger-theme';
 
 import { ValidationPipe } from '@nestjs/common';
-import { NodePgDatabase } from 'drizzle-orm/node-postgres';
-import * as schema from './entities/index';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  app.enableShutdownHooks();
 
   app.setGlobalPrefix('api', {
     exclude: ['metrics'],
@@ -35,16 +30,6 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   const port = process.env.PORT ?? 3000;
   console.log(`[STARTUP] Starting UMTAS API on port ${port}...`);
-
-  // if (process.env.NODE_ENV !== 'production') {
-  const dbService = app.get(DatabaseService);
-  if (dbService.dbMode !== DB_MODES.PGLITE) {
-    await migrate(dbService.db as NodePgDatabase<typeof schema>, {
-      migrationsFolder: join(__dirname, '..', 'drizzle'),
-    });
-    console.log('[STARTUP] Database migrations applied');
-  }
-  // }
 
   app.enableCors({
     origin: [

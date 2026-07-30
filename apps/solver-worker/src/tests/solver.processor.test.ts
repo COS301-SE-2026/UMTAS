@@ -66,6 +66,8 @@ test("SolverProcessor passes feasibility mode to the selected engine", async () 
 
 test("SolverProcessor falls back to GA only after CP-SAT is infeasible", async () => {
   const calls: string[] = [];
+  const logs: Array<{ message: string; metadata?: Record<string, unknown> }> =
+    [];
   const gaResult: SolverResult = {
     engine: "ga",
     outcome: "best-effort",
@@ -94,7 +96,9 @@ test("SolverProcessor falls back to GA only after CP-SAT is infeasible", async (
     writeInputFile: async () => {},
   });
 
-  const payload = await processor.process(context("auto"));
+  const payload = await processor.process(
+    context("auto", "optimization", logs),
+  );
 
   assert.deepEqual(calls, [
     "input:solve-1",
@@ -102,6 +106,46 @@ test("SolverProcessor falls back to GA only after CP-SAT is infeasible", async (
     "solve:ga:optimization",
   ]);
   assert.deepEqual(payload, { status: "completed", result: gaResult });
+  assert.deepEqual(logs, [
+    {
+      message: "Running timetable solver",
+      metadata: {
+        jobId: "solve-1",
+        engine: "cp-sat",
+        solveMode: "optimization",
+      },
+    },
+    {
+      message: "SOLVER_ENGINE_RESULT",
+      metadata: {
+        jobId: "solve-1",
+        engine: "cp-sat",
+        status: "infeasible",
+      },
+    },
+    {
+      message: "CP-SAT was infeasible; falling back to GA",
+      metadata: { jobId: "solve-1" },
+    },
+    {
+      message: "SOLVER_ENGINE_FALLBACK",
+      metadata: {
+        jobId: "solve-1",
+        fromEngine: "cp-sat",
+        toEngine: "ga",
+        reason: "infeasible",
+      },
+    },
+    {
+      message: "SOLVER_ENGINE_RESULT",
+      metadata: {
+        jobId: "solve-1",
+        engine: "ga",
+        status: "feasible",
+        outcome: "best-effort",
+      },
+    },
+  ]);
 });
 
 function inputClient(calls: string[]): SolverInputClient {
@@ -130,6 +174,10 @@ function executor(
 function context(
   engine: "auto" | "cp-sat" | "ga",
   solveMode: "feasibility" | "optimization" = "optimization",
+  infoLogs?: Array<{
+    message: string;
+    metadata?: Record<string, unknown>;
+  }>,
 ) {
   return {
     data: {
@@ -141,7 +189,9 @@ function context(
     tempDir: "/tmp/solve-1",
     logger: {
       debug: () => {},
-      info: () => {},
+      info: (message: string, metadata?: Record<string, unknown>) => {
+        infoLogs?.push(metadata ? { message, metadata } : { message });
+      },
       warn: () => {},
       error: () => {},
     },

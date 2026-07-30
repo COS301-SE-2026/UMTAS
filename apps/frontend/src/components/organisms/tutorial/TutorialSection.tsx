@@ -32,7 +32,7 @@ export default function TutorialSection({ section }: TutorialSectionProps) {
             className="uppercase font-medium bg-[var(--bg-elevated)] text-[var(--text-primary)] 
             hover:bg-[var(--bg-elevated)] rounded-full px-4 py-2 border-[var(--border)]"
           >
-            {section.category}
+            {section.title}
           </Badge>
         </div>
         <CardTitle className="text-xl font-semibold text-[var(--text-primary)] mb-2">
@@ -41,9 +41,9 @@ export default function TutorialSection({ section }: TutorialSectionProps) {
         <CardDescription className="text-md text-[var(--text-secondary)] font-normal">
           {section.description}
         </CardDescription>
-        {section.pageImage?.imageDescription && (
+        {section.pageImage?.altText && (
           <p className="text-md text-[var(--text-secondary)] mt-4 border-l-2 border-[var(--border)] pl-4">
-            {section.pageImage.imageDescription}
+            {section.pageImage.altText}
           </p>
         )}
       </CardHeader>
