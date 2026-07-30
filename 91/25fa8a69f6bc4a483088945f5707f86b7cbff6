@@ -1,0 +1,16 @@
+docs/srs/USER_STORIES.md
+  h_84e82529bd05a5 4
+docs/srs/USE_CASES.md
+  h_84e82529bd05a5 1-5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.18",
+  "base_commit_sha": "9125fa8a69f6bc4a483088945f5707f86b7cbff6",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}
