@@ -14,9 +14,9 @@ import { fetchAllModules } from "@/app/course-management/queries/modules/moduleB
 
 import Tutorial from "@/components/organisms/nav/Tutorial";
 import { UserDetails } from "@/lib/userclass/userClass";
-import { useRouter } from "next/navigation";
 import Popup from "@/components/atoms/utility/floatContainer";
 import { ChooseInstituteTemplate } from "../choose-institute/chooseInstituteTemplate";
+import NoRoleSelected from "@/components/molecules/roleManagement/NoRoleSelected";
 const steps = [
   {
     target: "#btn-browse-files",
@@ -50,7 +50,7 @@ export default function SolverShell() {
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [comingFromStep, setComingFromStep] = useState<number | null>(null);
   const [moduleGroupingID, setModuleGroupingID] = useState<string | null>(null);
-  const router = useRouter();
+  const UniDetails = UserDetails.getUniDetails();
   const { data: modulesData } = useQuery({
     queryKey: ["PDF", "MODULES"],
     queryFn: () => {
@@ -93,6 +93,9 @@ export default function SolverShell() {
   if (moduleGroupingID == null && currentStep != 0) {
     setCurrentStep(0);
   }
+
+  const hasRole = UniDetails?.role != null;
+  if (!hasRole) return <NoRoleSelected />;
 
   return (
     <>

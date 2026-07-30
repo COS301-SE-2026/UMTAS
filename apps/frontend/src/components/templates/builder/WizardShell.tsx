@@ -10,6 +10,8 @@ import { EventsStep } from "@/components/organisms/builder/EventsStep";
 import { getAllModulesQ } from "./Queries/moduleQueries";
 import { useQuery } from "@tanstack/react-query";
 import { getAllEventsQ } from "./Queries/eventQueries";
+import { UserDetails } from "@/lib/userclass/userClass";
+import NoRoleSelected from "@/components/molecules/roleManagement/NoRoleSelected";
 
 const Steps = [{ label: "Modules" }, { label: "Events" }];
 
@@ -19,6 +21,7 @@ export function WizardShell() {
   const editId = searchParams.get("editId");
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  const UniDetails = UserDetails.getUniDetails();
 
   const {
     data: modules = [],
@@ -100,6 +103,9 @@ export function WizardShell() {
     return false;
   }
   */
+
+  const hasRole = UniDetails?.role != null;
+  if (!hasRole) return <NoRoleSelected />;
 
   function renderStep() {
     if (currentStep === 0) {

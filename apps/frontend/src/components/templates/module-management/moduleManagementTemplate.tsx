@@ -27,6 +27,7 @@ import { useRouter } from "next/navigation";
 import Tutorial from "@/components/organisms/nav/Tutorial";
 import NotFound from "@/app/not-found";
 import { fetchAllModules } from "@/app/course-management/queries/modules/moduleBuilder";
+import NoRoleSelected from "@/components/molecules/roleManagement/NoRoleSelected";
 const steps = [
   {
     target: "#btn-create-module-new",
@@ -119,9 +120,12 @@ export default function ModManagementTemplate() {
     UniDetails?.role === "STUDENT";
   const router = useRouter();
 
-  if (UniDetails === null) {
-    router.push("/dashboard");
-  }
+  // if (UniDetails === null) {
+  //   router.push("/dashboard");
+  // }
+
+  const hasRole = UniDetails?.role != null;
+  if (!hasRole) return <NoRoleSelected />;
 
   if (!ViableRole) {
     return <NotFound />;
