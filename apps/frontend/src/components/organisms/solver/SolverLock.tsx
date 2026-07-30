@@ -15,7 +15,7 @@ export function SolverLock({
 }: CardLockOverlayProps) {
   if (locked) {
     return (
-      <div className="flex h-full min-h-125 w-full flex-col items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] p-6 shadow-sm transition-all duration-300">
+      <div className="flex h-full w-full flex-col items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] p-6 shadow-sm transition-all duration-300">
         {loading ? (
           <div className="flex flex-col items-center gap-4">
             <Loader2 className="h-8 w-8 animate-spin text-[var(--text-secondary)]" />

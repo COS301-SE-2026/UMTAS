@@ -27,6 +27,10 @@ import {
   updateModStylingPath,
   updateStylingBuilder,
 } from "@/app/course-management/queries/modules/moduleBuilder";
+import { CourseSelect } from "./selectedCourse";
+import { CourseDTO } from "@/app/course-management/queries/courses/courseBuilder";
+import { addModuleToCourseQ } from "@/app/course-management/queries/courses/courseQueries";
+import { Card } from "@/components/atoms/baseShadcn/card";
 
 export default function EditModuleEvent({
   data,
@@ -43,8 +47,23 @@ export default function EditModuleEvent({
     message: string;
   } | null>(null);
 
+  const [selectedCourse, setSelectedCourse] = useState<CourseDTO>({
+    CourseID: "",
+    CourseName: "",
+    UniversityID: UserDetails.getUniDetails()?.UniversityID ?? "",
+  });
+
   const updateModuleMutResult = useMutation(updateModQ());
   const updateEventMutResult = useMutation(updateEventMut());
+
+  const {
+    mutate: addModuleToCourseMut,
+    isPending: isAdding,
+    isSuccess: isAddSuccess,
+    isError: isAddError,
+    reset: resetAdd,
+  } = useMutation(addModuleToCourseQ());
+
   const updateStylingMut = useMutation({
     mutationFn: async (vars: {
       body: updateModStylingBody;
@@ -146,7 +165,6 @@ export default function EditModuleEvent({
         onClose();
       }, 2001);
     } catch (error) {
-      //console.error(error);
       setFeedback({
         type: "error",
         message: "Changes failed to save. Try again?",
@@ -155,11 +173,19 @@ export default function EditModuleEvent({
   };
 
   return (
-    <div className="flex flex-col gap-4 p-6 bg-[var(--bg-surface)] border border-[var(--border)] rounded-xl shadow-sm w-full max-w-2xl mx-auto max-h-[70vh] overflow-hidden">
+    <div className="flex flex-col gap-4 p-6 bg-[var(--bg-surface)] border border-[var(--border)] rounded-xl shadow-sm w-full max-w-2xl mx-auto max-h-[91vh] overflow-hidden">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold text-[var(--text-primary)]">
           Edit Module and Events
         </h2>
+        <Button
+          type="button"
+          variant={"default"}
+          onClick={onClose}
+          aria-label="Close"
+        >
+          Close
+        </Button>
       </div>
 
       <Tabs
@@ -228,6 +254,44 @@ export default function EditModuleEvent({
           </TabsContent>
         </div>
       </Tabs>
+
+      {UserDetails.getUniDetails()?.role !== "STUDENT" && (
+        <Card className="w-full mt-2 p-4 border-[var(--border)] bg-[var(--bg-surface)] shadow-md">
+          <Label className="text-sm font-medium text-[var(--text-primary)]">
+            Add Module to Course
+          </Label>
+          <CourseSelect
+            CourseState={selectedCourse}
+            updateCourseState={setSelectedCourse}
+          >
+            <Button
+              disabled={!selectedCourse.CourseID || isAdding || isAddSuccess}
+              onClick={() => {
+                resetAdd();
+                addModuleToCourseMut({
+                  body: { modules: [moduleState.moduleID] },
+                  path: { CourseID: selectedCourse.CourseID },
+                });
+              }}
+              className={`w-fit mt-4 ${
+                isAddSuccess
+                  ? "bg-[var(--success-bg)] text-[var(--success-text)]"
+                  : isAddError
+                    ? "bg-[var(--error-bg)] text-[var(--error-text)]"
+                    : ""
+              }`}
+            >
+              {isAdding
+                ? "Adding.."
+                : isAddSuccess
+                  ? "Successfully Added Module to Course"
+                  : isAddError
+                    ? "Failed to Add Module To Course"
+                    : "Add Module to Course"}
+            </Button>
+          </CourseSelect>
+        </Card>
+      )}
 
       <div className="flex justify-between items-center mt-4 pt-4 border-t border-[var(--border)]">
         <div className="flex-1">

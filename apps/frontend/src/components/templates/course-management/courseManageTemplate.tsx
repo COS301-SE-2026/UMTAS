@@ -34,6 +34,7 @@ import { CourseDTO } from "@/app/course-management/queries/courses/courseBuilder
 
 import Tutorial from "@/components/organisms/nav/Tutorial";
 import NotFound from "@/app/not-found";
+import { AddCoursePopup } from "@/components/organisms/course-management/AddCoursePopup";
 const steps = [
   {
     target: "#input-search-courses-degrees-modules",
@@ -66,6 +67,7 @@ export default function CourseManagementTemplate() {
   const [possibleCourses, setPossibleCourses] = useState<
     Record<string, boolean>
   >({});
+  const [showAddCourse, setShowAddCourse] = useState(false);
 
   const ViableRole = UniDetails?.role === "UNIVERSITY_ADMIN";
 
@@ -265,6 +267,10 @@ export default function CourseManagementTemplate() {
                   ))}
                 </SelectContent>
               </Select>
+              <Button onClick={() => setShowAddCourse(true)}>Add Course</Button>
+              {showAddCourse && (
+                <AddCoursePopup onClose={() => setShowAddCourse(false)} />
+              )}
             </div>
           </div>
           <Table>
