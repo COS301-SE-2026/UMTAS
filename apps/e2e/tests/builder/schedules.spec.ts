@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-test.describe.configure({ mode: "serial" });
+test.describe.configure({ mode: "serial", retries: 0 });
 test("Create and update module", async ({ page }) => {
   await page.goto("/builder");
   await page.getByTestId("btn-add-new-Module").click();
@@ -128,15 +128,20 @@ test.describe("Schedules", () => {
 
     await expect(page.getByTestId("schedules-Calendar-Div")).toBeVisible();
     await page.getByTestId("schedules-Date-Input").fill("2026-12-30");
-    await expect(page).toHaveScreenshot("Schedule-correct-event.png");
-    // page did change schedule created successfully
+
+    const calendar = page.getByTestId("schedules-Calendar-Div");
+    await expect(calendar).toContainText("TestName");
+    await expect(calendar).toContainText("AA");
+    await expect(calendar).toContainText("test");
+    await expect(calendar).toContainText("08:00 - 08:30");
   });
 
   test("Delete schedule", async ({ page }) => {
     await page.goto("/schedules");
     await page.getByTestId("schedules-Delete-Btn").click();
     await page.getByTestId("Schedules-ConfirmDelete-Btn").click();
-    await expect(page).toHaveScreenshot("Schedules-deleted.png");
+    await expect(page.getByText("No events generated yet.")).toBeVisible();
+    await expect(page.getByText("No timetables found.")).toBeVisible();
   });
 });
 test("Delete module", async ({ page }) => {

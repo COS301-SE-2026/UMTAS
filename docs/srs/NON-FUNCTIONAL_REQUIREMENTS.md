@@ -1,10 +1,5 @@
 # Non-Functional Requirements
 
-UMTAS quality requirements are expressed as six-part quality attribute scenarios. Each scenario
-identifies the source and stimulus, the operating environment, the affected artifact, the required
-response, and a quantitative response measure. The characteristics and sub-characteristics follow
-the ISO/IEC 25010:2023 categories used in the architectural design lectures.
-
 These five primary requirements are derived from the client's stated success criteria: correct
 University of Pretoria PDF extraction, conflict-free schedules, privacy-preserving administration,
 university-scale simulation, and university-specific adapters that do not alter the core. They are
@@ -95,24 +90,3 @@ successfully enqueued it, and returned its identifier.
 | **Artifact** | University ingestion extension point |
 | **Response** | Add the university-specific behaviour without altering unrelated application behaviour or existing adapters |
 | **Response measure** | The change modifies **0 Core API, persistent-schema, queue-contract, worker-orchestration, or existing-adapter implementation files**. Changes remain confined to the new adapter, registration/configuration, fixtures, and tests, and **100% of canonical contract and existing-adapter regression tests pass**. |
-
-## Measurement Rules
-
-- Each result shall identify the NFR ID, build, measurement date, environment, fixture or workload
-  version, and observed values.
-- PDF fixtures shall include a manually reviewed ground-truth manifest containing every expected
-  record and field. Correctness shall be calculated from an exact comparison with that manifest.
-- Solver fixtures shall record expected feasibility and hard constraints. An independent validator,
-  separate from the selected solving algorithm, shall calculate overlaps and verify the returned
-  result.
-- Privacy validation shall use synthetic data with known associations. It shall inspect
-  administrative responses, exports, persistent aggregate data, and logs before executing the
-  documented re-identification attempt.
-- The scalability workload shall document its request mix, ramp-up profile, steady-state duration,
-  timeout policy, client concurrency, and production-host specification. Queue completion and
-  synchronous API latency shall be reported separately.
-- Adapter modifiability shall be demonstrated through a controlled test adapter and a recorded diff
-  inspection in addition to automated contract and regression tests.
-- A requirement shall not be marked as satisfied until repeatable test evidence demonstrates every
-  response measure. Architectural support or a successful deployment alone is not proof that a
-  requirement has been met.
