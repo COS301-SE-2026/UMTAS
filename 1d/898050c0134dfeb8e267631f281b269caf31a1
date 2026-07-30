@@ -1,0 +1,46 @@
+docs/sas/architecture/ARCHITECTURAL_REQUIREMENTS.md
+  h_3359569cacef0e 28-29
+docs/sas/architecture/TECHNOLOGY_REQUIREMENTS.md
+  h_3359569cacef0e 17
+apps/e2e/tests/builder/schedules.spec.ts
+  s_f1f45e4bec9032::t_d98bf2f393b8bb 2,131-136,143-144
+apps/e2e/tests/setup/health-check.spec.ts
+  s_f1f45e4bec9032::t_ea2835dfb7df02 5,12-13
+apps/frontend/src/proxy.ts
+  s_f1f45e4bec9032::t_6c38f902d283ed 5-9
+docker/backend/backend.Dockerfile
+  s_f1f45e4bec9032::t_54496ef483887d 9-10
+docker/frontend/frontend.Dockerfile
+  s_f1f45e4bec9032::t_a072dc3cad9990 9-10,14-15,17-18
+docs/diagrams/architecture/.$Architecture.drawio.bkp
+  s_f1f45e4bec9032::t_3cadc7f295b142 3,16,31,37,47,67,123,128,131,139,147,224,232,235,243,248,251,256,261,271,274,285,296,301,310,323,337,350,356,365,379-385
+docs/diagrams/architecture/Architecture.drawio
+  s_f1f45e4bec9032::t_29983b6aefee68 3,128,164
+docs/diagrams/architecture/Architecture.svg
+  s_f1f45e4bec9032::t_1d835fc3beb669 4
+docs/sas/architecture/ARCHITECTURAL_DIAGRAM.md
+  s_f1f45e4bec9032::t_57fd0e0cadfd72 45
+docs/srs/NON-FUNCTIONAL_REQUIREMENTS.md
+  s_f1f45e4bec9032::t_f6486245747d7d 92
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.18",
+  "base_commit_sha": "1d898050c0134dfeb8e267631f281b269caf31a1",
+  "prompts": {},
+  "humans": {
+    "h_3359569cacef0e": {
+      "author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_f1f45e4bec9032": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fb2f8-3119-74b2-bee4-8a1f7ef6c9e8",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}
