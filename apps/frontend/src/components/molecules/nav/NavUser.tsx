@@ -23,7 +23,6 @@ export function NavUser({ name: nameProp }: NavUserProps) {
   const isLoggedIn = !!session?.user;
 
   useEffect(() => {
-     
     const check = () => setNeedsRole(!UserDetails.getUniDetails()?.role);
     check();
     window.addEventListener("focus", check);

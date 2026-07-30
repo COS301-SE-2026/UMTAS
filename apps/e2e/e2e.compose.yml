@@ -125,6 +125,77 @@ services:
       start_period: 15s
       retries: 30
 
+  pdf-parser-worker:
+    build:
+      context: ../..
+      dockerfile: docker/pdf-parser-worker/pdf-parser-worker.Dockerfile
+    init: true
+    environment:
+      NODE_ENV: test
+      REDIS_URL: redis://:${REDIS_PASSWORD:-e2e-redis-password}@redis:6379
+      WORKER_BACKEND_URL: http://backend:3000
+      WORKER_CALLBACK_TOKEN: ${WORKER_CALLBACK_TOKEN:-e2e-worker-callback-token}
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-e2e-minio}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-e2e-minio-password}
+      MINIO_BUCKET: umtas-uploads
+      PDF_PARSE_CLI_COMMAND: python3
+      PDF_PARSE_CLI_CWD: /app/python
+      WORKER_READY_FILE: /tmp/umtas-worker/pdf-parser-ready
+    networks:
+      - e2e
+    depends_on:
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('fs').accessSync(process.env.WORKER_READY_FILE)",
+        ]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    stop_grace_period: 90s
+
+  solver-worker:
+    build:
+      context: ../..
+      dockerfile: docker/solver-worker/solver-worker.Dockerfile
+    init: true
+    environment:
+      NODE_ENV: test
+      REDIS_URL: redis://:${REDIS_PASSWORD:-e2e-redis-password}@redis:6379
+      WORKER_BACKEND_URL: http://backend:3000
+      WORKER_CALLBACK_TOKEN: ${WORKER_CALLBACK_TOKEN:-e2e-worker-callback-token}
+      SOLVER_CLI_COMMAND: /app/bin/solver-cli
+      WORKER_READY_FILE: /tmp/umtas-worker/solver-ready
+    networks:
+      - e2e
+    depends_on:
+      redis:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('fs').accessSync(process.env.WORKER_READY_FILE)",
+        ]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    stop_grace_period: 330s
+
   frontend:
     build:
       context: ../..
@@ -174,4 +245,8 @@ services:
       - e2e
     depends_on:
       frontend:
+        condition: service_healthy
+      pdf-parser-worker:
+        condition: service_healthy
+      solver-worker:
         condition: service_healthy

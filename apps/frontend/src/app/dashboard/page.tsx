@@ -71,7 +71,7 @@ const Features = [
 const Links = [
   {
     label: "Documentation",
-    href: "https://cos301-se-2026.github.io/UMTAS/",
+    href: "https://cos301-se-2026.github.io/UMTAS/latest/",
     id: "documentation-link",
   },
   {
