@@ -1,7 +1,7 @@
 # User Stories
 
 !!! abstract "Section Brief"
-    The User stories are grouped by System, corresponding to the Use Cases systems.
+    The User stories are grouped by system, corresponding to the Use Cases systems.
 ---
 
 ??? info "**Landing Page**"
