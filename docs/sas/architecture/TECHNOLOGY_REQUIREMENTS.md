@@ -14,7 +14,7 @@ university-adapter modifiability.
 | Data access | Drizzle ORM | Relational persistence mapping | Keeps SQL explicit and typed. Trade-off: more manual query work than higher-level ORMs. |
 | Relational database | PostgreSQL | Authoritative relational store | Fits the relational domain model. Trade-off: heavier operations than file-backed storage. |
 | Solver CLI runtime | C++ executable | Local compute engine within the solver worker | Packages both strategies behind one process contract. Trade-off: native build and runtime dependencies. |
-| Solver strategies | Google OR-Tools CP-SAT, OpenGA SOGA | Conflict-free and best-effort timetable selection | CP-SAT enforces no-clash constraints. OpenGA runs an independent single-objective search using preferred-start-time distance and a dominant pairwise-conflict penalty. |
+| Solver strategies | Google OR-Tools CP-SAT, OpenGA | Conflict-free and best-effort timetable selection | CP-SAT enforces no-clash constraints. OpenGA is used as a fallback for conflicting solutions. |
 | Parser CLI runtime | Python | Local extraction engine within the parser worker | Supports a small adapter interface and mature PDF tooling. Trade-off: adds a second managed runtime. |
 | PDF extraction | PyMuPDF | Layout-aware timetable extraction | Spatial extraction fits timetable grids. Trade-off: source-specific layouts require adapter maintenance. |
 | Worker runtime | Node.js, BullMQ, shared worker package | Queue consumption, timeouts, cleanup, and callbacks | Reuses TypeScript contracts and Redis infrastructure. Trade-off: job-state and retry complexity. |
