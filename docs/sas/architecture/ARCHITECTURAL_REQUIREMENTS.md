@@ -25,8 +25,8 @@
 | Core API | Policy, orchestration, persistence, and validation | Authoritative application state |
 | PDF Parser Worker | Execute queued PDF parsing jobs | Temporary files only |
 | Timetable Solver Worker | Execute queued timetable solving jobs | Temporary files only |
-| PostgreSQL | Domain, authentication, and job records | Persistent relational state |
-| Redis and BullMQ | Coordinate asynchronous jobs | Operational queue state |
+| Relational DB | Domain, authentication, and job records | Persistent relational state |
+| Message Queue | Coordinate asynchronous jobs | Operational queue state |
 | Object Storage | Store uploaded PDFs | Persistent object state |
 
 ## Communication
@@ -38,10 +38,3 @@
 | Local command-line invocation | Worker-to-parser and worker-to-solver execution |
 | Authenticated callback | Terminal worker result to the Core API |
 | Polling | Browser reads of queued, completed, and failed jobs |
-
-The solution cache, additional solver heuristics, direct Google Calendar synchronisation, live
-university APIs, and lecturer availability remain future architectural concerns. Demo 2 calendar
-interoperability is implemented as browser-generated iCalendar export, while Google OAuth is an
-implemented optional identity-provider boundary.
-Privacy-preserving analytics and the reusable simulation workload are client-required architectural
-targets, but their current implementations and acceptance evidence remain incomplete.

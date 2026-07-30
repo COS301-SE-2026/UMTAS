@@ -48,6 +48,10 @@ function rejectWith(reason: unknown): Promise<never> {
 }
 
 describe('ObjectStorageService', () => {
+  delete process.env.MINIO_ENDPOINT;
+  delete process.env.MINIO_ROOT_USER;
+  delete process.env.MINIO_ROOT_PASSWORD;
+
   const originalEnv = process.env;
 
   beforeEach(() => {
