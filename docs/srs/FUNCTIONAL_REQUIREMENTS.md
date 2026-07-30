@@ -1,21 +1,7 @@
 # Functional Requirements
 
 # FR 1 
-### R1.1 Landing Page Website
-
-- **R1.1.1** The system shall provide a landing page for all users prior to login/register.
-    - **R1.1.1.1** The system shall allow users to visit the main Umtas website through the landing page.
-- **R1.1.2** The landing page shall present system functionalities to entice users.
-    - **R1.1.2.1** The system shall explain the functionality of each of the 3 adaptors to the users
-        - **R1.1.2.1.1** The system shall explain the functionality of the `Builder` adapter
-        - **R1.1.2.1.2** The system shall explain the functionality of the `pdf upload` adapter
-        - **R1.1.2.1.3** The system shall explain the functionality of the `University API` adapter
-    - **R1.1.2.2** The system shall highlight each users ability through the system
-        - **R1.1.2.2.1** The system shall explain the functionality extended to a Student.
-        - **R1.1.2.2.2** The system shall explain the functionality extended to an Admin.
-        - **R1.1.2.2.3** The system shall explain the functionality extended to a Lecturer.
-        - **R1.1.2.2.4** The system shall explain the functionality extended to a Tyto simulation admin.
-
+ 
 ### R1.2 Login and Register System
 
 - **R1.2.1** The system shall allow users to log in.
@@ -95,6 +81,28 @@
 	- **R2.5.1.6** The system shall make use of a uuid such that duplicate events are accounted for.
 - **R2.5.2** The system shall allow direct sync with Google Calendar.
 	- **R2.5.2.1** The system shall support creating a Google Calendar instance.
+
+### R2.6 Solver System
+
+- **R2.6.1** The system shall automatically solve for a schedule once a finalised set of events is received from an input adapter (Builder, PDF Upload, or University API).
+    - **R2.6.1.1** The system shall first attempt to generate a conflict-free schedule using the CP-SAT solver.
+        - **R2.6.1.1.1** The system shall model venue assignments as a hard constraint, preventing any venue from being double-booked.
+        - **R2.6.1.1.2** The system shall model lecturer assignments as a hard constraint, preventing any lecturer from being double-booked.
+        - **R2.6.1.1.3** The system shall model student group assignments as a hard constraint, preventing any student group from being double-booked.
+        - **R2.6.1.1.4** The system shall require each event to be scheduled its specified number of required occurrences.
+    - **R2.6.1.2** The system shall notify the User once the CP-SAT solver produces a valid, conflict-free timetable.
+    - **R2.6.1.3** The system shall automatically invoke the GA solver if the CP-SAT solver cannot find a feasible, conflict-free schedule.
+- **R2.6.2** The system shall generate a best-effort schedule using a Genetic Algorithm (GA) when no conflict-free solution exists.
+    - **R2.6.2.1** The system shall evaluate candidate schedules against soft preferences rather than hard constraints.
+        - **R2.6.2.1.1** The system shall support soft preferences for preferred venues.
+        - **R2.6.2.1.2** The system shall support soft preferences for preferred times.
+        - **R2.6.2.1.3** The system shall support soft preferences for minimising scheduling gaps.
+    - **R2.6.2.2** The system shall apply selection, crossover, and mutation operators across generations to improve candidate schedules.
+    - **R2.6.2.3** The system shall select the candidate schedule with the lowest soft-constraint violation score once a maximum generation count or convergence threshold is reached.
+    - **R2.6.2.4** The system shall notify the User when a GA-generated schedule is produced, including any remaining unresolved conflicts.
+- **R2.6.3** The system shall allow the User to view a generated schedule (CP-SAT or GA).
+    - **R2.6.3.1** The system shall allow the User to edit a generated schedule.
+    - **R2.6.3.2** The system shall allow the User to delete a generated schedule.
 
 # FR 3
 

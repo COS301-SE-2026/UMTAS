@@ -122,6 +122,16 @@
     | **UC-EX-02** | Sync Timetable with Google Calendar | [Calendar Export](#calendar-exporting-id) | Student |<span class="status-not-implemented">In Progress</span>|
     
     </div>
+
+    <div class="uc-table" markdown>
+
+    | **ID** | **Use Case** | **Group** | **Actor** | **Status** |
+    |:---:|:---:|:---:|:---:|:---:|
+    | **UC-SV-01** | Solve with CP-SAT | [Solver System](#solver-system-id) | Student |<span class="status-implemented">Implemented</span>|
+    | **UC-SV-02** | Solve with GA | [Solver System](#solver-system-id)  | Student |<span class="status-implemented">Implemented</span>|
+
+    </div>
+
     <div class="uc-table" markdown>
 
     ## Analytics Dashboard
