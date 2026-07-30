@@ -22,21 +22,3 @@ export interface HelpStep {
   description: string;
   imageUrl?: string;
 }
-
-export const createHelpPage = (
-  pageName: string,
-  overrides?: Partial<HelpPageSection>,
-): HelpPageSection => ({
-  id: `${pageName.toLowerCase()}_HelpPage`,
-  pageName,
-  title: `How to use the ${pageName} page`,
-  roles: ["all"],
-  description: `This section will guide you through using the ${pageName} page.`,
-  pageImage: {
-    url: `../../images/${pageName}/image.png`,
-    altText: `Image of the ${pageName} page`,
-  },
-  steps: [],
-
-  ...overrides,
-}); //END_createHelpPage

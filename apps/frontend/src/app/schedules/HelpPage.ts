@@ -1,12 +1,6 @@
-import {
-  HelpPageSection,
-  HelpStep,
-  createHelpPage,
-} from "../../types/HelpPage";
+import { HelpPageSection, HelpStep } from "../../types/HelpPage";
 
-const page = "My Schedules";
-
-const steps: HelpStep[] = [
+const schedulesSteps: HelpStep[] = [
   {
     stepNumber: 1,
     title: "Select a Schedule",
@@ -34,6 +28,15 @@ const steps: HelpStep[] = [
   },
 ];
 
-export const HelpPage: HelpPageSection = createHelpPage(page, {
-  steps,
-});
+export const schedulesSection: HelpPageSection = {
+  id: "schedules",
+  title: "My Schedules",
+  description: "View, Edit or Delete Your Timetable.",
+  pageName: "Schedules Page",
+  pageImage: {
+    url: "/images/Schedules/image.png",
+    //altText: "c",
+  },
+  roles: ["all"],
+  steps: schedulesSteps,
+};

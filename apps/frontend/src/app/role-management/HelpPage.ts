@@ -1,12 +1,6 @@
-import {
-  HelpPageSection,
-  HelpStep,
-  createHelpPage,
-} from "../../types/HelpPage";
+import { HelpPageSection, HelpStep } from "../../types/HelpPage";
 
-const page = "Manage Roles";
-
-const steps: HelpStep[] = [
+const roleSteps: HelpStep[] = [
   {
     stepNumber: 1,
     title: "View all Users",
@@ -29,7 +23,15 @@ const steps: HelpStep[] = [
   },
 ];
 
-export const HelpPage: HelpPageSection = createHelpPage(page, {
-  roles: ["UNIVERSITY_ADMIN"],
-  steps,
-});
+export const roleManagementSection: HelpPageSection = {
+  id: "role-management",
+  title: "Role Management",
+  description: "Filter Users and Apply/Update Roles.",
+  pageName: "Roles Page",
+  pageImage: {
+    url: "/images/Roles/image.png",
+    //altText: "c",
+  },
+  roles: ["all"],
+  steps: roleSteps,
+};
