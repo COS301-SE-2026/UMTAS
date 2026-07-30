@@ -14,5 +14,5 @@ test("Courses Page add Course", async ({ page }) => {
     await page.getByTestId("add-course-confirm").click();
   }
   await expect(page.getByText("Course Management")).toBeVisible();
-  await expect(page.getByText("TestName")).toBeVisible();
+  await expect(page.getByText("TestName")).toBeVisible(); // course created
 });
