@@ -109,20 +109,6 @@ export default function SolverShell() {
         ]}
       />
 
-      {showSelectUni && (
-        <Popup>
-          <div className="w-fit text-center">
-            <ChooseInstituteTemplate
-              onClose={() => {
-                if (UserDetails.getUniDetails()?.role) {
-                  SetSelectUni(false);
-                }
-              }}
-            />
-            <div className="w-full mt-5 items-center justify-center flex"></div>
-          </div>
-        </Popup>
-      )}
       <div className="flex flex-wrap justify-center gap-8 xl:gap-16 w-full max-w-[1920px] mx-auto px-4 md:px-6 pt-6">
         <div className="flex w-120 h-110 justify-center">
           <SolverUpload
@@ -131,7 +117,10 @@ export default function SolverShell() {
             setModuleGroupID={setModuleGroupingID}
           />
         </div>
-        <div className="flex w-120 h-110 justify-center">
+        <div
+          data-testid="div-review-solver"
+          className="flex w-120 h-110 justify-center"
+        >
           <SolverLock locked={currentStep < 1} loading={comingFromStep === 0}>
             <SolverReview
               events={events}
