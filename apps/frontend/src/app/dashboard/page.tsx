@@ -182,7 +182,7 @@ function DashboardContent() {
           </div>
         </Popup>
       )}
-      <div className="flex flex-col w-full">
+      <div className="flex flex-col w-full min-h-[60vh] items-center justify-center">
         {/* hero */}
         <div className="w-full bg-[var(--bg-elevated)] border-b border-[var(--border)] py-12 lg:py-16">
           <div className="max-w-6xl mx-auto px-6 lg:px-8 w-full grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">

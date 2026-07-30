@@ -16,6 +16,7 @@ interface AddCoursePopupProps {
 
 export function AddCoursePopup({ onClose }: AddCoursePopupProps) {
   const [courseName, setCourseName] = useState("");
+  const [degreeName, setDegreeName] = useState("");
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const queryClient = useQueryClient();
@@ -33,6 +34,7 @@ export function AddCoursePopup({ onClose }: AddCoursePopupProps) {
       {
         CourseName: courseName,
         UniversityID: UserDetails.getUniDetails()?.UniversityID ?? "",
+        Degree: degreeName,
       },
       {
         onSuccess: () => {
@@ -67,7 +69,16 @@ export function AddCoursePopup({ onClose }: AddCoursePopupProps) {
               id="course-name"
               value={courseName}
               onChange={(e) => setCourseName(e.target.value)}
-              placeholder="e.g. BA Blommerangskikking"
+              placeholder="e.g. Blommerangskikking"
+              disabled={isPending || !!successMessage}
+              className="bg-[var(--background)] border-[var(--border)] text-[var(--text-primary)] mb-4"
+            />
+            <Label htmlFor="degree-name">Degree Name</Label>
+            <Input
+              id="degree-name"
+              value={degreeName}
+              onChange={(e) => setDegreeName(e.target.value)}
+              placeholder="e.g. BA Inkleur"
               disabled={isPending || !!successMessage}
               className="bg-[var(--background)] border-[var(--border)] text-[var(--text-primary)]"
             />
