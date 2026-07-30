@@ -6,7 +6,8 @@ FROM base AS deps
 COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./
 COPY packages/shared-types/package.json ./packages/shared-types/
 COPY apps/backend/package.json ./apps/backend/
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile --filter backend... \
+    --network-concurrency=8 --fetch-retries=5 --fetch-timeout=60000
 
 FROM deps AS build
 COPY packages/shared-types/ ./packages/shared-types/

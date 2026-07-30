@@ -2,36 +2,26 @@ sequenceDiagram
     actor User
     participant Frontend
     participant API as Core API
-    participant DB as Relational Database
     participant Storage as Blob Storage
-    participant Queue as Message Queue
+    participant Queue as Parse Job Queue
     participant Worker as PDF Parser Worker
-    participant CLI as PDF Parser
+    participant DB as Timetable Database
 
-    User->>Frontend: Select and upload timetable PDF
-    Frontend->>API: POST /pdf-parser/jobs/upload
-    API->>API: Validate PDF and compute fingerprint
-    API->>DB: Create queued parseJob
-    API->>Storage: Store PDF
-    API->>Queue: Enqueue pdf.parse job
-    API-->>Frontend: 202 Accepted with jobId
+    User->>Frontend: Submit timetable PDF
+    Frontend->>API: Request timetable import
+    API->>API: Validate source and create parse job
+    API->>Storage: Store source PDF
+    API->>Queue: Assign parse job
+    API-->>Frontend: Return job reference
 
-    Queue-->>Worker: Deliver parse job
-    Worker->>Storage: Download PDF
-    Worker->>CLI: Parse PDF with registered adapter
-    CLI-->>Worker: Normalized parser result
-    Worker->>API: POST /pdf-parser/jobs/:jobId/callback
-    API->>DB: Persist timetable data and completed status
-    API-->>Worker: 202 Accepted
+    Queue-->>Worker: Deliver assigned job
+    Worker->>Storage: Read source PDF
+    Worker->>Worker: Extract data with university adapter
+    Worker->>API: Return normalized timetable and outcome
+    API->>DB: Record timetable data and job status
 
-    loop Until parse job completes
-        Frontend->>API: GET /pdf-parser/jobs/:jobId
-        API->>DB: Read parseJob status
-        DB-->>API: Completed status
-        API-->>Frontend: Job status and result metadata
+    loop While import is running
+        Frontend->>API: Check import status
+        API-->>Frontend: Progress or completion
     end
-    Frontend->>API: GET /pdf-parser/jobs/:jobId/result
-    API->>DB: Read parser result
-    DB-->>API: Normalized parser result
-    API-->>Frontend: 200 OK
     Frontend-->>User: Display imported timetable data

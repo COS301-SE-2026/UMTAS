@@ -1,0 +1,177 @@
+name: umtas-e2e
+
+networks:
+  e2e:
+    internal: true
+
+volumes:
+  postgres-data:
+  redis-data:
+  minio-data:
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: ${DB_NAME:-umtas_e2e}
+      POSTGRES_USER: ${DB_USER:-umtas_e2e}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-e2e-postgres-password}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - e2e
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${DB_USER:-umtas_e2e} -d ${DB_NAME:-umtas_e2e}",
+        ]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  redis:
+    image: redis:7-alpine
+    command:
+      - redis-server
+      - --requirepass
+      - ${REDIS_PASSWORD:-e2e-redis-password}
+    volumes:
+      - redis-data:/data
+    networks:
+      - e2e
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "redis-cli",
+          "-a",
+          "${REDIS_PASSWORD:-e2e-redis-password}",
+          "ping",
+        ]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  minio:
+    image: minio/minio:RELEASE.2023-10-25T06-33-25Z
+    command: server /data
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-e2e-minio}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-e2e-minio-password}
+    volumes:
+      - minio-data:/data
+    networks:
+      - e2e
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/ready"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  mailhog:
+    image: mailhog/mailhog:v1.0.1
+    networks:
+      - e2e
+
+  backend:
+    build:
+      context: ../..
+      dockerfile: docker/backend/backend.Dockerfile
+    init: true
+    environment:
+      PORT: "3000"
+      NODE_ENV: test
+      DB_MODE: DATABASE
+      DATABASE_URL: postgresql://${DB_USER:-umtas_e2e}:${DB_PASSWORD:-e2e-postgres-password}@postgres:5432/${DB_NAME:-umtas_e2e}
+      SEED: "TRUE"
+      SEED_SYSTEM_ADMIN_NAME: ${SEED_SYSTEM_ADMIN_NAME:-System Admin}
+      SEED_SYSTEM_ADMIN_EMAIL: ${SEED_SYSTEM_ADMIN_EMAIL:-system-admin@local.umtas}
+      SEED_SYSTEM_ADMIN_PASSWORD: ${SEED_SYSTEM_ADMIN_PASSWORD:-Admin@UMTAS2024!}
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-e2e-better-auth-secret-at-least-32-characters}
+      BETTER_AUTH_URL: http://frontend:3000/api/auth
+      BETTER_AUTH_TRUSTED_ORIGINS: http://frontend:3000
+      CORS_ORIGIN: http://frontend:3000
+      NEXT_PUBLIC_APP_URL: http://frontend:3000
+      REDIS_URL: redis://:${REDIS_PASSWORD:-e2e-redis-password}@redis:6379
+      WORKER_CALLBACK_TOKEN: ${WORKER_CALLBACK_TOKEN:-e2e-worker-callback-token}
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-e2e-minio}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-e2e-minio-password}
+      MINIO_BUCKET: umtas-uploads
+      SMTP_HOST: mailhog
+      SMTP_PORT: "1025"
+      SMTP_SECURE: "false"
+      SMTP_FROM: UMTAS E2E <noreply@test.umtas.local>
+    networks:
+      - e2e
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      mailhog:
+        condition: service_started
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          'node -e "require(''http'').get(''http://127.0.0.1:3000/api/health'',r=>process.exit(r.statusCode===200?0:1)).on(''error'',()=>process.exit(1))"',
+        ]
+      interval: 3s
+      timeout: 3s
+      start_period: 15s
+      retries: 30
+
+  frontend:
+    build:
+      context: ../..
+      dockerfile: docker/frontend/frontend.Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: /api
+        API_URL: http://backend:3000
+        COOKIE_SECURE: "false"
+    init: true
+    environment:
+      API_URL: http://backend:3000
+      NEXT_PUBLIC_APP_URL: http://frontend:3000
+      COOKIE_SECURE: "false"
+    networks:
+      - e2e
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('http').get('http://127.0.0.1:3000/api/health',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))",
+        ]
+      interval: 3s
+      timeout: 3s
+      start_period: 20s
+      retries: 30
+
+  test-runner:
+    build:
+      context: ../..
+      dockerfile: apps/e2e/Dockerfile
+    init: true
+    environment:
+      CI: "1"
+      PLAYWRIGHT_BASE_URL: http://frontend:3000
+      E2E_BACKEND_URL: http://backend:3000
+      SEED_SYSTEM_ADMIN_EMAIL: ${SEED_SYSTEM_ADMIN_EMAIL:-system-admin@local.umtas}
+      SEED_SYSTEM_ADMIN_PASSWORD: ${SEED_SYSTEM_ADMIN_PASSWORD:-Admin@UMTAS2024!}
+    volumes:
+      - ./test-results:/workspace/apps/e2e/test-results
+      - ./playwright-report:/workspace/apps/e2e/playwright-report
+    networks:
+      - e2e
+    depends_on:
+      frontend:
+        condition: service_healthy
