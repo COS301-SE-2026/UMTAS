@@ -14,6 +14,8 @@ export interface Link {
 export interface Token {
   token: string;
   hex: string;
+  rgb: string;
+  hsl: string;
   label: string;
   usage: string;
 }

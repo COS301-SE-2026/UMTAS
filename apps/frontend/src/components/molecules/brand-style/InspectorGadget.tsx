@@ -23,7 +23,7 @@ export function Inspector({ token }: InspectorProps) {
             {token.label}
           </p>
           <p className="text-xs font-mono text-[var(--text-secondary)] mt-0.5">
-            {token.token} · {token.hex}
+            {token.token} · hex {token.hex} - {token.hsl} - {token.rgb}
           </p>
         </div>
       </div>

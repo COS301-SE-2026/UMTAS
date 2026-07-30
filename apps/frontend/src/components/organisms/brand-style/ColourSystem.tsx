@@ -79,8 +79,12 @@ export function ColourSystem() {
                   </div>
                 </div>
                 <div className="p-3 bg-[var(--bg-base)] text-[11px] font-mono text-[var(--text-secondary)] border-t border-[var(--border)] flex justify-between">
-                  <span>L: {status.lightHex}</span>
-                  <span>D: {status.darkHex}</span>
+                  <span>
+                    L: {status.lightHex} | {status.lightHsl} | {status.lightRgb}
+                  </span>
+                  <span>
+                    D: {status.darkHex} | {status.darkHsl} | {status.darkRgb}
+                  </span>
                 </div>
               </div>
             ))}
