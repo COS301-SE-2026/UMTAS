@@ -26,6 +26,7 @@ import { useRouter } from "next/navigation";
 
 import Tutorial from "@/components/organisms/nav/Tutorial";
 import NotFound from "@/app/not-found";
+import { fetchAllModules } from "@/app/course-management/queries/modules/moduleBuilder";
 const steps = [
   {
     target: "#btn-create-module-new",
@@ -47,11 +48,14 @@ const steps = [
 
 export default function ModManagementTemplate() {
   const [showCreateModule, updateShowModule] = useState(false);
-  const { data: modData } = useQuery(
-    getAllModCoursesQ({
-      universityId: UserDetails.getUniDetails()?.UniversityID,
-    }),
-  );
+  const { data: modData } = useQuery({
+    queryKey: ["Modules"],
+    queryFn: async () => {
+      const result = await fetchAllModules({});
+      return result;
+    },
+  });
+
   const eventQueries = useQueries({
     queries: (modData ?? []).map((module) => ({
       ...getAllEventsAdminQ(module.moduleID),
@@ -109,7 +113,10 @@ export default function ModManagementTemplate() {
   }, [data, foundPrefixForModule, searchQuery]);
 
   const UniDetails = UserDetails.getUniDetails();
-  const ViableRole = UniDetails?.role === "UNIVERSITY_ADMIN";
+  const ViableRole =
+    UniDetails?.role === "UNIVERSITY_ADMIN" ||
+    UniDetails?.role === "LECTURER" ||
+    UniDetails?.role === "STUDENT";
   const router = useRouter();
 
   if (UniDetails === null) {

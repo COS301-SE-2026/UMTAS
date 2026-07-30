@@ -8,6 +8,60 @@ import { HelpPageGroup } from "@/types/HelpCommandPallete";
 import { MessageCircleQuestionIcon } from "lucide-react";
 import { Button } from "@/components/atoms/baseShadcn/button";
 
+import Tutorial from "@/components/organisms/nav/Tutorial";
+
+const cmdkTutorialSteps = [
+  {
+    target: '[data-tour="dashboard"]',
+    content: "Jump straight to your Dashboard from here.",
+  },
+  {
+    target: '[data-tour="builder"]',
+    content: "Open the Timetable Builder to start building schedules.",
+  },
+  {
+    target: '[data-tour="schedules"]',
+    content: "View all your saved Schedules here.",
+  },
+  {
+    target: '[data-tour="course-management"]',
+    content: "Manage your courses in Course Management.",
+  },
+  {
+    target: '[data-tour="role-management"]',
+    content: "Control user roles and permissions here.",
+  },
+  {
+    target: '[data-tour="login"]',
+    content: "Go to the Login page.",
+  },
+  {
+    target: '[data-tour="register"]',
+    content: "Register a new account from here.",
+  },
+  {
+    target: '[data-tour="forgot-password"]',
+    content: "Recover access if you've forgotten your password.",
+  },
+  {
+    target: '[data-tour="reset-password"]',
+    content: "Reset your password from this page.",
+  },
+  {
+    target: '[data-tour="faq"]',
+    content: "Check the FAQ for answers to common questions.",
+  },
+  {
+    target: '[data-tour="run-tutorial"]',
+    content:
+      "Click this to run a step-by-step tutorial for whichever page you're currently on.",
+  },
+  {
+    target: '[data-tour="cmdk-tutorial"]',
+    content: "And this is the option you just used to start this tour!",
+  },
+];
+
 export function HelpCommandPalette() {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -34,30 +88,35 @@ export function HelpCommandPalette() {
           children: "Dashboard",
           icon: "HomeIcon",
           href: "/dashboard",
+          "data-tour": "cmdk-dashboard-item",
         },
         {
           id: "builder",
           children: "Timetable Builder",
           icon: "CalendarIcon",
           href: "/builder",
+          "data-tour": "builder",
         },
         {
           id: "schedules",
           children: "Schedules",
           icon: "ClockIcon",
           href: "/schedules",
+          "data-tour": "schedules",
         },
         {
           id: "course-management",
           children: "Course Management",
           icon: "AcademicCapIcon",
           href: "/course-management",
+          "data-tour": "course-management",
         },
         {
           id: "role-management",
           children: "Role Management",
           icon: "UserGroupIcon",
           href: "/role-management",
+          "data-tour": "role-management",
         },
         // {
         //   id: "choose-institute",
@@ -82,24 +141,28 @@ export function HelpCommandPalette() {
           children: "Login",
           icon: "ArrowRightOnRectangleIcon",
           href: "/login",
+          "data-tour": "login",
         },
         {
           id: "register",
           children: "Register",
           icon: "UserPlusIcon",
           href: "/register",
+          "data-tour": "register",
         },
         {
           id: "forgot-password",
           children: "Forgot Password",
           icon: "KeyIcon",
           href: "/forgot-password",
+          "data-tour": "forgot-password",
         },
         {
           id: "reset-password",
           children: "Reset Password",
           icon: "ArrowPathIcon",
           href: "/reset-password",
+          "data-tour": "reset-password",
         },
       ],
     },
@@ -112,6 +175,7 @@ export function HelpCommandPalette() {
           children: "Frequently Asked Questions",
           icon: "QuestionMarkCircleIcon",
           href: "/faq",
+          "data-tour": "faq",
         },
         // {
         //   id: "help-centre",
@@ -123,8 +187,23 @@ export function HelpCommandPalette() {
           id: "run-tutorial",
           children: "Run Tutorial for this Page",
           icon: "PlayIcon",
+          "data-tour": "run-tutorial",
 
-          action: () => window.dispatchEvent(new Event("begin-tut")),
+          action: () => {
+            window.dispatchEvent(new Event("begin-tut"));
+          },
+        },
+
+        {
+          id: "cmdk-tutorial",
+          children: "How to use the Help Menu",
+          icon: "InformationCircleIcon",
+          closeOnSelect: false,
+          "data-tour": "cmdk-tutorial",
+
+          action: () => {
+            window.dispatchEvent(new Event("begin-cmdk-tut"));
+          },
         },
       ],
     },
@@ -132,6 +211,12 @@ export function HelpCommandPalette() {
 
   return (
     <>
+      <Tutorial
+        steps={cmdkTutorialSteps}
+        wait={true}
+        eventName="begin-cmdk-tut"
+      />
+
       <Button
         id="help-command-palette-btn"
         variant="default"
@@ -166,7 +251,9 @@ export function HelpCommandPalette() {
                       } else if (href) {
                         router.push(href);
                       }
-                      setIsOpen(false);
+                      if (id !== "cmdk-tutorial") {
+                        setIsOpen(false);
+                      }
                     }}
                   />
                 ))}

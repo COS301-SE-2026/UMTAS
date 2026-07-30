@@ -39,6 +39,7 @@ export function WeekNavBar({
           {formatWeekRange(weekStart)}
         </span>
         <input
+          data-testid="schedules-Date-Input"
           type="date"
           value={dateString}
           onChange={(e) => {

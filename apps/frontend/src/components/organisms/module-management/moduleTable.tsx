@@ -34,6 +34,9 @@ interface DataTableProps<TData> {
 
 export function ModuleTable<TData>({ columns, data }: DataTableProps<TData>) {
   "use no memo";
+
+  const userRole = UserDetails.getUniDetails()?.role;
+
   const table = useReactTable({
     data,
     columns,
@@ -87,38 +90,42 @@ export function ModuleTable<TData>({ columns, data }: DataTableProps<TData>) {
               onClose={() => updateModPopup(false)}
             />
 
-            <Card className="w-full max-w-2xl mt-4 p-4 border-[var(--border)] bg-[var(--bg-surface)] shadow-md">
-              <CourseSelect
-                CourseState={selectedCourse}
-                updateCourseState={setSelectedCourse}
-              >
-                <Button
-                  disabled={!selectedCourse.CourseID || isPending || isSuccess}
-                  onClick={() => {
-                    reset();
-                    addModuleToCourseMut({
-                      body: { modules: [dataState.modules.moduleID] },
-                      path: { CourseID: selectedCourse.CourseID },
-                    });
-                  }}
-                  className={`w-full mt-4 ${
-                    isSuccess
-                      ? "bg-[var(--success-bg)] text-[var(--success-text)]"
-                      : isError
-                        ? "bg-[var(--error-bg)] text-[var(--error-text)]"
-                        : ""
-                  }`}
+            {userRole !== "STUDENT" && (
+              <Card className="w-full max-w-2xl mt-4 p-4 border-[var(--border)] bg-[var(--bg-surface)] shadow-md">
+                <CourseSelect
+                  CourseState={selectedCourse}
+                  updateCourseState={setSelectedCourse}
                 >
-                  {isPending
-                    ? "Adding.."
-                    : isSuccess
-                      ? "Successfully Added Module to Course"
-                      : isError
-                        ? "Failed to Add Module To Course"
-                        : "Add Module to Course"}
-                </Button>
-              </CourseSelect>
-            </Card>
+                  <Button
+                    disabled={
+                      !selectedCourse.CourseID || isPending || isSuccess
+                    }
+                    onClick={() => {
+                      reset();
+                      addModuleToCourseMut({
+                        body: { modules: [dataState.modules.moduleID] },
+                        path: { CourseID: selectedCourse.CourseID },
+                      });
+                    }}
+                    className={`w-full mt-4 ${
+                      isSuccess
+                        ? "bg-[var(--success-bg)] text-[var(--success-text)]"
+                        : isError
+                          ? "bg-[var(--error-bg)] text-[var(--error-text)]"
+                          : ""
+                    }`}
+                  >
+                    {isPending
+                      ? "Adding.."
+                      : isSuccess
+                        ? "Successfully Added Module to Course"
+                        : isError
+                          ? "Failed to Add Module To Course"
+                          : "Add Module to Course"}
+                  </Button>
+                </CourseSelect>
+              </Card>
+            )}
           </div>
         </Popup>
       )}

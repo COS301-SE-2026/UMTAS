@@ -27,7 +27,7 @@ Distributing the system across subdomains routed by a single reverse proxy enabl
 ### Traefik Dashboard Routes 
 
 <figure markdown="span">
-  <img src="Traefik.png" alt="Traefik Dashboard Routes" width="800">
+  <img src="../Traefik.png" alt="Traefik Dashboard Routes" width="800">
   <figcaption>Fig 1. Live routing configuration via the Traefik Ingress Controller</figcaption>
 </figure>
 

@@ -45,6 +45,31 @@ import { getAllEventsQ } from "@/components/templates/builder/Queries/eventQueri
 import { getAllModulesQ } from "@/components/templates/builder/Queries/moduleQueries";
 import { removeTimetableMut } from "@/components/templates/builder/Queries/timetableQueries";
 import { useMutation } from "@tanstack/react-query";
+import { fetchAllModules } from "@/app/course-management/queries/modules/moduleBuilder";
+import { UserDetails } from "@/lib/userclass/userClass";
+
+import Tutorial from "@/components/organisms/nav/Tutorial";
+const emptySteps = [
+  {
+    target: "#ref-go-to-builder",
+    content: "Go to the builder page to create a schedule",
+  },
+];
+
+const steps = [
+  {
+    target: "#select-timetable",
+    content: "Select your schedule here.",
+  },
+  {
+    target: "#btn-edit",
+    content: "Edit your schedule here.",
+  },
+  {
+    target: "#btn-delete",
+    content: "Delete your schedule.",
+  },
+];
 
 interface ScheduleViewProps {
   onEventCountChange: (count: number) => void;
@@ -77,8 +102,15 @@ export function ScheduleView({
   const { mutateAsync: addTimetable } = useMutation(addTimetableMut());
   const { mutateAsync: updateTimetable } = useMutation(updateTimetableMut());
 
-  const { data: allModules = [], isLoading: isLoadingModules } =
-    useQuery(getAllModulesQ());
+  const { data: allModules = [], isLoading: isLoadingModules } = useQuery({
+    queryKey: ["Modules", "Courses"],
+    queryFn: async () => {
+      const result = await fetchAllModules({
+        userEnrollment: true,
+      });
+      return result;
+    },
+  });
   const { data: allEvents = [], isLoading: isLoadingEvents } =
     useQuery(getAllEventsQ());
   const { data: timetables = [], isLoading: isLoadingTimetables } =
@@ -161,8 +193,8 @@ export function ScheduleView({
   const currentWeekStart = useMemo(() => {
     const date = new Date(selectedDate);
     const day = date.getDay();
-    const dateDifference = date.getDate() - day + (day === 0 ? -6 : 1); //adj if day is sun
-    date.setDate(dateDifference);
+    const diffToMonday = day === 0 ? -6 : 1 - day;
+    date.setDate(date.getDate() + diffToMonday);
     date.setHours(0, 0, 0, 0);
     return date;
   }, [selectedDate]);
@@ -207,10 +239,13 @@ export function ScheduleView({
   if (timetables.length === 0 && viewMode !== "Generate") {
     return (
       <div className="flex flex-col items-center gap-4 py-20 text-center">
+        <Tutorial steps={emptySteps} wait={true} />
+
         <p className="text-base text-[var(--text-secondary)]">
           No timetables found.
         </p>
         <a
+          id="ref-go-to-builder"
           href="/builder"
           className="text-sm font-medium text-[var(--btn-primary-bg)] hover:underline"
         >
@@ -336,95 +371,110 @@ export function ScheduleView({
     }
 
     return (
-      <div data-testid="schedules-Calendar-Div" className="flex flex-col gap-3">
-        <div className="flex items-center justify-between">
-          <div className="w-64">
-            <Select
-              value={String(selectedTimetableId)}
-              onValueChange={(newValue) => {
-                setSelectedTimetableId(newValue);
-                setSelectedDate(new Date());
-              }}
-            >
-              <SelectTrigger className="bg-[var(--bg-surface)] border-[var(--border)]">
-                <SelectValue placeholder="Select a Timetable" />
-              </SelectTrigger>
-              <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)]">
-                {timetables.map((tt) => (
-                  <SelectItem
-                    key={tt.timetable.timetableID}
-                    value={String(tt.timetable.timetableID)}
-                    className="text-[var(--text-primary)]"
-                  >
-                    {tt.timetable.timetableName ||
-                      `Timetable ${tt.timetable.timetableID}`}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
+      <>
+        <Tutorial steps={steps} wait={true} />
 
-        {!currentWeekStart || events.length === 0 ? (
-          <EmptySchedule />
-        ) : (
-          <div className="flex flex-col">
-            <div className="flex flex-col md:flex-row justify-between items-center w-full gap-2 md:gap-0">
-              <WeekNavBar
-                selectedDate={selectedDate}
-                onDateChange={setSelectedDate}
-                weekStart={currentWeekStart}
-                onPrev={handlePrevWeek}
-                onNext={handleNextWeek}
-              />
-              <div className="flex flex-row justify-center md:justify-end w-full md:w-auto gap-2 mb-4 md:mb-0">
-                <Button
-                  type="button"
-                  className="h-7 px-3 text-xs bg-[var(--bg-surface)] text-[var(--text-primary)] border-[var(--border)] hover:opacity-90"
-                  onClick={editTimetable}
+        <div
+          data-testid="schedules-Calendar-Div"
+          className="flex flex-col gap-3"
+        >
+          <div className="flex items-center justify-between">
+            <div className="w-64">
+              <Select
+                value={String(selectedTimetableId)}
+                onValueChange={(newValue) => {
+                  setSelectedTimetableId(newValue);
+                  setSelectedDate(new Date());
+                }}
+              >
+                <SelectTrigger
+                  id="select-timetable"
+                  className="bg-[var(--bg-surface)] border-[var(--border)]"
                 >
-                  Edit
-                </Button>
-
-                <Button
-                  data-testid="schedules-Delete-Btn"
-                  type="button"
-                  className="h-7 px-3 text-xs bg-[var(--destructive)] text-[var(--text-primary)] border-[var(--border)] hover:opacity-90"
-                  onClick={deleteDialog}
-                >
-                  Delete
-                </Button>
-              </div>
+                  <SelectValue placeholder="Select a Timetable" />
+                </SelectTrigger>
+                <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)]">
+                  {timetables.map((tt) => (
+                    <SelectItem
+                      key={tt.timetable.timetableID}
+                      value={String(tt.timetable.timetableID)}
+                      className="text-[var(--text-primary)]"
+                    >
+                      {tt.timetable.timetableName ||
+                        `Timetable ${tt.timetable.timetableID}`}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-            <AlertDialog
-              open={isDeleteDialogOpen}
-              onOpenChange={setIsDeleteDialogOpen}
-            >
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>
-                    Are you sure you want to delete this timetable?
-                  </AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This cannot be undone
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction
-                    data-testid="Schedules-ConfirmDelete-Btn"
-                    onClick={deleteTimetableByID}
-                    variant="destructive"
+          </div>
+
+          {!currentWeekStart || events.length === 0 ? (
+            <EmptySchedule />
+          ) : (
+            <div className="flex flex-col">
+              <div className="flex flex-col md:flex-row justify-between items-center w-full gap-2 md:gap-0">
+                <WeekNavBar
+                  selectedDate={selectedDate}
+                  onDateChange={setSelectedDate}
+                  weekStart={currentWeekStart}
+                  onPrev={handlePrevWeek}
+                  onNext={handleNextWeek}
+                />
+                <div className="flex flex-row justify-center md:justify-end w-full md:w-auto gap-2 mb-4 md:mb-0">
+                  <Button
+                    id="btn-edit"
+                    type="button"
+                    className="h-7 px-3 text-xs bg-[var(--bg-surface)] text-[var(--text-primary)] border-[var(--border)] hover:opacity-90"
+                    onClick={editTimetable}
+                  >
+                    Edit
+                  </Button>
+
+                  <Button
+                    id="btn-delete"
+                    data-testid="schedules-Delete-Btn"
+                    type="button"
+                    className="h-7 px-3 text-xs bg-[var(--destructive)] text-[var(--text-primary)] border-[var(--border)] hover:opacity-90"
+                    onClick={deleteDialog}
                   >
                     Delete
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-            <WeeklyGrid events={resolvedEvents} weekStart={currentWeekStart} />
-          </div>
-        )}
-      </div>
+                  </Button>
+                </div>
+              </div>
+              <AlertDialog
+                open={isDeleteDialogOpen}
+                onOpenChange={setIsDeleteDialogOpen}
+              >
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Are you sure you want to delete this timetable?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This cannot be undone
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      data-testid="Schedules-ConfirmDelete-Btn"
+                      onClick={deleteTimetableByID}
+                      variant="destructive"
+                    >
+                      Delete
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+              <WeeklyGrid
+                events={resolvedEvents}
+                weekStart={currentWeekStart}
+              />
+            </div>
+          )}
+        </div>
+      </>
     );
   }
 

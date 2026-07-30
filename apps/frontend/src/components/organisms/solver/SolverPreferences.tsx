@@ -8,7 +8,7 @@ import {
   CardHeader,
 } from "@/components/atoms/baseShadcn/card";
 import { LucidePlusCircle } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import PreferenceSection from "@/components/molecules/solver/PreferencesCard";
 import { useRouter } from "next/navigation";
 import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
@@ -22,8 +22,13 @@ import { createTimeTableBuilder } from "@/app/builder/utils/timetables/TimeTable
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Spinner } from "@/components/atoms/baseShadcn/spinner";
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
-import { Tienne } from "next/font/google";
 import { Input } from "@/components/atoms/baseShadcn/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "@/components/atoms/baseShadcn/dialog";
 
 type solverProps = {
   modules: ModuleResponseDto[];
@@ -135,10 +140,9 @@ export default function SolverPreferences({ modules, events }: solverProps) {
         const result = await createTimeTableMutation.mutateAsync();
         setJobID(null);
         getQueryClient().setQueryData(["solver", "poll"], null);
-        if (timetableCreated === false)
-          alert(
-            `Timetable successfully created ${await result?.timetable.timetableName}`,
-          );
+        if (timetableCreated === false) {
+          router.push("\schedules");
+        }
       }
       if (resultOfPoll.status === "failed" && jobFailed === false) {
         console.log("set job to failed");

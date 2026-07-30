@@ -33,6 +33,10 @@ const baseSteps = [
     target: "#btn-add-new-module",
     content: "Add a new module to the list.",
   },
+  {
+    target: "#next-button",
+    content: "Click here to go to the next step.",
+  },
 ];
 
 const extraSteps = [

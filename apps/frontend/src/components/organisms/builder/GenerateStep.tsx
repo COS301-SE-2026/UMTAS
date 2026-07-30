@@ -10,8 +10,29 @@ import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
 import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
 import { Checkbox } from "@/components/atoms/baseShadcn/checkbox";
 import CustomiseShellPopup from "@/components/organisms/customise/CustomiseShellPopup";
-import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
+
+import Tutorial from "@/components/organisms/nav/Tutorial";
+
+let eventAdded = false;
+
+const baseSteps = [
+  {
+    target: "#timetable-name",
+    content: "Name your schedule.",
+  },
+  {
+    target: "#btn-customise-schedule",
+    content: "Customise your events and modules.",
+  },
+  {
+    target: "#btn-create-schedule",
+    content: "Create your schedule.",
+  },
+];
+
+const extendedSteps: typeof baseSteps = [];
 
 interface GenerateStepProps {
   modules: ModuleResponseDto[];
@@ -56,8 +77,6 @@ export function GenerateStep({
   selectedEventIds,
   setSelectedEventIds,
 }: GenerateStepProps) {
-  const router = useRouter();
-
   //checkbox logic
 
   function checkboxLogic(eventId: string, isChecked: boolean) {
@@ -144,6 +163,16 @@ export function GenerateStep({
               criteria?.endTime || "",
             );
 
+            if (!eventAdded && event) {
+              //Add step for event
+              extendedSteps.push({
+                target: `#event-${event.eventId}`,
+                content: "Select event to be added to schedule.",
+              });
+
+              eventAdded = true;
+            }
+
             return (
               <div
                 key={event.eventId}
@@ -228,11 +257,13 @@ export function GenerateStep({
     );
   }
 
+  const router = useRouter();
+  const steps = [...baseSteps, ...extendedSteps];
   return (
     <div>
-      <div className="mx-auto w-full max-w-2xl flex justify-left pb-4">
+      <Tutorial steps={steps} wait={true} />
+      <div className="mx-auto w-full max-w-2xl px-4 py-4">
         <Button
-          data-testid="schedules-Create-Btn"
           type="button"
           variant="ghost"
           size="default"
@@ -247,7 +278,7 @@ export function GenerateStep({
       </div>
       <div
         data-testid="create-Schedule-Div"
-        className="mx-auto w-full max-w-2xl px-4 py-4 border rounded-xl border-[var(--border)] bg-[var(--bg-surface)] min-h-150"
+        className="mx-auto w-full max-w-2xl px-4 py-4 border rounded-xl border-[var(--border)] bg-[var(--bg-surface)]"
       >
         <div className="mb-8">
           <h2 className="text-lg font-semibold text-[var(--text-primary)]">
@@ -276,6 +307,26 @@ export function GenerateStep({
         </div>
 
         {renderContent()}
+        <div className="flex justify-center mt-8">
+          <Button
+            id="btn-create-schedule"
+            data-testid="schedules-Create-Btn"
+            type="button"
+            size="default"
+            //only generate when there is at least 1 event
+            disabled={isGenerating || selectedEventIds.length === 0}
+            onClick={() => onGenerate(timetableName, selectedEventIds)}
+            className="w-fit px-4 text-sm bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] hover:bg-[var(--btn-primary-hover)] disabled:opacity-40 transition-colors duration-[var(--duration-fast)]"
+          >
+            {isGenerating
+              ? "Generating..."
+              : selectedEventIds.length === 0
+                ? "Select at least one event"
+                : isEditMode
+                  ? "Edit Schedule"
+                  : "Generate Schedule"}
+          </Button>
+        </div>
       </div>
     </div>
   );

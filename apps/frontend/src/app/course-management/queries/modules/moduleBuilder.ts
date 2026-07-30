@@ -4,7 +4,6 @@ import {
   RequestBuilder,
   RequestMethod,
 } from "../../../../../utilities/request";
-import { createModuleRes } from "@/app/builder/utils/modules/requestBuilders";
 
 export type moduleDTO = components["schemas"]["ModuleSingleResponseDto"];
 export type getAllModules = paths["/api/modules"]["get"];
