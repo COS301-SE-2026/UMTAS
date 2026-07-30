@@ -137,7 +137,7 @@ export function WizardShell() {
   }
 
   return (
-    <div className="flex flex-col h-full bg-[var(--bg-base)]">
+    <div className="flex flex-col h-full bg-[var(--bg-base)] mx-4">
       <WizardStepper
         currentStep={currentStep}
         steps={Steps}

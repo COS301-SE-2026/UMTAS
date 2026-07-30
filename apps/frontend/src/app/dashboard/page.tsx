@@ -16,6 +16,11 @@ import { PageSkeleton } from "@/components/atoms/nav/PageSkeleton";
 import Link from "next/link";
 
 import Tutorial from "@/components/organisms/nav/Tutorial";
+import { useSession } from "@/lib/auth-client";
+import { UserGreeting } from "@/components/atoms/dashboard/UserGreeting";
+import Popup from "@/components/atoms/utility/floatContainer";
+import { ChooseInstituteTemplate } from "@/components/templates/choose-institute/chooseInstituteTemplate";
+import { UserDetails } from "@/lib/userclass/userClass";
 const steps = [
   {
     target: "#theme-toggle-btn",
@@ -143,123 +148,154 @@ function DashboardContent() {
   function handleBuild() {
     router.push("/builder");
   }
-
+  const [showSelectUni, SetSelectUni] = useState(true);
   //Wilmar has DICTACTED this shall no longer exist.
+  //johan has overwritten wilmar's dictatorship
+  //To any curious reader since johan over wrote my dictatorship it stopped working again
+
+  const { isPending } = useSession();
+  if (showSelectUni === true && UserDetails.getUniDetails()?.role) {
+    SetSelectUni(false);
+  }
+
+  if (isPending) {
+    return (
+      <div className="flex flex-col w-full min-h-[60vh] items-center justify-center">
+        <PageSkeleton rows={3} />
+      </div>
+    );
+  }
 
   return (
-    <div className="flex flex-col w-full">
-      {/* hero */}
-      <div className="w-full bg-[var(--bg-elevated)] border-b border-[var(--border)] py-12 lg:py-16">
-        <div className="max-w-6xl mx-auto px-6 lg:px-8 w-full grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-          {/* left */}
-          <div className="flex flex-col gap-5">
-            <Badge
-              variant="outline"
-              className="w-fit text-[10px] uppercase tracking-[0.06em] border-[var(--border)] text-[var(--text-secondary)]"
-            >
-              University Modular Timetable &amp; Analytics System
-            </Badge>
-
-            <h1 className="text-4xl lg:text-5xl font-semibold text-[var(--text-primary)] leading-[1.1]">
-              Welcome back.
-            </h1>
-
-            <p className="text-base lg:text-lg text-[var(--text-secondary)] leading-relaxed max-w-sm">
-              Build your personal university timetable in minutes.
-            </p>
-
-            <TypewriterLine />
-
-            <div className="pt-1">
-              <Button
-                id="build-schedule-btn"
-                type="button"
-                onClick={handleBuild}
-                size="default"
-                className="bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] hover:bg-[var(--btn-primary-hover)] transition-colors duration-[var(--duration-fast)]"
+    <>
+      {showSelectUni && (
+        <Popup>
+          <div className="w-fit text-center">
+            <ChooseInstituteTemplate
+              onClose={() => {
+                if (UserDetails.getUniDetails()?.role) {
+                  SetSelectUni(false);
+                }
+              }}
+            />
+            <div className="w-full mt-5 items-center justify-center flex"></div>
+          </div>
+        </Popup>
+      )}
+      <div className="flex flex-col w-full min-h-[60vh] items-center justify-center">
+        {/* hero */}
+        <div className="w-full bg-[var(--bg-elevated)] border-b border-[var(--border)] py-12 lg:py-16">
+          <div className="max-w-6xl mx-auto px-6 lg:px-8 w-full grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            {/* left */}
+            <div className="flex flex-col gap-5">
+              <Badge
+                variant="outline"
+                className="w-fit text-[10px] uppercase tracking-[0.06em] border-[var(--border)] text-[var(--text-secondary)]"
               >
-                Build a schedule
-              </Button>
+                University Modular Timetable &amp; Analytics System
+              </Badge>
+
+              <h1 className="text-4xl lg:text-5xl font-semibold text-[var(--text-primary)] leading-[1.1]">
+                Welcome.
+              </h1>
+
+              <p className="text-base lg:text-lg text-[var(--text-secondary)] leading-relaxed max-w-sm">
+                Build your personal university timetable in minutes.
+              </p>
+
+              <TypewriterLine />
+
+              <div className="pt-1">
+                <Button
+                  id="build-schedule-btn"
+                  type="button"
+                  onClick={handleBuild}
+                  size="default"
+                  className="bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] hover:bg-[var(--btn-primary-hover)] transition-colors duration-[var(--duration-fast)]"
+                >
+                  Build a schedule
+                </Button>
+              </div>
+            </div>
+
+            {/* right */}
+            <div className="flex flex-col gap-3">
+              {Features.map((feature) => {
+                const Icon = feature.icon;
+                return (
+                  <Card
+                    key={feature.title}
+                    className="border-[var(--border)] bg-[var(--bg-base)] shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.08)]"
+                  >
+                    <CardContent className="p-4 lg:p-5 flex items-center gap-4">
+                      <div className="flex h-10 w-10 lg:h-12 lg:w-12 flex-shrink-0 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--bg-surface)]">
+                        <Icon
+                          size={20}
+                          strokeWidth={1.5}
+                          className="text-[var(--text-primary)]"
+                        />
+                      </div>
+                      <div className="flex flex-col gap-0.5">
+                        <p className="text-lg font-semibold text-[var(--text-primary)]">
+                          {feature.title}
+                        </p>
+                        <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
+                          {feature.description}
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
           </div>
+        </div>
 
-          {/* right */}
-          <div className="flex flex-col gap-3">
-            {Features.map((feature) => {
-              const Icon = feature.icon;
-              return (
-                <Card
-                  key={feature.title}
-                  className="border-[var(--border)] bg-[var(--bg-base)] shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.08)]"
+        {/* links */}
+        <div className="w-full py-10 bg-[var(--bg-base)]">
+          <div className="max-w-6xl mx-auto px-6 lg:px-8">
+            <p className="text-xs font-medium uppercase tracking-[0.04em] text-[var(--text-secondary)] mb-5">
+              Resources
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {Links.map((link) => (
+                <Link
+                  id={link.id}
+                  key={link.label}
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between gap-3 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] px-5 py-4 text-sm font-medium text-[var(--text-primary)] transition-colors duration-[var(--duration-fast)] hover:bg-[var(--bg-elevated)]"
                 >
-                  <CardContent className="p-4 lg:p-5 flex items-center gap-4">
-                    <div className="flex h-10 w-10 lg:h-12 lg:w-12 flex-shrink-0 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--bg-surface)]">
-                      <Icon
-                        size={20}
-                        strokeWidth={1.5}
-                        className="text-[var(--text-primary)]"
-                      />
-                    </div>
-                    <div className="flex flex-col gap-0.5">
-                      <p className="text-lg font-semibold text-[var(--text-primary)]">
-                        {feature.title}
-                      </p>
-                      <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
-                        {feature.description}
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
+                  {link.label}
+                  <ExternalLink
+                    size={14}
+                    strokeWidth={1.5}
+                    className="text-[var(--text-secondary)] flex-shrink-0"
+                  />
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* bottom stuffies */}
+        <div className="py-4 bg-[var(--bg-base)] border-t border-[var(--border)] w-full">
+          <div className="max-w-6xl mx-auto px-6 lg:px-8 flex items-center justify-between">
+            <p className="text-[10px] lg:text-xs uppercase tracking-[0.06em] text-[var(--text-disabled)] font-medium">
+              Team Vigil
+            </p>
+            <Separator
+              orientation="vertical"
+              className="h-4 bg-[var(--border)]"
+            />
+            <p className="text-[10px] lg:text-xs uppercase tracking-[0.06em] text-[var(--text-disabled)] font-medium">
+              Built for Tyto Insights
+            </p>
           </div>
         </div>
       </div>
-
-      {/* links */}
-      <div className="w-full py-10 bg-[var(--bg-base)]">
-        <div className="max-w-6xl mx-auto px-6 lg:px-8">
-          <p className="text-xs font-medium uppercase tracking-[0.04em] text-[var(--text-secondary)] mb-5">
-            Resources
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {Links.map((link) => (
-              <Link
-                id={link.id}
-                key={link.label}
-                href={link.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-between gap-3 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] px-5 py-4 text-sm font-medium text-[var(--text-primary)] transition-colors duration-[var(--duration-fast)] hover:bg-[var(--bg-elevated)]"
-              >
-                {link.label}
-                <ExternalLink
-                  size={14}
-                  strokeWidth={1.5}
-                  className="text-[var(--text-secondary)] flex-shrink-0"
-                />
-              </Link>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* bottom stuffies */}
-      <div className="py-4 bg-[var(--bg-base)] border-t border-[var(--border)] w-full">
-        <div className="max-w-6xl mx-auto px-6 lg:px-8 flex items-center justify-between">
-          <p className="text-[10px] lg:text-xs uppercase tracking-[0.06em] text-[var(--text-disabled)] font-medium">
-            Team Vigil
-          </p>
-          <Separator
-            orientation="vertical"
-            className="h-4 bg-[var(--border)]"
-          />
-          <p className="text-[10px] lg:text-xs uppercase tracking-[0.06em] text-[var(--text-disabled)] font-medium">
-            Built for Tyto Insights
-          </p>
-        </div>
-      </div>
-    </div>
+    </>
   );
 }
 

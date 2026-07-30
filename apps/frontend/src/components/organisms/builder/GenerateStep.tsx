@@ -10,6 +10,29 @@ import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
 import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
 import { Checkbox } from "@/components/atoms/baseShadcn/checkbox";
 import CustomiseShellPopup from "@/components/organisms/customise/CustomiseShellPopup";
+import { useRouter } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
+
+import Tutorial from "@/components/organisms/nav/Tutorial";
+
+let eventAdded = false;
+
+const baseSteps = [
+  {
+    target: "#timetable-name",
+    content: "Name your schedule.",
+  },
+  {
+    target: "#btn-customise-schedule",
+    content: "Customise your events and modules.",
+  },
+  {
+    target: "#btn-create-schedule",
+    content: "Create your schedule.",
+  },
+];
+
+const extendedSteps: typeof baseSteps = [];
 
 interface GenerateStepProps {
   modules: ModuleResponseDto[];
@@ -140,6 +163,16 @@ export function GenerateStep({
               criteria?.endTime || "",
             );
 
+            if (!eventAdded && event) {
+              //Add step for event
+              extendedSteps.push({
+                target: `#event-${event.eventId}`,
+                content: "Select event to be added to schedule.",
+              });
+
+              eventAdded = true;
+            }
+
             return (
               <div
                 key={event.eventId}
@@ -182,6 +215,7 @@ export function GenerateStep({
 
                 <span className="flex-shrink-0 flex items-center justify-center">
                   <Checkbox
+                    data-testid="schedule-Timetable-Checkbox"
                     id={`event-${event.eventId}`}
                     checked={isEventChecked}
                     onCheckedChange={(checkedState) =>
@@ -223,51 +257,76 @@ export function GenerateStep({
     );
   }
 
+  const router = useRouter();
+  const steps = [...baseSteps, ...extendedSteps];
   return (
-    <div className="mx-auto w-full max-w-2xl px-4 py-4 border rounded-xl border-[var(--border)] bg-[var(--bg-surface)]">
-      <div className="mb-8">
-        <h2 className="text-lg font-semibold text-[var(--text-primary)]">
-          Review and generate
-        </h2>
-        <p className="text-base text-[var(--text-secondary)] mt-1">
-          Check your events before generating your schedule.
-        </p>
-      </div>
-
-      <div className="mb-6 flex flex-col gap-2">
-        <Label
-          htmlFor="timetable-name"
-          className="text-sm font-medium text-[var(--text-secondary)]"
-        >
-          Schedule Name
-        </Label>
-        <Input
-          id="timetable-name"
-          value={timetableName}
-          onChange={(e) => setTimetableName(e.target.value)}
-          placeholder="e.g. Semester 1, 2024"
-          className="bg-[var(--bg-surface)] border-[var(--border)] text-[var(--text-primary)] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--ring)]"
-        />
-      </div>
-
-      {renderContent()}
-      <div className="flex justify-center mt-8">
+    <div>
+      <Tutorial steps={steps} wait={true} />
+      <div className="mx-auto w-full max-w-2xl px-4 py-4">
         <Button
           type="button"
+          variant="ghost"
           size="default"
-          //only generate when there is at least 1 event
-          disabled={isGenerating || selectedEventIds.length === 0}
-          onClick={() => onGenerate(timetableName, selectedEventIds)}
-          className="w-fit px-4 text-sm bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] hover:bg-[var(--btn-primary-hover)] disabled:opacity-40 transition-colors duration-[var(--duration-fast)]"
+          onClick={() => {
+            router.push("/builder");
+          }}
+          className="flex items-center gap-2 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-[var(--duration-fast)]"
         >
-          {isGenerating
-            ? "Generating..."
-            : selectedEventIds.length === 0
-              ? "Select at least one event"
-              : isEditMode
-                ? "Edit Schedule"
-                : "Generate Schedule"}
+          <ArrowLeft size={16} strokeWidth={1.5} />
+          Back
         </Button>
+      </div>
+      <div
+        data-testid="create-Schedule-Div"
+        className="mx-auto w-full max-w-2xl px-4 py-4 border rounded-xl border-[var(--border)] bg-[var(--bg-surface)]"
+      >
+        <div className="mb-8">
+          <h2 className="text-lg font-semibold text-[var(--text-primary)]">
+            Review and generate
+          </h2>
+          <p className="text-base text-[var(--text-secondary)] mt-1">
+            Check your events before generating your schedule.
+          </p>
+        </div>
+
+        <div className="mb-6 flex flex-col gap-2">
+          <Label
+            htmlFor="timetable-name"
+            className="text-sm font-medium text-[var(--text-secondary)]"
+          >
+            Schedule Name
+          </Label>
+          <Input
+            data-testid="schedule-Timetable-Input"
+            id="timetable-name"
+            value={timetableName}
+            onChange={(e) => setTimetableName(e.target.value)}
+            placeholder="e.g. Semester 1, 2024"
+            className="bg-[var(--bg-surface)] border-[var(--border)] text-[var(--text-primary)] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--ring)]"
+          />
+        </div>
+
+        {renderContent()}
+        <div className="flex justify-center mt-8">
+          <Button
+            id="btn-create-schedule"
+            data-testid="schedules-Create-Btn"
+            type="button"
+            size="default"
+            //only generate when there is at least 1 event
+            disabled={isGenerating || selectedEventIds.length === 0}
+            onClick={() => onGenerate(timetableName, selectedEventIds)}
+            className="w-fit px-4 text-sm bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] hover:bg-[var(--btn-primary-hover)] disabled:opacity-40 transition-colors duration-[var(--duration-fast)]"
+          >
+            {isGenerating
+              ? "Generating..."
+              : selectedEventIds.length === 0
+                ? "Select at least one event"
+                : isEditMode
+                  ? "Edit Schedule"
+                  : "Generate Schedule"}
+          </Button>
+        </div>
       </div>
     </div>
   );

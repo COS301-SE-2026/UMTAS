@@ -4,6 +4,7 @@ import {
   ActivityTypeSchema,
   ParsedDayOfWeekSchema,
   IsoDateSchema,
+  TimeOfDaySchema,
   WorkerCallbackErrorSchema,
 } from "./common.js";
 
@@ -37,12 +38,8 @@ const ParsedEventCandidateBaseShape = {
   activityType: ActivityTypeSchema,
   activityCode: z.string(),
   title: z.string(),
-  startTime: z.string().regex(/^(?:[01]\d|2[0-3]):[0-5]\d$/, {
-    message: "Expected a time in HH:mm format.",
-  }),
-  endTime: z.string().regex(/^(?:[01]\d|2[0-3]):[0-5]\d$/, {
-    message: "Expected a time in HH:mm format.",
-  }),
+  startTime: TimeOfDaySchema,
+  endTime: TimeOfDaySchema,
   venues: z.array(z.string()),
   metadata: JsonRecordSchema,
   warnings: z.array(ParseAnnotationSchema),

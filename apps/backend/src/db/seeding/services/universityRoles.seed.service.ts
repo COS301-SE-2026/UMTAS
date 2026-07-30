@@ -1,14 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { BaseSeedService } from '../base.seed.service';
 
-import { DatabaseService } from 'src/db/database.service';
+import { DatabaseService } from '../../database.service';
 import { eq, inArray, and } from 'drizzle-orm';
 
 //Tables
-import { University, UniversityRole, usersTable } from 'src/entities';
+import { University, UniversityRole, usersTable } from '../../../entities';
+import { SeedPersistenceService } from '../seed-persistence.service';
 
 @Injectable()
 export class UniRolesSeedService extends BaseSeedService {
+  constructor(private readonly persistence: SeedPersistenceService) {
+    super();
+  }
+
   async seed(tx: DatabaseService['db']): Promise<void> {
     //Select University to give roles to --> University of Pretoria
     const uniName = this.constants.UniversityNames[0]; //UP
@@ -57,10 +62,10 @@ export class UniRolesSeedService extends BaseSeedService {
 
     if (missingRoles.length > 0) {
       //Seed in the missingRoles
-      const uniRoles = await tx
-        .insert(UniversityRole)
-        .values(missingRoles)
-        .returning();
+      const uniRoles = await this.persistence.insertUniversityRoles(
+        tx,
+        missingRoles,
+      );
 
       this.logResult('UniversityRoles', uniRoles.length);
     } else {

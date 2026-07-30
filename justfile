@@ -145,7 +145,7 @@ pdf-worker-status:
 # Run the PDF worker natively after verifying its Python dependency
 pdf-worker-native:
     python3 -c "import fitz"
-    phase run -- sh -c 'BULLMQ_REDIS_URL="redis://:${REDIS_PASSWORD}@127.0.0.1:6379" MINIO_ENDPOINT=http://127.0.0.1:9000 PDF_PARSE_CALLBACK_URL=http://127.0.0.1:3000/pdf-parser/jobs PDF_PARSE_CLI_CWD={{ justfile_directory() }}/apps/pdf_parser WORKER_TOPOLOGY=native exec pnpm --filter pdf-parser-worker dev'
+    phase run -- sh -c 'REDIS_URL="redis://:${REDIS_PASSWORD}@127.0.0.1:6379" MINIO_ENDPOINT=http://127.0.0.1:9000 WORKER_BACKEND_URL=http://127.0.0.1:3000 PDF_PARSE_CLI_CWD={{ justfile_directory() }}/apps/pdf_parser exec pnpm --filter pdf-parser-worker dev'
 
 # Build the solver worker image
 solver-worker-build:
@@ -170,7 +170,7 @@ solver-worker-status:
 # Run the solver worker natively after verifying the C++ executable
 solver-worker-native:
     test -x {{ justfile_directory() }}/apps/preference-solver/GA_BIN
-    phase run -- sh -c 'BULLMQ_REDIS_URL="redis://:${REDIS_PASSWORD}@127.0.0.1:6379" SOLVER_INPUT_URL=http://127.0.0.1:3000/solver/jobs SOLVER_CALLBACK_URL=http://127.0.0.1:3000/solver/jobs SOLVER_CLI_COMMAND={{ justfile_directory() }}/apps/preference-solver/GA_BIN WORKER_TOPOLOGY=native exec pnpm --filter solver-worker dev'
+    phase run -- sh -c 'REDIS_URL="redis://:${REDIS_PASSWORD}@127.0.0.1:6379" WORKER_BACKEND_URL=http://127.0.0.1:3000 SOLVER_CLI_COMMAND={{ justfile_directory() }}/apps/preference-solver/GA_BIN exec pnpm --filter solver-worker dev'
 
 # Validate every Compose model with its matching Phase environment
 compose-validate-local:
@@ -244,4 +244,9 @@ db_sql:
 # unit test
 backend-unit:
     phase run -- pnpm --filter backend test --coverage
+
+# full-stack integration tests with backend c8 coverage
+backend-integration-coverage:
+    pnpm test:integration
+    @echo "Coverage report: {{ justfile_directory() }}/apps/backend/coverage/integration/index.html"
 ############################## END_Backend specific

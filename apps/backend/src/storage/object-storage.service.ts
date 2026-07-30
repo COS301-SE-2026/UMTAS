@@ -3,6 +3,7 @@ import {
   HeadBucketCommand,
   PutObjectCommand,
   S3Client,
+  type S3ClientConfig,
 } from '@aws-sdk/client-s3';
 import {
   Inject,
@@ -11,12 +12,6 @@ import {
   OnModuleInit,
   Optional,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import {
-  buildObjectStorageConfig,
-  buildS3ClientConfig,
-  type ObjectStorageConfig,
-} from './storage.config';
 
 export interface ObjectStorageClient {
   send(
@@ -29,30 +24,21 @@ export const OBJECT_STORAGE_CLIENT = Symbol('OBJECT_STORAGE_CLIENT');
 @Injectable()
 export class ObjectStorageService implements OnModuleInit {
   private readonly logger = new Logger(ObjectStorageService.name);
-  private readonly config: ObjectStorageConfig;
   private readonly client: ObjectStorageClient;
+  private readonly bucket = process.env.MINIO_BUCKET ?? 'umtas-uploads';
+  private readonly createBucketOnStartup =
+    process.env.MINIO_CREATE_BUCKET_ON_STARTUP !== 'false';
 
   constructor(
-    configService: ConfigService,
     @Optional()
     @Inject(OBJECT_STORAGE_CLIENT)
     client?: ObjectStorageClient,
   ) {
-    this.config = buildObjectStorageConfig((key) =>
-      configService.get<string>(key),
-    );
-    this.client = client ?? new S3Client(buildS3ClientConfig(this.config));
+    this.client = client ?? new S3Client(buildS3ClientConfig());
   }
 
   async onModuleInit(): Promise<void> {
-    if (!this.config.bucket) {
-      this.logger.warn(
-        'Object storage bucket is not configured; skipping setup',
-      );
-      return;
-    }
-
-    if (!this.config.createBucketOnStartup) {
+    if (!this.createBucketOnStartup) {
       this.logger.log('Object storage bucket creation is disabled');
       return;
     }
@@ -62,10 +48,8 @@ export class ObjectStorageService implements OnModuleInit {
 
   async ensureBucketExists(): Promise<void> {
     try {
-      await this.client.send(
-        new HeadBucketCommand({ Bucket: this.config.bucket }),
-      );
-      this.logger.log(`Object storage bucket is ready: ${this.config.bucket}`);
+      await this.client.send(new HeadBucketCommand({ Bucket: this.bucket }));
+      this.logger.log(`Object storage bucket is ready: ${this.bucket}`);
     } catch (error) {
       if (isMissingBucketError(error)) {
         await this.createBucket();
@@ -81,13 +65,9 @@ export class ObjectStorageService implements OnModuleInit {
     body: Buffer | Uint8Array;
     contentType?: string;
   }): Promise<{ bucket: string; key: string }> {
-    if (!this.config.bucket) {
-      throw new Error('Object storage bucket is not configured');
-    }
-
     await this.client.send(
       new PutObjectCommand({
-        Bucket: this.config.bucket,
+        Bucket: this.bucket,
         Key: options.key,
         Body: options.body,
         ContentLength: options.body.byteLength,
@@ -95,15 +75,30 @@ export class ObjectStorageService implements OnModuleInit {
       }),
     );
 
-    return { bucket: this.config.bucket, key: options.key };
+    return { bucket: this.bucket, key: options.key };
   }
 
   private async createBucket(): Promise<void> {
-    await this.client.send(
-      new CreateBucketCommand({ Bucket: this.config.bucket }),
-    );
-    this.logger.log(`Created object storage bucket: ${this.config.bucket}`);
+    await this.client.send(new CreateBucketCommand({ Bucket: this.bucket }));
+    this.logger.log(`Created object storage bucket: ${this.bucket}`);
   }
+}
+
+function buildS3ClientConfig(): S3ClientConfig {
+  const config: S3ClientConfig = {
+    region: 'us-east-1',
+    forcePathStyle: true,
+  };
+
+  if (process.env.MINIO_ENDPOINT) config.endpoint = process.env.MINIO_ENDPOINT;
+  if (process.env.MINIO_ROOT_USER || process.env.MINIO_ROOT_PASSWORD) {
+    config.credentials = {
+      accessKeyId: process.env.MINIO_ROOT_USER ?? '',
+      secretAccessKey: process.env.MINIO_ROOT_PASSWORD ?? '',
+    };
+  }
+
+  return config;
 }
 
 function isMissingBucketError(error: unknown): boolean {

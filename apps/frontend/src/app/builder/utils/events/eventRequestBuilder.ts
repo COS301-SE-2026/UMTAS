@@ -6,35 +6,36 @@ import {
 import { paths } from "@/lib/api";
 
 export type CreateEventBody =
-  paths["/events"]["post"]["requestBody"]["content"]["application/json"];
+  paths["/api/events"]["post"]["requestBody"]["content"]["application/json"];
 export type EventCriteria = CreateEventBody["eventCriteria"];
 
 export type createEventRes =
-  paths["/events"]["post"]["responses"]["201"]["content"]["application/json"];
+  paths["/api/events"]["post"]["responses"]["201"]["content"]["application/json"];
 
-export type getallEventsReq = paths["/events"]["get"]["parameters"]["query"];
+export type getallEventsReq =
+  paths["/api/events"]["get"]["parameters"]["query"];
 export type getAllEventsRes =
-  paths["/events"]["get"]["responses"]["200"]["content"]["application/json"];
+  paths["/api/events"]["get"]["responses"]["200"]["content"]["application/json"];
 
 export type EventResponse = getAllEventsRes["events"][number];
 
 export type getEventByIDPath =
-  paths["/events/{eventId}"]["get"]["parameters"]["path"];
+  paths["/api/events/{eventId}"]["get"]["parameters"]["path"];
 export type getEventByIDRes =
-  paths["/events/{eventId}"]["get"]["responses"]["200"]["content"]["application/json"];
+  paths["/api/events/{eventId}"]["get"]["responses"]["200"]["content"]["application/json"];
 
 export type updateEventByIdPath =
-  paths["/events/{id}"]["patch"]["parameters"]["path"];
+  paths["/api/events/{id}"]["patch"]["parameters"]["path"];
 
 export type updateEventByIdBody =
-  paths["/events/{id}"]["patch"]["requestBody"]["content"]["application/json"];
+  paths["/api/events/{id}"]["patch"]["requestBody"]["content"]["application/json"];
 export type updateEventByIdRes =
-  paths["/events/{id}"]["patch"]["responses"]["200"]["content"]["application/json"];
+  paths["/api/events/{id}"]["patch"]["responses"]["200"]["content"]["application/json"];
 
 type deleteEventByIdPath =
-  paths["/events/{id}"]["delete"]["parameters"]["path"];
+  paths["/api/events/{id}"]["delete"]["parameters"]["path"];
 export type deleteEventByIdRes =
-  paths["/events/{id}"]["delete"]["responses"]["200"]["content"]["application/json"];
+  paths["/api/events/{id}"]["delete"]["responses"]["200"]["content"]["application/json"];
 
 export class createEventsBuilder extends RequestBuilder<
   undefined,

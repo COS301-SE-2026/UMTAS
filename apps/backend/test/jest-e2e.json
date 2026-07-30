@@ -1,26 +1,28 @@
 {
-  "preset": "ts-jest/presets/default-esm",
   "testEnvironment": "node",
   "rootDir": ".",
   "testRegex": ".e2e-spec.ts$",
   "moduleNameMapper": {
-    "^(\\.{1,2}/.*)\\.js$": "$1"
+    "^(\\.{1,2}/.*)\\.js$": "$1",
+    "^src/(.*)$": "<rootDir>/../src/$1",
+    "^shared-types$": "<rootDir>/../../../packages/shared-types/src/index.ts"
   },
   "transform": {
     "^.+\\.(t|j)sx?$": [
       "ts-jest",
       {
-        "useESM": true
-      }
-    ],
-    "^.+\\.mjs$": [
-      "ts-jest",
-      {
-        "useESM": true
+        "tsconfig": {
+          "module": "CommonJS",
+          "moduleResolution": "Node",
+          "target": "ES2022",
+          "esModuleInterop": true,
+          "allowSyntheticDefaultImports": true,
+          "resolvePackageJsonExports": false,
+          "resolvePackageJsonImports": false
+        }
       }
     ]
   },
-  "extensionsToTreatAsEsm": [".ts"],
-  "setupFilesAfterEnv": ["<rootDir>/jest.setup.cjs"],
+  "setupFilesAfterEnv": ["<rootDir>/jest.setup.ts"],
   "transformIgnorePatterns": ["node_modules/(?!(better-auth|@better-auth)/)"]
 }

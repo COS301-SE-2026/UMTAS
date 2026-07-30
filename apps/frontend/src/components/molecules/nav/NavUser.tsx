@@ -6,6 +6,7 @@ import { UserAvatar } from "@/components/atoms/nav/UserAvatar";
 import { ThemeToggle } from "@/components/atoms/auth/ThemeToggle";
 import { Button } from "@/components/atoms/baseShadcn/button";
 import { signOut, useSession } from "@/../utilities/auth-client";
+import { UserDetails } from "@/lib/userclass/userClass";
 
 interface NavUserProps {
   name?: string | null;
@@ -19,6 +20,11 @@ export function NavUser({ name: nameProp }: NavUserProps) {
   const isLoggedIn = !!session?.user;
 
   async function handleSignOut() {
+    UserDetails.storeUniDetails({
+      UniversityID: "",
+      UniversityName: "",
+      role: undefined,
+    });
     await signOut({
       fetchOptions: {
         onSuccess: () => router.push("/login"),

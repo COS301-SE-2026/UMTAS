@@ -6,9 +6,9 @@ import {
 
 // uses a users enrolled modules
 type createJobBody =
-  paths["/solver/jobs"]["post"]["requestBody"]["content"]["application/json"];
+  paths["/api/solver/jobs"]["post"]["requestBody"]["content"]["application/json"];
 type createJobRes =
-  paths["/solver/jobs"]["post"]["responses"]["202"]["content"]["application/json"];
+  paths["/api/solver/jobs"]["post"]["responses"]["202"]["content"]["application/json"];
 export class createSolverJobBuilder extends RequestBuilder<
   undefined,
   createJobBody,
@@ -21,10 +21,10 @@ export class createSolverJobBuilder extends RequestBuilder<
 }
 
 export type enrollToModPath =
-  paths["/modules/enroll/{moduleId}"]["get"]["parameters"]["path"];
+  paths["/api/modules/enroll/{moduleId}"]["get"]["parameters"]["path"];
 
 export type enrollToModRes =
-  paths["/modules/enroll/{moduleId}"]["get"]["responses"]["200"]["content"]["application/json"];
+  paths["/api/modules/enroll/{moduleId}"]["get"]["responses"]["200"]["content"]["application/json"];
 export class enrollModBuilder extends RequestBuilder<
   enrollToModPath,
   undefined,
@@ -37,10 +37,10 @@ export class enrollModBuilder extends RequestBuilder<
 }
 
 export type getSolverOutputPath =
-  paths["/solver/jobs/{jobId}/result"]["get"]["parameters"]["path"];
+  paths["/api/solver/jobs/{jobId}/result"]["get"]["parameters"]["path"];
 
 export type getSolverOutputRes =
-  paths["/solver/jobs/{jobId}/result"]["get"]["responses"]["200"]["content"]["application/json"];
+  paths["/api/solver/jobs/{jobId}/result"]["get"]["responses"]["200"]["content"]["application/json"];
 
 export class getSolverOutputBuilder extends RequestBuilder<
   getSolverOutputPath,
@@ -54,9 +54,9 @@ export class getSolverOutputBuilder extends RequestBuilder<
 }
 
 export type pollSolverOutputPath =
-  paths["/solver/jobs/{jobId}"]["get"]["parameters"]["path"];
+  paths["/api/solver/jobs/{jobId}"]["get"]["parameters"]["path"];
 export type pollSolverOutputRes =
-  paths["/solver/jobs/{jobId}"]["get"]["responses"]["200"]["content"]["application/json"];
+  paths["/api/solver/jobs/{jobId}"]["get"]["responses"]["200"]["content"]["application/json"];
 export class pollSolverOutputBuilder extends RequestBuilder<
   pollSolverOutputPath,
   undefined,

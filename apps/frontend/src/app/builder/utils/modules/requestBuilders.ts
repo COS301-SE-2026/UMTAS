@@ -6,27 +6,27 @@ import {
 import { paths, components } from "@/lib/api";
 
 type createModuleReq =
-  paths["/builder"]["post"]["requestBody"]["content"]["application/json"];
+  paths["/api/builder"]["post"]["requestBody"]["content"]["application/json"];
 type createModuleRes =
-  paths["/builder"]["post"]["responses"]["201"]["content"]["application/json"];
+  paths["/api/builder"]["post"]["responses"]["201"]["content"]["application/json"];
 type deleteModulesByIdRes =
-  paths["/builder/{moduleId}"]["delete"]["responses"]["200"]["content"]["application/json"];
+  paths["/api/builder/{moduleId}"]["delete"]["responses"]["200"]["content"]["application/json"];
 type deleteModulesByIdPath =
-  paths["/builder/{moduleId}"]["delete"]["parameters"]["path"];
+  paths["/api/builder/{moduleId}"]["delete"]["parameters"]["path"];
 type getAllModulesRes =
-  paths["/builder"]["get"]["responses"]["200"]["content"]["application/json"];
+  paths["/api/builder"]["get"]["responses"]["200"]["content"]["application/json"];
 type getModuleByIdReq =
-  paths["/builder/{moduleId}"]["get"]["parameters"]["path"];
+  paths["/api/builder/{moduleId}"]["get"]["parameters"]["path"];
 type getModuleByIdRes =
-  paths["/builder/{moduleId}"]["get"]["responses"]["200"]["content"]["application/json"];
+  paths["/api/builder/{moduleId}"]["get"]["responses"]["200"]["content"]["application/json"];
 type updateModuleByIdBody =
-  paths["/builder/{moduleId}"]["patch"]["requestBody"]["content"]["application/json"];
+  paths["/api/builder/{moduleId}"]["patch"]["requestBody"]["content"]["application/json"];
 
 type updateModuleByIdPath =
-  paths["/builder/{moduleId}"]["patch"]["parameters"]["path"];
+  paths["/api/builder/{moduleId}"]["patch"]["parameters"]["path"];
 
 type updateModuleByIdRes =
-  paths["/builder/{moduleId}"]["patch"]["responses"]["200"]["content"]["application/json"];
+  paths["/api/builder/{moduleId}"]["patch"]["responses"]["200"]["content"]["application/json"];
 
 export type ModuleResponseDto =
   components["schemas"]["ModuleSingleResponseDto"];
