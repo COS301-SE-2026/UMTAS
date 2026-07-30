@@ -84,25 +84,13 @@
 
 ### R2.6 Solver System
 
-- **R2.6.1** The system shall automatically solve for a schedule once a finalised set of events is received from an input adapter (Builder, PDF Upload, or University API).
-    - **R2.6.1.1** The system shall first attempt to generate a conflict-free schedule using the CP-SAT solver.
-        - **R2.6.1.1.1** The system shall model venue assignments as a hard constraint, preventing any venue from being double-booked.
-        - **R2.6.1.1.2** The system shall model lecturer assignments as a hard constraint, preventing any lecturer from being double-booked.
-        - **R2.6.1.1.3** The system shall model student group assignments as a hard constraint, preventing any student group from being double-booked.
-        - **R2.6.1.1.4** The system shall require each event to be scheduled its specified number of required occurrences.
-    - **R2.6.1.2** The system shall notify the User once the CP-SAT solver produces a valid, conflict-free timetable.
-    - **R2.6.1.3** The system shall automatically invoke the GA solver if the CP-SAT solver cannot find a feasible, conflict-free schedule.
-- **R2.6.2** The system shall generate a best-effort schedule using a Genetic Algorithm (GA) when no conflict-free solution exists.
-    - **R2.6.2.1** The system shall evaluate candidate schedules against soft preferences rather than hard constraints.
-        - **R2.6.2.1.1** The system shall support soft preferences for preferred venues.
-        - **R2.6.2.1.2** The system shall support soft preferences for preferred times.
-        - **R2.6.2.1.3** The system shall support soft preferences for minimising scheduling gaps.
+- **R2.6.1** The system shall automatically attempt to solve for a schedule using the CP-SAT solver once a finalised set of events is received, notifying the User once a valid timetable is produced.
+    - **R2.6.1.1** The system shall enforce a selection rule as a hard constraint.
+    - **R2.6.1.2** The system shall enforce an overlap rule as a hard constraint, preventing events from clashing.
+    - **R2.6.1.3** The system shall optimise the schedule to centralise events around a User-given target time.
+- **R2.6.2** The system shall automatically invoke the GA solver to generate a best-effort schedule when the CP-SAT solver cannot find a feasible solution, notifying the User once produced.
+    - **R2.6.2.1** The system shall optimise the schedule to centralise events around a User-given target time.
     - **R2.6.2.2** The system shall apply selection, crossover, and mutation operators across generations to improve candidate schedules.
-    - **R2.6.2.3** The system shall select the candidate schedule with the lowest soft-constraint violation score once a maximum generation count or convergence threshold is reached.
-    - **R2.6.2.4** The system shall notify the User when a GA-generated schedule is produced, including any remaining unresolved conflicts.
-- **R2.6.3** The system shall allow the User to view a generated schedule (CP-SAT or GA).
-    - **R2.6.3.1** The system shall allow the User to edit a generated schedule.
-    - **R2.6.3.2** The system shall allow the User to delete a generated schedule.
 
 # FR 3
 

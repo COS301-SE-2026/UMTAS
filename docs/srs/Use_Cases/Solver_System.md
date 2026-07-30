@@ -15,7 +15,7 @@
 
     ??? warning "**Traceability Matrix**"
         <div align="center">
-        ![](./Traceability_Matrix/FR3_4.svg)
+        ![](./Traceability_Matrix/FR2_6.svg)
         </div>
 
     ---
@@ -37,7 +37,7 @@
         | **Basic Flow** | 1. System receives the finalised set of events and their hard constraints (venue, time, lecturer, student group, required occurrences).<br>2. System formulates the scheduling problem as a constraint satisfaction model for the CP-SAT solver.<br>3. System invokes the CP-SAT solver.<br>4. System checks the solver's result status.<br>5. System generates a conflict-free schedule in which each event occurs its required number of times.<br>6. System stores the generated schedule.<br>7. System notifies the User that a valid timetable has been created. |
         | **Alternate Flow** | **A1: No feasible solution found**<br>System automatically triggers [Solve with GA](#uc-sv-02) to generate a best-effort schedule using soft preferences.<br><br>**A2: Solver error or timeout**<br>System logs the failure and notifies the User that scheduling could not be completed. |
         | **Postcondition** | A conflict-free schedule is generated and available for the User to view, edit, or delete, or the GA solver has been triggered |
-        | **Requirements Covered** | R2.6.1, R2.6.1.1, R2.6.1.1.1, R2.6.1.1.2, R2.6.1.1.3, R2.6.1.1.4, R2.6.1.2, R2.6.1.3, R2.6.3, R2.6.3.1, R2.6.3.2 |
+        | **Requirements Covered** | R2.6.1, R2.6.1.1, R2.6.1.2, R2.6.1.3 |
 
     ---
     ??? "UC-SV-02: Solve with GA"
@@ -57,4 +57,4 @@
         | **Basic Flow** | 1. System receives the finalised set of events and associated soft preferences.<br>2. System initialises a population of candidate schedules.<br>3. System evaluates each candidate's fitness based on soft-constraint violations and preferences.<br>4. System applies selection, crossover, and mutation across successive generations.<br>5. System converges on the candidate schedule with the lowest violation score, once a maximum generation count or convergence threshold is reached.<br>6. System stores the generated schedule.<br>7. System notifies the User that a best-effort schedule has been created, including any remaining soft-constraint conflicts. |
         | **Alternate Flow** | **A1: No improvement across generations**<br>System returns the best schedule found and flags it as best-effort with unresolved conflicts. |
         | **Postcondition** | A best-effort schedule, with conflicts minimised according to soft preferences, is generated and available for the User to view, edit, or delete |
-        | **Requirements Covered** | R2.6.1.3, R2.6.2, R2.6.2.1, R2.6.2.1.1, R2.6.2.1.2, R2.6.2.1.3, R2.6.2.2, R2.6.2.3, R2.6.2.4, R2.6.3, R2.6.3.1, R2.6.3.2 |
+        | **Requirements Covered** | R2.6.2, R2.6.2.1, R2.6.2.2 |

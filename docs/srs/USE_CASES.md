@@ -125,6 +125,7 @@
 
     <div class="uc-table" markdown>
 
+    ## Solver System
     | **ID** | **Use Case** | **Group** | **Actor** | **Status** |
     |:---:|:---:|:---:|:---:|:---:|
     | **UC-SV-01** | Solve with CP-SAT | [Solver System](#solver-system-id) | Student |<span class="status-implemented">Implemented</span>|
@@ -225,6 +226,10 @@
 ---
 <!-- Calendar Exporting -->
 {% include-markdown "srs/Use_Cases/Calendar_Exporting.md" %}
+
+---
+<!-- Calendar Exporting -->
+{% include-markdown "srs/Use_Cases/Solver_System.md" %}
 
 ---
 <!-- Analytics Dashboard -->
