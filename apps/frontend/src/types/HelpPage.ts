@@ -1,10 +1,12 @@
 import { rolesTypeType } from "@/app/role-management/queries/builder";
 
+export type HelpRoles = rolesTypeType | "all";
+
 export interface HelpPageSection {
   id: string;
   pageName: string;
   title: string;
-  roles: rolesTypeType;
+  roles: HelpRoles;
   description: string;
   pageImage: {
     url: string;
@@ -28,9 +30,12 @@ export const createHelpPage = (
   id: `${pageName.toLowerCase()}_HelpPage`,
   pageName,
   title: `How to use the ${pageName} page`,
-  roles: null,
-  description: "",
-  pageImage: { url: "" },
+  roles: "all",
+  description: `This section will guide you through using the ${pageName} page.`,
+  pageImage: {
+    url: `../../images/${pageName}/image.png`,
+    altText: `Image of the ${pageName} page`,
+  },
   steps: [],
 
   ...overrides,
