@@ -47,7 +47,6 @@ export default function SolverPreferences({ modules, events }: solverProps) {
   const [timetableCreated, setTimetableCreated] = useState<boolean>(false);
   const router = useRouter();
   const [timetableName, setTimetableName] = useState<string>("");
-  const [showDialog, setShowDialog] = useState(false);
 
   const { data: resultOfPoll, isFetching: pollFetching } = useQuery({
     queryKey: ["solver", "poll"],
@@ -142,7 +141,7 @@ export default function SolverPreferences({ modules, events }: solverProps) {
         setJobID(null);
         getQueryClient().setQueryData(["solver", "poll"], null);
         if (timetableCreated === false) {
-          setShowDialog(true);
+          router.push("\schedules");
         }
       }
       if (resultOfPoll.status === "failed" && jobFailed === false) {
@@ -302,42 +301,9 @@ export default function SolverPreferences({ modules, events }: solverProps) {
   function handleError() {
     return resultOfPoll?.error as { code?: string; message?: string };
   }
-  function TimetableCreatedDialog() {
-    return (
-      <>
-        <Dialog open={showDialog}>
-          <DialogContent>
-            <DialogTitle>Successfully created</DialogTitle>
-            <DialogDescription>
-              {timetableName} an be found in your schedules
-            </DialogDescription>
-
-            <div className="flex flex-col p-5 space-y-5">
-              <Button
-                onClick={() => {
-                  setShowDialog(false);
-                  router.push("/schedules");
-                }}
-              >
-                View Schedules
-              </Button>
-              <Button
-                onClick={() => {
-                  setShowDialog(false);
-                }}
-              >
-                Close
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-      </>
-    );
-  }
 
   return (
     <>
-      {TimetableCreatedDialog()}
       <Card className="shadow-lg border-[var(--border)] rounded-xl bg-[var(--bg-surface)] w-md h-fit">
         <CardHeader className="text-xl font-bold text-[var(--text-primary)]">
           Set your preferences

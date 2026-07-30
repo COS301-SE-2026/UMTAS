@@ -102,39 +102,43 @@ test("Update event", async ({ page }) => {
   await expect(event.getByTestId("event-Type-Select")).toHaveText("Test");
 });
 
-test("Create schedule", async ({ page }) => {
-  await page.goto("/builder");
-  await page.getByTestId("builder-Next-Step").click();
-  await page.getByTestId("builder-Next-Step").click(); // now on schedules edit page
+test.describe("Schedules", () => {
+  test("Create schedule", async ({ page }) => {
+    await page.goto("/builder");
+    await page.getByTestId("builder-Next-Step").click();
+    await page.getByTestId("builder-Next-Step").click(); // now on schedules edit page
 
-  const createScheduleContainer = page.getByTestId("create-Schedule-Div");
-  const TimetableNameInput = createScheduleContainer.getByTestId(
-    "schedule-Timetable-Input",
-  );
-  await TimetableNameInput.fill("TestName");
+    const createScheduleContainer = page.getByTestId("create-Schedule-Div");
+    const TimetableNameInput = createScheduleContainer.getByTestId(
+      "schedule-Timetable-Input",
+    );
+    await TimetableNameInput.fill("TestName");
 
-  const EventCheckBox = createScheduleContainer
-    .getByTestId("schedule-Timetable-Checkbox")
-    .first();
-  await EventCheckBox.check();
-  const createScheduleBtn = createScheduleContainer.getByTestId(
-    "schedules-Create-Btn",
-  );
-  await createScheduleBtn.click();
+    const EventCheckBox = page
+      .locator("div")
+      .filter({ has: page.getByText("AA", { exact: true }) })
+      .getByTestId("schedule-Timetable-Checkbox")
+      .first();
 
-  await expect(page.getByTestId("schedules-Calendar-Div")).toBeVisible();
-  await page.getByTestId("schedules-Date-Input").fill("2026-12-30");
-  await expect(page).toHaveScreenshot("Schedule-correct-event.png");
-  // page did change schedule created successfully
+    await EventCheckBox.check();
+    const createScheduleBtn = createScheduleContainer.getByTestId(
+      "schedules-Create-Btn",
+    );
+    await createScheduleBtn.click();
+
+    await expect(page.getByTestId("schedules-Calendar-Div")).toBeVisible();
+    await page.getByTestId("schedules-Date-Input").fill("2026-12-30");
+    await expect(page).toHaveScreenshot("Schedule-correct-event.png");
+    // page did change schedule created successfully
+  });
+
+  test("Delete schedule", async ({ page }) => {
+    await page.goto("/schedules");
+    await page.getByTestId("schedules-Delete-Btn").click();
+    await page.getByTestId("Schedules-ConfirmDelete-Btn").click();
+    await expect(page).toHaveScreenshot("Schedules-deleted.png");
+  });
 });
-
-test("Delete schedule", async ({ page }) => {
-  await page.goto("/schedules");
-  await page.getByTestId("schedules-Delete-Btn").click();
-  await page.getByTestId("Schedules-ConfirmDelete-Btn").click();
-  await expect(page).toHaveScreenshot("Schedules-deleted.png");
-});
-
 test("Delete module", async ({ page }) => {
   await page.goto("/builder");
   const targetModule = page

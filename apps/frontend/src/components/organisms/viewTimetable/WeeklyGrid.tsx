@@ -72,26 +72,21 @@ function slotSpan(startTime: string, endTime: string): number {
   return Math.max(1, Math.ceil((endMinutes - startMinutes) / 30));
 }
 
-function getDayIndex(dateStr: string): number {
-  const date = new Date(dateStr + "T00:00:00");
-  const day = date.getDay();
-  if (day === 0) return 6;
-  return day - 1;
-}
-
 export function WeeklyGrid({ events, weekStart }: WeeklyGridProps) {
   const weekDates = getWeekDates(weekStart);
 
   function getEventsForDay(date: Date): ScheduleEvent[] {
     const dateStr = isoDateStr(date);
+
+    // Standard JS getDay(): 0 = Sunday etc...
     const dayNames = [
+      "sunday",
       "monday",
       "tuesday",
       "wednesday",
       "thursday",
       "friday",
       "saturday",
-      "sunday",
     ];
     const currentDayName = dayNames[date.getDay()];
 
@@ -99,12 +94,10 @@ export function WeeklyGrid({ events, weekStart }: WeeklyGridProps) {
 
     for (const event of events) {
       if (event.isRecurring) {
-        // if isRecurring, check that date of week matches
-        if (event.dayOfWeek === currentDayName) {
+        if (event.dayOfWeek?.toLowerCase() === currentDayName) {
           result.push(event);
         }
       } else {
-        // once off event, check that dates match
         if (event.date === dateStr) {
           result.push(event);
         }
