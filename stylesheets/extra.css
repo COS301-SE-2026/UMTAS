@@ -88,3 +88,71 @@ a {
   color: #1a1a1a !important;
   border-bottom: 2px solid #1a1a1a;
 }
+
+/* For use cases */
+
+/* Use-case overview container */
+.uc-overview {
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+/* Section headers */
+.uc-overview h2 {
+  margin-top: 2rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 2px solid var(--md-primary-fg-color);
+  color: var(--md-primary-fg-color);
+}
+
+/* Table styling */
+.uc-table table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.5rem 0 1.5rem 0;
+  font-size: 0.9rem;
+}
+
+.uc-table th {
+  background-color: var(--md-primary-fg-color);
+  color: var(--md-primary-bg-color);
+  padding: 0.6rem;
+  text-align: center;
+}
+
+.uc-table td {
+  padding: 0.5rem 0.6rem;
+  border-bottom: 1px solid #ddd;
+  text-align: center;
+}
+
+.uc-table tr:nth-child(even) {
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.uc-table tr:hover {
+  background-color: rgba(0, 0, 0, 0.06);
+}
+
+/* Status pills */
+.status-implemented {
+  background-color: #2e7d32;
+  color: white;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.status-not-implemented {
+  background-color: #e53935;
+  color: white;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+/* END_USe Cases */
