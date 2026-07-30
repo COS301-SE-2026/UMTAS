@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - main
-      - feat/health-points
-      - fix/scrub-url
-      - feat/integration-testing-setup
     tags:
       - "v*"
   pull_request:
@@ -52,11 +49,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # - name: Run Linter
-      #   run: pnpm run lint
+      - name: Run Linter
+        run: pnpm run lint
 
-      # - name: Run Build
-      #   run: pnpm run build
+      - name: Run Build
+        run: pnpm run build
 
       - name: Run Unit Tests
         run: |
@@ -147,7 +144,7 @@ jobs:
     name: Build & Push Staging Images
     runs-on: ubuntu-latest
     needs: ci
-    if: github.event_name == 'push' || github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     environment:
       name: staging
     permissions:
@@ -228,7 +225,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Deploy to Staging
     needs: docker-staging
-    if: github.event_name == 'push' || github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     environment:
       name: production
     permissions: {}
