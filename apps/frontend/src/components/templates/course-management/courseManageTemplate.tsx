@@ -49,6 +49,10 @@ const steps = [
     content: "Filter results by module type.",
   },
   {
+    target: "#btn-add-course",
+    content: "Create a new course for your institute.",
+  },
+  {
     target: "#btn-view-modules",
     content: "View the modules available for the selected course.",
   },
@@ -267,7 +271,12 @@ export default function CourseManagementTemplate() {
                   ))}
                 </SelectContent>
               </Select>
-              <Button onClick={() => setShowAddCourse(true)}>Add Course</Button>
+              <Button
+                id="btn-add-course"
+                onClick={() => setShowAddCourse(true)}
+              >
+                Add Course
+              </Button>
               {showAddCourse && (
                 <AddCoursePopup onClose={() => setShowAddCourse(false)} />
               )}
