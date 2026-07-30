@@ -280,17 +280,17 @@ export default function SolverPreferences({ modules, events }: solverProps) {
             disabled={loadingStatus()}
             type="button"
             onClick={enrollUser}
-            className="mt-8"
+            className="mt-4 w-fit"
           >
             Upload and Create Timetable
           </Button>
           <Button
-            hidden
-            disabled={loadingStatus()}
             type="button"
             onClick={() => {
               router.push("/schedules");
             }}
+            //bandaid fix will fix post demo 2
+            className="w-fit mt-40"
           >
             View Timetable
           </Button>
@@ -304,7 +304,8 @@ export default function SolverPreferences({ modules, events }: solverProps) {
 
   return (
     <>
-      <Card className="shadow-lg border-[var(--border)] rounded-xl bg-[var(--bg-surface)] w-md h-fit">
+      {/* {TimetableCreatedDialog()} */}
+      <Card className="shadow-lg border-[var(--border)] rounded-xl bg-[var(--bg-surface)] w-full h-full flex flex-col">
         <CardHeader className="text-xl font-bold text-[var(--text-primary)]">
           Set your preferences
         </CardHeader>
@@ -313,7 +314,7 @@ export default function SolverPreferences({ modules, events }: solverProps) {
           never making a timetable invalid
         </CardDescription>
 
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 overflow-y-auto flex-1">
           {jobFailed == false ? (
             <>
               {!loadingStatus() ? (

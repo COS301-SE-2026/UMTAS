@@ -123,16 +123,15 @@ export default function SolverShell() {
           </div>
         </Popup>
       )}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 xl:gap-16 w-full max-w-[1920px] mx-auto px-4 md:px-6 pt-6">
-        <div className="flex w-full justify-center h-fit">
+      <div className="flex flex-wrap justify-center gap-8 xl:gap-16 w-full max-w-[1920px] mx-auto px-4 md:px-6 pt-6">
+        <div className="flex w-120 h-110 justify-center">
           <SolverUpload
             onComplete={() => handleStepCompleted(0)}
             moduleGroupID={moduleGroupingID}
             setModuleGroupID={setModuleGroupingID}
           />
         </div>
-
-        <div className="flex w-full justify-center h-full">
+        <div className="flex w-120 h-110 justify-center">
           <SolverLock locked={currentStep < 1} loading={comingFromStep === 0}>
             <SolverReview
               events={events}
@@ -141,8 +140,7 @@ export default function SolverShell() {
             />
           </SolverLock>
         </div>
-
-        <div className="flex w-full justify-center h-full">
+        <div className="flex w-120 h-110 justify-center">
           <SolverLock locked={currentStep < 2} loading={comingFromStep === 1}>
             <SolverPreferences
               modules={displayMods as ModuleResponseDto[]}
