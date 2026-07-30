@@ -4,6 +4,7 @@ export * from './event.factory';
 export * from './grouping.factory';
 export * from './jobs.factory';
 export * from './module.factory';
+export * from './pdf-parser.factory';
 export * from './relationships.factory';
 export * from './session.factory';
 export * from './user.factory';

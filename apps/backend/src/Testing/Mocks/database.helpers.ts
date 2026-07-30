@@ -49,7 +49,10 @@ export const mockDbResult = (mockFn: jest.Mock, result: unknown[]) => {
 
 //generic Sequential result
 //methods called more than once with their respective results
-export const mockSequentialResults = <T>(mockFn: jest.Mock, results: T[][]) => {
+export const mockSequentialResults = (
+  mockFn: jest.Mock,
+  results: unknown[][],
+) => {
   results.forEach((result) =>
     mockFn.mockReturnValueOnce(createDbChain(result)),
   );

@@ -1,6 +1,11 @@
 import { ConflictException } from '@nestjs/common';
 import { EventImportFingerprintService } from '../Events/event-import-fingerprint.service';
-import { createEvent, createModule, createVenue } from '../Testing/Factories';
+import {
+  createEvent,
+  createModule,
+  createParsedEventCandidate,
+  createVenue,
+} from '../Testing/Factories';
 import { createMockDatabase } from '../Testing/Mocks/database.mock';
 import {
   createDbChain,
@@ -33,7 +38,7 @@ describe('EventImporter', () => {
     await h.service.createMissingEvents(
       mockDb,
       'uni-1',
-      [candidate({ moduleCode: 'unknown' })],
+      [createParsedEventCandidate({ moduleCode: 'unknown' })],
       new Map([['COS101', module]]),
     );
     expect(mockDb.select).not.toHaveBeenCalled();
@@ -58,7 +63,7 @@ describe('EventImporter', () => {
       mockDb,
       'uni-1',
       [
-        candidate({
+        createParsedEventCandidate({
           title: '',
           activityCode: '',
           activityType: 'tutorial',
@@ -126,7 +131,11 @@ describe('EventImporter', () => {
     await h.service.createMissingEvents(
       mockDb,
       'uni-1',
-      [candidate({ day: ` ${day.toUpperCase()} ` })],
+      [
+        createParsedEventCandidate({
+          day: ` ${day.toUpperCase()} `,
+        }),
+      ],
       new Map([['COS101', module]]),
     );
     expect(eventInsert.values).toHaveBeenCalledWith(
@@ -145,7 +154,7 @@ describe('EventImporter', () => {
         h.service.createMissingEvents(
           mockDb,
           'uni-1',
-          [candidate({ day })],
+          [createParsedEventCandidate({ day })],
           new Map([['COS101', module]]),
         ),
       ).rejects.toThrow(ConflictException);
@@ -166,7 +175,7 @@ describe('EventImporter', () => {
     await h.service.createMissingEvents(
       mockDb,
       'uni-1',
-      [candidate({ venues: [] })],
+      [createParsedEventCandidate({ venues: [] })],
       new Map([['COS101', module]]),
     );
     expect(
@@ -186,7 +195,7 @@ describe('EventImporter', () => {
       h.service.createMissingEvents(
         mockDb,
         'uni-1',
-        [candidate({ venues: [] })],
+        [createParsedEventCandidate({ venues: [] })],
         new Map([['COS101', module]]),
       ),
     ).rejects.toThrow('PDF parser event could not be resolved');
@@ -231,7 +240,7 @@ describe('EventImporter', () => {
       mockDb,
       'uni-1',
       [
-        candidate({
+        createParsedEventCandidate({
           venues: [' Existing ', 'New', 'New', ' ', 'L'.repeat(40), 'Race'],
         }),
       ],
@@ -265,7 +274,7 @@ describe('EventImporter', () => {
       mockDb,
       'uni-1',
       [
-        candidate({
+        createParsedEventCandidate({
           title: 'T'.repeat(40),
           activityCode: 'A'.repeat(20),
           venues: [],
@@ -281,21 +290,3 @@ describe('EventImporter', () => {
     );
   });
 });
-
-function candidate(overrides: Record<string, unknown> = {}) {
-  return {
-    moduleCode: ' cos101 ',
-    title: 'Lecture',
-    activityType: 'lecture',
-    activityCode: 'L1',
-    isRecurring: true,
-    day: 'monday',
-    date: null,
-    startTime: '08:00',
-    endTime: '09:00',
-    venues: [],
-    metadata: {},
-    warnings: [],
-    ...overrides,
-  } as never;
-}
