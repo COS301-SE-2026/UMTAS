@@ -170,8 +170,8 @@ export function ScheduleView({
   const currentWeekStart = useMemo(() => {
     const date = new Date(selectedDate);
     const day = date.getDay();
-    const dateDifference = date.getDate() - day + (day === 0 ? -6 : 1); //adj if day is sun
-    date.setDate(dateDifference);
+    const diffToMonday = day === 0 ? -6 : 1 - day;
+    date.setDate(date.getDate() + diffToMonday);
     date.setHours(0, 0, 0, 0);
     return date;
   }, [selectedDate]);
