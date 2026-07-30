@@ -35,6 +35,7 @@ import { CourseDTO } from "@/app/course-management/queries/courses/courseBuilder
 import Tutorial from "@/components/organisms/nav/Tutorial";
 import NotFound from "@/app/not-found";
 import { AddCoursePopup } from "@/components/organisms/course-management/AddCoursePopup";
+import NoRoleSelected from "@/components/molecules/roleManagement/NoRoleSelected";
 const steps = [
   {
     target: "#input-search-courses-degrees-modules",
@@ -71,9 +72,9 @@ export default function CourseManagementTemplate() {
 
   const ViableRole = UniDetails?.role === "UNIVERSITY_ADMIN";
 
-  if (UniDetails === null) {
-    router.push("/dashboard");
-  }
+  // if (UniDetails === null) {
+  //   router.push("/dashboard");
+  // }
 
   //forces you to pick an institude if you havent already
   useEffect(() => {
@@ -201,6 +202,9 @@ export default function CourseManagementTemplate() {
       </div>
     );
   }
+
+  const hasRole = UniDetails?.role != null;
+  if (!hasRole) return <NoRoleSelected />;
 
   if (!ViableRole) {
     return <NotFound />;
