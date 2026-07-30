@@ -1,0 +1,14 @@
+apps/frontend/src/app/role-management/HelpPage.ts
+  h_84e82529bd05a5 1-35
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.18",
+  "base_commit_sha": "ac488391102dc17e193369bacbe2bebcf951d1eb",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}
