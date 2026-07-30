@@ -1,26 +1,14 @@
 import TutorialStep from "@/components/molecules/tutorial/TutorialStep";
-import { HelpPageSection, HelpStep } from "@/types/HelpPage";
-
-// export interface HelpStep {
-//   stepNumber: number;
-//   title: string;
-//   description: string;
-//   imageUrl?: string;
-// }
-
-// export interface HelpPageSection {
-//   id: string;
-//   pageName: string;
-//   category: string;
-//   description: string;
-//   pageImage?: {
-//     url: string;
-//     altText?: string;
-//     imageDescription?: string;
-//   };
-//   steps: HelpStep[];
-//   relatedPageIds?: string[]; //link to the actual page (router.push(/page))
-// }
+import { HelpPageSection } from "@/types/HelpPage";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/atoms/baseShadcn/card";
+import { Badge } from "@/components/atoms/baseShadcn/badge";
+import { Separator } from "@/components/atoms/baseShadcn/separator";
 
 export interface TutorialSectionProps {
   section: HelpPageSection;
@@ -28,22 +16,43 @@ export interface TutorialSectionProps {
 
 export default function TutorialSection({ section }: TutorialSectionProps) {
   return (
-    <>
-      <p>id: {section.id}</p>
-      <p>Page name: {section.pageName}</p>
-      <p>Category: {section.category}</p>
-      <p>Description: {section.description}</p>
-      <p>Page image url: {section.pageImage?.url}</p>
-      <p>
-        Steps:{" "}
-        {section.steps.map((step) => {
-          return (
-            <>
-              <TutorialStep key={step.stepNumber} step={step} />
-            </>
-          );
-        })}
-      </p>
-    </>
+    <Card className="w-full bg-[var(--bg-surface)] border-[var(--border)] shadow-md rounded-xl overflow-hidden p-0">
+      {section.pageImage?.url && (
+        <div className="w-full bg-[var(--bg-elevated)] border-b border-[var(--border)] relative overflow-hidden">
+          <img
+            src={section.pageImage.url}
+            alt={section.pageImage.altText || section.pageName}
+            className="object-cover w-full h-full"
+          />
+        </div>
+      )}
+      <CardHeader className="p-6 md:p-8 pb-6">
+        <div className="flex justify-between items-start mb-4">
+          <Badge
+            className="uppercase font-medium bg-[var(--bg-elevated)] text-[var(--text-primary)] 
+            hover:bg-[var(--bg-elevated)] rounded-full px-4 py-2 border-[var(--border)]"
+          >
+            {section.category}
+          </Badge>
+        </div>
+        <CardTitle className="text-xl font-semibold text-[var(--text-primary)] mb-2">
+          {section.pageName}
+        </CardTitle>
+        <CardDescription className="text-md text-[var(--text-secondary)] font-normal">
+          {section.description}
+        </CardDescription>
+        {section.pageImage?.imageDescription && (
+          <p className="text-md text-[var(--text-secondary)] mt-4 border-l-2 border-[var(--border)] pl-4">
+            {section.pageImage.imageDescription}
+          </p>
+        )}
+      </CardHeader>
+      <Separator className="bg-[var(--border)]" />
+      <CardContent className="p-6 md:p-8 flex flex-col gap-12 bg-[var(--bg-base)]">
+        {section.steps.map((step) => (
+          <TutorialStep key={step.stepNumber} step={step} />
+        ))}
+      </CardContent>
+    </Card>
   );
 }
