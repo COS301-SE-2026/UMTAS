@@ -1,0 +1,18 @@
+docs/srs/Use_Cases/Attendance_Recording.md
+  h_84e82529bd05a5 17-21,40,60
+docs/srs/FUNCTIONAL_REQUIREMENTS.md
+  h_84e82529bd05a5 128-135
+docs/srs/Use_Cases/Traceability_Matrix/Traceability_Matrix.drawio
+  h_84e82529bd05a5 3,2856,2931-3055,3057-3061
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.18",
+  "base_commit_sha": "886a544bb03695db9374477b5fbde25e8ad16862",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}
