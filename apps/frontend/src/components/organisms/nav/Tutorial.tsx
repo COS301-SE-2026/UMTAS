@@ -6,9 +6,11 @@ import { Joyride, Step } from "react-joyride";
 export default function Tutorial({
   steps,
   wait = false,
+  eventName = "begin-tut",
 }: {
   steps: Step[];
   wait?: boolean;
+  eventName?: string;
 }) {
   const [run, setRun] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -23,8 +25,8 @@ export default function Tutorial({
       setRun(true);
     };
 
-    window.addEventListener("begin-tut", start);
-    return () => window.removeEventListener("begin-tut", start);
+    window.addEventListener(eventName, start);
+    return () => window.removeEventListener(eventName, start);
   }, []);
 
   useEffect(() => {
@@ -42,6 +44,7 @@ export default function Tutorial({
       steps={steps}
       run={run}
       continuous={true}
+      scrollToFirstStep={true}
       // @ts-expect-error idk why this keeps giving an error but it works haha
       callback={(data: { status: string; action: string }) => {
         if (["finished", "skipped"].includes(data.status)) {
