@@ -78,7 +78,7 @@ test("Update event", async ({ page }) => {
   await event.getByTestId("event-Code-Input").fill("AA");
   await event.getByTestId("event-Date-Input").fill("2026-12-30");
   await event.getByTestId("event-TimeStart-Select").click();
-  await page.getByRole("option", { name: "08:00" }).click();
+  await page.getByRole("option", { name: "07:00" }).click();
   await event.getByTestId("event-TimeEnd-Select").click();
   await page.getByRole("option", { name: "08:30" }).click();
   await event.getByTestId("event-Type-Select").click();
@@ -96,7 +96,7 @@ test("Update event", async ({ page }) => {
   await expect(event.getByTestId("event-Code-Input")).toHaveValue("AA");
   await expect(event.getByTestId("event-Date-Input")).toHaveValue("2026-12-30");
 
-  await expect(event.getByTestId("event-TimeStart-Select")).toHaveText("08:00");
+  await expect(event.getByTestId("event-TimeStart-Select")).toHaveText("07:00");
   await expect(event.getByTestId("event-TimeEnd-Select")).toHaveText("08:30");
 
   await expect(event.getByTestId("event-Type-Select")).toHaveText("Test");
