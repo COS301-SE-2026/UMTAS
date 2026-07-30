@@ -114,9 +114,12 @@ test.describe("Schedules", () => {
     );
     await TimetableNameInput.fill("TestName");
 
-    const EventCheckBox = createScheduleContainer
+    const EventCheckBox = page
+      .locator("div")
+      .filter({ has: page.getByText("AA", { exact: true }) })
       .getByTestId("schedule-Timetable-Checkbox")
       .first();
+
     await EventCheckBox.check();
     const createScheduleBtn = createScheduleContainer.getByTestId(
       "schedules-Create-Btn",
