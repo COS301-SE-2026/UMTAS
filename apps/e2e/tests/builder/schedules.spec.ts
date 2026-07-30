@@ -115,13 +115,18 @@ test("Create schedule", async ({ page }) => {
   );
   await TimetableNameInput.fill("TestName");
 
+  await page.waitForTimeout(1_000);
   const EventCheckBox = page
-    .locator("div")
-    .filter({ has: page.getByText("AA", { exact: true }) })
+    .getByTestId("outer-schedule-div")
+    .filter({ has: page.locator("p", { hasText: "AA" }) })
+    .first()
     .getByTestId("schedule-Timetable-Checkbox")
     .first();
 
   await EventCheckBox.check();
+
+  await EventCheckBox.check();
+
   const createScheduleBtn = createScheduleContainer.getByTestId(
     "schedules-Create-Btn",
   );

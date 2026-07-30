@@ -14,7 +14,7 @@ test("Solver uploads", async ({ page }) => {
   const fileInput = page.getByTestId("input-file-pdf");
   await fileInput.setInputFiles(filePath);
 
-  await page.waitForTimeout(15_000);
+  await page.waitForTimeout(5_000);
 
   const uploadBtn = page.getByTestId("btn-upload-confirm");
   const enabled = await uploadBtn.isEnabled();
