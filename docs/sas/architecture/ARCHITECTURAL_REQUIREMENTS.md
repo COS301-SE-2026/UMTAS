@@ -2,7 +2,7 @@
 
 ## Requirements
 
-| **ID** | **Requirement** | **Implemented response** |
+| **ID** | **Requirement** | **Current response / status** |
 |---|---|---|
 | **AR-1** | User workflows shall use a client-server boundary. | Browsers call the Core API rather than internal data or compute services. |
 | **AR-2** | University-specific import formats shall use adapters. | The parser selects the University of Pretoria adapter and returns canonical candidates. |
@@ -14,6 +14,8 @@
 | **AR-8** | Solver engines shall remain independently selectable. | Requests select CP-SAT, genetic search, or automatic CP-SAT-first fallback. |
 | **AR-9** | Imported academic data shall preserve a validation state. | Parser-created modules and events are stored with `validated` set to false. |
 | **AR-10** | Long-running components shall scale independently. | Core, parser-worker, and solver-worker containers have separate runtime and concurrency controls. |
+| **AR-11** | University analytics shall expose aggregate information without disclosing or permitting reconstruction of individual student schedules. | Authentication and role boundaries exist. The analytics aggregation boundary, identifier dissociation, and privacy audit evidence are not yet implemented. |
+| **AR-12** | A reusable synthetic workload shall exercise the system at the client's 20,000-user target. | Asynchronous job processing provides a scaling boundary, but the simulation workload and successful production-scale test are not yet implemented. |
 
 ## State Ownership
 
@@ -37,4 +39,9 @@
 | Authenticated callback | Terminal worker result to the Core API |
 | Polling | Browser reads of queued, completed, and failed jobs |
 
-Calendar providers, lecturer availability, analytics, and simulation remain future architectural concerns.
+The solution cache, additional solver heuristics, direct Google Calendar synchronisation, live
+university APIs, and lecturer availability remain future architectural concerns. Demo 2 calendar
+interoperability is implemented as browser-generated iCalendar export, while Google OAuth is an
+implemented optional identity-provider boundary.
+Privacy-preserving analytics and the reusable simulation workload are client-required architectural
+targets, but their current implementations and acceptance evidence remain incomplete.

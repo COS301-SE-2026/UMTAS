@@ -24,7 +24,7 @@ export default function SolverReview({
 }: SolverReviewProps) {
   return (
     <>
-      <Card className="shadow-lg border-[var(--border)] rounded-xl bg-[var(--bg-surface)]">
+      <Card className="shadow-lg border-[var(--border)] rounded-xl bg-[var(--bg-surface)] w-full h-full flex flex-col">
         <CardHeader className="text-xl font-bold text-[var(--text-primary)]">
           Review your Activities
         </CardHeader>
@@ -33,16 +33,20 @@ export default function SolverReview({
         </CardDescription>
         <CardContent
           id="card-review-stuff"
-          className="space-y-4 overflow-auto h-[50vh]"
+          className="flex flex-col flex-1 overflow-hidden space-y-4"
         >
-          <SolverReviewCard
-            events={events}
-            modules={modules}
-            onUpdateEvents={() => {}}
-          />
-          <Button id="btn-confirm-events" type="button" onClick={onComplete}>
-            Confirm Events
-          </Button>
+          <div className="flex-1 overflow-y-auto pr-2">
+            <SolverReviewCard
+              events={events}
+              modules={modules}
+              onUpdateEvents={() => {}}
+            />
+          </div>
+          <div className="mt-auto shrink-0 pt-2">
+            <Button id="btn-confirm-events" type="button" onClick={onComplete}>
+              Confirm Events
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </>

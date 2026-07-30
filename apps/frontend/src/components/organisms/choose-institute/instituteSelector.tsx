@@ -140,6 +140,9 @@ export function InstituteSelector({ onClose }: InstituteSelectorProps) {
                   e.stopPropagation();
                   handleConfirm();
                   triggerSuccessAndClose("Successfully continued!");
+                  setTimeout(() => {
+                    onClose?.();
+                  }, 1700);
                 }}
               >
                 Continue as {selectedInstitute?.role ?? "Student"}
@@ -169,6 +172,9 @@ export function InstituteSelector({ onClose }: InstituteSelectorProps) {
                       },
                     },
                   );
+                  setTimeout(() => {
+                    onClose?.();
+                  }, 1700);
                 }}
               >
                 {"Apply for role"}

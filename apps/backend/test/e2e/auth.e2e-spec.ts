@@ -3,9 +3,14 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { AppModule } from '../../src/app.module';
+import { DatabaseService } from '../../src/db/database.service';
 import { MailerService } from '../../src/mail/mailer.service';
 import { createMockMailer } from '../../test/utils/mailer.mock';
-import { TEST_AUTH_DATA, TEST_PASSWORD } from 'src/db/seeding/auth.seed';
+import {
+  AUTH_E2E_PASSWORD,
+  AUTH_E2E_USERS,
+  seedAuthE2eFixtures,
+} from '../utils/auth.fixtures';
 
 describe('Auth e2e', () => {
   let app: INestApplication;
@@ -15,7 +20,6 @@ describe('Auth e2e', () => {
     process.env.DB_MODE = 'PGLITE';
     process.env.NODE_ENV = 'test';
     process.env.SEED = 'TRUE';
-    process.env.SEED_TASKS = 'default-system-admin,auth-seed';
 
     mockMailer = createMockMailer();
 
@@ -28,6 +32,7 @@ describe('Auth e2e', () => {
 
     app = moduleFixture.createNestApplication();
     await app.init();
+    await seedAuthE2eFixtures(app.get(DatabaseService).db);
   }, 30000);
 
   afterAll(async () => {
@@ -110,15 +115,15 @@ describe('Auth e2e', () => {
       expect(res.status).toBe(401);
     });
 
-    test('sign-in with seeded user → 200', async () => {
+    test('sign-in with e2e fixture user → 200', async () => {
       const res = await request(app.getHttpServer())
         .post('/api/auth/sign-in/email')
         .send({
-          email: TEST_AUTH_DATA.users.student.email,
-          password: TEST_PASSWORD,
+          email: AUTH_E2E_USERS.student.email,
+          password: AUTH_E2E_PASSWORD,
         });
       expect(res.status).toBe(200);
-      expect(res.body.user.id).toBe(TEST_AUTH_DATA.users.student.id);
+      expect(res.body.user.id).toBe(AUTH_E2E_USERS.student.id);
     });
   });
 
@@ -134,8 +139,8 @@ describe('Auth e2e', () => {
     test('GET /get-session with valid cookie → 200', async () => {
       const agent = request.agent(app.getHttpServer());
       await agent.post('/api/auth/sign-in/email').send({
-        email: TEST_AUTH_DATA.users.student.email,
-        password: TEST_PASSWORD,
+        email: AUTH_E2E_USERS.student.email,
+        password: AUTH_E2E_PASSWORD,
       });
 
       const res = await agent.get('/api/auth/get-session');
@@ -146,8 +151,8 @@ describe('Auth e2e', () => {
     test('sign-out clears session', async () => {
       const agent = request.agent(app.getHttpServer());
       await agent.post('/api/auth/sign-in/email').send({
-        email: TEST_AUTH_DATA.users.student.email,
-        password: TEST_PASSWORD,
+        email: AUTH_E2E_USERS.student.email,
+        password: AUTH_E2E_PASSWORD,
       });
 
       await agent.post('/api/auth/sign-out');
@@ -159,8 +164,8 @@ describe('Auth e2e', () => {
     test('list-sessions and revoke-session', async () => {
       const agent = request.agent(app.getHttpServer());
       await agent.post('/api/auth/sign-in/email').send({
-        email: TEST_AUTH_DATA.users.student.email,
-        password: TEST_PASSWORD,
+        email: AUTH_E2E_USERS.student.email,
+        password: AUTH_E2E_PASSWORD,
       });
 
       const listRes = await agent.get('/api/auth/list-sessions');
@@ -183,8 +188,8 @@ describe('Auth e2e', () => {
     beforeEach(async () => {
       sysAdminAgent = request.agent(app.getHttpServer());
       await sysAdminAgent.post('/api/auth/sign-in/email').send({
-        email: TEST_AUTH_DATA.users.sysAdmin.email,
-        password: TEST_PASSWORD,
+        email: AUTH_E2E_USERS.sysAdmin.email,
+        password: AUTH_E2E_PASSWORD,
       });
     });
 
@@ -202,8 +207,8 @@ describe('Auth e2e', () => {
     test('admin/create-user as uni_admin creating lecturer → 200', async () => {
       const uniAdminAgent = request.agent(app.getHttpServer());
       await uniAdminAgent.post('/api/auth/sign-in/email').send({
-        email: TEST_AUTH_DATA.users.uniAdmin.email,
-        password: TEST_PASSWORD,
+        email: AUTH_E2E_USERS.uniAdmin.email,
+        password: AUTH_E2E_PASSWORD,
       });
 
       const res = await uniAdminAgent.post('/api/auth/admin/create-user').send({
@@ -218,8 +223,8 @@ describe('Auth e2e', () => {
     test('admin/create-user as uni_admin attempting sys_admin → 403', async () => {
       const uniAdminAgent = request.agent(app.getHttpServer());
       await uniAdminAgent.post('/api/auth/sign-in/email').send({
-        email: TEST_AUTH_DATA.users.uniAdmin.email,
-        password: TEST_PASSWORD,
+        email: AUTH_E2E_USERS.uniAdmin.email,
+        password: AUTH_E2E_PASSWORD,
       });
 
       const res = await uniAdminAgent.post('/api/auth/admin/create-user').send({
@@ -233,7 +238,7 @@ describe('Auth e2e', () => {
 
     test('admin/ban-user as sys_admin → 200', async () => {
       const res = await sysAdminAgent.post('/api/auth/admin/ban-user').send({
-        userId: TEST_AUTH_DATA.users.studentTwo.id,
+        userId: AUTH_E2E_USERS.studentTwo.id,
         reason: 'Test ban',
       });
       expect(res.status).toBe(200);
@@ -243,8 +248,8 @@ describe('Auth e2e', () => {
       const bannedRes = await request(app.getHttpServer())
         .post('/api/auth/sign-in/email')
         .send({
-          email: TEST_AUTH_DATA.users.studentTwo.email,
-          password: TEST_PASSWORD,
+          email: AUTH_E2E_USERS.studentTwo.email,
+          password: AUTH_E2E_PASSWORD,
         });
       expect(bannedRes.status).toBe(403);
       expect(bannedRes.body.error).toBe('USER_BANNED');
@@ -254,11 +259,11 @@ describe('Auth e2e', () => {
       const res = await sysAdminAgent
         .post('/api/auth/admin/impersonate-user')
         .send({
-          userId: TEST_AUTH_DATA.users.student.id,
+          userId: AUTH_E2E_USERS.student.id,
         });
       expect(res.status).toBe(200);
       // BetterAuth should return a new session for the target user
-      expect(res.body.user.id).toBe(TEST_AUTH_DATA.users.student.id);
+      expect(res.body.user.id).toBe(AUTH_E2E_USERS.student.id);
     });
   });
 
@@ -266,8 +271,8 @@ describe('Auth e2e', () => {
     test('student calls admin route → 403', async () => {
       const studentAgent = request.agent(app.getHttpServer());
       await studentAgent.post('/api/auth/sign-in/email').send({
-        email: TEST_AUTH_DATA.users.student.email,
-        password: TEST_PASSWORD,
+        email: AUTH_E2E_USERS.student.email,
+        password: AUTH_E2E_PASSWORD,
       });
 
       const res = await studentAgent.post('/api/auth/admin/create-user').send({
@@ -282,8 +287,8 @@ describe('Auth e2e', () => {
     test('lecturer calls admin route → 403', async () => {
       const lecturerAgent = request.agent(app.getHttpServer());
       await lecturerAgent.post('/api/auth/sign-in/email').send({
-        email: TEST_AUTH_DATA.users.lecturer.email,
-        password: TEST_PASSWORD,
+        email: AUTH_E2E_USERS.lecturer.email,
+        password: AUTH_E2E_PASSWORD,
       });
 
       const res = await lecturerAgent.post('/api/auth/admin/create-user').send({
@@ -309,7 +314,7 @@ describe('Auth e2e', () => {
     it('forgetPassword with known email sends reset mail', async () => {
       const res = await request(app.getHttpServer())
         .post('/api/auth/forget-password')
-        .send({ email: TEST_AUTH_DATA.users.student.email });
+        .send({ email: AUTH_E2E_USERS.student.email });
 
       expect(res.status).toBe(200);
       const sent = mockMailer.getSent();
@@ -322,7 +327,7 @@ describe('Auth e2e', () => {
     it('forgetPassword reset URL points to frontend (appURL), not backend port 3001', async () => {
       await request(app.getHttpServer())
         .post('/api/auth/forget-password')
-        .send({ email: TEST_AUTH_DATA.users.student.email });
+        .send({ email: AUTH_E2E_USERS.student.email });
 
       const sent = mockMailer.getSent();
       const resetMail = sent.find((m) => m.template === 'reset-password');
@@ -352,8 +357,8 @@ describe('Auth e2e', () => {
     it('uni_admin cannot assign uni_admin role via admin/create-user', async () => {
       const uniAdminAgent = request.agent(app.getHttpServer());
       await uniAdminAgent.post('/api/auth/sign-in/email').send({
-        email: TEST_AUTH_DATA.users.uniAdmin.email,
-        password: TEST_PASSWORD,
+        email: AUTH_E2E_USERS.uniAdmin.email,
+        password: AUTH_E2E_PASSWORD,
       });
 
       const res = await uniAdminAgent.post('/api/auth/admin/create-user').send({

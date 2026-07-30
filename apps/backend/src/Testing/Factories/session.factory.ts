@@ -1,11 +1,19 @@
 import { SessionData } from '../../auth/session.decorator';
 import { AppRole } from '../../auth/roles';
 
+type MockSessionOverrides = Omit<Partial<SessionData>, 'user' | 'session'> & {
+  user?: Partial<SessionData['user']>;
+  session?: Partial<SessionData['session']>;
+};
+
 export function createMockSession(
   userId: string,
   role: AppRole = 'user',
+  overrides: MockSessionOverrides = {},
 ): SessionData {
-  const now = new Date().toISOString();
+  const now = new Date();
+  const nowIso = now.toISOString();
+  const expiresAt = new Date(now.getTime() + 60 * 60 * 1000).toISOString();
 
   return {
     user: {
@@ -18,19 +26,23 @@ export function createMockSession(
       banned: false,
       banReason: undefined,
       banExpires: undefined,
-      createdAt: now,
-      updatedAt: now,
+      createdAt: nowIso,
+      updatedAt: nowIso,
+      ...overrides.user,
     },
     session: {
-      id: 'session_id',
-      token: 'tokentjie',
-      userId: userId,
-      expiresAt: now + 100000,
+      id: `test-session-${userId}`,
+      token: `test-token-${userId}`,
+      userId,
+      expiresAt,
       ipAddress: '127.0.0.1',
       userAgent: 'Mozilla/5.0',
       impersonatedBy: undefined,
-      createdAt: now,
-      updatedAt: now,
+      createdAt: nowIso,
+      updatedAt: nowIso,
+      ...overrides.session,
     },
+    uniId: overrides.uniId,
+    uniRole: overrides.uniRole,
   };
 }

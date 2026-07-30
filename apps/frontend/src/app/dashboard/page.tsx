@@ -153,7 +153,7 @@ function DashboardContent() {
   //johan has overwritten wilmar's dictatorship
   //To any curious reader since johan over wrote my dictatorship it stopped working again
 
-  const { data: session, isPending } = useSession();
+  const { isPending } = useSession();
   if (showSelectUni === true && UserDetails.getUniDetails()?.role) {
     SetSelectUni(false);
   }
@@ -165,8 +165,6 @@ function DashboardContent() {
       </div>
     );
   }
-
-  const userName = session?.user?.name ?? null;
 
   return (
     <>
@@ -184,7 +182,7 @@ function DashboardContent() {
           </div>
         </Popup>
       )}
-      <div className="flex flex-col w-full">
+      <div className="flex flex-col w-full min-h-[60vh] items-center justify-center">
         {/* hero */}
         <div className="w-full bg-[var(--bg-elevated)] border-b border-[var(--border)] py-12 lg:py-16">
           <div className="max-w-6xl mx-auto px-6 lg:px-8 w-full grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
@@ -198,7 +196,7 @@ function DashboardContent() {
               </Badge>
 
               <h1 className="text-4xl lg:text-5xl font-semibold text-[var(--text-primary)] leading-[1.1]">
-                Welcome {userName ? userName.split(" ")[0] : "Back"}.
+                Welcome.
               </h1>
 
               <p className="text-base lg:text-lg text-[var(--text-secondary)] leading-relaxed max-w-sm">

@@ -1,16 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { BaseSeedService } from '../base.seed.service';
 
-import { DatabaseService } from 'src/db/database.service';
+import { DatabaseService } from '../../database.service';
 
 //hashing
 import { hashPassword } from 'better-auth/crypto';
 
 //Tables
-import { accountsTable, usersTable } from 'src/entities';
+import { usersTable } from '../../../entities';
+import { SeedPersistenceService } from '../seed-persistence.service';
 
 @Injectable()
 export class UserSeedService extends BaseSeedService {
+  constructor(private readonly persistence: SeedPersistenceService) {
+    super();
+  }
+
   async seed(tx: DatabaseService['db']): Promise<void> {
     //Initialise constants
     const userIDs = this.constants.UserIDs;
@@ -48,21 +53,20 @@ export class UserSeedService extends BaseSeedService {
 
     if (missingUsers.length > 0) {
       //Seed missing users
-      const newUsers = await tx
-        .insert(usersTable)
-        .values(
-          missingUsers.map((user) => ({
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            role: user.role,
-            emailVerified: user.emailVerified,
-          })),
-        )
-        .returning();
+      const newUsers = await this.persistence.insertUsers(
+        tx,
+        missingUsers.map((user) => ({
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          emailVerified: user.emailVerified,
+        })),
+      );
 
       //Seed in the accounts table
-      await tx.insert(accountsTable).values(
+      await this.persistence.insertAccounts(
+        tx,
         missingUsers.map((user, index) => ({
           id: `${user.id}-account`,
           userId: newUsers[index].id,

@@ -1,7 +1,7 @@
 import { Test } from '@nestjs/testing';
 
 //Constants
-import { userId, courseId, uniId, groupId } from '../Testing/constants.spec';
+import { userId, courseId, uniId, groupId } from '../Testing/constants';
 
 //Table imports
 // import { modules, CourseModule, ModuleStyling } from '../entities/index';

@@ -19,8 +19,8 @@
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "clear && jest",
-    "test:int": "docker compose -f ./docker-compose.int.yml up --build --abort-on-container-exit --exit-code-from backend-int",
-    "test:int:local": "NODE_OPTIONS=--experimental-vm-modules jest --config jest.int.config.ts --runInBand",
+    "test:integration": "node --import tsx test/integration-runner/run.ts",
+    "test:integration:typecheck": "tsc -p test/integration-runner/tsconfig.json --noEmit",
     "test:watch": "jest --watch",
     "test:cov": "clear && jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
@@ -35,16 +35,15 @@
     "@nestjs/axios": "^4.0.1",
     "@nestjs/bullmq": "^11.0.4",
     "@nestjs/common": "^11.1.21",
-    "@nestjs/config": "^4.0.4",
     "@nestjs/core": "^11.1.21",
     "@nestjs/platform-express": "^11.1.21",
     "@nestjs/swagger": "^11.4.3",
     "@nestjs/terminus": "^11.1.1",
     "better-auth": "^1.6.11",
     "bullmq": "^5.76.10",
+    "c8": "^12.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.15.1",
-    "dotenv": "^16.6.1",
     "drizzle-orm": "^0.45.2",
     "fast-json-stable-stringify": "^2.1.0",
     "handlebars": "^4.7.9",
@@ -57,8 +56,7 @@
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
     "shared-types": "workspace:*",
-    "swagger-ui-express": "^5.0.1",
-    "zod": "^4.4.3"
+    "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.5",
@@ -89,6 +87,7 @@
     "ts-loader": "^9.5.7",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.22.3",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.59.4"
   }

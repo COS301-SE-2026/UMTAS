@@ -1,5 +1,5 @@
 import { randomUUID } from 'crypto';
-import { University } from 'src/entities';
+import { University } from '../../entities';
 
 type University = typeof University.$inferSelect;
 
