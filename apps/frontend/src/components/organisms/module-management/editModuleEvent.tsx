@@ -131,7 +131,7 @@ export default function EditModuleEvent({
           body: {
             moduleCode: moduleState.moduleCode,
             moduleName: moduleState.moduleName,
-            moduleDescription: moduleState.moduleDescription || undefined,
+            moduleDescription: moduleState.moduleDescription || " ",
             styling: moduleState.styling,
           },
         });
@@ -316,7 +316,11 @@ export default function EditModuleEvent({
           >
             Cancel
           </Button>
-          <Button onClick={handleSave} disabled={isPending}>
+          <Button
+            data-testid="save-changes-btn"
+            onClick={handleSave}
+            disabled={isPending}
+          >
             {isPending ? "Saving" : "Save Changes"}
           </Button>
         </div>

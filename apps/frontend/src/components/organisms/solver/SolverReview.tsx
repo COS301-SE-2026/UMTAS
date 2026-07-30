@@ -43,7 +43,12 @@ export default function SolverReview({
             />
           </div>
           <div className="mt-auto shrink-0 pt-2">
-            <Button id="btn-confirm-events" type="button" onClick={onComplete}>
+            <Button
+              data-testid="confirm-solver-events"
+              id="btn-confirm-events"
+              type="button"
+              onClick={onComplete}
+            >
               Confirm Events
             </Button>
           </div>

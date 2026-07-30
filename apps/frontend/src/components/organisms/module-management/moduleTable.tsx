@@ -126,6 +126,7 @@ function CourseTableBody<TData>({
           >
             {row.getVisibleCells().map((cell, index) => (
               <TableCell
+                data-testid="modules-table-cell"
                 key={cell.id}
                 className={`p-4 ${index === 0 ? "font-medium text-[var(--text-primary)]" : "text-[var(--text-secondary)]"}`}
                 onClick={() => {

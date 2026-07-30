@@ -2,6 +2,8 @@ import { test, expect } from "@playwright/test";
 
 const authFile = "playwright/.auth/user.json";
 
+test.describe.configure({ mode: "serial" });
+
 test("authenticate Admin", async ({ page }) => {
   await page.goto("/login");
   await page
@@ -13,5 +15,13 @@ test("authenticate Admin", async ({ page }) => {
 
   await page.getByRole("button", { name: "Log in" }).click();
   await page.waitForURL("**/dashboard");
+
+  if (!page.getByTestId("dashboard-popup-div").isVisible())
+    await page.getByTestId("click-avatar").click();
+
+  const instituteDiv = page.getByTestId("dashboard-popup-div");
+  await instituteDiv.getByTestId("institute-select-Uni").click();
+  await page.getByRole("option", { name: "University of Pretoria" }).click();
+  await instituteDiv.getByTestId("btn-continue").click();
   await page.context().storageState({ path: authFile });
 });

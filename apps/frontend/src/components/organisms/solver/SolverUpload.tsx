@@ -168,6 +168,7 @@ export default function SolverUpload({
           </Button>
 
           <Input
+            data-testid="input-file-pdf"
             ref={uploadFileRef}
             type="file"
             className="hidden"
@@ -188,6 +189,7 @@ export default function SolverUpload({
         </div>
 
         <Button
+          data-testid="btn-upload-confirm"
           id="btn-upload"
           disabled={
             currentlyPolling || moduleGroupID != null || selectedFile == null

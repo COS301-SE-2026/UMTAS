@@ -128,7 +128,6 @@ export class ModulesDto {
   })
   @IsOptional()
   @IsString()
-  @Length(1, 500)
   moduleDescription?: string | null;
 
   @ApiProperty({
