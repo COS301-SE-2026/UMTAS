@@ -1,3 +1,8 @@
+!!! abstract "Section Brief"
+    - This page contains all the Use Cases for our main system.
+    - The Use Cases are split up by system.
+    - Each Use Case System drop down also contains the respective Use Case diagram as well as the traceability matrix.
+
 ???+ info "Overview"
 
     <div class="uc-overview" markdown>
@@ -122,6 +127,17 @@
     | **UC-EX-02** | Sync Timetable with Google Calendar | [Calendar Export](#calendar-exporting-id) | Student |<span class="status-not-implemented">In Progress</span>|
     
     </div>
+
+    <div class="uc-table" markdown>
+
+    ## Solver System
+    | **ID** | **Use Case** | **Group** | **Actor** | **Status** |
+    |:---:|:---:|:---:|:---:|:---:|
+    | **UC-SV-01** | Solve with CP-SAT | [Solver System](#solver-system-id) | Student |<span class="status-implemented">Implemented</span>|
+    | **UC-SV-02** | Solve with GA | [Solver System](#solver-system-id)  | Student |<span class="status-implemented">Implemented</span>|
+
+    </div>
+
     <div class="uc-table" markdown>
 
     ## Analytics Dashboard
@@ -215,6 +231,10 @@
 ---
 <!-- Calendar Exporting -->
 {% include-markdown "srs/Use_Cases/Calendar_Exporting.md" %}
+
+---
+<!-- Calendar Exporting -->
+{% include-markdown "srs/Use_Cases/Solver_System.md" %}
 
 ---
 <!-- Analytics Dashboard -->

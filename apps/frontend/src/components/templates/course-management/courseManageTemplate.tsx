@@ -35,6 +35,8 @@ import { CourseDTO } from "@/app/course-management/queries/courses/courseBuilder
 import Tutorial from "@/components/organisms/nav/Tutorial";
 import NotFound from "@/app/not-found";
 import { AddCoursePopup } from "@/components/organisms/course-management/AddCoursePopup";
+import NoRoleSelected from "@/components/molecules/roleManagement/NoRoleSelected";
+import { EditCoursePopup } from "@/components/organisms/course-management/EditCoursePopup";
 const steps = [
   {
     target: "#input-search-courses-degrees-modules",
@@ -47,6 +49,10 @@ const steps = [
   {
     target: "#select-all-module",
     content: "Filter results by module type.",
+  },
+  {
+    target: "#btn-add-course",
+    content: "Create a new course for your institute.",
   },
   {
     target: "#btn-view-modules",
@@ -68,12 +74,13 @@ export default function CourseManagementTemplate() {
     Record<string, boolean>
   >({});
   const [showAddCourse, setShowAddCourse] = useState(false);
+  const [courseToEdit, setCourseToEdit] = useState<CourseDTO | null>(null);
 
   const ViableRole = UniDetails?.role === "UNIVERSITY_ADMIN";
 
-  if (UniDetails === null) {
-    router.push("/dashboard");
-  }
+  // if (UniDetails === null) {
+  //   router.push("/dashboard");
+  // }
 
   //forces you to pick an institude if you havent already
   useEffect(() => {
@@ -202,6 +209,9 @@ export default function CourseManagementTemplate() {
     );
   }
 
+  const hasRole = UniDetails?.role != null;
+  if (!hasRole) return <NoRoleSelected />;
+
   if (!ViableRole) {
     return <NotFound />;
     //console.log("account not admin");
@@ -267,7 +277,12 @@ export default function CourseManagementTemplate() {
                   ))}
                 </SelectContent>
               </Select>
-              <Button onClick={() => setShowAddCourse(true)}>Add Course</Button>
+              <Button
+                data-testid="show-add-course"
+                onClick={() => setShowAddCourse(true)}
+              >
+                Add Course
+              </Button>
               {showAddCourse && (
                 <AddCoursePopup onClose={() => setShowAddCourse(false)} />
               )}
@@ -316,14 +331,23 @@ export default function CourseManagementTemplate() {
                           {modules.length} modules
                         </TableCell>
                         <TableCell className="p-4 text-right">
-                          <Button
-                            id="btn-view-modules"
-                            size="sm"
-                            variant="outline"
-                            onClick={() => toggleExpand(course.CourseID)}
-                          >
-                            {isExpanded ? "Hide Modules" : "View Modules"}
-                          </Button>
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setCourseToEdit(course)}
+                            >
+                              Edit
+                            </Button>
+                            <Button
+                              id="btn-view-modules"
+                              size="sm"
+                              variant="default"
+                              onClick={() => toggleExpand(course.CourseID)}
+                            >
+                              {isExpanded ? "Hide Modules" : "View Modules"}
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                       {isExpanded && (
@@ -367,6 +391,15 @@ export default function CourseManagementTemplate() {
           </Table>
         </div>
       </div>
+
+      {courseToEdit && (
+        <EditCoursePopup
+          onClose={() => setCourseToEdit(null)}
+          courseId={courseToEdit.CourseID}
+          initialCourseName={courseToEdit.CourseName ?? ""}
+          initialDegreeName={courseToEdit.Degree ?? ""}
+        />
+      )}
     </>
   );
 }

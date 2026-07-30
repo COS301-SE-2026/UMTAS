@@ -4,6 +4,7 @@ import { UserDetails } from "@/lib/userclass/userClass";
 import { useRouter } from "next/navigation";
 import Tutorial from "@/components/organisms/nav/Tutorial";
 import NotFound from "@/app/not-found";
+import NoRoleSelected from "@/components/molecules/roleManagement/NoRoleSelected";
 const steps = [
   {
     target: "#input-search-name-email-role",
@@ -49,6 +50,9 @@ export default function RoleManagementTemplate() {
   }
 
   if (ViableRole) {
+    const hasRole = UniDetails?.role != null;
+    if (!hasRole) return <NoRoleSelected />;
+
     return (
       <>
         <Tutorial steps={steps} wait={true} />

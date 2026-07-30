@@ -71,7 +71,7 @@ const Features = [
 const Links = [
   {
     label: "Documentation",
-    href: "https://cos301-se-2026.github.io/UMTAS/",
+    href: "https://cos301-se-2026.github.io/UMTAS/latest/",
     id: "documentation-link",
   },
   {
@@ -148,19 +148,32 @@ function DashboardContent() {
   function handleBuild() {
     router.push("/builder");
   }
-  const [showSelectUni, SetSelectUni] = useState(true);
+  const [mounted, setMounted] = useState(false);
+  const [showSelectUni, SetSelectUni] = useState(false);
   //Wilmar has DICTACTED this shall no longer exist.
   //johan has overwritten wilmar's dictatorship
   //To any curious reader since johan over wrote my dictatorship it stopped working again
 
   const { isPending } = useSession();
-  if (showSelectUni === true && UserDetails.getUniDetails()?.role) {
-    SetSelectUni(false);
-  }
 
-  if (isPending) {
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMounted(true);
+    const sync = () => SetSelectUni(!UserDetails.getUniDetails()?.role);
+    sync();
+    window.addEventListener("focus", sync);
+    window.addEventListener("storage", sync);
+    window.addEventListener(UserDetails.changeEvent, sync);
+    return () => {
+      window.removeEventListener("focus", sync);
+      window.removeEventListener("storage", sync);
+      window.removeEventListener(UserDetails.changeEvent, sync);
+    };
+  }, []);
+
+  if (!mounted || isPending) {
     return (
-      <div className="flex flex-col w-full min-h-[60vh] items-center justify-center">
+      <div className="fixed w-full inset-0 flex items-center justify-center bg-black/70 z-50">
         <PageSkeleton rows={3} />
       </div>
     );
@@ -170,11 +183,11 @@ function DashboardContent() {
     <>
       {showSelectUni && (
         <Popup>
-          <div className="w-fit text-center">
+          <div data-testid="dashboard-popup-div" className="w-fit text-center">
             <ChooseInstituteTemplate
-              onClose={() => {
+              onClose={async () => {
                 if (UserDetails.getUniDetails()?.role) {
-                  SetSelectUni(false);
+                  await SetSelectUni(false);
                 }
               }}
             />

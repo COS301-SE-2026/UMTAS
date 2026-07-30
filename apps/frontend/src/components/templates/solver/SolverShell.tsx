@@ -14,9 +14,9 @@ import { fetchAllModules } from "@/app/course-management/queries/modules/moduleB
 
 import Tutorial from "@/components/organisms/nav/Tutorial";
 import { UserDetails } from "@/lib/userclass/userClass";
-import { useRouter } from "next/navigation";
 import Popup from "@/components/atoms/utility/floatContainer";
 import { ChooseInstituteTemplate } from "../choose-institute/chooseInstituteTemplate";
+import NoRoleSelected from "@/components/molecules/roleManagement/NoRoleSelected";
 const steps = [
   {
     target: "#btn-browse-files",
@@ -50,7 +50,7 @@ export default function SolverShell() {
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [comingFromStep, setComingFromStep] = useState<number | null>(null);
   const [moduleGroupingID, setModuleGroupingID] = useState<string | null>(null);
-  const router = useRouter();
+  const UniDetails = UserDetails.getUniDetails();
   const { data: modulesData } = useQuery({
     queryKey: ["PDF", "MODULES"],
     queryFn: () => {
@@ -94,6 +94,9 @@ export default function SolverShell() {
     setCurrentStep(0);
   }
 
+  const hasRole = UniDetails?.role != null;
+  if (!hasRole) return <NoRoleSelected />;
+
   return (
     <>
       <Tutorial steps={steps} wait={true} />
@@ -109,20 +112,6 @@ export default function SolverShell() {
         ]}
       />
 
-      {showSelectUni && (
-        <Popup>
-          <div className="w-fit text-center">
-            <ChooseInstituteTemplate
-              onClose={() => {
-                if (UserDetails.getUniDetails()?.role) {
-                  SetSelectUni(false);
-                }
-              }}
-            />
-            <div className="w-full mt-5 items-center justify-center flex"></div>
-          </div>
-        </Popup>
-      )}
       <div className="flex flex-wrap justify-center gap-8 xl:gap-16 w-full max-w-[1920px] mx-auto px-4 md:px-6 pt-6">
         <div className="flex w-120 h-110 justify-center">
           <SolverUpload
@@ -131,7 +120,10 @@ export default function SolverShell() {
             setModuleGroupID={setModuleGroupingID}
           />
         </div>
-        <div className="flex w-120 h-110 justify-center">
+        <div
+          data-testid="div-review-solver"
+          className="flex w-120 h-110 justify-center"
+        >
           <SolverLock locked={currentStep < 1} loading={comingFromStep === 0}>
             <SolverReview
               events={events}

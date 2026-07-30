@@ -61,6 +61,7 @@ export function CustomiseModuleCard({
               Code
             </Label>
             <Input
+              data-testid="update-module-code"
               id={"module-code-" + module.moduleID}
               value={module.moduleCode}
               onChange={(e) =>
@@ -87,6 +88,7 @@ export function CustomiseModuleCard({
               Name
             </Label>
             <Input
+              data-testid="update-module-name"
               id={"module-name-" + module.moduleID}
               value={module.moduleName}
               onChange={(e) =>

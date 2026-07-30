@@ -6,6 +6,7 @@ import { uniDto } from "@/app/choose-institute/queries/builders";
 
 export class UserDetails {
   private static uniKey = "universityDetails";
+  public static changeEvent = "unidetails-changed";
   private static checkWindow() {
     if (typeof window !== "undefined") {
       return true;
@@ -16,6 +17,7 @@ export class UserDetails {
     if (!details || !this.checkWindow()) return;
     const data = JSON.stringify(details);
     localStorage.setItem(this.uniKey, data);
+    window.dispatchEvent(new Event(this.changeEvent));
     console.log("University stored", details);
   }
   public static getUniDetails(): uniDto | undefined {

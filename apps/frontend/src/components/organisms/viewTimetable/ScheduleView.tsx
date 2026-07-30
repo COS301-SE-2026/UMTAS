@@ -47,6 +47,7 @@ import { removeTimetableMut } from "@/components/templates/builder/Queries/timet
 import { useMutation } from "@tanstack/react-query";
 import { fetchAllModules } from "@/app/course-management/queries/modules/moduleBuilder";
 import { UserDetails } from "@/lib/userclass/userClass";
+import NoRoleSelected from "@/components/molecules/roleManagement/NoRoleSelected";
 
 import Tutorial from "@/components/organisms/nav/Tutorial";
 const emptySteps = [
@@ -83,6 +84,8 @@ export function ScheduleView({
   onExportReady,
 }: ScheduleViewProps) {
   const router = useRouter();
+  const UniDetails = UserDetails.getUniDetails();
+
   const [selectedTimetableId, setSelectedTimetableId] = useState<string>("");
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -369,6 +372,9 @@ export function ScheduleView({
         />
       );
     }
+
+    const hasRole = UniDetails?.role != null;
+    if (!hasRole) return <NoRoleSelected />;
 
     return (
       <>
