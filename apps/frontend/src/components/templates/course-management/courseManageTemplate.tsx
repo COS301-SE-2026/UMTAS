@@ -36,6 +36,7 @@ import Tutorial from "@/components/organisms/nav/Tutorial";
 import NotFound from "@/app/not-found";
 import { AddCoursePopup } from "@/components/organisms/course-management/AddCoursePopup";
 import NoRoleSelected from "@/components/molecules/roleManagement/NoRoleSelected";
+import { EditCoursePopup } from "@/components/organisms/course-management/EditCoursePopup";
 const steps = [
   {
     target: "#input-search-courses-degrees-modules",
@@ -73,6 +74,7 @@ export default function CourseManagementTemplate() {
     Record<string, boolean>
   >({});
   const [showAddCourse, setShowAddCourse] = useState(false);
+  const [courseToEdit, setCourseToEdit] = useState<CourseDTO | null>(null);
 
   const ViableRole = UniDetails?.role === "UNIVERSITY_ADMIN";
 
@@ -276,7 +278,7 @@ export default function CourseManagementTemplate() {
                 </SelectContent>
               </Select>
               <Button
-                id="btn-add-course"
+                data-testid="show-add-course"
                 onClick={() => setShowAddCourse(true)}
               >
                 Add Course
@@ -329,14 +331,23 @@ export default function CourseManagementTemplate() {
                           {modules.length} modules
                         </TableCell>
                         <TableCell className="p-4 text-right">
-                          <Button
-                            id="btn-view-modules"
-                            size="sm"
-                            variant="outline"
-                            onClick={() => toggleExpand(course.CourseID)}
-                          >
-                            {isExpanded ? "Hide Modules" : "View Modules"}
-                          </Button>
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setCourseToEdit(course)}
+                            >
+                              Edit
+                            </Button>
+                            <Button
+                              id="btn-view-modules"
+                              size="sm"
+                              variant="default"
+                              onClick={() => toggleExpand(course.CourseID)}
+                            >
+                              {isExpanded ? "Hide Modules" : "View Modules"}
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                       {isExpanded && (
@@ -380,6 +391,15 @@ export default function CourseManagementTemplate() {
           </Table>
         </div>
       </div>
+
+      {courseToEdit && (
+        <EditCoursePopup
+          onClose={() => setCourseToEdit(null)}
+          courseId={courseToEdit.CourseID}
+          initialCourseName={courseToEdit.CourseName ?? ""}
+          initialDegreeName={courseToEdit.Degree ?? ""}
+        />
+      )}
     </>
   );
 }

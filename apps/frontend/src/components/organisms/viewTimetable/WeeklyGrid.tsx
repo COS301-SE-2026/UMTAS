@@ -214,8 +214,8 @@ export function WeeklyGrid({ events, weekStart }: WeeklyGridProps) {
   }
 
   return (
-    <div className="w-full max-h-[65vh] overflow-y-auto relative rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.08)] custom-scrollbar">
-      <div className="flex w-full">
+    <div className="w-full max-h-[65vh] overflow-auto relative rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.08)] custom-scrollbar">
+      <div className="flex w-full min-w-[600px]">
         {renderTimeColumn()}
         {weekDates.map((date) => renderDayColumn(date))}
       </div>

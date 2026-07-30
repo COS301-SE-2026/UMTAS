@@ -5,16 +5,19 @@ const schedulesSteps: HelpStep[] = [
     stepNumber: 1,
     title: "Select a Schedule",
     description: `Select the schedule you want to view from the dropdown.`,
+    imageUrl: "/images/Schedules/steps/step1.png",
   },
   {
     stepNumber: 2,
     title: "Customise your Schedule or Events",
     description: `To edit your timetable name or event's relative fields click the 'Edit' button.`,
+    imageUrl: "/images/Schedules/steps/step2.png",
   },
   {
     stepNumber: 3,
     title: "Delete Schedule",
     description: `To delete your schedule, click the 'Delete' button.`,
+    imageUrl: "/images/Schedules/steps/step3.png",
   },
   {
     stepNumber: 4,
@@ -25,6 +28,7 @@ const schedulesSteps: HelpStep[] = [
     stepNumber: 5,
     title: "View different week",
     description: `To view your schedule on a different week, use the arrow buttons surrounding the date to go to the previous or next week.`,
+    imageUrl: "/images/Schedules/steps/step5.png",
   },
 ];
 

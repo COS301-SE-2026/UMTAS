@@ -24,6 +24,7 @@ export function UserAvatar({ name, className }: UserAvatarProps) {
 
   return (
     <span
+      data-testid="click-avatar"
       aria-label={name ? `${name}'s avatar` : "User avatar"}
       className={cn(
         "inline-flex items-center justify-center",

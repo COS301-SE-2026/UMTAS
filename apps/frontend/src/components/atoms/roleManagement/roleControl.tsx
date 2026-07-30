@@ -74,7 +74,10 @@ function RoleSelectElement({ row }: pageProps) {
           updateRole(newRole as rolesTypeType);
         }}
       >
-        <SelectTrigger id="select-role-for-the-user">
+        <SelectTrigger
+          data-testid="select-user-role"
+          id="select-role-for-the-user"
+        >
           <SelectValue placeholder="Select a Role"></SelectValue>
         </SelectTrigger>
 
@@ -89,6 +92,7 @@ function RoleSelectElement({ row }: pageProps) {
         </SelectContent>
       </Select>
       <Button
+        data-testid="update-role-btn"
         id="update-role-of-user"
         className="ml-5"
         onClick={() =>

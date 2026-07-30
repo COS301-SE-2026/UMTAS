@@ -268,6 +268,7 @@ export default function SolverPreferences({ modules, events }: solverProps) {
         {solveMode(currentMode)}
         <div className="flex flex-col gap-y-2">
           <Input
+            data-testid="input-solver-timetable-name"
             id="input-name-timetable"
             placeholder="Name timetable"
             value={timetableName}
@@ -276,6 +277,7 @@ export default function SolverPreferences({ modules, events }: solverProps) {
             }}
           ></Input>
           <Button
+            data-testid="btn-upload-and-create-timetable"
             id="btn-upload-and-create-timetable"
             disabled={loadingStatus()}
             type="button"
