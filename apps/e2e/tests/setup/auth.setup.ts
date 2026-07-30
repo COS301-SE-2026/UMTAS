@@ -17,6 +17,7 @@ test("authenticate Admin", async ({ page }) => {
   await page.waitForURL("**/dashboard");
 
   const instituteDiv = page.getByTestId("dashboard-popup-div");
+  await page.getByTestId("click-avatar").click();
   await instituteDiv.getByTestId("institute-select-Uni").click();
   await page.getByRole("option", { name: "University of Pretoria" }).click();
   await instituteDiv.getByTestId("btn-continue").click();
