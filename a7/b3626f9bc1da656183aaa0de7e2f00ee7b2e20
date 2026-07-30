@@ -1,0 +1,14 @@
+apps/frontend/src/components/templates/course-management/courseManageTemplate.tsx
+  h_84e82529bd05a5 52-54,274
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.18",
+  "base_commit_sha": "a7b3626f9bc1da656183aaa0de7e2f00ee7b2e20",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}
