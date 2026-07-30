@@ -125,6 +125,14 @@
     - **R3.3.1.2** The system shall send out alerts if times have changed for an event.  
     - **R3.3.1.3** The system shall send out alerts if event status has changed, such as a cancellation of the event on a day.  
 
+### R3.4 Attendance Recording System
+- **R3.4.1** The system will allow students to record and manage their attendance intent for events.
+    - **R3.4.1.1** The system shall allow students to indicate their attendance intent for an event as Will Attend, Will Not Attend, or Not Specified.
+    - **R3.4.1.2** The system shall default a student's attendance intent to Not Specified if no option is selected.
+    - **R3.4.1.3** The system shall allow students to remove a previously recorded attendance response for an event.
+    - **R3.4.1.4** The system shall require student confirmation before removing a recorded attendance response.
+    - **R3.4.1.5** The system shall update projected attendance analytics whenever a student's attendance response is recorded or removed.
+
 # FR 4 Administation system
 
 ### FR 4.1 Course management for university admins
