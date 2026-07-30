@@ -4,7 +4,7 @@ import {
   CardHeader,
 } from "@/components/atoms/baseShadcn/card";
 import Popup from "@/components/atoms/utility/floatContainer";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/atoms/baseShadcn/button";
 
 export default function NoRoleSelected() {
