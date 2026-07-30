@@ -267,7 +267,12 @@ export default function CourseManagementTemplate() {
                   ))}
                 </SelectContent>
               </Select>
-              <Button onClick={() => setShowAddCourse(true)}>Add Course</Button>
+              <Button
+                data-testid="show-add-course"
+                onClick={() => setShowAddCourse(true)}
+              >
+                Add Course
+              </Button>
               {showAddCourse && (
                 <AddCoursePopup onClose={() => setShowAddCourse(false)} />
               )}

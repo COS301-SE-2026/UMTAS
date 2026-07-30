@@ -66,6 +66,7 @@ export function AddCoursePopup({ onClose }: AddCoursePopupProps) {
             {/* willie put me on that id grindd */}
             <Label htmlFor="course-name">Course Name</Label>
             <Input
+              data-testid="course-name-input"
               id="course-name"
               value={courseName}
               onChange={(e) => setCourseName(e.target.value)}
@@ -73,8 +74,9 @@ export function AddCoursePopup({ onClose }: AddCoursePopupProps) {
               disabled={isPending || !!successMessage}
               className="bg-[var(--background)] border-[var(--border)] text-[var(--text-primary)] mb-4"
             />
-            <Label htmlFor="degree-name">Degree Name</Label>
+            <Label htmlFor="degree-name">Degrhuee Name</Label>
             <Input
+              data-testid="degree-name-input"
               id="degree-name"
               value={degreeName}
               onChange={(e) => setDegreeName(e.target.value)}
@@ -93,6 +95,7 @@ export function AddCoursePopup({ onClose }: AddCoursePopupProps) {
               Cancel
             </Button>
             <Button
+              data-testid="add-course-confirm"
               onClick={handleSave}
               disabled={!courseName.trim() || isPending || !!successMessage}
               className={
