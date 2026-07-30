@@ -52,13 +52,13 @@ Get up and running with the UMTAS platform in minutes.
 
     [:octicons-arrow-right-24: Open SAS](sas/index.md)
 
--   :material-book-open-page-variant:{ .lg .middle } __API Reference__
+-   :material-book-open-page-variant:{ .lg .middle } __Software Requirements__
 
     ---
 
-    Explore the interactive Swagger documentation for the Core and Adapter services.
+    Explore our Software Requirements, Use Cases, traceability matrix and user stories.
 
-    [:octicons-arrow-right-24: View APIs](api/API-Reference.md)
+    [:octicons-arrow-right-24: View SRS](srs/index.md)
 
 -   :material-palette:{ .lg .middle } __Brand Style Guide__
 

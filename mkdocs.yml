@@ -65,11 +65,11 @@ nav:
   - SRS:
       - Overview: srs/index.md
       - User Stories: srs/USER_STORIES.md
-      - Use Cases: srs/USE_CASES.md
+      - Use Cases + Traceability Matrix: srs/USE_CASES.md
       - Functional Requirements: srs/FUNCTIONAL_REQUIREMENTS.md
       - Non-Functional Requirements: srs/NON-FUNCTIONAL_REQUIREMENTS.md
       - Domain Model: srs/DOMAIN_MODEL.md
-      - Traceability Matrix: srs/Traceability-Matrix.md
+
   - SAS:
       - Overview: sas/index.md
       - Architectural Requirements: sas/architecture/ARCHITECTURAL_REQUIREMENTS.md

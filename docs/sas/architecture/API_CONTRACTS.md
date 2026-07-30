@@ -1,6 +1,6 @@
 # API Contracts
 
-<swagger-ui src="https://api.capstone-vigil.dns.net.za/api/docs-json" />
+<swagger-ui src="https://capstone-vigil.dns.net.za/api/docs-json" />
 
 ## Worker CLI Invocations & Integration
 
