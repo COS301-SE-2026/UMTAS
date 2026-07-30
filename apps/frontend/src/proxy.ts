@@ -19,6 +19,7 @@ const PUBLIC_PATHS = [
   "/faq",
   "/help",
   "/brand-style",
+  "/tutorial",
 ];
 
 export function proxy(request: NextRequest) {
