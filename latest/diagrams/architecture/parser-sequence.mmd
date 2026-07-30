@@ -1,0 +1,27 @@
+sequenceDiagram
+    actor User
+    participant Frontend
+    participant API as Core API
+    participant Storage as Blob Storage
+    participant Queue as Parse Job Queue
+    participant Worker as PDF Parser Worker
+    participant DB as Timetable Database
+
+    User->>Frontend: Submit timetable PDF
+    Frontend->>API: Request timetable import
+    API->>API: Validate source and create parse job
+    API->>Storage: Store source PDF
+    API->>Queue: Assign parse job
+    API-->>Frontend: Return job reference
+
+    Queue-->>Worker: Deliver assigned job
+    Worker->>Storage: Read source PDF
+    Worker->>Worker: Extract data with university adapter
+    Worker->>API: Return normalized timetable and outcome
+    API->>DB: Record timetable data and job status
+
+    loop While import is running
+        Frontend->>API: Check import status
+        API-->>Frontend: Progress or completion
+    end
+    Frontend-->>User: Display imported timetable data
