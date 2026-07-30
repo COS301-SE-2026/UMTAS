@@ -1,7 +1,7 @@
 import { Test } from '@nestjs/testing';
 
 //Constants
-import { timetableId, userId } from '../Testing/constants.spec';
+import { timetableId, userId } from '../Testing/constants';
 
 //Actual Services
 import { TimetableService } from './timetable.service';

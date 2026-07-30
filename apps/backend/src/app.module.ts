@@ -1,10 +1,8 @@
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
-import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabaseModule } from './db/database.module';
-// import { SeedModule } from './db/seeding/seed.module';
 import { HealthModule } from './health/health.module';
 import { MailModule } from './mail/mail.module';
 import { AuthController } from './auth/auth.controller';
@@ -26,12 +24,7 @@ import { GroupingModule } from './Grouping/grouping.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-      envFilePath: ['.env', '.env.local', '../../.env', '../../.env.local'],
-    }),
     DatabaseModule,
-    // SeedModule,
     HealthModule,
     MailModule,
     ModuleModule,
