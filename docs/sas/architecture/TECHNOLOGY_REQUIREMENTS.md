@@ -22,7 +22,7 @@ university-adapter modifiability.
 | Boundary validation | NestJS DTO validation, Zod schemas, Python parser validation | HTTP, queue, process, and callback validation | Each runtime validates its boundary. Trade-off: equivalent contracts must remain synchronized. |
 | Frontend framework | Next.js | Browser delivery and route-level role separation | Supports server rendering and React-based surfaces. Trade-off: more complexity than a plain SPA. |
 | Component and styling system | Shadcn/UI, Radix UI, Tailwind CSS | Accessible components and theming | Supports accessible, themeable interfaces. Trade-off: requires design-token governance. |
-| Client state management | Zustand | Shared browser state | Fits workspace and UI preference state without replacing server ownership. |
+| Client state management | Tanstack | Shared browser state | Fits workspace and UI preference state without replacing server ownership. |
 
 ## Cross-Cutting Platform Choices
 
