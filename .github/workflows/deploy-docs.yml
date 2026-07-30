@@ -33,7 +33,7 @@ jobs:
       - name: Deploy Production
         if: github.event_name == 'push' || github.ref == 'refs/heads/main'
         run: |
-          sed -i 's|site_url: .*|site_url: https://cos301-se-2026.github.io/UMTAS/latest/|' mkdocs.yml
+          sed -i 's|site_url: .*|site_url: https://cos301-se-2026.github.io/UMTAS/latest//|' mkdocs.yml
           mkdocs build
           mkdir -p site_mapping
           mv site site_mapping/latest

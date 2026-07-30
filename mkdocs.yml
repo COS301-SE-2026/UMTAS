@@ -1,5 +1,5 @@
 site_name: UMTAS Documentation
-site_url: https://cos301-se-2026.github.io/UMTAS/
+site_url: https://cos301-se-2026.github.io/UMTAS/latest/
 extra_css:
   - stylesheets/extra.css
 
