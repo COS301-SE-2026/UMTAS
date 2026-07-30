@@ -276,7 +276,7 @@ export default function CourseManagementTemplate() {
                 </SelectContent>
               </Select>
               <Button
-                id="btn-add-course"
+                data-testid="show-add-course"
                 onClick={() => setShowAddCourse(true)}
               >
                 Add Course

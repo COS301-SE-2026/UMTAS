@@ -175,6 +175,7 @@ export function GenerateStep({
 
             return (
               <div
+                data-testid="outer-schedule-div"
                 key={event.eventId}
                 className="flex flex-row items-center gap-1 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] px-4 py-4 shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.08)]"
               >

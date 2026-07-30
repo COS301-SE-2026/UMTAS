@@ -17,7 +17,7 @@ import { UserDetails } from "@/lib/userclass/userClass";
 
 export function getAllModCoursesQ(queries?: getAllModulesQueries) {
   return queryOptions({
-    queryKey: ["Modules", "Courses"],
+    queryKey: ["Modules"],
     queryFn: async () => {
       const result = await fetchAllModules({
         userEnrollment: true,
@@ -36,6 +36,8 @@ export function updateModQ() {
       const builder = new updateModuleBuilder();
       return builder.send({ body: vars.body, paths: vars.path });
     },
+    onSuccess: () =>
+      getQueryClient().invalidateQueries({ queryKey: ["Modules"] }),
     onError: (err) => console.error("mutation failed", err),
   });
 }
