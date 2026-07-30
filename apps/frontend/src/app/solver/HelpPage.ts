@@ -1,12 +1,6 @@
-import {
-  HelpPageSection,
-  HelpStep,
-  createHelpPage,
-} from "../../types/HelpPage";
+import { HelpPageSection, HelpStep } from "../../types/HelpPage";
 
-const page = "Upload PDF";
-
-const steps: HelpStep[] = [
+const solverSteps: HelpStep[] = [
   {
     stepNumber: 1,
     title: "Upload your PDF",
@@ -24,6 +18,16 @@ const steps: HelpStep[] = [
   },
 ];
 
-export const HelpPage: HelpPageSection = createHelpPage(page, {
-  steps,
-});
+export const solverSection: HelpPageSection = {
+  id: "solver",
+  title: "Upload PDF",
+  description:
+    "Upload Your Timetable PDF, Review Your Events and Check Your Preferences.",
+  pageName: "Upload Page",
+  pageImage: {
+    url: "/images/Solver/image.png",
+    //altText: "c",
+  },
+  roles: ["all"],
+  steps: solverSteps,
+};

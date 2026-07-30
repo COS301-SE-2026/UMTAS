@@ -1,16 +1,11 @@
-import {
-  HelpPageSection,
-  HelpStep,
-  createHelpPage,
-} from "../../types/HelpPage";
+import { HelpPageSection, HelpStep } from "../../types/HelpPage";
 
-const page = "Event Builder";
-
-const steps: HelpStep[] = [
+const builderSteps: HelpStep[] = [
   {
     stepNumber: 1,
     title: "Create a module",
     description: `Click the 'Add Module' button to create a new default module that belongs to you.`,
+    imageUrl: "/images/Builder/steps/step1.png",
   },
   {
     stepNumber: 2,
@@ -49,6 +44,15 @@ const steps: HelpStep[] = [
   },
 ];
 
-export const HelpPage: HelpPageSection = createHelpPage(page, {
-  steps,
-});
+export const builderSection: HelpPageSection = {
+  id: "builder",
+  title: "Event Builder",
+  description: "Build Modules and Events to Create a Timetable.",
+  pageName: "Builder Page",
+  pageImage: {
+    url: "/images/Builder/image.png",
+    //altText: "builder image",
+  },
+  roles: ["all"],
+  steps: builderSteps,
+};

@@ -1,12 +1,6 @@
-import {
-  HelpPageSection,
-  HelpStep,
-  createHelpPage,
-} from "../../types/HelpPage";
+import { HelpPageSection, HelpStep } from "../../types/HelpPage";
 
-const page = "Home";
-
-const steps: HelpStep[] = [
+const dashboardSteps: HelpStep[] = [
   {
     stepNumber: 1,
     title: "Build your own schedule",
@@ -19,6 +13,15 @@ const steps: HelpStep[] = [
   },
 ];
 
-export const HelpPage: HelpPageSection = createHelpPage(page, {
-  steps,
-});
+export const dashboardSection: HelpPageSection = {
+  id: "dashboard",
+  title: "Dashboard",
+  description: "Access Resources or Build a Timetable.",
+  pageName: "Home Page",
+  pageImage: {
+    url: "/images/Dashboard/image.png",
+    //altText: "c",
+  },
+  roles: ["all"],
+  steps: dashboardSteps,
+};

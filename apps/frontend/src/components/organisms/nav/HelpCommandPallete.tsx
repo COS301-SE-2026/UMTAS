@@ -177,12 +177,12 @@ export function HelpCommandPalette() {
           href: "/faq",
           "data-tour": "faq",
         },
-        // {
-        //   id: "help-centre",
-        //   children: "Help Centre",
-        //   icon: "BookOpenIcon",
-        //   href: "/help",
-        // },
+        {
+          id: "user-manual",
+          children: "User Manual",
+          icon: "BookOpenIcon",
+          href: "/tutorial",
+        },
         {
           id: "run-tutorial",
           children: "Run Tutorial for this Page",

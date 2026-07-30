@@ -1,12 +1,6 @@
-import {
-  HelpPageSection,
-  HelpStep,
-  createHelpPage,
-} from "../../types/HelpPage";
+import { HelpPageSection, HelpStep } from "../../types/HelpPage";
 
-const page = "Manage Courses";
-
-const steps: HelpStep[] = [
+const courseSteps: HelpStep[] = [
   {
     stepNumber: 1,
     title: "View all Courses",
@@ -29,7 +23,15 @@ const steps: HelpStep[] = [
   },
 ];
 
-export const HelpPage: HelpPageSection = createHelpPage(page, {
-  roles: ["UNIVERSITY_ADMIN"],
-  steps,
-});
+export const courseSection: HelpPageSection = {
+  id: "course-management",
+  title: "Course Management",
+  description: "View, filter and edit courses as an admin.",
+  pageName: "Course Page",
+  pageImage: {
+    url: "/images/CourseManagement/image.png",
+    //altText: "course image",
+  },
+  roles: ["all"],
+  steps: courseSteps,
+};

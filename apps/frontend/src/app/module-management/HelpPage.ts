@@ -1,12 +1,6 @@
-import {
-  HelpPageSection,
-  HelpStep,
-  createHelpPage,
-} from "../../types/HelpPage";
+import { HelpPageSection, HelpStep } from "../../types/HelpPage";
 
-const page = "Manage Modules & Events";
-
-const steps: HelpStep[] = [
+const moduleSteps: HelpStep[] = [
   {
     stepNumber: 1,
     title: "View all Modules",
@@ -24,7 +18,16 @@ const steps: HelpStep[] = [
   },
 ];
 
-export const HelpPage: HelpPageSection = createHelpPage(page, {
-  roles: ["UNIVERSITY_ADMIN", "LECTURER"],
-  steps,
-});
+export const moduleManagementSection: HelpPageSection = {
+  id: "module-management",
+  title: "Module Management",
+  description:
+    "Filter and Edit Modules and Events and Add Modules to Courses. ",
+  pageName: "Modules Page",
+  pageImage: {
+    url: "/images/ModuleManagement/image.png",
+    //altText: "c",
+  },
+  roles: ["all"],
+  steps: moduleSteps,
+};
