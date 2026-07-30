@@ -172,11 +172,11 @@ function DashboardContent() {
     <>
       {showSelectUni && (
         <Popup>
-          <div className="w-fit text-center">
+          <div data-testid="dashboard-popup-div" className="w-fit text-center">
             <ChooseInstituteTemplate
-              onClose={() => {
+              onClose={async () => {
                 if (UserDetails.getUniDetails()?.role) {
-                  SetSelectUni(false);
+                  await SetSelectUni(false);
                 }
               }}
             />

@@ -132,6 +132,7 @@ export function InstituteSelector({ onClose }: InstituteSelectorProps) {
           <div className="flex justify-center items-center gap-4 w-full">
             <div className="flex-1 flex justify-end">
               <Button
+                data-testid="btn-continue"
                 id="btn-continue-as-role"
                 type="button"
                 variant={"outline"}
