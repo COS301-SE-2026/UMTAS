@@ -5,11 +5,13 @@ const dashboardSteps: HelpStep[] = [
     stepNumber: 1,
     title: "Build your own schedule",
     description: `Click the 'Build a schedule' button to start building your own custom schedule.`,
+    imageUrl: `/images/Dashboard/steps/step1.png`,
   },
   {
     stepNumber: 2,
     title: "Access resources.",
     description: "Access our Documentation, Brand Style or Github",
+    imageUrl: `/images/Dashboard/steps/step2.png`,
   },
 ];
 
