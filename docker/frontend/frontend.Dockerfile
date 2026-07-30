@@ -6,11 +6,16 @@ FROM base AS deps
 COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./
 COPY packages/shared-types/package.json ./packages/shared-types/
 COPY apps/frontend/package.json ./apps/frontend/
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile --filter frontend... \
+    --network-concurrency=8 --fetch-retries=5 --fetch-timeout=60000
 
 FROM deps AS build
 ARG NEXT_PUBLIC_API_URL
+ARG API_URL
+ARG COOKIE_SECURE
 ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+ENV API_URL=${API_URL}
+ENV COOKIE_SECURE=${COOKIE_SECURE}
 COPY packages/shared-types/ ./packages/shared-types/
 COPY apps/frontend/ ./apps/frontend/
 RUN pnpm --filter=shared-types build

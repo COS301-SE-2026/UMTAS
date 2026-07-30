@@ -2,9 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 
 const cookiePrefix = process.env.COOKIE_PREFIX ?? "umtas";
 
-const useSecureCookies = ["production", "staging"].includes(
-  process.env.NODE_ENV ?? "",
-);
+const secureCookiesOverride = process.env.COOKIE_SECURE;
+const useSecureCookies =
+  secureCookiesOverride === "true" ||
+  (secureCookiesOverride !== "false" &&
+    ["production", "staging"].includes(process.env.NODE_ENV ?? ""));
 
 const SESSION_COOKIE_NAME = `${useSecureCookies ? "__Secure-" : ""}${cookiePrefix}.session_token`;
 

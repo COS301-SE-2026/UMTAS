@@ -1,3 +1,3 @@
 # Core Domain Model
 
-![Core Domain Model](Domain.drawio)
+![Core Domain Model](Domain.png)

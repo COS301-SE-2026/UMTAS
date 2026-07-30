@@ -92,6 +92,8 @@ services:
         'html',
         '--reporter',
         'lcov',
+        '--include',
+        'dist/**/*.service.js',
         'node',
         'dist/main',
       ]
