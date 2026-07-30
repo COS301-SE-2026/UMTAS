@@ -1,7 +1,11 @@
 # Domain Model
 
 ## Diagram 
-![DomainDiagram](../diagrams/domain/DomainAttributes.drawio)
+
+<figure markdown="span">
+  <img src="../diagrams/domain/Domain.svg" alt="Domain Diagram" width="800">
+</figure>
+
 
 ## Domain descriptions
 ## Domains
