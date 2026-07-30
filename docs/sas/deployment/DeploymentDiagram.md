@@ -1,5 +1,5 @@
 # Deployment Diagram
-
+Using [UML Deployment Diagram Specs](https://www.uml-diagrams.org/deployment-diagrams.html) as the specifications for the below diagrams.
 
 ## Development Deployment Diagram
 

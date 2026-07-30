@@ -13,6 +13,6 @@ Use this page to navigate directly to the documentation assessed for Demo 2.
 | SAS - Deployment Diagram | 10 | [:octicons-arrow-right-24: Deployment Diagram](../sas/deployment/DeploymentDiagram.md) · [:octicons-arrow-right-24: CI/CD Pipeline](../sas/deployment/PipelineDiagram.md) |
 | Coding Standards Document | 10 | [:octicons-arrow-right-24: Coding Standards](../developer-guides/coding-standards.md)
 | Testing Policy Document | 10 | [:octicons-arrow-right-24: Testing Policy Document](../developer-guides/testing-policy.md)  |
-| User Manual Document | 5 | [:octicons-arrow-right-24: UMTAS Documentation](../index.md) |
-| Updated Brand Style Guide | 5 | [:octicons-arrow-right-24: Repository Guide](../design/Brand-Style.md) · [:octicons-arrow-right-24: Interactive Brand Guide](https://brand.capstone-vigil.dns.net.za/){ target="_blank" } |
+| User Manual Document | 5 | [:octicons-arrow-right-24: UMTAS Documentation](https://capstone-vigil.dns.net.za/tutorial) |
+| Updated Brand Style Guide | 5 | [:octicons-arrow-right-24: Interactive Brand Guide](https://brand.capstone-vigil.dns.net.za/){ target="_blank" } |
 | **Total** | **100** | |
