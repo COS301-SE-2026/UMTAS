@@ -1,0 +1,18 @@
+docs/srs/Use_Cases/Solver_System.md
+  h_84e82529bd05a5 1-60
+docs/srs/FUNCTIONAL_REQUIREMENTS.md
+  h_84e82529bd05a5 4,85-106
+docs/srs/USE_CASES.md
+  h_84e82529bd05a5 125-134
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "3bfffd496d9e3912df95b962829611c46dfcce90",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}
