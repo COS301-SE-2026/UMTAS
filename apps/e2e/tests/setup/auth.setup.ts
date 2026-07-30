@@ -15,11 +15,7 @@ test("authenticate Admin", async ({ page }) => {
 
   await page.getByRole("button", { name: "Log in" }).click();
   await page.waitForURL("**/dashboard");
-  await page.context().storageState({ path: authFile });
-});
 
-test("Choose institute", async ({ page }) => {
-  await page.goto("/dashboard");
   const instituteDiv = page.getByTestId("dashboard-popup-div");
   await instituteDiv.getByTestId("institute-select-Uni").click();
   await page.getByRole("option", { name: "University of Pretoria" }).click();
