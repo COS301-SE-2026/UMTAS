@@ -27,6 +27,7 @@ import {
   Eye,
   Globe,
 } from "lucide-react";
+import { DemoChanges } from "@/components/organisms/brand-style/DemoChanges";
 
 const Links: Link[] = [
   { id: "identity", label: "Brand Identity", Icon: Sparkle },
@@ -196,6 +197,12 @@ export default function BrandStyleShell() {
           </section>
           <section id="breakpoints" className="brand-card">
             <BreakpointSection />
+          </section>
+          <section
+            id="changes"
+            className="w-full  mb-8 border border-[var(--border)] rounded-2xl px-8"
+          >
+            <DemoChanges />
           </section>
         </div>
       </div>
