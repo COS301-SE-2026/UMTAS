@@ -9,9 +9,15 @@ using std::cout;
 using std::endl;
 using std::string;
 using json = nlohmann::json;
+
 struct API_DATA {
   API_DATA(const json &reqData);
   API_DATA() {};
+  API_DATA(API_DATA &copy) {
+    this->modules = copy.modules;
+    this->events = copy.events;
+    this->decorators = decorators.copy();
+  }
   std::vector<ModuleGA> modules;
   std::vector<EventGA> events;
   BaseHeuristic *decorators;

@@ -1,13 +1,18 @@
 #include "API-data.h"
 #include "../../heuristic/Decorators/baseHeuristic.h"
+#include "../../heuristic/Handlers/handler.h"
 #include "nlohmann/json.hpp"
 #include <stdexcept>
 // const string API_DATA::TARGET_TIME_KEY = "preferences";
+
+const string preferencesKey = "preferences";
+const string heuristicArrKey = "heuristics";
 
 API_DATA::API_DATA(const json &reqData) {
   if (reqData.empty()) {
     throw std::runtime_error("Input json is empty");
   }
+  Handler *chain = createHandlerChain();
 
   try {
     if (reqData.contains("schedulingProblem") &&
@@ -35,6 +40,22 @@ API_DATA::API_DATA(const json &reqData) {
           "schedulingProblem.events is not provided or is not an array");
     }
 
+    this->decorators = new BaseHeuristic();
+
+    if (reqData.contains(preferencesKey) &&
+        reqData[preferencesKey].is_object()) {
+      const auto &pref = reqData[preferencesKey];
+      if (pref.contains(heuristicArrKey) && pref[heuristicArrKey].is_array()) {
+        std::vector<nlohmann::json> heuristicsArr =
+            pref[heuristicArrKey].get<std::vector<nlohmann::json>>();
+
+        for (const json &heuristic : heuristicsArr) {
+          decorators = decorators->setHead(chain->getHeuristic(heuristic));
+
+        }
+      }
+    }
+
     /*
     this->targetTime = 420;
 
@@ -56,10 +77,12 @@ API_DATA::API_DATA(const json &reqData) {
 
   } catch (const json::parse_error &e) {
     // this is for errors casued by library misuse
+    delete chain;
     throw std::runtime_error(string("Json error: ") + e.what());
 
   } catch (const std::runtime_error &e) {
     // this is for our errors
+    delete chain;
     throw std::runtime_error(string("Could not create API_DATA: ") + e.what());
   }
 }
