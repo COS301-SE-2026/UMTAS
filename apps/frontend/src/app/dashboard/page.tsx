@@ -187,7 +187,7 @@ function DashboardContent() {
             <ChooseInstituteTemplate
               onClose={async () => {
                 if (UserDetails.getUniDetails()?.role) {
-                  await SetSelectUni(false);
+                  SetSelectUni(false);
                 }
               }}
             />
