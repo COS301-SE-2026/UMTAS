@@ -43,8 +43,8 @@ int countConflicts(const EventChromosome &candidate) {
 }
 } // namespace
 
-GA_Handler::GA_Handler(API_DATA data, bool optimize) : optimize(optimize) {
-  this->initData = data;
+GA_Handler::GA_Handler(API_DATA data, bool optimize)
+    : optimize(optimize), initData(data) {
   RequiredEvents = 0;
   modulesMap.clear();
   tempMap.clear();
@@ -271,7 +271,7 @@ double calculate_SO_total_fitness(
 
   double heuristicValue = 0;
   if (Heuristics)
-    Heuristics->calculateHeursitic(c.genes);
+    heuristicValue += Heuristics->calculateHeursitic(c.genes);
 
   return heuristicValue + Overlap_Heuristic(c.genes);
 }
