@@ -1,17 +1,18 @@
 #include "GA.h"
+#include "../heuristic/Decorators/Decorators.h"
 #include <algorithm>
 #include <cmath>
 #include <iostream>
 #include <ostream>
 #include <unordered_map>
 #include <vector>
-
 // used for short circuit of c(n)
 int RequiredEvents = 0;
 
 std::unordered_map<string, int> modulesMap;
 std::unordered_map<string, int> tempMap;
 std::unordered_map<string, eventsOccurring> mutationMap;
+BaseHeuristic *Heuristics = nullptr;
 
 string requirementKey(const EventGA &event) {
   return event.moduleCode + ":" + event.activityCode;
@@ -51,6 +52,11 @@ GA_Handler::GA_Handler(API_DATA data, bool optimize) : optimize(optimize) {
   copyChrom = EventChromosome(data);
   InitMap();
   InitMutationMap();
+  Heuristics = data.decorators;
+
+  // no unneded dups
+  data.decorators = nullptr;
+
   hasSufficientAlternatives = HasSufficientAlternatives();
   InitGA();
 }
@@ -261,8 +267,9 @@ double calculate_SO_total_fitness(
   // O(n) -> gives an int for number of collisions
   // O(n) * V(n) -> higher score
   // This function in GA minimises.
+  double heuristicValue = Heuristics->calculateHeursitic(c.genes);
 
-  return Overlap_Heuristic(c.genes);
+  return heuristicValue + Overlap_Heuristic(c.genes);
 }
 
 double calculate_conflict_total_fitness(

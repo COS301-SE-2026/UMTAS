@@ -41,9 +41,11 @@ SRC_FILES := $(wildcard $(SRC_DIR)/*.cpp)\
              $(wildcard $(SRC_DIR)/data/Events/*.cpp)\
              $(wildcard $(SRC_DIR)/data/GA-data/*.cpp)\
              $(wildcard $(SRC_DIR)/data/Modules/*.cpp)\
-             $(wildcard $(SRC_DIR)/data/Monitors/*.cpp)\
              $(wildcard $(SRC_DIR)/GA_handler/*.cpp)\
-             $(wildcard $(SRC_DIR)/CP_SOLVER/*.cpp)
+             $(wildcard $(SRC_DIR)/CP_SOLVER/*.cpp)\
+             $(wildcard $(SRC_DIR)/heuristic/Decorators/*.cpp)\
+             $(wildcard $(SRC_DIR)/heuristic/Handlers/*.cpp)\
+
 
 OBJS := $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SRC_FILES))
 

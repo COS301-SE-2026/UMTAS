@@ -50,8 +50,8 @@ API_DATA::API_DATA(const json &reqData) {
             pref[heuristicArrKey].get<std::vector<nlohmann::json>>();
 
         for (const json &heuristic : heuristicsArr) {
-          decorators = decorators->setHead(chain->getHeuristic(heuristic));
-
+          this->decorators =
+              this->decorators->setHead(chain->getHeuristic(heuristic));
         }
       }
     }
@@ -75,14 +75,28 @@ API_DATA::API_DATA(const json &reqData) {
 
     // Handler construction and so on
 
+    delete chain;
+    chain = nullptr;
   } catch (const json::parse_error &e) {
     // this is for errors casued by library misuse
-    delete chain;
+    if (chain)
+      delete chain;
     throw std::runtime_error(string("Json error: ") + e.what());
 
   } catch (const std::runtime_error &e) {
     // this is for our errors
-    delete chain;
+    if (chain)
+      delete chain;
     throw std::runtime_error(string("Could not create API_DATA: ") + e.what());
   }
+}
+
+API_DATA::API_DATA(const API_DATA &copy) {
+  this->modules = copy.modules;
+  this->events = copy.events;
+  this->decorators = copy.decorators->copy();
+}
+API_DATA::~API_DATA() {
+  if (decorators)
+    delete decorators;
 }

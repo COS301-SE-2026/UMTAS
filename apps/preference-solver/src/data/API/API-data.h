@@ -1,3 +1,4 @@
+#pragma once
 #include "../../../lib/nlohmann/json.hpp"
 #include "../Events/event.h"
 #include "../Modules/module.h"
@@ -13,13 +14,11 @@ using json = nlohmann::json;
 struct API_DATA {
   API_DATA(const json &reqData);
   API_DATA() {};
-  API_DATA(API_DATA &copy) {
-    this->modules = copy.modules;
-    this->events = copy.events;
-    this->decorators = decorators.copy();
-  }
+  API_DATA(const API_DATA &copy);
+
+  ~API_DATA();
+
   std::vector<ModuleGA> modules;
   std::vector<EventGA> events;
   BaseHeuristic *decorators;
 };
-#pragma once
