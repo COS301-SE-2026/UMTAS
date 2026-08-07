@@ -6,12 +6,13 @@ CXX ?= c++
 PKG_CONFIG ?= pkg-config
 BREW ?= brew
 
+LOCAL_ORTOOLS_DIR := $(LIB_DIR)/ortools
+LOCAL_ORTOOLS_HEADER := $(LOCAL_ORTOOLS_DIR)/include/ortools/sat/cp_model.h
+ORTOOLS_TARBALL_URL := https://github.com/google/or-tools/releases/download/v9.11/or-tools_x86_64_AlmaLinux-8.10_cpp_v9.11.4210.tar.gz
+
 ORTOOLS_PREFIX ?= $(shell $(PKG_CONFIG) --variable=prefix ortools 2>/dev/null || $(BREW) --prefix or-tools 2>/dev/null)
 ABSEIL_PREFIX ?= $(shell $(PKG_CONFIG) --variable=prefix absl_raw_hash_set 2>/dev/null || $(BREW) --prefix abseil 2>/dev/null)
 PROTOBUF_PREFIX ?= $(shell $(PKG_CONFIG) --variable=prefix protobuf 2>/dev/null || $(BREW) --prefix protobuf 2>/dev/null)
-
-LOCAL_ORTOOLS_DIR := $(LIB_DIR)/ortools
-LOCAL_ORTOOLS_HEADER := $(LOCAL_ORTOOLS_DIR)/include/ortools/sat/cp_model.h
 
 ifeq ($(strip $(ORTOOLS_PREFIX)),)
     ORTOOLS_PREFIX := $(LOCAL_ORTOOLS_DIR)
@@ -40,6 +41,7 @@ SRC_FILES := $(wildcard $(SRC_DIR)/*.cpp)\
              $(wildcard $(SRC_DIR)/data/Events/*.cpp)\
              $(wildcard $(SRC_DIR)/data/GA-data/*.cpp)\
              $(wildcard $(SRC_DIR)/data/Modules/*.cpp)\
+             $(wildcard $(SRC_DIR)/data/Monitors/*.cpp)\
              $(wildcard $(SRC_DIR)/GA_handler/*.cpp)\
              $(wildcard $(SRC_DIR)/CP_SOLVER/*.cpp)
 
@@ -53,8 +55,8 @@ JSON_HEADER := $(LIB_DIR)/nlohmann/json.hpp
 
 TARGET := GA_BIN
 COUNT_PATTERN_TEST := $(BUILD_DIR)/count-pattern-regression
-DEPENDENCY_HEADERS := $(OPEN_GA_HEADER) $(JSON_HEADER)
 
+DEPENDENCY_HEADERS := $(OPEN_GA_HEADER) $(JSON_HEADER)
 ifeq ($(abspath $(ORTOOLS_PREFIX)),$(abspath $(LOCAL_ORTOOLS_DIR)))
     DEPENDENCY_HEADERS += $(LOCAL_ORTOOLS_HEADER)
 endif
@@ -70,6 +72,15 @@ $(TARGET): $(OBJS) | $(DEPENDENCY_HEADERS)
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp $(DEPENDENCY_HEADERS)
 	@mkdir -p $(dir $@)
 	$(CXX) $(CFLAGS) -c $< -o $@
+
+$(LOCAL_ORTOOLS_HEADER):
+	@echo "OR-Tools not found on system. Downloading C++ binaries to $(LOCAL_ORTOOLS_DIR)..."
+	@mkdir -p $(LOCAL_ORTOOLS_DIR)
+	@set -eu; \
+		archive="$(LIB_DIR)/ortools.tar.gz.tmp"; \
+		trap 'rm -f "$$archive"' EXIT; \
+		curl --fail --location --show-error "$(ORTOOLS_TARBALL_URL)" -o "$$archive"; \
+		tar -xzf "$$archive" -C "$(LOCAL_ORTOOLS_DIR)" --strip-components=1
 
 $(OPEN_GA_HEADER):
 	@echo "Downloading OpenGA v1.0.5 header..."
@@ -95,7 +106,7 @@ $(JSON_HEADER):
 		mv "$$temporary_header" "$(JSON_HEADER)"
 
 download: clean_lib
-	$(MAKE) $(DEPENDENCY_HEADERS)
+	$(MAKE) DEPENDENCY_HEADERS="$(DEPENDENCY_HEADERS)" $(DEPENDENCY_HEADERS)
 
 d: download
 
