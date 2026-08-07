@@ -5,12 +5,8 @@
 class BaseHeuristic {
 
 public:
-    virtual ~BaseHeuristic(){}
-  virtual double calculateHeursitic(EventChromosome events) {
-    return 0 ;
-
-};
-
+  virtual ~BaseHeuristic() {}
+  virtual double calculateHeursitic(EventChromosome events) { return 0; };
 };
 
 #endif

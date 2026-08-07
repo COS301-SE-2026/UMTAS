@@ -33,7 +33,13 @@ public:
       delete next;
     }
   }
-  virtual BaseHeuristic *getHeuristic(nlohmann::json input) = 0;
+  virtual BaseHeuristic *getHeuristic(nlohmann::json input) {
+    if (next) {
+      return next->getHeuristic(input);
+    } else {
+      return nullptr; // -> unaccounted for case
+    }
+  }
 
   virtual json getParams(json input) {
     if (input.contains(key) && input[key].is_string() &&
@@ -52,5 +58,7 @@ public:
   TargetStartTimeHandler() : Handler("preferred-start-time") {}
   virtual BaseHeuristic *getHeuristic(nlohmann::json input);
 };
+
+Handler *createHandlerChain();
 
 #endif

@@ -13,5 +13,5 @@ BaseHeuristic *TargetStartTimeHandler::getHeuristic(nlohmann::json input) {
     return new TargetStartTime(targetTime);
 
   } else
-    return next->getHeuristic(input);
+    return Handler::getHeuristic(input); // does the null check
 }
