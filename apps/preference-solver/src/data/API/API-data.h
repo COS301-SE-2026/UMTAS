@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+class BaseHeuristic;
 using std::cout;
 using std::endl;
 using std::string;
@@ -13,5 +14,6 @@ struct API_DATA {
   API_DATA() {};
   std::vector<ModuleGA> modules;
   std::vector<EventGA> events;
+  BaseHeuristic *decorators;
 };
 #pragma once
