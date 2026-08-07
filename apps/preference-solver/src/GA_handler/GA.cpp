@@ -29,7 +29,8 @@ bool eventsOverlap(const EventGA &left, const EventGA &right) {
 int countConflicts(const EventChromosome &candidate) {
   int conflicts = 0;
   for (size_t left = 0; left < candidate.events.size(); ++left) {
-    if (!candidate.events[left].is_active) continue;
+    if (!candidate.events[left].is_active)
+      continue;
     for (size_t right = left + 1; right < candidate.events.size(); ++right) {
       if (candidate.events[right].is_active &&
           eventsOverlap(candidate.events[left], candidate.events[right])) {
@@ -91,8 +92,10 @@ void GA_Handler::InitGA() {
 }
 
 EventChromosome GA_Handler::findSolution() {
-  if (!hasSufficientAlternatives) return copyChrom;
-  if (copyChrom.events.empty()) return copyChrom;
+  if (!hasSufficientAlternatives)
+    return copyChrom;
+  if (copyChrom.events.empty())
+    return copyChrom;
   std::cout << "Starting GA" << std::endl;
   gaEngine.solve();
   int index = gaEngine.last_generation.best_chromosome_index;
@@ -115,13 +118,15 @@ void init_genes(EventChromosome &p, const std::function<double(void)> &rnd01) {
 void init_genes_randomized(EventChromosome &p,
                            const std::function<double(void)> &rnd01) {
   p = copyChrom;
-  for (EventGA &event : p.events) event.is_active = false;
+  for (EventGA &event : p.events)
+    event.is_active = false;
   p.numActive = 0;
   p.numCollision = 0;
 
   for (const auto &[key, group] : mutationMap) {
     const auto requirement = modulesMap.find(key);
-    if (requirement == modulesMap.end()) continue;
+    if (requirement == modulesMap.end())
+      continue;
 
     std::vector<int> indices = group.indices;
     for (size_t remaining = indices.size(); remaining > 1; --remaining) {
@@ -130,8 +135,8 @@ void init_genes_randomized(EventChromosome &p,
       std::swap(indices[selected], indices[remaining - 1]);
     }
 
-    const size_t selectionCount = std::min(
-        indices.size(), static_cast<size_t>(requirement->second));
+    const size_t selectionCount =
+        std::min(indices.size(), static_cast<size_t>(requirement->second));
     for (size_t index = 0; index < selectionCount; ++index) {
       p.events[indices[index]].is_active = true;
       ++p.numActive;
@@ -144,10 +149,12 @@ EventChromosome mutate(const EventChromosome &p,
                        double shrink_scale) {
   int size = p.events.size();
   EventChromosome nChrom = p;
-  if (size == 0) return nChrom;
+  if (size == 0)
+    return nChrom;
   const int index = (int)(std::floor(rnd01() * 1000)) % size;
   const auto group = mutationMap.find(requirementKey(nChrom.events[index]));
-  if (group == mutationMap.end()) return nChrom;
+  if (group == mutationMap.end())
+    return nChrom;
 
   std::vector<int> activeIndices;
   std::vector<int> inactiveIndices;
@@ -155,10 +162,12 @@ EventChromosome mutate(const EventChromosome &p,
     (nChrom.events[eventIndex].is_active ? activeIndices : inactiveIndices)
         .push_back(eventIndex);
   }
-  if (activeIndices.empty() || inactiveIndices.empty()) return nChrom;
+  if (activeIndices.empty() || inactiveIndices.empty())
+    return nChrom;
 
   const auto choose = [&rnd01](const std::vector<int> &indices) {
-    return indices[static_cast<size_t>(rnd01() * indices.size()) % indices.size()];
+    return indices[static_cast<size_t>(rnd01() * indices.size()) %
+                   indices.size()];
   };
   nChrom.events[choose(activeIndices)].is_active = false;
   nChrom.events[choose(inactiveIndices)].is_active = true;
@@ -188,36 +197,8 @@ EventChromosome crossover(const EventChromosome &X1, const EventChromosome &X2,
                           const std::function<double(void)> &rnd01)
 
 {
-
-  EventChromosome child;
-
-  child.events.resize(X1.events.size());
-  float r = rnd01();
-  int crossOverPt = r * child.events.size();
-
-  if (crossOverPt == child.events.size()) {
-    --crossOverPt;
-  } else if (crossOverPt == 0) {
-    ++crossOverPt;
-  }
-  int isActive = 0;
-  for (int i = 0; i < child.events.size(); i++) {
-
-    if (i < crossOverPt) {
-      child.events[i] = X1.events[i];
-      if (child.events[i].is_active)
-        isActive++;
-    } else {
-      child.events[i] = X2.events[i];
-      if (child.events[i].is_active)
-        isActive++;
-    }
-  }
-  child.numCollision = 0;
-  child.numActive = isActive;
-  child.targetTime = X1.targetTime;
-  child.requiredSelections = X1.requiredSelections;
-  return child;
+  // needs to be rewritten optimised for smart crossover
+  return X1;
 }
 
 bool eval_solution(const EventChromosome &p, ChromMiddleCost &c) {
@@ -291,21 +272,7 @@ double calculate_conflict_total_fitness(
 
 double Overlap_Heuristic(EventChromosome eventChrom) {
 
-  int numberOfPts = 0;
-  int target = eventChrom.targetTime;
-  double sum = 0;
-  for (const EventGA &event : eventChrom.events) {
-
-    if (event.is_active) {
-      numberOfPts++;
-      sum += std::fabs(event.event_start - target);
-    }
-  }
-  if (numberOfPts == 0) return 0.0;
-  double MAD = (1 / (double)numberOfPts) * sum;
-  // Conflicts dominate soft time preferences, while preference distance still
-  // ranks equally conflict-free (or equally best-effort) timetables.
-  return MAD + (countConflicts(eventChrom) * 10000.0);
+  return (countConflicts(eventChrom) * 10000.0);
 }
 void SO_report_generation(
     int generation_number,

@@ -3,7 +3,6 @@
 
 EventChromosome::EventChromosome(API_DATA &data) {
   this->events = data.events;
-  this->targetTime = data.targetTime;
   for (const ModuleGA &module : data.modules) {
     for (const auto &[activityCode, selections] : module.requiredSelections) {
       requiredSelections[module.moduleCode + ":" + activityCode] = selections;
