@@ -5,7 +5,6 @@
 #include <string>
 using std::string;
 
-
 /*
  Expected to get an index of heursitics array
     "preferences": {
@@ -20,12 +19,14 @@ using std::string;
 
 class Handler {
 protected:
+  const string key;
+  const string paramKey = "parameters";
   Handler *next = nullptr;
+
 public:
-  Handler() {}
-   void setNext(Handler * next){
-      this->next = next;
-  }
+  Handler(string key) : key(key) {}
+
+  void setNext(Handler *next) { this->next = next; }
 
   virtual ~Handler() {
     if (this->next) {
@@ -33,16 +34,23 @@ public:
     }
   }
   virtual BaseHeuristic *getHeuristic(nlohmann::json input) = 0;
+
+  virtual json getParams(json input) {
+    if (input.contains(key) && input[key].is_string() &&
+        input.contains(paramKey) && input[paramKey].is_object()) {
+      return input[paramKey].get<json>();
+    } else
+      return nullptr;
+  };
 };
 
-class TargetTimeHandler:public Handler{
+class TargetStartTimeHandler : public Handler {
+private:
+  const string targetKey = "minutesAfterMidnight";
 
-
-    const string key = "preferred-start-time";
-    TargetTimeHandler(): Handler() {
-    }
-     virtual BaseHeuristic *getHeuristic(nlohmann::json input);
-
+public:
+  TargetStartTimeHandler() : Handler("preferred-start-time") {}
+  virtual BaseHeuristic *getHeuristic(nlohmann::json input);
 };
 
 #endif
