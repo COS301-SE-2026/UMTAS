@@ -4,14 +4,14 @@ LIB_DIR := lib
 
 CXX ?= c++
 PKG_CONFIG ?= pkg-config
+BREW ?= brew
+
+ORTOOLS_PREFIX ?= $(shell $(PKG_CONFIG) --variable=prefix ortools 2>/dev/null || $(BREW) --prefix or-tools 2>/dev/null)
+ABSEIL_PREFIX ?= $(shell $(PKG_CONFIG) --variable=prefix absl_raw_hash_set 2>/dev/null || $(BREW) --prefix abseil 2>/dev/null)
+PROTOBUF_PREFIX ?= $(shell $(PKG_CONFIG) --variable=prefix protobuf 2>/dev/null || $(BREW) --prefix protobuf 2>/dev/null)
 
 LOCAL_ORTOOLS_DIR := $(LIB_DIR)/ortools
 LOCAL_ORTOOLS_HEADER := $(LOCAL_ORTOOLS_DIR)/include/ortools/sat/cp_model.h
-ORTOOLS_TARBALL_URL := https://github.com/google/or-tools/releases/download/v9.11/or-tools_x86_64_AlmaLinux-8.10_cpp_v9.11.4210.tar.gz
-
-ORTOOLS_PREFIX ?= $(shell $(PKG_CONFIG) --variable=prefix ortools 2>/dev/null)
-ABSEIL_PREFIX ?= $(shell $(PKG_CONFIG) --variable=prefix absl_raw_hash_set 2>/dev/null)
-PROTOBUF_PREFIX ?= $(shell $(PKG_CONFIG) --variable=prefix protobuf 2>/dev/null)
 
 ifeq ($(strip $(ORTOOLS_PREFIX)),)
     ORTOOLS_PREFIX := $(LOCAL_ORTOOLS_DIR)
@@ -20,14 +20,14 @@ endif
 dependency_include = $(if $(strip $($(1)_PREFIX)),-I$($(1)_PREFIX)/include)
 dependency_lib = $(if $(strip $($(1)_PREFIX)),-L$($(1)_PREFIX)/lib -L$($(1)_PREFIX)/lib64)
 comma := ,
-dependency_rpath = $(if $(strip $($(1)_PREFIX)),-Wl$(comma)-rpath$(comma)$(CURDIR)/$($(1)_PREFIX)/lib$(comma)-rpath$(comma)$(CURDIR)/$($(1)_PREFIX)/lib64)
+dependency_rpath = $(if $(strip $($(1)_PREFIX)),-Wl$(comma)-rpath$(comma)$($(1)_PREFIX)/lib$(comma)-rpath$(comma)$($(1)_PREFIX)/lib64)
 
 DEPENDENCY_CFLAGS ?= $(shell $(PKG_CONFIG) --cflags ortools protobuf absl_raw_hash_set 2>/dev/null)
 DEPENDENCY_LIBS ?= $(shell $(PKG_CONFIG) --libs ortools protobuf absl_raw_hash_set 2>/dev/null)
 
-CFLAGS ?= -std=c++17 -DOR_PROTO_DLL= -I$(LIB_DIR) -I$(LOCAL_ORTOOLS_DIR)/include $(DEPENDENCY_CFLAGS) \
+CFLAGS ?= -std=c++17 -DOR_PROTO_DLL= -I$(LIB_DIR) \
     $(call dependency_include,ORTOOLS) $(call dependency_include,ABSEIL) \
-    $(call dependency_include,PROTOBUF)
+    $(call dependency_include,PROTOBUF) $(DEPENDENCY_CFLAGS)
 
 LDFLAGS ?= $(if $(strip $(DEPENDENCY_LIBS)),$(DEPENDENCY_LIBS),\
     $(call dependency_lib,ORTOOLS) -lortools $(call dependency_lib,ABSEIL) \
@@ -53,9 +53,9 @@ JSON_HEADER := $(LIB_DIR)/nlohmann/json.hpp
 
 TARGET := GA_BIN
 COUNT_PATTERN_TEST := $(BUILD_DIR)/count-pattern-regression
-
 DEPENDENCY_HEADERS := $(OPEN_GA_HEADER) $(JSON_HEADER)
-ifeq ($(ORTOOLS_PREFIX),$(LOCAL_ORTOOLS_DIR))
+
+ifeq ($(abspath $(ORTOOLS_PREFIX)),$(abspath $(LOCAL_ORTOOLS_DIR)))
     DEPENDENCY_HEADERS += $(LOCAL_ORTOOLS_HEADER)
 endif
 
@@ -65,20 +65,11 @@ all: $(TARGET)
 
 $(TARGET): $(OBJS) | $(DEPENDENCY_HEADERS)
 	@mkdir -p $(BUILD_DIR)
-	$(CXX) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+	$(CXX) $(CFLAGS) -o $@ $(OBJS) $(LDFLAGS)
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp $(DEPENDENCY_HEADERS)
 	@mkdir -p $(dir $@)
 	$(CXX) $(CFLAGS) -c $< -o $@
-
-$(LOCAL_ORTOOLS_HEADER):
-	@echo "OR-Tools not found on system. Downloading C++ binaries to $(LOCAL_ORTOOLS_DIR)..."
-	@mkdir -p $(LOCAL_ORTOOLS_DIR)
-	@set -eu; \
-		archive="$(LIB_DIR)/ortools.tar.gz.tmp"; \
-		trap 'rm -f "$$archive"' EXIT; \
-		curl --fail --location --show-error "$(ORTOOLS_TARBALL_URL)" -o "$$archive"; \
-		tar -xzf "$$archive" -C "$(LOCAL_ORTOOLS_DIR)" --strip-components=1
 
 $(OPEN_GA_HEADER):
 	@echo "Downloading OpenGA v1.0.5 header..."
@@ -92,7 +83,7 @@ $(OPEN_GA_HEADER):
 		mkdir -p "$$extract_dir"; \
 		unzip -q "$$archive" -d "$$extract_dir"; \
 		cp "$$extract_dir/openGA-1.0.5/src/openGA.hpp" "$(OPEN_GA_HEADER)"; \
-		sed -i 's/std::mutex mtx_rand;/inline std::mutex mtx_rand;/' "$(OPEN_GA_HEADER)"
+		sed -i 's/\(^\|[^a-zA-Z0-9_]\)std::mutex mtx_rand;/ inline std::mutex mtx_rand;/g' "$(OPEN_GA_HEADER)"
 
 $(JSON_HEADER):
 	@echo "Downloading nlohmann/json v3.11.3 header..."
