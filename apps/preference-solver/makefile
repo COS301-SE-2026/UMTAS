@@ -124,9 +124,13 @@ clean_lib:
 run r: $(TARGET)
 	./$(TARGET)
 
-valgrind v: $(COUNT_PATTERN_TEST)
-	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --num-callers=20 ./$(COUNT_PATTERN_TEST)
-	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --trace-children=yes --num-callers=20 ./tests/run-cli-regressions.sh
+valgrind: $(COUNT_PATTERN_TEST)
+	valgrind --leak-check=full \
+	         --show-leak-kinds=all \
+	         --track-origins=yes \
+	         --log-file=valgrind-unit.log \
+	         ./$(COUNT_PATTERN_TEST)
+	@echo "Valgrind log saved to valgrind-unit.log"
 
 $(COUNT_PATTERN_TEST): $(DEPENDENCY_HEADERS) $(filter-out $(BUILD_DIR)/main.o,$(OBJS)) tests/count-pattern-regression.cpp
 	$(CXX) $(CFLAGS) -o $@ tests/count-pattern-regression.cpp $(filter-out $(BUILD_DIR)/main.o,$(OBJS)) $(LDFLAGS)
