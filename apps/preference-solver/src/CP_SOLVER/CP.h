@@ -5,7 +5,7 @@
 #include "ortools/sat/cp_model.h"
 
 class CP_SOLVER {
- private:
+private:
   API_DATA inputData;
   operations_research::sat::CpModelBuilder model;
   std::vector<operations_research::sat::BoolVar> selectedEvents;
@@ -15,7 +15,7 @@ class CP_SOLVER {
   void overlapRules();
   void objectiveRule();
 
- public:
+public:
   explicit CP_SOLVER(const API_DATA &data, bool optimize = true);
   EventChromosome solve();
 };

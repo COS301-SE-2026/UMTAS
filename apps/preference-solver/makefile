@@ -26,7 +26,7 @@ dependency_rpath = $(if $(strip $($(1)_PREFIX)),-Wl$(comma)-rpath$(comma)$($(1)_
 DEPENDENCY_CFLAGS ?= $(shell $(PKG_CONFIG) --cflags ortools protobuf absl_raw_hash_set 2>/dev/null)
 DEPENDENCY_LIBS ?= $(shell $(PKG_CONFIG) --libs ortools protobuf absl_raw_hash_set 2>/dev/null)
 
-CFLAGS ?= -std=c++17 -DOR_PROTO_DLL= -I$(LIB_DIR) \
+CFLAGS ?= -std=c++17 -g -DOR_PROTO_DLL= -I$(LIB_DIR) \
     $(call dependency_include,ORTOOLS) $(call dependency_include,ABSEIL) \
     $(call dependency_include,PROTOBUF) $(DEPENDENCY_CFLAGS)
 
@@ -123,6 +123,10 @@ clean_lib:
 
 run r: $(TARGET)
 	./$(TARGET)
+
+valgrind v: $(COUNT_PATTERN_TEST)
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --num-callers=20 ./$(COUNT_PATTERN_TEST)
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --trace-children=yes --num-callers=20 ./tests/run-cli-regressions.sh
 
 $(COUNT_PATTERN_TEST): $(DEPENDENCY_HEADERS) $(filter-out $(BUILD_DIR)/main.o,$(OBJS)) tests/count-pattern-regression.cpp
 	$(CXX) $(CFLAGS) -o $@ tests/count-pattern-regression.cpp $(filter-out $(BUILD_DIR)/main.o,$(OBJS)) $(LDFLAGS)

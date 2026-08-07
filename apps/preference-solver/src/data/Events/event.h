@@ -31,4 +31,3 @@ struct EventGA {
   // automatically sets is active to false
 };
 #pragma once
-

@@ -19,6 +19,7 @@ private:
   bool HasSufficientAlternatives() const;
 
 public:
+  ~GA_Handler();
   GA_Handler(API_DATA, bool optimize = true);
   // a global unordered map will be placed for each module and occurences
   EventChromosome findSolution();

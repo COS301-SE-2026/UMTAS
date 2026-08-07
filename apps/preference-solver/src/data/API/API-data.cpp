@@ -2,6 +2,7 @@
 #include "../../heuristic/Decorators/baseHeuristic.h"
 #include "../../heuristic/Handlers/handler.h"
 #include "nlohmann/json.hpp"
+#include <iostream>
 #include <stdexcept>
 // const string API_DATA::TARGET_TIME_KEY = "preferences";
 
@@ -49,9 +50,14 @@ API_DATA::API_DATA(const json &reqData) {
         std::vector<nlohmann::json> heuristicsArr =
             pref[heuristicArrKey].get<std::vector<nlohmann::json>>();
 
-        for (const json &heuristic : heuristicsArr) {
-          this->decorators =
-              this->decorators->setHead(chain->getHeuristic(heuristic));
+        if (heuristicsArr.size() > 0)
+          for (const json &heuristic : heuristicsArr) {
+            this->decorators =
+                this->decorators->setHead(chain->getHeuristic(heuristic));
+          }
+        else {
+          delete this->decorators;
+          this->decorators = nullptr;
         }
       }
     }
@@ -78,13 +84,21 @@ API_DATA::API_DATA(const json &reqData) {
     delete chain;
     chain = nullptr;
   } catch (const json::parse_error &e) {
-    // this is for errors casued by library misuse
     if (chain)
       delete chain;
-    throw std::runtime_error(string("Json error: ") + e.what());
+    throw std::runtime_error(string("Json parse error: ") + e.what());
+
+  } catch (const json::type_error &e) {
+    if (chain)
+      delete chain;
+    throw std::runtime_error(string("Json type error: ") + e.what());
+
+  } catch (const json::exception &e) {
+    if (chain)
+      delete chain;
+    throw std::runtime_error(string("Json exception: ") + e.what());
 
   } catch (const std::runtime_error &e) {
-    // this is for our errors
     if (chain)
       delete chain;
     throw std::runtime_error(string("Could not create API_DATA: ") + e.what());
@@ -94,7 +108,10 @@ API_DATA::API_DATA(const json &reqData) {
 API_DATA::API_DATA(const API_DATA &copy) {
   this->modules = copy.modules;
   this->events = copy.events;
-  this->decorators = copy.decorators->copy();
+  if (copy.decorators)
+    this->decorators = copy.decorators->copy();
+  else
+    this->decorators = nullptr;
 }
 API_DATA::~API_DATA() {
   if (decorators)

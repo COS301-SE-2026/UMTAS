@@ -2,6 +2,7 @@
 #define HANDLER_H
 #include "../Decorators/baseHeuristic.h"
 #include "nlohmann/json.hpp"
+#include <iostream>
 #include <string>
 using std::string;
 
@@ -19,7 +20,7 @@ using std::string;
 
 class Handler {
 protected:
-  const string key;
+  const string key = "Default";
   const string paramKey = "parameters";
   Handler *next = nullptr;
 
@@ -41,13 +42,7 @@ public:
     }
   }
 
-  virtual json getParams(json input) {
-    if (input.contains(key) && input[key].is_string() &&
-        input.contains(paramKey) && input[paramKey].is_object()) {
-      return input[paramKey].get<json>();
-    } else
-      return nullptr;
-  };
+  virtual json getParams(json input);
 };
 
 class TargetStartTimeHandler : public Handler {

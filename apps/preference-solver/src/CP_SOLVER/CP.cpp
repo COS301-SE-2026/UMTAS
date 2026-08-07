@@ -1,7 +1,7 @@
 #include "CP.h"
 
+#include "../heuristic/Decorators/Decorators.h"
 #include "ortools/sat/cp_model_solver.h"
-
 #include <cstdlib>
 #include <stdexcept>
 #include <string>
@@ -75,11 +75,11 @@ void CP_SOLVER::overlapRules() {
 void CP_SOLVER::objectiveRule() {
   using operations_research::sat::LinearExpr;
 
+  EventChromosome heuristicChrom(inputData);
+
   LinearExpr objective;
-  for (size_t index = 0; index < inputData.events.size(); ++index) {
-    objective += std::abs(inputData.events[index].event_start - 420) *
-                 selectedEvents[index];
-  }
+  if (inputData.decorators)
+    objective += inputData.decorators->calculateHeursitic(heuristicChrom);
   model.Minimize(objective);
 }
 // works towards 7:30 temp solution

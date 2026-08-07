@@ -52,10 +52,11 @@ GA_Handler::GA_Handler(API_DATA data, bool optimize) : optimize(optimize) {
   copyChrom = EventChromosome(data);
   InitMap();
   InitMutationMap();
-  Heuristics = data.decorators;
-
-  // no unneded dups
-  data.decorators = nullptr;
+  if (data.decorators) {
+    Heuristics = data.decorators;
+    // no uneeded dups
+    data.decorators = nullptr;
+  }
 
   hasSufficientAlternatives = HasSufficientAlternatives();
   InitGA();
@@ -267,7 +268,10 @@ double calculate_SO_total_fitness(
   // O(n) -> gives an int for number of collisions
   // O(n) * V(n) -> higher score
   // This function in GA minimises.
-  double heuristicValue = Heuristics->calculateHeursitic(c.genes);
+
+  double heuristicValue = 0;
+  if (Heuristics)
+    Heuristics->calculateHeursitic(c.genes);
 
   return heuristicValue + Overlap_Heuristic(c.genes);
 }
@@ -292,4 +296,9 @@ void SO_report_generation(
   std::cout << "Best fitness " << bestChrom.total_cost << std::endl;
   std::cout << "Number of collisions " << countConflicts(bestChrom.genes)
             << std::endl;
+}
+
+GA_Handler::~GA_Handler() {
+  if (Heuristics)
+    delete Heuristics;
 }

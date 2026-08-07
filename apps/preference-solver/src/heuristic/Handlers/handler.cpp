@@ -7,3 +7,12 @@ Handler *createHandlerChain() {
 
   return begin;
 }
+
+json Handler::getParams(json input) {
+  if (input.contains("key") && input["key"].is_string() &&
+      input["key"].get<string>() == key && input.contains(paramKey) &&
+      input[paramKey].is_object()) {
+    return input[paramKey].get<json>();
+  } else
+    return nullptr;
+};
