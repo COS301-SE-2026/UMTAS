@@ -5,7 +5,7 @@ import {
   PartialType,
   PickType,
 } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   IsBoolean,
   IsDefined,
@@ -162,4 +162,12 @@ export class DeleteResponseDto extends PickType(EventDto, [
 }
 export class EventFiltersDto {
   @ApiPropertyOptional() @IsOptional() @IsUUID() moduleId?: string;
+
+  @ApiPropertyOptional() @IsOptional() @IsUUID() timetableId?: string;
+
+  @ApiPropertyOptional({ type: Boolean })
+  @Transform(({ value }) => value === 'true')
+  @IsOptional()
+  @IsBoolean()
+  all?: boolean;
 }

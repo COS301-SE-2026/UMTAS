@@ -101,6 +101,8 @@ export class EventController {
   ): Promise<EventListResponseDto> {
     return this.service.getAllEvents(session.user.id, {
       moduleId: filters.moduleId,
+      timetableId: filters.timetableId,
+      all: filters.all,
     });
   } //getAllEvents
 

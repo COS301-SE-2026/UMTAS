@@ -21,6 +21,7 @@ import {
   usersTable,
   UniversityRole,
   University,
+  EventsToTimetables,
 } from '../entities/index';
 import {
   CreateEventDto,
@@ -154,11 +155,19 @@ export class EventService {
     } //END_transaction precencer check
 
     let events: EventDto[];
-
+    console.log(`Here: ${filters.all}`);
     if (filters.moduleId)
       // Events for a module
       events = await this.getEventsByModule(filters.moduleId, tx); //No moduleId provided, filter only by user
-    else events = await this.getEventsByUser(userId, tx);
+    else if (filters.timetableId)
+      events = await this.getEventsByTimetable(filters.timetableId, tx);
+    else if (filters.all) {
+      const pureEvents = await tx.select().from(Event);
+      console.log(`Here: ${JSON.stringify(pureEvents)}`);
+      events = await Promise.all(
+        pureEvents.map((event) => this.mapEventToDto(event)),
+      );
+    } else events = await this.getEventsByUser(userId, tx);
 
     return { events };
   } //getAllEvents
@@ -634,6 +643,25 @@ export class EventService {
 
     return Promise.all(events.map((event) => this.mapEventToDto(event)));
   } //END_getEventsByModule
+
+  //Get events by timetable
+  private async getEventsByTimetable(
+    timetableId: string,
+    tx?: AppDatabase,
+  ): Promise<EventDto[]> {
+    const db = tx ?? this.dbService.db;
+
+    const events = await db
+      .select(getTableColumns(Event))
+      .from(Event)
+      .innerJoin(
+        EventsToTimetables,
+        eq(EventsToTimetables.eventID, Event.eventID),
+      )
+      .where(eq(EventsToTimetables.timetableID, timetableId));
+
+    return Promise.all(events.map((event) => this.mapEventToDto(event)));
+  }
 
   //Get events for modules user is enrolled in
   private async getEventsByUser(
