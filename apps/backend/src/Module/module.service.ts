@@ -268,21 +268,46 @@ export class ModuleService {
   ): Promise<ModuleListResponseDto> {
     const db = tx ?? this.dbService.db;
 
-    // const conditions: SQL[] = [];
+    const uniId = filters.universityId?.trim();
 
-    const foundModules = await db
-      .selectDistinctOn([modules.moduleID], {
-        ...getTableColumns(modules),
-        styling: ModuleStyling.styling ?? null,
-      })
-      .from(modules)
-      .leftJoin(
-        ModuleStyling,
-        and(
-          eq(ModuleStyling.ModuleID, modules.moduleID),
-          eq(ModuleStyling.UserID, userId),
-        ),
-      );
+    let foundModules: ModuleSingleResponseDto[] = [];
+
+    if (uniId) {
+      foundModules = await db
+        .selectDistinctOn([modules.moduleID], {
+          ...getTableColumns(modules),
+          styling: ModuleStyling.styling ?? null,
+          CourseModuleInfo: getTableColumns(CourseModule),
+        })
+        .from(modules)
+        .leftJoin(
+          ModuleStyling,
+          and(
+            eq(ModuleStyling.ModuleID, modules.moduleID),
+            eq(ModuleStyling.UserID, userId),
+          ),
+        )
+        .leftJoin(GroupModules, eq(GroupModules.ModuleID, modules.moduleID))
+        .leftJoin(
+          CourseModule,
+          eq(CourseModule.GroupModuleID, GroupModules.GroupModuleID),
+        )
+        .leftJoin(Course, eq(Course.CourseID, CourseModule.CourseID));
+    } else {
+      foundModules = await db
+        .selectDistinctOn([modules.moduleID], {
+          ...getTableColumns(modules),
+          styling: ModuleStyling.styling ?? null,
+        })
+        .from(modules)
+        .leftJoin(
+          ModuleStyling,
+          and(
+            eq(ModuleStyling.ModuleID, modules.moduleID),
+            eq(ModuleStyling.UserID, userId),
+          ),
+        );
+    }
 
     return { modules: foundModules };
   }
