@@ -93,6 +93,26 @@ export class TimetableController {
     return this.service.getTimetableById(session.user.id, id);
   } //getTimetableById
 
+  @Get('/v2/:id')
+  @ApiOperation({
+    summary: 'Get timetable by ID',
+    operationId: 'getTimetableByIdV2',
+  })
+  @ApiParam({ name: 'id', type: String, description: 'Timetable ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Timetable fetched successfully',
+    type: TimetableResponseDto,
+  })
+  @ApiResponse({ status: 401, description: 'No active session' })
+  @ApiResponse({ status: 404, description: 'Timetable not found' })
+  getTimetableByIdV2(
+    @CurrentSession() session: SessionData,
+    @Param('id') id: string,
+  ): Promise<TimetableResponseDto> {
+    return this.service.getByIdV2(session.user.id, id);
+  } //getTimetableByIdV2
+
   @Patch(':id')
   @ApiOperation({
     summary: 'Update a timetable',

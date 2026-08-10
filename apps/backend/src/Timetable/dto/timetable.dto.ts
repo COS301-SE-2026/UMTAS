@@ -7,6 +7,7 @@ import {
   Length,
   IsUUID,
 } from 'class-validator';
+import { EventDto } from 'src/Events/dto/EventDto.dto';
 
 export class CreateTimetableDto {
   @ApiPropertyOptional({
@@ -96,6 +97,17 @@ export class TimetableResponseDto {
   })
   eventIds?: string[];
 } //TimetableResponseDto
+
+export class TimetableResponseDto2 {
+  @ApiProperty({ type: String })
+  UserTimetableID!: string;
+
+  @ApiProperty({ type: TimetableDto })
+  timetable!: TimetableDto;
+
+  @ApiProperty({ type: [EventDto] })
+  events: EventDto[] = [];
+}
 
 export class TimetableListResponseDto {
   @ApiProperty({

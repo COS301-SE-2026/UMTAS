@@ -19,12 +19,17 @@ import {
   DeleteTimetableResponseDto,
   TimetableListResponseDto,
   TimetableResponseDto,
+  TimetableResponseDto2,
   UpdateTimetableDto,
 } from './dto/timetable.dto';
+import { EventService } from '../Events/event.service';
 
 @Injectable()
 export class TimetableService {
-  constructor(private readonly databaseService: DatabaseService) {}
+  constructor(
+    private readonly databaseService: DatabaseService,
+    private readonly eventService: EventService,
+  ) {}
 
   async createTimetable(
     userId: string,
@@ -130,6 +135,50 @@ export class TimetableService {
   ): Promise<TimetableResponseDto> {
     return this.fetchTimetableWithEvents(userId, timetableId);
   } //getTimetableById
+
+  async getByIdV2(
+    userId: string,
+    timetableId: string,
+    tx?: AppDatabase,
+  ): Promise<TimetableResponseDto2> {
+    const db = tx ?? this.databaseService.db;
+
+    //Get Timetable - ensure it exists
+    const [timetable] = await db
+      .select()
+      .from(Timetable)
+      .where(eq(Timetable.timetableID, timetableId))
+      .limit(1);
+
+    //Get UserTimetableId
+    const [userTimetable] = await db
+      .select()
+      .from(UserTimetable)
+      .where(
+        and(
+          eq(UserTimetable.UserID, userId),
+          eq(UserTimetable.TimetableID, timetableId),
+        ),
+      )
+      .limit(1);
+
+    //Get Events
+    const events = await this.eventService.getAllEvents(
+      userId,
+      { timetableId },
+      db,
+    );
+
+    //Return
+    return {
+      UserTimetableID: userTimetable.UserTimetableID,
+      timetable,
+      events:
+        events.events !== undefined && events.events.length != null
+          ? events.events
+          : [],
+    };
+  } //END_getByIdV2
 
   async updateTimetable(
     userId: string,
