@@ -39,8 +39,8 @@ import { AppDatabase } from '../db/database.service';
 import { ModuleService } from '../Module/module.service';
 import { EventImportFingerprintService } from './event-import-fingerprint.service';
 import { EventCriteria, EventSource } from './dto/event.types';
-import { UniversityService } from 'src/University/university.service';
-import { UniversitySingleResponseDto } from 'src/University/dto/university.dto';
+import { UniversityService } from '../University/university.service';
+import { UniversitySingleResponseDto } from '../University/dto/university.dto';
 
 @Injectable()
 export class EventService {
@@ -313,12 +313,6 @@ export class EventService {
     };
   } //delete
 
-  //Attendance methods
-
-  //Create attendance
-
-  //END_Attendance methods
-
   //=======================================================
   //🎅's Little Helpers
 
@@ -564,6 +558,9 @@ export class EventService {
         }),
       })
       .returning();
+
+    if (!event)
+      throw new InternalServerErrorException(`Failed to create event`);
 
     return { event: await this.mapEventToDto(event) };
   } //END_createEventV2
@@ -828,23 +825,22 @@ export class EventService {
     //Validate eventCriteria
     validated.eventCriteria = await this.validateEventCriteria(
       userId,
-      uni.UniversityID,
       validated.eventCriteria,
       validated.isRecurring!,
     );
 
-    validated.venues = await this.validateVenues(
-      tx,
-      uni.UniversityID,
-      validated.venues,
-    );
+    if (validated.venues && validated.venues.length !== 0)
+      validated.venues = await this.validateVenues(
+        tx,
+        uni.UniversityID,
+        validated.venues,
+      );
 
     return validated;
   } //END_validateCreateEventDto
 
   private async validateEventCriteria(
     userId: string,
-    uniId: string,
     eventCriteria: EventCriteriaDto,
     isRecurring: boolean,
   ): Promise<EventCriteriaDto> {
