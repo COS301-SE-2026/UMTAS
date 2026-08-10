@@ -160,6 +160,7 @@ export class ModulesDto {
   @ValidateNested()
   @Type(() => CourseModuleDto)
   CourseModuleInfo?: CourseModuleDto | null;
+
   @ApiProperty({
     type: Boolean,
     example: true,
@@ -248,7 +249,6 @@ export class ModuleFiltersDto {
   @ApiPropertyOptional({
     description:
       'Filter by university ID - returns all modules across all courses in the university',
-    example: '00000000-0000-0000-0000-000000000000',
   })
   @IsOptional()
   @IsUUID()
@@ -256,14 +256,12 @@ export class ModuleFiltersDto {
 
   @ApiPropertyOptional({
     description: 'Filter by course ID - returns all modules in the course',
-    example: '00000000-0000-0000-0000-000000000000',
   })
   @IsOptional()
   @IsUUID()
   courseId?: string;
 
   @ApiPropertyOptional({
-    example: '00000000-0000-0000-0000-000000000000',
     description: 'Filter by ModuleGrouping ID',
   })
   @IsOptional()
@@ -272,7 +270,6 @@ export class ModuleFiltersDto {
 
   //Filter by code using wildcard
   @ApiPropertyOptional({
-    example: 'COS',
     description: 'Filter by code, makes use of wildcard search',
   })
   @IsOptional()
@@ -280,7 +277,7 @@ export class ModuleFiltersDto {
   moduleCode?: string;
 
   @ApiPropertyOptional({
-    example: false,
+    example: undefined,
     default: false,
     description: 'Choose to filter modules based of current user enrollments',
     type: Boolean,

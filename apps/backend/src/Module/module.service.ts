@@ -261,6 +261,32 @@ export class ModuleService {
     return { modules: foundModules };
   } //getAll
 
+  async getAllV2(
+    userId: string,
+    filters: ModuleFiltersDto,
+    tx?: AppDatabase,
+  ): Promise<ModuleListResponseDto> {
+    const db = tx ?? this.dbService.db;
+
+    // const conditions: SQL[] = [];
+
+    const foundModules = await db
+      .selectDistinctOn([modules.moduleID], {
+        ...getTableColumns(modules),
+        styling: ModuleStyling.styling ?? null,
+      })
+      .from(modules)
+      .leftJoin(
+        ModuleStyling,
+        and(
+          eq(ModuleStyling.ModuleID, modules.moduleID),
+          eq(ModuleStyling.UserID, userId),
+        ),
+      );
+
+    return { modules: foundModules };
+  }
+
   async getById(
     userId: string,
     moduleId: string,
