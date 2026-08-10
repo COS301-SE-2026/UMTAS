@@ -18,6 +18,7 @@ import {
   CreateTimetableDto,
   DeleteTimetableResponseDto,
   TimetableListResponseDto,
+  TimetableListResponseDtoV2,
   TimetableResponseDto,
   TimetableResponseDto2,
   UpdateTimetableDto,
@@ -128,6 +129,34 @@ export class TimetableService {
 
     return { timetables: Array.from(map.values()) };
   } //getAllTimetables
+
+  async getAllV2(userId: string): Promise<TimetableListResponseDtoV2> {
+    const timetables = await this.databaseService.db
+      .select({
+        UserTimetableID: UserTimetable.UserTimetableID,
+        timetable: Timetable,
+      })
+      .from(Timetable)
+      .innerJoin(
+        UserTimetable,
+        eq(UserTimetable.TimetableID, Timetable.timetableID),
+      )
+      .where(and(eq(UserTimetable.UserID, userId)));
+
+    const timetableList: TimetableResponseDto2[] = await Promise.all(
+      timetables.map(async (timetable) => ({
+        UserTimetableID: timetable.UserTimetableID,
+        timetable: timetable.timetable,
+        events: (
+          await this.eventService.getAllEvents(userId, {
+            timetableId: timetable.timetable.timetableID,
+          })
+        ).events,
+      })), //END_map
+    ); //END_Promise
+
+    return { timetables: timetableList };
+  }
 
   async getTimetableById(
     userId: string,

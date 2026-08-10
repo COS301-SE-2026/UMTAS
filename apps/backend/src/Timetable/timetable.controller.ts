@@ -21,6 +21,7 @@ import {
   TimetableResponseDto,
   TimetableListResponseDto,
   DeleteTimetableResponseDto,
+  TimetableListResponseDtoV2,
 } from './dto/timetable.dto';
 
 import { TimetableService } from './timetable.service';
@@ -71,6 +72,23 @@ export class TimetableController {
     @CurrentSession() session: SessionData,
   ): Promise<TimetableListResponseDto> {
     return this.service.getAllTimetables(session.user.id);
+  } //getAllTimetables
+
+  @Get('/v2')
+  @ApiOperation({
+    summary: 'Get all timetables',
+    operationId: 'getAllTimetablesV2',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Timetables fetched successfully',
+    type: TimetableListResponseDto,
+  })
+  @ApiResponse({ status: 401, description: 'No active session' })
+  getAllTimetablesV2(
+    @CurrentSession() session: SessionData,
+  ): Promise<TimetableListResponseDtoV2> {
+    return this.service.getAllV2(session.user.id);
   } //getAllTimetables
 
   @Get(':id')

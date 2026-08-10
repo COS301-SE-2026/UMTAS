@@ -109,6 +109,14 @@ export class TimetableResponseDto2 {
   events: EventDto[] = [];
 }
 
+export class TimetableListResponseDtoV2 {
+  @ApiProperty({
+    type: [TimetableResponseDto2],
+    description: 'List of timetables with their linked event objects',
+  })
+  timetables!: TimetableResponseDto2[];
+}
+
 export class TimetableListResponseDto {
   @ApiProperty({
     type: [TimetableResponseDto],
