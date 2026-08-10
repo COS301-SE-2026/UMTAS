@@ -30,6 +30,16 @@ import { Roles } from '../auth/roles.guard';
 export class EventController {
   constructor(private readonly service: EventService) {}
 
+  @Post('/v2')
+  @Roles('lecturer', 'uni_admin')
+  @ApiBody({ type: CreateEventDto })
+  createEvent2(
+    @CurrentSession() session: SessionData,
+    @Body() dto: CreateEventDto,
+  ) {
+    return this.service.createV2(dto, session.user.id, session.uniId);
+  }
+
   @Post()
   @Roles()
   @ApiOperation({

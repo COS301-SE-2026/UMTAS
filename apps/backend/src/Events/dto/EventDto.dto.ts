@@ -67,39 +67,56 @@ export class VenueDto {
 }
 
 export class EventDto {
-  @ApiProperty() @IsUUID() eventId!: string;
-  @ApiProperty({ type: EventCriteriaDto })
-  @ValidateNested()
-  @Type(() => EventCriteriaDto)
-  eventCriteria!: EventCriteriaDto;
+  @ApiProperty()
+  @IsUUID()
+  eventId!: string;
+
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
   @Length(1, 32)
   eventName?: string;
-  @ApiPropertyOptional({ enum: ActivityTypeSchema.options })
-  @IsOptional()
-  @IsEnum(ActivityTypeSchema.options)
-  activityType?: (typeof ActivityTypeSchema.options)[number];
+
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
   @Length(1, 10)
   activityCode?: string | null;
+
+  @ApiPropertyOptional({ enum: ActivityTypeSchema.options })
+  @IsOptional()
+  @IsEnum(ActivityTypeSchema.options)
+  activityType?: (typeof ActivityTypeSchema.options)[number];
+
+  @ApiProperty({ type: EventCriteriaDto })
+  @ValidateNested()
+  @Type(() => EventCriteriaDto)
+  eventCriteria!: EventCriteriaDto;
+
+  @ApiPropertyOptional({ type: Boolean })
+  @IsOptional()
+  @IsBoolean()
+  isRecurring?: boolean;
+
+  @ApiPropertyOptional({ type: Boolean })
+  @IsOptional()
+  @IsBoolean()
+  validated?: boolean;
+
   @ApiPropertyOptional({ type: [VenueDto] })
   @IsOptional()
   @ValidateNested({ each: true })
   @Type(() => VenueDto)
   venues?: VenueDto[];
-  @ApiPropertyOptional({ type: Boolean })
-  @IsOptional()
-  @IsBoolean()
-  isRecurring?: boolean;
-  @ApiPropertyOptional({ type: Boolean })
-  @IsOptional()
-  @IsBoolean()
-  validated?: boolean;
 }
+
+// export class CreateEventDto2 extends PickType(EventDto, [
+// 'eventName',
+// 'activityType',
+// 'activityCode'
+// ]){
+
+// }
 
 export class CreateEventDto extends PickType(EventDto, [
   'eventName',
