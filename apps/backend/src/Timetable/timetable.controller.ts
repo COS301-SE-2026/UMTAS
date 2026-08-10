@@ -102,7 +102,6 @@ export class TimetableController {
     description: 'Timetable fetched successfully',
     type: TimetableResponseDto,
   })
-  @ApiResponse({ status: 401, description: 'No active session' })
   @ApiResponse({ status: 404, description: 'Timetable not found' })
   getTimetableById(
     @CurrentSession() session: SessionData,
@@ -122,8 +121,7 @@ export class TimetableController {
     description: 'Timetable fetched successfully',
     type: TimetableResponseDto,
   })
-  @ApiResponse({ status: 401, description: 'No active session' })
-  @ApiResponse({ status: 404, description: 'Timetable not found' })
+  @ApiResponse({ status: 404, description: `Timetable[] not found` })
   getTimetableByIdV2(
     @CurrentSession() session: SessionData,
     @Param('id') id: string,

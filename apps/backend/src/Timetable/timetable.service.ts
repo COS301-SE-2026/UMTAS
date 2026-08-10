@@ -179,6 +179,9 @@ export class TimetableService {
       .where(eq(Timetable.timetableID, timetableId))
       .limit(1);
 
+    if (!timetable)
+      throw new NotFoundException(`Timetable[${timetableId}] not found :(`);
+
     //Get UserTimetableId
     const [userTimetable] = await db
       .select()
@@ -190,6 +193,11 @@ export class TimetableService {
         ),
       )
       .limit(1);
+
+    if (!userTimetable)
+      throw new NotFoundException(
+        `User[${userId}] doesn't seem to own timetable[${timetableId}]`,
+      );
 
     //Get Events
     const events = await this.eventService.getAllEvents(
