@@ -8,10 +8,17 @@ import { EventListResponseDto } from 'src/Events/dto/EventDto.dto';
 //Exceptions
 import { NotImplementedException } from '@nestjs/common';
 
-export class Example_Adapter extends University_Adapter {
+//OpenLearning API
+export class Example_Adapter implements University_Adapter {
+  constructor(
+    private readonly baseUrl: string,
+    private readonly apikey: string,
+  ) {}
+
   async authenticate() {}
 
   async getCourses(): Promise<CourseListResponseDto> {
+    console.log(`Yebbo: getCourses | Example_Adapter`);
     throw new NotImplementedException();
   }
 

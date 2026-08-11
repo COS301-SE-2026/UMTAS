@@ -8,7 +8,9 @@ import { EventListResponseDto } from 'src/Events/dto/EventDto.dto';
 import { ModuleListResponseDto } from 'src/Module/dto/module.dto';
 import { UniversityDto } from 'src/University/dto/university.dto';
 import { UniversityService } from 'src/University/university.service';
+import { AdapterRegistry } from './Registry/AdapterRegistry';
 
+//Context
 @Injectable()
 export class ApiService {
   constructor(private readonly uniService: UniversityService) {}
@@ -16,7 +18,11 @@ export class ApiService {
   async getCourses(uniId?: string): Promise<CourseListResponseDto> {
     const uni = await this.getUni(uniId);
 
-    console.log(uni);
+    const registry = new AdapterRegistry(uni);
+
+    const adapter = registry.get(uni.UniversityID);
+
+    adapter.getCourses();
 
     throw new NotImplementedException();
   } //END_getCourses

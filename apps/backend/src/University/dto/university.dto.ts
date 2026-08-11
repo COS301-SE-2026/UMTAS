@@ -48,7 +48,7 @@ export class UniversityDto {
   })
   @IsOptional()
   @IsString()
-  @Length(1, 70)
+  @Length(1, 100)
   ApiKey?: string | null;
 
   @ApiProperty({
