@@ -7,6 +7,7 @@ import {
 import { IsObject, IsOptional, IsString } from 'class-validator';
 import type {
   PdfParserResult,
+  SolverHeuristicPreference,
   SolverInput,
   SolverPreferences,
   SolverResult,
@@ -141,18 +142,15 @@ export class PdfParserResultDto implements PdfParserResult {
 
 export class SolverHeuristicPreferenceDto {
   @ApiProperty({ type: String })
-  key!: string;
-
-  @ApiPropertyOptional({ type: Number })
-  weight?: number;
+  key!: SolverHeuristicPreference['key'];
 
   @ApiPropertyOptional({ type: 'object', additionalProperties: true })
-  parameters?: Record<string, unknown>;
+  parameters?: SolverHeuristicPreference['parameters'];
 }
 
 export class SolverPreferencesDto implements SolverPreferences {
   @ApiProperty({ type: [SolverHeuristicPreferenceDto], default: [] })
-  heuristics!: SolverHeuristicPreferenceDto[];
+  heuristics!: (SolverHeuristicPreferenceDto & SolverHeuristicPreference)[];
 }
 
 export class SchedulingVenueDto {
