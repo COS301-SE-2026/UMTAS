@@ -22,9 +22,9 @@ export class ApiService {
 
     const adapter = registry.get(uni.UniversityID);
 
-    adapter.getCourses();
+    const result = adapter.getCourses();
 
-    throw new NotImplementedException();
+    return result;
   } //END_getCourses
 
   async getModules(uniId?: string): Promise<ModuleListResponseDto> {

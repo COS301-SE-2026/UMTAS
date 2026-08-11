@@ -1,8 +1,13 @@
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { University_Adapter } from '../Adapter/University_Adapter';
 import { UniversityDto } from '../../University/dto/university.dto';
-import { Example_Adapter } from '../Adapter/Example_Adapter';
+import { Example_Adapter } from '../Adapter/Example_Adapter/Example_Adapter';
 
+@Injectable()
 export class AdapterRegistry {
   private adapters = new Map<string, University_Adapter>();
 
