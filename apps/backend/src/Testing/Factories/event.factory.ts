@@ -142,6 +142,7 @@ export function createVenue(overrides: Partial<Venue> = {}): Venue {
     VenueID: randomUUID(),
     VenueName: 'Test Venue',
     UniversityID: randomUUID(),
+    BuildingID: null,
 
     ...overrides,
   };
