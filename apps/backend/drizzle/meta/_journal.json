@@ -8,6 +8,13 @@
       "when": 1784864309199,
       "tag": "0000_Loco",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1786456402299,
+      "tag": "0001_Added_BaseUrl_ApiKey_To_University_Object",
+      "breakpoints": true
     }
   ]
 }

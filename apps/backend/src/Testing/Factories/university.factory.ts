@@ -9,6 +9,8 @@ export function createUniversity(
   return {
     UniversityID: randomUUID(),
     UniversityName: 'University of Pretoria',
+    BaseApiUrl: '',
+    ApiKey: '',
 
     ...overrides,
   };
