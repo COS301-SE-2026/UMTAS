@@ -7,9 +7,8 @@ import {
   CardDescription,
   CardHeader,
 } from "@/components/atoms/baseShadcn/card";
-import { LucidePlusCircle } from "lucide-react";
+
 import { useState } from "react";
-import PreferenceSection from "@/components/molecules/solver/PreferencesCard";
 import { useRouter } from "next/navigation";
 import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
 import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
@@ -17,6 +16,7 @@ import {
   createSolverJobBuilder,
   enrollModBuilder,
   pollSolverOutputBuilder,
+  SolverPreferencesType,
 } from "@/app/solver/queries/Solver/builder";
 import { createTimeTableBuilder } from "@/app/builder/utils/timetables/TimeTableRequests";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -27,7 +27,6 @@ import {
   SkipDayPref,
   StartTimePref,
 } from "@/components/molecules/solver/PreferenceHandler";
-
 type solverProps = {
   modules: ModuleResponseDto[];
   events: EventResponse[];
@@ -43,72 +42,6 @@ export default function SolverPreferences({ modules, events }: solverProps) {
   const router = useRouter();
   const [timetableName, setTimetableName] = useState<string>("");
 
-  const { data: resultOfPoll, isFetching: pollFetching } = useQuery({
-    queryKey: ["solver", "poll"],
-    queryFn: async () => {
-      const pollBuilder = new pollSolverOutputBuilder();
-      const resultOfPoll = await pollBuilder.send({
-        paths: {
-          jobId: jobID || "",
-        },
-      });
-      console.log("Polled", resultOfPoll);
-      return resultOfPoll;
-    },
-    enabled: jobID != null && jobID != "",
-    refetchInterval: 2500,
-  });
-
-  const enrollUserMutation = useMutation({
-    mutationFn: async () => {
-      const builder = new enrollModBuilder();
-      return await Promise.allSettled(
-        modules.map(async (mod) => {
-          const result = await builder.send({
-            paths: {
-              moduleId: mod.moduleID,
-            },
-          });
-          return result;
-        }),
-      );
-    },
-  });
-
-  const createJobMutation = useMutation({
-    mutationFn: async () => {
-      const builder = new createSolverJobBuilder();
-      const eventIDS = events.map((event) => event.eventId);
-      return await builder.send({
-        body: {
-          engine: "auto",
-          solveMode: currentMode,
-          eventIds: eventIDS,
-        },
-      });
-    },
-  });
-
-  const createTimeTableMutation = useMutation({
-    mutationFn: async () => {
-      if (resultOfPoll && timetableCreated === false && !pollFetching) {
-        setTimetableCreated(true);
-        const typeShiftedResults = resultOfPoll.result;
-        console.log("Poll closed result finished", resultOfPoll.result);
-        const timetableBuilder = new createTimeTableBuilder();
-        const resultTT = await timetableBuilder.send({
-          body: {
-            eventIds: typeShiftedResults?.timetableSolution.selectedEventIds,
-            timetableName: timetableName == "" ? "My timetable" : timetableName,
-          },
-        });
-        return resultTT;
-      }
-    },
-    onError: () => {
-      console.error("failed to make timetable");
-    },
-  });
   const [startTime, setStartTime] = useState<string>("");
   const [startTimeChecked, SetStartTimeChecked] = useState<boolean>(false);
 
@@ -142,6 +75,99 @@ export default function SolverPreferences({ modules, events }: solverProps) {
       </div>
     );
   }
+
+  const { data: resultOfPoll, isFetching: pollFetching } = useQuery({
+    queryKey: ["solver", "poll"],
+    queryFn: async () => {
+      const pollBuilder = new pollSolverOutputBuilder();
+      const resultOfPoll = await pollBuilder.send({
+        paths: {
+          jobId: jobID || "",
+        },
+      });
+      console.log("Polled", resultOfPoll);
+      return resultOfPoll;
+    },
+    enabled: jobID != null && jobID != "",
+    refetchInterval: 2500,
+  });
+
+  const enrollUserMutation = useMutation({
+    mutationFn: async () => {
+      const builder = new enrollModBuilder();
+      return await Promise.allSettled(
+        modules.map(async (mod) => {
+          const result = await builder.send({
+            paths: {
+              moduleId: mod.moduleID,
+            },
+          });
+          return result;
+        }),
+      );
+    },
+  });
+  function minToMid(): number {
+    if (startTime != "") {
+      const [hours, minutes] = startTime.split(":").map(Number);
+      const totalMinutesFromMidnight = hours * 60 + minutes;
+      const minutesToMidnight = 24 * 60 - totalMinutesFromMidnight;
+      return minutesToMidnight % 1440;
+    } else {
+      return 0;
+    }
+  }
+
+  function createPreferences() {
+    const prefs: SolverPreferencesType["heuristics"] = [];
+    if (startTimeChecked) {
+      prefs.push({
+        key: "preferred-start-time",
+        parameters: {
+          "minutes-After-midnight": minToMid(),
+        },
+      });
+    }
+    return prefs;
+  }
+
+  const createJobMutation = useMutation({
+    mutationFn: async () => {
+      const builder = new createSolverJobBuilder();
+      const eventIDS = events.map((event) => event.eventId);
+      return await builder.send({
+        body: {
+          engine: "auto",
+          solveMode: currentMode,
+          eventIds: eventIDS,
+          preferences: {
+            heuristics: createPreferences(),
+          },
+        },
+      });
+    },
+  });
+
+  const createTimeTableMutation = useMutation({
+    mutationFn: async () => {
+      if (resultOfPoll && timetableCreated === false && !pollFetching) {
+        setTimetableCreated(true);
+        const typeShiftedResults = resultOfPoll.result;
+        console.log("Poll closed result finished", resultOfPoll.result);
+        const timetableBuilder = new createTimeTableBuilder();
+        const resultTT = await timetableBuilder.send({
+          body: {
+            eventIds: typeShiftedResults?.timetableSolution.selectedEventIds,
+            timetableName: timetableName == "" ? "My timetable" : timetableName,
+          },
+        });
+        return resultTT;
+      }
+    },
+    onError: () => {
+      console.error("failed to make timetable");
+    },
+  });
 
   async function enrollUser() {
     setTimetableCreated(false);
