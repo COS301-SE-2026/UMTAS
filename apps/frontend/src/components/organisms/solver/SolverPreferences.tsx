@@ -137,7 +137,7 @@ export default function SolverPreferences({ modules, events }: solverProps) {
         timetableCreated === false &&
         !createTimeTableMutation.isPending
       ) {
-        const result = await createTimeTableMutation.mutateAsync();
+        await createTimeTableMutation.mutateAsync();
         setJobID(null);
         getQueryClient().setQueryData(["solver", "poll"], null);
         if (timetableCreated === false) {
