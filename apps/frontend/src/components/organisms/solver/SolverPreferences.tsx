@@ -110,9 +110,7 @@ export default function SolverPreferences({ modules, events }: solverProps) {
   function minToMid(): number {
     if (startTime != "") {
       const [hours, minutes] = startTime.split(":").map(Number);
-      const totalMinutesFromMidnight = hours * 60 + minutes;
-      const minutesToMidnight = 24 * 60 - totalMinutesFromMidnight;
-      return minutesToMidnight % 1440;
+      return hours * 60 + minutes;
     } else {
       return 0;
     }
@@ -133,6 +131,7 @@ export default function SolverPreferences({ modules, events }: solverProps) {
 
   const createJobMutation = useMutation({
     mutationFn: async () => {
+      console.log(createPreferences());
       const builder = new createSolverJobBuilder();
       const eventIDS = events.map((event) => event.eventId);
       return await builder.send({
