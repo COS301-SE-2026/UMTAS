@@ -1,0 +1,2 @@
+# this file is responsible for creating the fake users, it reads profile_schema.yml and creates the random fake data based on the schema defined in the file. It uses the Faker library to generate realistic data for various fields such as names, addresses, emails, and more. The generated profiles can be used for testing and simulation purposes in the application.
+# it is supposed to ouptput the 20,000 syntehtic profiles in json/other format will still decide 
