@@ -7,7 +7,6 @@ import {
 import { IsObject, IsOptional, IsString } from 'class-validator';
 import type {
   PdfParserResult,
-  SolverHeuristicPreference,
   SolverInput,
   SolverPreferences,
   SolverResult,
@@ -140,17 +139,95 @@ export class PdfParserResultDto implements PdfParserResult {
   warnings!: ParseAnnotationDto[];
 }
 
-export class SolverHeuristicPreferenceDto {
-  @ApiProperty({ type: String })
-  key!: SolverHeuristicPreference['key'];
+export class PreferredStartTimePreferenceDto {
+  @ApiProperty({
+    enum: ['preferred-start-time'],
+    example: 'preferred-start-time',
+  })
+  key!: 'preferred-start-time';
 
-  @ApiPropertyOptional({ type: 'object', additionalProperties: true })
-  parameters?: SolverHeuristicPreference['parameters'];
+  @ApiProperty({
+    type: 'object',
+    properties: {
+      'minutes-After-midnight': {
+        type: 'number',
+        minimum: 0,
+        maximum: 1440,
+        example: 540,
+      },
+    },
+    required: ['minutes-After-midnight'],
+  })
+  parameters!: {
+    'minutes-After-midnight': number;
+  };
 }
 
+export class LargeGapsPreferenceDto {
+  @ApiProperty({
+    enum: ['large-gaps'],
+    example: 'large-gaps',
+  })
+  key!: 'large-gaps';
+}
+
+export class SmallGapsPreferenceDto {
+  @ApiProperty({
+    enum: ['small-gaps'],
+    example: 'small-gaps',
+  })
+  key!: 'small-gaps';
+}
+
+export class DaySkipPreferenceDto {
+  @ApiProperty({
+    enum: ['day-skip'],
+    example: 'day-skip',
+  })
+  key!: 'day-skip';
+
+  @ApiProperty({
+    type: 'object',
+    properties: {
+      'day-to-skip': {
+        type: 'string',
+        enum: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
+        example: 'monday',
+      },
+    },
+    required: ['day-to-skip'],
+  })
+  parameters!: {
+    'day-to-skip': 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday';
+  };
+}
+
+export type SolverHeuristicPreferenceDto =
+  | PreferredStartTimePreferenceDto
+  | LargeGapsPreferenceDto
+  | SmallGapsPreferenceDto
+  | DaySkipPreferenceDto;
+
+@ApiExtraModels(
+  PreferredStartTimePreferenceDto,
+  LargeGapsPreferenceDto,
+  SmallGapsPreferenceDto,
+  DaySkipPreferenceDto,
+)
 export class SolverPreferencesDto implements SolverPreferences {
-  @ApiProperty({ type: [SolverHeuristicPreferenceDto], default: [] })
-  heuristics!: (SolverHeuristicPreferenceDto & SolverHeuristicPreference)[];
+  @ApiProperty({
+    type: 'array',
+    default: [],
+    items: {
+      oneOf: [
+        { $ref: getSchemaPath(PreferredStartTimePreferenceDto) },
+        { $ref: getSchemaPath(LargeGapsPreferenceDto) },
+        { $ref: getSchemaPath(SmallGapsPreferenceDto) },
+        { $ref: getSchemaPath(DaySkipPreferenceDto) },
+      ],
+    },
+  })
+  heuristics!: SolverHeuristicPreferenceDto[];
 }
 
 export class SchedulingVenueDto {
