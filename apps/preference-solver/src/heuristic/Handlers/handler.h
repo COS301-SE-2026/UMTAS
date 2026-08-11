@@ -20,14 +20,19 @@ using std::string;
 
 class Handler {
 protected:
-  const string key = "Default";
+  const string key;
   const string paramKey = "parameters";
   Handler *next = nullptr;
 
 public:
   Handler(string key) : key(key) {}
 
-  void setNext(Handler *next) { this->next = next; }
+  void setNext(Handler *next) {
+    if (this->next)
+      this->next->setNext(next);
+    else
+      this->next = next;
+  }
 
   virtual ~Handler() {
     if (this->next) {
@@ -51,6 +56,7 @@ private:
 
 public:
   TargetStartTimeHandler() : Handler("preferred-start-time") {}
+  virtual ~TargetStartTimeHandler() {}
   virtual BaseHeuristic *getHeuristic(nlohmann::json input);
 };
 
@@ -59,6 +65,7 @@ private:
   const string targetKey = "day-to-skip";
 
 public:
+  virtual ~SkipDayHandler() {}
   SkipDayHandler() : Handler("day-skip") {}
   virtual BaseHeuristic *getHeuristic(nlohmann::json input);
 };

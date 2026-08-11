@@ -81,6 +81,7 @@ API_DATA::API_DATA(const json &reqData) {
     // Handler construction and so on
 
     delete chain;
+    
     chain = nullptr;
   } catch (const json::parse_error &e) {
     if (chain)

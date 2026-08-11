@@ -15,8 +15,11 @@ public:
    * @return BaseHeuristic* The new head of the decorator chain.
    */
   virtual BaseHeuristic *setHead(BaseHeuristic *ptr) {
-    ptr->setNext(this);
-    return ptr;
+    if (ptr) {
+      ptr->setNext(this);
+      return ptr;
+    } else
+      return this;
   }
 
   virtual BaseHeuristic *copy() { return new BaseHeuristic(); }

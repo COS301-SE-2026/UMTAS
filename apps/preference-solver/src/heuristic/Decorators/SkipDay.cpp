@@ -8,5 +8,7 @@ double SkipDayDec::calculateHeursitic(EventChromosome events) {
       score += 100;
     }
   }
-  return score; // for every event on the same day it theres a penalty applied
+  return score + H_Decorator::calculateHeursitic(
+                     events); // for every event on the same day it theres a
+                              // penalty applied
 }

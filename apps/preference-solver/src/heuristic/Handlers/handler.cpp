@@ -2,8 +2,8 @@
 
 Handler *createHandlerChain() {
   Handler *begin = new Handler("Start");
-
   begin->setNext(new TargetStartTimeHandler());
+  begin->setNext(new SkipDayHandler());
 
   return begin;
 }
