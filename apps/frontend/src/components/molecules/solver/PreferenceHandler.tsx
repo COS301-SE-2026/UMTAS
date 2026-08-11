@@ -24,6 +24,14 @@ function PreferenceContainer({ children }: { children: ReactNode }) {
   return <div className=" flex flex-row ">{children}</div>;
 }
 
+interface CheckBoxProps {
+  isChecked: boolean;
+  setChecked: (val: boolean) => void;
+}
+function PrefCheckbox({ isChecked, setChecked }: CheckBoxProps) {
+  return <Checkbox checked={isChecked} onCheckedChange={setChecked} />;
+}
+
 interface PreferenceSelectProps<T extends string | number> {
   value: T;
   onChange: (val: T) => void;
@@ -67,25 +75,40 @@ function PreferenceSelect<T extends string | number>({
 interface StartTimePref {
   startTime: string;
   onChange: (val: string) => void;
+  activePreference: boolean;
+  setChecked: (val: boolean) => void;
 }
 
-export function StartTimePref({ startTime, onChange }: StartTimePref) {
+export function StartTimePref({
+  startTime,
+  onChange,
+  activePreference,
+  setChecked,
+}: StartTimePref) {
   <PreferenceContainer>
     <PreferenceSelect
       value={startTime}
       onChange={onChange}
       placeholder="Start Time"
       dataArray={TIMES}
-    ></PreferenceSelect>
+    />
+    <PrefCheckbox setChecked={setChecked} isChecked={activePreference} />
   </PreferenceContainer>;
 }
 
 interface skipDayProps {
   day: string;
   onChange: (val: string) => void;
+  activePreference: boolean;
+  setChecked: (val: boolean) => void;
 }
 
-export function skipDayPref({ day, onChange }: skipDayProps) {
+export function skipDayPref({
+  day,
+  onChange,
+  activePreference,
+  setChecked,
+}: skipDayProps) {
   <PreferenceContainer>
     <PreferenceSelect
       value={day}
@@ -93,5 +116,6 @@ export function skipDayPref({ day, onChange }: skipDayProps) {
       dataArray={DAYS}
       placeholder="Day"
     />
+    <PrefCheckbox setChecked={setChecked} isChecked={activePreference} />
   </PreferenceContainer>;
 }
