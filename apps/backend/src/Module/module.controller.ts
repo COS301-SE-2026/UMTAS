@@ -91,33 +91,6 @@ export class ModuleController {
     return this.service.getAll(session.user.id, filters);
   }
 
-  @Get('/v2')
-  @Roles()
-  @ApiOperation({
-    summary: 'V2 - Get all modules with filters',
-    description:
-      'Filter by userId(enrolled) | courseId(course owned) | universityId(modules for university over all courses). At least one filter required',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Modules returned successfully',
-    type: ModuleListResponseDto,
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Invalid request - at least one filter required',
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'No modules found matching the filters',
-  })
-  getAllV2(
-    @CurrentSession() session: SessionData,
-    @Query() filters: ModuleFiltersDto,
-  ): Promise<ModuleListResponseDto> {
-    return this.service.getAllV2(session.user.id, filters);
-  }
-
   //Get by id
   @Get(':moduleId')
   @Roles()

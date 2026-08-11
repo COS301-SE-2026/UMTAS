@@ -6,6 +6,7 @@ import { timetableId, userId } from '../Testing/constants';
 //Actual Services
 import { TimetableService } from './timetable.service';
 import { DatabaseService } from '../db/database.service';
+import { EventService } from '../Events/event.service';
 
 //Mock Database and factories
 import { createMockDatabase } from '../Testing/Mocks/database.mock';
@@ -22,7 +23,7 @@ import {
 } from '../Testing/Factories/';
 
 //Mock Services
-import {} from '../Testing/Mocks/services';
+import { createMockEventService } from '../Testing/Mocks/services';
 
 //Exceptions
 import {
@@ -41,12 +42,14 @@ describe('Timetable Service', () => {
   let service: TimetableService;
 
   const { mockDb, reset: resetDb } = createMockDatabase();
+  const { mockEventService, reset: resetEvents } = createMockEventService();
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
       providers: [
         TimetableService,
         { provide: DatabaseService, useValue: { db: mockDb } },
+        { provide: EventService, useValue: mockEventService },
       ],
     }).compile();
 
@@ -55,6 +58,7 @@ describe('Timetable Service', () => {
 
   afterEach(() => {
     resetDb();
+    resetEvents();
   });
 
   //TESTS

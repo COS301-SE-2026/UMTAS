@@ -214,103 +214,57 @@ export class ModuleService {
   ): Promise<ModuleListResponseDto> {
     const db = tx ?? this.dbService.db;
 
-    //define empty conditions array to be added to based of filters
+    const uniId = filters.universityId?.trim();
+    const courseId = filters.courseId?.trim();
+    const groupId = filters.GroupID?.trim();
+    const moduleCode = filters.moduleCode?.trim();
+    const enroll = filters.userEnrollment;
+
+    let foundModules: ModuleSingleResponseDto[] = [];
+
     const conditions: SQL[] = [];
 
-    //filters
-    if (filters.universityId)
-      conditions.push(eq(Course.UniversityID, filters.universityId));
-    if (filters.courseId)
-      conditions.push(eq(Course.CourseID, filters.courseId));
-    if (filters.GroupID)
-      conditions.push(eq(GroupModules.GroupID, filters.GroupID));
-    if (filters.moduleCode)
-      conditions.push(ilike(modules.moduleCode, `%${filters.moduleCode}%`));
-    if (filters.userEnrollment)
-      conditions.push(eq(ModuleEnrollment.UserID, userId));
+    if (uniId) conditions.push(eq(Course.UniversityID, uniId));
+    if (courseId) conditions.push(eq(CourseModule.CourseID, courseId));
+    if (groupId) conditions.push(eq(Course.GroupID, groupId));
+    if (moduleCode)
+      conditions.push(ilike(modules.moduleCode, `%${moduleCode}%`));
+    if (enroll) conditions.push(eq(ModuleEnrollment.UserID, userId));
 
-    //Build actual query joining Modules -> ModuleEnrollment + CourseModule + Course and then add in dynamic where conditions
-    const foundModules = await db
+    foundModules = await db
       .selectDistinctOn([modules.moduleID], {
         ...getTableColumns(modules),
-        ModuleGroupingID: GroupModules.GroupID,
-        CourseID: Course.CourseID,
-        styling: ModuleStyling.styling,
+        styling: ModuleStyling.styling ?? null,
         CourseModuleInfo: getTableColumns(CourseModule),
       })
       .from(modules)
       .leftJoin(
         ModuleStyling,
         and(
-          eq(ModuleStyling.UserID, userId),
           eq(ModuleStyling.ModuleID, modules.moduleID),
+          eq(ModuleStyling.UserID, userId),
         ),
       )
-      .innerJoin(GroupModules, eq(GroupModules.ModuleID, modules.moduleID))
+      .leftJoin(GroupModules, eq(GroupModules.ModuleID, modules.moduleID))
       .leftJoin(
         CourseModule,
         eq(CourseModule.GroupModuleID, GroupModules.GroupModuleID),
       )
-      .leftJoin(Course, eq(Course.GroupID, GroupModules.GroupID))
+      .leftJoin(Course, eq(Course.CourseID, CourseModule.CourseID))
       .leftJoin(
         ModuleEnrollment,
-        eq(ModuleEnrollment.ModuleID, modules.moduleID),
+        and(
+          eq(ModuleEnrollment.ModuleID, modules.moduleID),
+          eq(ModuleEnrollment.UserID, userId),
+        ),
       )
       .where(and(...conditions));
 
-    return { modules: foundModules };
+    return {
+      modules: foundModules,
+      message: `Returning: ${foundModules.length}-Modules. | With filters: ${JSON.stringify(filters)}`,
+    };
   } //getAll
-
-  async getAllV2(
-    userId: string,
-    filters: ModuleFiltersDto,
-    tx?: AppDatabase,
-  ): Promise<ModuleListResponseDto> {
-    const db = tx ?? this.dbService.db;
-
-    const uniId = filters.universityId?.trim();
-
-    let foundModules: ModuleSingleResponseDto[] = [];
-
-    if (uniId) {
-      foundModules = await db
-        .selectDistinctOn([modules.moduleID], {
-          ...getTableColumns(modules),
-          styling: ModuleStyling.styling ?? null,
-          CourseModuleInfo: getTableColumns(CourseModule),
-        })
-        .from(modules)
-        .leftJoin(
-          ModuleStyling,
-          and(
-            eq(ModuleStyling.ModuleID, modules.moduleID),
-            eq(ModuleStyling.UserID, userId),
-          ),
-        )
-        .leftJoin(GroupModules, eq(GroupModules.ModuleID, modules.moduleID))
-        .leftJoin(
-          CourseModule,
-          eq(CourseModule.GroupModuleID, GroupModules.GroupModuleID),
-        )
-        .leftJoin(Course, eq(Course.CourseID, CourseModule.CourseID));
-    } else {
-      foundModules = await db
-        .selectDistinctOn([modules.moduleID], {
-          ...getTableColumns(modules),
-          styling: ModuleStyling.styling ?? null,
-        })
-        .from(modules)
-        .leftJoin(
-          ModuleStyling,
-          and(
-            eq(ModuleStyling.ModuleID, modules.moduleID),
-            eq(ModuleStyling.UserID, userId),
-          ),
-        );
-    }
-
-    return { modules: foundModules };
-  }
 
   async getById(
     userId: string,

@@ -234,6 +234,12 @@ export class ModuleListResponseDto {
     description: 'List of modules',
   })
   modules!: ModuleSingleResponseDto[];
+
+  @ApiPropertyOptional({
+    type: String,
+    description: 'Short message indicating  success of response.',
+  })
+  message?: string;
 }
 
 //Delete
@@ -286,7 +292,7 @@ export class ModuleFiltersDto {
   @IsBoolean()
   @IsOptional()
   @Transform(({ value }) => {
-    if (value === true) return true;
+    if (value === 'true') return true;
     else return false;
   })
   userEnrollment?: boolean;

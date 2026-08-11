@@ -155,7 +155,7 @@ export class EventService {
     } //END_transaction precencer check
 
     let events: EventDto[];
-    console.log(`Here: ${filters.all}`);
+    // console.log(`Here: ${filters.all}`);
     if (filters.moduleId)
       // Events for a module
       events = await this.getEventsByModule(filters.moduleId, tx); //No moduleId provided, filter only by user
@@ -163,7 +163,7 @@ export class EventService {
       events = await this.getEventsByTimetable(filters.timetableId, tx);
     else if (filters.all) {
       const pureEvents = await tx.select().from(Event);
-      console.log(`Here: ${JSON.stringify(pureEvents)}`);
+      // console.log(`Here: ${JSON.stringify(pureEvents)}`);
       events = await Promise.all(
         pureEvents.map((event) => this.mapEventToDto(event)),
       );
