@@ -34,6 +34,15 @@ export class UniversityDto {
   UniversityName!: string;
 
   @ApiPropertyOptional({
+    example: 'UP',
+    description: 'Unique string to identify university for ApiAdapter service',
+  })
+  @IsOptional()
+  @IsString()
+  @Length(1, 10)
+  ApiIdentifier?: string | null;
+
+  @ApiPropertyOptional({
     example: 'https://api.github.com',
     description: `Url of the university's api`,
   })
