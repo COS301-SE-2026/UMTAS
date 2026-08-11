@@ -33,6 +33,24 @@ export class UniversityDto {
   @Length(2, 30)
   UniversityName!: string;
 
+  @ApiPropertyOptional({
+    example: 'https://api.github.com',
+    description: `Url of the university's api`,
+  })
+  @IsOptional()
+  @IsString()
+  @Length(1, 50)
+  BaseApiUrl?: string | null;
+
+  @ApiPropertyOptional({
+    example: 'something1Nx8A2B9C0D1E2F3G4H5I6J7K8L9M0No12',
+    description: `Key for authorisation on univerity api`,
+  })
+  @IsOptional()
+  @IsString()
+  @Length(1, 70)
+  ApiKey?: string | null;
+
   @ApiProperty({
     enum: RoleType.enumValues,
     example: 'STUDENT',

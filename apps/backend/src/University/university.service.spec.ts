@@ -5,7 +5,6 @@ import { Test } from '@nestjs/testing';
 import {
   ConflictException,
   NotFoundException,
-  BadRequestException,
   InternalServerErrorException,
 } from '@nestjs/common';
 
@@ -143,19 +142,19 @@ describe('UniversityService', () => {
 
   describe('Test_UpdateUniversity', () => {
     //UnHappy
-    it('should throw an error if University name is undefined', async () => {
+    it('should return early if nothing to update', async () => {
       //Arrange
-      jest.spyOn(service, 'getById').mockResolvedValue({
-        UniversityID: '1',
-        UniversityName: 'Old Name',
-      });
+      const uni = createUniversity();
+
+      jest.spyOn(service, 'getById').mockResolvedValue(uni);
 
       const dto = { UniversityName: undefined };
 
-      //Act + arrange
-      await expect(service.update('1', dto)).rejects.toThrow(
-        BadRequestException,
-      );
+      //Act
+      const result = await service.update('1', dto);
+
+      //Assert
+      expect(result).toMatchObject(uni);
       expect(mockDb.update).not.toHaveBeenCalled();
     });
 

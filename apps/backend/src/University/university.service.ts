@@ -121,26 +121,39 @@ export class UniversityService {
     //verify University exists
     const uni = await this.getById(uniId, tx);
 
-    //Verify atleast one field provided for update
-    if (dto.UniversityName === undefined)
-      throw new BadRequestException('At least one field required for update');
+    const updateFields: Partial<typeof University.$inferInsert> = {};
+    //BaseApiUrl
+    if (
+      dto.BaseApiUrl &&
+      dto.BaseApiUrl.trim().length > 0 &&
+      dto.BaseApiUrl !== uni.BaseApiUrl
+    )
+      updateFields.BaseApiUrl = dto.BaseApiUrl.trim();
 
-    //get updated fields
-    const updatedName = dto.UniversityName?.trim();
+    //ApiKey
+    if (dto.ApiKey && dto.ApiKey.trim().length > 0 && dto.ApiKey !== uni.ApiKey)
+      updateFields.ApiKey = dto.ApiKey.trim();
+
+    //UniversityName
+    if (dto.UniversityName && dto.UniversityName.trim().length > 0)
+      updateFields.UniversityName = dto.UniversityName.trim();
+
+    //If nothing to udpate - return early
+    if (Object.keys(updateFields).length === 0) return uni;
+
+    const updatedName = updateFields.UniversityName;
 
     //check if updated name is the same || already exists on another university
     if (updatedName && updatedName !== uni.UniversityName)
       if (await this.checkDuplicateUniversityName(updatedName, tx))
         throw new ConflictException(
-          `University [${dto.UniversityName.trim()}] already exists.`,
+          `University [${updatedName}] already exists.`,
         );
 
     // update university
     const [newUni] = await tx
       .update(University)
-      .set({
-        UniversityName: updatedName ?? uni.UniversityName,
-      })
+      .set(updateFields)
       .where(eq(University.UniversityID, uniId))
       .returning();
 
