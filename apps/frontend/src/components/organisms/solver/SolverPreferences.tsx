@@ -24,11 +24,9 @@ import { Spinner } from "@/components/atoms/baseShadcn/spinner";
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
 import { Input } from "@/components/atoms/baseShadcn/input";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-} from "@/components/atoms/baseShadcn/dialog";
+  SkipDayPref,
+  StartTimePref,
+} from "@/components/molecules/solver/PreferenceHandler";
 
 type solverProps = {
   modules: ModuleResponseDto[];
@@ -36,12 +34,9 @@ type solverProps = {
 };
 
 export default function SolverPreferences({ modules, events }: solverProps) {
-  const [iconClicked, setIconClicked] = useState(false);
-  const [sections, setSections] = useState([0]);
   const [currentMode, setCurrentMode] = useState<
     "feasibility" | "optimization"
   >("feasibility");
-  const [timeValue, setTimevalue] = useState<number[]>([0]);
   const [jobID, setJobID] = useState<string | null>(null);
   const [jobFailed, setJobFailed] = useState<boolean>(false);
   const [timetableCreated, setTimetableCreated] = useState<boolean>(false);
@@ -114,6 +109,39 @@ export default function SolverPreferences({ modules, events }: solverProps) {
       console.error("failed to make timetable");
     },
   });
+  const [startTime, setStartTime] = useState<string>("");
+  const [startTimeChecked, SetStartTimeChecked] = useState<boolean>(false);
+
+  const [skipDay, setSkipDay] = useState<string>("");
+  const [skipChecked, setSkipChecked] = useState<boolean>(false);
+
+  function preferences() {
+    return (
+      <div className="flex flex-col w-full gap-y-5">
+        <div className="grid grid-cols-2 w-full h-full justify-items-start items-center gap-5">
+          <label className="flex items-center gap-2 cursor-pointer text-sm font-medium">
+            <span>Choose Preferences</span>
+          </label>
+
+          <label className="flex items-center gap-2 cursor-pointer text-sm font-medium">
+            <span>Activate Preference</span>
+          </label>
+        </div>
+        <StartTimePref
+          startTime={startTime}
+          onChange={setStartTime}
+          setChecked={SetStartTimeChecked}
+          activePreference={startTimeChecked}
+        />
+        <SkipDayPref
+          setChecked={setSkipChecked}
+          activePreference={skipChecked}
+          day={skipDay}
+          onChange={setSkipDay}
+        />
+      </div>
+    );
+  }
 
   async function enrollUser() {
     setTimetableCreated(false);
@@ -153,55 +181,6 @@ export default function SolverPreferences({ modules, events }: solverProps) {
 
   handleStatus();
 
-  function handleAdd() {
-    setSections((prev) => [...prev, Date.now()]);
-  }
-
-  function handleDelete(idToDelete: number) {
-    setSections((prev) => prev.filter((id) => id !== idToDelete));
-  }
-
-  function solveMode(mode: string) {
-    if (true) {
-      return <></>;
-    }
-    if (mode === "feasibility") {
-      return <></>;
-    }
-
-    return (
-      <>
-        {" "}
-        <div className="space-y-4">
-          <div className="flex flex-row items-center justify-between">
-            <strong>Preferences</strong>
-            <LucidePlusCircle
-              strokeWidth={iconClicked ? 1.8 : 1.1}
-              onClick={() => {
-                if (false) {
-                  handleAdd();
-                  setIconClicked(true);
-                  setTimeout(() => setIconClicked(false), 150);
-                }
-              }}
-              className="transition-all duration-150 cursor-pointer"
-            />
-          </div>
-          {sections.map((id) => (
-            <PreferenceSection
-              sliderValue={timeValue}
-              setSliderValue={setTimevalue}
-              key={id}
-              DropdownItems={["Time"]}
-              onDelete={() => {
-                handleDelete(id);
-              }}
-            />
-          ))}
-        </div>
-      </>
-    );
-  }
   function loadingStatus() {
     return (
       createJobMutation.isPending ||
@@ -265,7 +244,7 @@ export default function SolverPreferences({ modules, events }: solverProps) {
             </Button>
           </div>
         </div>
-        {solveMode(currentMode)}
+        {preferences()}
         <div className="flex flex-col gap-y-2">
           <Input
             data-testid="input-solver-timetable-name"
@@ -285,16 +264,6 @@ export default function SolverPreferences({ modules, events }: solverProps) {
             className="mt-4 w-fit"
           >
             Upload and Create Timetable
-          </Button>
-          <Button
-            type="button"
-            onClick={() => {
-              router.push("/schedules");
-            }}
-            //bandaid fix will fix post demo 2
-            className="w-fit mt-40"
-          >
-            View Timetable
           </Button>
         </div>
       </>

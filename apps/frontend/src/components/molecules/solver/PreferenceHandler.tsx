@@ -21,15 +21,29 @@ const triggerClass =
   "h-8 text-xs bg-[var(--bg-elevated)] border-[var(--border)] text-[var(--text-primary)] focus:ring-1 focus:ring-[var(--text-primary)]";
 
 function PreferenceContainer({ children }: { children: ReactNode }) {
-  return <div className=" flex flex-row ">{children}</div>;
+  return (
+    <div className="grid grid-cols-2 w-full h-full justify-items-start items-center gap-5">
+      {children}
+    </div>
+  );
 }
 
 interface CheckBoxProps {
   isChecked: boolean;
   setChecked: (val: boolean) => void;
+  disabled: boolean;
 }
-function PrefCheckbox({ isChecked, setChecked }: CheckBoxProps) {
-  return <Checkbox checked={isChecked} onCheckedChange={setChecked} />;
+function PrefCheckbox({ isChecked, setChecked, disabled }: CheckBoxProps) {
+  return (
+    <div className="flex flex-col justify-center ">
+      <Checkbox
+        disabled={disabled}
+        className="size-5"
+        checked={isChecked}
+        onCheckedChange={setChecked}
+      />
+    </div>
+  );
 }
 
 interface PreferenceSelectProps<T extends string | number> {
@@ -54,7 +68,7 @@ function PreferenceSelect<T extends string | number>({
     >
       <SelectTrigger
         data-testid="event-TimeStart-Select"
-        className={`${triggerClass} w-[84px]`}
+        className={`${triggerClass} w-50`}
       >
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
@@ -85,15 +99,22 @@ export function StartTimePref({
   activePreference,
   setChecked,
 }: StartTimePref) {
-  <PreferenceContainer>
-    <PreferenceSelect
-      value={startTime}
-      onChange={onChange}
-      placeholder="Start Time"
-      dataArray={TIMES}
-    />
-    <PrefCheckbox setChecked={setChecked} isChecked={activePreference} />
-  </PreferenceContainer>;
+  return (
+    <PreferenceContainer>
+      <PreferenceSelect
+        value={startTime}
+        onChange={onChange}
+        placeholder="Start Time"
+        dataArray={TIMES}
+      />
+
+      <PrefCheckbox
+        disabled={startTime == ""}
+        setChecked={setChecked}
+        isChecked={activePreference}
+      />
+    </PreferenceContainer>
+  );
 }
 
 interface skipDayProps {
@@ -103,19 +124,25 @@ interface skipDayProps {
   setChecked: (val: boolean) => void;
 }
 
-export function skipDayPref({
+export function SkipDayPref({
   day,
   onChange,
   activePreference,
   setChecked,
 }: skipDayProps) {
-  <PreferenceContainer>
-    <PreferenceSelect
-      value={day}
-      onChange={onChange}
-      dataArray={DAYS}
-      placeholder="Day"
-    />
-    <PrefCheckbox setChecked={setChecked} isChecked={activePreference} />
-  </PreferenceContainer>;
+  return (
+    <PreferenceContainer>
+      <PreferenceSelect
+        value={day}
+        onChange={onChange}
+        dataArray={DAYS}
+        placeholder="Day"
+      />
+      <PrefCheckbox
+        disabled={day == ""}
+        setChecked={setChecked}
+        isChecked={activePreference}
+      />
+    </PreferenceContainer>
+  );
 }
