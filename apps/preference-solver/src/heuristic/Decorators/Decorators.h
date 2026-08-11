@@ -3,6 +3,7 @@
 
 #include "baseHeuristic.h"
 #include <stdexcept>
+#include <string>
 class H_Decorator : public BaseHeuristic {
 protected:
   BaseHeuristic *next = nullptr;
@@ -44,4 +45,21 @@ public:
     return thisCopy;
   }
 };
+class SkipDayDec : public H_Decorator {
+
+private:
+  string day;
+
+public:
+  SkipDayDec(string day) : day(day) {}
+  virtual ~SkipDayDec() {}
+  virtual double calculateHeursitic(EventChromosome events);
+
+  virtual BaseHeuristic *copy() {
+    BaseHeuristic *thisCopy = new SkipDayDec(this->day);
+    thisCopy->setNext(H_Decorator::copy());
+    return thisCopy;
+  }
+};
+
 #endif

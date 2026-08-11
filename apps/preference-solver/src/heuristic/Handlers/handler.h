@@ -47,10 +47,19 @@ public:
 
 class TargetStartTimeHandler : public Handler {
 private:
-  const string targetKey = "minutesAfterMidnight";
+  const string targetKey = "minutes-After-midnight";
 
 public:
   TargetStartTimeHandler() : Handler("preferred-start-time") {}
+  virtual BaseHeuristic *getHeuristic(nlohmann::json input);
+};
+
+class SkipDayHandler : public Handler {
+private:
+  const string targetKey = "day-to-skip";
+
+public:
+  SkipDayHandler() : Handler("day-skip") {}
   virtual BaseHeuristic *getHeuristic(nlohmann::json input);
 };
 

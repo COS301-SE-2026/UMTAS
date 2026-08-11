@@ -1,0 +1,12 @@
+#include "Decorators.h"
+
+double SkipDayDec::calculateHeursitic(EventChromosome events) {
+
+  double score = 0;
+  for (const EventGA &event : events.events) {
+    if (event.dayOfWeek == day) {
+      score += 100;
+    }
+  }
+  return score; // for every event on the same day it theres a penalty applied
+}
