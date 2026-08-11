@@ -7,6 +7,7 @@ Handler function based on a given string returns the UI element we want
 - morning / afternoon
 */
 
+import { Checkbox } from "@/components/atoms/baseShadcn/checkbox";
 import {
   Select,
   SelectContent,
@@ -15,28 +16,45 @@ import {
   SelectValue,
 } from "@/components/atoms/baseShadcn/select";
 import { TIMES, DAYS } from "@/components/atoms/builder/TimeSlotSelect";
+import { ReactNode } from "react";
 const triggerClass =
   "h-8 text-xs bg-[var(--bg-elevated)] border-[var(--border)] text-[var(--text-primary)] focus:ring-1 focus:ring-[var(--text-primary)]";
 
-interface StartTimeHeuristicPref {
-  startTime: string;
-  onChange: (val: string) => void;
+function PreferenceContainer({ children }: { children: ReactNode }) {
+  return <div className=" flex flex-row ">{children}</div>;
 }
 
-export function StartTimePref({ startTime, onChange }: StartTimeHeuristicPref) {
-  <div>
-    <Select value={startTime} onValueChange={(v) => onChange(v)}>
+interface PreferenceSelectProps<T extends string | number> {
+  value: T;
+  onChange: (val: T) => void;
+  dataArray: T[];
+  placeholder?: string;
+}
+
+function PreferenceSelect<T extends string | number>({
+  value,
+  onChange,
+  dataArray,
+  placeholder,
+}: PreferenceSelectProps<T>) {
+  return (
+    <Select
+      value={String(value)}
+      onValueChange={(v) => {
+        onChange(v as T);
+      }}
+    >
       <SelectTrigger
         data-testid="event-TimeStart-Select"
         className={`${triggerClass} w-[84px]`}
       >
-        <SelectValue placeholder="Start" />
+        <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)] max-h-44">
-        {TIMES.map((t) => (
+        {dataArray.map((t) => (
           <SelectItem
-            key={t}
-            value={t}
+            key={String(t)}
+            value={String(t)}
             className="text-xs text-[var(--text-primary)] focus:bg-[var(--bg-elevated)]"
           >
             {t}
@@ -44,7 +62,22 @@ export function StartTimePref({ startTime, onChange }: StartTimeHeuristicPref) {
         ))}
       </SelectContent>
     </Select>
-  </div>;
+  );
+}
+interface StartTimePref {
+  startTime: string;
+  onChange: (val: string) => void;
+}
+
+export function StartTimePref({ startTime, onChange }: StartTimePref) {
+  <PreferenceContainer>
+    <PreferenceSelect
+      value={startTime}
+      onChange={onChange}
+      placeholder="Start Time"
+      dataArray={TIMES}
+    ></PreferenceSelect>
+  </PreferenceContainer>;
 }
 
 interface skipDayProps {
@@ -53,25 +86,12 @@ interface skipDayProps {
 }
 
 export function skipDayPref({ day, onChange }: skipDayProps) {
-  <div>
-    <Select value={day} onValueChange={(v) => onChange(v)}>
-      <SelectTrigger
-        data-testid="event-TimeStart-Select"
-        className={`${triggerClass} w-[84px]`}
-      >
-        <SelectValue placeholder="Start" />
-      </SelectTrigger>
-      <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)] max-h-44">
-        {DAYS.map((t) => (
-          <SelectItem
-            key={t}
-            value={t}
-            className="text-xs text-[var(--text-primary)] focus:bg-[var(--bg-elevated)]"
-          >
-            {t}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
-  </div>;
+  <PreferenceContainer>
+    <PreferenceSelect
+      value={day}
+      onChange={onChange}
+      dataArray={DAYS}
+      placeholder="Day"
+    />
+  </PreferenceContainer>;
 }
