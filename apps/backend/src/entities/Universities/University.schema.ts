@@ -23,8 +23,9 @@ export type RoleTypeType = (typeof RoleType.enumValues)[number];
 export const University = pgTable('University', {
   UniversityID: uuid('UniversityID').defaultRandom().primaryKey(),
   UniversityName: varchar('UniversityName', { length: 30 }).notNull(),
+  ApiIdentifier: varchar('ApiIdentifier', { length: 10 }).unique(),
   BaseApiUrl: varchar('BaseApiUrl', { length: 50 }),
-  ApiKey: varchar('ApiKey', { length: 70 }),
+  ApiKey: varchar('ApiKey', { length: 100 }),
 });
 
 export const UniversityRole = pgTable(

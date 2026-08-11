@@ -122,6 +122,15 @@ export class UniversityService {
     const uni = await this.getById(uniId, tx);
 
     const updateFields: Partial<typeof University.$inferInsert> = {};
+
+    //ApiIdentifier
+    if (
+      dto.ApiIdentifier &&
+      dto.ApiIdentifier.trim().length > 0 &&
+      dto.ApiIdentifier.toUpperCase() !== uni.ApiIdentifier?.toUpperCase()
+    )
+      updateFields.ApiIdentifier = dto.ApiIdentifier.trim().toUpperCase();
+
     //BaseApiUrl
     if (
       dto.BaseApiUrl &&

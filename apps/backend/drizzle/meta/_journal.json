@@ -15,6 +15,20 @@
       "when": 1786456402299,
       "tag": "0001_Added_BaseUrl_ApiKey_To_University_Object",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1786464786667,
+      "tag": "0002_University_ApiIdentifier_Added",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1786465212314,
+      "tag": "0003_Length_Altered_On_University_ApiKey",
+      "breakpoints": true
     }
   ]
 }
