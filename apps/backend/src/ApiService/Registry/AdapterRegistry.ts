@@ -24,7 +24,7 @@ export class AdapterRegistry {
 
   private createAdapter(uni: UniversityDto): University_Adapter {
     //Example used on UP since up doesnt have an api
-    if (uni.UniversityName === `University of Pretoria`) {
+    if (uni.ApiIdentifier?.toUpperCase() === `UP`) {
       const baseUrl = uni.BaseApiUrl ?? null;
       const apiKey = uni.ApiKey ?? null;
 
