@@ -75,4 +75,10 @@ export class NWU_Adapter implements University_Adapter {
       throw error;
     }
   }
+
+  // 🎅's little helpers
+  // mapCourse(input: JSON): CourseDto {
+
+  //     throw new NotImplementedException();
+  // }//END_mapCourse
 }
