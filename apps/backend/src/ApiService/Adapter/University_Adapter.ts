@@ -10,4 +10,6 @@ export interface University_Adapter {
   getModules(): Promise<ModuleListResponseDto>;
 
   getEvents(): Promise<EventListResponseDto>;
+
+  request<T = any>(url: string): Promise<T>;
 }
