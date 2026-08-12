@@ -25,6 +25,7 @@ import { getQueryClient } from "@/components/tanstack/getQueryClient";
 import { Input } from "@/components/atoms/baseShadcn/input";
 import {
   SkipDayPref,
+  SmallGapsPref,
   StartTimePref,
 } from "@/components/molecules/solver/PreferenceHandler";
 type solverProps = {
@@ -47,6 +48,8 @@ export default function SolverPreferences({ modules, events }: solverProps) {
 
   const [skipDay, setSkipDay] = useState<string>("");
   const [skipChecked, setSkipChecked] = useState<boolean>(false);
+
+  const [smallGapsChecked, setSmallGapsChecked] = useState<boolean>(false);
 
   function preferences() {
     return (
@@ -71,6 +74,10 @@ export default function SolverPreferences({ modules, events }: solverProps) {
           activePreference={skipChecked}
           day={skipDay}
           onChange={setSkipDay}
+        />
+        <SmallGapsPref
+          activePreference={smallGapsChecked}
+          setChecked={setSmallGapsChecked}
         />
       </div>
     );
@@ -137,6 +144,11 @@ export default function SolverPreferences({ modules, events }: solverProps) {
             | "thursday"
             | "friday",
         },
+      });
+    }
+    if (smallGapsChecked) {
+      prefs.push({
+        key: "small-gaps",
       });
     }
     return prefs;

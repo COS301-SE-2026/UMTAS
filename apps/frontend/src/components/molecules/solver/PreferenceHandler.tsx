@@ -20,7 +20,11 @@ import { ReactNode } from "react";
 const triggerClass =
   "h-8 text-xs bg-[var(--bg-elevated)] border-[var(--border)] text-[var(--text-primary)] focus:ring-1 focus:ring-[var(--text-primary)]";
 
-function PreferenceContainer({ children }: { children: ReactNode }) {
+interface prefContainerProp {
+  children: React.ReactNode;
+}
+
+function PreferenceContainer({ children }: prefContainerProp) {
   return (
     <div className="grid grid-cols-2 w-full h-full justify-items-start items-center gap-5">
       {children}
@@ -38,7 +42,7 @@ function PrefCheckbox({ isChecked, setChecked, disabled }: CheckBoxProps) {
     <div className="flex flex-col justify-center ">
       <Checkbox
         disabled={disabled}
-        className="size-5"
+        className="size-5 border-white"
         checked={isChecked}
         onCheckedChange={setChecked}
       />
@@ -101,12 +105,17 @@ export function StartTimePref({
 }: StartTimePref) {
   return (
     <PreferenceContainer>
-      <PreferenceSelect
-        value={startTime}
-        onChange={onChange}
-        placeholder="Start Time"
-        dataArray={TIMES}
-      />
+      <label className="flex flex-col gap-1.5 w-full">
+        <span className="font-medium text-xs text-[var(--text-primary)]">
+          Preferred Start Time
+        </span>
+        <PreferenceSelect
+          value={startTime}
+          onChange={onChange}
+          placeholder="Start Time"
+          dataArray={TIMES}
+        />
+      </label>
 
       <PrefCheckbox
         disabled={startTime == ""}
@@ -132,17 +141,41 @@ export function SkipDayPref({
 }: skipDayProps) {
   return (
     <PreferenceContainer>
-      <PreferenceSelect
-        value={day}
-        onChange={onChange}
-        dataArray={DAYS}
-        placeholder="Day"
-      />
+      <label className="flex flex-col gap-1.5 w-full">
+        <span className="font-medium text-xs text-[var(--text-primary)]">
+          Skip Day
+        </span>
+        <PreferenceSelect
+          value={day}
+          onChange={onChange}
+          dataArray={DAYS}
+          placeholder="Day"
+        />
+      </label>
       <PrefCheckbox
         disabled={day == ""}
         setChecked={setChecked}
         isChecked={activePreference}
       />
+    </PreferenceContainer>
+  );
+}
+
+interface smallGapsProp {
+  activePreference: boolean;
+  setChecked: (val: boolean) => void;
+}
+export function SmallGapsPref({ activePreference, setChecked }: smallGapsProp) {
+  return (
+    <PreferenceContainer>
+      <span className="font-medium text-xs text-[var(--text-primary)]">
+        Prefer Smaller Gaps Between Events?
+      </span>
+      <PrefCheckbox
+        disabled={false}
+        isChecked={activePreference}
+        setChecked={setChecked}
+      ></PrefCheckbox>
     </PreferenceContainer>
   );
 }
