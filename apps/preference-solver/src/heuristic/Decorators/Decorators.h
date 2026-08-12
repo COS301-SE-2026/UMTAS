@@ -4,7 +4,6 @@
 #include "baseHeuristic.h"
 #include <stdexcept>
 
-
 class H_Decorator : public BaseHeuristic {
 protected:
   BaseHeuristic *next = nullptr;
@@ -12,7 +11,11 @@ protected:
 public:
   void setNext(BaseHeuristic *next) { this->next = next; }
   H_Decorator() {}
-  virtual ~H_Decorator() { delete next; }
+  virtual ~H_Decorator() {
+    if (next)
+      delete next;
+    next = nullptr;
+  }
 
   // each base class will call the parent + their value
 
@@ -27,6 +30,11 @@ public:
    * in the chain
    */
   virtual BaseHeuristic *copy() {
+
+    if (next == nullptr) {
+      return nullptr;
+    }
+
     BaseHeuristic *nextCopy = next->copy();
     return nextCopy;
   }

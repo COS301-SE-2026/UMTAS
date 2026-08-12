@@ -1,4 +1,5 @@
 #include "../src/GA_handler/GA.h"
+#include "../src/filecreator/filecreator.h"
 #include "../src/heuristic/Handlers/handler.h"
 #include "nlohmann/json.hpp"
 #include <cassert>
@@ -6,6 +7,10 @@
 #include <stdexcept>
 void heuristicTesting();
 void handlerTesting();
+void testMinH();
+void testSkipDayH();
+void smallGapsTest();
+
 template <typename Callable> void assertThrows(Callable callable) {
   bool threw = false;
   try {
@@ -114,6 +119,9 @@ int main() {
   assert(calculate_conflict_total_fitness(lateSelection) == 0.0);
 
   heuristicTesting();
+  testMinH();
+  testSkipDayH();
+  smallGapsTest();
 }
 
 /**
@@ -158,4 +166,55 @@ void handlerTesting() {
   }
   std::cout << "Ending handler test" << std::endl;
   delete chain;
+}
+
+void testMinH() {
+  std::cout << "Start min test" << std::endl;
+  FileCreator file("tests/HeuristicTests/minutesAfterMid");
+  json input = file.inputJson();
+  API_DATA data(input);
+  GA_Handler ga(data);
+  EventChromosome output = ga.findSolution();
+
+  file.outputJson(output.returnJson());
+  for (EventGA event : output.events) {
+    if (event.is_active)
+      assert(event.eventId.find("RIGHT") != std::string::npos &&
+             "The wrong event was selected");
+  }
+  std::cout << "End skip test" << std::endl;
+}
+
+void testSkipDayH() {
+  std::cout << "Start skip test" << std::endl;
+  FileCreator file("tests/HeuristicTests/skipDay");
+  json input = file.inputJson();
+  API_DATA data(input);
+  GA_Handler ga(data);
+  EventChromosome output = ga.findSolution();
+
+  file.outputJson(output.returnJson());
+  for (EventGA event : output.events) {
+    if (event.is_active)
+      assert(event.eventId.find("RIGHT") != std::string::npos &&
+             "The wrong event was selected");
+  }
+  std::cout << "end skip test" << std::endl;
+}
+
+void smallGapsTest() {
+  std::cout << "Start small gap test" << std::endl;
+  FileCreator file("tests/HeuristicTests/smallGaps");
+  json input = file.inputJson();
+  API_DATA data(input);
+  GA_Handler ga(data);
+  EventChromosome output = ga.findSolution();
+
+  file.outputJson(output.returnJson());
+  for (EventGA event : output.events) {
+    if (event.is_active)
+      assert(event.eventId.find("RIGHT") != std::string::npos &&
+             "The wrong event was selected");
+  }
+  std::cout << "end small gap test" << std::endl;
 }

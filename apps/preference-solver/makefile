@@ -37,14 +37,15 @@ LDFLAGS ?= $(if $(strip $(DEPENDENCY_LIBS)),$(DEPENDENCY_LIBS),\
     $(call dependency_rpath,ORTOOLS) $(call dependency_rpath,ABSEIL)
 
 SRC_FILES := $(wildcard $(SRC_DIR)/*.cpp)\
-             $(wildcard $(SRC_DIR)/data/API/*.cpp)\
-             $(wildcard $(SRC_DIR)/data/Events/*.cpp)\
-             $(wildcard $(SRC_DIR)/data/GA-data/*.cpp)\
-             $(wildcard $(SRC_DIR)/data/Modules/*.cpp)\
-             $(wildcard $(SRC_DIR)/GA_handler/*.cpp)\
-             $(wildcard $(SRC_DIR)/CP_SOLVER/*.cpp)\
-             $(wildcard $(SRC_DIR)/heuristic/Decorators/*.cpp)\
-             $(wildcard $(SRC_DIR)/heuristic/Handlers/*.cpp)\
+                $(wildcard $(SRC_DIR)/data/API/*.cpp)\
+                $(wildcard $(SRC_DIR)/data/Events/*.cpp)\
+                $(wildcard $(SRC_DIR)/data/GA-data/*.cpp)\
+                $(wildcard $(SRC_DIR)/data/Modules/*.cpp)\
+                $(wildcard $(SRC_DIR)/filecreator/*.cpp)\
+                $(wildcard $(SRC_DIR)/GA_handler/*.cpp)\
+                $(wildcard $(SRC_DIR)/CP_SOLVER/*.cpp)\
+                $(wildcard $(SRC_DIR)/heuristic/Decorators/*.cpp)\
+                $(wildcard $(SRC_DIR)/heuristic/Handlers/*.cpp)
 
 
 OBJS := $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SRC_FILES))
@@ -137,5 +138,3 @@ $(COUNT_PATTERN_TEST): $(DEPENDENCY_HEADERS) $(filter-out $(BUILD_DIR)/main.o,$(
 test: $(TARGET) $(COUNT_PATTERN_TEST)
 	./tests/run-cli-regressions.sh
 	./$(COUNT_PATTERN_TEST)
-
-

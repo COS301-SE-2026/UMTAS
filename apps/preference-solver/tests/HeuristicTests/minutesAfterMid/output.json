@@ -8,6 +8,6 @@
   "outcome": "conflict-free",
   "status": "feasible",
   "timetableSolution": {
-    "selectedEventIds": ["CS101-L1-Right"]
+    "selectedEventIds": ["CS101-L1-RIGHT"]
   }
 }

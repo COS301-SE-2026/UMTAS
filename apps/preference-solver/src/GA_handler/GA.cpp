@@ -52,8 +52,6 @@ GA_Handler::GA_Handler(API_DATA data, bool optimize)
   InitMutationMap();
   if (data.decorators) {
     Heuristics = data.decorators;
-    // no uneeded dups
-    data.decorators = nullptr;
   }
 
   hasSufficientAlternatives = HasSufficientAlternatives();
@@ -296,7 +294,4 @@ void SO_report_generation(
             << std::endl;
 }
 
-GA_Handler::~GA_Handler() {
-  if (Heuristics)
-    delete Heuristics;
-}
+GA_Handler::~GA_Handler() {}

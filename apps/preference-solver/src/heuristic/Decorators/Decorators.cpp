@@ -66,7 +66,7 @@ vector<EventGA> getEventsOfDay(string day, EventChromosome events) {
  * distance between them negatively
  */
 double SmallGapsDec::calculateHeursitic(EventChromosome events) {
- std::cout << "Small gap heuristic ran" << std::endl;
+  std::cout << "Small gap heuristic ran" << std::endl;
   double score = 0;
   vector<string> days = DayOfWeek::getDayOfWeek().getDaysArray();
 
@@ -88,5 +88,5 @@ double SmallGapsDec::calculateHeursitic(EventChromosome events) {
     }
   }
 
-  return score;
+  return score * score + H_Decorator::calculateHeursitic(events);
 }
