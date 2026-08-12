@@ -4,23 +4,24 @@
 import yaml 
 import random 
 import csv 
+import json 
 from pathlib import Path
 from faker import Faker
 
 
 class ProfileEngine:
-    def __init__(self, schema_path: str, adapter_dir: str, seed: int =42):
+    def __init__(self, schema_path: str, adapter_dir: str, seed: int =42, worker_id: int = 0):
         """
         Initialize the ProfileEngine with the given schema and adapter directory.
         """
         self.adapter_dir = Path(adapter_dir)
-        self.seed = seed
+        self.seed = seed + worker_id
         self.faker = Faker()
         random.seed(self.seed)
         Faker.seed(self.seed)
         with open(schema_path, 'r') as file:
             self.schema = yaml.safe_load(file)
-        self.fields = self.schema.get('fields', [])
+        self.fields = self.schema.get('fields', {})
         self.loaded_samples ={}
         self._preload_samples()
 
@@ -33,7 +34,7 @@ class ProfileEngine:
                 with open(csv_path, 'r') as csvfile:
                     #right now this is just a flat list, could extend later on
                     reader = csv.reader(csvfile)
-                    self.loaded_samples[field_name] = [row[0] for row in reader]
+                    self.loaded_samples[field_name] = [row[0] for row in reader if row]
     def _generate_single_profile(self) -> dict:
         """Parses rule for a single user and generates their profile based on the schema.
         Returns:
@@ -43,16 +44,20 @@ class ProfileEngine:
 
         for field, rule in self.fields.items():
             field_type = rule.get('type')
-
             if field_type == 'choice':#picks based on the weights otherwise uniform dist 
-
                 values = rule['values']
                 weights = rule.get('weights')
                 profile[field] = random.choices(values, weights=weights, k=1)[0]
-            elif field_type == 'sample':# picks from a sample csv file, can be used for names, addresses, we can use this specifcally for domain specific stuff 
-                count =rule.get('count', 1)
+                # picks from a sample csv file, can be used for names, addresses, we can use this specifcally for domain specific stuff 
+            elif field_type == 'sample':
+                count = rule.get('count', 1)
                 population = self.loaded_samples[field]
-                profile[field] = random.sample(population, k=count)
+                
+                safe_count = min(count, len(population))
+                
+                sampled = random.sample(population, k=safe_count)
+                
+                profile[field] = sampled[0] if count == 1 else sampled
             elif field_type == 'fake':# picks from the faker library, can be used for names, addresses, emails 
 
                 provider = rule.get('provider')
@@ -62,6 +67,18 @@ class ProfileEngine:
             else:
                 raise ValueError(f"Unsupported field type in schema: {field_type}")
         return profile
+
+
+    def export_to_json(self, pop_size: int, output_path: str):
+            """Pre-generates all profiles and streams them to a JSON array file."""
+            with open(output_path, 'w') as f:
+                f.write('[\n')
+                for i, profile in enumerate(self.generate(pop_size)):
+                    if i > 0:
+                        f.write(',\n')
+                    json.dump(profile, f)
+                f.write('\n]')
+            print(f"Successfully exported {pop_size} profiles to {output_path}")
 
 
     def generate(self, pop_size: int):
