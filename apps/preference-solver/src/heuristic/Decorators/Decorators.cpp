@@ -30,7 +30,7 @@ double SkipDayDec::calculateHeursitic(EventChromosome events) {
   double score = 0;
   for (const EventGA &event : events.events) {
     if (event.dayOfWeek == day && event.is_active) {
-      score += 100;
+      score += 1000;
     }
   }
   return score + H_Decorator::calculateHeursitic(
@@ -66,15 +66,20 @@ vector<EventGA> getEventsOfDay(string day, EventChromosome events) {
  * distance between them negatively
  */
 double SmallGapsDec::calculateHeursitic(EventChromosome events) {
-
+ std::cout << "Small gap heuristic ran" << std::endl;
   double score = 0;
   vector<string> days = DayOfWeek::getDayOfWeek().getDaysArray();
 
   for (string day : days) {
     std::vector<EventGA> eventsOfDay = getEventsOfDay(day, events);
 
-    for (size_t start = 0, end = 1; start < eventsOfDay.size();
-         start++, end++) {
+    for (size_t start = 0; start < eventsOfDay.size(); start++) {
+
+      int end = start + 1;
+
+      while (end < eventsOfDay.size() && eventsOfDay[end].is_active == false) {
+        end++;
+      }
 
       if (end >= eventsOfDay.size())
         break;

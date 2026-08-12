@@ -137,3 +137,5 @@ $(COUNT_PATTERN_TEST): $(DEPENDENCY_HEADERS) $(filter-out $(BUILD_DIR)/main.o,$(
 test: $(TARGET) $(COUNT_PATTERN_TEST)
 	./tests/run-cli-regressions.sh
 	./$(COUNT_PATTERN_TEST)
+
+

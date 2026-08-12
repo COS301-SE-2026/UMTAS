@@ -3,7 +3,7 @@
 
 #include "baseHeuristic.h"
 #include <stdexcept>
-#include <string>
+
 
 class H_Decorator : public BaseHeuristic {
 protected:

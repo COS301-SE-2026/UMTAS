@@ -281,7 +281,7 @@ double calculate_conflict_total_fitness(
 
 double Overlap_Heuristic(EventChromosome eventChrom) {
 
-  return (countConflicts(eventChrom) * 10000.0);
+  return (countConflicts(eventChrom) * 100.0);
 }
 void SO_report_generation(
     int generation_number,

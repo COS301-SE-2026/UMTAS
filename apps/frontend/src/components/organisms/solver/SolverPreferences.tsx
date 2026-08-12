@@ -126,6 +126,19 @@ export default function SolverPreferences({ modules, events }: solverProps) {
         },
       });
     }
+    if (skipChecked) {
+      prefs.push({
+        key: "day-skip",
+        parameters: {
+          "day-to-skip": skipDay.toLowerCase() as
+            | "monday"
+            | "tuesday"
+            | "wednesday"
+            | "thursday"
+            | "friday",
+        },
+      });
+    }
     return prefs;
   }
 

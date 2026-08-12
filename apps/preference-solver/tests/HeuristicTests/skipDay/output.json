@@ -1,0 +1,13 @@
+{
+  "heuristicScores": [],
+  "metadata": {
+    "conflictCount": 0,
+    "conflicts": [],
+    "solveMode": "optimization"
+  },
+  "outcome": "conflict-free",
+  "status": "feasible",
+  "timetableSolution": {
+    "selectedEventIds": ["CS101-L1-RIGHT"]
+  }
+}
