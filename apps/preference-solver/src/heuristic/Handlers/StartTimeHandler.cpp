@@ -1,7 +1,6 @@
 #include "../Decorators/Decorators.h"
 #include "handler.h"
 #include "nlohmann/json.hpp"
-#include <iostream>
 BaseHeuristic *TargetStartTimeHandler::getHeuristic(nlohmann::json input) {
 
   json params = this->getParams(input);

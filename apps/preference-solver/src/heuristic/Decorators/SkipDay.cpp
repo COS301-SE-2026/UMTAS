@@ -1,7 +1,7 @@
 #include "Decorators.h"
 
 double SkipDayDec::calculateHeursitic(EventChromosome events) {
-
+  std::cout << "Skip day heuristic ran" << std::endl;
   double score = 0;
   for (const EventGA &event : events.events) {
     if (event.dayOfWeek == day) {

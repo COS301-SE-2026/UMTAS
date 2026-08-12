@@ -2,8 +2,8 @@
 
 #include "../../lib/openGA.hpp"
 #include "../data/GA-data/chromosome.h"
+#include "../heuristic/Decorators/Decorators.h"
 #include <vector>
-
 typedef EA::Genetic<EventChromosome, ChromMiddleCost> GA_type;
 typedef EA::GenerationType<EventChromosome, ChromMiddleCost> Generation_Type;
 class GA_Handler {

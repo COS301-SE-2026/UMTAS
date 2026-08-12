@@ -2,7 +2,6 @@
 #define DECORATOR_H
 
 #include "baseHeuristic.h"
-#include <iostream>
 #include <stdexcept>
 
 class H_Decorator : public BaseHeuristic {
@@ -37,7 +36,7 @@ private:
 
 public:
   TargetStartTime(int targetTime) { this->minutesToMidnight = targetTime; }
-  virtual ~TargetStartTime() { std::cout << "Delete target time" << std::endl; }
+  virtual ~TargetStartTime() {}
   virtual double calculateHeursitic(EventChromosome events);
 
   virtual BaseHeuristic *copy() {
@@ -53,7 +52,7 @@ private:
 
 public:
   SkipDayDec(string day) : day(day) {}
-  virtual ~SkipDayDec() { std::cout << "Delete skip day" << std::endl; }
+  virtual ~SkipDayDec() {}
   virtual double calculateHeursitic(EventChromosome events);
 
   virtual BaseHeuristic *copy() {

@@ -1,6 +1,8 @@
 #include "Decorators.h"
+#include <iostream>
 
 double TargetStartTime::calculateHeursitic(EventChromosome events) {
+  std::cout << "Target time heuristic ran" << std::endl;
   int numberOfPts = 0;
   int target = this->minutesToMidnight;
   double sum = 0;
@@ -17,5 +19,3 @@ double TargetStartTime::calculateHeursitic(EventChromosome events) {
 
   return MAD + H_Decorator::calculateHeursitic(events); // this calls next
 }
-
-

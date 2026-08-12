@@ -2,7 +2,6 @@
 #define HANDLER_H
 #include "../Decorators/baseHeuristic.h"
 #include "nlohmann/json.hpp"
-#include <iostream>
 #include <string>
 using std::string;
 

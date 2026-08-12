@@ -1,6 +1,4 @@
 #include "GA.h"
-#include "../heuristic/Decorators/Decorators.h"
-#include <algorithm>
 #include <cmath>
 #include <iostream>
 #include <ostream>
