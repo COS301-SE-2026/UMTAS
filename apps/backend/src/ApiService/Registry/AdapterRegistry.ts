@@ -6,6 +6,7 @@ import {
 import { University_Adapter } from '../Adapter/University_Adapter';
 import { UniversityDto } from '../../University/dto/university.dto';
 import { Example_Adapter } from '../Adapter/Example_Adapter/Example_Adapter';
+import { NWU_Adapter } from '../Adapter/NWU_Adapter/NWU_Adapter';
 
 @Injectable()
 export class AdapterRegistry {
@@ -38,6 +39,14 @@ export class AdapterRegistry {
           `BaseUrl and ApiKey does not exist for uni[${JSON.stringify(uni)}]`,
         );
       else return new Example_Adapter(baseUrl, apiKey);
+    } else if (uni.ApiIdentifier?.toUpperCase() === 'NWU') {
+      const baseUrl = uni.BaseApiUrl ?? null;
+
+      if (baseUrl === null)
+        throw new BadRequestException(
+          `BaseUrl does not exist for uni[${JSON.stringify(uni)}]`,
+        );
+      else return new NWU_Adapter(baseUrl);
     }
 
     throw new NotFoundException(

@@ -80,7 +80,7 @@ export class UniversitySeedService extends BaseSeedService {
     //update with api information
     const apiInfo = {
       ApiIdentifier: 'NWU',
-      BaseApiUrl: 'http://mock-university-api:3010',
+      BaseApiUrl: 'http://localhost:3010',
     };
 
     await tx

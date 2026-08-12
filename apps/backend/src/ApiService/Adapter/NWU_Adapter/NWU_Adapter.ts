@@ -1,37 +1,23 @@
-import { University_Adapter } from '../University_Adapter';
-
-//Dto's
-import { ModuleListResponseDto } from 'src/Module/dto/module.dto';
-import { CourseListResponseDto } from 'src/Course/dto/course.dto';
-import { EventListResponseDto } from 'src/Events/dto/EventDto.dto';
-
-//Exceptions
 import {
   Injectable,
   NotImplementedException,
   RequestTimeoutException,
 } from '@nestjs/common';
+import { University_Adapter } from '../University_Adapter';
+import { CourseListResponseDto } from 'src/Course/dto/course.dto';
+import { ModuleListResponseDto } from 'src/Module/dto/module.dto';
+import { EventListResponseDto } from 'src/Events/dto/EventDto.dto';
 
-//http
-
-//OpenLearning API
 @Injectable()
-export class Example_Adapter implements University_Adapter {
-  constructor(
-    private readonly baseUrl: string,
-    private readonly apiKey: string,
-  ) {}
+export class NWU_Adapter implements University_Adapter {
+  constructor(private readonly baseUrl: string) {}
 
   async authenticate(): Promise<void> {}
 
   async getCourses(): Promise<CourseListResponseDto> {
-    console.log(`Example_Adapter: getCourses`);
+    const response = await this.request('api/courses');
 
-    const response = await this.request('courses');
-
-    const data = response.data;
-
-    console.log(`Here: ${JSON.stringify(data[0])}`);
+    console.log(`Here: ${JSON.stringify(response)}`);
 
     throw new NotImplementedException();
   }
@@ -44,7 +30,6 @@ export class Example_Adapter implements University_Adapter {
     throw new NotImplementedException();
   }
 
-  //🎅's little helpers
   async request<T = any>(url: string): Promise<T> {
     const timeout = 10000; //10 seconds
     const controller = new AbortController();
@@ -58,7 +43,6 @@ export class Example_Adapter implements University_Adapter {
       const response = await fetch(`${finalUrl}`, {
         signal: controller.signal,
         headers: {
-          'X-API-Key': this.apiKey,
           'Content-Type': 'application/json',
           Accept: 'application/json',
         },
