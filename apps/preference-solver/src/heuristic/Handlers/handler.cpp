@@ -9,6 +9,9 @@ Handler *createHandlerChain() {
   return begin;
 }
 
+/**
+ * @brief returns params if the decorator needs it only used if params exisits
+ */
 json Handler::getParams(json input) {
   if (input.contains("key") && input["key"].is_string() &&
       input["key"].get<string>() == key && input.contains(paramKey) &&
@@ -18,3 +21,14 @@ json Handler::getParams(json input) {
   } else
     return nullptr;
 };
+/**
+ * @brief only checks if key is valid
+ */
+bool Handler::validKey(json input) {
+  if (input.contains("key") && input["key"].is_string() &&
+      input["key"].get<string>() == key) {
+    return true;
+  } else {
+    return false;
+  }
+}

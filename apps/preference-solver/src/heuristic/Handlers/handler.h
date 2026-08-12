@@ -51,6 +51,7 @@ public:
   }
 
   virtual json getParams(json input);
+  bool validKey(json input);
 };
 
 class TargetStartTimeHandler : public Handler {

@@ -129,18 +129,20 @@ void handlerTesting() {
   const string heuristicArrKey = "heuristics";
   Handler *chain = createHandlerChain();
 
-  json StartTimeH =
-      json::array({{{"key", "preferred-start-time"},
-                    {"parameters", {{"minutes-After-midnight", 420}}}}});
+  json StartTimeH = {{"key", "preferred-start-time"},
+                     {"parameters", {{"minutes-After-midnight", 420}}}};
 
-  json SkipDayH = json::array(
-      {{{"key", "day-skip"}, {"parameters", {{"day-to-skip", "monday"}}}}});
+  json SkipDayH = {{"key", "day-skip"},
+                   {"parameters", {{"day-to-skip", "monday"}}}};
+
+  json small_GapsH = {{"key", "small-gaps"}};
 
   json pref;
   json heuristics = json::array();
 
-  heuristics.push_back(StartTimeH[0]);
-  heuristics.push_back(SkipDayH[0]);
+  heuristics.push_back(StartTimeH);
+  heuristics.push_back(SkipDayH);
+  heuristics.push_back(small_GapsH);
 
   pref[preferencesKey][heuristicArrKey] = heuristics;
 
