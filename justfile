@@ -26,7 +26,7 @@ both: rebuild-packages
 
 # spin up local versions
 dev-infra:
-    WORKER_BACKEND_URL=http://host.docker.internal:3000 phase run -- docker compose --profile dev-infra up -d --build postgres redis minio mailhog pdf-parser-worker solver-worker
+    WORKER_BACKEND_URL=http://host.docker.internal:3000 phase run -- docker compose --profile dev-infra up -d --build postgres redis minio mailhog pdf-parser-worker solver-worker mock-university-api
 
 # compelete reset
 sync:
