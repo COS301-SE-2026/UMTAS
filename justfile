@@ -8,6 +8,14 @@ dev:
 
 # Umtas local dev commands
 
+
+# SimService
+simservInit:
+    cd apps/simulation-service \
+      && python3 -m venv .venv \
+      && source .venv/bin/activate \
+      && python3 -m pip install -r requirements.txt
+
 [private]
 rebuild-packages:
     pnpm --filter shared-types run build
