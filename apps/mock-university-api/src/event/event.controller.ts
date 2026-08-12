@@ -1,8 +1,11 @@
 import { Controller, Get } from '@nestjs/common';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Events')
 @Controller('api/events')
 export class EventController {
   @Get()
+  @ApiOperation({ summary: 'Get all events' })
   getEvents() {
     return [
       {

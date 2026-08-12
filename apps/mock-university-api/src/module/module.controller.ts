@@ -1,8 +1,11 @@
 import { Controller, Get } from '@nestjs/common';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Modules')
 @Controller('api/modules')
 export class ModuleController {
   @Get()
+  @ApiOperation({ summary: 'Get all modules' })
   getModules() {
     return [
       {
