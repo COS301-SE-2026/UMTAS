@@ -2,7 +2,7 @@ import { University_Adapter } from '../University_Adapter';
 
 //Dto's
 import { ModuleListResponseDto } from 'src/Module/dto/module.dto';
-import { CourseListResponseDto } from 'src/Course/dto/course.dto';
+import { CreateCourseDto } from 'src/Course/dto/course.dto';
 import { EventListResponseDto } from 'src/Events/dto/EventDto.dto';
 
 //Exceptions
@@ -24,7 +24,7 @@ export class Example_Adapter implements University_Adapter {
 
   async authenticate(): Promise<void> {}
 
-  async getCourses(): Promise<CourseListResponseDto> {
+  async getCourses(): Promise<CreateCourseDto[]> {
     console.log(`Example_Adapter: getCourses`);
 
     const response = await this.request('courses');

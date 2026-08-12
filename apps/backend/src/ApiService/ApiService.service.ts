@@ -3,28 +3,37 @@ import {
   Injectable,
   NotImplementedException,
 } from '@nestjs/common';
-import { CourseListResponseDto } from 'src/Course/dto/course.dto';
+import { CourseDto, CourseListResponseDto } from 'src/Course/dto/course.dto';
 import { EventListResponseDto } from 'src/Events/dto/EventDto.dto';
 import { ModuleListResponseDto } from 'src/Module/dto/module.dto';
 import { UniversityDto } from 'src/University/dto/university.dto';
 import { UniversityService } from 'src/University/university.service';
 import { AdapterRegistry } from './Registry/AdapterRegistry';
+import { CourseService } from 'src/Course/course.service';
 
 //Context
 @Injectable()
 export class ApiService {
-  constructor(private readonly uniService: UniversityService) {}
+  constructor(
+    private readonly uniService: UniversityService,
+    private readonly courseService: CourseService,
+    private readonly adapterRegistry: AdapterRegistry,
+  ) {}
 
   async getCourses(uniId?: string): Promise<CourseListResponseDto> {
     const uni = await this.getUni(uniId);
 
-    const registry = new AdapterRegistry(uni);
+    const adapter = this.adapterRegistry.getAdapter(uni);
 
-    const adapter = registry.get(uni.UniversityID);
+    const result = await adapter.getCourses();
 
-    const result = adapter.getCourses();
+    const courses: CourseDto[] = await Promise.all(
+      result.map((course) => this.courseService.create(course)),
+    );
 
-    return result;
+    return {
+      courses,
+    };
   } //END_getCourses
 
   async getModules(uniId?: string): Promise<ModuleListResponseDto> {

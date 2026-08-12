@@ -1,23 +1,37 @@
 import {
-  Injectable,
   NotImplementedException,
   RequestTimeoutException,
 } from '@nestjs/common';
 import { University_Adapter } from '../University_Adapter';
-import { CourseListResponseDto } from 'src/Course/dto/course.dto';
+import { CreateCourseDto } from 'src/Course/dto/course.dto';
 import { ModuleListResponseDto } from 'src/Module/dto/module.dto';
 import { EventListResponseDto } from 'src/Events/dto/EventDto.dto';
 
-@Injectable()
+interface ExternalCourse {
+  course_id: string;
+  course_name: string;
+  department: string;
+  description: string;
+}
+
 export class NWU_Adapter implements University_Adapter {
-  constructor(private readonly baseUrl: string) {}
+  constructor(
+    private readonly baseUrl: string,
+    private readonly uniId: string,
+  ) {}
 
   async authenticate(): Promise<void> {}
 
-  async getCourses(): Promise<CourseListResponseDto> {
-    const response = await this.request('api/courses');
+  async getCourses(): Promise<CreateCourseDto[]> {
+    const response: ExternalCourse[] = await this.request('api/courses');
 
-    console.log(`Here: ${JSON.stringify(response)}`);
+    const result: CreateCourseDto[] = response.map((course) => ({
+      UniversityID: this.uniId,
+      CourseName: course.course_name,
+    }));
+    // return courses;
+
+    return result;
 
     throw new NotImplementedException();
   }
@@ -77,8 +91,4 @@ export class NWU_Adapter implements University_Adapter {
   }
 
   // 🎅's little helpers
-  // mapCourse(input: JSON): CourseDto {
-
-  //     throw new NotImplementedException();
-  // }//END_mapCourse
 }

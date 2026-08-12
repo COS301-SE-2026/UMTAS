@@ -1,11 +1,11 @@
-import { CourseListResponseDto } from 'src/Course/dto/course.dto';
+import { CreateCourseDto } from 'src/Course/dto/course.dto';
 import { EventListResponseDto } from 'src/Events/dto/EventDto.dto';
 import { ModuleListResponseDto } from 'src/Module/dto/module.dto';
 
 export interface University_Adapter {
   authenticate(): Promise<void>;
 
-  getCourses(): Promise<CourseListResponseDto>;
+  getCourses(): Promise<CreateCourseDto[]>;
 
   getModules(): Promise<ModuleListResponseDto>;
 
