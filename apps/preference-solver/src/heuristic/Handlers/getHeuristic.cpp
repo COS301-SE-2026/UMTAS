@@ -1,12 +1,13 @@
 #include "../Decorators/Decorators.h"
 #include "handler.h"
+#include <iostream>
 BaseHeuristic *SkipDayHandler::getHeuristic(nlohmann::json input) {
+
   json params = this->getParams(input);
   if (params != nullptr) {
-    string day = 0;
+    string day = "";
 
     if (params.contains(targetKey) && params[targetKey].is_string()) {
-
       day = params[targetKey].get<string>();
     }
     return new SkipDayDec(day);

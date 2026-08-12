@@ -135,5 +135,5 @@ $(COUNT_PATTERN_TEST): $(DEPENDENCY_HEADERS) $(filter-out $(BUILD_DIR)/main.o,$(
 	$(CXX) $(CFLAGS) -o $@ tests/count-pattern-regression.cpp $(filter-out $(BUILD_DIR)/main.o,$(OBJS)) $(LDFLAGS)
 
 test: $(TARGET) $(COUNT_PATTERN_TEST)
-	./$(COUNT_PATTERN_TEST)
 	./tests/run-cli-regressions.sh
+	./$(COUNT_PATTERN_TEST)
