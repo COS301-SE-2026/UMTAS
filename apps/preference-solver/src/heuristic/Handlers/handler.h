@@ -38,6 +38,10 @@ public:
       delete next;
     }
   }
+
+  /**
+   * @brief used by the other getHeuristic functions to pass next along
+   */
   virtual BaseHeuristic *getHeuristic(nlohmann::json input) {
     if (next) {
       return next->getHeuristic(input);
@@ -66,6 +70,14 @@ private:
 public:
   virtual ~SkipDayHandler() {}
   SkipDayHandler() : Handler("day-skip") {}
+  virtual BaseHeuristic *getHeuristic(nlohmann::json input);
+};
+
+class SmallGapsHandler : public Handler {
+private:
+public:
+  virtual ~SmallGapsHandler() {}
+  SmallGapsHandler() : Handler("small-gaps") {}
   virtual BaseHeuristic *getHeuristic(nlohmann::json input);
 };
 

@@ -4,6 +4,7 @@ Handler *createHandlerChain() {
   Handler *begin = new Handler("Start");
   begin->setNext(new TargetStartTimeHandler());
   begin->setNext(new SkipDayHandler());
+  begin->setNext(new SmallGapsHandler());
 
   return begin;
 }

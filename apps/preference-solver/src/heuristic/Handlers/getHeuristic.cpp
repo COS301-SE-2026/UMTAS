@@ -30,3 +30,12 @@ BaseHeuristic *TargetStartTimeHandler::getHeuristic(nlohmann::json input) {
   } else
     return Handler::getHeuristic(input); // does the null check
 }
+
+BaseHeuristic *SmallGapsHandler::getHeuristic(nlohmann::json input) {
+  json params = this->getParams(input);
+  if (params != nullptr) {
+    return new SmallGapsDec();
+  } else {
+    return Handler::getHeuristic(input); // does the null check
+  }
+}
