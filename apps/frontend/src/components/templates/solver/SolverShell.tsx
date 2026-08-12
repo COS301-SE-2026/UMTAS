@@ -51,6 +51,7 @@ export default function SolverShell() {
   const [comingFromStep, setComingFromStep] = useState<number | null>(null);
   const [moduleGroupingID, setModuleGroupingID] = useState<string | null>(null);
   const UniDetails = UserDetails.getUniDetails();
+
   const { data: modulesData } = useQuery({
     queryKey: ["PDF", "MODULES"],
     queryFn: () => {
