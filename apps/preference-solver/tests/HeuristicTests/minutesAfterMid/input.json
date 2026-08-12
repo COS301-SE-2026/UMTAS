@@ -2,24 +2,26 @@
   "schedulingProblem": {
     "events": [
       {
-        "eventId": "CS101-L1-A",
-        "moduleCode": "CS101",
-        "activityType": "lecture",
-        "activityCode": "L1",
-        "requiredSelections": 1,
-        "dayOfWeek": "monday",
-        "startTime": "08:00",
-        "endTime": "09:00"
-      },
-      {
-        "eventId": "CS101-L1-B",
+        "eventId": "CS101-L1-WRONG",
         "moduleCode": "CS101",
         "activityType": "lecture",
         "activityCode": "L1",
         "requiredSelections": 1,
         "dayOfWeek": "monday",
         "startTime": "10:00",
-        "endTime": "11:00"
+        "endTime": "11:30",
+        "venues": []
+      },
+      {
+        "eventId": "CS101-L1-RIGHT",
+        "moduleCode": "CS101",
+        "activityType": "lecture",
+        "activityCode": "L1",
+        "requiredSelections": 1,
+        "dayOfWeek": "monday",
+        "startTime": "08:00",
+        "endTime": "09:30",
+        "venues": []
       }
     ]
   },
@@ -27,7 +29,7 @@
     "heuristics": [
       {
         "key": "preferred-start-time",
-        "parameters": { "minutes-After-midnight": 600 }
+        "parameters": { "minutes-After-midnight": 420 }
       }
     ]
   }

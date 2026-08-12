@@ -84,7 +84,11 @@ export function InstituteSelector({ onClose }: InstituteSelectorProps) {
         role: "STUDENT",
       });
     }
-    UserDetails.storeUniDetails(selectedInstitute);
+    UserDetails.storeUniDetails({
+      UniversityID: selectedInstitute?.UniversityID ?? "",
+      UniversityName: selectedInstitute?.UniversityName ?? "",
+      role: selectedInstitute?.role || "STUDENT",
+    });
   }
 
   const applyDisabled =
