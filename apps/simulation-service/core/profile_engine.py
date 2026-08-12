@@ -18,8 +18,6 @@ class ProfileEngine:
         self.faker = Faker()
         random.seed(self.seed)
         Faker.seed(self.seed)
-
-        #step 1: load yaml schema 
         with open(schema_path, 'r') as file:
             self.schema = yaml.safe_load(file)
         self.fields = self.schema.get('fields', [])
@@ -27,32 +25,48 @@ class ProfileEngine:
         self._preload_samples()
 
 
-        def _preload_samples(self):
-            """ Read CSV once to prevent disk IO issues """
-            for field_name, rule in self.fields.items():
-                if rule.get('type') == 'sample':
-                    csv_path = self.adapter_dir /rule['from']
-                    with open(csv_path, 'r') as csvfile:
-                        #right now this is just a flat list, could extend later on
-                        reader = csv.reader(csvfile)
-                        self.loaded_samples[field_name] = [row[0] for row in reader]
-        def _generate_single_profile(self) -> dict:
-            """Parses rule for a single user and generates their profile based on the schema.
-            Returns:
-                dict: A dictionary representing the generated user profile.
-            """
-            profile ={}
+    def _preload_samples(self):
+        """ Read CSV once to prevent disk IO issues """
+        for field_name, rule in self.fields.items():
+            if rule.get('type') == 'sample':
+                csv_path = self.adapter_dir /rule['from']
+                with open(csv_path, 'r') as csvfile:
+                    #right now this is just a flat list, could extend later on
+                    reader = csv.reader(csvfile)
+                    self.loaded_samples[field_name] = [row[0] for row in reader]
+    def _generate_single_profile(self) -> dict:
+        """Parses rule for a single user and generates their profile based on the schema.
+        Returns:
+            dict: A dictionary representing the generated user profile.
+        """
+        profile ={}
 
-            for field, rule in self.fields.items():
-                field_type = rule.get('type')
+        for field, rule in self.fields.items():
+            field_type = rule.get('type')
 
-                if field_type == 'choice':
+            if field_type == 'choice':#picks based on the weights otherwise uniform dist 
 
-                    values = rule['values']
-                    weights = rule.get('weights')
-                    profile[field] = random.choices(values, weights=weights, k=1)[0]
-                elif field_type == 'sample':
-                    count =rule.get('count', 1)
-                    population = self.loaded_samples[field]
-                    profile[field] = random.sample(population, k=count)
+                values = rule['values']
+                weights = rule.get('weights')
+                profile[field] = random.choices(values, weights=weights, k=1)[0]
+            elif field_type == 'sample':# picks from a sample csv file, can be used for names, addresses, we can use this specifcally for domain specific stuff 
+                count =rule.get('count', 1)
+                population = self.loaded_samples[field]
+                profile[field] = random.sample(population, k=count)
+            elif field_type == 'fake':# picks from the faker library, can be used for names, addresses, emails 
+
+                provider = rule.get('provider')
+                faker_method = getattr(self.faker, provider, None)
+                profile[field] = faker_method() if faker_method else None
+
+            else:
+                raise ValueError(f"Unsupported field type in schema: {field_type}")
+        return profile
+
+
+    def generate(self, pop_size: int):
+        """ yields N profiles, using a generate instead of returning a list to save memory when scaling to 20K users"""
+        for _ in range(pop_size):
+            yield self._generate_single_profile()
+
 
