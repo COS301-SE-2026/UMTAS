@@ -3,6 +3,7 @@
 
 #include "baseHeuristic.h"
 #include <stdexcept>
+#include <string>
 
 class H_Decorator : public BaseHeuristic {
 protected:
@@ -10,6 +11,7 @@ protected:
 
 public:
   void setNext(BaseHeuristic *next) { this->next = next; }
+  H_Decorator() {}
   virtual ~H_Decorator() { delete next; }
 
   // each base class will call the parent + their value
@@ -51,12 +53,26 @@ private:
   string day;
 
 public:
-  SkipDayDec(string day) : day(day) {}
+  SkipDayDec(string day) : H_Decorator(), day(day) {}
   virtual ~SkipDayDec() {}
   virtual double calculateHeursitic(EventChromosome events);
 
   virtual BaseHeuristic *copy() {
     BaseHeuristic *thisCopy = new SkipDayDec(this->day);
+    thisCopy->setNext(H_Decorator::copy());
+    return thisCopy;
+  }
+};
+
+class SmallGapsDec : public H_Decorator {
+private:
+public:
+  SmallGapsDec() : H_Decorator() {}
+  virtual ~SmallGapsDec() {}
+  virtual double calculateHeursitic(EventChromosome events);
+
+  virtual BaseHeuristic *copy() {
+    BaseHeuristic *thisCopy = new SmallGapsDec();
     thisCopy->setNext(H_Decorator::copy());
     return thisCopy;
   }

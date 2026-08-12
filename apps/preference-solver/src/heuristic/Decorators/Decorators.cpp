@@ -1,6 +1,11 @@
 #include "Decorators.h"
+#include <algorithm>
+#include <cstddef>
 #include <iostream>
-
+#include <sstream>
+#include <vector>
+using std::stringstream;
+using std::vector;
 double TargetStartTime::calculateHeursitic(EventChromosome events) {
   std::cout << "Target time heuristic ran" << std::endl;
   int numberOfPts = 0;
@@ -20,17 +25,63 @@ double TargetStartTime::calculateHeursitic(EventChromosome events) {
   return MAD + H_Decorator::calculateHeursitic(events); // this calls next
 }
 
-#include "Decorators.h"
-
 double SkipDayDec::calculateHeursitic(EventChromosome events) {
   std::cout << "Skip day heuristic ran" << std::endl;
   double score = 0;
   for (const EventGA &event : events.events) {
-    if (event.dayOfWeek == day) {
+    if (event.dayOfWeek == day && event.is_active) {
       score += 100;
     }
   }
   return score + H_Decorator::calculateHeursitic(
                      events); // for every event on the same day it theres a
                               // penalty applied
+}
+
+bool compareTimes(const EventGA &a, const EventGA &b) {
+  if (a.event_start != b.event_start) {
+    return a.event_start < b.event_start;
+  }
+  return a.event_end < b.event_end;
+}
+
+/**
+ * @brief returns an ordered list in terms of start time for a given day
+ */
+vector<EventGA> getEventsOfDay(string day, EventChromosome events) {
+  vector<EventGA> list;
+  for (EventGA event : events.events) {
+    if (event.dayOfWeek == day) {
+      list.push_back(event);
+    }
+  }
+
+  std::sort(list.begin(), list.end(), compareTimes);
+  return list;
+}
+
+/**
+ * @brief Calculates the score between hours
+ * @description takes a start time and an end time and calculates the
+ * distance between them negatively
+ */
+double SmallGapsDec::calculateHeursitic(EventChromosome events) {
+
+  double score = 0;
+  vector<string> days = DayOfWeek::getDayOfWeek().getDaysArray();
+
+  for (string day : days) {
+    std::vector<EventGA> eventsOfDay = getEventsOfDay(day, events);
+
+    for (size_t start = 0, end = 1; start < eventsOfDay.size();
+         start++, end++) {
+
+      if (end >= eventsOfDay.size())
+        break;
+
+      score += eventsOfDay[end].event_start - eventsOfDay[start].event_end;
+    }
+  }
+
+  return score;
 }

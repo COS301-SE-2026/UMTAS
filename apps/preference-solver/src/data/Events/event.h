@@ -30,4 +30,27 @@ struct EventGA {
   static const string ACTIVITY_CODE_KEY;
   // automatically sets is active to false
 };
+
+struct DayOfWeek {
+  const string Monday = "monday";
+  const string Tuesday = "tuesday";
+  const string Wednesday = "wednesday";
+  const string Thursday = "thursday";
+  const string Friday = "friday";
+  const string Saturday = "saturday";
+  const string Sunday = "sunday";
+
+  static DayOfWeek getDayOfWeek() {
+    static DayOfWeek days;
+    return days;
+  }
+
+  const std::vector<string> getDaysArray() const {
+    static std::vector<string> day = {Monday, Tuesday,  Wednesday, Thursday,
+                                      Friday, Saturday, Sunday};
+
+    return day;
+  }
+};
+
 #pragma once
