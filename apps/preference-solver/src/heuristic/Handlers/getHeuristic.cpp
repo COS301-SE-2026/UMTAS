@@ -1,6 +1,6 @@
 #include "../Decorators/Decorators.h"
 #include "handler.h"
-#include <iostream>
+
 BaseHeuristic *SkipDayHandler::getHeuristic(nlohmann::json input) {
 
   json params = this->getParams(input);

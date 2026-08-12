@@ -1,6 +1,7 @@
 #include "GA.h"
 #include <cmath>
 #include <iostream>
+#include <limits>
 #include <ostream>
 #include <unordered_map>
 #include <vector>
@@ -51,7 +52,7 @@ GA_Handler::GA_Handler(API_DATA data, bool optimize)
   InitMap();
   InitMutationMap();
   if (data.decorators) {
-    Heuristics = data.decorators;
+    Heuristics = this->initData.decorators;
   }
 
   hasSufficientAlternatives = HasSufficientAlternatives();
@@ -200,7 +201,6 @@ EventChromosome crossover(const EventChromosome &X1, const EventChromosome &X2,
                           const std::function<double(void)> &rnd01)
 
 {
-  // needs to be rewritten optimised for smart crossover
   return X1;
 }
 
@@ -265,9 +265,9 @@ double calculate_SO_total_fitness(
   // O(n) * V(n) -> higher score
   // This function in GA minimises.
 
-  double heuristicValue = 0;
+  double heuristicValue = std::numeric_limits<double>::max();
   if (Heuristics)
-    heuristicValue += Heuristics->calculateHeursitic(c.genes);
+    heuristicValue = Heuristics->calculateHeursitic(c.genes);
 
   return heuristicValue + Overlap_Heuristic(c.genes);
 }

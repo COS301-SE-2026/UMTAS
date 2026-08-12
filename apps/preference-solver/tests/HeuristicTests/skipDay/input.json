@@ -2,7 +2,7 @@
   "schedulingProblem": {
     "events": [
       {
-        "eventId": "CS101-L1-WRONG",
+        "eventId": "CS101-Skip-WRONG",
         "moduleCode": "CS101",
         "activityType": "lecture",
         "activityCode": "L1",
@@ -13,7 +13,7 @@
         "venues": []
       },
       {
-        "eventId": "CS101-L1-RIGHT",
+        "eventId": "CS101-Skip-RIGHT",
         "moduleCode": "CS101",
         "activityType": "lecture",
         "activityCode": "L1",

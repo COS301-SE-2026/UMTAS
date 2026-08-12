@@ -30,13 +30,11 @@ public:
    * in the chain
    */
   virtual BaseHeuristic *copy() {
-
     if (next == nullptr) {
-      return nullptr;
+      throw std::runtime_error(
+          "Decorator chain is missing a terminal BaseHeuristic node");
     }
-
-    BaseHeuristic *nextCopy = next->copy();
-    return nextCopy;
+    return next->copy();
   }
 };
 class TargetStartTime : public H_Decorator {

@@ -33,9 +33,9 @@ double SkipDayDec::calculateHeursitic(EventChromosome events) {
       score += 1000;
     }
   }
-  return score + H_Decorator::calculateHeursitic(
-                     events); // for every event on the same day it theres a
-                              // penalty applied
+  return (score * score) + H_Decorator::calculateHeursitic(
+                               events); // for every event on the same day it
+                                        // theres a penalty applied
 }
 
 bool compareTimes(const EventGA &a, const EventGA &b) {
@@ -51,7 +51,7 @@ bool compareTimes(const EventGA &a, const EventGA &b) {
 vector<EventGA> getEventsOfDay(string day, EventChromosome events) {
   vector<EventGA> list;
   for (EventGA event : events.events) {
-    if (event.dayOfWeek == day) {
+    if (event.dayOfWeek == day && event.is_active) {
       list.push_back(event);
     }
   }
@@ -77,16 +77,14 @@ double SmallGapsDec::calculateHeursitic(EventChromosome events) {
 
       int end = start + 1;
 
-      while (end < eventsOfDay.size() && eventsOfDay[end].is_active == false) {
-        end++;
-      }
-
       if (end >= eventsOfDay.size())
         break;
 
       score += eventsOfDay[end].event_start - eventsOfDay[start].event_end;
     }
   }
+  if (score == 0)
+    return std::numeric_limits<double>::max();
 
   return score * score + H_Decorator::calculateHeursitic(events);
 }
