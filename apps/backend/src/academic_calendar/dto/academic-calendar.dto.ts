@@ -1,19 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, IsUUID, Max, Min } from 'class-validator';
+import { IsInt, Max, Min } from 'class-validator';
 
 const UNIVERSITY_ID_EXAMPLE = '86f10d5e-f846-4bbc-85fb-67ea008f0f18';
 const CALENDAR_ID_EXAMPLE = '120afed7-9444-4d9c-a7f2-8f08dc2b7d70';
 
 export class CreateAcademicCalendarDto {
-  @ApiProperty({
-    type: String,
-    format: 'uuid',
-    example: UNIVERSITY_ID_EXAMPLE,
-    description: 'University that owns the academic calendar.',
-  })
-  @IsUUID()
-  universityId!: string;
-
   @ApiProperty({
     type: Number,
     example: 2026,
@@ -28,7 +19,7 @@ export class CreateAcademicCalendarDto {
   year!: number;
 }
 
-/** PUT replaces both mutable calendar fields, so both remain required. */
+/** PUT replaces the calendar's mutable year; university ownership is session-bound. */
 export class UpdateAcademicCalendarDto extends CreateAcademicCalendarDto {}
 
 export class AcademicCalendarDto {

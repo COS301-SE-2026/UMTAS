@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   Param,
   ParseUUIDPipe,
@@ -136,7 +137,7 @@ export class AcademicCalendarController {
   @ApiOperation({
     summary: 'Create an academic calendar',
     description:
-      'Creates one calendar for a university and four-digit academic year. Requires university-administrator access to the target university; system administrators may bypass this check.',
+      'Creates one calendar for the university selected in the current session and a four-digit academic year.',
     operationId: 'createAcademicCalendar',
   })
   @ApiBody({ type: CreateAcademicCalendarDto })
@@ -165,7 +166,7 @@ export class AcademicCalendarController {
     @CurrentSession() session: SessionData,
     @Body() dto: CreateAcademicCalendarDto,
   ): Promise<AcademicCalendarDto> {
-    return this.service.createCalendar(session.user.id, dto);
+    return this.service.createCalendar(this.selectedUniversityId(session), dto);
   }
 
   @Get(':id/restrictions')
@@ -203,7 +204,7 @@ export class AcademicCalendarController {
     @CurrentSession() session: SessionData,
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<CalendarRestrictionListDto> {
-    return this.service.getRestrictions(session.user.id, id);
+    return this.service.getRestrictions(this.selectedUniversityId(session), id);
   }
 
   @Post(':id/restrictions')
@@ -251,7 +252,11 @@ export class AcademicCalendarController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: CreateCalendarRestrictionDto,
   ): Promise<CalendarRestrictionDto> {
-    return this.service.createRestriction(session.user.id, id, dto);
+    return this.service.createRestriction(
+      this.selectedUniversityId(session),
+      id,
+      dto,
+    );
   }
 
   @Put(':id/restrictions/:restrictionId')
@@ -302,7 +307,7 @@ export class AcademicCalendarController {
     @Body() dto: UpdateCalendarRestrictionDto,
   ): Promise<CalendarRestrictionDto> {
     return this.service.updateRestriction(
-      session.user.id,
+      this.selectedUniversityId(session),
       id,
       restrictionId,
       dto,
@@ -315,7 +320,7 @@ export class AcademicCalendarController {
   @ApiOperation({
     summary: 'Delete an academic calendar restriction',
     description:
-      'Deletes a restriction only when it belongs to the specified calendar and the caller manages that calendar university.',
+      'Deletes a restriction only when it belongs to the specified calendar in the selected university.',
     operationId: 'deleteCalendarRestriction',
   })
   @ApiParam(CALENDAR_ID_PARAM)
@@ -346,7 +351,11 @@ export class AcademicCalendarController {
     @Param('id', ParseUUIDPipe) id: string,
     @Param('restrictionId', ParseUUIDPipe) restrictionId: string,
   ): Promise<DeleteCalendarRestrictionResponseDto> {
-    return this.service.deleteRestriction(session.user.id, id, restrictionId);
+    return this.service.deleteRestriction(
+      this.selectedUniversityId(session),
+      id,
+      restrictionId,
+    );
   }
 
   @Get(':id')
@@ -355,7 +364,7 @@ export class AcademicCalendarController {
   @ApiOperation({
     summary: 'Get an academic calendar',
     description:
-      'Returns a calendar when the caller manages its university. System administrators have access to every university.',
+      'Returns a calendar belonging to the university selected in the current session.',
     operationId: 'getAcademicCalendar',
   })
   @ApiParam(CALENDAR_ID_PARAM)
@@ -384,7 +393,7 @@ export class AcademicCalendarController {
     @CurrentSession() session: SessionData,
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<AcademicCalendarDto> {
-    return this.service.getCalendar(session.user.id, id);
+    return this.service.getCalendar(this.selectedUniversityId(session), id);
   }
 
   @Put(':id')
@@ -393,7 +402,7 @@ export class AcademicCalendarController {
   @ApiOperation({
     summary: 'Replace an academic calendar',
     description:
-      'Fully replaces the university and year. Moving a calendar requires administrator access to both the existing and target universities.',
+      'Replaces the year of a calendar belonging to the university selected in the current session.',
     operationId: 'updateAcademicCalendar',
   })
   @ApiParam(CALENDAR_ID_PARAM)
@@ -428,7 +437,11 @@ export class AcademicCalendarController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateAcademicCalendarDto,
   ): Promise<AcademicCalendarDto> {
-    return this.service.updateCalendar(session.user.id, id, dto);
+    return this.service.updateCalendar(
+      this.selectedUniversityId(session),
+      id,
+      dto,
+    );
   }
 
   @Delete(':id')
@@ -470,6 +483,13 @@ export class AcademicCalendarController {
     @CurrentSession() session: SessionData,
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<DeleteAcademicCalendarResponseDto> {
-    return this.service.deleteCalendar(session.user.id, id);
+    return this.service.deleteCalendar(this.selectedUniversityId(session), id);
+  }
+
+  private selectedUniversityId(session: SessionData): string {
+    if (!session.uniId) {
+      throw new ForbiddenException('No university selected');
+    }
+    return session.uniId;
   }
 }
