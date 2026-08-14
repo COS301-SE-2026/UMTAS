@@ -4,7 +4,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { Building, Venue } from '../entities/index';
-import { DatabaseService } from 'src/db/database.service';
+import { DatabaseService } from '../db/database.service';
 import { SessionData } from 'src/auth/session.decorator';
 import {
   BuildingDto,
