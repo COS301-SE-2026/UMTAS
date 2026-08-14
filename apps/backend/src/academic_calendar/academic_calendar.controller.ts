@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import {
   ApiBody,
+  ApiCookieAuth,
   ApiOperation,
   ApiParam,
   ApiResponse,
@@ -56,7 +57,9 @@ export class AcademicCalendarController {
   @Public()
   @ApiOperation({
     summary: 'Generate and persist a calendar snapshot',
-    operationId: 'generateAcademicCalendar',
+    description:
+      'Public endpoint reserved for calendar generation. Generation is not implemented yet.',
+    operationId: 'generateCalendar',
   })
   @ApiBody({ type: GenerateCalendarDto })
   @ApiResponse({
@@ -64,12 +67,25 @@ export class AcademicCalendarController {
     description: 'Calendar generated successfully',
     type: GeneratedCalendarDto,
   })
-  @ApiResponse({ status: 400, description: 'Invalid generation request' })
-  @ApiResponse({ status: 404, description: 'Calendar or timetable not found' })
-  @ApiResponse({ status: 409, description: 'Calendar data conflicts' })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid generation request',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Calendar or timetable not found',
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'Calendar data conflicts',
+  })
   @ApiResponse({
     status: 422,
     description: 'Calendar data cannot be converted into a valid snapshot',
+  })
+  @ApiResponse({
+    status: 501,
+    description: 'Calendar generation is not implemented',
   })
   generateCalendar(
     @Body() dto: GenerateCalendarDto,
@@ -81,7 +97,9 @@ export class AcademicCalendarController {
   @Public()
   @ApiOperation({
     summary: 'Get a generated calendar snapshot',
-    operationId: 'getGeneratedAcademicCalendar',
+    description:
+      'Public endpoint reserved for retrieving generated snapshots. Generation is not implemented yet.',
+    operationId: 'getGeneratedCalendar',
   })
   @ApiParam({
     name: 'id',
@@ -94,8 +112,18 @@ export class AcademicCalendarController {
     description: 'Generated calendar returned successfully',
     type: GeneratedCalendarDto,
   })
-  @ApiResponse({ status: 400, description: 'Invalid generated calendar ID' })
-  @ApiResponse({ status: 404, description: 'Generated calendar not found' })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid generated calendar ID',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Generated calendar not found',
+  })
+  @ApiResponse({
+    status: 501,
+    description: 'Calendar generation is not implemented',
+  })
   getGeneratedCalendar(
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<GeneratedCalendarDto> {
@@ -104,8 +132,11 @@ export class AcademicCalendarController {
 
   @Post()
   @Roles('uni_admin')
+  @ApiCookieAuth('umtas-session')
   @ApiOperation({
     summary: 'Create an academic calendar',
+    description:
+      'Creates one calendar for a university and four-digit academic year. Requires university-administrator access to the target university; system administrators may bypass this check.',
     operationId: 'createAcademicCalendar',
   })
   @ApiBody({ type: CreateAcademicCalendarDto })
@@ -114,9 +145,18 @@ export class AcademicCalendarController {
     description: 'Academic calendar created successfully',
     type: AcademicCalendarDto,
   })
-  @ApiResponse({ status: 400, description: 'Invalid calendar payload' })
-  @ApiResponse({ status: 401, description: 'No active session' })
-  @ApiResponse({ status: 403, description: 'Insufficient permissions' })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid calendar payload',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'No active session',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Insufficient permissions',
+  })
   @ApiResponse({
     status: 409,
     description: 'A calendar already exists for this university and year',
@@ -130,9 +170,12 @@ export class AcademicCalendarController {
 
   @Get(':id/restrictions')
   @Roles('uni_admin')
+  @ApiCookieAuth('umtas-session')
   @ApiOperation({
     summary: "List an academic calendar's restrictions",
-    operationId: 'getCalendarRestrictions',
+    description:
+      'Returns restrictions in chronological order for a calendar managed by the authenticated university administrator.',
+    operationId: 'listCalendarRestrictions',
   })
   @ApiParam(CALENDAR_ID_PARAM)
   @ApiResponse({
@@ -140,10 +183,22 @@ export class AcademicCalendarController {
     description: 'Calendar restrictions returned successfully',
     type: CalendarRestrictionListDto,
   })
-  @ApiResponse({ status: 400, description: 'Invalid academic calendar ID' })
-  @ApiResponse({ status: 401, description: 'No active session' })
-  @ApiResponse({ status: 403, description: 'Insufficient permissions' })
-  @ApiResponse({ status: 404, description: 'Academic calendar not found' })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid academic calendar ID',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'No active session',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Insufficient permissions',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Academic calendar not found',
+  })
   getRestrictions(
     @CurrentSession() session: SessionData,
     @Param('id', ParseUUIDPipe) id: string,
@@ -153,8 +208,11 @@ export class AcademicCalendarController {
 
   @Post(':id/restrictions')
   @Roles('uni_admin')
+  @ApiCookieAuth('umtas-session')
   @ApiOperation({
     summary: 'Create an academic calendar restriction',
+    description:
+      'Creates a dated restriction. Omitted endDate defaults to startDate and omitted description defaults to an empty string.',
     operationId: 'createCalendarRestriction',
   })
   @ApiParam(CALENDAR_ID_PARAM)
@@ -164,10 +222,22 @@ export class AcademicCalendarController {
     description: 'Calendar restriction created successfully',
     type: CalendarRestrictionDto,
   })
-  @ApiResponse({ status: 400, description: 'Invalid restriction request' })
-  @ApiResponse({ status: 401, description: 'No active session' })
-  @ApiResponse({ status: 403, description: 'Insufficient permissions' })
-  @ApiResponse({ status: 404, description: 'Academic calendar not found' })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid restriction request',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'No active session',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Insufficient permissions',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Academic calendar not found',
+  })
   @ApiResponse({
     status: 409,
     description: 'Restriction conflicts with existing data',
@@ -186,8 +256,11 @@ export class AcademicCalendarController {
 
   @Put(':id/restrictions/:restrictionId')
   @Roles('uni_admin')
+  @ApiCookieAuth('umtas-session')
   @ApiOperation({
     summary: 'Replace an academic calendar restriction',
+    description:
+      'Fully replaces a restriction after validating its date range and type-specific fields.',
     operationId: 'updateCalendarRestriction',
   })
   @ApiParam(CALENDAR_ID_PARAM)
@@ -198,9 +271,18 @@ export class AcademicCalendarController {
     description: 'Calendar restriction updated successfully',
     type: CalendarRestrictionDto,
   })
-  @ApiResponse({ status: 400, description: 'Invalid restriction request' })
-  @ApiResponse({ status: 401, description: 'No active session' })
-  @ApiResponse({ status: 403, description: 'Insufficient permissions' })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid restriction request',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'No active session',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Insufficient permissions',
+  })
   @ApiResponse({
     status: 404,
     description: 'Calendar or restriction not found',
@@ -229,8 +311,11 @@ export class AcademicCalendarController {
 
   @Delete(':id/restrictions/:restrictionId')
   @Roles('uni_admin')
+  @ApiCookieAuth('umtas-session')
   @ApiOperation({
     summary: 'Delete an academic calendar restriction',
+    description:
+      'Deletes a restriction only when it belongs to the specified calendar and the caller manages that calendar university.',
     operationId: 'deleteCalendarRestriction',
   })
   @ApiParam(CALENDAR_ID_PARAM)
@@ -244,8 +329,14 @@ export class AcademicCalendarController {
     status: 400,
     description: 'Invalid calendar or restriction ID',
   })
-  @ApiResponse({ status: 401, description: 'No active session' })
-  @ApiResponse({ status: 403, description: 'Insufficient permissions' })
+  @ApiResponse({
+    status: 401,
+    description: 'No active session',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Insufficient permissions',
+  })
   @ApiResponse({
     status: 404,
     description: 'Calendar or restriction not found',
@@ -260,8 +351,11 @@ export class AcademicCalendarController {
 
   @Get(':id')
   @Roles('uni_admin')
+  @ApiCookieAuth('umtas-session')
   @ApiOperation({
     summary: 'Get an academic calendar',
+    description:
+      'Returns a calendar when the caller manages its university. System administrators have access to every university.',
     operationId: 'getAcademicCalendar',
   })
   @ApiParam(CALENDAR_ID_PARAM)
@@ -270,10 +364,22 @@ export class AcademicCalendarController {
     description: 'Academic calendar returned successfully',
     type: AcademicCalendarDto,
   })
-  @ApiResponse({ status: 400, description: 'Invalid academic calendar ID' })
-  @ApiResponse({ status: 401, description: 'No active session' })
-  @ApiResponse({ status: 403, description: 'Insufficient permissions' })
-  @ApiResponse({ status: 404, description: 'Academic calendar not found' })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid academic calendar ID',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'No active session',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Insufficient permissions',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Academic calendar not found',
+  })
   getCalendar(
     @CurrentSession() session: SessionData,
     @Param('id', ParseUUIDPipe) id: string,
@@ -283,8 +389,11 @@ export class AcademicCalendarController {
 
   @Put(':id')
   @Roles('uni_admin')
+  @ApiCookieAuth('umtas-session')
   @ApiOperation({
     summary: 'Replace an academic calendar',
+    description:
+      'Fully replaces the university and year. Moving a calendar requires administrator access to both the existing and target universities.',
     operationId: 'updateAcademicCalendar',
   })
   @ApiParam(CALENDAR_ID_PARAM)
@@ -294,10 +403,22 @@ export class AcademicCalendarController {
     description: 'Academic calendar updated successfully',
     type: AcademicCalendarDto,
   })
-  @ApiResponse({ status: 400, description: 'Invalid calendar request' })
-  @ApiResponse({ status: 401, description: 'No active session' })
-  @ApiResponse({ status: 403, description: 'Insufficient permissions' })
-  @ApiResponse({ status: 404, description: 'Academic calendar not found' })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid calendar request',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'No active session',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Insufficient permissions',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Academic calendar not found',
+  })
   @ApiResponse({
     status: 409,
     description: 'A calendar already exists for this university and year',
@@ -312,8 +433,11 @@ export class AcademicCalendarController {
 
   @Delete(':id')
   @Roles('uni_admin')
+  @ApiCookieAuth('umtas-session')
   @ApiOperation({
     summary: 'Delete an academic calendar',
+    description:
+      'Deletes a calendar and cascades to its restrictions. Deletion is rejected while generated snapshots reference it.',
     operationId: 'deleteAcademicCalendar',
   })
   @ApiParam(CALENDAR_ID_PARAM)
@@ -322,10 +446,22 @@ export class AcademicCalendarController {
     description: 'Academic calendar deleted successfully',
     type: DeleteAcademicCalendarResponseDto,
   })
-  @ApiResponse({ status: 400, description: 'Invalid academic calendar ID' })
-  @ApiResponse({ status: 401, description: 'No active session' })
-  @ApiResponse({ status: 403, description: 'Insufficient permissions' })
-  @ApiResponse({ status: 404, description: 'Academic calendar not found' })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid academic calendar ID',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'No active session',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Insufficient permissions',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Academic calendar not found',
+  })
   @ApiResponse({
     status: 409,
     description: 'Generated snapshots still reference this calendar',

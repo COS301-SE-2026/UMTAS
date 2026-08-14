@@ -21,6 +21,7 @@ import { SolverModule } from './solver/solver.module';
 import { StorageModule } from './storage/storage.module';
 import { AttendanceModule } from './Attendance/attendance.module';
 import { GroupingModule } from './Grouping/grouping.module';
+import { AcademicCalendarModule } from './academic_calendar/academic_calendar.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { GroupingModule } from './Grouping/grouping.module';
     SolverModule,
     AttendanceModule,
     GroupingModule,
+    AcademicCalendarModule,
   ],
   controllers: [AppController, AuthController],
   providers: [
