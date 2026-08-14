@@ -5,3 +5,4 @@ export * from './PdfParser/index';
 export * from './Solver/index';
 export * from './timetables/index';
 export * from './Universities/index';
+export * from './Map/index';
