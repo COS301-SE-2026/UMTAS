@@ -107,7 +107,7 @@ export class BuildingQueryDto {
   @ApiPropertyOptional({
     example: true,
     description:
-      'True: building with pin. False: only buildings without pinn. Omit for all buildings.',
+      'True: building with pin. False: only buildings without pin. Omit for all buildings.',
   })
   @IsOptional()
   @Transform(({ value }) => value === 'true' || value === true)

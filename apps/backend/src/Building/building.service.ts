@@ -64,7 +64,7 @@ export class BuildingService {
 
     if (query.mapped === true) {
       filters.push(isNotNull(Building.Latitude));
-    } else {
+    } else if (query.mapped === false) {
       filters.push(isNull(Building.Latitude));
     }
 
