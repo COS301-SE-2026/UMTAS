@@ -68,7 +68,6 @@ export class ML_Adapter extends University_Adapter {
       per_page: 100,
     });
 
-    console.log(`Here: [${JSON.stringify(response)}]`);
     const result: CreateModuleDto[] = response.map((module) => ({
       moduleCode: module.section_id.split('-')[1],
       moduleName: `${course.CourseName}-[${module.section_id}]`,
@@ -81,8 +80,6 @@ export class ML_Adapter extends University_Adapter {
       },
     }));
 
-    console.log(`Here CreateModuleDto[]: [${JSON.stringify(result)}]`);
-
     return result;
   }
 
@@ -90,7 +87,7 @@ export class ML_Adapter extends University_Adapter {
     const externalId = module.ExternalID ?? null;
     if (externalId === null) {
       throw new BadRequestException(
-        `You are not referring to an existing external course with [${module.moduleID}]`,
+        `You are not referring to an existing external module with [${module.moduleID}]`,
       );
     }
 
@@ -98,31 +95,31 @@ export class ML_Adapter extends University_Adapter {
       `courses/sections/${externalId}`,
     );
 
+    if (response.length === 0) return []; //kannie gooi nie :(
+
+    const section = response[0];
+
     const result: CreateEventDto[] = [];
 
-    for (const event of response) {
-      for (const meeting of event.meetings) {
-        const days: DayOfWeek[] = this.parseDays(meeting.days);
+    for (const meeting of section.meetings) {
+      const days: DayOfWeek[] = this.parseDays(meeting.days);
 
-        for (const day of days) {
-          result.push({
-            isRecurring: true,
-            eventName: `Event_${module.moduleName.substring(0, 15)}`,
-            eventCriteria: {
-              eventSource: EventSource.UNIVERSITY,
-              moduleId: module.moduleID,
-              dayOfWeek: day,
-              startTime: this.convertTime(meeting.start_time),
-              endTime: this.convertTime(meeting.end_time),
-            },
-            activityType: 'lecture',
-            activityCode: 'lec',
-          });
-        } //END_day
-      } //END_meeting
-    } //END_event
-
-    // console.log(`Here: [${JSON.stringify(result)}]`);
+      for (const day of days) {
+        result.push({
+          isRecurring: true,
+          eventName: `Event_${module.moduleName.substring(0, 15)}`,
+          eventCriteria: {
+            eventSource: EventSource.UNIVERSITY,
+            moduleId: module.moduleID,
+            dayOfWeek: day,
+            startTime: this.convertTime(meeting.start_time),
+            endTime: this.convertTime(meeting.end_time),
+          },
+          activityType: 'lecture',
+          activityCode: 'lec',
+        });
+      } //END_day
+    } //END_meeting
 
     return result;
   }
