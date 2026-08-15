@@ -20,7 +20,7 @@ export abstract class University_Adapter {
   /**
    * Get all courses at the university
    */
-  abstract getCourses(): Promise<CreateCourseDto[]>;
+  abstract getCourses(page: number, limit: number): Promise<CreateCourseDto[]>;
 
   /**
    * Get all Modules for a selected course

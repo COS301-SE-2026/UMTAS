@@ -1,6 +1,13 @@
 import { ApiService } from './ApiService.service';
 
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiNotFoundResponse,
+  ApiOperation,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { BadRequestException, Controller, Get, Query } from '@nestjs/common';
 
 //Responses
@@ -13,6 +20,9 @@ import { CurrentSession } from '../auth/session.decorator';
 import type { SessionData } from '../auth/session.decorator';
 import { Roles } from 'src/auth/roles.guard';
 
+//kontant
+import { getRedisClient } from 'src/redis/redis';
+
 @ApiTags('ApiService')
 @Controller('api-service')
 export class ApiServiceController {
@@ -20,14 +30,42 @@ export class ApiServiceController {
 
   @Get('/courses')
   @Roles()
+  @ApiOperation({
+    summary: 'Fetch courses',
+    description: "Fetches courses for the authenticated user's university.",
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    example: 0,
+    description: 'Page index: zero index',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    example: 50,
+    description: 'Courses per page',
+  })
+  @ApiBadRequestResponse({
+    description: 'The authenticated user is not associated with a university.',
+  })
+  @ApiNotFoundResponse({
+    description: 'The university or its API adapter could not be found.',
+  })
   @ApiResponse({
-    status: 201,
+    status: 200,
     description: 'Courses fetched successfully',
     type: CourseListResponseDto,
   })
-  getCourses(
+  async getCourses(
     @CurrentSession() session: SessionData,
+    @Query('page') page = '0',
+    @Query('limit') limit = '50',
   ): Promise<CourseListResponseDto> {
+    const startTime = Date.now();
+
     const uniId = session.uniId;
 
     if (uniId === undefined || uniId.trim().length === 0)
@@ -35,20 +73,69 @@ export class ApiServiceController {
         `It seems you are not referring to any university.`,
       );
 
-    return this.service.getCourses(uniId);
+    //get cache client
+    const redis = getRedisClient();
+    //unique key to identify cache members
+    const kontantKey = `api-service:courses:${uniId}:${page}:${limit}`;
+    //if cache item exists -> return early
+    if (redis) {
+      const geKontant = await redis.get(kontantKey);
+
+      if (geKontant) {
+        const duration = Date.now() - startTime;
+        console.log(`Kontant HIT: ${kontantKey} | ${duration}ms`);
+        return JSON.parse(geKontant) as CourseListResponseDto;
+      }
+    }
+
+    //Fetch from api
+    const result = await this.service.getCourses(
+      uniId,
+      Number(page),
+      Number(limit),
+    );
+
+    //Cache for 5mins
+    if (redis) {
+      await redis?.set(kontantKey, JSON.stringify(result), 'EX', 300);
+    }
+
+    const duration = Date.now() - startTime;
+    result.message = `${result.message} | ${duration}ms`;
+    return result;
   } //END_getCourses
 
   @Get('/modules')
   @Roles()
+  @ApiOperation({
+    summary: 'Fetch modules',
+    description:
+      "Fetches modules for a course at the authenticated user's university.",
+  })
+  @ApiQuery({
+    name: 'courseId',
+    required: true,
+    type: String,
+    description: 'UUID of the course to fetch modules for.',
+    example: '00000000-0000-0000-0000-000000000000',
+  })
   @ApiResponse({
-    status: 201,
-    description: 'Modules fetched successfully',
+    status: 200,
+    description: 'Modules fetched successfully.',
     type: ModuleListResponseDto,
   })
-  getModules(
+  @ApiBadRequestResponse({
+    description: 'The university or course ID is invalid.',
+  })
+  @ApiNotFoundResponse({
+    description: 'The university, course, or API adapter could not be found.',
+  })
+  async getModules(
     @CurrentSession() session: SessionData,
     @Query('courseId') courseId: string,
   ): Promise<ModuleListResponseDto> {
+    const startTime = Date.now();
+
     const uniId = session.uniId;
 
     if (uniId === undefined || uniId.trim().length === 0)
@@ -56,20 +143,68 @@ export class ApiServiceController {
         `It seems you are not referring to any university.`,
       );
 
-    return this.service.getModules(session.user.id, uniId, courseId);
+    //get cache client
+    const redis = getRedisClient();
+    //unique key to identify cache members
+    const kontantKey = `api-service:modules:${uniId}:${courseId}`;
+    //if cache item exists -> return early
+    if (redis) {
+      const geKontant = await redis.get(kontantKey);
+
+      if (geKontant) {
+        const duration = Date.now() - startTime;
+        console.log(`Kontant HIT: ${kontantKey} | ${duration}ms`);
+        return JSON.parse(geKontant) as ModuleListResponseDto;
+      }
+    }
+
+    const result = await this.service.getModules(
+      session.user.id,
+      uniId,
+      courseId,
+    );
+
+    //Cache for 5mins
+    if (redis) {
+      await redis?.set(kontantKey, JSON.stringify(result), 'EX', 300);
+    }
+
+    const duration = Date.now() - startTime;
+    result.message = `${result.message} | ${duration}ms`;
+    return result;
   } //END_getModules
 
   @Get('/events')
   @Roles()
+  @ApiOperation({
+    summary: 'Fetch events',
+    description:
+      "Fetches events for a module at the authenticated user's university.",
+  })
+  @ApiQuery({
+    name: 'moduleId',
+    required: true,
+    type: String,
+    description: 'UUID of the module to fetch events for.',
+    example: '00000000-0000-0000-0000-000000000000',
+  })
   @ApiResponse({
-    status: 201,
-    description: 'Events fetched successfully',
+    status: 200,
+    description: 'Events fetched successfully.',
     type: EventListResponseDto,
   })
-  getEvents(
+  @ApiBadRequestResponse({
+    description: 'The university or module ID is invalid.',
+  })
+  @ApiNotFoundResponse({
+    description: 'The university, module, or API adapter could not be found.',
+  })
+  async getEvents(
     @CurrentSession() session: SessionData,
     @Query('moduleId') moduleId: string,
   ): Promise<EventListResponseDto> {
+    const startTime = Date.now();
+
     const uniId = session.uniId;
 
     if (uniId === undefined || uniId.trim().length === 0)
@@ -77,6 +212,34 @@ export class ApiServiceController {
         `It seems you are not referring to any university.`,
       );
 
-    return this.service.getEvents(session.user.id, uniId, moduleId);
+    //get cache client
+    const redis = getRedisClient();
+    //unique key to identify cache members
+    const kontantKey = `api-service:events:${uniId}:${moduleId}`;
+    //if cache item exists -> return early
+    if (redis) {
+      const geKontant = await redis.get(kontantKey);
+
+      if (geKontant) {
+        const duration = Date.now() - startTime;
+        console.log(`Kontant HIT: ${kontantKey} | ${duration}ms`);
+        return JSON.parse(geKontant) as EventListResponseDto;
+      }
+    }
+
+    const result = await this.service.getEvents(
+      session.user.id,
+      uniId,
+      moduleId,
+    );
+
+    //Cache for 5mins
+    if (redis) {
+      await redis?.set(kontantKey, JSON.stringify(result), 'EX', 300);
+    }
+
+    const duration = Date.now() - startTime;
+    result.message = `${result.message} | ${duration}ms`;
+    return result;
   } //END_getEvents
 }

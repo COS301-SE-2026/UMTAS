@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotImplementedException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CourseDto, CourseListResponseDto } from 'src/Course/dto/course.dto';
 import { EventDto, EventListResponseDto } from 'src/Events/dto/EventDto.dto';
 import { ModuleListResponseDto, ModulesDto } from 'src/Module/dto/module.dto';
@@ -24,12 +20,16 @@ export class ApiService {
     private readonly eventService: EventService,
   ) {}
 
-  async getCourses(uniId: string): Promise<CourseListResponseDto> {
+  async getCourses(
+    uniId: string,
+    page: number,
+    limit: number,
+  ): Promise<CourseListResponseDto> {
     const uni = await this.getUni(uniId);
 
     const adapter = this.adapterRegistry.getAdapter(uni);
 
-    const result = await adapter.getCourses();
+    const result = await adapter.getCourses(page, limit);
 
     const courses: CourseDto[] = await Promise.all(
       result.map((course) => this.courseService.create(course)),
@@ -37,7 +37,7 @@ export class ApiService {
 
     return {
       courses,
-      message: ``,
+      message: `Number of courses returned = [${courses.length}]`,
     };
   } //END_getCourses
 
@@ -65,8 +65,6 @@ export class ApiService {
       modules,
       message: `Modules returned for course[${course.CourseName}] = [${modules.length}]`,
     };
-
-    throw new NotImplementedException();
   } //END_getModules
 
   async getEvents(
@@ -94,8 +92,6 @@ export class ApiService {
       events,
       message: `Events returned for Module[${module.moduleName}] = [${events.length}]`,
     };
-
-    throw new NotImplementedException();
   } //END_getEvents
 
   //🎅's little helpers

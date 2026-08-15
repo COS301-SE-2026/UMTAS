@@ -40,8 +40,11 @@ export class ML_Adapter extends University_Adapter {
 
   async authenticate(): Promise<void> {}
 
-  async getCourses(): Promise<CreateCourseDto[]> {
-    const response: ExternalCourse[] = await this.request('courses');
+  async getCourses(page: number, limit: number): Promise<CreateCourseDto[]> {
+    const response: ExternalCourse[] = await this.request('courses', {
+      page,
+      per_page: limit,
+    });
 
     const result: CreateCourseDto[] = response.map((course) => ({
       UniversityID: this.uniID,
@@ -62,6 +65,7 @@ export class ML_Adapter extends University_Adapter {
 
     const response: ExternalModule[] = await this.request(`courses/sections`, {
       course_id: externalId,
+      per_page: 100,
     });
 
     console.log(`Here: [${JSON.stringify(response)}]`);
