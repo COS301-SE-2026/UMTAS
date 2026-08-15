@@ -42,7 +42,7 @@ export class CourseDto {
   })
   @IsNotEmpty()
   @IsString()
-  @Length(1, 30)
+  @Length(1, 255)
   CourseName!: string;
 
   @ApiPropertyOptional({

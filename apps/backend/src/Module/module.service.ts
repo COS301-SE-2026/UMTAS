@@ -116,6 +116,7 @@ export class ModuleService {
         moduleName: name,
         moduleDescription: description,
         ...(dto.validated === undefined ? {} : { validated: dto.validated }),
+        ExternalID: dto.ExternalID?.trim() ?? null,
       })
       .returning();
 

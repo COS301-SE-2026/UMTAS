@@ -168,6 +168,15 @@ export class ModulesDto {
   @IsOptional()
   @IsBoolean()
   validated?: boolean;
+
+  @ApiPropertyOptional({
+    example: '12345',
+    description: 'Refer to module on external API',
+  })
+  @IsOptional()
+  @IsString()
+  @Length(1, 255)
+  ExternalID?: string | null;
 } //ModuleDto
 
 //Create
@@ -177,6 +186,7 @@ export class CreateModuleDto extends PickType(ModulesDto, [
   'moduleDescription',
   'styling',
   'validated',
+  'ExternalID',
 ]) {
   @ApiPropertyOptional({
     example: '00000000-0000-0000-0000-000000000000',
@@ -233,6 +243,8 @@ export class ModuleListResponseDto {
     description: 'List of modules',
   })
   modules!: ModuleSingleResponseDto[];
+
+  message?: string;
 }
 
 //Delete
