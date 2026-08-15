@@ -2,45 +2,48 @@
 import {
   ConflictException,
   NotFoundException,
-  NotImplementedException,
   UnprocessableEntityException,
 } from '@nestjs/common';
 import type { HttpException } from '@nestjs/common';
 import { DatabaseService } from '../db/database.service';
+import { EventSource } from '../Events/dto/event.types';
 import {
   createDbChain,
   mockDbResult,
   mockSequentialResults,
 } from '../Testing/Mocks/database.helpers';
 import { createMockDatabase } from '../Testing/Mocks/database.mock';
+import {
+  createAcademicCalendar,
+  createCalendarRestriction,
+  createEvent,
+  createGeneratedCalendar,
+  createTimetable,
+} from '../Testing/Factories';
+import { AcademicCalendarGenerationService } from './academic-calendar-generation.service';
 import { AcademicCalendarService } from './academic_calendar.service';
 
 const universityId = '20000000-0000-4000-8000-000000000001';
-const otherUniversityId = '20000000-0000-4000-8000-000000000002';
 const calendarId = '30000000-0000-4000-8000-000000000001';
 const restrictionId = '40000000-0000-4000-8000-000000000001';
 const createdAt = new Date('2026-01-10T08:00:00.000Z');
 const updatedAt = new Date('2026-01-11T09:00:00.000Z');
-
-const calendar = {
+const calendar = createAcademicCalendar({
   id: calendarId,
   universityId,
   year: 2026,
   createdAt,
   updatedAt,
-};
+});
 
-const holiday = {
+const holiday = createCalendarRestriction({
   id: restrictionId,
   academicCalendarId: calendarId,
-  type: 'PUBLIC_HOLIDAY' as const,
   startDate: '2026-04-27',
   endDate: '2026-04-27',
-  description: 'Freedom Day',
-  replacementWeekday: null,
   createdAt,
   updatedAt,
-};
+});
 
 async function expectDomainError(
   promise: Promise<unknown>,
@@ -58,35 +61,43 @@ async function expectDomainError(
 
 describe('AcademicCalendarService', () => {
   const { mockDb, reset } = createMockDatabase();
-  const service = new AcademicCalendarService({
-    db: mockDb,
-  } as unknown as DatabaseService);
+  const service = new AcademicCalendarService(
+    {
+      db: mockDb,
+    } as unknown as DatabaseService,
+    new AcademicCalendarGenerationService(),
+  );
 
   afterEach(reset);
 
   describe('academic calendar CRUD', () => {
-    it('creates a calendar and serializes timestamps', async () => {
-      mockDbResult(mockDb.select as jest.Mock, []);
+    it('creates a calendar without exposing persistence metadata', async () => {
       mockDbResult(mockDb.insert as jest.Mock, [calendar]);
 
       await expect(
         service.createCalendar(universityId, { year: 2026 }),
       ).resolves.toEqual({
-        ...calendar,
-        createdAt: createdAt.toISOString(),
-        updatedAt: updatedAt.toISOString(),
+        id: calendarId,
+        year: 2026,
       });
     });
 
-    it('rejects a duplicate university/year before insertion', async () => {
-      mockDbResult(mockDb.select as jest.Mock, [{ id: calendarId }]);
+    it('maps a duplicate university/year constraint to a conflict', async () => {
+      (mockDb.insert as jest.Mock).mockReturnValue(
+        createDbChain(
+          Promise.reject(
+            Object.assign(new Error('unique constraint violation'), {
+              code: '23505',
+            }),
+          ),
+        ),
+      );
 
       await expectDomainError(
         service.createCalendar(universityId, { year: 2026 }),
         ConflictException,
         'already exists',
       );
-      expect(mockDb.insert).not.toHaveBeenCalled();
     });
 
     it('gets a calendar in the selected university', async () => {
@@ -96,7 +107,7 @@ describe('AcademicCalendarService', () => {
         service.getCalendar(universityId, calendarId),
       ).resolves.toMatchObject({
         id: calendarId,
-        createdAt: createdAt.toISOString(),
+        year: 2026,
       });
     });
 
@@ -110,34 +121,7 @@ describe('AcademicCalendarService', () => {
       );
     });
 
-    it('does not update a calendar outside the selected university', async () => {
-      mockDbResult(mockDb.select as jest.Mock, []);
-
-      await expect(
-        service.updateCalendar(otherUniversityId, calendarId, { year: 2027 }),
-      ).rejects.toBeInstanceOf(NotFoundException);
-      expect(mockDb.update).not.toHaveBeenCalled();
-    });
-
-    it('updates an academic calendar year without changing ownership', async () => {
-      const updated = {
-        ...calendar,
-        year: 2027,
-      };
-      mockSequentialResults(mockDb.select as jest.Mock, [[calendar], []]);
-      mockDbResult(mockDb.update as jest.Mock, [updated]);
-
-      await expect(
-        service.updateCalendar(universityId, calendarId, { year: 2027 }),
-      ).resolves.toMatchObject({
-        id: calendarId,
-        universityId,
-        year: 2027,
-      });
-    });
-
     it('deletes an authorized calendar', async () => {
-      mockDbResult(mockDb.select as jest.Mock, [calendar]);
       mockDbResult(mockDb.delete as jest.Mock, [calendar]);
 
       await expect(
@@ -158,9 +142,12 @@ describe('AcademicCalendarService', () => {
       ).resolves.toEqual({
         restrictions: [
           {
-            ...holiday,
-            createdAt: createdAt.toISOString(),
-            updatedAt: updatedAt.toISOString(),
+            id: restrictionId,
+            type: 'PUBLIC_HOLIDAY',
+            startDate: '2026-04-27',
+            endDate: '2026-04-27',
+            description: 'Freedom Day',
+            replacementWeekday: null,
           },
         ],
       });
@@ -181,6 +168,20 @@ describe('AcademicCalendarService', () => {
         description: '',
         replacementWeekday: null,
       });
+    });
+
+    it('rejects restriction dates outside the academic calendar year', async () => {
+      mockDbResult(mockDb.select as jest.Mock, [calendar]);
+
+      await expectDomainError(
+        service.createRestriction(universityId, calendarId, {
+          type: 'PUBLIC_HOLIDAY',
+          startDate: '2027-01-01',
+        }),
+        UnprocessableEntityException,
+        'must fall within academic calendar year 2026',
+      );
+      expect(mockDb.insert).not.toHaveBeenCalled();
     });
 
     it('rejects an inverted restriction range', async () => {
@@ -225,10 +226,16 @@ describe('AcademicCalendarService', () => {
     });
 
     it('rejects a duplicate DAY_SWAP target', async () => {
-      mockSequentialResults(mockDb.select as jest.Mock, [
-        [calendar],
-        [{ id: restrictionId }],
-      ]);
+      mockDbResult(mockDb.select as jest.Mock, [calendar]);
+      (mockDb.insert as jest.Mock).mockReturnValue(
+        createDbChain(
+          Promise.reject(
+            Object.assign(new Error('unique constraint violation'), {
+              code: '23505',
+            }),
+          ),
+        ),
+      );
 
       await expectDomainError(
         service.createRestriction(universityId, calendarId, {
@@ -247,10 +254,7 @@ describe('AcademicCalendarService', () => {
         type: 'UNIVERSITY_CLOSURE' as const,
         description: 'Campus closed',
       };
-      mockSequentialResults(mockDb.select as jest.Mock, [
-        [calendar],
-        [holiday],
-      ]);
+      mockDbResult(mockDb.select as jest.Mock, [calendar]);
       mockDbResult(mockDb.update as jest.Mock, [updated]);
 
       await expect(
@@ -266,8 +270,9 @@ describe('AcademicCalendarService', () => {
       });
     });
 
-    it('does not update a restriction from another calendar', async () => {
-      mockSequentialResults(mockDb.select as jest.Mock, [[calendar], []]);
+    it('returns not found when a scoped restriction update affects no row', async () => {
+      mockDbResult(mockDb.select as jest.Mock, [calendar]);
+      mockDbResult(mockDb.update as jest.Mock, []);
 
       await expect(
         service.updateRestriction(universityId, calendarId, restrictionId, {
@@ -275,7 +280,7 @@ describe('AcademicCalendarService', () => {
           startDate: '2026-04-27',
         }),
       ).rejects.toBeInstanceOf(NotFoundException);
-      expect(mockDb.update).not.toHaveBeenCalled();
+      expect(mockDb.update).toHaveBeenCalled();
     });
 
     it('deletes only a restriction belonging to the parent calendar', async () => {
@@ -299,34 +304,242 @@ describe('AcademicCalendarService', () => {
     });
   });
 
-  it.each([
-    ['generateCalendar', () => service.generateCalendar({} as never)],
-    ['getGeneratedCalendar', () => service.getGeneratedCalendar(calendarId)],
-  ])('leaves %s explicitly unimplemented', (_name, invoke) => {
-    expect(invoke).toThrow(NotImplementedException);
-    try {
-      void invoke();
-    } catch (error) {
-      expect((error as Error).message).toBe(
-        'Academic calendar generation is not implemented yet',
-      );
-    }
-  });
+  describe('calendar generation', () => {
+    const timetableId = '50000000-0000-4000-8000-000000000001';
+    const userId = '60000000-0000-4000-8000-000000000001';
+    const moduleId = '70000000-0000-4000-8000-000000000001';
+    const lectureId = '80000000-0000-4000-8000-000000000001';
+    const examId = '80000000-0000-4000-8000-000000000002';
+    const extraLectureId = '80000000-0000-4000-8000-000000000003';
+    const generatedId = '90000000-0000-4000-8000-000000000001';
+    beforeAll(() => {
+      jest.useFakeTimers().setSystemTime(new Date('2026-08-15T08:00:00.000Z'));
+    });
 
-  it('maps unique-constraint races to the calendar conflict', async () => {
-    mockDbResult(mockDb.select as jest.Mock, []);
-    (mockDb.insert as jest.Mock).mockReturnValue(
-      createDbChain(
-        Promise.reject(
-          Object.assign(new Error('unique constraint violation'), {
-            code: '23505',
-          }),
-        ),
-      ),
+    afterAll(() => {
+      jest.useRealTimers();
+    });
+
+    const restrictions = [
+      createCalendarRestriction({
+        ...holiday,
+        id: '41000000-0000-4000-8000-000000000001',
+        type: 'SEMESTER_1_START',
+        startDate: '2026-02-09',
+        endDate: '2026-02-09',
+      }),
+      createCalendarRestriction({
+        ...holiday,
+        id: '41000000-0000-4000-8000-000000000002',
+        type: 'SEMESTER_1_END',
+        startDate: '2026-06-12',
+        endDate: '2026-06-12',
+      }),
+      createCalendarRestriction({
+        ...holiday,
+        id: '41000000-0000-4000-8000-000000000003',
+        type: 'SEMESTER_2_START',
+        startDate: '2026-07-20',
+        endDate: '2026-07-20',
+      }),
+      createCalendarRestriction({
+        ...holiday,
+        id: '41000000-0000-4000-8000-000000000004',
+        type: 'SEMESTER_2_END',
+        startDate: '2026-11-06',
+        endDate: '2026-11-06',
+      }),
+      createCalendarRestriction({
+        ...holiday,
+        id: '41000000-0000-4000-8000-000000000005',
+        type: 'TEST_WEEK',
+        startDate: '2026-03-09',
+        endDate: '2026-03-13',
+        description: 'Test week',
+      }),
+      createCalendarRestriction({
+        ...holiday,
+        id: '41000000-0000-4000-8000-000000000006',
+        type: 'DAY_SWAP',
+        startDate: '2026-03-20',
+        endDate: '2026-03-20',
+        replacementWeekday: 'MONDAY',
+        description: 'Use Monday timetable',
+      }),
+    ];
+
+    const lecture = createEvent(
+      EventSource.UNIVERSITY,
+      {
+        eventID: lectureId,
+        eventName: 'Lecture',
+        activityCode: 'L1',
+        activityType: 'lecture',
+        isRecurring: true,
+      },
+      {
+        moduleId,
+        dayOfWeek: 'monday',
+        startTime: '08:30',
+        endTime: '09:20',
+      },
+    );
+    const exam = createEvent(
+      EventSource.UNIVERSITY,
+      {
+        eventID: examId,
+        eventName: 'Exam',
+        activityType: 'exam',
+      },
+      {
+        moduleId,
+        date: '2026-03-10',
+        startTime: '09:00',
+        endTime: '12:00',
+      },
+    );
+    const oneOffLecture = createEvent(
+      EventSource.UNIVERSITY,
+      {
+        eventID: extraLectureId,
+        eventName: 'Special Lecture',
+        activityType: 'lecture',
+      },
+      exam.eventCriteria,
     );
 
-    await expect(
-      service.createCalendar(universityId, { year: 2026 }),
-    ).rejects.toBeInstanceOf(ConflictException);
+    it("requires the selected university's current-year calendar", async () => {
+      mockDbResult(mockDb.select as jest.Mock, []);
+
+      await expectDomainError(
+        service.generateCalendar(userId, universityId, { timetableId }),
+        NotFoundException,
+        'and year 2026',
+      );
+      expect(mockDb.insert).not.toHaveBeenCalled();
+    });
+
+    it('filters teaching events, keeps one-off exams, applies day swaps, and persists student colours', async () => {
+      mockSequentialResults(mockDb.select as jest.Mock, [
+        [calendar],
+        [
+          {
+            timetable: createTimetable({
+              timetableID: timetableId,
+              timetableName: 'My timetable',
+            }),
+          },
+        ],
+        restrictions,
+        [
+          {
+            event: lecture,
+            moduleId,
+            moduleCode: 'COS301',
+            moduleName: 'Software Engineering',
+            semester: null,
+            styling: { colour: '#123456' },
+            venueName: 'IT 4-1',
+          },
+          {
+            event: exam,
+            moduleId,
+            moduleCode: 'COS301',
+            moduleName: 'Software Engineering',
+            semester: 'SEMESTER_1',
+            styling: { colour: '#123456' },
+            venueName: 'Exam Hall',
+          },
+          {
+            event: oneOffLecture,
+            moduleId,
+            moduleCode: 'COS301',
+            moduleName: 'Software Engineering',
+            semester: 'SEMESTER_1',
+            styling: { colour: '#123456' },
+            venueName: 'IT 4-1',
+          },
+        ],
+      ]);
+      const generated = createGeneratedCalendar({
+        id: generatedId,
+        academicCalendarId: calendarId,
+        timetableId,
+        createdAt,
+      });
+      const insertChain = createDbChain([generated]);
+      (mockDb.insert as jest.Mock).mockReturnValue(insertChain);
+
+      await expect(
+        service.generateCalendar(userId, universityId, {
+          timetableId,
+        }),
+      ).resolves.toMatchObject({ id: generatedId });
+
+      expect(insertChain.values).toHaveBeenCalledWith(
+        expect.objectContaining({
+          // Jest asymmetric matchers are typed as any.
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          payload: expect.objectContaining({
+            recurringEvents: [
+              expect.objectContaining({
+                moduleColour: '#123456',
+                startsOn: '2026-02-09',
+                endsOn: '2026-11-02',
+                excludedDates: ['2026-03-09'],
+                additionalDates: ['2026-03-20'],
+              }),
+            ],
+            oneOffEvents: [
+              expect.objectContaining({
+                date: '2026-03-10',
+                moduleColour: '#123456',
+              }),
+            ],
+            allDayEvents: [],
+          }),
+        }),
+      );
+    });
+
+    it('requires all four valid semester boundaries', async () => {
+      mockSequentialResults(mockDb.select as jest.Mock, [
+        [calendar],
+        [
+          {
+            timetable: createTimetable({
+              timetableID: timetableId,
+              timetableName: null,
+            }),
+          },
+        ],
+        restrictions.slice(1),
+        [],
+      ]);
+
+      await expectDomainError(
+        service.generateCalendar(userId, universityId, {
+          timetableId,
+        }),
+        UnprocessableEntityException,
+        'exactly one SEMESTER_1_START',
+      );
+      expect(mockDb.insert).not.toHaveBeenCalled();
+    });
+
+    it('returns only snapshots owned by the student in the selected university', async () => {
+      const generated = createGeneratedCalendar({
+        id: generatedId,
+        academicCalendarId: calendarId,
+        timetableId,
+        payload: {} as never,
+        createdAt,
+      });
+      mockDbResult(mockDb.select as jest.Mock, [{ generated }]);
+
+      await expect(
+        service.getGeneratedCalendar(userId, universityId, generatedId),
+      ).resolves.toEqual({ id: generatedId, payload: {} });
+    });
   });
 });
