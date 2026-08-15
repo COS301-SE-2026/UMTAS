@@ -51,6 +51,7 @@ export class BuilderService {
       const moduleDto: CreateModuleDto = {
         moduleCode: dto.moduleCode,
         moduleName: dto.moduleName,
+        semester: dto.semester,
         CourseID: userCourse.CourseID,
         moduleDescription: dto.moduleDescription,
         styling: dto.styling,

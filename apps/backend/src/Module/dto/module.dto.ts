@@ -9,6 +9,7 @@ import {
   IsBoolean,
   ValidateNested,
   IsNumber,
+  IsEnum,
 } from 'class-validator';
 import {
   PartialType,
@@ -18,6 +19,10 @@ import {
 } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import { PopulateGroupBodyDto } from '../../Grouping/dto/grouping.dto';
+import {
+  AcademicSemester,
+  type AcademicSemesterType,
+} from '../../entities/Modules/modules.schema';
 
 export class CourseModuleDto {
   @ApiProperty({
@@ -130,6 +135,18 @@ export class ModulesDto {
   @IsString()
   moduleDescription?: string | null;
 
+  @ApiPropertyOptional({
+    enum: AcademicSemester.enumValues,
+    enumName: 'AcademicSemester',
+    example: 'SEMESTER_1',
+    nullable: true,
+    description:
+      'Academic period in which this module is taught. Null or omitted means the whole academic year.',
+  })
+  @IsOptional()
+  @IsEnum(AcademicSemester.enumValues)
+  semester?: AcademicSemesterType | null;
+
   @ApiProperty({
     description: 'Styling to be used for a Module',
     example: {
@@ -175,6 +192,7 @@ export class CreateModuleDto extends PickType(ModulesDto, [
   'moduleCode',
   'moduleName',
   'moduleDescription',
+  'semester',
   'styling',
   'validated',
 ]) {

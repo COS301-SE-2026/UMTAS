@@ -80,6 +80,7 @@ export class ModuleSeedService extends BaseSeedService {
           moduleCode: mod.Code,
           moduleName: mod.Name,
           moduleDescription: mod.Description,
+          semester: this.moduleSemester(mod.SemesterOfStudy),
         })),
       );
 
@@ -206,5 +207,12 @@ export class ModuleSeedService extends BaseSeedService {
 
     //Return wether it was a success
     return !!newGroup;
+  }
+
+  private moduleSemester(value: string): 'SEMESTER_1' | 'SEMESTER_2' | 'YEAR' {
+    const normalized = value.trim().toLowerCase();
+    if (normalized.includes('1')) return 'SEMESTER_1';
+    if (normalized.includes('2')) return 'SEMESTER_2';
+    return 'YEAR';
   }
 } //ModuleSeedService
