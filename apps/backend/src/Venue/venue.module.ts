@@ -7,4 +7,4 @@ import { VenueService } from './venue.service';
   exports: [VenueService],
   providers: [VenueService],
 })
-export class BuildingModule {}
+export class VenueModule {}

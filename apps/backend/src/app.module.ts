@@ -21,6 +21,8 @@ import { SolverModule } from './solver/solver.module';
 import { StorageModule } from './storage/storage.module';
 import { AttendanceModule } from './Attendance/attendance.module';
 import { GroupingModule } from './Grouping/grouping.module';
+import { VenueModule } from './Venue/venue.module';
+import { BuildingModule } from './Building/building.module';
 
 @Module({
   imports: [
@@ -39,6 +41,8 @@ import { GroupingModule } from './Grouping/grouping.module';
     SolverModule,
     AttendanceModule,
     GroupingModule,
+    VenueModule,
+    BuildingModule,
   ],
   controllers: [AppController, AuthController],
   providers: [
