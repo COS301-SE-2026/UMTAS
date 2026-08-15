@@ -4,9 +4,10 @@ import { UniversityModule } from 'src/University/university.module';
 import { ApiServiceController } from './ApiService.controller';
 import { CourseModule } from 'src/Course/course.module';
 import { AdapterRegistry } from './Registry/AdapterRegistry';
+import { ModuleModule } from 'src/Module/module.module';
 
 @Module({
-  imports: [UniversityModule, CourseModule],
+  imports: [UniversityModule, CourseModule, ModuleModule],
   controllers: [ApiServiceController],
   providers: [ApiService, AdapterRegistry],
   exports: [ApiService],

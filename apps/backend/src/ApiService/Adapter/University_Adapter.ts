@@ -1,5 +1,5 @@
 import { RequestTimeoutException } from '@nestjs/common';
-import { CreateCourseDto } from 'src/Course/dto/course.dto';
+import { CourseDto, CreateCourseDto } from 'src/Course/dto/course.dto';
 import { CreateEventDto } from 'src/Events/dto/EventDto.dto';
 import { CreateModuleDto } from 'src/Module/dto/module.dto';
 import { UniversityDto } from 'src/University/dto/university.dto';
@@ -17,10 +17,19 @@ export abstract class University_Adapter {
 
   abstract authenticate(): Promise<void>;
 
+  /**
+   * Get all courses at the university
+   */
   abstract getCourses(): Promise<CreateCourseDto[]>;
 
-  abstract getModules(): Promise<CreateModuleDto[]>;
+  /**
+   * Get all Modules for a selected course
+   */
+  abstract getModules(course: CourseDto): Promise<CreateModuleDto[]>;
 
+  /**
+   * Get all Events for a selected module
+   */
   abstract getEvents(): Promise<CreateEventDto[]>;
 
   /**
@@ -28,7 +37,10 @@ export abstract class University_Adapter {
    * @param url - Path for the endpoint being hit
    * @returns
    */
-  async request<T = any>(url: string): Promise<T> {
+  async request<T = any>(
+    url: string,
+    params?: Record<string, string | number | boolean | undefined>,
+  ): Promise<T> {
     await this.authenticate();
 
     const timeout = 10000; //10 seconds
@@ -37,7 +49,22 @@ export abstract class University_Adapter {
 
     try {
       let finalUrl = `${this.baseUrl}/${url}`;
-      finalUrl = finalUrl.endsWith('/') ? finalUrl : `${finalUrl}/`;
+
+      // console.log(`University_Adapter finalUrl: [${finalUrl}]`);
+      if (params) {
+        const queryParams = new URLSearchParams();
+
+        Object.entries(params).forEach(([key, value]) => {
+          if (value !== undefined && value !== null) {
+            queryParams.append(key, String(value));
+          }
+        });
+
+        const queryString = queryParams.toString();
+        if (queryString) {
+          finalUrl += `?${queryString}`;
+        }
+      }
 
       //example: url='courses'
       const response = await fetch(`${finalUrl}`, {
