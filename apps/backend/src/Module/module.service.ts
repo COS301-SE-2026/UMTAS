@@ -115,6 +115,7 @@ export class ModuleService {
         moduleCode: code,
         moduleName: name,
         moduleDescription: description,
+        semester: dto.semester,
         ...(dto.validated === undefined ? {} : { validated: dto.validated }),
       })
       .returning();
@@ -328,6 +329,8 @@ export class ModuleService {
       updateFields.moduleDescription = dto.moduleDescription.trim();
     if (dto.validated !== undefined && dto.validated !== oldModule.validated)
       updateFields.validated = dto.validated;
+    if (dto.semester !== undefined && dto.semester !== oldModule.semester)
+      updateFields.semester = dto.semester;
 
     //Handle courseModule update -> requires courseId
     let courseModuleInfo: CourseModuleDto | null = null;
