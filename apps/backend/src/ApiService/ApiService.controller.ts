@@ -68,6 +68,7 @@ export class ApiServiceController {
   })
   getEvents(
     @CurrentSession() session: SessionData,
+    @Query('moduleId') moduleId: string,
   ): Promise<EventListResponseDto> {
     const uniId = session.uniId;
 
@@ -76,6 +77,6 @@ export class ApiServiceController {
         `It seems you are not referring to any university.`,
       );
 
-    return this.service.getEvents(uniId);
+    return this.service.getEvents(session.user.id, uniId, moduleId);
   } //END_getEvents
 }

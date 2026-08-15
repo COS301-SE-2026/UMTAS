@@ -67,10 +67,24 @@ export class ApiService {
     throw new NotImplementedException();
   } //END_getModules
 
-  async getEvents(uniId: string): Promise<EventListResponseDto> {
+  async getEvents(
+    userId: string,
+    uniId: string,
+    moduleId: string,
+  ): Promise<EventListResponseDto> {
     const uni = await this.getUni(uniId);
 
-    console.log(uni);
+    const module = await this.getModule(userId, moduleId);
+
+    const adapter = this.adapterRegistry.getAdapter(uni);
+
+    const result = await adapter.getEvents(module);
+
+    // const events: EventDto[] = [];
+
+    for (const event of result) {
+      console.log(event);
+    } //END_event
 
     throw new NotImplementedException();
   } //END_getEvents
@@ -85,5 +99,15 @@ export class ApiService {
       throw new BadRequestException(`Invalid courseID`);
 
     return await this.courseService.getById(courseId);
+  }
+
+  private async getModule(
+    userId: string,
+    moduleId: string,
+  ): Promise<ModulesDto> {
+    if (moduleId.trim().length === 0)
+      throw new BadRequestException(`Invalid moduleID`);
+
+    return await this.moduleService.getById(userId, moduleId);
   }
 } //END_ApiService
