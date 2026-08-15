@@ -1,0 +1,32 @@
+apps/backend/src/Builder/builder.service.spec.ts
+  h_3359569cacef0e 130
+apps/backend/src/Builder/builder.service.ts
+  h_3359569cacef0e 54
+apps/backend/src/Module/dto/module.dto.ts
+  h_3359569cacef0e 12,22-25,138-149,195
+apps/backend/src/Module/module.service.ts
+  h_3359569cacef0e 118,332-333
+apps/backend/src/db/seeding/services/modules.seed.service.ts
+  h_3359569cacef0e 83,211-217
+apps/backend/src/pdf-parser/module-resolver.service.spec.ts
+  h_3359569cacef0e 75,81-119
+apps/backend/src/pdf-parser/module-resolver.service.ts
+  h_3359569cacef0e 69,94-113
+apps/pdf_parser/parser/adapters/up_parser.py
+  h_3359569cacef0e 94,97-114,119,125-141
+apps/pdf_parser/parser/tests/test_cli_contract.py
+  h_3359569cacef0e 51-54
+apps/pdf_parser/parser/tests/test_up_lectures.py
+  h_3359569cacef0e 36-46
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "36177e3dde5d5fb94d19c6f5358f1a950c4b655f",
+  "prompts": {},
+  "humans": {
+    "h_3359569cacef0e": {
+      "author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}
