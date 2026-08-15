@@ -28,7 +28,7 @@ export const Course = pgTable(
     GroupID: uuid('GroupID').references(() => ModuleGrouping.GroupID, {
       onDelete: 'set null',
     }),
-    CourseName: varchar('CourseName', { length: 30 }).notNull(),
+    CourseName: varchar('CourseName', { length: 255 }).notNull(),
     Degree: varchar('Degree', { length: 30 }),
     ExternalID: varchar('ExternalID', { length: 255 }),
   },

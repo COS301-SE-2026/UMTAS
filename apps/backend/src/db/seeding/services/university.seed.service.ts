@@ -102,7 +102,7 @@ export class UniversitySeedService extends BaseSeedService {
     //update with api information
     const apiInfo = {
       ApiIdentifier: 'ML',
-      BaseApiUrl: 'https://api.umd.io/v1/',
+      BaseApiUrl: 'https://api.umd.io/v1',
     };
 
     await tx

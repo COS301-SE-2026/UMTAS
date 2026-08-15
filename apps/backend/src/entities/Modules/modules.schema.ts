@@ -6,25 +6,17 @@ import {
   uuid,
   varchar,
   primaryKey,
-  uniqueIndex,
 } from 'drizzle-orm/pg-core';
 import { usersTable } from '../auth';
 
-export const modules = pgTable(
-  'Modules',
-  {
-    moduleID: uuid('moduleID').defaultRandom().primaryKey(),
-    moduleCode: varchar('moduleCode', { length: 10 }).notNull(),
-    moduleName: varchar('moduleName', { length: 256 }).notNull(),
-    moduleDescription: text('moduleDescription'),
-    validated: boolean('validated').notNull().default(true),
-  },
-  (table) => ({
-    moduleCodeUnique: uniqueIndex('modules_module_code_unique').on(
-      table.moduleCode,
-    ),
-  }),
-);
+export const modules = pgTable('Modules', {
+  moduleID: uuid('moduleID').defaultRandom().primaryKey(),
+  moduleCode: varchar('moduleCode', { length: 10 }).notNull(),
+  moduleName: varchar('moduleName', { length: 256 }).notNull(),
+  moduleDescription: text('moduleDescription'),
+  validated: boolean('validated').notNull().default(true),
+  ExternalID: varchar('ExternalID', { length: 255 }),
+});
 
 export const ModuleEnrollment = pgTable(
   'ModuleEnrollment',

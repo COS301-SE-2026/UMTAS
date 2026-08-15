@@ -17,6 +17,7 @@ export function createModule(overrides: Partial<Module> = {}): Module {
     moduleName: MODULE_NAME,
     moduleDescription: MODULE_DESCRIPTION,
     validated: false,
+    ExternalID: null,
 
     ...overrides,
   };

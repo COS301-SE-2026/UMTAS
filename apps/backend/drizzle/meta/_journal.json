@@ -36,6 +36,27 @@
       "when": 1786779652024,
       "tag": "0004_Added_ExternalID_To_Course_Entity",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1786787222981,
+      "tag": "0005_Course_Name_Now_Length_100",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1786789191985,
+      "tag": "0006_ExternalID_Added_To_Module_Entity",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1786790623006,
+      "tag": "0007_Removed_Unique_Constraint_On_ModuleCode",
+      "breakpoints": true
     }
   ]
 }
