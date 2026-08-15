@@ -89,14 +89,6 @@ export class CalendarRestrictionDto {
   id!: string;
 
   @ApiProperty({
-    type: String,
-    format: 'uuid',
-    example: '120afed7-9444-4d9c-a7f2-8f08dc2b7d70',
-    description: 'Academic calendar containing this restriction.',
-  })
-  academicCalendarId!: string;
-
-  @ApiProperty({
     enum: CALENDAR_RESTRICTION_TYPES,
     enumName: 'CalendarRestrictionType',
     example: 'PUBLIC_HOLIDAY',
@@ -125,20 +117,6 @@ export class CalendarRestrictionDto {
     description: 'Present only for a DAY_SWAP restriction.',
   })
   replacementWeekday?: Weekday | null;
-
-  @ApiProperty({
-    type: String,
-    format: 'date-time',
-    example: '2026-08-11T10:30:00.000Z',
-  })
-  createdAt!: string;
-
-  @ApiProperty({
-    type: String,
-    format: 'date-time',
-    example: '2026-08-11T10:30:00.000Z',
-  })
-  updatedAt!: string;
 }
 
 export class CalendarRestrictionListDto {

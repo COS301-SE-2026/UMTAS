@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsInt, Max, Min } from 'class-validator';
 
-const UNIVERSITY_ID_EXAMPLE = '86f10d5e-f846-4bbc-85fb-67ea008f0f18';
 const CALENDAR_ID_EXAMPLE = '120afed7-9444-4d9c-a7f2-8f08dc2b7d70';
 
 export class CreateAcademicCalendarDto {
@@ -19,9 +18,6 @@ export class CreateAcademicCalendarDto {
   year!: number;
 }
 
-/** PUT replaces the calendar's mutable year; university ownership is session-bound. */
-export class UpdateAcademicCalendarDto extends CreateAcademicCalendarDto {}
-
 export class AcademicCalendarDto {
   @ApiProperty({
     type: String,
@@ -32,14 +28,6 @@ export class AcademicCalendarDto {
   id!: string;
 
   @ApiProperty({
-    type: String,
-    format: 'uuid',
-    example: UNIVERSITY_ID_EXAMPLE,
-    description: 'University that owns the academic calendar.',
-  })
-  universityId!: string;
-
-  @ApiProperty({
     type: Number,
     example: 2026,
     minimum: 1000,
@@ -47,22 +35,6 @@ export class AcademicCalendarDto {
     description: 'Four-digit academic year represented by this calendar.',
   })
   year!: number;
-
-  @ApiProperty({
-    type: String,
-    format: 'date-time',
-    example: '2026-08-11T10:30:00.000Z',
-    description: 'ISO 8601 timestamp at which the calendar was created.',
-  })
-  createdAt!: string;
-
-  @ApiProperty({
-    type: String,
-    format: 'date-time',
-    example: '2026-08-11T10:30:00.000Z',
-    description: 'ISO 8601 timestamp of the most recent calendar update.',
-  })
-  updatedAt!: string;
 }
 
 export class DeleteAcademicCalendarResponseDto {

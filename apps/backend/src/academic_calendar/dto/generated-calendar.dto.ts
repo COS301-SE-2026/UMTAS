@@ -1,6 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import { IsArray, IsUUID, ValidateNested } from 'class-validator';
+import { IsUUID } from 'class-validator';
 import {
   CALENDAR_RESTRICTION_TYPES,
   WEEKDAYS,
@@ -12,154 +11,11 @@ export class GenerateCalendarDto {
   @ApiProperty({
     type: String,
     format: 'uuid',
-    example: '120afed7-9444-4d9c-a7f2-8f08dc2b7d70',
-    description: 'Academic calendar whose restrictions must be applied.',
-  })
-  @IsUUID()
-  academicCalendarId!: string;
-
-  @ApiProperty({
-    type: String,
-    format: 'uuid',
     example: '339cd591-7c62-4ea7-8a2b-602598553133',
     description: 'Timetable containing the source events to generate.',
   })
   @IsUUID()
   timetableId!: string;
-}
-
-export class Rfc5545CalendarDto {
-  @ApiProperty({
-    type: String,
-    enum: ['-//UMTAS//Academic Calendar//EN'],
-    example: '-//UMTAS//Academic Calendar//EN',
-  })
-  prodId!: '-//UMTAS//Academic Calendar//EN';
-
-  @ApiProperty({ type: String, enum: ['2.0'], example: '2.0' })
-  version!: '2.0';
-
-  @ApiProperty({ type: String, enum: ['GREGORIAN'], example: 'GREGORIAN' })
-  calendarScale!: 'GREGORIAN';
-}
-
-export class Rfc5545TimedEventDto {
-  @ApiProperty({
-    example: 'series-cos301-l1-monday@umtas',
-    description: 'Globally unique, stable RFC 5545 event UID.',
-  })
-  uid!: string;
-
-  @ApiProperty({
-    example: '20260811T103000Z',
-    pattern: '^\\d{8}T\\d{6}Z$',
-    description: 'UTC basic-format creation timestamp.',
-  })
-  dtstamp!: string;
-
-  @ApiProperty({
-    example: 'Africa/Johannesburg',
-    description: 'IANA timezone used by all local timed values.',
-  })
-  tzid!: string;
-
-  @ApiProperty({
-    example: '20260202T083000',
-    pattern: '^\\d{8}T\\d{6}$',
-    description: 'Local basic-format event start.',
-  })
-  dtstart!: string;
-
-  @ApiProperty({
-    example: '20260202T092000',
-    pattern: '^\\d{8}T\\d{6}$',
-    description: 'Local basic-format event end.',
-  })
-  dtend!: string;
-
-  @ApiProperty({
-    example: 'COS301 Lecture',
-    description: 'RFC 5545-escaped TEXT value.',
-  })
-  summary!: string;
-
-  @ApiPropertyOptional({
-    example: 'Week 1 overview',
-    description: 'RFC 5545-escaped TEXT value.',
-  })
-  description?: string;
-
-  @ApiPropertyOptional({
-    example: 'IT 4-1',
-    description: 'RFC 5545-escaped TEXT value.',
-  })
-  location?: string;
-
-  @ApiProperty({ type: String, enum: ['CONFIRMED'], example: 'CONFIRMED' })
-  status!: 'CONFIRMED';
-
-  @ApiProperty({ type: Number, enum: [0], example: 0 })
-  sequence!: 0;
-
-  @ApiPropertyOptional({
-    example: 'FREQ=WEEKLY;INTERVAL=1;BYDAY=MO;UNTIL=20260622T063000Z',
-    description: 'RRULE value without the RRULE property-name prefix.',
-  })
-  rrule?: string;
-
-  @ApiProperty({
-    type: [String],
-    example: ['20260330T083000'],
-    description: 'Excluded local date-times in the same timezone as DTSTART.',
-  })
-  exdate!: string[];
-
-  @ApiProperty({
-    type: [String],
-    example: ['20260403T083000'],
-    description: 'Additional local date-times in the same timezone as DTSTART.',
-  })
-  rdate!: string[];
-}
-
-export class Rfc5545AllDayEventDto {
-  @ApiProperty({ example: 'restriction-f8429809@umtas' })
-  uid!: string;
-
-  @ApiProperty({ example: '20260811T103000Z', pattern: '^\\d{8}T\\d{6}Z$' })
-  dtstamp!: string;
-
-  @ApiProperty({
-    example: '20260427',
-    pattern: '^\\d{8}$',
-    description: 'Inclusive all-day start in RFC DATE format.',
-  })
-  dtstart!: string;
-
-  @ApiProperty({
-    example: '20260428',
-    pattern: '^\\d{8}$',
-    description: 'Exclusive all-day end in RFC DATE format.',
-  })
-  dtend!: string;
-
-  @ApiProperty({
-    example: 'Freedom Day',
-    description: 'RFC 5545-escaped TEXT.',
-  })
-  summary!: string;
-
-  @ApiPropertyOptional({
-    example: 'Public holiday',
-    description: 'RFC 5545-escaped TEXT.',
-  })
-  description?: string;
-
-  @ApiProperty({ type: String, enum: ['CONFIRMED'], example: 'CONFIRMED' })
-  status!: 'CONFIRMED';
-
-  @ApiProperty({ type: Number, enum: [0], example: 0 })
-  sequence!: 0;
 }
 
 export class GeneratedRecurringEventDto {
@@ -214,9 +70,6 @@ export class GeneratedRecurringEventDto {
     description: 'Dates added to the weekly series, normally by day swaps.',
   })
   additionalDates!: string[];
-
-  @ApiProperty({ type: () => Rfc5545TimedEventDto })
-  rfc5545!: Rfc5545TimedEventDto;
 }
 
 export class GeneratedOneOffEventDto {
@@ -249,9 +102,6 @@ export class GeneratedOneOffEventDto {
 
   @ApiProperty({ example: '12:00', pattern: '^([01]\\d|2[0-3]):[0-5]\\d$' })
   endTime!: string;
-
-  @ApiProperty({ type: () => Rfc5545TimedEventDto })
-  rfc5545!: Rfc5545TimedEventDto;
 }
 
 export class GeneratedAllDayEventDto {
@@ -284,16 +134,15 @@ export class GeneratedAllDayEventDto {
     description: 'Inclusive domain end date.',
   })
   endDate!: string;
-
-  @ApiProperty({ type: () => Rfc5545AllDayEventDto })
-  rfc5545!: Rfc5545AllDayEventDto;
 }
 
 export class GeneratedCalendarWarningDto {
-  @ApiProperty({ example: 'MODULE_SEMESTER_MISSING' })
+  @ApiProperty({ example: 'RECURRING_EVENT_CRITERIA_INVALID' })
   code!: string;
 
-  @ApiProperty({ example: 'COS301 has no semester assignment.' })
+  @ApiProperty({
+    example: 'COS301 Lecture is missing a weekday or time range.',
+  })
   message!: string;
 
   @ApiPropertyOptional({
@@ -305,9 +154,6 @@ export class GeneratedCalendarWarningDto {
 }
 
 export class GeneratedCalendarPayloadDto {
-  @ApiProperty({ type: Number, enum: [1], example: 1 })
-  schemaVersion!: 1;
-
   @ApiProperty({ example: 'University of Pretoria 2026 Academic Calendar' })
   name!: string;
 
@@ -320,33 +166,16 @@ export class GeneratedCalendarPayloadDto {
   })
   timezone!: string;
 
-  @ApiProperty({ type: () => Rfc5545CalendarDto })
-  @ValidateNested()
-  @Type(() => Rfc5545CalendarDto)
-  rfc5545!: Rfc5545CalendarDto;
-
   @ApiProperty({ type: () => [GeneratedRecurringEventDto] })
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => GeneratedRecurringEventDto)
   recurringEvents!: GeneratedRecurringEventDto[];
 
   @ApiProperty({ type: () => [GeneratedOneOffEventDto] })
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => GeneratedOneOffEventDto)
   oneOffEvents!: GeneratedOneOffEventDto[];
 
   @ApiProperty({ type: () => [GeneratedAllDayEventDto] })
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => GeneratedAllDayEventDto)
   allDayEvents!: GeneratedAllDayEventDto[];
 
   @ApiProperty({ type: () => [GeneratedCalendarWarningDto] })
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => GeneratedCalendarWarningDto)
   warnings!: GeneratedCalendarWarningDto[];
 }
 
@@ -354,30 +183,6 @@ export class GeneratedCalendarDto {
   @ApiProperty({ type: String, format: 'uuid' })
   id!: string;
 
-  @ApiProperty({ type: String, format: 'uuid' })
-  academicCalendarId!: string;
-
-  @ApiProperty({ type: String, format: 'uuid' })
-  timetableId!: string;
-
-  @ApiProperty({ type: String, format: 'uuid' })
-  universityId!: string;
-
-  @ApiProperty({
-    type: String,
-    format: 'date-time',
-    example: '2026-08-11T10:30:00.000Z',
-  })
-  generatedAt!: string;
-
   @ApiProperty({ type: () => GeneratedCalendarPayloadDto })
-  @ValidateNested()
-  @Type(() => GeneratedCalendarPayloadDto)
   payload!: GeneratedCalendarPayloadDto;
-
-  @ApiProperty({ type: String, format: 'date-time' })
-  createdAt!: string;
-
-  @ApiProperty({ type: String, format: 'date-time' })
-  updatedAt!: string;
 }

@@ -17,7 +17,6 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { Public } from '../auth/auth.guard';
 import { Roles } from '../auth/roles.guard';
 import { CurrentSession, type SessionData } from '../auth/session.decorator';
 import { AcademicCalendarService } from './academic_calendar.service';
@@ -31,7 +30,6 @@ import {
   DeleteCalendarRestrictionResponseDto,
   GenerateCalendarDto,
   GeneratedCalendarDto,
-  UpdateAcademicCalendarDto,
   UpdateCalendarRestrictionDto,
 } from './dto';
 
@@ -55,11 +53,12 @@ export class AcademicCalendarController {
   constructor(private readonly service: AcademicCalendarService) {}
 
   @Post('generate')
-  @Public()
+  @Roles('student')
+  @ApiCookieAuth('umtas-session')
   @ApiOperation({
     summary: 'Generate and persist a calendar snapshot',
     description:
-      'Public endpoint reserved for calendar generation. Generation is not implemented yet.',
+      "Generates a restriction-aware pseudo-calendar snapshot using the selected university's current-year academic calendar and a timetable owned by the authenticated student.",
     operationId: 'generateCalendar',
   })
   @ApiBody({ type: GenerateCalendarDto })
@@ -84,22 +83,24 @@ export class AcademicCalendarController {
     status: 422,
     description: 'Calendar data cannot be converted into a valid snapshot',
   })
-  @ApiResponse({
-    status: 501,
-    description: 'Calendar generation is not implemented',
-  })
   generateCalendar(
+    @CurrentSession() session: SessionData,
     @Body() dto: GenerateCalendarDto,
   ): Promise<GeneratedCalendarDto> {
-    return this.service.generateCalendar(dto);
+    return this.service.generateCalendar(
+      session.user.id,
+      this.selectedUniversityId(session),
+      dto,
+    );
   }
 
   @Get('generate/:id')
-  @Public()
+  @Roles('student')
+  @ApiCookieAuth('umtas-session')
   @ApiOperation({
     summary: 'Get a generated calendar snapshot',
     description:
-      'Public endpoint reserved for retrieving generated snapshots. Generation is not implemented yet.',
+      'Returns a generated snapshot only when its timetable belongs to the authenticated student.',
     operationId: 'getGeneratedCalendar',
   })
   @ApiParam({
@@ -121,14 +122,15 @@ export class AcademicCalendarController {
     status: 404,
     description: 'Generated calendar not found',
   })
-  @ApiResponse({
-    status: 501,
-    description: 'Calendar generation is not implemented',
-  })
   getGeneratedCalendar(
+    @CurrentSession() session: SessionData,
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<GeneratedCalendarDto> {
-    return this.service.getGeneratedCalendar(id);
+    return this.service.getGeneratedCalendar(
+      session.user.id,
+      this.selectedUniversityId(session),
+      id,
+    );
   }
 
   @Post()
@@ -394,54 +396,6 @@ export class AcademicCalendarController {
     @Param('id', ParseUUIDPipe) id: string,
   ): Promise<AcademicCalendarDto> {
     return this.service.getCalendar(this.selectedUniversityId(session), id);
-  }
-
-  @Put(':id')
-  @Roles('uni_admin')
-  @ApiCookieAuth('umtas-session')
-  @ApiOperation({
-    summary: 'Replace an academic calendar',
-    description:
-      'Replaces the year of a calendar belonging to the university selected in the current session.',
-    operationId: 'updateAcademicCalendar',
-  })
-  @ApiParam(CALENDAR_ID_PARAM)
-  @ApiBody({ type: UpdateAcademicCalendarDto })
-  @ApiResponse({
-    status: 200,
-    description: 'Academic calendar updated successfully',
-    type: AcademicCalendarDto,
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Invalid calendar request',
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'No active session',
-  })
-  @ApiResponse({
-    status: 403,
-    description: 'Insufficient permissions',
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Academic calendar not found',
-  })
-  @ApiResponse({
-    status: 409,
-    description: 'A calendar already exists for this university and year',
-  })
-  updateCalendar(
-    @CurrentSession() session: SessionData,
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body() dto: UpdateAcademicCalendarDto,
-  ): Promise<AcademicCalendarDto> {
-    return this.service.updateCalendar(
-      this.selectedUniversityId(session),
-      id,
-      dto,
-    );
   }
 
   @Delete(':id')
