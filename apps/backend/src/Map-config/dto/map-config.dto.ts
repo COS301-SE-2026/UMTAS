@@ -46,7 +46,7 @@ export class MapConfigDto {
     example: 'lalala-123',
     nullable: true,
   })
-  GoogleMapID!: string;
+  GoogleMapID!: string | null;
 }
 
 export class UpdateMapConfigDto {
@@ -95,5 +95,5 @@ export class UpdateMapConfigDto {
   @IsOptional()
   @IsString()
   @Length(1, 64)
-  GoogleMapID!: string;
+  GoogleMapID!: string | null;
 }

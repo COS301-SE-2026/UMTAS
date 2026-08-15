@@ -22,7 +22,7 @@ type BuildingEntity = typeof Building.$inferSelect;
 export class BuildingService {
   constructor(private readonly databaseService: DatabaseService) {}
 
-  private requireUniId(session: SessionData): string {
+  private requireUniId(session: SessionData | undefined): string {
     if (!session?.user) {
       throw new ForbiddenException('No active session');
     }
