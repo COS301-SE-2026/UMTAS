@@ -103,13 +103,13 @@ export class ML_Adapter extends University_Adapter {
         for (const day of days) {
           result.push({
             isRecurring: true,
-            eventName: `Event_${module.moduleName}`,
+            eventName: `Event_${module.moduleName.substring(0, 15)}`,
             eventCriteria: {
               eventSource: EventSource.UNIVERSITY,
               moduleId: module.moduleID,
               dayOfWeek: day,
-              startTime: meeting.start_time,
-              endTime: meeting.end_time,
+              startTime: this.convertTime(meeting.start_time),
+              endTime: this.convertTime(meeting.end_time),
             },
             activityType: 'lecture',
             activityCode: 'lec',
@@ -143,5 +143,25 @@ export class ML_Adapter extends University_Adapter {
     } //END_remain
 
     return result;
+  }
+
+  private convertTime(time: string): string {
+    const match = time.trim().match(/^(\d{1,2}):(\d{2})\s*(am|pm)$/i);
+
+    if (!match) {
+      throw new Error(`Invalid time format: ${time}`);
+    }
+
+    let hour = Number(match[1]);
+    const minutes = match[2];
+    const period = match[3].toLowerCase();
+
+    if (period === 'am' && hour === 12) {
+      hour = 0;
+    } else if (period === 'pm' && hour !== 12) {
+      hour += 12;
+    }
+
+    return `${String(hour).padStart(2, '0')}:${minutes}`;
   }
 }

@@ -4,13 +4,14 @@ import {
   NotImplementedException,
 } from '@nestjs/common';
 import { CourseDto, CourseListResponseDto } from 'src/Course/dto/course.dto';
-import { EventListResponseDto } from 'src/Events/dto/EventDto.dto';
+import { EventDto, EventListResponseDto } from 'src/Events/dto/EventDto.dto';
 import { ModuleListResponseDto, ModulesDto } from 'src/Module/dto/module.dto';
 import { UniversityDto } from 'src/University/dto/university.dto';
 import { UniversityService } from 'src/University/university.service';
 import { AdapterRegistry } from './Registry/AdapterRegistry';
 import { CourseService } from 'src/Course/course.service';
 import { ModuleService } from 'src/Module/module.service';
+import { EventService } from 'src/Events/event.service';
 
 //Context
 @Injectable()
@@ -20,6 +21,7 @@ export class ApiService {
     private readonly uniService: UniversityService,
     private readonly courseService: CourseService,
     private readonly moduleService: ModuleService,
+    private readonly eventService: EventService,
   ) {}
 
   async getCourses(uniId: string): Promise<CourseListResponseDto> {
@@ -80,11 +82,18 @@ export class ApiService {
 
     const result = await adapter.getEvents(module);
 
-    // const events: EventDto[] = [];
+    const events: EventDto[] = [];
 
     for (const event of result) {
-      console.log(event);
+      events.push(
+        (await this.eventService.createV2(event, userId, uniId)).event,
+      );
     } //END_event
+
+    return {
+      events,
+      message: `Events returned for Module[${module.moduleName}] = [${events.length}]`,
+    };
 
     throw new NotImplementedException();
   } //END_getEvents
