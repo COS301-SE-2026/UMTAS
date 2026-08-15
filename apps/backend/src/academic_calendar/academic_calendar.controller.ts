@@ -83,10 +83,6 @@ export class AcademicCalendarController {
     status: 422,
     description: 'Calendar data cannot be converted into a valid snapshot',
   })
-  @ApiResponse({
-    status: 501,
-    description: 'Calendar generation is not implemented',
-  })
   generateCalendar(
     @CurrentSession() session: SessionData,
     @Body() dto: GenerateCalendarDto,
