@@ -65,7 +65,7 @@ export class UniversitySeedService extends BaseSeedService {
     }
 
     await this.NWUmockApi(tx);
-    await this.WaterlooAPI(tx);
+    await this.MarylandAPI(tx);
   } //END_seed
 
   //🎅's little helpers
@@ -90,25 +90,24 @@ export class UniversitySeedService extends BaseSeedService {
       .where(eq(University.UniversityID, nwu.UniversityID));
   }
 
-  async WaterlooAPI(tx: AppDatabase) {
-    const waterlooName = this.constants.UniversityNames[3];
+  async MarylandAPI(tx: AppDatabase) {
+    const maryName = this.constants.UniversityNames[3];
 
-    const [waterloo] = await tx
+    const [maryland] = await tx
       .select()
       .from(University)
-      .where(eq(University.UniversityName, waterlooName))
+      .where(eq(University.UniversityName, maryName))
       .limit(1);
 
     //update with api information
     const apiInfo = {
-      ApiIdentifier: 'WL',
-      BaseApiUrl: 'https://openapi.data.uwaterloo.ca/v3/',
-      ApiKey: process.env.WATERLOO_API_KEY,
+      ApiIdentifier: 'ML',
+      BaseApiUrl: 'https://api.umd.io/v1/',
     };
 
     await tx
       .update(University)
       .set(apiInfo)
-      .where(eq(University.UniversityID, waterloo.UniversityID));
+      .where(eq(University.UniversityID, maryland.UniversityID));
   }
 } //UniversitySeedService

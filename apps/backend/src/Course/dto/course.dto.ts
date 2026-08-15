@@ -89,6 +89,8 @@ export class CourseListResponseDto {
     description: 'List of courses',
   })
   courses!: CourseDto[];
+
+  message?: string;
 }
 
 //Delete

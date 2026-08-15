@@ -2,12 +2,18 @@ import { RequestTimeoutException } from '@nestjs/common';
 import { CreateCourseDto } from 'src/Course/dto/course.dto';
 import { CreateEventDto } from 'src/Events/dto/EventDto.dto';
 import { CreateModuleDto } from 'src/Module/dto/module.dto';
+import { UniversityDto } from 'src/University/dto/university.dto';
 
 export abstract class University_Adapter {
-  constructor(
-    protected readonly baseUrl: string,
-    protected readonly uniId: string,
-  ) {}
+  protected uniID: string;
+  protected baseUrl: string | null;
+  protected apiKey: string | null;
+
+  constructor(protected uni: UniversityDto) {
+    this.uniID = uni.UniversityID;
+    this.baseUrl = uni.BaseApiUrl ?? null;
+    this.apiKey = uni.ApiKey ?? null;
+  }
 
   abstract authenticate(): Promise<void>;
 
@@ -23,6 +29,8 @@ export abstract class University_Adapter {
    * @returns
    */
   async request<T = any>(url: string): Promise<T> {
+    await this.authenticate();
+
     const timeout = 10000; //10 seconds
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);

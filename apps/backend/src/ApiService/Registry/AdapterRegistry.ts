@@ -5,7 +5,8 @@ import {
 } from '@nestjs/common';
 import { University_Adapter } from '../Adapter/University_Adapter';
 import { UniversityDto } from '../../University/dto/university.dto';
-import { NWU_Adapter } from '../Adapter/NWU_Adapter/NWU_Adapter';
+import { NWU_Adapter } from '../Adapter/NWU/NWU_Adapter';
+import { ML_Adapter } from '../Adapter/Maryland/ML_Adapter';
 
 @Injectable()
 export class AdapterRegistry {
@@ -36,25 +37,26 @@ export class AdapterRegistry {
   } //END_register
 
   private createAdapter(uni: UniversityDto): University_Adapter {
-    // if (uni.ApiIdentifier?.toUpperCase() === `UP`) {
-    //   const baseUrl = uni.BaseApiUrl ?? null;
-    //   const apiKey = uni.ApiKey ?? null;
+    const ident = uni.ApiIdentifier?.toUpperCase();
+    const baseUrl = uni.BaseApiUrl ?? null;
+    // const apiKey = uni.ApiKey ?? null;
 
-    //   if (baseUrl === null || apiKey === null)
-    //     throw new BadRequestException(
-    //       `BaseUrl and ApiKey does not exist for uni[${JSON.stringify(uni)}]`,
-    //     );
-    //   else return new Example_Adapter(baseUrl, apiKey);
-    // } else
-    if (uni.ApiIdentifier?.toUpperCase() === 'NWU') {
-      const baseUrl = uni.BaseApiUrl ?? null;
-
-      if (baseUrl === null)
-        throw new BadRequestException(
-          `BaseUrl does not exist for uni[${JSON.stringify(uni)}]`,
-        );
-      else return new NWU_Adapter(baseUrl, uni.UniversityID);
-    }
+    switch (ident) {
+      case 'NWU': {
+        if (baseUrl === null)
+          throw new BadRequestException(
+            `BaseUrl does not exist for uni[${uni.UniversityName}]`,
+          );
+        return new NWU_Adapter(uni);
+      }
+      case 'ML': {
+        if (baseUrl === null)
+          throw new BadRequestException(
+            `BaseUrl required for adapter[${uni.UniversityName}]`,
+          );
+        return new ML_Adapter(uni);
+      }
+    } //END)switch
 
     throw new NotFoundException(
       `Adapter does not exist for ${JSON.stringify(uni)}`,

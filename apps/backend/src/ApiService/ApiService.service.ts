@@ -33,6 +33,7 @@ export class ApiService {
 
     return {
       courses,
+      message: ``,
     };
   } //END_getCourses
 
