@@ -8,7 +8,13 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { BadRequestException, Controller, Get, Query } from '@nestjs/common';
+import {
+  BadRequestException,
+  Controller,
+  Get,
+  Logger,
+  Query,
+} from '@nestjs/common';
 
 //Responses
 import { CourseListResponseDto } from '../Course/dto/course.dto';
@@ -26,6 +32,8 @@ import { getRedisClient } from 'src/redis/redis';
 @ApiTags('ApiService')
 @Controller('api-service')
 export class ApiServiceController {
+  private readonly logger = new Logger(this.constructor.name);
+
   constructor(private readonly service: ApiService) {}
 
   @Get('/courses')
@@ -83,7 +91,9 @@ export class ApiServiceController {
 
       if (geKontant) {
         const duration = Date.now() - startTime;
-        console.log(`Kontant HIT: ${kontantKey} | ${duration}ms`);
+        this.logger.log(
+          `\x1b[1;36m KONTANT HIT: ${kontantKey} | ${duration}ms\x1b[0m`,
+        );
         return JSON.parse(geKontant) as CourseListResponseDto;
       }
     }
@@ -153,7 +163,9 @@ export class ApiServiceController {
 
       if (geKontant) {
         const duration = Date.now() - startTime;
-        console.log(`Kontant HIT: ${kontantKey} | ${duration}ms`);
+        this.logger.log(
+          `\x1b[1;36m KONTANT HIT: ${kontantKey} | ${duration}ms\x1b[0m`,
+        );
         return JSON.parse(geKontant) as ModuleListResponseDto;
       }
     }
@@ -222,7 +234,9 @@ export class ApiServiceController {
 
       if (geKontant) {
         const duration = Date.now() - startTime;
-        console.log(`Kontant HIT: ${kontantKey} | ${duration}ms`);
+        this.logger.log(
+          `\x1b[1;36m KONTANT HIT: ${kontantKey} | ${duration}ms\x1b[0m`,
+        );
         return JSON.parse(geKontant) as EventListResponseDto;
       }
     }
