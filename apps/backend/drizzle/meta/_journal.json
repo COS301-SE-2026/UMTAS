@@ -29,6 +29,13 @@
       "when": 1786465212314,
       "tag": "0003_Length_Altered_On_University_ApiKey",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1786779652024,
+      "tag": "0004_Added_ExternalID_To_Course_Entity",
+      "breakpoints": true
     }
   ]
 }

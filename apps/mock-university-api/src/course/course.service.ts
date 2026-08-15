@@ -5,16 +5,16 @@ export class CourseService {
   getCourses() {
     return [
       {
-        course_id: 'COS301',
-        course_name: 'Software Engineering',
-        department: 'Computer Science',
-        description: 'Software engineering principles and practices.',
+        course_id: '456123456123456123',
+        course_name: 'Computer Science',
+        department: 'EBIT',
+        description: 'Computer stuff.',
       },
       {
-        course_id: 'COS326',
-        course_name: 'Database Systems',
-        department: 'Computer Science',
-        description: 'Database design and implementation.',
+        course_id: '456123456789456123',
+        course_name: 'Genetics',
+        department: 'NAS',
+        description: 'Must have something to do with AI.',
       },
     ];
   }

@@ -53,6 +53,15 @@ export class CourseDto {
   @IsString()
   @Length(1, 30)
   Degree?: string | null;
+
+  @ApiPropertyOptional({
+    example: '12345',
+    description: 'Refer to course on external API',
+  })
+  @IsOptional()
+  @IsString()
+  @Length(1, 255)
+  ExternalID?: string | null;
 }
 
 //create
@@ -61,6 +70,7 @@ export class CreateCourseDto extends PickType(CourseDto, [
   'GroupID',
   'CourseName',
   'Degree',
+  'ExternalID',
 ]) {}
 
 //update
