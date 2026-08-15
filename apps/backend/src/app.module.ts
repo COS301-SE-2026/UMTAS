@@ -23,6 +23,7 @@ import { AttendanceModule } from './Attendance/attendance.module';
 import { GroupingModule } from './Grouping/grouping.module';
 import { VenueModule } from './Venue/venue.module';
 import { BuildingModule } from './Building/building.module';
+import { MapConfigModule } from './Map-config/map-config.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { BuildingModule } from './Building/building.module';
     GroupingModule,
     VenueModule,
     BuildingModule,
+    MapConfigModule,
   ],
   controllers: [AppController, AuthController],
   providers: [
