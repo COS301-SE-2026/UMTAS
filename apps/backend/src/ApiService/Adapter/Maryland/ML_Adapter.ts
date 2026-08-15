@@ -1,7 +1,7 @@
 import { BadRequestException, NotImplementedException } from '@nestjs/common';
 import { University_Adapter } from '../University_Adapter';
 import { CourseDto, CreateCourseDto } from 'src/Course/dto/course.dto';
-import { CreateModuleDto } from 'src/Module/dto/module.dto';
+import { CreateModuleDto, ModulesDto } from 'src/Module/dto/module.dto';
 import { CreateEventDto } from 'src/Events/dto/EventDto.dto';
 
 interface ExternalCourse {
@@ -49,7 +49,8 @@ export class ML_Adapter extends University_Adapter {
     console.log(`Here: [${JSON.stringify(response)}]`);
     const result: CreateModuleDto[] = response.map((module) => ({
       moduleCode: module.section_id.split('-')[1],
-      moduleName: module.section_id,
+      moduleName: `${course.CourseName}-[${module.section_id}]`,
+      moduleDescription: `${course.CourseName} "default description"`,
       ExternalID: module.section_id,
       CourseID: course.CourseID,
       CourseModuleInfo: {
@@ -61,11 +62,22 @@ export class ML_Adapter extends University_Adapter {
     console.log(`Here CreateModuleDto[]: [${JSON.stringify(result)}]`);
 
     return result;
-
-    throw new NotImplementedException();
   }
 
-  async getEvents(): Promise<CreateEventDto[]> {
+  async getEvents(module: ModulesDto): Promise<CreateEventDto[]> {
+    const externalId = module.ExternalID ?? null;
+    if (externalId === null) {
+      throw new BadRequestException(
+        `You are not referring to an existing external course with [${module.moduleID}]`,
+      );
+    }
+
+    const response: ExternalModule[] = await this.request(`courses/sections`, {
+      course_id: externalId,
+    });
+
+    console.log(`Here: [${JSON.stringify(response)}]`);
+
     throw new NotImplementedException();
   }
 

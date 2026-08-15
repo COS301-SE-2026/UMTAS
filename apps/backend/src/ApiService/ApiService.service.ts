@@ -53,9 +53,11 @@ export class ApiService {
 
     const result = await adapter.getModules(course);
 
-    const modules: ModulesDto[] = await Promise.all(
-      result.map((module) => this.moduleService.create(userId, module)),
-    );
+    const modules: ModulesDto[] = [];
+
+    for (const module of result) {
+      modules.push(await this.moduleService.create(userId, module));
+    } //END_module
 
     return {
       modules,
