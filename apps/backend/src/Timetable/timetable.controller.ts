@@ -21,6 +21,7 @@ import {
   TimetableResponseDto,
   TimetableListResponseDto,
   DeleteTimetableResponseDto,
+  TimetableListResponseDtoV2,
 } from './dto/timetable.dto';
 
 import { TimetableService } from './timetable.service';
@@ -73,6 +74,23 @@ export class TimetableController {
     return this.service.getAllTimetables(session.user.id);
   } //getAllTimetables
 
+  @Get('/v2')
+  @ApiOperation({
+    summary: 'Get all timetables',
+    operationId: 'getAllTimetablesV2',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Timetables fetched successfully',
+    type: TimetableListResponseDto,
+  })
+  @ApiResponse({ status: 401, description: 'No active session' })
+  getAllTimetablesV2(
+    @CurrentSession() session: SessionData,
+  ): Promise<TimetableListResponseDtoV2> {
+    return this.service.getAllV2(session.user.id);
+  } //getAllTimetables
+
   @Get(':id')
   @ApiOperation({
     summary: 'Get timetable by ID',
@@ -84,7 +102,6 @@ export class TimetableController {
     description: 'Timetable fetched successfully',
     type: TimetableResponseDto,
   })
-  @ApiResponse({ status: 401, description: 'No active session' })
   @ApiResponse({ status: 404, description: 'Timetable not found' })
   getTimetableById(
     @CurrentSession() session: SessionData,
@@ -92,6 +109,25 @@ export class TimetableController {
   ): Promise<TimetableResponseDto> {
     return this.service.getTimetableById(session.user.id, id);
   } //getTimetableById
+
+  @Get('/v2/:id')
+  @ApiOperation({
+    summary: 'Get timetable by ID',
+    operationId: 'getTimetableByIdV2',
+  })
+  @ApiParam({ name: 'id', type: String, description: 'Timetable ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Timetable fetched successfully',
+    type: TimetableResponseDto,
+  })
+  @ApiResponse({ status: 404, description: `Timetable[] not found` })
+  getTimetableByIdV2(
+    @CurrentSession() session: SessionData,
+    @Param('id') id: string,
+  ): Promise<TimetableResponseDto> {
+    return this.service.getByIdV2(session.user.id, id);
+  } //getTimetableByIdV2
 
   @Patch(':id')
   @ApiOperation({

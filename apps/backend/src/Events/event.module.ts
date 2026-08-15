@@ -5,11 +5,12 @@ import { EventImportFingerprintService } from './event-import-fingerprint.servic
 
 import { ModuleModule } from 'src/Module/module.module';
 import { CourseModule } from 'src/Course/course.module';
+import { UniversityService } from 'src/University/university.service';
 
 @Module({
   imports: [ModuleModule, CourseModule],
   controllers: [EventController],
-  providers: [EventService, EventImportFingerprintService],
-  exports: [EventService, EventImportFingerprintService],
+  providers: [EventService, EventImportFingerprintService, UniversityService],
+  exports: [EventService, EventImportFingerprintService, UniversityService],
 })
 export class EventModule {}

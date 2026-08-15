@@ -21,6 +21,7 @@ import {
   usersTable,
   UniversityRole,
   University,
+  EventsToTimetables,
 } from '../entities/index';
 import {
   CreateEventDto,
@@ -31,12 +32,16 @@ import {
   DeleteResponseDto,
   EventDto,
   UpdateEventCriteriaDto,
+  EventCriteriaDto,
+  VenueDto,
 } from './dto/EventDto.dto';
 
 import { AppDatabase } from '../db/database.service';
 import { ModuleService } from '../Module/module.service';
 import { EventImportFingerprintService } from './event-import-fingerprint.service';
-import { EventCriteria } from './dto/event.types';
+import { EventCriteria, EventSource } from './dto/event.types';
+import { UniversityService } from '../University/university.service';
+import { UniversitySingleResponseDto } from '../University/dto/university.dto';
 
 @Injectable()
 export class EventService {
@@ -44,6 +49,7 @@ export class EventService {
     private readonly dbService: DatabaseService,
     private readonly moduleService: ModuleService,
     private readonly eventImportFingerprintService: EventImportFingerprintService,
+    private readonly uniService: UniversityService,
   ) {}
 
   //Create
@@ -69,6 +75,70 @@ export class EventService {
     return { event };
   } //END_Create
 
+  //Create V2
+  /**
+   * Create Event - Version 2
+   * @description For Lecturers and University Admins to create events for modules
+   *
+   * @param dto CreateEventDto
+   * @param tx Transactional safety
+   *
+   * @note moduleId is required
+   */
+  async createV2(
+    dto: CreateEventDto,
+    userId: string,
+    uniId?: string,
+    tx?: AppDatabase,
+  ): Promise<EventSingleResponseDto> {
+    if (!tx) {
+      return this.dbService.db.transaction(async (t: AppDatabase) => {
+        return this.createV2(dto, userId, uniId, t);
+      }); //END_transaction
+    }
+
+    //Validate University
+    const university =
+      uniId !== undefined && uniId.trim().length !== 0
+        ? await this.uniService.getById(uniId)
+        : null;
+
+    if (university === null)
+      throw new BadRequestException(
+        `University[${uniId}] from your session data is invalid.`,
+      );
+
+    //Validate DTO
+    dto = await this.validateCreateEventDto(tx, userId, university, dto);
+
+    const moduleId = dto.eventCriteria.moduleId;
+
+    //Create Event
+    const event = (await this.createEventV2(tx, dto)).event;
+
+    //Create university Event entry
+    const [uniEvent] = await tx
+      .insert(UniversityEvent)
+      .values({
+        moduleID: moduleId,
+        eventID: event.eventId,
+      })
+      .returning();
+
+    if (!uniEvent)
+      throw new InternalServerErrorException(
+        `Failed to create UniversityEvent entry`,
+      );
+
+    const venueIds: string[] | undefined = event.venues?.map(
+      (venue) => venue.venueId,
+    );
+    if (venueIds !== undefined)
+      await this.insertEventVenues(tx, event.eventId, venueIds);
+
+    return { event };
+  } //END_CreateV2
+
   //getAllEvents
   async getAllEvents(
     userId: string,
@@ -85,11 +155,19 @@ export class EventService {
     } //END_transaction precencer check
 
     let events: EventDto[];
-
+    // console.log(`Here: ${filters.all}`);
     if (filters.moduleId)
       // Events for a module
       events = await this.getEventsByModule(filters.moduleId, tx); //No moduleId provided, filter only by user
-    else events = await this.getEventsByUser(userId, tx);
+    else if (filters.timetableId)
+      events = await this.getEventsByTimetable(filters.timetableId, tx);
+    else if (filters.all) {
+      const pureEvents = await tx.select().from(Event);
+      // console.log(`Here: ${JSON.stringify(pureEvents)}`);
+      events = await Promise.all(
+        pureEvents.map((event) => this.mapEventToDto(event)),
+      );
+    } else events = await this.getEventsByUser(userId, tx);
 
     return { events };
   } //getAllEvents
@@ -243,12 +321,6 @@ export class EventService {
       success: true,
     };
   } //delete
-
-  //Attendance methods
-
-  //Create attendance
-
-  //END_Attendance methods
 
   //=======================================================
   //🎅's Little Helpers
@@ -469,6 +541,39 @@ export class EventService {
     return authorizedUniversityIds[0];
   }
 
+  //Create simple event - V2
+  private async createEventV2(
+    tx: AppDatabase,
+    dto: CreateEventDto,
+  ): Promise<EventSingleResponseDto> {
+    const eventName = dto.eventName ?? `nothing`;
+    const activityCode = dto.activityCode;
+    const eventCriteria = dto.eventCriteria;
+    const isRec = dto.isRecurring;
+
+    const [event] = await tx
+      .insert(Event)
+      .values({
+        eventName: eventName,
+        activityCode,
+        activityType: dto.activityType ?? null,
+        eventCriteria: eventCriteria,
+        isRecurring: isRec,
+        validated: dto.validated ?? true,
+        importFingerprint: this.eventImportFingerprintService.buildForEvent({
+          activityType: dto.activityType,
+          activityCode,
+          eventCriteria: eventCriteria,
+        }),
+      })
+      .returning();
+
+    if (!event)
+      throw new InternalServerErrorException(`Failed to create event`);
+
+    return { event: await this.mapEventToDto(event) };
+  } //END_createEventV2
+
   //Create simple event entity
   private async createEvent(
     db: AppDatabase,
@@ -538,6 +643,25 @@ export class EventService {
 
     return Promise.all(events.map((event) => this.mapEventToDto(event)));
   } //END_getEventsByModule
+
+  //Get events by timetable
+  private async getEventsByTimetable(
+    timetableId: string,
+    tx?: AppDatabase,
+  ): Promise<EventDto[]> {
+    const db = tx ?? this.dbService.db;
+
+    const events = await db
+      .select(getTableColumns(Event))
+      .from(Event)
+      .innerJoin(
+        EventsToTimetables,
+        eq(EventsToTimetables.eventID, Event.eventID),
+      )
+      .where(eq(EventsToTimetables.timetableID, timetableId));
+
+    return Promise.all(events.map((event) => this.mapEventToDto(event)));
+  }
 
   //Get events for modules user is enrolled in
   private async getEventsByUser(
@@ -625,50 +749,6 @@ export class EventService {
     }));
   }
 
-  private async replaceEventVenues(
-    eventId: string,
-    venues: EventDto['venues'],
-  ): Promise<void> {
-    const venueIds = await this.validateVenueIds(this.dbService.db, venues);
-    await this.insertEventVenues(this.dbService.db, eventId, venueIds);
-  }
-
-  private async validateVenueIds(
-    db: AppDatabase,
-    venues: EventDto['venues'],
-    universityId?: string,
-  ): Promise<string[]> {
-    if (venues === undefined) return [];
-    const venueIds = [...new Set(venues.map(({ venueId }) => venueId))];
-    if (venueIds.length !== venues.length) {
-      //but just continue with unique ones instead of throwing
-      throw new BadRequestException('Event venues must not contain duplicates');
-    }
-    if (venueIds.length === 0) return [];
-
-    const existing = await db
-      .select({ venueId: Venue.VenueID })
-      .from(Venue)
-      .where(
-        and(
-          inArray(Venue.VenueID, venueIds),
-          universityId === undefined
-            ? undefined
-            : eq(Venue.UniversityID, universityId),
-        ),
-      );
-    if (existing.length !== venueIds.length) {
-      if (universityId !== undefined) {
-        throw new BadRequestException(
-          'One or more venueIds do not belong to the module university',
-        );
-      }
-      throw new BadRequestException('One or more venueIds do not exist');
-    }
-
-    return venueIds;
-  }
-
   private async insertEventVenues(
     db: AppDatabase,
     eventId: string,
@@ -735,5 +815,205 @@ export class EventService {
     //     'Non-recurring events require date and must not include dayOfWeek',
     //   );
     // }
+  }
+
+  private async validateCreateEventDto(
+    tx: AppDatabase,
+    userId: string,
+    uni: UniversitySingleResponseDto,
+    dto: CreateEventDto,
+  ): Promise<CreateEventDto> {
+    const validated: CreateEventDto = dto;
+
+    //Validate activityType
+    const activityType = validated.activityType;
+    if (activityType === undefined) validated.activityType = 'lecture';
+
+    //Validate EventCode
+    const activityCode = validated.activityCode?.trim();
+    if (!activityCode || activityCode === 'string') {
+      validated.activityCode = validated.activityType
+        ? validated.activityType.toUpperCase().substring(0, 9)
+        : 'EV';
+    }
+
+    //Validate EventName
+    if (!validated.eventName?.trim()) {
+      validated.eventName = `Event_${validated.activityCode}`;
+    }
+
+    //Validate isRecurring
+    const isRecurring = validated.isRecurring;
+    if (isRecurring === undefined) validated.isRecurring = false;
+
+    //Validate validated
+    const v = validated.validated;
+    if (v === undefined) validated.validated = false;
+
+    //Validate eventCriteria
+    validated.eventCriteria = await this.validateEventCriteria(
+      userId,
+      validated.eventCriteria,
+      validated.isRecurring!,
+    );
+
+    if (validated.venues && validated.venues.length !== 0)
+      validated.venues = await this.validateVenues(
+        tx,
+        uni.UniversityID,
+        validated.venues,
+      );
+
+    return validated;
+  } //END_validateCreateEventDto
+
+  private async validateEventCriteria(
+    userId: string,
+    eventCriteria: EventCriteriaDto,
+    isRecurring: boolean,
+  ): Promise<EventCriteriaDto> {
+    const v: EventCriteriaDto = eventCriteria;
+
+    //Validate eventSource
+    v.eventSource = v.eventSource ?? EventSource.UNIVERSITY;
+
+    //Validate Times
+    [v.startTime, v.endTime] = this.validateStartAndEndTime(
+      v.startTime,
+      v.endTime,
+    );
+
+    //Validate Module
+    const moduleId = eventCriteria.moduleId;
+    const module =
+      moduleId !== undefined && moduleId.trim().length !== 0
+        ? await this.moduleService.getById(userId, moduleId)
+        : null;
+
+    if (module === null)
+      throw new BadRequestException(`moduleId[${moduleId}] is invalid`);
+    //END_Validate Module
+
+    //Validate Day_Of_Week and date based of isRecurring
+    if (isRecurring) {
+      const dayOfWeek = v.dayOfWeek;
+      if (dayOfWeek == undefined)
+        throw new BadRequestException(
+          `day_Of_Week[${dayOfWeek}] required for recurring event.`,
+        );
+    } else {
+      const date = v.date;
+      if (date === undefined)
+        throw new BadRequestException(
+          `date[${date}] is required for nonRecurring events.`,
+        );
+    }
+
+    return v;
+  }
+
+  private validateStartAndEndTime(
+    start: string,
+    end: string,
+  ): [string, string] {
+    const parse = (s: string) => {
+      if (!/^\d{1,2}:\d{2}$/.test(s))
+        throw new Error(`Invalid time format: ${s}`);
+
+      const [hs, ms] = s.split(':');
+      const h = Number(hs);
+      const m = Number(ms);
+
+      if (
+        !Number.isInteger(h) ||
+        !Number.isInteger(m) ||
+        h < 0 ||
+        h > 23 ||
+        m < 0 ||
+        m > 59
+      ) {
+        throw new Error(`Invalid time value: ${s} | hour/minute`);
+      }
+
+      return h * 60 + m;
+    };
+
+    const format = (minutes: number) => {
+      const h = Math.floor(minutes / 60);
+      const m = minutes % 60;
+
+      return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+    };
+
+    const startIndex = parse(start);
+    let endIndex = parse(end);
+
+    if (endIndex <= startIndex) endIndex = startIndex + 60;
+
+    return [format(startIndex), format(endIndex)];
+  }
+
+  private async validateVenues(
+    tx: AppDatabase,
+    universityId: string,
+    venues?: VenueDto[],
+  ): Promise<VenueDto[]> {
+    const venueIds = await this.validateVenueIds(tx, venues, universityId);
+
+    //Fetch clean venues according to id's
+    const rows = await tx
+      .select({
+        venueId: Venue.VenueID,
+        venueName: Venue.VenueName,
+      })
+      .from(Venue)
+      .where(inArray(Venue.VenueID, venueIds));
+
+    const fresh = rows.map((r) => ({
+      venueId: r.venueId,
+      venueName: r.venueName ?? 'noNameVenue',
+    }));
+
+    return fresh;
+  }
+
+  private async validateVenueIds(
+    db: AppDatabase,
+    venues: EventDto['venues'],
+    universityId?: string,
+  ): Promise<string[]> {
+    if (venues === undefined) return [];
+
+    const venueIds = [...new Set(venues.map(({ venueId }) => venueId))];
+
+    if (venueIds.length !== venues.length) {
+      //but just continue with unique ones instead of throwing
+      throw new BadRequestException('Event venues must not contain duplicates');
+    }
+    if (venueIds.length === 0) return [];
+
+    const existing = await db
+      .select({ venueId: Venue.VenueID })
+      .from(Venue)
+      .where(
+        and(
+          inArray(Venue.VenueID, venueIds),
+          universityId === undefined
+            ? undefined
+            : eq(Venue.UniversityID, universityId),
+        ),
+      );
+
+    if (existing.length !== venueIds.length) {
+      if (universityId !== undefined) {
+        throw new BadRequestException(
+          `One or more venueIds do not belong to the university[${universityId}]`,
+        );
+      }
+
+      throw new BadRequestException('One or more venueIds do not exist');
+    }
+
+    return venueIds;
   }
 } //EventService
