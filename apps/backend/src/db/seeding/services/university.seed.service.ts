@@ -65,6 +65,7 @@ export class UniversitySeedService extends BaseSeedService {
     }
 
     await this.NWUmockApi(tx);
+    await this.WaterlooAPI(tx);
   } //END_seed
 
   //🎅's little helpers
@@ -87,5 +88,27 @@ export class UniversitySeedService extends BaseSeedService {
       .update(University)
       .set(apiInfo)
       .where(eq(University.UniversityID, nwu.UniversityID));
+  }
+
+  async WaterlooAPI(tx: AppDatabase) {
+    const waterlooName = this.constants.UniversityNames[3];
+
+    const [waterloo] = await tx
+      .select()
+      .from(University)
+      .where(eq(University.UniversityName, waterlooName))
+      .limit(1);
+
+    //update with api information
+    const apiInfo = {
+      ApiIdentifier: 'WL',
+      BaseApiUrl: 'https://openapi.data.uwaterloo.ca/v3/',
+      ApiKey: process.env.WATERLOO_API_KEY,
+    };
+
+    await tx
+      .update(University)
+      .set(apiInfo)
+      .where(eq(University.UniversityID, waterloo.UniversityID));
   }
 } //UniversitySeedService
