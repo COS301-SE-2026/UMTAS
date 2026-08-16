@@ -12,11 +12,42 @@ export const SolverEngineSchema = z.enum(["auto", "cp-sat", "ga"]);
 
 export type SolverEngine = z.infer<typeof SolverEngineSchema>;
 
-export const SolverHeuristicPreferenceSchema = z.strictObject({
-  key: z.string().trim().min(1),
-  weight: z.number().finite().optional(),
-  parameters: JsonRecordSchema.optional(),
+const PreferredStartTimeSchema = z.strictObject({
+  key: z.literal("preferred-start-time"),
+  parameters: z.object({
+    "minutes-After-midnight": z.number().min(0).max(1440),
+  }),
 });
+
+const LargeGapsSchema = z.strictObject({
+  key: z.literal("large-gaps"),
+  parameters: z.undefined().optional(), // not required
+});
+
+const SmallGapsSchema = z.strictObject({
+  key: z.literal("small-gaps"),
+  parameters: z.undefined().optional(), // not required
+});
+
+const DaySkipSchema = z.strictObject({
+  key: z.literal("day-skip"),
+  parameters: z.object({
+    "day-to-skip": z.enum([
+      "monday",
+      "tuesday",
+      "wednesday",
+      "thursday",
+      "friday",
+    ]),
+  }),
+});
+
+export const SolverHeuristicPreferenceSchema = z.discriminatedUnion("key", [
+  PreferredStartTimeSchema,
+  LargeGapsSchema,
+  SmallGapsSchema,
+  DaySkipSchema,
+]);
 
 export type SolverHeuristicPreference = z.infer<
   typeof SolverHeuristicPreferenceSchema

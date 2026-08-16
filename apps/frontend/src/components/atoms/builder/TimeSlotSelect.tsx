@@ -24,10 +24,11 @@ interface TimeSlotSelectProps {
   onRemove: () => void;
   error?: string;
   hideDaySelect?: boolean;
+  hideEndTime?: boolean;
   disabled?: boolean;
 }
 
-const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+export const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 
 export const TIMES: string[] = [];
 for (let h = 7; h <= 20; h++) {
