@@ -1,9 +1,8 @@
-import json 
+import json
 import yaml
 import os
-import argparse 
+import argparse
 from pathlib import Path
-
 
 def main():
     parser = argparse.ArgumentParser(description="OpenAPI Bootstrap")
@@ -12,29 +11,27 @@ def main():
     args = parser.parse_args()
 
     spec_path = Path(args.spec)
-    core= Path(__file__).resolve().parent
-    adapter_ = core / "adapters" / args.adapter
+    core = Path(__file__).resolve().parent
+    adapter_ = core.parent / "adapters" / args.adapter
 
     adapter_.mkdir(parents=True, exist_ok=True)
 
     with open(spec_path, "r", encoding="utf-8") as f:
         spec = json.load(f) if spec_path.suffix == ".json" else yaml.safe_load(f)
 
+    servers = spec.get("servers", [])
+    base = servers[0].get("url") if servers and isinstance(servers[0], dict) else "http://localhost:3000"
 
-        servers = spec.get("servers", [])
-        base = servers[0]["url"] if servers else "http://localhost:3000"
-
-        endpoints={
-            "base_url": base,
-            "auth":{
-                "type":"bearer",
-                "token_env_var":"SIMULATION_SERVICE_API_TOKEN"
-            }
-
+    endpoints = {
+        "base_url": base,
+        "auth": {
+            "type": "bearer",
+            "token_env_var": "SIMULATION_SERVICE_API_TOKEN"
         }
-        with open(adapter_ / "endpoints.json", 'w', encoding='utf-8') as f:
-            json.dump(endpoints, f, indent=4)
-
+    }
+    
+    with open(adapter_ / "endpoints.yaml", 'w', encoding='utf-8') as f:
+        yaml.dump(endpoints, f, sort_keys=False)
 
     schemas = spec.get("components", {}).get("schemas", {})
     profile_fields = {}
@@ -58,7 +55,6 @@ def main():
     schema_config = {"fields": profile_fields}
     with open(adapter_ / "profile_schema.yaml", 'w', encoding='utf-8') as f:
         yaml.dump(schema_config, f, sort_keys=False)
-
 
     locust_code = [
         "import os",
@@ -86,7 +82,6 @@ def main():
         ""
     ]
 
-
     paths = spec.get("paths", {})
     for path, methods in paths.items():
         for method, details in methods.items():
@@ -109,8 +104,8 @@ def main():
                 locust_code.append(f"        self.client.{method.lower()}('{path}')")
             locust_code.append("")
 
-        with open(adapter_ / "locust_user.py", 'w', encoding='utf-8') as f:
-            f.write("\n".join(locust_code))
+    with open(adapter_ / "locust_user.py", 'w', encoding='utf-8') as f:
+        f.write("\n".join(locust_code))
 
     print(f"Successfully bootstrapped '{args.adapter}' adapter from OpenAPI spec.")
     print(f"Files generated in: {adapter_.resolve()}")
