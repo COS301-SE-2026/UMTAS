@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+  simulation:
+    build:
+      context: .
+      dockerfile: ../../docker/simulation-service/simulation-service.dockerfile
+    container_name: umtas-sim-engine
+    ports:
+      - "8089:8089"
+    volumes:
+      - ./adapters:/app/adapters
+    environment:
+      - UMTAS_SIM_TOKEN=will_need_to_change_this_somehow
+    command:
+      ["--adapter", "umtas", "--population", "5000", "--web-port", "8089"]
