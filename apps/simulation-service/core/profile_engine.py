@@ -1,6 +1,11 @@
 # core/profile_engine.py
 # this file is responsible for creating the fake users, it reads profile_schema.yml and creates the random fake data based on the schema defined in the file. It uses the Faker library to generate realistic data for various fields such as names, addresses, emails, and more. The generated profiles can be used for testing and simulation purposes in the application.
 # it is supposed to output the 20,000 synthetic profiles in json/other format will still decide 
+import profile
+
+from dataclasses import field
+
+from PIL.ImtImagePlugin import field
 import yaml 
 import random 
 import csv 
@@ -20,7 +25,7 @@ class ProfileEngine:
         random.seed(self.seed)
         Faker.seed(self.seed)
         with open(schema_path, 'r') as file:
-            self.schema = yaml.safe_load(file)
+            self.schema = yaml.safe_load(file) or {}
         self.fields = self.schema.get('fields', {})
         self.loaded_samples ={}
         self._preload_samples()
@@ -51,13 +56,14 @@ class ProfileEngine:
                 # picks from a sample csv file, can be used for names, addresses, we can use this specifcally for domain specific stuff 
             elif field_type == 'sample':
                 count = rule.get('count', 1)
-                population = self.loaded_samples[field]
-                
+                population = self.loaded_samples.get(field, [])
                 safe_count = min(count, len(population))
-                
                 sampled = random.sample(population, k=safe_count)
                 
-                profile[field] = sampled[0] if count == 1 else sampled
+                if count == 1:
+                    profile[field] = sampled[0] if sampled else None
+                else:
+                    profile[field] = sampled
             elif field_type == 'fake':# picks from the faker library, can be used for names, addresses, emails 
 
                 provider = rule.get('provider')

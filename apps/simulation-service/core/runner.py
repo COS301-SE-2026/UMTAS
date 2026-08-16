@@ -5,7 +5,13 @@ import subprocess
 import sys
 import os
 from pathlib import Path
+CORE_DIR = Path(__file__).resolve().parent
+if str(CORE_DIR) not in sys.path:
+    sys.path.insert(0, str(CORE_DIR))
+
 from profile_engine import ProfileEngine
+from report import ReportGen
+
 
 def main():
     parser = argparse.ArgumentParser(description="SIMILATION SERVICE")
@@ -63,8 +69,6 @@ def main():
     except subprocess.CalledProcessError as e:
         print(f"Locust exited with error code {e.returncode}")
 
-
-    from report import ReportGen
     reporter = ReportGen(
         adapter_dir=str(adapt),
         adapter_name=args.adapter,

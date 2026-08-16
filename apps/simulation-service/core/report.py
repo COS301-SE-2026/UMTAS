@@ -17,7 +17,7 @@ class ReportGen:
         2. Packages them into a single JSON file 
         """
 
-        stats_path = Path(self.adapter_dir) / f"{csv_pre}.csv"
+        stats_path = Path(self.adapter_dir) / f"{csv_pre}_stats.csv"
         failures_path = Path(self.adapter_dir) / f"{csv_pre}_failures.csv"
         report ={"metadata": {"adapter_name": self.adapter_name, "population": self.pop, "timestamp": self.timestamp},"summary": {},"endpoints": [],    "failures": []}
 
@@ -27,11 +27,27 @@ class ReportGen:
                 for row in reader:
                     if row["Name"] == "Aggregated":
                         report["summary"] = {
-                    #  need to fill in with stats from locust
+                            "request_type": row.get("Type", "ALL"),
+                            "total_requests": int(row.get("Request Count", 0) or 0),
+                            "total_failures": int(row.get("Failure Count", 0) or 0),
+                            "median_response_time_ms": float(row.get("Median Response Time", 0) or 0),
+                            "avg_response_time_ms": float(row.get("Average Response Time", 0) or 0),
+                            "min_response_time_ms": float(row.get("Min Response Time", 0) or 0),
+                            "max_response_time_ms": float(row.get("Max Response Time", 0) or 0),
+                            "requests_per_second": float(row.get("Requests/s", 0) or 0),
+                            "failures_per_second": float(row.get("Failures/s", 0) or 0),
+                            "p95_response_time_ms": float(row.get("95%", 0) or 0),
+                            "p99_response_time_ms": float(row.get("99%", 0) or 0)
                         }
                     else:
                         report["endpoints"].append({
-
+                            "method": row.get("Type"),
+                            "name": row.get("Name"),
+                            "request_count": int(row.get("Request Count", 0) or 0),
+                            "failure_count": int(row.get("Failure Count", 0) or 0),
+                            "median_response_time_ms": float(row.get("Median Response Time", 0) or 0),
+                            "avg_response_time_ms": float(row.get("Average Response Time", 0) or 0),
+                            "requests_per_second": float(row.get("Requests/s", 0) or 0)
                         
                         })
         else:
@@ -43,8 +59,10 @@ class ReportGen:
                 reader = csv.DictReader(f)
                 for row in reader:
                     report["failures"].append({
-                 #   need to fill in with failure data from locust
-                 # TODO: if anyone sees this please tell me that im being an idiot and forgot to fill in the failure data from locust :(
+                        "method": row.get("Method"),
+                        "name": row.get("Name"),
+                        "error": row.get("Error"),
+                        "occurrences": int(row.get("Occurrences", 0) or 0)
                     })        
 
 
