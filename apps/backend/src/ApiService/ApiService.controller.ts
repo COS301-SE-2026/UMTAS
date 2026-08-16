@@ -32,6 +32,8 @@ import { getRedisClient } from 'src/redis/redis';
 @ApiTags('ApiService')
 @Controller('api-service')
 export class ApiServiceController {
+  private readonly logging = process.env.DEV;
+
   private readonly logger = new Logger(this.constructor.name);
 
   constructor(private readonly service: ApiService) {}
@@ -74,44 +76,67 @@ export class ApiServiceController {
   ): Promise<CourseListResponseDto> {
     const startTime = Date.now();
 
+    //Validate page and limit
+    const vPage = Number(page);
+    const vLimit = Number(limit);
+
+    if (vPage < 0 || vLimit < 0 || vLimit > 100)
+      throw new BadRequestException(
+        `Invalid page[${vPage}] or limit[${vLimit}]`,
+      );
+    //END_Validate page and limit
+
+    //Validate University ID
     const uniId = session.uniId;
 
     if (uniId === undefined || uniId.trim().length === 0)
       throw new BadRequestException(
-        `It seems you are not referring to any university.`,
+        `You have not selected a university. Tsk Tsk Tsk.`,
       );
+    //END_Validate uniID
 
     //get cache client
     const redis = getRedisClient();
     //unique key to identify cache members
-    const kontantKey = `api-service:courses:${uniId}:${page}:${limit}`;
+    const kontantKey = `api-service:courses:${uniId}:${vPage}:${vLimit}`;
     //if cache item exists -> return early
     if (redis) {
-      const geKontant = await redis.get(kontantKey);
+      try {
+        const geKontant = await redis.get(kontantKey);
 
-      if (geKontant) {
-        const duration = Date.now() - startTime;
-        this.logger.log(
-          `\x1b[1;36m KONTANT HIT: ${kontantKey} | ${duration}ms\x1b[0m`,
-        );
-        return JSON.parse(geKontant) as CourseListResponseDto;
+        if (geKontant) {
+          const duration = Date.now() - startTime;
+          this.log(
+            `\x1b[1;36m KONTANT HIT: ${kontantKey} | ${duration}ms\x1b[0m`,
+          );
+          return JSON.parse(geKontant) as CourseListResponseDto;
+        }
+      } catch (error) {
+        this.warn(`Redis GET failed: ${error}`);
       }
     }
 
     //Fetch from api
     const result = await this.service.getCourses(
       uniId,
-      Number(page),
-      Number(limit),
+      Number(vPage),
+      Number(vLimit),
     );
 
     //Cache for 5mins
     if (redis) {
-      await redis?.set(kontantKey, JSON.stringify(result), 'EX', 300);
+      try {
+        await redis.set(kontantKey, JSON.stringify(result), 'EX', 300);
+      } catch (error) {
+        this.warn(`Redis SET failed: ${error}`);
+      }
     }
 
     const duration = Date.now() - startTime;
-    result.message = `${result.message} | ${duration}ms`;
+    this.log(
+      `\x1b[38;5;208m KONTANT MIS: ${kontantKey} | ${duration}ms\x1b[0m`,
+    );
+
     return result;
   } //END_getCourses
 
@@ -150,7 +175,7 @@ export class ApiServiceController {
 
     if (uniId === undefined || uniId.trim().length === 0)
       throw new BadRequestException(
-        `It seems you are not referring to any university.`,
+        `You have not selected a university. Tsk Tsk Tsk.`,
       );
 
     //get cache client
@@ -159,14 +184,18 @@ export class ApiServiceController {
     const kontantKey = `api-service:modules:${uniId}:${courseId}`;
     //if cache item exists -> return early
     if (redis) {
-      const geKontant = await redis.get(kontantKey);
+      try {
+        const geKontant = await redis.get(kontantKey);
 
-      if (geKontant) {
-        const duration = Date.now() - startTime;
-        this.logger.log(
-          `\x1b[1;36m KONTANT HIT: ${kontantKey} | ${duration}ms\x1b[0m`,
-        );
-        return JSON.parse(geKontant) as ModuleListResponseDto;
+        if (geKontant) {
+          const duration = Date.now() - startTime;
+          this.log(
+            `\x1b[1;36m KONTANT HIT: ${kontantKey} | ${duration}ms\x1b[0m`,
+          );
+          return JSON.parse(geKontant) as ModuleListResponseDto;
+        }
+      } catch (error) {
+        this.warn(`Redis GET failed: ${error}`);
       }
     }
 
@@ -178,11 +207,18 @@ export class ApiServiceController {
 
     //Cache for 5mins
     if (redis) {
-      await redis?.set(kontantKey, JSON.stringify(result), 'EX', 300);
+      try {
+        await redis.set(kontantKey, JSON.stringify(result), 'EX', 300);
+      } catch (error) {
+        this.warn(`Redis SET failed: ${error}`);
+      }
     }
 
     const duration = Date.now() - startTime;
-    result.message = `${result.message} | ${duration}ms`;
+    this.log(
+      `\x1b[38;5;208m KONTANT MIS: ${kontantKey} | ${duration}ms\x1b[0m`,
+    );
+
     return result;
   } //END_getModules
 
@@ -221,7 +257,7 @@ export class ApiServiceController {
 
     if (uniId === undefined || uniId.trim().length === 0)
       throw new BadRequestException(
-        `It seems you are not referring to any university.`,
+        `You have not selected a university. Tsk Tsk Tsk.`,
       );
 
     //get cache client
@@ -230,14 +266,18 @@ export class ApiServiceController {
     const kontantKey = `api-service:events:${uniId}:${moduleId}`;
     //if cache item exists -> return early
     if (redis) {
-      const geKontant = await redis.get(kontantKey);
+      try {
+        const geKontant = await redis.get(kontantKey);
 
-      if (geKontant) {
-        const duration = Date.now() - startTime;
-        this.logger.log(
-          `\x1b[1;36m KONTANT HIT: ${kontantKey} | ${duration}ms\x1b[0m`,
-        );
-        return JSON.parse(geKontant) as EventListResponseDto;
+        if (geKontant) {
+          const duration = Date.now() - startTime;
+          this.log(
+            `\x1b[1;36m KONTANT HIT: ${kontantKey} | ${duration}ms\x1b[0m`,
+          );
+          return JSON.parse(geKontant) as EventListResponseDto;
+        }
+      } catch (error) {
+        this.warn(`Redis GET failed: ${error}`);
       }
     }
 
@@ -249,11 +289,31 @@ export class ApiServiceController {
 
     //Cache for 5mins
     if (redis) {
-      await redis?.set(kontantKey, JSON.stringify(result), 'EX', 300);
+      try {
+        await redis.set(kontantKey, JSON.stringify(result), 'EX', 300);
+      } catch (error) {
+        this.warn(`Redis SET failed: ${error}`);
+      }
     }
 
     const duration = Date.now() - startTime;
-    result.message = `${result.message} | ${duration}ms`;
+    this.log(
+      `\x1b[38;5;208m KONTANT MIS: ${kontantKey} | ${duration}ms\x1b[0m`,
+    );
+
     return result;
   } //END_getEvents
+
+  //🎅's little helpers
+  private log(message: string) {
+    if (this.logging) {
+      this.logger.log(message);
+    }
+  }
+
+  private warn(message: string) {
+    if (this.logging) {
+      this.logger.warn(message);
+    }
+  }
 }
