@@ -1,0 +1,16 @@
+apps/backend/src/Module/dto/module.dto.ts
+  h_84e82529bd05a5 186-196
+apps/backend/src/Module/module.service.ts
+  h_84e82529bd05a5 19,286-327
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "c6a0407ec538be8011b7ed90e03d1ae15220dcd4",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}

@@ -1,0 +1,20 @@
+docs/srs/USE_CASES.md
+  h_84e82529bd05a5 93-94
+docs/srs/Use_Cases/Traceability_Matrix/Traceability_Matrix.drawio
+  h_84e82529bd05a5 3,313,839-1576,1578,1582,1585,1588,1593,1598,1603,1608,1611,1616,1621,1626,1631,1634,1639,1644,1649,1654,1657,1662,1667,1672
+docs/srs/FUNCTIONAL_REQUIREMENTS.md
+  h_84e82529bd05a5 36-40,42-59
+docs/srs/Use_Cases/Timetable_Management.md
+  h_84e82529bd05a5 11,56,77-96
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "09af035be278615fa5c1a520ab6c94f68931872b",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}

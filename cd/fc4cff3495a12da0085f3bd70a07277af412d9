@@ -1,0 +1,22 @@
+apps/preference-solver/src/CP_SOLVER/CP.cpp
+  h_84e82529bd05a5 1-111
+apps/preference-solver/src/main.cpp
+  h_84e82529bd05a5 10-11,13,15-19,21-25,27,29,33,37,39
+apps/preference-solver/makefile
+  h_84e82529bd05a5 6,8-10,28-29,37,55-61
+apps/preference-solver/src/CP_SOLVER/CP.h
+  h_84e82529bd05a5 1-66
+apps/preference-solver/src/TEST_DIR/input.json
+  h_84e82529bd05a5 1-307
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "cdfc4cff3495a12da0085f3bd70a07277af412d9",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}

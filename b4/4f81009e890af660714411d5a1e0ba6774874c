@@ -1,0 +1,16 @@
+apps/backend/src/Course/course.service.spec.ts
+  h_84e82529bd05a5 413-418,420,422-423,425-442
+apps/backend/src/Course/course.service.ts
+  h_84e82529bd05a5 203
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "b44f81009e890af660714411d5a1e0ba6774874c",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}

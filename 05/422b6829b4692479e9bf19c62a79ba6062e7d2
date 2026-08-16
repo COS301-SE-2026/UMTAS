@@ -1,0 +1,14 @@
+apps/backend/src/Testing/Mocks/services/grouping.mock.ts
+  h_84e82529bd05a5 1-17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "05422b6829b4692479e9bf19c62a79ba6062e7d2",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}

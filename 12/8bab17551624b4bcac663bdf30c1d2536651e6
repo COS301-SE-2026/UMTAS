@@ -1,0 +1,26 @@
+apps/frontend/src/types/HelpPage.ts
+  h_84e82529bd05a5 9,33
+apps/frontend/src/app/dashboard/HelpPage.ts
+  h_84e82529bd05a5 22
+apps/frontend/src/app/solver/HelpPage.ts
+  h_84e82529bd05a5 27
+apps/frontend/src/app/module-management/HelpPage.ts
+  h_84e82529bd05a5 1-30
+apps/frontend/src/app/builder/HelpPage.ts
+  h_84e82529bd05a5 52
+apps/frontend/src/app/schedules/HelpPage.ts
+  h_84e82529bd05a5 37
+apps/frontend/src/app/course-management/HelpPage.ts
+  h_84e82529bd05a5 1-35
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.18",
+  "base_commit_sha": "128bab17551624b4bcac663bdf30c1d2536651e6",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}

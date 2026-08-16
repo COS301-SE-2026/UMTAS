@@ -1,0 +1,20 @@
+apps/backend/src/db/seeding/services/university.seed.service.ts
+  h_84e82529bd05a5 28
+apps/backend/src/db/database.module.ts
+  h_84e82529bd05a5 8
+apps/backend/src/db/seeding/base.seed.service.ts
+  h_84e82529bd05a5 56,61
+apps/backend/src/db/seeding/seed.module.ts
+  h_84e82529bd05a5 17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "af314abb80d68fbc7d51e5e6897999163afb302a",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}

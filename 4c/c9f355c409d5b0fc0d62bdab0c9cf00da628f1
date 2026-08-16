@@ -1,0 +1,18 @@
+apps/backend/src/entities/timetables/timetables.schema.ts
+  h_8b894b05e4a1b2 1-21
+apps/backend/src/entities/Modules/modules.schema.ts
+  h_8b894b05e4a1b2 31-40
+apps/backend/src/entities/Universities/course.schema.ts
+  h_8b894b05e4a1b2 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.10",
+  "base_commit_sha": "4cc9f355c409d5b0fc0d62bdab0c9cf00da628f1",
+  "prompts": {},
+  "humans": {
+    "h_8b894b05e4a1b2": {
+      "author": "Wilmar-Smit <u24584216@tuks.co.za>"
+    }
+  }
+}

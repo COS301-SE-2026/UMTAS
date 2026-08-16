@@ -1,0 +1,14 @@
+apps/backend/src/storage/object-storage.service.spec.ts
+  h_3359569cacef0e 51-54
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.18",
+  "base_commit_sha": "7f64ba61f7d9585ea6217b4e298b63eadc581425",
+  "prompts": {},
+  "humans": {
+    "h_3359569cacef0e": {
+      "author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,113 @@
+apps/frontend/src/components/organisms/viewTimetable/ScheduleView.tsx
+  s_4f7517544aae67::t_9616efb91e0710 9,34-42,64-78,92-95,98-109,195-196,212,239,242-243,245-294,297-301,303,305-308,310-323,327-354,357-381,384-418
+apps/frontend/src/components/organisms/stats/statCard.tsx
+  s_4f7517544aae67::t_9616efb91e0710 1-41
+apps/frontend/src/app/role-management/page.tsx
+  s_4f7517544aae67::t_9616efb91e0710 2,5-9
+apps/frontend/src/components/molecules/roleManagement/DataTable.tsx
+  s_4f7517544aae67::t_9616efb91e0710 1-187
+apps/frontend/src/app/stats/page.tsx
+  s_4f7517544aae67::t_9616efb91e0710 1-100
+apps/frontend/src/components/organisms/customise/CustomiseModuleShell.tsx
+  s_4f7517544aae67::t_9616efb91e0710 1-162
+apps/backend/src/Events/event.service.spec.ts
+  s_4f7517544aae67::t_9616efb91e0710 69,157
+apps/frontend/src/components/organisms/roleManagement/UserDirectory.tsx
+  s_4f7517544aae67::t_9616efb91e0710 1-67
+apps/frontend/src/components/organisms/stats/statsChart.tsx
+  s_4f7517544aae67::t_9616efb91e0710 1-53
+apps/frontend/package.json
+  s_4f7517544aae67::t_9616efb91e0710 19-20,29
+apps/frontend/src/components/molecules/roleManagement/PendingApplicationsColumns.tsx
+  s_4f7517544aae67::t_9616efb91e0710 1-89
+apps/frontend/src/components/templates/choose-institute/queries/UserRoleQueries.ts
+  s_4f7517544aae67::t_9616efb91e0710 1-14
+apps/backend/src/Module/module.service.ts
+  s_4f7517544aae67::t_9616efb91e0710 19-20,426-448
+  s_4f7517544aae67::t_b007235b3ea064 449
+apps/backend/src/Module/module.controller.ts
+  s_4f7517544aae67::t_9616efb91e0710 8-9,178-203
+  s_4f7517544aae67::t_b01cd842f5894e 204
+apps/frontend/src/components/organisms/customise/CustomiseEventShell.tsx
+  s_4f7517544aae67::t_9616efb91e0710 1-197
+apps/frontend/src/components/molecules/customise/CustomiseEventCard.tsx
+  s_4f7517544aae67::t_9616efb91e0710 18-21,38-42,93,157-159,178-180
+apps/frontend/src/components/organisms/customise/CustomiseShellPopup.tsx
+  s_4f7517544aae67::t_9616efb91e0710 1-50
+apps/backend/drizzle/0006_elite_talon.sql
+  s_4f7517544aae67::t_9616efb91e0710 1
+apps/backend/drizzle/0004_EVENT_ATTENDANCE_JOIN_TABLE_CREATED.sql
+  s_4f7517544aae67::t_9616efb91e0710 1-11
+apps/frontend/src/components/atoms/baseShadcn/dropdown-menu.tsx
+  s_4f7517544aae67::t_9616efb91e0710 1-273
+apps/frontend/src/components/organisms/roleManagement/PendingApplications.tsx
+  s_4f7517544aae67::t_9616efb91e0710 1-67
+apps/frontend/src/components/organisms/builder/GenerateStep.tsx
+  s_4f7517544aae67::t_9616efb91e0710 12,150,251
+apps/backend/src/app.module.ts
+  s_4f7517544aae67::t_9616efb91e0710 23,44
+apps/backend/src/Attendance/attendance.module.ts
+  s_4f7517544aae67::t_9616efb91e0710 1-14
+apps/frontend/src/components/templates/customise/CustomiseShell.tsx
+  s_4f7517544aae67::t_9616efb91e0710 1-41
+apps/frontend/src/components/molecules/roleManagement/UserDirectoryColumns.tsx
+  s_4f7517544aae67::t_9616efb91e0710 1-88
+apps/backend/src/Attendance/attendance.controller.ts
+  s_4f7517544aae67::t_9616efb91e0710 1-106
+apps/frontend/src/components/templates/builder/WizardShell.tsx
+  s_4f7517544aae67::t_9616efb91e0710 3,14,37-42,62,113-122
+apps/backend/src/entities/Events/events.schema.ts
+  s_4f7517544aae67::t_9616efb91e0710 1-9,20,48-69
+  s_4f7517544aae67::t_1899187be1826a 70
+apps/frontend/src/components/templates/roleManagement/roleManagementTemplate.tsx
+  s_4f7517544aae67::t_9616efb91e0710 1-38
+apps/frontend/src/components/templates/stats/heatMapTemplate.tsx
+  s_4f7517544aae67::t_9616efb91e0710 1-33
+apps/backend/src/Attendance/dto/attendance.dto.ts
+  s_4f7517544aae67::t_9616efb91e0710 1-84
+apps/backend/src/Attendance/attendance.service.ts
+  s_4f7517544aae67::t_9616efb91e0710 1-196
+apps/frontend/src/components/molecules/nav/NavLinks.tsx
+  s_4f7517544aae67::t_9616efb91e0710 1-3,8,14,18-32
+apps/backend/src/Module/dto/module.dto.ts
+  s_4f7517544aae67::t_9616efb91e0710 4,9,12,128-150
+apps/backend/src/Testing/Factories/event.factory.ts
+  s_4f7517544aae67::t_9616efb91e0710 53
+apps/backend/src/Events/event.service.ts
+  s_4f7517544aae67::t_9616efb91e0710 47,62,191-196,300-302,337,348,393
+apps/backend/drizzle/0005_UPDATED_EVENT_ATTENDANCE_TABLE_TO_HAVE_PRIMARYKEY.sql
+  s_4f7517544aae67::t_9616efb91e0710 1-2
+apps/frontend/src/components/atoms/customise/alert-dialog-customise.tsx
+  s_4f7517544aae67::t_9616efb91e0710 1-199
+apps/backend/drizzle/meta/0004_snapshot.json
+  s_4f7517544aae67::t_c8a2108250edec 1-1466
+apps/backend/drizzle/meta/0005_snapshot.json
+  s_4f7517544aae67::t_26bfabe3bda978 1-1468
+apps/backend/drizzle/meta/0006_snapshot.json
+  s_4f7517544aae67::t_d8c2e12db9640b 1-1468
+apps/backend/drizzle/meta/_journal.json
+  s_4f7517544aae67::t_8a06924c022ba4 32-52
+pnpm-lock.yaml
+  s_4f7517544aae67::t_f807236221f2c4 258-263,288-290,4978-4994,6097-6102,12494-12502,17752-17759,18435-18436,23574-23579
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.5",
+  "base_commit_sha": "6b0fa913d76d1b47fb436448c22de555a5e06eb1",
+  "prompts": {},
+  "humans": {
+    "h_3359569cacef0e": {
+      "author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_4f7517544aae67": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f23d7-767d-7fd0-85df-9e5cae50b34b",
+        "model": "gpt-5.5"
+      },
+      "human_author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}

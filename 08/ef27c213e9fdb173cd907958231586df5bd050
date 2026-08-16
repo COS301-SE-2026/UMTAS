@@ -1,0 +1,18 @@
+apps/backend/src/academic_calendar/academic_calendar.controller.ts
+  h_3359569cacef0e 1-37
+apps/backend/src/academic_calendar/dto/academic-calendar.dto.ts
+  h_3359569cacef0e 1-85
+apps/backend/src/academic_calendar/dto/calendar-restriction.dto.ts
+  h_3359569cacef0e 1-160
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "08ef27c213e9fdb173cd907958231586df5bd050",
+  "prompts": {},
+  "humans": {
+    "h_3359569cacef0e": {
+      "author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,16 @@
+apps/backend/src/Testing/Factories/event.factory.ts
+  h_84e82529bd05a5 45
+apps/backend/src/Events/event.service.spec.ts
+  h_84e82529bd05a5 27,29-30,34-35,69-166,168-171,173-176,178-186,189-192
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "fa811a02d71f08b0ce417605fefce3f0f96cd8b5",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}

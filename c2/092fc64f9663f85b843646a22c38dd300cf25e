@@ -1,0 +1,21 @@
+apps/pdf_parser/worker/src/index.ts
+  s_8aef4ecc2fe81d::t_f82f4d1e075839 132
+apps/solver-worker/src/index.ts
+  s_8aef4ecc2fe81d::t_f82f4d1e075839 92
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "c2092fc64f9663f85b843646a22c38dd300cf25e",
+  "prompts": {},
+  "sessions": {
+    "s_8aef4ecc2fe81d": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fad08-6841-7a63-817a-a380f519049a",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}

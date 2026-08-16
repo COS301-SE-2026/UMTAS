@@ -1,0 +1,28 @@
+docs/srs/Use_Cases/Analytics_Dashboard.md
+  h_84e82529bd05a5 35,55,75
+docs/srs/Use_Cases/Lecturer_Adjustment.md
+  h_84e82529bd05a5 35,55,75
+docs/srs/Use_Cases/Timetable_Creation_PDF.md
+  h_84e82529bd05a5 75
+docs/srs/FUNCTIONAL_REQUIREMENTS.md
+  h_84e82529bd05a5 60,70,112-116,124,155-159
+docs/diagrams/requirements/Requirements.drawio
+  h_84e82529bd05a5 3,7,109,112,115,124,280-281,283-284,286-287,289,291-292,294,298,300-301,304-305,307-308,310-311,313-314,316,318-319,321,325,327-328,330,334,336-337,339,343,345-346,348,352-353,355-356,358-359,361-368
+docs/srs/USE_CASES.md
+  h_84e82529bd05a5 85
+docs/srs/Use_Cases/Timetable_Creation_API.md
+  h_84e82529bd05a5 53
+docs/srs/Use_Cases/Traceability_Matrix/Traceability_Matrix.drawio
+  h_84e82529bd05a5 313,870,898,926,954,982,1010,1038,1066,1094,1122,1150,1178,1206,1234,1262,1290,1295,1298,1303,1308,1313,1318,1323,1326,1331,1336,1341,1346,1351,1354,1359,1364,1369,1374,1388,1398,1403,1408,1431,1444,1472,1500,1505-1517,1519,1524-1535,1539-1566,1570-1580,1585-1586,1588,1593-1604,1608-1658,1662-1672,1677,1680,1685-1696,1700-1750,1754-1764,1772-3360,3362
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "45b1849fcde84d7d2355ceb68c4e0c1d6cf9bd4e",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}

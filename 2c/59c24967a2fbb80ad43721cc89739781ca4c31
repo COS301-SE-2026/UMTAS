@@ -1,0 +1,26 @@
+apps/frontend/src/components/organisms/builder/EventsStep.tsx
+  h_8b894b05e4a1b2 75-79,102-103,246,269-270,272-277,287-304
+apps/frontend/src/components/molecules/builder/EventCard.tsx
+  s_00e6af17b2dbd7::t_914a13d7c02fb8 89-90,241
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "2c59c24967a2fbb80ad43721cc89739781ca4c31",
+  "prompts": {},
+  "humans": {
+    "h_8b894b05e4a1b2": {
+      "author": "Wilmar-Smit <u24584216@tuks.co.za>"
+    }
+  },
+  "sessions": {
+    "s_00e6af17b2dbd7": {
+      "agent_id": {
+        "tool": "github-copilot",
+        "id": "3d09a981-a9c8-44ef-af3d-36521a6ea51e",
+        "model": "unknown"
+      },
+      "human_author": "Wilmar-Smit <u24584216@tuks.co.za>"
+    }
+  }
+}

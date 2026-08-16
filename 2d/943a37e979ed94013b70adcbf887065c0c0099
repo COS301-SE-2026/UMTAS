@@ -1,0 +1,16 @@
+apps/backend/src/academic_calendar/dto/generated-calendar.dto.ts
+  h_3359569cacef0e 1-383
+apps/backend/src/academic_calendar/dto/index.ts
+  h_3359569cacef0e 1-3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "2d943a37e979ed94013b70adcbf887065c0c0099",
+  "prompts": {},
+  "humans": {
+    "h_3359569cacef0e": {
+      "author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}

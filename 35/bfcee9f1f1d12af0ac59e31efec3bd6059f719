@@ -1,0 +1,18 @@
+apps/frontend/src/app/solver/HelpPage.ts
+  h_84e82529bd05a5 1-28
+apps/frontend/src/types/HelpPage.ts
+  h_84e82529bd05a5 3-4,9,33-34,36-37
+apps/frontend/src/app/dashboard/HelpPage.ts
+  h_84e82529bd05a5 1-23
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.18",
+  "base_commit_sha": "35bfcee9f1f1d12af0ac59e31efec3bd6059f719",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}

@@ -1,0 +1,16 @@
+docs/developer-guides/testing-policy.md
+  h_84e82529bd05a5 1-175
+mkdocs.yml
+  h_84e82529bd05a5 104-106
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "9600f1b8feb70f8a2401dfa413e493cbcb666715",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}

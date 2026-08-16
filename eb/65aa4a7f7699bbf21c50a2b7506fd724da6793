@@ -1,0 +1,14 @@
+docs/stylesheets/extra.css
+  h_84e82529bd05a5 91-101
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "eb65aa4a7f7699bbf21c50a2b7506fd724da6793",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}

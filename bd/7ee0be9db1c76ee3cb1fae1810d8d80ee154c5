@@ -1,0 +1,14 @@
+apps/preference-solver/src/GA_handler/GA.cpp
+  h_8b894b05e4a1b2 221,237,246
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.8",
+  "base_commit_sha": "bd7ee0be9db1c76ee3cb1fae1810d8d80ee154c5",
+  "prompts": {},
+  "humans": {
+    "h_8b894b05e4a1b2": {
+      "author": "Wilmar-Smit <u24584216@tuks.co.za>"
+    }
+  }
+}

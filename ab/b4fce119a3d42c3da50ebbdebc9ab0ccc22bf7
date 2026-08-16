@@ -1,0 +1,26 @@
+apps/frontend/src/app/course-management/HelpPage.ts
+  h_84e82529bd05a5 8,14,20,26
+apps/frontend/src/app/dashboard/HelpPage.ts
+  h_84e82529bd05a5 8,14
+apps/frontend/src/app/solver/HelpPage.ts
+  h_84e82529bd05a5 8,14,20
+apps/frontend/src/app/role-management/HelpPage.ts
+  h_84e82529bd05a5 8,14,20,26
+apps/frontend/src/app/schedules/HelpPage.ts
+  h_84e82529bd05a5 8,14,20,31
+apps/frontend/src/app/builder/HelpPage.ts
+  h_84e82529bd05a5 14,20,26,32,38,44,50
+apps/frontend/src/app/module-management/HelpPage.ts
+  h_84e82529bd05a5 8,14,20
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.18",
+  "base_commit_sha": "abb4fce119a3d42c3da50ebbdebc9ab0ccc22bf7",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}

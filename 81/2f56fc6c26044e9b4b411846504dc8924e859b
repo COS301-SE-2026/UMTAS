@@ -1,0 +1,16 @@
+apps/frontend/src/components/organisms/viewTimetable/ScheduleView.tsx
+  h_84e82529bd05a5 52,242,375-376
+apps/frontend/src/components/organisms/builder/GenerateStep.tsx
+  h_84e82529bd05a5 29-32,312
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "812f56fc6c26044e9b4b411846504dc8924e859b",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}

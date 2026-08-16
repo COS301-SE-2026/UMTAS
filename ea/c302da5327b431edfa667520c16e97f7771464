@@ -1,0 +1,28 @@
+docs/sas/architecture/DESIGN_PATTERNS.md
+  h_3359569cacef0e 24
+docs/sas/architecture/ARCHITECTURAL_DIAGRAM.md
+  h_3359569cacef0e 3
+docs/sas/architecture/ARCHITECTURAL_REQUIREMENTS.md
+  s_ebd1832419f1c4::t_e4bf0355495f58 41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.5",
+  "base_commit_sha": "eac302da5327b431edfa667520c16e97f7771464",
+  "prompts": {},
+  "humans": {
+    "h_3359569cacef0e": {
+      "author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_ebd1832419f1c4": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f22cc-044d-70b2-84d5-b12d3c4e2996",
+        "model": "gpt-5.5"
+      },
+      "human_author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}

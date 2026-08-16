@@ -1,0 +1,24 @@
+justfile
+  s_93f7f48d8e40b9::t_13eba5fb5fbc4b 11-14,16,20,24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "1f7092a7e8a041532b27405a0b972f89e6f2f633",
+  "prompts": {},
+  "humans": {
+    "h_3359569cacef0e": {
+      "author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_93f7f48d8e40b9": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f8362-a343-7893-8bda-cb28d58fa9dc",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}

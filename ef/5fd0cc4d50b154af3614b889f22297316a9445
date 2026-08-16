@@ -1,0 +1,14 @@
+apps/frontend/src/app/globals.css
+  h_3359569cacef0e 230-300
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "ef5fd0cc4d50b154af3614b889f22297316a9445",
+  "prompts": {},
+  "humans": {
+    "h_3359569cacef0e": {
+      "author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}

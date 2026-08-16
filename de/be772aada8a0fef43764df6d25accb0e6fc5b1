@@ -1,0 +1,14 @@
+apps/frontend/src/components/organisms/viewTimetable/ScheduleView.tsx
+  h_84e82529bd05a5 51-58,227-228,233,359-360,453
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "debe772aada8a0fef43764df6d25accb0e6fc5b1",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}

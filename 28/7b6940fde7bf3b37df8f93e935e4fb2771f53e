@@ -1,0 +1,14 @@
+packages/bullmq-worker-core/package.json
+  h_3359569cacef0e 17-18
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.5",
+  "base_commit_sha": "287b6940fde7bf3b37df8f93e935e4fb2771f53e",
+  "prompts": {},
+  "humans": {
+    "h_3359569cacef0e": {
+      "author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}

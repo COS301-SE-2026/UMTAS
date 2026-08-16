@@ -1,0 +1,16 @@
+apps/frontend/src/components/templates/module-management/moduleManagementTemplate.tsx
+  h_84e82529bd05a5 27-46,113-114,125
+apps/frontend/src/components/organisms/module-management/moduleTable.tsx
+  h_84e82529bd05a5 144
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "6c2a663a382bc6c12da06f7d2f1044db5a61c472",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}

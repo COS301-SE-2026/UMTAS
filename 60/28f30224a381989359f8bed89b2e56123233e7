@@ -1,0 +1,14 @@
+.github/workflows/ci.yml
+  h_3359569cacef0e 196-197,266-267
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "6028f30224a381989359f8bed89b2e56123233e7",
+  "prompts": {},
+  "humans": {
+    "h_3359569cacef0e": {
+      "author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}

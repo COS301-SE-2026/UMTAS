@@ -1,0 +1,14 @@
+apps/frontend/src/app/course-management/HelpPage.ts
+  h_84e82529bd05a5 1-35
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.18",
+  "base_commit_sha": "653d3e89534d346b66b466088b354af90c081e21",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}

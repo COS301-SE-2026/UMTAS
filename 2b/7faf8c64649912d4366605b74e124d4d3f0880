@@ -1,0 +1,14 @@
+apps/frontend/src/app/builder/HelpPage.ts
+  h_84e82529bd05a5 1-55
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.18",
+  "base_commit_sha": "2b7faf8c64649912d4366605b74e124d4d3f0880",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}
