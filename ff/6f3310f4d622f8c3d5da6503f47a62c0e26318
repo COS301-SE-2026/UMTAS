@@ -1,0 +1,14 @@
+docker/simulation-service/simulation-service.dockerfile
+  h_2d4b3dca70a3d8 1-17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "ff6f3310f4d622f8c3d5da6503f47a62c0e26318",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
