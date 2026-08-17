@@ -1,0 +1,18 @@
+apps/simulation-service/adapters/UMTAS/endpoints.yaml
+  h_2d4b3dca70a3d8 1-4
+apps/simulation-service/adapters/UMTAS/locust_user.py
+  h_2d4b3dca70a3d8 1-430
+apps/simulation-service/adapters/UMTAS/profile_schema.yaml
+  h_2d4b3dca70a3d8 1-404
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "b151fe312efc78965f5e2a88bf444facd0fb3e88",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
