@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsUUID } from 'class-validator';
+import { IsBoolean, IsString, IsUUID } from 'class-validator';
 
 export const AUTH_ERROR_CODES = [
   'ACCOUNT_ALREADY_LINKED',
@@ -336,4 +336,31 @@ export class SelectUniversityDto {
   })
   @IsUUID()
   uniId!: string;
+}
+
+export enum MockUserRole {
+  STUDENT = 'STUDENT',
+  LECTURER = 'LECTURER',
+  UNIVERSITY_ADMIN = 'UNIVERSITY_ADMIN',
+  SYS_ADMIN = 'SYS_ADMIN',
+}
+
+export class CreateMockUserDto {
+  @ApiProperty({
+    enum: MockUserRole,
+    enumName: 'MockUserRole',
+    description: 'Role for the mock user',
+    default: MockUserRole.STUDENT,
+  })
+  role!: MockUserRole;
+}
+
+export class CreateMockUserResponseDto extends SignInEmailDto {}
+
+export class DeleteMockUsersResponseDto {
+  @IsBoolean()
+  success!: boolean;
+
+  @IsString()
+  message!: string;
 }
