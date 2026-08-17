@@ -15,6 +15,7 @@ import { createAuth } from './auth';
 import { UniRole } from './roles';
 import { SessionData } from './session.decorator';
 
+import { SESSION_EXAMPLE, AUTH_RESPONSE_EXAMPLE } from './auth.controller';
 @Injectable()
 export class AuthService implements OnModuleInit {
   private readonly logger = new Logger(AuthService.name);
@@ -170,4 +171,60 @@ export class AuthService implements OnModuleInit {
       uniRole,
     };
   } //END_selectUniversity
+
+  async createMockUser(): Promise<typeof AUTH_RESPONSE_EXAMPLE> {
+    const auth = this.getAuth();
+
+    const email = 'testUser1@gmail.com';
+    const password = 'password123';
+
+    // Create user
+    const result = await auth.api.createUser({
+      body: { email, password, name: 'Simulation User', role: 'user' },
+    });
+
+    // Verify email
+    await this.databaseService.db
+      .update(appSchema.usersTable)
+      .set({ emailVerified: true })
+      .where(eq(appSchema.usersTable.id, result.user.id));
+
+    // Sign in
+    const signInResult = await auth.api.signInEmail({
+      body: { email, password },
+    });
+
+    // Use the token from signInResult
+    const session: typeof SESSION_EXAMPLE = {
+      id: crypto.randomUUID(), // session ID
+      token: signInResult.token,
+      userId: result.user.id,
+      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+      ipAddress: '127.0.0.1',
+      userAgent: 'Simulation Script',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    return {
+      user: {
+        id: result.user.id,
+        email: result.user.email,
+        name: result.user.name,
+        emailVerified: true,
+        image: null,
+        role: result.user.role || 'user',
+        banned: result.user.banned ?? false,
+        createdAt:
+          result.user.createdAt instanceof Date
+            ? result.user.createdAt.toISOString()
+            : String(result.user.createdAt),
+        updatedAt:
+          result.user.updatedAt instanceof Date
+            ? result.user.updatedAt.toISOString()
+            : String(result.user.updatedAt),
+      },
+      session,
+    };
+  }
 }

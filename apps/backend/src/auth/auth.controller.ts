@@ -50,7 +50,7 @@ import { CurrentSession } from './session.decorator';
 import type { SessionData } from './session.decorator';
 import type { Response } from 'express';
 
-const USER_EXAMPLE = {
+export const USER_EXAMPLE = {
   id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
   email: 'system-admin@local.umtas',
   name: 'System Admin',
@@ -62,7 +62,7 @@ const USER_EXAMPLE = {
   updatedAt: '2025-01-01T00:00:00Z',
 };
 
-const SESSION_EXAMPLE = {
+export const SESSION_EXAMPLE = {
   id: 'b2c3d4e5-f6a7-8901-bcde-f12345678901',
   token: 'session-token-value',
   userId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
@@ -73,7 +73,10 @@ const SESSION_EXAMPLE = {
   updatedAt: '2025-01-01T00:00:00Z',
 };
 
-const AUTH_RESPONSE_EXAMPLE = { user: USER_EXAMPLE, session: SESSION_EXAMPLE };
+export const AUTH_RESPONSE_EXAMPLE = {
+  user: USER_EXAMPLE,
+  session: SESSION_EXAMPLE,
+};
 
 @Controller('auth')
 @ApiExtraModels(AuthEnvelopeDto)
@@ -602,6 +605,20 @@ export class AuthController {
     @Res() res: ServerResponse,
   ): Promise<void> {
     return this.handleRequest(req, res);
+  }
+
+  //Create mock user for simulation service
+  @Public()
+  @ApiTags('Auth Admin')
+  @Post('admin/create-mock-user')
+  @ApiOperation({
+    summary: 'Create a new mock user',
+    description:
+      'Create a mock user, authorise their email, sign in, return user and session information',
+    operationId: 'adminCreateMockUser',
+  })
+  async adminCreateMockUser(): Promise<typeof AUTH_RESPONSE_EXAMPLE> {
+    return await this.authService.createMockUser();
   }
 
   @ApiTags('Auth Admin')

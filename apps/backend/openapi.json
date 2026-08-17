@@ -769,6 +769,23 @@
         ]
       }
     },
+    "/api/auth/admin/create-mock-user": {
+      "post": {
+        "description": "Create a mock user, authorise their email, sign in, return user and session information",
+        "operationId": "adminCreateMockUser",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Create a new mock user",
+        "tags": [
+          "Auth",
+          "Auth Admin"
+        ]
+      }
+    },
     "/api/auth/admin/impersonate-user": {
       "post": {
         "operationId": "adminImpersonateUser",
