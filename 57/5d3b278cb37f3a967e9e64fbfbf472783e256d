@@ -1,0 +1,14 @@
+apps/simulation-service/adapters/UMTAS/locust_user.py
+  h_2d4b3dca70a3d8 5-446
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "575d3b278cb37f3a967e9e64fbfbf472783e256d",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
