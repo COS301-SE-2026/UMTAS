@@ -44,8 +44,6 @@ import {
 
 type DbError = { code?: string; constraint?: string; cause?: unknown };
 
-const TIMEZONE = 'Africa/Johannesburg';
-
 @Injectable()
 export class AcademicCalendarService {
   constructor(
