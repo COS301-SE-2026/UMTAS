@@ -44,8 +44,6 @@ import {
 
 type DbError = { code?: string; constraint?: string };
 
-const TIMEZONE = 'Africa/Johannesburg';
-
 @Injectable()
 export class AcademicCalendarService {
   constructor(
@@ -475,12 +473,7 @@ export class AcademicCalendarService {
   }
 
   private currentYear(): number {
-    return Number(
-      new Intl.DateTimeFormat('en', {
-        year: 'numeric',
-        timeZone: TIMEZONE,
-      }).format(new Date()),
-    );
+    return new Date().getUTCFullYear();
   }
 
   private toCalendarDto(row: AcademicCalendarRecord): AcademicCalendarDto {

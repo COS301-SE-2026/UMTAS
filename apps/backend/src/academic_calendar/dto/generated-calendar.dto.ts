@@ -160,12 +160,6 @@ export class GeneratedCalendarPayloadDto {
   @ApiProperty({ type: Number, minimum: 1000, maximum: 9999, example: 2026 })
   year!: number;
 
-  @ApiProperty({
-    example: 'Africa/Johannesburg',
-    description: 'IANA timezone for all generated timed events.',
-  })
-  timezone!: string;
-
   @ApiProperty({ type: () => [GeneratedRecurringEventDto] })
   recurringEvents!: GeneratedRecurringEventDto[];
 
