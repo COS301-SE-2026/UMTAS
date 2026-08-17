@@ -8,6 +8,13 @@
       "when": 1784864309199,
       "tag": "0000_Loco",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1786976725046,
+      "tag": "0001_lucky_cassandra_nova",
+      "breakpoints": true
     }
   ]
 }
