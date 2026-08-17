@@ -1,0 +1,4 @@
+base_url: https://staging.capstone-vigil.dns.net.za/api
+auth:
+  type: bearer
+  token_env_var: SIMULATION_SERVICE_API_TOKEN
