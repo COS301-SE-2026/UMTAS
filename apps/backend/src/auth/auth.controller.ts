@@ -2,14 +2,17 @@ import {
   All,
   Body,
   Controller,
+  Delete,
   Get,
   Logger,
   NotFoundException,
   Post,
   Req,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import {
+  ApiBearerAuth,
   ApiBody,
   ApiCookieAuth,
   ApiExcludeEndpoint,
@@ -38,6 +41,8 @@ import {
   AuthUserResponseDto,
   ChangePasswordDto,
   CreateMockUserDto,
+  CreateMockUserResponseDto,
+  DeleteMockUsersResponseDto,
   ForgetPasswordDto,
   LinkGoogleAccountDto,
   ResetPasswordDto,
@@ -50,7 +55,7 @@ import {
 import { CurrentSession } from './session.decorator';
 import type { SessionData } from './session.decorator';
 import type { Response } from 'express';
-// import { AppRole } from './roles';
+import { ApiKeyGuard } from './apiKey.guard';
 
 export const USER_EXAMPLE = {
   id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
@@ -611,7 +616,8 @@ export class AuthController {
 
   //Create mock user for simulation service
   @Public()
-  @ApiCookieAuth('umtas-session')
+  @UseGuards(ApiKeyGuard)
+  @ApiBearerAuth()
   @ApiTags('Auth Admin')
   @Post('admin/create-mock-user')
   @ApiBody({ type: () => CreateMockUserDto })
@@ -624,20 +630,30 @@ export class AuthController {
   @ApiResponse({
     status: 200,
     description: 'Success',
-    type: AuthEnvelopeDto,
+    type: CreateMockUserDto,
   })
   async adminCreateMockUser(
     @Body() dto: CreateMockUserDto,
-    @Res({ passthrough: true }) res: Response,
-  ): Promise<SessionData> {
-    const result = await this.authService.createMockUser(dto.role);
+  ): Promise<CreateMockUserResponseDto> {
+    return await this.authService.createMockUser(dto.role);
+  }
 
-    res.cookie('umtas-uni-id', result.uniId, {
-      path: '/',
-      sameSite: 'lax',
-    });
-
-    return result;
+  @Public()
+  @UseGuards(ApiKeyGuard)
+  @ApiBearerAuth()
+  @ApiTags('Auth admin')
+  @Delete('admin/delete-mock-users')
+  @ApiOperation({
+    summary: 'Delete all mock users',
+    operationId: 'adminDeleteMockUsers',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Success',
+    type: DeleteMockUsersResponseDto,
+  })
+  async DeleteMockUsersResponseDto(): Promise<DeleteMockUsersResponseDto> {
+    return await this.authService.deleteMockUsers();
   }
 
   @ApiTags('Auth Admin')

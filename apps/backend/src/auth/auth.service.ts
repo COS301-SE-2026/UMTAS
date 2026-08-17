@@ -4,16 +4,20 @@ import {
   Logger,
   OnModuleInit,
 } from '@nestjs/common';
-import { and, desc, eq, ilike, ne } from 'drizzle-orm';
+import { and, eq, ilike, ne } from 'drizzle-orm';
 import { MailerService } from '../mail/mailer.service';
 import * as appSchema from '../entities';
 import { createRedisClient } from '../redis/redis';
-import type { AuthInstance } from './auth';
+import type { AppDatabase, AuthInstance } from './auth';
 import { DatabaseService } from '../db/database.service';
 import { createAuth } from './auth';
 
-import { AppRole, UniRole } from './roles';
+import { UniRole } from './roles';
 import { SessionData } from './session.decorator';
+import {
+  CreateMockUserResponseDto,
+  DeleteMockUsersResponseDto,
+} from './auth.dto';
 
 @Injectable()
 export class AuthService implements OnModuleInit {
@@ -171,13 +175,24 @@ export class AuthService implements OnModuleInit {
     };
   } //END_selectUniversity
 
-  async createMockUser(inRole?: appSchema.RoleTypeType): Promise<SessionData> {
+  async createMockUser(
+    inRole?: appSchema.RoleTypeType,
+    tx?: AppDatabase,
+  ): Promise<CreateMockUserResponseDto> {
+    if (!tx) {
+      return await this.databaseService.db.transaction(
+        async (t: AppDatabase) => {
+          return this.createMockUser(inRole, t);
+        },
+      );
+    } //END_tx precence check
+
     const auth = this.getAuth();
 
     if (inRole === undefined) inRole = 'STUDENT';
 
     //Get next number
-    const existingUsers = await this.databaseService.db
+    const existingUsers = await tx
       .select({ email: appSchema.usersTable.email })
       .from(appSchema.usersTable)
       .where(ilike(appSchema.usersTable.email, `test_user_%@simulation.com`));
@@ -205,79 +220,52 @@ export class AuthService implements OnModuleInit {
     });
 
     // Verify email
-    await this.databaseService.db
+    await tx
       .update(appSchema.usersTable)
       .set({ emailVerified: true })
       .where(eq(appSchema.usersTable.id, result.user.id));
 
-    // Sign in
-    // const signInResult = await auth.api.signInEmail({
-    //   body: { email, password },
-    // });
-
-    const [dbSession] = await this.databaseService.db
-      .select()
-      .from(appSchema.sessionsTable)
-      .where(eq(appSchema.sessionsTable.userId, result.user.id))
-      .orderBy(desc(appSchema.sessionsTable.createdAt))
-      .limit(1);
-
-    if (dbSession === undefined)
-      throw new BadRequestException(`No session created by signInEmail`);
-
-    // Use the token from signInResult
-    const userSession: SessionData = {
-      user: {
-        id: result.user.id,
-        email: result.user.email,
-        name: result.user.name,
-        emailVerified: true,
-        image: 'noImage',
-        role: (result.user.role || 'user') as AppRole,
-        banned: result.user.banned ?? false,
-        createdAt:
-          result.user.createdAt instanceof Date
-            ? result.user.createdAt.toISOString()
-            : String(result.user.createdAt),
-        updatedAt:
-          result.user.updatedAt instanceof Date
-            ? result.user.updatedAt.toISOString()
-            : String(result.user.updatedAt),
-      },
-      session: {
-        id: dbSession.id, // session ID
-        token: dbSession.token,
-        userId: dbSession.userId,
-        expiresAt: String(dbSession.expiresAt),
-        ipAddress: dbSession.ipAddress || '127.0.0.1',
-        userAgent: dbSession.userAgent || 'Simulation Script',
-        createdAt: String(dbSession.createdAt),
-        updatedAt: String(dbSession.updatedAt),
-      },
-    };
-
     //select the university of pretoria
-    const [uni] = await this.databaseService.db
+    const [uni] = await tx
       .select({ uniID: appSchema.University.UniversityID })
       .from(appSchema.University)
       .where(ilike(appSchema.University.UniversityName, `%Pretoria%`))
       .limit(1);
 
-    await this.databaseService.db
+    //Create role
+    await tx
       .insert(appSchema.UniversityRole)
       .values({
-        UserID: userSession.user.id,
+        UserID: result.user.id,
         UniversityID: uni.uniID,
         role: inRole,
       })
       .returning();
 
-    const role = await this.getUniversityRole(userSession.user.id, uni.uniID);
+    return {
+      email,
+      password,
+    };
+  }
+
+  async deleteMockUsers(tx?: AppDatabase): Promise<DeleteMockUsersResponseDto> {
+    //Delete all users where the email is of form: test_user_%@simulation.com
+    if (!tx) {
+      return await this.databaseService.db.transaction(
+        async (t: AppDatabase) => {
+          return this.deleteMockUsers(t);
+        },
+      );
+    } //END_tx precence check
+
+    const deletedUsers = await tx
+      .delete(appSchema.usersTable)
+      .where(ilike(appSchema.usersTable.email, `test_user_%@simulation.com`))
+      .returning();
 
     return {
-      ...userSession,
-      uniId: uni.uniID,
-      uniRole: role,
+      success: true,
+      message: `Deleted ${deletedUsers.length} users.`,
     };
   }
 }

@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsUUID } from 'class-validator';
+import { IsBoolean, IsOptional, IsString, IsUUID } from 'class-validator';
 import { RoleType } from 'src/entities';
 import type { RoleTypeType } from 'src/entities';
 
@@ -348,4 +348,14 @@ export class CreateMockUserDto {
   })
   @IsOptional()
   role?: RoleTypeType;
+}
+
+export class CreateMockUserResponseDto extends SignInEmailDto {}
+
+export class DeleteMockUsersResponseDto {
+  @IsBoolean()
+  success!: boolean;
+
+  @IsString()
+  message!: string;
 }
