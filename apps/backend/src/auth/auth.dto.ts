@@ -1,7 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsBoolean, IsOptional, IsString, IsUUID } from 'class-validator';
-import { RoleType } from 'src/entities';
-import type { RoleTypeType } from 'src/entities';
+import { IsBoolean, IsString, IsUUID } from 'class-validator';
 
 export const AUTH_ERROR_CODES = [
   'ACCOUNT_ALREADY_LINKED',
@@ -340,14 +338,21 @@ export class SelectUniversityDto {
   uniId!: string;
 }
 
+export enum MockUserRole {
+  STUDENT = 'STUDENT',
+  LECTURER = 'LECTURER',
+  UNIVERSITY_ADMIN = 'UNIVERSITY_ADMIN',
+  SYS_ADMIN = 'SYS_ADMIN',
+}
+
 export class CreateMockUserDto {
-  @ApiPropertyOptional({
-    example: 'STUDENT',
-    description: 'Role to assign for the mock user',
-    type: RoleType,
+  @ApiProperty({
+    enum: MockUserRole,
+    enumName: 'MockUserRole',
+    description: 'Role for the mock user',
+    default: MockUserRole.STUDENT,
   })
-  @IsOptional()
-  role?: RoleTypeType;
+  role!: MockUserRole;
 }
 
 export class CreateMockUserResponseDto extends SignInEmailDto {}

@@ -17,6 +17,7 @@ import { SessionData } from './session.decorator';
 import {
   CreateMockUserResponseDto,
   DeleteMockUsersResponseDto,
+  MockUserRole,
 } from './auth.dto';
 
 @Injectable()
@@ -176,7 +177,7 @@ export class AuthService implements OnModuleInit {
   } //END_selectUniversity
 
   async createMockUser(
-    inRole?: appSchema.RoleTypeType,
+    inRole?: MockUserRole,
     tx?: AppDatabase,
   ): Promise<CreateMockUserResponseDto> {
     if (!tx) {
@@ -189,7 +190,7 @@ export class AuthService implements OnModuleInit {
 
     const auth = this.getAuth();
 
-    if (inRole === undefined) inRole = 'STUDENT';
+    if (inRole === undefined) inRole = MockUserRole['STUDENT'];
 
     //Get next number
     const existingUsers = await tx
@@ -238,7 +239,7 @@ export class AuthService implements OnModuleInit {
       .values({
         UserID: result.user.id,
         UniversityID: uni.uniID,
-        role: inRole,
+        role: inRole as appSchema.RoleTypeType,
       })
       .returning();
 
