@@ -37,6 +37,7 @@ import {
   AuthSessionDto,
   AuthUserResponseDto,
   ChangePasswordDto,
+  CreateMockUserDto,
   ForgetPasswordDto,
   LinkGoogleAccountDto,
   ResetPasswordDto,
@@ -49,6 +50,7 @@ import {
 import { CurrentSession } from './session.decorator';
 import type { SessionData } from './session.decorator';
 import type { Response } from 'express';
+// import { AppRole } from './roles';
 
 export const USER_EXAMPLE = {
   id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
@@ -609,16 +611,33 @@ export class AuthController {
 
   //Create mock user for simulation service
   @Public()
+  @ApiCookieAuth('umtas-session')
   @ApiTags('Auth Admin')
   @Post('admin/create-mock-user')
+  @ApiBody({ type: () => CreateMockUserDto })
   @ApiOperation({
     summary: 'Create a new mock user',
     description:
       'Create a mock user, authorise their email, sign in, return user and session information',
     operationId: 'adminCreateMockUser',
   })
-  async adminCreateMockUser(): Promise<typeof AUTH_RESPONSE_EXAMPLE> {
-    return await this.authService.createMockUser();
+  @ApiResponse({
+    status: 200,
+    description: 'Success',
+    type: AuthEnvelopeDto,
+  })
+  async adminCreateMockUser(
+    @Body() dto: CreateMockUserDto,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<SessionData> {
+    const result = await this.authService.createMockUser(dto.role);
+
+    res.cookie('umtas-uni-id', result.uniId, {
+      path: '/',
+      sameSite: 'lax',
+    });
+
+    return result;
   }
 
   @ApiTags('Auth Admin')

@@ -4,7 +4,7 @@ import {
   Logger,
   OnModuleInit,
 } from '@nestjs/common';
-import { and, eq, ne } from 'drizzle-orm';
+import { and, desc, eq, ilike, ne } from 'drizzle-orm';
 import { MailerService } from '../mail/mailer.service';
 import * as appSchema from '../entities';
 import { createRedisClient } from '../redis/redis';
@@ -12,10 +12,9 @@ import type { AuthInstance } from './auth';
 import { DatabaseService } from '../db/database.service';
 import { createAuth } from './auth';
 
-import { UniRole } from './roles';
+import { AppRole, UniRole } from './roles';
 import { SessionData } from './session.decorator';
 
-import { SESSION_EXAMPLE, AUTH_RESPONSE_EXAMPLE } from './auth.controller';
 @Injectable()
 export class AuthService implements OnModuleInit {
   private readonly logger = new Logger(AuthService.name);
@@ -172,15 +171,37 @@ export class AuthService implements OnModuleInit {
     };
   } //END_selectUniversity
 
-  async createMockUser(): Promise<typeof AUTH_RESPONSE_EXAMPLE> {
+  async createMockUser(inRole?: appSchema.RoleTypeType): Promise<SessionData> {
     const auth = this.getAuth();
 
-    const email = 'testUser1@gmail.com';
-    const password = 'password123';
+    if (inRole === undefined) inRole = 'STUDENT';
+
+    //Get next number
+    const existingUsers = await this.databaseService.db
+      .select({ email: appSchema.usersTable.email })
+      .from(appSchema.usersTable)
+      .where(ilike(appSchema.usersTable.email, `test_user_%@simulation.com`));
+
+    const existingNumbers = existingUsers
+      .map((user) => {
+        const match = user.email.match(/test_user_(\d+)@simulation\.com/);
+        return match ? parseInt(match[1]) : 0;
+      })
+      .sort((a, b) => a - b);
+
+    let nextNumber = 1;
+    if (existingNumbers.length > 0) {
+      const maxNum = existingNumbers[existingNumbers.length - 1]; //get last num = max
+      nextNumber = maxNum + 1;
+    }
+
+    const email = `test_user_${nextNumber}@simulation.com`;
+    const name = `Test User ${nextNumber}`;
+    const password = 'password123!';
 
     // Create user
     const result = await auth.api.createUser({
-      body: { email, password, name: 'Simulation User', role: 'user' },
+      body: { email, password, name, role: 'user' },
     });
 
     // Verify email
@@ -190,30 +211,29 @@ export class AuthService implements OnModuleInit {
       .where(eq(appSchema.usersTable.id, result.user.id));
 
     // Sign in
-    const signInResult = await auth.api.signInEmail({
-      body: { email, password },
-    });
+    // const signInResult = await auth.api.signInEmail({
+    //   body: { email, password },
+    // });
+
+    const [dbSession] = await this.databaseService.db
+      .select()
+      .from(appSchema.sessionsTable)
+      .where(eq(appSchema.sessionsTable.userId, result.user.id))
+      .orderBy(desc(appSchema.sessionsTable.createdAt))
+      .limit(1);
+
+    if (dbSession === undefined)
+      throw new BadRequestException(`No session created by signInEmail`);
 
     // Use the token from signInResult
-    const session: typeof SESSION_EXAMPLE = {
-      id: crypto.randomUUID(), // session ID
-      token: signInResult.token,
-      userId: result.user.id,
-      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-      ipAddress: '127.0.0.1',
-      userAgent: 'Simulation Script',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-
-    return {
+    const userSession: SessionData = {
       user: {
         id: result.user.id,
         email: result.user.email,
         name: result.user.name,
         emailVerified: true,
-        image: null,
-        role: result.user.role || 'user',
+        image: 'noImage',
+        role: (result.user.role || 'user') as AppRole,
         banned: result.user.banned ?? false,
         createdAt:
           result.user.createdAt instanceof Date
@@ -224,7 +244,40 @@ export class AuthService implements OnModuleInit {
             ? result.user.updatedAt.toISOString()
             : String(result.user.updatedAt),
       },
-      session,
+      session: {
+        id: dbSession.id, // session ID
+        token: dbSession.token,
+        userId: dbSession.userId,
+        expiresAt: String(dbSession.expiresAt),
+        ipAddress: dbSession.ipAddress || '127.0.0.1',
+        userAgent: dbSession.userAgent || 'Simulation Script',
+        createdAt: String(dbSession.createdAt),
+        updatedAt: String(dbSession.updatedAt),
+      },
+    };
+
+    //select the university of pretoria
+    const [uni] = await this.databaseService.db
+      .select({ uniID: appSchema.University.UniversityID })
+      .from(appSchema.University)
+      .where(ilike(appSchema.University.UniversityName, `%Pretoria%`))
+      .limit(1);
+
+    await this.databaseService.db
+      .insert(appSchema.UniversityRole)
+      .values({
+        UserID: userSession.user.id,
+        UniversityID: uni.uniID,
+        role: inRole,
+      })
+      .returning();
+
+    const role = await this.getUniversityRole(userSession.user.id, uni.uniID);
+
+    return {
+      ...userSession,
+      uniId: uni.uniID,
+      uniRole: role,
     };
   }
 }
