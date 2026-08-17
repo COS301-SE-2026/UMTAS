@@ -5,8 +5,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Building, Venue } from '../entities/index';
-import { DatabaseService } from 'src/db/database.service';
-import { SessionData } from 'src/auth/session.decorator';
+import { DatabaseService } from '..//db/database.service';
+import { SessionData } from '../auth/session.decorator';
 import { eq, ilike, isNotNull, isNull, and } from 'drizzle-orm';
 import {
   AssignVenueBuildingDto,
