@@ -114,6 +114,7 @@ assert_json_contains "$tmp_dir/cp-sat.json" '"outcome": "conflict-free"'
 assert_json_contains "$tmp_dir/cp-sat.json" '"solveMode": "optimization"'
 assert_json_contains "$tmp_dir/cp-sat.json" '"CS101-L1-A"'
 
+# Removed since logic is being changed -> tests will change
 ./GA_BIN --input tests/fixtures/preferred-start-time.json --output "$tmp_dir/preferred-start-time.json" --engine cp-sat --solve-mode optimization
 assert_json_contains "$tmp_dir/preferred-start-time.json" '"CS101-L1-B"'
 
@@ -127,9 +128,9 @@ assert_json_contains "$tmp_dir/ga-avoidable-conflict.json" '"conflictCount": 0'
 assert_json_contains "$tmp_dir/ga-avoidable-conflict.json" '"CS101-L1-B"'
 assert_json_not_contains "$tmp_dir/ga-avoidable-conflict.json" '"CS101-L1-A"'
 
-./GA_BIN --input tests/fixtures/preferred-start-time.json --output "$tmp_dir/ga-optimization.json" --engine ga --solve-mode optimization
-assert_json_contains "$tmp_dir/ga-optimization.json" '"CS101-L1-B"'
-assert_json_contains "$tmp_dir/ga-optimization.json" '"solveMode": "optimization"'
+ ./GA_BIN --input tests/fixtures/preferred-start-time.json --output "$tmp_dir/ga-optimization.json" --engine ga --solve-mode optimization
+ assert_json_contains "$tmp_dir/ga-optimization.json" '"CS101-L1-B"'
+ assert_json_contains "$tmp_dir/ga-optimization.json" '"solveMode": "optimization"'
 
 node - "$tmp_dir/insufficient-alternatives.json" <<'NODE'
 const { spawnSync } = require("node:child_process");
