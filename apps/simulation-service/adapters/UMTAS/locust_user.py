@@ -1,12 +1,144 @@
 import os
 import json
+import random
 from locust import HttpUser, task, between
 
 
+class DomainUser(HttpUser):
+    wait_time = between(1,20)
 
+    def on_start(self):
+        # we start by loading pre exisisting profiles
+        profiless= os.environ.get('PROFILES_PATH')
+        if profiless and getattr(self,"profiles",None) is None:
+            if os.path.exists(profiless):
+                with open(profiless,'r',encoding='utf-8') as f:
+                    DomainUser.profiles =json.load(f)
+            else:
+                DomainUser.profiles =[]
+            DomainUser.profile_index =0;
+        # load all the pdfs we have found from the various students haha
+        pdf_files = os.environ.get('PDF_DIR', '/app/adapters/umtas/pdfs')
+        if getattr(self, "pdf_files", None) is None:
+            if os.path.exists(pdf_files):
+                DomainUser.pdf_files = [
+                    os.path.join(pdf_files, f) for f in os.listdir(pdf_files) if f.endswith('.pdf')
+                ]
+            else:
+                DomainUser.pdf_files = []
 
+        # add pdfs to profile
+        if not DomainUser.profiles:
+            self.profile = {}
+        else:
+            self.profile = DomainUser.profiles[DomainUser.profile_index % len(DomainUser.profiles)]
+            DomainUser.profile_index += 1
 
+        self.pdf_id= None
+        self.solver_id = None
 
+        admin_token = os.environ.get('SIMULATION_SERVICE_API_TOKEN', '')
+        admin_headers = {'Authorization': f'Bearer {admin_token}'}
+
+        payload = {
+            "email": self.profile.get("email"),
+            "name": self.profile.get("name"),
+            "password": self.profile.get("password"),
+            "role": "STUDENT", 
+            "uniId": self.profile.get("uniId")
+        }
+
+        with self.client.post('/api/auth/admin/create-mock-user', json=payload, headers=admin_headers, catch_response=True) as response:
+            if response.status_code in (200, 201):
+                response.success()
+                response_data = response.json()
+                user_token = response_data.get("session", {}).get("token")
+                self.client.headers.update({'Authorization': f'Bearer {user_token}'})
+            else:
+                response.failure(f"Failure to create mock user {response.text}")
+                self.environment.runner.quit()
+
+    @task(5)
+    def upload_timetable_pdf(self):
+        if not self.pdf_files:
+            return
+
+        random_pdf_path = random.choice(self.pdf_files)
+        data = {
+            "universityId": self.profile.get("uniId"),
+            "adapterKey": "up"
+        }
+
+        with open(random_pdf_path, 'rb') as pdf_file:
+            files = {'file': (os.path.basename(random_pdf_path), pdf_file, 'application/pdf')}
+            
+            with self.client.post('/api/pdf-parser/jobs/upload', data=data, files=files, catch_response=True) as response:
+                if response.status_code == 202:
+                    response.success()
+                    res_json = response.json()
+                    self.pdf_job_id = res_json.get("jobId")
+                else:
+                    response.failure(f"Upload rejected: {response.text}")
+
+    @task(3)
+    def check_pdf_parser_status(self):
+        if not self.pdf_job_id:
+            return
+        
+        with self.client.get(f'/api/pdf-parser/jobs/{self.pdf_job_id}', catch_response=True) as response:
+            if response.status_code == 200:
+                response.success()
+            elif response.status_code == 404:
+                self.pdf_job_id = None 
+
+    @task(2)
+    def get_pdf_parser_result(self):
+        if not self.pdf_job_id:
+            return
+            
+        self.client.get(f'/api/pdf-parser/jobs/{self.pdf_job_id}/result')
+
+    @task(2)
+    def view_enrolled_modules(self):
+        self.client.get('/api/builder')
+
+    @task(2)
+    def view_timetables(self):
+        self.client.get('/api/timetables')
+
+    @task(2)
+    def view_all_events(self):
+        self.client.get('/api/events')
+
+    @task(1)
+    def get_active_session(self):
+        self.client.get('/api/auth/get-session')
+
+    @task(1)
+    def submit_solver_job(self):
+        payload = {
+            "eventIds": self.profile.get("eventIds", []), 
+            "solveMode": "feasibility",
+            "engine": "auto",
+            "preferences": {
+                "heuristics": []
+            }
+        }
+        with self.client.post('/api/solver/jobs', json=payload, catch_response=True) as response:
+            if response.status_code == 202:
+                response.success()
+                res_json = response.json()
+                self.solver_job_id = res_json.get("jobId")
+            else:
+                response.failure(f"Solver rejected: {response.text}")
+
+    @task(1)
+    def check_solver_status(self):
+        if not self.solver_job_id:
+            return
+            
+        self.client.get(f'/api/solver/jobs/{self.solver_job_id}')  
+    
 
 # PLEASE NOTE
 # down below is the auto generated script from the bootstrap spec 
