@@ -1,0 +1,14 @@
+apps/simulation-service/core/openapi_bootstrap.py
+  h_2d4b3dca70a3d8 1-119
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "37fa016c1664d6dd3ebe54b27d635e6c1023cd6a",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}

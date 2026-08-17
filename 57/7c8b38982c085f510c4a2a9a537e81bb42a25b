@@ -1,0 +1,14 @@
+apps/simulation-service/docker-compose.yml
+  h_2d4b3dca70a3d8 1-16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "577c8b38982c085f510c4a2a9a537e81bb42a25b",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
