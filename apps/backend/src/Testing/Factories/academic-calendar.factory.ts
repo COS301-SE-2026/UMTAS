@@ -55,7 +55,6 @@ export function createGeneratedCalendar(
     payload: {
       name: 'Generated calendar',
       year: 2026,
-      timezone: 'Africa/Johannesburg',
       recurringEvents: [],
       oneOffEvents: [],
       allDayEvents: [],
