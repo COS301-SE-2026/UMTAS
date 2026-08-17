@@ -2229,16 +2229,58 @@ export interface components {
       accepted: true;
       jobId: string;
     };
-    SolverHeuristicPreferenceDto: {
-      key: string;
-      weight?: number;
+    PreferredStartTimePreferenceDto: {
+      /**
+       * @example preferred-start-time
+       * @enum {string}
+       */
+      key: "preferred-start-time";
       parameters?: {
-        [key: string]: unknown;
+        /** @example 540 */
+        "minutes-After-midnight": number;
+      };
+    };
+    LargeGapsPreferenceDto: {
+      /**
+       * @example large-gaps
+       * @enum {string}
+       */
+      key: "large-gaps";
+    };
+    SmallGapsPreferenceDto: {
+      /**
+       * @example small-gaps
+       * @enum {string}
+       */
+      key: "small-gaps";
+    };
+    DaySkipPreferenceDto: {
+      /**
+       * @example day-skip
+       * @enum {string}
+       */
+      key: "day-skip";
+      parameters?: {
+        /**
+         * @example monday
+         * @enum {string}
+         */
+        "day-to-skip":
+          | "monday"
+          | "tuesday"
+          | "wednesday"
+          | "thursday"
+          | "friday";
       };
     };
     SolverPreferencesDto: {
       /** @default [] */
-      heuristics: components["schemas"]["SolverHeuristicPreferenceDto"][];
+      heuristics: (
+        | components["schemas"]["PreferredStartTimePreferenceDto"]
+        | components["schemas"]["LargeGapsPreferenceDto"]
+        | components["schemas"]["SmallGapsPreferenceDto"]
+        | components["schemas"]["DaySkipPreferenceDto"]
+      )[];
     };
     TimetableSolveJobDto: {
       /**

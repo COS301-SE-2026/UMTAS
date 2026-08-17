@@ -1,7 +1,7 @@
 #include "CP.h"
 
+#include "../heuristic/Decorators/Decorators.h"
 #include "ortools/sat/cp_model_solver.h"
-
 #include <cstdlib>
 #include <stdexcept>
 #include <string>
@@ -14,7 +14,7 @@ std::string requirementKey(const EventGA &event) {
   return event.moduleCode + ":" + event.activityCode;
 }
 
-}  // namespace
+} // namespace
 
 CP_SOLVER::CP_SOLVER(const API_DATA &data, bool optimize) : inputData(data) {
   selectedEvents.reserve(inputData.events.size());
@@ -23,7 +23,8 @@ CP_SOLVER::CP_SOLVER(const API_DATA &data, bool optimize) : inputData(data) {
   }
   selectionRules();
   overlapRules();
-  if (optimize) objectiveRule();
+  if (optimize)
+    objectiveRule();
 }
 
 void CP_SOLVER::createRules() {
@@ -74,15 +75,14 @@ void CP_SOLVER::overlapRules() {
 void CP_SOLVER::objectiveRule() {
   using operations_research::sat::LinearExpr;
 
+  EventChromosome heuristicChrom(inputData);
+
   LinearExpr objective;
-  for (size_t index = 0; index < inputData.events.size(); ++index) {
-    objective += std::abs(inputData.events[index].event_start -
-                          inputData.targetTime) *
-                 selectedEvents[index];
-  }
+  if (inputData.decorators)
+    objective += inputData.decorators->calculateHeursitic(heuristicChrom);
   model.Minimize(objective);
 }
-
+// works towards 7:30 temp solution
 EventChromosome CP_SOLVER::solve() {
   using operations_research::sat::CpSolverResponse;
   using operations_research::sat::CpSolverStatus;
@@ -91,25 +91,26 @@ EventChromosome CP_SOLVER::solve() {
   const CpSolverResponse response =
       operations_research::sat::Solve(model.Build());
   switch (response.status()) {
-    case CpSolverStatus::INFEASIBLE:
-      return result;
-    case CpSolverStatus::MODEL_INVALID:
-      throw std::runtime_error("CP-SAT rejected an invalid model");
-    case CpSolverStatus::UNKNOWN:
-      throw std::runtime_error(
-          "CP-SAT stopped before proving feasibility or infeasibility");
-    case CpSolverStatus::OPTIMAL:
-    case CpSolverStatus::FEASIBLE:
-      break;
-    default:
-      throw std::runtime_error("CP-SAT returned an unrecognized solver status");
+  case CpSolverStatus::INFEASIBLE:
+    return result;
+  case CpSolverStatus::MODEL_INVALID:
+    throw std::runtime_error("CP-SAT rejected an invalid model");
+  case CpSolverStatus::UNKNOWN:
+    throw std::runtime_error(
+        "CP-SAT stopped before proving feasibility or infeasibility");
+  case CpSolverStatus::OPTIMAL:
+  case CpSolverStatus::FEASIBLE:
+    break;
+  default:
+    throw std::runtime_error("CP-SAT returned an unrecognized solver status");
   }
 
   for (size_t index = 0; index < selectedEvents.size(); ++index) {
     result.events[index].is_active =
         operations_research::sat::SolutionBooleanValue(response,
-                                                        selectedEvents[index]);
-    if (result.events[index].is_active) ++result.numActive;
+                                                       selectedEvents[index]);
+    if (result.events[index].is_active)
+      ++result.numActive;
   }
   return result;
 }
