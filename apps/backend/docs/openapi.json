@@ -1145,7 +1145,7 @@
       },
       "get": {
         "description": "Filter by userId(enrolled) | courseId(course owned) | universityId(modules for university over all courses). At least one filter required",
-        "operationId": "ModuleController_getAll",
+        "operationId": "getAllModules",
         "parameters": [
           {
             "name": "universityId",
@@ -1288,13 +1288,10 @@
             }
           },
           "400": {
-            "description": "Invalid request"
-          },
-          "404": {
-            "description": "No modules found matching the filters"
+            "description": "Invalid filters"
           }
         },
-        "summary": "Get all modules with filters",
+        "summary": "Get all modules with filters - V2",
         "tags": [
           "Modules"
         ]

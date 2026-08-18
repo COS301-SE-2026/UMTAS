@@ -74,6 +74,7 @@ export class ModuleController {
     summary: 'Get all modules with filters',
     description:
       'Filter by userId(enrolled) | courseId(course owned) | universityId(modules for university over all courses). At least one filter required',
+    operationId: 'getAllModules',
   })
   @ApiResponse({
     status: 200,
@@ -99,7 +100,7 @@ export class ModuleController {
   @Get('v2/')
   @Roles()
   @ApiOperation({
-    summary: 'Get all modules with filters',
+    summary: 'Get all modules with filters - V2',
     description:
       'Filter by userId(enrolled) | courseId(course owned) | universityId(modules for university over all courses). At least one filter required',
     operationId: 'getAllModulesV2',
@@ -111,11 +112,7 @@ export class ModuleController {
   })
   @ApiResponse({
     status: 400,
-    description: 'Invalid request',
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'No modules found matching the filters',
+    description: 'Invalid filters',
   })
   getAllV2(
     @CurrentSession() session: SessionData,
