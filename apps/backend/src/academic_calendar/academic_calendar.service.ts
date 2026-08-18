@@ -42,7 +42,7 @@ import {
   type CalendarSourceEvent,
 } from './academic-calendar-generation.service';
 
-type DbError = { code?: string; constraint?: string };
+type DbError = { code?: string; constraint?: string; cause?: unknown };
 
 @Injectable()
 export class AcademicCalendarService {
@@ -527,10 +527,15 @@ export class AcademicCalendarService {
   }
 
   private isConstraint(error: unknown, code: string): boolean {
-    return (
-      typeof error === 'object' &&
-      error !== null &&
-      (error as DbError).code === code
-    );
+    let current = error;
+    const visited = new Set<object>();
+    while (typeof current === 'object' && current !== null) {
+      if (visited.has(current)) return false;
+      visited.add(current);
+      const databaseError = current as DbError;
+      if (databaseError.code === code) return true;
+      current = databaseError.cause;
+    }
+    return false;
   }
 }

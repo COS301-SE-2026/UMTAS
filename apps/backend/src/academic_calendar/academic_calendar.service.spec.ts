@@ -86,8 +86,10 @@ describe('AcademicCalendarService', () => {
       (mockDb.insert as jest.Mock).mockReturnValue(
         createDbChain(
           Promise.reject(
-            Object.assign(new Error('unique constraint violation'), {
-              code: '23505',
+            Object.assign(new Error('Failed query'), {
+              cause: Object.assign(new Error('unique constraint violation'), {
+                code: '23505',
+              }),
             }),
           ),
         ),
