@@ -14,8 +14,8 @@ export type updateMapConfigRes =
   paths["/api/map-config"]["put"]["responses"]["200"]["content"]["application/json"];
 
 export class getMapConfigBuilder extends RequestBuilder<
-  undefined,
   getMapConfigPath,
+  undefined,
   getMapConfigRes
 > {
   constructor() {
@@ -25,8 +25,8 @@ export class getMapConfigBuilder extends RequestBuilder<
 }
 
 export class updateMapConfigBuilder extends RequestBuilder<
-  updateMapConfigBody,
   updateMapConfigPath,
+  updateMapConfigBody,
   updateMapConfigRes
 > {
   constructor() {
