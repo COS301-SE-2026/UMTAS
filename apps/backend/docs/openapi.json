@@ -2540,6 +2540,50 @@
         ]
       }
     },
+    "/api/events/validate/{id}": {
+      "patch": {
+        "operationId": "validateEvent",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidateEventDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Event[${updated.eventName}] validated=[${updated.validated}]",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateEventResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Event not found"
+          }
+        },
+        "summary": "Validate an event",
+        "tags": [
+          "Events"
+        ]
+      }
+    },
     "/api/timetables": {
       "post": {
         "operationId": "createTimetable",
@@ -5678,6 +5722,28 @@
         },
         "required": [
           "success"
+        ]
+      },
+      "ValidateEventDto": {
+        "type": "object",
+        "properties": {
+          "validated": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ValidateEventResponseDto": {
+        "type": "object",
+        "properties": {
+          "event": {
+            "$ref": "#/components/schemas/EventDto"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "event"
         ]
       },
       "CreateTimetableDto": {

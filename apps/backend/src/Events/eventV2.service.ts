@@ -15,13 +15,14 @@ import {
   EventCriteriaDto,
   EventCriteriaDtoV2,
   EventSingleResponseDto,
+  ValidateEventResponseDto,
   VenueDto,
 } from './dto/EventDto.dto';
 import { AppDatabase } from 'src/auth/auth';
 import { Event, UniversityEvent, Venue } from 'src/entities';
 import { UniversitySingleResponseDto } from 'src/University/dto/university.dto';
 import { DayOfWeek } from './dto/event.types';
-import { inArray } from 'drizzle-orm';
+import { eq, inArray } from 'drizzle-orm';
 
 export class EventServiceV2 extends EventService {
   protected readonly Oopsie = new Logger(this.constructor.name);
@@ -99,6 +100,36 @@ export class EventServiceV2 extends EventService {
 
     return { event };
   } //END_CreateV2
+
+  /**
+   * Validate an event
+   * @param eventId - ID of event to validate
+   * @param validated - Update validated status to this param - Optional - default opposite
+   * @returns Updated event together with message
+   */
+  async validateEvent(
+    eventId: string,
+    validated?: boolean,
+  ): Promise<ValidateEventResponseDto> {
+    const tx = this.dbService.db;
+
+    //Check if event exists - will throw
+    const event = (await this.getById(eventId, tx)).event;
+
+    //Update event to validated
+    const [updated] = await this.dbService.db
+      .update(Event)
+      .set({
+        validated: validated ?? !event.validated,
+      })
+      .where(eq(Event.eventID, eventId))
+      .returning();
+
+    return {
+      event: await this.mapEventToDto(updated),
+      message: `Event[${updated.eventName}] validated=${updated.validated}`,
+    };
+  } //END_validateEvent
 
   //🎅's little helpers
 

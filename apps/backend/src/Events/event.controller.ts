@@ -19,6 +19,8 @@ import {
   DeleteResponseDto,
   EventFiltersDto,
   CreateEventDtoV2,
+  ValidateEventResponseDto,
+  ValidateEventDto,
 } from './dto/EventDto.dto';
 
 import { EventService } from './event.service';
@@ -229,5 +231,28 @@ export class EventController {
       session.user.role,
       eventId,
     );
+  }
+
+  @Patch('validate/:id')
+  @Roles()
+  @ApiOperation({
+    summary: 'Validate an event',
+    operationId: 'validateEvent',
+  })
+  @ApiBody({ type: ValidateEventDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Event[${updated.eventName}] validated=[${updated.validated}]',
+    type: ValidateEventResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Event not found',
+  })
+  validateEvent(
+    @Param('id', ParseUUIDPipe) eventId: string,
+    @Body() dto: ValidateEventDto,
+  ): Promise<ValidateEventResponseDto> {
+    return this.service2.validateEvent(eventId, dto.validated);
   }
 } //EventController

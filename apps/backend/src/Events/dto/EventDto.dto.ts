@@ -204,3 +204,13 @@ export class EventFiltersDto {
   @IsBoolean()
   all?: boolean;
 }
+
+export class ValidateEventDto extends PickType(EventDto, ['validated']) {}
+
+export class ValidateEventResponseDto {
+  @Type(() => EventDto)
+  event!: EventDto;
+
+  @IsString()
+  message?: string;
+} //END_ValidateEventResponseDto
