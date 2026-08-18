@@ -309,6 +309,15 @@ export class ModuleFiltersDto {
     else return false;
   })
   userEnrollment?: boolean;
+
+  // @ApiPropertyOptional({
+  //   default: false,
+  //   description: 'Used to get the moduel styling and when moduleEnrollment filter is active'
+  // })
+  // @IsOptional()
+  // @IsUUID()
+  // @ValidateIf((o)=> o.userEnrollment===true)
+  // userId?: string;
 } //ModuleFiltersDto
 
 export class ModuleStylingResponseDto {

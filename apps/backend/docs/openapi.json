@@ -1666,12 +1666,68 @@
                 }
               }
             }
-          },
-          "404": {
-            "description": "No Courses found"
           }
         },
         "summary": "Get all courses",
+        "tags": [
+          "Courses"
+        ]
+      }
+    },
+    "/api/Courses/v2/getAll": {
+      "get": {
+        "operationId": "getCoursesV2",
+        "parameters": [
+          {
+            "name": "UniversityID",
+            "required": false,
+            "in": "query",
+            "description": "Unique identifier for a university",
+            "schema": {
+              "format": "uuid",
+              "example": "00000000-0000-0000-0000-000000000000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "CourseName",
+            "required": false,
+            "in": "query",
+            "description": "Name of the course",
+            "schema": {
+              "minLength": 1,
+              "maxLength": 30,
+              "example": "Computer Science",
+              "type": "string"
+            }
+          },
+          {
+            "name": "Degree",
+            "required": false,
+            "in": "query",
+            "description": "Filter by Degree",
+            "schema": {
+              "minLength": 1,
+              "maxLength": 30,
+              "nullable": true,
+              "example": "Bachelor of Science",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Courses returned successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CourseListResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get all courses - V2",
         "tags": [
           "Courses"
         ]
@@ -1789,6 +1845,43 @@
           }
         },
         "summary": "Delete Course by Course ID",
+        "tags": [
+          "Courses"
+        ]
+      }
+    },
+    "/api/Courses/v2/{CourseId}": {
+      "get": {
+        "operationId": "getCourseByIdV2",
+        "parameters": [
+          {
+            "name": "CourseId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Course returned successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CourseSingleResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Course ID"
+          },
+          "404": {
+            "description": "Course not found"
+          }
+        },
+        "summary": "get a Course by ID - V2",
         "tags": [
           "Courses"
         ]
@@ -4690,6 +4783,86 @@
           "CourseName"
         ]
       },
+      "ModulesDto": {
+        "type": "object",
+        "properties": {
+          "moduleID": {
+            "type": "string",
+            "format": "uuid",
+            "example": "00000000-0000-0000-0000-000000000000",
+            "description": "Unique identifier for a module"
+          },
+          "moduleCode": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 10,
+            "example": "COS332",
+            "description": "Module code used by the university"
+          },
+          "moduleName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "example": "Computer Networks",
+            "description": "Name of the module"
+          },
+          "moduleDescription": {
+            "type": "string",
+            "nullable": true,
+            "example": "Introduction to computer networking concepts",
+            "description": "Short module description"
+          },
+          "styling": {
+            "nullable": true,
+            "description": "Styling to be used for a Module",
+            "example": {
+              "colour": "FFFFF"
+            },
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/StylingDto"
+              }
+            ]
+          },
+          "CourseModuleInfo": {
+            "nullable": true,
+            "description": "Metadata attached to module when owned by course",
+            "example": {
+              "CourseModuleID": "00000000-0000-0000-0000-000000000000",
+              "GroupModuleID": "00000000-0000-0000-0000-000000000000",
+              "CourseID": "00000000-0000-0000-0000-000000000000",
+              "core": true,
+              "SemesterOfStudy": "Semester 1",
+              "YearOfStudy": 1
+            },
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CourseModuleDto"
+              }
+            ]
+          },
+          "validated": {
+            "type": "boolean",
+            "example": true,
+            "description": "Whether the module has been approved by a university admin"
+          },
+          "events": {
+            "nullable": true,
+            "description": "List of events for the module",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EventDto"
+            }
+          }
+        },
+        "required": [
+          "moduleID",
+          "moduleCode",
+          "moduleName"
+        ]
+      },
       "CourseSingleResponseDto": {
         "type": "object",
         "properties": {
@@ -4726,6 +4899,14 @@
             "maxLength": 30,
             "example": "Bachelor of Science",
             "description": "Degree that course belongs to"
+          },
+          "Modules": {
+            "description": "Modules for the course.",
+            "nullable": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ModulesDto"
+            }
           }
         },
         "required": [
@@ -4796,6 +4977,14 @@
             "maxLength": 30,
             "example": "Bachelor of Science",
             "description": "Degree that course belongs to"
+          },
+          "Modules": {
+            "description": "Modules for the course.",
+            "nullable": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ModulesDto"
+            }
           }
         },
         "required": [
@@ -4813,6 +5002,9 @@
             "items": {
               "$ref": "#/components/schemas/CourseDto"
             }
+          },
+          "message": {
+            "type": "string"
           }
         },
         "required": [
@@ -4849,6 +5041,14 @@
             "maxLength": 30,
             "example": "Bachelor of Science",
             "description": "Degree that course belongs to"
+          },
+          "Modules": {
+            "description": "Modules for the course.",
+            "nullable": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ModulesDto"
+            }
           }
         }
       },

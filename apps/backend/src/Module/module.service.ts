@@ -4,6 +4,8 @@ import {
   Injectable,
   InternalServerErrorException,
   BadRequestException,
+  Inject,
+  forwardRef,
 } from '@nestjs/common';
 import { eq, ne, and, SQL, getTableColumns, ilike, inArray } from 'drizzle-orm';
 
@@ -46,6 +48,7 @@ import { GroupingSingleResponse } from 'src/Grouping/dto/grouping.dto';
 export class ModuleService {
   constructor(
     protected readonly dbService: DatabaseService,
+    @Inject(forwardRef(() => CourseService))
     protected readonly courseService: CourseService,
     protected readonly groupingService: GroupingService,
   ) {}

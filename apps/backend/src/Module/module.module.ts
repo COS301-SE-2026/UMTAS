@@ -7,7 +7,11 @@ import { ModuleServiceV2 } from './moduleV2.service';
 import { EventModule } from 'src/Events/event.module';
 
 @Module({
-  imports: [CourseModule, GroupingModule, forwardRef(() => EventModule)],
+  imports: [
+    forwardRef(() => CourseModule),
+    GroupingModule,
+    forwardRef(() => EventModule),
+  ],
   controllers: [ModuleController],
   providers: [ModuleService, ModuleServiceV2],
   exports: [ModuleService, ModuleServiceV2],
