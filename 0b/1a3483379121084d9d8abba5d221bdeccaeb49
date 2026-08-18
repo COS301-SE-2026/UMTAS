@@ -1,0 +1,44 @@
+apps/simulation-service/adapters/UMTAS/addEventIds_list.csv
+  h_2d4b3dca70a3d8 1-5
+apps/simulation-service/adapters/UMTAS/all_mock_entities.csv
+  h_2d4b3dca70a3d8 1-2
+apps/simulation-service/adapters/UMTAS/attendanceList_list.csv
+  h_2d4b3dca70a3d8 1-6
+apps/simulation-service/adapters/UMTAS/conflicts_list.csv
+  h_2d4b3dca70a3d8 1-4
+apps/simulation-service/adapters/UMTAS/courses_list.csv
+  h_2d4b3dca70a3d8 1-16
+apps/simulation-service/adapters/UMTAS/eventIds_list.csv
+  h_2d4b3dca70a3d8 1-9
+apps/simulation-service/adapters/UMTAS/events_list.csv
+  h_2d4b3dca70a3d8 1-27
+apps/simulation-service/adapters/UMTAS/heuristicScores_list.csv
+  h_2d4b3dca70a3d8 1-4
+apps/simulation-service/adapters/UMTAS/heuristics_list.csv
+  h_2d4b3dca70a3d8 1-5
+apps/simulation-service/adapters/UMTAS/modules_list.csv
+  h_2d4b3dca70a3d8 1-71
+apps/simulation-service/adapters/UMTAS/removeEventIds_list.csv
+  h_2d4b3dca70a3d8 1-4
+apps/simulation-service/adapters/UMTAS/selectedEventIds_list.csv
+  h_2d4b3dca70a3d8 1-7
+apps/simulation-service/adapters/UMTAS/timetables_list.csv
+  h_2d4b3dca70a3d8 1-6
+apps/simulation-service/adapters/UMTAS/universities_list.csv
+  h_2d4b3dca70a3d8 1-2
+apps/simulation-service/adapters/UMTAS/venues_list.csv
+  h_2d4b3dca70a3d8 1-93
+apps/simulation-service/adapters/UMTAS/warnings_list.csv
+  h_2d4b3dca70a3d8 1-5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "0b1a3483379121084d9d8abba5d221bdeccaeb49",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
