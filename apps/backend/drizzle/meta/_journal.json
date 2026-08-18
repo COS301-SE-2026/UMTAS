@@ -57,6 +57,13 @@
       "when": 1786790623006,
       "tag": "0007_Removed_Unique_Constraint_On_ModuleCode",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1787037094049,
+      "tag": "0008_Added_Unique_Constraint_Back_Onto_Modules",
+      "breakpoints": true
     }
   ]
 }
