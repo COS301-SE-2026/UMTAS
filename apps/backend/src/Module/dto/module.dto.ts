@@ -181,7 +181,7 @@ export class ModulesDto {
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => EventDto)
-  events?: EventDto[] | null;
+  Events?: EventDto[] | null;
 } //ModuleDto
 
 //Create

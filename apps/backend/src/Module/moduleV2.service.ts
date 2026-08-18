@@ -103,7 +103,7 @@ export class ModuleServiceV2 extends ModuleService {
     const modulesWithEvents = await Promise.all(
       uniqueModules.map(async (module) => ({
         ...module,
-        events: (
+        Events: (
           await this.eventService.getAllEvents(
             userId,
             {
@@ -159,7 +159,7 @@ export class ModuleServiceV2 extends ModuleService {
     //Enrich with events
     const moduleWithEvents: ModuleSingleResponseDto = {
       ...module,
-      events: (
+      Events: (
         await this.eventService.getAllEvents(userId, {
           moduleId: module.moduleID,
         })
