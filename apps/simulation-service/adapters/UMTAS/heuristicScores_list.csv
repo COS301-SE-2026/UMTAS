@@ -1,0 +1,4 @@
+score,metadata,timetableID,solveMode,engine
+85,"Optimal venue allocation achieved",t-001,optimal,v2_optimiser
+62,"Quick solve applied; minor overlaps present",t-002,quick,v1_legacy
+94,"Heuristic preferences fully met for lecturer",t-003,heuristic,v2_optimiser
