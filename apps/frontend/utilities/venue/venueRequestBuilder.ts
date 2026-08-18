@@ -20,7 +20,7 @@ export type bulkAssignVenuePath =
 export type bulkAssignVenueRes =
   paths["/api/venues/assign"]["post"]["responses"]["200"]["content"]["application/json"];
 
-export class getAllVenues extends RequestBuilder<
+export class getAllVenuesBuilder extends RequestBuilder<
   undefined,
   getAllVenuesPath,
   getAllVenuesRes
