@@ -21,8 +21,8 @@ export type bulkAssignVenueRes =
   paths["/api/venues/assign"]["post"]["responses"]["200"]["content"]["application/json"];
 
 export class getAllVenuesBuilder extends RequestBuilder<
-  undefined,
   getAllVenuesPath,
+  undefined,
   getAllVenuesRes
 > {
   constructor() {
@@ -32,8 +32,8 @@ export class getAllVenuesBuilder extends RequestBuilder<
 }
 
 export class assignVenueBuilder extends RequestBuilder<
-  assignVenueBody,
   assignVenuePath,
+  assignVenueBody,
   assignVenueRes
 > {
   constructor() {
@@ -43,8 +43,8 @@ export class assignVenueBuilder extends RequestBuilder<
 }
 
 export class bulkAssignVenueBuilder extends RequestBuilder<
-  bulkAssignVenueBody,
   bulkAssignVenuePath,
+  bulkAssignVenueBody,
   bulkAssignVenueRes
 > {
   constructor() {
