@@ -173,7 +173,10 @@ export class ModuleController {
     @CurrentSession() session: SessionData,
     @Param('moduleId', ParseUUIDPipe) moduleId: string,
   ): Promise<ModuleSingleResponseDto> {
-    return this.service2.getById(session.user.id, moduleId);
+    return this.service2.getByIdV2({
+      userId: session.user.id,
+      moduleId,
+    });
   }
 
   //Update

@@ -121,20 +121,29 @@ export class ModuleServiceV2 extends ModuleService {
     };
   } //getAll
 
-  async getById(
-    userId: string,
-    moduleId: string,
-    tx?: AppDatabase,
-  ): Promise<ModuleSingleResponseDto> {
+  /**Get a module
+   * @summary Will not attach styling/Events if userId not provided
+   * @param options - moduleId! | userId? | tx?
+   * @returns Module with Styling, Events and CourseModuleInformation
+   *
+   * @throws NotFoundException - Module not found for id provided
+   */
+  async getByIdV2(options: {
+    moduleId: string;
+    userId?: string;
+    tx?: AppDatabase;
+  }): Promise<ModuleSingleResponseDto> {
+    const { userId, moduleId, tx } = options;
+
     const db = tx ?? this.dbService.db;
 
     if (moduleId.trim().length === 0)
       throw new BadRequestException(`Invalid moduleId`);
 
-    const [module] = await db
+    const query = db
       .select({
         ...getTableColumns(modules),
-        styling: ModuleStyling.styling,
+        ...(userId ? { styling: ModuleStyling.styling } : {}),
         CourseModuleInfo: getTableColumns(CourseModule),
       })
       .from(modules)
@@ -143,29 +152,38 @@ export class ModuleServiceV2 extends ModuleService {
         CourseModule,
         eq(CourseModule.GroupModuleID, GroupModules.GroupModuleID),
       )
-      .leftJoin(
+      .where(eq(modules.moduleID, moduleId))
+      .limit(1);
+
+    if (userId) {
+      query.leftJoin(
         ModuleStyling,
         and(
           eq(ModuleStyling.UserID, userId),
           eq(ModuleStyling.ModuleID, modules.moduleID),
         ),
-      )
-      .where(eq(modules.moduleID, moduleId))
-      .limit(1);
+      );
+    }
+
+    const [module] = await query;
 
     if (!module)
       throw new NotFoundException(`Module not found for [${moduleId}]`);
 
-    //Enrich with events
-    const moduleWithEvents: ModuleSingleResponseDto = {
-      ...module,
-      Events: (
-        await this.eventService.getAllEvents(userId, {
-          moduleId: module.moduleID,
-        })
-      ).events,
-    };
+    //Enrich with events - if userId provided
+    if (userId) {
+      const moduleWithEvents: ModuleSingleResponseDto = {
+        ...module,
+        Events: (
+          await this.eventService.getAllEvents(userId, {
+            moduleId: module.moduleID,
+          })
+        ).events,
+      };
 
-    return moduleWithEvents;
+      return moduleWithEvents;
+    }
+
+    return module;
   }
 }
