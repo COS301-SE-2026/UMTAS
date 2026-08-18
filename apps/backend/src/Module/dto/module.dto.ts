@@ -9,6 +9,7 @@ import {
   IsBoolean,
   ValidateNested,
   IsNumber,
+  IsArray,
 } from 'class-validator';
 import {
   PartialType,
@@ -18,6 +19,7 @@ import {
 } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import { PopulateGroupBodyDto } from '../../Grouping/dto/grouping.dto';
+import { EventDto } from 'src/Events/dto/EventDto.dto';
 
 export class CourseModuleDto {
   @ApiProperty({
@@ -169,6 +171,17 @@ export class ModulesDto {
   @IsOptional()
   @IsBoolean()
   validated?: boolean;
+
+  @ApiPropertyOptional({
+    type: () => [EventDto],
+    description: 'List of events for the module',
+    nullable: true,
+  })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => EventDto)
+  events?: EventDto[] | null;
 } //ModuleDto
 
 //Create

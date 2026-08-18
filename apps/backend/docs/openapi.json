@@ -4120,6 +4120,118 @@
           "CourseID"
         ]
       },
+      "EventCriteriaDto": {
+        "type": "object",
+        "properties": {
+          "eventSource": {
+            "enum": [
+              "university",
+              "personal"
+            ],
+            "type": "string"
+          },
+          "date": {
+            "type": "string",
+            "example": "2026-02-17",
+            "description": "Required when the event is not recurring."
+          },
+          "dayOfWeek": {
+            "type": "string",
+            "enum": [
+              "monday",
+              "tuesday",
+              "wednesday",
+              "thursday",
+              "friday",
+              "saturday",
+              "sunday"
+            ],
+            "description": "Required when the event is recurring."
+          },
+          "startTime": {
+            "type": "string",
+            "example": "08:30"
+          },
+          "endTime": {
+            "type": "string",
+            "example": "10:20"
+          },
+          "moduleId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "eventSource",
+          "startTime",
+          "endTime"
+        ]
+      },
+      "VenueDto": {
+        "type": "object",
+        "properties": {
+          "venueId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "venueName": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "venueId",
+          "venueName"
+        ]
+      },
+      "EventDto": {
+        "type": "object",
+        "properties": {
+          "eventId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "eventName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 32
+          },
+          "activityCode": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 10
+          },
+          "activityType": {
+            "type": "string",
+            "enum": [
+              "lecture",
+              "tutorial",
+              "prac",
+              "test",
+              "exam"
+            ]
+          },
+          "eventCriteria": {
+            "$ref": "#/components/schemas/EventCriteriaDto"
+          },
+          "isRecurring": {
+            "type": "boolean"
+          },
+          "validated": {
+            "type": "boolean"
+          },
+          "venues": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VenueDto"
+            }
+          }
+        },
+        "required": [
+          "eventId",
+          "eventCriteria"
+        ]
+      },
       "ModuleSingleResponseDto": {
         "type": "object",
         "properties": {
@@ -4184,6 +4296,14 @@
             "type": "boolean",
             "example": true,
             "description": "Whether the module has been approved by a university admin"
+          },
+          "events": {
+            "nullable": true,
+            "description": "List of events for the module",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EventDto"
+            }
           },
           "ModuleGroupingID": {
             "type": "string",
@@ -4257,6 +4377,14 @@
             "type": "boolean",
             "example": true,
             "description": "Whether the module has been approved by a university admin"
+          },
+          "events": {
+            "nullable": true,
+            "description": "List of events for the module",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EventDto"
+            }
           },
           "CourseID": {
             "type": "string",
@@ -4986,69 +5114,6 @@
           "GroupID"
         ]
       },
-      "EventCriteriaDto": {
-        "type": "object",
-        "properties": {
-          "eventSource": {
-            "enum": [
-              "university",
-              "personal"
-            ],
-            "type": "string"
-          },
-          "date": {
-            "type": "string",
-            "example": "2026-02-17",
-            "description": "Required when the event is not recurring."
-          },
-          "dayOfWeek": {
-            "type": "string",
-            "enum": [
-              "monday",
-              "tuesday",
-              "wednesday",
-              "thursday",
-              "friday",
-              "saturday",
-              "sunday"
-            ],
-            "description": "Required when the event is recurring."
-          },
-          "startTime": {
-            "type": "string",
-            "example": "08:30"
-          },
-          "endTime": {
-            "type": "string",
-            "example": "10:20"
-          },
-          "moduleId": {
-            "type": "string",
-            "format": "uuid"
-          }
-        },
-        "required": [
-          "eventSource",
-          "startTime",
-          "endTime"
-        ]
-      },
-      "VenueDto": {
-        "type": "object",
-        "properties": {
-          "venueId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "venueName": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "venueId",
-          "venueName"
-        ]
-      },
       "CreateEventDto": {
         "type": "object",
         "properties": {
@@ -5091,55 +5156,6 @@
           }
         },
         "required": [
-          "eventCriteria"
-        ]
-      },
-      "EventDto": {
-        "type": "object",
-        "properties": {
-          "eventId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "eventName": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 32
-          },
-          "activityCode": {
-            "type": "string",
-            "nullable": true,
-            "minLength": 1,
-            "maxLength": 10
-          },
-          "activityType": {
-            "type": "string",
-            "enum": [
-              "lecture",
-              "tutorial",
-              "prac",
-              "test",
-              "exam"
-            ]
-          },
-          "eventCriteria": {
-            "$ref": "#/components/schemas/EventCriteriaDto"
-          },
-          "isRecurring": {
-            "type": "boolean"
-          },
-          "validated": {
-            "type": "boolean"
-          },
-          "venues": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/VenueDto"
-            }
-          }
-        },
-        "required": [
-          "eventId",
           "eventCriteria"
         ]
       },
