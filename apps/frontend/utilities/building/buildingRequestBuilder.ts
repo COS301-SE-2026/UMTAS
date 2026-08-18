@@ -14,6 +14,7 @@ export type createBuildingRes =
   paths["/api/buildings"]["post"]["responses"]["201"]["content"]["application/json"];
 
 export class getAllBuildingsBuilder extends RequestBuilder<
+  undefined,
   getAllBuildingsPath,
   getAllBuildingsRes
 > {
