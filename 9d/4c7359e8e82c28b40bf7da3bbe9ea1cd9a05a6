@@ -1,0 +1,14 @@
+apps/backend/test/integration/steps/academic-calendar.step.ts
+  h_3359569cacef0e 1-399
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "9d4c7359e8e82c28b40bf7da3bbe9ea1cd9a05a6",
+  "prompts": {},
+  "humans": {
+    "h_3359569cacef0e": {
+      "author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}
