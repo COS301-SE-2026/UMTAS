@@ -3127,6 +3127,320 @@
         "summary": "Delete an attendance record - effectively making attendance NOT_STATED",
         "tags": ["Attendance"]
       }
+    },
+    "/api/venues": {
+      "get": {
+        "description": "Get all venues from current selected uni",
+        "operationId": "VenueController_getAllVenues",
+        "parameters": [
+          {
+            "name": "buildingId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "mapped",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": true,
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/Object"
+                }
+              ]
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minLength": 1,
+              "maxLength": 100,
+              "example": "IT Building",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Venues returned successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VenueMappingListResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No uni selected or no role at uni"
+          }
+        },
+        "security": [
+          {
+            "umtas-session": []
+          }
+        ],
+        "summary": "Get all venues",
+        "tags": ["Venues"]
+      }
+    },
+    "/api/venues/{venueId}/building": {
+      "patch": {
+        "description": "Send buildingId to assign or null to unassign the venue",
+        "operationId": "VenueController_assignBuilding",
+        "parameters": [
+          {
+            "name": "venueId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignVenueBuildingDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Venue updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VenueMappingDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Building does not belong to the selected university"
+          },
+          "403": {
+            "description": "Wrong permissions"
+          },
+          "404": {
+            "description": "Venue not found"
+          }
+        },
+        "security": [
+          {
+            "umtas-session": []
+          }
+        ],
+        "summary": "Assign a venue to a building",
+        "tags": ["Venues"]
+      }
+    },
+    "/api/venues/assign": {
+      "post": {
+        "description": "Used by the venue mapping screen for multiple selection assignment",
+        "operationId": "VenueController_bulkAssign",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulkAssignVenuesDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Venues updated successfully"
+          },
+          "400": {
+            "description": "One/more buildings do not belong to the selected university"
+          },
+          "403": {
+            "description": "Wrong permissions bud"
+          }
+        },
+        "security": [
+          {
+            "umtas-session": []
+          }
+        ],
+        "summary": "Assign several venues to buildings in one request",
+        "tags": ["Venues"]
+      }
+    },
+    "/api/buildings": {
+      "get": {
+        "description": "Get all buildings from current selected uni",
+        "operationId": "BuildingController_getAllBuildings",
+        "parameters": [
+          {
+            "name": "mapped",
+            "required": false,
+            "in": "query",
+            "description": "True: building with pin. False: only buildings without pin. Omit for all buildings.",
+            "schema": {
+              "example": true,
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/Object"
+                }
+              ]
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search on building name",
+            "schema": {
+              "minLength": 1,
+              "maxLength": 100,
+              "example": "IT",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Buildings returned successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BuildingListResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No uni selected or no role at uni"
+          }
+        },
+        "security": [
+          {
+            "umtas-session": []
+          }
+        ],
+        "summary": "Get all buildings",
+        "tags": ["Buildings"]
+      },
+      "post": {
+        "operationId": "BuildingController_createBuilding",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBuildingDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Building created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BuildingSingleResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Incorrect role permissions"
+          },
+          "409": {
+            "description": "Building with this name already exists"
+          }
+        },
+        "security": [
+          {
+            "umtas-session": []
+          }
+        ],
+        "summary": "Create a building as uni admin",
+        "tags": ["Buildings"]
+      }
+    },
+    "/api/map-config": {
+      "get": {
+        "operationId": "MapConfigController_getMapConfig",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MapConfigDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No university selected"
+          },
+          "404": {
+            "description": "Map settings not configured boss"
+          }
+        },
+        "security": [
+          {
+            "umtas-session": []
+          }
+        ],
+        "summary": "Get map settings for the selected university",
+        "tags": ["Map Config"]
+      },
+      "put": {
+        "operationId": "MapConfigController_update",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMapConfigDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MapConfigDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          }
+        },
+        "security": [
+          {
+            "umtas-session": []
+          }
+        ],
+        "summary": "Set or update map settings for the selected university",
+        "tags": ["Map Config"]
+      }
     }
   },
   "info": {
@@ -5848,6 +6162,329 @@
           }
         },
         "required": ["success"]
+      },
+      "Object": {
+        "type": "object",
+        "properties": {}
+      },
+      "VenueMappingDto": {
+        "type": "object",
+        "properties": {
+          "venueId": {
+            "type": "string",
+            "format": "uuid",
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "venueName": {
+            "type": "string",
+            "nullable": true,
+            "example": "IT-2-26"
+          },
+          "buildingId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid",
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "buildingName": {
+            "type": "string",
+            "nullable": true,
+            "example": "IT Building"
+          }
+        },
+        "required": ["venueId", "venueName", "buildingId", "buildingName"]
+      },
+      "VenueMappingListResponseDto": {
+        "type": "object",
+        "properties": {
+          "venues": {
+            "description": "List of venue mappings",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VenueMappingDto"
+            }
+          }
+        },
+        "required": ["venues"]
+      },
+      "AssignVenueBuildingDto": {
+        "type": "object",
+        "properties": {
+          "buildingId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid",
+            "description": "Assigns a venue to a building"
+          }
+        },
+        "required": ["buildingId"]
+      },
+      "VenueAssignmentDto": {
+        "type": "object",
+        "properties": {
+          "venueId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "buildingId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid"
+          }
+        },
+        "required": ["venueId", "buildingId"]
+      },
+      "BulkAssignVenuesDto": {
+        "type": "object",
+        "properties": {
+          "assignments": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VenueAssignmentDto"
+            }
+          }
+        },
+        "required": ["assignments"]
+      },
+      "LatLngDto": {
+        "type": "object",
+        "properties": {
+          "lat": {
+            "type": "number",
+            "example": -25.7545,
+            "description": "Latitude in decimal degrees"
+          },
+          "lng": {
+            "type": "number",
+            "example": 28.2314,
+            "description": "Longitude in decimal degrees"
+          }
+        },
+        "required": ["lat", "lng"]
+      },
+      "BuildingDto": {
+        "type": "object",
+        "properties": {
+          "buildingId": {
+            "type": "string",
+            "format": "uuid",
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "buildingName": {
+            "type": "string",
+            "example": "IT Building"
+          },
+          "location": {
+            "nullable": true,
+            "description": "null when the building has not been placed on the map yet",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LatLngDto"
+              }
+            ]
+          },
+          "footprint": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": true
+          },
+          "icon": {
+            "type": "string",
+            "nullable": true,
+            "example": "school"
+          },
+          "displayColour": {
+            "type": "string",
+            "nullable": true,
+            "example": "#4A5468"
+          },
+          "venueCount": {
+            "type": "number",
+            "example": 12,
+            "description": "Number of venues assigned to this building (current count)"
+          }
+        },
+        "required": [
+          "buildingId",
+          "buildingName",
+          "location",
+          "footprint",
+          "icon",
+          "displayColour",
+          "venueCount"
+        ]
+      },
+      "BuildingListResponseDto": {
+        "type": "object",
+        "properties": {
+          "buildings": {
+            "description": "List of buildings",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BuildingDto"
+            }
+          }
+        },
+        "required": ["buildings"]
+      },
+      "CreateBuildingDto": {
+        "type": "object",
+        "properties": {
+          "buildingName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "example": "Information Technology Building",
+            "description": "Name of the building. Must be unique within the university."
+          },
+          "location": {
+            "nullable": true,
+            "description": "Map position. Omit to create the building unpinned. Admin places it then later.",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LatLngDto"
+              }
+            ]
+          },
+          "footprint": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": true,
+            "example": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [28.2314, -25.7545],
+                  [28.2318, -25.7545],
+                  [28.2318, -25.7549],
+                  [28.2314, -25.7549],
+                  [28.2314, -25.7545]
+                ]
+              ]
+            },
+            "description": "GeoJSON Polygon outlining the building. Positions are [long, lat]. The ring must be closed..."
+          },
+          "icon": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 64,
+            "example": "uni",
+            "description": "Icon key used when rendering the building marker"
+          },
+          "displayColour": {
+            "type": "string",
+            "nullable": true,
+            "pattern": "^#?([0-9A-F]{3}|[0-9A-F]{4}|[0-9A-F]{6}|[0-9A-F]{8})$",
+            "example": "#4A5548",
+            "description": "Hex colour used when rendering the building"
+          }
+        },
+        "required": ["buildingName"]
+      },
+      "BuildingSingleResponseDto": {
+        "type": "object",
+        "properties": {
+          "building": {
+            "$ref": "#/components/schemas/BuildingDto"
+          }
+        },
+        "required": ["building"]
+      },
+      "MapConfigDto": {
+        "type": "object",
+        "properties": {
+          "NorthLat": {
+            "type": "number",
+            "description": "North part of the campus",
+            "example": 69.69
+          },
+          "SouthLat": {
+            "type": "number",
+            "description": "South part of the campus",
+            "example": 67.67
+          },
+          "EastLng": {
+            "type": "number",
+            "description": "East part of the campus",
+            "example": 67.67
+          },
+          "WestLng": {
+            "type": "number",
+            "description": "West part of the campus",
+            "example": -67.67
+          },
+          "DefaultZoom": {
+            "type": "number",
+            "description": "The zoom level for the map",
+            "example": 10
+          },
+          "GoogleMapID": {
+            "type": "string",
+            "nullable": true,
+            "description": "Id for the google map id for cloud styling",
+            "example": "lalala-123"
+          }
+        },
+        "required": [
+          "NorthLat",
+          "SouthLat",
+          "EastLng",
+          "WestLng",
+          "DefaultZoom",
+          "GoogleMapID"
+        ]
+      },
+      "UpdateMapConfigDto": {
+        "type": "object",
+        "properties": {
+          "NorthLat": {
+            "type": "number",
+            "description": "North part of the campus",
+            "example": 69.69
+          },
+          "SouthLat": {
+            "type": "number",
+            "description": "South part of the campus",
+            "example": 67.67
+          },
+          "EastLng": {
+            "type": "number",
+            "description": "East part of the campus",
+            "example": 67.67
+          },
+          "WestLng": {
+            "type": "number",
+            "description": "West part of the campus",
+            "example": -67.67
+          },
+          "DefaultZoom": {
+            "minimum": 1,
+            "maximum": 20,
+            "type": "number",
+            "description": "The zoom level for the map",
+            "example": 10
+          },
+          "GoogleMapID": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 64,
+            "description": "Id for the google map id for cloud styling",
+            "example": "lalala-123"
+          }
+        },
+        "required": [
+          "NorthLat",
+          "SouthLat",
+          "EastLng",
+          "WestLng",
+          "DefaultZoom",
+          "GoogleMapID"
+        ]
       }
     }
   }

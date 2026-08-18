@@ -261,6 +261,43 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/auth/admin/create-mock-user": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Create a new mock user
+     * @description Create a mock user, authorise their email, sign in, return user and session information
+     */
+    post: operations["adminCreateMockUser"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/auth/admin/delete-mock-users": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** Delete all mock users */
+    delete: operations["adminDeleteMockUsers"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/auth/admin/impersonate-user": {
     parameters: {
       query?: never;
@@ -1016,6 +1053,105 @@ export interface paths {
     patch: operations["updateAttendance"];
     trace?: never;
   };
+  "/api/venues": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get all venues
+     * @description Get all venues from current selected uni
+     */
+    get: operations["VenueController_getAllVenues"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/venues/{venueId}/building": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /**
+     * Assign a venue to a building
+     * @description Send buildingId to assign or null to unassign the venue
+     */
+    patch: operations["VenueController_assignBuilding"];
+    trace?: never;
+  };
+  "/api/venues/assign": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Assign several venues to buildings in one request
+     * @description Used by the venue mapping screen for multiple selection assignment
+     */
+    post: operations["VenueController_bulkAssign"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/buildings": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get all buildings
+     * @description Get all buildings from current selected uni
+     */
+    get: operations["BuildingController_getAllBuildings"];
+    put?: never;
+    /** Create a building as uni admin */
+    post: operations["BuildingController_createBuilding"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/map-config": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get map settings for the selected university */
+    get: operations["MapConfigController_getMapConfig"];
+    /** Set or update map settings for the selected university */
+    put: operations["MapConfigController_update"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1212,6 +1348,22 @@ export interface components {
     };
     AuthUserResponseDto: {
       user: components["schemas"]["AuthUserDto"];
+    };
+    /**
+     * @description Role for the mock user
+     * @enum {string}
+     */
+    MockUserRole: "STUDENT" | "LECTURER" | "UNIVERSITY_ADMIN" | "SYS_ADMIN";
+    CreateMockUserDto: {
+      /**
+       * @description Role for the mock user
+       * @default STUDENT
+       */
+      role: components["schemas"]["MockUserRole"];
+    };
+    DeleteMockUsersResponseDto: {
+      success: Record<string, never>;
+      message: string;
     };
     AdminImpersonateUserDto: {
       /**
@@ -2471,6 +2623,201 @@ export interface components {
        */
       success: boolean;
     };
+    Object: Record<string, never>;
+    VenueMappingDto: {
+      /**
+       * Format: uuid
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      venueId: string;
+      /** @example IT-2-26 */
+      venueName: string | null;
+      /**
+       * Format: uuid
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      buildingId: string | null;
+      /** @example IT Building */
+      buildingName: string | null;
+    };
+    VenueMappingListResponseDto: {
+      /** @description List of venue mappings */
+      venues: components["schemas"]["VenueMappingDto"][];
+    };
+    AssignVenueBuildingDto: {
+      /**
+       * Format: uuid
+       * @description Assigns a venue to a building
+       */
+      buildingId: string | null;
+    };
+    VenueAssignmentDto: {
+      /** Format: uuid */
+      venueId: string;
+      /** Format: uuid */
+      buildingId: string | null;
+    };
+    BulkAssignVenuesDto: {
+      assignments: components["schemas"]["VenueAssignmentDto"][];
+    };
+    LatLngDto: {
+      /**
+       * @description Latitude in decimal degrees
+       * @example -25.7545
+       */
+      lat: number;
+      /**
+       * @description Longitude in decimal degrees
+       * @example 28.2314
+       */
+      lng: number;
+    };
+    BuildingDto: {
+      /**
+       * Format: uuid
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      buildingId: string;
+      /** @example IT Building */
+      buildingName: string;
+      /** @description null when the building has not been placed on the map yet */
+      location: components["schemas"]["LatLngDto"] | null;
+      footprint: {
+        [key: string]: unknown;
+      } | null;
+      /** @example school */
+      icon: string | null;
+      /** @example #4A5468 */
+      displayColour: string | null;
+      /**
+       * @description Number of venues assigned to this building (current count)
+       * @example 12
+       */
+      venueCount: number;
+    };
+    BuildingListResponseDto: {
+      /** @description List of buildings */
+      buildings: components["schemas"]["BuildingDto"][];
+    };
+    CreateBuildingDto: {
+      /**
+       * @description Name of the building. Must be unique within the university.
+       * @example Information Technology Building
+       */
+      buildingName: string;
+      /** @description Map position. Omit to create the building unpinned. Admin places it then later. */
+      location?: components["schemas"]["LatLngDto"] | null;
+      /**
+       * @description GeoJSON Polygon outlining the building. Positions are [long, lat]. The ring must be closed...
+       * @example {
+       *       "type": "Polygon",
+       *       "coordinates": [
+       *         [
+       *           [
+       *             28.2314,
+       *             -25.7545
+       *           ],
+       *           [
+       *             28.2318,
+       *             -25.7545
+       *           ],
+       *           [
+       *             28.2318,
+       *             -25.7549
+       *           ],
+       *           [
+       *             28.2314,
+       *             -25.7549
+       *           ],
+       *           [
+       *             28.2314,
+       *             -25.7545
+       *           ]
+       *         ]
+       *       ]
+       *     }
+       */
+      footprint?: {
+        [key: string]: unknown;
+      } | null;
+      /**
+       * @description Icon key used when rendering the building marker
+       * @example uni
+       */
+      icon?: string | null;
+      /**
+       * @description Hex colour used when rendering the building
+       * @example #4A5548
+       */
+      displayColour?: string | null;
+    };
+    BuildingSingleResponseDto: {
+      building: components["schemas"]["BuildingDto"];
+    };
+    MapConfigDto: {
+      /**
+       * @description North part of the campus
+       * @example 69.69
+       */
+      NorthLat: number;
+      /**
+       * @description South part of the campus
+       * @example 67.67
+       */
+      SouthLat: number;
+      /**
+       * @description East part of the campus
+       * @example 67.67
+       */
+      EastLng: number;
+      /**
+       * @description West part of the campus
+       * @example -67.67
+       */
+      WestLng: number;
+      /**
+       * @description The zoom level for the map
+       * @example 10
+       */
+      DefaultZoom: number;
+      /**
+       * @description Id for the google map id for cloud styling
+       * @example lalala-123
+       */
+      GoogleMapID: string | null;
+    };
+    UpdateMapConfigDto: {
+      /**
+       * @description North part of the campus
+       * @example 69.69
+       */
+      NorthLat: number;
+      /**
+       * @description South part of the campus
+       * @example 67.67
+       */
+      SouthLat: number;
+      /**
+       * @description East part of the campus
+       * @example 67.67
+       */
+      EastLng: number;
+      /**
+       * @description West part of the campus
+       * @example -67.67
+       */
+      WestLng: number;
+      /**
+       * @description The zoom level for the map
+       * @example 10
+       */
+      DefaultZoom: number;
+      /**
+       * @description Id for the google map id for cloud styling
+       * @example lalala-123
+       */
+      GoogleMapID: string | null;
+    };
   };
   responses: never;
   parameters: never;
@@ -3039,6 +3386,50 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["AuthErrorDto"];
+        };
+      };
+    };
+  };
+  adminCreateMockUser: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateMockUserDto"];
+      };
+    };
+    responses: {
+      /** @description Success */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CreateMockUserDto"];
+        };
+      };
+    };
+  };
+  adminDeleteMockUsers: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Success */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DeleteMockUsersResponseDto"];
         };
       };
     };
@@ -5128,6 +5519,253 @@ export interface operations {
         content: {
           "application/json": components["schemas"]["AttendanceSingleResponse"];
         };
+      };
+    };
+  };
+  VenueController_getAllVenues: {
+    parameters: {
+      query?: {
+        buildingId?: string;
+        mapped?: components["schemas"]["Object"];
+        search?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Venues returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["VenueMappingListResponseDto"];
+        };
+      };
+      /** @description No uni selected or no role at uni */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  VenueController_assignBuilding: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        venueId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AssignVenueBuildingDto"];
+      };
+    };
+    responses: {
+      /** @description Venue updated successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["VenueMappingDto"];
+        };
+      };
+      /** @description Building does not belong to the selected university */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Wrong permissions */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Venue not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  VenueController_bulkAssign: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["BulkAssignVenuesDto"];
+      };
+    };
+    responses: {
+      /** @description Venues updated successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description One/more buildings do not belong to the selected university */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Wrong permissions bud */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  BuildingController_getAllBuildings: {
+    parameters: {
+      query?: {
+        /** @description True: building with pin. False: only buildings without pin. Omit for all buildings. */
+        mapped?: components["schemas"]["Object"];
+        /** @description Search on building name */
+        search?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Buildings returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BuildingListResponseDto"];
+        };
+      };
+      /** @description No uni selected or no role at uni */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  BuildingController_createBuilding: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateBuildingDto"];
+      };
+    };
+    responses: {
+      /** @description Building created successfully */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BuildingSingleResponseDto"];
+        };
+      };
+      /** @description Incorrect role permissions */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Building with this name already exists */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  MapConfigController_getMapConfig: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["MapConfigDto"];
+        };
+      };
+      /** @description No university selected */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Map settings not configured boss */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  MapConfigController_update: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateMapConfigDto"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["MapConfigDto"];
+        };
+      };
+      /** @description Insufficient permissions */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
     };
   };
