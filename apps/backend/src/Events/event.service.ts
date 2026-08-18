@@ -1,6 +1,8 @@
 import {
   BadRequestException,
   ForbiddenException,
+  forwardRef,
+  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -47,9 +49,10 @@ import { UniversitySingleResponseDto } from '../University/dto/university.dto';
 export class EventService {
   constructor(
     private readonly dbService: DatabaseService,
-    private readonly moduleService: ModuleService,
     private readonly eventImportFingerprintService: EventImportFingerprintService,
     private readonly uniService: UniversityService,
+    @Inject(forwardRef(() => ModuleService))
+    private readonly moduleService: ModuleService,
   ) {}
 
   //Create

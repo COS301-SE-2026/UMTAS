@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { EventService } from './event.service';
 import { EventController } from './event.controller';
 import { EventImportFingerprintService } from './event-import-fingerprint.service';
@@ -8,7 +8,7 @@ import { CourseModule } from 'src/Course/course.module';
 import { UniversityService } from 'src/University/university.service';
 
 @Module({
-  imports: [ModuleModule, CourseModule],
+  imports: [forwardRef(() => ModuleModule), CourseModule],
   controllers: [EventController],
   providers: [EventService, EventImportFingerprintService, UniversityService],
   exports: [EventService, EventImportFingerprintService, UniversityService],
