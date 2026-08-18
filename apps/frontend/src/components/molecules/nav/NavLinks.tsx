@@ -11,6 +11,7 @@ const basicLinks = [
   { href: "/builder", label: "Event Builder" },
   { href: "/schedules", label: "My Schedules" },
   { href: "/module-management", label: "Manage Modules & Events" },
+  { href: "/map", label: "Map" },
 ];
 
 const extraAdminLinks = [
