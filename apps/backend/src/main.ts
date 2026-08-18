@@ -13,6 +13,10 @@ import {
 
 import { ValidationPipe } from '@nestjs/common';
 
+/*
+checking if the issue is new
+*/
+
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.enableShutdownHooks();
