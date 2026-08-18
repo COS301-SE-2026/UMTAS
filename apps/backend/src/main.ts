@@ -86,7 +86,7 @@ async function bootstrap() {
     },
   });
 
-  generateOpenapi(document);
+  if (process.env.NODE_ENV === 'development') generateOpenapi(document);
 
   console.log(
     `[STARTUP] Swagger docs available at http://localhost:${port}/api/docs`,
