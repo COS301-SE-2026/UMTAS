@@ -2660,6 +2660,12 @@ export interface components {
     BulkAssignVenuesDto: {
       assignments: components["schemas"]["VenueAssignmentDto"][];
     };
+    BulkAssignResponseDto: {
+      /** @example 7 */
+      updated: number;
+      /** @example true */
+      success: Record<string, never>;
+    };
     LatLngDto: {
       /**
        * @description Latitude in decimal degrees
@@ -5618,7 +5624,9 @@ export interface operations {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          "application/json": components["schemas"]["BulkAssignResponseDto"];
+        };
       };
       /** @description One/more buildings do not belong to the selected university */
       400: {

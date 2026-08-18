@@ -104,3 +104,11 @@ export class BulkAssignVenuesDto {
   @Type(() => VenueAssignmentDto)
   assignments!: VenueAssignmentDto[];
 }
+
+export class BulkAssignResponseDto {
+  @ApiProperty({ example: 7 })
+  updated!: number;
+
+  @ApiProperty({ example: true })
+  success!: boolean;
+}

@@ -21,6 +21,7 @@ import { Roles } from 'src/auth/roles.guard';
 import { CurrentSession, type SessionData } from 'src/auth/session.decorator';
 import {
   AssignVenueBuildingDto,
+  BulkAssignResponseDto,
   BulkAssignVenuesDto,
   VenueMappingDto,
   VenueMappingListResponseDto,
@@ -84,7 +85,10 @@ export class VenueController {
     summary: 'Assign several venues to buildings in one request',
   })
   @ApiForbiddenResponse({ description: 'Wrong permissions bud' })
-  @ApiOkResponse({ description: 'Venues updated successfully' })
+  @ApiOkResponse({
+    description: 'Venues updated successfully',
+    type: BulkAssignResponseDto,
+  })
   @ApiBadRequestResponse({
     description: 'One/more buildings do not belong to the selected university',
   })
