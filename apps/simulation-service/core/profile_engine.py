@@ -15,9 +15,6 @@ from faker import Faker
 
 class ProfileEngine:
     def __init__(self, schema_path: str, adapter_dir: str, seed: int =42, worker_id: int = 0):
-        """
-        Initialize the ProfileEngine with the given schema and adapter directory.
-        """
         self.adapter_dir = Path(adapter_dir)
         self.seed = seed + worker_id
         self.faker = Faker()
@@ -31,7 +28,6 @@ class ProfileEngine:
 
 
     def _preload_samples(self):
-        """ Read CSV once to prevent disk IO issues """
         for field_name, rule in self.fields.items():
             if rule.get('type') == 'sample':
                 csv_path = self.adapter_dir /rule['from']
@@ -40,10 +36,6 @@ class ProfileEngine:
                     reader = csv.reader(csvfile)
                     self.loaded_samples[field_name] = [row[0] for row in reader if row]
     def _generate_single_profile(self) -> dict:
-        """Parses rule for a single user and generates their profile based on the schema.
-        Returns:
-            dict: A dictionary representing the generated user profile.
-        """
         profile ={}
 
         for field, rule in self.fields.items():
@@ -75,7 +67,6 @@ class ProfileEngine:
 
 
     def export_to_json(self, pop_size: int, output_path: str):
-            """Pre-generates all profiles and streams them to a JSON array file."""
             with open(output_path, 'w') as f:
                 f.write('[\n')
                 for i, profile in enumerate(self.generate(pop_size)):
@@ -87,7 +78,6 @@ class ProfileEngine:
 
 
     def generate(self, pop_size: int):
-        """ yields N profiles, using a generate instead of returning a list to save memory when scaling to 20K users"""
         for _ in range(pop_size):
             yield self._generate_single_profile()
 
