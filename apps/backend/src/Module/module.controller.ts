@@ -29,11 +29,15 @@ import { ApiBody, ApiResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CurrentSession } from '../auth/session.decorator';
 import type { SessionData } from '../auth/session.decorator';
 import { Roles } from '../auth/roles.guard';
+import { ModuleServiceV2 } from './moduleV2.service';
 
 @ApiTags('Modules')
 @Controller('modules')
 export class ModuleController {
-  constructor(private readonly service: ModuleService) {}
+  constructor(
+    private readonly service: ModuleService,
+    private readonly service2: ModuleServiceV2,
+  ) {}
 
   //Create
   @Post()
@@ -89,6 +93,35 @@ export class ModuleController {
     @Query() filters: ModuleFiltersDto,
   ): Promise<ModuleListResponseDto> {
     return this.service.getAll(session.user.id, filters);
+  }
+
+  //GetAll V2
+  @Get('v2/')
+  @Roles()
+  @ApiOperation({
+    summary: 'Get all modules with filters',
+    description:
+      'Filter by userId(enrolled) | courseId(course owned) | universityId(modules for university over all courses). At least one filter required',
+    operationId: 'getAllModulesV2',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Modules returned successfully',
+    type: ModuleListResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid request',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'No modules found matching the filters',
+  })
+  getAllV2(
+    @CurrentSession() session: SessionData,
+    @Query() filters: ModuleFiltersDto,
+  ): Promise<ModuleListResponseDto> {
+    return this.service2.getAll(session.user.id, filters);
   }
 
   //Get by id
