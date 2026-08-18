@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import asdict, fields
 from enum import Enum
 
-import fitz
+import pymupdf as fitz
 
 from ..base_parser import BasePDFParser
 from ..models import ActivityType, EventCandidate, ModuleCandidate, ParseAnnotation, ParserDetails, ParserError, ParserOutput
