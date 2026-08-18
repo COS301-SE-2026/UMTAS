@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { SwaggerModule, DocumentBuilder, OpenAPIObject } from '@nestjs/swagger';
 import { collectDefaultMetrics, register } from 'prom-client';
 import type { Request, Response } from 'express';
 import { join } from 'path';
@@ -12,6 +12,8 @@ import {
 } from './swagger-theme';
 
 import { ValidationPipe } from '@nestjs/common';
+
+import { mkdirSync, writeFileSync } from 'fs';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -84,6 +86,8 @@ async function bootstrap() {
     },
   });
 
+  generateOpenapi(document);
+
   console.log(
     `[STARTUP] Swagger docs available at http://localhost:${port}/api/docs`,
   );
@@ -97,3 +101,15 @@ bootstrap().catch((err) => {
   console.error('Failed to start app', err);
   process.exit(1);
 });
+
+function generateOpenapi(document: OpenAPIObject) {
+  // writeFileSync('./openapi.json', JSON.stringify(document, null, 2));
+
+  const outDir = './docs';
+
+  mkdirSync(outDir, { recursive: true });
+  writeFileSync(
+    join(outDir, 'openapi.json'),
+    JSON.stringify(document, null, 2),
+  );
+}
