@@ -152,6 +152,33 @@ export class ModuleController {
     return this.service.getById(session.user.id, moduleId);
   }
 
+  @Get('v2/:moduleId')
+  @Roles()
+  @ApiOperation({
+    summary: 'Get a module by ID - V2',
+    description: 'Return a module from its moduleID',
+    operationId: 'getModuleByIdV2',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Module returned successfully',
+    type: ModuleSingleResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid module ID',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Module not found',
+  })
+  getByIdV2(
+    @CurrentSession() session: SessionData,
+    @Param('moduleId', ParseUUIDPipe) moduleId: string,
+  ): Promise<ModuleSingleResponseDto> {
+    return this.service2.getById(session.user.id, moduleId);
+  }
+
   //Update
   @Patch(':moduleId')
   @Roles('lecturer', 'uni_admin')

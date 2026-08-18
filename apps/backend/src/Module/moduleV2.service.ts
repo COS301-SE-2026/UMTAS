@@ -5,7 +5,13 @@ import {
   ModuleSingleResponseDto,
 } from './dto/module.dto';
 import { ModuleService } from './module.service';
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  forwardRef,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { and, eq, getTableColumns, ilike, SQL } from 'drizzle-orm';
 import {
   Course,
@@ -18,6 +24,7 @@ import {
 import { CourseService } from 'src/Course/course.service';
 import { GroupingService } from 'src/Grouping/grouping.service';
 import { EventService } from 'src/Events/event.service';
+import { AppDatabase } from 'src/auth/auth';
 
 @Injectable()
 export class ModuleServiceV2 extends ModuleService {
@@ -34,7 +41,7 @@ export class ModuleServiceV2 extends ModuleService {
   async getAll(
     userId: string,
     filters: ModuleFiltersDto,
-    tx?: DatabaseService['db'],
+    tx?: AppDatabase,
   ): Promise<ModuleListResponseDto> {
     const db = tx ?? this.dbService.db;
     const uniId = filters.universityId?.trim();
@@ -113,4 +120,52 @@ export class ModuleServiceV2 extends ModuleService {
       message: `Returning: ${uniqueModules.length}-Modules. | With filters: ${JSON.stringify(filters)}`,
     };
   } //getAll
+
+  async getById(
+    userId: string,
+    moduleId: string,
+    tx?: AppDatabase,
+  ): Promise<ModuleSingleResponseDto> {
+    const db = tx ?? this.dbService.db;
+
+    if (moduleId.trim().length === 0)
+      throw new BadRequestException(`Invalid moduleId`);
+
+    const [module] = await db
+      .select({
+        ...getTableColumns(modules),
+        styling: ModuleStyling.styling,
+        CourseModuleInfo: getTableColumns(CourseModule),
+      })
+      .from(modules)
+      .innerJoin(GroupModules, eq(GroupModules.ModuleID, modules.moduleID))
+      .leftJoin(
+        CourseModule,
+        eq(CourseModule.GroupModuleID, GroupModules.GroupModuleID),
+      )
+      .leftJoin(
+        ModuleStyling,
+        and(
+          eq(ModuleStyling.UserID, userId),
+          eq(ModuleStyling.ModuleID, modules.moduleID),
+        ),
+      )
+      .where(eq(modules.moduleID, moduleId))
+      .limit(1);
+
+    if (!module)
+      throw new NotFoundException(`Module not found for [${moduleId}]`);
+
+    //Enrich with events
+    const moduleWithEvents: ModuleSingleResponseDto = {
+      ...module,
+      events: (
+        await this.eventService.getAllEvents(userId, {
+          moduleId: module.moduleID,
+        })
+      ).events,
+    };
+
+    return moduleWithEvents;
+  }
 }
