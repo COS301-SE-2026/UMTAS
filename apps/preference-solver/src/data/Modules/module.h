@@ -16,9 +16,8 @@ struct ModuleGA {
   string moduleCode;
   // Required selections keyed by activityCode within this module.
   std::unordered_map<string, int> requiredSelections;
-  ModuleGA(const json& module);
+  ModuleGA(const json &module);
   static std::vector<ModuleGA> innitModules(const json &modulesArr);
-  void handleActivityRequirements(const json& requirements);
+  void handleActivityRequirements(const json &requirements);
 };
 #pragma once
-

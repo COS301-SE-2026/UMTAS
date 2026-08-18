@@ -21,7 +21,9 @@ describe('SolverFingerprintService', () => {
     const changedEventSet = createRequest();
     changedEventSet.solverInput.schedulingProblem.events.pop();
     const changedPreference = createRequest();
-    changedPreference.solverInput.preferences.heuristics[0].weight = 2;
+    changedPreference.solverInput.preferences.heuristics[0].parameters = {
+      'minutes-After-midnight': 421,
+    };
 
     expect(service.compute(changedEvent)).not.toBe(baseline);
     expect(service.compute(changedEventSet)).not.toBe(baseline);
@@ -75,8 +77,11 @@ function createRequest() {
       },
       preferences: {
         heuristics: [
-          { key: 'preferred-start-time', weight: 1 },
-          { key: 'compact-days' },
+          {
+            key: 'preferred-start-time',
+            parameters: { 'minutes-After-midnight': 420 },
+          },
+          { key: 'small-gaps' },
         ],
       },
     }),

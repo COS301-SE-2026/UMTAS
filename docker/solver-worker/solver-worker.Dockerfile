@@ -57,8 +57,8 @@ COPY apps/preference-solver /workspace/apps/preference-solver
 WORKDIR /workspace/apps/preference-solver
 ENV LD_LIBRARY_PATH=/opt/ortools/lib
 #Download first
-RUN make download && \
-    sed -i 's/std::mutex mtx_rand;/inline std::mutex mtx_rand;/g' lib/openGA.hpp
+RUN make lib/openGA.hpp lib/nlohmann/json.hpp 
+    
 RUN make clean \
     && make --jobs="$(nproc)" \
       ORTOOLS_PREFIX=/opt/ortools \

@@ -13,6 +13,8 @@ import {
 
 import { ValidationPipe } from '@nestjs/common';
 
+import { writeFileSync } from 'fs';
+
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.enableShutdownHooks();
@@ -83,6 +85,8 @@ async function bootstrap() {
       tagsSorter: 'alpha',
     },
   });
+
+  writeFileSync('./openapi.json', JSON.stringify(document, null, 2));
 
   console.log(
     `[STARTUP] Swagger docs available at http://localhost:${port}/api/docs`,
