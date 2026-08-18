@@ -4,16 +4,21 @@ import {
   Logger,
   OnModuleInit,
 } from '@nestjs/common';
-import { and, eq, ne } from 'drizzle-orm';
+import { and, eq, ilike, ne } from 'drizzle-orm';
 import { MailerService } from '../mail/mailer.service';
 import * as appSchema from '../entities';
 import { createRedisClient } from '../redis/redis';
-import type { AuthInstance } from './auth';
+import type { AppDatabase, AuthInstance } from './auth';
 import { DatabaseService } from '../db/database.service';
 import { createAuth } from './auth';
 
 import { UniRole } from './roles';
 import { SessionData } from './session.decorator';
+import {
+  CreateMockUserResponseDto,
+  DeleteMockUsersResponseDto,
+  MockUserRole,
+} from './auth.dto';
 
 @Injectable()
 export class AuthService implements OnModuleInit {
@@ -170,4 +175,98 @@ export class AuthService implements OnModuleInit {
       uniRole,
     };
   } //END_selectUniversity
+
+  async createMockUser(
+    inRole?: MockUserRole,
+    tx?: AppDatabase,
+  ): Promise<CreateMockUserResponseDto> {
+    if (!tx) {
+      return await this.databaseService.db.transaction(
+        async (t: AppDatabase) => {
+          return this.createMockUser(inRole, t);
+        },
+      );
+    } //END_tx precence check
+
+    const auth = this.getAuth();
+
+    if (inRole === undefined) inRole = MockUserRole['STUDENT'];
+
+    //Get next number
+    const existingUsers = await tx
+      .select({ email: appSchema.usersTable.email })
+      .from(appSchema.usersTable)
+      .where(ilike(appSchema.usersTable.email, `test_user_%@simulation.com`));
+
+    const existingNumbers = existingUsers
+      .map((user) => {
+        const match = user.email.match(/test_user_(\d+)@simulation\.com/);
+        return match ? parseInt(match[1]) : 0;
+      })
+      .sort((a, b) => a - b);
+
+    let nextNumber = 1;
+    if (existingNumbers.length > 0) {
+      const maxNum = existingNumbers[existingNumbers.length - 1]; //get last num = max
+      nextNumber = maxNum + 1;
+    }
+
+    const email = `test_user_${nextNumber}@simulation.com`;
+    const name = `Test User ${nextNumber}`;
+    const password = 'password123!';
+
+    // Create user
+    const result = await auth.api.createUser({
+      body: { email, password, name, role: 'user' },
+    });
+
+    // Verify email
+    await tx
+      .update(appSchema.usersTable)
+      .set({ emailVerified: true })
+      .where(eq(appSchema.usersTable.id, result.user.id));
+
+    //select the university of pretoria
+    const [uni] = await tx
+      .select({ uniID: appSchema.University.UniversityID })
+      .from(appSchema.University)
+      .where(ilike(appSchema.University.UniversityName, `%Pretoria%`))
+      .limit(1);
+
+    //Create role
+    await tx
+      .insert(appSchema.UniversityRole)
+      .values({
+        UserID: result.user.id,
+        UniversityID: uni.uniID,
+        role: inRole as appSchema.RoleTypeType,
+      })
+      .returning();
+
+    return {
+      email,
+      password,
+    };
+  }
+
+  async deleteMockUsers(tx?: AppDatabase): Promise<DeleteMockUsersResponseDto> {
+    //Delete all users where the email is of form: test_user_%@simulation.com
+    if (!tx) {
+      return await this.databaseService.db.transaction(
+        async (t: AppDatabase) => {
+          return this.deleteMockUsers(t);
+        },
+      );
+    } //END_tx precence check
+
+    const deletedUsers = await tx
+      .delete(appSchema.usersTable)
+      .where(ilike(appSchema.usersTable.email, `test_user_%@simulation.com`))
+      .returning();
+
+    return {
+      success: true,
+      message: `Deleted ${deletedUsers.length} users.`,
+    };
+  }
 }
