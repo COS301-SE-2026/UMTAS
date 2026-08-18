@@ -14,7 +14,7 @@ export const modules = pgTable(
   'Modules',
   {
     moduleID: uuid('moduleID').defaultRandom().primaryKey(),
-    moduleCode: varchar('moduleCode', { length: 10 }).notNull(),
+    moduleCode: varchar('moduleCode', { length: 15 }).notNull(),
     moduleName: varchar('moduleName', { length: 256 }).notNull(),
     moduleDescription: text('moduleDescription'),
     validated: boolean('validated').notNull().default(true),

@@ -109,7 +109,7 @@ export class ModulesDto {
   })
   @IsString()
   @IsNotEmpty()
-  @Length(2, 10)
+  @Length(2, 15)
   moduleCode!: string;
 
   @ApiProperty({
