@@ -1,0 +1,22 @@
+apps/backend/src/academic_calendar/academic-calendar-generation.service.spec.ts
+  h_3359569cacef0e 1-116
+apps/backend/src/academic_calendar/academic_calendar.service.spec.ts
+  h_3359569cacef0e 89-92
+apps/backend/src/academic_calendar/academic_calendar.service.ts
+  h_3359569cacef0e 45,530-539
+apps/backend/test/integration/flows/academic-calendar.flow.int.ts
+  h_3359569cacef0e 1-89
+apps/backend/test/integration/steps/index.ts
+  h_3359569cacef0e 2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "166c3699d401557e5393dfd0f95aff0255a7b450",
+  "prompts": {},
+  "humans": {
+    "h_3359569cacef0e": {
+      "author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}
