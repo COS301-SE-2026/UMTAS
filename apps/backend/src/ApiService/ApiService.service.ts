@@ -5,9 +5,9 @@ import { ModuleListResponseDto, ModulesDto } from 'src/Module/dto/module.dto';
 import { UniversityDto } from 'src/University/dto/university.dto';
 import { UniversityService } from 'src/University/university.service';
 import { AdapterRegistry } from './Registry/AdapterRegistry';
-import { CourseService } from 'src/Course/course.service';
-import { ModuleService } from 'src/Module/module.service';
-import { EventService } from 'src/Events/event.service';
+import { EventServiceV2 } from 'src/Events/eventV2.service';
+import { ModuleServiceV2 } from 'src/Module/moduleV2.service';
+import { CourseServiceV2 } from 'src/Course/courseV2.service';
 
 //Context
 @Injectable()
@@ -15,9 +15,9 @@ export class ApiService {
   constructor(
     private readonly adapterRegistry: AdapterRegistry,
     private readonly uniService: UniversityService,
-    private readonly courseService: CourseService,
-    private readonly moduleService: ModuleService,
-    private readonly eventService: EventService,
+    private readonly courseService: CourseServiceV2,
+    private readonly moduleService: ModuleServiceV2,
+    private readonly eventService: EventServiceV2,
   ) {}
 
   async getCourses(

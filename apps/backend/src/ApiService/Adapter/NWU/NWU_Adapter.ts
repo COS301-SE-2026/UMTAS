@@ -2,7 +2,7 @@ import { NotImplementedException } from '@nestjs/common';
 import { University_Adapter } from '../University_Adapter';
 import { CourseDto, CreateCourseDto } from 'src/Course/dto/course.dto';
 import { CreateModuleDto, ModulesDto } from 'src/Module/dto/module.dto';
-import { CreateEventDto } from 'src/Events/dto/EventDto.dto';
+import { CreateEventDtoV2 } from 'src/Events/dto/EventDto.dto';
 
 interface ExternalCourse {
   course_id: string;
@@ -36,7 +36,7 @@ export class NWU_Adapter extends University_Adapter {
     throw new NotImplementedException();
   }
 
-  async getEvents(module: ModulesDto): Promise<CreateEventDto[]> {
+  async getEvents(module: ModulesDto): Promise<CreateEventDtoV2[]> {
     console.log(module);
     throw new NotImplementedException();
   }

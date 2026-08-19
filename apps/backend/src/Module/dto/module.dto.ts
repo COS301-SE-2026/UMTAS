@@ -9,6 +9,7 @@ import {
   IsBoolean,
   ValidateNested,
   IsNumber,
+  IsArray,
 } from 'class-validator';
 import {
   PartialType,
@@ -18,6 +19,7 @@ import {
 } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import { PopulateGroupBodyDto } from '../../Grouping/dto/grouping.dto';
+import { EventDto } from 'src/Events/dto/EventDto.dto';
 
 export class CourseModuleDto {
   @ApiProperty({
@@ -86,7 +88,7 @@ export class CreateCourseModuleDto extends PickType(CourseModuleDto, [
   'YearOfStudy',
 ]) {}
 
-class StylingDto {
+export class StylingDto {
   @ApiProperty({ example: '#3B82F6' })
   @IsString()
   @IsNotEmpty()
@@ -169,6 +171,17 @@ export class ModulesDto {
   @IsOptional()
   @IsBoolean()
   validated?: boolean;
+
+  @ApiPropertyOptional({
+    type: () => [EventDto],
+    description: 'List of events for the module',
+    nullable: true,
+  })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => EventDto)
+  Events?: EventDto[] | null;
 
   @ApiPropertyOptional({
     example: '12345',
@@ -306,6 +319,15 @@ export class ModuleFiltersDto {
     else return false;
   })
   userEnrollment?: boolean;
+
+  // @ApiPropertyOptional({
+  //   default: false,
+  //   description: 'Used to get the moduel styling and when moduleEnrollment filter is active'
+  // })
+  // @IsOptional()
+  // @IsUUID()
+  // @ValidateIf((o)=> o.userEnrollment===true)
+  // userId?: string;
 } //ModuleFiltersDto
 
 export class ModuleStylingResponseDto {
@@ -359,4 +381,27 @@ export class AddModulesToCourseResponseDto extends AddModulesToCourseDto {
   })
   @IsUUID('4', { message: 'CourseID should be a UUID' })
   CourseID!: string;
+}
+
+export class EnrollToModuleDto {
+  @ApiPropertyOptional({
+    example: undefined,
+    description: 'Enroll or unenroll',
+    type: Boolean,
+  })
+  @IsOptional()
+  @IsBoolean()
+  @IsOptional()
+  @Transform(({ value }) => {
+    if (
+      value === 'true' ||
+      value === 'TRUE' ||
+      value === true ||
+      value === 1 ||
+      value === '1'
+    )
+      return true;
+    else return false;
+  })
+  enroll?: boolean;
 }

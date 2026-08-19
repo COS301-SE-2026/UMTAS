@@ -82,7 +82,7 @@ export class TimetableController {
   @ApiResponse({
     status: 200,
     description: 'Timetables fetched successfully',
-    type: TimetableListResponseDto,
+    type: TimetableListResponseDtoV2,
   })
   @ApiResponse({ status: 401, description: 'No active session' })
   getAllTimetablesV2(

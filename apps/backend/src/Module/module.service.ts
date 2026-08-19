@@ -3,6 +3,8 @@ import {
   Injectable,
   InternalServerErrorException,
   BadRequestException,
+  Inject,
+  forwardRef,
 } from '@nestjs/common';
 import { eq, ne, and, SQL, getTableColumns, ilike, inArray } from 'drizzle-orm';
 
@@ -45,9 +47,10 @@ import { GroupingSingleResponse } from 'src/Grouping/dto/grouping.dto';
 @Injectable()
 export class ModuleService {
   constructor(
-    private readonly dbService: DatabaseService,
-    private readonly courseService: CourseService,
-    private readonly groupingService: GroupingService,
+    protected readonly dbService: DatabaseService,
+    @Inject(forwardRef(() => CourseService))
+    protected readonly courseService: CourseService,
+    protected readonly groupingService: GroupingService,
   ) {}
 
   // Create module
@@ -218,56 +221,51 @@ export class ModuleService {
   ): Promise<ModuleListResponseDto> {
     const db = tx ?? this.dbService.db;
 
-    const uniId = filters.universityId?.trim();
-    const courseId = filters.courseId?.trim();
-    const groupId = filters.GroupID?.trim();
-    const moduleCode = filters.moduleCode?.trim();
-    const enroll = filters.userEnrollment;
-
-    let foundModules: ModuleSingleResponseDto[] = [];
-
+    //define empty conditions array to be added to based of filters
     const conditions: SQL[] = [];
 
-    if (uniId) conditions.push(eq(Course.UniversityID, uniId));
-    if (courseId) conditions.push(eq(CourseModule.CourseID, courseId));
-    if (groupId) conditions.push(eq(Course.GroupID, groupId));
-    if (moduleCode)
-      conditions.push(ilike(modules.moduleCode, `%${moduleCode}%`));
-    if (enroll) conditions.push(eq(ModuleEnrollment.UserID, userId));
+    //filters
+    if (filters.universityId)
+      conditions.push(eq(Course.UniversityID, filters.universityId));
+    if (filters.courseId)
+      conditions.push(eq(Course.CourseID, filters.courseId));
+    if (filters.GroupID)
+      conditions.push(eq(GroupModules.GroupID, filters.GroupID));
+    if (filters.moduleCode)
+      conditions.push(ilike(modules.moduleCode, `%${filters.moduleCode}%`));
+    if (filters.userEnrollment)
+      conditions.push(eq(ModuleEnrollment.UserID, userId));
 
-    foundModules = await db
+    //Build actual query joining Modules -> ModuleEnrollment + CourseModule + Course and then add in dynamic where conditions
+    const foundModules = await db
       .selectDistinctOn([modules.moduleID], {
         ...getTableColumns(modules),
-        styling: ModuleStyling.styling ?? null,
+        ModuleGroupingID: GroupModules.GroupID,
+        CourseID: Course.CourseID,
+        styling: ModuleStyling.styling,
         CourseModuleInfo: getTableColumns(CourseModule),
       })
       .from(modules)
       .leftJoin(
         ModuleStyling,
         and(
-          eq(ModuleStyling.ModuleID, modules.moduleID),
           eq(ModuleStyling.UserID, userId),
+          eq(ModuleStyling.ModuleID, modules.moduleID),
         ),
       )
-      .leftJoin(GroupModules, eq(GroupModules.ModuleID, modules.moduleID))
+      .innerJoin(GroupModules, eq(GroupModules.ModuleID, modules.moduleID))
       .leftJoin(
         CourseModule,
         eq(CourseModule.GroupModuleID, GroupModules.GroupModuleID),
       )
-      .leftJoin(Course, eq(Course.CourseID, CourseModule.CourseID))
+      .leftJoin(Course, eq(Course.GroupID, GroupModules.GroupID))
       .leftJoin(
         ModuleEnrollment,
-        and(
-          eq(ModuleEnrollment.ModuleID, modules.moduleID),
-          eq(ModuleEnrollment.UserID, userId),
-        ),
+        eq(ModuleEnrollment.ModuleID, modules.moduleID),
       )
       .where(and(...conditions));
 
-    return {
-      modules: foundModules,
-      message: `Returning: ${foundModules.length}-Modules. | With filters: ${JSON.stringify(filters)}`,
-    };
+    return { modules: foundModules };
   } //getAll
 
   async getById(
@@ -567,9 +565,9 @@ export class ModuleService {
 
   //🎅's Little Helpers
 
-  //Check if a module already exists for the ModuleGrouping with moduleCode
-  //return module
-  private async existingModuleCodeForModuleGrouping(
+  //Check if a module already exists for the ModuleGrouping
+  //True for duplicate | false otherwise
+  protected async existingModuleCodeForModuleGrouping(
     userId: string,
     moduleCode: string,
     groupId: string,

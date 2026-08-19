@@ -2,8 +2,8 @@ import { BadRequestException } from '@nestjs/common';
 import { University_Adapter } from '../University_Adapter';
 import { CourseDto, CreateCourseDto } from 'src/Course/dto/course.dto';
 import { CreateModuleDto, ModulesDto } from 'src/Module/dto/module.dto';
-import { CreateEventDto } from 'src/Events/dto/EventDto.dto';
-import { DayOfWeek, EventSource } from 'src/Events/dto/event.types';
+import { CreateEventDtoV2 } from 'src/Events/dto/EventDto.dto';
+import { DayOfWeek } from 'src/Events/dto/event.types';
 
 interface ExternalCourse {
   course_id: string; //External id
@@ -83,7 +83,7 @@ export class ML_Adapter extends University_Adapter {
     return result;
   }
 
-  async getEvents(module: ModulesDto): Promise<CreateEventDto[]> {
+  async getEvents(module: ModulesDto): Promise<CreateEventDtoV2[]> {
     const externalId = module.ExternalID ?? null;
     if (externalId === null) {
       throw new BadRequestException(
@@ -99,7 +99,7 @@ export class ML_Adapter extends University_Adapter {
 
     const section = response[0];
 
-    const result: CreateEventDto[] = [];
+    const result: CreateEventDtoV2[] = [];
 
     for (const meeting of section.meetings) {
       const days: DayOfWeek[] = this.parseDays(meeting.days);
@@ -109,7 +109,6 @@ export class ML_Adapter extends University_Adapter {
           isRecurring: true,
           eventName: `Event_${module.moduleName.substring(0, 15)}`,
           eventCriteria: {
-            eventSource: EventSource.UNIVERSITY,
             moduleId: module.moduleID,
             dayOfWeek: day,
             startTime: this.convertTime(meeting.start_time),

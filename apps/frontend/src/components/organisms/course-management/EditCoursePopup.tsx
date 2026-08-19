@@ -7,7 +7,10 @@ import { Label } from "@/components/atoms/baseShadcn/label";
 import { Card } from "@/components/atoms/baseShadcn/card";
 import Popup from "@/components/atoms/utility/floatContainer";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { updateCourseQ } from "@/app/course-management/queries/courses/courseQueries";
+import {
+  deleteCourseQ,
+  updateCourseQ,
+} from "@/app/course-management/queries/courses/courseQueries";
 
 interface EditCoursePopupProps {
   onClose: () => void;
@@ -32,6 +35,32 @@ export function EditCoursePopup({
     isPending,
     isError,
   } = useMutation(updateCourseQ());
+
+  const {
+    mutate: deleteCourse,
+    isPending: deletePending,
+    isError: deleteError,
+  } = useMutation(deleteCourseQ());
+
+  function handleDelete() {
+    if (!courseName.trim()) {
+      return;
+    }
+    deleteCourse(
+      {
+        CourseId: courseId,
+      },
+      {
+        onSuccess: () => {
+          setSuccessMessage("Course successfully deleted!");
+          queryClient.invalidateQueries({ queryKey: ["courses"] });
+          setTimeout(() => {
+            onClose();
+          }, 1000);
+        },
+      },
+    );
+  }
 
   function handleSave() {
     if (!courseName.trim()) {
@@ -113,6 +142,19 @@ export function EditCoursePopup({
                 : isError
                   ? "Failed to Update"
                   : "Save Changes"}
+            </Button>
+            <Button
+              onClick={handleDelete}
+              disabled={!courseName.trim() || isPending || !!successMessage}
+              className={
+                isError ? "bg-[var(--error-bg)] text-[var(--error-text)]" : ""
+              }
+            >
+              {isPending
+                ? "deleting..."
+                : isError
+                  ? "Failed to delete"
+                  : "delete course"}
             </Button>
           </div>
         </Card>

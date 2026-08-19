@@ -1,6 +1,6 @@
 import { RequestTimeoutException } from '@nestjs/common';
 import { CourseDto, CreateCourseDto } from 'src/Course/dto/course.dto';
-import { CreateEventDto } from 'src/Events/dto/EventDto.dto';
+import { CreateEventDtoV2 } from 'src/Events/dto/EventDto.dto';
 import { CreateModuleDto, ModulesDto } from 'src/Module/dto/module.dto';
 import { UniversityDto } from 'src/University/dto/university.dto';
 
@@ -30,7 +30,7 @@ export abstract class University_Adapter {
   /**
    * Get all Events for a selected module
    */
-  abstract getEvents(Module: ModulesDto): Promise<CreateEventDto[]>;
+  abstract getEvents(Module: ModulesDto): Promise<CreateEventDtoV2[]>;
 
   /**
    * Make a request to the external api, specifying only the url

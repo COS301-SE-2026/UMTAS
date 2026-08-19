@@ -1,5 +1,9 @@
 import { BuilderService } from './builder.service';
-import { CreateBuilderModuleDto, UpdateBuilderDto } from './dto/builder.dto';
+import {
+  CreateBuilderEventDto,
+  CreateBuilderModuleDto,
+  UpdateBuilderDto,
+} from './dto/builder.dto';
 import {
   Post,
   Body,
@@ -22,13 +26,18 @@ import {
   DeleteModuleResponseDto,
 } from '../Module/dto/module.dto';
 import { Roles } from '../auth/roles.guard';
+import { BuilderServiceV2 } from './builderV2.service';
+import { EventSingleResponseDto } from 'src/Events/dto/EventDto.dto';
 
 @ApiTags('Builder')
 @Controller('builder')
 export class BuilderController {
-  constructor(private readonly service: BuilderService) {}
+  constructor(
+    private readonly service: BuilderService,
+    private readonly service2: BuilderServiceV2,
+  ) {}
 
-  //Create
+  //Create Module
   @Post()
   @Roles()
   @ApiOperation({
@@ -173,5 +182,31 @@ export class BuilderController {
     @Param('moduleId', ParseUUIDPipe) moduleId: string,
   ): Promise<DeleteModuleResponseDto> {
     return this.service.deleteModule(session.user.id, moduleId);
+  }
+
+  // __________ Events __________
+
+  //Create Event
+  @Post(`events`)
+  @Roles()
+  @ApiOperation({
+    summary: 'Create a user defined event',
+    description: 'Create a new event, to module specified or personal module',
+  })
+  @ApiBody({ type: CreateBuilderEventDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Event created successfully',
+    type: ModuleSingleResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Module not found',
+  })
+  createEvent(
+    @CurrentSession() session: SessionData,
+    @Body() dto: CreateBuilderEventDto,
+  ): Promise<EventSingleResponseDto> {
+    return this.service2.createEvent(session.user.id, dto);
   }
 } //BuilderController

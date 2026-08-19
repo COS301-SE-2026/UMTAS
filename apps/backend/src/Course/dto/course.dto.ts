@@ -1,12 +1,16 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
+  IsArray,
   IsNotEmpty,
   IsOptional,
   IsString,
   IsUUID,
   Length,
+  ValidateNested,
 } from 'class-validator';
 import { PartialType, PickType, OmitType } from '@nestjs/swagger';
+import { ModulesDto } from 'src/Module/dto/module.dto';
+import { Type } from 'class-transformer';
 
 export class CourseDto {
   @ApiProperty({
@@ -53,6 +57,17 @@ export class CourseDto {
   @IsString()
   @Length(1, 30)
   Degree?: string | null;
+
+  @ApiPropertyOptional({
+    type: () => [ModulesDto],
+    description: 'Modules for the course.',
+    nullable: true,
+  })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ModulesDto)
+  Modules?: ModulesDto[];
 
   @ApiPropertyOptional({
     example: '12345',
