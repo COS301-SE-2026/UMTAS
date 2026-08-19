@@ -83,9 +83,10 @@ export default function SolverReviewCard({
     setTempEvent(null);
   }
 
+  console.log(modules);
   return (
     <>
-      {modules.map((module) => {
+      {modules.map((module) =>
         module?.Events?.map((event) => {
           const isSelected = selectedEvent?.eventId === event.eventId;
           const eventChange =
@@ -152,8 +153,8 @@ export default function SolverReviewCard({
               </AlertDialog>
             </div>
           );
-        });
-      })}
+        }),
+      )}
     </>
   );
 }

@@ -6,8 +6,6 @@ describe("GenerateStep props testing", () => {
   it("change name for button when edit is enabled", () => {
     render(
       <GenerateStep
-        modules={[]}
-        events={[]}
         onGenerate={jest.fn()}
         isGenerating={false}
         isEditMode={true}

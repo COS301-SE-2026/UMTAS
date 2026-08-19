@@ -2571,7 +2571,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TimetableListResponseDto"
+                  "$ref": "#/components/schemas/TimetableListResponseDtoV2"
                 }
               }
             }
@@ -5477,6 +5477,38 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/TimetableResponseDto"
+            }
+          }
+        },
+        "required": ["timetables"]
+      },
+      "TimetableResponseDto2": {
+        "type": "object",
+        "properties": {
+          "UserTimetableID": {
+            "type": "string"
+          },
+          "timetable": {
+            "$ref": "#/components/schemas/TimetableDto"
+          },
+          "events": {
+            "default": [],
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EventDto"
+            }
+          }
+        },
+        "required": ["UserTimetableID", "timetable", "events"]
+      },
+      "TimetableListResponseDtoV2": {
+        "type": "object",
+        "properties": {
+          "timetables": {
+            "description": "List of timetables with their linked event objects",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TimetableResponseDto2"
             }
           }
         },

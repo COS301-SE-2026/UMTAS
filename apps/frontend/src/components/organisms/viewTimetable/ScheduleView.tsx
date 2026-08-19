@@ -114,13 +114,13 @@ export function ScheduleView({
       return result.modules;
     },
   });
-  const { data: allEvents = [], isLoading: isLoadingEvents } =
-    useQuery(getAllEventsQ());
+
   const { data: timetables = [], isLoading: isLoadingTimetables } =
     useQuery(getAllTimetablesQ());
+
   const { mutate: deleteTimetable } = useMutation(removeTimetableMut());
 
-  const isLoading = isLoadingModules || isLoadingEvents || isLoadingTimetables;
+  const isLoading = isLoadingModules || isLoadingTimetables;
 
   useEffect(() => {
     if (timetables.length > 0 && !selectedTimetableId) {
@@ -152,13 +152,11 @@ export function ScheduleView({
     );
 
     if (selectedTT) {
-      const activeEventIds = (selectedTT.eventIds || []).map((id) =>
-        String(id).trim(),
+      const activeEventIds = (selectedTT.events || []).map((event) =>
+        String(event.eventId).trim(),
       );
 
-      const activeEvents = allEvents.filter((e) =>
-        activeEventIds.includes(String(e.eventId).trim()),
-      );
+      const activeEvents = selectedTT.events;
 
       const activeModuleIds = activeEvents
         .map((e) => e.eventCriteria?.moduleId)
@@ -172,7 +170,7 @@ export function ScheduleView({
     }
 
     return { events: [], modules: [] };
-  }, [selectedTimetableId, timetables, allEvents, allModules]);
+  }, [selectedTimetableId, timetables, allModules]);
 
   const resolvedEvents = useMemo(
     () => resolveScheduleEvents(events, modules),
@@ -360,8 +358,6 @@ export function ScheduleView({
     if (viewMode === "Generate") {
       return (
         <GenerateStep
-          modules={allModules}
-          events={allEvents}
           onGenerate={handleGenerate}
           isGenerating={isGenerating}
           isEditMode={isEditMode}

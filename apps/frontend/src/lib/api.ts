@@ -2338,6 +2338,16 @@ export interface components {
       /** @description List of timetables with their linked event IDs */
       timetables: components["schemas"]["TimetableResponseDto"][];
     };
+    TimetableResponseDto2: {
+      UserTimetableID: string;
+      timetable: components["schemas"]["TimetableDto"];
+      /** @default [] */
+      events: components["schemas"]["EventDto"][];
+    };
+    TimetableListResponseDtoV2: {
+      /** @description List of timetables with their linked event objects */
+      timetables: components["schemas"]["TimetableResponseDto2"][];
+    };
     UpdateTimetableDto: {
       /**
        * @description Updated display name for the timetable
@@ -5024,7 +5034,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["TimetableListResponseDto"];
+          "application/json": components["schemas"]["TimetableListResponseDtoV2"];
         };
       };
       /** @description No active session */

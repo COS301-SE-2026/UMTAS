@@ -14,6 +14,8 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 
 import Tutorial from "@/components/organisms/nav/Tutorial";
+import { useQuery } from "@tanstack/react-query";
+import { fetchAllModulesv2 } from "../../../../utilities/V2-Builders/Modules";
 
 let eventAdded = false;
 
@@ -35,8 +37,6 @@ const baseSteps = [
 const extendedSteps: typeof baseSteps = [];
 
 interface GenerateStepProps {
-  modules: ModuleResponseDto[];
-  events: EventResponse[];
   onGenerate: (name: string, selectedEventIds: string[]) => void;
   isGenerating: boolean;
   //props for editing
@@ -67,8 +67,6 @@ function formatTime(start: string, end: string) {
 }
 
 export function GenerateStep({
-  modules,
-  events,
   onGenerate,
   isGenerating,
   isEditMode,
@@ -97,6 +95,16 @@ export function GenerateStep({
     }
   }
 
+  const { data: modules = [] } = useQuery({
+    queryKey: ["Modules"],
+    queryFn: async () => {
+      const result = await fetchAllModulesv2({});
+      return result.modules;
+    },
+  });
+
+  const events = modules?.flatMap((module) => module?.Events) ?? [];
+
   function renderModulesSummary() {
     return (
       <div className="flex flex-col gap-3">
@@ -110,7 +118,7 @@ export function GenerateStep({
         </div>
 
         <div className="flex flex-col gap-2">
-          {modules.map((module) => {
+          {modules?.map((module) => {
             return (
               <div
                 key={module.moduleID}
@@ -152,10 +160,12 @@ export function GenerateStep({
 
         <div className="flex flex-col gap-2">
           {events.map((event) => {
-            const criteria = event.eventCriteria;
-            const isEventChecked = selectedEventIds.includes(event.eventId);
+            const criteria = event?.eventCriteria;
+            const isEventChecked = selectedEventIds.includes(
+              event?.eventId ?? "",
+            );
             const linkedModule = getLinkedModule(
-              event.eventCriteria?.moduleId,
+              event?.eventCriteria?.moduleId,
               modules,
             );
             const timeString = formatTime(
@@ -176,12 +186,12 @@ export function GenerateStep({
             return (
               <div
                 data-testid="outer-schedule-div"
-                key={event.eventId}
+                key={event?.eventId}
                 className="flex flex-row items-center gap-1 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] px-4 py-4 shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.08)]"
               >
                 <div className="flex flex-col gap-1 flex-1 min-w-0">
                   <p className="text-base font-medium text-[var(--text-primary)]">
-                    {event.eventName || "Event"}
+                    {event?.eventName || "Event"}
                   </p>
                   <div className="flex flex-wrap items-center gap-2">
                     {criteria?.date && (
@@ -209,7 +219,7 @@ export function GenerateStep({
                       </div>
                     )}
                     <p className="text-sm font-mono text-[var(--text-secondary)] uppercase">
-                      {event.activityType}
+                      {event?.activityType}
                     </p>
                   </div>
                 </div>
@@ -217,10 +227,10 @@ export function GenerateStep({
                 <span className="flex-shrink-0 flex items-center justify-center">
                   <Checkbox
                     data-testid="schedule-Timetable-Checkbox"
-                    id={`event-${event.eventId}`}
+                    id={`event-${event?.eventId}`}
                     checked={isEventChecked}
                     onCheckedChange={(checkedState) =>
-                      checkboxLogic(event.eventId, checkedState === true)
+                      checkboxLogic(event?.eventId ?? "", checkedState === true)
                     }
                   />
                 </span>
