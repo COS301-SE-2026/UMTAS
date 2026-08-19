@@ -1,12 +1,11 @@
-import UniMap from "@/components/templates/map/UniMap";
+import { UniMap } from "@/components/templates/map/UniMap";
 
-const MAP_KEY = process.env.MAP_KEY;
+const MAP_KEY = process.env.NEXT_PUBLIC_MAP_KEY || "";
 
 export default function MapPage() {
-  console.log("map api key is", MAP_KEY);
   return (
-    <div>
-      <UniMap apiKey={MAP_KEY} />;
+    <div className="h-screen flex flex-col min-h-0">
+      <UniMap apiKey={MAP_KEY} />
     </div>
   );
 }

@@ -7,6 +7,7 @@ export type getAllBuildingsRes =
   paths["/api/buildings"]["get"]["responses"]["200"]["content"]["application/json"];
 export type getAllBuildingsQuery =
   paths["/api/buildings"]["get"]["parameters"]["query"];
+export type BuildingType = getAllBuildingsRes["buildings"][number];
 
 export type createBuildingBody =
   paths["/api/buildings"]["post"]["requestBody"]["content"]["application/json"];
