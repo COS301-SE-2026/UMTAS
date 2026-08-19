@@ -22,10 +22,10 @@ import { AppDatabase } from 'src/auth/auth';
 import { Event, UniversityEvent, Venue } from 'src/entities';
 import { UniversitySingleResponseDto } from 'src/University/dto/university.dto';
 import { DayOfWeek } from './dto/event.types';
-import { eq, inArray } from 'drizzle-orm';
+import { and, eq, inArray } from 'drizzle-orm';
 
 export class EventServiceV2 extends EventService {
-  protected readonly Oopsie = new Logger(this.constructor.name);
+  private readonly OOPSIE = new Logger(this.constructor.name);
 
   constructor(
     protected readonly dbService: DatabaseService,
@@ -79,18 +79,32 @@ export class EventServiceV2 extends EventService {
     const event = (await this.createEventV2(tx, dto)).event;
 
     //Create university Event entry
-    const [uniEvent] = await tx
-      .insert(UniversityEvent)
-      .values({
-        moduleID: moduleId,
-        eventID: event.eventId,
-      })
-      .returning();
+    //Check if entity already exists
+    const [existing] = await tx
+      .select()
+      .from(UniversityEvent)
+      .where(
+        and(
+          eq(UniversityEvent.moduleID, moduleId),
+          eq(UniversityEvent.eventID, event.eventId),
+        ),
+      )
+      .limit(1);
 
-    if (!uniEvent)
-      throw new InternalServerErrorException(
-        `Failed to create UniversityEvent entry`,
-      );
+    if (!existing) {
+      const [uniEvent] = await tx
+        .insert(UniversityEvent)
+        .values({
+          moduleID: moduleId,
+          eventID: event.eventId,
+        })
+        .returning();
+
+      if (!uniEvent)
+        throw new InternalServerErrorException(
+          `Failed to create UniversityEvent entry`,
+        );
+    } //END_!existing
 
     const venueIds: string[] | undefined = event.venues?.map(
       (venue) => venue.venueId,
@@ -143,6 +157,33 @@ export class EventServiceV2 extends EventService {
     const eventCriteria = dto.eventCriteria as EventCriteriaDto;
     const isRec = dto.isRecurring;
 
+    const fingerprint = this.eventImportFingerprintService.buildForEvent({
+      eventName: dto.eventName,
+      activityType: dto.activityType,
+      activityCode,
+      eventCriteria: eventCriteria,
+    });
+
+    if (!fingerprint) {
+      this.OOPSIE.warn(
+        `Failed to create eventImportFingerprintService[${fingerprint}]`,
+      );
+      throw new InternalServerErrorException(
+        `Failed to create eventImportFingerprintService[${fingerprint}].`,
+      );
+    } //END_fingerprint
+
+    const [existing] = await tx
+      .select()
+      .from(Event)
+      .where(eq(Event.importFingerprint, fingerprint))
+      .limit(1);
+
+    if (existing) {
+      this.OOPSIE.log(`Existing Event[${existing.eventName}] returned.`);
+      return { event: await this.mapEventToDto(existing, tx) };
+    }
+
     const [event] = await tx
       .insert(Event)
       .values({
@@ -152,11 +193,7 @@ export class EventServiceV2 extends EventService {
         eventCriteria: eventCriteria,
         isRecurring: isRec,
         validated: dto.validated ?? true,
-        importFingerprint: this.eventImportFingerprintService.buildForEvent({
-          activityType: dto.activityType,
-          activityCode,
-          eventCriteria: eventCriteria,
-        }),
+        importFingerprint: fingerprint,
       })
       .returning();
 
@@ -241,8 +278,10 @@ export class EventServiceV2 extends EventService {
         ? await this.moduleService.getByIdV2({ moduleId })
         : null;
 
-    if (module === null)
+    if (module === null) {
+      this.OOPSIE.warn(`ModuleID invalid`);
       throw new BadRequestException(`moduleId[${moduleId}] is invalid`);
+    }
     //END_Validate Module
 
     //Validate Day_Of_Week and date based of isRecurring

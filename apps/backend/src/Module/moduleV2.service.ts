@@ -1,5 +1,7 @@
-import { DatabaseService } from 'src/db/database.service';
+import { AppDatabase, DatabaseService } from 'src/db/database.service';
 import {
+  CourseModuleDto,
+  CreateModuleDto,
   EnrollToModuleDto,
   EnrolResponseDto,
   ModuleFiltersDto,
@@ -13,6 +15,7 @@ import {
   Inject,
   Injectable,
   InternalServerErrorException,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { and, eq, getTableColumns, ilike, SQL } from 'drizzle-orm';
@@ -21,16 +24,18 @@ import {
   CourseModule,
   GroupModules,
   ModuleEnrollment,
+  ModuleGrouping,
   modules,
   ModuleStyling,
 } from 'src/entities';
 import { CourseService } from 'src/Course/course.service';
 import { GroupingService } from 'src/Grouping/grouping.service';
 import { EventService } from 'src/Events/event.service';
-import { AppDatabase } from 'src/auth/auth';
 
 @Injectable()
 export class ModuleServiceV2 extends ModuleService {
+  private readonly OOPSIE = new Logger(this.constructor.name);
+
   constructor(
     protected readonly dbService: DatabaseService,
     protected readonly courseService: CourseService,
@@ -41,7 +46,185 @@ export class ModuleServiceV2 extends ModuleService {
     super(dbService, courseService, groupingService);
   }
 
+  //Create
+  async create(
+    userId: string,
+    dto: CreateModuleDto,
+    tx?: AppDatabase,
+  ): Promise<ModuleSingleResponseDto> {
+    if (!tx) {
+      return this.dbService.db.transaction(async (t: AppDatabase) => {
+        return this.create(userId, dto, t);
+      }); //END_transaction
+    } //END_transaction precencer check
+
+    const code = dto.moduleCode?.trim().toUpperCase();
+    const name = dto.moduleName?.trim();
+    const description = dto.moduleDescription?.trim();
+    const courseId = dto.CourseID;
+    let groupId = dto.ModuleGroupingID;
+
+    //if courseId provided and doesn't exist -> throw fit
+    if (courseId) {
+      //get course
+      const course = await this.courseService.getById(courseId, tx);
+
+      //If group defined for course -> continue | else -> create group for course
+      if (!course.GroupID) {
+        const newGroup = await this.groupingService.createModuleGrouping(
+          {
+            CourseID: courseId,
+          },
+          tx,
+        );
+        groupId = newGroup.GroupID;
+      } else groupId = course.GroupID;
+    } //END_courseId
+
+    if (groupId) {
+      //check that module Grouping groupId is valid
+      // console.log('This should be null ', groupId);
+      await this.groupingService.getById(groupId, tx);
+
+      //Check for duplicate moduleCode in ModuleGrouping
+      const existing = await this.existingModuleCodeForModuleGroupingV2(
+        userId,
+        code,
+        groupId,
+        tx,
+      );
+
+      if (existing) return existing;
+    } else {
+      //If still no groupId
+      //-> this means no groupId or courseId provided
+      //-> Create new group for module
+      const moduleGrouping = await this.groupingService.createModuleGrouping(
+        {},
+        tx,
+      );
+
+      groupId = moduleGrouping.GroupID;
+    } //END_if-else
+
+    //Create new module
+    const [newModule] = await tx
+      .insert(modules)
+      .values({
+        moduleCode: code,
+        moduleName: name,
+        moduleDescription: description,
+        ...(dto.validated === undefined ? {} : { validated: dto.validated }),
+      })
+      .returning();
+
+    if (!newModule)
+      throw new InternalServerErrorException('Module failed to be created');
+
+    //Group module to its group
+    const moduleGroup = await this.groupingService.populateGroup(
+      groupId,
+      [newModule.moduleID],
+      tx,
+    );
+
+    //Course Module metadata logic - only when courseId specified
+    let courseModuleInfo: CourseModuleDto | null = null;
+    if (dto.CourseID && dto.CourseModuleInfo) {
+      //Check that necessary fields present -> else default
+      const core = dto.CourseModuleInfo.Core;
+      const semesterOfStudy =
+        dto.CourseModuleInfo.SemesterOfStudy ?? 'No semester specified';
+      const yearOfStudy = dto.CourseModuleInfo.YearOfStudy ?? 0;
+
+      //Fetch GroupModule entry for module to add metadata to
+      const [groupModule] = await tx
+        .select()
+        .from(GroupModules)
+        .where(
+          and(
+            eq(GroupModules.GroupID, moduleGroup.GroupID),
+            eq(GroupModules.ModuleID, newModule.moduleID),
+          ),
+        )
+        .limit(1);
+
+      if (!groupModule)
+        throw new InternalServerErrorException(
+          `Couldn't find group module entry in join table :(`,
+        );
+
+      //Add metadata to groupModule entity
+      [courseModuleInfo] = await tx
+        .insert(CourseModule)
+        .values({
+          CourseID: dto.CourseID,
+          GroupModuleID: groupModule.GroupModuleID,
+          Core: core,
+          SemesterOfStudy: semesterOfStudy,
+          YearOfStudy: yearOfStudy,
+        })
+        .returning();
+
+      if (!courseModuleInfo)
+        throw new InternalServerErrorException(
+          `Failed to add CourseModule metadata for groupModule entry[${groupModule.GroupModuleID}]`,
+        );
+    } //END_COurseModule metadata logic
+
+    //Styling
+    if (dto.styling) {
+      const styling = await this.setStyling(
+        newModule.moduleID,
+        userId,
+        dto.styling.colour,
+        tx,
+      );
+
+      return {
+        ...newModule,
+        styling: styling.styling,
+        CourseModuleInfo: courseModuleInfo,
+      };
+    }
+
+    return {
+      ...newModule,
+      CourseModuleInfo: courseModuleInfo,
+    };
+  }
+
   //getAllV2, overwrite
+  protected async existingModuleCodeForModuleGroupingV2(
+    userId: string,
+    moduleCode: string,
+    groupId: string,
+    tx: DatabaseService['db'],
+  ): Promise<ModuleSingleResponseDto | null> {
+    const [existingModule] = await tx
+      .select({
+        moduleId: modules.moduleID,
+      })
+      .from(modules)
+      .innerJoin(GroupModules, eq(GroupModules.ModuleID, modules.moduleID))
+      .innerJoin(
+        ModuleGrouping,
+        eq(ModuleGrouping.GroupID, GroupModules.GroupID),
+      )
+      .where(
+        and(
+          eq(modules.moduleCode, moduleCode),
+          eq(ModuleGrouping.GroupID, groupId),
+        ),
+      )
+      .limit(1);
+
+    if (existingModule === undefined) return null;
+
+    //If module exists with moduleCode for moduleGrouping, return true else false
+    return this.getById(userId, existingModule.moduleId);
+  }
+
   async getAll(
     userId: string,
     filters: ModuleFiltersDto,
@@ -171,8 +354,10 @@ export class ModuleServiceV2 extends ModuleService {
 
     const [module] = await query;
 
-    if (!module)
+    if (!module) {
+      this.OOPSIE.warn(`Module not found for [${moduleId}]`);
       throw new NotFoundException(`Module not found for [${moduleId}]`);
+    }
 
     //Enrich with events - if userId provided
     if (userId) {

@@ -183,6 +183,9 @@ export class UpdateEventDto extends PartialType(
 }
 export class EventSingleResponseDto {
   @ApiProperty({ type: EventDto }) event!: EventDto;
+
+  @IsString()
+  message?: string;
 }
 export class EventListResponseDto {
   @ApiProperty({ type: [EventDto] }) events!: EventDto[];
