@@ -16,6 +16,8 @@ import { ArrowLeft } from "lucide-react";
 import Tutorial from "@/components/organisms/nav/Tutorial";
 import { useQuery } from "@tanstack/react-query";
 import { fetchAllModulesv2 } from "../../../../utilities/V2-Builders/Modules";
+import Popup from "@/components/atoms/utility/floatContainer";
+import SolverPreferences from "../solver/SolverPreferences";
 
 let eventAdded = false;
 
@@ -77,6 +79,7 @@ export function GenerateStep({
 }: GenerateStepProps) {
   //checkbox logic
 
+  const [showSolver, setShowSolver] = useState<boolean>(false);
   function checkboxLogic(eventId: string, isChecked: boolean) {
     if (isChecked) {
       //add the event to the list
@@ -104,6 +107,18 @@ export function GenerateStep({
   });
 
   const events = modules?.flatMap((module) => module?.Events) ?? [];
+
+  function getSelectedModules() {
+    const selectedEvents = events.filter((event) =>
+      selectedEventIds.includes(event?.eventId ?? ""),
+    );
+
+    return modules.filter((module) =>
+      selectedEvents.some(
+        (event) => event?.eventCriteria.moduleId === module.moduleID,
+      ),
+    );
+  }
 
   function renderModulesSummary() {
     return (
@@ -318,7 +333,7 @@ export function GenerateStep({
         </div>
 
         {renderContent()}
-        <div className="flex justify-center mt-8">
+        <div className="flex justify-center mt-8 gap-x-2">
           <Button
             id="btn-create-schedule"
             data-testid="schedules-Create-Btn"
@@ -337,8 +352,30 @@ export function GenerateStep({
                   ? "Edit Schedule"
                   : "Generate Schedule"}
           </Button>
+          <Button
+            id=""
+            data-testid=""
+            type="button"
+            size="default"
+            //only solver when there is at least 1 event
+            disabled={isGenerating || selectedEventIds.length === 0}
+            onClick={() => setShowSolver(true)}
+            className="w-fit px-4 text-sm bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] hover:bg-[var(--btn-primary-hover)] disabled:opacity-40 transition-colors duration-[var(--duration-fast)]"
+          >
+            Solve timetable
+          </Button>
         </div>
       </div>
+      {showSolver && (
+        <Popup onClose={() => setShowSolver(false)}>
+          <div className="flex w-140 h-120 justify-center">
+            <SolverPreferences
+              modules={getSelectedModules()}
+              onJobCompleteAction={() => onGenerate("BACK", [])}
+            />
+          </div>
+        </Popup>
+      )}
     </div>
   );
 }

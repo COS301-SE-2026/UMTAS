@@ -2,7 +2,7 @@ import {
   Injectable,
   Logger,
   OnApplicationBootstrap,
-  OnModuleDestroy,
+  OnApplicationShutdown,
   Optional,
 } from '@nestjs/common';
 import { join, resolve } from 'node:path';
@@ -42,7 +42,7 @@ function isSeedEnabled(value: string | undefined): boolean {
 
 @Injectable()
 export class DatabaseService
-  implements OnApplicationBootstrap, OnModuleDestroy
+  implements OnApplicationBootstrap, OnApplicationShutdown
 {
   readonly pool?: Pool;
   readonly pglite?: PGlite;
@@ -66,6 +66,9 @@ export class DatabaseService
       this.logger.log('Initializing Node-Postgres Pool');
       this.pool = new Pool({
         connectionString: databaseUrl,
+        max: 20,
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 5000,
       });
       this.db = drizzleNodePg(this.pool, { schema });
     }
@@ -85,7 +88,8 @@ export class DatabaseService
     }
   }
 
-  async onModuleDestroy(): Promise<void> {
+  async onApplicationShutdown(): Promise<void> {
+    this.logger.log('Closing database pool on shutdown');
     if (this.pool) {
       await this.pool.end();
     }

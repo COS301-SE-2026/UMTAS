@@ -28,11 +28,16 @@ import {
   SmallGapsPref,
   StartTimePref,
 } from "@/components/molecules/solver/PreferenceHandler";
+import { getAllTimetablesQ } from "@/components/templates/builder/Queries/timetableQueries";
 type solverProps = {
   modules: ModuleResponseDto[];
+  onJobCompleteAction?: () => void;
 };
 
-export default function SolverPreferences({ modules }: solverProps) {
+export default function SolverPreferences({
+  modules,
+  onJobCompleteAction,
+}: solverProps) {
   const [currentMode, setCurrentMode] = useState<
     "feasibility" | "optimization"
   >("feasibility");
@@ -220,6 +225,10 @@ export default function SolverPreferences({ modules }: solverProps) {
         setJobID(null);
         getQueryClient().setQueryData(["solver", "poll"], null);
         if (timetableCreated === false) {
+          getQueryClient().invalidateQueries({
+            queryKey: getAllTimetablesQ().queryKey,
+          });
+          onJobCompleteAction?.();
           router.push("\schedules");
         }
       }
