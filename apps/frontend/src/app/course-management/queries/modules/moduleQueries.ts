@@ -2,8 +2,6 @@ import { mutationOptions, queryOptions } from "@tanstack/react-query";
 import {
   CreateModuleBody,
   CreateModuleBuilderAdmin,
-  fetchAllModules,
-  getAllModulesQueries,
   updateModStylingBody,
   updateModStylingPath,
   updateModuleBody,
@@ -13,16 +11,18 @@ import {
 } from "./moduleBuilder";
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
 import { getAllCoursesQ } from "../courses/courseQueries";
-import { UserDetails } from "@/lib/userclass/userClass";
 
-export function getAllModCoursesQ(queries?: getAllModulesQueries) {
+import {
+  fetchAllModulesv2,
+  getAllModulesV2Params,
+} from "../../../../../utilities/V2-Builders/Modules";
+
+export function getAllModCoursesQ(queries?: getAllModulesV2Params) {
   return queryOptions({
     queryKey: ["Modules"],
     queryFn: async () => {
-      const result = await fetchAllModules({
-        userEnrollment: true,
-      });
-      return result;
+      const result = await fetchAllModulesv2(queries);
+      return result.modules;
     },
   });
 }

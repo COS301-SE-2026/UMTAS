@@ -1,19 +1,21 @@
 import { paths } from "../src/lib/api";
 
 // url is something like /universities
-export function createUrl(url: string) {
+export function createBaseURL(): string {
   const baseUrl =
     (typeof window === "undefined"
       ? process.env.API_URL
       : process.env.NEXT_PUBLIC_API_URL) || "http://localhost:3000";
-  const cleanBase = baseUrl.replace(/\/$/, "");
-  const cleanPath = (url as string).replace(/^\//, "");
 
-  if (!cleanBase.includes("/api")) {
-    return `${cleanBase + "/api"}/${cleanPath}`;
-  } else {
-    return `${cleanBase}/${cleanPath}`;
-  }
+  const cleanBase = baseUrl.replace(/\/$/, "");
+  const apiBase = cleanBase.includes("/api") ? cleanBase : `${cleanBase}/api`;
+
+  return `${apiBase}/`;
+}
+
+export function createUrl(url: string): string {
+  const cleanPath = url.replace(/^\//, "");
+  return `${createBaseURL()}${cleanPath}`;
 }
 
 export function cleanBase() {

@@ -4,6 +4,7 @@ import {
   AddModulesToCourseResponseDto,
   CreateModuleDto,
   DeleteModuleResponseDto,
+  EnrollToModuleDto,
   EnrolResponseDto,
   ModuleFiltersDto,
   ModuleListResponseDto,
@@ -29,11 +30,15 @@ import { ApiBody, ApiResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CurrentSession } from '../auth/session.decorator';
 import type { SessionData } from '../auth/session.decorator';
 import { Roles } from '../auth/roles.guard';
+import { ModuleServiceV2 } from './moduleV2.service';
 
 @ApiTags('Modules')
 @Controller('modules')
 export class ModuleController {
-  constructor(private readonly service: ModuleService) {}
+  constructor(
+    private readonly service: ModuleService,
+    private readonly service2: ModuleServiceV2,
+  ) {}
 
   //Create
   @Post()
@@ -70,6 +75,7 @@ export class ModuleController {
     summary: 'Get all modules with filters',
     description:
       'Filter by userId(enrolled) | courseId(course owned) | universityId(modules for university over all courses). At least one filter required',
+    operationId: 'getAllModules',
   })
   @ApiResponse({
     status: 200,
@@ -89,6 +95,31 @@ export class ModuleController {
     @Query() filters: ModuleFiltersDto,
   ): Promise<ModuleListResponseDto> {
     return this.service.getAll(session.user.id, filters);
+  }
+
+  //GetAll V2
+  @Get('v2/')
+  @Roles()
+  @ApiOperation({
+    summary: 'Get all modules with filters - V2',
+    description:
+      'Filter by userId(enrolled) | courseId(course owned) | universityId(modules for university over all courses). At least one filter required',
+    operationId: 'getAllModulesV2',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Modules returned successfully',
+    type: ModuleListResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid filters',
+  })
+  getAllV2(
+    @CurrentSession() session: SessionData,
+    @Query() filters: ModuleFiltersDto,
+  ): Promise<ModuleListResponseDto> {
+    return this.service2.getAll(session.user.id, filters);
   }
 
   //Get by id
@@ -117,6 +148,36 @@ export class ModuleController {
     @Param('moduleId', ParseUUIDPipe) moduleId: string,
   ): Promise<ModuleSingleResponseDto> {
     return this.service.getById(session.user.id, moduleId);
+  }
+
+  @Get('v2/:moduleId')
+  @Roles()
+  @ApiOperation({
+    summary: 'Get a module by ID - V2',
+    description: 'Return a module from its moduleID',
+    operationId: 'getModuleByIdV2',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Module returned successfully',
+    type: ModuleSingleResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid module ID',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Module not found',
+  })
+  getByIdV2(
+    @CurrentSession() session: SessionData,
+    @Param('moduleId', ParseUUIDPipe) moduleId: string,
+  ): Promise<ModuleSingleResponseDto> {
+    return this.service2.getByIdV2({
+      userId: session.user.id,
+      moduleId,
+    });
   }
 
   //Update
@@ -208,6 +269,36 @@ export class ModuleController {
     @Param('moduleId', ParseUUIDPipe) moduleId: string,
   ): Promise<EnrolResponseDto> {
     return this.service.enrollToModule(session.user.id, moduleId);
+  } //END_enrol
+
+  //Enrol to module
+  @Patch('enroll/:moduleId')
+  @Roles('student')
+  @ApiOperation({
+    summary: 'Enrol student to module - V2',
+    operationId: 'enrolStudentToModuleV2',
+  })
+  @ApiBody({ type: EnrollToModuleDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Student successfully enrolled student into module',
+    type: EnrolResponseDto,
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Unenrolled user from module',
+    type: EnrolResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Module not found',
+  })
+  enrolV2(
+    @CurrentSession() session: SessionData,
+    @Param('moduleId', ParseUUIDPipe) moduleId: string,
+    @Body() dto: EnrollToModuleDto,
+  ): Promise<EnrolResponseDto> {
+    return this.service2.enrollToModuleV2(session.user.id, moduleId, dto);
   } //END_enrol
 
   //Add modules to Course

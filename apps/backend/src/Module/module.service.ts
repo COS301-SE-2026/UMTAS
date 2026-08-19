@@ -4,6 +4,8 @@ import {
   Injectable,
   InternalServerErrorException,
   BadRequestException,
+  Inject,
+  forwardRef,
 } from '@nestjs/common';
 import { eq, ne, and, SQL, getTableColumns, ilike, inArray } from 'drizzle-orm';
 
@@ -45,9 +47,10 @@ import { GroupingSingleResponse } from 'src/Grouping/dto/grouping.dto';
 @Injectable()
 export class ModuleService {
   constructor(
-    private readonly dbService: DatabaseService,
-    private readonly courseService: CourseService,
-    private readonly groupingService: GroupingService,
+    protected readonly dbService: DatabaseService,
+    @Inject(forwardRef(() => CourseService))
+    protected readonly courseService: CourseService,
+    protected readonly groupingService: GroupingService,
   ) {}
 
   // Create module
@@ -560,7 +563,7 @@ export class ModuleService {
 
   //Check if a module already exists for the ModuleGrouping
   //True for duplicate | false otherwise
-  private async existingModuleCodeForModuleGrouping(
+  protected async existingModuleCodeForModuleGrouping(
     moduleCode: string,
     groupId: string,
     tx: DatabaseService['db'],

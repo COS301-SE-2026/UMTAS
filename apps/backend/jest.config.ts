@@ -2,7 +2,7 @@ import type { Config } from 'jest';
 
 const config: Config = {
   moduleFileExtensions: ['js', 'json', 'ts'],
-  rootDir: 'src',
+  rootDir: './',
   testRegex: '.*\\.spec\\.ts$',
   transform: {
     '^.+\\.(t|j)s$': [
@@ -14,11 +14,12 @@ const config: Config = {
   },
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1',
+    '^src/(.*)$': '<rootDir>/src/$1',
     // Map shared-types to the source TypeScript files
-    '^shared-types$': '<rootDir>/../../../packages/shared-types/src/index.ts',
-    '^shared-types/(.*)$': '<rootDir>/../../../packages/shared-types/src/$1',
+    '^shared-types$': '<rootDir>/../../packages/shared-types/src/index.ts',
+    '^shared-types/(.*)$': '<rootDir>/../../packages/shared-types/src/$1',
   },
-  setupFilesAfterEnv: ['<rootDir>/../test/jest.setup.ts'],
+  setupFilesAfterEnv: ['<rootDir>/test/jest.setup.ts'],
   transformIgnorePatterns: [
     // Transform shared-types and better-auth
     'node_modules/(?!(shared-types|better-auth|@better-auth)/)',
@@ -37,7 +38,7 @@ const config: Config = {
     '!**/mail/**',
     '!**/redis/**',
   ],
-  coverageDirectory: '../coverage',
+  coverageDirectory: 'coverage',
   testEnvironment: 'node',
   coverageReporters: ['text', 'html', 'lcov'],
 };
