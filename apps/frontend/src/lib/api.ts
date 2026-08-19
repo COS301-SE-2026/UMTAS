@@ -1134,6 +1134,26 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/buildings/{buildingId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /**
+     * Update a building pin and/or drawn polygon
+     * @description Only admins can do this. Send location and/or footprint, omitted fields are left unchanged. Send null to erase.
+     */
+    patch: operations["BuildingController_updateBuildingLocation"];
+    trace?: never;
+  };
   "/api/map-config": {
     parameters: {
       query?: never;
@@ -2759,6 +2779,14 @@ export interface components {
     };
     BuildingSingleResponseDto: {
       building: components["schemas"]["BuildingDto"];
+    };
+    UpdateBuildingLocationDto: {
+      /** @description The location of the building pin. Sending null will unpin */
+      location?: components["schemas"]["LatLngDto"] | null;
+      /** @description GeoJSON polygon outline for the building. Send null to clear the polygon. */
+      footprint?: {
+        [key: string]: unknown;
+      } | null;
     };
     MapConfigDto: {
       /**
@@ -5707,6 +5735,46 @@ export interface operations {
       };
       /** @description Building with this name already exists */
       409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  BuildingController_updateBuildingLocation: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        buildingId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateBuildingLocationDto"];
+      };
+    };
+    responses: {
+      /** @description The building was updated successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BuildingSingleResponseDto"];
+        };
+      };
+      /** @description Your role is not admin, not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The building was not found in this uni */
+      404: {
         headers: {
           [name: string]: unknown;
         };
