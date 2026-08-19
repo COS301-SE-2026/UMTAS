@@ -81,5 +81,6 @@ describe('Google OAuth (mocked)', () => {
       .post('/api/auth/link-account/google')
       .set('Authorization', 'Bearer test')
       .send({ code: 'abc', state: 'xyz' });
+    expect(res.status).toBe(401);
   });
 });
