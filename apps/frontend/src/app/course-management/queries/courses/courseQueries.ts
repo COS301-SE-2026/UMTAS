@@ -7,26 +7,21 @@ import {
   createCoursesBuilder,
   deleteCourseBuilder,
   deleteCoursePath,
-  fetchAllCoursesBody,
-  getAllCoursesBuilder,
   updateCourseBody,
   updateCourseBuilder,
   updateCoursePath,
 } from "./courseBuilder";
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
 import { getAllModCoursesQ } from "../modules/moduleQueries";
+import {
+  getAllCoursesV2,
+  getCoursesV2Params,
+} from "../../../../../utilities/V2-Builders/Courses";
 
-export const getAllCoursesKey = ["courses"];
-
-export function getAllCoursesQ(body?: fetchAllCoursesBody) {
+export function getAllCoursesQ(params?: getCoursesV2Params) {
   return queryOptions({
-    queryKey: getAllCoursesKey,
-    queryFn: async () => {
-      const builder = new getAllCoursesBuilder();
-      const result = await builder.send({ body: body || {} });
-
-      return result.courses;
-    },
+    queryKey: ["courses", params],
+    queryFn: async () => (await getAllCoursesV2(params)).courses,
   });
 }
 

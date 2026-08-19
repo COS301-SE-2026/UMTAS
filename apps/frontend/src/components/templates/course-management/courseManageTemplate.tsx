@@ -1,14 +1,11 @@
 "use client";
-import {
-  getAllCoursesKey,
-  getAllCoursesQ,
-} from "@/app/course-management/queries/courses/courseQueries";
+import { getAllCoursesQ } from "@/app/course-management/queries/courses/courseQueries";
 import { Spinner } from "@/components/atoms/baseShadcn/spinner";
 import { UserDetails } from "@/lib/userclass/userClass";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { CourseTableData } from "@/components/organisms/course-management/courseColumns";
-import { getAllModCoursesQ } from "@/app/course-management/queries/modules/moduleQueries";
+
 import { useState, useEffect, useMemo, Fragment } from "react";
 import {
   getAllModulesQueries,
@@ -40,7 +37,7 @@ import NotFound from "@/app/not-found";
 import { AddCoursePopup } from "@/components/organisms/course-management/AddCoursePopup";
 import NoRoleSelected from "@/components/molecules/roleManagement/NoRoleSelected";
 import { EditCoursePopup } from "@/components/organisms/course-management/EditCoursePopup";
-import { getAllCoursesV2 } from "../../../../utilities/V2-Builders/Courses";
+
 const steps = [
   {
     target: "#input-search-courses-degrees-modules",
@@ -67,10 +64,6 @@ const steps = [
 export default function CourseManagementTemplate() {
   const router = useRouter();
   const UniDetails = UserDetails.getUniDetails();
-  const [moduleQueries, setModuleQueries] = useState<getAllModulesQueries>({
-    universityId: UniDetails?.UniversityID,
-  });
-
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDegree, setSelectedDegree] = useState("All");
   const [selectedModulePrefix, setSelectedModulePrefix] = useState("All");
@@ -97,15 +90,7 @@ export default function CourseManagementTemplate() {
     data: courseData = [],
     isLoading: isCourseLoading,
     isError: isCourseError,
-  } = useQuery({
-    queryKey: getAllCoursesKey,
-    queryFn: async () =>
-      (
-        await getAllCoursesV2({
-          UniversityID: UserDetails.getUniDetails()?.UniversityID,
-        })
-      ).courses,
-  });
+  } = useQuery(getAllCoursesQ());
 
   //use memo for caching between renders
   const availableDegrees = useMemo(() => {
