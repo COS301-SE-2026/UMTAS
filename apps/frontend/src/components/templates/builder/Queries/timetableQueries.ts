@@ -17,7 +17,12 @@ import { fetchAllTimetablesv2 } from "../../../../../utilities/V2-Builders/Timet
 export function getAllTimetablesQ() {
   return queryOptions({
     queryKey: ["timetables"] as const,
-    queryFn: async () => (await fetchAllTimetablesv2()).timetables,
+    queryFn: async () => {
+      console.log("request sent");
+      const result = await fetchAllTimetablesv2();
+      console.log(result);
+      return result.timetables;
+    },
   });
 }
 

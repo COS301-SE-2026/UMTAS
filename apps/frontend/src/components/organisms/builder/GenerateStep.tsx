@@ -279,7 +279,7 @@ export function GenerateStep({
           variant="ghost"
           size="default"
           onClick={() => {
-            router.push("/builder");
+            onGenerate("BACK", []);
           }}
           className="flex items-center gap-2 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-[var(--duration-fast)]"
         >
