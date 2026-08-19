@@ -177,13 +177,14 @@ export class AuthService implements OnModuleInit {
   } //END_selectUniversity
 
   async createMockUser(
+    dto: { email?: string; name?: string; password?: string },
     inRole?: MockUserRole,
     tx?: AppDatabase,
   ): Promise<CreateMockUserResponseDto> {
     if (!tx) {
       return await this.databaseService.db.transaction(
         async (t: AppDatabase) => {
-          return this.createMockUser(inRole, t);
+          return this.createMockUser(dto, inRole, t);
         },
       );
     } //END_tx precence check
@@ -192,65 +193,62 @@ export class AuthService implements OnModuleInit {
 
     if (inRole === undefined) inRole = MockUserRole['STUDENT'];
 
-    //Get next number
-    const existingUsers = await tx
-      .select({ email: appSchema.usersTable.email })
-      .from(appSchema.usersTable)
-      .where(ilike(appSchema.usersTable.email, `test_user_%@simulation.com`));
+    const email =
+      dto?.email ||
+      `test_user_${Date.now()}_${Math.floor(Math.random() * 1000)}@simulation.com`;
+    const name = dto?.name || 'Test User';
+    const password = dto?.password || 'password123!';
 
-    const existingNumbers = existingUsers
-      .map((user) => {
-        const match = user.email.match(/test_user_(\d+)@simulation\.com/);
-        return match ? parseInt(match[1]) : 0;
+    const [existingUser] = await tx
+      .select({
+        id: appSchema.usersTable.id,
+        email: appSchema.usersTable.email,
       })
-      .sort((a, b) => a - b);
+      .from(appSchema.usersTable)
+      .where(ilike(appSchema.usersTable.email, email))
+      .limit(1);
 
-    let nextNumber = 1;
-    if (existingNumbers.length > 0) {
-      const maxNum = existingNumbers[existingNumbers.length - 1]; //get last num = max
-      nextNumber = maxNum + 1;
+    if (existingUser) {
+      return {
+        email: existingUser.email,
+        password: password,
+      };
     }
 
-    const email = `test_user_${nextNumber}@simulation.com`;
-    const name = `Test User ${nextNumber}`;
-    const password = 'password123!';
-
-    // Create user
     const result = await auth.api.createUser({
       body: { email, password, name, role: 'user' },
     });
 
-    // Verify email
     await tx
       .update(appSchema.usersTable)
       .set({ emailVerified: true })
       .where(eq(appSchema.usersTable.id, result.user.id));
 
-    //select the university of pretoria
     const [uni] = await tx
       .select({ uniID: appSchema.University.UniversityID })
       .from(appSchema.University)
       .where(ilike(appSchema.University.UniversityName, `%Pretoria%`))
       .limit(1);
 
-    //Create role
-    await tx
-      .insert(appSchema.UniversityRole)
-      .values({
-        UserID: result.user.id,
-        UniversityID: uni.uniID,
-        role: inRole as appSchema.RoleTypeType,
-      })
-      .returning();
+    if (uni) {
+      await tx
+        .insert(appSchema.UniversityRole)
+        .values({
+          UserID: result.user.id,
+          UniversityID: uni.uniID,
+          role: inRole as appSchema.RoleTypeType,
+        })
+        .returning();
+    }
 
     return {
       email,
       password,
+      uniId: uni?.uniID,
     };
   }
 
   async deleteMockUsers(tx?: AppDatabase): Promise<DeleteMockUsersResponseDto> {
-    //Delete all users where the email is of form: test_user_%@simulation.com
     if (!tx) {
       return await this.databaseService.db.transaction(
         async (t: AppDatabase) => {

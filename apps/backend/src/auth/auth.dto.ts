@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsBoolean, IsString, IsUUID } from 'class-validator';
+import { IsBoolean, IsOptional, IsString, IsUUID } from 'class-validator';
 
 export const AUTH_ERROR_CODES = [
   'ACCOUNT_ALREADY_LINKED',
@@ -168,6 +168,12 @@ export class SignInEmailDto {
 
   @ApiProperty({ example: 'Admin@UMTAS2024!', default: 'Admin@UMTAS2024!' })
   password!: string;
+
+  @ApiPropertyOptional({
+    example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+    description: 'Optional university ID to select upon sign-in',
+  })
+  uniId?: string;
 }
 
 export class RevokeSessionDto {
@@ -346,13 +352,29 @@ export enum MockUserRole {
 }
 
 export class CreateMockUserDto {
-  @ApiProperty({
-    enum: MockUserRole,
-    enumName: 'MockUserRole',
-    description: 'Role for the mock user',
-    default: MockUserRole.STUDENT,
-  })
-  role!: MockUserRole;
+  @ApiPropertyOptional({ example: 'test_user_1@simulation.com' })
+  @IsOptional()
+  @IsString()
+  email?: string;
+
+  @ApiPropertyOptional({ example: 'Test User' })
+  @IsOptional()
+  @IsString()
+  name?: string;
+
+  @ApiPropertyOptional({ example: 'password123!' })
+  @IsOptional()
+  @IsString()
+  password?: string;
+
+  @ApiPropertyOptional({ example: 'STUDENT' })
+  @IsOptional()
+  role?: MockUserRole;
+
+  @ApiPropertyOptional({ example: 'some-uni-id' })
+  @IsOptional()
+  @IsString()
+  uniId?: string;
 }
 
 export class CreateMockUserResponseDto extends SignInEmailDto {}

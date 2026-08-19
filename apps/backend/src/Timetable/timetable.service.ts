@@ -18,13 +18,19 @@ import {
   CreateTimetableDto,
   DeleteTimetableResponseDto,
   TimetableListResponseDto,
+  TimetableListResponseDtoV2,
   TimetableResponseDto,
+  TimetableResponseDto2,
   UpdateTimetableDto,
 } from './dto/timetable.dto';
+import { EventService } from '../Events/event.service';
 
 @Injectable()
 export class TimetableService {
-  constructor(private readonly databaseService: DatabaseService) {}
+  constructor(
+    private readonly databaseService: DatabaseService,
+    private readonly eventService: EventService,
+  ) {}
 
   async createTimetable(
     userId: string,
@@ -124,12 +130,92 @@ export class TimetableService {
     return { timetables: Array.from(map.values()) };
   } //getAllTimetables
 
+  async getAllV2(userId: string): Promise<TimetableListResponseDtoV2> {
+    const timetables = await this.databaseService.db
+      .select({
+        UserTimetableID: UserTimetable.UserTimetableID,
+        timetable: Timetable,
+      })
+      .from(Timetable)
+      .innerJoin(
+        UserTimetable,
+        eq(UserTimetable.TimetableID, Timetable.timetableID),
+      )
+      .where(and(eq(UserTimetable.UserID, userId)));
+
+    const timetableList: TimetableResponseDto2[] = await Promise.all(
+      timetables.map(async (timetable) => ({
+        UserTimetableID: timetable.UserTimetableID,
+        timetable: timetable.timetable,
+        events: (
+          await this.eventService.getAllEvents(userId, {
+            timetableId: timetable.timetable.timetableID,
+          })
+        ).events,
+      })), //END_map
+    ); //END_Promise
+
+    return { timetables: timetableList };
+  }
+
   async getTimetableById(
     userId: string,
     timetableId: string,
   ): Promise<TimetableResponseDto> {
     return this.fetchTimetableWithEvents(userId, timetableId);
   } //getTimetableById
+
+  async getByIdV2(
+    userId: string,
+    timetableId: string,
+    tx?: AppDatabase,
+  ): Promise<TimetableResponseDto2> {
+    const db = tx ?? this.databaseService.db;
+
+    //Get Timetable - ensure it exists
+    const [timetable] = await db
+      .select()
+      .from(Timetable)
+      .where(eq(Timetable.timetableID, timetableId))
+      .limit(1);
+
+    if (!timetable)
+      throw new NotFoundException(`Timetable[${timetableId}] not found :(`);
+
+    //Get UserTimetableId
+    const [userTimetable] = await db
+      .select()
+      .from(UserTimetable)
+      .where(
+        and(
+          eq(UserTimetable.UserID, userId),
+          eq(UserTimetable.TimetableID, timetableId),
+        ),
+      )
+      .limit(1);
+
+    if (!userTimetable)
+      throw new NotFoundException(
+        `User[${userId}] doesn't seem to own timetable[${timetableId}]`,
+      );
+
+    //Get Events
+    const events = await this.eventService.getAllEvents(
+      userId,
+      { timetableId },
+      db,
+    );
+
+    //Return
+    return {
+      UserTimetableID: userTimetable.UserTimetableID,
+      timetable,
+      events:
+        events.events !== undefined && events.events.length != null
+          ? events.events
+          : [],
+    };
+  } //END_getByIdV2
 
   async updateTimetable(
     userId: string,

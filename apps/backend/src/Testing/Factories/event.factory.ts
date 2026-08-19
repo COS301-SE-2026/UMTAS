@@ -9,6 +9,8 @@ import {
 import { EventCriteria, EventSource } from '../../Events/dto/event.types';
 import {
   CreateEventDto,
+  CreateEventDtoV2,
+  EventCriteriaDtoV2,
   EventDto,
   EventSingleResponseDto,
 } from '../../Events/dto/EventDto.dto';
@@ -16,6 +18,7 @@ import { ActivityType } from 'shared-types';
 
 const EVENT_NAME: string = 'TestEvent';
 
+//Entity.eventCriteria has same type
 export function createEventCriteria(
   eventSource: EventSource = EventSource.UNIVERSITY,
   overrides: Partial<EventCriteria> = {},
@@ -36,6 +39,21 @@ export function createEventCriteria(
   return { ...base, ...overrides };
 } //END_createEventCriteria
 
+//Dto
+export function createEventCriteriaV2(
+  overrides: Partial<EventCriteriaDtoV2> = {},
+): EventCriteriaDtoV2 {
+  return {
+    date: '2026-01-12',
+    startTime: '08:30',
+    endTime: '10:20',
+    moduleId: randomUUID(),
+
+    ...overrides,
+  };
+} //END_createEventCriteriaV2
+
+//Entity
 type EventEntity = typeof Event.$inferSelect;
 export function createEvent(
   eventSource: EventSource = EventSource.UNIVERSITY,
@@ -99,6 +117,7 @@ export function createEventSingleResponse(
   };
 } //END_createEventSingleResponse
 
+//Dto
 export function createCreateEventDto(event: EventEntity): CreateEventDto {
   return {
     eventName: event.eventName,
@@ -109,6 +128,18 @@ export function createCreateEventDto(event: EventEntity): CreateEventDto {
     validated: event.validated,
   };
 } ///END_createCreateEventDto
+
+//Dto
+export function createCreateEventDtoV2(event: EventEntity): CreateEventDtoV2 {
+  return {
+    eventName: event.eventName,
+    activityCode: event.activityCode ?? undefined,
+    activityType: event.activityType as CreateEventDto['activityType'],
+    eventCriteria: event.eventCriteria as EventCriteriaDtoV2,
+    isRecurring: event.isRecurring,
+    validated: event.validated,
+  };
+} ///END_createCreateEventDtoV2
 
 type UniversityEvent = typeof UniversityEvent.$inferSelect;
 export function createUniversityEvent(

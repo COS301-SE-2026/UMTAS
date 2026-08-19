@@ -1,0 +1,404 @@
+fields:
+  id:
+    type: fake
+    provider: uuid4
+  email:
+    type: fake
+    provider: email
+  name:
+    type: fake
+    provider: name
+  emailVerified:
+    type: choice
+    values: [true, false]
+    weights: [0.8, 0.2]
+  image:
+    type: fake
+    provider: image_url
+  role:
+    type: choice
+    values: [student, lecturer, admin]
+    weights: [0.85, 0.10, 0.05]
+  banned:
+    type: choice
+    values: [true, false]
+    weights: [0.05, 0.95]
+  banReason:
+    type: fake
+    provider: sentence
+  banExpires:
+    type: fake
+    provider: iso8601
+  createdAt:
+    type: fake
+    provider: iso8601
+  updatedAt:
+    type: fake
+    provider: iso8601
+  token:
+    type: fake
+    provider: sha256
+  userId:
+    type: fake
+    provider: uuid4
+  expiresAt:
+    type: fake
+    provider: iso8601
+  ipAddress:
+    type: fake
+    provider: ipv4
+  userAgent:
+    type: fake
+    provider: user_agent
+  impersonatedBy:
+    type: fake
+    provider: user_name
+  user:
+    type: fake
+    provider: user_name
+  session:
+    type: fake
+    provider: sha256
+  uniId:
+    type: fake
+    provider: uuid4
+  uniRole:
+    type: choice
+    values: [undergraduate, postgraduate, staff]
+    weights: [0.7, 0.2, 0.1]
+  password:
+    type: fake
+    provider: password
+  error:
+    type: fake
+    provider: word
+  message:
+    type: fake
+    provider: sentence
+  sessionId:
+    type: fake
+    provider: uuid4
+  code:
+    type: fake
+    provider: ean8
+  newPassword:
+    type: fake
+    provider: password
+  currentPassword:
+    type: fake
+    provider: password
+  state:
+    type: choice
+    values: [active, inactive, suspended]
+    weights: [0.8, 0.15, 0.05]
+  reason:
+    type: fake
+    provider: sentence
+  banExpiresAt:
+    type: fake
+    provider: iso8601
+  colour:
+    type: fake
+    provider: hex_color
+  Core:
+    type: choice
+    values: [true, false]
+    weights: [0.5, 0.5]
+  SemesterOfStudy:
+    type: choice
+    values: [1, 2]
+    weights: [0.5, 0.5]
+  YearOfStudy:
+    type: choice
+    values: [1, 2, 3, 4]
+    weights: [0.3, 0.3, 0.2, 0.2]
+  moduleCode:
+    type: fake
+    provider: word
+  moduleName:
+    type: fake
+    provider: catch_phrase
+  moduleDescription:
+    type: fake
+    provider: sentence
+  validated:
+    type: choice
+    values: [true, false]
+    weights: [0.9, 0.1]
+  ModuleGroupingID:
+    type: fake
+    provider: uuid4
+  CourseID:
+    type: fake
+    provider: uuid4
+  CourseModuleInfo:
+    type: fake
+    provider: sentence
+  CourseModuleID:
+    type: fake
+    provider: uuid4
+  GroupModuleID:
+    type: fake
+    provider: uuid4
+  moduleID:
+    type: fake
+    provider: uuid4
+  modules:
+    type: sample
+    from: modules_list.csv
+    count: 3
+  success:
+    type: choice
+    values: [true, false]
+    weights: [0.8, 0.2]
+  UserID:
+    type: fake
+    provider: uuid4
+  styling:
+    type: fake
+    provider: word
+  UniversityID:
+    type: fake
+    provider: uuid4
+  GroupID:
+    type: fake
+    provider: uuid4
+  CourseName:
+    type: fake
+    provider: catch_phrase
+  Degree:
+    type: fake
+    provider: job
+  courses:
+    type: sample
+    from: courses_list.csv
+    count: 3
+  UniversityName:
+    type: fake
+    provider: company
+  universities:
+    type: sample
+    from: universities_list.csv
+    count: 3
+  pending:
+    type: choice
+    values: [true, false]
+    weights: [0.3, 0.7]
+  Email:
+    type: fake
+    provider: email
+  Name:
+    type: fake
+    provider: name
+  isApproved:
+    type: choice
+    values: [true, false]
+    weights: [0.7, 0.3]
+  provdedRole:
+    type: fake
+    provider: word
+  Hash:
+    type: fake
+    provider: sha256
+  eventSource:
+    type: fake
+    provider: word
+  date:
+    type: fake
+    provider: iso8601
+  dayOfWeek:
+    type: fake
+    provider: day_of_week
+  startTime:
+    type: fake
+    provider: time
+  endTime:
+    type: fake
+    provider: time
+  moduleId:
+    type: fake
+    provider: uuid4
+  venueId:
+    type: fake
+    provider: uuid4
+  venueName:
+    type: fake
+    provider: company
+  eventCriteria:
+    type: fake
+    provider: sentence
+  eventName:
+    type: fake
+    provider: catch_phrase
+  activityCode:
+    type: fake
+    provider: word
+  venues:
+    type: sample
+    from: venues_list.csv
+    count: 3
+  isRecurring:
+    type: choice
+    values: [true, false]
+    weights: [0.8, 0.2]
+  activityType:
+    type: choice
+    values: [lecture, practical, tutorial, assessment]
+    weights: [0.5, 0.2, 0.2, 0.1]
+  eventId:
+    type: fake
+    provider: uuid4
+  event:
+    type: fake
+    provider: word
+  events:
+    type: sample
+    from: events_list.csv
+    count: 3
+  timetableName:
+    type: fake
+    provider: catch_phrase
+  eventIds:
+    type: sample
+    from: eventIds_list.csv
+    count: 3
+  timetableID:
+    type: fake
+    provider: uuid4
+  UserTimetableID:
+    type: fake
+    provider: uuid4
+  timetable:
+    type: fake
+    provider: word
+  timetables:
+    type: sample
+    from: timetables_list.csv
+    count: 3
+  addEventIds:
+    type: sample
+    from: addEventIds_list.csv
+    count: 3
+  removeEventIds:
+    type: sample
+    from: removeEventIds_list.csv
+    count: 3
+  duplicate:
+    type: choice
+    values: [true, false]
+    weights: [0.1, 0.9]
+  jobId:
+    type: fake
+    provider: uuid4
+  status:
+    type: choice
+    values: [pending, running, completed, failed]
+    weights: [0.1, 0.2, 0.6, 0.1]
+  moduleGroupingId:
+    type: fake
+    provider: uuid4
+  resultAvailable:
+    type: choice
+    values: [true, false]
+    weights: [0.8, 0.2]
+  statusUrl:
+    type: fake
+    provider: url
+  title:
+    type: fake
+    provider: catch_phrase
+  warnings:
+    type: sample
+    from: warnings_list.csv
+    count: 3
+  day:
+    type: fake
+    provider: day_of_week
+  fileKey:
+    type: fake
+    provider: uuid4
+  adapterKey:
+    type: fake
+    provider: uuid4
+  result:
+    type: fake
+    provider: word
+  accepted:
+    type: choice
+    values: [true, false]
+    weights: [0.9, 0.1]
+  key:
+    type: fake
+    provider: uuid4
+  heuristics:
+    type: sample
+    from: heuristics_list.csv
+    count: 3
+  solveMode:
+    type: choice
+    values: [quick, optimal, heuristic]
+    weights: [0.6, 0.2, 0.2]
+  engine:
+    type: choice
+    values: [v1_legacy, v2_optimiser]
+    weights: [0.2, 0.8]
+  preferences:
+    type: fake
+    provider: sentence
+  selectedEventIds:
+    type: sample
+    from: selectedEventIds_list.csv
+    count: 3
+  score:
+    type: fake
+    provider: random_digit_not_null
+  conflictCount:
+    type: fake
+    provider: random_digit_not_null
+  conflicts:
+    type: sample
+    from: conflicts_list.csv
+    count: 3
+  outcome:
+    type: choice
+    values: [success, partial_success, failure]
+    weights: [0.7, 0.2, 0.1]
+  timetableSolution:
+    type: fake
+    provider: sentence
+  heuristicScores:
+    type: sample
+    from: heuristicScores_list.csv
+    count: 3
+  metadata:
+    type: fake
+    provider: sentence
+  requiredSelections:
+    type: fake
+    provider: random_digit_not_null
+  schedulingProblem:
+    type: fake
+    provider: sentence
+  requestedEngine:
+    type: choice
+    values: [v1_legacy, v2_optimiser]
+    weights: [0.2, 0.8]
+  completedAt:
+    type: fake
+    provider: iso8601
+  failedAt:
+    type: fake
+    provider: iso8601
+  eventID:
+    type: fake
+    provider: uuid4
+  eventDate:
+    type: fake
+    provider: iso8601
+  AttendanceID:
+    type: fake
+    provider: uuid4
+  attendanceList:
+    type: sample
+    from: attendanceList_list.csv
+    count: 3

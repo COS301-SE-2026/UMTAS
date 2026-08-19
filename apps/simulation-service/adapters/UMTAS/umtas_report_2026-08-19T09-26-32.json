@@ -1,0 +1,39 @@
+{
+  "metadata": {
+    "adapter_name": "umtas",
+    "population": 50,
+    "timestamp": "2026-08-19T09-26-32"
+  },
+  "summary": {
+    "request_type": "",
+    "total_requests": 50,
+    "total_failures": 50,
+    "median_response_time_ms": 18.0,
+    "avg_response_time_ms": 19.49652166105807,
+    "min_response_time_ms": 6.493458990007639,
+    "max_response_time_ms": 34.124875004636124,
+    "requests_per_second": 12.414798740921633,
+    "failures_per_second": 12.414798740921633,
+    "p95_response_time_ms": 32.0,
+    "p99_response_time_ms": 34.0
+  },
+  "endpoints": [
+    {
+      "method": "POST",
+      "name": "/api/auth/admin/create-mock-user",
+      "request_count": 50,
+      "failure_count": 50,
+      "median_response_time_ms": 18.0,
+      "avg_response_time_ms": 19.49652166105807,
+      "requests_per_second": 12.414798740921633
+    }
+  ],
+  "failures": [
+    {
+      "method": "POST",
+      "name": "/api/auth/admin/create-mock-user",
+      "error": "HTTPError('500 Server Error: Internal Server Error for url: /api/auth/admin/create-mock-user')",
+      "occurrences": 50
+    }
+  ]
+}

@@ -28,12 +28,16 @@ import {
   SmallGapsPref,
   StartTimePref,
 } from "@/components/molecules/solver/PreferenceHandler";
+import { getAllTimetablesQ } from "@/components/templates/builder/Queries/timetableQueries";
 type solverProps = {
   modules: ModuleResponseDto[];
-  events: EventResponse[];
+  onJobCompleteAction?: () => void;
 };
 
-export default function SolverPreferences({ modules, events }: solverProps) {
+export default function SolverPreferences({
+  modules,
+  onJobCompleteAction,
+}: solverProps) {
   const [currentMode, setCurrentMode] = useState<
     "feasibility" | "optimization"
   >("feasibility");
@@ -158,12 +162,14 @@ export default function SolverPreferences({ modules, events }: solverProps) {
     mutationFn: async () => {
       console.log(createPreferences());
       const builder = new createSolverJobBuilder();
-      const eventIDS = events.map((event) => event.eventId);
+      const eventIDs = modules.flatMap(
+        (module) => module.Events?.map((event) => event.eventId) ?? [],
+      );
       return await builder.send({
         body: {
           engine: "auto",
           solveMode: currentMode,
-          eventIds: eventIDS,
+          eventIds: eventIDs,
           preferences: {
             heuristics: createPreferences(),
           },
@@ -219,6 +225,10 @@ export default function SolverPreferences({ modules, events }: solverProps) {
         setJobID(null);
         getQueryClient().setQueryData(["solver", "poll"], null);
         if (timetableCreated === false) {
+          getQueryClient().invalidateQueries({
+            queryKey: getAllTimetablesQ().queryKey,
+          });
+          onJobCompleteAction?.();
           router.push("\schedules");
         }
       }
