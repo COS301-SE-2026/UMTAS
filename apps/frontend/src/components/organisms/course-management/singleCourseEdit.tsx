@@ -14,10 +14,7 @@ import { useMutation } from "@tanstack/react-query";
 import { ReactNode, useState } from "react";
 
 // a simple div that is given a course and lets a user update
-interface StateHolder {
-  course: CourseDTO;
-  updateCourse: (key: keyof CourseDTO, value: string) => void;
-}
+
 export default function CourseCustimisation({
   data,
   children,
@@ -59,12 +56,12 @@ export default function CourseCustimisation({
 }
 
 interface CourseInputProps {
-  field: keyof CourseDTO;
+  field: keyof Omit<CourseDTO, "Modules">;
   state: StateHolder;
 }
 interface StateHolder {
-  course: CourseDTO;
-  updateCourse: (key: keyof CourseDTO, value: string) => void;
+  course: Omit<CourseDTO, "Modules">;
+  updateCourse: (key: keyof Omit<CourseDTO, "Modules">, value: string) => void;
 }
 
 function CourseInput({ field, state }: CourseInputProps) {

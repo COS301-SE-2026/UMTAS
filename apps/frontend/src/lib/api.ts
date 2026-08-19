@@ -261,6 +261,43 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/auth/admin/create-mock-user": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Create a new mock user
+     * @description Create a mock user, authorise their email, sign in, return user and session information
+     */
+    post: operations["adminCreateMockUser"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/auth/admin/delete-mock-users": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** Delete all mock users */
+    delete: operations["adminDeleteMockUsers"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/auth/admin/impersonate-user": {
     parameters: {
       query?: never;
@@ -372,13 +409,33 @@ export interface paths {
      * Get all modules with filters
      * @description Filter by userId(enrolled) | courseId(course owned) | universityId(modules for university over all courses). At least one filter required
      */
-    get: operations["ModuleController_getAll"];
+    get: operations["getAllModules"];
     put?: never;
     /**
      * Create a module
      * @description Create a new module and link to appropriate course
      */
     post: operations["ModuleController_createModule"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/modules/v2": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get all modules with filters - V2
+     * @description Filter by userId(enrolled) | courseId(course owned) | universityId(modules for university over all courses). At least one filter required
+     */
+    get: operations["getAllModulesV2"];
+    put?: never;
+    post?: never;
     delete?: never;
     options?: never;
     head?: never;
@@ -413,6 +470,26 @@ export interface paths {
     patch: operations["updateModule"];
     trace?: never;
   };
+  "/api/modules/v2/{moduleId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get a module by ID - V2
+     * @description Return a module from its moduleID
+     */
+    get: operations["getModuleByIdV2"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/modules/enroll/{moduleId}": {
     parameters: {
       query?: never;
@@ -427,7 +504,8 @@ export interface paths {
     delete?: never;
     options?: never;
     head?: never;
-    patch?: never;
+    /** Enrol student to module - V2 */
+    patch: operations["enrolStudentToModuleV2"];
     trace?: never;
   };
   "/api/modules/{CourseID}": {
@@ -501,6 +579,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/Courses/v2/getAll": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get all courses - V2 */
+    get: operations["getCoursesV2"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/Courses/{CourseId}": {
     parameters: {
       query?: never;
@@ -518,6 +613,23 @@ export interface paths {
     head?: never;
     /** Update an Course */
     patch: operations["updateCourse"];
+    trace?: never;
+  };
+  "/api/Courses/v2/{CourseId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** get a Course by ID - V2 */
+    get: operations["getCourseByIdV2"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
     trace?: never;
   };
   "/api/universities": {
@@ -655,6 +767,23 @@ export interface paths {
     patch: operations["populateGroup"];
     trace?: never;
   };
+  "/api/events/v2": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Create an event - V2 */
+    post: operations["createEventV2"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/events": {
     parameters: {
       query?: never;
@@ -708,6 +837,23 @@ export interface paths {
     patch: operations["updateEvent"];
     trace?: never;
   };
+  "/api/events/validate/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** Validate an event */
+    patch: operations["validateEvent"];
+    trace?: never;
+  };
   "/api/timetables": {
     parameters: {
       query?: never;
@@ -720,6 +866,23 @@ export interface paths {
     put?: never;
     /** Create a timetable - user owned */
     post: operations["createTimetable"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/timetables/v2": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get all timetables */
+    get: operations["getAllTimetablesV2"];
+    put?: never;
+    post?: never;
     delete?: never;
     options?: never;
     head?: never;
@@ -743,6 +906,23 @@ export interface paths {
     head?: never;
     /** Update a timetable */
     patch: operations["updateTimetable"];
+    trace?: never;
+  };
+  "/api/timetables/v2/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get timetable by ID */
+    get: operations["getTimetableByIdV2"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
     trace?: never;
   };
   "/api/builder": {
@@ -1213,6 +1393,22 @@ export interface components {
     AuthUserResponseDto: {
       user: components["schemas"]["AuthUserDto"];
     };
+    /**
+     * @description Role for the mock user
+     * @enum {string}
+     */
+    MockUserRole: "STUDENT" | "LECTURER" | "UNIVERSITY_ADMIN" | "SYS_ADMIN";
+    CreateMockUserDto: {
+      /**
+       * @description Role for the mock user
+       * @default STUDENT
+       */
+      role: components["schemas"]["MockUserRole"];
+    };
+    DeleteMockUsersResponseDto: {
+      success: Record<string, never>;
+      message: string;
+    };
     AdminImpersonateUserDto: {
       /**
        * @description UUID of the user to impersonate
@@ -1363,6 +1559,50 @@ export interface components {
        */
       YearOfStudy?: number | null;
     };
+    EventCriteriaDto: {
+      /** @enum {string} */
+      eventSource: "university" | "personal";
+      /**
+       * @description Required when the event is not recurring.
+       * @example 2026-02-17
+       */
+      date?: string;
+      /**
+       * @description Required when the event is recurring.
+       * @enum {string}
+       */
+      dayOfWeek?:
+        | "monday"
+        | "tuesday"
+        | "wednesday"
+        | "thursday"
+        | "friday"
+        | "saturday"
+        | "sunday";
+      /** @example 08:30 */
+      startTime: string;
+      /** @example 10:20 */
+      endTime: string;
+      /** Format: uuid */
+      moduleId?: string;
+    };
+    VenueDto: {
+      /** Format: uuid */
+      venueId: string;
+      venueName: string;
+    };
+    EventDto: {
+      /** Format: uuid */
+      eventId: string;
+      eventName?: string;
+      activityCode?: string | null;
+      /** @enum {string} */
+      activityType?: "lecture" | "tutorial" | "prac" | "test" | "exam";
+      eventCriteria: components["schemas"]["EventCriteriaDto"];
+      isRecurring?: boolean;
+      validated?: boolean;
+      venues?: components["schemas"]["VenueDto"][];
+    };
     ModuleSingleResponseDto: {
       /**
        * Format: uuid
@@ -1409,6 +1649,8 @@ export interface components {
        * @example true
        */
       validated?: boolean;
+      /** @description List of events for the module */
+      Events?: components["schemas"]["EventDto"][] | null;
       /**
        * Format: uuid
        * @description Unique identifier for a module group
@@ -1419,6 +1661,8 @@ export interface components {
     ModuleListResponseDto: {
       /** @description List of modules */
       modules: components["schemas"]["ModuleSingleResponseDto"][];
+      /** @description Short message indicating  success of response. */
+      message?: string;
     };
     UpdateModuleDto: {
       /**
@@ -1448,6 +1692,8 @@ export interface components {
        * @example true
        */
       validated?: boolean;
+      /** @description List of events for the module */
+      Events?: components["schemas"]["EventDto"][] | null;
       /**
        * Format: uuid
        * @description ID to identify course owning this CourseModule
@@ -1492,6 +1738,10 @@ export interface components {
        */
       message: string;
       UserID: string;
+    };
+    EnrollToModuleDto: {
+      /** @description Enroll or unenroll */
+      enroll?: boolean;
     };
     AddModulesToCourseDto: {
       /**
@@ -1559,6 +1809,55 @@ export interface components {
        */
       Degree?: string | null;
     };
+    ModulesDto: {
+      /**
+       * Format: uuid
+       * @description Unique identifier for a module
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      moduleID: string;
+      /**
+       * @description Module code used by the university
+       * @example COS332
+       */
+      moduleCode: string;
+      /**
+       * @description Name of the module
+       * @example Computer Networks
+       */
+      moduleName: string;
+      /**
+       * @description Short module description
+       * @example Introduction to computer networking concepts
+       */
+      moduleDescription?: string | null;
+      /**
+       * @description Styling to be used for a Module
+       * @example {
+       *       "colour": "FFFFF"
+       *     }
+       */
+      styling?: components["schemas"]["StylingDto"] | null;
+      /**
+       * @description Metadata attached to module when owned by course
+       * @example {
+       *       "CourseModuleID": "00000000-0000-0000-0000-000000000000",
+       *       "GroupModuleID": "00000000-0000-0000-0000-000000000000",
+       *       "CourseID": "00000000-0000-0000-0000-000000000000",
+       *       "core": true,
+       *       "SemesterOfStudy": "Semester 1",
+       *       "YearOfStudy": 1
+       *     }
+       */
+      CourseModuleInfo?: components["schemas"]["CourseModuleDto"] | null;
+      /**
+       * @description Whether the module has been approved by a university admin
+       * @example true
+       */
+      validated?: boolean;
+      /** @description List of events for the module */
+      Events?: components["schemas"]["EventDto"][] | null;
+    };
     CourseSingleResponseDto: {
       /**
        * Format: uuid
@@ -1588,6 +1887,8 @@ export interface components {
        * @example Bachelor of Science
        */
       Degree?: string | null;
+      /** @description Modules for the course. */
+      Modules?: components["schemas"]["ModulesDto"][] | null;
     };
     CourseFilters: {
       /**
@@ -1636,10 +1937,13 @@ export interface components {
        * @example Bachelor of Science
        */
       Degree?: string | null;
+      /** @description Modules for the course. */
+      Modules?: components["schemas"]["ModulesDto"][] | null;
     };
     CourseListResponseDto: {
       /** @description List of courses */
       courses: components["schemas"]["CourseDto"][];
+      message?: string;
     };
     UpdateCourseDto: {
       /**
@@ -1664,6 +1968,8 @@ export interface components {
        * @example Bachelor of Science
        */
       Degree?: string | null;
+      /** @description Modules for the course. */
+      Modules?: components["schemas"]["ModulesDto"][] | null;
     };
     DeleteCourseResponseDto: {
       /**
@@ -1891,9 +2197,7 @@ export interface components {
       Hash?: string | null;
       modules?: string[];
     };
-    EventCriteriaDto: {
-      /** @enum {string} */
-      eventSource: "university" | "personal";
+    EventCriteriaDtoV2: {
       /**
        * @description Required when the event is not recurring.
        * @example 2026-02-17
@@ -1912,44 +2216,41 @@ export interface components {
         | "saturday"
         | "sunday";
       /** @example 08:30 */
-      startTime: string;
+      startTime?: string;
       /** @example 10:20 */
-      endTime: string;
-      /** Format: uuid */
-      moduleId?: string;
+      endTime?: string;
+      /**
+       * Format: uuid
+       * @description moduleId required in V2 - whomp whomp
+       * @default false
+       */
+      moduleId: string;
     };
-    VenueDto: {
-      /** Format: uuid */
-      venueId: string;
-      venueName: string;
-    };
-    CreateEventDto: {
-      eventCriteria: components["schemas"]["EventCriteriaDto"];
+    CreateEventDtoV2: {
       eventName?: string;
       activityCode?: string | null;
-      venues?: components["schemas"]["VenueDto"][];
+      /** @enum {string} */
+      activityType?: "lecture" | "tutorial" | "prac" | "test" | "exam";
       isRecurring?: boolean;
       validated?: boolean;
+      venues?: components["schemas"]["VenueDto"][];
+      eventCriteria: components["schemas"]["EventCriteriaDtoV2"];
+    };
+    EventSingleResponseDto: {
+      event: components["schemas"]["EventDto"];
+    };
+    CreateEventDto: {
+      eventName?: string;
+      activityCode?: string | null;
+      eventCriteria: components["schemas"]["EventCriteriaDto"];
+      isRecurring?: boolean;
+      validated?: boolean;
+      venues?: components["schemas"]["VenueDto"][];
       /**
        * @description Required when eventCriteria.moduleId is provided.
        * @enum {string}
        */
       activityType?: "lecture" | "tutorial" | "prac" | "test" | "exam";
-    };
-    EventDto: {
-      /** Format: uuid */
-      eventId: string;
-      eventCriteria: components["schemas"]["EventCriteriaDto"];
-      eventName?: string;
-      /** @enum {string} */
-      activityType?: "lecture" | "tutorial" | "prac" | "test" | "exam";
-      activityCode?: string | null;
-      venues?: components["schemas"]["VenueDto"][];
-      isRecurring?: boolean;
-      validated?: boolean;
-    };
-    EventSingleResponseDto: {
-      event: components["schemas"]["EventDto"];
     };
     EventListResponseDto: {
       events: components["schemas"]["EventDto"][];
@@ -1983,9 +2284,9 @@ export interface components {
     };
     UpdateEventDto: {
       eventName?: string;
+      activityCode?: string | null;
       /** @enum {string} */
       activityType?: "lecture" | "tutorial" | "prac" | "test" | "exam";
-      activityCode?: string | null;
       isRecurring?: boolean;
       validated?: boolean;
       eventCriteria?: components["schemas"]["UpdateEventCriteriaDto"];
@@ -1994,6 +2295,13 @@ export interface components {
       eventName?: string;
       activityCode?: string | null;
       success: boolean;
+    };
+    ValidateEventDto: {
+      validated?: boolean;
+    };
+    ValidateEventResponseDto: {
+      event: components["schemas"]["EventDto"];
+      message?: string;
     };
     CreateTimetableDto: {
       /**
@@ -3043,6 +3351,50 @@ export interface operations {
       };
     };
   };
+  adminCreateMockUser: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateMockUserDto"];
+      };
+    };
+    responses: {
+      /** @description Success */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CreateMockUserDto"];
+        };
+      };
+    };
+  };
+  adminDeleteMockUsers: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Success */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DeleteMockUsersResponseDto"];
+        };
+      };
+    };
+  };
   adminImpersonateUser: {
     parameters: {
       query?: never;
@@ -3254,7 +3606,7 @@ export interface operations {
       };
     };
   };
-  ModuleController_getAll: {
+  getAllModules: {
     parameters: {
       query?: {
         /** @description Filter by university ID - returns all modules across all courses in the university */
@@ -3330,6 +3682,44 @@ export interface operations {
       };
       /** @description Module code already exists for course */
       409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getAllModulesV2: {
+    parameters: {
+      query?: {
+        /** @description Filter by university ID - returns all modules across all courses in the university */
+        universityId?: string;
+        /** @description Filter by course ID - returns all modules in the course */
+        courseId?: string;
+        /** @description Filter by ModuleGrouping ID */
+        GroupID?: string;
+        /** @description Filter by code, makes use of wildcard search */
+        moduleCode?: string;
+        /** @description Choose to filter modules based of current user enrollments */
+        userEnrollment?: boolean;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Modules returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ModuleListResponseDto"];
+        };
+      };
+      /** @description Invalid filters */
+      400: {
         headers: {
           [name: string]: unknown;
         };
@@ -3456,6 +3846,42 @@ export interface operations {
       };
     };
   };
+  getModuleByIdV2: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        moduleId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Module returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ModuleSingleResponseDto"];
+        };
+      };
+      /** @description Invalid module ID */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Module not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   enrolStudentToModule: {
     parameters: {
       query?: never;
@@ -3466,6 +3892,48 @@ export interface operations {
       cookie?: never;
     };
     requestBody?: never;
+    responses: {
+      /** @description Student successfully enrolled student into module */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["EnrolResponseDto"];
+        };
+      };
+      /** @description Unenrolled user from module */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["EnrolResponseDto"];
+        };
+      };
+      /** @description Module not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  enrolStudentToModuleV2: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        moduleId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["EnrollToModuleDto"];
+      };
+    };
     responses: {
       /** @description Student successfully enrolled student into module */
       200: {
@@ -3627,12 +4095,32 @@ export interface operations {
           "application/json": components["schemas"]["CourseListResponseDto"];
         };
       };
-      /** @description No Courses found */
-      404: {
+    };
+  };
+  getCoursesV2: {
+    parameters: {
+      query?: {
+        /** @description Unique identifier for a university */
+        UniversityID?: string;
+        /** @description Name of the course */
+        CourseName?: string;
+        /** @description Filter by Degree */
+        Degree?: string | null;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Courses returned successfully */
+      200: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          "application/json": components["schemas"]["CourseListResponseDto"];
+        };
       };
     };
   };
@@ -3733,6 +4221,42 @@ export interface operations {
         };
       };
       /** @description Invalid update payload or CourseId */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Course not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getCourseByIdV2: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        CourseId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Course returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CourseSingleResponseDto"];
+        };
+      };
+      /** @description Invalid Course ID */
       400: {
         headers: {
           [name: string]: unknown;
@@ -4126,10 +4650,36 @@ export interface operations {
       };
     };
   };
+  createEventV2: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateEventDtoV2"];
+      };
+    };
+    responses: {
+      /** @description Event created successfully */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["EventSingleResponseDto"];
+        };
+      };
+    };
+  };
   getAllEvents: {
     parameters: {
       query?: {
         moduleId?: string;
+        timetableId?: string;
+        all?: boolean;
       };
       header?: never;
       path?: never;
@@ -4354,6 +4904,39 @@ export interface operations {
       };
     };
   };
+  validateEvent: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ValidateEventDto"];
+      };
+    };
+    responses: {
+      /** @description Event[${updated.eventName}] validated=[${updated.validated}] */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ValidateEventResponseDto"];
+        };
+      };
+      /** @description Event not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   getAllTimetables: {
     parameters: {
       query?: never;
@@ -4426,6 +5009,33 @@ export interface operations {
       };
     };
   };
+  getAllTimetablesV2: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Timetables fetched successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TimetableListResponseDto"];
+        };
+      };
+      /** @description No active session */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   getTimetableById: {
     parameters: {
       query?: never;
@@ -4446,13 +5056,6 @@ export interface operations {
         content: {
           "application/json": components["schemas"]["TimetableResponseDto"];
         };
-      };
-      /** @description No active session */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
       };
       /** @description Timetable not found */
       404: {
@@ -4555,6 +5158,36 @@ export interface operations {
       };
       /** @description Timetable was not updated */
       500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getTimetableByIdV2: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Timetable ID */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Timetable fetched successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TimetableResponseDto"];
+        };
+      };
+      /** @description Timetable[] not found */
+      404: {
         headers: {
           [name: string]: unknown;
         };
