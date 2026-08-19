@@ -13,15 +13,15 @@ import SolverReviewCard from "@/components/molecules/solver/SolverReviewCard";
 
 interface SolverReviewProps {
   modules: ModuleResponseDto[];
-  events: EventResponse[];
+
   onComplete: () => void;
 }
 
 export default function SolverReview({
-  events,
   modules,
   onComplete,
 }: SolverReviewProps) {
+  console.log(modules, "From solver review");
   return (
     <>
       <Card className="shadow-lg border-[var(--border)] rounded-xl bg-[var(--bg-surface)] w-full h-full flex flex-col">
@@ -36,11 +36,7 @@ export default function SolverReview({
           className="flex flex-col flex-1 overflow-hidden space-y-4"
         >
           <div className="flex-1 overflow-y-auto pr-2">
-            <SolverReviewCard
-              events={events}
-              modules={modules}
-              onUpdateEvents={() => {}}
-            />
+            <SolverReviewCard modules={modules} onUpdateEvents={() => {}} />
           </div>
           <div className="mt-auto shrink-0 pt-2">
             <Button

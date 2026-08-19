@@ -30,10 +30,9 @@ import {
 } from "@/components/molecules/solver/PreferenceHandler";
 type solverProps = {
   modules: ModuleResponseDto[];
-  events: EventResponse[];
 };
 
-export default function SolverPreferences({ modules, events }: solverProps) {
+export default function SolverPreferences({ modules }: solverProps) {
   const [currentMode, setCurrentMode] = useState<
     "feasibility" | "optimization"
   >("feasibility");
@@ -158,12 +157,14 @@ export default function SolverPreferences({ modules, events }: solverProps) {
     mutationFn: async () => {
       console.log(createPreferences());
       const builder = new createSolverJobBuilder();
-      const eventIDS = events.map((event) => event.eventId);
+      const eventIDs = modules.flatMap(
+        (module) => module.Events?.map((event) => event.eventId) ?? [],
+      );
       return await builder.send({
         body: {
           engine: "auto",
           solveMode: currentMode,
-          eventIds: eventIDS,
+          eventIds: eventIDs,
           preferences: {
             heuristics: createPreferences(),
           },

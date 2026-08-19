@@ -11,9 +11,12 @@ export type getAllModulesV2Resp =
 export function fetchAllModulesv2(
   params: getAllModulesV2Params,
 ): Promise<getAllModulesV2Resp> {
-  return api
+  const result = api
     .get("modules/v2", {
       searchParams: params,
     })
     .json<getAllModulesV2Resp>();
+
+  console.log(result);
+  return result;
 }

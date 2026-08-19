@@ -63,19 +63,6 @@ export default function SolverShell() {
     },
     enabled: moduleGroupingID != null,
   });
-  const displayMods = modulesData?.filter((mod) => {
-    return mod.ModuleGroupingID == moduleGroupingID;
-  });
-  const eventQueries = useQueries({
-    queries: (displayMods ?? []).map((mod) => ({
-      ...getAllEventsAdminQ(mod.moduleID),
-      enabled: !!mod.moduleID,
-    })),
-  });
-  if (showSelectUni === true && UserDetails.getUniDetails()?.role) {
-    SetSelectUni(false);
-  }
-  const events: EventResponse[] = eventQueries.map((q) => q.data ?? []).flat();
 
   function handleStepCompleted(fromStep: number) {
     setComingFromStep(fromStep);
@@ -129,18 +116,14 @@ export default function SolverShell() {
         >
           <SolverLock locked={currentStep < 1} loading={comingFromStep === 0}>
             <SolverReview
-              events={events}
-              modules={displayMods as ModuleResponseDto[]}
+              modules={modulesData as ModuleResponseDto[]}
               onComplete={() => handleStepCompleted(1)}
             />
           </SolverLock>
         </div>
         <div className="flex w-120 h-110 justify-center">
           <SolverLock locked={currentStep < 2} loading={comingFromStep === 1}>
-            <SolverPreferences
-              modules={displayMods as ModuleResponseDto[]}
-              events={events}
-            />
+            <SolverPreferences modules={modulesData as ModuleResponseDto[]} />
           </SolverLock>
         </div>
       </div>

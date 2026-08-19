@@ -16,13 +16,13 @@ import {
 
 interface SolverReviewProps {
   modules: ModuleResponseDto[];
-  events: EventResponse[];
+
   onUpdateEvents: React.Dispatch<React.SetStateAction<EventResponse[]>>;
 }
 
 export default function SolverReviewCard({
   modules,
-  events,
+
   onUpdateEvents,
 }: SolverReviewProps) {
   const [selectedEvent, setSelectedEvent] = useState<EventResponse | null>(
@@ -85,70 +85,74 @@ export default function SolverReviewCard({
 
   return (
     <>
-      {events.map((event) => {
-        const isSelected = selectedEvent?.eventId === event.eventId;
-        const eventChange =
-          tempEvent && JSON.stringify(tempEvent) !== JSON.stringify(event);
+      {modules.map((module) => {
+        module?.Events?.map((event) => {
+          const isSelected = selectedEvent?.eventId === event.eventId;
+          const eventChange =
+            tempEvent && JSON.stringify(tempEvent) !== JSON.stringify(event);
 
-        return (
-          <div key={event.eventId} className="space-y-2 border-b pb-4  ">
-            <CustomiseEventPanel
-              event={isSelected && tempEvent ? tempEvent : event}
-              modules={modules}
-              onClick={() => handleSelect(event)}
-            />
+          return (
+            <div key={event.eventId} className="space-y-2 border-b pb-4  ">
+              <CustomiseEventPanel
+                event={isSelected && tempEvent ? tempEvent : event}
+                modules={modules}
+                onClick={() => handleSelect(event)}
+              />
 
-            <AlertDialog
-              open={isSelected}
-              onOpenChange={(open) => {
-                if (!open) {
-                  setSelectedEvent(null);
-                  setTempEvent(null);
-                }
-              }}
-            >
-              <AlertDialogContent className="w-max max-w-[50vw] p-6">
-                <AlertDialogHeader className="flex flex-row justify-between items-center border-b pb-2">
-                  <AlertDialogTitle className="text-xl font-bold">
-                    Review your Events
-                  </AlertDialogTitle>
-                  <AlertDialogCancel className="mt-0">Close</AlertDialogCancel>
-                </AlertDialogHeader>
+              <AlertDialog
+                open={isSelected}
+                onOpenChange={(open) => {
+                  if (!open) {
+                    setSelectedEvent(null);
+                    setTempEvent(null);
+                  }
+                }}
+              >
+                <AlertDialogContent className="w-max max-w-[50vw] p-6">
+                  <AlertDialogHeader className="flex flex-row justify-between items-center border-b pb-2">
+                    <AlertDialogTitle className="text-xl font-bold">
+                      Review your Events
+                    </AlertDialogTitle>
+                    <AlertDialogCancel className="mt-0">
+                      Close
+                    </AlertDialogCancel>
+                  </AlertDialogHeader>
 
-                <div className="py-4 overflow-auto max-h-[80vh] ">
-                  <div className="pl-4 space-y-2">
-                    {tempEvent && (
-                      <NoPermissionsEventCard
-                        event={tempEvent}
-                        modules={modules}
-                        onUpdate={handleUpdate}
-                      />
-                    )}
+                  <div className="py-4 overflow-auto max-h-[80vh] ">
+                    <div className="pl-4 space-y-2">
+                      {tempEvent && (
+                        <NoPermissionsEventCard
+                          event={tempEvent}
+                          modules={modules}
+                          onUpdate={handleUpdate}
+                        />
+                      )}
+                    </div>
                   </div>
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    disabled={!eventChange}
-                    onClick={handleSave}
-                  >
-                    Save & Close
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="destructive"
-                    disabled={!eventChange}
-                    onClick={() => {
-                      setTempEvent(selectedEvent);
-                    }}
-                  >
-                    Discard & Close
-                  </Button>
-                </div>
-              </AlertDialogContent>
-            </AlertDialog>
-          </div>
-        );
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      disabled={!eventChange}
+                      onClick={handleSave}
+                    >
+                      Save & Close
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      disabled={!eventChange}
+                      onClick={() => {
+                        setTempEvent(selectedEvent);
+                      }}
+                    >
+                      Discard & Close
+                    </Button>
+                  </div>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
+          );
+        });
       })}
     </>
   );

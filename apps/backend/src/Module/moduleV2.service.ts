@@ -60,7 +60,7 @@ export class ModuleServiceV2 extends ModuleService {
 
     if (uniId) conditions.push(eq(Course.UniversityID, uniId));
     if (courseId) conditions.push(eq(CourseModule.CourseID, courseId));
-    if (groupId) conditions.push(eq(Course.GroupID, groupId));
+    if (groupId) conditions.push(eq(GroupModules.GroupID, groupId));
     if (moduleCode)
       conditions.push(ilike(modules.moduleCode, `%${moduleCode}%`));
     if (enroll) conditions.push(eq(ModuleEnrollment.UserID, userId));
