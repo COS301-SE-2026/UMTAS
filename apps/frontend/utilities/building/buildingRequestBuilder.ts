@@ -5,6 +5,8 @@ export type getAllBuildingsPath =
   paths["/api/buildings"]["get"]["parameters"]["path"];
 export type getAllBuildingsRes =
   paths["/api/buildings"]["get"]["responses"]["200"]["content"]["application/json"];
+export type getAllBuildingsQuery =
+  paths["/api/buildings"]["get"]["parameters"]["query"];
 
 export type createBuildingBody =
   paths["/api/buildings"]["post"]["requestBody"]["content"]["application/json"];
@@ -14,7 +16,7 @@ export type createBuildingRes =
   paths["/api/buildings"]["post"]["responses"]["201"]["content"]["application/json"];
 
 export class getAllBuildingsBuilder extends RequestBuilder<
-  getAllBuildingsPath,
+  getAllBuildingsQuery,
   undefined,
   getAllBuildingsRes
 > {

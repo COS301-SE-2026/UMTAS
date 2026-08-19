@@ -5,6 +5,8 @@ export type getAllVenuesPath =
   paths["/api/venues"]["get"]["parameters"]["path"];
 export type getAllVenuesRes =
   paths["/api/venues"]["get"]["responses"]["200"]["content"]["application/json"];
+export type getAllVenuesQuery =
+  paths["/api/venues"]["get"]["parameters"]["query"];
 
 export type assignVenueBody =
   paths["/api/venues/{venueId}/building"]["patch"]["requestBody"]["content"]["application/json"];
@@ -21,7 +23,7 @@ export type bulkAssignVenueRes =
   paths["/api/venues/assign"]["post"]["responses"]["200"]["content"]["application/json"];
 
 export class getAllVenuesBuilder extends RequestBuilder<
-  getAllVenuesPath,
+  getAllVenuesQuery,
   undefined,
   getAllVenuesRes
 > {

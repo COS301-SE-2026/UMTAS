@@ -7,20 +7,22 @@ import {
   bulkAssignVenueBody,
   bulkAssignVenueBuilder,
   getAllVenuesBuilder,
+  getAllVenuesQuery,
 } from "./venueRequestBuilder";
 
-export function getAllVenuesQ() {
+export function getAllVenuesQ(query?: getAllVenuesQuery) {
   return queryOptions({
-    queryKey: ["venues"] as const,
+    queryKey: ["venues", query] as const,
     queryFn: async () => {
-      const result = (await new getAllVenuesBuilder().send({})).venues;
+      const result = (await new getAllVenuesBuilder().send({ paths: query }))
+        .venues;
       console.log(result, "Sent venues ");
       return result;
     },
   });
 }
 
-export function assignVenueQ() {
+export function assignVenueMut() {
   return mutationOptions({
     mutationFn: async (vars: {
       body: assignVenueBody;
@@ -43,7 +45,7 @@ export function assignVenueQ() {
   });
 }
 
-export function bulkAssignVenueQ() {
+export function bulkAssignVenueMut() {
   return mutationOptions({
     mutationFn: async (vars: { body: bulkAssignVenueBody }) => {
       console.log(vars.body);
