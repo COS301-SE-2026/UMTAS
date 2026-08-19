@@ -1,0 +1,134 @@
+apps/backend/jest.config.ts
+  h_2d4b3dca70a3d8 5,17,19-20,22,41
+apps/backend/nest-cli.json
+  h_2d4b3dca70a3d8 8-10
+apps/backend/src/Attendance/attendance.service.spec.ts
+  h_2d4b3dca70a3d8 296
+apps/backend/src/Builder/builder.controller.ts
+  h_2d4b3dca70a3d8 2-6,29-30,35-38,40,186-211
+apps/backend/src/Builder/builder.module.ts
+  h_2d4b3dca70a3d8 7-8,11,13-14
+apps/backend/src/Builder/builder.service.ts
+  h_2d4b3dca70a3d8 33-36,153,188,225
+apps/backend/src/Builder/builderV2.service.ts
+  h_2d4b3dca70a3d8 1-125
+apps/backend/src/Builder/dto/builder.dto.ts
+  h_2d4b3dca70a3d8 1,9,35-45
+apps/backend/src/Course/course.controller.ts
+  h_2d4b3dca70a3d8 21,32-34,39-42,91-114,141-167
+apps/backend/src/Course/course.module.ts
+  h_2d4b3dca70a3d8 6-7,10-14,16-17
+apps/backend/src/Course/course.service.ts
+  h_2d4b3dca70a3d8 35-36,38
+apps/backend/src/Course/courseV2.service.ts
+  h_2d4b3dca70a3d8 1-95
+apps/backend/src/Course/dto/course.dto.ts
+  h_2d4b3dca70a3d8 3,9,12-13,60-70,97-98
+apps/backend/src/Events/dto/EventDto.dto.ts
+  h_2d4b3dca70a3d8 8,62-79,88-91,97,103-104,106-113,118,123-128,131-138,160-174,186-188,201-208,210-219
+apps/backend/src/Events/event-import-fingerprint.service.ts
+  h_2d4b3dca70a3d8 10,42
+apps/backend/src/Events/event.controller.ts
+  h_2d4b3dca70a3d8 21-23,30,35-61,124-125,235-257
+apps/backend/src/Events/event.module.ts
+  h_2d4b3dca70a3d8 1,8-9,12,14-25
+apps/backend/src/Events/event.service.spec.ts
+  h_2d4b3dca70a3d8 17,28,57-58,70,81
+apps/backend/src/Events/event.service.ts
+  h_2d4b3dca70a3d8 4-5,26,43,48-52,94,98-106,550-568,623,655,722-761
+apps/backend/src/Events/eventV2.service.spec.ts
+  h_2d4b3dca70a3d8 1-296
+apps/backend/src/Events/eventV2.service.ts
+  h_2d4b3dca70a3d8 1-389
+apps/backend/src/Module/dto/module.dto.ts
+  h_2d4b3dca70a3d8 12,22,165,174-184,250-255,299,308,312-320,375-397
+apps/backend/src/Module/module.controller.ts
+  h_2d4b3dca70a3d8 7,33,38-41,78,100-124,153-182,274-303
+apps/backend/src/Module/module.module.ts
+  h_2d4b3dca70a3d8 1,6-7,10-14,16-17
+apps/backend/src/Module/module.service.ts
+  h_2d4b3dca70a3d8 7-8,50-53,566
+apps/backend/src/Module/moduleV2.service.ts
+  h_2d4b3dca70a3d8 1-472
+apps/backend/src/Testing/Factories/event.factory.ts
+  h_2d4b3dca70a3d8 12-13,21,42-56,120,132-143
+apps/backend/src/Testing/Mocks/services/moduleV2.mock.ts
+  h_2d4b3dca70a3d8 1-25
+apps/backend/src/Timetable/dto/timetable.dto.ts
+  h_2d4b3dca70a3d8 10,101-119
+apps/backend/src/Timetable/timetable.controller.ts
+  h_2d4b3dca70a3d8 24,77-93,113-131
+apps/backend/src/Timetable/timetable.module.ts
+  h_2d4b3dca70a3d8 4,7
+apps/backend/src/Timetable/timetable.service.spec.ts
+  h_2d4b3dca70a3d8 9,26,45,52,61
+apps/backend/src/Timetable/timetable.service.ts
+  h_2d4b3dca70a3d8 21,23,26,30-33,133-160,168-219
+apps/backend/src/auth/auth.guard.ts
+  h_2d4b3dca70a3d8 77,90,92
+apps/backend/src/db/database.service.ts
+  h_2d4b3dca70a3d8 5,45,69-71,91-92
+apps/backend/src/main.ts
+  h_2d4b3dca70a3d8 3,5,15,18-24,31-43,61,64-71,112-114,129-141
+apps/backend/test/auth/google-oauth.spec.ts
+  h_2d4b3dca70a3d8 33,42,64,76,82,84
+apps/frontend/package.json
+  h_2d4b3dca70a3d8 24
+apps/frontend/src/app/course-management/queries/courses/courseQueries.ts
+  h_2d4b3dca70a3d8 16-19,21,23-24,62,64
+apps/frontend/src/app/course-management/queries/modules/moduleQueries.ts
+  h_2d4b3dca70a3d8 15-20,24-25
+apps/frontend/src/components/atoms/utility/floatContainer.tsx
+  h_2d4b3dca70a3d8 1,5,8-14,16-19
+apps/frontend/src/components/molecules/solver/SolverReviewCard.tsx
+  h_2d4b3dca70a3d8 19,25,86,89-150,152-157
+apps/frontend/src/components/organisms/builder/GenerateStep.tsx
+  h_2d4b3dca70a3d8 17-20,82,101-122,136,178-181,183,204,209,237,245,248,297,336,355-366,369-378
+apps/frontend/src/components/organisms/course-management/EditCoursePopup.tsx
+  h_2d4b3dca70a3d8 10-13,39-64,146-158
+apps/frontend/src/components/organisms/course-management/singleCourseEdit.tsx
+  h_2d4b3dca70a3d8 17,59,63-64
+apps/frontend/src/components/organisms/solver/SolverPreferences.tsx
+  h_2d4b3dca70a3d8 31,34,37-40,165-167,172,228-231
+apps/frontend/src/components/organisms/solver/SolverReview.tsx
+  h_2d4b3dca70a3d8 16,24,39
+apps/frontend/src/components/organisms/viewTimetable/ScheduleView.tsx
+  h_2d4b3dca70a3d8 50,95-97,111,114,117,120,123,126-130,136,159-160,163,177,254,257,290,315-323,326-330,335,345,378,381,446-454
+apps/frontend/src/components/tanstack/getQueryClient.ts
+  h_2d4b3dca70a3d8 2-9
+apps/frontend/src/components/templates/builder/Queries/timetableQueries.ts
+  h_2d4b3dca70a3d8 14-15,20-25
+apps/frontend/src/components/templates/course-management/courseManageTemplate.tsx
+  h_2d4b3dca70a3d8 8,40,93-97,116,118-126,131,142,171,181
+apps/frontend/src/components/templates/module-management/moduleManagementTemplate.tsx
+  h_2d4b3dca70a3d8 29,31-32,54,56-60,62-66,69-76,110,168-176
+apps/frontend/src/components/templates/solver/SolverShell.tsx
+  h_2d4b3dca70a3d8 19,57-62,119,126
+apps/frontend/src/lib/api.ts
+  h_2d4b3dca70a3d8 264-300,412,425-444,473-492,507-508,582-598,618-634,770-786,840-856,875-891,911-927,1396-1411,1562-1605,1652-1653,1664-1665,1695-1696,1742-1745,1812-1860,1890-1891,1940-1941,1946,1971-1972,2200,2219,2221-2227,2229-2240,2245,2248,2287,2299-2305,2341-2350,3364-3407,3619,3702-3739,3859-3894,3933-3974,4108-4127,4131-4133,4249-4284,4663-4686,4691-4692,4917-4949,5022,5026,5031,5037,5047-5069,5178-5207
+apps/frontend/utilities/V2-Builders/Courses.ts
+  h_2d4b3dca70a3d8 1-23
+apps/frontend/utilities/V2-Builders/Modules.ts
+  h_2d4b3dca70a3d8 1-22
+apps/frontend/utilities/V2-Builders/Timetables.ts
+  h_2d4b3dca70a3d8 1-16
+apps/frontend/utilities/request.ts
+  h_2d4b3dca70a3d8 4,9,11-14,16-18
+apps/pdf_parser/requirements.txt
+  h_2d4b3dca70a3d8 1
+apps/simulation-service/adapters/UMTAS/locust_user_run_stats_history.csv
+  h_2d4b3dca70a3d8 308-312
+pnpm-lock.yaml
+  h_2d4b3dca70a3d8 285-287,363,369,381,10549-10555,16308,16322,16343,16357,19492,19498,20132,20137-20138,20164,20175,20179,20183,20186,20190,20201,20212-20213,21402,21404,21408,21411,21459,21485,21521,21547,21552,21578,22082,22084,22087,22245-22246,24914,24919,24969-24989
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "c3e3434bacac91eb25883bef1cf71069373d69ee",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
