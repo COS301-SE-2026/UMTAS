@@ -15,6 +15,9 @@ export function getMapConfigQ() {
       console.log(result, "Sent map config ");
       return result;
     },
+    staleTime: Infinity,
+    //24 hour TTL for caching
+    gcTime: 1000 * 60 * 60 * 24,
   });
 }
 
