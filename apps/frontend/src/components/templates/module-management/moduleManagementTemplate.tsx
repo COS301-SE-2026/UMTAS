@@ -26,8 +26,9 @@ import { useRouter } from "next/navigation";
 
 import Tutorial from "@/components/organisms/nav/Tutorial";
 import NotFound from "@/app/not-found";
-import { fetchAllModules } from "@/app/course-management/queries/modules/moduleBuilder";
+
 import NoRoleSelected from "@/components/molecules/roleManagement/NoRoleSelected";
+import { fetchAllModulesv2 } from "../../../../utilities/V2-Builders/Modules";
 const steps = [
   {
     target: "#btn-create-module-new",
@@ -52,8 +53,8 @@ export default function ModManagementTemplate() {
   const { data: modData } = useQuery({
     queryKey: ["Modules"],
     queryFn: async () => {
-      const result = await fetchAllModules({});
-      return result;
+      const result = await fetchAllModulesv2({});
+      return result.modules;
     },
   });
 

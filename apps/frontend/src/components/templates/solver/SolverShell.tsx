@@ -10,13 +10,13 @@ import { useState } from "react";
 import { SolverLock } from "@/components/organisms/solver/SolverLock";
 import { useQueries, useQuery } from "@tanstack/react-query";
 import { getAllEventsAdminQ } from "@/app/module-management/queries/queries";
-import { fetchAllModules } from "@/app/course-management/queries/modules/moduleBuilder";
 
 import Tutorial from "@/components/organisms/nav/Tutorial";
 import { UserDetails } from "@/lib/userclass/userClass";
 import Popup from "@/components/atoms/utility/floatContainer";
 import { ChooseInstituteTemplate } from "../choose-institute/chooseInstituteTemplate";
 import NoRoleSelected from "@/components/molecules/roleManagement/NoRoleSelected";
+import { fetchAllModulesv2 } from "../../../../utilities/V2-Builders/Modules";
 const steps = [
   {
     target: "#btn-browse-files",
@@ -54,10 +54,12 @@ export default function SolverShell() {
 
   const { data: modulesData } = useQuery({
     queryKey: ["PDF", "MODULES"],
-    queryFn: () => {
-      return fetchAllModules({
-        GroupID: moduleGroupingID || "",
-      });
+    queryFn: async () => {
+      return (
+        await fetchAllModulesv2({
+          GroupID: moduleGroupingID || "",
+        })
+      ).modules;
     },
     enabled: moduleGroupingID != null,
   });

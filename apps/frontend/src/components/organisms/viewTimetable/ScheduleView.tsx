@@ -45,11 +45,11 @@ import { getAllEventsQ } from "@/components/templates/builder/Queries/eventQueri
 import { getAllModulesQ } from "@/components/templates/builder/Queries/moduleQueries";
 import { removeTimetableMut } from "@/components/templates/builder/Queries/timetableQueries";
 import { useMutation } from "@tanstack/react-query";
-import { fetchAllModules } from "@/app/course-management/queries/modules/moduleBuilder";
 import { UserDetails } from "@/lib/userclass/userClass";
 import NoRoleSelected from "@/components/molecules/roleManagement/NoRoleSelected";
 
 import Tutorial from "@/components/organisms/nav/Tutorial";
+import { fetchAllModulesv2 } from "../../../../utilities/V2-Builders/Modules";
 const emptySteps = [
   {
     target: "#ref-go-to-builder",
@@ -108,10 +108,10 @@ export function ScheduleView({
   const { data: allModules = [], isLoading: isLoadingModules } = useQuery({
     queryKey: ["Modules", "Courses"],
     queryFn: async () => {
-      const result = await fetchAllModules({
+      const result = await fetchAllModulesv2({
         userEnrollment: true,
       });
-      return result;
+      return result.modules;
     },
   });
   const { data: allEvents = [], isLoading: isLoadingEvents } =

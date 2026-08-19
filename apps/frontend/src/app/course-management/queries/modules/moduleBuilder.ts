@@ -12,57 +12,6 @@ export type getAllModulesQueries = getAllModules["parameters"]["query"];
 export type getAllModulesRes =
   getAllModules["responses"]["200"]["content"]["application/json"]["modules"];
 
-export async function fetchAllModules(
-  queries: getAllModulesQueries,
-): Promise<getAllModulesRes> {
-  const path = "/modules";
-
-  const searchParams = new URLSearchParams();
-
-  if (queries?.GroupID) {
-    searchParams.append("GroupID" as keyof typeof queries, queries.GroupID);
-  }
-  if (queries?.courseId) {
-    searchParams.append("courseId" as keyof typeof queries, queries.courseId);
-  }
-  if (queries?.universityId) {
-    searchParams.append(
-      "universityId" as keyof typeof queries,
-      queries.universityId,
-    );
-  }
-  if (queries?.moduleCode) {
-    searchParams.append(
-      "moduleCode" as keyof typeof queries,
-      queries.moduleCode,
-    );
-  }
-  if (queries?.userEnrollment) {
-    searchParams.append(
-      "userEnrollment" as keyof typeof queries,
-      String(queries.userEnrollment), // bool
-    );
-  }
-
-  const queryStr = searchParams.toString();
-  const URL = queryStr ? `${createUrl(path)}?${queryStr}` : createUrl(path);
-
-  const response = await fetch(URL, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch courses");
-  } else {
-    const data = await response.json();
-    return data.modules as getAllModulesRes;
-  }
-}
-
 type updateModule = paths["/api/modules/{moduleId}"]["patch"];
 export type updateModulePath = updateModule["parameters"]["path"];
 export type updateModuleBody =
