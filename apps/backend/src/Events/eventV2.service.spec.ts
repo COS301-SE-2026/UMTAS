@@ -123,7 +123,10 @@ describe('EventServiceV2', () => {
 
       mockModuleServiceV2.getByIdV2?.mockResolvedValue(module);
 
+      mockEventFingerprintService.buildForEvent?.mockReturnValue('something');
+
       mockTransaction(mockDb, {
+        select: [[]],
         insert: [[]],
       });
 
