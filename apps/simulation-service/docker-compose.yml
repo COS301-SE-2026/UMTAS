@@ -22,7 +22,6 @@ services:
         "http://host.docker.internal:3000",
         "--users",
         "10",
-        "locustfile_upload.py",
         "--spawn-rate",
         "1",
       ]

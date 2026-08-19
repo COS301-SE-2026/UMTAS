@@ -1,1 +1,15 @@
 Method,Name,Error,Occurrences
+GET,/api/pdf-parser/jobs/pdf-parse-526e4b46-7f1d-424e-a502-a47d85949107,"ConnectionRefusedError(111, 'Connection refused')",48
+GET,/api/pdf-parser/jobs/pdf-parse-858d2c85-31c6-4ff3-95e2-04b568927ce7/result,"ConnectionRefusedError(111, 'Connection refused')",25
+GET,/api/timetables,"ConnectionRefusedError(111, 'Connection refused')",87
+GET,/api/pdf-parser/jobs/pdf-parse-526e4b46-7f1d-424e-a502-a47d85949107/result,"ConnectionRefusedError(111, 'Connection refused')",20
+POST,/api/auth/sign-in/email,"CatchResponseError('Login failed [429]: {""message"":""Too many requests. Please try again later.""}')",28
+GET,/api/pdf-parser/jobs/pdf-parse-858d2c85-31c6-4ff3-95e2-04b568927ce7,"ConnectionRefusedError(111, 'Connection refused')",32
+GET,/api/auth/get-session,"ConnectionRefusedError(111, 'Connection refused')",41
+POST,/api/solver/jobs,CatchResponseError('Solver rejected: '),30
+GET,/api/pdf-parser/jobs/pdf-parse-c5a09127-b053-413a-81b9-3df92725a08d/result,"ConnectionRefusedError(111, 'Connection refused')",27
+POST,/api/solver/jobs,"CatchResponseError('Solver rejected: {""message"":[""each value in eventIds must be a UUID""],""error"":""Bad Request"",""statusCode"":400}')",6
+GET,/api/events,"ConnectionRefusedError(111, 'Connection refused')",70
+GET,/api/pdf-parser/jobs/pdf-parse-c5a09127-b053-413a-81b9-3df92725a08d,"ConnectionRefusedError(111, 'Connection refused')",47
+GET,/api/builder,"ConnectionRefusedError(111, 'Connection refused')",76
+POST,/api/pdf-parser/jobs/upload,CatchResponseError('Upload rejected: '),184
