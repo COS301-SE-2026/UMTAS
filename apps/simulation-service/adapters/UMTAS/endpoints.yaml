@@ -1,0 +1,4 @@
+base_url: "http://localhost:3000"
+auth:
+  type: bearer
+  token_env_var: SIMULATION_SERVICE_API_TOKEN

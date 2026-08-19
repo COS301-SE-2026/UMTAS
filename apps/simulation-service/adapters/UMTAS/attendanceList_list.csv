@@ -1,0 +1,6 @@
+AttendanceID,UserID,eventID,eventDate,accepted
+a-001,usr-001,e-001,2026-08-17T14:30:00Z,true
+a-002,usr-002,e-004,2026-08-17T11:30:00Z,true
+a-003,usr-003,e-007,2026-08-17T09:30:00Z,false
+a-004,usr-004,e-010,2026-08-18T15:30:00Z,true
+a-005,usr-005,e-013,2026-08-17T08:30:00Z,false

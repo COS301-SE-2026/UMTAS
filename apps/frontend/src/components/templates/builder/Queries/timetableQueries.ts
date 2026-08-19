@@ -11,13 +11,18 @@ import {
 
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
 import { mutationOptions, queryOptions } from "@tanstack/react-query";
-import { validators } from "tailwind-merge";
+
+import { fetchAllTimetablesv2 } from "../../../../../utilities/V2-Builders/Timetables";
 
 export function getAllTimetablesQ() {
   return queryOptions({
     queryKey: ["timetables"] as const,
-    queryFn: async () =>
-      (await new getAllTimeTablesBuilder().send({})).timetables,
+    queryFn: async () => {
+      console.log("request sent");
+      const result = await fetchAllTimetablesv2();
+      console.log(result);
+      return result.timetables;
+    },
   });
 }
 
