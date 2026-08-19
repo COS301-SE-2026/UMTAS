@@ -17,7 +17,7 @@ services:
         "--adapter",
         "umtas",
         "--population",
-        "10",
+        "500",
         "--host",
         "http://host.docker.internal:3000",
         "--users",
