@@ -251,6 +251,28 @@ runsim:
     cd apps/simulation-service && phase run --env development -- docker compose up --build
 
 
+nfr-start:
+    cd apps/NFR && phase run --env development -- docker compose up -d nfr-tester
+
+nfr-stop:
+    cd apps/NFR && phase run --env development -- docker compose stop nfr-tester
+
+
+
+nfr-upload:
+    cd apps/NFR && phase run --env development -- docker compose exec nfr-tester \
+        locust -f /apps/NFR/upload_locustfile.py \
+        --host http://host.docker.internal:3000 \
+        --users 50 \
+        --spawn-rate 10 \
+        --run-time 2m \
+        --headless \
+
+
+
+
+
+
 # Backend testing
 # unit test
 backend-unit:

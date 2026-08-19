@@ -1,0 +1,14 @@
+version: "3.8"
+
+services:
+  nfr-tester:
+    build:
+      context: .
+      dockerfile: ../../docker/simulation-service/simulation-service.dockerfile
+    container_name: umtas-nfr-tester
+    volumes:
+      - .:/apps/NFR
+      - ./adapters:/app/adapters
+    environment:
+      - SIMULATION_API_KEY
+    command: []
