@@ -88,7 +88,7 @@ export class CreateCourseModuleDto extends PickType(CourseModuleDto, [
   'YearOfStudy',
 ]) {}
 
-class StylingDto {
+export class StylingDto {
   @ApiProperty({ example: '#3B82F6' })
   @IsString()
   @IsNotEmpty()
