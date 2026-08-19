@@ -3391,6 +3391,11 @@
             "type": "string",
             "example": "Admin@UMTAS2024!",
             "default": "Admin@UMTAS2024!"
+          },
+          "uniId": {
+            "type": "string",
+            "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+            "description": "Optional university ID to select upon sign-in"
           }
         },
         "required": ["email", "password"]
@@ -3532,25 +3537,31 @@
         },
         "required": ["user"]
       },
-      "MockUserRole": {
-        "type": "string",
-        "enum": ["STUDENT", "LECTURER", "UNIVERSITY_ADMIN", "SYS_ADMIN"],
-        "description": "Role for the mock user"
-      },
       "CreateMockUserDto": {
         "type": "object",
         "properties": {
+          "email": {
+            "type": "string",
+            "example": "test_user_1@simulation.com"
+          },
+          "name": {
+            "type": "string",
+            "example": "Test User"
+          },
+          "password": {
+            "type": "string",
+            "example": "password123!"
+          },
           "role": {
-            "description": "Role for the mock user",
-            "default": "STUDENT",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/MockUserRole"
-              }
-            ]
+            "enum": ["STUDENT", "LECTURER", "UNIVERSITY_ADMIN", "SYS_ADMIN"],
+            "type": "string",
+            "example": "STUDENT"
+          },
+          "uniId": {
+            "type": "string",
+            "example": "some-uni-id"
           }
-        },
-        "required": ["role"]
+        }
       },
       "DeleteMockUsersResponseDto": {
         "type": "object",

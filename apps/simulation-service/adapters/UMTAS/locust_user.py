@@ -1,71 +1,107 @@
 import os
 import json
+import uuid
 import random
 from locust import HttpUser, task, between
+from locust.exception import StopUser 
+
+PROFILES_PATH = os.environ.get('PROFILES_PATH')
+PROFILES = []
+if PROFILES_PATH and os.path.exists(PROFILES_PATH):
+    with open(PROFILES_PATH, 'r', encoding='utf-8') as f:
+        PROFILES = json.load(f)
+
+PDF_DIR = os.environ.get('PDF_DIR', '/app/adapters/umtas/pdfs')
+PDF_FILES = []
+if os.path.exists(PDF_DIR):
+    PDF_FILES = [os.path.join(PDF_DIR, f) for f in os.listdir(PDF_DIR) if f.endswith('.pdf')]
+    
+print(f"Loaded {len(PROFILES)} profiles from {PROFILES_PATH}")
+print(f"Found {len(PDF_FILES)} PDF files in {PDF_DIR}")
 
 
 class DomainUser(HttpUser):
-    wait_time = between(1,20)
+    wait_time = between(0.5, 1)
 
     def on_start(self):
-        # we start by loading pre exisisting profiles
-        profiless= os.environ.get('PROFILES_PATH')
-        if profiless and getattr(self,"profiles",None) is None:
-            if os.path.exists(profiless):
-                with open(profiless,'r',encoding='utf-8') as f:
-                    DomainUser.profiles =json.load(f)
-            else:
-                DomainUser.profiles =[]
-            DomainUser.profile_index =0;
-        # load all the pdfs we have found from the various students haha
-        pdf_files = os.environ.get('PDF_DIR', '/app/adapters/umtas/pdfs')
-        if getattr(self, "pdf_files", None) is None:
-            if os.path.exists(pdf_files):
-                DomainUser.pdf_files = [
-                    os.path.join(pdf_files, f) for f in os.listdir(pdf_files) if f.endswith('.pdf')
-                ]
-            else:
-                DomainUser.pdf_files = []
-
-        # add pdfs to profile
-        if not DomainUser.profiles:
-            self.profile = {}
+        if PROFILES:
+            self.profile = random.choice(PROFILES)
         else:
-            self.profile = DomainUser.profiles[DomainUser.profile_index % len(DomainUser.profiles)]
-            DomainUser.profile_index += 1
+            self.profile = {}
 
-        self.pdf_id= None
+        self.pdf_id = None
         self.solver_id = None
 
-        admin_token = os.environ.get('SIMULATION_SERVICE_API_TOKEN', '')
+        admin_token = os.environ.get('SIMULATION_API_KEY')
+        if not admin_token:
+            raise ValueError("SIMULATION_API_KEY environment variable is not set!")
+        
         admin_headers = {'Authorization': f'Bearer {admin_token}'}
 
+        worker_id = str(uuid.uuid4())[:6]
+        base_email = self.profile.get("email", f"fallback_{random.randint(1,9999)}@simulation.com")
+        
+        if "@" in base_email:
+            name, domain = base_email.split("@", 1)
+            unique_email = f"{name}+{worker_id}@{domain}"
+        else:
+            unique_email = f"{base_email}_{worker_id}@simulation.com"
+
+        password = self.profile.get("password", "password123!")
+
         payload = {
-            "email": self.profile.get("email"),
-            "name": self.profile.get("name"),
-            "password": self.profile.get("password"),
+            "email": unique_email, 
+            "name": self.profile.get("name", "Test User"),
+            "password": password,
             "role": "STUDENT", 
-            "uniId": self.profile.get("uniId")
+            "uniId": self.profile.get("uniId", "default_uni")
         }
 
         with self.client.post('/api/auth/admin/create-mock-user', json=payload, headers=admin_headers, catch_response=True) as response:
             if response.status_code in (200, 201):
                 response.success()
-                response_data = response.json()
-                user_token = response_data.get("session", {}).get("token")
-                self.client.headers.update({'Authorization': f'Bearer {user_token}'})
+                print(f"User {unique_email} created successfully.")
+                creds = response.json()
+                self.uni_id = creds.get("uniId")
+                
+                login_payload = {
+                    "email": unique_email,
+                    "password": password
+                }
+                
+                self.client.headers.pop('Authorization', None)
+                
+                with self.client.post('/api/auth/sign-in/email', json=login_payload, catch_response=True) as login_res:
+                    if login_res.status_code == 200:
+                        login_res.success()
+                        print(f"User {unique_email} logged in successfully.")
+                        
+                        response_data = login_res.json()
+                        token = response_data.get('session', {}).get('token')
+                        
+                        if token:
+                            self.client.headers.update({'Authorization': f'Bearer {token}'})
+                            
+                    else:
+                        login_res.failure(f"Login failed [{login_res.status_code}]: {login_res.text}")
+                        print(f"LOGIN ERROR: {login_res.status_code} - {login_res.text}")
+                        raise StopUser()
             else:
-                response.failure(f"Failure to create mock user {response.text}")
-                self.environment.runner.quit()
+                response.failure(f"Failed to create user [{response.status_code}]: {response.text}")
+                raise StopUser()
 
     @task(5)
     def upload_timetable_pdf(self):
-        if not self.pdf_files:
+        if not PDF_FILES:
             return
+        
+        if not hasattr(self, 'uni_id') or not self.uni_id:
+            return 
 
-        random_pdf_path = random.choice(self.pdf_files)
+        random_pdf_path = random.choice(PDF_FILES)
+        
         data = {
-            "universityId": self.profile.get("uniId"),
+            "universityId": self.uni_id, 
             "adapterKey": "up"
         }
 
@@ -75,28 +111,28 @@ class DomainUser(HttpUser):
             with self.client.post('/api/pdf-parser/jobs/upload', data=data, files=files, catch_response=True) as response:
                 if response.status_code == 202:
                     response.success()
-                    res_json = response.json()
-                    self.pdf_job_id = res_json.get("jobId")
+                    print(f"PDF {random_pdf_path} uploaded successfully for universityId {self.uni_id}.")
+                    self.pdf_id = response.json().get("jobId")
                 else:
                     response.failure(f"Upload rejected: {response.text}")
+                    print(f"PDF UPLOAD ERROR: {response.status_code} - {response.text}")
 
     @task(3)
     def check_pdf_parser_status(self):
-        if not self.pdf_job_id:
+        if not self.pdf_id:
             return
         
-        with self.client.get(f'/api/pdf-parser/jobs/{self.pdf_job_id}', catch_response=True) as response:
+        with self.client.get(f'/api/pdf-parser/jobs/{self.pdf_id}', catch_response=True) as response:
             if response.status_code == 200:
+                print(f"PDF parser job {self.pdf_id} is complete.")
                 response.success()
             elif response.status_code == 404:
-                self.pdf_job_id = None 
+                self.pdf_id = None 
 
     @task(2)
     def get_pdf_parser_result(self):
-        if not self.pdf_job_id:
-            return
-            
-        self.client.get(f'/api/pdf-parser/jobs/{self.pdf_job_id}/result')
+        if self.pdf_id:
+            self.client.get(f'/api/pdf-parser/jobs/{self.pdf_id}/result')
 
     @task(2)
     def view_enrolled_modules(self):
@@ -127,452 +163,11 @@ class DomainUser(HttpUser):
         with self.client.post('/api/solver/jobs', json=payload, catch_response=True) as response:
             if response.status_code == 202:
                 response.success()
-                res_json = response.json()
-                self.solver_job_id = res_json.get("jobId")
+                self.solver_id = response.json().get("jobId")
             else:
                 response.failure(f"Solver rejected: {response.text}")
 
     @task(1)
     def check_solver_status(self):
-        if not self.solver_job_id:
-            return
-            
-        self.client.get(f'/api/solver/jobs/{self.solver_job_id}')  
-    
-
-# PLEASE NOTE
-# down below is the auto generated script from the bootstrap spec 
-
-# as a POC this is great, but for UMTAS we opted for a manually coded locust file to ensure we produce enough traffic for stats 
-# Down below works for an onboarding stress test 
-
-
-
-
-
-# class DomainUser(HttpUser):
-#     wait_time = between(1, 3)
-
-#     def on_start(self):
-#         profiles_path = os.environ.get('PROFILES_PATH')
-#         if profiles_path and os.path.exists(profiles_path):
-#             with open(profiles_path, 'r', encoding='utf-8') as f:
-#                 self.profiles = json.load(f)
-#         else:
-#             self.profiles = []
-#         self.profile_index = 0
-
-#     def get_next_profile(self):
-#         if not self.profiles:
-#             return {}
-#         p = self.profiles[self.profile_index % len(self.profiles)]
-#         self.profile_index += 1
-#         return p
-
-#     @task
-#     def AppController_getHello(self):
-#         profile = self.get_next_profile()
-#         self.client.get('/api')
-
-#     @task
-#     def signUpEmail(self):
-#         profile = self.get_next_profile()
-#         # TODO: Improve payloads
-#         payload = profile
-#         self.client.post('/api/auth/sign-up/email', json=payload)
-
-#     @task
-#     def signInEmail(self):
-#         profile = self.get_next_profile()
-#         # TODO: Improve payloads
-#         payload = profile
-#         self.client.post('/api/auth/sign-in/email', json=payload)
-
-#     @task
-#     def signOut(self):
-#         profile = self.get_next_profile()
-#         # TODO: Improve payloads
-#         payload = profile
-#         self.client.post('/api/auth/sign-out', json=payload)
-
-#     @task
-#     def getSession(self):
-#         profile = self.get_next_profile()
-#         self.client.get('/api/auth/get-session')
-
-#     @task
-#     def listSessions(self):
-#         profile = self.get_next_profile()
-#         self.client.get('/api/auth/list-sessions')
-
-#     @task
-#     def revokeSession(self):
-#         profile = self.get_next_profile()
-#         # TODO: Improve payloads
-#         payload = profile
-#         self.client.post('/api/auth/revoke-session', json=payload)
-
-#     @task
-#     def sendVerificationEmail(self):
-#         profile = self.get_next_profile()
-#         # TODO: Improve payloads
-#         payload = profile
-#         self.client.post('/api/auth/send-verification-email', json=payload)
-
-#     @task
-#     def verifyEmail(self):
-#         profile = self.get_next_profile()
-#         # TODO: Improve payloads
-#         payload = profile
-#         self.client.post('/api/auth/verify-email', json=payload)
-
-#     @task
-#     def forgetPassword(self):
-#         profile = self.get_next_profile()
-#         # TODO: Improve payloads
-#         payload = profile
-#         self.client.post('/api/auth/forget-password', json=payload)
-
-#     @task
-#     def resetPassword(self):
-#         profile = self.get_next_profile()
-#         # TODO: Improve payloads
-#         payload = profile
-#         self.client.post('/api/auth/reset-password', json=payload)
-
-#     @task
-#     def changePassword(self):
-#         profile = self.get_next_profile()
-#         # TODO: Improve payloads
-#         payload = profile
-#         self.client.post('/api/auth/change-password', json=payload)
-
-#     @task
-#     def googleOAuthCallback(self):
-#         profile = self.get_next_profile()
-#         self.client.get('/api/auth/callback/google')
-
-#     @task
-#     def linkGoogleAccount(self):
-#         profile = self.get_next_profile()
-#         # TODO: Improve payloads
-#         payload = profile
-#         self.client.post('/api/auth/link-account/google', json=payload)
-
-#     @task
-#     def adminCreateUser(self):
-#         profile = self.get_next_profile()
-#         # TODO: Improve payloads
-#         payload = profile
-#         self.client.post('/api/auth/admin/create-user', json=payload)
-
-#     @task
-#     def adminCreateMockUser(self):
-#         profile = self.get_next_profile()
-#         # TODO: Improve payloads
-#         payload = profile
-#         self.client.post('/api/auth/admin/create-mock-user', json=payload)
-
-#     @task
-#     def adminDeleteMockUsers(self):
-#         profile = self.get_next_profile()
-#         self.client.delete('/api/auth/admin/delete-mock-users')
-
-#     @task
-#     def adminImpersonateUser(self):
-#         profile = self.get_next_profile()
-#         # TODO: Improve payloads
-#         payload = profile
-#         self.client.post('/api/auth/admin/impersonate-user', json=payload)
-
-#     @task
-#     def adminBanUser(self):
-#         profile = self.get_next_profile()
-#         # TODO: Improve payloads
-#         payload = profile
-#         self.client.post('/api/auth/admin/ban-user', json=payload)
-
-#     @task
-#     def adminUpdateUser(self):
-#         profile = self.get_next_profile()
-#         # TODO: Improve payloads
-#         payload = profile
-#         self.client.post('/api/auth/admin/update-user', json=payload)
-
-#     @task
-#     def AuthController_selectUniversity(self):
-#         profile = self.get_next_profile()
-#         # TODO: Improve payloads
-#         payload = profile
-#         self.client.post('/api/auth/select-university', json=payload)
-
-#     @task
-#     def HealthController_live(self):
-#         profile = self.get_next_profile()
-#         self.client.get('/api/health')
-
-#     @task
-#     def HealthController_check(self):
-#         profile = self.get_next_profile()
-#         self.client.get('/api/health/check')
-
-#     @task
-#     def ModuleController_createModule(self):
-#         profile = self.get_next_profile()
-#         # TODO: Improve payloads
-#         payload = profile
-#         self.client.post('/api/modules', json=payload)
-
-#     @task
-#     def ModuleController_getAll(self):
-#         profile = self.get_next_profile()
-#         self.client.get('/api/modules')
-
-#     @task
-#     def getModuleById(self):
-#         profile = self.get_next_profile()
-#         self.client.get('/api/modules/{moduleId}')
-
-#     @task
-#     def deleteModule(self):
-#         profile = self.get_next_profile()
-#         self.client.delete('/api/modules/{moduleId}')
-
-#     @task
-#     def enrolStudentToModule(self):
-#         profile = self.get_next_profile()
-#         self.client.get('/api/modules/enroll/{moduleId}')
-
-#     @task
-#     def addModulesToCourse(self):
-#         profile = self.get_next_profile()
-#         # TODO: Improve payloads
-#         payload = profile
-#         self.client.put('/api/modules/{CourseID}', json=payload)
-
-#     @task
-#     def updateStyling(self):
-#         profile = self.get_next_profile()
-#         # TODO: Improve payloads
-#         payload = profile
-#         self.client.post('/api/modules/styling/{moduleId}', json=payload)
-
-#     @task
-#     def createCourse(self):
-#         profile = self.get_next_profile()
-#         # TODO: Improve payloads
-#         payload = profile
-#         self.client.post('/api/Courses', json=payload)
-
-#     @task
-#     def getCourses(self):
-#         profile = self.get_next_profile()
-#         # TODO: Improve payloads
-#         payload = profile
-#         self.client.post('/api/Courses/getAll', json=payload)
-
-#     @task
-#     def getCourseById(self):
-#         profile = self.get_next_profile()
-#         self.client.get('/api/Courses/{CourseId}')
-
-#     @task
-#     def deleteCourse(self):
-#         profile = self.get_next_profile()
-#         self.client.delete('/api/Courses/{CourseId}')
-
-#     @task
-#     def UniversityController_create(self):
-#         profile = self.get_next_profile()
-#         # TODO: Improve payloads
-#         payload = profile
-#         self.client.post('/api/universities', json=payload)
-
-#     @task
-#     def getUniversities(self):
-#         profile = self.get_next_profile()
-#         self.client.get('/api/universities')
-
-#     @task
-#     def getUniversityById(self):
-#         profile = self.get_next_profile()
-#         self.client.get('/api/universities/{universityId}')
-
-#     @task
-#     def deleteUniversity(self):
-#         profile = self.get_next_profile()
-#         self.client.delete('/api/universities/{universityId}')
-
-#     @task
-#     def getUserRoleByUniID(self):
-#         profile = self.get_next_profile()
-#         self.client.get('/api/universities/role/{universityId}')
-
-#     @task
-#     def getAllApplications(self):
-#         profile = self.get_next_profile()
-#         # TODO: Improve payloads
-#         payload = profile
-#         self.client.post('/api/universities/applications/{universityID}', json=payload)
-
-#     @task
-#     def applyForUniverstiyRole(self):
-#         profile = self.get_next_profile()
-#         # TODO: Improve payloads
-#         payload = profile
-#         self.client.post('/api/universities/apply', json=payload)
-
-#     @task
-#     def approveUsersRole(self):
-#         profile = self.get_next_profile()
-#         # TODO: Improve payloads
-#         payload = profile
-#         self.client.post('/api/universities/approve', json=payload)
-
-#     @task
-#     def createEvent(self):
-#         profile = self.get_next_profile()
-#         # TODO: Improve payloads
-#         payload = profile
-#         self.client.post('/api/events', json=payload)
-
-#     @task
-#     def getAllEvents(self):
-#         profile = self.get_next_profile()
-#         self.client.get('/api/events')
-
-#     @task
-#     def getEventById(self):
-#         profile = self.get_next_profile()
-#         self.client.get('/api/events/{eventId}')
-
-#     @task
-#     def deleteEvent(self):
-#         profile = self.get_next_profile()
-#         self.client.delete('/api/events/{id}')
-
-#     @task
-#     def createTimetable(self):
-#         profile = self.get_next_profile()
-#         # TODO: Improve payloads
-#         payload = profile
-#         self.client.post('/api/timetables', json=payload)
-
-#     @task
-#     def getAllTimetables(self):
-#         profile = self.get_next_profile()
-#         self.client.get('/api/timetables')
-
-#     @task
-#     def getTimetableById(self):
-#         profile = self.get_next_profile()
-#         self.client.get('/api/timetables/{id}')
-
-#     @task
-#     def deleteTimetable(self):
-#         profile = self.get_next_profile()
-#         self.client.delete('/api/timetables/{id}')
-
-#     @task
-#     def BuilderController_createModule(self):
-#         profile = self.get_next_profile()
-#         # TODO: Improve payloads
-#         payload = profile
-#         self.client.post('/api/builder', json=payload)
-
-#     @task
-#     def BuilderController_getAll(self):
-#         profile = self.get_next_profile()
-#         self.client.get('/api/builder')
-
-#     @task
-#     def builder_getModuleById(self):
-#         profile = self.get_next_profile()
-#         self.client.get('/api/builder/{moduleId}')
-
-#     @task
-#     def builder_deleteModule(self):
-#         profile = self.get_next_profile()
-#         self.client.delete('/api/builder/{moduleId}')
-
-#     @task
-#     def PdfParserController_lookupDuplicate(self):
-#         profile = self.get_next_profile()
-#         # TODO: Improve payloads
-#         payload = profile
-#         self.client.post('/api/pdf-parser/jobs/lookup', json=payload)
-
-#     @task
-#     def PdfParserController_uploadAndEnqueue(self):
-#         profile = self.get_next_profile()
-#         # TODO: Improve payloads
-#         payload = profile
-#         self.client.post('/api/pdf-parser/jobs/upload', json=payload)
-
-#     @task
-#     def PdfParserController_getJob(self):
-#         profile = self.get_next_profile()
-#         self.client.get('/api/pdf-parser/jobs/{jobId}')
-
-#     @task
-#     def PdfParserController_getJobResult(self):
-#         profile = self.get_next_profile()
-#         self.client.get('/api/pdf-parser/jobs/{jobId}/result')
-
-#     @task
-#     def PdfParserController_receiveCallback(self):
-#         profile = self.get_next_profile()
-#         # TODO: Improve payloads
-#         payload = profile
-#         self.client.post('/api/pdf-parser/jobs/{jobId}/callback', json=payload)
-
-#     @task
-#     def SolverController_submitAndEnqueue(self):
-#         profile = self.get_next_profile()
-#         # TODO: Improve payloads
-#         payload = profile
-#         self.client.post('/api/solver/jobs', json=payload)
-
-#     @task
-#     def SolverController_getInput(self):
-#         profile = self.get_next_profile()
-#         self.client.get('/api/solver/jobs/{jobId}/input')
-
-#     @task
-#     def SolverController_getJob(self):
-#         profile = self.get_next_profile()
-#         self.client.get('/api/solver/jobs/{jobId}')
-
-#     @task
-#     def SolverController_getJobResult(self):
-#         profile = self.get_next_profile()
-#         self.client.get('/api/solver/jobs/{jobId}/result')
-
-#     @task
-#     def SolverController_receiveCallback(self):
-#         profile = self.get_next_profile()
-#         # TODO: Improve payloads
-#         payload = profile
-#         self.client.post('/api/solver/jobs/{jobId}/callback', json=payload)
-
-#     @task
-#     def createAttendance(self):
-#         profile = self.get_next_profile()
-#         # TODO: Improve payloads
-#         payload = profile
-#         self.client.post('/api/attendance', json=payload)
-
-#     @task
-#     def getAllAttendance(self):
-#         profile = self.get_next_profile()
-#         self.client.get('/api/attendance')
-
-#     @task
-#     def getAttendanceById(self):
-#         profile = self.get_next_profile()
-#         self.client.get('/api/attendance/{attendanceId}')
-
-#     @task
-#     def deleteAttendance(self):
-#         profile = self.get_next_profile()
-#         self.client.delete('/api/attendance/{attendanceId}')
+        if self.solver_id:
+            self.client.get(f'/api/solver/jobs/{self.solver_id}')
