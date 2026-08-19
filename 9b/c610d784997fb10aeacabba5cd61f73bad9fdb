@@ -1,0 +1,18 @@
+apps/backend/src/auth/auth.controller.ts
+  h_2d4b3dca70a3d8 638
+apps/backend/src/auth/auth.dto.ts
+  h_2d4b3dca70a3d8 2,171-176,355-377
+apps/backend/src/auth/auth.service.ts
+  h_2d4b3dca70a3d8 180,187,196-200,202-205,207-209,211-215,233-242,247
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "9bc610d784997fb10aeacabba5cd61f73bad9fdb",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
