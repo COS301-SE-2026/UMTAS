@@ -1,5 +1,8 @@
 "use client";
-import { getAllCoursesQ } from "@/app/course-management/queries/courses/courseQueries";
+import {
+  getAllCoursesKey,
+  getAllCoursesQ,
+} from "@/app/course-management/queries/courses/courseQueries";
 import { Spinner } from "@/components/atoms/baseShadcn/spinner";
 import { UserDetails } from "@/lib/userclass/userClass";
 import { useQuery } from "@tanstack/react-query";
@@ -37,6 +40,7 @@ import NotFound from "@/app/not-found";
 import { AddCoursePopup } from "@/components/organisms/course-management/AddCoursePopup";
 import NoRoleSelected from "@/components/molecules/roleManagement/NoRoleSelected";
 import { EditCoursePopup } from "@/components/organisms/course-management/EditCoursePopup";
+import { getAllCoursesV2 } from "../../../../utilities/V2-Builders/Courses";
 const steps = [
   {
     target: "#input-search-courses-degrees-modules",
@@ -94,13 +98,14 @@ export default function CourseManagementTemplate() {
     isLoading: isCourseLoading,
     isError: isCourseError,
   } = useQuery({
-    ...getAllCoursesQ({ UniversityID: UniDetails?.UniversityID ?? "" }),
-    enabled: !!UniDetails?.UniversityID,
+    queryKey: getAllCoursesKey,
+    queryFn: async () =>
+      (
+        await getAllCoursesV2({
+          UniversityID: UserDetails.getUniDetails()?.UniversityID,
+        })
+      ).courses,
   });
-
-  const { data: moduleData, isLoading: isModuleLoading } = useQuery(
-    getAllModCoursesQ(moduleQueries),
-  );
 
   //use memo for caching between renders
   const availableDegrees = useMemo(() => {
@@ -117,24 +122,23 @@ export default function CourseManagementTemplate() {
 
   const availableModulePrefixes = useMemo(() => {
     const prefixes = new Set<string>();
-    moduleData?.forEach((module) => {
-      const parentCourse = courseData.find(
-        (course: CourseDTO) => course.GroupID === module.ModuleGroupingID,
-      );
 
+    courseData?.forEach((course) => {
       const matchesDegree =
-        selectedDegree === "All" || parentCourse?.Degree === selectedDegree;
+        selectedDegree === "All" || course?.Degree === selectedDegree;
 
-      if (matchesDegree && module.moduleCode) {
-        const match = module.moduleCode.match(/^[A-Za-z]+/);
-        if (match) {
-          prefixes.add(match[0].toUpperCase());
-        }
+      if (matchesDegree && course.Modules) {
+        course.Modules?.forEach((module) => {
+          const match = module.moduleCode.match(/^[A-Za-z]+/);
+          if (match) {
+            prefixes.add(match[0].toUpperCase());
+          }
+        });
       }
     });
 
     return Array.from(prefixes);
-  }, [moduleData, courseData, selectedDegree]);
+  }, [courseData, selectedDegree]);
 
   const effectiveModulePrefix =
     selectedModulePrefix !== "All" &&
@@ -145,10 +149,7 @@ export default function CourseManagementTemplate() {
   const filteredCourses: CourseTableData[] = useMemo(() => {
     const unfilteredCourses = courseData.map((course: CourseDTO) => ({
       course,
-      modules:
-        moduleData?.filter(
-          (module) => module.ModuleGroupingID === course.GroupID,
-        ) ?? [],
+      modules: course?.Modules || [],
     }));
 
     return unfilteredCourses.filter(
@@ -177,13 +178,7 @@ export default function CourseManagementTemplate() {
         return matchesDegree && matchesModulePrefix && matchesSearch;
       },
     );
-  }, [
-    courseData,
-    moduleData,
-    selectedDegree,
-    effectiveModulePrefix,
-    searchQuery,
-  ]);
+  }, [courseData, selectedDegree, effectiveModulePrefix, searchQuery]);
 
   //here is where you see all courses that are possible for the selected degree
   const toggleExpand = (courseId: string) => {
@@ -193,7 +188,7 @@ export default function CourseManagementTemplate() {
     }));
   };
 
-  if (isCourseLoading || isModuleLoading) {
+  if (isCourseLoading) {
     return (
       <div className="h-full w-full flex justify-center items-center py-20">
         <Spinner />

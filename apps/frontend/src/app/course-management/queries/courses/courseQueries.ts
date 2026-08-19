@@ -16,9 +16,11 @@ import {
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
 import { getAllModCoursesQ } from "../modules/moduleQueries";
 
+export const getAllCoursesKey = ["courses"];
+
 export function getAllCoursesQ(body?: fetchAllCoursesBody) {
   return queryOptions({
-    queryKey: ["courses", body],
+    queryKey: getAllCoursesKey,
     queryFn: async () => {
       const builder = new getAllCoursesBuilder();
       const result = await builder.send({ body: body || {} });
