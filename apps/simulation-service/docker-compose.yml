@@ -13,4 +13,13 @@ services:
     environment:
       - UMTAS_SIM_TOKEN=will_need_to_change_this_somehow
     command:
-      ["--adapter", "umtas", "--population", "5000", "--web-port", "8089"]
+      [
+        "--adapter",
+        "umtas",
+        "--population",
+        "50",
+        "--locust-file",
+        "locustfile_upload.py",
+        "--web-port",
+        "8089",
+      ]

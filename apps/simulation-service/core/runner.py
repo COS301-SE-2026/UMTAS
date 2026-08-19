@@ -1,6 +1,7 @@
 # this is the entry point
 # reads command line arguments -> generate required population -> loads endpoints and locust users -> launches locust and handles the generated profiles 
 import argparse
+from encodings.punycode import adapt
 import subprocess
 import sys
 import os
@@ -18,6 +19,8 @@ def main():
     parser.add_argument("--adapter", required=True, help="Name of the adapter directory for example umtas or openai")
     parser.add_argument("--population", type=int, default=1000, help="Number of profiles to generate")
     
+    parser.add_argument("--locust-file", default="locust_user.py", help="name of locust file to run")
+    
     args, locust_args = parser.parse_known_args()
 
 
@@ -26,7 +29,7 @@ def main():
     adapt = base / "adapters" / args.adapter
 
     schema_path = adapt / "profile_schema.yaml"
-    locust_file = adapt / "locust_user.py"
+    locust_file = adapt / args.locust_file
     profiles_out = adapt / "profiles.json"
 
     if not adapt.exists():
@@ -57,8 +60,8 @@ def main():
    
     env = os.environ.copy()
     env["PROFILES_PATH"] = str(profiles_out)
-
-    csv_pre = str(adapt / "locust_run")
+    file_prefix = args.locust_file.replace('.py', '')
+    csv_pre = str(adapt / f"{file_prefix}_run")
 
     cmd = ["locust", "-f", str(locust_file), f"--csv={csv_pre}"] + locust_args
 
@@ -74,7 +77,7 @@ def main():
         adapter_name=args.adapter,
         pop=args.population
     )
-    reporter.generate_report(csv_pre="locust_run")
+    reporter.generate_report(csv_pre=f"{file_prefix}_run")
 
 
 
