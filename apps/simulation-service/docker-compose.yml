@@ -11,15 +11,18 @@ services:
     volumes:
       - ./adapters:/app/adapters
     environment:
-      - UMTAS_SIM_TOKEN=will_need_to_change_this_somehow
+      - SIMULATION_API_KEY
     command:
       [
         "--adapter",
         "umtas",
         "--population",
-        "50",
-        "--locust-file",
+        "10",
+        "--host",
+        "http://host.docker.internal:3000",
+        "--users",
+        "10",
         "locustfile_upload.py",
-        "--web-port",
-        "8089",
+        "--spawn-rate",
+        "1",
       ]

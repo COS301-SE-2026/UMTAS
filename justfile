@@ -247,6 +247,9 @@ db_sql:
 # then you can delete all migrations and meta from drizzle and regenerate and migrate
 
 
+runsim:
+    cd apps/simulation-service && phase run --env development -- docker compose up --build
+
 
 # Backend testing
 # unit test
