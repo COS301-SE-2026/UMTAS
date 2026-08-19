@@ -1,36 +1,43 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
-import { Map, APIProvider } from "@vis.gl/react-google-maps";
 import { AlertCircle } from "lucide-react";
 import { Skeleton } from "@/components/atoms/baseShadcn/skeleton";
 import { Button } from "@/components/atoms/baseShadcn/button";
 import { getMapConfigQ } from "../../../../utilities/map/mapQueries";
 import { Alert, AlertDescription } from "@/components/atoms/baseShadcn/alert";
 import { UserDetails } from "@/lib/userclass/userClass";
+import { Map } from "@vis.gl/react-google-maps";
+import { useMemo } from "react";
 
 interface MapScreenProps {
   children?: React.ReactNode;
   onRequestMapSetup?: () => void;
-  apiKey: string;
 }
 
-export function MapScreen({
-  children,
-  onRequestMapSetup,
-  apiKey,
-}: MapScreenProps) {
-  //console.log("api key:", apiKey);
+export function MapScreen({ children, onRequestMapSetup }: MapScreenProps) {
   const { data: config, isLoading, error } = useQuery(getMapConfigQ());
-  // if (error) {
-  //   console.log("map error:", error);
-  // }
   const isUserAdmin = UserDetails.getUniDetails()?.role === "UNIVERSITY_ADMIN";
+  //caching for map styles
+  const mapStyle = useMemo(() => ({ width: "100%", height: "100%" }), []);
+
+  //caching for map loads
+  const mapRestriction = useMemo(() => {
+    if (!config) return undefined;
+    return {
+      latLngBounds: {
+        north: config.NorthLat,
+        south: config.SouthLat,
+        east: config.EastLng,
+        west: config.WestLng,
+      },
+      strictBounds: true,
+    };
+  }, [config]);
 
   if (isLoading) {
     return <Skeleton className="h-full w-full rounded-xl" />;
   }
 
-  //displays when the map config for that uni has not been configured. todo remember to add map config seeding vro
   if (error && (error as { status?: number }).status === 404) {
     return (
       <div className="flex h-full w-full items-center justify-center border border-[var(--border)] bg-[var(--bg-surface)] rounded-xl">
@@ -65,26 +72,18 @@ export function MapScreen({
     );
   }
 
-  //todo change to camelCase vro
-  const uniBoundaries = {
-    north: config.NorthLat,
-    south: config.SouthLat,
-    east: config.EastLng,
-    west: config.WestLng,
-  };
-
   return (
-    <APIProvider apiKey={apiKey}>
-      <Map
-        style={{ width: "100%", height: "100%" }}
-        mapId={config.GoogleMapID || undefined}
-        defaultBounds={uniBoundaries}
-        defaultZoom={config.DefaultZoom}
-        restriction={{ latLngBounds: uniBoundaries, strictBounds: true }}
-        gestureHandling="greedy"
-      >
-        {children}
-      </Map>
-    </APIProvider>
+    <Map
+      style={mapStyle}
+      mapId={config.GoogleMapID || undefined}
+      defaultBounds={mapRestriction?.latLngBounds}
+      defaultZoom={config.DefaultZoom}
+      restriction={mapRestriction}
+      gestureHandling="greedy"
+      clickableIcons={false}
+      reuseMaps={true}
+    >
+      {children}
+    </Map>
   );
 }

@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+// REMOVED APIProvider from imports
 import { AdvancedMarker, Pin } from "@vis.gl/react-google-maps";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
@@ -16,58 +17,61 @@ import {
   SheetTitle,
 } from "@/components/atoms/baseShadcn/sheet";
 import NoRoleSelected from "@/components/molecules/roleManagement/NoRoleSelected";
+import { AdminDrawControls } from "@/components/organisms/map/AdminDrawControls";
 
-//do you need to run api gen after making it an export in backend??
 interface GeoJsonPolygon {
   type: "Polygon";
   coordinates: [number, number][][];
 }
 
-//passed down so that google maps does not cry (happens more often than you would think)
-interface UniMapProps {
-  apiKey: string;
-}
-
-//the actual outline for the buildings
 function BuildingFootprint({ building }: { building: BuildingType }) {
   const footprint = building.footprint as GeoJsonPolygon | null;
-  const path = footprint?.coordinates?.[0]?.map(([lng, lat]) => ({ lat, lng }));
+
+  const polygon = footprint?.coordinates?.[0];
+
+  const path = Array.isArray(polygon)
+    ? polygon
+        .filter((coord) => Array.isArray(coord) && coord.length >= 2)
+        .map(([lng, lat]) => ({ lat, lng }))
+    : undefined;
+
   const colour = building.displayColour || "blue";
 
   useShapeCreator("polygon", {
-    polygon: path
-      ? {
-          paths: path,
-          strokeColor: colour,
-          strokeWeight: 2.5,
-          fillColor: colour,
-          fillOpacity: 0.2,
-        }
-      : undefined,
+    polygon:
+      path && path.length >= 3
+        ? {
+            paths: path,
+            strokeColor: colour,
+            strokeWeight: 2.5,
+            fillColor: colour,
+            fillOpacity: 0.2,
+          }
+        : undefined,
   });
 
   return null;
 }
 
-export function UniMap({ apiKey }: UniMapProps) {
+export function UniMap() {
   const router = useRouter();
   const [selectedBuilding, setSelectedBuilding] = useState<BuildingType | null>(
     null,
   );
   const { data: buildings = [] } = useQuery(getAllBuildingsQ());
-  const hasRole = UserDetails.getUniDetails()?.role != null;
+  const role = UserDetails.getUniDetails()?.role;
+  const isAssignedRole = role != null;
 
-  if (!hasRole) {
+  const canUserDraw = role === "UNIVERSITY_ADMIN";
+
+  if (!isAssignedRole) {
     return <NoRoleSelected />;
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-[var(--bg-base)]">
-      <div className="flex-1 overflow-hidden border border-[var(--border)] shadow-md">
-        <MapScreen
-          apiKey={apiKey}
-          onRequestMapSetup={() => router.push("/mapping/config")}
-        >
+    <div className="flex-1 flex flex-col bg-[var(--bg-base)] mx-4 gap-4">
+      <div className="flex-1 overflow-hidden">
+        <MapScreen onRequestMapSetup={() => router.push("/mapping/config")}>
           {buildings.map((building) => (
             <div key={building.buildingId}>
               {building.location && (
@@ -89,6 +93,7 @@ export function UniMap({ apiKey }: UniMapProps) {
           ))}
         </MapScreen>
       </div>
+      {canUserDraw && <AdminDrawControls buildings={buildings} />}
 
       <Sheet
         open={!!selectedBuilding}

@@ -34,9 +34,9 @@ export function useBuildingDraw() {
       return null;
     }
 
-    const polygon = polygonPath.map((poly) => {
-      [poly.lat, poly.lng] as [number, number];
-    });
+    const polygon = polygonPath.map(
+      (poly) => [poly.lng, poly.lat] as [number, number],
+    );
 
     //connects the points
     polygon.push(polygon[0]);
@@ -113,7 +113,7 @@ export function useBuildingDraw() {
         });
       } else {
         placedPinReference.current.setPosition(pinLocation);
-        placedPinReference.current.setMap(null);
+        placedPinReference.current.setMap(map);
       }
     } else {
       placedPinReference.current?.setMap(null);
