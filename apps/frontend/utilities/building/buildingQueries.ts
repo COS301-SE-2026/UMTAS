@@ -3,6 +3,9 @@ import {
   createBuildingBuilder,
   getAllBuildingsBuilder,
   getAllBuildingsQuery,
+  updateBuildingLocationBody,
+  updateBuildingLocationBuilder,
+  updateBuildingLocationPath,
 } from "./buildingRequestBuilder";
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
 import { mutationOptions, queryOptions } from "@tanstack/react-query";
@@ -32,6 +35,29 @@ export function createBuildingMut() {
     onSuccess: () => {
       getQueryClient().invalidateQueries({
         queryKey: getAllBuildingsQ().queryKey,
+      });
+    },
+    onError: (err) => console.error("mutation failed", err),
+  });
+}
+
+export function updateBuildingLocationMut() {
+  return mutationOptions({
+    mutationFn: async (vars: {
+      body: updateBuildingLocationBody;
+      path: updateBuildingLocationPath;
+    }) => {
+      console.log(vars.body);
+      const result = new updateBuildingLocationBuilder().send({
+        body: vars.body,
+        paths: vars.path,
+      });
+      console.log("result", await result);
+      return result;
+    },
+    onSuccess: () => {
+      getQueryClient().invalidateQueries({
+        queryKey: ["buildings"],
       });
     },
     onError: (err) => console.error("mutation failed", err),

@@ -16,6 +16,13 @@ export type createBuildingPath =
 export type createBuildingRes =
   paths["/api/buildings"]["post"]["responses"]["201"]["content"]["application/json"];
 
+export type updateBuildingLocationBody =
+  paths["/api/buildings/{buildingId}"]["patch"]["requestBody"]["content"]["application/json"];
+export type updateBuildingLocationPath =
+  paths["/api/buildings/{buildingId}"]["patch"]["parameters"]["path"];
+export type updateBuildingLocationRes =
+  paths["/api/buildings/{buildingId}"]["patch"]["responses"]["200"]["content"]["application/json"];
+
 export class getAllBuildingsBuilder extends RequestBuilder<
   getAllBuildingsQuery,
   undefined,
@@ -35,5 +42,16 @@ export class createBuildingBuilder extends RequestBuilder<
   constructor() {
     super();
     this.setUrl("/buildings").setMethod(RequestMethod.POST);
+  }
+}
+
+export class updateBuildingLocationBuilder extends RequestBuilder<
+  updateBuildingLocationPath,
+  updateBuildingLocationBody,
+  updateBuildingLocationRes
+> {
+  constructor() {
+    super();
+    this.setUrl("/buildings/{buildingId}").setMethod(RequestMethod.PATCH);
   }
 }
