@@ -25,7 +25,7 @@
     "test:cov": "clear && jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "docker:clean": "docker-compose down -v && docker network prune -f"
+    "docker:clean": "docker compose down -v --remove-orphans --timeout 1; docker ps -aq | xargs -r docker kill; docker ps -aq | xargs -r docker rm -f; docker network prune -f; docker volume prune -f"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.940.0",
