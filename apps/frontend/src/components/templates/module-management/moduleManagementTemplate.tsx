@@ -29,6 +29,7 @@ import NotFound from "@/app/not-found";
 
 import NoRoleSelected from "@/components/molecules/roleManagement/NoRoleSelected";
 import { fetchAllModulesv2 } from "../../../../utilities/V2-Builders/Modules";
+import { Checkbox } from "@/components/atoms/baseShadcn/checkbox";
 const steps = [
   {
     target: "#btn-create-module-new",
@@ -50,27 +51,29 @@ const steps = [
 
 export default function ModManagementTemplate() {
   const [showCreateModule, updateShowModule] = useState(false);
+  const [enrolledQ, setEnrolledQ] = useState<boolean>(false);
   const { data: modData } = useQuery({
-    queryKey: ["Modules"],
+    queryKey: [
+      "Modules",
+      UserDetails.getUniDetails()?.UniversityID ?? "",
+      enrolledQ ?? false,
+    ],
     queryFn: async () => {
-      const result = await fetchAllModulesv2({});
+      const result = await fetchAllModulesv2({
+        universityId: UserDetails.getUniDetails()?.UniversityID,
+        userEnrollment: enrolledQ,
+      });
       return result.modules;
     },
   });
-
-  const eventQueries = useQueries({
-    queries: (modData ?? []).map((module) => ({
-      ...getAllEventsAdminQ(module.moduleID),
-      enabled: !!module.moduleID,
-    })),
-  });
-
-  const data: ModuleTableData[] =
-    modData?.map((module, idx) => ({
-      modules: module,
-      events: eventQueries[idx].data ?? [],
-    })) ?? [];
-
+  const data = useMemo(
+    () =>
+      modData?.map((module) => ({
+        modules: module,
+        events: module.Events ?? [],
+      })) ?? [],
+    [modData],
+  );
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedPrefix, setSelectedPrefix] = useState("All");
 
@@ -104,7 +107,7 @@ export default function ModManagementTemplate() {
         searchQuery === "" ||
         module.moduleCode?.toLowerCase().includes(searchLowercase) ||
         module.moduleName?.toLowerCase().includes(searchLowercase) ||
-        events.some(
+        events?.some(
           (event) =>
             event.eventName?.toLowerCase().includes(searchLowercase) ||
             event.activityCode?.toLowerCase().includes(searchLowercase),
@@ -160,6 +163,15 @@ export default function ModManagementTemplate() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-[var(--background)]"
+            />
+          </div>
+          <div className="  flex items-center text-left gap-x-4 flex-row  bg-[var(--background)] px-2 p-1 rounded-xl ">
+            <label className="focus:text-accent-foreground ">
+              Show only enrolled modules
+            </label>
+            <Checkbox
+              checked={enrolledQ}
+              onCheckedChange={(checked: boolean) => setEnrolledQ(checked)}
             />
           </div>
 

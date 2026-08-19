@@ -90,7 +90,12 @@ export default function CourseManagementTemplate() {
     data: courseData = [],
     isLoading: isCourseLoading,
     isError: isCourseError,
-  } = useQuery(getAllCoursesQ());
+  } = useQuery(
+    getAllCoursesQ({
+      Degree: selectedDegree == "All" ? undefined : selectedDegree,
+      UniversityID: UserDetails.getUniDetails()?.UniversityID,
+    }),
+  );
 
   //use memo for caching between renders
   const availableDegrees = useMemo(() => {

@@ -59,9 +59,9 @@ export function updateCourseQ() {
   });
 }
 
-export function deleteCourseQ(path: deleteCoursePath) {
+export function deleteCourseQ() {
   return mutationOptions({
-    mutationFn: async () => {
+    mutationFn: async (path: deleteCoursePath) => {
       return new deleteCourseBuilder().send({ paths: path });
     },
     onSuccess: () => {
