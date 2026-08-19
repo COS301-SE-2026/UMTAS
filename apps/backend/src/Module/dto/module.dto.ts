@@ -372,3 +372,26 @@ export class AddModulesToCourseResponseDto extends AddModulesToCourseDto {
   @IsUUID('4', { message: 'CourseID should be a UUID' })
   CourseID!: string;
 }
+
+export class EnrollToModuleDto {
+  @ApiPropertyOptional({
+    example: undefined,
+    description: 'Enroll or unenroll',
+    type: Boolean,
+  })
+  @IsOptional()
+  @IsBoolean()
+  @IsOptional()
+  @Transform(({ value }) => {
+    if (
+      value === 'true' ||
+      value === 'TRUE' ||
+      value === true ||
+      value === 1 ||
+      value === '1'
+    )
+      return true;
+    else return false;
+  })
+  enroll?: boolean;
+}

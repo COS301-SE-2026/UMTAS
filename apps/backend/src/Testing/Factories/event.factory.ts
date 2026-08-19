@@ -18,6 +18,7 @@ import { ActivityType } from 'shared-types';
 
 const EVENT_NAME: string = 'TestEvent';
 
+//Entity.eventCriteria has same type
 export function createEventCriteria(
   eventSource: EventSource = EventSource.UNIVERSITY,
   overrides: Partial<EventCriteria> = {},
@@ -38,10 +39,11 @@ export function createEventCriteria(
   return { ...base, ...overrides };
 } //END_createEventCriteria
 
-export function createEventCriteriaDtoV2(
+//Dto
+export function createEventCriteriaV2(
   overrides: Partial<EventCriteriaDtoV2> = {},
 ): EventCriteriaDtoV2 {
-  const base: EventCriteriaDtoV2 = {
+  return {
     date: '2026-01-12',
     startTime: '08:30',
     endTime: '10:20',
@@ -49,10 +51,9 @@ export function createEventCriteriaDtoV2(
 
     ...overrides,
   };
-
-  return { ...base, ...overrides };
 } //END_createEventCriteriaV2
 
+//Entity
 type EventEntity = typeof Event.$inferSelect;
 export function createEvent(
   eventSource: EventSource = EventSource.UNIVERSITY,
@@ -116,6 +117,7 @@ export function createEventSingleResponse(
   };
 } //END_createEventSingleResponse
 
+//Dto
 export function createCreateEventDto(event: EventEntity): CreateEventDto {
   return {
     eventName: event.eventName,
@@ -127,6 +129,7 @@ export function createCreateEventDto(event: EventEntity): CreateEventDto {
   };
 } ///END_createCreateEventDto
 
+//Dto
 export function createCreateEventDtoV2(event: EventEntity): CreateEventDtoV2 {
   return {
     eventName: event.eventName,

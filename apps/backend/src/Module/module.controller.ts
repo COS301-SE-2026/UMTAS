@@ -4,6 +4,7 @@ import {
   AddModulesToCourseResponseDto,
   CreateModuleDto,
   DeleteModuleResponseDto,
+  EnrollToModuleDto,
   EnrolResponseDto,
   ModuleFiltersDto,
   ModuleListResponseDto,
@@ -268,6 +269,36 @@ export class ModuleController {
     @Param('moduleId', ParseUUIDPipe) moduleId: string,
   ): Promise<EnrolResponseDto> {
     return this.service.enrollToModule(session.user.id, moduleId);
+  } //END_enrol
+
+  //Enrol to module
+  @Patch('enroll/:moduleId')
+  @Roles('student')
+  @ApiOperation({
+    summary: 'Enrol student to module - V2',
+    operationId: 'enrolStudentToModuleV2',
+  })
+  @ApiBody({ type: EnrollToModuleDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Student successfully enrolled student into module',
+    type: EnrolResponseDto,
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Unenrolled user from module',
+    type: EnrolResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Module not found',
+  })
+  enrolV2(
+    @CurrentSession() session: SessionData,
+    @Param('moduleId', ParseUUIDPipe) moduleId: string,
+    @Body() dto: EnrollToModuleDto,
+  ): Promise<EnrolResponseDto> {
+    return this.service2.enrollToModuleV2(session.user.id, moduleId, dto);
   } //END_enrol
 
   //Add modules to Course

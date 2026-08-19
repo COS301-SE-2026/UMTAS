@@ -6,14 +6,12 @@ import { userId, moduleId, uniId } from '../Testing/constants';
 //Actual Service imports
 import { DatabaseService } from '../db/database.service';
 import { EventServiceV2 } from './eventV2.service';
-import { ModuleService } from '../Module/module.service';
 import { EventImportFingerprintService } from './event-import-fingerprint.service';
 import { UniversityService } from '../University/university.service';
 
 //Mocks
 import { createMockDatabase, mockTransaction } from '../Testing/Mocks/';
 import {
-  createMockModuleService,
   createMockEventImportFingerprintService,
   createMockUniversityService,
 } from '../Testing/Mocks/services/';
@@ -26,6 +24,7 @@ import {
   createEventDto,
   createModule,
   createCreateEventDtoV2,
+  createEventCriteriaV2,
 } from '../Testing/Factories/';
 
 import { EventSource } from './dto/event.types';
@@ -33,12 +32,15 @@ import {
   BadRequestException,
   InternalServerErrorException,
 } from '@nestjs/common';
+import { createMockModuleServiceV2 } from 'src/Testing/Mocks/services/moduleV2.mock';
+import { ModuleServiceV2 } from 'src/Module/moduleV2.service';
 
-describe('EventService', () => {
+describe('EventServiceV2', () => {
   let service: EventServiceV2;
 
   const { mockDb, reset: resetDb } = createMockDatabase();
-  const { mockModuleService, reset: resetModule } = createMockModuleService();
+  const { mockModuleServiceV2, reset: resetModule } =
+    createMockModuleServiceV2();
   const { mockEventFingerprintService, reset: resetEventFingerprint } =
     createMockEventImportFingerprintService();
   const { mockUniversityService, reset: resetUniversity } =
@@ -49,7 +51,7 @@ describe('EventService', () => {
       providers: [
         EventServiceV2,
         { provide: DatabaseService, useValue: { db: mockDb } },
-        { provide: ModuleService, useValue: mockModuleService },
+        { provide: ModuleServiceV2, useValue: mockModuleServiceV2 },
         {
           provide: EventImportFingerprintService,
           useValue: mockEventFingerprintService,
@@ -107,34 +109,6 @@ describe('EventService', () => {
       );
     });
 
-    //UnHapp - Recurring event - day of week required
-    it('should throw if dayOfWeek is undefined for recurring event', async () => {
-      //Arrange
-      const event = createEvent(
-        EventSource.UNIVERSITY,
-        { isRecurring: true },
-        { dayOfWeek: undefined },
-      );
-      const dto = createCreateEventDtoV2(event);
-
-      const uni = createUniversity();
-
-      mockUniversityService.getById?.mockResolvedValue(uni);
-
-      const module = createModule();
-
-      mockModuleService.getById?.mockResolvedValue(module);
-
-      mockTransaction(mockDb, {});
-
-      //Act + Assert
-      await expect(service.createV2(dto, userId, uniId)).rejects.toThrow(
-        new BadRequestException(
-          `day_Of_Week[${undefined}] required for recurring event.`,
-        ),
-      );
-    });
-
     //UnHapp - failed to insert event
     it('should throw if failed to insert new Event', async () => {
       //Arrange
@@ -147,7 +121,7 @@ describe('EventService', () => {
 
       const module = createModule();
 
-      mockModuleService.getById?.mockResolvedValue(module);
+      mockModuleServiceV2.getByIdV2?.mockResolvedValue(module);
 
       mockTransaction(mockDb, {
         insert: [[]],
@@ -172,7 +146,7 @@ describe('EventService', () => {
 
       const module = createModule();
 
-      mockModuleService.getById?.mockResolvedValue(module);
+      mockModuleServiceV2.getById?.mockResolvedValue(module);
 
       mockTransaction(mockDb, {
         select: [
@@ -193,6 +167,80 @@ describe('EventService', () => {
       expect(mockDb.insert).toHaveBeenCalledTimes(2);
     });
 
+    //UnHapp - Test defaults on createEventDtoV2
+    it('should default if createEventDtoV2 only contains: eventCriteria, ', async () => {
+      //Arrange
+      const event = createEvent(EventSource.UNIVERSITY, {
+        eventName: undefined,
+        activityCode: undefined,
+        activityType: undefined,
+        isRecurring: undefined,
+        validated: undefined,
+      });
+      const dto = createCreateEventDtoV2(event);
+
+      const uni = createUniversity();
+
+      // Validate University
+      mockUniversityService.getById?.mockResolvedValue(uni);
+
+      const module = createModule();
+
+      mockModuleServiceV2.getById?.mockResolvedValue(module);
+
+      const uniEvent = createUniversityEvent({
+        eventID: event.eventID,
+        moduleID: moduleId,
+      });
+
+      const eventCreated = createEvent(
+        EventSource.UNIVERSITY,
+        {
+          eventName: 'Event_lec',
+          activityCode: 'lec',
+          activityType: 'lecture',
+          isRecurring: false,
+          validated: false,
+        },
+        {
+          moduleId: module.moduleID,
+        },
+      );
+
+      mockTransaction(mockDb, {
+        select: [
+          [], //mapEventToDto
+        ],
+        insert: [
+          [eventCreated], //getEventVenues
+          [uniEvent], //createV2
+        ],
+      });
+
+      const expected = {
+        event: createEventDto(
+          {
+            eventId: eventCreated.eventID,
+            activityCode: 'lec',
+            activityType: 'lecture',
+            eventName: 'Event_lec',
+            isRecurring: false,
+            validated: false,
+          },
+          createEventCriteriaV2({
+            moduleId: module.moduleID,
+          }),
+        ),
+      };
+
+      //Act + Assert
+      const result = await service.createV2(dto, userId, uniId);
+
+      //ACt + Assert
+
+      expect(result).toMatchObject(expected);
+    });
+
     //Happy - return newly created event
     it('should create a new event', async () => {
       //Arrange
@@ -205,7 +253,7 @@ describe('EventService', () => {
 
       const module = createModule();
 
-      mockModuleService.getById?.mockResolvedValue(module);
+      mockModuleServiceV2.getById?.mockResolvedValue(module);
 
       const uniEvent = createUniversityEvent({
         eventID: event.eventID,

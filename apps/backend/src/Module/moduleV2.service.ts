@@ -1,5 +1,7 @@
 import { DatabaseService } from 'src/db/database.service';
 import {
+  EnrollToModuleDto,
+  EnrolResponseDto,
   ModuleFiltersDto,
   ModuleListResponseDto,
   ModuleSingleResponseDto,
@@ -10,6 +12,7 @@ import {
   forwardRef,
   Inject,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { and, eq, getTableColumns, ilike, SQL } from 'drizzle-orm';
@@ -38,6 +41,7 @@ export class ModuleServiceV2 extends ModuleService {
     super(dbService, courseService, groupingService);
   }
 
+  //getAllV2, overwrite
   async getAll(
     userId: string,
     filters: ModuleFiltersDto,
@@ -186,4 +190,98 @@ export class ModuleServiceV2 extends ModuleService {
 
     return module;
   }
+
+  //EnrollToModule
+  async enrollToModuleV2(
+    userId: string,
+    moduleId: string,
+    dto: EnrollToModuleDto,
+    tx?: DatabaseService['db'],
+  ): Promise<EnrolResponseDto> {
+    async function unenroll(userId: string, moduleId: string, tx: AppDatabase) {
+      await tx
+        .delete(ModuleEnrollment)
+        .where(
+          and(
+            eq(ModuleEnrollment.UserID, userId),
+            eq(ModuleEnrollment.ModuleID, moduleId),
+          ),
+        );
+    }
+
+    if (!tx) {
+      return this.dbService.db.transaction(async (t: AppDatabase) => {
+        return this.enrollToModuleV2(userId, moduleId, dto, t);
+      }); //END_transaction
+    } //END_transaction precencer check
+
+    const enroll = dto.enroll;
+
+    //Check if module exists
+    await this.getByIdV2({ moduleId, tx });
+
+    //Check if user already enrolled to module
+    const [enrollmentStatus] = await tx
+      .select()
+      .from(ModuleEnrollment)
+      .where(
+        and(
+          eq(ModuleEnrollment.UserID, userId),
+          eq(ModuleEnrollment.ModuleID, moduleId),
+        ),
+      )
+      .limit(1);
+
+    //If already enrolled
+    if (enrollmentStatus) {
+      if (enroll) {
+        //Defined and true
+        return {
+          moduleID: moduleId,
+          UserID: userId,
+          message: `User[${userId}] already enrolled in module[${moduleId}]`,
+        };
+      }
+
+      unenroll(userId, moduleId, tx);
+      //return successfull Unenrollment
+      return {
+        moduleID: moduleId,
+        UserID: userId,
+        message: `Successfully Unenrolled student[${userId}] from module[${moduleId}]`,
+      };
+    }
+
+    if (enroll === undefined || enroll) {
+      //Undefined and true
+      //Enroll student to module
+      const [newlyEnrolled] = await tx
+        .insert(ModuleEnrollment)
+        .values({
+          UserID: userId,
+          ModuleID: moduleId,
+        })
+        .returning();
+
+      //Check if enrollment failed
+      if (!newlyEnrolled)
+        throw new InternalServerErrorException(
+          `Failed to enroll student[${userId}] into module[${moduleId}]`,
+        );
+
+      //return successfull enrollment
+      return {
+        moduleID: moduleId,
+        UserID: userId,
+        message: `Successfully enrolled student[${userId}] into module[${moduleId}]`,
+      };
+    }
+
+    //Return already unenrolled
+    return {
+      moduleID: moduleId,
+      UserID: userId,
+      message: `Student[${userId}] already unenrolled from module[${moduleId}]`,
+    };
+  } //END_enrollToModule
 }

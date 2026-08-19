@@ -71,7 +71,7 @@ export class EventServiceV2 extends EventService {
       );
 
     //Validate DTO
-    dto = await this.validateCreateEventDto(tx, userId, university, dto);
+    dto = await this.validateCreateEventDto(tx, university, dto);
 
     const moduleId = dto.eventCriteria.moduleId;
 
@@ -168,7 +168,6 @@ export class EventServiceV2 extends EventService {
 
   protected async validateCreateEventDto(
     tx: AppDatabase,
-    userId: string,
     uni: UniversitySingleResponseDto,
     dto: CreateEventDtoV2,
   ): Promise<CreateEventDtoV2> {
@@ -199,8 +198,7 @@ export class EventServiceV2 extends EventService {
     //END_EventName
 
     //Validate validated
-    const v = validated.validated;
-    if (v === undefined) validated.validated = false;
+    validated.validated = validated.validated ?? false;
     //END_validated
 
     //Validate eventCriteria
