@@ -2,6 +2,7 @@ import {
   ConflictException,
   ForbiddenException,
   Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { Building, Venue } from '../entities/index';
 import { DatabaseService } from '../db/database.service';
@@ -12,8 +13,9 @@ import {
   BuildingQueryDto,
   BuildingSingleResponseDto,
   CreateBuildingDto,
+  UpdateBuildingLocationDto,
 } from './dto/building.dto';
-import { eq, ilike, isNotNull, isNull, sql, and } from 'drizzle-orm';
+import { eq, ilike, isNotNull, isNull, sql, and, count } from 'drizzle-orm';
 
 //building row return drizzle gives us
 type BuildingEntity = typeof Building.$inferSelect;
@@ -104,7 +106,7 @@ export class BuildingService {
       .where(
         and(
           eq(Building.UniversityID, universityId),
-          eq(Building.BuildingID, buildingDto.buildingName),
+          eq(Building.BuildingName, buildingDto.buildingName),
         ),
       )
       .limit(1);
@@ -130,5 +132,56 @@ export class BuildingService {
       .returning();
 
     return { building: this.buildingDtoAdapter(row, 0) };
+  }
+
+  async updateBuildingLocation(
+    session: SessionData,
+    buildingID: string,
+    updateBuildingLocationDto: UpdateBuildingLocationDto,
+  ): Promise<BuildingSingleResponseDto> {
+    const universityId = this.requireUniId(session);
+    const database = this.databaseService.db;
+
+    const [existingBuilding] = await database
+      .select()
+      .from(Building)
+      .where(
+        and(
+          eq(Building.BuildingID, buildingID),
+          eq(Building.UniversityID, universityId),
+        ),
+      )
+      .limit(1);
+
+    if (!existingBuilding) {
+      throw new NotFoundException('Building could not be found');
+    }
+
+    //everything is optional
+    const updateValues: Partial<typeof Building.$inferInsert> = {};
+
+    //only update what was sent
+    if (updateBuildingLocationDto.location != undefined) {
+      updateValues.Latitude = updateBuildingLocationDto.location?.lat ?? null;
+      updateValues.Longitude = updateBuildingLocationDto.location?.lng ?? null;
+    }
+
+    //only update what was sent
+    if (updateBuildingLocationDto.footprint != undefined) {
+      updateValues.Footprint = updateBuildingLocationDto.footprint;
+    }
+
+    const [row] = await database
+      .update(Building)
+      .set(updateValues)
+      .where(eq(Building.BuildingID, buildingID))
+      .returning();
+
+    const [{ venueCount }] = await database
+      .select({ venueCount: count(Venue.VenueID) })
+      .from(Venue)
+      .where(eq(Venue.BuildingID, buildingID));
+
+    return { building: this.buildingDtoAdapter(row, venueCount) };
   }
 }

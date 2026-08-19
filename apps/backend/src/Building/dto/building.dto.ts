@@ -169,6 +169,29 @@ export class BuildingListResponseDto {
   buildings!: BuildingDto[];
 }
 
+export class UpdateBuildingLocationDto {
+  @ApiProperty({
+    description: 'The location of the building pin. Sending null will unpin',
+    example: { lat: -67.67, lng: 67.67 },
+    nullable: true,
+  })
+  @IsOptional()
+  @IsObject()
+  location?: { lat: number; lng: number } | null;
+
+  @ApiProperty({
+    description:
+      'GeoJSON polygon outline for the building. Send null to clear the polygon.',
+    nullable: true,
+  })
+  @IsOptional()
+  @IsObject()
+  footprint?: {
+    type: 'Polygon';
+    coordinates: [number, number][][];
+  } | null;
+}
+
 export class DeleteBuildingResponseDto {
   @ApiProperty({ example: 'IT Building' })
   buildingName!: string;
