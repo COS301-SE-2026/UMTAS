@@ -30,7 +30,9 @@ class DomainUser(HttpUser):
             self.profile = {}
 
         self.pdf_id = None
+        self.pdf_result_ready = False
         self.solver_id = None
+        self.available_event_ids = []
 
         admin_token = os.environ.get('SIMULATION_API_KEY')
         if not admin_token:
@@ -92,11 +94,11 @@ class DomainUser(HttpUser):
 
     @task(5)
     def upload_timetable_pdf(self):
-        if not PDF_FILES:
-            return
-        
-        if not hasattr(self, 'uni_id') or not self.uni_id:
+        if not PDF_FILES or not getattr(self, 'uni_id', None):
             return 
+            
+        if getattr(self, 'pdf_id', None):
+            return
 
         random_pdf_path = random.choice(PDF_FILES)
         
@@ -113,26 +115,49 @@ class DomainUser(HttpUser):
                     response.success()
                     print(f"PDF {random_pdf_path} uploaded successfully for universityId {self.uni_id}.")
                     self.pdf_id = response.json().get("jobId")
+                    self.pdf_result_ready = False
                 else:
                     response.failure(f"Upload rejected: {response.text}")
                     print(f"PDF UPLOAD ERROR: {response.status_code} - {response.text}")
 
     @task(3)
     def check_pdf_parser_status(self):
-        if not self.pdf_id:
+        if not getattr(self, 'pdf_id', None) or getattr(self, 'pdf_result_ready', False):
             return
         
         with self.client.get(f'/api/pdf-parser/jobs/{self.pdf_id}', catch_response=True) as response:
             if response.status_code == 200:
-                print(f"PDF parser job {self.pdf_id} is complete.")
-                response.success()
+                data = response.json()
+                status = data.get("status", "").lower()
+                
+                if status in ["completed", "done", "success"]: 
+                    self.pdf_result_ready = True
+                    response.success()
+                    
+                elif status in ["failed", "error"]:
+                    error_msg = data.get("error", {}).get("message", "Unknown error")
+                    response.failure(f"Backend job failed: {error_msg}")
+                    self.pdf_id = None
+                    self.pdf_result_ready = False
+                    
+                else: 
+                    response.success()
+                    
             elif response.status_code == 404:
                 self.pdf_id = None 
+                self.pdf_result_ready = False
 
     @task(2)
     def get_pdf_parser_result(self):
-        if self.pdf_id:
-            self.client.get(f'/api/pdf-parser/jobs/{self.pdf_id}/result')
+        if getattr(self, 'pdf_id', None) and getattr(self, 'pdf_result_ready', False):
+            with self.client.get(f'/api/pdf-parser/jobs/{self.pdf_id}/result', catch_response=True) as response:
+                if response.status_code == 200:
+                    response.success()
+                elif response.status_code == 404:
+                    response.failure(f"Result 404 for ready job {self.pdf_id}")
+                
+                self.pdf_id = None
+                self.pdf_result_ready = False
 
     @task(2)
     def view_enrolled_modules(self):
@@ -144,7 +169,20 @@ class DomainUser(HttpUser):
 
     @task(2)
     def view_all_events(self):
-        self.client.get('/api/events')
+        with self.client.get('/api/events', catch_response=True) as response:
+            if response.status_code == 200:
+                try:
+                    data = response.json()
+                    events_list = data.get('events', [])
+                    
+                    extracted_ids = [str(event.get('eventId')) for event in events_list if event.get('eventId')]
+                    
+                    if extracted_ids:
+                        self.available_event_ids = extracted_ids
+                        
+                    response.success()
+                except Exception as e:
+                    response.failure(f"Failed to parse events JSON: {str(e)}")
 
     @task(1)
     def get_active_session(self):
@@ -152,20 +190,41 @@ class DomainUser(HttpUser):
 
     @task(1)
     def submit_solver_job(self):
+        def is_valid_uuid(val):
+            try:
+                uuid.UUID(str(val))
+                return True
+            except ValueError:
+                return False
+
+        event_ids_to_use = []
+
+        if hasattr(self, 'available_event_ids') and self.available_event_ids:
+            num_events = min(3, len(self.available_event_ids))
+            event_ids_to_use = random.sample(self.available_event_ids, num_events)
+            
+        if not event_ids_to_use:
+            raw_profile_ids = self.profile.get("eventIds", [])
+            event_ids_to_use = [eid for eid in raw_profile_ids if is_valid_uuid(eid)]
+
+        if not event_ids_to_use:
+            return 
+
         payload = {
-            "eventIds": self.profile.get("eventIds", []), 
+            "eventIds": event_ids_to_use, 
             "solveMode": "feasibility",
             "engine": "auto",
             "preferences": {
                 "heuristics": []
             }
         }
+        
         with self.client.post('/api/solver/jobs', json=payload, catch_response=True) as response:
             if response.status_code == 202:
                 response.success()
                 self.solver_id = response.json().get("jobId")
             else:
-                response.failure(f"Solver rejected: {response.text}")
+                response.failure(f"Solver rejected [{response.status_code}]: {response.text}")
 
     @task(1)
     def check_solver_status(self):
