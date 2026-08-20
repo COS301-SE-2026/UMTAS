@@ -75,6 +75,8 @@ function slotSpan(startTime: string, endTime: string): number {
 export function WeeklyGrid({ events, weekStart }: WeeklyGridProps) {
   const weekDates = getWeekDates(weekStart);
 
+  console.log(events, "These are the events being logged");
+
   function getEventsForDay(date: Date): ScheduleEvent[] {
     const dateStr = isoDateStr(date);
 
@@ -98,7 +100,11 @@ export function WeeklyGrid({ events, weekStart }: WeeklyGridProps) {
           result.push(event);
         }
       } else {
-        if (event.date === dateStr) {
+        if (
+          event.date === dateStr &&
+          event.date != undefined &&
+          event.date != ""
+        ) {
           result.push(event);
         }
       }
