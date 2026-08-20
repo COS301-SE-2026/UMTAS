@@ -128,14 +128,6 @@ export class EventDto {
   venues?: VenueDto[];
 }
 
-// export class CreateEventDto2 extends PickType(EventDto, [
-// 'eventName',
-// 'activityType',
-// 'activityCode'
-// ]){
-
-// }
-
 export class CreateEventDto extends PickType(EventDto, [
   'eventName',
   'activityCode',
@@ -189,6 +181,8 @@ export class EventSingleResponseDto {
 }
 export class EventListResponseDto {
   @ApiProperty({ type: [EventDto] }) events!: EventDto[];
+
+  message?: string;
 }
 export class DeleteResponseDto extends PickType(EventDto, [
   'eventName',

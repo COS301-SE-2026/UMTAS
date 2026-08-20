@@ -2,7 +2,7 @@
 import { getAllCoursesQ } from "@/app/course-management/queries/courses/courseQueries";
 import { Spinner } from "@/components/atoms/baseShadcn/spinner";
 import { UserDetails } from "@/lib/userclass/userClass";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { CourseTableData } from "@/components/organisms/course-management/courseColumns";
 
@@ -37,6 +37,13 @@ import NotFound from "@/app/not-found";
 import { AddCoursePopup } from "@/components/organisms/course-management/AddCoursePopup";
 import NoRoleSelected from "@/components/molecules/roleManagement/NoRoleSelected";
 import { EditCoursePopup } from "@/components/organisms/course-management/EditCoursePopup";
+import { ExternalCoursesPopup } from "@/components/organisms/course-management/API-gen/externalCoursesPopup";
+import Popup from "@/components/atoms/utility/floatContainer";
+import {
+  addCourseEvents,
+  addCourseModules,
+} from "@/components/organisms/course-management/API-gen/Queries/request";
+import { getQueryClient } from "@/components/tanstack/getQueryClient";
 
 const steps = [
   {
@@ -67,6 +74,7 @@ export default function CourseManagementTemplate() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDegree, setSelectedDegree] = useState("All");
   const [selectedModulePrefix, setSelectedModulePrefix] = useState("All");
+  const [showExternalCourses, setExternalCourses] = useState(false);
   const [possibleCourses, setPossibleCourses] = useState<
     Record<string, boolean>
   >({});
@@ -75,6 +83,24 @@ export default function CourseManagementTemplate() {
 
   const ViableRole = UniDetails?.role === "UNIVERSITY_ADMIN";
 
+  const { mutate: addExternalModules, isPending: modulesPending } = useMutation(
+    {
+      ...addCourseModules(),
+      onSuccess: (data) => {
+        getQueryClient().invalidateQueries({
+          queryKey: getAllCoursesQ({
+            Degree: selectedDegree == "All" ? undefined : selectedDegree,
+            UniversityID: UserDetails.getUniDetails()?.UniversityID,
+          }).queryKey,
+        });
+        addExternalEvents(data.modules);
+      },
+    },
+  );
+
+  const { mutate: addExternalEvents, isPending: eventsPending } = useMutation({
+    ...addCourseEvents(),
+  });
   // if (UniDetails === null) {
   //   router.push("/dashboard");
   // }
@@ -264,12 +290,26 @@ export default function CourseManagementTemplate() {
               </Select>
               <Button
                 data-testid="show-add-course"
-                onClick={() => setShowAddCourse(true)}
+                onClick={() => {
+                  if (
+                    UserDetails.getUniDetails()?.UniversityName ===
+                    "University of Maryland"
+                  ) {
+                    setExternalCourses(true);
+                  } else {
+                    setShowAddCourse(true);
+                  }
+                }}
               >
-                Add Course
+                Add Courses
               </Button>
               {showAddCourse && (
                 <AddCoursePopup onClose={() => setShowAddCourse(false)} />
+              )}
+              {showExternalCourses && (
+                <Popup onClose={() => setExternalCourses(false)}>
+                  <ExternalCoursesPopup />
+                </Popup>
               )}
             </div>
           </div>
@@ -345,8 +385,28 @@ export default function CourseManagementTemplate() {
                               Associated Modules:
                             </div>
                             {modules.length === 0 ? (
-                              <div className="text-sm text-[var(--text-disabled)] italic">
+                              <div className="text-sm text-[var(--text-disabled)] italic flex flex-row justify-around gap-x-2">
                                 No modules assigned to this course group.
+                                {course.ExternalID != undefined && (
+                                  <Button
+                                    disabled={modulesPending || eventsPending}
+                                    id=""
+                                    size="sm"
+                                    variant="default"
+                                    onClick={() =>
+                                      addExternalModules(course.CourseID)
+                                    }
+                                  >
+                                    {!(modulesPending || eventsPending) ? (
+                                      <p>Add Modules and Events</p>
+                                    ) : (
+                                      <div className="flex flex-row gap-x-2 ">
+                                        Adding modules and events
+                                        <Spinner></Spinner>
+                                      </div>
+                                    )}
+                                  </Button>
+                                )}
                               </div>
                             ) : (
                               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">

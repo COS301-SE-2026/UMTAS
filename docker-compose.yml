@@ -367,3 +367,19 @@ services:
       - "com.centurylinklabs.watchtower.enable=false"
     profiles:
       - server
+
+  mock-university-api:
+    build:
+      context: .
+      dockerfile: docker/mock-university-api/mock-university-api.Dockerfile
+    image: umtas-mock-university-api:local
+    restart: unless-stopped
+    ports:
+      - "3010:3010"
+    networks:
+      - internal
+      - gateway
+    profiles:
+      - dev-docker
+      - dev-pglite
+      - server

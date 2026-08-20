@@ -88,7 +88,7 @@ export class CreateCourseModuleDto extends PickType(CourseModuleDto, [
   'YearOfStudy',
 ]) {}
 
-class StylingDto {
+export class StylingDto {
   @ApiProperty({ example: '#3B82F6' })
   @IsString()
   @IsNotEmpty()
@@ -111,7 +111,7 @@ export class ModulesDto {
   })
   @IsString()
   @IsNotEmpty()
-  @Length(2, 10)
+  @Length(2, 15)
   moduleCode!: string;
 
   @ApiProperty({
@@ -182,6 +182,24 @@ export class ModulesDto {
   @ValidateNested({ each: true })
   @Type(() => EventDto)
   Events?: EventDto[] | null;
+
+  @ApiPropertyOptional({
+    example: '12345',
+    description: 'Refer to module on external API',
+  })
+  @IsOptional()
+  @IsString()
+  @Length(1, 255)
+  ExternalID?: string | null;
+
+  @ApiPropertyOptional({
+    example: false,
+    description: 'Is a user enrolled to this module',
+    type: Boolean,
+  })
+  @IsOptional()
+  @IsBoolean()
+  Enrolled?: boolean;
 } //ModuleDto
 
 //Create
@@ -191,6 +209,7 @@ export class CreateModuleDto extends PickType(ModulesDto, [
   'moduleDescription',
   'styling',
   'validated',
+  'ExternalID',
 ]) {
   @ApiPropertyOptional({
     example: '00000000-0000-0000-0000-000000000000',

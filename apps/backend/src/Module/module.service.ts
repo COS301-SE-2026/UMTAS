@@ -1,6 +1,5 @@
 import {
   NotFoundException,
-  ConflictException,
   Injectable,
   InternalServerErrorException,
   BadRequestException,
@@ -23,6 +22,7 @@ import {
   AddModulesToCourseDto,
   AddModulesToCourseResponseDto,
   CourseModuleDto,
+  ModulesDto,
 } from './dto/module.dto';
 
 //ENtities
@@ -95,10 +95,13 @@ export class ModuleService {
       await this.groupingService.getById(groupId, tx);
 
       //Check for duplicate moduleCode in ModuleGrouping
-      if (await this.existingModuleCodeForModuleGrouping(code, groupId, tx))
-        throw new ConflictException(
-          `Module code [${code}] already exists for ModuleGrouping[${groupId}]`,
-        );
+      const existing = await this.existingModuleCodeForModuleGrouping(
+        userId,
+        code,
+        groupId,
+        tx,
+      );
+      if (existing) return existing;
     } else {
       //If still no groupId
       //-> this means no groupId or courseId provided
@@ -119,6 +122,7 @@ export class ModuleService {
         moduleName: name,
         moduleDescription: description,
         ...(dto.validated === undefined ? {} : { validated: dto.validated }),
+        ExternalID: dto.ExternalID?.trim() ?? null,
       })
       .returning();
 
@@ -564,12 +568,13 @@ export class ModuleService {
   //Check if a module already exists for the ModuleGrouping
   //True for duplicate | false otherwise
   protected async existingModuleCodeForModuleGrouping(
+    userId: string,
     moduleCode: string,
     groupId: string,
     tx: DatabaseService['db'],
-  ): Promise<boolean> {
+  ): Promise<ModulesDto | null> {
     const [existingModule] = await tx
-      .select({ moduleCode: modules.moduleCode })
+      .select({ moduleID: modules.moduleID })
       .from(modules)
       .innerJoin(GroupModules, eq(GroupModules.ModuleID, modules.moduleID))
       .innerJoin(
@@ -585,7 +590,9 @@ export class ModuleService {
       .limit(1);
 
     //If module exists with moduleCode for moduleGrouping, return true else false
-    return !!existingModule;
+    if (existingModule === undefined) return null;
+
+    return this.getById(userId, existingModule.moduleID);
   } //END_existingModuleForCourse
 
   //Set module styling

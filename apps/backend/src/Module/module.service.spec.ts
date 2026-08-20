@@ -34,7 +34,6 @@ import {
 } from '../Testing/Mocks/services';
 import {
   BadRequestException,
-  ConflictException,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
@@ -89,28 +88,28 @@ describe('ModuleService', () => {
     });
 
     //UnHappy - duplicate module code for module grouping
-    it(`should throw if module code already exists for that moduleGrouping`, async () => {
-      //Arrange
-      const group = createGroup();
-      const course = createCourse({ GroupID: group.GroupID });
-      // const module = createModule();
-      const dto = createModuleDto({ CourseID: course.CourseID });
+    // it(`should throw if module code already exists for that moduleGrouping`, async () => {
+    //   //Arrange
+    //   const group = createGroup();
+    //   const course = createCourse({ GroupID: group.GroupID });
+    //   // const module = createModule();
+    //   const dto = createModuleDto({ CourseID: course.CourseID });
 
-      mockCourseService.getById?.mockResolvedValue(course);
+    //   mockCourseService.getById?.mockResolvedValue(course);
 
-      mockGroupingService.getById?.mockResolvedValue(group);
+    //   mockGroupingService.getById?.mockResolvedValue(group);
 
-      mockTransaction(mockDb, {
-        select: [[{ moduleCode: dto.moduleCode }]], //existingModuleCodeFormoduleGrouping
-      });
+    //   mockTransaction(mockDb, {
+    //     select: [[{ moduleCode: dto.moduleCode }]], //existingModuleCodeFormoduleGrouping
+    //   });
 
-      //Act + Assert
-      await expect(service.create(userId, dto)).rejects.toThrow(
-        ConflictException,
-      );
-      expect(mockCourseService.getById).toHaveBeenCalled();
-      expect(mockGroupingService.getById).toHaveBeenCalled();
-    });
+    //   //Act + Assert
+    //   await expect(service.create(userId, dto)).rejects.toThrow(
+    //     ConflictException,
+    //   );
+    //   expect(mockCourseService.getById).toHaveBeenCalled();
+    //   expect(mockGroupingService.getById).toHaveBeenCalled();
+    // });
 
     //UnHappy - failed to create new module
     it('should throw if insert into modules table failed', async () => {
