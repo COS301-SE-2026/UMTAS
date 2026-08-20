@@ -5,9 +5,18 @@ import { Label } from "@/components/atoms/baseShadcn/label";
 import { Spinner } from "@/components/atoms/baseShadcn/spinner";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
-import { fetchAPIserviceCourses } from "./Queries/request";
+import {
+  APIServiceCoursesResp,
+  APIserviceModulesResp,
+  fetchAllEvents,
+  fetchAllModules,
+  fetchAPIserviceCourses,
+  fetchAPIserviceModules,
+  moduleResponseType,
+} from "./Queries/request";
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
 import { getAllCoursesQ } from "@/app/course-management/queries/courses/courseQueries";
+import { moduleDTO } from "@/app/course-management/queries/modules/moduleBuilder";
 
 export function ExternalCoursesPopup() {
   const [numPages, setNumPages] = useState(0);
@@ -19,11 +28,25 @@ export function ExternalCoursesPopup() {
         limit: limit,
         page: numPages,
       }),
-    onSuccess: () => {
+    onSuccess: (successData) => {
       getQueryClient().invalidateQueries({
         queryKey: getAllCoursesQ().queryKey,
       });
+      getModules(successData);
     },
+  });
+
+  const { mutateAsync: getModules, isPending: pendingModules } = useMutation({
+    mutationFn: (coursesToFetch: APIServiceCoursesResp["courses"]) =>
+      fetchAllModules(coursesToFetch),
+    onSuccess: (successData) => {
+      getEvents(successData);
+    },
+  });
+
+  const { mutate: getEvents, isPending: pendingEvents } = useMutation({
+    mutationFn: async (data: APIserviceModulesResp["modules"]) =>
+      fetchAllEvents(data),
   });
 
   return (
@@ -45,7 +68,7 @@ export function ExternalCoursesPopup() {
           max={100}
           type="number"
           placeholder="0"
-          disabled={pendingCourses}
+          disabled={pendingCourses || pendingModules || pendingEvents}
           className="bg-[var(--background)] border-[var(--border)] text-[var(--text-primary)] mb-4"
         />
         <Label htmlFor="number of courses">Number of results</Label>
@@ -56,8 +79,8 @@ export function ExternalCoursesPopup() {
           onChange={(e) => {
             setLimit(Number(e.target.value));
           }}
-          placeholder="e.g. BA Inkleur"
-          disabled={pendingCourses}
+          placeholder="0"
+          disabled={pendingCourses || pendingModules || pendingEvents}
           min={1}
           max={10}
           type="number"
@@ -71,12 +94,12 @@ export function ExternalCoursesPopup() {
           onClick={async () => {
             await getCourses();
           }}
-          disabled={pendingCourses}
+          disabled={pendingCourses || pendingModules || pendingEvents}
           className={
             false ? "bg-[var(--error-bg)] text-[var(--error-text)]" : ""
           }
         >
-          {pendingCourses ? (
+          {pendingCourses || pendingModules || pendingEvents ? (
             <div className="flex flex-row gap-x-3">
               <Spinner></Spinner> fetching courses
             </div>
