@@ -17,7 +17,9 @@ export function createAcademicCalendar(
   return {
     id: randomUUID(),
     universityId: randomUUID(),
+    name: null,
     year: 2026,
+    subscriptions: [],
     createdAt: now,
     updatedAt: now,
     ...overrides,

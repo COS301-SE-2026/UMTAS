@@ -26,6 +26,7 @@ import { AcademicCalendarService } from './academic_calendar.service';
 const universityId = '20000000-0000-4000-8000-000000000001';
 const calendarId = '30000000-0000-4000-8000-000000000001';
 const restrictionId = '40000000-0000-4000-8000-000000000001';
+const publicCalendarId = '30000000-0000-4000-8000-000000000002';
 const createdAt = new Date('2026-01-10T08:00:00.000Z');
 const updatedAt = new Date('2026-01-11T09:00:00.000Z');
 const calendar = createAcademicCalendar({
@@ -61,14 +62,18 @@ async function expectDomainError(
 
 describe('AcademicCalendarService', () => {
   const { mockDb, reset } = createMockDatabase();
+  const generationService = new AcademicCalendarGenerationService();
   const service = new AcademicCalendarService(
     {
       db: mockDb,
     } as unknown as DatabaseService,
-    new AcademicCalendarGenerationService(),
+    generationService,
   );
 
-  afterEach(reset);
+  afterEach(() => {
+    reset();
+    jest.restoreAllMocks();
+  });
 
   describe('academic calendar CRUD', () => {
     it('creates a calendar without exposing persistence metadata', async () => {
@@ -79,6 +84,7 @@ describe('AcademicCalendarService', () => {
       ).resolves.toEqual({
         id: calendarId,
         year: 2026,
+        subscriptions: [],
       });
     });
 
@@ -110,7 +116,30 @@ describe('AcademicCalendarService', () => {
       ).resolves.toMatchObject({
         id: calendarId,
         year: 2026,
+        subscriptions: [],
       });
+    });
+
+    it('lists calendars for the selected university', async () => {
+      const olderCalendar = createAcademicCalendar({
+        ...calendar,
+        id: '30000000-0000-4000-8000-000000000003',
+        year: 2025,
+      });
+      mockDbResult(mockDb.select as jest.Mock, [calendar, olderCalendar]);
+
+      await expect(service.listCalendars(universityId)).resolves.toEqual([
+        { id: calendarId, year: 2026, subscriptions: [] },
+        { id: olderCalendar.id, year: 2025, subscriptions: [] },
+      ]);
+    });
+
+    it('lists calendars for a requested academic year', async () => {
+      mockDbResult(mockDb.select as jest.Mock, [calendar]);
+
+      await expect(service.listCalendars(universityId, 2026)).resolves.toEqual([
+        { id: calendarId, year: 2026, subscriptions: [] },
+      ]);
     });
 
     it('returns the domain not-found error for an unknown calendar', async () => {
@@ -129,6 +158,71 @@ describe('AcademicCalendarService', () => {
       await expect(
         service.deleteCalendar(universityId, calendarId),
       ).resolves.toEqual({ success: true });
+    });
+  });
+
+  describe('subscriptions', () => {
+    it('rejects an unknown public-calendar ID', async () => {
+      mockSequentialResults(mockDb.select as jest.Mock, [[calendar], []]);
+
+      await expectDomainError(
+        service.updateSubscriptions(universityId, calendarId, {
+          subscriptions: [publicCalendarId],
+        }),
+        NotFoundException,
+        publicCalendarId,
+      );
+      expect(mockDb.update).not.toHaveBeenCalled();
+    });
+
+    it('rejects a university-owned calendar as a subscription', async () => {
+      mockSequentialResults(mockDb.select as jest.Mock, [[calendar], []]);
+
+      await expectDomainError(
+        service.updateSubscriptions(universityId, calendarId, {
+          subscriptions: [publicCalendarId],
+        }),
+        NotFoundException,
+        'Public academic calendars not found',
+      );
+    });
+
+    it('rejects a public calendar from a different year', async () => {
+      mockSequentialResults(mockDb.select as jest.Mock, [
+        [calendar],
+        [{ id: publicCalendarId, year: 2027 }],
+      ]);
+
+      await expectDomainError(
+        service.updateSubscriptions(universityId, calendarId, {
+          subscriptions: [publicCalendarId],
+        }),
+        UnprocessableEntityException,
+        'must match academic calendar year 2026',
+      );
+      expect(mockDb.update).not.toHaveBeenCalled();
+    });
+
+    it('replaces subscriptions and returns the updated calendar', async () => {
+      const updated = {
+        ...calendar,
+        subscriptions: [publicCalendarId],
+      };
+      mockSequentialResults(mockDb.select as jest.Mock, [
+        [calendar],
+        [{ id: publicCalendarId, year: 2026 }],
+      ]);
+      mockDbResult(mockDb.update as jest.Mock, [updated]);
+
+      await expect(
+        service.updateSubscriptions(universityId, calendarId, {
+          subscriptions: [publicCalendarId],
+        }),
+      ).resolves.toEqual({
+        id: calendarId,
+        year: 2026,
+        subscriptions: [publicCalendarId],
+      });
     });
   });
 
@@ -419,6 +513,119 @@ describe('AcademicCalendarService', () => {
         'and year 2026',
       );
       expect(mockDb.insert).not.toHaveBeenCalled();
+    });
+
+    it('does not query subscribed restrictions when subscriptions are empty', async () => {
+      mockSequentialResults(mockDb.select as jest.Mock, [
+        [calendar],
+        [
+          {
+            timetable: createTimetable({
+              timetableID: timetableId,
+              timetableName: 'My timetable',
+            }),
+          },
+        ],
+        restrictions,
+        [],
+      ]);
+      const generated = createGeneratedCalendar({
+        id: generatedId,
+        academicCalendarId: calendarId,
+        timetableId,
+      });
+      mockDbResult(mockDb.insert as jest.Mock, [generated]);
+
+      await service.generateCalendar(userId, universityId, { timetableId });
+
+      expect(mockDb.select).toHaveBeenCalledTimes(4);
+    });
+
+    it('merges subscribed public restrictions into generation input', async () => {
+      const subscribedCalendar = {
+        ...calendar,
+        subscriptions: [publicCalendarId],
+      };
+      const publicHoliday = createCalendarRestriction({
+        id: '41000000-0000-4000-8000-000000000007',
+        academicCalendarId: publicCalendarId,
+        startDate: '2026-06-16',
+        endDate: '2026-06-16',
+        description: 'Youth Day',
+      });
+      mockSequentialResults(mockDb.select as jest.Mock, [
+        [subscribedCalendar],
+        [
+          {
+            timetable: createTimetable({
+              timetableID: timetableId,
+              timetableName: 'My timetable',
+            }),
+          },
+        ],
+        restrictions,
+        [{ restriction: publicHoliday }],
+        [],
+      ]);
+      const generated = createGeneratedCalendar({
+        id: generatedId,
+        academicCalendarId: calendarId,
+        timetableId,
+      });
+      mockDbResult(mockDb.insert as jest.Mock, [generated]);
+      const build = jest.spyOn(generationService, 'build');
+
+      await service.generateCalendar(userId, universityId, { timetableId });
+
+      expect(build.mock.calls[0][2]).toContainEqual(publicHoliday);
+    });
+
+    it('lets own restrictions win over a subscribed duplicate', async () => {
+      const subscribedCalendar = {
+        ...calendar,
+        subscriptions: [publicCalendarId],
+      };
+      const ownHoliday = createCalendarRestriction({
+        ...holiday,
+        description: 'University Freedom Day',
+      });
+      const publicHoliday = createCalendarRestriction({
+        ...holiday,
+        id: '41000000-0000-4000-8000-000000000008',
+        academicCalendarId: publicCalendarId,
+        description: 'Public Freedom Day',
+      });
+      mockSequentialResults(mockDb.select as jest.Mock, [
+        [subscribedCalendar],
+        [
+          {
+            timetable: createTimetable({
+              timetableID: timetableId,
+              timetableName: 'My timetable',
+            }),
+          },
+        ],
+        [...restrictions, ownHoliday],
+        [{ restriction: publicHoliday }],
+        [],
+      ]);
+      const generated = createGeneratedCalendar({
+        id: generatedId,
+        academicCalendarId: calendarId,
+        timetableId,
+      });
+      mockDbResult(mockDb.insert as jest.Mock, [generated]);
+      const build = jest.spyOn(generationService, 'build');
+
+      await service.generateCalendar(userId, universityId, { timetableId });
+
+      const freedomDays = build.mock.calls[0][2].filter(
+        (item) =>
+          item.type === 'PUBLIC_HOLIDAY' &&
+          item.startDate === '2026-04-27' &&
+          item.endDate === '2026-04-27',
+      );
+      expect(freedomDays).toEqual([ownHoliday]);
     });
 
     it('filters teaching events, keeps one-off exams, applies day swaps, and persists student colours', async () => {

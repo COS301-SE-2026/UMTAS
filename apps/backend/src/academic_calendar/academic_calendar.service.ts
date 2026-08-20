@@ -5,7 +5,7 @@ import {
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import { and, asc, eq } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray, isNull } from 'drizzle-orm';
 import { DatabaseService } from '../db/database.service';
 import {
   AcademicCalendar,
@@ -36,6 +36,7 @@ import {
   GenerateCalendarDto,
   GeneratedCalendarDto,
   UpdateCalendarRestrictionDto,
+  UpdateCalendarSubscriptionsDto,
 } from './dto';
 import {
   AcademicCalendarGenerationService,
@@ -43,6 +44,12 @@ import {
 } from './academic-calendar-generation.service';
 
 type DbError = { code?: string; constraint?: string; cause?: unknown };
+
+const PUBLIC_CALENDAR_RESTRICTION_TYPES = [
+  'PUBLIC_HOLIDAY',
+  'HOLIDAY',
+  'UNIVERSITY_CLOSURE',
+] as const;
 
 @Injectable()
 export class AcademicCalendarService {
@@ -81,6 +88,24 @@ export class AcademicCalendarService {
   ): Promise<AcademicCalendarDto> {
     const calendar = await this.findCalendar(universityId, id);
     return this.toCalendarDto(calendar);
+  }
+
+  async listCalendars(
+    universityId: string,
+    year?: number,
+  ): Promise<AcademicCalendarDto[]> {
+    const conditions = [eq(AcademicCalendar.universityId, universityId)];
+    if (year !== undefined) {
+      conditions.push(eq(AcademicCalendar.year, year));
+    }
+
+    const calendars = await this.databaseService.db
+      .select()
+      .from(AcademicCalendar)
+      .where(and(...conditions))
+      .orderBy(desc(AcademicCalendar.year));
+
+    return calendars.map((calendar) => this.toCalendarDto(calendar));
   }
 
   async deleteCalendar(
@@ -210,6 +235,55 @@ export class AcademicCalendarService {
     return { success: true };
   }
 
+  async updateSubscriptions(
+    universityId: string,
+    id: string,
+    dto: UpdateCalendarSubscriptionsDto,
+  ): Promise<AcademicCalendarDto> {
+    const calendar = await this.findCalendar(universityId, id);
+
+    if (dto.subscriptions.length > 0) {
+      const found = await this.databaseService.db
+        .select({ id: AcademicCalendar.id, year: AcademicCalendar.year })
+        .from(AcademicCalendar)
+        .where(
+          and(
+            inArray(AcademicCalendar.id, dto.subscriptions),
+            isNull(AcademicCalendar.universityId),
+          ),
+        );
+      const foundIds = new Set(found.map((item) => item.id));
+      const unresolved = dto.subscriptions.filter(
+        (item) => !foundIds.has(item),
+      );
+
+      if (unresolved.length > 0) {
+        throw new NotFoundException(
+          `Public academic calendars not found for ids: ${unresolved.join(', ')}`,
+        );
+      }
+      if (found.some((item) => item.year !== calendar.year)) {
+        throw new UnprocessableEntityException(
+          `Public academic calendars must match academic calendar year ${calendar.year}`,
+        );
+      }
+    }
+
+    const [updated] = await this.databaseService.db
+      .update(AcademicCalendar)
+      .set({ subscriptions: dto.subscriptions, updatedAt: new Date() })
+      .where(
+        and(
+          eq(AcademicCalendar.id, id),
+          eq(AcademicCalendar.universityId, universityId),
+        ),
+      )
+      .returning();
+
+    if (!updated) this.throwCalendarNotFound(id);
+    return this.toCalendarDto(updated);
+  }
+
   async generateCalendar(
     userId: string,
     universityId: string,
@@ -220,14 +294,7 @@ export class AcademicCalendarService {
       this.currentYear(),
     );
     const timetable = await this.findOwnedTimetable(userId, dto.timetableId);
-    const restrictions = await this.databaseService.db
-      .select()
-      .from(CalendarRestriction)
-      .where(eq(CalendarRestriction.academicCalendarId, calendar.id))
-      .orderBy(
-        asc(CalendarRestriction.startDate),
-        asc(CalendarRestriction.createdAt),
-      );
+    const restrictions = await this.resolveRestrictions(calendar);
     const sourceEvents = await this.findSourceEvents(
       userId,
       timetable.timetableID,
@@ -363,6 +430,60 @@ export class AcademicCalendarService {
     return [...events.values()];
   }
 
+  private async resolveRestrictions(
+    calendar: AcademicCalendarRecord,
+  ): Promise<CalendarRestrictionRecord[]> {
+    const own = await this.databaseService.db
+      .select()
+      .from(CalendarRestriction)
+      .where(eq(CalendarRestriction.academicCalendarId, calendar.id))
+      .orderBy(
+        asc(CalendarRestriction.startDate),
+        asc(CalendarRestriction.createdAt),
+      );
+
+    if (calendar.subscriptions.length === 0) return own;
+
+    const subscribedRows = await this.databaseService.db
+      .select({ restriction: CalendarRestriction })
+      .from(CalendarRestriction)
+      .innerJoin(
+        AcademicCalendar,
+        eq(AcademicCalendar.id, CalendarRestriction.academicCalendarId),
+      )
+      .where(
+        and(
+          inArray(
+            CalendarRestriction.academicCalendarId,
+            calendar.subscriptions,
+          ),
+          isNull(AcademicCalendar.universityId),
+          eq(AcademicCalendar.year, calendar.year),
+          inArray(CalendarRestriction.type, PUBLIC_CALENDAR_RESTRICTION_TYPES),
+        ),
+      );
+    const ownKeys = new Set(own.map((item) => this.restrictionKey(item)));
+    const subscribedKeys = new Set<string>();
+    const deduped = subscribedRows
+      .map((row) => row.restriction)
+      .filter((restriction) => {
+        const key = this.restrictionKey(restriction);
+        if (ownKeys.has(key) || subscribedKeys.has(key)) return false;
+        subscribedKeys.add(key);
+        return true;
+      });
+
+    return [...own, ...deduped].sort(
+      (left, right) =>
+        left.startDate.localeCompare(right.startDate) ||
+        left.createdAt.getTime() - right.createdAt.getTime(),
+    );
+  }
+
+  private restrictionKey(restriction: CalendarRestrictionRecord): string {
+    return `${restriction.type}:${restriction.startDate}:${restriction.endDate}`;
+  }
+
   private toGeneratedCalendarDto(
     row: GeneratedCalendarRecord,
   ): GeneratedCalendarDto {
@@ -480,6 +601,7 @@ export class AcademicCalendarService {
     return {
       id: row.id,
       year: row.year,
+      subscriptions: row.subscriptions,
     };
   }
 
