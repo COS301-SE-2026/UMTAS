@@ -74,7 +74,7 @@ export async function fetchAllEvents(
   modules: APIserviceModulesResp["modules"],
 ) {
   const requests = modules.map((module) =>
-    fetchAPIserviceEvents({ moduleId: module.ExternalID ?? "" }),
+    fetchAPIserviceEvents({ moduleId: module.moduleID ?? "" }),
   );
   const results = await Promise.all(requests);
 

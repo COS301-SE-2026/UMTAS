@@ -101,7 +101,9 @@ export function GenerateStep({
   const { data: modules = [] } = useQuery({
     queryKey: ["Modules"],
     queryFn: async () => {
-      const result = await fetchAllModulesv2({});
+      const result = await fetchAllModulesv2({
+        userEnrollment: true,
+      });
       return result.modules;
     },
   });
