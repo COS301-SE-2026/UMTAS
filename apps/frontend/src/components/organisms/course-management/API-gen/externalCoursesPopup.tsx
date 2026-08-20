@@ -27,24 +27,8 @@ export function ExternalCoursesPopup() {
         page: numPages,
       }),
     onSuccess: (successData) => {
-      getQueryClient().invalidateQueries({
-        queryKey: getAllCoursesQ().queryKey,
-      });
-      getModules(successData);
+      getQueryClient().invalidateQueries();
     },
-  });
-
-  const { mutateAsync: getModules, isPending: pendingModules } = useMutation({
-    mutationFn: (coursesToFetch: APIServiceCoursesResp["courses"]) =>
-      fetchAllModules(coursesToFetch),
-    onSuccess: (successData) => {
-      getEvents(successData);
-    },
-  });
-
-  const { mutate: getEvents, isPending: pendingEvents } = useMutation({
-    mutationFn: async (data: APIserviceModulesResp["modules"]) =>
-      fetchAllEvents(data),
   });
 
   return (
@@ -66,7 +50,7 @@ export function ExternalCoursesPopup() {
           max={100}
           type="number"
           placeholder="0"
-          disabled={pendingCourses || pendingModules || pendingEvents}
+          disabled={pendingCourses}
           className="bg-[var(--background)] border-[var(--border)] text-[var(--text-primary)] mb-4"
         />
         <Label htmlFor="number of courses">Number of results</Label>
@@ -78,7 +62,7 @@ export function ExternalCoursesPopup() {
             setLimit(Number(e.target.value));
           }}
           placeholder="0"
-          disabled={pendingCourses || pendingModules || pendingEvents}
+          disabled={pendingCourses}
           min={1}
           max={10}
           type="number"
@@ -92,12 +76,12 @@ export function ExternalCoursesPopup() {
           onClick={async () => {
             await getCourses();
           }}
-          disabled={pendingCourses || pendingModules || pendingEvents}
+          disabled={pendingCourses}
           className={
             false ? "bg-[var(--error-bg)] text-[var(--error-text)]" : ""
           }
         >
-          {pendingCourses || pendingModules || pendingEvents ? (
+          {pendingCourses ? (
             <div className="flex flex-row gap-x-3">
               <Spinner></Spinner> fetching courses
             </div>

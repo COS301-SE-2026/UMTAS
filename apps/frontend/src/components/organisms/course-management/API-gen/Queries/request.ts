@@ -1,5 +1,6 @@
 import { api } from "@/components/tanstack/getQueryClient";
 import { components, paths } from "@/lib/api";
+import { mutationOptions } from "@tanstack/react-query";
 
 type APIServiceCourses = paths["/api/api-service/courses"]["get"];
 
@@ -79,4 +80,18 @@ export async function fetchAllEvents(
   const results = await Promise.all(requests);
 
   return results.flat;
+}
+
+export function addCourseModules() {
+  return mutationOptions({
+    mutationFn: (courseID: string) =>
+      fetchAPIserviceModules({ courseId: courseID }),
+  });
+}
+
+export function addCourseEvents() {
+  return mutationOptions({
+    mutationFn: async (data: APIserviceModulesResp["modules"]) =>
+      fetchAllEvents(data),
+  });
 }
