@@ -244,7 +244,6 @@ export function CustomiseEventCard({
         >
           {event.isRecurring ? "Day of Week" : "Date"}
         </Label>
-
         {event.isRecurring ? (
           <Select
             disabled={!canEdit}
@@ -304,7 +303,7 @@ export function CustomiseEventCard({
               Event type
             </Label>
             <EventTypeDropdown
-              disabled={canEdit}
+              disabled={!canEdit}
               value={(event.activityType as EventType) || "lecture"}
               onChange={(v) => onUpdate(event.eventId, "activityType", v)}
             />
