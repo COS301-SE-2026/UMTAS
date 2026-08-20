@@ -1,0 +1,22 @@
+.github/workflows/ci.yml
+  h_2d4b3dca70a3d8 7,160,199-235
+apps/backend/drizzle.config.ts
+  h_2d4b3dca70a3d8 4
+apps/backend/drizzle/0000_nappy_molecule_man.sql
+  h_2d4b3dca70a3d8 3,180-203,267-271,301-302
+apps/backend/drizzle/meta/0000_snapshot.json
+  h_2d4b3dca70a3d8 2,1577-1772,2117-2128
+apps/backend/drizzle/meta/_journal.json
+  h_2d4b3dca70a3d8 8-9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "96cb01a59ae91f3e549fdb754d332f34b25725a9",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
