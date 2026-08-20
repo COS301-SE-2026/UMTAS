@@ -56,6 +56,21 @@ export class UniversitySeedService extends BaseSeedService {
             UserID: uniAdmin.id,
             role: 'UNIVERSITY_ADMIN',
           },
+          {
+            UniversityID: uniSeed[1].UniversityID,
+            UserID: uniAdmin.id,
+            role: 'UNIVERSITY_ADMIN',
+          },
+          {
+            UniversityID: uniSeed[2].UniversityID,
+            UserID: uniAdmin.id,
+            role: 'UNIVERSITY_ADMIN',
+          },
+          {
+            UniversityID: uniSeed[3].UniversityID,
+            UserID: uniAdmin.id,
+            role: 'UNIVERSITY_ADMIN',
+          },
         ]);
       }
     } //END_check for missing names
