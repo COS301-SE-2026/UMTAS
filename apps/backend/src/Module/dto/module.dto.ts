@@ -191,6 +191,15 @@ export class ModulesDto {
   @IsString()
   @Length(1, 255)
   ExternalID?: string | null;
+
+  @ApiPropertyOptional({
+    example: false,
+    description: 'Is a user enrolled to this module',
+    type: Boolean,
+  })
+  @IsOptional()
+  @IsBoolean()
+  Enrolled?: boolean;
 } //ModuleDto
 
 //Create

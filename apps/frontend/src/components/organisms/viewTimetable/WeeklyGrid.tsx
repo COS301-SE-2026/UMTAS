@@ -75,8 +75,6 @@ function slotSpan(startTime: string, endTime: string): number {
 export function WeeklyGrid({ events, weekStart }: WeeklyGridProps) {
   const weekDates = getWeekDates(weekStart);
 
-  console.log(events, "These are the events being logged");
-
   function getEventsForDay(date: Date): ScheduleEvent[] {
     const dateStr = isoDateStr(date);
 
@@ -95,7 +93,8 @@ export function WeeklyGrid({ events, weekStart }: WeeklyGridProps) {
     const result: ScheduleEvent[] = [];
 
     for (const event of events) {
-      if (event.isRecurring) {
+      console.log(event, "This is the event in the event array");
+      if (event.isRecurring || event.date === "") {
         if (event.dayOfWeek?.toLowerCase() === currentDayName) {
           result.push(event);
         }

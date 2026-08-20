@@ -4542,6 +4542,11 @@
             "example": "12345",
             "description": "Refer to module on external API"
           },
+          "Enrolled": {
+            "type": "boolean",
+            "example": false,
+            "description": "Is a user enrolled to this module"
+          },
           "ModuleGroupingID": {
             "type": "string",
             "format": "uuid",
@@ -4624,6 +4629,11 @@
             "maxLength": 255,
             "example": "12345",
             "description": "Refer to module on external API"
+          },
+          "Enrolled": {
+            "type": "boolean",
+            "example": false,
+            "description": "Is a user enrolled to this module"
           },
           "CourseID": {
             "type": "string",
@@ -4890,6 +4900,11 @@
             "maxLength": 255,
             "example": "12345",
             "description": "Refer to module on external API"
+          },
+          "Enrolled": {
+            "type": "boolean",
+            "example": false,
+            "description": "Is a user enrolled to this module"
           }
         },
         "required": ["moduleID", "moduleCode", "moduleName"]

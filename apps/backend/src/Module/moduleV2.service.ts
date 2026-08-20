@@ -30,6 +30,7 @@ import {
 import { CourseService } from 'src/Course/course.service';
 import { GroupingService } from 'src/Grouping/grouping.service';
 import { EventService } from 'src/Events/event.service';
+import { isNotNull } from 'drizzle-orm';
 
 @Injectable()
 export class ModuleServiceV2 extends ModuleService {
@@ -226,6 +227,7 @@ export class ModuleServiceV2 extends ModuleService {
         ...getTableColumns(modules),
         styling: ModuleStyling.styling ?? null,
         CourseModuleInfo: getTableColumns(CourseModule),
+        Enrolled: isNotNull(ModuleEnrollment.UserID).mapWith(Boolean),
       })
       .from(modules)
       .leftJoin(

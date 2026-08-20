@@ -11,8 +11,6 @@ import {
   fetchAllEvents,
   fetchAllModules,
   fetchAPIserviceCourses,
-  fetchAPIserviceModules,
-  moduleResponseType,
 } from "./Queries/request";
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
 import { getAllCoursesQ } from "@/app/course-management/queries/courses/courseQueries";

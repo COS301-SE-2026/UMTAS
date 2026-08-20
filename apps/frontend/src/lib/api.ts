@@ -1754,6 +1754,11 @@ export interface components {
        */
       ExternalID?: string | null;
       /**
+       * @description Is a user enrolled to this module
+       * @example false
+       */
+      Enrolled?: boolean;
+      /**
        * Format: uuid
        * @description Unique identifier for a module group
        * @example 00000000-0000-0000-0000-000000000000
@@ -1801,6 +1806,11 @@ export interface components {
        * @example 12345
        */
       ExternalID?: string | null;
+      /**
+       * @description Is a user enrolled to this module
+       * @example false
+       */
+      Enrolled?: boolean;
       /**
        * Format: uuid
        * @description ID to identify course owning this CourseModule
@@ -1974,6 +1984,11 @@ export interface components {
        * @example 12345
        */
       ExternalID?: string | null;
+      /**
+       * @description Is a user enrolled to this module
+       * @example false
+       */
+      Enrolled?: boolean;
     };
     CourseSingleResponseDto: {
       /**
