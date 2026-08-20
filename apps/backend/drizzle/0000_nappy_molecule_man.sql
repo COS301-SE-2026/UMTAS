@@ -1,6 +1,6 @@
 CREATE TYPE "public"."AttendanceState" AS ENUM('ATTENDING', 'NOT_ATTENDING');--> statement-breakpoint
-CREATE TYPE "public"."RestrictionType" AS ENUM('DATE-SWAP', 'PUBLIC-HOLIDAY', 'RECESS', 'CLOSURE', 'EXAM-PERIOD', 'DAY-SWAP');--> statement-breakpoint
 CREATE TYPE "public"."RoleType" AS ENUM('STUDENT', 'STUDENT_OWNED', 'UNIVERSITY_ADMIN', 'UNIVERSITY_ADMIN_PENDING', 'LECTURER', 'LECTURER_PENDING', 'SYSTEM_ADMIN', 'REJECTED');--> statement-breakpoint
+CREATE TYPE "public"."RestrictionType" AS ENUM('DATE-SWAP', 'PUBLIC-HOLIDAY', 'RECESS', 'CLOSURE', 'EXAM-PERIOD', 'DAY-SWAP');--> statement-breakpoint
 CREATE TABLE "account" (
 	"id" text PRIMARY KEY NOT NULL,
 	"accountId" text NOT NULL,
@@ -177,6 +177,30 @@ CREATE TABLE "UserTimetable" (
 	"TimetableID" uuid NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE "University" (
+	"UniversityID" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"UniversityName" varchar(30) NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "UniversityRole" (
+	"UserID" uuid NOT NULL,
+	"UniversityID" uuid NOT NULL,
+	"role" "RoleType" DEFAULT 'STUDENT' NOT NULL,
+	CONSTRAINT "UniversityRole_UniversityID_UserID_pk" PRIMARY KEY("UniversityID","UserID")
+);
+--> statement-breakpoint
+CREATE TABLE "EventVenue" (
+	"EventID" uuid NOT NULL,
+	"VenueID" uuid NOT NULL,
+	CONSTRAINT "EventVenue_EventID_VenueID_pk" PRIMARY KEY("EventID","VenueID")
+);
+--> statement-breakpoint
+CREATE TABLE "Venue" (
+	"VenueID" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"VenueName" varchar(30),
+	"UniversityID" uuid NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "AcademicCalendar" (
 	"CalendarID" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"UniversityID" uuid,
@@ -218,30 +242,6 @@ CREATE TABLE "ModuleGrouping" (
 	CONSTRAINT "ModuleGrouping_Hash_unique" UNIQUE("Hash")
 );
 --> statement-breakpoint
-CREATE TABLE "University" (
-	"UniversityID" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"UniversityName" varchar(30) NOT NULL
-);
---> statement-breakpoint
-CREATE TABLE "UniversityRole" (
-	"UserID" uuid NOT NULL,
-	"UniversityID" uuid NOT NULL,
-	"role" "RoleType" DEFAULT 'STUDENT' NOT NULL,
-	CONSTRAINT "UniversityRole_UniversityID_UserID_pk" PRIMARY KEY("UniversityID","UserID")
-);
---> statement-breakpoint
-CREATE TABLE "EventVenue" (
-	"EventID" uuid NOT NULL,
-	"VenueID" uuid NOT NULL,
-	CONSTRAINT "EventVenue_EventID_VenueID_pk" PRIMARY KEY("EventID","VenueID")
-);
---> statement-breakpoint
-CREATE TABLE "Venue" (
-	"VenueID" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"VenueName" varchar(30),
-	"UniversityID" uuid NOT NULL
-);
---> statement-breakpoint
 ALTER TABLE "account" ADD CONSTRAINT "account_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "session" ADD CONSTRAINT "session_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "EventAttendance" ADD CONSTRAINT "EventAttendance_eventID_Event_eventID_fk" FOREIGN KEY ("eventID") REFERENCES "public"."Event"("eventID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -264,6 +264,11 @@ ALTER TABLE "EventsToTimetables" ADD CONSTRAINT "EventsToTimetables_eventID_Even
 ALTER TABLE "EventsToTimetables" ADD CONSTRAINT "EventsToTimetables_timetableID_Timetable_timetableID_fk" FOREIGN KEY ("timetableID") REFERENCES "public"."Timetable"("timetableID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "UserTimetable" ADD CONSTRAINT "UserTimetable_UserID_user_id_fk" FOREIGN KEY ("UserID") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "UserTimetable" ADD CONSTRAINT "UserTimetable_TimetableID_Timetable_timetableID_fk" FOREIGN KEY ("TimetableID") REFERENCES "public"."Timetable"("timetableID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "UniversityRole" ADD CONSTRAINT "UniversityRole_UserID_user_id_fk" FOREIGN KEY ("UserID") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "UniversityRole" ADD CONSTRAINT "UniversityRole_UniversityID_University_UniversityID_fk" FOREIGN KEY ("UniversityID") REFERENCES "public"."University"("UniversityID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "EventVenue" ADD CONSTRAINT "EventVenue_EventID_Event_eventID_fk" FOREIGN KEY ("EventID") REFERENCES "public"."Event"("eventID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "EventVenue" ADD CONSTRAINT "EventVenue_VenueID_Venue_VenueID_fk" FOREIGN KEY ("VenueID") REFERENCES "public"."Venue"("VenueID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "Venue" ADD CONSTRAINT "Venue_UniversityID_University_UniversityID_fk" FOREIGN KEY ("UniversityID") REFERENCES "public"."University"("UniversityID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "AcademicCalendar" ADD CONSTRAINT "AcademicCalendar_UniversityID_University_UniversityID_fk" FOREIGN KEY ("UniversityID") REFERENCES "public"."University"("UniversityID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "RestrictedDates" ADD CONSTRAINT "RestrictedDates_CalendarID_AcademicCalendar_CalendarID_fk" FOREIGN KEY ("CalendarID") REFERENCES "public"."AcademicCalendar"("CalendarID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "Course" ADD CONSTRAINT "Course_UniversityID_University_UniversityID_fk" FOREIGN KEY ("UniversityID") REFERENCES "public"."University"("UniversityID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -272,11 +277,6 @@ ALTER TABLE "CourseModule" ADD CONSTRAINT "CourseModule_CourseID_Course_CourseID
 ALTER TABLE "CourseModule" ADD CONSTRAINT "CourseModule_GroupModuleID_GroupModules_GroupModuleID_fk" FOREIGN KEY ("GroupModuleID") REFERENCES "public"."GroupModules"("GroupModuleID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "GroupModules" ADD CONSTRAINT "GroupModules_GroupID_ModuleGrouping_GroupID_fk" FOREIGN KEY ("GroupID") REFERENCES "public"."ModuleGrouping"("GroupID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "GroupModules" ADD CONSTRAINT "GroupModules_ModuleID_Modules_moduleID_fk" FOREIGN KEY ("ModuleID") REFERENCES "public"."Modules"("moduleID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "UniversityRole" ADD CONSTRAINT "UniversityRole_UserID_user_id_fk" FOREIGN KEY ("UserID") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "UniversityRole" ADD CONSTRAINT "UniversityRole_UniversityID_University_UniversityID_fk" FOREIGN KEY ("UniversityID") REFERENCES "public"."University"("UniversityID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "EventVenue" ADD CONSTRAINT "EventVenue_EventID_Event_eventID_fk" FOREIGN KEY ("EventID") REFERENCES "public"."Event"("eventID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "EventVenue" ADD CONSTRAINT "EventVenue_VenueID_Venue_VenueID_fk" FOREIGN KEY ("VenueID") REFERENCES "public"."Venue"("VenueID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "Venue" ADD CONSTRAINT "Venue_UniversityID_University_UniversityID_fk" FOREIGN KEY ("UniversityID") REFERENCES "public"."University"("UniversityID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 CREATE UNIQUE INDEX "account_provider_account_unique" ON "account" USING btree ("providerId","accountId");--> statement-breakpoint
 CREATE INDEX "account_user_id_idx" ON "account" USING btree ("userId");--> statement-breakpoint
 CREATE UNIQUE INDEX "rate_limit_key_unique" ON "rateLimit" USING btree ("key");--> statement-breakpoint
@@ -298,5 +298,5 @@ CREATE UNIQUE INDEX "parse_job_duplicate_unique" ON "PARSE_JOB" USING btree ("Us
 CREATE INDEX "solver_job_status_idx" ON "SOLVER_JOB" USING btree ("Status");--> statement-breakpoint
 CREATE INDEX "solver_job_created_at_idx" ON "SOLVER_JOB" USING btree ("CreatedAt");--> statement-breakpoint
 CREATE UNIQUE INDEX "solver_job_duplicate_unique" ON "SOLVER_JOB" USING btree ("UserID","DeduplicationKey");--> statement-breakpoint
-CREATE UNIQUE INDEX "group_modules_group_module_unique" ON "GroupModules" USING btree ("GroupID","ModuleID");--> statement-breakpoint
-CREATE UNIQUE INDEX "venue_university_name_unique" ON "Venue" USING btree ("UniversityID","VenueName");
+CREATE UNIQUE INDEX "venue_university_name_unique" ON "Venue" USING btree ("UniversityID","VenueName");--> statement-breakpoint
+CREATE UNIQUE INDEX "group_modules_group_module_unique" ON "GroupModules" USING btree ("GroupID","ModuleID");

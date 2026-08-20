@@ -132,21 +132,14 @@ The Traceability Matrices for the functional requirements to use cases can be fo
         - **R3.2.1.4** The system shall allow lecturers to add lecturers to events/modules.
         - **R3.2.1.5** The system shall allow lecturers to alter module details (name, description, credit value).
 
-    ### R3.3 Alert System
+    ### R3.3 Attendance Recording System
 
-    - **R3.3.1** The system will send alerts out based on event changes.
-        - **R3.3.1.1** The system shall send out alerts if venues have changed for an event.
-        - **R3.3.1.2** The system shall send out alerts if times have changed for an event.
-        - **R3.3.1.3** The system shall send out alerts if event status has changed, such as a cancellation of the event on a day.
-
-    ### R3.4 Attendance Recording System
-
-    - **R3.4.1** The system will allow students to record and manage their attendance intent for events.
-        - **R3.4.1.1** The system shall allow students to indicate their attendance intent for an event as Will Attend, Will Not Attend, or Not Specified.
-        - **R3.4.1.2** The system shall default a student's attendance intent to Not Specified if no option is selected.
-        - **R3.4.1.3** The system shall allow students to remove a previously recorded attendance response for an event.
-        - **R3.4.1.4** The system shall require student confirmation before removing a recorded attendance response.
-        - **R3.4.1.5** The system shall update projected attendance analytics whenever a student's attendance response is recorded or removed.
+    - **R3.3.1** The system will allow students to record and manage their attendance intent for events.
+        - **R3.3.1.1** The system shall allow students to indicate their attendance intent for an event as Will Attend, Will Not Attend, or Not Specified.
+        - **R3.3.1.2** The system shall default a student's attendance intent to Not Specified if no option is selected.
+        - **R3.3.1.3** The system shall allow students to remove a previously recorded attendance response for an event.
+        - **R3.3.1.4** The system shall require student confirmation before removing a recorded attendance response.
+        - **R3.3.1.5** The system shall update projected attendance analytics whenever a student's attendance response is recorded or removed.
 
 ---
 
@@ -187,3 +180,37 @@ The Traceability Matrices for the functional requirements to use cases can be fo
     - **R4.4.1** The system shall allow for users to apply for a particular role, defaulted to students
     - **R4.4.2** The system shall allow for university admins to approve roles for a univeristy
     - **R4.4.3** The system shall allow for university admins to revoke privileges of users
+
+---
+
+??? info "**FR 5 — Simulation Service**"
+
+
+    ### R5.1 Execution & Environment
+
+    - **R5.1.1** The system shall launch the simulation via a central script accepting arguments for the target adapter and population size.
+    - **R5.1.2** The system shall run as an independent, configurable Docker container with exposed ports for live metrics.
+
+    ### R5.2 Synthetic Data Generation
+
+    - **R5.2.1** The system shall generate synthetic student profiles based on rules in a declarative YAML schema using a Faker library.
+    - **R5.2.2** The system shall sample domain-specific data from external CSV files.
+    - **R5.2.3** The system shall export the generated user population into a structured JSON file.
+
+    ### R5.3 Metrics & Reporting
+
+    - **R5.3.1** The system shall parse raw CSV simulation statistics into a single timestamped JSON report.
+    - **R5.3.2** The system shall aggregate and record overall latency (min, max, avg, median, p95, p99), requests, and failure counts per endpoint.
+    - **R5.3.3** The system shall automatically clean up temporary metric files after reporting.
+
+    ### R5.4 Adapter Bootstrapping
+
+    - **R5.4.1** The system shall automatically scaffold new client adapters using an OpenAPI specification file.
+    - **R5.4.2** The system shall auto-generate endpoint configurations, synthetic data schemas, and executable Python simulation scripts mapped to discovered API methods.
+
+    ### R5.5 Simulated Behaviors (UMTAS Domain)
+
+    - **R5.5.1** The system shall simulate mock account creation, secure login, and session token management.
+    - **R5.5.2** The system shall simulate uploading timetable PDF files, polling for parser job status, and retrieving results.
+    - **R5.5.3** The system shall simulate users browsing enrolled modules, available events, and existing timetables.
+    - **R5.5.4** The system shall simulate submitting custom scheduling jobs to the solver and polling for execution status.
