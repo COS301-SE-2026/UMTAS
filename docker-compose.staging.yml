@@ -178,6 +178,7 @@ services:
       - SMTP_USER=${SMTP_USER:-}
       - SMTP_PASS=${SMTP_PASS:-}
       - SMTP_FROM=${SMTP_FROM:-UMTAS <noreply@${STG_APP_DOMAIN}>}
+      - SIMULATION_API_KEY=${SIMULATION_API_KEY}
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=gateway"
