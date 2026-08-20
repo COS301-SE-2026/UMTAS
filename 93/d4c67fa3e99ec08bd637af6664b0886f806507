@@ -1,0 +1,33 @@
+apps/pdf_parser/parser/adapters/up_parser.py
+  s_b889f0c7cee333::t_0036247460e119 6,39,60,70,73-75,144,150-152,180-181
+  s_4163925fa513e4::t_b010f37441d652 182-185,192
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "93d4c67fa3e99ec08bd637af6664b0886f806507",
+  "prompts": {},
+  "humans": {
+    "h_3359569cacef0e": {
+      "author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_4163925fa513e4": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a01f6e-7e22-7c31-a397-88c2d7d8b0a4",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    },
+    "s_b889f0c7cee333": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a01a3e-3647-7ed1-8e37-feefc023d1ec",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}
