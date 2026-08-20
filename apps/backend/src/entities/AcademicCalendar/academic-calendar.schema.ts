@@ -2,7 +2,9 @@ import { sql } from 'drizzle-orm';
 import {
   check,
   integer,
+  jsonb,
   pgTable,
+  text,
   timestamp,
   uniqueIndex,
   uuid,
@@ -13,10 +15,16 @@ export const AcademicCalendar = pgTable(
   'AcademicCalendar',
   {
     id: uuid('id').defaultRandom().primaryKey(),
-    universityId: uuid('universityId')
-      .notNull()
-      .references(() => University.UniversityID, { onDelete: 'cascade' }),
+    universityId: uuid('universityId').references(
+      () => University.UniversityID,
+      { onDelete: 'cascade' },
+    ),
+    name: text('name'),
     year: integer('year').notNull(),
+    subscriptions: jsonb('subscriptions')
+      .$type<string[]>()
+      .notNull()
+      .default(sql`'[]'::jsonb`),
     createdAt: timestamp('createdAt', { withTimezone: true })
       .defaultNow()
       .notNull(),
@@ -30,9 +38,20 @@ export const AcademicCalendar = pgTable(
       table.universityId,
       table.year,
     ),
+    uniqueIndex('academic_calendar_public_name_year_unique')
+      .on(table.name, table.year)
+      .where(sql`${table.universityId} is null`),
     check(
       'academic_calendar_year_four_digits',
       sql`${table.year} between 1000 and 9999`,
+    ),
+    check(
+      'academic_calendar_public_requires_name',
+      sql`${table.universityId} is not null or ${table.name} is not null`,
+    ),
+    check(
+      'academic_calendar_public_no_subscriptions',
+      sql`${table.universityId} is not null or ${table.subscriptions} = '[]'::jsonb`,
     ),
   ],
 );

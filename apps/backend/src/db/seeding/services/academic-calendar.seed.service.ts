@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, isNull } from 'drizzle-orm';
 import {
   AcademicCalendar,
   CalendarRestriction,
@@ -45,6 +45,37 @@ export class AcademicCalendarSeedService extends BaseSeedService {
       [calendar] = await this.persistence.insertAcademicCalendars(db, [
         { universityId: university.id, year: seed.year },
       ]);
+    }
+
+    if (calendar.subscriptions.length === 0) {
+      const publicSeed = this.constants.PublicCalendarsSeed.find(
+        (item) => item.year === seed.year,
+      );
+      if (publicSeed) {
+        const [publicCalendar] = await db
+          .select({ id: AcademicCalendar.id })
+          .from(AcademicCalendar)
+          .where(
+            and(
+              isNull(AcademicCalendar.universityId),
+              eq(AcademicCalendar.name, publicSeed.name),
+              eq(AcademicCalendar.year, publicSeed.year),
+            ),
+          )
+          .limit(1);
+
+        if (publicCalendar) {
+          await db
+            .update(AcademicCalendar)
+            .set({ subscriptions: [publicCalendar.id] })
+            .where(eq(AcademicCalendar.id, calendar.id));
+          calendar.subscriptions = [publicCalendar.id];
+        } else {
+          this.logger.warn(
+            `Skipping academic calendar subscription: ${publicSeed.name} was not found`,
+          );
+        }
+      }
     }
 
     const existing = await db
