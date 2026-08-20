@@ -1,0 +1,111 @@
+import { mutationOptions, queryOptions } from "@tanstack/react-query";
+import { RequestBuilder, RequestMethod } from "../request";
+import { paths } from "@/lib/api";
+
+export type CreateAcRestriction =
+  paths["/api/academic-calendar/{id}/restrictions"]["post"];
+
+export type CreateAcRestrictionPath = CreateAcRestriction["parameters"]["path"];
+export type CreateAcRestrictionResp =
+  CreateAcRestriction["responses"]["201"]["content"]["application/json"];
+export type CreateAcRestrictionBody =
+  CreateAcRestriction["requestBody"]["content"]["application/json"];
+
+export class CreateAcRestrictionBuilder extends RequestBuilder<
+  CreateAcRestrictionPath,
+  CreateAcRestrictionBody,
+  CreateAcRestrictionResp
+> {
+  constructor() {
+    super();
+    this.setUrl("/academic-calendar/{id}/restrictions").setMethod(
+      RequestMethod.POST,
+    );
+  }
+}
+
+export const CreateAcMutation = mutationOptions({
+  mutationFn: ({
+    body,
+    paths,
+  }: {
+    body: CreateAcRestrictionBody;
+    paths: CreateAcRestrictionPath;
+  }) => {
+    return new CreateAcRestrictionBuilder().send({
+      paths: paths,
+      body: body,
+    });
+  },
+});
+
+type UpdateAcRestriction =
+  paths["/api/academic-calendar/{id}/restrictions/{restrictionId}"]["put"];
+
+export type UpdateAcRestrictionPaths =
+  UpdateAcRestriction["parameters"]["path"];
+
+export type UpdateAcRestrictionBody =
+  UpdateAcRestriction["requestBody"]["content"]["application/json"];
+
+export type UpdateAcRestrictionResp =
+  UpdateAcRestriction["responses"]["200"]["content"]["application/json"];
+
+export class UpdateAcRestrictionBuilder extends RequestBuilder<
+  UpdateAcRestrictionPaths,
+  UpdateAcRestrictionBody,
+  UpdateAcRestrictionResp
+> {
+  constructor() {
+    super();
+    this.setUrl(
+      "/academic-calendar/{id}/restrictions/{restrictionId}",
+    ).setMethod(RequestMethod.PUT);
+  }
+}
+
+export const UpdateAcMutation = mutationOptions({
+  mutationFn: ({
+    body,
+    paths,
+  }: {
+    body: UpdateAcRestrictionBody;
+    paths: UpdateAcRestrictionPaths;
+  }) => {
+    return new UpdateAcRestrictionBuilder().send({
+      paths: paths,
+      body: body,
+    });
+  },
+});
+
+type getAllRestrictions =
+  paths["/api/academic-calendar/{id}/restrictions"]["get"];
+
+export type getAcRestrictionPaths = getAllRestrictions["parameters"]["path"];
+
+export type getAcRestrictionResp =
+  getAllRestrictions["responses"]["200"]["content"]["application/json"];
+
+export class getAcRestrictionBuilder extends RequestBuilder<
+  getAcRestrictionPaths,
+  undefined,
+  getAcRestrictionResp
+> {
+  constructor() {
+    super();
+    this.setUrl("/academic-calendar/{id}/restrictions").setMethod(
+      RequestMethod.GET,
+    );
+  }
+}
+
+export function GetAllRestrictions(paths?: getAcRestrictionPaths) {
+  return queryOptions({
+    queryKey: ["Academic-Calendar", paths],
+    queryFn: () =>
+      new getAcRestrictionBuilder().send({
+        paths: paths,
+      }),
+  });
+}

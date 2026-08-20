@@ -42,6 +42,6 @@ export class GetAcademicCalendarBuilder extends RequestBuilder<
 > {
   constructor() {
     super();
-    this.setUrl("/academic-calendar/{id}").setMethod(RequestMethod.POST);
+    this.setUrl("/academic-calendar/{id}").setMethod(RequestMethod.GET);
   }
 }
