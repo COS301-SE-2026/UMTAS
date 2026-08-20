@@ -1,6 +1,40 @@
+CREATE TYPE "public"."CalendarRestrictionType" AS ENUM('SEMESTER_1_START', 'SEMESTER_1_END', 'SEMESTER_2_START', 'SEMESTER_2_END', 'HOLIDAY', 'PUBLIC_HOLIDAY', 'UNIVERSITY_CLOSURE', 'RECESS', 'TEST_WEEK', 'EXAM_PERIOD', 'SUPP_WEEK', 'DAY_SWAP');--> statement-breakpoint
+CREATE TYPE "public"."CalendarWeekday" AS ENUM('MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY');--> statement-breakpoint
 CREATE TYPE "public"."AttendanceState" AS ENUM('ATTENDING', 'NOT_ATTENDING');--> statement-breakpoint
-CREATE TYPE "public"."RestrictionType" AS ENUM('DATE-SWAP', 'PUBLIC-HOLIDAY', 'RECESS', 'CLOSURE', 'EXAM-PERIOD', 'DAY-SWAP');--> statement-breakpoint
+CREATE TYPE "public"."AcademicSemester" AS ENUM('SEMESTER_1', 'SEMESTER_2', 'YEAR');--> statement-breakpoint
 CREATE TYPE "public"."RoleType" AS ENUM('STUDENT', 'STUDENT_OWNED', 'UNIVERSITY_ADMIN', 'UNIVERSITY_ADMIN_PENDING', 'LECTURER', 'LECTURER_PENDING', 'SYSTEM_ADMIN', 'REJECTED');--> statement-breakpoint
+CREATE TABLE "AcademicCalendar" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"universityId" uuid NOT NULL,
+	"year" integer NOT NULL,
+	"createdAt" timestamp with time zone DEFAULT now() NOT NULL,
+	"updatedAt" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "academic_calendar_year_four_digits" CHECK ("AcademicCalendar"."year" between 1000 and 9999)
+);
+--> statement-breakpoint
+CREATE TABLE "CalendarRestriction" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"academicCalendarId" uuid NOT NULL,
+	"type" "CalendarRestrictionType" NOT NULL,
+	"startDate" date NOT NULL,
+	"endDate" date NOT NULL,
+	"description" text DEFAULT '' NOT NULL,
+	"replacementWeekday" "CalendarWeekday",
+	"createdAt" timestamp with time zone DEFAULT now() NOT NULL,
+	"updatedAt" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "calendar_restriction_date_range_valid" CHECK ("CalendarRestriction"."endDate" >= "CalendarRestriction"."startDate"),
+	CONSTRAINT "calendar_restriction_replacement_weekday_valid" CHECK (("CalendarRestriction"."type" = 'DAY_SWAP' and "CalendarRestriction"."replacementWeekday" is not null)
+          or ("CalendarRestriction"."type" <> 'DAY_SWAP' and "CalendarRestriction"."replacementWeekday" is null))
+);
+--> statement-breakpoint
+CREATE TABLE "GeneratedCalendar" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"academicCalendarId" uuid NOT NULL,
+	"payload" jsonb NOT NULL,
+	"timetableId" uuid NOT NULL,
+	"createdAt" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "account" (
 	"id" text PRIMARY KEY NOT NULL,
 	"accountId" text NOT NULL,
@@ -111,10 +145,12 @@ CREATE TABLE "ModuleTeaches" (
 --> statement-breakpoint
 CREATE TABLE "Modules" (
 	"moduleID" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"moduleCode" varchar(10) NOT NULL,
+	"moduleCode" varchar(15) NOT NULL,
 	"moduleName" varchar(256) NOT NULL,
 	"moduleDescription" text,
-	"validated" boolean DEFAULT true NOT NULL
+	"semester" "AcademicSemester",
+	"validated" boolean DEFAULT true NOT NULL,
+	"ExternalID" varchar(255)
 );
 --> statement-breakpoint
 CREATE TABLE "PARSE_JOB" (
@@ -177,24 +213,14 @@ CREATE TABLE "UserTimetable" (
 	"TimetableID" uuid NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "AcademicCalendar" (
-	"CalendarID" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"UniversityID" uuid,
-	"CreationDate" timestamp DEFAULT now() NOT NULL
-);
---> statement-breakpoint
-CREATE TABLE "RestrictedDates" (
-	"RestrictionID" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"CalendarID" uuid NOT NULL,
-	"Details" jsonb DEFAULT '{"dateStart":""}'::jsonb
-);
---> statement-breakpoint
 CREATE TABLE "Course" (
 	"CourseID" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"UniversityID" uuid NOT NULL,
 	"GroupID" uuid,
-	"CourseName" varchar(30) NOT NULL,
-	"Degree" varchar(30)
+	"CourseName" varchar(255) NOT NULL,
+	"Degree" varchar(30),
+	"ExternalID" varchar(255),
+	CONSTRAINT "Course_University_ExternalID_Unique" UNIQUE("UniversityID","ExternalID")
 );
 --> statement-breakpoint
 CREATE TABLE "CourseModule" (
@@ -220,7 +246,11 @@ CREATE TABLE "ModuleGrouping" (
 --> statement-breakpoint
 CREATE TABLE "University" (
 	"UniversityID" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"UniversityName" varchar(30) NOT NULL
+	"UniversityName" varchar(30) NOT NULL,
+	"ApiIdentifier" varchar(10),
+	"BaseApiUrl" varchar(50),
+	"ApiKey" varchar(100),
+	CONSTRAINT "University_ApiIdentifier_unique" UNIQUE("ApiIdentifier")
 );
 --> statement-breakpoint
 CREATE TABLE "UniversityRole" (
@@ -242,6 +272,10 @@ CREATE TABLE "Venue" (
 	"UniversityID" uuid NOT NULL
 );
 --> statement-breakpoint
+ALTER TABLE "AcademicCalendar" ADD CONSTRAINT "AcademicCalendar_universityId_University_UniversityID_fk" FOREIGN KEY ("universityId") REFERENCES "public"."University"("UniversityID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "CalendarRestriction" ADD CONSTRAINT "CalendarRestriction_academicCalendarId_AcademicCalendar_id_fk" FOREIGN KEY ("academicCalendarId") REFERENCES "public"."AcademicCalendar"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "GeneratedCalendar" ADD CONSTRAINT "GeneratedCalendar_academicCalendarId_AcademicCalendar_id_fk" FOREIGN KEY ("academicCalendarId") REFERENCES "public"."AcademicCalendar"("id") ON DELETE restrict ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "GeneratedCalendar" ADD CONSTRAINT "GeneratedCalendar_timetableId_Timetable_timetableID_fk" FOREIGN KEY ("timetableId") REFERENCES "public"."Timetable"("timetableID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "account" ADD CONSTRAINT "account_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "session" ADD CONSTRAINT "session_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "EventAttendance" ADD CONSTRAINT "EventAttendance_eventID_Event_eventID_fk" FOREIGN KEY ("eventID") REFERENCES "public"."Event"("eventID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -264,8 +298,6 @@ ALTER TABLE "EventsToTimetables" ADD CONSTRAINT "EventsToTimetables_eventID_Even
 ALTER TABLE "EventsToTimetables" ADD CONSTRAINT "EventsToTimetables_timetableID_Timetable_timetableID_fk" FOREIGN KEY ("timetableID") REFERENCES "public"."Timetable"("timetableID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "UserTimetable" ADD CONSTRAINT "UserTimetable_UserID_user_id_fk" FOREIGN KEY ("UserID") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "UserTimetable" ADD CONSTRAINT "UserTimetable_TimetableID_Timetable_timetableID_fk" FOREIGN KEY ("TimetableID") REFERENCES "public"."Timetable"("timetableID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "AcademicCalendar" ADD CONSTRAINT "AcademicCalendar_UniversityID_University_UniversityID_fk" FOREIGN KEY ("UniversityID") REFERENCES "public"."University"("UniversityID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "RestrictedDates" ADD CONSTRAINT "RestrictedDates_CalendarID_AcademicCalendar_CalendarID_fk" FOREIGN KEY ("CalendarID") REFERENCES "public"."AcademicCalendar"("CalendarID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "Course" ADD CONSTRAINT "Course_UniversityID_University_UniversityID_fk" FOREIGN KEY ("UniversityID") REFERENCES "public"."University"("UniversityID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "Course" ADD CONSTRAINT "Course_GroupID_ModuleGrouping_GroupID_fk" FOREIGN KEY ("GroupID") REFERENCES "public"."ModuleGrouping"("GroupID") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "CourseModule" ADD CONSTRAINT "CourseModule_CourseID_Course_CourseID_fk" FOREIGN KEY ("CourseID") REFERENCES "public"."Course"("CourseID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -277,6 +309,10 @@ ALTER TABLE "UniversityRole" ADD CONSTRAINT "UniversityRole_UniversityID_Univers
 ALTER TABLE "EventVenue" ADD CONSTRAINT "EventVenue_EventID_Event_eventID_fk" FOREIGN KEY ("EventID") REFERENCES "public"."Event"("eventID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "EventVenue" ADD CONSTRAINT "EventVenue_VenueID_Venue_VenueID_fk" FOREIGN KEY ("VenueID") REFERENCES "public"."Venue"("VenueID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "Venue" ADD CONSTRAINT "Venue_UniversityID_University_UniversityID_fk" FOREIGN KEY ("UniversityID") REFERENCES "public"."University"("UniversityID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+CREATE UNIQUE INDEX "academic_calendar_university_year_unique" ON "AcademicCalendar" USING btree ("universityId","year");--> statement-breakpoint
+CREATE INDEX "calendar_restriction_calendar_idx" ON "CalendarRestriction" USING btree ("academicCalendarId");--> statement-breakpoint
+CREATE UNIQUE INDEX "calendar_restriction_day_swap_target_unique" ON "CalendarRestriction" USING btree ("academicCalendarId","startDate") WHERE "CalendarRestriction"."type" = 'DAY_SWAP';--> statement-breakpoint
+CREATE INDEX "generated_calendar_timetable_created_at_idx" ON "GeneratedCalendar" USING btree ("timetableId","createdAt");--> statement-breakpoint
 CREATE UNIQUE INDEX "account_provider_account_unique" ON "account" USING btree ("providerId","accountId");--> statement-breakpoint
 CREATE INDEX "account_user_id_idx" ON "account" USING btree ("userId");--> statement-breakpoint
 CREATE UNIQUE INDEX "rate_limit_key_unique" ON "rateLimit" USING btree ("key");--> statement-breakpoint
@@ -289,7 +325,7 @@ CREATE INDEX "verification_identifier_idx" ON "verification" USING btree ("ident
 CREATE INDEX "verification_expires_at_idx" ON "verification" USING btree ("expiresAt");--> statement-breakpoint
 CREATE UNIQUE INDEX "event_import_key_unique" ON "Event" USING btree ("ImportKey");--> statement-breakpoint
 CREATE UNIQUE INDEX "university_event_module_event_unique" ON "UniversityEvent" USING btree ("moduleID","eventID");--> statement-breakpoint
-CREATE UNIQUE INDEX "modules_module_code_unique" ON "Modules" USING btree ("moduleCode");--> statement-breakpoint
+CREATE UNIQUE INDEX "moduleCode_unique_index" ON "Modules" USING btree ("moduleCode");--> statement-breakpoint
 CREATE INDEX "parse_job_user_id_idx" ON "PARSE_JOB" USING btree ("UserID");--> statement-breakpoint
 CREATE INDEX "parse_job_status_idx" ON "PARSE_JOB" USING btree ("Status");--> statement-breakpoint
 CREATE INDEX "parse_job_group_id_idx" ON "PARSE_JOB" USING btree ("GroupID");--> statement-breakpoint

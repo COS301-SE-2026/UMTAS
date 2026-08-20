@@ -3580,6 +3580,488 @@
         "tags": ["Attendance"]
       }
     },
+    "/api/academic-calendar/generate": {
+      "post": {
+        "description": "Generates a restriction-aware pseudo-calendar snapshot using the selected university's current-year academic calendar and a timetable owned by the authenticated student.",
+        "operationId": "generateCalendar",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenerateCalendarDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Calendar generated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeneratedCalendarDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid generation request"
+          },
+          "404": {
+            "description": "Calendar or timetable not found"
+          },
+          "409": {
+            "description": "Calendar data conflicts"
+          },
+          "422": {
+            "description": "Calendar data cannot be converted into a valid snapshot"
+          }
+        },
+        "security": [
+          {
+            "umtas-session": []
+          }
+        ],
+        "summary": "Generate and persist a calendar snapshot",
+        "tags": ["Academic Calendar"]
+      }
+    },
+    "/api/academic-calendar/generate/{id}": {
+      "get": {
+        "description": "Returns a generated snapshot only when its timetable belongs to the authenticated student.",
+        "operationId": "getGeneratedCalendar",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Generated calendar ID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Generated calendar returned successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeneratedCalendarDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid generated calendar ID"
+          },
+          "404": {
+            "description": "Generated calendar not found"
+          }
+        },
+        "security": [
+          {
+            "umtas-session": []
+          }
+        ],
+        "summary": "Get a generated calendar snapshot",
+        "tags": ["Academic Calendar"]
+      }
+    },
+    "/api/academic-calendar": {
+      "post": {
+        "description": "Creates one calendar for the university selected in the current session and a four-digit academic year.",
+        "operationId": "createAcademicCalendar",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAcademicCalendarDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Academic calendar created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcademicCalendarDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid calendar payload"
+          },
+          "401": {
+            "description": "No active session"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "409": {
+            "description": "A calendar already exists for this university and year"
+          }
+        },
+        "security": [
+          {
+            "umtas-session": []
+          }
+        ],
+        "summary": "Create an academic calendar",
+        "tags": ["Academic Calendar"]
+      }
+    },
+    "/api/academic-calendar/{id}/restrictions": {
+      "get": {
+        "description": "Returns restrictions in chronological order for a calendar managed by the authenticated university administrator.",
+        "operationId": "listCalendarRestrictions",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Academic calendar ID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Calendar restrictions returned successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CalendarRestrictionListDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid academic calendar ID"
+          },
+          "401": {
+            "description": "No active session"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Academic calendar not found"
+          }
+        },
+        "security": [
+          {
+            "umtas-session": []
+          }
+        ],
+        "summary": "List an academic calendar's restrictions",
+        "tags": ["Academic Calendar"]
+      },
+      "post": {
+        "description": "Creates a dated restriction. Omitted endDate defaults to startDate and omitted description defaults to an empty string.",
+        "operationId": "createCalendarRestriction",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Academic calendar ID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCalendarRestrictionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Calendar restriction created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CalendarRestrictionDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid restriction request"
+          },
+          "401": {
+            "description": "No active session"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Academic calendar not found"
+          },
+          "409": {
+            "description": "Restriction conflicts with existing data"
+          },
+          "422": {
+            "description": "Restriction is not valid for its type"
+          }
+        },
+        "security": [
+          {
+            "umtas-session": []
+          }
+        ],
+        "summary": "Create an academic calendar restriction",
+        "tags": ["Academic Calendar"]
+      }
+    },
+    "/api/academic-calendar/{id}/restrictions/{restrictionId}": {
+      "put": {
+        "description": "Fully replaces a restriction after validating its date range and type-specific fields.",
+        "operationId": "updateCalendarRestriction",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Academic calendar ID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "restrictionId",
+            "required": true,
+            "in": "path",
+            "description": "Calendar restriction ID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCalendarRestrictionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Calendar restriction updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CalendarRestrictionDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid restriction request"
+          },
+          "401": {
+            "description": "No active session"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Calendar or restriction not found"
+          },
+          "409": {
+            "description": "Restriction conflicts with existing data"
+          },
+          "422": {
+            "description": "Restriction is not valid for its type"
+          }
+        },
+        "security": [
+          {
+            "umtas-session": []
+          }
+        ],
+        "summary": "Replace an academic calendar restriction",
+        "tags": ["Academic Calendar"]
+      },
+      "delete": {
+        "description": "Deletes a restriction only when it belongs to the specified calendar in the selected university.",
+        "operationId": "deleteCalendarRestriction",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Academic calendar ID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "restrictionId",
+            "required": true,
+            "in": "path",
+            "description": "Calendar restriction ID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Calendar restriction deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteCalendarRestrictionResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid calendar or restriction ID"
+          },
+          "401": {
+            "description": "No active session"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Calendar or restriction not found"
+          }
+        },
+        "security": [
+          {
+            "umtas-session": []
+          }
+        ],
+        "summary": "Delete an academic calendar restriction",
+        "tags": ["Academic Calendar"]
+      }
+    },
+    "/api/academic-calendar/{id}": {
+      "get": {
+        "description": "Returns a calendar belonging to the university selected in the current session.",
+        "operationId": "getAcademicCalendar",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Academic calendar ID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Academic calendar returned successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcademicCalendarDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid academic calendar ID"
+          },
+          "401": {
+            "description": "No active session"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Academic calendar not found"
+          }
+        },
+        "security": [
+          {
+            "umtas-session": []
+          }
+        ],
+        "summary": "Get an academic calendar",
+        "tags": ["Academic Calendar"]
+      },
+      "delete": {
+        "description": "Deletes a calendar and cascades to its restrictions. Deletion is rejected while generated snapshots reference it.",
+        "operationId": "deleteAcademicCalendar",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Academic calendar ID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Academic calendar deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteAcademicCalendarResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid academic calendar ID"
+          },
+          "401": {
+            "description": "No active session"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Academic calendar not found"
+          },
+          "409": {
+            "description": "Generated snapshots still reference this calendar"
+          }
+        },
+        "security": [
+          {
+            "umtas-session": []
+          }
+        ],
+        "summary": "Delete an academic calendar",
+        "tags": ["Academic Calendar"]
+      }
+    },
     "/api/api-service/courses": {
       "get": {
         "description": "Fetches courses for the authenticated user's university.",
@@ -4223,6 +4705,11 @@
         },
         "required": ["uniId"]
       },
+      "AcademicSemester": {
+        "type": "string",
+        "enum": ["SEMESTER_1", "SEMESTER_2", "YEAR"],
+        "description": "Academic period in which this module is taught. Null or omitted means the whole academic year."
+      },
       "StylingDto": {
         "type": "object",
         "properties": {
@@ -4277,6 +4764,16 @@
             "nullable": true,
             "example": "Introduction to computer networking concepts",
             "description": "Short module description"
+          },
+          "semester": {
+            "nullable": true,
+            "example": "SEMESTER_1",
+            "description": "Academic period in which this module is taught. Null or omitted means the whole academic year.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AcademicSemester"
+              }
+            ]
           },
           "styling": {
             "nullable": true,
@@ -4490,6 +4987,16 @@
             "example": "Introduction to computer networking concepts",
             "description": "Short module description"
           },
+          "semester": {
+            "nullable": true,
+            "example": "SEMESTER_1",
+            "description": "Academic period in which this module is taught. Null or omitted means the whole academic year.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AcademicSemester"
+              }
+            ]
+          },
           "styling": {
             "nullable": true,
             "description": "Styling to be used for a Module",
@@ -4595,6 +5102,16 @@
             "nullable": true,
             "example": "Introduction to computer networking concepts",
             "description": "Short module description"
+          },
+          "semester": {
+            "nullable": true,
+            "example": "SEMESTER_1",
+            "description": "Academic period in which this module is taught. Null or omitted means the whole academic year.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AcademicSemester"
+              }
+            ]
           },
           "styling": {
             "nullable": true,
@@ -4848,6 +5365,16 @@
             "nullable": true,
             "example": "Introduction to computer networking concepts",
             "description": "Short module description"
+          },
+          "semester": {
+            "nullable": true,
+            "example": "SEMESTER_1",
+            "description": "Academic period in which this module is taught. Null or omitted means the whole academic year.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AcademicSemester"
+              }
+            ]
           },
           "styling": {
             "nullable": true,
@@ -5937,6 +6464,16 @@
             "example": "Introduction to computer networking concepts",
             "description": "Short module description"
           },
+          "semester": {
+            "nullable": true,
+            "example": "SEMESTER_1",
+            "description": "Academic period in which this module is taught. Null or omitted means the whole academic year.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AcademicSemester"
+              }
+            ]
+          },
           "styling": {
             "nullable": true,
             "description": "Styling to be used for a Module",
@@ -6882,6 +7419,499 @@
             "type": "boolean",
             "description": "successfully deleted or not",
             "example": true
+          }
+        },
+        "required": ["success"]
+      },
+      "GenerateCalendarDto": {
+        "type": "object",
+        "properties": {
+          "timetableId": {
+            "type": "string",
+            "format": "uuid",
+            "example": "339cd591-7c62-4ea7-8a2b-602598553133",
+            "description": "Timetable containing the source events to generate."
+          }
+        },
+        "required": ["timetableId"]
+      },
+      "Weekday": {
+        "type": "string",
+        "enum": [
+          "MONDAY",
+          "TUESDAY",
+          "WEDNESDAY",
+          "THURSDAY",
+          "FRIDAY",
+          "SATURDAY",
+          "SUNDAY"
+        ]
+      },
+      "GeneratedRecurringEventDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "example": "cos301-l1-monday",
+            "description": "Stable series key."
+          },
+          "title": {
+            "type": "string",
+            "example": "COS301 Lecture"
+          },
+          "description": {
+            "type": "string",
+            "example": "Lecture group 1"
+          },
+          "location": {
+            "type": "string",
+            "example": "IT 4-1"
+          },
+          "moduleId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "moduleColour": {
+            "type": "string",
+            "example": "#3B82F6"
+          },
+          "startTime": {
+            "type": "string",
+            "example": "08:30",
+            "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$"
+          },
+          "endTime": {
+            "type": "string",
+            "example": "09:20",
+            "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$"
+          },
+          "weekday": {
+            "example": "MONDAY",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Weekday"
+              }
+            ]
+          },
+          "startsOn": {
+            "type": "string",
+            "format": "date",
+            "example": "2026-02-02"
+          },
+          "endsOn": {
+            "type": "string",
+            "format": "date",
+            "example": "2026-06-22"
+          },
+          "excludedDates": {
+            "items": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": ["2026-03-30"],
+            "description": "Dates removed from the weekly series.",
+            "type": "array"
+          },
+          "additionalDates": {
+            "items": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": ["2026-04-03"],
+            "description": "Dates added to the weekly series, normally by day swaps.",
+            "type": "array"
+          }
+        },
+        "required": [
+          "key",
+          "title",
+          "startTime",
+          "endTime",
+          "weekday",
+          "startsOn",
+          "endsOn",
+          "excludedDates",
+          "additionalDates"
+        ]
+      },
+      "GeneratedOneOffEventDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "example": "exam-cos301-20260615",
+            "description": "Stable event key."
+          },
+          "title": {
+            "type": "string",
+            "example": "COS301 Exam"
+          },
+          "description": {
+            "type": "string",
+            "example": "Main examination"
+          },
+          "location": {
+            "type": "string",
+            "example": "Exam Hall A"
+          },
+          "moduleId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "moduleColour": {
+            "type": "string",
+            "example": "#3B82F6"
+          },
+          "date": {
+            "type": "string",
+            "format": "date",
+            "example": "2026-06-15"
+          },
+          "startTime": {
+            "type": "string",
+            "example": "09:00",
+            "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$"
+          },
+          "endTime": {
+            "type": "string",
+            "example": "12:00",
+            "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$"
+          }
+        },
+        "required": ["key", "title", "date", "startTime", "endTime"]
+      },
+      "CalendarRestrictionType": {
+        "type": "string",
+        "enum": [
+          "SEMESTER_1_START",
+          "SEMESTER_1_END",
+          "SEMESTER_2_START",
+          "SEMESTER_2_END",
+          "HOLIDAY",
+          "PUBLIC_HOLIDAY",
+          "UNIVERSITY_CLOSURE",
+          "RECESS",
+          "TEST_WEEK",
+          "EXAM_PERIOD",
+          "SUPP_WEEK",
+          "DAY_SWAP"
+        ]
+      },
+      "GeneratedAllDayEventDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "example": "restriction-f8429809",
+            "description": "Stable event key."
+          },
+          "title": {
+            "type": "string",
+            "example": "Freedom Day"
+          },
+          "description": {
+            "type": "string",
+            "example": "Public holiday"
+          },
+          "type": {
+            "example": "PUBLIC_HOLIDAY",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CalendarRestrictionType"
+              }
+            ]
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date",
+            "example": "2026-04-27"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date",
+            "example": "2026-04-27",
+            "description": "Inclusive domain end date."
+          }
+        },
+        "required": ["key", "title", "type", "startDate", "endDate"]
+      },
+      "GeneratedCalendarWarningDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "RECURRING_EVENT_CRITERIA_INVALID"
+          },
+          "message": {
+            "type": "string",
+            "example": "COS301 Lecture is missing a weekday or time range."
+          },
+          "sourceId": {
+            "type": "string",
+            "example": "6d3689c6-983b-4a6e-9da5-d12998290892",
+            "description": "Identifier of the source record that caused the warning."
+          }
+        },
+        "required": ["code", "message"]
+      },
+      "GeneratedCalendarPayloadDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "University of Pretoria 2026 Academic Calendar"
+          },
+          "year": {
+            "type": "number",
+            "minimum": 1000,
+            "maximum": 9999,
+            "example": 2026
+          },
+          "recurringEvents": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GeneratedRecurringEventDto"
+            }
+          },
+          "oneOffEvents": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GeneratedOneOffEventDto"
+            }
+          },
+          "allDayEvents": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GeneratedAllDayEventDto"
+            }
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GeneratedCalendarWarningDto"
+            }
+          }
+        },
+        "required": [
+          "name",
+          "year",
+          "recurringEvents",
+          "oneOffEvents",
+          "allDayEvents",
+          "warnings"
+        ]
+      },
+      "GeneratedCalendarDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/GeneratedCalendarPayloadDto"
+          }
+        },
+        "required": ["id", "payload"]
+      },
+      "CreateAcademicCalendarDto": {
+        "type": "object",
+        "properties": {
+          "year": {
+            "minimum": 1000,
+            "maximum": 9999,
+            "type": "number",
+            "example": 2026,
+            "description": "Four-digit academic year. A university may have only one calendar per year."
+          }
+        },
+        "required": ["year"]
+      },
+      "AcademicCalendarDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "120afed7-9444-4d9c-a7f2-8f08dc2b7d70",
+            "description": "Unique academic-calendar identifier."
+          },
+          "year": {
+            "type": "number",
+            "example": 2026,
+            "minimum": 1000,
+            "maximum": 9999,
+            "description": "Four-digit academic year represented by this calendar."
+          }
+        },
+        "required": ["id", "year"]
+      },
+      "CalendarRestrictionDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "f8429809-2402-41a7-af75-28c463e83d5f",
+            "description": "Unique restriction identifier."
+          },
+          "type": {
+            "example": "PUBLIC_HOLIDAY",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CalendarRestrictionType"
+              }
+            ]
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date",
+            "example": "2026-04-27"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date",
+            "example": "2026-04-27",
+            "description": "Inclusive final date."
+          },
+          "description": {
+            "type": "string",
+            "example": "Freedom Day"
+          },
+          "replacementWeekday": {
+            "nullable": true,
+            "example": "MONDAY",
+            "description": "Present only for a DAY_SWAP restriction.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Weekday"
+              }
+            ]
+          }
+        },
+        "required": ["id", "type", "startDate", "endDate", "description"]
+      },
+      "CalendarRestrictionListDto": {
+        "type": "object",
+        "properties": {
+          "restrictions": {
+            "description": "Restrictions belonging to the requested academic calendar.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CalendarRestrictionDto"
+            }
+          }
+        },
+        "required": ["restrictions"]
+      },
+      "CreateCalendarRestrictionDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "example": "PUBLIC_HOLIDAY",
+            "description": "How this restriction affects semester bounds or generated events.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CalendarRestrictionType"
+              }
+            ]
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "example": "2026-04-27",
+            "description": "Inclusive first date in YYYY-MM-DD format."
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "example": "2026-04-27",
+            "description": "Inclusive final date in YYYY-MM-DD format. Defaults to startDate when omitted."
+          },
+          "description": {
+            "type": "string",
+            "example": "Freedom Day",
+            "default": "",
+            "description": "Human-readable detail. Defaults to an empty string."
+          },
+          "replacementWeekday": {
+            "example": "MONDAY",
+            "description": "Teaching pattern to use on the target date. Required only for DAY_SWAP.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Weekday"
+              }
+            ]
+          }
+        },
+        "required": ["type", "startDate"]
+      },
+      "UpdateCalendarRestrictionDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "example": "PUBLIC_HOLIDAY",
+            "description": "How this restriction affects semester bounds or generated events.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CalendarRestrictionType"
+              }
+            ]
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "example": "2026-04-27",
+            "description": "Inclusive first date in YYYY-MM-DD format."
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "example": "2026-04-27",
+            "description": "Inclusive final date in YYYY-MM-DD format. Defaults to startDate when omitted."
+          },
+          "description": {
+            "type": "string",
+            "example": "Freedom Day",
+            "default": "",
+            "description": "Human-readable detail. Defaults to an empty string."
+          },
+          "replacementWeekday": {
+            "example": "MONDAY",
+            "description": "Teaching pattern to use on the target date. Required only for DAY_SWAP.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Weekday"
+              }
+            ]
+          }
+        },
+        "required": ["type", "startDate"]
+      },
+      "DeleteCalendarRestrictionResponseDto": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "enum": [true],
+            "example": true,
+            "description": "Confirms that the calendar restriction was deleted."
+          }
+        },
+        "required": ["success"]
+      },
+      "DeleteAcademicCalendarResponseDto": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "enum": [true],
+            "example": true,
+            "description": "Confirms that the academic calendar was deleted."
           }
         },
         "required": ["success"]
