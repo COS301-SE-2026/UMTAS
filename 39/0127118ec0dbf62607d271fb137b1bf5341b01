@@ -1,0 +1,18 @@
+apps/backend/drizzle/0000_spotty_harrier.sql
+  h_2d4b3dca70a3d8 114,117-118,183-187,225-228,299
+apps/backend/drizzle/meta/0000_snapshot.json
+  h_2d4b3dca70a3d8 2,959,981-986,990-991,1599-1616,1622-1628,1914,1923-1928,1953-1959
+apps/backend/drizzle/meta/_journal.json
+  h_2d4b3dca70a3d8 8-9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "390127118ec0dbf62607d271fb137b1bf5341b01",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
