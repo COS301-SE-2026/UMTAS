@@ -1,0 +1,14 @@
+pnpm-lock.yaml
+  h_2d4b3dca70a3d8 8770-8776,9137-9143,12792,12795,18917,20681-20688,20888-20891,23810,24084
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "a7e3ee1ab58c94fa6776fa464befecaa0f79d630",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}

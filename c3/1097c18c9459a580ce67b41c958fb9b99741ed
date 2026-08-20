@@ -1,0 +1,22 @@
+apps/NFR/docker-compose.yml
+  h_2d4b3dca70a3d8 1-14
+apps/NFR/requirements.txt
+  h_2d4b3dca70a3d8 1-4
+apps/NFR/run.sh
+  h_2d4b3dca70a3d8 1-10
+apps/NFR/upload_locustfile.py
+  h_2d4b3dca70a3d8 1-50
+justfile
+  h_2d4b3dca70a3d8 254-275
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "c31097c18c9459a580ce67b41c958fb9b99741ed",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}

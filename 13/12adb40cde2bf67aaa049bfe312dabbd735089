@@ -1,0 +1,14 @@
+apps/simulation-service/core/upload_locustfile.py
+  h_2d4b3dca70a3d8 13,18,20,24-30,39
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "1312adb40cde2bf67aaa049bfe312dabbd735089",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}

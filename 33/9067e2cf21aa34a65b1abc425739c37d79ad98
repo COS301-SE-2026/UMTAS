@@ -1,0 +1,14 @@
+README.md
+  h_2d4b3dca70a3d8 35-36
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "339067e2cf21aa34a65b1abc425739c37d79ad98",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
