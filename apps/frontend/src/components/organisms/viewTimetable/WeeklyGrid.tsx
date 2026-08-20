@@ -93,7 +93,6 @@ export function WeeklyGrid({ events, weekStart }: WeeklyGridProps) {
     const result: ScheduleEvent[] = [];
 
     for (const event of events) {
-      console.log(event, "This is the event in the event array");
       if (event.isRecurring || event.date === "") {
         if (event.dayOfWeek?.toLowerCase() === currentDayName) {
           result.push(event);
