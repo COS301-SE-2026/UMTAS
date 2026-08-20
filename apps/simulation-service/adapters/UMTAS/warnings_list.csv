@@ -1,5 +1,0 @@
-message,code
-"Venue capacity exceeded for Centenary 1.",WARN-CAP-01
-"Time conflict between module BIO 137 and CMY 137.",WARN-CONF-02
-"Instructor double-booked for Monday 14:30.",WARN-INST-03
-"Missing venue assignment for practical session.",WARN-VEN-04

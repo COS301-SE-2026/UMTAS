@@ -1,4 +1,0 @@
-conflictCount,reason,eventId,UserTimetableID
-1,"Time overlap between L1 and P1",e-003,t-001
-2,"Double booking at AE du Toit Auditorium",e-009,t-003
-1,"Travel time insufficient between campuses",e-015,t-002

@@ -1153,6 +1153,38 @@
       }
     },
     "/api/modules/v2": {
+      "post": {
+        "description": "Create a new module and link to appropriate course",
+        "operationId": "ModuleController_createModuleV2",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateModuleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Module created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModuleSingleResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing or invalid module payload"
+          }
+        },
+        "summary": "Create a module - V2",
+        "tags": ["Modules"]
+      },
       "get": {
         "description": "Filter by userId(enrolled) | courseId(course owned) | universityId(modules for university over all courses). At least one filter required",
         "operationId": "getAllModulesV2",
@@ -1654,7 +1686,7 @@
             "description": "Name of the course",
             "schema": {
               "minLength": 1,
-              "maxLength": 30,
+              "maxLength": 255,
               "example": "Computer Science",
               "type": "string"
             }
@@ -3547,6 +3579,130 @@
         "summary": "Delete an attendance record - effectively making attendance NOT_STATED",
         "tags": ["Attendance"]
       }
+    },
+    "/api/api-service/courses": {
+      "get": {
+        "description": "Fetches courses for the authenticated user's university.",
+        "operationId": "ApiServiceController_getCourses",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Courses per page",
+            "schema": {
+              "example": 50,
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page index: zero index",
+            "schema": {
+              "example": 0,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Courses fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CourseListResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The authenticated user is not associated with a university."
+          },
+          "404": {
+            "description": "The university or its API adapter could not be found."
+          }
+        },
+        "summary": "Fetch courses",
+        "tags": ["ApiService"]
+      }
+    },
+    "/api/api-service/modules": {
+      "get": {
+        "description": "Fetches modules for a course at the authenticated user's university.",
+        "operationId": "ApiServiceController_getModules",
+        "parameters": [
+          {
+            "name": "courseId",
+            "required": true,
+            "in": "query",
+            "description": "UUID of the course to fetch modules for.",
+            "schema": {
+              "example": "00000000-0000-0000-0000-000000000000",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Modules fetched successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModuleListResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The university or course ID is invalid."
+          },
+          "404": {
+            "description": "The university, course, or API adapter could not be found."
+          }
+        },
+        "summary": "Fetch modules",
+        "tags": ["ApiService"]
+      }
+    },
+    "/api/api-service/events": {
+      "get": {
+        "description": "Fetches events for a module at the authenticated user's university.",
+        "operationId": "ApiServiceController_getEvents",
+        "parameters": [
+          {
+            "name": "moduleId",
+            "required": true,
+            "in": "query",
+            "description": "UUID of the module to fetch events for.",
+            "schema": {
+              "example": "00000000-0000-0000-0000-000000000000",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Events fetched successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventListResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The university or module ID is invalid."
+          },
+          "404": {
+            "description": "The university, module, or API adapter could not be found."
+          }
+        },
+        "summary": "Fetch events",
+        "tags": ["ApiService"]
+      }
     }
   },
   "info": {
@@ -4105,7 +4261,7 @@
           "moduleCode": {
             "type": "string",
             "minLength": 2,
-            "maxLength": 10,
+            "maxLength": 15,
             "example": "COS332",
             "description": "Module code used by the university"
           },
@@ -4139,6 +4295,14 @@
             "type": "boolean",
             "example": true,
             "description": "Whether the module has been approved by a university admin"
+          },
+          "ExternalID": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 255,
+            "example": "12345",
+            "description": "Refer to module on external API"
           },
           "ModuleGroupingID": {
             "type": "string",
@@ -4309,7 +4473,7 @@
           "moduleCode": {
             "type": "string",
             "minLength": 2,
-            "maxLength": 10,
+            "maxLength": 15,
             "example": "COS332",
             "description": "Module code used by the university"
           },
@@ -4370,6 +4534,19 @@
               "$ref": "#/components/schemas/EventDto"
             }
           },
+          "ExternalID": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 255,
+            "example": "12345",
+            "description": "Refer to module on external API"
+          },
+          "Enrolled": {
+            "type": "boolean",
+            "example": false,
+            "description": "Is a user enrolled to this module"
+          },
           "ModuleGroupingID": {
             "type": "string",
             "format": "uuid",
@@ -4402,7 +4579,7 @@
           "moduleCode": {
             "type": "string",
             "minLength": 2,
-            "maxLength": 10,
+            "maxLength": 15,
             "example": "COS332",
             "description": "Module code used by the university"
           },
@@ -4445,6 +4622,19 @@
               "$ref": "#/components/schemas/EventDto"
             }
           },
+          "ExternalID": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 255,
+            "example": "12345",
+            "description": "Refer to module on external API"
+          },
+          "Enrolled": {
+            "type": "boolean",
+            "example": false,
+            "description": "Is a user enrolled to this module"
+          },
           "CourseID": {
             "type": "string",
             "format": "uuid",
@@ -4476,7 +4666,7 @@
           "moduleCode": {
             "type": "string",
             "minLength": 2,
-            "maxLength": 10,
+            "maxLength": 15,
             "example": "COS332",
             "description": "Module code used by the university"
           },
@@ -4607,7 +4797,7 @@
           "CourseName": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 30,
+            "maxLength": 255,
             "example": "Computer Science",
             "description": "Name of the course"
           },
@@ -4618,6 +4808,14 @@
             "maxLength": 30,
             "example": "Bachelor of Science",
             "description": "Degree that course belongs to"
+          },
+          "ExternalID": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 255,
+            "example": "12345",
+            "description": "Refer to course on external API"
           }
         },
         "required": ["UniversityID", "CourseName"]
@@ -4634,7 +4832,7 @@
           "moduleCode": {
             "type": "string",
             "minLength": 2,
-            "maxLength": 10,
+            "maxLength": 15,
             "example": "COS332",
             "description": "Module code used by the university"
           },
@@ -4694,6 +4892,19 @@
             "items": {
               "$ref": "#/components/schemas/EventDto"
             }
+          },
+          "ExternalID": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 255,
+            "example": "12345",
+            "description": "Refer to module on external API"
+          },
+          "Enrolled": {
+            "type": "boolean",
+            "example": false,
+            "description": "Is a user enrolled to this module"
           }
         },
         "required": ["moduleID", "moduleCode", "moduleName"]
@@ -4723,7 +4934,7 @@
           "CourseName": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 30,
+            "maxLength": 255,
             "example": "Computer Science",
             "description": "Name of the course"
           },
@@ -4742,6 +4953,14 @@
             "items": {
               "$ref": "#/components/schemas/ModulesDto"
             }
+          },
+          "ExternalID": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 255,
+            "example": "12345",
+            "description": "Refer to course on external API"
           }
         },
         "required": ["CourseID", "UniversityID", "CourseName"]
@@ -4758,7 +4977,7 @@
           "CourseName": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 30,
+            "maxLength": 255,
             "example": "Computer Science",
             "description": "Name of the course"
           },
@@ -4797,7 +5016,7 @@
           "CourseName": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 30,
+            "maxLength": 255,
             "example": "Computer Science",
             "description": "Name of the course"
           },
@@ -4816,6 +5035,14 @@
             "items": {
               "$ref": "#/components/schemas/ModulesDto"
             }
+          },
+          "ExternalID": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 255,
+            "example": "12345",
+            "description": "Refer to course on external API"
           }
         },
         "required": ["CourseID", "UniversityID", "CourseName"]
@@ -4855,7 +5082,7 @@
           "CourseName": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 30,
+            "maxLength": 255,
             "example": "Computer Science",
             "description": "Name of the course"
           },
@@ -4874,6 +5101,14 @@
             "items": {
               "$ref": "#/components/schemas/ModulesDto"
             }
+          },
+          "ExternalID": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 255,
+            "example": "12345",
+            "description": "Refer to course on external API"
           }
         }
       },
@@ -4883,7 +5118,7 @@
           "CourseName": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 30,
+            "maxLength": 255,
             "example": "Computer Science",
             "description": "Name of the course"
           },
@@ -4923,6 +5158,30 @@
             "example": "University of Pretoria",
             "description": "Name of the university"
           },
+          "ApiIdentifier": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 10,
+            "example": "UP",
+            "description": "Unique string to identify university for ApiAdapter service"
+          },
+          "BaseApiUrl": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 50,
+            "example": "https://api.github.com",
+            "description": "Url of the university's api"
+          },
+          "ApiKey": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 100,
+            "example": "something1Nx8A2B9C0D1E2F3G4H5I6J7K8L9M0No12",
+            "description": "Key for authorisation on univerity api"
+          },
           "role": {
             "type": "string",
             "nullable": true,
@@ -4957,6 +5216,30 @@
             "maxLength": 30,
             "example": "University of Pretoria",
             "description": "Name of the university"
+          },
+          "ApiIdentifier": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 10,
+            "example": "UP",
+            "description": "Unique string to identify university for ApiAdapter service"
+          },
+          "BaseApiUrl": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 50,
+            "example": "https://api.github.com",
+            "description": "Url of the university's api"
+          },
+          "ApiKey": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 100,
+            "example": "something1Nx8A2B9C0D1E2F3G4H5I6J7K8L9M0No12",
+            "description": "Key for authorisation on univerity api"
           },
           "role": {
             "type": "string",
@@ -5026,6 +5309,30 @@
             "maxLength": 30,
             "example": "University of Pretoria",
             "description": "Name of the university"
+          },
+          "ApiIdentifier": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 10,
+            "example": "UP",
+            "description": "Unique string to identify university for ApiAdapter service"
+          },
+          "BaseApiUrl": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 50,
+            "example": "https://api.github.com",
+            "description": "Url of the university's api"
+          },
+          "ApiKey": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 100,
+            "example": "something1Nx8A2B9C0D1E2F3G4H5I6J7K8L9M0No12",
+            "description": "Key for authorisation on univerity api"
           }
         }
       },
@@ -5348,6 +5655,9 @@
             "items": {
               "$ref": "#/components/schemas/EventDto"
             }
+          },
+          "message": {
+            "type": "string"
           }
         },
         "required": ["events"]
@@ -5610,7 +5920,7 @@
           "moduleCode": {
             "type": "string",
             "minLength": 2,
-            "maxLength": 10,
+            "maxLength": 15,
             "example": "COS332",
             "description": "Module code used by the university"
           },
@@ -5644,6 +5954,14 @@
             "type": "boolean",
             "example": true,
             "description": "Whether the module has been approved by a university admin"
+          },
+          "ExternalID": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 255,
+            "example": "12345",
+            "description": "Refer to module on external API"
           }
         },
         "required": ["moduleCode", "moduleName"]

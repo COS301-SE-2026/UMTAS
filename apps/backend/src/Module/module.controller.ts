@@ -68,6 +68,30 @@ export class ModuleController {
     return this.service.create(session.user.id, dto);
   }
 
+  //Create -V2
+  @Post('v2')
+  @Roles('lecturer', 'uni_admin')
+  @ApiOperation({
+    summary: 'Create a module - V2',
+    description: 'Create a new module and link to appropriate course',
+  })
+  @ApiBody({ type: CreateModuleDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Module created successfully',
+    type: ModuleSingleResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Missing or invalid module payload',
+  })
+  createModuleV2(
+    @CurrentSession() session: SessionData,
+    @Body() dto: CreateModuleDto,
+  ): Promise<ModuleSingleResponseDto> {
+    return this.service2.create(session.user.id, dto);
+  }
+
   //Get all
   @Get()
   @Roles()

@@ -759,4 +759,26 @@ export class EventService {
 
     return venueIds;
   }
+
+  /**
+   * Check if there is a matching event for the input event based of their fingerprints
+   * @param event - Find event matching this createEventDto
+   * @param tx - transactinoal safety
+   */
+  private async duplicateEvent(
+    fingerprint: string | null,
+    tx: AppDatabase,
+  ): Promise<EventDto | null> {
+    if (!fingerprint) {
+      return null;
+    }
+
+    const [fetched] = await tx
+      .select()
+      .from(Event)
+      .where(eq(Event.importFingerprint, fingerprint))
+      .limit(1);
+
+    return fetched !== undefined ? this.mapEventToDto(fetched) : null;
+  }
 } //EventService

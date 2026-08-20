@@ -69,6 +69,7 @@ export class CourseService {
       .values({
         UniversityID: dto.UniversityID,
         CourseName: dto.CourseName,
+        ExternalID: dto.ExternalID?.trim() ?? null,
         ...(dto.GroupID ? { GroupID: dto.GroupID } : {}),
         ...(dto.Degree ? { Degree: dto.Degree } : {}),
       })

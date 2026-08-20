@@ -1,2 +1,0 @@
-Method,Name,Error,Occurrences
-POST,/api/auth/admin/create-mock-user,CatchResponseError('Failed to create user [0]: '),10

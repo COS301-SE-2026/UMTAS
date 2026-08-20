@@ -1,6 +1,0 @@
-timetableID,timetableName,UniversityID,UserID,state,SemesterOfStudy,YearOfStudy
-t-001,BSc Computer Science Y1 S1,u-up-01,usr-001,active,1,1
-t-002,BSc Information Systems Y2 S2,u-up-01,usr-002,active,2,2
-t-003,BEng Civil Engineering Y3 S1,u-up-01,usr-003,active,1,3
-t-004,BCom Business Management Y1 S2,u-up-01,usr-004,inactive,2,1
-t-005,BSc Physics Y2 S1,u-up-01,usr-005,suspended,1,2
