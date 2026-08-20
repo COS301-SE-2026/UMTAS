@@ -435,7 +435,11 @@ export interface paths {
      */
     get: operations["getAllModulesV2"];
     put?: never;
-    post?: never;
+    /**
+     * Create a module - V2
+     * @description Create a new module and link to appropriate course
+     */
+    post: operations["ModuleController_createModuleV2"];
     delete?: never;
     options?: never;
     head?: never;
@@ -977,6 +981,26 @@ export interface paths {
     patch: operations["builder-updateModule"];
     trace?: never;
   };
+  "/api/builder/events": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Create a user defined event
+     * @description Create a new event, to module specified or personal module
+     */
+    post: operations["BuilderController_createEvent"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/pdf-parser/jobs/lookup": {
     parameters: {
       query?: never;
@@ -1196,6 +1220,66 @@ export interface paths {
     patch: operations["updateAttendance"];
     trace?: never;
   };
+  "/api/api-service/courses": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Fetch courses
+     * @description Fetches courses for the authenticated user's university.
+     */
+    get: operations["ApiServiceController_getCourses"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/api-service/modules": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Fetch modules
+     * @description Fetches modules for a course at the authenticated user's university.
+     */
+    get: operations["ApiServiceController_getModules"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/api-service/events": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Fetch events
+     * @description Fetches events for a module at the authenticated user's university.
+     */
+    get: operations["ApiServiceController_getEvents"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1298,6 +1382,11 @@ export interface components {
        * @example Admin@UMTAS2024!
        */
       password: string;
+      /**
+       * @description Optional university ID to select upon sign-in
+       * @example a1b2c3d4-e5f6-7890-abcd-ef1234567890
+       */
+      uniId?: string;
     };
     AuthAcknowledgementDto: Record<string, never>;
     RevokeSessionDto: {
@@ -1393,17 +1482,20 @@ export interface components {
     AuthUserResponseDto: {
       user: components["schemas"]["AuthUserDto"];
     };
-    /**
-     * @description Role for the mock user
-     * @enum {string}
-     */
-    MockUserRole: "STUDENT" | "LECTURER" | "UNIVERSITY_ADMIN" | "SYS_ADMIN";
     CreateMockUserDto: {
+      /** @example test_user_1@simulation.com */
+      email?: string;
+      /** @example Test User */
+      name?: string;
+      /** @example password123! */
+      password?: string;
       /**
-       * @description Role for the mock user
-       * @default STUDENT
+       * @example STUDENT
+       * @enum {string}
        */
-      role: components["schemas"]["MockUserRole"];
+      role?: "STUDENT" | "LECTURER" | "UNIVERSITY_ADMIN" | "SYS_ADMIN";
+      /** @example some-uni-id */
+      uniId?: string;
     };
     DeleteMockUsersResponseDto: {
       success: Record<string, never>;
@@ -1509,6 +1601,11 @@ export interface components {
        * @example true
        */
       validated?: boolean;
+      /**
+       * @description Refer to module on external API
+       * @example 12345
+       */
+      ExternalID?: string | null;
       /**
        * Format: uuid
        * @description ModuleGroupingID to identify group the module belongs to
@@ -1652,6 +1749,11 @@ export interface components {
       /** @description List of events for the module */
       Events?: components["schemas"]["EventDto"][] | null;
       /**
+       * @description Refer to module on external API
+       * @example 12345
+       */
+      ExternalID?: string | null;
+      /**
        * Format: uuid
        * @description Unique identifier for a module group
        * @example 00000000-0000-0000-0000-000000000000
@@ -1694,6 +1796,11 @@ export interface components {
       validated?: boolean;
       /** @description List of events for the module */
       Events?: components["schemas"]["EventDto"][] | null;
+      /**
+       * @description Refer to module on external API
+       * @example 12345
+       */
+      ExternalID?: string | null;
       /**
        * Format: uuid
        * @description ID to identify course owning this CourseModule
@@ -1808,6 +1915,11 @@ export interface components {
        * @example Bachelor of Science
        */
       Degree?: string | null;
+      /**
+       * @description Refer to course on external API
+       * @example 12345
+       */
+      ExternalID?: string | null;
     };
     ModulesDto: {
       /**
@@ -1857,6 +1969,11 @@ export interface components {
       validated?: boolean;
       /** @description List of events for the module */
       Events?: components["schemas"]["EventDto"][] | null;
+      /**
+       * @description Refer to module on external API
+       * @example 12345
+       */
+      ExternalID?: string | null;
     };
     CourseSingleResponseDto: {
       /**
@@ -1889,6 +2006,11 @@ export interface components {
       Degree?: string | null;
       /** @description Modules for the course. */
       Modules?: components["schemas"]["ModulesDto"][] | null;
+      /**
+       * @description Refer to course on external API
+       * @example 12345
+       */
+      ExternalID?: string | null;
     };
     CourseFilters: {
       /**
@@ -1939,6 +2061,11 @@ export interface components {
       Degree?: string | null;
       /** @description Modules for the course. */
       Modules?: components["schemas"]["ModulesDto"][] | null;
+      /**
+       * @description Refer to course on external API
+       * @example 12345
+       */
+      ExternalID?: string | null;
     };
     CourseListResponseDto: {
       /** @description List of courses */
@@ -1970,6 +2097,11 @@ export interface components {
       Degree?: string | null;
       /** @description Modules for the course. */
       Modules?: components["schemas"]["ModulesDto"][] | null;
+      /**
+       * @description Refer to course on external API
+       * @example 12345
+       */
+      ExternalID?: string | null;
     };
     DeleteCourseResponseDto: {
       /**
@@ -2000,6 +2132,21 @@ export interface components {
        */
       UniversityName: string;
       /**
+       * @description Unique string to identify university for ApiAdapter service
+       * @example UP
+       */
+      ApiIdentifier?: string | null;
+      /**
+       * @description Url of the university's api
+       * @example https://api.github.com
+       */
+      BaseApiUrl?: string | null;
+      /**
+       * @description Key for authorisation on univerity api
+       * @example something1Nx8A2B9C0D1E2F3G4H5I6J7K8L9M0No12
+       */
+      ApiKey?: string | null;
+      /**
        * @description Role current user has for university
        * @example STUDENT
        * @enum {string|null}
@@ -2027,6 +2174,21 @@ export interface components {
        * @example University of Pretoria
        */
       UniversityName: string;
+      /**
+       * @description Unique string to identify university for ApiAdapter service
+       * @example UP
+       */
+      ApiIdentifier?: string | null;
+      /**
+       * @description Url of the university's api
+       * @example https://api.github.com
+       */
+      BaseApiUrl?: string | null;
+      /**
+       * @description Key for authorisation on univerity api
+       * @example something1Nx8A2B9C0D1E2F3G4H5I6J7K8L9M0No12
+       */
+      ApiKey?: string | null;
       /**
        * @description Role current user has for university
        * @example STUDENT
@@ -2069,6 +2231,21 @@ export interface components {
        * @example University of Pretoria
        */
       UniversityName?: string;
+      /**
+       * @description Unique string to identify university for ApiAdapter service
+       * @example UP
+       */
+      ApiIdentifier?: string | null;
+      /**
+       * @description Url of the university's api
+       * @example https://api.github.com
+       */
+      BaseApiUrl?: string | null;
+      /**
+       * @description Key for authorisation on univerity api
+       * @example something1Nx8A2B9C0D1E2F3G4H5I6J7K8L9M0No12
+       */
+      ApiKey?: string | null;
     };
     DeleteUniversityResponseDto: {
       /**
@@ -2238,6 +2415,7 @@ export interface components {
     };
     EventSingleResponseDto: {
       event: components["schemas"]["EventDto"];
+      message?: string;
     };
     CreateEventDto: {
       eventName?: string;
@@ -2254,6 +2432,7 @@ export interface components {
     };
     EventListResponseDto: {
       events: components["schemas"]["EventDto"][];
+      message?: string;
     };
     UpdateEventCriteriaDto: {
       /** @enum {string} */
@@ -2401,6 +2580,22 @@ export interface components {
        * @example true
        */
       validated?: boolean;
+      /**
+       * @description Refer to module on external API
+       * @example 12345
+       */
+      ExternalID?: string | null;
+    };
+    CreateBuilderEventDto: {
+      eventName?: string;
+      activityCode?: string | null;
+      eventCriteria?: components["schemas"]["EventCriteriaDto"];
+      isRecurring?: boolean;
+      /**
+       * @description Required when eventCriteria.moduleId is provided.
+       * @enum {string}
+       */
+      activityType?: "lecture" | "tutorial" | "prac" | "test" | "exam";
     };
     PdfParserLookupResponseDto: {
       /** @example true */
@@ -3729,6 +3924,37 @@ export interface operations {
         };
       };
       /** @description Invalid filters */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  ModuleController_createModuleV2: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateModuleDto"];
+      };
+    };
+    responses: {
+      /** @description Module created successfully */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ModuleSingleResponseDto"];
+        };
+      };
+      /** @description Missing or invalid module payload */
       400: {
         headers: {
           [name: string]: unknown;
@@ -5396,6 +5622,37 @@ export interface operations {
       };
     };
   };
+  BuilderController_createEvent: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateBuilderEventDto"];
+      };
+    };
+    responses: {
+      /** @description Event created successfully */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ModuleSingleResponseDto"];
+        };
+      };
+      /** @description Module not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   PdfParserController_lookupDuplicate: {
     parameters: {
       query?: never;
@@ -5771,6 +6028,119 @@ export interface operations {
         content: {
           "application/json": components["schemas"]["AttendanceSingleResponse"];
         };
+      };
+    };
+  };
+  ApiServiceController_getCourses: {
+    parameters: {
+      query?: {
+        /** @description Courses per page */
+        limit?: number;
+        /** @description Page index: zero index */
+        page?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Courses fetched successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CourseListResponseDto"];
+        };
+      };
+      /** @description The authenticated user is not associated with a university. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The university or its API adapter could not be found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  ApiServiceController_getModules: {
+    parameters: {
+      query: {
+        /** @description UUID of the course to fetch modules for. */
+        courseId: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Modules fetched successfully. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ModuleListResponseDto"];
+        };
+      };
+      /** @description The university or course ID is invalid. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The university, course, or API adapter could not be found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  ApiServiceController_getEvents: {
+    parameters: {
+      query: {
+        /** @description UUID of the module to fetch events for. */
+        moduleId: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Events fetched successfully. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["EventListResponseDto"];
+        };
+      };
+      /** @description The university or module ID is invalid. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The university, module, or API adapter could not be found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
     };
   };

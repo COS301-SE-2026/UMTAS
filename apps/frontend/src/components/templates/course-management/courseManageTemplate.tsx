@@ -37,6 +37,8 @@ import NotFound from "@/app/not-found";
 import { AddCoursePopup } from "@/components/organisms/course-management/AddCoursePopup";
 import NoRoleSelected from "@/components/molecules/roleManagement/NoRoleSelected";
 import { EditCoursePopup } from "@/components/organisms/course-management/EditCoursePopup";
+import { ExternalCoursesPopup } from "@/components/organisms/course-management/API-gen/externalCoursesPopup";
+import Popup from "@/components/atoms/utility/floatContainer";
 
 const steps = [
   {
@@ -67,6 +69,7 @@ export default function CourseManagementTemplate() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDegree, setSelectedDegree] = useState("All");
   const [selectedModulePrefix, setSelectedModulePrefix] = useState("All");
+  const [showExternalCourses, setExternalCourses] = useState(false);
   const [possibleCourses, setPossibleCourses] = useState<
     Record<string, boolean>
   >({});
@@ -264,12 +267,26 @@ export default function CourseManagementTemplate() {
               </Select>
               <Button
                 data-testid="show-add-course"
-                onClick={() => setShowAddCourse(true)}
+                onClick={() => {
+                  if (
+                    UserDetails.getUniDetails()?.UniversityName ===
+                    "University of Maryland"
+                  ) {
+                    setExternalCourses(true);
+                  } else {
+                    setShowAddCourse(true);
+                  }
+                }}
               >
-                Add Course
+                Add Courses
               </Button>
               {showAddCourse && (
                 <AddCoursePopup onClose={() => setShowAddCourse(false)} />
+              )}
+              {showExternalCourses && (
+                <Popup onClose={() => setExternalCourses(false)}>
+                  <ExternalCoursesPopup />
+                </Popup>
               )}
             </div>
           </div>
