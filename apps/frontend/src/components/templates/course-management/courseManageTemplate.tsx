@@ -2,10 +2,10 @@
 import { getAllCoursesQ } from "@/app/course-management/queries/courses/courseQueries";
 import { Spinner } from "@/components/atoms/baseShadcn/spinner";
 import { UserDetails } from "@/lib/userclass/userClass";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { CourseTableData } from "@/components/organisms/course-management/courseColumns";
-import { getAllModCoursesQ } from "@/app/course-management/queries/modules/moduleQueries";
+
 import { useState, useEffect, useMemo, Fragment } from "react";
 import {
   getAllModulesQueries,
@@ -37,6 +37,14 @@ import NotFound from "@/app/not-found";
 import { AddCoursePopup } from "@/components/organisms/course-management/AddCoursePopup";
 import NoRoleSelected from "@/components/molecules/roleManagement/NoRoleSelected";
 import { EditCoursePopup } from "@/components/organisms/course-management/EditCoursePopup";
+import { ExternalCoursesPopup } from "@/components/organisms/course-management/API-gen/externalCoursesPopup";
+import Popup from "@/components/atoms/utility/floatContainer";
+import {
+  addCourseEvents,
+  addCourseModules,
+} from "@/components/organisms/course-management/API-gen/Queries/request";
+import { getQueryClient } from "@/components/tanstack/getQueryClient";
+
 const steps = [
   {
     target: "#input-search-courses-degrees-modules",
@@ -63,13 +71,10 @@ const steps = [
 export default function CourseManagementTemplate() {
   const router = useRouter();
   const UniDetails = UserDetails.getUniDetails();
-  const [moduleQueries, setModuleQueries] = useState<getAllModulesQueries>({
-    universityId: UniDetails?.UniversityID,
-  });
-
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDegree, setSelectedDegree] = useState("All");
   const [selectedModulePrefix, setSelectedModulePrefix] = useState("All");
+  const [showExternalCourses, setExternalCourses] = useState(false);
   const [possibleCourses, setPossibleCourses] = useState<
     Record<string, boolean>
   >({});
@@ -78,6 +83,24 @@ export default function CourseManagementTemplate() {
 
   const ViableRole = UniDetails?.role === "UNIVERSITY_ADMIN";
 
+  const { mutate: addExternalModules, isPending: modulesPending } = useMutation(
+    {
+      ...addCourseModules(),
+      onSuccess: (data) => {
+        getQueryClient().invalidateQueries({
+          queryKey: getAllCoursesQ({
+            Degree: selectedDegree == "All" ? undefined : selectedDegree,
+            UniversityID: UserDetails.getUniDetails()?.UniversityID,
+          }).queryKey,
+        });
+        addExternalEvents(data.modules);
+      },
+    },
+  );
+
+  const { mutate: addExternalEvents, isPending: eventsPending } = useMutation({
+    ...addCourseEvents(),
+  });
   // if (UniDetails === null) {
   //   router.push("/dashboard");
   // }
@@ -93,13 +116,11 @@ export default function CourseManagementTemplate() {
     data: courseData = [],
     isLoading: isCourseLoading,
     isError: isCourseError,
-  } = useQuery({
-    ...getAllCoursesQ({ UniversityID: UniDetails?.UniversityID ?? "" }),
-    enabled: !!UniDetails?.UniversityID,
-  });
-
-  const { data: moduleData, isLoading: isModuleLoading } = useQuery(
-    getAllModCoursesQ(moduleQueries),
+  } = useQuery(
+    getAllCoursesQ({
+      Degree: selectedDegree == "All" ? undefined : selectedDegree,
+      UniversityID: UserDetails.getUniDetails()?.UniversityID,
+    }),
   );
 
   //use memo for caching between renders
@@ -117,24 +138,23 @@ export default function CourseManagementTemplate() {
 
   const availableModulePrefixes = useMemo(() => {
     const prefixes = new Set<string>();
-    moduleData?.forEach((module) => {
-      const parentCourse = courseData.find(
-        (course: CourseDTO) => course.GroupID === module.ModuleGroupingID,
-      );
 
+    courseData?.forEach((course) => {
       const matchesDegree =
-        selectedDegree === "All" || parentCourse?.Degree === selectedDegree;
+        selectedDegree === "All" || course?.Degree === selectedDegree;
 
-      if (matchesDegree && module.moduleCode) {
-        const match = module.moduleCode.match(/^[A-Za-z]+/);
-        if (match) {
-          prefixes.add(match[0].toUpperCase());
-        }
+      if (matchesDegree && course.Modules) {
+        course.Modules?.forEach((module) => {
+          const match = module.moduleCode.match(/^[A-Za-z]+/);
+          if (match) {
+            prefixes.add(match[0].toUpperCase());
+          }
+        });
       }
     });
 
     return Array.from(prefixes);
-  }, [moduleData, courseData, selectedDegree]);
+  }, [courseData, selectedDegree]);
 
   const effectiveModulePrefix =
     selectedModulePrefix !== "All" &&
@@ -145,10 +165,7 @@ export default function CourseManagementTemplate() {
   const filteredCourses: CourseTableData[] = useMemo(() => {
     const unfilteredCourses = courseData.map((course: CourseDTO) => ({
       course,
-      modules:
-        moduleData?.filter(
-          (module) => module.ModuleGroupingID === course.GroupID,
-        ) ?? [],
+      modules: course?.Modules || [],
     }));
 
     return unfilteredCourses.filter(
@@ -177,13 +194,7 @@ export default function CourseManagementTemplate() {
         return matchesDegree && matchesModulePrefix && matchesSearch;
       },
     );
-  }, [
-    courseData,
-    moduleData,
-    selectedDegree,
-    effectiveModulePrefix,
-    searchQuery,
-  ]);
+  }, [courseData, selectedDegree, effectiveModulePrefix, searchQuery]);
 
   //here is where you see all courses that are possible for the selected degree
   const toggleExpand = (courseId: string) => {
@@ -193,7 +204,7 @@ export default function CourseManagementTemplate() {
     }));
   };
 
-  if (isCourseLoading || isModuleLoading) {
+  if (isCourseLoading) {
     return (
       <div className="h-full w-full flex justify-center items-center py-20">
         <Spinner />
@@ -279,12 +290,26 @@ export default function CourseManagementTemplate() {
               </Select>
               <Button
                 data-testid="show-add-course"
-                onClick={() => setShowAddCourse(true)}
+                onClick={() => {
+                  if (
+                    UserDetails.getUniDetails()?.UniversityName ===
+                    "University of Maryland"
+                  ) {
+                    setExternalCourses(true);
+                  } else {
+                    setShowAddCourse(true);
+                  }
+                }}
               >
-                Add Course
+                Add Courses
               </Button>
               {showAddCourse && (
                 <AddCoursePopup onClose={() => setShowAddCourse(false)} />
+              )}
+              {showExternalCourses && (
+                <Popup onClose={() => setExternalCourses(false)}>
+                  <ExternalCoursesPopup />
+                </Popup>
               )}
             </div>
           </div>
@@ -360,8 +385,28 @@ export default function CourseManagementTemplate() {
                               Associated Modules:
                             </div>
                             {modules.length === 0 ? (
-                              <div className="text-sm text-[var(--text-disabled)] italic">
+                              <div className="text-sm text-[var(--text-disabled)] italic flex flex-row justify-around gap-x-2">
                                 No modules assigned to this course group.
+                                {course.ExternalID != undefined && (
+                                  <Button
+                                    disabled={modulesPending || eventsPending}
+                                    id=""
+                                    size="sm"
+                                    variant="default"
+                                    onClick={() =>
+                                      addExternalModules(course.CourseID)
+                                    }
+                                  >
+                                    {!(modulesPending || eventsPending) ? (
+                                      <p>Add Modules and Events</p>
+                                    ) : (
+                                      <div className="flex flex-row gap-x-2 ">
+                                        Adding modules and events
+                                        <Spinner></Spinner>
+                                      </div>
+                                    )}
+                                  </Button>
+                                )}
                               </div>
                             ) : (
                               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">

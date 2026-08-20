@@ -3,6 +3,7 @@
 // Store current university dto with all the localstorage handled
 
 import { uniDto } from "@/app/choose-institute/queries/builders";
+import { getQueryClient } from "@/components/tanstack/getQueryClient";
 
 export class UserDetails {
   private static uniKey = "universityDetails";
@@ -19,6 +20,7 @@ export class UserDetails {
     localStorage.setItem(this.uniKey, data);
     window.dispatchEvent(new Event(this.changeEvent));
     console.log("University stored", details);
+    getQueryClient().invalidateQueries();
   }
   public static getUniDetails(): uniDto | undefined {
     if (!this.checkWindow()) return undefined;

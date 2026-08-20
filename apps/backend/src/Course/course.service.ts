@@ -32,10 +32,10 @@ type GroupingServiceDependency = Pick<
 @Injectable()
 export class CourseService {
   constructor(
-    private readonly dbService: DatabaseService,
-    private readonly uniService: UniversityService,
+    protected readonly dbService: DatabaseService,
+    protected readonly uniService: UniversityService,
     @Inject(forwardRef(() => GroupingService))
-    private readonly groupingService: GroupingServiceDependency,
+    protected readonly groupingService: GroupingServiceDependency,
   ) {}
 
   async create(
@@ -69,6 +69,7 @@ export class CourseService {
       .values({
         UniversityID: dto.UniversityID,
         CourseName: dto.CourseName,
+        ExternalID: dto.ExternalID?.trim() ?? null,
         ...(dto.GroupID ? { GroupID: dto.GroupID } : {}),
         ...(dto.Degree ? { Degree: dto.Degree } : {}),
       })

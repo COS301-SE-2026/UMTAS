@@ -1,8 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { SwaggerModule, DocumentBuilder, OpenAPIObject } from '@nestjs/swagger';
 import { collectDefaultMetrics, register } from 'prom-client';
-import type { Request, Response } from 'express';
+import type { NextFunction, Request, Response } from 'express';
 import { join } from 'path';
 import { AppModule } from './app.module';
 import {
@@ -12,16 +12,35 @@ import {
 } from './swagger-theme';
 
 import { ValidationPipe } from '@nestjs/common';
+import { mkdir, writeFile } from 'fs/promises';
 
 async function bootstrap() {
+  process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  });
+  process.on('uncaughtException', (err) => {
+    console.error('Uncaught Exception:', err);
+  });
+
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.enableShutdownHooks();
 
   app.setGlobalPrefix('api', {
     exclude: ['metrics'],
   });
-  app.use((req: Request, _res: Response, next: () => void) => {
-    console.log('REQ:', req.method, req.originalUrl);
+  app.use((req: Request, res: Response, next: NextFunction) => {
+    const start = Date.now();
+    const { method, originalUrl } = req;
+
+    console.log(`[REQ START] ${method} ${originalUrl}`);
+
+    res.on('finish', () => {
+      const duration = Date.now() - start;
+      console.log(
+        `[REQ END] ${method} ${originalUrl} ${res.statusCode} - ${duration}ms`,
+      );
+    });
+
     next();
   });
 
@@ -39,11 +58,17 @@ async function bootstrap() {
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     credentials: true,
   });
-
+  register.clear();
   collectDefaultMetrics();
   app.getHttpAdapter().get('/metrics', async (_req: Request, res: Response) => {
-    res.set('Content-Type', register.contentType);
-    res.end(await register.metrics());
+    try {
+      res.setHeader('Content-Type', register.contentType);
+      const metrics = await register.metrics();
+      res.status(200).send(metrics);
+    } catch (err) {
+      console.error('Error serving metrics:', err);
+      res.status(500).send(err);
+    }
   });
 
   const swaggerConfig = new DocumentBuilder()
@@ -84,6 +109,10 @@ async function bootstrap() {
     },
   });
 
+  if (process.env.NODE_ENV === 'development') {
+    await generateOpenapi(document);
+  }
+
   console.log(
     `[STARTUP] Swagger docs available at http://localhost:${port}/api/docs`,
   );
@@ -97,3 +126,16 @@ bootstrap().catch((err) => {
   console.error('Failed to start app', err);
   process.exit(1);
 });
+
+async function generateOpenapi(document: OpenAPIObject) {
+  try {
+    const outDir = './docs';
+    await mkdir(outDir, { recursive: true });
+    await writeFile(
+      join(outDir, 'openapi.json'),
+      JSON.stringify(document, null, 2),
+    );
+  } catch (error) {
+    console.error('Failed to write OpenAPI spec:', error);
+  }
+}

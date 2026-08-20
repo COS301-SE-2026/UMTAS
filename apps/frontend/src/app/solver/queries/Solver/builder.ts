@@ -1,12 +1,16 @@
-import { paths } from "@/lib/api";
+import { components, paths } from "@/lib/api";
 import {
   RequestBuilder,
   RequestMethod,
 } from "../../../../../utilities/request";
 
 // uses a users enrolled modules
-type createJobBody =
+export type createJobBody =
   paths["/api/solver/jobs"]["post"]["requestBody"]["content"]["application/json"];
+
+export type SolverPreferencesType =
+  components["schemas"]["SolverPreferencesDto"];
+
 type createJobRes =
   paths["/api/solver/jobs"]["post"]["responses"]["202"]["content"]["application/json"];
 export class createSolverJobBuilder extends RequestBuilder<

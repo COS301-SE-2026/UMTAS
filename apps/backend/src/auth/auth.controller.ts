@@ -2,14 +2,17 @@ import {
   All,
   Body,
   Controller,
+  Delete,
   Get,
   Logger,
   NotFoundException,
   Post,
   Req,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import {
+  ApiBearerAuth,
   ApiBody,
   ApiCookieAuth,
   ApiExcludeEndpoint,
@@ -37,6 +40,9 @@ import {
   AuthSessionDto,
   AuthUserResponseDto,
   ChangePasswordDto,
+  CreateMockUserDto,
+  CreateMockUserResponseDto,
+  DeleteMockUsersResponseDto,
   ForgetPasswordDto,
   LinkGoogleAccountDto,
   ResetPasswordDto,
@@ -49,8 +55,9 @@ import {
 import { CurrentSession } from './session.decorator';
 import type { SessionData } from './session.decorator';
 import type { Response } from 'express';
+import { ApiKeyGuard } from './apiKey.guard';
 
-const USER_EXAMPLE = {
+export const USER_EXAMPLE = {
   id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
   email: 'system-admin@local.umtas',
   name: 'System Admin',
@@ -62,7 +69,7 @@ const USER_EXAMPLE = {
   updatedAt: '2025-01-01T00:00:00Z',
 };
 
-const SESSION_EXAMPLE = {
+export const SESSION_EXAMPLE = {
   id: 'b2c3d4e5-f6a7-8901-bcde-f12345678901',
   token: 'session-token-value',
   userId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
@@ -73,7 +80,10 @@ const SESSION_EXAMPLE = {
   updatedAt: '2025-01-01T00:00:00Z',
 };
 
-const AUTH_RESPONSE_EXAMPLE = { user: USER_EXAMPLE, session: SESSION_EXAMPLE };
+export const AUTH_RESPONSE_EXAMPLE = {
+  user: USER_EXAMPLE,
+  session: SESSION_EXAMPLE,
+};
 
 @Controller('auth')
 @ApiExtraModels(AuthEnvelopeDto)
@@ -602,6 +612,48 @@ export class AuthController {
     @Res() res: ServerResponse,
   ): Promise<void> {
     return this.handleRequest(req, res);
+  }
+
+  //Create mock user for simulation service
+  @Public()
+  @UseGuards(ApiKeyGuard)
+  @ApiBearerAuth()
+  @ApiTags('Auth Admin')
+  @Post('admin/create-mock-user')
+  @ApiBody({ type: () => CreateMockUserDto })
+  @ApiOperation({
+    summary: 'Create a new mock user',
+    description:
+      'Create a mock user, authorise their email, sign in, return user and session information',
+    operationId: 'adminCreateMockUser',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Success',
+    type: CreateMockUserDto,
+  })
+  async adminCreateMockUser(
+    @Body() dto: CreateMockUserDto,
+  ): Promise<CreateMockUserResponseDto> {
+    return await this.authService.createMockUser(dto, dto.role);
+  }
+
+  @Public()
+  @UseGuards(ApiKeyGuard)
+  @ApiBearerAuth()
+  @ApiTags('Auth admin')
+  @Delete('admin/delete-mock-users')
+  @ApiOperation({
+    summary: 'Delete all mock users',
+    operationId: 'adminDeleteMockUsers',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Success',
+    type: DeleteMockUsersResponseDto,
+  })
+  async DeleteMockUsersResponseDto(): Promise<DeleteMockUsersResponseDto> {
+    return await this.authService.deleteMockUsers();
   }
 
   @ApiTags('Auth Admin')

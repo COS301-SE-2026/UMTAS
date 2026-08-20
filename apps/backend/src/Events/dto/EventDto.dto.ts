@@ -5,7 +5,7 @@ import {
   PartialType,
   PickType,
 } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   IsBoolean,
   IsDefined,
@@ -59,6 +59,24 @@ export class EventCriteriaDto {
   @ApiPropertyOptional() @IsOptional() @IsUUID() moduleId?: string;
 }
 
+export class EventCriteriaDtoV2 extends PartialType(
+  PickType(EventCriteriaDto, [
+    'date',
+    'dayOfWeek',
+    'startTime',
+    'endTime',
+    'moduleId',
+  ]),
+) {
+  @ApiProperty({
+    default: false,
+    description: `moduleId required in V2 - whomp whomp`,
+    nullable: false,
+  })
+  @IsUUID()
+  moduleId!: string;
+}
+
 export class UpdateEventCriteriaDto extends PartialType(EventCriteriaDto) {}
 
 export class VenueDto {
@@ -67,38 +85,47 @@ export class VenueDto {
 }
 
 export class EventDto {
-  @ApiProperty() @IsUUID() eventId!: string;
-  @ApiProperty({ type: EventCriteriaDto })
-  @ValidateNested()
-  @Type(() => EventCriteriaDto)
-  eventCriteria!: EventCriteriaDto;
+  @ApiProperty()
+  @IsUUID()
+  eventId!: string;
+
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
   @Length(1, 32)
   eventName?: string;
-  @ApiPropertyOptional({ enum: ActivityTypeSchema.options })
-  @IsOptional()
-  @IsEnum(ActivityTypeSchema.options)
-  activityType?: (typeof ActivityTypeSchema.options)[number];
+
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
   @Length(1, 10)
   activityCode?: string | null;
+
+  @ApiPropertyOptional({ enum: ActivityTypeSchema.options })
+  @IsOptional()
+  @IsEnum(ActivityTypeSchema.options)
+  activityType?: (typeof ActivityTypeSchema.options)[number];
+
+  @ApiProperty({ type: EventCriteriaDto })
+  @ValidateNested()
+  @Type(() => EventCriteriaDto)
+  eventCriteria!: EventCriteriaDto;
+
+  @ApiPropertyOptional({ type: Boolean })
+  @IsOptional()
+  @IsBoolean()
+  isRecurring?: boolean;
+
+  @ApiPropertyOptional({ type: Boolean })
+  @IsOptional()
+  @IsBoolean()
+  validated?: boolean;
+
   @ApiPropertyOptional({ type: [VenueDto] })
   @IsOptional()
   @ValidateNested({ each: true })
   @Type(() => VenueDto)
   venues?: VenueDto[];
-  @ApiPropertyOptional({ type: Boolean })
-  @IsOptional()
-  @IsBoolean()
-  isRecurring?: boolean;
-  @ApiPropertyOptional({ type: Boolean })
-  @IsOptional()
-  @IsBoolean()
-  validated?: boolean;
 }
 
 export class CreateEventDto extends PickType(EventDto, [
@@ -122,6 +149,21 @@ export class CreateEventDto extends PickType(EventDto, [
   @IsEnum(ActivityTypeSchema.options)
   activityType?: (typeof ActivityTypeSchema.options)[number];
 }
+
+export class CreateEventDtoV2 extends PickType(EventDto, [
+  'eventName',
+  'activityCode',
+  'activityType',
+  'venues',
+  'isRecurring',
+  'validated',
+]) {
+  @ApiProperty({ type: EventCriteriaDtoV2 })
+  @ValidateNested()
+  @Type(() => EventCriteriaDtoV2)
+  eventCriteria!: EventCriteriaDtoV2;
+}
+
 export class UpdateEventDto extends PartialType(
   OmitType(EventDto, ['eventId', 'eventCriteria', 'venues'] as const),
 ) {
@@ -133,9 +175,14 @@ export class UpdateEventDto extends PartialType(
 }
 export class EventSingleResponseDto {
   @ApiProperty({ type: EventDto }) event!: EventDto;
+
+  @IsString()
+  message?: string;
 }
 export class EventListResponseDto {
   @ApiProperty({ type: [EventDto] }) events!: EventDto[];
+
+  message?: string;
 }
 export class DeleteResponseDto extends PickType(EventDto, [
   'eventName',
@@ -145,4 +192,22 @@ export class DeleteResponseDto extends PickType(EventDto, [
 }
 export class EventFiltersDto {
   @ApiPropertyOptional() @IsOptional() @IsUUID() moduleId?: string;
+
+  @ApiPropertyOptional() @IsOptional() @IsUUID() timetableId?: string;
+
+  @ApiPropertyOptional({ type: Boolean })
+  @Transform(({ value }) => value === 'true')
+  @IsOptional()
+  @IsBoolean()
+  all?: boolean;
 }
+
+export class ValidateEventDto extends PickType(EventDto, ['validated']) {}
+
+export class ValidateEventResponseDto {
+  @Type(() => EventDto)
+  event!: EventDto;
+
+  @IsString()
+  message?: string;
+} //END_ValidateEventResponseDto

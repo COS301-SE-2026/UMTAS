@@ -67,10 +67,6 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException('No active session');
     }
 
-    // If user selected uni -> enrich header with it and role
-    const hUniId =
-      headers.get('x-umtas-uni-id') ?? headers.get('x-umtas-uni') ?? null;
-
     const cookieValue = headers.get('cookie') ?? '';
     const cookieUniId = cookieValue
       .split(';')
@@ -78,7 +74,7 @@ export class AuthGuard implements CanActivate {
       .find((cookie) => cookie.startsWith('umtas-uni-id='))
       ?.split('=')[1];
 
-    const uniId = hUniId || cookieUniId || null;
+    const uniId = cookieUniId || null;
 
     if (uniId) {
       try {
@@ -91,9 +87,9 @@ export class AuthGuard implements CanActivate {
           session.uniId = uniId;
           session.uniRole = uniRole;
         }
-      } catch {
+      } catch (error) {
         this.logger.warn(
-          `Failed enrichment of session with uniRole for uni[${hUniId}] user[${session.user.id}]`,
+          `Failed enrichment of session with uniRole for uni[${uniId}] user[${session.user.id}] | Error: ${error}`,
         );
       }
     } //END_hUniId

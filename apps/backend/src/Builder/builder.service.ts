@@ -30,10 +30,10 @@ import { ModuleService } from '../Module/module.service';
 @Injectable()
 export class BuilderService {
   constructor(
-    private readonly dbService: DatabaseService,
-    private readonly uniService: UniversityService,
-    private readonly courseService: CourseService,
-    private readonly moduleService: ModuleService,
+    protected readonly dbService: DatabaseService,
+    protected readonly uniService: UniversityService,
+    protected readonly courseService: CourseService,
+    protected readonly moduleService: ModuleService,
   ) {}
 
   //Create User Module
@@ -151,7 +151,7 @@ export class BuilderService {
   //🎅's Little Helpers
 
   //Check if user has personal uni and course | Return course
-  private async doUserUniCourseCheck(
+  protected async doUserUniCourseCheck(
     userId: string,
     tx: DatabaseService['db'],
   ): Promise<CourseDto> {
@@ -186,7 +186,7 @@ export class BuilderService {
   } //ENDdoUserUniCourseCheck
 
   //Called when user doesn't have a personalised uni to create one
-  private async createUserUni(
+  protected async createUserUni(
     userId: string,
     tx: DatabaseService['db'],
   ): Promise<typeof UniversityRole.$inferSelect> {
@@ -223,7 +223,7 @@ export class BuilderService {
   } //createUserUni
 
   //Called when user has personalised uni but not course for some reason :'(
-  private async createUserCourse(
+  protected async createUserCourse(
     userId: string,
     uniId: string,
     tx: DatabaseService['db'],
