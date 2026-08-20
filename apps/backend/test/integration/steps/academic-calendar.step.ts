@@ -152,10 +152,38 @@ export function academicCalendarLifecycleStep<TPlan>(
       const administrator = await actor(context);
       const year = String(plan.calendarYear);
       const daySwapDate = `${year}-08-14`;
+      const subscribedHolidayDate = `${year}-09-15`;
+      const weekdays = [
+        'sunday',
+        'monday',
+        'tuesday',
+        'wednesday',
+        'thursday',
+        'friday',
+        'saturday',
+      ] as const;
+      const subscribedHolidayWeekday =
+        weekdays[new Date(`${subscribedHolidayDate}T00:00:00Z`).getUTCDay()];
       const replacementWeekday =
         new Date(`${daySwapDate}T00:00:00Z`).getUTCDay() === 1
           ? 'TUESDAY'
           : 'MONDAY';
+
+      const [publicCalendar] = await context.runtime.database
+        .insert(AcademicCalendar)
+        .values({
+          universityId: null,
+          name: 'Integration Public Holidays',
+          year: plan.calendarYear,
+        })
+        .returning();
+      await context.runtime.database.insert(CalendarRestriction).values({
+        academicCalendarId: publicCalendar.id,
+        type: 'PUBLIC_HOLIDAY',
+        startDate: subscribedHolidayDate,
+        endDate: subscribedHolidayDate,
+        description: 'Integration Public Holiday',
+      });
 
       const created = await administrator.request.post('/academic-calendar', {
         json: { year: plan.calendarYear },
@@ -165,6 +193,18 @@ export function academicCalendarLifecycleStep<TPlan>(
       expectString(created.body.id, 'academic calendar ID');
       assert.equal(created.body.year, plan.calendarYear);
       const calendarId = created.body.id;
+
+      const listedCalendars = await administrator.request.get(
+        `/academic-calendar?year=${plan.calendarYear}`,
+      );
+      expectStatus(listedCalendars, 200, 'list academic calendars by year');
+      assert.deepEqual(listedCalendars.body, [
+        {
+          id: calendarId,
+          year: plan.calendarYear,
+          subscriptions: [],
+        },
+      ]);
 
       const duplicate = await administrator.request.post('/academic-calendar', {
         json: { year: plan.calendarYear },
@@ -179,7 +219,65 @@ export function academicCalendarLifecycleStep<TPlan>(
       assert.deepEqual(fetched.body, {
         id: calendarId,
         year: plan.calendarYear,
+        subscriptions: [],
       });
+
+      await context.runtime.database
+        .update(UniversityRole)
+        .set({ role: 'STUDENT' })
+        .where(
+          and(
+            eq(UniversityRole.UserID, adminSelection.userId),
+            eq(UniversityRole.UniversityID, adminSelection.universityId),
+          ),
+        );
+      const selectedAsStudent = await administrator.request.post(
+        '/auth/select-university',
+        { json: { uniId: adminSelection.universityId } },
+      );
+      expectStatus(selectedAsStudent, [200, 201], 'reselect as student');
+      const forbiddenSubscription = await administrator.request.put(
+        `/academic-calendar/${calendarId}/subscriptions`,
+        { json: { subscriptions: [publicCalendar.id] } },
+      );
+      expectStatus(
+        forbiddenSubscription,
+        403,
+        'reject calendar subscription update by student',
+      );
+
+      await context.runtime.database
+        .update(UniversityRole)
+        .set({ role: 'UNIVERSITY_ADMIN' })
+        .where(
+          and(
+            eq(UniversityRole.UserID, adminSelection.userId),
+            eq(UniversityRole.UniversityID, adminSelection.universityId),
+          ),
+        );
+      const selectedAsAdministrator = await administrator.request.post(
+        '/auth/select-university',
+        { json: { uniId: adminSelection.universityId } },
+      );
+      expectStatus(
+        selectedAsAdministrator,
+        [200, 201],
+        'reselect as administrator',
+      );
+      const subscribed = await administrator.request.put(
+        `/academic-calendar/${calendarId}/subscriptions`,
+        { json: { subscriptions: [publicCalendar.id] } },
+      );
+      expectStatus(subscribed, 200, 'subscribe to a public calendar');
+      expectObject(subscribed.body, 'subscribe to a public calendar');
+      assert.deepEqual(subscribed.body.subscriptions, [publicCalendar.id]);
+      const [persistedSubscription] = await context.runtime.database
+        .select({ subscriptions: AcademicCalendar.subscriptions })
+        .from(AcademicCalendar)
+        .where(eq(AcademicCalendar.id, calendarId));
+      assert.deepEqual(persistedSubscription.subscriptions, [
+        publicCalendar.id,
+      ]);
 
       const invalidRestriction = await administrator.request.post(
         `/academic-calendar/${calendarId}/restrictions`,
@@ -275,10 +373,37 @@ export function academicCalendarLifecycleStep<TPlan>(
       );
       assert.deepEqual(listedDates, [...listedDates].sort());
 
+      const recurringTeaching = await administrator.request.post('/events', {
+        json: {
+          eventName: 'Subscribed holiday lecture',
+          activityCode: 'HOL1',
+          activityType: 'lecture',
+          eventCriteria: {
+            eventSource: 'personal',
+            dayOfWeek: subscribedHolidayWeekday,
+            startTime: '10:00',
+            endTime: '11:00',
+          },
+          isRecurring: true,
+          validated: true,
+        },
+      });
+      expectStatus(recurringTeaching, 201, 'create recurring teaching event');
+      expectObject(recurringTeaching.body, 'create recurring teaching event');
+      expectObject(
+        recurringTeaching.body.event,
+        'created recurring teaching event',
+      );
+      expectString(
+        recurringTeaching.body.event.eventId,
+        'recurring teaching event ID',
+      );
+      const recurringTeachingEventId = recurringTeaching.body.event.eventId;
+
       const timetable = await administrator.request.post('/timetables', {
         json: {
           timetableName: 'Academic calendar source',
-          eventIds: [event.eventId],
+          eventIds: [event.eventId, recurringTeachingEventId],
         },
       });
       expectStatus(timetable, 201, 'create calendar source timetable');
@@ -310,11 +435,29 @@ export function academicCalendarLifecycleStep<TPlan>(
       expectObject(oneOffEvent, 'generated one-off event');
       assert.equal(oneOffEvent.date, event.eventDate);
       assert.ok(Array.isArray(generated.body.payload.allDayEvents));
-      const allDayEvents = generated.body.payload.allDayEvents as unknown[];
-      assert.equal(allDayEvents.length, 1);
-      const allDayEvent = allDayEvents[0];
-      expectObject(allDayEvent, 'generated academic calendar all-day event');
-      assert.equal(allDayEvent.type, 'UNIVERSITY_CLOSURE');
+      const allDayEvents = generated.body.payload.allDayEvents as Record<
+        string,
+        unknown
+      >[];
+      assert.ok(
+        allDayEvents.some(
+          (item) =>
+            item.type === 'PUBLIC_HOLIDAY' &&
+            item.startDate === subscribedHolidayDate,
+        ),
+      );
+      const recurringEvents = generated.body.payload.recurringEvents as Record<
+        string,
+        unknown
+      >[];
+      const generatedTeaching = recurringEvents.find(
+        (item) => item.key === `event-${recurringTeachingEventId}`,
+      );
+      assert.ok(generatedTeaching);
+      assert.ok(Array.isArray(generatedTeaching.excludedDates));
+      assert.ok(
+        generatedTeaching.excludedDates.includes(subscribedHolidayDate),
+      );
       const generatedCalendarId = generated.body.id;
 
       const retrievedSnapshot = await administrator.request.get(
@@ -340,6 +483,7 @@ export function academicCalendarLifecycleStep<TPlan>(
       ]);
       assert.equal(calendars.length, 1);
       assert.equal(calendars[0].universityId, adminSelection.universityId);
+      assert.deepEqual(calendars[0].subscriptions, [publicCalendar.id]);
       assert.equal(restrictions.length, restrictionInputs.length);
       assert.equal(snapshots.length, 1);
       assert.equal(snapshots[0].timetableId, timetableId);
