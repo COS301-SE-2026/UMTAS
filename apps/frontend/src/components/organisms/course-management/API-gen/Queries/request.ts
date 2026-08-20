@@ -9,7 +9,7 @@ type APIServiceCoursesResp =
 
 export async function fetchAPIserviceCourses(params: APIServiceCoursesParam) {
   const result = api
-    .get("api/api-service/courses", {
+    .get("api-service/courses", {
       searchParams: params,
     })
     .json<APIServiceCoursesResp>();

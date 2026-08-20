@@ -3,11 +3,28 @@ import { Card } from "@/components/atoms/baseShadcn/card";
 import { Input } from "@/components/atoms/baseShadcn/input";
 import { Label } from "@/components/atoms/baseShadcn/label";
 import { Spinner } from "@/components/atoms/baseShadcn/spinner";
+import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
+import { fetchAPIserviceCourses } from "./Queries/request";
+import { getQueryClient } from "@/components/tanstack/getQueryClient";
+import { getAllCoursesQ } from "@/app/course-management/queries/courses/courseQueries";
 
 export function ExternalCoursesPopup() {
   const [numPages, setNumPages] = useState(0);
   const [limit, setLimit] = useState(1);
+
+  const { mutateAsync: getCourses, isPending: pendingCourses } = useMutation({
+    mutationFn: () =>
+      fetchAPIserviceCourses({
+        limit: limit,
+        page: numPages,
+      }),
+    onSuccess: () => {
+      getQueryClient().invalidateQueries({
+        queryKey: getAllCoursesQ().queryKey,
+      });
+    },
+  });
 
   return (
     <Card className="w-full max-w-md p-6 flex flex-col gap-4 border-[var(--border)] bg-[var(--bg-surface)] shadow-sm">
@@ -28,7 +45,7 @@ export function ExternalCoursesPopup() {
           max={100}
           type="number"
           placeholder="0"
-          disabled={false}
+          disabled={pendingCourses}
           className="bg-[var(--background)] border-[var(--border)] text-[var(--text-primary)] mb-4"
         />
         <Label htmlFor="number of courses">Number of results</Label>
@@ -40,7 +57,7 @@ export function ExternalCoursesPopup() {
             setLimit(Number(e.target.value));
           }}
           placeholder="e.g. BA Inkleur"
-          disabled={false}
+          disabled={pendingCourses}
           min={1}
           max={10}
           type="number"
@@ -51,13 +68,21 @@ export function ExternalCoursesPopup() {
       <div className="flex justify-end gap-3 mt-4">
         <Button
           data-testid="add-course-confirm"
-          onClick={() => {}}
-          disabled={false}
+          onClick={async () => {
+            await getCourses();
+          }}
+          disabled={pendingCourses}
           className={
             false ? "bg-[var(--error-bg)] text-[var(--error-text)]" : ""
           }
         >
-          Fetch External Courses
+          {pendingCourses ? (
+            <div className="flex flex-row gap-x-3">
+              <Spinner></Spinner> fetching courses
+            </div>
+          ) : (
+            "Fetch External Courses"
+          )}
         </Button>
       </div>
     </Card>
