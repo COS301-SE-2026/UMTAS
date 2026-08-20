@@ -73,7 +73,7 @@ importers:
         version: 0.4.5
       "@nestjs-modules/mailer":
         specifier: ^2.3.6
-        version: 2.3.6(@nestjs/common@11.1.21(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.21)(@nestjs/terminus@11.1.1(@nestjs/axios@4.0.1(@nestjs/common@11.1.21(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(axios@1.16.1)(rxjs@7.8.2))(@nestjs/common@11.1.21(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.21)(reflect-metadata@0.2.2)(rxjs@7.8.2))(bullmq@5.76.10)(chokidar@3.6.0)(nodemailer@8.0.7)(relateurl@0.2.7)(svgo@4.0.1)(terser@5.47.1)(typescript@5.9.3)
+        version: 2.3.6(@nestjs/common@11.1.21(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.21)(@nestjs/terminus@11.1.1(@nestjs/axios@4.0.1(@nestjs/common@11.1.21(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(axios@1.16.1)(rxjs@7.8.2))(@nestjs/common@11.1.21(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.21)(reflect-metadata@0.2.2)(rxjs@7.8.2))(bullmq@5.76.10)(chokidar@4.0.3)(nodemailer@8.0.7)(relateurl@0.2.7)(svgo@4.0.1)(terser@5.47.1)(typescript@5.9.3)
       "@nestjs/axios":
         specifier: ^4.0.1
         version: 4.0.1(@nestjs/common@11.1.21(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(axios@1.16.1)(rxjs@7.8.2)
@@ -161,7 +161,7 @@ importers:
         version: 11.0.21(@swc/core@1.15.33)(@types/node@24.12.4)(cssnano@7.1.9(postcss@8.5.15))(postcss@8.5.15)(prettier@3.8.3)
       "@nestjs/schematics":
         specifier: ^11.1.0
-        version: 11.1.0(chokidar@3.6.0)(prettier@3.8.3)(typescript@5.9.3)
+        version: 11.1.0(chokidar@4.0.3)(prettier@3.8.3)(typescript@5.9.3)
       "@nestjs/testing":
         specifier: ^11.1.21
         version: 11.1.21(@nestjs/common@11.1.21(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.21)(@nestjs/platform-express@11.1.21)
@@ -282,6 +282,9 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      ky:
+        specifier: ^2.0.2
+        version: 2.0.2
       lucide-react:
         specifier: ^1.16.0
         version: 1.16.0(react@19.2.4)
@@ -10640,6 +10643,13 @@ packages:
       }
     engines: { node: ">=6" }
 
+  ky@2.0.2:
+    resolution:
+      {
+        integrity: sha512-/GmXpo9F9W+f8n4Ivr2iH+7h7wL7jLbLKWkMlpflcCRb6kGjBfTlASEXaZ9qUgNTn4VgS0P2pwxxzQ4EM6Ulgg==,
+      }
+    engines: { node: ">=22" }
+
   kysely@0.28.17:
     resolution:
       {
@@ -14977,17 +14987,6 @@ snapshots:
 
   "@alloc/quick-lru@5.2.0": {}
 
-  "@angular-devkit/core@19.2.24(chokidar@3.6.0)":
-    dependencies:
-      ajv: 8.18.0
-      ajv-formats: 3.0.1(ajv@8.18.0)
-      jsonc-parser: 3.3.1
-      picomatch: 4.0.4
-      rxjs: 7.8.1
-      source-map: 0.7.4
-    optionalDependencies:
-      chokidar: 3.6.0
-
   "@angular-devkit/core@19.2.24(chokidar@4.0.3)":
     dependencies:
       ajv: 8.18.0
@@ -15009,16 +15008,6 @@ snapshots:
       yargs-parser: 21.1.1
     transitivePeerDependencies:
       - "@types/node"
-      - chokidar
-
-  "@angular-devkit/schematics@19.2.24(chokidar@3.6.0)":
-    dependencies:
-      "@angular-devkit/core": 19.2.24(chokidar@3.6.0)
-      jsonc-parser: 3.3.1
-      magic-string: 0.30.17
-      ora: 5.4.1
-      rxjs: 7.8.1
-    transitivePeerDependencies:
       - chokidar
 
   "@angular-devkit/schematics@19.2.24(chokidar@4.0.3)":
@@ -16824,7 +16813,7 @@ snapshots:
       "@tybys/wasm-util": 0.10.2
     optional: true
 
-  "@nestjs-modules/mailer@2.3.6(@nestjs/common@11.1.21(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.21)(@nestjs/terminus@11.1.1(@nestjs/axios@4.0.1(@nestjs/common@11.1.21(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(axios@1.16.1)(rxjs@7.8.2))(@nestjs/common@11.1.21(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.21)(reflect-metadata@0.2.2)(rxjs@7.8.2))(bullmq@5.76.10)(chokidar@3.6.0)(nodemailer@8.0.7)(relateurl@0.2.7)(svgo@4.0.1)(terser@5.47.1)(typescript@5.9.3)":
+  "@nestjs-modules/mailer@2.3.6(@nestjs/common@11.1.21(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.21)(@nestjs/terminus@11.1.1(@nestjs/axios@4.0.1(@nestjs/common@11.1.21(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(axios@1.16.1)(rxjs@7.8.2))(@nestjs/common@11.1.21(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.21)(reflect-metadata@0.2.2)(rxjs@7.8.2))(bullmq@5.76.10)(chokidar@4.0.3)(nodemailer@8.0.7)(relateurl@0.2.7)(svgo@4.0.1)(terser@5.47.1)(typescript@5.9.3)":
     dependencies:
       "@css-inline/css-inline": 0.20.0
       "@nestjs/common": 11.1.21(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)
@@ -16842,7 +16831,7 @@ snapshots:
       handlebars: 4.7.9
       liquidjs: 10.27.0
       mjml: 5.2.2(relateurl@0.2.7)(svgo@4.0.1)(terser@5.47.1)(typescript@5.9.3)
-      nunjucks: 3.2.4(chokidar@3.6.0)
+      nunjucks: 3.2.4(chokidar@4.0.3)
       preview-email: 3.1.3
       pug: 3.0.4
     transitivePeerDependencies:
@@ -16999,19 +16988,6 @@ snapshots:
       tslib: 2.8.1
     transitivePeerDependencies:
       - supports-color
-
-  "@nestjs/schematics@11.1.0(chokidar@3.6.0)(prettier@3.8.3)(typescript@5.9.3)":
-    dependencies:
-      "@angular-devkit/core": 19.2.24(chokidar@3.6.0)
-      "@angular-devkit/schematics": 19.2.24(chokidar@3.6.0)
-      comment-json: 5.0.0
-      jsonc-parser: 3.3.1
-      pluralize: 8.0.0
-      typescript: 5.9.3
-    optionalDependencies:
-      prettier: 3.8.3
-    transitivePeerDependencies:
-      - chokidar
 
   "@nestjs/schematics@11.1.0(chokidar@4.0.3)(prettier@3.8.3)(typescript@5.9.3)":
     dependencies:
@@ -22385,6 +22361,8 @@ snapshots:
 
   kleur@4.1.5: {}
 
+  ky@2.0.2: {}
+
   kysely@0.28.17: {}
 
   language-subtag-registry@0.3.23: {}
@@ -23341,13 +23319,13 @@ snapshots:
     dependencies:
       boolbase: 1.0.0
 
-  nunjucks@3.2.4(chokidar@3.6.0):
+  nunjucks@3.2.4(chokidar@4.0.3):
     dependencies:
       a-sync-waterfall: 1.0.1
       asap: 2.0.6
       commander: 5.1.0
     optionalDependencies:
-      chokidar: 3.6.0
+      chokidar: 4.0.3
     optional: true
 
   nwsapi@2.2.23: {}
