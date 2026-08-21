@@ -8,6 +8,7 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -30,7 +31,9 @@ import {
   DeleteCalendarRestrictionResponseDto,
   GenerateCalendarDto,
   GeneratedCalendarDto,
+  ListAcademicCalendarsQueryDto,
   UpdateCalendarRestrictionDto,
+  UpdateCalendarSubscriptionsDto,
 } from './dto';
 
 const CALENDAR_ID_PARAM = {
@@ -169,6 +172,43 @@ export class AcademicCalendarController {
     @Body() dto: CreateAcademicCalendarDto,
   ): Promise<AcademicCalendarDto> {
     return this.service.createCalendar(this.selectedUniversityId(session), dto);
+  }
+
+  @Get()
+  @Roles('uni_admin')
+  @ApiCookieAuth('umtas-session')
+  @ApiOperation({
+    summary: 'List academic calendars',
+    description:
+      'Returns calendars belonging to the university selected in the current session, optionally filtered by academic year.',
+    operationId: 'listAcademicCalendars',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Academic calendars returned successfully',
+    type: AcademicCalendarDto,
+    isArray: true,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid academic year',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'No active session',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Insufficient permissions',
+  })
+  listCalendars(
+    @CurrentSession() session: SessionData,
+    @Query() query: ListAcademicCalendarsQueryDto,
+  ): Promise<AcademicCalendarDto[]> {
+    return this.service.listCalendars(
+      this.selectedUniversityId(session),
+      query.year,
+    );
   }
 
   @Get(':id/restrictions')
@@ -357,6 +397,54 @@ export class AcademicCalendarController {
       this.selectedUniversityId(session),
       id,
       restrictionId,
+    );
+  }
+
+  @Put(':id/subscriptions')
+  @Roles('uni_admin')
+  @ApiCookieAuth('umtas-session')
+  @ApiOperation({
+    summary: "Replace an academic calendar's public-calendar subscriptions",
+    description:
+      'Replaces the public calendars used to supply restrictions during calendar generation.',
+    operationId: 'updateCalendarSubscriptions',
+  })
+  @ApiParam(CALENDAR_ID_PARAM)
+  @ApiBody({ type: UpdateCalendarSubscriptionsDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Calendar subscriptions updated successfully',
+    type: AcademicCalendarDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid calendar ID or subscription payload',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'No active session',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Insufficient permissions',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Academic calendar or public calendar not found',
+  })
+  @ApiResponse({
+    status: 422,
+    description: 'Public calendar year does not match the academic calendar',
+  })
+  updateSubscriptions(
+    @CurrentSession() session: SessionData,
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() dto: UpdateCalendarSubscriptionsDto,
+  ): Promise<AcademicCalendarDto> {
+    return this.service.updateSubscriptions(
+      this.selectedUniversityId(session),
+      id,
+      dto,
     );
   }
 
