@@ -1,5 +1,9 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { CourseDto, CourseListResponseDto } from 'src/Course/dto/course.dto';
+import {
+  CourseDto,
+  CourseListResponseDto,
+  CourseSingleResponseDto,
+} from 'src/Course/dto/course.dto';
 import { EventDto, EventListResponseDto } from 'src/Events/dto/EventDto.dto';
 import { ModuleListResponseDto, ModulesDto } from 'src/Module/dto/module.dto';
 import { UniversityDto } from 'src/University/dto/university.dto';
@@ -93,6 +97,24 @@ export class ApiService {
       message: `Events returned for Module[${module.moduleName}] = [${events.length}]`,
     };
   } //END_getEvents
+
+  async getCourseWithModulesAndEvents(
+    userId: string,
+    uniId: string,
+    courseId: string,
+  ): Promise<CourseSingleResponseDto> {
+    const course = await this.getCourse(courseId);
+
+    const modules = (await this.getModules(userId, uniId, courseId)).modules;
+
+    for (const m of modules) {
+      m.Events = (await this.getEvents(userId, uniId, m.moduleID)).events;
+    } //END_m
+
+    course.Modules = modules;
+
+    return course;
+  } //END_getCourseWithModulesAndEvents
 
   //🎅's little helpers
   private async getUni(uniId: string): Promise<UniversityDto> {

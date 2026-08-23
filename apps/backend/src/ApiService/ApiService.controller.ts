@@ -17,7 +17,10 @@ import {
 } from '@nestjs/common';
 
 //Responses
-import { CourseListResponseDto } from '../Course/dto/course.dto';
+import {
+  CourseListResponseDto,
+  CourseSingleResponseDto,
+} from '../Course/dto/course.dto';
 import { EventListResponseDto } from '../Events/dto/EventDto.dto';
 import { ModuleListResponseDto } from '../Module/dto/module.dto';
 
@@ -139,6 +142,48 @@ export class ApiServiceController {
 
     return result;
   } //END_getCourses
+
+  @Get('course')
+  @Roles()
+  @ApiOperation({
+    summary: 'Get a specific course',
+    description:
+      'Returns the specified course together with its module and events.',
+  })
+  @ApiQuery({
+    name: 'courseId',
+    required: true,
+    type: String,
+    description: 'UUID of the course to fetch.',
+  })
+  @ApiBadRequestResponse({
+    description: 'The authenticated user is not associated with a university.',
+  })
+  @ApiNotFoundResponse({
+    description: 'The university or its API adapter could not be found.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Course fetched successfully',
+    type: CourseSingleResponseDto,
+  })
+  async getCourse(
+    @CurrentSession() session: SessionData,
+    @Query('courseId') courseId: string,
+  ): Promise<CourseSingleResponseDto> {
+    const uniId = session.uniId;
+
+    if (uniId === undefined || uniId.trim().length === 0)
+      throw new BadRequestException(
+        `You have not selected a university. Tsk Tsk Tsk.`,
+      );
+
+    return await this.service.getCourseWithModulesAndEvents(
+      session.user.id,
+      uniId,
+      courseId,
+    );
+  } //END_getCourse
 
   @Get('/modules')
   @Roles()
