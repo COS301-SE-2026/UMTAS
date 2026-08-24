@@ -4,8 +4,8 @@ import { UniversityService } from 'src/University/university.service';
 import { GroupingService } from 'src/Grouping/grouping.service';
 import { forwardRef, Inject, NotFoundException } from '@nestjs/common';
 import {
-  CourseFilters,
-  CourseListResponseDto,
+  CourseFiltersV2,
+  CourseListResponseDtoV2,
   CourseSingleResponseDto,
 } from './dto/course.dto';
 import { AppDatabase } from 'src/auth/auth';
@@ -27,9 +27,9 @@ export class CourseServiceV2 extends CourseService {
 
   async getAllV2(
     userId: string,
-    filters: CourseFilters,
+    filters: CourseFiltersV2,
     tx?: AppDatabase,
-  ): Promise<CourseListResponseDto> {
+  ): Promise<CourseListResponseDtoV2> {
     const db = tx ?? this.dbService.db;
 
     const conditions: SQL[] = [];
@@ -63,6 +63,11 @@ export class CourseServiceV2 extends CourseService {
     return {
       courses: coursesWithModules,
       message: `Returned ${coursesWithModules.length} Courses`,
+      ...(filters.Stats && filters.Stats === true
+        ? {
+            count: coursesWithModules.length,
+          }
+        : {}),
     };
   }
 
