@@ -274,6 +274,17 @@ export class ModuleListResponseDto {
   message?: string;
 }
 
+export class ModuleListResponseDtoV2 extends ModuleListResponseDto {
+  @ApiPropertyOptional({
+    type: Number,
+    example: 68,
+    description: 'Count of Modules',
+  })
+  @IsNumber()
+  @IsOptional()
+  count?: number;
+}
+
 //Delete
 export class DeleteModuleResponseDto extends PickType(ModulesDto, [
   'moduleCode',
@@ -338,6 +349,31 @@ export class ModuleFiltersDto {
   // @ValidateIf((o)=> o.userEnrollment===true)
   // userId?: string;
 } //ModuleFiltersDto
+
+//GetAllV2 filters
+export class ModuleFiltersDtoV2 extends ModuleFiltersDto {
+  @ApiPropertyOptional({
+    example: undefined,
+    description: 'Enable stats = TRUE',
+    type: Boolean,
+  })
+  @IsOptional()
+  @IsBoolean()
+  @Transform(({ value }) => {
+    if (
+      value === 't' ||
+      value === 'true' ||
+      value === 'True' ||
+      value === 'TRUE' ||
+      value === true ||
+      value === '1' ||
+      value === 1
+    )
+      return true;
+    else return false;
+  })
+  Stats?: boolean;
+}
 
 export class ModuleStylingResponseDto {
   @ApiProperty({

@@ -3,8 +3,8 @@ import {
   CreateModuleDto,
   EnrollToModuleDto,
   EnrolResponseDto,
-  ModuleFiltersDto,
-  ModuleListResponseDto,
+  ModuleFiltersDtoV2,
+  ModuleListResponseDtoV2,
   ModuleSingleResponseDto,
 } from './dto/module.dto';
 import { ModuleService } from './module.service';
@@ -199,9 +199,9 @@ export class ModuleServiceV2 extends ModuleService {
 
   async getAll(
     userId: string,
-    filters: ModuleFiltersDto,
+    filters: ModuleFiltersDtoV2,
     tx?: AppDatabase,
-  ): Promise<ModuleListResponseDto> {
+  ): Promise<ModuleListResponseDtoV2> {
     const db = tx ?? this.dbService.db;
     const uniId = filters.universityId?.trim();
     const courseId = filters.courseId?.trim();
@@ -278,6 +278,11 @@ export class ModuleServiceV2 extends ModuleService {
     return {
       modules: modulesWithEvents,
       message: `Returning: ${uniqueModules.length}-Modules. | With filters: ${JSON.stringify(filters)}`,
+      ...(filters.Stats && filters.Stats === true
+        ? {
+            count: foundModules.length,
+          }
+        : {}),
     };
   } //getAll
 
