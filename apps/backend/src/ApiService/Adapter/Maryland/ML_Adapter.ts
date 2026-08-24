@@ -69,8 +69,11 @@ export class ML_Adapter extends University_Adapter {
     });
 
     const result: CreateModuleDto[] = response.map((module) => ({
-      moduleCode: module.section_id.replace('-', ''),
-      moduleName: `${course.CourseName}-[${module.section_id}]`,
+      moduleCode: module.section_id.replace('-', '').substring(0, 14),
+      moduleName: `${course.CourseName}-[${module.section_id}]`.substring(
+        0,
+        99,
+      ),
       moduleDescription: `${course.CourseName} "default description"`,
       ExternalID: module.section_id,
       CourseID: course.CourseID,
