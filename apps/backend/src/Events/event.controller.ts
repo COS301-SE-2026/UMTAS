@@ -120,11 +120,8 @@ export class EventController {
     @CurrentSession() session: SessionData,
     @Query() filters: EventFiltersDtoV2,
   ): Promise<EventListResponseDtoV2> {
-    return this.service.getAllEvents(session.user.id, {
-      moduleId: filters.moduleId,
-      timetableId: filters.timetableId,
-      all: filters.all,
-    });
+    console.log(`Controller: ${JSON.stringify(filters)}`);
+    return this.service.getAllEvents(session.user.id, filters);
   } //getAllEvents
 
   //get by id
