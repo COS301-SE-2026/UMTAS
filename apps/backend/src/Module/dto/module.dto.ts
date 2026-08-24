@@ -20,6 +20,7 @@ import {
 import { Transform, Type } from 'class-transformer';
 import { PopulateGroupBodyDto } from '../../Grouping/dto/grouping.dto';
 import { EventDto } from 'src/Events/dto/EventDto.dto';
+import { StatsFiltersDto, StatsResponseDto } from 'src/stats.dto';
 
 export class CourseModuleDto {
   @ApiProperty({
@@ -274,16 +275,10 @@ export class ModuleListResponseDto {
   message?: string;
 }
 
-export class ModuleListResponseDtoV2 extends ModuleListResponseDto {
-  @ApiPropertyOptional({
-    type: Number,
-    example: 68,
-    description: 'Count of Modules',
-  })
-  @IsNumber()
-  @IsOptional()
-  count?: number;
-}
+export class ModuleListResponseDtoV2 extends IntersectionType(
+  ModuleListResponseDto,
+  PickType(StatsResponseDto, ['count']),
+) {}
 
 //Delete
 export class DeleteModuleResponseDto extends PickType(ModulesDto, [
@@ -339,41 +334,13 @@ export class ModuleFiltersDto {
     else return false;
   })
   userEnrollment?: boolean;
-
-  // @ApiPropertyOptional({
-  //   default: false,
-  //   description: 'Used to get the moduel styling and when moduleEnrollment filter is active'
-  // })
-  // @IsOptional()
-  // @IsUUID()
-  // @ValidateIf((o)=> o.userEnrollment===true)
-  // userId?: string;
 } //ModuleFiltersDto
 
 //GetAllV2 filters
-export class ModuleFiltersDtoV2 extends ModuleFiltersDto {
-  @ApiPropertyOptional({
-    example: undefined,
-    description: 'Enable stats = TRUE',
-    type: Boolean,
-  })
-  @IsOptional()
-  @IsBoolean()
-  @Transform(({ value }) => {
-    if (
-      value === 't' ||
-      value === 'true' ||
-      value === 'True' ||
-      value === 'TRUE' ||
-      value === true ||
-      value === '1' ||
-      value === 1
-    )
-      return true;
-    else return false;
-  })
-  Stats?: boolean;
-}
+export class ModuleFiltersDtoV2 extends IntersectionType(
+  ModuleFiltersDto,
+  PickType(StatsFiltersDto, ['Stats']),
+) {}
 
 export class ModuleStylingResponseDto {
   @ApiProperty({
