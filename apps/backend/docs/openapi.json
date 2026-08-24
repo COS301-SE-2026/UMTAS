@@ -1257,7 +1257,7 @@
         ]
       },
       "get": {
-        "description": "Filter by userId(enrolled) | courseId(course owned) | universityId(modules for university over all courses). At least one filter required",
+        "description": "Filter by userId(enrolled) | courseId(course owned) | universityId(modules for university over all courses). At least one filter required \n\n      Enable stats response: filters: { stats=t/true/True/TRUE/1 }",
         "operationId": "getAllModulesV2",
         "parameters": [
           {
@@ -1308,6 +1308,15 @@
               "default": false,
               "type": "boolean"
             }
+          },
+          {
+            "name": "Stats",
+            "required": false,
+            "in": "query",
+            "description": "Enable stats = TRUE",
+            "schema": {
+              "type": "boolean"
+            }
           }
         ],
         "responses": {
@@ -1316,7 +1325,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ModuleListResponseDto"
+                  "$ref": "#/components/schemas/ModuleListResponseDtoV2"
                 }
               }
             }
@@ -1325,7 +1334,7 @@
             "description": "Invalid filters"
           }
         },
-        "summary": "Get all modules with filters - V2",
+        "summary": "Get all modules with filters and counts - V2",
         "tags": [
           "Modules"
         ]
@@ -2452,6 +2461,7 @@
         ]
       },
       "get": {
+        "description": "Apply filters - Enable stats mode with filters.stats=TRUE",
         "operationId": "getAllEvents",
         "parameters": [
           {
@@ -2479,6 +2489,15 @@
             "schema": {
               "type": "boolean"
             }
+          },
+          {
+            "name": "Stats",
+            "required": false,
+            "in": "query",
+            "description": "Enable stats = TRUE",
+            "schema": {
+              "type": "boolean"
+            }
           }
         ],
         "responses": {
@@ -2487,7 +2506,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/EventListResponseDto"
+                  "$ref": "#/components/schemas/EventListResponseDtoV2"
                 }
               }
             }
@@ -4920,6 +4939,30 @@
           "modules"
         ]
       },
+      "ModuleListResponseDtoV2": {
+        "type": "object",
+        "properties": {
+          "modules": {
+            "description": "List of modules",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ModuleSingleResponseDto"
+            }
+          },
+          "message": {
+            "type": "string",
+            "description": "Short message indicating  success of response."
+          },
+          "count": {
+            "type": "number",
+            "example": 68,
+            "description": "Count of Modules"
+          }
+        },
+        "required": [
+          "modules"
+        ]
+      },
       "UpdateModuleDto": {
         "type": "object",
         "properties": {
@@ -6107,7 +6150,7 @@
           "eventCriteria"
         ]
       },
-      "EventListResponseDto": {
+      "EventListResponseDtoV2": {
         "type": "object",
         "properties": {
           "events": {
@@ -6115,6 +6158,11 @@
             "items": {
               "$ref": "#/components/schemas/EventDto"
             }
+          },
+          "count": {
+            "type": "number",
+            "example": 68,
+            "description": "Count of Modules"
           },
           "message": {
             "type": "string"
@@ -7579,6 +7627,23 @@
         },
         "required": [
           "success"
+        ]
+      },
+      "EventListResponseDto": {
+        "type": "object",
+        "properties": {
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EventDto"
+            }
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "events"
         ]
       }
     }
