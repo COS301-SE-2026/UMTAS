@@ -30,8 +30,8 @@ export default function CalTemplate() {
   const [selectedYear, setSelectedYear] = useState(String(startYear));
 
   return (
-    <div className="h-[80vh] items-center flex flex-col gap-6 w-full px-6">
-      <div className="w-full p-2 h-full max-w-6xl overflow-auto border border-[var(--border)] rounded-xl bg-[var(--bg-surface)] shadow-sm">
+    <div className="h-[85vh] items-center flex flex-col gap-6 w-full px-6 ">
+      <div className="w-full  h-full max-w-6xl overflow-auto border border-[var(--border)] rounded-xl bg-[var(--bg-surface)] shadow-sm">
         <h1 className="text-lg font-semibold text-[var(--text-primary)] pl-4 pt-4">
           Calendar Management
         </h1>
@@ -64,13 +64,18 @@ export default function CalTemplate() {
             <Button>create restriction</Button>
           </div>
         </div>
-        <div className="w-full border-dashed border-5  flex flex-col items-center p-5 h-1/4">
-          <CalCard></CalCard>
-        </div>
-        <div className="w-full  flex flex-col items-center p-5 h-3/4 gap-y-5">
-          <CalCard></CalCard>
-          <CalCard></CalCard>
-          <CalCard></CalCard>
+        <div className="w-full h-full items-center flex flex-col p-4">
+          <div className="w-full  border-dashed border-5 rounded-2xl my-2  flex flex-col items-center p-5 h-1/4">
+            <CalCard></CalCard>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2  gap-5 p-5 w-full h-auto justify-items-center items-center overflow-auto">
+            <CalCard />
+            <CalCard />
+            <CalCard />
+            <CalCard />
+            <CalCard />
+            <CalCard />
+          </div>
         </div>
       </div>
     </div>

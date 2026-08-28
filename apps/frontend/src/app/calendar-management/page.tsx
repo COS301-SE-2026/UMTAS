@@ -2,7 +2,7 @@ import CalTemplate from "@/components/templates/calendar-management/caltemplate"
 
 export default function CourseManagement() {
   return (
-    <div>
+    <div className="overflow-y-hidden">
       <CalTemplate />
     </div>
   );
