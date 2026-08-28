@@ -1,15 +1,17 @@
+// uses chain of responsibility and template method
+import { useState } from "react";
 import {
-  getAcRestrictionResp,
   RestrictionTypes,
   SingleRestrictionResp,
 } from "../../../../utilities/Calendar-Builders/RestrictionManagement";
+import { Input } from "@/components/atoms/baseShadcn/input";
 
 abstract class RestrictionHandler {
-  protected MyHandletype: RestrictionTypes;
+  protected MyHandletypes: RestrictionTypes[];
   protected next: RestrictionHandler | null = null;
 
-  constructor(type: RestrictionTypes) {
-    this.MyHandletype = type;
+  constructor(types: RestrictionTypes[]) {
+    this.MyHandletypes = types;
   }
 
   protected setNext(next: RestrictionHandler) {
@@ -19,15 +21,15 @@ abstract class RestrictionHandler {
       this.next = next;
     }
   }
-  protected handle(resType: SingleRestrictionResp) {
-    if ((this.MyHandletype = resType.type)) {
-      return this.handleFunction(resType);
+  protected handle(resType: SingleRestrictionResp): React.ReactNode {
+    if (this.MyHandletypes.includes(resType.type)) {
+      return this.handleHtml(resType);
     } else {
-      this.next?.handle(resType);
+      return this.next?.handle(resType);
     }
   }
 
-  abstract handleFunction(resType: SingleRestrictionResp): React.ReactNode; // returns the self managing elements
+  abstract handleHtml(resType: SingleRestrictionResp): React.ReactNode; // returns the self managing elements
 }
 
 /*
@@ -38,3 +40,39 @@ abstract class RestrictionHandler {
 | "EXAM_PERIOD" | "SUPP_WEEK" | "DAY_SWAP"
 import RestrictionTypes
 */
+
+export class DateOnlyHanlder extends RestrictionHandler {
+  constructor() {
+    super([
+      "SEMESTER_1_START",
+      "SEMESTER_1_END",
+      "SEMESTER_2_END",
+      "SEMESTER_2_START",
+      "EXAM_PERIOD",
+      "SUPP_WEEK",
+      "TEST_WEEK",
+      "UNIVERSITY_CLOSURE",
+      "PUBLIC_HOLIDAY",
+      "HOLIDAY",
+      "RECESS",
+    ]);
+  }
+  handleHtml(resType: SingleRestrictionResp): React.ReactNode {
+    return <CalendarRestrictionHTML resType={resType} />;
+  }
+}
+
+interface restrictionProps {
+  resType: SingleRestrictionResp;
+}
+
+function CalendarRestrictionHTML({ resType }: restrictionProps) {
+  const [restriction, setRestriction] =
+    useState<SingleRestrictionResp>(resType);
+
+  return (
+    <div>
+      <Input></Input>
+    </div>
+  );
+}
