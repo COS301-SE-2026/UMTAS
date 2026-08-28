@@ -3717,6 +3717,55 @@
         ],
         "summary": "Create an academic calendar",
         "tags": ["Academic Calendar"]
+      },
+      "get": {
+        "description": "Returns calendars belonging to the university selected in the current session, optionally filtered by academic year.",
+        "operationId": "listAcademicCalendars",
+        "parameters": [
+          {
+            "name": "year",
+            "required": false,
+            "in": "query",
+            "description": "Limit results to a four-digit academic year.",
+            "schema": {
+              "minimum": 1000,
+              "maximum": 9999,
+              "example": 2026,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Academic calendars returned successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AcademicCalendarDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid academic year"
+          },
+          "401": {
+            "description": "No active session"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          }
+        },
+        "security": [
+          {
+            "umtas-session": []
+          }
+        ],
+        "summary": "List academic calendars",
+        "tags": ["Academic Calendar"]
       }
     },
     "/api/academic-calendar/{id}/restrictions": {
@@ -3960,6 +4009,68 @@
           }
         ],
         "summary": "Delete an academic calendar restriction",
+        "tags": ["Academic Calendar"]
+      }
+    },
+    "/api/academic-calendar/{id}/subscriptions": {
+      "put": {
+        "description": "Replaces the public calendars used to supply restrictions during calendar generation.",
+        "operationId": "updateCalendarSubscriptions",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Academic calendar ID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCalendarSubscriptionsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Calendar subscriptions updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcademicCalendarDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid calendar ID or subscription payload"
+          },
+          "401": {
+            "description": "No active session"
+          },
+          "403": {
+            "description": "Insufficient permissions"
+          },
+          "404": {
+            "description": "Academic calendar or public calendar not found"
+          },
+          "422": {
+            "description": "Public calendar year does not match the academic calendar"
+          }
+        },
+        "security": [
+          {
+            "umtas-session": []
+          }
+        ],
+        "summary": "Replace an academic calendar's public-calendar subscriptions",
         "tags": ["Academic Calendar"]
       }
     },
@@ -7742,9 +7853,18 @@
             "minimum": 1000,
             "maximum": 9999,
             "description": "Four-digit academic year represented by this calendar."
+          },
+          "subscriptions": {
+            "example": ["120afed7-9444-4d9c-a7f2-8f08dc2b7d70"],
+            "description": "Public-calendar IDs this academic calendar subscribes to.",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         },
-        "required": ["id", "year"]
+        "required": ["id", "year", "subscriptions"]
       },
       "CalendarRestrictionDto": {
         "type": "object",
@@ -7903,6 +8023,22 @@
           }
         },
         "required": ["success"]
+      },
+      "UpdateCalendarSubscriptionsDto": {
+        "type": "object",
+        "properties": {
+          "subscriptions": {
+            "uniqueItems": true,
+            "example": ["120afed7-9444-4d9c-a7f2-8f08dc2b7d70"],
+            "description": "Public-calendar IDs this academic calendar subscribes to. Replaces the existing set.",
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "required": ["subscriptions"]
       },
       "DeleteAcademicCalendarResponseDto": {
         "type": "object",
