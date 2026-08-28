@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { NavLink } from "@/components/atoms/nav/NavLink";
 import { UserDetails } from "@/lib/userclass/userClass";
 import { useEffect, useState } from "react";
+import { Label } from "@/components/atoms/baseShadcn/label";
 
 const basicLinks = [
   { href: "/dashboard", label: "Home" },
@@ -16,6 +17,7 @@ const basicLinks = [
 const extraAdminLinks = [
   { href: "/course-management", label: "Manage Courses" },
   { href: "/role-management", label: "Manage Roles" },
+  { href: "/calendar-management", label: "Manage Calendars" },
 ];
 
 export function NavLinks() {

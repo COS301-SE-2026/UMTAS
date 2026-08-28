@@ -1,3 +1,9 @@
+import CalTemplate from "@/components/templates/calendar-management/caltemplate";
+
 export default function CourseManagement() {
-  return <div></div>;
+  return (
+    <div>
+      <CalTemplate />
+    </div>
+  );
 }
