@@ -64,7 +64,7 @@ export default function CalTemplate() {
             <Button>create restriction</Button>
           </div>
         </div>
-        <div className="w-full h-full items-center flex flex-col p-4">
+        <div className="w-full h-full items-center flex flex-col p-4 px-10">
           <div className="w-full  border-dashed border-5 rounded-2xl my-2  flex flex-col items-center p-5 h-1/4">
             <CalCard></CalCard>
           </div>

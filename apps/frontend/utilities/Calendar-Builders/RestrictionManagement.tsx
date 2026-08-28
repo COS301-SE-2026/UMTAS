@@ -1,6 +1,6 @@
 import { mutationOptions, queryOptions } from "@tanstack/react-query";
 import { RequestBuilder, RequestMethod } from "../request";
-import { paths } from "@/lib/api";
+import { paths, components } from "@/lib/api";
 
 export type CreateAcRestriction =
   paths["/api/academic-calendar/{id}/restrictions"]["post"];
@@ -87,6 +87,9 @@ export type getAcRestrictionPaths = getAllRestrictions["parameters"]["path"];
 export type getAcRestrictionResp =
   getAllRestrictions["responses"]["200"]["content"]["application/json"];
 
+export type SingleRestrictionResp =
+  getAcRestrictionResp["restrictions"][number];
+
 export class getAcRestrictionBuilder extends RequestBuilder<
   getAcRestrictionPaths,
   undefined,
@@ -109,3 +112,5 @@ export function GetAllRestrictions(paths?: getAcRestrictionPaths) {
       }),
   });
 }
+
+export type RestrictionTypes = components["schemas"]["CalendarRestrictionType"];

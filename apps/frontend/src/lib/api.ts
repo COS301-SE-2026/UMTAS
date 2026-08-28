@@ -1267,7 +1267,11 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    get?: never;
+    /**
+     * List academic calendars
+     * @description Returns calendars belonging to the university selected in the current session, optionally filtered by academic year.
+     */
+    get: operations["listAcademicCalendars"];
     put?: never;
     /**
      * Create an academic calendar
@@ -1323,6 +1327,26 @@ export interface paths {
      * @description Deletes a restriction only when it belongs to the specified calendar in the selected university.
      */
     delete: operations["deleteCalendarRestriction"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/academic-calendar/{id}/subscriptions": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Replace an academic calendar's public-calendar subscriptions
+     * @description Replaces the public calendars used to supply restrictions during calendar generation.
+     */
+    put: operations["updateCalendarSubscriptions"];
+    post?: never;
+    delete?: never;
     options?: never;
     head?: never;
     patch?: never;
@@ -3334,6 +3358,13 @@ export interface components {
        * @example 2026
        */
       year: number;
+      /**
+       * @description Public-calendar IDs this academic calendar subscribes to.
+       * @example [
+       *       "120afed7-9444-4d9c-a7f2-8f08dc2b7d70"
+       *     ]
+       */
+      subscriptions: string[];
     };
     CalendarRestrictionDto: {
       /**
@@ -3434,6 +3465,15 @@ export interface components {
        * @enum {boolean}
        */
       success: true;
+    };
+    UpdateCalendarSubscriptionsDto: {
+      /**
+       * @description Public-calendar IDs this academic calendar subscribes to. Replaces the existing set.
+       * @example [
+       *       "120afed7-9444-4d9c-a7f2-8f08dc2b7d70"
+       *     ]
+       */
+      subscriptions: string[];
     };
     DeleteAcademicCalendarResponseDto: {
       /**
@@ -6579,6 +6619,50 @@ export interface operations {
       };
     };
   };
+  listAcademicCalendars: {
+    parameters: {
+      query?: {
+        /** @description Limit results to a four-digit academic year. */
+        year?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Academic calendars returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AcademicCalendarDto"][];
+        };
+      };
+      /** @description Invalid academic year */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No active session */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Insufficient permissions */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   createAcademicCalendar: {
     parameters: {
       query?: never;
@@ -6868,6 +6952,68 @@ export interface operations {
       };
       /** @description Calendar or restriction not found */
       404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  updateCalendarSubscriptions: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Academic calendar ID */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateCalendarSubscriptionsDto"];
+      };
+    };
+    responses: {
+      /** @description Calendar subscriptions updated successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AcademicCalendarDto"];
+        };
+      };
+      /** @description Invalid calendar ID or subscription payload */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No active session */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Insufficient permissions */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Academic calendar or public calendar not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Public calendar year does not match the academic calendar */
+      422: {
         headers: {
           [name: string]: unknown;
         };
