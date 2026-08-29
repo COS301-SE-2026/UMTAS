@@ -95,6 +95,7 @@ export class ModuleServiceV2 extends ModuleService {
           moduleDescription: description,
           validated,
           ExternalID,
+          createdAt: new Date(),
         })
         .returning();
 
