@@ -7,6 +7,7 @@ import {
   varchar,
   primaryKey,
   uniqueIndex,
+  timestamp,
 } from 'drizzle-orm/pg-core';
 import { usersTable } from '../auth';
 
@@ -19,6 +20,9 @@ export const modules = pgTable(
     moduleDescription: text('moduleDescription'),
     validated: boolean('validated').notNull().default(true),
     ExternalID: varchar('ExternalID', { length: 255 }),
+    createdAt: timestamp('createdAt', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
   },
   (table) => ({
     moduleCodeUnique: uniqueIndex('moduleCode_unique_index').on(

@@ -71,6 +71,13 @@
       "when": 1787038510505,
       "tag": "0009_ModuleCode_Length_Changed_to_15_from_10",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1787990539482,
+      "tag": "0010_ADDED_CREATEDAT_TIMESTAMPS_TO_COURSE_MODULE_EVENT",
+      "breakpoints": true
     }
   ]
 }
