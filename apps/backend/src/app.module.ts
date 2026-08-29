@@ -24,6 +24,7 @@ import { GroupingModule } from './Grouping/grouping.module';
 import { VenueModule } from './Venue/venue.module';
 import { BuildingModule } from './Building/building.module';
 import { MapConfigModule } from './Map-config/map-config.module';
+import { ApiServiceModule } from './ApiService/ApiService.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { MapConfigModule } from './Map-config/map-config.module';
     VenueModule,
     BuildingModule,
     MapConfigModule,
+    ApiServiceModule,
   ],
   controllers: [AppController, AuthController],
   providers: [

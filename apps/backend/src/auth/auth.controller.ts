@@ -635,7 +635,7 @@ export class AuthController {
   async adminCreateMockUser(
     @Body() dto: CreateMockUserDto,
   ): Promise<CreateMockUserResponseDto> {
-    return await this.authService.createMockUser(dto.role);
+    return await this.authService.createMockUser(dto, dto.role);
   }
 
   @Public()

@@ -1,0 +1,1 @@
+DROP INDEX "modules_module_code_unique";

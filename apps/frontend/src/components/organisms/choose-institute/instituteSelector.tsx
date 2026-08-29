@@ -16,6 +16,7 @@ import { UserDetails } from "@/lib/userclass/userClass";
 
 import Tutorial from "@/components/organisms/nav/Tutorial";
 import { University } from "lucide-react";
+import { getQueryClient } from "@/components/tanstack/getQueryClient";
 const steps = [
   {
     target: "#institute-select",
@@ -89,6 +90,8 @@ export function InstituteSelector({ onClose }: InstituteSelectorProps) {
       UniversityName: selectedInstitute?.UniversityName ?? "",
       role: selectedInstitute?.role || "STUDENT",
     });
+
+    getQueryClient().clear();
   }
 
   const applyDisabled =

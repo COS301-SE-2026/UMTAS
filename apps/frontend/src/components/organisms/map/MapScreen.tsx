@@ -61,7 +61,10 @@ export function MapScreen({ children, onRequestMapSetup }: MapScreenProps) {
     );
   }
 
+  //check that you have selected the uni when this error pops up
   if (error || !config) {
+    //console.log(error);
+    //console.log(config);
     return (
       <Alert className="border-[var(--error-text)] bg-[var(--error-bg)]">
         <AlertCircle size={16} />

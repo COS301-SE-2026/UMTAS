@@ -1078,7 +1078,7 @@
       },
       "get": {
         "description": "Filter by userId(enrolled) | courseId(course owned) | universityId(modules for university over all courses). At least one filter required",
-        "operationId": "ModuleController_getAll",
+        "operationId": "getAllModules",
         "parameters": [
           {
             "name": "universityId",
@@ -1087,7 +1087,6 @@
             "description": "Filter by university ID - returns all modules across all courses in the university",
             "schema": {
               "format": "uuid",
-              "example": "00000000-0000-0000-0000-000000000000",
               "type": "string"
             }
           },
@@ -1098,7 +1097,6 @@
             "description": "Filter by course ID - returns all modules in the course",
             "schema": {
               "format": "uuid",
-              "example": "00000000-0000-0000-0000-000000000000",
               "type": "string"
             }
           },
@@ -1109,7 +1107,6 @@
             "description": "Filter by ModuleGrouping ID",
             "schema": {
               "format": "uuid",
-              "example": "00000000-0000-0000-0000-000000000000",
               "type": "string"
             }
           },
@@ -1119,7 +1116,6 @@
             "in": "query",
             "description": "Filter by code, makes use of wildcard search",
             "schema": {
-              "example": "COS",
               "type": "string"
             }
           },
@@ -1130,7 +1126,6 @@
             "description": "Choose to filter modules based of current user enrollments",
             "schema": {
               "default": false,
-              "example": false,
               "type": "boolean"
             }
           }
@@ -1154,6 +1149,112 @@
           }
         },
         "summary": "Get all modules with filters",
+        "tags": ["Modules"]
+      }
+    },
+    "/api/modules/v2": {
+      "post": {
+        "description": "Create a new module and link to appropriate course",
+        "operationId": "ModuleController_createModuleV2",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateModuleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Module created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModuleSingleResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing or invalid module payload"
+          }
+        },
+        "summary": "Create a module - V2",
+        "tags": ["Modules"]
+      },
+      "get": {
+        "description": "Filter by userId(enrolled) | courseId(course owned) | universityId(modules for university over all courses). At least one filter required",
+        "operationId": "getAllModulesV2",
+        "parameters": [
+          {
+            "name": "universityId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by university ID - returns all modules across all courses in the university",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "courseId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by course ID - returns all modules in the course",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "GroupID",
+            "required": false,
+            "in": "query",
+            "description": "Filter by ModuleGrouping ID",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "moduleCode",
+            "required": false,
+            "in": "query",
+            "description": "Filter by code, makes use of wildcard search",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userEnrollment",
+            "required": false,
+            "in": "query",
+            "description": "Choose to filter modules based of current user enrollments",
+            "schema": {
+              "default": false,
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Modules returned successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModuleListResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid filters"
+          }
+        },
+        "summary": "Get all modules with filters - V2",
         "tags": ["Modules"]
       }
     },
@@ -1274,6 +1375,42 @@
         "tags": ["Modules"]
       }
     },
+    "/api/modules/v2/{moduleId}": {
+      "get": {
+        "description": "Return a module from its moduleID",
+        "operationId": "getModuleByIdV2",
+        "parameters": [
+          {
+            "name": "moduleId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Module returned successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModuleSingleResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid module ID"
+          },
+          "404": {
+            "description": "Module not found"
+          }
+        },
+        "summary": "Get a module by ID - V2",
+        "tags": ["Modules"]
+      }
+    },
     "/api/modules/enroll/{moduleId}": {
       "get": {
         "operationId": "enrolStudentToModule",
@@ -1313,6 +1450,56 @@
           }
         },
         "summary": "Enrol student to module",
+        "tags": ["Modules"]
+      },
+      "patch": {
+        "operationId": "enrolStudentToModuleV2",
+        "parameters": [
+          {
+            "name": "moduleId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnrollToModuleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Student successfully enrolled student into module",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnrolResponseDto"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Unenrolled user from module",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnrolResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Module not found"
+          }
+        },
+        "summary": "Enrol student to module - V2",
         "tags": ["Modules"]
       }
     },
@@ -1471,12 +1658,66 @@
                 }
               }
             }
-          },
-          "404": {
-            "description": "No Courses found"
           }
         },
         "summary": "Get all courses",
+        "tags": ["Courses"]
+      }
+    },
+    "/api/Courses/v2/getAll": {
+      "get": {
+        "operationId": "getCoursesV2",
+        "parameters": [
+          {
+            "name": "UniversityID",
+            "required": false,
+            "in": "query",
+            "description": "Unique identifier for a university",
+            "schema": {
+              "format": "uuid",
+              "example": "00000000-0000-0000-0000-000000000000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "CourseName",
+            "required": false,
+            "in": "query",
+            "description": "Name of the course",
+            "schema": {
+              "minLength": 1,
+              "maxLength": 255,
+              "example": "Computer Science",
+              "type": "string"
+            }
+          },
+          {
+            "name": "Degree",
+            "required": false,
+            "in": "query",
+            "description": "Filter by Degree",
+            "schema": {
+              "minLength": 1,
+              "maxLength": 30,
+              "nullable": true,
+              "example": "Bachelor of Science",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Courses returned successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CourseListResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get all courses - V2",
         "tags": ["Courses"]
       }
     },
@@ -1588,6 +1829,41 @@
           }
         },
         "summary": "Delete Course by Course ID",
+        "tags": ["Courses"]
+      }
+    },
+    "/api/Courses/v2/{CourseId}": {
+      "get": {
+        "operationId": "getCourseByIdV2",
+        "parameters": [
+          {
+            "name": "CourseId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Course returned successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CourseSingleResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Course ID"
+          },
+          "404": {
+            "description": "Course not found"
+          }
+        },
+        "summary": "get a Course by ID - V2",
         "tags": ["Courses"]
       }
     },
@@ -1967,6 +2243,36 @@
         "tags": ["Grouping"]
       }
     },
+    "/api/events/v2": {
+      "post": {
+        "operationId": "createEventV2",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateEventDtoV2"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Event created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventSingleResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Create an event - V2",
+        "tags": ["Events"]
+      }
+    },
     "/api/events": {
       "post": {
         "operationId": "createEvent",
@@ -2018,6 +2324,23 @@
             "schema": {
               "format": "uuid",
               "type": "string"
+            }
+          },
+          {
+            "name": "timetableId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "all",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
             }
           }
         ],
@@ -2168,6 +2491,48 @@
         "tags": ["Events"]
       }
     },
+    "/api/events/validate/{id}": {
+      "patch": {
+        "operationId": "validateEvent",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidateEventDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Event[${updated.eventName}] validated=[${updated.validated}]",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateEventResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Event not found"
+          }
+        },
+        "summary": "Validate an event",
+        "tags": ["Events"]
+      }
+    },
     "/api/timetables": {
       "post": {
         "operationId": "createTimetable",
@@ -2228,6 +2593,29 @@
         "tags": ["Timetables"]
       }
     },
+    "/api/timetables/v2": {
+      "get": {
+        "operationId": "getAllTimetablesV2",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Timetables fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimetableListResponseDtoV2"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No active session"
+          }
+        },
+        "summary": "Get all timetables",
+        "tags": ["Timetables"]
+      }
+    },
     "/api/timetables/{id}": {
       "get": {
         "operationId": "getTimetableById",
@@ -2252,9 +2640,6 @@
                 }
               }
             }
-          },
-          "401": {
-            "description": "No active session"
           },
           "404": {
             "description": "Timetable not found"
@@ -2348,6 +2733,39 @@
           }
         },
         "summary": "Delete a timetable",
+        "tags": ["Timetables"]
+      }
+    },
+    "/api/timetables/v2/{id}": {
+      "get": {
+        "operationId": "getTimetableByIdV2",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Timetable ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Timetable fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimetableResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Timetable[] not found"
+          }
+        },
+        "summary": "Get timetable by ID",
         "tags": ["Timetables"]
       }
     },
@@ -2527,6 +2945,40 @@
           }
         },
         "summary": "Delete a module by ID",
+        "tags": ["Builder"]
+      }
+    },
+    "/api/builder/events": {
+      "post": {
+        "description": "Create a new event, to module specified or personal module",
+        "operationId": "BuilderController_createEvent",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBuilderEventDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Event created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModuleSingleResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Module not found"
+          }
+        },
+        "summary": "Create a user defined event",
         "tags": ["Builder"]
       }
     },
@@ -3262,7 +3714,14 @@
         },
         "responses": {
           "200": {
-            "description": "Venues updated successfully"
+            "description": "Venues updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BulkAssignResponseDto"
+                }
+              }
+            }
           },
           "400": {
             "description": "One/more buildings do not belong to the selected university"
@@ -3375,6 +3834,57 @@
         "tags": ["Buildings"]
       }
     },
+    "/api/buildings/{buildingId}": {
+      "patch": {
+        "description": "Only admins can do this. Send location and/or footprint, omitted fields are left unchanged. Send null to erase.",
+        "operationId": "BuildingController_updateBuildingLocation",
+        "parameters": [
+          {
+            "name": "buildingId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateBuildingLocationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The building was updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BuildingSingleResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Your role is not admin, not allowed"
+          },
+          "404": {
+            "description": "The building was not found in this uni"
+          }
+        },
+        "security": [
+          {
+            "umtas-session": []
+          }
+        ],
+        "summary": "Update a building pin and/or drawn polygon",
+        "tags": ["Buildings"]
+      }
+    },
     "/api/map-config": {
       "get": {
         "operationId": "MapConfigController_getMapConfig",
@@ -3440,6 +3950,130 @@
         ],
         "summary": "Set or update map settings for the selected university",
         "tags": ["Map Config"]
+      }
+    },
+    "/api/api-service/courses": {
+      "get": {
+        "description": "Fetches courses for the authenticated user's university.",
+        "operationId": "ApiServiceController_getCourses",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Courses per page",
+            "schema": {
+              "example": 50,
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page index: zero index",
+            "schema": {
+              "example": 0,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Courses fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CourseListResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The authenticated user is not associated with a university."
+          },
+          "404": {
+            "description": "The university or its API adapter could not be found."
+          }
+        },
+        "summary": "Fetch courses",
+        "tags": ["ApiService"]
+      }
+    },
+    "/api/api-service/modules": {
+      "get": {
+        "description": "Fetches modules for a course at the authenticated user's university.",
+        "operationId": "ApiServiceController_getModules",
+        "parameters": [
+          {
+            "name": "courseId",
+            "required": true,
+            "in": "query",
+            "description": "UUID of the course to fetch modules for.",
+            "schema": {
+              "example": "00000000-0000-0000-0000-000000000000",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Modules fetched successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModuleListResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The university or course ID is invalid."
+          },
+          "404": {
+            "description": "The university, course, or API adapter could not be found."
+          }
+        },
+        "summary": "Fetch modules",
+        "tags": ["ApiService"]
+      }
+    },
+    "/api/api-service/events": {
+      "get": {
+        "description": "Fetches events for a module at the authenticated user's university.",
+        "operationId": "ApiServiceController_getEvents",
+        "parameters": [
+          {
+            "name": "moduleId",
+            "required": true,
+            "in": "query",
+            "description": "UUID of the module to fetch events for.",
+            "schema": {
+              "example": "00000000-0000-0000-0000-000000000000",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Events fetched successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventListResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The university or module ID is invalid."
+          },
+          "404": {
+            "description": "The university, module, or API adapter could not be found."
+          }
+        },
+        "summary": "Fetch events",
+        "tags": ["ApiService"]
       }
     }
   },
@@ -3705,6 +4339,11 @@
             "type": "string",
             "example": "Admin@UMTAS2024!",
             "default": "Admin@UMTAS2024!"
+          },
+          "uniId": {
+            "type": "string",
+            "example": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+            "description": "Optional university ID to select upon sign-in"
           }
         },
         "required": ["email", "password"]
@@ -3846,25 +4485,31 @@
         },
         "required": ["user"]
       },
-      "MockUserRole": {
-        "type": "string",
-        "enum": ["STUDENT", "LECTURER", "UNIVERSITY_ADMIN", "SYS_ADMIN"],
-        "description": "Role for the mock user"
-      },
       "CreateMockUserDto": {
         "type": "object",
         "properties": {
+          "email": {
+            "type": "string",
+            "example": "test_user_1@simulation.com"
+          },
+          "name": {
+            "type": "string",
+            "example": "Test User"
+          },
+          "password": {
+            "type": "string",
+            "example": "password123!"
+          },
           "role": {
-            "description": "Role for the mock user",
-            "default": "STUDENT",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/MockUserRole"
-              }
-            ]
+            "enum": ["STUDENT", "LECTURER", "UNIVERSITY_ADMIN", "SYS_ADMIN"],
+            "type": "string",
+            "example": "STUDENT"
+          },
+          "uniId": {
+            "type": "string",
+            "example": "some-uni-id"
           }
-        },
-        "required": ["role"]
+        }
       },
       "DeleteMockUsersResponseDto": {
         "type": "object",
@@ -3988,7 +4633,7 @@
           "moduleCode": {
             "type": "string",
             "minLength": 2,
-            "maxLength": 10,
+            "maxLength": 15,
             "example": "COS332",
             "description": "Module code used by the university"
           },
@@ -4022,6 +4667,14 @@
             "type": "boolean",
             "example": true,
             "description": "Whether the module has been approved by a university admin"
+          },
+          "ExternalID": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 255,
+            "example": "12345",
+            "description": "Refer to module on external API"
           },
           "ModuleGroupingID": {
             "type": "string",
@@ -4087,6 +4740,99 @@
         },
         "required": ["CourseModuleID", "GroupModuleID", "CourseID"]
       },
+      "EventCriteriaDto": {
+        "type": "object",
+        "properties": {
+          "eventSource": {
+            "enum": ["university", "personal"],
+            "type": "string"
+          },
+          "date": {
+            "type": "string",
+            "example": "2026-02-17",
+            "description": "Required when the event is not recurring."
+          },
+          "dayOfWeek": {
+            "type": "string",
+            "enum": [
+              "monday",
+              "tuesday",
+              "wednesday",
+              "thursday",
+              "friday",
+              "saturday",
+              "sunday"
+            ],
+            "description": "Required when the event is recurring."
+          },
+          "startTime": {
+            "type": "string",
+            "example": "08:30"
+          },
+          "endTime": {
+            "type": "string",
+            "example": "10:20"
+          },
+          "moduleId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": ["eventSource", "startTime", "endTime"]
+      },
+      "VenueDto": {
+        "type": "object",
+        "properties": {
+          "venueId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "venueName": {
+            "type": "string"
+          }
+        },
+        "required": ["venueId", "venueName"]
+      },
+      "EventDto": {
+        "type": "object",
+        "properties": {
+          "eventId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "eventName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 32
+          },
+          "activityCode": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 10
+          },
+          "activityType": {
+            "type": "string",
+            "enum": ["lecture", "tutorial", "prac", "test", "exam"]
+          },
+          "eventCriteria": {
+            "$ref": "#/components/schemas/EventCriteriaDto"
+          },
+          "isRecurring": {
+            "type": "boolean"
+          },
+          "validated": {
+            "type": "boolean"
+          },
+          "venues": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VenueDto"
+            }
+          }
+        },
+        "required": ["eventId", "eventCriteria"]
+      },
       "ModuleSingleResponseDto": {
         "type": "object",
         "properties": {
@@ -4099,7 +4845,7 @@
           "moduleCode": {
             "type": "string",
             "minLength": 2,
-            "maxLength": 10,
+            "maxLength": 15,
             "example": "COS332",
             "description": "Module code used by the university"
           },
@@ -4152,6 +4898,27 @@
             "example": true,
             "description": "Whether the module has been approved by a university admin"
           },
+          "Events": {
+            "nullable": true,
+            "description": "List of events for the module",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EventDto"
+            }
+          },
+          "ExternalID": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 255,
+            "example": "12345",
+            "description": "Refer to module on external API"
+          },
+          "Enrolled": {
+            "type": "boolean",
+            "example": false,
+            "description": "Is a user enrolled to this module"
+          },
           "ModuleGroupingID": {
             "type": "string",
             "format": "uuid",
@@ -4170,6 +4937,10 @@
             "items": {
               "$ref": "#/components/schemas/ModuleSingleResponseDto"
             }
+          },
+          "message": {
+            "type": "string",
+            "description": "Short message indicating  success of response."
           }
         },
         "required": ["modules"]
@@ -4180,7 +4951,7 @@
           "moduleCode": {
             "type": "string",
             "minLength": 2,
-            "maxLength": 10,
+            "maxLength": 15,
             "example": "COS332",
             "description": "Module code used by the university"
           },
@@ -4215,6 +4986,27 @@
             "example": true,
             "description": "Whether the module has been approved by a university admin"
           },
+          "Events": {
+            "nullable": true,
+            "description": "List of events for the module",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EventDto"
+            }
+          },
+          "ExternalID": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 255,
+            "example": "12345",
+            "description": "Refer to module on external API"
+          },
+          "Enrolled": {
+            "type": "boolean",
+            "example": false,
+            "description": "Is a user enrolled to this module"
+          },
           "CourseID": {
             "type": "string",
             "format": "uuid",
@@ -4246,7 +5038,7 @@
           "moduleCode": {
             "type": "string",
             "minLength": 2,
-            "maxLength": 10,
+            "maxLength": 15,
             "example": "COS332",
             "description": "Module code used by the university"
           },
@@ -4276,6 +5068,15 @@
           }
         },
         "required": ["moduleID", "message", "UserID"]
+      },
+      "EnrollToModuleDto": {
+        "type": "object",
+        "properties": {
+          "enroll": {
+            "type": "boolean",
+            "description": "Enroll or unenroll"
+          }
+        }
       },
       "AddModulesToCourseDto": {
         "type": "object",
@@ -4368,7 +5169,7 @@
           "CourseName": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 30,
+            "maxLength": 255,
             "example": "Computer Science",
             "description": "Name of the course"
           },
@@ -4379,9 +5180,106 @@
             "maxLength": 30,
             "example": "Bachelor of Science",
             "description": "Degree that course belongs to"
+          },
+          "ExternalID": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 255,
+            "example": "12345",
+            "description": "Refer to course on external API"
           }
         },
         "required": ["UniversityID", "CourseName"]
+      },
+      "ModulesDto": {
+        "type": "object",
+        "properties": {
+          "moduleID": {
+            "type": "string",
+            "format": "uuid",
+            "example": "00000000-0000-0000-0000-000000000000",
+            "description": "Unique identifier for a module"
+          },
+          "moduleCode": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 15,
+            "example": "COS332",
+            "description": "Module code used by the university"
+          },
+          "moduleName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "example": "Computer Networks",
+            "description": "Name of the module"
+          },
+          "moduleDescription": {
+            "type": "string",
+            "nullable": true,
+            "example": "Introduction to computer networking concepts",
+            "description": "Short module description"
+          },
+          "styling": {
+            "nullable": true,
+            "description": "Styling to be used for a Module",
+            "example": {
+              "colour": "FFFFF"
+            },
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/StylingDto"
+              }
+            ]
+          },
+          "CourseModuleInfo": {
+            "nullable": true,
+            "description": "Metadata attached to module when owned by course",
+            "example": {
+              "CourseModuleID": "00000000-0000-0000-0000-000000000000",
+              "GroupModuleID": "00000000-0000-0000-0000-000000000000",
+              "CourseID": "00000000-0000-0000-0000-000000000000",
+              "core": true,
+              "SemesterOfStudy": "Semester 1",
+              "YearOfStudy": 1
+            },
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CourseModuleDto"
+              }
+            ]
+          },
+          "validated": {
+            "type": "boolean",
+            "example": true,
+            "description": "Whether the module has been approved by a university admin"
+          },
+          "Events": {
+            "nullable": true,
+            "description": "List of events for the module",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EventDto"
+            }
+          },
+          "ExternalID": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 255,
+            "example": "12345",
+            "description": "Refer to module on external API"
+          },
+          "Enrolled": {
+            "type": "boolean",
+            "example": false,
+            "description": "Is a user enrolled to this module"
+          }
+        },
+        "required": ["moduleID", "moduleCode", "moduleName"]
       },
       "CourseSingleResponseDto": {
         "type": "object",
@@ -4408,7 +5306,7 @@
           "CourseName": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 30,
+            "maxLength": 255,
             "example": "Computer Science",
             "description": "Name of the course"
           },
@@ -4419,6 +5317,22 @@
             "maxLength": 30,
             "example": "Bachelor of Science",
             "description": "Degree that course belongs to"
+          },
+          "Modules": {
+            "description": "Modules for the course.",
+            "nullable": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ModulesDto"
+            }
+          },
+          "ExternalID": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 255,
+            "example": "12345",
+            "description": "Refer to course on external API"
           }
         },
         "required": ["CourseID", "UniversityID", "CourseName"]
@@ -4435,7 +5349,7 @@
           "CourseName": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 30,
+            "maxLength": 255,
             "example": "Computer Science",
             "description": "Name of the course"
           },
@@ -4474,7 +5388,7 @@
           "CourseName": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 30,
+            "maxLength": 255,
             "example": "Computer Science",
             "description": "Name of the course"
           },
@@ -4485,6 +5399,22 @@
             "maxLength": 30,
             "example": "Bachelor of Science",
             "description": "Degree that course belongs to"
+          },
+          "Modules": {
+            "description": "Modules for the course.",
+            "nullable": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ModulesDto"
+            }
+          },
+          "ExternalID": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 255,
+            "example": "12345",
+            "description": "Refer to course on external API"
           }
         },
         "required": ["CourseID", "UniversityID", "CourseName"]
@@ -4498,6 +5428,9 @@
             "items": {
               "$ref": "#/components/schemas/CourseDto"
             }
+          },
+          "message": {
+            "type": "string"
           }
         },
         "required": ["courses"]
@@ -4521,7 +5454,7 @@
           "CourseName": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 30,
+            "maxLength": 255,
             "example": "Computer Science",
             "description": "Name of the course"
           },
@@ -4532,6 +5465,22 @@
             "maxLength": 30,
             "example": "Bachelor of Science",
             "description": "Degree that course belongs to"
+          },
+          "Modules": {
+            "description": "Modules for the course.",
+            "nullable": true,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ModulesDto"
+            }
+          },
+          "ExternalID": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 255,
+            "example": "12345",
+            "description": "Refer to course on external API"
           }
         }
       },
@@ -4541,7 +5490,7 @@
           "CourseName": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 30,
+            "maxLength": 255,
             "example": "Computer Science",
             "description": "Name of the course"
           },
@@ -4581,6 +5530,30 @@
             "example": "University of Pretoria",
             "description": "Name of the university"
           },
+          "ApiIdentifier": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 10,
+            "example": "UP",
+            "description": "Unique string to identify university for ApiAdapter service"
+          },
+          "BaseApiUrl": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 50,
+            "example": "https://api.github.com",
+            "description": "Url of the university's api"
+          },
+          "ApiKey": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 100,
+            "example": "something1Nx8A2B9C0D1E2F3G4H5I6J7K8L9M0No12",
+            "description": "Key for authorisation on univerity api"
+          },
           "role": {
             "type": "string",
             "nullable": true,
@@ -4615,6 +5588,30 @@
             "maxLength": 30,
             "example": "University of Pretoria",
             "description": "Name of the university"
+          },
+          "ApiIdentifier": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 10,
+            "example": "UP",
+            "description": "Unique string to identify university for ApiAdapter service"
+          },
+          "BaseApiUrl": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 50,
+            "example": "https://api.github.com",
+            "description": "Url of the university's api"
+          },
+          "ApiKey": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 100,
+            "example": "something1Nx8A2B9C0D1E2F3G4H5I6J7K8L9M0No12",
+            "description": "Key for authorisation on univerity api"
           },
           "role": {
             "type": "string",
@@ -4684,6 +5681,30 @@
             "maxLength": 30,
             "example": "University of Pretoria",
             "description": "Name of the university"
+          },
+          "ApiIdentifier": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 10,
+            "example": "UP",
+            "description": "Unique string to identify university for ApiAdapter service"
+          },
+          "BaseApiUrl": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 50,
+            "example": "https://api.github.com",
+            "description": "Url of the university's api"
+          },
+          "ApiKey": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 100,
+            "example": "something1Nx8A2B9C0D1E2F3G4H5I6J7K8L9M0No12",
+            "description": "Key for authorisation on univerity api"
           }
         }
       },
@@ -4875,13 +5896,9 @@
         },
         "required": ["GroupID"]
       },
-      "EventCriteriaDto": {
+      "EventCriteriaDtoV2": {
         "type": "object",
         "properties": {
-          "eventSource": {
-            "enum": ["university", "personal"],
-            "type": "string"
-          },
           "date": {
             "type": "string",
             "example": "2026-02-17",
@@ -4910,30 +5927,16 @@
           },
           "moduleId": {
             "type": "string",
-            "format": "uuid"
+            "format": "uuid",
+            "default": false,
+            "description": "moduleId required in V2 - whomp whomp",
+            "nullable": false
           }
-        },
-        "required": ["eventSource", "startTime", "endTime"]
+        }
       },
-      "VenueDto": {
+      "CreateEventDtoV2": {
         "type": "object",
         "properties": {
-          "venueId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "venueName": {
-            "type": "string"
-          }
-        },
-        "required": ["venueId", "venueName"]
-      },
-      "CreateEventDto": {
-        "type": "object",
-        "properties": {
-          "eventCriteria": {
-            "$ref": "#/components/schemas/EventCriteriaDto"
-          },
           "eventName": {
             "type": "string",
             "minLength": 1,
@@ -4945,17 +5948,68 @@
             "minLength": 1,
             "maxLength": 10
           },
-          "venues": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/VenueDto"
-            }
+          "activityType": {
+            "type": "string",
+            "enum": ["lecture", "tutorial", "prac", "test", "exam"]
           },
           "isRecurring": {
             "type": "boolean"
           },
           "validated": {
             "type": "boolean"
+          },
+          "venues": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VenueDto"
+            }
+          },
+          "eventCriteria": {
+            "$ref": "#/components/schemas/EventCriteriaDtoV2"
+          }
+        },
+        "required": ["eventCriteria"]
+      },
+      "EventSingleResponseDto": {
+        "type": "object",
+        "properties": {
+          "event": {
+            "$ref": "#/components/schemas/EventDto"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": ["event"]
+      },
+      "CreateEventDto": {
+        "type": "object",
+        "properties": {
+          "eventName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 32
+          },
+          "activityCode": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 10
+          },
+          "eventCriteria": {
+            "$ref": "#/components/schemas/EventCriteriaDto"
+          },
+          "isRecurring": {
+            "type": "boolean"
+          },
+          "validated": {
+            "type": "boolean"
+          },
+          "venues": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VenueDto"
+            }
           },
           "activityType": {
             "type": "string",
@@ -4965,55 +6019,6 @@
         },
         "required": ["eventCriteria"]
       },
-      "EventDto": {
-        "type": "object",
-        "properties": {
-          "eventId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "eventCriteria": {
-            "$ref": "#/components/schemas/EventCriteriaDto"
-          },
-          "eventName": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 32
-          },
-          "activityType": {
-            "type": "string",
-            "enum": ["lecture", "tutorial", "prac", "test", "exam"]
-          },
-          "activityCode": {
-            "type": "string",
-            "nullable": true,
-            "minLength": 1,
-            "maxLength": 10
-          },
-          "venues": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/VenueDto"
-            }
-          },
-          "isRecurring": {
-            "type": "boolean"
-          },
-          "validated": {
-            "type": "boolean"
-          }
-        },
-        "required": ["eventId", "eventCriteria"]
-      },
-      "EventSingleResponseDto": {
-        "type": "object",
-        "properties": {
-          "event": {
-            "$ref": "#/components/schemas/EventDto"
-          }
-        },
-        "required": ["event"]
-      },
       "EventListResponseDto": {
         "type": "object",
         "properties": {
@@ -5022,6 +6027,9 @@
             "items": {
               "$ref": "#/components/schemas/EventDto"
             }
+          },
+          "message": {
+            "type": "string"
           }
         },
         "required": ["events"]
@@ -5073,15 +6081,15 @@
             "minLength": 1,
             "maxLength": 32
           },
-          "activityType": {
-            "type": "string",
-            "enum": ["lecture", "tutorial", "prac", "test", "exam"]
-          },
           "activityCode": {
             "type": "string",
             "nullable": true,
             "minLength": 1,
             "maxLength": 10
+          },
+          "activityType": {
+            "type": "string",
+            "enum": ["lecture", "tutorial", "prac", "test", "exam"]
           },
           "isRecurring": {
             "type": "boolean"
@@ -5113,6 +6121,26 @@
           }
         },
         "required": ["success"]
+      },
+      "ValidateEventDto": {
+        "type": "object",
+        "properties": {
+          "validated": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ValidateEventResponseDto": {
+        "type": "object",
+        "properties": {
+          "event": {
+            "$ref": "#/components/schemas/EventDto"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": ["event"]
       },
       "CreateTimetableDto": {
         "type": "object",
@@ -5184,6 +6212,38 @@
         },
         "required": ["timetables"]
       },
+      "TimetableResponseDto2": {
+        "type": "object",
+        "properties": {
+          "UserTimetableID": {
+            "type": "string"
+          },
+          "timetable": {
+            "$ref": "#/components/schemas/TimetableDto"
+          },
+          "events": {
+            "default": [],
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EventDto"
+            }
+          }
+        },
+        "required": ["UserTimetableID", "timetable", "events"]
+      },
+      "TimetableListResponseDtoV2": {
+        "type": "object",
+        "properties": {
+          "timetables": {
+            "description": "List of timetables with their linked event objects",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TimetableResponseDto2"
+            }
+          }
+        },
+        "required": ["timetables"]
+      },
       "UpdateTimetableDto": {
         "type": "object",
         "properties": {
@@ -5232,7 +6292,7 @@
           "moduleCode": {
             "type": "string",
             "minLength": 2,
-            "maxLength": 10,
+            "maxLength": 15,
             "example": "COS332",
             "description": "Module code used by the university"
           },
@@ -5266,9 +6326,44 @@
             "type": "boolean",
             "example": true,
             "description": "Whether the module has been approved by a university admin"
+          },
+          "ExternalID": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 255,
+            "example": "12345",
+            "description": "Refer to module on external API"
           }
         },
         "required": ["moduleCode", "moduleName"]
+      },
+      "CreateBuilderEventDto": {
+        "type": "object",
+        "properties": {
+          "eventName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 32
+          },
+          "activityCode": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 10
+          },
+          "eventCriteria": {
+            "$ref": "#/components/schemas/EventCriteriaDto"
+          },
+          "isRecurring": {
+            "type": "boolean"
+          },
+          "activityType": {
+            "type": "string",
+            "enum": ["lecture", "tutorial", "prac", "test", "exam"],
+            "description": "Required when eventCriteria.moduleId is provided."
+          }
+        }
       },
       "PdfParserLookupResponseDto": {
         "type": "object",
@@ -6247,6 +7342,20 @@
         },
         "required": ["assignments"]
       },
+      "BulkAssignResponseDto": {
+        "type": "object",
+        "properties": {
+          "updated": {
+            "type": "number",
+            "example": 7
+          },
+          "success": {
+            "type": "object",
+            "example": true
+          }
+        },
+        "required": ["updated", "success"]
+      },
       "LatLngDto": {
         "type": "object",
         "properties": {
@@ -6393,6 +7502,27 @@
           }
         },
         "required": ["building"]
+      },
+      "UpdateBuildingLocationDto": {
+        "type": "object",
+        "properties": {
+          "location": {
+            "nullable": true,
+            "description": "The location of the building pin. Sending null will unpin",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LatLngDto"
+              }
+            ]
+          },
+          "footprint": {
+            "type": "object",
+            "nullable": true,
+            "description": "GeoJSON polygon outline for the building. Send null to clear the polygon.",
+            "additionalProperties": true
+          }
+        }
       },
       "MapConfigDto": {
         "type": "object",

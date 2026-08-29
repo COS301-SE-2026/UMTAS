@@ -1,12 +1,16 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
+  IsArray,
   IsNotEmpty,
   IsOptional,
   IsString,
   IsUUID,
   Length,
+  ValidateNested,
 } from 'class-validator';
 import { PartialType, PickType, OmitType } from '@nestjs/swagger';
+import { ModulesDto } from 'src/Module/dto/module.dto';
+import { Type } from 'class-transformer';
 
 export class CourseDto {
   @ApiProperty({
@@ -42,7 +46,7 @@ export class CourseDto {
   })
   @IsNotEmpty()
   @IsString()
-  @Length(1, 30)
+  @Length(1, 255)
   CourseName!: string;
 
   @ApiPropertyOptional({
@@ -53,6 +57,26 @@ export class CourseDto {
   @IsString()
   @Length(1, 30)
   Degree?: string | null;
+
+  @ApiPropertyOptional({
+    type: () => [ModulesDto],
+    description: 'Modules for the course.',
+    nullable: true,
+  })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ModulesDto)
+  Modules?: ModulesDto[];
+
+  @ApiPropertyOptional({
+    example: '12345',
+    description: 'Refer to course on external API',
+  })
+  @IsOptional()
+  @IsString()
+  @Length(1, 255)
+  ExternalID?: string | null;
 }
 
 //create
@@ -61,6 +85,7 @@ export class CreateCourseDto extends PickType(CourseDto, [
   'GroupID',
   'CourseName',
   'Degree',
+  'ExternalID',
 ]) {}
 
 //update
@@ -79,6 +104,8 @@ export class CourseListResponseDto {
     description: 'List of courses',
   })
   courses!: CourseDto[];
+
+  message?: string;
 }
 
 //Delete

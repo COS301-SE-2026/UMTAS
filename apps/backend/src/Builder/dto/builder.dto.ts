@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { PickType, OmitType, IntersectionType } from '@nestjs/swagger';
 
 import {
@@ -6,6 +6,7 @@ import {
   ModuleSingleResponseDto,
   UpdateModuleDto,
 } from '../../Module/dto/module.dto';
+import { CreateEventDto } from 'src/Events/dto/EventDto.dto';
 
 export class CreateBuilderModuleDto extends OmitType(CreateModuleDto, [
   'CourseID',
@@ -31,3 +32,14 @@ export class BuilderListResponseDto {
   })
   modules!: BuilderSingleResponseDto[];
 }
+
+//BuilderEvent
+export class CreateBuilderEventDto extends PartialType(
+  PickType(CreateEventDto, [
+    'eventName',
+    'activityType',
+    'activityCode',
+    'isRecurring',
+    'eventCriteria',
+  ]),
+) {}

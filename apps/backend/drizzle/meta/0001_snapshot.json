@@ -1,5 +1,5 @@
 {
-  "id": "8c3509c5-3601-4fc0-8b53-08d6d46a736f",
+  "id": "53f0b580-5184-496c-ba2c-42f744349e6a",
   "prevId": "36d2ea84-ff86-457f-978a-dfb4361f5ce2",
   "version": "7",
   "dialect": "postgresql",
@@ -2118,6 +2118,18 @@
           "type": "varchar(30)",
           "primaryKey": false,
           "notNull": true
+        },
+        "BaseApiUrl": {
+          "name": "BaseApiUrl",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ApiKey": {
+          "name": "ApiKey",
+          "type": "varchar(70)",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {},

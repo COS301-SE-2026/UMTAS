@@ -1,5 +1,5 @@
 {
-  "id": "36d2ea84-ff86-457f-978a-dfb4361f5ce2",
+  "id": "d35f4e90-6215-4861-acc9-7f08536e39cc",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -1574,6 +1574,202 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.University": {
+      "name": "University",
+      "schema": "",
+      "columns": {
+        "UniversityID": {
+          "name": "UniversityID",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "UniversityName": {
+          "name": "UniversityName",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.UniversityRole": {
+      "name": "UniversityRole",
+      "schema": "",
+      "columns": {
+        "UserID": {
+          "name": "UserID",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "UniversityID": {
+          "name": "UniversityID",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "role": {
+          "name": "role",
+          "type": "RoleType",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'STUDENT'"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "UniversityRole_UserID_user_id_fk": {
+          "name": "UniversityRole_UserID_user_id_fk",
+          "tableFrom": "UniversityRole",
+          "tableTo": "user",
+          "columnsFrom": ["UserID"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "UniversityRole_UniversityID_University_UniversityID_fk": {
+          "name": "UniversityRole_UniversityID_University_UniversityID_fk",
+          "tableFrom": "UniversityRole",
+          "tableTo": "University",
+          "columnsFrom": ["UniversityID"],
+          "columnsTo": ["UniversityID"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "UniversityRole_UniversityID_UserID_pk": {
+          "name": "UniversityRole_UniversityID_UserID_pk",
+          "columns": ["UniversityID", "UserID"]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.EventVenue": {
+      "name": "EventVenue",
+      "schema": "",
+      "columns": {
+        "EventID": {
+          "name": "EventID",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "VenueID": {
+          "name": "VenueID",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "EventVenue_EventID_Event_eventID_fk": {
+          "name": "EventVenue_EventID_Event_eventID_fk",
+          "tableFrom": "EventVenue",
+          "tableTo": "Event",
+          "columnsFrom": ["EventID"],
+          "columnsTo": ["eventID"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "EventVenue_VenueID_Venue_VenueID_fk": {
+          "name": "EventVenue_VenueID_Venue_VenueID_fk",
+          "tableFrom": "EventVenue",
+          "tableTo": "Venue",
+          "columnsFrom": ["VenueID"],
+          "columnsTo": ["VenueID"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "EventVenue_EventID_VenueID_pk": {
+          "name": "EventVenue_EventID_VenueID_pk",
+          "columns": ["EventID", "VenueID"]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.Venue": {
+      "name": "Venue",
+      "schema": "",
+      "columns": {
+        "VenueID": {
+          "name": "VenueID",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "VenueName": {
+          "name": "VenueName",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "UniversityID": {
+          "name": "UniversityID",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "venue_university_name_unique": {
+          "name": "venue_university_name_unique",
+          "columns": [
+            {
+              "expression": "UniversityID",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "VenueName",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "Venue_UniversityID_University_UniversityID_fk": {
+          "name": "Venue_UniversityID_University_UniversityID_fk",
+          "tableFrom": "Venue",
+          "tableTo": "University",
+          "columnsFrom": ["UniversityID"],
+          "columnsTo": ["UniversityID"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.AcademicCalendar": {
       "name": "AcademicCalendar",
       "schema": "",
@@ -1897,202 +2093,6 @@
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
-    },
-    "public.University": {
-      "name": "University",
-      "schema": "",
-      "columns": {
-        "UniversityID": {
-          "name": "UniversityID",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "UniversityName": {
-          "name": "UniversityName",
-          "type": "varchar(30)",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.UniversityRole": {
-      "name": "UniversityRole",
-      "schema": "",
-      "columns": {
-        "UserID": {
-          "name": "UserID",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "UniversityID": {
-          "name": "UniversityID",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "role": {
-          "name": "role",
-          "type": "RoleType",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'STUDENT'"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "UniversityRole_UserID_user_id_fk": {
-          "name": "UniversityRole_UserID_user_id_fk",
-          "tableFrom": "UniversityRole",
-          "tableTo": "user",
-          "columnsFrom": ["UserID"],
-          "columnsTo": ["id"],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "UniversityRole_UniversityID_University_UniversityID_fk": {
-          "name": "UniversityRole_UniversityID_University_UniversityID_fk",
-          "tableFrom": "UniversityRole",
-          "tableTo": "University",
-          "columnsFrom": ["UniversityID"],
-          "columnsTo": ["UniversityID"],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {
-        "UniversityRole_UniversityID_UserID_pk": {
-          "name": "UniversityRole_UniversityID_UserID_pk",
-          "columns": ["UniversityID", "UserID"]
-        }
-      },
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.EventVenue": {
-      "name": "EventVenue",
-      "schema": "",
-      "columns": {
-        "EventID": {
-          "name": "EventID",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "VenueID": {
-          "name": "VenueID",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "EventVenue_EventID_Event_eventID_fk": {
-          "name": "EventVenue_EventID_Event_eventID_fk",
-          "tableFrom": "EventVenue",
-          "tableTo": "Event",
-          "columnsFrom": ["EventID"],
-          "columnsTo": ["eventID"],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "EventVenue_VenueID_Venue_VenueID_fk": {
-          "name": "EventVenue_VenueID_Venue_VenueID_fk",
-          "tableFrom": "EventVenue",
-          "tableTo": "Venue",
-          "columnsFrom": ["VenueID"],
-          "columnsTo": ["VenueID"],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {
-        "EventVenue_EventID_VenueID_pk": {
-          "name": "EventVenue_EventID_VenueID_pk",
-          "columns": ["EventID", "VenueID"]
-        }
-      },
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.Venue": {
-      "name": "Venue",
-      "schema": "",
-      "columns": {
-        "VenueID": {
-          "name": "VenueID",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "VenueName": {
-          "name": "VenueName",
-          "type": "varchar(30)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "UniversityID": {
-          "name": "UniversityID",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {
-        "venue_university_name_unique": {
-          "name": "venue_university_name_unique",
-          "columns": [
-            {
-              "expression": "UniversityID",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "VenueName",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": true,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "Venue_UniversityID_University_UniversityID_fk": {
-          "name": "Venue_UniversityID_University_UniversityID_fk",
-          "tableFrom": "Venue",
-          "tableTo": "University",
-          "columnsFrom": ["UniversityID"],
-          "columnsTo": ["UniversityID"],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
     }
   },
   "enums": {
@@ -2100,18 +2100,6 @@
       "name": "AttendanceState",
       "schema": "public",
       "values": ["ATTENDING", "NOT_ATTENDING"]
-    },
-    "public.RestrictionType": {
-      "name": "RestrictionType",
-      "schema": "public",
-      "values": [
-        "DATE-SWAP",
-        "PUBLIC-HOLIDAY",
-        "RECESS",
-        "CLOSURE",
-        "EXAM-PERIOD",
-        "DAY-SWAP"
-      ]
     },
     "public.RoleType": {
       "name": "RoleType",
@@ -2125,6 +2113,18 @@
         "LECTURER_PENDING",
         "SYSTEM_ADMIN",
         "REJECTED"
+      ]
+    },
+    "public.RestrictionType": {
+      "name": "RestrictionType",
+      "schema": "public",
+      "values": [
+        "DATE-SWAP",
+        "PUBLIC-HOLIDAY",
+        "RECESS",
+        "CLOSURE",
+        "EXAM-PERIOD",
+        "DAY-SWAP"
       ]
     }
   },

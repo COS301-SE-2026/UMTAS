@@ -14,13 +14,14 @@ export const modules = pgTable(
   'Modules',
   {
     moduleID: uuid('moduleID').defaultRandom().primaryKey(),
-    moduleCode: varchar('moduleCode', { length: 10 }).notNull(),
+    moduleCode: varchar('moduleCode', { length: 15 }).notNull(),
     moduleName: varchar('moduleName', { length: 256 }).notNull(),
     moduleDescription: text('moduleDescription'),
     validated: boolean('validated').notNull().default(true),
+    ExternalID: varchar('ExternalID', { length: 255 }),
   },
   (table) => ({
-    moduleCodeUnique: uniqueIndex('modules_module_code_unique').on(
+    moduleCodeUnique: uniqueIndex('moduleCode_unique_index').on(
       table.moduleCode,
     ),
   }),

@@ -14,6 +14,10 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 
 import Tutorial from "@/components/organisms/nav/Tutorial";
+import { useQuery } from "@tanstack/react-query";
+import { fetchAllModulesv2 } from "../../../../utilities/V2-Builders/Modules";
+import Popup from "@/components/atoms/utility/floatContainer";
+import SolverPreferences from "../solver/SolverPreferences";
 
 let eventAdded = false;
 
@@ -35,8 +39,6 @@ const baseSteps = [
 const extendedSteps: typeof baseSteps = [];
 
 interface GenerateStepProps {
-  modules: ModuleResponseDto[];
-  events: EventResponse[];
   onGenerate: (name: string, selectedEventIds: string[]) => void;
   isGenerating: boolean;
   //props for editing
@@ -67,8 +69,6 @@ function formatTime(start: string, end: string) {
 }
 
 export function GenerateStep({
-  modules,
-  events,
   onGenerate,
   isGenerating,
   isEditMode,
@@ -79,6 +79,7 @@ export function GenerateStep({
 }: GenerateStepProps) {
   //checkbox logic
 
+  const [showSolver, setShowSolver] = useState<boolean>(false);
   function checkboxLogic(eventId: string, isChecked: boolean) {
     if (isChecked) {
       //add the event to the list
@@ -97,6 +98,30 @@ export function GenerateStep({
     }
   }
 
+  const { data: modules = [] } = useQuery({
+    queryKey: ["Modules"],
+    queryFn: async () => {
+      const result = await fetchAllModulesv2({
+        userEnrollment: true,
+      });
+      return result.modules;
+    },
+  });
+
+  const events = modules?.flatMap((module) => module?.Events) ?? [];
+
+  function getSelectedModules() {
+    const selectedEvents = events.filter((event) =>
+      selectedEventIds.includes(event?.eventId ?? ""),
+    );
+
+    return modules.filter((module) =>
+      selectedEvents.some(
+        (event) => event?.eventCriteria.moduleId === module.moduleID,
+      ),
+    );
+  }
+
   function renderModulesSummary() {
     return (
       <div className="flex flex-col gap-3">
@@ -110,7 +135,7 @@ export function GenerateStep({
         </div>
 
         <div className="flex flex-col gap-2">
-          {modules.map((module) => {
+          {modules?.map((module) => {
             return (
               <div
                 key={module.moduleID}
@@ -152,10 +177,12 @@ export function GenerateStep({
 
         <div className="flex flex-col gap-2">
           {events.map((event) => {
-            const criteria = event.eventCriteria;
-            const isEventChecked = selectedEventIds.includes(event.eventId);
+            const criteria = event?.eventCriteria;
+            const isEventChecked = selectedEventIds.includes(
+              event?.eventId ?? "",
+            );
             const linkedModule = getLinkedModule(
-              event.eventCriteria?.moduleId,
+              event?.eventCriteria?.moduleId,
               modules,
             );
             const timeString = formatTime(
@@ -176,12 +203,12 @@ export function GenerateStep({
             return (
               <div
                 data-testid="outer-schedule-div"
-                key={event.eventId}
+                key={event?.eventId}
                 className="flex flex-row items-center gap-1 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] px-4 py-4 shadow-[0_1px_3px_rgba(0,0,0,0.12),0_1px_2px_rgba(0,0,0,0.08)]"
               >
                 <div className="flex flex-col gap-1 flex-1 min-w-0">
                   <p className="text-base font-medium text-[var(--text-primary)]">
-                    {event.eventName || "Event"}
+                    {event?.eventName || "Event"}
                   </p>
                   <div className="flex flex-wrap items-center gap-2">
                     {criteria?.date && (
@@ -209,7 +236,7 @@ export function GenerateStep({
                       </div>
                     )}
                     <p className="text-sm font-mono text-[var(--text-secondary)] uppercase">
-                      {event.activityType}
+                      {event?.activityType}
                     </p>
                   </div>
                 </div>
@@ -217,10 +244,10 @@ export function GenerateStep({
                 <span className="flex-shrink-0 flex items-center justify-center">
                   <Checkbox
                     data-testid="schedule-Timetable-Checkbox"
-                    id={`event-${event.eventId}`}
+                    id={`event-${event?.eventId}`}
                     checked={isEventChecked}
                     onCheckedChange={(checkedState) =>
-                      checkboxLogic(event.eventId, checkedState === true)
+                      checkboxLogic(event?.eventId ?? "", checkedState === true)
                     }
                   />
                 </span>
@@ -269,7 +296,7 @@ export function GenerateStep({
           variant="ghost"
           size="default"
           onClick={() => {
-            router.push("/builder");
+            onGenerate("BACK", []);
           }}
           className="flex items-center gap-2 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors duration-[var(--duration-fast)]"
         >
@@ -308,7 +335,7 @@ export function GenerateStep({
         </div>
 
         {renderContent()}
-        <div className="flex justify-center mt-8">
+        <div className="flex justify-center mt-8 gap-x-2">
           <Button
             id="btn-create-schedule"
             data-testid="schedules-Create-Btn"
@@ -327,8 +354,30 @@ export function GenerateStep({
                   ? "Edit Schedule"
                   : "Generate Schedule"}
           </Button>
+          <Button
+            id=""
+            data-testid=""
+            type="button"
+            size="default"
+            //only solver when there is at least 1 event
+            disabled={isGenerating || selectedEventIds.length === 0}
+            onClick={() => setShowSolver(true)}
+            className="w-fit px-4 text-sm bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] hover:bg-[var(--btn-primary-hover)] disabled:opacity-40 transition-colors duration-[var(--duration-fast)]"
+          >
+            Solve timetable
+          </Button>
         </div>
       </div>
+      {showSolver && (
+        <Popup onClose={() => setShowSolver(false)}>
+          <div className="flex w-140 h-120 justify-center">
+            <SolverPreferences
+              modules={getSelectedModules()}
+              onJobCompleteAction={() => onGenerate("BACK", [])}
+            />
+          </div>
+        </Popup>
+      )}
     </div>
   );
 }

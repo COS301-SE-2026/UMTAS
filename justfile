@@ -8,6 +8,14 @@ dev:
 
 # Umtas local dev commands
 
+
+# SimService
+simservInit:
+    cd apps/simulation-service \
+      && python3 -m venv .venv \
+      && source .venv/bin/activate \
+      && python3 -m pip install -r requirements.txt
+
 [private]
 rebuild-packages:
     pnpm --filter shared-types run build
@@ -26,7 +34,7 @@ both: rebuild-packages
 
 # spin up local versions
 dev-infra:
-    WORKER_BACKEND_URL=http://host.docker.internal:3000 phase run -- docker compose --profile dev-infra up -d --build postgres redis minio mailhog pdf-parser-worker solver-worker
+    WORKER_BACKEND_URL=http://host.docker.internal:3000 phase run -- docker compose --profile dev-infra up -d --build postgres redis minio mailhog pdf-parser-worker solver-worker mock-university-api
 
 # compelete reset
 sync:
@@ -237,6 +245,31 @@ db_sql:
 #Migration problem solution
 # DROP SCHEMA public CASCADE; CREATE SCHEMA public; then quite
 # then you can delete all migrations and meta from drizzle and regenerate and migrate
+
+
+runsim:
+    cd apps/simulation-service && phase run --env development -- docker compose up --build
+
+
+nfr-start:
+    cd apps/NFR && phase run --env development -- docker compose up -d nfr-tester
+
+nfr-stop:
+    cd apps/NFR && phase run --env development -- docker compose stop nfr-tester
+
+
+
+nfr-upload:
+    cd apps/NFR && phase run --env development -- docker compose exec nfr-tester \
+        locust -f /apps/NFR/upload_locustfile.py \
+        --host http://host.docker.internal:3000 \
+        --users 50 \
+        --spawn-rate 10 \
+        --run-time 2m \
+        --headless \
+
+
+
 
 
 

@@ -31,7 +31,7 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 COPY apps/pdf_parser/requirements.txt /tmp/requirements.txt
 RUN python3 -m venv /opt/pdf-parser-venv \
-    && /opt/pdf-parser-venv/bin/pip install --no-cache-dir --requirement /tmp/requirements.txt
+    && /opt/pdf-parser-venv/bin/pip install --default-timeout=1000 --no-cache-dir --requirement /tmp/requirements.txt
 
 FROM ${NODE_IMAGE} AS runtime
 ARG BUILD_DATE

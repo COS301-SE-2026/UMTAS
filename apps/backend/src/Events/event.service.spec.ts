@@ -14,6 +14,7 @@ import { DatabaseService } from '../db/database.service';
 import { EventService } from './event.service';
 import { ModuleService } from '../Module/module.service';
 import { EventImportFingerprintService } from './event-import-fingerprint.service';
+import { UniversityService } from '../University/university.service';
 
 //Mocks
 import {
@@ -24,6 +25,7 @@ import {
 import {
   createMockModuleService,
   createMockEventImportFingerprintService,
+  createMockUniversityService,
 } from '../Testing/Mocks/services/';
 
 //Factories
@@ -52,6 +54,8 @@ describe('EventService', () => {
   const { mockModuleService, reset: resetModule } = createMockModuleService();
   const { mockEventFingerprintService, reset: resetEventFingerprint } =
     createMockEventImportFingerprintService();
+  const { mockUniversityService, reset: resetUniversity } =
+    createMockUniversityService();
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
@@ -63,6 +67,7 @@ describe('EventService', () => {
           provide: EventImportFingerprintService,
           useValue: mockEventFingerprintService,
         },
+        { provide: UniversityService, useValue: mockUniversityService },
       ],
     }).compile();
 
@@ -73,6 +78,7 @@ describe('EventService', () => {
     resetDb();
     resetModule();
     resetEventFingerprint();
+    resetUniversity();
   });
 
   //TESTS

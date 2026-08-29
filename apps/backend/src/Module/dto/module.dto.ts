@@ -9,6 +9,7 @@ import {
   IsBoolean,
   ValidateNested,
   IsNumber,
+  IsArray,
 } from 'class-validator';
 import {
   PartialType,
@@ -18,6 +19,7 @@ import {
 } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import { PopulateGroupBodyDto } from '../../Grouping/dto/grouping.dto';
+import { EventDto } from 'src/Events/dto/EventDto.dto';
 
 export class CourseModuleDto {
   @ApiProperty({
@@ -86,7 +88,7 @@ export class CreateCourseModuleDto extends PickType(CourseModuleDto, [
   'YearOfStudy',
 ]) {}
 
-class StylingDto {
+export class StylingDto {
   @ApiProperty({ example: '#3B82F6' })
   @IsString()
   @IsNotEmpty()
@@ -109,7 +111,7 @@ export class ModulesDto {
   })
   @IsString()
   @IsNotEmpty()
-  @Length(2, 10)
+  @Length(2, 15)
   moduleCode!: string;
 
   @ApiProperty({
@@ -160,6 +162,7 @@ export class ModulesDto {
   @ValidateNested()
   @Type(() => CourseModuleDto)
   CourseModuleInfo?: CourseModuleDto | null;
+
   @ApiProperty({
     type: Boolean,
     example: true,
@@ -168,6 +171,35 @@ export class ModulesDto {
   @IsOptional()
   @IsBoolean()
   validated?: boolean;
+
+  @ApiPropertyOptional({
+    type: () => [EventDto],
+    description: 'List of events for the module',
+    nullable: true,
+  })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => EventDto)
+  Events?: EventDto[] | null;
+
+  @ApiPropertyOptional({
+    example: '12345',
+    description: 'Refer to module on external API',
+  })
+  @IsOptional()
+  @IsString()
+  @Length(1, 255)
+  ExternalID?: string | null;
+
+  @ApiPropertyOptional({
+    example: false,
+    description: 'Is a user enrolled to this module',
+    type: Boolean,
+  })
+  @IsOptional()
+  @IsBoolean()
+  Enrolled?: boolean;
 } //ModuleDto
 
 //Create
@@ -177,6 +209,7 @@ export class CreateModuleDto extends PickType(ModulesDto, [
   'moduleDescription',
   'styling',
   'validated',
+  'ExternalID',
 ]) {
   @ApiPropertyOptional({
     example: '00000000-0000-0000-0000-000000000000',
@@ -233,6 +266,12 @@ export class ModuleListResponseDto {
     description: 'List of modules',
   })
   modules!: ModuleSingleResponseDto[];
+
+  @ApiPropertyOptional({
+    type: String,
+    description: 'Short message indicating  success of response.',
+  })
+  message?: string;
 }
 
 //Delete
@@ -248,7 +287,6 @@ export class ModuleFiltersDto {
   @ApiPropertyOptional({
     description:
       'Filter by university ID - returns all modules across all courses in the university',
-    example: '00000000-0000-0000-0000-000000000000',
   })
   @IsOptional()
   @IsUUID()
@@ -256,14 +294,12 @@ export class ModuleFiltersDto {
 
   @ApiPropertyOptional({
     description: 'Filter by course ID - returns all modules in the course',
-    example: '00000000-0000-0000-0000-000000000000',
   })
   @IsOptional()
   @IsUUID()
   courseId?: string;
 
   @ApiPropertyOptional({
-    example: '00000000-0000-0000-0000-000000000000',
     description: 'Filter by ModuleGrouping ID',
   })
   @IsOptional()
@@ -272,7 +308,6 @@ export class ModuleFiltersDto {
 
   //Filter by code using wildcard
   @ApiPropertyOptional({
-    example: 'COS',
     description: 'Filter by code, makes use of wildcard search',
   })
   @IsOptional()
@@ -280,7 +315,7 @@ export class ModuleFiltersDto {
   moduleCode?: string;
 
   @ApiPropertyOptional({
-    example: false,
+    example: undefined,
     default: false,
     description: 'Choose to filter modules based of current user enrollments',
     type: Boolean,
@@ -289,10 +324,19 @@ export class ModuleFiltersDto {
   @IsBoolean()
   @IsOptional()
   @Transform(({ value }) => {
-    if (value === true) return true;
+    if (value === 'true') return true;
     else return false;
   })
   userEnrollment?: boolean;
+
+  // @ApiPropertyOptional({
+  //   default: false,
+  //   description: 'Used to get the moduel styling and when moduleEnrollment filter is active'
+  // })
+  // @IsOptional()
+  // @IsUUID()
+  // @ValidateIf((o)=> o.userEnrollment===true)
+  // userId?: string;
 } //ModuleFiltersDto
 
 export class ModuleStylingResponseDto {
@@ -346,4 +390,27 @@ export class AddModulesToCourseResponseDto extends AddModulesToCourseDto {
   })
   @IsUUID('4', { message: 'CourseID should be a UUID' })
   CourseID!: string;
+}
+
+export class EnrollToModuleDto {
+  @ApiPropertyOptional({
+    example: undefined,
+    description: 'Enroll or unenroll',
+    type: Boolean,
+  })
+  @IsOptional()
+  @IsBoolean()
+  @IsOptional()
+  @Transform(({ value }) => {
+    if (
+      value === 'true' ||
+      value === 'TRUE' ||
+      value === true ||
+      value === 1 ||
+      value === '1'
+    )
+      return true;
+    else return false;
+  })
+  enroll?: boolean;
 }
