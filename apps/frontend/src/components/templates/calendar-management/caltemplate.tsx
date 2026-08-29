@@ -7,9 +7,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/atoms/baseShadcn/select";
+import createRestrictionHandlers from "@/components/molecules/Calendar-management/handlerCreator";
 import CalCard from "@/components/organisms/Calandar-management/temporary-card";
 
 import { useState } from "react";
+import {
+  CreateAcMutation,
+  GetAcademicCalendarBuilder,
+  getAllAcQuery,
+} from "../../../../utilities/Calendar-Builders/CalendarManagement";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { GetAllRestrictions } from "../../../../utilities/Calendar-Builders/RestrictionManagement";
 
 const startYear = 2026;
 const endYear = 2035;
@@ -26,8 +34,34 @@ function generateYears() {
 
 export default function CalTemplate() {
   const years = generateYears();
+  const yearsWithAC: number[] = [];
 
   const [selectedYear, setSelectedYear] = useState(String(startYear));
+  const [selectedAcID, setSelectedAcID] = useState("");
+
+  const { data: academicCalendars = [], isLoading: acLoading } = useQuery({
+    ...getAllAcQuery(),
+    select: (data) => {
+      data.map((ac) => {
+        if (!yearsWithAC.includes(ac.year)) yearsWithAC.push(ac.year);
+      });
+      return data;
+    },
+  });
+
+  const { data: restrictions } = useQuery({
+    ...GetAllRestrictions({ id: selectedAcID }),
+  });
+
+  const { mutateAsync: createACmut } = useMutation(CreateAcMutation);
+
+  const handlers = createRestrictionHandlers();
+
+  function findAcID(year: number) {
+    return academicCalendars.find((ac) => {
+      if (ac.year == year) return ac;
+    });
+  }
 
   return (
     <div className="h-[85vh] items-center flex flex-col gap-6 w-full px-6 ">
@@ -42,8 +76,17 @@ export default function CalTemplate() {
           <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
             <Select
               value={selectedYear}
-              onValueChange={(e) => {
+              onValueChange={async (e) => {
                 setSelectedYear(e);
+                const year = Number(e);
+                if (yearsWithAC.includes(year)) {
+                  setSelectedAcID(findAcID(year)?.id || "");
+                } else {
+                  const result = await createACmut({
+                    year: year,
+                  });
+                  setSelectedAcID(result.id);
+                }
               }}
             >
               <SelectTrigger
@@ -69,12 +112,9 @@ export default function CalTemplate() {
             <CalCard></CalCard>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2  gap-5 p-5 w-full h-auto justify-items-center items-center overflow-auto">
-            <CalCard />
-            <CalCard />
-            <CalCard />
-            <CalCard />
-            <CalCard />
-            <CalCard />
+            {restrictions?.restrictions.map((res) => {
+              return handlers.handle(res, selectedAcID);
+            })}
           </div>
         </div>
       </div>

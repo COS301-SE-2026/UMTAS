@@ -1,5 +1,5 @@
 // uses chain of responsibility and template method
-import { useState } from "react";
+
 import {
   RestrictionTypes,
   SingleRestrictionResp,
@@ -8,6 +8,8 @@ import {
 import { Input } from "@/components/atoms/baseShadcn/input";
 import { Label } from "@/components/atoms/baseShadcn/label";
 import { useMutation } from "@tanstack/react-query";
+import { Button } from "@/components/atoms/baseShadcn/button";
+import { Trash2 } from "lucide-react";
 
 abstract class RestrictionHandler {
   protected MyHandletypes: RestrictionTypes[];
@@ -24,7 +26,7 @@ abstract class RestrictionHandler {
       this.next = next;
     }
   }
-  protected handle(
+  public handle(
     resType: SingleRestrictionResp,
     academicCalendarID: string,
   ): React.ReactNode {
@@ -79,6 +81,8 @@ interface restrictionProps {
   academicCalendarID: string;
 }
 
+function RestrictionContainerHtml() {}
+
 function DateRestrictionHTML({
   resType,
   academicCalendarID,
@@ -102,12 +106,12 @@ function DateRestrictionHTML({
   return (
     <div>
       <Label className="text-sm font-medium text-[var(--text-secondary)]">
-        Date
+        Selected date
       </Label>
       <Input
         data-testid="schedules-Date-Input"
         type="date"
-        value={""}
+        value={resType.startDate}
         onChange={(e) => {
           if (e.target.value) {
             {
@@ -117,6 +121,21 @@ function DateRestrictionHTML({
         }}
         className="h-8 rounded-md border border-[var(--border)] bg-transparent px-2 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--ring)]"
       />
+      <Button
+        id="btn-delete-restriction"
+        type="button"
+        variant="ghost"
+        size="icon"
+        onClick={() => {}}
+        disabled={false}
+        className="h-10 w-10 flex-shrink-0 border border-[var(--error-text)] text-[var(--text-secondary)] transition-colors duration-[var(--duration-fast)] hover:border-[var(--error-text)] hover:text-[var(--error-text)] hover:bg-[var(--error-bg)]"
+      >
+        <Trash2
+          size={16}
+          strokeWidth={1.5}
+          className="text-[var(--error-text)]"
+        />
+      </Button>
     </div>
   );
 }
