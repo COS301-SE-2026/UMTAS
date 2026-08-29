@@ -3,8 +3,11 @@ import { useState } from "react";
 import {
   RestrictionTypes,
   SingleRestrictionResp,
+  UpdateRestrictionMutation,
 } from "../../../../utilities/Calendar-Builders/RestrictionManagement";
 import { Input } from "@/components/atoms/baseShadcn/input";
+import { Label } from "@/components/atoms/baseShadcn/label";
+import { useMutation } from "@tanstack/react-query";
 
 abstract class RestrictionHandler {
   protected MyHandletypes: RestrictionTypes[];
@@ -21,15 +24,21 @@ abstract class RestrictionHandler {
       this.next = next;
     }
   }
-  protected handle(resType: SingleRestrictionResp): React.ReactNode {
+  protected handle(
+    resType: SingleRestrictionResp,
+    academicCalendarID: string,
+  ): React.ReactNode {
     if (this.MyHandletypes.includes(resType.type)) {
-      return this.handleHtml(resType);
+      return this.handleHtml(resType, academicCalendarID);
     } else {
-      return this.next?.handle(resType);
+      return this.next?.handle(resType, academicCalendarID);
     }
   }
 
-  abstract handleHtml(resType: SingleRestrictionResp): React.ReactNode; // returns the self managing elements
+  abstract handleHtml(
+    resType: SingleRestrictionResp,
+    academicCalendarID: string,
+  ): React.ReactNode; // returns the self managing elements
 }
 
 /*
@@ -48,31 +57,75 @@ export class DateOnlyHanlder extends RestrictionHandler {
       "SEMESTER_1_END",
       "SEMESTER_2_END",
       "SEMESTER_2_START",
-      "EXAM_PERIOD",
-      "SUPP_WEEK",
-      "TEST_WEEK",
       "UNIVERSITY_CLOSURE",
       "PUBLIC_HOLIDAY",
-      "HOLIDAY",
-      "RECESS",
     ]);
   }
-  handleHtml(resType: SingleRestrictionResp): React.ReactNode {
-    return <CalendarRestrictionHTML resType={resType} />;
+  handleHtml(
+    resType: SingleRestrictionResp,
+    academicCalendarID: string,
+  ): React.ReactNode {
+    return (
+      <DateRestrictionHTML
+        resType={resType}
+        academicCalendarID={academicCalendarID}
+      />
+    );
   }
 }
 
 interface restrictionProps {
   resType: SingleRestrictionResp;
+  academicCalendarID: string;
 }
 
-function CalendarRestrictionHTML({ resType }: restrictionProps) {
-  const [restriction, setRestriction] =
-    useState<SingleRestrictionResp>(resType);
+function DateRestrictionHTML({
+  resType,
+  academicCalendarID,
+}: restrictionProps) {
+  const { mutate: updateMut } = useMutation(UpdateRestrictionMutation);
+
+  function updateRestrictionDate(date: string) {
+    updateMut({
+      body: {
+        description: resType.description,
+        startDate: date,
+        type: resType.type,
+      },
+      paths: {
+        restrictionId: resType.id,
+        id: academicCalendarID,
+      },
+    });
+  }
 
   return (
     <div>
-      <Input></Input>
+      <Label className="text-sm font-medium text-[var(--text-secondary)]">
+        Date
+      </Label>
+      <Input
+        data-testid="schedules-Date-Input"
+        type="date"
+        value={""}
+        onChange={(e) => {
+          if (e.target.value) {
+            {
+              updateRestrictionDate(e.target.value);
+            }
+          }
+        }}
+        className="h-8 rounded-md border border-[var(--border)] bg-transparent px-2 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--ring)]"
+      />
     </div>
   );
+}
+
+export class DayToDayHanlder extends RestrictionHandler {
+  constructor() {
+    super(["EXAM_PERIOD", "SUPP_WEEK", "TEST_WEEK", "HOLIDAY", "RECESS"]);
+  }
+  handleHtml(resType: SingleRestrictionResp): React.ReactNode {
+    return <></>;
+  }
 }

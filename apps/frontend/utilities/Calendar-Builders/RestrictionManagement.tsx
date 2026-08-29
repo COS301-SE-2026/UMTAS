@@ -1,6 +1,7 @@
 import { mutationOptions, queryOptions } from "@tanstack/react-query";
 import { RequestBuilder, RequestMethod } from "../request";
 import { paths, components } from "@/lib/api";
+import { getQueryClient } from "@/components/tanstack/getQueryClient";
 
 export type CreateAcRestriction =
   paths["/api/academic-calendar/{id}/restrictions"]["post"];
@@ -37,6 +38,11 @@ export const CreateAcMutation = mutationOptions({
       body: body,
     });
   },
+  onSuccess: () => {
+    getQueryClient().invalidateQueries({
+      queryKey: ["Restrictions"],
+    });
+  },
 });
 
 type UpdateAcRestriction =
@@ -64,7 +70,7 @@ export class UpdateAcRestrictionBuilder extends RequestBuilder<
   }
 }
 
-export const UpdateAcMutation = mutationOptions({
+export const UpdateRestrictionMutation = mutationOptions({
   mutationFn: ({
     body,
     paths,
@@ -75,6 +81,11 @@ export const UpdateAcMutation = mutationOptions({
     return new UpdateAcRestrictionBuilder().send({
       paths: paths,
       body: body,
+    });
+  },
+  onSuccess: () => {
+    getQueryClient().invalidateQueries({
+      queryKey: ["Restrictions"],
     });
   },
 });
@@ -105,7 +116,7 @@ export class getAcRestrictionBuilder extends RequestBuilder<
 
 export function GetAllRestrictions(paths?: getAcRestrictionPaths) {
   return queryOptions({
-    queryKey: ["Academic-Calendar", paths],
+    queryKey: ["Restrictions", paths],
     queryFn: () =>
       new getAcRestrictionBuilder().send({
         paths: paths,
