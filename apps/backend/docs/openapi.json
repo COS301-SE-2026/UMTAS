@@ -3952,6 +3952,61 @@
         "tags": ["Map Config"]
       }
     },
+    "/api/routes": {
+      "get": {
+        "description": "Returns cached route if one exists, otherwise fetches it from OpenRouteService and caches it in the DB.",
+        "operationId": "RouteController_getRoute",
+        "parameters": [
+          {
+            "name": "originBuildingId",
+            "required": true,
+            "in": "query",
+            "description": "The origin building that the student is walking from",
+            "schema": {
+              "format": "uuid",
+              "example": "00000000-0000-0000-0000-000000000000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "destinationBuildingId",
+            "required": true,
+            "in": "query",
+            "description": "The destination building that the student is walking to",
+            "schema": {
+              "format": "uuid",
+              "example": "00000000-0000-0000-0000-000000000000",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Route was returned successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RouteSingleResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No university or university role was selected"
+          },
+          "404": {
+            "description": "One or both buildings have not been pinned, or no walking path was found between the two buildings"
+          }
+        },
+        "security": [
+          {
+            "umtas-session": []
+          }
+        ],
+        "summary": "Get a walking route between an origin and a destination building",
+        "tags": ["Routes"]
+      }
+    },
     "/api/api-service/courses": {
       "get": {
         "description": "Fetches courses for the authenticated user's university.",
@@ -7615,6 +7670,65 @@
           "DefaultZoom",
           "GoogleMapID"
         ]
+      },
+      "RouteDto": {
+        "type": "object",
+        "properties": {
+          "routeId": {
+            "type": "string",
+            "format": "uuid",
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "originBuildingId": {
+            "type": "string",
+            "format": "uuid",
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "destinationBuildingId": {
+            "type": "string",
+            "format": "uuid",
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "pathCoordinates": {
+            "description": "List of lat/long coordinates for the route path",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "latLngDto"
+              }
+            },
+            "type": "array"
+          },
+          "distanceMetres": {
+            "minimum": 1,
+            "type": "number",
+            "example": 67,
+            "description": "The route distance in metres"
+          },
+          "displayColour": {
+            "type": "string",
+            "pattern": "^#?([0-9A-F]{3}|[0-9A-F]{4}|[0-9A-F]{6}|[0-9A-F]{8})$",
+            "example": "#0000FF",
+            "description": "The hex colour for the polyline (path)"
+          }
+        },
+        "required": [
+          "routeId",
+          "originBuildingId",
+          "destinationBuildingId",
+          "pathCoordinates",
+          "distanceMetres",
+          "displayColour"
+        ]
+      },
+      "RouteSingleResponseDto": {
+        "type": "object",
+        "properties": {
+          "route": {
+            "$ref": "#/components/schemas/RouteDto"
+          }
+        },
+        "required": ["route"]
       }
     }
   }

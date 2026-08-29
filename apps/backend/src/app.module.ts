@@ -25,6 +25,7 @@ import { VenueModule } from './Venue/venue.module';
 import { BuildingModule } from './Building/building.module';
 import { MapConfigModule } from './Map-config/map-config.module';
 import { ApiServiceModule } from './ApiService/ApiService.module';
+import { RouteModule } from './Route/route.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { ApiServiceModule } from './ApiService/ApiService.module';
     VenueModule,
     BuildingModule,
     MapConfigModule,
+    RouteModule,
     ApiServiceModule,
   ],
   controllers: [AppController, AuthController],

@@ -3,7 +3,7 @@ import { pgTable } from 'drizzle-orm/pg-core';
 import { University } from '../Universities';
 import { Building } from './building.schema';
 import { jsonb } from 'drizzle-orm/pg-core';
-import { LatLngDto } from 'src/Building/dto/building.dto';
+import type { LatLngDto } from 'src/Building/dto/building.dto';
 import { integer } from 'drizzle-orm/pg-core';
 import { varchar } from 'drizzle-orm/pg-core';
 import { timestamp } from 'drizzle-orm/pg-core';

@@ -1339,6 +1339,26 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/routes": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get a walking route between an origin and a destination building
+     * @description Returns cached route if one exists, otherwise fetches it from OpenRouteService and caches it in the DB.
+     */
+    get: operations["RouteController_getRoute"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/api-service/courses": {
     parameters: {
       query?: never;
@@ -3326,6 +3346,38 @@ export interface components {
        * @example lalala-123
        */
       GoogleMapID: string | null;
+    };
+    RouteDto: {
+      /**
+       * Format: uuid
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      routeId: string;
+      /**
+       * Format: uuid
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      originBuildingId: string;
+      /**
+       * Format: uuid
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      destinationBuildingId: string;
+      /** @description List of lat/long coordinates for the route path */
+      pathCoordinates: Record<string, never>[][];
+      /**
+       * @description The route distance in metres
+       * @example 67
+       */
+      distanceMetres: number;
+      /**
+       * @description The hex colour for the polyline (path)
+       * @example #0000FF
+       */
+      displayColour: string;
+    };
+    RouteSingleResponseDto: {
+      route: components["schemas"]["RouteDto"];
     };
   };
   responses: never;
@@ -6656,6 +6708,45 @@ export interface operations {
       };
       /** @description Insufficient permissions */
       403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  RouteController_getRoute: {
+    parameters: {
+      query: {
+        /** @description The origin building that the student is walking from */
+        originBuildingId: string;
+        /** @description The destination building that the student is walking to */
+        destinationBuildingId: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Route was returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RouteSingleResponseDto"];
+        };
+      };
+      /** @description No university or university role was selected */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description One or both buildings have not been pinned, or no walking path was found between the two buildings */
+      404: {
         headers: {
           [name: string]: unknown;
         };
