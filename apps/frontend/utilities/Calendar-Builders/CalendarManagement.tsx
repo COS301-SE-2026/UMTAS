@@ -22,6 +22,7 @@ export class CreateAcademicCalendarBuilder extends RequestBuilder<
 
 export const CreateAcMutation = mutationOptions({
   mutationFn: (body: CreateAcademicCalendarBody) => {
+    console.log("created AC");
     return new CreateAcademicCalendarBuilder().send({
       body: body,
     });

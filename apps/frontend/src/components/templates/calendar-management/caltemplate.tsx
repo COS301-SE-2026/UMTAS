@@ -79,16 +79,12 @@ export default function CalTemplate() {
               value={selectedYear}
               onValueChange={async (e) => {
                 setSelectedYear(e);
+                const year = Number(e);
 
-                const currentAC = academicCalendars.find(
-                  (ac) => ac.year === Number(selectedYear),
-                );
-
-                const selectedAcID = currentAC?.id;
-
-                if (selectedAcID == null) {
-                  createACmut({
-                    year: Number(e),
+                const AC = academicCalendars.find((ac) => year === ac.year);
+                if (AC == undefined) {
+                  await createACmut({
+                    year: year,
                   });
                 }
               }}
