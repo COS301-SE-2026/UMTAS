@@ -24,7 +24,7 @@ export const Route = pgTable(
       .references(() => Building.BuildingID, { onDelete: 'cascade' })
       .notNull(),
     PathCoordinates: jsonb('PathCoordinates').$type<LatLngDto>().notNull(),
-    DistanceMeters: integer('DistanceMeters').notNull(),
+    DistanceMetres: integer('DistanceMetres').notNull(),
     DisplayColour: varchar('DisplayColour', { length: 10 })
       .default('#0000FF')
       .notNull(),
