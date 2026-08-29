@@ -37,7 +37,6 @@ export default function CalTemplate() {
   const yearsWithAC: number[] = [];
 
   const [selectedYear, setSelectedYear] = useState(String(startYear));
-  const [selectedAcID, setSelectedAcID] = useState<string | null>(null);
 
   const { data: academicCalendars = [], isLoading: acLoading } = useQuery({
     ...getAllAcQuery(),
@@ -45,11 +44,16 @@ export default function CalTemplate() {
       data.map((ac) => {
         if (!yearsWithAC.includes(ac.year)) yearsWithAC.push(ac.year);
       });
-      if (selectedAcID == null || selectedAcID == "")
-        setSelectedAcID(data[0].id);
+
       return data;
     },
   });
+
+  const currentAC = academicCalendars.find(
+    (ac) => ac.year === Number(selectedYear),
+  );
+
+  const selectedAcID = currentAC?.id;
 
   const { data: restrictions } = useQuery({
     ...GetAllRestrictions({ id: selectedAcID ?? "" }),
@@ -59,12 +63,6 @@ export default function CalTemplate() {
   const { mutateAsync: createACmut } = useMutation(CreateAcMutation);
 
   const handlers = createRestrictionHandlers();
-
-  function findAcID(year: number) {
-    return academicCalendars.find((ac) => {
-      if (ac.year == year) return ac;
-    });
-  }
 
   return (
     <div className=" items-center flex flex-col gap-6 w-full px-6 ">
@@ -82,14 +80,16 @@ export default function CalTemplate() {
               onValueChange={async (e) => {
                 setSelectedYear(e);
 
-                const year = Number(e);
-                if (yearsWithAC.includes(year)) {
-                  setSelectedAcID(findAcID(year)?.id || "");
-                } else {
-                  const result = await createACmut({
-                    year: year,
+                const currentAC = academicCalendars.find(
+                  (ac) => ac.year === Number(selectedYear),
+                );
+
+                const selectedAcID = currentAC?.id;
+
+                if (selectedAcID == null) {
+                  createACmut({
+                    year: Number(e),
                   });
-                  setSelectedAcID(result.id);
                 }
               }}
             >
