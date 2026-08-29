@@ -78,6 +78,13 @@
       "when": 1786976725046,
       "tag": "0001_lucky_cassandra_nova",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1788021723004,
+      "tag": "0002_route_table_yay",
+      "breakpoints": true
     }
   ]
 }

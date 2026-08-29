@@ -3,12 +3,16 @@ import { pgTable } from 'drizzle-orm/pg-core';
 import { University } from '../Universities';
 import { Building } from './building.schema';
 import { jsonb } from 'drizzle-orm/pg-core';
-import type { LatLngDto } from 'src/Building/dto/building.dto';
 import { integer } from 'drizzle-orm/pg-core';
 import { varchar } from 'drizzle-orm/pg-core';
 import { timestamp } from 'drizzle-orm/pg-core';
 import { uniqueIndex } from 'drizzle-orm/pg-core';
 import { index } from 'drizzle-orm/pg-core';
+
+interface LatLng {
+  lat: number;
+  lng: number;
+}
 
 export const Route = pgTable(
   'Route',
@@ -23,7 +27,7 @@ export const Route = pgTable(
     DestinationBuildingID: uuid('DestinationBuildingID')
       .references(() => Building.BuildingID, { onDelete: 'cascade' })
       .notNull(),
-    PathCoordinates: jsonb('PathCoordinates').$type<LatLngDto[]>().notNull(),
+    PathCoordinates: jsonb('PathCoordinates').$type<LatLng[]>().notNull(),
     DistanceMetres: integer('DistanceMetres').notNull(),
     DisplayColour: varchar('DisplayColour', { length: 10 })
       .default('#0000FF')
