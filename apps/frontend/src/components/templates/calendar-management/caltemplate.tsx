@@ -23,9 +23,9 @@ const startYear = 2026;
 const endYear = 2035;
 
 function generateYears() {
-  const length = startYear - endYear;
+  const length = endYear - startYear;
   const years = [String(startYear)];
-  for (let i = 0; i < length; i++) {
+  for (let i = 1; i < length; i++) {
     years.push(String(startYear + i));
   }
 
@@ -93,10 +93,9 @@ export default function CalTemplate() {
                 id="select-all-degrees"
                 className="w-[180px] bg-[var(--background)]"
               >
-                <SelectValue placeholder="Filter Degree" />
+                <SelectValue placeholder="Year" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="All">All Degrees</SelectItem>
                 {years.map((year, idx) => (
                   <SelectItem key={idx} value={year}>
                     {year}
