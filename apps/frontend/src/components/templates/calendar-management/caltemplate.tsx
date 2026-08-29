@@ -13,11 +13,11 @@ import CalCard from "@/components/organisms/Calandar-management/temporary-card";
 import { useState } from "react";
 import {
   CreateAcMutation,
-  GetAcademicCalendarBuilder,
   getAllAcQuery,
 } from "../../../../utilities/Calendar-Builders/CalendarManagement";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { GetAllRestrictions } from "../../../../utilities/Calendar-Builders/RestrictionManagement";
+import { getQueryClient } from "@/components/tanstack/getQueryClient";
 
 const startYear = 2026;
 const endYear = 2035;
@@ -37,7 +37,7 @@ export default function CalTemplate() {
   const yearsWithAC: number[] = [];
 
   const [selectedYear, setSelectedYear] = useState(String(startYear));
-  const [selectedAcID, setSelectedAcID] = useState("");
+  const [selectedAcID, setSelectedAcID] = useState<string | null>(null);
 
   const { data: academicCalendars = [], isLoading: acLoading } = useQuery({
     ...getAllAcQuery(),
@@ -45,12 +45,15 @@ export default function CalTemplate() {
       data.map((ac) => {
         if (!yearsWithAC.includes(ac.year)) yearsWithAC.push(ac.year);
       });
+      if (selectedAcID == null || selectedAcID == "")
+        setSelectedAcID(data[0].id);
       return data;
     },
   });
 
   const { data: restrictions } = useQuery({
-    ...GetAllRestrictions({ id: selectedAcID }),
+    ...GetAllRestrictions({ id: selectedAcID ?? "" }),
+    enabled: selectedAcID != "" && selectedAcID != null,
   });
 
   const { mutateAsync: createACmut } = useMutation(CreateAcMutation);
@@ -64,7 +67,7 @@ export default function CalTemplate() {
   }
 
   return (
-    <div className="h-[85vh] items-center flex flex-col gap-6 w-full px-6 ">
+    <div className=" items-center flex flex-col gap-6 w-full px-6 ">
       <div className="w-full  h-full max-w-6xl overflow-auto border border-[var(--border)] rounded-xl bg-[var(--bg-surface)] shadow-sm">
         <h1 className="text-lg font-semibold text-[var(--text-primary)] pl-4 pt-4">
           Calendar Management
@@ -78,6 +81,7 @@ export default function CalTemplate() {
               value={selectedYear}
               onValueChange={async (e) => {
                 setSelectedYear(e);
+
                 const year = Number(e);
                 if (yearsWithAC.includes(year)) {
                   setSelectedAcID(findAcID(year)?.id || "");
@@ -110,10 +114,15 @@ export default function CalTemplate() {
           <div className="w-full  border-dashed border-5 rounded-2xl my-2  flex flex-col items-center p-5 h-1/4">
             <CalCard></CalCard>
           </div>
-          <div className="grid grid-cols-1 lg:grid-cols-2  gap-5 p-5 w-full h-auto justify-items-center items-center overflow-auto">
-            {restrictions?.restrictions.map((res) => {
-              return handlers.handle(res, selectedAcID);
-            })}
+          <div className="grid grid-cols-1 lg:grid-cols-2   gap-y-5 p-5 w-full h-auto  justify-items-center items-center ">
+            {selectedAcID &&
+              restrictions?.restrictions.map((res) => {
+                return (
+                  <CalCard key={res.id}>
+                    {handlers.handle(res, selectedAcID)}
+                  </CalCard>
+                );
+              })}
           </div>
         </div>
       </div>

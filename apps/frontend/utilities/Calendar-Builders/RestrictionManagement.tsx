@@ -117,10 +117,13 @@ export class getAcRestrictionBuilder extends RequestBuilder<
 export function GetAllRestrictions(paths?: getAcRestrictionPaths) {
   return queryOptions({
     queryKey: ["Restrictions", paths],
-    queryFn: () =>
-      new getAcRestrictionBuilder().send({
+    queryFn: async () => {
+      const res = await new getAcRestrictionBuilder().send({
         paths: paths,
-      }),
+      });
+      console.log(res, "Restrictions ");
+      return res;
+    },
   });
 }
 

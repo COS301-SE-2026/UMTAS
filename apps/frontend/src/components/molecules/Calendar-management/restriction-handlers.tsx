@@ -104,23 +104,39 @@ function DateRestrictionHTML({
   }
 
   return (
-    <div>
-      <Label className="text-sm font-medium text-[var(--text-secondary)]">
+    <div className="grid grid-cols-3 w-full  items-center justify-items-center gap-4 text-center ">
+      <Label className="text-sm font-medium text-[var(--text-secondary)] flex flex-col">
         Selected date
-      </Label>
-      <Input
-        data-testid="schedules-Date-Input"
-        type="date"
-        value={resType.startDate}
-        onChange={(e) => {
-          if (e.target.value) {
-            {
-              updateRestrictionDate(e.target.value);
+        <Input
+          data-testid="schedules-Date-Input"
+          type="date"
+          value={resType.startDate}
+          onChange={(e) => {
+            if (e.target.value) {
+              {
+                updateRestrictionDate(e.target.value);
+              }
             }
-          }
-        }}
-        className="h-8 rounded-md border border-[var(--border)] bg-transparent px-2 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--ring)]"
-      />
+          }}
+          className="h-8 rounded-md border border-[var(--border)] bg-transparent px-2 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--ring)]"
+        />
+      </Label>
+      <Label className="text-sm font-medium text-[var(--text-secondary)] flex flex-col">
+        description
+        <Input
+          data-testid="schedules-Date-Input"
+          type="text"
+          value={resType.description}
+          onChange={(e) => {
+            if (e.target.value) {
+              {
+                updateRestrictionDate(e.target.value);
+              }
+            }
+          }}
+          className="h-8  rounded-md border border-[var(--border)] bg-transparent px-2 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--ring)]"
+        />
+      </Label>
       <Button
         id="btn-delete-restriction"
         type="button"
