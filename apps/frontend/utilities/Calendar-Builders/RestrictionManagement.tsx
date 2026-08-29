@@ -128,3 +128,37 @@ export function GetAllRestrictions(paths?: getAcRestrictionPaths) {
 }
 
 export type RestrictionTypes = components["schemas"]["CalendarRestrictionType"];
+
+type DelRestriction =
+  paths["/api/academic-calendar/{id}/restrictions/{restrictionId}"]["delete"];
+
+export type DelRestrictionPath = DelRestriction["parameters"]["path"];
+export type DelRestrictionResp =
+  DelRestriction["responses"]["200"]["content"]["application/json"];
+
+export class DeleteAcRestrictionBuilder extends RequestBuilder<
+  DelRestrictionPath,
+  undefined,
+  DelRestrictionResp
+> {
+  constructor() {
+    super();
+    this.setUrl(
+      "/academic-calendar/{id}/restrictions/{restrictionId}",
+    ).setMethod(RequestMethod.DELETE);
+  }
+}
+
+export const DelRestrictionMut = mutationOptions({
+  mutationFn: async ({ paths }: { paths: DelRestrictionPath }) => {
+    const res = await new DeleteAcRestrictionBuilder().send({
+      paths: paths,
+    });
+    console.log(res);
+  },
+  onSuccess: () => {
+    getQueryClient().invalidateQueries({
+      queryKey: ["Restrictions"],
+    });
+  },
+});

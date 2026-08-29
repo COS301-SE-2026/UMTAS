@@ -1,6 +1,7 @@
 // uses chain of responsibility and template method
 
 import {
+  DelRestrictionMut,
   RestrictionTypes,
   SingleRestrictionResp,
   UpdateRestrictionMutation,
@@ -9,7 +10,9 @@ import { Input } from "@/components/atoms/baseShadcn/input";
 import { Label } from "@/components/atoms/baseShadcn/label";
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/atoms/baseShadcn/button";
-import { Trash2 } from "lucide-react";
+import { Save, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { Spinner } from "@/components/atoms/baseShadcn/spinner";
 
 abstract class RestrictionHandler {
   protected MyHandletypes: RestrictionTypes[];
@@ -87,34 +90,53 @@ function DateRestrictionHTML({
   resType,
   academicCalendarID,
 }: restrictionProps) {
-  const { mutate: updateMut } = useMutation(UpdateRestrictionMutation);
+  const { mutate: updateMut, isPending: savePending } = useMutation(
+    UpdateRestrictionMutation,
+  );
+  const { mutate: deleteMut, isPending: deletePending } = useMutation({
+    ...DelRestrictionMut,
+  });
 
-  function updateRestrictionDate(date: string) {
+  const [restriction, setRestriction] =
+    useState<SingleRestrictionResp>(resType);
+
+  function save() {
     updateMut({
       body: {
-        description: resType.description,
-        startDate: date,
-        type: resType.type,
+        description: restriction.description,
+        startDate: restriction.startDate,
+        type: restriction.type,
       },
       paths: {
-        restrictionId: resType.id,
+        restrictionId: restriction.id,
         id: academicCalendarID,
+      },
+    });
+  }
+  function deleteRes() {
+    deleteMut({
+      paths: {
+        id: academicCalendarID,
+        restrictionId: restriction.id,
       },
     });
   }
 
   return (
-    <div className="grid grid-cols-3 w-full  items-center justify-items-center gap-4 text-center ">
+    <div className="flex flex-row w-full  items-center justify-items-center gap-4 text-center ">
       <Label className="text-sm font-medium text-[var(--text-secondary)] flex flex-col">
         Selected date
         <Input
-          data-testid="schedules-Date-Input"
+          data-testid="restriction-Date-Input"
           type="date"
-          value={resType.startDate}
+          value={restriction.startDate}
           onChange={(e) => {
             if (e.target.value) {
               {
-                updateRestrictionDate(e.target.value);
+                setRestriction((res) => ({
+                  ...res,
+                  startDate: e.target.value,
+                }));
               }
             }
           }}
@@ -124,13 +146,16 @@ function DateRestrictionHTML({
       <Label className="text-sm font-medium text-[var(--text-secondary)] flex flex-col">
         description
         <Input
-          data-testid="schedules-Date-Input"
+          data-testid="restriction-dsc-Input"
           type="text"
-          value={resType.description}
+          value={restriction.description}
           onChange={(e) => {
             if (e.target.value) {
               {
-                updateRestrictionDate(e.target.value);
+                setRestriction((res) => ({
+                  ...res,
+                  description: e.target.value,
+                }));
               }
             }
           }}
@@ -142,8 +167,8 @@ function DateRestrictionHTML({
         type="button"
         variant="ghost"
         size="icon"
-        onClick={() => {}}
-        disabled={false}
+        onClick={deleteRes}
+        disabled={deletePending}
         className="h-10 w-10 flex-shrink-0 border border-[var(--error-text)] text-[var(--text-secondary)] transition-colors duration-[var(--duration-fast)] hover:border-[var(--error-text)] hover:text-[var(--error-text)] hover:bg-[var(--error-bg)]"
       >
         <Trash2
@@ -151,6 +176,25 @@ function DateRestrictionHTML({
           strokeWidth={1.5}
           className="text-[var(--error-text)]"
         />
+      </Button>
+      <Button
+        id="btn-delete-restriction"
+        type="button"
+        variant="ghost"
+        size="icon"
+        onClick={save}
+        disabled={savePending}
+        className="h-10 w-10 flex-shrink-0 border border-[var(--success-text)] text-[var(--text-secondary)] transition-colors duration-[var(--duration-fast)] hover:border-[var(--success-text)] hover:text-[var(--success-text)] hover:bg-[var(--success-bg)]"
+      >
+        {savePending ? (
+          <Spinner />
+        ) : (
+          <Save
+            size={16}
+            strokeWidth={1.5}
+            className="text-[var(--success-text)]"
+          />
+        )}
       </Button>
     </div>
   );
