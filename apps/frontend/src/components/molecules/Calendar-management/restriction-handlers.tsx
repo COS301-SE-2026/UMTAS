@@ -11,7 +11,7 @@ import { Label } from "@/components/atoms/baseShadcn/label";
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/atoms/baseShadcn/button";
 import { Save, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { Spinner } from "@/components/atoms/baseShadcn/spinner";
 
 abstract class RestrictionHandler {
@@ -34,7 +34,11 @@ abstract class RestrictionHandler {
     academicCalendarID: string,
   ): React.ReactNode {
     if (this.MyHandletypes.includes(resType.type)) {
-      return this.handleHtml(resType, academicCalendarID);
+      return (
+        <RestrictionContainerHtml type={resType.type + " : "}>
+          {this.handleHtml(resType, academicCalendarID)}
+        </RestrictionContainerHtml>
+      );
     } else {
       return this.next?.handle(resType, academicCalendarID);
     }
@@ -84,7 +88,20 @@ interface restrictionProps {
   academicCalendarID: string;
 }
 
-function RestrictionContainerHtml() {}
+interface containerProp {
+  children: ReactNode;
+  type: string;
+}
+function RestrictionContainerHtml({ children, type }: containerProp) {
+  return (
+    <div className="flex flex-col text-left">
+      <h1 className="text-sm font-bold tracking-tight text-[var(--text-secondary)]  ">
+        {type.toLowerCase().replaceAll("_", " ")}
+      </h1>
+      <div className="p-4">{children}</div>
+    </div>
+  );
+}
 
 function DateRestrictionHTML({
   resType,
