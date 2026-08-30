@@ -13,6 +13,7 @@ import { Button } from "@/components/atoms/baseShadcn/button";
 import { Save, Trash2 } from "lucide-react";
 import { ReactNode, useState } from "react";
 import { Spinner } from "@/components/atoms/baseShadcn/spinner";
+import CalCard from "@/components/organisms/Calandar-management/temporary-card";
 
 abstract class RestrictionHandler {
   protected MyHandletypes: RestrictionTypes[];
@@ -94,12 +95,14 @@ interface containerProp {
 }
 function RestrictionContainerHtml({ children, type }: containerProp) {
   return (
-    <div className="flex flex-col text-left">
-      <h1 className="text-sm font-bold tracking-tight text-[var(--text-secondary)]  ">
-        {type.toLowerCase().replaceAll("_", " ")}
-      </h1>
-      <div className="p-4">{children}</div>
-    </div>
+    <CalCard>
+      <div className="flex flex-col text-left ">
+        <h1 className="text-sm font-bold tracking-tight text-[var(--text-secondary)]  ">
+          {type.toLowerCase().replaceAll("_", " ")}
+        </h1>
+        <div className="p-4">{children}</div>
+      </div>
+    </CalCard>
   );
 }
 
