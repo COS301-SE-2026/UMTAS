@@ -3,7 +3,7 @@ import { ApiService } from './ApiService.service';
 import { Test } from '@nestjs/testing';
 
 //Constants
-import { uniId } from 'src/Testing/constants';
+import { courseId, moduleId, uniId, userId } from 'src/Testing/constants';
 
 //MockServices
 import { createMockAdapterRegistryService } from 'src/Testing/Mocks/services/adapterRegistry.mock';
@@ -13,13 +13,28 @@ import { createMockModuleServiceV2 } from 'src/Testing/Mocks/services/module.moc
 import { createMockEventServiceV2 } from 'src/Testing/Mocks/services/event.mock';
 
 //Factories
-import { createUniversity } from 'src/Testing/Factories';
+import {
+  createCourse,
+  createUniversity,
+  createModuleSingleResponseDto,
+  createModule,
+  createEventDto,
+} from 'src/Testing/Factories';
 import { UniversityService } from 'src/University/university.service';
 import { CourseServiceV2 } from 'src/Course/courseV2.service';
 import { ModuleServiceV2 } from 'src/Module/moduleV2.service';
 import { EventServiceV2 } from 'src/Events/eventV2.service';
 import { AdapterRegistry } from './Registry/AdapterRegistry.service';
 import { NWU_Adapter } from './Adapter/NWU/NWU_Adapter';
+import {
+  CourseListResponseDto,
+  CourseSingleResponseDto,
+} from 'src/Course/dto/course.dto';
+import {
+  ModuleListResponseDto,
+  ModuleSingleResponseDto,
+} from 'src/Module/dto/module.dto';
+import { BadRequestException } from '@nestjs/common';
 
 const nwuUni = createUniversity({
   UniversityID: uniId,
@@ -95,6 +110,14 @@ describe('ApiService', () => {
   //Tests
 
   describe('Test_getCourse', () => {
+    //UnHappy - throw Badrequest from getCOurse
+    it('should throw if courseId is invalid', async () => {
+      //Act + Assert
+      await expect(service.getModules(userId, uniId, '   ')).rejects.toThrow(
+        new BadRequestException('Invalid courseID'),
+      );
+    });
+
     //Happy - returns a course
     it('should return a list of courses', async () => {
       // Arrange
@@ -102,13 +125,242 @@ describe('ApiService', () => {
         .spyOn(service['uniService'], 'getById')
         .mockResolvedValue(nwuUni);
 
+      const course1 = createCourse();
+      const course2 = createCourse();
+
+      mockCourseServiceV2.create?.mockResolvedValueOnce(course1);
+      mockCourseServiceV2.create?.mockResolvedValueOnce(course2);
+
+      const expectedResult: CourseListResponseDto = {
+        courses: [course1, course2],
+        message: 'Number of courses returned = [2]',
+      };
+
       // Act
       const result = await service.getCourses(nwuUni.UniversityID, 1, 2);
 
       // Assert
       expect(getUniSpy).toHaveBeenCalledWith(nwuUni.UniversityID);
-      expect(result).toBeDefined();
-      expect(result).toHaveLength(2);
+      expect(result).toMatchObject(expectedResult);
     });
   }); //END_Test_getCourse
+
+  describe('Test_getModules', () => {
+    it('should return a list of modules', async () => {
+      // Arrange
+      const getUniSpy = jest
+        .spyOn(service['uniService'], 'getById')
+        .mockResolvedValue(nwuUni);
+
+      const course = createCourse({
+        CourseID: courseId,
+        CourseName: 'someCourse',
+      });
+
+      const getCourseSpy = jest
+        .spyOn(service['courseService'], 'getById')
+        .mockResolvedValue(course);
+
+      const module1 = createModule();
+      const module2 = createModule();
+
+      const mockModulesFromAdapter = [
+        {
+          UniversityID: uniId,
+          CourseID: courseId,
+          ExternalID: 'MOD1',
+        },
+        {
+          UniversityID: uniId,
+          CourseID: courseId,
+          ExternalID: 'MOD2',
+        },
+      ];
+
+      mockNWUAdapter.getModules = jest
+        .fn()
+        .mockResolvedValue(mockModulesFromAdapter);
+
+      // Mock the moduleService.create to return the created modules
+      const moduleServiceSpy = jest
+        .spyOn(service['moduleService'], 'create')
+        .mockResolvedValueOnce(module1)
+        .mockResolvedValueOnce(module2);
+
+      const modules: ModuleSingleResponseDto[] = [
+        createModuleSingleResponseDto(module1),
+        createModuleSingleResponseDto(module2),
+      ];
+
+      const expectedResult: ModuleListResponseDto = {
+        modules,
+        message: `Modules returned for course[${course.CourseName}] = [${modules.length}]`,
+      };
+
+      // Act
+      const result = await service.getModules(userId, uniId, courseId);
+
+      // Assert
+      expect(getUniSpy).toHaveBeenCalled();
+      expect(getCourseSpy).toHaveBeenCalled();
+      expect(mockNWUAdapter.getModules).toHaveBeenCalled();
+      expect(moduleServiceSpy).toHaveBeenCalledTimes(2);
+
+      expect(result).toMatchObject(expectedResult);
+    });
+  });
+
+  describe('Test_getEvents', () => {
+    it('should throw if moduleID invalid', async () => {
+      //Act + Assert
+      await expect(service.getEvents(userId, uniId, '   ')).rejects.toThrow(
+        new BadRequestException('Invalid moduleID'),
+      );
+    });
+
+    it('should return a list of events', async () => {
+      const getUniSpy = jest
+        .spyOn(service['uniService'], 'getById')
+        .mockResolvedValue(nwuUni);
+
+      const module = createModule({
+        moduleID: moduleId,
+        moduleName: 'someModule',
+      });
+
+      const getModuleSpy = jest
+        .spyOn(service['moduleService'], 'getById')
+        .mockResolvedValue(module);
+
+      const mockEventsFromAdapter = [
+        {
+          UniversityID: uniId,
+          ModuleID: moduleId,
+          EventName: 'Event 1',
+          ActivityCode: 'ACT1',
+          EventCriteria: { key: 'value1' },
+          ExternalID: 'EXT1',
+        },
+        {
+          UniversityID: uniId,
+          ModuleID: moduleId,
+          EventName: 'Event 2',
+          ActivityCode: 'ACT2',
+          EventCriteria: { key: 'value2' },
+          ExternalID: 'EXT2',
+        },
+      ];
+
+      mockNWUAdapter.getEvents = jest
+        .fn()
+        .mockResolvedValue(mockEventsFromAdapter);
+
+      const event1 = createEventDto(
+        {
+          eventId: 'event-1',
+          eventName: 'Event 1',
+          activityCode: 'ACT1',
+        },
+        {},
+      );
+
+      const event2 = createEventDto(
+        {
+          eventId: 'event-2',
+          eventName: 'Event 2',
+          activityCode: 'ACT2',
+        },
+        {},
+      );
+
+      const eventServiceSpy = jest
+        .spyOn(service['eventService'], 'createV2')
+        .mockResolvedValueOnce({ event: event1 })
+        .mockResolvedValueOnce({ event: event2 });
+
+      const result = await service.getEvents(userId, uniId, moduleId);
+
+      expect(getUniSpy).toHaveBeenCalled();
+      expect(getModuleSpy).toHaveBeenCalled();
+      expect(mockNWUAdapter.getEvents).toHaveBeenCalled();
+      expect(eventServiceSpy).toHaveBeenCalledTimes(2);
+      expect(result.events).toHaveLength(2);
+      expect(result.message).toBe(
+        'Events returned for Module[someModule] = [2]',
+      );
+    });
+  });
+
+  describe('Test_getCourseWithModulesAndEvents', () => {
+    it('should return a course with modules and events', async () => {
+      //Arrange
+      const course = createCourse({
+        CourseID: courseId,
+        CourseName: 'someCourse',
+      });
+
+      const getCourseSpy = jest
+        .spyOn(service['courseService'], 'getById')
+        .mockResolvedValue(course);
+
+      const module1 = createModule({
+        moduleID: 'module-1',
+        moduleName: 'Module 1',
+      });
+      const module2 = createModule({
+        moduleID: 'module-2',
+        moduleName: 'Module 2',
+      });
+
+      const modules: ModuleSingleResponseDto[] = [
+        {
+          moduleID: module1.moduleID,
+          moduleCode: module1.moduleCode,
+          moduleName: module1.moduleName,
+          moduleDescription: module1.moduleDescription,
+          ExternalID: module1.ExternalID,
+          validated: module1.validated,
+          Events: [],
+        },
+        {
+          moduleID: module2.moduleID,
+          moduleCode: module2.moduleCode,
+          moduleName: module2.moduleName,
+          moduleDescription: module2.moduleDescription,
+          ExternalID: module2.ExternalID,
+          validated: module2.validated,
+          Events: [],
+        },
+      ];
+
+      const getModulesSpy = jest
+        .spyOn(service, 'getModules')
+        .mockResolvedValue({
+          modules,
+        });
+
+      const getEventsSpy = jest.spyOn(service, 'getEvents').mockResolvedValue({
+        events: [],
+      });
+
+      const expectedResult: CourseSingleResponseDto = {
+        ...course,
+        Modules: modules,
+      };
+
+      //Act
+      const result = await service.getCourseWithModulesAndEvents(
+        userId,
+        uniId,
+        courseId,
+      );
+
+      //Assert
+      expect(getCourseSpy).toHaveBeenCalled();
+      expect(getModulesSpy).toHaveBeenCalled();
+      expect(getEventsSpy).toHaveBeenCalledTimes(2);
+
+      expect(result).toMatchObject(expectedResult);
+    });
+  });
 });

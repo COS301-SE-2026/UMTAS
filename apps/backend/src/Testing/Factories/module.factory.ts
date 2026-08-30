@@ -1,6 +1,10 @@
 import { randomUUID } from 'crypto';
 import { modules, ModuleStyling } from '../../entities';
-import { CourseModuleDto, CreateModuleDto } from '../../Module/dto/module.dto';
+import {
+  CourseModuleDto,
+  CreateModuleDto,
+  ModuleSingleResponseDto,
+} from '../../Module/dto/module.dto';
 
 type Module = typeof modules.$inferSelect;
 
@@ -37,6 +41,14 @@ export function createModuleDto(
     ...overrides,
   };
 } //END_createModuleDto
+
+export function createModuleSingleResponseDto(
+  overrides: Partial<Module> = {},
+): ModuleSingleResponseDto {
+  return {
+    ...createModule(overrides),
+  };
+}
 
 export function createCourseModule(
   overrides: Partial<CourseModuleDto> = {},
