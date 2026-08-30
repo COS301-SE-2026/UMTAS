@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { MapPin, Pentagon, Check, X } from "lucide-react";
 import { Button } from "@/components/atoms/baseShadcn/button";
@@ -18,9 +18,13 @@ import { CreateBuilding } from "@/components/organisms/map/CreateBuilding";
 
 interface AdminDrawControlsProps {
   buildings: BuildingType[];
+  onModeChange: (mode: "none" | "draw" | "pin") => void;
 }
 
-export function AdminDrawControls({ buildings }: AdminDrawControlsProps) {
+export function AdminDrawControls({
+  buildings,
+  onModeChange,
+}: AdminDrawControlsProps) {
   const [selectedBuildingId, setSelectedBuildingId] = useState<string>("");
   //from my little hook(er)
   const {
@@ -32,6 +36,10 @@ export function AdminDrawControls({ buildings }: AdminDrawControlsProps) {
     finishDrawing,
     toGeoJSON,
   } = useBuildingDraw();
+
+  useEffect(() => {
+    onModeChange(mode);
+  }, [mode, onModeChange]);
 
   const { mutate, isPending } = useMutation(updateBuildingLocationMut());
 

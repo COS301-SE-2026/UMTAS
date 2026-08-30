@@ -18,6 +18,8 @@ import {
 } from "@/components/atoms/baseShadcn/sheet";
 import NoRoleSelected from "@/components/molecules/roleManagement/NoRoleSelected";
 import { AdminDrawControls } from "@/components/organisms/map/AdminDrawControls";
+import { RouteLine } from "@/components/organisms/map/RouteLine";
+import { getActiveRouteQ } from "../../../../utilities/route/routeQueries";
 
 interface GeoJsonPolygon {
   type: "Polygon";
@@ -58,11 +60,34 @@ export function UniMap() {
   const [selectedBuilding, setSelectedBuilding] = useState<BuildingType | null>(
     null,
   );
+  const [adminMode, setAdminMode] = useState<"none" | "draw" | "pin">("none");
+  const [selectedDate, setSelectedDate] = useState(() =>
+    new Date().toISOString().slice(0, 10),
+  );
+  //this needs to be in a very specific format. Looks super complicated, but the backend cries when I don't send the request in this format
+  const [selectedTime, setSelectedTime] = useState(() => {
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+    return `${hours}:${minutes}`;
+  });
   const { data: buildings = [] } = useQuery(getAllBuildingsQ());
+  //console.log("active route query:", { selectedDate, selectedTime });
+  const { data: activeRoute } = useQuery(
+    getActiveRouteQ({ date: selectedDate, time: selectedTime }),
+  );
   const role = UserDetails.getUniDetails()?.role;
   const isAssignedRole = role != null;
 
   const canUserDraw = role === "UNIVERSITY_ADMIN";
+
+  //new system for admins so that they don't do multiple things with one click
+  function handleMarkerClick(building: BuildingType) {
+    if (adminMode != "none") {
+      return;
+    }
+    setSelectedBuilding(building);
+  }
 
   if (!isAssignedRole) {
     return <NoRoleSelected />;
@@ -70,6 +95,30 @@ export function UniMap() {
 
   return (
     <div className="flex-1 flex flex-col bg-[var(--bg-base)] mx-4 gap-4">
+      <div className="flex items-center gap-4 rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] p-4">
+        <input
+          type="date"
+          value={selectedDate}
+          onChange={(e) => setSelectedDate(e.target.value)}
+        />
+        <input
+          type="time"
+          value={selectedTime}
+          onChange={(e) => setSelectedTime(e.target.value)}
+          className="text-sm"
+        />
+        {activeRoute?.status === "AT_VENUE" && (
+          <span className="text-sm text-[var(--text-secondary)]">
+            At {activeRoute.fromEventName}
+          </span>
+        )}
+        {activeRoute?.status === "MOVING" && (
+          <span className="text-sm text-[var(--text-secondary)]">
+            Walking from {activeRoute.fromEventName} to{" "}
+            {activeRoute.toEventName}
+          </span>
+        )}
+      </div>
       <div className="flex-1 overflow-hidden">
         <MapScreen onRequestMapSetup={() => router.push("/mapping/config")}>
           {buildings.map((building) => (
@@ -78,11 +127,13 @@ export function UniMap() {
                 <AdvancedMarker
                   position={building.location}
                   title={building.buildingName}
-                  onClick={() => setSelectedBuilding(building)}
+                  onClick={() => handleMarkerClick(building)}
                 >
                   <Pin
                     background={
-                      building.displayColour || "var(--btn-primary-bg)"
+                      building.buildingId === activeRoute?.currentBuildingId
+                        ? "var(--success-text)"
+                        : building.displayColour || "var(--btn-primary-bg)"
                     }
                     scale={building.venueCount === 0 ? 0.85 : 1}
                   />
@@ -91,9 +142,23 @@ export function UniMap() {
               {building.footprint && <BuildingFootprint building={building} />}
             </div>
           ))}
+          {/* Ugly as can be, fix this */}
+          {activeRoute?.status === "MOVING" && activeRoute.route && (
+            <RouteLine
+              path={
+                activeRoute.route.pathCoordinates as unknown as {
+                  lat: number;
+                  lng: number;
+                }[]
+              }
+              colour={activeRoute.route.displayColour}
+            />
+          )}
         </MapScreen>
       </div>
-      {canUserDraw && <AdminDrawControls buildings={buildings} />}
+      {canUserDraw && (
+        <AdminDrawControls buildings={buildings} onModeChange={setAdminMode} />
+      )}
 
       <Sheet
         open={!!selectedBuilding}
