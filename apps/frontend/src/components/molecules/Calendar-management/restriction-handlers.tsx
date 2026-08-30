@@ -45,7 +45,7 @@ export abstract class RestrictionHandler {
           availableTypes={this.MyHandletypes}
           academicCalendarID={academicCalendarID}
         >
-          {this.handleHtml(resType, academicCalendarID)}
+          {this.handleHtml(resType, academicCalendarID, onSave)}
         </RestrictionContainerHtml>
       );
     } else {
