@@ -113,7 +113,8 @@ function DateRestrictionHTML({
       },
     });
   }
-
+  const minDate = `${academicCalendarID.year}-01-01`;
+  const maxDate = `${academicCalendarID.year}-12-31`;
   return (
     <div className="flex flex-row gap-x-5 w-full  items-center justify-between    text-center ">
       <div className="grid grid-rows-2 w-full gap-y-2">
@@ -123,6 +124,8 @@ function DateRestrictionHTML({
             data-testid="restriction-Date-Input"
             type="date"
             value={restriction.startDate}
+            min={minDate}
+            max={maxDate}
             onChange={(e) => {
               if (e.target.value) {
                 {

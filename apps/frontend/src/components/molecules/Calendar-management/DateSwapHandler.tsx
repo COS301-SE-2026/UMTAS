@@ -135,7 +135,8 @@ function DateSwapHtml({
       },
     });
   }
-
+  const minDate = `${academicCalendarID.year}-01-01`;
+  const maxDate = `${academicCalendarID.year}-12-31`;
   return (
     <div className="flex flex-row w-full   items-center justify-items-center gap-6 text-center ">
       <div className="w-full flex flex-col gap-y-2">
@@ -146,6 +147,8 @@ function DateSwapHtml({
               data-testid="restriction-Date-Input"
               type="date"
               value={restriction.startDate}
+              min={minDate}
+              max={maxDate}
               onChange={(e) => {
                 if (e.target.value) {
                   {
