@@ -8,7 +8,7 @@ import { EventDto, EventListResponseDto } from 'src/Events/dto/EventDto.dto';
 import { ModuleListResponseDto, ModulesDto } from 'src/Module/dto/module.dto';
 import { UniversityDto } from 'src/University/dto/university.dto';
 import { UniversityService } from 'src/University/university.service';
-import { AdapterRegistry } from './Registry/AdapterRegistry';
+import { AdapterRegistry } from './Registry/AdapterRegistry.service';
 import { EventServiceV2 } from 'src/Events/eventV2.service';
 import { ModuleServiceV2 } from 'src/Module/moduleV2.service';
 import { CourseServiceV2 } from 'src/Course/courseV2.service';
