@@ -107,21 +107,14 @@ The Traceability Matrices for the functional requirements to use cases can be fo
 ??? info "**FR 3 — Analytics, Lecturer, Alert & Attendance Systems**"
 
     ### R3.1 Analytics System
-
-    - **R3.1.1** The system will provide statistical analysis tools for admins and lecturers of supported universities.
-        - **R3.1.1.1** The system shall provide statistical analysis tools centred around attendance.
-            - **R3.1.1.1.1** The system shall allow university admins and lecturers to view submitted students for a module time slot.
-            - **R3.1.1.1.2** The system shall allow university admins and lecturers to view actual attendance for a module time slot.
-            - **R3.1.1.1.3** The system shall allow university admins and lecturers to view projected attendance.
-        - **R3.1.1.2** The system shall provide statistical analysis tools centred around visualisation.
-            - **R3.1.1.2.1** The system shall provide statistical heat‑map tools based on venues in the university of logged modules.
-            - **R3.1.1.2.2** The system shall provide statistical graphing tools based on attendance of events for projected, actual, and submitted attendance types.
-            - **R3.1.1.2.3** The system shall provide statistical graphing tools based on bookings of events by date.
-        - **R3.1.1.3** The system shall provide statistical analysis tools centred around lecturer performance.
-            - **R3.1.1.3.1** The system shall allow university admins and lecturers to view aggregated attendance trends attributable to a lecturer's sessions.
-            - **R3.1.1.3.2** The system shall allow university admins and lecturers to view a lecturer's teaching load across their modules.
-            - **R3.1.1.3.3** The system shall allow university admins and lecturers to view comparative lecturer statistics over time.
-            - **R3.1.1.3.4** The system shall restrict lecturers to viewing analytics for their own modules only, while allowing admins to view analytics for any lecturer.
+    - **R3.1.1** The system shall provide the number of Modules per Course, for Courses within a University.
+    - **R3.1.2** The system shall provide the number of Events per Module, for Modules within a Course.
+    - **R3.1.3** The system shall provide the number of students who have submitted attendance per Event, for Events within a Module.
+    - **R3.1.4** The system shall provide the attendance detail for a specific Event, comprising the students who have submitted attendance for it.
+    - **R3.1.5** The system shall provide the number of Events per Venue, over a given period.
+    - **R3.1.6** The system shall provide Lecturer statistics.
+        - **R3.1.6.1** The system shall provide the number of Events taught by a Lecturer.
+        - **R3.1.6.2** The system shall provide attendance statistics for a Lecturer's Events.
 
     ### R3.2 Lecturer Adjustment System
 
