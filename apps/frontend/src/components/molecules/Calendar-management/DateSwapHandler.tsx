@@ -10,6 +10,7 @@ import {
   UpdateRestrictionMutation,
   DelRestrictionMut,
   RestrictionDays,
+  CreateRestrictionMutation,
 } from "../../../../utilities/Calendar-Builders/RestrictionManagement";
 import { Label } from "@/components/atoms/baseShadcn/label";
 import { RestrictionHandler, restrictionProps } from "./restriction-handlers";
@@ -20,6 +21,7 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/atoms/baseShadcn/select";
+import { CreateAcMutation } from "../../../../utilities/Calendar-Builders/CalendarManagement";
 
 export const EnumDays: RestrictionDays[] = [
   "MONDAY",
@@ -42,37 +44,62 @@ export class DateSwapHandler extends RestrictionHandler {
   handleHtml(
     resType: SingleRestrictionResp,
     academicCalendarID: string,
+    onSave?: () => void,
   ): React.ReactNode {
     return (
-      <DateSwapHtml resType={resType} academicCalendarID={academicCalendarID} />
+      <DateSwapHtml
+        resType={resType}
+        academicCalendarID={academicCalendarID}
+        onSave={onSave}
+      />
     );
   }
 }
 
-function DateSwapHtml({ resType, academicCalendarID }: restrictionProps) {
+function DateSwapHtml({
+  resType,
+  academicCalendarID,
+  onSave,
+}: restrictionProps) {
   const { mutate: updateMut, isPending: savePending } = useMutation(
     UpdateRestrictionMutation,
   );
   const { mutate: deleteMut, isPending: deletePending } = useMutation({
     ...DelRestrictionMut,
   });
+  const { mutate: CreateRestriction } = useMutation(CreateRestrictionMutation);
 
   const [restriction, setRestriction] =
     useState<SingleRestrictionResp>(resType);
 
   function save() {
-    updateMut({
-      body: {
-        description: restriction.description,
-        startDate: restriction.startDate,
-        type: restriction.type,
-        replacementWeekday: restriction.replacementWeekday ?? undefined,
-      },
-      paths: {
-        restrictionId: restriction.id,
-        id: academicCalendarID,
-      },
-    });
+    if (restriction.id !== "")
+      updateMut({
+        body: {
+          description: restriction.description,
+          startDate: restriction.startDate,
+          type: restriction.type,
+          replacementWeekday: restriction.replacementWeekday ?? undefined,
+        },
+        paths: {
+          restrictionId: restriction.id,
+          id: academicCalendarID,
+        },
+      });
+    else {
+      CreateRestriction({
+        body: {
+          description: restriction.description,
+          startDate: restriction.startDate,
+          type: restriction.type,
+          replacementWeekday: restriction.replacementWeekday ?? undefined,
+        },
+        paths: {
+          id: academicCalendarID,
+        },
+      });
+      onSave?.();
+    }
   }
   function deleteRes() {
     deleteMut({
@@ -160,6 +187,7 @@ function DateSwapHtml({ resType, academicCalendarID }: restrictionProps) {
           id="btn-delete-restriction"
           type="button"
           variant="ghost"
+          hidden={restriction.id == ""}
           size="icon"
           onClick={deleteRes}
           disabled={deletePending}

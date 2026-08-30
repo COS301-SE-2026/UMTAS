@@ -25,7 +25,7 @@ export class CreateAcRestrictionBuilder extends RequestBuilder<
   }
 }
 
-export const CreateAcMutation = mutationOptions({
+export const CreateRestrictionMutation = mutationOptions({
   mutationFn: ({
     body,
     paths,

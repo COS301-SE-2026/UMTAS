@@ -9,6 +9,7 @@ import {
   SingleRestrictionResp,
   UpdateRestrictionMutation,
   DelRestrictionMut,
+  CreateRestrictionMutation,
 } from "../../../../utilities/Calendar-Builders/RestrictionManagement";
 import { Label } from "@/components/atoms/baseShadcn/label";
 import { RestrictionHandler, restrictionProps } from "./restriction-handlers";
@@ -27,11 +28,13 @@ export class DateOnlyHanlder extends RestrictionHandler {
   handleHtml(
     resType: SingleRestrictionResp,
     academicCalendarID: string,
+    onSave?: () => void,
   ): React.ReactNode {
     return (
       <DateRestrictionHTML
         resType={resType}
         academicCalendarID={academicCalendarID}
+        onSave={onSave}
       />
     );
   }
@@ -40,6 +43,7 @@ export class DateOnlyHanlder extends RestrictionHandler {
 function DateRestrictionHTML({
   resType,
   academicCalendarID,
+  onSave,
 }: restrictionProps) {
   const { mutate: updateMut, isPending: savePending } = useMutation(
     UpdateRestrictionMutation,
@@ -47,23 +51,39 @@ function DateRestrictionHTML({
   const { mutate: deleteMut, isPending: deletePending } = useMutation({
     ...DelRestrictionMut,
   });
+  const { mutate: CreateRestriction } = useMutation(CreateRestrictionMutation);
 
   const [restriction, setRestriction] =
     useState<SingleRestrictionResp>(resType);
 
   function save() {
-    updateMut({
-      body: {
-        description: restriction.description,
-        startDate: restriction.startDate,
-        type: restriction.type,
-      },
-      paths: {
-        restrictionId: restriction.id,
-        id: academicCalendarID,
-      },
-    });
+    if (restriction.id !== "")
+      updateMut({
+        body: {
+          description: restriction.description,
+          startDate: restriction.startDate,
+          type: restriction.type,
+        },
+        paths: {
+          restrictionId: restriction.id,
+          id: academicCalendarID,
+        },
+      });
+    else {
+      CreateRestriction({
+        body: {
+          description: restriction.description,
+          startDate: restriction.startDate,
+          type: restriction.type,
+        },
+        paths: {
+          id: academicCalendarID,
+        },
+      });
+      onSave?.();
+    }
   }
+
   function deleteRes() {
     deleteMut({
       paths: {

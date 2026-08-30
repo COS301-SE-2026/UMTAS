@@ -36,6 +36,7 @@ export abstract class RestrictionHandler {
   public handle(
     resType: SingleRestrictionResp,
     academicCalendarID: string,
+    onSave?: () => void,
   ): React.ReactNode {
     if (this.MyHandletypes.includes(resType.type)) {
       return (
@@ -48,13 +49,14 @@ export abstract class RestrictionHandler {
         </RestrictionContainerHtml>
       );
     } else {
-      return this.next?.handle(resType, academicCalendarID);
+      return this.next?.handle(resType, academicCalendarID, onSave);
     }
   }
 
   abstract handleHtml(
     resType: SingleRestrictionResp,
     academicCalendarID: string,
+    onSave?: () => void,
   ): React.ReactNode; // returns the self managing elements
 }
 interface containerProp {
@@ -133,6 +135,7 @@ function RestrictionContainerHtml({
 export interface restrictionProps {
   resType: SingleRestrictionResp;
   academicCalendarID: string;
+  onSave?: () => void;
 }
 
 /*
