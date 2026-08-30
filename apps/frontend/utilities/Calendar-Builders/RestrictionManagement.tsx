@@ -83,7 +83,8 @@ export const UpdateRestrictionMutation = mutationOptions({
       body: body,
     });
   },
-  onSuccess: () => {
+  onSuccess: (result) => {
+    console.log(result);
     getQueryClient().invalidateQueries({
       queryKey: ["Restrictions"],
     });

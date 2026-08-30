@@ -1,19 +1,22 @@
 // uses chain of responsibility and template method
 
 import {
-  DelRestrictionMut,
   RestrictionTypes,
   SingleRestrictionResp,
   UpdateRestrictionMutation,
 } from "../../../../utilities/Calendar-Builders/RestrictionManagement";
-import { Input } from "@/components/atoms/baseShadcn/input";
-import { Label } from "@/components/atoms/baseShadcn/label";
-import { useMutation } from "@tanstack/react-query";
-import { Button } from "@/components/atoms/baseShadcn/button";
-import { Save, Trash2 } from "lucide-react";
+
 import { ReactNode, useState } from "react";
-import { Spinner } from "@/components/atoms/baseShadcn/spinner";
+
 import CalCard from "@/components/organisms/Calandar-management/temporary-card";
+import {
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+  Select,
+} from "@/components/atoms/baseShadcn/select";
+import { useMutation } from "@tanstack/react-query";
 
 export abstract class RestrictionHandler {
   protected MyHandletypes: RestrictionTypes[];
@@ -36,7 +39,11 @@ export abstract class RestrictionHandler {
   ): React.ReactNode {
     if (this.MyHandletypes.includes(resType.type)) {
       return (
-        <RestrictionContainerHtml type={resType.type + " : "}>
+        <RestrictionContainerHtml
+          res={resType}
+          availableTypes={this.MyHandletypes}
+          academicCalendarID={academicCalendarID}
+        >
           {this.handleHtml(resType, academicCalendarID)}
         </RestrictionContainerHtml>
       );
@@ -52,14 +59,68 @@ export abstract class RestrictionHandler {
 }
 interface containerProp {
   children: ReactNode;
-  type: string;
+  res: SingleRestrictionResp;
+  availableTypes: RestrictionTypes[];
+  academicCalendarID: string;
 }
-function RestrictionContainerHtml({ children, type }: containerProp) {
+
+function RestrictionContainerHtml({
+  children,
+  res,
+  availableTypes,
+  academicCalendarID,
+}: containerProp) {
+  function toRead(str: string) {
+    str = str.toLocaleLowerCase().replaceAll("_", " ");
+    return str;
+  }
+  function toEnum(str: string) {
+    return str.toUpperCase().replaceAll(" ", "_");
+  }
+
+  const [restriction, setRestriction] = useState<SingleRestrictionResp>(res);
+
+  const { mutate: updateMut } = useMutation(UpdateRestrictionMutation);
+
+  function save(updated: string) {
+    updateMut({
+      body: {
+        description: restriction.description,
+        startDate: restriction.startDate,
+        type: updated as RestrictionTypes,
+      },
+      paths: {
+        restrictionId: restriction.id,
+        id: academicCalendarID,
+      },
+    });
+  }
   return (
-    <div className="flex flex-col text-left ">
-      <h1 className="text-sm font-bold tracking-tight text-[var(--text-secondary)]  ">
-        {type.toLowerCase().replaceAll("_", " ")}
-      </h1>
+    <div className="flex flex-col text-left  ">
+      <Select
+        value={restriction.type}
+        onValueChange={async (e) => {
+          setRestriction((res) => ({
+            ...res,
+            type: toEnum(e) as RestrictionTypes,
+          }));
+          save(toEnum(e));
+        }}
+      >
+        <SelectTrigger
+          id="select-year"
+          className="capitalize w-40 bg-[var(--background)]"
+        >
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {availableTypes.map((type, idx) => (
+            <SelectItem key={idx} value={type}>
+              {toRead(type)}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
       <CalCard>
         <div className="p-4">{children}</div>
       </CalCard>

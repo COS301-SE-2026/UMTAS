@@ -12,7 +12,6 @@ import {
 } from "../../../../utilities/Calendar-Builders/RestrictionManagement";
 import { Label } from "@/components/atoms/baseShadcn/label";
 import { RestrictionHandler, restrictionProps } from "./restriction-handlers";
-
 export class RangeDayHandler extends RestrictionHandler {
   constructor() {
     super(["EXAM_PERIOD", "SUPP_WEEK", "TEST_WEEK", "HOLIDAY", "RECESS"]);
