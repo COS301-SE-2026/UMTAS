@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, isNull } from 'drizzle-orm';
 import {
   AcademicCalendar,
   CalendarRestriction,
@@ -13,6 +13,10 @@ import {
 } from '../framework/contracts';
 import type { AuthenticationStepOutput } from './authentication.step';
 import type { PersonalEventOutput } from './event.step';
+import {
+  authenticateRealActor,
+  type VerificationRequestResolver,
+} from '../framework/session/real-auth';
 import {
   expectObject,
   expectStatus,
@@ -120,6 +124,13 @@ export function universityAdminSelectionStep<TPlan>(
 export type AcademicCalendarLifecyclePlan = {
   readonly adminSelectionKey: FlowKey<UniversityAdminSelectionOutput>;
   readonly eventKey: FlowKey<PersonalEventOutput>;
+  readonly isolationUniversityKey: FlowKey<UniversityOutput>;
+  readonly isolationStudent: {
+    readonly email: string;
+    readonly password: string;
+    readonly name: string;
+    readonly resolveVerificationRequest: VerificationRequestResolver;
+  };
   readonly calendarYear: number;
 };
 
@@ -149,10 +160,11 @@ export function academicCalendarLifecycleStep<TPlan>(
       const plan = select(context.plan);
       const adminSelection = context.require(plan.adminSelectionKey);
       const event = context.require(plan.eventKey);
+      const isolationUniversity = context.require(plan.isolationUniversityKey);
       const administrator = await actor(context);
       const year = String(plan.calendarYear);
       const daySwapDate = `${year}-08-14`;
-      const subscribedHolidayDate = `${year}-09-15`;
+      const subscribedHolidayDate = `${year}-09-24`;
       const weekdays = [
         'sunday',
         'monday',
@@ -169,21 +181,17 @@ export function academicCalendarLifecycleStep<TPlan>(
           ? 'TUESDAY'
           : 'MONDAY';
 
-      const [publicCalendar] = await context.runtime.database
-        .insert(AcademicCalendar)
-        .values({
-          universityId: null,
-          name: 'Integration Public Holidays',
-          year: plan.calendarYear,
-        })
-        .returning();
-      await context.runtime.database.insert(CalendarRestriction).values({
-        academicCalendarId: publicCalendar.id,
-        type: 'PUBLIC_HOLIDAY',
-        startDate: subscribedHolidayDate,
-        endDate: subscribedHolidayDate,
-        description: 'Integration Public Holiday',
-      });
+      const publicCalendars = await context.runtime.database
+        .select()
+        .from(AcademicCalendar)
+        .where(
+          and(
+            isNull(AcademicCalendar.universityId),
+            eq(AcademicCalendar.year, plan.calendarYear),
+          ),
+        );
+      assert.equal(publicCalendars.length, 1);
+      const publicCalendar = publicCalendars[0];
 
       const created = await administrator.request.post('/academic-calendar', {
         json: { year: plan.calendarYear },
@@ -466,6 +474,71 @@ export function academicCalendarLifecycleStep<TPlan>(
       expectStatus(retrievedSnapshot, 200, 'retrieve generated calendar');
       expectObject(retrievedSnapshot.body, 'retrieve generated calendar');
       assert.deepEqual(retrievedSnapshot.body, generated.body);
+
+      const isolationStudent = context.actor('calendar-isolation-student');
+      await authenticateRealActor(
+        isolationStudent,
+        plan.isolationStudent,
+        plan.isolationStudent.resolveVerificationRequest,
+      );
+      const isolationSession = isolationStudent.session();
+      assert.equal(isolationSession.strategy, 'real-auth');
+      assert.ok(isolationSession.userId);
+      for (const UniversityID of [
+        adminSelection.universityId,
+        isolationUniversity.UniversityID,
+      ]) {
+        const application = await isolationStudent.request.post(
+          '/universities/apply',
+          { json: { UniversityID, role: 'STUDENT' } },
+        );
+        expectStatus(application, 201, 'apply isolation student to university');
+      }
+      await context.runtime.database
+        .update(UniversityRole)
+        .set({ role: 'UNIVERSITY_ADMIN' })
+        .where(
+          and(
+            eq(UniversityRole.UserID, isolationSession.userId),
+            eq(UniversityRole.UniversityID, isolationUniversity.UniversityID),
+          ),
+        );
+
+      const selectedOwningUniversity = await isolationStudent.request.post(
+        '/auth/select-university',
+        { json: { uniId: adminSelection.universityId } },
+      );
+      expectStatus(
+        selectedOwningUniversity,
+        [200, 201],
+        'select snapshot university as another student',
+      );
+      const otherStudentSnapshot = await isolationStudent.request.get(
+        `/academic-calendar/generated/${generatedCalendarId}`,
+      );
+      expectStatus(
+        otherStudentSnapshot,
+        404,
+        'hide generated snapshot from another student',
+      );
+
+      const selectedOtherUniversity = await isolationStudent.request.post(
+        '/auth/select-university',
+        { json: { uniId: isolationUniversity.UniversityID } },
+      );
+      expectStatus(
+        selectedOtherUniversity,
+        [200, 201],
+        'select another university as administrator',
+      );
+      const crossUniversityCalendar = await isolationStudent.request.get(
+        `/academic-calendar/${calendarId}`,
+      );
+      expectStatus(
+        crossUniversityCalendar,
+        404,
+        'hide calendar from another university',
+      );
 
       const [calendars, restrictions, snapshots] = await Promise.all([
         context.runtime.database

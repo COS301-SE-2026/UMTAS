@@ -8,6 +8,7 @@ import { UniRolesSeedService } from './seeding/services/universityRoles.seed.ser
 import { UserSeedService } from './seeding/services/users.seed.service';
 import { SeedPersistenceService } from './seeding/seed-persistence.service';
 import { AcademicCalendarSeedService } from './seeding/services/academic-calendar.seed.service';
+import { PublicCalendarSeedService } from './seeding/services/public-calendar.seed.service';
 
 @Global()
 @Module({
@@ -20,6 +21,7 @@ import { AcademicCalendarSeedService } from './seeding/services/academic-calenda
     UniRolesSeedService,
     UserSeedService,
     SeedPersistenceService,
+    PublicCalendarSeedService,
     AcademicCalendarSeedService,
   ],
   exports: [DatabaseService, SeedPersistenceService],
