@@ -138,6 +138,10 @@ export interface restrictionProps {
   onSave?: () => void;
 }
 
+export type errorManagement = {
+  error: string;
+  isError: boolean;
+};
 /*
 (alias) type RestrictionTypes = "SEMESTER_1_START"
 | "SEMESTER_1_END" | "SEMESTER_2_START"
