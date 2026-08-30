@@ -19,6 +19,7 @@ export function createDbChain<T>(result: T) {
     'execute',
     'onConflictDoNothing',
     'for',
+    'orderBy',
   ];
 
   chainable.forEach((method) => {

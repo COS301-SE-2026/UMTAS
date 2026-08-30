@@ -196,8 +196,7 @@ export class ModuleServiceV2 extends ModuleService {
     }
   }
 
-  //getAllV2, overwrite
-
+  //getAll, overwrite
   async getAll(
     userId: string,
     filters: ModuleFiltersDtoV2,
