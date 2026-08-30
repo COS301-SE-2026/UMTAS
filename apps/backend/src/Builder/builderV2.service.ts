@@ -80,8 +80,6 @@ export class BuilderServiceV2 extends BuilderService {
       }); //END_transaction
     }
 
-    console.log('Hallo');
-
     const course = await this.doUserUniCourseCheck(userId, tx);
 
     return await this.getOrCreatePersonalModule(userId, course, tx);
@@ -128,14 +126,8 @@ export class BuilderServiceV2 extends BuilderService {
   protected async getOrCreatePersonalModule(
     userId: string,
     course: CourseDto,
-    tx?: AppDatabase,
+    tx: AppDatabase,
   ): Promise<ModulesDto> {
-    if (!tx) {
-      return this.dbService.db.transaction(async (t: AppDatabase) => {
-        return this.getOrCreatePersonalModule(userId, course, t);
-      }); //END_transaction
-    }
-
     //Check if personal module already exists
     let module = (
       await this.moduleService.getAll(
