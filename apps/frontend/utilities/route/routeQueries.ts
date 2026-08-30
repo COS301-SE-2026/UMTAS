@@ -24,11 +24,9 @@ export function getRouteQ(query: getRouteQuery) {
 
 export function getActiveRouteQ(query: getActiveRouteQuery) {
   return queryOptions({
-    queryKey: ["routes", '"active', query.date, query.time] as const,
+    queryKey: ["routes", "active", query.date, query.time] as const,
     queryFn: async () => {
-      const result = (await new getActiveRouteBuilder().send({ paths: query }))
-        .route;
-
+      const result = await new getActiveRouteBuilder().send({ paths: query });
       return result;
     },
   });
