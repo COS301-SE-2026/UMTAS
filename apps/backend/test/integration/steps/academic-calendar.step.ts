@@ -461,7 +461,7 @@ export function academicCalendarLifecycleStep<TPlan>(
       const generatedCalendarId = generated.body.id;
 
       const retrievedSnapshot = await administrator.request.get(
-        `/academic-calendar/generate/${generatedCalendarId}`,
+        `/academic-calendar/generated/${generatedCalendarId}`,
       );
       expectStatus(retrievedSnapshot, 200, 'retrieve generated calendar');
       expectObject(retrievedSnapshot.body, 'retrieve generated calendar');

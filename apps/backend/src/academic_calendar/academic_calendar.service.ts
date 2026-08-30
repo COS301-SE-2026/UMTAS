@@ -23,8 +23,8 @@ import {
   UniversityEvent,
   UserTimetable,
   Venue,
-  type Weekday,
 } from '../entities';
+import { weekdayForDate } from '../entities/AcademicCalendar/date.utils';
 import {
   AcademicCalendarDto,
   CalendarRestrictionDto,
@@ -50,6 +50,17 @@ const PUBLIC_CALENDAR_RESTRICTION_TYPES = [
   'HOLIDAY',
   'UNIVERSITY_CLOSURE',
 ] as const;
+const SEMESTER_BOUNDARY_TYPES = [
+  'SEMESTER_1_START',
+  'SEMESTER_1_END',
+  'SEMESTER_2_START',
+  'SEMESTER_2_END',
+] as const;
+type SemesterBoundaryType = (typeof SEMESTER_BOUNDARY_TYPES)[number];
+type RestrictionForValidation = Pick<
+  CalendarRestrictionRecord,
+  'id' | 'type' | 'startDate' | 'endDate'
+>;
 
 @Injectable()
 export class AcademicCalendarService {
@@ -95,6 +106,21 @@ export class AcademicCalendarService {
     year?: number,
   ): Promise<AcademicCalendarDto[]> {
     const conditions = [eq(AcademicCalendar.universityId, universityId)];
+    if (year !== undefined) {
+      conditions.push(eq(AcademicCalendar.year, year));
+    }
+
+    const calendars = await this.databaseService.db
+      .select()
+      .from(AcademicCalendar)
+      .where(and(...conditions))
+      .orderBy(desc(AcademicCalendar.year));
+
+    return calendars.map((calendar) => this.toCalendarDto(calendar));
+  }
+
+  async listPublicCalendars(year?: number): Promise<AcademicCalendarDto[]> {
+    const conditions = [isNull(AcademicCalendar.universityId)];
     if (year !== undefined) {
       conditions.push(eq(AcademicCalendar.year, year));
     }
@@ -162,6 +188,12 @@ export class AcademicCalendarService {
   ): Promise<CalendarRestrictionDto> {
     const calendar = await this.findCalendar(universityId, academicCalendarId);
     const values = this.normalizeRestriction(dto, calendar.year);
+    const existing =
+      await this.findRestrictionsForValidation(academicCalendarId);
+    this.validateSemesterInvariants(existing, [
+      ...existing,
+      { id: '__new__', ...values },
+    ]);
 
     try {
       const [created] = await this.databaseService.db
@@ -191,6 +223,19 @@ export class AcademicCalendarService {
   ): Promise<CalendarRestrictionDto> {
     const calendar = await this.findCalendar(universityId, academicCalendarId);
     const values = this.normalizeRestriction(dto, calendar.year);
+    const existing =
+      await this.findRestrictionsForValidation(academicCalendarId);
+    if (!existing.some((restriction) => restriction.id === restrictionId)) {
+      this.throwRestrictionNotFound(restrictionId);
+    }
+    this.validateSemesterInvariants(
+      existing,
+      existing.map((restriction) =>
+        restriction.id === restrictionId
+          ? { id: restrictionId, ...values }
+          : restriction,
+      ),
+    );
 
     try {
       const [updated] = await this.databaseService.db
@@ -220,6 +265,15 @@ export class AcademicCalendarService {
     restrictionId: string,
   ): Promise<DeleteCalendarRestrictionResponseDto> {
     await this.findCalendar(universityId, academicCalendarId);
+    const existing =
+      await this.findRestrictionsForValidation(academicCalendarId);
+    if (!existing.some((restriction) => restriction.id === restrictionId)) {
+      this.throwRestrictionNotFound(restrictionId);
+    }
+    this.validateSemesterInvariants(
+      existing,
+      existing.filter((restriction) => restriction.id !== restrictionId),
+    );
 
     const [deleted] = await this.databaseService.db
       .delete(CalendarRestriction)
@@ -291,7 +345,7 @@ export class AcademicCalendarService {
   ): Promise<GeneratedCalendarDto> {
     const calendar = await this.findCalendarForYear(
       universityId,
-      this.currentYear(),
+      dto.year ?? this.currentYear(),
     );
     const timetable = await this.findOwnedTimetable(userId, dto.timetableId);
     const restrictions = await this.resolveRestrictions(calendar);
@@ -312,6 +366,13 @@ export class AcademicCalendarService {
         academicCalendarId: calendar.id,
         timetableId: timetable.timetableID,
         payload,
+      })
+      .onConflictDoUpdate({
+        target: [
+          GeneratedCalendar.academicCalendarId,
+          GeneratedCalendar.timetableId,
+        ],
+        set: { payload, createdAt: new Date() },
       })
       .returning();
 
@@ -560,7 +621,7 @@ export class AcademicCalendarService {
           'DAY_SWAP requires replacementWeekday and must target one date',
         );
       }
-      if (this.weekdayForDate(dto.startDate) === dto.replacementWeekday) {
+      if (weekdayForDate(dto.startDate) === dto.replacementWeekday) {
         throw new ConflictException(
           'A day swap must use a different weekday pattern',
         );
@@ -580,17 +641,77 @@ export class AcademicCalendarService {
     };
   }
 
-  private weekdayForDate(date: string): Weekday {
-    const weekdays: Weekday[] = [
-      'SUNDAY',
-      'MONDAY',
-      'TUESDAY',
-      'WEDNESDAY',
-      'THURSDAY',
-      'FRIDAY',
-      'SATURDAY',
-    ];
-    return weekdays[new Date(`${date}T00:00:00Z`).getUTCDay()];
+  private async findRestrictionsForValidation(
+    academicCalendarId: string,
+  ): Promise<RestrictionForValidation[]> {
+    return this.databaseService.db
+      .select({
+        id: CalendarRestriction.id,
+        type: CalendarRestriction.type,
+        startDate: CalendarRestriction.startDate,
+        endDate: CalendarRestriction.endDate,
+      })
+      .from(CalendarRestriction)
+      .where(eq(CalendarRestriction.academicCalendarId, academicCalendarId));
+  }
+
+  private validateSemesterInvariants(
+    before: RestrictionForValidation[],
+    after: RestrictionForValidation[],
+  ): void {
+    const boundaries = (restrictions: RestrictionForValidation[]) =>
+      new Map(
+        SEMESTER_BOUNDARY_TYPES.map((type) => [
+          type,
+          restrictions.filter((restriction) => restriction.type === type),
+        ]),
+      );
+    const previous = boundaries(before);
+    const candidate = boundaries(after);
+
+    for (const type of SEMESTER_BOUNDARY_TYPES) {
+      if (candidate.get(type)!.length > 1) {
+        throw new UnprocessableEntityException(
+          `Academic calendar requires exactly one ${type} restriction`,
+        );
+      }
+    }
+
+    const wasComplete = SEMESTER_BOUNDARY_TYPES.every(
+      (type) => previous.get(type)!.length === 1,
+    );
+    const isComplete = SEMESTER_BOUNDARY_TYPES.every(
+      (type) => candidate.get(type)!.length === 1,
+    );
+    if (wasComplete && !isComplete) {
+      const missing = SEMESTER_BOUNDARY_TYPES.find(
+        (type) => candidate.get(type)!.length !== 1,
+      )!;
+      throw new UnprocessableEntityException(
+        `Academic calendar requires exactly one ${missing} restriction`,
+      );
+    }
+    if (!isComplete) return;
+
+    const boundaryDate = (type: SemesterBoundaryType): string => {
+      const restriction = candidate.get(type)![0];
+      return type.endsWith('_END')
+        ? restriction.endDate
+        : restriction.startDate;
+    };
+    const semester1Start = boundaryDate('SEMESTER_1_START');
+    const semester1End = boundaryDate('SEMESTER_1_END');
+    const semester2Start = boundaryDate('SEMESTER_2_START');
+    const semester2End = boundaryDate('SEMESTER_2_END');
+    if (
+      semester1Start > semester1End ||
+      semester2Start > semester2End ||
+      semester1End >= semester2Start
+    ) {
+      throw new UnprocessableEntityException(
+        'Academic calendar semester boundaries overlap or are out of order',
+      );
+    }
   }
 
   private currentYear(): number {

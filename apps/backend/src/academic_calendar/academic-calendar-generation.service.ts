@@ -6,6 +6,14 @@ import type {
   CalendarRestrictionRecord,
   Weekday,
 } from '../entities';
+import {
+  addDays,
+  dateFromDomain,
+  domainDate,
+  firstWeekdayOnOrAfter,
+  lastWeekdayOnOrBefore,
+  weekdayForDate,
+} from '../entities/AcademicCalendar/date.utils';
 import type { AcademicSemesterType } from '../entities/Modules/modules.schema';
 import type { EventCriteria } from '../Events/dto/event.types';
 import type {
@@ -55,16 +63,10 @@ const DISPLAYED_ALL_DAY_TYPES = new Set<CalendarRestrictionType>([
   'PUBLIC_HOLIDAY',
   'UNIVERSITY_CLOSURE',
   'RECESS',
+  'TEST_WEEK',
+  'EXAM_PERIOD',
+  'SUPP_WEEK',
 ]);
-const DAY_TO_INDEX: Record<Lowercase<Weekday>, number> = {
-  sunday: 0,
-  monday: 1,
-  tuesday: 2,
-  wednesday: 3,
-  thursday: 4,
-  friday: 5,
-  saturday: 6,
-};
 
 @Injectable()
 export class AcademicCalendarGenerationService {
@@ -142,7 +144,7 @@ export class AcademicCalendarGenerationService {
           `Academic calendar requires exactly one ${type} restriction`,
         );
       }
-      return matches[0].startDate;
+      return type.endsWith('_END') ? matches[0].endDate : matches[0].startDate;
     };
 
     const bounds: SemesterBounds = {
@@ -188,11 +190,13 @@ export class AcademicCalendarGenerationService {
     }
 
     const ranges =
-      !isTeaching || !event.semester || event.semester === 'YEAR'
+      !isTeaching || !event.semester
         ? [{ start: bounds.SEMESTER_1.start, end: bounds.SEMESTER_2.end }]
-        : [bounds[event.semester]];
-    const startsOn = this.firstWeekdayOnOrAfter(ranges[0].start, day);
-    const endsOn = this.lastWeekdayOnOrBefore(ranges.at(-1)!.end, day);
+        : event.semester === 'YEAR'
+          ? [bounds.SEMESTER_1, bounds.SEMESTER_2]
+          : [bounds[event.semester]];
+    const startsOn = firstWeekdayOnOrAfter(ranges[0].start, day);
+    const endsOn = lastWeekdayOnOrBefore(ranges.at(-1)!.end, day);
     if (startsOn > endsOn) {
       warnings.push({
         code: 'RECURRING_EVENT_OUTSIDE_SEMESTER',
@@ -224,7 +228,7 @@ export class AcademicCalendarGenerationService {
           continue;
         }
 
-        if (this.weekdayForDate(date).toLowerCase() === day) {
+        if (weekdayForDate(date).toLowerCase() === day) {
           excludedDates.add(date);
         }
         if (restriction.replacementWeekday?.toLowerCase() === day) {
@@ -366,8 +370,8 @@ export class AcademicCalendarGenerationService {
 
   private isDomainDate(value: string): boolean {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
-    const date = this.dateFromDomain(value);
-    return !Number.isNaN(date.getTime()) && this.domainDate(date) === value;
+    const date = dateFromDomain(value);
+    return !Number.isNaN(date.getTime()) && domainDate(date) === value;
   }
 
   private weekdayDates(
@@ -377,51 +381,13 @@ export class AcademicCalendarGenerationService {
   ): string[] {
     const dates: string[] = [];
     for (
-      let current = this.firstWeekdayOnOrAfter(start, day);
+      let current = firstWeekdayOnOrAfter(start, day);
       current <= end;
-      current = this.addDays(current, 7)
+      current = addDays(current, 7)
     ) {
       dates.push(current);
     }
     return dates;
-  }
-
-  private firstWeekdayOnOrAfter(date: string, day: Lowercase<Weekday>): string {
-    const current = this.dateFromDomain(date);
-    const delta = (DAY_TO_INDEX[day] - current.getUTCDay() + 7) % 7;
-    return this.domainDate(new Date(current.getTime() + delta * 86_400_000));
-  }
-
-  private lastWeekdayOnOrBefore(date: string, day: Lowercase<Weekday>): string {
-    const current = this.dateFromDomain(date);
-    const delta = (current.getUTCDay() - DAY_TO_INDEX[day] + 7) % 7;
-    return this.domainDate(new Date(current.getTime() - delta * 86_400_000));
-  }
-
-  private addDays(date: string, days: number): string {
-    const current = this.dateFromDomain(date);
-    return this.domainDate(new Date(current.getTime() + days * 86_400_000));
-  }
-
-  private dateFromDomain(date: string): Date {
-    return new Date(`${date}T00:00:00.000Z`);
-  }
-
-  private domainDate(date: Date): string {
-    return date.toISOString().slice(0, 10);
-  }
-
-  private weekdayForDate(date: string): Weekday {
-    const weekdays: Weekday[] = [
-      'SUNDAY',
-      'MONDAY',
-      'TUESDAY',
-      'WEDNESDAY',
-      'THURSDAY',
-      'FRIDAY',
-      'SATURDAY',
-    ];
-    return weekdays[this.dateFromDomain(date).getUTCDay()];
   }
 
   private humanize(value: string): string {
