@@ -89,7 +89,7 @@ export enum ActiveRouteStatus {
 export class ActiveRouteQueryDto {
   @ApiProperty({
     description: 'Calendar date that matches the EventAttendance date',
-    example: '2026/10/12',
+    example: '2026-10-12',
   })
   @IsDateString()
   date!: string;

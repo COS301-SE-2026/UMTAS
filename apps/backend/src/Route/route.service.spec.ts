@@ -10,7 +10,6 @@ import {
   mockDbResult,
   mockSequentialResults,
 } from 'src/Testing/Mocks';
-import { beforeEach } from 'node:test';
 import { Test } from '@nestjs/testing';
 import { DatabaseService } from 'src/db/database.service';
 import {
@@ -21,6 +20,9 @@ import {
 import { createRoute } from 'src/Testing/Factories/route.factory';
 import { createBuilding } from 'src/Testing/Factories/building.factory';
 import { SessionData } from 'src/auth/session.decorator';
+import { ActiveRouteStatus } from './dto/route.dto';
+import { createEvent } from 'src/Testing/Factories/event.factory';
+import { EventSource } from 'src/Events/dto/event.types';
 
 const mockSession = {
   user: { id: userId },
@@ -64,7 +66,7 @@ describe('RouteService', () => {
 
       //tracks all calls for getOrCreate... hence a spy
       const jamesBond = jest.spyOn(global, 'fetch');
-      mockDbResult(mockDb.select, [route]);
+      mockDbResult(mockDb.select.bind(mockDb), [route]);
       const result = await routeService.getOrCreateRoute(
         mockSession,
         buildingId,
@@ -90,7 +92,7 @@ describe('RouteService', () => {
       ],
     });
 
-    mockSequentialResults(mockDb.select, [[], [reverseRoute]]);
+    mockSequentialResults(mockDb.select.bind(mockDb), [[], [reverseRoute]]);
 
     const result = await routeService.getOrCreateRoute(
       mockSession,
@@ -119,29 +121,30 @@ describe('RouteService', () => {
       DestinationBuildingID: destinationBuildingId,
     });
 
-    mockSequentialResults(mockDb.select, [
+    mockSequentialResults(mockDb.select.bind(mockDb), [
       [],
       [],
       [originBuilding],
       [destinationBuilding],
     ]);
-    mockDbResult(mockDb.insert, [savedRoute]);
+    mockDbResult(mockDb.insert.bind(mockDb), [savedRoute]);
 
     jest.spyOn(global, 'fetch').mockResolvedValue({
       ok: true,
-      json: async () => ({
-        features: [
-          {
-            geometry: {
-              coordinates: [
-                [28.2314, -25.7545],
-                [28.232, -25.755],
-              ],
+      json: async () =>
+        Promise.resolve({
+          features: [
+            {
+              geometry: {
+                coordinates: [
+                  [28.2314, -25.7545],
+                  [28.232, -25.755],
+                ],
+              },
+              properties: { summary: { distance: 420.4, duration: 310.9 } },
             },
-            properties: { summary: { distance: 420.4, duration: 310.9 } },
-          },
-        ],
-      }),
+          ],
+        }),
     } as Response);
 
     const result = await routeService.getOrCreateRoute(
@@ -162,7 +165,7 @@ describe('RouteService', () => {
       BuildingID: destinationBuildingId,
     });
 
-    mockSequentialResults(mockDb.select, [
+    mockSequentialResults(mockDb.select.bind(mockDb), [
       [],
       [],
       [originBuilding],
@@ -189,7 +192,7 @@ describe('RouteService', () => {
       BuildingID: destinationBuildingId,
     });
 
-    mockSequentialResults(mockDb.select, [
+    mockSequentialResults(mockDb.select.bind(mockDb), [
       [],
       [],
       [originBuilding],
@@ -197,7 +200,7 @@ describe('RouteService', () => {
     ]);
     jest.spyOn(global, 'fetch').mockResolvedValue({
       ok: true,
-      json: async () => ({ features: [] }),
+      json: async () => Promise.resolve({ features: [] }),
     } as Response);
 
     await expect(
@@ -207,5 +210,203 @@ describe('RouteService', () => {
         destinationBuildingId,
       ),
     ).rejects.toThrow(NotFoundException);
+  });
+
+  describe('Test_getActiveRoute', () => {
+    it('should return NONE if the student has no planned attended lectures on that day', async () => {
+      mockDbResult(mockDb.select.bind(mockDb), []);
+
+      const result = await routeService.getActiveRoute(
+        mockSession,
+        '2026-10-12',
+        '10:12',
+      );
+
+      expect(result).toEqual({ status: ActiveRouteStatus.NONE });
+    });
+
+    it('should return AT_VENUE when an attended event falls between the start and end time', async () => {
+      const event = createEvent(
+        EventSource.UNIVERSITY,
+        {},
+        { startTime: '08:30', endTime: '09:20' },
+      );
+
+      mockSequentialResults(mockDb.select.bind(mockDb), [
+        [
+          {
+            eventId: event.eventID,
+            eventName: event.eventName,
+            eventCriteria: event.eventCriteria,
+          },
+        ],
+        [{ buildingId: buildingId }],
+      ]);
+
+      const result = await routeService.getActiveRoute(
+        mockSession,
+        '2026-10-12',
+        '09:00',
+      );
+
+      expect(result.status).toBe(ActiveRouteStatus.AT_VENUE);
+      expect(result.currentBuildingId).toBe(buildingId);
+    });
+
+    it('should skip an attended event if it has no venue', async () => {
+      const event = createEvent(
+        EventSource.UNIVERSITY,
+        {},
+        { startTime: '08:30', endTime: '09:20' },
+      );
+
+      mockSequentialResults(mockDb.select.bind(mockDb), [
+        [
+          {
+            eventId: event.eventID,
+            eventName: event.eventName,
+            eventCriteria: event.eventCriteria,
+          },
+        ],
+        [],
+      ]);
+
+      const result = await routeService.getActiveRoute(
+        mockSession,
+        '2026-10-12',
+        '09:00',
+      );
+
+      expect(result).toEqual({ status: ActiveRouteStatus.NONE });
+    });
+
+    it('should return MOVING and call getOrCreateRoute between two events that are in different buildings', async () => {
+      const eventLecture = createEvent(
+        EventSource.UNIVERSITY,
+        { eventName: 'COS332 L1' },
+        { startTime: '08:30', endTime: '09:20' },
+      );
+      const eventPractical = createEvent(
+        EventSource.UNIVERSITY,
+        { eventName: 'COS332 P1' },
+        { startTime: '09:30', endTime: '10:20' },
+      );
+
+      mockSequentialResults(mockDb.select.bind(mockDb), [
+        [
+          {
+            eventId: eventLecture.eventID,
+            eventName: eventLecture.eventName,
+            eventCriteria: eventLecture.eventCriteria,
+          },
+          {
+            eventId: eventPractical.eventID,
+            eventName: eventPractical.eventName,
+            eventCriteria: eventPractical.eventCriteria,
+          },
+        ],
+        [{ buildingId: buildingId }],
+        [{ buildingId: destinationBuildingId }],
+      ]);
+
+      const route = createRoute({
+        OriginBuildingID: buildingId,
+        DestinationBuildingID: destinationBuildingId,
+      });
+      jest.spyOn(routeService, 'getOrCreateRoute').mockResolvedValue({
+        route: {
+          routeId: route.RouteID,
+          originBuildingId: buildingId,
+          pathCoordinates: route.PathCoordinates,
+          displayColour: route.DisplayColour,
+          destinationBuildingId: destinationBuildingId,
+          distanceMetres: route.DistanceMetres,
+        },
+      });
+
+      const result = await routeService.getActiveRoute(
+        mockSession,
+        '2026-10-12',
+        '09:10',
+      );
+
+      expect(result.status).toBe(ActiveRouteStatus.MOVING);
+      expect(result.fromEventName).toBe('COS332 L1');
+      expect(result.toEventName).toBe('COS332 P1');
+      expect(routeService.getOrCreateRoute).toHaveBeenCalledWith(
+        mockSession,
+        buildingId,
+        destinationBuildingId,
+      );
+    });
+
+    it('should return AT_VENUE when the events share a venue', async () => {
+      const eventLecture = createEvent(
+        EventSource.UNIVERSITY,
+        { eventName: 'COS332 L1' },
+        { startTime: '08:30', endTime: '09:20' },
+      );
+      const eventPractical = createEvent(
+        EventSource.UNIVERSITY,
+        { eventName: 'COS332 P1' },
+        { startTime: '09:30', endTime: '10:20' },
+      );
+
+      mockSequentialResults(mockDb.select.bind(mockDb), [
+        [
+          {
+            eventId: eventLecture.eventID,
+            eventName: eventLecture.eventName,
+            eventCriteria: eventLecture.eventCriteria,
+          },
+          {
+            eventId: eventPractical.eventID,
+            eventName: eventPractical.eventName,
+            eventCriteria: eventPractical.eventCriteria,
+          },
+        ],
+        [{ buildingId: buildingId }],
+        [{ buildingId: buildingId }],
+      ]);
+
+      const spyKids = jest.spyOn(routeService, 'getOrCreateRoute');
+
+      const result = await routeService.getActiveRoute(
+        mockSession,
+        '2026-10-12',
+        '09:10',
+      );
+
+      expect(result.status).toBe(ActiveRouteStatus.AT_VENUE);
+      expect(result.currentBuildingId).toBe(buildingId);
+      expect(spyKids).not.toHaveBeenCalled();
+    });
+
+    it('should return NONE if time is before first or after last attending event', async () => {
+      const event = createEvent(
+        EventSource.UNIVERSITY,
+        {},
+        { startTime: '08:30', endTime: '09:20' },
+      );
+
+      mockSequentialResults(mockDb.select.bind(mockDb), [
+        [
+          {
+            eventId: event.eventID,
+            eventName: event.eventName,
+            eventCriteria: event.eventCriteria,
+          },
+        ],
+        [{ buildingId: buildingId }],
+      ]);
+
+      const result = await routeService.getActiveRoute(
+        mockSession,
+        '2026-10-12',
+        '23:23',
+      );
+
+      expect(result).toEqual({ status: ActiveRouteStatus.NONE });
+    });
   });
 });
