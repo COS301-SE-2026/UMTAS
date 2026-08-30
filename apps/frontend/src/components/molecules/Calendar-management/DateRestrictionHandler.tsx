@@ -18,6 +18,7 @@ import {
   restrictionProps,
 } from "./restriction-handlers";
 import { errorName } from "../../../../utilities/errorCries";
+import { getAcademicCalendarResp } from "../../../../utilities/Calendar-Builders/CalendarManagement";
 
 export class DateOnlyHanlder extends RestrictionHandler {
   constructor() {
@@ -32,7 +33,7 @@ export class DateOnlyHanlder extends RestrictionHandler {
   }
   handleHtml(
     resType: SingleRestrictionResp,
-    academicCalendarID: string,
+    academicCalendarID: getAcademicCalendarResp,
     onSave?: () => void,
   ): React.ReactNode {
     return (
@@ -86,7 +87,7 @@ function DateRestrictionHTML({
         },
         paths: {
           restrictionId: restriction.id,
-          id: academicCalendarID,
+          id: academicCalendarID.id,
         },
       });
     else {
@@ -97,7 +98,7 @@ function DateRestrictionHTML({
           type: restriction.type,
         },
         paths: {
-          id: academicCalendarID,
+          id: academicCalendarID.id,
         },
       });
       onSave?.();
@@ -107,7 +108,7 @@ function DateRestrictionHTML({
   function deleteRes() {
     deleteMut({
       paths: {
-        id: academicCalendarID,
+        id: academicCalendarID.id,
         restrictionId: restriction.id,
       },
     });

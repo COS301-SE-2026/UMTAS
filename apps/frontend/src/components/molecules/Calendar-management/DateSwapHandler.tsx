@@ -25,7 +25,10 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/atoms/baseShadcn/select";
-import { CreateAcMutation } from "../../../../utilities/Calendar-Builders/CalendarManagement";
+import {
+  CreateAcMutation,
+  getAcademicCalendarResp,
+} from "../../../../utilities/Calendar-Builders/CalendarManagement";
 import { errorName } from "../../../../utilities/errorCries";
 
 export const EnumDays: RestrictionDays[] = [
@@ -66,7 +69,7 @@ export class DateSwapHandler extends RestrictionHandler {
   }
   handleHtml(
     resType: SingleRestrictionResp,
-    academicCalendarID: string,
+    academicCalendarID: getAcademicCalendarResp,
     onSave?: () => void,
   ): React.ReactNode {
     return (
@@ -106,7 +109,7 @@ function DateSwapHtml({
         },
         paths: {
           restrictionId: restriction.id,
-          id: academicCalendarID,
+          id: academicCalendarID.id,
         },
       });
     else {
@@ -118,7 +121,7 @@ function DateSwapHtml({
           replacementWeekday: restriction.replacementWeekday ?? undefined,
         },
         paths: {
-          id: academicCalendarID,
+          id: academicCalendarID.id,
         },
       });
       onSave?.();
@@ -127,7 +130,7 @@ function DateSwapHtml({
   function deleteRes() {
     deleteMut({
       paths: {
-        id: academicCalendarID,
+        id: academicCalendarID.id,
         restrictionId: restriction.id,
       },
     });

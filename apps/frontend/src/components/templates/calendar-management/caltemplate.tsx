@@ -183,7 +183,7 @@ export default function CalTemplate() {
           {flagtempRes && tempRes && selectedAcID && (
             <div className="  border-dashed border-5 rounded-2xl my-2  flex flex-col items-center p-5 h-1/4">
               <div key={tempRes.type}>
-                {handlers.handle(tempRes, selectedAcID, () => {
+                {handlers.handle(tempRes, currentAC, () => {
                   setFlagTempRes(false);
                   setTempRes(null);
                 })}
@@ -194,7 +194,7 @@ export default function CalTemplate() {
             {selectedAcID &&
               restrictions?.restrictions.map((res) => {
                 return (
-                  <div key={res.id}>{handlers.handle(res, selectedAcID)}</div>
+                  <div key={res.id}>{handlers.handle(res, currentAC)}</div>
                 );
               })}
           </div>

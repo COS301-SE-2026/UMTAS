@@ -19,13 +19,14 @@ import {
 } from "./restriction-handlers";
 
 import { errorName } from "../../../../utilities/errorCries";
+import { getAcademicCalendarResp } from "../../../../utilities/Calendar-Builders/CalendarManagement";
 export class RangeDayHandler extends RestrictionHandler {
   constructor() {
     super(["EXAM_PERIOD", "SUPP_WEEK", "TEST_WEEK", "HOLIDAY", "RECESS"]);
   }
   handleHtml(
     resType: SingleRestrictionResp,
-    academicCalendarID: string,
+    academicCalendarID: getAcademicCalendarResp,
     onSave?: () => void,
   ): React.ReactNode {
     return (
@@ -83,7 +84,7 @@ function RangeDateHTML({
         },
         paths: {
           restrictionId: restriction.id,
-          id: academicCalendarID,
+          id: academicCalendarID.id,
         },
       });
     else {
@@ -95,7 +96,7 @@ function RangeDateHTML({
           endDate: restriction.endDate,
         },
         paths: {
-          id: academicCalendarID,
+          id: academicCalendarID.id,
         },
       });
       onSave?.();
@@ -105,7 +106,7 @@ function RangeDateHTML({
   function deleteRes() {
     deleteMut({
       paths: {
-        id: academicCalendarID,
+        id: academicCalendarID.id,
         restrictionId: restriction.id,
       },
     });

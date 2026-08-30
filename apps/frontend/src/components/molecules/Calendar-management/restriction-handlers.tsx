@@ -17,6 +17,7 @@ import {
   Select,
 } from "@/components/atoms/baseShadcn/select";
 import { useMutation } from "@tanstack/react-query";
+import { getAcademicCalendarResp } from "../../../../utilities/Calendar-Builders/CalendarManagement";
 
 export abstract class RestrictionHandler {
   protected MyHandletypes: RestrictionTypes[];
@@ -35,7 +36,7 @@ export abstract class RestrictionHandler {
   }
   public handle(
     resType: SingleRestrictionResp,
-    academicCalendarID: string,
+    academicCalendarID: getAcademicCalendarResp,
     onSave?: () => void,
   ): React.ReactNode {
     if (this.MyHandletypes.includes(resType.type)) {
@@ -55,7 +56,7 @@ export abstract class RestrictionHandler {
 
   abstract handleHtml(
     resType: SingleRestrictionResp,
-    academicCalendarID: string,
+    academicCalendarID: getAcademicCalendarResp,
     onSave?: () => void,
   ): React.ReactNode; // returns the self managing elements
 }
@@ -63,7 +64,7 @@ interface containerProp {
   children: ReactNode;
   res: SingleRestrictionResp;
   availableTypes: RestrictionTypes[];
-  academicCalendarID: string;
+  academicCalendarID: getAcademicCalendarResp;
 }
 
 function RestrictionContainerHtml({
@@ -93,7 +94,7 @@ function RestrictionContainerHtml({
       },
       paths: {
         restrictionId: restriction.id,
-        id: academicCalendarID,
+        id: academicCalendarID.id,
       },
     });
   }
@@ -102,6 +103,7 @@ function RestrictionContainerHtml({
       <CalCard>
         <div className="flex flex-col gap-y-2">
           <Select
+            disabled={restriction.id == ""}
             value={restriction.type}
             onValueChange={async (e) => {
               setRestriction((res) => ({
@@ -134,7 +136,7 @@ function RestrictionContainerHtml({
 
 export interface restrictionProps {
   resType: SingleRestrictionResp;
-  academicCalendarID: string;
+  academicCalendarID: getAcademicCalendarResp;
   onSave?: () => void;
 }
 
