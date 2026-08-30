@@ -7,8 +7,20 @@ import {
 import { SessionData } from 'src/auth/session.decorator';
 import { LatLngDto } from 'src/Building/dto/building.dto';
 import { DatabaseService } from 'src/db/database.service';
-import { Building, Route } from 'src/entities';
-import { RouteDto, RouteSingleResponseDto } from './dto/route.dto';
+import {
+  Building,
+  Event,
+  EventAttendance,
+  EventVenue,
+  Route,
+  Venue,
+} from 'src/entities';
+import {
+  ActiveRouteResponseDto,
+  ActiveRouteStatus,
+  RouteDto,
+  RouteSingleResponseDto,
+} from './dto/route.dto';
 import { eq, and } from 'drizzle-orm';
 
 type RouteEntity = typeof Route.$inferSelect;
@@ -135,6 +147,107 @@ export class RouteService {
       .returning();
 
     return { route: this.routeDtoAdapter(newRoute) };
+  }
+
+  public async getActiveRoute(
+    session: SessionData,
+    date: string,
+    time: string,
+  ): Promise<ActiveRouteResponseDto> {
+    const userId = session.user.id;
+    const database = this.databaseService.db;
+
+    const attendedEvents = await database
+      .select({
+        eventId: Event.eventID,
+        eventName: Event.eventName,
+        eventCriteria: Event.eventCriteria,
+      })
+      .from(EventAttendance)
+      .innerJoin(Event, eq(Event.eventID, EventAttendance.eventID))
+      .where(
+        and(
+          eq(EventAttendance.UserID, userId),
+          eq(EventAttendance.eventDate, date),
+          eq(EventAttendance.state, 'ATTENDING'),
+        ),
+      );
+
+    //sort by the starting time. I am not proud of how complex it is :(
+    const sortedAttendedEvents = attendedEvents
+      .map((event) => ({
+        ...event,
+        startTime: event.eventCriteria.startTime,
+        endTime: event.eventCriteria.endTime,
+      }))
+      .sort((x, y) => x.startTime.localeCompare(y.startTime));
+
+    const currentEvent = sortedAttendedEvents.find(
+      (event) => time >= event.startTime && time <= event.endTime,
+    );
+
+    if (currentEvent) {
+      const buildingId = await this.getMatchingBuildingId(currentEvent.eventId);
+
+      return {
+        status: ActiveRouteStatus.AT_VENUE,
+        currentBuildingId: buildingId,
+        fromEventName: currentEvent.eventName,
+      };
+    }
+
+    //necessary to check if the time is in between two consec planned attended events
+    //this is veeeery inefficient. will have to change. cos 212 lecturers would be ashamed
+    for (let i = 0; i < sortedAttendedEvents.length - 1; i++) {
+      const fromAttendedEvent = sortedAttendedEvents[i];
+      const toAttendedEvent = sortedAttendedEvents[i + 1];
+
+      if (
+        time >= fromAttendedEvent.endTime &&
+        time < toAttendedEvent.startTime
+      ) {
+        const fromBuildingId = await this.getMatchingBuildingId(
+          fromAttendedEvent.eventId,
+        );
+        const toBuildingId = await this.getMatchingBuildingId(
+          toAttendedEvent.eventId,
+        );
+
+        if (!fromBuildingId || !toBuildingId) {
+          return { status: ActiveRouteStatus.NONE };
+        }
+
+        const { route } = await this.getOrCreateRoute(
+          session,
+          fromBuildingId,
+          toBuildingId,
+        );
+
+        return {
+          status: ActiveRouteStatus.MOVING,
+          route: route,
+          fromEventName: fromAttendedEvent.eventName,
+          toEventName: toAttendedEvent.eventName,
+        };
+      }
+    }
+
+    return { status: ActiveRouteStatus.NONE };
+  }
+
+  private async getMatchingBuildingId(eventId: string): Promise<string | null> {
+    const database = this.databaseService.db;
+
+    //note for future dev: events can have multiple venues (thank you for the added complexity michael)
+    //for now we are just taking the first event from the array
+    const [row] = await database
+      .select({ buildingId: Venue.BuildingID })
+      .from(EventVenue)
+      .innerJoin(Venue, eq(Venue.VenueID, EventVenue.VenueID))
+      .where(eq(EventVenue.VenueID, eventId))
+      .limit(1);
+
+    return row?.buildingId ?? null;
   }
 
   private async fetchFromORS(

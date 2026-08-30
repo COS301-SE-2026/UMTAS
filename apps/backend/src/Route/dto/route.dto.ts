@@ -127,7 +127,7 @@ export class ActiveRouteResponseDto {
   })
   @IsUUID()
   @IsOptional()
-  currentBuildingId?: string;
+  currentBuildingId?: string | null;
 
   @ApiProperty({
     type: () => RouteDto,
