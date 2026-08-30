@@ -1,6 +1,7 @@
 import { mutationOptions, queryOptions } from "@tanstack/react-query";
 import { RequestBuilder, RequestMethod } from "../request";
 import { paths } from "@/lib/api";
+import { getQueryClient } from "@/components/tanstack/getQueryClient";
 
 type CreateAcademicCalendar = paths["/api/academic-calendar"]["post"];
 export type CreateAcademicCalendarBody =
@@ -25,6 +26,11 @@ export const CreateAcMutation = mutationOptions({
     console.log("created AC");
     return new CreateAcademicCalendarBuilder().send({
       body: body,
+    });
+  },
+  onSuccess: () => {
+    getQueryClient().invalidateQueries({
+      queryKey: ["Academic-Calendar"],
     });
   },
 });

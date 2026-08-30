@@ -32,7 +32,7 @@ import {
 import { useErrorListener } from "@/hooks/errorListener";
 
 const startYear = 2026;
-const endYear = 2035;
+const endYear = 2040;
 
 function generateYears() {
   const length = endYear - startYear;
@@ -117,7 +117,7 @@ export default function CalTemplate() {
                 const year = Number(e);
 
                 const AC = academicCalendars.find((ac) => year === ac.year);
-                if (AC == undefined) {
+                if (AC == undefined || AC == null || AC.id == "") {
                   await createACmut({
                     year: year,
                   });
