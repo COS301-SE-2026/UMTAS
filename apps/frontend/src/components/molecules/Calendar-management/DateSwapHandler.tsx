@@ -9,9 +9,32 @@ import {
   SingleRestrictionResp,
   UpdateRestrictionMutation,
   DelRestrictionMut,
+  RestrictionDays,
 } from "../../../../utilities/Calendar-Builders/RestrictionManagement";
 import { Label } from "@/components/atoms/baseShadcn/label";
 import { RestrictionHandler, restrictionProps } from "./restriction-handlers";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/atoms/baseShadcn/select";
+
+export const EnumDays: RestrictionDays[] = [
+  "MONDAY",
+  "TUESDAY",
+  "WEDNESDAY",
+  "THURSDAY",
+  "FRIDAY",
+];
+function toEnum(str: string) {
+  return str.toUpperCase();
+}
+function toRead(str: string) {
+  return str.toLowerCase();
+}
+
 export class DateSwapHandler extends RestrictionHandler {
   constructor() {
     super(["DAY_SWAP"]);
@@ -43,6 +66,7 @@ function DateSwapHtml({ resType, academicCalendarID }: restrictionProps) {
         description: restriction.description,
         startDate: restriction.startDate,
         type: restriction.type,
+        replacementWeekday: restriction.replacementWeekday ?? undefined,
       },
       paths: {
         restrictionId: restriction.id,
@@ -83,23 +107,31 @@ function DateSwapHtml({ resType, academicCalendarID }: restrictionProps) {
             />
           </Label>
           <Label className="text-sm font-medium text-[var(--text-secondary)] flex flex-col">
-            End Date
-            <Input
-              data-testid="restriction-Date-Input"
-              type="date"
-              value={restriction.endDate}
-              onChange={(e) => {
-                if (e.target.value) {
+            Day to swap
+            <Select
+              value={restriction?.replacementWeekday ?? "monday"}
+              onValueChange={async (e) => {
+                if (e) {
                   {
                     setRestriction((res) => ({
                       ...res,
-                      endDate: e.target.value,
+                      replacementWeekday: toEnum(e) as RestrictionDays,
                     }));
                   }
                 }
               }}
-              className="h-8 rounded-md border border-[var(--border)] bg-transparent px-2 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--ring)]"
-            />
+            >
+              <SelectTrigger id="select-year" className="capitalize w-40 ">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="capitalize">
+                {EnumDays.map((type, idx) => (
+                  <SelectItem key={idx} value={type}>
+                    {toRead(type)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </Label>
         </div>
 

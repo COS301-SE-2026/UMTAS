@@ -129,6 +129,7 @@ export function GetAllRestrictions(paths?: getAcRestrictionPaths) {
 }
 
 export type RestrictionTypes = components["schemas"]["CalendarRestrictionType"];
+export type RestrictionDays = components["schemas"]["Weekday"];
 
 type DelRestriction =
   paths["/api/academic-calendar/{id}/restrictions/{restrictionId}"]["delete"];
