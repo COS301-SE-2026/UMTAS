@@ -63,100 +63,105 @@ function RangeDateHTML({ resType, academicCalendarID }: restrictionProps) {
   }
 
   return (
-    <div className="flex flex-row w-full  items-center justify-items-center gap-4 text-center ">
-      <div className=" grid grid-rows-2 gap-y-2">
+    <div className="flex flex-row w-full  items-center justify-items-center gap-6 text-center ">
+      <div className="w-full flex flex-col gap-y-2">
+        <div className="w-full grid grid-cols-2 gap-x-2">
+          <Label className="text-sm font-medium text-[var(--text-secondary)] flex flex-col">
+            Start Date
+            <Input
+              data-testid="restriction-Date-Input"
+              type="date"
+              value={restriction.startDate}
+              onChange={(e) => {
+                if (e.target.value) {
+                  {
+                    setRestriction((res) => ({
+                      ...res,
+                      startDate: e.target.value,
+                    }));
+                  }
+                }
+              }}
+              className="h-8 rounded-md border border-[var(--border)] bg-transparent px-2 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--ring)]"
+            />
+          </Label>
+          <Label className="text-sm font-medium text-[var(--text-secondary)] flex flex-col">
+            End Date
+            <Input
+              data-testid="restriction-Date-Input"
+              type="date"
+              value={restriction.endDate}
+              onChange={(e) => {
+                if (e.target.value) {
+                  {
+                    setRestriction((res) => ({
+                      ...res,
+                      endDate: e.target.value,
+                    }));
+                  }
+                }
+              }}
+              className="h-8 rounded-md border border-[var(--border)] bg-transparent px-2 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--ring)]"
+            />
+          </Label>
+        </div>
+
         <Label className="text-sm font-medium text-[var(--text-secondary)] flex flex-col">
-          Start Date
+          description
           <Input
-            data-testid="restriction-Date-Input"
-            type="date"
-            value={restriction.startDate}
+            data-testid="restriction-dsc-Input"
+            type="text"
+            value={restriction.description}
             onChange={(e) => {
               if (e.target.value) {
                 {
                   setRestriction((res) => ({
                     ...res,
-                    startDate: e.target.value,
+                    description: e.target.value,
                   }));
                 }
               }
             }}
-            className="h-8 rounded-md border border-[var(--border)] bg-transparent px-2 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--ring)]"
-          />
-        </Label>
-        <Label className="text-sm font-medium text-[var(--text-secondary)] flex flex-col">
-          End Date
-          <Input
-            data-testid="restriction-Date-Input"
-            type="date"
-            value={restriction.endDate}
-            onChange={(e) => {
-              if (e.target.value) {
-                {
-                  setRestriction((res) => ({
-                    ...res,
-                    endDate: e.target.value,
-                  }));
-                }
-              }
-            }}
-            className="h-8 rounded-md border border-[var(--border)] bg-transparent px-2 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--ring)]"
+            className="h-8  rounded-md border border-[var(--border)] bg-transparent px-2 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--ring)]"
           />
         </Label>
       </div>
-      <Label className="text-sm font-medium text-[var(--text-secondary)] flex flex-col">
-        description
-        <Input
-          data-testid="restriction-dsc-Input"
-          type="text"
-          value={restriction.description}
-          onChange={(e) => {
-            if (e.target.value) {
-              {
-                setRestriction((res) => ({
-                  ...res,
-                  description: e.target.value,
-                }));
-              }
-            }
-          }}
-          className="h-8  rounded-md border border-[var(--border)] bg-transparent px-2 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--ring)]"
-        />
-      </Label>
-      <Button
-        id="btn-delete-restriction"
-        type="button"
-        variant="ghost"
-        size="icon"
-        onClick={deleteRes}
-        disabled={deletePending}
-        className="h-10 w-10 flex-shrink-0 border border-[var(--error-text)] text-[var(--text-secondary)] transition-colors duration-[var(--duration-fast)] hover:border-[var(--error-text)] hover:text-[var(--error-text)] hover:bg-[var(--error-bg)]"
-      >
-        <Trash2
-          size={16}
-          strokeWidth={1.5}
-          className="text-[var(--error-text)]"
-        />
-      </Button>
-      <Button
-        id="btn-delete-restriction"
-        type="button"
-        variant="ghost"
-        size="icon"
-        onClick={save}
-        disabled={savePending}
-        className="h-10 w-10 flex-shrink-0 border border-[var(--success-text)] text-[var(--text-secondary)] transition-colors duration-[var(--duration-fast)] hover:border-[var(--success-text)] hover:text-[var(--success-text)] hover:bg-[var(--success-bg)]"
-      >
-        {savePending ? (
-          <Spinner />
-        ) : (
-          <Save
+      <div className="flex flex-col gap-y-5">
+        <Button
+          id="btn-delete-restriction"
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={deleteRes}
+          disabled={deletePending}
+          className="h-10 w-10 flex-shrink-0 border border-[var(--error-text)] text-[var(--text-secondary)] transition-colors duration-[var(--duration-fast)] hover:border-[var(--error-text)] hover:text-[var(--error-text)] hover:bg-[var(--error-bg)]"
+        >
+          <Trash2
             size={16}
             strokeWidth={1.5}
-            className="text-[var(--success-text)]"
+            className="text-[var(--error-text)]"
           />
-        )}
-      </Button>
+        </Button>
+        <Button
+          id="btn-delete-restriction"
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={save}
+          disabled={savePending}
+          className="h-10 w-10 flex-shrink-0 border border-[var(--success-text)] text-[var(--text-secondary)] transition-colors duration-[var(--duration-fast)] hover:border-[var(--success-text)] hover:text-[var(--success-text)] hover:bg-[var(--success-bg)]"
+        >
+          {savePending ? (
+            <Spinner />
+          ) : (
+            <Save
+              size={16}
+              strokeWidth={1.5}
+              className="text-[var(--success-text)]"
+            />
+          )}
+        </Button>
+      </div>
     </div>
   );
 }

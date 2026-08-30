@@ -97,32 +97,34 @@ function RestrictionContainerHtml({
   }
   return (
     <div className="flex flex-col text-left  ">
-      <Select
-        value={restriction.type}
-        onValueChange={async (e) => {
-          setRestriction((res) => ({
-            ...res,
-            type: toEnum(e) as RestrictionTypes,
-          }));
-          save(toEnum(e));
-        }}
-      >
-        <SelectTrigger
-          id="select-year"
-          className="capitalize w-40 bg-[var(--background)]"
-        >
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          {availableTypes.map((type, idx) => (
-            <SelectItem key={idx} value={type}>
-              {toRead(type)}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
       <CalCard>
-        <div className="p-4">{children}</div>
+        <div className="flex flex-col gap-y-2">
+          <Select
+            value={restriction.type}
+            onValueChange={async (e) => {
+              setRestriction((res) => ({
+                ...res,
+                type: toEnum(e) as RestrictionTypes,
+              }));
+              save(toEnum(e));
+            }}
+          >
+            <SelectTrigger
+              id="select-year"
+              className="capitalize w-40 bg-[var(--background)]"
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {availableTypes.map((type, idx) => (
+                <SelectItem key={idx} value={type}>
+                  {toRead(type)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <div className="">{children}</div>
+        </div>
       </CalCard>
     </div>
   );

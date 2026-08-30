@@ -7,10 +7,8 @@ interface props {
 }
 export default function CalCard({ children }: props) {
   return (
-    <Card className="flex flex-row px-2 items-center w-[95%] h-40">
-      <CardContent className="w-full justify-between flex flex-row ">
-        {children}
-      </CardContent>
+    <Card className="flex px-2 items-center w-125 h-50">
+      <CardContent className="w-full items-center  ">{children}</CardContent>
     </Card>
   );
 }
