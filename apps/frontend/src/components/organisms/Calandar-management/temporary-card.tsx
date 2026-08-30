@@ -1,6 +1,5 @@
 import { Card, CardContent } from "@/components/atoms/baseShadcn/card";
 import { ReactNode } from "react";
-import { RestrictionTypes } from "../../../../utilities/Calendar-Builders/RestrictionManagement";
 
 interface props {
   children?: ReactNode;
