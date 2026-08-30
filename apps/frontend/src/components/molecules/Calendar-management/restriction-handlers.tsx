@@ -95,14 +95,14 @@ interface containerProp {
 }
 function RestrictionContainerHtml({ children, type }: containerProp) {
   return (
-    <CalCard>
-      <div className="flex flex-col text-left ">
-        <h1 className="text-sm font-bold tracking-tight text-[var(--text-secondary)]  ">
-          {type.toLowerCase().replaceAll("_", " ")}
-        </h1>
+    <div className="flex flex-col text-left ">
+      <h1 className="text-sm font-bold tracking-tight text-[var(--text-secondary)]  ">
+        {type.toLowerCase().replaceAll("_", " ")}
+      </h1>
+      <CalCard>
         <div className="p-4">{children}</div>
-      </div>
-    </CalCard>
+      </CalCard>
+    </div>
   );
 }
 
@@ -272,25 +272,46 @@ function RangeDateHTML({ resType, academicCalendarID }: restrictionProps) {
 
   return (
     <div className="flex flex-row w-full  items-center justify-items-center gap-4 text-center ">
-      <Label className="text-sm font-medium text-[var(--text-secondary)] flex flex-col">
-        Selected date
-        <Input
-          data-testid="restriction-Date-Input"
-          type="date"
-          value={restriction.startDate}
-          onChange={(e) => {
-            if (e.target.value) {
-              {
-                setRestriction((res) => ({
-                  ...res,
-                  startDate: e.target.value,
-                }));
+      <div className=" grid grid-rows-2 gap-y-2">
+        <Label className="text-sm font-medium text-[var(--text-secondary)] flex flex-col">
+          Start Date
+          <Input
+            data-testid="restriction-Date-Input"
+            type="date"
+            value={restriction.startDate}
+            onChange={(e) => {
+              if (e.target.value) {
+                {
+                  setRestriction((res) => ({
+                    ...res,
+                    startDate: e.target.value,
+                  }));
+                }
               }
-            }
-          }}
-          className="h-8 rounded-md border border-[var(--border)] bg-transparent px-2 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--ring)]"
-        />
-      </Label>
+            }}
+            className="h-8 rounded-md border border-[var(--border)] bg-transparent px-2 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--ring)]"
+          />
+        </Label>
+        <Label className="text-sm font-medium text-[var(--text-secondary)] flex flex-col">
+          End Date
+          <Input
+            data-testid="restriction-Date-Input"
+            type="date"
+            value={restriction.endDate}
+            onChange={(e) => {
+              if (e.target.value) {
+                {
+                  setRestriction((res) => ({
+                    ...res,
+                    endDate: e.target.value,
+                  }));
+                }
+              }
+            }}
+            className="h-8 rounded-md border border-[var(--border)] bg-transparent px-2 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--ring)]"
+          />
+        </Label>
+      </div>
       <Label className="text-sm font-medium text-[var(--text-secondary)] flex flex-col">
         description
         <Input
