@@ -90,7 +90,7 @@ export default function CalTemplate() {
               }}
             >
               <SelectTrigger
-                id="select-all-degrees"
+                id="select-year"
                 className="w-[180px] bg-[var(--background)]"
               >
                 <SelectValue placeholder="Year" />
