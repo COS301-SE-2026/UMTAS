@@ -36,7 +36,29 @@ export class ApiService {
     const result = await adapter.getCourses(page, limit);
 
     const courses: CourseDto[] = await Promise.all(
-      result.map((course) => this.courseService.create(course)),
+      result.map(async (courseDto) => {
+        if (courseDto.ExternalID) {
+          const course = await this.courseService.getByExternalID(
+            courseDto.ExternalID,
+            uni.UniversityID,
+          );
+
+          //If course already exists - check for updated fields and update - return
+          if (course) {
+            const nonMatchingFields = this.getChanges(courseDto, course);
+
+            if (Object.keys(nonMatchingFields).length > 0)
+              return this.courseService.update(
+                course.CourseID,
+                nonMatchingFields,
+              );
+
+            return course;
+          }
+        }
+
+        return await this.courseService.create(courseDto);
+      }),
     );
 
     return {
@@ -59,11 +81,35 @@ export class ApiService {
 
     const result = await adapter.getModules(course);
 
-    const modules: ModulesDto[] = [];
+    const modules: ModulesDto[] = await Promise.all(
+      result.map(async (moduleDto) => {
+        if (moduleDto.ExternalID) {
+          const module = await this.moduleService.getByExternalID(
+            moduleDto.ExternalID,
+            course.CourseID,
+          );
 
-    for (const module of result) {
-      modules.push(await this.moduleService.create(userId, module));
-    } //END_module
+          // Module already exists
+          if (module) {
+            const changes = this.getChanges(moduleDto, module);
+
+            // Module has changed
+            if (Object.keys(changes).length > 0)
+              return this.moduleService.update(
+                userId,
+                module.moduleID,
+                changes,
+              );
+
+            // Module exists and is unchanged
+            return module;
+          }
+        }
+
+        // Module doesn't exist
+        return this.moduleService.create(userId, moduleDto);
+      }),
+    );
 
     return {
       modules,
@@ -137,4 +183,15 @@ export class ApiService {
 
     return await this.moduleService.getById(userId, moduleId);
   }
+
+  private getChanges<D extends object, T extends object>(
+    dto: D,
+    dbObject: T,
+  ): Partial<D> {
+    return Object.fromEntries(
+      Object.entries(dto).filter(
+        ([key, value]) => value !== dbObject[key as keyof T],
+      ),
+    ) as Partial<D>;
+  } //END_getChanges
 } //END_ApiService

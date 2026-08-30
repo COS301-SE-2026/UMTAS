@@ -449,6 +449,27 @@ export class ModuleServiceV2 extends ModuleService {
     };
   } //END_enrollToModule
 
+  async getByExternalID(
+    externalId: string,
+    courseId: string,
+  ): Promise<ModuleSingleResponseDto> {
+    const [module] = await this.dbService.db
+      .select(getTableColumns(modules))
+      .from(modules)
+      .where(eq(modules.ExternalID, externalId))
+      .leftJoin(GroupModules, eq(GroupModules.ModuleID, modules.moduleID))
+      .leftJoin(
+        Course,
+        and(
+          eq(Course.CourseID, courseId),
+          eq(Course.GroupID, GroupModules.GroupID),
+        ),
+      )
+      .limit(1);
+
+    return module;
+  }
+
   //🎅's little helpers
   protected async getGroupId(
     tx: AppDatabase,

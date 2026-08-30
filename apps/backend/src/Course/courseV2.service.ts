@@ -97,4 +97,19 @@ export class CourseServiceV2 extends CourseService {
 
     return courseWithModules;
   }
+
+  async getByExternalID(
+    externalId: string,
+    uniId: string,
+  ): Promise<CourseSingleResponseDto> {
+    const [course] = await this.dbService.db
+      .select()
+      .from(Course)
+      .where(
+        and(eq(Course.UniversityID, uniId), eq(Course.ExternalID, externalId)),
+      )
+      .limit(1);
+
+    return course;
+  }
 } //END_COurseServiceV2

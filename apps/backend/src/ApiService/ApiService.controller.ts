@@ -32,6 +32,9 @@ import { Roles } from 'src/auth/roles.guard';
 //kontant
 import { getRedisClient } from 'src/redis/redis';
 
+const TTL: number = parseInt(process.env.Api_Service_TTL || '300', 10);
+// const TTL = 0;
+
 @ApiTags('ApiService')
 @Controller('api-service')
 export class ApiServiceController {
@@ -129,7 +132,7 @@ export class ApiServiceController {
     //Cache for 5mins
     if (redis) {
       try {
-        await redis.set(kontantKey, JSON.stringify(result), 'EX', 300);
+        await redis.set(kontantKey, JSON.stringify(result), 'EX', TTL);
       } catch (error) {
         this.warn(`Redis SET failed: ${error}`);
       }
@@ -253,7 +256,7 @@ export class ApiServiceController {
     //Cache for 5mins
     if (redis) {
       try {
-        await redis.set(kontantKey, JSON.stringify(result), 'EX', 300);
+        await redis.set(kontantKey, JSON.stringify(result), 'EX', TTL);
       } catch (error) {
         this.warn(`Redis SET failed: ${error}`);
       }
@@ -335,7 +338,7 @@ export class ApiServiceController {
     //Cache for 5mins
     if (redis) {
       try {
-        await redis.set(kontantKey, JSON.stringify(result), 'EX', 300);
+        await redis.set(kontantKey, JSON.stringify(result), 'EX', TTL);
       } catch (error) {
         this.warn(`Redis SET failed: ${error}`);
       }
