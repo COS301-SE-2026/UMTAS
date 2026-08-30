@@ -156,6 +156,14 @@ export class BuilderServiceV2 extends BuilderService {
       this.OOPSIE.log(
         `getPersonalModule: Created module[${JSON.stringify(module)}]`,
       );
+
+      //Enroll into module
+      await this.moduleService.enrollToModuleV2(
+        userId,
+        module.moduleID,
+        { enroll: true },
+        tx,
+      );
     }
 
     return module;
