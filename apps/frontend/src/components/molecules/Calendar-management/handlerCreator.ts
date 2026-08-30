@@ -1,4 +1,5 @@
-import { DateOnlyHanlder, RangeDayHandler } from "./restriction-handlers";
+import { DateOnlyHanlder } from "./DateRestrictionHandler";
+import { RangeDayHandler } from "./restriction-handlers";
 
 export default function createRestrictionHandlers() {
   const start = new DateOnlyHanlder();
