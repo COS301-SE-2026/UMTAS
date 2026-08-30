@@ -56,6 +56,13 @@ const ResTypes: RestrictionTypes[] = [
   "SUPP_WEEK",
   "DAY_SWAP",
 ];
+function toRead(str: string) {
+  str = str.toLocaleLowerCase().replaceAll("_", " ");
+  return str;
+}
+function toEnum(str: string) {
+  return str.toUpperCase().replaceAll(" ", "_");
+}
 export default function CalTemplate() {
   const years = generateYears();
   const yearsWithAC: number[] = [];
@@ -139,6 +146,7 @@ export default function CalTemplate() {
                   {ResTypes.map((type, idx) => {
                     return (
                       <DropdownMenuItem
+                        className="capitalize"
                         key={idx}
                         onSelect={() => {
                           setFlagTempRes(true);
@@ -152,13 +160,22 @@ export default function CalTemplate() {
                           });
                         }}
                       >
-                        {type}
+                        {toRead(type)}
                       </DropdownMenuItem>
                     );
                   })}
                 </DropdownMenuGroup>
               </DropdownMenuContent>
             </DropdownMenu>
+            <Button
+              hidden={!flagtempRes}
+              onClick={() => {
+                setTempRes(null);
+                setFlagTempRes(false);
+              }}
+            >
+              Clear Created restriction
+            </Button>
           </div>
         </div>
         <div className="w-full h-full items-center flex flex-col p-4 px-10">
