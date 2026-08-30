@@ -12,7 +12,11 @@ import {
   EventCriteriaDtoV2,
   EventSingleResponseDto,
 } from 'src/Events/dto/EventDto.dto';
-import { CreateModuleDto, ModulesDto } from 'src/Module/dto/module.dto';
+import {
+  CreateModuleDto,
+  ModulesDto,
+  ModuleSingleResponseDto,
+} from 'src/Module/dto/module.dto';
 import { CourseDto } from 'src/Course/dto/course.dto';
 
 const PERS_MODULE_CODE: string = 'PERS';
@@ -43,7 +47,7 @@ export class BuilderServiceV2 extends BuilderService {
 
     //Get personal Course and Module
     const course = await this.doUserUniCourseCheck(userId, tx);
-    const module = await this.getPersonalModule(userId, course);
+    const module = await this.getOrCreatePersonalModule(userId, course, tx);
 
     //If moduleId defined - create for module - else for personal module
     const moduleId = dto.eventCriteria?.moduleId ?? module.moduleID;
@@ -65,6 +69,23 @@ export class BuilderServiceV2 extends BuilderService {
       message: `Personal event[${result.event.eventName}] created.`,
     };
   } //END_createEvent
+
+  async getPersonalModule(
+    userId: string,
+    tx?: AppDatabase,
+  ): Promise<ModuleSingleResponseDto> {
+    if (!tx) {
+      return this.dbService.db.transaction(async (t: AppDatabase) => {
+        return this.getPersonalModule(userId, t);
+      }); //END_transaction
+    }
+
+    console.log('Hallo');
+
+    const course = await this.doUserUniCourseCheck(userId, tx);
+
+    return await this.getOrCreatePersonalModule(userId, course, tx);
+  } //END_getPersonalModule
 
   //🎅's little helpers
 
@@ -104,21 +125,46 @@ export class BuilderServiceV2 extends BuilderService {
    *
    * @abstract Will create a Personal module if not existing
    */
-  protected async getPersonalModule(
+  protected async getOrCreatePersonalModule(
     userId: string,
     course: CourseDto,
+    tx?: AppDatabase,
   ): Promise<ModulesDto> {
-    const createModuleDto: CreateModuleDto = {
-      moduleName: `Personal_Module [${userId}]`,
-      moduleCode: PERS_MODULE_CODE,
-      moduleDescription: `Module to hold all Personal Events`,
-      CourseID: course.CourseID,
-      validated: true,
-    }; //createModuleDto
+    if (!tx) {
+      return this.dbService.db.transaction(async (t: AppDatabase) => {
+        return this.getOrCreatePersonalModule(userId, course, t);
+      }); //END_transaction
+    }
 
-    const module = await this.moduleService.create(userId, createModuleDto); //module
+    //Check if personal module already exists
+    let module = (
+      await this.moduleService.getAll(
+        userId,
+        {
+          courseId: course.CourseID,
+          moduleCode: PERS_MODULE_CODE,
+        },
+        tx,
+      )
+    ).modules[0];
 
-    this.OOPSIE.log(`getPersonalModule: module=[${JSON.stringify(module)}]`);
+    if (!module) {
+      //Create Personal module
+
+      const createModuleDto: CreateModuleDto = {
+        moduleName: `Personal_Module [${userId}]`,
+        moduleCode: PERS_MODULE_CODE,
+        moduleDescription: `Module to hold all Personal Events`,
+        CourseID: course.CourseID,
+        validated: true,
+      }; //createModuleDto
+
+      module = await this.moduleService.create(userId, createModuleDto, tx); //module
+
+      this.OOPSIE.log(
+        `getPersonalModule: Created module[${JSON.stringify(module)}]`,
+      );
+    }
 
     return module;
   } //END_getPersonalModule

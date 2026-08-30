@@ -37,6 +37,26 @@ export class BuilderController {
     private readonly service2: BuilderServiceV2,
   ) {}
 
+  //Get Personal Module
+  @Get('personalModule')
+  @Roles()
+  @ApiOperation({
+    summary: 'Get personal module',
+    description: 'Get the personal module that owns your personal events',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Module fetched successfully',
+    type: ModuleSingleResponseDto,
+  })
+  getPersonalModule(
+    @CurrentSession() session: SessionData,
+  ): Promise<ModuleSingleResponseDto> {
+    console.log('Hallo COntorller');
+
+    return this.service2.getPersonalModule(session.user.id);
+  }
+
   //Create Module
   @Post()
   @Roles()

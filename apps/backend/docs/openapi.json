@@ -2949,6 +2949,29 @@
         ]
       }
     },
+    "/api/builder/personalModule": {
+      "get": {
+        "description": "Get the personal module that owns your personal events",
+        "operationId": "BuilderController_getPersonalModule",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Module fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModuleSingleResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get personal module",
+        "tags": [
+          "Builder"
+        ]
+      }
+    },
     "/api/builder": {
       "post": {
         "description": "Create a new module and link to appropriate course and automatically enroll student into module",
