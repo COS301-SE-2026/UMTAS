@@ -29,6 +29,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/atoms/baseShadcn/dropdown-menu";
+import { useErrorListener } from "@/hooks/errorListener";
 
 const startYear = 2026;
 const endYear = 2035;
@@ -97,7 +98,7 @@ export default function CalTemplate() {
   const { mutateAsync: createACmut } = useMutation(CreateAcMutation);
 
   const handlers = createRestrictionHandlers();
-
+  useErrorListener();
   return (
     <div className=" items-center flex flex-col gap-6 w-full px-6 capitalize">
       <div className="w-full  h-full max-w-6xl overflow-auto border border-[var(--border)] rounded-xl bg-[var(--bg-surface)] shadow-sm">

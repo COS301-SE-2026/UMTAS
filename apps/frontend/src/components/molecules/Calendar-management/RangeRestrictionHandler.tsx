@@ -17,6 +17,9 @@ import {
   RestrictionHandler,
   restrictionProps,
 } from "./restriction-handlers";
+import { useErrorListener } from "@/hooks/errorListener";
+import { error } from "better-auth/api";
+import { errorName } from "../../../../utilities/errorCries";
 export class RangeDayHandler extends RestrictionHandler {
   constructor() {
     super(["EXAM_PERIOD", "SUPP_WEEK", "TEST_WEEK", "HOLIDAY", "RECESS"]);
@@ -199,6 +202,13 @@ function RangeDateHTML({
             const check = ValidateRes(restriction);
 
             if (check.isError) {
+              window.dispatchEvent(
+                new CustomEvent(errorName, {
+                  detail: {
+                    userMessage: check.error,
+                  },
+                }),
+              );
             } else save();
           }}
           disabled={savePending}
