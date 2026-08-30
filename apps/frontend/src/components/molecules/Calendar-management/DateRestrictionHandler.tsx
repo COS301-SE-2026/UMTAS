@@ -141,6 +141,7 @@ function DateRestrictionHTML({
           type="button"
           variant="ghost"
           size="icon"
+          hidden={restriction.id == ""}
           onClick={deleteRes}
           disabled={deletePending}
           className="h-10 w-10 flex-shrink-0 border border-[var(--error-text)] text-[var(--text-secondary)] transition-colors duration-[var(--duration-fast)] hover:border-[var(--error-text)] hover:text-[var(--error-text)] hover:bg-[var(--error-bg)]"

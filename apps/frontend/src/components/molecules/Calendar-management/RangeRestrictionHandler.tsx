@@ -156,6 +156,7 @@ function RangeDateHTML({
           id="btn-delete-restriction"
           type="button"
           variant="ghost"
+          hidden={restriction.id == ""}
           size="icon"
           onClick={deleteRes}
           disabled={deletePending}
