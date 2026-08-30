@@ -61,7 +61,7 @@ export class AcademicCalendarController {
   @ApiOperation({
     summary: 'Generate and persist a calendar snapshot',
     description:
-      "Generates a restriction-aware pseudo-calendar snapshot using the selected university's current-year academic calendar and a timetable owned by the authenticated student.",
+      "Generates a restriction-aware pseudo-calendar snapshot using the selected university's requested academic year and a timetable owned by the authenticated student.",
     operationId: 'generateCalendar',
   })
   @ApiBody({ type: GenerateCalendarDto })
@@ -97,7 +97,7 @@ export class AcademicCalendarController {
     );
   }
 
-  @Get('generate/:id')
+  @Get('generated/:id')
   @Roles('student')
   @ApiCookieAuth('umtas-session')
   @ApiOperation({
@@ -134,6 +134,28 @@ export class AcademicCalendarController {
       this.selectedUniversityId(session),
       id,
     );
+  }
+
+  @Get('public')
+  @Roles('uni_admin')
+  @ApiCookieAuth('umtas-session')
+  @ApiOperation({
+    summary: 'List public academic calendars',
+    description:
+      'Returns public calendars available for subscription, optionally filtered by academic year.',
+    operationId: 'listPublicAcademicCalendars',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Public academic calendars returned successfully',
+    type: AcademicCalendarDto,
+    isArray: true,
+  })
+  @ApiResponse({ status: 400, description: 'Invalid academic year' })
+  listPublicCalendars(
+    @Query() query: ListAcademicCalendarsQueryDto,
+  ): Promise<AcademicCalendarDto[]> {
+    return this.service.listPublicCalendars(query.year);
   }
 
   @Post()

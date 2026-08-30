@@ -1,4 +1,11 @@
-import { index, jsonb, pgTable, timestamp, uuid } from 'drizzle-orm/pg-core';
+import {
+  index,
+  jsonb,
+  pgTable,
+  timestamp,
+  uniqueIndex,
+  uuid,
+} from 'drizzle-orm/pg-core';
 import type { GeneratedCalendarPayloadDto } from '../../academic_calendar/dto';
 import { Timetable } from '../timetables/timetables.schema';
 import { AcademicCalendar } from './academic-calendar.schema';
@@ -19,6 +26,10 @@ export const GeneratedCalendar = pgTable(
       .notNull(),
   },
   (table) => [
+    uniqueIndex('generated_calendar_calendar_timetable_unique').on(
+      table.academicCalendarId,
+      table.timetableId,
+    ),
     index('generated_calendar_timetable_created_at_idx').on(
       table.timetableId,
       table.createdAt,
