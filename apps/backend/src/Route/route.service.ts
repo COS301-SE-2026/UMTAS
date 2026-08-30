@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   InternalServerErrorException,
@@ -63,8 +64,15 @@ export class RouteService {
     originBuildingId: string,
     destinationBuildingId: string,
   ): Promise<RouteSingleResponseDto> {
-    const universityId = this.requireUniId(session);
     const database = this.databaseService.db;
+
+    if (originBuildingId === destinationBuildingId) {
+      throw new BadRequestException(
+        'Origin and destination buildings need to be different',
+      );
+    }
+
+    const universityId = this.requireUniId(session);
 
     const [directRoute] = await database
       .select()
@@ -189,6 +197,10 @@ export class RouteService {
     if (currentEvent) {
       const buildingId = await this.getMatchingBuildingId(currentEvent.eventId);
 
+      if (!buildingId) {
+        return { status: ActiveRouteStatus.NONE };
+      }
+
       return {
         status: ActiveRouteStatus.AT_VENUE,
         currentBuildingId: buildingId,
@@ -215,6 +227,13 @@ export class RouteService {
 
         if (!fromBuildingId || !toBuildingId) {
           return { status: ActiveRouteStatus.NONE };
+        }
+
+        if (fromBuildingId === toBuildingId) {
+          return {
+            status: ActiveRouteStatus.AT_VENUE,
+            currentBuildingId: fromBuildingId,
+          };
         }
 
         const { route } = await this.getOrCreateRoute(

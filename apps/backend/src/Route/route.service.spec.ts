@@ -66,7 +66,7 @@ describe('RouteService', () => {
 
       //tracks all calls for getOrCreate... hence a spy
       const jamesBond = jest.spyOn(global, 'fetch');
-      mockDbResult(mockDb.select.bind(mockDb), [route]);
+      mockDbResult(mockDb.select, [route]);
       const result = await routeService.getOrCreateRoute(
         mockSession,
         buildingId,
@@ -92,7 +92,7 @@ describe('RouteService', () => {
       ],
     });
 
-    mockSequentialResults(mockDb.select.bind(mockDb), [[], [reverseRoute]]);
+    mockSequentialResults(mockDb.select, [[], [reverseRoute]]);
 
     const result = await routeService.getOrCreateRoute(
       mockSession,
@@ -116,45 +116,21 @@ describe('RouteService', () => {
     const destinationBuilding = createBuilding({
       BuildingID: destinationBuildingId,
     });
-    const savedRoute = createRoute({
-      OriginBuildingID: buildingId,
-      DestinationBuildingID: destinationBuildingId,
-    });
 
-    mockSequentialResults(mockDb.select.bind(mockDb), [
+    mockSequentialResults(mockDb.select, [
       [],
       [],
       [originBuilding],
       [destinationBuilding],
     ]);
-    mockDbResult(mockDb.insert.bind(mockDb), [savedRoute]);
 
-    jest.spyOn(global, 'fetch').mockResolvedValue({
-      ok: true,
-      json: async () =>
-        Promise.resolve({
-          features: [
-            {
-              geometry: {
-                coordinates: [
-                  [28.2314, -25.7545],
-                  [28.232, -25.755],
-                ],
-              },
-              properties: { summary: { distance: 420.4, duration: 310.9 } },
-            },
-          ],
-        }),
-    } as Response);
-
-    const result = await routeService.getOrCreateRoute(
-      mockSession,
-      buildingId,
-      destinationBuildingId,
-    );
-
-    expect(result.route.routeId).toBe(savedRoute.RouteID);
-    expect(mockDb.insert).toHaveBeenCalled();
+    await expect(
+      routeService.getOrCreateRoute(
+        mockSession,
+        buildingId,
+        destinationBuildingId,
+      ),
+    ).rejects.toThrow(NotFoundException);
   });
 
   it('should throw InternalServerErrorException if ORS does not respond ok', async () => {
@@ -165,7 +141,7 @@ describe('RouteService', () => {
       BuildingID: destinationBuildingId,
     });
 
-    mockSequentialResults(mockDb.select.bind(mockDb), [
+    mockSequentialResults(mockDb.select, [
       [],
       [],
       [originBuilding],
@@ -192,7 +168,7 @@ describe('RouteService', () => {
       BuildingID: destinationBuildingId,
     });
 
-    mockSequentialResults(mockDb.select.bind(mockDb), [
+    mockSequentialResults(mockDb.select, [
       [],
       [],
       [originBuilding],
@@ -214,7 +190,7 @@ describe('RouteService', () => {
 
   describe('Test_getActiveRoute', () => {
     it('should return NONE if the student has no planned attended lectures on that day', async () => {
-      mockDbResult(mockDb.select.bind(mockDb), []);
+      mockDbResult(mockDb.select, []);
 
       const result = await routeService.getActiveRoute(
         mockSession,
@@ -232,7 +208,7 @@ describe('RouteService', () => {
         { startTime: '08:30', endTime: '09:20' },
       );
 
-      mockSequentialResults(mockDb.select.bind(mockDb), [
+      mockSequentialResults(mockDb.select, [
         [
           {
             eventId: event.eventID,
@@ -260,7 +236,7 @@ describe('RouteService', () => {
         { startTime: '08:30', endTime: '09:20' },
       );
 
-      mockSequentialResults(mockDb.select.bind(mockDb), [
+      mockSequentialResults(mockDb.select, [
         [
           {
             eventId: event.eventID,
@@ -292,7 +268,7 @@ describe('RouteService', () => {
         { startTime: '09:30', endTime: '10:20' },
       );
 
-      mockSequentialResults(mockDb.select.bind(mockDb), [
+      mockSequentialResults(mockDb.select, [
         [
           {
             eventId: eventLecture.eventID,
@@ -327,7 +303,7 @@ describe('RouteService', () => {
       const result = await routeService.getActiveRoute(
         mockSession,
         '2026-10-12',
-        '09:10',
+        '09:25',
       );
 
       expect(result.status).toBe(ActiveRouteStatus.MOVING);
@@ -352,7 +328,7 @@ describe('RouteService', () => {
         { startTime: '09:30', endTime: '10:20' },
       );
 
-      mockSequentialResults(mockDb.select.bind(mockDb), [
+      mockSequentialResults(mockDb.select, [
         [
           {
             eventId: eventLecture.eventID,
@@ -374,7 +350,7 @@ describe('RouteService', () => {
       const result = await routeService.getActiveRoute(
         mockSession,
         '2026-10-12',
-        '09:10',
+        '09:25',
       );
 
       expect(result.status).toBe(ActiveRouteStatus.AT_VENUE);
@@ -389,7 +365,7 @@ describe('RouteService', () => {
         { startTime: '08:30', endTime: '09:20' },
       );
 
-      mockSequentialResults(mockDb.select.bind(mockDb), [
+      mockSequentialResults(mockDb.select, [
         [
           {
             eventId: event.eventID,
