@@ -1,3 +1,4 @@
+import { ModuleServiceV2 } from 'src/Module/moduleV2.service';
 import { ModuleService } from '../../../Module/module.service';
 
 export function createMockModuleService() {
@@ -18,6 +19,22 @@ export function createMockModuleService() {
 
   return {
     mockModuleService,
+    reset: () => jest.clearAllMocks(),
+  };
+} //END_createMockModuleService
+
+//V2
+export function createMockModuleServiceV2() {
+  const mockModuleServiceV2: Partial<jest.Mocked<ModuleServiceV2>> = {
+    ...createMockModuleService().mockModuleService,
+    create: jest.fn(),
+    getAll: jest.fn(),
+    getByIdV2: jest.fn(),
+    enrollToModuleV2: jest.fn(),
+  };
+
+  return {
+    mockModuleServiceV2,
     reset: () => jest.clearAllMocks(),
   };
 } //END_createMockModuleService

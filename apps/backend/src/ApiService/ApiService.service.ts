@@ -117,7 +117,7 @@ export class ApiService {
   } //END_getCourseWithModulesAndEvents
 
   //🎅's little helpers
-  private async getUni(uniId: string): Promise<UniversityDto> {
+  protected async getUni(uniId: string): Promise<UniversityDto> {
     return await this.uniService.getById(uniId);
   } //END_getUni
 
