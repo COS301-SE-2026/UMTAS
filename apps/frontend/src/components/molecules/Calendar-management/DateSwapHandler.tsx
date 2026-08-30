@@ -84,9 +84,9 @@ function DateSwapHtml({ resType, academicCalendarID }: restrictionProps) {
   }
 
   return (
-    <div className="flex flex-row w-full  items-center justify-items-center gap-6 text-center ">
+    <div className="flex flex-row w-full   items-center justify-items-center gap-6 text-center ">
       <div className="w-full flex flex-col gap-y-2">
-        <div className="w-full grid grid-cols-2 gap-x-2">
+        <div className="w-full grid grid-cols-1 lg:grid-cols-2  gap-x-2">
           <Label className="text-sm font-medium text-[var(--text-secondary)] flex flex-col">
             Start Date
             <Input
