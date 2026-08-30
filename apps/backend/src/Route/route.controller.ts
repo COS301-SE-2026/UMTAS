@@ -8,7 +8,12 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Roles } from 'src/auth/roles.guard';
-import { RouteQueryDto, RouteSingleResponseDto } from './dto/route.dto';
+import {
+  ActiveRouteQueryDto,
+  ActiveRouteResponseDto,
+  RouteQueryDto,
+  RouteSingleResponseDto,
+} from './dto/route.dto';
 import { CurrentSession, type SessionData } from 'src/auth/session.decorator';
 import { RouteService } from './route.service';
 
@@ -45,5 +50,26 @@ export class RouteController {
       query.originBuildingId,
       query.destinationBuildingId,
     );
+  }
+
+  @Get('active')
+  @Roles('student')
+  @ApiOperation({
+    description:
+      'Returns whether the student as at a venue, moving between two venues, or has no planned event in that time',
+    summary: 'Get student route status at certain date/time',
+  })
+  @ApiOkResponse({
+    description: 'Route status retured successfully',
+    type: ActiveRouteResponseDto,
+  })
+  @ApiForbiddenResponse({
+    description: 'No university or university role was selected',
+  })
+  getActiveRoute(
+    @CurrentSession() session: SessionData,
+    @Query() query: ActiveRouteQueryDto,
+  ): Promise<ActiveRouteResponseDto> {
+    return this.routeService.getActiveRoute(session, query.date, query.time);
   }
 }
