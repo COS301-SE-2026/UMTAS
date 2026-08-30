@@ -101,7 +101,7 @@ export class CourseServiceV2 extends CourseService {
   async getByExternalID(
     externalId: string,
     uniId: string,
-  ): Promise<CourseSingleResponseDto> {
+  ): Promise<CourseSingleResponseDto | null> {
     const [course] = await this.dbService.db
       .select()
       .from(Course)
@@ -110,6 +110,6 @@ export class CourseServiceV2 extends CourseService {
       )
       .limit(1);
 
-    return course;
+    return course ?? null;
   }
 } //END_COurseServiceV2

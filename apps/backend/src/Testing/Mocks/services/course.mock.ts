@@ -25,6 +25,7 @@ export function createMockCourseServiceV2() {
     ...createMockCourseService().mockCourseService,
     getAllV2: jest.fn(),
     getByIdV2: jest.fn(),
+    getByExternalID: jest.fn(),
   };
 
   return {

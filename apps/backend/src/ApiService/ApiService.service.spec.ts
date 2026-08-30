@@ -29,8 +29,10 @@ import { NWU_Adapter } from './Adapter/NWU/NWU_Adapter';
 import {
   CourseListResponseDto,
   CourseSingleResponseDto,
+  CreateCourseDto,
 } from 'src/Course/dto/course.dto';
 import {
+  CreateModuleDto,
   ModuleListResponseDto,
   ModuleSingleResponseDto,
 } from 'src/Module/dto/module.dto';
@@ -110,20 +112,14 @@ describe('ApiService', () => {
   //Tests
 
   describe('Test_getCourse', () => {
-    //UnHappy - throw Badrequest from getCOurse
-    it('should throw if courseId is invalid', async () => {
-      //Act + Assert
-      await expect(service.getModules(userId, uniId, '   ')).rejects.toThrow(
-        new BadRequestException('Invalid courseID'),
-      );
-    });
-
-    //Happy - returns a course
-    it('should return a list of courses', async () => {
+    //Happy - creates and returns courses
+    it('should return a list of courses - freshly created', async () => {
       // Arrange
       const getUniSpy = jest
         .spyOn(service['uniService'], 'getById')
         .mockResolvedValue(nwuUni);
+
+      mockCourseServiceV2.getByExternalID?.mockResolvedValue(null);
 
       const course1 = createCourse();
       const course2 = createCourse();
@@ -143,10 +139,99 @@ describe('ApiService', () => {
       expect(getUniSpy).toHaveBeenCalledWith(nwuUni.UniversityID);
       expect(result).toMatchObject(expectedResult);
     });
+
+    //Happy - updates and returns courses
+    it('should return a list of courses - updated', async () => {
+      // Arrange
+      const getUniSpy = jest
+        .spyOn(service['uniService'], 'getById')
+        .mockResolvedValue(nwuUni);
+
+      const oldCourse1 = createCourse({ CourseName: 'old1' });
+      const oldCourse2 = createCourse({ CourseName: 'old2' });
+
+      mockCourseServiceV2.getByExternalID
+        ?.mockResolvedValueOnce(oldCourse1)
+        .mockResolvedValueOnce(oldCourse2);
+
+      const course1 = createCourse();
+      const course2 = createCourse();
+
+      mockCourseServiceV2.update?.mockResolvedValueOnce(course1);
+      mockCourseServiceV2.update?.mockResolvedValueOnce(course2);
+
+      const expectedResult: CourseListResponseDto = {
+        courses: [course1, course2],
+        message: 'Number of courses returned = [2]',
+      };
+
+      // Act
+      const result = await service.getCourses(nwuUni.UniversityID, 1, 2);
+
+      // Assert
+      expect(getUniSpy).toHaveBeenCalledWith(nwuUni.UniversityID);
+      expect(mockCourseServiceV2.update).toHaveBeenCalledTimes(2);
+
+      expect(result).toMatchObject(expectedResult);
+    });
+
+    //Happy - fetch and returns courses
+    it('should return a list of existing courses', async () => {
+      // Arrange
+      const getUniSpy = jest
+        .spyOn(service['uniService'], 'getById')
+        .mockResolvedValue(nwuUni);
+
+      const course1 = createCourse({ ExternalID: '1' });
+      const course2 = createCourse({ ExternalID: '2' });
+
+      mockCourseServiceV2.getByExternalID
+        ?.mockResolvedValueOnce(course1)
+        .mockResolvedValueOnce(course2);
+
+      const mockCoursesFromAdapter: Partial<CreateCourseDto>[] = [
+        {
+          CourseName: course1.CourseName,
+          ExternalID: course1.ExternalID,
+        },
+        {
+          CourseName: course2.CourseName,
+          ExternalID: course2.ExternalID,
+        },
+      ];
+
+      mockNWUAdapter.getCourses = jest
+        .fn()
+        .mockResolvedValue(mockCoursesFromAdapter);
+
+      const expectedResult: CourseListResponseDto = {
+        courses: [course1, course2],
+        message: 'Number of courses returned = [2]',
+      };
+
+      // Act
+      const result = await service.getCourses(nwuUni.UniversityID, 1, 2);
+
+      // Assert
+      expect(getUniSpy).toHaveBeenCalledWith(nwuUni.UniversityID);
+      expect(mockCourseServiceV2.update).not.toHaveBeenCalled();
+      expect(mockCourseServiceV2.create).not.toHaveBeenCalled();
+
+      expect(result).toMatchObject(expectedResult);
+    });
   }); //END_Test_getCourse
 
   describe('Test_getModules', () => {
-    it('should return a list of modules', async () => {
+    //UnHappy - throw Badrequest from getCOurse
+    it('should throw if courseId is invalid', async () => {
+      //Act + Assert
+      await expect(service.getModules(userId, uniId, '   ')).rejects.toThrow(
+        new BadRequestException('Invalid courseID'),
+      );
+    });
+
+    //Happy - Create + return modules
+    it('should return a list of modules - created freshly', async () => {
       // Arrange
       const getUniSpy = jest
         .spyOn(service['uniService'], 'getById')
@@ -160,6 +245,8 @@ describe('ApiService', () => {
       const getCourseSpy = jest
         .spyOn(service['courseService'], 'getById')
         .mockResolvedValue(course);
+
+      mockModuleServiceV2.getByExternalID?.mockResolvedValue(null);
 
       const module1 = createModule();
       const module2 = createModule();
@@ -207,6 +294,142 @@ describe('ApiService', () => {
       expect(moduleServiceSpy).toHaveBeenCalledTimes(2);
 
       expect(result).toMatchObject(expectedResult);
+    });
+
+    //Happy - Update + return modules
+    it('should return a list of modules - created freshly', async () => {
+      // Arrange
+      const getUniSpy = jest
+        .spyOn(service['uniService'], 'getById')
+        .mockResolvedValue(nwuUni);
+
+      const course = createCourse({
+        CourseID: courseId,
+        CourseName: 'someCourse',
+      });
+
+      const getCourseSpy = jest
+        .spyOn(service['courseService'], 'getById')
+        .mockResolvedValue(course);
+
+      const oldModule1 = createModule();
+      const oldModule2 = createModule();
+
+      mockModuleServiceV2.getByExternalID
+        ?.mockResolvedValueOnce(oldModule1)
+        .mockResolvedValueOnce(oldModule2);
+
+      const module1 = createModule();
+      const module2 = createModule();
+
+      const mockModulesFromAdapter = [
+        {
+          UniversityID: uniId,
+          CourseID: courseId,
+          ExternalID: 'MOD1',
+        },
+        {
+          UniversityID: uniId,
+          CourseID: courseId,
+          ExternalID: 'MOD2',
+        },
+      ];
+
+      mockNWUAdapter.getModules = jest
+        .fn()
+        .mockResolvedValue(mockModulesFromAdapter);
+
+      // Mock the moduleService.create to return the created modules
+      const moduleServiceSpy = jest
+        .spyOn(service['moduleService'], 'update')
+        .mockResolvedValueOnce(module1)
+        .mockResolvedValueOnce(module2);
+
+      const modules: ModuleSingleResponseDto[] = [
+        createModuleSingleResponseDto(module1),
+        createModuleSingleResponseDto(module2),
+      ];
+
+      const expectedResult: ModuleListResponseDto = {
+        modules,
+        message: `Modules returned for course[${course.CourseName}] = [${modules.length}]`,
+      };
+
+      // Act
+      const result = await service.getModules(userId, uniId, courseId);
+
+      // Assert
+      expect(getUniSpy).toHaveBeenCalled();
+      expect(getCourseSpy).toHaveBeenCalled();
+      expect(mockNWUAdapter.getModules).toHaveBeenCalled();
+      expect(moduleServiceSpy).toHaveBeenCalledTimes(2);
+
+      expect(result).toMatchObject(expectedResult);
+    });
+
+    //Happy - Fetch + return modules
+    it('should return existing modules when nothing has changed', async () => {
+      // Arrange
+      const getUniSpy = jest
+        .spyOn(service['uniService'], 'getById')
+        .mockResolvedValue(nwuUni);
+
+      const course = createCourse({
+        CourseID: courseId,
+        CourseName: 'someCourse',
+      });
+
+      const getCourseSpy = jest
+        .spyOn(service['courseService'], 'getById')
+        .mockResolvedValue(course);
+
+      const existingModule1 = createModule({
+        ExternalID: '1',
+      });
+
+      const existingModule2 = createModule({
+        ExternalID: '2',
+      });
+
+      mockModuleServiceV2.getByExternalID
+        ?.mockResolvedValueOnce(existingModule1)
+        .mockResolvedValueOnce(existingModule2);
+
+      const mockModulesFromAdapter: Partial<CreateModuleDto>[] = [
+        {
+          moduleName: existingModule1.moduleName,
+          ExternalID: existingModule1.ExternalID,
+        },
+        {
+          moduleName: existingModule1.moduleName,
+          ExternalID: existingModule2.ExternalID,
+        },
+      ];
+
+      mockNWUAdapter.getModules = jest
+        .fn()
+        .mockResolvedValue(mockModulesFromAdapter);
+
+      // Act
+      const result = await service.getModules(userId, uniId, courseId);
+
+      // Assert
+      expect(getUniSpy).toHaveBeenCalledWith(uniId);
+      expect(getCourseSpy).toHaveBeenCalledWith(courseId);
+      expect(mockNWUAdapter.getModules).toHaveBeenCalledWith(course);
+
+      expect(mockModuleServiceV2.getByExternalID).toHaveBeenCalledTimes(2);
+
+      // Nothing should be created or updated
+      expect(mockModuleServiceV2.create).not.toHaveBeenCalled();
+      expect(mockModuleServiceV2.update).not.toHaveBeenCalled();
+
+      // Existing modules should be returned
+      expect(result.modules).toEqual([existingModule1, existingModule2]);
+
+      expect(result.message).toBe(
+        `Modules returned for course[${course.CourseName}] = [2]`,
+      );
     });
   });
 

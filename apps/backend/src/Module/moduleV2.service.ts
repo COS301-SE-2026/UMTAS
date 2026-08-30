@@ -452,7 +452,7 @@ export class ModuleServiceV2 extends ModuleService {
   async getByExternalID(
     externalId: string,
     courseId: string,
-  ): Promise<ModuleSingleResponseDto> {
+  ): Promise<ModuleSingleResponseDto | null> {
     const [module] = await this.dbService.db
       .select(getTableColumns(modules))
       .from(modules)
@@ -467,7 +467,7 @@ export class ModuleServiceV2 extends ModuleService {
       )
       .limit(1);
 
-    return module;
+    return module ?? null;
   }
 
   //🎅's little helpers

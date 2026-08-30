@@ -31,6 +31,7 @@ export function createMockModuleServiceV2() {
     getAll: jest.fn(),
     getByIdV2: jest.fn(),
     enrollToModuleV2: jest.fn(),
+    getByExternalID: jest.fn(),
   };
 
   return {
