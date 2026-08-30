@@ -4007,6 +4007,56 @@
         "tags": ["Routes"]
       }
     },
+    "/api/routes/active": {
+      "get": {
+        "description": "Returns whether the student as at a venue, moving between two venues, or has no planned event in that time",
+        "operationId": "RouteController_getActiveRoute",
+        "parameters": [
+          {
+            "name": "date",
+            "required": true,
+            "in": "query",
+            "description": "Calendar date that matches the EventAttendance date",
+            "schema": {
+              "example": "2026/10/12",
+              "type": "string"
+            }
+          },
+          {
+            "name": "time",
+            "required": true,
+            "in": "query",
+            "description": "Time in hh:mm",
+            "schema": {
+              "example": "10:12",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Route status returned successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActiveRouteResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No university or university role was selected"
+          }
+        },
+        "security": [
+          {
+            "umtas-session": []
+          }
+        ],
+        "summary": "Get student route status at certain date/time",
+        "tags": ["Routes"]
+      }
+    },
     "/api/api-service/courses": {
       "get": {
         "description": "Fetches courses for the authenticated user's university.",
@@ -7729,6 +7779,41 @@
           }
         },
         "required": ["route"]
+      },
+      "ActiveRouteStatus": {
+        "type": "string",
+        "enum": ["AT_VENUE", "MOVING", "NONE"]
+      },
+      "ActiveRouteResponseDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "example": "MOVING",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ActiveRouteStatus"
+              }
+            ]
+          },
+          "currentBuildingId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid",
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "route": {
+            "$ref": "#/components/schemas/RouteDto"
+          },
+          "fromEventName": {
+            "type": "string",
+            "example": "Lecture 1"
+          },
+          "toEventName": {
+            "type": "string",
+            "example": "Lecture 2"
+          }
+        },
+        "required": ["status"]
       }
     }
   }

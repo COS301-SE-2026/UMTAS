@@ -1359,6 +1359,26 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/routes/active": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get student route status at certain date/time
+     * @description Returns whether the student as at a venue, moving between two venues, or has no planned event in that time
+     */
+    get: operations["RouteController_getActiveRoute"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/api-service/courses": {
     parameters: {
       query?: never;
@@ -3378,6 +3398,22 @@ export interface components {
     };
     RouteSingleResponseDto: {
       route: components["schemas"]["RouteDto"];
+    };
+    /** @enum {string} */
+    ActiveRouteStatus: "AT_VENUE" | "MOVING" | "NONE";
+    ActiveRouteResponseDto: {
+      /** @example MOVING */
+      status: components["schemas"]["ActiveRouteStatus"];
+      /**
+       * Format: uuid
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      currentBuildingId?: string | null;
+      route?: components["schemas"]["RouteDto"];
+      /** @example Lecture 1 */
+      fromEventName?: string;
+      /** @example Lecture 2 */
+      toEventName?: string;
     };
   };
   responses: never;
@@ -6747,6 +6783,38 @@ export interface operations {
       };
       /** @description One or both buildings have not been pinned, or no walking path was found between the two buildings */
       404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  RouteController_getActiveRoute: {
+    parameters: {
+      query: {
+        /** @description Calendar date that matches the EventAttendance date */
+        date: string;
+        /** @description Time in hh:mm */
+        time: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Route status returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ActiveRouteResponseDto"];
+        };
+      };
+      /** @description No university or university role was selected */
+      403: {
         headers: {
           [name: string]: unknown;
         };

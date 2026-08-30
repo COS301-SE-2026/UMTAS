@@ -60,7 +60,7 @@ export class RouteController {
     summary: 'Get student route status at certain date/time',
   })
   @ApiOkResponse({
-    description: 'Route status retured successfully',
+    description: 'Route status returned successfully',
     type: ActiveRouteResponseDto,
   })
   @ApiForbiddenResponse({
