@@ -263,7 +263,7 @@ export class RouteService {
       .select({ buildingId: Venue.BuildingID })
       .from(EventVenue)
       .innerJoin(Venue, eq(Venue.VenueID, EventVenue.VenueID))
-      .where(eq(EventVenue.VenueID, eventId))
+      .where(eq(EventVenue.EventID, eventId))
       .limit(1);
 
     return row?.buildingId ?? null;

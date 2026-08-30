@@ -10,6 +10,7 @@ import {
   IsPositive,
   IsString,
   IsUUID,
+  Matches,
   ValidateNested,
 } from 'class-validator';
 import { LatLngDto } from 'src/Building/dto/building.dto';
@@ -98,7 +99,9 @@ export class ActiveRouteQueryDto {
     description: 'Time in hh:mm',
     example: '10:12',
   })
-  @IsString()
+  @Matches(/^([01]\d|2[0-3]):([0-5]\d)$/, {
+    message: 'time must be in the format HH:mm',
+  })
   time!: string;
 }
 
