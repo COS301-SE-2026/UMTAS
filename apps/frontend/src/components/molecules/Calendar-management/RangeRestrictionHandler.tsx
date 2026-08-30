@@ -17,8 +17,7 @@ import {
   RestrictionHandler,
   restrictionProps,
 } from "./restriction-handlers";
-import { useErrorListener } from "@/hooks/errorListener";
-import { error } from "better-auth/api";
+
 import { errorName } from "../../../../utilities/errorCries";
 export class RangeDayHandler extends RestrictionHandler {
   constructor() {

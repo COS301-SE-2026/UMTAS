@@ -13,7 +13,11 @@ import {
   CreateRestrictionMutation,
 } from "../../../../utilities/Calendar-Builders/RestrictionManagement";
 import { Label } from "@/components/atoms/baseShadcn/label";
-import { RestrictionHandler, restrictionProps } from "./restriction-handlers";
+import {
+  errorManagement,
+  RestrictionHandler,
+  restrictionProps,
+} from "./restriction-handlers";
 import {
   Select,
   SelectTrigger,
@@ -22,6 +26,7 @@ import {
   SelectItem,
 } from "@/components/atoms/baseShadcn/select";
 import { CreateAcMutation } from "../../../../utilities/Calendar-Builders/CalendarManagement";
+import { errorName } from "../../../../utilities/errorCries";
 
 export const EnumDays: RestrictionDays[] = [
   "MONDAY",
@@ -37,6 +42,24 @@ function toRead(str: string) {
   return str.toLowerCase();
 }
 
+function ValidateRes(res: SingleRestrictionResp) {
+  const errorMessage: errorManagement = {
+    error: "",
+    isError: false,
+  };
+
+  if (res.description == "") {
+    errorMessage.isError = true;
+    errorMessage.error = "Description cannot be empty";
+  } else if (res.startDate == "") {
+    errorMessage.isError = true;
+    errorMessage.error = "Start date must be set";
+  } else if (res.replacementWeekday == undefined) {
+    errorMessage.isError = true;
+    errorMessage.error = "replacement day must be set";
+  }
+  return errorMessage;
+}
 export class DateSwapHandler extends RestrictionHandler {
   constructor() {
     super(["DAY_SWAP"]);
@@ -204,7 +227,19 @@ function DateSwapHtml({
           type="button"
           variant="ghost"
           size="icon"
-          onClick={save}
+          onClick={() => {
+            const check = ValidateRes(restriction);
+
+            if (check.isError) {
+              window.dispatchEvent(
+                new CustomEvent(errorName, {
+                  detail: {
+                    userMessage: check.error,
+                  },
+                }),
+              );
+            } else save();
+          }}
           disabled={savePending}
           className="h-10 w-10 flex-shrink-0 border border-[var(--success-text)] text-[var(--text-secondary)] transition-colors duration-[var(--duration-fast)] hover:border-[var(--success-text)] hover:text-[var(--success-text)] hover:bg-[var(--success-bg)]"
         >
