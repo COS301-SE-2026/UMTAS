@@ -313,7 +313,7 @@ export function EventsStep({
   function handleUpdate(
     id: string,
     field: keyof EventResponse | keyof EventCriteria,
-    value: string | boolean,
+    value: string | boolean | string[],
   ) {
     setIsDirty(true);
     getQueryClient().setQueryData(
