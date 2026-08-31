@@ -1,0 +1,16 @@
+apps/frontend/src/components/molecules/viewTimetable/googleExport.tsx
+  h_8b894b05e4a1b2 1-151
+apps/frontend/src/components/organisms/viewTimetable/ScheduleView.tsx
+  h_8b894b05e4a1b2 50-51,109-110,457-466,528-537
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "f5f3e110f79750d8821981d928fac871c9778609",
+  "prompts": {},
+  "humans": {
+    "h_8b894b05e4a1b2": {
+      "author": "Wilmar-Smit <u24584216@tuks.co.za>"
+    }
+  }
+}
