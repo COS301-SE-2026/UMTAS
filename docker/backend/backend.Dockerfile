@@ -29,4 +29,4 @@ EXPOSE 8000
 USER node
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
   CMD node -e "require('http').get('http://127.0.0.1:'+process.env.PORT+'/api/health',r=>process.exit(r.statusCode>=200&&r.statusCode<300?0:1)).on('error',()=>process.exit(1))"
-CMD ["node", "dist/main"]
+CMD ["sh", "-c", "node dist/db/migrate.js && node dist/main.js"]
