@@ -217,7 +217,7 @@ export class BuilderController {
   @ApiResponse({
     status: 201,
     description: 'Event created successfully',
-    type: ModuleSingleResponseDto,
+    type: EventSingleResponseDto,
   })
   @ApiResponse({
     status: 404,
