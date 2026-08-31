@@ -47,6 +47,8 @@ import { UserDetails } from "@/lib/userclass/userClass";
 
 import Tutorial from "@/components/organisms/nav/Tutorial";
 import { fetchAllModulesv2 } from "../../../../utilities/V2-Builders/Modules";
+import GooglePopup from "@/components/molecules/viewTimetable/googleExport";
+import Popup from "@/components/atoms/utility/floatContainer";
 const emptySteps = [
   {
     target: "#ref-go-to-builder",
@@ -103,6 +105,8 @@ export function ScheduleView({
 
   const { mutateAsync: addTimetable } = useMutation(addTimetableMut());
   const { mutateAsync: updateTimetable } = useMutation(updateTimetableMut());
+
+  const [showGC, setShowGC] = useState(false);
 
   const { data: allModules = [], isLoading: isLoadingModules } = useQuery({
     queryKey: ["Modules", "Courses"],
@@ -451,6 +455,16 @@ export function ScheduleView({
                     Export to ICS
                   </Button>
                   <Button
+                    id="btn-delete"
+                    type="button"
+                    className="h-7 px-3 text-xs bg-[var(--bg-surface)] text-[var(--text-primary)] border-[var(--border)] hover:opacity-90"
+                    onClick={() => {
+                      setShowGC(true);
+                    }}
+                  >
+                    Export to Google Calendar
+                  </Button>
+                  <Button
                     id="btn-create"
                     type="button"
                     className="h-7 px-3 text-xs bg-[var(--bg-surface)] text-[var(--text-primary)] border-[var(--border)] hover:opacity-90"
@@ -511,6 +525,16 @@ export function ScheduleView({
             </div>
           )}
         </div>
+
+        {showGC && (
+          <Popup
+            onClose={() => {
+              setShowGC(false);
+            }}
+          >
+            <GooglePopup></GooglePopup>
+          </Popup>
+        )}
       </>
     );
   }
