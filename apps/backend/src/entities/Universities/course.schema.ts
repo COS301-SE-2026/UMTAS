@@ -5,6 +5,7 @@ import {
   integer,
   boolean,
   uniqueIndex,
+  unique,
 } from 'drizzle-orm/pg-core';
 import { modules } from '../Modules';
 import { University } from './University.schema';
@@ -17,17 +18,27 @@ export const ModuleGrouping = pgTable('ModuleGrouping', {
 
 //Course metadata for moduleGrouping
 //GroupID is optional - course can exist without a ModuleGrouping - but needs to belong to  university
-export const Course = pgTable('Course', {
-  CourseID: uuid('CourseID').primaryKey().defaultRandom(),
-  UniversityID: uuid('UniversityID') // university owns
-    .references(() => University.UniversityID, { onDelete: 'cascade' })
-    .notNull(),
-  GroupID: uuid('GroupID').references(() => ModuleGrouping.GroupID, {
-    onDelete: 'set null',
-  }),
-  CourseName: varchar('CourseName', { length: 30 }).notNull(),
-  Degree: varchar('Degree', { length: 30 }),
-});
+export const Course = pgTable(
+  'Course',
+  {
+    CourseID: uuid('CourseID').primaryKey().defaultRandom(),
+    UniversityID: uuid('UniversityID') // university owns
+      .references(() => University.UniversityID, { onDelete: 'cascade' })
+      .notNull(),
+    GroupID: uuid('GroupID').references(() => ModuleGrouping.GroupID, {
+      onDelete: 'set null',
+    }),
+    CourseName: varchar('CourseName', { length: 255 }).notNull(),
+    Degree: varchar('Degree', { length: 30 }),
+    ExternalID: varchar('ExternalID', { length: 255 }),
+  },
+  (table) => [
+    unique('Course_University_ExternalID_Unique').on(
+      table.UniversityID,
+      table.ExternalID,
+    ),
+  ],
+);
 
 //Join table defining modules grouped together to ModuleGrouping
 export const GroupModules = pgTable(

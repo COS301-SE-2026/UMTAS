@@ -27,7 +27,7 @@
     "heuristics": [
       {
         "key": "preferred-start-time",
-        "parameters": { "minutesAfterMidnight": 600 }
+        "parameters": { "minutes-After-midnight": 600 }
       }
     ]
   }

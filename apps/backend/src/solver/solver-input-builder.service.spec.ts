@@ -3,7 +3,7 @@ import {
   ConflictException,
   NotFoundException,
 } from '@nestjs/common';
-import { SolverInputSchema } from 'shared-types';
+import { SolverInputSchema, SolverPreferences } from 'shared-types';
 import { createSolverJob } from '../Testing/Factories';
 import { createMockDatabase } from '../Testing/Mocks/database.mock';
 import { mockDbResult } from '../Testing/Mocks/database.helpers';
@@ -71,8 +71,8 @@ describe('SolverInputBuilderService', () => {
         venueName: 'Alpha',
       }),
     ]);
-    const preferences = {
-      heuristics: [{ key: 'compact-days', weight: 2 }],
+    const preferences: SolverPreferences = {
+      heuristics: [{ key: 'small-gaps' }],
     };
 
     const result = await h.service.buildForSubmission(

@@ -14,6 +14,7 @@ export function createCourse(overrides: Partial<Course> = {}): Course {
     GroupID: null,
     CourseName: COURSE_NAME,
     Degree: DEGREE,
+    ExternalID: null,
 
     ...overrides,
   };

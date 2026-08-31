@@ -93,12 +93,16 @@ export function WeeklyGrid({ events, weekStart }: WeeklyGridProps) {
     const result: ScheduleEvent[] = [];
 
     for (const event of events) {
-      if (event.isRecurring) {
+      if (event.isRecurring || event.date === "") {
         if (event.dayOfWeek?.toLowerCase() === currentDayName) {
           result.push(event);
         }
       } else {
-        if (event.date === dateStr) {
+        if (
+          event.date === dateStr &&
+          event.date != undefined &&
+          event.date != ""
+        ) {
           result.push(event);
         }
       }

@@ -328,7 +328,13 @@ export function createAuth(input: CreateAuthInput) {
       enabled: true,
       storage: redisClient ? 'secondary-storage' : 'memory',
       window: 60,
-      max: 100,
+      max: isProduction ? 100 : 5000,
+      customRules: {
+        '/sign-in/email': {
+          window: 60,
+          max: isProduction ? 5 : 5000,
+        },
+      },
     },
     session: {
       expiresIn: 60 * 60 * 24 * 7, // 7 days (reduced from 30 for classroom security)
