@@ -1,0 +1,14 @@
+apps/frontend/src/components/organisms/viewTimetable/ScheduleView.tsx
+  h_8b894b05e4a1b2 441-452,459
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "b0cf9ba142f4828363e75cce09a0d4309e6662b3",
+  "prompts": {},
+  "humans": {
+    "h_8b894b05e4a1b2": {
+      "author": "Wilmar-Smit <u24584216@tuks.co.za>"
+    }
+  }
+}
