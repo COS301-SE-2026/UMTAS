@@ -3582,7 +3582,7 @@
     },
     "/api/academic-calendar/generate": {
       "post": {
-        "description": "Generates a restriction-aware pseudo-calendar snapshot using the selected university's current-year academic calendar and a timetable owned by the authenticated student.",
+        "description": "Generates a restriction-aware pseudo-calendar snapshot using the selected university's requested academic year and a timetable owned by the authenticated student.",
         "operationId": "generateCalendar",
         "parameters": [],
         "requestBody": {
@@ -3628,7 +3628,7 @@
         "tags": ["Academic Calendar"]
       }
     },
-    "/api/academic-calendar/generate/{id}": {
+    "/api/academic-calendar/generated/{id}": {
       "get": {
         "description": "Returns a generated snapshot only when its timetable belongs to the authenticated student.",
         "operationId": "getGeneratedCalendar",
@@ -3668,6 +3668,51 @@
           }
         ],
         "summary": "Get a generated calendar snapshot",
+        "tags": ["Academic Calendar"]
+      }
+    },
+    "/api/academic-calendar/public": {
+      "get": {
+        "description": "Returns public calendars available for subscription, optionally filtered by academic year.",
+        "operationId": "listPublicAcademicCalendars",
+        "parameters": [
+          {
+            "name": "year",
+            "required": false,
+            "in": "query",
+            "description": "Limit results to a four-digit academic year.",
+            "schema": {
+              "minimum": 1000,
+              "maximum": 9999,
+              "example": 2026,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Public academic calendars returned successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AcademicCalendarDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid academic year"
+          }
+        },
+        "security": [
+          {
+            "umtas-session": []
+          }
+        ],
+        "summary": "List public academic calendars",
         "tags": ["Academic Calendar"]
       }
     },
@@ -7542,6 +7587,13 @@
             "format": "uuid",
             "example": "339cd591-7c62-4ea7-8a2b-602598553133",
             "description": "Timetable containing the source events to generate."
+          },
+          "year": {
+            "minimum": 1000,
+            "maximum": 9999,
+            "type": "number",
+            "example": 2027,
+            "description": "Academic year to generate. Defaults to the current UTC year."
           }
         },
         "required": ["timetableId"]
@@ -7825,19 +7877,6 @@
         },
         "required": ["id", "payload"]
       },
-      "CreateAcademicCalendarDto": {
-        "type": "object",
-        "properties": {
-          "year": {
-            "minimum": 1000,
-            "maximum": 9999,
-            "type": "number",
-            "example": 2026,
-            "description": "Four-digit academic year. A university may have only one calendar per year."
-          }
-        },
-        "required": ["year"]
-      },
       "AcademicCalendarDto": {
         "type": "object",
         "properties": {
@@ -7865,6 +7904,19 @@
           }
         },
         "required": ["id", "year", "subscriptions"]
+      },
+      "CreateAcademicCalendarDto": {
+        "type": "object",
+        "properties": {
+          "year": {
+            "minimum": 1000,
+            "maximum": 9999,
+            "type": "number",
+            "example": 2026,
+            "description": "Four-digit academic year. A university may have only one calendar per year."
+          }
+        },
+        "required": ["year"]
       },
       "CalendarRestrictionDto": {
         "type": "object",

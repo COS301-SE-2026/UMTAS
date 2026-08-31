@@ -10,6 +10,16 @@ import {
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
 import { mutationOptions, queryOptions } from "@tanstack/react-query";
 
+import type { paths } from "@/lib/api";
+
+export type BuilderEventV2 = paths["/api/builder/events"]["post"];
+
+export type BuilderEventV2Body =
+  BuilderEventV2["requestBody"]["content"]["application/json"];
+
+export type BuilderEventV2Resp =
+  BuilderEventV2["responses"]["201"]["content"]["application/json"];
+
 export function getAllEventsQ() {
   return queryOptions({
     queryKey: ["events"] as const,
