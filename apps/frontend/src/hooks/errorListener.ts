@@ -8,7 +8,7 @@ export const useErrorListener = () => {
       const CustomEvent = event as CustomEvent<ErrorPayload>;
       const { debugError, userMessage } = CustomEvent.detail;
 
-      console.error(`[Error man]: ${debugError}`);
+      if (debugError) console.error(`[Error man]: ${debugError}`);
 
       //the actual UI that gets rendered once the error is emitted by errorCries.ts
       toast.error(userMessage);

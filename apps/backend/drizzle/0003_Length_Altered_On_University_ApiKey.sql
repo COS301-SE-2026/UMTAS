@@ -1,1 +1,0 @@
-ALTER TABLE "University" ALTER COLUMN "ApiKey" SET DATA TYPE varchar(100);

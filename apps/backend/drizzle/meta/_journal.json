@@ -5,71 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1787225145151,
-      "tag": "0000_nappy_molecule_man",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1786456402299,
-      "tag": "0001_Added_BaseUrl_ApiKey_To_University_Object",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1786464786667,
-      "tag": "0002_University_ApiIdentifier_Added",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1786465212314,
-      "tag": "0003_Length_Altered_On_University_ApiKey",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1786779652024,
-      "tag": "0004_Added_ExternalID_To_Course_Entity",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1786787222981,
-      "tag": "0005_Course_Name_Now_Length_100",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1786789191985,
-      "tag": "0006_ExternalID_Added_To_Module_Entity",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "7",
-      "when": 1786790623006,
-      "tag": "0007_Removed_Unique_Constraint_On_ModuleCode",
-      "breakpoints": true
-    },
-    {
-      "idx": 8,
-      "version": "7",
-      "when": 1787037094049,
-      "tag": "0008_Added_Unique_Constraint_Back_Onto_Modules",
-      "breakpoints": true
-    },
-    {
-      "idx": 9,
-      "version": "7",
-      "when": 1787038510505,
-      "tag": "0009_ModuleCode_Length_Changed_to_15_from_10",
+      "when": 1788162115777,
+      "tag": "0000_calendar-gen",
       "breakpoints": true
     },
     {

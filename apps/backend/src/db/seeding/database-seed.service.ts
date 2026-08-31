@@ -9,6 +9,8 @@ import { UniversitySeedService } from './services/university.seed.service';
 import { UniRolesSeedService } from './services/universityRoles.seed.service';
 import { UserSeedService } from './services/users.seed.service';
 import { SeedPersistenceService } from './seed-persistence.service';
+import { AcademicCalendarSeedService } from './services/academic-calendar.seed.service';
+import { PublicCalendarSeedService } from './services/public-calendar.seed.service';
 
 @Injectable()
 export class DatabaseSeedService {
@@ -20,6 +22,8 @@ export class DatabaseSeedService {
     private readonly universityRolesSeedService: UniRolesSeedService,
     private readonly courseSeedService: CourseSeedService,
     private readonly moduleSeedService: ModuleSeedService,
+    private readonly publicCalendarSeedService: PublicCalendarSeedService,
+    private readonly academicCalendarSeedService: AcademicCalendarSeedService,
     private readonly persistence: SeedPersistenceService,
   ) {}
 
@@ -37,6 +41,14 @@ export class DatabaseSeedService {
       ],
       ['courses', (tx: AppDatabase) => this.courseSeedService.seed(tx)],
       ['modules', (tx: AppDatabase) => this.moduleSeedService.seed(tx)],
+      [
+        'public calendars',
+        (tx: AppDatabase) => this.publicCalendarSeedService.seed(tx),
+      ],
+      [
+        'academic calendar',
+        (tx: AppDatabase) => this.academicCalendarSeedService.seed(tx),
+      ],
     ] as const;
 
     this.logger.log(`Starting database seeding (${tasks.length} tasks)`);

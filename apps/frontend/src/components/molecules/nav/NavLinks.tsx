@@ -5,37 +5,47 @@ import { NavLink } from "@/components/atoms/nav/NavLink";
 import { UserDetails } from "@/lib/userclass/userClass";
 import { useEffect, useState } from "react";
 
-const basicLinks = [
+const noUniLinks = [
   { href: "/dashboard", label: "Home" },
-  { href: "/solver", label: "Upload PDF" },
   { href: "/builder", label: "Event Builder" },
   { href: "/schedules", label: "My Schedules" },
+];
+
+const basicLinks = [
   { href: "/module-management", label: "Manage Modules & Events" },
 ];
 
 const extraAdminLinks = [
   { href: "/course-management", label: "Manage Courses" },
   { href: "/role-management", label: "Manage Roles" },
+  { href: "/calendar-management", label: "Manage Calendars" },
 ];
+const universitySpecific = [{ href: "/solver", label: "Upload PDF" }];
 
 export function NavLinks() {
   const pathName = usePathname();
-  const [vlaggie, setVlaggie] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
-  //timer is to silence linting's screams...
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setVlaggie(true);
-    }, 0);
-
-    return () => clearTimeout(timer);
+    // eslint-disable-next-line
+    setIsMounted(true);
   }, []);
 
-  const isAdmin = vlaggie
-    ? UserDetails.getUniDetails()?.role === "UNIVERSITY_ADMIN"
-    : false;
+  const isAdmin = UserDetails.getUniDetails()?.role === "UNIVERSITY_ADMIN";
 
-  const navItems = isAdmin ? [...basicLinks, ...extraAdminLinks] : basicLinks;
+  const navItems = [...noUniLinks];
+
+  const uniDetails = isMounted ? UserDetails.getUniDetails() : null;
+
+  if (uniDetails != undefined) {
+    navItems.push(...basicLinks);
+  }
+  if (uniDetails?.UniversityName == "University of Pretoria")
+    navItems.push(...universitySpecific);
+
+  if (isAdmin) {
+    navItems.push(...extraAdminLinks);
+  }
 
   return (
     <nav aria-label="Main navigation">

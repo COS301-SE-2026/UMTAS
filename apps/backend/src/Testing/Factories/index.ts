@@ -1,4 +1,5 @@
 export * from './auth.factory';
+export * from './academic-calendar.factory';
 export * from './course.factory';
 export * from './event.factory';
 export * from './grouping.factory';
