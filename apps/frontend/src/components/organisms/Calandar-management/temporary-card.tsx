@@ -6,7 +6,7 @@ interface props {
 }
 export default function CalCard({ children }: props) {
   return (
-    <Card className="flex  lg:px-2 items-center w-75 capitalize  md:w-125 h-auto md::h-50 ">
+    <Card className="flex  bg-[var(--bg-surface)]  lg:px-2 items-center w-75 capitalize  md:w-125 h-auto md::h-50 ">
       <CardContent className="w-full items-center  ">{children}</CardContent>
     </Card>
   );
