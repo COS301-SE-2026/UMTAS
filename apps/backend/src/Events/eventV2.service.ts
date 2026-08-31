@@ -243,6 +243,7 @@ export class EventServiceV2 extends EventService {
     validated.eventCriteria = await this.validateEventCriteria(
       validated.eventCriteria,
       validated.isRecurring,
+      tx,
     );
 
     if (validated.venues && validated.venues.length !== 0)
@@ -263,6 +264,7 @@ export class EventServiceV2 extends EventService {
   protected async validateEventCriteria(
     eventCriteria: EventCriteriaDtoV2,
     isRecurring: boolean,
+    tx: AppDatabase,
   ): Promise<EventCriteriaDtoV2> {
     const v: EventCriteriaDtoV2 = eventCriteria;
 
@@ -276,7 +278,7 @@ export class EventServiceV2 extends EventService {
     const moduleId = eventCriteria.moduleId;
     const module =
       moduleId !== undefined && moduleId.trim().length !== 0
-        ? await this.moduleService.getByIdV2({ moduleId })
+        ? await this.moduleService.getByIdV2({ moduleId, tx })
         : null;
 
     if (module === null) {
