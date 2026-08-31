@@ -204,6 +204,8 @@ services:
       - PORT=${FRONTEND_PORT}
       - API_URL=http://backend-staging:${BACKEND_PORT}
       - COOKIE_PREFIX=umtas-staging
+      - NEXT_PUBLIC_POSTHOG_PT=${NEXT_PUBLIC_POSTHOG_PT}
+      - NEXT_PUBLIC_POSTHOG_API_HOST=${NEXT_PUBLIC_POSTHOG_API_HOST}
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=gateway"

@@ -212,6 +212,8 @@ services:
       - gateway
     environment:
       - API_URL=http://backend:${BACKEND_PORT}
+      - NEXT_PUBLIC_POSTHOG_PT=${NEXT_PUBLIC_POSTHOG_PT}
+      - NEXT_PUBLIC_POSTHOG_API_HOST=${NEXT_PUBLIC_POSTHOG_API_HOST}
     healthcheck:
       test:
         [
