@@ -72,6 +72,7 @@ export class CourseService {
         ExternalID: dto.ExternalID?.trim() ?? null,
         ...(dto.GroupID ? { GroupID: dto.GroupID } : {}),
         ...(dto.Degree ? { Degree: dto.Degree } : {}),
+        createdAt: new Date(),
       })
       .returning();
 

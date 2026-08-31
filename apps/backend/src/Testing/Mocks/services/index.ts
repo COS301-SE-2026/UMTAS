@@ -1,7 +1,7 @@
-export { createMockModuleService } from './module.mock';
-export { createMockCourseService } from './course.mock';
-export { createMockUniversityService } from './university.mock';
-export { createMockBuilderService } from './builder.mock';
-export { createMockEventImportFingerprintService } from './event-import-fingerprint';
-export { createMockGroupingService } from './grouping.mock';
-export { createMockEventService } from './event.mock';
+export * from './module.mock';
+export * from './course.mock';
+export * from './university.mock';
+export * from './builder.mock';
+export * from './event-import-fingerprint';
+export * from './grouping.mock';
+export * from './event.mock';
