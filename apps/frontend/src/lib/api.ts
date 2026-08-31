@@ -435,7 +435,11 @@ export interface paths {
      */
     get: operations["getAllModulesV2"];
     put?: never;
-    post?: never;
+    /**
+     * Create a module - V2
+     * @description Create a new module and link to appropriate course
+     */
+    post: operations["ModuleController_createModuleV2"];
     delete?: never;
     options?: never;
     head?: never;
@@ -977,6 +981,26 @@ export interface paths {
     patch: operations["builder-updateModule"];
     trace?: never;
   };
+  "/api/builder/events": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Create a user defined event
+     * @description Create a new event, to module specified or personal module
+     */
+    post: operations["BuilderController_createEvent"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/pdf-parser/jobs/lookup": {
     parameters: {
       query?: never;
@@ -1196,6 +1220,222 @@ export interface paths {
     patch: operations["updateAttendance"];
     trace?: never;
   };
+  "/api/academic-calendar/generate": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Generate and persist a calendar snapshot
+     * @description Generates a restriction-aware pseudo-calendar snapshot using the selected university's current-year academic calendar and a timetable owned by the authenticated student.
+     */
+    post: operations["generateCalendar"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/academic-calendar/generate/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get a generated calendar snapshot
+     * @description Returns a generated snapshot only when its timetable belongs to the authenticated student.
+     */
+    get: operations["getGeneratedCalendar"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/academic-calendar": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List academic calendars
+     * @description Returns calendars belonging to the university selected in the current session, optionally filtered by academic year.
+     */
+    get: operations["listAcademicCalendars"];
+    put?: never;
+    /**
+     * Create an academic calendar
+     * @description Creates one calendar for the university selected in the current session and a four-digit academic year.
+     */
+    post: operations["createAcademicCalendar"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/academic-calendar/{id}/restrictions": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List an academic calendar's restrictions
+     * @description Returns restrictions in chronological order for a calendar managed by the authenticated university administrator.
+     */
+    get: operations["listCalendarRestrictions"];
+    put?: never;
+    /**
+     * Create an academic calendar restriction
+     * @description Creates a dated restriction. Omitted endDate defaults to startDate and omitted description defaults to an empty string.
+     */
+    post: operations["createCalendarRestriction"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/academic-calendar/{id}/restrictions/{restrictionId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Replace an academic calendar restriction
+     * @description Fully replaces a restriction after validating its date range and type-specific fields.
+     */
+    put: operations["updateCalendarRestriction"];
+    post?: never;
+    /**
+     * Delete an academic calendar restriction
+     * @description Deletes a restriction only when it belongs to the specified calendar in the selected university.
+     */
+    delete: operations["deleteCalendarRestriction"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/academic-calendar/{id}/subscriptions": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Replace an academic calendar's public-calendar subscriptions
+     * @description Replaces the public calendars used to supply restrictions during calendar generation.
+     */
+    put: operations["updateCalendarSubscriptions"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/academic-calendar/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get an academic calendar
+     * @description Returns a calendar belonging to the university selected in the current session.
+     */
+    get: operations["getAcademicCalendar"];
+    put?: never;
+    post?: never;
+    /**
+     * Delete an academic calendar
+     * @description Deletes a calendar and cascades to its restrictions. Deletion is rejected while generated snapshots reference it.
+     */
+    delete: operations["deleteAcademicCalendar"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/api-service/courses": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Fetch courses
+     * @description Fetches courses for the authenticated user's university.
+     */
+    get: operations["ApiServiceController_getCourses"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/api-service/modules": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Fetch modules
+     * @description Fetches modules for a course at the authenticated user's university.
+     */
+    get: operations["ApiServiceController_getModules"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/api-service/events": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Fetch events
+     * @description Fetches events for a module at the authenticated user's university.
+     */
+    get: operations["ApiServiceController_getEvents"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1298,6 +1538,11 @@ export interface components {
        * @example Admin@UMTAS2024!
        */
       password: string;
+      /**
+       * @description Optional university ID to select upon sign-in
+       * @example a1b2c3d4-e5f6-7890-abcd-ef1234567890
+       */
+      uniId?: string;
     };
     AuthAcknowledgementDto: Record<string, never>;
     RevokeSessionDto: {
@@ -1393,17 +1638,20 @@ export interface components {
     AuthUserResponseDto: {
       user: components["schemas"]["AuthUserDto"];
     };
-    /**
-     * @description Role for the mock user
-     * @enum {string}
-     */
-    MockUserRole: "STUDENT" | "LECTURER" | "UNIVERSITY_ADMIN" | "SYS_ADMIN";
     CreateMockUserDto: {
+      /** @example test_user_1@simulation.com */
+      email?: string;
+      /** @example Test User */
+      name?: string;
+      /** @example password123! */
+      password?: string;
       /**
-       * @description Role for the mock user
-       * @default STUDENT
+       * @example STUDENT
+       * @enum {string}
        */
-      role: components["schemas"]["MockUserRole"];
+      role?: "STUDENT" | "LECTURER" | "UNIVERSITY_ADMIN" | "SYS_ADMIN";
+      /** @example some-uni-id */
+      uniId?: string;
     };
     DeleteMockUsersResponseDto: {
       success: Record<string, never>;
@@ -1460,6 +1708,11 @@ export interface components {
        */
       uniId: string;
     };
+    /**
+     * @description Academic period in which this module is taught. Null or omitted means the whole academic year.
+     * @enum {string}
+     */
+    AcademicSemester: "SEMESTER_1" | "SEMESTER_2" | "YEAR";
     StylingDto: {
       /** @example #3B82F6 */
       colour: string;
@@ -1498,6 +1751,11 @@ export interface components {
        */
       moduleDescription?: string | null;
       /**
+       * @description Academic period in which this module is taught. Null or omitted means the whole academic year.
+       * @example SEMESTER_1
+       */
+      semester?: components["schemas"]["AcademicSemester"] | null;
+      /**
        * @description Styling to be used for a Module
        * @example {
        *       "colour": "FFFFF"
@@ -1509,6 +1767,11 @@ export interface components {
        * @example true
        */
       validated?: boolean;
+      /**
+       * @description Refer to module on external API
+       * @example 12345
+       */
+      ExternalID?: string | null;
       /**
        * Format: uuid
        * @description ModuleGroupingID to identify group the module belongs to
@@ -1626,6 +1889,11 @@ export interface components {
        */
       moduleDescription?: string | null;
       /**
+       * @description Academic period in which this module is taught. Null or omitted means the whole academic year.
+       * @example SEMESTER_1
+       */
+      semester?: components["schemas"]["AcademicSemester"] | null;
+      /**
        * @description Styling to be used for a Module
        * @example {
        *       "colour": "FFFFF"
@@ -1651,6 +1919,16 @@ export interface components {
       validated?: boolean;
       /** @description List of events for the module */
       Events?: components["schemas"]["EventDto"][] | null;
+      /**
+       * @description Refer to module on external API
+       * @example 12345
+       */
+      ExternalID?: string | null;
+      /**
+       * @description Is a user enrolled to this module
+       * @example false
+       */
+      Enrolled?: boolean;
       /**
        * Format: uuid
        * @description Unique identifier for a module group
@@ -1681,6 +1959,11 @@ export interface components {
        */
       moduleDescription?: string | null;
       /**
+       * @description Academic period in which this module is taught. Null or omitted means the whole academic year.
+       * @example SEMESTER_1
+       */
+      semester?: components["schemas"]["AcademicSemester"] | null;
+      /**
        * @description Styling to be used for a Module
        * @example {
        *       "colour": "FFFFF"
@@ -1694,6 +1977,16 @@ export interface components {
       validated?: boolean;
       /** @description List of events for the module */
       Events?: components["schemas"]["EventDto"][] | null;
+      /**
+       * @description Refer to module on external API
+       * @example 12345
+       */
+      ExternalID?: string | null;
+      /**
+       * @description Is a user enrolled to this module
+       * @example false
+       */
+      Enrolled?: boolean;
       /**
        * Format: uuid
        * @description ID to identify course owning this CourseModule
@@ -1808,6 +2101,11 @@ export interface components {
        * @example Bachelor of Science
        */
       Degree?: string | null;
+      /**
+       * @description Refer to course on external API
+       * @example 12345
+       */
+      ExternalID?: string | null;
     };
     ModulesDto: {
       /**
@@ -1831,6 +2129,11 @@ export interface components {
        * @example Introduction to computer networking concepts
        */
       moduleDescription?: string | null;
+      /**
+       * @description Academic period in which this module is taught. Null or omitted means the whole academic year.
+       * @example SEMESTER_1
+       */
+      semester?: components["schemas"]["AcademicSemester"] | null;
       /**
        * @description Styling to be used for a Module
        * @example {
@@ -1857,6 +2160,16 @@ export interface components {
       validated?: boolean;
       /** @description List of events for the module */
       Events?: components["schemas"]["EventDto"][] | null;
+      /**
+       * @description Refer to module on external API
+       * @example 12345
+       */
+      ExternalID?: string | null;
+      /**
+       * @description Is a user enrolled to this module
+       * @example false
+       */
+      Enrolled?: boolean;
     };
     CourseSingleResponseDto: {
       /**
@@ -1889,6 +2202,11 @@ export interface components {
       Degree?: string | null;
       /** @description Modules for the course. */
       Modules?: components["schemas"]["ModulesDto"][] | null;
+      /**
+       * @description Refer to course on external API
+       * @example 12345
+       */
+      ExternalID?: string | null;
     };
     CourseFilters: {
       /**
@@ -1939,6 +2257,11 @@ export interface components {
       Degree?: string | null;
       /** @description Modules for the course. */
       Modules?: components["schemas"]["ModulesDto"][] | null;
+      /**
+       * @description Refer to course on external API
+       * @example 12345
+       */
+      ExternalID?: string | null;
     };
     CourseListResponseDto: {
       /** @description List of courses */
@@ -1970,6 +2293,11 @@ export interface components {
       Degree?: string | null;
       /** @description Modules for the course. */
       Modules?: components["schemas"]["ModulesDto"][] | null;
+      /**
+       * @description Refer to course on external API
+       * @example 12345
+       */
+      ExternalID?: string | null;
     };
     DeleteCourseResponseDto: {
       /**
@@ -2000,6 +2328,21 @@ export interface components {
        */
       UniversityName: string;
       /**
+       * @description Unique string to identify university for ApiAdapter service
+       * @example UP
+       */
+      ApiIdentifier?: string | null;
+      /**
+       * @description Url of the university's api
+       * @example https://api.github.com
+       */
+      BaseApiUrl?: string | null;
+      /**
+       * @description Key for authorisation on univerity api
+       * @example something1Nx8A2B9C0D1E2F3G4H5I6J7K8L9M0No12
+       */
+      ApiKey?: string | null;
+      /**
        * @description Role current user has for university
        * @example STUDENT
        * @enum {string|null}
@@ -2027,6 +2370,21 @@ export interface components {
        * @example University of Pretoria
        */
       UniversityName: string;
+      /**
+       * @description Unique string to identify university for ApiAdapter service
+       * @example UP
+       */
+      ApiIdentifier?: string | null;
+      /**
+       * @description Url of the university's api
+       * @example https://api.github.com
+       */
+      BaseApiUrl?: string | null;
+      /**
+       * @description Key for authorisation on univerity api
+       * @example something1Nx8A2B9C0D1E2F3G4H5I6J7K8L9M0No12
+       */
+      ApiKey?: string | null;
       /**
        * @description Role current user has for university
        * @example STUDENT
@@ -2069,6 +2427,21 @@ export interface components {
        * @example University of Pretoria
        */
       UniversityName?: string;
+      /**
+       * @description Unique string to identify university for ApiAdapter service
+       * @example UP
+       */
+      ApiIdentifier?: string | null;
+      /**
+       * @description Url of the university's api
+       * @example https://api.github.com
+       */
+      BaseApiUrl?: string | null;
+      /**
+       * @description Key for authorisation on univerity api
+       * @example something1Nx8A2B9C0D1E2F3G4H5I6J7K8L9M0No12
+       */
+      ApiKey?: string | null;
     };
     DeleteUniversityResponseDto: {
       /**
@@ -2238,6 +2611,7 @@ export interface components {
     };
     EventSingleResponseDto: {
       event: components["schemas"]["EventDto"];
+      message?: string;
     };
     CreateEventDto: {
       eventName?: string;
@@ -2254,6 +2628,7 @@ export interface components {
     };
     EventListResponseDto: {
       events: components["schemas"]["EventDto"][];
+      message?: string;
     };
     UpdateEventCriteriaDto: {
       /** @enum {string} */
@@ -2390,6 +2765,11 @@ export interface components {
        */
       moduleDescription?: string | null;
       /**
+       * @description Academic period in which this module is taught. Null or omitted means the whole academic year.
+       * @example SEMESTER_1
+       */
+      semester?: components["schemas"]["AcademicSemester"] | null;
+      /**
        * @description Styling to be used for a Module
        * @example {
        *       "colour": "FFFFF"
@@ -2401,6 +2781,22 @@ export interface components {
        * @example true
        */
       validated?: boolean;
+      /**
+       * @description Refer to module on external API
+       * @example 12345
+       */
+      ExternalID?: string | null;
+    };
+    CreateBuilderEventDto: {
+      eventName?: string;
+      activityCode?: string | null;
+      eventCriteria?: components["schemas"]["EventCriteriaDto"];
+      isRecurring?: boolean;
+      /**
+       * @description Required when eventCriteria.moduleId is provided.
+       * @enum {string}
+       */
+      activityType?: "lecture" | "tutorial" | "prac" | "test" | "exam";
     };
     PdfParserLookupResponseDto: {
       /** @example true */
@@ -2788,6 +3184,304 @@ export interface components {
        * @example true
        */
       success: boolean;
+    };
+    GenerateCalendarDto: {
+      /**
+       * Format: uuid
+       * @description Timetable containing the source events to generate.
+       * @example 339cd591-7c62-4ea7-8a2b-602598553133
+       */
+      timetableId: string;
+    };
+    /** @enum {string} */
+    Weekday:
+      | "MONDAY"
+      | "TUESDAY"
+      | "WEDNESDAY"
+      | "THURSDAY"
+      | "FRIDAY"
+      | "SATURDAY"
+      | "SUNDAY";
+    GeneratedRecurringEventDto: {
+      /**
+       * @description Stable series key.
+       * @example cos301-l1-monday
+       */
+      key: string;
+      /** @example COS301 Lecture */
+      title: string;
+      /** @example Lecture group 1 */
+      description?: string;
+      /** @example IT 4-1 */
+      location?: string;
+      /** Format: uuid */
+      moduleId?: string;
+      /** @example #3B82F6 */
+      moduleColour?: string;
+      /** @example 08:30 */
+      startTime: string;
+      /** @example 09:20 */
+      endTime: string;
+      /** @example MONDAY */
+      weekday: components["schemas"]["Weekday"];
+      /**
+       * Format: date
+       * @example 2026-02-02
+       */
+      startsOn: string;
+      /**
+       * Format: date
+       * @example 2026-06-22
+       */
+      endsOn: string;
+      /**
+       * @description Dates removed from the weekly series.
+       * @example [
+       *       "2026-03-30"
+       *     ]
+       */
+      excludedDates: string[];
+      /**
+       * @description Dates added to the weekly series, normally by day swaps.
+       * @example [
+       *       "2026-04-03"
+       *     ]
+       */
+      additionalDates: string[];
+    };
+    GeneratedOneOffEventDto: {
+      /**
+       * @description Stable event key.
+       * @example exam-cos301-20260615
+       */
+      key: string;
+      /** @example COS301 Exam */
+      title: string;
+      /** @example Main examination */
+      description?: string;
+      /** @example Exam Hall A */
+      location?: string;
+      /** Format: uuid */
+      moduleId?: string;
+      /** @example #3B82F6 */
+      moduleColour?: string;
+      /**
+       * Format: date
+       * @example 2026-06-15
+       */
+      date: string;
+      /** @example 09:00 */
+      startTime: string;
+      /** @example 12:00 */
+      endTime: string;
+    };
+    /** @enum {string} */
+    CalendarRestrictionType:
+      | "SEMESTER_1_START"
+      | "SEMESTER_1_END"
+      | "SEMESTER_2_START"
+      | "SEMESTER_2_END"
+      | "HOLIDAY"
+      | "PUBLIC_HOLIDAY"
+      | "UNIVERSITY_CLOSURE"
+      | "RECESS"
+      | "TEST_WEEK"
+      | "EXAM_PERIOD"
+      | "SUPP_WEEK"
+      | "DAY_SWAP";
+    GeneratedAllDayEventDto: {
+      /**
+       * @description Stable event key.
+       * @example restriction-f8429809
+       */
+      key: string;
+      /** @example Freedom Day */
+      title: string;
+      /** @example Public holiday */
+      description?: string;
+      /** @example PUBLIC_HOLIDAY */
+      type: components["schemas"]["CalendarRestrictionType"];
+      /**
+       * Format: date
+       * @example 2026-04-27
+       */
+      startDate: string;
+      /**
+       * Format: date
+       * @description Inclusive domain end date.
+       * @example 2026-04-27
+       */
+      endDate: string;
+    };
+    GeneratedCalendarWarningDto: {
+      /** @example RECURRING_EVENT_CRITERIA_INVALID */
+      code: string;
+      /** @example COS301 Lecture is missing a weekday or time range. */
+      message: string;
+      /**
+       * @description Identifier of the source record that caused the warning.
+       * @example 6d3689c6-983b-4a6e-9da5-d12998290892
+       */
+      sourceId?: string;
+    };
+    GeneratedCalendarPayloadDto: {
+      /** @example University of Pretoria 2026 Academic Calendar */
+      name: string;
+      /** @example 2026 */
+      year: number;
+      recurringEvents: components["schemas"]["GeneratedRecurringEventDto"][];
+      oneOffEvents: components["schemas"]["GeneratedOneOffEventDto"][];
+      allDayEvents: components["schemas"]["GeneratedAllDayEventDto"][];
+      warnings: components["schemas"]["GeneratedCalendarWarningDto"][];
+    };
+    GeneratedCalendarDto: {
+      /** Format: uuid */
+      id: string;
+      payload: components["schemas"]["GeneratedCalendarPayloadDto"];
+    };
+    CreateAcademicCalendarDto: {
+      /**
+       * @description Four-digit academic year. A university may have only one calendar per year.
+       * @example 2026
+       */
+      year: number;
+    };
+    AcademicCalendarDto: {
+      /**
+       * Format: uuid
+       * @description Unique academic-calendar identifier.
+       * @example 120afed7-9444-4d9c-a7f2-8f08dc2b7d70
+       */
+      id: string;
+      /**
+       * @description Four-digit academic year represented by this calendar.
+       * @example 2026
+       */
+      year: number;
+      /**
+       * @description Public-calendar IDs this academic calendar subscribes to.
+       * @example [
+       *       "120afed7-9444-4d9c-a7f2-8f08dc2b7d70"
+       *     ]
+       */
+      subscriptions: string[];
+    };
+    CalendarRestrictionDto: {
+      /**
+       * Format: uuid
+       * @description Unique restriction identifier.
+       * @example f8429809-2402-41a7-af75-28c463e83d5f
+       */
+      id: string;
+      /** @example PUBLIC_HOLIDAY */
+      type: components["schemas"]["CalendarRestrictionType"];
+      /**
+       * Format: date
+       * @example 2026-04-27
+       */
+      startDate: string;
+      /**
+       * Format: date
+       * @description Inclusive final date.
+       * @example 2026-04-27
+       */
+      endDate: string;
+      /** @example Freedom Day */
+      description: string;
+      /**
+       * @description Present only for a DAY_SWAP restriction.
+       * @example MONDAY
+       */
+      replacementWeekday?: components["schemas"]["Weekday"] | null;
+    };
+    CalendarRestrictionListDto: {
+      /** @description Restrictions belonging to the requested academic calendar. */
+      restrictions: components["schemas"]["CalendarRestrictionDto"][];
+    };
+    CreateCalendarRestrictionDto: {
+      /**
+       * @description How this restriction affects semester bounds or generated events.
+       * @example PUBLIC_HOLIDAY
+       */
+      type: components["schemas"]["CalendarRestrictionType"];
+      /**
+       * Format: date
+       * @description Inclusive first date in YYYY-MM-DD format.
+       * @example 2026-04-27
+       */
+      startDate: string;
+      /**
+       * Format: date
+       * @description Inclusive final date in YYYY-MM-DD format. Defaults to startDate when omitted.
+       * @example 2026-04-27
+       */
+      endDate?: string;
+      /**
+       * @description Human-readable detail. Defaults to an empty string.
+       * @default
+       * @example Freedom Day
+       */
+      description: string;
+      /**
+       * @description Teaching pattern to use on the target date. Required only for DAY_SWAP.
+       * @example MONDAY
+       */
+      replacementWeekday?: components["schemas"]["Weekday"];
+    };
+    UpdateCalendarRestrictionDto: {
+      /**
+       * @description How this restriction affects semester bounds or generated events.
+       * @example PUBLIC_HOLIDAY
+       */
+      type: components["schemas"]["CalendarRestrictionType"];
+      /**
+       * Format: date
+       * @description Inclusive first date in YYYY-MM-DD format.
+       * @example 2026-04-27
+       */
+      startDate: string;
+      /**
+       * Format: date
+       * @description Inclusive final date in YYYY-MM-DD format. Defaults to startDate when omitted.
+       * @example 2026-04-27
+       */
+      endDate?: string;
+      /**
+       * @description Human-readable detail. Defaults to an empty string.
+       * @default
+       * @example Freedom Day
+       */
+      description: string;
+      /**
+       * @description Teaching pattern to use on the target date. Required only for DAY_SWAP.
+       * @example MONDAY
+       */
+      replacementWeekday?: components["schemas"]["Weekday"];
+    };
+    DeleteCalendarRestrictionResponseDto: {
+      /**
+       * @description Confirms that the calendar restriction was deleted.
+       * @example true
+       * @enum {boolean}
+       */
+      success: true;
+    };
+    UpdateCalendarSubscriptionsDto: {
+      /**
+       * @description Public-calendar IDs this academic calendar subscribes to. Replaces the existing set.
+       * @example [
+       *       "120afed7-9444-4d9c-a7f2-8f08dc2b7d70"
+       *     ]
+       */
+      subscriptions: string[];
+    };
+    DeleteAcademicCalendarResponseDto: {
+      /**
+       * @description Confirms that the academic calendar was deleted.
+       * @example true
+       * @enum {boolean}
+       */
+      success: true;
     };
   };
   responses: never;
@@ -3729,6 +4423,37 @@ export interface operations {
         };
       };
       /** @description Invalid filters */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  ModuleController_createModuleV2: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateModuleDto"];
+      };
+    };
+    responses: {
+      /** @description Module created successfully */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ModuleSingleResponseDto"];
+        };
+      };
+      /** @description Missing or invalid module payload */
       400: {
         headers: {
           [name: string]: unknown;
@@ -5396,6 +6121,37 @@ export interface operations {
       };
     };
   };
+  BuilderController_createEvent: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateBuilderEventDto"];
+      };
+    };
+    responses: {
+      /** @description Event created successfully */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ModuleSingleResponseDto"];
+        };
+      };
+      /** @description Module not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   PdfParserController_lookupDuplicate: {
     parameters: {
       query?: never;
@@ -5771,6 +6527,719 @@ export interface operations {
         content: {
           "application/json": components["schemas"]["AttendanceSingleResponse"];
         };
+      };
+    };
+  };
+  generateCalendar: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["GenerateCalendarDto"];
+      };
+    };
+    responses: {
+      /** @description Calendar generated successfully */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["GeneratedCalendarDto"];
+        };
+      };
+      /** @description Invalid generation request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Calendar or timetable not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Calendar data conflicts */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Calendar data cannot be converted into a valid snapshot */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getGeneratedCalendar: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Generated calendar ID */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Generated calendar returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["GeneratedCalendarDto"];
+        };
+      };
+      /** @description Invalid generated calendar ID */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Generated calendar not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  listAcademicCalendars: {
+    parameters: {
+      query?: {
+        /** @description Limit results to a four-digit academic year. */
+        year?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Academic calendars returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AcademicCalendarDto"][];
+        };
+      };
+      /** @description Invalid academic year */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No active session */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Insufficient permissions */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  createAcademicCalendar: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateAcademicCalendarDto"];
+      };
+    };
+    responses: {
+      /** @description Academic calendar created successfully */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AcademicCalendarDto"];
+        };
+      };
+      /** @description Invalid calendar payload */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No active session */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Insufficient permissions */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description A calendar already exists for this university and year */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  listCalendarRestrictions: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Academic calendar ID */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Calendar restrictions returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CalendarRestrictionListDto"];
+        };
+      };
+      /** @description Invalid academic calendar ID */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No active session */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Insufficient permissions */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Academic calendar not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  createCalendarRestriction: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Academic calendar ID */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateCalendarRestrictionDto"];
+      };
+    };
+    responses: {
+      /** @description Calendar restriction created successfully */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CalendarRestrictionDto"];
+        };
+      };
+      /** @description Invalid restriction request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No active session */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Insufficient permissions */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Academic calendar not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Restriction conflicts with existing data */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Restriction is not valid for its type */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  updateCalendarRestriction: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Academic calendar ID */
+        id: string;
+        /** @description Calendar restriction ID */
+        restrictionId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateCalendarRestrictionDto"];
+      };
+    };
+    responses: {
+      /** @description Calendar restriction updated successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CalendarRestrictionDto"];
+        };
+      };
+      /** @description Invalid restriction request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No active session */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Insufficient permissions */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Calendar or restriction not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Restriction conflicts with existing data */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Restriction is not valid for its type */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  deleteCalendarRestriction: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Academic calendar ID */
+        id: string;
+        /** @description Calendar restriction ID */
+        restrictionId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Calendar restriction deleted successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DeleteCalendarRestrictionResponseDto"];
+        };
+      };
+      /** @description Invalid calendar or restriction ID */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No active session */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Insufficient permissions */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Calendar or restriction not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  updateCalendarSubscriptions: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Academic calendar ID */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateCalendarSubscriptionsDto"];
+      };
+    };
+    responses: {
+      /** @description Calendar subscriptions updated successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AcademicCalendarDto"];
+        };
+      };
+      /** @description Invalid calendar ID or subscription payload */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No active session */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Insufficient permissions */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Academic calendar or public calendar not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Public calendar year does not match the academic calendar */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getAcademicCalendar: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Academic calendar ID */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Academic calendar returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AcademicCalendarDto"];
+        };
+      };
+      /** @description Invalid academic calendar ID */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No active session */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Insufficient permissions */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Academic calendar not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  deleteAcademicCalendar: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Academic calendar ID */
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Academic calendar deleted successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DeleteAcademicCalendarResponseDto"];
+        };
+      };
+      /** @description Invalid academic calendar ID */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No active session */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Insufficient permissions */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Academic calendar not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Generated snapshots still reference this calendar */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  ApiServiceController_getCourses: {
+    parameters: {
+      query?: {
+        /** @description Courses per page */
+        limit?: number;
+        /** @description Page index: zero index */
+        page?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Courses fetched successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CourseListResponseDto"];
+        };
+      };
+      /** @description The authenticated user is not associated with a university. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The university or its API adapter could not be found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  ApiServiceController_getModules: {
+    parameters: {
+      query: {
+        /** @description UUID of the course to fetch modules for. */
+        courseId: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Modules fetched successfully. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ModuleListResponseDto"];
+        };
+      };
+      /** @description The university or course ID is invalid. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The university, course, or API adapter could not be found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  ApiServiceController_getEvents: {
+    parameters: {
+      query: {
+        /** @description UUID of the module to fetch events for. */
+        moduleId: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Events fetched successfully. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["EventListResponseDto"];
+        };
+      };
+      /** @description The university or module ID is invalid. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The university, module, or API adapter could not be found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
     };
   };

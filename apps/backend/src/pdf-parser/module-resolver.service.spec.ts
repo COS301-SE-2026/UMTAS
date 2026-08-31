@@ -72,10 +72,50 @@ describe('ModuleResolver', () => {
       moduleCode: 'MAT101',
       moduleName: 'M'.repeat(256),
       moduleDescription: '{"semester":1}',
+      semester: 'SEMESTER_1',
       validated: false,
     });
     expect(result.get('MAT101')).toBe(created);
   });
+
+  it.each([
+    ['S1', 'SEMESTER_1'],
+    ['SEMESTER_1', 'SEMESTER_1'],
+    ['S2', 'SEMESTER_2'],
+    ['SEMESTER_2', 'SEMESTER_2'],
+    ['YEAR', 'YEAR'],
+  ] as const)(
+    'normalizes parser semester %s to module semester %s',
+    async (parserSemester, expectedSemester) => {
+      const { mockDb } = createMockDatabase();
+      const created = createModule({
+        moduleID: 'new-id',
+        moduleCode: 'MAT101',
+        semester: expectedSemester,
+      });
+      mockDbResult(mockDb.select as jest.Mock, []);
+      const insert = createDbChain([created]);
+      (mockDb.insert as jest.Mock).mockReturnValue(insert);
+
+      await service.resolveForUniversity(
+        mockDb,
+        'uni-1',
+        new Map([
+          [
+            'MAT101',
+            createParsedModuleCandidate({
+              code: 'MAT101',
+              metadata: { semester: parserSemester },
+            }),
+          ],
+        ]),
+      );
+
+      expect(insert.values).toHaveBeenCalledWith(
+        expect.objectContaining({ semester: expectedSemester }),
+      );
+    },
+  );
 
   it('uses the code as name and serializes empty metadata', async () => {
     const { mockDb } = createMockDatabase();

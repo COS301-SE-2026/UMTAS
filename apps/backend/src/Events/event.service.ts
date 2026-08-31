@@ -28,12 +28,12 @@ import {
 import {
   CreateEventDto,
   EventSingleResponseDto,
-  EventFiltersDto,
-  EventListResponseDto,
   UpdateEventDto,
   DeleteResponseDto,
   EventDto,
   UpdateEventCriteriaDto,
+  EventListResponseDtoV2,
+  EventFiltersDtoV2,
 } from './dto/EventDto.dto';
 
 import { AppDatabase } from '../db/database.service';
@@ -78,9 +78,9 @@ export class EventService {
   //getAllEvents
   async getAllEvents(
     userId: string,
-    filters: EventFiltersDto,
+    filters: EventFiltersDtoV2,
     tx?: AppDatabase,
-  ): Promise<EventListResponseDto> {
+  ): Promise<EventListResponseDtoV2> {
     //moduleId -> Return events for that module
     //Else -> Return events for modules that user is enrolled in
 
@@ -105,7 +105,14 @@ export class EventService {
       );
     } else events = await this.getEventsByUser(userId, tx);
 
-    return { events };
+    return {
+      events,
+      ...(filters.Stats && filters.Stats === true
+        ? {
+            count: events.length,
+          }
+        : {}),
+    };
   } //getAllEvents
 
   //getById - Shouldn't be changing again
@@ -758,5 +765,27 @@ export class EventService {
     }
 
     return venueIds;
+  }
+
+  /**
+   * Check if there is a matching event for the input event based of their fingerprints
+   * @param event - Find event matching this createEventDto
+   * @param tx - transactinoal safety
+   */
+  private async duplicateEvent(
+    fingerprint: string | null,
+    tx: AppDatabase,
+  ): Promise<EventDto | null> {
+    if (!fingerprint) {
+      return null;
+    }
+
+    const [fetched] = await tx
+      .select()
+      .from(Event)
+      .where(eq(Event.importFingerprint, fingerprint))
+      .limit(1);
+
+    return fetched !== undefined ? this.mapEventToDto(fetched) : null;
   }
 } //EventService

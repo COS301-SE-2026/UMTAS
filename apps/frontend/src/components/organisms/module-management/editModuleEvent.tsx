@@ -13,6 +13,7 @@ import {
 import { useMutation } from "@tanstack/react-query";
 
 import {
+  getAllModCoursesQ,
   updateModQ,
   updateModStylingQ,
 } from "@/app/course-management/queries/modules/moduleQueries";
@@ -31,6 +32,13 @@ import { CourseSelect } from "./selectedCourse";
 import { CourseDTO } from "@/app/course-management/queries/courses/courseBuilder";
 import { addModuleToCourseQ } from "@/app/course-management/queries/courses/courseQueries";
 import { Card } from "@/components/atoms/baseShadcn/card";
+import { Checkbox } from "@/components/atoms/baseShadcn/checkbox";
+import {
+  updateEnrollmentBody,
+  updateEnrollmentBuilder,
+  updateEnrollmentParam,
+} from "./queries/moduleQueries";
+import { getQueryClient } from "@/components/tanstack/getQueryClient";
 
 export default function EditModuleEvent({
   data,
@@ -42,6 +50,7 @@ export default function EditModuleEvent({
   const [moduleState, setModuleState] = useState(data.modules);
   const [eventsState, setEventsState] = useState(data.events);
 
+  console.log(moduleState, "This is module state ");
   const [feedback, setFeedback] = useState<{
     type: "success" | "error";
     message: string;
@@ -63,6 +72,20 @@ export default function EditModuleEvent({
     isError: isAddError,
     reset: resetAdd,
   } = useMutation(addModuleToCourseQ());
+
+  const { mutate: updateEnrollment, isPending: enrollmentPending } =
+    useMutation({
+      mutationFn: (body: updateEnrollmentBody) =>
+        new updateEnrollmentBuilder().send({
+          body: body,
+          paths: { moduleId: moduleState.moduleID },
+        }),
+      onSuccess: () => {
+        getQueryClient().invalidateQueries({
+          queryKey: getAllModCoursesQ().queryKey,
+        });
+      },
+    });
 
   const updateStylingMut = useMutation({
     mutationFn: async (vars: {
@@ -218,9 +241,39 @@ export default function EditModuleEvent({
                 htmlFor="module-description-input"
                 className="text-sm font-medium text-[var(--text-secondary)]"
               >
+                Module Enrollment
+              </Label>
+              <Label
+                htmlFor="module-description-input"
+                className="text-sm font-medium text-[var(--text-secondary)]"
+              >
+                Enroll
+                <Checkbox
+                  checked={moduleState.Enrolled ?? false}
+                  onCheckedChange={(checked) => {
+                    setModuleState((mod) => ({
+                      ...mod,
+                      Enrolled: Boolean(checked),
+                    }));
+                    updateEnrollment({ enroll: Boolean(checked) });
+                  }}
+                />
+              </Label>
+            </div>
+            <div className="flex flex-col gap-2 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4">
+              <Label
+                htmlFor="module-description-input"
+                className="text-sm font-medium text-[var(--text-secondary)]"
+              >
                 Module Description
               </Label>
               <Input
+                disabled={
+                  !(
+                    UserDetails.getUniDetails()?.role === "LECTURER" ||
+                    UserDetails.getUniDetails()?.role === "UNIVERSITY_ADMIN"
+                  )
+                }
                 id="module-description-input"
                 value={moduleState.moduleDescription || ""}
                 onChange={(e) =>

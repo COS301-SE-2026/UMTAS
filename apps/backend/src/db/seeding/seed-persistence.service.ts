@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import type { AppDatabase } from '../database.service';
 import {
   accountsTable,
+  AcademicCalendar,
+  CalendarRestriction,
   Course,
   CourseModule,
   Event,
@@ -26,6 +28,26 @@ import {
 
 @Injectable()
 export class SeedPersistenceService {
+  insertAcademicCalendars(
+    db: AppDatabase,
+    values: readonly (typeof AcademicCalendar.$inferInsert)[],
+  ) {
+    return db
+      .insert(AcademicCalendar)
+      .values([...values])
+      .returning();
+  }
+
+  insertCalendarRestrictions(
+    db: AppDatabase,
+    values: readonly (typeof CalendarRestriction.$inferInsert)[],
+  ) {
+    return db
+      .insert(CalendarRestriction)
+      .values([...values])
+      .returning();
+  }
+
   insertUsers(
     db: AppDatabase,
     values: readonly (typeof usersTable.$inferInsert)[],

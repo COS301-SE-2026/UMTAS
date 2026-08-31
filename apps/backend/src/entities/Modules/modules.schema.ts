@@ -7,20 +7,35 @@ import {
   varchar,
   primaryKey,
   uniqueIndex,
+  timestamp,
+  pgEnum,
 } from 'drizzle-orm/pg-core';
 import { usersTable } from '../auth';
+
+export const AcademicSemester = pgEnum('AcademicSemester', [
+  'SEMESTER_1',
+  'SEMESTER_2',
+  'YEAR',
+]);
+
+export type AcademicSemesterType = (typeof AcademicSemester.enumValues)[number];
 
 export const modules = pgTable(
   'Modules',
   {
     moduleID: uuid('moduleID').defaultRandom().primaryKey(),
-    moduleCode: varchar('moduleCode', { length: 10 }).notNull(),
+    moduleCode: varchar('moduleCode', { length: 15 }).notNull(),
     moduleName: varchar('moduleName', { length: 256 }).notNull(),
     moduleDescription: text('moduleDescription'),
+    semester: AcademicSemester('semester'),
     validated: boolean('validated').notNull().default(true),
+    ExternalID: varchar('ExternalID', { length: 255 }),
+    createdAt: timestamp('createdAt', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
   },
   (table) => ({
-    moduleCodeUnique: uniqueIndex('modules_module_code_unique').on(
+    moduleCodeUnique: uniqueIndex('moduleCode_unique_index').on(
       table.moduleCode,
     ),
   }),

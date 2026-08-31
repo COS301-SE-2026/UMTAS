@@ -17,6 +17,5 @@ export function fetchAllModulesv2(
     })
     .json<getAllModulesV2Resp>();
 
-  console.log(result);
   return result;
 }

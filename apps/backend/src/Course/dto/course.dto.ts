@@ -1,4 +1,8 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  ApiProperty,
+  ApiPropertyOptional,
+  IntersectionType,
+} from '@nestjs/swagger';
 import {
   IsArray,
   IsNotEmpty,
@@ -11,6 +15,7 @@ import {
 import { PartialType, PickType, OmitType } from '@nestjs/swagger';
 import { ModulesDto } from 'src/Module/dto/module.dto';
 import { Type } from 'class-transformer';
+import { StatsFiltersDto, StatsResponseDto } from 'src/stats.dto';
 
 export class CourseDto {
   @ApiProperty({
@@ -46,7 +51,7 @@ export class CourseDto {
   })
   @IsNotEmpty()
   @IsString()
-  @Length(1, 30)
+  @Length(1, 255)
   CourseName!: string;
 
   @ApiPropertyOptional({
@@ -68,6 +73,15 @@ export class CourseDto {
   @ValidateNested({ each: true })
   @Type(() => ModulesDto)
   Modules?: ModulesDto[];
+
+  @ApiPropertyOptional({
+    example: '12345',
+    description: 'Refer to course on external API',
+  })
+  @IsOptional()
+  @IsString()
+  @Length(1, 255)
+  ExternalID?: string | null;
 }
 
 //create
@@ -76,6 +90,7 @@ export class CreateCourseDto extends PickType(CourseDto, [
   'GroupID',
   'CourseName',
   'Degree',
+  'ExternalID',
 ]) {}
 
 //update
@@ -98,6 +113,11 @@ export class CourseListResponseDto {
   message?: string;
 }
 
+export class CourseListResponseDtoV2 extends IntersectionType(
+  CourseListResponseDto,
+  PickType(StatsResponseDto, ['count']),
+) {}
+
 //Delete
 export class DeleteCourseResponseDto extends PickType(CourseDto, [
   'CourseName',
@@ -109,4 +129,9 @@ export class DeleteCourseResponseDto extends PickType(CourseDto, [
 //getAll filters
 export class CourseFilters extends PartialType(
   PickType(CourseDto, ['CourseName', 'UniversityID', 'Degree']),
+) {}
+
+export class CourseFiltersV2 extends IntersectionType(
+  CourseFilters,
+  PickType(StatsFiltersDto, ['Stats']),
 ) {}

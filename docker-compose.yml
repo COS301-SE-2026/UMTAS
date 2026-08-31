@@ -30,7 +30,6 @@ services:
       POSTGRES_DB: ${DB_NAME}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./infra/database/seeds.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
       interval: 5s
@@ -212,6 +211,8 @@ services:
       - gateway
     environment:
       - API_URL=http://backend:${BACKEND_PORT}
+      - NEXT_PUBLIC_POSTHOG_PT=${NEXT_PUBLIC_POSTHOG_PT}
+      - NEXT_PUBLIC_POSTHOG_API_HOST=${NEXT_PUBLIC_POSTHOG_API_HOST}
     healthcheck:
       test:
         [
@@ -366,4 +367,20 @@ services:
     labels:
       - "com.centurylinklabs.watchtower.enable=false"
     profiles:
+      - server
+
+  mock-university-api:
+    build:
+      context: .
+      dockerfile: docker/mock-university-api/mock-university-api.Dockerfile
+    image: umtas-mock-university-api:local
+    restart: unless-stopped
+    ports:
+      - "3010:3010"
+    networks:
+      - internal
+      - gateway
+    profiles:
+      - dev-docker
+      - dev-pglite
       - server
