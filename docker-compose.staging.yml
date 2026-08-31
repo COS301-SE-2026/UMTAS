@@ -14,7 +14,6 @@ services:
       POSTGRES_DB: ${DB_NAME}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./infra/database/seeds.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
       interval: 5s
@@ -204,6 +203,8 @@ services:
       - PORT=${FRONTEND_PORT}
       - API_URL=http://backend-staging:${BACKEND_PORT}
       - COOKIE_PREFIX=umtas-staging
+      - NEXT_PUBLIC_POSTHOG_PT=${NEXT_PUBLIC_POSTHOG_PT}
+      - NEXT_PUBLIC_POSTHOG_API_HOST=${NEXT_PUBLIC_POSTHOG_API_HOST}
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=gateway"
