@@ -1,0 +1,20 @@
+.github/workflows/ci.yml
+  h_2d4b3dca70a3d8 48-49,51-52,54-55,57-58,199-214,258,261-353
+apps/backend/drizzle/0000_fearless_yellowjacket.sql
+  h_2d4b3dca70a3d8 108-109,158-159,257,333
+apps/backend/drizzle/meta/0000_snapshot.json
+  h_2d4b3dca70a3d8 2,817-837,940-946,1364-1370,2227-2233
+apps/backend/drizzle/meta/_journal.json
+  h_2d4b3dca70a3d8 8-9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "ae5a04ac542c00a3e5c16bcf2c8ff62e10d2b383",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
