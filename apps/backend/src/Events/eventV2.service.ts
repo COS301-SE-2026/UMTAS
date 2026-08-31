@@ -266,7 +266,7 @@ export class EventServiceV2 extends EventService {
     isRecurring: boolean,
     tx: AppDatabase,
   ): Promise<EventCriteriaDtoV2> {
-    const v: EventCriteriaDtoV2 = eventCriteria;
+    const v: EventCriteriaDtoV2 = eventCriteria ?? {};
 
     //Validate Times
     [v.startTime, v.endTime] = this.validateStartAndEndTime(
@@ -275,7 +275,7 @@ export class EventServiceV2 extends EventService {
     );
 
     //Validate Module - Required
-    const moduleId = eventCriteria.moduleId;
+    const moduleId = eventCriteria?.moduleId;
     const module =
       moduleId !== undefined && moduleId.trim().length !== 0
         ? await this.moduleService.getByIdV2({ moduleId, tx })
@@ -344,6 +344,7 @@ export class EventServiceV2 extends EventService {
       return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
     };
 
+    this.OOPSIE.log(`validateStartAndEndTime`);
     //Default
     start = start ?? `07:30`;
     end = end ?? `08:20`;
