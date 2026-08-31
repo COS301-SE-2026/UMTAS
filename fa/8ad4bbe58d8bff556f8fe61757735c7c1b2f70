@@ -1,0 +1,18 @@
+apps/frontend/src/proxy.ts
+  h_2d4b3dca70a3d8 30-33,38,43
+docker/backend/backend.Dockerfile
+  h_2d4b3dca70a3d8 32
+justfile
+  h_2d4b3dca70a3d8 272-273
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "fa8ad4bbe58d8bff556f8fe61757735c7c1b2f70",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
