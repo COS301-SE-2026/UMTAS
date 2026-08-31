@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - feat/devops-fixes
     tags:
       - "v*"
   pull_request:
