@@ -149,7 +149,7 @@ export function InstituteSelector({ onClose }: InstituteSelectorProps) {
                   triggerSuccessAndClose("Successfully continued!");
                   setTimeout(() => {
                     onClose?.();
-                  }, 1700);
+                  }, 500);
                 }}
               >
                 Continue as {selectedInstitute?.role ?? "Student"}
