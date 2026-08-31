@@ -7,7 +7,7 @@ import {
   IsBoolean,
   IsOptional,
 } from 'class-validator';
-import { AttendanceState } from '../../entities';
+import { AttendanceStateEnum } from '../../entities';
 import type { AttendanceStateType } from '../../entities';
 
 //Create attendance record
@@ -30,11 +30,11 @@ export class CreateAttendanceDto {
   eventDate!: string;
 
   @ApiProperty({
-    enum: AttendanceState,
-    example: AttendanceState.enumValues[0],
+    enum: AttendanceStateEnum,
+    example: AttendanceStateEnum.ATTENDING,
     description: 'Is the user attending this event or not',
   })
-  @IsEnum(AttendanceState, {
+  @IsEnum(AttendanceStateEnum, {
     message:
       'state must be one of the following values: ATTENDING, NOT_ATTENDING',
   })
