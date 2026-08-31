@@ -1,5 +1,5 @@
 {
-  "id": "e3a31d8d-4183-4ebc-b8a7-661d9fbe4f79",
+  "id": "a28e07b5-f572-4e36-92e8-e40ffd0e4f9f",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -814,6 +814,27 @@
         }
       },
       "indexes": {
+        "generated_calendar_calendar_timetable_unique": {
+          "name": "generated_calendar_calendar_timetable_unique",
+          "columns": [
+            {
+              "expression": "academicCalendarId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "timetableId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
         "generated_calendar_timetable_created_at_idx": {
           "name": "generated_calendar_timetable_created_at_idx",
           "columns": [
@@ -916,6 +937,13 @@
           "type": "varchar(64)",
           "primaryKey": false,
           "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {
@@ -1333,6 +1361,13 @@
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {
@@ -2189,6 +2224,13 @@
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {},
