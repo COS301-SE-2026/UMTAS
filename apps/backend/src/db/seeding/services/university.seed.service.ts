@@ -66,11 +66,6 @@ export class UniversitySeedService extends BaseSeedService {
             UserID: uniAdmin.id,
             role: 'UNIVERSITY_ADMIN',
           },
-          {
-            UniversityID: uniSeed[3].UniversityID,
-            UserID: uniAdmin.id,
-            role: 'UNIVERSITY_ADMIN',
-          },
         ]);
       }
     } //END_check for missing names
@@ -106,7 +101,7 @@ export class UniversitySeedService extends BaseSeedService {
   }
 
   async MarylandAPI(tx: AppDatabase) {
-    const maryName = this.constants.UniversityNames[3];
+    const maryName = this.constants.UniversityNames[2];
 
     const [maryland] = await tx
       .select()

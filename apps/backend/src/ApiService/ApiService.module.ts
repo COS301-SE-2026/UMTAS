@@ -3,7 +3,7 @@ import { ApiService } from './ApiService.service';
 import { UniversityModule } from 'src/University/university.module';
 import { ApiServiceController } from './ApiService.controller';
 import { CourseModule } from 'src/Course/course.module';
-import { AdapterRegistry } from './Registry/AdapterRegistry';
+import { AdapterRegistry } from './Registry/AdapterRegistry.service';
 import { ModuleModule } from 'src/Module/module.module';
 import { EventModule } from 'src/Events/event.module';
 

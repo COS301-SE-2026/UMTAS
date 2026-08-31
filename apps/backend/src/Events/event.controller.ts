@@ -14,13 +14,13 @@ import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
   CreateEventDto,
   EventSingleResponseDto,
-  EventListResponseDto,
   UpdateEventDto,
   DeleteResponseDto,
-  EventFiltersDto,
   CreateEventDtoV2,
   ValidateEventResponseDto,
   ValidateEventDto,
+  EventListResponseDtoV2,
+  EventFiltersDtoV2,
 } from './dto/EventDto.dto';
 
 import { EventService } from './event.service';
@@ -100,12 +100,13 @@ export class EventController {
   @Roles()
   @ApiOperation({
     summary: 'Get all events',
+    description: 'Apply filters - Enable stats mode with filters.stats=TRUE',
     operationId: 'getAllEvents',
   })
   @ApiResponse({
     status: 200,
     description: 'Events fetched successfully',
-    type: EventListResponseDto,
+    type: EventListResponseDtoV2,
   })
   @ApiResponse({
     status: 401,
@@ -117,13 +118,10 @@ export class EventController {
   })
   getAllEvents(
     @CurrentSession() session: SessionData,
-    @Query() filters: EventFiltersDto,
-  ): Promise<EventListResponseDto> {
-    return this.service.getAllEvents(session.user.id, {
-      moduleId: filters.moduleId,
-      timetableId: filters.timetableId,
-      all: filters.all,
-    });
+    @Query() filters: EventFiltersDtoV2,
+  ): Promise<EventListResponseDtoV2> {
+    console.log(`Controller: ${JSON.stringify(filters)}`);
+    return this.service.getAllEvents(session.user.id, filters);
   } //getAllEvents
 
   //get by id
