@@ -16,6 +16,9 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
     posthog.init(process.env.NEXT_PUBLIC_POSTHOG_PT as string, {
       api_host: process.env.NEXT_PUBLIC_POSTHOG_API_HOST,
       tracing_headers: headers,
+      capture_performance: true,
+      capture_exceptions: true,
+      enable_recording_console_log: true,
     });
   }, []);
 
