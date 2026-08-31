@@ -8,7 +8,7 @@ import { PostHog } from 'posthog-node';
       provide: PostHog,
       useFactory: () =>
         new PostHog(process.env.POSTHOG_K!, {
-          host: process.env.POSTHOG_H ?? 'https://us.i.posthog.com',
+          host: process.env.POSTHOG_H ?? 'https://eu.i.posthog.com',
         }),
     },
   ],
