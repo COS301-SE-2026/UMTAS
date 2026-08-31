@@ -1,0 +1,22 @@
+apps/backend/package.json
+  h_2d4b3dca70a3d8 14
+apps/backend/src/db/database.service.ts
+  h_2d4b3dca70a3d8 78-80,82-87
+apps/backend/src/db/migrate.ts
+  h_2d4b3dca70a3d8 1-46
+docker/backend/backend.Dockerfile
+  h_2d4b3dca70a3d8 32
+pnpm-lock.yaml
+  h_2d4b3dca70a3d8 76,176,381,387,399,16626,16640,16661,16675,17108,17126,19971,19977,20615,20620-20621,20647,20658,20662,20668,20672,20683,21913,21915,21919,21922,21989,22015,22020,22046,22051,22077,22645,22647,22650,23779,23785,25517,25522
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "d5f1c4b5bc1a49986ef48842c3b9bbea81eb1c9e",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
