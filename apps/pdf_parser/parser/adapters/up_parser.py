@@ -141,7 +141,7 @@ class UPPDFParser(BasePDFParser):
             return "SEMESTER_2"
         return "YEAR"
 
-    def _first_table(self, doc: pymupdf.Document):
+    def _first_table(self, doc: fitz.Document):
         tables = doc[0].find_tables().tables
         if not tables:
             raise ParserError("UNRECOGNIZED_FORMAT", "The first UP timetable page did not contain a table.", {})

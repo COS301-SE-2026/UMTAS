@@ -142,6 +142,19 @@ describe('AcademicCalendarService', () => {
       ]);
     });
 
+    it('lists public calendars independently of the selected university', async () => {
+      const publicCalendar = createAcademicCalendar({
+        ...calendar,
+        id: publicCalendarId,
+        universityId: null,
+      });
+      mockDbResult(mockDb.select as jest.Mock, [publicCalendar]);
+
+      await expect(service.listPublicCalendars(2026)).resolves.toEqual([
+        { id: publicCalendarId, year: 2026, subscriptions: [] },
+      ]);
+    });
+
     it('returns the domain not-found error for an unknown calendar', async () => {
       mockDbResult(mockDb.select as jest.Mock, []);
 
@@ -350,7 +363,10 @@ describe('AcademicCalendarService', () => {
         type: 'UNIVERSITY_CLOSURE' as const,
         description: 'Campus closed',
       };
-      mockDbResult(mockDb.select as jest.Mock, [calendar]);
+      mockSequentialResults(mockDb.select as jest.Mock, [
+        [calendar],
+        [holiday],
+      ]);
       mockDbResult(mockDb.update as jest.Mock, [updated]);
 
       await expect(
@@ -367,7 +383,7 @@ describe('AcademicCalendarService', () => {
     });
 
     it('returns not found when a scoped restriction update affects no row', async () => {
-      mockDbResult(mockDb.select as jest.Mock, [calendar]);
+      mockSequentialResults(mockDb.select as jest.Mock, [[calendar], []]);
       mockDbResult(mockDb.update as jest.Mock, []);
 
       await expect(
@@ -376,11 +392,14 @@ describe('AcademicCalendarService', () => {
           startDate: '2026-04-27',
         }),
       ).rejects.toBeInstanceOf(NotFoundException);
-      expect(mockDb.update).toHaveBeenCalled();
+      expect(mockDb.update).not.toHaveBeenCalled();
     });
 
     it('deletes only a restriction belonging to the parent calendar', async () => {
-      mockDbResult(mockDb.select as jest.Mock, [calendar]);
+      mockSequentialResults(mockDb.select as jest.Mock, [
+        [calendar],
+        [holiday],
+      ]);
       mockDbResult(mockDb.delete as jest.Mock, [holiday]);
 
       await expect(
@@ -389,7 +408,7 @@ describe('AcademicCalendarService', () => {
     });
 
     it('returns not found when a scoped restriction delete affects no row', async () => {
-      mockDbResult(mockDb.select as jest.Mock, [calendar]);
+      mockSequentialResults(mockDb.select as jest.Mock, [[calendar], []]);
       mockDbResult(mockDb.delete as jest.Mock, []);
 
       await expectDomainError(
@@ -397,6 +416,144 @@ describe('AcademicCalendarService', () => {
         NotFoundException,
         'Calendar restriction not found',
       );
+    });
+
+    it('rejects a duplicate semester boundary at write time', async () => {
+      const semesterStart = createCalendarRestriction({
+        id: '41000000-0000-4000-8000-000000000011',
+        academicCalendarId: calendarId,
+        type: 'SEMESTER_1_START',
+        startDate: '2026-02-09',
+        endDate: '2026-02-09',
+      });
+      mockSequentialResults(mockDb.select as jest.Mock, [
+        [calendar],
+        [semesterStart],
+      ]);
+
+      await expectDomainError(
+        service.createRestriction(universityId, calendarId, {
+          type: 'SEMESTER_1_START',
+          startDate: '2026-02-16',
+        }),
+        UnprocessableEntityException,
+        'exactly one SEMESTER_1_START',
+      );
+      expect(mockDb.insert).not.toHaveBeenCalled();
+    });
+
+    it('rejects out-of-order semester boundaries when the set becomes complete', async () => {
+      const existing = [
+        createCalendarRestriction({
+          id: '41000000-0000-4000-8000-000000000012',
+          type: 'SEMESTER_1_START',
+          startDate: '2026-02-09',
+          endDate: '2026-02-09',
+        }),
+        createCalendarRestriction({
+          id: '41000000-0000-4000-8000-000000000013',
+          type: 'SEMESTER_1_END',
+          startDate: '2026-06-12',
+          endDate: '2026-06-12',
+        }),
+        createCalendarRestriction({
+          id: '41000000-0000-4000-8000-000000000014',
+          type: 'SEMESTER_2_START',
+          startDate: '2026-07-20',
+          endDate: '2026-07-20',
+        }),
+      ];
+      mockSequentialResults(mockDb.select as jest.Mock, [[calendar], existing]);
+
+      await expectDomainError(
+        service.createRestriction(universityId, calendarId, {
+          type: 'SEMESTER_2_END',
+          startDate: '2026-07-01',
+        }),
+        UnprocessableEntityException,
+        'overlap or are out of order',
+      );
+      expect(mockDb.insert).not.toHaveBeenCalled();
+    });
+
+    it('rejects an update that makes complete semester boundaries invalid', async () => {
+      const boundaries = [
+        createCalendarRestriction({
+          id: '41000000-0000-4000-8000-000000000021',
+          type: 'SEMESTER_1_START',
+          startDate: '2026-02-09',
+          endDate: '2026-02-09',
+        }),
+        createCalendarRestriction({
+          id: restrictionId,
+          type: 'SEMESTER_1_END',
+          startDate: '2026-06-12',
+          endDate: '2026-06-12',
+        }),
+        createCalendarRestriction({
+          id: '41000000-0000-4000-8000-000000000022',
+          type: 'SEMESTER_2_START',
+          startDate: '2026-07-20',
+          endDate: '2026-07-20',
+        }),
+        createCalendarRestriction({
+          id: '41000000-0000-4000-8000-000000000023',
+          type: 'SEMESTER_2_END',
+          startDate: '2026-11-06',
+          endDate: '2026-11-06',
+        }),
+      ];
+      mockSequentialResults(mockDb.select as jest.Mock, [
+        [calendar],
+        boundaries,
+      ]);
+
+      await expectDomainError(
+        service.updateRestriction(universityId, calendarId, restrictionId, {
+          type: 'SEMESTER_1_END',
+          startDate: '2026-07-21',
+        }),
+        UnprocessableEntityException,
+        'overlap or are out of order',
+      );
+      expect(mockDb.update).not.toHaveBeenCalled();
+    });
+
+    it('rejects deleting a boundary from a complete semester set', async () => {
+      const boundaries = [
+        createCalendarRestriction({
+          id: restrictionId,
+          type: 'SEMESTER_1_START',
+          startDate: '2026-02-09',
+          endDate: '2026-02-09',
+        }),
+        createCalendarRestriction({
+          type: 'SEMESTER_1_END',
+          startDate: '2026-06-12',
+          endDate: '2026-06-12',
+        }),
+        createCalendarRestriction({
+          type: 'SEMESTER_2_START',
+          startDate: '2026-07-20',
+          endDate: '2026-07-20',
+        }),
+        createCalendarRestriction({
+          type: 'SEMESTER_2_END',
+          startDate: '2026-11-06',
+          endDate: '2026-11-06',
+        }),
+      ];
+      mockSequentialResults(mockDb.select as jest.Mock, [
+        [calendar],
+        boundaries,
+      ]);
+
+      await expectDomainError(
+        service.deleteRestriction(universityId, calendarId, restrictionId),
+        UnprocessableEntityException,
+        'exactly one SEMESTER_1_START',
+      );
+      expect(mockDb.delete).not.toHaveBeenCalled();
     });
   });
 
@@ -513,6 +670,19 @@ describe('AcademicCalendarService', () => {
         'and year 2026',
       );
       expect(mockDb.insert).not.toHaveBeenCalled();
+    });
+
+    it('uses an explicitly requested academic year', async () => {
+      mockDbResult(mockDb.select as jest.Mock, []);
+
+      await expectDomainError(
+        service.generateCalendar(userId, universityId, {
+          timetableId,
+          year: 2027,
+        }),
+        NotFoundException,
+        'and year 2027',
+      );
     });
 
     it('does not query subscribed restrictions when subscriptions are empty', async () => {
@@ -705,10 +875,23 @@ describe('AcademicCalendarService', () => {
                 moduleColour: '#123456',
               }),
             ],
-            allDayEvents: [],
+            allDayEvents: [
+              expect.objectContaining({
+                type: 'TEST_WEEK',
+                startDate: '2026-03-09',
+                endDate: '2026-03-13',
+              }),
+            ],
           }),
         }),
       );
+      expect(insertChain.onConflictDoUpdate).toHaveBeenCalledWith({
+        target: expect.any(Array),
+        set: expect.objectContaining({
+          payload: expect.any(Object),
+          createdAt: expect.any(Date),
+        }),
+      });
     });
 
     it('requires all four valid semester boundaries', async () => {

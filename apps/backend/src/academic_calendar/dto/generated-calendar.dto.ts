@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsUUID } from 'class-validator';
+import { IsInt, IsOptional, IsUUID, Max, Min } from 'class-validator';
 import {
   CALENDAR_RESTRICTION_TYPES,
   WEEKDAYS,
@@ -16,6 +16,19 @@ export class GenerateCalendarDto {
   })
   @IsUUID()
   timetableId!: string;
+
+  @ApiPropertyOptional({
+    type: Number,
+    minimum: 1000,
+    maximum: 9999,
+    example: 2027,
+    description: 'Academic year to generate. Defaults to the current UTC year.',
+  })
+  @IsOptional()
+  @IsInt()
+  @Min(1000)
+  @Max(9999)
+  year?: number;
 }
 
 export class GeneratedRecurringEventDto {
