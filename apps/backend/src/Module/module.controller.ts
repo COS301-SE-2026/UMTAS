@@ -7,7 +7,9 @@ import {
   EnrollToModuleDto,
   EnrolResponseDto,
   ModuleFiltersDto,
+  ModuleFiltersDtoV2,
   ModuleListResponseDto,
+  ModuleListResponseDtoV2,
   ModuleSingleResponseDto,
   ModuleStylingBodyDto,
   ModuleStylingResponseDto,
@@ -97,8 +99,7 @@ export class ModuleController {
   @Roles()
   @ApiOperation({
     summary: 'Get all modules with filters',
-    description:
-      'Filter by userId(enrolled) | courseId(course owned) | universityId(modules for university over all courses). At least one filter required',
+    description: `Filter by userId(enrolled) | courseId(course owned) | universityId(modules for university over all courses). At least one filter required`,
     operationId: 'getAllModules',
   })
   @ApiResponse({
@@ -125,15 +126,15 @@ export class ModuleController {
   @Get('v2/')
   @Roles()
   @ApiOperation({
-    summary: 'Get all modules with filters - V2',
-    description:
-      'Filter by userId(enrolled) | courseId(course owned) | universityId(modules for university over all courses). At least one filter required',
+    summary: 'Get all modules with filters and counts - V2',
+    description: `Filter by userId(enrolled) | courseId(course owned) | universityId(modules for university over all courses). At least one filter required \n
+      Enable stats response: filters: { stats=t/true/True/TRUE/1 }`,
     operationId: 'getAllModulesV2',
   })
   @ApiResponse({
     status: 200,
     description: 'Modules returned successfully',
-    type: ModuleListResponseDto,
+    type: ModuleListResponseDtoV2,
   })
   @ApiResponse({
     status: 400,
@@ -141,8 +142,8 @@ export class ModuleController {
   })
   getAllV2(
     @CurrentSession() session: SessionData,
-    @Query() filters: ModuleFiltersDto,
-  ): Promise<ModuleListResponseDto> {
+    @Query() filters: ModuleFiltersDtoV2,
+  ): Promise<ModuleListResponseDtoV2> {
     return this.service2.getAll(session.user.id, filters);
   }
 

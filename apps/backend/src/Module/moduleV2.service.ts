@@ -3,8 +3,8 @@ import {
   CreateModuleDto,
   EnrollToModuleDto,
   EnrolResponseDto,
-  ModuleFiltersDto,
-  ModuleListResponseDto,
+  ModuleFiltersDtoV2,
+  ModuleListResponseDtoV2,
   ModuleSingleResponseDto,
 } from './dto/module.dto';
 import { ModuleService } from './module.service';
@@ -95,6 +95,7 @@ export class ModuleServiceV2 extends ModuleService {
           moduleDescription: description,
           validated,
           ExternalID,
+          createdAt: new Date(),
         })
         .returning();
 
@@ -195,13 +196,12 @@ export class ModuleServiceV2 extends ModuleService {
     }
   }
 
-  //getAllV2, overwrite
-
+  //getAll, overwrite
   async getAll(
     userId: string,
-    filters: ModuleFiltersDto,
+    filters: ModuleFiltersDtoV2,
     tx?: AppDatabase,
-  ): Promise<ModuleListResponseDto> {
+  ): Promise<ModuleListResponseDtoV2> {
     const db = tx ?? this.dbService.db;
     const uniId = filters.universityId?.trim();
     const courseId = filters.courseId?.trim();
@@ -278,6 +278,11 @@ export class ModuleServiceV2 extends ModuleService {
     return {
       modules: modulesWithEvents,
       message: `Returning: ${uniqueModules.length}-Modules. | With filters: ${JSON.stringify(filters)}`,
+      ...(filters.Stats && filters.Stats === true
+        ? {
+            count: foundModules.length,
+          }
+        : {}),
     };
   } //getAll
 
@@ -442,6 +447,27 @@ export class ModuleServiceV2 extends ModuleService {
       message: `Student[${userId}] already unenrolled from module[${moduleId}]`,
     };
   } //END_enrollToModule
+
+  async getByExternalID(
+    externalId: string,
+    courseId: string,
+  ): Promise<ModuleSingleResponseDto | null> {
+    const [module] = await this.dbService.db
+      .select(getTableColumns(modules))
+      .from(modules)
+      .where(eq(modules.ExternalID, externalId))
+      .leftJoin(GroupModules, eq(GroupModules.ModuleID, modules.moduleID))
+      .leftJoin(
+        Course,
+        and(
+          eq(Course.CourseID, courseId),
+          eq(Course.GroupID, GroupModules.GroupID),
+        ),
+      )
+      .limit(1);
+
+    return module ?? null;
+  }
 
   //🎅's little helpers
   protected async getGroupId(
