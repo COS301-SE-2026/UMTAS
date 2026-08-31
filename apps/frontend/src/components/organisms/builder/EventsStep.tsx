@@ -171,20 +171,7 @@ export function EventsStep({
   // a local construct to add an empty event
   function addNewEvent() {
     addEvent.mutate({
-      body: {
-        activityCode: "L1",
-        isRecurring: false,
-        eventName: "Name",
-        activityType: "lecture",
-        eventCriteria: {
-          eventSource: "university",
-          date: new Date().toISOString().split("T")[0],
-          startTime: "07:00",
-          endTime: "07:30",
-          moduleId: modules[0].moduleID,
-        },
-        validated: true,
-      },
+      body: {},
     });
   }
 
