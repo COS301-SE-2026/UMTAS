@@ -40,8 +40,8 @@ export class createEventAttendanceBuilder extends RequestBuilder<
 }
 
 export class getEventAttendanceBuilder extends RequestBuilder<
-  undefined,
   getEventAttendanceQuery,
+  undefined,
   getEventAttendanceRes
 > {
   constructor() {
