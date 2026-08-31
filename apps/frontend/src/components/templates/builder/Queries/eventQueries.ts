@@ -24,11 +24,11 @@ export function getAllEventsQ() {
 export function addUniEventMut() {
   return mutationOptions({
     mutationFn: async (vars: { body: CreateEventBody }) => {
-      console.log(vars.body);
+      //console.log(vars.body);
       const result = new createEventsBuilder().send({
         body: vars.body,
       });
-      console.log("result", await result);
+      //console.log("result", await result);
       return result;
     },
     onSuccess: () => {
