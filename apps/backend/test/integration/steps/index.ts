@@ -1,4 +1,5 @@
 export * from './authentication.step';
+export * from './academic-calendar.step';
 export * from './attendance.step';
 export * from './builder.step';
 export * from './enrollment.step';

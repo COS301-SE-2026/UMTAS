@@ -48,6 +48,10 @@ def test_parser_cli_emits_normalised_lecture_candidates():
     assert all(module["name"] is None for module in payload["modules"])
     assert all(module["metadata"]["campus"] == "HATFIELD" for module in payload["modules"])
     assert all(module["warnings"] == [] for module in payload["modules"])
+    modules_by_code = {module["code"]: module for module in payload["modules"]}
+    assert modules_by_code["COS314"]["metadata"]["semester"] == "SEMESTER_1"
+    assert modules_by_code["COS326"]["metadata"]["semester"] == "SEMESTER_2"
+    assert modules_by_code["COS301"]["metadata"]["semester"] == "YEAR"
 
     cos301_p2 = next(
         event

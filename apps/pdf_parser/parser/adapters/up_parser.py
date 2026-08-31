@@ -91,23 +91,53 @@ class UPPDFParser(BasePDFParser):
         )
 
     def build_modules(self, events: list[EventCandidate]) -> list[ModuleCandidate]:
-        modules: list[ModuleCandidate] = []
-        seen = set()
+        events_by_module: dict[str, list[EventCandidate]] = {}
         for event in events:
             code = event["moduleCode"]
-            if code in seen:
-                continue
-            seen.add(code)
-            campus = clean_cell(event.get("metadata", {}).get("campus") or event.get("metadata", {}).get("examCampus") or "")
+            events_by_module.setdefault(code, []).append(event)
+
+        modules: list[ModuleCandidate] = []
+        for code, module_events in events_by_module.items():
+            campus = next(
+                (
+                    clean_cell(event.get("metadata", {}).get("campus") or event.get("metadata", {}).get("examCampus") or "")
+                    for event in module_events
+                    if clean_cell(event.get("metadata", {}).get("campus") or event.get("metadata", {}).get("examCampus") or "")
+                ),
+                "",
+            )
+            semester = self._module_semester(module_events)
+            metadata: ParserDetails = {}
+            if campus:
+                metadata["campus"] = campus
+            if semester:
+                metadata["semester"] = semester
             modules.append(
                 {
                     "code": code,
                     "name": None,
-                    "metadata": {"campus": campus} if campus else {},
+                    "metadata": metadata,
                     "warnings": [],
                 }
             )
         return modules
+
+    def _module_semester(self, events: list[EventCandidate]) -> str | None:
+        offered = {
+            clean_cell(event.get("metadata", {}).get("semester") or "").upper()
+            for event in events
+        }
+        offered.discard("")
+
+        if not offered:
+            return None
+        if offered & {"Y", "YEAR", "YEAR-LONG"} or offered >= {"S1", "S2"}:
+            return "YEAR"
+        if offered == {"S1"}:
+            return "SEMESTER_1"
+        if offered == {"S2"}:
+            return "SEMESTER_2"
+        return "YEAR"
 
     def _first_table(self, doc: fitz.Document):
         tables = doc[0].find_tables().tables
