@@ -20,6 +20,8 @@ export type updateEventAttendanceByIdBody =
   paths["/api/attendance/{attendanceId}"]["patch"]["requestBody"]["content"]["application/json"];
 export type updateEventAttendanceByIdRes =
   paths["/api/attendance/{attendanceId}"]["patch"]["responses"]["200"]["content"]["application/json"];
+export type updateEventAttendanceByIdPath =
+  paths["/api/attendance/{attendanceId}"]["patch"]["parameters"]["path"];
 
 export type deleteEventAttendanceByIdPath =
   paths["/api/attendance/{attendanceId}"]["delete"]["parameters"]["path"];
@@ -60,7 +62,7 @@ export class getEventAttendanceByIdBuilder extends RequestBuilder<
 }
 
 export class updateEventAttendanceByIdBuilder extends RequestBuilder<
-  undefined,
+  updateEventAttendanceByIdPath,
   updateEventAttendanceByIdBody,
   updateEventAttendanceByIdRes
 > {
