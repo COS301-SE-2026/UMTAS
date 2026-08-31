@@ -1,0 +1,16 @@
+docs/diagrams/domain/Core-Domain-Model.md
+  h_84e82529bd05a5 3
+docs/srs/USER_STORIES.md
+  h_84e82529bd05a5 3-4,7,15-16,28-29,37-38,46-47,55-56,64-65,73-74,83-84,92-93,100-101,108-109,116-117,125-126,133-134,142-143,149-150
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.18",
+  "base_commit_sha": "45c101e4b98a0e13042ca4da84b5bdb1a317d492",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}

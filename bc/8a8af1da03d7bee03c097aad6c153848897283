@@ -1,0 +1,24 @@
+apps/backend/src/Testing/Factories/academic-calendar.factory.ts
+  h_3359569cacef0e 1-67
+apps/backend/src/Testing/Factories/index.ts
+  h_3359569cacef0e 2
+apps/backend/src/academic_calendar/academic_calendar.controller.ts
+  h_3359569cacef0e 56-57,61,87,90-94,98-99,103,126,129-133
+apps/backend/src/academic_calendar/academic_calendar.module.ts
+  h_3359569cacef0e 3,8
+apps/backend/src/academic_calendar/dto/generated-calendar.dto.ts
+  h_3359569cacef0e 2,140,143-145
+apps/backend/src/entities/AcademicCalendar/generated-calendar.schema.ts
+  h_3359569cacef0e 22,24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "bc8a8af1da03d7bee03c097aad6c153848897283",
+  "prompts": {},
+  "humans": {
+    "h_3359569cacef0e": {
+      "author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}

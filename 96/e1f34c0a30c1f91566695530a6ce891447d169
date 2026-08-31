@@ -1,0 +1,20 @@
+apps/backend/src/entities/Events/UniversityEvent.ts
+  h_8b894b05e4a1b2 5
+apps/backend/src/Events/integration/event.service.int.ts
+  h_8b894b05e4a1b2 7,49
+apps/backend/src/Events/event.service.ts
+  h_8b894b05e4a1b2 9,74,77,97,100,136,139,237,272,276
+apps/backend/src/Events/dto/EventDto.dto.ts
+  h_8b894b05e4a1b2 114
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.10",
+  "base_commit_sha": "96e1f34c0a30c1f91566695530a6ce891447d169",
+  "prompts": {},
+  "humans": {
+    "h_8b894b05e4a1b2": {
+      "author": "Wilmar-Smit <u24584216@tuks.co.za>"
+    }
+  }
+}

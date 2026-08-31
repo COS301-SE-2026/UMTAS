@@ -1,0 +1,22 @@
+apps/frontend/src/components/organisms/solver/SolverReview.tsx
+  h_3359569cacef0e 29,44
+apps/frontend/src/components/organisms/solver/SolverUpload.tsx
+  h_3359569cacef0e 202,205,209
+apps/backend/src/University/university.service.ts
+  h_3359569cacef0e 9,73
+apps/frontend/src/components/organisms/module-management/moduleTable.tsx
+  h_3359569cacef0e 139
+apps/frontend/src/components/organisms/solver/SolverPreferences.tsx
+  h_3359569cacef0e 237,265,280,323
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "51ea316350492505eb191472bd91c58be816ef4c",
+  "prompts": {},
+  "humans": {
+    "h_3359569cacef0e": {
+      "author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}

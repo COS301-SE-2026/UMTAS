@@ -1,0 +1,19 @@
+packages/shared-types/index.ts
+  s_885242901a3051::t_df13ddf63fa327 1-63
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.5",
+  "base_commit_sha": "bd997eaea67211e144ae6b9a99b08be3ab2c6a5e",
+  "prompts": {},
+  "sessions": {
+    "s_885242901a3051": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f1d22-d503-7631-b746-21eca8b1e035",
+        "model": "gpt-5.5"
+      },
+      "human_author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,16 @@
+apps/backend/src/Attendance/attendance.service.spec.ts
+  h_84e82529bd05a5 4,33,154-234
+apps/backend/src/Testing/constants.spec.ts
+  h_84e82529bd05a5 7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "2641c0b56f258382e003fed7a28760cc49f5a68f",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}

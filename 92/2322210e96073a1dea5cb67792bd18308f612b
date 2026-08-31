@@ -1,0 +1,20 @@
+apps/simulation-service/core/profile_engine.py
+  h_2d4b3dca70a3d8 4-8,28,59,63-66
+apps/simulation-service/core/report.py
+  h_2d4b3dca70a3d8 20,30-40,44-50,62-65
+apps/simulation-service/core/runner.py
+  h_2d4b3dca70a3d8 8-11,13-14
+apps/simulation-service/requirements.txt
+  h_2d4b3dca70a3d8 1-3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "922322210e96073a1dea5cb67792bd18308f612b",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}

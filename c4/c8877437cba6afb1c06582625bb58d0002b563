@@ -1,0 +1,14 @@
+apps/backend/src/academic_calendar/academic_calendar.controller.ts
+  h_3359569cacef0e 1-339
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "c4c8877437cba6afb1c06582625bb58d0002b563",
+  "prompts": {},
+  "humans": {
+    "h_3359569cacef0e": {
+      "author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}

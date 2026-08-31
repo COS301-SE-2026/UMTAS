@@ -1,0 +1,14 @@
+apps/frontend/src/components/templates/builder/WizardShell.tsx
+  h_8b894b05e4a1b2 58
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.13",
+  "base_commit_sha": "871a387451e865a3d276799c58192c932adccb42",
+  "prompts": {},
+  "humans": {
+    "h_8b894b05e4a1b2": {
+      "author": "Wilmar-Smit <u24584216@tuks.co.za>"
+    }
+  }
+}

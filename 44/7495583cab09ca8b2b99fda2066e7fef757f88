@@ -1,0 +1,18 @@
+apps/preference-solver/src/main.cpp
+  h_8b894b05e4a1b2 2
+apps/preference-solver/src/Pref_Solver/pref.h
+  h_8b894b05e4a1b2 1-6,8-9,11-20,22,24-28,30-31,33-35,37-41
+apps/preference-solver/makefile
+  h_8b894b05e4a1b2 15-16,37-40,42,46-56
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "447495583cab09ca8b2b99fda2066e7fef757f88",
+  "prompts": {},
+  "humans": {
+    "h_8b894b05e4a1b2": {
+      "author": "Wilmar-Smit <u24584216@tuks.co.za>"
+    }
+  }
+}

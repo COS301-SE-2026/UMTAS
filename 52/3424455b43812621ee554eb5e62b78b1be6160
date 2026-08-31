@@ -1,0 +1,417 @@
+apps/backend/src/Module/dto/module.dto.ts
+  h_3359569cacef0e 13,27,96,119,182,191-219,230,287-292,336,345,349-357,412-433
+  s_8f054821d02439::t_954ed70ab24064 434
+apps/backend/src/app.module.ts
+  h_3359569cacef0e 25,45
+.github/workflows/ci.yml
+  s_8f054821d02439::t_dcbfd58208ad32 12
+.gitignore
+  s_8f054821d02439::t_99930e74815454 149-151
+README.md
+  s_8f054821d02439::t_14761973f74650 35-36
+apps/NFR/docker-compose.yml
+  s_8f054821d02439::t_4347edc31121c0 1-14
+apps/NFR/requirements.txt
+  s_8f054821d02439::t_702b1f0745b5d1 1-4
+apps/NFR/run.sh
+  s_8f054821d02439::t_62b78207826424 1-10
+apps/NFR/upload_locustfile.py
+  s_8f054821d02439::t_6d7042709946c4 1-50
+apps/backend/docs/openapi.json
+  s_8f054821d02439::t_b30aba400f33c2 1-6891
+apps/backend/drizzle/0001_Added_BaseUrl_ApiKey_To_University_Object.sql
+  s_8f054821d02439::t_dccc94e26a3afc 1-2
+apps/backend/drizzle/0002_University_ApiIdentifier_Added.sql
+  s_8f054821d02439::t_e09207a46c231c 1-2
+apps/backend/drizzle/0003_Length_Altered_On_University_ApiKey.sql
+  s_8f054821d02439::t_4ed192013e70a5 1
+apps/backend/drizzle/0004_Added_ExternalID_To_Course_Entity.sql
+  s_8f054821d02439::t_075a139dfe2eeb 1-2
+apps/backend/drizzle/0005_Course_Name_Now_Length_100.sql
+  s_8f054821d02439::t_6e8bfd3ce18604 1
+apps/backend/drizzle/0006_ExternalID_Added_To_Module_Entity.sql
+  s_8f054821d02439::t_4d4f98063dcbcd 1-2
+apps/backend/drizzle/0007_Removed_Unique_Constraint_On_ModuleCode.sql
+  s_8f054821d02439::t_ea19cbc3601a3d 1
+apps/backend/drizzle/0008_Added_Unique_Constraint_Back_Onto_Modules.sql
+  s_8f054821d02439::t_82c7367057b553 1
+apps/backend/drizzle/0009_ModuleCode_Length_Changed_to_15_from_10.sql
+  s_8f054821d02439::t_3a62908c519b19 1
+apps/backend/drizzle/meta/0000_snapshot.json
+  s_8f054821d02439::t_c3da582ed8b975 2
+apps/backend/drizzle/meta/0001_snapshot.json
+  s_8f054821d02439::t_554fc495373dbb 1-2153
+apps/backend/drizzle/meta/0002_snapshot.json
+  s_8f054821d02439::t_91ec5864624f2a 1-2165
+apps/backend/drizzle/meta/0003_snapshot.json
+  s_8f054821d02439::t_6f2c9ffe8a542e 1-2165
+apps/backend/drizzle/meta/0004_snapshot.json
+  s_8f054821d02439::t_922a00c6eae6b6 1-2177
+apps/backend/drizzle/meta/0005_snapshot.json
+  s_8f054821d02439::t_305f2625440c42 1-2177
+apps/backend/drizzle/meta/0006_snapshot.json
+  s_8f054821d02439::t_dcea374933f83f 1-2183
+apps/backend/drizzle/meta/0007_snapshot.json
+  s_8f054821d02439::t_7da83246aee695 1-2167
+apps/backend/drizzle/meta/0008_snapshot.json
+  s_8f054821d02439::t_f076f74d66a8c3 1-2183
+apps/backend/drizzle/meta/0009_snapshot.json
+  s_8f054821d02439::t_96d28c70b58139 1-2183
+apps/backend/drizzle/meta/_journal.json
+  s_8f054821d02439::t_3cb47cf51f5302 8-72
+apps/backend/jest.config.ts
+  s_8f054821d02439::t_883ce299142b42 5,17,19-20,22,41
+apps/backend/nest-cli.json
+  s_8f054821d02439::t_b613fd11a218d4 8-10
+apps/backend/package.json
+  s_8f054821d02439::t_08bdbaa0694615 28
+apps/backend/src/ApiService/Adapter/Maryland/ML_Adapter.ts
+  s_8f054821d02439::t_87857c7ccdf96e 1-34,36-38,41,43-47,49-53,55-56,58-64,66-69,71-83,86-92,94-96,98,100,102,104-105,107-121,123-124,126-129,131-134,136-139,141-143,145,148-152,155-162,164-165
+apps/backend/src/ApiService/Adapter/Maryland/mapping.md
+  s_8f054821d02439::t_4754bd4cf21530 1-87
+apps/backend/src/ApiService/Adapter/NWU/NWU_Adapter.ts
+  s_8f054821d02439::t_6b5901821078e0 1-45
+apps/backend/src/ApiService/Adapter/University_Adapter.ts
+  s_8f054821d02439::t_dc959d61439288 1-105
+apps/backend/src/ApiService/ApiService.controller.ts
+  s_8f054821d02439::t_b69493a5c0f5f3 1-319
+apps/backend/src/ApiService/ApiService.module.ts
+  s_8f054821d02439::t_314dab6e2e2b4d 1-16
+apps/backend/src/ApiService/ApiService.service.ts
+  s_8f054821d02439::t_9825a198890a0f 1-118
+apps/backend/src/ApiService/Planning/API_Adapter_System.drawio
+  s_8f054821d02439::t_f89a2578aee615 1-400
+apps/backend/src/ApiService/Registry/AdapterRegistry.ts
+  s_8f054821d02439::t_f26c6f477245cc 1-65
+apps/backend/src/Attendance/attendance.service.spec.ts
+  s_8f054821d02439::t_561c959569a1b3 296
+apps/backend/src/Builder/builder.controller.ts
+  s_8f054821d02439::t_ea903ef10c1d89 2-6,29-30,35-38,40,186-211
+apps/backend/src/Builder/builder.module.ts
+  s_8f054821d02439::t_f2f6a340d84004 7-8,11,13-14
+apps/backend/src/Builder/builder.service.ts
+  s_8f054821d02439::t_6a1dd9219820fd 33-36,154,189,226
+apps/backend/src/Builder/builderV2.service.ts
+  s_8f054821d02439::t_a4f6a3dada0e5d 1-125
+apps/backend/src/Builder/dto/builder.dto.ts
+  s_8f054821d02439::t_66aa01b45c2c08 1,9,35-45
+apps/backend/src/Course/course.controller.ts
+  s_8f054821d02439::t_1f785e206255db 21,32-34,39-42,91-114,141-167
+apps/backend/src/Course/course.module.ts
+  s_8f054821d02439::t_e96637f6eb138e 6-7,10-14,16-17
+apps/backend/src/Course/course.service.ts
+  s_8f054821d02439::t_f47b527826cab3 35-36,38,72
+apps/backend/src/Course/courseV2.service.ts
+  s_8f054821d02439::t_037369b57ef899 1-95
+apps/backend/src/Course/dto/course.dto.ts
+  s_8f054821d02439::t_c97a881c81352b 3,9,12-13,49,60-79,88,107-108
+apps/backend/src/Events/dto/EventDto.dto.ts
+  s_8f054821d02439::t_13b73bcdc2df81 8,62-79,88-91,97,103-104,106-113,118,123-128,152-166,178-180,184-185,195-202,204-213
+apps/backend/src/Events/event-import-fingerprint.service.ts
+  s_8f054821d02439::t_c7176bc3ce990b 10,42
+apps/backend/src/Events/event.controller.ts
+  s_8f054821d02439::t_5cdeee1b3a798f 21-23,30,35-61,124-125,235-257
+apps/backend/src/Events/event.module.ts
+  s_8f054821d02439::t_135ba5b05df656 1,8-9,12,14-25
+apps/backend/src/Events/event.service.spec.ts
+  s_8f054821d02439::t_c06b649082bd75 17,28,57-58,70,81
+apps/backend/src/Events/event.service.ts
+  s_8f054821d02439::t_4fd035cd84d076 4-5,26,43,48-52,94,98-106,550-568,623,655,722-783
+apps/backend/src/Events/eventV2.service.spec.ts
+  s_8f054821d02439::t_4689aa21c3e1d4 1-296
+apps/backend/src/Events/eventV2.service.ts
+  s_8f054821d02439::t_edc6f1964c14c3 1-389
+apps/backend/src/Module/module.controller.ts
+  s_8f054821d02439::t_414893b39aa367 7,33,38-41,71-94,102,124-148,177-206,298-327
+apps/backend/src/Module/module.module.ts
+  s_8f054821d02439::t_1bc3dea0b5a15d 1,6-7,10-14,16-17
+apps/backend/src/Module/module.service.spec.ts
+  s_8f054821d02439::t_664d10b1cbe991 91-112
+apps/backend/src/Module/module.service.ts
+  s_8f054821d02439::t_4cb5ff4d24e522 6-7,25,50-53,98-104,126,573-574,578,580,596-598
+apps/backend/src/Module/moduleV2.service.ts
+  s_8f054821d02439::t_15ebb98edadc02 1-552
+apps/backend/src/Testing/Factories/course.factory.ts
+  s_8f054821d02439::t_4bfff778ebb150 17
+apps/backend/src/Testing/Factories/event.factory.ts
+  s_8f054821d02439::t_3819bb037e037d 12-13,21,42-56,120,132-143
+apps/backend/src/Testing/Factories/module.factory.ts
+  s_8f054821d02439::t_70a95d994b8a32 21
+apps/backend/src/Testing/Factories/university.factory.ts
+  s_8f054821d02439::t_d5ed18d2f2b836 12-14
+apps/backend/src/Testing/Mocks/services/moduleV2.mock.ts
+  s_8f054821d02439::t_3e7a6caffe8446 1-25
+apps/backend/src/Timetable/dto/timetable.dto.ts
+  s_8f054821d02439::t_7d93812aa32860 10,101-119
+apps/backend/src/Timetable/timetable.controller.ts
+  s_8f054821d02439::t_1b4f8bbdf8605a 24,77-93,113-131
+apps/backend/src/Timetable/timetable.module.ts
+  s_8f054821d02439::t_0fcb856f100415 4,7
+apps/backend/src/Timetable/timetable.service.spec.ts
+  s_8f054821d02439::t_4e47d0e7b830e1 9,26,45,52,61
+apps/backend/src/Timetable/timetable.service.ts
+  s_8f054821d02439::t_967513393d55d9 21,23,26,30-33,133-160,168-219
+apps/backend/src/University/dto/university.dto.ts
+  s_8f054821d02439::t_a0e29bc04451d0 36-62
+apps/backend/src/University/university.service.spec.ts
+  s_8f054821d02439::t_0ca62b326d13b1 145,147-149,153-157
+apps/backend/src/University/university.service.ts
+  s_8f054821d02439::t_f37320b362062f 124,126-153,159,165
+apps/backend/src/auth/apiKey.guard.ts
+  s_8f054821d02439::t_d0686233b75b09 1-31
+apps/backend/src/auth/auth.controller.ts
+  s_8f054821d02439::t_4deedeb3e56fb4 5,12,15,43-45,58,60,72,83-86,617-658
+apps/backend/src/auth/auth.dto.ts
+  s_8f054821d02439::t_86db6811042577 2,171-176,346-388
+apps/backend/src/auth/auth.guard.ts
+  s_8f054821d02439::t_75c413c2c9e5b6 77,90,92
+apps/backend/src/auth/auth.service.ts
+  s_8f054821d02439::t_cd44645150af86 7,11,17-21,178-269
+apps/backend/src/auth/auth.ts
+  s_8f054821d02439::t_0a772c1a4b5c73 329-335
+apps/backend/src/db/database.service.ts
+  s_8f054821d02439::t_df21cd488143e3 5,45,69-71,91-92
+apps/backend/src/db/seeding/Constants/Universities.constants.ts
+  s_8f054821d02439::t_b69bafb5a13231 6,15
+apps/backend/src/db/seeding/services/university.seed.service.ts
+  s_8f054821d02439::t_51e977d1f28336 8,59-73,81-83,85-127
+apps/backend/src/entities/Modules/modules.schema.ts
+  s_8f054821d02439::t_45f98c6b08eee3 26,31,34
+apps/backend/src/entities/Universities/University.schema.ts
+  s_8f054821d02439::t_0e978454b745b7 26-28
+apps/backend/src/entities/Universities/course.schema.ts
+  s_8f054821d02439::t_c8f1fdbecef8e0 8,21-41
+apps/backend/src/jobs/dto/worker-contract.dto.ts
+  s_8f054821d02439::t_6a96225d077b3e 142-180,182-187,189-202,205-216,218-229
+apps/backend/src/main.ts
+  s_8f054821d02439::t_fd2d6e97a262e6 3,5,15,18-24,31-43,61,64-71,112-115,129-141
+apps/backend/src/solver/solver-fingerprint.service.spec.ts
+  s_8f054821d02439::t_6aae7d20d40465 24-26,80-84
+apps/backend/src/solver/solver-input-builder.service.spec.ts
+  s_8f054821d02439::t_375c517d3e7739 6,74-75
+apps/backend/test/auth/google-oauth.spec.ts
+  s_8f054821d02439::t_217a813617a05e 33,42,64,76,82,84
+apps/frontend/package.json
+  s_8f054821d02439::t_ec8f1030bb8479 24
+apps/frontend/src/app/course-management/queries/courses/courseQueries.ts
+  s_8f054821d02439::t_afc24da9960ff7 16-19,21,23-24,62,64
+apps/frontend/src/app/course-management/queries/modules/moduleQueries.ts
+  s_8f054821d02439::t_f9cc2637e82195 15-20,24-25
+apps/frontend/src/app/solver/queries/Solver/builder.ts
+  s_8f054821d02439::t_48e550e099cc66 1,8,10-13
+apps/frontend/src/components/atoms/builder/TimeSlotSelect.tsx
+  s_8f054821d02439::t_6c9f468a7303c9 27,31
+apps/frontend/src/components/atoms/utility/floatContainer.tsx
+  s_8f054821d02439::t_6d0613167b5b77 1,5,8-14,16-19
+apps/frontend/src/components/molecules/customise/CustomiseEventCard.tsx
+  s_8f054821d02439::t_ba8932acd408a5 306
+apps/frontend/src/components/molecules/solver/PreferenceHandler.tsx
+  s_8f054821d02439::t_4608e000eb2597 1-181
+apps/frontend/src/components/molecules/solver/SolverReviewCard.tsx
+  s_8f054821d02439::t_d7acc757a04b74 19,25,86,89-150,152-157
+apps/frontend/src/components/organisms/builder/GenerateStep.tsx
+  s_8f054821d02439::t_13cf4f10cec259 17-20,82,101-124,138,180-183,185,206,211,239,247,250,299,338,357-368,371-380
+apps/frontend/src/components/organisms/choose-institute/instituteSelector.tsx
+  s_8f054821d02439::t_25fb6f6554c1e7 19,93-94
+apps/frontend/src/components/organisms/course-management/API-gen/Queries/request.ts
+  s_8f054821d02439::t_5bd8acbafd5a6a 1-97
+apps/frontend/src/components/organisms/course-management/API-gen/externalCoursesPopup.tsx
+  s_8f054821d02439::t_2cc7c534840c2d 1-95
+apps/frontend/src/components/organisms/course-management/EditCoursePopup.tsx
+  s_8f054821d02439::t_6eb3f4497f1350 10-13,39-64,146-158
+apps/frontend/src/components/organisms/course-management/singleCourseEdit.tsx
+  s_8f054821d02439::t_28eb15a26d503c 17,59,63-64
+apps/frontend/src/components/organisms/module-management/editModuleEvent.tsx
+  s_8f054821d02439::t_8fdf7e8a020519 16,35-41,53,76-89,239-262,271-276
+apps/frontend/src/components/organisms/module-management/queries/moduleQueries.ts
+  s_8f054821d02439::t_35c3bc9fc63c42 1-26
+apps/frontend/src/components/organisms/solver/SolverPreferences.tsx
+  s_8f054821d02439::t_2e38fe6c4bf8d1 10,19,27-31,34,37-40,50-89,121-159,163,165-167,172-175,224,228-231,307
+apps/frontend/src/components/organisms/solver/SolverReview.tsx
+  s_8f054821d02439::t_0d78d144bb49c6 16,24,39
+apps/frontend/src/components/organisms/viewTimetable/ScheduleView.tsx
+  s_8f054821d02439::t_02822d4c5eacde 50,95-97,111,114,117,120,123,126-130,136,159-160,163,177,254,257,290,315-323,326-330,335,345,378,381,446-454
+apps/frontend/src/components/organisms/viewTimetable/WeeklyGrid.tsx
+  s_8f054821d02439::t_a62e0a67954dc5 96,101-105
+apps/frontend/src/components/tanstack/getQueryClient.ts
+  s_8f054821d02439::t_577a8b977ae47c 2-9
+apps/frontend/src/components/templates/builder/Queries/timetableQueries.ts
+  s_8f054821d02439::t_8775943f27f7f6 14-15,20-25
+apps/frontend/src/components/templates/course-management/courseManageTemplate.tsx
+  s_8f054821d02439::t_6ec8f715df83db 5,8,40-47,77,86-103,119-123,142,144-152,157,168,197,207,293-302,304,309-313,388,390-409
+apps/frontend/src/components/templates/module-management/moduleManagementTemplate.tsx
+  s_8f054821d02439::t_b5b515ffe8616f 29,31-32,54,56-60,62-66,69-76,110,168-176
+apps/frontend/src/components/templates/solver/SolverShell.tsx
+  s_8f054821d02439::t_3acfab6bb50777 19,54,57-62,119,126
+apps/frontend/src/lib/api.ts
+  s_8f054821d02439::t_de2daf106e8123 264-300,412,425-448,477-496,511-512,586-602,622-638,774-790,844-860,879-895,915-931,984-1003,1223-1282,1385-1389,1485-1503,1604-1608,1659-1702,1749-1760,1771-1772,1802-1813,1859-1862,1928-1991,2022-2028,2077-2083,2088,2113-2119,2149-2163,2192-2206,2249-2263,2392,2411,2413-2419,2421-2433,2438,2441,2450,2481,2493-2499,2535-2544,2598-2613,2755-2776,2778-2790,2792-2801,2806-2811,3574-3617,3829,3912-3980,4100-4135,4174-4215,4349-4368,4372-4374,4421-4462,4465,4471,4474,4490,4499,4501,4510,4904-4927,4932-4933,5158-5190,5263,5267,5272,5278,5288-5310,5419-5448,5640-5670,6049-6161
+apps/frontend/src/lib/scheduleUtils.ts
+  s_8f054821d02439::t_685310e7b35b87 75-78
+apps/frontend/src/lib/userclass/userClass.ts
+  s_8f054821d02439::t_89c9e005f47d69 6,23
+apps/frontend/utilities/V2-Builders/Courses.ts
+  s_8f054821d02439::t_497fd921cbf503 1-23
+apps/frontend/utilities/V2-Builders/Modules.ts
+  s_8f054821d02439::t_1e7ddf95556aab 1-21
+apps/frontend/utilities/V2-Builders/Timetables.ts
+  s_8f054821d02439::t_c78db72f075add 1-16
+apps/frontend/utilities/request.ts
+  s_8f054821d02439::t_eb636cf2161fe2 4,9,11-14,16-18
+apps/mock-university-api/.gitignore
+  s_8f054821d02439::t_edec2e782f7c79 1-56
+apps/mock-university-api/.prettierrc
+  s_8f054821d02439::t_9b28e1fd611e8a 1-4
+apps/mock-university-api/README.md
+  s_8f054821d02439::t_ea2d53cc944867 1-98
+apps/mock-university-api/eslint.config.mjs
+  s_8f054821d02439::t_6418ce73ae5133 1-35
+apps/mock-university-api/nest-cli.json
+  s_8f054821d02439::t_1b29cb5c263064 1-8
+apps/mock-university-api/package.json
+  s_8f054821d02439::t_0e4510ccbe2698 1-72
+apps/mock-university-api/src/app.controller.spec.ts
+  s_8f054821d02439::t_d4d8e1f170e9b1 1-22
+apps/mock-university-api/src/app.controller.ts
+  s_8f054821d02439::t_a9f5c26bd0887a 1-12
+apps/mock-university-api/src/app.module.ts
+  s_8f054821d02439::t_bd0f206a59d155 1-13
+apps/mock-university-api/src/app.service.ts
+  s_8f054821d02439::t_bb7d3829adcd9a 1-8
+apps/mock-university-api/src/course/course.controller.ts
+  s_8f054821d02439::t_6ed1a78cacf558 1-15
+apps/mock-university-api/src/course/course.module.ts
+  s_8f054821d02439::t_6141ab3dfdbe05 1-9
+apps/mock-university-api/src/course/course.service.ts
+  s_8f054821d02439::t_f82cd5d79c907f 1-21
+apps/mock-university-api/src/event/event.controller.ts
+  s_8f054821d02439::t_16bb75f0eb58f3 1-29
+apps/mock-university-api/src/event/event.module.ts
+  s_8f054821d02439::t_bca5f27b181b86 1-7
+apps/mock-university-api/src/main.ts
+  s_8f054821d02439::t_6933108b3bee07 1-21
+apps/mock-university-api/src/module/module.controller.ts
+  s_8f054821d02439::t_cc56e738bc1ac3 1-25
+apps/mock-university-api/src/module/module.module.ts
+  s_8f054821d02439::t_05f0e046de1df9 1-7
+apps/mock-university-api/test/app.e2e-spec.ts
+  s_8f054821d02439::t_995f13a4d5e52f 1-29
+apps/mock-university-api/test/jest-e2e.json
+  s_8f054821d02439::t_c3b2cb3bd2cefe 1-9
+apps/mock-university-api/tsconfig.build.json
+  s_8f054821d02439::t_470eea24914e75 1-4
+apps/mock-university-api/tsconfig.json
+  s_8f054821d02439::t_024caefc94eca7 1-25
+apps/pdf_parser/requirements.txt
+  s_8f054821d02439::t_99222043cad9f1 1
+apps/preference-solver/TEST_DIR/output.json
+  s_8f054821d02439::t_1d413d1fa0857b 2-15
+apps/preference-solver/makefile
+  s_8f054821d02439::t_083a008215731a 9-12,17-20,22,24,29-31,33-37,40-50,53-54,61,63-65,69,73,79-86,99-100,110,112,116,124,128-134,140
+apps/preference-solver/src/CP_SOLVER/CP.cpp
+  s_8f054821d02439::t_6afe1c75a8aba8 3,17,26-27,78-79,81-82,85,94-105,111-113
+apps/preference-solver/src/CP_SOLVER/CP.h
+  s_8f054821d02439::t_0adc78a4e3b6d3 8,18
+apps/preference-solver/src/GA_handler/GA.cpp
+  s_8f054821d02439::t_0a1b09b29e4446 4,14,32-33,45-46,54-57,99-102,125-126,132-133,142-143,156-157,160-161,169-170,173-174,204,268-272,282,296-297
+apps/preference-solver/src/GA_handler/GA.h
+  s_8f054821d02439::t_1bdfaffaa9629e 5,22
+apps/preference-solver/src/data/API/API-data.cpp
+  s_8f054821d02439::t_8445782d862ab0 2-3,6,8-9,15,21,24,27-28,30-32,35-36,38-40,42-61,64,66-70,73-74,77,79-83,85,87-99,102-103,108-119
+apps/preference-solver/src/data/API/API-data.h
+  s_8f054821d02439::t_93bea35173d4c7 1,8,13,17-20,23
+apps/preference-solver/src/data/Events/event.h
+  s_8f054821d02439::t_aef4868f2753d6 34-56
+apps/preference-solver/src/data/GA-data/chromosome.h
+  s_8f054821d02439::t_a818210e31eec3 8
+apps/preference-solver/src/data/Modules/module.h
+  s_8f054821d02439::t_5efb92e8b7e256 19,21
+apps/preference-solver/src/heuristic/Decorators/Decorators.cpp
+  s_8f054821d02439::t_43c32244130b3a 1-90
+apps/preference-solver/src/heuristic/Decorators/Decorators.h
+  s_8f054821d02439::t_ad6d0e26f39b32 1-87
+apps/preference-solver/src/heuristic/Decorators/baseHeuristic.h
+  s_8f054821d02439::t_8973f9567bf899 1-32
+apps/preference-solver/src/heuristic/Handlers/getHeuristic.cpp
+  s_8f054821d02439::t_a84d2eeddd5758 1-42
+apps/preference-solver/src/heuristic/Handlers/handler.cpp
+  s_8f054821d02439::t_ec73a7c94d1959 1-34
+apps/preference-solver/src/heuristic/Handlers/handler.h
+  s_8f054821d02439::t_b33b7b7e9b2079 1-87
+apps/preference-solver/tests/HeuristicTests/minutesAfterMid/input.json
+  s_8f054821d02439::t_d5bd5a1d9d73f3 1-36
+apps/preference-solver/tests/HeuristicTests/skipDay/input.json
+  s_8f054821d02439::t_8d39b0aacad4c0 1-38
+apps/preference-solver/tests/HeuristicTests/smallGaps/input.json
+  s_8f054821d02439::t_a8484548f2755b 1-57
+apps/preference-solver/tests/count-pattern-regression.cpp
+  s_8f054821d02439::t_0384b095176d5e 2-4,6,8-12,14,78-81,100-101,104-105,120-219
+apps/preference-solver/tests/fixtures/preferred-start-time.json
+  s_8f054821d02439::t_38eafb0f906a34 30
+apps/preference-solver/tests/run-cli-regressions.sh
+  s_8f054821d02439::t_c51ee62f96c5b0 117,131-133
+apps/simulation-service/.gitignore
+  s_8f054821d02439::t_52cc42dc843dc2 1
+apps/simulation-service/adapters/UMTAS/endpoints.yaml
+  s_8f054821d02439::t_caa362876f2993 1-4
+apps/simulation-service/adapters/UMTAS/locust_user.py
+  s_8f054821d02439::t_a90b7d22c63e46 1-232
+apps/simulation-service/adapters/UMTAS/profile_schema.yaml
+  s_8f054821d02439::t_6fc4b59d1451ee 1-404
+apps/simulation-service/adapters/UMTAS/umtas_report_2026-08-19T08-58-15.json
+  s_8f054821d02439::t_26efe83866efc3 1-10
+apps/simulation-service/adapters/UMTAS/umtas_report_2026-08-19T08-58-40.json
+  s_8f054821d02439::t_848a9c2b839c3d 1-10
+apps/simulation-service/adapters/UMTAS/umtas_report_2026-08-19T08-59-24.json
+  s_8f054821d02439::t_82f8202dd8e27f 1-10
+apps/simulation-service/adapters/UMTAS/umtas_report_2026-08-19T09-26-32.json
+  s_8f054821d02439::t_430b3585bb017e 1-39
+apps/simulation-service/core/openapi_bootstrap.py
+  s_8f054821d02439::t_7992a3bb06986b 1-114
+apps/simulation-service/core/profile_engine.py
+  s_8f054821d02439::t_b2e6c9eaf9a8ae 1-84
+apps/simulation-service/core/report.py
+  s_8f054821d02439::t_8befb8f4bd5c4c 1-87
+apps/simulation-service/core/runner.py
+  s_8f054821d02439::t_975d2e7250b5de 1-85
+apps/simulation-service/docker-compose.yml
+  s_8f054821d02439::t_e767da0f8e5ce4 1-27
+apps/simulation-service/requirements.txt
+  s_8f054821d02439::t_114e339993bc34 1-4
+apps/simulation-service/run.sh
+  s_8f054821d02439::t_11774eaf024c6c 1-7
+docker-compose.yml
+  s_8f054821d02439::t_e8cce2dd01b5f4 370-385
+docker/mock-university-api/mock-university-api.Dockerfile
+  s_8f054821d02439::t_f2242a6da0db5f 1-32
+docker/simulation-service/simulation-service.dockerfile
+  s_8f054821d02439::t_c16534fc4c81b8 1-17
+docker/solver-worker/solver-worker.Dockerfile
+  s_8f054821d02439::t_4bda64b923a707 60-61
+justfile
+  s_8f054821d02439::t_a00d2230c6bdff 11-18,37,250-274
+packages/shared-types/src/solver.ts
+  s_8f054821d02439::t_2084f5377af9ea 15-19,22-51
+pnpm-lock.yaml
+  s_8f054821d02439::t_e1be81e517371d 43,285-287,308,369,381,389-479,5483-5488,10646-10652,16390,16399,16412,16419,16440,16448,16456,16482,16489,16518,16527,16554,16565,16594,16713,16723,16905-16942,18340,18344,18367,18380,18405-18409,18412,18476,18481,18485,18495,19597,19603,20761-20777,21029,21037,21475,21501,21521,21523,21527,21530,21559,21561,21567,21578,21580-21582,21584-21589,21591,21593,21595,21597,21622,21627,21652,21658,21661-21665,21667,21669,21671-21678,21680,21684-21685,21690,21779,21788,21799,21814,21893,21899,21958,21984,22013,22040,22112,22121,22149,22160,22169,22175,22182,22188,22190,22193,22212,22214,22217-22230,22364-22365,24150,24154,24948-24955,25041,25046,25081-25100,25111-25120,25435-25476
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "523424455b43812621ee554eb5e62b78b1be6160",
+  "prompts": {},
+  "humans": {
+    "h_3359569cacef0e": {
+      "author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_8f054821d02439": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a01f9f-e839-7cb1-8f07-45dea1200132",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}

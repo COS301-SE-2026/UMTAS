@@ -1,0 +1,14 @@
+apps/frontend/src/components/organisms/builder/EventsStep.tsx
+  h_84e82529bd05a5 177
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "868fefae31400562ef8b602814f25b84fd282d4f",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}

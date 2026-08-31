@@ -1,0 +1,32 @@
+apps/backend/src/Testing/Factories/module.factory.ts
+  h_3359569cacef0e 19
+apps/backend/src/Testing/Mocks/database.helpers.ts
+  h_3359569cacef0e 21
+apps/backend/src/db/database.module.ts
+  h_3359569cacef0e 10,23
+apps/backend/src/db/seeding/Constants/AcademicCalendar.constants.ts
+  h_3359569cacef0e 1-54
+apps/backend/src/db/seeding/Constants/index.ts
+  h_3359569cacef0e 5
+apps/backend/src/db/seeding/database-seed.service.ts
+  h_3359569cacef0e 12,24,42-45
+apps/backend/src/db/seeding/seed-persistence.service.ts
+  h_3359569cacef0e 5-6,31-50
+apps/backend/src/db/seeding/services/academic-calendar.seed.service.ts
+  h_3359569cacef0e 1-77
+apps/backend/src/entities/Modules/modules.schema.ts
+  h_3359569cacef0e 10,14-21,29
+apps/backend/src/entities/index.ts
+  h_3359569cacef0e 2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "9da1ed14ea24fd7337a73f522fbec90a91d61bc8",
+  "prompts": {},
+  "humans": {
+    "h_3359569cacef0e": {
+      "author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}

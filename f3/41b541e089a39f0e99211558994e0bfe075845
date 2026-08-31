@@ -1,0 +1,16 @@
+apps/backend/src/academic_calendar/academic_calendar.service.spec.ts
+  h_3359569cacef0e 9,16-23,31,37,39,46,64-69,74,80-81,85-94,110,145-150,173-186,229-238,257,273-275,283,307-417,419-420,422-499,501-503,505-543
+apps/backend/src/academic_calendar/academic_calendar.service.ts
+  h_3359569cacef0e 8,15-25,40-43,47-48,51-54,61,140-141,169-170,215-258,261-374,395-399,401,404-405,409-414,417-420,428-437,477-485
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "f341b541e089a39f0e99211558994e0bfe075845",
+  "prompts": {},
+  "humans": {
+    "h_3359569cacef0e": {
+      "author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}

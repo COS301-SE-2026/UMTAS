@@ -1,0 +1,14 @@
+apps/backend/test/integration-runner/integration.compose.yml
+  h_3359569cacef0e 95-96
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.18",
+  "base_commit_sha": "a858024d4682bd60d8ef92326ba1ad2779cf5941",
+  "prompts": {},
+  "humans": {
+    "h_3359569cacef0e": {
+      "author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}

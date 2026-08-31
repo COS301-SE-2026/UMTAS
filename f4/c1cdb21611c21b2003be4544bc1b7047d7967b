@@ -1,0 +1,28 @@
+apps/preference-solver/makefile
+  s_4e037e1c700204::t_8d243f4c82d9f0 7,16,32
+apps/preference-solver/src/GA_handler/GA.cpp
+  h_8b894b05e4a1b2 35-36,178,180
+apps/preference-solver/compile_commands.json
+  s_4e037e1c700204::t_bf37af568dba8f 47-61,91-105
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.8",
+  "base_commit_sha": "f4c1cdb21611c21b2003be4544bc1b7047d7967b",
+  "prompts": {},
+  "humans": {
+    "h_8b894b05e4a1b2": {
+      "author": "Wilmar-Smit <u24584216@tuks.co.za>"
+    }
+  },
+  "sessions": {
+    "s_4e037e1c700204": {
+      "agent_id": {
+        "tool": "github-copilot",
+        "id": "32caa82a-b3b7-421a-8e67-027f816ec315",
+        "model": "gpt-4.1"
+      },
+      "human_author": "Wilmar-Smit <u24584216@tuks.co.za>"
+    }
+  }
+}

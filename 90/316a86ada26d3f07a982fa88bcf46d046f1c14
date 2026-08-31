@@ -1,0 +1,22 @@
+apps/frontend/src/components/atoms/builder/WizardFooter.tsx
+  h_84e82529bd05a5 46
+apps/frontend/src/components/organisms/builder/EventsStep.tsx
+  h_84e82529bd05a5 42,50-51
+apps/frontend/src/components/organisms/builder/ModulesStep.tsx
+  h_84e82529bd05a5 36-39
+apps/frontend/src/components/organisms/customise/CustomiseShellPopup.tsx
+  h_84e82529bd05a5 28
+apps/frontend/src/components/organisms/builder/GenerateStep.tsx
+  h_84e82529bd05a5 16-32,164-173,258,261-262
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "90316a86ada26d3f07a982fa88bcf46d046f1c14",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}

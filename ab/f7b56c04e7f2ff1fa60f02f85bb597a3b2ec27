@@ -1,0 +1,16 @@
+apps/backend/src/Testing/Factories/attendance.factory.ts
+  h_84e82529bd05a5 1-32
+apps/backend/src/Testing/Factories/index.ts
+  h_84e82529bd05a5 8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "abf7b56c04e7f2ff1fa60f02f85bb597a3b2ec27",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}

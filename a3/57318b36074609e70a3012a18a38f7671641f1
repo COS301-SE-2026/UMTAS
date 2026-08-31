@@ -1,0 +1,22 @@
+docs/srs/FUNCTIONAL_REQUIREMENTS.md
+  h_84e82529bd05a5 87-92
+docs/srs/Use_Cases/Traceability_Matrix/Traceability_Matrix.drawio
+  h_84e82529bd05a5 3,1982,2170-2319
+docs/diagrams/requirements/Requirements.drawio
+  h_84e82529bd05a5 3,276,280,286,361,809,921,925,981,1034,1139-1179,1181-1203
+docs/srs/USE_CASES.md
+  h_84e82529bd05a5 128,231-233
+docs/srs/Use_Cases/Solver_System.md
+  h_84e82529bd05a5 18,40,60
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "a357318b36074609e70a3012a18a38f7671641f1",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}

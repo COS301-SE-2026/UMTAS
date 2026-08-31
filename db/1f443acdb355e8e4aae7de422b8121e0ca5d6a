@@ -1,0 +1,16 @@
+apps/backend/src/auth/roles.guard.ts
+  h_84e82529bd05a5 60,67,69-70,74,76-77,81,86-102
+apps/backend/src/University/university.controller.ts
+  h_84e82529bd05a5 220
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "db1f443acdb355e8e4aae7de422b8121e0ca5d6a",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}

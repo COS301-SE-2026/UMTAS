@@ -1,0 +1,14 @@
+packages/bullmq-worker-core/src/run-cli.ts
+  h_3359569cacef0e 1-98
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.5",
+  "base_commit_sha": "cdd1d7ac2deded4d9892ef37dfe5ff07fd2d5ce2",
+  "prompts": {},
+  "humans": {
+    "h_3359569cacef0e": {
+      "author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}

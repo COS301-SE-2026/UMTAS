@@ -1,0 +1,14 @@
+apps/frontend/src/components/organisms/builder/GenerateStep.tsx
+  h_84e82529bd05a5 14,256,261,277,306-324
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "4eb35c9f5e098cd70d02f2f10402d16a1c112d97",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}

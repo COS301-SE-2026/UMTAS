@@ -1,0 +1,14 @@
+apps/e2e/tests/solver/solver.spec.ts
+  h_3359569cacef0e 17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.18",
+  "base_commit_sha": "b745d04941ce37d84ee99dd451d724051e4fa5df",
+  "prompts": {},
+  "humans": {
+    "h_3359569cacef0e": {
+      "author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,14 @@
+apps/backend/package.json
+  h_84e82529bd05a5 124
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "0bab9359908a3207216f9e82d68db1a1b2e06f58",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}

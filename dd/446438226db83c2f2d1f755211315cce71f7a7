@@ -1,0 +1,16 @@
+apps/backend/src/entities/Universities/University.schema.ts
+  h_8b894b05e4a1b2 9-10,16
+apps/backend/src/entities/Universities/academicCalendar.ts
+  h_8b894b05e4a1b2 1-23
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.10",
+  "base_commit_sha": "dd446438226db83c2f2d1f755211315cce71f7a7",
+  "prompts": {},
+  "humans": {
+    "h_8b894b05e4a1b2": {
+      "author": "Wilmar-Smit <u24584216@tuks.co.za>"
+    }
+  }
+}

@@ -1,0 +1,16 @@
+apps/frontend/src/components/atoms/choose-institute/NotSupportedLink.tsx
+  h_84e82529bd05a5 10
+apps/frontend/src/components/organisms/choose-institute/instituteSelector.tsx
+  h_84e82529bd05a5 17-44,65-67,85,103,112,126
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "4506d610a849dcddb36f905c3b02140500690e5b",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}

@@ -1,0 +1,112 @@
+apps/preference-solver/src/data/Events/event.cpp
+  s_b99fa822f33ab8::t_eb0b18556eb4b3 1-109
+.gitignore
+  s_b99fa822f33ab8::t_eb0b18556eb4b3 136-140,148-150
+apps/backend/src/Testing/constants.spec.ts
+  s_b99fa822f33ab8::t_eb0b18556eb4b3 5
+apps/backend/src/Testing/Factories/module.factory.ts
+  s_b99fa822f33ab8::t_196ea8d35e00b6 41
+  s_b99fa822f33ab8::t_eb0b18556eb4b3 1-7,32,34-40,43-45
+apps/backend/src/University/university.service.ts
+  s_b99fa822f33ab8::t_eb0b18556eb4b3 8,60,305-307
+apps/preference-solver/src/filecreator/filecreator.h
+  s_b99fa822f33ab8::t_eb0b18556eb4b3 1-27
+apps/preference-solver/src/filecreator/filecreator.cpp
+  s_b99fa822f33ab8::t_eb0b18556eb4b3 1-32
+apps/preference-solver/src/data/GA-data/chromosome.cpp
+  s_b99fa822f33ab8::t_eb0b18556eb4b3 1-16
+apps/backend/src/Testing/Mocks/index.ts
+  s_b99fa822f33ab8::t_eb0b18556eb4b3 1-2
+apps/frontend/src/components/molecules/choose-institute/SelectInstituteField.tsx
+  s_b99fa822f33ab8::t_eb0b18556eb4b3 12,15,17,30,36-40
+apps/frontend/src/components/templates/choose-institute/queries/builders.ts
+  s_b99fa822f33ab8::t_eb0b18556eb4b3 1-37
+apps/preference-solver/src/data/API/API-data.h
+  s_b99fa822f33ab8::t_eb0b18556eb4b3 1-18
+apps/preference-solver/src/data/Modules/module.cpp
+  s_b99fa822f33ab8::t_eb0b18556eb4b3 1-73
+apps/preference-solver/src/data/API/example.json
+  s_b99fa822f33ab8::t_eb0b18556eb4b3 1-26
+apps/backend/src/Builder/builder.controller.ts
+  s_b99fa822f33ab8::t_eb0b18556eb4b3 24
+apps/preference-solver/src/data/Modules/module.h
+  s_b99fa822f33ab8::t_eb0b18556eb4b3 1-23
+apps/backend/src/Builder/dto/builder.dto.ts
+  s_b99fa822f33ab8::t_eb0b18556eb4b3 8
+apps/backend/src/Testing/Mocks/services/builder.mock.ts
+  s_b99fa822f33ab8::t_eb0b18556eb4b3 1-18
+apps/backend/src/Builder/builder.service.spec.ts
+  s_b99fa822f33ab8::t_eb0b18556eb4b3 1-341
+apps/backend/package.json
+  s_b99fa822f33ab8::t_eb0b18556eb4b3 25,78
+apps/backend/src/Testing/Factories/session.factory.ts
+  s_b99fa822f33ab8::t_eb0b18556eb4b3 1-35
+apps/backend/src/Builder/builder.service.ts
+  s_b99fa822f33ab8::t_eb0b18556eb4b3 19,23-25,154
+apps/frontend/src/lib/api.ts
+  s_b99fa822f33ab8::t_eb0b18556eb4b3 399-418,472-565,708-744,935,937,940-946,949,952,977,979,982,984,1006,1008,1011,1022,1024-1027,1029-1038,1047,1050,1053,1056-1068,1077,1080,1083,1086-1098,1105-1120,1133-1148,1153,1159,1161-1162,1164-1308,1450,1452-1453,1455-1472,1474,1477,1480,1482-1483,1485-1491,1493,1496,1499,1501-1502,1504,1506-1508,1510,1512-1514,1516,1518-1522,1524-1525,1527,1529-1531,1533-1535,1537-1538,1540,2307-2314,2504-2536,2556-2837,2840,2847-2848,2856,2865-2869,2871,2877,2880-2887,2896,2901,2907,2912,2914,2921,2930,2934,2937-2942,2944-2945,2950,2953,2960,2967-2973,2976,2980,2983,2986,2990-2991,2996,2999,3006,3013-3019,3459,3468,3474,3477-3484,3493,3502,3506,3512,3515,3522,3531,3536,3542,3548,3551,3558,3567,3572,3578,3584,3587,3594,3603,3608,3614,3618,3624,3627,3634,3641-3647,3650,3652-3661,3673,3678,3687,3696,3701,3706,3717,3722,3727,3738,3743,3748,3754,3763
+apps/preference-solver/makefile
+  s_b99fa822f33ab8::t_eb0b18556eb4b3 1-64
+justfile
+  s_b99fa822f33ab8::t_eb0b18556eb4b3 110-113
+apps/backend/src/Builder/builder.controller.spec.ts
+  s_b99fa822f33ab8::t_eb0b18556eb4b3 1-175
+apps/frontend/src/components/molecules/choose-institute/SelectRoleField.tsx
+  s_b99fa822f33ab8::t_eb0b18556eb4b3 11,13,30
+apps/backend/src/Testing/Mocks/services/module.mock.ts
+  s_b99fa822f33ab8::t_eb0b18556eb4b3 1-23
+apps/backend/src/Testing/Mocks/services/course.mock.ts
+  s_b99fa822f33ab8::t_eb0b18556eb4b3 1-19
+apps/backend/src/Testing/Mocks/services/index.ts
+  s_b99fa822f33ab8::t_eb0b18556eb4b3 1-4
+apps/preference-solver/src/data/Events/event.h
+  s_b99fa822f33ab8::t_eb0b18556eb4b3 1-31
+apps/frontend/src/app/choose-institute/page.tsx
+  s_b99fa822f33ab8::t_eb0b18556eb4b3 6
+apps/preference-solver/src/GA_handler/GA.cpp
+  s_b99fa822f33ab8::t_eb0b18556eb4b3 1-331
+apps/backend/src/Testing/Mocks/database.helpers.ts
+  s_b99fa822f33ab8::t_eb0b18556eb4b3 3-4,23-25,28-30,32-34,36-37,39-43,45,47,51-66,68-70
+apps/frontend/src/components/molecules/choose-institute/ApprovalStatus.tsx
+  s_b99fa822f33ab8::t_eb0b18556eb4b3 6,9,11-18,23-24,28-33,35-36,38-39,45-46,48-49
+apps/preference-solver/src/data/API/API-data.cpp
+  s_b99fa822f33ab8::t_eb0b18556eb4b3 1-44
+apps/backend/src/Testing/Mocks/database.mock.ts
+  s_b99fa822f33ab8::t_eb0b18556eb4b3 3-4,7,11
+apps/preference-solver/src/data/GA-data/chromosome.h
+  s_b99fa822f33ab8::t_eb0b18556eb4b3 1-16
+apps/frontend/src/components/templates/choose-institute/chooseInstituteTemplate.tsx
+  s_b99fa822f33ab8::t_eb0b18556eb4b3 10,17
+apps/preference-solver/src/main.cpp
+  s_b99fa822f33ab8::t_eb0b18556eb4b3 1-26
+apps/frontend/src/components/organisms/choose-institute/instituteSelector.tsx
+  s_b99fa822f33ab8::t_eb0b18556eb4b3 3,8-16,18-19,21-23,25-28,31,33,44-46,52,54,56-57,59,61,64-79
+apps/backend/src/Testing/Mocks/services/university.mock.ts
+  s_b99fa822f33ab8::t_eb0b18556eb4b3 1-24
+apps/backend/src/Testing/Factories/index.ts
+  s_b99fa822f33ab8::t_eb0b18556eb4b3 1-2
+apps/preference-solver/src/GA_handler/GA.h
+  s_b99fa822f33ab8::t_eb0b18556eb4b3 1-62
+apps/frontend/src/components/templates/choose-institute/queries/UserRoleQueries.ts
+  s_b99fa822f33ab8::t_eb0b18556eb4b3 1-3,5,18-43
+apps/preference-solver/compile_commands.json
+  s_b99fa822f33ab8::t_c39bb5078d9ae5 6,16-105,107
+pnpm-lock.yaml
+  s_b99fa822f33ab8::t_5b14d5e0d32ee8 213-215,9978-9987,10641-10647,13732-13742,21395-21402,22004-22005,24438-24441
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "7df55725b65bcf3e80e83c53444205f52adcc137",
+  "prompts": {},
+  "sessions": {
+    "s_b99fa822f33ab8": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f3675-d47f-7bb3-98c5-a439824274e1",
+        "model": "gpt-5.5"
+      },
+      "human_author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}

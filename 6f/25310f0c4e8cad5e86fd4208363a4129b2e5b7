@@ -1,0 +1,20 @@
+docs/srs/USE_CASES.md
+  h_84e82529bd05a5 140-141
+docs/developer-guides/integration-testing-guide.md
+  h_84e82529bd05a5 1-61
+docs/developer-guides/e2e-testing-guide.md
+  h_84e82529bd05a5 1-84
+docs/developer-guides/unit-testing-guide.md
+  h_84e82529bd05a5 1-61
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "6f25310f0c4e8cad5e86fd4208363a4129b2e5b7",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}

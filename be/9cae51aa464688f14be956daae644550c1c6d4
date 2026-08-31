@@ -1,0 +1,18 @@
+apps/backend/drizzle/meta/0000_snapshot.json
+  h_2d4b3dca70a3d8 2
+apps/backend/drizzle/meta/_journal.json
+  h_2d4b3dca70a3d8 8-9
+apps/simulation-service/adapters/UMTAS/endpoints.yaml
+  h_2d4b3dca70a3d8 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "be9cae51aa464688f14be956daae644550c1c6d4",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}

@@ -1,0 +1,16 @@
+apps/backend/src/entities/Universities/University.schema.ts
+  h_8b894b05e4a1b2 1-5
+apps/backend/src/entities/Universities/Venue.schema.ts
+  h_8b894b05e4a1b2 1-6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.10",
+  "base_commit_sha": "b9d8988052b618d1f9d5671454f46c028297fcfd",
+  "prompts": {},
+  "humans": {
+    "h_8b894b05e4a1b2": {
+      "author": "Wilmar-Smit <u24584216@tuks.co.za>"
+    }
+  }
+}

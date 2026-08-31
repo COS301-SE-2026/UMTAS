@@ -1,0 +1,21 @@
+apps/solver-worker/package.json
+  s_973a293136a6d7::t_bfb8a5b1cd9c04 9
+apps/pdf_parser/worker/package.json
+  s_973a293136a6d7::t_11f7f091797392 9,13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "6b13fad9071334e7d946911695d4c401ac8011a6",
+  "prompts": {},
+  "sessions": {
+    "s_973a293136a6d7": {
+      "agent_id": {
+        "tool": "github-copilot",
+        "id": "1b99b85e-5022-4a1f-83de-ee93ac38c7bf",
+        "model": "gpt-4.1"
+      },
+      "human_author": "Wilmar-Smit <u24584216@tuks.co.za>"
+    }
+  }
+}

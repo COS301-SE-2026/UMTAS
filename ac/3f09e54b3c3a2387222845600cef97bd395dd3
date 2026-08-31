@@ -1,0 +1,22 @@
+apps/backend/src/Testing/Mocks/database.helpers.ts
+  h_84e82529bd05a5 3-4,58-64,66-139
+apps/backend/src/University/university.controller.spec.ts
+  h_84e82529bd05a5 119
+apps/backend/src/Events/event.service.spec.ts
+  h_84e82529bd05a5 86-88,92,95,97-105,107,109,111-113,117-243
+apps/backend/src/University/university.service.ts
+  h_84e82529bd05a5 200,225,280
+apps/backend/src/University/university.service.spec.ts
+  h_84e82529bd05a5 7-8,20,29,64-66,68-69,76-80,82,112-113,116,123,127,129-134,136,138-142,144-145,147,149-151,153-154,156-180,182-195,197-199,201-202,204-206,208-233,235-238,240,242-248,250-251,253-259,261-288,290-316,318-328,330-364,366-401,403-409,411,413,415-418
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "ac3f09e54b3c3a2387222845600cef97bd395dd3",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}

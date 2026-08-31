@@ -1,0 +1,14 @@
+apps/backend/src/Builder/builder.service.spec.ts
+  h_84e82529bd05a5 21,67-69,86,119-133,140-149,151-159,188-201,203-204,213-222,224,238-243,248-257,259,282
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "d5295333d4a0386fe6c92eae280861aebe0b09e1",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}

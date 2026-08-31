@@ -1,0 +1,18 @@
+apps/backend/src/Course/dto/course.dto.ts
+  h_84e82529bd05a5 88
+apps/backend/src/Course/course.service.ts
+  h_84e82529bd05a5 7,74-75
+apps/backend/src/Course/course.controller.ts
+  h_84e82529bd05a5 60
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "3c59740eef235f66f502b6ae4ea1cbb2b09b61fd",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}

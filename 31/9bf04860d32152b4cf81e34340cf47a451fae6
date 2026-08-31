@@ -1,0 +1,18 @@
+apps/backend/src/solver/solver-input-builder.service.ts
+  h_3359569cacef0e 2,42,44,47-56,58-60,89-96,104-106,113-114
+apps/backend/src/solver/solver.controller.spec.ts
+  h_3359569cacef0e 82-90,92-103,106-130
+apps/backend/src/solver/solver-submission.service.spec.ts
+  h_3359569cacef0e 29,31,79,102,107
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "319bf04860d32152b4cf81e34340cf47a451fae6",
+  "prompts": {},
+  "humans": {
+    "h_3359569cacef0e": {
+      "author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}

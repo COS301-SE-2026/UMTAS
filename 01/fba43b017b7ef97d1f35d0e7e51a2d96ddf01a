@@ -1,0 +1,16 @@
+apps/backend/src/University/university.service.ts
+  h_84e82529bd05a5 165,167-168,171-172,393,411
+apps/backend/src/University/university.service.spec.ts
+  h_84e82529bd05a5 9,25-27,94-116,180-197,211,232-233,235-240,256,260,262,268,274,490-503,505-506,516,522-523,527-529,532-533,535-550,552,558,560-561,563-564
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "01fba43b017b7ef97d1f35d0e7e51a2d96ddf01a",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}

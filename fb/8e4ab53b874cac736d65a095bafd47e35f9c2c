@@ -1,0 +1,16 @@
+apps/backend/src/entities/Modules/modules.schema.ts
+  h_8b894b05e4a1b2 50
+apps/backend/src/Timetable/dto/timetable.dto.ts
+  h_8b894b05e4a1b2 88
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "fb8e4ab53b874cac736d65a095bafd47e35f9c2c",
+  "prompts": {},
+  "humans": {
+    "h_8b894b05e4a1b2": {
+      "author": "Wilmar-Smit <u24584216@tuks.co.za>"
+    }
+  }
+}

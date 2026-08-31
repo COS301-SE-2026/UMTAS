@@ -1,0 +1,16 @@
+apps/backend/src/main.ts
+  h_3359569cacef0e 2
+apps/backend/test/jest.setup.ts
+  h_3359569cacef0e 1-2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "c5c57b32a53972859e7fd7e75500d359141da9b0",
+  "prompts": {},
+  "humans": {
+    "h_3359569cacef0e": {
+      "author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}

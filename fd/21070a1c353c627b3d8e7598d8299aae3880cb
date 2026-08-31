@@ -1,0 +1,20 @@
+apps/backend/src/Events/event.service.spec.ts
+  h_84e82529bd05a5 4,36,154-155,161-162,164-304,333,376
+apps/backend/src/Testing/constants.spec.ts
+  h_84e82529bd05a5 9
+apps/backend/src/Events/event.service.ts
+  h_84e82529bd05a5 703-705,717-719
+apps/backend/src/Testing/Factories/event.factory.ts
+  h_84e82529bd05a5 12,17-18,62-78
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "fd21070a1c353c627b3d8e7598d8299aae3880cb",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}

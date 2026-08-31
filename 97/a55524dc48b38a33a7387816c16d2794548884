@@ -1,0 +1,41 @@
+apps/backend/src/academic_calendar/academic_calendar.service.ts
+  s_bfc57e2b37d3cf::t_ce61fc8a47e355 8,39,48-53,93-110,238-286,297,433-486,604
+apps/backend/src/academic_calendar/academic_calendar.service.spec.ts
+  s_bfc57e2b37d3cf::t_ce61fc8a47e355 29,65,70,73-76,87,119-127,129-142,164-228,518-629
+  s_bfc57e2b37d3cf::t_f66340a46ed8e3 630
+apps/backend/src/academic_calendar/academic_calendar.controller.ts
+  s_bfc57e2b37d3cf::t_ce61fc8a47e355 11,34,36,177-213,403-449
+  s_bfc57e2b37d3cf::t_4cdf25c45b3b31 450
+apps/backend/src/db/seeding/services/academic-calendar.seed.service.ts
+  s_bfc57e2b37d3cf::t_ce61fc8a47e355 2,50-78
+  s_bfc57e2b37d3cf::t_485f094e95aae6 79-80
+apps/backend/src/db/seeding/services/public-calendar.seed.service.ts
+  s_bfc57e2b37d3cf::t_ce61fc8a47e355 1-65
+apps/backend/src/Testing/Factories/academic-calendar.factory.ts
+  s_bfc57e2b37d3cf::t_ce61fc8a47e355 20,22
+apps/backend/src/entities/AcademicCalendar/academic-calendar.schema.ts
+  s_bfc57e2b37d3cf::t_ce61fc8a47e355 5,7,18-22,24-27,41-43,48-55
+apps/backend/src/academic_calendar/dto/academic-calendar.dto.ts
+  s_bfc57e2b37d3cf::t_ce61fc8a47e355 1-11,47-84
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "97a55524dc48b38a33a7387816c16d2794548884",
+  "prompts": {},
+  "humans": {
+    "h_3359569cacef0e": {
+      "author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_bfc57e2b37d3cf": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "39c0f775-4488-4ee5-bbe4-922b5c2d7bff",
+        "model": "claude-opus-5"
+      },
+      "human_author": "michaeltomlinsontuks <159887992+michaeltomlinsontuks@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,16 @@
+apps/backend/src/Testing/Factories/index.ts
+  h_84e82529bd05a5 9
+apps/backend/src/Testing/Factories/timetable.factory.ts
+  h_84e82529bd05a5 1-42
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "1ffdd1a0230ed97df1543ae50237d664494a5c41",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}

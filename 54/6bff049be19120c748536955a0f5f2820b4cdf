@@ -1,0 +1,26 @@
+apps/backend/src/Testing/Factories/index.ts
+  h_84e82529bd05a5 2,7
+apps/backend/src/Testing/Factories/grouping.factory.ts
+  h_84e82529bd05a5 1-13
+apps/backend/src/Module/module.service.ts
+  h_84e82529bd05a5 91,132-136,580
+apps/backend/src/Testing/Factories/module.factory.ts
+  h_84e82529bd05a5 2-3,7-11,16-18,24-36
+apps/backend/src/Testing/Factories/course.factory.ts
+  h_84e82529bd05a5 2,4-5,13-15
+apps/backend/src/Testing/constants.spec.ts
+  h_84e82529bd05a5 6
+apps/backend/src/Module/module.service.spec.ts
+  h_84e82529bd05a5 13-14,18-24,26-30,33,36-40,42,49,52,54,57,61-62,65,69-159,161-259,261-394
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "546bff049be19120c748536955a0f5f2820b4cdf",
+  "prompts": {},
+  "humans": {
+    "h_84e82529bd05a5": {
+      "author": "sdcreek240 <aidandwsn@gmail.com>"
+    }
+  }
+}

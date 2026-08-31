@@ -1,0 +1,16 @@
+apps/preference-solver/src/main.cpp
+  h_8b894b05e4a1b2 1-6
+apps/preference-solver/makefile
+  h_8b894b05e4a1b2 1-41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "226dcf4196faf0c049154bbc1277a4237bb10a03",
+  "prompts": {},
+  "humans": {
+    "h_8b894b05e4a1b2": {
+      "author": "Wilmar-Smit <u24584216@tuks.co.za>"
+    }
+  }
+}
