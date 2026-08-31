@@ -1231,7 +1231,7 @@ export interface paths {
     put?: never;
     /**
      * Generate and persist a calendar snapshot
-     * @description Generates a restriction-aware pseudo-calendar snapshot using the selected university's current-year academic calendar and a timetable owned by the authenticated student.
+     * @description Generates a restriction-aware pseudo-calendar snapshot using the selected university's requested academic year and a timetable owned by the authenticated student.
      */
     post: operations["generateCalendar"];
     delete?: never;
@@ -1240,7 +1240,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/academic-calendar/generate/{id}": {
+  "/api/academic-calendar/generated/{id}": {
     parameters: {
       query?: never;
       header?: never;
@@ -1252,6 +1252,26 @@ export interface paths {
      * @description Returns a generated snapshot only when its timetable belongs to the authenticated student.
      */
     get: operations["getGeneratedCalendar"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/academic-calendar/public": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List public academic calendars
+     * @description Returns public calendars available for subscription, optionally filtered by academic year.
+     */
+    get: operations["listPublicAcademicCalendars"];
     put?: never;
     post?: never;
     delete?: never;
@@ -3192,6 +3212,11 @@ export interface components {
        * @example 339cd591-7c62-4ea7-8a2b-602598553133
        */
       timetableId: string;
+      /**
+       * @description Academic year to generate. Defaults to the current UTC year.
+       * @example 2027
+       */
+      year?: number;
     };
     /** @enum {string} */
     Weekday:
@@ -3339,13 +3364,6 @@ export interface components {
       id: string;
       payload: components["schemas"]["GeneratedCalendarPayloadDto"];
     };
-    CreateAcademicCalendarDto: {
-      /**
-       * @description Four-digit academic year. A university may have only one calendar per year.
-       * @example 2026
-       */
-      year: number;
-    };
     AcademicCalendarDto: {
       /**
        * Format: uuid
@@ -3365,6 +3383,13 @@ export interface components {
        *     ]
        */
       subscriptions: string[];
+    };
+    CreateAcademicCalendarDto: {
+      /**
+       * @description Four-digit academic year. A university may have only one calendar per year.
+       * @example 2026
+       */
+      year: number;
     };
     CalendarRestrictionDto: {
       /**
@@ -6612,6 +6637,36 @@ export interface operations {
       };
       /** @description Generated calendar not found */
       404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  listPublicAcademicCalendars: {
+    parameters: {
+      query?: {
+        /** @description Limit results to a four-digit academic year. */
+        year?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Public academic calendars returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AcademicCalendarDto"][];
+        };
+      };
+      /** @description Invalid academic year */
+      400: {
         headers: {
           [name: string]: unknown;
         };

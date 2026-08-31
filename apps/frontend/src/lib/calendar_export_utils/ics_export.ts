@@ -6,6 +6,7 @@ import {
   toBasicDateTime,
 } from "./calendar_time";
 import type { GeneratedCalendarPayloadDto } from "./types";
+import { assertCalendarPayload } from "./validation";
 
 const TEXT_ENCODER = new TextEncoder();
 
@@ -21,7 +22,7 @@ function foldLine(line: string): string[] {
   const folded: string[] = [];
   let current = "";
   let byteLength = 0;
-  let limit = 75;
+  const limit = 75;
 
   for (const character of line) {
     const characterBytes = TEXT_ENCODER.encode(character).length;
@@ -29,7 +30,6 @@ function foldLine(line: string): string[] {
       folded.push(current);
       current = ` ${character}`;
       byteLength = 1 + characterBytes;
-      limit = 75;
     } else {
       current += character;
       byteLength += characterBytes;
@@ -53,7 +53,7 @@ function textProperty(name: string, value: string | undefined): string[] {
 function eventEnvelope(key: string, now: Date, body: string[]): string[] {
   return [
     "BEGIN:VEVENT",
-    `UID:${key}@umtas.vigil`,
+    `UID:${escapeText(key)}@umtas.vigil`,
     `DTSTAMP:${utcTimestamp(now)}`,
     ...body,
     "STATUS:CONFIRMED",
@@ -86,6 +86,8 @@ export function generateAcademicCalendarICS(
   timezone = Intl.DateTimeFormat().resolvedOptions().timeZone,
   now = new Date(),
 ): string {
+  assertCalendarPayload(payload, timezone);
+  if (Number.isNaN(now.getTime())) throw new RangeError("Invalid DTSTAMP date");
   const [fromYear, toYear] = calendarYearRange(payload);
   const lines = [
     "BEGIN:VCALENDAR",
