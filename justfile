@@ -269,6 +269,8 @@ nfr-upload:
         --headless \
 
 
+staging-migrate:
+    phase run --env staging -- docker compose -p umtas-staging -f docker-compose.staging.yml run --rm backend node dist/db/migrate.js
 
 
 
