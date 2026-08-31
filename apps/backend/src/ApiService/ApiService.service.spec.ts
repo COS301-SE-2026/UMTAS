@@ -25,7 +25,7 @@ import { CourseServiceV2 } from 'src/Course/courseV2.service';
 import { ModuleServiceV2 } from 'src/Module/moduleV2.service';
 import { EventServiceV2 } from 'src/Events/eventV2.service';
 import { AdapterRegistry } from './Registry/AdapterRegistry.service';
-import { NWU_Adapter } from './Adapter/NWU/NWU_Adapter';
+import { ML_Adapter } from './Adapter/Maryland/ML_Adapter';
 import {
   CourseListResponseDto,
   CourseSingleResponseDto,
@@ -38,27 +38,27 @@ import {
 } from 'src/Module/dto/module.dto';
 import { BadRequestException } from '@nestjs/common';
 
-const nwuUni = createUniversity({
+const mlUni = createUniversity({
   UniversityID: uniId,
-  ApiIdentifier: 'NWU',
+  ApiIdentifier: 'ML',
   BaseApiUrl: 'baseUrl',
 });
 
-const mockNWUAdapter = {
-  uniID: nwuUni.UniversityID,
-  uni: nwuUni,
-  baseUrl: nwuUni.BaseApiUrl,
-  apiKey: nwuUni.ApiKey,
+const mockMLAdapter = {
+  uniID: mlUni.UniversityID,
+  uni: mlUni,
+  baseUrl: mlUni.BaseApiUrl,
+  apiKey: mlUni.ApiKey,
 
   authenticate: jest.fn().mockResolvedValue(undefined),
   getCourses: jest.fn().mockResolvedValue([
     {
-      UniversityID: nwuUni.UniversityID,
+      UniversityID: mlUni.UniversityID,
       CourseName: 'Computer Science 101',
       ExternalID: 'CS1',
     },
     {
-      UniversityID: nwuUni.UniversityID,
+      UniversityID: mlUni.UniversityID,
       CourseName: 'Mathematics 101',
       ExternalID: 'MATH1',
     },
@@ -66,7 +66,7 @@ const mockNWUAdapter = {
   getModules: jest.fn().mockResolvedValue([]),
   getEvents: jest.fn().mockResolvedValue([]),
   request: jest.fn(),
-} as Partial<NWU_Adapter> as NWU_Adapter;
+} as Partial<ML_Adapter> as ML_Adapter;
 
 describe('ApiService', () => {
   let service: ApiService;
@@ -95,7 +95,7 @@ describe('ApiService', () => {
 
     service = module.get(ApiService);
 
-    mockAdapterRegistryService.getAdapter?.mockReturnValue(mockNWUAdapter);
+    mockAdapterRegistryService.getAdapter?.mockReturnValue(mockMLAdapter);
   }); //END_beforeEach
 
   //after each
@@ -117,7 +117,7 @@ describe('ApiService', () => {
       // Arrange
       const getUniSpy = jest
         .spyOn(service['uniService'], 'getById')
-        .mockResolvedValue(nwuUni);
+        .mockResolvedValue(mlUni);
 
       mockCourseServiceV2.getByExternalID?.mockResolvedValue(null);
 
@@ -133,10 +133,10 @@ describe('ApiService', () => {
       };
 
       // Act
-      const result = await service.getCourses(nwuUni.UniversityID, 1, 2);
+      const result = await service.getCourses(mlUni.UniversityID, 1, 2);
 
       // Assert
-      expect(getUniSpy).toHaveBeenCalledWith(nwuUni.UniversityID);
+      expect(getUniSpy).toHaveBeenCalledWith(mlUni.UniversityID);
       expect(result).toMatchObject(expectedResult);
     });
 
@@ -145,7 +145,7 @@ describe('ApiService', () => {
       // Arrange
       const getUniSpy = jest
         .spyOn(service['uniService'], 'getById')
-        .mockResolvedValue(nwuUni);
+        .mockResolvedValue(mlUni);
 
       const oldCourse1 = createCourse({ CourseName: 'old1' });
       const oldCourse2 = createCourse({ CourseName: 'old2' });
@@ -166,10 +166,10 @@ describe('ApiService', () => {
       };
 
       // Act
-      const result = await service.getCourses(nwuUni.UniversityID, 1, 2);
+      const result = await service.getCourses(mlUni.UniversityID, 1, 2);
 
       // Assert
-      expect(getUniSpy).toHaveBeenCalledWith(nwuUni.UniversityID);
+      expect(getUniSpy).toHaveBeenCalledWith(mlUni.UniversityID);
       expect(mockCourseServiceV2.update).toHaveBeenCalledTimes(2);
 
       expect(result).toMatchObject(expectedResult);
@@ -180,7 +180,7 @@ describe('ApiService', () => {
       // Arrange
       const getUniSpy = jest
         .spyOn(service['uniService'], 'getById')
-        .mockResolvedValue(nwuUni);
+        .mockResolvedValue(mlUni);
 
       const course1 = createCourse({ ExternalID: '1' });
       const course2 = createCourse({ ExternalID: '2' });
@@ -200,7 +200,7 @@ describe('ApiService', () => {
         },
       ];
 
-      mockNWUAdapter.getCourses = jest
+      mockMLAdapter.getCourses = jest
         .fn()
         .mockResolvedValue(mockCoursesFromAdapter);
 
@@ -210,10 +210,10 @@ describe('ApiService', () => {
       };
 
       // Act
-      const result = await service.getCourses(nwuUni.UniversityID, 1, 2);
+      const result = await service.getCourses(mlUni.UniversityID, 1, 2);
 
       // Assert
-      expect(getUniSpy).toHaveBeenCalledWith(nwuUni.UniversityID);
+      expect(getUniSpy).toHaveBeenCalledWith(mlUni.UniversityID);
       expect(mockCourseServiceV2.update).not.toHaveBeenCalled();
       expect(mockCourseServiceV2.create).not.toHaveBeenCalled();
 
@@ -235,7 +235,7 @@ describe('ApiService', () => {
       // Arrange
       const getUniSpy = jest
         .spyOn(service['uniService'], 'getById')
-        .mockResolvedValue(nwuUni);
+        .mockResolvedValue(mlUni);
 
       const course = createCourse({
         CourseID: courseId,
@@ -264,7 +264,7 @@ describe('ApiService', () => {
         },
       ];
 
-      mockNWUAdapter.getModules = jest
+      mockMLAdapter.getModules = jest
         .fn()
         .mockResolvedValue(mockModulesFromAdapter);
 
@@ -290,7 +290,7 @@ describe('ApiService', () => {
       // Assert
       expect(getUniSpy).toHaveBeenCalled();
       expect(getCourseSpy).toHaveBeenCalled();
-      expect(mockNWUAdapter.getModules).toHaveBeenCalled();
+      expect(mockMLAdapter.getModules).toHaveBeenCalled();
       expect(moduleServiceSpy).toHaveBeenCalledTimes(2);
 
       expect(result).toMatchObject(expectedResult);
@@ -301,7 +301,7 @@ describe('ApiService', () => {
       // Arrange
       const getUniSpy = jest
         .spyOn(service['uniService'], 'getById')
-        .mockResolvedValue(nwuUni);
+        .mockResolvedValue(mlUni);
 
       const course = createCourse({
         CourseID: courseId,
@@ -335,7 +335,7 @@ describe('ApiService', () => {
         },
       ];
 
-      mockNWUAdapter.getModules = jest
+      mockMLAdapter.getModules = jest
         .fn()
         .mockResolvedValue(mockModulesFromAdapter);
 
@@ -361,7 +361,7 @@ describe('ApiService', () => {
       // Assert
       expect(getUniSpy).toHaveBeenCalled();
       expect(getCourseSpy).toHaveBeenCalled();
-      expect(mockNWUAdapter.getModules).toHaveBeenCalled();
+      expect(mockMLAdapter.getModules).toHaveBeenCalled();
       expect(moduleServiceSpy).toHaveBeenCalledTimes(2);
 
       expect(result).toMatchObject(expectedResult);
@@ -372,7 +372,7 @@ describe('ApiService', () => {
       // Arrange
       const getUniSpy = jest
         .spyOn(service['uniService'], 'getById')
-        .mockResolvedValue(nwuUni);
+        .mockResolvedValue(mlUni);
 
       const course = createCourse({
         CourseID: courseId,
@@ -406,7 +406,7 @@ describe('ApiService', () => {
         },
       ];
 
-      mockNWUAdapter.getModules = jest
+      mockMLAdapter.getModules = jest
         .fn()
         .mockResolvedValue(mockModulesFromAdapter);
 
@@ -416,7 +416,7 @@ describe('ApiService', () => {
       // Assert
       expect(getUniSpy).toHaveBeenCalledWith(uniId);
       expect(getCourseSpy).toHaveBeenCalledWith(courseId);
-      expect(mockNWUAdapter.getModules).toHaveBeenCalledWith(course);
+      expect(mockMLAdapter.getModules).toHaveBeenCalledWith(course);
 
       expect(mockModuleServiceV2.getByExternalID).toHaveBeenCalledTimes(2);
 
@@ -444,7 +444,7 @@ describe('ApiService', () => {
     it('should return a list of events', async () => {
       const getUniSpy = jest
         .spyOn(service['uniService'], 'getById')
-        .mockResolvedValue(nwuUni);
+        .mockResolvedValue(mlUni);
 
       const module = createModule({
         moduleID: moduleId,
@@ -474,7 +474,7 @@ describe('ApiService', () => {
         },
       ];
 
-      mockNWUAdapter.getEvents = jest
+      mockMLAdapter.getEvents = jest
         .fn()
         .mockResolvedValue(mockEventsFromAdapter);
 
@@ -505,7 +505,7 @@ describe('ApiService', () => {
 
       expect(getUniSpy).toHaveBeenCalled();
       expect(getModuleSpy).toHaveBeenCalled();
-      expect(mockNWUAdapter.getEvents).toHaveBeenCalled();
+      expect(mockMLAdapter.getEvents).toHaveBeenCalled();
       expect(eventServiceSpy).toHaveBeenCalledTimes(2);
       expect(result.events).toHaveLength(2);
       expect(result.message).toBe(
