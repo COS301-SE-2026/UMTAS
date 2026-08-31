@@ -1,0 +1,16 @@
+.github/workflows/ci.yml
+  h_2d4b3dca70a3d8 159,205-207,215-237,264,311-313
+docker/frontend/frontend.Dockerfile
+  h_2d4b3dca70a3d8 18,25
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "6c8814d79feafcd2c494767cf786fb981e4b9031",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
