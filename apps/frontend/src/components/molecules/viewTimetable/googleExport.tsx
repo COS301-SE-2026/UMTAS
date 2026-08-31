@@ -31,12 +31,12 @@ export default function GooglePopup() {
 
   if (signedIn)
     return (
-      <Card className="flex  lg:px-2 items-center capitalize  w-1/4  ">
+      <Card className="flex  lg:px-2 items-center capitalize p-10 w-75  ">
         <CardTitle className="text-left w-full p-2">
           Export to google Calendar
         </CardTitle>
         <CardContent className="w-full  items-center  ">
-          <div className="flex flex-col w-full gap-y-4  justify-center text-center ">
+          <div className="flex flex-col w-full gap-y-4  justify-center  ">
             <GoogleList />
             <div className="flex items-center w-full gap-4">
               <Separator className="flex-1" />
@@ -81,8 +81,8 @@ export function GoogleList() {
 
   return (
     <div className="grid grid-cols-1  justify-center gap-y-4   items-center w-full ">
-      <Label className="text-sm font-medium text-left w-full gap-y-2  text-[var(--text-secondary)] grid grid-cols-1">
-        Select Schedule
+      <Label className="text-sm font-medium text-left w-full gap-y-2  text-[var(--text-secondary)] flex flex-col">
+        <p className="text-left w-50">Select Schedule</p>
         <Select
           disabled={false}
           value={selectedSchedule.googleID}
@@ -95,10 +95,7 @@ export function GoogleList() {
             }
           }}
         >
-          <SelectTrigger
-            id="select-year"
-            className="capitalize w-50 bg-primary text-secondary"
-          >
+          <SelectTrigger id="select-year" className="capitalize w-50 ">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -111,8 +108,8 @@ export function GoogleList() {
         </Select>
       </Label>
 
-      <Label className="text-sm font-medium text-left w-full gap-y-2   text-[var(--text-secondary)] grid grid-cols-1">
-        Confirm
+      <Label className="text-sm font-medium text-left w-full gap-y-2   text-[var(--text-secondary)] flex flex-col">
+        <p className="text-left w-50">Confirm</p>
         <Button className="w-50" onClick={() => {}}>
           <GoogleIcon></GoogleIcon> Add to Google Calendar
         </Button>
@@ -126,8 +123,8 @@ export function GoogleAddSchedule() {
 
   return (
     <div className="grid grid-cols-1  justify-center gap-y-4   items-center w-full">
-      <Label className="text-sm font-medium text-left w-full gap-y-2  text-[var(--text-secondary)] flex flex-col">
-        Select Schedule
+      <Label className="text-sm font-medium text-left w-full gap-y-2   text-[var(--text-secondary)] flex flex-col">
+        <p className="text-left w-50">Create Schedule</p>
         <Input
           data-testid="restriction-Date-Input"
           type="text"
@@ -141,7 +138,7 @@ export function GoogleAddSchedule() {
       </Label>
 
       <Label className="text-sm font-medium text-left w-full gap-y-2   text-[var(--text-secondary)] flex flex-col">
-        Confirm
+        <p className="text-left w-50">Confirm</p>
         <Button className="w-50" onClick={() => {}}>
           <GoogleIcon></GoogleIcon> Add to Google Calendar
         </Button>
