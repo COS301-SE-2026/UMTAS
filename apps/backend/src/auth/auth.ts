@@ -318,6 +318,8 @@ export function createAuth(input: CreateAuthInput) {
               clientId: googleClientId,
               clientSecret: googleClientSecret,
               scope: ['openid', 'email', 'profile'],
+              accessType: 'offline',
+              prompt: 'select_account consent',
               mapProfileToUser: mapGoogleProfileToUser,
             },
           }

@@ -1,1 +1,0 @@
-ALTER TABLE "Modules" ALTER COLUMN "moduleCode" SET DATA TYPE varchar(15);
