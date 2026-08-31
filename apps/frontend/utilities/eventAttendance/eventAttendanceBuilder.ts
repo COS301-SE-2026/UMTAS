@@ -21,6 +21,11 @@ export type updateEventAttendanceByIdBody =
 export type updateEventAttendanceByIdRes =
   paths["/api/attendance/{attendanceId}"]["patch"]["responses"]["200"]["content"]["application/json"];
 
+export type deleteEventAttendanceByIdPath =
+  paths["/api/attendance/{attendanceId}"]["delete"]["parameters"]["path"];
+export type deleteEventAttendanceByIdRes =
+  paths["/api/attendance/{attendanceId}"]["delete"]["responses"]["200"]["content"]["application/json"];
+
 export class createEventAttendanceBuilder extends RequestBuilder<
   undefined,
   createEventAttendanceBody,
@@ -62,5 +67,16 @@ export class updateEventAttendanceByIdBuilder extends RequestBuilder<
   constructor() {
     super();
     this.setUrl("/attendance/{attendanceId}").setMethod(RequestMethod.PATCH);
+  }
+}
+
+export class deleteEventAttendanceById extends RequestBuilder<
+  deleteEventAttendanceByIdPath,
+  undefined,
+  deleteEventAttendanceByIdRes
+> {
+  constructor() {
+    super();
+    this.setUrl("/attendance/{attendanceId}").setMethod(RequestMethod.DELETE);
   }
 }
