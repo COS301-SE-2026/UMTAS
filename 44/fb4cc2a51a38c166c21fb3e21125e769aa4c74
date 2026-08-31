@@ -1,0 +1,18 @@
+apps/frontend/src/components/molecules/Calendar-management/restriction-handlers.tsx
+  h_8b894b05e4a1b2 116
+apps/frontend/src/components/organisms/Calandar-management/temporary-card.tsx
+  h_8b894b05e4a1b2 9
+apps/frontend/src/components/templates/calendar-management/caltemplate.tsx
+  h_8b894b05e4a1b2 104,111,193
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "44fb4cc2a51a38c166c21fb3e21125e769aa4c74",
+  "prompts": {},
+  "humans": {
+    "h_8b894b05e4a1b2": {
+      "author": "Wilmar-Smit <u24584216@tuks.co.za>"
+    }
+  }
+}
