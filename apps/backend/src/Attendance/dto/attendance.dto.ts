@@ -30,11 +30,14 @@ export class CreateAttendanceDto {
   eventDate!: string;
 
   @ApiProperty({
-    enum: AttendanceState.enumValues,
+    enum: AttendanceState,
     example: AttendanceState.enumValues[0],
     description: 'Is the user attending this event or not',
   })
-  @IsEnum(AttendanceState.enumValues)
+  @IsEnum(AttendanceState, {
+    message:
+      'state must be one of the following values: ATTENDING, NOT_ATTENDING',
+  })
   @IsNotEmpty()
   state!: AttendanceStateType;
 } //END_createAttendance
