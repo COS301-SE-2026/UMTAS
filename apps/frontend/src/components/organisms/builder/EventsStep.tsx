@@ -37,8 +37,13 @@ import {
   removeEventMut,
   updateEventMut,
 } from "@/components/templates/builder/Queries/eventQueries";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
+import {
+  getAllEventAttendanceQ,
+  addEventAttendanceMut,
+  removeEventAttendanceMut,
+} from "../../../../utilities/eventAttendance/eventAttendanceQueries";
 
 import Tutorial from "@/components/organisms/nav/Tutorial";
 
@@ -167,6 +172,10 @@ export function EventsStep({
   const addEvent = useMutation(addUniEventMut());
   const deleteEvent = useMutation(removeEventMut());
   const updateEvent = useMutation(updateEventMut());
+
+  const { data: attendanceList } = useQuery(getAllEventAttendanceQ());
+  const addEventAttendance = useMutation(addEventAttendanceMut());
+  const removeEventAttendance = useMutation(removeEventAttendanceMut());
 
   // a local construct to add an empty event
   function addNewEvent() {
@@ -328,6 +337,42 @@ export function EventsStep({
     );
   }
 
+  function handleAttendanceCheckbox(
+    eventId: string,
+    isAttendingEvent: boolean,
+  ) {
+    const event = events.find((event) => event.eventId === eventId);
+    if (!event) {
+      return;
+    }
+
+    const attendanceDate =
+      event.eventCriteria?.date || new Date().toISOString().substring(0, 10);
+
+    if (isAttendingEvent) {
+      addEventAttendance.mutate({
+        body: {
+          eventID: eventId,
+          state: "ATTENDING",
+          eventDate: attendanceDate,
+        },
+      });
+    } else {
+      const attendanceInfo = attendanceList?.attendanceList?.find(
+        (eventAttendance: {
+          eventID: string;
+          eventDate: string;
+          state: "ATTENDING" | "NOT_ATTENDING";
+          AttendanceID: string;
+        }) => eventAttendance.eventID === eventId,
+      );
+
+      if (attendanceInfo?.AttendanceID) {
+        removeEventAttendance.mutate(attendanceInfo.AttendanceID);
+      }
+    }
+  }
+
   function renderEmptyState() {
     return (
       <div className="flex flex-col items-center gap-3 py-32 text-center">
@@ -442,6 +487,14 @@ export function EventsStep({
               onUpdate={handleUpdate}
               onGoToModules={onGoToModules}
               errors={errors}
+              isAttending={
+                attendanceList?.attendanceList?.some(
+                  (attendanceEvennt: { eventID: string; state: string }) =>
+                    attendanceEvennt.eventID === event.eventId &&
+                    attendanceEvennt.state === "ATTENDING",
+                ) ?? false
+              }
+              onAttendanceChange={handleAttendanceCheckbox}
             />
 
             <Button

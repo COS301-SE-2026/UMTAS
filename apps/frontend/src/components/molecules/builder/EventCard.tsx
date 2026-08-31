@@ -20,6 +20,7 @@ import {
   EventResponse,
 } from "@/app/builder/utils/events/eventRequestBuilder";
 import { Switch } from "@/components/atoms/baseShadcn/switch";
+import { Checkbox } from "@/components/atoms/baseShadcn/checkbox";
 
 export interface EventErrors {
   name?: string;
@@ -41,6 +42,8 @@ interface EventCardProps {
   ) => void;
   onGoToModules?: () => void;
   errors?: EventErrors;
+  isAttending?: boolean;
+  onAttendanceChange?: (eventId: string, isAttending: boolean) => void;
 }
 
 export function EventCard({
@@ -49,6 +52,8 @@ export function EventCard({
   onUpdate,
   onGoToModules,
   errors,
+  isAttending = false,
+  onAttendanceChange,
 }: EventCardProps) {
   const inputClass =
     "h-10 bg-[var(--bg-base)] border-[var(--border)] text-[var(--text-primary)] " +
@@ -296,6 +301,27 @@ export function EventCard({
           error={errors?.time}
           hideDaySelect
         />
+
+        <div className="flex items-center p-4 justify-between gap-2 rounded-md border border-[var(--border)]">
+          <div className="space-y-0.5">
+            <Label className="text-sm font-medium text-[var(--text-primary)]">
+              Attendance
+            </Label>
+            <p className="text-xs text-[var(--text-secondary)]">
+              Tick the box if you are planning to attend the event
+            </p>
+          </div>
+          <Checkbox
+            data-testid="schedule-Timetable-Checkbox-attending"
+            id={`event-${event?.eventId}-attendance`}
+            checked={isAttending}
+            onCheckedChange={(checked) => {
+              if (onAttendanceChange) {
+                onAttendanceChange(event.eventId, checked === true);
+              }
+            }}
+          />
+        </div>
 
         {/* event type */}
         <div className="flex flex-col gap-2">
