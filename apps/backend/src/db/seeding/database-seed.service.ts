@@ -29,6 +29,7 @@ export class DatabaseSeedService {
 
   async seed(db: AppDatabase): Promise<void> {
     const tasks = [
+      ['COS admin', (tx: AppDatabase) => this.seedCOSAdmin(tx)],
       ['system admin', (tx: AppDatabase) => this.seedSystemAdmin(tx)],
       [
         'universities',
@@ -61,6 +62,40 @@ export class DatabaseSeedService {
     });
 
     this.logger.log('Database seeding completed');
+  }
+
+  private async seedCOSAdmin(db: AppDatabase): Promise<void> {
+    const name = 'Admin301';
+    const email = process.env.SEED_COS_ADMIN_EMAIL ?? 'admin301@local.umtas';
+    const password = process.env.SEED_COS_ADMIN_PASSWORD ?? 'Admin@UMTAS2024!';
+
+    const [existing] = await db
+      .select({ id: usersTable.id })
+      .from(usersTable)
+      .where(eq(usersTable.email, email))
+      .limit(1);
+
+    if (existing) return;
+
+    const [user] = await this.persistence.insertUsers(db, [
+      {
+        name,
+        email,
+        role: 'sys_admin',
+        emailVerified: true,
+      },
+    ]);
+
+    await this.persistence.insertAccounts(db, [
+      {
+        id: `${user.id}-account`,
+        userId: user.id,
+        accountId: user.id,
+        providerId: 'credential',
+        password: await hashPassword(password),
+      },
+    ]);
+    this.logger.log(`Seeded COS admin ${email}`);
   }
 
   private async seedSystemAdmin(db: AppDatabase): Promise<void> {
