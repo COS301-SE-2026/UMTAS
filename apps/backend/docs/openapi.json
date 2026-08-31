@@ -3182,7 +3182,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ModuleSingleResponseDto"
+                  "$ref": "#/components/schemas/EventSingleResponseDto"
                 }
               }
             }
@@ -3997,6 +3997,37 @@
         "summary": "Fetch events",
         "tags": [
           "ApiService"
+        ]
+      }
+    },
+    "/api/Analytics/university/{universityId}": {
+      "get": {
+        "operationId": "AnalyticsController_coursesPerUniversity",
+        "parameters": [
+          {
+            "name": "universityId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Courses per university counts returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UniversityCourseStatsResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Count of Courses per University / all universities",
+        "tags": [
+          "Analytics"
         ]
       }
     }
@@ -7667,6 +7698,38 @@
         },
         "required": [
           "events"
+        ]
+      },
+      "UniversityCourseStatsDto": {
+        "type": "object",
+        "properties": {
+          "UniversityID": {
+            "type": "string"
+          },
+          "UniversityName": {
+            "type": "string"
+          },
+          "CourseCount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "UniversityID",
+          "CourseCount"
+        ]
+      },
+      "UniversityCourseStatsResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UniversityCourseStatsDto"
+            }
+          }
+        },
+        "required": [
+          "data"
         ]
       }
     }

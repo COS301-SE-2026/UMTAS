@@ -22,6 +22,7 @@ import { StorageModule } from './storage/storage.module';
 import { AttendanceModule } from './Attendance/attendance.module';
 import { GroupingModule } from './Grouping/grouping.module';
 import { ApiServiceModule } from './ApiService/ApiService.module';
+import { AnalyticsModule } from './AnalyticsService/analytics.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { ApiServiceModule } from './ApiService/ApiService.module';
     AttendanceModule,
     GroupingModule,
     ApiServiceModule,
+    AnalyticsModule,
   ],
   controllers: [AppController, AuthController],
   providers: [
