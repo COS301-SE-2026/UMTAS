@@ -69,6 +69,7 @@ export function createEvent(
     validated: true,
     importFingerprint: null,
     eventCriteria: createEventCriteria(eventSource, eventCriteriaOverrides),
+    createdAt: new Date(),
   };
 
   return {

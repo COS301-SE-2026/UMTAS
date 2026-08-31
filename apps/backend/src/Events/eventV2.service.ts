@@ -194,6 +194,7 @@ export class EventServiceV2 extends EventService {
         isRecurring: isRec,
         validated: dto.validated ?? true,
         importFingerprint: fingerprint,
+        createdAt: new Date(),
       })
       .returning();
 

@@ -15,25 +15,21 @@ export class AdapterRegistry {
   constructor() {}
 
   getAdapter(uni: UniversityDto): University_Adapter {
-    if (!this.adapters.has(uni.UniversityID)) {
-      this.register(uni);
-    }
-
     const adapter = this.adapters.get(uni.UniversityID);
 
-    if (!adapter) {
-      throw new NotFoundException(
-        `No adapter registered for university ${uni.UniversityID}`,
-      );
+    if (adapter) {
+      return adapter;
+    } else {
+      return this.register(uni);
     }
-
-    return adapter;
   } //END_getAdapter
 
-  register(uni: UniversityDto): void {
+  register(uni: UniversityDto): University_Adapter {
     const adapter = this.createAdapter(uni);
 
     this.adapters.set(uni.UniversityID, adapter);
+
+    return adapter;
   } //END_register
 
   private createAdapter(uni: UniversityDto): University_Adapter {
@@ -41,25 +37,25 @@ export class AdapterRegistry {
     const baseUrl = uni.BaseApiUrl ?? null;
     // const apiKey = uni.ApiKey ?? null;
 
+    //Usually required
+    if (baseUrl === null)
+      throw new BadRequestException(
+        `BaseUrl does not exist for uni[${uni.UniversityName}]`,
+      );
+
     switch (ident) {
       case 'NWU': {
-        if (baseUrl === null)
-          throw new BadRequestException(
-            `BaseUrl does not exist for uni[${uni.UniversityName}]`,
-          );
         return new NWU_Adapter(uni);
       }
       case 'ML': {
-        if (baseUrl === null)
-          throw new BadRequestException(
-            `BaseUrl required for adapter[${uni.UniversityName}]`,
-          );
         return new ML_Adapter(uni);
       }
-    } //END)switch
 
-    throw new NotFoundException(
-      `Adapter does not exist for ${JSON.stringify(uni)}`,
-    );
+      default: {
+        throw new NotFoundException(
+          `Adapter does not exist for ${JSON.stringify(uni)}`,
+        );
+      }
+    } //END)switch
   }
 }

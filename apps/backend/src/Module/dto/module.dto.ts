@@ -25,6 +25,7 @@ import {
   type AcademicSemesterType,
 } from '../../entities/Modules/modules.schema';
 import { EventDto } from 'src/Events/dto/EventDto.dto';
+import { StatsFiltersDto, StatsResponseDto } from 'src/stats.dto';
 
 export class CourseModuleDto {
   @ApiProperty({
@@ -292,6 +293,11 @@ export class ModuleListResponseDto {
   message?: string;
 }
 
+export class ModuleListResponseDtoV2 extends IntersectionType(
+  ModuleListResponseDto,
+  PickType(StatsResponseDto, ['count']),
+) {}
+
 //Delete
 export class DeleteModuleResponseDto extends PickType(ModulesDto, [
   'moduleCode',
@@ -346,16 +352,13 @@ export class ModuleFiltersDto {
     else return false;
   })
   userEnrollment?: boolean;
-
-  // @ApiPropertyOptional({
-  //   default: false,
-  //   description: 'Used to get the moduel styling and when moduleEnrollment filter is active'
-  // })
-  // @IsOptional()
-  // @IsUUID()
-  // @ValidateIf((o)=> o.userEnrollment===true)
-  // userId?: string;
 } //ModuleFiltersDto
+
+//GetAllV2 filters
+export class ModuleFiltersDtoV2 extends IntersectionType(
+  ModuleFiltersDto,
+  PickType(StatsFiltersDto, ['Stats']),
+) {}
 
 export class ModuleStylingResponseDto {
   @ApiProperty({
