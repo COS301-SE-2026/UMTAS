@@ -439,12 +439,24 @@ export function ScheduleView({
                 />
                 <div className="flex flex-row justify-center md:justify-end w-full md:w-auto gap-2 mb-4 md:mb-0">
                   <Button
+                    id="btn-delete"
+                    type="button"
+                    className="h-7 px-3 text-xs bg-[var(--bg-surface)] text-[var(--text-primary)] border-[var(--border)] hover:opacity-90"
+                    onClick={() => {
+                      /**TODO
+                       * add ICS function here Mikal
+                       */
+                    }}
+                  >
+                    Export to ICS
+                  </Button>
+                  <Button
                     id="btn-create"
                     type="button"
                     className="h-7 px-3 text-xs bg-[var(--bg-surface)] text-[var(--text-primary)] border-[var(--border)] hover:opacity-90"
                     onClick={createTimetable}
                   >
-                    Create New Timetable
+                    Create
                   </Button>
 
                   <Button
