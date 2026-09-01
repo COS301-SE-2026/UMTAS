@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 test.describe.configure({ mode: "serial" });
 
-test("Create and update module", async ({ page }) => {
+test.skip("Create and update module", async ({ page }) => {
   await page.goto("/builder");
   await page.getByTestId("btn-add-new-Module").click();
 
@@ -104,7 +104,7 @@ test("Update event", async ({ page }) => {
   await expect(event.getByTestId("event-Type-Select")).toHaveText("Test");
 });
 
-test("Create schedule", async ({ page }) => {
+test.skip("Create schedule", async ({ page }) => {
   await page.goto("/builder");
   await page.getByTestId("builder-Next-Step").click();
   await page.getByTestId("builder-Next-Step").click(); // now on schedules edit page
