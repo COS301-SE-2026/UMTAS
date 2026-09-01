@@ -62,8 +62,22 @@ export default function EditModuleEvent({
     UniversityID: UserDetails.getUniDetails()?.UniversityID ?? "",
   });
 
-  const updateModuleMutResult = useMutation(updateModQ());
-  const updateEventMutResult = useMutation(updateEventMut());
+  const updateModuleMutResult = useMutation({
+    ...updateModQ(),
+    onSuccess: () => {
+      getQueryClient().invalidateQueries({
+        queryKey: ["Modules"],
+      });
+    },
+  });
+  const updateEventMutResult = useMutation({
+    ...updateEventMut(),
+    onSuccess: () => {
+      getQueryClient().invalidateQueries({
+        queryKey: ["Modules"],
+      });
+    },
+  });
 
   const {
     mutate: addModuleToCourseMut,
@@ -82,7 +96,7 @@ export default function EditModuleEvent({
         }),
       onSuccess: () => {
         getQueryClient().invalidateQueries({
-          queryKey: getAllModCoursesQ().queryKey,
+          queryKey: ["Modules"],
         });
       },
     });
@@ -94,6 +108,11 @@ export default function EditModuleEvent({
     }) => {
       const builder = new updateStylingBuilder();
       return builder.send({ body: vars.body, paths: vars.path });
+    },
+    onSuccess: () => {
+      getQueryClient().invalidateQueries({
+        queryKey: ["Modules"],
+      });
     },
     onError: (err) => console.error("mutation failed", err),
   });

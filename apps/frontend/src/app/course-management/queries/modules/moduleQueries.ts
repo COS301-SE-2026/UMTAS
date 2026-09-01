@@ -50,6 +50,7 @@ export function updateModStylingQ() {
       const builder = new updateStylingBuilder();
       return builder.send({ body: vars.body, paths: vars.path });
     },
+    onSuccess: () => getQueryClient().invalidateQueries(),
     onError: (err) => console.error("mutation failed", err),
   });
 }
