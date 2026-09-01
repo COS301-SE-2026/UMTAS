@@ -15,43 +15,49 @@ import {
   SelectValue,
 } from "@/components/atoms/baseShadcn/select";
 import { Separator } from "@/components/atoms/baseShadcn/separator";
-import Popup from "@/components/atoms/utility/floatContainer";
+
 import { useState } from "react";
 interface googleListType {
   name: string;
   googleID: string;
 }
+type googleDetailsDTo = {
+  name: string;
+};
+
 export default function GooglePopup() {
   const [signedIn, setSignedIn] = useState(false);
 
   /**
    * @todo Mikal heres where you store google details you need please define a type or interface for type safety
    */
-  const [googleDetails, setGoogleDetails] = useState({});
+  const [googleDetails, setGoogleDetails] = useState<googleDetailsDTo>({
+    name: "",
+  });
 
   if (signedIn)
     return (
-      <Card className="flex  lg:px-2 items-center capitalize p-10 w-75  ">
+      <Card className="flexitems-center capitalize  w-75  ">
         <CardTitle className="text-left w-full p-2">
           Export to google Calendar
         </CardTitle>
         <CardContent className="w-full  items-center  ">
           <div className="flex flex-col w-full gap-y-4  justify-center  ">
-            <GoogleList />
+            <GoogleList name={googleDetails.name} />
             <div className="flex items-center w-full gap-4">
               <Separator className="flex-1" />
               <span className="">OR</span>
               <Separator className="flex-1" />
             </div>
-            <GoogleAddSchedule />
+            <GoogleAddSchedule name={googleDetails.name} />
           </div>
         </CardContent>
       </Card>
     );
   else {
     return (
-      <Card className="flex  lg:px-2 items-center capitalize  w-1/4 h-1/3  ">
-        <CardTitle className="text-left w-full p-2">
+      <Card className="flex   items-center capitalize  w-1/4 h-1/3  ">
+        <CardTitle className="text-left w-full ">
           Export to google Calendar
         </CardTitle>
         <CardContent className="w-full h-full flex flex-col justify-center items-center">
@@ -59,6 +65,10 @@ export default function GooglePopup() {
             className="w-50"
             onClick={() => {
               setSignedIn(true);
+              /**
+               * @todo here put the functionality to store the signed details in setGoogleDetails
+               * also please call setSignedIn only if signed in...
+               */
             }}
           >
             <GoogleIcon></GoogleIcon> Sign in with Google
@@ -69,7 +79,7 @@ export default function GooglePopup() {
   }
 }
 
-export function GoogleList() {
+export function GoogleList({ name }: googleDetailsDTo) {
   const [googleSchedules, setGoogleSchedules] = useState<googleListType[]>([
     { name: "TT1", googleID: "id1" },
     { name: "TT2", googleID: "id2" },
@@ -110,7 +120,14 @@ export function GoogleList() {
 
       <Label className="text-sm font-medium text-left w-full gap-y-2   text-[var(--text-secondary)] flex flex-col">
         <p className="text-left w-50">Confirm</p>
-        <Button className="w-50" onClick={() => {}}>
+        <Button
+          className="w-50"
+          onClick={() => {
+            /**
+             * @todo Mikal here put select schedle and create
+             */
+          }}
+        >
           <GoogleIcon></GoogleIcon> Add to Google Calendar
         </Button>
       </Label>
@@ -118,7 +135,7 @@ export function GoogleList() {
   );
 }
 
-export function GoogleAddSchedule() {
+export function GoogleAddSchedule({ name }: googleDetailsDTo) {
   const [scheduleName, setScheduleName] = useState<string>("");
 
   return (
@@ -139,7 +156,14 @@ export function GoogleAddSchedule() {
 
       <Label className="text-sm font-medium text-left w-full gap-y-2   text-[var(--text-secondary)] flex flex-col">
         <p className="text-left w-50">Confirm</p>
-        <Button className="w-50" onClick={() => {}}>
+        <Button
+          className="w-50"
+          onClick={() => {
+            /**
+             * @todo Mikal here put function to create schedule and then add to that one
+             */
+          }}
+        >
           <GoogleIcon></GoogleIcon> Add to Google Calendar
         </Button>
       </Label>
