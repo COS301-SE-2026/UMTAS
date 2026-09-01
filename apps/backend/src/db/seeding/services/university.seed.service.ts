@@ -73,6 +73,8 @@ export class UniversitySeedService extends BaseSeedService {
             role: 'UNIVERSITY_ADMIN',
           },
         ]);
+
+        this.logger.log(`😞`);
       } //END_uni
     } //END_check for missing names
     else {
