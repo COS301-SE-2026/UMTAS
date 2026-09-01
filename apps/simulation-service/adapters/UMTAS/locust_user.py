@@ -97,38 +97,42 @@ class DomainUser(HttpUser):
             "uniId": self.profile.get("uniId", "default_uni")
         }
 
-        with self.client.post('/api/auth/admin/create-mock-user', json=payload, headers=admin_headers, catch_response=True) as response:
-            if response.status_code in (200, 201):
-                response.success()
-                print(f"User {unique_email} created successfully.")
-                creds = response.json()
-                self.uni_id = creds.get("uniId")
-                
-                login_payload = {
-                    "email": unique_email,
-                    "password": password
-                }
-                
-                self.client.headers.pop('Authorization', None)
-                
-                with self.client.post('/api/auth/sign-in/email', json=login_payload, catch_response=True) as login_res:
-                    if login_res.status_code == 200:
-                        login_res.success()
-                        print(f"User {unique_email} logged in successfully.")
-                        
-                        response_data = login_res.json()
-                        token = response_data.get('session', {}).get('token')
-                        
-                        if token:
-                            self.client.headers.update({'Authorization': f'Bearer {token}'})
-                            
-                    else:
-                        login_res.failure(f"Login failed [{login_res.status_code}]: {login_res.text}")
-                        print(f"LOGIN ERROR: {login_res.status_code} - {login_res.text}")
-                        raise StopUser()
-            else:
-                response.failure(f"Failed to create user [{response.status_code}]: {response.text}")
+        with self.client.post(
+            "/api/auth/admin/create-mock-user", json=payload, headers=admin_headers, catch_response=True
+        ) as response:
+            if response.status_code not in (200, 201):
+                response.failure(f"create-mock-user {response.status_code}: {response.text}")
                 raise StopUser()
+            response.success()
+            self.uni_id = response.json().get("uniId")
+
+        login_payload = {"email": unique_email, "password": password}
+        self.client.headers.pop("Authorization", None)
+        with self.client.post("/api/auth/sign-in/email", json=login_payload, catch_response=True) as login_res:
+            if login_res.status_code != 200:
+                login_res.failure(f"login failed ({login_res.status_code})")
+                raise StopUser()
+            login_res.success()
+            token = (login_res.json().get("session") or {}).get("token")
+            if token:
+                self.client.headers.update({"Authorization": f"Bearer {token}"})
+
+        if not self.uni_id:
+            return
+
+        with self.client.post(
+            "/api/auth/select-university", json={"uniId": self.uni_id}, catch_response=True
+        ) as select_res:
+            if select_res.status_code not in (200, 201):
+                select_res.failure(f"select-university {select_res.status_code}: {select_res.text}")
+                raise StopUser()
+            select_res.success()
+            select_data = select_res.json()
+            self.uni_role = select_data.get("uniRole")
+            select_token = (select_data.get("session") or {}).get("token")
+            if select_token:
+                self.client.headers.update({"Authorization": f"Bearer {select_token}"})
+
 
     @task(5)
     def upload_timetable_pdf(self):
