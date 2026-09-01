@@ -246,6 +246,26 @@ class DomainUser(HttpUser):
             else:
                 response.success()
 
+    @task(1)
+    def view_timetable_detail(self):
+        if not self.timetable_id:
+            return
+        with self.client.get(
+            f"/api/timetables/{self.timetable_id}",
+            name="/api/timetables/[id]",
+            catch_response=True,
+        ) as response:
+            if response.status_code == 200:
+                response.success()
+            elif response.status_code == 404:
+                response.success()
+                self.timetable_id = None
+                self.timetable_event_ids = set()
+            else:
+                response.failure(
+                    f"timetable detail fetch failed [{response.status_code}]"
+                )
+
     @task(2)
     def build_or_grow_timetable(self):
         candidate_ids = [
@@ -361,45 +381,49 @@ class DomainUser(HttpUser):
     def get_active_session(self):
         self.client.get("/api/auth/get-session")
 
-    @task(1)
+    @task(2)
     def submit_solver_job(self):
-        def is_valid_uuid(val):
-            try:
-                uuid.UUID(str(val))
-                return True
-            except ValueError:
-                return False
-
-        event_ids_to_use = []
-
-        if hasattr(self, "available_event_ids") and self.available_event_ids:
-            num_events = min(3, len(self.available_event_ids))
-            event_ids_to_use = random.sample(self.available_event_ids, num_events)
-
-        if not event_ids_to_use:
-            raw_profile_ids = self.profile.get("eventIds", [])
-            event_ids_to_use = [eid for eid in raw_profile_ids if is_valid_uuid(eid)]
-
-        if not event_ids_to_use:
+        if self.solver_id is not None:
             return
 
+        event_ids = [eid for eid in self.timetable_event_ids if is_valid_checker(eid)]
+        if not event_ids:
+            event_ids = [eid for eid in self.known_events if is_valid_checker(eid)]
+        if not event_ids:
+            event_ids = [
+                eid for eid in self.profile.get("eventIds", []) if is_valid_checker(eid)
+            ]
+        if not event_ids:
+            return
+
+        solve_mode = random.choices(["feasibility", "optimization"], weights=[7, 3])[0]
+        engine = random.choices(["auto", "cp-sat", "ga"], weights=[6, 2, 2])[0]
+        heuristics = []
+        if solve_mode == "optimization":
+            heuristics = [
+                {"key": k, "weight": round(random.uniform(0.1, 1.0), 2)}
+                for k in HEURISTIC_KEYS
+            ]
+
         payload = {
-            "eventIds": event_ids_to_use,
-            "solveMode": "feasibility",
-            "engine": "auto",
-            "preferences": {"heuristics": []},
+            "eventIds": event_ids,
+            "solveMode": solve_mode,
+            "engine": engine,
+            "preferences": {"heuristics": heuristics},
         }
 
         with self.client.post(
             "/api/solver/jobs", json=payload, catch_response=True
         ) as response:
-            if response.status_code == 202:
-                response.success()
-                self.solver_id = response.json().get("jobId")
-            else:
-                response.failure(
-                    f"Solver rejected [{response.status_code}]: {response.text}"
-                )
+            if response.status_code != 202:
+                response.failure(f"solver rejected [{response.status_code}]")
+                return
+            response.success()
+            data = response.json()
+            self.solver_id = data.get("jobId")
+            self.solver_result_ready = False
+            if data.get("status") == "completed" and data.get("result"):
+                self.solver_result_ready = True
 
     @task(1)
     def check_solver_status(self):
