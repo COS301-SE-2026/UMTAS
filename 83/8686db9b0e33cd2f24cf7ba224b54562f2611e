@@ -1,0 +1,20 @@
+apps/backend/src/Attendance/attendance.service.ts
+  h_2d4b3dca70a3d8 89-95
+apps/backend/src/Attendance/dto/attendance.dto.ts
+  h_2d4b3dca70a3d8 10,86-91
+apps/simulation-service/adapters/UMTAS/profile_schema.yaml
+  h_2d4b3dca70a3d8 147-148,173-174,180-181,237-238,255-256,262-263,275-276,279-280,283-284,311-312,334-335,349-350,359-360,370-371,402-403
+justfile
+  h_2d4b3dca70a3d8 251
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "838686db9b0e33cd2f24cf7ba224b54562f2611e",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
