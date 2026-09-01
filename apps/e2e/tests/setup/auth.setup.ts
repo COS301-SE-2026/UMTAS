@@ -16,6 +16,8 @@ test("authenticate Admin", async ({ page }) => {
   await page.getByRole("button", { name: "Log in" }).click();
   await page.waitForURL("**/dashboard");
 
+  await page.getByTestId("click-avatar").click();
+
   if (!page.getByTestId("dashboard-popup-div").isVisible())
     await page.getByTestId("click-avatar").click();
 
