@@ -44,6 +44,7 @@ describe("generateAcademicCalendarICS", () => {
       "DESCRIPTION:Bring notes\\\\draft\\nSecond line\r\n",
     );
     expect(content).toContain("LOCATION:IT\\, 4-1\\; North\r\n");
+    expect(content).toContain("COLOR:#4A90F8\r\n");
     expect(content).not.toContain("Algorithms\\\\,");
 
     const exam = content.slice(
@@ -54,6 +55,31 @@ describe("generateAcademicCalendarICS", () => {
       ),
     );
     expect(exam).not.toContain("DESCRIPTION:");
+    expect(exam).not.toContain("COLOR:");
+  });
+
+  it("adds colour to one-off module events", () => {
+    const content = unfold(
+      generateAcademicCalendarICS(
+        {
+          ...calendarFixture,
+          oneOffEvents: [
+            { ...calendarFixture.oneOffEvents[0], moduleColour: "#22C55E" },
+          ],
+        },
+        "Africa/Johannesburg",
+        NOW,
+      ),
+    );
+
+    const exam = content.slice(
+      content.indexOf("UID:event-exam-1@umtas.vigil"),
+      content.indexOf(
+        "END:VEVENT",
+        content.indexOf("UID:event-exam-1@umtas.vigil"),
+      ),
+    );
+    expect(exam).toContain("COLOR:#22C55E\r\n");
   });
 
   it("uses CRLF only", () => {

@@ -10,7 +10,7 @@ export const calendarFixture: GeneratedCalendarPayloadDto = {
       description: "Bring notes\\draft\nSecond line",
       location: "IT, 4-1; North",
       moduleId: "module-1",
-      moduleColour: "#3B82F6",
+      moduleColour: "#4A90F8",
       startTime: "08:30",
       endTime: "09:20",
       weekday: "MONDAY",

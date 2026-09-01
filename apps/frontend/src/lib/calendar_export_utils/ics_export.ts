@@ -50,6 +50,10 @@ function textProperty(name: string, value: string | undefined): string[] {
   return value === undefined ? [] : [`${name}:${escapeText(value)}`];
 }
 
+function colourProperty(colour: string | undefined): string[] {
+  return colour?.trim() ? [`COLOR:${colour.trim().toUpperCase()}`] : [];
+}
+
 function eventEnvelope(key: string, now: Date, body: string[]): string[] {
   return [
     "BEGIN:VEVENT",
@@ -121,6 +125,7 @@ export function generateAcademicCalendarICS(
         ...textProperty("SUMMARY", event.title),
         ...textProperty("DESCRIPTION", event.description),
         ...textProperty("LOCATION", event.location),
+        ...colourProperty(event.moduleColour),
       ]),
     );
   }
@@ -133,6 +138,7 @@ export function generateAcademicCalendarICS(
         ...textProperty("SUMMARY", event.title),
         ...textProperty("DESCRIPTION", event.description),
         ...textProperty("LOCATION", event.location),
+        ...colourProperty(event.moduleColour),
       ]),
     );
   }

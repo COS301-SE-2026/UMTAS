@@ -25,6 +25,7 @@ describe("toGoogleCalendarEvents", () => {
       summary: "Algorithms, Seminars; βeta",
       description: "Bring notes\\draft\nSecond line",
       location: "IT, 4-1; North",
+      colorId: "9",
       start: {
         dateTime: "2026-02-02T08:30:00",
         timeZone: "Africa/Johannesburg",
@@ -52,6 +53,22 @@ describe("toGoogleCalendarEvents", () => {
       end: { date: "2026-07-06" },
     });
     expect(toGoogleCalendarEvents(calendarFixture)[0].id).toBe(events[0].id);
+  });
+
+  it("maps one-off module colours to Google event colours", () => {
+    const [event] = toGoogleCalendarEvents(
+      {
+        ...calendarFixture,
+        recurringEvents: [],
+        allDayEvents: [],
+        oneOffEvents: [
+          { ...calendarFixture.oneOffEvents[0], moduleColour: "#22C55E" },
+        ],
+      },
+      "Africa/Johannesburg",
+    );
+
+    expect(event.colorId).toBe("10");
   });
 
   it("satisfies the official Google Calendar event request contract", () => {

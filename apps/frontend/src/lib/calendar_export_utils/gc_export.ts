@@ -1,4 +1,5 @@
 import { addDays, buildWeeklyRrule, toBasicDateTime } from "./calendar_time";
+import { MODULE_COLOURS } from "../moduleColours";
 import type { GeneratedCalendarPayloadDto } from "./types";
 import { ensureUmtasCalendar } from "./gc_calendars";
 import { GoogleApiError, GoogleAuthError, requestGoogle } from "./google_http";
@@ -23,6 +24,7 @@ export interface GoogleCalendarEvent {
   summary: string;
   description?: string;
   location?: string;
+  colorId?: string;
   start: GoogleTimedDate | GoogleAllDayDate;
   end: GoogleTimedDate | GoogleAllDayDate;
   recurrence?: string[];
@@ -90,6 +92,12 @@ function contentHash(value: unknown): string {
     .padStart(8, "0")}`;
 }
 
+function googleColourId(colour: string | undefined): string | undefined {
+  const normalized = colour?.trim().toUpperCase();
+  return MODULE_COLOURS.find((option) => option.value === normalized)
+    ?.googleColorId;
+}
+
 function managedEvent(
   event: Omit<GoogleCalendarEvent, "extendedProperties">,
 ): GoogleCalendarEvent {
@@ -112,6 +120,7 @@ export function toGoogleCalendarEvents(
   const events: GoogleCalendarEvent[] = [];
 
   for (const event of payload.recurringEvents) {
+    const colorId = googleColourId(event.moduleColour);
     const recurrence = [
       `RRULE:${buildWeeklyRrule({ ...event, tzid: timezone })}`,
       ...(event.excludedDates.length
@@ -137,6 +146,7 @@ export function toGoogleCalendarEvents(
           ? {}
           : { description: event.description }),
         ...(event.location === undefined ? {} : { location: event.location }),
+        ...(colorId ? { colorId } : {}),
         start: {
           dateTime: localDateTime(event.startsOn, event.startTime),
           timeZone: timezone,
@@ -151,6 +161,7 @@ export function toGoogleCalendarEvents(
   }
 
   for (const event of payload.oneOffEvents) {
+    const colorId = googleColourId(event.moduleColour);
     events.push(
       managedEvent({
         id: googleEventId(event.key),
@@ -159,6 +170,7 @@ export function toGoogleCalendarEvents(
           ? {}
           : { description: event.description }),
         ...(event.location === undefined ? {} : { location: event.location }),
+        ...(colorId ? { colorId } : {}),
         start: {
           dateTime: localDateTime(event.date, event.startTime),
           timeZone: timezone,
