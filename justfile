@@ -248,7 +248,7 @@ db_sql:
 
 
 runsim:
-    cd apps/simulation-service && phase run --env development -- docker compose up --build
+    cd apps/simulation-service && phase run --env development -- docker compose up
 
 
 nfr-start:

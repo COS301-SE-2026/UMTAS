@@ -86,9 +86,13 @@ export class AttendanceService {
 
     const conditions: SQL[] = [];
 
-    if (!filters || Object.keys(filters).length === 0) {
-      //No filters to apply
-      //default to filter by userId
+    const hasAnyFilter =
+      !!filters?.eventID ||
+      !!filters?.eventDate ||
+      !!filters?.state ||
+      !!filters?.AlsoFilterByUser;
+
+    if (!hasAnyFilter) {
       conditions.push(eq(EventAttendance.UserID, userId));
     } else {
       if (filters.eventID)
