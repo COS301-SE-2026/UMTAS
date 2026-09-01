@@ -10,6 +10,11 @@ RUN pnpm install --frozen-lockfile --filter backend... \
     --network-concurrency=8 --fetch-retries=5 --fetch-timeout=60000
 
 FROM deps AS build
+ARG SEED_COS_ADMIN_EMAIL
+ARG SEED_COS_ADMIN_PASSWORD
+
+ENV SEED_COS_ADMIN_EMAIL=${SEED_COS_ADMIN_EMAIL}
+ENV SEED_COS_ADMIN_PASSWORD=${SEED_COS_ADMIN_PASSWORD}
 COPY packages/shared-types/ ./packages/shared-types/
 COPY apps/backend/ ./apps/backend/
 RUN pnpm --filter=shared-types build
@@ -20,6 +25,7 @@ RUN pnpm --filter=backend deploy --prod --legacy /deploy \
     && mkdir -p /deploy/src/mail \
     && cp -r apps/backend/src/mail/templates /deploy/src/mail/templates
 
+
 FROM node:22-alpine AS runtime
 WORKDIR /app
 ENV NODE_ENV=production
@@ -29,4 +35,4 @@ EXPOSE 8000
 USER node
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
   CMD node -e "require('http').get('http://127.0.0.1:'+process.env.PORT+'/api/health',r=>process.exit(r.statusCode>=200&&r.statusCode<300?0:1)).on('error',()=>process.exit(1))"
-CMD ["node", "dist/main"]
+CMD ["node", "dist/main.js"]

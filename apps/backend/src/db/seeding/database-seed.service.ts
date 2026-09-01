@@ -66,7 +66,8 @@ export class DatabaseSeedService {
 
   private async seedCOSAdmin(db: AppDatabase): Promise<void> {
     const name = 'Admin301';
-    const email = process.env.SEED_COS_ADMIN_EMAIL ?? 'admin301@local.umtas';
+    const email =
+      process.env.SEED_COS_ADMIN_EMAIL?.toLowerCase() ?? 'admin301@local.umtas';
     const password = process.env.SEED_COS_ADMIN_PASSWORD ?? 'Admin@UMTAS2024!';
 
     const [existing] = await db
