@@ -47,10 +47,14 @@ export class BuilderServiceV2 extends BuilderService {
 
     //Get personal Course and Module
     const course = await this.doUserUniCourseCheck(userId, tx);
-    const module = await this.getOrCreatePersonalModule(userId, course, tx);
 
-    //If moduleId defined - create for module - else for personal module
-    const moduleId = dto.eventCriteria?.moduleId ?? module.moduleID;
+    let moduleId = dto.eventCriteria?.moduleId;
+    if (moduleId == undefined) {
+      const module = await this.getOrCreatePersonalModule(userId, course, tx);
+
+      //If moduleId defined - create for module - else for personal module
+      moduleId = dto.eventCriteria?.moduleId ?? module.moduleID;
+    }
 
     const uniId = course.UniversityID;
 

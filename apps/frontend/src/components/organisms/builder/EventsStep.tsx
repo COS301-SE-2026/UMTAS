@@ -17,6 +17,7 @@ import {
 } from "@/components/molecules/builder/EventCard";
 import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
 import {
+  createEventRes,
   EventCriteria,
   EventResponse,
 } from "@/app/builder/utils/events/eventRequestBuilder";
@@ -42,6 +43,8 @@ import { useMutation } from "@tanstack/react-query";
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
 
 import Tutorial from "@/components/organisms/nav/Tutorial";
+import { useErrorListener } from "@/hooks/errorListener";
+import { errorName } from "../../../../utilities/errorCries";
 
 const baseSteps = [
   {
@@ -161,7 +164,7 @@ export function EventsStep({
   const [isDirty, setIsDirty] = useState(false);
   const [showGuard, setShowGuard] = useState(false);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
-
+  const [createdEvent, setCreatedEvent] = useState<createEventRes>();
   const steps =
     events.length > 0 ? [...extendedSteps, ...baseSteps] : baseSteps;
 
@@ -169,9 +172,11 @@ export function EventsStep({
   const deleteEvent = useMutation(removeEventMut());
   const updateEvent = useMutation(updateEventMut());
 
+  useErrorListener();
+
   // a local construct to add an empty event
-  function addNewEvent() {
-    addEvent.mutate({
+  async function addNewEvent() {
+    const result = await addEvent.mutateAsync({
       body: {
         eventCriteria: {
           startTime: "07:30",
@@ -181,6 +186,24 @@ export function EventsStep({
         },
       },
     });
+
+    if (result.event.eventId == createdEvent?.event.eventId) {
+      window.dispatchEvent(
+        new CustomEvent(errorName, {
+          detail: {
+            userMessage:
+              "Please update the details of the event before creating more",
+          },
+        }),
+      );
+    } else {
+      console.log(
+        result.event.eventId,
+        "created event",
+        createdEvent?.event.eventId,
+      );
+      setCreatedEvent(result);
+    }
   }
 
   function requestNavigation(action: () => void) {

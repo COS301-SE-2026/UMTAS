@@ -56,7 +56,7 @@ export function addUniEventMut() {
         body: vars.body,
       });
       console.log("result", await result);
-      return result;
+      return await result;
     },
     onSuccess: () => {
       getQueryClient().invalidateQueries({
