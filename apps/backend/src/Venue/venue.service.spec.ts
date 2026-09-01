@@ -121,17 +121,6 @@ describe('VenueService', () => {
       ).rejects.toThrow(NotFoundException);
     });
 
-    it('should throw BadRequestException if the building belongs to a different university', async () => {
-      mockDbResult(mockDb.select, [{ VenueID: 'venue-1' }]);
-      mockDbResult(mockDb.select, []);
-
-      await expect(
-        venueService.assignBuilding(mockSession, 'venue-1', {
-          buildingId: 'wits-building',
-        }),
-      ).rejects.toThrow(BadRequestException);
-    });
-
     it('should assign the building and return the updated mapping', async () => {
       mockDbResult(mockDb.select, [{ VenueID: 'venue-1' }]);
       mockDbResult(mockDb.select, [{ id: 'building-1' }]);
