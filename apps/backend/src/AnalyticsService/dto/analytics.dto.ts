@@ -1,22 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-// Modules per Course
-export class CourseModuleStatsDto {
-  @ApiProperty()
-  CourseID!: string;
-
-  @ApiProperty({ required: false })
-  CourseName?: string;
-
-  @ApiProperty()
-  ModuleCount!: number;
-}
-
-export class CourseModuleStatsResponseDto {
-  @ApiProperty({ type: [CourseModuleStatsDto] })
-  data!: CourseModuleStatsDto[];
-}
-
 // Events per Module
 export class ModuleEventStatsDto {
   @ApiProperty()

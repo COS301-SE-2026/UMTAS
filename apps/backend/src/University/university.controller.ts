@@ -269,8 +269,9 @@ export class UniversityController {
   @Get('statistics')
   @Roles('lecturer', 'uni_admin')
   @ApiOperation({
-    summary: 'Count of Courses per user University',
+    summary: 'University statistics',
     operationId: 'universityStatistics',
+    description: `Return count of (courses, modules, events) for users unviersity`,
   })
   @ApiResponse({
     status: 200,
@@ -285,7 +286,7 @@ export class UniversityController {
     status: 404,
     description: 'University not found',
   })
-  coursesPerUniversity(
+  statistics(
     @CurrentSession() session: SessionData,
   ): Promise<UniversityCourseStatsResponseDto> {
     const uniId = session.uniId;
@@ -293,7 +294,7 @@ export class UniversityController {
     if (!uniId) throw new BadRequestException(`No university selected`);
 
     return this.service.getStatistics(uniId);
-  } //END_coursesPerUniversity
+  } //END_statistics
 
   //NOT STATS
 

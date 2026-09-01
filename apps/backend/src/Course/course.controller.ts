@@ -9,6 +9,7 @@ import {
   CourseFilters,
   CourseFiltersV2,
   CourseListResponseDtoV2,
+  CourseModuleStatsResponseDto,
 } from './dto/course.dto';
 
 import {
@@ -21,6 +22,7 @@ import {
   Delete,
   ParseUUIDPipe,
   Query,
+  BadRequestException,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -109,32 +111,6 @@ export class CourseController {
     return this.service2.getAllV2(session.user.id, filters);
   }
 
-  //GetById
-  @Get(':CourseId')
-  @Roles()
-  @ApiOperation({
-    summary: 'get a Course by ID',
-    operationId: 'getCourseById',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Course returned successfully',
-    type: CourseSingleResponseDto,
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Invalid Course ID',
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Course not found',
-  })
-  getById(
-    @Param('CourseId', ParseUUIDPipe) CourseId: string,
-  ): Promise<CourseSingleResponseDto> {
-    return this.service.getById(CourseId);
-  }
-
   //getById V2
   @Get('v2/:CourseId')
   @Roles()
@@ -214,5 +190,65 @@ export class CourseController {
     @Param('CourseId', ParseUUIDPipe) CourseId: string,
   ): Promise<DeleteCourseResponseDto> {
     return this.service.delete(CourseId);
+  }
+
+  //Stats
+
+  //Modules per Course
+  @Get('statistics')
+  @Roles('lecturer', 'uni_admin')
+  @ApiOperation({
+    summary: 'Course Statistics',
+    operationId: 'courseStatistics',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Courses with statistics returned',
+    type: CourseModuleStatsResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'No university selected',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'University not found',
+  })
+  statistics(
+    @CurrentSession() session: SessionData,
+  ): Promise<CourseModuleStatsResponseDto> {
+    const uniId = session.uniId;
+
+    if (!uniId) throw new BadRequestException(`No university selected`);
+
+    return this.service2.getStatistics(uniId);
+  } //END_statistics
+
+  //Not Stats
+
+  //GetById
+  @Get(':CourseId')
+  @Roles()
+  @ApiOperation({
+    summary: 'get a Course by ID',
+    operationId: 'getCourseById',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Course returned successfully',
+    type: CourseSingleResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid Course ID',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Course not found',
+  })
+  getById(
+    @Param('CourseId', ParseUUIDPipe) CourseId: string,
+  ): Promise<CourseSingleResponseDto> {
+    return this.service.getById(CourseId);
   }
 } //CourseController

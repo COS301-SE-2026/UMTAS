@@ -6,11 +6,18 @@ import { forwardRef, Inject, NotFoundException } from '@nestjs/common';
 import {
   CourseFiltersV2,
   CourseListResponseDtoV2,
+  CourseModuleStatsResponseDto,
   CourseSingleResponseDto,
 } from './dto/course.dto';
 import { AppDatabase } from 'src/auth/auth';
-import { and, eq, ilike, SQL } from 'drizzle-orm';
-import { Course } from 'src/entities';
+import { and, countDistinct, desc, eq, ilike, SQL } from 'drizzle-orm';
+import {
+  Course,
+  Event,
+  GroupModules,
+  modules,
+  UniversityEvent,
+} from 'src/entities';
 import { ModuleServiceV2 } from 'src/Module/moduleV2.service';
 
 export class CourseServiceV2 extends CourseService {
@@ -112,4 +119,33 @@ export class CourseServiceV2 extends CourseService {
 
     return course ?? null;
   }
+
+  async getStatistics(uniId: string): Promise<CourseModuleStatsResponseDto> {
+    const db = this.dbService.db;
+
+    //Verify uni exists
+    await this.uniService.getById(uniId, db);
+
+    //Get stats
+    const statistics = await db
+      .select({
+        CourseID: Course.CourseID,
+        CourseName: Course.CourseName,
+        ModuleCount: countDistinct(modules.moduleID),
+        EventCount: countDistinct(Event.eventID),
+      })
+      .from(Course)
+      .leftJoin(GroupModules, eq(GroupModules.GroupID, Course.GroupID))
+      .leftJoin(modules, eq(modules.moduleID, GroupModules.ModuleID))
+      .leftJoin(UniversityEvent, eq(UniversityEvent.moduleID, modules.moduleID))
+      .leftJoin(Event, eq(Event.eventID, UniversityEvent.eventID))
+      .where(eq(Course.UniversityID, uniId))
+      .groupBy(Course.CourseID, Course.CourseName)
+      .orderBy(
+        desc(countDistinct(modules.moduleID)),
+        desc(countDistinct(Event.eventID)),
+      );
+
+    return { data: statistics };
+  } //END_getStatistics
 } //END_COurseServiceV2
