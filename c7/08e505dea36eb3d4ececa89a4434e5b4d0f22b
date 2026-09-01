@@ -1,0 +1,14 @@
+pnpm-lock.yaml
+  h_2d4b3dca70a3d8 43,326,387,399,19900,19906,21350,21358,21842,21844,21848,21851,21899,21901,21907,21918,22011,22509,22511,22514,22546,22548,22551,24499,24503,25298-25306,25390,25395,25788-25829
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "c708e505dea36eb3d4ececa89a4434e5b4d0f22b",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
