@@ -12,6 +12,7 @@ import {
   GetRoleFilterDto,
   GetRolesDto,
   UserUniversityRoleResponseDto,
+  UniversityCourseStatsResponseDto,
 } from './dto/university.dto';
 
 import {
@@ -23,6 +24,7 @@ import {
   Patch,
   Delete,
   ParseUUIDPipe,
+  BadRequestException,
 } from '@nestjs/common';
 import { ApiBody, ApiResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
@@ -80,33 +82,6 @@ export class UniversityController {
     @CurrentSession() session: SessionData,
   ): Promise<UniversityListResponseDto> {
     return this.service.getAll(session.user.id);
-  }
-
-  //GetById
-  @Get(':universityId')
-  @Roles()
-  @ApiOperation({
-    summary: 'get a university by ID',
-    operationId: 'getUniversityById',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'University returned successfully',
-    type: UniversitySingleResponseDto,
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Invalid University ID',
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'University not found',
-  })
-  getById(
-    @CurrentSession() session: SessionData,
-    @Param('universityId', ParseUUIDPipe) universityId: string,
-  ): Promise<UniversitySingleResponseDto> {
-    return this.service.getById(universityId);
   }
 
   //GetById
@@ -286,5 +261,66 @@ export class UniversityController {
     @Body() dto: ApproveUsersRoleDto,
   ): Promise<ApprovedUserRoleResponse> {
     return this.service.approveUserRole(dto);
+  }
+
+  //Stats
+
+  //Courses per University
+  @Get('statistics')
+  @Roles('lecturer', 'uni_admin')
+  @ApiOperation({
+    summary: 'Count of Courses per user University',
+    operationId: 'universityStatistics',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Count of courses for user`s university returned',
+    type: UniversityCourseStatsResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'No university selected',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'University not found',
+  })
+  coursesPerUniversity(
+    @CurrentSession() session: SessionData,
+  ): Promise<UniversityCourseStatsResponseDto> {
+    const uniId = session.uniId;
+
+    if (!uniId) throw new BadRequestException(`No university selected`);
+
+    return this.service.getStatistics(uniId);
+  } //END_coursesPerUniversity
+
+  //NOT STATS
+
+  //GetById
+  @Get(':universityId')
+  @Roles()
+  @ApiOperation({
+    summary: 'get a university by ID',
+    operationId: 'getUniversityById',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'University returned successfully',
+    type: UniversitySingleResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid University ID',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'University not found',
+  })
+  getById(
+    @CurrentSession() session: SessionData,
+    @Param('universityId', ParseUUIDPipe) universityId: string,
+  ): Promise<UniversitySingleResponseDto> {
+    return this.service.getById(universityId);
   }
 } //UniversityController

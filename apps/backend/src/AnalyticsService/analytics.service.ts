@@ -1,30 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import {
-  CourseModuleStatsResponseDto,
-  UniversityCourseStatsResponseDto,
-} from './dto/analytics.dto';
+import { CourseModuleStatsResponseDto } from './dto/analytics.dto';
 import { AnalyticsRepository } from './analytics.repository';
 
 @Injectable()
 export class AnalyticsService {
   constructor(private readonly repo: AnalyticsRepository) {}
-
-  // Courses per University
-  async coursesPerUniversity(
-    uniId: string,
-  ): Promise<UniversityCourseStatsResponseDto> {
-    const result = await this.repo.getCoursesPerUniversity(uniId);
-
-    return {
-      data: [
-        {
-          UniversityID: result.UniversityID,
-          UniversityName: result.UniversityName,
-          CourseCount: result.CourseCount,
-        },
-      ],
-    };
-  } //END_coursesPerUniversity
 
   async modulesPerSpecificCourse(
     courseId: string,
