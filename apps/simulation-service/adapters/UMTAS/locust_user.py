@@ -60,15 +60,17 @@ class DomainUser(HttpUser):
     wait_time = between(0.5, 1)
 
     def on_start(self):
-        if PROFILES:
-            self.profile = random.choice(PROFILES)
-        else:
-            self.profile = {}
-
+        self.profile = random.choice(PROFILES) if PROFILES else {}
         self.pdf_id = None
         self.pdf_result_ready = False
+        self.browsed_module_ids = []
+        self.enrolled_module_ids = set()
+        self.known_events = {} 
+        self.timetable_id = None
+        self.timetable_event_ids = set()
         self.solver_id = None
-        self.available_event_ids = []
+        self.solver_result_ready = False
+        self.attendance_ids = []
 
         admin_token = os.environ.get('SIMULATION_API_KEY')
         if not admin_token:
