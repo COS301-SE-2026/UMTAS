@@ -4,8 +4,6 @@ import { ensureUmtasCalendar } from "./gc_calendars";
 import { GoogleApiError, GoogleAuthError, requestGoogle } from "./google_http";
 import { assertCalendarPayload } from "./validation";
 
-export { ensureUmtasCalendar } from "./gc_calendars";
-
 const BASE32_HEX = "0123456789abcdefghijklmnopqrstuv";
 const CONCURRENCY = 5;
 const MAX_EVENT_LIST_PAGES = 20;
@@ -196,7 +194,6 @@ export async function syncToGoogleCalendar(
   payload: GeneratedCalendarPayloadDto,
   opts: {
     accessToken: string;
-    calendarId?: string;
     timezone?: string;
     signal?: AbortSignal;
     reconcile?: boolean;
@@ -206,11 +203,9 @@ export async function syncToGoogleCalendar(
     throw new Error("A Google access token is required");
   if (opts.signal?.aborted) throw abortError();
 
-  const calendarId =
-    opts.calendarId ??
-    (await ensureUmtasCalendar(opts.accessToken, "UMTAS", {
-      signal: opts.signal,
-    }));
+  const calendarId = await ensureUmtasCalendar(opts.accessToken, {
+    signal: opts.signal,
+  });
   const mappedEvents = toGoogleCalendarEvents(payload, opts.timezone);
   const result: GoogleCalendarSyncResult = {
     created: 0,

@@ -1,11 +1,8 @@
 /** @jest-environment node */
 
 import type { calendar_v3 } from "@googleapis/calendar";
-import {
-  ensureUmtasCalendar,
-  syncToGoogleCalendar,
-  toGoogleCalendarEvents,
-} from "./gc_export";
+import { syncToGoogleCalendar, toGoogleCalendarEvents } from "./gc_export";
+import { ensureUmtasCalendar } from "./gc_calendars";
 import { calendarFixture } from "./test_fixture";
 
 function response(status: number, body: unknown = {}): Response {
@@ -137,6 +134,12 @@ describe("Google Calendar transport", () => {
     jest.restoreAllMocks();
   });
 
+  function mockExistingUmtasCalendar(): void {
+    fetchMock.mockResolvedValueOnce(
+      response(200, { items: [{ id: "umtas-calendar", summary: "UMTAS" }] }),
+    );
+  }
+
   it("reuses an existing UMTAS calendar or creates it when absent", async () => {
     fetchMock.mockResolvedValueOnce(
       response(200, { items: [{ id: "existing-id", summary: "UMTAS" }] }),
@@ -161,14 +164,19 @@ describe("Google Calendar transport", () => {
 
   it("inserts all mapped events with bounded workers", async () => {
     fetchMock.mockResolvedValue(response(201, { id: "created" }));
+    mockExistingUmtasCalendar();
     await expect(
       syncToGoogleCalendar(calendarFixture, {
         accessToken: "token",
-        calendarId: "primary",
         timezone: "Africa/Johannesburg",
       }),
     ).resolves.toEqual({ created: 3, updated: 0, deleted: 0, failed: [] });
-    expect(fetchMock).toHaveBeenCalledTimes(3);
+    expect(fetchMock).toHaveBeenCalledTimes(4);
+    expect(
+      fetchMock.mock.calls
+        .filter(([url]) => String(url).includes("/events"))
+        .every(([url]) => String(url).includes("/calendars/umtas-calendar/")),
+    ).toBe(true);
     expect(fetchMock.mock.calls[0][1].headers.get("Authorization")).toBe(
       "Bearer token",
     );
@@ -192,10 +200,10 @@ describe("Google Calendar transport", () => {
       );
     });
 
+    mockExistingUmtasCalendar();
     await expect(
       syncToGoogleCalendar(calendarFixture, {
         accessToken: "token",
-        calendarId: "primary",
         timezone: "Africa/Johannesburg",
       }),
     ).resolves.toEqual({ created: 2, updated: 1, deleted: 0, failed: [] });
@@ -215,10 +223,10 @@ describe("Google Calendar transport", () => {
       );
     });
 
+    mockExistingUmtasCalendar();
     await expect(
       syncToGoogleCalendar(calendarFixture, {
         accessToken: "token",
-        calendarId: "primary",
         timezone: "Africa/Johannesburg",
       }),
     ).resolves.toEqual({
@@ -251,10 +259,10 @@ describe("Google Calendar transport", () => {
       );
     });
 
+    mockExistingUmtasCalendar();
     await expect(
       syncToGoogleCalendar(calendarFixture, {
         accessToken: "token",
-        calendarId: "primary",
         timezone: "Africa/Johannesburg",
       }),
     ).resolves.toEqual({
@@ -285,21 +293,20 @@ describe("Google Calendar transport", () => {
       return Promise.resolve(response(201));
     });
 
+    mockExistingUmtasCalendar();
     await expect(
       syncToGoogleCalendar(calendarFixture, {
         accessToken: "token",
-        calendarId: "primary",
         timezone: "Africa/Johannesburg",
       }),
     ).resolves.toEqual({ created: 3, updated: 0, deleted: 0, failed: [] });
-    expect(fetchMock).toHaveBeenCalledTimes(4);
+    expect(fetchMock).toHaveBeenCalledTimes(5);
   });
 
   it("throws for a missing or rejected access token", async () => {
     await expect(
       syncToGoogleCalendar(calendarFixture, {
         accessToken: "",
-        calendarId: "primary",
       }),
     ).rejects.toMatchObject({ message: expect.stringContaining("required") });
 
@@ -309,7 +316,6 @@ describe("Google Calendar transport", () => {
     await expect(
       syncToGoogleCalendar(calendarFixture, {
         accessToken: "expired",
-        calendarId: "primary",
       }),
     ).rejects.toMatchObject({ message: expect.stringContaining("expired") });
   });
@@ -321,6 +327,7 @@ describe("Google Calendar transport", () => {
       allDayEvents: [],
     };
     const [mapped] = toGoogleCalendarEvents(payload, "Africa/Johannesburg");
+    mockExistingUmtasCalendar();
     fetchMock.mockResolvedValueOnce(response(409)).mockResolvedValueOnce(
       response(200, {
         extendedProperties: {
@@ -334,11 +341,10 @@ describe("Google Calendar transport", () => {
     await expect(
       syncToGoogleCalendar(payload, {
         accessToken: "token",
-        calendarId: "primary",
         timezone: "Africa/Johannesburg",
       }),
     ).resolves.toEqual({ created: 0, updated: 0, deleted: 0, failed: [] });
-    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(fetchMock).toHaveBeenCalledTimes(3);
     expect(fetchMock.mock.calls.some(([, init]) => init.method === "PUT")).toBe(
       false,
     );
@@ -364,10 +370,10 @@ describe("Google Calendar transport", () => {
       );
     });
 
+    mockExistingUmtasCalendar();
     await expect(
       syncToGoogleCalendar(calendarFixture, {
         accessToken: "token",
-        calendarId: "primary",
         timezone: "Africa/Johannesburg",
         reconcile: true,
       }),
@@ -377,7 +383,10 @@ describe("Google Calendar transport", () => {
     ).toHaveLength(1);
     expect(fetchMock.mock.calls.at(-1)?.[0]).toMatch(/\/events\/umtasorphan$/);
     expect(
-      fetchMock.mock.calls.find(([, init]) => init.method === "GET")?.[0],
+      fetchMock.mock.calls.find(
+        ([url, init]) =>
+          init.method === "GET" && String(url).includes("/events?"),
+      )?.[0],
     ).toContain("privateExtendedProperty=umtas%3D1");
   });
 
@@ -413,10 +422,10 @@ describe("Google Calendar transport", () => {
       );
     });
 
+    mockExistingUmtasCalendar();
     await expect(
       syncToGoogleCalendar(calendarFixture, {
         accessToken: "token",
-        calendarId: "primary",
         timezone: "Africa/Johannesburg",
         reconcile: true,
       }),
@@ -429,7 +438,10 @@ describe("Google Calendar transport", () => {
       ],
     });
     expect(
-      fetchMock.mock.calls.filter(([, init]) => init.method === "GET"),
+      fetchMock.mock.calls.filter(
+        ([url, init]) =>
+          init.method === "GET" && String(url).includes("/events?"),
+      ),
     ).toHaveLength(2);
     expect(
       fetchMock.mock.calls.filter(([, init]) => init.method === "DELETE"),

@@ -1,48 +1,34 @@
 import { requestGoogle, type GoogleRequestOptions } from "./google_http";
 
 const MAX_CALENDAR_LIST_PAGES = 20;
+const UMTAS_CALENDAR_NAME = "UMTAS";
 
-export interface GoogleCalendarSummary {
+interface GoogleCalendar {
   id: string;
   summary: string;
-  description?: string;
-  timeZone?: string;
-  backgroundColor?: string;
-  accessRole: "owner" | "writer";
-  primary: boolean;
 }
 
-interface CalendarListEntry extends Partial<GoogleCalendarSummary> {
+interface CalendarListEntry {
+  id?: string;
+  summary?: string;
   deleted?: boolean;
 }
 
-function normalize(
-  calendar: CalendarListEntry,
-  defaults?: Pick<GoogleCalendarSummary, "accessRole" | "primary">,
-): GoogleCalendarSummary {
+function normalize(calendar: CalendarListEntry): GoogleCalendar {
   if (!calendar.id)
     throw new Error("Google Calendar API returned no calendar id");
   return {
     id: calendar.id,
     summary: calendar.summary ?? calendar.id,
-    ...(calendar.description === undefined
-      ? {}
-      : { description: calendar.description }),
-    ...(calendar.timeZone === undefined ? {} : { timeZone: calendar.timeZone }),
-    ...(calendar.backgroundColor === undefined
-      ? {}
-      : { backgroundColor: calendar.backgroundColor }),
-    accessRole: calendar.accessRole ?? defaults?.accessRole ?? "writer",
-    primary: calendar.primary ?? defaults?.primary ?? false,
   };
 }
 
-export async function listWritableCalendars(
+async function listWritableCalendars(
   accessToken: string,
   opts: GoogleRequestOptions = {},
-): Promise<GoogleCalendarSummary[]> {
+): Promise<GoogleCalendar[]> {
   if (!accessToken.trim()) throw new Error("A Google access token is required");
-  const calendars: GoogleCalendarSummary[] = [];
+  const calendars: GoogleCalendar[] = [];
   let pageToken: string | undefined;
   let pageCount = 0;
   do {
@@ -68,18 +54,14 @@ export async function listWritableCalendars(
     }
     pageToken = body.nextPageToken;
   } while (pageToken && pageCount < MAX_CALENDAR_LIST_PAGES);
-  return calendars.sort(
-    (left, right) =>
-      Number(right.primary) - Number(left.primary) ||
-      left.summary.localeCompare(right.summary),
-  );
+  return calendars;
 }
 
-export async function createCalendar(
+async function createCalendar(
   accessToken: string,
   input: { summary: string; description?: string; timeZone?: string },
   opts: GoogleRequestOptions = {},
-): Promise<GoogleCalendarSummary> {
+): Promise<GoogleCalendar> {
   if (!accessToken.trim()) throw new Error("A Google access token is required");
   const payload = {
     ...input,
@@ -92,38 +74,19 @@ export async function createCalendar(
     accessToken,
     opts,
   );
-  return normalize((await response.json()) as CalendarListEntry, {
-    accessRole: "owner",
-    primary: false,
-  });
-}
-
-export async function getCalendar(
-  accessToken: string,
-  calendarId: string,
-  opts: GoogleRequestOptions = {},
-): Promise<GoogleCalendarSummary> {
-  const response = await requestGoogle(
-    `calendars/${encodeURIComponent(calendarId)}`,
-    { method: "GET" },
-    accessToken,
-    opts,
-  );
-  return normalize((await response.json()) as CalendarListEntry, {
-    accessRole: "writer",
-    primary: calendarId === "primary",
-  });
+  return normalize((await response.json()) as CalendarListEntry);
 }
 
 export async function ensureUmtasCalendar(
   accessToken: string,
-  summary = "UMTAS",
   opts: GoogleRequestOptions = {},
 ): Promise<string> {
   const existing = (await listWritableCalendars(accessToken, opts)).find(
-    (calendar) => calendar.summary === summary,
+    (calendar) => calendar.summary === UMTAS_CALENDAR_NAME,
   );
   return (
-    existing?.id ?? (await createCalendar(accessToken, { summary }, opts)).id
+    existing?.id ??
+    (await createCalendar(accessToken, { summary: UMTAS_CALENDAR_NAME }, opts))
+      .id
   );
 }

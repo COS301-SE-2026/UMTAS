@@ -1,11 +1,6 @@
 /** @jest-environment node */
 
-import {
-  createCalendar,
-  ensureUmtasCalendar,
-  getCalendar,
-  listWritableCalendars,
-} from "./gc_calendars";
+import { ensureUmtasCalendar } from "./gc_calendars";
 
 function response(status: number, body: unknown = {}): Response {
   return new Response(JSON.stringify(body), {
@@ -34,7 +29,7 @@ describe("Google calendars", () => {
     };
   });
 
-  it("paginates writable calendars, drops deleted entries, and sorts primary first", async () => {
+  it("paginates calendar discovery and reuses an existing UMTAS calendar", async () => {
     fetchMock
       .mockResolvedValueOnce(
         response(200, {
@@ -52,55 +47,27 @@ describe("Google calendars", () => {
       )
       .mockResolvedValueOnce(
         response(200, {
-          items: [
-            { id: "p", summary: "Primary", accessRole: "owner", primary: true },
-          ],
+          items: [{ id: "p", summary: "UMTAS" }],
         }),
       );
-    await expect(listWritableCalendars("token")).resolves.toEqual([
-      { id: "p", summary: "Primary", accessRole: "owner", primary: true },
-      { id: "z", summary: "Zulu", accessRole: "writer", primary: false },
-    ]);
+    await expect(ensureUmtasCalendar("token")).resolves.toBe("p");
     expect(fetchMock.mock.calls[0][0]).toContain("minAccessRole=writer");
     expect(fetchMock.mock.calls[0][0]).toContain("showHidden=false");
     expect(fetchMock.mock.calls[1][0]).toContain("pageToken=next");
   });
 
-  it("creates and gets normalized calendars", async () => {
-    fetchMock
-      .mockResolvedValueOnce(
-        response(200, { id: "new", summary: "My timetable", timeZone: "UTC" }),
-      )
-      .mockResolvedValueOnce(
-        response(200, { id: "new", summary: "My timetable" }),
-      );
-    await expect(
-      createCalendar("token", { summary: "My timetable", timeZone: "UTC" }),
-    ).resolves.toMatchObject({
-      id: "new",
-      accessRole: "owner",
-      primary: false,
-    });
-    expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual({
-      summary: "My timetable",
-      timeZone: "UTC",
-    });
-    await expect(getCalendar("token", "new")).resolves.toMatchObject({
-      id: "new",
-      accessRole: "writer",
-    });
-  });
-
-  it("ensures a named calendar through the shared retrying operations", async () => {
+  it("creates the UMTAS calendar when discovery finds none", async () => {
     fetchMock
       .mockResolvedValueOnce(response(200, { items: [] }))
       .mockResolvedValueOnce(
-        response(200, { id: "created", summary: "Course calendar" }),
+        response(200, { id: "created", summary: "UMTAS" }),
       );
-    await expect(ensureUmtasCalendar("token", "Course calendar")).resolves.toBe(
-      "created",
-    );
+    await expect(ensureUmtasCalendar("token")).resolves.toBe("created");
     expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(JSON.parse(fetchMock.mock.calls[1][1].body)).toEqual({
+      summary: "UMTAS",
+      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    });
   });
 
   it("threads cancellation through calendar discovery", async () => {
@@ -118,7 +85,7 @@ describe("Google calendars", () => {
         }),
     );
 
-    const discovery = ensureUmtasCalendar("token", "UMTAS", {
+    const discovery = ensureUmtasCalendar("token", {
       signal: controller.signal,
     });
     controller.abort();
@@ -132,7 +99,15 @@ describe("Google calendars", () => {
       Promise.resolve(response(200, { items: [], nextPageToken: "stuck" })),
     );
 
-    await expect(listWritableCalendars("token")).resolves.toEqual([]);
-    expect(fetchMock).toHaveBeenCalledTimes(20);
+    fetchMock.mockImplementation((url: string) =>
+      Promise.resolve(
+        url.endsWith("/calendars")
+          ? response(200, { id: "created" })
+          : response(200, { items: [], nextPageToken: "stuck" }),
+      ),
+    );
+
+    await expect(ensureUmtasCalendar("token")).resolves.toBe("created");
+    expect(fetchMock).toHaveBeenCalledTimes(21);
   });
 });
