@@ -80,3 +80,30 @@ export function updateEventMut() {
     onError: (err) => console.error("mutation failed", err),
   });
 }
+
+import {
+  updateEventVenueBuilder,
+  updateEventVenueBody,
+  updateEventVenuePath,
+} from "@/app/builder/utils/events/eventRequestBuilder";
+
+export function updateEventVenueMut() {
+  return mutationOptions({
+    mutationFn: async (vars: {
+      path: updateEventVenuePath;
+      body: updateEventVenueBody;
+    }) => {
+      const result = await new updateEventVenueBuilder().send({
+        paths: vars.path,
+        body: vars.body,
+      });
+      return result;
+    },
+    onSuccess: () => {
+      getQueryClient().invalidateQueries({
+        queryKey: getAllEventsQ().queryKey,
+      });
+    },
+    onError: (err) => console.error("mutation failed", err),
+  });
+}

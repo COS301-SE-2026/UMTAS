@@ -22,6 +22,13 @@ export type bulkAssignVenuePath =
 export type bulkAssignVenueRes =
   paths["/api/venues/assign"]["post"]["responses"]["200"]["content"]["application/json"];
 
+export type updateEventVenuePath =
+  paths["/api/events/{id}/venue"]["patch"]["parameters"]["path"];
+export type updateEventVenueBody =
+  paths["/api/events/{id}/venue"]["patch"]["requestBody"]["content"]["application/json"];
+export type updateEventVenueRes =
+  paths["/api/events/{id}/venue"]["patch"]["responses"]["200"]["content"]["application/json"];
+
 export class getAllVenuesBuilder extends RequestBuilder<
   getAllVenuesQuery,
   undefined,
@@ -52,5 +59,15 @@ export class bulkAssignVenueBuilder extends RequestBuilder<
   constructor() {
     super();
     this.setUrl("/venues/assign").setMethod(RequestMethod.POST);
+  }
+}
+export class updateEventVenueBuilder extends RequestBuilder<
+  updateEventVenuePath,
+  updateEventVenueBody,
+  updateEventVenueRes
+> {
+  constructor() {
+    super();
+    this.setUrl("/events/{id}/venue").setMethod(RequestMethod.PATCH);
   }
 }
