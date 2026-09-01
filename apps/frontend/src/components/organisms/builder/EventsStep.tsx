@@ -9,6 +9,7 @@ import {
   AlertCircle,
   AwardIcon,
   ArrowUpWideNarrow,
+  University,
 } from "lucide-react";
 import {
   EventCard,
@@ -171,7 +172,14 @@ export function EventsStep({
   // a local construct to add an empty event
   function addNewEvent() {
     addEvent.mutate({
-      body: {},
+      body: {
+        eventCriteria: {
+          startTime: "07:30",
+          endTime: "08:30",
+          eventSource: "university",
+          moduleId: modules[0].moduleID,
+        },
+      },
     });
   }
 
