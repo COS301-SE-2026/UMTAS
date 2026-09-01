@@ -17,7 +17,9 @@
             }
           }
         },
-        "tags": ["App"]
+        "tags": [
+          "App"
+        ]
       }
     },
     "/api/auth/sign-up/email": {
@@ -77,7 +79,10 @@
           }
         },
         "summary": "Register with email and password",
-        "tags": ["Auth", "Auth Email"]
+        "tags": [
+          "Auth",
+          "Auth Email"
+        ]
       }
     },
     "/api/auth/sign-in/email": {
@@ -137,7 +142,10 @@
           }
         },
         "summary": "Sign in with email and password",
-        "tags": ["Auth", "Auth Email"]
+        "tags": [
+          "Auth",
+          "Auth Email"
+        ]
       }
     },
     "/api/auth/sign-out": {
@@ -172,7 +180,10 @@
           }
         ],
         "summary": "Sign out and invalidate the current session",
-        "tags": ["Auth", "Auth Session"]
+        "tags": [
+          "Auth",
+          "Auth Session"
+        ]
       }
     },
     "/api/auth/get-session": {
@@ -225,7 +236,10 @@
           }
         ],
         "summary": "Get the current user session",
-        "tags": ["Auth", "Auth Session"]
+        "tags": [
+          "Auth",
+          "Auth Session"
+        ]
       }
     },
     "/api/auth/list-sessions": {
@@ -263,7 +277,10 @@
           }
         ],
         "summary": "List all active sessions for the current user",
-        "tags": ["Auth", "Auth Session"]
+        "tags": [
+          "Auth",
+          "Auth Session"
+        ]
       }
     },
     "/api/auth/revoke-session": {
@@ -318,7 +335,10 @@
           }
         ],
         "summary": "Terminate a specific session by ID",
-        "tags": ["Auth", "Auth Session"]
+        "tags": [
+          "Auth",
+          "Auth Session"
+        ]
       }
     },
     "/api/auth/send-verification-email": {
@@ -373,7 +393,10 @@
           }
         ],
         "summary": "Send a verification email to the signed-in user",
-        "tags": ["Auth", "Auth Email"]
+        "tags": [
+          "Auth",
+          "Auth Email"
+        ]
       }
     },
     "/api/auth/verify-email": {
@@ -413,7 +436,10 @@
           }
         },
         "summary": "Verify email address using the code from the verification email",
-        "tags": ["Auth", "Auth Email"]
+        "tags": [
+          "Auth",
+          "Auth Email"
+        ]
       }
     },
     "/api/auth/forget-password": {
@@ -453,7 +479,10 @@
           }
         },
         "summary": "Request a password reset email",
-        "tags": ["Auth", "Auth Email"]
+        "tags": [
+          "Auth",
+          "Auth Email"
+        ]
       }
     },
     "/api/auth/reset-password": {
@@ -493,7 +522,10 @@
           }
         },
         "summary": "Reset password using the token from the reset email",
-        "tags": ["Auth", "Auth Email"]
+        "tags": [
+          "Auth",
+          "Auth Email"
+        ]
       }
     },
     "/api/auth/change-password": {
@@ -548,7 +580,10 @@
           }
         ],
         "summary": "Change password for the signed-in user",
-        "tags": ["Auth", "Auth Email"]
+        "tags": [
+          "Auth",
+          "Auth Email"
+        ]
       }
     },
     "/api/auth/callback/google": {
@@ -592,7 +627,10 @@
           }
         },
         "summary": "Google OAuth callback",
-        "tags": ["Auth", "Auth Google"]
+        "tags": [
+          "Auth",
+          "Auth Google"
+        ]
       }
     },
     "/api/auth/link-account/google": {
@@ -657,7 +695,10 @@
           }
         ],
         "summary": "Link a Google account to the current user",
-        "tags": ["Auth", "Auth Google"]
+        "tags": [
+          "Auth",
+          "Auth Google"
+        ]
       }
     },
     "/api/auth/admin/create-user": {
@@ -722,7 +763,10 @@
           }
         ],
         "summary": "Create a new user - requires sys_admin role",
-        "tags": ["Auth", "Auth Admin"]
+        "tags": [
+          "Auth",
+          "Auth Admin"
+        ]
       }
     },
     "/api/auth/admin/create-mock-user": {
@@ -758,7 +802,10 @@
           }
         ],
         "summary": "Create a new mock user",
-        "tags": ["Auth", "Auth Admin"]
+        "tags": [
+          "Auth",
+          "Auth Admin"
+        ]
       }
     },
     "/api/auth/admin/delete-mock-users": {
@@ -783,7 +830,10 @@
           }
         ],
         "summary": "Delete all mock users",
-        "tags": ["Auth", "Auth admin"]
+        "tags": [
+          "Auth",
+          "Auth admin"
+        ]
       }
     },
     "/api/auth/admin/impersonate-user": {
@@ -838,7 +888,10 @@
           }
         ],
         "summary": "Impersonate a user - requires sys_admin role",
-        "tags": ["Auth", "Auth Admin"]
+        "tags": [
+          "Auth",
+          "Auth Admin"
+        ]
       }
     },
     "/api/auth/admin/ban-user": {
@@ -903,7 +956,10 @@
           }
         ],
         "summary": "Ban a user - requires sys_admin role",
-        "tags": ["Auth", "Auth Admin"]
+        "tags": [
+          "Auth",
+          "Auth Admin"
+        ]
       }
     },
     "/api/auth/admin/update-user": {
@@ -978,7 +1034,10 @@
           }
         ],
         "summary": "Update a user's details - requires sys_admin role",
-        "tags": ["Auth", "Auth Admin"]
+        "tags": [
+          "Auth",
+          "Auth Admin"
+        ]
       }
     },
     "/api/auth/select-university": {
@@ -1013,7 +1072,9 @@
           }
         ],
         "summary": "Select current university",
-        "tags": ["Auth"]
+        "tags": [
+          "Auth"
+        ]
       }
     },
     "/api/health": {
@@ -1025,7 +1086,9 @@
             "description": ""
           }
         },
-        "tags": ["Health"]
+        "tags": [
+          "Health"
+        ]
       }
     },
     "/api/health/check": {
@@ -1037,7 +1100,9 @@
             "description": ""
           }
         },
-        "tags": ["Health"]
+        "tags": [
+          "Health"
+        ]
       }
     },
     "/api/modules": {
@@ -1074,7 +1139,9 @@
           }
         },
         "summary": "Create a module",
-        "tags": ["Modules"]
+        "tags": [
+          "Modules"
+        ]
       },
       "get": {
         "description": "Filter by userId(enrolled) | courseId(course owned) | universityId(modules for university over all courses). At least one filter required",
@@ -1149,7 +1216,9 @@
           }
         },
         "summary": "Get all modules with filters",
-        "tags": ["Modules"]
+        "tags": [
+          "Modules"
+        ]
       }
     },
     "/api/modules/v2": {
@@ -1183,7 +1252,9 @@
           }
         },
         "summary": "Create a module - V2",
-        "tags": ["Modules"]
+        "tags": [
+          "Modules"
+        ]
       },
       "get": {
         "description": "Filter by userId(enrolled) | courseId(course owned) | universityId(modules for university over all courses). At least one filter required \n\n      Enable stats response: filters: { stats=t/true/True/TRUE/1 }",
@@ -1264,7 +1335,9 @@
           }
         },
         "summary": "Get all modules with filters and counts - V2",
-        "tags": ["Modules"]
+        "tags": [
+          "Modules"
+        ]
       }
     },
     "/api/modules/{moduleId}": {
@@ -1300,7 +1373,9 @@
           }
         },
         "summary": "Get a module by ID",
-        "tags": ["Modules"]
+        "tags": [
+          "Modules"
+        ]
       },
       "patch": {
         "description": "Update a modules | STUDENT_OWNED needs to go through Builder Service",
@@ -1347,7 +1422,9 @@
           }
         },
         "summary": "Update a module",
-        "tags": ["Modules"]
+        "tags": [
+          "Modules"
+        ]
       },
       "delete": {
         "description": "Deletes a module | STUDENT_OWNED needs to go through Builder Service",
@@ -1381,7 +1458,9 @@
           }
         },
         "summary": "Delete a module by ID",
-        "tags": ["Modules"]
+        "tags": [
+          "Modules"
+        ]
       }
     },
     "/api/modules/v2/{moduleId}": {
@@ -1417,7 +1496,9 @@
           }
         },
         "summary": "Get a module by ID - V2",
-        "tags": ["Modules"]
+        "tags": [
+          "Modules"
+        ]
       }
     },
     "/api/modules/enroll/{moduleId}": {
@@ -1459,7 +1540,9 @@
           }
         },
         "summary": "Enrol student to module",
-        "tags": ["Modules"]
+        "tags": [
+          "Modules"
+        ]
       },
       "patch": {
         "operationId": "enrolStudentToModuleV2",
@@ -1509,7 +1592,9 @@
           }
         },
         "summary": "Enrol student to module - V2",
-        "tags": ["Modules"]
+        "tags": [
+          "Modules"
+        ]
       }
     },
     "/api/modules/{CourseID}": {
@@ -1551,7 +1636,9 @@
           }
         },
         "summary": "Populate Course with modules array",
-        "tags": ["Modules"]
+        "tags": [
+          "Modules"
+        ]
       }
     },
     "/api/modules/styling/{moduleId}": {
@@ -1594,7 +1681,9 @@
           }
         },
         "summary": "Update a module styling",
-        "tags": ["Modules"]
+        "tags": [
+          "Modules"
+        ]
       }
     },
     "/api/Courses": {
@@ -1630,7 +1719,9 @@
           }
         },
         "summary": "Create a Course",
-        "tags": ["Courses"]
+        "tags": [
+          "Courses"
+        ]
       }
     },
     "/api/Courses/getAll": {
@@ -1670,7 +1761,9 @@
           }
         },
         "summary": "Get all courses",
-        "tags": ["Courses"]
+        "tags": [
+          "Courses"
+        ]
       }
     },
     "/api/Courses/v2/getAll": {
@@ -1737,7 +1830,9 @@
           }
         },
         "summary": "Get all courses - V2",
-        "tags": ["Courses"]
+        "tags": [
+          "Courses"
+        ]
       }
     },
     "/api/Courses/{CourseId}": {
@@ -1772,7 +1867,9 @@
           }
         },
         "summary": "get a Course by ID",
-        "tags": ["Courses"]
+        "tags": [
+          "Courses"
+        ]
       },
       "patch": {
         "operationId": "updateCourse",
@@ -1815,7 +1912,9 @@
           }
         },
         "summary": "Update an Course",
-        "tags": ["Courses"]
+        "tags": [
+          "Courses"
+        ]
       },
       "delete": {
         "operationId": "deleteCourse",
@@ -1848,7 +1947,9 @@
           }
         },
         "summary": "Delete Course by Course ID",
-        "tags": ["Courses"]
+        "tags": [
+          "Courses"
+        ]
       }
     },
     "/api/Courses/v2/{CourseId}": {
@@ -1883,7 +1984,9 @@
           }
         },
         "summary": "get a Course by ID - V2",
-        "tags": ["Courses"]
+        "tags": [
+          "Courses"
+        ]
       }
     },
     "/api/universities": {
@@ -1919,7 +2022,9 @@
           }
         },
         "summary": "Create a University",
-        "tags": ["Universities"]
+        "tags": [
+          "Universities"
+        ]
       },
       "get": {
         "operationId": "getUniversities",
@@ -1940,7 +2045,9 @@
           }
         },
         "summary": "Get all universities",
-        "tags": ["Universities"]
+        "tags": [
+          "Universities"
+        ]
       }
     },
     "/api/universities/{universityId}": {
@@ -1975,7 +2082,9 @@
           }
         },
         "summary": "get a university by ID",
-        "tags": ["Universities"]
+        "tags": [
+          "Universities"
+        ]
       },
       "patch": {
         "operationId": "updateUniversity",
@@ -2018,7 +2127,9 @@
           }
         },
         "summary": "Update an university",
-        "tags": ["Universities"]
+        "tags": [
+          "Universities"
+        ]
       },
       "delete": {
         "operationId": "deleteUniversity",
@@ -2051,7 +2162,9 @@
           }
         },
         "summary": "Delete university by university ID",
-        "tags": ["Universities"]
+        "tags": [
+          "Universities"
+        ]
       }
     },
     "/api/universities/role/{universityId}": {
@@ -2086,7 +2199,9 @@
           }
         },
         "summary": "get a users role by universityID",
-        "tags": ["Universities"]
+        "tags": [
+          "Universities"
+        ]
       }
     },
     "/api/universities/applications/{universityID}": {
@@ -2131,7 +2246,9 @@
           }
         },
         "summary": "Get all applications for a specific university",
-        "tags": ["Universities"]
+        "tags": [
+          "Universities"
+        ]
       }
     },
     "/api/universities/apply": {
@@ -2172,7 +2289,9 @@
           }
         },
         "summary": "Apply for a role at a specific university",
-        "tags": ["Universities"]
+        "tags": [
+          "Universities"
+        ]
       }
     },
     "/api/universities/approve": {
@@ -2213,7 +2332,9 @@
           }
         },
         "summary": "Approve a users role for a university",
-        "tags": ["Universities"]
+        "tags": [
+          "Universities"
+        ]
       }
     },
     "/api/grouping/{groupId}": {
@@ -2259,7 +2380,9 @@
           }
         },
         "summary": "Add array of modules to a module group",
-        "tags": ["Grouping"]
+        "tags": [
+          "Grouping"
+        ]
       }
     },
     "/api/events/v2": {
@@ -2289,7 +2412,9 @@
           }
         },
         "summary": "Create an event - V2",
-        "tags": ["Events"]
+        "tags": [
+          "Events"
+        ]
       }
     },
     "/api/events": {
@@ -2331,7 +2456,9 @@
           }
         },
         "summary": "Create an event",
-        "tags": ["Events"]
+        "tags": [
+          "Events"
+        ]
       },
       "get": {
         "description": "Apply filters - Enable stats mode with filters.stats=TRUE",
@@ -2392,7 +2519,9 @@
           }
         },
         "summary": "Get all events",
-        "tags": ["Events"]
+        "tags": [
+          "Events"
+        ]
       }
     },
     "/api/events/{eventId}": {
@@ -2424,7 +2553,9 @@
           }
         },
         "summary": "Get event by ID",
-        "tags": ["Events"]
+        "tags": [
+          "Events"
+        ]
       }
     },
     "/api/events/{id}": {
@@ -2478,7 +2609,9 @@
           }
         },
         "summary": "Update an event",
-        "tags": ["Events"]
+        "tags": [
+          "Events"
+        ]
       },
       "delete": {
         "operationId": "deleteEvent",
@@ -2517,7 +2650,9 @@
           }
         },
         "summary": "Delete an event",
-        "tags": ["Events"]
+        "tags": [
+          "Events"
+        ]
       }
     },
     "/api/events/validate/{id}": {
@@ -2559,7 +2694,9 @@
           }
         },
         "summary": "Validate an event",
-        "tags": ["Events"]
+        "tags": [
+          "Events"
+        ]
       }
     },
     "/api/timetables": {
@@ -2598,7 +2735,9 @@
           }
         },
         "summary": "Create a timetable - user owned",
-        "tags": ["Timetables"]
+        "tags": [
+          "Timetables"
+        ]
       },
       "get": {
         "operationId": "getAllTimetables",
@@ -2619,7 +2758,9 @@
           }
         },
         "summary": "Get all timetables",
-        "tags": ["Timetables"]
+        "tags": [
+          "Timetables"
+        ]
       }
     },
     "/api/timetables/v2": {
@@ -2642,7 +2783,9 @@
           }
         },
         "summary": "Get all timetables",
-        "tags": ["Timetables"]
+        "tags": [
+          "Timetables"
+        ]
       }
     },
     "/api/timetables/{id}": {
@@ -2675,7 +2818,9 @@
           }
         },
         "summary": "Get timetable by ID",
-        "tags": ["Timetables"]
+        "tags": [
+          "Timetables"
+        ]
       },
       "patch": {
         "operationId": "updateTimetable",
@@ -2725,7 +2870,9 @@
           }
         },
         "summary": "Update a timetable",
-        "tags": ["Timetables"]
+        "tags": [
+          "Timetables"
+        ]
       },
       "delete": {
         "operationId": "deleteTimetable",
@@ -2762,7 +2909,9 @@
           }
         },
         "summary": "Delete a timetable",
-        "tags": ["Timetables"]
+        "tags": [
+          "Timetables"
+        ]
       }
     },
     "/api/timetables/v2/{id}": {
@@ -2795,7 +2944,9 @@
           }
         },
         "summary": "Get timetable by ID",
-        "tags": ["Timetables"]
+        "tags": [
+          "Timetables"
+        ]
       }
     },
     "/api/builder/personalModule": {
@@ -2816,7 +2967,9 @@
           }
         },
         "summary": "Get personal module",
-        "tags": ["Builder"]
+        "tags": [
+          "Builder"
+        ]
       }
     },
     "/api/builder": {
@@ -2853,7 +3006,9 @@
           }
         },
         "summary": "Create a user defined module",
-        "tags": ["Builder"]
+        "tags": [
+          "Builder"
+        ]
       },
       "get": {
         "description": "Filter by userId(enrolled) | courseId(course owned) | universityId(modules for university over all courses). At least one filter required",
@@ -2878,7 +3033,9 @@
           }
         },
         "summary": "Get all modules a user is enrolled in with their course",
-        "tags": ["Builder"]
+        "tags": [
+          "Builder"
+        ]
       }
     },
     "/api/builder/{moduleId}": {
@@ -2914,7 +3071,9 @@
           }
         },
         "summary": "Get a module by ID",
-        "tags": ["Builder"]
+        "tags": [
+          "Builder"
+        ]
       },
       "patch": {
         "description": "STUDENT_OWNED so they can update any field of the module",
@@ -2961,7 +3120,9 @@
           }
         },
         "summary": "Update a module that the student owns",
-        "tags": ["Builder"]
+        "tags": [
+          "Builder"
+        ]
       },
       "delete": {
         "description": "STUDENT_OWNED so student is allowed to delete the module if they own it",
@@ -2995,7 +3156,9 @@
           }
         },
         "summary": "Delete a module by ID",
-        "tags": ["Builder"]
+        "tags": [
+          "Builder"
+        ]
       }
     },
     "/api/builder/events": {
@@ -3029,7 +3192,9 @@
           }
         },
         "summary": "Create a user defined event",
-        "tags": ["Builder"]
+        "tags": [
+          "Builder"
+        ]
       }
     },
     "/api/pdf-parser/jobs/lookup": {
@@ -3088,7 +3253,9 @@
           }
         },
         "summary": "Look up an existing PDF parser job by PDF stream fingerprint",
-        "tags": ["PDF Parser"]
+        "tags": [
+          "PDF Parser"
+        ]
       }
     },
     "/api/pdf-parser/jobs/upload": {
@@ -3102,7 +3269,10 @@
             "multipart/form-data": {
               "schema": {
                 "type": "object",
-                "required": ["file", "universityId"],
+                "required": [
+                  "file",
+                  "universityId"
+                ],
                 "properties": {
                   "file": {
                     "type": "string",
@@ -3150,7 +3320,9 @@
           }
         },
         "summary": "Upload a timetable PDF and enqueue it for parsing",
-        "tags": ["PDF Parser"]
+        "tags": [
+          "PDF Parser"
+        ]
       }
     },
     "/api/pdf-parser/jobs/{jobId}": {
@@ -3180,7 +3352,9 @@
           }
         },
         "summary": "Get PDF parser job status and result metadata",
-        "tags": ["PDF Parser"]
+        "tags": [
+          "PDF Parser"
+        ]
       }
     },
     "/api/pdf-parser/jobs/{jobId}/result": {
@@ -3210,7 +3384,9 @@
           }
         },
         "summary": "Get completed PDF parser result",
-        "tags": ["PDF Parser"]
+        "tags": [
+          "PDF Parser"
+        ]
       }
     },
     "/api/pdf-parser/jobs/{jobId}/callback": {
@@ -3254,7 +3430,9 @@
           }
         ],
         "summary": "Receive final PDF parser worker callback",
-        "tags": ["PDF Parser"]
+        "tags": [
+          "PDF Parser"
+        ]
       }
     },
     "/api/solver/jobs": {
@@ -3289,7 +3467,9 @@
           }
         ],
         "summary": "Persist and enqueue a timetable solve job",
-        "tags": ["Solver"]
+        "tags": [
+          "Solver"
+        ]
       }
     },
     "/api/solver/jobs/{jobId}/input": {
@@ -3323,7 +3503,9 @@
           }
         ],
         "summary": "Build solver input for an authenticated worker",
-        "tags": ["Solver"]
+        "tags": [
+          "Solver"
+        ]
       }
     },
     "/api/solver/jobs/{jobId}": {
@@ -3357,7 +3539,9 @@
           }
         ],
         "summary": "Get solver job status and persisted result metadata",
-        "tags": ["Solver"]
+        "tags": [
+          "Solver"
+        ]
       }
     },
     "/api/solver/jobs/{jobId}/result": {
@@ -3391,7 +3575,9 @@
           }
         ],
         "summary": "Get a completed solver result",
-        "tags": ["Solver"]
+        "tags": [
+          "Solver"
+        ]
       }
     },
     "/api/solver/jobs/{jobId}/callback": {
@@ -3443,7 +3629,9 @@
           }
         ],
         "summary": "Receive final solver worker callback",
-        "tags": ["Solver"]
+        "tags": [
+          "Solver"
+        ]
       }
     },
     "/api/attendance": {
@@ -3473,7 +3661,9 @@
           }
         },
         "summary": "Create attendance record for current user for an event",
-        "tags": ["Attendance"]
+        "tags": [
+          "Attendance"
+        ]
       },
       "get": {
         "operationId": "getAllAttendance",
@@ -3507,7 +3697,10 @@
             "schema": {
               "example": "ATTENDING",
               "type": "string",
-              "enum": ["ATTENDING", "NOT_ATTENDING"]
+              "enum": [
+                "ATTENDING",
+                "NOT_ATTENDING"
+              ]
             }
           },
           {
@@ -3534,7 +3727,9 @@
           }
         },
         "summary": "Get all attendance records for user or with filters",
-        "tags": ["Attendance"]
+        "tags": [
+          "Attendance"
+        ]
       }
     },
     "/api/attendance/{attendanceId}": {
@@ -3563,7 +3758,9 @@
           }
         },
         "summary": "Get attendance record by attendanceID",
-        "tags": ["Attendance"]
+        "tags": [
+          "Attendance"
+        ]
       },
       "patch": {
         "operationId": "updateAttendance",
@@ -3600,7 +3797,9 @@
           }
         },
         "summary": "Update date or state of attendance",
-        "tags": ["Attendance"]
+        "tags": [
+          "Attendance"
+        ]
       },
       "delete": {
         "operationId": "deleteAttendance",
@@ -3627,7 +3826,9 @@
           }
         },
         "summary": "Delete an attendance record - effectively making attendance NOT_STATED",
-        "tags": ["Attendance"]
+        "tags": [
+          "Attendance"
+        ]
       }
     },
     "/api/academic-calendar/generate": {
@@ -3675,7 +3876,9 @@
           }
         ],
         "summary": "Generate and persist a calendar snapshot",
-        "tags": ["Academic Calendar"]
+        "tags": [
+          "Academic Calendar"
+        ]
       }
     },
     "/api/academic-calendar/generated/{id}": {
@@ -3718,7 +3921,9 @@
           }
         ],
         "summary": "Get a generated calendar snapshot",
-        "tags": ["Academic Calendar"]
+        "tags": [
+          "Academic Calendar"
+        ]
       }
     },
     "/api/academic-calendar/public": {
@@ -3763,7 +3968,9 @@
           }
         ],
         "summary": "List public academic calendars",
-        "tags": ["Academic Calendar"]
+        "tags": [
+          "Academic Calendar"
+        ]
       }
     },
     "/api/academic-calendar": {
@@ -3811,7 +4018,9 @@
           }
         ],
         "summary": "Create an academic calendar",
-        "tags": ["Academic Calendar"]
+        "tags": [
+          "Academic Calendar"
+        ]
       },
       "get": {
         "description": "Returns calendars belonging to the university selected in the current session, optionally filtered by academic year.",
@@ -3860,7 +4069,9 @@
           }
         ],
         "summary": "List academic calendars",
-        "tags": ["Academic Calendar"]
+        "tags": [
+          "Academic Calendar"
+        ]
       }
     },
     "/api/academic-calendar/{id}/restrictions": {
@@ -3909,7 +4120,9 @@
           }
         ],
         "summary": "List an academic calendar's restrictions",
-        "tags": ["Academic Calendar"]
+        "tags": [
+          "Academic Calendar"
+        ]
       },
       "post": {
         "description": "Creates a dated restriction. Omitted endDate defaults to startDate and omitted description defaults to an empty string.",
@@ -3972,7 +4185,9 @@
           }
         ],
         "summary": "Create an academic calendar restriction",
-        "tags": ["Academic Calendar"]
+        "tags": [
+          "Academic Calendar"
+        ]
       }
     },
     "/api/academic-calendar/{id}/restrictions/{restrictionId}": {
@@ -4047,7 +4262,9 @@
           }
         ],
         "summary": "Replace an academic calendar restriction",
-        "tags": ["Academic Calendar"]
+        "tags": [
+          "Academic Calendar"
+        ]
       },
       "delete": {
         "description": "Deletes a restriction only when it belongs to the specified calendar in the selected university.",
@@ -4104,7 +4321,9 @@
           }
         ],
         "summary": "Delete an academic calendar restriction",
-        "tags": ["Academic Calendar"]
+        "tags": [
+          "Academic Calendar"
+        ]
       }
     },
     "/api/academic-calendar/{id}/subscriptions": {
@@ -4166,7 +4385,9 @@
           }
         ],
         "summary": "Replace an academic calendar's public-calendar subscriptions",
-        "tags": ["Academic Calendar"]
+        "tags": [
+          "Academic Calendar"
+        ]
       }
     },
     "/api/academic-calendar/{id}": {
@@ -4215,7 +4436,9 @@
           }
         ],
         "summary": "Get an academic calendar",
-        "tags": ["Academic Calendar"]
+        "tags": [
+          "Academic Calendar"
+        ]
       },
       "delete": {
         "description": "Deletes a calendar and cascades to its restrictions. Deletion is rejected while generated snapshots reference it.",
@@ -4265,7 +4488,9 @@
           }
         ],
         "summary": "Delete an academic calendar",
-        "tags": ["Academic Calendar"]
+        "tags": [
+          "Academic Calendar"
+        ]
       }
     },
     "/api/api-service/courses": {
@@ -4313,7 +4538,9 @@
           }
         },
         "summary": "Fetch courses",
-        "tags": ["ApiService"]
+        "tags": [
+          "ApiService"
+        ]
       }
     },
     "/api/api-service/course": {
@@ -4350,7 +4577,9 @@
           }
         },
         "summary": "Get a specific course",
-        "tags": ["ApiService"]
+        "tags": [
+          "ApiService"
+        ]
       }
     },
     "/api/api-service/modules": {
@@ -4388,7 +4617,9 @@
           }
         },
         "summary": "Fetch modules",
-        "tags": ["ApiService"]
+        "tags": [
+          "ApiService"
+        ]
       }
     },
     "/api/api-service/events": {
@@ -4426,7 +4657,9 @@
           }
         },
         "summary": "Fetch events",
-        "tags": ["ApiService"]
+        "tags": [
+          "ApiService"
+        ]
       }
     }
   },
@@ -4517,7 +4750,10 @@
           },
           "role": {
             "type": "string",
-            "enum": ["user", "sys_admin"]
+            "enum": [
+              "user",
+              "sys_admin"
+            ]
           },
           "banned": {
             "type": "boolean"
@@ -4622,7 +4858,10 @@
             ]
           }
         },
-        "required": ["user", "session"]
+        "required": [
+          "user",
+          "session"
+        ]
       },
       "SignUpEmailDto": {
         "type": "object",
@@ -4648,7 +4887,11 @@
             "default": "System Admin"
           }
         },
-        "required": ["email", "password", "name"]
+        "required": [
+          "email",
+          "password",
+          "name"
+        ]
       },
       "AuthErrorDto": {
         "type": "object",
@@ -4678,7 +4921,9 @@
             "type": "string"
           }
         },
-        "required": ["error"]
+        "required": [
+          "error"
+        ]
       },
       "SignInEmailDto": {
         "type": "object",
@@ -4699,7 +4944,10 @@
             "description": "Optional university ID to select upon sign-in"
           }
         },
-        "required": ["email", "password"]
+        "required": [
+          "email",
+          "password"
+        ]
       },
       "AuthAcknowledgementDto": {
         "type": "object",
@@ -4715,7 +4963,9 @@
             "description": "ID of the session to terminate"
           }
         },
-        "required": ["sessionId"]
+        "required": [
+          "sessionId"
+        ]
       },
       "VerifyEmailDto": {
         "type": "object",
@@ -4732,7 +4982,10 @@
             "default": "system-admin@local.umtas"
           }
         },
-        "required": ["code", "email"]
+        "required": [
+          "code",
+          "email"
+        ]
       },
       "ForgetPasswordDto": {
         "type": "object",
@@ -4743,7 +4996,9 @@
             "default": "system-admin@local.umtas"
           }
         },
-        "required": ["email"]
+        "required": [
+          "email"
+        ]
       },
       "ResetPasswordDto": {
         "type": "object",
@@ -4762,7 +5017,10 @@
             "maxLength": 128
           }
         },
-        "required": ["token", "newPassword"]
+        "required": [
+          "token",
+          "newPassword"
+        ]
       },
       "ChangePasswordDto": {
         "type": "object",
@@ -4780,7 +5038,10 @@
             "maxLength": 128
           }
         },
-        "required": ["currentPassword", "newPassword"]
+        "required": [
+          "currentPassword",
+          "newPassword"
+        ]
       },
       "LinkGoogleAccountDto": {
         "type": "object",
@@ -4798,7 +5059,10 @@
             "description": "OAuth state parameter"
           }
         },
-        "required": ["code", "state"]
+        "required": [
+          "code",
+          "state"
+        ]
       },
       "AdminCreateUserDto": {
         "type": "object",
@@ -4822,12 +5086,18 @@
           },
           "role": {
             "type": "string",
-            "enum": ["user", "sys_admin"],
+            "enum": [
+              "user",
+              "sys_admin"
+            ],
             "example": "user",
             "default": "user"
           }
         },
-        "required": ["email", "password"]
+        "required": [
+          "email",
+          "password"
+        ]
       },
       "AuthUserResponseDto": {
         "type": "object",
@@ -4836,7 +5106,9 @@
             "$ref": "#/components/schemas/AuthUserDto"
           }
         },
-        "required": ["user"]
+        "required": [
+          "user"
+        ]
       },
       "CreateMockUserDto": {
         "type": "object",
@@ -4854,7 +5126,12 @@
             "example": "password123!"
           },
           "role": {
-            "enum": ["STUDENT", "LECTURER", "UNIVERSITY_ADMIN", "SYS_ADMIN"],
+            "enum": [
+              "STUDENT",
+              "LECTURER",
+              "UNIVERSITY_ADMIN",
+              "SYS_ADMIN"
+            ],
             "type": "string",
             "example": "STUDENT"
           },
@@ -4874,7 +5151,10 @@
             "type": "string"
           }
         },
-        "required": ["success", "message"]
+        "required": [
+          "success",
+          "message"
+        ]
       },
       "AdminImpersonateUserDto": {
         "type": "object",
@@ -4886,7 +5166,9 @@
             "description": "UUID of the user to impersonate"
           }
         },
-        "required": ["userId"]
+        "required": [
+          "userId"
+        ]
       },
       "AdminBanUserDto": {
         "type": "object",
@@ -4909,7 +5191,10 @@
             "description": "Ban expiry datetime. Omit or set null for a permanent ban."
           }
         },
-        "required": ["userId", "reason"]
+        "required": [
+          "userId",
+          "reason"
+        ]
       },
       "AdminUpdateUserDto": {
         "type": "object",
@@ -4930,11 +5215,16 @@
           },
           "role": {
             "type": "string",
-            "enum": ["user", "sys_admin"],
+            "enum": [
+              "user",
+              "sys_admin"
+            ],
             "example": "user"
           }
         },
-        "required": ["userId"]
+        "required": [
+          "userId"
+        ]
       },
       "SelectUniversityDto": {
         "type": "object",
@@ -4946,11 +5236,17 @@
             "description": "University ID selected by the user"
           }
         },
-        "required": ["uniId"]
+        "required": [
+          "uniId"
+        ]
       },
       "AcademicSemester": {
         "type": "string",
-        "enum": ["SEMESTER_1", "SEMESTER_2", "YEAR"],
+        "enum": [
+          "SEMESTER_1",
+          "SEMESTER_2",
+          "YEAR"
+        ],
         "description": "Academic period in which this module is taught. Null or omitted means the whole academic year."
       },
       "StylingDto": {
@@ -4961,7 +5257,9 @@
             "example": "#3B82F6"
           }
         },
-        "required": ["colour"]
+        "required": [
+          "colour"
+        ]
       },
       "CreateCourseModuleDto": {
         "type": "object",
@@ -5065,7 +5363,10 @@
             ]
           }
         },
-        "required": ["moduleCode", "moduleName"]
+        "required": [
+          "moduleCode",
+          "moduleName"
+        ]
       },
       "CourseModuleDto": {
         "type": "object",
@@ -5106,13 +5407,20 @@
             "description": "Which year does the module belong to for the course"
           }
         },
-        "required": ["CourseModuleID", "GroupModuleID", "CourseID"]
+        "required": [
+          "CourseModuleID",
+          "GroupModuleID",
+          "CourseID"
+        ]
       },
       "EventCriteriaDto": {
         "type": "object",
         "properties": {
           "eventSource": {
-            "enum": ["university", "personal"],
+            "enum": [
+              "university",
+              "personal"
+            ],
             "type": "string"
           },
           "date": {
@@ -5146,7 +5454,11 @@
             "format": "uuid"
           }
         },
-        "required": ["eventSource", "startTime", "endTime"]
+        "required": [
+          "eventSource",
+          "startTime",
+          "endTime"
+        ]
       },
       "VenueDto": {
         "type": "object",
@@ -5159,7 +5471,10 @@
             "type": "string"
           }
         },
-        "required": ["venueId", "venueName"]
+        "required": [
+          "venueId",
+          "venueName"
+        ]
       },
       "EventDto": {
         "type": "object",
@@ -5181,7 +5496,13 @@
           },
           "activityType": {
             "type": "string",
-            "enum": ["lecture", "tutorial", "prac", "test", "exam"]
+            "enum": [
+              "lecture",
+              "tutorial",
+              "prac",
+              "test",
+              "exam"
+            ]
           },
           "eventCriteria": {
             "$ref": "#/components/schemas/EventCriteriaDto"
@@ -5199,7 +5520,10 @@
             }
           }
         },
-        "required": ["eventId", "eventCriteria"]
+        "required": [
+          "eventId",
+          "eventCriteria"
+        ]
       },
       "ModuleSingleResponseDto": {
         "type": "object",
@@ -5304,7 +5628,11 @@
             "description": "Unique identifier for a module group"
           }
         },
-        "required": ["moduleID", "moduleCode", "moduleName"]
+        "required": [
+          "moduleID",
+          "moduleCode",
+          "moduleName"
+        ]
       },
       "ModuleListResponseDto": {
         "type": "object",
@@ -5321,7 +5649,9 @@
             "description": "Short message indicating  success of response."
           }
         },
-        "required": ["modules"]
+        "required": [
+          "modules"
+        ]
       },
       "ModuleListResponseDtoV2": {
         "type": "object",
@@ -5343,7 +5673,9 @@
             "description": "Count of Modules"
           }
         },
-        "required": ["modules"]
+        "required": [
+          "modules"
+        ]
       },
       "UpdateModuleDto": {
         "type": "object",
@@ -5457,7 +5789,10 @@
             "example": true
           }
         },
-        "required": ["moduleCode", "success"]
+        "required": [
+          "moduleCode",
+          "success"
+        ]
       },
       "EnrolResponseDto": {
         "type": "object",
@@ -5477,7 +5812,11 @@
             "type": "string"
           }
         },
-        "required": ["moduleID", "message", "UserID"]
+        "required": [
+          "moduleID",
+          "message",
+          "UserID"
+        ]
       },
       "EnrollToModuleDto": {
         "type": "object",
@@ -5505,7 +5844,9 @@
             }
           }
         },
-        "required": ["modules"]
+        "required": [
+          "modules"
+        ]
       },
       "AddModulesToCourseResponseDto": {
         "type": "object",
@@ -5530,7 +5871,10 @@
             "example": "00000000-0000-0000-0000-000000000000"
           }
         },
-        "required": ["modules", "CourseID"]
+        "required": [
+          "modules",
+          "CourseID"
+        ]
       },
       "ModuleStylingBodyDto": {
         "type": "object",
@@ -5547,7 +5891,9 @@
             ]
           }
         },
-        "required": ["styling"]
+        "required": [
+          "styling"
+        ]
       },
       "ModuleStylingResponseDto": {
         "type": "object",
@@ -5558,7 +5904,9 @@
             "example": "Suceess"
           }
         },
-        "required": ["message"]
+        "required": [
+          "message"
+        ]
       },
       "CreateCourseDto": {
         "type": "object",
@@ -5600,7 +5948,10 @@
             "description": "Refer to course on external API"
           }
         },
-        "required": ["UniversityID", "CourseName"]
+        "required": [
+          "UniversityID",
+          "CourseName"
+        ]
       },
       "ModulesDto": {
         "type": "object",
@@ -5699,7 +6050,11 @@
             "description": "Is a user enrolled to this module"
           }
         },
-        "required": ["moduleID", "moduleCode", "moduleName"]
+        "required": [
+          "moduleID",
+          "moduleCode",
+          "moduleName"
+        ]
       },
       "CourseSingleResponseDto": {
         "type": "object",
@@ -5755,7 +6110,11 @@
             "description": "Refer to course on external API"
           }
         },
-        "required": ["CourseID", "UniversityID", "CourseName"]
+        "required": [
+          "CourseID",
+          "UniversityID",
+          "CourseName"
+        ]
       },
       "CourseFilters": {
         "type": "object",
@@ -5837,7 +6196,11 @@
             "description": "Refer to course on external API"
           }
         },
-        "required": ["CourseID", "UniversityID", "CourseName"]
+        "required": [
+          "CourseID",
+          "UniversityID",
+          "CourseName"
+        ]
       },
       "CourseListResponseDto": {
         "type": "object",
@@ -5853,7 +6216,9 @@
             "type": "string"
           }
         },
-        "required": ["courses"]
+        "required": [
+          "courses"
+        ]
       },
       "CourseListResponseDtoV2": {
         "type": "object",
@@ -5874,7 +6239,9 @@
             "type": "string"
           }
         },
-        "required": ["courses"]
+        "required": [
+          "courses"
+        ]
       },
       "UpdateCourseDto": {
         "type": "object",
@@ -5940,7 +6307,10 @@
             "example": true
           }
         },
-        "required": ["CourseName", "success"]
+        "required": [
+          "CourseName",
+          "success"
+        ]
       },
       "CreateUniversityDto": {
         "type": "object",
@@ -5953,7 +6323,9 @@
             "description": "Name of the university"
           }
         },
-        "required": ["UniversityName"]
+        "required": [
+          "UniversityName"
+        ]
       },
       "UniversitySingleResponseDto": {
         "type": "object",
@@ -6012,7 +6384,10 @@
             "description": "Role current user has for university"
           }
         },
-        "required": ["UniversityID", "UniversityName"]
+        "required": [
+          "UniversityID",
+          "UniversityName"
+        ]
       },
       "UniversityDto": {
         "type": "object",
@@ -6071,7 +6446,10 @@
             "description": "Role current user has for university"
           }
         },
-        "required": ["UniversityID", "UniversityName"]
+        "required": [
+          "UniversityID",
+          "UniversityName"
+        ]
       },
       "UniversityListResponseDto": {
         "type": "object",
@@ -6084,7 +6462,9 @@
             }
           }
         },
-        "required": ["universities"]
+        "required": [
+          "universities"
+        ]
       },
       "UserUniversityRoleResponseDto": {
         "type": "object",
@@ -6111,7 +6491,11 @@
             ]
           }
         },
-        "required": ["UniversityID", "UserID", "role"]
+        "required": [
+          "UniversityID",
+          "UserID",
+          "role"
+        ]
       },
       "UpdateUniversityDto": {
         "type": "object",
@@ -6164,7 +6548,10 @@
             "example": true
           }
         },
-        "required": ["UniversityName", "success"]
+        "required": [
+          "UniversityName",
+          "success"
+        ]
       },
       "GetRoleFilterDto": {
         "type": "object",
@@ -6214,7 +6601,13 @@
             "example": "LECTURER_PENDING"
           }
         },
-        "required": ["UserID", "Email", "Name", "UniversityID", "role"]
+        "required": [
+          "UserID",
+          "Email",
+          "Name",
+          "UniversityID",
+          "role"
+        ]
       },
       "ApplyForUniRoleDto": {
         "type": "object",
@@ -6242,7 +6635,9 @@
             "description": "Role current user has for university"
           }
         },
-        "required": ["UniversityID"]
+        "required": [
+          "UniversityID"
+        ]
       },
       "ApproveUsersRoleDto": {
         "type": "object",
@@ -6279,7 +6674,11 @@
             "example": "LECTURER_PENDING"
           }
         },
-        "required": ["UniversityID", "userId", "isApproved"]
+        "required": [
+          "UniversityID",
+          "userId",
+          "isApproved"
+        ]
       },
       "ApprovedUserRoleResponse": {
         "type": "object",
@@ -6294,7 +6693,10 @@
             "example": true
           }
         },
-        "required": ["userId", "success"]
+        "required": [
+          "userId",
+          "success"
+        ]
       },
       "PopulateGroupBodyDto": {
         "type": "object",
@@ -6313,7 +6715,9 @@
             }
           }
         },
-        "required": ["modules"]
+        "required": [
+          "modules"
+        ]
       },
       "GroupingSingleResponse": {
         "type": "object",
@@ -6335,7 +6739,9 @@
             }
           }
         },
-        "required": ["GroupID"]
+        "required": [
+          "GroupID"
+        ]
       },
       "EventCriteriaDtoV2": {
         "type": "object",
@@ -6391,7 +6797,13 @@
           },
           "activityType": {
             "type": "string",
-            "enum": ["lecture", "tutorial", "prac", "test", "exam"]
+            "enum": [
+              "lecture",
+              "tutorial",
+              "prac",
+              "test",
+              "exam"
+            ]
           },
           "isRecurring": {
             "type": "boolean"
@@ -6409,7 +6821,9 @@
             "$ref": "#/components/schemas/EventCriteriaDtoV2"
           }
         },
-        "required": ["eventCriteria"]
+        "required": [
+          "eventCriteria"
+        ]
       },
       "EventSingleResponseDto": {
         "type": "object",
@@ -6421,7 +6835,9 @@
             "type": "string"
           }
         },
-        "required": ["event"]
+        "required": [
+          "event"
+        ]
       },
       "CreateEventDto": {
         "type": "object",
@@ -6454,11 +6870,19 @@
           },
           "activityType": {
             "type": "string",
-            "enum": ["lecture", "tutorial", "prac", "test", "exam"],
+            "enum": [
+              "lecture",
+              "tutorial",
+              "prac",
+              "test",
+              "exam"
+            ],
             "description": "Required when eventCriteria.moduleId is provided."
           }
         },
-        "required": ["eventCriteria"]
+        "required": [
+          "eventCriteria"
+        ]
       },
       "EventListResponseDtoV2": {
         "type": "object",
@@ -6478,13 +6902,18 @@
             "type": "string"
           }
         },
-        "required": ["events"]
+        "required": [
+          "events"
+        ]
       },
       "UpdateEventCriteriaDto": {
         "type": "object",
         "properties": {
           "eventSource": {
-            "enum": ["university", "personal"],
+            "enum": [
+              "university",
+              "personal"
+            ],
             "type": "string"
           },
           "date": {
@@ -6535,7 +6964,13 @@
           },
           "activityType": {
             "type": "string",
-            "enum": ["lecture", "tutorial", "prac", "test", "exam"]
+            "enum": [
+              "lecture",
+              "tutorial",
+              "prac",
+              "test",
+              "exam"
+            ]
           },
           "isRecurring": {
             "type": "boolean"
@@ -6566,7 +7001,9 @@
             "type": "boolean"
           }
         },
-        "required": ["success"]
+        "required": [
+          "success"
+        ]
       },
       "ValidateEventDto": {
         "type": "object",
@@ -6586,7 +7023,9 @@
             "type": "string"
           }
         },
-        "required": ["event"]
+        "required": [
+          "event"
+        ]
       },
       "CreateTimetableDto": {
         "type": "object",
@@ -6600,7 +7039,9 @@
           },
           "eventIds": {
             "uniqueItems": true,
-            "example": ["00000000-0000-0000-0000-000000000000"],
+            "example": [
+              "00000000-0000-0000-0000-000000000000"
+            ],
             "description": "Event IDs to attach on creation",
             "type": "array",
             "items": {
@@ -6623,7 +7064,9 @@
             "example": "Semester 1"
           }
         },
-        "required": ["timetableID"]
+        "required": [
+          "timetableID"
+        ]
       },
       "TimetableResponseDto": {
         "type": "object",
@@ -6635,7 +7078,9 @@
             "$ref": "#/components/schemas/TimetableDto"
           },
           "eventIds": {
-            "example": ["00000000-0000-0000-0000-000000000000"],
+            "example": [
+              "00000000-0000-0000-0000-000000000000"
+            ],
             "description": "IDs of events linked to this timetable",
             "type": "array",
             "items": {
@@ -6643,7 +7088,10 @@
             }
           }
         },
-        "required": ["UserTimetableID", "timetable"]
+        "required": [
+          "UserTimetableID",
+          "timetable"
+        ]
       },
       "TimetableListResponseDto": {
         "type": "object",
@@ -6656,7 +7104,9 @@
             }
           }
         },
-        "required": ["timetables"]
+        "required": [
+          "timetables"
+        ]
       },
       "TimetableResponseDto2": {
         "type": "object",
@@ -6675,7 +7125,11 @@
             }
           }
         },
-        "required": ["UserTimetableID", "timetable", "events"]
+        "required": [
+          "UserTimetableID",
+          "timetable",
+          "events"
+        ]
       },
       "TimetableListResponseDtoV2": {
         "type": "object",
@@ -6688,7 +7142,9 @@
             }
           }
         },
-        "required": ["timetables"]
+        "required": [
+          "timetables"
+        ]
       },
       "UpdateTimetableDto": {
         "type": "object",
@@ -6702,7 +7158,9 @@
           },
           "addEventIds": {
             "uniqueItems": true,
-            "example": ["00000000-0000-0000-0000-000000000000"],
+            "example": [
+              "00000000-0000-0000-0000-000000000000"
+            ],
             "description": "Event IDs to link to the timetable",
             "type": "array",
             "items": {
@@ -6712,7 +7170,9 @@
           },
           "removeEventIds": {
             "uniqueItems": true,
-            "example": ["00000000-0000-0000-0000-000000000000"],
+            "example": [
+              "00000000-0000-0000-0000-000000000000"
+            ],
             "description": "Event IDs to unlink from the timetable",
             "type": "array",
             "items": {
@@ -6730,7 +7190,9 @@
             "example": true
           }
         },
-        "required": ["success"]
+        "required": [
+          "success"
+        ]
       },
       "CreateBuilderModuleDto": {
         "type": "object",
@@ -6792,7 +7254,10 @@
             "description": "Refer to module on external API"
           }
         },
-        "required": ["moduleCode", "moduleName"]
+        "required": [
+          "moduleCode",
+          "moduleName"
+        ]
       },
       "CreateBuilderEventDto": {
         "type": "object",
@@ -6816,7 +7281,13 @@
           },
           "activityType": {
             "type": "string",
-            "enum": ["lecture", "tutorial", "prac", "test", "exam"],
+            "enum": [
+              "lecture",
+              "tutorial",
+              "prac",
+              "test",
+              "exam"
+            ],
             "description": "Required when eventCriteria.moduleId is provided."
           }
         }
@@ -6834,7 +7305,11 @@
           },
           "status": {
             "type": "string",
-            "enum": ["queued", "completed", "failed"]
+            "enum": [
+              "queued",
+              "completed",
+              "failed"
+            ]
           },
           "moduleGroupingId": {
             "type": "string",
@@ -6850,7 +7325,9 @@
             "example": "/pdf-parser/jobs/pdf-parse-2d82d1ff-fb51-4c67-80cf-61d88c12d596"
           }
         },
-        "required": ["duplicate"]
+        "required": [
+          "duplicate"
+        ]
       },
       "ParseAnnotationDto": {
         "type": "object",
@@ -6866,7 +7343,11 @@
             "additionalProperties": true
           }
         },
-        "required": ["code", "message", "details"]
+        "required": [
+          "code",
+          "message",
+          "details"
+        ]
       },
       "RecurringParsedEventCandidateDto": {
         "type": "object",
@@ -6876,7 +7357,13 @@
           },
           "activityType": {
             "type": "string",
-            "enum": ["lecture", "tutorial", "prac", "test", "exam"]
+            "enum": [
+              "lecture",
+              "tutorial",
+              "prac",
+              "test",
+              "exam"
+            ]
           },
           "activityCode": {
             "type": "string"
@@ -6926,7 +7413,9 @@
           },
           "isRecurring": {
             "type": "boolean",
-            "enum": [true]
+            "enum": [
+              true
+            ]
           }
         },
         "required": [
@@ -6952,7 +7441,13 @@
           },
           "activityType": {
             "type": "string",
-            "enum": ["lecture", "tutorial", "prac", "test", "exam"]
+            "enum": [
+              "lecture",
+              "tutorial",
+              "prac",
+              "test",
+              "exam"
+            ]
           },
           "activityCode": {
             "type": "string"
@@ -6994,7 +7489,9 @@
           },
           "isRecurring": {
             "type": "boolean",
-            "enum": [false]
+            "enum": [
+              false
+            ]
           }
         },
         "required": [
@@ -7033,7 +7530,12 @@
             }
           }
         },
-        "required": ["code", "name", "metadata", "warnings"]
+        "required": [
+          "code",
+          "name",
+          "metadata",
+          "warnings"
+        ]
       },
       "PdfParserResultDto": {
         "type": "object",
@@ -7064,7 +7566,11 @@
             }
           }
         },
-        "required": ["modules", "events", "warnings"]
+        "required": [
+          "modules",
+          "events",
+          "warnings"
+        ]
       },
       "WorkerCallbackErrorDto": {
         "type": "object",
@@ -7083,7 +7589,10 @@
             "description": "Worker-specific diagnostic values."
           }
         },
-        "required": ["code", "message"]
+        "required": [
+          "code",
+          "message"
+        ]
       },
       "PdfParserUploadResponseDto": {
         "type": "object",
@@ -7104,7 +7613,11 @@
           },
           "status": {
             "type": "string",
-            "enum": ["queued", "completed", "failed"]
+            "enum": [
+              "queued",
+              "completed",
+              "failed"
+            ]
           },
           "result": {
             "$ref": "#/components/schemas/PdfParserResultDto"
@@ -7130,7 +7643,13 @@
             "example": "/pdf-parser/jobs/pdf-parse-2d82d1ff-fb51-4c67-80cf-61d88c12d596"
           }
         },
-        "required": ["jobId", "status", "createdAt", "updatedAt", "statusUrl"]
+        "required": [
+          "jobId",
+          "status",
+          "createdAt",
+          "updatedAt",
+          "statusUrl"
+        ]
       },
       "PdfParserJobResponseDto": {
         "type": "object",
@@ -7151,7 +7670,11 @@
           },
           "status": {
             "type": "string",
-            "enum": ["queued", "completed", "failed"]
+            "enum": [
+              "queued",
+              "completed",
+              "failed"
+            ]
           },
           "result": {
             "$ref": "#/components/schemas/PdfParserResultDto"
@@ -7173,14 +7696,22 @@
             "example": "2026-07-02T10:15:45.000Z"
           }
         },
-        "required": ["jobId", "status", "createdAt", "updatedAt"]
+        "required": [
+          "jobId",
+          "status",
+          "createdAt",
+          "updatedAt"
+        ]
       },
       "PdfParserCallbackDto": {
         "type": "object",
         "properties": {
           "status": {
             "type": "string",
-            "enum": ["completed", "failed"]
+            "enum": [
+              "completed",
+              "failed"
+            ]
           },
           "result": {
             "$ref": "#/components/schemas/PdfParserResultDto"
@@ -7189,31 +7720,42 @@
             "$ref": "#/components/schemas/WorkerCallbackErrorDto"
           }
         },
-        "required": ["status"]
+        "required": [
+          "status"
+        ]
       },
       "AcceptedJobResponseDto": {
         "type": "object",
         "properties": {
           "accepted": {
             "type": "boolean",
-            "enum": [true]
+            "enum": [
+              true
+            ]
           },
           "jobId": {
             "type": "string"
           }
         },
-        "required": ["accepted", "jobId"]
+        "required": [
+          "accepted",
+          "jobId"
+        ]
       },
       "PreferredStartTimePreferenceDto": {
         "type": "object",
         "properties": {
           "key": {
             "type": "string",
-            "enum": ["preferred-start-time"],
+            "enum": [
+              "preferred-start-time"
+            ],
             "example": "preferred-start-time"
           },
           "parameters": {
-            "required": ["minutes-After-midnight"],
+            "required": [
+              "minutes-After-midnight"
+            ],
             "type": "object",
             "properties": {
               "minutes-After-midnight": {
@@ -7225,40 +7767,54 @@
             }
           }
         },
-        "required": ["key"]
+        "required": [
+          "key"
+        ]
       },
       "LargeGapsPreferenceDto": {
         "type": "object",
         "properties": {
           "key": {
             "type": "string",
-            "enum": ["large-gaps"],
+            "enum": [
+              "large-gaps"
+            ],
             "example": "large-gaps"
           }
         },
-        "required": ["key"]
+        "required": [
+          "key"
+        ]
       },
       "SmallGapsPreferenceDto": {
         "type": "object",
         "properties": {
           "key": {
             "type": "string",
-            "enum": ["small-gaps"],
+            "enum": [
+              "small-gaps"
+            ],
             "example": "small-gaps"
           }
         },
-        "required": ["key"]
+        "required": [
+          "key"
+        ]
       },
       "DaySkipPreferenceDto": {
         "type": "object",
         "properties": {
           "key": {
             "type": "string",
-            "enum": ["day-skip"],
+            "enum": [
+              "day-skip"
+            ],
             "example": "day-skip"
           },
           "parameters": {
-            "required": ["day-to-skip"],
+            "required": [
+              "day-to-skip"
+            ],
             "type": "object",
             "properties": {
               "day-to-skip": {
@@ -7275,7 +7831,9 @@
             }
           }
         },
-        "required": ["key"]
+        "required": [
+          "key"
+        ]
       },
       "SolverPreferencesDto": {
         "type": "object",
@@ -7301,7 +7859,9 @@
             }
           }
         },
-        "required": ["heuristics"]
+        "required": [
+          "heuristics"
+        ]
       },
       "TimetableSolveJobDto": {
         "type": "object",
@@ -7309,7 +7869,9 @@
           "eventIds": {
             "minItems": 1,
             "uniqueItems": true,
-            "example": ["00000000-0000-4000-8000-000000000004"],
+            "example": [
+              "00000000-0000-4000-8000-000000000004"
+            ],
             "type": "array",
             "items": {
               "type": "string",
@@ -7318,11 +7880,18 @@
           },
           "solveMode": {
             "type": "string",
-            "enum": ["feasibility", "optimization"]
+            "enum": [
+              "feasibility",
+              "optimization"
+            ]
           },
           "engine": {
             "type": "string",
-            "enum": ["auto", "cp-sat", "ga"]
+            "enum": [
+              "auto",
+              "cp-sat",
+              "ga"
+            ]
           },
           "preferences": {
             "example": {
@@ -7335,7 +7904,9 @@
             ]
           }
         },
-        "required": ["solveMode"]
+        "required": [
+          "solveMode"
+        ]
       },
       "TimetableSolutionDto": {
         "type": "object",
@@ -7347,7 +7918,9 @@
             }
           }
         },
-        "required": ["selectedEventIds"]
+        "required": [
+          "selectedEventIds"
+        ]
       },
       "SolverHeuristicScoreDto": {
         "type": "object",
@@ -7363,7 +7936,10 @@
             "additionalProperties": true
           }
         },
-        "required": ["key", "score"]
+        "required": [
+          "key",
+          "score"
+        ]
       },
       "SolverConflictDto": {
         "type": "object",
@@ -7377,7 +7953,9 @@
             "maxItems": 2
           }
         },
-        "required": ["eventIds"]
+        "required": [
+          "eventIds"
+        ]
       },
       "SolverResultMetadataDto": {
         "type": "object",
@@ -7394,21 +7972,34 @@
           },
           "solveMode": {
             "type": "string",
-            "enum": ["feasibility", "optimization"]
+            "enum": [
+              "feasibility",
+              "optimization"
+            ]
           }
         },
-        "required": ["conflictCount", "conflicts", "solveMode"]
+        "required": [
+          "conflictCount",
+          "conflicts",
+          "solveMode"
+        ]
       },
       "SolverResultDto": {
         "type": "object",
         "properties": {
           "engine": {
             "type": "string",
-            "enum": ["cp-sat", "ga"]
+            "enum": [
+              "cp-sat",
+              "ga"
+            ]
           },
           "outcome": {
             "type": "string",
-            "enum": ["conflict-free", "best-effort"]
+            "enum": [
+              "conflict-free",
+              "best-effort"
+            ]
           },
           "timetableSolution": {
             "$ref": "#/components/schemas/TimetableSolutionDto"
@@ -7442,20 +8033,30 @@
         "properties": {
           "accepted": {
             "type": "boolean",
-            "enum": [true]
+            "enum": [
+              true
+            ]
           },
           "jobId": {
             "type": "string"
           },
           "status": {
             "type": "string",
-            "enum": ["queued", "completed", "failed"]
+            "enum": [
+              "queued",
+              "completed",
+              "failed"
+            ]
           },
           "result": {
             "$ref": "#/components/schemas/SolverResultDto"
           }
         },
-        "required": ["accepted", "jobId", "status"]
+        "required": [
+          "accepted",
+          "jobId",
+          "status"
+        ]
       },
       "SchedulingVenueDto": {
         "type": "object",
@@ -7467,7 +8068,10 @@
             "type": "string"
           }
         },
-        "required": ["id", "name"]
+        "required": [
+          "id",
+          "name"
+        ]
       },
       "SchedulingEventDto": {
         "type": "object",
@@ -7480,7 +8084,13 @@
           },
           "activityType": {
             "type": "string",
-            "enum": ["lecture", "tutorial", "prac", "test", "exam"]
+            "enum": [
+              "lecture",
+              "tutorial",
+              "prac",
+              "test",
+              "exam"
+            ]
           },
           "activityCode": {
             "type": "string"
@@ -7543,7 +8153,9 @@
             }
           }
         },
-        "required": ["events"]
+        "required": [
+          "events"
+        ]
       },
       "SolverInputDto": {
         "type": "object",
@@ -7555,7 +8167,10 @@
             "$ref": "#/components/schemas/SolverPreferencesDto"
           }
         },
-        "required": ["schedulingProblem", "preferences"]
+        "required": [
+          "schedulingProblem",
+          "preferences"
+        ]
       },
       "SolverJobResponseDto": {
         "type": "object",
@@ -7566,15 +8181,26 @@
           },
           "solveMode": {
             "type": "string",
-            "enum": ["feasibility", "optimization"]
+            "enum": [
+              "feasibility",
+              "optimization"
+            ]
           },
           "requestedEngine": {
             "type": "string",
-            "enum": ["auto", "cp-sat", "ga"]
+            "enum": [
+              "auto",
+              "cp-sat",
+              "ga"
+            ]
           },
           "status": {
             "type": "string",
-            "enum": ["queued", "completed", "failed"]
+            "enum": [
+              "queued",
+              "completed",
+              "failed"
+            ]
           },
           "result": {
             "$ref": "#/components/schemas/SolverResultDto"
@@ -7599,14 +8225,23 @@
             "example": "2026-07-13T10:15:45.000Z"
           }
         },
-        "required": ["jobId", "solveMode", "status", "createdAt", "updatedAt"]
+        "required": [
+          "jobId",
+          "solveMode",
+          "status",
+          "createdAt",
+          "updatedAt"
+        ]
       },
       "SolverCallbackDto": {
         "type": "object",
         "properties": {
           "status": {
             "type": "string",
-            "enum": ["completed", "failed"]
+            "enum": [
+              "completed",
+              "failed"
+            ]
           },
           "result": {
             "description": "A valid timetable solution and its soft-heuristic scores.",
@@ -7620,7 +8255,9 @@
             "$ref": "#/components/schemas/WorkerCallbackErrorDto"
           }
         },
-        "required": ["status"]
+        "required": [
+          "status"
+        ]
       },
       "CreateAttendanceDto": {
         "type": "object",
@@ -7638,12 +8275,19 @@
           },
           "state": {
             "type": "string",
-            "enum": ["ATTENDING", "NOT_ATTENDING"],
+            "enum": [
+              "ATTENDING",
+              "NOT_ATTENDING"
+            ],
             "example": "ATTENDING",
             "description": "Is the user attending this event or not"
           }
         },
-        "required": ["eventID", "eventDate", "state"]
+        "required": [
+          "eventID",
+          "eventDate",
+          "state"
+        ]
       },
       "AttendanceSingleResponse": {
         "type": "object",
@@ -7661,7 +8305,10 @@
           },
           "state": {
             "type": "string",
-            "enum": ["ATTENDING", "NOT_ATTENDING"],
+            "enum": [
+              "ATTENDING",
+              "NOT_ATTENDING"
+            ],
             "example": "ATTENDING",
             "description": "Is the user attending this event or not"
           },
@@ -7672,7 +8319,12 @@
             "description": "Unique identifier for an EventAttendance record"
           }
         },
-        "required": ["eventID", "eventDate", "state", "AttendanceID"]
+        "required": [
+          "eventID",
+          "eventDate",
+          "state",
+          "AttendanceID"
+        ]
       },
       "AttendanceListResponse": {
         "type": "object",
@@ -7685,7 +8337,9 @@
             }
           }
         },
-        "required": ["attendanceList"]
+        "required": [
+          "attendanceList"
+        ]
       },
       "UpdateAttendanceDto": {
         "type": "object",
@@ -7697,7 +8351,10 @@
           },
           "state": {
             "type": "string",
-            "enum": ["ATTENDING", "NOT_ATTENDING"],
+            "enum": [
+              "ATTENDING",
+              "NOT_ATTENDING"
+            ],
             "example": "ATTENDING",
             "description": "Is the user attending this event or not"
           }
@@ -7712,7 +8369,9 @@
             "example": true
           }
         },
-        "required": ["success"]
+        "required": [
+          "success"
+        ]
       },
       "GenerateCalendarDto": {
         "type": "object",
@@ -7731,7 +8390,9 @@
             "description": "Academic year to generate. Defaults to the current UTC year."
           }
         },
-        "required": ["timetableId"]
+        "required": [
+          "timetableId"
+        ]
       },
       "Weekday": {
         "type": "string",
@@ -7806,7 +8467,9 @@
               "type": "string",
               "format": "date"
             },
-            "example": ["2026-03-30"],
+            "example": [
+              "2026-03-30"
+            ],
             "description": "Dates removed from the weekly series.",
             "type": "array"
           },
@@ -7815,7 +8478,9 @@
               "type": "string",
               "format": "date"
             },
-            "example": ["2026-04-03"],
+            "example": [
+              "2026-04-03"
+            ],
             "description": "Dates added to the weekly series, normally by day swaps.",
             "type": "array"
           }
@@ -7876,7 +8541,13 @@
             "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$"
           }
         },
-        "required": ["key", "title", "date", "startTime", "endTime"]
+        "required": [
+          "key",
+          "title",
+          "date",
+          "startTime",
+          "endTime"
+        ]
       },
       "CalendarRestrictionType": {
         "type": "string",
@@ -7931,7 +8602,13 @@
             "description": "Inclusive domain end date."
           }
         },
-        "required": ["key", "title", "type", "startDate", "endDate"]
+        "required": [
+          "key",
+          "title",
+          "type",
+          "startDate",
+          "endDate"
+        ]
       },
       "GeneratedCalendarWarningDto": {
         "type": "object",
@@ -7950,7 +8627,10 @@
             "description": "Identifier of the source record that caused the warning."
           }
         },
-        "required": ["code", "message"]
+        "required": [
+          "code",
+          "message"
+        ]
       },
       "GeneratedCalendarPayloadDto": {
         "type": "object",
@@ -8010,7 +8690,10 @@
             "$ref": "#/components/schemas/GeneratedCalendarPayloadDto"
           }
         },
-        "required": ["id", "payload"]
+        "required": [
+          "id",
+          "payload"
+        ]
       },
       "AcademicCalendarDto": {
         "type": "object",
@@ -8029,7 +8712,9 @@
             "description": "Four-digit academic year represented by this calendar."
           },
           "subscriptions": {
-            "example": ["120afed7-9444-4d9c-a7f2-8f08dc2b7d70"],
+            "example": [
+              "120afed7-9444-4d9c-a7f2-8f08dc2b7d70"
+            ],
             "description": "Public-calendar IDs this academic calendar subscribes to.",
             "type": "array",
             "items": {
@@ -8038,7 +8723,11 @@
             }
           }
         },
-        "required": ["id", "year", "subscriptions"]
+        "required": [
+          "id",
+          "year",
+          "subscriptions"
+        ]
       },
       "CreateAcademicCalendarDto": {
         "type": "object",
@@ -8051,7 +8740,9 @@
             "description": "Four-digit academic year. A university may have only one calendar per year."
           }
         },
-        "required": ["year"]
+        "required": [
+          "year"
+        ]
       },
       "CalendarRestrictionDto": {
         "type": "object",
@@ -8096,7 +8787,13 @@
             ]
           }
         },
-        "required": ["id", "type", "startDate", "endDate", "description"]
+        "required": [
+          "id",
+          "type",
+          "startDate",
+          "endDate",
+          "description"
+        ]
       },
       "CalendarRestrictionListDto": {
         "type": "object",
@@ -8109,7 +8806,9 @@
             }
           }
         },
-        "required": ["restrictions"]
+        "required": [
+          "restrictions"
+        ]
       },
       "CreateCalendarRestrictionDto": {
         "type": "object",
@@ -8153,7 +8852,10 @@
             ]
           }
         },
-        "required": ["type", "startDate"]
+        "required": [
+          "type",
+          "startDate"
+        ]
       },
       "UpdateCalendarRestrictionDto": {
         "type": "object",
@@ -8197,26 +8899,35 @@
             ]
           }
         },
-        "required": ["type", "startDate"]
+        "required": [
+          "type",
+          "startDate"
+        ]
       },
       "DeleteCalendarRestrictionResponseDto": {
         "type": "object",
         "properties": {
           "success": {
             "type": "boolean",
-            "enum": [true],
+            "enum": [
+              true
+            ],
             "example": true,
             "description": "Confirms that the calendar restriction was deleted."
           }
         },
-        "required": ["success"]
+        "required": [
+          "success"
+        ]
       },
       "UpdateCalendarSubscriptionsDto": {
         "type": "object",
         "properties": {
           "subscriptions": {
             "uniqueItems": true,
-            "example": ["120afed7-9444-4d9c-a7f2-8f08dc2b7d70"],
+            "example": [
+              "120afed7-9444-4d9c-a7f2-8f08dc2b7d70"
+            ],
             "description": "Public-calendar IDs this academic calendar subscribes to. Replaces the existing set.",
             "type": "array",
             "items": {
@@ -8225,19 +8936,25 @@
             }
           }
         },
-        "required": ["subscriptions"]
+        "required": [
+          "subscriptions"
+        ]
       },
       "DeleteAcademicCalendarResponseDto": {
         "type": "object",
         "properties": {
           "success": {
             "type": "boolean",
-            "enum": [true],
+            "enum": [
+              true
+            ],
             "example": true,
             "description": "Confirms that the academic calendar was deleted."
           }
         },
-        "required": ["success"]
+        "required": [
+          "success"
+        ]
       },
       "EventListResponseDto": {
         "type": "object",
@@ -8252,7 +8969,9 @@
             "type": "string"
           }
         },
-        "required": ["events"]
+        "required": [
+          "events"
+        ]
       }
     }
   }
