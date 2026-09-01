@@ -32,7 +32,7 @@ export function ExternalCoursesPopup() {
   });
 
   return (
-    <Card className="w-full max-w-md p-6 flex flex-col gap-4 border-[var(--border)] bg-[var(--bg-surface)] shadow-sm">
+    <Card className="w-75 max-w-md p-6 flex flex-col gap-4 border-[var(--border)] bg-[var(--bg-surface)] shadow-sm">
       <h2 className="text-lg font-semibold text-[var(--text-primary)]">
         Fetch courses
       </h2>
