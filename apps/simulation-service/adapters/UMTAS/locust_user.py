@@ -178,6 +178,27 @@ class DomainUser(HttpUser):
                 response.failure(f"unexpected status {response.status_code}")
 
     @task(2)
+    def enroll_in_module(self):
+        if len(self.enrolled_module_ids) >= MAX_ENROLLED_MODULES:
+            return
+        candidates = [m for m in self.browsed_module_ids if m not in self.enrolled_module_ids]
+        if not candidates:
+            return
+        module_id = random.choice(candidates)
+
+        with self.client.get(
+            f"/api/modules/enroll/{module_id}", name="/api/modules/enroll/[moduleId]", catch_response=True
+        ) as response:
+            if response.status_code == 200:
+                response.success()
+                self.enrolled_module_ids.add(module_id)
+            elif response.status_code == 201:
+                response.success()
+                self.enrolled_module_ids.discard(module_id)
+            else:
+                response.failure(f"enroll rejected [{response.status_code}]")
+
+    @task(2)
     def upload_timetable_pdf(self):
         if not PDF_FILES or not getattr(self, "uni_id", None) or self.pdf_id:
             return
@@ -200,6 +221,9 @@ class DomainUser(HttpUser):
                     self.pdf_result_ready = False
                 else:
                     response.failure(f"upload rejected [{response.status_code}]")
+
+
+
 
     @task(3)
     def check_pdf_parser_status(self):
