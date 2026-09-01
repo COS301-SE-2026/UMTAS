@@ -1,7 +1,11 @@
-import os
+import datetime
 import json
-import uuid
+import os
 import random
+import threading
+import time
+import uuid
+from collections import Counter
 from locust import HttpUser, task, between
 from locust.exception import StopUser 
 
@@ -18,6 +22,12 @@ if os.path.exists(PDF_DIR):
     
 print(f"Loaded {len(PROFILES)} profiles from {PROFILES_PATH}")
 print(f"Found {len(PDF_FILES)} PDF files in {PDF_DIR}")
+
+MAX_ENROLLED_MODULES = 4
+MAX_TIMETABLE_EVENTS = 20
+HEURISTIC_KEYS = "module,activity,location"
+
+DAY_NAMES = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
 
 
 class DomainUser(HttpUser):
