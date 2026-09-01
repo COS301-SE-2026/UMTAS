@@ -1,0 +1,40 @@
+.gitignore
+  h_2d4b3dca70a3d8 152-155
+apps/backend/drizzle/meta/0000_snapshot.json
+  h_2d4b3dca70a3d8 2
+apps/backend/src/ApiService/Adapter/University_Adapter.ts
+  h_2d4b3dca70a3d8 46
+apps/backend/src/ApiService/ApiService.service.spec.ts
+  h_2d4b3dca70a3d8 28,41,43,47-51,56,61,69,98,120,136,139,148,169,172,183,203,213,216,238,267,293,304,338,364,375,409,419,447,477,508
+apps/backend/src/ApiService/Registry/AdapterRegistry.service.spec.ts
+  h_2d4b3dca70a3d8 77-78,85,89
+apps/backend/src/Attendance/dto/attendance.dto.ts
+  h_2d4b3dca70a3d8 10,33-34,37-40
+apps/backend/src/Events/eventV2.service.ts
+  h_2d4b3dca70a3d8 246,267,269,278,281,347
+apps/backend/src/db/seeding/services/university.seed.service.ts
+  h_2d4b3dca70a3d8 6,81
+apps/backend/src/entities/Events/events.schema.ts
+  h_2d4b3dca70a3d8 75-80
+apps/backend/test/integration/steps/pdf.step.ts
+  h_2d4b3dca70a3d8 294
+apps/e2e/tests/setup/auth.setup.ts
+  h_2d4b3dca70a3d8 19-20
+apps/frontend/src/components/atoms/nav/UserAvatar.tsx
+  h_2d4b3dca70a3d8 44
+justfile
+  h_2d4b3dca70a3d8 37
+pnpm-lock.yaml
+  h_2d4b3dca70a3d8 76,103,3660-3668,3705-3713,17263-17267,17297-17302,21894,25237,25751
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "b9b0fab57e3b58710dd44dc5989fbd0cbd0781d0",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
