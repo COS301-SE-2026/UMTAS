@@ -39,7 +39,7 @@ export class UniversitySeedService extends BaseSeedService {
       this.logResult('Universities', uniSeed.length);
 
       // if University of pretroia had to be seeded -> seed in uni_admin for it <=================================Might remove later :)
-      if (missingNames.includes(uniNames[0])) {
+      for (const uni of uniSeed) {
         const [uniAdmin] = await tx
           .select()
           .from(usersTable)
@@ -50,19 +50,29 @@ export class UniversitySeedService extends BaseSeedService {
             ),
           );
 
+        const [cosAdmin] = await tx
+          .select()
+          .from(usersTable)
+          .where(
+            eq(
+              usersTable.email,
+              process.env.SEED_COS_ADMIN_EMAIL ?? 'admin301@local.umtas',
+            ),
+          );
+
         await this.persistence.insertUniversityRoles(tx, [
           {
-            UniversityID: uniSeed[0].UniversityID,
+            UniversityID: uni.UniversityID,
             UserID: uniAdmin.id,
             role: 'UNIVERSITY_ADMIN',
           },
           {
-            UniversityID: uniSeed[1].UniversityID,
-            UserID: uniAdmin.id,
+            UniversityID: uni.UniversityID,
+            UserID: cosAdmin.id,
             role: 'UNIVERSITY_ADMIN',
           },
         ]);
-      }
+      } //END_uni
     } //END_check for missing names
     else {
       //No new unis to seed
