@@ -38,7 +38,12 @@ export function ExternalCoursesPopup() {
       </h2>
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="course pages">Number of pages</Label>
+        <Label
+          htmlFor="course pages"
+          className="text-sm font-medium text-[var(--text-secondary)] flex flex-col"
+        >
+          Page number{" "}
+        </Label>
         <Input
           data-testid="course-Page-input"
           id="course-page"
@@ -51,9 +56,14 @@ export function ExternalCoursesPopup() {
           type="number"
           placeholder="0"
           disabled={pendingCourses}
-          className="bg-[var(--background)] border-[var(--border)] text-[var(--text-primary)] mb-4"
+          className="h-8 rounded-md border border-[var(--border)] bg-transparent px-2 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--ring)]"
         />
-        <Label htmlFor="number of courses">Number of results</Label>
+        <Label
+          htmlFor="number of courses"
+          className="text-sm font-medium text-[var(--text-secondary)] flex flex-col"
+        >
+          Courses per page{" "}
+        </Label>
         <Input
           data-testid="course-number-input"
           id="course-number-input"
@@ -66,7 +76,7 @@ export function ExternalCoursesPopup() {
           min={1}
           max={10}
           type="number"
-          className="bg-[var(--background)] border-[var(--border)] text-[var(--text-primary)]"
+          className="h-8 rounded-md border border-[var(--border)] bg-transparent px-2 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--ring)]"
         />
       </div>
 
