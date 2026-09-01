@@ -72,6 +72,12 @@ export const AttendanceState = pgEnum('AttendanceState', [
   'NOT_ATTENDING',
 ]);
 
+//Validation
+export enum AttendanceStateEnum {
+  ATTENDING = 'ATTENDING',
+  NOT_ATTENDING = 'NOT_ATTENDING',
+}
+
 export type AttendanceStateType = (typeof AttendanceState.enumValues)[number];
 
 export const EventAttendance = pgTable('EventAttendance', {
