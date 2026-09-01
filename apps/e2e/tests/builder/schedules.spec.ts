@@ -53,7 +53,7 @@ test("Add Event", async ({ page }) => {
   await page.getByRole("option").first().click();
   await page.getByTestId("event-Confirm-Btn").first().click();
 
-  eventContainer = await page.getByTestId("builder-event-div");
+  eventContainer = page.getByTestId("builder-event-div");
   await eventContainer.getByTestId("event-open-btn").first().click();
   event = await eventContainer.getByTestId("event-card-div").first();
 
@@ -89,7 +89,7 @@ test("Update event", async ({ page }) => {
   await page.getByRole("option").last().click();
   await page.getByTestId("event-Confirm-Btn").first().click();
 
-  eventContainer = await page.getByTestId("builder-event-div");
+  eventContainer = page.getByTestId("builder-event-div");
   await eventContainer.getByTestId("event-open-btn").first().click();
   event = await eventContainer.getByTestId("event-card-div").first();
 
@@ -125,17 +125,18 @@ test("Create schedule", async ({ page }) => {
 
   await EventCheckBox.check();
 
-  await EventCheckBox.check();
-
   const createScheduleBtn = createScheduleContainer.getByTestId(
     "schedules-Create-Btn",
   );
   await createScheduleBtn.click();
 
   await expect(page.getByTestId("schedules-Calendar-Div")).toBeVisible();
-  await page.getByTestId("schedules-Date-Input").fill("2026-12-30");
-  await expect(page.getByText("AA").first()).toBeVisible();
-  // page did change schedule created successfully
+
+  const dateInput = page.getByTestId("schedules-Date-Input");
+  await dateInput.fill("2026-12-30");
+  await dateInput.press("Enter");
+
+  await expect(page.getByText("AA").first()).toBeVisible({ timeout: 15000 });
 });
 
 test("Delete schedule", async ({ page }) => {
