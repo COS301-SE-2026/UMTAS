@@ -224,6 +224,24 @@ class DomainUser(HttpUser):
 
 
 
+    @task(3)
+    def view_events_for_enrolled_module(self):
+        if not self.enrolled_module_ids:
+            return
+        module_id = random.choice(list(self.enrolled_module_ids))
+        with self.client.get(
+            f"/api/events?moduleId={module_id}", name="/api/events?moduleId=[id]", catch_response=True
+        ) as response:
+            if response.status_code == 200:
+                response.success()
+                for ev in response.json().get("events", []):
+                    if ev.get("eventId"):
+                        self.known_events[ev["eventId"]] = ev
+            elif response.status_code in (401, 403):
+                response.failure(f"auth error viewing events: {response.status_code}")
+            else:
+                response.success()  
+
 
     @task(3)
     def check_pdf_parser_status(self):
