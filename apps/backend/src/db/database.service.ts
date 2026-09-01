@@ -75,16 +75,17 @@ export class DatabaseService
   }
 
   async onApplicationBootstrap(): Promise<void> {
-    try {
-      await this.migrate();
-      this.logger.log('Database migrations applied successfully');
-
-      if (isSeedEnabled(process.env.SEED)) {
+    if (isSeedEnabled(process.env.SEED)) {
+      try {
+        this.logger.log('Starting database seeding...');
         await this.seedService?.seed(this.db);
+        this.logger.log('Database seeding completed successfully');
+      } catch (error) {
+        this.logger.error(
+          'SEEDING FAILED: App will continue to start, but seed data is incomplete.',
+          error,
+        );
       }
-    } catch (error) {
-      this.logger.error('Failed to initialize database', error);
-      throw error;
     }
   }
 

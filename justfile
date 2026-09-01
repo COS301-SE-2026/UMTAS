@@ -248,7 +248,7 @@ db_sql:
 
 
 runsim:
-    cd apps/simulation-service && phase run --env development -- docker compose up --build
+    cd apps/simulation-service && phase run --env development -- docker compose up
 
 
 nfr-start:
@@ -269,6 +269,8 @@ nfr-upload:
         --headless \
 
 
+staging-migrate:
+    phase run --env staging -- docker compose -p umtas-staging -f docker-compose.staging.yml run --rm backend node dist/db/migrate.js
 
 
 
