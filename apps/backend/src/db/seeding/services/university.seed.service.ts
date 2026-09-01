@@ -56,7 +56,8 @@ export class UniversitySeedService extends BaseSeedService {
           .where(
             eq(
               usersTable.email,
-              process.env.SEED_COS_ADMIN_EMAIL ?? 'admin301@local.umtas',
+              process.env.SEED_COS_ADMIN_EMAIL?.toLowerCase() ??
+                'admin301@local.umtas',
             ),
           );
 
@@ -72,6 +73,8 @@ export class UniversitySeedService extends BaseSeedService {
             role: 'UNIVERSITY_ADMIN',
           },
         ]);
+
+        this.logger.log(`😞`);
       } //END_uni
     } //END_check for missing names
     else {
