@@ -211,3 +211,17 @@ export class ValidateEventResponseDto {
   @IsString()
   message?: string;
 } //END_ValidateEventResponseDto
+export class UpdateEventVenueDto {
+  @ApiProperty({ description: 'The venue name' })
+  @IsString()
+  @Length(1, 100)
+  venueName!: string;
+
+  @ApiPropertyOptional({
+    format: 'uuid',
+    description: 'The selected buildingdD',
+  })
+  @IsOptional()
+  @IsUUID()
+  buildingId?: string;
+}

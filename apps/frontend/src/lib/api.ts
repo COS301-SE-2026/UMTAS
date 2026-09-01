@@ -858,6 +858,23 @@ export interface paths {
     patch: operations["validateEvent"];
     trace?: never;
   };
+  "/api/events/{id}/venue": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** Attach or clear an event's venue */
+    patch: operations["updateEventVenue"];
+    trace?: never;
+  };
   "/api/timetables": {
     parameters: {
       query?: never;
@@ -2655,6 +2672,15 @@ export interface components {
     ValidateEventResponseDto: {
       event: components["schemas"]["EventDto"];
       message?: string;
+    };
+    UpdateEventVenueDto: {
+      /** @description The venue name */
+      venueName: string;
+      /**
+       * Format: uuid
+       * @description The selected buildingdD
+       */
+      buildingId?: string;
     };
     CreateTimetableDto: {
       /**
@@ -5594,6 +5620,46 @@ export interface operations {
         content: {
           "application/json": components["schemas"]["ValidateEventResponseDto"];
         };
+      };
+      /** @description Event not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  updateEventVenue: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateEventVenueDto"];
+      };
+    };
+    responses: {
+      /** @description Venue updated successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["EventSingleResponseDto"];
+        };
+      };
+      /** @description Insufficient permissions */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
       /** @description Event not found */
       404: {

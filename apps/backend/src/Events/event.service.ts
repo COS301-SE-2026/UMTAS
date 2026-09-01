@@ -34,6 +34,7 @@ import {
   DeleteResponseDto,
   EventDto,
   UpdateEventCriteriaDto,
+  UpdateEventVenueDto,
 } from './dto/EventDto.dto';
 
 import { AppDatabase } from '../db/database.service';
@@ -41,6 +42,7 @@ import { ModuleService } from '../Module/module.service';
 import { EventImportFingerprintService } from './event-import-fingerprint.service';
 import { EventCriteria } from './dto/event.types';
 import { UniversityService } from '../University/university.service';
+import { SessionData } from 'src/auth/session.decorator';
 
 @Injectable()
 export class EventService {
@@ -780,5 +782,96 @@ export class EventService {
       .limit(1);
 
     return fetched !== undefined ? this.mapEventToDto(fetched) : null;
+  }
+
+  async updateEventVenue(
+    session: SessionData,
+    eventId: string,
+    updateEventVenueDto: UpdateEventVenueDto,
+    database?: AppDatabase,
+  ): Promise<EventSingleResponseDto> {
+    if (!database) {
+      return this.dbService.db.transaction(async (transaction: AppDatabase) => {
+        return this.updateEventVenue(
+          session,
+          eventId,
+          updateEventVenueDto,
+          transaction,
+        );
+      });
+    }
+
+    const userId = session.user.id;
+    const role = session.user.role as string;
+    const universityId = session.uniId;
+
+    if (!universityId) {
+      throw new ForbiddenException('No active university selected');
+    }
+
+    if (
+      role === 'student' &&
+      !(await this.ownershipCheck(userId, eventId, database))
+    ) {
+      throw new ForbiddenException(
+        'users cannot update events they do not own',
+      );
+    }
+
+    const existingEvent = (await this.getById(eventId, database)).event;
+    if (!existingEvent) {
+      throw new NotFoundException(`Event not found for event id: ${eventId}`);
+    }
+
+    let venueIdToLink: string;
+
+    const [existingVenue] = await database
+      .select({ id: Venue.VenueID })
+      .from(Venue)
+      .where(
+        and(
+          eq(Venue.UniversityID, universityId),
+          ilike(Venue.VenueName, updateEventVenueDto.venueName),
+        ),
+      )
+      .limit(1);
+
+    if (existingVenue) {
+      venueIdToLink = existingVenue.id;
+      if (updateEventVenueDto.buildingId) {
+        await database
+          .update(Venue)
+          .set({ BuildingID: updateEventVenueDto.buildingId })
+          .where(eq(Venue.VenueID, venueIdToLink));
+      }
+    } else {
+      const [newVenue] = await database
+        .insert(Venue)
+        .values({
+          VenueName: updateEventVenueDto.venueName,
+          UniversityID: universityId,
+          BuildingID: updateEventVenueDto.buildingId || null,
+        })
+        .returning();
+
+      venueIdToLink = newVenue.VenueID;
+    }
+
+    await database.delete(EventVenue).where(eq(EventVenue.EventID, eventId));
+
+    await database
+      .insert(EventVenue)
+      .values({ EventID: eventId, VenueID: venueIdToLink })
+      .onConflictDoNothing({
+        target: [EventVenue.EventID, EventVenue.VenueID],
+      });
+
+    const [event] = await database
+      .select()
+      .from(Event)
+      .where(eq(Event.eventID, eventId))
+      .limit(1);
+
+    return { event: await this.mapEventToDto(event, database) };
   }
 } //EventService

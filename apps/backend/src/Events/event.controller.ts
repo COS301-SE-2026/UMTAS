@@ -9,7 +9,14 @@ import {
   Query,
   ParseUUIDPipe,
 } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiForbiddenResponse,
+  ApiNotFoundResponse,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
 import {
   CreateEventDto,
@@ -21,6 +28,7 @@ import {
   CreateEventDtoV2,
   ValidateEventResponseDto,
   ValidateEventDto,
+  UpdateEventVenueDto,
 } from './dto/EventDto.dto';
 
 import { EventService } from './event.service';
@@ -254,5 +262,27 @@ export class EventController {
     @Body() dto: ValidateEventDto,
   ): Promise<ValidateEventResponseDto> {
     return this.service2.validateEvent(eventId, dto.validated);
+  }
+
+  @Patch(':id/venue')
+  @Roles('student', 'uni_admin', 'lecturer')
+  @ApiOperation({
+    summary: "Attach or clear an event's venue",
+    operationId: 'updateEventVenue',
+  })
+  @ApiBody({ type: UpdateEventVenueDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Venue updated successfully',
+    type: EventSingleResponseDto,
+  })
+  @ApiNotFoundResponse({ description: 'Event not found' })
+  @ApiForbiddenResponse({ description: 'Insufficient permissions' })
+  updateEventVenue(
+    @CurrentSession() session: SessionData,
+    @Param('id', ParseUUIDPipe) eventId: string,
+    @Body() updateEventVenueDto: UpdateEventVenueDto,
+  ): Promise<EventSingleResponseDto> {
+    return this.service.updateEventVenue(session, eventId, updateEventVenueDto);
   }
 } //EventController
