@@ -194,7 +194,6 @@ export class CourseController {
 
   //Stats
 
-  //Modules per Course
   @Get('statistics')
   @Roles('lecturer', 'uni_admin')
   @ApiOperation({

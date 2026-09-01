@@ -11,6 +11,7 @@ import {
   ModuleListResponseDto,
   ModuleListResponseDtoV2,
   ModuleSingleResponseDto,
+  ModuleStatsResponseDto,
   ModuleStylingBodyDto,
   ModuleStylingResponseDto,
   UpdateModuleDto,
@@ -26,6 +27,7 @@ import {
   ParseUUIDPipe,
   Query,
   Put,
+  BadRequestException,
 } from '@nestjs/common';
 import { ApiBody, ApiResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
@@ -145,34 +147,6 @@ export class ModuleController {
     @Query() filters: ModuleFiltersDtoV2,
   ): Promise<ModuleListResponseDtoV2> {
     return this.service2.getAll(session.user.id, filters);
-  }
-
-  //Get by id
-  @Get(':moduleId')
-  @Roles()
-  @ApiOperation({
-    summary: 'Get a module by ID',
-    description: 'Return a module from its moduleID',
-    operationId: 'getModuleById',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Module returned successfully',
-    type: ModuleSingleResponseDto,
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Invalid module ID',
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Module not found',
-  })
-  getById(
-    @CurrentSession() session: SessionData,
-    @Param('moduleId', ParseUUIDPipe) moduleId: string,
-  ): Promise<ModuleSingleResponseDto> {
-    return this.service.getById(session.user.id, moduleId);
   }
 
   @Get('v2/:moduleId')
@@ -378,5 +352,66 @@ export class ModuleController {
     @Body() dto: ModuleStylingBodyDto,
   ): Promise<ModuleStylingResponseDto> {
     return this.service.updateStylingService(session.user.id, moduleId, dto);
+  }
+
+  //Stats
+
+  @Get('statistics')
+  @Roles('lecturer', 'uni_admin')
+  @ApiOperation({
+    summary: 'Module Statistics',
+    operationId: 'moduleStatistics',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Modules with statistics returned',
+    type: ModuleStatsResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'No university selected',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'University not found',
+  })
+  statistics(
+    @CurrentSession() session: SessionData,
+  ): Promise<ModuleStatsResponseDto> {
+    const uniId = session.uniId;
+
+    if (!uniId) throw new BadRequestException(`No university selected`);
+
+    return this.service2.getStatistics(uniId);
+  } //END_statistics
+
+  //Not Stats
+
+  //Get by id
+  @Get(':moduleId')
+  @Roles()
+  @ApiOperation({
+    summary: 'Get a module by ID',
+    description: 'Return a module from its moduleID',
+    operationId: 'getModuleById',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Module returned successfully',
+    type: ModuleSingleResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid module ID',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Module not found',
+  })
+  getById(
+    @CurrentSession() session: SessionData,
+    @Param('moduleId', ParseUUIDPipe) moduleId: string,
+  ): Promise<ModuleSingleResponseDto> {
+    return this.service.getById(session.user.id, moduleId);
   }
 } //ModuleController
