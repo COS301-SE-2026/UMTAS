@@ -32,7 +32,7 @@ import {
   BadRequestException,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { createMockModuleServiceV2 } from 'src/Testing/Mocks/services/moduleV2.mock';
+import { createMockModuleServiceV2 } from 'src/Testing/Mocks/services/module.mock';
 import { ModuleServiceV2 } from 'src/Module/moduleV2.service';
 
 describe('EventServiceV2', () => {

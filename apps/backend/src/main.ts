@@ -11,6 +11,9 @@ import {
   swaggerFaviconUrl,
 } from './swagger-theme';
 
+import { PostHog } from 'posthog-node';
+import { PostHogInterceptor } from 'posthog-node/nestjs';
+
 import { ValidationPipe } from '@nestjs/common';
 import { mkdir, writeFile } from 'fs/promises';
 
@@ -23,6 +26,10 @@ async function bootstrap() {
   });
 
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const ph = app.get(PostHog);
+  app.useGlobalInterceptors(
+    new PostHogInterceptor(ph, { captureExceptions: true }),
+  );
   app.enableShutdownHooks();
 
   app.setGlobalPrefix('api', {
@@ -117,7 +124,6 @@ async function bootstrap() {
     `[STARTUP] Swagger docs available at http://localhost:${port}/api/docs`,
   );
   console.log(`[STARTUP] Listening on port ${port}`);
-  // console.log(process.env); // everything
 
   await app.listen(port, '0.0.0.0');
 }

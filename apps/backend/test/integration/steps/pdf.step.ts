@@ -291,7 +291,7 @@ export function pdfImportResolutionStep<TPlan>(
         {
           code: plan.expectedModuleCode,
           name: null,
-          metadata: { campus: 'Main' },
+          metadata: { campus: 'Main', semester: 'SEMESTER_1' },
           warnings: [],
         },
       ]);

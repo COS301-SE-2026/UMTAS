@@ -28,13 +28,13 @@ import {
 import {
   CreateEventDto,
   EventSingleResponseDto,
-  EventFiltersDto,
-  EventListResponseDto,
   UpdateEventDto,
   DeleteResponseDto,
   EventDto,
   UpdateEventCriteriaDto,
   UpdateEventVenueDto,
+  EventListResponseDtoV2,
+  EventFiltersDtoV2,
 } from './dto/EventDto.dto';
 
 import { AppDatabase } from '../db/database.service';
@@ -80,9 +80,9 @@ export class EventService {
   //getAllEvents
   async getAllEvents(
     userId: string,
-    filters: EventFiltersDto,
+    filters: EventFiltersDtoV2,
     tx?: AppDatabase,
-  ): Promise<EventListResponseDto> {
+  ): Promise<EventListResponseDtoV2> {
     //moduleId -> Return events for that module
     //Else -> Return events for modules that user is enrolled in
 
@@ -107,7 +107,14 @@ export class EventService {
       );
     } else events = await this.getEventsByUser(userId, tx);
 
-    return { events };
+    return {
+      events,
+      ...(filters.Stats && filters.Stats === true
+        ? {
+            count: events.length,
+          }
+        : {}),
+    };
   } //getAllEvents
 
   //getById - Shouldn't be changing again

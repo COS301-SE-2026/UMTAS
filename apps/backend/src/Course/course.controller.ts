@@ -7,6 +7,8 @@ import {
   CourseListResponseDto,
   DeleteCourseResponseDto,
   CourseFilters,
+  CourseFiltersV2,
+  CourseListResponseDtoV2,
 } from './dto/course.dto';
 
 import {
@@ -92,23 +94,18 @@ export class CourseController {
   @Roles()
   @ApiOperation({
     summary: 'Get all courses - V2',
+    description: 'Use filters and enable stats mode in filters',
     operationId: 'getCoursesV2',
-  })
-  @ApiQuery({
-    name: 'Degree',
-    required: false,
-    type: String,
-    description: 'Filter by Degree',
   })
   @ApiResponse({
     status: 200,
     description: 'Courses returned successfully',
-    type: CourseListResponseDto,
+    type: CourseListResponseDtoV2,
   })
   getAllV2(
     @CurrentSession() session: SessionData,
-    @Query() filters: CourseFilters,
-  ): Promise<CourseListResponseDto> {
+    @Query() filters: CourseFiltersV2,
+  ): Promise<CourseListResponseDtoV2> {
     return this.service2.getAllV2(session.user.id, filters);
   }
 

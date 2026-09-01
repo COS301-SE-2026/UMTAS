@@ -1,4 +1,5 @@
 export * from './auth/index';
+export * from './AcademicCalendar/index';
 export * from './Events/index';
 export * from './Modules/index';
 export * from './PdfParser/index';

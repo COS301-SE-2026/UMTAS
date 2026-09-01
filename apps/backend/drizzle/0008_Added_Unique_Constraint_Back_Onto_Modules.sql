@@ -1,1 +1,0 @@
-CREATE UNIQUE INDEX "moduleCode_unique_index" ON "Modules" USING btree ("moduleCode");

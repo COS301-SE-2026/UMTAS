@@ -194,6 +194,7 @@ export class EventServiceV2 extends EventService {
         isRecurring: isRec,
         validated: dto.validated ?? true,
         importFingerprint: fingerprint,
+        createdAt: new Date(),
       })
       .returning();
 
@@ -242,6 +243,7 @@ export class EventServiceV2 extends EventService {
     validated.eventCriteria = await this.validateEventCriteria(
       validated.eventCriteria,
       validated.isRecurring,
+      tx,
     );
 
     if (validated.venues && validated.venues.length !== 0)
@@ -262,8 +264,9 @@ export class EventServiceV2 extends EventService {
   protected async validateEventCriteria(
     eventCriteria: EventCriteriaDtoV2,
     isRecurring: boolean,
+    tx: AppDatabase,
   ): Promise<EventCriteriaDtoV2> {
-    const v: EventCriteriaDtoV2 = eventCriteria;
+    const v: EventCriteriaDtoV2 = eventCriteria ?? {};
 
     //Validate Times
     [v.startTime, v.endTime] = this.validateStartAndEndTime(
@@ -272,10 +275,10 @@ export class EventServiceV2 extends EventService {
     );
 
     //Validate Module - Required
-    const moduleId = eventCriteria.moduleId;
+    const moduleId = eventCriteria?.moduleId;
     const module =
       moduleId !== undefined && moduleId.trim().length !== 0
-        ? await this.moduleService.getByIdV2({ moduleId })
+        ? await this.moduleService.getByIdV2({ moduleId, tx })
         : null;
 
     if (module === null) {
@@ -341,6 +344,7 @@ export class EventServiceV2 extends EventService {
       return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
     };
 
+    this.OOPSIE.log(`validateStartAndEndTime`);
     //Default
     start = start ?? `07:30`;
     end = end ?? `08:20`;

@@ -9,6 +9,7 @@ import {
   IsBoolean,
   ValidateNested,
   IsNumber,
+  IsEnum,
   IsArray,
 } from 'class-validator';
 import {
@@ -19,7 +20,12 @@ import {
 } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import { PopulateGroupBodyDto } from '../../Grouping/dto/grouping.dto';
+import {
+  AcademicSemester,
+  type AcademicSemesterType,
+} from '../../entities/Modules/modules.schema';
 import { EventDto } from 'src/Events/dto/EventDto.dto';
+import { StatsFiltersDto, StatsResponseDto } from 'src/stats.dto';
 
 export class CourseModuleDto {
   @ApiProperty({
@@ -132,6 +138,18 @@ export class ModulesDto {
   @IsString()
   moduleDescription?: string | null;
 
+  @ApiPropertyOptional({
+    enum: AcademicSemester.enumValues,
+    enumName: 'AcademicSemester',
+    example: 'SEMESTER_1',
+    nullable: true,
+    description:
+      'Academic period in which this module is taught. Null or omitted means the whole academic year.',
+  })
+  @IsOptional()
+  @IsEnum(AcademicSemester.enumValues)
+  semester?: AcademicSemesterType | null;
+
   @ApiProperty({
     description: 'Styling to be used for a Module',
     example: {
@@ -207,6 +225,7 @@ export class CreateModuleDto extends PickType(ModulesDto, [
   'moduleCode',
   'moduleName',
   'moduleDescription',
+  'semester',
   'styling',
   'validated',
   'ExternalID',
@@ -274,6 +293,11 @@ export class ModuleListResponseDto {
   message?: string;
 }
 
+export class ModuleListResponseDtoV2 extends IntersectionType(
+  ModuleListResponseDto,
+  PickType(StatsResponseDto, ['count']),
+) {}
+
 //Delete
 export class DeleteModuleResponseDto extends PickType(ModulesDto, [
   'moduleCode',
@@ -328,16 +352,13 @@ export class ModuleFiltersDto {
     else return false;
   })
   userEnrollment?: boolean;
-
-  // @ApiPropertyOptional({
-  //   default: false,
-  //   description: 'Used to get the moduel styling and when moduleEnrollment filter is active'
-  // })
-  // @IsOptional()
-  // @IsUUID()
-  // @ValidateIf((o)=> o.userEnrollment===true)
-  // userId?: string;
 } //ModuleFiltersDto
+
+//GetAllV2 filters
+export class ModuleFiltersDtoV2 extends IntersectionType(
+  ModuleFiltersDto,
+  PickType(StatsFiltersDto, ['Stats']),
+) {}
 
 export class ModuleStylingResponseDto {
   @ApiProperty({

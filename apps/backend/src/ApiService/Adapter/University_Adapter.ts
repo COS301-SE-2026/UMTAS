@@ -43,7 +43,7 @@ export abstract class University_Adapter {
   ): Promise<T> {
     await this.authenticate();
 
-    const timeout = 10000; //10 seconds
+    const timeout = 15000; //15 seconds
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 

@@ -1,4 +1,8 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  ApiProperty,
+  ApiPropertyOptional,
+  IntersectionType,
+} from '@nestjs/swagger';
 import {
   IsArray,
   IsNotEmpty,
@@ -11,6 +15,7 @@ import {
 import { PartialType, PickType, OmitType } from '@nestjs/swagger';
 import { ModulesDto } from 'src/Module/dto/module.dto';
 import { Type } from 'class-transformer';
+import { StatsFiltersDto, StatsResponseDto } from 'src/stats.dto';
 
 export class CourseDto {
   @ApiProperty({
@@ -108,6 +113,11 @@ export class CourseListResponseDto {
   message?: string;
 }
 
+export class CourseListResponseDtoV2 extends IntersectionType(
+  CourseListResponseDto,
+  PickType(StatsResponseDto, ['count']),
+) {}
+
 //Delete
 export class DeleteCourseResponseDto extends PickType(CourseDto, [
   'CourseName',
@@ -119,4 +129,9 @@ export class DeleteCourseResponseDto extends PickType(CourseDto, [
 //getAll filters
 export class CourseFilters extends PartialType(
   PickType(CourseDto, ['CourseName', 'UniversityID', 'Degree']),
+) {}
+
+export class CourseFiltersV2 extends IntersectionType(
+  CourseFilters,
+  PickType(StatsFiltersDto, ['Stats']),
 ) {}

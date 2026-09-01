@@ -33,6 +33,17 @@ def test_lecture_fixture_preserves_multiline_rows_and_metadata(up_parser):
     assert cos301_p2[0]["metadata"] == {"group": "G01", "semester": "S1", "language": "E", "campus": "HATFIELD"}
 
 
+def test_lecture_fixture_promotes_semester_to_module_metadata(up_parser):
+    modules = {
+        module["code"]: module
+        for module in parse_fixture(up_parser, "LECTURES_BOTH.pdf")["modules"]
+    }
+
+    assert modules["COS314"]["metadata"]["semester"] == "SEMESTER_1"
+    assert modules["COS326"]["metadata"]["semester"] == "SEMESTER_2"
+    assert modules["COS301"]["metadata"]["semester"] == "YEAR"
+
+
 def test_lecture_processing_normalises_times_days_recurrence_and_locations(up_parser):
     events = parse_fixture(up_parser, "LECTURES_BOTH.pdf")["events"]
 

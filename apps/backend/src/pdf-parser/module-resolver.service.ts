@@ -66,6 +66,7 @@ export class ModuleResolver {
         moduleDescription: candidate.metadata
           ? JSON.stringify(candidate.metadata)
           : null,
+        semester: this.moduleSemester(candidate.metadata.semester),
         validated: false,
       })
       .onConflictDoNothing({
@@ -88,6 +89,26 @@ export class ModuleResolver {
     }
 
     return existing;
+  }
+
+  private moduleSemester(value: unknown): ModuleRecord['semester'] {
+    if (
+      value === 1 ||
+      value === '1' ||
+      value === 'S1' ||
+      value === 'SEMESTER_1'
+    ) {
+      return 'SEMESTER_1';
+    }
+    if (
+      value === 2 ||
+      value === '2' ||
+      value === 'S2' ||
+      value === 'SEMESTER_2'
+    ) {
+      return 'SEMESTER_2';
+    }
+    return 'YEAR';
   }
 
   private async findModulesOwnedByUniversityViaGroupLinks(

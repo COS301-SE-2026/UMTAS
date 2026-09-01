@@ -1,0 +1,784 @@
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
+import { and, asc, desc, eq, inArray, isNull } from 'drizzle-orm';
+import { DatabaseService } from '../db/database.service';
+import {
+  AcademicCalendar,
+  type AcademicCalendarRecord,
+  CalendarRestriction,
+  type CalendarRestrictionRecord,
+  Event,
+  EventsToTimetables,
+  EventVenue,
+  GeneratedCalendar,
+  type GeneratedCalendarRecord,
+  modules,
+  ModuleStyling,
+  Timetable,
+  UniversityEvent,
+  UserTimetable,
+  Venue,
+} from '../entities';
+import { weekdayForDate } from '../entities/AcademicCalendar/date.utils';
+import {
+  AcademicCalendarDto,
+  CalendarRestrictionDto,
+  CalendarRestrictionListDto,
+  CreateAcademicCalendarDto,
+  CreateCalendarRestrictionDto,
+  DeleteAcademicCalendarResponseDto,
+  DeleteCalendarRestrictionResponseDto,
+  GenerateCalendarDto,
+  GeneratedCalendarDto,
+  UpdateCalendarRestrictionDto,
+  UpdateCalendarSubscriptionsDto,
+} from './dto';
+import {
+  AcademicCalendarGenerationService,
+  type CalendarSourceEvent,
+} from './academic-calendar-generation.service';
+
+type DbError = { code?: string; constraint?: string; cause?: unknown };
+
+const PUBLIC_CALENDAR_RESTRICTION_TYPES = [
+  'PUBLIC_HOLIDAY',
+  'HOLIDAY',
+  'UNIVERSITY_CLOSURE',
+] as const;
+const SEMESTER_BOUNDARY_TYPES = [
+  'SEMESTER_1_START',
+  'SEMESTER_1_END',
+  'SEMESTER_2_START',
+  'SEMESTER_2_END',
+] as const;
+type SemesterBoundaryType = (typeof SEMESTER_BOUNDARY_TYPES)[number];
+type RestrictionForValidation = Pick<
+  CalendarRestrictionRecord,
+  'id' | 'type' | 'startDate' | 'endDate'
+>;
+
+@Injectable()
+export class AcademicCalendarService {
+  constructor(
+    private readonly databaseService: DatabaseService,
+    private readonly generationService: AcademicCalendarGenerationService,
+  ) {}
+
+  async createCalendar(
+    universityId: string,
+    dto: CreateAcademicCalendarDto,
+  ): Promise<AcademicCalendarDto> {
+    try {
+      const [created] = await this.databaseService.db
+        .insert(AcademicCalendar)
+        .values({ universityId, year: dto.year })
+        .returning();
+
+      if (!created) {
+        throw new InternalServerErrorException(
+          'Academic calendar was not created',
+        );
+      }
+      return this.toCalendarDto(created);
+    } catch (error) {
+      if (this.isConstraint(error, '23505')) {
+        this.throwCalendarAlreadyExists(universityId, dto.year);
+      }
+      throw error;
+    }
+  }
+
+  async getCalendar(
+    universityId: string,
+    id: string,
+  ): Promise<AcademicCalendarDto> {
+    const calendar = await this.findCalendar(universityId, id);
+    return this.toCalendarDto(calendar);
+  }
+
+  async listCalendars(
+    universityId: string,
+    year?: number,
+  ): Promise<AcademicCalendarDto[]> {
+    const conditions = [eq(AcademicCalendar.universityId, universityId)];
+    if (year !== undefined) {
+      conditions.push(eq(AcademicCalendar.year, year));
+    }
+
+    const calendars = await this.databaseService.db
+      .select()
+      .from(AcademicCalendar)
+      .where(and(...conditions))
+      .orderBy(desc(AcademicCalendar.year));
+
+    return calendars.map((calendar) => this.toCalendarDto(calendar));
+  }
+
+  async listPublicCalendars(year?: number): Promise<AcademicCalendarDto[]> {
+    const conditions = [isNull(AcademicCalendar.universityId)];
+    if (year !== undefined) {
+      conditions.push(eq(AcademicCalendar.year, year));
+    }
+
+    const calendars = await this.databaseService.db
+      .select()
+      .from(AcademicCalendar)
+      .where(and(...conditions))
+      .orderBy(desc(AcademicCalendar.year));
+
+    return calendars.map((calendar) => this.toCalendarDto(calendar));
+  }
+
+  async deleteCalendar(
+    universityId: string,
+    id: string,
+  ): Promise<DeleteAcademicCalendarResponseDto> {
+    try {
+      const [deleted] = await this.databaseService.db
+        .delete(AcademicCalendar)
+        .where(
+          and(
+            eq(AcademicCalendar.id, id),
+            eq(AcademicCalendar.universityId, universityId),
+          ),
+        )
+        .returning();
+
+      if (!deleted) this.throwCalendarNotFound(id);
+      return { success: true };
+    } catch (error) {
+      if (this.isConstraint(error, '23503')) {
+        throw new ConflictException(
+          'Generated snapshots still reference this calendar',
+        );
+      }
+      throw error;
+    }
+  }
+
+  async getRestrictions(
+    universityId: string,
+    academicCalendarId: string,
+  ): Promise<CalendarRestrictionListDto> {
+    await this.findCalendar(universityId, academicCalendarId);
+
+    const restrictions = await this.databaseService.db
+      .select()
+      .from(CalendarRestriction)
+      .where(eq(CalendarRestriction.academicCalendarId, academicCalendarId))
+      .orderBy(
+        asc(CalendarRestriction.startDate),
+        asc(CalendarRestriction.createdAt),
+      );
+
+    return {
+      restrictions: restrictions.map((row) => this.toRestrictionDto(row)),
+    };
+  }
+
+  async createRestriction(
+    universityId: string,
+    academicCalendarId: string,
+    dto: CreateCalendarRestrictionDto,
+  ): Promise<CalendarRestrictionDto> {
+    const calendar = await this.findCalendar(universityId, academicCalendarId);
+    const values = this.normalizeRestriction(dto, calendar.year);
+    const existing =
+      await this.findRestrictionsForValidation(academicCalendarId);
+    this.validateSemesterInvariants(existing, [
+      ...existing,
+      { id: '__new__', ...values },
+    ]);
+
+    try {
+      const [created] = await this.databaseService.db
+        .insert(CalendarRestriction)
+        .values({ academicCalendarId, ...values })
+        .returning();
+
+      if (!created) {
+        throw new InternalServerErrorException(
+          'Calendar restriction was not created',
+        );
+      }
+      return this.toRestrictionDto(created);
+    } catch (error) {
+      if (this.isConstraint(error, '23505')) {
+        this.throwDuplicateDaySwap(academicCalendarId, values.startDate);
+      }
+      throw error;
+    }
+  }
+
+  async updateRestriction(
+    universityId: string,
+    academicCalendarId: string,
+    restrictionId: string,
+    dto: UpdateCalendarRestrictionDto,
+  ): Promise<CalendarRestrictionDto> {
+    const calendar = await this.findCalendar(universityId, academicCalendarId);
+    const values = this.normalizeRestriction(dto, calendar.year);
+    const existing =
+      await this.findRestrictionsForValidation(academicCalendarId);
+    if (!existing.some((restriction) => restriction.id === restrictionId)) {
+      this.throwRestrictionNotFound(restrictionId);
+    }
+    this.validateSemesterInvariants(
+      existing,
+      existing.map((restriction) =>
+        restriction.id === restrictionId
+          ? { id: restrictionId, ...values }
+          : restriction,
+      ),
+    );
+
+    try {
+      const [updated] = await this.databaseService.db
+        .update(CalendarRestriction)
+        .set({ ...values, updatedAt: new Date() })
+        .where(
+          and(
+            eq(CalendarRestriction.id, restrictionId),
+            eq(CalendarRestriction.academicCalendarId, academicCalendarId),
+          ),
+        )
+        .returning();
+
+      if (!updated) this.throwRestrictionNotFound(restrictionId);
+      return this.toRestrictionDto(updated);
+    } catch (error) {
+      if (this.isConstraint(error, '23505')) {
+        this.throwDuplicateDaySwap(academicCalendarId, values.startDate);
+      }
+      throw error;
+    }
+  }
+
+  async deleteRestriction(
+    universityId: string,
+    academicCalendarId: string,
+    restrictionId: string,
+  ): Promise<DeleteCalendarRestrictionResponseDto> {
+    await this.findCalendar(universityId, academicCalendarId);
+    const existing =
+      await this.findRestrictionsForValidation(academicCalendarId);
+    if (!existing.some((restriction) => restriction.id === restrictionId)) {
+      this.throwRestrictionNotFound(restrictionId);
+    }
+    this.validateSemesterInvariants(
+      existing,
+      existing.filter((restriction) => restriction.id !== restrictionId),
+    );
+
+    const [deleted] = await this.databaseService.db
+      .delete(CalendarRestriction)
+      .where(
+        and(
+          eq(CalendarRestriction.id, restrictionId),
+          eq(CalendarRestriction.academicCalendarId, academicCalendarId),
+        ),
+      )
+      .returning();
+
+    if (!deleted) this.throwRestrictionNotFound(restrictionId);
+    return { success: true };
+  }
+
+  async updateSubscriptions(
+    universityId: string,
+    id: string,
+    dto: UpdateCalendarSubscriptionsDto,
+  ): Promise<AcademicCalendarDto> {
+    const calendar = await this.findCalendar(universityId, id);
+
+    if (dto.subscriptions.length > 0) {
+      const found = await this.databaseService.db
+        .select({ id: AcademicCalendar.id, year: AcademicCalendar.year })
+        .from(AcademicCalendar)
+        .where(
+          and(
+            inArray(AcademicCalendar.id, dto.subscriptions),
+            isNull(AcademicCalendar.universityId),
+          ),
+        );
+      const foundIds = new Set(found.map((item) => item.id));
+      const unresolved = dto.subscriptions.filter(
+        (item) => !foundIds.has(item),
+      );
+
+      if (unresolved.length > 0) {
+        throw new NotFoundException(
+          `Public academic calendars not found for ids: ${unresolved.join(', ')}`,
+        );
+      }
+      if (found.some((item) => item.year !== calendar.year)) {
+        throw new UnprocessableEntityException(
+          `Public academic calendars must match academic calendar year ${calendar.year}`,
+        );
+      }
+    }
+
+    const [updated] = await this.databaseService.db
+      .update(AcademicCalendar)
+      .set({ subscriptions: dto.subscriptions, updatedAt: new Date() })
+      .where(
+        and(
+          eq(AcademicCalendar.id, id),
+          eq(AcademicCalendar.universityId, universityId),
+        ),
+      )
+      .returning();
+
+    if (!updated) this.throwCalendarNotFound(id);
+    return this.toCalendarDto(updated);
+  }
+
+  async generateCalendar(
+    userId: string,
+    universityId: string,
+    dto: GenerateCalendarDto,
+  ): Promise<GeneratedCalendarDto> {
+    const calendar = await this.findCalendarForYear(
+      universityId,
+      dto.year ?? this.currentYear(),
+    );
+    const timetable = await this.findOwnedTimetable(userId, dto.timetableId);
+    const restrictions = await this.resolveRestrictions(calendar);
+    const sourceEvents = await this.findSourceEvents(
+      userId,
+      timetable.timetableID,
+    );
+    const payload = this.generationService.build(
+      calendar,
+      timetable.timetableName,
+      restrictions,
+      sourceEvents,
+    );
+
+    const [created] = await this.databaseService.db
+      .insert(GeneratedCalendar)
+      .values({
+        academicCalendarId: calendar.id,
+        timetableId: timetable.timetableID,
+        payload,
+      })
+      .onConflictDoUpdate({
+        target: [
+          GeneratedCalendar.academicCalendarId,
+          GeneratedCalendar.timetableId,
+        ],
+        set: { payload, createdAt: new Date() },
+      })
+      .returning();
+
+    if (!created) {
+      throw new InternalServerErrorException(
+        'Generated calendar snapshot was not saved',
+      );
+    }
+    return this.toGeneratedCalendarDto(created);
+  }
+
+  async getGeneratedCalendar(
+    userId: string,
+    universityId: string,
+    id: string,
+  ): Promise<GeneratedCalendarDto> {
+    const [row] = await this.databaseService.db
+      .select({ generated: GeneratedCalendar })
+      .from(GeneratedCalendar)
+      .innerJoin(
+        AcademicCalendar,
+        eq(AcademicCalendar.id, GeneratedCalendar.academicCalendarId),
+      )
+      .innerJoin(
+        UserTimetable,
+        eq(UserTimetable.TimetableID, GeneratedCalendar.timetableId),
+      )
+      .where(
+        and(
+          eq(GeneratedCalendar.id, id),
+          eq(AcademicCalendar.universityId, universityId),
+          eq(UserTimetable.UserID, userId),
+        ),
+      )
+      .limit(1);
+    if (!row) {
+      throw new NotFoundException(`Generated calendar not found for id: ${id}`);
+    }
+    return this.toGeneratedCalendarDto(row.generated);
+  }
+
+  private async findOwnedTimetable(userId: string, timetableId: string) {
+    const [row] = await this.databaseService.db
+      .select({ timetable: Timetable })
+      .from(UserTimetable)
+      .innerJoin(
+        Timetable,
+        eq(UserTimetable.TimetableID, Timetable.timetableID),
+      )
+      .where(
+        and(
+          eq(UserTimetable.UserID, userId),
+          eq(Timetable.timetableID, timetableId),
+        ),
+      )
+      .limit(1);
+    if (!row) {
+      throw new NotFoundException(`Timetable not found for id: ${timetableId}`);
+    }
+    return row.timetable;
+  }
+
+  private async findSourceEvents(
+    userId: string,
+    timetableId: string,
+  ): Promise<CalendarSourceEvent[]> {
+    const rows = await this.databaseService.db
+      .select({
+        event: Event,
+        moduleId: modules.moduleID,
+        moduleCode: modules.moduleCode,
+        moduleName: modules.moduleName,
+        semester: modules.semester,
+        styling: ModuleStyling.styling,
+        venueName: Venue.VenueName,
+      })
+      .from(EventsToTimetables)
+      .innerJoin(Event, eq(Event.eventID, EventsToTimetables.eventID))
+      .leftJoin(UniversityEvent, eq(UniversityEvent.eventID, Event.eventID))
+      .leftJoin(modules, eq(modules.moduleID, UniversityEvent.moduleID))
+      .leftJoin(
+        ModuleStyling,
+        and(
+          eq(ModuleStyling.ModuleID, modules.moduleID),
+          eq(ModuleStyling.UserID, userId),
+        ),
+      )
+      .leftJoin(EventVenue, eq(EventVenue.EventID, Event.eventID))
+      .leftJoin(Venue, eq(Venue.VenueID, EventVenue.VenueID))
+      .where(eq(EventsToTimetables.timetableID, timetableId));
+
+    const events = new Map<string, CalendarSourceEvent>();
+    for (const row of rows) {
+      let event = events.get(row.event.eventID);
+      if (!event) {
+        event = {
+          id: row.event.eventID,
+          name: row.event.eventName,
+          activityCode: row.event.activityCode,
+          activityType: row.event.activityType,
+          criteria: row.event.eventCriteria,
+          isRecurring: row.event.isRecurring,
+          moduleId: row.moduleId,
+          moduleCode: row.moduleCode,
+          moduleName: row.moduleName,
+          semester: row.semester,
+          moduleColour: row.styling?.colour || null,
+          venues: [],
+        };
+        events.set(event.id, event);
+      }
+      if (row.venueName && !event.venues.includes(row.venueName)) {
+        event.venues.push(row.venueName);
+      }
+    }
+    return [...events.values()];
+  }
+
+  private async resolveRestrictions(
+    calendar: AcademicCalendarRecord,
+  ): Promise<CalendarRestrictionRecord[]> {
+    const own = await this.databaseService.db
+      .select()
+      .from(CalendarRestriction)
+      .where(eq(CalendarRestriction.academicCalendarId, calendar.id))
+      .orderBy(
+        asc(CalendarRestriction.startDate),
+        asc(CalendarRestriction.createdAt),
+      );
+
+    if (calendar.subscriptions.length === 0) return own;
+
+    const subscribedRows = await this.databaseService.db
+      .select({ restriction: CalendarRestriction })
+      .from(CalendarRestriction)
+      .innerJoin(
+        AcademicCalendar,
+        eq(AcademicCalendar.id, CalendarRestriction.academicCalendarId),
+      )
+      .where(
+        and(
+          inArray(
+            CalendarRestriction.academicCalendarId,
+            calendar.subscriptions,
+          ),
+          isNull(AcademicCalendar.universityId),
+          eq(AcademicCalendar.year, calendar.year),
+          inArray(CalendarRestriction.type, PUBLIC_CALENDAR_RESTRICTION_TYPES),
+        ),
+      );
+    const ownKeys = new Set(own.map((item) => this.restrictionKey(item)));
+    const subscribedKeys = new Set<string>();
+    const deduped = subscribedRows
+      .map((row) => row.restriction)
+      .filter((restriction) => {
+        const key = this.restrictionKey(restriction);
+        if (ownKeys.has(key) || subscribedKeys.has(key)) return false;
+        subscribedKeys.add(key);
+        return true;
+      });
+
+    return [...own, ...deduped].sort(
+      (left, right) =>
+        left.startDate.localeCompare(right.startDate) ||
+        left.createdAt.getTime() - right.createdAt.getTime(),
+    );
+  }
+
+  private restrictionKey(restriction: CalendarRestrictionRecord): string {
+    return `${restriction.type}:${restriction.startDate}:${restriction.endDate}`;
+  }
+
+  private toGeneratedCalendarDto(
+    row: GeneratedCalendarRecord,
+  ): GeneratedCalendarDto {
+    return {
+      id: row.id,
+      payload: row.payload,
+    };
+  }
+
+  private async findCalendar(
+    universityId: string,
+    id: string,
+  ): Promise<AcademicCalendarRecord> {
+    const [calendar] = await this.databaseService.db
+      .select()
+      .from(AcademicCalendar)
+      .where(
+        and(
+          eq(AcademicCalendar.id, id),
+          eq(AcademicCalendar.universityId, universityId),
+        ),
+      )
+      .limit(1);
+    if (!calendar) this.throwCalendarNotFound(id);
+    return calendar;
+  }
+
+  private async findCalendarForYear(
+    universityId: string,
+    year: number,
+  ): Promise<AcademicCalendarRecord> {
+    const [calendar] = await this.databaseService.db
+      .select()
+      .from(AcademicCalendar)
+      .where(
+        and(
+          eq(AcademicCalendar.universityId, universityId),
+          eq(AcademicCalendar.year, year),
+        ),
+      )
+      .limit(1);
+    if (!calendar) {
+      throw new NotFoundException(
+        `Academic calendar not found for university ${universityId} and year ${year}`,
+      );
+    }
+    return calendar;
+  }
+
+  private normalizeRestriction(
+    dto: CreateCalendarRestrictionDto,
+    calendarYear: number,
+  ) {
+    const endDate = dto.endDate ?? dto.startDate;
+    if (endDate < dto.startDate) {
+      throw new UnprocessableEntityException(
+        'Restriction endDate must be on or after startDate',
+      );
+    }
+
+    const expectedYear = String(calendarYear);
+    if (
+      !dto.startDate.startsWith(`${expectedYear}-`) ||
+      !endDate.startsWith(`${expectedYear}-`)
+    ) {
+      throw new UnprocessableEntityException(
+        `Restriction dates must fall within academic calendar year ${calendarYear}`,
+      );
+    }
+
+    if (dto.type === 'DAY_SWAP') {
+      if (!dto.replacementWeekday || endDate !== dto.startDate) {
+        this.throwInvalidRestrictionFields(
+          'DAY_SWAP requires replacementWeekday and must target one date',
+        );
+      }
+      if (weekdayForDate(dto.startDate) === dto.replacementWeekday) {
+        throw new ConflictException(
+          'A day swap must use a different weekday pattern',
+        );
+      }
+    } else if (dto.replacementWeekday !== undefined) {
+      this.throwInvalidRestrictionFields(
+        'replacementWeekday is allowed only for DAY_SWAP',
+      );
+    }
+
+    return {
+      type: dto.type,
+      startDate: dto.startDate,
+      endDate,
+      description: dto.description ?? '',
+      replacementWeekday: dto.replacementWeekday ?? null,
+    };
+  }
+
+  private async findRestrictionsForValidation(
+    academicCalendarId: string,
+  ): Promise<RestrictionForValidation[]> {
+    return this.databaseService.db
+      .select({
+        id: CalendarRestriction.id,
+        type: CalendarRestriction.type,
+        startDate: CalendarRestriction.startDate,
+        endDate: CalendarRestriction.endDate,
+      })
+      .from(CalendarRestriction)
+      .where(eq(CalendarRestriction.academicCalendarId, academicCalendarId));
+  }
+
+  private validateSemesterInvariants(
+    before: RestrictionForValidation[],
+    after: RestrictionForValidation[],
+  ): void {
+    const boundaries = (restrictions: RestrictionForValidation[]) =>
+      new Map(
+        SEMESTER_BOUNDARY_TYPES.map((type) => [
+          type,
+          restrictions.filter((restriction) => restriction.type === type),
+        ]),
+      );
+    const previous = boundaries(before);
+    const candidate = boundaries(after);
+
+    for (const type of SEMESTER_BOUNDARY_TYPES) {
+      if (candidate.get(type)!.length > 1) {
+        throw new UnprocessableEntityException(
+          `Academic calendar requires exactly one ${type} restriction`,
+        );
+      }
+    }
+
+    const wasComplete = SEMESTER_BOUNDARY_TYPES.every(
+      (type) => previous.get(type)!.length === 1,
+    );
+    const isComplete = SEMESTER_BOUNDARY_TYPES.every(
+      (type) => candidate.get(type)!.length === 1,
+    );
+    if (wasComplete && !isComplete) {
+      const missing = SEMESTER_BOUNDARY_TYPES.find(
+        (type) => candidate.get(type)!.length !== 1,
+      )!;
+      throw new UnprocessableEntityException(
+        `Academic calendar requires exactly one ${missing} restriction`,
+      );
+    }
+    if (!isComplete) return;
+
+    const boundaryDate = (type: SemesterBoundaryType): string => {
+      const restriction = candidate.get(type)![0];
+      return type.endsWith('_END')
+        ? restriction.endDate
+        : restriction.startDate;
+    };
+    const semester1Start = boundaryDate('SEMESTER_1_START');
+    const semester1End = boundaryDate('SEMESTER_1_END');
+    const semester2Start = boundaryDate('SEMESTER_2_START');
+    const semester2End = boundaryDate('SEMESTER_2_END');
+    if (
+      semester1Start > semester1End ||
+      semester2Start > semester2End ||
+      semester1End >= semester2Start
+    ) {
+      throw new UnprocessableEntityException(
+        'Academic calendar semester boundaries overlap or are out of order',
+      );
+    }
+  }
+
+  private currentYear(): number {
+    return new Date().getUTCFullYear();
+  }
+
+  private toCalendarDto(row: AcademicCalendarRecord): AcademicCalendarDto {
+    return {
+      id: row.id,
+      year: row.year,
+      subscriptions: row.subscriptions,
+    };
+  }
+
+  private toRestrictionDto(
+    row: CalendarRestrictionRecord,
+  ): CalendarRestrictionDto {
+    return {
+      id: row.id,
+      type: row.type,
+      startDate: row.startDate,
+      endDate: row.endDate,
+      description: row.description,
+      replacementWeekday: row.replacementWeekday,
+    };
+  }
+
+  private throwCalendarNotFound(id: string): never {
+    throw new NotFoundException(`Academic calendar not found for id: ${id}`);
+  }
+
+  private throwRestrictionNotFound(id: string): never {
+    throw new NotFoundException(`Calendar restriction not found for id: ${id}`);
+  }
+
+  private throwCalendarAlreadyExists(
+    universityId: string,
+    year: number,
+  ): never {
+    throw new ConflictException(
+      `An academic calendar already exists for university ${universityId} and year ${year}`,
+    );
+  }
+
+  private throwDuplicateDaySwap(
+    academicCalendarId: string,
+    startDate: string,
+  ): never {
+    throw new ConflictException(
+      `A day swap already exists for ${startDate} in calendar ${academicCalendarId}`,
+    );
+  }
+
+  private throwInvalidRestrictionFields(message: string): never {
+    throw new UnprocessableEntityException(message);
+  }
+
+  private isConstraint(error: unknown, code: string): boolean {
+    let current = error;
+    const visited = new Set<object>();
+    while (typeof current === 'object' && current !== null) {
+      if (visited.has(current)) return false;
+      visited.add(current);
+      const databaseError = current as DbError;
+      if (databaseError.code === code) return true;
+      current = databaseError.cause;
+    }
+    return false;
+  }
+}

@@ -1,6 +1,7 @@
 import {
   ApiProperty,
   ApiPropertyOptional,
+  IntersectionType,
   OmitType,
   PartialType,
   PickType,
@@ -20,6 +21,7 @@ import {
 } from 'class-validator';
 import { ActivityTypeSchema } from 'shared-types';
 import { EventSource, type DayOfWeek } from './event.types';
+import { StatsFiltersDto, StatsResponseDto } from 'src/stats.dto';
 
 const DAY_OF_WEEK: DayOfWeek[] = [
   'monday',
@@ -179,17 +181,25 @@ export class EventSingleResponseDto {
   @IsString()
   message?: string;
 }
+
 export class EventListResponseDto {
   @ApiProperty({ type: [EventDto] }) events!: EventDto[];
 
   message?: string;
 }
+
+export class EventListResponseDtoV2 extends IntersectionType(
+  EventListResponseDto,
+  PickType(StatsResponseDto, ['count']),
+) {}
+
 export class DeleteResponseDto extends PickType(EventDto, [
   'eventName',
   'activityCode',
 ] as const) {
   @ApiProperty({ type: Boolean }) success!: boolean;
 }
+
 export class EventFiltersDto {
   @ApiPropertyOptional() @IsOptional() @IsUUID() moduleId?: string;
 
@@ -201,6 +211,11 @@ export class EventFiltersDto {
   @IsBoolean()
   all?: boolean;
 }
+
+export class EventFiltersDtoV2 extends IntersectionType(
+  EventFiltersDto,
+  PickType(StatsFiltersDto, ['Stats']),
+) {}
 
 export class ValidateEventDto extends PickType(EventDto, ['validated']) {}
 

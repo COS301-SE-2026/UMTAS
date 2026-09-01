@@ -127,6 +127,7 @@ describe('BuilderService', () => {
           moduleCode: moduleDto.moduleCode,
           moduleName: moduleDto.moduleName,
           moduleDescription: moduleDto.moduleDescription,
+          semester: moduleDto.semester,
           CourseID: courseId,
           styling: undefined,
         },

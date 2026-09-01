@@ -44,7 +44,6 @@ import { useSearchParams } from "next/navigation";
 import { removeTimetableMut } from "@/components/templates/builder/Queries/timetableQueries";
 import { useMutation } from "@tanstack/react-query";
 import { UserDetails } from "@/lib/userclass/userClass";
-import NoRoleSelected from "@/components/molecules/roleManagement/NoRoleSelected";
 
 import Tutorial from "@/components/organisms/nav/Tutorial";
 import { fetchAllModulesv2 } from "../../../../utilities/V2-Builders/Modules";
@@ -386,9 +385,6 @@ export function ScheduleView({
         />
       );
     }
-
-    const hasRole = UniDetails?.role != null;
-    if (!hasRole) return <NoRoleSelected />;
 
     return (
       <>

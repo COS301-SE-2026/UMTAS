@@ -36,11 +36,8 @@ export function NavUser({ name: nameProp }: NavUserProps) {
   }, [pathname, session]);
 
   async function handleSignOut() {
-    UserDetails.storeUniDetails({
-      UniversityID: "",
-      UniversityName: "",
-      role: undefined,
-    });
+    UserDetails.storeUniDetails(undefined);
+
     await signOut({
       fetchOptions: {
         onSuccess: () => router.push("/login"),

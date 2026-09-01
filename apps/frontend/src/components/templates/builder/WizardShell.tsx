@@ -11,7 +11,6 @@ import { getAllModulesQ } from "./Queries/moduleQueries";
 import { useQuery } from "@tanstack/react-query";
 import { getAllEventsQ } from "./Queries/eventQueries";
 import { UserDetails } from "@/lib/userclass/userClass";
-import NoRoleSelected from "@/components/molecules/roleManagement/NoRoleSelected";
 
 const Steps = [{ label: "Modules" }, { label: "Events" }];
 
@@ -103,9 +102,6 @@ export function WizardShell() {
     return false;
   }
   */
-
-  const hasRole = UniDetails?.role != null;
-  if (!hasRole) return <NoRoleSelected />;
 
   function renderStep() {
     if (currentStep === 0) {

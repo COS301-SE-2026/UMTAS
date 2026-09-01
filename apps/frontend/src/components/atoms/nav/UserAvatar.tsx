@@ -41,7 +41,7 @@ export function UserAvatar({ name, className }: UserAvatarProps) {
     >
       {selectAvatar && (
         <Popup>
-          <div className="w-fit text-center">
+          <div className="w-fit text-center" data-testid="dashboard-popup-div">
             <ChooseInstituteTemplate onClose={() => setSelectAvatar(false)} />
             <div className="w-full mt-5 items-center justify-center flex"></div>
           </div>

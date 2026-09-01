@@ -1,8 +1,6 @@
 //University
 export const UniversityNames: string[] = [
   'University of Pretoria',
-  'North-West University',
-  'University of Cape Town',
   'University of Maryland',
 ];
 
@@ -11,6 +9,5 @@ import type { RoleTypeType } from '../../../entities';
 export const UserUniRoles: RoleTypeType[] = [
   'STUDENT',
   'LECTURER',
-  'UNIVERSITY_ADMIN',
   'UNIVERSITY_ADMIN',
 ]; //Jannie | Sarrie | Piet

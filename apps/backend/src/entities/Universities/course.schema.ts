@@ -6,6 +6,7 @@ import {
   boolean,
   uniqueIndex,
   unique,
+  timestamp,
 } from 'drizzle-orm/pg-core';
 import { modules } from '../Modules';
 import { University } from './University.schema';
@@ -31,6 +32,9 @@ export const Course = pgTable(
     CourseName: varchar('CourseName', { length: 255 }).notNull(),
     Degree: varchar('Degree', { length: 30 }),
     ExternalID: varchar('ExternalID', { length: 255 }),
+    createdAt: timestamp('createdAt', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
   },
   (table) => [
     unique('Course_University_ExternalID_Unique').on(

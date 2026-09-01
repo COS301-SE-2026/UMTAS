@@ -14,12 +14,17 @@ export class UserDetails {
     } else return false;
   }
 
-  public static storeUniDetails(details?: uniDto) {
+  public static storeUniDetails(details?: uniDto | undefined) {
+    if (details == undefined && this.checkWindow()) {
+      localStorage.setItem(this.uniKey, "");
+    }
+
     if (!details || !this.checkWindow()) return;
     const data = JSON.stringify(details);
     localStorage.setItem(this.uniKey, data);
+
     window.dispatchEvent(new Event(this.changeEvent));
-    console.log("University stored", details);
+
     getQueryClient().invalidateQueries();
   }
   public static getUniDetails(): uniDto | undefined {
@@ -27,7 +32,7 @@ export class UserDetails {
 
     const storedItem = localStorage.getItem(this.uniKey);
 
-    if (storedItem) {
+    if (storedItem && storedItem != "") {
       const data = JSON.parse(storedItem);
       return data as uniDto;
     }

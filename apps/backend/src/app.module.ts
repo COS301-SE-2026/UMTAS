@@ -26,9 +26,12 @@ import { BuildingModule } from './Building/building.module';
 import { MapConfigModule } from './Map-config/map-config.module';
 import { ApiServiceModule } from './ApiService/ApiService.module';
 import { RouteModule } from './Route/route.module';
+import { AcademicCalendarModule } from './academic_calendar/academic_calendar.module';
+import { PostHogModule } from './posthog/posthog.module';
 
 @Module({
   imports: [
+    PostHogModule,
     DatabaseModule,
     HealthModule,
     MailModule,
@@ -48,6 +51,7 @@ import { RouteModule } from './Route/route.module';
     BuildingModule,
     MapConfigModule,
     RouteModule,
+    AcademicCalendarModule,
     ApiServiceModule,
   ],
   controllers: [AppController, AuthController],
