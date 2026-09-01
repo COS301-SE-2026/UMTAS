@@ -20,7 +20,10 @@ import {
 } from './dto/EventDto.dto';
 import { AppDatabase } from 'src/auth/auth';
 import { Event, UniversityEvent, Venue } from 'src/entities';
-import { UniversitySingleResponseDto } from 'src/University/dto/university.dto';
+import {
+  UniversityDto,
+  UniversitySingleResponseDto,
+} from 'src/University/dto/university.dto';
 import { DayOfWeek } from './dto/event.types';
 import { and, eq, inArray } from 'drizzle-orm';
 
@@ -106,11 +109,13 @@ export class EventServiceV2 extends EventService {
         );
     } //END_!existing
 
-    const venueIds: string[] | undefined = event.venues?.map(
+    const venueIds: string[] | undefined = dto.venues?.map(
       (venue) => venue.venueId,
     );
-    if (venueIds !== undefined)
+    if (venueIds !== undefined) {
       await this.insertEventVenues(tx, event.eventId, venueIds);
+      event.venues = dto.venues;
+    }
 
     return { event };
   } //END_CreateV2
@@ -246,12 +251,17 @@ export class EventServiceV2 extends EventService {
       tx,
     );
 
-    if (validated.venues && validated.venues.length !== 0)
+    if (validated.venues && validated.venues.length !== 0) {
       validated.venues = await this.validateVenues(
         tx,
         uni.UniversityID,
         validated.venues,
       );
+    } else if (validated.venueName) {
+      validated.venues = [
+        await this.validateAndCreateVenueName(tx, uni, validated.venueName),
+      ];
+    }
 
     return validated;
   } //END_validateCreateEventDto
@@ -390,4 +400,57 @@ export class EventServiceV2 extends EventService {
 
     return fresh;
   } //END_validateVenues
+
+  protected async validateAndCreateVenueName(
+    tx: AppDatabase,
+    university: UniversityDto,
+    venueName: string,
+  ): Promise<VenueDto> {
+    this.OOPSIE.log(`validateAndCreateVenueName: venueName[${venueName}]`);
+    venueName = venueName.trim();
+
+    //Assign default venueName
+    if (venueName.length === 0) venueName = 'Default VenueName';
+
+    //If venue with that name already exists, with same universityID - return early
+    const [existing] = await tx
+      .select({
+        venueId: Venue.VenueID,
+        venueName: Venue.VenueName,
+      })
+      .from(Venue)
+      .where(
+        and(
+          eq(Venue.VenueName, venueName),
+          eq(Venue.UniversityID, university.UniversityID),
+        ),
+      )
+      .limit(1);
+
+    if (existing) {
+      this.OOPSIE.log(
+        `validateAndCreateVenue: Returned existing venue[${JSON.stringify(existing)}]`,
+      );
+      return { ...existing, venueName: existing.venueName ?? 'NoName' };
+    }
+
+    //Create venue for university
+    const [newVenue] = await tx
+      .insert(Venue)
+      .values({
+        VenueName: venueName,
+        UniversityID: university.UniversityID,
+      })
+      .returning();
+
+    if (!newVenue)
+      throw new InternalServerErrorException(`Failed to create venue`);
+    this.OOPSIE.log(
+      `validateAndCreateVenueName: Created new venue[${JSON.stringify(newVenue)}]`,
+    );
+    return {
+      venueId: newVenue.VenueID,
+      venueName: newVenue.VenueName ?? 'NoName',
+    };
+  } //END_validateAndCreateVenue
 } //END_EventServiceV2

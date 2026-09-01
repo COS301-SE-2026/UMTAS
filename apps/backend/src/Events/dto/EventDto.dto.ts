@@ -164,6 +164,17 @@ export class CreateEventDtoV2 extends PickType(EventDto, [
   @ValidateNested()
   @Type(() => EventCriteriaDtoV2)
   eventCriteria!: EventCriteriaDtoV2;
+
+  @ApiProperty({
+    description: 'Name of venue',
+    example: 'Main Hall',
+    required: false,
+    type: String,
+  })
+  @IsOptional()
+  @IsString()
+  @Length(1, 30)
+  venueName?: string;
 }
 
 export class UpdateEventDto extends PartialType(
