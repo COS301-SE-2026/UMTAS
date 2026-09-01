@@ -36,6 +36,7 @@ import {
   getAllEventsQ,
   removeEventMut,
   updateEventMut,
+  updateEventVenueMut,
 } from "@/components/templates/builder/Queries/eventQueries";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
@@ -44,6 +45,7 @@ import {
   addEventAttendanceMut,
   removeEventAttendanceMut,
 } from "../../../../utilities/eventAttendance/eventAttendanceQueries";
+import { getAllBuildingsQ } from "../../../../utilities/building/buildingQueries";
 
 import Tutorial from "@/components/organisms/nav/Tutorial";
 
@@ -177,6 +179,11 @@ export function EventsStep({
   const addEventAttendance = useMutation(addEventAttendanceMut());
   const removeEventAttendance = useMutation(removeEventAttendanceMut());
 
+  const { data: buildingsList } = useQuery(getAllBuildingsQ());
+  const buildings = buildingsList ?? [];
+
+  const updateEventVenue = useMutation(updateEventVenueMut());
+
   // a local construct to add an empty event
   function addNewEvent() {
     addEvent.mutate({
@@ -263,26 +270,48 @@ export function EventsStep({
       return next;
     });
 
-    const cleanCriteria = { ...event.eventCriteria };
+    const thisEventCriteria = { ...event.eventCriteria } as EventCriteria & {
+      buildingId?: string;
+    };
+
+    const selectedBuildingId = thisEventCriteria.buildingId;
+    delete thisEventCriteria.buildingId;
 
     if (event.isRecurring) {
-      delete cleanCriteria.date;
+      delete thisEventCriteria.date;
     } else {
-      delete cleanCriteria.dayOfWeek;
+      delete thisEventCriteria.dayOfWeek;
     }
 
-    updateEvent.mutate({
-      body: {
-        isRecurring: event.isRecurring,
-        activityType: event.activityType,
-        activityCode: event.activityCode,
-        eventCriteria: cleanCriteria,
-        eventName: event.eventName,
-      },
-      path: {
-        id: id,
-      },
-    });
+    const selectedVenueName =
+      typeof event.venues?.[0] === "string"
+        ? event.venues[0]
+        : event.venues?.[0]?.venueName;
+
+    if (selectedVenueName?.trim()) {
+      updateEventVenue.mutate({
+        path: { id: id },
+        body: {
+          venueName: selectedVenueName.trim(),
+          buildingId: selectedBuildingId || undefined,
+        },
+      });
+    }
+
+    if (event.eventCriteria?.eventSource !== "university") {
+      updateEvent.mutate({
+        body: {
+          isRecurring: event.isRecurring,
+          activityType: event.activityType,
+          activityCode: event.activityCode,
+          eventCriteria: thisEventCriteria,
+          eventName: event.eventName,
+        },
+        path: {
+          id: id,
+        },
+      });
+    }
 
     setIsDirty(false);
     setSelectedId(null);
@@ -312,7 +341,7 @@ export function EventsStep({
 
   function handleUpdate(
     id: string,
-    field: keyof EventResponse | keyof EventCriteria,
+    field: keyof EventResponse | keyof EventCriteria | "buildingId",
     value: string | boolean | string[],
   ) {
     setIsDirty(true);
@@ -484,6 +513,7 @@ export function EventsStep({
             <EventCard
               event={event}
               modules={modules}
+              buildings={buildings}
               onUpdate={handleUpdate}
               onGoToModules={onGoToModules}
               errors={errors}

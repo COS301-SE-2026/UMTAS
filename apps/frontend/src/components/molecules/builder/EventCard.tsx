@@ -21,6 +21,7 @@ import {
 } from "@/app/builder/utils/events/eventRequestBuilder";
 import { Switch } from "@/components/atoms/baseShadcn/switch";
 import { Checkbox } from "@/components/atoms/baseShadcn/checkbox";
+import { BuildingType } from "../../../../utilities/building/buildingRequestBuilder";
 
 export interface EventErrors {
   name?: string;
@@ -35,9 +36,10 @@ export interface EventErrors {
 interface EventCardProps {
   event: EventResponse;
   modules: ModuleResponseDto[];
+  buildings: BuildingType[];
   onUpdate: (
     id: string,
-    field: keyof EventResponse | keyof EventCriteria,
+    field: keyof EventResponse | keyof EventCriteria | "buildingId",
     value: string | boolean | string[],
   ) => void;
   onGoToModules?: () => void;
@@ -49,6 +51,7 @@ interface EventCardProps {
 export function EventCard({
   event,
   modules,
+  buildings,
   onUpdate,
   onGoToModules,
   errors,
@@ -210,7 +213,9 @@ export function EventCard({
                 ? event.venues[0]
                 : event.venues?.[0]?.venueName || ""
             }
-            onChange={(e) => onUpdate(event.eventId, "venues", e.target.value)}
+            onChange={(e) =>
+              onUpdate(event.eventId, "venues", [e.target.value])
+            }
             placeholder="e.g. IT 2-26"
             className={getInputClass(!!errors?.venue)}
           />
@@ -218,6 +223,42 @@ export function EventCard({
           {errors?.venue && (
             <p className="text-sm text-[var(--error-text)]">{errors.venue}</p>
           )}
+        </div>
+
+        {/* building dropdown */}
+        <div className="flex flex-col gap-2">
+          <Label className="text-sm font-medium text-[var(--text-secondary)]">
+            Building
+          </Label>
+          <Select
+            value={
+              (event.eventCriteria as EventCriteria & { buildingId?: string })
+                ?.buildingId
+            }
+            onValueChange={(value) =>
+              onUpdate(event.eventId, "buildingId", value)
+            }
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select the building" />
+            </SelectTrigger>
+            <SelectContent>
+              {buildings.length === 0 ? (
+                <SelectItem value="no-buildings" disabled>
+                  No buildings available
+                </SelectItem>
+              ) : (
+                buildings.map((building) => (
+                  <SelectItem
+                    key={building.buildingId}
+                    value={building.buildingId}
+                  >
+                    {building.buildingName}
+                  </SelectItem>
+                ))
+              )}
+            </SelectContent>
+          </Select>
         </div>
 
         {/* date - mapped to day */}
