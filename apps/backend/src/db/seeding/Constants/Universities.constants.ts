@@ -10,4 +10,5 @@ export const UserUniRoles: RoleTypeType[] = [
   'STUDENT',
   'LECTURER',
   'UNIVERSITY_ADMIN',
+  'UNIVERSITY_ADMIN',
 ]; //Jannie | Sarrie | Piet
