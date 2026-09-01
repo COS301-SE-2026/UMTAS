@@ -1,7 +1,6 @@
 //University
 export const UniversityNames: string[] = [
   'University of Pretoria',
-  'North-West University',
   'University of Maryland',
   'University of Cape Town',
 ];

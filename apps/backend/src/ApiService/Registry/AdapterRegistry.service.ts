@@ -5,7 +5,6 @@ import {
 } from '@nestjs/common';
 import { University_Adapter } from '../Adapter/University_Adapter';
 import { UniversityDto } from '../../University/dto/university.dto';
-import { NWU_Adapter } from '../Adapter/NWU/NWU_Adapter';
 import { ML_Adapter } from '../Adapter/Maryland/ML_Adapter';
 
 @Injectable()
@@ -44,9 +43,6 @@ export class AdapterRegistry {
       );
 
     switch (ident) {
-      case 'NWU': {
-        return new NWU_Adapter(uni);
-      }
       case 'ML': {
         return new ML_Adapter(uni);
       }
