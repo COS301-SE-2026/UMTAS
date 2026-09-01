@@ -8,13 +8,13 @@ export const UserNames: string[] = [
   'Piet Pierneef',
 ];
 export const UserEmails: string[] = [
-  'Jannie Bloekom@FlyAtUP.com',
-  'Sarrie Jammer Gat@FlyAtUP.com',
-  'Piet Pierneef@FlyAtUP.com',
+  'JannieBloekom@FlyAtUP.com',
+  'SarrieJammerGat@FlyAtUP.com',
+  'PietPierneef@FlyAtUP.com',
 ];
 
 export const UserPasswords: string[] = [
-  '123Jannie Bloekom#123',
-  '123Sarrie Jammer Gat#123',
-  '123Piet Pierneef#123',
+  'JannieBloekom#123',
+  'SarrieJammerGat#123',
+  'PietPierneef#123',
 ];

@@ -56,7 +56,8 @@ export class UniversitySeedService extends BaseSeedService {
           .where(
             eq(
               usersTable.email,
-              process.env.SEED_COS_ADMIN_EMAIL ?? 'admin301@local.umtas',
+              process.env.SEED_COS_ADMIN_EMAIL?.toLowerCase() ??
+                'admin301@local.umtas',
             ),
           );
 
