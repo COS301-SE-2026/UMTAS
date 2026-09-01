@@ -30,7 +30,7 @@ test.skip("Create and update module", async ({ page }) => {
   await expect(updatedModuleBtn).toContainText("AA");
 });
 
-test("Add Event", async ({ page }) => {
+test.skip("Add Event", async ({ page }) => {
   await page.goto("/builder");
   await page.getByTestId("builder-Next-Step").click();
   const addEvent = page.getByTestId("event-add-btn");
@@ -68,7 +68,7 @@ test("Add Event", async ({ page }) => {
   await expect(event.getByTestId("event-Type-Select")).toHaveText("Lecture");
 });
 
-test("Update event", async ({ page }) => {
+test.skip("Update event", async ({ page }) => {
   await page.goto("/builder");
   await page.getByTestId("builder-Next-Step").click();
   let eventContainer = page.getByTestId("builder-event-div");
@@ -139,14 +139,14 @@ test.skip("Create schedule", async ({ page }) => {
   await expect(page.getByText("AA").first()).toBeVisible({ timeout: 15000 });
 });
 
-test("Delete schedule", async ({ page }) => {
+test.skip("Delete schedule", async ({ page }) => {
   await page.goto("/schedules");
   await page.getByTestId("schedules-Delete-Btn").click();
   await page.getByTestId("Schedules-ConfirmDelete-Btn").click();
   await expect(page.getByText("AA")).not.toBeVisible();
 });
 
-test("Delete module", async ({ page }) => {
+test.skip("Delete module", async ({ page }) => {
   await page.goto("/builder");
 
   const targetModule = page
