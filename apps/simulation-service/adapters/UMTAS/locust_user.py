@@ -8,7 +8,7 @@ import uuid
 from collections import Counter
 from locust import HttpUser, task, between
 from locust.exception import StopUser 
-
+    
 PROFILES_PATH = os.environ.get('PROFILES_PATH')
 PROFILES = []
 if PROFILES_PATH and os.path.exists(PROFILES_PATH):
@@ -27,8 +27,34 @@ MAX_ENROLLED_MODULES = 4
 MAX_TIMETABLE_EVENTS = 20
 HEURISTIC_KEYS = "module,activity,location"
 
-DAY_NAMES = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+names_of_days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
 
+
+def is_valid_checker(val) -> bool:
+    try:
+        uuid.UUID(str(val))
+        return True
+    except (ValueError, TypeError):
+        return False
+
+
+def next_day_checker(day_of_week):
+    today = datetime.date.today()
+    try:
+        target = names_of_days.index(day_of_week.lower())
+    except (ValueError, AttributeError):
+        return today.isoformat()
+    delta = (target - today.weekday()) % 7
+    return (today + datetime.timedelta(days=delta)).isoformat()
+
+
+def event_date_checker(event: dict) -> str:
+    criteria = event.get("eventCriteria") or {}
+    if criteria.get("date"):
+        return criteria["date"]
+    if criteria.get("dayOfWeek"):
+        return next_day_checker(criteria["dayOfWeek"])
+    return datetime.date.today().isoformat()
 
 class DomainUser(HttpUser):
     wait_time = between(0.5, 1)
