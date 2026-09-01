@@ -165,13 +165,14 @@ describe("Google Calendar transport", () => {
   it("inserts all mapped events with bounded workers", async () => {
     fetchMock.mockResolvedValue(response(201, { id: "created" }));
     mockExistingUmtasCalendar();
+    fetchMock.mockResolvedValueOnce(response(200, { items: [] }));
     await expect(
       syncToGoogleCalendar(calendarFixture, {
         accessToken: "token",
         timezone: "Africa/Johannesburg",
       }),
     ).resolves.toEqual({ created: 3, updated: 0, deleted: 0, failed: [] });
-    expect(fetchMock).toHaveBeenCalledTimes(4);
+    expect(fetchMock).toHaveBeenCalledTimes(5);
     expect(
       fetchMock.mock.calls
         .filter(([url]) => String(url).includes("/events"))
@@ -182,22 +183,27 @@ describe("Google Calendar transport", () => {
     );
   });
 
-  it("updates the deterministic event id after a 409 conflict", async () => {
+  it("updates an existing deterministic event without a 409 round trip", async () => {
     fetchMock.mockImplementation((url: string, init: RequestInit) => {
-      if (init.method === "PUT") return Promise.resolve(response(200));
       if (init.method === "GET") {
+        const mapped = toGoogleCalendarEvents(
+          calendarFixture,
+          "Africa/Johannesburg",
+        )[0];
         return Promise.resolve(
           response(200, {
-            extendedProperties: { private: { umtasHash: "changed" } },
+            items: [
+              {
+                id: mapped.id,
+                extendedProperties: { private: { umtasHash: "changed" } },
+              },
+            ],
           }),
         );
       }
+      if (init.method === "PUT") return Promise.resolve(response(200));
       const event = JSON.parse(String(init.body)) as { summary: string };
-      return Promise.resolve(
-        event.summary === calendarFixture.recurringEvents[0].title
-          ? response(409)
-          : response(201),
-      );
+      return Promise.resolve(response(201, { id: event.summary }));
     });
 
     mockExistingUmtasCalendar();
@@ -215,6 +221,8 @@ describe("Google Calendar transport", () => {
 
   it("collects a persistent server failure while other events succeed", async () => {
     fetchMock.mockImplementation((_url: string, init: RequestInit) => {
+      if (init.method === "GET")
+        return Promise.resolve(response(200, { items: [] }));
       const event = JSON.parse(String(init.body)) as { summary: string };
       return Promise.resolve(
         event.summary === calendarFixture.oneOffEvents[0].title
@@ -246,6 +254,8 @@ describe("Google Calendar transport", () => {
 
   it("records a non-authentication 403 as a per-event failure", async () => {
     fetchMock.mockImplementation((_url: string, init: RequestInit) => {
+      if (init.method === "GET")
+        return Promise.resolve(response(200, { items: [] }));
       const event = JSON.parse(String(init.body)) as { summary: string };
       return Promise.resolve(
         event.summary === calendarFixture.oneOffEvents[0].title
@@ -282,6 +292,8 @@ describe("Google Calendar transport", () => {
   it("retries a rate-limited event and then succeeds", async () => {
     let rateLimited = true;
     fetchMock.mockImplementation((_url: string, init: RequestInit) => {
+      if (init.method === "GET")
+        return Promise.resolve(response(200, { items: [] }));
       const event = JSON.parse(String(init.body)) as { summary: string };
       if (
         event.summary === calendarFixture.recurringEvents[0].title &&
@@ -300,7 +312,7 @@ describe("Google Calendar transport", () => {
         timezone: "Africa/Johannesburg",
       }),
     ).resolves.toEqual({ created: 3, updated: 0, deleted: 0, failed: [] });
-    expect(fetchMock).toHaveBeenCalledTimes(5);
+    expect(fetchMock).toHaveBeenCalledTimes(6);
   });
 
   it("throws for a missing or rejected access token", async () => {
@@ -320,7 +332,7 @@ describe("Google Calendar transport", () => {
     ).rejects.toMatchObject({ message: expect.stringContaining("expired") });
   });
 
-  it("skips a 409 update when the stored content hash matches", async () => {
+  it("skips an update when the stored content hash matches", async () => {
     const payload = {
       ...calendarFixture,
       oneOffEvents: [],
@@ -328,13 +340,18 @@ describe("Google Calendar transport", () => {
     };
     const [mapped] = toGoogleCalendarEvents(payload, "Africa/Johannesburg");
     mockExistingUmtasCalendar();
-    fetchMock.mockResolvedValueOnce(response(409)).mockResolvedValueOnce(
+    fetchMock.mockResolvedValueOnce(
       response(200, {
-        extendedProperties: {
-          private: {
-            umtasHash: mapped.extendedProperties.private.umtasHash,
+        items: [
+          {
+            id: mapped.id,
+            extendedProperties: {
+              private: {
+                umtasHash: mapped.extendedProperties.private.umtasHash,
+              },
+            },
           },
-        },
+        ],
       }),
     );
 
@@ -344,26 +361,20 @@ describe("Google Calendar transport", () => {
         timezone: "Africa/Johannesburg",
       }),
     ).resolves.toEqual({ created: 0, updated: 0, deleted: 0, failed: [] });
-    expect(fetchMock).toHaveBeenCalledTimes(3);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
     expect(fetchMock.mock.calls.some(([, init]) => init.method === "PUT")).toBe(
       false,
     );
   });
 
   it("reconciles managed events by deleting only orphans", async () => {
-    const mapped = toGoogleCalendarEvents(
-      calendarFixture,
-      "Africa/Johannesburg",
-    );
     fetchMock.mockImplementation((url: string, init: RequestInit) => {
-      if (init.method === "POST") return Promise.resolve(response(201));
       if (init.method === "GET") {
         return Promise.resolve(
-          response(200, {
-            items: [{ id: mapped[0].id }, { id: "umtasorphan" }],
-          }),
+          response(200, { items: [{ id: "umtasorphan" }] }),
         );
       }
+      if (init.method === "POST") return Promise.resolve(response(201));
       if (init.method === "DELETE") return Promise.resolve(response(204));
       return Promise.reject(
         new Error(`Unexpected request: ${init.method} ${url}`),
@@ -392,12 +403,12 @@ describe("Google Calendar transport", () => {
 
   it("paginates reconciliation and records an orphan deletion failure", async () => {
     fetchMock.mockImplementation((url: string, init: RequestInit) => {
-      if (init.method === "POST") return Promise.resolve(response(201));
       if (init.method === "GET" && url.includes("pageToken=second")) {
         return Promise.resolve(
           response(200, { items: [{ id: "orphan-two" }] }),
         );
       }
+      if (init.method === "POST") return Promise.resolve(response(201));
       if (init.method === "GET") {
         return Promise.resolve(
           response(200, {

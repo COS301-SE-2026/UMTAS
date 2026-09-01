@@ -1,12 +1,12 @@
 import { GoogleIcon } from "@/components/atoms/auth/GoogleIcon";
 import { Button } from "@/components/atoms/baseShadcn/button";
+import { Alert, AlertDescription } from "@/components/atoms/baseShadcn/alert";
 import {
-  Card,
-  CardContent,
-  CardTitle,
-} from "@/components/atoms/baseShadcn/card";
-import { Input } from "@/components/atoms/baseShadcn/input";
-import { Label } from "@/components/atoms/baseShadcn/label";
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/atoms/baseShadcn/dialog";
 import {
   Select,
   SelectContent,
@@ -14,159 +14,142 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/atoms/baseShadcn/select";
-import { Separator } from "@/components/atoms/baseShadcn/separator";
+import { Label } from "@/components/atoms/baseShadcn/label";
 
-import { useState } from "react";
-interface googleListType {
+export interface GoogleScheduleOption {
+  id: string;
   name: string;
-  googleID: string;
 }
-type googleDetailsDTo = {
-  name: string;
-};
 
-export default function GooglePopup() {
-  const [signedIn, setSignedIn] = useState(false);
+export interface GoogleExportNotice {
+  variant: "default" | "success" | "destructive";
+  message: string;
+}
 
-  /**
-   * @todo Mikal heres where you store google details you need please define a type or interface for type safety
-   */
-  const [googleDetails, setGoogleDetails] = useState<googleDetailsDTo>({
-    name: "",
-  });
+interface GoogleExportDialogProps {
+  hasGoogleCalendarAccess: boolean;
+  isLoading: boolean;
+  isExporting: boolean;
+  schedules: GoogleScheduleOption[];
+  selectedScheduleId: string;
+  onScheduleChange: (scheduleId: string) => void;
+  onSignIn: () => void;
+  onExport: (scheduleId: string) => void;
+  notice: GoogleExportNotice | null;
+}
 
-  if (signedIn)
-    return (
-      <Card className="flexitems-center capitalize  w-75  ">
-        <CardTitle className="text-left w-full p-2">
-          Export to google Calendar
-        </CardTitle>
-        <CardContent className="w-full  items-center  ">
-          <div className="flex flex-col w-full gap-y-4  justify-center  ">
-            <GoogleList name={googleDetails.name} />
-            <div className="flex items-center w-full gap-4">
-              <Separator className="flex-1" />
-              <span className="">OR</span>
-              <Separator className="flex-1" />
-            </div>
-            <GoogleAddSchedule name={googleDetails.name} />
-          </div>
-        </CardContent>
-      </Card>
-    );
-  else {
-    return (
-      <Card className="flex   items-center capitalize  w-1/4 h-1/3  ">
-        <CardTitle className="text-left w-full ">
-          Export to google Calendar
-        </CardTitle>
-        <CardContent className="w-full h-full flex flex-col justify-center items-center">
+export default function GoogleExportDialog({
+  hasGoogleCalendarAccess,
+  isLoading,
+  isExporting,
+  schedules,
+  selectedScheduleId,
+  onScheduleChange,
+  onSignIn,
+  onExport,
+  notice,
+}: GoogleExportDialogProps) {
+  const selectedSchedule =
+    schedules.find((schedule) => schedule.id === selectedScheduleId) ??
+    schedules[0];
+
+  return (
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle>Export to Google Calendar</DialogTitle>
+        <DialogDescription>
+          Choose a timetable to add to your UMTAS Calendar.
+        </DialogDescription>
+      </DialogHeader>
+
+      {notice && (
+        <Alert variant={notice.variant} aria-live="polite">
+          <AlertDescription>{notice.message}</AlertDescription>
+        </Alert>
+      )}
+
+      {!hasGoogleCalendarAccess ? (
+        <div className="flex flex-col items-center justify-center gap-4">
+          <p className="text-center text-sm text-muted-foreground">
+            Connect your Google account to add this timetable to Calendar.
+          </p>
           <Button
-            className="w-50"
+            type="button"
+            className="w-full max-w-52"
+            disabled={isLoading || isExporting}
+            onClick={onSignIn}
+          >
+            <GoogleIcon />
+            {isLoading ? "Checking Google access…" : "Sign in with Google"}
+          </Button>
+        </div>
+      ) : (
+        <div className="flex w-full flex-col items-center gap-5">
+          <GoogleList
+            schedules={schedules}
+            selectedScheduleId={selectedSchedule?.id ?? ""}
+            onScheduleChange={onScheduleChange}
+          />
+          <div className="w-full space-y-2 text-center">
+            <p className="text-sm font-medium">
+              Export “{selectedSchedule?.name ?? "selected timetable"}”
+            </p>
+            <p className="text-xs text-muted-foreground">
+              This will update your UMTAS Calendar in Google Calendar.
+            </p>
+          </div>
+          <Button
+            type="button"
+            className="w-full max-w-52"
+            disabled={!selectedSchedule || isExporting}
             onClick={() => {
-              setSignedIn(true);
-              /**
-               * @todo here put the functionality to store the signed details in setGoogleDetails
-               * also please call setSignedIn only if signed in...
-               */
+              if (selectedSchedule) onExport(selectedSchedule.id);
             }}
           >
-            <GoogleIcon></GoogleIcon> Sign in with Google
+            <GoogleIcon />
+            {isExporting ? "Exporting…" : "Add to Google Calendar"}
           </Button>
-        </CardContent>
-      </Card>
-    );
-  }
-}
-
-export function GoogleList({ name }: googleDetailsDTo) {
-  const [googleSchedules, setGoogleSchedules] = useState<googleListType[]>([
-    { name: "TT1", googleID: "id1" },
-    { name: "TT2", googleID: "id2" },
-    { name: "TT3", googleID: "id3" },
-  ]);
-  const [selectedSchedule, setSelectedSchedule] = useState<googleListType>(
-    googleSchedules[0],
-  );
-
-  return (
-    <div className="grid grid-cols-1  justify-center gap-y-4   items-center w-full ">
-      <Label className="text-sm font-medium text-left w-full gap-y-2  text-[var(--text-secondary)] flex flex-col">
-        <p className="text-left w-50">Select Schedule</p>
-        <Select
-          disabled={false}
-          value={selectedSchedule.googleID}
-          onValueChange={async (e) => {
-            const schedule = googleSchedules.find(
-              (schedule) => schedule.googleID === e,
-            );
-            if (schedule) {
-              setSelectedSchedule(schedule);
-            }
-          }}
-        >
-          <SelectTrigger id="select-year" className="capitalize w-50 ">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {googleSchedules.map((timetable, idx) => (
-              <SelectItem key={idx} value={timetable.googleID}>
-                {timetable.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </Label>
-
-      <Label className="text-sm font-medium text-left w-full gap-y-2   text-[var(--text-secondary)] flex flex-col">
-        <p className="text-left w-50">Confirm</p>
-        <Button
-          className="w-50"
-          onClick={() => {
-            /**
-             * @todo Mikal here put select schedle and create
-             */
-          }}
-        >
-          <GoogleIcon></GoogleIcon> Add to Google Calendar
-        </Button>
-      </Label>
-    </div>
+        </div>
+      )}
+    </DialogContent>
   );
 }
 
-export function GoogleAddSchedule({ name }: googleDetailsDTo) {
-  const [scheduleName, setScheduleName] = useState<string>("");
+interface GoogleListProps {
+  schedules: GoogleScheduleOption[];
+  selectedScheduleId: string;
+  onScheduleChange: (scheduleId: string) => void;
+}
 
+export function GoogleList({
+  schedules,
+  selectedScheduleId,
+  onScheduleChange,
+}: GoogleListProps) {
   return (
-    <div className="grid grid-cols-1  justify-center gap-y-4   items-center w-full">
-      <Label className="text-sm font-medium text-left w-full gap-y-2   text-[var(--text-secondary)] flex flex-col">
-        <p className="text-left w-50">Create Schedule</p>
-        <Input
-          data-testid="restriction-Date-Input"
-          type="text"
-          placeholder="Schedule Name..."
-          value={scheduleName}
-          onChange={(e) => {
-            setScheduleName(e.target.value);
-          }}
-          className="h-8 w-50 rounded-md border border-[var(--border)] bg-transparent px-2 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--ring)]"
-        />
+    <div className="grid w-full grid-cols-1 items-center justify-center gap-y-2">
+      <Label
+        htmlFor="google-export-schedule"
+        className="text-[var(--text-secondary)]"
+      >
+        Select Schedule
       </Label>
-
-      <Label className="text-sm font-medium text-left w-full gap-y-2   text-[var(--text-secondary)] flex flex-col">
-        <p className="text-left w-50">Confirm</p>
-        <Button
-          className="w-50"
-          onClick={() => {
-            /**
-             * @todo Mikal here put function to create schedule and then add to that one
-             */
-          }}
-        >
-          <GoogleIcon></GoogleIcon> Add to Google Calendar
-        </Button>
-      </Label>
+      <Select
+        value={selectedScheduleId}
+        onValueChange={onScheduleChange}
+        disabled={schedules.length === 0}
+      >
+        <SelectTrigger id="google-export-schedule" className="w-full">
+          <SelectValue placeholder="Select a timetable" />
+        </SelectTrigger>
+        <SelectContent>
+          {schedules.map((schedule) => (
+            <SelectItem key={schedule.id} value={schedule.id}>
+              {schedule.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
     </div>
   );
 }

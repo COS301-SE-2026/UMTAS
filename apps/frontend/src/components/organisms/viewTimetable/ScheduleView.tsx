@@ -1,7 +1,13 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+} from "react";
 import { Skeleton } from "@/components/atoms/baseShadcn/skeleton";
 import { WeeklyGrid } from "@/components/organisms/viewTimetable/WeeklyGrid";
 import { EmptySchedule } from "@/components/organisms/viewTimetable/EmptySchedule";
@@ -24,31 +30,43 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/atoms/baseShadcn/select";
-import { getAllWeekStarts, resolveScheduleEvents } from "@/lib/scheduleUtils";
+import { resolveScheduleEvents } from "@/lib/scheduleUtils";
 
-import { downloadICS, generateICS } from "@/lib/ICS-utils/ICS";
+import {
+  downloadICS,
+  generateAcademicCalendarICS,
+} from "@/lib/calendar_export_utils/ics_export";
+import { generateCalendarPayload } from "@/lib/calendar_export_utils/calendar_api";
+import { syncToGoogleCalendar } from "@/lib/calendar_export_utils/gc_export";
+import {
+  ConsentRequiredError,
+  GOOGLE_CALENDAR_PERMISSIONS_QUERY_KEY,
+  fetchGoogleCalendarToken,
+  hasGoogleCalendarPermissions,
+  startCalendarConsent,
+} from "@/lib/auth/google-calendar";
+import GoogleExportDialog, {
+  type GoogleExportNotice,
+  type GoogleScheduleOption,
+} from "@/components/molecules/viewTimetable/googleExport";
 import { Button } from "@/components/atoms/baseShadcn/button";
-
-import { useQuery } from "@tanstack/react-query";
-
+import { Alert, AlertDescription } from "@/components/atoms/baseShadcn/alert";
+import { Dialog } from "@/components/atoms/baseShadcn/dialog";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   getAllTimetablesQ,
   getTimetableByIdQ,
   addTimetableMut,
+  removeTimetableMut,
   updateTimetableMut,
 } from "@/components/templates/builder/Queries/timetableQueries";
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
-
-import { useSearchParams } from "next/navigation";
-
-import { removeTimetableMut } from "@/components/templates/builder/Queries/timetableQueries";
-import { useMutation } from "@tanstack/react-query";
-import { UserDetails } from "@/lib/userclass/userClass";
-
 import Tutorial from "@/components/organisms/nav/Tutorial";
 import { fetchAllModulesv2 } from "../../../../utilities/V2-Builders/Modules";
-import GooglePopup from "@/components/molecules/viewTimetable/googleExport";
-import Popup from "@/components/atoms/utility/floatContainer";
+
+const CALENDAR_TIMEZONE = "Africa/Johannesburg";
+const GOOGLE_CALENDAR_EXPORT_TIMEOUT_MS = 60_000;
+
 const emptySteps = [
   {
     target: "#ref-go-to-builder",
@@ -83,30 +101,32 @@ export function ScheduleView({
   onExportReady,
 }: ScheduleViewProps) {
   const router = useRouter();
-  const UniDetails = UserDetails.getUniDetails();
 
   const [selectedTimetableId, setSelectedTimetableId] = useState<string>("");
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  //most of these are straight copied and pasted from wizard shell
   const [isGenerating, setIsGenerating] = useState(false);
   const [viewMode, setViewMode] = useState<"Generate" | "Timetable">(
     "Timetable",
   );
 
-  const isEditMode = selectedTimetableId !== "";
-
   const [timetableName, setTimetableName] = useState("My New Schedule");
   const [selectedEventIds, setSelectedEventIds] = useState<string[]>([]);
   const [OGeventId, setOGeventId] = useState<string[]>([]);
-  const editId = selectedTimetableId;
   const searchParams = useSearchParams();
   const actionChecker = searchParams.get("action");
 
   const { mutateAsync: addTimetable } = useMutation(addTimetableMut());
   const { mutateAsync: updateTimetable } = useMutation(updateTimetableMut());
 
-  const [showGC, setShowGC] = useState(false);
+  const [exportingTo, setExportingTo] = useState<"ics" | "google" | null>(null);
+  const exportInProgress = useRef(false);
+  const handledConsentReturn = useRef(false);
+  const [isGoogleDialogOpen, setIsGoogleDialogOpen] = useState(false);
+  const [googleDialogTimetableId, setGoogleDialogTimetableId] = useState("");
+  const [exportNotice, setExportNotice] = useState<GoogleExportNotice | null>(
+    null,
+  );
 
   const { data: allModules = [], isLoading: isLoadingModules } = useQuery({
     queryKey: ["Modules", "Courses"],
@@ -121,6 +141,16 @@ export function ScheduleView({
   const { data: timetables = [], isLoading: isLoadingTimetables } =
     useQuery(getAllTimetablesQ());
 
+  const {
+    data: hasGoogleCalendarAccess,
+    isLoading: isLoadingGoogleCalendarAccess,
+  } = useQuery({
+    queryKey: GOOGLE_CALENDAR_PERMISSIONS_QUERY_KEY,
+    queryFn: hasGoogleCalendarPermissions,
+    staleTime: 5 * 60 * 1000,
+    retry: false,
+  });
+
   const { mutate: deleteTimetable } = useMutation(removeTimetableMut());
 
   const isLoading = isLoadingModules || isLoadingTimetables;
@@ -131,21 +161,23 @@ export function ScheduleView({
       !selectedTimetableId &&
       viewMode !== "Generate"
     ) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setSelectedTimetableId(
-        String(timetables[timetables.length - 1].timetable.timetableID),
-      );
+      const selectTimetable = window.setTimeout(() => {
+        setSelectedTimetableId(
+          String(timetables[timetables.length - 1].timetable.timetableID),
+        );
+      }, 0);
+      return () => window.clearTimeout(selectTimetable);
     }
   }, [timetables, selectedTimetableId, viewMode]);
 
-  //this useEffect is the "memory" between the builder and schedules
   useEffect(() => {
     if (actionChecker === "new") {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setSelectedTimetableId("");
-      setViewMode("Generate");
-
-      router.replace("/schedules");
+      const startGeneration = window.setTimeout(() => {
+        setSelectedTimetableId("");
+        setViewMode("Generate");
+        router.replace("/schedules");
+      }, 0);
+      return () => window.clearTimeout(startGeneration);
     }
   }, [actionChecker, router]);
 
@@ -159,10 +191,6 @@ export function ScheduleView({
     );
 
     if (selectedTT) {
-      const activeEventIds = (selectedTT.events || []).map((event) =>
-        String(event.eventId).trim(),
-      );
-
       const activeEvents = selectedTT.events;
 
       const activeModuleIds = activeEvents
@@ -189,14 +217,184 @@ export function ScheduleView({
     onEventCountChange(events.length);
   }, [modules.length, events.length, onModuleCountChange, onEventCountChange]);
 
-  const doExport = useCallback(() => {
-    const icsContent = generateICS(events, modules);
-    downloadICS(icsContent, "umtas-schedule.ics");
-  }, [events, modules]);
+  const exportToICS = useCallback(async () => {
+    if (!selectedTimetableId || exportInProgress.current) return;
+
+    exportInProgress.current = true;
+    setExportingTo("ics");
+    setExportNotice(null);
+    try {
+      const payload = await generateCalendarPayload(selectedTimetableId);
+      const icsContent = generateAcademicCalendarICS(
+        payload,
+        CALENDAR_TIMEZONE,
+      );
+      downloadICS(icsContent, "umtas-schedule.ics");
+      setExportNotice({
+        variant: "success",
+        message: "Calendar exported to ICS.",
+      });
+    } catch {
+      setExportNotice({
+        variant: "destructive",
+        message: "Could not export this calendar to ICS.",
+      });
+    } finally {
+      exportInProgress.current = false;
+      setExportingTo(null);
+    }
+  }, [selectedTimetableId]);
+
+  const exportToGoogleCalendar = useCallback(
+    async (timetableId = selectedTimetableId) => {
+      if (!timetableId || exportInProgress.current) return;
+
+      exportInProgress.current = true;
+      setExportingTo("google");
+      setExportNotice(null);
+      try {
+        const token = await fetchGoogleCalendarToken();
+        const payload = await generateCalendarPayload(timetableId);
+        const exportController = new AbortController();
+        const timeoutId = window.setTimeout(
+          () => exportController.abort(),
+          GOOGLE_CALENDAR_EXPORT_TIMEOUT_MS,
+        );
+
+        try {
+          const result = await syncToGoogleCalendar(payload, {
+            accessToken: token.accessToken,
+            timezone: CALENDAR_TIMEZONE,
+            signal: exportController.signal,
+          });
+
+          if (result.failed.length > 0) {
+            setExportNotice({
+              variant: "default",
+              message: `UMTAS Calendar exported with ${result.failed.length} failed event${result.failed.length === 1 ? "" : "s"}.`,
+            });
+          } else {
+            setExportNotice({
+              variant: "success",
+              message: `UMTAS Calendar updated (${result.created} added, ${result.updated} updated).`,
+            });
+          }
+        } finally {
+          window.clearTimeout(timeoutId);
+        }
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") {
+          setExportNotice({
+            variant: "destructive",
+            message:
+              "UMTAS Calendar export timed out. Please try again in a moment.",
+          });
+          return;
+        }
+        if (error instanceof ConsentRequiredError) {
+          const returnUrl = new URL(window.location.href);
+          returnUrl.searchParams.set("calendarExportTimetable", timetableId);
+          try {
+            await startCalendarConsent(
+              `${returnUrl.pathname}${returnUrl.search}${returnUrl.hash}`,
+            );
+          } catch {
+            setExportNotice({
+              variant: "destructive",
+              message: "Could not start Google Calendar authorization.",
+            });
+          }
+          return;
+        }
+
+        setExportNotice({
+          variant: "destructive",
+          message: "Could not export this timetable to Google Calendar.",
+        });
+      } finally {
+        exportInProgress.current = false;
+        setExportingTo(null);
+      }
+    },
+    [selectedTimetableId],
+  );
+
+  const handleGoogleCalendarExport = useCallback(() => {
+    setExportNotice(null);
+    setGoogleDialogTimetableId(selectedTimetableId);
+    setIsGoogleDialogOpen(true);
+  }, [selectedTimetableId]);
+
+  const connectGoogleCalendar = useCallback(async () => {
+    if (!googleDialogTimetableId || exportInProgress.current) return;
+
+    exportInProgress.current = true;
+    setExportingTo("google");
+    setExportNotice(null);
+    const returnUrl = new URL(window.location.href);
+    returnUrl.searchParams.set(
+      "calendarExportTimetable",
+      googleDialogTimetableId,
+    );
+
+    try {
+      await startCalendarConsent(
+        `${returnUrl.pathname}${returnUrl.search}${returnUrl.hash}`,
+      );
+    } catch {
+      setExportNotice({
+        variant: "destructive",
+        message: "Could not start Google Calendar authorization.",
+      });
+      exportInProgress.current = false;
+      setExportingTo(null);
+    }
+  }, [googleDialogTimetableId]);
+
+  const confirmGoogleCalendarExport = useCallback(
+    async (timetableId: string) => {
+      await exportToGoogleCalendar(timetableId);
+      setIsGoogleDialogOpen(false);
+    },
+    [exportToGoogleCalendar],
+  );
 
   useEffect(() => {
-    onExportReady(doExport);
-  }, [doExport, onExportReady]);
+    onExportReady(() => {
+      void exportToICS();
+    });
+  }, [exportToICS, onExportReady]);
+
+  useEffect(() => {
+    const consentStatus = searchParams.get("calendarConsent");
+    if (!consentStatus || handledConsentReturn.current) return;
+    handledConsentReturn.current = true;
+
+    const timetableId =
+      searchParams.get("calendarExportTimetable") ?? selectedTimetableId;
+    const cleanedParams = new URLSearchParams(searchParams.toString());
+    cleanedParams.delete("calendarConsent");
+    cleanedParams.delete("calendarExportTimetable");
+    const cleanedUrl = `${window.location.pathname}${cleanedParams.size ? `?${cleanedParams}` : ""}`;
+
+    if (consentStatus === "granted") {
+      const resumeExport = window.setTimeout(() => {
+        void exportToGoogleCalendar(timetableId).finally(() => {
+          router.replace(cleanedUrl);
+        });
+      }, 0);
+      return () => window.clearTimeout(resumeExport);
+    } else {
+      const showDeniedNotice = window.setTimeout(() => {
+        setExportNotice({
+          variant: "destructive",
+          message: "Google Calendar access was not granted.",
+        });
+        router.replace(cleanedUrl);
+      }, 0);
+      return () => window.clearTimeout(showDeniedNotice);
+    }
+  }, [exportToGoogleCalendar, router, searchParams, selectedTimetableId]);
 
   const currentWeekStart = useMemo(() => {
     const date = new Date(selectedDate);
@@ -243,7 +441,6 @@ export function ScheduleView({
     return renderLoadingSkeleton();
   }
 
-  //NB check viewMode otherwise the generate step does not show on this page
   if (timetables.length === 0 && viewMode !== "Generate") {
     return (
       <div className="flex flex-col items-center gap-4 py-20 text-center">
@@ -262,8 +459,6 @@ export function ScheduleView({
       </div>
     );
   }
-
-  //delete timetable (works)
 
   function deleteDialog() {
     if (!selectedTimetableId) {
@@ -290,7 +485,6 @@ export function ScheduleView({
     });
   }
 
-  //edit timetable
   async function editTimetable() {
     if (!selectedTimetableId) return;
 
@@ -324,7 +518,6 @@ export function ScheduleView({
     setViewMode("Generate");
   }
 
-  //the functions below are copied, pasted and slightly changed from the wizard shell. you'll see wizard shell is a lot shorter
   async function handleGenerate(name: string, selectedEventIds: string[]) {
     if (name == "BACK" && selectedEventIds.length == 0) {
       setViewMode("Timetable");
@@ -381,7 +574,7 @@ export function ScheduleView({
           key={selectedTimetableId || "new-timetable"}
           onGenerate={handleGenerate}
           isGenerating={isGenerating}
-          isEditMode={selectedTimetableId !== ""} // can edit if the timetable id != ""
+          isEditMode={selectedTimetableId !== ""}
           timetableName={timetableName}
           setTimetableName={setTimetableName}
           selectedEventIds={selectedEventIds}
@@ -443,27 +636,29 @@ export function ScheduleView({
                 />
                 <div className="flex flex-row justify-center md:justify-end w-full md:w-auto gap-2 mb-4 md:mb-0">
                   <Button
-                    id="btn-delete"
+                    id="btn-export-ics"
                     type="button"
+                    disabled={exportingTo !== null}
                     className="h-7 px-3 text-xs bg-[var(--bg-surface)] text-[var(--text-primary)] border-[var(--border)] hover:opacity-90"
-                    onClick={() => {
-                      /**TODO
-                       * add ICS function here Mikal
-                       */
-                    }}
+                    onClick={() => void exportToICS()}
                   >
-                    Export to ICS
+                    {exportingTo === "ics" ? "Exporting…" : "Export to ICS"}
                   </Button>
-                  <Button
-                    id="btn-delete"
-                    type="button"
-                    className="h-7 px-3 text-xs bg-[var(--bg-surface)] text-[var(--text-primary)] border-[var(--border)] hover:opacity-90"
-                    onClick={() => {
-                      setShowGC(true);
-                    }}
-                  >
-                    Export to Google Calendar
-                  </Button>
+                  {!isLoadingGoogleCalendarAccess && (
+                    <Button
+                      id="btn-export-google-calendar"
+                      type="button"
+                      disabled={exportingTo !== null}
+                      className="h-7 px-3 text-xs bg-[var(--bg-surface)] text-[var(--text-primary)] border-[var(--border)] hover:opacity-90"
+                      onClick={handleGoogleCalendarExport}
+                    >
+                      {exportingTo === "google"
+                        ? "Exporting…"
+                        : hasGoogleCalendarAccess
+                          ? "Export to UMTAS Calendar"
+                          : "Connect Google Calendar"}
+                    </Button>
+                  )}
                   <Button
                     id="btn-create"
                     type="button"
@@ -493,6 +688,15 @@ export function ScheduleView({
                   </Button>
                 </div>
               </div>
+              {exportNotice && (
+                <Alert
+                  variant={exportNotice.variant}
+                  aria-live="polite"
+                  className="mt-2"
+                >
+                  <AlertDescription>{exportNotice.message}</AlertDescription>
+                </Alert>
+              )}
               <AlertDialog
                 open={isDeleteDialogOpen}
                 onOpenChange={setIsDeleteDialogOpen}
@@ -525,19 +729,35 @@ export function ScheduleView({
             </div>
           )}
         </div>
-
-        {showGC && (
-          <Popup
-            onClose={() => {
-              setShowGC(false);
-            }}
-          >
-            <GooglePopup></GooglePopup>
-          </Popup>
-        )}
       </>
     );
   }
 
-  return <>{renderView()}</>;
+  const googleSchedules: GoogleScheduleOption[] = timetables.map((tt) => ({
+    id: String(tt.timetable.timetableID),
+    name:
+      tt.timetable.timetableName ||
+      `Timetable ${String(tt.timetable.timetableID)}`,
+  }));
+
+  return (
+    <>
+      {renderView()}
+      <Dialog open={isGoogleDialogOpen} onOpenChange={setIsGoogleDialogOpen}>
+        <GoogleExportDialog
+          hasGoogleCalendarAccess={Boolean(hasGoogleCalendarAccess)}
+          isLoading={isLoadingGoogleCalendarAccess}
+          isExporting={exportingTo === "google"}
+          schedules={googleSchedules}
+          selectedScheduleId={googleDialogTimetableId}
+          onScheduleChange={setGoogleDialogTimetableId}
+          onSignIn={() => void connectGoogleCalendar()}
+          onExport={(timetableId) =>
+            void confirmGoogleCalendarExport(timetableId)
+          }
+          notice={exportNotice}
+        />
+      </Dialog>
+    </>
+  );
 }

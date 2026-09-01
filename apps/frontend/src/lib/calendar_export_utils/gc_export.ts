@@ -48,6 +48,8 @@ interface ManagedGoogleEvent {
   };
 }
 
+type ManagedEventState = Map<string, string | undefined>;
+
 function googleEventId(key: string): string {
   const bytes = TEXT_ENCODER.encode(key);
   let bits = 0;
@@ -190,6 +192,49 @@ function abortError(): Error {
   return new DOMException("The operation was aborted", "AbortError");
 }
 
+async function listManagedEvents(
+  calendarId: string,
+  opts: { accessToken: string; signal?: AbortSignal },
+): Promise<ManagedEventState> {
+  const managedEvents: ManagedEventState = new Map();
+  let pageToken: string | undefined;
+  let pageCount = 0;
+
+  do {
+    pageCount += 1;
+    const query = new URLSearchParams({
+      maxResults: "2500",
+      privateExtendedProperty: "umtas=1",
+      showDeleted: "false",
+      fields: "items(id,extendedProperties),nextPageToken",
+    });
+    if (pageToken) query.set("pageToken", pageToken);
+
+    const response = await requestGoogle(
+      `calendars/${encodeURIComponent(calendarId)}/events?${query}`,
+      { method: "GET" },
+      opts.accessToken,
+      { signal: opts.signal },
+    );
+    const body = (await response.json()) as {
+      items?: ManagedGoogleEvent[];
+      nextPageToken?: string;
+    };
+
+    for (const event of body.items ?? []) {
+      if (event.id) {
+        managedEvents.set(
+          event.id,
+          event.extendedProperties?.private?.umtasHash,
+        );
+      }
+    }
+    pageToken = body.nextPageToken;
+  } while (pageToken && pageCount < MAX_EVENT_LIST_PAGES);
+
+  return managedEvents;
+}
+
 export async function syncToGoogleCalendar(
   payload: GeneratedCalendarPayloadDto,
   opts: {
@@ -206,6 +251,11 @@ export async function syncToGoogleCalendar(
   const calendarId = await ensureUmtasCalendar(opts.accessToken, {
     signal: opts.signal,
   });
+  const existingEvents = await listManagedEvents(calendarId, {
+    accessToken: opts.accessToken,
+    signal: opts.signal,
+  });
+  const collectionUrl = `calendars/${encodeURIComponent(calendarId)}/events`;
   const mappedEvents = toGoogleCalendarEvents(payload, opts.timezone);
   const result: GoogleCalendarSyncResult = {
     created: 0,
@@ -221,30 +271,31 @@ export async function syncToGoogleCalendar(
   let nextIndex = 0;
 
   async function syncOne(event: GoogleCalendarEvent): Promise<void> {
-    const collectionUrl = `calendars/${encodeURIComponent(calendarId)}/events`;
+    const existingHash = existingEvents.get(event.id);
+    if (existingHash === event.extendedProperties.private.umtasHash) return;
+
+    const isUpdate = existingEvents.has(event.id);
     try {
       await requestGoogle(
-        collectionUrl,
-        { method: "POST", body: JSON.stringify(event) },
+        isUpdate
+          ? `${collectionUrl}/${encodeURIComponent(event.id)}`
+          : collectionUrl,
+        {
+          method: isUpdate ? "PUT" : "POST",
+          body: JSON.stringify(event),
+        },
         opts.accessToken,
         { signal: opts.signal },
       );
     } catch (error) {
-      if (!(error instanceof GoogleApiError) || error.status !== 409)
-        throw error;
-      const existingResponse = await requestGoogle(
-        `${collectionUrl}/${encodeURIComponent(event.id)}?fields=extendedProperties`,
-        { method: "GET" },
-        opts.accessToken,
-        { signal: opts.signal },
-      );
-      const existing = (await existingResponse.json()) as ManagedGoogleEvent;
       if (
-        existing.extendedProperties?.private?.umtasHash ===
-        event.extendedProperties.private.umtasHash
+        !(error instanceof GoogleApiError) ||
+        error.status !== 409 ||
+        isUpdate
       ) {
-        return;
+        throw error;
       }
+
       await requestGoogle(
         `${collectionUrl}/${encodeURIComponent(event.id)}`,
         { method: "PUT", body: JSON.stringify(event) },
@@ -254,7 +305,8 @@ export async function syncToGoogleCalendar(
       result.updated += 1;
       return;
     }
-    result.created += 1;
+    if (isUpdate) result.updated += 1;
+    else result.created += 1;
   }
 
   async function worker(): Promise<void> {
@@ -287,54 +339,31 @@ export async function syncToGoogleCalendar(
 
   if (opts.reconcile) {
     const desiredIds = new Set(mappedEvents.map((event) => event.id));
-    let pageToken: string | undefined;
-    let pageCount = 0;
-    do {
-      pageCount += 1;
-      const query = new URLSearchParams({
-        maxResults: "2500",
-        privateExtendedProperty: "umtas=1",
-        showDeleted: "false",
-        fields: "items(id),nextPageToken",
-      });
-      if (pageToken) query.set("pageToken", pageToken);
-      const response = await requestGoogle(
-        `calendars/${encodeURIComponent(calendarId)}/events?${query}`,
-        { method: "GET" },
-        opts.accessToken,
-        { signal: opts.signal },
-      );
-      const body = (await response.json()) as {
-        items?: ManagedGoogleEvent[];
-        nextPageToken?: string;
-      };
-      for (const existing of body.items ?? []) {
-        if (!existing.id || desiredIds.has(existing.id)) continue;
-        try {
-          await requestGoogle(
-            `calendars/${encodeURIComponent(calendarId)}/events/${encodeURIComponent(existing.id)}`,
-            { method: "DELETE" },
-            opts.accessToken,
-            { signal: opts.signal },
-          );
-          result.deleted += 1;
-        } catch (error) {
-          if (
-            opts.signal?.aborted ||
-            (error instanceof DOMException && error.name === "AbortError") ||
-            error instanceof GoogleAuthError
-          ) {
-            throw error;
-          }
-          result.failed.push({
-            key: `orphan-${existing.id}`,
-            status: error instanceof GoogleApiError ? error.status : 0,
-            message: error instanceof Error ? error.message : String(error),
-          });
+    for (const existingId of existingEvents.keys()) {
+      if (desiredIds.has(existingId)) continue;
+      try {
+        await requestGoogle(
+          `${collectionUrl}/${encodeURIComponent(existingId)}`,
+          { method: "DELETE" },
+          opts.accessToken,
+          { signal: opts.signal },
+        );
+        result.deleted += 1;
+      } catch (error) {
+        if (
+          opts.signal?.aborted ||
+          (error instanceof DOMException && error.name === "AbortError") ||
+          error instanceof GoogleAuthError
+        ) {
+          throw error;
         }
+        result.failed.push({
+          key: `orphan-${existingId}`,
+          status: error instanceof GoogleApiError ? error.status : 0,
+          message: error instanceof Error ? error.message : String(error),
+        });
       }
-      pageToken = body.nextPageToken;
-    } while (pageToken && pageCount < MAX_EVENT_LIST_PAGES);
+    }
   }
 
   return result;

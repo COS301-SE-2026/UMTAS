@@ -6,6 +6,10 @@ export const GOOGLE_CALENDAR_TOKEN_QUERY_KEY = [
   "google-calendar",
   "token",
 ] as const;
+export const GOOGLE_CALENDAR_PERMISSIONS_QUERY_KEY = [
+  "google-calendar",
+  "permissions",
+] as const;
 const REQUIRED_SCOPES = [
   "https://www.googleapis.com/auth/calendar.calendars",
   "https://www.googleapis.com/auth/calendar.calendarlist.readonly",
@@ -34,15 +38,25 @@ function betterAuthError(
   );
 }
 
-export async function fetchGoogleCalendarToken(): Promise<GoogleCalendarToken> {
+async function getGoogleAccount() {
   const accounts = await authClient.listAccounts();
   if (accounts.error) {
     throw betterAuthError("Could not list linked accounts", accounts.error);
   }
 
-  const googleAccount = accounts.data?.find(
-    (account) => account.providerId === "google",
+  return accounts.data?.find((account) => account.providerId === "google");
+}
+
+export async function hasGoogleCalendarPermissions(): Promise<boolean> {
+  const googleAccount = await getGoogleAccount();
+  return Boolean(
+    googleAccount &&
+    REQUIRED_SCOPES.every((scope) => googleAccount.scopes.includes(scope)),
   );
+}
+
+export async function fetchGoogleCalendarToken(): Promise<GoogleCalendarToken> {
+  const googleAccount = await getGoogleAccount();
   if (
     !googleAccount ||
     REQUIRED_SCOPES.some((scope) => !googleAccount.scopes.includes(scope))
@@ -52,7 +66,7 @@ export async function fetchGoogleCalendarToken(): Promise<GoogleCalendarToken> {
 
   const token = await authClient.getAccessToken({
     providerId: "google",
-    accountId: googleAccount.id,
+    accountId: googleAccount.accountId,
   });
   if (token.error || !token.data) {
     throw betterAuthError("Could not get Google Calendar token", token.error);
@@ -124,11 +138,15 @@ export function finishCalendarConsent(
   replace: (url: string) => void = (url) => window.location.replace(url),
 ): void {
   if (status === "granted") clearGoogleCalendarTokenCache();
-  replace(calendarConsentReturnUrl(status));
+  const returnUrl = calendarConsentReturnUrl(status);
+  replace(returnUrl);
 }
 
 export function clearGoogleCalendarTokenCache(): void {
   void getQueryClient().invalidateQueries({
     queryKey: GOOGLE_CALENDAR_TOKEN_QUERY_KEY,
+  });
+  void getQueryClient().invalidateQueries({
+    queryKey: GOOGLE_CALENDAR_PERMISSIONS_QUERY_KEY,
   });
 }
