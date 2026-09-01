@@ -15,14 +15,24 @@ import {
   EventCriteriaDto,
   EventCriteriaDtoV2,
   EventSingleResponseDto,
+  EventStatsVenueResponseDto,
+  EventStatsWeeklyResponseDto,
   ValidateEventResponseDto,
   VenueDto,
 } from './dto/EventDto.dto';
 import { AppDatabase } from 'src/auth/auth';
-import { Event, UniversityEvent, Venue } from 'src/entities';
+import {
+  Course,
+  Event,
+  EventVenue,
+  GroupModules,
+  modules,
+  UniversityEvent,
+  Venue,
+} from 'src/entities';
 import { UniversitySingleResponseDto } from 'src/University/dto/university.dto';
 import { DayOfWeek } from './dto/event.types';
-import { and, eq, inArray } from 'drizzle-orm';
+import { and, countDistinct, eq, inArray, sql } from 'drizzle-orm';
 
 export class EventServiceV2 extends EventService {
   private readonly OOPSIE = new Logger(this.constructor.name);
@@ -144,6 +154,83 @@ export class EventServiceV2 extends EventService {
       message: `Event[${updated.eventName}] validated=${updated.validated}`,
     };
   } //END_validateEvent
+
+  //Stats
+
+  async getStatisticsWeekly(
+    uniId: string,
+  ): Promise<EventStatsWeeklyResponseDto> {
+    const db = this.dbService.db;
+
+    //Validate uni
+    await this.uniService.getById(uniId, db);
+
+    // Day of week
+    const dayOfWeek = sql<DayOfWeek>`${Event.eventCriteria}->>'dayOfWeek'`;
+
+    //Day order
+    const dayOrder = sql<number>`
+      CASE ${dayOfWeek}
+        WHEN 'monday' THEN 1
+        WHEN 'tuesday' THEN 2
+        WHEN 'wednesday' THEN 3
+        WHEN 'thursday' THEN 4
+        WHEN 'friday' THEN 5
+        WHEN 'saturday' THEN 6
+        WHEN 'sunday' THEN 7
+      END
+    `;
+
+    const statistics = await db
+      .select({
+        dayOfWeek,
+        EventCount: countDistinct(Event.eventID),
+      })
+      .from(Event)
+      .leftJoin(UniversityEvent, eq(UniversityEvent.eventID, Event.eventID))
+      .leftJoin(modules, eq(modules.moduleID, UniversityEvent.moduleID))
+      .leftJoin(GroupModules, eq(GroupModules.ModuleID, modules.moduleID))
+      .innerJoin(Course, eq(Course.GroupID, GroupModules.GroupID))
+      .where(eq(Course.UniversityID, uniId))
+      .groupBy(dayOfWeek)
+      .orderBy(dayOrder);
+
+    return { data: statistics };
+  } //END_getStatisticsWeekly
+
+  async getStatisticsVenues(
+    uniId: string,
+  ): Promise<EventStatsVenueResponseDto> {
+    const db = this.dbService.db;
+
+    //Validate uni
+    await this.uniService.getById(uniId, db);
+
+    //Statistics
+    const statistics = await db
+      .select({
+        VenueID: Venue.VenueID,
+        VenueName: Venue.VenueName,
+        EventCount: countDistinct(Event.eventID),
+      })
+      .from(Venue)
+      .leftJoin(EventVenue, eq(EventVenue.VenueID, Venue.VenueID))
+      .leftJoin(Event, eq(Event.eventID, EventVenue.EventID))
+      .leftJoin(UniversityEvent, eq(UniversityEvent.eventID, Event.eventID))
+      .leftJoin(modules, eq(modules.moduleID, UniversityEvent.moduleID))
+      .leftJoin(GroupModules, eq(GroupModules.ModuleID, modules.moduleID))
+      .innerJoin(Course, eq(Course.GroupID, GroupModules.GroupID))
+      .where(eq(Course.UniversityID, uniId))
+      .groupBy(Venue.VenueID, Venue.VenueName)
+      .orderBy(countDistinct(Event.eventID));
+
+    return {
+      data: statistics.map((s) => ({
+        ...s,
+        VenueName: s.VenueName ?? 'NoName',
+      })),
+    };
+  }
 
   //🎅's little helpers
 

@@ -226,3 +226,40 @@ export class ValidateEventResponseDto {
   @IsString()
   message?: string;
 } //END_ValidateEventResponseDto
+
+//stats
+
+//Events per day of week
+export class EventStatsWeekDayDto {
+  @ApiProperty()
+  @ApiProperty({
+    enum: DAY_OF_WEEK,
+  })
+  @IsEnum(DAY_OF_WEEK)
+  dayOfWeek!: DayOfWeek;
+
+  @ApiProperty()
+  EventCount!: number;
+}
+
+export class EventStatsWeeklyResponseDto {
+  @ApiProperty({ type: [EventStatsWeekDayDto] })
+  data!: EventStatsWeekDayDto[];
+}
+
+//Events per venue
+export class EventStatsVenueDto {
+  @ApiProperty()
+  VenueID!: string;
+
+  @ApiProperty()
+  VenueName!: string;
+
+  @ApiProperty()
+  EventCount!: number;
+} //END_EventStatsVenueDto
+
+export class EventStatsVenueResponseDto {
+  @ApiProperty({ type: [EventStatsVenueDto] })
+  data!: EventStatsVenueDto[];
+}
