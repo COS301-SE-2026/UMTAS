@@ -2,7 +2,6 @@
 export const UniversityNames: string[] = [
   'University of Pretoria',
   'University of Maryland',
-  'University of Cape Town',
 ];
 
 //University Roles -> 3 for the three users opf University of Pretoria
