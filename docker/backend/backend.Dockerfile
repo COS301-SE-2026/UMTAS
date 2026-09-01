@@ -10,6 +10,11 @@ RUN pnpm install --frozen-lockfile --filter backend... \
     --network-concurrency=8 --fetch-retries=5 --fetch-timeout=60000
 
 FROM deps AS build
+ARG SEED_COS_ADMIN_EMAIL
+ARG SEED_COS_ADMIN_PASSWORD
+
+ENV SEED_COS_ADMIN_EMAIL=${SEED_COS_ADMIN_EMAIL}
+ENV SEED_COS_ADMIN_PASSWORD=${SEED_COS_ADMIN_PASSWORD}
 COPY packages/shared-types/ ./packages/shared-types/
 COPY apps/backend/ ./apps/backend/
 RUN pnpm --filter=shared-types build
@@ -19,6 +24,7 @@ RUN pnpm --filter=backend deploy --prod --legacy /deploy \
     && cp -r apps/backend/drizzle /deploy/drizzle \
     && mkdir -p /deploy/src/mail \
     && cp -r apps/backend/src/mail/templates /deploy/src/mail/templates
+
 
 FROM node:22-alpine AS runtime
 WORKDIR /app
