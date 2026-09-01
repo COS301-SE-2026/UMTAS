@@ -246,6 +246,7 @@ class DomainUser(HttpUser):
             else:
                 response.success()
 
+
     @task(1)
     def view_timetable_detail(self):
         if not self.timetable_id:
@@ -381,6 +382,15 @@ class DomainUser(HttpUser):
     def get_active_session(self):
         self.client.get("/api/auth/get-session")
 
+
+    @task(1)
+    def view_attendance(self):
+        with self.client.get("/api/attendance", catch_response=True) as response:
+            if response.status_code == 200:
+                response.success()
+            else:
+                response.failure(f"view attendance failed [{response.status_code}]")
+                
     @task(2)
     def submit_solver_job(self):
         if self.solver_id is not None:
@@ -425,7 +435,23 @@ class DomainUser(HttpUser):
             if data.get("status") == "completed" and data.get("result"):
                 self.solver_result_ready = True
 
-    @task(1)
+
+    @task(2)
     def check_solver_status(self):
-        if self.solver_id:
-            self.client.get(f"/api/solver/jobs/{self.solver_id}")
+        if not self.solver_id or self.solver_result_ready:
+            return
+        with self.client.get(
+            f"/api/solver/jobs/{self.solver_id}", name="/api/solver/jobs/[id]", catch_response=True
+        ) as response:
+            if response.status_code != 200:
+                response.failure(f"solver status check failed [{response.status_code}]")
+                return
+            response.success()
+            data = response.json()
+            status = data.get("status")
+
+            if status == "completed":
+                self.solver_result_ready = True
+            elif status == "failed":
+                self.solver_id = None
+                self.solver_result_ready = False
