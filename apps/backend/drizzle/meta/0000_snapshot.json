@@ -1,308 +1,9 @@
 {
-  "id": "0a4151e1-62fe-4872-9bbc-32fd50e23252",
+  "id": "e3a31d8d-4183-4ebc-b8a7-661d9fbe4f79",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.AcademicCalendar": {
-      "name": "AcademicCalendar",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "universityId": {
-          "name": "universityId",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "year": {
-          "name": "year",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updatedAt": {
-          "name": "updatedAt",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {
-        "academic_calendar_university_year_unique": {
-          "name": "academic_calendar_university_year_unique",
-          "columns": [
-            {
-              "expression": "universityId",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "year",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": true,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "AcademicCalendar_universityId_University_UniversityID_fk": {
-          "name": "AcademicCalendar_universityId_University_UniversityID_fk",
-          "tableFrom": "AcademicCalendar",
-          "tableTo": "University",
-          "columnsFrom": ["universityId"],
-          "columnsTo": ["UniversityID"],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {
-        "academic_calendar_year_four_digits": {
-          "name": "academic_calendar_year_four_digits",
-          "value": "\"AcademicCalendar\".\"year\" between 1000 and 9999"
-        }
-      },
-      "isRLSEnabled": false
-    },
-    "public.CalendarRestriction": {
-      "name": "CalendarRestriction",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "academicCalendarId": {
-          "name": "academicCalendarId",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "type": {
-          "name": "type",
-          "type": "CalendarRestrictionType",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "startDate": {
-          "name": "startDate",
-          "type": "date",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "endDate": {
-          "name": "endDate",
-          "type": "date",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "''"
-        },
-        "replacementWeekday": {
-          "name": "replacementWeekday",
-          "type": "CalendarWeekday",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updatedAt": {
-          "name": "updatedAt",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {
-        "calendar_restriction_calendar_idx": {
-          "name": "calendar_restriction_calendar_idx",
-          "columns": [
-            {
-              "expression": "academicCalendarId",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "calendar_restriction_day_swap_target_unique": {
-          "name": "calendar_restriction_day_swap_target_unique",
-          "columns": [
-            {
-              "expression": "academicCalendarId",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "startDate",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": true,
-          "where": "\"CalendarRestriction\".\"type\" = 'DAY_SWAP'",
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "CalendarRestriction_academicCalendarId_AcademicCalendar_id_fk": {
-          "name": "CalendarRestriction_academicCalendarId_AcademicCalendar_id_fk",
-          "tableFrom": "CalendarRestriction",
-          "tableTo": "AcademicCalendar",
-          "columnsFrom": ["academicCalendarId"],
-          "columnsTo": ["id"],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {
-        "calendar_restriction_date_range_valid": {
-          "name": "calendar_restriction_date_range_valid",
-          "value": "\"CalendarRestriction\".\"endDate\" >= \"CalendarRestriction\".\"startDate\""
-        },
-        "calendar_restriction_replacement_weekday_valid": {
-          "name": "calendar_restriction_replacement_weekday_valid",
-          "value": "(\"CalendarRestriction\".\"type\" = 'DAY_SWAP' and \"CalendarRestriction\".\"replacementWeekday\" is not null)\n          or (\"CalendarRestriction\".\"type\" <> 'DAY_SWAP' and \"CalendarRestriction\".\"replacementWeekday\" is null)"
-        }
-      },
-      "isRLSEnabled": false
-    },
-    "public.GeneratedCalendar": {
-      "name": "GeneratedCalendar",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "academicCalendarId": {
-          "name": "academicCalendarId",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "payload": {
-          "name": "payload",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "timetableId": {
-          "name": "timetableId",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {
-        "generated_calendar_timetable_created_at_idx": {
-          "name": "generated_calendar_timetable_created_at_idx",
-          "columns": [
-            {
-              "expression": "timetableId",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "createdAt",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "GeneratedCalendar_academicCalendarId_AcademicCalendar_id_fk": {
-          "name": "GeneratedCalendar_academicCalendarId_AcademicCalendar_id_fk",
-          "tableFrom": "GeneratedCalendar",
-          "tableTo": "AcademicCalendar",
-          "columnsFrom": ["academicCalendarId"],
-          "columnsTo": ["id"],
-          "onDelete": "restrict",
-          "onUpdate": "no action"
-        },
-        "GeneratedCalendar_timetableId_Timetable_timetableID_fk": {
-          "name": "GeneratedCalendar_timetableId_Timetable_timetableID_fk",
-          "tableFrom": "GeneratedCalendar",
-          "tableTo": "Timetable",
-          "columnsFrom": ["timetableId"],
-          "columnsTo": ["timetableID"],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
     "public.account": {
       "name": "account",
       "schema": "",
@@ -813,6 +514,348 @@
         }
       },
       "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.AcademicCalendar": {
+      "name": "AcademicCalendar",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "universityId": {
+          "name": "universityId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "year": {
+          "name": "year",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "subscriptions": {
+          "name": "subscriptions",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'[]'::jsonb"
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "academic_calendar_university_year_unique": {
+          "name": "academic_calendar_university_year_unique",
+          "columns": [
+            {
+              "expression": "universityId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "year",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "academic_calendar_public_name_year_unique": {
+          "name": "academic_calendar_public_name_year_unique",
+          "columns": [
+            {
+              "expression": "name",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "year",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"AcademicCalendar\".\"universityId\" is null",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "AcademicCalendar_universityId_University_UniversityID_fk": {
+          "name": "AcademicCalendar_universityId_University_UniversityID_fk",
+          "tableFrom": "AcademicCalendar",
+          "tableTo": "University",
+          "columnsFrom": ["universityId"],
+          "columnsTo": ["UniversityID"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "academic_calendar_year_four_digits": {
+          "name": "academic_calendar_year_four_digits",
+          "value": "\"AcademicCalendar\".\"year\" between 1000 and 9999"
+        },
+        "academic_calendar_public_requires_name": {
+          "name": "academic_calendar_public_requires_name",
+          "value": "\"AcademicCalendar\".\"universityId\" is not null or \"AcademicCalendar\".\"name\" is not null"
+        },
+        "academic_calendar_public_no_subscriptions": {
+          "name": "academic_calendar_public_no_subscriptions",
+          "value": "\"AcademicCalendar\".\"universityId\" is not null or \"AcademicCalendar\".\"subscriptions\" = '[]'::jsonb"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.CalendarRestriction": {
+      "name": "CalendarRestriction",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "academicCalendarId": {
+          "name": "academicCalendarId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "CalendarRestrictionType",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "startDate": {
+          "name": "startDate",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "endDate": {
+          "name": "endDate",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "''"
+        },
+        "replacementWeekday": {
+          "name": "replacementWeekday",
+          "type": "CalendarWeekday",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "calendar_restriction_calendar_idx": {
+          "name": "calendar_restriction_calendar_idx",
+          "columns": [
+            {
+              "expression": "academicCalendarId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "calendar_restriction_day_swap_target_unique": {
+          "name": "calendar_restriction_day_swap_target_unique",
+          "columns": [
+            {
+              "expression": "academicCalendarId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "startDate",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"CalendarRestriction\".\"type\" = 'DAY_SWAP'",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "CalendarRestriction_academicCalendarId_AcademicCalendar_id_fk": {
+          "name": "CalendarRestriction_academicCalendarId_AcademicCalendar_id_fk",
+          "tableFrom": "CalendarRestriction",
+          "tableTo": "AcademicCalendar",
+          "columnsFrom": ["academicCalendarId"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "calendar_restriction_date_range_valid": {
+          "name": "calendar_restriction_date_range_valid",
+          "value": "\"CalendarRestriction\".\"endDate\" >= \"CalendarRestriction\".\"startDate\""
+        },
+        "calendar_restriction_replacement_weekday_valid": {
+          "name": "calendar_restriction_replacement_weekday_valid",
+          "value": "(\"CalendarRestriction\".\"type\" = 'DAY_SWAP' and \"CalendarRestriction\".\"replacementWeekday\" is not null)\n          or (\"CalendarRestriction\".\"type\" <> 'DAY_SWAP' and \"CalendarRestriction\".\"replacementWeekday\" is null)"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.GeneratedCalendar": {
+      "name": "GeneratedCalendar",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "academicCalendarId": {
+          "name": "academicCalendarId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "payload": {
+          "name": "payload",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "timetableId": {
+          "name": "timetableId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "generated_calendar_timetable_created_at_idx": {
+          "name": "generated_calendar_timetable_created_at_idx",
+          "columns": [
+            {
+              "expression": "timetableId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "createdAt",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "GeneratedCalendar_academicCalendarId_AcademicCalendar_id_fk": {
+          "name": "GeneratedCalendar_academicCalendarId_AcademicCalendar_id_fk",
+          "tableFrom": "GeneratedCalendar",
+          "tableTo": "AcademicCalendar",
+          "columnsFrom": ["academicCalendarId"],
+          "columnsTo": ["id"],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "GeneratedCalendar_timetableId_Timetable_timetableID_fk": {
+          "name": "GeneratedCalendar_timetableId_Timetable_timetableID_fk",
+          "tableFrom": "GeneratedCalendar",
+          "tableTo": "Timetable",
+          "columnsFrom": ["timetableId"],
+          "columnsTo": ["timetableID"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -1886,6 +1929,226 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.University": {
+      "name": "University",
+      "schema": "",
+      "columns": {
+        "UniversityID": {
+          "name": "UniversityID",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "UniversityName": {
+          "name": "UniversityName",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ApiIdentifier": {
+          "name": "ApiIdentifier",
+          "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "BaseApiUrl": {
+          "name": "BaseApiUrl",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ApiKey": {
+          "name": "ApiKey",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "University_ApiIdentifier_unique": {
+          "name": "University_ApiIdentifier_unique",
+          "nullsNotDistinct": false,
+          "columns": ["ApiIdentifier"]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.UniversityRole": {
+      "name": "UniversityRole",
+      "schema": "",
+      "columns": {
+        "UserID": {
+          "name": "UserID",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "UniversityID": {
+          "name": "UniversityID",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "role": {
+          "name": "role",
+          "type": "RoleType",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'STUDENT'"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "UniversityRole_UserID_user_id_fk": {
+          "name": "UniversityRole_UserID_user_id_fk",
+          "tableFrom": "UniversityRole",
+          "tableTo": "user",
+          "columnsFrom": ["UserID"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "UniversityRole_UniversityID_University_UniversityID_fk": {
+          "name": "UniversityRole_UniversityID_University_UniversityID_fk",
+          "tableFrom": "UniversityRole",
+          "tableTo": "University",
+          "columnsFrom": ["UniversityID"],
+          "columnsTo": ["UniversityID"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "UniversityRole_UniversityID_UserID_pk": {
+          "name": "UniversityRole_UniversityID_UserID_pk",
+          "columns": ["UniversityID", "UserID"]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.EventVenue": {
+      "name": "EventVenue",
+      "schema": "",
+      "columns": {
+        "EventID": {
+          "name": "EventID",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "VenueID": {
+          "name": "VenueID",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "EventVenue_EventID_Event_eventID_fk": {
+          "name": "EventVenue_EventID_Event_eventID_fk",
+          "tableFrom": "EventVenue",
+          "tableTo": "Event",
+          "columnsFrom": ["EventID"],
+          "columnsTo": ["eventID"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "EventVenue_VenueID_Venue_VenueID_fk": {
+          "name": "EventVenue_VenueID_Venue_VenueID_fk",
+          "tableFrom": "EventVenue",
+          "tableTo": "Venue",
+          "columnsFrom": ["VenueID"],
+          "columnsTo": ["VenueID"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "EventVenue_EventID_VenueID_pk": {
+          "name": "EventVenue_EventID_VenueID_pk",
+          "columns": ["EventID", "VenueID"]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.Venue": {
+      "name": "Venue",
+      "schema": "",
+      "columns": {
+        "VenueID": {
+          "name": "VenueID",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "VenueName": {
+          "name": "VenueName",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "UniversityID": {
+          "name": "UniversityID",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "venue_university_name_unique": {
+          "name": "venue_university_name_unique",
+          "columns": [
+            {
+              "expression": "UniversityID",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "VenueName",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "Venue_UniversityID_University_UniversityID_fk": {
+          "name": "Venue_UniversityID_University_UniversityID_fk",
+          "tableFrom": "Venue",
+          "tableTo": "University",
+          "columnsFrom": ["UniversityID"],
+          "columnsTo": ["UniversityID"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.Course": {
       "name": "Course",
       "schema": "",
@@ -2132,226 +2395,6 @@
           "columns": ["Hash"]
         }
       },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.University": {
-      "name": "University",
-      "schema": "",
-      "columns": {
-        "UniversityID": {
-          "name": "UniversityID",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "UniversityName": {
-          "name": "UniversityName",
-          "type": "varchar(30)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "ApiIdentifier": {
-          "name": "ApiIdentifier",
-          "type": "varchar(10)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "BaseApiUrl": {
-          "name": "BaseApiUrl",
-          "type": "varchar(50)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "ApiKey": {
-          "name": "ApiKey",
-          "type": "varchar(100)",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "University_ApiIdentifier_unique": {
-          "name": "University_ApiIdentifier_unique",
-          "nullsNotDistinct": false,
-          "columns": ["ApiIdentifier"]
-        }
-      },
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.UniversityRole": {
-      "name": "UniversityRole",
-      "schema": "",
-      "columns": {
-        "UserID": {
-          "name": "UserID",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "UniversityID": {
-          "name": "UniversityID",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "role": {
-          "name": "role",
-          "type": "RoleType",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'STUDENT'"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "UniversityRole_UserID_user_id_fk": {
-          "name": "UniversityRole_UserID_user_id_fk",
-          "tableFrom": "UniversityRole",
-          "tableTo": "user",
-          "columnsFrom": ["UserID"],
-          "columnsTo": ["id"],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "UniversityRole_UniversityID_University_UniversityID_fk": {
-          "name": "UniversityRole_UniversityID_University_UniversityID_fk",
-          "tableFrom": "UniversityRole",
-          "tableTo": "University",
-          "columnsFrom": ["UniversityID"],
-          "columnsTo": ["UniversityID"],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {
-        "UniversityRole_UniversityID_UserID_pk": {
-          "name": "UniversityRole_UniversityID_UserID_pk",
-          "columns": ["UniversityID", "UserID"]
-        }
-      },
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.EventVenue": {
-      "name": "EventVenue",
-      "schema": "",
-      "columns": {
-        "EventID": {
-          "name": "EventID",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "VenueID": {
-          "name": "VenueID",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "EventVenue_EventID_Event_eventID_fk": {
-          "name": "EventVenue_EventID_Event_eventID_fk",
-          "tableFrom": "EventVenue",
-          "tableTo": "Event",
-          "columnsFrom": ["EventID"],
-          "columnsTo": ["eventID"],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "EventVenue_VenueID_Venue_VenueID_fk": {
-          "name": "EventVenue_VenueID_Venue_VenueID_fk",
-          "tableFrom": "EventVenue",
-          "tableTo": "Venue",
-          "columnsFrom": ["VenueID"],
-          "columnsTo": ["VenueID"],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {
-        "EventVenue_EventID_VenueID_pk": {
-          "name": "EventVenue_EventID_VenueID_pk",
-          "columns": ["EventID", "VenueID"]
-        }
-      },
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.Venue": {
-      "name": "Venue",
-      "schema": "",
-      "columns": {
-        "VenueID": {
-          "name": "VenueID",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "VenueName": {
-          "name": "VenueName",
-          "type": "varchar(30)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "UniversityID": {
-          "name": "UniversityID",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {
-        "venue_university_name_unique": {
-          "name": "venue_university_name_unique",
-          "columns": [
-            {
-              "expression": "UniversityID",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "VenueName",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": true,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "Venue_UniversityID_University_UniversityID_fk": {
-          "name": "Venue_UniversityID_University_UniversityID_fk",
-          "tableFrom": "Venue",
-          "tableTo": "University",
-          "columnsFrom": ["UniversityID"],
-          "columnsTo": ["UniversityID"],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false

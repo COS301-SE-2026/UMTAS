@@ -115,12 +115,14 @@
 
 ---
 ??? info "**Analytics Dashboard**"
-
     | **ID** | **User Story** | **Use Case** |
     |---|---|---|
-    | US-39 | As an admin or lecturer, I want to view an attendance analytics dashboard so that I can monitor engagement trends across events. | UC-AN-01 |
-    | US-40 | As an admin or lecturer, I want to explore venue and booking analytics so that I can understand space utilisation. | UC-AN-02 |
-    | US-41 | As an admin or lecturer, I want to view lecturer analytics so that I can assess lecturer workload and scheduling patterns. | UC-AN-03 |
+    | US-39 | As an admin or lecturer, I want to see the Courses in my University with how many Modules each has, so that I get a top-level view of scale. | UC-AN-01 |
+    | US-40 | As an admin or lecturer, I want to select a Course and see its Modules with how many Events each has, so that I can see activity within that Course. | UC-AN-02 |
+    | US-41 | As an admin or lecturer, I want to select a Module and see its Events with how many students have submitted attendance for each, so that I can gauge engagement per Event. | UC-AN-03 |
+    | US-42 | As an admin or lecturer, I want to select a specific Event and see its full attendance detail, so that I can understand attendance for that session. | UC-AN-04 |
+    | US-43 | As an admin or lecturer, I want to view how many Events were held per Venue over a period, so that I can understand space usage. | UC-AN-05 |
+    | US-44 | As an admin or lecturer, I want to view how many Events a Lecturer has taught and the associated attendance, so that I can understand their teaching load. | UC-AN-06 |
 
 ---
 ??? info "**Attendance Recording**"

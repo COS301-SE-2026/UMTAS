@@ -29,7 +29,7 @@ scrape_configs:
 
   - job_name: solver
     static_configs:
-      - targets: ["solver:8000"]
+      - targets: ["solver-worker:8000"]
         labels:
           service: solver
           language: python
@@ -61,12 +61,3 @@ scrape_configs:
       - targets: ["health-exporter:9066"]
         labels:
           service: health-exporter
-
-  - job_name: watchtower
-    static_configs:
-      - targets: ["watchtower:8080"]
-        labels:
-          service: watchtower
-    metrics_path: /v1/metrics
-    authorization:
-      credentials_file: /tmp/watchtower_token

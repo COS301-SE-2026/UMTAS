@@ -23,9 +23,11 @@ import { AttendanceModule } from './Attendance/attendance.module';
 import { GroupingModule } from './Grouping/grouping.module';
 import { AcademicCalendarModule } from './academic_calendar/academic_calendar.module';
 import { ApiServiceModule } from './ApiService/ApiService.module';
+import { PostHogModule } from './posthog/posthog.module';
 
 @Module({
   imports: [
+    PostHogModule,
     DatabaseModule,
     HealthModule,
     MailModule,

@@ -1186,7 +1186,7 @@
         "tags": ["Modules"]
       },
       "get": {
-        "description": "Filter by userId(enrolled) | courseId(course owned) | universityId(modules for university over all courses). At least one filter required",
+        "description": "Filter by userId(enrolled) | courseId(course owned) | universityId(modules for university over all courses). At least one filter required \n\n      Enable stats response: filters: { stats=t/true/True/TRUE/1 }",
         "operationId": "getAllModulesV2",
         "parameters": [
           {
@@ -1237,6 +1237,15 @@
               "default": false,
               "type": "boolean"
             }
+          },
+          {
+            "name": "Stats",
+            "required": false,
+            "in": "query",
+            "description": "Enable stats = TRUE",
+            "schema": {
+              "type": "boolean"
+            }
           }
         ],
         "responses": {
@@ -1245,7 +1254,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ModuleListResponseDto"
+                  "$ref": "#/components/schemas/ModuleListResponseDtoV2"
                 }
               }
             }
@@ -1254,7 +1263,7 @@
             "description": "Invalid filters"
           }
         },
-        "summary": "Get all modules with filters - V2",
+        "summary": "Get all modules with filters and counts - V2",
         "tags": ["Modules"]
       }
     },
@@ -1666,6 +1675,7 @@
     },
     "/api/Courses/v2/getAll": {
       "get": {
+        "description": "Use filters and enable stats mode in filters",
         "operationId": "getCoursesV2",
         "parameters": [
           {
@@ -1695,13 +1705,22 @@
             "name": "Degree",
             "required": false,
             "in": "query",
-            "description": "Filter by Degree",
+            "description": "Degree that course belongs to",
             "schema": {
               "minLength": 1,
               "maxLength": 30,
               "nullable": true,
               "example": "Bachelor of Science",
               "type": "string"
+            }
+          },
+          {
+            "name": "Stats",
+            "required": false,
+            "in": "query",
+            "description": "Enable stats = TRUE",
+            "schema": {
+              "type": "boolean"
             }
           }
         ],
@@ -1711,7 +1730,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CourseListResponseDto"
+                  "$ref": "#/components/schemas/CourseListResponseDtoV2"
                 }
               }
             }
@@ -2315,6 +2334,7 @@
         "tags": ["Events"]
       },
       "get": {
+        "description": "Apply filters - Enable stats mode with filters.stats=TRUE",
         "operationId": "getAllEvents",
         "parameters": [
           {
@@ -2342,6 +2362,15 @@
             "schema": {
               "type": "boolean"
             }
+          },
+          {
+            "name": "Stats",
+            "required": false,
+            "in": "query",
+            "description": "Enable stats = TRUE",
+            "schema": {
+              "type": "boolean"
+            }
           }
         ],
         "responses": {
@@ -2350,7 +2379,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/EventListResponseDto"
+                  "$ref": "#/components/schemas/EventListResponseDtoV2"
                 }
               }
             }
@@ -2769,6 +2798,27 @@
         "tags": ["Timetables"]
       }
     },
+    "/api/builder/personalModule": {
+      "get": {
+        "description": "Get the personal module that owns your personal events",
+        "operationId": "BuilderController_getPersonalModule",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Module fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModuleSingleResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get personal module",
+        "tags": ["Builder"]
+      }
+    },
     "/api/builder": {
       "post": {
         "description": "Create a new module and link to appropriate course and automatically enroll student into module",
@@ -2969,7 +3019,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ModuleSingleResponseDto"
+                  "$ref": "#/components/schemas/EventSingleResponseDto"
                 }
               }
             }
@@ -3582,7 +3632,7 @@
     },
     "/api/academic-calendar/generate": {
       "post": {
-        "description": "Generates a restriction-aware pseudo-calendar snapshot using the selected university's current-year academic calendar and a timetable owned by the authenticated student.",
+        "description": "Generates a restriction-aware pseudo-calendar snapshot using the selected university's requested academic year and a timetable owned by the authenticated student.",
         "operationId": "generateCalendar",
         "parameters": [],
         "requestBody": {
@@ -3628,7 +3678,7 @@
         "tags": ["Academic Calendar"]
       }
     },
-    "/api/academic-calendar/generate/{id}": {
+    "/api/academic-calendar/generated/{id}": {
       "get": {
         "description": "Returns a generated snapshot only when its timetable belongs to the authenticated student.",
         "operationId": "getGeneratedCalendar",
@@ -3668,6 +3718,51 @@
           }
         ],
         "summary": "Get a generated calendar snapshot",
+        "tags": ["Academic Calendar"]
+      }
+    },
+    "/api/academic-calendar/public": {
+      "get": {
+        "description": "Returns public calendars available for subscription, optionally filtered by academic year.",
+        "operationId": "listPublicAcademicCalendars",
+        "parameters": [
+          {
+            "name": "year",
+            "required": false,
+            "in": "query",
+            "description": "Limit results to a four-digit academic year.",
+            "schema": {
+              "minimum": 1000,
+              "maximum": 9999,
+              "example": 2026,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Public academic calendars returned successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AcademicCalendarDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid academic year"
+          }
+        },
+        "security": [
+          {
+            "umtas-session": []
+          }
+        ],
+        "summary": "List public academic calendars",
         "tags": ["Academic Calendar"]
       }
     },
@@ -4218,6 +4313,43 @@
           }
         },
         "summary": "Fetch courses",
+        "tags": ["ApiService"]
+      }
+    },
+    "/api/api-service/course": {
+      "get": {
+        "description": "Returns the specified course together with its module and events.",
+        "operationId": "ApiServiceController_getCourse",
+        "parameters": [
+          {
+            "name": "courseId",
+            "required": true,
+            "in": "query",
+            "description": "UUID of the course to fetch.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Course fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CourseSingleResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The authenticated user is not associated with a university."
+          },
+          "404": {
+            "description": "The university or its API adapter could not be found."
+          }
+        },
+        "summary": "Get a specific course",
         "tags": ["ApiService"]
       }
     },
@@ -5191,6 +5323,28 @@
         },
         "required": ["modules"]
       },
+      "ModuleListResponseDtoV2": {
+        "type": "object",
+        "properties": {
+          "modules": {
+            "description": "List of modules",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ModuleSingleResponseDto"
+            }
+          },
+          "message": {
+            "type": "string",
+            "description": "Short message indicating  success of response."
+          },
+          "count": {
+            "type": "number",
+            "example": 68,
+            "description": "Count of Modules"
+          }
+        },
+        "required": ["modules"]
+      },
       "UpdateModuleDto": {
         "type": "object",
         "properties": {
@@ -5694,6 +5848,27 @@
             "items": {
               "$ref": "#/components/schemas/CourseDto"
             }
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": ["courses"]
+      },
+      "CourseListResponseDtoV2": {
+        "type": "object",
+        "properties": {
+          "courses": {
+            "description": "List of courses",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CourseDto"
+            }
+          },
+          "count": {
+            "type": "number",
+            "example": 68,
+            "description": "Count of Modules"
           },
           "message": {
             "type": "string"
@@ -6285,7 +6460,7 @@
         },
         "required": ["eventCriteria"]
       },
-      "EventListResponseDto": {
+      "EventListResponseDtoV2": {
         "type": "object",
         "properties": {
           "events": {
@@ -6293,6 +6468,11 @@
             "items": {
               "$ref": "#/components/schemas/EventDto"
             }
+          },
+          "count": {
+            "type": "number",
+            "example": 68,
+            "description": "Count of Modules"
           },
           "message": {
             "type": "string"
@@ -7542,6 +7722,13 @@
             "format": "uuid",
             "example": "339cd591-7c62-4ea7-8a2b-602598553133",
             "description": "Timetable containing the source events to generate."
+          },
+          "year": {
+            "minimum": 1000,
+            "maximum": 9999,
+            "type": "number",
+            "example": 2027,
+            "description": "Academic year to generate. Defaults to the current UTC year."
           }
         },
         "required": ["timetableId"]
@@ -7825,19 +8012,6 @@
         },
         "required": ["id", "payload"]
       },
-      "CreateAcademicCalendarDto": {
-        "type": "object",
-        "properties": {
-          "year": {
-            "minimum": 1000,
-            "maximum": 9999,
-            "type": "number",
-            "example": 2026,
-            "description": "Four-digit academic year. A university may have only one calendar per year."
-          }
-        },
-        "required": ["year"]
-      },
       "AcademicCalendarDto": {
         "type": "object",
         "properties": {
@@ -7865,6 +8039,19 @@
           }
         },
         "required": ["id", "year", "subscriptions"]
+      },
+      "CreateAcademicCalendarDto": {
+        "type": "object",
+        "properties": {
+          "year": {
+            "minimum": 1000,
+            "maximum": 9999,
+            "type": "number",
+            "example": 2026,
+            "description": "Four-digit academic year. A university may have only one calendar per year."
+          }
+        },
+        "required": ["year"]
       },
       "CalendarRestrictionDto": {
         "type": "object",
@@ -8051,6 +8238,21 @@
           }
         },
         "required": ["success"]
+      },
+      "EventListResponseDto": {
+        "type": "object",
+        "properties": {
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EventDto"
+            }
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": ["events"]
       }
     }
   }

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { BaseSeedService } from '../base.seed.service';
 
 import { DatabaseService } from '../../database.service';
-import { eq, inArray, and } from 'drizzle-orm';
+import { eq, inArray, and, ilike, or } from 'drizzle-orm';
 
 //Tables
 import { University, UniversityRole, usersTable } from '../../../entities';
@@ -15,13 +15,15 @@ export class UniRolesSeedService extends BaseSeedService {
   }
 
   async seed(tx: DatabaseService['db']): Promise<void> {
-    //Select University to give roles to --> University of Pretoria
-    const uniName = this.constants.UniversityNames[0]; //UP
-    const [uni] = await tx
+    const universities = await tx
       .select()
       .from(University)
-      .where(eq(University.UniversityName, uniName))
-      .limit(1);
+      .where(
+        or(
+          ilike(University.UniversityName, `%Pretoria%`),
+          ilike(University.UniversityName, `%Maryland%`),
+        ),
+      );
 
     //Users for which to create roles -> fetched by their emails
     const userEmails = this.constants.UserEmails;
@@ -34,42 +36,44 @@ export class UniRolesSeedService extends BaseSeedService {
     //Array of roles to be assigned
     const userUniRoles = this.constants.UserUniRoles;
 
-    //Create role objects that will be used
-    const uniRoles = userIDs.map((id, index) => ({
-      UserID: id,
-      UniversityID: uni.UniversityID,
-      role: userUniRoles[index],
-    }));
+    for (const uni of universities) {
+      //Create role objects that will be used
+      const uniRoles = userIDs.map((id, index) => ({
+        UserID: id,
+        UniversityID: uni.UniversityID,
+        role: userUniRoles[index],
+      }));
 
-    //Fetch existing roles for the userId's & uniId
-    const existingRoles = await tx
-      .select()
-      .from(UniversityRole)
-      .where(
-        and(
-          eq(UniversityRole.UniversityID, uni.UniversityID),
-          inArray(UniversityRole.UserID, userIDs),
-        ),
+      //Fetch existing roles for the userId's & uniId
+      const existingRoles = await tx
+        .select()
+        .from(UniversityRole)
+        .where(
+          and(
+            eq(UniversityRole.UniversityID, uni.UniversityID),
+            inArray(UniversityRole.UserID, userIDs),
+          ),
+        );
+
+      //Existing UserID's in the uniRole table
+      const existingIDs = new Set(existingRoles.map((role) => role.UserID));
+
+      //Get the missing roles from the roles object using the existing User ID's
+      const missingRoles = uniRoles.filter(
+        (role) => !existingIDs.has(role.UserID),
       );
 
-    //Existing UserID's in the uniRole table
-    const existingIDs = new Set(existingRoles.map((role) => role.UserID));
+      if (missingRoles.length > 0) {
+        //Seed in the missingRoles
+        const uniRoles = await this.persistence.insertUniversityRoles(
+          tx,
+          missingRoles,
+        );
 
-    //Get the missing roles from the roles object using the existing User ID's
-    const missingRoles = uniRoles.filter(
-      (role) => !existingIDs.has(role.UserID),
-    );
-
-    if (missingRoles.length > 0) {
-      //Seed in the missingRoles
-      const uniRoles = await this.persistence.insertUniversityRoles(
-        tx,
-        missingRoles,
-      );
-
-      this.logResult('UniversityRoles', uniRoles.length);
-    } else {
-      this.logResult('UniversityRoles');
-    }
+        this.logResult('UniversityRoles', uniRoles.length);
+      } else {
+        this.logResult('UniversityRoles');
+      }
+    } //END_uni
   } //END_seed
 } //END_BaseSeedService

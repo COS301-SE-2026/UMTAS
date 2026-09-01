@@ -44,10 +44,11 @@ import { useSearchParams } from "next/navigation";
 import { removeTimetableMut } from "@/components/templates/builder/Queries/timetableQueries";
 import { useMutation } from "@tanstack/react-query";
 import { UserDetails } from "@/lib/userclass/userClass";
-import NoRoleSelected from "@/components/molecules/roleManagement/NoRoleSelected";
 
 import Tutorial from "@/components/organisms/nav/Tutorial";
 import { fetchAllModulesv2 } from "../../../../utilities/V2-Builders/Modules";
+import GooglePopup from "@/components/molecules/viewTimetable/googleExport";
+import Popup from "@/components/atoms/utility/floatContainer";
 const emptySteps = [
   {
     target: "#ref-go-to-builder",
@@ -104,6 +105,8 @@ export function ScheduleView({
 
   const { mutateAsync: addTimetable } = useMutation(addTimetableMut());
   const { mutateAsync: updateTimetable } = useMutation(updateTimetableMut());
+
+  const [showGC, setShowGC] = useState(false);
 
   const { data: allModules = [], isLoading: isLoadingModules } = useQuery({
     queryKey: ["Modules", "Courses"],
@@ -387,9 +390,6 @@ export function ScheduleView({
       );
     }
 
-    const hasRole = UniDetails?.role != null;
-    if (!hasRole) return <NoRoleSelected />;
-
     return (
       <>
         <Tutorial steps={steps} wait={true} />
@@ -443,12 +443,34 @@ export function ScheduleView({
                 />
                 <div className="flex flex-row justify-center md:justify-end w-full md:w-auto gap-2 mb-4 md:mb-0">
                   <Button
+                    id="btn-delete"
+                    type="button"
+                    className="h-7 px-3 text-xs bg-[var(--bg-surface)] text-[var(--text-primary)] border-[var(--border)] hover:opacity-90"
+                    onClick={() => {
+                      /**TODO
+                       * add ICS function here Mikal
+                       */
+                    }}
+                  >
+                    Export to ICS
+                  </Button>
+                  <Button
+                    id="btn-delete"
+                    type="button"
+                    className="h-7 px-3 text-xs bg-[var(--bg-surface)] text-[var(--text-primary)] border-[var(--border)] hover:opacity-90"
+                    onClick={() => {
+                      setShowGC(true);
+                    }}
+                  >
+                    Export to Google Calendar
+                  </Button>
+                  <Button
                     id="btn-create"
                     type="button"
                     className="h-7 px-3 text-xs bg-[var(--bg-surface)] text-[var(--text-primary)] border-[var(--border)] hover:opacity-90"
                     onClick={createTimetable}
                   >
-                    Create New Timetable
+                    Create
                   </Button>
 
                   <Button
@@ -503,6 +525,16 @@ export function ScheduleView({
             </div>
           )}
         </div>
+
+        {showGC && (
+          <Popup
+            onClose={() => {
+              setShowGC(false);
+            }}
+          >
+            <GooglePopup></GooglePopup>
+          </Popup>
+        )}
       </>
     );
   }

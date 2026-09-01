@@ -180,9 +180,9 @@
     ## Tyto Simulation System
     | **ID** | **Use Case** | **Group** | **Actor** | **Status** |
     |:---:|:---:|:---:|:---:|:---:|
-    | **UC-TY-01** | Run Simulation Batch | [Tyto Simulation System](#tyto-simulation-id) | Tyto Administrator |<span class="status-not-implemented">In Progress</span>|
-    | **UC-TY-02** | View Simulation Analytics | [Tyto Simulation System](#tyto-simulation-id) | Tyto Administrator |<span class="status-not-implemented">In Progress</span>|
-    | **UC-TY-03** | Display Stress-Test Results | [Tyto Simulation System](#tyto-simulation-id) | Tyto Administrator |<span class="status-not-implemented">In Progress</span>|
+    | **UC-TY-01** | Run Simulation Batch | [Tyto Simulation System](#tyto-simulation-id) | Tyto Administrator |<span class="status-implemented">Implemented</span>|
+    | **UC-TY-02** | View Simulation Analytics | [Tyto Simulation System](#tyto-simulation-id) | Tyto Administrator |<span class="status-implemented">Implemented</span>|
+    | **UC-TY-03** | Display Stress-Test Results | [Tyto Simulation System](#tyto-simulation-id) | Tyto Administrator |<span class="status-implemented">Implemented</span>|
     
     </div>
 
