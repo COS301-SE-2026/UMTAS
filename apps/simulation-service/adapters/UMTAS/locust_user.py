@@ -181,13 +181,17 @@ class DomainUser(HttpUser):
     def enroll_in_module(self):
         if len(self.enrolled_module_ids) >= MAX_ENROLLED_MODULES:
             return
-        candidates = [m for m in self.browsed_module_ids if m not in self.enrolled_module_ids]
+        candidates = [
+            m for m in self.browsed_module_ids if m not in self.enrolled_module_ids
+        ]
         if not candidates:
             return
         module_id = random.choice(candidates)
 
         with self.client.get(
-            f"/api/modules/enroll/{module_id}", name="/api/modules/enroll/[moduleId]", catch_response=True
+            f"/api/modules/enroll/{module_id}",
+            name="/api/modules/enroll/[moduleId]",
+            catch_response=True,
         ) as response:
             if response.status_code == 200:
                 response.success()
@@ -222,15 +226,15 @@ class DomainUser(HttpUser):
                 else:
                     response.failure(f"upload rejected [{response.status_code}]")
 
-
-
     @task(3)
     def view_events_for_enrolled_module(self):
         if not self.enrolled_module_ids:
             return
         module_id = random.choice(list(self.enrolled_module_ids))
         with self.client.get(
-            f"/api/events?moduleId={module_id}", name="/api/events?moduleId=[id]", catch_response=True
+            f"/api/events?moduleId={module_id}",
+            name="/api/events?moduleId=[id]",
+            catch_response=True,
         ) as response:
             if response.status_code == 200:
                 response.success()
@@ -240,8 +244,54 @@ class DomainUser(HttpUser):
             elif response.status_code in (401, 403):
                 response.failure(f"auth error viewing events: {response.status_code}")
             else:
-                response.success()  
+                response.success()
 
+    @task(2)
+    def build_or_grow_timetable(self):
+        candidate_ids = [
+            eid for eid in self.known_events if eid not in self.timetable_event_ids
+        ]
+
+        if self.timetable_id is None:
+            if not candidate_ids:
+                return
+            picks = random.sample(candidate_ids, k=min(3, len(candidate_ids)))
+            payload = {
+                "timetableName": f"Sim Timetable {uuid.uuid4().hex[:6]}",
+                "eventIds": picks,
+            }
+            with self.client.post(
+                "/api/timetables", json=payload, catch_response=True
+            ) as response:
+                if response.status_code == 201:
+                    response.success()
+                    data = response.json()
+                    self.timetable_id = data.get("UserTimetableID")
+                    self.timetable_event_ids = set(data.get("eventIds", picks))
+                else:
+                    response.failure(
+                        f"timetable create failed [{response.status_code}]: {response.text}"
+                    )
+            return
+
+        if len(self.timetable_event_ids) >= MAX_TIMETABLE_EVENTS or not candidate_ids:
+            return
+        picks = random.sample(candidate_ids, k=min(2, len(candidate_ids)))
+        with self.client.patch(
+            f"/api/timetables/{self.timetable_id}",
+            json={"addEventIds": picks},
+            name="/api/timetables/[id]",
+            catch_response=True,
+        ) as response:
+            if response.status_code == 200:
+                response.success()
+                self.timetable_event_ids.update(picks)
+            elif response.status_code == 404:
+                response.success()
+                self.timetable_id = None
+                self.timetable_event_ids = set()
+            else:
+                response.failure(f"timetable update failed [{response.status_code}]")
 
     @task(3)
     def check_pdf_parser_status(self):
@@ -296,26 +346,16 @@ class DomainUser(HttpUser):
     def view_timetables(self):
         self.client.get("/api/timetables")
 
-    @task(2)
+    @task(1)
     def view_all_events(self):
         with self.client.get("/api/events", catch_response=True) as response:
             if response.status_code == 200:
-                try:
-                    data = response.json()
-                    events_list = data.get("events", [])
-
-                    extracted_ids = [
-                        str(event.get("eventId"))
-                        for event in events_list
-                        if event.get("eventId")
-                    ]
-
-                    if extracted_ids:
-                        self.available_event_ids = extracted_ids
-
-                    response.success()
-                except Exception as e:
-                    response.failure(f"Failed to parse events JSON: {str(e)}")
+                response.success()
+                for ev in response.json().get("events", []):
+                    if ev.get("eventId"):
+                        self.known_events[ev["eventId"]] = ev
+            else:
+                response.failure(f"failed to list events [{response.status_code}]")
 
     @task(1)
     def get_active_session(self):
