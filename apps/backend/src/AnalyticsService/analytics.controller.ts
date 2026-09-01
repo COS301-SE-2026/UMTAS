@@ -1,8 +1,19 @@
-import { Controller, Get, Param, ParseUUIDPipe } from '@nestjs/common';
+import {
+  BadRequestException,
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+} from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AnalyticsService } from './analytics.service';
 import { Roles } from 'src/auth/roles.guard';
-import { UniversityCourseStatsResponseDto } from './analytics.dto';
+import {
+  CourseModuleStatsResponseDto,
+  UniversityCourseStatsResponseDto,
+} from './dto/analytics.dto';
+import { CurrentSession } from 'src/auth/session.decorator';
+import type { SessionData } from 'src/auth/session.decorator';
 
 @ApiTags('Analytics')
 @Controller('Analytics')
@@ -10,23 +21,56 @@ export class AnalyticsController {
   constructor(private readonly service: AnalyticsService) {}
 
   //Courses per University
-  @Get('university/:universityId')
+  @Get('university')
   @Roles('lecturer', 'uni_admin')
   @ApiOperation({
-    summary: 'Count of Courses per University / all universities',
+    summary: 'Count of Courses per user University',
+    operationId: 'coursesPerUniversity',
   })
   @ApiResponse({
     status: 200,
-    description: 'Courses per university counts returned',
+    description: 'Count of courses for user`s university returned',
     type: UniversityCourseStatsResponseDto,
   })
+  @ApiResponse({
+    status: 400,
+    description: 'No university selected',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'University not found',
+  })
   coursesPerUniversity(
-    @Param('universityId', ParseUUIDPipe) uniId: string,
+    @CurrentSession() session: SessionData,
   ): Promise<UniversityCourseStatsResponseDto> {
+    const uniId = session.uniId;
+
+    if (!uniId) throw new BadRequestException(`No university selected`);
+
     return this.service.coursesPerUniversity(uniId);
   } //END_coursesPerUniversity
 
   //Modules per Course
+  @Get('course/:courseID')
+  @Roles('lecturer', 'uni_admin')
+  @ApiOperation({
+    summary: 'Count of modules per specified course',
+    operationId: 'coursesPerSpecificCourse',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Count of courses for user`s university returned',
+    type: UniversityCourseStatsResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Course not found',
+  })
+  modulesPerSpecificCourse(
+    @Param('courseID', ParseUUIDPipe) courseId: string,
+  ): Promise<CourseModuleStatsResponseDto> {
+    return this.service.modulesPerSpecificCourse(courseId);
+  }
 
   //Events per Module
 

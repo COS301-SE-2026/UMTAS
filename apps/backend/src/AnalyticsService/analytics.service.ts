@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { UniversityCourseStatsResponseDto } from './analytics.dto';
+import {
+  CourseModuleStatsResponseDto,
+  UniversityCourseStatsResponseDto,
+} from './dto/analytics.dto';
 import { AnalyticsRepository } from './analytics.repository';
 
 @Injectable()
@@ -23,6 +26,21 @@ export class AnalyticsService {
     };
   } //END_coursesPerUniversity
 
+  async modulesPerSpecificCourse(
+    courseId: string,
+  ): Promise<CourseModuleStatsResponseDto> {
+    const result = await this.repo.getModulesPerCourse(courseId);
+
+    return {
+      data: [
+        {
+          CourseID: result.CourseID,
+          CourseName: result.CourseName,
+          ModuleCount: result.ModuleCount,
+        },
+      ],
+    };
+  } //END_modulesPerSpecificCourse
   // //Universities
   // async allUniversityStats(userId: string, tx?: AppDatabase): Promise<UniversityStatsListResponseDto> {
   //     if (!tx) {

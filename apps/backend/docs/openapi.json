@@ -4662,12 +4662,40 @@
         ]
       }
     },
-    "/api/Analytics/university/{universityId}": {
+    "/api/Analytics/university": {
       "get": {
-        "operationId": "AnalyticsController_coursesPerUniversity",
+        "operationId": "coursesPerUniversity",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Count of courses for user`s university returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UniversityCourseStatsResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "No university selected"
+          },
+          "404": {
+            "description": "University not found"
+          }
+        },
+        "summary": "Count of Courses per user University",
+        "tags": [
+          "Analytics"
+        ]
+      }
+    },
+    "/api/Analytics/course/{courseID}": {
+      "get": {
+        "operationId": "coursesPerSpecificCourse",
         "parameters": [
           {
-            "name": "universityId",
+            "name": "courseID",
             "required": true,
             "in": "path",
             "schema": {
@@ -4677,7 +4705,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Courses per university counts returned",
+            "description": "Count of courses for user`s university returned",
             "content": {
               "application/json": {
                 "schema": {
@@ -4685,9 +4713,12 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "Course not found"
           }
         },
-        "summary": "Count of Courses per University / all universities",
+        "summary": "Count of modules per specified course",
         "tags": [
           "Analytics"
         ]
