@@ -4,6 +4,7 @@ import {
   createEventAttendanceBody,
   createEventAttendanceBuilder,
   deleteEventAttendanceById,
+  getAllAttendanceKy,
   getEventAttendanceBuilder,
   getEventAttendanceByIdBuilder,
   getEventAttendanceByIdPath,
@@ -17,9 +18,7 @@ export function getAllEventAttendanceQ(query?: getEventAttendanceQuery) {
   return queryOptions({
     queryKey: ["eventAttendance", query] as const,
     queryFn: async () => {
-      const result = await new getEventAttendanceBuilder().send({
-        paths: query,
-      });
+      const result = (await getAllAttendanceKy(query)).attendanceList;
       return result;
     },
   });
