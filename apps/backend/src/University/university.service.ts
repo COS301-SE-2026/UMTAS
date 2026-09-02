@@ -12,6 +12,7 @@ import {
   Course,
   Event,
   GroupModules,
+  ModuleEnrollment,
   modules,
   RoleTypeType,
   University,
@@ -438,12 +439,28 @@ export class UniversityService {
         CourseCount: countDistinct(Course.CourseID),
         ModuleCount: countDistinct(modules.moduleID),
         EventCount: countDistinct(Event.eventID),
+        EnrolledStudents: countDistinct(ModuleEnrollment.UserID),
       })
       .from(Course)
       .leftJoin(GroupModules, eq(GroupModules.GroupID, Course.GroupID))
       .leftJoin(modules, eq(GroupModules.ModuleID, modules.moduleID))
+      .leftJoin(
+        ModuleEnrollment,
+        eq(ModuleEnrollment.ModuleID, modules.moduleID),
+      )
       .leftJoin(UniversityEvent, eq(UniversityEvent.moduleID, modules.moduleID))
       .leftJoin(Event, eq(Event.eventID, UniversityEvent.eventID))
+      .where(eq(Course.UniversityID, uniId))
+      .groupBy(Course.UniversityID);
+
+    const [enrolledStats] = await db
+      .select({ EnrolledStudents: countDistinct(ModuleEnrollment.UserID) })
+      .from(ModuleEnrollment)
+      .innerJoin(
+        GroupModules,
+        eq(GroupModules.ModuleID, ModuleEnrollment.ModuleID),
+      )
+      .innerJoin(Course, eq(GroupModules.GroupID, Course.GroupID))
       .where(eq(Course.UniversityID, uniId));
 
     return {
@@ -452,6 +469,7 @@ export class UniversityService {
       CourseCount: courseStats?.CourseCount ?? 0,
       ModuleCount: courseStats?.ModuleCount ?? 0,
       EventCount: courseStats?.EventCount ?? 0,
+      EnrolledStudents: enrolledStats?.EnrolledStudents ?? 0,
     };
   } //END_getStatistics
 

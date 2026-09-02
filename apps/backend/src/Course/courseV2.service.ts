@@ -108,8 +108,11 @@ export class CourseServiceV2 extends CourseService {
   async getByExternalID(
     externalId: string,
     uniId: string,
+    tx?: AppDatabase,
   ): Promise<CourseSingleResponseDto | null> {
-    const [course] = await this.dbService.db
+    const db = tx ?? this.dbService.db;
+
+    const [course] = await db
       .select()
       .from(Course)
       .where(

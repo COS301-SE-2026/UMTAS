@@ -12,11 +12,14 @@ import { AdapterRegistry } from './Registry/AdapterRegistry.service';
 import { EventServiceV2 } from 'src/Events/eventV2.service';
 import { ModuleServiceV2 } from 'src/Module/moduleV2.service';
 import { CourseServiceV2 } from 'src/Course/courseV2.service';
+import { DatabaseService } from 'src/db/database.service';
+import { AppDatabase } from 'src/auth/auth';
 
 //Context
 @Injectable()
 export class ApiService {
   constructor(
+    private readonly dbService: DatabaseService,
     private readonly adapterRegistry: AdapterRegistry,
     private readonly uniService: UniversityService,
     private readonly courseService: CourseServiceV2,
@@ -35,31 +38,43 @@ export class ApiService {
 
     const result = await adapter.getCourses(page, limit);
 
-    const courses: CourseDto[] = await Promise.all(
-      result.map(async (courseDto) => {
-        if (courseDto.ExternalID) {
-          const course = await this.courseService.getByExternalID(
-            courseDto.ExternalID,
-            uni.UniversityID,
-          );
+    const courses: CourseDto[] = await this.dbService.db.transaction(
+      async (tx: AppDatabase) => {
+        const out: CourseDto[] = [];
 
-          //If course already exists - check for updated fields and update - return
-          if (course) {
-            const nonMatchingFields = this.getChanges(courseDto, course);
+        for (const c of result) {
+          if (c.ExternalID) {
+            const course = await this.courseService.getByExternalID(
+              c.ExternalID,
+              uni.UniversityID,
+              tx,
+            );
 
-            if (Object.keys(nonMatchingFields).length > 0)
-              return this.courseService.update(
-                course.CourseID,
-                nonMatchingFields,
-              );
+            //If course already exists - check for updated fields and update - return
+            if (course) {
+              const nonMatchingFields = this.getChanges(c, course);
 
-            return course;
+              if (Object.keys(nonMatchingFields).length > 0) {
+                out.push(
+                  await this.courseService.update(
+                    course.CourseID,
+                    nonMatchingFields,
+                    tx,
+                  ),
+                );
+
+                continue;
+              }
+
+              out.push(course);
+              continue;
+            }
           }
-        }
+        } //END_c
 
-        return await this.courseService.create(courseDto);
-      }),
-    );
+        return out;
+      }, //END_tx
+    ); //END_transaction
 
     return {
       courses,
@@ -81,35 +96,44 @@ export class ApiService {
 
     const result = await adapter.getModules(course);
 
-    const modules: ModulesDto[] = await Promise.all(
-      result.map(async (moduleDto) => {
-        if (moduleDto.ExternalID) {
-          const module = await this.moduleService.getByExternalID(
-            moduleDto.ExternalID,
-            course.CourseID,
-          );
+    const modules: ModulesDto[] = await this.dbService.db.transaction(
+      async (tx: AppDatabase) => {
+        const out: ModulesDto[] = [];
 
-          // Module already exists
-          if (module) {
-            const changes = this.getChanges(moduleDto, module);
+        for (const m of result) {
+          if (m.ExternalID) {
+            const module = await this.moduleService.getByExternalID(
+              m.ExternalID,
+              course.CourseID,
+              tx,
+            );
 
-            // Module has changed
-            if (Object.keys(changes).length > 0)
-              return this.moduleService.update(
-                userId,
-                module.moduleID,
-                changes,
-              );
+            if (module) {
+              const changes = this.getChanges(m, module);
 
-            // Module exists and is unchanged
-            return module;
+              if (Object.keys(changes).length > 0) {
+                out.push(
+                  await this.moduleService.update(
+                    userId,
+                    module.moduleID,
+                    changes,
+                    tx,
+                  ),
+                );
+                continue;
+              }
+
+              out.push(module);
+              continue;
+            }
           }
-        }
 
-        // Module doesn't exist
-        return this.moduleService.create(userId, moduleDto);
-      }),
-    );
+          out.push(await this.moduleService.create(userId, m, tx));
+        } //END_m
+
+        return out;
+      }, //END_tx
+    ); //END_transaction
 
     return {
       modules,
@@ -130,13 +154,23 @@ export class ApiService {
 
     const result = await adapter.getEvents(module);
 
-    const events: EventDto[] = [];
+    const events: EventDto[] = await this.dbService.db.transaction(
+      async (tx: AppDatabase) => {
+        const out: EventDto[] = [];
 
-    for (const event of result) {
-      events.push(
-        (await this.eventService.createV2(event, userId, uniId)).event,
-      );
-    } //END_event
+        for (const e of result) {
+          const created = await this.eventService.createV2(
+            e,
+            userId,
+            uniId,
+            tx,
+          );
+          out.push(created.event);
+        } //END_e
+
+        return out;
+      }, //END_tx
+    ); //END_transaction
 
     return {
       events,

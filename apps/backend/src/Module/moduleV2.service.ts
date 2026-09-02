@@ -463,8 +463,11 @@ export class ModuleServiceV2 extends ModuleService {
   async getByExternalID(
     externalId: string,
     courseId: string,
+    tx?: AppDatabase,
   ): Promise<ModuleSingleResponseDto | null> {
-    const [module] = await this.dbService.db
+    const db = tx ?? this.dbService.db;
+
+    const [module] = await db
       .select(getTableColumns(modules))
       .from(modules)
       .where(eq(modules.ExternalID, externalId))
@@ -523,6 +526,7 @@ export class ModuleServiceV2 extends ModuleService {
     courseId?: string,
     groupId?: string,
   ): Promise<string> {
+    this.OOPSIE.log(`getGroupId: courseId[${courseId}] | groupId[${groupId}]`);
     if (courseId) {
       //Validate courseId
       const course = await this.courseService.getById(courseId, tx);
@@ -538,6 +542,9 @@ export class ModuleServiceV2 extends ModuleService {
         groupId = newGroup.GroupID;
       } else groupId = course.GroupID;
 
+      this.OOPSIE.log(
+        `No Group for course[${courseId}] created new group[${groupId}]`,
+      );
       return groupId;
     }
 
