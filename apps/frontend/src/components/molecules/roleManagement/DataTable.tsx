@@ -51,7 +51,9 @@ export function DataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
+    role: false,
+  });
   const [rowSelection, setRowSelection] = useState({});
 
   const [globalFilter, setGlobalFilter] = useState("");
@@ -160,7 +162,10 @@ export function DataTable<TData, TValue>({
               <DropdownMenuContent align="end">
                 {table
                   .getAllColumns()
-                  .filter((column) => column.getCanHide())
+                  .filter(
+                    (column) =>
+                      column.getCanHide() && column.id.toLowerCase() !== "role",
+                  )
                   .map((column) => {
                     return (
                       <DropdownMenuCheckboxItem
