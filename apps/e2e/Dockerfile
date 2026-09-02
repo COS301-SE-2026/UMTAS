@@ -8,6 +8,8 @@ COPY apps/e2e/package.json ./apps/e2e/package.json
 RUN pnpm install --frozen-lockfile --filter e2e... \
     --network-concurrency=8 --fetch-retries=5 --fetch-timeout=60000
 
+    RUN npx playwright install-deps firefox webkit
+    
 COPY apps/e2e ./apps/e2e
 
 WORKDIR /workspace/apps/e2e

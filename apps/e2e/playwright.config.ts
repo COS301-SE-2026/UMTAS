@@ -44,6 +44,22 @@ export default defineConfig({
       },
       dependencies: ["setup"],
     },
+    {
+      name: "firefox",
+      use: {
+        ...devices["Desktop Firefox"],
+        storageState: "playwright/.auth/user.json",
+      },
+      dependencies: ["setup"],
+    },
+    {
+      name: "MS edge",
+      use: {
+        ...devices["Desktop Edge"],
+        storageState: "playwright/.auth/user.json",
+      },
+      dependencies: ["setup"],
+    },
     // install additional browsers with: playwright install firefox webkit
     // {
     //   name: 'firefox',
