@@ -1,0 +1,20 @@
+README.md
+  h_2d4b3dca70a3d8 402
+docs/sas/architecture/SERVICE_CONTRACTS.md
+  h_2d4b3dca70a3d8 1
+docs/sas/index.md
+  h_2d4b3dca70a3d8 23
+mkdocs.yml
+  h_2d4b3dca70a3d8 83
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "ed729f4699674b9af99da8a84f9ed85b9567a086",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}

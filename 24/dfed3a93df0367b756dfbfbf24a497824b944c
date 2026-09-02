@@ -1,0 +1,18 @@
+.github/workflows/ci.yml
+  h_2d4b3dca70a3d8 60-61
+apps/frontend/next.config.ts
+  h_2d4b3dca70a3d8 5
+docs/srs/NON-FUNCTIONAL_REQUIREMENTS.md
+  h_2d4b3dca70a3d8 25,166-179,194-199
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "24dfed3a93df0367b756dfbfbf24a497824b944c",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}

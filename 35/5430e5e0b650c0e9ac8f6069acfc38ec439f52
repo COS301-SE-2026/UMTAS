@@ -1,0 +1,14 @@
+docs/srs/NON-FUNCTIONAL_REQUIREMENTS.md
+  h_2d4b3dca70a3d8 162-179
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "355430e5e0b650c0e9ac8f6069acfc38ec439f52",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}

@@ -1,0 +1,22 @@
+docs/srs/Lighthouse.md
+  h_2d4b3dca70a3d8 1-22
+docs/srs/NON-FUNCTIONAL_TESTING.md
+  h_2d4b3dca70a3d8 13,16
+docs/srs/Owasp.md
+  h_2d4b3dca70a3d8 1-3
+mkdocs.yml
+  h_2d4b3dca70a3d8 36
+requirements.txt
+  h_2d4b3dca70a3d8 11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "4cd3fa7632bd7775206991beca228f3a04cda978",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
