@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 test.describe.configure({ mode: "serial" });
 
-test.skip("Create and update module", async ({ page }) => {
+test("Create and update module", async ({ page }) => {
   await page.goto("/builder");
   await page.getByTestId("btn-add-new-Module").click();
 
@@ -30,7 +30,7 @@ test.skip("Create and update module", async ({ page }) => {
   await expect(updatedModuleBtn).toContainText("AA");
 });
 
-test.skip("Add Event", async ({ page }) => {
+test("Add Event", async ({ page }) => {
   await page.goto("/builder");
   await page.getByTestId("builder-Next-Step").click();
   const addEvent = page.getByTestId("event-add-btn");
@@ -55,7 +55,7 @@ test.skip("Add Event", async ({ page }) => {
 
   eventContainer = page.getByTestId("builder-event-div");
   await eventContainer.getByTestId("event-open-btn").first().click();
-  event = await eventContainer.getByTestId("event-card-div").first();
+  event = eventContainer.getByTestId("event-card-div").first();
 
   await expect(event).toBeVisible();
   await expect(event.getByTestId("event-Name-Input")).toHaveValue("AA");
@@ -68,7 +68,7 @@ test.skip("Add Event", async ({ page }) => {
   await expect(event.getByTestId("event-Type-Select")).toHaveText("Lecture");
 });
 
-test.skip("Update event", async ({ page }) => {
+test("Update event", async ({ page }) => {
   await page.goto("/builder");
   await page.getByTestId("builder-Next-Step").click();
   let eventContainer = page.getByTestId("builder-event-div");
@@ -82,7 +82,7 @@ test.skip("Update event", async ({ page }) => {
   await event.getByTestId("event-TimeStart-Select").click();
   await page.getByRole("option", { name: "07:00" }).click();
   await event.getByTestId("event-TimeEnd-Select").click();
-  await page.getByRole("option", { name: "08:30" }).click();
+  await page.getByRole("option", { name: "10:30" }).click();
   await event.getByTestId("event-Type-Select").click();
   await page.getByRole("option").last().click();
   await event.getByTestId("event-Module-Select").click();
@@ -91,7 +91,7 @@ test.skip("Update event", async ({ page }) => {
 
   eventContainer = page.getByTestId("builder-event-div");
   await eventContainer.getByTestId("event-open-btn").first().click();
-  event = await eventContainer.getByTestId("event-card-div").first();
+  event = eventContainer.getByTestId("event-card-div").first();
 
   await expect(event).toBeVisible();
   await expect(event.getByTestId("event-Name-Input")).toHaveValue("AA");
@@ -99,12 +99,12 @@ test.skip("Update event", async ({ page }) => {
   await expect(event.getByTestId("event-Date-Input")).toHaveValue("2026-12-30");
 
   await expect(event.getByTestId("event-TimeStart-Select")).toHaveText("07:00");
-  await expect(event.getByTestId("event-TimeEnd-Select")).toHaveText("08:30");
+  await expect(event.getByTestId("event-TimeEnd-Select")).toHaveText("10:30");
 
   await expect(event.getByTestId("event-Type-Select")).toHaveText("Test");
 });
 
-test.skip("Create schedule", async ({ page }) => {
+test("Create schedule", async ({ page }) => {
   await page.goto("/builder");
   await page.getByTestId("builder-Next-Step").click();
   await page.getByTestId("builder-Next-Step").click(); // now on schedules edit page
@@ -139,14 +139,14 @@ test.skip("Create schedule", async ({ page }) => {
   await expect(page.getByText("AA").first()).toBeVisible({ timeout: 15000 });
 });
 
-test.skip("Delete schedule", async ({ page }) => {
+test("Delete schedule", async ({ page }) => {
   await page.goto("/schedules");
   await page.getByTestId("schedules-Delete-Btn").click();
   await page.getByTestId("Schedules-ConfirmDelete-Btn").click();
   await expect(page.getByText("AA")).not.toBeVisible();
 });
 
-test.skip("Delete module", async ({ page }) => {
+test("Delete module", async ({ page }) => {
   await page.goto("/builder");
 
   const targetModule = page
