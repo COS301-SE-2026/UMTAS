@@ -215,4 +215,19 @@ successfully enqueued it, and returned its identifier.
 | **Response** | The Lighthouse scanner analyzes the web pages for accessibility best practices, contrast ratios, and ARIA usage, generating a performance and quality breakdown |
 | **Response measure** | The resulting lighthouse Accesibility score exceeds 90 out of a maximum of 100. |
 
+---
 
+## NFR-Maint-1 - University Adapter Modifiability
+
+**Quality attribute:** Maintainability - modifiability
+
+| **Part** | **UMTAS scenario** |
+| --- | --- |
+| **Source of stimulus** | A developer adding support for another university |
+| **Stimulus** | Implement and register a new concrete adapter that transforms the new university's API responses into the canonical UMTAS DTO representation |
+| **Environment** | Normal development workflow using representative API fixtures from the new university |
+| **Artifact** | University API Adapter layer and AdapterRegistry |
+| **Response** | Add the university-specific behaviour without modifying existing production components outside the Adapter layer |
+| **Response measure** | Number of existing production components outside the University API Adapter layer that must be modified equals **0**. The AdapterRegistry may be updated; this is considered part of the Adapter layer and does not count against the measure. |
+
+---
