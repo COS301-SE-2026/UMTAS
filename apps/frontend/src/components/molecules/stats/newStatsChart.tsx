@@ -10,7 +10,17 @@ import {
 } from "@/components/atoms/baseShadcn/chart";
 import { Skeleton } from "@/components/atoms/baseShadcn/skeleton";
 import { ReactNode } from "react";
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
+import {
+  Area,
+  AreaChart,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Line,
+  LineChart,
+  XAxis,
+  YAxis,
+} from "recharts";
 import StatCard from "../../organisms/stats/statCard";
 
 export interface ChartCardProps {
@@ -21,7 +31,13 @@ export interface ChartCardProps {
 }
 
 export interface DynamicChartProps {
-  type: "bar" | "bar-horizontal" | "bar-grouped" | "bar-stacked";
+  type:
+    | "bar"
+    | "bar-horizontal"
+    | "bar-grouped"
+    | "bar-stacked"
+    | "area"
+    | "line";
   data: Record<string, string | number>[];
   config: ChartConfig;
   xKey: string;
@@ -137,6 +153,43 @@ export default function DynamicChart({
               />
             ))}
           </BarChart>
+        );
+      case "area":
+        return (
+          <AreaChart data={data}>
+            <CartesianGrid vertical={false} />
+            <XAxis dataKey={xKey} tickLine={false} axisLine={false} />
+            <YAxis tickLine={false} axisLine={false} />
+            <ChartTooltip content={<ChartTooltipContent />} />
+            {yKey.map((key) => (
+              <Area
+                key={key}
+                dataKey={key}
+                type="monotone"
+                fill="var(--chart-2)"
+                fillOpacity={0.2}
+                stroke="var(--chart-2)"
+              />
+            ))}
+          </AreaChart>
+        );
+      case "line":
+        return (
+          <LineChart data={data}>
+            <CartesianGrid vertical={false} />
+            <XAxis dataKey={xKey} tickLine={false} axisLine={false} />
+            <YAxis axisLine={false} tickLine={false} />
+            <ChartTooltip content={<ChartTooltipContent />} />
+            {yKey.map((key) => (
+              <Line
+                key={key}
+                type="monotone"
+                dataKey={key}
+                strokeWidth={2}
+                stroke="var(--chart-2)"
+              />
+            ))}
+          </LineChart>
         );
       default:
         return null;
