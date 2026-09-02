@@ -151,6 +151,9 @@ export class CourseModuleStatsDto {
 
   @ApiProperty()
   EventCount!: number;
+
+  @ApiProperty()
+  EnrolledStudents!: number;
 }
 
 export class CourseModuleStatsResponseDto {

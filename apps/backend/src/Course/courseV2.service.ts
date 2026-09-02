@@ -15,6 +15,7 @@ import {
   Course,
   Event,
   GroupModules,
+  ModuleEnrollment,
   modules,
   UniversityEvent,
 } from 'src/entities';
@@ -136,10 +137,15 @@ export class CourseServiceV2 extends CourseService {
         CourseName: Course.CourseName,
         ModuleCount: countDistinct(modules.moduleID),
         EventCount: countDistinct(Event.eventID),
+        EnrolledStudents: countDistinct(ModuleEnrollment.UserID),
       })
       .from(Course)
       .leftJoin(GroupModules, eq(GroupModules.GroupID, Course.GroupID))
       .leftJoin(modules, eq(modules.moduleID, GroupModules.ModuleID))
+      .leftJoin(
+        ModuleEnrollment,
+        eq(ModuleEnrollment.ModuleID, modules.moduleID),
+      )
       .leftJoin(UniversityEvent, eq(UniversityEvent.moduleID, modules.moduleID))
       .leftJoin(Event, eq(Event.eventID, UniversityEvent.eventID))
       .where(eq(Course.UniversityID, uniId))

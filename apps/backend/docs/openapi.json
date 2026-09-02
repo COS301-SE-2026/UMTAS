@@ -6499,12 +6499,16 @@
           },
           "EventCount": {
             "type": "number"
+          },
+          "EnrolledStudents": {
+            "type": "number"
           }
         },
         "required": [
           "CourseID",
           "ModuleCount",
-          "EventCount"
+          "EventCount",
+          "EnrolledStudents"
         ]
       },
       "CourseModuleStatsResponseDto": {
