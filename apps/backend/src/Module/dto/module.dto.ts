@@ -446,6 +446,9 @@ export class ModuleStatsDto {
 
   @ApiProperty()
   EventCount!: number;
+
+  @ApiProperty()
+  EnrolledStudents!: number;
 }
 
 export class ModuleStatsResponseDto {

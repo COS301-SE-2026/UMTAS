@@ -6060,11 +6060,15 @@
           },
           "EventCount": {
             "type": "number"
+          },
+          "EnrolledStudents": {
+            "type": "number"
           }
         },
         "required": [
           "ModuleID",
-          "EventCount"
+          "EventCount",
+          "EnrolledStudents"
         ]
       },
       "ModuleStatsResponseDto": {

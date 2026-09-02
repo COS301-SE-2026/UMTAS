@@ -507,15 +507,23 @@ export class ModuleServiceV2 extends ModuleService {
         ModuleCode: modules.moduleCode,
         ModuleName: modules.moduleName,
         EventCount: countDistinct(Event.eventID),
+        EnrolledStudents: countDistinct(ModuleEnrollment.UserID),
       })
       .from(modules)
+      .leftJoin(
+        ModuleEnrollment,
+        eq(ModuleEnrollment.ModuleID, modules.moduleID),
+      )
       .leftJoin(GroupModules, eq(GroupModules.ModuleID, modules.moduleID))
       .innerJoin(Course, eq(Course.GroupID, GroupModules.GroupID))
       .leftJoin(UniversityEvent, eq(UniversityEvent.moduleID, modules.moduleID))
       .leftJoin(Event, eq(Event.eventID, UniversityEvent.eventID))
       .where(eq(Course.UniversityID, uniId))
       .groupBy(modules.moduleID, modules.moduleCode, modules.moduleName)
-      .orderBy(desc(countDistinct(Event.eventID)));
+      .orderBy(
+        desc(countDistinct(Event.eventID)),
+        desc(countDistinct(ModuleEnrollment.UserID)),
+      );
 
     return { data: statistics };
   } //END_ModuleStatsResponseDto
