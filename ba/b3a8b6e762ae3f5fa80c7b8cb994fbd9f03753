@@ -1,0 +1,42 @@
+apps/frontend/package.json
+  h_2d4b3dca70a3d8 38
+apps/frontend/src/app/stats/page.tsx
+  h_2d4b3dca70a3d8 1,3,5-6
+apps/frontend/src/components/atoms/baseShadcn/chart.tsx
+  h_2d4b3dca70a3d8 1-373
+apps/frontend/src/components/molecules/nav/NavLinks.tsx
+  h_2d4b3dca70a3d8 23
+apps/frontend/src/components/molecules/stats/newStatsChart.tsx
+  h_2d4b3dca70a3d8 1-243
+apps/frontend/src/components/organisms/stats/coursesTab.tsx
+  h_2d4b3dca70a3d8 1-188
+apps/frontend/src/components/organisms/stats/eventsTab.tsx
+  h_2d4b3dca70a3d8 1-130
+apps/frontend/src/components/organisms/stats/modulesTab.tsx
+  h_2d4b3dca70a3d8 1-165
+apps/frontend/src/components/organisms/stats/statCard.tsx
+  h_2d4b3dca70a3d8 10,12,18-20,29-32,35-37,39-56
+apps/frontend/src/components/organisms/stats/universityTab.tsx
+  h_2d4b3dca70a3d8 1-82
+apps/frontend/src/components/templates/stats/statsPageTemplate.tsx
+  h_2d4b3dca70a3d8 1-171
+apps/frontend/src/lib/api.ts
+  h_2d4b3dca70a3d8 451,459,462,465,468,471,479,482,485-489,492-496,554-570,625-641,661,668-669,696,703-704,707,710,713,720-721,724-725,728-729,789-808,923-956,2424-2432,2673-2682,2929-2936,2991-2995,3071-3094,3406,5152,5188,5199,5205,5224,5233,5235,5241,5244,5260,5269-5273,5275,5284,5298-5304,5457-5490,5585-5620,5733,5737,5742,5748,5751,5758,5832,5843,5849,5868,5879,5885,5888,5904,5913,5915,5921,5924,5940,5949-5953,5955,5961,5964,6105-6138,6467-6534
+apps/frontend/utilities/stats/statsQueries.ts
+  h_2d4b3dca70a3d8 1-90
+apps/frontend/utilities/stats/statsRequestBuilder.ts
+  h_2d4b3dca70a3d8 1-68
+pnpm-lock.yaml
+  h_2d4b3dca70a3d8 412-414,4736-4749,4950-4955,5513-5566,5834-5839,7728-7804,7869-7874,9750-9761,9837-9843,13278-13292,13367-13377,13399-13412,13466-13471,15013-15018,18433-18444,18588-18589,18897-18920,19076-19077,20352-20389,20430-20431,21758-21761,21798-21799,24779-24787,24841-24860,24872-24877,24916-24917,26031-26047
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "bab3a8b6e762ae3f5fa80c7b8cb994fbd9f03753",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
