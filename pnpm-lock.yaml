@@ -40,7 +40,7 @@ importers:
         version: 9.1.7
       jest:
         specifier: ^30.4.2
-        version: 30.4.2(@types/node@25.9.1)
+        version: 30.4.2(@types/node@25.9.1)(ts-node@10.9.2(@swc/core@1.15.33)(@types/node@25.9.1)(typescript@6.0.3))
       jest-junit:
         specifier: ^17.0.0
         version: 17.0.0
@@ -323,7 +323,7 @@ importers:
         version: 2.1.1(apexcharts@5.15.2)(react@19.2.4)
       react-cmdk:
         specifier: ^1.3.9
-        version: 1.3.9(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(webpack@5.106.0)
+        version: 1.3.9(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(webpack@5.106.0(@swc/core@1.15.33))
       react-dom:
         specifier: 19.2.4
         version: 19.2.4(react@19.2.4)
@@ -16744,7 +16744,7 @@ snapshots:
       "@jest/test-result": 30.4.1
       "@jest/transform": 30.4.1
       "@jest/types": 30.4.1
-      "@types/node": 24.12.4
+      "@types/node": 25.9.1
       ansi-escapes: 4.3.2
       chalk: 4.1.2
       ci-info: 4.4.0
@@ -16752,7 +16752,7 @@ snapshots:
       fast-json-stable-stringify: 2.1.0
       graceful-fs: 4.2.11
       jest-changed-files: 30.4.1
-      jest-config: 30.4.2(@types/node@24.12.4)(ts-node@10.9.2(@swc/core@1.15.33)(@types/node@25.9.1)(typescript@6.0.3))
+      jest-config: 30.4.2(@types/node@25.9.1)(ts-node@10.9.2(@swc/core@1.15.33)(@types/node@25.9.1)(typescript@6.0.3))
       jest-haste-map: 30.4.1
       jest-message-util: 30.4.1
       jest-regex-util: 30.4.0
@@ -16850,7 +16850,7 @@ snapshots:
 
   "@jest/pattern@30.4.0":
     dependencies:
-      "@types/node": 24.12.4
+      "@types/node": 25.9.1
       jest-regex-util: 30.4.0
 
   "@jest/reporters@29.7.0":
@@ -16890,7 +16890,7 @@ snapshots:
       "@jest/transform": 30.4.1
       "@jest/types": 30.4.1
       "@jridgewell/trace-mapping": 0.3.31
-      "@types/node": 24.12.4
+      "@types/node": 25.9.1
       chalk: 4.1.2
       collect-v8-coverage: 1.0.3
       exit-x: 0.2.2
@@ -21435,7 +21435,7 @@ snapshots:
       selderee: 0.11.0
     optional: true
 
-  html-webpack-plugin@5.6.7(webpack@5.106.0):
+  html-webpack-plugin@5.6.7(webpack@5.106.0(@swc/core@1.15.33)):
     dependencies:
       "@types/html-minifier-terser": 6.1.0
       html-minifier-terser: 6.1.0
@@ -21443,7 +21443,7 @@ snapshots:
       pretty-error: 4.0.0
       tapable: 2.3.3
     optionalDependencies:
-      webpack: 5.106.0
+      webpack: 5.106.0(@swc/core@1.15.33)
 
   htmlnano@3.3.1(cssnano@7.1.9(postcss@8.5.15))(postcss@8.5.15)(relateurl@0.2.7)(svgo@4.0.1)(terser@5.47.1)(typescript@5.9.3):
     dependencies:
@@ -21967,34 +21967,15 @@ snapshots:
       - supports-color
       - ts-node
 
-  jest-cli@30.4.2(@types/node@24.12.4)(ts-node@10.9.2(@swc/core@1.15.33)(@types/node@24.12.4)(typescript@5.9.3)):
+  jest-cli@30.4.2(@types/node@25.9.1)(ts-node@10.9.2(@swc/core@1.15.33)(@types/node@25.9.1)(typescript@6.0.3)):
     dependencies:
-      "@jest/core": 30.4.2(ts-node@10.9.2(@swc/core@1.15.33)(@types/node@24.12.4)(typescript@5.9.3))
+      "@jest/core": 30.4.2(ts-node@10.9.2(@swc/core@1.15.33)(@types/node@25.9.1)(typescript@6.0.3))
       "@jest/test-result": 30.4.1
       "@jest/types": 30.4.1
       chalk: 4.1.2
       exit-x: 0.2.2
       import-local: 3.2.0
-      jest-config: 30.4.2(@types/node@24.12.4)(ts-node@10.9.2(@swc/core@1.15.33)(@types/node@24.12.4)(typescript@5.9.3))
-      jest-util: 30.4.1
-      jest-validate: 30.4.1
-      yargs: 17.7.2
-    transitivePeerDependencies:
-      - "@types/node"
-      - babel-plugin-macros
-      - esbuild-register
-      - supports-color
-      - ts-node
-
-  jest-cli@30.4.2(@types/node@25.9.1):
-    dependencies:
-      "@jest/core": 30.4.2(ts-node@10.9.2(@swc/core@1.15.33)(@types/node@24.12.4)(typescript@5.9.3))
-      "@jest/test-result": 30.4.1
-      "@jest/types": 30.4.1
-      chalk: 4.1.2
-      exit-x: 0.2.2
-      import-local: 3.2.0
-      jest-config: 30.4.2(@types/node@25.9.1)
+      jest-config: 30.4.2(@types/node@25.9.1)(ts-node@10.9.2(@swc/core@1.15.33)(@types/node@25.9.1)(typescript@6.0.3))
       jest-util: 30.4.1
       jest-validate: 30.4.1
       yargs: 17.7.2
@@ -22098,7 +22079,7 @@ snapshots:
       - babel-plugin-macros
       - supports-color
 
-  jest-config@30.4.2(@types/node@25.9.1):
+  jest-config@30.4.2(@types/node@25.9.1)(ts-node@10.9.2(@swc/core@1.15.33)(@types/node@25.9.1)(typescript@6.0.3)):
     dependencies:
       "@babel/core": 7.29.0
       "@jest/get-type": 30.1.0
@@ -22125,6 +22106,7 @@ snapshots:
       strip-json-comments: 3.1.1
     optionalDependencies:
       "@types/node": 25.9.1
+      ts-node: 10.9.2(@swc/core@1.15.33)(@types/node@25.9.1)(typescript@6.0.3)
     transitivePeerDependencies:
       - babel-plugin-macros
       - supports-color
@@ -22568,7 +22550,7 @@ snapshots:
     dependencies:
       "@jest/test-result": 30.4.1
       "@jest/types": 30.4.1
-      "@types/node": 24.12.4
+      "@types/node": 25.9.1
       ansi-escapes: 4.3.2
       chalk: 4.1.2
       emittery: 0.13.1
@@ -22620,25 +22602,12 @@ snapshots:
       - supports-color
       - ts-node
 
-  jest@30.4.2(@types/node@24.12.4)(ts-node@10.9.2(@swc/core@1.15.33)(@types/node@24.12.4)(typescript@5.9.3)):
+  jest@30.4.2(@types/node@25.9.1)(ts-node@10.9.2(@swc/core@1.15.33)(@types/node@25.9.1)(typescript@6.0.3)):
     dependencies:
-      "@jest/core": 30.4.2(ts-node@10.9.2(@swc/core@1.15.33)(@types/node@24.12.4)(typescript@5.9.3))
+      "@jest/core": 30.4.2(ts-node@10.9.2(@swc/core@1.15.33)(@types/node@25.9.1)(typescript@6.0.3))
       "@jest/types": 30.4.1
       import-local: 3.2.0
-      jest-cli: 30.4.2(@types/node@24.12.4)(ts-node@10.9.2(@swc/core@1.15.33)(@types/node@24.12.4)(typescript@5.9.3))
-    transitivePeerDependencies:
-      - "@types/node"
-      - babel-plugin-macros
-      - esbuild-register
-      - supports-color
-      - ts-node
-
-  jest@30.4.2(@types/node@25.9.1):
-    dependencies:
-      "@jest/core": 30.4.2(ts-node@10.9.2(@swc/core@1.15.33)(@types/node@24.12.4)(typescript@5.9.3))
-      "@jest/types": 30.4.1
-      import-local: 3.2.0
-      jest-cli: 30.4.2(@types/node@25.9.1)
+      jest-cli: 30.4.2(@types/node@25.9.1)(ts-node@10.9.2(@swc/core@1.15.33)(@types/node@25.9.1)(typescript@6.0.3))
     transitivePeerDependencies:
       - "@types/node"
       - babel-plugin-macros
@@ -24601,11 +24570,11 @@ snapshots:
       prop-types: 15.8.1
       react: 19.2.4
 
-  react-cmdk@1.3.9(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(webpack@5.106.0):
+  react-cmdk@1.3.9(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(webpack@5.106.0(@swc/core@1.15.33)):
     dependencies:
       "@headlessui/react": 1.7.19(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       "@heroicons/react": 2.2.0(react@19.2.4)
-      html-webpack-plugin: 5.6.7(webpack@5.106.0)
+      html-webpack-plugin: 5.6.7(webpack@5.106.0(@swc/core@1.15.33))
       react: 19.2.4
       react-dom: 19.2.4(react@19.2.4)
     transitivePeerDependencies:
@@ -25405,15 +25374,6 @@ snapshots:
       "@swc/core": 1.15.33
     optional: true
 
-  terser-webpack-plugin@5.6.0(webpack@5.106.0):
-    dependencies:
-      "@jridgewell/trace-mapping": 0.3.31
-      jest-worker: 27.5.1
-      schema-utils: 4.3.3
-      terser: 5.47.1
-      webpack: 5.106.0
-    optional: true
-
   terser@5.47.1:
     dependencies:
       "@jridgewell/source-map": 0.3.11
@@ -25571,6 +25531,27 @@ snapshots:
       yn: 3.1.1
     optionalDependencies:
       "@swc/core": 1.15.33
+
+  ts-node@10.9.2(@swc/core@1.15.33)(@types/node@25.9.1)(typescript@6.0.3):
+    dependencies:
+      "@cspotcode/source-map-support": 0.8.1
+      "@tsconfig/node10": 1.0.12
+      "@tsconfig/node12": 1.0.11
+      "@tsconfig/node14": 1.0.3
+      "@tsconfig/node16": 1.0.4
+      "@types/node": 25.9.1
+      acorn: 8.16.0
+      acorn-walk: 8.3.5
+      arg: 4.1.3
+      create-require: 1.1.1
+      diff: 4.0.4
+      make-error: 1.3.6
+      typescript: 6.0.3
+      v8-compile-cache-lib: 3.0.1
+      yn: 3.1.1
+    optionalDependencies:
+      "@swc/core": 1.15.33
+    optional: true
 
   tsconfig-paths-webpack-plugin@4.2.0:
     dependencies:
@@ -25866,48 +25847,6 @@ snapshots:
   webpack-node-externals@3.0.0: {}
 
   webpack-sources@3.4.1: {}
-
-  webpack@5.106.0:
-    dependencies:
-      "@types/eslint-scope": 3.7.7
-      "@types/estree": 1.0.9
-      "@types/json-schema": 7.0.15
-      "@webassemblyjs/ast": 1.14.1
-      "@webassemblyjs/wasm-edit": 1.14.1
-      "@webassemblyjs/wasm-parser": 1.14.1
-      acorn: 8.16.0
-      acorn-import-phases: 1.0.4(acorn@8.16.0)
-      browserslist: 4.28.2
-      chrome-trace-event: 1.0.4
-      enhanced-resolve: 5.21.5
-      es-module-lexer: 2.1.0
-      eslint-scope: 5.1.1
-      events: 3.3.0
-      glob-to-regexp: 0.4.1
-      graceful-fs: 4.2.11
-      json-parse-even-better-errors: 2.3.1
-      loader-runner: 4.3.2
-      mime-types: 2.1.35
-      neo-async: 2.6.2
-      schema-utils: 4.3.3
-      tapable: 2.3.3
-      terser-webpack-plugin: 5.6.0(webpack@5.106.0)
-      watchpack: 2.5.1
-      webpack-sources: 3.4.1
-    transitivePeerDependencies:
-      - "@minify-html/node"
-      - "@swc/core"
-      - "@swc/css"
-      - "@swc/html"
-      - clean-css
-      - cssnano
-      - csso
-      - esbuild
-      - html-minifier-terser
-      - lightningcss
-      - postcss
-      - uglify-js
-    optional: true
 
   webpack@5.106.0(@swc/core@1.15.33):
     dependencies:
