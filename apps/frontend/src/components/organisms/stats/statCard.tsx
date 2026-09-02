@@ -32,20 +32,20 @@ export default function StatCard({
 }: StatsProps) {
   return (
     <Card className={className}>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+      <CardHeader className="flex flex-row justify-between items-center pb-2">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
         {icon}
       </CardHeader>
       <CardContent>
         {isLoading ? (
-          <Skeleton className="h-7 w-20 my-1" />
+          <Skeleton className="h-8 w-20" />
         ) : (
           <div className="text-2xl font-bold">
             {value !== undefined ? value.toLocaleString() : ""}
           </div>
         )}
         {description && (
-          <CardDescription className="mt-1">{description}</CardDescription>
+          <CardDescription className="mt-2">{description}</CardDescription>
         )}
         {children}
       </CardContent>
