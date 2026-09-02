@@ -638,8 +638,9 @@ export function ScheduleView({
                   <Button
                     id="btn-export-ics"
                     type="button"
+                    variant="outline"
                     disabled={exportingTo !== null}
-                    className="h-7 px-3 text-xs bg-[var(--bg-surface)] text-[var(--text-primary)] border-[var(--border)] hover:opacity-90"
+                    className="h-7 px-3 text-xs hover:opacity-90"
                     onClick={() => void exportToICS()}
                   >
                     {exportingTo === "ics" ? "Exporting…" : "Export to ICS"}
@@ -648,8 +649,9 @@ export function ScheduleView({
                     <Button
                       id="btn-export-google-calendar"
                       type="button"
+                      variant="outline"
                       disabled={exportingTo !== null}
-                      className="h-7 px-3 text-xs bg-[var(--bg-surface)] text-[var(--text-primary)] border-[var(--border)] hover:opacity-90"
+                      className="h-7 px-3 text-xs hover:opacity-90"
                       onClick={handleGoogleCalendarExport}
                     >
                       {exportingTo === "google"
@@ -662,7 +664,8 @@ export function ScheduleView({
                   <Button
                     id="btn-create"
                     type="button"
-                    className="h-7 px-3 text-xs bg-[var(--bg-surface)] text-[var(--text-primary)] border-[var(--border)] hover:opacity-90"
+                    variant="default"
+                    className="h-7 px-3 text-xs hover:opacity-90"
                     onClick={createTimetable}
                   >
                     Create
