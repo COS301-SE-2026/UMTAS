@@ -65,10 +65,6 @@ export default function CoursesTab({
     (x, y) => y.countModules - x.countModules,
   )[0];
 
-  const topCourse = [...coursesData].sort(
-    (x, y) => y.numberOfStudents - x.numberOfStudents,
-  )[0];
-
   const averageStudentCountPerCourse = () => {
     if (coursesData.length <= 0) {
       return 0;
