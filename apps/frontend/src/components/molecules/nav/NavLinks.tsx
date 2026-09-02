@@ -13,6 +13,7 @@ const noUniLinks = [
 
 const basicLinks = [
   { href: "/module-management", label: "Manage Modules & Events" },
+  { href: "/map", label: "Map" },
 ];
 
 const extraAdminLinks = [

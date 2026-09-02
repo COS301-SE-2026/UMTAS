@@ -7,3 +7,6 @@ export const groupId = 'groupId_for_testing';
 export const attendanceId = 'attendanceId_for_testing';
 export const timetableId = 'timteableId_for_testing';
 export const venueId = 'venueId_for_testing';
+export const buildingId = 'buildingId_for_testing';
+export const destinationBuildingId = 'destinationBuildingId_for_testing';
+export const routeId = 'routeId_for_testing';
