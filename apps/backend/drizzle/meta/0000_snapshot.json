@@ -1,5 +1,5 @@
 {
-  "id": "c11f170b-228a-439d-89b4-e21b39bee131",
+  "id": "337d2f44-0823-4940-896e-c2242b1d5b54",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -2142,6 +2142,12 @@
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
+        },
+        "BuildingID": {
+          "name": "BuildingID",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {
@@ -2165,6 +2171,21 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
+        },
+        "venue_building_id_idx": {
+          "name": "venue_building_id_idx",
+          "columns": [
+            {
+              "expression": "BuildingID",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
         }
       },
       "foreignKeys": {
@@ -2175,6 +2196,15 @@
           "columnsFrom": ["UniversityID"],
           "columnsTo": ["UniversityID"],
           "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "Venue_BuildingID_Building_BuildingID_fk": {
+          "name": "Venue_BuildingID_Building_BuildingID_fk",
+          "tableFrom": "Venue",
+          "tableTo": "Building",
+          "columnsFrom": ["BuildingID"],
+          "columnsTo": ["BuildingID"],
+          "onDelete": "set null",
           "onUpdate": "no action"
         }
       },
@@ -2437,6 +2467,346 @@
           "columns": ["Hash"]
         }
       },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.Building": {
+      "name": "Building",
+      "schema": "",
+      "columns": {
+        "BuildingID": {
+          "name": "BuildingID",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "UniversityID": {
+          "name": "UniversityID",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "BuildingName": {
+          "name": "BuildingName",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "Latitude": {
+          "name": "Latitude",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "Longitude": {
+          "name": "Longitude",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "Footprint": {
+          "name": "Footprint",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "Icon": {
+          "name": "Icon",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "DisplayColour": {
+          "name": "DisplayColour",
+          "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "CreatedBy": {
+          "name": "CreatedBy",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "CreatedAt": {
+          "name": "CreatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "UpdatedAt": {
+          "name": "UpdatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "building_university_name_unique": {
+          "name": "building_university_name_unique",
+          "columns": [
+            {
+              "expression": "UniversityID",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "BuildingName",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "building_university_id_idx": {
+          "name": "building_university_id_idx",
+          "columns": [
+            {
+              "expression": "UniversityID",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "Building_UniversityID_University_UniversityID_fk": {
+          "name": "Building_UniversityID_University_UniversityID_fk",
+          "tableFrom": "Building",
+          "tableTo": "University",
+          "columnsFrom": ["UniversityID"],
+          "columnsTo": ["UniversityID"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "Building_CreatedBy_user_id_fk": {
+          "name": "Building_CreatedBy_user_id_fk",
+          "tableFrom": "Building",
+          "tableTo": "user",
+          "columnsFrom": ["CreatedBy"],
+          "columnsTo": ["id"],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.UniversityMapConfig": {
+      "name": "UniversityMapConfig",
+      "schema": "",
+      "columns": {
+        "UniversityID": {
+          "name": "UniversityID",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "NorthLat": {
+          "name": "NorthLat",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "SouthLat": {
+          "name": "SouthLat",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "EastLng": {
+          "name": "EastLng",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "WestLng": {
+          "name": "WestLng",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "DefaultZoom": {
+          "name": "DefaultZoom",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 16
+        },
+        "GoogleMapId": {
+          "name": "GoogleMapId",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "UniversityMapConfig_UniversityID_University_UniversityID_fk": {
+          "name": "UniversityMapConfig_UniversityID_University_UniversityID_fk",
+          "tableFrom": "UniversityMapConfig",
+          "tableTo": "University",
+          "columnsFrom": ["UniversityID"],
+          "columnsTo": ["UniversityID"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.Route": {
+      "name": "Route",
+      "schema": "",
+      "columns": {
+        "RouteID": {
+          "name": "RouteID",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "UniversityID": {
+          "name": "UniversityID",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "OriginBuildingID": {
+          "name": "OriginBuildingID",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "DestinationBuildingID": {
+          "name": "DestinationBuildingID",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "PathCoordinates": {
+          "name": "PathCoordinates",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "DistanceMetres": {
+          "name": "DistanceMetres",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "DisplayColour": {
+          "name": "DisplayColour",
+          "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'#0000FF'"
+        },
+        "CreatedAt": {
+          "name": "CreatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "UpdatedAt": {
+          "name": "UpdatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "route_origin_destination_unique": {
+          "name": "route_origin_destination_unique",
+          "columns": [
+            {
+              "expression": "OriginBuildingID",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "DestinationBuildingID",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "route_university_id_idx": {
+          "name": "route_university_id_idx",
+          "columns": [
+            {
+              "expression": "UniversityID",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "Route_UniversityID_University_UniversityID_fk": {
+          "name": "Route_UniversityID_University_UniversityID_fk",
+          "tableFrom": "Route",
+          "tableTo": "University",
+          "columnsFrom": ["UniversityID"],
+          "columnsTo": ["UniversityID"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "Route_OriginBuildingID_Building_BuildingID_fk": {
+          "name": "Route_OriginBuildingID_Building_BuildingID_fk",
+          "tableFrom": "Route",
+          "tableTo": "Building",
+          "columnsFrom": ["OriginBuildingID"],
+          "columnsTo": ["BuildingID"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "Route_DestinationBuildingID_Building_BuildingID_fk": {
+          "name": "Route_DestinationBuildingID_Building_BuildingID_fk",
+          "tableFrom": "Route",
+          "tableTo": "Building",
+          "columnsFrom": ["DestinationBuildingID"],
+          "columnsTo": ["BuildingID"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false

@@ -164,6 +164,17 @@ export class CreateEventDtoV2 extends PickType(EventDto, [
   @ValidateNested()
   @Type(() => EventCriteriaDtoV2)
   eventCriteria!: EventCriteriaDtoV2;
+
+  @ApiProperty({
+    description: 'Name of venue',
+    example: 'Main Hall',
+    required: false,
+    type: String,
+  })
+  @IsOptional()
+  @IsString()
+  @Length(1, 30)
+  venueName?: string;
 }
 
 export class UpdateEventDto extends PartialType(
@@ -226,3 +237,58 @@ export class ValidateEventResponseDto {
   @IsString()
   message?: string;
 } //END_ValidateEventResponseDto
+
+//stats
+
+//Events per day of week
+export class EventStatsWeekDayDto {
+  @ApiProperty()
+  @ApiProperty({
+    enum: DAY_OF_WEEK,
+  })
+  @IsEnum(DAY_OF_WEEK)
+  dayOfWeek!: DayOfWeek;
+
+  @ApiProperty()
+  EventCount!: number;
+}
+
+export class EventStatsWeeklyResponseDto {
+  @ApiProperty({ type: [EventStatsWeekDayDto] })
+  data!: EventStatsWeekDayDto[];
+}
+
+//Events per venue
+export class EventStatsVenueDto {
+  @ApiProperty()
+  VenueID!: string;
+
+  @ApiProperty()
+  VenueName!: string;
+
+  @ApiProperty()
+  EventCount!: number;
+
+  @ApiProperty()
+  ProjectedAttendance!: number;
+} //END_EventStatsVenueDto
+
+export class EventStatsVenueResponseDto {
+  @ApiProperty({ type: [EventStatsVenueDto] })
+  data!: EventStatsVenueDto[];
+}
+
+export class UpdateEventVenueDto {
+  @ApiProperty({ description: 'The venue name' })
+  @IsString()
+  @Length(1, 100)
+  venueName!: string;
+
+  @ApiPropertyOptional({
+    format: 'uuid',
+    description: 'The selected buildingdD',
+  })
+  @IsOptional()
+  @IsUUID()
+  buildingId?: string;
+}
