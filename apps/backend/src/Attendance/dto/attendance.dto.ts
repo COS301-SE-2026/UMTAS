@@ -7,6 +7,7 @@ import {
   IsBoolean,
   IsOptional,
 } from 'class-validator';
+import { Transform } from 'class-transformer';
 import { AttendanceStateEnum } from '../../entities';
 import type { AttendanceStateType } from '../../entities';
 
@@ -84,6 +85,12 @@ export class AttendanceFilters extends PartialType(CreateAttendanceDto) {
     type: Boolean,
     example: false,
     description: 'Filter by current userId together with other filters',
+  })
+  @Transform(({ value }) => {
+    if (typeof value === 'boolean') return value;
+    if (value === 'true') return true;
+    if (value === 'false') return false;
+    return value;
   })
   @IsBoolean()
   @IsOptional()

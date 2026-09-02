@@ -435,3 +435,23 @@ export class EnrollToModuleDto {
   })
   enroll?: boolean;
 }
+
+// Events per module
+export class ModuleStatsDto {
+  @ApiProperty()
+  ModuleID!: string;
+
+  @ApiProperty({ required: false })
+  ModuleCode?: string;
+
+  @ApiProperty()
+  EventCount!: number;
+
+  @ApiProperty()
+  EnrolledStudents!: number;
+}
+
+export class ModuleStatsResponseDto {
+  @ApiProperty({ type: [ModuleStatsDto] })
+  data!: ModuleStatsDto[];
+}
