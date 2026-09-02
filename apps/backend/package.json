@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.940.0",
-    "@better-auth/redis-storage": "^1.6.11",
+    "@better-auth/redis-storage": "1.6.27",
     "@electric-sql/pglite": "^0.4.5",
     "@nestjs-modules/mailer": "^2.3.6",
     "@nestjs/axios": "^4.0.1",
@@ -43,7 +43,7 @@
     "@opentelemetry/exporter-logs-otlp-http": "^0.221.0",
     "@opentelemetry/resources": "^2.10.0",
     "@opentelemetry/sdk-logs": "^0.221.0",
-    "better-auth": "^1.6.11",
+    "better-auth": "^1.6.27",
     "bullmq": "^5.76.10",
     "c8": "^12.0.0",
     "class-transformer": "^0.5.1",

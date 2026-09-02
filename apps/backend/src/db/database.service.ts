@@ -20,8 +20,7 @@ import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
 export type AppDatabase =
-  | NodePgDatabase<typeof schema>
-  | PgliteDatabase<typeof schema>;
+  NodePgDatabase<typeof schema> | PgliteDatabase<typeof schema>;
 
 const DB_MODES = {
   PGLITE: 'PGLITE',
@@ -75,6 +74,7 @@ export class DatabaseService
   }
 
   async onApplicationBootstrap(): Promise<void> {
+    await this.migrate();
     if (isSeedEnabled(process.env.SEED)) {
       try {
         this.logger.log('Starting database seeding...');
