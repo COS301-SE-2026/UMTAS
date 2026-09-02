@@ -82,11 +82,11 @@ export default async function statsPageTemplate() {
             <TabsTrigger value="courses" className="px-4 py-2">
               Courses
             </TabsTrigger>
-            <TabsTrigger value="events" className="px-4 py-2">
-              Events
-            </TabsTrigger>
             <TabsTrigger value="modules" className="px-4 py-2">
               Modules
+            </TabsTrigger>
+            <TabsTrigger value="events" className="px-4 py-2">
+              Events
             </TabsTrigger>
           </TabsList>
 
