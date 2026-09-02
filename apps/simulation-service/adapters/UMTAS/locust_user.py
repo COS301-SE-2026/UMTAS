@@ -427,7 +427,34 @@ class DomainUser(HttpUser):
                 response.success()
             else:
                 response.failure(f"view attendance failed [{response.status_code}]")
-                
+               
+               
+    @task(2)
+    def mark_attendance(self):
+        pool = list(self.timetable_event_ids & set(self.known_events)) or list(self.known_events)
+        if not pool:
+            return
+        event_id = random.choice(pool)
+        event = self.known_events.get(event_id, {})
+        state = random.choices(["ATTENDING", "NOT_ATTENDING"], weights=[8, 2])[0]
+
+        payload = {
+            "eventID": event_id,
+            "eventDate": event_date_checker(event),
+            "state": state,
+        }
+        with self.client.post("/api/attendance", json=payload, catch_response=True) as response:
+            if response.status_code == 201:
+                response.success()
+                data = response.json()
+                if data.get("AttendanceID"):
+                    self.attendance_ids.append(data["AttendanceID"])
+            else:
+                response.failure(f"attendance create failed [{response.status_code}]: {response.text}")
+
+
+    
+    
     @task(2)
     def submit_solver_job(self):
         if self.solver_id is not None:
