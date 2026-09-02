@@ -1,4 +1,4 @@
-# API Contracts
+# Service Contract 
 
 <swagger-ui src="https://capstone-vigil.dns.net.za/api/docs-json" />
 

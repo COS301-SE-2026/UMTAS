@@ -17,6 +17,14 @@ and **L** = low.
 | **NFR-Sec-1** | Security | Confidentiality | H | H |
 | **NFR-Scale-1** | Flexibility | Scalability | H | H |
 | **NFR-Maint-1** | Maintainability | Modifiability | H | M |
+| **NFR-Sec-2** | Security | Vulnerability resistance | H | M |
+| **NFR-Perf-1** | Performance efficiency | Time behaviour | H | M |
+| **NFR-Eff-1** | Performance efficiency | Resource/capacity utilisation | M | M |
+| **NFR-Rely-1** | Reliability | Availability under load | H | M |
+| **NFR-Avail-1** | Reliability | Availability | M | L |
+| **NFR-Sec-3** | Security | Vulnerability resistance | H | L |
+| **NFR-Por-1** | Portability | Adaptability | H | L |
+| **NFR-Acc-1** | Usability | Accessibility | H | H |
 
 ## NFR-Corr-1 - Supported Timetable PDF Extraction Correctness
 
@@ -30,6 +38,14 @@ and **L** = low.
 | **Artifact** | Timetable ingestion capability |
 | **Response** | Extract the expected module codes, venues, dates, times, activity groups, and scheduling warnings into the canonical timetable representation |
 | **Response measure** | For every supported-format acceptance fixture, field-level precision and recall are both **100%**: every expected record and field is extracted correctly, **0 expected records are omitted**, and **0 records or values are invented**. The result passes the canonical parser contract. |
+
+**Acceptance evidence (2026-09-02):** The nine supported UP lecture, semester-test, and exam
+fixtures pass complete comparisons against the
+[manually reviewed ground-truth manifest](../../apps/pdf_parser/parser/tests/ground_truth/up_supported_fixtures.json).
+The acceptance test calculates 100% field-level precision and recall for each fixture, reports zero
+omitted and zero invented records or fields, and checks exact canonical-result equality. The Python
+parser suite is an active CI gate; see the
+[NFR test matrix](NON-FUNCTIONAL_TESTING.md#332-nfr-traceability-matrix) for the recorded result.
 
 ## NFR-Corr-2 - Conflict-Free Schedule Correctness
 
@@ -89,4 +105,114 @@ successfully enqueued it, and returned its identifier.
 | **Environment** | Normal development and continuous-integration workflow using representative fixtures |
 | **Artifact** | University ingestion extension point |
 | **Response** | Add the university-specific behaviour without altering unrelated application behaviour or existing adapters |
-| **Response measure** | The change modifies **0 Core API, persistent-schema, queue-contract, worker-orchestration, or existing-adapter implementation files**. Changes remain confined to the new adapter, registration/configuration, fixtures, and tests, and **100% of canonical contract and existing-adapter regression tests pass**. |
+
+## NFR-Sec-2 - API Vulnerability Resistance
+
+**Quality attribute:** Security - vulnerability resistance
+
+| **Part** | **UMTAS scenario** |
+|---|---|
+| **Source of stimulus** | An automated security scanning tool acting as an unauthenticated or low-privilege attacker |
+| **Stimulus** | Run an OWASP ZAP scan (baseline and authenticated full scan) against the deployed public API surface |
+| **Environment** | Staging environment, configuration equivalent to production, with a seeded test tenant and test user session |
+| **Artifact** | Public API endpoints, authentication flow, and input-handling boundary |
+| **Response** | Reject or safely handle malformed, injected, or unauthorised requests without exposing sensitive data or internal state |
+| **Response measure** | The OWASP ZAP report contains **0 alerts of medium severity or above**. Any informational/low findings are logged and triaged, but do not block release. |
+
+## NFR-Perf-1 - Everyday Scheduling Responsiveness
+
+**Quality attribute:** Performance efficiency - time behaviour
+
+| **Part** | **UMTAS scenario** |
+|---|---|
+| **Source of stimulus** | Ordinary concurrent student usage (module browsing, enrolment, timetable building, solver requests) |
+| **Stimulus** | A representative mix of student actions generated against the deployed API under normal, non-peak concurrency |
+| **Environment** | Production-equivalent deployment, steady-state Locust load at a moderate, everyday concurrency level (not the NFR-Scale-1 peak) |
+| **Artifact** | Public API, in particular the scheduling-job submission and status-retrieval endpoints |
+| **Response** | Serve requests within the response-time budget while maintaining a low error rate |
+| **Response measure** | Across the steady-state window, the **p95 response time for submission and status endpoints does not exceed 2 seconds**, and the **overall request success rate is at least 99%**. |
+
+## NFR-Eff-1 - Ingestion and Solver Processing Efficiency
+
+**Quality attribute:** Performance efficiency - resource/capacity utilisation
+
+| **Part** | **UMTAS scenario** |
+|---|---|
+| **Source of stimulus** | A student submitting a timetable PDF for parsing or a schedule for solving |
+| **Stimulus** | Submit a PDF-ingestion job or a solver job while the system is under Locust-generated concurrent load |
+| **Environment** | Production-equivalent deployment, steady-state Locust load |
+| **Artifact** | PDF-parsing worker and scheduling-solver worker |
+| **Response** | Complete each job in a duration that scales acceptably with the size of the input, rather than degrading disproportionately under load |
+| **Response measure** | The **p95 solver processing time does not exceed 500 ms per scheduled event**, and the **p95 PDF-parsing time does not exceed 300 ms per KB** of input file size. |
+
+
+## NFR-Rely-1 - Sustained Reliability Under Load
+
+**Quality attribute:** Reliability - availability under load
+
+| **Part** | **UMTAS scenario** |
+|---|---|
+| **Source of stimulus** | Continuous concurrent student traffic over an extended (soak) duration |
+| **Stimulus** | A constant, low-cost session/authentication check issued alongside normal Locust load for the full duration of the test |
+| **Environment** | Production-equivalent deployment, sustained Locust load held for an extended period (soak test) |
+| **Artifact** | Authentication/session endpoint and overall API request pipeline |
+| **Response** | Continue responding correctly and without degradation for the full duration of the sustained run |
+| **Response measure** | The dedicated canary request maintains **≥99% success rate** for the entire soak duration. |
+
+## NFR-Avail-1 - Public Availability
+
+**Quality attribute:** Reliability - availability
+
+| **Part** | **UMTAS scenario** |
+|---|---|
+| **Source of stimulus** | External uptime monitoring, independent of any test run |
+| **Stimulus** | Periodic automated health checks against the public endpoint over the weeks leading up to Demo 3 |
+| **Environment** | Production deployment, continuous monitoring window |
+| **Artifact** | Public entry point / health-check endpoint |
+| **Response** | Remain reachable and healthy, with any outage detected and the service restarted automatically or promptly |
+| **Response measure** | Measured uptime over the monitoring window preceding Demo 3 is **at least 99.5%**. |
+
+
+## NFR-Sec-3 - Dependency Vulnerability Resistance
+
+**Quality attribute:** Security - vulnerability resistance
+
+| **Part** | **UMTAS scenario** |
+| --- | --- |
+| **Source of stimulus** | A developer opening a pull request or merging code to the `main` branch |
+| **Stimulus** | Execute the `pnpm audit` command during the Continuous Integration (CI) pipeline |
+| **Environment** | Automated CI pipeline running against the `main` branch |
+| **Artifact** | Project dependency tree and lockfile (`pnpm-lock.yaml`) |
+| **Response** | Scan the monorepo dependency tree for known Common Vulnerabilities and Exposures (CVEs) and report findings |
+| **Response measure** | The CI pipeline step passes with an exit code of 0, confirming **0 known vulnerabilities** of moderate or higher severity exist in the dependencies on the `main` branch. |
+
+
+## NFR-Por-1 - Browser Adaptability
+
+**Quality attribute:** Portability - Adaptability
+
+| **Part** | **UMTAS scenario** |
+| --- | --- |
+| **Source of stimulus** | A developer opening a pull request to the dev branch |
+| **Stimulus** | Execute the automated Playwright end-to-end test suite targeting Chromium, Microsoft Edge, and Mozilla Firefox |
+| **Environment** | Automated CI/CD pipeline (or local development environment) pre-configured with all three browser targets |
+| **Artifact** | E2e test files and playwright.config.ts |
+| **Response** | Run E2e tests on all provided browsers in the config |
+| **Response measure** | Measured 0 tests fail in the pipeline for repeated tests across all provided browsers |
+
+---
+
+## NFR-Acc-1 - Frontend Accessibility Audit
+
+**Quality attribute:** Usability - accessibility
+
+| **Part** | **UMTAS scenario** |
+| --- | --- |
+| **Source of stimulus** | A major release version of the software |
+| **Stimulus** | Execute a manual Lighthouse accessibility audit across key pages of the frontend application |
+| **Environment** | Local development or staging environment prior to major deployment |
+| **Artifact** | Frontend web application and all UI views |
+| **Response** | The Lighthouse scanner analyzes the web pages for accessibility best practices, contrast ratios, and ARIA usage, generating a performance and quality breakdown |
+| **Response measure** | The resulting lighthouse Accesibility score exceeds 90 out of a maximum of 100. |
+
+

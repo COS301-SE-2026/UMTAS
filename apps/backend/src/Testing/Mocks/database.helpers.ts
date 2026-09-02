@@ -21,6 +21,7 @@ export function createDbChain<T>(result: T) {
     'onConflictDoUpdate',
     'orderBy',
     'for',
+    'groupBy',
     'orderBy',
   ];
 

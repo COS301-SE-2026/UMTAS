@@ -110,9 +110,6 @@ prod-up release_tag:
 prod-down release_tag:
      IMAGE_TAG={{ release_tag }} phase run --env production -- docker compose -p umtas-prod -f docker-compose.prod.yml down
 
-# execute migrations on prod
-prod-migrate:
-    phase run --env production -- docker compose -f docker-compose.prod.yml exec -T backend npx drizzle-kit migrate
 
 # manual prod deployment
 
@@ -152,7 +149,7 @@ pdf-worker-status:
 
 # Run the PDF worker natively after verifying its Python dependency
 pdf-worker-native:
-    python3 -c "import fitz"
+    python3 -c "import pymupdf as fitz"
     phase run -- sh -c 'REDIS_URL="redis://:${REDIS_PASSWORD}@127.0.0.1:6379" MINIO_ENDPOINT=http://127.0.0.1:9000 WORKER_BACKEND_URL=http://127.0.0.1:3000 PDF_PARSE_CLI_CWD={{ justfile_directory() }}/apps/pdf_parser exec pnpm --filter pdf-parser-worker dev'
 
 # Build the solver worker image
@@ -272,6 +269,8 @@ nfr-upload:
 staging-migrate:
     phase run --env staging -- docker compose -p umtas-staging -f docker-compose.staging.yml run --rm backend node dist/db/migrate.js
 
+prod-migrate:
+    phase run --env production -- docker compose -p umtas-production -f docker-compose.prod.yml run --rm backend node dist/db/migrate.js
 
 
 

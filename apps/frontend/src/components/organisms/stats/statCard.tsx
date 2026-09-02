@@ -7,13 +7,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/atoms/baseShadcn/card";
+import { Skeleton } from "@/components/atoms/baseShadcn/skeleton";
 
-export interface stats {
+export interface StatsProps {
   title: string;
   description?: string;
   footer?: string | ReactNode;
   children?: ReactNode;
   className?: string;
+  isLoading?: boolean;
+  icon?: ReactNode;
+  value?: number | string;
 }
 
 export default function StatCard({
@@ -22,20 +26,34 @@ export default function StatCard({
   footer,
   children,
   className,
-}: stats) {
+  isLoading,
+  icon,
+  value,
+}: StatsProps) {
   return (
     <Card className={className}>
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
-
-        <CardDescription>{description}</CardDescription>
+      <CardHeader className="flex flex-row justify-between items-center pb-2">
+        <CardTitle className="text-sm font-medium">{title}</CardTitle>
+        {icon}
       </CardHeader>
-
-      <CardContent>{children}</CardContent>
-
-      <CardFooter>
-        <div className="text-sm text-muted-foreground w-full">{footer}</div>
-      </CardFooter>
+      <CardContent>
+        {isLoading ? (
+          <Skeleton className="h-8 w-20" />
+        ) : (
+          <div className="text-2xl font-bold">
+            {value !== undefined ? value.toLocaleString() : ""}
+          </div>
+        )}
+        {description && (
+          <CardDescription className="mt-2">{description}</CardDescription>
+        )}
+        {children}
+      </CardContent>
+      {footer && (
+        <CardFooter>
+          <div className="text-sm text-muted-foreground w-full">{footer}</div>
+        </CardFooter>
+      )}
     </Card>
   );
 }

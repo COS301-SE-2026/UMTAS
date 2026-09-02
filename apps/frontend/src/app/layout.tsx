@@ -7,6 +7,7 @@ import { Toaster } from "sonner";
 import Script from "next/script";
 import TanstackProvider from "@/components/tanstack/tanstackProvider";
 import { HelpCommandPalette } from "@/components/organisms/nav/HelpCommandPallete";
+import { MapProvider } from "@/components/organisms/map/MapProvider";
 import { PostHogProvider } from "@/app/posthog/providers";
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -62,13 +63,15 @@ export default async function RootLayout({
       </head>
       <body className="min-h-full flex flex-col">
         <TanstackProvider>
-          <PostHogProvider>
-            <AppShellTemplate userName={userName}>{children}</AppShellTemplate>
-          </PostHogProvider>
-
-          <HelpCommandPalette />
-
-          <Toaster />
+          <MapProvider>
+            <PostHogProvider>
+              <AppShellTemplate userName={userName}>
+                {children}
+              </AppShellTemplate>
+            </PostHogProvider>
+            <HelpCommandPalette />
+            <Toaster />
+          </MapProvider>
         </TanstackProvider>
       </body>
     </html>
