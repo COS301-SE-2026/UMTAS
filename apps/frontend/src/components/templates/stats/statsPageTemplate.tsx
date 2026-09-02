@@ -8,6 +8,9 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/atoms/baseShadcn/tabs";
+import CoursesTab, {
+  CourseData,
+} from "@/components/organisms/stats/coursesTab";
 
 const mockUniversityStats: UniversityStatsData = {
   countCourses: 100,
@@ -15,6 +18,23 @@ const mockUniversityStats: UniversityStatsData = {
   countModule: 420,
   numberOfStudents: 69690,
 };
+
+const mockCourseData: CourseData[] = [
+  {
+    id: "1",
+    name: "Computer Science",
+    countModules: 10,
+    countEvents: 30,
+    numberOfStudents: 67,
+  },
+  {
+    id: "2",
+    name: "Mathematics",
+    countModules: 12,
+    countEvents: 22,
+    numberOfStudents: 152,
+  },
+];
 
 export default async function statsPageTemplate() {
   return (
@@ -54,7 +74,11 @@ export default async function statsPageTemplate() {
           </TabsContent>
 
           <TabsContent value="courses">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            <CoursesTab
+              data={mockCourseData}
+              isLoading={false}
+              isError={false}
+            />
           </TabsContent>
 
           <TabsContent value="events">
