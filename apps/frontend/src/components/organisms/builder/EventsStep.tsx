@@ -9,6 +9,7 @@ import {
   AlertCircle,
   AwardIcon,
   ArrowUpWideNarrow,
+  University,
 } from "lucide-react";
 import {
   EventCard,
@@ -16,6 +17,7 @@ import {
 } from "@/components/molecules/builder/EventCard";
 import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
 import {
+  createEventRes,
   EventCriteria,
   EventResponse,
 } from "@/app/builder/utils/events/eventRequestBuilder";
@@ -48,6 +50,8 @@ import {
 import { getAllBuildingsQ } from "../../../../utilities/building/buildingQueries";
 
 import Tutorial from "@/components/organisms/nav/Tutorial";
+import { useErrorListener } from "@/hooks/errorListener";
+import { errorName } from "../../../../utilities/errorCries";
 
 const baseSteps = [
   {
@@ -167,7 +171,7 @@ export function EventsStep({
   const [isDirty, setIsDirty] = useState(false);
   const [showGuard, setShowGuard] = useState(false);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
-
+  const [createdEvent, setCreatedEvent] = useState<createEventRes>();
   const steps =
     events.length > 0 ? [...extendedSteps, ...baseSteps] : baseSteps;
 
@@ -183,25 +187,38 @@ export function EventsStep({
   const buildings = buildingsList ?? [];
 
   const updateEventVenue = useMutation(updateEventVenueMut());
+  useErrorListener();
 
   // a local construct to add an empty event
-  function addNewEvent() {
-    addEvent.mutate({
+  async function addNewEvent() {
+    const result = await addEvent.mutateAsync({
       body: {
-        activityCode: "L1",
-        isRecurring: false,
-        eventName: "Name",
-        activityType: "lecture",
         eventCriteria: {
+          startTime: "07:30",
+          endTime: "08:30",
           eventSource: "university",
-          date: new Date().toISOString().split("T")[0],
-          startTime: "07:00",
-          endTime: "07:30",
           moduleId: modules[0].moduleID,
         },
-        validated: true,
       },
     });
+
+    if (result.event.eventId == createdEvent?.event.eventId) {
+      window.dispatchEvent(
+        new CustomEvent(errorName, {
+          detail: {
+            userMessage:
+              "Please update the details of the event before creating more",
+          },
+        }),
+      );
+    } else {
+      console.log(
+        result.event.eventId,
+        "created event",
+        createdEvent?.event.eventId,
+      );
+      setCreatedEvent(result);
+    }
   }
 
   function requestNavigation(action: () => void) {

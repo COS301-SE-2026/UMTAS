@@ -37,17 +37,17 @@ export function NavLinks() {
   const navItems = [...noUniLinks];
 
   const uniDetails = isMounted ? UserDetails.getUniDetails() : null;
+  if (isMounted) {
+    if (uniDetails != undefined) {
+      navItems.push(...basicLinks);
+    }
+    if (uniDetails?.UniversityName == "University of Pretoria")
+      navItems.push(...universitySpecific);
 
-  if (uniDetails != undefined) {
-    navItems.push(...basicLinks);
+    if (isAdmin) {
+      navItems.push(...extraAdminLinks);
+    }
   }
-  if (uniDetails?.UniversityName == "University of Pretoria")
-    navItems.push(...universitySpecific);
-
-  if (isAdmin) {
-    navItems.push(...extraAdminLinks);
-  }
-
   return (
     <nav aria-label="Main navigation">
       <ul className="flex items-center gap-6 list-none m-0 p-0">
