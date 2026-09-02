@@ -70,6 +70,7 @@ export class ApiService {
               continue;
             }
           }
+          out.push(await this.courseService.create(c, tx));
         } //END_c
 
         return out;
@@ -78,7 +79,7 @@ export class ApiService {
 
     return {
       courses,
-      message: `Number of courses returned = [${courses.length}]`,
+      message: `Number of courses returned = [${courses?.length ?? 0}]`,
     };
   } //END_getCourses
 
