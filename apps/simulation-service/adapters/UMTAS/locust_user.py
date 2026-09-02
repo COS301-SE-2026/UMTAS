@@ -314,51 +314,6 @@ class DomainUser(HttpUser):
             else:
                 response.failure(f"timetable update failed [{response.status_code}]")
 
-    @task(3)
-    def check_pdf_parser_status(self):
-        if not getattr(self, "pdf_id", None) or getattr(
-            self, "pdf_result_ready", False
-        ):
-            return
-
-        with self.client.get(
-            f"/api/pdf-parser/jobs/{self.pdf_id}", catch_response=True
-        ) as response:
-            if response.status_code == 200:
-                data = response.json()
-                status = data.get("status", "").lower()
-
-                if status in ["completed", "done", "success"]:
-                    self.pdf_result_ready = True
-                    response.success()
-
-                elif status in ["failed", "error"]:
-                    error_msg = data.get("error", {}).get("message", "Unknown error")
-                    response.failure(f"Backend job failed: {error_msg}")
-                    self.pdf_id = None
-                    self.pdf_result_ready = False
-
-                else:
-                    response.success()
-
-            elif response.status_code == 404:
-                self.pdf_id = None
-                self.pdf_result_ready = False
-
-    @task(2)
-    def get_pdf_parser_result(self):
-        if getattr(self, "pdf_id", None) and getattr(self, "pdf_result_ready", False):
-            with self.client.get(
-                f"/api/pdf-parser/jobs/{self.pdf_id}/result", catch_response=True
-            ) as response:
-                if response.status_code == 200:
-                    response.success()
-                elif response.status_code == 404:
-                    response.failure(f"Result 404 for ready job {self.pdf_id}")
-
-                self.pdf_id = None
-                self.pdf_result_ready = False
-
     @task(2)
     def view_enrolled_modules(self):
         self.client.get("/api/builder")
