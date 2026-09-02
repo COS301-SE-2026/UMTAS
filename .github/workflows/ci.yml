@@ -257,8 +257,13 @@ jobs:
           key: ${{ secrets.PROD_SSH_KEY }}
           script: |
             cd /opt/UMTAS
-            docker compose -f docker-compose.staging.yml up -d --pull always
-            just staging-up
+                docker compose -p umtas-staging -f docker-compose.staging.yml stop
+                docker compose -p umtas-staging -f docker-compose.staging.yml rm -f db
+                docker volume rm umtas-staging_postgres_data || true
+                docker compose -p umtas-staging -f docker-compose.staging.yml up -d --pull always db
+                phase run --env staging -- docker compose -p umtas-staging -f docker-compose.staging.yml run --rm backend node dist/db/migrate.js
+                docker compose -p umtas-staging -f docker-compose.staging.yml up -d --pull always
+                just staging-up
 
   # docker-release:
   #   name: Build & Push Release Images

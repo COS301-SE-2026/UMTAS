@@ -68,6 +68,7 @@ nav:
       - Use Cases + Traceability Matrix: srs/USE_CASES.md
       - Functional Requirements: srs/FUNCTIONAL_REQUIREMENTS.md
       - Non-Functional Requirements: srs/NON-FUNCTIONAL_REQUIREMENTS.md
+      - Non-Functional Requirements Testing & Traceability Matrix: srs/NON-FUNCTIONAL_TESTING.md
       - Domain Model: srs/DOMAIN_MODEL.md
 
   - SAS:
