@@ -272,6 +272,8 @@ nfr-upload:
 staging-migrate:
     phase run --env staging -- docker compose -p umtas-staging -f docker-compose.staging.yml run --rm backend node dist/db/migrate.js
 
+prod-migrate:
+    phase run --env production -- docker compose -p umtas-production -f docker-compose.prod.yml run --rm backend node dist/db/migrate.js
 
 
 

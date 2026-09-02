@@ -11,8 +11,6 @@ import {
   swaggerFaviconUrl,
 } from './swagger-theme';
 
-import helmet from 'helmet';
-
 import { PostHog } from 'posthog-node';
 import { PostHogInterceptor } from 'posthog-node/nestjs';
 
@@ -28,8 +26,6 @@ async function bootstrap() {
   });
 
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
-  app.disable('x-powered-by');
-
   const ph = app.get(PostHog);
   app.useGlobalInterceptors(
     new PostHogInterceptor(ph, { captureExceptions: true }),
@@ -39,38 +35,6 @@ async function bootstrap() {
   app.setGlobalPrefix('api', {
     exclude: ['metrics'],
   });
-
-  app.use(
-    helmet({
-      xFrameOptions: { action: 'sameorigin' },
-
-      noSniff: true,
-
-      hsts: {
-        maxAge: 31536000,
-        includeSubDomains: true,
-        preload: true,
-      },
-
-      hidePoweredBy: true,
-
-      contentSecurityPolicy: {
-        directives: {
-          defaultSrc: ["'self'"],
-          scriptSrc: ["'self'"],
-          styleSrc: ["'self'"],
-          imgSrc: ["'self'", 'data:', 'blob:'],
-          fontSrc: ["'self'", 'data:'],
-          objectSrc: ["'none'"],
-          baseUri: ["'self'"],
-          formAction: ["'self'"],
-          frameAncestors: ["'self'"],
-          upgradeInsecureRequests: [],
-        },
-      },
-    }),
-  );
-
   app.use((req: Request, res: Response, next: NextFunction) => {
     const start = Date.now();
     const { method, originalUrl } = req;
