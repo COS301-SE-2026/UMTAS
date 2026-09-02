@@ -338,8 +338,22 @@ export class AcademicCalendarGenerationService {
   }
 
   private eventTitle(event: CalendarSourceEvent): string {
-    const module = event.moduleCode ?? event.criteria.moduleId;
-    return module ? `${module} ${event.name}` : event.name;
+    const module = (event.moduleCode ?? event.criteria.moduleId)?.trim();
+    const name = event.name.trim();
+    if (!module) return name;
+
+    const escapedModule = module.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const repeatedModulePrefix = new RegExp(
+      `^(?:${escapedModule}(?:\\s+|$))+`,
+      'i',
+    );
+    const nameWithoutModulePrefix = name
+      .replace(repeatedModulePrefix, '')
+      .trim();
+
+    return nameWithoutModulePrefix
+      ? `${module} ${nameWithoutModulePrefix}`
+      : module;
   }
 
   private eventDescription(event: CalendarSourceEvent): string | undefined {

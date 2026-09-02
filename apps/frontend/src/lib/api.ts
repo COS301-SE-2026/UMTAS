@@ -1615,11 +1615,11 @@ export interface components {
     AuthAcknowledgementDto: Record<string, never>;
     RevokeSessionDto: {
       /**
-       * @description ID of the session to terminate
-       * @default b2c3d4e5-f6a7-8901-bcde-f12345678901
-       * @example b2c3d4e5-f6a7-8901-bcde-f12345678901
+       * @description Token of the session to terminate
+       * @default session-token-value
+       * @example session-token-value
        */
-      sessionId: string;
+      token: string;
     };
     VerifyEmailDto: {
       /**
