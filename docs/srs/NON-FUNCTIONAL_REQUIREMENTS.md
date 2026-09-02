@@ -39,6 +39,14 @@ and **L** = low.
 | **Response** | Extract the expected module codes, venues, dates, times, activity groups, and scheduling warnings into the canonical timetable representation |
 | **Response measure** | For every supported-format acceptance fixture, field-level precision and recall are both **100%**: every expected record and field is extracted correctly, **0 expected records are omitted**, and **0 records or values are invented**. The result passes the canonical parser contract. |
 
+**Acceptance evidence (2026-09-02):** The nine supported UP lecture, semester-test, and exam
+fixtures pass complete comparisons against the
+[manually reviewed ground-truth manifest](../../apps/pdf_parser/parser/tests/ground_truth/up_supported_fixtures.json).
+The acceptance test calculates 100% field-level precision and recall for each fixture, reports zero
+omitted and zero invented records or fields, and checks exact canonical-result equality. The Python
+parser suite is an active CI gate; see the
+[NFR test matrix](NON-FUNCTIONAL_TESTING.md#332-nfr-traceability-matrix) for the recorded result.
+
 ## NFR-Corr-2 - Conflict-Free Schedule Correctness
 
 **Quality attribute:** Functional suitability - functional correctness
