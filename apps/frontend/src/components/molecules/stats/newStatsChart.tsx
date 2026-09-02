@@ -18,6 +18,8 @@ import {
   CartesianGrid,
   Line,
   LineChart,
+  Pie,
+  PieChart,
   XAxis,
   YAxis,
 } from "recharts";
@@ -37,7 +39,9 @@ export interface DynamicChartProps {
     | "bar-grouped"
     | "bar-stacked"
     | "area"
-    | "line";
+    | "line"
+    | "pie"
+    | "donut";
   data: Record<string, string | number>[];
   config: ChartConfig;
   xKey: string;
@@ -204,6 +208,23 @@ export default function DynamicChart({
               />
             ))}
           </LineChart>
+        );
+      case "pie":
+      case "donut":
+        return (
+          <PieChart>
+            <ChartTooltip content={<ChartTooltipContent hideLabel />} />
+            {yKey.map((key) => (
+              <Pie
+                key={key}
+                data={data}
+                dataKey={key}
+                nameKey={xKey}
+                innerRadius={type === "donut" ? 60 : 0}
+                strokeWidth={5}
+              />
+            ))}
+          </PieChart>
         );
       default:
         return null;
