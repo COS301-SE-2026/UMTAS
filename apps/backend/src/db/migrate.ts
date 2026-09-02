@@ -7,7 +7,7 @@ import { Pool } from 'pg';
 import { join, resolve } from 'node:path';
 import 'dotenv/config';
 
-async function runMigrations() {
+export async function runMigrations() {
   const dbMode = (process.env.DB_MODE ?? 'DATABASE').trim().toUpperCase();
   const configuredMigrationsPath = process.env.MIGRATIONS_PATH;
 
