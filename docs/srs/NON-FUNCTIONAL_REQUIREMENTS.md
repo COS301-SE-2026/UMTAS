@@ -17,6 +17,11 @@ and **L** = low.
 | **NFR-Sec-1** | Security | Confidentiality | H | H |
 | **NFR-Scale-1** | Flexibility | Scalability | H | H |
 | **NFR-Maint-1** | Maintainability | Modifiability | H | M |
+| **NFR-Sec-2** | Security | Vulnerability resistance | H | M |
+| **NFR-Perf-1** | Performance efficiency | Time behaviour | H | M |
+| **NFR-Eff-1** | Performance efficiency | Resource/capacity utilisation | M | M |
+| **NFR-Rely-1** | Reliability | Availability under load | H | M |
+| **NFR-Avail-1** | Reliability | Availability | M | L |
 
 ## NFR-Corr-1 - Supported Timetable PDF Extraction Correctness
 
@@ -90,3 +95,16 @@ successfully enqueued it, and returned its identifier.
 | **Artifact** | University ingestion extension point |
 | **Response** | Add the university-specific behaviour without altering unrelated application behaviour or existing adapters |
 | **Response measure** | The change modifies **0 Core API, persistent-schema, queue-contract, worker-orchestration, or existing-adapter implementation files**. Changes remain confined to the new adapter, registration/configuration, fixtures, and tests, and **100% of canonical contract and existing-adapter regression tests pass**. |
+
+## NFR-Sec-2 - API Vulnerability Resistance
+
+**Quality attribute:** Security - vulnerability resistance
+
+| **Part** | **UMTAS scenario** |
+|---|---|
+| **Source of stimulus** | An automated security scanning tool acting as an unauthenticated or low-privilege attacker |
+| **Stimulus** | Run an OWASP ZAP scan (baseline and authenticated full scan) against the deployed public API surface |
+| **Environment** | Staging environment, configuration equivalent to production, with a seeded test tenant and test user session |
+| **Artifact** | Public API endpoints, authentication flow, and input-handling boundary |
+| **Response** | Reject or safely handle malformed, injected, or unauthorised requests without exposing sensitive data or internal state |
+| **Response measure** | The OWASP ZAP report contains **0 alerts of medium severity or above**. Any informational/low findings are logged and triaged, but do not block release. |
