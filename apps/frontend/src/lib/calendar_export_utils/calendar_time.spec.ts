@@ -84,4 +84,47 @@ describe("calendar_time", () => {
     expect(lines).toContain("TZOFFSETFROM:+0100");
     expect(lines).toContain("TZOFFSETTO:+0000");
   });
+
+  it("does not depend on the runtime's default locale or numbering system", () => {
+    const RealDateTimeFormat = Intl.DateTimeFormat;
+    const spy = jest
+      .spyOn(Intl, "DateTimeFormat")
+      .mockImplementation(
+        (locales, options) =>
+          new RealDateTimeFormat(locales ?? "ar-EG-u-nu-arab", options),
+      );
+
+    expect(
+      getUtcOffsetMinutes("Asia/Tokyo", new Date("2026-01-15T12:00:00Z")),
+    ).toBe(540);
+    expect(spy).toHaveBeenCalledWith(
+      "en-US-u-ca-gregory-nu-latn",
+      expect.objectContaining({ timeZone: "Asia/Tokyo" }),
+    );
+    spy.mockRestore();
+  });
+
+  it("handles DST transition boundaries explicitly", () => {
+    expect(() =>
+      localToUtcBasic("America/New_York", "2026-03-08", "02:30"),
+    ).toThrow(/does not exist/);
+    expect(localToUtcBasic("America/New_York", "2026-11-01", "01:30")).toBe(
+      "20261101T053000Z",
+    );
+  });
+
+  it.each([
+    ["2026-02-29", "08:30"],
+    ["2026-13-01", "08:30"],
+    ["2026-01-01", "24:00"],
+    ["2026-01-01", "12:60"],
+  ])("rejects invalid date/time input %s %s", (date, time) => {
+    expect(() => toBasicDateTime(date, time)).toThrow(RangeError);
+  });
+
+  it("rejects unknown time zones", () => {
+    expect(() =>
+      getUtcOffsetMinutes("Not/A_Timezone", new Date("2026-01-01T00:00:00Z")),
+    ).toThrow(RangeError);
+  });
 });
