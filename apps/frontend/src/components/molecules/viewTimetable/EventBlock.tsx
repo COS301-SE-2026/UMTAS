@@ -1,11 +1,20 @@
 "use client";
 
-import React from "react";
 import { Clock } from "lucide-react";
 import type { ScheduleEvent } from "@/types/schedule";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  addEventAttendanceMut,
+  getAllEventAttendanceQ,
+  getEventAttendanceByIdQ,
+  updateEventAttendanceMut,
+} from "../../../../utilities/eventAttendance/eventAttendanceQueries";
+import { Checkbox } from "@/components/atoms/baseShadcn/checkbox";
+import { useEffect } from "react";
 
 interface EventBlockProps {
   event: ScheduleEvent;
+  date: string;
 }
 
 function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
@@ -18,7 +27,32 @@ function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
   };
 }
 
-export function EventBlock({ event }: EventBlockProps) {
+export function EventBlock({ event, date }: EventBlockProps) {
+  const { mutateAsync: createAttendance } = useMutation({
+    ...addEventAttendanceMut(),
+  });
+
+  const { mutate: updateAttendance } = useMutation({
+    ...updateEventAttendanceMut(),
+  });
+  const { data: attendData = [] } = useQuery({
+    ...getAllEventAttendanceQ({ eventID: event.id, eventDate: date }),
+  });
+
+  useEffect(() => {
+    if (attendData && attendData.length === 0) {
+      createAttendance({
+        body: {
+          eventDate: date,
+          eventID: event.id,
+          state: "NOT_ATTENDING",
+        },
+      });
+    }
+  }, [attendData, createAttendance, event.id, date]);
+
+  const currAtt = attendData[0];
+
   function getBlockStyle() {
     if (!event.accentColour) {
       return {
@@ -71,6 +105,22 @@ export function EventBlock({ event }: EventBlockProps) {
         <p className="text-[10px] text-[var(--text-secondary)] font-medium truncate">
           {event.startTime} - {event.endTime}
         </p>
+      </div>
+      <div className="flex items-center gap-1 mt-auto">
+        <Checkbox
+          checked={currAtt.state === "ATTENDING"}
+          onCheckedChange={() => {
+            updateAttendance({
+              body: {
+                state:
+                  currAtt.state === "ATTENDING" ? "NOT_ATTENDING" : "ATTENDING",
+              },
+              path: {
+                attendanceId: currAtt.AttendanceID,
+              },
+            });
+          }}
+        />
       </div>
     </div>
   );
