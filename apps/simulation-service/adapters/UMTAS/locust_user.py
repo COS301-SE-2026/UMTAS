@@ -498,6 +498,43 @@ class DomainUser(HttpUser):
             self.solver_result_ready = False
             if data.get("status") == "completed" and data.get("result"):
                 self.solver_result_ready = True
+                
+                
+    
+    @task(1)
+    def view_attendance_for_event(self):
+        if not self.known_events:
+            return
+        event_id = random.choice(list(self.known_events))
+        with self.client.get(
+            f"/api/attendance?eventID={event_id}&AlsoFilterByUser=true",
+            name="/api/attendance?eventID=[id]&AlsoFilterByUser=true",
+            catch_response=True,
+        ) as response:
+            if response.status_code == 200:
+                response.success()
+            else:
+                response.failure(f"view attendance for event failed [{response.status_code}]")
+
+    @task(1)
+    def update_attendance(self):
+        if not self.attendance_ids:
+            return
+        attendance_id = random.choice(self.attendance_ids)
+        new_state = random.choice(["ATTENDING", "NOT_ATTENDING"])
+        with self.client.patch(
+            f"/api/attendance/{attendance_id}",
+            json={"state": new_state},
+            name="/api/attendance/[id]",
+            catch_response=True,
+        ) as response:
+            if response.status_code == 200:
+                response.success()
+            elif response.status_code == 404:
+                response.success()
+                self.attendance_ids.remove(attendance_id)
+            else:
+                response.failure(f"attendance update failed [{response.status_code}]")
 
 
     @task(2)
