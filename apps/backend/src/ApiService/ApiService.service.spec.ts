@@ -37,6 +37,8 @@ import {
   ModuleSingleResponseDto,
 } from 'src/Module/dto/module.dto';
 import { BadRequestException } from '@nestjs/common';
+import { createMockDatabase, mockTransaction } from 'src/Testing/Mocks';
+import { DatabaseService } from 'src/db/database.service';
 
 const mlUni = createUniversity({
   UniversityID: uniId,
@@ -71,6 +73,7 @@ const mockMLAdapter = {
 describe('ApiService', () => {
   let service: ApiService;
 
+  const { mockDb, reset: resetDb } = createMockDatabase();
   const { mockAdapterRegistryService, reset: resetAdapterRegistry } =
     createMockAdapterRegistryService();
   const { mockUniversityService, reset: resetUni } =
@@ -85,6 +88,7 @@ describe('ApiService', () => {
     const module = await Test.createTestingModule({
       providers: [
         ApiService,
+        { provide: DatabaseService, useValue: { db: mockDb } },
         { provide: AdapterRegistry, useValue: mockAdapterRegistryService },
         { provide: UniversityService, useValue: mockUniversityService },
         { provide: CourseServiceV2, useValue: mockCourseServiceV2 },
@@ -94,7 +98,7 @@ describe('ApiService', () => {
     }).compile();
 
     service = module.get(ApiService);
-
+    mockTransaction(mockDb);
     mockAdapterRegistryService.getAdapter?.mockReturnValue(mockMLAdapter);
   }); //END_beforeEach
 
@@ -105,6 +109,7 @@ describe('ApiService', () => {
     resetCourse();
     resetModule();
     resetEvent();
+    resetDb();
 
     jest.clearAllMocks();
   });

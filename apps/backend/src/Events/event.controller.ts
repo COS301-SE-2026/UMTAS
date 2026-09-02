@@ -8,6 +8,7 @@ import {
   Delete,
   Query,
   ParseUUIDPipe,
+  BadRequestException,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -29,6 +30,8 @@ import {
   UpdateEventVenueDto,
   EventListResponseDtoV2,
   EventFiltersDtoV2,
+  EventStatsWeeklyResponseDto,
+  EventStatsVenueResponseDto,
 } from './dto/EventDto.dto';
 
 import { EventService } from './event.service';
@@ -262,6 +265,67 @@ export class EventController {
     return this.service2.validateEvent(eventId, dto.validated);
   }
 
+  //Stats
+
+  @Get('statistics/week')
+  @Roles('lecturer', 'uni_admin')
+  @ApiOperation({
+    summary: 'Event statistics - week',
+    operationId: 'eventStatisticsWeek',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Count of events on each day of the week',
+    type: EventStatsWeeklyResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'No university selected',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'University not found',
+  })
+  statisticsWeek(
+    @CurrentSession() session: SessionData,
+  ): Promise<EventStatsWeeklyResponseDto> {
+    const uniId = session.uniId;
+
+    if (!uniId) throw new BadRequestException(`No university selected`);
+
+    return this.service2.getStatisticsWeekly(uniId);
+  } //END_statistics
+
+  @Get('statistics/venue')
+  @Roles('lecturer', 'uni_admin')
+  @ApiOperation({
+    summary: 'Event statistics - venue',
+    operationId: 'eventStatisticsVenue',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Count of events for each venue',
+    type: EventStatsVenueResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'No university selected',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'University not found',
+  })
+  statisticsVenue(
+    @CurrentSession() session: SessionData,
+  ): Promise<EventStatsVenueResponseDto> {
+    const uniId = session.uniId;
+
+    if (!uniId) throw new BadRequestException(`No university selected`);
+
+    return this.service2.getStatisticsVenues(uniId);
+  } //END_statistics
+
+  //No Stats
   @Patch(':id/venue')
   @Roles('student', 'uni_admin', 'lecturer')
   @ApiOperation({
