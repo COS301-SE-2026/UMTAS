@@ -1,5 +1,7 @@
-import statsPageTemplate from "@/components/templates/stats/statsPageTemplate";
+"use client";
 
-export default async function statsPage() {
-  return statsPageTemplate();
+import StatsPageTemplate from "@/components/templates/stats/statsPageTemplate";
+
+export default function statsPage() {
+  return <StatsPageTemplate />;
 }

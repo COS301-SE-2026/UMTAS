@@ -1,3 +1,5 @@
+"use client";
+
 import UniversityStats, {
   UniversityStatsData,
 } from "@/components/organisms/stats/universityTab";
@@ -18,50 +20,88 @@ import EventsTab, {
 import ModulesTab, {
   ModuleData,
 } from "@/components/organisms/stats/modulesTab";
+import { useQuery } from "@tanstack/react-query";
+import {
+  getCourseStatsQ,
+  getEventStatsVenueQ,
+  getEventStatsWeekQ,
+  getModuleStatsQ,
+  getUniversityStatsQ,
+} from "../../../../utilities/stats/statsQueries";
 
-const mockUniversityStats: UniversityStatsData = {
-  countCourses: 100,
-  countEvents: 67,
-  countModule: 420,
-  numberOfStudents: 69690,
-};
+// const mockUniversityStats: UniversityStatsData = {
+//   countCourses: 100,
+//   countEvents: 67,
+//   countModule: 420,
+//   numberOfStudents: 69690,
+// };
 
-const mockCourseData: CourseData[] = [
-  {
-    id: "1",
-    name: "Computer Science",
-    countModules: 10,
-    countEvents: 30,
-    numberOfStudents: 67,
-  },
-  {
-    id: "2",
-    name: "Mathematics",
-    countModules: 12,
-    countEvents: 22,
-    numberOfStudents: 152,
-  },
-];
+// const mockCourseData: CourseData[] = [
+//   {
+//     id: "1",
+//     name: "Computer Science",
+//     countModules: 10,
+//     countEvents: 30,
+//     numberOfStudents: 67,
+//   },
+//   {
+//     id: "2",
+//     name: "Mathematics",
+//     countModules: 12,
+//     countEvents: 22,
+//     numberOfStudents: 152,
+//   },
+// ];
 
-const mockWeekStats: WeekStatsData[] = [
-  { day: "Mon", count: 12 },
-  { day: "Tue", count: 8 },
-  { day: "Wed", count: 15 },
-  { day: "Thu", count: 10 },
-  { day: "Fri", count: 6 },
-];
+// const mockWeekStats: WeekStatsData[] = [
+//   { day: "Mon", count: 12 },
+//   { day: "Tue", count: 8 },
+//   { day: "Wed", count: 15 },
+//   { day: "Thu", count: 10 },
+//   { day: "Fri", count: 6 },
+// ];
 
-const mockVenueStats: VenueStatsData[] = [
-  { venue: "Louw Hal", eventCount: 13, predictedAttendance: 100 },
-  { venue: "Thuto 1-1", eventCount: 9, predictedAttendance: 150 },
-];
+// const mockVenueStats: VenueStatsData[] = [
+//   { venue: "Louw Hal", eventCount: 13, predictedAttendance: 100 },
+//   { venue: "Thuto 1-1", eventCount: 9, predictedAttendance: 150 },
+// ];
 
-const mockModules: ModuleData[] = [
-  { id: "1", name: "COS 330", countEvents: 9, numberOfStudents: 112 },
-  { id: "2", name: "COS 332", countEvents: 4, numberOfStudents: 99 },
-];
+// const mockModules: ModuleData[] = [
+//   { id: "1", name: "COS 330", countEvents: 9, numberOfStudents: 112 },
+//   { id: "2", name: "COS 332", countEvents: 4, numberOfStudents: 99 },
+// ];
 
-export default async function statsPageTemplate() {
+export default function StatsPageTemplate() {
+  const {
+    data: universityStats,
+    isLoading: isUniversityLoading,
+    isError: isUniversityError,
+  } = useQuery(getUniversityStatsQ());
+
+  const {
+    data: courseStats,
+    isLoading: isCourseLoading,
+    isError: isCourseError,
+  } = useQuery(getCourseStatsQ());
+
+  const {
+    data: moduleStats,
+    isLoading: isModuleLoading,
+    isError: isModuleError,
+  } = useQuery(getModuleStatsQ());
+
+  const {
+    data: weekStats,
+    isLoading: isWeekLoading,
+    isError: isWeekError,
+  } = useQuery(getEventStatsWeekQ());
+
+  const {
+    data: venueStats,
+    isLoading: isVenueLoading,
+    isError: isVenueError,
+  } = useQuery(getEventStatsVenueQ());
+
   return (
     <div className="container mx-auto py-10 space-y-6">
       <div>
@@ -92,31 +132,37 @@ export default async function statsPageTemplate() {
 
           <TabsContent value="university" className="space-y-6">
             <UniversityStats
-              data={mockUniversityStats}
-              isLoading={false}
-              isError={false}
+              data={universityStats}
+              isLoading={isUniversityLoading}
+              isError={isUniversityError}
             />
           </TabsContent>
 
           <TabsContent value="courses">
             <CoursesTab
-              data={mockCourseData}
-              isLoading={false}
-              isError={false}
+              data={courseStats}
+              isLoading={isCourseLoading}
+              isError={isCourseError}
+            />
+          </TabsContent>
+
+          <TabsContent value="modules">
+            <ModulesTab
+              data={moduleStats}
+              isLoading={isModuleLoading}
+              isError={isModuleError}
             />
           </TabsContent>
 
           <TabsContent value="events">
             <EventsTab
-              isErrorWeek={false}
-              isLoadingVenue={false}
-              venueData={mockVenueStats}
-              weekData={mockWeekStats}
+              weekData={weekStats}
+              isLoadingWeek={isWeekLoading}
+              isErrorWeek={isWeekError}
+              venueData={venueStats}
+              isLoadingVenue={isVenueLoading}
+              isErrorVenue={isVenueError}
             />
-          </TabsContent>
-
-          <TabsContent value="modules">
-            <ModulesTab data={mockModules} isLoading={false} isError={false} />
           </TabsContent>
         </Tabs>
       </div>
