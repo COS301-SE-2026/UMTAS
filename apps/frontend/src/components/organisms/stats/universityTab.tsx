@@ -41,25 +41,25 @@ export default function UniversityStats({
       <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
         <StatCard
           title="Courses"
-          value={data?.countCourses}
+          value={data?.countCourses ?? 0}
           isLoading={isLoading}
           icon={<BookOpen className="h-4 w-4" />}
         />
         <StatCard
           title="Events"
-          value={data?.countEvents}
+          value={data?.countEvents ?? 0}
           isLoading={isLoading}
           icon={<Calendar className="h-4 w-4" />}
         />
         <StatCard
           title="Modules"
-          value={data?.countModule}
+          value={data?.countModule ?? 0}
           isLoading={isLoading}
           icon={<GraduationCap className="h-4 w-4" />}
         />
         <StatCard
           title="Students at University"
-          value={data?.numberOfStudents}
+          value={data?.numberOfStudents ?? 0}
           isLoading={isLoading}
           icon={<Users className="h-4 w-4" />}
         />

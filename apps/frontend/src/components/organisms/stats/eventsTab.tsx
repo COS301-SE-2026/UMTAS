@@ -64,28 +64,28 @@ export default function EventsTab({
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatCard
           title="Event Count this Week"
-          value={totalEventsThisWeek}
+          value={totalEventsThisWeek ?? 0}
           isLoading={isLoadingWeek}
           icon={<BookOpen className={"h-4 w-4"} />}
         />
         <StatCard
           title="Busiest day"
-          value={busiestDay?.count}
-          description={busiestDay?.day}
+          value={busiestDay?.count ?? 0}
+          description={busiestDay?.day ?? ""}
           isLoading={isLoadingWeek}
           icon={<Calendar className={"h-4 w-4"} />}
         />
         <StatCard
           title="Busiest Venue by Events"
-          value={busiestVenueByEvents?.venue}
-          description={`${busiestVenueByEvents?.eventCount} events`}
+          value={busiestVenueByEvents?.venue ?? ""}
+          description={`${busiestVenueByEvents?.eventCount ?? 0} events`}
           isLoading={isLoadingVenue}
           icon={<Flame className={"h-4 w-4"} />}
         />
         <StatCard
           title="Busiest Venue by Attendance"
           value={busiestVenueByAttendance?.venue}
-          description={`${busiestVenueByAttendance?.eventCount} events`}
+          description={`${busiestVenueByAttendance?.eventCount ?? 0} events`}
           isLoading={isLoadingVenue}
           icon={<TrendingUp className={"h-4 w-4"} />}
         />
