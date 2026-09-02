@@ -113,15 +113,12 @@ function DateRestrictionHTML({
       },
     });
   }
-
   const minDate = `${academicCalendarID.year}-01-01`;
   const maxDate = `${academicCalendarID.year}-12-31`;
-
   return (
     <div className="flex flex-col w-full gap-y-4">
-      {/* Date Row */}
       <div className="flex flex-col gap-y-1.5 w-full">
-        <Label className="text-sm font-medium text-[var(--text-secondary)] text-left">
+        <Label className="text-sm font-medium text-[var(--text-primary)] text-left">
           Selected date
         </Label>
         <div className="flex flex-row items-center gap-x-5 w-full">
@@ -159,7 +156,7 @@ function DateRestrictionHTML({
       </div>
 
       <div className="flex flex-col gap-y-1.5 w-full">
-        <Label className="text-sm font-medium text-[var(--text-secondary)] text-left">
+        <Label className="text-sm font-medium text-[var(--text-primary)] text-left">
           Description
         </Label>
         <div className="flex flex-row items-center gap-x-5 w-full">

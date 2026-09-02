@@ -111,7 +111,7 @@ export default function CalTemplate() {
   useErrorListener();
   return (
     <div className=" items-center flex flex-col gap-6 w-full px-6 capitalize">
-      <div className="w-full  h-full max-w-6xl overflow-auto border border-[var(--border)] rounded-xl  shadow-sm">
+      <div className="w-full  h-full max-w-6xl bg-[var(--bg-surface)] overflow-auto border border-[var(--border)] rounded-xl  shadow-sm">
         <h1 className="text-lg font-semibold text-[var(--text-primary)] pl-4 pt-4">
           Calendar Management
         </h1>
@@ -119,63 +119,67 @@ export default function CalTemplate() {
           Update and manage calendars by year
         </p>
         <div className="flex flex-col md:flex-row gap-4 p-5  items-center justify-between ">
-          <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-            <Select
-              value={selectedYear}
-              onValueChange={async (e) => {
-                setSelectedYear(e);
-                const year = Number(e);
+          <div className="flex flex-wrap items-start gap-3 w-full md:w-auto">
+            <div className="flex flex-col gap-2">
+              <Select
+                value={selectedYear}
+                onValueChange={async (e) => {
+                  setSelectedYear(e);
+                  const year = Number(e);
 
-                const AC = academicCalendars.find((ac) => year === ac.year);
-                if (AC == undefined || AC == null || AC.id == "") {
-                  await createACmut({
-                    year: year,
-                  });
-                }
-              }}
-            >
-              <SelectTrigger
-                id="select-year"
-                className="w-[180px] bg-[var(--background)]"
-              >
-                <SelectValue placeholder="Year" />
-              </SelectTrigger>
-              <SelectContent>
-                {years.map((year, idx) => (
-                  <SelectItem key={idx} value={year}>
-                    {year}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Label
-              htmlFor="include-public-holidays"
-              className="cursor-pointer whitespace-nowrap"
-            >
-              <Checkbox
-                id="include-public-holidays"
-                checked={includePublicHolidays}
-                disabled={
-                  !selectedAcID ||
-                  !publicHolidayCalendar ||
-                  isUpdatingSubscriptions
-                }
-                onCheckedChange={(checked) => {
-                  if (!selectedAcID || !publicHolidayCalendar) return;
-
-                  updateSubscriptions({
-                    paths: { id: selectedAcID },
-                    body: {
-                      subscriptions: checked ? [publicHolidayCalendar.id] : [],
-                    },
-                  });
+                  const AC = academicCalendars.find((ac) => year === ac.year);
+                  if (AC == undefined || AC == null || AC.id == "") {
+                    await createACmut({
+                      year: year,
+                    });
+                  }
                 }}
-              />
-              Include public holidays
-            </Label>
+              >
+                <SelectTrigger
+                  id="select-year"
+                  className="w-[180px] bg-[var(--background)]"
+                >
+                  <SelectValue placeholder="Year" />
+                </SelectTrigger>
+                <SelectContent>
+                  {years.map((year, idx) => (
+                    <SelectItem key={idx} value={year}>
+                      {year}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Label
+                htmlFor="include-public-holidays"
+                className="cursor-pointer whitespace-nowrap flex items-center gap-2 pl-1 pt-2"
+              >
+                <Checkbox
+                  id="include-public-holidays"
+                  checked={includePublicHolidays}
+                  disabled={
+                    !selectedAcID ||
+                    !publicHolidayCalendar ||
+                    isUpdatingSubscriptions
+                  }
+                  onCheckedChange={(checked) => {
+                    if (!selectedAcID || !publicHolidayCalendar) return;
+
+                    updateSubscriptions({
+                      paths: { id: selectedAcID },
+                      body: {
+                        subscriptions: checked
+                          ? [publicHolidayCalendar.id]
+                          : [],
+                      },
+                    });
+                  }}
+                />
+                Include public holidays
+              </Label>
+            </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button className="w-50 capitalize">create restriction</Button>
+                <Button className="w-fit capitalize">create restriction</Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <DropdownMenuGroup>
@@ -205,18 +209,19 @@ export default function CalTemplate() {
             </DropdownMenu>
             <Button
               hidden={!flagtempRes}
+              variant={"destructive"}
               onClick={() => {
                 setTempRes(null);
                 setFlagTempRes(false);
               }}
             >
-              Clear Created restriction
+              Clear
             </Button>
           </div>
         </div>
         <div className="w-full h-full items-center flex flex-col p-4 px-10">
           {flagtempRes && tempRes && selectedAcID && (
-            <div className="  border-dashed border-5 rounded-2xl my-2  flex flex-col items-center p-5 h-1/4">
+            <div className="border-dashed border-2 rounded-2xl my-2  flex flex-col items-center p-3 h-1/4">
               <div key={tempRes.type}>
                 {handlers.handle(tempRes, currentAC, () => {
                   setFlagTempRes(false);

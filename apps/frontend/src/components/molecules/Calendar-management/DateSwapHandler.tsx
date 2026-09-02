@@ -145,7 +145,7 @@ function DateSwapHtml({
       <div className="flex flex-row items-end gap-x-5 w-full">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 w-full">
           <div className="flex flex-col gap-y-1.5 w-full">
-            <Label className="text-sm font-medium text-[var(--text-secondary)] text-left">
+            <Label className="text-sm font-medium text-[var(--text-primary)] text-left">
               Start Date
             </Label>
             <Input
