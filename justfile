@@ -110,9 +110,6 @@ prod-up release_tag:
 prod-down release_tag:
      IMAGE_TAG={{ release_tag }} phase run --env production -- docker compose -p umtas-prod -f docker-compose.prod.yml down
 
-# execute migrations on prod
-prod-migrate:
-    phase run --env production -- docker compose -f docker-compose.prod.yml exec -T backend npx drizzle-kit migrate
 
 # manual prod deployment
 
