@@ -1,0 +1,16 @@
+docker-compose.prod.yml
+  h_2d4b3dca70a3d8 152-153
+justfile
+  h_2d4b3dca70a3d8 275-276
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "4b31435056b8c9ee46bd1c1df33b22bb27acddd3",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
