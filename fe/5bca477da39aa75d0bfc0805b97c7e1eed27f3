@@ -1,0 +1,18 @@
+apps/backend/package.json
+  h_2d4b3dca70a3d8 34,79
+apps/backend/src/db/database.service.ts
+  h_2d4b3dca70a3d8 78-86,126
+pnpm-lock.yaml
+  h_2d4b3dca70a3d8 72-73,109,124,202-203,299,1439,1442,5641,5644,15767,15772,16009,18834,19513,19516,19534,20344,20346,20348
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "fe5bca477da39aa75d0bfc0805b97c7e1eed27f3",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
