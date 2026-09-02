@@ -33,6 +33,7 @@ plugins:
   - glightbox
   - drawio
   - swagger-ui-tag
+  - mkdocs-pdf
   - minify:
       minify_html: true
   - git-revision-date-localized:
