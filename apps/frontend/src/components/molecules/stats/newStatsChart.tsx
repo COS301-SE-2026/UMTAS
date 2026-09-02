@@ -101,7 +101,12 @@ export default function DynamicChart({
             <YAxis tickLine={false} axisLine={false} />
             <ChartTooltip content={<ChartTooltipContent />} />
             {yKey.map((key) => (
-              <Bar key={key} dataKey={key} fill={"var(--chart-2)"} radius={4} />
+              <Bar
+                key={key}
+                dataKey={key}
+                fill={`var(--color-${key})`}
+                radius={4}
+              />
             ))}
           </BarChart>
         );
@@ -118,7 +123,12 @@ export default function DynamicChart({
             />
             <ChartTooltip content={<ChartTooltipContent />} />
             {yKey.map((key) => (
-              <Bar key={key} dataKey={key} fill={"var(--chart-2)"} radius={4} />
+              <Bar
+                key={key}
+                dataKey={key}
+                fill={`var(--color-${key})`}
+                radius={4}
+              />
             ))}
           </BarChart>
         );
@@ -131,7 +141,12 @@ export default function DynamicChart({
             <ChartLegend content={<ChartLegendContent />} />
             <ChartTooltip content={<ChartTooltipContent />} />
             {yKey.map((key) => (
-              <Bar key={key} dataKey={key} fill={"var(--chart-2)"} radius={4} />
+              <Bar
+                key={key}
+                dataKey={key}
+                fill={`var(--color-${key})`}
+                radius={4}
+              />
             ))}
           </BarChart>
         );
@@ -142,13 +157,12 @@ export default function DynamicChart({
             <XAxis dataKey={xKey} tickLine={false} axisLine={false} />
             <YAxis tickLine={false} axisLine={false} />
             <ChartTooltip content={<ChartTooltipContent />} />
-            <ChartTooltip content={<ChartTooltipContent />} />
             {yKey.map((key) => (
               <Bar
                 key={key}
                 stackId="stack"
                 dataKey={key}
-                fill={"var(--chart-2)"}
+                fill={`var(--color-${key})`}
                 radius={4}
               />
             ))}
@@ -166,9 +180,9 @@ export default function DynamicChart({
                 key={key}
                 dataKey={key}
                 type="monotone"
-                fill="var(--chart-2)"
+                fill={`var(--color-${key})`}
                 fillOpacity={0.2}
-                stroke="var(--chart-2)"
+                stroke={`var(--color-${key})`}
               />
             ))}
           </AreaChart>
@@ -186,7 +200,7 @@ export default function DynamicChart({
                 type="monotone"
                 dataKey={key}
                 strokeWidth={2}
-                stroke="var(--chart-2)"
+                stroke={`var(--color-${key})`}
               />
             ))}
           </LineChart>

@@ -70,7 +70,7 @@ export default function UniversityStats({
         description="Counts courses, events and modules."
         type="bar"
         data={dynamicChartData}
-        config={{ count: { label: "Count", color: "var(--chart-1)" } }}
+        config={{ count: { label: "Count", color: "var(--chart-3)" } }}
         xKey="xKey"
         yKey={["count"]}
         height={300}
