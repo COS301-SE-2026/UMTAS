@@ -9,6 +9,7 @@ import {
   AlertCircle,
   AwardIcon,
   ArrowUpWideNarrow,
+  University,
 } from "lucide-react";
 import {
   EventCard,
@@ -16,6 +17,7 @@ import {
 } from "@/components/molecules/builder/EventCard";
 import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
 import {
+  createEventRes,
   EventCriteria,
   EventResponse,
 } from "@/app/builder/utils/events/eventRequestBuilder";
@@ -36,11 +38,20 @@ import {
   getAllEventsQ,
   removeEventMut,
   updateEventMut,
+  updateEventVenueMut,
 } from "@/components/templates/builder/Queries/eventQueries";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
+import {
+  getAllEventAttendanceQ,
+  addEventAttendanceMut,
+  removeEventAttendanceMut,
+} from "../../../../utilities/eventAttendance/eventAttendanceQueries";
+import { getAllBuildingsQ } from "../../../../utilities/building/buildingQueries";
 
 import Tutorial from "@/components/organisms/nav/Tutorial";
+import { useErrorListener } from "@/hooks/errorListener";
+import { errorName } from "../../../../utilities/errorCries";
 
 const baseSteps = [
   {
@@ -160,7 +171,7 @@ export function EventsStep({
   const [isDirty, setIsDirty] = useState(false);
   const [showGuard, setShowGuard] = useState(false);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
-
+  const [createdEvent, setCreatedEvent] = useState<createEventRes>();
   const steps =
     events.length > 0 ? [...extendedSteps, ...baseSteps] : baseSteps;
 
@@ -168,24 +179,46 @@ export function EventsStep({
   const deleteEvent = useMutation(removeEventMut());
   const updateEvent = useMutation(updateEventMut());
 
+  const { data: attendanceList } = useQuery(getAllEventAttendanceQ());
+  const addEventAttendance = useMutation(addEventAttendanceMut());
+  const removeEventAttendance = useMutation(removeEventAttendanceMut());
+
+  const { data: buildingsList } = useQuery(getAllBuildingsQ());
+  const buildings = buildingsList ?? [];
+
+  const updateEventVenue = useMutation(updateEventVenueMut());
+  useErrorListener();
+
   // a local construct to add an empty event
-  function addNewEvent() {
-    addEvent.mutate({
+  async function addNewEvent() {
+    const result = await addEvent.mutateAsync({
       body: {
-        activityCode: "L1",
-        isRecurring: false,
-        eventName: "Name",
-        activityType: "lecture",
         eventCriteria: {
+          startTime: "07:30",
+          endTime: "08:30",
           eventSource: "university",
-          date: new Date().toISOString().split("T")[0],
-          startTime: "07:00",
-          endTime: "07:30",
           moduleId: modules[0].moduleID,
         },
-        validated: true,
       },
     });
+
+    if (result.event.eventId == createdEvent?.event.eventId) {
+      window.dispatchEvent(
+        new CustomEvent(errorName, {
+          detail: {
+            userMessage:
+              "Please update the details of the event before creating more",
+          },
+        }),
+      );
+    } else {
+      console.log(
+        result.event.eventId,
+        "created event",
+        createdEvent?.event.eventId,
+      );
+      setCreatedEvent(result);
+    }
   }
 
   function requestNavigation(action: () => void) {
@@ -254,26 +287,48 @@ export function EventsStep({
       return next;
     });
 
-    const cleanCriteria = { ...event.eventCriteria };
+    const thisEventCriteria = { ...event.eventCriteria } as EventCriteria & {
+      buildingId?: string;
+    };
+
+    const selectedBuildingId = thisEventCriteria.buildingId;
+    delete thisEventCriteria.buildingId;
 
     if (event.isRecurring) {
-      delete cleanCriteria.date;
+      delete thisEventCriteria.date;
     } else {
-      delete cleanCriteria.dayOfWeek;
+      delete thisEventCriteria.dayOfWeek;
     }
 
-    updateEvent.mutate({
-      body: {
-        isRecurring: event.isRecurring,
-        activityType: event.activityType,
-        activityCode: event.activityCode,
-        eventCriteria: cleanCriteria,
-        eventName: event.eventName,
-      },
-      path: {
-        id: id,
-      },
-    });
+    const selectedVenueName =
+      typeof event.venues?.[0] === "string"
+        ? event.venues[0]
+        : event.venues?.[0]?.venueName;
+
+    if (selectedVenueName?.trim()) {
+      updateEventVenue.mutate({
+        path: { id: id },
+        body: {
+          venueName: selectedVenueName.trim(),
+          buildingId: selectedBuildingId || undefined,
+        },
+      });
+    }
+
+    if (event.eventCriteria?.eventSource === "university") {
+      updateEvent.mutate({
+        body: {
+          isRecurring: event.isRecurring,
+          activityType: event.activityType,
+          activityCode: event.activityCode,
+          eventCriteria: thisEventCriteria,
+          eventName: event.eventName,
+        },
+        path: {
+          id: id,
+        },
+      });
+    }
 
     setIsDirty(false);
     setSelectedId(null);
@@ -303,8 +358,8 @@ export function EventsStep({
 
   function handleUpdate(
     id: string,
-    field: keyof EventResponse | keyof EventCriteria,
-    value: string | boolean,
+    field: keyof EventResponse | keyof EventCriteria | "buildingId",
+    value: string | boolean | string[],
   ) {
     setIsDirty(true);
     getQueryClient().setQueryData(
@@ -326,6 +381,42 @@ export function EventsStep({
         );
       },
     );
+  }
+
+  function handleAttendanceCheckbox(
+    eventId: string,
+    isAttendingEvent: boolean,
+  ) {
+    const event = events.find((event) => event.eventId === eventId);
+    if (!event) {
+      return;
+    }
+
+    const attendanceDate =
+      event.eventCriteria?.date || new Date().toISOString().substring(0, 10);
+
+    if (isAttendingEvent) {
+      addEventAttendance.mutate({
+        body: {
+          eventID: eventId,
+          state: "ATTENDING",
+          eventDate: attendanceDate,
+        },
+      });
+    } else {
+      const attendanceInfo = attendanceList?.attendanceList?.find(
+        (eventAttendance: {
+          eventID: string;
+          eventDate: string;
+          state: "ATTENDING" | "NOT_ATTENDING";
+          AttendanceID: string;
+        }) => eventAttendance.eventID === eventId,
+      );
+
+      if (attendanceInfo?.AttendanceID) {
+        removeEventAttendance.mutate(attendanceInfo.AttendanceID);
+      }
+    }
   }
 
   function renderEmptyState() {
@@ -439,9 +530,18 @@ export function EventsStep({
             <EventCard
               event={event}
               modules={modules}
+              buildings={buildings}
               onUpdate={handleUpdate}
               onGoToModules={onGoToModules}
               errors={errors}
+              isAttending={
+                attendanceList?.attendanceList?.some(
+                  (attendanceEvennt: { eventID: string; state: string }) =>
+                    attendanceEvennt.eventID === event.eventId &&
+                    attendanceEvennt.state === "ATTENDING",
+                ) ?? false
+              }
+              onAttendanceChange={handleAttendanceCheckbox}
             />
 
             <Button

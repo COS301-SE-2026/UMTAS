@@ -430,8 +430,10 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * Get all modules with filters - V2
+     * Get all modules with filters and counts - V2
      * @description Filter by userId(enrolled) | courseId(course owned) | universityId(modules for university over all courses). At least one filter required
+     *
+     *           Enable stats response: filters: { stats=t/true/True/TRUE/1 }
      */
     get: operations["getAllModulesV2"];
     put?: never;
@@ -590,7 +592,10 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** Get all courses - V2 */
+    /**
+     * Get all courses - V2
+     * @description Use filters and enable stats mode in filters
+     */
     get: operations["getCoursesV2"];
     put?: never;
     post?: never;
@@ -795,7 +800,10 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** Get all events */
+    /**
+     * Get all events
+     * @description Apply filters - Enable stats mode with filters.stats=TRUE
+     */
     get: operations["getAllEvents"];
     put?: never;
     /** Create an event */
@@ -856,6 +864,23 @@ export interface paths {
     head?: never;
     /** Validate an event */
     patch: operations["validateEvent"];
+    trace?: never;
+  };
+  "/api/events/{id}/venue": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** Attach or clear an event's venue */
+    patch: operations["updateEventVenue"];
     trace?: never;
   };
   "/api/timetables": {
@@ -921,6 +946,26 @@ export interface paths {
     };
     /** Get timetable by ID */
     get: operations["getTimetableByIdV2"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/builder/personalModule": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get personal module
+     * @description Get the personal module that owns your personal events
+     */
+    get: operations["BuilderController_getPersonalModule"];
     put?: never;
     post?: never;
     delete?: never;
@@ -1220,6 +1265,165 @@ export interface paths {
     patch: operations["updateAttendance"];
     trace?: never;
   };
+  "/api/venues": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get all venues
+     * @description Get all venues from current selected uni
+     */
+    get: operations["VenueController_getAllVenues"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/venues/{venueId}/building": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /**
+     * Assign a venue to a building
+     * @description Send buildingId to assign or null to unassign the venue
+     */
+    patch: operations["VenueController_assignBuilding"];
+    trace?: never;
+  };
+  "/api/venues/assign": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Assign several venues to buildings in one request
+     * @description Used by the venue mapping screen for multiple selection assignment
+     */
+    post: operations["VenueController_bulkAssign"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/buildings": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get all buildings
+     * @description Get all buildings from current selected uni
+     */
+    get: operations["BuildingController_getAllBuildings"];
+    put?: never;
+    /** Create a building as uni admin */
+    post: operations["BuildingController_createBuilding"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/buildings/{buildingId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /**
+     * Update a building pin and/or drawn polygon
+     * @description Only admins can do this. Send location and/or footprint, omitted fields are left unchanged. Send null to erase.
+     */
+    patch: operations["BuildingController_updateBuildingLocation"];
+    trace?: never;
+  };
+  "/api/map-config": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get map settings for the selected university */
+    get: operations["MapConfigController_getMapConfig"];
+    /** Set or update map settings for the selected university */
+    put: operations["MapConfigController_update"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/routes": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get a walking route between an origin and a destination building
+     * @description Returns cached route if one exists, otherwise fetches it from OpenRouteService and caches it in the DB.
+     */
+    get: operations["RouteController_getRoute"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/routes/active": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get student route status at certain date/time
+     * @description Returns whether the student as at a venue, moving between two venues, or has no planned event in that time
+     */
+    get: operations["RouteController_getActiveRoute"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/academic-calendar/generate": {
     parameters: {
       query?: never;
@@ -1231,7 +1435,7 @@ export interface paths {
     put?: never;
     /**
      * Generate and persist a calendar snapshot
-     * @description Generates a restriction-aware pseudo-calendar snapshot using the selected university's current-year academic calendar and a timetable owned by the authenticated student.
+     * @description Generates a restriction-aware pseudo-calendar snapshot using the selected university's requested academic year and a timetable owned by the authenticated student.
      */
     post: operations["generateCalendar"];
     delete?: never;
@@ -1240,7 +1444,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/academic-calendar/generate/{id}": {
+  "/api/academic-calendar/generated/{id}": {
     parameters: {
       query?: never;
       header?: never;
@@ -1252,6 +1456,26 @@ export interface paths {
      * @description Returns a generated snapshot only when its timetable belongs to the authenticated student.
      */
     get: operations["getGeneratedCalendar"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/academic-calendar/public": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List public academic calendars
+     * @description Returns public calendars available for subscription, optionally filtered by academic year.
+     */
+    get: operations["listPublicAcademicCalendars"];
     put?: never;
     post?: never;
     delete?: never;
@@ -1388,6 +1612,26 @@ export interface paths {
      * @description Fetches courses for the authenticated user's university.
      */
     get: operations["ApiServiceController_getCourses"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/api-service/course": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get a specific course
+     * @description Returns the specified course together with its module and events.
+     */
+    get: operations["ApiServiceController_getCourse"];
     put?: never;
     post?: never;
     delete?: never;
@@ -1942,6 +2186,17 @@ export interface components {
       /** @description Short message indicating  success of response. */
       message?: string;
     };
+    ModuleListResponseDtoV2: {
+      /** @description List of modules */
+      modules: components["schemas"]["ModuleSingleResponseDto"][];
+      /** @description Short message indicating  success of response. */
+      message?: string;
+      /**
+       * @description Count of Modules
+       * @example 68
+       */
+      count?: number;
+    };
     UpdateModuleDto: {
       /**
        * @description Module code used by the university
@@ -2266,6 +2521,16 @@ export interface components {
     CourseListResponseDto: {
       /** @description List of courses */
       courses: components["schemas"]["CourseDto"][];
+      message?: string;
+    };
+    CourseListResponseDtoV2: {
+      /** @description List of courses */
+      courses: components["schemas"]["CourseDto"][];
+      /**
+       * @description Count of Modules
+       * @example 68
+       */
+      count?: number;
       message?: string;
     };
     UpdateCourseDto: {
@@ -2626,8 +2891,13 @@ export interface components {
        */
       activityType?: "lecture" | "tutorial" | "prac" | "test" | "exam";
     };
-    EventListResponseDto: {
+    EventListResponseDtoV2: {
       events: components["schemas"]["EventDto"][];
+      /**
+       * @description Count of Modules
+       * @example 68
+       */
+      count?: number;
       message?: string;
     };
     UpdateEventCriteriaDto: {
@@ -2677,6 +2947,15 @@ export interface components {
     ValidateEventResponseDto: {
       event: components["schemas"]["EventDto"];
       message?: string;
+    };
+    UpdateEventVenueDto: {
+      /** @description The venue name */
+      venueName: string;
+      /**
+       * Format: uuid
+       * @description The selected buildingdD
+       */
+      buildingId?: string;
     };
     CreateTimetableDto: {
       /**
@@ -3185,6 +3464,263 @@ export interface components {
        */
       success: boolean;
     };
+    Object: Record<string, never>;
+    VenueMappingDto: {
+      /**
+       * Format: uuid
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      venueId: string;
+      /** @example IT-2-26 */
+      venueName: string | null;
+      /**
+       * Format: uuid
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      buildingId: string | null;
+      /** @example IT Building */
+      buildingName: string | null;
+    };
+    VenueMappingListResponseDto: {
+      /** @description List of venue mappings */
+      venues: components["schemas"]["VenueMappingDto"][];
+    };
+    AssignVenueBuildingDto: {
+      /**
+       * Format: uuid
+       * @description Assigns a venue to a building
+       */
+      buildingId: string | null;
+    };
+    VenueAssignmentDto: {
+      /** Format: uuid */
+      venueId: string;
+      /** Format: uuid */
+      buildingId: string | null;
+    };
+    BulkAssignVenuesDto: {
+      assignments: components["schemas"]["VenueAssignmentDto"][];
+    };
+    BulkAssignResponseDto: {
+      /** @example 7 */
+      updated: number;
+      /** @example true */
+      success: Record<string, never>;
+    };
+    LatLngDto: {
+      /**
+       * @description Latitude in decimal degrees
+       * @example -25.7545
+       */
+      lat: number;
+      /**
+       * @description Longitude in decimal degrees
+       * @example 28.2314
+       */
+      lng: number;
+    };
+    BuildingDto: {
+      /**
+       * Format: uuid
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      buildingId: string;
+      /** @example IT Building */
+      buildingName: string;
+      /** @description null when the building has not been placed on the map yet */
+      location: components["schemas"]["LatLngDto"] | null;
+      footprint: {
+        [key: string]: unknown;
+      } | null;
+      /** @example school */
+      icon: string | null;
+      /** @example #4A5468 */
+      displayColour: string | null;
+      /**
+       * @description Number of venues assigned to this building (current count)
+       * @example 12
+       */
+      venueCount: number;
+    };
+    BuildingListResponseDto: {
+      /** @description List of buildings */
+      buildings: components["schemas"]["BuildingDto"][];
+    };
+    CreateBuildingDto: {
+      /**
+       * @description Name of the building. Must be unique within the university.
+       * @example Information Technology Building
+       */
+      buildingName: string;
+      /** @description Map position. Omit to create the building unpinned. Admin places it then later. */
+      location?: components["schemas"]["LatLngDto"] | null;
+      /**
+       * @description GeoJSON Polygon outlining the building. Positions are [long, lat]. The ring must be closed...
+       * @example {
+       *       "type": "Polygon",
+       *       "coordinates": [
+       *         [
+       *           [
+       *             28.2314,
+       *             -25.7545
+       *           ],
+       *           [
+       *             28.2318,
+       *             -25.7545
+       *           ],
+       *           [
+       *             28.2318,
+       *             -25.7549
+       *           ],
+       *           [
+       *             28.2314,
+       *             -25.7549
+       *           ],
+       *           [
+       *             28.2314,
+       *             -25.7545
+       *           ]
+       *         ]
+       *       ]
+       *     }
+       */
+      footprint?: {
+        [key: string]: unknown;
+      } | null;
+      /**
+       * @description Icon key used when rendering the building marker
+       * @example uni
+       */
+      icon?: string | null;
+      /**
+       * @description Hex colour used when rendering the building
+       * @example #4A5548
+       */
+      displayColour?: string | null;
+    };
+    BuildingSingleResponseDto: {
+      building: components["schemas"]["BuildingDto"];
+    };
+    UpdateBuildingLocationDto: {
+      /** @description The location of the building pin. Sending null will unpin */
+      location?: components["schemas"]["LatLngDto"] | null;
+      /** @description GeoJSON polygon outline for the building. Send null to clear the polygon. */
+      footprint?: {
+        [key: string]: unknown;
+      } | null;
+    };
+    MapConfigDto: {
+      /**
+       * @description North part of the campus
+       * @example 69.69
+       */
+      NorthLat: number;
+      /**
+       * @description South part of the campus
+       * @example 67.67
+       */
+      SouthLat: number;
+      /**
+       * @description East part of the campus
+       * @example 67.67
+       */
+      EastLng: number;
+      /**
+       * @description West part of the campus
+       * @example -67.67
+       */
+      WestLng: number;
+      /**
+       * @description The zoom level for the map
+       * @example 10
+       */
+      DefaultZoom: number;
+      /**
+       * @description Id for the google map id for cloud styling
+       * @example lalala-123
+       */
+      GoogleMapID: string | null;
+    };
+    UpdateMapConfigDto: {
+      /**
+       * @description North part of the campus
+       * @example 69.69
+       */
+      NorthLat: number;
+      /**
+       * @description South part of the campus
+       * @example 67.67
+       */
+      SouthLat: number;
+      /**
+       * @description East part of the campus
+       * @example 67.67
+       */
+      EastLng: number;
+      /**
+       * @description West part of the campus
+       * @example -67.67
+       */
+      WestLng: number;
+      /**
+       * @description The zoom level for the map
+       * @example 10
+       */
+      DefaultZoom: number;
+      /**
+       * @description Id for the google map id for cloud styling
+       * @example lalala-123
+       */
+      GoogleMapID: string | null;
+    };
+    RouteDto: {
+      /**
+       * Format: uuid
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      routeId: string;
+      /**
+       * Format: uuid
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      originBuildingId: string;
+      /**
+       * Format: uuid
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      destinationBuildingId: string;
+      /** @description List of lat/long coordinates for the route path */
+      pathCoordinates: Record<string, never>[][];
+      /**
+       * @description The route distance in metres
+       * @example 67
+       */
+      distanceMetres: number;
+      /**
+       * @description The hex colour for the polyline (path)
+       * @example #0000FF
+       */
+      displayColour: string;
+    };
+    RouteSingleResponseDto: {
+      route: components["schemas"]["RouteDto"];
+    };
+    /** @enum {string} */
+    ActiveRouteStatus: "AT_VENUE" | "MOVING" | "NONE";
+    ActiveRouteResponseDto: {
+      /** @example MOVING */
+      status: components["schemas"]["ActiveRouteStatus"];
+      /**
+       * Format: uuid
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      currentBuildingId?: string | null;
+      route?: components["schemas"]["RouteDto"];
+      /** @example Lecture 1 */
+      fromEventName?: string;
+      /** @example Lecture 2 */
+      toEventName?: string;
+    };
     GenerateCalendarDto: {
       /**
        * Format: uuid
@@ -3192,6 +3728,11 @@ export interface components {
        * @example 339cd591-7c62-4ea7-8a2b-602598553133
        */
       timetableId: string;
+      /**
+       * @description Academic year to generate. Defaults to the current UTC year.
+       * @example 2027
+       */
+      year?: number;
     };
     /** @enum {string} */
     Weekday:
@@ -3339,13 +3880,6 @@ export interface components {
       id: string;
       payload: components["schemas"]["GeneratedCalendarPayloadDto"];
     };
-    CreateAcademicCalendarDto: {
-      /**
-       * @description Four-digit academic year. A university may have only one calendar per year.
-       * @example 2026
-       */
-      year: number;
-    };
     AcademicCalendarDto: {
       /**
        * Format: uuid
@@ -3365,6 +3899,13 @@ export interface components {
        *     ]
        */
       subscriptions: string[];
+    };
+    CreateAcademicCalendarDto: {
+      /**
+       * @description Four-digit academic year. A university may have only one calendar per year.
+       * @example 2026
+       */
+      year: number;
     };
     CalendarRestrictionDto: {
       /**
@@ -3482,6 +4023,10 @@ export interface components {
        * @enum {boolean}
        */
       success: true;
+    };
+    EventListResponseDto: {
+      events: components["schemas"]["EventDto"][];
+      message?: string;
     };
   };
   responses: never;
@@ -4406,6 +4951,8 @@ export interface operations {
         moduleCode?: string;
         /** @description Choose to filter modules based of current user enrollments */
         userEnrollment?: boolean;
+        /** @description Enable stats = TRUE */
+        Stats?: boolean;
       };
       header?: never;
       path?: never;
@@ -4419,7 +4966,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["ModuleListResponseDto"];
+          "application/json": components["schemas"]["ModuleListResponseDtoV2"];
         };
       };
       /** @description Invalid filters */
@@ -4839,8 +5386,10 @@ export interface operations {
         UniversityID?: string;
         /** @description Name of the course */
         CourseName?: string;
-        /** @description Filter by Degree */
+        /** @description Degree that course belongs to */
         Degree?: string | null;
+        /** @description Enable stats = TRUE */
+        Stats?: boolean;
       };
       header?: never;
       path?: never;
@@ -4854,7 +5403,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["CourseListResponseDto"];
+          "application/json": components["schemas"]["CourseListResponseDtoV2"];
         };
       };
     };
@@ -5415,6 +5964,8 @@ export interface operations {
         moduleId?: string;
         timetableId?: string;
         all?: boolean;
+        /** @description Enable stats = TRUE */
+        Stats?: boolean;
       };
       header?: never;
       path?: never;
@@ -5428,7 +5979,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["EventListResponseDto"];
+          "application/json": components["schemas"]["EventListResponseDtoV2"];
         };
       };
       /** @description No active session */
@@ -5662,6 +6213,46 @@ export interface operations {
         content: {
           "application/json": components["schemas"]["ValidateEventResponseDto"];
         };
+      };
+      /** @description Event not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  updateEventVenue: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateEventVenueDto"];
+      };
+    };
+    responses: {
+      /** @description Venue updated successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["EventSingleResponseDto"];
+        };
+      };
+      /** @description Insufficient permissions */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
       /** @description Event not found */
       404: {
@@ -5930,6 +6521,26 @@ export interface operations {
       };
     };
   };
+  BuilderController_getPersonalModule: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Module fetched successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ModuleSingleResponseDto"];
+        };
+      };
+    };
+  };
   BuilderController_getAll: {
     parameters: {
       query?: never;
@@ -6140,7 +6751,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["ModuleSingleResponseDto"];
+          "application/json": components["schemas"]["EventSingleResponseDto"];
         };
       };
       /** @description Module not found */
@@ -6530,6 +7141,366 @@ export interface operations {
       };
     };
   };
+  VenueController_getAllVenues: {
+    parameters: {
+      query?: {
+        buildingId?: string;
+        mapped?: components["schemas"]["Object"];
+        search?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Venues returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["VenueMappingListResponseDto"];
+        };
+      };
+      /** @description No uni selected or no role at uni */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  VenueController_assignBuilding: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        venueId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AssignVenueBuildingDto"];
+      };
+    };
+    responses: {
+      /** @description Venue updated successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["VenueMappingDto"];
+        };
+      };
+      /** @description Building does not belong to the selected university */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Wrong permissions */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Venue not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  VenueController_bulkAssign: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["BulkAssignVenuesDto"];
+      };
+    };
+    responses: {
+      /** @description Venues updated successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BulkAssignResponseDto"];
+        };
+      };
+      /** @description One/more buildings do not belong to the selected university */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Wrong permissions bud */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  BuildingController_getAllBuildings: {
+    parameters: {
+      query?: {
+        /** @description True: building with pin. False: only buildings without pin. Omit for all buildings. */
+        mapped?: components["schemas"]["Object"];
+        /** @description Search on building name */
+        search?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Buildings returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BuildingListResponseDto"];
+        };
+      };
+      /** @description No uni selected or no role at uni */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  BuildingController_createBuilding: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateBuildingDto"];
+      };
+    };
+    responses: {
+      /** @description Building created successfully */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BuildingSingleResponseDto"];
+        };
+      };
+      /** @description Incorrect role permissions */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Building with this name already exists */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  BuildingController_updateBuildingLocation: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        buildingId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateBuildingLocationDto"];
+      };
+    };
+    responses: {
+      /** @description The building was updated successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BuildingSingleResponseDto"];
+        };
+      };
+      /** @description Your role is not admin, not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The building was not found in this uni */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  MapConfigController_getMapConfig: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["MapConfigDto"];
+        };
+      };
+      /** @description No university selected */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Map settings not configured boss */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  MapConfigController_update: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateMapConfigDto"];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["MapConfigDto"];
+        };
+      };
+      /** @description Insufficient permissions */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  RouteController_getRoute: {
+    parameters: {
+      query: {
+        /** @description The origin building that the student is walking from */
+        originBuildingId: string;
+        /** @description The destination building that the student is walking to */
+        destinationBuildingId: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Route was returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RouteSingleResponseDto"];
+        };
+      };
+      /** @description No university or university role was selected */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description One or both buildings have not been pinned, or no walking path was found between the two buildings */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  RouteController_getActiveRoute: {
+    parameters: {
+      query: {
+        /** @description Calendar date that matches the EventAttendance date */
+        date: string;
+        /** @description Time in hh:mm */
+        time: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Route status returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ActiveRouteResponseDto"];
+        };
+      };
+      /** @description No university or university role was selected */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   generateCalendar: {
     parameters: {
       query?: never;
@@ -6612,6 +7583,36 @@ export interface operations {
       };
       /** @description Generated calendar not found */
       404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  listPublicAcademicCalendars: {
+    parameters: {
+      query?: {
+        /** @description Limit results to a four-digit academic year. */
+        year?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Public academic calendars returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AcademicCalendarDto"][];
+        };
+      };
+      /** @description Invalid academic year */
+      400: {
         headers: {
           [name: string]: unknown;
         };
@@ -7151,6 +8152,43 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["CourseListResponseDto"];
+        };
+      };
+      /** @description The authenticated user is not associated with a university. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The university or its API adapter could not be found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  ApiServiceController_getCourse: {
+    parameters: {
+      query: {
+        /** @description UUID of the course to fetch. */
+        courseId: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Course fetched successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CourseSingleResponseDto"];
         };
       };
       /** @description The authenticated user is not associated with a university. */

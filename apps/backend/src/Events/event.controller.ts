@@ -10,7 +10,14 @@ import {
   ParseUUIDPipe,
   BadRequestException,
 } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiForbiddenResponse,
+  ApiNotFoundResponse,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
 import {
   CreateEventDto,
@@ -20,6 +27,7 @@ import {
   CreateEventDtoV2,
   ValidateEventResponseDto,
   ValidateEventDto,
+  UpdateEventVenueDto,
   EventListResponseDtoV2,
   EventFiltersDtoV2,
   EventStatsWeeklyResponseDto,
@@ -318,4 +326,25 @@ export class EventController {
   } //END_statistics
 
   //No Stats
+  @Patch(':id/venue')
+  @Roles('student', 'uni_admin', 'lecturer')
+  @ApiOperation({
+    summary: "Attach or clear an event's venue",
+    operationId: 'updateEventVenue',
+  })
+  @ApiBody({ type: UpdateEventVenueDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Venue updated successfully',
+    type: EventSingleResponseDto,
+  })
+  @ApiNotFoundResponse({ description: 'Event not found' })
+  @ApiForbiddenResponse({ description: 'Insufficient permissions' })
+  updateEventVenue(
+    @CurrentSession() session: SessionData,
+    @Param('id', ParseUUIDPipe) eventId: string,
+    @Body() updateEventVenueDto: UpdateEventVenueDto,
+  ): Promise<EventSingleResponseDto> {
+    return this.service.updateEventVenue(session, eventId, updateEventVenueDto);
+  }
 } //EventController

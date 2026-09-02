@@ -285,6 +285,12 @@ importers:
       "@tanstack/react-table":
         specifier: ^8.21.3
         version: 8.21.3(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      "@types/google.maps":
+        specifier: ^3.65.5
+        version: 3.65.5
+      "@vis.gl/react-google-maps":
+        specifier: ^1.9.0
+        version: 1.9.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       apexcharts:
         specifier: ^5.15.2
         version: 5.15.2
@@ -2279,6 +2285,12 @@ packages:
     resolution:
       {
         integrity: sha512-QuQDBRRcm1Q8AbSac2W1YElurOhprj3Iko/o+P1fJxUWS4rOGKMVli98OXS7uo4z+cKAif6a+L9bcZFSyauQpQ==,
+      }
+
+  "@googlemaps/js-api-loader@2.1.1":
+    resolution:
+      {
+        integrity: sha512-yUpAwksbHrlZIWD49JmveNSfBG4oAK0AwMknfSaPMnP5N7UT8oFRVCqwjGb1XQovi//7KLbPQKZpbofiLGzpDw==,
       }
 
   "@headlessui/react@1.7.19":
@@ -5486,6 +5498,12 @@ packages:
         integrity: sha512-sKYVuV7Sv9fbPIt/442koC7+IIwK5olP1KWeD88e/idgoJqDm3JV/YUiPwkoKK92ylff2MGxSz1CSjsXelx0YA==,
       }
 
+  "@types/google.maps@3.65.5":
+    resolution:
+      {
+        integrity: sha512-oR9Hq/WaKGzIguZEwoCuyQ0ofDhCbefmS9RrjLUZ5scMziwTE6xA90drJYt2ZsyUCYmCqnxQcDpfGqeRE/Zgog==,
+      }
+
   "@types/graceful-fs@4.1.9":
     resolution:
       {
@@ -6009,6 +6027,15 @@ packages:
       }
     cpu: [x64]
     os: [win32]
+
+  "@vis.gl/react-google-maps@1.9.0":
+    resolution:
+      {
+        integrity: sha512-ELL/zo8mRMPGDQZwHRClf2tE1/PMYYKjg+C/dUn8rmlQ0e+s7rkcNmCgaeBAV48GJzEcrBsr+vjDv4AvzJrlUA==,
+      }
+    peerDependencies:
+      react: ">=16.8.0 || ^19.0 || ^19.0.0-rc"
+      react-dom: ">=16.8.0 || ^19.0 || ^19.0.0-rc"
 
   "@webassemblyjs/ast@1.14.1":
     resolution:
@@ -8731,6 +8758,13 @@ packages:
       {
         integrity: sha512-VxPP4NqbUjj6MaAOafWeUn2cXWLcCtljklUtZf0Ind4XQ+QPtmA0b18zZy0jIQx+ExRVCR/ZQpBmik5lXshNsw==,
       }
+
+  fast-equals@6.0.2:
+    resolution:
+      {
+        integrity: sha512-sAjhj9ZhOxYCGiNMnZLaucOqf5ZeFnHNoKoAZiD9thhJ0N8RP85qJK759/97C/3L7NzzmGVB5uiX9AUpySZmUQ==,
+      }
+    engines: { node: ">=6.0.0" }
 
   fast-glob@3.3.1:
     resolution:
@@ -16210,6 +16244,10 @@ snapshots:
     dependencies:
       type-fest: 4.41.0
 
+  "@googlemaps/js-api-loader@2.1.1":
+    dependencies:
+      "@types/google.maps": 3.65.5
+
   "@headlessui/react@1.7.19(react-dom@19.2.4(react@19.2.4))(react@19.2.4)":
     dependencies:
       "@tanstack/react-virtual": 3.14.8(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -16551,14 +16589,14 @@ snapshots:
       "@jest/test-result": 29.7.0
       "@jest/transform": 29.7.0
       "@jest/types": 29.6.3
-      "@types/node": 24.12.4
+      "@types/node": 25.9.1
       ansi-escapes: 4.3.2
       chalk: 4.1.2
       ci-info: 3.9.0
       exit: 0.1.2
       graceful-fs: 4.2.11
       jest-changed-files: 29.7.0
-      jest-config: 29.7.0(@types/node@24.12.4)(ts-node@10.9.2(@swc/core@1.15.33)(@types/node@24.12.4)(typescript@5.9.3))
+      jest-config: 29.7.0(@types/node@25.9.1)(ts-node@10.9.2(@swc/core@1.15.33)(@types/node@24.12.4)(typescript@5.9.3))
       jest-haste-map: 29.7.0
       jest-message-util: 29.7.0
       jest-regex-util: 29.6.3
@@ -16586,14 +16624,14 @@ snapshots:
       "@jest/test-result": 29.7.0
       "@jest/transform": 29.7.0
       "@jest/types": 29.6.3
-      "@types/node": 24.12.4
+      "@types/node": 25.9.1
       ansi-escapes: 4.3.2
       chalk: 4.1.2
       ci-info: 3.9.0
       exit: 0.1.2
       graceful-fs: 4.2.11
       jest-changed-files: 29.7.0
-      jest-config: 29.7.0(@types/node@24.12.4)(ts-node@10.9.2(@swc/core@1.15.33)(@types/node@25.9.1)(typescript@6.0.3))
+      jest-config: 29.7.0(@types/node@25.9.1)(ts-node@10.9.2(@swc/core@1.15.33)(@types/node@25.9.1)(typescript@6.0.3))
       jest-haste-map: 29.7.0
       jest-message-util: 29.7.0
       jest-regex-util: 29.6.3
@@ -18602,6 +18640,8 @@ snapshots:
       "@types/express-serve-static-core": 5.1.1
       "@types/serve-static": 2.2.0
 
+  "@types/google.maps@3.65.5": {}
+
   "@types/graceful-fs@4.1.9":
     dependencies:
       "@types/node": 24.12.4
@@ -18899,6 +18939,14 @@ snapshots:
 
   "@unrs/resolver-binding-win32-x64-msvc@1.12.2":
     optional: true
+
+  "@vis.gl/react-google-maps@1.9.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)":
+    dependencies:
+      "@googlemaps/js-api-loader": 2.1.1
+      "@types/google.maps": 3.65.5
+      fast-equals: 6.0.2
+      react: 19.2.4
+      react-dom: 19.2.4(react@19.2.4)
 
   "@webassemblyjs/ast@1.14.1":
     dependencies:
@@ -20851,6 +20899,8 @@ snapshots:
 
   fast-diff@1.3.0: {}
 
+  fast-equals@6.0.2: {}
+
   fast-glob@3.3.1:
     dependencies:
       "@nodelib/fs.stat": 2.0.5
@@ -21865,7 +21915,7 @@ snapshots:
       - babel-plugin-macros
       - supports-color
 
-  jest-config@29.7.0(@types/node@24.12.4)(ts-node@10.9.2(@swc/core@1.15.33)(@types/node@25.9.1)(typescript@6.0.3)):
+  jest-config@29.7.0(@types/node@25.9.1)(ts-node@10.9.2(@swc/core@1.15.33)(@types/node@24.12.4)(typescript@5.9.3)):
     dependencies:
       "@babel/core": 7.29.0
       "@jest/test-sequencer": 29.7.0
@@ -21890,7 +21940,38 @@ snapshots:
       slash: 3.0.0
       strip-json-comments: 3.1.1
     optionalDependencies:
-      "@types/node": 24.12.4
+      "@types/node": 25.9.1
+      ts-node: 10.9.2(@swc/core@1.15.33)(@types/node@24.12.4)(typescript@5.9.3)
+    transitivePeerDependencies:
+      - babel-plugin-macros
+      - supports-color
+
+  jest-config@29.7.0(@types/node@25.9.1)(ts-node@10.9.2(@swc/core@1.15.33)(@types/node@25.9.1)(typescript@6.0.3)):
+    dependencies:
+      "@babel/core": 7.29.0
+      "@jest/test-sequencer": 29.7.0
+      "@jest/types": 29.6.3
+      babel-jest: 29.7.0(@babel/core@7.29.0)
+      chalk: 4.1.2
+      ci-info: 3.9.0
+      deepmerge: 4.3.1
+      glob: 7.2.3
+      graceful-fs: 4.2.11
+      jest-circus: 29.7.0
+      jest-environment-node: 29.7.0
+      jest-get-type: 29.6.3
+      jest-regex-util: 29.6.3
+      jest-resolve: 29.7.0
+      jest-runner: 29.7.0
+      jest-util: 29.7.0
+      jest-validate: 29.7.0
+      micromatch: 4.0.8
+      parse-json: 5.2.0
+      pretty-format: 29.7.0
+      slash: 3.0.0
+      strip-json-comments: 3.1.1
+    optionalDependencies:
+      "@types/node": 25.9.1
       ts-node: 10.9.2(@swc/core@1.15.33)(@types/node@25.9.1)(typescript@6.0.3)
     transitivePeerDependencies:
       - babel-plugin-macros
