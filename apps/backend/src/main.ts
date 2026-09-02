@@ -11,6 +11,8 @@ import {
   swaggerFaviconUrl,
 } from './swagger-theme';
 
+import helmet from 'helmet';
+
 import { PostHog } from 'posthog-node';
 import { PostHogInterceptor } from 'posthog-node/nestjs';
 
@@ -35,6 +37,18 @@ async function bootstrap() {
   app.setGlobalPrefix('api', {
     exclude: ['metrics'],
   });
+
+  app.use(
+    helmet({
+      xFrameOptions: { action: 'sameorigin' },
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+        },
+      },
+    }),
+  );
+
   app.use((req: Request, res: Response, next: NextFunction) => {
     const start = Date.now();
     const { method, originalUrl } = req;
