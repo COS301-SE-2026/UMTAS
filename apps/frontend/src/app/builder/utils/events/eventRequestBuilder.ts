@@ -37,6 +37,12 @@ type deleteEventByIdPath =
 export type deleteEventByIdRes =
   paths["/api/events/{id}"]["delete"]["responses"]["200"]["content"]["application/json"];
 
+export type updateEventVenuePath =
+  paths["/api/events/{id}/venue"]["patch"]["parameters"]["path"];
+export type updateEventVenueBody =
+  paths["/api/events/{id}/venue"]["patch"]["requestBody"]["content"]["application/json"];
+export type updateEventVenueRes =
+  paths["/api/events/{id}/venue"]["patch"]["responses"]["200"]["content"]["application/json"];
 export class createEventsBuilder extends RequestBuilder<
   undefined,
   CreateEventBody,
@@ -89,5 +95,16 @@ export class deleteEventById extends RequestBuilder<
   constructor() {
     super();
     this.setUrl("/events/{id}").setMethod(RequestMethod.DELETE);
+  }
+}
+
+export class updateEventVenueBuilder extends RequestBuilder<
+  updateEventVenuePath,
+  updateEventVenueBody,
+  updateEventVenueRes
+> {
+  constructor() {
+    super();
+    this.setUrl("/events/{id}/venue").setMethod(RequestMethod.PATCH);
   }
 }

@@ -152,7 +152,7 @@ pdf-worker-status:
 
 # Run the PDF worker natively after verifying its Python dependency
 pdf-worker-native:
-    python3 -c "import fitz"
+    python3 -c "import pymupdf as fitz"
     phase run -- sh -c 'REDIS_URL="redis://:${REDIS_PASSWORD}@127.0.0.1:6379" MINIO_ENDPOINT=http://127.0.0.1:9000 WORKER_BACKEND_URL=http://127.0.0.1:3000 PDF_PARSE_CLI_CWD={{ justfile_directory() }}/apps/pdf_parser exec pnpm --filter pdf-parser-worker dev'
 
 # Build the solver worker image

@@ -4,9 +4,12 @@ import {
   varchar,
   primaryKey,
   uniqueIndex,
+  AnyPgColumn,
 } from 'drizzle-orm/pg-core';
 import { University } from './University.schema';
 import { Event } from '../Events/index';
+import { Building } from '../Map';
+import { index } from 'drizzle-orm/pg-core';
 
 export const Venue = pgTable(
   'Venue',
@@ -16,12 +19,17 @@ export const Venue = pgTable(
     UniversityID: uuid('UniversityID')
       .references(() => University.UniversityID, { onDelete: 'cascade' })
       .notNull(),
+    BuildingID: uuid('BuildingID').references(
+      (): AnyPgColumn => Building.BuildingID,
+      { onDelete: 'set null' },
+    ),
   },
   (table) => ({
     universityVenueNameUnique: uniqueIndex('venue_university_name_unique').on(
       table.UniversityID,
       table.VenueName,
     ),
+    venueBuildingIdIdx: index('venue_building_id_idx').on(table.BuildingID),
   }),
 );
 

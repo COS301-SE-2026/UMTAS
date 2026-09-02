@@ -31,7 +31,7 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 COPY apps/pdf_parser/requirements.txt /tmp/requirements.txt
 RUN python3 -m venv /opt/pdf-parser-venv \
-    && /opt/pdf-parser-venv/bin/pip install --no-cache-dir --requirement /tmp/requirements.txt
+    && /opt/pdf-parser-venv/bin/pip install --default-timeout=1000 --no-cache-dir --requirement /tmp/requirements.txt
 
 FROM ${NODE_IMAGE} AS runtime
 ARG BUILD_DATE
@@ -56,7 +56,7 @@ WORKDIR /app
 ENV NODE_ENV=production \
     PATH="/opt/pdf-parser-venv/bin:${PATH}" \
     PDF_PARSE_CLI_COMMAND=python3 \
-    PDF_PARSE_CLI_ARGS="-m parser_cli" \
+    PDF_PARSE_CLI_ARGS="-W ignore -m parser_cli" \
     PDF_PARSE_CLI_CWD=/app/python \
     WORKER_TEMP_ROOT=/tmp/umtas-worker
 
@@ -72,7 +72,7 @@ CMD ["node", "/app/dist/index.js"]
 FROM runtime AS smoke
 COPY --chown=node:node apps/pdf_parser/up_test_pdfs/SEM_TESTS_S2.pdf /tmp/parser-smoke.pdf
 RUN cd /app/python \
-    && python3 -m parser_cli --adapter up --file /tmp/parser-smoke.pdf > /tmp/parser-smoke.json \
+    && python3 -W ignore -m parser_cli --adapter up --file /tmp/parser-smoke.pdf > /tmp/parser-smoke.json \
     && node -e "JSON.parse(require('fs').readFileSync('/tmp/parser-smoke.json','utf8'))" \
     && touch /tmp/image-smoke-ok
 

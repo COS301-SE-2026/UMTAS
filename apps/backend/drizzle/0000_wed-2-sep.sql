@@ -244,7 +244,8 @@ CREATE TABLE "EventVenue" (
 CREATE TABLE "Venue" (
 	"VenueID" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"VenueName" varchar(30),
-	"UniversityID" uuid NOT NULL
+	"UniversityID" uuid NOT NULL,
+	"BuildingID" uuid
 );
 --> statement-breakpoint
 CREATE TABLE "Course" (
@@ -279,6 +280,42 @@ CREATE TABLE "ModuleGrouping" (
 	CONSTRAINT "ModuleGrouping_Hash_unique" UNIQUE("Hash")
 );
 --> statement-breakpoint
+CREATE TABLE "Building" (
+	"BuildingID" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"UniversityID" uuid NOT NULL,
+	"BuildingName" varchar(100) NOT NULL,
+	"Latitude" double precision,
+	"Longitude" double precision,
+	"Footprint" jsonb,
+	"Icon" varchar(64),
+	"DisplayColour" varchar(10),
+	"CreatedBy" uuid,
+	"CreatedAt" timestamp with time zone DEFAULT now() NOT NULL,
+	"UpdatedAt" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "UniversityMapConfig" (
+	"UniversityID" uuid PRIMARY KEY NOT NULL,
+	"NorthLat" double precision NOT NULL,
+	"SouthLat" double precision NOT NULL,
+	"EastLng" double precision NOT NULL,
+	"WestLng" double precision NOT NULL,
+	"DefaultZoom" integer DEFAULT 16 NOT NULL,
+	"GoogleMapId" varchar(64)
+);
+--> statement-breakpoint
+CREATE TABLE "Route" (
+	"RouteID" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"UniversityID" uuid NOT NULL,
+	"OriginBuildingID" uuid NOT NULL,
+	"DestinationBuildingID" uuid NOT NULL,
+	"PathCoordinates" jsonb NOT NULL,
+	"DistanceMetres" integer NOT NULL,
+	"DisplayColour" varchar(10) DEFAULT '#0000FF' NOT NULL,
+	"CreatedAt" timestamp with time zone DEFAULT now() NOT NULL,
+	"UpdatedAt" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
 ALTER TABLE "account" ADD CONSTRAINT "account_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "session" ADD CONSTRAINT "session_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "AcademicCalendar" ADD CONSTRAINT "AcademicCalendar_universityId_University_UniversityID_fk" FOREIGN KEY ("universityId") REFERENCES "public"."University"("UniversityID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -310,12 +347,19 @@ ALTER TABLE "UniversityRole" ADD CONSTRAINT "UniversityRole_UniversityID_Univers
 ALTER TABLE "EventVenue" ADD CONSTRAINT "EventVenue_EventID_Event_eventID_fk" FOREIGN KEY ("EventID") REFERENCES "public"."Event"("eventID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "EventVenue" ADD CONSTRAINT "EventVenue_VenueID_Venue_VenueID_fk" FOREIGN KEY ("VenueID") REFERENCES "public"."Venue"("VenueID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "Venue" ADD CONSTRAINT "Venue_UniversityID_University_UniversityID_fk" FOREIGN KEY ("UniversityID") REFERENCES "public"."University"("UniversityID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "Venue" ADD CONSTRAINT "Venue_BuildingID_Building_BuildingID_fk" FOREIGN KEY ("BuildingID") REFERENCES "public"."Building"("BuildingID") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "Course" ADD CONSTRAINT "Course_UniversityID_University_UniversityID_fk" FOREIGN KEY ("UniversityID") REFERENCES "public"."University"("UniversityID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "Course" ADD CONSTRAINT "Course_GroupID_ModuleGrouping_GroupID_fk" FOREIGN KEY ("GroupID") REFERENCES "public"."ModuleGrouping"("GroupID") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "CourseModule" ADD CONSTRAINT "CourseModule_CourseID_Course_CourseID_fk" FOREIGN KEY ("CourseID") REFERENCES "public"."Course"("CourseID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "CourseModule" ADD CONSTRAINT "CourseModule_GroupModuleID_GroupModules_GroupModuleID_fk" FOREIGN KEY ("GroupModuleID") REFERENCES "public"."GroupModules"("GroupModuleID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "GroupModules" ADD CONSTRAINT "GroupModules_GroupID_ModuleGrouping_GroupID_fk" FOREIGN KEY ("GroupID") REFERENCES "public"."ModuleGrouping"("GroupID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "GroupModules" ADD CONSTRAINT "GroupModules_ModuleID_Modules_moduleID_fk" FOREIGN KEY ("ModuleID") REFERENCES "public"."Modules"("moduleID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "Building" ADD CONSTRAINT "Building_UniversityID_University_UniversityID_fk" FOREIGN KEY ("UniversityID") REFERENCES "public"."University"("UniversityID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "Building" ADD CONSTRAINT "Building_CreatedBy_user_id_fk" FOREIGN KEY ("CreatedBy") REFERENCES "public"."user"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "UniversityMapConfig" ADD CONSTRAINT "UniversityMapConfig_UniversityID_University_UniversityID_fk" FOREIGN KEY ("UniversityID") REFERENCES "public"."University"("UniversityID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "Route" ADD CONSTRAINT "Route_UniversityID_University_UniversityID_fk" FOREIGN KEY ("UniversityID") REFERENCES "public"."University"("UniversityID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "Route" ADD CONSTRAINT "Route_OriginBuildingID_Building_BuildingID_fk" FOREIGN KEY ("OriginBuildingID") REFERENCES "public"."Building"("BuildingID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "Route" ADD CONSTRAINT "Route_DestinationBuildingID_Building_BuildingID_fk" FOREIGN KEY ("DestinationBuildingID") REFERENCES "public"."Building"("BuildingID") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 CREATE UNIQUE INDEX "account_provider_account_unique" ON "account" USING btree ("providerId","accountId");--> statement-breakpoint
 CREATE INDEX "account_user_id_idx" ON "account" USING btree ("userId");--> statement-breakpoint
 CREATE UNIQUE INDEX "rate_limit_key_unique" ON "rateLimit" USING btree ("key");--> statement-breakpoint
@@ -344,4 +388,9 @@ CREATE INDEX "solver_job_status_idx" ON "SOLVER_JOB" USING btree ("Status");--> 
 CREATE INDEX "solver_job_created_at_idx" ON "SOLVER_JOB" USING btree ("CreatedAt");--> statement-breakpoint
 CREATE UNIQUE INDEX "solver_job_duplicate_unique" ON "SOLVER_JOB" USING btree ("UserID","DeduplicationKey");--> statement-breakpoint
 CREATE UNIQUE INDEX "venue_university_name_unique" ON "Venue" USING btree ("UniversityID","VenueName");--> statement-breakpoint
-CREATE UNIQUE INDEX "group_modules_group_module_unique" ON "GroupModules" USING btree ("GroupID","ModuleID");
+CREATE INDEX "venue_building_id_idx" ON "Venue" USING btree ("BuildingID");--> statement-breakpoint
+CREATE UNIQUE INDEX "group_modules_group_module_unique" ON "GroupModules" USING btree ("GroupID","ModuleID");--> statement-breakpoint
+CREATE UNIQUE INDEX "building_university_name_unique" ON "Building" USING btree ("UniversityID","BuildingName");--> statement-breakpoint
+CREATE INDEX "building_university_id_idx" ON "Building" USING btree ("UniversityID");--> statement-breakpoint
+CREATE UNIQUE INDEX "route_origin_destination_unique" ON "Route" USING btree ("OriginBuildingID","DestinationBuildingID");--> statement-breakpoint
+CREATE INDEX "route_university_id_idx" ON "Route" USING btree ("UniversityID");
