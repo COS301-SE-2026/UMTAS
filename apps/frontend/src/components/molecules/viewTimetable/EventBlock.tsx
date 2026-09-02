@@ -47,7 +47,7 @@ export function EventBlock({ event }: EventBlockProps) {
       style={getBlockStyle()}
     >
       <p className="text-xs font-medium text-[var(--text-primary)] truncate leading-tight">
-        {event.name}
+        {event.name} : {""}
       </p>
 
       {event.type && (
