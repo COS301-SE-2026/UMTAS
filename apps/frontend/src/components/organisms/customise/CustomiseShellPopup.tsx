@@ -13,6 +13,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { getAllModulesQ } from "@/components/templates/builder/Queries/moduleQueries";
 import { getAllEventsQ } from "@/components/templates/builder/Queries/eventQueries";
+import { UserDetails } from "@/lib/userclass/userClass";
 
 export default function CustomiseShellPopup() {
   const { data: modules, isLoading: modulesLoading } =

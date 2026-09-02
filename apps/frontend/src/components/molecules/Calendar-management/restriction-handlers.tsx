@@ -113,10 +113,7 @@ function RestrictionContainerHtml({
               save(toEnum(e));
             }}
           >
-            <SelectTrigger
-              id="select-year"
-              className="capitalize w-40 bg-[var(--background)]"
-            >
+            <SelectTrigger id="select-year" className="capitalize w-40 ">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

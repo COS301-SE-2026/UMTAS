@@ -430,8 +430,10 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * Get all modules with filters - V2
+     * Get all modules with filters and counts - V2
      * @description Filter by userId(enrolled) | courseId(course owned) | universityId(modules for university over all courses). At least one filter required
+     *
+     *           Enable stats response: filters: { stats=t/true/True/TRUE/1 }
      */
     get: operations["getAllModulesV2"];
     put?: never;
@@ -590,7 +592,10 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** Get all courses - V2 */
+    /**
+     * Get all courses - V2
+     * @description Use filters and enable stats mode in filters
+     */
     get: operations["getCoursesV2"];
     put?: never;
     post?: never;
@@ -795,7 +800,10 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** Get all events */
+    /**
+     * Get all events
+     * @description Apply filters - Enable stats mode with filters.stats=TRUE
+     */
     get: operations["getAllEvents"];
     put?: never;
     /** Create an event */
@@ -921,6 +929,26 @@ export interface paths {
     };
     /** Get timetable by ID */
     get: operations["getTimetableByIdV2"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/builder/personalModule": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get personal module
+     * @description Get the personal module that owns your personal events
+     */
+    get: operations["BuilderController_getPersonalModule"];
     put?: never;
     post?: never;
     delete?: never;
@@ -1231,7 +1259,7 @@ export interface paths {
     put?: never;
     /**
      * Generate and persist a calendar snapshot
-     * @description Generates a restriction-aware pseudo-calendar snapshot using the selected university's current-year academic calendar and a timetable owned by the authenticated student.
+     * @description Generates a restriction-aware pseudo-calendar snapshot using the selected university's requested academic year and a timetable owned by the authenticated student.
      */
     post: operations["generateCalendar"];
     delete?: never;
@@ -1240,7 +1268,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/academic-calendar/generate/{id}": {
+  "/api/academic-calendar/generated/{id}": {
     parameters: {
       query?: never;
       header?: never;
@@ -1252,6 +1280,26 @@ export interface paths {
      * @description Returns a generated snapshot only when its timetable belongs to the authenticated student.
      */
     get: operations["getGeneratedCalendar"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/academic-calendar/public": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List public academic calendars
+     * @description Returns public calendars available for subscription, optionally filtered by academic year.
+     */
+    get: operations["listPublicAcademicCalendars"];
     put?: never;
     post?: never;
     delete?: never;
@@ -1388,6 +1436,26 @@ export interface paths {
      * @description Fetches courses for the authenticated user's university.
      */
     get: operations["ApiServiceController_getCourses"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/api-service/course": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get a specific course
+     * @description Returns the specified course together with its module and events.
+     */
+    get: operations["ApiServiceController_getCourse"];
     put?: never;
     post?: never;
     delete?: never;
@@ -1942,6 +2010,17 @@ export interface components {
       /** @description Short message indicating  success of response. */
       message?: string;
     };
+    ModuleListResponseDtoV2: {
+      /** @description List of modules */
+      modules: components["schemas"]["ModuleSingleResponseDto"][];
+      /** @description Short message indicating  success of response. */
+      message?: string;
+      /**
+       * @description Count of Modules
+       * @example 68
+       */
+      count?: number;
+    };
     UpdateModuleDto: {
       /**
        * @description Module code used by the university
@@ -2266,6 +2345,16 @@ export interface components {
     CourseListResponseDto: {
       /** @description List of courses */
       courses: components["schemas"]["CourseDto"][];
+      message?: string;
+    };
+    CourseListResponseDtoV2: {
+      /** @description List of courses */
+      courses: components["schemas"]["CourseDto"][];
+      /**
+       * @description Count of Modules
+       * @example 68
+       */
+      count?: number;
       message?: string;
     };
     UpdateCourseDto: {
@@ -2626,8 +2715,13 @@ export interface components {
        */
       activityType?: "lecture" | "tutorial" | "prac" | "test" | "exam";
     };
-    EventListResponseDto: {
+    EventListResponseDtoV2: {
       events: components["schemas"]["EventDto"][];
+      /**
+       * @description Count of Modules
+       * @example 68
+       */
+      count?: number;
       message?: string;
     };
     UpdateEventCriteriaDto: {
@@ -3192,6 +3286,11 @@ export interface components {
        * @example 339cd591-7c62-4ea7-8a2b-602598553133
        */
       timetableId: string;
+      /**
+       * @description Academic year to generate. Defaults to the current UTC year.
+       * @example 2027
+       */
+      year?: number;
     };
     /** @enum {string} */
     Weekday:
@@ -3339,13 +3438,6 @@ export interface components {
       id: string;
       payload: components["schemas"]["GeneratedCalendarPayloadDto"];
     };
-    CreateAcademicCalendarDto: {
-      /**
-       * @description Four-digit academic year. A university may have only one calendar per year.
-       * @example 2026
-       */
-      year: number;
-    };
     AcademicCalendarDto: {
       /**
        * Format: uuid
@@ -3365,6 +3457,13 @@ export interface components {
        *     ]
        */
       subscriptions: string[];
+    };
+    CreateAcademicCalendarDto: {
+      /**
+       * @description Four-digit academic year. A university may have only one calendar per year.
+       * @example 2026
+       */
+      year: number;
     };
     CalendarRestrictionDto: {
       /**
@@ -3482,6 +3581,10 @@ export interface components {
        * @enum {boolean}
        */
       success: true;
+    };
+    EventListResponseDto: {
+      events: components["schemas"]["EventDto"][];
+      message?: string;
     };
   };
   responses: never;
@@ -4406,6 +4509,8 @@ export interface operations {
         moduleCode?: string;
         /** @description Choose to filter modules based of current user enrollments */
         userEnrollment?: boolean;
+        /** @description Enable stats = TRUE */
+        Stats?: boolean;
       };
       header?: never;
       path?: never;
@@ -4419,7 +4524,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["ModuleListResponseDto"];
+          "application/json": components["schemas"]["ModuleListResponseDtoV2"];
         };
       };
       /** @description Invalid filters */
@@ -4839,8 +4944,10 @@ export interface operations {
         UniversityID?: string;
         /** @description Name of the course */
         CourseName?: string;
-        /** @description Filter by Degree */
+        /** @description Degree that course belongs to */
         Degree?: string | null;
+        /** @description Enable stats = TRUE */
+        Stats?: boolean;
       };
       header?: never;
       path?: never;
@@ -4854,7 +4961,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["CourseListResponseDto"];
+          "application/json": components["schemas"]["CourseListResponseDtoV2"];
         };
       };
     };
@@ -5415,6 +5522,8 @@ export interface operations {
         moduleId?: string;
         timetableId?: string;
         all?: boolean;
+        /** @description Enable stats = TRUE */
+        Stats?: boolean;
       };
       header?: never;
       path?: never;
@@ -5428,7 +5537,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["EventListResponseDto"];
+          "application/json": components["schemas"]["EventListResponseDtoV2"];
         };
       };
       /** @description No active session */
@@ -5930,6 +6039,26 @@ export interface operations {
       };
     };
   };
+  BuilderController_getPersonalModule: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Module fetched successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ModuleSingleResponseDto"];
+        };
+      };
+    };
+  };
   BuilderController_getAll: {
     parameters: {
       query?: never;
@@ -6140,7 +6269,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["ModuleSingleResponseDto"];
+          "application/json": components["schemas"]["EventSingleResponseDto"];
         };
       };
       /** @description Module not found */
@@ -6612,6 +6741,36 @@ export interface operations {
       };
       /** @description Generated calendar not found */
       404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  listPublicAcademicCalendars: {
+    parameters: {
+      query?: {
+        /** @description Limit results to a four-digit academic year. */
+        year?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Public academic calendars returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AcademicCalendarDto"][];
+        };
+      };
+      /** @description Invalid academic year */
+      400: {
         headers: {
           [name: string]: unknown;
         };
@@ -7151,6 +7310,43 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["CourseListResponseDto"];
+        };
+      };
+      /** @description The authenticated user is not associated with a university. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The university or its API adapter could not be found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  ApiServiceController_getCourse: {
+    parameters: {
+      query: {
+        /** @description UUID of the course to fetch. */
+        courseId: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Course fetched successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CourseSingleResponseDto"];
         };
       };
       /** @description The authenticated user is not associated with a university. */
