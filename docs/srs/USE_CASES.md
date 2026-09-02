@@ -143,11 +143,13 @@
     ## Analytics Dashboard
     | **ID** | **Use Case** | **Group** | **Actor** | **Status** |
     |:---:|:---:|:---:|:---:|:---:|
-    | **UC-AN-01** | View Attendance Analytics Dashboard | [Analytics Dashboard](#analytics-dashboard-id) | Admin, Lecturer |<span class="status-not-implemented">In Progress</span>|
-    | **UC-AN-02** | Explore Venue and Booking Analytics | [Analytics Dashboard](#analytics-dashboard-id) | Admin, Lecturer |<span class="status-not-implemented">In Progress</span>|
-    | **UC-AN-03** | View Lecturer Analytics | [Analytics Dashboard](#analytics-dashboard-id) | Admin, Lecturer |<span class="status-not-implemented">In Progress</span>|
+    | **UC-AN-01** | View University Statistics | [Analytics Dashboard](#analytics-dashboard-id) | Admin, Lecturer |<span class="status-implemented">Implemented</span>|
+    | **UC-AN-02** | View Course Statistics | [Analytics Dashboard](#analytics-dashboard-id) | Admin, Lecturer |<span class="status-implemented">Implemented</span>|
+    | **UC-AN-03** | View Module Statistics | [Analytics Dashboard](#analytics-dashboard-id) | Admin, Lecturer |<span class="status-implemented">Implemented</span>|
+    | **UC-AN-04** | View Event Statistics | [Analytics Dashboard](#analytics-dashboard-id) | Admin, Lecturer |<span class="status-implemented">Implemented</span>|
     
     </div>
+
     <div class="uc-table" markdown>
 
     ## Attendance Recording
@@ -157,6 +159,7 @@
     | **UC-AR-02** | Unrecord Attendance for Event | [Attendance Recording](#attendance-recording-id) | Student |<span class="status-not-implemented">In Progress</span>|
 
     </div>
+    
     <div class="uc-table" markdown>
 
     ## Lecturer Adjustment
@@ -167,23 +170,18 @@
     | **UC-LA-02** | Assign Lecturers to Events/Modules | [Lecturer Adjustment](#lecturer-adjustment-id) | Lecturer, Admin |<span class="status-not-implemented">In Progress</span>|
     
     </div>
-    <div class="uc-table" markdown>
 
-    ## Alert System
-    | **ID** | **Use Case** | **Group** | **Actor** | **Status** |
-    |:---:|:---:|:---:|:---:|:---:|
-    | **UC-AL-01** | Event Change Alerts | [Alert System](#alert-system-id) | User |<span class="status-not-implemented">In Progress</span>|
-    
-    </div>
     <div class="uc-table" markdown>
 
     ## Tyto Simulation System
     | **ID** | **Use Case** | **Group** | **Actor** | **Status** |
     |:---:|:---:|:---:|:---:|:---:|
-    | **UC-TY-01** | Run Simulation Batch | [Tyto Simulation System](#tyto-simulation-id) | Tyto Administrator |<span class="status-implemented">Implemented</span>|
-    | **UC-TY-02** | View Simulation Analytics | [Tyto Simulation System](#tyto-simulation-id) | Tyto Administrator |<span class="status-implemented">Implemented</span>|
-    | **UC-TY-03** | Display Stress-Test Results | [Tyto Simulation System](#tyto-simulation-id) | Tyto Administrator |<span class="status-implemented">Implemented</span>|
-    
+    | **UC-TY-01** | Launch Simulation Batch | [Tyto Simulation System](#tyto-simulation-id) | Tyto Administrator |<span class="status-implemented">Implemented</span>|
+    | **UC-TY-02** | Generate Synthetic Population | [Tyto Simulation System](#tyto-simulation-id) | Tyto Administrator |<span class="status-implemented">Implemented</span>|
+    | **UC-TY-03** | View Simulation Analytics | [Tyto Simulation System](#tyto-simulation-id) | Tyto Administrator |<span class="status-implemented">Implemented</span>|
+    | **UC-TY-04** | Bootstrap Adapter from OpenAPI Spec | [Tyto Simulation System](#tyto-simulation-id) | Tyto Administrator |<span class="status-implemented">Implemented</span>|
+    | **UC-TY-05** | Simulate UMTAS User Behaviours | [Tyto Simulation System](#tyto-simulation-id) | Tyto Administrator |<span class="status-implemented">Implemented</span>|
+
     </div>
 
     </div>
@@ -247,10 +245,6 @@
 ---
 <!-- Lecturer Adjustment -->
 {% include-markdown "srs/Use_Cases/Lecturer_Adjustment.md" %}
-
----
-<!-- Alert System -->
-{% include-markdown "srs/Use_Cases/Alert_System.md" %}
 
 ---
 <!-- Tyto Simulation -->
