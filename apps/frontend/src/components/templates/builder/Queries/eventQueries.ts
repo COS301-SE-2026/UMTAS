@@ -94,6 +94,7 @@ export function updateEventMut() {
       path: updateEventByIdPath;
       body: updateEventByIdBody;
     }) => {
+      console.log(vars.body, "update event body");
       return new updateEventByID().send({
         paths: vars.path,
         body: vars.body,

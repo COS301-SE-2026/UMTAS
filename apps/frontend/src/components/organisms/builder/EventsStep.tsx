@@ -315,7 +315,7 @@ export function EventsStep({
       });
     }
 
-    if (event.eventCriteria?.eventSource !== "university") {
+    if (event.eventCriteria?.eventSource === "university") {
       updateEvent.mutate({
         body: {
           isRecurring: event.isRecurring,
