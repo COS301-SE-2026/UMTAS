@@ -20,6 +20,7 @@ const extraAdminLinks = [
   { href: "/course-management", label: "Manage Courses" },
   { href: "/role-management", label: "Manage Roles" },
   { href: "/calendar-management", label: "Manage Calendars" },
+  { href: "/stats", label: "Stats" },
 ];
 const universitySpecific = [{ href: "/solver", label: "Upload PDF" }];
 
