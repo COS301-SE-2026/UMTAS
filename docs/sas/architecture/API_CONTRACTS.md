@@ -1,185 +1,415 @@
-# API Contracts
+# Service Contracts
 
 <swagger-ui src="https://capstone-vigil.dns.net.za/api/docs-json" />
 
-## Implemented Contract Standard
+## PDF parsing
 
-The committed OpenAPI document is the comprehensive system-contract catalogue,
-and the generated frontend types consume its HTTP portion. NestJS decorators
-provide route-specific schemas; the backend contract completion step and
-`scripts/normalize-openapi.mjs` add the shared policy and system overview.
-Redis/BullMQ and CLI boundaries remain runtime-typed by `packages/shared-types`;
-their payloads are documented under OpenAPI components rather than represented
-as HTTP paths.
+```mermaid
+sequenceDiagram
+    participant Web as Frontend
+    participant Core as Core API
+    participant Store as Object storage
+    participant Queue as pdf.parse
+    participant Worker as Parser worker
+    participant Parser as Python parser
 
-### Current baseline
+    Web->>Core: PDF, universityId, adapterKey
+    Core->>Core: Validate, fingerprint, create queued job
+    Core->>Store: Object_PdfUpload
+    Core->>Queue: Queue_PdfParseJob
+    Core-->>Web: jobId and statusUrl
+    Queue->>Worker: Queue_PdfParseJob
+    Worker->>Store: Read fileKey
+    Store-->>Worker: PDF bytes
+    Worker->>Parser: --adapter and --file
+    Parser-->>Worker: Cli_PdfParserOutput or error JSON
+    Worker->>Core: Http_PdfParserCallback with bearer token
+    Core->>Core: Import result and record terminal state
+    loop While queued
+        Web->>Core: Read job status
+        Core-->>Web: queued, completed, or failed
+    end
+```
 
-- The NestJS backend publishes an OpenAPI 3.0.0 document at `/api/docs-json`.
-- The generated document currently contains 88 paths and 115 operations.
-- The frontend generates TypeScript API types from the backend document.
-- PDF parser and solver HTTP job boundaries are already present in the
-  generated document.
-- Parser and solver queue, CLI, and callback payloads are also represented by
-  shared TypeScript/Zod contracts and fixtures.
-- Google OAuth sign-in and account linking are present.
-- Google Calendar synchronisation is not implemented; the frontend currently
-  generates browser-side `.ics` exports. Google Maps is a direct frontend
-  dependency rather than a UMTAS backend API.
+### `Object_PdfUpload`
 
-### Target contract architecture
+The Core writes the PDF to S3-compatible object storage. The queue carries its
+key instead of the file bytes.
 
-Maintain one authoritative OpenAPI document for all UMTAS HTTP interfaces:
+```text
+uploads/pdf-parser/{jobId}/{sanitised-file-name}
+```
 
-1. **Public Core API** — frontend-facing authentication, CRUD, builder,
-   timetable, academic calendar, PDF job, and solver job endpoints.
-2. **Internal Worker API** — solver input retrieval and parser/solver callback
-   endpoints, explicitly marked as internal and protected by the worker bearer
-   token.
-3. **External-provider documentation** — Google OAuth redirect/callback and
-   account linking, plus Google Calendar operations if that integration is
-   implemented in the future.
+- Maximum upload size: 25 MiB.
+- The Core checks the PDF signature and accepts a PDF MIME type or `.pdf` name.
+- The Core recomputes the PDF-stream fingerprint. A client hash is diagnostic
+  only.
+- A storage failure marks the job `failed`; the queue message is not sent.
+- The parser worker downloads the object using service credentials.
 
-Redis/BullMQ messages and local CLI invocations are not HTTP interfaces and are
-therefore not modelled as OpenAPI paths. Their JSON payloads remain typed
-through `packages/shared-types` and are included in the same OpenAPI document as
-named component schemas with transport, producer, consumer, and runtime-rule
-descriptions.
+**Implementation:** `pdf-parse-submission.ts`, `object-storage.service.ts`, and
+`apps/pdf_parser/worker/src/storage.ts`.
 
-### Contract policy
+### `Queue_PdfParseJob`
 
-OpenAPI 3.0.3 is used because it is the version emitted by the installed
-NestJS Swagger toolchain. A future 3.1 migration is a compatibility change.
-Paths use kebab-case where introduced, operation IDs are unique and stable,
-UUIDs use `format: uuid`, timestamps use RFC 3339 `date-time`, dates use
-`YYYY-MM-DD`, and local time uses `HH:mm`. Public, session-cookie, and internal
-bearer operations are explicitly distinguished in every operation.
+The Core assigns a stored document to the parser worker through `pdf.parse`.
 
-#### Backend endpoint catalogue
+```json
+{
+  "jobId": "pdf-parse-550e8400-e29b-41d4-a716-446655440000",
+  "fileKey": "uploads/pdf-parser/pdf-parse-550e8400-e29b-41d4-a716-446655440000/input.pdf",
+  "adapterKey": "up"
+}
+```
 
-For every controller operation, record the summary, description, operation ID,
-tag, authentication requirement, parameters, request body, content types,
-success response, failure responses, examples, defaults, and validation rules.
-The catalogue must include Health, Auth, Modules, Courses, Universities,
-Grouping, Events, Timetables, Builder, Attendance, Venues, Buildings, Map
-Config, Routes, Academic Calendar, API Service, PDF Parser, and Solver.
+- All three fields are required and must be non-empty strings.
+- `fileKey` must identify the object stored before the message is published.
+- The worker validates the message with `PdfParseJobDataSchema`.
+- The default queue policy allows three attempts with exponential backoff.
+- A message may be processed more than once. The callback contract therefore
+  provides the terminal idempotency boundary.
+- Only the final failed queue attempt sends a failure callback.
 
-The documented tag set must be declared centrally and use consistent casing;
-for example, `Auth Admin` must not also appear as `Auth admin`.
+**Producer:** `PdfParseSubmission` through `QueueProducerService`.
+**Consumer:** `PdfParseProcessor`.
+**Runtime schema:** `packages/shared-types/src/parser.ts`.
 
-#### Reusable schemas
+### `Cli_PdfParserOutput`
 
-Document reusable OpenAPI components for common parameters and responses,
-including:
+The worker invokes the Python parser with `--adapter <key> --file <path>`. A
+successful process writes one JSON result to stdout.
 
-- Error, validation, unauthorized, forbidden, not-found, conflict, and rate
-  limit responses.
-- Job status, job error, accepted-job, and pagination structures.
-- Parser results, parser annotations, solver input, solver results, and worker
-  callback payloads.
-- Shared UUID, timestamp, date, and time-of-day fields.
+```json
+{
+  "modules": [
+    {
+      "code": "COS301",
+      "name": "Software Engineering",
+      "metadata": {},
+      "warnings": []
+    }
+  ],
+  "events": [
+    {
+      "moduleCode": "COS301",
+      "activityType": "lecture",
+      "activityCode": "L1",
+      "title": "COS301 Lecture",
+      "startTime": "08:30",
+      "endTime": "10:20",
+      "venues": ["IT 4-5"],
+      "metadata": {},
+      "warnings": [],
+      "day": "monday",
+      "date": null,
+      "isRecurring": true
+    }
+  ],
+  "warnings": []
+}
+```
 
-Inline duplicate schemas should be identified and consolidated in the future
-implementation work.
+- An event is either recurring (`day` set and `date: null`) or dated (`date`
+  set and `day: null`).
+- `startTime` must be earlier than `endTime`.
+- Only the `up` adapter is currently accepted by the upload contract.
+- Exit code `0` means stdout contains a parser result. Parser failures return a
+  structured error with a non-zero exit code.
+- A timeout, invalid JSON, or schema violation becomes a failed worker attempt.
+- The default parser-worker timeout is 60 seconds.
 
-#### Standard error contract
+**Producer:** `apps/pdf_parser/parser_cli.py`.
+**Consumer:** `CliParserExecutor` followed by `PdfParserResultSchema`.
 
-All documented errors should use a stable machine-readable code, human-readable
-message, optional structured details, and an optional request/correlation ID.
-Each code should state its HTTP status and whether retrying is appropriate.
+### `Http_PdfParserCallback`
 
-The error-code catalogue should group codes by domain, including `AUTH_*`,
-`MODULE_*`, `EVENT_*`, `TIMETABLE_*`, `PDF_*`, `SOLVER_*`, `CALENDAR_*`,
-`UNIVERSITY_*`, `VALIDATION_*`, and `INTERNAL_*`. Existing worker codes such as
-`SOLVER_INFEASIBLE` and `SOLVER_JOB_PROTOCOL_ERROR` must be included rather
-than documented only in implementation tests.
+The worker sends exactly one of these shapes for a terminal outcome:
 
-#### PDF parser contract
+```json
+{
+  "status": "completed",
+  "result": {
+    "modules": [],
+    "events": [],
+    "warnings": []
+  }
+}
+```
 
-Document the complete lifecycle for:
+```json
+{
+  "status": "failed",
+  "error": {
+    "code": "PARSER_PROTOCOL_ERROR",
+    "message": "PDF parser stdout was not valid JSON.",
+    "details": {}
+  }
+}
+```
 
-- `POST /pdf-parser/jobs/upload`
-- `POST /pdf-parser/jobs/lookup`
-- `GET /pdf-parser/jobs/{jobId}`
-- `GET /pdf-parser/jobs/{jobId}/result`
-- Internal `POST /pdf-parser/jobs/{jobId}/callback`
+- The callback requires the configured worker bearer token.
+- The worker retries callback delivery three times, starting at 500 ms and
+  backing off to at most 5 seconds.
+- An identical repeated callback is accepted without importing the result
+  twice.
+- A different callback for an already terminal job is rejected as a conflict.
+- A successful callback imports the parsed modules and events before setting
+  the job to `completed`.
 
-The documentation must specify multipart field names, required fields, maximum
-file size, MIME types, adapter keys, fingerprint and hash formats, duplicate
-behaviour, job states, result availability, warnings, callback authentication,
-idempotency, retries, and parser failure codes.
+**Producer:** `HttpCallbackClient` in `bullmq-worker-core`.
+**Consumer:** `PdfParserController` and `PdfParserJobStoreService`.
+**Runtime schema:** `PdfParserCallbackPayloadSchema`.
 
-The semantic source for parser payloads is the shared contract in
-`packages/shared-types/src/parser.ts`; the OpenAPI representation must explain
-its discriminated recurring/dated event shapes and validation rules.
+## Timetable solving
 
-#### Solver contract
+```mermaid
+sequenceDiagram
+    participant Web as Frontend
+    participant Core as Core API
+    participant Queue as timetable.solve
+    participant Worker as Solver worker
+    participant Solver as Native solver
 
-Document job submission, status, result retrieval, internal input retrieval,
-internal callbacks, attempt tokens, engine selection, solve modes, heuristic
-preferences, conflict metadata, best-effort results, infeasibility, timeout,
-and CP-SAT-to-GA fallback behaviour.
+    Web->>Core: Events, preferences, mode, engine
+    Core->>Core: Build input, fingerprint, reserve queued job
+    Core->>Queue: Queue_TimetableSolveJob
+    Core-->>Web: jobId and queued status
+    Queue->>Worker: Queue_TimetableSolveJob
+    Worker->>Core: Request input with bearer token
+    Core-->>Worker: Worker_SolverInput
+    Worker->>Solver: Cli_SolverInput, engine, solve mode
+    Solver-->>Worker: Cli_SolverOutput
+    opt auto and CP-SAT is infeasible
+        Worker->>Solver: Retry Cli_SolverInput with GA
+        Solver-->>Worker: Cli_SolverOutput
+    end
+    Worker->>Core: Http_SolverCallback with attemptToken
+    Core->>Core: Verify attempt and record terminal state
+    loop While queued
+        Web->>Core: Read job status
+        Core-->>Web: queued, completed, or failed
+    end
+```
 
-Cross-field rules that OpenAPI cannot express completely must be stated in the
-schema descriptions and examples, including exactly one of `date` or
-`dayOfWeek`, valid time ordering, conflict-count consistency, and the meaning
-of `engine: auto`.
+### `Queue_TimetableSolveJob`
 
-#### Google and frontend interactions
+The Core assigns a persisted scheduling problem to the solver worker through
+`timetable.solve`.
 
-Document Google OAuth separately from calendar synchronisation:
+```json
+{
+  "jobId": "solve-550e8400-e29b-41d4-a716-446655440000",
+  "attemptToken": "6ba7b810-9dad-41d1-80b4-00c04fd430c8",
+  "solveMode": "optimization",
+  "engine": "auto"
+}
+```
 
-- OAuth initiation, callback, account linking, redirects, scopes, session
-  cookies, disabled-configuration behaviour, and failure handling.
-- `.ics` export as a frontend-generated interoperability feature, not a Google
-  Calendar API endpoint.
-- Google Maps as a frontend configuration/dependency contract.
+- `solveMode` is `feasibility` or `optimization`.
+- `engine` is `auto`, `cp-sat`, or `ga`; omitted values default to `auto`.
+- `attemptToken` is a UUID and is also the BullMQ job identifier.
+- The queue does not carry the scheduling problem. The worker fetches the
+  persisted input after receiving the job.
+- The default queue policy allows two attempts with exponential backoff.
+- Retrying a confirmed failed solve creates a new attempt token.
 
-Google Calendar endpoints shall only be added to the OpenAPI contract after a
-separate implementation decision defines scopes, calendar selection, event
-create/update/delete semantics, idempotency, token expiry, revocation, and
-Google-error translation. They are not to be documented as implemented today.
+**Producer:** `SolverSubmissionService` through `QueueProducerService`.
+**Consumer:** `SolverProcessor`.
+**Runtime schema:** `TimetableSolveJobDataSchema`.
 
-#### Frontend contract consumption
+### `Worker_SolverInput`
 
-Document the required generation workflow for `apps/frontend/src/lib/api.ts`:
+The worker fetches the problem associated with `jobId` from the Core.
 
-- Generate from the authoritative committed OpenAPI document.
-- Make generation reproducible without relying on a production deployment.
-- Record the contract version used by generated types.
-- Ensure PDF parser, solver, authentication, academic calendar, and future
-  Google flows use the same definitions.
+```json
+{
+  "schedulingProblem": {
+    "events": [
+      {
+        "eventId": "event-1",
+        "moduleCode": "COS301",
+        "activityType": "lecture",
+        "activityCode": "L1",
+        "requiredSelections": 1,
+        "dayOfWeek": "monday",
+        "startTime": "08:30",
+        "endTime": "10:20",
+        "venues": [{ "id": "venue-1", "name": "IT 4-5" }]
+      }
+    ]
+  },
+  "preferences": {
+    "heuristics": [
+      {
+        "key": "day-skip",
+        "parameters": { "day-to-skip": "friday" }
+      }
+    ]
+  }
+}
+```
 
-#### Verification standard
+- Every event contains exactly one of `date` or `dayOfWeek`.
+- `startTime` must be earlier than `endTime`.
+- `requiredSelections` is a positive integer and defaults to `1`.
+- The input operation requires the worker bearer token.
+- The worker parses the response as JSON and validates it with
+  `SolverInputSchema` before starting the native solver.
 
-CI validates:
+**Producer:** `SolverInputBuilderService` and `SolverController`.
+**Consumer:** `HttpSolverInputClient`.
 
-- OpenAPI syntax, version, `$ref` resolution, and examples.
-- Unique operation IDs and declared tags.
-- Complete route coverage.
-- Security declarations.
-- Success and failure response schemas.
-- Generated frontend types being up to date.
-- Runtime responses and error codes matching the documented schemas.
-- Parser and solver callback idempotency, retries, fallback, and terminal
-  failure paths.
+### `Cli_SolverInput` and `Cli_SolverOutput`
 
-### Current completion status
+The worker writes `Worker_SolverInput` to a temporary JSON file and invokes:
 
-The current artifact contains every discovered backend route (88 paths / 115
-operations), canonical tags, explicit security, reusable error/job components,
-and internal parser/solver worker operations. Google OAuth is documented from
-the implemented flows. Google Calendar synchronization is explicitly not
-implemented; browser `.ics` export remains the supported calendar
-interoperability feature. CI runs contract validation and fails when generated
-frontend types differ from the committed source document.
+```text
+solver-cli --input <path> --output <path> --engine <cp-sat|ga> \
+  --solve-mode <feasibility|optimization>
+```
 
-## Worker CLI Invocations & Integration
+A feasible native result has this shape:
 
-| Worker | CLI Invocation | Input Source | Callback Endpoint | Notes |
-| :--- | :--- | :--- | :--- | :--- |
-| **PDF Parser** | `python3 -m parser_cli --adapter <adapterKey> --file <path>` | Blob storage (`fileKey`) | `POST /pdf-parser/jobs/:jobId/callback` | Only University of Pretoria adapter is registered. Outputs structured JSON. |
-| **Timetable Solver** | `solver-cli --input <path> --output <path> --engine <cp-sat\|ga> --solve-mode <feasibility\|optimization>` | `GET /solver/jobs/:jobId/input` | `POST /solver/jobs/:jobId/callback?attemptToken=:attemptToken` | Tries `cp-sat` first; starts `ga` if `cp-sat` is infeasible. |
+```json
+{
+  "status": "feasible",
+  "outcome": "conflict-free",
+  "timetableSolution": {
+    "selectedEventIds": ["event-1"]
+  },
+  "heuristicScores": [],
+  "metadata": {
+    "conflictCount": 0,
+    "conflicts": [],
+    "solveMode": "optimization"
+  }
+}
+```
 
-### Shared Worker Runtime
-* **Job Statuses:** `Queued` (waiting/processing), `Completed` (success), `Failed` (failure). Core API is polled for status.
-* **Behaviour:** Handles concurrency, timeouts, cleanup, and callback retries (3x with exponential backoff).
+An infeasible result is exactly:
+
+```json
+{ "status": "infeasible" }
+```
+
+- `conflictCount` must equal the number of entries in `conflicts`.
+- `outcome` must be `conflict-free` when that count is zero and `best-effort`
+  otherwise.
+- With `engine: auto`, the worker runs CP-SAT first and runs GA only if CP-SAT
+  returns `infeasible`.
+- With an explicit engine, `infeasible` becomes `SOLVER_INFEASIBLE` without a
+  fallback.
+- A non-zero exit, timeout, unreadable output, invalid JSON, or schema violation
+  fails the attempt.
+- The default solver-worker timeout is 300 seconds.
+
+**Producer:** the native solver in `apps/preference-solver`.
+**Consumer:** `CliSolverExecutor`, validated by `SolverCliOutputSchema`.
+
+### `Http_SolverCallback`
+
+A completed callback adds the engine selected by the worker:
+
+```json
+{
+  "status": "completed",
+  "result": {
+    "engine": "cp-sat",
+    "outcome": "conflict-free",
+    "timetableSolution": {
+      "selectedEventIds": ["event-1"]
+    },
+    "heuristicScores": [],
+    "metadata": {
+      "conflictCount": 0,
+      "conflicts": [],
+      "solveMode": "optimization"
+    }
+  }
+}
+```
+
+A failure uses the same error envelope as the parser callback:
+
+```json
+{
+  "status": "failed",
+  "error": {
+    "code": "SOLVER_INFEASIBLE",
+    "message": "Neither solver found a valid timetable.",
+    "details": { "engines": ["cp-sat", "ga"] }
+  }
+}
+```
+
+- The callback requires the worker bearer token and the attempt token supplied
+  with the queue message.
+- A callback whose attempt token is no longer active is rejected.
+- Callback delivery uses the same three-attempt backoff policy as parsing.
+- An identical repeated callback is accepted; a different terminal callback is
+  rejected as a conflict.
+
+**Producer:** `SolverProcessor` through `HttpCallbackClient`.
+**Consumer:** `SolverController` and `SolverJobStoreService`.
+**Runtime schema:** `SolverCallbackPayloadSchema`.
+
+## Asynchronous job state
+
+```mermaid
+stateDiagram-v2
+    [*] --> queued: Core accepts work
+    queued --> queued: Worker retry
+    queued --> completed: Valid completed callback
+    queued --> failed: Valid final failure callback
+    completed --> completed: Identical callback
+    failed --> failed: Identical callback
+```
+
+- The Core owns the job record, input, result, and terminal state.
+- Workers keep only temporary files. They remove them after acknowledged work
+  and may retain failed files only when diagnostics are explicitly enabled.
+- Queue retries do not create another Core job.
+- Completed and failed states are terminal. A conflicting later callback is
+  rejected.
+- The frontend reads status from the Core; it does not contact queues, workers,
+  storage, or native processes.
+
+## Google authentication
+
+```mermaid
+sequenceDiagram
+    participant Web as Browser
+    participant Core as Core authentication
+    participant Google as Google identity provider
+
+    Web->>Core: Start Google sign-in or account link
+    Core-->>Web: Redirect with state
+    Web->>Google: Authenticate and consent
+    Google-->>Core: Authorization code and state
+    Core->>Google: Exchange code and request OpenID profile
+    Google-->>Core: Tokens and profile
+    Core-->>Web: Redirect and set UMTAS session cookie
+```
+
+- Requested scopes are `openid`, `email`, and `profile`.
+- OAuth state is stored in a cookie and checked on callback.
+- Provider tokens stored by UMTAS are encrypted.
+- Account linking requires a fresh UMTAS session.
+- Accounts are linked only when the Google email matches a verified credential
+  account.
+- Missing configuration returns `404`; an invalid or expired code returns
+  `400`; an email already owned by another account returns `422`.
+
+**Implementation:** `apps/backend/src/auth/auth.controller.ts` and
+`apps/backend/src/auth/auth.ts`. HTTP operations are grouped under **Auth
+Google** in Swagger.
+
+## Contract sources
+
+- HTTP operations and DTOs: NestJS controllers and Swagger decorators.
+- Queue, callback, parser-result, and solver schemas:
+  `packages/shared-types`.
+- Non-HTTP OpenAPI catalogue:
+  `apps/backend/src/system-contract-catalog.json`.
+- Committed OpenAPI document: `apps/backend/docs/openapi.json`.
+- Generated frontend types: `apps/frontend/src/lib/api.ts`.

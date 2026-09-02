@@ -1,57 +1,118 @@
 {
-  "description": "University Management Timetable & Scheduling System API\n\n## System contract boundaries\n\nThis document is the comprehensive contract overview for UMTAS. Entries under **Paths** are callable HTTP operations. Queue and CLI payloads are documented under **Schemas** and are not HTTP endpoints.\n\n| Boundary | Transport | Contract schemas |\n| --- | --- | --- |\n| Next.js frontend → NestJS backend | HTTP | Paths and HTTP DTO schemas |\n| NestJS backend → PDF parser worker | BullMQ `pdf.parse` | `Queue_PdfParseJob` |\n| PDF parser worker → NestJS backend | HTTP callback | `Http_PdfParserCallback`, `Worker_PdfParserResult` |\n| NestJS backend → solver worker | BullMQ `timetable.solve` | `Queue_TimetableSolveJob` |\n| NestJS backend → solver worker | Internal HTTP | `Worker_SolverInput` |\n| Solver worker → NestJS backend | HTTP callback | `Http_SolverCallback`, `Worker_SolverResult` |\n| Solver worker ↔ native solver | CLI and JSON files | `Cli_SolverInput`, `Cli_SolverOutput` |\n\nCross-field rules described on schemas are enforced by the runtime Zod contracts in `packages/shared-types`; OpenAPI documents those rules but cannot enforce all relational constraints.",
+  "description": "The UMTAS service contract. **Paths** contains callable HTTP operations. **Schemas** also contains the queue, object-storage, callback, and CLI data exchanged between services. Runtime Zod schemas enforce cross-field rules that OpenAPI cannot express.",
   "boundaries": [
     {
       "id": "frontend-backend-http",
+      "purpose": "Expose authentication, timetable, import, solver, and management operations to the web application.",
       "transport": "http",
       "producer": "nextjs-frontend",
       "consumer": "nestjs-backend",
-      "contract": "OpenAPI paths"
+      "data": "JSON and multipart form data",
+      "contract": "OpenAPI paths",
+      "security": "Operation-specific: public, session cookie, or role checks",
+      "failure": "OpenAPI error responses"
+    },
+    {
+      "id": "backend-pdf-object-storage",
+      "purpose": "Make an uploaded PDF available to the parser without placing file bytes on the queue.",
+      "transport": "s3-compatible-object-storage",
+      "producer": "nestjs-backend",
+      "consumer": "pdf-parser-worker",
+      "data": "PDF bytes addressed by fileKey",
+      "schema": "#/components/schemas/Object_PdfUpload",
+      "security": "Service credentials on the internal network",
+      "failure": "Upload or download failure ends the parser job"
     },
     {
       "id": "backend-pdf-parser-queue",
+      "purpose": "Assign a stored PDF to the parser worker.",
       "transport": "bullmq",
       "channel": "pdf.parse",
       "producer": "nestjs-backend",
       "consumer": "pdf-parser-worker",
-      "schema": "#/components/schemas/Queue_PdfParseJob"
+      "data": "Job ID, object key, and parser adapter key",
+      "schema": "#/components/schemas/Queue_PdfParseJob",
+      "security": "Authenticated Redis connection on the internal network",
+      "failure": "BullMQ retries the job; the final failure is returned by callback"
+    },
+    {
+      "id": "pdf-worker-parser-cli",
+      "purpose": "Run the Python parser against the downloaded PDF.",
+      "transport": "cli-stdout-json",
+      "producer": "pdf-parser-worker/python-parser",
+      "consumer": "python-parser/pdf-parser-worker",
+      "data": "PDF path and adapter key in; structured parser result out",
+      "outputSchema": "#/components/schemas/Cli_PdfParserOutput",
+      "security": "Local process boundary",
+      "failure": "Non-zero exit, timeout, or invalid JSON becomes a failed callback"
     },
     {
       "id": "pdf-parser-backend-callback",
+      "purpose": "Return the final parser result or error and update the stored job.",
       "transport": "http",
       "producer": "pdf-parser-worker",
       "consumer": "nestjs-backend",
-      "schema": "#/components/schemas/Http_PdfParserCallback"
+      "data": "Completed result or structured worker error",
+      "schema": "#/components/schemas/Http_PdfParserCallback",
+      "security": "Worker bearer token",
+      "failure": "Callback delivery retries three times; repeated identical callbacks are accepted"
     },
     {
       "id": "backend-solver-queue",
+      "purpose": "Assign a prepared timetable problem to the solver worker.",
       "transport": "bullmq",
       "channel": "timetable.solve",
       "producer": "nestjs-backend",
       "consumer": "solver-worker",
-      "schema": "#/components/schemas/Queue_TimetableSolveJob"
+      "data": "Job ID, attempt token, solve mode, and engine choice",
+      "schema": "#/components/schemas/Queue_TimetableSolveJob",
+      "security": "Authenticated Redis connection on the internal network",
+      "failure": "BullMQ retries the job; the final failure is returned by callback"
     },
     {
       "id": "backend-solver-input",
+      "purpose": "Give the worker the current scheduling problem and preferences.",
       "transport": "http",
       "producer": "nestjs-backend",
       "consumer": "solver-worker",
-      "schema": "#/components/schemas/Worker_SolverInput"
+      "data": "Scheduling events and solver preferences",
+      "schema": "#/components/schemas/Worker_SolverInput",
+      "security": "Worker bearer token",
+      "failure": "Missing, rejected, or invalid input fails the worker attempt"
     },
     {
       "id": "solver-backend-callback",
+      "purpose": "Return the final solution or error and update the active job attempt.",
       "transport": "http",
       "producer": "solver-worker",
       "consumer": "nestjs-backend",
-      "schema": "#/components/schemas/Http_SolverCallback"
+      "data": "Completed solver result or structured worker error",
+      "schema": "#/components/schemas/Http_SolverCallback",
+      "security": "Worker bearer token and attempt token",
+      "failure": "Callback delivery retries three times; stale attempts are rejected"
     },
     {
       "id": "solver-worker-native-cli",
+      "purpose": "Execute CP-SAT or GA outside the worker runtime.",
       "transport": "cli-json-file",
       "producer": "solver-worker/native-solver",
       "consumer": "native-solver/solver-worker",
+      "data": "Solver input file, engine and mode flags, then solver output file",
       "inputSchema": "#/components/schemas/Cli_SolverInput",
-      "outputSchema": "#/components/schemas/Cli_SolverOutput"
+      "outputSchema": "#/components/schemas/Cli_SolverOutput",
+      "security": "Local process boundary",
+      "failure": "Timeout, invalid output, or infeasibility becomes a failed callback; auto mode may fall back to GA"
+    },
+    {
+      "id": "backend-google-oauth",
+      "purpose": "Sign in or link an account with a Google identity.",
+      "transport": "oauth2-openid-connect",
+      "producer": "nestjs-backend/google",
+      "consumer": "google/nestjs-backend",
+      "data": "Authorization redirect, code, state, and OpenID profile",
+      "contract": "OpenAPI Auth Google paths; scopes: openid, email, profile",
+      "security": "OAuth state cookie, HTTPS redirect, and encrypted stored tokens",
+      "failure": "Provider and callback errors return through the authentication flow"
     }
   ],
   "schemas": {
@@ -69,6 +130,14 @@
         "fileKey": { "type": "string", "minLength": 1 },
         "adapterKey": { "type": "string", "minLength": 1 }
       }
+    },
+    "Object_PdfUpload": {
+      "type": "string",
+      "format": "binary",
+      "description": "PDF bytes written by the backend and downloaded by the parser worker using the `fileKey` from `Queue_PdfParseJob`.",
+      "x-transport": "s3-compatible-object-storage",
+      "x-producer": "nestjs-backend",
+      "x-consumer": "pdf-parser-worker"
     },
     "Queue_TimetableSolveJob": {
       "type": "object",
@@ -97,6 +166,14 @@
       "description": "Structured parser result produced by the PDF parser worker. Every event is either recurring (`isRecurring: true`, `day` set, `date: null`) or dated (`isRecurring: false`, `date` set, `day: null`). Runtime rule: `startTime` must be earlier than `endTime`.",
       "x-runtime-schema": "PdfParserResultSchema",
       "allOf": [{ "$ref": "#/components/schemas/PdfParserResultDto" }]
+    },
+    "Cli_PdfParserOutput": {
+      "description": "JSON written to stdout by the Python parser after a successful parse.",
+      "x-transport": "cli-stdout-json",
+      "x-producer": "python-parser",
+      "x-consumer": "pdf-parser-worker",
+      "x-cli-arguments": "--adapter <adapterKey> --file <path>",
+      "allOf": [{ "$ref": "#/components/schemas/Worker_PdfParserResult" }]
     },
     "Worker_SolverInput": {
       "description": "Scheduling problem and preferences returned by the backend to the solver worker and written as the native solver input JSON file. Each scheduling event must contain exactly one of `date` or `dayOfWeek`, and `startTime` must be earlier than `endTime`.",

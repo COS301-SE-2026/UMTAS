@@ -12,8 +12,8 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * Get api
-     * @description Get api. This App operation is part of the versioned UMTAS HTTP contract.
+     * GET /api
+     * @description GET /api. This App operation is part of the versioned UMTAS HTTP contract.
      */
     get: operations["AppController_getHello"];
     put?: never;
@@ -432,8 +432,8 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * Get health
-     * @description Get health. This Health operation is part of the versioned UMTAS HTTP contract.
+     * GET /api/health
+     * @description GET /api/health. This Health operation is part of the versioned UMTAS HTTP contract.
      */
     get: operations["HealthController_live"];
     put?: never;
@@ -452,8 +452,8 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * Get check
-     * @description Get check. This Health operation is part of the versioned UMTAS HTTP contract.
+     * GET /api/health/check
+     * @description GET /api/health/check. This Health operation is part of the versioned UMTAS HTTP contract.
      */
     get: operations["HealthController_check"];
     put?: never;
@@ -4226,33 +4226,52 @@ export interface components {
       events: components["schemas"]["EventDto"][];
       message?: string;
     };
+    /** @description Stable UMTAS error envelope. */
     ErrorResponse: {
-      /** @example PDF_JOB_NOT_FOUND */
+      /**
+       * @description Stable machine-readable error code.
+       * @example PDF_JOB_NOT_FOUND
+       */
       code: string;
+      /** @example PDF parser job was not found. */
       message: string;
       details?: {
         [key: string]: unknown;
       };
+      /** @example req_01J... */
       requestId?: string;
     };
+    /** @description Request validation failed. */
     ValidationErrorResponse: components["schemas"]["ErrorResponse"];
     AcceptedJobResponse: {
+      /** @example true */
       accepted: boolean;
       /** Format: uuid */
       jobId: string;
-      status?: components["schemas"]["JobStatus"];
+      /** @enum {string} */
+      status?: "queued" | "processing" | "completed" | "failed";
     };
-    /** @enum {string} */
+    /**
+     * @description Asynchronous job lifecycle state.
+     * @enum {string}
+     */
     JobStatus: "queued" | "processing" | "completed" | "failed";
+    /** @description Terminal asynchronous job failure. */
     JobError: components["schemas"]["ErrorResponse"];
     PaginationMetadata: {
       page: number;
       pageSize: number;
       total: number;
     };
-    /** Format: uuid */
+    /**
+     * Format: uuid
+     * @example 00000000-0000-4000-8000-000000000001
+     */
     UUID: string;
-    /** @description 24-hour local time in HH:mm format. */
+    /**
+     * @description 24-hour local time in HH:mm format.
+     * @example 08:30
+     */
     TimeOfDay: string;
     /** @description BullMQ job payload sent by the NestJS backend to the PDF parser worker on the `pdf.parse` queue. Runtime authority: `PdfParseJobDataSchema` in `packages/shared-types/src/parser.ts`. */
     Queue_PdfParseJob: {
@@ -4260,6 +4279,11 @@ export interface components {
       fileKey: string;
       adapterKey: string;
     };
+    /**
+     * Format: binary
+     * @description PDF bytes written by the backend and downloaded by the parser worker using the `fileKey` from `Queue_PdfParseJob`.
+     */
+    Object_PdfUpload: string;
     /** @description BullMQ job payload sent by the NestJS backend to the solver worker on the `timetable.solve` queue. Runtime authority: `TimetableSolveJobDataSchema` in `packages/shared-types/src/solver.ts`. */
     Queue_TimetableSolveJob: {
       jobId: string;
@@ -4275,6 +4299,8 @@ export interface components {
     };
     /** @description Structured parser result produced by the PDF parser worker. Every event is either recurring (`isRecurring: true`, `day` set, `date: null`) or dated (`isRecurring: false`, `date` set, `day: null`). Runtime rule: `startTime` must be earlier than `endTime`. */
     Worker_PdfParserResult: components["schemas"]["PdfParserResultDto"];
+    /** @description JSON written to stdout by the Python parser after a successful parse. */
+    Cli_PdfParserOutput: components["schemas"]["Worker_PdfParserResult"];
     /** @description Scheduling problem and preferences returned by the backend to the solver worker and written as the native solver input JSON file. Each scheduling event must contain exactly one of `date` or `dayOfWeek`, and `startTime` must be earlier than `endTime`. */
     Worker_SolverInput: components["schemas"]["SolverInputDto"];
     /** @description Normalized solver result returned by the solver worker. Runtime rules: `metadata.conflictCount` equals `metadata.conflicts.length`; `outcome` is `conflict-free` when the count is zero and `best-effort` otherwise. */
@@ -4341,7 +4367,7 @@ export interface components {
         "application/json": components["schemas"]["ErrorResponse"];
       };
     };
-    /** @description Access is forbidden. */
+    /** @description The authenticated principal is not allowed to perform this operation. */
     ForbiddenError: {
       headers: {
         [name: string]: unknown;
@@ -4403,7 +4429,7 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description Response for this operation. */
+      /** @description HTTP 200 response. */
       200: {
         headers: {
           [name: string]: unknown;
@@ -4412,9 +4438,7 @@ export interface operations {
           "application/json": string;
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -4449,7 +4473,6 @@ export interface operations {
           "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
-      /** @description HTTP response. */
       409: components["responses"]["ConflictError"];
       /** @description Email already registered */
       422: {
@@ -4469,7 +4492,6 @@ export interface operations {
           "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -4513,7 +4535,6 @@ export interface operations {
           "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
-      /** @description HTTP response. */
       409: components["responses"]["ConflictError"];
       /** @description Rate limited */
       429: {
@@ -4524,7 +4545,6 @@ export interface operations {
           "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -4546,7 +4566,6 @@ export interface operations {
           "application/json": components["schemas"]["AuthAcknowledgementDto"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
       /** @description No active session */
       401: {
@@ -4557,11 +4576,8 @@ export interface operations {
           "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
-      /** @description HTTP response. */
       409: components["responses"]["ConflictError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -4583,13 +4599,9 @@ export interface operations {
           "application/json": components["schemas"]["AuthEnvelopeDto"] | null;
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -4611,7 +4623,6 @@ export interface operations {
           "application/json": components["schemas"]["AuthSessionDto"][];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
       /** @description Unauthorized */
       401: {
@@ -4622,9 +4633,7 @@ export interface operations {
           "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -4668,11 +4677,8 @@ export interface operations {
           "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
-      /** @description HTTP response. */
       409: components["responses"]["ConflictError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -4712,9 +4718,7 @@ export interface operations {
           "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
-      /** @description HTTP response. */
       409: components["responses"]["ConflictError"];
       /** @description Rate limited */
       429: {
@@ -4725,7 +4729,6 @@ export interface operations {
           "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -4760,9 +4763,7 @@ export interface operations {
           "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
-      /** @description HTTP response. */
       409: components["responses"]["ConflictError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -4788,9 +4789,7 @@ export interface operations {
           "application/json": components["schemas"]["AuthAcknowledgementDto"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
-      /** @description HTTP response. */
       409: components["responses"]["ConflictError"];
       /** @description Rate limited */
       429: {
@@ -4801,7 +4800,6 @@ export interface operations {
           "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -4836,9 +4834,7 @@ export interface operations {
           "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
-      /** @description HTTP response. */
       409: components["responses"]["ConflictError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -4882,11 +4878,8 @@ export interface operations {
           "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
-      /** @description HTTP response. */
       409: components["responses"]["ConflictError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -4920,7 +4913,6 @@ export interface operations {
           "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -4964,9 +4956,7 @@ export interface operations {
           "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
-      /** @description HTTP response. */
       409: components["responses"]["ConflictError"];
       /** @description The Google account email is already in use by another account */
       422: {
@@ -4977,7 +4967,6 @@ export interface operations {
           "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -5003,7 +4992,6 @@ export interface operations {
           "application/json": components["schemas"]["AuthUserResponseDto"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
       /** @description Unauthorized */
       401: {
@@ -5023,7 +5011,6 @@ export interface operations {
           "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
-      /** @description HTTP response. */
       409: components["responses"]["ConflictError"];
       /** @description Email already registered */
       422: {
@@ -5034,7 +5021,6 @@ export interface operations {
           "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -5060,15 +5046,10 @@ export interface operations {
           "application/json": components["schemas"]["CreateMockUserDto"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
-      /** @description HTTP response. */
       409: components["responses"]["ConflictError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -5090,13 +5071,9 @@ export interface operations {
           "application/json": components["schemas"]["DeleteMockUsersResponseDto"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -5122,7 +5099,6 @@ export interface operations {
           "application/json": components["schemas"]["AuthEnvelopeDto"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
       /** @description Unauthorized */
       401: {
@@ -5142,9 +5118,7 @@ export interface operations {
           "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
-      /** @description HTTP response. */
       409: components["responses"]["ConflictError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -5170,7 +5144,6 @@ export interface operations {
           "application/json": components["schemas"]["AuthUserResponseDto"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
       /** @description Unauthorized */
       401: {
@@ -5199,9 +5172,7 @@ export interface operations {
           "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
-      /** @description HTTP response. */
       409: components["responses"]["ConflictError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -5227,7 +5198,6 @@ export interface operations {
           "application/json": components["schemas"]["AuthUserResponseDto"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
       /** @description Unauthorized */
       401: {
@@ -5256,7 +5226,6 @@ export interface operations {
           "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
-      /** @description HTTP response. */
       409: components["responses"]["ConflictError"];
       /** @description New email already in use */
       422: {
@@ -5267,7 +5236,6 @@ export interface operations {
           "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -5293,15 +5261,10 @@ export interface operations {
           "application/json": components["schemas"]["AuthEnvelopeDto"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
-      /** @description HTTP response. */
       409: components["responses"]["ConflictError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -5314,16 +5277,14 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description Response for this operation. */
+      /** @description HTTP 200 response. */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content?: never;
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -5336,16 +5297,14 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description Response for this operation. */
+      /** @description HTTP 200 response. */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content?: never;
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -5385,9 +5344,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
       /** @description No modules found matching the filters */
       404: {
@@ -5396,7 +5353,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -5429,9 +5385,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
       /** @description Module code already exists for course */
       409: {
@@ -5440,7 +5394,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -5482,11 +5435,8 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -5519,13 +5469,9 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
-      /** @description HTTP response. */
       409: components["responses"]["ConflictError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -5556,9 +5502,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
       /** @description Module not found */
       404: {
@@ -5567,7 +5511,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -5598,9 +5541,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
       /** @description Module not found */
       404: {
@@ -5609,7 +5550,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -5644,9 +5584,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
       /** @description Module not found */
       404: {
@@ -5662,7 +5600,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -5693,9 +5630,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
       /** @description Module not found */
       404: {
@@ -5704,7 +5639,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -5737,11 +5671,8 @@ export interface operations {
           "application/json": components["schemas"]["EnrolResponseDto"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
       /** @description Module not found */
       404: {
@@ -5750,7 +5681,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -5787,11 +5717,8 @@ export interface operations {
           "application/json": components["schemas"]["EnrolResponseDto"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
       /** @description Module not found */
       404: {
@@ -5800,9 +5727,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       409: components["responses"]["ConflictError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -5830,11 +5755,8 @@ export interface operations {
           "application/json": components["schemas"]["AddModulesToCourseResponseDto"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
       /**
        * @description Modules specified in modules array not found
@@ -5847,9 +5769,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       409: components["responses"]["ConflictError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -5877,11 +5797,8 @@ export interface operations {
           "application/json": components["schemas"]["ModuleStylingResponseDto"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
       /** @description Module not found */
       404: {
@@ -5890,9 +5807,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       409: components["responses"]["ConflictError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -5925,9 +5840,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
       /** @description Course already exists */
       409: {
@@ -5936,7 +5849,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -5965,15 +5877,10 @@ export interface operations {
           "application/json": components["schemas"]["CourseListResponseDto"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
-      /** @description HTTP response. */
       409: components["responses"]["ConflictError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -6004,13 +5911,9 @@ export interface operations {
           "application/json": components["schemas"]["CourseListResponseDtoV2"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -6041,9 +5944,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
       /** @description Course not found */
       404: {
@@ -6052,7 +5953,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -6083,9 +5983,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
       /** @description Course not found */
       404: {
@@ -6094,7 +5992,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -6129,9 +6026,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
       /** @description Course not found */
       404: {
@@ -6140,9 +6035,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       409: components["responses"]["ConflictError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -6173,9 +6066,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
       /** @description Course not found */
       404: {
@@ -6184,7 +6075,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -6206,11 +6096,8 @@ export interface operations {
           "application/json": components["schemas"]["UniversityListResponseDto"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
       /** @description No universities found */
       404: {
@@ -6219,7 +6106,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -6252,9 +6138,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
       /** @description University already exists */
       409: {
@@ -6263,7 +6147,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -6294,9 +6177,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
       /** @description University not found */
       404: {
@@ -6305,7 +6186,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -6336,9 +6216,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
       /** @description University not found */
       404: {
@@ -6347,7 +6225,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -6382,9 +6259,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
       /** @description University not found */
       404: {
@@ -6393,9 +6268,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       409: components["responses"]["ConflictError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -6426,9 +6299,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
       /** @description University not found */
       404: {
@@ -6437,7 +6308,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -6465,11 +6335,8 @@ export interface operations {
           "application/json": components["schemas"]["GetRolesDto"][];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
       /** @description Unauthorized */
       409: {
@@ -6478,7 +6345,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -6512,9 +6378,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
       /** @description University not found */
       404: {
@@ -6530,7 +6394,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -6564,9 +6427,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
       /** @description UniversityRole not found */
       404: {
@@ -6582,7 +6443,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -6617,9 +6477,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
       /** @description Group not found */
       404: {
@@ -6628,9 +6486,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       409: components["responses"]["ConflictError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -6656,15 +6512,10 @@ export interface operations {
           "application/json": components["schemas"]["EventSingleResponseDto"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
-      /** @description HTTP response. */
       409: components["responses"]["ConflictError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -6692,7 +6543,6 @@ export interface operations {
           "application/json": components["schemas"]["EventListResponseDtoV2"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
       /** @description No active session */
       401: {
@@ -6708,7 +6558,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -6755,7 +6604,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       409: components["responses"]["ConflictError"];
       /** @description Event was not created */
       500: {
@@ -6786,11 +6634,8 @@ export interface operations {
           "application/json": components["schemas"]["EventSingleResponseDto"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
       /** @description Event not found */
       404: {
@@ -6799,7 +6644,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -6823,7 +6667,6 @@ export interface operations {
           "application/json": components["schemas"]["DeleteResponseDto"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
       /** @description No active session */
       401: {
@@ -6907,7 +6750,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       409: components["responses"]["ConflictError"];
       /** @description Event was not updated */
       500: {
@@ -6942,11 +6784,8 @@ export interface operations {
           "application/json": components["schemas"]["ValidateEventResponseDto"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
       /** @description Event not found */
       404: {
@@ -6955,9 +6794,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       409: components["responses"]["ConflictError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -6985,9 +6822,7 @@ export interface operations {
           "application/json": components["schemas"]["EventSingleResponseDto"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
       /** @description Insufficient permissions */
       403: {
@@ -7003,9 +6838,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       409: components["responses"]["ConflictError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -7027,7 +6860,6 @@ export interface operations {
           "application/json": components["schemas"]["TimetableListResponseDto"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
       /** @description No active session */
       401: {
@@ -7036,9 +6868,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -7078,9 +6908,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
-      /** @description HTTP response. */
       409: components["responses"]["ConflictError"];
       /** @description Timetable was not created */
       500: {
@@ -7109,7 +6937,6 @@ export interface operations {
           "application/json": components["schemas"]["TimetableListResponseDtoV2"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
       /** @description No active session */
       401: {
@@ -7118,9 +6945,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -7145,11 +6970,8 @@ export interface operations {
           "application/json": components["schemas"]["TimetableResponseDto"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
       /** @description Timetable not found */
       404: {
@@ -7158,7 +6980,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -7183,7 +7004,6 @@ export interface operations {
           "application/json": components["schemas"]["DeleteTimetableResponseDto"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
       /** @description No active session */
       401: {
@@ -7192,7 +7012,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
       /** @description Timetable not found */
       404: {
@@ -7249,7 +7068,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
       /** @description Timetable not found */
       404: {
@@ -7258,7 +7076,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       409: components["responses"]["ConflictError"];
       /** @description Timetable was not updated */
       500: {
@@ -7290,11 +7107,8 @@ export interface operations {
           "application/json": components["schemas"]["TimetableResponseDto"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
       /** @description Timetable[] not found */
       404: {
@@ -7303,7 +7117,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -7325,13 +7138,9 @@ export interface operations {
           "application/json": components["schemas"]["ModuleSingleResponseDto"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -7360,9 +7169,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
       /** @description No modules found matching the filters */
       404: {
@@ -7371,7 +7178,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -7404,9 +7210,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
       /** @description Module code already exists for course */
       409: {
@@ -7415,7 +7219,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -7446,9 +7249,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
       /** @description Module not found */
       404: {
@@ -7457,7 +7258,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -7488,9 +7288,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
       /** @description Module not found */
       404: {
@@ -7499,7 +7297,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -7534,9 +7331,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
       /** @description Module not found */
       404: {
@@ -7552,7 +7347,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -7578,11 +7372,8 @@ export interface operations {
           "application/json": components["schemas"]["EventSingleResponseDto"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
       /** @description Module not found */
       404: {
@@ -7591,9 +7382,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       409: components["responses"]["ConflictError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -7619,7 +7408,7 @@ export interface operations {
       };
     };
     responses: {
-      /** @description Response for this operation. */
+      /** @description HTTP 200 response. */
       200: {
         headers: {
           [name: string]: unknown;
@@ -7628,15 +7417,10 @@ export interface operations {
           "application/json": components["schemas"]["PdfParserLookupResponseDto"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
-      /** @description HTTP response. */
       409: components["responses"]["ConflictError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -7678,7 +7462,7 @@ export interface operations {
       };
     };
     responses: {
-      /** @description Response for this operation. */
+      /** @description HTTP 202 response. */
       202: {
         headers: {
           [name: string]: unknown;
@@ -7687,15 +7471,10 @@ export interface operations {
           "application/json": components["schemas"]["PdfParserUploadResponseDto"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
-      /** @description HTTP response. */
       409: components["responses"]["ConflictError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -7710,7 +7489,7 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description Response for this operation. */
+      /** @description HTTP 200 response. */
       200: {
         headers: {
           [name: string]: unknown;
@@ -7719,15 +7498,10 @@ export interface operations {
           "application/json": components["schemas"]["PdfParserJobResponseDto"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
-      /** @description HTTP response. */
       404: components["responses"]["NotFoundError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -7742,7 +7516,7 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description Response for this operation. */
+      /** @description HTTP 200 response. */
       200: {
         headers: {
           [name: string]: unknown;
@@ -7751,15 +7525,10 @@ export interface operations {
           "application/json": components["schemas"]["Worker_PdfParserResult"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
-      /** @description HTTP response. */
       404: components["responses"]["NotFoundError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -7778,7 +7547,7 @@ export interface operations {
       };
     };
     responses: {
-      /** @description Response for this operation. */
+      /** @description HTTP 202 response. */
       202: {
         headers: {
           [name: string]: unknown;
@@ -7787,15 +7556,10 @@ export interface operations {
           "application/json": components["schemas"]["AcceptedJobResponseDto"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       404: components["responses"]["NotFoundError"];
-      /** @description HTTP response. */
       409: components["responses"]["ConflictError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -7812,7 +7576,7 @@ export interface operations {
       };
     };
     responses: {
-      /** @description Response for this operation. */
+      /** @description HTTP 202 response. */
       202: {
         headers: {
           [name: string]: unknown;
@@ -7821,15 +7585,10 @@ export interface operations {
           "application/json": components["schemas"]["SolverSubmissionResponseDto"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
-      /** @description HTTP response. */
       409: components["responses"]["ConflictError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -7844,7 +7603,7 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description Response for this operation. */
+      /** @description HTTP 200 response. */
       200: {
         headers: {
           [name: string]: unknown;
@@ -7853,13 +7612,9 @@ export interface operations {
           "application/json": components["schemas"]["Worker_SolverInput"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       404: components["responses"]["NotFoundError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -7874,7 +7629,7 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description Response for this operation. */
+      /** @description HTTP 200 response. */
       200: {
         headers: {
           [name: string]: unknown;
@@ -7883,15 +7638,10 @@ export interface operations {
           "application/json": components["schemas"]["SolverJobResponseDto"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
-      /** @description HTTP response. */
       404: components["responses"]["NotFoundError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -7906,7 +7656,7 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description Response for this operation. */
+      /** @description HTTP 200 response. */
       200: {
         headers: {
           [name: string]: unknown;
@@ -7915,15 +7665,10 @@ export interface operations {
           "application/json": components["schemas"]["Worker_SolverResult"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
-      /** @description HTTP response. */
       404: components["responses"]["NotFoundError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -7944,7 +7689,7 @@ export interface operations {
       };
     };
     responses: {
-      /** @description Response for this operation. */
+      /** @description HTTP 202 response. */
       202: {
         headers: {
           [name: string]: unknown;
@@ -7953,15 +7698,10 @@ export interface operations {
           "application/json": components["schemas"]["AcceptedJobResponseDto"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       404: components["responses"]["NotFoundError"];
-      /** @description HTTP response. */
       409: components["responses"]["ConflictError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -7983,7 +7723,7 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description Response for this operation. */
+      /** @description HTTP 200 response. */
       200: {
         headers: {
           [name: string]: unknown;
@@ -7992,13 +7732,9 @@ export interface operations {
           "application/json": components["schemas"]["AttendanceListResponse"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -8015,7 +7751,7 @@ export interface operations {
       };
     };
     responses: {
-      /** @description Response for this operation. */
+      /** @description HTTP 201 response. */
       201: {
         headers: {
           [name: string]: unknown;
@@ -8024,15 +7760,10 @@ export interface operations {
           "application/json": components["schemas"]["AttendanceSingleResponse"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
-      /** @description HTTP response. */
       409: components["responses"]["ConflictError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -8047,7 +7778,7 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description Response for this operation. */
+      /** @description HTTP 200 response. */
       200: {
         headers: {
           [name: string]: unknown;
@@ -8056,15 +7787,10 @@ export interface operations {
           "application/json": components["schemas"]["AttendanceSingleResponse"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
-      /** @description HTTP response. */
       404: components["responses"]["NotFoundError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -8079,7 +7805,7 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description Response for this operation. */
+      /** @description HTTP 200 response. */
       200: {
         headers: {
           [name: string]: unknown;
@@ -8088,15 +7814,10 @@ export interface operations {
           "application/json": components["schemas"]["deleteAttendanceResponse"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
-      /** @description HTTP response. */
       404: components["responses"]["NotFoundError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -8115,7 +7836,7 @@ export interface operations {
       };
     };
     responses: {
-      /** @description Response for this operation. */
+      /** @description HTTP 200 response. */
       200: {
         headers: {
           [name: string]: unknown;
@@ -8124,17 +7845,11 @@ export interface operations {
           "application/json": components["schemas"]["AttendanceSingleResponse"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
-      /** @description HTTP response. */
       404: components["responses"]["NotFoundError"];
-      /** @description HTTP response. */
       409: components["responses"]["ConflictError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -8160,9 +7875,7 @@ export interface operations {
           "application/json": components["schemas"]["VenueMappingListResponseDto"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
       /** @description No uni selected or no role at uni */
       403: {
@@ -8171,7 +7884,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -8206,7 +7918,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
       /** @description Wrong permissions */
       403: {
@@ -8222,9 +7933,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       409: components["responses"]["ConflictError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -8257,7 +7966,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
       /** @description Wrong permissions bud */
       403: {
@@ -8266,9 +7974,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       409: components["responses"]["ConflictError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -8295,9 +8001,7 @@ export interface operations {
           "application/json": components["schemas"]["BuildingListResponseDto"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
       /** @description No uni selected or no role at uni */
       403: {
@@ -8306,7 +8010,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -8332,9 +8035,7 @@ export interface operations {
           "application/json": components["schemas"]["BuildingSingleResponseDto"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
       /** @description Incorrect role permissions */
       403: {
@@ -8350,7 +8051,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -8378,9 +8078,7 @@ export interface operations {
           "application/json": components["schemas"]["BuildingSingleResponseDto"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
       /** @description Your role is not admin, not allowed */
       403: {
@@ -8396,9 +8094,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       409: components["responses"]["ConflictError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -8411,7 +8107,7 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description Response for this operation. */
+      /** @description HTTP 200 response. */
       200: {
         headers: {
           [name: string]: unknown;
@@ -8420,9 +8116,7 @@ export interface operations {
           "application/json": components["schemas"]["MapConfigDto"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
       /** @description No university selected */
       403: {
@@ -8438,7 +8132,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -8455,7 +8148,7 @@ export interface operations {
       };
     };
     responses: {
-      /** @description Response for this operation. */
+      /** @description HTTP 200 response. */
       200: {
         headers: {
           [name: string]: unknown;
@@ -8464,9 +8157,7 @@ export interface operations {
           "application/json": components["schemas"]["MapConfigDto"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
       /** @description Insufficient permissions */
       403: {
@@ -8475,9 +8166,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       409: components["responses"]["ConflictError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -8504,9 +8193,7 @@ export interface operations {
           "application/json": components["schemas"]["RouteSingleResponseDto"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
       /** @description No university or university role was selected */
       403: {
@@ -8522,7 +8209,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -8549,9 +8235,7 @@ export interface operations {
           "application/json": components["schemas"]["ActiveRouteResponseDto"];
         };
       };
-      /** @description HTTP response. */
       400: components["responses"]["BadRequestError"];
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
       /** @description No university or university role was selected */
       403: {
@@ -8560,7 +8244,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -8593,9 +8276,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
       /** @description Calendar or timetable not found */
       404: {
@@ -8618,7 +8299,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -8650,9 +8330,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
       /** @description Generated calendar not found */
       404: {
@@ -8661,7 +8339,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -8693,11 +8370,8 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -8743,7 +8417,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -8797,7 +8470,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -8850,7 +8522,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -8921,7 +8592,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -8994,7 +8664,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -9049,7 +8718,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -9106,7 +8774,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       409: components["responses"]["ConflictError"];
       /** @description Public calendar year does not match the academic calendar */
       422: {
@@ -9115,7 +8782,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -9168,7 +8834,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -9228,7 +8893,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -9262,9 +8926,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
       /** @description The university or its API adapter could not be found. */
       404: {
@@ -9273,7 +8935,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -9305,9 +8966,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
       /** @description The university or its API adapter could not be found. */
       404: {
@@ -9316,7 +8975,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -9348,9 +9006,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
       /** @description The university, course, or API adapter could not be found. */
       404: {
@@ -9359,7 +9015,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
@@ -9391,9 +9046,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       401: components["responses"]["UnauthorizedError"];
-      /** @description HTTP response. */
       403: components["responses"]["ForbiddenError"];
       /** @description The university, module, or API adapter could not be found. */
       404: {
@@ -9402,7 +9055,6 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description HTTP response. */
       500: components["responses"]["InternalError"];
     };
   };
