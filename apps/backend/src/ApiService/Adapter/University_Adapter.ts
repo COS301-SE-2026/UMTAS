@@ -5,13 +5,15 @@ import { CreateModuleDto, ModulesDto } from 'src/Module/dto/module.dto';
 import { UniversityDto } from 'src/University/dto/university.dto';
 
 export abstract class University_Adapter {
-  protected uniID: string;
-  protected baseUrl: string | null;
+  protected readonly uniID: string;
+  protected readonly baseUrl: string;
   protected apiKey: string | null;
 
-  constructor(protected uni: UniversityDto) {
+  private readonly REQUEST_TIMEOUT_MS = 10000;
+
+  constructor(protected readonly uni: UniversityDto) {
     this.uniID = uni.UniversityID;
-    this.baseUrl = uni.BaseApiUrl ?? null;
+    this.baseUrl = uni.BaseApiUrl!;
     this.apiKey = uni.ApiKey ?? null;
   }
 
@@ -30,20 +32,20 @@ export abstract class University_Adapter {
   /**
    * Get all Events for a selected module
    */
-  abstract getEvents(Module: ModulesDto): Promise<CreateEventDtoV2[]>;
+  abstract getEvents(module: ModulesDto): Promise<CreateEventDtoV2[]>;
 
   /**
    * Make a request to the external api, specifying only the url
    * @param url - Path for the endpoint being hit
    * @returns
    */
-  async request<T = any>(
+  protected async request<T>(
     url: string,
     params?: Record<string, string | number | boolean | undefined>,
   ): Promise<T> {
     await this.authenticate();
 
-    const timeout = 15000; //15 seconds
+    const timeout = this.REQUEST_TIMEOUT_MS;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
