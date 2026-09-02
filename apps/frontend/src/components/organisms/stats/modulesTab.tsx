@@ -138,7 +138,7 @@ export default function ModulesTab({
         {isLoading ? (
           <Skeleton />
         ) : (
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto overflow-y-auto max-h-80">
             <Table>
               <TableHeader>
                 <TableRow>
