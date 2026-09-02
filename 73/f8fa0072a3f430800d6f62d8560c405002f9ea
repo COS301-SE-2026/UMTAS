@@ -1,0 +1,16 @@
+apps/backend/src/main.ts
+  h_2d4b3dca70a3d8 47-55
+apps/frontend/next.config.ts
+  h_2d4b3dca70a3d8 3-15,29
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "73f8fa0072a3f430800d6f62d8560c405002f9ea",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
