@@ -1,5 +1,5 @@
 {
-  "openapi": "3.0.0",
+  "openapi": "3.0.3",
   "paths": {
     "/api": {
       "get": {
@@ -7,7 +7,7 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "",
+            "description": "Response for this operation.",
             "content": {
               "application/json": {
                 "schema": {
@@ -15,11 +15,20 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
-        "tags": [
-          "App"
-        ]
+        "tags": ["App"],
+        "summary": "Get api",
+        "description": "Get api. This App operation is part of the versioned UMTAS HTTP contract.",
+        "security": []
       }
     },
     "/api/auth/sign-up/email": {
@@ -57,6 +66,10 @@
               }
             }
           },
+          "409": {
+            "$ref": "#/components/responses/ConflictError",
+            "description": "HTTP response."
+          },
           "422": {
             "description": "Email already registered",
             "content": {
@@ -76,13 +89,16 @@
                 }
               }
             }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Register with email and password",
-        "tags": [
-          "Auth",
-          "Auth Email"
-        ]
+        "tags": ["Auth", "Auth Email"],
+        "description": "Register with email and password. This Auth operation is part of the versioned UMTAS HTTP contract.",
+        "security": []
       }
     },
     "/api/auth/sign-in/email": {
@@ -130,6 +146,10 @@
               }
             }
           },
+          "409": {
+            "$ref": "#/components/responses/ConflictError",
+            "description": "HTTP response."
+          },
           "429": {
             "description": "Rate limited",
             "content": {
@@ -139,13 +159,16 @@
                 }
               }
             }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Sign in with email and password",
-        "tags": [
-          "Auth",
-          "Auth Email"
-        ]
+        "tags": ["Auth", "Auth Email"],
+        "description": "Sign in with email and password. This Auth operation is part of the versioned UMTAS HTTP contract.",
+        "security": []
       }
     },
     "/api/auth/sign-out": {
@@ -163,6 +186,10 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
           "401": {
             "description": "No active session",
             "content": {
@@ -172,6 +199,18 @@
                 }
               }
             }
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "security": [
@@ -180,10 +219,8 @@
           }
         ],
         "summary": "Sign out and invalidate the current session",
-        "tags": [
-          "Auth",
-          "Auth Session"
-        ]
+        "tags": ["Auth", "Auth Session"],
+        "description": "Sign out and invalidate the current session. This Auth operation is part of the versioned UMTAS HTTP contract."
       }
     },
     "/api/auth/get-session": {
@@ -228,6 +265,22 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "security": [
@@ -236,10 +289,8 @@
           }
         ],
         "summary": "Get the current user session",
-        "tags": [
-          "Auth",
-          "Auth Session"
-        ]
+        "tags": ["Auth", "Auth Session"],
+        "description": "Get the current user session. This Auth operation is part of the versioned UMTAS HTTP contract."
       }
     },
     "/api/auth/list-sessions": {
@@ -260,6 +311,10 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
           "401": {
             "description": "Unauthorized",
             "content": {
@@ -269,6 +324,14 @@
                 }
               }
             }
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "security": [
@@ -277,10 +340,8 @@
           }
         ],
         "summary": "List all active sessions for the current user",
-        "tags": [
-          "Auth",
-          "Auth Session"
-        ]
+        "tags": ["Auth", "Auth Session"],
+        "description": "List all active sessions for the current user. This Auth operation is part of the versioned UMTAS HTTP contract."
       }
     },
     "/api/auth/revoke-session": {
@@ -327,6 +388,18 @@
                 }
               }
             }
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "security": [
@@ -335,10 +408,8 @@
           }
         ],
         "summary": "Terminate a specific session by ID",
-        "tags": [
-          "Auth",
-          "Auth Session"
-        ]
+        "tags": ["Auth", "Auth Session"],
+        "description": "Terminate a specific session by ID. This Auth operation is part of the versioned UMTAS HTTP contract."
       }
     },
     "/api/auth/send-verification-email": {
@@ -376,6 +447,14 @@
               }
             }
           },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError",
+            "description": "HTTP response."
+          },
           "429": {
             "description": "Rate limited",
             "content": {
@@ -385,6 +464,10 @@
                 }
               }
             }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "security": [
@@ -393,10 +476,8 @@
           }
         ],
         "summary": "Send a verification email to the signed-in user",
-        "tags": [
-          "Auth",
-          "Auth Email"
-        ]
+        "tags": ["Auth", "Auth Email"],
+        "description": "Send a verification email to the signed-in user. This Auth operation is part of the versioned UMTAS HTTP contract."
       }
     },
     "/api/auth/verify-email": {
@@ -433,13 +514,20 @@
                 }
               }
             }
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Verify email address using the code from the verification email",
-        "tags": [
-          "Auth",
-          "Auth Email"
-        ]
+        "tags": ["Auth", "Auth Email"],
+        "description": "Verify email address using the code from the verification email. This Auth operation is part of the versioned UMTAS HTTP contract.",
+        "security": []
       }
     },
     "/api/auth/forget-password": {
@@ -467,6 +555,14 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError",
+            "description": "HTTP response."
+          },
           "429": {
             "description": "Rate limited",
             "content": {
@@ -476,13 +572,16 @@
                 }
               }
             }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Request a password reset email",
-        "tags": [
-          "Auth",
-          "Auth Email"
-        ]
+        "tags": ["Auth", "Auth Email"],
+        "description": "Request a password reset email. This Auth operation is part of the versioned UMTAS HTTP contract.",
+        "security": []
       }
     },
     "/api/auth/reset-password": {
@@ -519,13 +618,20 @@
                 }
               }
             }
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Reset password using the token from the reset email",
-        "tags": [
-          "Auth",
-          "Auth Email"
-        ]
+        "tags": ["Auth", "Auth Email"],
+        "description": "Reset password using the token from the reset email. This Auth operation is part of the versioned UMTAS HTTP contract.",
+        "security": []
       }
     },
     "/api/auth/change-password": {
@@ -572,6 +678,18 @@
                 }
               }
             }
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "security": [
@@ -580,10 +698,8 @@
           }
         ],
         "summary": "Change password for the signed-in user",
-        "tags": [
-          "Auth",
-          "Auth Email"
-        ]
+        "tags": ["Auth", "Auth Email"],
+        "description": "Change password for the signed-in user. This Auth operation is part of the versioned UMTAS HTTP contract."
       }
     },
     "/api/auth/callback/google": {
@@ -624,13 +740,15 @@
                 }
               }
             }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Google OAuth callback",
-        "tags": [
-          "Auth",
-          "Auth Google"
-        ]
+        "tags": ["Auth", "Auth Google"],
+        "security": []
       }
     },
     "/api/auth/link-account/google": {
@@ -678,6 +796,14 @@
               }
             }
           },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError",
+            "description": "HTTP response."
+          },
           "422": {
             "description": "The Google account email is already in use by another account",
             "content": {
@@ -687,6 +813,10 @@
                 }
               }
             }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "security": [
@@ -695,10 +825,8 @@
           }
         ],
         "summary": "Link a Google account to the current user",
-        "tags": [
-          "Auth",
-          "Auth Google"
-        ]
+        "tags": ["Auth", "Auth Google"],
+        "description": "Link a Google account to the current user. This Auth operation is part of the versioned UMTAS HTTP contract."
       }
     },
     "/api/auth/admin/create-user": {
@@ -726,6 +854,10 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
           "401": {
             "description": "Unauthorized",
             "content": {
@@ -746,6 +878,10 @@
               }
             }
           },
+          "409": {
+            "$ref": "#/components/responses/ConflictError",
+            "description": "HTTP response."
+          },
           "422": {
             "description": "Email already registered",
             "content": {
@@ -755,6 +891,10 @@
                 }
               }
             }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "security": [
@@ -763,10 +903,8 @@
           }
         ],
         "summary": "Create a new user - requires sys_admin role",
-        "tags": [
-          "Auth",
-          "Auth Admin"
-        ]
+        "tags": ["Auth", "Auth Admin"],
+        "description": "Create a new user - requires sys_admin role. This Auth operation is part of the versioned UMTAS HTTP contract."
       }
     },
     "/api/auth/admin/create-mock-user": {
@@ -794,6 +932,26 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "security": [
@@ -802,10 +960,7 @@
           }
         ],
         "summary": "Create a new mock user",
-        "tags": [
-          "Auth",
-          "Auth Admin"
-        ]
+        "tags": ["Auth", "Auth Admin"]
       }
     },
     "/api/auth/admin/delete-mock-users": {
@@ -822,6 +977,22 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "security": [
@@ -830,10 +1001,8 @@
           }
         ],
         "summary": "Delete all mock users",
-        "tags": [
-          "Auth",
-          "Auth admin"
-        ]
+        "tags": ["Auth", "Auth Admin"],
+        "description": "Delete all mock users. This Auth operation is part of the versioned UMTAS HTTP contract."
       }
     },
     "/api/auth/admin/impersonate-user": {
@@ -861,6 +1030,10 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
           "401": {
             "description": "Unauthorized",
             "content": {
@@ -880,6 +1053,14 @@
                 }
               }
             }
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "security": [
@@ -888,10 +1069,8 @@
           }
         ],
         "summary": "Impersonate a user - requires sys_admin role",
-        "tags": [
-          "Auth",
-          "Auth Admin"
-        ]
+        "tags": ["Auth", "Auth Admin"],
+        "description": "Impersonate a user - requires sys_admin role. This Auth operation is part of the versioned UMTAS HTTP contract."
       }
     },
     "/api/auth/admin/ban-user": {
@@ -919,6 +1098,10 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
           "401": {
             "description": "Unauthorized",
             "content": {
@@ -948,6 +1131,14 @@
                 }
               }
             }
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "security": [
@@ -956,10 +1147,8 @@
           }
         ],
         "summary": "Ban a user - requires sys_admin role",
-        "tags": [
-          "Auth",
-          "Auth Admin"
-        ]
+        "tags": ["Auth", "Auth Admin"],
+        "description": "Ban a user - requires sys_admin role. This Auth operation is part of the versioned UMTAS HTTP contract."
       }
     },
     "/api/auth/admin/update-user": {
@@ -987,6 +1176,10 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
           "401": {
             "description": "Unauthorized",
             "content": {
@@ -1017,6 +1210,10 @@
               }
             }
           },
+          "409": {
+            "$ref": "#/components/responses/ConflictError",
+            "description": "HTTP response."
+          },
           "422": {
             "description": "New email already in use",
             "content": {
@@ -1026,6 +1223,10 @@
                 }
               }
             }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "security": [
@@ -1034,10 +1235,8 @@
           }
         ],
         "summary": "Update a user's details - requires sys_admin role",
-        "tags": [
-          "Auth",
-          "Auth Admin"
-        ]
+        "tags": ["Auth", "Auth Admin"],
+        "description": "Update a user's details - requires sys_admin role. This Auth operation is part of the versioned UMTAS HTTP contract."
       }
     },
     "/api/auth/select-university": {
@@ -1064,6 +1263,26 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "security": [
@@ -1072,9 +1291,8 @@
           }
         ],
         "summary": "Select current university",
-        "tags": [
-          "Auth"
-        ]
+        "tags": ["Auth"],
+        "description": "Select current university. This Auth operation is part of the versioned UMTAS HTTP contract."
       }
     },
     "/api/health": {
@@ -1083,12 +1301,21 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": ""
+            "description": "Response for this operation."
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
-        "tags": [
-          "Health"
-        ]
+        "tags": ["Health"],
+        "summary": "Get health",
+        "description": "Get health. This Health operation is part of the versioned UMTAS HTTP contract.",
+        "security": []
       }
     },
     "/api/health/check": {
@@ -1097,12 +1324,21 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": ""
+            "description": "Response for this operation."
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
-        "tags": [
-          "Health"
-        ]
+        "tags": ["Health"],
+        "summary": "Get check",
+        "description": "Get check. This Health operation is part of the versioned UMTAS HTTP contract.",
+        "security": []
       }
     },
     "/api/modules": {
@@ -1134,13 +1370,28 @@
           "400": {
             "description": "Missing or invalid module payload"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
           "409": {
             "description": "Module code already exists for course"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Create a module",
-        "tags": [
-          "Modules"
+        "tags": ["Modules"],
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       },
       "get": {
@@ -1211,13 +1462,28 @@
           "400": {
             "description": "Invalid request - at least one filter required"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
           "404": {
             "description": "No modules found matching the filters"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Get all modules with filters",
-        "tags": [
-          "Modules"
+        "tags": ["Modules"],
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       }
     },
@@ -1249,11 +1515,30 @@
           },
           "400": {
             "description": "Missing or invalid module payload"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Create a module - V2",
-        "tags": [
-          "Modules"
+        "tags": ["Modules"],
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       },
       "get": {
@@ -1332,11 +1617,26 @@
           },
           "400": {
             "description": "Invalid filters"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Get all modules with filters and counts - V2",
-        "tags": [
-          "Modules"
+        "tags": ["Modules"],
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       }
     },
@@ -1368,13 +1668,28 @@
           "400": {
             "description": "Invalid module ID"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
           "404": {
             "description": "Module not found"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Get a module by ID",
-        "tags": [
-          "Modules"
+        "tags": ["Modules"],
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       },
       "patch": {
@@ -1414,16 +1729,31 @@
           "400": {
             "description": "Invalid update payload or module ID"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
           "404": {
             "description": "Module not found"
           },
           "409": {
             "description": "Duplicate module code detected for course"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Update a module",
-        "tags": [
-          "Modules"
+        "tags": ["Modules"],
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       },
       "delete": {
@@ -1453,13 +1783,28 @@
           "400": {
             "description": "Invalid module ID"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
           "404": {
             "description": "Module not found"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Delete a module by ID",
-        "tags": [
-          "Modules"
+        "tags": ["Modules"],
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       }
     },
@@ -1491,13 +1836,28 @@
           "400": {
             "description": "Invalid module ID"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
           "404": {
             "description": "Module not found"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Get a module by ID - V2",
-        "tags": [
-          "Modules"
+        "tags": ["Modules"],
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       }
     },
@@ -1535,13 +1895,33 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
           "404": {
             "description": "Module not found"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Enrol student to module",
-        "tags": [
-          "Modules"
+        "tags": ["Modules"],
+        "description": "Enrol student to module. This Modules operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       },
       "patch": {
@@ -1587,13 +1967,37 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
           "404": {
             "description": "Module not found"
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Enrol student to module - V2",
-        "tags": [
-          "Modules"
+        "tags": ["Modules"],
+        "description": "Enrol student to module - V2. This Modules operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       }
     },
@@ -1631,13 +2035,37 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
           "404": {
             "description": "Modules specified in modules array not found\n\nCourse not found"
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Populate Course with modules array",
-        "tags": [
-          "Modules"
+        "tags": ["Modules"],
+        "description": "Populate Course with modules array. This Modules operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       }
     },
@@ -1676,13 +2104,36 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
           "404": {
             "description": "Module not found"
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Update a module styling",
-        "tags": [
-          "Modules"
+        "tags": ["Modules"],
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       }
     },
@@ -1714,13 +2165,29 @@
           "400": {
             "description": "Missing or invalid course payload"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
           "409": {
             "description": "Course already exists"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Create a Course",
-        "tags": [
-          "Courses"
+        "tags": ["Courses"],
+        "description": "Create a Course. This Courses operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       }
     },
@@ -1758,11 +2225,35 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Get all courses",
-        "tags": [
-          "Courses"
+        "tags": ["Courses"],
+        "description": "Get all courses. This Courses operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       }
     },
@@ -1827,11 +2318,30 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Get all courses - V2",
-        "tags": [
-          "Courses"
+        "tags": ["Courses"],
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       }
     },
@@ -1862,13 +2372,29 @@
           "400": {
             "description": "Invalid Course ID"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
           "404": {
             "description": "Course not found"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "get a Course by ID",
-        "tags": [
-          "Courses"
+        "tags": ["Courses"],
+        "description": "get a Course by ID. This Courses operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       },
       "patch": {
@@ -1907,13 +2433,33 @@
           "400": {
             "description": "Invalid update payload or CourseId"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
           "404": {
             "description": "Course not found"
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Update an Course",
-        "tags": [
-          "Courses"
+        "tags": ["Courses"],
+        "description": "Update an Course. This Courses operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       },
       "delete": {
@@ -1942,13 +2488,29 @@
           "400": {
             "description": "Invalid Course ID"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
           "404": {
             "description": "Course not found"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Delete Course by Course ID",
-        "tags": [
-          "Courses"
+        "tags": ["Courses"],
+        "description": "Delete Course by Course ID. This Courses operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       }
     },
@@ -1979,13 +2541,29 @@
           "400": {
             "description": "Invalid Course ID"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
           "404": {
             "description": "Course not found"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "get a Course by ID - V2",
-        "tags": [
-          "Courses"
+        "tags": ["Courses"],
+        "description": "get a Course by ID - V2. This Courses operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       }
     },
@@ -2017,13 +2595,29 @@
           "400": {
             "description": "Missing or invalid university payload"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
           "409": {
             "description": "University already exists"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Create a University",
-        "tags": [
-          "Universities"
+        "tags": ["Universities"],
+        "description": "Create a University. This Universities operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       },
       "get": {
@@ -2040,13 +2634,33 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
           "404": {
             "description": "No universities found"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Get all universities",
-        "tags": [
-          "Universities"
+        "tags": ["Universities"],
+        "description": "Get all universities. This Universities operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       }
     },
@@ -2077,13 +2691,29 @@
           "400": {
             "description": "Invalid University ID"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
           "404": {
             "description": "University not found"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "get a university by ID",
-        "tags": [
-          "Universities"
+        "tags": ["Universities"],
+        "description": "get a university by ID. This Universities operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       },
       "patch": {
@@ -2122,13 +2752,33 @@
           "400": {
             "description": "Invlaid update payload or universityId"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
           "404": {
             "description": "University not found"
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Update an university",
-        "tags": [
-          "Universities"
+        "tags": ["Universities"],
+        "description": "Update an university. This Universities operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       },
       "delete": {
@@ -2157,13 +2807,29 @@
           "400": {
             "description": "Invalid university ID"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
           "404": {
             "description": "University not found"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Delete university by university ID",
-        "tags": [
-          "Universities"
+        "tags": ["Universities"],
+        "description": "Delete university by university ID. This Universities operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       }
     },
@@ -2194,13 +2860,29 @@
           "400": {
             "description": "Invalid University ID"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
           "404": {
             "description": "University not found"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "get a users role by universityID",
-        "tags": [
-          "Universities"
+        "tags": ["Universities"],
+        "description": "get a users role by universityID. This Universities operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       }
     },
@@ -2241,13 +2923,33 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
           "409": {
             "description": "Unauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Get all applications for a specific university",
-        "tags": [
-          "Universities"
+        "tags": ["Universities"],
+        "description": "Get all applications for a specific university. This Universities operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       }
     },
@@ -2281,16 +2983,31 @@
           "400": {
             "description": "Invalid request body or university does not exist"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
           "404": {
             "description": "University not found"
           },
           "409": {
             "description": "User already has this role at the university"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Apply for a role at a specific university",
-        "tags": [
-          "Universities"
+        "tags": ["Universities"],
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       }
     },
@@ -2324,16 +3041,31 @@
           "400": {
             "description": "Invalid request body or universityRole does not exist"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
           "404": {
             "description": "UniversityRole not found"
           },
           "409": {
             "description": "User already has an approved role"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Approve a users role for a university",
-        "tags": [
-          "Universities"
+        "tags": ["Universities"],
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       }
     },
@@ -2375,13 +3107,32 @@
           "400": {
             "description": "Invalid input"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
           "404": {
             "description": "Group not found"
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Add array of modules to a module group",
-        "tags": [
-          "Grouping"
+        "tags": ["Grouping"],
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       }
     },
@@ -2409,11 +3160,35 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Create an event - V2",
-        "tags": [
-          "Events"
+        "tags": ["Events"],
+        "description": "Create an event - V2. This Events operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       }
     },
@@ -2451,13 +3226,21 @@
           "403": {
             "description": "Insufficient permissions"
           },
+          "409": {
+            "$ref": "#/components/responses/ConflictError",
+            "description": "HTTP response."
+          },
           "500": {
             "description": "Event was not created"
           }
         },
         "summary": "Create an event",
-        "tags": [
-          "Events"
+        "tags": ["Events"],
+        "description": "Create an event. This Events operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       },
       "get": {
@@ -2511,16 +3294,27 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
           "401": {
             "description": "No active session"
           },
           "403": {
             "description": "Insufficient permissions"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Get all events",
-        "tags": [
-          "Events"
+        "tags": ["Events"],
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       }
     },
@@ -2548,13 +3342,33 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
           "404": {
             "description": "Event not found"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Get event by ID",
-        "tags": [
-          "Events"
+        "tags": ["Events"],
+        "description": "Get event by ID. This Events operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       }
     },
@@ -2604,13 +3418,21 @@
           "404": {
             "description": "Event or referenced module not found"
           },
+          "409": {
+            "$ref": "#/components/responses/ConflictError",
+            "description": "HTTP response."
+          },
           "500": {
             "description": "Event was not updated"
           }
         },
         "summary": "Update an event",
-        "tags": [
-          "Events"
+        "tags": ["Events"],
+        "description": "Update an event. This Events operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       },
       "delete": {
@@ -2636,6 +3458,10 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
           "401": {
             "description": "No active session"
           },
@@ -2650,8 +3476,12 @@
           }
         },
         "summary": "Delete an event",
-        "tags": [
-          "Events"
+        "tags": ["Events"],
+        "description": "Delete an event. This Events operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       }
     },
@@ -2689,13 +3519,37 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
           "404": {
             "description": "Event not found"
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Validate an event",
-        "tags": [
-          "Events"
+        "tags": ["Events"],
+        "description": "Validate an event. This Events operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       }
     },
@@ -2733,16 +3587,36 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
           "403": {
             "description": "Insufficient permissions"
           },
           "404": {
             "description": "Event not found"
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Attach or clear an event's venue",
-        "tags": [
-          "Events"
+        "tags": ["Events"],
+        "description": "Attach or clear an event's venue. This Events operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       }
     },
@@ -2777,13 +3651,25 @@
           "401": {
             "description": "No active session"
           },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError",
+            "description": "HTTP response."
+          },
           "500": {
             "description": "Timetable was not created"
           }
         },
         "summary": "Create a timetable - user owned",
-        "tags": [
-          "Timetables"
+        "tags": ["Timetables"],
+        "description": "Create a timetable - user owned. This Timetables operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       },
       "get": {
@@ -2800,13 +3686,29 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
           "401": {
             "description": "No active session"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Get all timetables",
-        "tags": [
-          "Timetables"
+        "tags": ["Timetables"],
+        "description": "Get all timetables. This Timetables operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       }
     },
@@ -2825,13 +3727,29 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
           "401": {
             "description": "No active session"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Get all timetables",
-        "tags": [
-          "Timetables"
+        "tags": ["Timetables"],
+        "description": "Get all timetables. This Timetables operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       }
     },
@@ -2860,13 +3778,33 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
           "404": {
             "description": "Timetable not found"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Get timetable by ID",
-        "tags": [
-          "Timetables"
+        "tags": ["Timetables"],
+        "description": "Get timetable by ID. This Timetables operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       },
       "patch": {
@@ -2909,16 +3847,28 @@
           "401": {
             "description": "No active session"
           },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
           "404": {
             "description": "Timetable not found"
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError",
+            "description": "HTTP response."
           },
           "500": {
             "description": "Timetable was not updated"
           }
         },
         "summary": "Update a timetable",
-        "tags": [
-          "Timetables"
+        "tags": ["Timetables"],
+        "description": "Update a timetable. This Timetables operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       },
       "delete": {
@@ -2945,8 +3895,16 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
           "401": {
             "description": "No active session"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
           },
           "404": {
             "description": "Timetable not found"
@@ -2956,8 +3914,12 @@
           }
         },
         "summary": "Delete a timetable",
-        "tags": [
-          "Timetables"
+        "tags": ["Timetables"],
+        "description": "Delete a timetable. This Timetables operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       }
     },
@@ -2986,13 +3948,33 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
           "404": {
             "description": "Timetable[] not found"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Get timetable by ID",
-        "tags": [
-          "Timetables"
+        "tags": ["Timetables"],
+        "description": "Get timetable by ID. This Timetables operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       }
     },
@@ -3011,11 +3993,30 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Get personal module",
-        "tags": [
-          "Builder"
+        "tags": ["Builder"],
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       }
     },
@@ -3048,13 +4049,28 @@
           "400": {
             "description": "Missing or invalid module payload"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
           "409": {
             "description": "Module code already exists for course"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Create a user defined module",
-        "tags": [
-          "Builder"
+        "tags": ["Builder"],
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       },
       "get": {
@@ -3075,13 +4091,28 @@
           "400": {
             "description": "Invalid request - at least one filter required"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
           "404": {
             "description": "No modules found matching the filters"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Get all modules a user is enrolled in with their course",
-        "tags": [
-          "Builder"
+        "tags": ["Builder"],
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       }
     },
@@ -3113,13 +4144,28 @@
           "400": {
             "description": "Invalid module ID"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
           "404": {
             "description": "Module not found"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Get a module by ID",
-        "tags": [
-          "Builder"
+        "tags": ["Builder"],
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       },
       "patch": {
@@ -3159,16 +4205,31 @@
           "400": {
             "description": "Invalid update payload or module ID"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
           "404": {
             "description": "Module not found"
           },
           "409": {
             "description": "Duplicate module code detected for course"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Update a module that the student owns",
-        "tags": [
-          "Builder"
+        "tags": ["Builder"],
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       },
       "delete": {
@@ -3198,13 +4259,28 @@
           "400": {
             "description": "Invalid module ID"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
           "404": {
             "description": "Module not found"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Delete a module by ID",
-        "tags": [
-          "Builder"
+        "tags": ["Builder"],
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       }
     },
@@ -3234,13 +4310,36 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
           "404": {
             "description": "Module not found"
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Create a user defined event",
-        "tags": [
-          "Builder"
+        "tags": ["Builder"],
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       }
     },
@@ -3289,7 +4388,7 @@
         },
         "responses": {
           "200": {
-            "description": "",
+            "description": "Response for this operation.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3297,11 +4396,34 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Look up an existing PDF parser job by PDF stream fingerprint",
-        "tags": [
-          "PDF Parser"
+        "tags": ["PDF Parser"],
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       }
     },
@@ -3316,10 +4438,7 @@
             "multipart/form-data": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "file",
-                  "universityId"
-                ],
+                "required": ["file", "universityId"],
                 "properties": {
                   "file": {
                     "type": "string",
@@ -3356,7 +4475,7 @@
         },
         "responses": {
           "202": {
-            "description": "",
+            "description": "Response for this operation.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3364,11 +4483,34 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Upload a timetable PDF and enqueue it for parsing",
-        "tags": [
-          "PDF Parser"
+        "tags": ["PDF Parser"],
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       }
     },
@@ -3388,7 +4530,7 @@
         ],
         "responses": {
           "200": {
-            "description": "",
+            "description": "Response for this operation.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3396,11 +4538,34 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Get PDF parser job status and result metadata",
-        "tags": [
-          "PDF Parser"
+        "tags": ["PDF Parser"],
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       }
     },
@@ -3420,7 +4585,7 @@
         ],
         "responses": {
           "200": {
-            "description": "",
+            "description": "Response for this operation.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3428,11 +4593,34 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Get completed PDF parser result",
-        "tags": [
-          "PDF Parser"
+        "tags": ["PDF Parser"],
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       }
     },
@@ -3461,7 +4649,7 @@
         },
         "responses": {
           "202": {
-            "description": "",
+            "description": "Response for this operation.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3469,6 +4657,26 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError",
+            "description": "HTTP response."
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "security": [
@@ -3477,9 +4685,9 @@
           }
         ],
         "summary": "Receive final PDF parser worker callback",
-        "tags": [
-          "PDF Parser"
-        ]
+        "tags": ["PDF Parser"],
+        "description": "Receive final PDF parser worker callback. This PDF Parser operation is part of the versioned UMTAS HTTP contract. Internal worker operation; requires the UMTAS worker bearer token.",
+        "x-internal": true
       }
     },
     "/api/solver/jobs": {
@@ -3498,7 +4706,7 @@
         },
         "responses": {
           "202": {
-            "description": "",
+            "description": "Response for this operation.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3506,6 +4714,26 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "security": [
@@ -3514,9 +4742,8 @@
           }
         ],
         "summary": "Persist and enqueue a timetable solve job",
-        "tags": [
-          "Solver"
-        ]
+        "tags": ["Solver"],
+        "description": "Persist and enqueue a timetable solve job. This Solver operation is part of the versioned UMTAS HTTP contract."
       }
     },
     "/api/solver/jobs/{jobId}/input": {
@@ -3534,7 +4761,7 @@
         ],
         "responses": {
           "200": {
-            "description": "",
+            "description": "Response for this operation.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3542,6 +4769,22 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "security": [
@@ -3550,9 +4793,9 @@
           }
         ],
         "summary": "Build solver input for an authenticated worker",
-        "tags": [
-          "Solver"
-        ]
+        "tags": ["Solver"],
+        "description": "Build solver input for an authenticated worker. This Solver operation is part of the versioned UMTAS HTTP contract. Internal worker operation; requires the UMTAS worker bearer token.",
+        "x-internal": true
       }
     },
     "/api/solver/jobs/{jobId}": {
@@ -3570,7 +4813,7 @@
         ],
         "responses": {
           "200": {
-            "description": "",
+            "description": "Response for this operation.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3578,6 +4821,26 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "security": [
@@ -3586,9 +4849,8 @@
           }
         ],
         "summary": "Get solver job status and persisted result metadata",
-        "tags": [
-          "Solver"
-        ]
+        "tags": ["Solver"],
+        "description": "Get solver job status and persisted result metadata. This Solver operation is part of the versioned UMTAS HTTP contract."
       }
     },
     "/api/solver/jobs/{jobId}/result": {
@@ -3606,7 +4868,7 @@
         ],
         "responses": {
           "200": {
-            "description": "",
+            "description": "Response for this operation.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3614,6 +4876,26 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "security": [
@@ -3622,9 +4904,8 @@
           }
         ],
         "summary": "Get a completed solver result",
-        "tags": [
-          "Solver"
-        ]
+        "tags": ["Solver"],
+        "description": "Get a completed solver result. This Solver operation is part of the versioned UMTAS HTTP contract."
       }
     },
     "/api/solver/jobs/{jobId}/callback": {
@@ -3660,7 +4941,7 @@
         },
         "responses": {
           "202": {
-            "description": "",
+            "description": "Response for this operation.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3668,6 +4949,26 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError",
+            "description": "HTTP response."
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "security": [
@@ -3676,9 +4977,9 @@
           }
         ],
         "summary": "Receive final solver worker callback",
-        "tags": [
-          "Solver"
-        ]
+        "tags": ["Solver"],
+        "description": "Receive final solver worker callback. This Solver operation is part of the versioned UMTAS HTTP contract. Internal worker operation; requires the UMTAS worker bearer token.",
+        "x-internal": true
       }
     },
     "/api/attendance": {
@@ -3697,7 +4998,7 @@
         },
         "responses": {
           "201": {
-            "description": "",
+            "description": "Response for this operation.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3705,11 +5006,35 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Create attendance record for current user for an event",
-        "tags": [
-          "Attendance"
+        "tags": ["Attendance"],
+        "description": "Create attendance record for current user for an event. This Attendance operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       },
       "get": {
@@ -3744,10 +5069,7 @@
             "schema": {
               "example": "ATTENDING",
               "type": "string",
-              "enum": [
-                "ATTENDING",
-                "NOT_ATTENDING"
-              ]
+              "enum": ["ATTENDING", "NOT_ATTENDING"]
             }
           },
           {
@@ -3763,7 +5085,7 @@
         ],
         "responses": {
           "200": {
-            "description": "",
+            "description": "Response for this operation.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3771,11 +5093,31 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Get all attendance records for user or with filters",
-        "tags": [
-          "Attendance"
+        "tags": ["Attendance"],
+        "description": "Get all attendance records for user or with filters. This Attendance operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       }
     },
@@ -3794,7 +5136,7 @@
         ],
         "responses": {
           "200": {
-            "description": "",
+            "description": "Response for this operation.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3802,11 +5144,35 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Get attendance record by attendanceID",
-        "tags": [
-          "Attendance"
+        "tags": ["Attendance"],
+        "description": "Get attendance record by attendanceID. This Attendance operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       },
       "patch": {
@@ -3833,7 +5199,7 @@
         },
         "responses": {
           "200": {
-            "description": "",
+            "description": "Response for this operation.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3841,11 +5207,39 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError",
+            "description": "HTTP response."
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Update date or state of attendance",
-        "tags": [
-          "Attendance"
+        "tags": ["Attendance"],
+        "description": "Update date or state of attendance. This Attendance operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       },
       "delete": {
@@ -3862,7 +5256,7 @@
         ],
         "responses": {
           "200": {
-            "description": "",
+            "description": "Response for this operation.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3870,11 +5264,35 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Delete an attendance record - effectively making attendance NOT_STATED",
-        "tags": [
-          "Attendance"
+        "tags": ["Attendance"],
+        "description": "Delete an attendance record - effectively making attendance NOT_STATED. This Attendance operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       }
     },
@@ -3928,8 +5346,20 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
           "403": {
             "description": "No uni selected or no role at uni"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "security": [
@@ -3938,9 +5368,7 @@
           }
         ],
         "summary": "Get all venues",
-        "tags": [
-          "Venues"
-        ]
+        "tags": ["Venues"]
       }
     },
     "/api/venues/{venueId}/building": {
@@ -3981,11 +5409,23 @@
           "400": {
             "description": "Building does not belong to the selected university"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
           "403": {
             "description": "Wrong permissions"
           },
           "404": {
             "description": "Venue not found"
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "security": [
@@ -3994,9 +5434,7 @@
           }
         ],
         "summary": "Assign a venue to a building",
-        "tags": [
-          "Venues"
-        ]
+        "tags": ["Venues"]
       }
     },
     "/api/venues/assign": {
@@ -4028,8 +5466,20 @@
           "400": {
             "description": "One/more buildings do not belong to the selected university"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
           "403": {
             "description": "Wrong permissions bud"
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "security": [
@@ -4038,9 +5488,7 @@
           }
         ],
         "summary": "Assign several venues to buildings in one request",
-        "tags": [
-          "Venues"
-        ]
+        "tags": ["Venues"]
       }
     },
     "/api/buildings": {
@@ -4086,8 +5534,20 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
           "403": {
             "description": "No uni selected or no role at uni"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "security": [
@@ -4096,9 +5556,7 @@
           }
         ],
         "summary": "Get all buildings",
-        "tags": [
-          "Buildings"
-        ]
+        "tags": ["Buildings"]
       },
       "post": {
         "operationId": "BuildingController_createBuilding",
@@ -4124,11 +5582,23 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
           "403": {
             "description": "Incorrect role permissions"
           },
           "409": {
             "description": "Building with this name already exists"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "security": [
@@ -4137,9 +5607,8 @@
           }
         ],
         "summary": "Create a building as uni admin",
-        "tags": [
-          "Buildings"
-        ]
+        "tags": ["Buildings"],
+        "description": "Create a building as uni admin. This Buildings operation is part of the versioned UMTAS HTTP contract."
       }
     },
     "/api/buildings/{buildingId}": {
@@ -4177,11 +5646,27 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
           "403": {
             "description": "Your role is not admin, not allowed"
           },
           "404": {
             "description": "The building was not found in this uni"
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "security": [
@@ -4190,9 +5675,7 @@
           }
         ],
         "summary": "Update a building pin and/or drawn polygon",
-        "tags": [
-          "Buildings"
-        ]
+        "tags": ["Buildings"]
       }
     },
     "/api/map-config": {
@@ -4201,7 +5684,7 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "",
+            "description": "Response for this operation.",
             "content": {
               "application/json": {
                 "schema": {
@@ -4210,11 +5693,23 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
           "403": {
             "description": "No university selected"
           },
           "404": {
             "description": "Map settings not configured boss"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "security": [
@@ -4223,9 +5718,8 @@
           }
         ],
         "summary": "Get map settings for the selected university",
-        "tags": [
-          "Map Config"
-        ]
+        "tags": ["Map Config"],
+        "description": "Get map settings for the selected university. This Map Config operation is part of the versioned UMTAS HTTP contract."
       },
       "put": {
         "operationId": "MapConfigController_update",
@@ -4242,7 +5736,7 @@
         },
         "responses": {
           "200": {
-            "description": "",
+            "description": "Response for this operation.",
             "content": {
               "application/json": {
                 "schema": {
@@ -4251,8 +5745,24 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
           "403": {
             "description": "Insufficient permissions"
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "security": [
@@ -4261,9 +5771,8 @@
           }
         ],
         "summary": "Set or update map settings for the selected university",
-        "tags": [
-          "Map Config"
-        ]
+        "tags": ["Map Config"],
+        "description": "Set or update map settings for the selected university. This Map Config operation is part of the versioned UMTAS HTTP contract."
       }
     },
     "/api/routes": {
@@ -4305,11 +5814,23 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
           "403": {
             "description": "No university or university role was selected"
           },
           "404": {
             "description": "One or both buildings have not been pinned, or no walking path was found between the two buildings"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "security": [
@@ -4318,9 +5839,7 @@
           }
         ],
         "summary": "Get a walking route between an origin and a destination building",
-        "tags": [
-          "Routes"
-        ]
+        "tags": ["Routes"]
       }
     },
     "/api/routes/active": {
@@ -4361,8 +5880,20 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError",
+            "description": "HTTP response."
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
           "403": {
             "description": "No university or university role was selected"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "security": [
@@ -4371,9 +5902,7 @@
           }
         ],
         "summary": "Get student route status at certain date/time",
-        "tags": [
-          "Routes"
-        ]
+        "tags": ["Routes"]
       }
     },
     "/api/academic-calendar/generate": {
@@ -4405,6 +5934,14 @@
           "400": {
             "description": "Invalid generation request"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
           "404": {
             "description": "Calendar or timetable not found"
           },
@@ -4413,6 +5950,10 @@
           },
           "422": {
             "description": "Calendar data cannot be converted into a valid snapshot"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "security": [
@@ -4421,9 +5962,7 @@
           }
         ],
         "summary": "Generate and persist a calendar snapshot",
-        "tags": [
-          "Academic Calendar"
-        ]
+        "tags": ["Academic Calendar"]
       }
     },
     "/api/academic-calendar/generated/{id}": {
@@ -4456,8 +5995,20 @@
           "400": {
             "description": "Invalid generated calendar ID"
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
           "404": {
             "description": "Generated calendar not found"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "security": [
@@ -4466,9 +6017,7 @@
           }
         ],
         "summary": "Get a generated calendar snapshot",
-        "tags": [
-          "Academic Calendar"
-        ]
+        "tags": ["Academic Calendar"]
       }
     },
     "/api/academic-calendar/public": {
@@ -4505,6 +6054,18 @@
           },
           "400": {
             "description": "Invalid academic year"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "security": [
@@ -4513,9 +6074,7 @@
           }
         ],
         "summary": "List public academic calendars",
-        "tags": [
-          "Academic Calendar"
-        ]
+        "tags": ["Academic Calendar"]
       }
     },
     "/api/academic-calendar": {
@@ -4555,6 +6114,10 @@
           },
           "409": {
             "description": "A calendar already exists for this university and year"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "security": [
@@ -4563,9 +6126,7 @@
           }
         ],
         "summary": "Create an academic calendar",
-        "tags": [
-          "Academic Calendar"
-        ]
+        "tags": ["Academic Calendar"]
       },
       "get": {
         "description": "Returns calendars belonging to the university selected in the current session, optionally filtered by academic year.",
@@ -4606,6 +6167,10 @@
           },
           "403": {
             "description": "Insufficient permissions"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "security": [
@@ -4614,9 +6179,7 @@
           }
         ],
         "summary": "List academic calendars",
-        "tags": [
-          "Academic Calendar"
-        ]
+        "tags": ["Academic Calendar"]
       }
     },
     "/api/academic-calendar/{id}/restrictions": {
@@ -4657,6 +6220,10 @@
           },
           "404": {
             "description": "Academic calendar not found"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "security": [
@@ -4665,9 +6232,7 @@
           }
         ],
         "summary": "List an academic calendar's restrictions",
-        "tags": [
-          "Academic Calendar"
-        ]
+        "tags": ["Academic Calendar"]
       },
       "post": {
         "description": "Creates a dated restriction. Omitted endDate defaults to startDate and omitted description defaults to an empty string.",
@@ -4722,6 +6287,10 @@
           },
           "422": {
             "description": "Restriction is not valid for its type"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "security": [
@@ -4730,9 +6299,7 @@
           }
         ],
         "summary": "Create an academic calendar restriction",
-        "tags": [
-          "Academic Calendar"
-        ]
+        "tags": ["Academic Calendar"]
       }
     },
     "/api/academic-calendar/{id}/restrictions/{restrictionId}": {
@@ -4799,6 +6366,10 @@
           },
           "422": {
             "description": "Restriction is not valid for its type"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "security": [
@@ -4807,9 +6378,7 @@
           }
         ],
         "summary": "Replace an academic calendar restriction",
-        "tags": [
-          "Academic Calendar"
-        ]
+        "tags": ["Academic Calendar"]
       },
       "delete": {
         "description": "Deletes a restriction only when it belongs to the specified calendar in the selected university.",
@@ -4858,6 +6427,10 @@
           },
           "404": {
             "description": "Calendar or restriction not found"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "security": [
@@ -4866,9 +6439,7 @@
           }
         ],
         "summary": "Delete an academic calendar restriction",
-        "tags": [
-          "Academic Calendar"
-        ]
+        "tags": ["Academic Calendar"]
       }
     },
     "/api/academic-calendar/{id}/subscriptions": {
@@ -4920,8 +6491,16 @@
           "404": {
             "description": "Academic calendar or public calendar not found"
           },
+          "409": {
+            "$ref": "#/components/responses/ConflictError",
+            "description": "HTTP response."
+          },
           "422": {
             "description": "Public calendar year does not match the academic calendar"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "security": [
@@ -4930,9 +6509,7 @@
           }
         ],
         "summary": "Replace an academic calendar's public-calendar subscriptions",
-        "tags": [
-          "Academic Calendar"
-        ]
+        "tags": ["Academic Calendar"]
       }
     },
     "/api/academic-calendar/{id}": {
@@ -4973,6 +6550,10 @@
           },
           "404": {
             "description": "Academic calendar not found"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "security": [
@@ -4981,9 +6562,7 @@
           }
         ],
         "summary": "Get an academic calendar",
-        "tags": [
-          "Academic Calendar"
-        ]
+        "tags": ["Academic Calendar"]
       },
       "delete": {
         "description": "Deletes a calendar and cascades to its restrictions. Deletion is rejected while generated snapshots reference it.",
@@ -5025,6 +6604,10 @@
           },
           "409": {
             "description": "Generated snapshots still reference this calendar"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "security": [
@@ -5033,9 +6616,7 @@
           }
         ],
         "summary": "Delete an academic calendar",
-        "tags": [
-          "Academic Calendar"
-        ]
+        "tags": ["Academic Calendar"]
       }
     },
     "/api/api-service/courses": {
@@ -5078,13 +6659,28 @@
           "400": {
             "description": "The authenticated user is not associated with a university."
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
           "404": {
             "description": "The university or its API adapter could not be found."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Fetch courses",
-        "tags": [
-          "ApiService"
+        "tags": ["ApiService"],
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       }
     },
@@ -5117,13 +6713,28 @@
           "400": {
             "description": "The authenticated user is not associated with a university."
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
           "404": {
             "description": "The university or its API adapter could not be found."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Get a specific course",
-        "tags": [
-          "ApiService"
+        "tags": ["ApiService"],
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       }
     },
@@ -5157,13 +6768,28 @@
           "400": {
             "description": "The university or course ID is invalid."
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
           "404": {
             "description": "The university, course, or API adapter could not be found."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Fetch modules",
-        "tags": [
-          "ApiService"
+        "tags": ["ApiService"],
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       }
     },
@@ -5197,35 +6823,54 @@
           "400": {
             "description": "The university or module ID is invalid."
           },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError",
+            "description": "HTTP response."
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError",
+            "description": "HTTP response."
+          },
           "404": {
             "description": "The university, module, or API adapter could not be found."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError",
+            "description": "HTTP response."
           }
         },
         "summary": "Fetch events",
-        "tags": [
-          "ApiService"
+        "tags": ["ApiService"],
+        "security": [
+          {
+            "cookie": []
+          }
         ]
       }
     }
   },
   "info": {
     "title": "UMTAS API",
-    "description": "University Management Timetable & Scheduling System API",
+    "description": "University Management Timetable & Scheduling System API. HTTP contract for public/core endpoints and explicitly marked internal worker boundaries. Google Calendar synchronisation is not implemented.",
     "version": "1.0.0",
     "contact": {}
   },
   "tags": [
     {
-      "name": "Health",
-      "description": "System health checks"
+      "name": "App",
+      "description": "Application and metadata endpoints"
+    },
+    {
+      "name": "Auth",
+      "description": "Authentication and account lifecycle endpoints"
     },
     {
       "name": "Auth Email",
-      "description": "Email-based authentication and account management"
+      "description": "Email authentication and account recovery"
     },
     {
       "name": "Auth Google",
-      "description": "Google OAuth and account linking"
+      "description": "Google OAuth sign-in and account linking"
     },
     {
       "name": "Auth Session",
@@ -5236,8 +6881,24 @@
       "description": "Administrative user management"
     },
     {
+      "name": "Health",
+      "description": "System health checks"
+    },
+    {
       "name": "Modules",
       "description": "Academic module management"
+    },
+    {
+      "name": "Courses",
+      "description": "Course management"
+    },
+    {
+      "name": "Universities",
+      "description": "University and membership management"
+    },
+    {
+      "name": "Grouping",
+      "description": "Module grouping management"
     },
     {
       "name": "Events",
@@ -5245,7 +6906,47 @@
     },
     {
       "name": "Timetables",
-      "description": "Timetable generation and management"
+      "description": "Timetable management"
+    },
+    {
+      "name": "Builder",
+      "description": "Personal timetable builder"
+    },
+    {
+      "name": "PDF Parser",
+      "description": "PDF parser jobs and worker callbacks"
+    },
+    {
+      "name": "Solver",
+      "description": "Timetable solver jobs and worker callbacks"
+    },
+    {
+      "name": "Attendance",
+      "description": "Attendance management"
+    },
+    {
+      "name": "Venues",
+      "description": "Venue management"
+    },
+    {
+      "name": "Buildings",
+      "description": "Building management"
+    },
+    {
+      "name": "Map Config",
+      "description": "Frontend map configuration"
+    },
+    {
+      "name": "Routes",
+      "description": "Route management"
+    },
+    {
+      "name": "Academic Calendar",
+      "description": "Academic calendar management"
+    },
+    {
+      "name": "ApiService",
+      "description": "External university API adapter endpoints"
     }
   ],
   "servers": [
@@ -5295,10 +6996,7 @@
           },
           "role": {
             "type": "string",
-            "enum": [
-              "user",
-              "sys_admin"
-            ]
+            "enum": ["user", "sys_admin"]
           },
           "banned": {
             "type": "boolean"
@@ -5403,10 +7101,7 @@
             ]
           }
         },
-        "required": [
-          "user",
-          "session"
-        ]
+        "required": ["user", "session"]
       },
       "SignUpEmailDto": {
         "type": "object",
@@ -5432,11 +7127,7 @@
             "default": "System Admin"
           }
         },
-        "required": [
-          "email",
-          "password",
-          "name"
-        ]
+        "required": ["email", "password", "name"]
       },
       "AuthErrorDto": {
         "type": "object",
@@ -5466,9 +7157,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "error"
-        ]
+        "required": ["error"]
       },
       "SignInEmailDto": {
         "type": "object",
@@ -5489,10 +7178,7 @@
             "description": "Optional university ID to select upon sign-in"
           }
         },
-        "required": [
-          "email",
-          "password"
-        ]
+        "required": ["email", "password"]
       },
       "AuthAcknowledgementDto": {
         "type": "object",
@@ -5508,9 +7194,7 @@
             "description": "ID of the session to terminate"
           }
         },
-        "required": [
-          "sessionId"
-        ]
+        "required": ["sessionId"]
       },
       "VerifyEmailDto": {
         "type": "object",
@@ -5527,10 +7211,7 @@
             "default": "system-admin@local.umtas"
           }
         },
-        "required": [
-          "code",
-          "email"
-        ]
+        "required": ["code", "email"]
       },
       "ForgetPasswordDto": {
         "type": "object",
@@ -5541,9 +7222,7 @@
             "default": "system-admin@local.umtas"
           }
         },
-        "required": [
-          "email"
-        ]
+        "required": ["email"]
       },
       "ResetPasswordDto": {
         "type": "object",
@@ -5562,10 +7241,7 @@
             "maxLength": 128
           }
         },
-        "required": [
-          "token",
-          "newPassword"
-        ]
+        "required": ["token", "newPassword"]
       },
       "ChangePasswordDto": {
         "type": "object",
@@ -5583,10 +7259,7 @@
             "maxLength": 128
           }
         },
-        "required": [
-          "currentPassword",
-          "newPassword"
-        ]
+        "required": ["currentPassword", "newPassword"]
       },
       "LinkGoogleAccountDto": {
         "type": "object",
@@ -5604,10 +7277,7 @@
             "description": "OAuth state parameter"
           }
         },
-        "required": [
-          "code",
-          "state"
-        ]
+        "required": ["code", "state"]
       },
       "AdminCreateUserDto": {
         "type": "object",
@@ -5631,18 +7301,12 @@
           },
           "role": {
             "type": "string",
-            "enum": [
-              "user",
-              "sys_admin"
-            ],
+            "enum": ["user", "sys_admin"],
             "example": "user",
             "default": "user"
           }
         },
-        "required": [
-          "email",
-          "password"
-        ]
+        "required": ["email", "password"]
       },
       "AuthUserResponseDto": {
         "type": "object",
@@ -5651,9 +7315,7 @@
             "$ref": "#/components/schemas/AuthUserDto"
           }
         },
-        "required": [
-          "user"
-        ]
+        "required": ["user"]
       },
       "CreateMockUserDto": {
         "type": "object",
@@ -5671,12 +7333,7 @@
             "example": "password123!"
           },
           "role": {
-            "enum": [
-              "STUDENT",
-              "LECTURER",
-              "UNIVERSITY_ADMIN",
-              "SYS_ADMIN"
-            ],
+            "enum": ["STUDENT", "LECTURER", "UNIVERSITY_ADMIN", "SYS_ADMIN"],
             "type": "string",
             "example": "STUDENT"
           },
@@ -5696,10 +7353,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "success",
-          "message"
-        ]
+        "required": ["success", "message"]
       },
       "AdminImpersonateUserDto": {
         "type": "object",
@@ -5711,9 +7365,7 @@
             "description": "UUID of the user to impersonate"
           }
         },
-        "required": [
-          "userId"
-        ]
+        "required": ["userId"]
       },
       "AdminBanUserDto": {
         "type": "object",
@@ -5736,10 +7388,7 @@
             "description": "Ban expiry datetime. Omit or set null for a permanent ban."
           }
         },
-        "required": [
-          "userId",
-          "reason"
-        ]
+        "required": ["userId", "reason"]
       },
       "AdminUpdateUserDto": {
         "type": "object",
@@ -5760,16 +7409,11 @@
           },
           "role": {
             "type": "string",
-            "enum": [
-              "user",
-              "sys_admin"
-            ],
+            "enum": ["user", "sys_admin"],
             "example": "user"
           }
         },
-        "required": [
-          "userId"
-        ]
+        "required": ["userId"]
       },
       "SelectUniversityDto": {
         "type": "object",
@@ -5781,17 +7425,11 @@
             "description": "University ID selected by the user"
           }
         },
-        "required": [
-          "uniId"
-        ]
+        "required": ["uniId"]
       },
       "AcademicSemester": {
         "type": "string",
-        "enum": [
-          "SEMESTER_1",
-          "SEMESTER_2",
-          "YEAR"
-        ],
+        "enum": ["SEMESTER_1", "SEMESTER_2", "YEAR"],
         "description": "Academic period in which this module is taught. Null or omitted means the whole academic year."
       },
       "StylingDto": {
@@ -5802,9 +7440,7 @@
             "example": "#3B82F6"
           }
         },
-        "required": [
-          "colour"
-        ]
+        "required": ["colour"]
       },
       "CreateCourseModuleDto": {
         "type": "object",
@@ -5908,10 +7544,7 @@
             ]
           }
         },
-        "required": [
-          "moduleCode",
-          "moduleName"
-        ]
+        "required": ["moduleCode", "moduleName"]
       },
       "CourseModuleDto": {
         "type": "object",
@@ -5952,20 +7585,13 @@
             "description": "Which year does the module belong to for the course"
           }
         },
-        "required": [
-          "CourseModuleID",
-          "GroupModuleID",
-          "CourseID"
-        ]
+        "required": ["CourseModuleID", "GroupModuleID", "CourseID"]
       },
       "EventCriteriaDto": {
         "type": "object",
         "properties": {
           "eventSource": {
-            "enum": [
-              "university",
-              "personal"
-            ],
+            "enum": ["university", "personal"],
             "type": "string"
           },
           "date": {
@@ -5999,11 +7625,7 @@
             "format": "uuid"
           }
         },
-        "required": [
-          "eventSource",
-          "startTime",
-          "endTime"
-        ]
+        "required": ["eventSource", "startTime", "endTime"]
       },
       "VenueDto": {
         "type": "object",
@@ -6016,10 +7638,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "venueId",
-          "venueName"
-        ]
+        "required": ["venueId", "venueName"]
       },
       "EventDto": {
         "type": "object",
@@ -6041,13 +7660,7 @@
           },
           "activityType": {
             "type": "string",
-            "enum": [
-              "lecture",
-              "tutorial",
-              "prac",
-              "test",
-              "exam"
-            ]
+            "enum": ["lecture", "tutorial", "prac", "test", "exam"]
           },
           "eventCriteria": {
             "$ref": "#/components/schemas/EventCriteriaDto"
@@ -6065,10 +7678,7 @@
             }
           }
         },
-        "required": [
-          "eventId",
-          "eventCriteria"
-        ]
+        "required": ["eventId", "eventCriteria"]
       },
       "ModuleSingleResponseDto": {
         "type": "object",
@@ -6173,11 +7783,7 @@
             "description": "Unique identifier for a module group"
           }
         },
-        "required": [
-          "moduleID",
-          "moduleCode",
-          "moduleName"
-        ]
+        "required": ["moduleID", "moduleCode", "moduleName"]
       },
       "ModuleListResponseDto": {
         "type": "object",
@@ -6194,9 +7800,7 @@
             "description": "Short message indicating  success of response."
           }
         },
-        "required": [
-          "modules"
-        ]
+        "required": ["modules"]
       },
       "ModuleListResponseDtoV2": {
         "type": "object",
@@ -6218,9 +7822,7 @@
             "description": "Count of Modules"
           }
         },
-        "required": [
-          "modules"
-        ]
+        "required": ["modules"]
       },
       "UpdateModuleDto": {
         "type": "object",
@@ -6334,10 +7936,7 @@
             "example": true
           }
         },
-        "required": [
-          "moduleCode",
-          "success"
-        ]
+        "required": ["moduleCode", "success"]
       },
       "EnrolResponseDto": {
         "type": "object",
@@ -6357,11 +7956,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "moduleID",
-          "message",
-          "UserID"
-        ]
+        "required": ["moduleID", "message", "UserID"]
       },
       "EnrollToModuleDto": {
         "type": "object",
@@ -6389,9 +7984,7 @@
             }
           }
         },
-        "required": [
-          "modules"
-        ]
+        "required": ["modules"]
       },
       "AddModulesToCourseResponseDto": {
         "type": "object",
@@ -6416,10 +8009,7 @@
             "example": "00000000-0000-0000-0000-000000000000"
           }
         },
-        "required": [
-          "modules",
-          "CourseID"
-        ]
+        "required": ["modules", "CourseID"]
       },
       "ModuleStylingBodyDto": {
         "type": "object",
@@ -6436,9 +8026,7 @@
             ]
           }
         },
-        "required": [
-          "styling"
-        ]
+        "required": ["styling"]
       },
       "ModuleStylingResponseDto": {
         "type": "object",
@@ -6449,9 +8037,7 @@
             "example": "Suceess"
           }
         },
-        "required": [
-          "message"
-        ]
+        "required": ["message"]
       },
       "CreateCourseDto": {
         "type": "object",
@@ -6493,10 +8079,7 @@
             "description": "Refer to course on external API"
           }
         },
-        "required": [
-          "UniversityID",
-          "CourseName"
-        ]
+        "required": ["UniversityID", "CourseName"]
       },
       "ModulesDto": {
         "type": "object",
@@ -6595,11 +8178,7 @@
             "description": "Is a user enrolled to this module"
           }
         },
-        "required": [
-          "moduleID",
-          "moduleCode",
-          "moduleName"
-        ]
+        "required": ["moduleID", "moduleCode", "moduleName"]
       },
       "CourseSingleResponseDto": {
         "type": "object",
@@ -6655,11 +8234,7 @@
             "description": "Refer to course on external API"
           }
         },
-        "required": [
-          "CourseID",
-          "UniversityID",
-          "CourseName"
-        ]
+        "required": ["CourseID", "UniversityID", "CourseName"]
       },
       "CourseFilters": {
         "type": "object",
@@ -6741,11 +8316,7 @@
             "description": "Refer to course on external API"
           }
         },
-        "required": [
-          "CourseID",
-          "UniversityID",
-          "CourseName"
-        ]
+        "required": ["CourseID", "UniversityID", "CourseName"]
       },
       "CourseListResponseDto": {
         "type": "object",
@@ -6761,9 +8332,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "courses"
-        ]
+        "required": ["courses"]
       },
       "CourseListResponseDtoV2": {
         "type": "object",
@@ -6784,9 +8353,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "courses"
-        ]
+        "required": ["courses"]
       },
       "UpdateCourseDto": {
         "type": "object",
@@ -6852,10 +8419,7 @@
             "example": true
           }
         },
-        "required": [
-          "CourseName",
-          "success"
-        ]
+        "required": ["CourseName", "success"]
       },
       "CreateUniversityDto": {
         "type": "object",
@@ -6868,9 +8432,7 @@
             "description": "Name of the university"
           }
         },
-        "required": [
-          "UniversityName"
-        ]
+        "required": ["UniversityName"]
       },
       "UniversitySingleResponseDto": {
         "type": "object",
@@ -6929,10 +8491,7 @@
             "description": "Role current user has for university"
           }
         },
-        "required": [
-          "UniversityID",
-          "UniversityName"
-        ]
+        "required": ["UniversityID", "UniversityName"]
       },
       "UniversityDto": {
         "type": "object",
@@ -6991,10 +8550,7 @@
             "description": "Role current user has for university"
           }
         },
-        "required": [
-          "UniversityID",
-          "UniversityName"
-        ]
+        "required": ["UniversityID", "UniversityName"]
       },
       "UniversityListResponseDto": {
         "type": "object",
@@ -7007,9 +8563,7 @@
             }
           }
         },
-        "required": [
-          "universities"
-        ]
+        "required": ["universities"]
       },
       "UserUniversityRoleResponseDto": {
         "type": "object",
@@ -7036,11 +8590,7 @@
             ]
           }
         },
-        "required": [
-          "UniversityID",
-          "UserID",
-          "role"
-        ]
+        "required": ["UniversityID", "UserID", "role"]
       },
       "UpdateUniversityDto": {
         "type": "object",
@@ -7093,10 +8643,7 @@
             "example": true
           }
         },
-        "required": [
-          "UniversityName",
-          "success"
-        ]
+        "required": ["UniversityName", "success"]
       },
       "GetRoleFilterDto": {
         "type": "object",
@@ -7146,13 +8693,7 @@
             "example": "LECTURER_PENDING"
           }
         },
-        "required": [
-          "UserID",
-          "Email",
-          "Name",
-          "UniversityID",
-          "role"
-        ]
+        "required": ["UserID", "Email", "Name", "UniversityID", "role"]
       },
       "ApplyForUniRoleDto": {
         "type": "object",
@@ -7180,9 +8721,7 @@
             "description": "Role current user has for university"
           }
         },
-        "required": [
-          "UniversityID"
-        ]
+        "required": ["UniversityID"]
       },
       "ApproveUsersRoleDto": {
         "type": "object",
@@ -7219,11 +8758,7 @@
             "example": "LECTURER_PENDING"
           }
         },
-        "required": [
-          "UniversityID",
-          "userId",
-          "isApproved"
-        ]
+        "required": ["UniversityID", "userId", "isApproved"]
       },
       "ApprovedUserRoleResponse": {
         "type": "object",
@@ -7238,10 +8773,7 @@
             "example": true
           }
         },
-        "required": [
-          "userId",
-          "success"
-        ]
+        "required": ["userId", "success"]
       },
       "PopulateGroupBodyDto": {
         "type": "object",
@@ -7260,9 +8792,7 @@
             }
           }
         },
-        "required": [
-          "modules"
-        ]
+        "required": ["modules"]
       },
       "GroupingSingleResponse": {
         "type": "object",
@@ -7284,9 +8814,7 @@
             }
           }
         },
-        "required": [
-          "GroupID"
-        ]
+        "required": ["GroupID"]
       },
       "EventCriteriaDtoV2": {
         "type": "object",
@@ -7342,13 +8870,7 @@
           },
           "activityType": {
             "type": "string",
-            "enum": [
-              "lecture",
-              "tutorial",
-              "prac",
-              "test",
-              "exam"
-            ]
+            "enum": ["lecture", "tutorial", "prac", "test", "exam"]
           },
           "isRecurring": {
             "type": "boolean"
@@ -7366,9 +8888,7 @@
             "$ref": "#/components/schemas/EventCriteriaDtoV2"
           }
         },
-        "required": [
-          "eventCriteria"
-        ]
+        "required": ["eventCriteria"]
       },
       "EventSingleResponseDto": {
         "type": "object",
@@ -7380,9 +8900,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "event"
-        ]
+        "required": ["event"]
       },
       "CreateEventDto": {
         "type": "object",
@@ -7415,19 +8933,11 @@
           },
           "activityType": {
             "type": "string",
-            "enum": [
-              "lecture",
-              "tutorial",
-              "prac",
-              "test",
-              "exam"
-            ],
+            "enum": ["lecture", "tutorial", "prac", "test", "exam"],
             "description": "Required when eventCriteria.moduleId is provided."
           }
         },
-        "required": [
-          "eventCriteria"
-        ]
+        "required": ["eventCriteria"]
       },
       "EventListResponseDtoV2": {
         "type": "object",
@@ -7447,18 +8957,13 @@
             "type": "string"
           }
         },
-        "required": [
-          "events"
-        ]
+        "required": ["events"]
       },
       "UpdateEventCriteriaDto": {
         "type": "object",
         "properties": {
           "eventSource": {
-            "enum": [
-              "university",
-              "personal"
-            ],
+            "enum": ["university", "personal"],
             "type": "string"
           },
           "date": {
@@ -7509,13 +9014,7 @@
           },
           "activityType": {
             "type": "string",
-            "enum": [
-              "lecture",
-              "tutorial",
-              "prac",
-              "test",
-              "exam"
-            ]
+            "enum": ["lecture", "tutorial", "prac", "test", "exam"]
           },
           "isRecurring": {
             "type": "boolean"
@@ -7546,9 +9045,7 @@
             "type": "boolean"
           }
         },
-        "required": [
-          "success"
-        ]
+        "required": ["success"]
       },
       "ValidateEventDto": {
         "type": "object",
@@ -7568,9 +9065,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "event"
-        ]
+        "required": ["event"]
       },
       "UpdateEventVenueDto": {
         "type": "object",
@@ -7587,9 +9082,7 @@
             "description": "The selected buildingdD"
           }
         },
-        "required": [
-          "venueName"
-        ]
+        "required": ["venueName"]
       },
       "CreateTimetableDto": {
         "type": "object",
@@ -7603,9 +9096,7 @@
           },
           "eventIds": {
             "uniqueItems": true,
-            "example": [
-              "00000000-0000-0000-0000-000000000000"
-            ],
+            "example": ["00000000-0000-0000-0000-000000000000"],
             "description": "Event IDs to attach on creation",
             "type": "array",
             "items": {
@@ -7628,9 +9119,7 @@
             "example": "Semester 1"
           }
         },
-        "required": [
-          "timetableID"
-        ]
+        "required": ["timetableID"]
       },
       "TimetableResponseDto": {
         "type": "object",
@@ -7642,9 +9131,7 @@
             "$ref": "#/components/schemas/TimetableDto"
           },
           "eventIds": {
-            "example": [
-              "00000000-0000-0000-0000-000000000000"
-            ],
+            "example": ["00000000-0000-0000-0000-000000000000"],
             "description": "IDs of events linked to this timetable",
             "type": "array",
             "items": {
@@ -7652,10 +9139,7 @@
             }
           }
         },
-        "required": [
-          "UserTimetableID",
-          "timetable"
-        ]
+        "required": ["UserTimetableID", "timetable"]
       },
       "TimetableListResponseDto": {
         "type": "object",
@@ -7668,9 +9152,7 @@
             }
           }
         },
-        "required": [
-          "timetables"
-        ]
+        "required": ["timetables"]
       },
       "TimetableResponseDto2": {
         "type": "object",
@@ -7689,11 +9171,7 @@
             }
           }
         },
-        "required": [
-          "UserTimetableID",
-          "timetable",
-          "events"
-        ]
+        "required": ["UserTimetableID", "timetable", "events"]
       },
       "TimetableListResponseDtoV2": {
         "type": "object",
@@ -7706,9 +9184,7 @@
             }
           }
         },
-        "required": [
-          "timetables"
-        ]
+        "required": ["timetables"]
       },
       "UpdateTimetableDto": {
         "type": "object",
@@ -7722,9 +9198,7 @@
           },
           "addEventIds": {
             "uniqueItems": true,
-            "example": [
-              "00000000-0000-0000-0000-000000000000"
-            ],
+            "example": ["00000000-0000-0000-0000-000000000000"],
             "description": "Event IDs to link to the timetable",
             "type": "array",
             "items": {
@@ -7734,9 +9208,7 @@
           },
           "removeEventIds": {
             "uniqueItems": true,
-            "example": [
-              "00000000-0000-0000-0000-000000000000"
-            ],
+            "example": ["00000000-0000-0000-0000-000000000000"],
             "description": "Event IDs to unlink from the timetable",
             "type": "array",
             "items": {
@@ -7754,9 +9226,7 @@
             "example": true
           }
         },
-        "required": [
-          "success"
-        ]
+        "required": ["success"]
       },
       "CreateBuilderModuleDto": {
         "type": "object",
@@ -7818,10 +9288,7 @@
             "description": "Refer to module on external API"
           }
         },
-        "required": [
-          "moduleCode",
-          "moduleName"
-        ]
+        "required": ["moduleCode", "moduleName"]
       },
       "CreateBuilderEventDto": {
         "type": "object",
@@ -7845,13 +9312,7 @@
           },
           "activityType": {
             "type": "string",
-            "enum": [
-              "lecture",
-              "tutorial",
-              "prac",
-              "test",
-              "exam"
-            ],
+            "enum": ["lecture", "tutorial", "prac", "test", "exam"],
             "description": "Required when eventCriteria.moduleId is provided."
           }
         }
@@ -7869,11 +9330,7 @@
           },
           "status": {
             "type": "string",
-            "enum": [
-              "queued",
-              "completed",
-              "failed"
-            ]
+            "enum": ["queued", "completed", "failed"]
           },
           "moduleGroupingId": {
             "type": "string",
@@ -7889,9 +9346,7 @@
             "example": "/pdf-parser/jobs/pdf-parse-2d82d1ff-fb51-4c67-80cf-61d88c12d596"
           }
         },
-        "required": [
-          "duplicate"
-        ]
+        "required": ["duplicate"]
       },
       "ParseAnnotationDto": {
         "type": "object",
@@ -7907,11 +9362,7 @@
             "additionalProperties": true
           }
         },
-        "required": [
-          "code",
-          "message",
-          "details"
-        ]
+        "required": ["code", "message", "details"]
       },
       "RecurringParsedEventCandidateDto": {
         "type": "object",
@@ -7921,13 +9372,7 @@
           },
           "activityType": {
             "type": "string",
-            "enum": [
-              "lecture",
-              "tutorial",
-              "prac",
-              "test",
-              "exam"
-            ]
+            "enum": ["lecture", "tutorial", "prac", "test", "exam"]
           },
           "activityCode": {
             "type": "string"
@@ -7977,9 +9422,7 @@
           },
           "isRecurring": {
             "type": "boolean",
-            "enum": [
-              true
-            ]
+            "enum": [true]
           }
         },
         "required": [
@@ -8005,13 +9448,7 @@
           },
           "activityType": {
             "type": "string",
-            "enum": [
-              "lecture",
-              "tutorial",
-              "prac",
-              "test",
-              "exam"
-            ]
+            "enum": ["lecture", "tutorial", "prac", "test", "exam"]
           },
           "activityCode": {
             "type": "string"
@@ -8053,9 +9490,7 @@
           },
           "isRecurring": {
             "type": "boolean",
-            "enum": [
-              false
-            ]
+            "enum": [false]
           }
         },
         "required": [
@@ -8094,12 +9529,7 @@
             }
           }
         },
-        "required": [
-          "code",
-          "name",
-          "metadata",
-          "warnings"
-        ]
+        "required": ["code", "name", "metadata", "warnings"]
       },
       "PdfParserResultDto": {
         "type": "object",
@@ -8130,11 +9560,7 @@
             }
           }
         },
-        "required": [
-          "modules",
-          "events",
-          "warnings"
-        ]
+        "required": ["modules", "events", "warnings"]
       },
       "WorkerCallbackErrorDto": {
         "type": "object",
@@ -8153,10 +9579,7 @@
             "description": "Worker-specific diagnostic values."
           }
         },
-        "required": [
-          "code",
-          "message"
-        ]
+        "required": ["code", "message"]
       },
       "PdfParserUploadResponseDto": {
         "type": "object",
@@ -8177,11 +9600,7 @@
           },
           "status": {
             "type": "string",
-            "enum": [
-              "queued",
-              "completed",
-              "failed"
-            ]
+            "enum": ["queued", "completed", "failed"]
           },
           "result": {
             "$ref": "#/components/schemas/PdfParserResultDto"
@@ -8207,13 +9626,7 @@
             "example": "/pdf-parser/jobs/pdf-parse-2d82d1ff-fb51-4c67-80cf-61d88c12d596"
           }
         },
-        "required": [
-          "jobId",
-          "status",
-          "createdAt",
-          "updatedAt",
-          "statusUrl"
-        ]
+        "required": ["jobId", "status", "createdAt", "updatedAt", "statusUrl"]
       },
       "PdfParserJobResponseDto": {
         "type": "object",
@@ -8234,11 +9647,7 @@
           },
           "status": {
             "type": "string",
-            "enum": [
-              "queued",
-              "completed",
-              "failed"
-            ]
+            "enum": ["queued", "completed", "failed"]
           },
           "result": {
             "$ref": "#/components/schemas/PdfParserResultDto"
@@ -8260,22 +9669,14 @@
             "example": "2026-07-02T10:15:45.000Z"
           }
         },
-        "required": [
-          "jobId",
-          "status",
-          "createdAt",
-          "updatedAt"
-        ]
+        "required": ["jobId", "status", "createdAt", "updatedAt"]
       },
       "PdfParserCallbackDto": {
         "type": "object",
         "properties": {
           "status": {
             "type": "string",
-            "enum": [
-              "completed",
-              "failed"
-            ]
+            "enum": ["completed", "failed"]
           },
           "result": {
             "$ref": "#/components/schemas/PdfParserResultDto"
@@ -8284,42 +9685,31 @@
             "$ref": "#/components/schemas/WorkerCallbackErrorDto"
           }
         },
-        "required": [
-          "status"
-        ]
+        "required": ["status"]
       },
       "AcceptedJobResponseDto": {
         "type": "object",
         "properties": {
           "accepted": {
             "type": "boolean",
-            "enum": [
-              true
-            ]
+            "enum": [true]
           },
           "jobId": {
             "type": "string"
           }
         },
-        "required": [
-          "accepted",
-          "jobId"
-        ]
+        "required": ["accepted", "jobId"]
       },
       "PreferredStartTimePreferenceDto": {
         "type": "object",
         "properties": {
           "key": {
             "type": "string",
-            "enum": [
-              "preferred-start-time"
-            ],
+            "enum": ["preferred-start-time"],
             "example": "preferred-start-time"
           },
           "parameters": {
-            "required": [
-              "minutes-After-midnight"
-            ],
+            "required": ["minutes-After-midnight"],
             "type": "object",
             "properties": {
               "minutes-After-midnight": {
@@ -8331,54 +9721,40 @@
             }
           }
         },
-        "required": [
-          "key"
-        ]
+        "required": ["key"]
       },
       "LargeGapsPreferenceDto": {
         "type": "object",
         "properties": {
           "key": {
             "type": "string",
-            "enum": [
-              "large-gaps"
-            ],
+            "enum": ["large-gaps"],
             "example": "large-gaps"
           }
         },
-        "required": [
-          "key"
-        ]
+        "required": ["key"]
       },
       "SmallGapsPreferenceDto": {
         "type": "object",
         "properties": {
           "key": {
             "type": "string",
-            "enum": [
-              "small-gaps"
-            ],
+            "enum": ["small-gaps"],
             "example": "small-gaps"
           }
         },
-        "required": [
-          "key"
-        ]
+        "required": ["key"]
       },
       "DaySkipPreferenceDto": {
         "type": "object",
         "properties": {
           "key": {
             "type": "string",
-            "enum": [
-              "day-skip"
-            ],
+            "enum": ["day-skip"],
             "example": "day-skip"
           },
           "parameters": {
-            "required": [
-              "day-to-skip"
-            ],
+            "required": ["day-to-skip"],
             "type": "object",
             "properties": {
               "day-to-skip": {
@@ -8395,9 +9771,7 @@
             }
           }
         },
-        "required": [
-          "key"
-        ]
+        "required": ["key"]
       },
       "SolverPreferencesDto": {
         "type": "object",
@@ -8423,9 +9797,7 @@
             }
           }
         },
-        "required": [
-          "heuristics"
-        ]
+        "required": ["heuristics"]
       },
       "TimetableSolveJobDto": {
         "type": "object",
@@ -8433,9 +9805,7 @@
           "eventIds": {
             "minItems": 1,
             "uniqueItems": true,
-            "example": [
-              "00000000-0000-4000-8000-000000000004"
-            ],
+            "example": ["00000000-0000-4000-8000-000000000004"],
             "type": "array",
             "items": {
               "type": "string",
@@ -8444,18 +9814,11 @@
           },
           "solveMode": {
             "type": "string",
-            "enum": [
-              "feasibility",
-              "optimization"
-            ]
+            "enum": ["feasibility", "optimization"]
           },
           "engine": {
             "type": "string",
-            "enum": [
-              "auto",
-              "cp-sat",
-              "ga"
-            ]
+            "enum": ["auto", "cp-sat", "ga"]
           },
           "preferences": {
             "example": {
@@ -8468,9 +9831,7 @@
             ]
           }
         },
-        "required": [
-          "solveMode"
-        ]
+        "required": ["solveMode"]
       },
       "TimetableSolutionDto": {
         "type": "object",
@@ -8482,9 +9843,7 @@
             }
           }
         },
-        "required": [
-          "selectedEventIds"
-        ]
+        "required": ["selectedEventIds"]
       },
       "SolverHeuristicScoreDto": {
         "type": "object",
@@ -8500,10 +9859,7 @@
             "additionalProperties": true
           }
         },
-        "required": [
-          "key",
-          "score"
-        ]
+        "required": ["key", "score"]
       },
       "SolverConflictDto": {
         "type": "object",
@@ -8517,9 +9873,7 @@
             "maxItems": 2
           }
         },
-        "required": [
-          "eventIds"
-        ]
+        "required": ["eventIds"]
       },
       "SolverResultMetadataDto": {
         "type": "object",
@@ -8536,34 +9890,21 @@
           },
           "solveMode": {
             "type": "string",
-            "enum": [
-              "feasibility",
-              "optimization"
-            ]
+            "enum": ["feasibility", "optimization"]
           }
         },
-        "required": [
-          "conflictCount",
-          "conflicts",
-          "solveMode"
-        ]
+        "required": ["conflictCount", "conflicts", "solveMode"]
       },
       "SolverResultDto": {
         "type": "object",
         "properties": {
           "engine": {
             "type": "string",
-            "enum": [
-              "cp-sat",
-              "ga"
-            ]
+            "enum": ["cp-sat", "ga"]
           },
           "outcome": {
             "type": "string",
-            "enum": [
-              "conflict-free",
-              "best-effort"
-            ]
+            "enum": ["conflict-free", "best-effort"]
           },
           "timetableSolution": {
             "$ref": "#/components/schemas/TimetableSolutionDto"
@@ -8597,30 +9938,20 @@
         "properties": {
           "accepted": {
             "type": "boolean",
-            "enum": [
-              true
-            ]
+            "enum": [true]
           },
           "jobId": {
             "type": "string"
           },
           "status": {
             "type": "string",
-            "enum": [
-              "queued",
-              "completed",
-              "failed"
-            ]
+            "enum": ["queued", "completed", "failed"]
           },
           "result": {
             "$ref": "#/components/schemas/SolverResultDto"
           }
         },
-        "required": [
-          "accepted",
-          "jobId",
-          "status"
-        ]
+        "required": ["accepted", "jobId", "status"]
       },
       "SchedulingVenueDto": {
         "type": "object",
@@ -8632,10 +9963,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id",
-          "name"
-        ]
+        "required": ["id", "name"]
       },
       "SchedulingEventDto": {
         "type": "object",
@@ -8648,13 +9976,7 @@
           },
           "activityType": {
             "type": "string",
-            "enum": [
-              "lecture",
-              "tutorial",
-              "prac",
-              "test",
-              "exam"
-            ]
+            "enum": ["lecture", "tutorial", "prac", "test", "exam"]
           },
           "activityCode": {
             "type": "string"
@@ -8717,9 +10039,7 @@
             }
           }
         },
-        "required": [
-          "events"
-        ]
+        "required": ["events"]
       },
       "SolverInputDto": {
         "type": "object",
@@ -8731,10 +10051,7 @@
             "$ref": "#/components/schemas/SolverPreferencesDto"
           }
         },
-        "required": [
-          "schedulingProblem",
-          "preferences"
-        ]
+        "required": ["schedulingProblem", "preferences"]
       },
       "SolverJobResponseDto": {
         "type": "object",
@@ -8745,26 +10062,15 @@
           },
           "solveMode": {
             "type": "string",
-            "enum": [
-              "feasibility",
-              "optimization"
-            ]
+            "enum": ["feasibility", "optimization"]
           },
           "requestedEngine": {
             "type": "string",
-            "enum": [
-              "auto",
-              "cp-sat",
-              "ga"
-            ]
+            "enum": ["auto", "cp-sat", "ga"]
           },
           "status": {
             "type": "string",
-            "enum": [
-              "queued",
-              "completed",
-              "failed"
-            ]
+            "enum": ["queued", "completed", "failed"]
           },
           "result": {
             "$ref": "#/components/schemas/SolverResultDto"
@@ -8789,23 +10095,14 @@
             "example": "2026-07-13T10:15:45.000Z"
           }
         },
-        "required": [
-          "jobId",
-          "solveMode",
-          "status",
-          "createdAt",
-          "updatedAt"
-        ]
+        "required": ["jobId", "solveMode", "status", "createdAt", "updatedAt"]
       },
       "SolverCallbackDto": {
         "type": "object",
         "properties": {
           "status": {
             "type": "string",
-            "enum": [
-              "completed",
-              "failed"
-            ]
+            "enum": ["completed", "failed"]
           },
           "result": {
             "description": "A valid timetable solution and its soft-heuristic scores.",
@@ -8819,9 +10116,7 @@
             "$ref": "#/components/schemas/WorkerCallbackErrorDto"
           }
         },
-        "required": [
-          "status"
-        ]
+        "required": ["status"]
       },
       "CreateAttendanceDto": {
         "type": "object",
@@ -8839,19 +10134,12 @@
           },
           "state": {
             "type": "string",
-            "enum": [
-              "ATTENDING",
-              "NOT_ATTENDING"
-            ],
+            "enum": ["ATTENDING", "NOT_ATTENDING"],
             "example": "ATTENDING",
             "description": "Is the user attending this event or not"
           }
         },
-        "required": [
-          "eventID",
-          "eventDate",
-          "state"
-        ]
+        "required": ["eventID", "eventDate", "state"]
       },
       "AttendanceSingleResponse": {
         "type": "object",
@@ -8869,10 +10157,7 @@
           },
           "state": {
             "type": "string",
-            "enum": [
-              "ATTENDING",
-              "NOT_ATTENDING"
-            ],
+            "enum": ["ATTENDING", "NOT_ATTENDING"],
             "example": "ATTENDING",
             "description": "Is the user attending this event or not"
           },
@@ -8883,12 +10168,7 @@
             "description": "Unique identifier for an EventAttendance record"
           }
         },
-        "required": [
-          "eventID",
-          "eventDate",
-          "state",
-          "AttendanceID"
-        ]
+        "required": ["eventID", "eventDate", "state", "AttendanceID"]
       },
       "AttendanceListResponse": {
         "type": "object",
@@ -8901,9 +10181,7 @@
             }
           }
         },
-        "required": [
-          "attendanceList"
-        ]
+        "required": ["attendanceList"]
       },
       "UpdateAttendanceDto": {
         "type": "object",
@@ -8915,10 +10193,7 @@
           },
           "state": {
             "type": "string",
-            "enum": [
-              "ATTENDING",
-              "NOT_ATTENDING"
-            ],
+            "enum": ["ATTENDING", "NOT_ATTENDING"],
             "example": "ATTENDING",
             "description": "Is the user attending this event or not"
           }
@@ -8933,9 +10208,7 @@
             "example": true
           }
         },
-        "required": [
-          "success"
-        ]
+        "required": ["success"]
       },
       "Object": {
         "type": "object",
@@ -8966,12 +10239,7 @@
             "example": "IT Building"
           }
         },
-        "required": [
-          "venueId",
-          "venueName",
-          "buildingId",
-          "buildingName"
-        ]
+        "required": ["venueId", "venueName", "buildingId", "buildingName"]
       },
       "VenueMappingListResponseDto": {
         "type": "object",
@@ -8984,9 +10252,7 @@
             }
           }
         },
-        "required": [
-          "venues"
-        ]
+        "required": ["venues"]
       },
       "AssignVenueBuildingDto": {
         "type": "object",
@@ -8998,9 +10264,7 @@
             "description": "Assigns a venue to a building"
           }
         },
-        "required": [
-          "buildingId"
-        ]
+        "required": ["buildingId"]
       },
       "VenueAssignmentDto": {
         "type": "object",
@@ -9015,10 +10279,7 @@
             "format": "uuid"
           }
         },
-        "required": [
-          "venueId",
-          "buildingId"
-        ]
+        "required": ["venueId", "buildingId"]
       },
       "BulkAssignVenuesDto": {
         "type": "object",
@@ -9031,9 +10292,7 @@
             }
           }
         },
-        "required": [
-          "assignments"
-        ]
+        "required": ["assignments"]
       },
       "BulkAssignResponseDto": {
         "type": "object",
@@ -9047,10 +10306,7 @@
             "example": true
           }
         },
-        "required": [
-          "updated",
-          "success"
-        ]
+        "required": ["updated", "success"]
       },
       "LatLngDto": {
         "type": "object",
@@ -9066,10 +10322,7 @@
             "description": "Longitude in decimal degrees"
           }
         },
-        "required": [
-          "lat",
-          "lng"
-        ]
+        "required": ["lat", "lng"]
       },
       "BuildingDto": {
         "type": "object",
@@ -9135,9 +10388,7 @@
             }
           }
         },
-        "required": [
-          "buildings"
-        ]
+        "required": ["buildings"]
       },
       "CreateBuildingDto": {
         "type": "object",
@@ -9167,26 +10418,11 @@
               "type": "Polygon",
               "coordinates": [
                 [
-                  [
-                    28.2314,
-                    -25.7545
-                  ],
-                  [
-                    28.2318,
-                    -25.7545
-                  ],
-                  [
-                    28.2318,
-                    -25.7549
-                  ],
-                  [
-                    28.2314,
-                    -25.7549
-                  ],
-                  [
-                    28.2314,
-                    -25.7545
-                  ]
+                  [28.2314, -25.7545],
+                  [28.2318, -25.7545],
+                  [28.2318, -25.7549],
+                  [28.2314, -25.7549],
+                  [28.2314, -25.7545]
                 ]
               ]
             },
@@ -9208,9 +10444,7 @@
             "description": "Hex colour used when rendering the building"
           }
         },
-        "required": [
-          "buildingName"
-        ]
+        "required": ["buildingName"]
       },
       "BuildingSingleResponseDto": {
         "type": "object",
@@ -9219,9 +10453,7 @@
             "$ref": "#/components/schemas/BuildingDto"
           }
         },
-        "required": [
-          "building"
-        ]
+        "required": ["building"]
       },
       "UpdateBuildingLocationDto": {
         "type": "object",
@@ -9393,17 +10625,11 @@
             "$ref": "#/components/schemas/RouteDto"
           }
         },
-        "required": [
-          "route"
-        ]
+        "required": ["route"]
       },
       "ActiveRouteStatus": {
         "type": "string",
-        "enum": [
-          "AT_VENUE",
-          "MOVING",
-          "NONE"
-        ]
+        "enum": ["AT_VENUE", "MOVING", "NONE"]
       },
       "ActiveRouteResponseDto": {
         "type": "object",
@@ -9434,9 +10660,7 @@
             "example": "Lecture 2"
           }
         },
-        "required": [
-          "status"
-        ]
+        "required": ["status"]
       },
       "GenerateCalendarDto": {
         "type": "object",
@@ -9455,9 +10679,7 @@
             "description": "Academic year to generate. Defaults to the current UTC year."
           }
         },
-        "required": [
-          "timetableId"
-        ]
+        "required": ["timetableId"]
       },
       "Weekday": {
         "type": "string",
@@ -9532,9 +10754,7 @@
               "type": "string",
               "format": "date"
             },
-            "example": [
-              "2026-03-30"
-            ],
+            "example": ["2026-03-30"],
             "description": "Dates removed from the weekly series.",
             "type": "array"
           },
@@ -9543,9 +10763,7 @@
               "type": "string",
               "format": "date"
             },
-            "example": [
-              "2026-04-03"
-            ],
+            "example": ["2026-04-03"],
             "description": "Dates added to the weekly series, normally by day swaps.",
             "type": "array"
           }
@@ -9606,13 +10824,7 @@
             "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$"
           }
         },
-        "required": [
-          "key",
-          "title",
-          "date",
-          "startTime",
-          "endTime"
-        ]
+        "required": ["key", "title", "date", "startTime", "endTime"]
       },
       "CalendarRestrictionType": {
         "type": "string",
@@ -9667,13 +10879,7 @@
             "description": "Inclusive domain end date."
           }
         },
-        "required": [
-          "key",
-          "title",
-          "type",
-          "startDate",
-          "endDate"
-        ]
+        "required": ["key", "title", "type", "startDate", "endDate"]
       },
       "GeneratedCalendarWarningDto": {
         "type": "object",
@@ -9692,10 +10898,7 @@
             "description": "Identifier of the source record that caused the warning."
           }
         },
-        "required": [
-          "code",
-          "message"
-        ]
+        "required": ["code", "message"]
       },
       "GeneratedCalendarPayloadDto": {
         "type": "object",
@@ -9755,10 +10958,7 @@
             "$ref": "#/components/schemas/GeneratedCalendarPayloadDto"
           }
         },
-        "required": [
-          "id",
-          "payload"
-        ]
+        "required": ["id", "payload"]
       },
       "AcademicCalendarDto": {
         "type": "object",
@@ -9777,9 +10977,7 @@
             "description": "Four-digit academic year represented by this calendar."
           },
           "subscriptions": {
-            "example": [
-              "120afed7-9444-4d9c-a7f2-8f08dc2b7d70"
-            ],
+            "example": ["120afed7-9444-4d9c-a7f2-8f08dc2b7d70"],
             "description": "Public-calendar IDs this academic calendar subscribes to.",
             "type": "array",
             "items": {
@@ -9788,11 +10986,7 @@
             }
           }
         },
-        "required": [
-          "id",
-          "year",
-          "subscriptions"
-        ]
+        "required": ["id", "year", "subscriptions"]
       },
       "CreateAcademicCalendarDto": {
         "type": "object",
@@ -9805,9 +10999,7 @@
             "description": "Four-digit academic year. A university may have only one calendar per year."
           }
         },
-        "required": [
-          "year"
-        ]
+        "required": ["year"]
       },
       "CalendarRestrictionDto": {
         "type": "object",
@@ -9852,13 +11044,7 @@
             ]
           }
         },
-        "required": [
-          "id",
-          "type",
-          "startDate",
-          "endDate",
-          "description"
-        ]
+        "required": ["id", "type", "startDate", "endDate", "description"]
       },
       "CalendarRestrictionListDto": {
         "type": "object",
@@ -9871,9 +11057,7 @@
             }
           }
         },
-        "required": [
-          "restrictions"
-        ]
+        "required": ["restrictions"]
       },
       "CreateCalendarRestrictionDto": {
         "type": "object",
@@ -9917,10 +11101,7 @@
             ]
           }
         },
-        "required": [
-          "type",
-          "startDate"
-        ]
+        "required": ["type", "startDate"]
       },
       "UpdateCalendarRestrictionDto": {
         "type": "object",
@@ -9964,35 +11145,26 @@
             ]
           }
         },
-        "required": [
-          "type",
-          "startDate"
-        ]
+        "required": ["type", "startDate"]
       },
       "DeleteCalendarRestrictionResponseDto": {
         "type": "object",
         "properties": {
           "success": {
             "type": "boolean",
-            "enum": [
-              true
-            ],
+            "enum": [true],
             "example": true,
             "description": "Confirms that the calendar restriction was deleted."
           }
         },
-        "required": [
-          "success"
-        ]
+        "required": ["success"]
       },
       "UpdateCalendarSubscriptionsDto": {
         "type": "object",
         "properties": {
           "subscriptions": {
             "uniqueItems": true,
-            "example": [
-              "120afed7-9444-4d9c-a7f2-8f08dc2b7d70"
-            ],
+            "example": ["120afed7-9444-4d9c-a7f2-8f08dc2b7d70"],
             "description": "Public-calendar IDs this academic calendar subscribes to. Replaces the existing set.",
             "type": "array",
             "items": {
@@ -10001,25 +11173,19 @@
             }
           }
         },
-        "required": [
-          "subscriptions"
-        ]
+        "required": ["subscriptions"]
       },
       "DeleteAcademicCalendarResponseDto": {
         "type": "object",
         "properties": {
           "success": {
             "type": "boolean",
-            "enum": [
-              true
-            ],
+            "enum": [true],
             "example": true,
             "description": "Confirms that the academic calendar was deleted."
           }
         },
-        "required": [
-          "success"
-        ]
+        "required": ["success"]
       },
       "EventListResponseDto": {
         "type": "object",
@@ -10034,9 +11200,161 @@
             "type": "string"
           }
         },
-        "required": [
-          "events"
+        "required": ["events"]
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "required": ["code", "message"],
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "PDF_JOB_NOT_FOUND"
+          },
+          "message": {
+            "type": "string"
+          },
+          "details": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "requestId": {
+            "type": "string"
+          }
+        }
+      },
+      "ValidationErrorResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ErrorResponse"
+          }
         ]
+      },
+      "AcceptedJobResponse": {
+        "type": "object",
+        "required": ["accepted", "jobId"],
+        "properties": {
+          "accepted": {
+            "type": "boolean"
+          },
+          "jobId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "$ref": "#/components/schemas/JobStatus"
+          }
+        }
+      },
+      "JobStatus": {
+        "type": "string",
+        "enum": ["queued", "processing", "completed", "failed"]
+      },
+      "JobError": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ErrorResponse"
+          }
+        ]
+      },
+      "PaginationMetadata": {
+        "type": "object",
+        "required": ["page", "pageSize", "total"],
+        "properties": {
+          "page": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "pageSize": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "UUID": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "TimeOfDay": {
+        "type": "string",
+        "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+        "description": "24-hour local time in HH:mm format."
+      }
+    },
+    "responses": {
+      "BadRequestError": {
+        "description": "The request is invalid.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ValidationErrorResponse"
+            }
+          }
+        }
+      },
+      "UnauthorizedError": {
+        "description": "Authentication is required.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "ForbiddenError": {
+        "description": "Access is forbidden.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "NotFoundError": {
+        "description": "The requested resource was not found.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "ConflictError": {
+        "description": "The request conflicts with current resource state.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "RateLimitError": {
+        "description": "Too many requests.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "An unexpected server error occurred.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
       }
     }
   }
