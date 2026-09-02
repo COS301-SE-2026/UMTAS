@@ -23,6 +23,8 @@ and **L** = low.
 | **NFR-Rely-1** | Reliability | Availability under load | H | M |
 | **NFR-Avail-1** | Reliability | Availability | M | L |
 | **NFR-Sec-3** | Security | Vulnerability resistance | H | L |
+| **NFR-Por-1** | Portability | Adaptability | H | L |
+| **NFR-Acc-1** | Usability | Accessibility | H | H |
 
 ## NFR-Corr-1 - Supported Timetable PDF Extraction Correctness
 
@@ -176,5 +178,33 @@ successfully enqueued it, and returned its identifier.
 | **Response** | Scan the monorepo dependency tree for known Common Vulnerabilities and Exposures (CVEs) and report findings |
 | **Response measure** | The CI pipeline step passes with an exit code of 0, confirming **0 known vulnerabilities** of moderate or higher severity exist in the dependencies on the `main` branch. |
 
+
+## NFR-Por-1 - Browser Adaptability
+
+**Quality attribute:** Portability - Adaptability
+
+| **Part** | **UMTAS scenario** |
+| --- | --- |
+| **Source of stimulus** | A developer opening a pull request to the dev branch |
+| **Stimulus** | Execute the automated Playwright end-to-end test suite targeting Chromium, Microsoft Edge, and Mozilla Firefox |
+| **Environment** | Automated CI/CD pipeline (or local development environment) pre-configured with all three browser targets |
+| **Artifact** | E2e test files and playwright.config.ts |
+| **Response** | Run E2e tests on all provided browsers in the config |
+| **Response measure** | Measured 0 tests fail in the pipeline for repeated tests across all provided browsers |
+
+---
+
+## NFR-Acc-1 - Frontend Accessibility Audit
+
+**Quality attribute:** Usability - accessibility
+
+| **Part** | **UMTAS scenario** |
+| --- | --- |
+| **Source of stimulus** | A major release version of the software |
+| **Stimulus** | Execute a manual Lighthouse accessibility audit across key pages of the frontend application |
+| **Environment** | Local development or staging environment prior to major deployment |
+| **Artifact** | Frontend web application and all UI views |
+| **Response** | The Lighthouse scanner analyzes the web pages for accessibility best practices, contrast ratios, and ARIA usage, generating a performance and quality breakdown |
+| **Response measure** | The resulting lighthouse Accesibility score exceeds 90 out of a maximum of 100. |
 
 
