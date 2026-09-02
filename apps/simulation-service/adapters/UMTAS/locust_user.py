@@ -381,6 +381,43 @@ class DomainUser(HttpUser):
     @task(1)
     def get_active_session(self):
         self.client.get("/api/auth/get-session")
+        
+    @task(1)
+    def fetch_and_apply_solver_result(self):
+        if not (self.solver_id and self.solver_result_ready):
+            return
+        with self.client.get(
+            f"/api/solver/jobs/{self.solver_id}/result", name="/api/solver/jobs/[id]/result", catch_response=True
+        ) as response:
+            if response.status_code != 200:
+                response.failure(f"solver result fetch failed [{response.status_code}]")
+                self.solver_id = None
+                self.solver_result_ready = False
+                return
+            response.success()
+            selected = response.json().get("timetableSolution", {}).get("selectedEventIds", [])
+
+        if self.timetable_id and selected:
+            to_add = [eid for eid in selected if eid not in self.timetable_event_ids]
+            if to_add:
+                with self.client.patch(
+                    f"/api/timetables/{self.timetable_id}",
+                    json={"addEventIds": to_add},
+                    name="/api/timetables/[id]",
+                    catch_response=True,
+                ) as patch_response:
+                    if patch_response.status_code == 200:
+                        patch_response.success()
+                        self.timetable_event_ids.update(to_add)
+                    elif patch_response.status_code == 404:
+                        patch_response.success()
+                        self.timetable_id = None
+                        self.timetable_event_ids = set()
+                    else:
+                        patch_response.failure(f"failed to apply solver result [{patch_response.status_code}]")
+
+        self.solver_id = None
+        self.solver_result_ready = False
 
 
     @task(1)
