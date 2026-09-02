@@ -399,7 +399,7 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 <br>
 <div align="center">
 
-[![Service Contracts](https://img.shields.io/badge/Service_Contracts-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/latest/sas/architecture/API_CONTRACTS/)
+[![Service Contracts](https://img.shields.io/badge/Service_Contracts-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/latest/sas/architecture/SERVICE_CONTRACTS/)
 
 </div>
 </details>
