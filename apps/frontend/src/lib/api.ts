@@ -4254,6 +4254,73 @@ export interface components {
     UUID: string;
     /** @description 24-hour local time in HH:mm format. */
     TimeOfDay: string;
+    /** @description BullMQ job payload sent by the NestJS backend to the PDF parser worker on the `pdf.parse` queue. Runtime authority: `PdfParseJobDataSchema` in `packages/shared-types/src/parser.ts`. */
+    Queue_PdfParseJob: {
+      jobId: string;
+      fileKey: string;
+      adapterKey: string;
+    };
+    /** @description BullMQ job payload sent by the NestJS backend to the solver worker on the `timetable.solve` queue. Runtime authority: `TimetableSolveJobDataSchema` in `packages/shared-types/src/solver.ts`. */
+    Queue_TimetableSolveJob: {
+      jobId: string;
+      /** Format: uuid */
+      attemptToken: string;
+      /** @enum {string} */
+      solveMode: "feasibility" | "optimization";
+      /**
+       * @default auto
+       * @enum {string}
+       */
+      engine: "auto" | "cp-sat" | "ga";
+    };
+    /** @description Structured parser result produced by the PDF parser worker. Every event is either recurring (`isRecurring: true`, `day` set, `date: null`) or dated (`isRecurring: false`, `date` set, `day: null`). Runtime rule: `startTime` must be earlier than `endTime`. */
+    Worker_PdfParserResult: components["schemas"]["PdfParserResultDto"];
+    /** @description Scheduling problem and preferences returned by the backend to the solver worker and written as the native solver input JSON file. Each scheduling event must contain exactly one of `date` or `dayOfWeek`, and `startTime` must be earlier than `endTime`. */
+    Worker_SolverInput: components["schemas"]["SolverInputDto"];
+    /** @description Normalized solver result returned by the solver worker. Runtime rules: `metadata.conflictCount` equals `metadata.conflicts.length`; `outcome` is `conflict-free` when the count is zero and `best-effort` otherwise. */
+    Worker_SolverResult: components["schemas"]["SolverResultDto"];
+    /** @description Discriminated HTTP callback sent by the PDF parser worker. A completed callback contains only `status` and `result`; a failed callback contains only `status` and `error`. */
+    Http_PdfParserCallback:
+      | {
+          /** @enum {string} */
+          status: "completed";
+          result: components["schemas"]["Worker_PdfParserResult"];
+        }
+      | {
+          /** @enum {string} */
+          status: "failed";
+          error: components["schemas"]["WorkerCallbackErrorDto"];
+        };
+    /** @description Discriminated HTTP callback sent by the solver worker. A completed callback contains only `status` and `result`; a failed callback contains only `status` and `error`. */
+    Http_SolverCallback:
+      | {
+          /** @enum {string} */
+          status: "completed";
+          result: components["schemas"]["Worker_SolverResult"];
+        }
+      | {
+          /** @enum {string} */
+          status: "failed";
+          error: components["schemas"]["WorkerCallbackErrorDto"];
+        };
+    /** @description JSON file passed to the native solver with `--input`. Its content is the solver input retrieved from the backend. */
+    Cli_SolverInput: components["schemas"]["Worker_SolverInput"];
+    /** @description JSON file written by the native solver to the `--output` path. Runtime authority: `SolverCliOutputSchema` in `packages/shared-types/src/solver.ts`. A successful process writes exactly one of the feasible or infeasible shapes. */
+    Cli_SolverOutput:
+      | {
+          /** @enum {string} */
+          status: "feasible";
+          /** @enum {string} */
+          outcome: "conflict-free" | "best-effort";
+          timetableSolution: components["schemas"]["TimetableSolutionDto"];
+          /** @default [] */
+          heuristicScores: components["schemas"]["SolverHeuristicScoreDto"][];
+          metadata: components["schemas"]["SolverResultMetadataDto"];
+        }
+      | {
+          /** @enum {string} */
+          status: "infeasible";
+        };
   };
   responses: {
     /** @description The request is invalid. */
@@ -7681,7 +7748,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["PdfParserResultDto"];
+          "application/json": components["schemas"]["Worker_PdfParserResult"];
         };
       };
       /** @description HTTP response. */
@@ -7707,7 +7774,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": components["schemas"]["PdfParserCallbackDto"];
+        "application/json": components["schemas"]["Http_PdfParserCallback"];
       };
     };
     responses: {
@@ -7783,7 +7850,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["SolverInputDto"];
+          "application/json": components["schemas"]["Worker_SolverInput"];
         };
       };
       /** @description HTTP response. */
@@ -7845,7 +7912,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["SolverResultDto"];
+          "application/json": components["schemas"]["Worker_SolverResult"];
         };
       };
       /** @description HTTP response. */
@@ -7873,7 +7940,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": components["schemas"]["SolverCallbackDto"];
+        "application/json": components["schemas"]["Http_SolverCallback"];
       };
     };
     responses: {

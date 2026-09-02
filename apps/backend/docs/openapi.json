@@ -7,7 +7,7 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Response for this operation.",
+            "description": "HTTP 200 response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -17,17 +17,15 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "tags": ["App"],
-        "summary": "Get api",
-        "description": "Get api. This App operation is part of the versioned UMTAS HTTP contract.",
+        "summary": "GET /api",
+        "description": "GET /api. This App operation is part of the versioned UMTAS HTTP contract.",
         "security": []
       }
     },
@@ -67,8 +65,7 @@
             }
           },
           "409": {
-            "$ref": "#/components/responses/ConflictError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ConflictError"
           },
           "422": {
             "description": "Email already registered",
@@ -91,8 +88,7 @@
             }
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Register with email and password",
@@ -147,8 +143,7 @@
             }
           },
           "409": {
-            "$ref": "#/components/responses/ConflictError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ConflictError"
           },
           "429": {
             "description": "Rate limited",
@@ -161,8 +156,7 @@
             }
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Sign in with email and password",
@@ -187,8 +181,7 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
             "description": "No active session",
@@ -201,16 +194,13 @@
             }
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "409": {
-            "$ref": "#/components/responses/ConflictError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ConflictError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "security": [
@@ -267,20 +257,16 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "security": [
@@ -312,8 +298,7 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
             "description": "Unauthorized",
@@ -326,12 +311,10 @@
             }
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "security": [
@@ -390,16 +373,13 @@
             }
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "409": {
-            "$ref": "#/components/responses/ConflictError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ConflictError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "security": [
@@ -448,12 +428,10 @@
             }
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "409": {
-            "$ref": "#/components/responses/ConflictError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ConflictError"
           },
           "429": {
             "description": "Rate limited",
@@ -466,8 +444,7 @@
             }
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "security": [
@@ -516,12 +493,10 @@
             }
           },
           "409": {
-            "$ref": "#/components/responses/ConflictError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ConflictError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Verify email address using the code from the verification email",
@@ -556,12 +531,10 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "409": {
-            "$ref": "#/components/responses/ConflictError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ConflictError"
           },
           "429": {
             "description": "Rate limited",
@@ -574,8 +547,7 @@
             }
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Request a password reset email",
@@ -620,12 +592,10 @@
             }
           },
           "409": {
-            "$ref": "#/components/responses/ConflictError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ConflictError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Reset password using the token from the reset email",
@@ -680,16 +650,13 @@
             }
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "409": {
-            "$ref": "#/components/responses/ConflictError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ConflictError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "security": [
@@ -742,8 +709,7 @@
             }
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Google OAuth callback",
@@ -797,12 +763,10 @@
             }
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "409": {
-            "$ref": "#/components/responses/ConflictError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ConflictError"
           },
           "422": {
             "description": "The Google account email is already in use by another account",
@@ -815,8 +779,7 @@
             }
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "security": [
@@ -855,8 +818,7 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
             "description": "Unauthorized",
@@ -879,8 +841,7 @@
             }
           },
           "409": {
-            "$ref": "#/components/responses/ConflictError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ConflictError"
           },
           "422": {
             "description": "Email already registered",
@@ -893,8 +854,7 @@
             }
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "security": [
@@ -934,24 +894,19 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "409": {
-            "$ref": "#/components/responses/ConflictError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ConflictError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "security": [
@@ -979,20 +934,16 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "security": [
@@ -1031,8 +982,7 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
             "description": "Unauthorized",
@@ -1055,12 +1005,10 @@
             }
           },
           "409": {
-            "$ref": "#/components/responses/ConflictError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ConflictError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "security": [
@@ -1099,8 +1047,7 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
             "description": "Unauthorized",
@@ -1133,12 +1080,10 @@
             }
           },
           "409": {
-            "$ref": "#/components/responses/ConflictError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ConflictError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "security": [
@@ -1177,8 +1122,7 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
             "description": "Unauthorized",
@@ -1211,8 +1155,7 @@
             }
           },
           "409": {
-            "$ref": "#/components/responses/ConflictError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ConflictError"
           },
           "422": {
             "description": "New email already in use",
@@ -1225,8 +1168,7 @@
             }
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "security": [
@@ -1265,24 +1207,19 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "409": {
-            "$ref": "#/components/responses/ConflictError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ConflictError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "security": [
@@ -1301,20 +1238,18 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Response for this operation."
+            "description": "HTTP 200 response."
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "tags": ["Health"],
-        "summary": "Get health",
-        "description": "Get health. This Health operation is part of the versioned UMTAS HTTP contract.",
+        "summary": "GET /api/health",
+        "description": "GET /api/health. This Health operation is part of the versioned UMTAS HTTP contract.",
         "security": []
       }
     },
@@ -1324,20 +1259,18 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Response for this operation."
+            "description": "HTTP 200 response."
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "tags": ["Health"],
-        "summary": "Get check",
-        "description": "Get check. This Health operation is part of the versioned UMTAS HTTP contract.",
+        "summary": "GET /api/health/check",
+        "description": "GET /api/health/check. This Health operation is part of the versioned UMTAS HTTP contract.",
         "security": []
       }
     },
@@ -1371,19 +1304,16 @@
             "description": "Missing or invalid module payload"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "409": {
             "description": "Module code already exists for course"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Create a module",
@@ -1463,19 +1393,16 @@
             "description": "Invalid request - at least one filter required"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
             "description": "No modules found matching the filters"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Get all modules with filters",
@@ -1517,20 +1444,16 @@
             "description": "Missing or invalid module payload"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "409": {
-            "$ref": "#/components/responses/ConflictError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ConflictError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Create a module - V2",
@@ -1619,16 +1542,13 @@
             "description": "Invalid filters"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Get all modules with filters and counts - V2",
@@ -1669,19 +1589,16 @@
             "description": "Invalid module ID"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
             "description": "Module not found"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Get a module by ID",
@@ -1730,12 +1647,10 @@
             "description": "Invalid update payload or module ID"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
             "description": "Module not found"
@@ -1744,8 +1659,7 @@
             "description": "Duplicate module code detected for course"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Update a module",
@@ -1784,19 +1698,16 @@
             "description": "Invalid module ID"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
             "description": "Module not found"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Delete a module by ID",
@@ -1837,19 +1748,16 @@
             "description": "Invalid module ID"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
             "description": "Module not found"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Get a module by ID - V2",
@@ -1896,23 +1804,19 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
             "description": "Module not found"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Enrol student to module",
@@ -1968,27 +1872,22 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
             "description": "Module not found"
           },
           "409": {
-            "$ref": "#/components/responses/ConflictError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ConflictError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Enrol student to module - V2",
@@ -2036,27 +1935,22 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
             "description": "Modules specified in modules array not found\n\nCourse not found"
           },
           "409": {
-            "$ref": "#/components/responses/ConflictError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ConflictError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Populate Course with modules array",
@@ -2105,27 +1999,22 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
             "description": "Module not found"
           },
           "409": {
-            "$ref": "#/components/responses/ConflictError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ConflictError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Update a module styling",
@@ -2166,19 +2055,16 @@
             "description": "Missing or invalid course payload"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "409": {
             "description": "Course already exists"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Create a Course",
@@ -2227,24 +2113,19 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "409": {
-            "$ref": "#/components/responses/ConflictError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ConflictError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Get all courses",
@@ -2320,20 +2201,16 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Get all courses - V2",
@@ -2373,19 +2250,16 @@
             "description": "Invalid Course ID"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
             "description": "Course not found"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "get a Course by ID",
@@ -2434,23 +2308,19 @@
             "description": "Invalid update payload or CourseId"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
             "description": "Course not found"
           },
           "409": {
-            "$ref": "#/components/responses/ConflictError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ConflictError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Update an Course",
@@ -2489,19 +2359,16 @@
             "description": "Invalid Course ID"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
             "description": "Course not found"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Delete Course by Course ID",
@@ -2542,19 +2409,16 @@
             "description": "Invalid Course ID"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
             "description": "Course not found"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "get a Course by ID - V2",
@@ -2596,19 +2460,16 @@
             "description": "Missing or invalid university payload"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "409": {
             "description": "University already exists"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Create a University",
@@ -2635,23 +2496,19 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
             "description": "No universities found"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Get all universities",
@@ -2692,19 +2549,16 @@
             "description": "Invalid University ID"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
             "description": "University not found"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "get a university by ID",
@@ -2753,23 +2607,19 @@
             "description": "Invlaid update payload or universityId"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
             "description": "University not found"
           },
           "409": {
-            "$ref": "#/components/responses/ConflictError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ConflictError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Update an university",
@@ -2808,19 +2658,16 @@
             "description": "Invalid university ID"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
             "description": "University not found"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Delete university by university ID",
@@ -2861,19 +2708,16 @@
             "description": "Invalid University ID"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
             "description": "University not found"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "get a users role by universityID",
@@ -2924,23 +2768,19 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "409": {
             "description": "Unauthorized"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Get all applications for a specific university",
@@ -2984,12 +2824,10 @@
             "description": "Invalid request body or university does not exist"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
             "description": "University not found"
@@ -2998,8 +2836,7 @@
             "description": "User already has this role at the university"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Apply for a role at a specific university",
@@ -3042,12 +2879,10 @@
             "description": "Invalid request body or universityRole does not exist"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
             "description": "UniversityRole not found"
@@ -3056,8 +2891,7 @@
             "description": "User already has an approved role"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Approve a users role for a university",
@@ -3108,23 +2942,19 @@
             "description": "Invalid input"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
             "description": "Group not found"
           },
           "409": {
-            "$ref": "#/components/responses/ConflictError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ConflictError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Add array of modules to a module group",
@@ -3162,24 +2992,19 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "409": {
-            "$ref": "#/components/responses/ConflictError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ConflictError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Create an event - V2",
@@ -3227,8 +3052,7 @@
             "description": "Insufficient permissions"
           },
           "409": {
-            "$ref": "#/components/responses/ConflictError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ConflictError"
           },
           "500": {
             "description": "Event was not created"
@@ -3295,8 +3119,7 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
             "description": "No active session"
@@ -3305,8 +3128,7 @@
             "description": "Insufficient permissions"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Get all events",
@@ -3343,23 +3165,19 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
             "description": "Event not found"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Get event by ID",
@@ -3419,8 +3237,7 @@
             "description": "Event or referenced module not found"
           },
           "409": {
-            "$ref": "#/components/responses/ConflictError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ConflictError"
           },
           "500": {
             "description": "Event was not updated"
@@ -3459,8 +3276,7 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
             "description": "No active session"
@@ -3520,27 +3336,22 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
             "description": "Event not found"
           },
           "409": {
-            "$ref": "#/components/responses/ConflictError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ConflictError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Validate an event",
@@ -3588,12 +3399,10 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
             "description": "Insufficient permissions"
@@ -3602,12 +3411,10 @@
             "description": "Event not found"
           },
           "409": {
-            "$ref": "#/components/responses/ConflictError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ConflictError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Attach or clear an event's venue",
@@ -3652,12 +3459,10 @@
             "description": "No active session"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "409": {
-            "$ref": "#/components/responses/ConflictError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ConflictError"
           },
           "500": {
             "description": "Timetable was not created"
@@ -3687,19 +3492,16 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
             "description": "No active session"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Get all timetables",
@@ -3728,19 +3530,16 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
             "description": "No active session"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Get all timetables",
@@ -3779,23 +3578,19 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
             "description": "Timetable not found"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Get timetable by ID",
@@ -3848,15 +3643,13 @@
             "description": "No active session"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
             "description": "Timetable not found"
           },
           "409": {
-            "$ref": "#/components/responses/ConflictError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ConflictError"
           },
           "500": {
             "description": "Timetable was not updated"
@@ -3896,15 +3689,13 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
             "description": "No active session"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
             "description": "Timetable not found"
@@ -3949,23 +3740,19 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
             "description": "Timetable[] not found"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Get timetable by ID",
@@ -3995,20 +3782,16 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Get personal module",
@@ -4050,19 +3833,16 @@
             "description": "Missing or invalid module payload"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "409": {
             "description": "Module code already exists for course"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Create a user defined module",
@@ -4092,19 +3872,16 @@
             "description": "Invalid request - at least one filter required"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
             "description": "No modules found matching the filters"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Get all modules a user is enrolled in with their course",
@@ -4145,19 +3922,16 @@
             "description": "Invalid module ID"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
             "description": "Module not found"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Get a module by ID",
@@ -4206,12 +3980,10 @@
             "description": "Invalid update payload or module ID"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
             "description": "Module not found"
@@ -4220,8 +3992,7 @@
             "description": "Duplicate module code detected for course"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Update a module that the student owns",
@@ -4260,19 +4031,16 @@
             "description": "Invalid module ID"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
             "description": "Module not found"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Delete a module by ID",
@@ -4311,27 +4079,22 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
             "description": "Module not found"
           },
           "409": {
-            "$ref": "#/components/responses/ConflictError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ConflictError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Create a user defined event",
@@ -4388,7 +4151,7 @@
         },
         "responses": {
           "200": {
-            "description": "Response for this operation.",
+            "description": "HTTP 200 response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -4398,24 +4161,19 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "409": {
-            "$ref": "#/components/responses/ConflictError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ConflictError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Look up an existing PDF parser job by PDF stream fingerprint",
@@ -4475,7 +4233,7 @@
         },
         "responses": {
           "202": {
-            "description": "Response for this operation.",
+            "description": "HTTP 202 response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -4485,24 +4243,19 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "409": {
-            "$ref": "#/components/responses/ConflictError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ConflictError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Upload a timetable PDF and enqueue it for parsing",
@@ -4530,7 +4283,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Response for this operation.",
+            "description": "HTTP 200 response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -4540,24 +4293,19 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
-            "$ref": "#/components/responses/NotFoundError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/NotFoundError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Get PDF parser job status and result metadata",
@@ -4585,34 +4333,29 @@
         ],
         "responses": {
           "200": {
-            "description": "Response for this operation.",
+            "description": "HTTP 200 response.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PdfParserResultDto"
+                  "$ref": "#/components/schemas/Worker_PdfParserResult"
                 }
               }
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
-            "$ref": "#/components/responses/NotFoundError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/NotFoundError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Get completed PDF parser result",
@@ -4642,14 +4385,14 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/PdfParserCallbackDto"
+                "$ref": "#/components/schemas/Http_PdfParserCallback"
               }
             }
           }
         },
         "responses": {
           "202": {
-            "description": "Response for this operation.",
+            "description": "HTTP 202 response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -4659,24 +4402,19 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "404": {
-            "$ref": "#/components/responses/NotFoundError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/NotFoundError"
           },
           "409": {
-            "$ref": "#/components/responses/ConflictError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ConflictError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "security": [
@@ -4706,7 +4444,7 @@
         },
         "responses": {
           "202": {
-            "description": "Response for this operation.",
+            "description": "HTTP 202 response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -4716,24 +4454,19 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "409": {
-            "$ref": "#/components/responses/ConflictError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ConflictError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "security": [
@@ -4761,30 +4494,26 @@
         ],
         "responses": {
           "200": {
-            "description": "Response for this operation.",
+            "description": "HTTP 200 response.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SolverInputDto"
+                  "$ref": "#/components/schemas/Worker_SolverInput"
                 }
               }
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "404": {
-            "$ref": "#/components/responses/NotFoundError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/NotFoundError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "security": [
@@ -4813,7 +4542,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Response for this operation.",
+            "description": "HTTP 200 response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -4823,24 +4552,19 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
-            "$ref": "#/components/responses/NotFoundError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/NotFoundError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "security": [
@@ -4868,34 +4592,29 @@
         ],
         "responses": {
           "200": {
-            "description": "Response for this operation.",
+            "description": "HTTP 200 response.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SolverResultDto"
+                  "$ref": "#/components/schemas/Worker_SolverResult"
                 }
               }
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
-            "$ref": "#/components/responses/NotFoundError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/NotFoundError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "security": [
@@ -4934,14 +4653,14 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/SolverCallbackDto"
+                "$ref": "#/components/schemas/Http_SolverCallback"
               }
             }
           }
         },
         "responses": {
           "202": {
-            "description": "Response for this operation.",
+            "description": "HTTP 202 response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -4951,24 +4670,19 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "404": {
-            "$ref": "#/components/responses/NotFoundError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/NotFoundError"
           },
           "409": {
-            "$ref": "#/components/responses/ConflictError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ConflictError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "security": [
@@ -4998,7 +4712,7 @@
         },
         "responses": {
           "201": {
-            "description": "Response for this operation.",
+            "description": "HTTP 201 response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -5008,24 +4722,19 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "409": {
-            "$ref": "#/components/responses/ConflictError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ConflictError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Create attendance record for current user for an event",
@@ -5085,7 +4794,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Response for this operation.",
+            "description": "HTTP 200 response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -5095,20 +4804,16 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Get all attendance records for user or with filters",
@@ -5136,7 +4841,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Response for this operation.",
+            "description": "HTTP 200 response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -5146,24 +4851,19 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
-            "$ref": "#/components/responses/NotFoundError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/NotFoundError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Get attendance record by attendanceID",
@@ -5199,7 +4899,7 @@
         },
         "responses": {
           "200": {
-            "description": "Response for this operation.",
+            "description": "HTTP 200 response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -5209,28 +4909,22 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
-            "$ref": "#/components/responses/NotFoundError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/NotFoundError"
           },
           "409": {
-            "$ref": "#/components/responses/ConflictError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ConflictError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Update date or state of attendance",
@@ -5256,7 +4950,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Response for this operation.",
+            "description": "HTTP 200 response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -5266,24 +4960,19 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
-            "$ref": "#/components/responses/NotFoundError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/NotFoundError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Delete an attendance record - effectively making attendance NOT_STATED",
@@ -5347,19 +5036,16 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
             "description": "No uni selected or no role at uni"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "security": [
@@ -5410,8 +5096,7 @@
             "description": "Building does not belong to the selected university"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
             "description": "Wrong permissions"
@@ -5420,12 +5105,10 @@
             "description": "Venue not found"
           },
           "409": {
-            "$ref": "#/components/responses/ConflictError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ConflictError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "security": [
@@ -5467,19 +5150,16 @@
             "description": "One/more buildings do not belong to the selected university"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
             "description": "Wrong permissions bud"
           },
           "409": {
-            "$ref": "#/components/responses/ConflictError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ConflictError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "security": [
@@ -5535,19 +5215,16 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
             "description": "No uni selected or no role at uni"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "security": [
@@ -5583,12 +5260,10 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
             "description": "Incorrect role permissions"
@@ -5597,8 +5272,7 @@
             "description": "Building with this name already exists"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "security": [
@@ -5647,12 +5321,10 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
             "description": "Your role is not admin, not allowed"
@@ -5661,12 +5333,10 @@
             "description": "The building was not found in this uni"
           },
           "409": {
-            "$ref": "#/components/responses/ConflictError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ConflictError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "security": [
@@ -5684,7 +5354,7 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Response for this operation.",
+            "description": "HTTP 200 response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -5694,12 +5364,10 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
             "description": "No university selected"
@@ -5708,8 +5376,7 @@
             "description": "Map settings not configured boss"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "security": [
@@ -5736,7 +5403,7 @@
         },
         "responses": {
           "200": {
-            "description": "Response for this operation.",
+            "description": "HTTP 200 response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -5746,23 +5413,19 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
             "description": "Insufficient permissions"
           },
           "409": {
-            "$ref": "#/components/responses/ConflictError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ConflictError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "security": [
@@ -5815,12 +5478,10 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
             "description": "No university or university role was selected"
@@ -5829,8 +5490,7 @@
             "description": "One or both buildings have not been pinned, or no walking path was found between the two buildings"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "security": [
@@ -5881,19 +5541,16 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequestError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/BadRequestError"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
             "description": "No university or university role was selected"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "security": [
@@ -5935,12 +5592,10 @@
             "description": "Invalid generation request"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
             "description": "Calendar or timetable not found"
@@ -5952,8 +5607,7 @@
             "description": "Calendar data cannot be converted into a valid snapshot"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "security": [
@@ -5996,19 +5650,16 @@
             "description": "Invalid generated calendar ID"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
             "description": "Generated calendar not found"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "security": [
@@ -6056,16 +5707,13 @@
             "description": "Invalid academic year"
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "security": [
@@ -6116,8 +5764,7 @@
             "description": "A calendar already exists for this university and year"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "security": [
@@ -6169,8 +5816,7 @@
             "description": "Insufficient permissions"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "security": [
@@ -6222,8 +5868,7 @@
             "description": "Academic calendar not found"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "security": [
@@ -6289,8 +5934,7 @@
             "description": "Restriction is not valid for its type"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "security": [
@@ -6368,8 +6012,7 @@
             "description": "Restriction is not valid for its type"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "security": [
@@ -6429,8 +6072,7 @@
             "description": "Calendar or restriction not found"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "security": [
@@ -6492,15 +6134,13 @@
             "description": "Academic calendar or public calendar not found"
           },
           "409": {
-            "$ref": "#/components/responses/ConflictError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ConflictError"
           },
           "422": {
             "description": "Public calendar year does not match the academic calendar"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "security": [
@@ -6552,8 +6192,7 @@
             "description": "Academic calendar not found"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "security": [
@@ -6606,8 +6245,7 @@
             "description": "Generated snapshots still reference this calendar"
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "security": [
@@ -6660,19 +6298,16 @@
             "description": "The authenticated user is not associated with a university."
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
             "description": "The university or its API adapter could not be found."
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Fetch courses",
@@ -6714,19 +6349,16 @@
             "description": "The authenticated user is not associated with a university."
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
             "description": "The university or its API adapter could not be found."
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Get a specific course",
@@ -6769,19 +6401,16 @@
             "description": "The university or course ID is invalid."
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
             "description": "The university, course, or API adapter could not be found."
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Fetch modules",
@@ -6824,19 +6453,16 @@
             "description": "The university or module ID is invalid."
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "$ref": "#/components/responses/ForbiddenError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
             "description": "The university, module, or API adapter could not be found."
           },
           "500": {
-            "$ref": "#/components/responses/InternalError",
-            "description": "HTTP response."
+            "$ref": "#/components/responses/InternalError"
           }
         },
         "summary": "Fetch events",
@@ -6851,7 +6477,7 @@
   },
   "info": {
     "title": "UMTAS API",
-    "description": "University Management Timetable & Scheduling System API. HTTP contract for public/core endpoints and explicitly marked internal worker boundaries. Google Calendar synchronisation is not implemented.",
+    "description": "University Management Timetable & Scheduling System API\n\n## System contract boundaries\n\nThis document is the comprehensive contract overview for UMTAS. Entries under **Paths** are callable HTTP operations. Queue and CLI payloads are documented under **Schemas** and are not HTTP endpoints.\n\n| Boundary | Transport | Contract schemas |\n| --- | --- | --- |\n| Next.js frontend → NestJS backend | HTTP | Paths and HTTP DTO schemas |\n| NestJS backend → PDF parser worker | BullMQ `pdf.parse` | `Queue_PdfParseJob` |\n| PDF parser worker → NestJS backend | HTTP callback | `Http_PdfParserCallback`, `Worker_PdfParserResult` |\n| NestJS backend → solver worker | BullMQ `timetable.solve` | `Queue_TimetableSolveJob` |\n| NestJS backend → solver worker | Internal HTTP | `Worker_SolverInput` |\n| Solver worker → NestJS backend | HTTP callback | `Http_SolverCallback`, `Worker_SolverResult` |\n| Solver worker ↔ native solver | CLI and JSON files | `Cli_SolverInput`, `Cli_SolverOutput` |\n\nCross-field rules described on schemas are enforced by the runtime Zod contracts in `packages/shared-types`; OpenAPI documents those rules but cannot enforce all relational constraints.",
     "version": "1.0.0",
     "contact": {}
   },
@@ -11204,21 +10830,25 @@
       },
       "ErrorResponse": {
         "type": "object",
+        "description": "Stable UMTAS error envelope.",
         "required": ["code", "message"],
         "properties": {
           "code": {
             "type": "string",
+            "description": "Stable machine-readable error code.",
             "example": "PDF_JOB_NOT_FOUND"
           },
           "message": {
-            "type": "string"
+            "type": "string",
+            "example": "PDF parser job was not found."
           },
           "details": {
             "type": "object",
             "additionalProperties": true
           },
           "requestId": {
-            "type": "string"
+            "type": "string",
+            "example": "req_01J..."
           }
         }
       },
@@ -11227,34 +10857,39 @@
           {
             "$ref": "#/components/schemas/ErrorResponse"
           }
-        ]
+        ],
+        "description": "Request validation failed."
       },
       "AcceptedJobResponse": {
         "type": "object",
         "required": ["accepted", "jobId"],
         "properties": {
           "accepted": {
-            "type": "boolean"
+            "type": "boolean",
+            "example": true
           },
           "jobId": {
             "type": "string",
             "format": "uuid"
           },
           "status": {
-            "$ref": "#/components/schemas/JobStatus"
+            "type": "string",
+            "enum": ["queued", "processing", "completed", "failed"]
           }
         }
       },
       "JobStatus": {
         "type": "string",
-        "enum": ["queued", "processing", "completed", "failed"]
+        "enum": ["queued", "processing", "completed", "failed"],
+        "description": "Asynchronous job lifecycle state."
       },
       "JobError": {
         "allOf": [
           {
             "$ref": "#/components/schemas/ErrorResponse"
           }
-        ]
+        ],
+        "description": "Terminal asynchronous job failure."
       },
       "PaginationMetadata": {
         "type": "object",
@@ -11277,12 +10912,246 @@
       },
       "UUID": {
         "type": "string",
-        "format": "uuid"
+        "format": "uuid",
+        "example": "00000000-0000-4000-8000-000000000001"
       },
       "TimeOfDay": {
         "type": "string",
         "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+        "example": "08:30",
         "description": "24-hour local time in HH:mm format."
+      },
+      "Queue_PdfParseJob": {
+        "type": "object",
+        "description": "BullMQ job payload sent by the NestJS backend to the PDF parser worker on the `pdf.parse` queue. Runtime authority: `PdfParseJobDataSchema` in `packages/shared-types/src/parser.ts`.",
+        "x-transport": "bullmq",
+        "x-channel": "pdf.parse",
+        "x-producer": "nestjs-backend",
+        "x-consumer": "pdf-parser-worker",
+        "additionalProperties": false,
+        "required": ["jobId", "fileKey", "adapterKey"],
+        "properties": {
+          "jobId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "fileKey": {
+            "type": "string",
+            "minLength": 1
+          },
+          "adapterKey": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "Queue_TimetableSolveJob": {
+        "type": "object",
+        "description": "BullMQ job payload sent by the NestJS backend to the solver worker on the `timetable.solve` queue. Runtime authority: `TimetableSolveJobDataSchema` in `packages/shared-types/src/solver.ts`.",
+        "x-transport": "bullmq",
+        "x-channel": "timetable.solve",
+        "x-producer": "nestjs-backend",
+        "x-consumer": "solver-worker",
+        "additionalProperties": false,
+        "required": ["jobId", "attemptToken", "solveMode"],
+        "properties": {
+          "jobId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "attemptToken": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "solveMode": {
+            "type": "string",
+            "enum": ["feasibility", "optimization"]
+          },
+          "engine": {
+            "type": "string",
+            "enum": ["auto", "cp-sat", "ga"],
+            "default": "auto"
+          }
+        }
+      },
+      "Worker_PdfParserResult": {
+        "description": "Structured parser result produced by the PDF parser worker. Every event is either recurring (`isRecurring: true`, `day` set, `date: null`) or dated (`isRecurring: false`, `date` set, `day: null`). Runtime rule: `startTime` must be earlier than `endTime`.",
+        "x-runtime-schema": "PdfParserResultSchema",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/PdfParserResultDto"
+          }
+        ]
+      },
+      "Worker_SolverInput": {
+        "description": "Scheduling problem and preferences returned by the backend to the solver worker and written as the native solver input JSON file. Each scheduling event must contain exactly one of `date` or `dayOfWeek`, and `startTime` must be earlier than `endTime`.",
+        "x-transport": "internal-http",
+        "x-producer": "nestjs-backend",
+        "x-consumer": "solver-worker",
+        "x-runtime-schema": "SolverInputSchema",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/SolverInputDto"
+          }
+        ]
+      },
+      "Worker_SolverResult": {
+        "description": "Normalized solver result returned by the solver worker. Runtime rules: `metadata.conflictCount` equals `metadata.conflicts.length`; `outcome` is `conflict-free` when the count is zero and `best-effort` otherwise.",
+        "x-runtime-schema": "SolverResultSchema",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/SolverResultDto"
+          }
+        ]
+      },
+      "Http_PdfParserCallback": {
+        "description": "Discriminated HTTP callback sent by the PDF parser worker. A completed callback contains only `status` and `result`; a failed callback contains only `status` and `error`.",
+        "x-transport": "http",
+        "x-producer": "pdf-parser-worker",
+        "x-consumer": "nestjs-backend",
+        "x-runtime-schema": "PdfParserCallbackPayloadSchema",
+        "discriminator": {
+          "propertyName": "status"
+        },
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["status", "result"],
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": ["completed"]
+              },
+              "result": {
+                "$ref": "#/components/schemas/Worker_PdfParserResult"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["status", "error"],
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": ["failed"]
+              },
+              "error": {
+                "$ref": "#/components/schemas/WorkerCallbackErrorDto"
+              }
+            }
+          }
+        ]
+      },
+      "Http_SolverCallback": {
+        "description": "Discriminated HTTP callback sent by the solver worker. A completed callback contains only `status` and `result`; a failed callback contains only `status` and `error`.",
+        "x-transport": "http",
+        "x-producer": "solver-worker",
+        "x-consumer": "nestjs-backend",
+        "x-runtime-schema": "SolverCallbackPayloadSchema",
+        "discriminator": {
+          "propertyName": "status"
+        },
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["status", "result"],
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": ["completed"]
+              },
+              "result": {
+                "$ref": "#/components/schemas/Worker_SolverResult"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["status", "error"],
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": ["failed"]
+              },
+              "error": {
+                "$ref": "#/components/schemas/WorkerCallbackErrorDto"
+              }
+            }
+          }
+        ]
+      },
+      "Cli_SolverInput": {
+        "description": "JSON file passed to the native solver with `--input`. Its content is the solver input retrieved from the backend.",
+        "x-transport": "cli-json-file",
+        "x-producer": "solver-worker",
+        "x-consumer": "native-solver",
+        "x-cli-arguments": "--input <path> --output <path> --engine <cp-sat|ga> --solve-mode <feasibility|optimization>",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Worker_SolverInput"
+          }
+        ]
+      },
+      "Cli_SolverOutput": {
+        "description": "JSON file written by the native solver to the `--output` path. Runtime authority: `SolverCliOutputSchema` in `packages/shared-types/src/solver.ts`. A successful process writes exactly one of the feasible or infeasible shapes.",
+        "x-transport": "cli-json-file",
+        "x-producer": "native-solver",
+        "x-consumer": "solver-worker",
+        "x-runtime-schema": "SolverCliOutputSchema",
+        "discriminator": {
+          "propertyName": "status"
+        },
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "status",
+              "outcome",
+              "timetableSolution",
+              "heuristicScores",
+              "metadata"
+            ],
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": ["feasible"]
+              },
+              "outcome": {
+                "type": "string",
+                "enum": ["conflict-free", "best-effort"]
+              },
+              "timetableSolution": {
+                "$ref": "#/components/schemas/TimetableSolutionDto"
+              },
+              "heuristicScores": {
+                "type": "array",
+                "default": [],
+                "items": {
+                  "$ref": "#/components/schemas/SolverHeuristicScoreDto"
+                }
+              },
+              "metadata": {
+                "$ref": "#/components/schemas/SolverResultMetadataDto"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["status"],
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": ["infeasible"]
+              }
+            }
+          }
+        ]
       }
     },
     "responses": {
@@ -11307,7 +11176,7 @@
         }
       },
       "ForbiddenError": {
-        "description": "Access is forbidden.",
+        "description": "The authenticated principal is not allowed to perform this operation.",
         "content": {
           "application/json": {
             "schema": {
@@ -11357,5 +11226,59 @@
         }
       }
     }
-  }
+  },
+  "x-umtas-service-contracts": [
+    {
+      "id": "frontend-backend-http",
+      "transport": "http",
+      "producer": "nextjs-frontend",
+      "consumer": "nestjs-backend",
+      "contract": "OpenAPI paths"
+    },
+    {
+      "id": "backend-pdf-parser-queue",
+      "transport": "bullmq",
+      "channel": "pdf.parse",
+      "producer": "nestjs-backend",
+      "consumer": "pdf-parser-worker",
+      "schema": "#/components/schemas/Queue_PdfParseJob"
+    },
+    {
+      "id": "pdf-parser-backend-callback",
+      "transport": "http",
+      "producer": "pdf-parser-worker",
+      "consumer": "nestjs-backend",
+      "schema": "#/components/schemas/Http_PdfParserCallback"
+    },
+    {
+      "id": "backend-solver-queue",
+      "transport": "bullmq",
+      "channel": "timetable.solve",
+      "producer": "nestjs-backend",
+      "consumer": "solver-worker",
+      "schema": "#/components/schemas/Queue_TimetableSolveJob"
+    },
+    {
+      "id": "backend-solver-input",
+      "transport": "http",
+      "producer": "nestjs-backend",
+      "consumer": "solver-worker",
+      "schema": "#/components/schemas/Worker_SolverInput"
+    },
+    {
+      "id": "solver-backend-callback",
+      "transport": "http",
+      "producer": "solver-worker",
+      "consumer": "nestjs-backend",
+      "schema": "#/components/schemas/Http_SolverCallback"
+    },
+    {
+      "id": "solver-worker-native-cli",
+      "transport": "cli-json-file",
+      "producer": "solver-worker/native-solver",
+      "consumer": "native-solver/solver-worker",
+      "inputSchema": "#/components/schemas/Cli_SolverInput",
+      "outputSchema": "#/components/schemas/Cli_SolverOutput"
+    }
+  ]
 }

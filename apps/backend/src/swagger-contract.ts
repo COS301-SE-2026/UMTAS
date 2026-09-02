@@ -1,4 +1,5 @@
 import type { OpenAPIObject } from '@nestjs/swagger';
+import systemContractCatalog from './system-contract-catalog.json';
 
 const HTTP_METHODS = [
   'get',
@@ -65,6 +66,10 @@ export function completeOpenApiContract(document: OpenAPIObject): void {
   const tags = new Map<string, ContractTag>();
 
   document.openapi = '3.0.3';
+  document.info.description = systemContractCatalog.description;
+  Object.assign(document, {
+    'x-umtas-service-contracts': systemContractCatalog.boundaries,
+  });
 
   for (const [route, pathItem] of Object.entries(document.paths ?? {})) {
     for (const [method, operation] of Object.entries(pathItem)) {
@@ -88,6 +93,7 @@ export function completeOpenApiContract(document: OpenAPIObject): void {
   document.components ??= {};
   document.components.schemas ??= {};
   Object.assign(document.components.schemas, standardContractSchemas());
+  applySystemContractRouteSchemas(document);
   document.components.responses = {
     ...(document.components.responses ?? {}),
     ...standardContractResponses(),
@@ -328,7 +334,81 @@ function standardContractSchemas() {
       example: '08:30',
       description: '24-hour local time in HH:mm format.',
     },
+    ...systemContractCatalog.schemas,
   };
+}
+
+function applySystemContractRouteSchemas(document: OpenAPIObject): void {
+  setRequestSchema(
+    document,
+    '/api/pdf-parser/jobs/{jobId}/callback',
+    'post',
+    'Http_PdfParserCallback',
+  );
+  setResponseSchema(
+    document,
+    '/api/pdf-parser/jobs/{jobId}/result',
+    'get',
+    '200',
+    'Worker_PdfParserResult',
+  );
+  setResponseSchema(
+    document,
+    '/api/solver/jobs/{jobId}/input',
+    'get',
+    '200',
+    'Worker_SolverInput',
+  );
+  setResponseSchema(
+    document,
+    '/api/solver/jobs/{jobId}/result',
+    'get',
+    '200',
+    'Worker_SolverResult',
+  );
+  setRequestSchema(
+    document,
+    '/api/solver/jobs/{jobId}/callback',
+    'post',
+    'Http_SolverCallback',
+  );
+}
+
+function setRequestSchema(
+  document: OpenAPIObject,
+  route: string,
+  method: string,
+  schema: string,
+): void {
+  const operation = getOperation(document, route, method);
+  const requestBody = operation?.requestBody as
+    | { content?: Record<string, { schema?: unknown }> }
+    | undefined;
+  const json = requestBody?.content?.['application/json'];
+  if (json) json.schema = { $ref: `#/components/schemas/${schema}` };
+}
+
+function setResponseSchema(
+  document: OpenAPIObject,
+  route: string,
+  method: string,
+  status: string,
+  schema: string,
+): void {
+  const operation = getOperation(document, route, method);
+  const response = operation?.responses?.[status] as
+    | { content?: Record<string, { schema?: unknown }> }
+    | undefined;
+  const json = response?.content?.['application/json'];
+  if (json) json.schema = { $ref: `#/components/schemas/${schema}` };
+}
+
+function getOperation(
+  document: OpenAPIObject,
+  route: string,
+  method: string,
+): Record<string, any> | undefined {
+  return document.paths?.[route]?.[method] as Record<string, any> | undefined;
 }
 
 function standardContractResponses() {

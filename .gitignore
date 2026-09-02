@@ -151,5 +151,4 @@ apps/preference-solver/tests/HeuristicTests/skipDay/output.json
 apps/preference-solver/tests/HeuristicTests/smallGaps/output.json
 
 # Api docs
-**/openapi.json
-apps/backend/docs/openapi.json
+# The committed OpenAPI document is the local source for reproducible client generation.
