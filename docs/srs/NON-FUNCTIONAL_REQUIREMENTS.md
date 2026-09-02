@@ -160,3 +160,20 @@ successfully enqueued it, and returned its identifier.
 | **Artifact** | Public entry point / health-check endpoint |
 | **Response** | Remain reachable and healthy, with any outage detected and the service restarted automatically or promptly |
 | **Response measure** | Measured uptime over the monitoring window preceding Demo 3 is **at least 99.5%**. |
+
+
+
+---
+
+## 3.3 Non-Functional Requirement (NFR) Testing
+
+
+### 3.3.1 Quality Requirement Mapping Verification
+
+<!-- Aidan and Michael I think you guys will fill in these sections  -->
+
+### 3.3.2 NFR Traceability Matrix
+
+
+| **ID** | **Quantified requirement** | **Tactic in SAS** | **Test / Tool** | **Target / Actual** |
+
