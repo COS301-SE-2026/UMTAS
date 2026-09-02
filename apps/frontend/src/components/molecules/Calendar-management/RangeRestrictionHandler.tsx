@@ -54,6 +54,9 @@ function ValidateRes(res: SingleRestrictionResp) {
   } else if (res.endDate == "") {
     errorMessage.isError = true;
     errorMessage.error = "End date must be set";
+  } else if (res.endDate < res.startDate) {
+    errorMessage.isError = true;
+    errorMessage.error = "End date must be after start date";
   }
   return errorMessage;
 }

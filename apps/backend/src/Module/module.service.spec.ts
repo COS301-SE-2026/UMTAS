@@ -34,6 +34,7 @@ import {
 } from '../Testing/Mocks/services';
 import {
   BadRequestException,
+  ConflictException,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
@@ -381,7 +382,7 @@ describe('ModuleService', () => {
 
       //Act + Assert
       await expect(service.update(userId, 'someid', dto)).rejects.toThrow(
-        InternalServerErrorException,
+        ConflictException,
       );
     });
 
@@ -420,7 +421,7 @@ describe('ModuleService', () => {
       const newModule = createModule(dto);
 
       mockTransaction(mockDb, {
-        select: [[oldModule]],
+        select: [[oldModule], []],
         update: [[newModule]],
       });
 

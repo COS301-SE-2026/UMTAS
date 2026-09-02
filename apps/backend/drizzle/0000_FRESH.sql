@@ -105,7 +105,8 @@ CREATE TABLE "Event" (
 	"eventCriteria" jsonb NOT NULL,
 	"isRecurring" boolean DEFAULT false NOT NULL,
 	"validated" boolean DEFAULT true NOT NULL,
-	"ImportKey" varchar(64)
+	"ImportKey" varchar(64),
+	"createdAt" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "EventAttendance" (
@@ -154,7 +155,8 @@ CREATE TABLE "Modules" (
 	"moduleDescription" text,
 	"semester" "AcademicSemester",
 	"validated" boolean DEFAULT true NOT NULL,
-	"ExternalID" varchar(255)
+	"ExternalID" varchar(255),
+	"createdAt" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "PARSE_JOB" (
@@ -252,6 +254,7 @@ CREATE TABLE "Course" (
 	"CourseName" varchar(255) NOT NULL,
 	"Degree" varchar(30),
 	"ExternalID" varchar(255),
+	"createdAt" timestamp with time zone DEFAULT now() NOT NULL,
 	CONSTRAINT "Course_University_ExternalID_Unique" UNIQUE("UniversityID","ExternalID")
 );
 --> statement-breakpoint
@@ -327,6 +330,7 @@ CREATE UNIQUE INDEX "academic_calendar_university_year_unique" ON "AcademicCalen
 CREATE UNIQUE INDEX "academic_calendar_public_name_year_unique" ON "AcademicCalendar" USING btree ("name","year") WHERE "AcademicCalendar"."universityId" is null;--> statement-breakpoint
 CREATE INDEX "calendar_restriction_calendar_idx" ON "CalendarRestriction" USING btree ("academicCalendarId");--> statement-breakpoint
 CREATE UNIQUE INDEX "calendar_restriction_day_swap_target_unique" ON "CalendarRestriction" USING btree ("academicCalendarId","startDate") WHERE "CalendarRestriction"."type" = 'DAY_SWAP';--> statement-breakpoint
+CREATE UNIQUE INDEX "generated_calendar_calendar_timetable_unique" ON "GeneratedCalendar" USING btree ("academicCalendarId","timetableId");--> statement-breakpoint
 CREATE INDEX "generated_calendar_timetable_created_at_idx" ON "GeneratedCalendar" USING btree ("timetableId","createdAt");--> statement-breakpoint
 CREATE UNIQUE INDEX "event_import_key_unique" ON "Event" USING btree ("ImportKey");--> statement-breakpoint
 CREATE UNIQUE INDEX "university_event_module_event_unique" ON "UniversityEvent" USING btree ("moduleID","eventID");--> statement-breakpoint

@@ -13,7 +13,6 @@ import { createUniversity } from 'src/Testing/Factories';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { ML_Adapter } from '../Adapter/Maryland/ML_Adapter';
 import { UniversityDto } from 'src/University/dto/university.dto';
-import { NWU_Adapter } from '../Adapter/NWU/NWU_Adapter';
 
 describe('AdapterRegistryService', () => {
   let service: AdapterRegistry;
@@ -75,19 +74,19 @@ describe('AdapterRegistryService', () => {
       expect(spy).toHaveBeenCalled();
     });
 
-    //Happy - return NWU_Adapter
-    it('should return Univerity of NWU adpater', () => {
+    //Happy - return ML_Adapter
+    it('should return Univerity of Maryland adpater', () => {
       //Arrange
       const spy = jest.spyOn(service, 'register');
 
       //Act
       const adapter = service.getAdapter({
         ...uni,
-        ApiIdentifier: 'NWU',
+        ApiIdentifier: 'ML',
       });
 
       //Assert
-      expect(adapter).toBeInstanceOf(NWU_Adapter);
+      expect(adapter).toBeInstanceOf(ML_Adapter);
       expect(spy).toHaveBeenCalled();
     });
 

@@ -111,14 +111,14 @@ export default function CalTemplate() {
   useErrorListener();
   return (
     <div className=" items-center flex flex-col gap-6 w-full px-6 capitalize">
-      <div className="w-full  h-full max-w-6xl overflow-auto border border-[var(--border)] rounded-xl bg-[var(--bg-surface)] shadow-sm">
+      <div className="w-full  h-full max-w-6xl overflow-auto border border-[var(--border)] rounded-xl  shadow-sm">
         <h1 className="text-lg font-semibold text-[var(--text-primary)] pl-4 pt-4">
           Calendar Management
         </h1>
         <p className="text-sm text-[var(--text-secondary)] pl-4 pt-2 pb-2">
           Update and manage calendars by year
         </p>
-        <div className="flex flex-col md:flex-row gap-4 p-5 border-b border-[var(--border)] items-center justify-between bg-[var(--bg-surface)]">
+        <div className="flex flex-col md:flex-row gap-4 p-5  items-center justify-between ">
           <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
             <Select
               value={selectedYear}
@@ -225,7 +225,7 @@ export default function CalTemplate() {
               </div>
             </div>
           )}
-          <div className="grid grid-cols-1 lg:grid-cols-2  gap-y-5 p-5 w-full h-auto  justify-items-center items-center ">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-20  gap-y-10 p-5 w-full h-auto  justify-items-center items-center ">
             {selectedAcID &&
               restrictions?.restrictions.map((res) => {
                 return (

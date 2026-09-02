@@ -18,6 +18,7 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchAllModulesv2 } from "../../../../utilities/V2-Builders/Modules";
 import Popup from "@/components/atoms/utility/floatContainer";
 import SolverPreferences from "../solver/SolverPreferences";
+import { UserDetails } from "@/lib/userclass/userClass";
 
 let eventAdded = false;
 
@@ -162,6 +163,7 @@ export function GenerateStep({
       </div>
     );
   }
+  const isAdmin = UserDetails.getUniDetails()?.role === "UNIVERSITY_ADMIN";
 
   function renderEventsSummary() {
     return (
@@ -170,9 +172,11 @@ export function GenerateStep({
           <h3 className="text-base font-semibold text-[var(--text-primary)]">
             Events - {events.length} event{events.length !== 1 ? "s" : ""}
           </h3>
-          <span>
-            <CustomiseShellPopup />
-          </span>
+          {isAdmin && (
+            <span>
+              <CustomiseShellPopup />
+            </span>
+          )}
         </div>
 
         <div className="flex flex-col gap-2">

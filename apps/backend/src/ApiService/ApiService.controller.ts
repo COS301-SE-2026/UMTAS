@@ -29,12 +29,6 @@ import { CurrentSession } from '../auth/session.decorator';
 import type { SessionData } from '../auth/session.decorator';
 import { Roles } from 'src/auth/roles.guard';
 
-//kontant
-import { getRedisClient } from 'src/redis/redis';
-
-const TTL: number = parseInt(process.env.Api_Service_TTL || '300', 10);
-// const TTL = 0;
-
 @ApiTags('ApiService')
 @Controller('api-service')
 export class ApiServiceController {
@@ -80,8 +74,6 @@ export class ApiServiceController {
     @Query('page') page = '0',
     @Query('limit') limit = '50',
   ): Promise<CourseListResponseDto> {
-    const startTime = Date.now();
-
     //Validate page and limit
     const vPage = Number(page);
     const vLimit = Number(limit);
@@ -101,46 +93,11 @@ export class ApiServiceController {
       );
     //END_Validate uniID
 
-    //get cache client
-    const redis = getRedisClient();
-    //unique key to identify cache members
-    const kontantKey = `api-service:courses:${uniId}:${vPage}:${vLimit}`;
-    //if cache item exists -> return early
-    if (redis) {
-      try {
-        const geKontant = await redis.get(kontantKey);
-
-        if (geKontant) {
-          const duration = Date.now() - startTime;
-          this.log(
-            `\x1b[1;36m KONTANT HIT: ${kontantKey} | ${duration}ms\x1b[0m`,
-          );
-          return JSON.parse(geKontant) as CourseListResponseDto;
-        }
-      } catch (error) {
-        this.warn(`Redis GET failed: ${error}`);
-      }
-    }
-
     //Fetch from api
     const result = await this.service.getCourses(
       uniId,
       Number(vPage),
       Number(vLimit),
-    );
-
-    //Cache for 5mins
-    if (redis) {
-      try {
-        await redis.set(kontantKey, JSON.stringify(result), 'EX', TTL);
-      } catch (error) {
-        this.warn(`Redis SET failed: ${error}`);
-      }
-    }
-
-    const duration = Date.now() - startTime;
-    this.log(
-      `\x1b[38;5;208m KONTANT MIS: ${kontantKey} | ${duration}ms\x1b[0m`,
     );
 
     return result;
@@ -217,8 +174,6 @@ export class ApiServiceController {
     @CurrentSession() session: SessionData,
     @Query('courseId') courseId: string,
   ): Promise<ModuleListResponseDto> {
-    const startTime = Date.now();
-
     const uniId = session.uniId;
 
     if (uniId === undefined || uniId.trim().length === 0)
@@ -226,45 +181,10 @@ export class ApiServiceController {
         `You have not selected a university. Tsk Tsk Tsk.`,
       );
 
-    //get cache client
-    const redis = getRedisClient();
-    //unique key to identify cache members
-    const kontantKey = `api-service:modules:${uniId}:${courseId}`;
-    //if cache item exists -> return early
-    if (redis) {
-      try {
-        const geKontant = await redis.get(kontantKey);
-
-        if (geKontant) {
-          const duration = Date.now() - startTime;
-          this.log(
-            `\x1b[1;36m KONTANT HIT: ${kontantKey} | ${duration}ms\x1b[0m`,
-          );
-          return JSON.parse(geKontant) as ModuleListResponseDto;
-        }
-      } catch (error) {
-        this.warn(`Redis GET failed: ${error}`);
-      }
-    }
-
     const result = await this.service.getModules(
       session.user.id,
       uniId,
       courseId,
-    );
-
-    //Cache for 5mins
-    if (redis) {
-      try {
-        await redis.set(kontantKey, JSON.stringify(result), 'EX', TTL);
-      } catch (error) {
-        this.warn(`Redis SET failed: ${error}`);
-      }
-    }
-
-    const duration = Date.now() - startTime;
-    this.log(
-      `\x1b[38;5;208m KONTANT MIS: ${kontantKey} | ${duration}ms\x1b[0m`,
     );
 
     return result;
@@ -299,8 +219,6 @@ export class ApiServiceController {
     @CurrentSession() session: SessionData,
     @Query('moduleId') moduleId: string,
   ): Promise<EventListResponseDto> {
-    const startTime = Date.now();
-
     const uniId = session.uniId;
 
     if (uniId === undefined || uniId.trim().length === 0)
@@ -308,60 +226,14 @@ export class ApiServiceController {
         `You have not selected a university. Tsk Tsk Tsk.`,
       );
 
-    //get cache client
-    const redis = getRedisClient();
-    //unique key to identify cache members
-    const kontantKey = `api-service:events:${uniId}:${moduleId}`;
-    //if cache item exists -> return early
-    if (redis) {
-      try {
-        const geKontant = await redis.get(kontantKey);
-
-        if (geKontant) {
-          const duration = Date.now() - startTime;
-          this.log(
-            `\x1b[1;36m KONTANT HIT: ${kontantKey} | ${duration}ms\x1b[0m`,
-          );
-          return JSON.parse(geKontant) as EventListResponseDto;
-        }
-      } catch (error) {
-        this.warn(`Redis GET failed: ${error}`);
-      }
-    }
-
     const result = await this.service.getEvents(
       session.user.id,
       uniId,
       moduleId,
     );
 
-    //Cache for 5mins
-    if (redis) {
-      try {
-        await redis.set(kontantKey, JSON.stringify(result), 'EX', TTL);
-      } catch (error) {
-        this.warn(`Redis SET failed: ${error}`);
-      }
-    }
-
-    const duration = Date.now() - startTime;
-    this.log(
-      `\x1b[38;5;208m KONTANT MIS: ${kontantKey} | ${duration}ms\x1b[0m`,
-    );
-
     return result;
   } //END_getEvents
 
   //🎅's little helpers
-  private log(message: string) {
-    if (this.logging) {
-      this.logger.log(message);
-    }
-  }
-
-  private warn(message: string) {
-    if (this.logging) {
-      this.logger.warn(message);
-    }
-  }
 }
