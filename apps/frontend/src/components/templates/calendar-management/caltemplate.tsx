@@ -1,5 +1,7 @@
 "use client";
 import { Button } from "@/components/atoms/baseShadcn/button";
+import { Checkbox } from "@/components/atoms/baseShadcn/checkbox";
+import { Label } from "@/components/atoms/baseShadcn/label";
 import {
   Select,
   SelectContent,
@@ -8,12 +10,13 @@ import {
   SelectValue,
 } from "@/components/atoms/baseShadcn/select";
 import createRestrictionHandlers from "@/components/molecules/Calendar-management/handlerCreator";
-import CalCard from "@/components/organisms/Calandar-management/temporary-card";
 
 import { useState } from "react";
 import {
   CreateAcMutation,
+  getPublicAcQuery,
   getAllAcQuery,
+  UpdateAcSubscriptionsMutation,
 } from "../../../../utilities/Calendar-Builders/CalendarManagement";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
@@ -21,7 +24,6 @@ import {
   RestrictionTypes,
   SingleRestrictionResp,
 } from "../../../../utilities/Calendar-Builders/RestrictionManagement";
-import { getQueryClient } from "@/components/tanstack/getQueryClient";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -61,9 +63,6 @@ function toRead(str: string) {
   str = str.toLocaleLowerCase().replaceAll("_", " ");
   return str;
 }
-function toEnum(str: string) {
-  return str.toUpperCase().replaceAll(" ", "_");
-}
 export default function CalTemplate() {
   const years = generateYears();
   const yearsWithAC: number[] = [];
@@ -72,7 +71,7 @@ export default function CalTemplate() {
   const [flagtempRes, setFlagTempRes] = useState<boolean>(false);
   const [tempRes, setTempRes] = useState<SingleRestrictionResp | null>();
 
-  const { data: academicCalendars = [], isLoading: acLoading } = useQuery({
+  const { data: academicCalendars = [] } = useQuery({
     ...getAllAcQuery(),
     select: (data) => {
       data.map((ac) => {
@@ -90,12 +89,23 @@ export default function CalTemplate() {
 
   const selectedAcID = currentAC?.id;
 
+  const { data: publicCalendars = [] } = useQuery(getPublicAcQuery());
+  const publicHolidayCalendar = publicCalendars.find(
+    (calendar) => calendar.year === Number(selectedYear),
+  );
+  const includePublicHolidays = Boolean(
+    publicHolidayCalendar &&
+    currentAC?.subscriptions.includes(publicHolidayCalendar.id),
+  );
+
   const { data: restrictions } = useQuery({
     ...GetAllRestrictions({ id: selectedAcID ?? "" }),
     enabled: selectedAcID != "" && selectedAcID != null,
   });
 
   const { mutateAsync: createACmut } = useMutation(CreateAcMutation);
+  const { mutate: updateSubscriptions, isPending: isUpdatingSubscriptions } =
+    useMutation(UpdateAcSubscriptionsMutation);
 
   const handlers = createRestrictionHandlers();
   useErrorListener();
@@ -138,6 +148,31 @@ export default function CalTemplate() {
                 ))}
               </SelectContent>
             </Select>
+            <Label
+              htmlFor="include-public-holidays"
+              className="cursor-pointer whitespace-nowrap"
+            >
+              <Checkbox
+                id="include-public-holidays"
+                checked={includePublicHolidays}
+                disabled={
+                  !selectedAcID ||
+                  !publicHolidayCalendar ||
+                  isUpdatingSubscriptions
+                }
+                onCheckedChange={(checked) => {
+                  if (!selectedAcID || !publicHolidayCalendar) return;
+
+                  updateSubscriptions({
+                    paths: { id: selectedAcID },
+                    body: {
+                      subscriptions: checked ? [publicHolidayCalendar.id] : [],
+                    },
+                  });
+                }}
+              />
+              Include public holidays
+            </Label>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button className="w-50 capitalize">create restriction</Button>
