@@ -11,6 +11,10 @@ import {
 import CoursesTab, {
   CourseData,
 } from "@/components/organisms/stats/coursesTab";
+import EventsTab, {
+  VenueStatsData,
+  WeekStatsData,
+} from "@/components/organisms/stats/eventsTab";
 
 const mockUniversityStats: UniversityStatsData = {
   countCourses: 100,
@@ -34,6 +38,19 @@ const mockCourseData: CourseData[] = [
     countEvents: 22,
     numberOfStudents: 152,
   },
+];
+
+const mockWeekStats: WeekStatsData[] = [
+  { day: "Mon", count: 12 },
+  { day: "Tue", count: 8 },
+  { day: "Wed", count: 15 },
+  { day: "Thu", count: 10 },
+  { day: "Fri", count: 6 },
+];
+
+const mockVenueStats: VenueStatsData[] = [
+  { venue: "Louw Hal", eventCount: 13, predictedAttendance: 100 },
+  { venue: "Thuto 1-1", eventCount: 9, predictedAttendance: 150 },
 ];
 
 export default async function statsPageTemplate() {
@@ -82,7 +99,12 @@ export default async function statsPageTemplate() {
           </TabsContent>
 
           <TabsContent value="events">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            <EventsTab
+              isErrorWeek={false}
+              isLoadingVenue={false}
+              venueData={mockVenueStats}
+              weekData={mockWeekStats}
+            />
           </TabsContent>
 
           <TabsContent value="modules">
