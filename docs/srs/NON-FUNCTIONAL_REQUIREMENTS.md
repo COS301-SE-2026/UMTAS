@@ -108,3 +108,29 @@ successfully enqueued it, and returned its identifier.
 | **Artifact** | Public API endpoints, authentication flow, and input-handling boundary |
 | **Response** | Reject or safely handle malformed, injected, or unauthorised requests without exposing sensitive data or internal state |
 | **Response measure** | The OWASP ZAP report contains **0 alerts of medium severity or above**. Any informational/low findings are logged and triaged, but do not block release. |
+
+## NFR-Perf-1 - Everyday Scheduling Responsiveness
+
+**Quality attribute:** Performance efficiency - time behaviour
+
+| **Part** | **UMTAS scenario** |
+|---|---|
+| **Source of stimulus** | Ordinary concurrent student usage (module browsing, enrolment, timetable building, solver requests) |
+| **Stimulus** | A representative mix of student actions generated against the deployed API under normal, non-peak concurrency |
+| **Environment** | Production-equivalent deployment, steady-state Locust load at a moderate, everyday concurrency level (not the NFR-Scale-1 peak) |
+| **Artifact** | Public API, in particular the scheduling-job submission and status-retrieval endpoints |
+| **Response** | Serve requests within the response-time budget while maintaining a low error rate |
+| **Response measure** | Across the steady-state window, the **p95 response time for submission and status endpoints does not exceed 2 seconds**, and the **overall request success rate is at least 99%**. |
+
+## NFR-Eff-1 - Ingestion and Solver Processing Efficiency
+
+**Quality attribute:** Performance efficiency - resource/capacity utilisation
+
+| **Part** | **UMTAS scenario** |
+|---|---|
+| **Source of stimulus** | A student submitting a timetable PDF for parsing or a schedule for solving |
+| **Stimulus** | Submit a PDF-ingestion job or a solver job while the system is under Locust-generated concurrent load |
+| **Environment** | Production-equivalent deployment, steady-state Locust load |
+| **Artifact** | PDF-parsing worker and scheduling-solver worker |
+| **Response** | Complete each job in a duration that scales acceptably with the size of the input, rather than degrading disproportionately under load |
+| **Response measure** | The **p95 solver processing time does not exceed 500 ms per scheduled event**, and the **p95 PDF-parsing time does not exceed 300 ms per KB** of input file size. |
