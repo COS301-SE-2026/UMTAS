@@ -15,19 +15,19 @@ if PROFILES_PATH and os.path.exists(PROFILES_PATH):
     with open(PROFILES_PATH, "r", encoding="utf-8") as f:
         PROFILES = json.load(f)
 
-PDF_DIR = os.environ.get("PDF_DIR", "/app/adapters/umtas/pdfs")
-PDF_FILES = []
-if os.path.exists(PDF_DIR):
-    PDF_FILES = [
-        os.path.join(PDF_DIR, f) for f in os.listdir(PDF_DIR) if f.endswith(".pdf")
+pdf_dir = os.environ.get("PDF_DIR", "/app/adapters/umtas/pdfs")
+files_pdf = []
+if os.path.exists(pdf_dir):
+    files_pdf = [
+        os.path.join(pdf_dir, f) for f in os.listdir(pdf_dir) if f.endswith(".pdf")
     ]
 
 print(f"Loaded {len(PROFILES)} profiles from {PROFILES_PATH}")
-print(f"Found {len(PDF_FILES)} PDF files in {PDF_DIR}")
+print(f"Found {len(files_pdf)} PDF files in {pdf_dir}")
 
-MAX_ENROLLED_MODULES = 4
-MAX_TIMETABLE_EVENTS = 20
-HEURISTIC_KEYS = "module,activity,location"
+max_modules = 4
+max_tt_events = 20
+h_keys = "module,activity,location"
 
 names_of_days = [
     "monday",
@@ -179,7 +179,7 @@ class DomainUser(HttpUser):
 
     @task(2)
     def enroll_in_module(self):
-        if len(self.enrolled_module_ids) >= MAX_ENROLLED_MODULES:
+        if len(self.enrolled_module_ids) >= max_modules:
             return
         candidates = [
             m for m in self.browsed_module_ids if m not in self.enrolled_module_ids
@@ -204,10 +204,10 @@ class DomainUser(HttpUser):
 
     @task(2)
     def upload_timetable_pdf(self):
-        if not PDF_FILES or not getattr(self, "uni_id", None) or self.pdf_id:
+        if not files_pdf or not getattr(self, "uni_id", None) or self.pdf_id:
             return
 
-        random_pdf_path = random.choice(PDF_FILES)
+        random_pdf_path = random.choice(files_pdf)
         data = {"universityId": self.uni_id, "adapterKey": "up"}
         with open(random_pdf_path, "rb") as pdf_file:
             files = {
@@ -295,7 +295,7 @@ class DomainUser(HttpUser):
                     )
             return
 
-        if len(self.timetable_event_ids) >= MAX_TIMETABLE_EVENTS or not candidate_ids:
+        if len(self.timetable_event_ids) >= max_tt_events or not candidate_ids:
             return
         picks = random.sample(candidate_ids, k=min(2, len(candidate_ids)))
         with self.client.patch(
@@ -476,7 +476,7 @@ class DomainUser(HttpUser):
         if solve_mode == "optimization":
             heuristics = [
                 {"key": k, "weight": round(random.uniform(0.1, 1.0), 2)}
-                for k in HEURISTIC_KEYS
+                for k in h_keys
             ]
 
         payload = {
@@ -556,3 +556,44 @@ class DomainUser(HttpUser):
             elif status == "failed":
                 self.solver_id = None
                 self.solver_result_ready = False
+                
+    
+    @task(1)
+    def check_pdf_parser_status(self):
+        if not self.pdf_id or self.pdf_result_ready:
+            return
+        with self.client.get(
+            f"/api/pdf-parser/jobs/{self.pdf_id}", name="/api/pdf-parser/jobs/[id]", catch_response=True
+        ) as response:
+            if response.status_code != 200:
+                if response.status_code == 404:
+                    response.success()
+                    self.pdf_id = None
+                else:
+                    response.failure(f"pdf status check failed [{response.status_code}]")
+                return
+            response.success()
+            status = response.json().get("status", "").lower()
+            if status == "completed":
+                self.pdf_result_ready = True
+            elif status == "failed":
+                self.pdf_id = None
+                self.pdf_result_ready = False
+
+    @task(1)
+    def get_pdf_parser_result(self):
+        if not (self.pdf_id and self.pdf_result_ready):
+            return
+        with self.client.get(
+            f"/api/pdf-parser/jobs/{self.pdf_id}/result",
+            name="/api/pdf-parser/jobs/[id]/result",
+            catch_response=True,
+        ) as response:
+            if response.status_code == 200:
+                response.success()
+            else:
+                response.failure(f"pdf result fetch failed [{response.status_code}]")
+            self.pdf_id = None
+            self.pdf_result_ready = False
+
+
