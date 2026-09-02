@@ -12,7 +12,7 @@ const noUniLinks = [
 ];
 
 const basicLinks = [
-  { href: "/module-management", label: "Manage Modules & Events" },
+  { href: "/module-management", label: "Manage Modules / Events" },
   { href: "/map", label: "Map" },
 ];
 
@@ -35,7 +35,6 @@ export function NavLinks() {
   }, []);
 
   useEffect(() => {
-     
     const handleChange = () => setRefreshKey((key) => key + 1);
     window.addEventListener(UserDetails.changeEvent, handleChange);
     return () =>
