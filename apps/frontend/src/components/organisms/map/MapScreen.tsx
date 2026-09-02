@@ -78,7 +78,7 @@ export function MapScreen({ children, onRequestMapSetup }: MapScreenProps) {
   return (
     <Map
       style={mapStyle}
-      mapId={"DEMO_MAP_ID"} //change this before demo day bro
+      mapId={process.env.NEXT_PUBLIC_MAP_KEY || "DEMO_MAP_ID"} //should work
       defaultBounds={mapRestriction?.latLngBounds}
       defaultZoom={config.DefaultZoom}
       restriction={mapRestriction}
