@@ -144,8 +144,8 @@ fields:
     type: fake
     provider: uuid4
   modules:
-    type: sample
-    from: modules_list.csv
+    type: fake
+    provider: catch_phrase
     count: 3
   success:
     type: choice
@@ -170,15 +170,15 @@ fields:
     type: fake
     provider: job
   courses:
-    type: sample
-    from: courses_list.csv
+    type: fake
+    provider: catch_phrase
     count: 3
   UniversityName:
     type: fake
     provider: company
   universities:
-    type: sample
-    from: universities_list.csv
+    type: fake
+    provider: company
     count: 3
   pending:
     type: choice
@@ -234,8 +234,8 @@ fields:
     type: fake
     provider: word
   venues:
-    type: sample
-    from: venues_list.csv
+    type: fake
+    provider: company
     count: 3
   isRecurring:
     type: choice
@@ -252,15 +252,15 @@ fields:
     type: fake
     provider: word
   events:
-    type: sample
-    from: events_list.csv
+    type: fake
+    provider: catch_phrase
     count: 3
   timetableName:
     type: fake
     provider: catch_phrase
   eventIds:
-    type: sample
-    from: eventIds_list.csv
+    type: fake
+    provider: uuid4
     count: 3
   timetableID:
     type: fake
@@ -272,16 +272,16 @@ fields:
     type: fake
     provider: word
   timetables:
-    type: sample
-    from: timetables_list.csv
+    type: fake
+    provider: catch_phrase
     count: 3
   addEventIds:
-    type: sample
-    from: addEventIds_list.csv
+    type: fake
+    provider: uuid4
     count: 3
   removeEventIds:
-    type: sample
-    from: removeEventIds_list.csv
+    type: fake
+    provider: uuid4
     count: 3
   duplicate:
     type: choice
@@ -308,8 +308,8 @@ fields:
     type: fake
     provider: catch_phrase
   warnings:
-    type: sample
-    from: warnings_list.csv
+    type: fake
+    provider: sentence
     count: 3
   day:
     type: fake
@@ -331,8 +331,8 @@ fields:
     type: fake
     provider: uuid4
   heuristics:
-    type: sample
-    from: heuristics_list.csv
+    type: fake
+    provider: word
     count: 3
   solveMode:
     type: choice
@@ -346,8 +346,8 @@ fields:
     type: fake
     provider: sentence
   selectedEventIds:
-    type: sample
-    from: selectedEventIds_list.csv
+    type: fake
+    provider: uuid4
     count: 3
   score:
     type: fake
@@ -356,8 +356,8 @@ fields:
     type: fake
     provider: random_digit_not_null
   conflicts:
-    type: sample
-    from: conflicts_list.csv
+    type: fake
+    provider: uuid4
     count: 3
   outcome:
     type: choice
@@ -367,8 +367,8 @@ fields:
     type: fake
     provider: sentence
   heuristicScores:
-    type: sample
-    from: heuristicScores_list.csv
+    type: fake
+    provider: word
     count: 3
   metadata:
     type: fake
@@ -399,6 +399,6 @@ fields:
     type: fake
     provider: uuid4
   attendanceList:
-    type: sample
-    from: attendanceList_list.csv
+    type: fake
+    provider: uuid4
     count: 3

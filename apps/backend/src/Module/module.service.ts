@@ -5,6 +5,7 @@ import {
   BadRequestException,
   Inject,
   forwardRef,
+  ConflictException,
 } from '@nestjs/common';
 import { eq, ne, and, SQL, getTableColumns, ilike, inArray } from 'drizzle-orm';
 
@@ -354,6 +355,22 @@ export class ModuleService {
     )
       return oldModule;
     else if (Object.keys(updateFields).length > 0) {
+      if (updateFields.moduleCode) {
+        //Check for duplicate moduleCode
+        const [ex] = await tx
+          .select({
+            moduleID: modules.moduleID,
+          })
+          .from(modules)
+          .where(eq(modules.moduleCode, updateFields.moduleCode))
+          .limit(1);
+
+        if (ex)
+          throw new ConflictException(
+            `ModuleCode[${updateFields.moduleCode}] already exists`,
+          );
+      }
+
       //update module
       const [nuweModule] = await tx
         .update(modules)

@@ -27,22 +27,20 @@ const PUBLIC_PATHS = [
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  console.log(
-    "PROXY:",
-    pathname,
-    "looking for",
-    SESSION_COOKIE_NAME,
-    "found:",
-    !!request.cookies.get(SESSION_COOKIE_NAME)?.value,
-  );
+
+  if (pathname === "/") {
+    return NextResponse.redirect(new URL("/dashboard", request.url));
+  }
   const isPublicPath = PUBLIC_PATHS.some((path) => pathname.startsWith(path));
   const isAuthApiPath = pathname.startsWith("/api/auth");
   const isHealthApiPath = pathname.startsWith("/api/health");
   const isApiRoute = pathname.startsWith("/api");
+
   if (isPublicPath || isAuthApiPath || isHealthApiPath || isApiRoute)
     return NextResponse.next();
 
   const sessionCookie = request.cookies.get(SESSION_COOKIE_NAME);
+
   if (!sessionCookie?.value) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("next", pathname);
