@@ -27,10 +27,19 @@ const universitySpecific = [{ href: "/solver", label: "Upload PDF" }];
 export function NavLinks() {
   const pathName = usePathname();
   const [isMounted, setIsMounted] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     // eslint-disable-next-line
     setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+     
+    const handleChange = () => setRefreshKey((key) => key + 1);
+    window.addEventListener(UserDetails.changeEvent, handleChange);
+    return () =>
+      window.removeEventListener(UserDetails.changeEvent, handleChange);
   }, []);
 
   const isAdmin = UserDetails.getUniDetails()?.role === "UNIVERSITY_ADMIN";
