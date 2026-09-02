@@ -25,8 +25,8 @@ if os.path.exists(pdf_dir):
 print(f"Loaded {len(PROFILES)} profiles from {PROFILES_PATH}")
 print(f"Found {len(files_pdf)} PDF files in {pdf_dir}")
 
-max_modules = 4
-max_tt_events = 20
+max_modules = 10
+max_tt_events = 40
 h_keys = "module,activity,location"
 
 names_of_days = [
