@@ -18,6 +18,7 @@ import { DatabaseSeedService } from './seeding/database-seed.service';
 
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
+import { runMigrations } from './migrate';
 
 export type AppDatabase =
   | NodePgDatabase<typeof schema>
@@ -75,6 +76,7 @@ export class DatabaseService
   }
 
   async onApplicationBootstrap(): Promise<void> {
+    await runMigrations();
     if (isSeedEnabled(process.env.SEED)) {
       try {
         this.logger.log('Starting database seeding...');
