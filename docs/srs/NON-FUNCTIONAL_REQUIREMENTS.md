@@ -94,7 +94,6 @@ successfully enqueued it, and returned its identifier.
 | **Environment** | Normal development and continuous-integration workflow using representative fixtures |
 | **Artifact** | University ingestion extension point |
 | **Response** | Add the university-specific behaviour without altering unrelated application behaviour or existing adapters |
-| **Response measure** | The change modifies **0 Core API, persistent-schema, queue-contract, worker-orchestration, or existing-adapter implementation files**. Changes remain confined to the new adapter, registration/configuration, fixtures, and tests, and **100% of canonical contract and existing-adapter regression tests pass**. |
 
 ## NFR-Sec-2 - API Vulnerability Resistance
 
@@ -134,3 +133,30 @@ successfully enqueued it, and returned its identifier.
 | **Artifact** | PDF-parsing worker and scheduling-solver worker |
 | **Response** | Complete each job in a duration that scales acceptably with the size of the input, rather than degrading disproportionately under load |
 | **Response measure** | The **p95 solver processing time does not exceed 500 ms per scheduled event**, and the **p95 PDF-parsing time does not exceed 300 ms per KB** of input file size. |
+
+
+## NFR-Rely-1 - Sustained Reliability Under Load
+
+**Quality attribute:** Reliability - availability under load
+
+| **Part** | **UMTAS scenario** |
+|---|---|
+| **Source of stimulus** | Continuous concurrent student traffic over an extended (soak) duration |
+| **Stimulus** | A constant, low-cost session/authentication check issued alongside normal Locust load for the full duration of the test |
+| **Environment** | Production-equivalent deployment, sustained Locust load held for an extended period (soak test) |
+| **Artifact** | Authentication/session endpoint and overall API request pipeline |
+| **Response** | Continue responding correctly and without degradation for the full duration of the sustained run |
+| **Response measure** | The dedicated canary request maintains **≥99% success rate** for the entire soak duration. |
+
+## NFR-Avail-1 - Public Availability
+
+**Quality attribute:** Reliability - availability
+
+| **Part** | **UMTAS scenario** |
+|---|---|
+| **Source of stimulus** | External uptime monitoring, independent of any test run |
+| **Stimulus** | Periodic automated health checks against the public endpoint over the weeks leading up to Demo 3 |
+| **Environment** | Production deployment, continuous monitoring window |
+| **Artifact** | Public entry point / health-check endpoint |
+| **Response** | Remain reachable and healthy, with any outage detected and the service restarted automatically or promptly |
+| **Response measure** | Measured uptime over the monitoring window preceding Demo 3 is **at least 99.5%**. |
