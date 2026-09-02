@@ -636,6 +636,7 @@ export function ScheduleView({
                 />
                 <div className="flex flex-row justify-center md:justify-end w-full md:w-auto gap-2 mb-4 md:mb-0">
                   <Button
+                    aria-label="Export to ICS"
                     id="btn-export-ics"
                     type="button"
                     disabled={exportingTo !== null}
@@ -646,6 +647,7 @@ export function ScheduleView({
                   </Button>
                   {!isLoadingGoogleCalendarAccess && (
                     <Button
+                      aria-label="Connect Google Calendar"
                       id="btn-export-google-calendar"
                       type="button"
                       disabled={exportingTo !== null}
@@ -660,31 +662,34 @@ export function ScheduleView({
                     </Button>
                   )}
                   <Button
+                    aria-label="Create Timetable"
                     id="btn-create"
                     type="button"
                     className="h-7 px-3 text-xs bg-[var(--bg-surface)] text-[var(--text-primary)] border-[var(--border)] hover:opacity-90"
                     onClick={createTimetable}
                   >
-                    Create
+                    Create Timetable
                   </Button>
 
                   <Button
+                    aria-label="Edit Timetable"
                     id="btn-edit"
                     type="button"
                     className="h-7 px-3 text-xs bg-[var(--bg-surface)] text-[var(--text-primary)] border-[var(--border)] hover:opacity-90"
                     onClick={editTimetable}
                   >
-                    Edit
+                    Edit Timetable
                   </Button>
 
                   <Button
+                    aria-label="Delete Timetable"
                     id="btn-delete"
                     data-testid="schedules-Delete-Btn"
                     type="button"
                     className="h-7 px-3 text-xs bg-[var(--destructive)] text-[var(--text-primary)] border-[var(--border)] hover:opacity-90"
                     onClick={deleteDialog}
                   >
-                    Delete
+                    Delete Timetable
                   </Button>
                 </div>
               </div>

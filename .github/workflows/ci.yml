@@ -64,6 +64,9 @@ jobs:
           pnpm --filter pdf-parser-worker test
           pnpm --filter backend exec jest --coverage --runInBand
 
+      - name: Run migrate
+        run: pnpm
+
       - name: Run Full-Stack Integration Tests
         run: pnpm test:integration
 
