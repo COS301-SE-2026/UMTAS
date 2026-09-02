@@ -1879,11 +1879,11 @@ export interface components {
     AuthAcknowledgementDto: Record<string, never>;
     RevokeSessionDto: {
       /**
-       * @description Token of the session to terminate
-       * @default session-token-value
-       * @example session-token-value
+       * @description ID of the session to terminate
+       * @default b2c3d4e5-f6a7-8901-bcde-f12345678901
+       * @example b2c3d4e5-f6a7-8901-bcde-f12345678901
        */
-      token: string;
+      sessionId: string;
     };
     VerifyEmailDto: {
       /**
@@ -2185,6 +2185,11 @@ export interface components {
       /** Format: uuid */
       venueId: string;
       venueName: string;
+      /**
+       * Format: uuid
+       * @description The ID of the building the venue belongs to
+       */
+      buildingId?: string | null;
     };
     EventDto: {
       /** Format: uuid */

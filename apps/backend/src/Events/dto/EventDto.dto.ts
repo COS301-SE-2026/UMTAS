@@ -84,6 +84,15 @@ export class UpdateEventCriteriaDto extends PartialType(EventCriteriaDto) {}
 export class VenueDto {
   @ApiProperty() @IsUUID() venueId!: string;
   @ApiProperty() @IsString() venueName!: string;
+
+  @ApiPropertyOptional({
+    format: 'uuid',
+    nullable: true,
+    description: 'The ID of the building the venue belongs to',
+  })
+  @IsOptional()
+  @IsUUID()
+  buildingId?: string | null;
 }
 
 export class EventDto {
