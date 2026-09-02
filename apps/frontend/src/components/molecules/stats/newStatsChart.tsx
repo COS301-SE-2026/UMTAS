@@ -1,3 +1,5 @@
+"use client";
+
 import {
   ChartConfig,
   ChartContainer,
@@ -9,7 +11,7 @@ import {
 import { Skeleton } from "@/components/atoms/baseShadcn/skeleton";
 import { ReactNode } from "react";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
-import StatCard from "./statCard";
+import StatCard from "../../organisms/stats/statCard";
 
 export interface ChartCardProps {
   title: string;
