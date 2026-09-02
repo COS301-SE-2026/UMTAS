@@ -1,0 +1,20 @@
+apps/backend/package.json
+  h_2d4b3dca70a3d8 54
+apps/backend/src/main.ts
+  h_2d4b3dca70a3d8 14-15,40-51
+apps/frontend/next.config.ts
+  h_2d4b3dca70a3d8 5-22
+pnpm-lock.yaml
+  h_2d4b3dca70a3d8 201-203,6712,9367-9373,20568,20605,20619,21296-21297
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "ac6970af564764964fc15e1c80fd73a40e05c971",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
