@@ -32,13 +32,18 @@ export function WeekNavBar({
           onClick={onPrev}
           className="h-8 w-8 shrink-0 border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
         >
-          <ChevronLeft size={16} strokeWidth={1.5} />
+          <ChevronLeft
+            aria-label="go back one week"
+            size={16}
+            strokeWidth={1.5}
+          />
         </Button>
 
         <span className="text-sm font-medium text-[var(--text-primary)] px-2 whitespace-nowrap">
           {formatWeekRange(weekStart)}
         </span>
         <input
+          aria-label="select date "
           data-testid="schedules-Date-Input"
           type="date"
           value={dateString}
@@ -58,7 +63,11 @@ export function WeekNavBar({
         onClick={onNext}
         className="h-8 w-8 border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
       >
-        <ChevronRight size={16} strokeWidth={1.5} />
+        <ChevronRight
+          aria-label="go forward one week"
+          size={16}
+          strokeWidth={1.5}
+        />
       </Button>
     </div>
   );
