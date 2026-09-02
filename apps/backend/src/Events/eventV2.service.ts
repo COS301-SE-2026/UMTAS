@@ -24,6 +24,7 @@ import { AppDatabase } from 'src/auth/auth';
 import {
   Course,
   Event,
+  EventsToTimetables,
   EventVenue,
   GroupModules,
   modules,
@@ -35,7 +36,7 @@ import {
   UniversitySingleResponseDto,
 } from 'src/University/dto/university.dto';
 import { DayOfWeek } from './dto/event.types';
-import { and, countDistinct, eq, inArray, sql } from 'drizzle-orm';
+import { and, count, countDistinct, eq, inArray, sql } from 'drizzle-orm';
 
 export class EventServiceV2 extends EventService {
   private readonly OOPSIE = new Logger(this.constructor.name);
@@ -217,10 +218,15 @@ export class EventServiceV2 extends EventService {
         VenueID: Venue.VenueID,
         VenueName: Venue.VenueName,
         EventCount: countDistinct(Event.eventID),
+        ProjectedAttendance: count(EventsToTimetables.eventID),
       })
       .from(Venue)
       .leftJoin(EventVenue, eq(EventVenue.VenueID, Venue.VenueID))
       .leftJoin(Event, eq(Event.eventID, EventVenue.EventID))
+      .leftJoin(
+        EventsToTimetables,
+        eq(EventsToTimetables.eventID, Event.eventID),
+      )
       .leftJoin(UniversityEvent, eq(UniversityEvent.eventID, Event.eventID))
       .leftJoin(modules, eq(modules.moduleID, UniversityEvent.moduleID))
       .leftJoin(GroupModules, eq(GroupModules.ModuleID, modules.moduleID))
@@ -231,11 +237,13 @@ export class EventServiceV2 extends EventService {
 
     return {
       data: statistics.map((s) => ({
-        ...s,
+        VenueID: s.VenueID,
         VenueName: s.VenueName ?? 'NoName',
+        EventCount: s.EventCount,
+        ProjectedAttendance: s.ProjectedAttendance,
       })),
     };
-  }
+  } //END_getStatisticsVenues
 
   //🎅's little helpers
 

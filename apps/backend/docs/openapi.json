@@ -7330,12 +7330,16 @@
           },
           "EventCount": {
             "type": "number"
+          },
+          "ProjectedAttendance": {
+            "type": "number"
           }
         },
         "required": [
           "VenueID",
           "VenueName",
-          "EventCount"
+          "EventCount",
+          "ProjectedAttendance"
         ]
       },
       "EventStatsVenueResponseDto": {

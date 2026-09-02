@@ -268,6 +268,9 @@ export class EventStatsVenueDto {
 
   @ApiProperty()
   EventCount!: number;
+
+  @ApiProperty()
+  ProjectedAttendance!: number;
 } //END_EventStatsVenueDto
 
 export class EventStatsVenueResponseDto {
