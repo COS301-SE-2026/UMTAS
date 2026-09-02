@@ -153,3 +153,6 @@ infra/database/seeds.sql
 infra/database/seeds.sql/
 infra/database/seeds.sql
 infra/database/seeds.sql/
+
+# api docs
+apps/backend/docs/openapi.json
