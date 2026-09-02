@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const cspHeader = [
   "default-src 'self'",
-  `script-src 'self' ${process.env.NODE_ENV === "development" ? "'unsafe-eval'" : ""}`,
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob:",
   "font-src 'self' data:",

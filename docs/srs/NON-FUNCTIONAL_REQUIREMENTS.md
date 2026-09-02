@@ -22,6 +22,7 @@ and **L** = low.
 | **NFR-Eff-1** | Performance efficiency | Resource/capacity utilisation | M | M |
 | **NFR-Rely-1** | Reliability | Availability under load | H | M |
 | **NFR-Avail-1** | Reliability | Availability | M | L |
+| **NFR-Sec-3** | Security | Vulnerability resistance | H | L |
 
 ## NFR-Corr-1 - Supported Timetable PDF Extraction Correctness
 
@@ -162,6 +163,20 @@ successfully enqueued it, and returned its identifier.
 | **Response measure** | Measured uptime over the monitoring window preceding Demo 3 is **at least 99.5%**. |
 
 
+## NFR-Sec-3 - Dependency Vulnerability Resistance
+
+**Quality attribute:** Security - vulnerability resistance
+
+| **Part** | **UMTAS scenario** |
+| --- | --- |
+| **Source of stimulus** | A developer opening a pull request or merging code to the `main` branch |
+| **Stimulus** | Execute the `pnpm audit` command during the Continuous Integration (CI) pipeline |
+| **Environment** | Automated CI pipeline running against the `main` branch |
+| **Artifact** | Project dependency tree and lockfile (`pnpm-lock.yaml`) |
+| **Response** | Scan the monorepo dependency tree for known Common Vulnerabilities and Exposures (CVEs) and report findings |
+| **Response measure** | The CI pipeline step passes with an exit code of 0, confirming **0 known vulnerabilities** of moderate or higher severity exist in the dependencies on the `main` branch. |
+
+
 
 ---
 
@@ -176,4 +191,10 @@ successfully enqueued it, and returned its identifier.
 
 
 | **ID** | **Quantified requirement** | **Tactic in SAS** | **Test / Tool** | **Target / Actual** |
+| **NFR-Sec-3** | 0 `pnpm audit` findings of moderate or higher severity on `main` | Strict dependency management | `pnpm audit` in CI pipeline | 0 findings / 0 findings |
+| **NFR-Avail-1** | ≥99.5% uptime on public endpoints prior to Demo 3 | Automated health checks / Process supervisors | UptimeRobot | ≥99.5% / >99.95 |
+| **NFR-Sec-2** | 0 alerts of Medium severity or higher | Input validation / Authorisation middleware | OWASP ZAP (Baseline & Full Scan) | 0 alerts / [TBD] |
+
+
+
 

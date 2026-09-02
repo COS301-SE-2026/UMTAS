@@ -57,6 +57,8 @@ jobs:
       # - name: Run Build
       #   run: pnpm run build
 
+      # - name: Run Audit
+      #   run: pnpm audit --audit-level=moderate
       # - name: Run Unit Tests
       #   run: |
       #     pnpm --filter shared-types test
