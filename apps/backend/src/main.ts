@@ -28,6 +28,8 @@ async function bootstrap() {
   });
 
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  app.disable('x-powered-by');
+
   const ph = app.get(PostHog);
   app.useGlobalInterceptors(
     new PostHogInterceptor(ph, { captureExceptions: true }),
@@ -41,6 +43,17 @@ async function bootstrap() {
   app.use(
     helmet({
       xFrameOptions: { action: 'sameorigin' },
+
+      noSniff: true,
+
+      hsts: {
+        maxAge: 31536000,
+        includeSubDomains: true,
+        preload: true,
+      },
+
+      hidePoweredBy: true,
+
       contentSecurityPolicy: {
         directives: {
           defaultSrc: ["'self'"],

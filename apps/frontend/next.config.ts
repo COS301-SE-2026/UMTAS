@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 const cspHeader = [
   "default-src 'self'",
   `script-src 'self' ${process.env.NODE_ENV === "development" ? "'unsafe-eval'" : ""}`,
-  "style-src 'self'",
+  "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob:",
   "font-src 'self' data:",
   "object-src 'none'",
@@ -15,6 +15,7 @@ const cspHeader = [
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  poweredByHeader: false,
   async headers() {
     return [
       {
@@ -23,6 +24,14 @@ const nextConfig: NextConfig = {
           {
             key: "X-Frame-Options",
             value: "SAMEORIGIN",
+          },
+          {
+            key: "X-Content-Type-Options",
+            value: "nosniff",
+          },
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=31536000; includeSubDomains; preload",
           },
           {
             key: "Content-Security-Policy",
