@@ -146,3 +146,10 @@ apps/pdf_parser/**/*.pdf
 !apps/pdf_parser/up_test_pdfs/SEM_TESTS_S2.pdf
 docs/drawio-exporter/
 !apps/pdf_parser/up_test_pdfs/CONFLICT_FALLBACK.pdf
+apps/preference-solver/tests/HeuristicTests/minutesAfterMid/output.json
+apps/preference-solver/tests/HeuristicTests/skipDay/output.json
+apps/preference-solver/tests/HeuristicTests/smallGaps/output.json
+
+# Api docs
+**/openapi.json
+apps/backend/docs/openapi.json

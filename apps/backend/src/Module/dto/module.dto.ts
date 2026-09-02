@@ -9,6 +9,8 @@ import {
   IsBoolean,
   ValidateNested,
   IsNumber,
+  IsEnum,
+  IsArray,
 } from 'class-validator';
 import {
   PartialType,
@@ -18,6 +20,12 @@ import {
 } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import { PopulateGroupBodyDto } from '../../Grouping/dto/grouping.dto';
+import {
+  AcademicSemester,
+  type AcademicSemesterType,
+} from '../../entities/Modules/modules.schema';
+import { EventDto } from 'src/Events/dto/EventDto.dto';
+import { StatsFiltersDto, StatsResponseDto } from 'src/stats.dto';
 
 export class CourseModuleDto {
   @ApiProperty({
@@ -86,7 +94,7 @@ export class CreateCourseModuleDto extends PickType(CourseModuleDto, [
   'YearOfStudy',
 ]) {}
 
-class StylingDto {
+export class StylingDto {
   @ApiProperty({ example: '#3B82F6' })
   @IsString()
   @IsNotEmpty()
@@ -109,7 +117,7 @@ export class ModulesDto {
   })
   @IsString()
   @IsNotEmpty()
-  @Length(2, 10)
+  @Length(2, 15)
   moduleCode!: string;
 
   @ApiProperty({
@@ -129,6 +137,18 @@ export class ModulesDto {
   @IsOptional()
   @IsString()
   moduleDescription?: string | null;
+
+  @ApiPropertyOptional({
+    enum: AcademicSemester.enumValues,
+    enumName: 'AcademicSemester',
+    example: 'SEMESTER_1',
+    nullable: true,
+    description:
+      'Academic period in which this module is taught. Null or omitted means the whole academic year.',
+  })
+  @IsOptional()
+  @IsEnum(AcademicSemester.enumValues)
+  semester?: AcademicSemesterType | null;
 
   @ApiProperty({
     description: 'Styling to be used for a Module',
@@ -160,6 +180,7 @@ export class ModulesDto {
   @ValidateNested()
   @Type(() => CourseModuleDto)
   CourseModuleInfo?: CourseModuleDto | null;
+
   @ApiProperty({
     type: Boolean,
     example: true,
@@ -168,6 +189,35 @@ export class ModulesDto {
   @IsOptional()
   @IsBoolean()
   validated?: boolean;
+
+  @ApiPropertyOptional({
+    type: () => [EventDto],
+    description: 'List of events for the module',
+    nullable: true,
+  })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => EventDto)
+  Events?: EventDto[] | null;
+
+  @ApiPropertyOptional({
+    example: '12345',
+    description: 'Refer to module on external API',
+  })
+  @IsOptional()
+  @IsString()
+  @Length(1, 255)
+  ExternalID?: string | null;
+
+  @ApiPropertyOptional({
+    example: false,
+    description: 'Is a user enrolled to this module',
+    type: Boolean,
+  })
+  @IsOptional()
+  @IsBoolean()
+  Enrolled?: boolean;
 } //ModuleDto
 
 //Create
@@ -175,8 +225,10 @@ export class CreateModuleDto extends PickType(ModulesDto, [
   'moduleCode',
   'moduleName',
   'moduleDescription',
+  'semester',
   'styling',
   'validated',
+  'ExternalID',
 ]) {
   @ApiPropertyOptional({
     example: '00000000-0000-0000-0000-000000000000',
@@ -233,7 +285,18 @@ export class ModuleListResponseDto {
     description: 'List of modules',
   })
   modules!: ModuleSingleResponseDto[];
+
+  @ApiPropertyOptional({
+    type: String,
+    description: 'Short message indicating  success of response.',
+  })
+  message?: string;
 }
+
+export class ModuleListResponseDtoV2 extends IntersectionType(
+  ModuleListResponseDto,
+  PickType(StatsResponseDto, ['count']),
+) {}
 
 //Delete
 export class DeleteModuleResponseDto extends PickType(ModulesDto, [
@@ -248,7 +311,6 @@ export class ModuleFiltersDto {
   @ApiPropertyOptional({
     description:
       'Filter by university ID - returns all modules across all courses in the university',
-    example: '00000000-0000-0000-0000-000000000000',
   })
   @IsOptional()
   @IsUUID()
@@ -256,14 +318,12 @@ export class ModuleFiltersDto {
 
   @ApiPropertyOptional({
     description: 'Filter by course ID - returns all modules in the course',
-    example: '00000000-0000-0000-0000-000000000000',
   })
   @IsOptional()
   @IsUUID()
   courseId?: string;
 
   @ApiPropertyOptional({
-    example: '00000000-0000-0000-0000-000000000000',
     description: 'Filter by ModuleGrouping ID',
   })
   @IsOptional()
@@ -272,7 +332,6 @@ export class ModuleFiltersDto {
 
   //Filter by code using wildcard
   @ApiPropertyOptional({
-    example: 'COS',
     description: 'Filter by code, makes use of wildcard search',
   })
   @IsOptional()
@@ -280,7 +339,7 @@ export class ModuleFiltersDto {
   moduleCode?: string;
 
   @ApiPropertyOptional({
-    example: false,
+    example: undefined,
     default: false,
     description: 'Choose to filter modules based of current user enrollments',
     type: Boolean,
@@ -289,11 +348,17 @@ export class ModuleFiltersDto {
   @IsBoolean()
   @IsOptional()
   @Transform(({ value }) => {
-    if (value === true) return true;
+    if (value === 'true') return true;
     else return false;
   })
   userEnrollment?: boolean;
 } //ModuleFiltersDto
+
+//GetAllV2 filters
+export class ModuleFiltersDtoV2 extends IntersectionType(
+  ModuleFiltersDto,
+  PickType(StatsFiltersDto, ['Stats']),
+) {}
 
 export class ModuleStylingResponseDto {
   @ApiProperty({
@@ -346,4 +411,27 @@ export class AddModulesToCourseResponseDto extends AddModulesToCourseDto {
   })
   @IsUUID('4', { message: 'CourseID should be a UUID' })
   CourseID!: string;
+}
+
+export class EnrollToModuleDto {
+  @ApiPropertyOptional({
+    example: undefined,
+    description: 'Enroll or unenroll',
+    type: Boolean,
+  })
+  @IsOptional()
+  @IsBoolean()
+  @IsOptional()
+  @Transform(({ value }) => {
+    if (
+      value === 'true' ||
+      value === 'TRUE' ||
+      value === true ||
+      value === 1 ||
+      value === '1'
+    )
+      return true;
+    else return false;
+  })
+  enroll?: boolean;
 }

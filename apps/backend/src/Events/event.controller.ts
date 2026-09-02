@@ -14,21 +14,51 @@ import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
   CreateEventDto,
   EventSingleResponseDto,
-  EventListResponseDto,
   UpdateEventDto,
   DeleteResponseDto,
-  EventFiltersDto,
+  CreateEventDtoV2,
+  ValidateEventResponseDto,
+  ValidateEventDto,
+  EventListResponseDtoV2,
+  EventFiltersDtoV2,
 } from './dto/EventDto.dto';
 
 import { EventService } from './event.service';
 import type { SessionData } from '../auth/session.decorator';
 import { CurrentSession } from '../auth/session.decorator';
 import { Roles } from '../auth/roles.guard';
+import { EventServiceV2 } from './eventV2.service';
 
 @ApiTags('Events')
 @Controller('events')
 export class EventController {
-  constructor(private readonly service: EventService) {}
+  constructor(
+    private readonly service: EventService,
+    private readonly service2: EventServiceV2,
+  ) {}
+
+  @Post('v2')
+  @Roles('lecturer', 'uni_admin')
+  @ApiOperation({
+    summary: 'Create an event - V2',
+    operationId: 'createEventV2',
+  })
+  @ApiBody({ type: CreateEventDtoV2 })
+  @ApiResponse({
+    status: 201,
+    description: 'Event created successfully',
+    type: EventSingleResponseDto,
+  })
+  createEvent2(
+    @CurrentSession() session: SessionData,
+    @Body() dto: CreateEventDtoV2,
+  ) {
+    //make activityType and activityCode very optional
+    //isrecurring default to false - just need date
+    //validated - dfault false - need a validate event endpoint!!!!!!!!!
+    //
+    return this.service2.createV2(dto, session.user.id, session.uniId);
+  }
 
   @Post()
   @Roles()
@@ -70,12 +100,13 @@ export class EventController {
   @Roles()
   @ApiOperation({
     summary: 'Get all events',
+    description: 'Apply filters - Enable stats mode with filters.stats=TRUE',
     operationId: 'getAllEvents',
   })
   @ApiResponse({
     status: 200,
     description: 'Events fetched successfully',
-    type: EventListResponseDto,
+    type: EventListResponseDtoV2,
   })
   @ApiResponse({
     status: 401,
@@ -87,11 +118,10 @@ export class EventController {
   })
   getAllEvents(
     @CurrentSession() session: SessionData,
-    @Query() filters: EventFiltersDto,
-  ): Promise<EventListResponseDto> {
-    return this.service.getAllEvents(session.user.id, {
-      moduleId: filters.moduleId,
-    });
+    @Query() filters: EventFiltersDtoV2,
+  ): Promise<EventListResponseDtoV2> {
+    console.log(`Controller: ${JSON.stringify(filters)}`);
+    return this.service.getAllEvents(session.user.id, filters);
   } //getAllEvents
 
   //get by id
@@ -199,5 +229,28 @@ export class EventController {
       session.user.role,
       eventId,
     );
+  }
+
+  @Patch('validate/:id')
+  @Roles()
+  @ApiOperation({
+    summary: 'Validate an event',
+    operationId: 'validateEvent',
+  })
+  @ApiBody({ type: ValidateEventDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Event[${updated.eventName}] validated=[${updated.validated}]',
+    type: ValidateEventResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Event not found',
+  })
+  validateEvent(
+    @Param('id', ParseUUIDPipe) eventId: string,
+    @Body() dto: ValidateEventDto,
+  ): Promise<ValidateEventResponseDto> {
+    return this.service2.validateEvent(eventId, dto.validated);
   }
 } //EventController

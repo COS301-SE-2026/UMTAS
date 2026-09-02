@@ -7,6 +7,7 @@ export interface EventImportFingerprintInput {
   activityCode: string | null | undefined;
   eventCriteria: EventCriteria;
   venueNames?: readonly string[];
+  eventName?: string;
 }
 
 export interface ModuleEventImportFingerprintInput extends EventImportFingerprintInput {
@@ -38,6 +39,7 @@ export class EventImportFingerprintService {
       input.eventCriteria.dayOfWeek ?? '',
       input.eventCriteria.startTime,
       input.eventCriteria.endTime,
+      input.eventName ?? '',
       ...venues,
     ]);
   }

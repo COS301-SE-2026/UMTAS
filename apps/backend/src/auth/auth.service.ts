@@ -4,16 +4,21 @@ import {
   Logger,
   OnModuleInit,
 } from '@nestjs/common';
-import { and, eq, ne } from 'drizzle-orm';
+import { and, eq, ilike, ne } from 'drizzle-orm';
 import { MailerService } from '../mail/mailer.service';
 import * as appSchema from '../entities';
 import { createRedisClient } from '../redis/redis';
-import type { AuthInstance } from './auth';
+import type { AppDatabase, AuthInstance } from './auth';
 import { DatabaseService } from '../db/database.service';
 import { createAuth } from './auth';
 
 import { UniRole } from './roles';
 import { SessionData } from './session.decorator';
+import {
+  CreateMockUserResponseDto,
+  DeleteMockUsersResponseDto,
+  MockUserRole,
+} from './auth.dto';
 
 @Injectable()
 export class AuthService implements OnModuleInit {
@@ -170,4 +175,96 @@ export class AuthService implements OnModuleInit {
       uniRole,
     };
   } //END_selectUniversity
+
+  async createMockUser(
+    dto: { email?: string; name?: string; password?: string },
+    inRole?: MockUserRole,
+    tx?: AppDatabase,
+  ): Promise<CreateMockUserResponseDto> {
+    if (!tx) {
+      return await this.databaseService.db.transaction(
+        async (t: AppDatabase) => {
+          return this.createMockUser(dto, inRole, t);
+        },
+      );
+    } //END_tx precence check
+
+    const auth = this.getAuth();
+
+    if (inRole === undefined) inRole = MockUserRole['STUDENT'];
+
+    const email =
+      dto?.email ||
+      `test_user_${Date.now()}_${Math.floor(Math.random() * 1000)}@simulation.com`;
+    const name = dto?.name || 'Test User';
+    const password = dto?.password || 'password123!';
+
+    const [existingUser] = await tx
+      .select({
+        id: appSchema.usersTable.id,
+        email: appSchema.usersTable.email,
+      })
+      .from(appSchema.usersTable)
+      .where(ilike(appSchema.usersTable.email, email))
+      .limit(1);
+
+    if (existingUser) {
+      return {
+        email: existingUser.email,
+        password: password,
+      };
+    }
+
+    const result = await auth.api.createUser({
+      body: { email, password, name, role: 'user' },
+    });
+
+    await tx
+      .update(appSchema.usersTable)
+      .set({ emailVerified: true })
+      .where(eq(appSchema.usersTable.id, result.user.id));
+
+    const [uni] = await tx
+      .select({ uniID: appSchema.University.UniversityID })
+      .from(appSchema.University)
+      .where(ilike(appSchema.University.UniversityName, `%Pretoria%`))
+      .limit(1);
+
+    if (uni) {
+      await tx
+        .insert(appSchema.UniversityRole)
+        .values({
+          UserID: result.user.id,
+          UniversityID: uni.uniID,
+          role: inRole as appSchema.RoleTypeType,
+        })
+        .returning();
+    }
+
+    return {
+      email,
+      password,
+      uniId: uni?.uniID,
+    };
+  }
+
+  async deleteMockUsers(tx?: AppDatabase): Promise<DeleteMockUsersResponseDto> {
+    if (!tx) {
+      return await this.databaseService.db.transaction(
+        async (t: AppDatabase) => {
+          return this.deleteMockUsers(t);
+        },
+      );
+    } //END_tx precence check
+
+    const deletedUsers = await tx
+      .delete(appSchema.usersTable)
+      .where(ilike(appSchema.usersTable.email, `test_user_%@simulation.com`))
+      .returning();
+
+    return {
+      success: true,
+      message: `Deleted ${deletedUsers.length} users.`,
+    };
+  }
 }

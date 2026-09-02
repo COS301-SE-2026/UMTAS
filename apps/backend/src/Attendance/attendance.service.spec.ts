@@ -293,7 +293,7 @@ describe('Attendance Service', () => {
     it('should update each field of the attendance entry', async () => {
       //Arrange
       const dto = createUpdateAttendanceDto();
-      console.log(`Here: [${JSON.stringify(dto)}]`);
+      // console.log(`Here: [${JSON.stringify(dto)}]`);
       const attendance = createAttendance();
       const spy = jest.spyOn(service, 'getById').mockResolvedValue(attendance);
 

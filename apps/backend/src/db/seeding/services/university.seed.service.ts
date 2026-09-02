@@ -3,8 +3,9 @@ import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../../database.service';
 import { BaseSeedService } from '../base.seed.service';
 import { University, usersTable } from '../../../entities';
-import { eq } from 'drizzle-orm';
+import { eq, ilike } from 'drizzle-orm';
 import { SeedPersistenceService } from '../seed-persistence.service';
+import { AppDatabase } from 'src/auth/auth';
 
 @Injectable()
 export class UniversitySeedService extends BaseSeedService {
@@ -55,6 +56,11 @@ export class UniversitySeedService extends BaseSeedService {
             UserID: uniAdmin.id,
             role: 'UNIVERSITY_ADMIN',
           },
+          {
+            UniversityID: uniSeed[1].UniversityID,
+            UserID: uniAdmin.id,
+            role: 'UNIVERSITY_ADMIN',
+          },
         ]);
       }
     } //END_check for missing names
@@ -62,5 +68,28 @@ export class UniversitySeedService extends BaseSeedService {
       //No new unis to seed
       this.logResult('Universities');
     }
+
+    await this.MarylandAPI(tx);
   } //END_seed
+
+  //🎅's little helpers
+
+  async MarylandAPI(tx: AppDatabase) {
+    const [maryland] = await tx
+      .select()
+      .from(University)
+      .where(ilike(University.UniversityName, `%Maryland%`))
+      .limit(1);
+
+    //update with api information
+    const apiInfo = {
+      ApiIdentifier: 'ML',
+      BaseApiUrl: 'https://api.umd.io/v1',
+    };
+
+    await tx
+      .update(University)
+      .set(apiInfo)
+      .where(eq(University.UniversityID, maryland.UniversityID));
+  }
 } //UniversitySeedService

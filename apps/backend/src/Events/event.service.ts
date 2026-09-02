@@ -1,6 +1,8 @@
 import {
   BadRequestException,
   ForbiddenException,
+  forwardRef,
+  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -21,29 +23,33 @@ import {
   usersTable,
   UniversityRole,
   University,
+  EventsToTimetables,
 } from '../entities/index';
 import {
   CreateEventDto,
   EventSingleResponseDto,
-  EventFiltersDto,
-  EventListResponseDto,
   UpdateEventDto,
   DeleteResponseDto,
   EventDto,
   UpdateEventCriteriaDto,
+  EventListResponseDtoV2,
+  EventFiltersDtoV2,
 } from './dto/EventDto.dto';
 
 import { AppDatabase } from '../db/database.service';
 import { ModuleService } from '../Module/module.service';
 import { EventImportFingerprintService } from './event-import-fingerprint.service';
 import { EventCriteria } from './dto/event.types';
+import { UniversityService } from '../University/university.service';
 
 @Injectable()
 export class EventService {
   constructor(
-    private readonly dbService: DatabaseService,
-    private readonly moduleService: ModuleService,
-    private readonly eventImportFingerprintService: EventImportFingerprintService,
+    protected readonly dbService: DatabaseService,
+    protected readonly eventImportFingerprintService: EventImportFingerprintService,
+    protected readonly uniService: UniversityService,
+    @Inject(forwardRef(() => ModuleService))
+    protected readonly moduleService: ModuleService,
   ) {}
 
   //Create
@@ -72,9 +78,9 @@ export class EventService {
   //getAllEvents
   async getAllEvents(
     userId: string,
-    filters: EventFiltersDto,
+    filters: EventFiltersDtoV2,
     tx?: AppDatabase,
-  ): Promise<EventListResponseDto> {
+  ): Promise<EventListResponseDtoV2> {
     //moduleId -> Return events for that module
     //Else -> Return events for modules that user is enrolled in
 
@@ -85,13 +91,28 @@ export class EventService {
     } //END_transaction precencer check
 
     let events: EventDto[];
-
+    // console.log(`Here: ${filters.all}`);
     if (filters.moduleId)
       // Events for a module
       events = await this.getEventsByModule(filters.moduleId, tx); //No moduleId provided, filter only by user
-    else events = await this.getEventsByUser(userId, tx);
+    else if (filters.timetableId)
+      events = await this.getEventsByTimetable(filters.timetableId, tx);
+    else if (filters.all) {
+      const pureEvents = await tx.select().from(Event);
+      // console.log(`Here: ${JSON.stringify(pureEvents)}`);
+      events = await Promise.all(
+        pureEvents.map((event) => this.mapEventToDto(event)),
+      );
+    } else events = await this.getEventsByUser(userId, tx);
 
-    return { events };
+    return {
+      events,
+      ...(filters.Stats && filters.Stats === true
+        ? {
+            count: events.length,
+          }
+        : {}),
+    };
   } //getAllEvents
 
   //getById - Shouldn't be changing again
@@ -243,12 +264,6 @@ export class EventService {
       success: true,
     };
   } //delete
-
-  //Attendance methods
-
-  //Create attendance
-
-  //END_Attendance methods
 
   //=======================================================
   //🎅's Little Helpers
@@ -539,6 +554,25 @@ export class EventService {
     return Promise.all(events.map((event) => this.mapEventToDto(event)));
   } //END_getEventsByModule
 
+  //Get events by timetable
+  private async getEventsByTimetable(
+    timetableId: string,
+    tx?: AppDatabase,
+  ): Promise<EventDto[]> {
+    const db = tx ?? this.dbService.db;
+
+    const events = await db
+      .select(getTableColumns(Event))
+      .from(Event)
+      .innerJoin(
+        EventsToTimetables,
+        eq(EventsToTimetables.eventID, Event.eventID),
+      )
+      .where(eq(EventsToTimetables.timetableID, timetableId));
+
+    return Promise.all(events.map((event) => this.mapEventToDto(event)));
+  }
+
   //Get events for modules user is enrolled in
   private async getEventsByUser(
     userId: string,
@@ -593,7 +627,7 @@ export class EventService {
   } //END_ownershipCheck
 
   //Map an event to the DTO - idk why this is even necessary but I kept getting type errors when returning an event which is literally fetched straight from the database
-  private async mapEventToDto(
+  protected async mapEventToDto(
     event: typeof Event.$inferSelect,
     db: AppDatabase = this.dbService.db,
   ): Promise<EventDto> {
@@ -625,51 +659,7 @@ export class EventService {
     }));
   }
 
-  private async replaceEventVenues(
-    eventId: string,
-    venues: EventDto['venues'],
-  ): Promise<void> {
-    const venueIds = await this.validateVenueIds(this.dbService.db, venues);
-    await this.insertEventVenues(this.dbService.db, eventId, venueIds);
-  }
-
-  private async validateVenueIds(
-    db: AppDatabase,
-    venues: EventDto['venues'],
-    universityId?: string,
-  ): Promise<string[]> {
-    if (venues === undefined) return [];
-    const venueIds = [...new Set(venues.map(({ venueId }) => venueId))];
-    if (venueIds.length !== venues.length) {
-      //but just continue with unique ones instead of throwing
-      throw new BadRequestException('Event venues must not contain duplicates');
-    }
-    if (venueIds.length === 0) return [];
-
-    const existing = await db
-      .select({ venueId: Venue.VenueID })
-      .from(Venue)
-      .where(
-        and(
-          inArray(Venue.VenueID, venueIds),
-          universityId === undefined
-            ? undefined
-            : eq(Venue.UniversityID, universityId),
-        ),
-      );
-    if (existing.length !== venueIds.length) {
-      if (universityId !== undefined) {
-        throw new BadRequestException(
-          'One or more venueIds do not belong to the module university',
-        );
-      }
-      throw new BadRequestException('One or more venueIds do not exist');
-    }
-
-    return venueIds;
-  }
-
-  private async insertEventVenues(
+  protected async insertEventVenues(
     db: AppDatabase,
     eventId: string,
     venueIds: string[],
@@ -735,5 +725,67 @@ export class EventService {
     //     'Non-recurring events require date and must not include dayOfWeek',
     //   );
     // }
+  }
+
+  protected async validateVenueIds(
+    db: AppDatabase,
+    venues: EventDto['venues'],
+    universityId?: string,
+  ): Promise<string[]> {
+    if (venues === undefined) return [];
+
+    const venueIds = [...new Set(venues.map(({ venueId }) => venueId))];
+
+    if (venueIds.length !== venues.length) {
+      //but just continue with unique ones instead of throwing
+      throw new BadRequestException('Event venues must not contain duplicates');
+    }
+    if (venueIds.length === 0) return [];
+
+    const existing = await db
+      .select({ venueId: Venue.VenueID })
+      .from(Venue)
+      .where(
+        and(
+          inArray(Venue.VenueID, venueIds),
+          universityId === undefined
+            ? undefined
+            : eq(Venue.UniversityID, universityId),
+        ),
+      );
+
+    if (existing.length !== venueIds.length) {
+      if (universityId !== undefined) {
+        throw new BadRequestException(
+          `One or more venueIds do not belong to the university[${universityId}]`,
+        );
+      }
+
+      throw new BadRequestException('One or more venueIds do not exist');
+    }
+
+    return venueIds;
+  }
+
+  /**
+   * Check if there is a matching event for the input event based of their fingerprints
+   * @param event - Find event matching this createEventDto
+   * @param tx - transactinoal safety
+   */
+  private async duplicateEvent(
+    fingerprint: string | null,
+    tx: AppDatabase,
+  ): Promise<EventDto | null> {
+    if (!fingerprint) {
+      return null;
+    }
+
+    const [fetched] = await tx
+      .select()
+      .from(Event)
+      .where(eq(Event.importFingerprint, fingerprint))
+      .limit(1);
+
+    return fetched !== undefined ? this.mapEventToDto(fetched) : null;
   }
 } //EventService

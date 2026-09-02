@@ -72,7 +72,10 @@ export function resolveScheduleEvents(
     const criteria = event.eventCriteria;
     const isRecurring = false; // Temporarily disabled
 
-    if (criteria?.eventSource === "university") {
+    if (
+      criteria?.eventSource === "university" ||
+      criteria.moduleId != undefined
+    ) {
       const uniModule = modules.find(
         (m) => m.moduleID === event.eventCriteria?.moduleId,
       );

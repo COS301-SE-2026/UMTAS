@@ -5,7 +5,7 @@
 struct EventChromosome {
   std::vector<EventGA> events;
   std::unordered_map<std::string, int> requiredSelections;
-  int targetTime = 0;
+
   int numActive = 0;
   int numCollision = 0;
   EventChromosome() {};

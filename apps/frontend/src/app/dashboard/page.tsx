@@ -21,6 +21,7 @@ import { UserGreeting } from "@/components/atoms/dashboard/UserGreeting";
 import Popup from "@/components/atoms/utility/floatContainer";
 import { ChooseInstituteTemplate } from "@/components/templates/choose-institute/chooseInstituteTemplate";
 import { UserDetails } from "@/lib/userclass/userClass";
+import { createUrl } from "../../../utilities/request";
 const steps = [
   {
     target: "#theme-toggle-btn",
@@ -143,6 +144,15 @@ function TypewriterLine() {
   );
 }
 
+async function fetchSession() {
+  const res = await fetch(createUrl("/auth/get-session"), {
+    credentials: "include",
+    cache: "no-store",
+  }).catch(() => null);
+
+  return res?.ok ? await res.json() : null;
+}
+
 function DashboardContent() {
   const router = useRouter();
   function handleBuild() {
@@ -150,6 +160,7 @@ function DashboardContent() {
   }
   const [mounted, setMounted] = useState(false);
   const [showSelectUni, SetSelectUni] = useState(false);
+  const [session, setSession] = useState({});
   //Wilmar has DICTACTED this shall no longer exist.
   //johan has overwritten wilmar's dictatorship
   //To any curious reader since johan over wrote my dictatorship it stopped working again
@@ -159,6 +170,7 @@ function DashboardContent() {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
+
     const sync = () => SetSelectUni(!UserDetails.getUniDetails()?.role);
     sync();
     window.addEventListener("focus", sync);
@@ -181,20 +193,20 @@ function DashboardContent() {
 
   return (
     <>
-      {showSelectUni && (
+      {/*{showSelectUni && session && (
         <Popup>
           <div data-testid="dashboard-popup-div" className="w-fit text-center">
             <ChooseInstituteTemplate
               onClose={async () => {
                 if (UserDetails.getUniDetails()?.role) {
-                  await SetSelectUni(false);
+                  SetSelectUni(false);
                 }
               }}
             />
             <div className="w-full mt-5 items-center justify-center flex"></div>
           </div>
         </Popup>
-      )}
+      )}*/}
       <div className="flex flex-col w-full min-h-[60vh] items-center justify-center">
         {/* hero */}
         <div className="w-full bg-[var(--bg-elevated)] border-b border-[var(--border)] py-12 lg:py-16">

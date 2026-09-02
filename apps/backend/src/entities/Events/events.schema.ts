@@ -7,6 +7,7 @@ import {
   pgEnum,
   date,
   uniqueIndex,
+  timestamp,
 } from 'drizzle-orm/pg-core';
 import { usersTable } from '../auth';
 import { modules } from '../Modules';
@@ -24,6 +25,9 @@ export const Event = pgTable(
     isRecurring: boolean('isRecurring').notNull().default(false),
     validated: boolean('validated').notNull().default(true),
     importFingerprint: varchar('ImportKey', { length: 64 }),
+    createdAt: timestamp('createdAt', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
   },
   (table) => ({
     importFingerprintUnique: uniqueIndex('event_import_key_unique').on(
@@ -67,6 +71,12 @@ export const AttendanceState = pgEnum('AttendanceState', [
   'ATTENDING',
   'NOT_ATTENDING',
 ]);
+
+//Validation
+export enum AttendanceStateEnum {
+  ATTENDING = 'ATTENDING',
+  NOT_ATTENDING = 'NOT_ATTENDING',
+}
 
 export type AttendanceStateType = (typeof AttendanceState.enumValues)[number];
 

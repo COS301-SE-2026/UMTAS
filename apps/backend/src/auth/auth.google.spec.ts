@@ -85,6 +85,9 @@ describe('Google OAuth helpers', () => {
             google: expect.objectContaining({
               clientId: 'client-id',
               clientSecret: 'client-secret',
+              scope: ['openid', 'email', 'profile'],
+              accessType: 'offline',
+              prompt: 'select_account consent',
             }),
           }),
         }),

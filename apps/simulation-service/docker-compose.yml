@@ -1,0 +1,27 @@
+version: "3.8"
+
+services:
+  simulation:
+    build:
+      context: .
+      dockerfile: ../../docker/simulation-service/simulation-service.dockerfile
+    container_name: umtas-sim-engine
+    ports:
+      - "8089:8089"
+    volumes:
+      - ./adapters:/app/adapters
+    environment:
+      - SIMULATION_API_KEY
+    command:
+      [
+        "--adapter",
+        "umtas",
+        "--population",
+        "100",
+        "--host",
+        "http://host.docker.internal:3000",
+        "--users",
+        "10",
+        "--spawn-rate",
+        "1",
+      ]

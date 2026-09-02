@@ -10,13 +10,13 @@ import { useState } from "react";
 import { SolverLock } from "@/components/organisms/solver/SolverLock";
 import { useQueries, useQuery } from "@tanstack/react-query";
 import { getAllEventsAdminQ } from "@/app/module-management/queries/queries";
-import { fetchAllModules } from "@/app/course-management/queries/modules/moduleBuilder";
 
 import Tutorial from "@/components/organisms/nav/Tutorial";
 import { UserDetails } from "@/lib/userclass/userClass";
 import Popup from "@/components/atoms/utility/floatContainer";
 import { ChooseInstituteTemplate } from "../choose-institute/chooseInstituteTemplate";
 import NoRoleSelected from "@/components/molecules/roleManagement/NoRoleSelected";
+import { fetchAllModulesv2 } from "../../../../utilities/V2-Builders/Modules";
 const steps = [
   {
     target: "#btn-browse-files",
@@ -51,28 +51,18 @@ export default function SolverShell() {
   const [comingFromStep, setComingFromStep] = useState<number | null>(null);
   const [moduleGroupingID, setModuleGroupingID] = useState<string | null>(null);
   const UniDetails = UserDetails.getUniDetails();
+
   const { data: modulesData } = useQuery({
     queryKey: ["PDF", "MODULES"],
-    queryFn: () => {
-      return fetchAllModules({
-        GroupID: moduleGroupingID || "",
-      });
+    queryFn: async () => {
+      return (
+        await fetchAllModulesv2({
+          GroupID: moduleGroupingID || "",
+        })
+      ).modules;
     },
     enabled: moduleGroupingID != null,
   });
-  const displayMods = modulesData?.filter((mod) => {
-    return mod.ModuleGroupingID == moduleGroupingID;
-  });
-  const eventQueries = useQueries({
-    queries: (displayMods ?? []).map((mod) => ({
-      ...getAllEventsAdminQ(mod.moduleID),
-      enabled: !!mod.moduleID,
-    })),
-  });
-  if (showSelectUni === true && UserDetails.getUniDetails()?.role) {
-    SetSelectUni(false);
-  }
-  const events: EventResponse[] = eventQueries.map((q) => q.data ?? []).flat();
 
   function handleStepCompleted(fromStep: number) {
     setComingFromStep(fromStep);
@@ -126,18 +116,14 @@ export default function SolverShell() {
         >
           <SolverLock locked={currentStep < 1} loading={comingFromStep === 0}>
             <SolverReview
-              events={events}
-              modules={displayMods as ModuleResponseDto[]}
+              modules={modulesData as ModuleResponseDto[]}
               onComplete={() => handleStepCompleted(1)}
             />
           </SolverLock>
         </div>
         <div className="flex w-120 h-110 justify-center">
           <SolverLock locked={currentStep < 2} loading={comingFromStep === 1}>
-            <SolverPreferences
-              modules={displayMods as ModuleResponseDto[]}
-              events={events}
-            />
+            <SolverPreferences modules={modulesData as ModuleResponseDto[]} />
           </SolverLock>
         </div>
       </div>

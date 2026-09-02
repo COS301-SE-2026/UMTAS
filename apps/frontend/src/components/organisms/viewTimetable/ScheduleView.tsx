@@ -41,15 +41,12 @@ import { getQueryClient } from "@/components/tanstack/getQueryClient";
 
 import { useSearchParams } from "next/navigation";
 
-import { getAllEventsQ } from "@/components/templates/builder/Queries/eventQueries";
-import { getAllModulesQ } from "@/components/templates/builder/Queries/moduleQueries";
 import { removeTimetableMut } from "@/components/templates/builder/Queries/timetableQueries";
 import { useMutation } from "@tanstack/react-query";
-import { fetchAllModules } from "@/app/course-management/queries/modules/moduleBuilder";
 import { UserDetails } from "@/lib/userclass/userClass";
-import NoRoleSelected from "@/components/molecules/roleManagement/NoRoleSelected";
 
 import Tutorial from "@/components/organisms/nav/Tutorial";
+import { fetchAllModulesv2 } from "../../../../utilities/V2-Builders/Modules";
 const emptySteps = [
   {
     target: "#ref-go-to-builder",
@@ -94,7 +91,9 @@ export function ScheduleView({
   const [viewMode, setViewMode] = useState<"Generate" | "Timetable">(
     "Timetable",
   );
-  const isEditMode = !!selectedTimetableId;
+
+  const isEditMode = selectedTimetableId !== "";
+
   const [timetableName, setTimetableName] = useState("My New Schedule");
   const [selectedEventIds, setSelectedEventIds] = useState<string[]>([]);
   const [OGeventId, setOGeventId] = useState<string[]>([]);
@@ -108,28 +107,32 @@ export function ScheduleView({
   const { data: allModules = [], isLoading: isLoadingModules } = useQuery({
     queryKey: ["Modules", "Courses"],
     queryFn: async () => {
-      const result = await fetchAllModules({
+      const result = await fetchAllModulesv2({
         userEnrollment: true,
       });
-      return result;
+      return result.modules;
     },
   });
-  const { data: allEvents = [], isLoading: isLoadingEvents } =
-    useQuery(getAllEventsQ());
+
   const { data: timetables = [], isLoading: isLoadingTimetables } =
     useQuery(getAllTimetablesQ());
+
   const { mutate: deleteTimetable } = useMutation(removeTimetableMut());
 
-  const isLoading = isLoadingModules || isLoadingEvents || isLoadingTimetables;
+  const isLoading = isLoadingModules || isLoadingTimetables;
 
   useEffect(() => {
-    if (timetables.length > 0 && !selectedTimetableId) {
+    if (
+      timetables.length > 0 &&
+      !selectedTimetableId &&
+      viewMode !== "Generate"
+    ) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelectedTimetableId(
         String(timetables[timetables.length - 1].timetable.timetableID),
       );
     }
-  }, [timetables, selectedTimetableId]);
+  }, [timetables, selectedTimetableId, viewMode]);
 
   //this useEffect is the "memory" between the builder and schedules
   useEffect(() => {
@@ -152,13 +155,11 @@ export function ScheduleView({
     );
 
     if (selectedTT) {
-      const activeEventIds = (selectedTT.eventIds || []).map((id) =>
-        String(id).trim(),
+      const activeEventIds = (selectedTT.events || []).map((event) =>
+        String(event.eventId).trim(),
       );
 
-      const activeEvents = allEvents.filter((e) =>
-        activeEventIds.includes(String(e.eventId).trim()),
-      );
+      const activeEvents = selectedTT.events;
 
       const activeModuleIds = activeEvents
         .map((e) => e.eventCriteria?.moduleId)
@@ -172,7 +173,7 @@ export function ScheduleView({
     }
 
     return { events: [], modules: [] };
-  }, [selectedTimetableId, timetables, allEvents, allModules]);
+  }, [selectedTimetableId, timetables, allModules]);
 
   const resolvedEvents = useMemo(
     () => resolveScheduleEvents(events, modules),
@@ -249,10 +250,10 @@ export function ScheduleView({
         </p>
         <a
           id="ref-go-to-builder"
-          href="/builder"
+          onClick={createTimetable}
           className="text-sm font-medium text-[var(--btn-primary-bg)] hover:underline"
         >
-          Go to Builder to create one
+          Go to generator to create one
         </a>
       </div>
     );
@@ -285,8 +286,7 @@ export function ScheduleView({
     });
   }
 
-  //edit timetable (broken currently)
-
+  //edit timetable
   async function editTimetable() {
     if (!selectedTimetableId) return;
 
@@ -311,13 +311,27 @@ export function ScheduleView({
     }
   }
 
+  function createTimetable() {
+    setSelectedTimetableId("");
+    setTimetableName("My New Schedule");
+    setOGeventId([]);
+    setSelectedEventIds([]);
+    setIsGenerating(false);
+    setViewMode("Generate");
+  }
+
   //the functions below are copied, pasted and slightly changed from the wizard shell. you'll see wizard shell is a lot shorter
   async function handleGenerate(name: string, selectedEventIds: string[]) {
+    if (name == "BACK" && selectedEventIds.length == 0) {
+      setViewMode("Timetable");
+      return;
+    }
+
     setIsGenerating(true);
     try {
       const finalEvents = selectedEventIds.map((id) => id);
 
-      if (editId) {
+      if (selectedTimetableId != "") {
         const noNumIds = OGeventId.filter(
           (id) => !selectedEventIds.includes(id),
         );
@@ -327,7 +341,7 @@ export function ScheduleView({
         );
 
         await updateTimetable({
-          path: { id: editId },
+          path: { id: selectedTimetableId },
           body: {
             timetableName: name || "Updated Schedule",
             removeEventIds: noNumIds,
@@ -360,11 +374,10 @@ export function ScheduleView({
     if (viewMode === "Generate") {
       return (
         <GenerateStep
-          modules={allModules}
-          events={allEvents}
+          key={selectedTimetableId || "new-timetable"}
           onGenerate={handleGenerate}
           isGenerating={isGenerating}
-          isEditMode={isEditMode}
+          isEditMode={selectedTimetableId !== ""} // can edit if the timetable id != ""
           timetableName={timetableName}
           setTimetableName={setTimetableName}
           selectedEventIds={selectedEventIds}
@@ -372,9 +385,6 @@ export function ScheduleView({
         />
       );
     }
-
-    const hasRole = UniDetails?.role != null;
-    if (!hasRole) return <NoRoleSelected />;
 
     return (
       <>
@@ -428,6 +438,15 @@ export function ScheduleView({
                   onNext={handleNextWeek}
                 />
                 <div className="flex flex-row justify-center md:justify-end w-full md:w-auto gap-2 mb-4 md:mb-0">
+                  <Button
+                    id="btn-create"
+                    type="button"
+                    className="h-7 px-3 text-xs bg-[var(--bg-surface)] text-[var(--text-primary)] border-[var(--border)] hover:opacity-90"
+                    onClick={createTimetable}
+                  >
+                    Create New Timetable
+                  </Button>
+
                   <Button
                     id="btn-edit"
                     type="button"

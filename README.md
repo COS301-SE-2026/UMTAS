@@ -32,7 +32,8 @@ _Built by: Wilmar Smit, Michael Tomlinson, Johan Coetzer, Marcel Stoltz, & Aidan
 [![Coverage](https://img.shields.io/codecov/c/github/COS301-SE-2026/UMTAS/dev?style=for-the-badge&logo=codecov&logoColor=white&label=Coverage)](https://codecov.io/gh/COS301-SE-2026/UMTAS)
 [![Quality Gate](https://img.shields.io/sonar/quality_gate/COS301-SE-2026_UMTAS?server=https%3A%2F%2Fsonarcloud.io&style=for-the-badge&logo=sonarcloud&logoColor=white)](https://sonarcloud.io/dashboard?id=COS301-SE-2026_UMTAS) -->
 
-[![Uptime](https://img.shields.io/uptimerobot/ratio/m803102764-591e06f9f3d70c1a4b161f6f?style=for-the-badge&logo=uptimerobot&logoColor=white&label=Uptime+30d&color=1d4ed8)](https://dashboard.uptimerobot.com/monitors/803102764)
+[![Uptime](https://img.shields.io/uptimerobot/ratio/m803621896-8c4148150774bc697176b5e2?style=for-the-badge&logo=uptimerobot&logoColor=white&label=Uptime+30d&color=1d4ed8)](https://dashboard.uptimerobot.com/monitors/803621896)
+[![Status](https://img.shields.io/uptimerobot/status/m803621896-8c4148150774bc697176b5e2?style=for-the-badge&logo=uptimerobot&logoColor=white&label=Status&color=1d4ed8)](https://dashboard.uptimerobot.com/monitors/803621896)
 
 <!-- Platform & Tooling -->
 

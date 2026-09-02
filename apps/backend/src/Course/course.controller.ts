@@ -7,6 +7,8 @@ import {
   CourseListResponseDto,
   DeleteCourseResponseDto,
   CourseFilters,
+  CourseFiltersV2,
+  CourseListResponseDtoV2,
 } from './dto/course.dto';
 
 import {
@@ -18,6 +20,7 @@ import {
   Patch,
   Delete,
   ParseUUIDPipe,
+  Query,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -27,14 +30,18 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 
-// import { CurrentSession } from '../auth/session.decorator';
-// import type { SessionData } from '../auth/session.decorator';
 import { Roles } from 'src/auth/roles.guard';
+import { CourseServiceV2 } from './courseV2.service';
+import { CurrentSession } from 'src/auth/session.decorator';
+import type { SessionData } from 'src/auth/session.decorator';
 
 @ApiTags('Courses')
 @Controller('Courses')
 export class CourseController {
-  constructor(private readonly service: CourseService) {}
+  constructor(
+    private readonly service: CourseService,
+    private readonly service2: CourseServiceV2,
+  ) {}
 
   //Create
   @Post()
@@ -79,12 +86,27 @@ export class CourseController {
     description: 'Courses returned successfully',
     type: CourseListResponseDto,
   })
-  @ApiResponse({
-    status: 404,
-    description: 'No Courses found',
-  })
   getAll(@Body() filters: CourseFilters): Promise<CourseListResponseDto> {
     return this.service.getAll(filters);
+  }
+
+  @Get('v2/getAll')
+  @Roles()
+  @ApiOperation({
+    summary: 'Get all courses - V2',
+    description: 'Use filters and enable stats mode in filters',
+    operationId: 'getCoursesV2',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Courses returned successfully',
+    type: CourseListResponseDtoV2,
+  })
+  getAllV2(
+    @CurrentSession() session: SessionData,
+    @Query() filters: CourseFiltersV2,
+  ): Promise<CourseListResponseDtoV2> {
+    return this.service2.getAllV2(session.user.id, filters);
   }
 
   //GetById
@@ -111,6 +133,33 @@ export class CourseController {
     @Param('CourseId', ParseUUIDPipe) CourseId: string,
   ): Promise<CourseSingleResponseDto> {
     return this.service.getById(CourseId);
+  }
+
+  //getById V2
+  @Get('v2/:CourseId')
+  @Roles()
+  @ApiOperation({
+    summary: 'get a Course by ID - V2',
+    operationId: 'getCourseByIdV2',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Course returned successfully',
+    type: CourseSingleResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid Course ID',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Course not found',
+  })
+  getByIdV2(
+    @CurrentSession() session: SessionData,
+    @Param('CourseId', ParseUUIDPipe) CourseId: string,
+  ): Promise<CourseSingleResponseDto> {
+    return this.service2.getByIdV2(session.user.id, CourseId);
   }
 
   //Update
