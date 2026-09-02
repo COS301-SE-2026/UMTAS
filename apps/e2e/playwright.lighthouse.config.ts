@@ -15,6 +15,10 @@ export default defineConfig({
   },
   projects: [
     {
+      name: "setup",
+      testMatch: /.*\.setup\.ts/,
+    },
+    {
       name: "Lighthouse",
       testMatch: /.*\.audit\.ts/,
       use: {
