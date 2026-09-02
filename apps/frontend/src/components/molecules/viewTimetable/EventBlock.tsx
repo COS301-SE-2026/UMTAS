@@ -11,6 +11,8 @@ import {
 } from "../../../../utilities/eventAttendance/eventAttendanceQueries";
 import { Checkbox } from "@/components/atoms/baseShadcn/checkbox";
 import { useEffect } from "react";
+import { getQueryClient } from "@/components/tanstack/getQueryClient";
+import { errorName } from "../../../../utilities/errorCries";
 
 interface EventBlockProps {
   event: ScheduleEvent;
@@ -32,8 +34,22 @@ export function EventBlock({ event, date }: EventBlockProps) {
     ...addEventAttendanceMut(),
   });
 
-  const { mutate: updateAttendance } = useMutation({
+  const { mutate: updateAttendance, isPending: updatePending } = useMutation({
     ...updateEventAttendanceMut(),
+    onSuccess: (data) => {
+      getQueryClient().invalidateQueries({
+        queryKey: ["eventAttendance", { eventID: event.id, eventDate: date }],
+      });
+      const attending =
+        data.state === "ATTENDING" ? "Attending" : "Not attending";
+      window.dispatchEvent(
+        new CustomEvent(errorName, {
+          detail: {
+            userMessage: `Event: ${event.name} : updated to ${attending}`,
+          },
+        }),
+      );
+    },
   });
   const { data: attendData = [] } = useQuery({
     ...getAllEventAttendanceQ({ eventID: event.id, eventDate: date }),
@@ -50,8 +66,6 @@ export function EventBlock({ event, date }: EventBlockProps) {
       });
     }
   }, [attendData, createAttendance, event.id, date]);
-
-  const currAtt = attendData[0];
 
   function getBlockStyle() {
     if (!event.accentColour) {
@@ -78,11 +92,36 @@ export function EventBlock({ event, date }: EventBlockProps) {
   return (
     <div
       className="flex flex-col gap-1 rounded-sm border-l-[3px] px-2 py-1.5 h-full overflow-hidden"
+      onClick={() => {
+        if (attendData[0])
+          updateAttendance({
+            body: {
+              state:
+                attendData[0].state === "ATTENDING"
+                  ? "NOT_ATTENDING"
+                  : "ATTENDING",
+            },
+            path: {
+              attendanceId: attendData[0].AttendanceID,
+            },
+          });
+      }}
       style={getBlockStyle()}
     >
-      <p className="text-xs font-medium text-[var(--text-primary)] truncate leading-tight">
-        {event.name}
-      </p>
+      <span className="text-[10px] flex flex-row gap-1 font-medium uppercase tracking-[0.04em] text-[var(--text-secondary)] truncate">
+        <p className="text-xs font-medium text-[var(--text-primary)] truncate leading-tight">
+          {event.name}
+        </p>
+        <p className="text-[7px] text-[var(--text-secondary)] capitalize font-medium truncate">
+          {!updatePending
+            ? attendData[0]?.state
+              ? attendData[0].state === "ATTENDING"
+                ? "Attending"
+                : "Not attending"
+              : ""
+            : "updating"}
+        </p>
+      </span>
 
       {event.type && (
         <span className="text-[10px] font-medium uppercase tracking-[0.04em] text-[var(--text-secondary)] truncate">
@@ -91,7 +130,7 @@ export function EventBlock({ event, date }: EventBlockProps) {
       )}
 
       {event.subLabel && (
-        <span className="text-[10px] font-medium uppercase tracking-[0.04em] text-[var(--text-secondary)] truncate">
+        <span className="text-[10px]  flex flex-row font-medium uppercase tracking-[0.04em] text-[var(--text-secondary)] truncate">
           {event.subLabel}
         </span>
       )}
@@ -106,22 +145,23 @@ export function EventBlock({ event, date }: EventBlockProps) {
           {event.startTime} - {event.endTime}
         </p>
       </div>
-      <div className="flex items-center gap-1 mt-auto">
-        <Checkbox
-          checked={currAtt.state === "ATTENDING"}
-          onCheckedChange={() => {
-            updateAttendance({
-              body: {
-                state:
-                  currAtt.state === "ATTENDING" ? "NOT_ATTENDING" : "ATTENDING",
-              },
-              path: {
-                attendanceId: currAtt.AttendanceID,
-              },
-            });
-          }}
-        />
-      </div>
     </div>
   );
 }
+
+// <div className="flex items-center gap-1 mt-auto">
+//   <Checkbox
+//     checked={checked}
+//     onCheckedChange={() => {
+//       updateAttendance({
+//         body: {
+//           state:
+//             currAtt.state === "ATTENDING" ? "NOT_ATTENDING" : "ATTENDING",
+//         },
+//         path: {
+//           attendanceId: currAtt.AttendanceID,
+//         },
+//       });
+//     }}
+//   />
+// </div>

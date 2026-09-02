@@ -4,6 +4,7 @@ import React from "react";
 import { EventBlock } from "@/components/molecules/viewTimetable/EventBlock";
 import { isoDateStr } from "@/lib/scheduleUtils";
 import type { ScheduleEvent } from "@/types/schedule";
+import { useErrorListener } from "@/hooks/errorListener";
 
 interface WeeklyGridProps {
   events: ScheduleEvent[];
@@ -73,6 +74,7 @@ function slotSpan(startTime: string, endTime: string): number {
 }
 
 export function WeeklyGrid({ events, weekStart }: WeeklyGridProps) {
+  useErrorListener();
   const weekDates = getWeekDates(weekStart);
 
   function getEventsForDay(date: Date): ScheduleEvent[] {
