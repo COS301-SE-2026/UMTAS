@@ -77,19 +77,17 @@ export function MapScreen({ children, onRequestMapSetup }: MapScreenProps) {
   }
 
   return (
-    <APIProvider apiKey={process.env.NEXT_PUBLIC_MAP_KEY!}>
-      <Map
-        style={mapStyle}
-        mapId={process.env.MAP_ID}
-        defaultBounds={mapRestriction?.latLngBounds}
-        defaultZoom={config.DefaultZoom}
-        restriction={mapRestriction}
-        gestureHandling="greedy"
-        clickableIcons={false}
-        reuseMaps={true}
-      >
-        {children}
-      </Map>
-    </APIProvider>
+    <Map
+      style={mapStyle}
+      mapId={process.env.NEXT_PUBLIC_MAP_ID}
+      defaultBounds={mapRestriction?.latLngBounds}
+      defaultZoom={config.DefaultZoom}
+      restriction={mapRestriction}
+      gestureHandling="greedy"
+      clickableIcons={false}
+      reuseMaps={true}
+    >
+      {children}
+    </Map>
   );
 }
