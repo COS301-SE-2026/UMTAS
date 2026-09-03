@@ -117,12 +117,10 @@
 ??? info "**Analytics Dashboard**"
     | **ID** | **User Story** | **Use Case** |
     |---|---|---|
-    | US-39 | As an admin or lecturer, I want to see the Courses in my University with how many Modules each has, so that I get a top-level view of scale. | UC-AN-01 |
-    | US-40 | As an admin or lecturer, I want to select a Course and see its Modules with how many Events each has, so that I can see activity within that Course. | UC-AN-02 |
-    | US-41 | As an admin or lecturer, I want to select a Module and see its Events with how many students have submitted attendance for each, so that I can gauge engagement per Event. | UC-AN-03 |
-    | US-42 | As an admin or lecturer, I want to select a specific Event and see its full attendance detail, so that I can understand attendance for that session. | UC-AN-04 |
-    | US-43 | As an admin or lecturer, I want to view how many Events were held per Venue over a period, so that I can understand space usage. | UC-AN-05 |
-    | US-44 | As an admin or lecturer, I want to view how many Events a Lecturer has taught and the associated attendance, so that I can understand their teaching load. | UC-AN-06 |
+    | US-39 | As an admin or lecturer, I want to see University-level analytics counting Courses, Events, Modules and Students, so that I get a top-level view of scale. | UC-AN-01 |
+    | US-40 | As an admin or lecturer, I want to see Course analytics showing total Courses, the Courses with the most Events, the Courses with the most Modules, and the average student count per Course, so that I can identify scale and load across Courses. | UC-AN-02 |
+    | US-41 | As an admin or lecturer, I want to see Module analytics showing total Modules, the Modules with the most students, and the Modules with the most Events, so that I can identify high-demand Modules. | UC-AN-03 |
+    | US-42 | As an admin or lecturer, I want to see Event analytics showing total Events this week, the busiest day of the week, the Venues with the most Events, and the Venues with the highest attendance, so that I can understand scheduling and Venue usage patterns. | UC-AN-04 |
 
 ---
 ??? info "**Attendance Recording**"
@@ -131,7 +129,7 @@
     |---|---|---|
     | US-42 | As a student, I want to indicate my attendance intent for an event so that my participation is tracked by date. | UC-AR-01 |
     | US-43 | As a student, I want to unrecord my attendance for an event so that I can correct a mistaken entry. | UC-AR-02 |
-
+    
 ---
 ??? info "**Lecturer Adjustment**"
 
@@ -142,17 +140,12 @@
     | US-46 | As a lecturer or admin, I want to assign lecturers to events and modules so that responsibility for teaching is clearly recorded. | UC-LA-02 |
 
 ---
-??? info "**Alert System**"
-
-    | **ID** | **User Story** | **Use Case** |
-    |---|---|---|
-    | US-47 | As a user, I want to receive an alert when an event changes so that I am aware of schedule changes affecting me. | UC-AL-01 |
-
----
 ??? info "**Tyto Simulation System**"
 
     | **ID** | **User Story** | **Use Case** |
     |---|---|---|
-    | US-48 | As a Tyto administrator, I want to run a simulation batch so that I can test system behaviour under representative load. | UC-TY-01 |
-    | US-49 | As a Tyto administrator, I want to view simulation analytics so that I can interpret the results of a simulation run. | UC-TY-02 |
-    | US-50 | As a Tyto administrator, I want to display stress-test results so that I can assess system performance under peak conditions. | UC-TY-03 |
+    | US-48 | As a Tyto administrator, I want to launch a simulation batch via a central script and Docker container so that I can test system behaviour under representative load. | UC-TY-01 |
+    | US-49 | As a Tyto administrator, I want the system to generate a synthetic student population from a schema and domain data so that simulations run against realistic profiles. | UC-TY-02 |
+    | US-50 | As a Tyto administrator, I want to view aggregated simulation analytics and reports so that I can interpret the results of a simulation run. | UC-TY-03 |
+    | US-51 | As a Tyto administrator, I want to bootstrap a new adapter from an OpenAPI specification so that I can extend simulations to new target systems without manual setup. | UC-TY-04 |
+    | US-52 | As a Tyto administrator, I want the simulation to exercise realistic UMTAS user behaviours so that I can validate the platform under a full range of domain activity. | UC-TY-05 |

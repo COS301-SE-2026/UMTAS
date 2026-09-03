@@ -6,68 +6,108 @@
     ## **Use Case Table**
     | **Use Case ID** | **Use Case Name** | **Actor** |
     |:---:|:---:|:---:|
-    | **UC-TY-01** | [Run Simulation Batch](#uc-ty-01) | Tyto Administrator |
-    | **UC-TY-02** | [View Simulation Analytics](#uc-ty-02) | Tyto Administrator |
-    | **UC-TY-03** | [Display Stress-Test Results](#uc-ty-03) | Tyto Administrator |
+    | **UC-TY-01** | [Launch Simulation Batch](#uc-ty-01) | Tyto Administrator |
+    | **UC-TY-02** | [Generate Synthetic Population](#uc-ty-02) | Tyto Administrator |
+    | **UC-TY-03** | [View Simulation Analytics](#uc-ty-03) | Tyto Administrator |
+    | **UC-TY-04** | [Bootstrap Adapter from OpenAPI Spec](#uc-ty-04) | Tyto Administrator |
+    | **UC-TY-05** | [Simulate UMTAS User Behaviours](#uc-ty-05) | Tyto Administrator |
 
-
+    </div>
 
     ??? tip "**Use Case Diagram**"
         ![](../../diagrams/requirements/Tyto_Simulation.svg)
 
     ---
-    ??? "UC-TY-01: Run Simulation Batch"
+    ??? "UC-TY-01: Launch Simulation Batch"
         <a id="uc-ty-01"></a>
         ##### High Level
         ```
-        Run Simulation Batch (Actor: Tyto Administrator, System: Simulation Engine)  
-            TUCBW the administrator initiates a simulation job with defined adapter and load parameters via the central runner.  
-            TUCEW the system generates synthetic profile data, simulates concurrent requests via the Locust engine, and aggregates raw metrics.
+        Launch Simulation Batch (Actor: Tyto Administrator, System: Simulation Engine)
+            TUCBW the administrator invokes the central runner script with a target adapter and population size.
+            TUCEW the system launches the configured Docker container and begins executing the simulation with live metrics exposed.
         ```
         ##### Expanded
         | Field | Detail |
         | :--- | :--- |
         | **Actor** | Tyto Administrator |
-        | **Precondition** | The simulation service is configured via Docker or `run.sh`. The target adapter is defined. Load parameters are established (specifically, mocking 20,000 concurrent students using 100 Locust users maintaining 15 requests per second). |
-        | **Trigger** | Administrator initiates the simulation container or script with required arguments. |
-        | **Basic Flow** | 1. Administrator configures simulation parameters, including the target adapter and total synthetic population.<br>2. System invokes the profile engine to generate synthetic JSON profiles using declarative YAML schemas and Faker.<br>3. System launches the Locust engine, spinning up 100 concurrent users that sustain 15 requests per second to accurately mock a load of 20,000 students.<br>4. System dynamically executes domain-specific tasks against the core API.<br>5. System logs live request metrics, latencies, and failure rates to CSV formats.<br>6. Simulation batch completes manually or via time limit. |
-        | **Alternate Flow** | **A1: Adapter configuration missing**<br>System halts execution immediately, logging an error that the specified adapter or schema files were not found.<br><br>**A2: Authentication failure**<br>Simulated users fail to retrieve valid bearer tokens; the engine logs the HTTP errors  and halts user spawning to prevent spamming.<br><br>**A3: Core API overload**<br>The target API drops requests. Locust records the specific endpoint failure rates and continues executing or gracefully stops based on configuration. |
-        | **Postcondition** | Simulation stops, and raw CSV metric files are ready for report compilation. |
+        | **Precondition** | The simulation service and its Docker container are available. The target adapter exists. |
+        | **Trigger** | Administrator runs the central script with adapter and population arguments. |
+        | **Basic Flow** | 1. Administrator supplies the target adapter and population size to the runner script.<br>2. System launches the simulation as a Docker container with the given configuration.<br>3. System exposes live metrics ports for the running container.<br>4. Simulation batch executes until completion or manual stop. |
+        | **Alternate Flow** | **A1: Adapter configuration missing**<br>System halts execution and logs an error that the specified adapter files were not found.<br><br>**A2: Container fails to start**<br>System reports the Docker startup failure and aborts the run. |
+        | **Postcondition** | Simulation container is running with live metrics exposed. |
 
     ---
-    ??? "UC-TY-02: View Simulation Analytics"
+    ??? "UC-TY-02: Generate Synthetic Population"
         <a id="uc-ty-02"></a>
         ##### High Level
         ```
-        View Simulation Analytics (Actor: Tyto Administrator, System: Simulation Engine)  
-            TUCBW the administrator accesses the live dashboard or generated JSON report.  
-            TUCEW the system presents aggregated performance metrics, including endpoint-specific latencies, throughput, and error traces.
+        Generate Synthetic Population (Actor: Tyto Administrator, System: Simulation Engine)
+            TUCBW a simulation batch requires a synthetic student population.
+            TUCEW the system generates profiles from a declarative YAML schema and domain CSV samples, and exports them as structured JSON.
         ```
         ##### Expanded
         | Field | Detail |
         | :--- | :--- |
         | **Actor** | Tyto Administrator |
-        | **Precondition** | A simulation batch is currently running, or a batch has completed and the reporting script has run. |
-        | **Trigger** | Administrator opens the live Locust Web UI or accesses the exported JSON report. |
-        | **Basic Flow** | 1. Administrator navigates to the live web UI or opens the timestamped JSON report generated by `report.py`.<br>2. System displays aggregated execution statistics, including total requests, requests per second (RPS), and total failures.<br>3. System breaks down latency metrics (min, max, average, median, p95, and p99) per API endpoint.<br>4. System highlights any logged endpoint exceptions or errors recorded during the run.<br>5. Administrator analyses the data to identify performance bottlenecks. |
-        | **Alternate Flow** | **A1: No simulation data available**<br>If checking reports, the system displays an empty directory. If checking the UI, the system shows an idle Locust state.<br><br>**A2: CSV cleanup failed**<br>System generated the JSON report but failed to purge the temporary CSV files. Administrator views the JSON data normally but residual files remain. |
-        | **Postcondition** | Comprehensive performance insights and endpoint behaviors are provided to the administrator. |
+        | **Precondition** | A YAML schema and any required domain CSV files are present for the target adapter. |
+        | **Trigger** | Simulation batch is launched (UC-TY-01) and requires a synthetic population. |
+        | **Basic Flow** | 1. System reads the declarative YAML schema defining the population's fields.<br>2. System generates profile values using Faker, sampling domain-specific fields from external CSV files where defined.<br>3. System exports the generated population to a structured JSON file for use by the simulation. |
+        | **Alternate Flow** | **A1: Schema invalid or missing**<br>System halts generation and logs a schema error.<br><br>**A2: CSV sample file missing**<br>System halts generation and logs which domain CSV file could not be found. |
+        | **Postcondition** | A structured JSON file of synthetic student profiles is available for the simulation run. |
 
     ---
-    ??? "UC-TY-03: Display Stress-Test Results"
+    ??? "UC-TY-03: View Simulation Analytics"
         <a id="uc-ty-03"></a>
         ##### High Level
         ```
-        Display Stress-Test Results (Actor: Tyto Administrator, System: Simulation Engine)  
-            TUCBW the administrator reviews the finalised JSON report for a specific load threshold.  
-            TUCEW the system provides the total breakdown of system degradation, failure occurrences, and pass/fail metrics based on the applied load.
+        View Simulation Analytics (Actor: Tyto Administrator, System: Simulation Engine)
+            TUCBW the administrator accesses the live dashboard or a generated report.
+            TUCEW the system presents aggregated latency, throughput, and failure metrics per endpoint, with temporary metric files cleaned up afterwards.
         ```
         ##### Expanded
         | Field | Detail |
         | :--- | :--- |
         | **Actor** | Tyto Administrator |
-        | **Precondition** | A stress-test simulation batch (mocking 20,000 students via 100 users at 15 RPS) has completed and the `report.py` script has packaged the data. |
-        | **Trigger** | Administrator reviews the finalised `_report.json` file. |
-        | **Basic Flow** | 1. Administrator opens the structured JSON output corresponding to the completed stress test.<br>2. System provides a clear summary block detailing the simulated population sise and test duration.<br>3. System lists exact occurrence counts of specific HTTP errors or backend exceptions.<br>4. Administrator compares the recorded p95 and p99 response times against the core API's acceptable SLAs.<br>5. Administrator evaluates if the breaking point was reached by checking the total failure percentage. |
-        | **Alternate Flow** | **A1: sero failures recorded**<br>The report shows a 0% failure rate. The administrator marks the core API as having successfully sustained the mocked 20,000 student load.<br><br>**A2: Incomplete report generation**<br>The simulation crashed unexpectedly before `report.py` could execute. Administrator must inspect the raw Locust CSV dumps manually. |
-        | **Postcondition** | Definitive proof of system limits and load-handling capabilities is documented.
+        | **Precondition** | A simulation batch is running, or a batch has completed and raw CSV metrics exist. |
+        | **Trigger** | Administrator opens the live web UI or requests report generation. |
+        | **Basic Flow** | 1. Administrator navigates to the live web UI, or triggers parsing of the raw CSV metrics.<br>2. System parses the CSV data into a single timestamped JSON report.<br>3. System aggregates and displays overall requests, RPS, and failure counts, plus per-endpoint latency (min, max, avg, median, p95, p99).<br>4. System removes the temporary CSV files once the report is produced.<br>5. Administrator reviews the results to identify bottlenecks or confirm the system withstood the applied load. |
+        | **Alternate Flow** | **A1: No simulation data available**<br>System displays an idle state or an empty report directory.<br><br>**A2: Cleanup failed**<br>Report is generated successfully but temporary CSV files are not removed; administrator is notified residual files remain. |
+        | **Postcondition** | A timestamped JSON report with aggregated performance metrics is available for review. |
+
+    ---
+    ??? "UC-TY-04: Bootstrap Adapter from OpenAPI Spec"
+        <a id="uc-ty-04"></a>
+        ##### High Level
+        ```
+        Bootstrap Adapter from OpenAPI Spec (Actor: Tyto Administrator, System: Simulation Engine)
+            TUCBW the administrator supplies an OpenAPI specification for a new target system.
+            TUCEW the system scaffolds a new adapter, generating endpoint configuration, synthetic data schemas, and executable simulation scripts mapped to the discovered API methods.
+        ```
+        ##### Expanded
+        | Field | Detail |
+        | :--- | :--- |
+        | **Actor** | Tyto Administrator |
+        | **Precondition** | A valid OpenAPI specification file for the target system is available. |
+        | **Trigger** | Administrator runs the adapter scaffolding tool against the OpenAPI spec. |
+        | **Basic Flow** | 1. Administrator provides the OpenAPI specification file to the scaffolding tool.<br>2. System parses the specification to discover available API methods.<br>3. System generates endpoint configuration files, synthetic data schemas, and executable Python simulation scripts mapped to each discovered method.<br>4. System places the generated adapter alongside existing adapters, ready for use in a simulation batch. |
+        | **Alternate Flow** | **A1: Specification invalid**<br>System halts scaffolding and logs the parsing error.<br><br>**A2: Unsupported method type discovered**<br>System skips the unsupported method, logs a warning, and continues scaffolding the remaining methods. |
+        | **Postcondition** | A new adapter is available for use in simulation batches. |
+
+    ---
+    ??? "UC-TY-05: Simulate UMTAS User Behaviours"
+        <a id="uc-ty-05"></a>
+        ##### High Level
+        ```
+        Simulate UMTAS User Behaviours (Actor: Tyto Administrator, System: Simulation Engine)
+            TUCBW a simulation batch is executing against the UMTAS adapter.
+            TUCEW the system drives simulated users through account creation, timetable upload and parsing, browsing, and custom scheduling requests.
+        ```
+        ##### Expanded
+        | Field | Detail |
+        | :--- | :--- |
+        | **Actor** | Tyto Administrator |
+        | **Precondition** | A simulation batch (UC-TY-01) is running against the UMTAS adapter with a generated population (UC-TY-02). |
+        | **Trigger** | Simulated users are spawned and begin executing UMTAS domain tasks. |
+        | **Basic Flow** | 1. System simulates mock account creation, secure login, and session token management for each user.<br>2. System simulates uploading timetable PDF files, polling for parser job status, and retrieving results.<br>3. System simulates users browsing their enrolled Modules, available Events, and existing timetables.<br>4. System simulates submitting custom scheduling jobs to the solver and polling for execution status. |
+        | **Alternate Flow** | **A1: Authentication failure**<br>Simulated users fail to retrieve valid bearer tokens; the engine logs the failure and halts further spawning to prevent spamming.<br><br>**A2: Core API overload**<br>The target API drops requests; the engine records the endpoint failure rate and continues or gracefully stops based on configuration. |
+        | **Postcondition** | Simulated users have exercised the full range of UMTAS domain behaviours, with results captured for reporting. |

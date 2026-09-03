@@ -344,7 +344,7 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 
 <div align="center">
 
-[![UMTAS Documentation](https://img.shields.io/badge/UMTAS_Documentation-52525b?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/latest/management/UserManual/)
+[![User Manual](https://img.shields.io/badge/UMTAS_Documentation-52525b?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/latest/management/UserManual/)
 
 </div>
 
