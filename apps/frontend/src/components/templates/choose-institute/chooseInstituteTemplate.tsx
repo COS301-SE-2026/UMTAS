@@ -17,13 +17,12 @@ export function ChooseInstituteTemplate({
   const uni = UserDetails.getUniDetails();
 
   return (
-    <Card className="mx-auto min-w-md bg-[var(--bg-surface)]">
+    <Card className="w-full max-w-md mx-auto bg-[var(--bg-surface)] p-4 sm:p-6 border-0 sm:border shadow-none sm:shadow-sm">
       <CardHeader>
-        <CardTitle>Choose Institute</CardTitle>
-        <br />
+        <CardTitle className="text-xl sm:text-2xl">Choose Institute</CardTitle>
         {uni && <>Current University : {uni.UniversityName}</>}
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-0">
         <InstituteSelector onClose={onClose} />
       </CardContent>
     </Card>
