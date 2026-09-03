@@ -1,0 +1,16 @@
+.github/workflows/ci.yml
+  h_2d4b3dca70a3d8 212,262,264
+apps/frontend/src/components/organisms/map/MapScreen.tsx
+  h_2d4b3dca70a3d8 81
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "d89585fe76e49a185f36cfb6d4c9c4872aabbdde",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
