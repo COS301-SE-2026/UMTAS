@@ -76,21 +76,21 @@ export default function ModulesTab({
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatCard
           title="Total Modules"
-          value={modulesData.length ?? 0}
+          value={modulesData?.length ?? 0}
           isLoading={isLoading}
           icon={<Notebook className={"h-4 w-4"} />}
         />
         <StatCard
           title="Module with Most Students"
           value={topModuleByStudentCount[0]?.studentCount ?? 0}
-          description={topStudentModule.name ?? ""}
+          description={topStudentModule?.name ?? ""}
           isLoading={isLoading}
           icon={<Flame className={"h-4 w-4"} />}
         />
         <StatCard
           title="Module with the Most Events"
           value={topModuleByStudentCount[0]?.studentCount ?? 0}
-          description={topEventModule.name ?? ""}
+          description={topEventModule?.name ?? ""}
           isLoading={isLoading}
           icon={<Star className={"h-4 w-4"} />}
         />
