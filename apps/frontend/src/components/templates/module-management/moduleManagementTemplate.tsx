@@ -155,7 +155,7 @@ export default function ModManagementTemplate() {
           Create Module
         </Button> */}
 
-        <div className="flex flex-col md:flex-row gap-4 p-5 border-b border-[var(--border)] items-center justify-between bg-[var(--bg-surface)]">
+        <div className="flex flex-col md:flex-row gap-4 p-5 border-b border-[var(--border)] items-start justify-between bg-[var(--bg-surface)]">
           <div className="w-full md:max-w-sm flex-1">
             <Input
               id="input-search-module-code"
@@ -165,8 +165,8 @@ export default function ModManagementTemplate() {
               className="w-full bg-[var(--background)]"
             />
           </div>
-          <div className="  flex items-center text-left gap-x-4 flex-row  bg-[var(--background)] px-2 p-1 rounded-xl ">
-            <label className="focus:text-accent-foreground ">
+          <div className="  flex items-center text-left gap-x-4 bg-[var(--background)] p-2 h-7.5 rounded-md">
+            <label className="focus:text-accent-foreground text-sm">
               Show only enrolled modules
             </label>
             <Checkbox
