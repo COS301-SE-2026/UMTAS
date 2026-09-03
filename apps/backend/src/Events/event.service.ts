@@ -651,13 +651,19 @@ export class EventService {
     db: AppDatabase = this.dbService.db,
   ): Promise<EventDto['venues']> {
     const rows = await db
-      .select({ venueId: Venue.VenueID, venueName: Venue.VenueName })
+      .select({
+        venueId: Venue.VenueID,
+        venueName: Venue.VenueName,
+        buildingId: Venue.BuildingID,
+      })
       .from(EventVenue)
       .innerJoin(Venue, eq(EventVenue.VenueID, Venue.VenueID))
       .where(eq(EventVenue.EventID, eventId));
+
     return rows.map((row) => ({
       venueId: row.venueId,
       venueName: row.venueName ?? '',
+      buildingId: row.buildingId ?? undefined,
     }));
   }
 

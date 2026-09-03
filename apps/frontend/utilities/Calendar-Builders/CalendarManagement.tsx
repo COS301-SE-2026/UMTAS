@@ -78,3 +78,68 @@ export function getAllAcQuery() {
     },
   });
 }
+
+type getPublicAC = paths["/api/academic-calendar/public"]["get"];
+
+export type getPublicAcResp =
+  getPublicAC["responses"]["200"]["content"]["application/json"];
+
+export class GetPublicAcBuilder extends RequestBuilder<
+  undefined,
+  undefined,
+  getPublicAcResp
+> {
+  constructor() {
+    super();
+    this.setUrl("/academic-calendar/public").setMethod(RequestMethod.GET);
+  }
+}
+
+export function getPublicAcQuery() {
+  return queryOptions({
+    queryKey: ["Public-Academic-Calendar"],
+    queryFn: async () => {
+      return await new GetPublicAcBuilder().send({});
+    },
+  });
+}
+
+type UpdateAcSubscriptions =
+  paths["/api/academic-calendar/{id}/subscriptions"]["put"];
+
+export type UpdateAcSubscriptionsPath =
+  UpdateAcSubscriptions["parameters"]["path"];
+export type UpdateAcSubscriptionsBody =
+  UpdateAcSubscriptions["requestBody"]["content"]["application/json"];
+export type UpdateAcSubscriptionsResp =
+  UpdateAcSubscriptions["responses"]["200"]["content"]["application/json"];
+
+export class UpdateAcSubscriptionsBuilder extends RequestBuilder<
+  UpdateAcSubscriptionsPath,
+  UpdateAcSubscriptionsBody,
+  UpdateAcSubscriptionsResp
+> {
+  constructor() {
+    super();
+    this.setUrl("/academic-calendar/{id}/subscriptions").setMethod(
+      RequestMethod.PUT,
+    );
+  }
+}
+
+export const UpdateAcSubscriptionsMutation = mutationOptions({
+  mutationFn: ({
+    paths,
+    body,
+  }: {
+    paths: UpdateAcSubscriptionsPath;
+    body: UpdateAcSubscriptionsBody;
+  }) => {
+    return new UpdateAcSubscriptionsBuilder().send({ paths, body });
+  },
+  onSuccess: () => {
+    getQueryClient().invalidateQueries({
+      queryKey: ["Academic-Calendar"],
+    });
+  },
+});

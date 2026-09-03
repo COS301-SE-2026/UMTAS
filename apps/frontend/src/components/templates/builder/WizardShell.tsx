@@ -10,7 +10,10 @@ import { EventsStep } from "@/components/organisms/builder/EventsStep";
 import { getAllModulesQ } from "./Queries/moduleQueries";
 import { useQuery } from "@tanstack/react-query";
 import { getAllEventsQ } from "./Queries/eventQueries";
-import { UserDetails } from "@/lib/userclass/userClass";
+import {
+  UniversityStateLoading,
+  useUniversityState,
+} from "@/hooks/useUniversityState";
 
 const Steps = [{ label: "Modules" }, { label: "Events" }];
 
@@ -20,21 +23,23 @@ export function WizardShell() {
   const editId = searchParams.get("editId");
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
-  const UniDetails = UserDetails.getUniDetails();
+  const { university, isLoading: isUniversityLoading } = useUniversityState();
 
-  const {
-    data: modules = [],
-    isLoading: modLoading,
-    isError: modError,
-  } = useQuery(getAllModulesQ());
-  const { data: Allevents = [] } = useQuery(getAllEventsQ());
+  const { data: modules = [] } = useQuery({
+    ...getAllModulesQ(),
+    enabled: !isUniversityLoading && university != null,
+  });
+  const { data: Allevents = [] } = useQuery({
+    ...getAllEventsQ(),
+    enabled: !isUniversityLoading && university != null,
+  });
   const events = Allevents.filter(
     (event) =>
       modules.some((mod) => mod.moduleID === event.eventCriteria.moduleId) ||
       event.eventCriteria.moduleId === "TEMP",
   );
 
-  const [isInitialLoading, setIsInitialLoading] = useState(!!editId);
+  const isInitialLoading = !!editId;
 
   function handleStepClick(index: number) {
     setCurrentStep(index);
@@ -129,6 +134,8 @@ export function WizardShell() {
       </>
     );
   }
+
+  if (isUniversityLoading) return <UniversityStateLoading />;
 
   if (isInitialLoading) {
     return (

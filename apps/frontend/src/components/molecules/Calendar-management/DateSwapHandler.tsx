@@ -127,6 +127,7 @@ function DateSwapHtml({
       onSave?.();
     }
   }
+
   function deleteRes() {
     deleteMut({
       paths: {
@@ -135,14 +136,18 @@ function DateSwapHtml({
       },
     });
   }
+
   const minDate = `${academicCalendarID.year}-01-01`;
   const maxDate = `${academicCalendarID.year}-12-31`;
+
   return (
-    <div className="flex flex-row w-full   items-center justify-items-center gap-6 text-center ">
-      <div className="w-full flex flex-col gap-y-2">
-        <div className="w-full grid grid-cols-1 lg:grid-cols-2  gap-x-2">
-          <Label className="text-sm font-medium text-[var(--text-secondary)] flex flex-col">
-            Start Date
+    <div className="flex flex-col w-full gap-y-4">
+      <div className="flex flex-row items-end gap-x-5 w-full">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 w-full">
+          <div className="flex flex-col gap-y-1.5 w-full">
+            <Label className="text-sm font-medium text-[var(--text-primary)] text-left pl-1">
+              Start Date
+            </Label>
             <Input
               data-testid="restriction-Date-Input"
               type="date"
@@ -150,34 +155,34 @@ function DateSwapHtml({
               min={minDate}
               max={maxDate}
               onChange={(e) => {
-                if (e.target.value) {
-                  {
-                    setRestriction((res) => ({
-                      ...res,
-                      startDate: e.target.value,
-                    }));
-                  }
-                }
+                setRestriction((res) => ({
+                  ...res,
+                  startDate: e.target.value,
+                }));
               }}
-              className="h-8 rounded-md border border-[var(--border)] bg-transparent px-2 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--ring)]"
+              className="h-10 w-full rounded-md border border-[var(--border)] bg-transparent px-3 text-left text-sm text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--ring)]"
             />
-          </Label>
-          <Label className="text-sm font-medium text-[var(--text-secondary)] flex flex-col">
-            Day to swap
+          </div>
+
+          <div className="flex flex-col gap-y-1.5 w-full">
+            <Label className="text-sm font-medium text-[var(--text-secondary)] text-left pl-1">
+              Day to swap
+            </Label>
             <Select
               value={restriction?.replacementWeekday ?? "monday"}
               onValueChange={async (e) => {
                 if (e) {
-                  {
-                    setRestriction((res) => ({
-                      ...res,
-                      replacementWeekday: toEnum(e) as RestrictionDays,
-                    }));
-                  }
+                  setRestriction((res) => ({
+                    ...res,
+                    replacementWeekday: toEnum(e) as RestrictionDays,
+                  }));
                 }
               }}
             >
-              <SelectTrigger id="select-year" className="capitalize w-40 ">
+              <SelectTrigger
+                id="select-day"
+                className="h-10 w-full capitalize text-left"
+              >
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="capitalize">
@@ -188,39 +193,18 @@ function DateSwapHtml({
                 ))}
               </SelectContent>
             </Select>
-          </Label>
+          </div>
         </div>
 
-        <Label className="text-sm font-medium text-[var(--text-secondary)] flex flex-col">
-          description
-          <Input
-            data-testid="restriction-dsc-Input"
-            type="text"
-            value={restriction.description}
-            onChange={(e) => {
-              if (e.target.value) {
-                {
-                  setRestriction((res) => ({
-                    ...res,
-                    description: e.target.value,
-                  }));
-                }
-              }
-            }}
-            className="h-8  rounded-md border border-[var(--border)] bg-transparent px-2 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--ring)]"
-          />
-        </Label>
-      </div>
-      <div className="flex flex-col gap-y-5">
         <Button
           id="btn-delete-restriction"
           type="button"
           variant="ghost"
-          hidden={restriction.id == ""}
           size="icon"
+          hidden={restriction.id === ""}
           onClick={deleteRes}
           disabled={deletePending}
-          className="h-10 w-10 flex-shrink-0 border border-[var(--error-text)] text-[var(--text-secondary)] transition-colors duration-[var(--duration-fast)] hover:border-[var(--error-text)] hover:text-[var(--error-text)] hover:bg-[var(--error-bg)]"
+          className="h-10 w-10 flex-shrink-0 border border-[var(--error-text)] text-[var(--text-primary)] transition-colors duration-[var(--duration-fast)] hover:border-[var(--error-text)] hover:text-[var(--error-text)] hover:bg-[var(--error-bg)]"
         >
           <Trash2
             size={16}
@@ -228,37 +212,57 @@ function DateSwapHtml({
             className="text-[var(--error-text)]"
           />
         </Button>
-        <Button
-          id="btn-delete-restriction"
-          type="button"
-          variant="ghost"
-          size="icon"
-          onClick={() => {
-            const check = ValidateRes(restriction);
+      </div>
 
-            if (check.isError) {
-              window.dispatchEvent(
-                new CustomEvent(errorName, {
-                  detail: {
-                    userMessage: check.error,
-                  },
-                }),
-              );
-            } else save();
-          }}
-          disabled={savePending}
-          className="h-10 w-10 flex-shrink-0 border border-[var(--success-text)] text-[var(--text-secondary)] transition-colors duration-[var(--duration-fast)] hover:border-[var(--success-text)] hover:text-[var(--success-text)] hover:bg-[var(--success-bg)]"
-        >
-          {savePending ? (
-            <Spinner />
-          ) : (
-            <Save
-              size={16}
-              strokeWidth={1.5}
-              className="text-[var(--success-text)]"
-            />
-          )}
-        </Button>
+      <div className="flex flex-col gap-y-1.5 w-full">
+        <Label className="text-sm font-medium text-[var(--text-primary)] text-left pl-1">
+          Description
+        </Label>
+        <div className="flex flex-row items-center gap-x-5 w-full">
+          <Input
+            data-testid="restriction-dsc-Input"
+            type="text"
+            value={restriction.description}
+            onChange={(e) => {
+              setRestriction((res) => ({
+                ...res,
+                description: e.target.value,
+              }));
+            }}
+            className="h-10 w-full rounded-md border border-[var(--border)] bg-transparent px-3 text-left text-sm text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--ring)]"
+          />
+          <Button
+            id="btn-save-restriction"
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={() => {
+              const check = ValidateRes(restriction);
+
+              if (check.isError) {
+                window.dispatchEvent(
+                  new CustomEvent(errorName, {
+                    detail: {
+                      userMessage: check.error,
+                    },
+                  }),
+                );
+              } else save();
+            }}
+            disabled={savePending}
+            className="h-10 w-10 flex-shrink-0 border border-[var(--success-text)] text-[var(--text-secondary)] transition-colors duration-[var(--duration-fast)] hover:border-[var(--success-text)] hover:text-[var(--success-text)] hover:bg-[var(--success-bg)]"
+          >
+            {savePending ? (
+              <Spinner />
+            ) : (
+              <Save
+                size={16}
+                strokeWidth={1.5}
+                className="text-[var(--success-text)]"
+              />
+            )}
+          </Button>
+        </div>
       </div>
     </div>
   );

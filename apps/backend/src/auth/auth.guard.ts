@@ -52,6 +52,9 @@ export class AuthGuard implements CanActivate {
 
     let session: SessionData | null;
     try {
+      // The cookie cache is kept on purpose (see auth.ts); the userExistsById
+      // check below is what authoritatively rejects an identity whose user row
+      // is gone, so a cached session can never reach application FKs.
       const result = await auth.api.getSession({ headers });
       const rawSession = result as AuthSession | null;
       session = rawSession ? normalizeSession(rawSession) : null;
@@ -65,6 +68,13 @@ export class AuthGuard implements CanActivate {
 
     if (!session) {
       throw new UnauthorizedException('No active session');
+    }
+
+    // Secondary session storage can also survive a database reset. Never pass
+    // a cached identity into application tables unless its user row still
+    // exists in the authoritative database.
+    if (!(await this.authService.userExistsById(session.user.id))) {
+      throw new UnauthorizedException('Session user no longer exists');
     }
 
     const cookieValue = headers.get('cookie') ?? '';

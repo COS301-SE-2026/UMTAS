@@ -1,21 +1,23 @@
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { SwaggerModule, DocumentBuilder, OpenAPIObject } from '@nestjs/swagger';
-import { collectDefaultMetrics, register } from 'prom-client';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import type { OpenAPIObject } from '@nestjs/swagger';
 import type { NextFunction, Request, Response } from 'express';
+import { mkdir, writeFile } from 'fs/promises';
 import { join } from 'path';
+import { PostHog } from 'posthog-node';
+import { PostHogInterceptor } from 'posthog-node/nestjs';
+import { collectDefaultMetrics, register } from 'prom-client';
+
 import { AppModule } from './app.module';
+import { StandardErrorFilter } from './common/standard-error.filter';
+import { completeOpenApiContract } from './swagger-contract';
 import {
   swaggerCustomCss,
   swaggerCustomJs,
   swaggerFaviconUrl,
 } from './swagger-theme';
-
-import { PostHog } from 'posthog-node';
-import { PostHogInterceptor } from 'posthog-node/nestjs';
-
-import { ValidationPipe } from '@nestjs/common';
-import { mkdir, writeFile } from 'fs/promises';
 
 async function bootstrap() {
   process.on('unhandledRejection', (reason, promise) => {
@@ -54,6 +56,7 @@ async function bootstrap() {
   app.set('trust proxy', 1);
   app.useStaticAssets(join(__dirname, '..', 'public'));
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+  app.useGlobalFilters(new StandardErrorFilter());
   const port = process.env.PORT ?? 3000;
   console.log(`[STARTUP] Starting UMTAS API on port ${port}...`);
 
@@ -101,6 +104,7 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, swaggerConfig);
+  completeOpenApiContract(document);
   SwaggerModule.setup('api/docs', app, document, {
     customSiteTitle: 'UMTAS API Docs',
     customfavIcon: swaggerFaviconUrl,
@@ -117,7 +121,7 @@ async function bootstrap() {
   });
 
   if (process.env.NODE_ENV === 'development') {
-    await generateOpenapi(document);
+    await writeOpenApiDocument(document);
   }
 
   console.log(
@@ -133,7 +137,7 @@ bootstrap().catch((err) => {
   process.exit(1);
 });
 
-async function generateOpenapi(document: OpenAPIObject) {
+async function writeOpenApiDocument(document: OpenAPIObject): Promise<void> {
   try {
     const outDir = './docs';
     await mkdir(outDir, { recursive: true });

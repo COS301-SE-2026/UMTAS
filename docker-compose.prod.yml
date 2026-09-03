@@ -146,9 +146,12 @@ services:
     environment:
       - PORT=${BACKEND_PORT}
       - NODE_ENV=production
+      - NODE_OPTIONS=--dns-result-order=ipv4first --network-family-autoselection-attempt-timeout=2000
       - DATABASE_URL=${DATABASE_URL}
       - DB_MODE=${DB_MODE}
       - SEED=${SEED}
+      - SEED_COS_ADMIN_EMAIL=${SEED_COS_ADMIN_EMAIL}
+      - SEED_COS_ADMIN_PASSWORD=${SEED_COS_ADMIN_PASSWORD}
       - SEED_SYSTEM_ADMIN_NAME=${SEED_SYSTEM_ADMIN_NAME}
       - SEED_SYSTEM_ADMIN_EMAIL=${SEED_SYSTEM_ADMIN_EMAIL}
       - SEED_SYSTEM_ADMIN_PASSWORD=${SEED_SYSTEM_ADMIN_PASSWORD}
@@ -177,6 +180,8 @@ services:
       - SMTP_USER=${SMTP_USER:-}
       - SMTP_PASS=${SMTP_PASS:-}
       - SMTP_FROM=${SMTP_FROM:-UMTAS <noreply@${PROD_APP_DOMAIN}>}
+      - SIMULATION_API_KEY=${SIMULATION_API_KEY}
+      - ORS_API_KEY=${ORS_API_KEY}
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=gateway"
@@ -205,6 +210,8 @@ services:
       - COOKIE_PREFIX=umtas-production
       - NEXT_PUBLIC_POSTHOG_PT=${NEXT_PUBLIC_POSTHOG_PT}
       - NEXT_PUBLIC_POSTHOG_API_HOST=${NEXT_PUBLIC_POSTHOG_API_HOST}
+      - NEXT_PUBLIC_MAP_KEY=${NEXT_PUBLIC_MAP_KEY}
+      - NEXT_PUBLIC_MAP_ID=${NEXT_PUBLIC_MAP_ID}
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=gateway"

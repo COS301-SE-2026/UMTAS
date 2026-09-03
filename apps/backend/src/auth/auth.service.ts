@@ -51,6 +51,15 @@ export class AuthService implements OnModuleInit {
     return result.length > 0;
   }
 
+  async userExistsById(userId: string): Promise<boolean> {
+    const result = await this.databaseService.db
+      .select({ id: appSchema.usersTable.id })
+      .from(appSchema.usersTable)
+      .where(eq(appSchema.usersTable.id, userId))
+      .limit(1);
+    return result.length > 0;
+  }
+
   getAuth(): AuthInstance {
     if (this.authInitialized && this.authInstance) {
       return this.authInstance;

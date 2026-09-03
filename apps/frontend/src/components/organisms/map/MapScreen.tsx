@@ -8,6 +8,7 @@ import { Alert, AlertDescription } from "@/components/atoms/baseShadcn/alert";
 import { UserDetails } from "@/lib/userclass/userClass";
 import { Map } from "@vis.gl/react-google-maps";
 import { useMemo } from "react";
+import { APIProvider } from "@vis.gl/react-google-maps";
 
 interface MapScreenProps {
   children?: React.ReactNode;
@@ -78,7 +79,7 @@ export function MapScreen({ children, onRequestMapSetup }: MapScreenProps) {
   return (
     <Map
       style={mapStyle}
-      mapId={process.env.NEXT_PUBLIC_MAP_KEY || "DEMO_MAP_ID"} //should work
+      mapId={process.env.NEXT_PUBLIC_MAP_ID}
       defaultBounds={mapRestriction?.latLngBounds}
       defaultZoom={config.DefaultZoom}
       restriction={mapRestriction}

@@ -11,6 +11,10 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /**
+     * GET /api
+     * @description GET /api. This App operation is part of the versioned UMTAS HTTP contract.
+     */
     get: operations["AppController_getHello"];
     put?: never;
     post?: never;
@@ -29,7 +33,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** Register with email and password */
+    /**
+     * Register with email and password
+     * @description Register with email and password. This Auth operation is part of the versioned UMTAS HTTP contract.
+     */
     post: operations["signUpEmail"];
     delete?: never;
     options?: never;
@@ -46,7 +53,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** Sign in with email and password */
+    /**
+     * Sign in with email and password
+     * @description Sign in with email and password. This Auth operation is part of the versioned UMTAS HTTP contract.
+     */
     post: operations["signInEmail"];
     delete?: never;
     options?: never;
@@ -63,7 +73,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** Sign out and invalidate the current session */
+    /**
+     * Sign out and invalidate the current session
+     * @description Sign out and invalidate the current session. This Auth operation is part of the versioned UMTAS HTTP contract.
+     */
     post: operations["signOut"];
     delete?: never;
     options?: never;
@@ -78,7 +91,10 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** Get the current user session */
+    /**
+     * Get the current user session
+     * @description Get the current user session. This Auth operation is part of the versioned UMTAS HTTP contract.
+     */
     get: operations["getSession"];
     put?: never;
     post?: never;
@@ -95,7 +111,10 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** List all active sessions for the current user */
+    /**
+     * List all active sessions for the current user
+     * @description List all active sessions for the current user. This Auth operation is part of the versioned UMTAS HTTP contract.
+     */
     get: operations["listSessions"];
     put?: never;
     post?: never;
@@ -114,7 +133,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** Terminate a specific session by ID */
+    /**
+     * Terminate a specific session by ID
+     * @description Terminate a specific session by ID. This Auth operation is part of the versioned UMTAS HTTP contract.
+     */
     post: operations["revokeSession"];
     delete?: never;
     options?: never;
@@ -131,7 +153,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** Send a verification email to the signed-in user */
+    /**
+     * Send a verification email to the signed-in user
+     * @description Send a verification email to the signed-in user. This Auth operation is part of the versioned UMTAS HTTP contract.
+     */
     post: operations["sendVerificationEmail"];
     delete?: never;
     options?: never;
@@ -148,7 +173,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** Verify email address using the code from the verification email */
+    /**
+     * Verify email address using the code from the verification email
+     * @description Verify email address using the code from the verification email. This Auth operation is part of the versioned UMTAS HTTP contract.
+     */
     post: operations["verifyEmail"];
     delete?: never;
     options?: never;
@@ -165,7 +193,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** Request a password reset email */
+    /**
+     * Request a password reset email
+     * @description Request a password reset email. This Auth operation is part of the versioned UMTAS HTTP contract.
+     */
     post: operations["forgetPassword"];
     delete?: never;
     options?: never;
@@ -182,7 +213,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** Reset password using the token from the reset email */
+    /**
+     * Reset password using the token from the reset email
+     * @description Reset password using the token from the reset email. This Auth operation is part of the versioned UMTAS HTTP contract.
+     */
     post: operations["resetPassword"];
     delete?: never;
     options?: never;
@@ -199,7 +233,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** Change password for the signed-in user */
+    /**
+     * Change password for the signed-in user
+     * @description Change password for the signed-in user. This Auth operation is part of the versioned UMTAS HTTP contract.
+     */
     post: operations["changePassword"];
     delete?: never;
     options?: never;
@@ -236,7 +273,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** Link a Google account to the current user */
+    /**
+     * Link a Google account to the current user
+     * @description Link a Google account to the current user. This Auth operation is part of the versioned UMTAS HTTP contract.
+     */
     post: operations["linkGoogleAccount"];
     delete?: never;
     options?: never;
@@ -253,7 +293,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** Create a new user - requires sys_admin role */
+    /**
+     * Create a new user - requires sys_admin role
+     * @description Create a new user - requires sys_admin role. This Auth operation is part of the versioned UMTAS HTTP contract.
+     */
     post: operations["adminCreateUser"];
     delete?: never;
     options?: never;
@@ -291,7 +334,10 @@ export interface paths {
     get?: never;
     put?: never;
     post?: never;
-    /** Delete all mock users */
+    /**
+     * Delete all mock users
+     * @description Delete all mock users. This Auth operation is part of the versioned UMTAS HTTP contract.
+     */
     delete: operations["adminDeleteMockUsers"];
     options?: never;
     head?: never;
@@ -307,7 +353,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** Impersonate a user - requires sys_admin role */
+    /**
+     * Impersonate a user - requires sys_admin role
+     * @description Impersonate a user - requires sys_admin role. This Auth operation is part of the versioned UMTAS HTTP contract.
+     */
     post: operations["adminImpersonateUser"];
     delete?: never;
     options?: never;
@@ -324,7 +373,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** Ban a user - requires sys_admin role */
+    /**
+     * Ban a user - requires sys_admin role
+     * @description Ban a user - requires sys_admin role. This Auth operation is part of the versioned UMTAS HTTP contract.
+     */
     post: operations["adminBanUser"];
     delete?: never;
     options?: never;
@@ -341,7 +393,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** Update a user's details - requires sys_admin role */
+    /**
+     * Update a user's details - requires sys_admin role
+     * @description Update a user's details - requires sys_admin role. This Auth operation is part of the versioned UMTAS HTTP contract.
+     */
     post: operations["adminUpdateUser"];
     delete?: never;
     options?: never;
@@ -358,7 +413,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** Select current university */
+    /**
+     * Select current university
+     * @description Select current university. This Auth operation is part of the versioned UMTAS HTTP contract.
+     */
     post: operations["AuthController_selectUniversity"];
     delete?: never;
     options?: never;
@@ -373,6 +431,10 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /**
+     * GET /api/health
+     * @description GET /api/health. This Health operation is part of the versioned UMTAS HTTP contract.
+     */
     get: operations["HealthController_live"];
     put?: never;
     post?: never;
@@ -389,6 +451,10 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /**
+     * GET /api/health/check
+     * @description GET /api/health/check. This Health operation is part of the versioned UMTAS HTTP contract.
+     */
     get: operations["HealthController_check"];
     put?: never;
     post?: never;
@@ -448,6 +514,26 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/modules/v2/{moduleId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get a module by ID - V2
+     * @description Return a module from its moduleID
+     */
+    get: operations["getModuleByIdV2"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/modules/{moduleId}": {
     parameters: {
       query?: never;
@@ -476,26 +562,6 @@ export interface paths {
     patch: operations["updateModule"];
     trace?: never;
   };
-  "/api/modules/v2/{moduleId}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Get a module by ID - V2
-     * @description Return a module from its moduleID
-     */
-    get: operations["getModuleByIdV2"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   "/api/modules/enroll/{moduleId}": {
     parameters: {
       query?: never;
@@ -503,14 +569,20 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** Enrol student to module */
+    /**
+     * Enrol student to module
+     * @description Enrol student to module. This Modules operation is part of the versioned UMTAS HTTP contract.
+     */
     get: operations["enrolStudentToModule"];
     put?: never;
     post?: never;
     delete?: never;
     options?: never;
     head?: never;
-    /** Enrol student to module - V2 */
+    /**
+     * Enrol student to module - V2
+     * @description Enrol student to module - V2. This Modules operation is part of the versioned UMTAS HTTP contract.
+     */
     patch: operations["enrolStudentToModuleV2"];
     trace?: never;
   };
@@ -522,7 +594,10 @@ export interface paths {
       cookie?: never;
     };
     get?: never;
-    /** Populate Course with modules array */
+    /**
+     * Populate Course with modules array
+     * @description Populate Course with modules array. This Modules operation is part of the versioned UMTAS HTTP contract.
+     */
     put: operations["addModulesToCourse"];
     post?: never;
     delete?: never;
@@ -551,6 +626,26 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/modules/statistics": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Module Statistics
+     * @description Module Statistics. This Modules operation is part of the versioned UMTAS HTTP contract.
+     */
+    get: operations["moduleStatistics"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/Courses": {
     parameters: {
       query?: never;
@@ -560,7 +655,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** Create a Course */
+    /**
+     * Create a Course
+     * @description Create a Course. This Courses operation is part of the versioned UMTAS HTTP contract.
+     */
     post: operations["createCourse"];
     delete?: never;
     options?: never;
@@ -577,7 +675,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** Get all courses */
+    /**
+     * Get all courses
+     * @description Get all courses. This Courses operation is part of the versioned UMTAS HTTP contract.
+     */
     post: operations["getCourses"];
     delete?: never;
     options?: never;
@@ -605,25 +706,6 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/Courses/{CourseId}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** get a Course by ID */
-    get: operations["getCourseById"];
-    put?: never;
-    post?: never;
-    /** Delete Course by Course ID */
-    delete: operations["deleteCourse"];
-    options?: never;
-    head?: never;
-    /** Update an Course */
-    patch: operations["updateCourse"];
-    trace?: never;
-  };
   "/api/Courses/v2/{CourseId}": {
     parameters: {
       query?: never;
@@ -631,8 +713,59 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** get a Course by ID - V2 */
+    /**
+     * get a Course by ID - V2
+     * @description get a Course by ID - V2. This Courses operation is part of the versioned UMTAS HTTP contract.
+     */
     get: operations["getCourseByIdV2"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/Courses/{CourseId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * get a Course by ID
+     * @description get a Course by ID. This Courses operation is part of the versioned UMTAS HTTP contract.
+     */
+    get: operations["getCourseById"];
+    put?: never;
+    post?: never;
+    /**
+     * Delete Course by Course ID
+     * @description Delete Course by Course ID. This Courses operation is part of the versioned UMTAS HTTP contract.
+     */
+    delete: operations["deleteCourse"];
+    options?: never;
+    head?: never;
+    /**
+     * Update an Course
+     * @description Update an Course. This Courses operation is part of the versioned UMTAS HTTP contract.
+     */
+    patch: operations["updateCourse"];
+    trace?: never;
+  };
+  "/api/Courses/statistics": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Course Statistics
+     * @description Course Statistics. This Courses operation is part of the versioned UMTAS HTTP contract.
+     */
+    get: operations["courseStatistics"];
     put?: never;
     post?: never;
     delete?: never;
@@ -648,11 +781,37 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** Get all universities */
+    /**
+     * Get all universities
+     * @description Get all universities. This Universities operation is part of the versioned UMTAS HTTP contract.
+     */
     get: operations["getUniversities"];
     put?: never;
-    /** Create a University */
+    /**
+     * Create a University
+     * @description Create a University. This Universities operation is part of the versioned UMTAS HTTP contract.
+     */
     post: operations["UniversityController_create"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/universities/role/{universityId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * get a users role by universityID
+     * @description get a users role by universityID. This Universities operation is part of the versioned UMTAS HTTP contract.
+     */
+    get: operations["getUserRoleByUniID"];
+    put?: never;
+    post?: never;
     delete?: never;
     options?: never;
     head?: never;
@@ -666,33 +825,25 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** get a university by ID */
+    /**
+     * get a university by ID
+     * @description get a university by ID. This Universities operation is part of the versioned UMTAS HTTP contract.
+     */
     get: operations["getUniversityById"];
     put?: never;
     post?: never;
-    /** Delete university by university ID */
+    /**
+     * Delete university by university ID
+     * @description Delete university by university ID. This Universities operation is part of the versioned UMTAS HTTP contract.
+     */
     delete: operations["deleteUniversity"];
     options?: never;
     head?: never;
-    /** Update an university */
+    /**
+     * Update an university
+     * @description Update an university. This Universities operation is part of the versioned UMTAS HTTP contract.
+     */
     patch: operations["updateUniversity"];
-    trace?: never;
-  };
-  "/api/universities/role/{universityId}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** get a users role by universityID */
-    get: operations["getUserRoleByUniID"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
     trace?: never;
   };
   "/api/universities/applications/{universityID}": {
@@ -704,7 +855,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** Get all applications for a specific university */
+    /**
+     * Get all applications for a specific university
+     * @description Get all applications for a specific university. This Universities operation is part of the versioned UMTAS HTTP contract.
+     */
     post: operations["getAllApplications"];
     delete?: never;
     options?: never;
@@ -752,6 +906,26 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/universities/statistics": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * University statistics
+     * @description Return count of (courses, modules, events) for users unviersity
+     */
+    get: operations["universityStatistics"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/grouping/{groupId}": {
     parameters: {
       query?: never;
@@ -785,7 +959,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** Create an event - V2 */
+    /**
+     * Create an event - V2
+     * @description Create an event - V2. This Events operation is part of the versioned UMTAS HTTP contract.
+     */
     post: operations["createEventV2"];
     delete?: never;
     options?: never;
@@ -806,7 +983,10 @@ export interface paths {
      */
     get: operations["getAllEvents"];
     put?: never;
-    /** Create an event */
+    /**
+     * Create an event
+     * @description Create an event. This Events operation is part of the versioned UMTAS HTTP contract.
+     */
     post: operations["createEvent"];
     delete?: never;
     options?: never;
@@ -821,7 +1001,10 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** Get event by ID */
+    /**
+     * Get event by ID
+     * @description Get event by ID. This Events operation is part of the versioned UMTAS HTTP contract.
+     */
     get: operations["getEventById"];
     put?: never;
     post?: never;
@@ -841,11 +1024,17 @@ export interface paths {
     get?: never;
     put?: never;
     post?: never;
-    /** Delete an event */
+    /**
+     * Delete an event
+     * @description Delete an event. This Events operation is part of the versioned UMTAS HTTP contract.
+     */
     delete: operations["deleteEvent"];
     options?: never;
     head?: never;
-    /** Update an event */
+    /**
+     * Update an event
+     * @description Update an event. This Events operation is part of the versioned UMTAS HTTP contract.
+     */
     patch: operations["updateEvent"];
     trace?: never;
   };
@@ -862,8 +1051,51 @@ export interface paths {
     delete?: never;
     options?: never;
     head?: never;
-    /** Validate an event */
+    /**
+     * Validate an event
+     * @description Validate an event. This Events operation is part of the versioned UMTAS HTTP contract.
+     */
     patch: operations["validateEvent"];
+    trace?: never;
+  };
+  "/api/events/statistics/week": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Event statistics - week
+     * @description Event statistics - week. This Events operation is part of the versioned UMTAS HTTP contract.
+     */
+    get: operations["eventStatisticsWeek"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/events/statistics/venue": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Event statistics - venue
+     * @description Event statistics - venue. This Events operation is part of the versioned UMTAS HTTP contract.
+     */
+    get: operations["eventStatisticsVenue"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
     trace?: never;
   };
   "/api/events/{id}/venue": {
@@ -879,7 +1111,10 @@ export interface paths {
     delete?: never;
     options?: never;
     head?: never;
-    /** Attach or clear an event's venue */
+    /**
+     * Attach or clear an event's venue
+     * @description Attach or clear an event's venue. This Events operation is part of the versioned UMTAS HTTP contract.
+     */
     patch: operations["updateEventVenue"];
     trace?: never;
   };
@@ -890,10 +1125,16 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** Get all timetables */
+    /**
+     * Get all timetables
+     * @description Get all timetables. This Timetables operation is part of the versioned UMTAS HTTP contract.
+     */
     get: operations["getAllTimetables"];
     put?: never;
-    /** Create a timetable - user owned */
+    /**
+     * Create a timetable - user owned
+     * @description Create a timetable - user owned. This Timetables operation is part of the versioned UMTAS HTTP contract.
+     */
     post: operations["createTimetable"];
     delete?: never;
     options?: never;
@@ -908,7 +1149,10 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** Get all timetables */
+    /**
+     * Get all timetables
+     * @description Get all timetables. This Timetables operation is part of the versioned UMTAS HTTP contract.
+     */
     get: operations["getAllTimetablesV2"];
     put?: never;
     post?: never;
@@ -925,15 +1169,24 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** Get timetable by ID */
+    /**
+     * Get timetable by ID
+     * @description Get timetable by ID. This Timetables operation is part of the versioned UMTAS HTTP contract.
+     */
     get: operations["getTimetableById"];
     put?: never;
     post?: never;
-    /** Delete a timetable */
+    /**
+     * Delete a timetable
+     * @description Delete a timetable. This Timetables operation is part of the versioned UMTAS HTTP contract.
+     */
     delete: operations["deleteTimetable"];
     options?: never;
     head?: never;
-    /** Update a timetable */
+    /**
+     * Update a timetable
+     * @description Update a timetable. This Timetables operation is part of the versioned UMTAS HTTP contract.
+     */
     patch: operations["updateTimetable"];
     trace?: never;
   };
@@ -944,7 +1197,10 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** Get timetable by ID */
+    /**
+     * Get timetable by ID
+     * @description Get timetable by ID. This Timetables operation is part of the versioned UMTAS HTTP contract.
+     */
     get: operations["getTimetableByIdV2"];
     put?: never;
     post?: never;
@@ -1135,7 +1391,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** Receive final PDF parser worker callback */
+    /**
+     * Receive final PDF parser worker callback
+     * @description Receive final PDF parser worker callback. This PDF Parser operation is part of the versioned UMTAS HTTP contract. Internal worker operation; requires the UMTAS worker bearer token.
+     */
     post: operations["PdfParserController_receiveCallback"];
     delete?: never;
     options?: never;
@@ -1152,7 +1411,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** Persist and enqueue a timetable solve job */
+    /**
+     * Persist and enqueue a timetable solve job
+     * @description Persist and enqueue a timetable solve job. This Solver operation is part of the versioned UMTAS HTTP contract.
+     */
     post: operations["SolverController_submitAndEnqueue"];
     delete?: never;
     options?: never;
@@ -1167,7 +1429,10 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** Build solver input for an authenticated worker */
+    /**
+     * Build solver input for an authenticated worker
+     * @description Build solver input for an authenticated worker. This Solver operation is part of the versioned UMTAS HTTP contract. Internal worker operation; requires the UMTAS worker bearer token.
+     */
     get: operations["SolverController_getInput"];
     put?: never;
     post?: never;
@@ -1184,7 +1449,10 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** Get solver job status and persisted result metadata */
+    /**
+     * Get solver job status and persisted result metadata
+     * @description Get solver job status and persisted result metadata. This Solver operation is part of the versioned UMTAS HTTP contract.
+     */
     get: operations["SolverController_getJob"];
     put?: never;
     post?: never;
@@ -1201,7 +1469,10 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** Get a completed solver result */
+    /**
+     * Get a completed solver result
+     * @description Get a completed solver result. This Solver operation is part of the versioned UMTAS HTTP contract.
+     */
     get: operations["SolverController_getJobResult"];
     put?: never;
     post?: never;
@@ -1220,7 +1491,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** Receive final solver worker callback */
+    /**
+     * Receive final solver worker callback
+     * @description Receive final solver worker callback. This Solver operation is part of the versioned UMTAS HTTP contract. Internal worker operation; requires the UMTAS worker bearer token.
+     */
     post: operations["SolverController_receiveCallback"];
     delete?: never;
     options?: never;
@@ -1235,10 +1509,16 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** Get all attendance records for user or with filters */
+    /**
+     * Get all attendance records for user or with filters
+     * @description Get all attendance records for user or with filters. This Attendance operation is part of the versioned UMTAS HTTP contract.
+     */
     get: operations["getAllAttendance"];
     put?: never;
-    /** Create attendance record for current user for an event */
+    /**
+     * Create attendance record for current user for an event
+     * @description Create attendance record for current user for an event. This Attendance operation is part of the versioned UMTAS HTTP contract.
+     */
     post: operations["createAttendance"];
     delete?: never;
     options?: never;
@@ -1253,15 +1533,24 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** Get attendance record by attendanceID */
+    /**
+     * Get attendance record by attendanceID
+     * @description Get attendance record by attendanceID. This Attendance operation is part of the versioned UMTAS HTTP contract.
+     */
     get: operations["getAttendanceById"];
     put?: never;
     post?: never;
-    /** Delete an attendance record - effectively making attendance NOT_STATED */
+    /**
+     * Delete an attendance record - effectively making attendance NOT_STATED
+     * @description Delete an attendance record - effectively making attendance NOT_STATED. This Attendance operation is part of the versioned UMTAS HTTP contract.
+     */
     delete: operations["deleteAttendance"];
     options?: never;
     head?: never;
-    /** Update date or state of attendance */
+    /**
+     * Update date or state of attendance
+     * @description Update date or state of attendance. This Attendance operation is part of the versioned UMTAS HTTP contract.
+     */
     patch: operations["updateAttendance"];
     trace?: never;
   };
@@ -1338,7 +1627,10 @@ export interface paths {
      */
     get: operations["BuildingController_getAllBuildings"];
     put?: never;
-    /** Create a building as uni admin */
+    /**
+     * Create a building as uni admin
+     * @description Create a building as uni admin. This Buildings operation is part of the versioned UMTAS HTTP contract.
+     */
     post: operations["BuildingController_createBuilding"];
     delete?: never;
     options?: never;
@@ -1373,9 +1665,15 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** Get map settings for the selected university */
+    /**
+     * Get map settings for the selected university
+     * @description Get map settings for the selected university. This Map Config operation is part of the versioned UMTAS HTTP contract.
+     */
     get: operations["MapConfigController_getMapConfig"];
-    /** Set or update map settings for the selected university */
+    /**
+     * Set or update map settings for the selected university
+     * @description Set or update map settings for the selected university. This Map Config operation is part of the versioned UMTAS HTTP contract.
+     */
     put: operations["MapConfigController_update"];
     post?: never;
     delete?: never;
@@ -2097,6 +2395,11 @@ export interface components {
       /** Format: uuid */
       venueId: string;
       venueName: string;
+      /**
+       * Format: uuid
+       * @description The ID of the building the venue belongs to
+       */
+      buildingId?: string | null;
     };
     EventDto: {
       /** Format: uuid */
@@ -2332,6 +2635,15 @@ export interface components {
        * @example Suceess
        */
       message: string;
+    };
+    ModuleStatsDto: {
+      ModuleID: string;
+      ModuleCode?: string;
+      EventCount: number;
+      EnrolledStudents: number;
+    };
+    ModuleStatsResponseDto: {
+      data: components["schemas"]["ModuleStatsDto"][];
     };
     CreateCourseDto: {
       /**
@@ -2572,6 +2884,16 @@ export interface components {
       CourseName: string;
       /** @example true */
       success: boolean;
+    };
+    CourseModuleStatsDto: {
+      CourseID: string;
+      CourseName?: string;
+      ModuleCount: number;
+      EventCount: number;
+      EnrolledStudents: number;
+    };
+    CourseModuleStatsResponseDto: {
+      data: components["schemas"]["CourseModuleStatsDto"][];
     };
     CreateUniversityDto: {
       /**
@@ -2819,6 +3141,14 @@ export interface components {
       /** @example true */
       success: boolean;
     };
+    UniversityCourseStatsResponseDto: {
+      UniversityID: string;
+      UniversityName?: string;
+      CourseCount: number;
+      ModuleCount: number;
+      EventCount: number;
+      EnrolledStudents: number;
+    };
     PopulateGroupBodyDto: {
       /**
        * @description module array to ad dto the group
@@ -2873,6 +3203,11 @@ export interface components {
       validated?: boolean;
       venues?: components["schemas"]["VenueDto"][];
       eventCriteria: components["schemas"]["EventCriteriaDtoV2"];
+      /**
+       * @description Name of venue
+       * @example Main Hall
+       */
+      venueName?: string;
     };
     EventSingleResponseDto: {
       event: components["schemas"]["EventDto"];
@@ -2947,6 +3282,30 @@ export interface components {
     ValidateEventResponseDto: {
       event: components["schemas"]["EventDto"];
       message?: string;
+    };
+    EventStatsWeekDayDto: {
+      /** @enum {string} */
+      dayOfWeek:
+        | "monday"
+        | "tuesday"
+        | "wednesday"
+        | "thursday"
+        | "friday"
+        | "saturday"
+        | "sunday";
+      EventCount: number;
+    };
+    EventStatsWeeklyResponseDto: {
+      data: components["schemas"]["EventStatsWeekDayDto"][];
+    };
+    EventStatsVenueDto: {
+      VenueID: string;
+      VenueName: string;
+      EventCount: number;
+      ProjectedAttendance: number;
+    };
+    EventStatsVenueResponseDto: {
+      data: components["schemas"]["EventStatsVenueDto"][];
     };
     UpdateEventVenueDto: {
       /** @description The venue name */
@@ -3259,11 +3618,7 @@ export interface components {
          * @enum {string}
          */
         "day-to-skip":
-          | "monday"
-          | "tuesday"
-          | "wednesday"
-          | "thursday"
-          | "friday";
+          "monday" | "tuesday" | "wednesday" | "thursday" | "friday";
       };
     };
     SolverPreferencesDto: {
@@ -4028,8 +4383,193 @@ export interface components {
       events: components["schemas"]["EventDto"][];
       message?: string;
     };
+    /** @description Stable UMTAS error envelope. */
+    ErrorResponse: {
+      /**
+       * @description Stable machine-readable error code.
+       * @example PDF_JOB_NOT_FOUND
+       */
+      code: string;
+      /** @example PDF parser job was not found. */
+      message: string;
+      details?: {
+        [key: string]: unknown;
+      };
+      /** @example req_01J... */
+      requestId?: string;
+    };
+    /** @description Request validation failed. */
+    ValidationErrorResponse: components["schemas"]["ErrorResponse"];
+    AcceptedJobResponse: {
+      /** @example true */
+      accepted: boolean;
+      /** Format: uuid */
+      jobId: string;
+      /** @enum {string} */
+      status?: "queued" | "processing" | "completed" | "failed";
+    };
+    /**
+     * @description Asynchronous job lifecycle state.
+     * @enum {string}
+     */
+    JobStatus: "queued" | "processing" | "completed" | "failed";
+    /** @description Terminal asynchronous job failure. */
+    JobError: components["schemas"]["ErrorResponse"];
+    PaginationMetadata: {
+      page: number;
+      pageSize: number;
+      total: number;
+    };
+    /**
+     * Format: uuid
+     * @example 00000000-0000-4000-8000-000000000001
+     */
+    UUID: string;
+    /**
+     * @description 24-hour local time in HH:mm format.
+     * @example 08:30
+     */
+    TimeOfDay: string;
+    /** @description BullMQ job payload sent by the NestJS backend to the PDF parser worker on the `pdf.parse` queue. Runtime authority: `PdfParseJobDataSchema` in `packages/shared-types/src/parser.ts`. */
+    Queue_PdfParseJob: {
+      jobId: string;
+      fileKey: string;
+      adapterKey: string;
+    };
+    /**
+     * Format: binary
+     * @description PDF bytes written by the backend and downloaded by the parser worker using the `fileKey` from `Queue_PdfParseJob`.
+     */
+    Object_PdfUpload: string;
+    /** @description BullMQ job payload sent by the NestJS backend to the solver worker on the `timetable.solve` queue. Runtime authority: `TimetableSolveJobDataSchema` in `packages/shared-types/src/solver.ts`. */
+    Queue_TimetableSolveJob: {
+      jobId: string;
+      /** Format: uuid */
+      attemptToken: string;
+      /** @enum {string} */
+      solveMode: "feasibility" | "optimization";
+      /**
+       * @default auto
+       * @enum {string}
+       */
+      engine: "auto" | "cp-sat" | "ga";
+    };
+    /** @description Structured parser result produced by the PDF parser worker. Every event is either recurring (`isRecurring: true`, `day` set, `date: null`) or dated (`isRecurring: false`, `date` set, `day: null`). Runtime rule: `startTime` must be earlier than `endTime`. */
+    Worker_PdfParserResult: components["schemas"]["PdfParserResultDto"];
+    /** @description JSON written to stdout by the Python parser after a successful parse. */
+    Cli_PdfParserOutput: components["schemas"]["Worker_PdfParserResult"];
+    /** @description Scheduling problem and preferences returned by the backend to the solver worker and written as the native solver input JSON file. Each scheduling event must contain exactly one of `date` or `dayOfWeek`, and `startTime` must be earlier than `endTime`. */
+    Worker_SolverInput: components["schemas"]["SolverInputDto"];
+    /** @description Normalized solver result returned by the solver worker. Runtime rules: `metadata.conflictCount` equals `metadata.conflicts.length`; `outcome` is `conflict-free` when the count is zero and `best-effort` otherwise. */
+    Worker_SolverResult: components["schemas"]["SolverResultDto"];
+    /** @description Discriminated HTTP callback sent by the PDF parser worker. A completed callback contains only `status` and `result`; a failed callback contains only `status` and `error`. */
+    Http_PdfParserCallback:
+      | {
+          /** @enum {string} */
+          status: "completed";
+          result: components["schemas"]["Worker_PdfParserResult"];
+        }
+      | {
+          /** @enum {string} */
+          status: "failed";
+          error: components["schemas"]["WorkerCallbackErrorDto"];
+        };
+    /** @description Discriminated HTTP callback sent by the solver worker. A completed callback contains only `status` and `result`; a failed callback contains only `status` and `error`. */
+    Http_SolverCallback:
+      | {
+          /** @enum {string} */
+          status: "completed";
+          result: components["schemas"]["Worker_SolverResult"];
+        }
+      | {
+          /** @enum {string} */
+          status: "failed";
+          error: components["schemas"]["WorkerCallbackErrorDto"];
+        };
+    /** @description JSON file passed to the native solver with `--input`. Its content is the solver input retrieved from the backend. */
+    Cli_SolverInput: components["schemas"]["Worker_SolverInput"];
+    /** @description JSON file written by the native solver to the `--output` path. Runtime authority: `SolverCliOutputSchema` in `packages/shared-types/src/solver.ts`. A successful process writes exactly one of the feasible or infeasible shapes. */
+    Cli_SolverOutput:
+      | {
+          /** @enum {string} */
+          status: "feasible";
+          /** @enum {string} */
+          outcome: "conflict-free" | "best-effort";
+          timetableSolution: components["schemas"]["TimetableSolutionDto"];
+          /** @default [] */
+          heuristicScores: components["schemas"]["SolverHeuristicScoreDto"][];
+          metadata: components["schemas"]["SolverResultMetadataDto"];
+        }
+      | {
+          /** @enum {string} */
+          status: "infeasible";
+        };
   };
-  responses: never;
+  responses: {
+    /** @description The request is invalid. */
+    BadRequestError: {
+      headers: {
+        [name: string]: unknown;
+      };
+      content: {
+        "application/json": components["schemas"]["ValidationErrorResponse"];
+      };
+    };
+    /** @description Authentication is required. */
+    UnauthorizedError: {
+      headers: {
+        [name: string]: unknown;
+      };
+      content: {
+        "application/json": components["schemas"]["ErrorResponse"];
+      };
+    };
+    /** @description The authenticated principal is not allowed to perform this operation. */
+    ForbiddenError: {
+      headers: {
+        [name: string]: unknown;
+      };
+      content: {
+        "application/json": components["schemas"]["ErrorResponse"];
+      };
+    };
+    /** @description The requested resource was not found. */
+    NotFoundError: {
+      headers: {
+        [name: string]: unknown;
+      };
+      content: {
+        "application/json": components["schemas"]["ErrorResponse"];
+      };
+    };
+    /** @description The request conflicts with current resource state. */
+    ConflictError: {
+      headers: {
+        [name: string]: unknown;
+      };
+      content: {
+        "application/json": components["schemas"]["ErrorResponse"];
+      };
+    };
+    /** @description Too many requests. */
+    RateLimitError: {
+      headers: {
+        [name: string]: unknown;
+      };
+      content: {
+        "application/json": components["schemas"]["ErrorResponse"];
+      };
+    };
+    /** @description An unexpected server error occurred. */
+    InternalError: {
+      headers: {
+        [name: string]: unknown;
+      };
+      content: {
+        "application/json": components["schemas"]["ErrorResponse"];
+      };
+    };
+  };
   parameters: never;
   requestBodies: never;
   headers: never;
@@ -4046,6 +4586,7 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
+      /** @description HTTP 200 response. */
       200: {
         headers: {
           [name: string]: unknown;
@@ -4054,6 +4595,8 @@ export interface operations {
           "application/json": string;
         };
       };
+      400: components["responses"]["BadRequestError"];
+      500: components["responses"]["InternalError"];
     };
   };
   signUpEmail: {
@@ -4087,6 +4630,7 @@ export interface operations {
           "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
+      409: components["responses"]["ConflictError"];
       /** @description Email already registered */
       422: {
         headers: {
@@ -4105,6 +4649,7 @@ export interface operations {
           "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
+      500: components["responses"]["InternalError"];
     };
   };
   signInEmail: {
@@ -4147,6 +4692,7 @@ export interface operations {
           "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
+      409: components["responses"]["ConflictError"];
       /** @description Rate limited */
       429: {
         headers: {
@@ -4156,6 +4702,7 @@ export interface operations {
           "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
+      500: components["responses"]["InternalError"];
     };
   };
   signOut: {
@@ -4176,6 +4723,7 @@ export interface operations {
           "application/json": components["schemas"]["AuthAcknowledgementDto"];
         };
       };
+      400: components["responses"]["BadRequestError"];
       /** @description No active session */
       401: {
         headers: {
@@ -4185,6 +4733,9 @@ export interface operations {
           "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
+      403: components["responses"]["ForbiddenError"];
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
     };
   };
   getSession: {
@@ -4205,6 +4756,10 @@ export interface operations {
           "application/json": components["schemas"]["AuthEnvelopeDto"] | null;
         };
       };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      500: components["responses"]["InternalError"];
     };
   };
   listSessions: {
@@ -4225,6 +4780,7 @@ export interface operations {
           "application/json": components["schemas"]["AuthSessionDto"][];
         };
       };
+      400: components["responses"]["BadRequestError"];
       /** @description Unauthorized */
       401: {
         headers: {
@@ -4234,6 +4790,8 @@ export interface operations {
           "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
+      403: components["responses"]["ForbiddenError"];
+      500: components["responses"]["InternalError"];
     };
   };
   revokeSession: {
@@ -4276,6 +4834,9 @@ export interface operations {
           "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
+      403: components["responses"]["ForbiddenError"];
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
     };
   };
   sendVerificationEmail: {
@@ -4314,6 +4875,8 @@ export interface operations {
           "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
+      403: components["responses"]["ForbiddenError"];
+      409: components["responses"]["ConflictError"];
       /** @description Rate limited */
       429: {
         headers: {
@@ -4323,6 +4886,7 @@ export interface operations {
           "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
+      500: components["responses"]["InternalError"];
     };
   };
   verifyEmail: {
@@ -4356,6 +4920,8 @@ export interface operations {
           "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
     };
   };
   forgetPassword: {
@@ -4380,6 +4946,8 @@ export interface operations {
           "application/json": components["schemas"]["AuthAcknowledgementDto"];
         };
       };
+      400: components["responses"]["BadRequestError"];
+      409: components["responses"]["ConflictError"];
       /** @description Rate limited */
       429: {
         headers: {
@@ -4389,6 +4957,7 @@ export interface operations {
           "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
+      500: components["responses"]["InternalError"];
     };
   };
   resetPassword: {
@@ -4422,6 +4991,8 @@ export interface operations {
           "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
     };
   };
   changePassword: {
@@ -4464,6 +5035,9 @@ export interface operations {
           "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
+      403: components["responses"]["ForbiddenError"];
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
     };
   };
   googleOAuthCallback: {
@@ -4496,6 +5070,7 @@ export interface operations {
           "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
+      500: components["responses"]["InternalError"];
     };
   };
   linkGoogleAccount: {
@@ -4538,6 +5113,8 @@ export interface operations {
           "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
+      403: components["responses"]["ForbiddenError"];
+      409: components["responses"]["ConflictError"];
       /** @description The Google account email is already in use by another account */
       422: {
         headers: {
@@ -4547,6 +5124,7 @@ export interface operations {
           "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
+      500: components["responses"]["InternalError"];
     };
   };
   adminCreateUser: {
@@ -4571,6 +5149,7 @@ export interface operations {
           "application/json": components["schemas"]["AuthUserResponseDto"];
         };
       };
+      400: components["responses"]["BadRequestError"];
       /** @description Unauthorized */
       401: {
         headers: {
@@ -4589,6 +5168,7 @@ export interface operations {
           "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
+      409: components["responses"]["ConflictError"];
       /** @description Email already registered */
       422: {
         headers: {
@@ -4598,6 +5178,7 @@ export interface operations {
           "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
+      500: components["responses"]["InternalError"];
     };
   };
   adminCreateMockUser: {
@@ -4622,6 +5203,11 @@ export interface operations {
           "application/json": components["schemas"]["CreateMockUserDto"];
         };
       };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
     };
   };
   adminDeleteMockUsers: {
@@ -4642,6 +5228,10 @@ export interface operations {
           "application/json": components["schemas"]["DeleteMockUsersResponseDto"];
         };
       };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      500: components["responses"]["InternalError"];
     };
   };
   adminImpersonateUser: {
@@ -4666,6 +5256,7 @@ export interface operations {
           "application/json": components["schemas"]["AuthEnvelopeDto"];
         };
       };
+      400: components["responses"]["BadRequestError"];
       /** @description Unauthorized */
       401: {
         headers: {
@@ -4684,6 +5275,8 @@ export interface operations {
           "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
     };
   };
   adminBanUser: {
@@ -4708,6 +5301,7 @@ export interface operations {
           "application/json": components["schemas"]["AuthUserResponseDto"];
         };
       };
+      400: components["responses"]["BadRequestError"];
       /** @description Unauthorized */
       401: {
         headers: {
@@ -4735,6 +5329,8 @@ export interface operations {
           "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
     };
   };
   adminUpdateUser: {
@@ -4759,6 +5355,7 @@ export interface operations {
           "application/json": components["schemas"]["AuthUserResponseDto"];
         };
       };
+      400: components["responses"]["BadRequestError"];
       /** @description Unauthorized */
       401: {
         headers: {
@@ -4786,6 +5383,7 @@ export interface operations {
           "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
+      409: components["responses"]["ConflictError"];
       /** @description New email already in use */
       422: {
         headers: {
@@ -4795,6 +5393,7 @@ export interface operations {
           "application/json": components["schemas"]["AuthErrorDto"];
         };
       };
+      500: components["responses"]["InternalError"];
     };
   };
   AuthController_selectUniversity: {
@@ -4819,6 +5418,11 @@ export interface operations {
           "application/json": components["schemas"]["AuthEnvelopeDto"];
         };
       };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
     };
   };
   HealthController_live: {
@@ -4830,12 +5434,15 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
+      /** @description HTTP 200 response. */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content?: never;
       };
+      400: components["responses"]["BadRequestError"];
+      500: components["responses"]["InternalError"];
     };
   };
   HealthController_check: {
@@ -4847,12 +5454,15 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
+      /** @description HTTP 200 response. */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content?: never;
       };
+      400: components["responses"]["BadRequestError"];
+      500: components["responses"]["InternalError"];
     };
   };
   getAllModules: {
@@ -4891,6 +5501,8 @@ export interface operations {
         };
         content?: never;
       };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
       /** @description No modules found matching the filters */
       404: {
         headers: {
@@ -4898,6 +5510,7 @@ export interface operations {
         };
         content?: never;
       };
+      500: components["responses"]["InternalError"];
     };
   };
   ModuleController_createModule: {
@@ -4929,6 +5542,8 @@ export interface operations {
         };
         content?: never;
       };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
       /** @description Module code already exists for course */
       409: {
         headers: {
@@ -4936,6 +5551,7 @@ export interface operations {
         };
         content?: never;
       };
+      500: components["responses"]["InternalError"];
     };
   };
   getAllModulesV2: {
@@ -4976,6 +5592,9 @@ export interface operations {
         };
         content?: never;
       };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      500: components["responses"]["InternalError"];
     };
   };
   ModuleController_createModuleV2: {
@@ -5007,6 +5626,49 @@ export interface operations {
         };
         content?: never;
       };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  getModuleByIdV2: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        moduleId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Module returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ModuleSingleResponseDto"];
+        };
+      };
+      /** @description Invalid module ID */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      /** @description Module not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      500: components["responses"]["InternalError"];
     };
   };
   getModuleById: {
@@ -5036,6 +5698,8 @@ export interface operations {
         };
         content?: never;
       };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
       /** @description Module not found */
       404: {
         headers: {
@@ -5043,6 +5707,7 @@ export interface operations {
         };
         content?: never;
       };
+      500: components["responses"]["InternalError"];
     };
   };
   deleteModule: {
@@ -5072,6 +5737,8 @@ export interface operations {
         };
         content?: never;
       };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
       /** @description Module not found */
       404: {
         headers: {
@@ -5079,6 +5746,7 @@ export interface operations {
         };
         content?: never;
       };
+      500: components["responses"]["InternalError"];
     };
   };
   updateModule: {
@@ -5112,6 +5780,8 @@ export interface operations {
         };
         content?: never;
       };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
       /** @description Module not found */
       404: {
         headers: {
@@ -5126,42 +5796,7 @@ export interface operations {
         };
         content?: never;
       };
-    };
-  };
-  getModuleByIdV2: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        moduleId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Module returned successfully */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["ModuleSingleResponseDto"];
-        };
-      };
-      /** @description Invalid module ID */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Module not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
+      500: components["responses"]["InternalError"];
     };
   };
   enrolStudentToModule: {
@@ -5193,6 +5828,9 @@ export interface operations {
           "application/json": components["schemas"]["EnrolResponseDto"];
         };
       };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
       /** @description Module not found */
       404: {
         headers: {
@@ -5200,6 +5838,7 @@ export interface operations {
         };
         content?: never;
       };
+      500: components["responses"]["InternalError"];
     };
   };
   enrolStudentToModuleV2: {
@@ -5235,6 +5874,9 @@ export interface operations {
           "application/json": components["schemas"]["EnrolResponseDto"];
         };
       };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
       /** @description Module not found */
       404: {
         headers: {
@@ -5242,6 +5884,8 @@ export interface operations {
         };
         content?: never;
       };
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
     };
   };
   addModulesToCourse: {
@@ -5268,6 +5912,9 @@ export interface operations {
           "application/json": components["schemas"]["AddModulesToCourseResponseDto"];
         };
       };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
       /**
        * @description Modules specified in modules array not found
        *
@@ -5279,6 +5926,8 @@ export interface operations {
         };
         content?: never;
       };
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
     };
   };
   updateStyling: {
@@ -5305,6 +5954,9 @@ export interface operations {
           "application/json": components["schemas"]["ModuleStylingResponseDto"];
         };
       };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
       /** @description Module not found */
       404: {
         headers: {
@@ -5312,6 +5964,45 @@ export interface operations {
         };
         content?: never;
       };
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  moduleStatistics: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Modules with statistics returned */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ModuleStatsResponseDto"];
+        };
+      };
+      /** @description No university selected */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      /** @description University not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      500: components["responses"]["InternalError"];
     };
   };
   createCourse: {
@@ -5343,6 +6034,8 @@ export interface operations {
         };
         content?: never;
       };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
       /** @description Course already exists */
       409: {
         headers: {
@@ -5350,6 +6043,7 @@ export interface operations {
         };
         content?: never;
       };
+      500: components["responses"]["InternalError"];
     };
   };
   getCourses: {
@@ -5377,6 +6071,11 @@ export interface operations {
           "application/json": components["schemas"]["CourseListResponseDto"];
         };
       };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
     };
   };
   getCoursesV2: {
@@ -5406,6 +6105,49 @@ export interface operations {
           "application/json": components["schemas"]["CourseListResponseDtoV2"];
         };
       };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  getCourseByIdV2: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        CourseId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Course returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CourseSingleResponseDto"];
+        };
+      };
+      /** @description Invalid Course ID */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      /** @description Course not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      500: components["responses"]["InternalError"];
     };
   };
   getCourseById: {
@@ -5435,6 +6177,8 @@ export interface operations {
         };
         content?: never;
       };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
       /** @description Course not found */
       404: {
         headers: {
@@ -5442,6 +6186,7 @@ export interface operations {
         };
         content?: never;
       };
+      500: components["responses"]["InternalError"];
     };
   };
   deleteCourse: {
@@ -5471,6 +6216,8 @@ export interface operations {
         };
         content?: never;
       };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
       /** @description Course not found */
       404: {
         headers: {
@@ -5478,6 +6225,7 @@ export interface operations {
         };
         content?: never;
       };
+      500: components["responses"]["InternalError"];
     };
   };
   updateCourse: {
@@ -5511,6 +6259,8 @@ export interface operations {
         };
         content?: never;
       };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
       /** @description Course not found */
       404: {
         headers: {
@@ -5518,42 +6268,45 @@ export interface operations {
         };
         content?: never;
       };
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
     };
   };
-  getCourseByIdV2: {
+  courseStatistics: {
     parameters: {
       query?: never;
       header?: never;
-      path: {
-        CourseId: string;
-      };
+      path?: never;
       cookie?: never;
     };
     requestBody?: never;
     responses: {
-      /** @description Course returned successfully */
+      /** @description Courses with statistics returned */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["CourseSingleResponseDto"];
+          "application/json": components["schemas"]["CourseModuleStatsResponseDto"];
         };
       };
-      /** @description Invalid Course ID */
+      /** @description No university selected */
       400: {
         headers: {
           [name: string]: unknown;
         };
         content?: never;
       };
-      /** @description Course not found */
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      /** @description University not found */
       404: {
         headers: {
           [name: string]: unknown;
         };
         content?: never;
       };
+      500: components["responses"]["InternalError"];
     };
   };
   getUniversities: {
@@ -5574,6 +6327,9 @@ export interface operations {
           "application/json": components["schemas"]["UniversityListResponseDto"];
         };
       };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
       /** @description No universities found */
       404: {
         headers: {
@@ -5581,6 +6337,7 @@ export interface operations {
         };
         content?: never;
       };
+      500: components["responses"]["InternalError"];
     };
   };
   UniversityController_create: {
@@ -5612,6 +6369,8 @@ export interface operations {
         };
         content?: never;
       };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
       /** @description University already exists */
       409: {
         headers: {
@@ -5619,6 +6378,46 @@ export interface operations {
         };
         content?: never;
       };
+      500: components["responses"]["InternalError"];
+    };
+  };
+  getUserRoleByUniID: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        universityId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Role returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["UserUniversityRoleResponseDto"];
+        };
+      };
+      /** @description Invalid University ID */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      /** @description University not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      500: components["responses"]["InternalError"];
     };
   };
   getUniversityById: {
@@ -5648,6 +6447,8 @@ export interface operations {
         };
         content?: never;
       };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
       /** @description University not found */
       404: {
         headers: {
@@ -5655,6 +6456,7 @@ export interface operations {
         };
         content?: never;
       };
+      500: components["responses"]["InternalError"];
     };
   };
   deleteUniversity: {
@@ -5684,6 +6486,8 @@ export interface operations {
         };
         content?: never;
       };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
       /** @description University not found */
       404: {
         headers: {
@@ -5691,6 +6495,7 @@ export interface operations {
         };
         content?: never;
       };
+      500: components["responses"]["InternalError"];
     };
   };
   updateUniversity: {
@@ -5724,6 +6529,8 @@ export interface operations {
         };
         content?: never;
       };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
       /** @description University not found */
       404: {
         headers: {
@@ -5731,42 +6538,8 @@ export interface operations {
         };
         content?: never;
       };
-    };
-  };
-  getUserRoleByUniID: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        universityId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Role returned successfully */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["UserUniversityRoleResponseDto"];
-        };
-      };
-      /** @description Invalid University ID */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description University not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
     };
   };
   getAllApplications: {
@@ -5793,6 +6566,9 @@ export interface operations {
           "application/json": components["schemas"]["GetRolesDto"][];
         };
       };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
       /** @description Unauthorized */
       409: {
         headers: {
@@ -5800,6 +6576,7 @@ export interface operations {
         };
         content?: never;
       };
+      500: components["responses"]["InternalError"];
     };
   };
   applyForUniverstiyRole: {
@@ -5832,6 +6609,8 @@ export interface operations {
         };
         content?: never;
       };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
       /** @description University not found */
       404: {
         headers: {
@@ -5846,6 +6625,7 @@ export interface operations {
         };
         content?: never;
       };
+      500: components["responses"]["InternalError"];
     };
   };
   approveUsersRole: {
@@ -5878,6 +6658,8 @@ export interface operations {
         };
         content?: never;
       };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
       /** @description UniversityRole not found */
       404: {
         headers: {
@@ -5892,6 +6674,44 @@ export interface operations {
         };
         content?: never;
       };
+      500: components["responses"]["InternalError"];
+    };
+  };
+  universityStatistics: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Count of courses for user`s university returned */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["UniversityCourseStatsResponseDto"];
+        };
+      };
+      /** @description No university selected */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      /** @description University not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      500: components["responses"]["InternalError"];
     };
   };
   populateGroup: {
@@ -5925,6 +6745,8 @@ export interface operations {
         };
         content?: never;
       };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
       /** @description Group not found */
       404: {
         headers: {
@@ -5932,6 +6754,8 @@ export interface operations {
         };
         content?: never;
       };
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
     };
   };
   createEventV2: {
@@ -5956,6 +6780,11 @@ export interface operations {
           "application/json": components["schemas"]["EventSingleResponseDto"];
         };
       };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
     };
   };
   getAllEvents: {
@@ -5982,6 +6811,7 @@ export interface operations {
           "application/json": components["schemas"]["EventListResponseDtoV2"];
         };
       };
+      400: components["responses"]["BadRequestError"];
       /** @description No active session */
       401: {
         headers: {
@@ -5996,6 +6826,7 @@ export interface operations {
         };
         content?: never;
       };
+      500: components["responses"]["InternalError"];
     };
   };
   createEvent: {
@@ -6041,6 +6872,7 @@ export interface operations {
         };
         content?: never;
       };
+      409: components["responses"]["ConflictError"];
       /** @description Event was not created */
       500: {
         headers: {
@@ -6070,6 +6902,9 @@ export interface operations {
           "application/json": components["schemas"]["EventSingleResponseDto"];
         };
       };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
       /** @description Event not found */
       404: {
         headers: {
@@ -6077,6 +6912,7 @@ export interface operations {
         };
         content?: never;
       };
+      500: components["responses"]["InternalError"];
     };
   };
   deleteEvent: {
@@ -6099,6 +6935,7 @@ export interface operations {
           "application/json": components["schemas"]["DeleteResponseDto"];
         };
       };
+      400: components["responses"]["BadRequestError"];
       /** @description No active session */
       401: {
         headers: {
@@ -6181,6 +7018,7 @@ export interface operations {
         };
         content?: never;
       };
+      409: components["responses"]["ConflictError"];
       /** @description Event was not updated */
       500: {
         headers: {
@@ -6214,6 +7052,9 @@ export interface operations {
           "application/json": components["schemas"]["ValidateEventResponseDto"];
         };
       };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
       /** @description Event not found */
       404: {
         headers: {
@@ -6221,6 +7062,82 @@ export interface operations {
         };
         content?: never;
       };
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  eventStatisticsWeek: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Count of events on each day of the week */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["EventStatsWeeklyResponseDto"];
+        };
+      };
+      /** @description No university selected */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      /** @description University not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      500: components["responses"]["InternalError"];
+    };
+  };
+  eventStatisticsVenue: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Count of events for each venue */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["EventStatsVenueResponseDto"];
+        };
+      };
+      /** @description No university selected */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      /** @description University not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      500: components["responses"]["InternalError"];
     };
   };
   updateEventVenue: {
@@ -6247,6 +7164,8 @@ export interface operations {
           "application/json": components["schemas"]["EventSingleResponseDto"];
         };
       };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
       /** @description Insufficient permissions */
       403: {
         headers: {
@@ -6261,6 +7180,8 @@ export interface operations {
         };
         content?: never;
       };
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
     };
   };
   getAllTimetables: {
@@ -6281,6 +7202,7 @@ export interface operations {
           "application/json": components["schemas"]["TimetableListResponseDto"];
         };
       };
+      400: components["responses"]["BadRequestError"];
       /** @description No active session */
       401: {
         headers: {
@@ -6288,6 +7210,8 @@ export interface operations {
         };
         content?: never;
       };
+      403: components["responses"]["ForbiddenError"];
+      500: components["responses"]["InternalError"];
     };
   };
   createTimetable: {
@@ -6326,6 +7250,8 @@ export interface operations {
         };
         content?: never;
       };
+      403: components["responses"]["ForbiddenError"];
+      409: components["responses"]["ConflictError"];
       /** @description Timetable was not created */
       500: {
         headers: {
@@ -6353,6 +7279,7 @@ export interface operations {
           "application/json": components["schemas"]["TimetableListResponseDtoV2"];
         };
       };
+      400: components["responses"]["BadRequestError"];
       /** @description No active session */
       401: {
         headers: {
@@ -6360,6 +7287,8 @@ export interface operations {
         };
         content?: never;
       };
+      403: components["responses"]["ForbiddenError"];
+      500: components["responses"]["InternalError"];
     };
   };
   getTimetableById: {
@@ -6383,6 +7312,9 @@ export interface operations {
           "application/json": components["schemas"]["TimetableResponseDto"];
         };
       };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
       /** @description Timetable not found */
       404: {
         headers: {
@@ -6390,6 +7322,7 @@ export interface operations {
         };
         content?: never;
       };
+      500: components["responses"]["InternalError"];
     };
   };
   deleteTimetable: {
@@ -6413,6 +7346,7 @@ export interface operations {
           "application/json": components["schemas"]["DeleteTimetableResponseDto"];
         };
       };
+      400: components["responses"]["BadRequestError"];
       /** @description No active session */
       401: {
         headers: {
@@ -6420,6 +7354,7 @@ export interface operations {
         };
         content?: never;
       };
+      403: components["responses"]["ForbiddenError"];
       /** @description Timetable not found */
       404: {
         headers: {
@@ -6475,6 +7410,7 @@ export interface operations {
         };
         content?: never;
       };
+      403: components["responses"]["ForbiddenError"];
       /** @description Timetable not found */
       404: {
         headers: {
@@ -6482,6 +7418,7 @@ export interface operations {
         };
         content?: never;
       };
+      409: components["responses"]["ConflictError"];
       /** @description Timetable was not updated */
       500: {
         headers: {
@@ -6512,6 +7449,9 @@ export interface operations {
           "application/json": components["schemas"]["TimetableResponseDto"];
         };
       };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
       /** @description Timetable[] not found */
       404: {
         headers: {
@@ -6519,6 +7459,7 @@ export interface operations {
         };
         content?: never;
       };
+      500: components["responses"]["InternalError"];
     };
   };
   BuilderController_getPersonalModule: {
@@ -6539,6 +7480,10 @@ export interface operations {
           "application/json": components["schemas"]["ModuleSingleResponseDto"];
         };
       };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      500: components["responses"]["InternalError"];
     };
   };
   BuilderController_getAll: {
@@ -6566,6 +7511,8 @@ export interface operations {
         };
         content?: never;
       };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
       /** @description No modules found matching the filters */
       404: {
         headers: {
@@ -6573,6 +7520,7 @@ export interface operations {
         };
         content?: never;
       };
+      500: components["responses"]["InternalError"];
     };
   };
   BuilderController_createModule: {
@@ -6604,6 +7552,8 @@ export interface operations {
         };
         content?: never;
       };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
       /** @description Module code already exists for course */
       409: {
         headers: {
@@ -6611,6 +7561,7 @@ export interface operations {
         };
         content?: never;
       };
+      500: components["responses"]["InternalError"];
     };
   };
   "builder-getModuleById": {
@@ -6640,6 +7591,8 @@ export interface operations {
         };
         content?: never;
       };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
       /** @description Module not found */
       404: {
         headers: {
@@ -6647,6 +7600,7 @@ export interface operations {
         };
         content?: never;
       };
+      500: components["responses"]["InternalError"];
     };
   };
   "builder-deleteModule": {
@@ -6676,6 +7630,8 @@ export interface operations {
         };
         content?: never;
       };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
       /** @description Module not found */
       404: {
         headers: {
@@ -6683,6 +7639,7 @@ export interface operations {
         };
         content?: never;
       };
+      500: components["responses"]["InternalError"];
     };
   };
   "builder-updateModule": {
@@ -6716,6 +7673,8 @@ export interface operations {
         };
         content?: never;
       };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
       /** @description Module not found */
       404: {
         headers: {
@@ -6730,6 +7689,7 @@ export interface operations {
         };
         content?: never;
       };
+      500: components["responses"]["InternalError"];
     };
   };
   BuilderController_createEvent: {
@@ -6754,6 +7714,9 @@ export interface operations {
           "application/json": components["schemas"]["EventSingleResponseDto"];
         };
       };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
       /** @description Module not found */
       404: {
         headers: {
@@ -6761,6 +7724,8 @@ export interface operations {
         };
         content?: never;
       };
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
     };
   };
   PdfParserController_lookupDuplicate: {
@@ -6785,6 +7750,7 @@ export interface operations {
       };
     };
     responses: {
+      /** @description HTTP 200 response. */
       200: {
         headers: {
           [name: string]: unknown;
@@ -6793,6 +7759,11 @@ export interface operations {
           "application/json": components["schemas"]["PdfParserLookupResponseDto"];
         };
       };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
     };
   };
   PdfParserController_uploadAndEnqueue: {
@@ -6833,6 +7804,7 @@ export interface operations {
       };
     };
     responses: {
+      /** @description HTTP 202 response. */
       202: {
         headers: {
           [name: string]: unknown;
@@ -6841,6 +7813,11 @@ export interface operations {
           "application/json": components["schemas"]["PdfParserUploadResponseDto"];
         };
       };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
     };
   };
   PdfParserController_getJob: {
@@ -6854,6 +7831,7 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
+      /** @description HTTP 200 response. */
       200: {
         headers: {
           [name: string]: unknown;
@@ -6862,6 +7840,11 @@ export interface operations {
           "application/json": components["schemas"]["PdfParserJobResponseDto"];
         };
       };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      404: components["responses"]["NotFoundError"];
+      500: components["responses"]["InternalError"];
     };
   };
   PdfParserController_getJobResult: {
@@ -6875,14 +7858,20 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
+      /** @description HTTP 200 response. */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["PdfParserResultDto"];
+          "application/json": components["schemas"]["Worker_PdfParserResult"];
         };
       };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      404: components["responses"]["NotFoundError"];
+      500: components["responses"]["InternalError"];
     };
   };
   PdfParserController_receiveCallback: {
@@ -6896,10 +7885,11 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": components["schemas"]["PdfParserCallbackDto"];
+        "application/json": components["schemas"]["Http_PdfParserCallback"];
       };
     };
     responses: {
+      /** @description HTTP 202 response. */
       202: {
         headers: {
           [name: string]: unknown;
@@ -6908,6 +7898,11 @@ export interface operations {
           "application/json": components["schemas"]["AcceptedJobResponseDto"];
         };
       };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      404: components["responses"]["NotFoundError"];
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
     };
   };
   SolverController_submitAndEnqueue: {
@@ -6923,6 +7918,7 @@ export interface operations {
       };
     };
     responses: {
+      /** @description HTTP 202 response. */
       202: {
         headers: {
           [name: string]: unknown;
@@ -6931,6 +7927,11 @@ export interface operations {
           "application/json": components["schemas"]["SolverSubmissionResponseDto"];
         };
       };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
     };
   };
   SolverController_getInput: {
@@ -6944,14 +7945,19 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
+      /** @description HTTP 200 response. */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["SolverInputDto"];
+          "application/json": components["schemas"]["Worker_SolverInput"];
         };
       };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      404: components["responses"]["NotFoundError"];
+      500: components["responses"]["InternalError"];
     };
   };
   SolverController_getJob: {
@@ -6965,6 +7971,7 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
+      /** @description HTTP 200 response. */
       200: {
         headers: {
           [name: string]: unknown;
@@ -6973,6 +7980,11 @@ export interface operations {
           "application/json": components["schemas"]["SolverJobResponseDto"];
         };
       };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      404: components["responses"]["NotFoundError"];
+      500: components["responses"]["InternalError"];
     };
   };
   SolverController_getJobResult: {
@@ -6986,14 +7998,20 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
+      /** @description HTTP 200 response. */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["SolverResultDto"];
+          "application/json": components["schemas"]["Worker_SolverResult"];
         };
       };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      404: components["responses"]["NotFoundError"];
+      500: components["responses"]["InternalError"];
     };
   };
   SolverController_receiveCallback: {
@@ -7009,10 +8027,11 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": components["schemas"]["SolverCallbackDto"];
+        "application/json": components["schemas"]["Http_SolverCallback"];
       };
     };
     responses: {
+      /** @description HTTP 202 response. */
       202: {
         headers: {
           [name: string]: unknown;
@@ -7021,6 +8040,11 @@ export interface operations {
           "application/json": components["schemas"]["AcceptedJobResponseDto"];
         };
       };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      404: components["responses"]["NotFoundError"];
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
     };
   };
   getAllAttendance: {
@@ -7041,6 +8065,7 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
+      /** @description HTTP 200 response. */
       200: {
         headers: {
           [name: string]: unknown;
@@ -7049,6 +8074,10 @@ export interface operations {
           "application/json": components["schemas"]["AttendanceListResponse"];
         };
       };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      500: components["responses"]["InternalError"];
     };
   };
   createAttendance: {
@@ -7064,6 +8093,7 @@ export interface operations {
       };
     };
     responses: {
+      /** @description HTTP 201 response. */
       201: {
         headers: {
           [name: string]: unknown;
@@ -7072,6 +8102,11 @@ export interface operations {
           "application/json": components["schemas"]["AttendanceSingleResponse"];
         };
       };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
     };
   };
   getAttendanceById: {
@@ -7085,6 +8120,7 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
+      /** @description HTTP 200 response. */
       200: {
         headers: {
           [name: string]: unknown;
@@ -7093,6 +8129,11 @@ export interface operations {
           "application/json": components["schemas"]["AttendanceSingleResponse"];
         };
       };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      404: components["responses"]["NotFoundError"];
+      500: components["responses"]["InternalError"];
     };
   };
   deleteAttendance: {
@@ -7106,6 +8147,7 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
+      /** @description HTTP 200 response. */
       200: {
         headers: {
           [name: string]: unknown;
@@ -7114,6 +8156,11 @@ export interface operations {
           "application/json": components["schemas"]["deleteAttendanceResponse"];
         };
       };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      404: components["responses"]["NotFoundError"];
+      500: components["responses"]["InternalError"];
     };
   };
   updateAttendance: {
@@ -7131,6 +8178,7 @@ export interface operations {
       };
     };
     responses: {
+      /** @description HTTP 200 response. */
       200: {
         headers: {
           [name: string]: unknown;
@@ -7139,6 +8187,12 @@ export interface operations {
           "application/json": components["schemas"]["AttendanceSingleResponse"];
         };
       };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      404: components["responses"]["NotFoundError"];
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
     };
   };
   VenueController_getAllVenues: {
@@ -7163,6 +8217,8 @@ export interface operations {
           "application/json": components["schemas"]["VenueMappingListResponseDto"];
         };
       };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
       /** @description No uni selected or no role at uni */
       403: {
         headers: {
@@ -7170,6 +8226,7 @@ export interface operations {
         };
         content?: never;
       };
+      500: components["responses"]["InternalError"];
     };
   };
   VenueController_assignBuilding: {
@@ -7203,6 +8260,7 @@ export interface operations {
         };
         content?: never;
       };
+      401: components["responses"]["UnauthorizedError"];
       /** @description Wrong permissions */
       403: {
         headers: {
@@ -7217,6 +8275,8 @@ export interface operations {
         };
         content?: never;
       };
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
     };
   };
   VenueController_bulkAssign: {
@@ -7248,6 +8308,7 @@ export interface operations {
         };
         content?: never;
       };
+      401: components["responses"]["UnauthorizedError"];
       /** @description Wrong permissions bud */
       403: {
         headers: {
@@ -7255,6 +8316,8 @@ export interface operations {
         };
         content?: never;
       };
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
     };
   };
   BuildingController_getAllBuildings: {
@@ -7280,6 +8343,8 @@ export interface operations {
           "application/json": components["schemas"]["BuildingListResponseDto"];
         };
       };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
       /** @description No uni selected or no role at uni */
       403: {
         headers: {
@@ -7287,6 +8352,7 @@ export interface operations {
         };
         content?: never;
       };
+      500: components["responses"]["InternalError"];
     };
   };
   BuildingController_createBuilding: {
@@ -7311,6 +8377,8 @@ export interface operations {
           "application/json": components["schemas"]["BuildingSingleResponseDto"];
         };
       };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
       /** @description Incorrect role permissions */
       403: {
         headers: {
@@ -7325,6 +8393,7 @@ export interface operations {
         };
         content?: never;
       };
+      500: components["responses"]["InternalError"];
     };
   };
   BuildingController_updateBuildingLocation: {
@@ -7351,6 +8420,8 @@ export interface operations {
           "application/json": components["schemas"]["BuildingSingleResponseDto"];
         };
       };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
       /** @description Your role is not admin, not allowed */
       403: {
         headers: {
@@ -7365,6 +8436,8 @@ export interface operations {
         };
         content?: never;
       };
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
     };
   };
   MapConfigController_getMapConfig: {
@@ -7376,6 +8449,7 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
+      /** @description HTTP 200 response. */
       200: {
         headers: {
           [name: string]: unknown;
@@ -7384,6 +8458,8 @@ export interface operations {
           "application/json": components["schemas"]["MapConfigDto"];
         };
       };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
       /** @description No university selected */
       403: {
         headers: {
@@ -7398,6 +8474,7 @@ export interface operations {
         };
         content?: never;
       };
+      500: components["responses"]["InternalError"];
     };
   };
   MapConfigController_update: {
@@ -7413,6 +8490,7 @@ export interface operations {
       };
     };
     responses: {
+      /** @description HTTP 200 response. */
       200: {
         headers: {
           [name: string]: unknown;
@@ -7421,6 +8499,8 @@ export interface operations {
           "application/json": components["schemas"]["MapConfigDto"];
         };
       };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
       /** @description Insufficient permissions */
       403: {
         headers: {
@@ -7428,6 +8508,8 @@ export interface operations {
         };
         content?: never;
       };
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
     };
   };
   RouteController_getRoute: {
@@ -7453,6 +8535,8 @@ export interface operations {
           "application/json": components["schemas"]["RouteSingleResponseDto"];
         };
       };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
       /** @description No university or university role was selected */
       403: {
         headers: {
@@ -7467,6 +8551,7 @@ export interface operations {
         };
         content?: never;
       };
+      500: components["responses"]["InternalError"];
     };
   };
   RouteController_getActiveRoute: {
@@ -7492,6 +8577,8 @@ export interface operations {
           "application/json": components["schemas"]["ActiveRouteResponseDto"];
         };
       };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
       /** @description No university or university role was selected */
       403: {
         headers: {
@@ -7499,6 +8586,7 @@ export interface operations {
         };
         content?: never;
       };
+      500: components["responses"]["InternalError"];
     };
   };
   generateCalendar: {
@@ -7530,6 +8618,8 @@ export interface operations {
         };
         content?: never;
       };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
       /** @description Calendar or timetable not found */
       404: {
         headers: {
@@ -7551,6 +8641,7 @@ export interface operations {
         };
         content?: never;
       };
+      500: components["responses"]["InternalError"];
     };
   };
   getGeneratedCalendar: {
@@ -7581,6 +8672,8 @@ export interface operations {
         };
         content?: never;
       };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
       /** @description Generated calendar not found */
       404: {
         headers: {
@@ -7588,6 +8681,7 @@ export interface operations {
         };
         content?: never;
       };
+      500: components["responses"]["InternalError"];
     };
   };
   listPublicAcademicCalendars: {
@@ -7618,6 +8712,9 @@ export interface operations {
         };
         content?: never;
       };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      500: components["responses"]["InternalError"];
     };
   };
   listAcademicCalendars: {
@@ -7662,6 +8759,7 @@ export interface operations {
         };
         content?: never;
       };
+      500: components["responses"]["InternalError"];
     };
   };
   createAcademicCalendar: {
@@ -7714,6 +8812,7 @@ export interface operations {
         };
         content?: never;
       };
+      500: components["responses"]["InternalError"];
     };
   };
   listCalendarRestrictions: {
@@ -7765,6 +8864,7 @@ export interface operations {
         };
         content?: never;
       };
+      500: components["responses"]["InternalError"];
     };
   };
   createCalendarRestriction: {
@@ -7834,6 +8934,7 @@ export interface operations {
         };
         content?: never;
       };
+      500: components["responses"]["InternalError"];
     };
   };
   updateCalendarRestriction: {
@@ -7905,6 +9006,7 @@ export interface operations {
         };
         content?: never;
       };
+      500: components["responses"]["InternalError"];
     };
   };
   deleteCalendarRestriction: {
@@ -7958,6 +9060,7 @@ export interface operations {
         };
         content?: never;
       };
+      500: components["responses"]["InternalError"];
     };
   };
   updateCalendarSubscriptions: {
@@ -8013,6 +9116,7 @@ export interface operations {
         };
         content?: never;
       };
+      409: components["responses"]["ConflictError"];
       /** @description Public calendar year does not match the academic calendar */
       422: {
         headers: {
@@ -8020,6 +9124,7 @@ export interface operations {
         };
         content?: never;
       };
+      500: components["responses"]["InternalError"];
     };
   };
   getAcademicCalendar: {
@@ -8071,6 +9176,7 @@ export interface operations {
         };
         content?: never;
       };
+      500: components["responses"]["InternalError"];
     };
   };
   deleteAcademicCalendar: {
@@ -8129,6 +9235,7 @@ export interface operations {
         };
         content?: never;
       };
+      500: components["responses"]["InternalError"];
     };
   };
   ApiServiceController_getCourses: {
@@ -8161,6 +9268,8 @@ export interface operations {
         };
         content?: never;
       };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
       /** @description The university or its API adapter could not be found. */
       404: {
         headers: {
@@ -8168,6 +9277,7 @@ export interface operations {
         };
         content?: never;
       };
+      500: components["responses"]["InternalError"];
     };
   };
   ApiServiceController_getCourse: {
@@ -8198,6 +9308,8 @@ export interface operations {
         };
         content?: never;
       };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
       /** @description The university or its API adapter could not be found. */
       404: {
         headers: {
@@ -8205,6 +9317,7 @@ export interface operations {
         };
         content?: never;
       };
+      500: components["responses"]["InternalError"];
     };
   };
   ApiServiceController_getModules: {
@@ -8235,6 +9348,8 @@ export interface operations {
         };
         content?: never;
       };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
       /** @description The university, course, or API adapter could not be found. */
       404: {
         headers: {
@@ -8242,6 +9357,7 @@ export interface operations {
         };
         content?: never;
       };
+      500: components["responses"]["InternalError"];
     };
   };
   ApiServiceController_getEvents: {
@@ -8272,6 +9388,8 @@ export interface operations {
         };
         content?: never;
       };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
       /** @description The university, module, or API adapter could not be found. */
       404: {
         headers: {
@@ -8279,6 +9397,7 @@ export interface operations {
         };
         content?: never;
       };
+      500: components["responses"]["InternalError"];
     };
   };
 }

@@ -12,7 +12,7 @@ const noUniLinks = [
 ];
 
 const basicLinks = [
-  { href: "/module-management", label: "Manage Modules & Events" },
+  { href: "/module-management", label: "Manage Modules / Events" },
   { href: "/map", label: "Map" },
 ];
 
@@ -20,16 +20,25 @@ const extraAdminLinks = [
   { href: "/course-management", label: "Manage Courses" },
   { href: "/role-management", label: "Manage Roles" },
   { href: "/calendar-management", label: "Manage Calendars" },
+  { href: "/stats", label: "Stats" },
 ];
 const universitySpecific = [{ href: "/solver", label: "Upload PDF" }];
 
 export function NavLinks() {
   const pathName = usePathname();
   const [isMounted, setIsMounted] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     // eslint-disable-next-line
     setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    const handleChange = () => setRefreshKey((key) => key + 1);
+    window.addEventListener(UserDetails.changeEvent, handleChange);
+    return () =>
+      window.removeEventListener(UserDetails.changeEvent, handleChange);
   }, []);
 
   const isAdmin = UserDetails.getUniDetails()?.role === "UNIVERSITY_ADMIN";

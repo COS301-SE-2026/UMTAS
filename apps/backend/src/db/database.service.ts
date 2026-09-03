@@ -20,8 +20,7 @@ import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
 export type AppDatabase =
-  | NodePgDatabase<typeof schema>
-  | PgliteDatabase<typeof schema>;
+  NodePgDatabase<typeof schema> | PgliteDatabase<typeof schema>;
 
 const DB_MODES = {
   PGLITE: 'PGLITE',
@@ -66,7 +65,7 @@ export class DatabaseService
       this.logger.log('Initializing Node-Postgres Pool');
       this.pool = new Pool({
         connectionString: databaseUrl,
-        max: 20,
+        max: 50,
         idleTimeoutMillis: 30000,
         connectionTimeoutMillis: 5000,
       });
@@ -75,6 +74,21 @@ export class DatabaseService
   }
 
   async onApplicationBootstrap(): Promise<void> {
+    try {
+      this.logger.log('Running database migrations...');
+      await this.migrate();
+      this.logger.log('Database migrations completed successfully');
+    } catch (error) {
+      this.logger.error('MIGRATION FAILED: App cannot start.', error);
+      process.exit(1);
+    }
+
+    if (isSeedEnabled(process.env.SEED)) {
+      this.logger.log('Seeding is enabled');
+    } else {
+      this.logger.log('Seeding is disabled');
+    }
+
     if (isSeedEnabled(process.env.SEED)) {
       try {
         this.logger.log('Starting database seeding...');
@@ -114,8 +128,7 @@ export class DatabaseService
     }
 
     await this.db.execute(sql`
-      CREATE EXTENSION IF NOT EXISTS "pgcrypto";
-    `);
+      CREATE EXTENSION IF NOT EXISTS "pgcrypto";`);
     await migrateNodePg(this.db as NodePgDatabase<Record<string, unknown>>, {
       migrationsFolder,
     });

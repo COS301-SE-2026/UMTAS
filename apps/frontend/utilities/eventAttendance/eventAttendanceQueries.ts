@@ -4,6 +4,7 @@ import {
   createEventAttendanceBody,
   createEventAttendanceBuilder,
   deleteEventAttendanceById,
+  getAllAttendanceKy,
   getEventAttendanceBuilder,
   getEventAttendanceByIdBuilder,
   getEventAttendanceByIdPath,
@@ -17,9 +18,7 @@ export function getAllEventAttendanceQ(query?: getEventAttendanceQuery) {
   return queryOptions({
     queryKey: ["eventAttendance", query] as const,
     queryFn: async () => {
-      const result = await new getEventAttendanceBuilder().send({
-        paths: query,
-      });
+      const result = (await getAllAttendanceKy(query)).attendanceList;
       return result;
     },
   });
@@ -45,9 +44,15 @@ export function addEventAttendanceMut() {
       });
       return result;
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       getQueryClient().invalidateQueries({
-        queryKey: ["eventAttendance"],
+        queryKey: [
+          "eventAttendance",
+          {
+            eventID: variables.body.eventID,
+            eventDate: variables.body.eventDate,
+          },
+        ],
       });
     },
     onError: (error) => console.error("Could not create attendance", error),
