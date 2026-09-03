@@ -65,7 +65,7 @@ export class DatabaseService
       this.logger.log('Initializing Node-Postgres Pool');
       this.pool = new Pool({
         connectionString: databaseUrl,
-        max: 100,
+        max: 50,
         idleTimeoutMillis: 30000,
         connectionTimeoutMillis: 5000,
       });
