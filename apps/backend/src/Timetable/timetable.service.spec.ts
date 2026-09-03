@@ -12,11 +12,13 @@ import { EventService } from '../Events/event.service';
 import { createMockDatabase } from '../Testing/Mocks/database.mock';
 import {
   mockDbResult,
+  mockSequentialResults,
   mockTransaction,
 } from '../Testing/Mocks/database.helpers';
 import {
   createCreateTimetableDto,
   createEvent,
+  createEventDto,
   createTimetable,
   createUpdateTimetableDto,
   createUserTimetable,
@@ -281,6 +283,100 @@ describe('Timetable Service', () => {
       expect(mockDb.select).toHaveBeenCalled();
     });
   }); //END_Test_getTimetableById
+
+  describe('V2 timetable reads', () => {
+    it('returns populated timetables for the user', async () => {
+      const timetable = createTimetable();
+      const userTimetable = createUserTimetable({
+        UserID: userId,
+        TimetableID: timetable.timetableID,
+      });
+      const eventEntity = createEvent();
+      const event = createEventDto(
+        { eventId: eventEntity.eventID },
+        eventEntity.eventCriteria,
+      );
+      mockDbResult(mockDb.select, [
+        {
+          UserTimetableID: userTimetable.UserTimetableID,
+          timetable,
+        },
+      ]);
+      mockEventService.getAllEvents?.mockResolvedValue({ events: [event] });
+
+      await expect(service.getAllV2(userId)).resolves.toEqual({
+        timetables: [
+          {
+            UserTimetableID: userTimetable.UserTimetableID,
+            timetable,
+            events: [event],
+          },
+        ],
+      });
+      expect(mockEventService.getAllEvents).toHaveBeenCalledWith(userId, {
+        timetableId: timetable.timetableID,
+      });
+    });
+
+    it('propagates relationship-query failures from event loading', async () => {
+      const timetable = createTimetable();
+      mockDbResult(mockDb.select, [
+        { UserTimetableID: 'user-timetable-1', timetable },
+      ]);
+      mockEventService.getAllEvents?.mockRejectedValue(
+        new Error('event relationship query failed'),
+      );
+
+      await expect(service.getAllV2(userId)).rejects.toThrow(
+        'event relationship query failed',
+      );
+    });
+
+    it('rejects a missing timetable', async () => {
+      mockSequentialResults(mockDb.select, [[]]);
+
+      await expect(service.getByIdV2(userId, timetableId)).rejects.toThrow(
+        `Timetable[${timetableId}] not found`,
+      );
+    });
+
+    it('rejects a timetable the user does not own', async () => {
+      const timetable = createTimetable({ timetableID: timetableId });
+      mockSequentialResults(mockDb.select, [[timetable], []]);
+
+      await expect(service.getByIdV2(userId, timetableId)).rejects.toThrow(
+        `User[${userId}] doesn't seem to own timetable[${timetableId}]`,
+      );
+    });
+
+    it('returns an owned timetable with events using an explicit transaction', async () => {
+      const timetable = createTimetable({ timetableID: timetableId });
+      const userTimetable = createUserTimetable({
+        UserID: userId,
+        TimetableID: timetableId,
+      });
+      const eventEntity = createEvent();
+      const event = createEventDto(
+        { eventId: eventEntity.eventID },
+        eventEntity.eventCriteria,
+      );
+      mockSequentialResults(mockDb.select, [[timetable], [userTimetable]]);
+      mockEventService.getAllEvents?.mockResolvedValue({ events: [event] });
+
+      await expect(
+        service.getByIdV2(userId, timetableId, mockDb),
+      ).resolves.toEqual({
+        UserTimetableID: userTimetable.UserTimetableID,
+        timetable,
+        events: [event],
+      });
+      expect(mockEventService.getAllEvents).toHaveBeenCalledWith(
+        userId,
+        { timetableId },
+        mockDb,
+      );
+    });
+  });
 
   //Update
   describe('Test_updateTimetable', () => {

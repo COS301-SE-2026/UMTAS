@@ -46,7 +46,7 @@ afterAll(async () => {
   await runtime.close();
 });
 
-xtest('[flow:pdf-solver] uploads, imports, enrolls, solves, and saves a timetable', async () => {
+test('[flow:pdf-solver] uploads, imports, enrolls, solves, and saves a timetable', async () => {
   const plan: PdfSolverPlan = {
     university: TEST_UNIVERSITY,
     fixturePath: FIXTURE_PATH,

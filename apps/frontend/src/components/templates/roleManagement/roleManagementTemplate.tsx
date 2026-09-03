@@ -1,10 +1,12 @@
 "use client";
 import UserDirectoryCard from "@/components/organisms/roleManagement/UserDirectory";
-import { UserDetails } from "@/lib/userclass/userClass";
-import { useRouter } from "next/navigation";
 import Tutorial from "@/components/organisms/nav/Tutorial";
 import NotFound from "@/app/not-found";
 import NoRoleSelected from "@/components/molecules/roleManagement/NoRoleSelected";
+import {
+  UniversityStateLoading,
+  useUniversityState,
+} from "@/hooks/useUniversityState";
 const steps = [
   {
     target: "#input-search-name-email-role",
@@ -41,16 +43,13 @@ const steps = [
 ];
 
 export default function RoleManagementTemplate() {
-  const router = useRouter();
-  const UniDetails = UserDetails.getUniDetails();
-  const ViableRole = UniDetails?.role === "UNIVERSITY_ADMIN";
+  const { university, isLoading } = useUniversityState();
+  const ViableRole = university?.role === "UNIVERSITY_ADMIN";
 
-  if (UniDetails === null) {
-    router.push("/dashboard");
-  }
+  if (isLoading) return <UniversityStateLoading />;
 
   if (ViableRole) {
-    const hasRole = UniDetails?.role != null;
+    const hasRole = university?.role != null;
     if (!hasRole) return <NoRoleSelected />;
 
     return (

@@ -10,7 +10,11 @@ import { EventImportFingerprintService } from './event-import-fingerprint.servic
 import { UniversityService } from '../University/university.service';
 
 //Mocks
-import { createMockDatabase, mockTransaction } from '../Testing/Mocks/';
+import {
+  createDbChain,
+  createMockDatabase,
+  mockTransaction,
+} from '../Testing/Mocks/';
 import {
   createMockEventImportFingerprintService,
   createMockUniversityService,
@@ -291,6 +295,147 @@ describe('EventServiceV2', () => {
       //Assert
       expect(result).toMatchObject(expected);
       expect(mockDb.insert).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  describe('event validation and statistics', () => {
+    it('toggles validation and maps the updated event', async () => {
+      const current = createEvent(
+        EventSource.UNIVERSITY,
+        { validated: false },
+        { moduleId },
+      );
+      const updated = { ...current, validated: true };
+      const mapped = createEventDto(
+        { eventId: current.eventID, validated: true },
+        current.eventCriteria,
+      );
+      jest.spyOn(service, 'getById').mockResolvedValue({ event: mapped });
+      (mockDb.update as unknown as jest.Mock).mockReturnValue(
+        createDbChain([updated]),
+      );
+      jest
+        .spyOn(service as never, 'mapEventToDto' as never)
+        .mockResolvedValue(mapped as never);
+
+      await expect(service.validateEvent(current.eventID)).resolves.toEqual({
+        event: mapped,
+        message: `Event[${updated.eventName}] validated=true`,
+      });
+      expect(mockDb.update).toHaveBeenCalledTimes(1);
+    });
+
+    it('honors an explicit validation value', async () => {
+      const current = createEvent(
+        EventSource.UNIVERSITY,
+        { validated: true },
+        { moduleId },
+      );
+      const updated = { ...current, validated: false };
+      const mapped = createEventDto(
+        { eventId: current.eventID, validated: false },
+        current.eventCriteria,
+      );
+      jest.spyOn(service, 'getById').mockResolvedValue({ event: mapped });
+      (mockDb.update as unknown as jest.Mock).mockReturnValue(
+        createDbChain([updated]),
+      );
+      jest
+        .spyOn(service as never, 'mapEventToDto' as never)
+        .mockResolvedValue(mapped as never);
+
+      await expect(
+        service.validateEvent(current.eventID, false),
+      ).resolves.toMatchObject({ event: { validated: false } });
+    });
+
+    it('returns weekly event statistics after validating the university', async () => {
+      const rows = [
+        { dayOfWeek: 'monday', EventCount: 4 },
+        { dayOfWeek: 'wednesday', EventCount: 2 },
+      ];
+      mockUniversityService.getById?.mockResolvedValue(createUniversity());
+      (mockDb.select as unknown as jest.Mock).mockReturnValue(
+        createDbChain(rows),
+      );
+
+      await expect(service.getStatisticsWeekly(uniId)).resolves.toEqual({
+        data: rows,
+      });
+      expect(mockUniversityService.getById).toHaveBeenCalledWith(uniId, mockDb);
+    });
+
+    it('normalizes nullable venue names in event statistics', async () => {
+      const rows = [
+        {
+          VenueID: 'venue-1',
+          VenueName: null,
+          EventCount: 3,
+          ProjectedAttendance: 20,
+        },
+      ];
+      mockUniversityService.getById?.mockResolvedValue(createUniversity());
+      (mockDb.select as unknown as jest.Mock).mockReturnValue(
+        createDbChain(rows),
+      );
+
+      await expect(service.getStatisticsVenues(uniId)).resolves.toEqual({
+        data: [
+          {
+            VenueID: 'venue-1',
+            VenueName: 'NoName',
+            EventCount: 3,
+            ProjectedAttendance: 20,
+          },
+        ],
+      });
+    });
+  });
+
+  describe('event criteria validation', () => {
+    it.each(['9am', '24:00', '08:60'])(
+      'rejects invalid start time %s',
+      async (startTime) => {
+        await expect(
+          (service as any).validateEventCriteria(
+            { moduleId, startTime, endTime: '10:00' },
+            false,
+            mockDb,
+          ),
+        ).rejects.toThrow(BadRequestException);
+      },
+    );
+
+    it('moves an end time before the start one hour forward', async () => {
+      mockModuleServiceV2.getByIdV2?.mockResolvedValue(createModule());
+
+      await expect(
+        (service as any).validateEventCriteria(
+          { moduleId, startTime: '10:30', endTime: '09:00' },
+          false,
+          mockDb,
+        ),
+      ).resolves.toMatchObject({
+        startTime: '10:30',
+        endTime: '11:30',
+      });
+    });
+
+    it('defaults recurring criteria to a day and non-recurring criteria to a date', async () => {
+      mockModuleServiceV2.getByIdV2?.mockResolvedValue(createModule());
+      const recurring = await (service as any).validateEventCriteria(
+        { moduleId },
+        true,
+        mockDb,
+      );
+      const single = await (service as any).validateEventCriteria(
+        { moduleId },
+        false,
+        mockDb,
+      );
+
+      expect(recurring.dayOfWeek).toBeDefined();
+      expect(single.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     });
   });
 });
