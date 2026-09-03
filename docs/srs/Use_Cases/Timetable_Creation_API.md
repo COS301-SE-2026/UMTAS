@@ -18,7 +18,7 @@
         </div>
 
     ---
-    ??? "UC-API-01: Import Timetable from API"
+    ??? "UC-API-01: Synchronise University API Data"
         <a id="uc-api-01"></a>
         ##### High Level
 
@@ -43,7 +43,7 @@
         | **Requirements Covered** | R2.4.1 \| R2.4.1.1 \| R2.4.1.2 \| R2.4.1.5 |
 
     ---
-    ??? "UC-API-02: Review API Retrieved Data"
+    ??? "UC-API-02: Update Existing University Data"
         <a id="uc-api-02"></a>
 
         ##### High Level

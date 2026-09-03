@@ -101,8 +101,8 @@ The Traceability Matrices for the functional requirements to use cases can be fo
         - **R2.6.1.1** The system shall enforce a selection rule as a hard constraint.
         - **R2.6.1.2** The system shall enforce an overlap rule as a hard constraint, preventing events from clashing.
         - **R2.6.1.3** The system shall optimise the schedule to centralise events around a User-given target time.
-        - **R2.6.1.2** The system shall optimise the schedule to centralise events around smaller gaps between events if requested.
-        - **R2.6.1.3** The system shall optimise the schedule to centralise events around a user-given day to minimise events (skip day).
+        - **R2.6.1.4** The system shall optimise the schedule to centralise events around smaller gaps between events if requested.
+        - **R2.6.1.5** The system shall optimise the schedule to centralise events around a user-given day to minimise events (skip day).
     - **R2.6.2** The system shall automatically invoke the GA solver to generate a best-effort schedule when the CP-SAT solver cannot find a feasible solution, notifying the User once produced.
         - **R2.6.2.1** The system shall optimise the schedule to centralise events around a User-given target time.
         - **R2.6.2.2** The system shall optimise the schedule to centralise events around smaller gaps between events if requested.
@@ -136,8 +136,7 @@ The Traceability Matrices for the functional requirements to use cases can be fo
     - **R3.2.1** The system will allow lecturers to alter details about their events.
         - **R3.2.1.1** The system shall allow lecturers to alter venue location for an event(s).
         - **R3.2.1.2** The system shall allow lecturers to alter times for an event(s).
-        - **R3.2.1.3** The system shall allow lecturers to add lecturers to events/modules.
-        - **R3.2.1.4** The system shall allow lecturers to alter module details (name, description, credit value).
+        - **R3.2.1.3** The system shall allow lecturers to alter module details (name, description, credit value).
 
     ### R3.3 Attendance Recording System
 
@@ -188,7 +187,7 @@ The Traceability Matrices for the functional requirements to use cases can be fo
     - **R4.4.2** The system shall allow for university admins to approve roles for a univeristy
     - **R4.4.3** The system shall allow for university admins to revoke privileges of users
 
-      ### FR 4.5 Calendar Management for university applications
+    ### FR 4.5 Calendar Management for university applications
 
     - **R4.5.1** The system shall allow an admin to create calendars for universities for a specific year
     - **R4.5.2** The system shall allow an admin to search for calendars for universities for a specific year
@@ -201,32 +200,24 @@ The Traceability Matrices for the functional requirements to use cases can be fo
 
 ??? info "**FR 5 — Simulation Service**"
 
+    ### R5 Simulation Service
 
-    ### R5.1 Execution & Environment
-
-    - **R5.1.1** The system shall launch the simulation via a central script accepting arguments for the target adapter and population size.
-    - **R5.1.2** The system shall run as an independent, configurable Docker container with exposed ports for live metrics.
-
-    ### R5.2 Synthetic Data Generation
-
-    - **R5.2.1** The system shall generate synthetic student profiles based on rules in a declarative YAML schema using a Faker library.
-    - **R5.2.2** The system shall sample domain-specific data from external CSV files.
-    - **R5.2.3** The system shall export the generated user population into a structured JSON file.
-
-    ### R5.3 Metrics & Reporting
-
-    - **R5.3.1** The system shall parse raw CSV simulation statistics into a single timestamped JSON report.
-    - **R5.3.2** The system shall aggregate and record overall latency (min, max, avg, median, p95, p99), requests, and failure counts per endpoint.
-    - **R5.3.3** The system shall automatically clean up temporary metric files after reporting.
-
-    ### R5.4 Adapter Bootstrapping
-
-    - **R5.4.1** The system shall automatically scaffold new client adapters using an OpenAPI specification file.
-    - **R5.4.2** The system shall auto-generate endpoint configurations, synthetic data schemas, and executable Python simulation scripts mapped to discovered API methods.
-
-    ### R5.5 Simulated Behaviors (UMTAS Domain)
-
-    - **R5.5.1** The system shall simulate mock account creation, secure login, and session token management.
-    - **R5.5.2** The system shall simulate uploading timetable PDF files, polling for parser job status, and retrieving results.
-    - **R5.5.3** The system shall simulate users browsing enrolled modules, available events, and existing timetables.
-    - **R5.5.4** The system shall simulate submitting custom scheduling jobs to the solver and polling for execution status.
+    - **R5.1** Execution & Environment
+        - **R5.1.1** The system shall launch the simulation via a central script accepting arguments for the target adapter and population size.
+        - **R5.1.2** The system shall run as an independent, configurable Docker container with exposed ports for live metrics.
+    - **R5.2** Synthetic Data Generation
+        - **R5.2.1** The system shall generate synthetic student profiles based on rules in a declarative YAML schema using a Faker library.
+        - **R5.2.2** The system shall sample domain-specific data from external CSV files.
+        - **R5.2.3** The system shall export the generated user population into a structured JSON file.
+    - **R5.3** Metrics & Reporting
+        - **R5.3.1** The system shall parse raw CSV simulation statistics into a single timestamped JSON report.
+        - **R5.3.2** The system shall aggregate and record overall latency (min, max, avg, median, p95, p99), requests, and failure counts per endpoint.
+        - **R5.3.3** The system shall automatically clean up temporary metric files after reporting.
+    - **R5.4** Adapter Bootstrapping
+        - **R5.4.1** The system shall automatically scaffold new client adapters using an OpenAPI specification file.
+        - **R5.4.2** The system shall auto-generate endpoint configurations, synthetic data schemas, and executable Python simulation scripts mapped to discovered API methods.
+    - **R5.5** Simulated Behaviors (UMTAS Domain)
+        - **R5.5.1** The system shall simulate mock account creation, secure login, and session token management.
+        - **R5.5.2** The system shall simulate uploading timetable PDF files, polling for parser job status, and retrieving results.
+        - **R5.5.3** The system shall simulate users browsing enrolled modules, available events, and existing timetables.
+        - **R5.5.4** The system shall simulate submitting custom scheduling jobs to the solver and polling for execution status.

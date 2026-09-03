@@ -112,8 +112,8 @@
     ## API Import
     | **ID** | **Use Case** | **Group** | **Actor** | **Status** |
     |:---:|:---:|:---:|:---:|:---:|
-    | **UC-API-01** | Synchronise University API Data | [API Import](#api-system) | User | <span class="status-not-implemented">In Progress</span> |
-    | **UC-API-02** | Update Existing University Data | [API Import](#api-system) | User | <span class="status-not-implemented">In Progress</span> |
+    | **UC-API-01** | Synchronise University API Data | [API Import](#api-system) | User | <span class="status-implemented">Implemented</span> |
+    | **UC-API-02** | Update Existing University Data | [API Import](#api-system) | User | <span class="status-implemented">Implemented</span> |
     
     </div>
     <div class="uc-table" markdown>
@@ -122,7 +122,7 @@
     | **ID** | **Use Case** | **Group** | **Actor** | **Status** |
     |:---:|:---:|:---:|:---:|:---:|
     | **UC-EX-01** | Export Timetable as ICS File | [Calendar Export](#calendar-exporting-id) | Student |<span class="status-implemented">Implemented</span>|
-    | **UC-EX-02** | Sync Timetable with Google Calendar | [Calendar Export](#calendar-exporting-id) | Student |<span class="status-not-implemented">In Progress</span>|
+    | **UC-EX-02** | Sync Timetable with Google Calendar | [Calendar Export](#calendar-exporting-id) | Student |<span class="status-implemented">Implemented</span>|
     
     </div>
 
@@ -153,8 +153,8 @@
     ## Attendance Recording
     | **ID** | **Use Case** | **Group** | **Actor** | **Status** |
     |:---:|:---:|:---:|:---:|:---:|
-    | **UC-AR-01** | Indicate Attendance Intent for Event | [Attendance Recording](#attendance-recording-id) | Student |<span class="status-not-implemented">In Progress</span>|
-    | **UC-AR-02** | Unrecord Attendance for Event | [Attendance Recording](#attendance-recording-id) | Student |<span class="status-not-implemented">In Progress</span>|
+    | **UC-AR-01** | Indicate Attendance Intent for Event | [Attendance Recording](#attendance-recording-id) | Student |<span class="status-implemented">Implemented</span>|
+    | **UC-AR-02** | Unrecord Attendance for Event | [Attendance Recording](#attendance-recording-id) | Student |<span class="status-implemented">Implemented</span>|
 
     </div>
     
@@ -164,9 +164,19 @@
     | **ID** | **Use Case** | **Group** | **Actor** | **Status** |
     |:---:|:---:|:---:|:---:|:---:|
     | **UC-LA-01** | Manage Event Details | [Lecturer Adjustment](#lecturer-adjustment-id) | Lecturer, Admin |<span class="status-implemented">Implemented</span>|
-    | **UC-LA-01** | Manage Module Details | [Lecturer Adjustment](#lecturer-adjustment-id) | Lecturer, Admin |<span class="status-implemented">Implemented</span>|
-    | **UC-LA-02** | Assign Lecturers to Events/Modules | [Lecturer Adjustment](#lecturer-adjustment-id) | Lecturer, Admin |<span class="status-not-implemented">In Progress</span>|
+    | **UC-LA-02** | Manage Module Details | [Lecturer Adjustment](#lecturer-adjustment-id) | Lecturer, Admin |<span class="status-implemented">Implemented</span>|
     
+    </div>
+
+    <div class="uc-table" markdown>
+
+    ## Calendar Management
+    | **ID** | **Use Case** | **Group** | **Actor** | **Status** |
+    |:---:|:---:|:---:|:---:|:---:|
+    | **UC-CAL-01** | Create University Calendar | [Calendar Management](#calendar-management-id) | Admin |<span class="status-implemented">Implemented</span>|
+    | **UC-CAL-02** | Search University Calendars | [Calendar Management](#calendar-management-id) | Admin |<span class="status-implemented">Implemented</span>|
+    | **UC-CAL-03** | Create Calendar Restriction | [Calendar Management](#calendar-management-id) | Admin |<span class="status-implemented">Implemented</span>|
+
     </div>
 
     <div class="uc-table" markdown>
@@ -243,6 +253,10 @@
 ---
 <!-- Lecturer Adjustment -->
 {% include-markdown "srs/Use_Cases/Lecturer_Adjustment.md" %}
+
+---
+<!-- Calendar Management -->
+{% include-markdown "srs/Use_Cases/Calendar_Management.md" %}
 
 ---
 <!-- Tyto Simulation -->
