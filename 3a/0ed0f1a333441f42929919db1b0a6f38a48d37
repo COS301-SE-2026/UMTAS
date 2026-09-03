@@ -1,0 +1,14 @@
+apps/backend/src/db/seeding/database-seed.service.ts
+  h_2d4b3dca70a3d8 107-110
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "3a0ed0f1a333441f42929919db1b0a6f38a48d37",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
