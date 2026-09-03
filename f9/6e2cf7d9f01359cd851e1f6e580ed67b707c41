@@ -1,0 +1,14 @@
+README.md
+  h_2d4b3dca70a3d8 412,422
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "f96e2cf7d9f01359cd851e1f6e580ed67b707c41",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
