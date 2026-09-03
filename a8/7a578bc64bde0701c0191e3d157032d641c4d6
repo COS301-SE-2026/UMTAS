@@ -1,0 +1,22 @@
+.github/workflows/ci.yml
+  h_2d4b3dca70a3d8 214,321-326
+apps/frontend/src/components/organisms/map/MapScreen.tsx
+  h_2d4b3dca70a3d8 81-82
+docker-compose.prod.yml
+  h_2d4b3dca70a3d8 212
+docker-compose.staging.yml
+  h_2d4b3dca70a3d8 212
+docker/frontend/frontend.Dockerfile
+  h_2d4b3dca70a3d8 20,22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "a87a578bc64bde0701c0191e3d157032d641c4d6",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
