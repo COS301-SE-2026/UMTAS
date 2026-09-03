@@ -409,7 +409,7 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 <br>
 <div align="center">
 
-[![NFR Testing](https://img.shields.io/badge/NFR_Testing-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/latest/sas/architecture/NON-FUNCTIONAL_TESTING/)
+[![NFR Testing](https://img.shields.io/badge/NFR_Testing-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/latest/srs/NON-FUNCTIONAL_TESTING/)
 
 </div>
 </details>
@@ -419,7 +419,7 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 <br>
 <div align="center">
 
-[![NFR Traceability Matrix](https://img.shields.io/badge/NFR_Traceability_Matrix-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/latest/sas/architecture/NON-FUNCTIONAL_TESTING/)
+[![NFR Traceability Matrix](https://img.shields.io/badge/NFR_Traceability_Matrix-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/latest/srs/NON-FUNCTIONAL_TESTING/)
 
 </div>
 </details>
