@@ -233,7 +233,11 @@ export function EventCard({
           <Select
             value={
               (event.eventCriteria as EventCriteria & { buildingId?: string })
-                ?.buildingId
+                ?.buildingId ||
+              (typeof event.venues?.[0] === "object"
+                ? event.venues[0].buildingId
+                : undefined) ||
+              ""
             }
             onValueChange={(value) =>
               onUpdate(event.eventId, "buildingId", value)

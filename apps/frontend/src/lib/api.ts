@@ -2185,6 +2185,11 @@ export interface components {
       /** Format: uuid */
       venueId: string;
       venueName: string;
+      /**
+       * Format: uuid
+       * @description The ID of the building the venue belongs to
+       */
+      buildingId?: string | null;
     };
     EventDto: {
       /** Format: uuid */

@@ -188,7 +188,7 @@ The Traceability Matrices for the functional requirements to use cases can be fo
     - **R4.4.2** The system shall allow for university admins to approve roles for a univeristy
     - **R4.4.3** The system shall allow for university admins to revoke privileges of users
 
-      ### FR 4.5 Calendar Management for university applications
+    ### FR 4.5 Calendar Management for university applications
 
     - **R4.5.1** The system shall allow an admin to create calendars for universities for a specific year
     - **R4.5.2** The system shall allow an admin to search for calendars for universities for a specific year
@@ -230,3 +230,14 @@ The Traceability Matrices for the functional requirements to use cases can be fo
     - **R5.5.2** The system shall simulate uploading timetable PDF files, polling for parser job status, and retrieving results.
     - **R5.5.3** The system shall simulate users browsing enrolled modules, available events, and existing timetables.
     - **R5.5.4** The system shall simulate submitting custom scheduling jobs to the solver and polling for execution status.
+
+
+??? info "**FR 6 — (Bonus) Mapping system**"
+    ### R6.1 University Mapping system
+    - **R6.1.1** The system shall allow allow for admins to configure a map for their university
+    - **R6.1.2** The system shall allow allow for admins to place pins and polygons to existing buildings in database for routing and visualisation
+    - **R6.1.3** The system shall allow allow for admins to add venues to buildings
+
+    ### R6.2 University Routing system
+    - **R6.2.1** The system shall allow for students to request routes between Events for a requested interval
+    - **R6.2.2** The system shall cache requested routes in the database for optimization of following requests

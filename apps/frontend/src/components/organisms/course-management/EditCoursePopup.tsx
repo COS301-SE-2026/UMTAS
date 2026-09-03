@@ -72,7 +72,7 @@ export function EditCoursePopup({
         path: { CourseId: courseId },
         body: {
           CourseName: courseName,
-          Degree: degreeName,
+          Degree: degreeName === "" ? undefined : degreeName,
         },
       },
       {
@@ -154,7 +154,7 @@ export function EditCoursePopup({
                 ? "deleting..."
                 : isError
                   ? "Failed to delete"
-                  : "delete course"}
+                  : "Delete course"}
             </Button>
           </div>
         </Card>
