@@ -467,6 +467,37 @@ describe('EventService', () => {
         { eventId: events[1].eventID, eventName: events[1].eventName },
       ]);
     });
+
+    it.each([
+      ['timetable', { timetableId: 'timetable-1' }],
+      ['enrolled user', {}],
+      ['all events', { all: true }],
+    ])(
+      'returns events for the %s filter with statistics',
+      async (_name, filters) => {
+        const event = createEvent();
+        mockTransaction(mockDb, {
+          select: [[event], []],
+        });
+
+        const result = await service.getAllEvents(userId, {
+          ...filters,
+          Stats: true,
+        });
+
+        expect(result.events).toHaveLength(1);
+        expect(result.count).toBe(1);
+        expect(result.events?.[0]).toMatchObject({ eventId: event.eventID });
+      },
+    );
+
+    it('omits the statistics count unless requested', async () => {
+      mockTransaction(mockDb, { select: [[]] });
+
+      await expect(service.getAllEvents(userId, {})).resolves.toEqual({
+        events: [],
+      });
+    });
   });
 
   //GetById
@@ -492,6 +523,51 @@ describe('EventService', () => {
 
   //Update
   describe('Test_UpdateEvent', () => {
+    it('rejects an update with no fields', async () => {
+      mockTransaction(mockDb, {});
+
+      await expect(
+        service.updateEvent(userId, 'uni_admin', eventId, {}),
+      ).rejects.toThrow('At least one update field required');
+    });
+
+    it('rejects a student who does not own the event', async () => {
+      mockModuleService.moduleOwnershipCheck?.mockResolvedValue(false);
+      mockTransaction(mockDb, {
+        select: [[{ moduleId }]],
+      });
+
+      await expect(
+        service.updateEvent(userId, 'student', eventId, {
+          eventName: 'Forbidden update',
+        }),
+      ).rejects.toThrow(ForbiddenException);
+      expect(mockModuleService.moduleOwnershipCheck).toHaveBeenCalledWith(
+        userId,
+        moduleId,
+        mockDb,
+      );
+    });
+
+    it('rejects recurrence that retains a concrete date', async () => {
+      const existing = createEvent(
+        EventSource.UNIVERSITY,
+        { isRecurring: false },
+        { moduleId, date: '2026-01-12', dayOfWeek: undefined },
+      );
+      mockTransaction(mockDb, {
+        select: [[existing], []],
+      });
+
+      await expect(
+        service.updateEvent(userId, 'uni_admin', existing.eventID, {
+          isRecurring: true,
+        }),
+      ).rejects.toThrow(
+        'Recurring events require dayOfWeek and must not include date',
+      );
+    });
+
     it('should update all event fields', async () => {
       //Arrange
       const oldEvent = createEvent();
@@ -545,6 +621,18 @@ describe('EventService', () => {
 
   //Delete
   describe('Test_DeleteEvent', () => {
+    it('rejects deletion by a student who does not own the event', async () => {
+      mockModuleService.moduleOwnershipCheck?.mockResolvedValue(false);
+      mockTransaction(mockDb, {
+        select: [[{ moduleId }]],
+      });
+
+      await expect(
+        service.deleteEvent(userId, 'student', eventId),
+      ).rejects.toThrow(ForbiddenException);
+      expect(mockDb.delete).not.toHaveBeenCalled();
+    });
+
     it('should delete event - admin', async () => {
       const event = createEvent();
 

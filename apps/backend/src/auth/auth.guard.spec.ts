@@ -15,6 +15,7 @@ describe('AuthGuard', () => {
         getSession: jest.fn(),
       },
     }),
+    userExistsById: jest.fn().mockResolvedValue(true),
   };
 
   beforeEach(async () => {
@@ -97,16 +98,39 @@ describe('AuthGuard', () => {
       };
 
       jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(false);
+      const getSession = jest.fn().mockResolvedValue(mockSession);
       jest.spyOn(mockAuthService, 'getAuth').mockReturnValueOnce({
         api: {
-          getSession: jest.fn().mockResolvedValue(mockSession),
+          getSession,
         },
       });
 
       const result = await guard.canActivate(mockExecutionContext);
       expect(result).toBe(true);
+      expect(getSession).toHaveBeenCalledWith({
+        headers: expect.any(Headers),
+      });
       expect(mockRequest.session).toBeDefined();
       expect(mockRequest.session!.user.id).toBe('user-1');
+    });
+
+    it('rejects a cached session whose user was deleted', async () => {
+      const mockSession = {
+        user: { id: 'deleted-user' },
+        session: { id: 'stale-session' },
+      };
+      jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(false);
+      jest.spyOn(mockAuthService, 'getAuth').mockReturnValueOnce({
+        api: {
+          getSession: jest.fn().mockResolvedValue(mockSession),
+        },
+      });
+      mockAuthService.userExistsById.mockResolvedValueOnce(false);
+
+      await expect(guard.canActivate(mockExecutionContext)).rejects.toThrow(
+        new UnauthorizedException('Session user no longer exists'),
+      );
+      expect(mockRequest.session).toBeUndefined();
     });
 
     it('should handle requests with no headers', async () => {

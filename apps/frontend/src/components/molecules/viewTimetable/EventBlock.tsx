@@ -30,7 +30,7 @@ function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
 }
 
 export function EventBlock({ event, date }: EventBlockProps) {
-  const { mutate: createAttendance } = useMutation({
+  const { mutateAsync: createAttendance } = useMutation({
     ...addEventAttendanceMut(),
   });
 
@@ -45,7 +45,7 @@ export function EventBlock({ event, date }: EventBlockProps) {
       window.dispatchEvent(
         new CustomEvent(errorName, {
           detail: {
-            userMessage: `Event: ${event.name} : updated to ${attending}`,
+            userMessage: `Event: ${event.name} : Updated to ${attending}`,
           },
         }),
       );
@@ -55,7 +55,17 @@ export function EventBlock({ event, date }: EventBlockProps) {
     ...getAllEventAttendanceQ({ eventID: event.id, eventDate: date }),
   });
 
-  const currentAttendance = attendData[0];
+  useEffect(() => {
+    if (attendData && attendData.length === 0) {
+      createAttendance({
+        body: {
+          eventDate: date,
+          eventID: event.id,
+          state: "NOT_ATTENDING",
+        },
+      });
+    }
+  }, [attendData, createAttendance, event.id, date]);
 
   function getBlockStyle() {
     if (!event.accentColour) {
@@ -83,27 +93,18 @@ export function EventBlock({ event, date }: EventBlockProps) {
     <div
       className="flex flex-col gap-1 rounded-sm border-l-[3px] px-2 py-1.5 h-full overflow-hidden"
       onClick={() => {
-        if (currentAttendance) {
+        if (attendData[0])
           updateAttendance({
             body: {
               state:
-                currentAttendance.state === "ATTENDING"
+                attendData[0].state === "ATTENDING"
                   ? "NOT_ATTENDING"
                   : "ATTENDING",
             },
             path: {
-              attendanceId: currentAttendance.AttendanceID,
+              attendanceId: attendData[0].AttendanceID,
             },
           });
-        } else {
-          createAttendance({
-            body: {
-              eventDate: date,
-              eventID: event.id,
-              state: "ATTENDING",
-            },
-          });
-        }
       }}
       style={getBlockStyle()}
     >

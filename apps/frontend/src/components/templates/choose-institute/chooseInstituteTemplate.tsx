@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Card,
   CardContent,
@@ -5,7 +7,10 @@ import {
   CardTitle,
 } from "@/components/atoms/baseShadcn/card";
 import { InstituteSelector } from "@/components/organisms/choose-institute/instituteSelector";
-import { UserDetails } from "@/lib/userclass/userClass";
+import {
+  UniversityStateLoading,
+  useUniversityState,
+} from "@/hooks/useUniversityState";
 
 interface ChooseInstituteTemplateProps {
   onClose?: () => void;
@@ -14,14 +19,16 @@ interface ChooseInstituteTemplateProps {
 export function ChooseInstituteTemplate({
   onClose,
 }: ChooseInstituteTemplateProps) {
-  const uni = UserDetails.getUniDetails();
+  const { university, isLoading } = useUniversityState();
+
+  if (isLoading) return <UniversityStateLoading />;
 
   return (
     <Card className="mx-auto min-w-md bg-[var(--bg-surface)]">
       <CardHeader>
         <CardTitle>Choose Institute</CardTitle>
         <br />
-        {uni && <>Current University : {uni.UniversityName}</>}
+        {university && <>Current University : {university.UniversityName}</>}
       </CardHeader>
       <CardContent>
         <InstituteSelector onClose={onClose} />
