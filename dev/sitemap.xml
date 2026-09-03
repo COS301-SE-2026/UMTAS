@@ -245,10 +245,6 @@
          <lastmod>2026-09-03</lastmod>
     </url>
     <url>
-         <loc>https://cos301-se-2026.github.io/UMTAS/dev/sas/architecture/API_CONTRACTS/</loc>
-         <lastmod>2026-09-03</lastmod>
-    </url>
-    <url>
          <loc>https://cos301-se-2026.github.io/UMTAS/dev/sas/architecture/ARCHITECTURAL_DIAGRAM/</loc>
          <lastmod>2026-09-03</lastmod>
     </url>
@@ -270,6 +266,10 @@
     </url>
     <url>
          <loc>https://cos301-se-2026.github.io/UMTAS/dev/sas/architecture/QUALITY_REQUIREMENT_MAPPING/</loc>
+         <lastmod>2026-09-03</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/dev/sas/architecture/SERVICE_CONTRACTS/</loc>
          <lastmod>2026-09-03</lastmod>
     </url>
     <url>
@@ -313,6 +313,10 @@
          <lastmod>2026-09-03</lastmod>
     </url>
     <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/dev/srs/API_ADAPTER_CASE_STUDY/</loc>
+         <lastmod>2026-09-03</lastmod>
+    </url>
+    <url>
          <loc>https://cos301-se-2026.github.io/UMTAS/dev/srs/DOMAIN_MODEL/</loc>
          <lastmod>2026-09-03</lastmod>
     </url>
@@ -321,7 +325,19 @@
          <lastmod>2026-09-03</lastmod>
     </url>
     <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/dev/srs/Lighthouse/</loc>
+         <lastmod>2026-09-03</lastmod>
+    </url>
+    <url>
          <loc>https://cos301-se-2026.github.io/UMTAS/dev/srs/NON-FUNCTIONAL_REQUIREMENTS/</loc>
+         <lastmod>2026-09-03</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/dev/srs/NON-FUNCTIONAL_TESTING/</loc>
+         <lastmod>2026-09-03</lastmod>
+    </url>
+    <url>
+         <loc>https://cos301-se-2026.github.io/UMTAS/dev/srs/Owasp/</loc>
          <lastmod>2026-09-03</lastmod>
     </url>
     <url>
