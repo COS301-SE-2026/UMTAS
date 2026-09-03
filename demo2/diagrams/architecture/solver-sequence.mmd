@@ -1,0 +1,30 @@
+sequenceDiagram
+    actor User
+    participant Frontend
+    participant API as Core API
+    participant DB as Scheduling Database
+    participant Queue as Solve Job Queue
+    participant Worker as Timetable Solver Worker
+    participant Engine as Solver Engine
+
+    User->>Frontend: Request timetable generation
+    Frontend->>API: Submit scheduling preferences
+    API->>DB: Read canonical scheduling data
+    DB-->>API: Events, venues, modules, and access rules
+    API->>API: Prepare solver input and create solve job
+    API->>Queue: Assign solve job
+    API-->>Frontend: Return job reference
+
+    Queue-->>Worker: Deliver assigned job
+    Worker->>API: Request prepared solver input
+    API-->>Worker: Provide solver input
+    Worker->>Engine: Generate timetable
+    Engine-->>Worker: Return feasible solution or failure
+    Worker->>API: Return solver result and outcome
+    API->>DB: Record solution and job status
+
+    loop While generation is running
+        Frontend->>API: Check solve status
+        API-->>Frontend: Progress or completion
+    end
+    Frontend-->>User: Display generated timetable
