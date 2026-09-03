@@ -1,0 +1,102 @@
+.gitignore
+  h_2d4b3dca70a3d8 157-158
+apps/backend/docs/openapi.json
+  h_2d4b3dca70a3d8 1-11749
+apps/backend/jest.config.ts
+  h_2d4b3dca70a3d8 36-41
+apps/backend/src/Events/event.service.spec.ts
+  h_2d4b3dca70a3d8 470-500,526-570,624-635
+apps/backend/src/Events/eventV2.service.spec.ts
+  h_2d4b3dca70a3d8 13-17,300-440
+apps/backend/src/Module/module.service.spec.ts
+  h_2d4b3dca70a3d8 4-10,631-732
+apps/backend/src/Timetable/timetable.service.spec.ts
+  h_2d4b3dca70a3d8 15,21,287-380
+apps/backend/src/University/university.service.spec.ts
+  h_2d4b3dca70a3d8 6,20-24,492-552,602-618,621-652
+apps/backend/src/auth/auth.guard.spec.ts
+  h_2d4b3dca70a3d8 18,101,104,110-112,117-135
+apps/backend/src/auth/auth.guard.ts
+  h_2d4b3dca70a3d8 55-57,73-79
+apps/backend/src/auth/auth.service.spec.ts
+  h_2d4b3dca70a3d8 17,19,256-269,397-514
+apps/backend/src/auth/auth.service.ts
+  h_2d4b3dca70a3d8 54-62
+apps/backend/src/common/standard-error.filter.ts
+  h_2d4b3dca70a3d8 1-104
+apps/backend/src/main.ts
+  h_2d4b3dca70a3d8 1,4-5,7,9-12,14-15,59,107,124,140
+apps/backend/src/swagger-contract.ts
+  h_2d4b3dca70a3d8 1-442
+apps/backend/src/system-contract-catalog.json
+  h_2d4b3dca70a3d8 1-305
+apps/backend/test/integration-runner/integration.compose.yml
+  h_2d4b3dca70a3d8 97-106
+apps/backend/test/integration/flows/pdf-solver.flow.int.ts
+  h_2d4b3dca70a3d8 49
+apps/backend/tsconfig.json
+  h_2d4b3dca70a3d8 5
+apps/frontend/package.json
+  h_2d4b3dca70a3d8 14,24
+apps/frontend/src/app/layout.tsx
+  h_2d4b3dca70a3d8 12-13,70-76
+apps/frontend/src/components/molecules/viewTimetable/EventBlock.tsx
+  h_2d4b3dca70a3d8 33,48,58-68,96,100,105
+apps/frontend/src/components/organisms/solver/SolverPreferences.tsx
+  h_2d4b3dca70a3d8 145
+apps/frontend/src/components/templates/builder/WizardShell.tsx
+  h_2d4b3dca70a3d8 13-16,26-35,42,138-139
+apps/frontend/src/components/templates/choose-institute/UniversitySelectionGate.tsx
+  h_2d4b3dca70a3d8 1-22
+apps/frontend/src/components/templates/choose-institute/chooseInstituteTemplate.tsx
+  h_2d4b3dca70a3d8 1-2,10-13,22-24,31
+apps/frontend/src/components/templates/course-management/courseManageTemplate.tsx
+  h_2d4b3dca70a3d8 7-8,42-45,71,82,91,106-107,109,111-112,195-196,213,284
+apps/frontend/src/components/templates/map/UniMap.tsx
+  h_2d4b3dca70a3d8 21-24,61,77-80,82-86,99-100
+apps/frontend/src/components/templates/module-management/moduleManagementTemplate.tsx
+  h_2d4b3dca70a3d8 2-3,26-29,50,54,57,62,116-118,120,122
+apps/frontend/src/components/templates/roleManagement/roleManagementTemplate.tsx
+  h_2d4b3dca70a3d8 6-9,46-47,49,52
+apps/frontend/src/components/templates/solver/SolverShell.tsx
+  h_2d4b3dca70a3d8 10,15-18,51,81-83,86-88,111
+apps/frontend/src/hooks/useUniversityState.tsx
+  h_2d4b3dca70a3d8 1-121
+apps/frontend/src/lib/api.ts
+  h_2d4b3dca70a3d8 14-17,36-39,56-59,76-79,94-97,114-117,136-139,156-159,176-179,196-199,216-219,236-239,276-279,296-299,337-340,356-359,376-379,396-399,416-419,434-437,454-457,572-575,582-585,597-600,636-639,658-661,678-681,716-719,736-739,743-746,750-753,764-767,784-787,790-793,808-811,828-831,835-838,842-845,858-861,962-965,986-989,1004-1007,1027-1030,1034-1037,1054-1057,1068-1071,1088-1091,1114-1117,1128-1131,1134-1137,1152-1155,1172-1175,1179-1182,1186-1189,1200-1203,1394-1397,1414-1417,1432-1435,1452-1455,1472-1475,1494-1497,1512-1515,1518-1521,1536-1539,1543-1546,1550-1553,1630-1633,1668-1671,1673-1676,4386-4571,4589,4598-4599,4633,4652,4695,4705,4726,4736-4738,4759-4762,4783,4793-4794,4837-4839,4878-4879,4889,4923-4924,4949-4950,4960,4994-4995,5038-5040,5073,5116-5117,5127,5152,5171,5181,5206-5210,5231-5234,5259,5278-5279,5304,5332-5333,5358,5386,5396,5421-5425,5437,5444-5445,5457,5464-5465,5504-5505,5513,5545-5546,5554,5595-5597,5629-5632,5662-5663,5671,5701-5702,5710,5740-5741,5749,5783-5784,5799,5831-5833,5841,5877-5879,5887-5888,5915-5917,5929-5930,5957-5959,5967-5968,5996-5997,6005,6037-6038,6046,6074-6078,6108-6111,6141-6142,6150,6180-6181,6189,6219-6220,6228,6262-6263,6271-6272,6300-6301,6309,6330-6332,6340,6372-6373,6381,6411-6412,6420,6450-6451,6459,6489-6490,6498,6532-6533,6541-6542,6569-6571,6579,6612-6613,6628,6661-6662,6677,6705-6706,6714,6748-6749,6757-6758,6783-6787,6814,6829,6875,6905-6907,6915,6938,7021,7055-7057,7065-7066,7094-7095,7103,7131-7132,7140,7167-7168,7183-7184,7205,7213-7214,7253-7254,7282,7290-7291,7315-7317,7325,7349,7357,7413,7421,7452-7454,7462,7483-7486,7514-7515,7523,7555-7556,7564,7594-7595,7603,7633-7634,7642,7676-7677,7692,7717-7719,7727-7728,7753,7762-7766,7807,7816-7820,7834,7843-7847,7861,7867,7870-7874,7888,7892,7901-7905,7921,7930-7934,7948,7954,7957-7960,7974,7983-7987,8001,8007,8010-8014,8030,8034,8043-8047,8068,8077-8080,8096,8105-8109,8123,8132-8136,8150,8159-8163,8181,8190-8195,8220-8221,8229,8263,8278-8279,8311,8319-8320,8346-8347,8355,8380-8381,8396,8423-8424,8439-8440,8452,8461-8462,8477,8493,8502-8503,8511-8512,8538-8539,8554,8580-8581,8589,8621-8622,8644,8675-8676,8684,8715-8717,8762,8815,8867,8937,9009,9063,9119,9127,9179,9238,9271-9272,9280,9311-9312,9320,9351-9352,9360,9391-9392,9400
+apps/frontend/src/lib/auth/google-calendar.ts
+  h_2d4b3dca70a3d8 68
+apps/frontend/src/lib/request.spec.ts
+  h_2d4b3dca70a3d8 1-43
+apps/frontend/src/lib/userclass/userClass.ts
+  h_2d4b3dca70a3d8 18-21,35-40,46-54
+apps/frontend/utilities/request.ts
+  h_2d4b3dca70a3d8 3-4,7-13,15-24,35
+docs/index.md
+  h_2d4b3dca70a3d8 27,39,43
+docs/management/Marking-Guide.md
+  h_2d4b3dca70a3d8 1,3,5-20
+docs/requirements/API-Service-Contracts.md
+  h_2d4b3dca70a3d8 6,14-18
+docs/requirements/Introduction.md
+  h_2d4b3dca70a3d8 6
+docs/requirements/Technology-Requirements.md
+  h_2d4b3dca70a3d8 36,39,50,71
+docs/sas/architecture/REST_ENDPOINT_CATALOGUE.md
+  h_2d4b3dca70a3d8 1-218
+docs/sas/architecture/SERVICE_CONTRACTS.md
+  h_2d4b3dca70a3d8 1-3,7-407,409,411-418
+pnpm-lock.yaml
+  h_2d4b3dca70a3d8 361-362,16039,16053,16069,16076,16083,16088,16093,16098,16103,19810,19812,19832,19840,19842-19848,19862
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "563b529a3f97cacd7ca429959a79aa8febcb2c0a",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
