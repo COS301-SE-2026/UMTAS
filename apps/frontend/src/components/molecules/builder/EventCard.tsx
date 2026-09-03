@@ -351,7 +351,7 @@ export function EventCard({
           hideDaySelect
         />
 
-        <div className="flex items-center p-4 justify-between gap-2 rounded-md border border-[var(--border)]">
+        {/* <div className="flex items-center p-4 justify-between gap-2 rounded-md border border-[var(--border)]">
           <div className="space-y-0.5">
             <Label className="text-sm font-medium text-[var(--text-primary)]">
               Attendance
@@ -370,7 +370,7 @@ export function EventCard({
               }
             }}
           />
-        </div>
+        </div> */}
 
         {/* event type */}
         <div className="flex flex-col gap-2">

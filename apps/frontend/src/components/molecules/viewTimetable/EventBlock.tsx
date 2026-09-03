@@ -42,7 +42,7 @@ export function EventBlock({ event, date }: EventBlockProps) {
       window.dispatchEvent(
         new CustomEvent(errorName, {
           detail: {
-            userMessage: `Event: ${event.name} : updated to ${attending}`,
+            userMessage: `Event: ${event.name} : Updated to ${attending}`,
           },
         }),
       );

@@ -117,6 +117,12 @@ export function UniMap() {
           onChange={(e) => setSelectedTime(e.target.value)}
           className="text-sm"
         />
+        {activeRoute?.status === "NONE" && (
+          <span className="text-sm text-[var(--text-secondary)]">
+            Select a Time and Date. All Attending Events From Your Schedule Will
+            Display Routes Between Your Events On The Map.
+          </span>
+        )}
         {activeRoute?.status === "AT_VENUE" && (
           <span className="text-sm text-[var(--text-secondary)]">
             At {activeRoute.fromEventName}

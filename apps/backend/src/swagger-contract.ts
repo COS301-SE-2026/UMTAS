@@ -382,8 +382,7 @@ function setRequestSchema(
 ): void {
   const operation = getOperation(document, route, method);
   const requestBody = operation?.requestBody as
-    | { content?: Record<string, { schema?: unknown }> }
-    | undefined;
+    { content?: Record<string, { schema?: unknown }> } | undefined;
   const json = requestBody?.content?.['application/json'];
   if (json) json.schema = { $ref: `#/components/schemas/${schema}` };
 }
@@ -397,8 +396,7 @@ function setResponseSchema(
 ): void {
   const operation = getOperation(document, route, method);
   const response = operation?.responses?.[status] as
-    | { content?: Record<string, { schema?: unknown }> }
-    | undefined;
+    { content?: Record<string, { schema?: unknown }> } | undefined;
   const json = response?.content?.['application/json'];
   if (json) json.schema = { $ref: `#/components/schemas/${schema}` };
 }
