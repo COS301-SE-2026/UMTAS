@@ -94,8 +94,8 @@
 
     | **ID** | **User Story** | **Use Case** |
     |---|---|---|
-    | US-33 | As a user, I want to import my timetable from a university API so that my academic schedule stays synchronised automatically. | UC-API-01 |
-    | US-34 | As a user, I want to review API-retrieved timetable data so that I can confirm it is correct before it is saved. | UC-API-02 |
+    | US-33 | As a user, I want to synchronise courses, modules, and events from my university API so that the university data is available in UMTAS. | UC-API-01 |
+    | US-34 | As a user, I want existing university data to be updated when it changes in the university API so that my UMTAS data remains current. | UC-API-02 |
 
 ---
 ??? info "**Calendar Export**"

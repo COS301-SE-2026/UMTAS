@@ -4,8 +4,8 @@
     ### **Use Case Table**
     | **Use Case ID** | **Use Case Name** | **Actor** |
     | :---: | :---: | :---: |
-    | **UC-API-01** | [Import Timetable from API](#uc-api-01) | User |
-    | **UC-API-02** | [Review API Retrieved Data](#uc-api-02) | User |
+    | **UC-API-01** | [Synchronise University API Data](#uc-api-01) | User |
+    | **UC-API-02** | [Update Existing University Data](#uc-api-02) | User |
 
     </div>
 
@@ -21,38 +21,48 @@
     ??? "UC-API-01: Import Timetable from API"
         <a id="uc-api-01"></a>
         ##### High Level
+
         ```
-        Import Timetable from API (Actor: User, System: API Integration Layer)  
-        TUCBW the user triggers timetable import from a university-provided API.  
-        TUCEW the system retrieves module and event data from the API, performs lookup against existing records, and prepares a structured dataset for timetable creation.
+        Synchronise University API Data (Actor: User, System: University API Adapter)
+
+        TUCBW the user requests synchronisation of university data.
+
+        TUCEW the system retrieves courses, modules, and events from the university API, maps them to core-system entities, and creates entities that do not already exist.
         ```
+
         ##### Expanded
+
         | Field | Detail |
         | :--- | :--- |
         | **Actor** | User |
-        | **Precondition** | User is authenticated and API access is available |
-        | **Trigger** | User selects “Import from API” |
-        | **Basic Flow** | 1. User initiates API import.<br>2. System authenticates with university API (if required).<br>3. System requests timetable data from API.<br>4. System receives module and event data.<br>5. System performs module lookup against existing records.<br>6. System performs event lookup against existing records.<br>7. System maps existing entities or prepares new ones.<br>8. System constructs structured import dataset.<br>9. System forwards dataset to review stage. |
-        | **Alternate Flow** | **A1: API authentication failure**<br>System aborts import and notifies user.<br><br>**A2: API unavailable or timeout**<br>System retries request and then fails gracefully with error message.<br><br>**A3: Partial API response**<br>System imports available data and flags missing entries. |
-        | **Postcondition** | API data is retrieved and staged for review |
-        | **Requirements Covered** | R2.4.1 \| R2.4.1.1 \| R2.4.1.2 \| R2.4.1.3 \| R2.4.1.4 |
+        | **Precondition** | User is authenticated and a supported university API is available |
+        | **Trigger** | User requests synchronisation of university data |
+        | **Basic Flow** | 1. User initiates synchronisation.<br>2. System requests course, module, and event data from the university API.<br>3. System maps the retrieved API objects to core-system entities.<br>4. System checks whether corresponding entities already exist.<br>5. System creates entities that do not exist.<br>6. System retains existing entities for further synchronisation. |
+        | **Alternate Flow** | **A1: API unavailable**<br>System reports that synchronisation could not be completed.<br><br>**A2: Invalid or unsupported API data**<br>System rejects the affected data and reports the synchronisation error. |
+        | **Postcondition** | Retrieved university data is represented by corresponding entities in the core system |
+        | **Requirements Covered** | R2.4.1 \| R2.4.1.1 \| R2.4.1.2 \| R2.4.1.5 |
 
     ---
     ??? "UC-API-02: Review API Retrieved Data"
         <a id="uc-api-02"></a>
+
         ##### High Level
+
         ```
-        Review API Retrieved Data (Actor: User, System: Timetable Builder)  
-        TUCBW the user reviews the timetable data retrieved from the API.  
-        TUCEW the system presents modules and events for selection and confirmation, allowing the user to finalise timetable creation.
+        Update Existing University Data (Actor: User, System: University API Adapter)
+
+        TUCBW the user requests a subsequent synchronisation of university data.
+
+        TUCEW the system compares retrieved API data with existing core-system entities and updates relevant fields where differences are detected.
         ```
+
         ##### Expanded
         | Field | Detail |
         | :--- | :--- |
         | **Actor** | User |
-        | **Precondition** | API data has been successfully retrieved and staged |
-        | **Trigger** | System displays imported API timetable data |
-        | **Basic Flow** | 1. System displays retrieved modules and events.<br>2. User reviews imported data.<br>3. User selects modules/events to include in timetable.<br>4. System validates selections.<br>5. System creates timetable from selected data.<br>6. System stores timetable under user profile.<br>7. System confirms successful creation. |
-        | **Alternate Flow** | **A1: No items selected**<br>System prevents timetable creation and requests selection.<br><br>**A2: Data inconsistency detected**<br>System highlights conflicting or missing fields.<br><br>**A3: User cancels import**<br>System discards staged dataset without saving. |
-        | **Postcondition** | Timetable is created and stored in system |
-        | **Requirements Covered** | R2.4.1.5 \| R2.4.1.6 \| R2.4.2 \| R2.4.2.1 \| R2.4.2.2 |
+        | **Precondition** | Corresponding university data has previously been imported into the core system |
+        | **Trigger** | User requests synchronisation of university data |
+        | **Basic Flow** | 1. User initiates synchronisation.<br>2. System retrieves the latest course, module, and event data from the university API.<br>3. System identifies the corresponding existing core-system entities.<br>4. System compares the relevant API fields with the existing entity fields.<br>5. System updates fields where differences are detected.<br>6. System leaves unchanged fields unmodified.<br>7. System preserves the identity of the existing entities. |
+        | **Alternate Flow** | **A1: No changes detected**<br>System leaves the existing entities unchanged.<br><br>**A2: API unavailable**<br>System reports that synchronisation could not be completed. |
+        | **Postcondition** | Existing core-system entities reflect the latest available university API data |
+        | **Requirements Covered** | R2.4.1.2 \| R2.4.1.3 \| R2.4.1.4 |

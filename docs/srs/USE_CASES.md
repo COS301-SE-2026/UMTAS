@@ -25,7 +25,7 @@
     | **UC-AU-02** | Login Account | [Authentication](#auth-use-cases) | User |<span class="status-implemented">Implemented</span>|
     | **UC-AU-03** | Reset Password | [Authentication](#auth-use-cases) | User |<span class="status-implemented">Implemented</span>|
     | **UC-AU-04** | Logout Account | [Authentication](#auth-use-cases) | User |<span class="status-implemented">Implemented</span>|
-    | **UC-AU-05** | Delete Account | [Authentication](#auth-use-cases) | User |<span class="status-not-implemented">In Progress</span>|
+    | **UC-AU-05** | Delete Account | [Authentication](#auth-use-cases) | User |<span class="status-implemented">Implemented</span>|
     | **UC-AU-06** | Verify Email | [Authentication](#auth-use-cases) | User |<span class="status-implemented">Implemented</span>|
     | **UC-AU-07** | OAuth | [Authentication](#auth-use-cases) | User |<span class="status-implemented">Implemented</span>|
 
