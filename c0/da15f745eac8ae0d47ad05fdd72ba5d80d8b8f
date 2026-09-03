@@ -1,0 +1,14 @@
+apps/e2e/package.json
+  h_2d4b3dca70a3d8 18
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "c0da15f745eac8ae0d47ad05fdd72ba5d80d8b8f",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
