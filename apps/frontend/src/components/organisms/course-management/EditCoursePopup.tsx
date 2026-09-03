@@ -72,7 +72,7 @@ export function EditCoursePopup({
         path: { CourseId: courseId },
         body: {
           CourseName: courseName,
-          Degree: degreeName,
+          Degree: degreeName === "" ? undefined : degreeName,
         },
       },
       {
