@@ -211,7 +211,7 @@ jobs:
             NEXT_PUBLIC_APP_ENV=staging
             NEXT_PUBLIC_API_URL=https://staging.capstone-vigil.dns.net.za/api
             NEXT_PUBLIC_MAP_KEY=${{ secrets.NEXT_PUBLIC_MAP_KEY }}
-            MAP_ID=${{ secrets.NEXT_PUBLIC_MAP_ID }}
+            NEXT_PUBLIC_MAP_ID=${{ secrets.NEXT_PUBLIC_MAP_ID }}
           tags: |
             vigilcs/umtas:frontend-staging-${{ steps.tag.outputs.latest }}
             vigilcs/umtas:frontend-staging-${{ steps.tag.outputs.sha }}
@@ -323,7 +323,7 @@ jobs:
   # NEXT_PUBLIC_APP_ENV=staging
   # NEXT_PUBLIC_API_URL=https://capstone-vigil.dns.net.za/api
   # NEXT_PUBLIC_MAP_KEY=${{ secrets.NEXT_PUBLIC_MAP_KEY }}
-  #MAP_ID=${{ secrets.NEXT_PUBLIC_MAP_ID }}
+  # NEXT_PUBLIC_MAP_ID=${{ secrets.NEXT_PUBLIC_MAP_ID }}
   #         tags: |
   #           vigilcs/umtas:frontend-${{ steps.tag.outputs.release }}
   #           vigilcs/umtas:frontend-${{ steps.tag.outputs.sha }}
