@@ -160,18 +160,20 @@ export default function SolverPreferences({
 
   const createJobMutation = useMutation({
     mutationFn: async () => {
-      console.log(createPreferences());
       const builder = new createSolverJobBuilder();
       const eventIDs = modules.flatMap(
         (module) => module.Events?.map((event) => event.eventId) ?? [],
       );
+
+      const preferences = createPreferences();
+
       return await builder.send({
         body: {
-          engine: "auto",
+          engine: preferences.length !== 0 ? "ga" : "auto",
           solveMode: currentMode,
           eventIds: eventIDs,
           preferences: {
-            heuristics: createPreferences(),
+            heuristics: preferences,
           },
         },
       });
