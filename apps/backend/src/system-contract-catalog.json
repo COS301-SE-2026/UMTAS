@@ -1,0 +1,305 @@
+{
+  "description": "The UMTAS service contract. **Paths** contains callable HTTP operations. **Schemas** also contains the queue, object-storage, callback, and CLI data exchanged between services. Runtime Zod schemas enforce cross-field rules that OpenAPI cannot express.",
+  "boundaries": [
+    {
+      "id": "frontend-backend-http",
+      "purpose": "Expose authentication, timetable, import, solver, and management operations to the web application.",
+      "transport": "http",
+      "producer": "nextjs-frontend",
+      "consumer": "nestjs-backend",
+      "data": "JSON and multipart form data",
+      "contract": "OpenAPI paths",
+      "security": "Operation-specific: public, session cookie, or role checks",
+      "failure": "OpenAPI error responses"
+    },
+    {
+      "id": "backend-pdf-object-storage",
+      "purpose": "Make an uploaded PDF available to the parser without placing file bytes on the queue.",
+      "transport": "s3-compatible-object-storage",
+      "producer": "nestjs-backend",
+      "consumer": "pdf-parser-worker",
+      "data": "PDF bytes addressed by fileKey",
+      "schema": "#/components/schemas/Object_PdfUpload",
+      "security": "Service credentials on the internal network",
+      "failure": "Upload or download failure ends the parser job"
+    },
+    {
+      "id": "backend-pdf-parser-queue",
+      "purpose": "Assign a stored PDF to the parser worker.",
+      "transport": "bullmq",
+      "channel": "pdf.parse",
+      "producer": "nestjs-backend",
+      "consumer": "pdf-parser-worker",
+      "data": "Job ID, object key, and parser adapter key",
+      "schema": "#/components/schemas/Queue_PdfParseJob",
+      "security": "Authenticated Redis connection on the internal network",
+      "failure": "BullMQ retries the job; the final failure is returned by callback"
+    },
+    {
+      "id": "pdf-worker-parser-cli",
+      "purpose": "Run the Python parser against the downloaded PDF.",
+      "transport": "cli-stdout-json",
+      "producer": "pdf-parser-worker/python-parser",
+      "consumer": "python-parser/pdf-parser-worker",
+      "data": "PDF path and adapter key in; structured parser result out",
+      "outputSchema": "#/components/schemas/Cli_PdfParserOutput",
+      "security": "Local process boundary",
+      "failure": "Non-zero exit, timeout, or invalid JSON becomes a failed callback"
+    },
+    {
+      "id": "pdf-parser-backend-callback",
+      "purpose": "Return the final parser result or error and update the stored job.",
+      "transport": "http",
+      "producer": "pdf-parser-worker",
+      "consumer": "nestjs-backend",
+      "data": "Completed result or structured worker error",
+      "schema": "#/components/schemas/Http_PdfParserCallback",
+      "security": "Worker bearer token",
+      "failure": "Callback delivery retries three times; repeated identical callbacks are accepted"
+    },
+    {
+      "id": "backend-solver-queue",
+      "purpose": "Assign a prepared timetable problem to the solver worker.",
+      "transport": "bullmq",
+      "channel": "timetable.solve",
+      "producer": "nestjs-backend",
+      "consumer": "solver-worker",
+      "data": "Job ID, attempt token, solve mode, and engine choice",
+      "schema": "#/components/schemas/Queue_TimetableSolveJob",
+      "security": "Authenticated Redis connection on the internal network",
+      "failure": "BullMQ retries the job; the final failure is returned by callback"
+    },
+    {
+      "id": "backend-solver-input",
+      "purpose": "Give the worker the current scheduling problem and preferences.",
+      "transport": "http",
+      "producer": "nestjs-backend",
+      "consumer": "solver-worker",
+      "data": "Scheduling events and solver preferences",
+      "schema": "#/components/schemas/Worker_SolverInput",
+      "security": "Worker bearer token",
+      "failure": "Missing, rejected, or invalid input fails the worker attempt"
+    },
+    {
+      "id": "solver-backend-callback",
+      "purpose": "Return the final solution or error and update the active job attempt.",
+      "transport": "http",
+      "producer": "solver-worker",
+      "consumer": "nestjs-backend",
+      "data": "Completed solver result or structured worker error",
+      "schema": "#/components/schemas/Http_SolverCallback",
+      "security": "Worker bearer token and attempt token",
+      "failure": "Callback delivery retries three times; stale attempts are rejected"
+    },
+    {
+      "id": "solver-worker-native-cli",
+      "purpose": "Execute CP-SAT or GA outside the worker runtime.",
+      "transport": "cli-json-file",
+      "producer": "solver-worker/native-solver",
+      "consumer": "native-solver/solver-worker",
+      "data": "Solver input file, engine and mode flags, then solver output file",
+      "inputSchema": "#/components/schemas/Cli_SolverInput",
+      "outputSchema": "#/components/schemas/Cli_SolverOutput",
+      "security": "Local process boundary",
+      "failure": "Timeout, invalid output, or infeasibility becomes a failed callback; auto mode may fall back to GA"
+    },
+    {
+      "id": "backend-google-oauth",
+      "purpose": "Sign in or link an account with a Google identity.",
+      "transport": "oauth2-openid-connect",
+      "producer": "nestjs-backend/google",
+      "consumer": "google/nestjs-backend",
+      "data": "Authorization redirect, code, state, and OpenID profile",
+      "contract": "OpenAPI Auth Google paths; scopes: openid, email, profile",
+      "security": "OAuth state cookie, HTTPS redirect, and encrypted stored tokens",
+      "failure": "Provider and callback errors return through the authentication flow"
+    }
+  ],
+  "schemas": {
+    "Queue_PdfParseJob": {
+      "type": "object",
+      "description": "BullMQ job payload sent by the NestJS backend to the PDF parser worker on the `pdf.parse` queue. Runtime authority: `PdfParseJobDataSchema` in `packages/shared-types/src/parser.ts`.",
+      "x-transport": "bullmq",
+      "x-channel": "pdf.parse",
+      "x-producer": "nestjs-backend",
+      "x-consumer": "pdf-parser-worker",
+      "additionalProperties": false,
+      "required": ["jobId", "fileKey", "adapterKey"],
+      "properties": {
+        "jobId": { "type": "string", "minLength": 1 },
+        "fileKey": { "type": "string", "minLength": 1 },
+        "adapterKey": { "type": "string", "minLength": 1 }
+      }
+    },
+    "Object_PdfUpload": {
+      "type": "string",
+      "format": "binary",
+      "description": "PDF bytes written by the backend and downloaded by the parser worker using the `fileKey` from `Queue_PdfParseJob`.",
+      "x-transport": "s3-compatible-object-storage",
+      "x-producer": "nestjs-backend",
+      "x-consumer": "pdf-parser-worker"
+    },
+    "Queue_TimetableSolveJob": {
+      "type": "object",
+      "description": "BullMQ job payload sent by the NestJS backend to the solver worker on the `timetable.solve` queue. Runtime authority: `TimetableSolveJobDataSchema` in `packages/shared-types/src/solver.ts`.",
+      "x-transport": "bullmq",
+      "x-channel": "timetable.solve",
+      "x-producer": "nestjs-backend",
+      "x-consumer": "solver-worker",
+      "additionalProperties": false,
+      "required": ["jobId", "attemptToken", "solveMode"],
+      "properties": {
+        "jobId": { "type": "string", "minLength": 1 },
+        "attemptToken": { "type": "string", "format": "uuid" },
+        "solveMode": {
+          "type": "string",
+          "enum": ["feasibility", "optimization"]
+        },
+        "engine": {
+          "type": "string",
+          "enum": ["auto", "cp-sat", "ga"],
+          "default": "auto"
+        }
+      }
+    },
+    "Worker_PdfParserResult": {
+      "description": "Structured parser result produced by the PDF parser worker. Every event is either recurring (`isRecurring: true`, `day` set, `date: null`) or dated (`isRecurring: false`, `date` set, `day: null`). Runtime rule: `startTime` must be earlier than `endTime`.",
+      "x-runtime-schema": "PdfParserResultSchema",
+      "allOf": [{ "$ref": "#/components/schemas/PdfParserResultDto" }]
+    },
+    "Cli_PdfParserOutput": {
+      "description": "JSON written to stdout by the Python parser after a successful parse.",
+      "x-transport": "cli-stdout-json",
+      "x-producer": "python-parser",
+      "x-consumer": "pdf-parser-worker",
+      "x-cli-arguments": "--adapter <adapterKey> --file <path>",
+      "allOf": [{ "$ref": "#/components/schemas/Worker_PdfParserResult" }]
+    },
+    "Worker_SolverInput": {
+      "description": "Scheduling problem and preferences returned by the backend to the solver worker and written as the native solver input JSON file. Each scheduling event must contain exactly one of `date` or `dayOfWeek`, and `startTime` must be earlier than `endTime`.",
+      "x-transport": "internal-http",
+      "x-producer": "nestjs-backend",
+      "x-consumer": "solver-worker",
+      "x-runtime-schema": "SolverInputSchema",
+      "allOf": [{ "$ref": "#/components/schemas/SolverInputDto" }]
+    },
+    "Worker_SolverResult": {
+      "description": "Normalized solver result returned by the solver worker. Runtime rules: `metadata.conflictCount` equals `metadata.conflicts.length`; `outcome` is `conflict-free` when the count is zero and `best-effort` otherwise.",
+      "x-runtime-schema": "SolverResultSchema",
+      "allOf": [{ "$ref": "#/components/schemas/SolverResultDto" }]
+    },
+    "Http_PdfParserCallback": {
+      "description": "Discriminated HTTP callback sent by the PDF parser worker. A completed callback contains only `status` and `result`; a failed callback contains only `status` and `error`.",
+      "x-transport": "http",
+      "x-producer": "pdf-parser-worker",
+      "x-consumer": "nestjs-backend",
+      "x-runtime-schema": "PdfParserCallbackPayloadSchema",
+      "discriminator": { "propertyName": "status" },
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "result"],
+          "properties": {
+            "status": { "type": "string", "enum": ["completed"] },
+            "result": { "$ref": "#/components/schemas/Worker_PdfParserResult" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "error"],
+          "properties": {
+            "status": { "type": "string", "enum": ["failed"] },
+            "error": { "$ref": "#/components/schemas/WorkerCallbackErrorDto" }
+          }
+        }
+      ]
+    },
+    "Http_SolverCallback": {
+      "description": "Discriminated HTTP callback sent by the solver worker. A completed callback contains only `status` and `result`; a failed callback contains only `status` and `error`.",
+      "x-transport": "http",
+      "x-producer": "solver-worker",
+      "x-consumer": "nestjs-backend",
+      "x-runtime-schema": "SolverCallbackPayloadSchema",
+      "discriminator": { "propertyName": "status" },
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "result"],
+          "properties": {
+            "status": { "type": "string", "enum": ["completed"] },
+            "result": { "$ref": "#/components/schemas/Worker_SolverResult" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "error"],
+          "properties": {
+            "status": { "type": "string", "enum": ["failed"] },
+            "error": { "$ref": "#/components/schemas/WorkerCallbackErrorDto" }
+          }
+        }
+      ]
+    },
+    "Cli_SolverInput": {
+      "description": "JSON file passed to the native solver with `--input`. Its content is the solver input retrieved from the backend.",
+      "x-transport": "cli-json-file",
+      "x-producer": "solver-worker",
+      "x-consumer": "native-solver",
+      "x-cli-arguments": "--input <path> --output <path> --engine <cp-sat|ga> --solve-mode <feasibility|optimization>",
+      "allOf": [{ "$ref": "#/components/schemas/Worker_SolverInput" }]
+    },
+    "Cli_SolverOutput": {
+      "description": "JSON file written by the native solver to the `--output` path. Runtime authority: `SolverCliOutputSchema` in `packages/shared-types/src/solver.ts`. A successful process writes exactly one of the feasible or infeasible shapes.",
+      "x-transport": "cli-json-file",
+      "x-producer": "native-solver",
+      "x-consumer": "solver-worker",
+      "x-runtime-schema": "SolverCliOutputSchema",
+      "discriminator": { "propertyName": "status" },
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "outcome",
+            "timetableSolution",
+            "heuristicScores",
+            "metadata"
+          ],
+          "properties": {
+            "status": { "type": "string", "enum": ["feasible"] },
+            "outcome": {
+              "type": "string",
+              "enum": ["conflict-free", "best-effort"]
+            },
+            "timetableSolution": {
+              "$ref": "#/components/schemas/TimetableSolutionDto"
+            },
+            "heuristicScores": {
+              "type": "array",
+              "default": [],
+              "items": {
+                "$ref": "#/components/schemas/SolverHeuristicScoreDto"
+              }
+            },
+            "metadata": {
+              "$ref": "#/components/schemas/SolverResultMetadataDto"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status"],
+          "properties": {
+            "status": { "type": "string", "enum": ["infeasible"] }
+          }
+        }
+      ]
+    }
+  }
+}

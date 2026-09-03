@@ -65,6 +65,7 @@ export async function fetchGoogleCalendarToken(): Promise<GoogleCalendarToken> {
   }
 
   const token = await authClient.getAccessToken({
+    providerId: "google",
     accountId: googleAccount.accountId,
   });
   if (token.error || !token.data) {

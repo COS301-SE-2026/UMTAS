@@ -27,11 +27,6 @@ export async function uploadPdfBuilder(
 ): Promise<uploadPDFRes> {
   if (!body.file) throw new Error("No file selected");
 
-  const baseUrl =
-    (typeof window === "undefined"
-      ? process.env.API_URL
-      : process.env.NEXT_PUBLIC_API_URL) || "http://localhost:3000";
-
   const formData = new FormData();
   formData.append("file", body.file);
   formData.append("adapterKey", "up");

@@ -1,7 +1,13 @@
 import { Test } from '@nestjs/testing';
 
 //Constants
-import { userId, courseId, uniId, groupId } from '../Testing/constants';
+import {
+  userId,
+  courseId,
+  uniId,
+  groupId,
+  moduleId,
+} from '../Testing/constants';
 
 //Table imports
 // import { modules, CourseModule, ModuleStyling } from '../entities/index';
@@ -621,6 +627,108 @@ describe('ModuleService', () => {
       });
     });
   }); //END_Test_enrollToModule
+
+  describe('module styling and ownership', () => {
+    it('creates styling when the user has no existing preference', async () => {
+      const styling = createModuleStyling({
+        ModuleID: moduleId,
+        UserID: userId,
+        styling: { colour: '#123456' },
+      });
+      mockTransaction(mockDb, {
+        select: [[]],
+        insert: [[styling]],
+      });
+
+      await expect(
+        service.setStyling(moduleId, userId, '#123456'),
+      ).resolves.toEqual(styling);
+      expect(mockDb.insert).toHaveBeenCalledTimes(1);
+      expect(mockDb.update).not.toHaveBeenCalled();
+    });
+
+    it('updates an existing styling preference', async () => {
+      const existing = createModuleStyling({
+        ModuleID: moduleId,
+        UserID: userId,
+      });
+      const updated = { ...existing, styling: { colour: '#654321' } };
+      mockTransaction(mockDb, {
+        select: [[existing]],
+        update: [[updated]],
+      });
+
+      await expect(
+        service.setStyling(moduleId, userId, '#654321'),
+      ).resolves.toEqual(updated);
+      expect(mockDb.update).toHaveBeenCalledTimes(1);
+      expect(mockDb.insert).not.toHaveBeenCalled();
+    });
+
+    it('reports a failed styling write', async () => {
+      mockTransaction(mockDb, {
+        select: [[]],
+        insert: [[]],
+      });
+
+      await expect(
+        service.setStyling(moduleId, userId, '#123456'),
+      ).rejects.toThrow('Module styling ceased to exist');
+    });
+
+    it('returns the current styling preference', async () => {
+      const styling = createModuleStyling({
+        ModuleID: moduleId,
+        UserID: userId,
+      });
+      mockDbResult(mockDb.select, [styling]);
+
+      await expect(service.getStyling(moduleId, userId)).resolves.toEqual(
+        styling,
+      );
+    });
+
+    it.each([
+      [[{ moduleId }], true],
+      [[], false],
+    ])(
+      'resolves module ownership from the relationship query',
+      async (rows, expected) => {
+        mockDbResult(mockDb.select, rows);
+
+        await expect(
+          service.moduleOwnershipCheck(userId, moduleId, mockDb),
+        ).resolves.toBe(expected);
+      },
+    );
+
+    it('returns the university related to a module', async () => {
+      mockDbResult(mockDb.select, [{ UniversityID: uniId }]);
+
+      await expect(service.getUniForModule(moduleId)).resolves.toEqual({
+        UniversityID: uniId,
+      });
+    });
+
+    it('returns a success message after updating styling', async () => {
+      const module = createModule({ moduleID: moduleId, moduleCode: 'COS301' });
+      const styling = createModuleStyling({
+        ModuleID: moduleId,
+        UserID: userId,
+        styling: { colour: '#ABCDEF' },
+      });
+      jest.spyOn(service, 'getById').mockResolvedValue(module);
+      jest.spyOn(service, 'setStyling').mockResolvedValue(styling);
+
+      await expect(
+        service.updateStylingService(userId, moduleId, {
+          styling: { colour: '#ABCDEF' },
+        }),
+      ).resolves.toEqual({
+        message: 'Successfully updated the module COS301 updated to #ABCDEF',
+      });
+    });
+  });
 
   //Add modules to course
   describe('Test_addModulesToCourse', () => {

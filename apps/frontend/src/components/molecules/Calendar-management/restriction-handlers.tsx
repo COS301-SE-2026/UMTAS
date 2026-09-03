@@ -18,6 +18,7 @@ import {
 } from "@/components/atoms/baseShadcn/select";
 import { useMutation } from "@tanstack/react-query";
 import { getAcademicCalendarResp } from "../../../../utilities/Calendar-Builders/CalendarManagement";
+import { Label } from "@/components/atoms/baseShadcn/label";
 
 export abstract class RestrictionHandler {
   protected MyHandletypes: RestrictionTypes[];
@@ -102,6 +103,9 @@ function RestrictionContainerHtml({
     <div className="flex flex-col text-left  ">
       <CalCard>
         <div className="flex flex-col gap-y-2">
+          <Label className="text-sm font-medium text-[var(--text-primary)] text-left pl-1">
+            Restriction Type
+          </Label>
           <Select
             disabled={restriction.id == ""}
             value={restriction.type}
@@ -113,7 +117,10 @@ function RestrictionContainerHtml({
               save(toEnum(e));
             }}
           >
-            <SelectTrigger id="select-year" className="capitalize w-40 ">
+            <SelectTrigger
+              id="select-year"
+              className="capitalize w-40 bg-[var(--background)]"
+            >
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

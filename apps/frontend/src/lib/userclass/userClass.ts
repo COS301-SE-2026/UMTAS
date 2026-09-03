@@ -15,11 +15,11 @@ export class UserDetails {
   }
 
   public static storeUniDetails(details?: uniDto | undefined) {
-    if (details == undefined && this.checkWindow()) {
-      localStorage.setItem(this.uniKey, "");
+    if (!this.checkWindow()) return;
+    if (!details) {
+      this.clearUniDetails();
+      return;
     }
-
-    if (!details || !this.checkWindow()) return;
     const data = JSON.stringify(details);
     localStorage.setItem(this.uniKey, data);
 
@@ -32,12 +32,24 @@ export class UserDetails {
 
     const storedItem = localStorage.getItem(this.uniKey);
 
-    if (storedItem && storedItem != "") {
-      const data = JSON.parse(storedItem);
-      return data as uniDto;
+    if (storedItem) {
+      try {
+        return JSON.parse(storedItem) as uniDto;
+      } catch {
+        this.clearUniDetails();
+      }
     }
 
     return undefined;
+  }
+
+  public static clearUniDetails() {
+    if (!this.checkWindow()) return;
+
+    localStorage.removeItem(this.uniKey);
+    document.cookie = "umtas-uni-id=; Path=/; Max-Age=0; SameSite=Lax";
+    window.dispatchEvent(new Event(this.changeEvent));
+    getQueryClient().invalidateQueries();
   }
 
   public static userCanEdit() {

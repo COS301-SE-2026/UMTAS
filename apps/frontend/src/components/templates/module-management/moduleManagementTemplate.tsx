@@ -1,14 +1,8 @@
 "use client";
-import { getAllModCoursesQ } from "@/app/course-management/queries/modules/moduleQueries";
-import {
-  moduleCols,
-  ModuleTableData,
-} from "@/components/organisms/module-management/ModuleColumns";
-import { useQueries, useQuery } from "@tanstack/react-query";
+import { moduleCols } from "@/components/organisms/module-management/ModuleColumns";
+import { useQuery } from "@tanstack/react-query";
 
-import { UserDetails } from "@/lib/userclass/userClass";
 import { ModuleTable } from "@/components/organisms/module-management/moduleTable";
-import { getAllEventsAdminQ } from "@/app/module-management/queries/queries";
 import { useState } from "react";
 import CreateModuleAdmin from "@/components/organisms/module-management/addModule";
 import Popup from "@/components/atoms/utility/floatContainer";
@@ -22,7 +16,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/atoms/baseShadcn/select";
-import { useRouter } from "next/navigation";
 
 import Tutorial from "@/components/organisms/nav/Tutorial";
 import NotFound from "@/app/not-found";
@@ -30,6 +23,10 @@ import NotFound from "@/app/not-found";
 import NoRoleSelected from "@/components/molecules/roleManagement/NoRoleSelected";
 import { fetchAllModulesv2 } from "../../../../utilities/V2-Builders/Modules";
 import { Checkbox } from "@/components/atoms/baseShadcn/checkbox";
+import {
+  UniversityStateLoading,
+  useUniversityState,
+} from "@/hooks/useUniversityState";
 const steps = [
   {
     target: "#btn-create-module-new",
@@ -50,21 +47,19 @@ const steps = [
 ];
 
 export default function ModManagementTemplate() {
+  const { university, isLoading: isUniversityLoading } = useUniversityState();
   const [showCreateModule, updateShowModule] = useState(false);
   const [enrolledQ, setEnrolledQ] = useState<boolean>(false);
   const { data: modData } = useQuery({
-    queryKey: [
-      "Modules",
-      UserDetails.getUniDetails()?.UniversityID ?? "",
-      enrolledQ ?? false,
-    ],
+    queryKey: ["Modules", university?.UniversityID ?? "", enrolledQ ?? false],
     queryFn: async () => {
       const result = await fetchAllModulesv2({
-        universityId: UserDetails.getUniDetails()?.UniversityID,
+        universityId: university?.UniversityID,
         userEnrollment: enrolledQ,
       });
       return result.modules;
     },
+    enabled: !isUniversityLoading && university != null,
   });
   const data = useMemo(
     () =>
@@ -117,18 +112,14 @@ export default function ModManagementTemplate() {
     });
   }, [data, foundPrefixForModule, searchQuery]);
 
-  const UniDetails = UserDetails.getUniDetails();
   const ViableRole =
-    UniDetails?.role === "UNIVERSITY_ADMIN" ||
-    UniDetails?.role === "LECTURER" ||
-    UniDetails?.role === "STUDENT";
-  const router = useRouter();
+    university?.role === "UNIVERSITY_ADMIN" ||
+    university?.role === "LECTURER" ||
+    university?.role === "STUDENT";
 
-  // if (UniDetails === null) {
-  //   router.push("/dashboard");
-  // }
+  if (isUniversityLoading) return <UniversityStateLoading />;
 
-  const hasRole = UniDetails?.role != null;
+  const hasRole = university?.role != null;
   if (!hasRole) return <NoRoleSelected />;
 
   if (!ViableRole) {
@@ -155,7 +146,7 @@ export default function ModManagementTemplate() {
           Create Module
         </Button> */}
 
-        <div className="flex flex-col md:flex-row gap-4 p-5 border-b border-[var(--border)] items-center justify-between bg-[var(--bg-surface)]">
+        <div className="flex flex-col md:flex-row gap-4 p-5 border-b border-[var(--border)] items-start justify-between bg-[var(--bg-surface)]">
           <div className="w-full md:max-w-sm flex-1">
             <Input
               id="input-search-module-code"
@@ -165,8 +156,8 @@ export default function ModManagementTemplate() {
               className="w-full bg-[var(--background)]"
             />
           </div>
-          <div className="  flex items-center text-left gap-x-4 flex-row  bg-[var(--background)] px-2 p-1 rounded-xl ">
-            <label className="focus:text-accent-foreground ">
+          <div className="  flex items-center text-left gap-x-4 bg-[var(--background)] p-2 h-7.5 rounded-md">
+            <label className="focus:text-accent-foreground text-sm">
               Show only enrolled modules
             </label>
             <Checkbox

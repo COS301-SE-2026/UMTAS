@@ -16,7 +16,7 @@ export function getAllBuildingsQ(query?: getAllBuildingsQuery) {
     queryFn: async () => {
       const result = (await new getAllBuildingsBuilder().send({ paths: query }))
         .buildings;
-      console.log(result, "Sent building ");
+      //console.log(result, "Sent building ");
       return result;
     },
   });
@@ -29,7 +29,7 @@ export function createBuildingMut() {
       const result = new createBuildingBuilder().send({
         body: vars.body,
       });
-      console.log("result", await result);
+      //console.log("result", await result);
       return result;
     },
     onSuccess: () => {
@@ -47,12 +47,12 @@ export function updateBuildingLocationMut() {
       body: updateBuildingLocationBody;
       path: updateBuildingLocationPath;
     }) => {
-      console.log(vars.body);
+      //console.log(vars.body);
       const result = new updateBuildingLocationBuilder().send({
         body: vars.body,
         paths: vars.path,
       });
-      console.log("result", await result);
+      //console.log("result", await result);
       return result;
     },
     onSuccess: () => {

@@ -12,9 +12,11 @@ RUN pnpm install --frozen-lockfile --filter backend... \
 FROM deps AS build
 ARG SEED_COS_ADMIN_EMAIL
 ARG SEED_COS_ADMIN_PASSWORD
+ARG ORS_API_KEY
 
 ENV SEED_COS_ADMIN_EMAIL=${SEED_COS_ADMIN_EMAIL}
 ENV SEED_COS_ADMIN_PASSWORD=${SEED_COS_ADMIN_PASSWORD}
+ENV ORS_API_KEY=${ORS_API_KEY}
 COPY packages/shared-types/ ./packages/shared-types/
 COPY apps/backend/ ./apps/backend/
 RUN pnpm --filter=shared-types build
