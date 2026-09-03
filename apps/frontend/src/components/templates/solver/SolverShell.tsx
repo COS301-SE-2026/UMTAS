@@ -72,12 +72,9 @@ export default function SolverShell() {
     // once the group id is not null then this page will run the query to send
     // for modules and events
     // will automatically be done using the get modules query
-    const stepInterval = setInterval(() => {
-      if (moduleGroupingID != null && modulesData != undefined) {
-        setCurrentStep(fromStep + 1);
-        setComingFromStep(null);
-        clearInterval(stepInterval);
-      }
+    setTimeout(() => {
+      setCurrentStep(fromStep + 1);
+      setComingFromStep(null);
     }, 676);
   }
 
