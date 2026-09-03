@@ -53,6 +53,8 @@ export function EventBlock({ event, date }: EventBlockProps) {
   });
   const { data: attendData = [] } = useQuery({
     ...getAllEventAttendanceQ({ eventID: event.id, eventDate: date }),
+    refetchInterval: false,
+    staleTime: Infinity,
   });
 
   const currentAttendance = attendData[0];
