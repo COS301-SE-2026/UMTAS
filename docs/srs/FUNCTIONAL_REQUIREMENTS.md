@@ -8,6 +8,12 @@ The Traceability Matrices for the functional requirements to use cases can be fo
 
 ??? info "**FR 1 — Authentication System**"
 
+    ### R1.1 Landing Page System
+
+    - **R1.1.1** The system shall display the landing page to unauthenticated visitors.   
+        - **R1.1.1.1** The system shall provide navigation to the login page.  
+        - **R1.1.1.2** The system shall provide navigation to the registration page.  
+
     ### R1.2 Login and Register System
 
     - **R1.2.1** The system shall allow users to log in.
@@ -67,18 +73,15 @@ The Traceability Matrices for the functional requirements to use cases can be fo
         - **R2.3.2.1** The system shall allow users to modify individual related details of a timetable
         - **R2.3.2.2** The system shall allow users to modify selected events from module list
 
-    ### R2.4 Timetable Creation – API System
+    ### R2.4 University API Integration
 
-    - **R2.4.1** The system shall automate timetable creation using a university‑provided API (if applicable).
-        - **R2.4.1.1** The system will create modules based on the provided API if they do not exist within the system.
-        - **R2.4.1.2** The system will do a module lookup based on the provided API if they do exist within the system.
-        - **R2.4.1.3** The system will create events based on the provided API if they do not exist within the system.
-        - **R2.4.1.4** The system will do an event lookup based on the provided API if they do exist within the system.
-        - **R2.4.1.5** The system will allow a user to create a timetable based on provided selection of events from the system.
-        - **R2.4.1.6** The system will allow a user to modify colours and other individual user details related to the timetable.
-    - **R2.4.2** The system shall allow user customisation of API‑generated timetables.
-        - **R2.4.2.1** The system shall allow users to modify individual related details of a timetable.
-        - **R2.4.2.2** The system shall allow users to modify selected events from the module list.
+    - **R2.4.1** The system shall retrieve course, module, and event data from a supported university API.
+        - **R2.4.1.1** The system shall create a corresponding core-system entity when an imported course, module, or event does not already exist.
+        - **R2.4.1.2** The system shall identify existing core-system entities corresponding to imported university API data.
+        - **R2.4.1.3** The system shall update the relevant fields of an existing core-system entity when the corresponding API data has changed.
+        - **R2.4.1.4** The system shall preserve the core-system identity of an existing entity when synchronising updated API data.
+        - **R2.4.1.5** The system shall map university-specific API objects to the corresponding core-system entities.
+
 
     ### R2.5 Calendar Exporting
 
