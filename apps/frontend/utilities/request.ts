@@ -1,14 +1,27 @@
 import { paths } from "../src/lib/api";
 
-// url is something like /universities
-export function createBaseURL(): string {
-  const baseUrl =
+function resolveApiBaseUrl(): string {
+  return (
     (typeof window === "undefined"
       ? process.env.API_URL
-      : process.env.NEXT_PUBLIC_API_URL) || "http://localhost:3000";
+      : process.env.NEXT_PUBLIC_API_URL) || "http://localhost:3000"
+  );
+}
 
-  const cleanBase = baseUrl.replace(/\/$/, "");
-  const apiBase = cleanBase.includes("/api") ? cleanBase : `${cleanBase}/api`;
+// url is something like /universities
+export function createBaseURL(): string {
+  const cleanBase = resolveApiBaseUrl().replace(/\/+$/, "");
+
+  // The configured base can be absolute ("https://api.example.com") or a
+  // same-origin path ("/api", which the e2e compose build sets), so resolve
+  // against a dummy origin: `new URL("/api")` on its own throws. Comparing the
+  // pathname rather than the whole string keeps hosts like "api.example.com"
+  // from being mistaken for an existing "/api" prefix.
+  const pathname = new URL(cleanBase, "http://localhost").pathname.replace(
+    /\/+$/,
+    "",
+  );
+  const apiBase = pathname.endsWith("/api") ? cleanBase : `${cleanBase}/api`;
 
   return `${apiBase}/`;
 }
@@ -19,11 +32,7 @@ export function createUrl(url: string): string {
 }
 
 export function cleanBase() {
-  const baseUrl =
-    (typeof window === "undefined"
-      ? process.env.API_URL
-      : process.env.NEXT_PUBLIC_API_URL) || "http://localhost:3000";
-  return baseUrl.replace(/\/$/, "");
+  return resolveApiBaseUrl().replace(/\/+$/, "");
 }
 
 type SwaggerPathKeys = Extract<keyof paths, string>;
