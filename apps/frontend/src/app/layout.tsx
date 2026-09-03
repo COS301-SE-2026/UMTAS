@@ -9,6 +9,8 @@ import TanstackProvider from "@/components/tanstack/tanstackProvider";
 import { HelpCommandPalette } from "@/components/organisms/nav/HelpCommandPallete";
 import { MapProvider } from "@/components/organisms/map/MapProvider";
 import { PostHogProvider } from "@/app/posthog/providers";
+import { UniversityStateProvider } from "@/hooks/useUniversityState";
+import { UniversitySelectionGate } from "@/components/templates/choose-institute/UniversitySelectionGate";
 const dmSans = DM_Sans({
   subsets: ["latin"],
   weight: ["400", "500", "600"],
@@ -65,9 +67,13 @@ export default async function RootLayout({
         <TanstackProvider>
           <MapProvider>
             <PostHogProvider>
-              <AppShellTemplate userName={userName}>
-                {children}
-              </AppShellTemplate>
+              <UniversityStateProvider>
+                <UniversitySelectionGate>
+                  <AppShellTemplate userName={userName}>
+                    {children}
+                  </AppShellTemplate>
+                </UniversitySelectionGate>
+              </UniversityStateProvider>
             </PostHogProvider>
             <HelpCommandPalette />
             <Toaster />

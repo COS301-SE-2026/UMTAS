@@ -1,16 +1,11 @@
 "use client";
 import { getAllCoursesQ } from "@/app/course-management/queries/courses/courseQueries";
 import { Spinner } from "@/components/atoms/baseShadcn/spinner";
-import { UserDetails } from "@/lib/userclass/userClass";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
 import { CourseTableData } from "@/components/organisms/course-management/courseColumns";
 
-import { useState, useEffect, useMemo, Fragment } from "react";
-import {
-  getAllModulesQueries,
-  moduleDTO,
-} from "@/app/course-management/queries/modules/moduleBuilder";
+import { useState, useMemo, Fragment } from "react";
+import { moduleDTO } from "@/app/course-management/queries/modules/moduleBuilder";
 import { Input } from "@/components/atoms/baseShadcn/input";
 import { Button } from "@/components/atoms/baseShadcn/button";
 
@@ -44,6 +39,10 @@ import {
   addCourseModules,
 } from "@/components/organisms/course-management/API-gen/Queries/request";
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
+import {
+  UniversityStateLoading,
+  useUniversityState,
+} from "@/hooks/useUniversityState";
 
 const steps = [
   {
@@ -69,8 +68,7 @@ const steps = [
 ];
 
 export default function CourseManagementTemplate() {
-  const router = useRouter();
-  const UniDetails = UserDetails.getUniDetails();
+  const { university, isLoading: isUniversityLoading } = useUniversityState();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDegree, setSelectedDegree] = useState("All");
   const [selectedModulePrefix, setSelectedModulePrefix] = useState("All");
@@ -81,7 +79,7 @@ export default function CourseManagementTemplate() {
   const [showAddCourse, setShowAddCourse] = useState(false);
   const [courseToEdit, setCourseToEdit] = useState<CourseDTO | null>(null);
 
-  const ViableRole = UniDetails?.role === "UNIVERSITY_ADMIN";
+  const ViableRole = university?.role === "UNIVERSITY_ADMIN";
 
   const { mutate: addExternalModules, isPending: modulesPending } = useMutation(
     {
@@ -90,7 +88,7 @@ export default function CourseManagementTemplate() {
         getQueryClient().invalidateQueries({
           queryKey: getAllCoursesQ({
             Degree: selectedDegree == "All" ? undefined : selectedDegree,
-            UniversityID: UserDetails.getUniDetails()?.UniversityID,
+            UniversityID: university?.UniversityID,
           }).queryKey,
         });
         addExternalEvents(data.modules);
@@ -101,27 +99,17 @@ export default function CourseManagementTemplate() {
   const { mutate: addExternalEvents, isPending: eventsPending } = useMutation({
     ...addCourseEvents(),
   });
-  // if (UniDetails === null) {
-  //   router.push("/dashboard");
-  // }
-
-  //forces you to pick an institude if you havent already
-  useEffect(() => {
-    if (UniDetails === null) {
-      router.push("/choose-institute");
-    }
-  }, [UniDetails, router]);
-
   const {
     data: courseData = [],
     isLoading: isCourseLoading,
     isError: isCourseError,
-  } = useQuery(
-    getAllCoursesQ({
+  } = useQuery({
+    ...getAllCoursesQ({
       Degree: selectedDegree == "All" ? undefined : selectedDegree,
-      UniversityID: UserDetails.getUniDetails()?.UniversityID,
+      UniversityID: university?.UniversityID,
     }),
-  );
+    enabled: !isUniversityLoading && university != null,
+  });
 
   //use memo for caching between renders
   const availableDegrees = useMemo(() => {
@@ -204,6 +192,8 @@ export default function CourseManagementTemplate() {
     }));
   };
 
+  if (isUniversityLoading) return <UniversityStateLoading />;
+
   if (isCourseLoading) {
     return (
       <div className="h-full w-full flex justify-center items-center py-20">
@@ -220,7 +210,7 @@ export default function CourseManagementTemplate() {
     );
   }
 
-  const hasRole = UniDetails?.role != null;
+  const hasRole = university?.role != null;
   if (!hasRole) return <NoRoleSelected />;
 
   if (!ViableRole) {
@@ -291,10 +281,7 @@ export default function CourseManagementTemplate() {
               <Button
                 data-testid="show-add-course"
                 onClick={() => {
-                  if (
-                    UserDetails.getUniDetails()?.UniversityName ===
-                    "University of Maryland"
-                  ) {
+                  if (university?.UniversityName === "University of Maryland") {
                     setExternalCourses(true);
                   } else {
                     setShowAddCourse(true);

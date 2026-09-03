@@ -3,7 +3,7 @@
 !!! abstract "Document Overview"
     This Software Requirements Specification (SRS) defines the complete requirements for **UMTAS** - the *University Management & Timetabling Automation System* - developed by **Team Vigil**.
 
-    **What UMTAS does:** Automates university timetable generation and venue management. The system ingests master schedule PDFs, resolves hard and soft scheduling constraints via a CP-SAT constraint solver, and delivers conflict-free, personalized timetables to up to 20,000 concurrent students.
+    **What UMTAS does:** Automates university timetable generation and venue management. The system ingests supported schedule PDFs and resolves hard and soft scheduling constraints through CP-SAT with a best-effort GA fallback.
 
     **Who this document is for:**
 
