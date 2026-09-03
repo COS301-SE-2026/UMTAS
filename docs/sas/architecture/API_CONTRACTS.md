@@ -1,5 +1,7 @@
 # Service Contracts
 
+The tables and schemas below document the asynchronous parser, solver, and authentication boundaries. For complete static REST coverage, see the [REST endpoint catalogue](REST_ENDPOINT_CATALOGUE.md), generated from the committed OpenAPI source. Interactive Swagger remains available below as a convenience, not as the sole contract source.
+
 <swagger-ui src="https://capstone-vigil.dns.net.za/api/docs-json" />
 
 ## PDF parsing
@@ -412,4 +414,5 @@ Google** in Swagger.
 - Non-HTTP OpenAPI catalogue:
   `apps/backend/src/system-contract-catalog.json`.
 - Committed OpenAPI document: `apps/backend/docs/openapi.json`.
+- Static method, route, tag, and response-status index: [REST endpoint catalogue](REST_ENDPOINT_CATALOGUE.md).
 - Generated frontend types: `apps/frontend/src/lib/api.ts`.
