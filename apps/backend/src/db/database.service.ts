@@ -20,8 +20,7 @@ import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import type { PgliteDatabase } from 'drizzle-orm/pglite';
 
 export type AppDatabase =
-  | NodePgDatabase<typeof schema>
-  | PgliteDatabase<typeof schema>;
+  NodePgDatabase<typeof schema> | PgliteDatabase<typeof schema>;
 
 const DB_MODES = {
   PGLITE: 'PGLITE',
@@ -66,7 +65,7 @@ export class DatabaseService
       this.logger.log('Initializing Node-Postgres Pool');
       this.pool = new Pool({
         connectionString: databaseUrl,
-        max: 20,
+        max: 100,
         idleTimeoutMillis: 30000,
         connectionTimeoutMillis: 5000,
       });
