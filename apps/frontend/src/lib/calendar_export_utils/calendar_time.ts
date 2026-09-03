@@ -1,49 +1,97 @@
 import type { Weekday } from "./types";
 
-const OFFSET_FORMATTERS = new Map<string, Intl.DateTimeFormat>();
+const WALL_CLOCK_FORMATTERS = new Map<string, Intl.DateTimeFormat>();
 
-function offsetFormatter(tzid: string): Intl.DateTimeFormat {
-  let formatter = OFFSET_FORMATTERS.get(tzid);
+function wallClockFormatter(tzid: string): Intl.DateTimeFormat {
+  let formatter = WALL_CLOCK_FORMATTERS.get(tzid);
   if (!formatter) {
-    formatter = new Intl.DateTimeFormat(undefined, {
+    formatter = new Intl.DateTimeFormat("en-US-u-ca-gregory-nu-latn", {
       timeZone: tzid,
-      timeZoneName: "longOffset",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
       hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hourCycle: "h23",
     });
-    OFFSET_FORMATTERS.set(tzid, formatter);
+    WALL_CLOCK_FORMATTERS.set(tzid, formatter);
   }
   return formatter;
 }
 
+interface DateTimeParts {
+  year: number;
+  month: number;
+  day: number;
+  hour: number;
+  minute: number;
+  second: number;
+}
+
+function wallClockParts(tzid: string, instant: Date): DateTimeParts {
+  const values = Object.fromEntries(
+    wallClockFormatter(tzid)
+      .formatToParts(instant)
+      .filter((part) => part.type !== "literal")
+      .map((part) => [part.type, Number(part.value)]),
+  ) as Partial<DateTimeParts>;
+  if (
+    values.year === undefined ||
+    values.month === undefined ||
+    values.day === undefined ||
+    values.hour === undefined ||
+    values.minute === undefined ||
+    values.second === undefined
+  ) {
+    throw new RangeError(`Could not determine the wall-clock time for ${tzid}`);
+  }
+  return values as DateTimeParts;
+}
+
 export function getUtcOffsetMinutes(tzid: string, utcInstant: Date): number {
-  const zoneName = offsetFormatter(tzid)
-    .formatToParts(utcInstant)
-    .find((part) => part.type === "timeZoneName")?.value;
-
-  if (!zoneName) {
-    throw new RangeError(`Could not determine the UTC offset for ${tzid}`);
-  }
-  if (zoneName === "GMT" || zoneName === "UTC") return 0;
-
-  const match = /^(?:GMT|UTC)([+\-\u2212])(\d{2}):(\d{2})$/.exec(zoneName);
-  if (!match) {
-    throw new RangeError(`Unsupported UTC offset ${zoneName} for ${tzid}`);
-  }
-
-  const sign = match[1] === "+" ? 1 : -1;
-  return sign * (Number(match[2]) * 60 + Number(match[3]));
+  if (Number.isNaN(utcInstant.getTime())) throw new RangeError("Invalid date");
+  const parts = wallClockParts(tzid, utcInstant);
+  const localAsUtc = Date.UTC(
+    parts.year,
+    parts.month - 1,
+    parts.day,
+    parts.hour,
+    parts.minute,
+    parts.second,
+  );
+  const instantSeconds = Math.floor(utcInstant.getTime() / 1_000) * 1_000;
+  return (localAsUtc - instantSeconds) / 60_000;
 }
 
 function parseDate(date: string): [number, number, number] {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date);
   if (!match) throw new RangeError(`Invalid calendar date: ${date}`);
-  return [Number(match[1]), Number(match[2]), Number(match[3])];
+  const parsed: [number, number, number] = [
+    Number(match[1]),
+    Number(match[2]),
+    Number(match[3]),
+  ];
+  const normalized = new Date(Date.UTC(parsed[0], parsed[1] - 1, parsed[2]));
+  if (
+    normalized.getUTCFullYear() !== parsed[0] ||
+    normalized.getUTCMonth() !== parsed[1] - 1 ||
+    normalized.getUTCDate() !== parsed[2]
+  ) {
+    throw new RangeError(`Invalid calendar date: ${date}`);
+  }
+  return parsed;
 }
 
 function parseTime(time: string): [number, number] {
   const match = /^(\d{2}):(\d{2})$/.exec(time);
   if (!match) throw new RangeError(`Invalid wall-clock time: ${time}`);
-  return [Number(match[1]), Number(match[2])];
+  const hour = Number(match[1]);
+  const minute = Number(match[2]);
+  if (hour > 23 || minute > 59) {
+    throw new RangeError(`Invalid wall-clock time: ${time}`);
+  }
+  return [hour, minute];
 }
 
 function utcBasic(instant: Date): string {
@@ -61,15 +109,31 @@ export function localToUtcBasic(
   const [year, month, day] = parseDate(date);
   const [hour, minute] = parseTime(time);
   const wallClockAsUtc = Date.UTC(year, month - 1, day, hour, minute);
-  const firstOffset = getUtcOffsetMinutes(tzid, new Date(wallClockAsUtc));
-  let instantMs = wallClockAsUtc - firstOffset * 60_000;
-  const secondOffset = getUtcOffsetMinutes(tzid, new Date(instantMs));
-
-  if (secondOffset !== firstOffset) {
-    instantMs += (firstOffset - secondOffset) * 60_000;
+  const offsets = new Set<number>();
+  for (let hours = -36; hours <= 36; hours += 6) {
+    offsets.add(
+      getUtcOffsetMinutes(tzid, new Date(wallClockAsUtc + hours * 3_600_000)),
+    );
   }
-
-  return utcBasic(new Date(instantMs));
+  const matches = [...offsets]
+    .map((offset) => new Date(wallClockAsUtc - offset * 60_000))
+    .filter((instant) => {
+      const parts = wallClockParts(tzid, instant);
+      return (
+        parts.year === year &&
+        parts.month === month &&
+        parts.day === day &&
+        parts.hour === hour &&
+        parts.minute === minute
+      );
+    })
+    .sort((left, right) => left.getTime() - right.getTime());
+  if (matches.length === 0) {
+    throw new RangeError(
+      `The local time ${date} ${time} does not exist in ${tzid}`,
+    );
+  }
+  return utcBasic(matches[0]);
 }
 
 export function toBasicDate(date: string): string {

@@ -418,7 +418,7 @@ export default function CourseManagementTemplate() {
                                     <div className="font-bold text-[var(--text-primary)]">
                                       {module.moduleCode}
                                     </div>
-                                    <div className="text-[var(--text-secondary)] h-8 text-xs mt-1 overflow-scroll">
+                                    <div className="text-[var(--text-secondary)] h-8 text-xs mt-1 overflow-y-auto">
                                       {module.moduleName}
                                     </div>
                                   </div>

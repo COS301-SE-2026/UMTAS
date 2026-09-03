@@ -2,7 +2,7 @@
 
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { LogOut } from "lucide-react";
+import { LogIn, LogOut } from "lucide-react";
 import { UserAvatar } from "@/components/atoms/nav/UserAvatar";
 import { ThemeToggle } from "@/components/atoms/auth/ThemeToggle";
 import { Button } from "@/components/atoms/baseShadcn/button";
@@ -45,9 +45,26 @@ export function NavUser({ name: nameProp }: NavUserProps) {
     });
   }
 
+  async function handleLogin() {
+    router.push("/login");
+  }
+
   return (
     <div className="flex items-center gap-3">
       <ThemeToggle />
+
+      {!isLoggedIn && (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleLogin}
+          aria-label="Sign in"
+          className="gap-1.5 text-[--text-secondary] hover:text-[--text-primary]"
+        >
+          <LogIn size={15} aria-hidden />
+          <span className="hidden sm:inline">Sign in</span>
+        </Button>
+      )}
 
       {isLoggedIn && (
         <>
