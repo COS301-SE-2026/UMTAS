@@ -6,7 +6,7 @@
 
 ??? note "NFR-Corr-1 - Supported Timetable PDF Extraction Correctness"
 
-    The nine supported UP lecture, semester-test, and exam fixtures pass complete comparisons against the [manually reviewed ground-truth manifest](../../apps/pdf_parser/parser/tests/ground_truth/up_supported_fixtures.json). The acceptance test calculates 100% field-level precision and recall for each fixture, reports zero omitted and zero invented records or fields, and checks exact canonical-result equality. The Python parser suite is an active CI gate; see the [NFR test matrix](NON-FUNCTIONAL_TESTING.md#332-nfr-traceability-matrix) for the recorded result.
+    The nine supported UP lecture, semester-test, and exam fixtures pass complete comparisons against the [manually reviewed ground-truth manifest](https://github.com/COS301-SE-2026/UMTAS/blob/main/apps/pdf_parser/parser/tests/ground_truth/up_supported_fixtures.json). The acceptance test calculates 100% field-level precision and recall for each fixture, reports zero omitted and zero invented records or fields, and checks exact canonical-result equality. The Python parser suite is an active CI gate; see the [NFR test matrix](NON-FUNCTIONAL_TESTING.md#332-nfr-traceability-matrix) for the recorded result.
 
 ??? note "NFR-Corr-2 - Conflict-Free Schedule Correctness"
 
