@@ -1,0 +1,114 @@
+.github/workflows/ci.yml
+  h_2d4b3dca70a3d8 44-98,161-162,218-240,246,268-360
+apps/backend/drizzle/meta/0000_snapshot.json
+  h_2d4b3dca70a3d8 2
+apps/backend/drizzle/meta/_journal.json
+  h_2d4b3dca70a3d8 8-9
+apps/backend/package.json
+  h_2d4b3dca70a3d8 80
+apps/backend/src/Events/dto/EventDto.dto.ts
+  h_2d4b3dca70a3d8 87-95
+apps/backend/src/Events/event.service.ts
+  h_2d4b3dca70a3d8 654-658,662,666
+apps/backend/src/Events/eventV2.service.ts
+  h_2d4b3dca70a3d8 487,495,517,532-536,556
+apps/backend/src/academic_calendar/academic-calendar-generation.service.spec.ts
+  h_2d4b3dca70a3d8 71,77-86
+apps/backend/src/academic_calendar/academic-calendar-generation.service.ts
+  h_2d4b3dca70a3d8 341-356
+apps/backend/src/db/database.service.ts
+  h_2d4b3dca70a3d8 77-85,125
+apps/backend/src/db/migrate.ts
+  h_2d4b3dca70a3d8 10
+apps/backend/src/db/seeding/Constants/PublicCalendars.constants.ts
+  h_2d4b3dca70a3d8 95-352
+apps/e2e/playwright.config.ts
+  h_2d4b3dca70a3d8 47-62
+apps/frontend/package.json
+  h_2d4b3dca70a3d8 47,59
+apps/frontend/src/app/(auth)/auth-callback/google-calendar/page.tsx
+  h_2d4b3dca70a3d8 1-54
+apps/frontend/src/components/molecules/Calendar-management/DateRestrictionHandler.tsx
+  h_2d4b3dca70a3d8 119-121,123-124,132-135,137,139-160,162,168-171,173,175-181,183-206
+apps/frontend/src/components/molecules/Calendar-management/DateSwapHandler.tsx
+  h_2d4b3dca70a3d8 130,139,142,144-150,158-161,163,165-170,175-178,182-185,196,204,215,217-265
+apps/frontend/src/components/molecules/Calendar-management/RangeRestrictionHandler.tsx
+  h_2d4b3dca70a3d8 117,120,122-128,130,136-139,141,143-147,149,155-158,160,162,169,180,182-230
+apps/frontend/src/components/molecules/builder/EventCard.tsx
+  h_2d4b3dca70a3d8 236-240
+apps/frontend/src/components/molecules/nav/NavLinks.tsx
+  h_2d4b3dca70a3d8 15,30,37-43
+apps/frontend/src/components/molecules/nav/NavUser.tsx
+  h_2d4b3dca70a3d8 5,48-51,56-68
+apps/frontend/src/components/molecules/roleManagement/DataTable.tsx
+  h_2d4b3dca70a3d8 54-56,165-168
+apps/frontend/src/components/molecules/viewTimetable/EventBlock.tsx
+  h_2d4b3dca70a3d8 5-15,19,32-69,95-108,111-124,133,151-167
+apps/frontend/src/components/molecules/viewTimetable/WeekNavBar.tsx
+  h_2d4b3dca70a3d8 35-39,46,66-70
+apps/frontend/src/components/molecules/viewTimetable/googleExport.tsx
+  h_2d4b3dca70a3d8 1-155
+apps/frontend/src/components/organisms/builder/EventsStep.tsx
+  h_2d4b3dca70a3d8 407,538
+apps/frontend/src/components/organisms/course-management/AddCoursePopup.tsx
+  h_2d4b3dca70a3d8 77
+apps/frontend/src/components/organisms/course-management/EditCoursePopup.tsx
+  h_2d4b3dca70a3d8 157
+apps/frontend/src/components/organisms/viewTimetable/ScheduleView.tsx
+  h_2d4b3dca70a3d8 3-10,33,35-51,53-55,60,66-69,122-130,144-153,164-169,175-180,220-360,363-397,577,639-667,670-671,674,678,684,688,695,699-707,744-770
+apps/frontend/src/components/organisms/viewTimetable/WeeklyGrid.tsx
+  h_2d4b3dca70a3d8 7,77,213
+apps/frontend/src/components/templates/calendar-management/caltemplate.tsx
+  h_2d4b3dca70a3d8 3-4,17,19,74,92-100,107-108,114,122-128,130-154,156-179,182,212,218,224
+apps/frontend/src/components/templates/course-management/courseManageTemplate.tsx
+  h_2d4b3dca70a3d8 421
+apps/frontend/src/lib/api.ts
+  h_2d4b3dca70a3d8 2188-2192
+apps/frontend/src/lib/auth/google-calendar.ts
+  h_2d4b3dca70a3d8 1-149
+apps/frontend/src/lib/calendar_export_utils/calendar_api.ts
+  h_2d4b3dca70a3d8 1-31
+apps/frontend/src/lib/calendar_export_utils/calendar_time.spec.ts
+  h_2d4b3dca70a3d8 87-129
+apps/frontend/src/lib/calendar_export_utils/calendar_time.ts
+  h_2d4b3dca70a3d8 3,5-6,8,10-12,14-16,18,23-30,32-47,49-50,52-64,70-83,89-94,112-116,118-136
+apps/frontend/src/lib/calendar_export_utils/gc_calendars.spec.ts
+  h_2d4b3dca70a3d8 1-113
+apps/frontend/src/lib/calendar_export_utils/gc_calendars.ts
+  h_2d4b3dca70a3d8 1-92
+apps/frontend/src/lib/calendar_export_utils/gc_export.spec.ts
+  h_2d4b3dca70a3d8 1-478
+apps/frontend/src/lib/calendar_export_utils/gc_export.ts
+  h_2d4b3dca70a3d8 1-382
+apps/frontend/src/lib/calendar_export_utils/google_http.ts
+  h_2d4b3dca70a3d8 1-157
+apps/frontend/src/lib/calendar_export_utils/ics_export.spec.ts
+  h_2d4b3dca70a3d8 1-229
+apps/frontend/src/lib/calendar_export_utils/ics_export.ts
+  h_2d4b3dca70a3d8 9,25,53-56,60,93-94,128,141
+apps/frontend/src/lib/calendar_export_utils/test_fixture.ts
+  h_2d4b3dca70a3d8 1-44
+apps/frontend/src/lib/calendar_export_utils/validation.ts
+  h_2d4b3dca70a3d8 1-63
+apps/frontend/src/lib/moduleColours.ts
+  h_2d4b3dca70a3d8 1-10
+apps/frontend/utilities/Calendar-Builders/CalendarManagement.tsx
+  h_2d4b3dca70a3d8 81-145
+apps/frontend/utilities/eventAttendance/eventAttendanceBuilder.ts
+  h_2d4b3dca70a3d8 3,54-63
+apps/frontend/utilities/eventAttendance/eventAttendanceQueries.ts
+  h_2d4b3dca70a3d8 7,21
+pnpm-lock.yaml
+  h_2d4b3dca70a3d8 275,434-436,470-472,2377-2383,7027-7032,7119-7124,7995-8001,8497-8502,9161-9166,9248-9254,9380-9386,9475-9488,9681-9701,9715-9721,9975-9980,11146-11151,11242-11253,12188-12195,12209-12215,13847-13853,15211-15216,15370-15376,16883-16888,17198,17400,19266,19330,19399,19423,20129-20130,20198-20199,20769-20770,20992-20995,21645-21646,21689-21693,21795-21798,21849-21865,21985-22009,22014-22020,22187-22188,22542,22822,22842,22992,23043,23172,23192,23198,23326-23329,23381-23391,24267-24268,24280-24285,25428-25431,26454-26455,26550-26551
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "44fe0f10dbaef7f441fa3ef2e003f6452ece8b06",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
