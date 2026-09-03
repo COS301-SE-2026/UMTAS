@@ -84,21 +84,21 @@ export default function CoursesTab({
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatCard
           title="Total Courses"
-          value={coursesData.length ?? 0}
+          value={coursesData?.length ?? 0}
           isLoading={isLoading}
           icon={<BookOpen className={"h-4 w-4"} />}
         />
         <StatCard
           title="Course with Most Events"
-          value={topCourseByEvents[0].eventCount ?? 0}
-          description={topEventCourse.name ?? ""}
+          value={topCourseByEvents[0]?.eventCount ?? 0}
+          description={topEventCourse?.name ?? ""}
           isLoading={isLoading}
           icon={<Hash className={"h-4 w-4"} />}
         />
         <StatCard
           title="Course with Most Modules"
-          value={topCourseByModules[0].moduleCount ?? 0}
-          description={topModuleCourse.name ?? ""}
+          value={topCourseByModules[0]?.moduleCount ?? 0}
+          description={topModuleCourse?.name ?? ""}
           isLoading={isLoading}
           icon={<Hash className={"h-4 w-4"} />}
         />

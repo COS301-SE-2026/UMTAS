@@ -31,32 +31,32 @@ function moduleNameCol(): ColumnDef<ModuleTableData, string> {
   });
 }
 
-function eventsCol(): ColumnDef<ModuleTableData, EventResponse[]> {
-  return columnCreator.accessor("events", {
-    header: "Events",
-    cell: (info) => {
-      const events = info.getValue();
-      return events.map((event) => {
-        return (
-          <Badge
-            className="m-2"
-            key={event.eventId}
-            style={{
-              backgroundColor: info.row.original.modules.styling?.colour,
-            }}
-          >
-            {event.activityCode}
-          </Badge>
-        );
-      });
-    },
-  });
-}
+// function eventsCol(): ColumnDef<ModuleTableData, EventResponse[]> {
+//   return columnCreator.accessor("events", {
+//     header: "Events",
+//     cell: (info) => {
+//       const events = info.getValue();
+//       return events.map((event) => {
+//         return (
+//           <Badge
+//             className="m-2"
+//             key={event.eventId}
+//             style={{
+//               backgroundColor: info.row.original.modules.styling?.colour,
+//             }}
+//           >
+//             {event.activityCode}
+//           </Badge>
+//         );
+//       });
+//     },
+//   });
+// }
 type CourseTableColumn =
   | ColumnDef<ModuleTableData, string>
   | ColumnDef<ModuleTableData, EventResponse[]>;
 export const moduleCols: CourseTableColumn[] = [
   moduleCodeCol(),
   moduleNameCol(),
-  eventsCol(),
+  //eventsCol(),
 ];

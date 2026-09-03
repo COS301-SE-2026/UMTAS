@@ -145,7 +145,7 @@ function DateSwapHtml({
       <div className="flex flex-row items-end gap-x-5 w-full">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 w-full">
           <div className="flex flex-col gap-y-1.5 w-full">
-            <Label className="text-sm font-medium text-[var(--text-primary)] text-left">
+            <Label className="text-sm font-medium text-[var(--text-primary)] text-left pl-1">
               Start Date
             </Label>
             <Input
@@ -165,7 +165,7 @@ function DateSwapHtml({
           </div>
 
           <div className="flex flex-col gap-y-1.5 w-full">
-            <Label className="text-sm font-medium text-[var(--text-secondary)] text-left">
+            <Label className="text-sm font-medium text-[var(--text-secondary)] text-left pl-1">
               Day to swap
             </Label>
             <Select
@@ -204,7 +204,7 @@ function DateSwapHtml({
           hidden={restriction.id === ""}
           onClick={deleteRes}
           disabled={deletePending}
-          className="h-10 w-10 flex-shrink-0 border border-[var(--error-text)] text-[var(--text-secondary)] transition-colors duration-[var(--duration-fast)] hover:border-[var(--error-text)] hover:text-[var(--error-text)] hover:bg-[var(--error-bg)]"
+          className="h-10 w-10 flex-shrink-0 border border-[var(--error-text)] text-[var(--text-primary)] transition-colors duration-[var(--duration-fast)] hover:border-[var(--error-text)] hover:text-[var(--error-text)] hover:bg-[var(--error-bg)]"
         >
           <Trash2
             size={16}
@@ -215,7 +215,7 @@ function DateSwapHtml({
       </div>
 
       <div className="flex flex-col gap-y-1.5 w-full">
-        <Label className="text-sm font-medium text-[var(--text-secondary)] text-left">
+        <Label className="text-sm font-medium text-[var(--text-primary)] text-left pl-1">
           Description
         </Label>
         <div className="flex flex-row items-center gap-x-5 w-full">
