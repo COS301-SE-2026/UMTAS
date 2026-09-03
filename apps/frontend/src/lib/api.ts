@@ -3457,11 +3457,7 @@ export interface components {
          * @enum {string}
          */
         "day-to-skip":
-          | "monday"
-          | "tuesday"
-          | "wednesday"
-          | "thursday"
-          | "friday";
+          "monday" | "tuesday" | "wednesday" | "thursday" | "friday";
       };
     };
     SolverPreferencesDto: {

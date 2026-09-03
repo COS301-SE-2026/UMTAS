@@ -15,14 +15,28 @@ import {
   EventCriteriaDto,
   EventCriteriaDtoV2,
   EventSingleResponseDto,
+  EventStatsVenueResponseDto,
+  EventStatsWeeklyResponseDto,
   ValidateEventResponseDto,
   VenueDto,
 } from './dto/EventDto.dto';
 import { AppDatabase } from 'src/auth/auth';
-import { Event, UniversityEvent, Venue } from 'src/entities';
-import { UniversitySingleResponseDto } from 'src/University/dto/university.dto';
+import {
+  Course,
+  Event,
+  EventsToTimetables,
+  EventVenue,
+  GroupModules,
+  modules,
+  UniversityEvent,
+  Venue,
+} from 'src/entities';
+import {
+  UniversityDto,
+  UniversitySingleResponseDto,
+} from 'src/University/dto/university.dto';
 import { DayOfWeek } from './dto/event.types';
-import { and, eq, inArray } from 'drizzle-orm';
+import { and, count, countDistinct, eq, inArray, sql } from 'drizzle-orm';
 
 export class EventServiceV2 extends EventService {
   private readonly OOPSIE = new Logger(this.constructor.name);
@@ -106,11 +120,13 @@ export class EventServiceV2 extends EventService {
         );
     } //END_!existing
 
-    const venueIds: string[] | undefined = event.venues?.map(
+    const venueIds: string[] | undefined = dto.venues?.map(
       (venue) => venue.venueId,
     );
-    if (venueIds !== undefined)
+    if (venueIds !== undefined) {
       await this.insertEventVenues(tx, event.eventId, venueIds);
+      event.venues = dto.venues;
+    }
 
     return { event };
   } //END_CreateV2
@@ -144,6 +160,90 @@ export class EventServiceV2 extends EventService {
       message: `Event[${updated.eventName}] validated=${updated.validated}`,
     };
   } //END_validateEvent
+
+  //Stats
+
+  async getStatisticsWeekly(
+    uniId: string,
+  ): Promise<EventStatsWeeklyResponseDto> {
+    const db = this.dbService.db;
+
+    //Validate uni
+    await this.uniService.getById(uniId, db);
+
+    // Day of week
+    const dayOfWeek = sql<DayOfWeek>`${Event.eventCriteria}->>'dayOfWeek'`;
+
+    //Day order
+    const dayOrder = sql<number>`
+      CASE ${dayOfWeek}
+        WHEN 'monday' THEN 1
+        WHEN 'tuesday' THEN 2
+        WHEN 'wednesday' THEN 3
+        WHEN 'thursday' THEN 4
+        WHEN 'friday' THEN 5
+        WHEN 'saturday' THEN 6
+        WHEN 'sunday' THEN 7
+      END
+    `;
+
+    const statistics = await db
+      .select({
+        dayOfWeek,
+        EventCount: countDistinct(Event.eventID),
+      })
+      .from(Event)
+      .leftJoin(UniversityEvent, eq(UniversityEvent.eventID, Event.eventID))
+      .leftJoin(modules, eq(modules.moduleID, UniversityEvent.moduleID))
+      .leftJoin(GroupModules, eq(GroupModules.ModuleID, modules.moduleID))
+      .innerJoin(Course, eq(Course.GroupID, GroupModules.GroupID))
+      .where(eq(Course.UniversityID, uniId))
+      .groupBy(dayOfWeek)
+      .orderBy(dayOrder);
+
+    return { data: statistics };
+  } //END_getStatisticsWeekly
+
+  async getStatisticsVenues(
+    uniId: string,
+  ): Promise<EventStatsVenueResponseDto> {
+    const db = this.dbService.db;
+
+    //Validate uni
+    await this.uniService.getById(uniId, db);
+
+    //Statistics
+    const statistics = await db
+      .select({
+        VenueID: Venue.VenueID,
+        VenueName: Venue.VenueName,
+        EventCount: countDistinct(Event.eventID),
+        ProjectedAttendance: count(EventsToTimetables.eventID),
+      })
+      .from(Venue)
+      .leftJoin(EventVenue, eq(EventVenue.VenueID, Venue.VenueID))
+      .leftJoin(Event, eq(Event.eventID, EventVenue.EventID))
+      .leftJoin(
+        EventsToTimetables,
+        eq(EventsToTimetables.eventID, Event.eventID),
+      )
+      .leftJoin(UniversityEvent, eq(UniversityEvent.eventID, Event.eventID))
+      .leftJoin(modules, eq(modules.moduleID, UniversityEvent.moduleID))
+      .leftJoin(GroupModules, eq(GroupModules.ModuleID, modules.moduleID))
+      .innerJoin(Course, eq(Course.GroupID, GroupModules.GroupID))
+      .where(eq(Course.UniversityID, uniId))
+      .groupBy(Venue.VenueID, Venue.VenueName)
+      .orderBy(countDistinct(Event.eventID));
+
+    return {
+      data: statistics.map((s) => ({
+        VenueID: s.VenueID,
+        VenueName: s.VenueName ?? 'NoName',
+        EventCount: s.EventCount,
+        ProjectedAttendance: s.ProjectedAttendance,
+      })),
+    };
+  } //END_getStatisticsVenues
 
   //🎅's little helpers
 
@@ -246,12 +346,17 @@ export class EventServiceV2 extends EventService {
       tx,
     );
 
-    if (validated.venues && validated.venues.length !== 0)
+    if (validated.venues && validated.venues.length !== 0) {
       validated.venues = await this.validateVenues(
         tx,
         uni.UniversityID,
         validated.venues,
       );
+    } else if (validated.venueName) {
+      validated.venues = [
+        await this.validateAndCreateVenueName(tx, uni, validated.venueName),
+      ];
+    }
 
     return validated;
   } //END_validateCreateEventDto
@@ -379,6 +484,7 @@ export class EventServiceV2 extends EventService {
       .select({
         venueId: Venue.VenueID,
         venueName: Venue.VenueName,
+        buildingId: Venue.BuildingID,
       })
       .from(Venue)
       .where(inArray(Venue.VenueID, venueIds));
@@ -386,8 +492,68 @@ export class EventServiceV2 extends EventService {
     const fresh = rows.map((r) => ({
       venueId: r.venueId,
       venueName: r.venueName ?? 'noNameVenue',
+      buildingId: r.buildingId ?? undefined,
     }));
 
     return fresh;
   } //END_validateVenues
+
+  protected async validateAndCreateVenueName(
+    tx: AppDatabase,
+    university: UniversityDto,
+    venueName: string,
+  ): Promise<VenueDto> {
+    this.OOPSIE.log(`validateAndCreateVenueName: venueName[${venueName}]`);
+    venueName = venueName.trim();
+
+    //Assign default venueName
+    if (venueName.length === 0) venueName = 'Default VenueName';
+
+    //If venue with that name already exists, with same universityID - return early
+    const [existing] = await tx
+      .select({
+        venueId: Venue.VenueID,
+        venueName: Venue.VenueName,
+        buildingId: Venue.BuildingID,
+      })
+      .from(Venue)
+      .where(
+        and(
+          eq(Venue.VenueName, venueName),
+          eq(Venue.UniversityID, university.UniversityID),
+        ),
+      )
+      .limit(1);
+
+    if (existing) {
+      this.OOPSIE.log(
+        `validateAndCreateVenue: Returned existing venue[${JSON.stringify(existing)}]`,
+      );
+      return {
+        ...existing,
+        venueName: existing.venueName ?? 'NoName',
+        buildingId: existing.buildingId ?? undefined,
+      };
+    }
+
+    //Create venue for university
+    const [newVenue] = await tx
+      .insert(Venue)
+      .values({
+        VenueName: venueName,
+        UniversityID: university.UniversityID,
+      })
+      .returning();
+
+    if (!newVenue)
+      throw new InternalServerErrorException(`Failed to create venue`);
+    this.OOPSIE.log(
+      `validateAndCreateVenueName: Created new venue[${JSON.stringify(newVenue)}]`,
+    );
+    return {
+      venueId: newVenue.VenueID,
+      venueName: newVenue.VenueName ?? 'NoName',
+      buildingId: newVenue.BuildingID ?? undefined,
+    };
+  } //END_validateAndCreateVenue
 } //END_EventServiceV2

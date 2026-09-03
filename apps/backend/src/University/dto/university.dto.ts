@@ -197,3 +197,26 @@ export class UserUniversityRoleResponseDto {
   @ApiProperty({ enum: RoleType.enumValues })
   role!: RoleTypeType;
 }
+
+//Stats =============================================================================
+
+// Courses per University
+export class UniversityCourseStatsResponseDto {
+  @ApiProperty()
+  UniversityID!: string;
+
+  @ApiProperty({ required: false })
+  UniversityName?: string;
+
+  @ApiProperty()
+  CourseCount!: number;
+
+  @ApiProperty()
+  ModuleCount!: number;
+
+  @ApiProperty()
+  EventCount!: number;
+
+  @ApiProperty()
+  EnrolledStudents!: number;
+}

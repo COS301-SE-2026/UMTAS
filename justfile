@@ -110,9 +110,6 @@ prod-up release_tag:
 prod-down release_tag:
      IMAGE_TAG={{ release_tag }} phase run --env production -- docker compose -p umtas-prod -f docker-compose.prod.yml down
 
-# execute migrations on prod
-prod-migrate:
-    phase run --env production -- docker compose -f docker-compose.prod.yml exec -T backend npx drizzle-kit migrate
 
 # manual prod deployment
 
@@ -248,7 +245,7 @@ db_sql:
 
 
 runsim:
-    cd apps/simulation-service && phase run --env development -- docker compose up --build
+    cd apps/simulation-service && phase run --env development -- docker compose up
 
 
 nfr-start:
@@ -269,7 +266,11 @@ nfr-upload:
         --headless \
 
 
+staging-migrate:
+    phase run --env staging -- docker compose -p umtas-staging -f docker-compose.staging.yml run --rm backend node dist/db/migrate.js
 
+prod-migrate:
+    phase run --env production -- docker compose -p umtas-production -f docker-compose.prod.yml run --rm backend node dist/db/migrate.js
 
 
 

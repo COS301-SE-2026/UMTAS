@@ -149,6 +149,10 @@ docs/drawio-exporter/
 apps/preference-solver/tests/HeuristicTests/minutesAfterMid/output.json
 apps/preference-solver/tests/HeuristicTests/skipDay/output.json
 apps/preference-solver/tests/HeuristicTests/smallGaps/output.json
+infra/database/seeds.sql
+infra/database/seeds.sql/
+infra/database/seeds.sql
+infra/database/seeds.sql/
 
 # Api docs
 # The committed OpenAPI document is the local source for reproducible client generation.

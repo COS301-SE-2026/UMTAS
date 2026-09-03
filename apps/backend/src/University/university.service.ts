@@ -5,12 +5,18 @@ import {
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { eq, and, or, notLike } from 'drizzle-orm';
+import { eq, and, or, notLike, countDistinct } from 'drizzle-orm';
 
 import { AppDatabase, DatabaseService } from '../db/database.service';
 import {
+  Course,
+  Event,
+  GroupModules,
+  ModuleEnrollment,
+  modules,
   RoleTypeType,
   University,
+  UniversityEvent,
   UniversityRole,
   usersTable,
 } from '../entities';
@@ -26,6 +32,7 @@ import {
   GetRolesDto,
   UserUniversityRoleResponseDto,
   GetRoleFilterDto,
+  UniversityCourseStatsResponseDto,
 } from './dto/university.dto';
 
 @Injectable()
@@ -414,6 +421,57 @@ export class UniversityService {
 
     return applications;
   }
+
+  //Stats
+
+  // Courses per University
+  async getStatistics(
+    uniId: string,
+  ): Promise<UniversityCourseStatsResponseDto> {
+    const db = this.dbService.db;
+
+    //Fetch the university
+    const university = await this.getById(uniId, db);
+
+    //Fetch the course counts for that university
+    const [courseStats] = await db
+      .select({
+        CourseCount: countDistinct(Course.CourseID),
+        ModuleCount: countDistinct(modules.moduleID),
+        EventCount: countDistinct(Event.eventID),
+        EnrolledStudents: countDistinct(ModuleEnrollment.UserID),
+      })
+      .from(Course)
+      .leftJoin(GroupModules, eq(GroupModules.GroupID, Course.GroupID))
+      .leftJoin(modules, eq(GroupModules.ModuleID, modules.moduleID))
+      .leftJoin(
+        ModuleEnrollment,
+        eq(ModuleEnrollment.ModuleID, modules.moduleID),
+      )
+      .leftJoin(UniversityEvent, eq(UniversityEvent.moduleID, modules.moduleID))
+      .leftJoin(Event, eq(Event.eventID, UniversityEvent.eventID))
+      .where(eq(Course.UniversityID, uniId))
+      .groupBy(Course.UniversityID);
+
+    const [enrolledStats] = await db
+      .select({ EnrolledStudents: countDistinct(ModuleEnrollment.UserID) })
+      .from(ModuleEnrollment)
+      .innerJoin(
+        GroupModules,
+        eq(GroupModules.ModuleID, ModuleEnrollment.ModuleID),
+      )
+      .innerJoin(Course, eq(GroupModules.GroupID, Course.GroupID))
+      .where(eq(Course.UniversityID, uniId));
+
+    return {
+      UniversityID: university.UniversityID,
+      UniversityName: university.UniversityName,
+      CourseCount: courseStats?.CourseCount ?? 0,
+      ModuleCount: courseStats?.ModuleCount ?? 0,
+      EventCount: courseStats?.EventCount ?? 0,
+      EnrolledStudents: enrolledStats?.EnrolledStudents ?? 0,
+    };
+  } //END_getStatistics
 
   //🎅's Little Helpers
 

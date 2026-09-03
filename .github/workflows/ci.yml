@@ -41,8 +41,8 @@ jobs:
         with:
           node-version: 22
 
-      # - name: Setup Just
-      #   uses: extractions/setup-just@v2
+      - name: Setup Just
+        uses: extractions/setup-just@v2
 
       - name: Enable Corepack (pnpm)
         run: corepack enable pnpm
@@ -56,6 +56,8 @@ jobs:
       - name: Run Build
         run: pnpm run build
 
+      - name: Run Audit
+        run: pnpm audit --audit-level=high
       - name: Run Unit Tests
         run: |
           pnpm --filter shared-types test
@@ -71,6 +73,7 @@ jobs:
         run: pnpm test:e2e
 
       - name: Upload Playwright report
+
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
@@ -202,7 +205,12 @@ jobs:
           file: docker/frontend/frontend.Dockerfile
           push: true
           build-args: |
+            NEXT_PUBLIC_POSTHOG_PT=${{ secrets.NEXT_PUBLIC_POSTHOG_PT }}
+            NEXT_PUBLIC_POSTHOG_API_HOST=${{ secrets.NEXT_PUBLIC_POSTHOG_API_HOST}}
+            NEXT_PUBLIC_APP_ENV=staging
             NEXT_PUBLIC_API_URL=https://staging.capstone-vigil.dns.net.za/api
+            NEXT_PUBLIC_MAP_KEY=${{ secrets.NEXT_PUBLIC_MAP_KEY }}
+            MAP_ID=${{ secrets.MAP_ID }}
           tags: |
             vigilcs/umtas:frontend-staging-${{ steps.tag.outputs.latest }}
             vigilcs/umtas:frontend-staging-${{ steps.tag.outputs.sha }}
@@ -251,8 +259,13 @@ jobs:
           key: ${{ secrets.PROD_SSH_KEY }}
           script: |
             cd /opt/UMTAS
-            docker compose -f docker-compose.staging.yml pull
-            just staging-up
+                docker compose -p umtas-staging -f docker-compose.staging.yml stop
+                docker compose -p umtas-staging -f docker-compose.staging.yml rm -f umtas-staging-postgres-1
+                docker volume rm umtas-staging_postgres_data || true
+                docker compose -p umtas-staging -f docker-compose.staging.yml up -d --pull always umtas-staging-postgres-1
+                phase run --env staging -- docker compose -p umtas-staging -f docker-compose.staging.yml run --rm backend node dist/db/migrate.js
+                docker compose -p umtas-staging -f docker-compose.staging.yml up -d --pull always
+                just staging-up
 
   docker-release:
     name: Build & Push Release Images
@@ -304,7 +317,12 @@ jobs:
           file: docker/frontend/frontend.Dockerfile
           push: true
           build-args: |
+            NEXT_PUBLIC_POSTHOG_PT=${{ secrets.NEXT_PUBLIC_POSTHOG_PT }}
+            NEXT_PUBLIC_POSTHOG_API_HOST=${{ secrets.NEXT_PUBLIC_POSTHOG_API_HOST}}
+            NEXT_PUBLIC_APP_ENV=staging
             NEXT_PUBLIC_API_URL=https://capstone-vigil.dns.net.za/api
+            NEXT_PUBLIC_MAP_KEY=${{ secrets.NEXT_PUBLIC_MAP_KEY }}
+            MAP_ID=${{ secrets.MAP_ID }}
           tags: |
             vigilcs/umtas:frontend-${{ steps.tag.outputs.release }}
             vigilcs/umtas:frontend-${{ steps.tag.outputs.sha }}

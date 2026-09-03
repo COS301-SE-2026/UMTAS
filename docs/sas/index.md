@@ -20,5 +20,5 @@ Requirements Specification.
 
 - [:octicons-arrow-right-24: Architectural Requirements](architecture/ARCHITECTURAL_REQUIREMENTS.md)
 - [:octicons-arrow-right-24: Technology Requirements](architecture/TECHNOLOGY_REQUIREMENTS.md)
-- [:octicons-arrow-right-24: API Contracts](architecture/API_CONTRACTS.md)
+- [:octicons-arrow-right-24: API Contracts](architecture/SERVICE_CONTRACTS.md)
 - [:octicons-arrow-right-24: Deployment](deployment/index.md)

@@ -33,6 +33,7 @@ plugins:
   - glightbox
   - drawio
   - swagger-ui-tag
+  - mkdocs-pdf
   - minify:
       minify_html: true
   - git-revision-date-localized:
@@ -68,6 +69,7 @@ nav:
       - Use Cases + Traceability Matrix: srs/USE_CASES.md
       - Functional Requirements: srs/FUNCTIONAL_REQUIREMENTS.md
       - Non-Functional Requirements: srs/NON-FUNCTIONAL_REQUIREMENTS.md
+      - Non-Functional Requirements Testing & Traceability Matrix: srs/NON-FUNCTIONAL_TESTING.md
       - Domain Model: srs/DOMAIN_MODEL.md
 
   - SAS:
@@ -79,7 +81,7 @@ nav:
       - Architectural Diagram: sas/architecture/ARCHITECTURAL_DIAGRAM.md
       - Quality Requirement Mapping: sas/architecture/QUALITY_REQUIREMENT_MAPPING.md
       - Technology Requirements: sas/architecture/TECHNOLOGY_REQUIREMENTS.md
-      - API Contracts: sas/architecture/API_CONTRACTS.md
+      - Service Contracts: sas/architecture/SERVICE_CONTRACTS.md
       - Deployment:
           - Overview: sas/deployment/index.md
           - Live, Accessible System: sas/deployment/LiveAccessibleSystem.md

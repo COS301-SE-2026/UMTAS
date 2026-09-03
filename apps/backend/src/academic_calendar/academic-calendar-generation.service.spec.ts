@@ -68,9 +68,20 @@ describe('AcademicCalendarGenerationService', () => {
     ]);
 
     expect(payload.recurringEvents[0]).toMatchObject({
+      title: 'COS301 Lecture',
       description: 'Software Engineering - L1',
       location: 'Room A, Room B',
     });
+  });
+
+  it('does not duplicate a module code already present in the event name', () => {
+    const service = new AcademicCalendarGenerationService();
+
+    const payload = service.build(calendar, 'Timetable', restrictions, [
+      sourceEvent({ name: 'COS301 L2' }),
+    ]);
+
+    expect(payload.recurringEvents[0].title).toBe('COS301 L2');
   });
 
   it('warns and omits malformed time ranges', () => {

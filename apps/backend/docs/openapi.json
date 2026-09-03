@@ -1560,10 +1560,10 @@
         ]
       }
     },
-    "/api/modules/{moduleId}": {
+    "/api/modules/v2/{moduleId}": {
       "get": {
         "description": "Return a module from its moduleID",
-        "operationId": "getModuleById",
+        "operationId": "getModuleByIdV2",
         "parameters": [
           {
             "name": "moduleId",
@@ -1601,14 +1601,16 @@
             "$ref": "#/components/responses/InternalError"
           }
         },
-        "summary": "Get a module by ID",
+        "summary": "Get a module by ID - V2",
         "tags": ["Modules"],
         "security": [
           {
             "cookie": []
           }
         ]
-      },
+      }
+    },
+    "/api/modules/{moduleId}": {
       "patch": {
         "description": "Update a modules | STUDENT_OWNED needs to go through Builder Service",
         "operationId": "updateModule",
@@ -1717,12 +1719,10 @@
             "cookie": []
           }
         ]
-      }
-    },
-    "/api/modules/v2/{moduleId}": {
+      },
       "get": {
         "description": "Return a module from its moduleID",
-        "operationId": "getModuleByIdV2",
+        "operationId": "getModuleById",
         "parameters": [
           {
             "name": "moduleId",
@@ -1760,7 +1760,7 @@
             "$ref": "#/components/responses/InternalError"
           }
         },
-        "summary": "Get a module by ID - V2",
+        "summary": "Get a module by ID",
         "tags": ["Modules"],
         "security": [
           {
@@ -2026,6 +2026,47 @@
         ]
       }
     },
+    "/api/modules/statistics": {
+      "get": {
+        "operationId": "moduleStatistics",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Modules with statistics returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModuleStatsResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "No university selected"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "description": "University not found"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "summary": "Module Statistics",
+        "tags": ["Modules"],
+        "description": "Module Statistics. This Modules operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
+        ]
+      }
+    },
     "/api/Courses": {
       "post": {
         "operationId": "createCourse",
@@ -2222,9 +2263,9 @@
         ]
       }
     },
-    "/api/Courses/{CourseId}": {
+    "/api/Courses/v2/{CourseId}": {
       "get": {
-        "operationId": "getCourseById",
+        "operationId": "getCourseByIdV2",
         "parameters": [
           {
             "name": "CourseId",
@@ -2262,15 +2303,17 @@
             "$ref": "#/components/responses/InternalError"
           }
         },
-        "summary": "get a Course by ID",
+        "summary": "get a Course by ID - V2",
         "tags": ["Courses"],
-        "description": "get a Course by ID. This Courses operation is part of the versioned UMTAS HTTP contract.",
+        "description": "get a Course by ID - V2. This Courses operation is part of the versioned UMTAS HTTP contract.",
         "security": [
           {
             "cookie": []
           }
         ]
-      },
+      }
+    },
+    "/api/Courses/{CourseId}": {
       "patch": {
         "operationId": "updateCourse",
         "parameters": [
@@ -2379,11 +2422,9 @@
             "cookie": []
           }
         ]
-      }
-    },
-    "/api/Courses/v2/{CourseId}": {
+      },
       "get": {
-        "operationId": "getCourseByIdV2",
+        "operationId": "getCourseById",
         "parameters": [
           {
             "name": "CourseId",
@@ -2421,9 +2462,50 @@
             "$ref": "#/components/responses/InternalError"
           }
         },
-        "summary": "get a Course by ID - V2",
+        "summary": "get a Course by ID",
         "tags": ["Courses"],
-        "description": "get a Course by ID - V2. This Courses operation is part of the versioned UMTAS HTTP contract.",
+        "description": "get a Course by ID. This Courses operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
+        ]
+      }
+    },
+    "/api/Courses/statistics": {
+      "get": {
+        "operationId": "courseStatistics",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Courses with statistics returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CourseModuleStatsResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "No university selected"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "description": "University not found"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "summary": "Course Statistics",
+        "tags": ["Courses"],
+        "description": "Course Statistics. This Courses operation is part of the versioned UMTAS HTTP contract.",
         "security": [
           {
             "cookie": []
@@ -2521,9 +2603,9 @@
         ]
       }
     },
-    "/api/universities/{universityId}": {
+    "/api/universities/role/{universityId}": {
       "get": {
-        "operationId": "getUniversityById",
+        "operationId": "getUserRoleByUniID",
         "parameters": [
           {
             "name": "universityId",
@@ -2536,11 +2618,11 @@
         ],
         "responses": {
           "200": {
-            "description": "University returned successfully",
+            "description": "Role returned successfully",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UniversitySingleResponseDto"
+                  "$ref": "#/components/schemas/UserUniversityRoleResponseDto"
                 }
               }
             }
@@ -2561,15 +2643,17 @@
             "$ref": "#/components/responses/InternalError"
           }
         },
-        "summary": "get a university by ID",
+        "summary": "get a users role by universityID",
         "tags": ["Universities"],
-        "description": "get a university by ID. This Universities operation is part of the versioned UMTAS HTTP contract.",
+        "description": "get a users role by universityID. This Universities operation is part of the versioned UMTAS HTTP contract.",
         "security": [
           {
             "cookie": []
           }
         ]
-      },
+      }
+    },
+    "/api/universities/{universityId}": {
       "patch": {
         "operationId": "updateUniversity",
         "parameters": [
@@ -2678,11 +2762,9 @@
             "cookie": []
           }
         ]
-      }
-    },
-    "/api/universities/role/{universityId}": {
+      },
       "get": {
-        "operationId": "getUserRoleByUniID",
+        "operationId": "getUniversityById",
         "parameters": [
           {
             "name": "universityId",
@@ -2695,11 +2777,11 @@
         ],
         "responses": {
           "200": {
-            "description": "Role returned successfully",
+            "description": "University returned successfully",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserUniversityRoleResponseDto"
+                  "$ref": "#/components/schemas/UniversitySingleResponseDto"
                 }
               }
             }
@@ -2720,9 +2802,9 @@
             "$ref": "#/components/responses/InternalError"
           }
         },
-        "summary": "get a users role by universityID",
+        "summary": "get a university by ID",
         "tags": ["Universities"],
-        "description": "get a users role by universityID. This Universities operation is part of the versioned UMTAS HTTP contract.",
+        "description": "get a university by ID. This Universities operation is part of the versioned UMTAS HTTP contract.",
         "security": [
           {
             "cookie": []
@@ -2895,6 +2977,47 @@
           }
         },
         "summary": "Approve a users role for a university",
+        "tags": ["Universities"],
+        "security": [
+          {
+            "cookie": []
+          }
+        ]
+      }
+    },
+    "/api/universities/statistics": {
+      "get": {
+        "description": "Return count of (courses, modules, events) for users unviersity",
+        "operationId": "universityStatistics",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Count of courses for user`s university returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UniversityCourseStatsResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "No university selected"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "description": "University not found"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "summary": "University statistics",
         "tags": ["Universities"],
         "security": [
           {
@@ -3357,6 +3480,88 @@
         "summary": "Validate an event",
         "tags": ["Events"],
         "description": "Validate an event. This Events operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
+        ]
+      }
+    },
+    "/api/events/statistics/week": {
+      "get": {
+        "operationId": "eventStatisticsWeek",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Count of events on each day of the week",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventStatsWeeklyResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "No university selected"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "description": "University not found"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "summary": "Event statistics - week",
+        "tags": ["Events"],
+        "description": "Event statistics - week. This Events operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
+        ]
+      }
+    },
+    "/api/events/statistics/venue": {
+      "get": {
+        "operationId": "eventStatisticsVenue",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Count of events for each venue",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventStatsVenueResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "No university selected"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "description": "University not found"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "summary": "Event statistics - venue",
+        "tags": ["Events"],
+        "description": "Event statistics - venue. This Events operation is part of the versioned UMTAS HTTP contract.",
         "security": [
           {
             "cookie": []
@@ -7262,6 +7467,12 @@
           },
           "venueName": {
             "type": "string"
+          },
+          "buildingId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid",
+            "description": "The ID of the building the venue belongs to"
           }
         },
         "required": ["venueId", "venueName"]
@@ -7665,6 +7876,36 @@
         },
         "required": ["message"]
       },
+      "ModuleStatsDto": {
+        "type": "object",
+        "properties": {
+          "ModuleID": {
+            "type": "string"
+          },
+          "ModuleCode": {
+            "type": "string"
+          },
+          "EventCount": {
+            "type": "number"
+          },
+          "EnrolledStudents": {
+            "type": "number"
+          }
+        },
+        "required": ["ModuleID", "EventCount", "EnrolledStudents"]
+      },
+      "ModuleStatsResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ModuleStatsDto"
+            }
+          }
+        },
+        "required": ["data"]
+      },
       "CreateCourseDto": {
         "type": "object",
         "properties": {
@@ -8047,6 +8288,44 @@
         },
         "required": ["CourseName", "success"]
       },
+      "CourseModuleStatsDto": {
+        "type": "object",
+        "properties": {
+          "CourseID": {
+            "type": "string"
+          },
+          "CourseName": {
+            "type": "string"
+          },
+          "ModuleCount": {
+            "type": "number"
+          },
+          "EventCount": {
+            "type": "number"
+          },
+          "EnrolledStudents": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "CourseID",
+          "ModuleCount",
+          "EventCount",
+          "EnrolledStudents"
+        ]
+      },
+      "CourseModuleStatsResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CourseModuleStatsDto"
+            }
+          }
+        },
+        "required": ["data"]
+      },
       "CreateUniversityDto": {
         "type": "object",
         "properties": {
@@ -8401,6 +8680,36 @@
         },
         "required": ["userId", "success"]
       },
+      "UniversityCourseStatsResponseDto": {
+        "type": "object",
+        "properties": {
+          "UniversityID": {
+            "type": "string"
+          },
+          "UniversityName": {
+            "type": "string"
+          },
+          "CourseCount": {
+            "type": "number"
+          },
+          "ModuleCount": {
+            "type": "number"
+          },
+          "EventCount": {
+            "type": "number"
+          },
+          "EnrolledStudents": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "UniversityID",
+          "CourseCount",
+          "ModuleCount",
+          "EventCount",
+          "EnrolledStudents"
+        ]
+      },
       "PopulateGroupBodyDto": {
         "type": "object",
         "properties": {
@@ -8512,6 +8821,13 @@
           },
           "eventCriteria": {
             "$ref": "#/components/schemas/EventCriteriaDtoV2"
+          },
+          "venueName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 30,
+            "description": "Name of venue",
+            "example": "Main Hall"
           }
         },
         "required": ["eventCriteria"]
@@ -8692,6 +9008,74 @@
           }
         },
         "required": ["event"]
+      },
+      "EventStatsWeekDayDto": {
+        "type": "object",
+        "properties": {
+          "dayOfWeek": {
+            "type": "string",
+            "enum": [
+              "monday",
+              "tuesday",
+              "wednesday",
+              "thursday",
+              "friday",
+              "saturday",
+              "sunday"
+            ]
+          },
+          "EventCount": {
+            "type": "number"
+          }
+        },
+        "required": ["dayOfWeek", "EventCount"]
+      },
+      "EventStatsWeeklyResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EventStatsWeekDayDto"
+            }
+          }
+        },
+        "required": ["data"]
+      },
+      "EventStatsVenueDto": {
+        "type": "object",
+        "properties": {
+          "VenueID": {
+            "type": "string"
+          },
+          "VenueName": {
+            "type": "string"
+          },
+          "EventCount": {
+            "type": "number"
+          },
+          "ProjectedAttendance": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "VenueID",
+          "VenueName",
+          "EventCount",
+          "ProjectedAttendance"
+        ]
+      },
+      "EventStatsVenueResponseDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EventStatsVenueDto"
+            }
+          }
+        },
+        "required": ["data"]
       },
       "UpdateEventVenueDto": {
         "type": "object",

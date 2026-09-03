@@ -1,5 +1,6 @@
 import { paths } from "@/lib/api";
 import { RequestBuilder, RequestMethod } from "../request";
+import { api } from "@/components/tanstack/getQueryClient";
 
 export type createEventAttendanceBody =
   paths["/api/attendance"]["post"]["requestBody"]["content"]["application/json"];
@@ -48,6 +49,16 @@ export class getEventAttendanceBuilder extends RequestBuilder<
     super();
     this.setUrl("/attendance").setMethod(RequestMethod.GET);
   }
+}
+
+export async function getAllAttendanceKy(
+  params: getEventAttendanceQuery,
+): Promise<getEventAttendanceRes> {
+  return api
+    .get("/attendance", {
+      searchParams: params as getEventAttendanceQuery,
+    })
+    .json<getEventAttendanceRes>();
 }
 
 export class getEventAttendanceByIdBuilder extends RequestBuilder<
