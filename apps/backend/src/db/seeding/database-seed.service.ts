@@ -104,10 +104,10 @@ export class DatabaseSeedService {
   private async seedMap(db: AppDatabase): Promise<void> {
     await db.execute(
       sql`INSERT INTO public."UniversityMapConfig" ("UniversityID", "NorthLat", "SouthLat", "EastLng", "WestLng", "DefaultZoom")
-      VALUES 
-        ('acc16c39-f7d6-4247-9006-15510d68771a', -25.74800, -25.76200, 28.23800, 28.22200, 16)
-      ON CONFLICT ("UniversityID") DO NOTHING;
-     `,
+    VALUES 
+      ((SELECT "UniversityID" FROM public."University" WHERE "UniversityName" = 'University of Pretoria'), -25.74800, -25.76200, 28.23800, 28.22200, 16)
+    ON CONFLICT ("UniversityID") DO NOTHING;
+   `,
     );
 
     this.logger.log('Seeded university map config');
