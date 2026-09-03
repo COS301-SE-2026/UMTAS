@@ -4,7 +4,7 @@ import sys
 
 import pytest
 
-from .conftest import FIXTURE_DIR, ROOT
+from .conftest import FIXTURE_DIR, ROOT, SUPPORTED_FIXTURES, load_ground_truth
 
 
 def run_cli(*args):
@@ -24,6 +24,14 @@ def parse_stdout_json(result):
         pytest.fail(
             f"stdout was not exactly one JSON object: {result.stdout!r}; {exc}"
         )
+
+
+@pytest.mark.parametrize("filename", SUPPORTED_FIXTURES)
+def test_parser_cli_matches_complete_ground_truth(filename):
+    result = run_cli("--adapter", "up", "--file", str(FIXTURE_DIR / filename))
+
+    assert result.returncode == 0, result.stderr
+    assert parse_stdout_json(result) == load_ground_truth()["fixtures"][filename]
 
 
 def test_parser_cli_emits_normalised_lecture_candidates():
