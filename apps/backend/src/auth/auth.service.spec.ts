@@ -14,7 +14,9 @@ import { createMockDatabase } from '../Testing/Mocks/database.mock';
 import {
   mockDbResult,
   mockSequentialResults,
+  mockTransaction,
 } from '../Testing/Mocks/database.helpers';
+import { MockUserRole } from './auth.dto';
 
 jest.mock('../redis/redis');
 
@@ -375,6 +377,124 @@ describe('AuthService', () => {
           uniRole: undefined,
         },
       );
+    });
+  });
+
+  describe('mock-user management', () => {
+    function mockUserHarness(ops: {
+      select?: unknown[][];
+      insert?: unknown[][];
+      update?: unknown[][];
+      delete?: unknown[][];
+    }) {
+      const { mockDb: database } = createMockDatabase();
+      mockTransaction(database, ops);
+      const local = new AuthService(
+        { db: database } as never,
+        {
+          sendResetPasswordEmail: jest.fn(),
+          sendVerificationEmail: jest.fn(),
+        } as never,
+      );
+      const createUser = jest.fn().mockResolvedValue({
+        user: { id: 'created-user' },
+      });
+      Object.assign(local as object, {
+        authInitialized: true,
+        authInstance: { api: { createUser } },
+      });
+      return { database, local, createUser };
+    }
+
+    it('returns an existing mock user without creating a duplicate', async () => {
+      const { local, createUser } = mockUserHarness({
+        select: [[{ id: 'existing-user', email: 'existing@simulation.com' }]],
+      });
+
+      await expect(
+        local.createMockUser({
+          email: 'existing@simulation.com',
+          password: 'Existing!Password',
+        }),
+      ).resolves.toEqual({
+        email: 'existing@simulation.com',
+        password: 'Existing!Password',
+      });
+      expect(createUser).not.toHaveBeenCalled();
+    });
+
+    it('creates, verifies, and assigns a university role to a mock user', async () => {
+      const { database, local, createUser } = mockUserHarness({
+        select: [[], [{ uniID: 'uni-1' }]],
+        update: [[]],
+        insert: [[{ UserID: 'created-user' }]],
+      });
+
+      await expect(
+        local.createMockUser(
+          {
+            email: 'lecturer@simulation.com',
+            name: 'Mock Lecturer',
+            password: 'Lecturer!Password',
+          },
+          MockUserRole.LECTURER,
+        ),
+      ).resolves.toEqual({
+        email: 'lecturer@simulation.com',
+        password: 'Lecturer!Password',
+        uniId: 'uni-1',
+      });
+      expect(createUser).toHaveBeenCalledWith({
+        body: {
+          email: 'lecturer@simulation.com',
+          password: 'Lecturer!Password',
+          name: 'Mock Lecturer',
+          role: 'user',
+        },
+      });
+      expect(database.update).toHaveBeenCalledTimes(1);
+      expect(database.insert).toHaveBeenCalledTimes(1);
+    });
+
+    it('uses generated defaults and skips role assignment without a university', async () => {
+      const now = jest.spyOn(Date, 'now').mockReturnValue(123456789);
+      const random = jest.spyOn(Math, 'random').mockReturnValue(0.042);
+      const { database, local, createUser } = mockUserHarness({
+        select: [[], []],
+        update: [[]],
+      });
+
+      try {
+        await expect(local.createMockUser({})).resolves.toEqual({
+          email: 'test_user_123456789_42@simulation.com',
+          password: 'password123!',
+          uniId: undefined,
+        });
+        expect(createUser).toHaveBeenCalledWith({
+          body: {
+            email: 'test_user_123456789_42@simulation.com',
+            password: 'password123!',
+            name: 'Test User',
+            role: 'user',
+          },
+        });
+        expect(database.insert).not.toHaveBeenCalled();
+      } finally {
+        now.mockRestore();
+        random.mockRestore();
+      }
+    });
+
+    it('deletes only generated mock users and reports the count', async () => {
+      const { database, local } = mockUserHarness({
+        delete: [[{ id: 'one' }, { id: 'two' }]],
+      });
+
+      await expect(local.deleteMockUsers()).resolves.toEqual({
+        success: true,
+        message: 'Deleted 2 users.',
+      });
+      expect(database.delete).toHaveBeenCalledTimes(1);
     });
   });
 
