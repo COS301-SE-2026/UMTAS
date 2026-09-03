@@ -157,16 +157,6 @@
     | **UC-AR-02** | Unrecord Attendance for Event | [Attendance Recording](#attendance-recording-id) | Student |<span class="status-implemented">Implemented</span>|
 
     </div>
-    
-    <div class="uc-table" markdown>
-
-    ## Lecturer Adjustment
-    | **ID** | **Use Case** | **Group** | **Actor** | **Status** |
-    |:---:|:---:|:---:|:---:|:---:|
-    | **UC-LA-01** | Manage Event Details | [Lecturer Adjustment](#lecturer-adjustment-id) | Lecturer, Admin |<span class="status-implemented">Implemented</span>|
-    | **UC-LA-02** | Manage Module Details | [Lecturer Adjustment](#lecturer-adjustment-id) | Lecturer, Admin |<span class="status-implemented">Implemented</span>|
-    
-    </div>
 
     <div class="uc-table" markdown>
 
@@ -249,10 +239,6 @@
 ---
 <!-- Attendance Recording -->
 {% include-markdown "srs/Use_Cases/Attendance_Recording.md" %}
-
----
-<!-- Lecturer Adjustment -->
-{% include-markdown "srs/Use_Cases/Lecturer_Adjustment.md" %}
 
 ---
 <!-- Calendar Management -->
