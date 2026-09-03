@@ -6,11 +6,8 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   addEventAttendanceMut,
   getAllEventAttendanceQ,
-  getEventAttendanceByIdQ,
   updateEventAttendanceMut,
 } from "../../../../utilities/eventAttendance/eventAttendanceQueries";
-import { Checkbox } from "@/components/atoms/baseShadcn/checkbox";
-import { useEffect } from "react";
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
 import { errorName } from "../../../../utilities/errorCries";
 
@@ -30,7 +27,7 @@ function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
 }
 
 export function EventBlock({ event, date }: EventBlockProps) {
-  const { mutateAsync: createAttendance } = useMutation({
+  const { mutate: createAttendance, isPending: createPending } = useMutation({
     ...addEventAttendanceMut(),
   });
 
@@ -51,21 +48,9 @@ export function EventBlock({ event, date }: EventBlockProps) {
       );
     },
   });
-  const { data: attendData = [] } = useQuery({
+  const { data: attendData } = useQuery({
     ...getAllEventAttendanceQ({ eventID: event.id, eventDate: date }),
   });
-
-  useEffect(() => {
-    if (attendData && attendData.length === 0) {
-      createAttendance({
-        body: {
-          eventDate: date,
-          eventID: event.id,
-          state: "NOT_ATTENDING",
-        },
-      });
-    }
-  }, [attendData, createAttendance, event.id, date]);
 
   function getBlockStyle() {
     if (!event.accentColour) {
@@ -93,7 +78,9 @@ export function EventBlock({ event, date }: EventBlockProps) {
     <div
       className="flex flex-col gap-1 rounded-sm border-l-[3px] px-2 py-1.5 h-full overflow-hidden"
       onClick={() => {
-        if (attendData[0])
+        if (createPending || updatePending) return;
+
+        if (attendData?.[0]) {
           updateAttendance({
             body: {
               state:
@@ -105,6 +92,15 @@ export function EventBlock({ event, date }: EventBlockProps) {
               attendanceId: attendData[0].AttendanceID,
             },
           });
+        } else {
+          createAttendance({
+            body: {
+              eventDate: date,
+              eventID: event.id,
+              state: "ATTENDING",
+            },
+          });
+        }
       }}
       style={getBlockStyle()}
     >
@@ -113,12 +109,12 @@ export function EventBlock({ event, date }: EventBlockProps) {
           {event.name}
         </p>
         <p className="text-[7px] text-[var(--text-secondary)] capitalize font-medium truncate">
-          {!updatePending
-            ? attendData[0]?.state
+          {!updatePending && !createPending
+            ? attendData?.[0]?.state
               ? attendData[0].state === "ATTENDING"
                 ? "Attending"
                 : "Not attending"
-              : ""
+              : "Not stated"
             : "updating"}
         </p>
       </span>
@@ -148,20 +144,3 @@ export function EventBlock({ event, date }: EventBlockProps) {
     </div>
   );
 }
-
-// <div className="flex items-center gap-1 mt-auto">
-//   <Checkbox
-//     checked={checked}
-//     onCheckedChange={() => {
-//       updateAttendance({
-//         body: {
-//           state:
-//             currAtt.state === "ATTENDING" ? "NOT_ATTENDING" : "ATTENDING",
-//         },
-//         path: {
-//           attendanceId: currAtt.AttendanceID,
-//         },
-//       });
-//     }}
-//   />
-// </div>

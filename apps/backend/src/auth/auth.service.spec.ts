@@ -253,6 +253,20 @@ describe('AuthService', () => {
     });
   });
 
+  describe('userExistsById', () => {
+    it('returns true when the authoritative user row exists', async () => {
+      const { service: local } = userExistsHarness([{ id: 'user-1' }]);
+
+      await expect(local.userExistsById('user-1')).resolves.toBe(true);
+    });
+
+    it('returns false when a cached session refers to a deleted user', async () => {
+      const { service: local } = userExistsHarness([]);
+
+      await expect(local.userExistsById('deleted-user')).resolves.toBe(false);
+    });
+  });
+
   describe('getAuth - mail callback wiring', () => {
     it('wires sendResetPasswordEmail to mailerService.sendResetPasswordEmail', async () => {
       const mockMailerService = {
