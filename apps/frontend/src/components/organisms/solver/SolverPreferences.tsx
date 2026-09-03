@@ -142,11 +142,7 @@ export default function SolverPreferences({
         key: "day-skip",
         parameters: {
           "day-to-skip": skipDay.toLowerCase() as
-            | "monday"
-            | "tuesday"
-            | "wednesday"
-            | "thursday"
-            | "friday",
+            "monday" | "tuesday" | "wednesday" | "thursday" | "friday",
         },
       });
     }
