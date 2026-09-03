@@ -84,6 +84,12 @@ export class DatabaseService
     }
 
     if (isSeedEnabled(process.env.SEED)) {
+      this.logger.log('Seeding is enabled');
+    } else {
+      this.logger.log('Seeding is disabled');
+    }
+
+    if (isSeedEnabled(process.env.SEED)) {
       try {
         this.logger.log('Starting database seeding...');
         await this.seedService?.seed(this.db);
