@@ -514,6 +514,26 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/modules/v2/{moduleId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get a module by ID - V2
+     * @description Return a module from its moduleID
+     */
+    get: operations["getModuleByIdV2"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/modules/{moduleId}": {
     parameters: {
       query?: never;
@@ -540,26 +560,6 @@ export interface paths {
      * @description Update a modules | STUDENT_OWNED needs to go through Builder Service
      */
     patch: operations["updateModule"];
-    trace?: never;
-  };
-  "/api/modules/v2/{moduleId}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Get a module by ID - V2
-     * @description Return a module from its moduleID
-     */
-    get: operations["getModuleByIdV2"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
     trace?: never;
   };
   "/api/modules/enroll/{moduleId}": {
@@ -626,6 +626,26 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/modules/statistics": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Module Statistics
+     * @description Module Statistics. This Modules operation is part of the versioned UMTAS HTTP contract.
+     */
+    get: operations["moduleStatistics"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/Courses": {
     parameters: {
       query?: never;
@@ -686,6 +706,26 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/Courses/v2/{CourseId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * get a Course by ID - V2
+     * @description get a Course by ID - V2. This Courses operation is part of the versioned UMTAS HTTP contract.
+     */
+    get: operations["getCourseByIdV2"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/Courses/{CourseId}": {
     parameters: {
       query?: never;
@@ -714,7 +754,7 @@ export interface paths {
     patch: operations["updateCourse"];
     trace?: never;
   };
-  "/api/Courses/v2/{CourseId}": {
+  "/api/Courses/statistics": {
     parameters: {
       query?: never;
       header?: never;
@@ -722,10 +762,10 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * get a Course by ID - V2
-     * @description get a Course by ID - V2. This Courses operation is part of the versioned UMTAS HTTP contract.
+     * Course Statistics
+     * @description Course Statistics. This Courses operation is part of the versioned UMTAS HTTP contract.
      */
-    get: operations["getCourseByIdV2"];
+    get: operations["courseStatistics"];
     put?: never;
     post?: never;
     delete?: never;
@@ -758,6 +798,26 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/universities/role/{universityId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * get a users role by universityID
+     * @description get a users role by universityID. This Universities operation is part of the versioned UMTAS HTTP contract.
+     */
+    get: operations["getUserRoleByUniID"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/universities/{universityId}": {
     parameters: {
       query?: never;
@@ -784,26 +844,6 @@ export interface paths {
      * @description Update an university. This Universities operation is part of the versioned UMTAS HTTP contract.
      */
     patch: operations["updateUniversity"];
-    trace?: never;
-  };
-  "/api/universities/role/{universityId}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * get a users role by universityID
-     * @description get a users role by universityID. This Universities operation is part of the versioned UMTAS HTTP contract.
-     */
-    get: operations["getUserRoleByUniID"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
     trace?: never;
   };
   "/api/universities/applications/{universityID}": {
@@ -860,6 +900,26 @@ export interface paths {
      * @description Approve a users role at university, will only approve if role is PENDING else throws probleme
      */
     post: operations["approveUsersRole"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/universities/statistics": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * University statistics
+     * @description Return count of (courses, modules, events) for users unviersity
+     */
+    get: operations["universityStatistics"];
+    put?: never;
+    post?: never;
     delete?: never;
     options?: never;
     head?: never;
@@ -996,6 +1056,46 @@ export interface paths {
      * @description Validate an event. This Events operation is part of the versioned UMTAS HTTP contract.
      */
     patch: operations["validateEvent"];
+    trace?: never;
+  };
+  "/api/events/statistics/week": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Event statistics - week
+     * @description Event statistics - week. This Events operation is part of the versioned UMTAS HTTP contract.
+     */
+    get: operations["eventStatisticsWeek"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/events/statistics/venue": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Event statistics - venue
+     * @description Event statistics - venue. This Events operation is part of the versioned UMTAS HTTP contract.
+     */
+    get: operations["eventStatisticsVenue"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
     trace?: never;
   };
   "/api/events/{id}/venue": {
@@ -2295,6 +2395,11 @@ export interface components {
       /** Format: uuid */
       venueId: string;
       venueName: string;
+      /**
+       * Format: uuid
+       * @description The ID of the building the venue belongs to
+       */
+      buildingId?: string | null;
     };
     EventDto: {
       /** Format: uuid */
@@ -2530,6 +2635,15 @@ export interface components {
        * @example Suceess
        */
       message: string;
+    };
+    ModuleStatsDto: {
+      ModuleID: string;
+      ModuleCode?: string;
+      EventCount: number;
+      EnrolledStudents: number;
+    };
+    ModuleStatsResponseDto: {
+      data: components["schemas"]["ModuleStatsDto"][];
     };
     CreateCourseDto: {
       /**
@@ -2770,6 +2884,16 @@ export interface components {
       CourseName: string;
       /** @example true */
       success: boolean;
+    };
+    CourseModuleStatsDto: {
+      CourseID: string;
+      CourseName?: string;
+      ModuleCount: number;
+      EventCount: number;
+      EnrolledStudents: number;
+    };
+    CourseModuleStatsResponseDto: {
+      data: components["schemas"]["CourseModuleStatsDto"][];
     };
     CreateUniversityDto: {
       /**
@@ -3017,6 +3141,14 @@ export interface components {
       /** @example true */
       success: boolean;
     };
+    UniversityCourseStatsResponseDto: {
+      UniversityID: string;
+      UniversityName?: string;
+      CourseCount: number;
+      ModuleCount: number;
+      EventCount: number;
+      EnrolledStudents: number;
+    };
     PopulateGroupBodyDto: {
       /**
        * @description module array to ad dto the group
@@ -3071,6 +3203,11 @@ export interface components {
       validated?: boolean;
       venues?: components["schemas"]["VenueDto"][];
       eventCriteria: components["schemas"]["EventCriteriaDtoV2"];
+      /**
+       * @description Name of venue
+       * @example Main Hall
+       */
+      venueName?: string;
     };
     EventSingleResponseDto: {
       event: components["schemas"]["EventDto"];
@@ -3145,6 +3282,30 @@ export interface components {
     ValidateEventResponseDto: {
       event: components["schemas"]["EventDto"];
       message?: string;
+    };
+    EventStatsWeekDayDto: {
+      /** @enum {string} */
+      dayOfWeek:
+        | "monday"
+        | "tuesday"
+        | "wednesday"
+        | "thursday"
+        | "friday"
+        | "saturday"
+        | "sunday";
+      EventCount: number;
+    };
+    EventStatsWeeklyResponseDto: {
+      data: components["schemas"]["EventStatsWeekDayDto"][];
+    };
+    EventStatsVenueDto: {
+      VenueID: string;
+      VenueName: string;
+      EventCount: number;
+      ProjectedAttendance: number;
+    };
+    EventStatsVenueResponseDto: {
+      data: components["schemas"]["EventStatsVenueDto"][];
     };
     UpdateEventVenueDto: {
       /** @description The venue name */
@@ -5471,6 +5632,45 @@ export interface operations {
       500: components["responses"]["InternalError"];
     };
   };
+  getModuleByIdV2: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        moduleId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Module returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ModuleSingleResponseDto"];
+        };
+      };
+      /** @description Invalid module ID */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      /** @description Module not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      500: components["responses"]["InternalError"];
+    };
+  };
   getModuleById: {
     parameters: {
       query?: never;
@@ -5591,45 +5791,6 @@ export interface operations {
       };
       /** @description Duplicate module code detected for course */
       409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      500: components["responses"]["InternalError"];
-    };
-  };
-  getModuleByIdV2: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        moduleId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Module returned successfully */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["ModuleSingleResponseDto"];
-        };
-      };
-      /** @description Invalid module ID */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      401: components["responses"]["UnauthorizedError"];
-      403: components["responses"]["ForbiddenError"];
-      /** @description Module not found */
-      404: {
         headers: {
           [name: string]: unknown;
         };
@@ -5807,6 +5968,43 @@ export interface operations {
       500: components["responses"]["InternalError"];
     };
   };
+  moduleStatistics: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Modules with statistics returned */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ModuleStatsResponseDto"];
+        };
+      };
+      /** @description No university selected */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      /** @description University not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      500: components["responses"]["InternalError"];
+    };
+  };
   createCourse: {
     parameters: {
       query?: never;
@@ -5910,6 +6108,45 @@ export interface operations {
       400: components["responses"]["BadRequestError"];
       401: components["responses"]["UnauthorizedError"];
       403: components["responses"]["ForbiddenError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  getCourseByIdV2: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        CourseId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Course returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CourseSingleResponseDto"];
+        };
+      };
+      /** @description Invalid Course ID */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      /** @description Course not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
       500: components["responses"]["InternalError"];
     };
   };
@@ -6035,27 +6272,25 @@ export interface operations {
       500: components["responses"]["InternalError"];
     };
   };
-  getCourseByIdV2: {
+  courseStatistics: {
     parameters: {
       query?: never;
       header?: never;
-      path: {
-        CourseId: string;
-      };
+      path?: never;
       cookie?: never;
     };
     requestBody?: never;
     responses: {
-      /** @description Course returned successfully */
+      /** @description Courses with statistics returned */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["CourseSingleResponseDto"];
+          "application/json": components["schemas"]["CourseModuleStatsResponseDto"];
         };
       };
-      /** @description Invalid Course ID */
+      /** @description No university selected */
       400: {
         headers: {
           [name: string]: unknown;
@@ -6064,7 +6299,7 @@ export interface operations {
       };
       401: components["responses"]["UnauthorizedError"];
       403: components["responses"]["ForbiddenError"];
-      /** @description Course not found */
+      /** @description University not found */
       404: {
         headers: {
           [name: string]: unknown;
@@ -6138,6 +6373,45 @@ export interface operations {
       403: components["responses"]["ForbiddenError"];
       /** @description University already exists */
       409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      500: components["responses"]["InternalError"];
+    };
+  };
+  getUserRoleByUniID: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        universityId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Role returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["UserUniversityRoleResponseDto"];
+        };
+      };
+      /** @description Invalid University ID */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      /** @description University not found */
+      404: {
         headers: {
           [name: string]: unknown;
         };
@@ -6268,45 +6542,6 @@ export interface operations {
       500: components["responses"]["InternalError"];
     };
   };
-  getUserRoleByUniID: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        universityId: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Role returned successfully */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["UserUniversityRoleResponseDto"];
-        };
-      };
-      /** @description Invalid University ID */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      401: components["responses"]["UnauthorizedError"];
-      403: components["responses"]["ForbiddenError"];
-      /** @description University not found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      500: components["responses"]["InternalError"];
-    };
-  };
   getAllApplications: {
     parameters: {
       query?: never;
@@ -6434,6 +6669,43 @@ export interface operations {
       };
       /** @description User already has an approved role */
       409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      500: components["responses"]["InternalError"];
+    };
+  };
+  universityStatistics: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Count of courses for user`s university returned */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["UniversityCourseStatsResponseDto"];
+        };
+      };
+      /** @description No university selected */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      /** @description University not found */
+      404: {
         headers: {
           [name: string]: unknown;
         };
@@ -6791,6 +7063,80 @@ export interface operations {
         content?: never;
       };
       409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  eventStatisticsWeek: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Count of events on each day of the week */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["EventStatsWeeklyResponseDto"];
+        };
+      };
+      /** @description No university selected */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      /** @description University not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      500: components["responses"]["InternalError"];
+    };
+  };
+  eventStatisticsVenue: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Count of events for each venue */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["EventStatsVenueResponseDto"];
+        };
+      };
+      /** @description No university selected */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      /** @description University not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
       500: components["responses"]["InternalError"];
     };
   };
