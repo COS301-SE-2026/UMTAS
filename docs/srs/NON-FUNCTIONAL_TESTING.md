@@ -96,37 +96,6 @@ Ordered by request volume. All times in milliseconds.
 
 Grouped by verb: the 14 `GET` endpoints served **30,498 requests with 0 failures**; the 9 `POST`/`PATCH` endpoints served **10,015 requests with 335 failures**, all of them on a single endpoint.
 
-#### Solver submission failures
-
-All 335 failures in the run landed on `POST /api/solver/jobs`:
-
-| **Failure** | **Occurrences** |
-|---|---:|
-| `CatchResponseError('solver rejected [400]')` | 334 |
-| `CatchResponseError('solver rejected [502]')` | 1 |
-
-**The 334 HTTP 400 responses are a defect in the load script, not in the API.** In `locust_user.py`, `submit_solver_job` builds optimisation-mode heuristics with:
-
-```python
-h_keys = "module,activity,location"          # a string, not a list
-...
-heuristics = [
-    {"key": k, "weight": round(random.uniform(0.1, 1.0), 2)}
-    for k in h_keys                          # iterates character by character
-]
-```
-
-Because `h_keys` is a string rather than a list, the comprehension iterates over its characters and emits 24 heuristics with single-character keys such as `{"key": "m", "weight": 0.42}`. `SolverPreferencesSchema` in `packages/shared-types/src/solver.ts` is a strict discriminated union keyed on `key`, admitting only `preferred-start-time`, `large-gaps`, `small-gaps`, and `day-skip`, each of which carries a `parameters` object rather than a `weight`. The payload therefore fails validation on two counts, and `validateTimetableSolveJob` in `apps/backend/src/solver/solver.controller.ts` correctly rejects it with HTTP 400.
-
-The arithmetic corroborates this. Heuristics are only built when `solve_mode == "optimization"`, which the script selects with weight 3 out of 10; 30% of the 1,176 submissions is 353 expected rejections against 334 observed. Every feasibility-mode submission, which sends no heuristics, was accepted.
-
-Two consequences for how this run should be read:
-
-1. The API's own success rate under this load was **40,512 of 40,513 requests (99.998%)**. The single genuine failure was one HTTP 502 on solver submission, out of 842 well-formed submissions - a 0.12% error rate on that endpoint.
-2. The optimisation path of the solver was never exercised end to end. Only feasibility-mode solves reached the worker, so this run provides no evidence about optimisation-mode solve behaviour under load.
-
-**Outstanding action:** correct `h_keys` to a list of valid heuristic keys with the `parameters` shape the schema expects, then re-run to obtain optimisation-path evidence. The correctly returned 400s are, in themselves, evidence that contract validation on the solver submission endpoint works as designed under load.
-
 #### Stability over the steady-state window
 
 | **Metric** | **Value** |

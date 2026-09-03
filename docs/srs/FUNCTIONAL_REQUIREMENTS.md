@@ -6,7 +6,7 @@ The Traceability Matrices for the functional requirements to use cases can be fo
 
 ---
 
-??? info "**FR 1 — Authentication System**"
+??? info "**FR 1 - Authentication System**"
 
     ### R1.1 Landing Page System
 
@@ -30,7 +30,7 @@ The Traceability Matrices for the functional requirements to use cases can be fo
 
 ---
 
-??? info "**FR 2 — Timetable System**"
+??? info "**FR 2 - Timetable System**"
 
     ### R2.1 Timetable Management
 
@@ -111,7 +111,7 @@ The Traceability Matrices for the functional requirements to use cases can be fo
 
 ---
 
-??? info "**FR 3 — Analytics, Lecturer, & Attendance Systems**"
+??? info "**FR 3 - Analytics, Lecturer, & Attendance Systems**"
 
     ### R3.1 Analytics System
     - **R3.1.1** University Analytics
@@ -143,7 +143,7 @@ The Traceability Matrices for the functional requirements to use cases can be fo
 
 ---
 
-??? info "**FR 4 — University Administration**"
+??? info "**FR 4 - University Administration**"
 
     ### FR 4.1 Course management for university admins
 
@@ -192,7 +192,7 @@ The Traceability Matrices for the functional requirements to use cases can be fo
 
 ---
 
-??? info "**FR 5 — Simulation Service**"
+??? info "**FR 5 - Simulation Service**"
 
     ### R5 Simulation Service
 
