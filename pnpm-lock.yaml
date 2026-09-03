@@ -322,7 +322,7 @@ importers:
   apps/e2e:
     devDependencies:
       "@playwright/test":
-        specifier: ^1.60.0
+        specifier: 1.60.0
         version: 1.62.1
       "@types/node":
         specifier: ^25.9.1
