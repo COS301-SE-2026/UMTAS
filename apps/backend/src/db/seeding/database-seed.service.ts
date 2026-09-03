@@ -102,29 +102,49 @@ export class DatabaseSeedService {
   }
 
   private async seedMap(db: AppDatabase): Promise<void> {
+    const existing = await db.execute(
+      sql`SELECT 1 FROM public."UniversityMapConfig" 
+          WHERE "UniversityID" = (SELECT "UniversityID" FROM public."University" WHERE "UniversityName" = 'University of Pretoria') 
+          LIMIT 1;`,
+    );
+    if (existing && existing.rows.length > 0) {
+      this.logger.log('University map config already seeded, skipping.');
+      return;
+    }
+
     await db.execute(
       sql`INSERT INTO public."UniversityMapConfig" ("UniversityID", "NorthLat", "SouthLat", "EastLng", "WestLng", "DefaultZoom")
-    VALUES 
-      ((SELECT "UniversityID" FROM public."University" WHERE "UniversityName" = 'University of Pretoria'), -25.74800, -25.76200, 28.23800, 28.22200, 16)
-    ON CONFLICT ("UniversityID") DO NOTHING;
-   `,
+          VALUES 
+            ((SELECT "UniversityID" FROM public."University" WHERE "UniversityName" = 'University of Pretoria'), -25.74800, -25.76200, 28.23800, 28.22200, 16);`,
     );
 
     this.logger.log('Seeded university map config');
   }
 
   private async seedBuildings(db: AppDatabase): Promise<void> {
+    const existing = await db.execute(
+      sql`SELECT 1 FROM public."Building" 
+          WHERE "UniversityID" IN (
+            SELECT "UniversityID" FROM public."University" WHERE "UniversityName" IN ('University of Pretoria', 'University of Maryland')
+          ) LIMIT 1;`,
+    );
+
+    if (existing && existing.rows.length > 0) {
+      this.logger.log('Buildings already seeded, skipping.');
+      return;
+    }
+
     await db.execute(
       sql`INSERT INTO public."Building" ("UniversityID", "BuildingName", "Latitude", "Longitude")
-VALUES
- ((SELECT "UniversityID" FROM public."University" WHERE "UniversityName" = 'University of Pretoria'), 'Thuto Building', -25.752932877052245, 28.23145960192486),
- ((SELECT "UniversityID" FROM public."University" WHERE "UniversityName" = 'University of Pretoria'), 'IT Building', -25.755334709611287, 28.232579768596462),
- ((SELECT "UniversityID" FROM public."University" WHERE "UniversityName" = 'University of Pretoria'), 'Centenary/Eeufees Building', -25.75382056742293, 28.233478481562628),
- ((SELECT "UniversityID" FROM public."University" WHERE "UniversityName" = 'University of Pretoria'), 'AE du Toit Auditorium', -25.752032648778318, 28.22904682574297),
- ((SELECT "UniversityID" FROM public."University" WHERE "UniversityName" = 'University of Pretoria'), 'Chancellors Building', -25.754243030429393, 28.23051010413832),
- ((SELECT "UniversityID" FROM public."University" WHERE "UniversityName" = 'University of Pretoria'), 'Merensky Library', -25.755122709513454, 28.23046714644736),
- ((SELECT "UniversityID" FROM public."University" WHERE "UniversityName" = 'University of Pretoria'), 'Humanities Building', -25.75535702140905, 28.231503793202357),
- ((SELECT "UniversityID" FROM public."University" WHERE "UniversityName" = 'University of Maryland'), 'University Of Maryland', 38.98701000530837, -76.94241482758859);`,
+          VALUES
+           ((SELECT "UniversityID" FROM public."University" WHERE "UniversityName" = 'University of Pretoria'), 'Thuto Building', -25.752932877052245, 28.23145960192486),
+           ((SELECT "UniversityID" FROM public."University" WHERE "UniversityName" = 'University of Pretoria'), 'IT Building', -25.755334709611287, 28.232579768596462),
+           ((SELECT "UniversityID" FROM public."University" WHERE "UniversityName" = 'University of Pretoria'), 'Centenary/Eeufees Building', -25.75382056742293, 28.233478481562628),
+           ((SELECT "UniversityID" FROM public."University" WHERE "UniversityName" = 'University of Pretoria'), 'AE du Toit Auditorium', -25.752032648778318, 28.22904682574297),
+           ((SELECT "UniversityID" FROM public."University" WHERE "UniversityName" = 'University of Pretoria'), 'Chancellors Building', -25.754243030429393, 28.23051010413832),
+           ((SELECT "UniversityID" FROM public."University" WHERE "UniversityName" = 'University of Pretoria'), 'Merensky Library', -25.755122709513454, 28.23046714644736),
+           ((SELECT "UniversityID" FROM public."University" WHERE "UniversityName" = 'University of Pretoria'), 'Humanities Building', -25.75535702140905, 28.231503793202357),
+           ((SELECT "UniversityID" FROM public."University" WHERE "UniversityName" = 'University of Maryland'), 'University Of Maryland', 38.98701000530837, -76.94241482758859);`,
     );
     this.logger.log('Seeded buildings');
   }
