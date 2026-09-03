@@ -210,6 +210,7 @@ jobs:
             NEXT_PUBLIC_POSTHOG_API_HOST=${{ secrets.NEXT_PUBLIC_POSTHOG_API_HOST}}
             NEXT_PUBLIC_APP_ENV=staging
             NEXT_PUBLIC_API_URL=https://staging.capstone-vigil.dns.net.za/api
+            NEXT_PUBLIC_MAP_KEY=${{ secrets.NEXT_PUBLIC_MAP_KEY }}
           tags: |
             vigilcs/umtas:frontend-staging-${{ steps.tag.outputs.latest }}
             vigilcs/umtas:frontend-staging-${{ steps.tag.outputs.sha }}
@@ -259,9 +260,9 @@ jobs:
           script: |
             cd /opt/UMTAS
                 docker compose -p umtas-staging -f docker-compose.staging.yml stop
-                docker compose -p umtas-staging -f docker-compose.staging.yml rm -f db
+                docker compose -p umtas-staging -f docker-compose.staging.yml rm -f umtas-staging-postgres-1
                 docker volume rm umtas-staging_postgres_data || true
-                docker compose -p umtas-staging -f docker-compose.staging.yml up -d --pull always db
+                docker compose -p umtas-staging -f docker-compose.staging.yml up -d --pull always umtas-staging-postgres-1
                 phase run --env staging -- docker compose -p umtas-staging -f docker-compose.staging.yml run --rm backend node dist/db/migrate.js
                 docker compose -p umtas-staging -f docker-compose.staging.yml up -d --pull always
                 just staging-up
