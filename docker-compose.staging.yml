@@ -208,6 +208,7 @@ services:
       - COOKIE_PREFIX=umtas-staging
       - NEXT_PUBLIC_POSTHOG_PT=${NEXT_PUBLIC_POSTHOG_PT}
       - NEXT_PUBLIC_POSTHOG_API_HOST=${NEXT_PUBLIC_POSTHOG_API_HOST}
+      - NEXT_PUBLIC_MAP_KEY=${NEXT_PUBLIC_MAP_KEY}
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=gateway"
