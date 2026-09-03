@@ -122,7 +122,7 @@
     | **ID** | **Use Case** | **Group** | **Actor** | **Status** |
     |:---:|:---:|:---:|:---:|:---:|
     | **UC-EX-01** | Export Timetable as ICS File | [Calendar Export](#calendar-exporting-id) | Student |<span class="status-implemented">Implemented</span>|
-    | **UC-EX-02** | Sync Timetable with Google Calendar | [Calendar Export](#calendar-exporting-id) | Student |<span class="status-implemented">Implemented</span>|
+    | **UC-EX-02** | Export Timetable to Google Calendar | [Calendar Export](#calendar-exporting-id) | Student |<span class="status-implemented">Implemented</span>|
     
     </div>
 

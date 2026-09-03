@@ -92,7 +92,7 @@ The Traceability Matrices for the functional requirements to use cases can be fo
         - **R2.5.1.4** The system shall allow users to change the event start and end times in the `.ics` file.
         - **R2.5.1.5** The system shall allow users to adjust the event status such as confirmed or cancelled.
         - **R2.5.1.6** The system shall make use of a uuid such that duplicate events are accounted for.
-    - **R2.5.2** The system shall allow direct sync with Google Calendar.
+    - **R2.5.2** The system shall allow direct export of timetables to Google Calendar.
         - **R2.5.2.1** The system shall support creating a Google Calendar instance.
 
     ### R2.6 Solver System
