@@ -1,0 +1,2322 @@
+{
+  "schemaVersion": 1,
+  "review": {
+    "requirement": "NFR-Corr-1",
+    "reviewedOn": "2026-09-02",
+    "method": "Each source PDF table was reviewed row-by-row against this complete canonical result, including continued venue rows, multi-page rows, and absent source values.",
+    "normalisationRules": [
+      "Spaces are removed from module codes.",
+      "Repeated source rows for one activity at the same day and time are one event with an ordered venue list.",
+      "EP and EL lecture language values are represented as E by the supported adapter contract.",
+      "Dated tests and exams use date with day set to null; recurring lectures use day with date set to null.",
+      "Exam endTime is the supported three-hour duration derived from Start Time.",
+      "Missing exam venues remain empty and produce VENUE_MISSING; no venue is inferred."
+    ]
+  },
+  "fixtures": {
+    "LECTURES_S1.pdf": {
+      "modules": [
+        {
+          "code": "COS301",
+          "name": null,
+          "metadata": {
+            "campus": "HATFIELD",
+            "semester": "YEAR"
+          },
+          "warnings": []
+        },
+        {
+          "code": "COS314",
+          "name": null,
+          "metadata": {
+            "campus": "HATFIELD",
+            "semester": "SEMESTER_1"
+          },
+          "warnings": []
+        },
+        {
+          "code": "COS332",
+          "name": null,
+          "metadata": {
+            "campus": "HATFIELD",
+            "semester": "SEMESTER_1"
+          },
+          "warnings": []
+        },
+        {
+          "code": "COS333",
+          "name": null,
+          "metadata": {
+            "campus": "HATFIELD",
+            "semester": "SEMESTER_1"
+          },
+          "warnings": []
+        }
+      ],
+      "events": [
+        {
+          "moduleCode": "COS301",
+          "activityType": "prac",
+          "activityCode": "P1",
+          "title": "COS301 P1",
+          "day": "Wednesday",
+          "date": null,
+          "startTime": "07:30",
+          "endTime": "09:20",
+          "venues": ["Informatorium Brown Lab"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "G01",
+            "semester": "S1",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS301",
+          "activityType": "prac",
+          "activityCode": "P2",
+          "title": "COS301 P2",
+          "day": "Friday",
+          "date": null,
+          "startTime": "07:30",
+          "endTime": "08:20",
+          "venues": ["Informatorium Blue Lab 1", "Informatorium Blue Lab 2"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "G01",
+            "semester": "S1",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS301",
+          "activityType": "lecture",
+          "activityCode": "L1",
+          "title": "COS301 L1",
+          "day": "Monday",
+          "date": null,
+          "startTime": "11:30",
+          "endTime": "12:20",
+          "venues": ["IT 2-23"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "G01",
+            "semester": "Y",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS301",
+          "activityType": "lecture",
+          "activityCode": "L2",
+          "title": "COS301 L2",
+          "day": "Tuesday",
+          "date": null,
+          "startTime": "13:30",
+          "endTime": "14:20",
+          "venues": ["IT 2-26"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "G01",
+            "semester": "Y",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS314",
+          "activityType": "lecture",
+          "activityCode": "L1",
+          "title": "COS314 L1",
+          "day": "Tuesday",
+          "date": null,
+          "startTime": "10:30",
+          "endTime": "11:20",
+          "venues": ["EMS 4-151"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "G01",
+            "semester": "S1",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS314",
+          "activityType": "lecture",
+          "activityCode": "L2",
+          "title": "COS314 L2",
+          "day": "Wednesday",
+          "date": null,
+          "startTime": "10:30",
+          "endTime": "11:20",
+          "venues": ["IT 2-27"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "G01",
+            "semester": "S1",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS314",
+          "activityType": "prac",
+          "activityCode": "P1",
+          "title": "COS314 P1",
+          "day": "Thursday",
+          "date": null,
+          "startTime": "14:30",
+          "endTime": "17:20",
+          "venues": [
+            "Informatorium Brown Lab",
+            "Informatorium Grey Lab",
+            "Informatorium Maroon Lab"
+          ],
+          "isRecurring": true,
+          "metadata": {
+            "group": "G01",
+            "semester": "S1",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS332",
+          "activityType": "lecture",
+          "activityCode": "L1",
+          "title": "COS332 L1",
+          "day": "Monday",
+          "date": null,
+          "startTime": "12:30",
+          "endTime": "13:20",
+          "venues": ["North hall"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "G01",
+            "semester": "S1",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS332",
+          "activityType": "lecture",
+          "activityCode": "L2",
+          "title": "COS332 L2",
+          "day": "Wednesday",
+          "date": null,
+          "startTime": "14:30",
+          "endTime": "15:20",
+          "venues": ["North hall"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "G01",
+            "semester": "S1",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS332",
+          "activityType": "prac",
+          "activityCode": "P1",
+          "title": "COS332 P1",
+          "day": "Tuesday",
+          "date": null,
+          "startTime": "14:30",
+          "endTime": "17:20",
+          "venues": ["Informatorium SIT 1 lab"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "P01",
+            "semester": "S1",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS332",
+          "activityType": "prac",
+          "activityCode": "P1",
+          "title": "COS332 P1",
+          "day": "Friday",
+          "date": null,
+          "startTime": "08:30",
+          "endTime": "11:20",
+          "venues": ["Informatorium Green Lab", "Informatorium Grey Lab"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "P02",
+            "semester": "S1",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS333",
+          "activityType": "lecture",
+          "activityCode": "L1",
+          "title": "COS333 L1",
+          "day": "Tuesday",
+          "date": null,
+          "startTime": "08:30",
+          "endTime": "09:20",
+          "venues": ["IT 2-26"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "G01",
+            "semester": "S1",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS333",
+          "activityType": "lecture",
+          "activityCode": "L2",
+          "title": "COS333 L2",
+          "day": "Friday",
+          "date": null,
+          "startTime": "11:30",
+          "endTime": "12:20",
+          "venues": ["IT 2-26"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "G01",
+            "semester": "S1",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS333",
+          "activityType": "prac",
+          "activityCode": "P1",
+          "title": "COS333 P1",
+          "day": "Monday",
+          "date": null,
+          "startTime": "14:30",
+          "endTime": "17:20",
+          "venues": [
+            "Informatorium Blue Lab 1",
+            "Informatorium Blue Lab 2",
+            "Informatorium Blue Lab 3"
+          ],
+          "isRecurring": true,
+          "metadata": {
+            "group": "P01",
+            "semester": "S1",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS333",
+          "activityType": "prac",
+          "activityCode": "P1",
+          "title": "COS333 P1",
+          "day": "Friday",
+          "date": null,
+          "startTime": "14:30",
+          "endTime": "17:20",
+          "venues": ["Informatorium Green Lab", "Informatorium Purple Lab"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "P02",
+            "semester": "S1",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        }
+      ],
+      "warnings": []
+    },
+    "LECTURES_S2.pdf": {
+      "modules": [
+        {
+          "code": "COS301",
+          "name": null,
+          "metadata": {
+            "campus": "HATFIELD",
+            "semester": "YEAR"
+          },
+          "warnings": []
+        },
+        {
+          "code": "COS326",
+          "name": null,
+          "metadata": {
+            "campus": "HATFIELD",
+            "semester": "SEMESTER_2"
+          },
+          "warnings": []
+        },
+        {
+          "code": "COS330",
+          "name": null,
+          "metadata": {
+            "campus": "HATFIELD",
+            "semester": "SEMESTER_2"
+          },
+          "warnings": []
+        },
+        {
+          "code": "COS341",
+          "name": null,
+          "metadata": {
+            "campus": "HATFIELD",
+            "semester": "SEMESTER_2"
+          },
+          "warnings": []
+        },
+        {
+          "code": "STK353",
+          "name": null,
+          "metadata": {
+            "campus": "HATFIELD",
+            "semester": "SEMESTER_2"
+          },
+          "warnings": []
+        }
+      ],
+      "events": [
+        {
+          "moduleCode": "COS301",
+          "activityType": "prac",
+          "activityCode": "P1",
+          "title": "COS301 P1",
+          "day": "Friday",
+          "date": null,
+          "startTime": "07:30",
+          "endTime": "10:20",
+          "venues": ["Informatorium Green Lab", "Informatorium Purple Lab"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "G01",
+            "semester": "S2",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS301",
+          "activityType": "lecture",
+          "activityCode": "L1",
+          "title": "COS301 L1",
+          "day": "Monday",
+          "date": null,
+          "startTime": "11:30",
+          "endTime": "12:20",
+          "venues": ["IT 2-23"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "G01",
+            "semester": "Y",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS301",
+          "activityType": "lecture",
+          "activityCode": "L2",
+          "title": "COS301 L2",
+          "day": "Tuesday",
+          "date": null,
+          "startTime": "13:30",
+          "endTime": "14:20",
+          "venues": ["IT 2-26"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "G01",
+            "semester": "Y",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS326",
+          "activityType": "lecture",
+          "activityCode": "L1",
+          "title": "COS326 L1",
+          "day": "Tuesday",
+          "date": null,
+          "startTime": "12:30",
+          "endTime": "13:20",
+          "venues": ["IT 2-26"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "G01",
+            "semester": "S2",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS326",
+          "activityType": "lecture",
+          "activityCode": "L2",
+          "title": "COS326 L2",
+          "day": "Thursday",
+          "date": null,
+          "startTime": "09:30",
+          "endTime": "10:20",
+          "venues": ["IT 2-26"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "G01",
+            "semester": "S2",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS326",
+          "activityType": "prac",
+          "activityCode": "P1",
+          "title": "COS326 P1",
+          "day": "Friday",
+          "date": null,
+          "startTime": "12:30",
+          "endTime": "15:20",
+          "venues": ["Informatorium Green Lab"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "G01",
+            "semester": "S2",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS330",
+          "activityType": "lecture",
+          "activityCode": "L1",
+          "title": "COS330 L1",
+          "day": "Monday",
+          "date": null,
+          "startTime": "08:30",
+          "endTime": "09:20",
+          "venues": ["IT 2-27"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "G01",
+            "semester": "S2",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS330",
+          "activityType": "lecture",
+          "activityCode": "L2",
+          "title": "COS330 L2",
+          "day": "Thursday",
+          "date": null,
+          "startTime": "11:30",
+          "endTime": "12:20",
+          "venues": ["IT 4-4"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "G01",
+            "semester": "S2",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS330",
+          "activityType": "prac",
+          "activityCode": "P1",
+          "title": "COS330 P1",
+          "day": "Wednesday",
+          "date": null,
+          "startTime": "07:30",
+          "endTime": "10:20",
+          "venues": ["Informatorium SIT 1 lab"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "P01",
+            "semester": "S2",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS330",
+          "activityType": "prac",
+          "activityCode": "P1",
+          "title": "COS330 P1",
+          "day": "Wednesday",
+          "date": null,
+          "startTime": "13:30",
+          "endTime": "16:20",
+          "venues": ["Informatorium Blue Lab 1", "Informatorium Blue Lab 2"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "P02",
+            "semester": "S2",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS341",
+          "activityType": "lecture",
+          "activityCode": "L1",
+          "title": "COS341 L1",
+          "day": "Monday",
+          "date": null,
+          "startTime": "12:30",
+          "endTime": "13:20",
+          "venues": ["Centenary 4"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "G01",
+            "semester": "S2",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS341",
+          "activityType": "lecture",
+          "activityCode": "L2",
+          "title": "COS341 L2",
+          "day": "Thursday",
+          "date": null,
+          "startTime": "10:30",
+          "endTime": "11:20",
+          "venues": ["IT 2-26"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "G01",
+            "semester": "S2",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS341",
+          "activityType": "prac",
+          "activityCode": "P1",
+          "title": "COS341 P1",
+          "day": "Tuesday",
+          "date": null,
+          "startTime": "14:30",
+          "endTime": "17:20",
+          "venues": ["Informatorium Orange Lab", "Informatorium Purple Lab"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "G01",
+            "semester": "S2",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "STK353",
+          "activityType": "lecture",
+          "activityCode": "L1",
+          "title": "STK353 L1",
+          "day": "Monday",
+          "date": null,
+          "startTime": "13:30",
+          "endTime": "14:20",
+          "venues": ["Centenary 4"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "G01",
+            "semester": "S2",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "STK353",
+          "activityType": "lecture",
+          "activityCode": "L2",
+          "title": "STK353 L2",
+          "day": "Wednesday",
+          "date": null,
+          "startTime": "15:30",
+          "endTime": "16:20",
+          "venues": ["Centenary 3"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "G01",
+            "semester": "S2",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "STK353",
+          "activityType": "prac",
+          "activityCode": "P1",
+          "title": "STK353 P1",
+          "day": "Monday",
+          "date": null,
+          "startTime": "15:30",
+          "endTime": "17:20",
+          "venues": [
+            "IT Open Bronze Lab",
+            "IT Open Copper Lab",
+            "IT Open Gold Lab",
+            "IT Open Silver Lab"
+          ],
+          "isRecurring": true,
+          "metadata": {
+            "group": "G01",
+            "semester": "S2",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        }
+      ],
+      "warnings": []
+    },
+    "LECTURES_BOTH.pdf": {
+      "modules": [
+        {
+          "code": "COS301",
+          "name": null,
+          "metadata": {
+            "campus": "HATFIELD",
+            "semester": "YEAR"
+          },
+          "warnings": []
+        },
+        {
+          "code": "COS314",
+          "name": null,
+          "metadata": {
+            "campus": "HATFIELD",
+            "semester": "SEMESTER_1"
+          },
+          "warnings": []
+        },
+        {
+          "code": "COS326",
+          "name": null,
+          "metadata": {
+            "campus": "HATFIELD",
+            "semester": "SEMESTER_2"
+          },
+          "warnings": []
+        },
+        {
+          "code": "COS330",
+          "name": null,
+          "metadata": {
+            "campus": "HATFIELD",
+            "semester": "SEMESTER_2"
+          },
+          "warnings": []
+        },
+        {
+          "code": "COS332",
+          "name": null,
+          "metadata": {
+            "campus": "HATFIELD",
+            "semester": "SEMESTER_1"
+          },
+          "warnings": []
+        },
+        {
+          "code": "COS333",
+          "name": null,
+          "metadata": {
+            "campus": "HATFIELD",
+            "semester": "SEMESTER_1"
+          },
+          "warnings": []
+        },
+        {
+          "code": "COS341",
+          "name": null,
+          "metadata": {
+            "campus": "HATFIELD",
+            "semester": "SEMESTER_2"
+          },
+          "warnings": []
+        },
+        {
+          "code": "STK353",
+          "name": null,
+          "metadata": {
+            "campus": "HATFIELD",
+            "semester": "SEMESTER_2"
+          },
+          "warnings": []
+        }
+      ],
+      "events": [
+        {
+          "moduleCode": "COS301",
+          "activityType": "prac",
+          "activityCode": "P1",
+          "title": "COS301 P1",
+          "day": "Wednesday",
+          "date": null,
+          "startTime": "07:30",
+          "endTime": "09:20",
+          "venues": ["Informatorium Brown Lab"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "G01",
+            "semester": "S1",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS301",
+          "activityType": "prac",
+          "activityCode": "P2",
+          "title": "COS301 P2",
+          "day": "Friday",
+          "date": null,
+          "startTime": "07:30",
+          "endTime": "08:20",
+          "venues": ["Informatorium Blue Lab 1", "Informatorium Blue Lab 2"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "G01",
+            "semester": "S1",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS301",
+          "activityType": "prac",
+          "activityCode": "P1",
+          "title": "COS301 P1",
+          "day": "Friday",
+          "date": null,
+          "startTime": "07:30",
+          "endTime": "10:20",
+          "venues": ["Informatorium Green Lab", "Informatorium Purple Lab"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "G01",
+            "semester": "S2",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS301",
+          "activityType": "lecture",
+          "activityCode": "L1",
+          "title": "COS301 L1",
+          "day": "Monday",
+          "date": null,
+          "startTime": "11:30",
+          "endTime": "12:20",
+          "venues": ["IT 2-23"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "G01",
+            "semester": "Y",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS301",
+          "activityType": "lecture",
+          "activityCode": "L2",
+          "title": "COS301 L2",
+          "day": "Tuesday",
+          "date": null,
+          "startTime": "13:30",
+          "endTime": "14:20",
+          "venues": ["IT 2-26"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "G01",
+            "semester": "Y",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS314",
+          "activityType": "lecture",
+          "activityCode": "L1",
+          "title": "COS314 L1",
+          "day": "Tuesday",
+          "date": null,
+          "startTime": "10:30",
+          "endTime": "11:20",
+          "venues": ["EMS 4-151"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "G01",
+            "semester": "S1",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS314",
+          "activityType": "lecture",
+          "activityCode": "L2",
+          "title": "COS314 L2",
+          "day": "Wednesday",
+          "date": null,
+          "startTime": "10:30",
+          "endTime": "11:20",
+          "venues": ["IT 2-27"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "G01",
+            "semester": "S1",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS314",
+          "activityType": "prac",
+          "activityCode": "P1",
+          "title": "COS314 P1",
+          "day": "Thursday",
+          "date": null,
+          "startTime": "14:30",
+          "endTime": "17:20",
+          "venues": [
+            "Informatorium Brown Lab",
+            "Informatorium Grey Lab",
+            "Informatorium Maroon Lab"
+          ],
+          "isRecurring": true,
+          "metadata": {
+            "group": "G01",
+            "semester": "S1",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS326",
+          "activityType": "lecture",
+          "activityCode": "L1",
+          "title": "COS326 L1",
+          "day": "Tuesday",
+          "date": null,
+          "startTime": "12:30",
+          "endTime": "13:20",
+          "venues": ["IT 2-26"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "G01",
+            "semester": "S2",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS326",
+          "activityType": "lecture",
+          "activityCode": "L2",
+          "title": "COS326 L2",
+          "day": "Thursday",
+          "date": null,
+          "startTime": "09:30",
+          "endTime": "10:20",
+          "venues": ["IT 2-26"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "G01",
+            "semester": "S2",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS326",
+          "activityType": "prac",
+          "activityCode": "P1",
+          "title": "COS326 P1",
+          "day": "Friday",
+          "date": null,
+          "startTime": "12:30",
+          "endTime": "15:20",
+          "venues": ["Informatorium Green Lab"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "G01",
+            "semester": "S2",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS330",
+          "activityType": "lecture",
+          "activityCode": "L1",
+          "title": "COS330 L1",
+          "day": "Monday",
+          "date": null,
+          "startTime": "08:30",
+          "endTime": "09:20",
+          "venues": ["IT 2-27"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "G01",
+            "semester": "S2",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS330",
+          "activityType": "lecture",
+          "activityCode": "L2",
+          "title": "COS330 L2",
+          "day": "Thursday",
+          "date": null,
+          "startTime": "11:30",
+          "endTime": "12:20",
+          "venues": ["IT 4-4"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "G01",
+            "semester": "S2",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS330",
+          "activityType": "prac",
+          "activityCode": "P1",
+          "title": "COS330 P1",
+          "day": "Wednesday",
+          "date": null,
+          "startTime": "07:30",
+          "endTime": "10:20",
+          "venues": ["Informatorium SIT 1 lab"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "P01",
+            "semester": "S2",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS330",
+          "activityType": "prac",
+          "activityCode": "P1",
+          "title": "COS330 P1",
+          "day": "Wednesday",
+          "date": null,
+          "startTime": "13:30",
+          "endTime": "16:20",
+          "venues": ["Informatorium Blue Lab 1", "Informatorium Blue Lab 2"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "P02",
+            "semester": "S2",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS332",
+          "activityType": "lecture",
+          "activityCode": "L1",
+          "title": "COS332 L1",
+          "day": "Monday",
+          "date": null,
+          "startTime": "12:30",
+          "endTime": "13:20",
+          "venues": ["North hall"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "G01",
+            "semester": "S1",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS332",
+          "activityType": "lecture",
+          "activityCode": "L2",
+          "title": "COS332 L2",
+          "day": "Wednesday",
+          "date": null,
+          "startTime": "14:30",
+          "endTime": "15:20",
+          "venues": ["North hall"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "G01",
+            "semester": "S1",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS332",
+          "activityType": "prac",
+          "activityCode": "P1",
+          "title": "COS332 P1",
+          "day": "Tuesday",
+          "date": null,
+          "startTime": "14:30",
+          "endTime": "17:20",
+          "venues": ["Informatorium SIT 1 lab"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "P01",
+            "semester": "S1",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS332",
+          "activityType": "prac",
+          "activityCode": "P1",
+          "title": "COS332 P1",
+          "day": "Friday",
+          "date": null,
+          "startTime": "08:30",
+          "endTime": "11:20",
+          "venues": ["Informatorium Green Lab", "Informatorium Grey Lab"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "P02",
+            "semester": "S1",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS333",
+          "activityType": "lecture",
+          "activityCode": "L1",
+          "title": "COS333 L1",
+          "day": "Tuesday",
+          "date": null,
+          "startTime": "08:30",
+          "endTime": "09:20",
+          "venues": ["IT 2-26"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "G01",
+            "semester": "S1",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS333",
+          "activityType": "lecture",
+          "activityCode": "L2",
+          "title": "COS333 L2",
+          "day": "Friday",
+          "date": null,
+          "startTime": "11:30",
+          "endTime": "12:20",
+          "venues": ["IT 2-26"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "G01",
+            "semester": "S1",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS333",
+          "activityType": "prac",
+          "activityCode": "P1",
+          "title": "COS333 P1",
+          "day": "Monday",
+          "date": null,
+          "startTime": "14:30",
+          "endTime": "17:20",
+          "venues": [
+            "Informatorium Blue Lab 1",
+            "Informatorium Blue Lab 2",
+            "Informatorium Blue Lab 3"
+          ],
+          "isRecurring": true,
+          "metadata": {
+            "group": "P01",
+            "semester": "S1",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS333",
+          "activityType": "prac",
+          "activityCode": "P1",
+          "title": "COS333 P1",
+          "day": "Friday",
+          "date": null,
+          "startTime": "14:30",
+          "endTime": "17:20",
+          "venues": ["Informatorium Green Lab", "Informatorium Purple Lab"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "P02",
+            "semester": "S1",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS341",
+          "activityType": "lecture",
+          "activityCode": "L1",
+          "title": "COS341 L1",
+          "day": "Monday",
+          "date": null,
+          "startTime": "12:30",
+          "endTime": "13:20",
+          "venues": ["Centenary 4"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "G01",
+            "semester": "S2",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS341",
+          "activityType": "lecture",
+          "activityCode": "L2",
+          "title": "COS341 L2",
+          "day": "Thursday",
+          "date": null,
+          "startTime": "10:30",
+          "endTime": "11:20",
+          "venues": ["IT 2-26"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "G01",
+            "semester": "S2",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS341",
+          "activityType": "prac",
+          "activityCode": "P1",
+          "title": "COS341 P1",
+          "day": "Tuesday",
+          "date": null,
+          "startTime": "14:30",
+          "endTime": "17:20",
+          "venues": ["Informatorium Orange Lab", "Informatorium Purple Lab"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "G01",
+            "semester": "S2",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "STK353",
+          "activityType": "lecture",
+          "activityCode": "L1",
+          "title": "STK353 L1",
+          "day": "Monday",
+          "date": null,
+          "startTime": "13:30",
+          "endTime": "14:20",
+          "venues": ["Centenary 4"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "G01",
+            "semester": "S2",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "STK353",
+          "activityType": "lecture",
+          "activityCode": "L2",
+          "title": "STK353 L2",
+          "day": "Wednesday",
+          "date": null,
+          "startTime": "15:30",
+          "endTime": "16:20",
+          "venues": ["Centenary 3"],
+          "isRecurring": true,
+          "metadata": {
+            "group": "G01",
+            "semester": "S2",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "STK353",
+          "activityType": "prac",
+          "activityCode": "P1",
+          "title": "STK353 P1",
+          "day": "Monday",
+          "date": null,
+          "startTime": "15:30",
+          "endTime": "17:20",
+          "venues": [
+            "IT Open Bronze Lab",
+            "IT Open Copper Lab",
+            "IT Open Gold Lab",
+            "IT Open Silver Lab"
+          ],
+          "isRecurring": true,
+          "metadata": {
+            "group": "G01",
+            "semester": "S2",
+            "language": "E",
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        }
+      ],
+      "warnings": []
+    },
+    "SEM_TESTS_S1.pdf": {
+      "modules": [
+        {
+          "code": "COS333",
+          "name": null,
+          "metadata": {
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "code": "COS314",
+          "name": null,
+          "metadata": {
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "code": "COS332",
+          "name": null,
+          "metadata": {
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        }
+      ],
+      "events": [
+        {
+          "moduleCode": "COS333",
+          "activityType": "test",
+          "activityCode": "Test1",
+          "title": "COS333 Semester Test 1",
+          "day": null,
+          "date": "2026-03-17",
+          "startTime": "12:30",
+          "endTime": "14:00",
+          "venues": [
+            "IT Open Bronze Lab",
+            "IT Open Copper Lab",
+            "IT Open Gold Lab",
+            "IT Open Silver Lab",
+            "Informatorium Brown Lab",
+            "Informatorium Grey Lab",
+            "Informatorium Maroon Lab"
+          ],
+          "isRecurring": false,
+          "metadata": {
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS314",
+          "activityType": "test",
+          "activityCode": "Test1",
+          "title": "COS314 Semester Test 1",
+          "day": null,
+          "date": "2026-03-18",
+          "startTime": "12:30",
+          "endTime": "14:00",
+          "venues": [
+            "Informatorium Brown Lab",
+            "Informatorium Grey Lab",
+            "Informatorium Maroon Lab",
+            "Informatorium SIT 1 lab"
+          ],
+          "isRecurring": false,
+          "metadata": {
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS332",
+          "activityType": "test",
+          "activityCode": "Test1",
+          "title": "COS332 Semester Test 1",
+          "day": null,
+          "date": "2026-03-19",
+          "startTime": "07:30",
+          "endTime": "09:00",
+          "venues": ["Roos hall"],
+          "isRecurring": false,
+          "metadata": {
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS333",
+          "activityType": "test",
+          "activityCode": "Test2",
+          "title": "COS333 Semester Test 2",
+          "day": null,
+          "date": "2026-05-08",
+          "startTime": "12:30",
+          "endTime": "14:00",
+          "venues": [
+            "IT Open Bronze Lab",
+            "IT Open Copper Lab",
+            "IT Open Gold Lab",
+            "IT Open Silver Lab",
+            "Informatorium Brown Lab",
+            "Informatorium Grey Lab",
+            "Informatorium Maroon Lab"
+          ],
+          "isRecurring": false,
+          "metadata": {
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS314",
+          "activityType": "test",
+          "activityCode": "Test2",
+          "title": "COS314 Semester Test 2",
+          "day": null,
+          "date": "2026-05-09",
+          "startTime": "12:30",
+          "endTime": "14:00",
+          "venues": [
+            "Informatorium Brown Lab",
+            "Informatorium Grey Lab",
+            "Informatorium Maroon Lab",
+            "Informatorium SIT 1 lab"
+          ],
+          "isRecurring": false,
+          "metadata": {
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS332",
+          "activityType": "test",
+          "activityCode": "Test2",
+          "title": "COS332 Semester Test 2",
+          "day": null,
+          "date": "2026-05-16",
+          "startTime": "07:30",
+          "endTime": "09:00",
+          "venues": ["Roos hall"],
+          "isRecurring": false,
+          "metadata": {
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        }
+      ],
+      "warnings": []
+    },
+    "SEM_TESTS_S2.pdf": {
+      "modules": [
+        {
+          "code": "COS341",
+          "name": null,
+          "metadata": {
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "code": "COS326",
+          "name": null,
+          "metadata": {
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "code": "COS330",
+          "name": null,
+          "metadata": {
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "code": "STK353",
+          "name": null,
+          "metadata": {
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        }
+      ],
+      "events": [
+        {
+          "moduleCode": "COS341",
+          "activityType": "test",
+          "activityCode": "Test1",
+          "title": "COS341 Semester Test 1",
+          "day": null,
+          "date": "2026-08-26",
+          "startTime": "12:30",
+          "endTime": "14:00",
+          "venues": ["IT 2-23"],
+          "isRecurring": false,
+          "metadata": {
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS326",
+          "activityType": "test",
+          "activityCode": "Test1",
+          "title": "COS326 Semester Test 1",
+          "day": null,
+          "date": "2026-08-27",
+          "startTime": "12:30",
+          "endTime": "14:00",
+          "venues": [
+            "Informatorium Blue Lab 1",
+            "Informatorium Blue Lab 2",
+            "Informatorium Blue Lab 3",
+            "Informatorium Red Lab"
+          ],
+          "isRecurring": false,
+          "metadata": {
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS330",
+          "activityType": "test",
+          "activityCode": "Test1",
+          "title": "COS330 Semester Test 1",
+          "day": null,
+          "date": "2026-08-28",
+          "startTime": "10:00",
+          "endTime": "11:30",
+          "venues": [
+            "Informatorium Blue Lab 1",
+            "Informatorium Blue Lab 2",
+            "Informatorium Blue Lab 3",
+            "Informatorium Red Lab"
+          ],
+          "isRecurring": false,
+          "metadata": {
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "STK353",
+          "activityType": "test",
+          "activityCode": "Test1",
+          "title": "STK353 Semester Test 1",
+          "day": null,
+          "date": "2026-08-29",
+          "startTime": "12:30",
+          "endTime": "14:00",
+          "venues": ["Thuto 3-2"],
+          "isRecurring": false,
+          "metadata": {
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "STK353",
+          "activityType": "test",
+          "activityCode": "Test2",
+          "title": "STK353 Semester Test 2",
+          "day": null,
+          "date": "2026-10-14",
+          "startTime": "10:00",
+          "endTime": "11:30",
+          "venues": ["Thuto 3-2"],
+          "isRecurring": false,
+          "metadata": {
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        }
+      ],
+      "warnings": []
+    },
+    "SEM_TESTS_BOTH.pdf": {
+      "modules": [
+        {
+          "code": "COS333",
+          "name": null,
+          "metadata": {
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "code": "COS314",
+          "name": null,
+          "metadata": {
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "code": "COS332",
+          "name": null,
+          "metadata": {
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "code": "COS301",
+          "name": null,
+          "metadata": {
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "code": "COS341",
+          "name": null,
+          "metadata": {
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "code": "COS326",
+          "name": null,
+          "metadata": {
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "code": "COS330",
+          "name": null,
+          "metadata": {
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "code": "STK353",
+          "name": null,
+          "metadata": {
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        }
+      ],
+      "events": [
+        {
+          "moduleCode": "COS333",
+          "activityType": "test",
+          "activityCode": "Test1",
+          "title": "COS333 Semester Test 1",
+          "day": null,
+          "date": "2026-03-17",
+          "startTime": "12:30",
+          "endTime": "14:00",
+          "venues": [
+            "IT Open Bronze Lab",
+            "IT Open Copper Lab",
+            "IT Open Gold Lab",
+            "IT Open Silver Lab",
+            "Informatorium Brown Lab",
+            "Informatorium Grey Lab",
+            "Informatorium Maroon Lab"
+          ],
+          "isRecurring": false,
+          "metadata": {
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS314",
+          "activityType": "test",
+          "activityCode": "Test1",
+          "title": "COS314 Semester Test 1",
+          "day": null,
+          "date": "2026-03-18",
+          "startTime": "12:30",
+          "endTime": "14:00",
+          "venues": [
+            "Informatorium Brown Lab",
+            "Informatorium Grey Lab",
+            "Informatorium Maroon Lab",
+            "Informatorium SIT 1 lab"
+          ],
+          "isRecurring": false,
+          "metadata": {
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS332",
+          "activityType": "test",
+          "activityCode": "Test1",
+          "title": "COS332 Semester Test 1",
+          "day": null,
+          "date": "2026-03-19",
+          "startTime": "07:30",
+          "endTime": "09:00",
+          "venues": ["Roos hall"],
+          "isRecurring": false,
+          "metadata": {
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS301",
+          "activityType": "test",
+          "activityCode": "Test1",
+          "title": "COS301 Semester Test 1",
+          "day": null,
+          "date": "2026-05-05",
+          "startTime": "12:30",
+          "endTime": "14:00",
+          "venues": [
+            "Informatorium Brown Lab",
+            "Informatorium Grey Lab",
+            "Informatorium Maroon Lab",
+            "Informatorium SIT 1 lab"
+          ],
+          "isRecurring": false,
+          "metadata": {
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS333",
+          "activityType": "test",
+          "activityCode": "Test2",
+          "title": "COS333 Semester Test 2",
+          "day": null,
+          "date": "2026-05-08",
+          "startTime": "12:30",
+          "endTime": "14:00",
+          "venues": [
+            "IT Open Bronze Lab",
+            "IT Open Copper Lab",
+            "IT Open Gold Lab",
+            "IT Open Silver Lab",
+            "Informatorium Brown Lab",
+            "Informatorium Grey Lab",
+            "Informatorium Maroon Lab"
+          ],
+          "isRecurring": false,
+          "metadata": {
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS314",
+          "activityType": "test",
+          "activityCode": "Test2",
+          "title": "COS314 Semester Test 2",
+          "day": null,
+          "date": "2026-05-09",
+          "startTime": "12:30",
+          "endTime": "14:00",
+          "venues": [
+            "Informatorium Brown Lab",
+            "Informatorium Grey Lab",
+            "Informatorium Maroon Lab",
+            "Informatorium SIT 1 lab"
+          ],
+          "isRecurring": false,
+          "metadata": {
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS332",
+          "activityType": "test",
+          "activityCode": "Test2",
+          "title": "COS332 Semester Test 2",
+          "day": null,
+          "date": "2026-05-16",
+          "startTime": "07:30",
+          "endTime": "09:00",
+          "venues": ["Roos hall"],
+          "isRecurring": false,
+          "metadata": {
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS341",
+          "activityType": "test",
+          "activityCode": "Test1",
+          "title": "COS341 Semester Test 1",
+          "day": null,
+          "date": "2026-08-26",
+          "startTime": "12:30",
+          "endTime": "14:00",
+          "venues": ["IT 2-23"],
+          "isRecurring": false,
+          "metadata": {
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS326",
+          "activityType": "test",
+          "activityCode": "Test1",
+          "title": "COS326 Semester Test 1",
+          "day": null,
+          "date": "2026-08-27",
+          "startTime": "12:30",
+          "endTime": "14:00",
+          "venues": [
+            "Informatorium Blue Lab 1",
+            "Informatorium Blue Lab 2",
+            "Informatorium Blue Lab 3",
+            "Informatorium Red Lab"
+          ],
+          "isRecurring": false,
+          "metadata": {
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS330",
+          "activityType": "test",
+          "activityCode": "Test1",
+          "title": "COS330 Semester Test 1",
+          "day": null,
+          "date": "2026-08-28",
+          "startTime": "10:00",
+          "endTime": "11:30",
+          "venues": [
+            "Informatorium Blue Lab 1",
+            "Informatorium Blue Lab 2",
+            "Informatorium Blue Lab 3",
+            "Informatorium Red Lab"
+          ],
+          "isRecurring": false,
+          "metadata": {
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "STK353",
+          "activityType": "test",
+          "activityCode": "Test1",
+          "title": "STK353 Semester Test 1",
+          "day": null,
+          "date": "2026-08-29",
+          "startTime": "12:30",
+          "endTime": "14:00",
+          "venues": ["Thuto 3-2"],
+          "isRecurring": false,
+          "metadata": {
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS301",
+          "activityType": "test",
+          "activityCode": "Test2",
+          "title": "COS301 Semester Test 2",
+          "day": null,
+          "date": "2026-10-13",
+          "startTime": "10:00",
+          "endTime": "11:30",
+          "venues": [
+            "Informatorium CBT Lab 1",
+            "Informatorium CBT Lab 2",
+            "Informatorium CBT Lab 3",
+            "Informatorium Red Lab"
+          ],
+          "isRecurring": false,
+          "metadata": {
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "STK353",
+          "activityType": "test",
+          "activityCode": "Test2",
+          "title": "STK353 Semester Test 2",
+          "day": null,
+          "date": "2026-10-14",
+          "startTime": "10:00",
+          "endTime": "11:30",
+          "venues": ["Thuto 3-2"],
+          "isRecurring": false,
+          "metadata": {
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        }
+      ],
+      "warnings": []
+    },
+    "EXAMS_S1.pdf": {
+      "modules": [
+        {
+          "code": "COS314",
+          "name": null,
+          "metadata": {
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "code": "COS332",
+          "name": null,
+          "metadata": {
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "code": "COS333",
+          "name": null,
+          "metadata": {
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        }
+      ],
+      "events": [
+        {
+          "moduleCode": "COS314",
+          "activityType": "exam",
+          "activityCode": "Paper 1",
+          "title": "COS314 Paper 1",
+          "day": null,
+          "date": "2026-06-05",
+          "startTime": "11:15",
+          "endTime": "14:15",
+          "venues": ["IT Building CBT Labs 1,2,3"],
+          "isRecurring": false,
+          "metadata": {
+            "status": "FINAL",
+            "moduleCampus": "HATF",
+            "examCampus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS332",
+          "activityType": "exam",
+          "activityCode": "Paper 1",
+          "title": "COS332 Paper 1",
+          "day": null,
+          "date": "2026-06-09",
+          "startTime": "07:30",
+          "endTime": "10:30",
+          "venues": ["Large Chemistry hall"],
+          "isRecurring": false,
+          "metadata": {
+            "status": "FINAL",
+            "moduleCampus": "HATF",
+            "examCampus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS333",
+          "activityType": "exam",
+          "activityCode": "Paper 1",
+          "title": "COS333 Paper 1",
+          "day": null,
+          "date": "2026-06-15",
+          "startTime": "11:15",
+          "endTime": "14:15",
+          "venues": ["Informatorium Brown lab"],
+          "isRecurring": false,
+          "metadata": {
+            "status": "FINAL",
+            "moduleCampus": "HATF",
+            "examCampus": "HATFIELD"
+          },
+          "warnings": []
+        }
+      ],
+      "warnings": []
+    },
+    "EXAMS_S2.pdf": {
+      "modules": [
+        {
+          "code": "COS341",
+          "name": null,
+          "metadata": {},
+          "warnings": []
+        },
+        {
+          "code": "COS326",
+          "name": null,
+          "metadata": {},
+          "warnings": []
+        },
+        {
+          "code": "COS330",
+          "name": null,
+          "metadata": {},
+          "warnings": []
+        }
+      ],
+      "events": [
+        {
+          "moduleCode": "COS341",
+          "activityType": "exam",
+          "activityCode": "Paper 1",
+          "title": "COS341 Paper 1",
+          "day": null,
+          "date": "2026-11-09",
+          "startTime": "11:15",
+          "endTime": "14:15",
+          "venues": [],
+          "isRecurring": false,
+          "metadata": {
+            "status": "PRELIM",
+            "moduleCampus": "HATF",
+            "examCampus": ""
+          },
+          "warnings": [
+            {
+              "code": "VENUE_MISSING",
+              "message": "Exam venue was not present in the PDF.",
+              "details": {}
+            }
+          ]
+        },
+        {
+          "moduleCode": "COS326",
+          "activityType": "exam",
+          "activityCode": "Paper 1",
+          "title": "COS326 Paper 1",
+          "day": null,
+          "date": "2026-11-12",
+          "startTime": "07:30",
+          "endTime": "10:30",
+          "venues": [],
+          "isRecurring": false,
+          "metadata": {
+            "status": "PRELIM",
+            "moduleCampus": "HATF",
+            "examCampus": ""
+          },
+          "warnings": [
+            {
+              "code": "VENUE_MISSING",
+              "message": "Exam venue was not present in the PDF.",
+              "details": {}
+            }
+          ]
+        },
+        {
+          "moduleCode": "COS330",
+          "activityType": "exam",
+          "activityCode": "Paper 1",
+          "title": "COS330 Paper 1",
+          "day": null,
+          "date": "2026-11-21",
+          "startTime": "15:00",
+          "endTime": "18:00",
+          "venues": [],
+          "isRecurring": false,
+          "metadata": {
+            "status": "PRELIM",
+            "moduleCampus": "HATF",
+            "examCampus": ""
+          },
+          "warnings": [
+            {
+              "code": "VENUE_MISSING",
+              "message": "Exam venue was not present in the PDF.",
+              "details": {}
+            }
+          ]
+        }
+      ],
+      "warnings": []
+    },
+    "EXAMS_BOTH.pdf": {
+      "modules": [
+        {
+          "code": "COS314",
+          "name": null,
+          "metadata": {
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "code": "COS332",
+          "name": null,
+          "metadata": {
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "code": "COS333",
+          "name": null,
+          "metadata": {
+            "campus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "code": "COS341",
+          "name": null,
+          "metadata": {},
+          "warnings": []
+        },
+        {
+          "code": "COS326",
+          "name": null,
+          "metadata": {},
+          "warnings": []
+        },
+        {
+          "code": "COS330",
+          "name": null,
+          "metadata": {},
+          "warnings": []
+        }
+      ],
+      "events": [
+        {
+          "moduleCode": "COS314",
+          "activityType": "exam",
+          "activityCode": "Paper 1",
+          "title": "COS314 Paper 1",
+          "day": null,
+          "date": "2026-06-05",
+          "startTime": "11:15",
+          "endTime": "14:15",
+          "venues": ["IT Building CBT Labs 1,2,3"],
+          "isRecurring": false,
+          "metadata": {
+            "status": "FINAL",
+            "moduleCampus": "HATF",
+            "examCampus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS332",
+          "activityType": "exam",
+          "activityCode": "Paper 1",
+          "title": "COS332 Paper 1",
+          "day": null,
+          "date": "2026-06-09",
+          "startTime": "07:30",
+          "endTime": "10:30",
+          "venues": ["Large Chemistry hall"],
+          "isRecurring": false,
+          "metadata": {
+            "status": "FINAL",
+            "moduleCampus": "HATF",
+            "examCampus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS333",
+          "activityType": "exam",
+          "activityCode": "Paper 1",
+          "title": "COS333 Paper 1",
+          "day": null,
+          "date": "2026-06-15",
+          "startTime": "11:15",
+          "endTime": "14:15",
+          "venues": ["Informatorium Brown lab"],
+          "isRecurring": false,
+          "metadata": {
+            "status": "FINAL",
+            "moduleCampus": "HATF",
+            "examCampus": "HATFIELD"
+          },
+          "warnings": []
+        },
+        {
+          "moduleCode": "COS341",
+          "activityType": "exam",
+          "activityCode": "Paper 1",
+          "title": "COS341 Paper 1",
+          "day": null,
+          "date": "2026-11-09",
+          "startTime": "11:15",
+          "endTime": "14:15",
+          "venues": [],
+          "isRecurring": false,
+          "metadata": {
+            "status": "PRELIM",
+            "moduleCampus": "HATF",
+            "examCampus": ""
+          },
+          "warnings": [
+            {
+              "code": "VENUE_MISSING",
+              "message": "Exam venue was not present in the PDF.",
+              "details": {}
+            }
+          ]
+        },
+        {
+          "moduleCode": "COS326",
+          "activityType": "exam",
+          "activityCode": "Paper 1",
+          "title": "COS326 Paper 1",
+          "day": null,
+          "date": "2026-11-12",
+          "startTime": "07:30",
+          "endTime": "10:30",
+          "venues": [],
+          "isRecurring": false,
+          "metadata": {
+            "status": "PRELIM",
+            "moduleCampus": "HATF",
+            "examCampus": ""
+          },
+          "warnings": [
+            {
+              "code": "VENUE_MISSING",
+              "message": "Exam venue was not present in the PDF.",
+              "details": {}
+            }
+          ]
+        },
+        {
+          "moduleCode": "COS330",
+          "activityType": "exam",
+          "activityCode": "Paper 1",
+          "title": "COS330 Paper 1",
+          "day": null,
+          "date": "2026-11-21",
+          "startTime": "15:00",
+          "endTime": "18:00",
+          "venues": [],
+          "isRecurring": false,
+          "metadata": {
+            "status": "PRELIM",
+            "moduleCampus": "HATF",
+            "examCampus": ""
+          },
+          "warnings": [
+            {
+              "code": "VENUE_MISSING",
+              "message": "Exam venue was not present in the PDF.",
+              "details": {}
+            }
+          ]
+        }
+      ],
+      "warnings": []
+    }
+  }
+}

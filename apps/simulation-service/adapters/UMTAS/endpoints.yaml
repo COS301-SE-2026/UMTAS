@@ -1,4 +1,4 @@
-base_url: "http://localhost:3000"
+base_url: "https://staging.capstone-vigil.cs.net.za"
 auth:
   type: bearer
   token_env_var: SIMULATION_SERVICE_API_TOKEN

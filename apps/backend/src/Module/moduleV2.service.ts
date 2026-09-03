@@ -6,6 +6,7 @@ import {
   ModuleFiltersDtoV2,
   ModuleListResponseDtoV2,
   ModuleSingleResponseDto,
+  ModuleStatsResponseDto,
 } from './dto/module.dto';
 import { ModuleService } from './module.service';
 import {
@@ -17,15 +18,26 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { and, eq, getTableColumns, ilike, SQL } from 'drizzle-orm';
+import {
+  and,
+  countDistinct,
+  desc,
+  eq,
+  getTableColumns,
+  ilike,
+  SQL,
+} from 'drizzle-orm';
 import {
   Course,
   CourseModule,
+  Event,
   GroupModules,
   ModuleEnrollment,
   ModuleGrouping,
   modules,
   ModuleStyling,
+  University,
+  UniversityEvent,
 } from 'src/entities';
 import { CourseService } from 'src/Course/course.service';
 import { GroupingService } from 'src/Grouping/grouping.service';
@@ -451,8 +463,11 @@ export class ModuleServiceV2 extends ModuleService {
   async getByExternalID(
     externalId: string,
     courseId: string,
+    tx?: AppDatabase,
   ): Promise<ModuleSingleResponseDto | null> {
-    const [module] = await this.dbService.db
+    const db = tx ?? this.dbService.db;
+
+    const [module] = await db
       .select(getTableColumns(modules))
       .from(modules)
       .where(eq(modules.ExternalID, externalId))
@@ -469,12 +484,57 @@ export class ModuleServiceV2 extends ModuleService {
     return module ?? null;
   }
 
+  //Stats
+  async getStatistics(uniId: string): Promise<ModuleStatsResponseDto> {
+    const db = this.dbService.db;
+
+    //Validate university
+    const [uni] = await db
+      .select()
+      .from(University)
+      .where(eq(University.UniversityID, uniId))
+      .limit(1);
+
+    if (!uni) {
+      this.OOPSIE.warn(`University[${uniId}] not found`);
+      throw new NotFoundException(`University not found`);
+    }
+
+    //get stats
+    const statistics = await db
+      .select({
+        ModuleID: modules.moduleID,
+        ModuleCode: modules.moduleCode,
+        ModuleName: modules.moduleName,
+        EventCount: countDistinct(Event.eventID),
+        EnrolledStudents: countDistinct(ModuleEnrollment.UserID),
+      })
+      .from(modules)
+      .leftJoin(
+        ModuleEnrollment,
+        eq(ModuleEnrollment.ModuleID, modules.moduleID),
+      )
+      .leftJoin(GroupModules, eq(GroupModules.ModuleID, modules.moduleID))
+      .innerJoin(Course, eq(Course.GroupID, GroupModules.GroupID))
+      .leftJoin(UniversityEvent, eq(UniversityEvent.moduleID, modules.moduleID))
+      .leftJoin(Event, eq(Event.eventID, UniversityEvent.eventID))
+      .where(eq(Course.UniversityID, uniId))
+      .groupBy(modules.moduleID, modules.moduleCode, modules.moduleName)
+      .orderBy(
+        desc(countDistinct(Event.eventID)),
+        desc(countDistinct(ModuleEnrollment.UserID)),
+      );
+
+    return { data: statistics };
+  } //END_ModuleStatsResponseDto
+
   //🎅's little helpers
   protected async getGroupId(
     tx: AppDatabase,
     courseId?: string,
     groupId?: string,
   ): Promise<string> {
+    this.OOPSIE.log(`getGroupId: courseId[${courseId}] | groupId[${groupId}]`);
     if (courseId) {
       //Validate courseId
       const course = await this.courseService.getById(courseId, tx);
@@ -490,6 +550,9 @@ export class ModuleServiceV2 extends ModuleService {
         groupId = newGroup.GroupID;
       } else groupId = course.GroupID;
 
+      this.OOPSIE.log(
+        `No Group for course[${courseId}] created new group[${groupId}]`,
+      );
       return groupId;
     }
 

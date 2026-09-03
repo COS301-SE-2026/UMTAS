@@ -21,8 +21,13 @@ import { SolverModule } from './solver/solver.module';
 import { StorageModule } from './storage/storage.module';
 import { AttendanceModule } from './Attendance/attendance.module';
 import { GroupingModule } from './Grouping/grouping.module';
-import { AcademicCalendarModule } from './academic_calendar/academic_calendar.module';
+import { VenueModule } from './Venue/venue.module';
+import { BuildingModule } from './Building/building.module';
+import { MapConfigModule } from './Map-config/map-config.module';
 import { ApiServiceModule } from './ApiService/ApiService.module';
+import { AnalyticsModule } from './AnalyticsService/analytics.module';
+import { RouteModule } from './Route/route.module';
+import { AcademicCalendarModule } from './academic_calendar/academic_calendar.module';
 import { PostHogModule } from './posthog/posthog.module';
 
 @Module({
@@ -43,8 +48,13 @@ import { PostHogModule } from './posthog/posthog.module';
     SolverModule,
     AttendanceModule,
     GroupingModule,
+    VenueModule,
+    BuildingModule,
+    MapConfigModule,
+    RouteModule,
     AcademicCalendarModule,
     ApiServiceModule,
+    AnalyticsModule,
   ],
   controllers: [AppController, AuthController],
   providers: [

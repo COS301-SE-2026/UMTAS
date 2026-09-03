@@ -20,6 +20,8 @@ import {
   EventResponse,
 } from "@/app/builder/utils/events/eventRequestBuilder";
 import { Switch } from "@/components/atoms/baseShadcn/switch";
+import { Checkbox } from "@/components/atoms/baseShadcn/checkbox";
+import { BuildingType } from "../../../../utilities/building/buildingRequestBuilder";
 
 export interface EventErrors {
   name?: string;
@@ -34,21 +36,27 @@ export interface EventErrors {
 interface EventCardProps {
   event: EventResponse;
   modules: ModuleResponseDto[];
+  buildings: BuildingType[];
   onUpdate: (
     id: string,
-    field: keyof EventResponse | keyof EventCriteria,
-    value: string | boolean,
+    field: keyof EventResponse | keyof EventCriteria | "buildingId",
+    value: string | boolean | string[],
   ) => void;
   onGoToModules?: () => void;
   errors?: EventErrors;
+  isAttending?: boolean;
+  onAttendanceChange?: (eventId: string, isAttending: boolean) => void;
 }
 
 export function EventCard({
   event,
   modules,
+  buildings,
   onUpdate,
   onGoToModules,
   errors,
+  isAttending = false,
+  onAttendanceChange,
 }: EventCardProps) {
   const inputClass =
     "h-10 bg-[var(--bg-base)] border-[var(--border)] text-[var(--text-primary)] " +
@@ -190,26 +198,72 @@ export function EventCard({
         </div>
 
         {/* venue */}
-        {/* <div className="flex flex-col gap-2"> */}
-        {/* <Label
+        <div className="flex flex-col gap-2">
+          <Label
             htmlFor={"event-venue-" + event.eventId}
             className="text-sm font-medium text-[var(--text-secondary)]"
           >
             Venue
-          </Label> */}
-        {
-          // <Input
-          //   id={"event-venue-" + event.eventId}
-          //   value={event.eventCriteria?.venue || ""}
-          //   onChange={(e) => onUpdate(event.eventId, "venue", e.target.value)}
-          //   placeholder="e.g. IT 2-26"
-          //   className={getInputClass(!!errors?.venue)}
-          // />
-        }
-        {/* {errors?.venue && (
+          </Label>
+
+          <Input
+            id={"event-venue-" + event.eventId}
+            value={
+              typeof event.venues?.[0] === "string"
+                ? event.venues[0]
+                : event.venues?.[0]?.venueName || ""
+            }
+            onChange={(e) =>
+              onUpdate(event.eventId, "venues", [e.target.value])
+            }
+            placeholder="e.g. IT 2-26"
+            className={getInputClass(!!errors?.venue)}
+          />
+
+          {errors?.venue && (
             <p className="text-sm text-[var(--error-text)]">{errors.venue}</p>
-          )} */}
-        {/* </div> */}
+          )}
+        </div>
+
+        {/* building dropdown */}
+        <div className="flex flex-col gap-2">
+          <Label className="text-sm font-medium text-[var(--text-secondary)]">
+            Building
+          </Label>
+          <Select
+            value={
+              (event.eventCriteria as EventCriteria & { buildingId?: string })
+                ?.buildingId ||
+              (typeof event.venues?.[0] === "object"
+                ? event.venues[0].buildingId
+                : undefined) ||
+              ""
+            }
+            onValueChange={(value) =>
+              onUpdate(event.eventId, "buildingId", value)
+            }
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select the building" />
+            </SelectTrigger>
+            <SelectContent>
+              {buildings.length === 0 ? (
+                <SelectItem value="no-buildings" disabled>
+                  No buildings available
+                </SelectItem>
+              ) : (
+                buildings.map((building) => (
+                  <SelectItem
+                    key={building.buildingId}
+                    value={building.buildingId}
+                  >
+                    {building.buildingName}
+                  </SelectItem>
+                ))
+              )}
+            </SelectContent>
+          </Select>
+        </div>
 
         {/* date - mapped to day */}
         {/* recurring toggle */}
@@ -296,6 +350,27 @@ export function EventCard({
           error={errors?.time}
           hideDaySelect
         />
+
+        <div className="flex items-center p-4 justify-between gap-2 rounded-md border border-[var(--border)]">
+          <div className="space-y-0.5">
+            <Label className="text-sm font-medium text-[var(--text-primary)]">
+              Attendance
+            </Label>
+            <p className="text-xs text-[var(--text-secondary)]">
+              Tick the box if you are planning to attend the event
+            </p>
+          </div>
+          <Checkbox
+            data-testid="schedule-Timetable-Checkbox-attending"
+            id={`event-${event?.eventId}-attendance`}
+            checked={isAttending}
+            onCheckedChange={(checked) => {
+              if (onAttendanceChange) {
+                onAttendanceChange(event.eventId, checked === true);
+              }
+            }}
+          />
+        </div>
 
         {/* event type */}
         <div className="flex flex-col gap-2">

@@ -74,7 +74,7 @@ export function AddCoursePopup({ onClose }: AddCoursePopupProps) {
               disabled={isPending || !!successMessage}
               className="bg-[var(--background)] border-[var(--border)] text-[var(--text-primary)] mb-4"
             />
-            <Label htmlFor="degree-name">Degrhuee Name</Label>
+            <Label htmlFor="degree-name">Degree Name</Label>
             <Input
               data-testid="degree-name-input"
               id="degree-name"

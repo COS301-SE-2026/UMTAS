@@ -7,7 +7,8 @@ import {
   IsBoolean,
   IsOptional,
 } from 'class-validator';
-import { AttendanceState } from '../../entities';
+import { Transform } from 'class-transformer';
+import { AttendanceStateEnum } from '../../entities';
 import type { AttendanceStateType } from '../../entities';
 
 //Create attendance record
@@ -30,11 +31,14 @@ export class CreateAttendanceDto {
   eventDate!: string;
 
   @ApiProperty({
-    enum: AttendanceState.enumValues,
-    example: AttendanceState.enumValues[0],
+    enum: AttendanceStateEnum,
+    example: AttendanceStateEnum.ATTENDING,
     description: 'Is the user attending this event or not',
   })
-  @IsEnum(AttendanceState.enumValues)
+  @IsEnum(AttendanceStateEnum, {
+    message:
+      'state must be one of the following values: ATTENDING, NOT_ATTENDING',
+  })
   @IsNotEmpty()
   state!: AttendanceStateType;
 } //END_createAttendance
@@ -81,6 +85,12 @@ export class AttendanceFilters extends PartialType(CreateAttendanceDto) {
     type: Boolean,
     example: false,
     description: 'Filter by current userId together with other filters',
+  })
+  @Transform(({ value }) => {
+    if (typeof value === 'boolean') return value;
+    if (value === 'true') return true;
+    if (value === 'false') return false;
+    return value;
   })
   @IsBoolean()
   @IsOptional()

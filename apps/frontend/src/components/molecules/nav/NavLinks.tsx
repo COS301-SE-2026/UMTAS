@@ -12,23 +12,33 @@ const noUniLinks = [
 ];
 
 const basicLinks = [
-  { href: "/module-management", label: "Manage Modules & Events" },
+  { href: "/module-management", label: "Manage Modules / Events" },
+  { href: "/map", label: "Map" },
 ];
 
 const extraAdminLinks = [
   { href: "/course-management", label: "Manage Courses" },
   { href: "/role-management", label: "Manage Roles" },
   { href: "/calendar-management", label: "Manage Calendars" },
+  { href: "/stats", label: "Stats" },
 ];
 const universitySpecific = [{ href: "/solver", label: "Upload PDF" }];
 
 export function NavLinks() {
   const pathName = usePathname();
   const [isMounted, setIsMounted] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     // eslint-disable-next-line
     setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    const handleChange = () => setRefreshKey((key) => key + 1);
+    window.addEventListener(UserDetails.changeEvent, handleChange);
+    return () =>
+      window.removeEventListener(UserDetails.changeEvent, handleChange);
   }, []);
 
   const isAdmin = UserDetails.getUniDetails()?.role === "UNIVERSITY_ADMIN";
@@ -36,17 +46,17 @@ export function NavLinks() {
   const navItems = [...noUniLinks];
 
   const uniDetails = isMounted ? UserDetails.getUniDetails() : null;
+  if (isMounted) {
+    if (uniDetails != undefined) {
+      navItems.push(...basicLinks);
+    }
+    if (uniDetails?.UniversityName == "University of Pretoria")
+      navItems.push(...universitySpecific);
 
-  if (uniDetails != undefined) {
-    navItems.push(...basicLinks);
+    if (isAdmin) {
+      navItems.push(...extraAdminLinks);
+    }
   }
-  if (uniDetails?.UniversityName == "University of Pretoria")
-    navItems.push(...universitySpecific);
-
-  if (isAdmin) {
-    navItems.push(...extraAdminLinks);
-  }
-
   return (
     <nav aria-label="Main navigation">
       <ul className="flex items-center gap-6 list-none m-0 p-0">
