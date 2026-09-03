@@ -5,18 +5,17 @@ import SolverUpload from "@/components/organisms/solver/SolverUpload";
 import SolverReview from "@/components/organisms/solver/SolverReview";
 import SolverPreferences from "@/components/organisms/solver/SolverPreferences";
 import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
-import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
 import { useState } from "react";
 import { SolverLock } from "@/components/organisms/solver/SolverLock";
-import { useQueries, useQuery } from "@tanstack/react-query";
-import { getAllEventsAdminQ } from "@/app/module-management/queries/queries";
+import { useQuery } from "@tanstack/react-query";
 
 import Tutorial from "@/components/organisms/nav/Tutorial";
-import { UserDetails } from "@/lib/userclass/userClass";
-import Popup from "@/components/atoms/utility/floatContainer";
-import { ChooseInstituteTemplate } from "../choose-institute/chooseInstituteTemplate";
 import NoRoleSelected from "@/components/molecules/roleManagement/NoRoleSelected";
 import { fetchAllModulesv2 } from "../../../../utilities/V2-Builders/Modules";
+import {
+  UniversityStateLoading,
+  useUniversityState,
+} from "@/hooks/useUniversityState";
 const steps = [
   {
     target: "#btn-browse-files",
@@ -45,12 +44,11 @@ const steps = [
 ];
 
 export default function SolverShell() {
-  const [showSelectUni, SetSelectUni] = useState<boolean>(true);
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [comingFromStep, setComingFromStep] = useState<number | null>(null);
   const [moduleGroupingID, setModuleGroupingID] = useState<string | null>(null);
-  const UniDetails = UserDetails.getUniDetails();
+  const { university, isLoading: isUniversityLoading } = useUniversityState();
 
   const { data: modulesData } = useQuery({
     queryKey: ["PDF", "MODULES"],
@@ -80,11 +78,14 @@ export default function SolverShell() {
     }, 676);
   }
 
-  if (moduleGroupingID == null && currentStep != 0) {
-    setCurrentStep(0);
+  function handleModuleGroupingChange(groupingID: string | null) {
+    setModuleGroupingID(groupingID);
+    if (groupingID == null) setCurrentStep(0);
   }
 
-  const hasRole = UniDetails?.role != null;
+  if (isUniversityLoading) return <UniversityStateLoading />;
+
+  const hasRole = university?.role != null;
   if (!hasRole) return <NoRoleSelected />;
 
   return (
@@ -107,7 +108,7 @@ export default function SolverShell() {
           <SolverUpload
             onComplete={() => handleStepCompleted(0)}
             moduleGroupID={moduleGroupingID}
-            setModuleGroupID={setModuleGroupingID}
+            setModuleGroupID={handleModuleGroupingChange}
           />
         </div>
         <div

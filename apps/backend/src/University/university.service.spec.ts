@@ -3,6 +3,7 @@ import { UniversityService } from './university.service';
 import { Test } from '@nestjs/testing';
 
 import {
+  BadRequestException,
   ConflictException,
   NotFoundException,
   InternalServerErrorException,
@@ -16,7 +17,11 @@ import { createMockDatabase } from '../Testing/Mocks/database.mock';
 import { DatabaseService } from '../db/database.service';
 
 //mock functions on db
-import { mockDbResult, mockTransaction } from '../Testing/Mocks';
+import {
+  mockDbResult,
+  mockSequentialResults,
+  mockTransaction,
+} from '../Testing/Mocks';
 
 //factories
 import { createUniversity } from '../Testing/Factories';
@@ -484,6 +489,67 @@ describe('UniversityService', () => {
       expect(mockDb.select).toHaveBeenCalled();
       expect(mockDb.update).toHaveBeenCalled();
     });
+
+    it('rejects approval when the current role is not pending', async () => {
+      mockTransaction(mockDb, {
+        select: [[{ UniversityID: uniId, UserID: userId, role: 'STUDENT' }]],
+      });
+
+      await expect(
+        service.approveUserRole({
+          UniversityID: uniId,
+          userId,
+          isApproved: true,
+        }),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('stores REJECTED when an application is declined', async () => {
+      mockTransaction(mockDb, {
+        select: [
+          [
+            {
+              UniversityID: uniId,
+              UserID: userId,
+              role: 'LECTURER_PENDING',
+            },
+          ],
+        ],
+        update: [[{ UniversityID: uniId, UserID: userId, role: 'REJECTED' }]],
+      });
+
+      await expect(
+        service.approveUserRole({
+          UniversityID: uniId,
+          userId,
+          isApproved: false,
+        }),
+      ).resolves.toEqual({ userId, success: true });
+      expect(mockDb.update).toHaveBeenCalledTimes(1);
+    });
+
+    it('reports a failed approval update', async () => {
+      mockTransaction(mockDb, {
+        select: [
+          [
+            {
+              UniversityID: uniId,
+              UserID: userId,
+              role: 'UNIVERSITY_ADMIN_PENDING',
+            },
+          ],
+        ],
+        update: [[]],
+      });
+
+      await expect(
+        service.approveUserRole({
+          UniversityID: uniId,
+          userId,
+          isApproved: true,
+        }),
+      ).rejects.toThrow(InternalServerErrorException);
+    });
   });
 
   describe('Test_getAllApplications', () => {
@@ -533,7 +599,56 @@ describe('UniversityService', () => {
       expect(mockDb.select).toHaveBeenCalledTimes(1);
       expect(result).toEqual(mockApplications);
     });
+
+    it('returns all roles when the pending filter is false', async () => {
+      const roles = [
+        {
+          Name: 'Approved Student',
+          UserID: userId,
+          Email: 'student@example.com',
+          UniversityID: uniId,
+          role: 'STUDENT',
+        },
+      ];
+      mockTransaction(mockDb, { select: [roles] });
+
+      await expect(
+        service.getAllApplications(userId, uniId, { pending: false }),
+      ).resolves.toEqual(roles);
+    });
   }); //END_Test_getAllApplications
+
+  describe('Test_getStatistics', () => {
+    it('returns university course, module, event, and enrollment totals', async () => {
+      const university = createUniversity({ UniversityID: uniId });
+      mockSequentialResults(mockDb.select, [
+        [university],
+        [{ CourseCount: 2, ModuleCount: 8, EventCount: 24 }],
+        [{ EnrolledStudents: 120 }],
+      ]);
+
+      await expect(service.getStatistics(uniId)).resolves.toEqual({
+        UniversityID: uniId,
+        UniversityName: university.UniversityName,
+        CourseCount: 2,
+        ModuleCount: 8,
+        EventCount: 24,
+        EnrolledStudents: 120,
+      });
+    });
+
+    it('defaults absent aggregate rows to zero', async () => {
+      const university = createUniversity({ UniversityID: uniId });
+      mockSequentialResults(mockDb.select, [[university], [], []]);
+
+      await expect(service.getStatistics(uniId)).resolves.toMatchObject({
+        CourseCount: 0,
+        ModuleCount: 0,
+        EventCount: 0,
+        EnrolledStudents: 0,
+      });
+    });
+  });
 
   describe('Test_getByName', () => {
     //UnHappy - uni not found - return null

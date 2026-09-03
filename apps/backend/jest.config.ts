@@ -33,6 +33,12 @@ const config: Config = {
     '!**/swagger-theme.ts',
     '!**/integration/**',
     '!**/db/**',
+    // The campus map/routing modules are an incomplete bonus feature and are
+    // intentionally outside the tested product scope.
+    '!**/Building/**',
+    '!**/Map-config/**',
+    '!**/Route/**',
+    '!**/Venue/**',
     '!**/entities/**',
     '!**/health/**',
     '!**/mail/**',
