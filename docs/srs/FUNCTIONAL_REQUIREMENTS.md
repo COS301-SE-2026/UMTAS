@@ -131,21 +131,15 @@ The Traceability Matrices for the functional requirements to use cases can be fo
         - **R3.1.4.3** The system will provide event analytics showing venues with most events
         - **R3.1.4.4** The system will provide event analytics showing venues with highest attendance
         
-    ### R3.2 Lecturer Adjustment System
 
-    - **R3.2.1** The system will allow lecturers to alter details about their events.
-        - **R3.2.1.1** The system shall allow lecturers to alter venue location for an event(s).
-        - **R3.2.1.2** The system shall allow lecturers to alter times for an event(s).
-        - **R3.2.1.3** The system shall allow lecturers to alter module details (name, description, credit value).
+    ### R3.2 Attendance Recording System
 
-    ### R3.3 Attendance Recording System
-
-    - **R3.3.1** The system will allow students to record and manage their attendance intent for events.
-        - **R3.3.1.1** The system shall allow students to indicate their attendance intent for an event as Will Attend, Will Not Attend, or Not Specified.
-        - **R3.3.1.2** The system shall default a student's attendance intent to Not Specified if no option is selected.
-        - **R3.3.1.3** The system shall allow students to remove a previously recorded attendance response for an event.
-        - **R3.3.1.4** The system shall require student confirmation before removing a recorded attendance response.
-        - **R3.3.1.5** The system shall update projected attendance analytics whenever a student's attendance response is recorded or removed.
+    - **R3.2.1** The system will allow students to record and manage their attendance intent for events.
+        - **R3.2.1.1** The system shall allow students to indicate their attendance intent for an event as Will Attend, Will Not Attend, or Not Specified.
+        - **R3.2.1.2** The system shall default a student's attendance intent to Not Specified if no option is selected.
+        - **R3.2.1.3** The system shall allow students to remove a previously recorded attendance response for an event.
+        - **R3.2.1.4** The system shall require student confirmation before removing a recorded attendance response.
+        - **R3.2.1.5** The system shall update projected attendance analytics whenever a student's attendance response is recorded or removed.
 
 ---
 
