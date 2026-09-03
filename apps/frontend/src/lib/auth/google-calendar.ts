@@ -65,7 +65,6 @@ export async function fetchGoogleCalendarToken(): Promise<GoogleCalendarToken> {
   }
 
   const token = await authClient.getAccessToken({
-    providerId: "google",
     accountId: googleAccount.accountId,
   });
   if (token.error || !token.data) {
@@ -73,9 +72,7 @@ export async function fetchGoogleCalendarToken(): Promise<GoogleCalendarToken> {
   }
 
   const rawExpiresAt = token.data.accessTokenExpiresAt as
-    | Date
-    | string
-    | undefined;
+    Date | string | undefined;
   const parsedExpiresAt = rawExpiresAt
     ? new Date(
         rawExpiresAt instanceof Date ? rawExpiresAt.getTime() : rawExpiresAt,

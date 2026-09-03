@@ -33,10 +33,10 @@
 
     ---
 
-    ![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi&logoColor=white) ![Google OR-Tools](https://img.shields.io/badge/google%20ortools-4285F4?style=for-the-badge&logo=google&logoColor=white)
+    ![C++](https://img.shields.io/badge/C%2B%2B-Native_Solver-00599C?style=for-the-badge&logo=cplusplus&logoColor=white) ![Google OR-Tools](https://img.shields.io/badge/google%20ortools-4285F4?style=for-the-badge&logo=google&logoColor=white)
     ![PyMuPDF](https://img.shields.io/badge/pymupdf-41454a?style=for-the-badge&logo=python&logoColor=white) ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
 
-    - **FastAPI + OR-Tools (CP-SAT)** for the async solver service with OpenAPI docs and partial result support at timeout.
+    - A **BullMQ TypeScript worker** invokes the native **C++ solver CLI**, which packages OR-Tools CP-SAT and the GA fallback behind a validated process contract.
     - **PyMuPDF** for spatially-aware PDF extraction. Bounding-box positioning is required to interpret timetable grid layouts.
 
 -   __:material-layers: Infra & DevOps__
@@ -47,7 +47,7 @@
     ![GitHub Actions](https://img.shields.io/badge/github%20actions-%232671E5.svg?style=for-the-badge&logo=githubactions&logoColor=white) ![Turborepo](https://img.shields.io/badge/Turborepo-000000?style=for-the-badge&logo=Turborepo&logoColor=white)
     ![pnpm](https://img.shields.io/badge/pnpm-%234a4a4a.svg?style=for-the-badge&logo=pnpm&logoColor=f69220) ![MinIO](https://img.shields.io/badge/minio-C72C48?style=for-the-badge&logo=minio&logoColor=white)
 
-    - **Docker + Traefik** for containerised deployment with SSL termination and blue-green switching.
+    - **Docker + Traefik** for containerised deployment with TLS termination. Blue-green switching is future resilience work, not current behaviour.
     - **pnpm + Turborepo** for monorepo workspace management. **MinIO** for S3-compatible PDF object storage.
 
 -   __:material-test-tube: Testing & QA__

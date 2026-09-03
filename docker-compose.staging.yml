@@ -148,6 +148,7 @@ services:
     environment:
       - PORT=${BACKEND_PORT}
       - NODE_ENV=staging
+      - NODE_OPTIONS=--dns-result-order=ipv4first --network-family-autoselection-attempt-timeout=2000
       - DATABASE_URL=${DATABASE_URL}
       - DB_MODE=${DB_MODE}
       - SEED=${SEED}
@@ -207,6 +208,8 @@ services:
       - COOKIE_PREFIX=umtas-staging
       - NEXT_PUBLIC_POSTHOG_PT=${NEXT_PUBLIC_POSTHOG_PT}
       - NEXT_PUBLIC_POSTHOG_API_HOST=${NEXT_PUBLIC_POSTHOG_API_HOST}
+      - NEXT_PUBLIC_MAP_KEY=${NEXT_PUBLIC_MAP_KEY}
+      - MAP_ID=${MAP_ID}
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=gateway"
