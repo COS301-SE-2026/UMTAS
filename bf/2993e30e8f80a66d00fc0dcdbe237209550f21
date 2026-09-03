@@ -1,0 +1,18 @@
+docker-compose.prod.yml
+  h_2d4b3dca70a3d8 211
+docker-compose.staging.yml
+  h_2d4b3dca70a3d8 211
+docker/frontend/frontend.Dockerfile
+  h_2d4b3dca70a3d8 19,21-22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "bf2993e30e8f80a66d00fc0dcdbe237209550f21",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
