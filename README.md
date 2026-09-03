@@ -192,7 +192,7 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 
 <div align="center">
 
-[![Full Documentation](https://img.shields.io/badge/Full_Documentation-Visit_Docs-1d4ed8?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/latest/)
+[![Full Documentation](https://img.shields.io/badge/Full_Documentation-Visit_Docs-1d4ed8?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo2/)
 
 [![Brand Style Guide](https://img.shields.io/badge/Brand_Style_Guide-Visit_Site-52525b?style=for-the-badge)](https://brand.capstone-vigil.dns.net.za/)
 
@@ -201,39 +201,39 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 <br>
 
 <details>
-<summary><strong>SRS - Updated Functional Requirements</strong> &nbsp;-&nbsp; 5 marks</summary>
+<summary><strong>SRS - Functional Requirements</strong> &nbsp;-&nbsp; 5 marks</summary>
 
 <br>
 
 <div align="center">
 
-[![Functional Requirements](https://img.shields.io/badge/Functional_Requirements-1d4ed8?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/latest/srs/FUNCTIONAL_REQUIREMENTS/)
+[![Functional Requirements](https://img.shields.io/badge/Functional_Requirements-1d4ed8?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo2/srs/FUNCTIONAL_REQUIREMENTS/)
 
 </div>
 
 </details>
 
 <details>
-<summary><strong>SRS - Updated Use Cases and Use Case Diagrams</strong> &nbsp;-&nbsp; 10 marks</summary>
+<summary><strong>SRS - Use Cases and Use Case Diagrams</strong> &nbsp;-&nbsp; 10 marks</summary>
 
 <br>
 
 <div align="center">
 
-[![Use Cases and Diagrams](https://img.shields.io/badge/Use_Cases_and_Diagrams-1d4ed8?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/latest/srs/USE_CASES/)
+[![Use Cases and Diagrams](https://img.shields.io/badge/Use_Cases_and_Diagrams-1d4ed8?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo2/srs/USE_CASES/)
 
 </div>
 
 </details>
 
 <details>
-<summary><strong>SRS - Updated Domain Model</strong> &nbsp;-&nbsp; 5 marks</summary>
+<summary><strong>SRS - Domain Model</strong> &nbsp;-&nbsp; 5 marks</summary>
 
 <br>
 
 <div align="center">
 
-[![Domain Model](https://img.shields.io/badge/Domain_Model-1d4ed8?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/latest/srs/DOMAIN_MODEL/)
+[![Domain Model](https://img.shields.io/badge/Domain_Model-1d4ed8?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo2/srs/DOMAIN_MODEL/)
 
 </div>
 
@@ -246,7 +246,7 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 
 <div align="center">
 
-[![Non-Functional Requirements](https://img.shields.io/badge/Non--Functional_Requirements-1d4ed8?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/latest/srs/NON-FUNCTIONAL_REQUIREMENTS/)
+[![Non-Functional Requirements](https://img.shields.io/badge/Non--Functional_Requirements-1d4ed8?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo2/srs/NON-FUNCTIONAL_REQUIREMENTS/)
 
 </div>
 
@@ -259,7 +259,7 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 
 <div align="center">
 
-[![Architectural Requirements](https://img.shields.io/badge/Architectural_Requirements-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/latest/sas/architecture/ARCHITECTURAL_REQUIREMENTS/)
+[![Architectural Requirements](https://img.shields.io/badge/Architectural_Requirements-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo2/sas/architecture/ARCHITECTURAL_REQUIREMENTS/)
 
 </div>
 
@@ -272,7 +272,7 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 
 <div align="center">
 
-[![Architecture Diagram](https://img.shields.io/badge/Architecture_Diagram-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/latest/sas/architecture/ARCHITECTURAL_DIAGRAM/)
+[![Architecture Diagram](https://img.shields.io/badge/Architecture_Diagram-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo2/sas/architecture/ARCHITECTURAL_DIAGRAM/)
 
 </div>
 
@@ -285,21 +285,21 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 
 <div align="center">
 
-[![Deployment Overview](https://img.shields.io/badge/Deployment_Overview-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/latest/sas/deployment/)
+[![Deployment Overview](https://img.shields.io/badge/Deployment_Overview-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo2/sas/deployment/)
 
-[![Live System](https://img.shields.io/badge/Live_System-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/latest/sas/deployment/LiveAccessibleSystem/)
+[![Live System](https://img.shields.io/badge/Live_System-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo2/sas/deployment/LiveAccessibleSystem/)
 
-[![Environment Parity](https://img.shields.io/badge/Environment_Parity-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/latest/sas/deployment/EnvironmentParity/)
+[![Environment Parity](https://img.shields.io/badge/Environment_Parity-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo2/sas/deployment/EnvironmentParity/)
 
-[![Infrastructure as Code](https://img.shields.io/badge/Infrastructure_as_Code-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/latest/sas/deployment/InfrastructureAsCode/)
+[![Infrastructure as Code](https://img.shields.io/badge/Infrastructure_as_Code-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo2/sas/deployment/InfrastructureAsCode/)
 
-[![Secrets Management](https://img.shields.io/badge/Secrets_Management-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/latest/sas/deployment/SecretsManagement/)
+[![Secrets Management](https://img.shields.io/badge/Secrets_Management-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo2/sas/deployment/SecretsManagement/)
 
-[![Rollback Strategy](https://img.shields.io/badge/Rollback_Strategy-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/latest/sas/deployment/RollBackStrategy/)
+[![Rollback Strategy](https://img.shields.io/badge/Rollback_Strategy-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo2/sas/deployment/RollBackStrategy/)
 
-[![Deployment Diagram](https://img.shields.io/badge/Deployment_Diagram-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/latest/sas/deployment/DeploymentDiagram/)
+[![Deployment Diagram](https://img.shields.io/badge/Deployment_Diagram-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo2/sas/deployment/DeploymentDiagram/)
 
-[![CI/CD Pipeline](https://img.shields.io/badge/CI%2FCD_Pipeline-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/latest/sas/deployment/PipelineDiagram/)
+[![CI/CD Pipeline](https://img.shields.io/badge/CI%2FCD_Pipeline-1e3a8a?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo2/sas/deployment/PipelineDiagram/)
 
 </div>
 
@@ -312,13 +312,13 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 
 <div align="center">
 
-[![Master Development Guide](https://img.shields.io/badge/Master_Development_Guide-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/latest/developer-guides/master-development-guide/)
+[![Master Development Guide](https://img.shields.io/badge/Master_Development_Guide-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo2/developer-guides/master-development-guide/)
 
-[![Backend Standards](https://img.shields.io/badge/Backend_Standards-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/latest/developer-guides/backend-development-guide/)
+[![Backend Standards](https://img.shields.io/badge/Backend_Standards-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo2/developer-guides/backend-development-guide/)
 
-[![Frontend Standards](https://img.shields.io/badge/Frontend_Standards-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/latest/developer-guides/frontend-development-guide/)
+[![Frontend Standards](https://img.shields.io/badge/Frontend_Standards-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo2/developer-guides/frontend-development-guide/)
 
-[![Git Standards](https://img.shields.io/badge/Git_Standards-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/latest/developer-guides/git-strategy-guide/)
+[![Git Standards](https://img.shields.io/badge/Git_Standards-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo2/developer-guides/git-strategy-guide/)
 
 </div>
 
@@ -331,7 +331,7 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 
 <div align="center">
 
-[![Testing Policy Document](https://img.shields.io/badge/Testing_Policy_Document-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/latest/developer-guides/testing-policy/)
+[![Testing Policy Document](https://img.shields.io/badge/Testing_Policy_Document-3f3f46?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo2/developer-guides/testing-policy/)
 
 </div>
 
@@ -344,14 +344,14 @@ The system is **university-agnostic by design**: a Core-and-Adapter architecture
 
 <div align="center">
 
-[![User Manual](https://img.shields.io/badge/UMTAS_Documentation-52525b?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/latest/management/UserManual/)
+[![User Manual](https://img.shields.io/badge/UMTAS_Documentation-52525b?style=for-the-badge)](https://cos301-se-2026.github.io/UMTAS/demo2/management/UserManual/)
 
 </div>
 
 </details>
 
 <details>
-<summary><strong>Updated Brand Style Guide</strong> &nbsp;-&nbsp; 5 marks</summary>
+<summary><strong>Brand Style Guide</strong> &nbsp;-&nbsp; 5 marks</summary>
 
 <br>
 
