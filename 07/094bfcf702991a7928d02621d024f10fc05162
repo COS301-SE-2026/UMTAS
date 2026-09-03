@@ -1,0 +1,14 @@
+apps/frontend/src/components/organisms/map/MapScreen.tsx
+  h_2d4b3dca70a3d8 11,80-93
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "07094bfcf702991a7928d02621d024f10fc05162",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
