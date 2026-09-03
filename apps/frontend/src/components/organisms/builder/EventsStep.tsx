@@ -404,7 +404,7 @@ export function EventsStep({
         },
       });
     } else {
-      const attendanceInfo = attendanceList?.attendanceList?.find(
+      const attendanceInfo = attendanceList?.find(
         (eventAttendance: {
           eventID: string;
           eventDate: string;
@@ -535,7 +535,7 @@ export function EventsStep({
               onGoToModules={onGoToModules}
               errors={errors}
               isAttending={
-                attendanceList?.attendanceList?.some(
+                attendanceList?.some(
                   (attendanceEvennt: { eventID: string; state: string }) =>
                     attendanceEvennt.eventID === event.eventId &&
                     attendanceEvennt.state === "ATTENDING",

@@ -484,6 +484,7 @@ export class EventServiceV2 extends EventService {
       .select({
         venueId: Venue.VenueID,
         venueName: Venue.VenueName,
+        buildingId: Venue.BuildingID,
       })
       .from(Venue)
       .where(inArray(Venue.VenueID, venueIds));
@@ -491,6 +492,7 @@ export class EventServiceV2 extends EventService {
     const fresh = rows.map((r) => ({
       venueId: r.venueId,
       venueName: r.venueName ?? 'noNameVenue',
+      buildingId: r.buildingId ?? undefined,
     }));
 
     return fresh;
@@ -512,6 +514,7 @@ export class EventServiceV2 extends EventService {
       .select({
         venueId: Venue.VenueID,
         venueName: Venue.VenueName,
+        buildingId: Venue.BuildingID,
       })
       .from(Venue)
       .where(
@@ -526,7 +529,11 @@ export class EventServiceV2 extends EventService {
       this.OOPSIE.log(
         `validateAndCreateVenue: Returned existing venue[${JSON.stringify(existing)}]`,
       );
-      return { ...existing, venueName: existing.venueName ?? 'NoName' };
+      return {
+        ...existing,
+        venueName: existing.venueName ?? 'NoName',
+        buildingId: existing.buildingId ?? undefined,
+      };
     }
 
     //Create venue for university
@@ -546,6 +553,7 @@ export class EventServiceV2 extends EventService {
     return {
       venueId: newVenue.VenueID,
       venueName: newVenue.VenueName ?? 'NoName',
+      buildingId: newVenue.BuildingID ?? undefined,
     };
   } //END_validateAndCreateVenue
 } //END_EventServiceV2

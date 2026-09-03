@@ -74,7 +74,15 @@ export class DatabaseService
   }
 
   async onApplicationBootstrap(): Promise<void> {
-    await this.migrate();
+    try {
+      this.logger.log('Running database migrations...');
+      await this.migrate();
+      this.logger.log('Database migrations completed successfully');
+    } catch (error) {
+      this.logger.error('MIGRATION FAILED: App cannot start.', error);
+      process.exit(1);
+    }
+
     if (isSeedEnabled(process.env.SEED)) {
       try {
         this.logger.log('Starting database seeding...');
@@ -114,8 +122,7 @@ export class DatabaseService
     }
 
     await this.db.execute(sql`
-      CREATE EXTENSION IF NOT EXISTS "pgcrypto";
-    `);
+      CREATE EXTENSION IF NOT EXISTS "pgcrypto";`);
     await migrateNodePg(this.db as NodePgDatabase<Record<string, unknown>>, {
       migrationsFolder,
     });
