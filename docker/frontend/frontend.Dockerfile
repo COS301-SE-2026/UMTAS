@@ -1,3 +1,26 @@
+FROM rust:slim AS rust-builder
+RUN apt-get update && apt-get install -y \
+    curl \
+    python3 \
+    python3-pip \
+    build-essential \
+    libxcb1 \
+    libgl1 \
+    libglib2.0-0 && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+WORKDIR /app
+
+RUN pip3 install --no-cache-dir ultralytics --break-system-packages && \
+    mkdir -p /app/models-output && \
+    python3 -c "from ultralytics import YOLO; model = YOLO('yolov8n.pt'); model.export(format='onnx', imgsz=640)" && \
+    mv yolov8n.onnx /app/models-output/yolov8n.onnx
+
+COPY apps/frontend/wasm-engine ./wasm-engine
+WORKDIR /app/wasm-engine
+RUN wasm-pack build --target web --release
+
 FROM node:22-alpine AS base
 WORKDIR /app
 RUN corepack enable
@@ -28,8 +51,15 @@ ENV NEXT_PUBLIC_POSTHOG_PT=${NEXT_PUBLIC_POSTHOG_PT}
 ENV NEXT_PUBLIC_POSTHOG_API_HOST=${NEXT_PUBLIC_POSTHOG_API_HOST}
 ENV NEXT_PUBLIC_APP_ENV=${NEXT_PUBLIC_APP_ENV}
 
+
 COPY packages/shared-types/ ./packages/shared-types/
 COPY apps/frontend/ ./apps/frontend/
+
+# rust stuff
+COPY --from=rust-builder /app/wasm-engine/pkg ./apps/frontend/wasm-engine/pkg
+COPY --from=rust-builder /app/models-output/yolov8n.onnx ./apps/frontend/public/models/yolov8n.onnx
+
+
 RUN pnpm --filter=shared-types build
 RUN pnpm --filter=frontend build
 
