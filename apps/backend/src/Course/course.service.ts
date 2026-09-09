@@ -209,6 +209,7 @@ export class CourseService {
       .returning();
 
     if (course?.GroupID) {
+      //OLD
       const partnerCourses = await db
         .select({ CourseID: Course.CourseID })
         .from(Course)
@@ -221,21 +222,45 @@ export class CourseService {
 
       // Only delete the group's modules if no other course uses the group
       if (partnerCourses.length === 0) {
-        const groupModules = await db
-          .select({
-            ModuleID: GroupModules.ModuleID,
-          })
-          .from(GroupModules)
-          .where(eq(GroupModules.GroupID, course.GroupID));
+        const groupModules = await this.groupingService.getById(
+          course.GroupID,
+          db,
+        );
 
-        const moduleIds = groupModules.map((m) => m.ModuleID);
+        const moduleIds = groupModules.modules;
 
+        //Delete the moduleGrouping and groupModules entries that wont be used anymore
         await db
           .delete(ModuleGrouping)
           .where(eq(ModuleGrouping.GroupID, course.GroupID));
 
-        if (moduleIds.length > 0) {
-          await db.delete(modules).where(inArray(modules.moduleID, moduleIds));
+        if (moduleIds && moduleIds.length > 0) {
+          //There are modules that need to be deleted
+
+          //Modules that belong to other groups
+          const modulesOwnedByOtherGroups = await db
+            .select({
+              ModuleID: GroupModules.ModuleID,
+            })
+            .from(GroupModules)
+            .where(inArray(GroupModules.ModuleID, moduleIds));
+
+          // Get IDs of modules owned by other groups
+          const ownedByOtherGroupIds = modulesOwnedByOtherGroups.map(
+            (m) => m.ModuleID,
+          );
+
+          // Filter out modules that belong to groups
+          const modulesToDelete = moduleIds.filter(
+            (id) => !ownedByOtherGroupIds.includes(id),
+          );
+
+          // Delete only the modules that do NOT belong to other groups
+          if (modulesToDelete.length > 0) {
+            await db
+              .delete(modules)
+              .where(inArray(modules.moduleID, modulesToDelete));
+          }
         }
       }
     }
