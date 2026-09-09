@@ -12,13 +12,15 @@ RUN apt-get update && apt-get install -y \
 RUN curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 WORKDIR /app
 
-RUN pip3 install --no-cache-dir ultralytics --break-system-packages && \
+RUN pip3 install --no-cache-dir ultralytics onnx onnxruntime --break-system-packages && \
     mkdir -p /app/models-output && \
     python3 -c "from ultralytics import YOLO; model = YOLO('yolov8n.pt'); model.export(format='onnx', imgsz=640)" && \
     mv yolov8n.onnx /app/models-output/yolov8n.onnx
 
 COPY apps/frontend/wasm-engine ./wasm-engine
 WORKDIR /app/wasm-engine
+
+RUN rustup target add wasm32-unknown-unknown
 RUN wasm-pack build --target web --release
 
 FROM node:22-alpine AS base
