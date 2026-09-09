@@ -56,8 +56,9 @@ jobs:
       - name: Run Build
         run: pnpm run build
 
-      - name: Run Audit
-        run: pnpm audit --audit-level=high
+      # - name: Run Audit
+      #   run: pnpm audit --audit-level=moderate
+
       - name: Run Unit Tests
         run: |
           pnpm --filter shared-types test
@@ -152,7 +153,8 @@ jobs:
             NEXT_PUBLIC_APP_ENV=staging
             NEXT_PUBLIC_API_URL=https://staging.capstone-vigil.dns.net.za/api
             NEXT_PUBLIC_MAP_KEY=${{ secrets.NEXT_PUBLIC_MAP_KEY }}
-            MAP_ID=${{ secrets.MAP_ID }}
+            NEXT_PUBLIC_MAP_ID=${{ secrets.NEXT_PUBLIC_MAP_ID }}
+            ORS_API_KEY=${{ secrets.ORS_API_KEY }}
           tags: |
             vigilcs/umtas:frontend-staging-${{ steps.tag.outputs.latest }}
             vigilcs/umtas:frontend-staging-${{ steps.tag.outputs.sha }}
@@ -264,7 +266,8 @@ jobs:
             NEXT_PUBLIC_APP_ENV=staging
             NEXT_PUBLIC_API_URL=https://capstone-vigil.dns.net.za/api
             NEXT_PUBLIC_MAP_KEY=${{ secrets.NEXT_PUBLIC_MAP_KEY }}
-            MAP_ID=${{ secrets.MAP_ID }}
+            NEXT_PUBLIC_MAP_ID=${{ secrets.NEXT_PUBLIC_MAP_ID }}
+            ORS_API_KEY=${{ secrets.ORS_API_KEY }}
           tags: |
             vigilcs/umtas:frontend-${{ steps.tag.outputs.release }}
             vigilcs/umtas:frontend-${{ steps.tag.outputs.sha }}

@@ -6,10 +6,10 @@ import {
   forwardRef,
   Inject,
 } from '@nestjs/common';
-import { eq, and, SQL, ilike } from 'drizzle-orm';
+import { eq, and, SQL, ilike, ne, inArray } from 'drizzle-orm';
 
 import { AppDatabase, DatabaseService } from '../db/database.service';
-import { Course } from '../entities';
+import { Course, GroupModules, ModuleGrouping, modules } from '../entities';
 import {
   CourseDto,
   CreateCourseDto,
@@ -207,6 +207,38 @@ export class CourseService {
       .delete(Course)
       .where(eq(Course.CourseID, courseId))
       .returning();
+
+    if (course?.GroupID) {
+      const partnerCourses = await db
+        .select({ CourseID: Course.CourseID })
+        .from(Course)
+        .where(
+          and(
+            eq(Course.GroupID, course.GroupID),
+            ne(Course.CourseID, course.CourseID),
+          ),
+        );
+
+      // Only delete the group's modules if no other course uses the group
+      if (partnerCourses.length === 0) {
+        const groupModules = await db
+          .select({
+            ModuleID: GroupModules.ModuleID,
+          })
+          .from(GroupModules)
+          .where(eq(GroupModules.GroupID, course.GroupID));
+
+        const moduleIds = groupModules.map((m) => m.ModuleID);
+
+        await db
+          .delete(ModuleGrouping)
+          .where(eq(ModuleGrouping.GroupID, course.GroupID));
+
+        if (moduleIds.length > 0) {
+          await db.delete(modules).where(inArray(modules.moduleID, moduleIds));
+        }
+      }
+    }
 
     return {
       success: !!course,

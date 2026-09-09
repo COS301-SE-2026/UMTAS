@@ -20,6 +20,11 @@ const AUTH_REASONS = new Set([
   "insufficientPermissions",
 ]);
 
+const MIN_REQUEST_GAP_MS = 200;
+const MAX_REQUEST_GAP_MS = 2_000;
+let requestGapMs = MIN_REQUEST_GAP_MS;
+let nextRequestSlot = 0;
+
 interface GoogleErrorBody {
   error?: string | { message?: string; errors?: { reason?: string }[] };
   message?: string;
@@ -80,11 +85,51 @@ function parseGoogleError(
   };
 }
 
+function waitForSlot(delayMs: number, signal?: AbortSignal): Promise<void> {
+  if (signal?.aborted) {
+    return Promise.reject(
+      new DOMException("The operation was aborted", "AbortError"),
+    );
+  }
+  if (delayMs <= 0) return Promise.resolve();
+
+  return new Promise((resolve, reject) => {
+    const timeoutId = setTimeout(() => {
+      signal?.removeEventListener("abort", onAbort);
+      resolve();
+    }, delayMs);
+    const onAbort = () => {
+      clearTimeout(timeoutId);
+      reject(new DOMException("The operation was aborted", "AbortError"));
+    };
+    signal?.addEventListener("abort", onAbort, { once: true });
+  });
+}
+
+async function takeRequestSlot(signal?: AbortSignal): Promise<void> {
+  const now = Date.now();
+  const slot = Math.max(now, nextRequestSlot);
+  nextRequestSlot = slot + requestGapMs;
+  await waitForSlot(slot - now, signal);
+}
+
+async function isRateLimitResponse(response: Response): Promise<boolean> {
+  if (response.status === 429) return true;
+  if (response.status !== 403) return false;
+
+  const data = await response
+    .clone()
+    .json()
+    .catch(() => undefined);
+  const parsed = parseGoogleError(response.status, response.statusText, data);
+  return parsed.reasons.some((reason) => RATE_LIMIT_REASONS.has(reason));
+}
+
 const googleApi = ky.create({
   prefix: GOOGLE_API,
   timeout: 15_000,
   retry: {
-    limit: 3,
+    limit: 6,
     methods: ["get", "post", "put", "delete"],
     statusCodes: [429, 500, 502, 503, 504],
     afterStatusCodes: [429, 503],
@@ -104,6 +149,22 @@ const googleApi = ky.create({
       return parsed.reasons.some((reason) => RATE_LIMIT_REASONS.has(reason));
     },
   },
+  hooks: {
+    beforeRetry: [
+      async ({ request }) => {
+        await takeRequestSlot(request.signal ?? undefined);
+      },
+    ],
+    afterResponse: [
+      async ({ response }) => {
+        if (await isRateLimitResponse(response)) {
+          requestGapMs = Math.min(requestGapMs * 2, MAX_REQUEST_GAP_MS);
+        } else if (response.ok) {
+          requestGapMs = Math.max(MIN_REQUEST_GAP_MS, requestGapMs * 0.9);
+        }
+      },
+    ],
+  },
 });
 
 export async function requestGoogle(
@@ -113,6 +174,7 @@ export async function requestGoogle(
   opts: GoogleRequestOptions = {},
 ): Promise<Response> {
   try {
+    await takeRequestSlot(opts.signal ?? undefined);
     return await googleApi(path, {
       ...init,
       ...opts,

@@ -65,7 +65,7 @@ export class DatabaseService
       this.logger.log('Initializing Node-Postgres Pool');
       this.pool = new Pool({
         connectionString: databaseUrl,
-        max: 100,
+        max: 50,
         idleTimeoutMillis: 30000,
         connectionTimeoutMillis: 5000,
       });
@@ -81,6 +81,12 @@ export class DatabaseService
     } catch (error) {
       this.logger.error('MIGRATION FAILED: App cannot start.', error);
       process.exit(1);
+    }
+
+    if (isSeedEnabled(process.env.SEED)) {
+      this.logger.log('Seeding is enabled');
+    } else {
+      this.logger.log('Seeding is disabled');
     }
 
     if (isSeedEnabled(process.env.SEED)) {
