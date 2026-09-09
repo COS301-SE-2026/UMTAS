@@ -44,19 +44,19 @@ export default function CameraCanvas() {
   }
 
   return (
-    <div className="w-full h-full justify-around flex flex-col gap-y-4 border-0">
-      <div className="w-full h-full flex flex-col justify-center items-center text-center">
+    <div className="w-full h-full justify-around flex flex-col gap-y-4 p-4">
+      <div className="w-full h-full flex flex-col justify-center items-center text-center border rounded-xl ">
         {cameraOn ? (
           <div className="">
             <Webcam
               audio={false}
               ref={webcamRef}
-              videoConstraints={{ width: 640, height: 480 }}
-              className="environment"
+              videoConstraints={{ width: 640, height: 480, facingMode: "user" }}
+              className="w-full h-full"
             />
           </div>
         ) : (
-          <p>camera disabled</p>
+          <p>Camera Disabled</p>
         )}
       </div>
       <div className="flex flex-row justify-around">
