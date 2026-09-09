@@ -399,6 +399,9 @@ importers:
       react-joyride:
         specifier: ^3.2.0
         version: 3.2.0(@types/react@19.2.18)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      react-webcam:
+        specifier: ^7.2.0
+        version: 7.2.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       recharts:
         specifier: 3.8.0
         version: 3.8.0(@types/react@19.2.18)(react-dom@19.2.4(react@19.2.4))(react-is@19.2.8)(react@19.2.4)(redux@5.0.1)
@@ -13440,6 +13443,15 @@ packages:
       "@types/react":
         optional: true
 
+  react-webcam@7.2.0:
+    resolution:
+      {
+        integrity: sha512-xkrzYPqa1ag2DP+2Q/kLKBmCIfEx49bVdgCCCcZf88oF+0NPEbkwYk3/s/C7Zy0mhM8k+hpdNkBLzxg8H0aWcg==,
+      }
+    peerDependencies:
+      react: ">=16.2.0"
+      react-dom: ">=16.2.0"
+
   react@19.2.4:
     resolution:
       {
@@ -25122,6 +25134,11 @@ snapshots:
       tslib: 2.8.1
     optionalDependencies:
       "@types/react": 19.2.18
+
+  react-webcam@7.2.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
+    dependencies:
+      react: 19.2.4
+      react-dom: 19.2.4(react@19.2.4)
 
   react@19.2.4: {}
 
