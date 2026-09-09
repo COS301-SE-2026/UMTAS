@@ -3,7 +3,10 @@
     "list": [
       {
         "builtIn": 1,
-        "datasource": { "type": "grafana", "uid": "-- Grafana --" },
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
         "enable": true,
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
@@ -20,29 +23,54 @@
   "panels": [
     {
       "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
       "id": 100,
       "title": "Summary",
       "type": "row"
     },
     {
-      "datasource": { "type": "loki", "uid": "loki" },
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "orange", "value": 1 },
-              { "color": "red", "value": 50 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 50
+              }
             ]
           },
           "unit": "short"
         },
         "overrides": []
       },
-      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 1 },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 3,
+        "y": 1
+      },
       "id": 1,
       "options": {
         "colorMode": "background",
@@ -54,11 +82,17 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
+      "pluginVersion": "10.4.3",
       "targets": [
         {
-          "datasource": { "type": "loki", "uid": "loki" },
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
           "expr": "sum(count_over_time({job=\"docker\"} |~ \"(?i)\\\\b(error|fatal|critical|exception|panic)\\\\b\" [$__range]))",
           "instant": true,
           "refId": "A"
@@ -68,23 +102,43 @@
       "type": "stat"
     },
     {
-      "datasource": { "type": "loki", "uid": "loki" },
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "orange", "value": 1 },
-              { "color": "red", "value": 5 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 5
+              }
             ]
           },
           "unit": "short"
         },
         "overrides": []
       },
-      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 1 },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 15,
+        "y": 1
+      },
       "id": 2,
       "options": {
         "colorMode": "background",
@@ -96,11 +150,17 @@
           "fields": "",
           "values": false
         },
-        "textMode": "auto"
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
+      "pluginVersion": "10.4.3",
       "targets": [
         {
-          "datasource": { "type": "loki", "uid": "loki" },
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
           "expr": "sum(count_over_time({job=\"docker\", stream=\"stderr\"} [$__range]))",
           "instant": true,
           "refId": "A"
@@ -110,115 +170,83 @@
       "type": "stat"
     },
     {
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "fieldConfig": {
-        "defaults": {
-          "color": { "mode": "thresholds" },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              { "color": "green", "value": null },
-              { "color": "red", "value": 1 }
-            ]
-          },
-          "unit": "short"
-        },
-        "overrides": []
-      },
-      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 1 },
-      "id": 3,
-      "options": {
-        "colorMode": "background",
-        "graphMode": "none",
-        "justifyMode": "center",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": ["lastNotNull"],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "auto"
-      },
-      "targets": [
-        {
-          "datasource": { "type": "prometheus", "uid": "prometheus" },
-          "expr": "count(up == 0)",
-          "instant": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Services Down",
-      "type": "stat"
-    },
-    {
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "fieldConfig": {
-        "defaults": {
-          "color": { "mode": "thresholds" },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              { "color": "green", "value": null },
-              { "color": "orange", "value": 1 },
-              { "color": "red", "value": 5 }
-            ]
-          },
-          "unit": "short"
-        },
-        "overrides": []
-      },
-      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 1 },
-      "id": 4,
-      "options": {
-        "colorMode": "background",
-        "graphMode": "none",
-        "justifyMode": "center",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": ["lastNotNull"],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "auto"
-      },
-      "targets": [
-        {
-          "datasource": { "type": "prometheus", "uid": "prometheus" },
-          "expr": "watchtower_containers_failed",
-          "instant": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Watchtower Failed Updates",
-      "type": "stat"
-    },
-    {
       "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 },
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 5
+      },
       "id": 101,
       "title": "Error Rate Over Time",
       "type": "row"
     },
     {
-      "datasource": { "type": "loki", "uid": "loki" },
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
+          "color": {
+            "mode": "palette-classic"
+          },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "errors/min",
             "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
             "fillOpacity": 20,
             "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
             "lineWidth": 2,
-            "showPoints": "never"
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
           },
           "unit": "short"
         },
         "overrides": []
       },
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 6
+      },
       "id": 5,
       "options": {
         "legend": {
@@ -227,11 +255,17 @@
           "placement": "bottom",
           "showLegend": true
         },
-        "tooltip": { "mode": "multi", "sort": "desc" }
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
       },
       "targets": [
         {
-          "datasource": { "type": "loki", "uid": "loki" },
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
           "expr": "sum by (compose_service) (count_over_time({job=\"docker\", compose_service=~\"$service\"} |~ \"(?i)\\\\b(error|fatal|critical|exception|panic)\\\\b\" [1m]))",
           "legendFormat": "{{compose_service}}",
           "refId": "A"
@@ -241,25 +275,71 @@
       "type": "timeseries"
     },
     {
-      "datasource": { "type": "loki", "uid": "loki" },
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
+          "color": {
+            "mode": "palette-classic"
+          },
           "custom": {
+            "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
             "axisLabel": "lines/min",
             "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
             "fillOpacity": 20,
             "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
             "lineWidth": 2,
-            "showPoints": "never"
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
           },
           "unit": "short"
         },
         "overrides": []
       },
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 6
+      },
       "id": 6,
       "options": {
         "legend": {
@@ -268,11 +348,17 @@
           "placement": "bottom",
           "showLegend": true
         },
-        "tooltip": { "mode": "multi", "sort": "desc" }
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
       },
       "targets": [
         {
-          "datasource": { "type": "loki", "uid": "loki" },
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
           "expr": "sum by (compose_service) (count_over_time({job=\"docker\", stream=\"stderr\", compose_service=~\"$service\"} [1m]))",
           "legendFormat": "{{compose_service}}",
           "refId": "A"
@@ -283,131 +369,130 @@
     },
     {
       "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 14 },
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 14
+      },
       "id": 102,
       "title": "Per-Service Error Counts",
       "type": "row"
     },
     {
-      "datasource": { "type": "loki", "uid": "loki" },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "thresholds" },
+          "color": {
+            "mode": "thresholds"
+          },
           "custom": {
             "align": "auto",
-            "displayMode": "color-background",
-            "filterable": true
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              { "color": "green", "value": null },
-              { "color": "orange", "value": 1 },
-              { "color": "red", "value": 20 }
-            ]
-          },
-          "unit": "short"
-        },
-        "overrides": [
-          {
-            "matcher": { "id": "byName", "options": "Service" },
-            "properties": [
-              { "id": "custom.width", "value": 180 },
-              { "id": "custom.displayMode", "value": "auto" }
-            ]
-          }
-        ]
-      },
-      "gridPos": { "h": 10, "w": 12, "x": 0, "y": 15 },
-      "id": 7,
-      "options": {
-        "footer": { "fields": "", "reducer": ["sum"], "show": false },
-        "showHeader": true,
-        "sortBy": [{ "desc": true, "displayName": "Errors" }]
-      },
-      "targets": [
-        {
-          "datasource": { "type": "loki", "uid": "loki" },
-          "expr": "sum by (compose_service) (count_over_time({job=\"docker\", compose_service=~\"$service\"} |~ \"(?i)\\\\b(error|fatal|critical|exception|panic)\\\\b\" [$__range]))",
-          "instant": true,
-          "legendFormat": "{{compose_service}}",
-          "refId": "A"
-        }
-      ],
-      "title": "Error Count by Service",
-      "transformations": [
-        {
-          "id": "labelsToFields",
-          "options": { "mode": "columns", "valueLabel": "compose_service" }
-        },
-        {
-          "id": "reduce",
-          "options": { "reducers": ["sum"] }
-        },
-        {
-          "id": "organize",
-          "options": {
-            "renameByName": {
-              "Field": "Service",
-              "Sum": "Errors"
-            }
-          }
-        }
-      ],
-      "type": "table"
-    },
-    {
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "fieldConfig": {
-        "defaults": {
-          "color": { "mode": "thresholds" },
-          "custom": {
-            "align": "auto",
-            "displayMode": "auto",
-            "filterable": true
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              { "color": "green", "value": null },
-              { "color": "red", "value": 0.5 }
-            ]
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": true,
+            "inspect": false
           },
           "mappings": [
             {
               "options": {
-                "0": { "color": "red", "index": 0, "text": "DOWN" },
-                "1": { "color": "green", "index": 1, "text": "UP" }
+                "0": {
+                  "color": "red",
+                  "index": 0,
+                  "text": "DOWN"
+                },
+                "1": {
+                  "color": "green",
+                  "index": 1,
+                  "text": "UP"
+                }
               },
               "type": "value"
             }
           ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 0.5
+              }
+            ]
+          },
           "unit": "short"
         },
         "overrides": [
           {
-            "matcher": { "id": "byName", "options": "Job" },
-            "properties": [{ "id": "custom.width", "value": 150 }]
+            "matcher": {
+              "id": "byName",
+              "options": "Job"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 150
+              }
+            ]
           },
           {
-            "matcher": { "id": "byName", "options": "Status" },
+            "matcher": {
+              "id": "byName",
+              "options": "Status"
+            },
             "properties": [
-              { "id": "custom.displayMode", "value": "color-background" },
-              { "id": "custom.width", "value": 100 }
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "gradient",
+                  "type": "color-background"
+                }
+              },
+              {
+                "id": "custom.width",
+                "value": 100
+              }
             ]
           }
         ]
       },
-      "gridPos": { "h": 10, "w": 12, "x": 12, "y": 15 },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 6,
+        "y": 15
+      },
       "id": 8,
       "options": {
-        "footer": { "fields": "", "reducer": ["sum"], "show": false },
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": ["sum"],
+          "show": false
+        },
         "showHeader": true,
-        "sortBy": [{ "desc": false, "displayName": "Status" }]
+        "sortBy": [
+          {
+            "desc": false,
+            "displayName": "Status"
+          }
+        ]
       },
+      "pluginVersion": "10.4.3",
       "targets": [
         {
-          "datasource": { "type": "prometheus", "uid": "prometheus" },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
           "expr": "up",
           "format": "table",
           "instant": true,
@@ -425,8 +510,8 @@
               "instance": true
             },
             "renameByName": {
-              "job": "Job",
-              "Value": "Status"
+              "Value": "Status",
+              "job": "Job"
             }
           }
         }
@@ -435,15 +520,27 @@
     },
     {
       "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 25 },
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 25
+      },
       "id": 103,
       "title": "Error Logs",
       "type": "row"
     },
     {
-      "datasource": { "type": "loki", "uid": "loki" },
-      "fieldConfig": { "defaults": {}, "overrides": [] },
-      "gridPos": { "h": 22, "w": 24, "x": 0, "y": 26 },
+      "datasource": {
+        "type": "loki",
+        "uid": "loki"
+      },
+      "gridPos": {
+        "h": 22,
+        "w": 24,
+        "x": 0,
+        "y": 26
+      },
       "id": 9,
       "options": {
         "dedupStrategy": "none",
@@ -457,7 +554,10 @@
       },
       "targets": [
         {
-          "datasource": { "type": "loki", "uid": "loki" },
+          "datasource": {
+            "type": "loki",
+            "uid": "loki"
+          },
           "expr": "{job=\"docker\", compose_service=~\"$service\"} |~ \"(?i)\\\\b(error|fatal|critical|exception|panic|traceback)\\\\b\"",
           "refId": "A"
         }
@@ -467,30 +567,58 @@
     }
   ],
   "refresh": "30s",
-  "schemaVersion": 36,
-  "style": "dark",
+  "schemaVersion": 39,
   "tags": ["errors", "health", "monitoring"],
   "templating": {
     "list": [
       {
         "allValue": ".+",
-        "current": { "selected": true, "text": "All", "value": "$__all" },
-        "datasource": { "type": "loki", "uid": "loki" },
+        "current": {
+          "selected": false,
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "loki",
+          "uid": "loki"
+        },
         "definition": "label_values(compose_service)",
         "hide": 0,
         "includeAll": true,
+        "label": "Service",
         "multi": true,
         "name": "service",
         "options": [],
         "query": "label_values(compose_service)",
         "refresh": 2,
+        "regex": "",
+        "skipUrlSync": false,
         "sort": 1,
-        "type": "query",
-        "label": "Service"
+        "type": "query"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+        },
+        "filters": [
+          {
+            "key": "job",
+            "operator": "!=",
+            "value": "solver"
+          }
+        ],
+        "hide": 0,
+        "name": "Filters",
+        "skipUrlSync": false,
+        "type": "adhoc"
       }
     ]
   },
-  "time": { "from": "now-1h", "to": "now" },
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
   "timepicker": {},
   "timezone": "",
   "title": "Errors & Health",

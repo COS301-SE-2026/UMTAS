@@ -10,7 +10,7 @@ import { uniId } from 'src/Testing/constants';
 //Factories
 import { createUniversity } from 'src/Testing/Factories';
 
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { BadRequestException } from '@nestjs/common';
 import { ML_Adapter } from '../Adapter/Maryland/ML_Adapter';
 import { UniversityDto } from 'src/University/dto/university.dto';
 
@@ -47,14 +47,24 @@ describe('AdapterRegistryService', () => {
       ).toThrow(BadRequestException);
     });
 
-    //UnHappy - should throw NotFoundException
+    //UnHappy - should throw bRE
     it('should throw if university does not have ApiIdentifier - they dont want api integration', async () => {
       expect(() =>
         service.register({
           ...uni,
           ApiIdentifier: undefined,
         }),
-      ).toThrow(NotFoundException);
+      ).toThrow(BadRequestException);
+    });
+
+    //UnHappy - should throw bRE
+    it('should throw if university does not have ApiIdentifier - they dont want api integration', async () => {
+      expect(() =>
+        service.register({
+          ...uni,
+          BaseApiUrl: undefined,
+        }),
+      ).toThrow(BadRequestException);
     });
   }); //END_Test_Register
 
@@ -67,6 +77,7 @@ describe('AdapterRegistryService', () => {
       const adapter = service.getAdapter({
         ...uni,
         ApiIdentifier: 'ML',
+        BaseApiUrl: 'testUrl',
       });
 
       //Assert
@@ -83,6 +94,7 @@ describe('AdapterRegistryService', () => {
       const adapter = service.getAdapter({
         ...uni,
         ApiIdentifier: 'ML',
+        BaseApiUrl: 'testUrl',
       });
 
       //Assert
@@ -96,6 +108,7 @@ describe('AdapterRegistryService', () => {
       const mlUni: UniversityDto = {
         ...uni,
         ApiIdentifier: 'ML',
+        BaseApiUrl: 'testUrl',
       };
 
       const spy = jest.spyOn(service, 'register');

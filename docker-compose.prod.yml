@@ -180,6 +180,8 @@ services:
       - SMTP_USER=${SMTP_USER:-}
       - SMTP_PASS=${SMTP_PASS:-}
       - SMTP_FROM=${SMTP_FROM:-UMTAS <noreply@${PROD_APP_DOMAIN}>}
+      - SIMULATION_API_KEY=${SIMULATION_API_KEY}
+      - ORS_API_KEY=${ORS_API_KEY}
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=gateway"
@@ -209,7 +211,7 @@ services:
       - NEXT_PUBLIC_POSTHOG_PT=${NEXT_PUBLIC_POSTHOG_PT}
       - NEXT_PUBLIC_POSTHOG_API_HOST=${NEXT_PUBLIC_POSTHOG_API_HOST}
       - NEXT_PUBLIC_MAP_KEY=${NEXT_PUBLIC_MAP_KEY}
-      - MAP_ID=${MAP_ID}
+      - NEXT_PUBLIC_MAP_ID=${NEXT_PUBLIC_MAP_ID}
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=gateway"

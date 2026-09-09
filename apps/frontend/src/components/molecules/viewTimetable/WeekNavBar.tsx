@@ -24,7 +24,7 @@ export function WeekNavBar({
 
   return (
     <div className="flex flex-col sm:flex-row items-center gap-3 mb-4">
-      <div className="flex items-center gap-3">
+      <div className="flex items-center justify-center gap-3">
         <Button
           type="button"
           variant="ghost"
@@ -42,33 +42,34 @@ export function WeekNavBar({
         <span className="text-sm font-medium text-[var(--text-primary)] px-2 whitespace-nowrap">
           {formatWeekRange(weekStart)}
         </span>
-        <input
-          aria-label="select date "
-          data-testid="schedules-Date-Input"
-          type="date"
-          value={dateString}
-          onChange={(e) => {
-            if (e.target.value) {
-              onDateChange(new Date(e.target.value));
-            }
-          }}
-          className="h-8 rounded-md border border-[var(--border)] bg-transparent px-2 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--ring)]"
-        />
+
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={onNext}
+          className="h-8 w-8 shrink-0 border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+        >
+          <ChevronRight
+            aria-label="go forward one week"
+            size={16}
+            strokeWidth={1.5}
+          />
+        </Button>
       </div>
 
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        onClick={onNext}
-        className="h-8 w-8 border border-[var(--border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
-      >
-        <ChevronRight
-          aria-label="go forward one week"
-          size={16}
-          strokeWidth={1.5}
-        />
-      </Button>
+      <input
+        aria-label="select date "
+        data-testid="schedules-Date-Input"
+        type="date"
+        value={dateString}
+        onChange={(e) => {
+          if (e.target.value) {
+            onDateChange(new Date(e.target.value));
+          }
+        }}
+        className="h-8 w-full sm:w-auto rounded-md border border-[var(--border)] bg-transparent px-2 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--ring)]"
+      />
     </div>
   );
 }

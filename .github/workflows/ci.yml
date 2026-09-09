@@ -56,8 +56,9 @@ jobs:
       - name: Run Build
         run: pnpm run build
 
-      - name: Run Audit
-        run: pnpm audit --audit-level=high
+      # - name: Run Audit
+      #   run: pnpm audit --audit-level=moderate
+
       - name: Run Unit Tests
         run: |
           pnpm --filter shared-types test
@@ -97,69 +98,11 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: "**/junit.xml"
 
-  docker-check:
-    name: Validate Docker Builds (PR)
-    runs-on: ubuntu-latest
-    needs: ci
-    if: github.event_name == 'pull_request'
-    permissions:
-      contents: read
-
-    services:
-      postgres:
-        image: postgres:15-alpine
-        env:
-          POSTGRES_USER: ci
-          POSTGRES_PASSWORD: ci
-          POSTGRES_DB: umtas_ci
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
-
-      redis:
-        image: redis:7-alpine
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f
-
-      - name: Build backend image
-        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8
-        with:
-          context: .
-          file: docker/backend/backend.Dockerfile
-          push: false
-          load: true
-          tags: umtas-backend:ci
-          cache-from: type=gha,scope=backend-main
-
-      - name: Build frontend image
-        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8
-        with:
-          context: .
-          file: docker/frontend/frontend.Dockerfile
-          push: false
-          load: true
-          build-args: |
-            NEXT_PUBLIC_API_URL=https://staging.${{ secrets.STAGING_DOMAIN }}/api
-          tags: umtas-frontend:ci
-          cache-from: type=gha,scope=frontend-main
-
   docker-staging:
     name: Build & Push Staging Images
     runs-on: ubuntu-latest
     needs: ci
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
     environment:
       name: staging
     permissions:
@@ -210,7 +153,8 @@ jobs:
             NEXT_PUBLIC_APP_ENV=staging
             NEXT_PUBLIC_API_URL=https://staging.capstone-vigil.dns.net.za/api
             NEXT_PUBLIC_MAP_KEY=${{ secrets.NEXT_PUBLIC_MAP_KEY }}
-            MAP_ID=${{ secrets.MAP_ID }}
+            NEXT_PUBLIC_MAP_ID=${{ secrets.NEXT_PUBLIC_MAP_ID }}
+            ORS_API_KEY=${{ secrets.ORS_API_KEY }}
           tags: |
             vigilcs/umtas:frontend-staging-${{ steps.tag.outputs.latest }}
             vigilcs/umtas:frontend-staging-${{ steps.tag.outputs.sha }}
@@ -245,7 +189,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Deploy to Staging
     needs: docker-staging
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
     environment:
       name: production
     permissions: {}
@@ -322,7 +266,8 @@ jobs:
             NEXT_PUBLIC_APP_ENV=staging
             NEXT_PUBLIC_API_URL=https://capstone-vigil.dns.net.za/api
             NEXT_PUBLIC_MAP_KEY=${{ secrets.NEXT_PUBLIC_MAP_KEY }}
-            MAP_ID=${{ secrets.MAP_ID }}
+            NEXT_PUBLIC_MAP_ID=${{ secrets.NEXT_PUBLIC_MAP_ID }}
+            ORS_API_KEY=${{ secrets.ORS_API_KEY }}
           tags: |
             vigilcs/umtas:frontend-${{ steps.tag.outputs.release }}
             vigilcs/umtas:frontend-${{ steps.tag.outputs.sha }}

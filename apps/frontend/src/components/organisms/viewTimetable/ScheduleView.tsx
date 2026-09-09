@@ -591,8 +591,8 @@ export function ScheduleView({
           data-testid="schedules-Calendar-Div"
           className="flex flex-col gap-3"
         >
-          <div className="flex items-center justify-between">
-            <div className="w-64">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="w-full sm:w-64">
               <Select
                 value={String(selectedTimetableId)}
                 onValueChange={(newValue) => {
@@ -620,68 +620,87 @@ export function ScheduleView({
                 </SelectContent>
               </Select>
             </div>
+
+            <div className="grid grid-cols-2 gap-2 w-full sm:flex sm:w-auto sm:flex-wrap">
+              <Button
+                aria-label="Export to ICS"
+                id="btn-export-ics"
+                type="button"
+                variant="outline"
+                disabled={exportingTo !== null}
+                className="h-8 px-3 text-xs hover:opacity-90"
+                onClick={() => void exportToICS()}
+              >
+                {exportingTo === "ics" ? "Exporting…" : "Export to ICS"}
+              </Button>
+              {!isLoadingGoogleCalendarAccess && (
+                <Button
+                  aria-label="Connect Google Calendar"
+                  id="btn-export-google-calendar"
+                  type="button"
+                  variant="outline"
+                  disabled={exportingTo !== null}
+                  className="h-8 px-3 text-xs hover:opacity-90"
+                  onClick={handleGoogleCalendarExport}
+                >
+                  {exportingTo === "google" ? (
+                    "Exporting…"
+                  ) : hasGoogleCalendarAccess ? (
+                    <>
+                      <span className="hidden sm:inline">
+                        Export to UMTAS Calendar
+                      </span>
+                      <span className="sm:hidden">Export</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="hidden sm:inline">
+                        Connect Google Calendar
+                      </span>
+                      <span className="sm:hidden">Connect</span>
+                    </>
+                  )}
+                </Button>
+              )}
+            </div>
           </div>
 
           {!currentWeekStart || events.length === 0 ? (
             <EmptySchedule />
           ) : (
             <div className="flex flex-col">
-              <div className="flex flex-col md:flex-row justify-between items-center w-full gap-2 md:gap-0">
-                <WeekNavBar
-                  selectedDate={selectedDate}
-                  onDateChange={setSelectedDate}
-                  weekStart={currentWeekStart}
-                  onPrev={handlePrevWeek}
-                  onNext={handleNextWeek}
-                />
-                <div className="flex flex-row justify-center md:justify-end w-full md:w-auto gap-2 mb-4 md:mb-0">
-                  <Button
-                    aria-label="Export to ICS"
-                    id="btn-export-ics"
-                    type="button"
-                    variant="outline"
-                    disabled={exportingTo !== null}
-                    className="h-7 px-3 text-xs hover:opacity-90"
-                    onClick={() => void exportToICS()}
-                  >
-                    {exportingTo === "ics" ? "Exporting…" : "Export to ICS"}
-                  </Button>
-                  {!isLoadingGoogleCalendarAccess && (
-                    <Button
-                      aria-label="Connect Google Calendar"
-                      id="btn-export-google-calendar"
-                      type="button"
-                      variant="outline"
-                      disabled={exportingTo !== null}
-                      className="h-7 px-3 text-xs hover:opacity-90"
-                      onClick={handleGoogleCalendarExport}
-                    >
-                      {exportingTo === "google"
-                        ? "Exporting…"
-                        : hasGoogleCalendarAccess
-                          ? "Export to UMTAS Calendar"
-                          : "Connect Google Calendar"}
-                    </Button>
-                  )}
+              <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between w-full pb-2">
+                <div className="flex justify-center md:justify-start">
+                  <WeekNavBar
+                    selectedDate={selectedDate}
+                    onDateChange={setSelectedDate}
+                    weekStart={currentWeekStart}
+                    onPrev={handlePrevWeek}
+                    onNext={handleNextWeek}
+                  />
+                </div>
+                <div className="grid grid-cols-3 gap-2 w-full md:flex md:w-auto md:flex-wrap md:justify-end">
                   <Button
                     aria-label="Create Timetable"
                     id="btn-create"
                     type="button"
                     variant="default"
-                    className="h-7 px-3 text-xs hover:opacity-90"
+                    className="h-8 px-3 text-xs hover:opacity-90"
                     onClick={createTimetable}
                   >
-                    Create Timetable
+                    <span className="hidden sm:inline">Create Timetable</span>
+                    <span className="sm:hidden">Create</span>
                   </Button>
 
                   <Button
                     aria-label="Edit Timetable"
                     id="btn-edit"
                     type="button"
-                    className="h-7 px-3 text-xs bg-[var(--bg-surface)] text-[var(--text-primary)] border-[var(--border)] hover:opacity-90"
+                    className="h-8 px-3 text-xs bg-[var(--bg-surface)] text-[var(--text-primary)] border-[var(--border)] hover:opacity-90"
                     onClick={editTimetable}
                   >
-                    Edit Timetable
+                    <span className="hidden sm:inline">Edit Timetable</span>
+                    <span className="sm:hidden">Edit</span>
                   </Button>
 
                   <Button
@@ -689,10 +708,11 @@ export function ScheduleView({
                     id="btn-delete"
                     data-testid="schedules-Delete-Btn"
                     type="button"
-                    className="h-7 px-3 text-xs bg-[var(--destructive)] text-[var(--text-primary)] border-[var(--border)] hover:opacity-90"
+                    className="h-8 px-3 text-xs bg-[var(--destructive)] text-[var(--text-primary)] border-[var(--border)] hover:opacity-90"
                     onClick={deleteDialog}
                   >
-                    Delete Timetable
+                    <span className="hidden sm:inline">Delete Timetable</span>
+                    <span className="sm:hidden">Delete</span>
                   </Button>
                 </div>
               </div>

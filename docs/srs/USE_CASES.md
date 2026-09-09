@@ -13,8 +13,6 @@
     | **ID** | **Use Case** | **Group** | **Actor** | **Status** |
     |:---:|:---:|:---:|:---:|:---:|
     | **UC-LP-01** | Visit Landing Page | [Landing Page](#landing-page-use-cases) | Visitor |<span class="status-implemented">Implemented</span>|
-    | **UC-LP-02** | View Adapter Capabilities | [Landing Page](#landing-page-use-cases) | Visitor |<span class="status-not-implemented">In Progress</span>|
-    | **UC-LP-03** | View Role Capabilities | [Landing Page](#landing-page-use-cases) | Visitor |<span class="status-not-implemented">In Progress</span>|
 
     </div>
 
@@ -27,7 +25,7 @@
     | **UC-AU-02** | Login Account | [Authentication](#auth-use-cases) | User |<span class="status-implemented">Implemented</span>|
     | **UC-AU-03** | Reset Password | [Authentication](#auth-use-cases) | User |<span class="status-implemented">Implemented</span>|
     | **UC-AU-04** | Logout Account | [Authentication](#auth-use-cases) | User |<span class="status-implemented">Implemented</span>|
-    | **UC-AU-05** | Delete Account | [Authentication](#auth-use-cases) | User |<span class="status-not-implemented">In Progress</span>|
+    | **UC-AU-05** | Delete Account | [Authentication](#auth-use-cases) | User |<span class="status-implemented">Implemented</span>|
     | **UC-AU-06** | Verify Email | [Authentication](#auth-use-cases) | User |<span class="status-implemented">Implemented</span>|
     | **UC-AU-07** | OAuth | [Authentication](#auth-use-cases) | User |<span class="status-implemented">Implemented</span>|
 
@@ -114,8 +112,8 @@
     ## API Import
     | **ID** | **Use Case** | **Group** | **Actor** | **Status** |
     |:---:|:---:|:---:|:---:|:---:|
-    | **UC-API-01** | Import Timetable from API | [API Import](#api-system) | User |<span class="status-not-implemented">In Progress</span>|
-    | **UC-API-02** | Review API Retrieved Data | [API Import](#api-system) | User |<span class="status-not-implemented">In Progress</span>|
+    | **UC-API-01** | Synchronise University API Data | [API Import](#api-system) | User | <span class="status-implemented">Implemented</span> |
+    | **UC-API-02** | Update Existing University Data | [API Import](#api-system) | User | <span class="status-implemented">Implemented</span> |
     
     </div>
     <div class="uc-table" markdown>
@@ -124,7 +122,7 @@
     | **ID** | **Use Case** | **Group** | **Actor** | **Status** |
     |:---:|:---:|:---:|:---:|:---:|
     | **UC-EX-01** | Export Timetable as ICS File | [Calendar Export](#calendar-exporting-id) | Student |<span class="status-implemented">Implemented</span>|
-    | **UC-EX-02** | Sync Timetable with Google Calendar | [Calendar Export](#calendar-exporting-id) | Student |<span class="status-not-implemented">In Progress</span>|
+    | **UC-EX-02** | Export Timetable to Google Calendar | [Calendar Export](#calendar-exporting-id) | Student |<span class="status-implemented">Implemented</span>|
     
     </div>
 
@@ -155,20 +153,20 @@
     ## Attendance Recording
     | **ID** | **Use Case** | **Group** | **Actor** | **Status** |
     |:---:|:---:|:---:|:---:|:---:|
-    | **UC-AR-01** | Indicate Attendance Intent for Event | [Attendance Recording](#attendance-recording-id) | Student |<span class="status-not-implemented">In Progress</span>|
-    | **UC-AR-02** | Unrecord Attendance for Event | [Attendance Recording](#attendance-recording-id) | Student |<span class="status-not-implemented">In Progress</span>|
+    | **UC-AR-01** | Indicate Attendance Intent for Event | [Attendance Recording](#attendance-recording-id) | Student |<span class="status-implemented">Implemented</span>|
+    | **UC-AR-02** | Unrecord Attendance for Event | [Attendance Recording](#attendance-recording-id) | Student |<span class="status-implemented">Implemented</span>|
 
     </div>
-    
+
     <div class="uc-table" markdown>
 
-    ## Lecturer Adjustment
+    ## Calendar Management
     | **ID** | **Use Case** | **Group** | **Actor** | **Status** |
     |:---:|:---:|:---:|:---:|:---:|
-    | **UC-LA-01** | Manage Event Details | [Lecturer Adjustment](#lecturer-adjustment-id) | Lecturer, Admin |<span class="status-implemented">Implemented</span>|
-    | **UC-LA-01** | Manage Module Details | [Lecturer Adjustment](#lecturer-adjustment-id) | Lecturer, Admin |<span class="status-implemented">Implemented</span>|
-    | **UC-LA-02** | Assign Lecturers to Events/Modules | [Lecturer Adjustment](#lecturer-adjustment-id) | Lecturer, Admin |<span class="status-not-implemented">In Progress</span>|
-    
+    | **UC-CAL-01** | Create University Calendar | [Calendar Management](#calendar-management-id) | Admin |<span class="status-implemented">Implemented</span>|
+    | **UC-CAL-02** | Search University Calendars | [Calendar Management](#calendar-management-id) | Admin |<span class="status-implemented">Implemented</span>|
+    | **UC-CAL-03** | Create Calendar Restriction | [Calendar Management](#calendar-management-id) | Admin |<span class="status-implemented">Implemented</span>|
+
     </div>
 
     <div class="uc-table" markdown>
@@ -243,8 +241,8 @@
 {% include-markdown "srs/Use_Cases/Attendance_Recording.md" %}
 
 ---
-<!-- Lecturer Adjustment -->
-{% include-markdown "srs/Use_Cases/Lecturer_Adjustment.md" %}
+<!-- Calendar Management -->
+{% include-markdown "srs/Use_Cases/Calendar_Management.md" %}
 
 ---
 <!-- Tyto Simulation -->

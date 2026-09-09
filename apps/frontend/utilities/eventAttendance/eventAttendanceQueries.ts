@@ -44,9 +44,15 @@ export function addEventAttendanceMut() {
       });
       return result;
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       getQueryClient().invalidateQueries({
-        queryKey: ["eventAttendance"],
+        queryKey: [
+          "eventAttendance",
+          {
+            eventID: variables.body.eventID,
+            eventDate: variables.body.eventDate,
+          },
+        ],
       });
     },
     onError: (error) => console.error("Could not create attendance", error),
