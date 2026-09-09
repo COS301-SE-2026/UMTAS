@@ -84,7 +84,7 @@ describe('ModuleServiceV2', () => {
 
       //Act + Assert
       await expect(service.create(userId, dto)).rejects.toThrow(
-        InternalServerErrorException,
+        NotFoundException,
       );
       expect(mockCourseService.getById).toHaveBeenCalled();
     });
@@ -97,6 +97,7 @@ describe('ModuleServiceV2', () => {
       mockGroupingService.createModuleGrouping?.mockResolvedValue(group);
 
       mockTransaction(mockDb, {
+        select: [[]],
         insert: [[]],
       });
 

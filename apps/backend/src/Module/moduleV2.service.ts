@@ -64,148 +64,141 @@ export class ModuleServiceV2 extends ModuleService {
     dto: CreateModuleDto,
     tx?: AppDatabase,
   ): Promise<ModuleSingleResponseDto> {
-    try {
-      if (!tx) {
-        return this.dbService.db.transaction(async (t: AppDatabase) => {
-          return this.create(userId, dto, t);
-        }); //END_transaction
-      } //END_transaction precencer check
+    if (!tx) {
+      return this.dbService.db.transaction(async (t: AppDatabase) => {
+        return this.create(userId, dto, t);
+      }); //END_transaction
+    } //END_transaction precencer check
 
-      //Get + Validate GroupId with CourseID and ModulegroupingID
-      const groupId = await this.getGroupId(
-        tx,
-        dto.CourseID,
-        dto.ModuleGroupingID,
+    //Get + Validate GroupId with CourseID and ModulegroupingID
+    const groupId = await this.getGroupId(
+      tx,
+      dto.CourseID,
+      dto.ModuleGroupingID,
+    );
+
+    //Validate dto
+    const validatedDto: CreateModuleDto =
+      await this.validateCreateModuleDto(dto);
+
+    const code = validatedDto.moduleCode;
+    const name = validatedDto.moduleName;
+    const description = validatedDto.moduleDescription;
+    const ExternalID = validatedDto.ExternalID;
+    const validated = validatedDto.validated;
+
+    //Check for duplicate moduleCode in ModuleGrouping
+    const existing = await this.existingModuleCodeForModuleGroupingV2(
+      userId,
+      code,
+      groupId,
+      tx,
+    );
+
+    if (existing) return existing; //Return Early if already exists
+
+    //Create new module
+    const [newModule] = await tx
+      .insert(modules)
+      .values({
+        moduleCode: code,
+        moduleName: name,
+        moduleDescription: description,
+        validated,
+        ExternalID,
+        createdAt: new Date(),
+      })
+      .returning();
+
+    if (!newModule) {
+      this.OOPSIE.fatal(
+        `Failed to create module for CreateModuleDto[${JSON.stringify(validatedDto)}]`,
       );
+      throw new InternalServerErrorException('Module failed to be created');
+    }
 
-      //Validate dto
-      const validatedDto: CreateModuleDto =
-        await this.validateCreateModuleDto(dto);
+    //Start constructing response
+    const response: ModuleSingleResponseDto = {
+      ...newModule,
+    };
 
-      const code = validatedDto.moduleCode;
-      const name = validatedDto.moduleName;
-      const description = validatedDto.moduleDescription;
-      const ExternalID = validatedDto.ExternalID;
-      const validated = validatedDto.validated;
+    //Group module to its group
+    const moduleGroup = await this.groupingService.populateGroup(
+      groupId,
+      [newModule.moduleID],
+      tx,
+    );
 
-      //Check for duplicate moduleCode in ModuleGrouping
-      const existing = await this.existingModuleCodeForModuleGroupingV2(
-        userId,
-        code,
-        groupId,
-        tx,
-      );
+    response.ModuleGroupingID = moduleGroup.GroupID;
 
-      if (existing) return existing; //Return Early if already exists
+    //Course Module metadata logic - only when courseId specified
+    const courseId = dto.CourseID;
 
-      //Create new module
-      const [newModule] = await tx
-        .insert(modules)
+    if (courseId && dto.CourseModuleInfo) {
+      //Fetch GroupModule entry for module to add metadata to
+      const [groupModule] = await tx
+        .select()
+        .from(GroupModules)
+        .where(
+          and(
+            eq(GroupModules.GroupID, moduleGroup.GroupID),
+            eq(GroupModules.ModuleID, newModule.moduleID),
+          ),
+        )
+        .limit(1);
+
+      if (!groupModule) {
+        this.OOPSIE.error(
+          `No GroupModules entry for your module[${JSON.stringify(response)}]`,
+        );
+        throw new InternalServerErrorException(
+          `Couldn't find group module entry in join table :(`,
+        );
+      }
+
+      //Default fields
+      const core = validatedDto.CourseModuleInfo?.Core ?? false;
+      const semOfStudy =
+        validatedDto.CourseModuleInfo?.SemesterOfStudy ?? 'yearly';
+      const yearOfStudy = validatedDto.CourseModuleInfo?.YearOfStudy ?? 1;
+
+      //Add metadata to groupModule entity
+      const [courseModuleInfo] = await tx
+        .insert(CourseModule)
         .values({
-          moduleCode: code,
-          moduleName: name,
-          moduleDescription: description,
-          validated,
-          ExternalID,
-          createdAt: new Date(),
+          CourseID: courseId,
+          GroupModuleID: groupModule.GroupModuleID,
+          Core: core,
+          SemesterOfStudy: semOfStudy,
+          YearOfStudy: yearOfStudy,
         })
         .returning();
 
-      if (!newModule) {
+      if (!courseModuleInfo) {
         this.OOPSIE.fatal(
-          `Failed to create module for CreateModuleDto[${JSON.stringify(validatedDto)}]`,
+          `Failed to add CourseModule metadata for groupModule entry[${groupModule.GroupModuleID}]`,
         );
-        throw new InternalServerErrorException('Module failed to be created');
+        throw new InternalServerErrorException(
+          `Failed to add CourseModule metadata for groupModule entry[${groupModule.GroupModuleID}]`,
+        );
       }
 
-      //Start constructing response
-      const response: ModuleSingleResponseDto = {
-        ...newModule,
-      };
+      response.CourseModuleInfo = courseModuleInfo;
+    } //END_COurseModule metadata logic
 
-      //Group module to its group
-      const moduleGroup = await this.groupingService.populateGroup(
-        groupId,
-        [newModule.moduleID],
+    //Styling
+    if (dto.styling) {
+      const styling = await this.setStyling(
+        newModule.moduleID,
+        userId,
+        dto.styling.colour,
         tx,
       );
 
-      response.ModuleGroupingID = moduleGroup.GroupID;
+      response.styling = styling.styling;
+    } //END_Styling
 
-      //Course Module metadata logic - only when courseId specified
-      const courseId = dto.CourseID;
-
-      if (courseId && dto.CourseModuleInfo) {
-        //Fetch GroupModule entry for module to add metadata to
-        const [groupModule] = await tx
-          .select()
-          .from(GroupModules)
-          .where(
-            and(
-              eq(GroupModules.GroupID, moduleGroup.GroupID),
-              eq(GroupModules.ModuleID, newModule.moduleID),
-            ),
-          )
-          .limit(1);
-
-        if (!groupModule) {
-          this.OOPSIE.error(
-            `No GroupModules entry for your module[${JSON.stringify(response)}]`,
-          );
-          throw new InternalServerErrorException(
-            `Couldn't find group module entry in join table :(`,
-          );
-        }
-
-        //Default fields
-        const core = validatedDto.CourseModuleInfo?.Core ?? false;
-        const semOfStudy =
-          validatedDto.CourseModuleInfo?.SemesterOfStudy ?? 'yearly';
-        const yearOfStudy = validatedDto.CourseModuleInfo?.YearOfStudy ?? 1;
-
-        //Add metadata to groupModule entity
-        const [courseModuleInfo] = await tx
-          .insert(CourseModule)
-          .values({
-            CourseID: courseId,
-            GroupModuleID: groupModule.GroupModuleID,
-            Core: core,
-            SemesterOfStudy: semOfStudy,
-            YearOfStudy: yearOfStudy,
-          })
-          .returning();
-
-        if (!courseModuleInfo) {
-          this.OOPSIE.fatal(
-            `Failed to add CourseModule metadata for groupModule entry[${groupModule.GroupModuleID}]`,
-          );
-          throw new InternalServerErrorException(
-            `Failed to add CourseModule metadata for groupModule entry[${groupModule.GroupModuleID}]`,
-          );
-        }
-
-        response.CourseModuleInfo = courseModuleInfo;
-      } //END_COurseModule metadata logic
-
-      //Styling
-      if (dto.styling) {
-        const styling = await this.setStyling(
-          newModule.moduleID,
-          userId,
-          dto.styling.colour,
-          tx,
-        );
-
-        response.styling = styling.styling;
-      } //END_Styling
-
-      return response;
-    } catch (error) {
-      this.OOPSIE.warn(`create: Something went wrong - [${error}]`);
-      throw new InternalServerErrorException(
-        `CreateModule - V2: Something went wrong`,
-      );
-    }
+    return response;
   }
 
   //getAll, overwrite
@@ -613,7 +606,7 @@ export class ModuleServiceV2 extends ModuleService {
     userId: string,
     moduleCode: string,
     groupId: string,
-    tx: DatabaseService['db'],
+    tx: AppDatabase,
   ): Promise<ModuleSingleResponseDto | null> {
     const [existingModule] = await tx
       .select({
