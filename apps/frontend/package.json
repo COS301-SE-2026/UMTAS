@@ -6,7 +6,7 @@
   "scripts": {
     "build:wasm:dev": "wasm-pack build wasm-engine --target web --dev",
     "build:wasm:prod": "wasm-pack build wasm-engine --target web --release",
-    "rust:dev": "cargo-watch -w wasm-engine/src -s 'wasm-pack build wasm-engine --target web --dev'",
+    "rust:dev": "cargo-watch --workdir wasm-engine -w src -s 'wasm-pack build --target web --dev'",
     "dev": "concurrently \"pnpm rust:dev\" \"next dev --port 3001\"",
     "build": "pnpm --filter shared-types build && next build",
     "start": "next start",

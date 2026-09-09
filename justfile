@@ -8,7 +8,6 @@ dev:
 
 # Umtas local dev commands
 
-
 # SimService
 simservInit:
     cd apps/simulation-service \
@@ -26,10 +25,12 @@ back: rebuild-packages
 
 # frontend + phase injection
 front: rebuild-packages
+    phase run -- pnpm --filter frontend build:wasm:dev
     phase run -- pnpm --filter frontend run dev
 
 # both + phase
 both: rebuild-packages
+    phase run -- pnpm --filter frontend build:wasm:dev
     phase run -- pnpm --parallel --filter backend --filter frontend run dev
 
 # spin up local versions
@@ -54,13 +55,13 @@ reset-volumes:
 
 # shared proxy stack
 proxy-up:
-  phase run --env staging -- docker compose -p umtas-proxy -f docker-compose.traefik.yml up 
+    phase run --env staging -- docker compose -p umtas-proxy -f docker-compose.traefik.yml up
 
 proxy-down:
-   phase run --env staging  -- docker compose -p umtas-proxy -f docker-compose.traefik.yml down
+    phase run --env staging  -- docker compose -p umtas-proxy -f docker-compose.traefik.yml down
 
 staging-up:
-    phase run --env staging -- docker compose -p umtas-staging -f docker-compose.staging.yml up -d --remove-orphans 
+    phase run --env staging -- docker compose -p umtas-staging -f docker-compose.staging.yml up -d --remove-orphans
 
 staging-down:
     phase run --env staging -- docker compose -p umtas-staging -f docker-compose.staging.yml down
@@ -108,8 +109,7 @@ prod-up release_tag:
     IMAGE_TAG={{ release_tag }} phase run --env production -- docker compose -p umtas-prod -f docker-compose.prod.yml up -d --remove-orphans
 
 prod-down release_tag:
-     IMAGE_TAG={{ release_tag }} phase run --env production -- docker compose -p umtas-prod -f docker-compose.prod.yml down
-
+    IMAGE_TAG={{ release_tag }} phase run --env production -- docker compose -p umtas-prod -f docker-compose.prod.yml down
 
 # manual prod deployment
 
@@ -209,13 +209,13 @@ docker-build-multiarch image_tag registry="vigilcs/umtas":
 
 ############################## Backend specific
 
-#Complete restart of backend, I'm getting lazy
+# Complete restart of backend, I'm getting lazy
 resetBack:
     just dockerClean
     just sync
     just back
 
-#lint-staged
+# lint-staged
 lintBack:
     pnpm run lint-staged
 
@@ -243,18 +243,14 @@ db_sql:
 # DROP SCHEMA public CASCADE; CREATE SCHEMA public; then quite
 # then you can delete all migrations and meta from drizzle and regenerate and migrate
 
-
 runsim:
     cd apps/simulation-service && phase run --env development -- docker compose up
-
 
 nfr-start:
     cd apps/NFR && phase run --env development -- docker compose up -d nfr-tester
 
 nfr-stop:
     cd apps/NFR && phase run --env development -- docker compose stop nfr-tester
-
-
 
 nfr-upload:
     cd apps/NFR && phase run --env development -- docker compose exec nfr-tester \
@@ -265,14 +261,11 @@ nfr-upload:
         --run-time 2m \
         --headless \
 
-
 staging-migrate:
     phase run --env staging -- docker compose -p umtas-staging -f docker-compose.staging.yml run --rm backend node dist/db/migrate.js
 
 prod-migrate:
     phase run --env production -- docker compose -p umtas-production -f docker-compose.prod.yml run --rm backend node dist/db/migrate.js
-
-
 
 # Backend testing
 # unit test

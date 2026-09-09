@@ -1,5 +1,4 @@
-// src/lib/wasm-loader.ts
-import init, { add } from "@/../wasm-engine/pkg/wasm_engine";
+import init, { add, print_rust } from "@/../wasm-engine/pkg/wasm_engine";
 
 let isInitialized = false;
 let initPromise: Promise<void> | null = null;
@@ -18,5 +17,5 @@ export async function loadWasmEngine() {
   }
 
   await initPromise;
-  return { add };
+  return { add, print_rust };
 }
