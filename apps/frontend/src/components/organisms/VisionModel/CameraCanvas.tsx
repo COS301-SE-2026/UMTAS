@@ -1,6 +1,7 @@
 "use client";
 import { Button } from "@/components/atoms/baseShadcn/button";
 import { useRef, useState } from "react";
+import { CircleX } from "lucide-react";
 import Webcam from "react-webcam";
 
 export default function CameraCanvas() {
@@ -56,7 +57,15 @@ export default function CameraCanvas() {
             />
           </div>
         ) : (
-          <p>Camera Disabled</p>
+          <p
+            className="flex gap-x-2"
+            onClick={() => {
+              setCameraOn(!cameraOn);
+            }}
+          >
+            Camera Disabled
+            <CircleX />
+          </p>
         )}
       </div>
       <div className="flex flex-row justify-around">
