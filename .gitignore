@@ -156,3 +156,11 @@ infra/database/seeds.sql/
 
 # Api docs
 # The committed OpenAPI document is the local source for reproducible client generation.
+
+
+
+# Rust wasm
+apps/frontend/wasm-engine/target/
+
+*.onnx
+*.pt
