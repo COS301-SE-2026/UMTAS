@@ -6,7 +6,7 @@
     | **Use Case ID** | **Use Case Name** | **Actor** |
     | :---: | :---: | :---: |
     | **UC-EX-01** | [Export Timetable as ICS File](#uc-ex-01) | Student |
-    | **UC-EX-02** | [Sync Timetable with Google Calendar](#uc-ex-02) | Student |
+    | **UC-EX-02** | [Export Timetable to Google Calendar](#uc-ex-02) | Student |
 
     </div>
 
@@ -39,21 +39,25 @@
         | **Requirements Covered** | R2.5.1 \| R2.5.1.1 \| R2.5.1.2 \| R2.5.1.3 \| R2.5.1.4 \| R2.5.1.5 \| R2.5.1.6 |
 
     ---
-    ??? "UC-EX-02: Sync Timetable with Google Calendar"
+    ??? "UC-EX-02: Export Timetable to Google Calendar"
         <a id="uc-ex-02">
         ##### High Level
         ```
-        Sync Timetable with Google Calendar (Actor: Student, System: Google Calendar Integration)  
-        TUCBW the student selects Google Calendar sync and authorises access if required.  
-        TUCEW the system creates or updates a Google Calendar instance and synchronises timetable events with the user’s calendar.
+        Export Timetable to Google Calendar (Actor: Student, System: Google Calendar Integration)  
+        TUCBW the student selects the option to export a timetable to Google Calendar and authorises access if required.  
+        TUCEW the system creates a Google Calendar instance and pushes the timetable events to the user's Google Calendar.
         ```
         ##### Expanded
         | Field | Detail |
         | :--- | :--- |
         | **Actor** | Student |
         | **Precondition** | Student is authenticated and a timetable exists |
-        | **Trigger** | Student selects “Sync with Google Calendar” |
-        | **Basic Flow** | 1. Student initiates Google Calendar sync.<br>2. System requests Google OAuth authentication (if not already authorised).<br>3. Student grants calendar permissions.<br>4. System retrieves timetable events.<br>5. System creates or selects Google Calendar instance.<br>6. System maps timetable events to Google Calendar format.<br>7. System pushes events to Google Calendar API.<br>8. System confirms successful sync. |
-        | **Alternate Flow** | **A1: OAuth not authorised**<br>System prompts user to authenticate before proceeding.<br><br>**A2: API failure**<br>System retries sync and then reports failure.<br><br>**A3: Partial sync failure**<br>System reports which events failed and which succeeded.<br><br>**A4: Duplicate event detection (UUID conflict)**<br>System updates existing events instead of duplicating them. |
-        | **Postcondition** | Timetable events are synchronised with Google Calendar |
+        | **Trigger** | Student selects "Export to Google Calendar" |
+        | **Basic Flow** | 1. Student initiates Google Calendar export.<br>2. System requests Google OAuth authentication (if not already authorised).<br>3. Student grants calendar permissions.<br>4. System retrieves timetable events.<br>5. System creates a Google Calendar instance.<br>6. System maps timetable events to Google Calendar format.<br>7. System pushes events to Google Calendar API.<br>8. System confirms successful export. |
+        | **Alternate Flow** | **A1: OAuth not authorised**<br>System prompts user to authenticate before proceeding.<br><br>**A2: API failure**<br>System retries export and then reports failure.<br><br>**A3: Partial export failure**<br>System reports which events failed and which succeeded.<br><br>**A4: Duplicate event detection (UUID conflict)**<br>System skips or overwrites previously exported events instead of duplicating them. |
+        | **Postcondition** | Timetable events are exported to Google Calendar |
         | **Requirements Covered** | R2.5.2 \| R2.5.2.1 |
+
+
+
+

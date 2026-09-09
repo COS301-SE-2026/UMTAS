@@ -94,8 +94,8 @@
 
     | **ID** | **User Story** | **Use Case** |
     |---|---|---|
-    | US-33 | As a user, I want to import my timetable from a university API so that my academic schedule stays synchronised automatically. | UC-API-01 |
-    | US-34 | As a user, I want to review API-retrieved timetable data so that I can confirm it is correct before it is saved. | UC-API-02 |
+    | US-33 | As a user, I want to synchronise courses, modules, and events from my university API so that the university data is available in UMTAS. | UC-API-01 |
+    | US-34 | As a user, I want existing university data to be updated when it changes in the university API so that my UMTAS data remains current. | UC-API-02 |
 
 ---
 ??? info "**Calendar Export**"
@@ -103,15 +103,15 @@
     | **ID** | **User Story** | **Use Case** |
     |---|---|---|
     | US-35 | As a student, I want to export my timetable as an ICS file so that I can use it in other calendar applications. | UC-EX-01 |
-    | US-36 | As a student, I want to sync my timetable with Google Calendar so that changes are reflected automatically without re-exporting. | UC-EX-02 |
+    | US-36 | As a student, I want to export my timetable with Google Calendar so that my timetable is in my Google Calendar App. | UC-EX-02 |
 
 ---
 ??? info "**Solver System**"
 
     | **ID** | **User Story** | **Use Case** |
     |---|---|---|
-    | US-37 | As a student, I want the system to solve my timetable using CP-SAT so that I receive a conflict-free schedule where one exists. | UC-SV-01 |
-    | US-38 | As a student, I want the system to solve my timetable using a genetic algorithm so that I receive a clearly labelled best-effort schedule when no perfect solution is feasible. | UC-SV-02 |
+    | US-37 | As a student, I want the system to solve my timetable using CP-SAT, respecting hard constraints and my soft preferences (target time, minimal gaps, skip day), so that I receive a conflict-free schedule that fits how I like my week structured. | UC-SV-01 |
+    | US-38 | As a student, I want the system to solve my timetable using a genetic algorithm guided by the same soft preferences so that I receive a clearly labelled best-effort schedule when no perfect solution is feasible. | UC-SV-02 |
 
 ---
 ??? info "**Analytics Dashboard**"
@@ -136,16 +136,24 @@
     | **ID** | **User Story** | **Use Case** |
     |---|---|---|
     | US-44 | As a lecturer or admin, I want to manage event details so that scheduling stays accurate from the teaching side. | UC-LA-01 |
-    | US-45 | As a lecturer or admin, I want to manage module details so that module information stays accurate from the teaching side. | UC-LA-01 |
-    | US-46 | As a lecturer or admin, I want to assign lecturers to events and modules so that responsibility for teaching is clearly recorded. | UC-LA-02 |
+    | US-45 | As a lecturer or admin, I want to manage module details so that module information stays accurate from the teaching side. | UC-LA-02 |
 
 ---
 ??? info "**Tyto Simulation System**"
 
     | **ID** | **User Story** | **Use Case** |
     |---|---|---|
-    | US-48 | As a Tyto administrator, I want to launch a simulation batch via a central script and Docker container so that I can test system behaviour under representative load. | UC-TY-01 |
-    | US-49 | As a Tyto administrator, I want the system to generate a synthetic student population from a schema and domain data so that simulations run against realistic profiles. | UC-TY-02 |
+    | US-48 | As a Tyto administrator, I want to launch a simulation batch from a single entry point so that I can test system behaviour under representative load. | UC-TY-01 |
+    | US-49 | As a Tyto administrator, I want the system to generate a synthetic student population from defined domain data so that simulations run against realistic profiles. | UC-TY-02 |
     | US-50 | As a Tyto administrator, I want to view aggregated simulation analytics and reports so that I can interpret the results of a simulation run. | UC-TY-03 |
-    | US-51 | As a Tyto administrator, I want to bootstrap a new adapter from an OpenAPI specification so that I can extend simulations to new target systems without manual setup. | UC-TY-04 |
+    | US-51 | As a Tyto administrator, I want to bootstrap a new adapter from a target system's interface definition so that I can extend simulations to new systems without manual setup. | UC-TY-04 |
     | US-52 | As a Tyto administrator, I want the simulation to exercise realistic UMTAS user behaviours so that I can validate the platform under a full range of domain activity. | UC-TY-05 |
+
+---
+??? info "**Calendar Management**"
+
+    | **ID** | **User Story** | **Use Case** |
+    |---|---|---|
+    | US-53 | As an admin, I want to create a calendar for a University for a specific year so that scheduling has a calendar to work within. | UC-CM-01 |
+    | US-54 | As an admin, I want to search for a University's calendar by year so that I can find and manage the correct one. | UC-CM-02 |
+    | US-55 | As an admin, I want to add single day, date range, or day swap restrictions to a University calendar so that scheduling respects institution-specific exceptions. | UC-CM-03 |
