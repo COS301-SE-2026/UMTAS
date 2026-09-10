@@ -3,11 +3,12 @@ import { Button } from "@/components/atoms/baseShadcn/button";
 import { useRef, useState } from "react";
 import { CircleX } from "lucide-react";
 import Webcam from "react-webcam";
+import { add } from "../../../../wasm-engine/pkg/wasm_engine";
 
 export default function CameraCanvas() {
   const webcamRef = useRef<Webcam>(null);
   const [cameraOn, setCameraOn] = useState(true);
-
+  const [CameraLoading, setCameraLoading] = useState(false);
   function getPixelData() {
     const videoNode = webcamRef.current?.video;
     if (!videoNode || videoNode.readyState < videoNode.HAVE_CURRENT_DATA) {
@@ -52,6 +53,9 @@ export default function CameraCanvas() {
             <Webcam
               audio={false}
               ref={webcamRef}
+              onUserMedia={() => {
+                setCameraLoading(false);
+              }}
               videoConstraints={{ width: 640, height: 480, facingMode: "user" }}
               className="w-full h-full"
             />
@@ -61,6 +65,7 @@ export default function CameraCanvas() {
             className="flex gap-x-2"
             onClick={() => {
               setCameraOn(!cameraOn);
+              setCameraLoading(true);
             }}
           >
             Camera Disabled
@@ -73,6 +78,7 @@ export default function CameraCanvas() {
         <Button
           onClick={() => {
             setCameraOn(!cameraOn);
+            setCameraLoading(true);
           }}
         >
           {cameraOn ? <>Switch camera off</> : <>Switch camera on</>}
