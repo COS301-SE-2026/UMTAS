@@ -2044,6 +2044,7 @@ dependencies = [
  "js-sys",
  "ndarray",
  "tract",
+ "tract-onnx",
  "wasm-bindgen",
  "web-sys",
 ]

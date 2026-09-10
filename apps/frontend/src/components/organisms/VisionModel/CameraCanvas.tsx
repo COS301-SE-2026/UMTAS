@@ -3,7 +3,6 @@ import { Button } from "@/components/atoms/baseShadcn/button";
 import { useRef, useState } from "react";
 import { CircleX } from "lucide-react";
 import Webcam from "react-webcam";
-import { add } from "../../../../wasm-engine/pkg/wasm_engine";
 
 export default function CameraCanvas() {
   const webcamRef = useRef<Webcam>(null);
