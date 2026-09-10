@@ -2042,6 +2042,7 @@ dependencies = [
  "console_error_panic_hook",
  "getrandom 0.4.3",
  "js-sys",
+ "ndarray",
  "tract",
  "wasm-bindgen",
  "web-sys",
