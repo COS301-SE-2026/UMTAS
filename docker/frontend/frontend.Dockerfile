@@ -57,10 +57,16 @@ ENV NEXT_PUBLIC_APP_ENV=${NEXT_PUBLIC_APP_ENV}
 COPY packages/shared-types/ ./packages/shared-types/
 COPY apps/frontend/ ./apps/frontend/
 
-# rust stuff
+# rust stuff -->deprecated
 COPY --from=rust-builder /app/wasm-engine/pkg ./apps/frontend/wasm-engine/pkg
 COPY --from=rust-builder /app/models-output/yolov11n.onnx ./apps/frontend/public/models/yolov11n.onnx
 
+# Wasm stuff 
+RUN mkdir -p apps/frontend/public/wasm && \
+    cp node_modules/onnxruntime-web/dist/ort-wasm*.wasm apps/frontend/public/wasm/ 2>/dev/null || \
+    cp apps/frontend/node_modules/onnxruntime-web/dist/ort-wasm*.wasm apps/frontend/public/wasm/ 2>/dev/null || \
+    find . -name "ort-wasm*.wasm" -exec cp {} apps/frontend/public/wasm/ \; || true && \
+    cp node_modules/onnxruntime-web/dist/ort-wasm*.mjs apps/frontend/public/wasm/ 2>/dev/null || true
 
 RUN pnpm --filter=shared-types build
 RUN pnpm --filter=frontend build

@@ -9,12 +9,24 @@ dev:
 # Umtas local dev commands
 
 VisionModel:
-    python3 -m venv .venv
-    .venv/bin/pip install --no-cache-dir ultralytics onnx onnxruntime
-    mkdir -p apps/frontend/public/models
-    .venv/bin/yolo export model=yolo11n.pt format=onnx imgsz=640
-    mv yolo11n.onnx apps/frontend/public/models/yolov11n.onnx
-    rm -rf .venv
+    @if [ ! -f apps/frontend/public/models/yolov11n.onnx ]; then \
+        python3 -m venv .venv; \
+        .venv/bin/pip install --no-cache-dir ultralytics onnx onnxruntime; \
+        mkdir -p apps/frontend/public/models; \
+        .venv/bin/yolo export model=yolo11n.pt format=onnx imgsz=640; \
+        mv yolo11n.onnx apps/frontend/public/models/yolov11n.onnx; \
+        rm -rf .venv; \
+    fi
+
+VisionWasm:
+    @if [ ! -f apps/frontend/public/wasm/ort-wasm.wasm ]; then \
+        mkdir -p apps/frontend/public/wasm; \
+        cp apps/frontend/node_modules/onnxruntime-web/dist/ort-wasm*.wasm apps/frontend/public/wasm/ 2>/dev/null || \
+        cp node_modules/onnxruntime-web/dist/ort-wasm*.wasm apps/frontend/public/wasm/ 2>/dev/null || \
+        cp $(pnpm --filter frontend root)/onnxruntime-web/dist/ort-wasm*.wasm apps/frontend/public/wasm/; \
+        cp apps/frontend/node_modules/onnxruntime-web/dist/ort-wasm*.mjs apps/frontend/public/wasm/ 2>/dev/null || true; \
+        echo "Done!"; \
+    fi
 
 # SimService
 simservInit:
@@ -33,13 +45,13 @@ back: rebuild-packages
 
 # frontend + phase injection
 front: rebuild-packages
-    phase run -- pnpm --filter frontend build:wasm:dev
     phase run -- pnpm --filter frontend run dev
+    #phase run -- pnpm --filter frontend build:wasm:dev place above frontend if we add back
 
 # both + phase
 both: rebuild-packages
-    phase run -- pnpm --filter frontend build:wasm:dev
     phase run -- pnpm --parallel --filter backend --filter frontend run dev
+    #phase run -- pnpm --filter frontend build:wasm:dev place above frontend if we add back
 
 # spin up local versions
 dev-infra:
