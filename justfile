@@ -12,8 +12,8 @@ VisionModel:
     python3 -m venv .venv
     .venv/bin/pip install --no-cache-dir ultralytics onnx onnxruntime
     mkdir -p apps/frontend/public/models
-    .venv/bin/python -c "from ultralytics import YOLO; model = YOLO('yolov8n.pt'); model.export(format='onnx', imgsz=640)"
-    mv yolov8n.onnx apps/frontend/public/models/yolov8n.onnx
+    .venv/bin/python -c "from ultralytics import YOLO; model = YOLO('yolov11n.pt'); model.export(format='onnx', imgsz=640)"
+    mv yolov11n.onnx apps/frontend/public/models/yolov11n.onnx
     rm -rf .venv
 
 # SimService

@@ -14,8 +14,8 @@ WORKDIR /app
 
 RUN pip3 install --no-cache-dir ultralytics onnx onnxruntime --break-system-packages && \
     mkdir -p /app/models-output && \
-    python3 -c "from ultralytics import YOLO; model = YOLO('yolov8n.pt'); model.export(format='onnx', imgsz=640)" && \
-    mv yolov8n.onnx /app/models-output/yolov8n.onnx
+    python3 -c "from ultralytics import YOLO; model = YOLO('yolov11n.pt'); model.export(format='onnx', imgsz=640)" && \
+    mv yolov11n.onnx /app/models-output/yolov11n.onnx
 
 COPY apps/frontend/wasm-engine ./wasm-engine
 WORKDIR /app/wasm-engine
@@ -59,7 +59,7 @@ COPY apps/frontend/ ./apps/frontend/
 
 # rust stuff
 COPY --from=rust-builder /app/wasm-engine/pkg ./apps/frontend/wasm-engine/pkg
-COPY --from=rust-builder /app/models-output/yolov8n.onnx ./apps/frontend/public/models/yolov8n.onnx
+COPY --from=rust-builder /app/models-output/yolov11n.onnx ./apps/frontend/public/models/yolov11n.onnx
 
 
 RUN pnpm --filter=shared-types build
