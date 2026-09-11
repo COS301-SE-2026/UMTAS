@@ -4,8 +4,13 @@ import { DatabaseService } from 'src/db/database.service';
 import { CourseEnrollment } from 'src/entities';
 import { and, eq } from 'drizzle-orm';
 import { EnrollStudentToCourseResponseDto } from './dto/course.enrollment.dto';
-import { InternalServerErrorException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 
+@Injectable()
 export class CourseEnrollmentService {
   private readonly OOPSIE = new Logger(this.constructor.name);
 

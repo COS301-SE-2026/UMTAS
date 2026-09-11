@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class EnrollStudentToCourseResponseDto {
+class BaseCourseEnrollmentResponseDto {
   @ApiProperty({
     description: 'Unique identifier of the enrolled student',
     example: '00000000-0000-0000-0000-000000000000',
@@ -14,7 +14,9 @@ export class EnrollStudentToCourseResponseDto {
     format: 'uuid',
   })
   CourseID!: string;
+} //END_BaseCourseEnrollmentResponseDto
 
+export class EnrollStudentToCourseResponseDto extends BaseCourseEnrollmentResponseDto {
   @ApiProperty({
     description:
       'Timestamp when the student enrolled in the course (UTC, ISO 8601)',
@@ -24,3 +26,5 @@ export class EnrollStudentToCourseResponseDto {
   })
   EnrolledAt!: Date;
 } //END_EnrollStudentToCourseResponseDto
+
+export class UnenrollStudentFromCourseResponseDto {}

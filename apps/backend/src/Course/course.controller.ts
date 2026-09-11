@@ -36,6 +36,8 @@ import { Roles } from 'src/auth/roles.guard';
 import { CourseServiceV2 } from './courseV2.service';
 import { CurrentSession } from 'src/auth/session.decorator';
 import type { SessionData } from 'src/auth/session.decorator';
+import { EnrollStudentToCourseResponseDto } from './dto/course.enrollment.dto';
+import { CourseEnrollmentService } from './course.enrollment.service';
 
 @ApiTags('Courses')
 @Controller('Courses')
@@ -43,6 +45,7 @@ export class CourseController {
   constructor(
     private readonly service: CourseService,
     private readonly service2: CourseServiceV2,
+    private readonly enrollmentService: CourseEnrollmentService,
   ) {}
 
   //Create
@@ -250,4 +253,45 @@ export class CourseController {
   ): Promise<CourseSingleResponseDto> {
     return this.service.getById(CourseId);
   }
+
+  //Enroll Student into a course
+  @Post('enroll-course/:CourseId')
+  @Roles('student')
+  @ApiOperation({
+    summary: 'Enroll the current user/student into a course',
+    operationId: 'enrollStudentToCourse',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Student successfully enrolled into course',
+    type: EnrollStudentToCourseResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid Course ID',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Course not found',
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Failed to enroll student to course.',
+    schema: {
+      example: {
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Could not complete enrollment. Please try again later.',
+        requestId: 'req_3091ce57-0c00-4dcd-84fa-a06243ad4f62',
+      },
+    },
+  })
+  enrollStudentToCourse(
+    @CurrentSession() session: SessionData,
+    @Param('CourseId', ParseUUIDPipe) CourseId: string,
+  ): Promise<EnrollStudentToCourseResponseDto> {
+    return this.enrollmentService.enrollStudentToCourse({
+      userID: session.user.id,
+      courseID: CourseId,
+    });
+  } //END_enrollStudentToCourse
 } //CourseController
