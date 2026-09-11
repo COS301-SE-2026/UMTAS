@@ -64,12 +64,21 @@ import { getQueryClient } from "@/components/tanstack/getQueryClient";
 import Tutorial from "@/components/organisms/nav/Tutorial";
 import { fetchAllModulesv2 } from "../../../../utilities/V2-Builders/Modules";
 import {
-  CalendarCog,
   CalendarPlus,
   FileDown,
+  Menu,
+  MoreVertical,
+  Save,
   SquarePen,
   Trash2,
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/atoms/baseShadcn/dropdown-menu";
 
 const CALENDAR_TIMEZONE = "Africa/Johannesburg";
 const GOOGLE_CALENDAR_EXPORT_TIMEOUT_MS = 60_000;
@@ -626,7 +635,7 @@ export function ScheduleView({
                   ))}
                 </SelectContent>
               </Select>
-              <div className="flex justify-center md:justify-start pl-4">
+              <div className="pl-4">
                 <WeekNavBar
                   selectedDate={selectedDate}
                   onDateChange={setSelectedDate}
@@ -635,6 +644,97 @@ export function ScheduleView({
                   onNext={handleNextWeek}
                 />
               </div>
+              <div className="sm:hidden flex just\ ml-auto">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      aria-label="Timetable actions"
+                      id="btn-actions-menu"
+                      className="cursor-pointer"
+                      type="button"
+                      variant={"default"}
+                    >
+                      Actions
+                      <MoreVertical />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="end"
+                    className="bg-[var(--bg-surface)] border-[var(--border)]"
+                  >
+                    <DropdownMenuItem
+                      aria-label="Export to ICS"
+                      id="export-ics-item"
+                      disabled={exportingTo !== null}
+                      onClick={() => void exportToICS()}
+                      className="cursor-pointer"
+                    >
+                      {exportingTo === "ics" ? "Exporting…" : "Export .ics"}
+                      <FileDown />
+                    </DropdownMenuItem>
+                    {!isLoadingGoogleCalendarAccess && (
+                      <DropdownMenuItem
+                        aria-label="Connect Google Calendar"
+                        id="export-google-calendar-item"
+                        disabled={exportingTo !== null}
+                        onClick={handleGoogleCalendarExport}
+                        className="cursor-pointer"
+                      >
+                        {exportingTo === "google" ? (
+                          "Exporting…"
+                        ) : hasGoogleCalendarAccess ? (
+                          <>
+                            <span className="hidden sm:inline">
+                              Export to UMTAS Calendar
+                            </span>
+                            <span className="sm:hidden">Export</span>
+                          </>
+                        ) : (
+                          <>
+                            <span className="hidden sm:inline">
+                              Connect Google Calendar
+                            </span>
+                            <span className="sm:hidden">
+                              Save to Google Calendar
+                            </span>
+                          </>
+                        )}
+                      </DropdownMenuItem>
+                    )}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      aria-label="Create Timetable"
+                      id="create-item"
+                      className="cursor-pointer"
+                      onClick={createTimetable}
+                    >
+                      Create Timetable
+                      <CalendarPlus />
+                    </DropdownMenuItem>
+
+                    <DropdownMenuItem
+                      aria-label="Edit Timetable"
+                      id="edit-item"
+                      className="cursor-pointer"
+                      onClick={editTimetable}
+                    >
+                      Edit Timetable
+                      <SquarePen />
+                    </DropdownMenuItem>
+
+                    <DropdownMenuItem
+                      aria-label="Delete Timetable"
+                      id="delete-item"
+                      variant={"destructive"}
+                      className="cursor-pointer"
+                      onClick={deleteDialog}
+                    >
+                      Delete Timetable
+                      <Trash2 />
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
           </div>
 
@@ -642,15 +742,15 @@ export function ScheduleView({
             <EmptySchedule />
           ) : (
             <div className="flex flex-col">
-              <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between w-full pb-2">
-                <div className="grid grid-cols-2 gap-2 w-full sm:flex sm:w-auto sm:flex-wrap">
+              <div className="flex flex-col gap-2 flex-row items-center justify-between w-full pb-2">
+                <div className="hidden sm:flex sm:w-auto sm:flex-wrap gap-2">
                   <Button
                     aria-label="Export to ICS"
                     id="btn-export-ics"
                     type="button"
                     variant="outline"
                     disabled={exportingTo !== null}
-                    className="h-8 px-3 text-xs hover:opacity-90 cursor-pointer"
+                    className="h-8 px-3 hover:opacity-90 cursor-pointer"
                     onClick={() => void exportToICS()}
                   >
                     {exportingTo === "ics" ? "Exporting…" : "Export .ics"}
@@ -663,7 +763,7 @@ export function ScheduleView({
                       type="button"
                       variant="default"
                       disabled={exportingTo !== null}
-                      className="h-8 px-3 text-xs hover:opacity-90 cursor-pointer"
+                      className="h-8 px-3 hover:opacity-90 cursor-pointer"
                       onClick={handleGoogleCalendarExport}
                     >
                       {exportingTo === "google" ? (
@@ -678,15 +778,16 @@ export function ScheduleView({
                       ) : (
                         <>
                           <span className="hidden sm:inline">
-                            Connect Google Calendar
+                            Save to Google Calendar
                           </span>
+                          <Save />
                           <span className="sm:hidden">Google Calendar</span>
                         </>
                       )}
                     </Button>
                   )}
                 </div>
-                <div className="grid grid-cols-3 gap-2 w-full md:flex md:w-auto md:flex-wrap md:justify-end">
+                <div className="hidden sm:flex sm:w-auto sm:flex-wrap sm:justify-end gap-2">
                   <Button
                     aria-label="Create Timetable"
                     id="btn-create"
