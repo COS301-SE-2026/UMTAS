@@ -1,0 +1,14 @@
+apps/frontend/src/components/templates/stats/statsPageTemplate.tsx
+  h_2d4b3dca70a3d8 3,11-15,25-34,68-136,138
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "236ec1315b81079168e309a0b1f4a64e055b7a99",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
