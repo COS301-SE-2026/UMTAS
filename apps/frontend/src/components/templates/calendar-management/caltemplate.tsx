@@ -136,6 +136,7 @@ export default function CalTemplate() {
                 }}
               >
                 <SelectTrigger
+                  data-testid="SELECT_NEW_YEAR"
                   id="select-year"
                   className="w-[180px] bg-[var(--background)]"
                 >
@@ -179,13 +180,19 @@ export default function CalTemplate() {
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button className="w-fit capitalize">create restriction</Button>
+                <Button
+                  data-testid="CREATE_RESTRICTION"
+                  className="w-fit capitalize"
+                >
+                  create restriction
+                </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <DropdownMenuGroup>
                   {ResTypes.map((type, idx) => {
                     return (
                       <DropdownMenuItem
+                        data-testid={`MENU_ITEM_${type}`} // to select a specific type
                         className="capitalize"
                         key={idx}
                         onSelect={() => {
@@ -222,7 +229,7 @@ export default function CalTemplate() {
         <div className="w-full h-full items-center flex flex-col p-4 px-10">
           {flagtempRes && tempRes && selectedAcID && (
             <div className="border-dashed border-2 rounded-2xl my-2  flex flex-col items-center p-3 h-1/4">
-              <div key={tempRes.type}>
+              <div data-testid="TEMP_CONTAINER" key={tempRes.type}>
                 {handlers.handle(tempRes, currentAC, () => {
                   setFlagTempRes(false);
                   setTempRes(null);
@@ -234,7 +241,9 @@ export default function CalTemplate() {
             {selectedAcID &&
               restrictions?.restrictions.map((res) => {
                 return (
-                  <div key={res.id}>{handlers.handle(res, currentAC)}</div>
+                  <div data-testid="ADDED_CONTAINER" key={res.id}>
+                    {handlers.handle(res, currentAC)}
+                  </div>
                 );
               })}
           </div>

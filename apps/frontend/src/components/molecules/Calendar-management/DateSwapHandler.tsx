@@ -169,6 +169,7 @@ function DateSwapHtml({
               Day to swap
             </Label>
             <Select
+              data-testid="SELECT_DAY_VALUE"
               value={restriction?.replacementWeekday ?? "monday"}
               onValueChange={async (e) => {
                 if (e) {
@@ -181,6 +182,7 @@ function DateSwapHtml({
             >
               <SelectTrigger
                 id="select-day"
+                data-testid="SELECT_DAY"
                 className="h-10 w-full capitalize text-left"
               >
                 <SelectValue />
@@ -197,6 +199,8 @@ function DateSwapHtml({
         </div>
 
         <Button
+          data-testid="btn-delete-restriction"
+
           id="btn-delete-restriction"
           type="button"
           variant="ghost"
@@ -233,6 +237,8 @@ function DateSwapHtml({
           />
           <Button
             id="btn-save-restriction"
+            data-testid="btn-save-restriction"
+
             type="button"
             variant="ghost"
             size="icon"
