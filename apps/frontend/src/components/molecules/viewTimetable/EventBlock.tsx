@@ -17,6 +17,7 @@ import { errorName } from "../../../../utilities/errorCries";
 interface EventBlockProps {
   event: ScheduleEvent;
   date: string;
+  compact?: boolean;
 }
 
 function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
@@ -29,7 +30,7 @@ function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
   };
 }
 
-export function EventBlock({ event, date }: EventBlockProps) {
+export function EventBlock({ event, date, compact }: EventBlockProps) {
   const { mutate: createAttendance } = useMutation({
     ...addEventAttendanceMut(),
   });
@@ -114,39 +115,43 @@ export function EventBlock({ event, date }: EventBlockProps) {
         <p className="text-xs font-medium text-[var(--text-primary)] truncate leading-tight">
           {event.name}
         </p>
-        <p className="text-[7px] text-[var(--text-secondary)] capitalize font-medium truncate">
-          {!updatePending
-            ? attendData[0]?.state
-              ? attendData[0].state === "ATTENDING"
-                ? "Attending"
-                : "Not attending"
-              : ""
-            : "updating"}
-        </p>
+        {!compact && (
+          <p className="text-[7px] text-[var(--text-secondary)] capitalize font-medium truncate">
+            {!updatePending
+              ? attendData[0]?.state
+                ? attendData[0].state === "ATTENDING"
+                  ? "Attending"
+                  : "Not attending"
+                : ""
+              : "updating"}
+          </p>
+        )}
       </span>
 
-      {event.type && (
+      {!compact && event.type && (
         <span className="text-[10px] font-medium uppercase tracking-[0.04em] text-[var(--text-secondary)] truncate">
           {event.type}
         </span>
       )}
 
-      {event.subLabel && (
+      {!compact && event.subLabel && (
         <span className="text-[10px]  flex flex-row font-medium uppercase tracking-[0.04em] text-[var(--text-secondary)] truncate">
           {event.subLabel}
         </span>
       )}
 
-      <div className="flex items-center gap-1 mt-auto">
-        <Clock
-          size={10}
-          className="text-[var(--text-secondary)] flex-shrink-0"
-          strokeWidth={1.5}
-        />
-        <p className="text-[10px] text-[var(--text-secondary)] font-medium truncate">
-          {event.startTime} - {event.endTime}
-        </p>
-      </div>
+      {!compact && (
+        <div className="flex items-center gap-1 mt-auto">
+          <Clock
+            size={10}
+            className="text-[var(--text-secondary)] flex-shrink-0"
+            strokeWidth={1.5}
+          />
+          <p className="text-[10px] text-[var(--text-secondary)] font-medium truncate">
+            {event.startTime} - {event.endTime}
+          </p>
+        </div>
+      )}
     </div>
   );
 }
