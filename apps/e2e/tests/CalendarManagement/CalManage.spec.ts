@@ -27,7 +27,7 @@ test("Calendar Page add Calendar year", async ({ page }) => {
   await expect(page.getByText("2030")).toBeVisible();
 });
 
-test("Calendar Page add Restriction holiday", async ({ page }) => {
+test("Calendar Page add Restriction SingleDate", async ({ page }) => {
   await page.goto("/calendar-management");
   await page.getByTestId("SELECT_NEW_YEAR").click();
   await page.getByRole("option", { name: "2030" }).click();
@@ -64,7 +64,75 @@ test("Calendar Page add Restriction holiday", async ({ page }) => {
   await expect(
     page.getByTestId("ADDED_CONTAINER").getByTestId("restriction-dsc-Input"),
   ).toHaveValue("Test Holiday");
+  await expect(
+    page.getByTestId("ADDED_CONTAINER").getByTestId("restriction-Date-Input"),
+  ).toHaveValue("2030-12-30");
+  await page
+    .getByTestId("ADDED_CONTAINER")
+    .getByTestId("btn-delete-restriction")
+    .click();
+});
 
+test("Calendar Page add Restriction Range", async ({ page }) => {
+  await page.goto("/calendar-management");
+  await page.getByTestId("SELECT_NEW_YEAR").click();
+  await page.getByRole("option", { name: "2030" }).click();
+  await expect(page.getByText("2030")).toBeVisible();
+
+  const SingleDateType: ResTypes = "RECESS";
+
+  await page.getByTestId(`CREATE_RESTRICTION`).click();
+  await page.getByTestId(`MENU_ITEM_${SingleDateType}`).click();
+
+  await expect(
+    page
+      .getByTestId("TEMP_CONTAINER")
+      .getByTestId("restriction-Date-Input-start"),
+  ).toBeVisible();
+
+  await expect(
+    page
+      .getByTestId("TEMP_CONTAINER")
+      .getByTestId("restriction-Date-Input-end"),
+  ).toBeVisible();
+
+  await expect(
+    page.getByTestId("TEMP_CONTAINER").getByTestId("restriction-dsc-Input"),
+  ).toBeVisible();
+
+  await page
+    .getByTestId("TEMP_CONTAINER")
+    .getByTestId("restriction-Date-Input-start")
+    .fill("2030-10-10");
+
+  await page
+    .getByTestId("TEMP_CONTAINER")
+    .getByTestId("restriction-Date-Input-end")
+    .fill("2030-10-12");
+
+  await page
+    .getByTestId("TEMP_CONTAINER")
+    .getByTestId("restriction-dsc-Input")
+    .fill("Test Range");
+
+  await page
+    .getByTestId("TEMP_CONTAINER")
+    .getByTestId("btn-save-restriction")
+    .click();
+
+  await expect(
+    page.getByTestId("ADDED_CONTAINER").getByTestId("restriction-dsc-Input"),
+  ).toHaveValue("Test Range");
+  await expect(
+    page
+      .getByTestId("ADDED_CONTAINER")
+      .getByTestId("restriction-Date-Input-start"),
+  ).toHaveValue("2030-10-10");
+  await expect(
+    page
+      .getByTestId("ADDED_CONTAINER")
+      .getByTestId("restriction-Date-Input-end"),
+  ).toHaveValue("2030-10-12");
   await page
     .getByTestId("ADDED_CONTAINER")
     .getByTestId("btn-delete-restriction")
