@@ -1,0 +1,14 @@
+apps/frontend/src/app/reset-password/page.tsx
+  h_2d4b3dca70a3d8 15,21-35,87-88,90-107,110-132,134-189
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "9414e43d8831c620d0d7e3706d86d1d764c212d5",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
