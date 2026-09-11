@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/atoms/baseShadcn/button";
 import { formatWeekRange } from "@/lib/scheduleUtils";
 
@@ -24,7 +24,7 @@ export function WeekNavBar({
 
   return (
     <div className="flex flex-col sm:flex-row items-center gap-3 mb-4">
-      <div className="flex items-center justify-center gap-3">
+      {/* <div className="flex items-center justify-center gap-3">
         <Button
           type="button"
           variant="ghost"
@@ -56,20 +56,23 @@ export function WeekNavBar({
             strokeWidth={1.5}
           />
         </Button>
-      </div>
+      </div> */}
 
-      <input
-        aria-label="select date "
-        data-testid="schedules-Date-Input"
-        type="date"
-        value={dateString}
-        onChange={(e) => {
-          if (e.target.value) {
-            onDateChange(new Date(e.target.value));
-          }
-        }}
-        className="h-8 w-full sm:w-auto rounded-md border border-[var(--border)] bg-transparent px-2 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--ring)]"
-      />
+      <div className="relative flex items-center justify-center h-8 w-8 rounded-md border border-[var(--border)] hover:bg-[var(--accent)] cursor-pointer text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
+        <Calendar size={16} strokeWidth={1.5} className="pointer-events-none" />
+        <input
+          aria-label="select date "
+          data-testid="schedules-Date-Input"
+          type="date"
+          value={dateString}
+          onChange={(e) => {
+            if (e.target.value) {
+              onDateChange(new Date(e.target.value));
+            }
+          }}
+          className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+        />
+      </div>
     </div>
   );
 }
