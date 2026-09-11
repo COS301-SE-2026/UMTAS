@@ -1,0 +1,14 @@
+apps/frontend/src/app/verify-email/page.tsx
+  h_2d4b3dca70a3d8 11,19-29,64-75,77-80,82-91,93-96,98-118,120-147
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "1ea8e9ec28e8951b536b7657f0735f1c74537de4",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
