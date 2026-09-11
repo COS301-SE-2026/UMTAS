@@ -1,0 +1,14 @@
+apps/frontend/src/components/templates/map/UniMap.tsx
+  h_2d4b3dca70a3d8 25,92-113,129-160,162-236,238
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "ec4e1c14b930f81405e73d116245fe8292332657",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
