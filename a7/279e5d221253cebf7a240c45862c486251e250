@@ -1,0 +1,16 @@
+apps/frontend/src/app/tutorial/page.tsx
+  h_2d4b3dca70a3d8 2-3,22-32,35-49,51
+apps/frontend/src/components/templates/tutorial/TutorialShell.tsx
+  h_2d4b3dca70a3d8 41,43,62
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "a7279e5d221253cebf7a240c45862c486251e250",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
