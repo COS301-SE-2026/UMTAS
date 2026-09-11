@@ -618,7 +618,8 @@ export function ScheduleView({
               >
                 <SelectTrigger
                   id="select-timetable"
-                  className="bg-[var(--bg-surface)] border-[var(--border)]"
+                  className="bg-[var(--bg-surface)] border-[var(--border)] cursor-pointer"
+                  title="Select Timetable"
                 >
                   <SelectValue placeholder="Select a Timetable" />
                 </SelectTrigger>
@@ -644,7 +645,7 @@ export function ScheduleView({
                   onNext={handleNextWeek}
                 />
               </div>
-              <div className="sm:hidden flex just\ ml-auto">
+              <div className="sm:hidden flex justify-end ml-auto">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
@@ -795,6 +796,7 @@ export function ScheduleView({
                     variant="default"
                     className="h-8 px-3 text-xs hover:opacity-90 cursor-pointer"
                     onClick={createTimetable}
+                    title="Add Timetable"
                   >
                     <CalendarPlus />
                   </Button>
@@ -806,6 +808,7 @@ export function ScheduleView({
                     variant="outline"
                     className="h-8 px-3 text-xs hover:opacity-90 cursor-pointer"
                     onClick={editTimetable}
+                    title="Edit Timetable"
                   >
                     <SquarePen />
                   </Button>
@@ -818,6 +821,7 @@ export function ScheduleView({
                     variant={"destructive"}
                     className="h-8 px-3 text-xs hover:opacity-90 cursor-pointer"
                     onClick={deleteDialog}
+                    title="Delete Timetable"
                   >
                     <Trash2 />
                   </Button>

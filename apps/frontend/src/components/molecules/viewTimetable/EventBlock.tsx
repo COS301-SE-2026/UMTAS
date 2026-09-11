@@ -83,7 +83,7 @@ export function EventBlock({ event, date }: EventBlockProps) {
 
   return (
     <div
-      className="flex flex-col gap-1 rounded-sm border-l-[3px] px-2 py-1.5 h-full overflow-hidden"
+      className="flex flex-col gap-1 rounded-sm border-l-[3px] px-2 py-1.5 h-full overflow-hidden cursor-pointer"
       onClick={() => {
         if (currentAttendance) {
           updateAttendance({
@@ -108,6 +108,7 @@ export function EventBlock({ event, date }: EventBlockProps) {
         }
       }}
       style={getBlockStyle()}
+      title="Click to Change Attendance"
     >
       <span className="text-[10px] flex flex-row gap-1 font-medium uppercase tracking-[0.04em] text-[var(--text-secondary)] truncate">
         <p className="text-xs font-medium text-[var(--text-primary)] truncate leading-tight">
