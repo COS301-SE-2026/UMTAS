@@ -28,6 +28,7 @@ import {
   resolveAuthRedirectTarget,
   storeAuthRedirectTarget,
 } from "@/lib/auth-redirect";
+import Tutorial from "@/components/organisms/nav/Tutorial";
 
 interface FieldErrors {
   name?: string;
@@ -69,6 +70,22 @@ function mapAuthError(message: string): string {
   }
   return "Account creation failed. Check your details and try again.";
 }
+
+const steps = [
+  {
+    target: "#register-form",
+    content: "Enter your details to create your UMTAS account.",
+  },
+  {
+    target: "#create-account-btn",
+    content:
+      "Click here to create your account once your details are complete.",
+  },
+  {
+    target: "#google-signup",
+    content: "Alternatively, you can create your account using Google.",
+  },
+];
 
 export function RegisterForm() {
   const router = useRouter();
@@ -140,142 +157,85 @@ export function RegisterForm() {
   const anyLoading = isEmailLoading || isGoogleLoading;
 
   return (
-    <Card
-      className="w-full max-w-[440px] bg-[var(--bg-surface)] border border-[var(--border)]"
-      style={{
-        boxShadow: "0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08)",
-      }}
-    >
-      <CardContent className="p-8 flex flex-col gap-6">
-        <div className="flex flex-col gap-1">
-          <UmtasLogo size="md" className="mb-2" />
-          <h1
-            className="text-[32px] font-semibold leading-tight text-[var(--text-primary)]"
-            style={{ fontFamily: "var(--font-dm-sans)" }}
-          >
-            Create your account
-          </h1>
-          <p className="text-[14px] text-[var(--text-secondary)] leading-relaxed">
-            Set up your UMTAS account to start building your timetable
-          </p>
-        </div>
+    <>
+      <Tutorial steps={steps} wait={true} />
 
-        {globalError && <AuthAlert type="error" message={globalError} />}
+      <Card
+        className="w-full max-w-[440px] bg-[var(--bg-surface)] border border-[var(--border)]"
+        style={{
+          boxShadow: "0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08)",
+        }}
+      >
+        <CardContent className="p-8 flex flex-col gap-6">
+          <div className="flex flex-col gap-1">
+            <UmtasLogo size="md" className="mb-2" />
 
-        <form
-          onSubmit={handleEmailSignUp}
-          className="flex flex-col gap-4"
-          noValidate
-          aria-label="Create account form"
-        >
-          <FormField
-            id="register-name"
-            label="Full Name"
-            error={fieldErrors.name}
-          >
-            <Input
-              type="text"
-              placeholder="e.g. Jane Smith"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              autoComplete="name"
-              required
-              disabled={anyLoading}
-              className="h-9 bg-[var(--bg-base)] border-[var(--border)] text-[var(--text-primary)] placeholder:text-[var(--text-disabled)]"
-            />
-          </FormField>
-
-          <FormField
-            id="register-email"
-            label="Email"
-            error={fieldErrors.email}
-          >
-            <Input
-              type="email"
-              placeholder="e.g. student@up.ac.za"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              autoComplete="email"
-              required
-              disabled={anyLoading}
-              className="h-9 bg-[var(--bg-base)] border-[var(--border)] text-[var(--text-primary)] placeholder:text-[var(--text-disabled)]"
-            />
-          </FormField>
-
-          <div className="flex flex-col gap-2">
-            <FormField
-              id="register-password"
-              label="Password"
-              error={fieldErrors.password}
+            <h1
+              className="text-[32px] font-semibold leading-tight text-[var(--text-primary)]"
+              style={{ fontFamily: "var(--font-dm-sans)" }}
             >
-              <PasswordInput
-                placeholder="Create a password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                autoComplete="new-password"
-                required
-                disabled={anyLoading}
-                className="h-9 bg-[var(--bg-base)] border-[var(--border)] text-[var(--text-primary)] placeholder:text-[var(--text-disabled)]"
-              />
-            </FormField>
-            <PasswordStrengthBadge password={password} />
+              Create your account
+            </h1>
+
+            <p className="text-[14px] text-[var(--text-secondary)] leading-relaxed">
+              Set up your UMTAS account to start building your timetable
+            </p>
           </div>
 
-          <FormField
-            id="register-confirm-password"
-            label="Confirm Password"
-            error={fieldErrors.confirmPassword}
+          {globalError && <AuthAlert type="error" message={globalError} />}
+
+          <form
+            id="register-form"
+            onSubmit={handleEmailSignUp}
+            className="flex flex-col gap-4"
+            noValidate
+            aria-label="Create account form"
           >
-            <PasswordInput
-              placeholder="Repeat your password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              autoComplete="new-password"
-              required
+            {/* existing form fields */}
+
+            <Button
+              id="create-account-btn"
+              type="submit"
               disabled={anyLoading}
-              className="h-9 bg-[var(--bg-base)] border-[var(--border)] text-[var(--text-primary)] placeholder:text-[var(--text-disabled)]"
+              className="w-full h-9 font-medium text-[14px] bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] hover:bg-[var(--btn-primary-hover)] transition-colors duration-150"
+            >
+              {isEmailLoading ? (
+                <>
+                  <Loader2
+                    size={14}
+                    className="animate-spin mr-2"
+                    aria-hidden="true"
+                  />
+                  Creating account…
+                </>
+              ) : (
+                "Create account"
+              )}
+            </Button>
+          </form>
+
+          <AuthDivider />
+
+          <div id="google-signup">
+            <GoogleSignInButton
+              onClick={handleGoogleSignUp}
+              label="Sign up with Google"
+              isLoading={isGoogleLoading}
+              disabled={anyLoading}
             />
-          </FormField>
+          </div>
 
-          <Button
-            type="submit"
-            disabled={anyLoading}
-            className="w-full h-9 font-medium text-[14px] bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] hover:bg-[var(--btn-primary-hover)] transition-colors duration-150"
-          >
-            {isEmailLoading ? (
-              <>
-                <Loader2
-                  size={14}
-                  className="animate-spin mr-2"
-                  aria-hidden="true"
-                />
-                Creating account…
-              </>
-            ) : (
-              "Create account"
-            )}
-          </Button>
-        </form>
-
-        <AuthDivider />
-
-        <GoogleSignInButton
-          onClick={handleGoogleSignUp}
-          label="Sign up with Google"
-          isLoading={isGoogleLoading}
-          disabled={anyLoading}
-        />
-
-        <p className="text-[12px] text-[var(--text-secondary)] text-center">
-          Already have an account?{" "}
-          <Link
-            href={buildAuthLinkHref("/login", redirectTarget)}
-            className="text-[var(--text-primary)] underline-offset-2 hover:underline transition-colors duration-150"
-          >
-            Log in
-          </Link>
-        </p>
-      </CardContent>
-    </Card>
+          <p className="text-[12px] text-[var(--text-secondary)] text-center">
+            Already have an account?{" "}
+            <Link
+              href={buildAuthLinkHref("/login", redirectTarget)}
+              className="text-[var(--text-primary)] underline-offset-2 hover:underline transition-colors duration-150"
+            >
+              Log in
+            </Link>
+          </p>
+        </CardContent>
+      </Card>
+    </>
   );
 }
