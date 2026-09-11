@@ -1,0 +1,18 @@
+apps/frontend/src/components/organisms/forms/ForgotPasswordForm.tsx
+  h_2d4b3dca70a3d8 17-28,55-56,58-76,79-104,106-153
+apps/frontend/src/components/organisms/forms/LoginForm.tsx
+  h_2d4b3dca70a3d8 30-45,126-158,160-221,224,226-227,229-230,232,234-237
+apps/frontend/src/components/organisms/forms/RegisterForm.tsx
+  h_2d4b3dca70a3d8 31,74-89,160-178,180-183,185,187-192,194,196-200,202-223,226,228-239
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "2a7d1a7e65005716bca387027d8b8acea0624299",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
