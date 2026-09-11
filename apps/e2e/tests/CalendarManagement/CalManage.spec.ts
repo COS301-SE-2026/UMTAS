@@ -378,22 +378,22 @@ test.describe("Calendar", () => {
 
     // updates -------------
     await page
-      .getByTestId("TEMP_CONTAINER")
+      .getByTestId("ADDED_CONTAINER")
       .getByTestId("restriction-Date-Input-start")
       .fill("2030-12-10");
 
     await page
-      .getByTestId("TEMP_CONTAINER")
+      .getByTestId("ADDED_CONTAINER")
       .getByTestId("restriction-Date-Input-end")
       .fill("2030-12-30");
 
     await page
-      .getByTestId("TEMP_CONTAINER")
+      .getByTestId("ADDED_CONTAINER")
       .getByTestId("restriction-dsc-Input")
       .fill("Test Range UPDATED");
 
     await page
-      .getByTestId("TEMP_CONTAINER")
+      .getByTestId("ADDED_CONTAINER")
       .getByTestId("btn-save-restriction")
       .click();
     // saved now check
