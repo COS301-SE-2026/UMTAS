@@ -1,0 +1,24 @@
+.gitignore
+  h_2d4b3dca70a3d8 159-161
+apps/e2e/tests/CalendarManagement/CalManage.spec.ts
+  h_2d4b3dca70a3d8 1-418
+apps/frontend/src/components/molecules/Calendar-management/DateRestrictionHandler.tsx
+  h_2d4b3dca70a3d8 140-141,179
+apps/frontend/src/components/molecules/Calendar-management/DateSwapHandler.tsx
+  h_2d4b3dca70a3d8 172,185,202-203,240-241
+apps/frontend/src/components/molecules/Calendar-management/RangeRestrictionHandler.tsx
+  h_2d4b3dca70a3d8 165,201
+apps/frontend/src/components/templates/calendar-management/caltemplate.tsx
+  h_2d4b3dca70a3d8 2,44,51,66,106-108,110,122,126,138,143,145,149-151,155,159-160,167,171,181,186,195,209-211,214-216,228,231-235,239,245,251,268,271,281,286-291,293,295-305
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "c73fecfd01320393c005e7af9c48e9d0ab4be511",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
