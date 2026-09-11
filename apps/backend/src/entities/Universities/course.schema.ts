@@ -10,6 +10,7 @@ import {
 } from 'drizzle-orm/pg-core';
 import { modules } from '../Modules';
 import { University } from './University.schema';
+import { usersTable } from '../auth';
 
 //Main table defining the "owner" of the grouped modules
 export const ModuleGrouping = pgTable('ModuleGrouping', {
@@ -78,23 +79,26 @@ export const CourseModule = pgTable('CourseModule', {
   YearOfStudy: integer('YearOfStudy'),
 });
 
-// export const Course = pgTable('Course', {
-//   CourseID: uuid('courseID').defaultRandom().primaryKey(),
-//   CourseName: varchar('courseName', { length: 30 }).notNull(),
-//   UniversityID: uuid('UniversityID') // university owns
-//     .references(() => University.UniversityID, { onDelete: 'cascade' })
-//     .notNull(),
-// });
-
-// export const CourseModule = pgTable(
-//   'CourseModule',
-//   {
-//     ModuleID: uuid('ModuleID')
-//       .references(() => modules.moduleID, { onDelete: 'cascade' })
-//       .notNull(),
-//     CourseID: uuid('CourseID')
-//       .references(() => Course.CourseID, { onDelete: 'cascade' })
-//       .notNull(),
-//   },
-//   (table) => [primaryKey({ columns: [table.CourseID, table.ModuleID] })],
-// );
+//Course Enrollment
+export const CourseEnrollment = pgTable(
+  'CourseEnrollment',
+  {
+    EnrollmentID: uuid('EnrollmentID').primaryKey().defaultRandom(),
+    UserID: uuid('UserID')
+      .references(() => usersTable.id, { onDelete: 'cascade' })
+      .notNull(),
+    CourseID: uuid('CourseID')
+      .references(() => Course.CourseID, { onDelete: 'cascade' })
+      .notNull(),
+    enrolledAt: timestamp('enrolledAt', { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => ({
+    // Prevent duplicate enrollments of the same student in the same course
+    studentCourseUnique: uniqueIndex('student_course_unique').on(
+      table.UserID,
+      table.CourseID,
+    ),
+  }),
+);
