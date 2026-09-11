@@ -241,7 +241,9 @@ export default function CalTemplate() {
             {selectedAcID &&
               restrictions?.restrictions.map((res) => {
                 return (
-                  <div key={res.id}>{handlers.handle(res, currentAC)}</div>
+                  <div data-testid="ADDED_CONTAINER" key={res.id}>
+                    {handlers.handle(res, currentAC)}
+                  </div>
                 );
               })}
           </div>

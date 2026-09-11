@@ -138,3 +138,57 @@ test("Calendar Page add Restriction Range", async ({ page }) => {
     .getByTestId("btn-delete-restriction")
     .click();
 });
+
+test("Calendar Page add Restriction Day swap", async ({ page }) => {
+  await page.goto("/calendar-management");
+  await page.getByTestId("SELECT_NEW_YEAR").click();
+  await page.getByRole("option", { name: "2030" }).click();
+  await expect(page.getByText("2030")).toBeVisible();
+
+  const SingleDateType: ResTypes = "DAY_SWAP";
+
+  await page.getByTestId(`CREATE_RESTRICTION`).click();
+  await page.getByTestId(`MENU_ITEM_${SingleDateType}`).click();
+
+  await expect(
+    page.getByTestId("TEMP_CONTAINER").getByTestId("restriction-Date-Input"),
+  ).toBeVisible();
+
+  await page.getByTestId("SELECT_DAY").click();
+  await page.getByRole("option", { name: "Wednesday" }).click();
+
+  await expect(
+    page.getByTestId("TEMP_CONTAINER").getByTestId("restriction-dsc-Input"),
+  ).toBeVisible();
+
+  await page
+    .getByTestId("TEMP_CONTAINER")
+    .getByTestId("restriction-Date-Input")
+    .fill("2030-12-30");
+
+  await page
+    .getByTestId("TEMP_CONTAINER")
+    .getByTestId("restriction-dsc-Input")
+    .fill("Test DAYSWAP");
+
+  await page
+    .getByTestId("TEMP_CONTAINER")
+    .getByTestId("btn-save-restriction")
+    .click();
+
+  await expect(
+    page.getByTestId("ADDED_CONTAINER").getByTestId("restriction-dsc-Input"),
+  ).toHaveValue("Test DAYSWAP");
+  await expect(
+    page.getByTestId("ADDED_CONTAINER").getByTestId("restriction-Date-Input"),
+  ).toHaveValue("2030-12-30");
+
+  await expect(
+    page.getByTestId("ADDED_CONTAINER").getByTestId("SELECT_DAY"),
+  ).toHaveText("wednesday");
+
+  await page
+    .getByTestId("ADDED_CONTAINER")
+    .getByTestId("btn-delete-restriction")
+    .click();
+});
