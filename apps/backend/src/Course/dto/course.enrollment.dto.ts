@@ -27,4 +27,10 @@ export class EnrollStudentToCourseResponseDto extends BaseCourseEnrollmentRespon
   EnrolledAt!: Date;
 } //END_EnrollStudentToCourseResponseDto
 
-export class UnenrollStudentFromCourseResponseDto {}
+export class UnenrollStudentFromCourseResponseDto extends BaseCourseEnrollmentResponseDto {
+  @ApiProperty({
+    description: 'Message indicating success of unenrollment',
+    example: 'Succesfully unenrolled student from course',
+  })
+  message?: string;
+} //END_UnenrollStudentFromCourseResponseDto
