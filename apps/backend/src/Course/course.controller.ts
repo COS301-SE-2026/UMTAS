@@ -36,7 +36,10 @@ import { Roles } from 'src/auth/roles.guard';
 import { CourseServiceV2 } from './courseV2.service';
 import { CurrentSession } from 'src/auth/session.decorator';
 import type { SessionData } from 'src/auth/session.decorator';
-import { EnrollStudentToCourseResponseDto } from './dto/course.enrollment.dto';
+import {
+  EnrollStudentToCourseResponseDto,
+  UnenrollStudentFromCourseResponseDto,
+} from './dto/course.enrollment.dto';
 import { CourseEnrollmentService } from './course.enrollment.service';
 
 @ApiTags('Courses')
@@ -255,7 +258,7 @@ export class CourseController {
   }
 
   //Enroll Student into a course
-  @Post('enroll-course/:CourseId')
+  @Post('course-enrollment/:CourseId')
   @Roles('student')
   @ApiOperation({
     summary: 'Enroll the current user/student into a course',
@@ -294,4 +297,45 @@ export class CourseController {
       courseID: CourseId,
     });
   } //END_enrollStudentToCourse
+
+  //UnEnroll Student from a course
+  @Delete('course-unenrollment/:CourseId')
+  @Roles('student')
+  @ApiOperation({
+    summary: 'Enenroll the current user/student from a course',
+    operationId: 'UnenrollStudentFromCourse',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Student successfully unenrolled from course',
+    type: UnenrollStudentFromCourseResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid Course ID',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Course not found',
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Failed to unenroll student from course.',
+    schema: {
+      example: {
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Could not complete unenrollment. Please try again later.',
+        requestId: 'req_3091ce57-0c00-4dcd-84fa-a06243ad4f62',
+      },
+    },
+  })
+  unenrollStudentFromCourse(
+    @CurrentSession() session: SessionData,
+    @Param('CourseId', ParseUUIDPipe) CourseId: string,
+  ): Promise<UnenrollStudentFromCourseResponseDto> {
+    return this.enrollmentService.unenrollStudentFromCourse({
+      userID: session.user.id,
+      courseID: CourseId,
+    });
+  } //END_unenrollStudentToCourse
 } //CourseController

@@ -103,7 +103,7 @@ export class CourseEnrollmentService {
 
     if (!tx) {
       return await this.dbService.db.transaction(async (t: AppDatabase) => {
-        return this.enrollStudentToCourse({ ...options, tx: t });
+        return this.unenrollStudentFromCourse({ ...options, tx: t });
       });
     } //END_tx precence check
 
