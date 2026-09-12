@@ -125,14 +125,14 @@ export default function ModulesShell({
   }
 
   return (
-    <Card className="w-fit m-6 p-4">
-      <div className="flex flex-row gap-6">
-        <div className="flex flex-col gap-2 min-w-[240px]">
-          <div className="flex gap-1 bg-muted p-1 rounded-md mb-1">
+    <Card className="w-[720px] h-[600px] m-6 p-4 flex flex-col overflow-hidden">
+      <div className="flex flex-row gap-6 h-full min-h-0">
+        <div className="flex flex-col gap-2 min-w-[240px] h-full">
+          <div className="flex gap-1 bg-muted p-1 rounded-md mb-1 flex-shrink-0">
             <Button
               size="sm"
               variant="ghost"
-              className="h-7 text-xs flex-1 text-muted-foreground"
+              className="h-7 text-xs flex-1 text-muted-foreground cursor-pointer"
               onClick={() => {
                 onViewModeChange?.("Events");
               }}
@@ -142,27 +142,28 @@ export default function ModulesShell({
             <Button
               size="sm"
               variant="secondary"
-              className="h-7 text-xs flex-1 font-semibold"
+              className="h-7 text-xs flex-1 font-semibold cursor-pointer"
             >
               Modules
             </Button>
           </div>
 
-          <div className="flex flex-col gap-2 [280px]max-h- overflow-y-auto pr-1">
+          <div className="flex flex-col gap-2 overflow-y-auto pr-1 flex-1">
             {modules.map((module) => (
               <CustomiseModulePanel
                 module={module}
                 key={module.moduleID}
+                isSelected={selectedModuleId === module.moduleID}
                 onClick={() => setSelectedModuleId(module.moduleID)}
               />
             ))}
           </div>
         </div>
 
-        <div className="w-[1px] bg-border self-stretch" />
+        <div className="w-[1px] bg-border self-stretch flex-shrink-0" />
 
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center justify-between pb-3 border-b min-w-[320px]">
+        <div className="flex flex-col gap-4 flex-1 h-full min-h-0">
+          <div className="flex items-center justify-between pb-3 border-b min-w-[320px] flex-shrink-0">
             <span className="text-sm font-semibold">
               {tempModule.moduleName}
               {" | "}
@@ -192,7 +193,9 @@ export default function ModulesShell({
             </div>
           </div>
 
-          <CustomiseModuleCard module={tempModule} onUpdate={handleUpdate} />
+          <div className="flex-1 overflow-y-auto pr-2">
+            <CustomiseModuleCard module={tempModule} onUpdate={handleUpdate} />
+          </div>
         </div>
       </div>
     </Card>

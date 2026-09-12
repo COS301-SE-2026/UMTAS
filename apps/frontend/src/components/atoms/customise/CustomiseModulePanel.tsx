@@ -2,20 +2,26 @@ import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
 
 interface ModulePanelProps {
   module: ModuleResponseDto;
+  isSelected: boolean;
   onClick?: () => void;
 }
 
 export default function CustomiseModulePanel({
   module,
+  isSelected,
   onClick,
 }: ModulePanelProps) {
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2 cursor-pointer">
       <div className="flex items-center gap-2">
         <button
           type="button"
           onClick={onClick}
-          className="flex flex-1 items-center gap-3 rounded-lg border px-4 py-4 text-left"
+          className={`flex flex-1 items-center gap-3 rounded-lg border px-4 py-4 text-left transition-colors ${
+            isSelected
+              ? "bg-[var(--bg-elevated)] border-[var(--ring)]"
+              : "border-[var(--border)] bg-[var(--bg-surface)] hover:bg-[var(--bg-elevated)] cursor-pointer"
+          }`}
         >
           <span
             className="h-3 w-3 rounded-full flex-shrink-0"
