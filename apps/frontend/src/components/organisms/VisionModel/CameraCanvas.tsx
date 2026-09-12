@@ -2,12 +2,9 @@
 import { Button } from "@/components/atoms/baseShadcn/button";
 import { useEffect, useRef, useState } from "react";
 import { CircleX } from "lucide-react";
-import Webcam from "react-webcam";
-import { boolean } from "better-auth";
 
 export default function CameraCanvas() {
   const [cameraOn, setCameraOn] = useState(true);
-  const [CameraLoading, setCameraLoading] = useState(false);
 
   return (
     <div className="w-full h-full justify-around flex flex-col gap-y-4 p-4">
@@ -20,7 +17,6 @@ export default function CameraCanvas() {
             className="flex gap-x-2"
             onClick={() => {
               setCameraOn(!cameraOn);
-              setCameraLoading(true);
             }}
           >
             Camera Disabled
@@ -32,7 +28,6 @@ export default function CameraCanvas() {
         <Button
           onClick={() => {
             setCameraOn(!cameraOn);
-            setCameraLoading(true);
           }}
         >
           {cameraOn ? <>Switch camera off</> : <>Switch camera on</>}
