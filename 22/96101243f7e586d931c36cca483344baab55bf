@@ -1,0 +1,16 @@
+apps/frontend/src/app/calendar-management/page.tsx
+  h_2d4b3dca70a3d8 1-3,6-27,30-36
+apps/frontend/src/components/templates/calendar-management/caltemplate.tsx
+  h_2d4b3dca70a3d8 148
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "2296101243f7e586d931c36cca483344baab55bf",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
