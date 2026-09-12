@@ -10,6 +10,10 @@ variable "CI_SOLVER_IMAGE" {
   default = "umtas-ci-solver:local"
 }
 
+group "default" {
+  targets = ["backend", "pdf-parser-worker", "solver-worker"]
+}
+
 target "backend" {
   context    = "."
   dockerfile = "docker/backend/backend.Dockerfile"
