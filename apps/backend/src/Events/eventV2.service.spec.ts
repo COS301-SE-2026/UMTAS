@@ -649,5 +649,29 @@ describe('EventServiceV2', () => {
         },
       ]);
     });
+
+    it('should use the default venue name when venue name is empty', async () => {
+      const university = createUniversity();
+
+      (mockDb.select as unknown as jest.Mock).mockReturnValue(
+        createDbChain([]),
+      );
+      (mockDb.insert as unknown as jest.Mock).mockReturnValue(
+        createDbChain([
+          {
+            VenueID: venueId,
+            VenueName: 'Default VenueName',
+            BuildingID: null,
+          },
+        ]),
+      );
+
+      await expect(
+        (service as any).validateAndCreateVenueName(mockDb, university, '   '),
+      ).resolves.toMatchObject({
+        venueId,
+        venueName: 'Default VenueName',
+      });
+    });
   });
 });

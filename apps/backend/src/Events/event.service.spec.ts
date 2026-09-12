@@ -20,6 +20,7 @@ import { UniversityService } from '../University/university.service';
 import {
   createDbChain,
   createMockDatabase,
+  mockDbResult,
   mockSequentialResults,
   mockTransaction,
 } from '../Testing/Mocks/';
@@ -772,6 +773,14 @@ describe('EventService', () => {
       expect(mockDb.delete).not.toHaveBeenCalled();
     });
 
+    it('should throw if the event does not exist during deletion', async () => {
+      jest.spyOn(service, 'getById').mockResolvedValue(undefined as any);
+
+      await expect(
+        service.deleteEvent(userId, 'uni_admin', eventId, mockDb),
+      ).rejects.toThrow(`Event [${eventId}] doesn't exist`);
+    });
+
     it('should delete event - admin', async () => {
       const event = createEvent();
 
@@ -1101,6 +1110,26 @@ describe('EventService', () => {
       );
 
       expect(result.event).toMatchObject(mappedEvent);
+    });
+
+    it('should map event venues to venue DTOs', async () => {
+      mockDbResult(mockDb.select, [
+        {
+          venueId,
+          venueName: 'Test Venue',
+          buildingId: 'building-1',
+        },
+      ]);
+
+      await expect(
+        (service as any).getEventVenues(eventId, mockDb),
+      ).resolves.toEqual([
+        {
+          venueId,
+          venueName: 'Test Venue',
+          buildingId: 'building-1',
+        },
+      ]);
     });
   });
 });
