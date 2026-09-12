@@ -1,0 +1,22 @@
+apps/backend/test/integration-runner/integration.compose.yml
+  h_2d4b3dca70a3d8 57
+apps/e2e/e2e.compose.yml
+  h_2d4b3dca70a3d8 57
+docker-compose.prod.yml
+  h_2d4b3dca70a3d8 40
+docker-compose.staging.yml
+  h_2d4b3dca70a3d8 40
+docker-compose.yml
+  h_2d4b3dca70a3d8 57
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "3e2d8682bf104c380e2d7d1e5d2554931ba17b6e",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
