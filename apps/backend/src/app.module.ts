@@ -25,7 +25,6 @@ import { VenueModule } from './Venue/venue.module';
 import { BuildingModule } from './Building/building.module';
 import { MapConfigModule } from './Map-config/map-config.module';
 import { ApiServiceModule } from './ApiService/ApiService.module';
-import { AnalyticsModule } from './AnalyticsService/analytics.module';
 import { RouteModule } from './Route/route.module';
 import { AcademicCalendarModule } from './academic_calendar/academic_calendar.module';
 import { PostHogModule } from './posthog/posthog.module';
@@ -54,7 +53,6 @@ import { PostHogModule } from './posthog/posthog.module';
     RouteModule,
     AcademicCalendarModule,
     ApiServiceModule,
-    AnalyticsModule,
   ],
   controllers: [AppController, AuthController],
   providers: [
