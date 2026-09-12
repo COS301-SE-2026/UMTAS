@@ -99,7 +99,11 @@ export class CourseServiceV2 extends CourseService {
     const courseWithModules = {
       ...course,
       Modules: (
-        await this.moduleService.getAll(userId, { courseId: course.CourseID })
+        await this.moduleService.getAll(
+          userId,
+          { courseId: course.CourseID },
+          db,
+        )
       ).modules,
     };
 
