@@ -6,16 +6,16 @@ import Webcam from "react-webcam";
 import { boolean } from "better-auth";
 
 export default function CameraCanvas() {
-  const webcamRef = useRef<Webcam>(null);
   const [cameraOn, setCameraOn] = useState(true);
   const [CameraLoading, setCameraLoading] = useState(false);
 
   return (
     <div className="w-full h-full justify-around flex flex-col gap-y-4 p-4">
       <div className="w-full h-full flex flex-col justify-center items-center text-center border rounded-xl ">
-        {cameraOn ? (
-          <div className="">{/* canvas go here */}</div>
-        ) : (
+        <div className="">
+          <CanvasWebcam isCameraActive={cameraOn} />
+        </div>
+        {!cameraOn && (
           <p
             className="flex gap-x-2"
             onClick={() => {
@@ -52,6 +52,10 @@ function CanvasWebcam({ isCameraActive }: CanvasCamProps) {
   const [cameraLoaded, setCameraLoaded] = useState<boolean>(false);
 
   useEffect(() => {
+    if (isCameraActive == false) {
+      return;
+    }
+
     let currentStream: MediaStream | null = null;
     async function startCam() {
       try {
@@ -70,6 +74,7 @@ function CanvasWebcam({ isCameraActive }: CanvasCamProps) {
         console.error(err);
       }
     }
+
     startCam();
 
     return () => {
@@ -77,7 +82,7 @@ function CanvasWebcam({ isCameraActive }: CanvasCamProps) {
         currentStream.getTracks().forEach((track) => track.stop());
       }
     };
-  }, []);
+  }, [isCameraActive]);
 
   useEffect(() => {
     if (!cameraLoaded) return;
@@ -104,10 +109,12 @@ function CanvasWebcam({ isCameraActive }: CanvasCamProps) {
     };
   }, [cameraLoaded]);
 
-  return (
+  return isCameraActive ? (
     <>
-      <video ref={videoRef} playsInline muted></video>
-      <canvas ref={canvasRef} width={640} height={640}></canvas>
+      <video ref={videoRef} playsInline muted className="hidden"></video>
+      <canvas ref={canvasRef} width={640} height={480}></canvas>
     </>
+  ) : (
+    <></>
   );
 }
