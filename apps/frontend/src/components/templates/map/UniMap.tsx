@@ -23,6 +23,7 @@ import {
   useUniversityState,
 } from "@/hooks/useUniversityState";
 import Tutorial from "@/components/organisms/nav/Tutorial";
+import { useBuildingDraw } from "@/hooks/useBuildingDraw";
 
 interface GeoJsonPolygon {
   type: "Polygon";
@@ -65,6 +66,8 @@ export function UniMap() {
     null,
   );
   const [adminMode, setAdminMode] = useState<"none" | "draw" | "pin">("none");
+  const buildingDraw = useBuildingDraw();
+  const { polygonPath, pinLocation } = buildingDraw;
   const [selectedDate, setSelectedDate] = useState(() =>
     new Date().toISOString().slice(0, 10),
   );
@@ -169,7 +172,12 @@ export function UniMap() {
         </div>
 
         <div id="university-map" className="flex-1 overflow-hidden">
-          <MapScreen onRequestMapSetup={() => router.push("/mapping/config")}>
+          <MapScreen
+            onRequestMapSetup={() => router.push("/mapping/config")}
+            adminMode={adminMode}
+            polygonPath={polygonPath}
+            pinLocation={pinLocation}
+          >
             {buildings.map((building) => (
               <div key={building.buildingId}>
                 {building.location && (
@@ -214,6 +222,7 @@ export function UniMap() {
             <AdminDrawControls
               buildings={buildings}
               onModeChange={setAdminMode}
+              drawingState={buildingDraw}
             />{" "}
           </div>
         )}

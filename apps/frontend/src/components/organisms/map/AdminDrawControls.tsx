@@ -19,11 +19,13 @@ import { CreateBuilding } from "@/components/organisms/map/CreateBuilding";
 interface AdminDrawControlsProps {
   buildings: BuildingType[];
   onModeChange: (mode: "none" | "draw" | "pin") => void;
+  drawingState: ReturnType<typeof useBuildingDraw>;
 }
 
 export function AdminDrawControls({
   buildings,
   onModeChange,
+  drawingState,
 }: AdminDrawControlsProps) {
   const [selectedBuildingId, setSelectedBuildingId] = useState<string>("");
   //from my little hook(er)
@@ -35,7 +37,7 @@ export function AdminDrawControls({
     reset,
     finishDrawing,
     toGeoJSON,
-  } = useBuildingDraw();
+  } = drawingState;
 
   useEffect(() => {
     onModeChange(mode);
