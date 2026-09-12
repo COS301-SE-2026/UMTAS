@@ -1,8 +1,7 @@
 name: umtas-integration
 
 networks:
-  integration:
-    internal: true
+  integration: {}
 
 volumes:
   postgres-data:
@@ -12,6 +11,8 @@ volumes:
 services:
   postgres:
     image: postgres:15-alpine
+    ports:
+      - '5432'
     environment:
       POSTGRES_DB: ${DB_NAME:-umtas_integration}
       POSTGRES_USER: ${DB_USER:-umtas_integration}
@@ -32,6 +33,8 @@ services:
 
   redis:
     image: redis:7-alpine
+    ports:
+      - '6379'
     command:
       - redis-server
       - --requirepass
@@ -55,6 +58,8 @@ services:
 
   minio:
     image: quay.io/minio/minio:RELEASE.2023-10-25T06-33-25Z
+    ports:
+      - '9000'
     command: server /data
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-integration-minio}
@@ -71,10 +76,15 @@ services:
 
   mailhog:
     image: mailhog/mailhog:v1.0.1
+    ports:
+      - '8025'
     networks:
       - integration
 
   backend:
+    image: ${CI_BACKEND_IMAGE:-umtas-integration-backend}
+    ports:
+      - '3000'
     build:
       context: ../../../..
       dockerfile: docker/backend/backend.Dockerfile
@@ -153,6 +163,7 @@ services:
       retries: 30
 
   pdf-parser-worker:
+    image: ${CI_PDF_PARSER_IMAGE:-umtas-integration-pdf-parser}
     build:
       context: ../../../..
       dockerfile: docker/pdf-parser-worker/pdf-parser-worker.Dockerfile
@@ -192,6 +203,7 @@ services:
     stop_grace_period: 90s
 
   solver-worker:
+    image: ${CI_SOLVER_IMAGE:-umtas-integration-solver}
     build:
       context: ../../../..
       dockerfile: docker/solver-worker/solver-worker.Dockerfile
@@ -222,32 +234,3 @@ services:
       timeout: 3s
       retries: 30
     stop_grace_period: 330s
-
-  test-runner:
-    build:
-      context: ../../../..
-      dockerfile: apps/backend/test/integration-runner/Dockerfile
-    environment:
-      CI: '1'
-      NODE_OPTIONS: --experimental-vm-modules
-      DB_MODE: DATABASE
-      FULL_STACK_BACKEND_URL: http://backend:3000
-      FULL_STACK_MAILHOG_URL: http://mailhog:8025
-      DATABASE_URL: postgresql://${DB_USER:-umtas_integration}:${DB_PASSWORD:-integration-postgres-password}@postgres:5432/${DB_NAME:-umtas_integration}
-      REDIS_URL: redis://:${REDIS_PASSWORD:-integration-redis-password}@redis:6379
-      REDIS_PASSWORD: ${REDIS_PASSWORD:-integration-redis-password}
-      MINIO_ENDPOINT: http://minio:9000
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-integration-minio}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-integration-minio-password}
-      MINIO_BUCKET: umtas-uploads
-    volumes:
-      - ./test-results:/workspace/apps/backend/test/integration-runner/test-results
-    networks:
-      - integration
-    depends_on:
-      backend:
-        condition: service_healthy
-      pdf-parser-worker:
-        condition: service_healthy
-      solver-worker:
-        condition: service_healthy

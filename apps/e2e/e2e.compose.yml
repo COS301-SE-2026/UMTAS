@@ -75,6 +75,7 @@ services:
       - e2e
 
   backend:
+    image: ${CI_BACKEND_IMAGE:-umtas-e2e-backend}
     build:
       context: ../..
       dockerfile: docker/backend/backend.Dockerfile
@@ -126,6 +127,7 @@ services:
       retries: 30
 
   pdf-parser-worker:
+    image: ${CI_PDF_PARSER_IMAGE:-umtas-e2e-pdf-parser}
     build:
       context: ../..
       dockerfile: docker/pdf-parser-worker/pdf-parser-worker.Dockerfile
@@ -165,6 +167,7 @@ services:
     stop_grace_period: 90s
 
   solver-worker:
+    image: ${CI_SOLVER_IMAGE:-umtas-e2e-solver}
     build:
       context: ../..
       dockerfile: docker/solver-worker/solver-worker.Dockerfile
