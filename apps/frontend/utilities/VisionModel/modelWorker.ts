@@ -31,6 +31,27 @@ function createSlices(payload: PIXEL_PAYLOAD) {
   ) as Float32Array[];
 }
 
+async function runModel(slices: Float32Array[], payload: PIXEL_PAYLOAD) {
+  const sliceHeight = payload.height / 2;
+  const sliceWidth = payload.width / 2;
+  const tensorShape = [1, 3, sliceHeight, sliceWidth];
+
+  const inputName = DetectSession?.inputNames[0];
+  const outputName = DetectSession?.outputNames[0];
+
+  if (inputName && outputName) {
+    const inferencePromises = slices.map(async (sliceData) => {
+      const inputTensor = new ort.Tensor("float32", sliceData, tensorShape);
+      const results = await DetectSession!.run({ [inputName]: inputTensor });
+      return results[outputName].data;
+    });
+
+    return await Promise.all(inferencePromises);
+  } else {
+    throw Error("Input and output names not set");
+  }
+}
+
 self.onmessage = async (event: MessageEvent) => {
   const message = event.data as DETECT_MESSAGE;
 
@@ -45,5 +66,11 @@ self.onmessage = async (event: MessageEvent) => {
     }
 
     const slices = createSlices(payload);
+
+    try {
+      runModel(slices, payload);
+    } catch (err) {
+      console.error(err);
+    }
   }
 };
