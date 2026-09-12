@@ -25,7 +25,7 @@ export default function CustomiseShellPopup() {
     <div className="">
       <AlertDialog>
         <AlertDialogTrigger asChild>
-          <Button id="btn-customise-schedule" variant="outline">
+          <Button id="btn-customise-schedule" variant="default">
             Customise
           </Button>
         </AlertDialogTrigger>
