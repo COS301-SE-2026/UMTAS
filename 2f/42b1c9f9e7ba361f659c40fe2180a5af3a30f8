@@ -1,0 +1,16 @@
+apps/frontend/src/components/molecules/roleManagement/DataTable.tsx
+  h_2d4b3dca70a3d8 253-269,271-280,282
+apps/frontend/src/components/organisms/roleManagement/UserDirectory.tsx
+  h_2d4b3dca70a3d8 25-30
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "2f42b1c9f9e7ba361f659c40fe2180a5af3a30f8",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
