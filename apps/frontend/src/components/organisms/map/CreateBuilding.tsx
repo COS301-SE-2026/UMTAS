@@ -69,7 +69,7 @@ export function CreateBuilding() {
       }}
     >
       <DialogTrigger asChild>
-        <Button size="sm" variant="secondary" className="gap-2">
+        <Button size="sm" variant="default" className="gap-2">
           <Plus size={14} strokeWidth={1} />
           New Building
         </Button>
@@ -101,7 +101,7 @@ export function CreateBuilding() {
             )}
           </div>
 
-          <div className="flex flex-col gap-2">
+          {/* <div className="flex flex-col gap-2">
             <Label htmlFor="building-icon">Icon (optional)</Label>
             <Input
               id="building-icon"
@@ -109,7 +109,7 @@ export function CreateBuilding() {
               onChange={(event) => setIcon(event.target.value)}
               placeholder="e.g. icon"
             />
-          </div>
+          </div> */}
 
           <div className="flex flex-col gap-2">
             <Label htmlFor="building-colour">Display colour</Label>
