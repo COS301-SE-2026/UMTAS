@@ -1,6 +1,4 @@
 use std::usize;
-
-use js_sys::JsString;
 use wasm_bindgen::prelude::*;
 
 pub struct SliceFormat {
@@ -61,14 +59,14 @@ pub fn extract_slice(
     pixel_data: &[u8],
     full_width: usize,
 ) -> js_sys::Float32Array {
-    let total_pix = start_pix.slice_width * start_pix.slice_height * 3;
+    let total_pix = start_pix.slice_width * start_pix.slice_height;
 
-    let mut slice = vec![0.0; total_pix];
+    let mut slice = vec![0.0; total_pix * 3];
 
     // one for loop to creage all 3 buffers of slice
     let mut r_offset = 0;
     let mut g_offset = total_pix;
-    let mut b_offset = total_pix + 2;
+    let mut b_offset = total_pix * 2;
 
     for row in 0..start_pix.slice_height {
         let global_y = start_pix.y + row;
