@@ -1,7 +1,7 @@
 import { Test } from '@nestjs/testing';
 
 //Constants
-import { userId, moduleId, uniId } from '../Testing/constants';
+import { userId, moduleId, uniId, venueId } from '../Testing/constants';
 
 //Actual Service imports
 import { DatabaseService } from '../db/database.service';
@@ -13,6 +13,7 @@ import { UniversityService } from '../University/university.service';
 import {
   createDbChain,
   createMockDatabase,
+  mockSequentialResults,
   mockTransaction,
 } from '../Testing/Mocks/';
 import {
@@ -248,6 +249,45 @@ describe('EventServiceV2', () => {
       expect(result).toMatchObject(expected);
     });
 
+    //Happy
+    it('should add venues when creating a V2 event', async () => {
+      const event = createEvent(EventSource.UNIVERSITY, {}, { moduleId });
+      const dto = {
+        ...createCreateEventDtoV2(event),
+        venues: [
+          {
+            venueId,
+            venueName: 'Test Venue',
+          },
+        ],
+      };
+
+      mockUniversityService.getById?.mockResolvedValue(createUniversity());
+      mockModuleServiceV2.getByIdV2?.mockResolvedValue(createModule());
+      mockEventFingerprintService.buildForEvent?.mockReturnValue('fingerprint');
+
+      mockTransaction(mockDb, {
+        select: [
+          [{ venueId }],
+          [
+            {
+              venueId,
+              venueName: 'Test Venue',
+              buildingId: null,
+            },
+          ],
+          [],
+          [],
+          [],
+        ],
+        insert: [[event], [createUniversityEvent()], []],
+      });
+
+      const result = await service.createV2(dto, userId, uniId);
+
+      expect(result.event.venues).toEqual(dto.venues);
+    });
+
     //Happy - return newly created event
     it('should create a new event', async () => {
       //Arrange
@@ -436,6 +476,178 @@ describe('EventServiceV2', () => {
 
       expect(recurring.dayOfWeek).toBeDefined();
       expect(single.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    });
+  });
+
+  describe('Test_Helpers', () => {
+    it('should throw if the event fingerprint cannot be created', async () => {
+      mockEventFingerprintService.buildForEvent?.mockReturnValue(null);
+
+      await expect(
+        (service as any).createEventV2(
+          mockDb,
+          createCreateEventDtoV2(createEvent()),
+        ),
+      ).rejects.toThrow(InternalServerErrorException);
+    });
+
+    it('should return an empty venue list when no venues are provided', async () => {
+      await expect(
+        (service as any).validateVenues(mockDb, uniId, []),
+      ).resolves.toEqual([]);
+    });
+
+    it('should normalize validated venues', async () => {
+      (mockDb.select as unknown as jest.Mock).mockReturnValue(
+        createDbChain([
+          {
+            venueId,
+            venueName: null,
+            buildingId: null,
+          },
+        ]),
+      );
+
+      await expect(
+        (service as any).validateVenues(mockDb, uniId, [
+          {
+            venueId,
+            venueName: 'Test Venue',
+          },
+        ]),
+      ).resolves.toEqual([
+        {
+          venueId,
+          venueName: 'noNameVenue',
+          buildingId: undefined,
+        },
+      ]);
+    });
+
+    it('should create a venue from a venue name', async () => {
+      const university = createUniversity();
+
+      (mockDb.select as unknown as jest.Mock).mockReturnValue(
+        createDbChain([]),
+      );
+      (mockDb.insert as unknown as jest.Mock).mockReturnValue(
+        createDbChain([
+          {
+            VenueID: venueId,
+            VenueName: 'New Venue',
+            BuildingID: null,
+          },
+        ]),
+      );
+
+      await expect(
+        (service as any).validateAndCreateVenueName(
+          mockDb,
+          university,
+          ' New Venue ',
+        ),
+      ).resolves.toMatchObject({
+        venueId,
+        venueName: 'New Venue',
+      });
+    });
+
+    it('should return an existing venue by name', async () => {
+      const university = createUniversity();
+
+      (mockDb.select as unknown as jest.Mock).mockReturnValue(
+        createDbChain([
+          {
+            venueId,
+            venueName: null,
+            buildingId: null,
+          },
+        ]),
+      );
+
+      await expect(
+        (service as any).validateAndCreateVenueName(
+          mockDb,
+          university,
+          'Existing Venue',
+        ),
+      ).resolves.toEqual({
+        venueId,
+        venueName: 'NoName',
+        buildingId: undefined,
+      });
+    });
+
+    it('should return an existing event for an existing fingerprint', async () => {
+      const event = createEvent();
+
+      mockEventFingerprintService.buildForEvent?.mockReturnValue('fingerprint');
+      mockSequentialResults(mockDb.select, [[event], []]);
+
+      const result = await (service as any).createEventV2(
+        mockDb,
+        createCreateEventDtoV2(event),
+      );
+
+      expect(result.event).toMatchObject({
+        eventId: event.eventID,
+      });
+    });
+
+    it('should throw if venue creation fails', async () => {
+      const university = createUniversity();
+
+      (mockDb.select as unknown as jest.Mock).mockReturnValue(
+        createDbChain([]),
+      );
+      (mockDb.insert as unknown as jest.Mock).mockReturnValue(
+        createDbChain([]),
+      );
+
+      await expect(
+        (service as any).validateAndCreateVenueName(
+          mockDb,
+          university,
+          'New Venue',
+        ),
+      ).rejects.toThrow('Failed to create venue');
+    });
+
+    it('should create a venue from venueName during DTO validation', async () => {
+      const university = createUniversity();
+
+      mockModuleServiceV2.getByIdV2?.mockResolvedValue(createModule());
+
+      (mockDb.select as unknown as jest.Mock).mockReturnValue(
+        createDbChain([]),
+      );
+      (mockDb.insert as unknown as jest.Mock).mockReturnValue(
+        createDbChain([
+          {
+            VenueID: venueId,
+            VenueName: 'New Venue',
+            BuildingID: null,
+          },
+        ]),
+      );
+
+      const result = await (service as any).validateCreateEventDto(
+        mockDb,
+        university,
+        {
+          eventCriteria: {
+            moduleId,
+          },
+          venueName: 'New Venue',
+        },
+      );
+
+      expect(result.venues).toMatchObject([
+        {
+          venueId,
+          venueName: 'New Venue',
+        },
+      ]);
     });
   });
 });
