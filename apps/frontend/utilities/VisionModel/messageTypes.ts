@@ -15,6 +15,8 @@ export type VisionModelEvent<PayloadType> = {
 
 export type PIXEL_PAYLOAD = {
   pixelData: Uint8ClampedArray;
+  width: number;
+  height: number;
 };
 
 export type DETECT_MESSAGE = VisionModelEvent<PIXEL_PAYLOAD>;
