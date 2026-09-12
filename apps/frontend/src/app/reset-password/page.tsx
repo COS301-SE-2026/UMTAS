@@ -12,10 +12,26 @@ import { FormField } from "@/components/molecules/OAuth/FormField";
 import { AuthAlert } from "@/components/molecules/OAuth/AuthAlert";
 import { AuthPageTemplate } from "@/components/templates/auth/AuthPageTemplate";
 import { authClient } from "@/../utilities/auth-client";
+import Tutorial from "@/components/organisms/nav/Tutorial";
 import {
   buildAuthLinkHref,
   resolveAuthRedirectTarget,
 } from "@/lib/auth-redirect";
+
+const steps = [
+  {
+    target: "#new-password",
+    content: "Enter your new password here.",
+  },
+  {
+    target: "#confirm-password",
+    content: "Enter your new password again to confirm it.",
+  },
+  {
+    target: "#reset-password-btn",
+    content: "Click here to reset your password.",
+  },
+];
 
 function ResetPasswordContent() {
   const router = useRouter();
@@ -68,104 +84,109 @@ function ResetPasswordContent() {
   }
 
   return (
-    <AuthPageTemplate>
-      <Card
-        className="w-full max-w-[400px] bg-[var(--bg-surface)] border border-[var(--border)]"
-        style={{
-          boxShadow: "0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08)",
-        }}
-      >
-        <CardContent className="p-8 flex flex-col gap-6">
-          <div className="flex flex-col gap-1">
-            <UmtasLogo size="md" className="mb-2" />
-            <h1
-              className="text-[32px] font-semibold leading-tight text-[var(--text-primary)]"
-              style={{ fontFamily: "var(--font-dm-sans)" }}
-            >
-              Set new password
-            </h1>
-            <p className="text-[14px] text-[var(--text-secondary)] leading-relaxed">
-              Must be at least 8 characters
-            </p>
-          </div>
+    <>
+      <Tutorial steps={steps} wait={true} />
 
-          {status === "success" ? (
-            <div className="flex flex-col items-center gap-3 text-center">
-              <CheckCircle
-                size={40}
-                className="text-[var(--success)]"
-                aria-hidden="true"
-              />
-              <p className="text-[14px] text-[var(--text-secondary)]">
-                {message}
+      <AuthPageTemplate>
+        <Card
+          className="w-full max-w-[400px] bg-[var(--bg-surface)] border border-[var(--border)]"
+          style={{
+            boxShadow: "0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08)",
+          }}
+        >
+          <CardContent className="p-8 flex flex-col gap-6">
+            <div className="flex flex-col gap-1">
+              <UmtasLogo size="md" className="mb-2" />
+              <h1
+                className="text-[32px] font-semibold leading-tight text-[var(--text-primary)]"
+                style={{ fontFamily: "var(--font-dm-sans)" }}
+              >
+                Set new password
+              </h1>
+              <p className="text-[14px] text-[var(--text-secondary)] leading-relaxed">
+                Must be at least 8 characters
               </p>
             </div>
-          ) : (
-            <>
-              {status === "error" && (
-                <AuthAlert type="error" message={message} />
-              )}
-              <form
-                onSubmit={handleReset}
-                className="flex flex-col gap-4"
-                noValidate
-                role="form"
-                aria-label="Reset password form"
-              >
-                <FormField id="new-password" label="New password">
-                  <PasswordInput
-                    id="new-password"
-                    placeholder="Enter new password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    autoComplete="new-password"
-                    required
-                    disabled={status === "loading"}
-                    className="h-9 bg-[var(--bg-base)] border-[var(--border)] text-[var(--text-primary)] placeholder:text-[var(--text-disabled)]"
-                  />
-                </FormField>
-                <FormField id="confirm-password" label="Confirm new password">
-                  <PasswordInput
-                    id="confirm-password"
-                    placeholder="Repeat new password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    autoComplete="new-password"
-                    required
-                    disabled={status === "loading"}
-                    className="h-9 bg-[var(--bg-base)] border-[var(--border)] text-[var(--text-primary)] placeholder:text-[var(--text-disabled)]"
-                  />
-                </FormField>
-                <Button
-                  type="submit"
-                  disabled={
-                    status === "loading" || !newPassword || !confirmPassword
-                  }
-                  className="w-full h-9 font-medium text-[14px] bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] hover:bg-[var(--btn-primary-hover)] transition-colors duration-150"
+
+            {status === "success" ? (
+              <div className="flex flex-col items-center gap-3 text-center">
+                <CheckCircle
+                  size={40}
+                  className="text-[var(--success)]"
+                  aria-hidden="true"
+                />
+                <p className="text-[14px] text-[var(--text-secondary)]">
+                  {message}
+                </p>
+              </div>
+            ) : (
+              <>
+                {status === "error" && (
+                  <AuthAlert type="error" message={message} />
+                )}
+                <form
+                  onSubmit={handleReset}
+                  className="flex flex-col gap-4"
+                  noValidate
+                  role="form"
+                  aria-label="Reset password form"
                 >
-                  {status === "loading" ? (
-                    <>
-                      <Loader2 size={14} className="animate-spin mr-2" />
-                      Resetting…
-                    </>
-                  ) : (
-                    "Reset password"
-                  )}
-                </Button>
-              </form>
-              <p className="text-[12px] text-[var(--text-secondary)] text-center">
-                <Link
-                  href={buildAuthLinkHref("/login", redirectTarget)}
-                  className="text-[var(--text-primary)] underline-offset-2 hover:underline transition-colors duration-150"
-                >
-                  Back to log in
-                </Link>
-              </p>
-            </>
-          )}
-        </CardContent>
-      </Card>
-    </AuthPageTemplate>
+                  <FormField id="new-password" label="New password">
+                    <PasswordInput
+                      id="new-password"
+                      placeholder="Enter new password"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      autoComplete="new-password"
+                      required
+                      disabled={status === "loading"}
+                      className="h-9 bg-[var(--bg-base)] border-[var(--border)] text-[var(--text-primary)] placeholder:text-[var(--text-disabled)]"
+                    />
+                  </FormField>
+                  <FormField id="confirm-password" label="Confirm new password">
+                    <PasswordInput
+                      id="confirm-password"
+                      placeholder="Repeat new password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      autoComplete="new-password"
+                      required
+                      disabled={status === "loading"}
+                      className="h-9 bg-[var(--bg-base)] border-[var(--border)] text-[var(--text-primary)] placeholder:text-[var(--text-disabled)]"
+                    />
+                  </FormField>
+                  <Button
+                    id="reset-password-btn"
+                    type="submit"
+                    disabled={
+                      status === "loading" || !newPassword || !confirmPassword
+                    }
+                    className="w-full h-9 font-medium text-[14px] bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] hover:bg-[var(--btn-primary-hover)] transition-colors duration-150"
+                  >
+                    {status === "loading" ? (
+                      <>
+                        <Loader2 size={14} className="animate-spin mr-2" />
+                        Resetting…
+                      </>
+                    ) : (
+                      "Reset password"
+                    )}
+                  </Button>
+                </form>
+                <p className="text-[12px] text-[var(--text-secondary)] text-center">
+                  <Link
+                    href={buildAuthLinkHref("/login", redirectTarget)}
+                    className="text-[var(--text-primary)] underline-offset-2 hover:underline transition-colors duration-150"
+                  >
+                    Back to log in
+                  </Link>
+                </p>
+              </>
+            )}
+          </CardContent>
+        </Card>
+      </AuthPageTemplate>
+    </>
   );
 }
 
