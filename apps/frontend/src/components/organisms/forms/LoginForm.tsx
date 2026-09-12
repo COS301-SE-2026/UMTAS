@@ -27,6 +27,22 @@ import {
   resolveAuthRedirectTarget,
   storeAuthRedirectTarget,
 } from "@/lib/auth-redirect";
+import Tutorial from "@/components/organisms/nav/Tutorial";
+
+const steps = [
+  {
+    target: "#login-form",
+    content: "Enter your email and password to access your UMTAS account.",
+  },
+  {
+    target: "#login-btn",
+    content: "Click here to log in once your details are complete.",
+  },
+  {
+    target: "#google-login",
+    content: "Alternatively, you can sign in using your Google account.",
+  },
+];
 
 function mapAuthError(message: string): string {
   if (
@@ -107,107 +123,117 @@ export function LoginForm() {
   const anyLoading = isEmailLoading || isGoogleLoading;
 
   return (
-    <Card
-      className="w-full max-w-[400px] bg-[var(--bg-surface)] border border-[var(--border)]"
-      style={{
-        boxShadow: "0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08)",
-      }}
-    >
-      <CardContent className="p-8 flex flex-col gap-6">
-        <div className="flex flex-col gap-1">
-          <UmtasLogo size="md" className="mb-2" />
-          <h1
-            className="text-[32px] font-semibold leading-tight text-[var(--text-primary)]"
-            style={{ fontFamily: "var(--font-dm-sans)" }}
-          >
-            Log in to UMTAS
-          </h1>
-          <p className="text-[14px] text-[var(--text-secondary)] leading-relaxed">
-            Enter your details to access your timetable
-          </p>
-        </div>
+    <>
+      <Tutorial steps={steps} wait={true} />
 
-        {error && <AuthAlert type="error" message={error} />}
+      <Card
+        className="w-full max-w-[400px] bg-[var(--bg-surface)] border border-[var(--border)]"
+        style={{
+          boxShadow: "0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08)",
+        }}
+      >
+        <CardContent className="p-8 flex flex-col gap-6">
+          <div className="flex flex-col gap-1">
+            <UmtasLogo size="md" className="mb-2" />
 
-        <form
-          onSubmit={handleEmailSignIn}
-          className="flex flex-col gap-4"
-          noValidate
-          aria-label="Email and password sign-in form"
-        >
-          <FormField id="login-email" label="Email">
-            <Input
-              type="email"
-              placeholder="e.g. student@up.ac.za"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              autoComplete="email"
-              required
-              disabled={anyLoading}
-              className="h-9 bg-[var(--bg-base)] border-[var(--border)] text-[var(--text-primary)] placeholder:text-[var(--text-disabled)]"
-            />
-          </FormField>
-
-          <FormField id="login-password" label="Password">
-            <PasswordInput
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete="current-password"
-              required
-              disabled={anyLoading}
-              className="h-9 bg-[var(--bg-base)] border-[var(--border)] text-[var(--text-primary)] placeholder:text-[var(--text-disabled)]"
-            />
-          </FormField>
-
-          <div className="flex justify-end -mt-2">
-            <Link
-              href="/forgot-password"
-              className="text-[12px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] underline-offset-2 hover:underline transition-colors duration-150"
+            <h1
+              className="text-[32px] font-semibold leading-tight text-[var(--text-primary)]"
+              style={{ fontFamily: "var(--font-dm-sans)" }}
             >
-              Forgot password?
-            </Link>
+              Log in to UMTAS
+            </h1>
+
+            <p className="text-[14px] text-[var(--text-secondary)] leading-relaxed">
+              Enter your details to access your timetable
+            </p>
           </div>
 
-          <Button
-            type="submit"
-            disabled={anyLoading || !email || !password}
-            className="w-full h-9 font-medium text-[14px] bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] hover:bg-[var(--btn-primary-hover)] transition-colors duration-150"
+          {error && <AuthAlert type="error" message={error} />}
+
+          <form
+            id="login-form"
+            onSubmit={handleEmailSignIn}
+            className="flex flex-col gap-4"
+            noValidate
+            aria-label="Email and password sign-in form"
           >
-            {isEmailLoading ? (
-              <>
-                <Loader2
-                  size={14}
-                  className="animate-spin mr-2"
-                  aria-hidden="true"
-                />
-                Signing in…
-              </>
-            ) : (
-              "Log in"
-            )}
-          </Button>
-        </form>
+            <FormField id="login-email" label="Email">
+              <Input
+                type="email"
+                placeholder="e.g. student@up.ac.za"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                autoComplete="email"
+                required
+                disabled={anyLoading}
+                className="h-9 bg-[var(--bg-base)] border-[var(--border)] text-[var(--text-primary)] placeholder:text-[var(--text-disabled)]"
+              />
+            </FormField>
 
-        <AuthDivider />
+            <FormField id="login-password" label="Password">
+              <PasswordInput
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
+                required
+                disabled={anyLoading}
+                className="h-9 bg-[var(--bg-base)] border-[var(--border)] text-[var(--text-primary)] placeholder:text-[var(--text-disabled)]"
+              />
+            </FormField>
 
-        <GoogleSignInButton
-          onClick={handleGoogleSignIn}
-          label="Continue with Google"
-          isLoading={isGoogleLoading}
-          disabled={anyLoading}
-        />
+            <div className="flex justify-end -mt-2">
+              <Link
+                href="/forgot-password"
+                className="text-[12px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] underline-offset-2 hover:underline transition-colors duration-150"
+              >
+                Forgot password?
+              </Link>
+            </div>
 
-        <p className="text-[12px] text-[var(--text-secondary)] text-center">
-          Don&apos;t have an account?{" "}
-          <Link
-            href={buildAuthLinkHref("/register", redirectTarget)}
-            className="text-[var(--text-primary)] underline-offset-2 hover:underline transition-colors duration-150"
-          >
-            Register
-          </Link>
-        </p>
-      </CardContent>
-    </Card>
+            <Button
+              id="login-btn"
+              type="submit"
+              disabled={anyLoading || !email || !password}
+              className="w-full h-9 font-medium text-[14px] bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] hover:bg-[var(--btn-primary-hover)] transition-colors duration-150"
+            >
+              {isEmailLoading ? (
+                <>
+                  <Loader2
+                    size={14}
+                    className="animate-spin mr-2"
+                    aria-hidden="true"
+                  />
+                  Signing in…
+                </>
+              ) : (
+                "Log in"
+              )}
+            </Button>
+          </form>
+
+          <AuthDivider />
+
+          <div id="google-login">
+            <GoogleSignInButton
+              onClick={handleGoogleSignIn}
+              label="Continue with Google"
+              isLoading={isGoogleLoading}
+              disabled={anyLoading}
+            />
+          </div>
+
+          <p className="text-[12px] text-[var(--text-secondary)] text-center">
+            Don&apos;t have an account?{" "}
+            <Link
+              href={buildAuthLinkHref("/register", redirectTarget)}
+              className="text-[var(--text-primary)] underline-offset-2 hover:underline transition-colors duration-150"
+            >
+              Register
+            </Link>
+          </p>
+        </CardContent>
+      </Card>
+    </>
   );
 }
