@@ -9,7 +9,7 @@ import { MessageCircleQuestionIcon } from "lucide-react";
 import { Button } from "@/components/atoms/baseShadcn/button";
 
 import Tutorial from "@/components/organisms/nav/Tutorial";
-import { useUniversityState } from "@/hooks/useUniversityState";
+import { UserDetails } from "@/lib/userclass/userClass";
 
 const cmdkTutorialSteps = [
   {
@@ -253,8 +253,7 @@ export function HelpCommandPalette() {
     },
   ];
 
-  const { university } = useUniversityState();
-  const role = university?.role;
+  const role = UserDetails.getUniDetails()?.role;
 
   const filteredPages = pages
     .map((group) => ({
