@@ -1,7 +1,15 @@
 import { FaqCategorySection } from "@/components/organisms/faq/faqOrganisms";
 // import { helpCentreData } from '../../types/faq';
 // import { FaqCategorySection } from '@/components/organisms/faq/faqOrganisms';
+import Tutorial from "@/components/organisms/nav/Tutorial";
 
+const steps = [
+  {
+    target: "#faq-categories",
+    content:
+      "Browse the help categories and select a question to view its answer.",
+  },
+];
 export interface FaqItem {
   id: string;
   question: string;
@@ -116,23 +124,26 @@ const johanHierisDieData: helpCentreData = {
 
 const HelpCentrePage = () => {
   return (
-    <main className="max-w-[1280px] mx-auto py-12 px-6 md:px-8">
-      <div className="mb-12 space-y-4">
-        <h1 className="text-[32px] font-semibold leading-[1.2] text-primary tracking-normal">
-          Help Centre
-        </h1>
-        <p className="text-[14px] font-normal leading-[1.6] text-primary max-w-2xl">
-          Find clear answers to common questions about UMTAS, PDF parsing, and
-          timetable generation.
-        </p>
-      </div>
+    <>
+      <Tutorial steps={steps} wait={true} />
+      <main className="max-w-[1280px] mx-auto py-12 px-6 md:px-8">
+        <div className="mb-12 space-y-4">
+          <h1 className="text-[32px] font-semibold leading-[1.2] text-primary tracking-normal">
+            Help Centre
+          </h1>
+          <p className="text-[14px] font-normal leading-[1.6] text-primary max-w-2xl">
+            Find clear answers to common questions about UMTAS, PDF parsing, and
+            timetable generation.
+          </p>
+        </div>
 
-      <div className="space-y-12 max-w-4xl">
-        {johanHierisDieData.categories.map((category) => (
-          <FaqCategorySection key={category.id} category={category} />
-        ))}
-      </div>
-    </main>
+        <div id="faq-categories" className="space-y-12 max-w-4xl">
+          {johanHierisDieData.categories.map((category) => (
+            <FaqCategorySection key={category.id} category={category} />
+          ))}
+        </div>
+      </main>
+    </>
   );
 };
 
