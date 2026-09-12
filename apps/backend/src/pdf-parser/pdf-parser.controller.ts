@@ -8,6 +8,8 @@ import {
   NotFoundException,
   Param,
   Post,
+  Res,
+  ServiceUnavailableException,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -18,8 +20,10 @@ import {
   ApiBearerAuth,
   ApiBody,
   ApiConsumes,
+  ApiCookieAuth,
   ApiOkResponse,
   ApiOperation,
+  ApiProduces,
   ApiTags,
 } from '@nestjs/swagger';
 import type { PdfParserCallbackPayload, PdfParserResult } from 'shared-types';
@@ -42,6 +46,9 @@ import {
 } from './dto/pdf-parser-job-response.dto';
 import { PdfParseSubmission } from './pdf-parse-submission';
 import { PdfParserJobStoreService } from './pdf-parser-job-store.service';
+import { ObjectStorageService } from '../storage/object-storage.service';
+import type { Response } from 'express';
+import { Readable } from 'node:stream';
 
 @ApiTags('PDF Parser')
 @Controller('pdf-parser')
@@ -49,7 +56,72 @@ export class PdfParserController {
   constructor(
     private readonly jobStore: PdfParserJobStoreService,
     private readonly submission: PdfParseSubmission,
+    private readonly storage: ObjectStorageService,
   ) {}
+
+  @Get('demo-pdf')
+  @ApiCookieAuth('umtas-session')
+  @ApiProduces('application/pdf')
+  @ApiOperation({
+    summary:
+      'Download the configured University of Pretoria demo timetable PDF',
+    operationId: 'getDemoPdf',
+  })
+  @ApiOkResponse({
+    description: 'The configured demo PDF is returned as an attachment.',
+    content: {
+      'application/pdf': { schema: { type: 'string', format: 'binary' } },
+    },
+  })
+  async getDemoPdf(@Res() res: Response): Promise<void> {
+    const key = process.env.GUEST_DEMO_PDF_KEY?.trim();
+    if (!key) {
+      throw new ServiceUnavailableException('Demo PDF is not configured');
+    }
+
+    let object: Awaited<ReturnType<ObjectStorageService['getObject']>>;
+    try {
+      object = await this.storage.getObject(key);
+    } catch {
+      throw new ServiceUnavailableException(
+        'Demo PDF is temporarily unavailable',
+      );
+    }
+
+    if (!object.Body) {
+      throw new ServiceUnavailableException(
+        'Demo PDF is temporarily unavailable',
+      );
+    }
+
+    let body: Buffer;
+    try {
+      body = await readObjectBody(object.Body);
+    } catch {
+      throw new ServiceUnavailableException(
+        'Demo PDF is temporarily unavailable',
+      );
+    }
+
+    if (
+      body.length === 0 ||
+      !body.subarray(0, 5).equals(Buffer.from('%PDF-'))
+    ) {
+      throw new ServiceUnavailableException(
+        'Configured demo object is not a PDF',
+      );
+    }
+
+    res.status(200);
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename="${getDemoPdfFilename()}"`,
+    );
+    res.setHeader('Cache-Control', 'private, no-store');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.end(body);
+  }
 
   @Post('jobs/lookup')
   @ApiOperation({
@@ -249,6 +321,61 @@ interface UploadedPdfFile {
   mimetype: string;
   buffer: Buffer;
   size: number;
+}
+
+async function readObjectBody(
+  body: NonNullable<
+    Awaited<ReturnType<ObjectStorageService['getObject']>>['Body']
+  >,
+): Promise<Buffer> {
+  const withTransform = body as typeof body & {
+    transformToByteArray?: () => Promise<Uint8Array>;
+  };
+  if (typeof withTransform.transformToByteArray === 'function') {
+    return Buffer.from(await withTransform.transformToByteArray());
+  }
+
+  if (body instanceof Uint8Array) return Buffer.from(body);
+  if (body instanceof Readable) {
+    const chunks: Buffer[] = [];
+    for await (const chunk of body) {
+      chunks.push(bufferFromChunk(chunk));
+    }
+    return Buffer.concat(chunks);
+  }
+
+  if (isAsyncIterable(body)) {
+    const chunks: Buffer[] = [];
+    for await (const chunk of body) {
+      chunks.push(bufferFromChunk(chunk));
+    }
+    return Buffer.concat(chunks);
+  }
+
+  throw new Error('Unsupported object storage body');
+}
+
+function bufferFromChunk(chunk: unknown): Buffer {
+  if (Buffer.isBuffer(chunk)) return Buffer.from(chunk);
+  if (typeof chunk === 'string' || chunk instanceof Uint8Array) {
+    return Buffer.from(chunk);
+  }
+  throw new Error('Unsupported object storage chunk');
+}
+
+function isAsyncIterable(
+  value: unknown,
+): value is AsyncIterable<Uint8Array | string> {
+  return (
+    typeof value === 'object' && value !== null && Symbol.asyncIterator in value
+  );
+}
+
+function getDemoPdfFilename(): string {
+  const configured = process.env.GUEST_DEMO_PDF_FILENAME?.trim();
+  return configured && /^[a-zA-Z0-9._-]+\.pdf$/i.test(configured)
+    ? configured
+    : 'umtas-demo-timetable.pdf';
 }
 
 interface PdfParserLookupRequestBody {

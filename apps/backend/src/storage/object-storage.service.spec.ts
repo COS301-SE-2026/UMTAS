@@ -1,5 +1,6 @@
 import {
   CreateBucketCommand,
+  GetObjectCommand,
   HeadBucketCommand,
   PutObjectCommand,
   S3Client,
@@ -173,6 +174,26 @@ describe('ObjectStorageService', () => {
       Bucket: 'umtas-uploads',
       ContentLength: 3,
       ContentType: undefined,
+    });
+  });
+
+  it('gets an object from the configured bucket', async () => {
+    process.env.MINIO_BUCKET = 'configured-bucket';
+    const { commands, client } = createClient(() => ({
+      Body: Buffer.from('%PDF-1.7'),
+      ContentType: 'application/pdf',
+    }));
+
+    await expect(
+      new ObjectStorageService(client).getObject('demo/file.pdf'),
+    ).resolves.toEqual({
+      Body: expect.any(Buffer),
+      ContentType: 'application/pdf',
+    });
+    expect(commands[0]).toBeInstanceOf(GetObjectCommand);
+    expect((commands[0] as GetObjectCommand).input).toEqual({
+      Bucket: 'configured-bucket',
+      Key: 'demo/file.pdf',
     });
   });
 
