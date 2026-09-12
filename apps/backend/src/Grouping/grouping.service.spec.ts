@@ -368,4 +368,17 @@ describe('GroupingService', () => {
       expect(spy).toHaveBeenCalled();
     });
   }); //END_Test_populateGroup
+
+  //RemoveModulesFromGroup
+  describe('Test_removeModulesFromGroup', () => {
+    it('should remove modules from a group', async () => {
+      mockDbResult(mockDb.delete, []);
+
+      await expect(
+        service.removeModulesFromGroup(groupId, [moduleId], mockDb),
+      ).resolves.toBeUndefined();
+
+      expect(mockDb.delete).toHaveBeenCalledTimes(1);
+    });
+  });
 });
