@@ -14,10 +14,10 @@ const noUniLinks = [
 const basicLinks = [
   { href: "/module-management", label: "Manage Modules / Events" },
   { href: "/map", label: "Map" },
+  { href: "/course-management", label: "Manage Courses" },
 ];
 
 const extraAdminLinks = [
-  { href: "/course-management", label: "Manage Courses" },
   { href: "/role-management", label: "Manage Roles" },
   { href: "/calendar-management", label: "Manage Calendars" },
   { href: "/stats", label: "Stats" },

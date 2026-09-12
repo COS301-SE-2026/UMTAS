@@ -5,6 +5,7 @@ import {
 } from '@nestjs/swagger';
 import {
   IsArray,
+  IsBoolean,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -85,8 +86,11 @@ export class CourseDto {
 
   @ApiPropertyOptional({
     type: Boolean,
+    example: false,
     description: 'true if the user is enrolled in this course false if not',
   })
+  @IsOptional()
+  @IsBoolean()
   isEnrolled?: boolean;
 }
 

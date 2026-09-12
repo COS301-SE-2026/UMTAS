@@ -2814,6 +2814,11 @@ export interface components {
        * @example 12345
        */
       ExternalID?: string | null;
+      /**
+       * @description true if the user is enrolled in this course false if not
+       * @example false
+       */
+      isEnrolled?: boolean;
     };
     CourseFilters: {
       /**
@@ -2869,6 +2874,11 @@ export interface components {
        * @example 12345
        */
       ExternalID?: string | null;
+      /**
+       * @description true if the user is enrolled in this course false if not
+       * @example false
+       */
+      isEnrolled?: boolean;
     };
     CourseListResponseDto: {
       /** @description List of courses */
@@ -2915,6 +2925,11 @@ export interface components {
        * @example 12345
        */
       ExternalID?: string | null;
+      /**
+       * @description true if the user is enrolled in this course false if not
+       * @example false
+       */
+      isEnrolled?: boolean;
     };
     DeleteCourseResponseDto: {
       /**

@@ -221,6 +221,8 @@ export default function CourseManagementTemplate() {
 
   const isStudent = university.role === "STUDENT";
 
+  const enrolledCourse = courseData.find((course) => course.isEnrolled);
+
   return (
     <>
       <Tutorial steps={steps} wait={true} />
@@ -351,7 +353,7 @@ export default function CourseManagementTemplate() {
                         </TableCell>
                         <TableCell className="p-4 text-right">
                           <div className="flex justify-end gap-2">
-                            {isStudent == true ? (
+                            {isStudent == false ? (
                               <Button
                                 size="sm"
                                 variant="outline"
@@ -359,14 +361,24 @@ export default function CourseManagementTemplate() {
                               >
                                 Edit
                               </Button>
-                            ) : (
+                            ) : enrolledCourse?.CourseID == null ? (
                               <Button
                                 size="sm"
                                 variant="outline"
-                                onClick={() => setCourseToEdit(course)}
+                                onClick={() => {}}
                               >
                                 Enroll
                               </Button>
+                            ) : enrolledCourse.CourseID == course.CourseID ? (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => {}}
+                              >
+                                Un-Enroll
+                              </Button>
+                            ) : (
+                              <></>
                             )}
                             <Button
                               id="btn-view-modules"

@@ -56,7 +56,7 @@ export default function CourseCustimisation({
 }
 
 interface CourseInputProps {
-  field: keyof Omit<CourseDTO, "Modules">;
+  field: keyof Omit<CourseDTO, "Modules" | "isEnrolled">;
   state: StateHolder;
 }
 interface StateHolder {
