@@ -1,0 +1,14 @@
+.github/workflows/ci.yml
+  h_2d4b3dca70a3d8 7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "64ac04833d1a2380ebdfd9de67d2c5123694eaaf",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
