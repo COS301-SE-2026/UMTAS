@@ -35,7 +35,9 @@ export default function CustomiseShellPopup() {
             <AlertDialogTitle className="text-xl font-bold">
               Customise Events and Modules
             </AlertDialogTitle>
-            <AlertDialogCancel className="mt-0">Close</AlertDialogCancel>
+            <AlertDialogCancel className="mt-0 cursor-pointer">
+              Close
+            </AlertDialogCancel>
           </AlertDialogHeader>
 
           <div className="overflow-auto max-h-[80vh]">

@@ -26,7 +26,7 @@ export default function CustomiseEventPanel({
           onClick={onClick}
           className={`flex flex-1 items-center gap-3 rounded-lg border px-4 py-4 text-left transition-colors ${
             isSelected
-              ? "bg-[var(--bg-elevated)] border-[var(--ring)]"
+              ? "bg-[var(--bg-elevated)] border-[var(--text-disabled)]"
               : "border-[var(--border)] bg-[var(--bg-surface)] hover:bg-[var(--bg-elevated)] cursor-pointer"
           }`}
         >
