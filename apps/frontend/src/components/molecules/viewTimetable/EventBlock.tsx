@@ -115,17 +115,16 @@ export function EventBlock({ event, date, compact }: EventBlockProps) {
         <p className="text-xs font-medium text-[var(--text-primary)] truncate leading-tight">
           {event.name}
         </p>
-        {!compact && (
-          <p className="text-[7px] text-[var(--text-secondary)] capitalize font-medium truncate">
-            {!updatePending
-              ? attendData[0]?.state
-                ? attendData[0].state === "ATTENDING"
-                  ? "Attending"
-                  : "Not attending"
-                : ""
-              : "updating"}
-          </p>
-        )}
+
+        <p className="text-[7px] text-[var(--text-secondary)] capitalize font-medium truncate">
+          {!updatePending
+            ? attendData[0]?.state
+              ? attendData[0].state === "ATTENDING"
+                ? "Attending"
+                : "Not attending"
+              : ""
+            : "updating"}
+        </p>
       </span>
 
       {!compact && event.type && (
