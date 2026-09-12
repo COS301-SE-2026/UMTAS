@@ -783,15 +783,15 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
     /**
      * Enroll the current user/student into a course
      * @description Enroll the current user/student into a course. This Courses operation is part of the versioned UMTAS HTTP contract.
      */
-    post: operations["enrollStudentToCourse"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
+    patch: operations["enrollStudentToCourse"];
     trace?: never;
   };
   "/api/Courses/course-unenrollment/{CourseId}": {

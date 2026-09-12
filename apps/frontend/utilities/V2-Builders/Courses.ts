@@ -24,7 +24,7 @@ export async function getAllCoursesV2(
 }
 
 export type enrollCourse =
-  paths["/api/Courses/course-enrollment/{CourseId}"]["post"];
+  paths["/api/Courses/course-enrollment/{CourseId}"]["patch"];
 
 export type enrollCourseParam = enrollCourse["parameters"]["path"];
 export type enrollCourseResp =
@@ -38,7 +38,7 @@ export class enrollCourseBuilder extends RequestBuilder<
   constructor() {
     super();
     this.setUrl("/Courses/course-enrollment/{CourseId}").setMethod(
-      RequestMethod.POST,
+      RequestMethod.GET,
     );
   }
 }
@@ -52,7 +52,7 @@ export type deleteEnrollmentCourseParam =
 export type deleteEnrollmentCourseResp =
   deleteEnrollmentCourse["responses"]["200"]["content"]["application/json"];
 
-export class delEnrollCourseBuilder extends RequestBuilder<
+export class deleteEnrollCourseBuilder extends RequestBuilder<
   deleteEnrollmentCourseParam,
   undefined,
   deleteEnrollmentCourseResp
@@ -60,15 +60,32 @@ export class delEnrollCourseBuilder extends RequestBuilder<
   constructor() {
     super();
     this.setUrl("/Courses/course-unenrollment/{CourseId}").setMethod(
-      RequestMethod.POST,
+      RequestMethod.DELETE,
     );
   }
 }
 
-export function enrollUser() {
+export function enrollUserCourseMut() {
   return mutationOptions({
     mutationFn: async (paths: enrollCourseParam) => {
+      console.log("Enrolling user into course", paths.CourseId);
       const result = await new enrollCourseBuilder().send({ paths: paths });
+      return result;
+    },
+    onSuccess: () => {
+      getQueryClient().invalidateQueries({
+        queryKey: ["courses"],
+      });
+    },
+  });
+}
+
+export function DeleteEnrollUserCourseMut() {
+  return mutationOptions({
+    mutationFn: async (paths: deleteEnrollmentCourseParam) => {
+      const result = await new deleteEnrollCourseBuilder().send({
+        paths: paths,
+      });
       return result;
     },
     onSuccess: () => {

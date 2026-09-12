@@ -258,7 +258,7 @@ export class CourseController {
   }
 
   //Enroll Student into a course
-  @Post('course-enrollment/:CourseId')
+  @Get('course-enrollment/:CourseId')
   @Roles('student')
   @ApiOperation({
     summary: 'Enroll the current user/student into a course',
