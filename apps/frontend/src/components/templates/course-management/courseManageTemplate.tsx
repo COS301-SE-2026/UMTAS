@@ -79,7 +79,8 @@ export default function CourseManagementTemplate() {
   const [showAddCourse, setShowAddCourse] = useState(false);
   const [courseToEdit, setCourseToEdit] = useState<CourseDTO | null>(null);
 
-  const ViableRole = university?.role === "UNIVERSITY_ADMIN";
+  const ViableRole =
+    university?.role === "UNIVERSITY_ADMIN" || university?.role === "STUDENT";
 
   const { mutate: addExternalModules, isPending: modulesPending } = useMutation(
     {
@@ -218,6 +219,8 @@ export default function CourseManagementTemplate() {
     //console.log("account not admin");
   }
 
+  const isStudent = university.role === "STUDENT";
+
   return (
     <>
       <Tutorial steps={steps} wait={true} />
@@ -281,7 +284,11 @@ export default function CourseManagementTemplate() {
               <Button
                 data-testid="show-add-course"
                 onClick={() => {
-                  if (university?.UniversityName === "University of Maryland") {
+                  if (
+                    // updated to be more agnostic
+                    university?.ApiKey != null ||
+                    university?.ApiKey != undefined
+                  ) {
                     setExternalCourses(true);
                   } else {
                     setShowAddCourse(true);
@@ -344,13 +351,23 @@ export default function CourseManagementTemplate() {
                         </TableCell>
                         <TableCell className="p-4 text-right">
                           <div className="flex justify-end gap-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => setCourseToEdit(course)}
-                            >
-                              Edit
-                            </Button>
+                            {isStudent == true ? (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => setCourseToEdit(course)}
+                              >
+                                Edit
+                              </Button>
+                            ) : (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => setCourseToEdit(course)}
+                              >
+                                Enroll
+                              </Button>
+                            )}
                             <Button
                               id="btn-view-modules"
                               size="sm"

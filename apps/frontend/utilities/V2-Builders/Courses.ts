@@ -9,8 +9,7 @@ export type getCoursesV2Resp =
 export type CourseDtoV2 = components["schemas"]["CourseDto"];
 
 type paramsCoursesV2 =
-  | { UniversityID?: string; CourseName?: string; Degree?: string }
-  | undefined;
+  { UniversityID?: string; CourseName?: string; Degree?: string } | undefined;
 
 export async function getAllCoursesV2(
   params: getCoursesV2Params,

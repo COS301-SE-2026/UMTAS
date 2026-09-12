@@ -774,6 +774,46 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/Courses/course-enrollment/{CourseId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Enroll the current user/student into a course
+     * @description Enroll the current user/student into a course. This Courses operation is part of the versioned UMTAS HTTP contract.
+     */
+    post: operations["enrollStudentToCourse"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/Courses/course-unenrollment/{CourseId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /**
+     * Enenroll the current user/student from a course
+     * @description Enenroll the current user/student from a course. This Courses operation is part of the versioned UMTAS HTTP contract.
+     */
+    delete: operations["UnenrollStudentFromCourse"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/universities": {
     parameters: {
       query?: never;
@@ -2894,6 +2934,45 @@ export interface components {
     };
     CourseModuleStatsResponseDto: {
       data: components["schemas"]["CourseModuleStatsDto"][];
+    };
+    EnrollStudentToCourseResponseDto: {
+      /**
+       * Format: uuid
+       * @description Unique identifier of the enrolled student
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      UserID: string;
+      /**
+       * Format: uuid
+       * @description Unique identifier of the course the student enrolled in
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      CourseID: string;
+      /**
+       * Format: date-time
+       * @description Timestamp when the student enrolled in the course (UTC, ISO 8601)
+       * @example 2026-09-11T14:32:07.000Z
+       */
+      EnrolledAt: string;
+    };
+    UnenrollStudentFromCourseResponseDto: {
+      /**
+       * Format: uuid
+       * @description Unique identifier of the enrolled student
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      UserID: string;
+      /**
+       * Format: uuid
+       * @description Unique identifier of the course the student enrolled in
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      CourseID: string;
+      /**
+       * @description Message indicating success of unenrollment
+       * @example Succesfully unenrolled student from course
+       */
+      message?: string;
     };
     CreateUniversityDto: {
       /**
@@ -6307,6 +6386,101 @@ export interface operations {
         content?: never;
       };
       500: components["responses"]["InternalError"];
+    };
+  };
+  enrollStudentToCourse: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        CourseId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Student successfully enrolled into course */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["EnrollStudentToCourseResponseDto"];
+        };
+      };
+      /** @description Invalid Course ID */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      /** @description Course not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      409: components["responses"]["ConflictError"];
+      /** @description Failed to enroll student to course. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": unknown;
+        };
+      };
+    };
+  };
+  UnenrollStudentFromCourse: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        CourseId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Student successfully unenrolled from course */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["UnenrollStudentFromCourseResponseDto"];
+        };
+      };
+      /** @description Invalid Course ID */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      /** @description Course not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Failed to unenroll student from course. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": unknown;
+        };
+      };
     };
   };
   getUniversities: {

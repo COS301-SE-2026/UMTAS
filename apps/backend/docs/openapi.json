@@ -2620,6 +2620,135 @@
         ]
       }
     },
+    "/api/Courses/course-enrollment/{CourseId}": {
+      "post": {
+        "operationId": "enrollStudentToCourse",
+        "parameters": [
+          {
+            "name": "CourseId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Student successfully enrolled into course",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnrollStudentToCourseResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Course ID"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "description": "Course not found"
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError"
+          },
+          "500": {
+            "description": "Failed to enroll student to course.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "code": "INTERNAL_SERVER_ERROR",
+                    "message": "Could not complete enrollment. Please try again later.",
+                    "requestId": "req_3091ce57-0c00-4dcd-84fa-a06243ad4f62"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Enroll the current user/student into a course",
+        "tags": [
+          "Courses"
+        ],
+        "description": "Enroll the current user/student into a course. This Courses operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
+        ]
+      }
+    },
+    "/api/Courses/course-unenrollment/{CourseId}": {
+      "delete": {
+        "operationId": "UnenrollStudentFromCourse",
+        "parameters": [
+          {
+            "name": "CourseId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Student successfully unenrolled from course",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnenrollStudentFromCourseResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Course ID"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "description": "Course not found"
+          },
+          "500": {
+            "description": "Failed to unenroll student from course.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "code": "INTERNAL_SERVER_ERROR",
+                    "message": "Could not complete unenrollment. Please try again later.",
+                    "requestId": "req_3091ce57-0c00-4dcd-84fa-a06243ad4f62"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Enenroll the current user/student from a course",
+        "tags": [
+          "Courses"
+        ],
+        "description": "Enenroll the current user/student from a course. This Courses operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
+        ]
+      }
+    },
     "/api/universities": {
       "post": {
         "operationId": "UniversityController_create",
@@ -8492,6 +8621,10 @@
             "maxLength": 255,
             "example": "12345",
             "description": "Refer to course on external API"
+          },
+          "isEnrolled": {
+            "type": "boolean",
+            "description": "true if the user is enrolled in this course false if not"
           }
         },
         "required": [
@@ -8578,6 +8711,10 @@
             "maxLength": 255,
             "example": "12345",
             "description": "Refer to course on external API"
+          },
+          "isEnrolled": {
+            "type": "boolean",
+            "description": "true if the user is enrolled in this course false if not"
           }
         },
         "required": [
@@ -8673,6 +8810,10 @@
             "maxLength": 255,
             "example": "12345",
             "description": "Refer to course on external API"
+          },
+          "isEnrolled": {
+            "type": "boolean",
+            "description": "true if the user is enrolled in this course false if not"
           }
         }
       },
@@ -8734,6 +8875,60 @@
         },
         "required": [
           "data"
+        ]
+      },
+      "EnrollStudentToCourseResponseDto": {
+        "type": "object",
+        "properties": {
+          "UserID": {
+            "type": "string",
+            "description": "Unique identifier of the enrolled student",
+            "example": "00000000-0000-0000-0000-000000000000",
+            "format": "uuid"
+          },
+          "CourseID": {
+            "type": "string",
+            "description": "Unique identifier of the course the student enrolled in",
+            "example": "00000000-0000-0000-0000-000000000000",
+            "format": "uuid"
+          },
+          "EnrolledAt": {
+            "type": "string",
+            "description": "Timestamp when the student enrolled in the course (UTC, ISO 8601)",
+            "example": "2026-09-11T14:32:07.000Z",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "UserID",
+          "CourseID",
+          "EnrolledAt"
+        ]
+      },
+      "UnenrollStudentFromCourseResponseDto": {
+        "type": "object",
+        "properties": {
+          "UserID": {
+            "type": "string",
+            "description": "Unique identifier of the enrolled student",
+            "example": "00000000-0000-0000-0000-000000000000",
+            "format": "uuid"
+          },
+          "CourseID": {
+            "type": "string",
+            "description": "Unique identifier of the course the student enrolled in",
+            "example": "00000000-0000-0000-0000-000000000000",
+            "format": "uuid"
+          },
+          "message": {
+            "type": "string",
+            "description": "Message indicating success of unenrollment",
+            "example": "Succesfully unenrolled student from course"
+          }
+        },
+        "required": [
+          "UserID",
+          "CourseID"
         ]
       },
       "CreateUniversityDto": {

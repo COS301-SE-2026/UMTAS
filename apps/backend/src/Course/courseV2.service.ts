@@ -54,9 +54,21 @@ export class CourseServiceV2 extends CourseService {
 
     const courses = await db.select().from(Course).where(whereClause);
 
+    const enrollments = await db
+      .select()
+      .from(CourseEnrollment)
+      .where(eq(CourseEnrollment.UserID, userId));
+
+    const enrolledCourseIds = new Set(enrollments.map((e) => e.CourseID));
+
+    const UpdatedCourses = courses.map((course) => ({
+      ...course,
+      isEnrolled: enrolledCourseIds.has(course.CourseID),
+    }));
+
     //Attach modules to course
     const coursesWithModules = await Promise.all(
-      courses.map(async (course) => ({
+      UpdatedCourses.map(async (course) => ({
         ...course,
         Modules: (
           await this.moduleService.getAll(

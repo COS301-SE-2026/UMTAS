@@ -82,6 +82,12 @@ export class CourseDto {
   @IsString()
   @Length(1, 255)
   ExternalID?: string | null;
+
+  @ApiPropertyOptional({
+    type: Boolean,
+    description: 'true if the user is enrolled in this course false if not',
+  })
+  isEnrolled?: boolean;
 }
 
 //create

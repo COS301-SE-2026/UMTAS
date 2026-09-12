@@ -159,3 +159,4 @@ infra/database/seeds.sql/
 apps/frontend/public/models/
 apps/frontend/public/wasm/
 apps/frontend/wasm-engine/target/
+apps/backend/docs/openapi.json
