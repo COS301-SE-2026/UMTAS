@@ -190,7 +190,7 @@ export function UniMap() {
                       background={
                         building.buildingId === activeRoute?.currentBuildingId
                           ? "var(--success-text)"
-                          : building.displayColour || "var(--btn-primary-bg)"
+                          : building.displayColour
                       }
                       scale={building.venueCount === 0 ? 0.85 : 1}
                     />
