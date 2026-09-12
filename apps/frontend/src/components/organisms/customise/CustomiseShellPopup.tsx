@@ -30,7 +30,7 @@ export default function CustomiseShellPopup() {
           </Button>
         </AlertDialogTrigger>
 
-        <AlertDialogContent className="w-[792px] max-w-[95vw] p-0 flex flex-col gap-3">
+        <AlertDialogContent className="w-[768px] max-w-[95vw] p-0 flex flex-col gap-3">
           <AlertDialogHeader className="flex flex-row justify-between items-center space-y-0 px-6 pt-6 pb-0">
             <AlertDialogTitle className="text-xl font-bold">
               Customise Events and Modules
