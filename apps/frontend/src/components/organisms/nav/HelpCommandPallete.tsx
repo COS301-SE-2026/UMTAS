@@ -9,6 +9,7 @@ import { MessageCircleQuestionIcon } from "lucide-react";
 import { Button } from "@/components/atoms/baseShadcn/button";
 
 import Tutorial from "@/components/organisms/nav/Tutorial";
+import { UserDetails } from "@/lib/userclass/userClass";
 
 const cmdkTutorialSteps = [
   {
@@ -89,6 +90,7 @@ export function HelpCommandPalette() {
           icon: "HomeIcon",
           href: "/dashboard",
           "data-tour": "cmdk-dashboard-item",
+          roles: ["UNIVERSITY_ADMIN"],
         },
         {
           id: "builder",
@@ -96,6 +98,7 @@ export function HelpCommandPalette() {
           icon: "CalendarIcon",
           href: "/builder",
           "data-tour": "builder",
+          roles: ["UNIVERSITY_ADMIN", "STUDENT"],
         },
         {
           id: "schedules",
@@ -103,6 +106,39 @@ export function HelpCommandPalette() {
           icon: "ClockIcon",
           href: "/schedules",
           "data-tour": "schedules",
+          roles: ["UNIVERSITY_ADMIN", "STUDENT"],
+        },
+        {
+          id: "map",
+          children: "Map",
+          icon: "MapIcon",
+          href: "/map",
+          "data-tour": "map",
+          roles: ["UNIVERSITY_ADMIN", "STUDENT"],
+        },
+        {
+          id: "module-management",
+          children: "Module Management",
+          icon: "BookOpenIcon",
+          href: "/module-management",
+          "data-tour": "module-management",
+          roles: ["UNIVERSITY_ADMIN", "STUDENT"],
+        },
+        {
+          id: "solver",
+          children: "Timetable Solver",
+          icon: "AdjustmentsHorizontalIcon",
+          href: "/solver",
+          "data-tour": "solver",
+          roles: ["UNIVERSITY_ADMIN"],
+        },
+        {
+          id: "calendar-management",
+          children: "Calendar Management",
+          icon: "CalendarDaysIcon",
+          href: "/calendar-management",
+          "data-tour": "calendar-management",
+          roles: ["UNIVERSITY_ADMIN"],
         },
         {
           id: "course-management",
@@ -110,6 +146,7 @@ export function HelpCommandPalette() {
           icon: "AcademicCapIcon",
           href: "/course-management",
           "data-tour": "course-management",
+          roles: ["UNIVERSITY_ADMIN"],
         },
         {
           id: "role-management",
@@ -117,21 +154,27 @@ export function HelpCommandPalette() {
           icon: "UserGroupIcon",
           href: "/role-management",
           "data-tour": "role-management",
+          roles: ["UNIVERSITY_ADMIN"],
         },
-        // {
-        //   id: "choose-institute",
-        //   children: "Choose Institute",
-        //   icon: "BuildingOfficeIcon",
-        //   href: "/choose-institute",
-        // },
-        // {
-        //   id: "brand-style",
-        //   children: "Brand Style",
-        //   icon: "SwatchIcon",
-        //   href: "/brand-style",
-        // },
+        {
+          id: "stats",
+          children: "Statistics",
+          icon: "ChartBarIcon",
+          href: "/stats",
+          "data-tour": "stats",
+          roles: ["UNIVERSITY_ADMIN"],
+        },
+        {
+          id: "brand-style",
+          children: "Brand Style",
+          icon: "SwatchIcon",
+          href: "/brand-style",
+          "data-tour": "brand-style",
+          roles: ["UNIVERSITY_ADMIN"],
+        },
       ],
     },
+
     {
       heading: "Authentication",
       id: "auth",
@@ -166,6 +209,7 @@ export function HelpCommandPalette() {
         },
       ],
     },
+
     {
       heading: "Help & Resources",
       id: "resources",
@@ -182,6 +226,7 @@ export function HelpCommandPalette() {
           children: "User Manual",
           icon: "BookOpenIcon",
           href: "/tutorial",
+          "data-tour": "user-manual",
         },
         {
           id: "run-tutorial",
@@ -193,7 +238,6 @@ export function HelpCommandPalette() {
             window.dispatchEvent(new Event("begin-tut"));
           },
         },
-
         {
           id: "cmdk-tutorial",
           children: "How to use the Help Menu",
@@ -208,6 +252,21 @@ export function HelpCommandPalette() {
       ],
     },
   ];
+
+  const role = UserDetails.getUniDetails()?.role;
+
+  const filteredPages = pages
+    .map((group) => ({
+      ...group,
+      items: group.items.filter((item) => {
+        if (!item.roles) {
+          return true;
+        }
+
+        return item.roles.includes(role ?? "");
+      }),
+    }))
+    .filter((group) => group.items.length > 0);
 
   return (
     <>
@@ -236,14 +295,14 @@ export function HelpCommandPalette() {
         page="root"
       >
         <CommandPalette.Page id="root">
-          {pages.length ? (
-            pages.map((list) => (
+          {filteredPages.length ? (
+            filteredPages.map((list) => (
               <CommandPalette.List key={list.id} heading={list.heading}>
                 {list.items.map(({ id, action, href, ...rest }) => (
                   <CommandPalette.ListItem
                     key={id}
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    index={getItemIndex(pages as any, id)}
+                    index={getItemIndex(filteredPages as any, id)}
                     {...rest}
                     onClick={() => {
                       if (action) {

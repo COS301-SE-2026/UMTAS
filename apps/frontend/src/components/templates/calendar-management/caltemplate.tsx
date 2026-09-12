@@ -145,7 +145,7 @@ export default function CalTemplate() {
 
   return (
     <>
-      <Tutorial steps={steps} wait={true} />
+      {/* <Tutorial steps={steps} wait={true} /> */}
 
       <div className="items-center flex flex-col gap-6 w-full px-6 capitalize">
         <div className="w-full h-full max-w-6xl bg-[var(--bg-surface)] overflow-auto border border-[var(--border)] rounded-xl shadow-sm">
@@ -294,7 +294,7 @@ export default function CalTemplate() {
               </div>
             )}
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-20 gap-y-10 p-5 w-full h-auto justify-items-center items-center">
+            <div className="grid grid-cols-1 gap-y-10 p-5 w-full h-auto justify-items-center items-center">
               {selectedAcID &&
                 restrictions?.restrictions.map((res) => {
                   return (

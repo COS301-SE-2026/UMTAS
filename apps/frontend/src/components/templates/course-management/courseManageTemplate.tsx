@@ -371,27 +371,26 @@ export default function CourseManagementTemplate() {
                             <div className="text-xs font-semibold text-[var(--text-secondary)] mb-3 uppercase tracking-wider">
                               Associated Modules:
                             </div>
-                            {modules.length === 0 ? (
+                            {modulesPending || eventsPending ? (
+                              <div className="flex items-center justify-center gap-2 py-4 text-sm text-[var(--text-secondary)]">
+                                <Spinner />
+                                <span>Loading modules...</span>
+                              </div>
+                            ) : modules.length === 0 ? (
                               <div className="text-sm text-[var(--text-disabled)] italic flex flex-row justify-around gap-x-2">
-                                No modules assigned to this course group.
+                                <span>
+                                  No modules assigned to this course group.
+                                </span>
+
                                 {course.ExternalID != undefined && (
                                   <Button
-                                    disabled={modulesPending || eventsPending}
-                                    id=""
                                     size="sm"
                                     variant="default"
                                     onClick={() =>
                                       addExternalModules(course.CourseID)
                                     }
                                   >
-                                    {!(modulesPending || eventsPending) ? (
-                                      <p>Add Modules and Events</p>
-                                    ) : (
-                                      <div className="flex flex-row gap-x-2 ">
-                                        Adding modules and events
-                                        <Spinner></Spinner>
-                                      </div>
-                                    )}
+                                    Add Modules and Events
                                   </Button>
                                 )}
                               </div>
