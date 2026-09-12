@@ -165,3 +165,6 @@ apps/frontend/wasm-engine/target/
 *.onnx
 *.pt
 apps/frontend/public/wasm/
+apps/frontend/public/models/
+apps/frontend/public/wasm/
+apps/frontend/wasm-engine/target/
