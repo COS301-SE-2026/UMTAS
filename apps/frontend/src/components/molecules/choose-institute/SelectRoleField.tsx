@@ -8,12 +8,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/atoms/baseShadcn/select";
-import { uniDtoRoles } from "@/app/choose-institute/queries/builders";
 
-const roles: uniDtoRoles[] = ["LECTURER", "STUDENT", "UNIVERSITY_ADMIN"];
+const roles = ["LECTURER", "STUDENT", "UNIVERSITY_ADMIN"] as const;
 
 interface SelectRoleFieldProps {
-  value: string; //todo: adjust when willie tells me to
+  value: string;
   onChange: (value: string) => void;
 }
 
@@ -21,14 +20,19 @@ export function SelectRoleField({ value, onChange }: SelectRoleFieldProps) {
   return (
     <div className="flex flex-col gap-2">
       <Label htmlFor="role-select">Select Role</Label>
+
       <Select value={value} onValueChange={onChange}>
         <SelectTrigger id="role-select" className="w-full">
           <SelectValue placeholder="Select a Role" />
         </SelectTrigger>
+
         <SelectContent>
           {roles.map((role) => (
-            <SelectItem key={role} value={role || ""}>
-              {role}
+            <SelectItem key={role} value={role}>
+              {role
+                .toLowerCase()
+                .replaceAll("_", " ")
+                .replace(/\b\w/g, (char) => char.toUpperCase())}
             </SelectItem>
           ))}
         </SelectContent>

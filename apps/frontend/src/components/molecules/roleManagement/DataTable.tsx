@@ -250,33 +250,36 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
 
-        <div className="flex items-center justify-between p-4 border-t border-[var(--border)] bg-[var(--bg-surface)]">
-          <div className="text-sm text-muted-foreground">
-            {table.getFilteredSelectedRowModel().rows.length} of{" "}
-            {table.getFilteredRowModel().rows.length} row(s) selected.
-          </div>
+        {table.getColumn("select") && (
+          <div className="flex items-center justify-between p-4 border-t border-[var(--border)] bg-[var(--bg-surface)]">
+            <div className="text-sm text-muted-foreground">
+              {table.getFilteredSelectedRowModel().rows.length} of{" "}
+              {table.getFilteredRowModel().rows.length} row(s) selected.
+            </div>
 
-          <div className="flex items-center space-x-2">
-            <Button
-              id="btn-role-previous"
-              variant="outline"
-              size="sm"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-            >
-              Previous
-            </Button>
-            <Button
-              id="btn-role-next"
-              variant="outline"
-              size="sm"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-            >
-              Next
-            </Button>
+            <div className="flex items-center space-x-2">
+              <Button
+                id="btn-role-previous"
+                variant="outline"
+                size="sm"
+                onClick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
+              >
+                Previous
+              </Button>
+
+              <Button
+                id="btn-role-next"
+                variant="outline"
+                size="sm"
+                onClick={() => table.nextPage()}
+                disabled={!table.getCanNextPage()}
+              >
+                Next
+              </Button>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
