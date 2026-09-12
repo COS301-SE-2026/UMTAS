@@ -294,7 +294,7 @@ export default function CalTemplate() {
               </div>
             )}
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-20 gap-y-10 p-5 w-full h-auto justify-items-center items-center">
+            <div className="grid grid-cols-1 gap-y-10 p-5 w-full h-auto justify-items-center items-center">
               {selectedAcID &&
                 restrictions?.restrictions.map((res) => {
                   return (
