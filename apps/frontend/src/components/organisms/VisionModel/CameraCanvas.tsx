@@ -79,6 +79,31 @@ function CanvasWebcam({ isCameraActive }: CanvasCamProps) {
     };
   }, []);
 
+  useEffect(() => {
+    if (!cameraLoaded) return;
+
+    let animationFrameID: number;
+
+    function renderFrame() {
+      const canvas = canvasRef.current;
+      const video = videoRef.current;
+
+      if (canvas && video) {
+        const context = canvas.getContext("2d");
+        if (context) {
+          context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        }
+      }
+
+      animationFrameID = requestAnimationFrame(renderFrame);
+    }
+    renderFrame();
+
+    return () => {
+      cancelAnimationFrame(animationFrameID);
+    };
+  }, [cameraLoaded]);
+
   return (
     <>
       <video ref={videoRef} playsInline muted></video>
