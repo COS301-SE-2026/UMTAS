@@ -152,8 +152,7 @@ export function UniMap() {
 
           {activeRoute?.status === "NONE" && (
             <span className="text-sm text-[var(--text-secondary)]">
-              Select a Time and Date. All Attending Events From Your Schedule
-              Will Display Routes Between Your Events On The Map.
+              Select a Time and Date to View Attending Event Routes
             </span>
           )}
 
