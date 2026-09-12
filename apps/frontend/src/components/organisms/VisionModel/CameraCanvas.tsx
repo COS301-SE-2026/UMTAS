@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/atoms/baseShadcn/button";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CircleX } from "lucide-react";
 import Webcam from "react-webcam";
 import { boolean } from "better-auth";
@@ -46,9 +46,31 @@ interface CanvasCamProps {
   isCameraActive: boolean;
 }
 
-function CanvasWebcam() {
+function CanvasWebcam({ isCameraActive }: CanvasCamProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [cameraLoaded, setCameraLoaded] = useState<boolean>(false);
+
+  useEffect(() => {
+    async function startCam() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { width: 640, height: 480 },
+          audio: false,
+        });
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          videoRef.current.onloadedmetadata = () => {
+            videoRef.current?.play();
+            setCameraLoaded(true);
+          };
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    startCam();
+  }, []);
 
   return (
     <>
