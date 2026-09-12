@@ -130,9 +130,7 @@ export function InstituteSelector({ onClose }: InstituteSelectorProps) {
           institutes={uniList?.universities || []}
           value={selectedInstitute?.UniversityID || ""}
           onChange={updateSelectedUni}
-          onNotSupportedClick={() => {
-            /* werk hierso haha */
-          }}
+          onNotSupportedClick={() => onClose?.()}
         />
 
         {selectedInstitute?.role == null && (
