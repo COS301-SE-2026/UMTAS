@@ -1,0 +1,16 @@
+apps/frontend/src/components/organisms/choose-institute/instituteSelector.tsx
+  h_2d4b3dca70a3d8 4-5,10-11,13,20,22,59-60,70,72,81-83,92,96,107-110,137-154,157,165-166,169,171,173,183-219,228
+apps/frontend/src/components/templates/calendar-management/caltemplate.tsx
+  h_2d4b3dca70a3d8 297
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "ddefdd6e676e06fc1121d78a2724af0bb89d104a",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
