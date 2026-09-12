@@ -1,0 +1,14 @@
+apps/frontend/src/components/organisms/choose-institute/instituteSelector.tsx
+  h_2d4b3dca70a3d8 65-67,69,71-72,74-76,78-103,106-108,111-128,134,144,159,179-195,197-211,214
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "e00ef664d638f0463ccaaf6193af433aed160079",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
