@@ -58,6 +58,8 @@ services:
 
   minio:
     image: quay.io/minio/minio:RELEASE.2023-10-25T06-33-25Z
+    ports:
+      - '9000'
     command: server /data
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-integration-minio}
