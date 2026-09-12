@@ -1,0 +1,14 @@
+apps/frontend/src/components/organisms/nav/HelpCommandPallete.tsx
+  h_2d4b3dca70a3d8 12,256
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "cff2ab6da94825731aa42e9e1aa95cb3c240c610",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
