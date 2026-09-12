@@ -145,7 +145,7 @@ export default function CalTemplate() {
 
   return (
     <>
-      <Tutorial steps={steps} wait={true} />
+      {/* <Tutorial steps={steps} wait={true} /> */}
 
       <div className="items-center flex flex-col gap-6 w-full px-6 capitalize">
         <div className="w-full h-full max-w-6xl bg-[var(--bg-surface)] overflow-auto border border-[var(--border)] rounded-xl shadow-sm">
