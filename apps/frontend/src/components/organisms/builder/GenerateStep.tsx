@@ -353,7 +353,7 @@ export function GenerateStep({
             {isGenerating
               ? "Generating..."
               : selectedEventIds.length === 0
-                ? "Select at least one event"
+                ? "Select at Least One Event"
                 : isEditMode
                   ? "Edit Schedule"
                   : "Generate Schedule"}

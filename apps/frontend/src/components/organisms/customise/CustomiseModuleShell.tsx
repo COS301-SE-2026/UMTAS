@@ -131,13 +131,6 @@ export default function ModulesShell({
           <div className="flex gap-1 bg-muted p-1 rounded-md mb-1">
             <Button
               size="sm"
-              variant="secondary"
-              className="h-7 text-xs flex-1 font-semibold"
-            >
-              Modules
-            </Button>
-            <Button
-              size="sm"
               variant="ghost"
               className="h-7 text-xs flex-1 text-muted-foreground"
               onClick={() => {
@@ -145,6 +138,13 @@ export default function ModulesShell({
               }}
             >
               Events
+            </Button>
+            <Button
+              size="sm"
+              variant="secondary"
+              className="h-7 text-xs flex-1 font-semibold"
+            >
+              Modules
             </Button>
           </div>
 

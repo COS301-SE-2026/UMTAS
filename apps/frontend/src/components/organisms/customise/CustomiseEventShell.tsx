@@ -8,8 +8,12 @@ import {
   EventCriteria,
 } from "@/app/builder/utils/events/eventRequestBuilder";
 import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
-import { useMutation } from "@tanstack/react-query";
-import { updateEventMut } from "@/components/templates/builder/Queries/eventQueries";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  updateEventMut,
+  updateEventVenueMut,
+} from "@/components/templates/builder/Queries/eventQueries";
+import { getAllBuildingsQ } from "../../../../utilities/building/buildingQueries";
 
 interface CustomiseShellProps {
   events: EventResponse[];
@@ -22,6 +26,9 @@ export default function EventsShell({
   modules,
   onViewModeChange,
 }: CustomiseShellProps) {
+  const { data: buildingsList } = useQuery(getAllBuildingsQ());
+  const buildings = buildingsList ?? [];
+
   const [selectedEventId, setSelectedEventId] = useState<string>(
     events[0]?.eventId,
   );
@@ -41,9 +48,14 @@ export default function EventsShell({
     setTempEvent(savedEvent);
   }
 
-  //mutation for updating
-  const { mutate: saveEvent, isPending: isSaving } =
+  // Mutations
+  const { mutate: saveEvent, isPending: isSavingEvent } =
     useMutation(updateEventMut());
+  const { mutate: updateEventVenue, isPending: isSavingVenue } = useMutation(
+    updateEventVenueMut(),
+  );
+
+  const isSaving = isSavingEvent || isSavingVenue;
 
   //bool check if the event actually changed
   const didEventChange =
@@ -58,8 +70,8 @@ export default function EventsShell({
   //updates event object
   function handleUpdate(
     id: string,
-    field: keyof EventResponse | keyof EventCriteria,
-    value: string | boolean,
+    field: keyof EventResponse | keyof EventCriteria | "buildingId",
+    value: string | boolean | string[],
   ) {
     setTempEvent((prev) => {
       if (!prev) {
@@ -75,7 +87,6 @@ export default function EventsShell({
         };
       }
 
-      //inside eventCriteria
       return {
         ...prev,
         eventCriteria: {
@@ -86,15 +97,39 @@ export default function EventsShell({
     });
   }
 
-  //what gets called in the component
   function handleSave() {
     if (!tempEvent) return;
+
+    const thisEventCriteria = {
+      ...tempEvent.eventCriteria,
+    } as EventCriteria & {
+      buildingId?: string;
+    };
+
+    const selectedBuildingId = thisEventCriteria.buildingId;
+    delete thisEventCriteria.buildingId;
+
+    const selectedVenueName =
+      typeof tempEvent.venues?.[0] === "string"
+        ? tempEvent.venues[0]
+        : tempEvent.venues?.[0]?.venueName;
+
+    if (selectedVenueName?.trim()) {
+      updateEventVenue({
+        path: { id: tempEvent.eventId },
+        body: {
+          venueName: selectedVenueName.trim(),
+          buildingId: selectedBuildingId || undefined,
+        },
+      });
+    }
+
     saveEvent({
       path: { id: tempEvent.eventId },
       body: {
         eventName: tempEvent.eventName,
         activityCode: tempEvent.activityCode,
-        eventCriteria: tempEvent.eventCriteria,
+        eventCriteria: thisEventCriteria,
         isRecurring: tempEvent.isRecurring,
       },
     });
@@ -125,18 +160,18 @@ export default function EventsShell({
           <div className="flex gap-1 bg-muted p-1 rounded-md mb-1">
             <Button
               size="sm"
+              variant="secondary"
+              className="h-7 text-xs flex-1 font-semibold"
+            >
+              Events
+            </Button>
+            <Button
+              size="sm"
               variant="ghost"
               className="h-7 text-xs flex-1 text-muted-foreground"
               onClick={() => onViewModeChange?.("Modules")}
             >
               Modules
-            </Button>
-            <Button
-              size="sm"
-              variant="secondary"
-              className="h-7 text-xs flex-1 font-semibold"
-            >
-              Events
             </Button>
           </div>
 
@@ -188,6 +223,7 @@ export default function EventsShell({
           <CustomiseEventCard
             event={tempEvent}
             modules={modules}
+            buildings={buildings}
             onUpdate={handleUpdate}
           />
         </div>
