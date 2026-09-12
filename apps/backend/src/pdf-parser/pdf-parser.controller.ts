@@ -50,6 +50,9 @@ import { ObjectStorageService } from '../storage/object-storage.service';
 import type { Response } from 'express';
 import { Readable } from 'node:stream';
 
+const DEMO_PDF_KEY = 'demo/pdf-parser/up/default-timetable.pdf';
+const DEMO_PDF_FILENAME = 'umtas-demo-timetable.pdf';
+
 @ApiTags('PDF Parser')
 @Controller('pdf-parser')
 export class PdfParserController {
@@ -74,14 +77,9 @@ export class PdfParserController {
     },
   })
   async getDemoPdf(@Res() res: Response): Promise<void> {
-    const key = process.env.GUEST_DEMO_PDF_KEY?.trim();
-    if (!key) {
-      throw new ServiceUnavailableException('Demo PDF is not configured');
-    }
-
     let object: Awaited<ReturnType<ObjectStorageService['getObject']>>;
     try {
-      object = await this.storage.getObject(key);
+      object = await this.storage.getObject(DEMO_PDF_KEY);
     } catch {
       throw new ServiceUnavailableException(
         'Demo PDF is temporarily unavailable',
@@ -116,7 +114,7 @@ export class PdfParserController {
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader(
       'Content-Disposition',
-      `attachment; filename="${getDemoPdfFilename()}"`,
+      `attachment; filename="${DEMO_PDF_FILENAME}"`,
     );
     res.setHeader('Cache-Control', 'private, no-store');
     res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -369,13 +367,6 @@ function isAsyncIterable(
   return (
     typeof value === 'object' && value !== null && Symbol.asyncIterator in value
   );
-}
-
-function getDemoPdfFilename(): string {
-  const configured = process.env.GUEST_DEMO_PDF_FILENAME?.trim();
-  return configured && /^[a-zA-Z0-9._-]+\.pdf$/i.test(configured)
-    ? configured
-    : 'umtas-demo-timetable.pdf';
 }
 
 interface PdfParserLookupRequestBody {
