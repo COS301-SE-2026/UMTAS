@@ -52,14 +52,15 @@ function CanvasWebcam({ isCameraActive }: CanvasCamProps) {
   const [cameraLoaded, setCameraLoaded] = useState<boolean>(false);
 
   useEffect(() => {
+    let currentStream: MediaStream | null = null;
     async function startCam() {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({
+        currentStream = await navigator.mediaDevices.getUserMedia({
           video: { width: 640, height: 480 },
           audio: false,
         });
         if (videoRef.current) {
-          videoRef.current.srcObject = stream;
+          videoRef.current.srcObject = currentStream;
           videoRef.current.onloadedmetadata = () => {
             videoRef.current?.play();
             setCameraLoaded(true);
@@ -70,6 +71,12 @@ function CanvasWebcam({ isCameraActive }: CanvasCamProps) {
       }
     }
     startCam();
+
+    return () => {
+      if (currentStream) {
+        currentStream.getTracks().forEach((track) => track.stop());
+      }
+    };
   }, []);
 
   return (
