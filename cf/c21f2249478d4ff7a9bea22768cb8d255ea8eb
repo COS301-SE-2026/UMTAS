@@ -1,0 +1,16 @@
+apps/frontend/src/components/organisms/builder/EventsStep.tsx
+  h_2d4b3dca70a3d8 529
+apps/frontend/src/components/organisms/builder/ModulesStep.tsx
+  h_2d4b3dca70a3d8 261
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "cfc21f2249478d4ff7a9bea22768cb8d255ea8eb",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
