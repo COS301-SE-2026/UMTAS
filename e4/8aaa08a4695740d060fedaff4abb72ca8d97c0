@@ -1,0 +1,14 @@
+apps/frontend/src/components/templates/course-management/courseManageTemplate.tsx
+  h_2d4b3dca70a3d8 374-379,381-384,393
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "e48aaa08a4695740d060fedaff4abb72ca8d97c0",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
