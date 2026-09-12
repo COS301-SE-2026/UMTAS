@@ -1,5 +1,10 @@
-import { DETECT_MESSAGE, PIXEL_PAYLOAD } from "./messageTypes";
-import init, { slice_image_data } from "../../wasm-engine/pkg/wasm_engine";
+import {
+  DETECT_MESSAGE,
+  PIXEL_PAYLOAD,
+} from "../../../../utilities/VisionModel/messageTypes";
+import init, {
+  slice_image_data,
+} from "../../../../wasm-engine/pkg/wasm_engine";
 import * as ort from "onnxruntime-web";
 
 let wasmLoaded = false;
@@ -68,7 +73,7 @@ self.onmessage = async (event: MessageEvent) => {
     const slices = createSlices(payload);
 
     try {
-      runModel(slices, payload);
+      const results = await runModel(slices, payload);
     } catch (err) {
       console.error(err);
     }
