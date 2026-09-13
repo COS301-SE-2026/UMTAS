@@ -74,6 +74,7 @@ export function LoginForm() {
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isGuestLoading, setIsGuestLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isEmailLoading, setIsEmailLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
@@ -120,7 +121,44 @@ export function LoginForm() {
     }
   }
 
-  const anyLoading = isEmailLoading || isGoogleLoading;
+  async function handleGuestSignIn() {
+    setError(null);
+    setIsGuestLoading(true);
+    storeAuthRedirectTarget(redirectTarget);
+
+    try {
+      const response = await fetch("/api/auth/sign-in/guest", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({}),
+      });
+
+      if (!response.ok) {
+        if (response.status === 409) {
+          setError("You are already signed in.");
+        } else if (response.status === 503) {
+          setError(
+            "Guest login is currently unavailable. Please try again later.",
+          );
+        } else {
+          setError("Guest login failed. Please try again.");
+        }
+
+        return;
+      }
+
+      window.location.assign(redirectTarget);
+    } catch {
+      setError("Guest login failed. Check your connection and try again.");
+    } finally {
+      setIsGuestLoading(false);
+    }
+  }
+
+  const anyLoading = isEmailLoading || isGoogleLoading || isGuestLoading;
 
   return (
     <>
@@ -222,6 +260,22 @@ export function LoginForm() {
               disabled={anyLoading}
             />
           </div>
+
+          <button
+            type="button"
+            onClick={handleGuestSignIn}
+            disabled={anyLoading}
+            className="mx-auto text-[12px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] underline-offset-2 hover:underline transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isGuestLoading ? (
+              <span className="flex items-center gap-1.5">
+                <Loader2 size={12} className="animate-spin" />
+                Logging in as guest…
+              </span>
+            ) : (
+              "Log in as guest"
+            )}
+          </button>
 
           <p className="text-[12px] text-[var(--text-secondary)] text-center">
             Don&apos;t have an account?{" "}
