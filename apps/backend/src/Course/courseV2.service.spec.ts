@@ -13,7 +13,11 @@ import { ModuleServiceV2 } from '../Module/moduleV2.service';
 //Mock Database and factories
 import { createMockDatabase } from '../Testing/Mocks/database.mock';
 import { mockDbResult } from '../Testing/Mocks/database.helpers';
-import { createCourse, createModule } from '../Testing/Factories';
+import {
+  createCourse,
+  createModule,
+  createUniversity,
+} from '../Testing/Factories';
 
 //Mock Services
 import {
@@ -26,7 +30,10 @@ import {
 import { NotFoundException } from '@nestjs/common';
 
 //DTO's
-import { CourseFiltersV2 } from './dto/course.dto';
+import {
+  CourseFiltersV2,
+  CourseModuleStatsResponseDto,
+} from './dto/course.dto';
 
 describe('CourseServiceV2', () => {
   let service: CourseServiceV2;
@@ -285,4 +292,43 @@ describe('CourseServiceV2', () => {
       expect(result).toBeNull();
     });
   }); //END_Test_GetByExternalID
+
+  describe('Test_getStatistics', () => {
+    it('should return simple statistics for the course', async () => {
+      //Arrange
+      const uni = createUniversity();
+      const course = createCourse();
+
+      mockUniversityService.getById?.mockResolvedValue(uni);
+
+      const expectedResult: CourseModuleStatsResponseDto = {
+        data: [
+          {
+            CourseID: course.CourseID,
+            CourseName: course.CourseName,
+            ModuleCount: 2,
+            EventCount: 3,
+            EnrolledStudents: 5,
+          },
+        ],
+      };
+
+      mockDbResult(mockDb.select, [
+        {
+          CourseID: course.CourseID,
+          CourseName: course.CourseName,
+          ModuleCount: 2,
+          EventCount: 3,
+          EnrolledStudents: 5,
+        },
+      ]);
+
+      //Act
+      const result = await service.getStatistics(uni.UniversityID);
+
+      //Assert
+      expect(result).toMatchObject(expectedResult);
+      expect(mockDb.select).toHaveBeenCalledTimes(1);
+    });
+  });
 }); //END_CourseServiceV2
