@@ -1,0 +1,14 @@
+apps/e2e/playwright.config.ts
+  h_2d4b3dca70a3d8 8-11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "440d232e11c9f1cb58fa4418dbb5710bb6e7bb21",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
