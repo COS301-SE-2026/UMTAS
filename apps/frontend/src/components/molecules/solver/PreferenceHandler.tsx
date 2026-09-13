@@ -39,7 +39,7 @@ interface CheckBoxProps {
 }
 function PrefCheckbox({ isChecked, setChecked, disabled }: CheckBoxProps) {
   return (
-    <div className="flex flex-col justify-center ">
+    <div className="flex  justify-center w-full">
       <Checkbox
         disabled={disabled}
         className="size-5 border-white"
@@ -168,8 +168,8 @@ interface smallGapsProp {
 export function SmallGapsPref({ activePreference, setChecked }: smallGapsProp) {
   return (
     <>
-      <span className="font-medium text-xs text-[var(--text-primary)]">
-        Prefer Smaller Gaps Between Events?
+      <span className="flex items-center font-medium h-10 text-sm text-[var(--text-primary)]">
+        Prefer Smaller Gaps ?
       </span>
       <PrefCheckbox
         disabled={false}

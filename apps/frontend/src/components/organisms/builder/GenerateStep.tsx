@@ -19,6 +19,7 @@ import { fetchAllModulesv2 } from "../../../../utilities/V2-Builders/Modules";
 import Popup from "@/components/atoms/utility/floatContainer";
 import SolverPreferences from "../solver/SolverPreferences";
 import { UserDetails } from "@/lib/userclass/userClass";
+import { useErrorListener } from "@/hooks/errorListener";
 
 let eventAdded = false;
 
@@ -374,7 +375,7 @@ export function GenerateStep({
       </div>
       {showSolver && (
         <Popup onClose={() => setShowSolver(false)}>
-          <div className="flex w-140 h-120 justify-center">
+          <div className="flex w-120  justify-center">
             <SolverPreferences
               modules={getSelectedModules()}
               onJobCompleteAction={() => onGenerate("BACK", [])}
