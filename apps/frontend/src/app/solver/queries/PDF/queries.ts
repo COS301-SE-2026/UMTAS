@@ -4,8 +4,8 @@ import {
   PDFjobLookupBuilder,
   PDFjobStatusBuilder,
   PDFjobStatusParams,
+  fetchDemoPdfBuilder,
   tempUploadPDFbody,
-  uploadPDFBody,
   uploadPdfBuilder,
 } from "./builder";
 
@@ -23,6 +23,12 @@ export function uploadPDF() {
       return result;
       // this result will be used to set job id which will cause pollPDFresult to update
     },
+  });
+}
+
+export function demoPdf() {
+  return mutationOptions({
+    mutationFn: fetchDemoPdfBuilder,
   });
 }
 

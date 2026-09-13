@@ -50,7 +50,7 @@ import { ObjectStorageService } from '../storage/object-storage.service';
 import type { Response } from 'express';
 import { Readable } from 'node:stream';
 
-const DEMO_PDF_KEY = 'demo/pdf-parser/up/default-timetable.pdf';
+const DEMO_PDF_KEY = 'demo/pdf-parser/up/LECTURES_S1.pdf';
 const DEMO_PDF_FILENAME = 'umtas-demo-timetable.pdf';
 
 @ApiTags('PDF Parser')

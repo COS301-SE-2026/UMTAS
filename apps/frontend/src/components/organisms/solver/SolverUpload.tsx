@@ -10,13 +10,8 @@ import {
   CardTitle,
 } from "@/components/atoms/baseShadcn/card";
 import { Input } from "@/components/atoms/baseShadcn/input";
-import {
-  fileHash,
-  lookupPdfHash,
-  pollPdfResult,
-  uploadPDF,
-} from "@/app/solver/queries/PDF/queries";
-import { QueryClient, useMutation, useQuery } from "@tanstack/react-query";
+import { fileHash, uploadPDF } from "@/app/solver/queries/PDF/queries";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { UserDetails } from "@/lib/userclass/userClass";
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
 import { Spinner } from "@/components/atoms/baseShadcn/spinner";
@@ -25,6 +20,10 @@ import {
   PDFjobLookupBuilder,
   PDFjobStatusBuilder,
 } from "@/app/solver/queries/PDF/builder";
+import { useIsGuest } from "@/hooks/useIsGuest";
+import DemoPdfDialog from "@/components/molecules/solver/DemoPdfDialog";
+
+const DEMO_PDF_PROMPT_STORAGE_KEY = "umtas-demo-pdf-prompt";
 
 interface SolverUploadProps {
   onComplete: () => void;
@@ -40,9 +39,12 @@ export default function SolverUpload({
   //connects to the upload part
   const uploadFileRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [pdfHash, setPdfHash] = useState<string | null>(null);
+  const [, setPdfHash] = useState<string | null>(null);
   const [jobId, setJobID] = useState<string | null>(null);
   const [currentlyPolling, SetCurrentlyPolling] = useState<boolean>(false);
+  const [showDemoDialog, setShowDemoDialog] = useState(false);
+  const dismissedThisSession = useRef(false);
+  const { isGuest, isPending: isGuestPending } = useIsGuest();
 
   const { data: pdfJobResult } = useQuery({
     queryKey: ["PDF", jobId],
@@ -74,6 +76,52 @@ export default function SolverUpload({
   });
 
   const UploadPDFmut = useMutation(uploadPDF());
+
+  function selectFile(file: File | null) {
+    setJobID(null);
+    SetCurrentlyPolling(false);
+    setPdfHash(null);
+    setModuleGroupID(null);
+    getQueryClient().clear();
+    setSelectedFile(file);
+    if (file) {
+      uploadFile(file);
+    }
+  }
+
+  useEffect(() => {
+    if (
+      isGuestPending ||
+      !isGuest ||
+      selectedFile ||
+      dismissedThisSession.current
+    ) {
+      return;
+    }
+
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const dismissed = window.sessionStorage.getItem(
+      DEMO_PDF_PROMPT_STORAGE_KEY,
+    );
+    if (dismissed === "true") {
+      dismissedThisSession.current = true;
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => setShowDemoDialog(true), 0);
+    return () => window.clearTimeout(timeoutId);
+  }, [dismissedThisSession, isGuest, isGuestPending, selectedFile]);
+
+  function handleDemoDialogChange(open: boolean) {
+    setShowDemoDialog(open);
+    if (!open && typeof window !== "undefined") {
+      window.sessionStorage.setItem(DEMO_PDF_PROMPT_STORAGE_KEY, "true");
+      dismissedThisSession.current = true;
+    }
+  }
   // uploads and starts the timeout function
   async function uploadFile(file: File) {
     if (!file) return;
@@ -154,14 +202,27 @@ export default function SolverUpload({
             )}
           </div>
 
-          <Button
-            id="btn-browse-files"
-            variant="outline"
-            onClick={() => uploadFileRef.current?.click()}
-            className="font-mono"
-          >
-            Browse files
-          </Button>
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            <Button
+              id="btn-browse-files"
+              variant="outline"
+              onClick={() => uploadFileRef.current?.click()}
+              className="font-mono"
+            >
+              Browse files
+            </Button>
+
+            {isGuest && (
+              <Button
+                data-testid="btn-demo-pdf"
+                type="button"
+                onClick={() => setShowDemoDialog(true)}
+                className="font-mono"
+              >
+                Use a demo PDF
+              </Button>
+            )}
+          </div>
 
           <Input
             data-testid="input-file-pdf"
@@ -169,18 +230,9 @@ export default function SolverUpload({
             type="file"
             className="hidden"
             accept=".pdf"
-            onChange={(inputFile) => {
-              const file = inputFile.target.files?.[0] || null;
-              setJobID(null);
-              SetCurrentlyPolling(false);
-              setPdfHash(null);
-              setModuleGroupID(null);
-              setSelectedFile(file);
-              getQueryClient().clear();
-              if (file) {
-                uploadFile(file);
-              }
-            }}
+            onChange={(inputFile) =>
+              selectFile(inputFile.target.files?.[0] ?? null)
+            }
           />
         </div>
 
@@ -209,6 +261,12 @@ export default function SolverUpload({
           )}
         </Button>
       </CardContent>
+
+      <DemoPdfDialog
+        open={showDemoDialog}
+        onOpenChange={handleDemoDialogChange}
+        onFileReady={selectFile}
+      />
     </Card>
   );
 }
