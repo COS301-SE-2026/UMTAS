@@ -13,6 +13,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { getAllModulesQ } from "@/components/templates/builder/Queries/moduleQueries";
 import { getAllEventsQ } from "@/components/templates/builder/Queries/eventQueries";
+import { X } from "lucide-react";
 
 export default function CustomiseShellPopup() {
   const { data: modules, isLoading: modulesLoading } =
@@ -35,8 +36,8 @@ export default function CustomiseShellPopup() {
             <AlertDialogTitle className="text-xl font-bold">
               Customise Events and Modules
             </AlertDialogTitle>
-            <AlertDialogCancel className="mt-0 cursor-pointer">
-              Close
+            <AlertDialogCancel className="mt-0 cursor-pointer h-8 w-8 p-0 rounded-full bg-transparent border-transparent">
+              <X className="h-4 w-4" />
             </AlertDialogCancel>
           </AlertDialogHeader>
 
