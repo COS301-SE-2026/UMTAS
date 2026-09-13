@@ -281,11 +281,15 @@ export default function CalTemplate() {
 
           <div
             id="calendar-restrictions"
-            className="w-full h-full items-center flex flex-col p-4 px-10"
+            className="w-full flex flex-col items-center p-4 px-10"
           >
             {flagtempRes && tempRes && selectedAcID && (
-              <div className="border-dashed border-2 rounded-2xl my-2 flex flex-col items-center p-3 h-1/4">
-                <div data-testid="TEMP_CONTAINER" key={tempRes.type}>
+              <div className="w-full max-w-2xl border-dashed border-2 rounded-2xl my-2 p-3">
+                <div
+                  data-testid="TEMP_CONTAINER"
+                  key={tempRes.type}
+                  className="w-full"
+                >
                   {handlers.handle(tempRes, currentAC, () => {
                     setFlagTempRes(false);
                     setTempRes(null);
@@ -294,15 +298,17 @@ export default function CalTemplate() {
               </div>
             )}
 
-            <div className="grid grid-cols-1 gap-y-10 p-5 w-full h-auto justify-items-center items-center">
+            <div className="grid grid-cols-1 gap-y-10 p-5 w-full justify-items-center">
               {selectedAcID &&
-                restrictions?.restrictions.map((res) => {
-                  return (
-                    <div data-testid="ADDED_CONTAINER" key={res.id}>
-                      {handlers.handle(res, currentAC)}
-                    </div>
-                  );
-                })}
+                restrictions?.restrictions.map((res) => (
+                  <div
+                    data-testid="ADDED_CONTAINER"
+                    key={res.id}
+                    className="w-full max-w-2xl"
+                  >
+                    {handlers.handle(res, currentAC)}
+                  </div>
+                ))}
             </div>
           </div>
         </div>
