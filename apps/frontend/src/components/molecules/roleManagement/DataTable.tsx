@@ -250,7 +250,7 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
 
-        {table.getColumn("select") && (
+        {table.getAllLeafColumns().some((column) => column.id === "select") && (
           <div className="flex items-center justify-between p-4 border-t border-[var(--border)] bg-[var(--bg-surface)]">
             <div className="text-sm text-muted-foreground">
               {table.getFilteredSelectedRowModel().rows.length} of{" "}
