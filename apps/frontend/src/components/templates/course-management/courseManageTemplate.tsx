@@ -295,23 +295,25 @@ export default function CourseManagementTemplate() {
                   ))}
                 </SelectContent>
               </Select>
-              <Button
-                data-testid="show-add-course"
-                onClick={() => {
-                  if (
-                    // updated to be more agnostic
-                    university?.ApiKey != null ||
-                    university?.ApiKey != undefined
-                  ) {
-                    setExternalCourses(true);
-                  } else {
-                    setShowAddCourse(true);
-                  }
-                }}
-              >
-                Add Courses
-              </Button>
-              {showAddCourse && (
+              {isStudent === false && (
+                <Button
+                  data-testid="show-add-course"
+                  onClick={() => {
+                    if (
+                      // updated to be more agnostic
+                      university?.ApiKey != null ||
+                      university?.ApiKey != undefined
+                    ) {
+                      setExternalCourses(true);
+                    } else {
+                      setShowAddCourse(true);
+                    }
+                  }}
+                >
+                  Add Courses
+                </Button>
+              )}
+              {showAddCourse && isStudent === false && (
                 <AddCoursePopup onClose={() => setShowAddCourse(false)} />
               )}
               {showExternalCourses && (
@@ -428,26 +430,27 @@ export default function CourseManagementTemplate() {
                             {modules.length === 0 ? (
                               <div className="text-sm text-[var(--text-disabled)] italic flex flex-row justify-around gap-x-2">
                                 No modules assigned to this course group.
-                                {course.ExternalID != undefined && (
-                                  <Button
-                                    disabled={modulesPending || eventsPending}
-                                    id=""
-                                    size="sm"
-                                    variant="default"
-                                    onClick={() =>
-                                      addExternalModules(course.CourseID)
-                                    }
-                                  >
-                                    {!(modulesPending || eventsPending) ? (
-                                      <p>Add Modules and Events</p>
-                                    ) : (
-                                      <div className="flex flex-row gap-x-2 ">
-                                        Adding modules and events
-                                        <Spinner></Spinner>
-                                      </div>
-                                    )}
-                                  </Button>
-                                )}
+                                {course.ExternalID != undefined &&
+                                  isStudent === false && (
+                                    <Button
+                                      disabled={modulesPending || eventsPending}
+                                      id=""
+                                      size="sm"
+                                      variant="default"
+                                      onClick={() =>
+                                        addExternalModules(course.CourseID)
+                                      }
+                                    >
+                                      {!(modulesPending || eventsPending) ? (
+                                        <p>Add Modules and Events</p>
+                                      ) : (
+                                        <div className="flex flex-row gap-x-2 ">
+                                          Adding modules and events
+                                          <Spinner></Spinner>
+                                        </div>
+                                      )}
+                                    </Button>
+                                  )}
                               </div>
                             ) : (
                               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
