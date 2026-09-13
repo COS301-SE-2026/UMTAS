@@ -23,6 +23,7 @@ import {
   useUniversityState,
 } from "@/hooks/useUniversityState";
 import Tutorial from "@/components/organisms/nav/Tutorial";
+import { useBuildingDraw } from "@/hooks/useBuildingDraw";
 
 interface GeoJsonPolygon {
   type: "Polygon";
@@ -65,6 +66,8 @@ export function UniMap() {
     null,
   );
   const [adminMode, setAdminMode] = useState<"none" | "draw" | "pin">("none");
+  const buildingDraw = useBuildingDraw();
+  const { polygonPath, pinLocation } = buildingDraw;
   const [selectedDate, setSelectedDate] = useState(() =>
     new Date().toISOString().slice(0, 10),
   );
@@ -149,8 +152,7 @@ export function UniMap() {
 
           {activeRoute?.status === "NONE" && (
             <span className="text-sm text-[var(--text-secondary)]">
-              Select a Time and Date. All Attending Events From Your Schedule
-              Will Display Routes Between Your Events On The Map.
+              Select a Time and Date to View Attending Event Routes
             </span>
           )}
 
@@ -169,7 +171,12 @@ export function UniMap() {
         </div>
 
         <div id="university-map" className="flex-1 overflow-hidden">
-          <MapScreen onRequestMapSetup={() => router.push("/mapping/config")}>
+          <MapScreen
+            onRequestMapSetup={() => router.push("/mapping/config")}
+            adminMode={adminMode}
+            polygonPath={polygonPath}
+            pinLocation={pinLocation}
+          >
             {buildings.map((building) => (
               <div key={building.buildingId}>
                 {building.location && (
@@ -179,11 +186,7 @@ export function UniMap() {
                     onClick={() => handleMarkerClick(building)}
                   >
                     <Pin
-                      background={
-                        building.buildingId === activeRoute?.currentBuildingId
-                          ? "var(--success-text)"
-                          : building.displayColour || "var(--btn-primary-bg)"
-                      }
+                      background={building.displayColour}
                       scale={building.venueCount === 0 ? 0.85 : 1}
                     />
                   </AdvancedMarker>
@@ -194,6 +197,27 @@ export function UniMap() {
                 )}
               </div>
             ))}
+
+            {activeRoute?.currentBuildingId &&
+              (() => {
+                const currentBuilding = buildings.find(
+                  (building) =>
+                    building.buildingId === activeRoute.currentBuildingId,
+                );
+
+                if (!currentBuilding?.location) {
+                  return null;
+                }
+
+                return (
+                  <AdvancedMarker position={currentBuilding.location}>
+                    <div className="relative flex items-center justify-center">
+                      <span className="absolute h-8 w-8 rounded-full bg-green-500 opacity-70 animate-ping" />
+                      <div className="h-4 w-4 rounded-full bg-green-500 border-2 border-white" />
+                    </div>
+                  </AdvancedMarker>
+                );
+              })()}
 
             {activeRoute?.status === "MOVING" && activeRoute.route && (
               <RouteLine
@@ -214,6 +238,7 @@ export function UniMap() {
             <AdminDrawControls
               buildings={buildings}
               onModeChange={setAdminMode}
+              drawingState={buildingDraw}
             />{" "}
           </div>
         )}
