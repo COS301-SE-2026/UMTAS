@@ -21,8 +21,38 @@ function eventCodeCol(): ColumnDef<EventResponse, string> {
     },
   });
 }
+function eventDateCol() {
+  return columnCreator.accessor((row) => row.eventCriteria?.date ?? "", {
+    id: "date",
+    header: "Date",
+    cell: (info) => {
+      const date = info.getValue();
+      return <div>{date}</div>;
+    },
+  });
+}
+function eventTimeCol() {
+  return columnCreator.accessor(
+    (row) => {
+      const start = row.eventCriteria?.startTime;
+      const end = row.eventCriteria?.endTime;
+      if (!start || !end) return "";
+      return `${start} - ${end}`;
+    },
+    {
+      id: "time",
+      header: "Time",
+      cell: (info) => {
+        const time = info.getValue();
+        return <div>{time}</div>;
+      },
+    },
+  );
+}
 
 export const eventCols: ColumnDef<EventResponse, string>[] = [
-  eventCodeCol(),
   eventNameCol(),
+  eventCodeCol(),
+  eventDateCol(),
+  eventTimeCol(),
 ];
