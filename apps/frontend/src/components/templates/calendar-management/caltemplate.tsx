@@ -71,23 +71,29 @@ function toRead(str: string) {
 
 const steps = [
   {
-    target: "#select-year",
-    content: "Select the academic calendar year you want to manage.",
+    target: "#calendar-management",
+    content:
+      "Manage your university's academic calendars, public holidays, and calendar restrictions here.",
+  },
+  {
+    target: "#select-calendar-year",
+    content:
+      "Select the academic year you want to manage. A calendar will be created automatically if one does not already exist.",
   },
   {
     target: "#include-public-holidays",
     content:
-      "Choose whether public holidays should be included in this calendar.",
+      "Choose whether the public holiday calendar should be included for the selected academic year.",
   },
   {
     target: "#create-restriction",
     content:
-      "Create a new calendar restriction such as a recess, test week, or exam period.",
+      "Create a new calendar restriction and choose its type, such as a semester period, recess, test week, or exam period.",
   },
   {
     target: "#calendar-restrictions",
     content:
-      "View and manage the restrictions for the selected academic year here.",
+      "View and manage all restrictions for the selected academic year here.",
   },
 ];
 
@@ -148,7 +154,10 @@ export default function CalTemplate() {
       {/* <Tutorial steps={steps} wait={true} /> */}
 
       <div className="items-center flex flex-col gap-6 w-full px-6 capitalize">
-        <div className="w-full h-full max-w-6xl bg-[var(--bg-surface)] overflow-auto border border-[var(--border)] rounded-xl shadow-sm">
+        <div
+          id="calendar-management"
+          className="w-full h-full max-w-6xl bg-[var(--bg-surface)] overflow-auto border border-[var(--border)] rounded-xl shadow-sm"
+        >
           <h1 className="text-lg font-semibold text-[var(--text-primary)] pl-4 pt-4">
             Calendar Management
           </h1>
@@ -177,7 +186,7 @@ export default function CalTemplate() {
                   }}
                 >
                   <SelectTrigger
-                    id="select-year"
+                    id="select-calendar-year"
                     data-testid="SELECT_NEW_YEAR"
                     className="w-[180px] bg-[var(--background)]"
                   >

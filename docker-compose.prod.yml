@@ -64,6 +64,28 @@ services:
       - "traefik.http.routers.minio-prod.tls.certresolver=myresolver"
       - "traefik.http.services.minio-prod.loadbalancer.server.port=9001"
 
+  minio-init:
+    image: quay.io/minio/minio:RELEASE.2023-10-25T06-33-25Z
+    networks:
+      - data-internal
+    depends_on:
+      minio:
+        condition: service_healthy
+    environment:
+      MINIO_ENDPOINT: http://minio-prod:9000
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_BUCKET: ${MINIO_BUCKET:-umtas-uploads}
+    volumes:
+      - ./apps/pdf_parser/up_test_pdfs/LECTURES_S1.pdf:/seed/LECTURES_S1.pdf:ro
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -eu
+        /opt/bin/mc alias set local "$${MINIO_ENDPOINT}" "$${MINIO_ROOT_USER}" "$${MINIO_ROOT_PASSWORD}"
+        /opt/bin/mc mb --ignore-existing "local/$${MINIO_BUCKET}"
+        /opt/bin/mc cp --quiet /seed/LECTURES_S1.pdf "local/$${MINIO_BUCKET}/demo/pdf-parser/up/LECTURES_S1.pdf"
+
   pdf-parser-worker:
     image: ${DOCKER_REGISTRY:-vigilcs/umtas}:pdf-parser-worker-${IMAGE_TAG:?IMAGE_TAG is required}
     restart: unless-stopped
@@ -143,6 +165,8 @@ services:
         condition: service_healthy
       minio:
         condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
     environment:
       - PORT=${BACKEND_PORT}
       - NODE_ENV=production

@@ -124,11 +124,7 @@ export default function SolverUpload({
         <div className="border-2 border-dashed border-[var(--border)] rounded-lg p-20 flex flex-col items-center justify-center gap-4 bg-[var(--bg-base)] text-[var(--text-secondary)]">
           <p className="text-sm text-center font-mono leading-relaxed">
             {!selectedFile && (
-              <>
-                Drag and drop here
-                <br />
-                or
-              </>
+              <>Upload a PDF file to start the timetable creation process.</>
             )}
             {selectedFile && (
               <>

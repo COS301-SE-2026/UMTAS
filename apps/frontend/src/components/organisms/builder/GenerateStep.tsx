@@ -374,7 +374,7 @@ export function GenerateStep({
         </div>
 
         {renderContent()}
-        <div className="flex justify-start mt-8 gap-x-2">
+        <div className="flex flex-wrap justify-center items-center mt-8 gap-3">
           <Button
             id="btn-create-schedule"
             data-testid="schedules-Create-Btn"
@@ -409,9 +409,10 @@ export function GenerateStep({
       </div>
       {showSolver && (
         <Popup onClose={() => setShowSolver(false)}>
-          <div className="flex w-120 h-110 justify-center">
+          <div className="flex w-120 justify-center">
             <SolverPreferences
               modules={getSelectedModules()}
+              timetableName={timetableName}
               onJobCompleteAction={() => onGenerate("BACK", [])}
             />
           </div>

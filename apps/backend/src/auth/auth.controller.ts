@@ -1,9 +1,13 @@
 import {
   All,
+  BadRequestException,
   Body,
+  ConflictException,
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Logger,
   NotFoundException,
   Post,
@@ -160,6 +164,94 @@ export class AuthController {
     @Res() res: ServerResponse,
   ): Promise<void> {
     return this.handleRequest(req, res);
+  }
+
+  @Public()
+  @ApiTags('Auth Email')
+  @Post('sign-in/guest')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({
+    summary: 'Create and sign in as a University of Pretoria demo guest',
+    operationId: 'signInGuest',
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      additionalProperties: false,
+      description: 'No user-controlled fields are accepted.',
+    },
+  })
+  @ApiResponse({
+    status: 201,
+    description:
+      'Guest created and signed in. Sets the normal Better Auth session cookie and the University of Pretoria selection cookie.',
+    type: AuthEnvelopeDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'The guest request contains fields.',
+  })
+  @ApiResponse({
+    status: 409,
+    description:
+      'An authenticated session already exists and was not replaced.',
+  })
+  @ApiResponse({
+    status: 503,
+    description: 'The University of Pretoria is unavailable.',
+  })
+  async signInGuest(
+    @Req() req: IncomingMessage,
+    @Body() body: unknown,
+    @Res() res: ServerResponse,
+  ): Promise<void> {
+    if (
+      body !== undefined &&
+      (body === null || typeof body !== 'object' || Array.isArray(body))
+    ) {
+      throw new BadRequestException('Guest sign-in expects an empty object');
+    }
+    if (body && Object.keys(body).length > 0) {
+      throw new BadRequestException('Guest sign-in does not accept fields');
+    }
+
+    const headers = requestHeaders(req);
+    const auth = this.authService.getAuth();
+    const existingSession = await auth.api.getSession({ headers });
+    if (existingSession) {
+      throw new ConflictException(
+        'An authenticated session already exists; guest sign-in did not replace it',
+      );
+    }
+
+    let provisioned:
+      Awaited<ReturnType<AuthService['createGuestUser']>> | undefined;
+    try {
+      provisioned = await this.authService.createGuestUser();
+      const signedIn = await auth.api.signInEmail({
+        body: {
+          email: provisioned.email,
+          password: provisioned.password,
+          rememberMe: true,
+        },
+        headers,
+        returnHeaders: true,
+        returnStatus: true,
+      });
+
+      const cookies = getSetCookieHeaders(signedIn.headers);
+      cookies.push(makeUniversityCookie(provisioned.uniId));
+      res.statusCode = HttpStatus.CREATED;
+      res.setHeader('Set-Cookie', cookies);
+      res.setHeader('Cache-Control', 'no-store');
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify(signedIn.response));
+    } catch (error) {
+      if (provisioned) {
+        await this.authService.removeProvisionedUser(provisioned.userId);
+      }
+      throw error;
+    }
   }
 
   // ─── Sign out ─────────────────────────────────────────────────────────────────
@@ -828,4 +920,33 @@ export class AuthController {
       process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET,
     );
   }
+}
+
+function requestHeaders(req: IncomingMessage): Headers {
+  const headers = new Headers();
+  for (const [key, value] of Object.entries(req.headers)) {
+    if (value !== undefined)
+      headers.set(key, Array.isArray(value) ? value.join(', ') : value);
+  }
+  return headers;
+}
+
+function getSetCookieHeaders(headers: Headers): string[] {
+  const nodeHeaders = headers as Headers & {
+    getSetCookie?: () => string[];
+  };
+  if (typeof nodeHeaders.getSetCookie === 'function') {
+    return nodeHeaders.getSetCookie();
+  }
+
+  const value = headers.get('set-cookie');
+  if (!value) return [];
+  return value.split(/,(?=\s*[^;,=\s]+=[^;,]*)/);
+}
+
+function makeUniversityCookie(universityId?: string): string {
+  const secure =
+    process.env.NODE_ENV?.trim().toLowerCase() === 'production' ||
+    process.env.NODE_ENV?.trim().toLowerCase() === 'staging';
+  return `umtas-uni-id=${encodeURIComponent(universityId ?? '')}; Path=/; SameSite=Lax${secure ? '; Secure' : ''}`;
 }

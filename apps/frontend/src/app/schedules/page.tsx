@@ -9,18 +9,19 @@ import Tutorial from "@/components/organisms/nav/Tutorial";
 const steps = [
   {
     target: "#schedule-header",
-    content: "View your schedule summary and export your timetable from here.",
+    content:
+      "View your schedule summary, including module and event counts, and export your timetable from here.",
   },
   {
     target: "#schedule-view",
-    content: "View your scheduled modules and events here.",
+    content:
+      "Select a timetable, navigate between weeks, and manage your saved schedules here.",
   },
 ];
 
 export default function SchedulesPage() {
   const [eventCount, setEventCount] = useState(0);
   const [moduleCount, setModuleCount] = useState(0);
-  const [exportFn, setExportFn] = useState<(() => void) | null>(null);
 
   const exportRef = React.useRef<(() => void) | null>(null);
 
