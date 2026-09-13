@@ -104,7 +104,7 @@ export function StartTimePref({
   setChecked,
 }: StartTimePref) {
   return (
-    <PreferenceContainer>
+    <>
       <label className="flex flex-col gap-1.5 w-full">
         <span className="font-medium text-xs text-[var(--text-primary)]">
           Preferred Start Time
@@ -122,7 +122,7 @@ export function StartTimePref({
         setChecked={setChecked}
         isChecked={activePreference}
       />
-    </PreferenceContainer>
+    </>
   );
 }
 

@@ -58,7 +58,7 @@ export default function SolverPreferences({
   function preferences() {
     return (
       <div className="flex flex-col w-full gap-y-5">
-        <div className="grid grid-cols-2 w-full h-full justify-items-start items-center gap-5">
+        <div className="grid grid-cols-2 w-full h-full justify-items-center items-center gap-5 ">
           <label className="flex items-center gap-2 cursor-pointer text-sm font-medium">
             <span>Choose Preferences</span>
           </label>
@@ -66,23 +66,24 @@ export default function SolverPreferences({
           <label className="flex items-center gap-2 cursor-pointer text-sm font-medium">
             <span>Activate Preference</span>
           </label>
+
+          <StartTimePref
+            startTime={startTime}
+            onChange={setStartTime}
+            setChecked={SetStartTimeChecked}
+            activePreference={startTimeChecked}
+          />
+          <SkipDayPref
+            setChecked={setSkipChecked}
+            activePreference={skipChecked}
+            day={skipDay}
+            onChange={setSkipDay}
+          />
+          <SmallGapsPref
+            activePreference={smallGapsChecked}
+            setChecked={setSmallGapsChecked}
+          />
         </div>
-        <StartTimePref
-          startTime={startTime}
-          onChange={setStartTime}
-          setChecked={SetStartTimeChecked}
-          activePreference={startTimeChecked}
-        />
-        <SkipDayPref
-          setChecked={setSkipChecked}
-          activePreference={skipChecked}
-          day={skipDay}
-          onChange={setSkipDay}
-        />
-        <SmallGapsPref
-          activePreference={smallGapsChecked}
-          setChecked={setSmallGapsChecked}
-        />
       </div>
     );
   }
