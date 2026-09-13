@@ -186,11 +186,7 @@ export function UniMap() {
                     onClick={() => handleMarkerClick(building)}
                   >
                     <Pin
-                      background={
-                        building.buildingId === activeRoute?.currentBuildingId
-                          ? "var(--success-text)"
-                          : building.displayColour
-                      }
+                      background={building.displayColour}
                       scale={building.venueCount === 0 ? 0.85 : 1}
                     />
                   </AdvancedMarker>
@@ -201,6 +197,27 @@ export function UniMap() {
                 )}
               </div>
             ))}
+
+            {activeRoute?.currentBuildingId &&
+              (() => {
+                const currentBuilding = buildings.find(
+                  (building) =>
+                    building.buildingId === activeRoute.currentBuildingId,
+                );
+
+                if (!currentBuilding?.location) {
+                  return null;
+                }
+
+                return (
+                  <AdvancedMarker position={currentBuilding.location}>
+                    <div className="relative flex items-center justify-center">
+                      <span className="absolute h-8 w-8 rounded-full bg-green-500 opacity-70 animate-ping" />
+                      <div className="h-4 w-4 rounded-full bg-green-500 border-2 border-white" />
+                    </div>
+                  </AdvancedMarker>
+                );
+              })()}
 
             {activeRoute?.status === "MOVING" && activeRoute.route && (
               <RouteLine
