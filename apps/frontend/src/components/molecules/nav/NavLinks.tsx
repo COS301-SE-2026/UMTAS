@@ -1,81 +1,195 @@
 "use client";
 
-import { usePathname } from "next/navigation";
-import { NavLink } from "@/components/atoms/nav/NavLink";
-import { UserDetails } from "@/lib/userclass/userClass";
 import { useEffect, useState } from "react";
 
-const noUniLinks = [
-  { href: "/dashboard", label: "Home" },
-  { href: "/builder", label: "Event Builder" },
-  { href: "/schedules", label: "My Schedules" },
-];
+import { usePathname, useRouter } from "next/navigation";
 
-const basicLinks = [
-  { href: "/module-management", label: "Manage Modules / Events" },
-  { href: "/map", label: "Map" },
-];
+import {
+  Menubar,
+  MenubarContent,
+  MenubarItem,
+  MenubarMenu,
+  MenubarTrigger,
+} from "@/components/atoms/baseShadcn/menubar";
 
-const extraAdminLinks = [
-  { href: "/course-management", label: "Manage Courses" },
-  { href: "/role-management", label: "Manage Roles" },
-  { href: "/calendar-management", label: "Manage Calendars" },
-  { href: "/stats", label: "Stats" },
-];
-const universitySpecific = [{ href: "/solver", label: "Upload PDF" }];
+import { UserDetails } from "@/lib/userclass/userClass";
+
+import {
+  executeNavigationAction,
+  getVisibleNavigationItems,
+  NavigationItem,
+} from "@/types/Nav";
 
 export function NavLinks() {
-  const pathName = usePathname();
-  const [isMounted, setIsMounted] = useState(false);
-  const [refreshKey, setRefreshKey] = useState(0);
+  const pathname = usePathname();
+  const router = useRouter();
+
+  const [, forceRefresh] = useState(0);
 
   useEffect(() => {
-    // eslint-disable-next-line
-    setIsMounted(true);
+    const handleUserDetailsChange = () => {
+      forceRefresh((value) => value + 1);
+    };
+
+    window.addEventListener(UserDetails.changeEvent, handleUserDetailsChange);
+
+    return () => {
+      window.removeEventListener(
+        UserDetails.changeEvent,
+        handleUserDetailsChange,
+      );
+    };
   }, []);
 
-  useEffect(() => {
-    const handleChange = () => setRefreshKey((key) => key + 1);
-    window.addEventListener(UserDetails.changeEvent, handleChange);
-    return () =>
-      window.removeEventListener(UserDetails.changeEvent, handleChange);
-  }, []);
+  const universityDetails = UserDetails.getUniDetails();
 
-  const isAdmin = UserDetails.getUniDetails()?.role === "UNIVERSITY_ADMIN";
+  const visibleItems = getVisibleNavigationItems({
+    role: universityDetails?.role ?? undefined,
+    universityName: universityDetails?.UniversityName,
+  }).filter((item) => item.showInNavbar);
 
-  const navItems = [...noUniLinks];
+  const primaryItems = visibleItems.filter(
+    (item) => item.section === "primary",
+  );
 
-  const uniDetails = isMounted ? UserDetails.getUniDetails() : null;
-  if (isMounted) {
-    if (uniDetails != undefined) {
-      navItems.push(...basicLinks);
+  const actionItems = visibleItems.filter((item) => item.section === "actions");
+
+  const adminItems = visibleItems.filter((item) => item.section === "admin");
+
+  const helpItems = visibleItems.filter((item) => item.section === "help");
+
+  const isActive = (href?: string) => {
+    if (!href) {
+      return false;
     }
-    if (uniDetails?.UniversityName == "University of Pretoria")
-      navItems.push(...universitySpecific);
 
-    if (isAdmin) {
-      navItems.push(...extraAdminLinks);
+    return pathname === href || pathname.startsWith(`${href}/`);
+  };
+
+  const isGroupActive = (items: NavigationItem[]) => {
+    return items.some((item) => isActive(item.href));
+  };
+
+  const handleItemClick = (item: NavigationItem) => {
+    if (item.action) {
+      executeNavigationAction(item.action);
+      return;
     }
-  }
+
+    if (item.href) {
+      router.push(item.href);
+    }
+  };
+
+  const triggerClass = (active: boolean) => {
+    return [
+      "cursor-pointer",
+      "text-sm",
+      "font-medium",
+      "border-b-2",
+      "rounded-none",
+      "px-1",
+      "py-1.5",
+      "bg-transparent",
+      "data-[state=open]:bg-transparent",
+      "focus:bg-transparent",
+      active
+        ? "border-[var(--text-primary)] text-[var(--text-primary)]"
+        : "border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border)]",
+    ].join(" ");
+  };
+
+  const menuItemClass = (item: NavigationItem) => {
+    return `cursor-pointer ${
+      isActive(item.href) ? "font-medium text-[var(--text-primary)]" : ""
+    }`;
+  };
+
   return (
     <nav aria-label="Main navigation">
-      <ul className="flex items-center gap-6 list-none m-0 p-0">
-        {navItems.map(({ href, label }) => {
-          const isActive = pathName === href;
-          return (
-            <li
-              key={href}
-              className={`h-full flex items-center border-b-2 transition-colors ${
-                isActive
-                  ? "border-primary text-foreground"
-                  : "border-transparent text-muted-foreground hover:border-border hover:text-foreground"
-              }`}
+      <Menubar className="border-none bg-transparent p-0 gap-6 h-auto">
+        {primaryItems.map((item) => (
+          <MenubarMenu key={item.id}>
+            <MenubarTrigger
+              onClick={() => handleItemClick(item)}
+              className={triggerClass(isActive(item.href))}
             >
-              <NavLink href={href}>{label}</NavLink>
-            </li>
-          );
-        })}
-      </ul>
+              {item.label}
+            </MenubarTrigger>
+          </MenubarMenu>
+        ))}
+
+        {actionItems.length > 0 && (
+          <MenubarMenu>
+            <MenubarTrigger
+              className={triggerClass(isGroupActive(actionItems))}
+            >
+              Actions
+            </MenubarTrigger>
+
+            <MenubarContent
+              align="start"
+              className="bg-[var(--bg-surface)] border-[var(--border)]"
+            >
+              {actionItems.map((item) => (
+                <MenubarItem
+                  key={item.id}
+                  onClick={() => handleItemClick(item)}
+                  className={menuItemClass(item)}
+                >
+                  {item.label}
+                </MenubarItem>
+              ))}
+            </MenubarContent>
+          </MenubarMenu>
+        )}
+
+        {adminItems.length > 0 && (
+          <MenubarMenu>
+            <MenubarTrigger className={triggerClass(isGroupActive(adminItems))}>
+              Admin
+            </MenubarTrigger>
+
+            <MenubarContent
+              align="start"
+              className="bg-[var(--bg-surface)] border-[var(--border)]"
+            >
+              {adminItems.map((item) => (
+                <MenubarItem
+                  key={item.id}
+                  onClick={() => handleItemClick(item)}
+                  className={menuItemClass(item)}
+                >
+                  {item.label}
+                </MenubarItem>
+              ))}
+            </MenubarContent>
+          </MenubarMenu>
+        )}
+
+        {helpItems.length > 0 && (
+          <MenubarMenu>
+            <MenubarTrigger className={triggerClass(isGroupActive(helpItems))}>
+              Help
+            </MenubarTrigger>
+
+            <MenubarContent
+              align="end"
+              className="min-w-60 bg-[var(--bg-surface)] border-[var(--border)]"
+            >
+              {helpItems.map((item) => (
+                <MenubarItem
+                  key={item.id}
+                  onClick={() => handleItemClick(item)}
+                  className={menuItemClass(item)}
+                >
+                  {item.label}
+                </MenubarItem>
+              ))}
+            </MenubarContent>
+          </MenubarMenu>
+        )}
+      </Menubar>
     </nav>
   );
 }

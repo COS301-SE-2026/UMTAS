@@ -10,7 +10,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/atoms/baseShadcn/tabs";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 import {
   getAllModCoursesQ,
@@ -41,6 +41,7 @@ import {
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
 import { useErrorListener } from "@/hooks/errorListener";
 import { errorName } from "../../../../utilities/errorCries";
+import { getAllBuildingsQ } from "../../../../utilities/building/buildingQueries";
 
 export default function EditModuleEvent({
   data,
@@ -131,6 +132,9 @@ export default function EditModuleEvent({
     },
     onError: (err) => console.error("mutation failed", err),
   });
+
+  const { data: buildingsList } = useQuery(getAllBuildingsQ());
+  const buildings = buildingsList ?? [];
 
   const isPending =
     updateModuleMutResult.isPending || updateEventMutResult.isPending;
@@ -334,6 +338,7 @@ export default function EditModuleEvent({
                   key={event.eventId}
                   event={event}
                   modules={[moduleState]}
+                  buildings={buildings}
                   onUpdate={handleEventUpdate}
                 />
               ))

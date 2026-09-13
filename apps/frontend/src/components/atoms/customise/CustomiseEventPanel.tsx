@@ -4,12 +4,14 @@ import { ModuleResponseDto } from "@/app/builder/utils/modules/requestBuilders";
 interface EventPanelProps {
   event: EventResponse;
   modules: ModuleResponseDto[];
+  isSelected: boolean;
   onClick?: () => void;
 }
 
 export default function CustomiseEventPanel({
   event,
   modules,
+  isSelected,
   onClick,
 }: EventPanelProps) {
   const assignedModule = modules.find(
@@ -22,7 +24,11 @@ export default function CustomiseEventPanel({
         <button
           type="button"
           onClick={onClick}
-          className="flex flex-1 items-center gap-3 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] px-4 py-4 text-left"
+          className={`flex flex-1 items-center gap-3 rounded-lg border px-4 py-4 text-left transition-colors ${
+            isSelected
+              ? "bg-[var(--bg-elevated)] border-[var(--text-disabled)]"
+              : "border-[var(--border)] bg-[var(--bg-surface)] hover:bg-[var(--bg-elevated)] cursor-pointer"
+          }`}
         >
           <span
             className="h-3 w-3 rounded-full flex-shrink-0"

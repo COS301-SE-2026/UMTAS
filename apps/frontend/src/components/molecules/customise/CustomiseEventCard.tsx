@@ -21,6 +21,7 @@ import {
 } from "@/app/builder/utils/events/eventRequestBuilder";
 import { UserDetails } from "@/lib/userclass/userClass";
 import { Switch } from "@/components/atoms/baseShadcn/switch";
+import { BuildingType } from "../../../../utilities/building/buildingRequestBuilder";
 
 //NOTE
 //copied from event card and changed slightly for customisation
@@ -39,10 +40,11 @@ export interface EventErrors {
 interface EventCardProps {
   event: EventResponse;
   modules: ModuleResponseDto[];
+  buildings: BuildingType[];
   onUpdate: (
     id: string,
-    field: keyof EventResponse | keyof EventCriteria,
-    value: string | boolean,
+    field: keyof EventResponse | keyof EventCriteria | "buildingId",
+    value: string | boolean | string[],
   ) => void;
   onGoToModules?: () => void;
   errors?: EventErrors;
@@ -51,6 +53,7 @@ interface EventCardProps {
 export function CustomiseEventCard({
   event,
   modules,
+  buildings,
   onUpdate,
   onGoToModules,
   errors,
@@ -193,7 +196,14 @@ export function CustomiseEventCard({
               <p className="text-sm text-[var(--error-text)]">{errors.code}</p>
             )}
           </div>
-
+        </div>
+      </div>
+      <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4">
+        <div className="flex flex-col gap-4">
+          <Label className="text-sm font-medium text-[var(--text-primary)]">
+            Location
+          </Label>
+          {/* venue */}
           <div className="flex flex-col gap-2">
             <Label
               htmlFor={"event-venue-" + event.eventId}
@@ -201,17 +211,64 @@ export function CustomiseEventCard({
             >
               Venue
             </Label>
-            {/* <Input
-              readOnly={!canEdit}
+
+            <Input
               id={"event-venue-" + event.eventId}
-              value={event.eventCriteria?.venue || ""}
-              onChange={(e) => onUpdate(event.eventId, "venue", e.target.value)}
+              value={
+                typeof event.venues?.[0] === "string"
+                  ? event.venues[0]
+                  : event.venues?.[0]?.venueName || ""
+              }
+              onChange={(e) =>
+                onUpdate(event.eventId, "venues", [e.target.value])
+              }
               placeholder="e.g. IT 2-26"
               className={getInputClass(!!errors?.venue)}
             />
+
             {errors?.venue && (
               <p className="text-sm text-[var(--error-text)]">{errors.venue}</p>
-            )} */}
+            )}
+          </div>
+
+          {/* building dropdown */}
+          <div className="flex flex-col gap-2">
+            <Label className="text-sm font-medium text-[var(--text-secondary)]">
+              Building
+            </Label>
+            <Select
+              value={
+                (event.eventCriteria as EventCriteria & { buildingId?: string })
+                  ?.buildingId ||
+                (typeof event.venues?.[0] === "object"
+                  ? event.venues[0].buildingId
+                  : undefined) ||
+                ""
+              }
+              onValueChange={(value) =>
+                onUpdate(event.eventId, "buildingId", value)
+              }
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select the building" />
+              </SelectTrigger>
+              <SelectContent>
+                {buildings.length === 0 ? (
+                  <SelectItem value="no-buildings" disabled>
+                    No buildings available
+                  </SelectItem>
+                ) : (
+                  buildings.map((building) => (
+                    <SelectItem
+                      key={building.buildingId}
+                      value={building.buildingId}
+                    >
+                      {building.buildingName}
+                    </SelectItem>
+                  ))
+                )}
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </div>
@@ -274,14 +331,16 @@ export function CustomiseEventCard({
             </SelectContent>
           </Select>
         ) : (
-          <Input
-            readOnly={!canEdit}
-            id={"event-date-" + event.eventId}
-            type="date"
-            value={event.eventCriteria?.date || ""}
-            onChange={(e) => onUpdate(event.eventId, "date", e.target.value)}
-            className={getInputClass(!!errors?.date)}
-          />
+          <div className="relative w-full">
+            <Input
+              readOnly={!canEdit}
+              id={"event-date-" + event.eventId}
+              type="date"
+              value={event.eventCriteria?.date || ""}
+              onChange={(e) => onUpdate(event.eventId, "date", e.target.value)}
+              className={getInputClass(!!errors?.date)}
+            />
+          </div>
         )}
 
         {errors?.date && !event.isRecurring && (

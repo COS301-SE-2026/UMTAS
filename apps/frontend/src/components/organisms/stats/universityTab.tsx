@@ -37,7 +37,7 @@ export default function UniversityStats({
     : [];
 
   return (
-    <div className="flex flex-col p-4 gap-4">
+    <div className="flex flex-col gap-4">
       <div className="grid gap-4 grid-cols-2 md:grid-cols-4">
         <StatCard
           title="Courses"

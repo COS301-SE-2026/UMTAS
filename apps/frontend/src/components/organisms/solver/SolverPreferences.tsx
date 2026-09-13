@@ -29,6 +29,8 @@ import {
   StartTimePref,
 } from "@/components/molecules/solver/PreferenceHandler";
 import { getAllTimetablesQ } from "@/components/templates/builder/Queries/timetableQueries";
+import { errorName } from "../../../../utilities/errorCries";
+import { useErrorListener } from "@/hooks/errorListener";
 type solverProps = {
   modules: ModuleResponseDto[];
   onJobCompleteAction?: () => void;
@@ -47,42 +49,48 @@ export default function SolverPreferences({
   const router = useRouter();
   const [timetableName, setTimetableName] = useState<string>("");
 
-  const [startTime, setStartTime] = useState<string>("");
+  const [startTime, setStartTime] = useState<string>("07:30");
   const [startTimeChecked, SetStartTimeChecked] = useState<boolean>(false);
 
-  const [skipDay, setSkipDay] = useState<string>("");
+  const [skipDay, setSkipDay] = useState<string>("Monday");
   const [skipChecked, setSkipChecked] = useState<boolean>(false);
 
   const [smallGapsChecked, setSmallGapsChecked] = useState<boolean>(false);
 
   function preferences() {
     return (
-      <div className="flex flex-col w-full gap-y-5">
-        <div className="grid grid-cols-2 w-full h-full justify-items-start items-center gap-5">
-          <label className="flex items-center gap-2 cursor-pointer text-sm font-medium">
-            <span>Choose Preferences</span>
-          </label>
+      <div className="flex flex-col w-full min-w-100 max-w-120    ">
+        <div className="grid grid-cols-2  items-center gap-x-8  auto-rows-[minmax(30px,auto)]">
+          <span className="text-sm font-medium text-[var(--text-primary)]">
+            Choose Preferences
+          </span>
+          <span className="text-sm font-medium text-[var(--text-primary)] text-center">
+            Activate
+          </span>
+          <div className="col-span-2  border-b border-[var(--border)] " />
+          <div className=" col-span-2 grid grid-cols-2  items-center gap-x-8 max-h-45  auto-rows-[minmax(30px,auto)] overflow-scroll">
+            <StartTimePref
+              startTime={startTime}
+              onChange={setStartTime}
+              setChecked={SetStartTimeChecked}
+              activePreference={startTimeChecked}
+            />
 
-          <label className="flex items-center gap-2 cursor-pointer text-sm font-medium">
-            <span>Activate Preference</span>
-          </label>
+            <div className="col-span-2  " />
+            <SkipDayPref
+              setChecked={setSkipChecked}
+              activePreference={skipChecked}
+              day={skipDay}
+              onChange={setSkipDay}
+            />
+            <div className="col-span-2   " />
+            <SmallGapsPref
+              activePreference={smallGapsChecked}
+              setChecked={setSmallGapsChecked}
+            />
+            <div className="col-span-2  " />
+          </div>
         </div>
-        <StartTimePref
-          startTime={startTime}
-          onChange={setStartTime}
-          setChecked={SetStartTimeChecked}
-          activePreference={startTimeChecked}
-        />
-        <SkipDayPref
-          setChecked={setSkipChecked}
-          activePreference={skipChecked}
-          day={skipDay}
-          onChange={setSkipDay}
-        />
-        <SmallGapsPref
-          activePreference={smallGapsChecked}
-          setChecked={setSmallGapsChecked}
-        />
       </div>
     );
   }
@@ -236,7 +244,7 @@ export default function SolverPreferences({
       }
     }
   }
-
+  useErrorListener();
   handleStatus();
 
   function loadingStatus() {
@@ -302,24 +310,45 @@ export default function SolverPreferences({
             </Button>
           </div>
         </div>
-        {preferences()}
-        <div className="flex flex-col gap-y-2">
-          <Input
-            data-testid="input-solver-timetable-name"
-            id="input-name-timetable"
-            placeholder="Name timetable"
-            value={timetableName}
-            onChange={(e) => {
-              setTimetableName(e.target.value);
-            }}
-          ></Input>
+        <div className="grid grid-cols-1 gap-y-2">
+          <label className="flex flex-col gap-1  w-full">
+            <span className="font-medium text-sm text-[var(--text-primary)]">
+              Timetable name
+            </span>
+            <Input
+              data-testid="input-solver-timetable-name"
+              id="input-name-timetable"
+              placeholder="My timetable"
+              value={timetableName}
+              className="h-8  w-full min-w-100 max-w-100 rounded-md border border-[var(--border)] bg-transparent px-3 text-left text-sm text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--ring)]"
+
+              onChange={(e) => {
+                setTimetableName(e.target.value);
+              }}
+            ></Input>
+          </label>
+
+          {preferences()}
+        </div>
+        <div className="grid grid-cols-1 gap-y-2 mt-2">
           <Button
             data-testid="btn-upload-and-create-timetable"
             id="btn-upload-and-create-timetable"
             disabled={loadingStatus()}
             type="button"
-            onClick={enrollUser}
-            className="mt-4 w-fit"
+            onClick={() => {
+              if (timetableName != "") enrollUser();
+              else {
+                window.dispatchEvent(
+                  new CustomEvent(errorName, {
+                    detail: {
+                      userMessage: "Please ensure you provide a timetable name",
+                    },
+                  }),
+                );
+              }
+            }}
+            className=" w-fit h-8"
           >
             Upload and Create Timetable
           </Button>
@@ -338,12 +367,8 @@ export default function SolverPreferences({
         <CardHeader className="text-xl font-bold text-[var(--text-primary)]">
           Set your preferences
         </CardHeader>
-        <CardDescription className="px-4">
-          These are soft preferences. They shape which timetable is picked,
-          never making a timetable invalid
-        </CardDescription>
 
-        <CardContent className="space-y-4 overflow-y-auto flex-1">
+        <CardContent className=" overflow-y-auto flex-1">
           {jobFailed == false ? (
             <>
               {!loadingStatus() ? (

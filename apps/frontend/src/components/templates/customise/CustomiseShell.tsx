@@ -17,25 +17,25 @@ export default function CustomiseShell({
   modules,
   invalidateKey,
 }: CustomiseShellProps) {
-  const [viewMode, setViewMode] = useState<"Modules" | "Events">("Modules");
+  const [viewMode, setViewMode] = useState<"Events" | "Modules">("Events");
 
   function renderView() {
-    if (viewMode === "Modules" || events.length === 0) {
+    if (viewMode === "Events" || events.length === 0) {
       return (
-        <CustomiseModuleShell
-          modules={modules}
+        <CustomiseEventShell
           events={events}
+          modules={modules}
           onViewModeChange={setViewMode}
-          invalidateKey={invalidateKey}
         />
       );
     }
 
     return (
-      <CustomiseEventShell
-        events={events}
+      <CustomiseModuleShell
         modules={modules}
+        events={events}
         onViewModeChange={setViewMode}
+        invalidateKey={invalidateKey}
       />
     );
   }
