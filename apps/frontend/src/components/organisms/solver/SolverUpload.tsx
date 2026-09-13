@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Button } from "@/components/atoms/baseShadcn/button";
 import {
   Card,
@@ -10,20 +10,18 @@ import {
   CardTitle,
 } from "@/components/atoms/baseShadcn/card";
 import { Input } from "@/components/atoms/baseShadcn/input";
-import { fileHash, uploadPDF } from "@/app/solver/queries/PDF/queries";
+import { demoPdf, fileHash, uploadPDF } from "@/app/solver/queries/PDF/queries";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { UserDetails } from "@/lib/userclass/userClass";
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
 import { Spinner } from "@/components/atoms/baseShadcn/spinner";
 import { CheckSquare } from "lucide-react";
 import {
+  DEMO_PDF_FILENAME,
   PDFjobLookupBuilder,
   PDFjobStatusBuilder,
 } from "@/app/solver/queries/PDF/builder";
 import { useIsGuest } from "@/hooks/useIsGuest";
-import DemoPdfDialog from "@/components/molecules/solver/DemoPdfDialog";
-
-const DEMO_PDF_PROMPT_STORAGE_KEY = "umtas-demo-pdf-prompt";
 
 interface SolverUploadProps {
   onComplete: () => void;
@@ -42,9 +40,8 @@ export default function SolverUpload({
   const [, setPdfHash] = useState<string | null>(null);
   const [jobId, setJobID] = useState<string | null>(null);
   const [currentlyPolling, SetCurrentlyPolling] = useState<boolean>(false);
-  const [showDemoDialog, setShowDemoDialog] = useState(false);
-  const dismissedThisSession = useRef(false);
-  const { isGuest, isPending: isGuestPending } = useIsGuest();
+  const { isGuest } = useIsGuest();
+  const isDemoPdfSelected = selectedFile?.name === DEMO_PDF_FILENAME;
 
   const { data: pdfJobResult } = useQuery({
     queryKey: ["PDF", jobId],
@@ -76,6 +73,7 @@ export default function SolverUpload({
   });
 
   const UploadPDFmut = useMutation(uploadPDF());
+  const demoPdfMutation = useMutation(demoPdf());
 
   function selectFile(file: File | null) {
     setJobID(null);
@@ -89,40 +87,15 @@ export default function SolverUpload({
     }
   }
 
-  useEffect(() => {
-    if (
-      isGuestPending ||
-      !isGuest ||
-      selectedFile ||
-      dismissedThisSession.current
-    ) {
-      return;
-    }
-
-    if (typeof window === "undefined") {
-      return;
-    }
-
-    const dismissed = window.sessionStorage.getItem(
-      DEMO_PDF_PROMPT_STORAGE_KEY,
-    );
-    if (dismissed === "true") {
-      dismissedThisSession.current = true;
-      return;
-    }
-
-    const timeoutId = window.setTimeout(() => setShowDemoDialog(true), 0);
-    return () => window.clearTimeout(timeoutId);
-  }, [dismissedThisSession, isGuest, isGuestPending, selectedFile]);
-
-  function handleDemoDialogChange(open: boolean) {
-    setShowDemoDialog(open);
-    if (!open && typeof window !== "undefined") {
-      window.sessionStorage.setItem(DEMO_PDF_PROMPT_STORAGE_KEY, "true");
-      dismissedThisSession.current = true;
+  async function handleUseDemoPdf() {
+    try {
+      const file = await demoPdfMutation.mutateAsync();
+      selectFile(file);
+    } catch {
+      // The mutation error is rendered inline below the file controls.
     }
   }
-  // uploads and starts the timeout function
+  // Uploads the file and checks for an existing parsed result.
   async function uploadFile(file: File) {
     if (!file) return;
 
@@ -168,15 +141,17 @@ export default function SolverUpload({
         Upload your PDF file here to start the timetable creation process
       </CardDescription>
 
-      <CardContent className="space-y-6 flex-1">
-        <div className="border-2 border-dashed border-[var(--border)] rounded-lg p-20 flex flex-col items-center justify-center gap-4 bg-[var(--bg-base)] text-[var(--text-secondary)]">
-          <p className="text-sm text-center font-mono leading-relaxed">
+      <CardContent className="flex min-h-0 flex-1 flex-col gap-6">
+        <div className="min-h-0 flex-1 overflow-hidden border-2 border-dashed border-[var(--border)] rounded-lg p-8 flex flex-col items-center justify-center gap-4 bg-[var(--bg-base)] text-[var(--text-secondary)]">
+          <p className="w-full text-sm text-center font-mono leading-relaxed">
             {!selectedFile && (
               <>Upload a PDF file to start the timetable creation process.</>
             )}
             {selectedFile && (
               <>
-                {selectedFile.name}
+                <span className="block truncate" title={selectedFile.name}>
+                  {selectedFile.name}
+                </span>
                 <br />
               </>
             )}
@@ -216,13 +191,23 @@ export default function SolverUpload({
               <Button
                 data-testid="btn-demo-pdf"
                 type="button"
-                onClick={() => setShowDemoDialog(true)}
+                disabled={isDemoPdfSelected || demoPdfMutation.isPending}
+                onClick={() => void handleUseDemoPdf()}
                 className="font-mono"
               >
-                Use a demo PDF
+                {demoPdfMutation.isPending && <Spinner />}
+                {demoPdfMutation.isPending
+                  ? "Loading demo PDF..."
+                  : "Use a demo PDF"}
               </Button>
             )}
           </div>
+
+          {demoPdfMutation.isError && (
+            <p className="text-sm text-center text-destructive" role="alert">
+              The demo PDF could not be loaded. Please upload your own PDF.
+            </p>
+          )}
 
           <Input
             data-testid="input-file-pdf"
@@ -236,37 +221,33 @@ export default function SolverUpload({
           />
         </div>
 
-        <Button
-          data-testid="btn-upload-confirm"
-          id="btn-upload"
-          disabled={
-            currentlyPolling || moduleGroupID != null || selectedFile == null
-          }
-          type="button"
-          className="w-fit"
-          onClick={() => {
-            if (pdfJobResult?.status != "completed") pollEvents();
-          }}
-        >
-          {pdfJobResult?.status === "completed" && !currentlyPolling && (
-            <>Continue</>
-          )}
-          {pdfJobResult?.status !== "completed" && !currentlyPolling && (
-            <>Upload</>
-          )}
-          {(currentlyPolling || pdfJobResult?.status === "queued") && (
-            <>
-              Waiting for Updates <br /> <Spinner />
-            </>
-          )}
-        </Button>
+        <div className="flex shrink-0 justify-center pt-2">
+          <Button
+            data-testid="btn-upload-confirm"
+            id="btn-upload"
+            disabled={
+              currentlyPolling || moduleGroupID != null || selectedFile == null
+            }
+            type="button"
+            className="w-fit"
+            onClick={() => {
+              if (pdfJobResult?.status != "completed") pollEvents();
+            }}
+          >
+            {pdfJobResult?.status === "completed" && !currentlyPolling && (
+              <>Continue</>
+            )}
+            {pdfJobResult?.status !== "completed" && !currentlyPolling && (
+              <>Upload</>
+            )}
+            {(currentlyPolling || pdfJobResult?.status === "queued") && (
+              <>
+                Waiting for Updates <br /> <Spinner />
+              </>
+            )}
+          </Button>
+        </div>
       </CardContent>
-
-      <DemoPdfDialog
-        open={showDemoDialog}
-        onOpenChange={handleDemoDialogChange}
-        onFileReady={selectFile}
-      />
     </Card>
   );
 }
