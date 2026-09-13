@@ -54,11 +54,11 @@ export default function GoogleExportDialog({
     schedules[0];
 
   return (
-    <DialogContent>
+    <DialogContent className="bg-[var(--bg-surface)]">
       <DialogHeader>
         <DialogTitle>Export to Google Calendar</DialogTitle>
         <DialogDescription>
-          Choose a timetable to add to your UMTAS Calendar.
+          Add a Timetable to Your UMTAS Calendar.
         </DialogDescription>
       </DialogHeader>
 
@@ -69,13 +69,14 @@ export default function GoogleExportDialog({
       )}
 
       {!hasGoogleCalendarAccess ? (
-        <div className="flex flex-col items-center justify-center gap-4">
-          <p className="text-center text-sm text-muted-foreground">
-            Connect your Google account to add this timetable to Calendar.
+        <div className="flex flex-col items-start justify-center gap-4">
+          <p className="text-start text-sm">
+            Connect your Google Account to Add this Timetable to Your Google
+            Calendar.
           </p>
           <Button
             type="button"
-            className="w-full max-w-52"
+            className="w-fit cursor-pointer"
             disabled={isLoading || isExporting}
             onClick={onSignIn}
           >

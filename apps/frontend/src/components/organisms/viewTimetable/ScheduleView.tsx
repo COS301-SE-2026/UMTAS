@@ -79,6 +79,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/atoms/baseShadcn/dropdown-menu";
+import { GoogleIcon } from "@/components/atoms/auth/GoogleIcon";
 
 const CALENDAR_TIMEZONE = "Africa/Johannesburg";
 const GOOGLE_CALENDAR_EXPORT_TIMEOUT_MS = 60_000;
@@ -754,8 +755,8 @@ export function ScheduleView({
                     className="h-8 px-3 hover:opacity-90 cursor-pointer"
                     onClick={() => void exportToICS()}
                   >
-                    {exportingTo === "ics" ? "Exporting…" : "Export .ics"}
                     <FileDown />
+                    {exportingTo === "ics" ? "Exporting…" : "Export .ics"}
                   </Button>
                   {!isLoadingGoogleCalendarAccess && (
                     <Button
@@ -778,10 +779,11 @@ export function ScheduleView({
                         </>
                       ) : (
                         <>
+                          <GoogleIcon />
                           <span className="hidden sm:inline">
                             Save to Google Calendar
                           </span>
-                          <Save />
+
                           <span className="sm:hidden">Google Calendar</span>
                         </>
                       )}
