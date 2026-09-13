@@ -140,7 +140,7 @@ export function SkipDayPref({
   setChecked,
 }: skipDayProps) {
   return (
-    <PreferenceContainer>
+    <>
       <label className="flex flex-col gap-1.5 w-full">
         <span className="font-medium text-xs text-[var(--text-primary)]">
           Skip Day
@@ -157,7 +157,7 @@ export function SkipDayPref({
         setChecked={setChecked}
         isChecked={activePreference}
       />
-    </PreferenceContainer>
+    </>
   );
 }
 
@@ -167,7 +167,7 @@ interface smallGapsProp {
 }
 export function SmallGapsPref({ activePreference, setChecked }: smallGapsProp) {
   return (
-    <PreferenceContainer>
+    <>
       <span className="font-medium text-xs text-[var(--text-primary)]">
         Prefer Smaller Gaps Between Events?
       </span>
@@ -176,6 +176,6 @@ export function SmallGapsPref({ activePreference, setChecked }: smallGapsProp) {
         isChecked={activePreference}
         setChecked={setChecked}
       ></PrefCheckbox>
-    </PreferenceContainer>
+    </>
   );
 }
