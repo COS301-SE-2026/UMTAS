@@ -39,7 +39,7 @@ interface CheckBoxProps {
 }
 function PrefCheckbox({ isChecked, setChecked, disabled }: CheckBoxProps) {
   return (
-    <div className="flex flex-col justify-center ">
+    <div className="flex  justify-center w-full">
       <Checkbox
         disabled={disabled}
         className="size-5 border-white"
@@ -104,9 +104,9 @@ export function StartTimePref({
   setChecked,
 }: StartTimePref) {
   return (
-    <PreferenceContainer>
+    <>
       <label className="flex flex-col gap-1.5 w-full">
-        <span className="font-medium text-xs text-[var(--text-primary)]">
+        <span className="font-medium text-sm text-[var(--text-primary)]">
           Preferred Start Time
         </span>
         <PreferenceSelect
@@ -122,7 +122,7 @@ export function StartTimePref({
         setChecked={setChecked}
         isChecked={activePreference}
       />
-    </PreferenceContainer>
+    </>
   );
 }
 
@@ -140,9 +140,9 @@ export function SkipDayPref({
   setChecked,
 }: skipDayProps) {
   return (
-    <PreferenceContainer>
+    <>
       <label className="flex flex-col gap-1.5 w-full">
-        <span className="font-medium text-xs text-[var(--text-primary)]">
+        <span className="font-medium text-sm text-[var(--text-primary)]">
           Skip Day
         </span>
         <PreferenceSelect
@@ -157,7 +157,7 @@ export function SkipDayPref({
         setChecked={setChecked}
         isChecked={activePreference}
       />
-    </PreferenceContainer>
+    </>
   );
 }
 
@@ -167,15 +167,15 @@ interface smallGapsProp {
 }
 export function SmallGapsPref({ activePreference, setChecked }: smallGapsProp) {
   return (
-    <PreferenceContainer>
-      <span className="font-medium text-xs text-[var(--text-primary)]">
-        Prefer Smaller Gaps Between Events?
+    <>
+      <span className="flex items-center font-medium h-10 text-sm text-[var(--text-primary)]">
+        Prefer Smaller Gaps ?
       </span>
       <PrefCheckbox
         disabled={false}
         isChecked={activePreference}
         setChecked={setChecked}
       ></PrefCheckbox>
-    </PreferenceContainer>
+    </>
   );
 }
