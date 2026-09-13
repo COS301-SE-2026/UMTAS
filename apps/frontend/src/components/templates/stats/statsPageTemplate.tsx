@@ -67,7 +67,7 @@ export default function StatsPageTemplate() {
   return (
     <>
       <Tutorial steps={steps} wait={true} />
-      <div className="container mx-auto py-10 space-y-6">
+      <div className="container mx-auto py-10 space-y-6 px-8">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-[var(--text-primary)] pb-2">
             Stats Dashboard
@@ -81,18 +81,30 @@ export default function StatsPageTemplate() {
           <Tabs defaultValue="university" className="w-full space-y-4">
             <TabsList
               id="stats-tabs"
-              className="w-full flex flex-wrap gap-2 h-auto p-2"
+              className="w-full flex flex-wrap gap-2 h-auto"
             >
-              <TabsTrigger value="university" className="px-4 py-2">
+              <TabsTrigger
+                value="university"
+                className="px-4 py-2 cursor-pointer focus-visible:ring-2"
+              >
                 University
               </TabsTrigger>
-              <TabsTrigger value="courses" className="px-4 py-2">
+              <TabsTrigger
+                value="courses"
+                className="px-4 py-2 cursor-pointer focus-visible:ring-2"
+              >
                 Courses
               </TabsTrigger>
-              <TabsTrigger value="modules" className="px-4 py-2">
+              <TabsTrigger
+                value="modules"
+                className="px-4 py-2 cursor-pointer focus-visible:ring-2"
+              >
                 Modules
               </TabsTrigger>
-              <TabsTrigger value="events" className="px-4 py-2">
+              <TabsTrigger
+                value="events"
+                className="px-4 py-2 cursor-pointer focus-visible:ring-2"
+              >
                 Events
               </TabsTrigger>
             </TabsList>

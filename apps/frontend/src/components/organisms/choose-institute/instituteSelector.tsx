@@ -61,51 +61,77 @@ export function InstituteSelector({ onClose }: InstituteSelectorProps) {
   const applyMut = useMutation(applyMutator());
   const selectUniMut = useMutation(selectUniMutator());
 
-  function triggerSuccessAndClose(msg: string) {
-    setSuccessMessage(msg);
-  }
-
   function updateSelectedUni(id: string) {
-    const nUni = uniList?.universities.find((uni) => uni.UniversityID === id);
+    const university = uniList?.universities.find(
+      (uni) => uni.UniversityID === id,
+    );
 
-    setSelectedInstitute(nUni);
+    setSelectedInstitute(university);
     setSelectedRole("");
-
-    if (id) {
-      selectUniMut.mutate(
-        { uniId: id },
-        {
-          onSuccess: () => {
-            triggerSuccessAndClose("Institute successfully selected!");
-          },
-          onError: (error) => {
-            console.error("Failed to select role:", error);
-          },
-        },
-      );
-    }
+    setSuccessMessage(null);
   }
 
-  function handleConfirm() {
-    if (selectedInstitute?.role === null && selectedInstitute?.UniversityID) {
-      applyMut.mutate({
-        UniversityID: selectedInstitute.UniversityID,
-        role: "STUDENT",
-      });
+  function handleContinue() {
+    if (!selectedInstitute?.UniversityID || !selectedInstitute.role) {
+      return;
     }
 
-    UserDetails.storeUniDetails({
-      UniversityID: selectedInstitute?.UniversityID ?? "",
-      UniversityName: selectedInstitute?.UniversityName ?? "",
-      role: selectedInstitute?.role || "STUDENT",
-    });
+    selectUniMut.mutate(
+      {
+        uniId: selectedInstitute.UniversityID,
+      },
+      {
+        onSuccess: () => {
+          UserDetails.storeUniDetails({
+            UniversityID: selectedInstitute.UniversityID,
+            UniversityName: selectedInstitute.UniversityName,
+            role: selectedInstitute.role!,
+          });
 
-    getQueryClient().clear();
+          getQueryClient().clear();
+
+          setSuccessMessage("Successfully continued!");
+
+          setTimeout(() => {
+            onClose?.();
+          }, 500);
+        },
+        onError: (error) => {
+          console.error("Failed to select university:", error);
+        },
+      },
+    );
+  }
+
+  function handleApply() {
+    if (!selectedInstitute?.UniversityID || !selectedRole) {
+      return;
+    }
+
+    applyMut.mutate(
+      {
+        UniversityID: selectedInstitute.UniversityID,
+        role: selectedRole as uniDtoRoles,
+      },
+      {
+        onSuccess: () => {
+          setSuccessMessage("Application submitted successfully!");
+
+          setTimeout(() => {
+            onClose?.();
+          }, 1700);
+        },
+        onError: (error) => {
+          console.error("Failed to apply for role:", error);
+        },
+      },
+    );
   }
 
   const applyDisabled =
     !selectedInstitute ||
     !selectedRole ||
+    selectedRole === selectedInstitute.role ||
     selectUniMut.isPending ||
     applyMut.isPending;
 
@@ -115,10 +141,7 @@ export function InstituteSelector({ onClose }: InstituteSelectorProps) {
 
       <form
         className="flex flex-col gap-6"
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleConfirm();
-        }}
+        onSubmit={(e) => e.preventDefault()}
       >
         {successMessage && (
           <div className="p-2 text-sm text-[var(--success-text)] bg-[var(--success-bg)] rounded-md text-center font-medium">
@@ -133,7 +156,7 @@ export function InstituteSelector({ onClose }: InstituteSelectorProps) {
           onNotSupportedClick={() => onClose?.()}
         />
 
-        {selectedInstitute?.role == null && (
+        {selectedInstitute && (
           <>
             <SelectRoleField value={selectedRole} onChange={setSelectedRole} />
 
@@ -153,79 +176,42 @@ export function InstituteSelector({ onClose }: InstituteSelectorProps) {
 
         {selectedInstitute && <ApprovalStatus uni={selectedInstitute} />}
 
-        <div className="flex flex-col mt-2 justify-around gap-3 border-t pt-4">
-          <div className="flex justify-center items-center gap-4 w-full">
-            <div className="flex-1 flex justify-end">
-              <Button
-                data-testid="btn-continue"
-                id="btn-continue-as-role"
-                type="button"
-                variant="outline"
-                disabled={!selectedInstitute}
-                onClick={(e) => {
-                  e.stopPropagation();
+        <div className="flex flex-col mt-2 gap-3 border-t pt-4">
+          {selectedInstitute && (
+            <div className="w-full flex items-center justify-center gap-4">
+              {selectedInstitute.role && (
+                <Button
+                  data-testid="btn-continue"
+                  id="btn-continue-as-role"
+                  type="button"
+                  variant="outline"
+                  disabled={selectUniMut.isPending}
+                  onClick={handleContinue}
+                >
+                  Continue as {selectedInstitute.role}
+                </Button>
+              )}
 
-                  handleConfirm();
-
-                  triggerSuccessAndClose("Successfully continued!");
-
-                  setTimeout(() => {
-                    onClose?.();
-                  }, 500);
-                }}
-              >
-                Continue as {selectedInstitute?.role ?? "Student"}
-              </Button>
-            </div>
-
-            {selectedInstitute?.role == null && (
-              <>
+              {selectedInstitute.role && selectedRole && (
                 <p className="text-sm text-muted-foreground">or</p>
+              )}
 
-                <div className="flex-1 flex justify-start">
-                  <Button
-                    id="btn-apply-for-role"
-                    type="button"
-                    variant="outline"
-                    disabled={applyDisabled}
-                    onClick={(e) => {
-                      e.stopPropagation();
-
-                      applyMut.mutate(
-                        {
-                          UniversityID: selectedInstitute?.UniversityID || "",
-                          role: selectedRole as uniDtoRoles,
-                        },
-                        {
-                          onSuccess: () => {
-                            triggerSuccessAndClose(
-                              "Application submitted successfully!",
-                            );
-                          },
-                        },
-                      );
-
-                      setTimeout(() => {
-                        onClose?.();
-                      }, 1700);
-                    }}
-                  >
-                    Apply for role
-                  </Button>
-                </div>
-              </>
-            )}
-          </div>
+              {selectedRole && (
+                <Button
+                  id="btn-apply-for-role"
+                  type="button"
+                  variant="outline"
+                  disabled={applyDisabled}
+                  onClick={handleApply}
+                >
+                  Apply for {selectedRole}
+                </Button>
+              )}
+            </div>
+          )}
 
           <div className="w-full flex items-center justify-center mt-2">
-            <Button
-              type="button"
-              variant="default"
-              onClick={(e) => {
-                e.stopPropagation();
-                onClose?.();
-              }}
-            >
+            <Button type="button" variant="default" onClick={() => onClose?.()}>
               Close
             </Button>
           </div>

@@ -6,20 +6,30 @@ import { Button } from "@/components/atoms/baseShadcn/button";
 import { getMapConfigQ } from "../../../../utilities/map/mapQueries";
 import { Alert, AlertDescription } from "@/components/atoms/baseShadcn/alert";
 import { UserDetails } from "@/lib/userclass/userClass";
-import { Map } from "@vis.gl/react-google-maps";
+import { AdvancedMarker, Map, Pin } from "@vis.gl/react-google-maps";
 import { useMemo } from "react";
 import { APIProvider } from "@vis.gl/react-google-maps";
 
 interface MapScreenProps {
   children?: React.ReactNode;
   onRequestMapSetup?: () => void;
+  adminMode?: "none" | "draw" | "pin";
+  polygonPath?: { lat: number; lng: number }[];
+  pinLocation?: { lat: number; lng: number } | null;
 }
 
-export function MapScreen({ children, onRequestMapSetup }: MapScreenProps) {
+export function MapScreen({
+  children,
+  onRequestMapSetup,
+  adminMode = "none",
+  polygonPath = [],
+  pinLocation = null,
+}: MapScreenProps) {
   const { data: config, isLoading, error } = useQuery(getMapConfigQ());
   const isUserAdmin = UserDetails.getUniDetails()?.role === "UNIVERSITY_ADMIN";
   //caching for map styles
   const mapStyle = useMemo(() => ({ width: "100%", height: "100%" }), []);
+  //const cursorStyle = adminMode !== "none" ? "cursor-pointer" : "";
 
   //caching for map loads
   const mapRestriction = useMemo(() => {
@@ -86,8 +96,22 @@ export function MapScreen({ children, onRequestMapSetup }: MapScreenProps) {
       gestureHandling="greedy"
       clickableIcons={false}
       reuseMaps={true}
+      draggableCursor={adminMode !== "none" ? "pointer" : "grab"}
     >
       {children}
+
+      {adminMode === "draw" &&
+        polygonPath.map((point, index) => (
+          <AdvancedMarker key={`draw-pt-${index}`} position={point}>
+            <div className="flex h-2 w-2 justify-center items-center rounded-full bg-blue-700 border-white" />
+          </AdvancedMarker>
+        ))}
+
+      {adminMode === "pin" && pinLocation && (
+        <AdvancedMarker position={pinLocation}>
+          <Pin background="var(--btn-primary-bg)" />
+        </AdvancedMarker>
+      )}
     </Map>
   );
 }

@@ -81,6 +81,7 @@ export function GenerateStep({
   //checkbox logic
 
   const [showSolver, setShowSolver] = useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = useState<string>("");
   function checkboxLogic(eventId: string, isChecked: boolean) {
     if (isChecked) {
       //add the event to the list
@@ -166,11 +167,35 @@ export function GenerateStep({
   const isAdmin = UserDetails.getUniDetails()?.role === "UNIVERSITY_ADMIN";
 
   function renderEventsSummary() {
+    const filteredEvents = events.filter((event) => {
+      if (!searchQuery.trim()) {
+        return true;
+      }
+
+      const query = searchQuery.toLowerCase();
+      const matchName = event?.eventName?.toLowerCase().includes(query);
+      const matchCode = event?.activityCode?.toLowerCase().includes(query);
+
+      const linkedMod = getLinkedModule(
+        event?.eventCriteria?.moduleId,
+        modules,
+      );
+
+      const matchModuleName = linkedMod?.moduleName
+        ?.toLowerCase()
+        .includes(query);
+      const matchModuleCode = linkedMod?.moduleCode
+        ?.toLowerCase()
+        .includes(query);
+      return matchName || matchCode || matchModuleName || matchModuleCode;
+    });
+
     return (
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <h3 className="text-base font-semibold text-[var(--text-primary)]">
-            Events - {events.length} event{events.length !== 1 ? "s" : ""}
+            Events - {filteredEvents.length} of {events.length} event
+            {events.length !== 1 ? "s" : ""}
           </h3>
           {isAdmin && (
             <span>
@@ -179,8 +204,17 @@ export function GenerateStep({
           )}
         </div>
 
-        <div className="flex flex-col gap-2">
-          {events.map((event) => {
+        <div className="flex-shrink-0">
+          <Input
+            placeholder="Search..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="h-9 text-xs bg-[var(--bg-surface)] border-[var(--border)] w-full"
+          />
+        </div>
+
+        <div className="flex flex-col gap-2 max-h-[50vh] overflow-y-auto pr-1">
+          {filteredEvents.map((event) => {
             const criteria = event?.eventCriteria;
             const isEventChecked = selectedEventIds.includes(
               event?.eventId ?? "",
@@ -339,24 +373,24 @@ export function GenerateStep({
         </div>
 
         {renderContent()}
-        <div className="flex justify-center mt-8 gap-x-2">
+        <div className="flex justify-start mt-8 gap-x-2">
           <Button
             id="btn-create-schedule"
             data-testid="schedules-Create-Btn"
             type="button"
+            variant="default"
             size="default"
             //only generate when there is at least 1 event
             disabled={isGenerating || selectedEventIds.length === 0}
             onClick={() => onGenerate(timetableName, selectedEventIds)}
-            className="w-fit px-4 text-sm bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] hover:bg-[var(--btn-primary-hover)] disabled:opacity-40 transition-colors duration-[var(--duration-fast)]"
           >
             {isGenerating
               ? "Generating..."
               : selectedEventIds.length === 0
-                ? "Select at least one event"
+                ? "Select at Least One Event"
                 : isEditMode
-                  ? "Edit Schedule"
-                  : "Generate Schedule"}
+                  ? "Edit Timetable"
+                  : "Generate Timetable"}
           </Button>
           <Button
             id=""

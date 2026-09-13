@@ -19,10 +19,10 @@ export function EmptySchedule() {
       </div>
       <div className="flex flex-col gap-1">
         <p className="text-base font-medium text-[var(--text-primary)]">
-          No schedule yet
+          No Timetable yet
         </p>
         <p className="text-sm text-[var(--text-secondary)] max-w-xs">
-          Build your schedule in the builder and generate it to see it here.
+          Build Your Timetable in the Builder and Generate it to see it here.
         </p>
       </div>
       <Button
@@ -30,7 +30,7 @@ export function EmptySchedule() {
         onClick={handleBuild}
         className="mt-2 bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] hover:bg-[var(--btn-primary-hover)] transition-colors duration-[var(--duration-fast)]"
       >
-        Build a schedule
+        Build a Timetable
       </Button>
     </div>
   );

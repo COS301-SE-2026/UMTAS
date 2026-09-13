@@ -236,9 +236,9 @@ function DashboardContent() {
                   type="button"
                   onClick={handleBuild}
                   size="default"
-                  className="bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] hover:bg-[var(--btn-primary-hover)] transition-colors duration-[var(--duration-fast)]"
+                  className="bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] hover:bg-[var(--btn-primary-hover)] transition-colors duration-[var(--duration-fast)] cursor-pointer"
                 >
-                  Build a schedule
+                  Build a Timetable
                 </Button>
               </div>
             </div>
