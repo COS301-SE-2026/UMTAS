@@ -1,0 +1,14 @@
+apps/frontend/src/components/organisms/forms/LoginForm.tsx
+  h_2d4b3dca70a3d8 77,124-161,264-279
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "7b2cd4e7a2378f8311227c6ca5e06f2b3f6c175e",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
