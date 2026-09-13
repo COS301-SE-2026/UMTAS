@@ -1,22 +1,25 @@
 "use client";
 
 import { useState } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+
 import { ApprovalStatus } from "@/components/molecules/choose-institute/ApprovalStatus";
 import { SelectInstituteField } from "@/components/molecules/choose-institute/SelectInstituteField";
 import { SelectRoleField } from "@/components/molecules/choose-institute/SelectRoleField";
 import { Button } from "@/components/atoms/baseShadcn/button";
+import Tutorial from "@/components/organisms/nav/Tutorial";
+
 import { uniDto, uniDtoRoles } from "@/app/choose-institute/queries/builders";
-import { useMutation, useQuery } from "@tanstack/react-query";
+
 import {
   applyMutator,
   getAllUni,
   selectUniMutator,
 } from "@/app/choose-institute/queries/UserRoleQueries";
-import { UserDetails } from "@/lib/userclass/userClass";
 
-import Tutorial from "@/components/organisms/nav/Tutorial";
-import { University } from "lucide-react";
+import { UserDetails } from "@/lib/userclass/userClass";
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
+
 const steps = [
   {
     target: "#institute-select",
@@ -53,7 +56,8 @@ export function InstituteSelector({ onClose }: InstituteSelectorProps) {
   const [selectedRole, setSelectedRole] = useState("");
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  const { data: uniList, isLoading: uniLoading } = useQuery(getAllUni());
+  const { data: uniList } = useQuery(getAllUni());
+
   const applyMut = useMutation(applyMutator());
   const selectUniMut = useMutation(selectUniMutator());
 
@@ -63,7 +67,9 @@ export function InstituteSelector({ onClose }: InstituteSelectorProps) {
 
   function updateSelectedUni(id: string) {
     const nUni = uniList?.universities.find((uni) => uni.UniversityID === id);
+
     setSelectedInstitute(nUni);
+    setSelectedRole("");
 
     if (id) {
       selectUniMut.mutate(
@@ -72,7 +78,9 @@ export function InstituteSelector({ onClose }: InstituteSelectorProps) {
           onSuccess: () => {
             triggerSuccessAndClose("Institute successfully selected!");
           },
-          onError: (error) => console.error("Failed to select role:", error),
+          onError: (error) => {
+            console.error("Failed to select role:", error);
+          },
         },
       );
     }
@@ -81,10 +89,11 @@ export function InstituteSelector({ onClose }: InstituteSelectorProps) {
   function handleConfirm() {
     if (selectedInstitute?.role === null && selectedInstitute?.UniversityID) {
       applyMut.mutate({
-        UniversityID: selectedInstitute?.UniversityID,
+        UniversityID: selectedInstitute.UniversityID,
         role: "STUDENT",
       });
     }
+
     UserDetails.storeUniDetails({
       UniversityID: selectedInstitute?.UniversityID ?? "",
       UniversityName: selectedInstitute?.UniversityName ?? "",
@@ -95,7 +104,10 @@ export function InstituteSelector({ onClose }: InstituteSelectorProps) {
   }
 
   const applyDisabled =
-    !selectedInstitute || !selectedRole || selectUniMut.isPending;
+    !selectedInstitute ||
+    !selectedRole ||
+    selectUniMut.isPending ||
+    applyMut.isPending;
 
   return (
     <>
@@ -118,23 +130,29 @@ export function InstituteSelector({ onClose }: InstituteSelectorProps) {
           institutes={uniList?.universities || []}
           value={selectedInstitute?.UniversityID || ""}
           onChange={updateSelectedUni}
-          onNotSupportedClick={() => {
-            /* werk hierso haha */
-          }}
+          onNotSupportedClick={() => onClose?.()}
         />
-        <SelectRoleField value={selectedRole} onChange={setSelectedRole} />
-        <div className="w-full items-center flex flex-col">
-          <button
-            id="btn-clear-role"
-            className="text-xs text-[var(--text-secondary)] underline-offset-2 hover:underline"
-            disabled={selectedRole == ""}
-            onClick={() => setSelectedRole("")}
-          >
-            Clear role
-          </button>
-        </div>
+
+        {selectedInstitute?.role == null && (
+          <>
+            <SelectRoleField value={selectedRole} onChange={setSelectedRole} />
+
+            <div className="w-full items-center flex flex-col">
+              <button
+                type="button"
+                id="btn-clear-role"
+                className="text-xs text-[var(--text-secondary)] underline-offset-2 hover:underline"
+                disabled={selectedRole === ""}
+                onClick={() => setSelectedRole("")}
+              >
+                Clear role
+              </button>
+            </div>
+          </>
+        )}
 
         {selectedInstitute && <ApprovalStatus uni={selectedInstitute} />}
+
         <div className="flex flex-col mt-2 justify-around gap-3 border-t pt-4">
           <div className="flex justify-center items-center gap-4 w-full">
             <div className="flex-1 flex justify-end">
@@ -142,11 +160,15 @@ export function InstituteSelector({ onClose }: InstituteSelectorProps) {
                 data-testid="btn-continue"
                 id="btn-continue-as-role"
                 type="button"
-                variant={"outline"}
+                variant="outline"
+                disabled={!selectedInstitute}
                 onClick={(e) => {
                   e.stopPropagation();
+
                   handleConfirm();
+
                   triggerSuccessAndClose("Successfully continued!");
+
                   setTimeout(() => {
                     onClose?.();
                   }, 500);
@@ -156,37 +178,43 @@ export function InstituteSelector({ onClose }: InstituteSelectorProps) {
               </Button>
             </div>
 
-            <p className="text-sm text-muted-foreground">or</p>
-            <div className="flex-1 flex justify-start">
-              <Button
-                id="btn-apply-for-role"
-                type="button"
-                variant={"outline"}
-                disabled={applyDisabled}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleConfirm();
-                  applyMut.mutate(
-                    {
-                      UniversityID: selectedInstitute?.UniversityID || "",
-                      role: selectedRole as uniDtoRoles,
-                    },
-                    {
-                      onSuccess: () => {
-                        triggerSuccessAndClose(
-                          "Application submitted successfully!",
-                        );
-                      },
-                    },
-                  );
-                  setTimeout(() => {
-                    onClose?.();
-                  }, 1700);
-                }}
-              >
-                {"Apply for role"}
-              </Button>
-            </div>
+            {selectedInstitute?.role == null && (
+              <>
+                <p className="text-sm text-muted-foreground">or</p>
+
+                <div className="flex-1 flex justify-start">
+                  <Button
+                    id="btn-apply-for-role"
+                    type="button"
+                    variant="outline"
+                    disabled={applyDisabled}
+                    onClick={(e) => {
+                      e.stopPropagation();
+
+                      applyMut.mutate(
+                        {
+                          UniversityID: selectedInstitute?.UniversityID || "",
+                          role: selectedRole as uniDtoRoles,
+                        },
+                        {
+                          onSuccess: () => {
+                            triggerSuccessAndClose(
+                              "Application submitted successfully!",
+                            );
+                          },
+                        },
+                      );
+
+                      setTimeout(() => {
+                        onClose?.();
+                      }, 1700);
+                    }}
+                  >
+                    Apply for role
+                  </Button>
+                </div>
+              </>
+            )}
           </div>
 
           <div className="w-full flex items-center justify-center mt-2">
@@ -194,8 +222,8 @@ export function InstituteSelector({ onClose }: InstituteSelectorProps) {
               type="button"
               variant="default"
               onClick={(e) => {
-                onClose?.();
                 e.stopPropagation();
+                onClose?.();
               }}
             >
               Close
