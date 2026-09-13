@@ -22,5 +22,10 @@ export default function UserDirectoryCard() {
     );
   }
 
-  return <DataTable columns={columns} data={data} />;
+  return (
+    <DataTable
+      columns={columns.filter((column) => column.id !== "select")}
+      data={data}
+    />
+  );
 }

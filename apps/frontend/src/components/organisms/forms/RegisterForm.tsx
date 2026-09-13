@@ -10,6 +10,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
+
 import { Card, CardContent } from "@/components/atoms/baseShadcn/card";
 import { Button } from "@/components/atoms/baseShadcn/button";
 import { Input } from "@/components/atoms/baseShadcn/input";
@@ -21,6 +22,7 @@ import { AuthDivider } from "@/components/molecules/OAuth/AuthDivider";
 import { AuthAlert } from "@/components/molecules/OAuth/AuthAlert";
 import { PasswordStrengthBadge } from "@/components/molecules/OAuth/PasswordStrengthBadge";
 import { signUp, signIn } from "@/../utilities/auth-client";
+
 import {
   buildAuthCallbackUrl,
   buildAuthLinkHref,
@@ -28,6 +30,7 @@ import {
   resolveAuthRedirectTarget,
   storeAuthRedirectTarget,
 } from "@/lib/auth-redirect";
+
 import Tutorial from "@/components/organisms/nav/Tutorial";
 
 interface FieldErrors {
@@ -44,17 +47,22 @@ function validateFields(
   confirmPassword: string,
 ): FieldErrors {
   const errors: FieldErrors = {};
+
   if (!name.trim()) errors.name = "Full name is required.";
+
   if (!email.trim()) errors.email = "Email address is required.";
   else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
     errors.email = "Enter a valid email address.";
+
   if (!password) errors.password = "Password is required.";
   else if (password.length < 8)
     errors.password = "Password must be at least 8 characters.";
+
   if (!confirmPassword)
     errors.confirmPassword = "Please confirm your password.";
   else if (password !== confirmPassword)
     errors.confirmPassword = "Passwords do not match.";
+
   return errors;
 }
 
@@ -65,9 +73,11 @@ function mapAuthError(message: string): string {
   ) {
     return "An account with that email address already exists. Log in or reset your password.";
   }
+
   if (message.toLowerCase().includes("email")) {
     return "That email address is not valid. Use your university email (e.g. student@up.ac.za).";
   }
+
   return "Account creation failed. Check your details and try again.";
 }
 
@@ -90,24 +100,33 @@ const steps = [
 export function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [globalError, setGlobalError] = useState<string | null>(null);
+
   const [isEmailLoading, setIsEmailLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+
   const redirectTarget = resolveAuthRedirectTarget(searchParams);
 
   async function handleEmailSignUp(e: React.FormEvent) {
     e.preventDefault();
+
     setGlobalError(null);
+
     const errors = validateFields(name, email, password, confirmPassword);
+
     setFieldErrors(errors);
+
     if (Object.keys(errors).length > 0) return;
 
     setIsEmailLoading(true);
+
     storeAuthRedirectTarget(redirectTarget);
 
     try {
@@ -139,6 +158,7 @@ export function RegisterForm() {
   async function handleGoogleSignUp() {
     setGlobalError(null);
     setIsGoogleLoading(true);
+
     storeAuthRedirectTarget(redirectTarget);
 
     try {
@@ -150,6 +170,7 @@ export function RegisterForm() {
       setGlobalError(
         "Google sign-up failed. Try again or use email and password.",
       );
+
       setIsGoogleLoading(false);
     }
   }
@@ -191,7 +212,75 @@ export function RegisterForm() {
             noValidate
             aria-label="Create account form"
           >
-            {/* existing form fields */}
+            <FormField
+              id="register-name"
+              label="Full Name"
+              error={fieldErrors.name}
+            >
+              <Input
+                type="text"
+                placeholder="e.g. Jane Smith"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                autoComplete="name"
+                required
+                disabled={anyLoading}
+                className="h-9 bg-[var(--bg-base)] border-[var(--border)] text-[var(--text-primary)] placeholder:text-[var(--text-disabled)]"
+              />
+            </FormField>
+
+            <FormField
+              id="register-email"
+              label="Email"
+              error={fieldErrors.email}
+            >
+              <Input
+                type="email"
+                placeholder="e.g. student@up.ac.za"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                autoComplete="email"
+                required
+                disabled={anyLoading}
+                className="h-9 bg-[var(--bg-base)] border-[var(--border)] text-[var(--text-primary)] placeholder:text-[var(--text-disabled)]"
+              />
+            </FormField>
+
+            <div className="flex flex-col gap-2">
+              <FormField
+                id="register-password"
+                label="Password"
+                error={fieldErrors.password}
+              >
+                <PasswordInput
+                  placeholder="Create a password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="new-password"
+                  required
+                  disabled={anyLoading}
+                  className="h-9 bg-[var(--bg-base)] border-[var(--border)] text-[var(--text-primary)] placeholder:text-[var(--text-disabled)]"
+                />
+              </FormField>
+
+              <PasswordStrengthBadge password={password} />
+            </div>
+
+            <FormField
+              id="register-confirm-password"
+              label="Confirm Password"
+              error={fieldErrors.confirmPassword}
+            >
+              <PasswordInput
+                placeholder="Repeat your password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                autoComplete="new-password"
+                required
+                disabled={anyLoading}
+                className="h-9 bg-[var(--bg-base)] border-[var(--border)] text-[var(--text-primary)] placeholder:text-[var(--text-disabled)]"
+              />
+            </FormField>
 
             <Button
               id="create-account-btn"
