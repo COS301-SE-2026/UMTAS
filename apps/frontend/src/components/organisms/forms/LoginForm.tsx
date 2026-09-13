@@ -20,6 +20,7 @@ import { GoogleSignInButton } from "@/components/molecules/OAuth/GoogleSignInBut
 import { AuthDivider } from "@/components/molecules/OAuth/AuthDivider";
 import { AuthAlert } from "@/components/molecules/OAuth/AuthAlert";
 import { signIn } from "@/../utilities/auth-client";
+import { getallUnisBuilder } from "@/app/choose-institute/queries/builders";
 import {
   buildAuthCallbackUrl,
   buildAuthLinkHref,
@@ -27,6 +28,7 @@ import {
   resolveAuthRedirectTarget,
   storeAuthRedirectTarget,
 } from "@/lib/auth-redirect";
+import { UserDetails } from "@/lib/userclass/userClass";
 import Tutorial from "@/components/organisms/nav/Tutorial";
 
 const steps = [
@@ -148,6 +150,22 @@ export function LoginForm() {
         }
 
         return;
+      }
+
+      const { universities } = await new getallUnisBuilder().send({});
+      const guestUni =
+        universities.find((university) => university.role != null) ??
+        universities.find(
+          (university) =>
+            university.UniversityName === "University of Pretoria",
+        );
+
+      if (guestUni) {
+        UserDetails.storeUniDetails({
+          UniversityID: guestUni.UniversityID,
+          UniversityName: guestUni.UniversityName,
+          role: guestUni.role ?? "STUDENT",
+        });
       }
 
       window.location.assign(redirectTarget);
