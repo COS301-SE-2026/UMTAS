@@ -60,7 +60,7 @@ export default function EventsTab({
   }));
 
   return (
-    <div className="flex flex-col gap-4 p-4">
+    <div className="flex flex-col gap-4">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatCard
           title="Event Count this Week"
