@@ -1,272 +1,211 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import CommandPalette, { getItemIndex } from "react-cmdk";
-import "react-cmdk/dist/cmdk.css";
-import { HelpPageGroup } from "@/types/HelpCommandPallete";
-import { MessageCircleQuestionIcon } from "lucide-react";
-import { Button } from "@/components/atoms/baseShadcn/button";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { useRouter } from "next/navigation";
+
+import CommandPalette, { filterItems, getItemIndex } from "react-cmdk";
+
+import "react-cmdk/dist/cmdk.css";
+
+import { MessageCircleQuestionIcon } from "lucide-react";
+
+import { Button } from "@/components/atoms/baseShadcn/button";
 import Tutorial from "@/components/organisms/nav/Tutorial";
+
 import { UserDetails } from "@/lib/userclass/userClass";
 
-const cmdkTutorialSteps = [
-  {
-    target: '[data-tour="dashboard"]',
-    content: "Jump straight to your Dashboard from here.",
-  },
-  {
-    target: '[data-tour="builder"]',
-    content: "Open the Timetable Builder to start building schedules.",
-  },
-  {
-    target: '[data-tour="schedules"]',
-    content: "View all your saved Schedules here.",
-  },
-  {
-    target: '[data-tour="course-management"]',
-    content: "Manage your courses in Course Management.",
-  },
-  {
-    target: '[data-tour="role-management"]',
-    content: "Control user roles and permissions here.",
-  },
-  {
-    target: '[data-tour="login"]',
-    content: "Go to the Login page.",
-  },
-  {
-    target: '[data-tour="register"]',
-    content: "Register a new account from here.",
-  },
-  {
-    target: '[data-tour="forgot-password"]',
-    content: "Recover access if you've forgotten your password.",
-  },
-  {
-    target: '[data-tour="reset-password"]',
-    content: "Reset your password from this page.",
-  },
-  {
-    target: '[data-tour="faq"]',
-    content: "Check the FAQ for answers to common questions.",
-  },
-  {
-    target: '[data-tour="run-tutorial"]',
-    content:
-      "Click this to run a step-by-step tutorial for whichever page you're currently on.",
-  },
-  {
-    target: '[data-tour="cmdk-tutorial"]',
-    content: "And this is the option you just used to start this tour!",
-  },
-];
+import {
+  executeNavigationAction,
+  getVisibleNavigationItems,
+  NavigationItem,
+} from "@/types/Nav";
 
 export function HelpCommandPalette() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [search, setSearch] = useState("");
   const router = useRouter();
 
+  const [isOpen, setIsOpen] = useState(false);
+  const [search, setSearch] = useState("");
+
+  const [pendingCmdkTutorial, setPendingCmdkTutorial] = useState(false);
+
+  const [, forceRefresh] = useState(0);
+
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-        e.preventDefault();
+    const handleUserDetailsChange = () => {
+      forceRefresh((value) => value + 1);
+    };
+
+    window.addEventListener(UserDetails.changeEvent, handleUserDetailsChange);
+
+    return () => {
+      window.removeEventListener(
+        UserDetails.changeEvent,
+        handleUserDetailsChange,
+      );
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
         setIsOpen((open) => !open);
       }
     };
+
     document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
   }, []);
 
-  const pages: HelpPageGroup[] = [
-    {
-      heading: "Application Pages",
-      id: "app-pages",
-      items: [
-        {
-          id: "dashboard",
-          children: "Dashboard",
-          icon: "HomeIcon",
-          href: "/dashboard",
-          "data-tour": "cmdk-dashboard-item",
-          roles: ["UNIVERSITY_ADMIN"],
-        },
-        {
-          id: "builder",
-          children: "Timetable Builder",
-          icon: "CalendarIcon",
-          href: "/builder",
-          "data-tour": "builder",
-          roles: ["UNIVERSITY_ADMIN", "STUDENT"],
-        },
-        {
-          id: "schedules",
-          children: "Schedules",
-          icon: "ClockIcon",
-          href: "/schedules",
-          "data-tour": "schedules",
-          roles: ["UNIVERSITY_ADMIN", "STUDENT"],
-        },
-        {
-          id: "map",
-          children: "Map",
-          icon: "MapIcon",
-          href: "/map",
-          "data-tour": "map",
-          roles: ["UNIVERSITY_ADMIN", "STUDENT"],
-        },
-        {
-          id: "module-management",
-          children: "Module Management",
-          icon: "BookOpenIcon",
-          href: "/module-management",
-          "data-tour": "module-management",
-          roles: ["UNIVERSITY_ADMIN", "STUDENT"],
-        },
-        {
-          id: "solver",
-          children: "Timetable Solver",
-          icon: "AdjustmentsHorizontalIcon",
-          href: "/solver",
-          "data-tour": "solver",
-          roles: ["UNIVERSITY_ADMIN"],
-        },
-        {
-          id: "calendar-management",
-          children: "Calendar Management",
-          icon: "CalendarDaysIcon",
-          href: "/calendar-management",
-          "data-tour": "calendar-management",
-          roles: ["UNIVERSITY_ADMIN"],
-        },
-        {
-          id: "course-management",
-          children: "Course Management",
-          icon: "AcademicCapIcon",
-          href: "/course-management",
-          "data-tour": "course-management",
-          roles: ["UNIVERSITY_ADMIN"],
-        },
-        {
-          id: "role-management",
-          children: "Role Management",
-          icon: "UserGroupIcon",
-          href: "/role-management",
-          "data-tour": "role-management",
-          roles: ["UNIVERSITY_ADMIN"],
-        },
-        {
-          id: "stats",
-          children: "Statistics",
-          icon: "ChartBarIcon",
-          href: "/stats",
-          "data-tour": "stats",
-          roles: ["UNIVERSITY_ADMIN"],
-        },
-        {
-          id: "brand-style",
-          children: "Brand Style",
-          icon: "SwatchIcon",
-          href: "/brand-style",
-          "data-tour": "brand-style",
-          roles: ["UNIVERSITY_ADMIN"],
-        },
-      ],
-    },
+  const universityDetails = UserDetails.getUniDetails();
 
-    {
-      heading: "Authentication",
-      id: "auth",
-      items: [
-        {
-          id: "login",
-          children: "Login",
-          icon: "ArrowRightOnRectangleIcon",
-          href: "/login",
-          "data-tour": "login",
-        },
-        {
-          id: "register",
-          children: "Register",
-          icon: "UserPlusIcon",
-          href: "/register",
-          "data-tour": "register",
-        },
-        {
-          id: "forgot-password",
-          children: "Forgot Password",
-          icon: "KeyIcon",
-          href: "/forgot-password",
-          "data-tour": "forgot-password",
-        },
-        {
-          id: "reset-password",
-          children: "Reset Password",
-          icon: "ArrowPathIcon",
-          href: "/reset-password",
-          "data-tour": "reset-password",
-        },
-      ],
-    },
+  const visibleItems = useMemo(() => {
+    return getVisibleNavigationItems({
+      role: universityDetails?.role ?? undefined,
+      universityName: universityDetails?.UniversityName,
+    }).filter((item) => item.showInCommandPalette);
+  }, [universityDetails?.role, universityDetails?.UniversityName]);
 
-    {
-      heading: "Help & Resources",
-      id: "resources",
-      items: [
-        {
-          id: "faq",
-          children: "Frequently Asked Questions",
-          icon: "QuestionMarkCircleIcon",
-          href: "/faq",
-          "data-tour": "faq",
-        },
-        {
-          id: "user-manual",
-          children: "User Manual",
-          icon: "BookOpenIcon",
-          href: "/tutorial",
-          "data-tour": "user-manual",
-        },
-        {
-          id: "run-tutorial",
-          children: "Run Tutorial for this Page",
-          icon: "PlayIcon",
-          "data-tour": "run-tutorial",
+  const handleNavigationItem = useCallback(
+    (item: NavigationItem) => {
+      if (item.action) {
+        executeNavigationAction(item.action);
 
-          action: () => {
-            window.dispatchEvent(new Event("begin-tut"));
-          },
-        },
-        {
-          id: "cmdk-tutorial",
-          children: "How to use the Help Menu",
-          icon: "InformationCircleIcon",
-          closeOnSelect: false,
-          "data-tour": "cmdk-tutorial",
-
-          action: () => {
-            window.dispatchEvent(new Event("begin-cmdk-tut"));
-          },
-        },
-      ],
-    },
-  ];
-
-  const role = UserDetails.getUniDetails()?.role;
-
-  const filteredPages = pages
-    .map((group) => ({
-      ...group,
-      items: group.items.filter((item) => {
-        if (!item.roles) {
-          return true;
+        if (item.action !== "run-cmdk-tutorial") {
+          setIsOpen(false);
         }
 
-        return item.roles.includes(role ?? "");
-      }),
-    }))
-    .filter((group) => group.items.length > 0);
+        return;
+      }
+
+      if (item.href) {
+        router.push(item.href);
+        setIsOpen(false);
+      }
+    },
+    [router],
+  );
+
+  const commandGroups = useMemo(() => {
+    const applicationItems = visibleItems.filter(
+      (item) => item.section === "primary" || item.section === "actions",
+    );
+
+    const administrationItems = visibleItems.filter(
+      (item) => item.section === "admin",
+    );
+
+    const helpItems = visibleItems.filter((item) => item.section === "help");
+
+    const authenticationItems = visibleItems.filter(
+      (item) => item.section === "auth",
+    );
+
+    const groups = [
+      {
+        heading: "Application Pages",
+        id: "app-pages",
+        items: applicationItems,
+      },
+      {
+        heading: "Administration",
+        id: "administration",
+        items: administrationItems,
+      },
+      {
+        heading: "Help & Resources",
+        id: "resources",
+        items: helpItems,
+      },
+      {
+        heading: "Authentication",
+        id: "authentication",
+        items: authenticationItems,
+      },
+    ];
+
+    return groups
+      .filter((group) => group.items.length > 0)
+      .map((group) => ({
+        heading: group.heading,
+        id: group.id,
+
+        items: group.items.map((item) => ({
+          id: item.id,
+          children: item.label,
+          icon: item.icon,
+          keywords: item.keywords,
+
+          "data-tour": item.id,
+
+          closeOnSelect: item.action !== "run-cmdk-tutorial",
+
+          onClick: () => {
+            handleNavigationItem(item);
+          },
+        })),
+      }));
+  }, [visibleItems, handleNavigationItem]);
+
+  const filteredPages = useMemo(() => {
+    return filterItems(commandGroups, search);
+  }, [commandGroups, search]);
+
+  const cmdkTutorialSteps = useMemo(() => {
+    return visibleItems.map((item) => ({
+      target: `[data-tour="${item.id}"]`,
+      content: item.tourContent,
+    }));
+  }, [visibleItems]);
+
+  useEffect(() => {
+    const handleTutorialRequest = () => {
+      setSearch("");
+      setIsOpen(true);
+
+      if (cmdkTutorialSteps.length > 0) {
+        setPendingCmdkTutorial(true);
+      }
+    };
+
+    window.addEventListener("request-cmdk-tut", handleTutorialRequest);
+
+    return () => {
+      window.removeEventListener("request-cmdk-tut", handleTutorialRequest);
+    };
+  }, [cmdkTutorialSteps.length]);
+
+  useEffect(() => {
+    if (!isOpen || !pendingCmdkTutorial || cmdkTutorialSteps.length === 0) {
+      return;
+    }
+
+    let animationFrameId = 0;
+
+    const waitForCommandPalette = () => {
+      const firstTarget = cmdkTutorialSteps[0]?.target;
+
+      if (firstTarget && document.querySelector(firstTarget)) {
+        window.dispatchEvent(new Event("begin-cmdk-tut"));
+
+        setPendingCmdkTutorial(false);
+
+        return;
+      }
+
+      animationFrameId = requestAnimationFrame(waitForCommandPalette);
+    };
+
+    animationFrameId = requestAnimationFrame(waitForCommandPalette);
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, [isOpen, pendingCmdkTutorial, cmdkTutorialSteps]);
 
   return (
     <>
@@ -280,7 +219,7 @@ export function HelpCommandPalette() {
         id="help-command-palette-btn"
         variant="default"
         size="icon"
-        onClick={() => setIsOpen((prev) => !prev)}
+        onClick={() => setIsOpen((previous) => !previous)}
         className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full shadow-lg transition-transform hover:scale-105"
         aria-label="Toggle Help Menu"
       >
@@ -293,27 +232,17 @@ export function HelpCommandPalette() {
         search={search}
         isOpen={isOpen}
         page="root"
+        placeholder="Search pages, actions and help..."
       >
         <CommandPalette.Page id="root">
-          {filteredPages.length ? (
+          {filteredPages.length > 0 ? (
             filteredPages.map((list) => (
               <CommandPalette.List key={list.id} heading={list.heading}>
-                {list.items.map(({ id, action, href, ...rest }) => (
+                {list.items.map(({ id, ...rest }) => (
                   <CommandPalette.ListItem
                     key={id}
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    index={getItemIndex(filteredPages as any, id)}
+                    index={getItemIndex(filteredPages, id)}
                     {...rest}
-                    onClick={() => {
-                      if (action) {
-                        action();
-                      } else if (href) {
-                        router.push(href);
-                      }
-                      if (id !== "cmdk-tutorial") {
-                        setIsOpen(false);
-                      }
-                    }}
                   />
                 ))}
               </CommandPalette.List>
