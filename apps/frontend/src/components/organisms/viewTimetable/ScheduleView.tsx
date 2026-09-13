@@ -66,9 +66,7 @@ import { fetchAllModulesv2 } from "../../../../utilities/V2-Builders/Modules";
 import {
   CalendarPlus,
   FileDown,
-  Menu,
   MoreVertical,
-  Save,
   SquarePen,
   Trash2,
 } from "lucide-react";
@@ -86,23 +84,33 @@ const GOOGLE_CALENDAR_EXPORT_TIMEOUT_MS = 60_000;
 
 const emptySteps = [
   {
+    target: "#empty-schedule",
+    content: "You do not have any timetables yet.",
+  },
+  {
     target: "#ref-go-to-builder",
-    content: "Go to the builder page to create a schedule",
+    content: "Go to the generator to create your first timetable.",
   },
 ];
 
 const steps = [
   {
     target: "#select-timetable",
-    content: "Select your schedule here.",
+    content: "Select which saved timetable you want to view.",
   },
   {
-    target: "#btn-edit",
-    content: "Edit your schedule here.",
+    target: "#week-navigation",
+    content: "Move between weeks or choose a specific date to view.",
   },
   {
-    target: "#btn-delete",
-    content: "Delete your schedule.",
+    target: "#schedule-actions",
+    content:
+      "Export, create, edit, or delete your timetable using these actions.",
+  },
+  {
+    target: "#weekly-schedule",
+    content:
+      "View your scheduled modules and events for the selected week here.",
   },
 ];
 
@@ -460,7 +468,10 @@ export function ScheduleView({
 
   if (timetables.length === 0 && viewMode !== "Generate") {
     return (
-      <div className="flex flex-col items-center gap-4 py-20 text-center">
+      <div
+        id="empty-schedule"
+        className="flex flex-col items-center gap-4 py-20 text-center"
+      >
         <Tutorial steps={emptySteps} wait={true} />
 
         <p className="text-base text-[var(--text-secondary)]">
@@ -637,7 +648,7 @@ export function ScheduleView({
                   ))}
                 </SelectContent>
               </Select>
-              <div className="pl-4">
+              <div id="week-navigation" className="pl-4">
                 <WeekNavBar
                   selectedDate={selectedDate}
                   onDateChange={setSelectedDate}
@@ -743,8 +754,11 @@ export function ScheduleView({
           {!currentWeekStart || events.length === 0 ? (
             <EmptySchedule />
           ) : (
-            <div className="flex flex-col">
-              <div className="flex flex-col gap-2 flex-row items-center justify-between w-full pb-2">
+            <div id="weekly-schedule" className="flex flex-col">
+              <div
+                id="schedule-actions"
+                className="flex flex-col gap-2 flex-row items-center justify-between w-full pb-2"
+              >
                 <div className="hidden sm:flex sm:w-auto sm:flex-wrap gap-2">
                   <Button
                     aria-label="Export to ICS"

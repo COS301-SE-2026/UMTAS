@@ -11,7 +11,7 @@ test("authenticate Admin", async ({ page }) => {
     .getByLabel("Password", { exact: true })
     .fill(process.env.SEED_SYSTEM_ADMIN_PASSWORD ?? "Admin@UMTAS2024!");
 
-  await page.getByRole("button", { name: "Log in" }).click();
+  await page.getByRole("button", { name: "Log in", exact: true }).click();
   await page.waitForURL("**/dashboard");
   await page.getByTestId("click-avatar").click();
   const instituteDiv = page.getByTestId("dashboard-popup-div");
