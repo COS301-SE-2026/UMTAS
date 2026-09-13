@@ -59,36 +59,37 @@ export default function SolverPreferences({
 
   function preferences() {
     return (
-      <div className="flex flex-col w-full min-w-100 max-w-120 max-h-120  p-2">
+      <div className="flex flex-col w-full min-w-100 max-w-120    ">
         <div className="grid grid-cols-2  items-center gap-x-8  auto-rows-[minmax(30px,auto)]">
           <span className="text-sm font-medium text-[var(--text-primary)]">
             Choose Preferences
           </span>
           <span className="text-sm font-medium text-[var(--text-primary)] text-center">
-            Activate Preference
+            Activate
           </span>
-
-          <div className="col-span-2 border-b border-[var(--border)] " />
-          <StartTimePref
-            startTime={startTime}
-            onChange={setStartTime}
-            setChecked={SetStartTimeChecked}
-            activePreference={startTimeChecked}
-          />
-
-          <div className="col-span-2 border-b border-[var(--border)] " />
-          <SkipDayPref
-            setChecked={setSkipChecked}
-            activePreference={skipChecked}
-            day={skipDay}
-            onChange={setSkipDay}
-          />
-          <div className="col-span-2 border-b border-[var(--border)] " />
-          <SmallGapsPref
-            activePreference={smallGapsChecked}
-            setChecked={setSmallGapsChecked}
-          />
           <div className="col-span-2  border-b border-[var(--border)] " />
+          <div className=" col-span-2 grid grid-cols-2  items-center gap-x-8 max-h-45  auto-rows-[minmax(30px,auto)] overflow-scroll">
+            <StartTimePref
+              startTime={startTime}
+              onChange={setStartTime}
+              setChecked={SetStartTimeChecked}
+              activePreference={startTimeChecked}
+            />
+
+            <div className="col-span-2  " />
+            <SkipDayPref
+              setChecked={setSkipChecked}
+              activePreference={skipChecked}
+              day={skipDay}
+              onChange={setSkipDay}
+            />
+            <div className="col-span-2   " />
+            <SmallGapsPref
+              activePreference={smallGapsChecked}
+              setChecked={setSmallGapsChecked}
+            />
+            <div className="col-span-2  " />
+          </div>
         </div>
       </div>
     );
@@ -309,21 +310,27 @@ export default function SolverPreferences({
             </Button>
           </div>
         </div>
-        <div className="grid grid-cols-1 gap-y-4">
-          <Input
-            data-testid="input-solver-timetable-name"
-            id="input-name-timetable"
-            placeholder="Name timetable"
-            value={timetableName}
-            className="h-8  w-full min-w-100 max-w-100 rounded-md border border-[var(--border)] bg-transparent px-3 text-left text-sm text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--ring)]"
+        <div className="grid grid-cols-1 gap-y-2">
+          <label className="flex flex-col gap-1  w-full">
+            <span className="font-medium text-sm text-[var(--text-primary)]">
+              Timetable name
+            </span>
+            <Input
+              data-testid="input-solver-timetable-name"
+              id="input-name-timetable"
+              placeholder="My timetable"
+              value={timetableName}
+              className="h-8  w-full min-w-100 max-w-100 rounded-md border border-[var(--border)] bg-transparent px-3 text-left text-sm text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--ring)]"
 
-            onChange={(e) => {
-              setTimetableName(e.target.value);
-            }}
-          ></Input>
+              onChange={(e) => {
+                setTimetableName(e.target.value);
+              }}
+            ></Input>
+          </label>
+
+          {preferences()}
         </div>
-        {preferences()}
-        <div className="grid grid-cols-1 gap-y-4">
+        <div className="grid grid-cols-1 gap-y-2 mt-2">
           <Button
             data-testid="btn-upload-and-create-timetable"
             id="btn-upload-and-create-timetable"
@@ -360,11 +367,8 @@ export default function SolverPreferences({
         <CardHeader className="text-xl font-bold text-[var(--text-primary)]">
           Set your preferences
         </CardHeader>
-        <CardDescription className="px-4 ">
-          These are preferences as to how you want your schedule built
-        </CardDescription>
 
-        <CardContent className="space-y-1 overflow-y-auto flex-1">
+        <CardContent className=" overflow-y-auto flex-1">
           {jobFailed == false ? (
             <>
               {!loadingStatus() ? (

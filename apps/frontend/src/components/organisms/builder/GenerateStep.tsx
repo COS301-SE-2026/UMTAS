@@ -375,7 +375,7 @@ export function GenerateStep({
       </div>
       {showSolver && (
         <Popup onClose={() => setShowSolver(false)}>
-          <div className="flex w-120  justify-center">
+          <div className="flex w-120 h-110 justify-center">
             <SolverPreferences
               modules={getSelectedModules()}
               onJobCompleteAction={() => onGenerate("BACK", [])}

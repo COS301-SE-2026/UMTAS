@@ -106,7 +106,7 @@ export function StartTimePref({
   return (
     <>
       <label className="flex flex-col gap-1.5 w-full">
-        <span className="font-medium text-xs text-[var(--text-primary)]">
+        <span className="font-medium text-sm text-[var(--text-primary)]">
           Preferred Start Time
         </span>
         <PreferenceSelect
@@ -142,7 +142,7 @@ export function SkipDayPref({
   return (
     <>
       <label className="flex flex-col gap-1.5 w-full">
-        <span className="font-medium text-xs text-[var(--text-primary)]">
+        <span className="font-medium text-sm text-[var(--text-primary)]">
           Skip Day
         </span>
         <PreferenceSelect
