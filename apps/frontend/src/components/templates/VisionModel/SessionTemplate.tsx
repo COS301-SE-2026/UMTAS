@@ -21,6 +21,7 @@ export default function VM_SessionTemplate() {
             <CameraCanvas isCameraActive={cameraOn} />
           </div>
           <div className="h-full  items-center flex flex-col  w-full ">
+            {/* ------------ Settings hier asseblief --------------- */}
             <div className="w-full h-full overflow-auto  rounded-t-none  border-t  border-[var(--border)]  bg-[var(--bg-surface)] shadow-sm flex flex-col">
               <h1 className="text-md font-semibold text-[var(--text-primary)] pl-4 py-4">
                 Session Settings
