@@ -3,13 +3,10 @@
 import { Input } from "@/components/atoms/baseShadcn/input";
 import { Label } from "@/components/atoms/baseShadcn/label";
 import { Switch } from "@/components/atoms/baseShadcn/switch";
-import CameraCanvas from "@/components/organisms/VisionModel/CameraCanvas";
+import CameraCanvas, {
+  DetectionSettings,
+} from "@/components/organisms/VisionModel/CameraCanvas";
 import { useState } from "react";
-
-interface DetectionSettings {
-  runDetection: boolean;
-  DetectionInterval: number; // should be in seconds using a counter
-}
 
 export default function VM_SessionTemplate() {
   // settings
@@ -31,7 +28,10 @@ export default function VM_SessionTemplate() {
         </h1>
         <div className="flex flex-col justify-around w-full h-full just">
           <div className="flex justify-center items-center w-full min-h-[50vh] max-h-[50vh]  md:min-h-[60vh] md:max-h-[60vh]  ">
-            <CameraCanvas isCameraActive={cameraOn} />
+            <CameraCanvas
+              isCameraActive={cameraOn}
+              detectionSettings={detectionSettings}
+            />
           </div>
           <div className="  items-center flex flex-col  w-full  h-[10vh] min-h-[15vh] max-h-[15vh]">
             {/* ------------ Settings hier asseblief --------------- */}

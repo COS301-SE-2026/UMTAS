@@ -22,21 +22,31 @@ function getCanvasConstraints() {
     height: isMobile ? 1280 : 720,
   };
 }
+export interface DetectionSettings {
+  runDetection: boolean;
+  DetectionInterval: number; // should be in seconds using a counter
+}
+interface CanvasCamProps {
+  isCameraActive: boolean;
+  detectionSettings: DetectionSettings;
+}
 
-export default function CameraCanvas({ isCameraActive }: CanvasCamProps) {
+export default function CameraCanvas({
+  isCameraActive,
+  detectionSettings,
+}: CanvasCamProps) {
   return (
     <div className="w-full min-w-fit h-full justify-around flex flex-col gap-y-4 p-4">
       <div className="w-full min-w-fit h-full flex flex-col justify-center items-center text-center border rounded-2xl ">
         <div className={` w-full min-w-fit h-full `}>
-          <CanvasWebcam isCameraActive={isCameraActive} />
+          <CanvasWebcam
+            isCameraActive={isCameraActive}
+            detectionSettings={detectionSettings}
+          />
         </div>
       </div>
     </div>
   );
-}
-
-interface CanvasCamProps {
-  isCameraActive: boolean;
 }
 
 function CanvasWebcam({ isCameraActive }: CanvasCamProps) {
