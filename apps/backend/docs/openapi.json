@@ -11509,12 +11509,19 @@
             "nullable": true,
             "format": "uuid",
             "description": "Optional building identifier. Nulled if the building is deleted."
+          },
+          "Capacity": {
+            "minimum": 0,
+            "type": "number",
+            "description": "Maximum capacity of the venue.",
+            "example": 120
           }
         },
         "required": [
           "VenueID",
           "VenueName",
-          "UniversityID"
+          "UniversityID",
+          "Capacity"
         ]
       },
       "VenueSingleResponseDto": {
@@ -11566,6 +11573,12 @@
             "nullable": true,
             "format": "uuid",
             "description": "Optional building identifier. Nulled if the building is deleted."
+          },
+          "Capacity": {
+            "minimum": 0,
+            "type": "number",
+            "description": "Maximum capacity of the venue.",
+            "example": 120
           }
         }
       },

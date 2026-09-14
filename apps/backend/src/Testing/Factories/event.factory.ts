@@ -3,7 +3,6 @@ import {
   Event,
   UniversityEvent,
   PersonalEvent,
-  Venue,
   EventVenue,
 } from '../../entities/index';
 import { EventCriteria, EventSource } from '../../Events/dto/event.types';
@@ -167,18 +166,6 @@ export function createPersonalEvent(
     ...overrides,
   };
 } //END_createPersonalEvent
-
-type Venue = typeof Venue.$inferSelect;
-export function createVenue(overrides: Partial<Venue> = {}): Venue {
-  return {
-    VenueID: randomUUID(),
-    VenueName: 'Test Venue',
-    UniversityID: randomUUID(),
-    BuildingID: null,
-
-    ...overrides,
-  };
-} //END_createVenue
 
 type EventVenue = typeof EventVenue.$inferSelect;
 export function createEventVenue(

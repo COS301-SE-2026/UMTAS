@@ -5,6 +5,7 @@ import {
   primaryKey,
   uniqueIndex,
   AnyPgColumn,
+  integer,
 } from 'drizzle-orm/pg-core';
 import { University } from './University.schema';
 import { Event } from '../Events/index';
@@ -23,6 +24,7 @@ export const Venue = pgTable(
       (): AnyPgColumn => Building.BuildingID,
       { onDelete: 'set null' },
     ),
+    Capacity: integer('Capacity').notNull().default(0),
   },
   (table) => ({
     universityVenueNameUnique: uniqueIndex('venue_university_name_unique').on(

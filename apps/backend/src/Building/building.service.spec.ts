@@ -24,7 +24,7 @@ import {
 } from './dto/building.dto';
 import { uniId } from 'src/Testing/constants';
 import { UniversityService } from 'src/University/university.service';
-import { createBuilding } from 'src/Testing/Factories';
+import { createBuilding, createVenue } from 'src/Testing/Factories';
 
 export const DEFAULT_DISPLAY_COLOUR = '#808080';
 
@@ -128,18 +128,18 @@ describe('BuildingService', () => {
       //Arrange
       const building = createBuilding();
       const venues = [
-        {
+        createVenue({
           VenueID: 'venue-1',
           VenueName: 'IT 2-26',
           BuildingID: building.BuildingID,
           UniversityID: uniId,
-        },
-        {
+        }),
+        createVenue({
           VenueID: 'venue-2',
           VenueName: 'IT 2-27',
           BuildingID: building.BuildingID,
           UniversityID: uniId,
-        },
+        }),
       ];
       mockDbResult(mockDb.select, [building]);
       jest

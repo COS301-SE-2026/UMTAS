@@ -118,7 +118,7 @@ export class VenueController {
   @ApiOperation({
     summary: 'Update a venue',
     description:
-      'Update venue name and/or building assignment. Only fields present in the body are updated.',
+      'Update venue name, capacity and/or building assignment. Only fields present in the body are updated.',
     operationId: 'updateVenue',
   })
   @ApiBody({ type: UpdateVenueDto })

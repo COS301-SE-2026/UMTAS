@@ -25,7 +25,6 @@ import { AppDatabase } from 'src/auth/auth';
 import { UniversityService } from 'src/University/university.service';
 import { BuildingService } from 'src/Building/building.service';
 import { DatabaseService } from 'src/db/database.service';
-import { uniId } from 'src/Testing/constants';
 
 @Injectable()
 export class VenueService {
@@ -57,6 +56,7 @@ export class VenueService {
       .insert(Venue)
       .values({
         VenueName: input.VenueName,
+        Capacity: input.Capacity,
         UniversityID: input.UniversityID,
         BuildingID: input.BuildingID,
       })
@@ -271,7 +271,11 @@ export class VenueService {
 
     //If building provided -> validate it exists - will throw 404
     if (input.BuildingID && input.BuildingID !== null) {
-      await this.buildingService.getById(input.BuildingID, uniId, tx);
+      await this.buildingService.getById(
+        input.BuildingID,
+        input.UniversityID,
+        tx,
+      );
     } else {
       input.BuildingID = null;
     }
@@ -287,6 +291,11 @@ export class VenueService {
         `Venue with name[${input.VenueName}] already exists for university[${input.UniversityID}]`,
       );
       throw new ConflictException(`Venue already exists with that name`);
+    }
+
+    //Capcity
+    if (!input.Capacity) {
+      input.Capacity = 0;
     }
   } //END_validateCreateInput
 
@@ -349,6 +358,11 @@ export class VenueService {
         );
         throw new ConflictException(`Venue name already exists for university`);
       }
+    }
+
+    //Capacity
+    if (input.Capacity === undefined || input.Capacity === oldVenue.Capacity) {
+      delete input.Capacity;
     }
 
     return input;

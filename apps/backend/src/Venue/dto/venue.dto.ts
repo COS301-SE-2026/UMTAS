@@ -8,12 +8,14 @@ import { Transform, Type } from 'class-transformer';
 import {
   ArrayMinSize,
   IsBoolean,
+  IsInt,
   IsNotEmpty,
   IsOptional,
   IsString,
   IsUUID,
   Length,
   MaxLength,
+  Min,
   ValidateNested,
 } from 'class-validator';
 
@@ -52,13 +54,33 @@ export class BaseVenueDto {
   @IsOptional()
   @IsUUID()
   BuildingID?: string | null;
+
+  @ApiProperty({
+    description: 'Maximum capacity of the venue.',
+    example: 120,
+    minimum: 0,
+  })
+  @IsInt()
+  @Min(0)
+  Capacity!: number;
 } //END_BaseVenueDto
 
 //Create
 export class CreateVenueDto extends PickType(BaseVenueDto, [
   'VenueName',
   'BuildingID',
-]) {}
+]) {
+  @ApiPropertyOptional({
+    description:
+      'Maximum capacity of the venue. Defaults to 0 if not provided.',
+    example: 120,
+    minimum: 0,
+  })
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  Capacity?: number;
+}
 
 //Create Service Input
 export class CreateVenueInput extends CreateVenueDto {
@@ -89,7 +111,7 @@ export class VenueListResponseDto {
 
 //Update
 export class UpdateVenueDto extends PartialType(
-  PickType(BaseVenueDto, ['BuildingID', 'VenueName']),
+  PickType(BaseVenueDto, ['BuildingID', 'VenueName', 'Capacity']),
 ) {} //END_UpdateVenueDto
 
 export class UpdateVenueInput extends UpdateVenueDto {

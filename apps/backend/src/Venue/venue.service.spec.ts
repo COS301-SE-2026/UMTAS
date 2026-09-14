@@ -171,6 +171,45 @@ describe('VenueService', () => {
         InternalServerErrorException,
       );
     });
+
+    it('persists the supplied capacity when creating a venue', async () => {
+      const input = {
+        VenueName: 'Main Lecture Hall',
+        UniversityID: uniId,
+        BuildingID: null,
+        Capacity: 120,
+      };
+
+      const createdVenue = createVenue({ Capacity: 120 });
+
+      mockTransaction(mockDb, {
+        select: [[]],
+        insert: [[createdVenue]],
+      });
+
+      const result = await service.create(input);
+
+      expect(result.venue.Capacity).toBe(120);
+    });
+
+    it('defaults capacity to zero when it is omitted', async () => {
+      const input = {
+        VenueName: 'Main Lecture Hall',
+        UniversityID: uniId,
+        BuildingID: null,
+      };
+
+      const createdVenue = createVenue({ Capacity: 0 });
+
+      mockTransaction(mockDb, {
+        select: [[]],
+        insert: [[createdVenue]],
+      });
+
+      const result = await service.create(input);
+
+      expect(result.venue.Capacity).toBe(0);
+    });
   }); //END_Test_create
 
   describe('Test_getById', () => {
@@ -351,6 +390,26 @@ describe('VenueService', () => {
         }),
       ).rejects.toThrow(InternalServerErrorException);
     });
+
+    it('updates venue capacity', async () => {
+      const venue = createVenue({ Capacity: 100 });
+      const updated = { ...venue, Capacity: 150 };
+
+      mockTransaction(mockDb, {
+        select: [[venue]],
+      });
+      jest
+        .spyOn(service as any, 'validateUpdateInput')
+        .mockResolvedValue({ Capacity: 150 });
+      mockDbResult(mockDb.update, [updated]);
+
+      const result = await service.update(venue.VenueID, {
+        UniversityID: uniId,
+        Capacity: 150,
+      });
+
+      expect(result.venue.Capacity).toBe(150);
+    });
   }); //END_Test_update
 
   //delete
@@ -502,6 +561,7 @@ describe('VenueService', () => {
       VenueName: 'IT 2-26',
       UniversityID: 'uni-1',
       BuildingID: 'building-1',
+      Capacity: 0,
     };
 
     it('should delete BuildingID when undefined', async () => {
