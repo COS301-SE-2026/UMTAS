@@ -2,7 +2,6 @@ import {
   Body,
   Controller,
   Delete,
-  ForbiddenException,
   Get,
   Param,
   ParseUUIDPipe,
@@ -24,7 +23,11 @@ import {
 } from '@nestjs/swagger';
 import { BuildingService } from './building.service';
 import { Roles } from 'src/auth/roles.guard';
-import { CurrentSession, type SessionData } from 'src/auth/session.decorator';
+import {
+  CurrentSession,
+  CurrentUniId,
+  type SessionData,
+} from 'src/auth/session.decorator';
 import {
   BuildingListResponseDto,
   BuildingQueryDto,
@@ -58,13 +61,10 @@ export class BuildingController {
   })
   @ApiForbiddenResponse({ description: 'Wrong permissions' })
   create(
+    @CurrentUniId() uniId: string,
     @CurrentSession() session: SessionData,
     @Body() dto: CreateBuildingDto,
   ): Promise<BuildingSingleResponseDto> {
-    const uniId = session.uniId;
-
-    if (!uniId) throw new ForbiddenException(`No university selected`);
-
     return this.buildingService.create({
       ...dto,
       UniversityID: uniId,
@@ -86,13 +86,9 @@ export class BuildingController {
   @ApiNotFoundResponse({ description: 'Building not found' })
   @ApiForbiddenResponse({ description: 'No university selected' })
   getById(
-    @CurrentSession() session: SessionData,
+    @CurrentUniId() uniId: string,
     @Param('buildingId', ParseUUIDPipe) buildingId: string,
   ): Promise<BuildingSingleResponseDto> {
-    const uniId = session.uniId;
-
-    if (!uniId) throw new ForbiddenException(`No university selected`);
-
     return this.buildingService.getById(uniId, buildingId);
   } //END_getById
 
@@ -112,13 +108,9 @@ export class BuildingController {
     description: 'No uni selected or no role at uni',
   })
   getAll(
-    @CurrentSession() session: SessionData,
+    @CurrentUniId() uniId: string,
     @Query() query: BuildingQueryDto,
   ): Promise<BuildingListResponseDto> {
-    const uniId = session.uniId;
-
-    if (!uniId) throw new ForbiddenException(`No university selected`);
-
     return this.buildingService.getAll(uniId, query);
   } //END_getAll
 
@@ -143,14 +135,10 @@ export class BuildingController {
   })
   @ApiForbiddenResponse({ description: 'Wrong permissions' })
   update(
-    @CurrentSession() session: SessionData,
+    @CurrentUniId() uniId: string,
     @Param('buildingId', ParseUUIDPipe) buildingId: string,
     @Body() dto: UpdateBuildingDto,
   ): Promise<BuildingSingleResponseDto> {
-    const uniId = session.uniId;
-
-    if (!uniId) throw new ForbiddenException(`No university selected`);
-
     return this.buildingService.update(uniId, buildingId, dto);
   } //END_update
 
@@ -166,7 +154,6 @@ export class BuildingController {
     type: BuildingSingleResponseDto,
   })
   @ApiNotFoundResponse({ description: 'Building not found' })
-  @ApiForbiddenResponse({ description: 'Wrong permissions' })
   delete(
     @Param('buildingId', ParseUUIDPipe) buildingId: string,
   ): Promise<BuildingSingleResponseDto> {

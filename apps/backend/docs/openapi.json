@@ -5888,7 +5888,7 @@
             "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "description": "Wrong permissions"
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
             "description": "Venue not found"
@@ -5907,6 +5907,59 @@
           "Venues"
         ],
         "description": "Delete a venue by ID. This Venues operation is part of the versioned UMTAS HTTP contract."
+      }
+    },
+    "/api/venues/assign": {
+      "post": {
+        "description": "Assign one or many venues to buildings in a single request.",
+        "operationId": "assignVenuesToBuildings",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulkAssignVenuesDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Venues updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BulkAssignResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "One or more buildings or venues do not belong to the selected university"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "description": "Wrong permissions"
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "security": [
+          {
+            "umtas-session": []
+          }
+        ],
+        "summary": "Assign venues to buildings",
+        "tags": [
+          "Venues"
+        ]
       }
     },
     "/api/buildings": {
@@ -6171,7 +6224,7 @@
             "$ref": "#/components/responses/UnauthorizedError"
           },
           "403": {
-            "description": "Wrong permissions"
+            "$ref": "#/components/responses/ForbiddenError"
           },
           "404": {
             "description": "Building not found"
@@ -11515,6 +11568,56 @@
             "description": "Optional building identifier. Nulled if the building is deleted."
           }
         }
+      },
+      "VenueAssignmentDto": {
+        "type": "object",
+        "properties": {
+          "venueId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "buildingId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "venueId",
+          "buildingId"
+        ]
+      },
+      "BulkAssignVenuesDto": {
+        "type": "object",
+        "properties": {
+          "assignments": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VenueAssignmentDto"
+            }
+          }
+        },
+        "required": [
+          "assignments"
+        ]
+      },
+      "BulkAssignResponseDto": {
+        "type": "object",
+        "properties": {
+          "updated": {
+            "type": "number",
+            "example": 7
+          },
+          "success": {
+            "type": "object",
+            "example": true
+          }
+        },
+        "required": [
+          "updated",
+          "success"
+        ]
       },
       "LatLngDto": {
         "type": "object",

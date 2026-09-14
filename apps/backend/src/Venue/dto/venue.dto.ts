@@ -96,33 +96,6 @@ export class UpdateVenueInput extends UpdateVenueDto {
   UniversityID!: string;
 }
 
-export class VenueMappingDto {
-  @ApiProperty({
-    format: 'uuid',
-    example: '00000000-0000-0000-0000-000000000000',
-  })
-  venueId!: string;
-
-  @ApiProperty({
-    example: 'IT-2-26',
-    nullable: true,
-  })
-  venueName!: string | null;
-
-  @ApiProperty({
-    format: 'uuid',
-    example: '00000000-0000-0000-0000-000000000000',
-    nullable: true,
-  })
-  buildingId!: string | null;
-
-  @ApiProperty({
-    example: 'IT Building',
-    nullable: true,
-  })
-  buildingName!: string | null;
-}
-
 export class VenueQueryDto {
   @ApiPropertyOptional({
     format: 'uuid',
@@ -146,14 +119,6 @@ export class VenueQueryDto {
   @IsString()
   @Length(1, 100)
   search?: string;
-}
-
-export class VenueMappingListResponseDto {
-  @ApiProperty({
-    type: [VenueMappingDto],
-    description: 'List of venue mappings',
-  })
-  venues!: VenueMappingDto[];
 }
 
 export class AssignVenueBuildingDto {

@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   forwardRef,
   Inject,
@@ -7,8 +8,8 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { Venue } from '../entities/index';
-import { eq, ilike, isNotNull, isNull, and } from 'drizzle-orm';
+import { Building, Venue } from '../entities/index';
+import { eq, ilike, isNotNull, isNull, and, inArray } from 'drizzle-orm';
 import {
   VenueQueryDto,
   CreateVenueInput,
@@ -17,6 +18,8 @@ import {
   UpdateVenueDto,
   BaseVenueDto,
   VenueListResponseDto,
+  VenueAssignmentDto,
+  BulkAssignResponseDto,
 } from './dto/venue.dto';
 import { AppDatabase } from 'src/auth/auth';
 import { UniversityService } from 'src/University/university.service';
@@ -173,128 +176,82 @@ export class VenueService {
 
     if (!venue) {
       this.OOPSIE.fatal(`Failed to delete venue[${venueId}]`);
-      throw new InternalServerErrorException(`Failed to delete venue`);
+      throw new NotFoundException(`Failed to delete venue`);
     }
 
     return { venue };
   } //END_delete
 
-  // private async venueToDto(venueId: string): Promise<VenueMappingDto> {
-  //   const database = this.dbService.db;
+  //Non CRUD
+  async assignVenuesToBuildings(
+    uniId: string,
+    assignments: VenueAssignmentDto[],
+    tx?: AppDatabase,
+  ): Promise<BulkAssignResponseDto> {
+    if (!tx) {
+      return this.dbService.db.transaction((t) =>
+        this.assignVenuesToBuildings(uniId, assignments, t),
+      ); //END_transaction
+    }
 
-  //   const [row] = await database
-  //     .select({
-  //       venueId: Venue.VenueID,
-  //       venueName: Venue.VenueName,
-  //       buildingId: Building.BuildingID,
-  //       buildingName: Building.BuildingName,
-  //     })
-  //     .from(Venue)
-  //     .leftJoin(Building, eq(Venue.BuildingID, Building.BuildingID))
-  //     .where(eq(Venue.VenueID, venueId));
+    // Collect unique building IDs from assignments
+    const buildingIds = [
+      ...new Set(
+        assignments
+          .map((a) => a.buildingId)
+          .filter((id): id is string => id !== null),
+      ),
+    ];
 
-  //   return row;
-  // }
+    // Validate all buildings exist and belong to the university
+    if (buildingIds.length > 0) {
+      const validBuildings = await tx
+        .select({ id: Building.BuildingID })
+        .from(Building)
+        .where(
+          and(
+            inArray(Building.BuildingID, buildingIds),
+            eq(Building.UniversityID, uniId),
+          ),
+        );
 
-  // async assignBuilding(
-  //   session: SessionData,
-  //   venueId: string,
-  //   assignVenueDto: AssignVenueBuildingDto,
-  // ): Promise<VenueMappingDto> {
-  //   const universityId = this.requireUniId(session);
-  //   const database = this.dbService.db;
+      if (validBuildings.length !== buildingIds.length) {
+        throw new BadRequestException(
+          'One or more buildings do not belong to the selected university',
+        );
+      }
+    }
 
-  //   const [venue] = await database
-  //     .select()
-  //     .from(Venue)
-  //     .where(
-  //       and(eq(Venue.VenueID, venueId), eq(Venue.UniversityID, universityId)),
-  //     );
+    // Validate all venues exist and belong to the university
+    const venueIds = assignments.map((a) => a.venueId);
+    const validVenues = await tx
+      .select({ id: Venue.VenueID })
+      .from(Venue)
+      .where(
+        and(inArray(Venue.VenueID, venueIds), eq(Venue.UniversityID, uniId)),
+      );
 
-  //   if (!venue) {
-  //     throw new NotFoundException('Venue not found');
-  //   }
+    if (validVenues.length !== new Set(venueIds).size) {
+      throw new BadRequestException(
+        'One or more venues do not belong to the selected university',
+      );
+    }
 
-  //   if (assignVenueDto.buildingId) {
-  //     const [building] = await database
-  //       .select({ id: Building.BuildingID })
-  //       .from(Building)
-  //       .where(
-  //         and(
-  //           eq(Building.BuildingID, assignVenueDto.buildingId),
-  //           eq(Building.UniversityID, universityId),
-  //         ),
-  //       );
+    // Apply updates
+    for (const a of assignments) {
+      await tx
+        .update(Venue)
+        .set({ BuildingID: a.buildingId })
+        .where(
+          and(eq(Venue.VenueID, a.venueId), eq(Venue.UniversityID, uniId)),
+        );
+    } //END_a
 
-  //     if (!building) {
-  //       throw new BadRequestException(
-  //         'Building does not belong to the selected university',
-  //       );
-  //     }
-  //   }
-
-  //   const [updated] = await database
-  //     .update(Venue)
-  //     .set({ BuildingID: assignVenueDto.buildingId })
-  //     .where(eq(Venue.VenueID, venueId))
-  //     .returning();
-
-  //   return this.venueToDto(updated.VenueID);
-  // }
-
-  // async bulkAssign(
-  //   session: SessionData,
-  //   bulkAssignVenueDto: BulkAssignVenuesDto,
-  // ): Promise<{ updated: number; success: boolean }> {
-  //   const universityId = this.requireUniId(session);
-  //   const database = this.dbService.db;
-
-  //   const buildingIds = [
-  //     ...new Set(
-  //       bulkAssignVenueDto.assignments
-  //         .map((assignment) => assignment.buildingId)
-  //         .filter((id): id is string => id !== null),
-  //     ),
-  //   ];
-
-  //   if (buildingIds.length > 0) {
-  //     const validBuildings = await database
-  //       .select({ id: Building.BuildingID })
-  //       .from(Building)
-  //       .where(
-  //         and(
-  //           inArray(Building.BuildingID, buildingIds),
-  //           eq(Building.UniversityID, universityId),
-  //         ),
-  //       );
-
-  //     this.OOPSIE.log(
-  //       `Here: validBuildings[${JSON.stringify(validBuildings)}] | buildingIds[${JSON.stringify(buildingIds)}]`,
-  //     );
-
-  //     if (validBuildings.length !== buildingIds.length) {
-  //       throw new BadRequestException(
-  //         'One or more buildings do not belong to your selected university',
-  //       );
-  //     }
-  //   }
-
-  //   await database.transaction(async (tx) => {
-  //     for (const assignment of bulkAssignVenueDto.assignments) {
-  //       await tx
-  //         .update(Venue)
-  //         .set({ BuildingID: assignment.buildingId })
-  //         .where(
-  //           and(
-  //             eq(Venue.VenueID, assignment.venueId),
-  //             eq(Venue.UniversityID, universityId),
-  //           ),
-  //         );
-  //     }
-  //   });
-
-  //   return { updated: bulkAssignVenueDto.assignments.length, success: true };
-  // }
+    return {
+      updated: assignments.length,
+      success: true,
+    };
+  } //END_assignVenuesToBuildings
 
   //🎅's little helpers
 

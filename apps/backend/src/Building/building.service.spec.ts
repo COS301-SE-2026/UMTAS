@@ -388,13 +388,13 @@ describe('BuildingService', () => {
 
   //Delete
   describe('Test_delete', () => {
-    it('should throw InternalServerErrorException when delete returns no row', async () => {
+    it('should throw NotFoundException when delete returns no row', async () => {
       //Arrange
       mockDbResult(mockDb.delete, []);
 
       //Act + Assert
       await expect(service.delete('building-1')).rejects.toThrow(
-        InternalServerErrorException,
+        NotFoundException,
       );
     });
 

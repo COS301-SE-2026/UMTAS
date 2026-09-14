@@ -11,6 +11,7 @@ import {
   NotFoundException,
   ConflictException,
   InternalServerErrorException,
+  BadRequestException,
 } from '@nestjs/common';
 import {
   createMockUniversityService,
@@ -354,13 +355,13 @@ describe('VenueService', () => {
 
   //delete
   describe('Test_delete', () => {
-    it('should throw InternalServerErrorException when delete returns no row', async () => {
+    it('should throw NotFoundException when delete returns no row', async () => {
       //Arrange
       mockDbResult(mockDb.delete, []);
 
       //Act + Assert
       await expect(service.delete('venue-1')).rejects.toThrow(
-        InternalServerErrorException,
+        NotFoundException,
       );
     });
 
@@ -377,102 +378,122 @@ describe('VenueService', () => {
     });
   }); //END_Test_delete
 
-  // describe('assignBuilding', () => {
-  //   it('should throw NotFoundException if the venue does not belong to the selected university', async () => {
-  //     mockDbResult(mockDb.select, []);
+  //assignVenuesToBuildings
+  describe('Test_assignVenuesToBuildings', () => {
+    it('should assign a single venue to a building', async () => {
+      //Arrange
+      mockTransaction(mockDb, {
+        select: [
+          [{ id: 'building-1' }], // validBuildings
+          [{ id: 'venue-1' }], // validVenues
+        ],
+        update: [[]],
+      });
 
-  //     await expect(
-  //       service.assignBuilding(mockSession, 'venue-1', {
-  //         buildingId: 'building-1',
-  //       }),
-  //     ).rejects.toThrow(NotFoundException);
-  //   });
+      //Act
+      const result = await service.assignVenuesToBuildings(uniId, [
+        { venueId: 'venue-1', buildingId: 'building-1' },
+      ]);
 
-  //   it('should assign the building and return the updated mapping', async () => {
-  //     mockDbResult(mockDb.select, [{ VenueID: 'venue-1' }]);
-  //     mockDbResult(mockDb.select, [{ id: 'building-1' }]);
-  //     mockDbResult(mockDb.update, [{ VenueID: 'venue-1' }]);
-  //     mockDbResult(mockDb.select, [
-  //       {
-  //         venueId: 'venue-1',
-  //         venueName: 'IT 2-26',
-  //         buildingId: 'building-1',
-  //         buildingName: 'IT Building',
-  //       },
-  //     ]);
+      //Assert
+      expect(result).toEqual({ updated: 1, success: true });
+      expect(mockDb.update).toHaveBeenCalledTimes(1);
+    });
 
-  //     const result = await service.assignBuilding(mockSession, 'venue-1', {
-  //       buildingId: 'building-1',
-  //     });
+    it('should assign multiple venues to different buildings', async () => {
+      //Arrange
+      mockTransaction(mockDb, {
+        select: [
+          [{ id: 'building-1' }, { id: 'building-2' }], // validBuildings
+          [{ id: 'venue-1' }, { id: 'venue-2' }], // validVenues
+        ],
+        update: [[], []],
+      });
 
-  //     expect(result).toMatchObject({
-  //       venueId: 'venue-1',
-  //       buildingId: 'building-1',
-  //       buildingName: 'IT Building',
-  //     });
-  //   });
+      //Act
+      const result = await service.assignVenuesToBuildings(uniId, [
+        { venueId: 'venue-1', buildingId: 'building-1' },
+        { venueId: 'venue-2', buildingId: 'building-2' },
+      ]);
 
-  //   it('should allow unassigning a venue by sending a null buildingId', async () => {
-  //     mockDbResult(mockDb.select, [{ VenueID: 'venue-1' }]);
-  //     mockDbResult(mockDb.update, [{ VenueID: 'venue-1' }]);
-  //     mockDbResult(mockDb.select, [
-  //       {
-  //         venueId: 'venue-1',
-  //         venueName: 'IT 2-26',
-  //         buildingId: null,
-  //         buildingName: null,
-  //       },
-  //     ]);
+      //Assert
+      expect(result).toEqual({ updated: 2, success: true });
+      expect(mockDb.update).toHaveBeenCalledTimes(2);
+    });
 
-  //     const result = await service.assignBuilding(mockSession, 'venue-1', {
-  //       buildingId: null,
-  //     });
+    it('should unassign venues when buildingId is null', async () => {
+      //Arrange
+      mockTransaction(mockDb, {
+        select: [
+          [{ id: 'venue-1' }], // validVenues only — no building check
+        ],
+        update: [[]],
+      });
 
-  //     expect(result.buildingId).toBeNull();
-  //   });
-  // });
+      //Act
+      const result = await service.assignVenuesToBuildings(uniId, [
+        { venueId: 'venue-1', buildingId: null },
+      ]);
 
-  // describe('bulkAssign', () => {
-  //   it('should throw BadRequestException if any building belongs to a different university', async () => {
-  //     mockDbResult(mockDb.select, [{ id: 'building-1' }]);
+      //Assert
+      expect(result).toEqual({ updated: 1, success: true });
+    });
 
-  //     await expect(
-  //       service.bulkAssign(mockSession, {
-  //         assignments: [
-  //           { venueId: 'venue-1', buildingId: 'building-1' },
-  //           { venueId: 'venue-2', buildingId: 'wits-building' },
-  //         ],
-  //       }),
-  //     ).rejects.toThrow(BadRequestException);
-  //   });
+    it('should throw BadRequestException when a building belongs to another university', async () => {
+      //Arrange
+      mockTransaction(mockDb, {
+        select: [
+          [{ id: 'building-1' }], // only 1 of 2 requested buildings is valid
+        ],
+      });
 
-  //   it('should skip the building ownership check entirely when every assignment gets unassigned', async () => {
-  //     const result = await service.bulkAssign(mockSession, {
-  //       assignments: [
-  //         { venueId: 'venue-1', buildingId: null },
-  //         { venueId: 'venue-2', buildingId: null },
-  //       ],
-  //     });
+      //Act + Assert
+      await expect(
+        service.assignVenuesToBuildings(uniId, [
+          { venueId: 'venue-1', buildingId: 'building-1' },
+          { venueId: 'venue-2', buildingId: 'other-building' },
+        ]),
+      ).rejects.toThrow(BadRequestException);
+    });
 
-  //     expect(result).toEqual({ updated: 2, success: true });
-  //   });
+    it('should throw BadRequestException when a venue belongs to another university', async () => {
+      //Arrange
+      mockTransaction(mockDb, {
+        select: [
+          [{ id: 'building-1' }], // validBuildings
+          [{ id: 'venue-1' }], // only 1 of 2 requested venues is valid
+        ],
+      });
 
-  //   it('should update every row inside a transaction and report the count', async () => {
-  //     mockDbResult(mockDb.select, [{ id: 'building-1' }]);
-  //     mockTransaction(mockDb, {
-  //       update: [[{ VenueID: 'venue-1' }], [{ VenueID: 'venue-2' }]],
-  //     });
+      //Act + Assert
+      await expect(
+        service.assignVenuesToBuildings(uniId, [
+          { venueId: 'venue-1', buildingId: 'building-1' },
+          { venueId: 'venue-2', buildingId: 'building-1' },
+        ]),
+      ).rejects.toThrow(BadRequestException);
+    });
 
-  //     const result = await service.bulkAssign(mockSession, {
-  //       assignments: [
-  //         { venueId: 'venue-1', buildingId: 'building-1' },
-  //         { venueId: 'venue-2', buildingId: 'building-1' },
-  //       ],
-  //     });
+    it('should skip building validation when all assignments are unassignments', async () => {
+      //Arrange
+      mockTransaction(mockDb, {
+        select: [
+          [{ id: 'venue-1' }, { id: 'venue-2' }], // validVenues
+        ],
+        update: [[], []],
+      });
 
-  //     expect(result).toEqual({ updated: 2, success: true });
-  //   });
-  // });
+      //Act
+      const result = await service.assignVenuesToBuildings(uniId, [
+        { venueId: 'venue-1', buildingId: null },
+        { venueId: 'venue-2', buildingId: null },
+      ]);
+
+      //Assert
+      expect(result).toEqual({ updated: 2, success: true });
+      expect(mockDb.select).toHaveBeenCalledTimes(1); // only venue validation ran
+    });
+  }); //END_Test_assignVenuesToBuildings
 
   //validateUpdateInput
   describe('Test_validateUpdateInput', () => {

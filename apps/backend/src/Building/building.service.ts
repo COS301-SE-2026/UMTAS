@@ -223,7 +223,7 @@ export class BuildingService {
 
     if (!building) {
       this.OOPSIE.fatal(`Failed to delete building[${buildingId}]`);
-      throw new InternalServerErrorException(`Failed to delete building`);
+      throw new NotFoundException(`Failed to delete building`);
     }
 
     return { building };
