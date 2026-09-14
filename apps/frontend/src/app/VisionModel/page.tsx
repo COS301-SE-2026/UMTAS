@@ -1,7 +1,5 @@
-"use client";
+import VM_SessionTemplate from "@/components/templates/VisionModel/SessionTemplate";
 
-import SetupVMSessionTemplate from "@/components/templates/VisionModel/SessionSetup";
-
-export default function VisionModel() {
-  return <SetupVMSessionTemplate />;
+export default function VMsession() {
+  return <VM_SessionTemplate />;
 }
