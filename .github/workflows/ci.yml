@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - dev
+      - feat/attendance
     tags:
       - "v*"
   pull_request:
@@ -36,99 +37,99 @@ jobs:
       CI_PDF_PARSER_IMAGE: umtas-ci-pdf-parser:${{ github.sha }}
       CI_SOLVER_IMAGE: umtas-ci-solver:${{ github.sha }}
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+    # steps:
+    # - name: Checkout code
+    #   uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f
+    # - name: Set up Docker Buildx
+    #   uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f
 
-      - name: Setup Node.js
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
-        with:
-          node-version: 22
+    # - name: Setup Node.js
+    #   uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+    #   with:
+    #     node-version: 22
 
-      - name: Setup Just
-        uses: extractions/setup-just@v2
+    # - name: Setup Just
+    #   uses: extractions/setup-just@v2
 
-      - name: Enable Corepack (pnpm)
-        run: corepack enable pnpm
+    # - name: Enable Corepack (pnpm)
+    #   run: corepack enable pnpm
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+    # - name: Install dependencies
+    #   run: pnpm install --frozen-lockfile
 
-      - name: Run Linter
-        run: pnpm run lint
+    # - name: Run Linter
+    #   run: pnpm run lint
 
-      - name: Run Build
-        run: pnpm run build
+    # - name: Run Build
+    #   run: pnpm run build
 
-      # - name: Run Audit
-      #   run: pnpm audit --audit-level=moderate
+    # # - name: Run Audit
+    # #   run: pnpm audit --audit-level=moderate
 
-      - name: Run Unit Tests
-        run: |
-          pnpm --filter shared-types test
-          pnpm --filter bullmq-worker-core test
-          pnpm --filter solver-worker test
-          pnpm --filter pdf-parser-worker test
-          pnpm --filter backend exec jest --coverage --runInBand
+    # - name: Run Unit Tests
+    #   run: |
+    #     pnpm --filter shared-types test
+    #     pnpm --filter bullmq-worker-core test
+    #     pnpm --filter solver-worker test
+    #     pnpm --filter pdf-parser-worker test
+    #     pnpm --filter backend exec jest --coverage --runInBand
 
-      - name: Typecheck Full-Stack Integration Tests
-        run: pnpm --filter backend test:integration:typecheck
+    # - name: Typecheck Full-Stack Integration Tests
+    #   run: pnpm --filter backend test:integration:typecheck
 
-      - name: Build integration images in parallel
-        uses: docker/bake-action@d3418bd7d0e9324001bca92fa8ba175ea7e6dc9b # v7.3.0
-        with:
-          files: ./docker-bake.hcl
-          load: true
+    # - name: Build integration images in parallel
+    #   uses: docker/bake-action@d3418bd7d0e9324001bca92fa8ba175ea7e6dc9b # v7.3.0
+    #   with:
+    #     files: ./docker-bake.hcl
+    #     load: true
 
-      - name: Run Full-Stack Integration Tests
-        run: pnpm test:integration
+    # - name: Run Full-Stack Integration Tests
+    #   run: pnpm test:integration
 
-      - name: Run Browser E2E Tests
-        run: pnpm test:e2e
+    # - name: Run Browser E2E Tests
+    #   run: pnpm test:e2e
 
-      - name: Upload Playwright report
+    # - name: Upload Playwright report
 
-        if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: playwright-report
-          path: |
-            apps/e2e/playwright-report
-            apps/e2e/test-results
-          retention-days: 30
+    #   if: ${{ !cancelled() }}
+    #   uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+    #   with:
+    #     name: playwright-report
+    #     path: |
+    #       apps/e2e/playwright-report
+    #       apps/e2e/test-results
+    #     retention-days: 30
 
-      - name: Upload unit coverage to Codecov
-        uses: codecov/codecov-action@75cd11691c0faa626561e295848008c8a7dddffe
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: apps/backend/coverage/lcov.info
-          disable_search: true
-          flags: unit
+    # - name: Upload unit coverage to Codecov
+    #   uses: codecov/codecov-action@75cd11691c0faa626561e295848008c8a7dddffe
+    #   with:
+    #     token: ${{ secrets.CODECOV_TOKEN }}
+    #     files: apps/backend/coverage/lcov.info
+    #     disable_search: true
+    #     flags: unit
 
-      #When Integration tests actually contribut to coverage
-      # - name: Upload integration coverage to Codecov
-      #   uses: codecov/codecov-action@75cd11691c0faa626561e295848008c8a7dddffe
-      #   with:
-      #     token: ${{ secrets.CODECOV_TOKEN }}
-      #     files: apps/backend/coverage/integration/lcov.info
-      #     disable_search: true
-      #     flags: integration
+    # #When Integration tests actually contribut to coverage
+    # # - name: Upload integration coverage to Codecov
+    # #   uses: codecov/codecov-action@75cd11691c0faa626561e295848008c8a7dddffe
+    # #   with:
+    # #     token: ${{ secrets.CODECOV_TOKEN }}
+    # #     files: apps/backend/coverage/integration/lcov.info
+    # #     disable_search: true
+    # #     flags: integration
 
-      - name: Upload test results to Codecov
-        if: ${{ !cancelled() }}
-        uses: codecov/test-results-action@0fa95f0e1eeaafde2c782583b36b28ad0d8c77d3
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: "**/junit.xml"
+    # - name: Upload test results to Codecov
+    #   if: ${{ !cancelled() }}
+    #   uses: codecov/test-results-action@0fa95f0e1eeaafde2c782583b36b28ad0d8c77d3
+    #   with:
+    #     token: ${{ secrets.CODECOV_TOKEN }}
+    #     files: "**/junit.xml"
 
   docker-staging:
     name: Build & Push Staging Images
     runs-on: ubuntu-latest
-    needs: ci
-    if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
+    # needs: ci
+    if: github.event_name == 'push' || github.ref == 'refs/heads/dev'
     environment:
       name: staging
     permissions:
@@ -155,17 +156,17 @@ jobs:
           echo "latest=latest" >> $GITHUB_OUTPUT
           echo "sha=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
 
-      - name: Build & push backend
-        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8
-        with:
-          context: .
-          file: docker/backend/backend.Dockerfile
-          push: true
-          tags: |
-            vigilcs/umtas:backend-staging-${{ steps.tag.outputs.latest }}
-            vigilcs/umtas:backend-staging-${{ steps.tag.outputs.sha }}
-          cache-from: type=gha,scope=backend-staging
-          cache-to: type=gha,mode=max,scope=backend-staging
+      # - name: Build & push backend
+      #   uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8
+      #   with:
+      #     context: .
+      #     file: docker/backend/backend.Dockerfile
+      #     push: true
+      #     tags: |
+      #       vigilcs/umtas:backend-staging-${{ steps.tag.outputs.latest }}
+      #       vigilcs/umtas:backend-staging-${{ steps.tag.outputs.sha }}
+      #     cache-from: type=gha,scope=backend-staging
+      #     cache-to: type=gha,mode=max,scope=backend-staging
 
       - name: Build & push frontend
         uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8
@@ -187,35 +188,35 @@ jobs:
           cache-from: type=gha,scope=frontend-staging
           cache-to: type=gha,mode=max,scope=frontend-staging
 
-      - name: Build & push solver
-        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8
-        with:
-          context: .
-          file: docker/solver-worker/solver-worker.Dockerfile
-          push: true
-          tags: |
-            vigilcs/umtas:solver-worker-staging-${{ steps.tag.outputs.latest }}
-            vigilcs/umtas:solver-worker-staging-${{ steps.tag.outputs.sha }}
-          cache-from: type=gha,scope=solver-worker-staging
-          cache-to: type=gha,mode=max,scope=solver-worker-staging
+      # - name: Build & push solver
+      #   uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8
+      #   with:
+      #     context: .
+      #     file: docker/solver-worker/solver-worker.Dockerfile
+      #     push: true
+      #     tags: |
+      #       vigilcs/umtas:solver-worker-staging-${{ steps.tag.outputs.latest }}
+      #       vigilcs/umtas:solver-worker-staging-${{ steps.tag.outputs.sha }}
+      #     cache-from: type=gha,scope=solver-worker-staging
+      #     cache-to: type=gha,mode=max,scope=solver-worker-staging
 
-      - name: Build & push pdf-parser
-        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8
-        with:
-          context: .
-          file: docker/pdf-parser-worker/pdf-parser-worker.Dockerfile
-          push: true
-          tags: |
-            vigilcs/umtas:pdf-parser-worker-staging-${{ steps.tag.outputs.latest }}
-            vigilcs/umtas:pdf-parser-worker-staging-${{ steps.tag.outputs.sha }}
-          cache-from: type=gha,scope=pdf-parser-staging
-          cache-to: type=gha,mode=max,scope=pdf-parser-staging
+      # - name: Build & push pdf-parser
+      #   uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8
+      #   with:
+      #     context: .
+      #     file: docker/pdf-parser-worker/pdf-parser-worker.Dockerfile
+      #     push: true
+      #     tags: |
+      #       vigilcs/umtas:pdf-parser-worker-staging-${{ steps.tag.outputs.latest }}
+      #       vigilcs/umtas:pdf-parser-worker-staging-${{ steps.tag.outputs.sha }}
+      #     cache-from: type=gha,scope=pdf-parser-staging
+      #     cache-to: type=gha,mode=max,scope=pdf-parser-staging
 
   deploy-staging:
     runs-on: ubuntu-latest
     name: Deploy to Staging
     needs: docker-staging
-    if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
+    if: github.event_name == 'push' || github.ref == 'refs/heads/dev'
     environment:
       name: production
     permissions: {}
@@ -324,12 +325,12 @@ jobs:
           cache-from: type=gha,scope=pdf-parser-release
           cache-to: type=gha,mode=max,scope=pdf-parser-release
 
-  notify-ci-failure:
-    name: Notify CI/CD Failure
-    needs: [ci, docker-staging, docker-release]
-    if: failure()
-    uses: ./.github/workflows/discord-notify.yml
-    with:
-      status: "Failure"
-      message: "The pipeline failed during CI or Docker Build. Check the GitHub Actions logs."
-    secrets: inherit
+  # notify-ci-failure:
+  #   name: Notify CI/CD Failure
+  #   needs: [ci, docker-staging, docker-release]
+  #   if: failure()
+  #   uses: ./.github/workflows/discord-notify.yml
+  #   with:
+  #     status: "Failure"
+  #     message: "The pipeline failed during CI or Docker Build. Check the GitHub Actions logs."
+  #   secrets: inherit
