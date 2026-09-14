@@ -101,3 +101,11 @@ pub fn extract_slice(
 pub fn normalize_pixel(colour: &u8) -> f32 {
     return (*colour as f32) / 255.0;
 }
+
+pub struct DetectedPerson {
+    pub x: f32,
+    pub y: f32,
+    pub width: f32,
+    pub height: f32,
+    pub confidence: f32,
+}
