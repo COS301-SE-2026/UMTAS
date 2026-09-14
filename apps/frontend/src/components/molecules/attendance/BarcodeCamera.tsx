@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { BrowserMultiFormatReader } from "@zxing/browser";
 import { BarcodeFormat, DecodeHintType } from "@zxing/library";
+import { readBarcodes } from "zxing-wasm/reader";
 
 interface BarcodeCameraProps {
   onScan: (value: string) => void;
@@ -20,6 +21,8 @@ type CameraCapabilities = MediaTrackCapabilities & {
 type CameraState =
   "starting" | "ready" | "not-found" | "permission-denied" | "error";
 
+type DecoderSource = "ZXING_JS" | "ZXING_WASM";
+
 export function BarcodeCamera({ onScan }: BarcodeCameraProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -27,11 +30,117 @@ export function BarcodeCamera({ onScan }: BarcodeCameraProps) {
 
   const [scanFlash, setScanFlash] = useState(false);
 
+  const lastScanRef = useRef<{
+    value: string;
+    time: number;
+  } | null>(null);
+
   useEffect(() => {
     let stream: MediaStream | null = null;
-    let controls: { stop: () => void } | undefined;
+
+    let jsControls: { stop: () => void } | undefined;
+
+    let wasmInterval: ReturnType<typeof setInterval> | undefined;
 
     let cancelled = false;
+    let wasmBusy = false;
+
+    function handleDecodedValue(value: string, source: DecoderSource) {
+      const now = Date.now();
+
+      if (
+        lastScanRef.current?.value === value &&
+        now - lastScanRef.current.time < 1500
+      ) {
+        return;
+      }
+
+      lastScanRef.current = {
+        value,
+        time: now,
+      };
+
+      console.log(`Barcode decoded by ${source}:`, value);
+
+      setScanFlash(true);
+
+      window.setTimeout(() => {
+        setScanFlash(false);
+      }, 300);
+
+      onScan(value);
+    }
+
+    async function scanWithWasm() {
+      if (wasmBusy) {
+        return;
+      }
+
+      const video = videoRef.current;
+
+      if (!video || video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) {
+        return;
+      }
+
+      const width = video.videoWidth;
+
+      const height = video.videoHeight;
+
+      if (!width || !height) {
+        return;
+      }
+
+      wasmBusy = true;
+
+      try {
+        const cropHeight = Math.floor(height * 0.3);
+
+        const cropY = Math.floor((height - cropHeight) / 2);
+
+        const canvas = document.createElement("canvas");
+
+        canvas.width = width;
+        canvas.height = cropHeight;
+
+        const context = canvas.getContext("2d", {
+          willReadFrequently: true,
+        });
+
+        if (!context) {
+          return;
+        }
+
+        context.drawImage(
+          video,
+          0,
+          cropY,
+          width,
+          cropHeight,
+          0,
+          0,
+          width,
+          cropHeight,
+        );
+
+        const imageData = context.getImageData(0, 0, width, cropHeight);
+
+        const results = await readBarcodes(imageData, {
+          formats: ["Code39"],
+          tryHarder: true,
+        });
+
+        const result = results[0];
+
+        if (!result?.text) {
+          return;
+        }
+
+        handleDecodedValue(result.text, "ZXING_WASM");
+      } catch {
+      } finally {
+        wasmBusy = false;
+      }
+    }
 
     async function startCamera() {
       try {
@@ -86,12 +195,12 @@ export function BarcodeCamera({ onScan }: BarcodeCameraProps) {
 
         hints.set(DecodeHintType.TRY_HARDER, true);
 
-        const reader = new BrowserMultiFormatReader(hints, {
+        const jsReader = new BrowserMultiFormatReader(hints, {
           delayBetweenScanAttempts: 100,
           delayBetweenScanSuccess: 1000,
         });
 
-        controls = await reader.decodeFromStream(
+        jsControls = await jsReader.decodeFromStream(
           stream,
           videoRef.current,
           (result) => {
@@ -99,17 +208,13 @@ export function BarcodeCamera({ onScan }: BarcodeCameraProps) {
               return;
             }
 
-            const value = result.getText();
-
-            setScanFlash(true);
-
-            window.setTimeout(() => {
-              setScanFlash(false);
-            }, 300);
-
-            onScan(value);
+            handleDecodedValue(result.getText(), "ZXING_JS");
           },
         );
+
+        const wasmInterval = window.setInterval(() => {
+          void scanWithWasm();
+        }, 200);
       } catch (error) {
         if (error instanceof DOMException) {
           if (error.name === "NotFoundError") {
@@ -134,7 +239,11 @@ export function BarcodeCamera({ onScan }: BarcodeCameraProps) {
     return () => {
       cancelled = true;
 
-      controls?.stop();
+      jsControls?.stop();
+
+      if (wasmInterval) {
+        clearInterval(wasmInterval);
+      }
 
       stream?.getTracks().forEach((track) => {
         track.stop();
