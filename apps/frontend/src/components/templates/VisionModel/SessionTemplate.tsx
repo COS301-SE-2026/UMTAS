@@ -80,7 +80,7 @@ export default function VM_SessionTemplate() {
                             DetectionInterval: Number(e.target.value),
                           }));
                         }}
-                        min={4}
+                        min={1}
                         max={100}
                         type="number"
                         placeholder="0"

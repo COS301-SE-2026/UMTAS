@@ -8,10 +8,16 @@ class DetectionManager {
   private worker: Worker | null = null;
   private isProcessing = false;
 
-  constructor() {
-    this.worker = new Worker(new URL("./modelWorker.ts", import.meta.url), {
-      type: "module",
-    });
+  constructor() {}
+  public start() {
+    if (typeof window === "undefined") return;
+
+    if (!this.worker) {
+      this.worker = new Worker(new URL("./modelWorker.ts", import.meta.url), {
+        type: "module",
+      });
+      this.isProcessing = false;
+    }
   }
 
   public run(

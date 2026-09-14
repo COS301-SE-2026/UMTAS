@@ -3,6 +3,7 @@ import { Button } from "@/components/atoms/baseShadcn/button";
 import { useEffect, useRef, useState } from "react";
 import { CircleX } from "lucide-react";
 import { detectionManager } from "../../../../utilities/VisionModel/detectionManager";
+import { use } from "apexcharts";
 
 function getVideoConstraints(): MediaStreamConstraints {
   const isMobile = window.innerWidth < 768;
@@ -58,6 +59,14 @@ function CanvasWebcam({ isCameraActive, detectionSettings }: CanvasCamProps) {
   const lastRunRef = useRef<number>(0);
 
   useEffect(() => {
+    if (detectionSettings.runDetection && isCameraActive) {
+      detectionManager.start();
+    } else {
+      detectionManager.terminate();
+    }
+  });
+
+  useEffect(() => {
     if (isCameraActive == false) {
       return;
     }
@@ -94,19 +103,23 @@ function CanvasWebcam({ isCameraActive, detectionSettings }: CanvasCamProps) {
 
     let animationFrameID: number;
 
-    function renderFrame() {
+    function renderFrame(timestamp: number) {
       const canvas = canvasRef.current;
       const video = videoRef.current;
 
       if (canvas && video) {
-        const context = canvas.getContext("2d");
+        const context = canvas.getContext("2d", { willReadFrequently: true });
         if (context) {
           context.drawImage(video, 0, 0, canvas.width, canvas.height);
         }
 
         const intervalMs = detectionSettings.DetectionInterval * 1000;
 
-        if (context && detectionSettings.runDetection) {
+        if (
+          context &&
+          detectionSettings.runDetection &&
+          timestamp - lastRunRef.current >= intervalMs
+        ) {
           const imageData = context?.getImageData(
             0,
             0,
@@ -126,12 +139,12 @@ function CanvasWebcam({ isCameraActive, detectionSettings }: CanvasCamProps) {
 
       animationFrameID = requestAnimationFrame(renderFrame);
     }
-    renderFrame();
+    animationFrameID = requestAnimationFrame(renderFrame);
 
     return () => {
       cancelAnimationFrame(animationFrameID);
     };
-  }, [cameraLoaded]);
+  }, [cameraLoaded, detectionSettings]);
 
   return isCameraActive ? (
     <>

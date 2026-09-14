@@ -18,7 +18,7 @@ async function initDetection() {
   const fullUrl = `${location.origin}/models/yolov11n.onnx`;
 
   DetectSession = await ort.InferenceSession.create(fullUrl, {
-    executionProviders: ["wgpu", "wasm"],
+    executionProviders: ["webgpu", "wasm"],
   });
 }
 
@@ -37,26 +37,25 @@ function createSlices(payload: PIXEL_PAYLOAD) {
 }
 
 async function runModel(slices: Float32Array[], payload: PIXEL_PAYLOAD) {
-  const sliceHeight = payload.height / 2;
-  const sliceWidth = payload.width / 2;
-  const tensorShape = [1, 3, sliceHeight, sliceWidth];
+  const tensorShape = [1, 3, 640, 640];
 
   const inputName = DetectSession?.inputNames[0];
   const outputName = DetectSession?.outputNames[0];
 
-  if (inputName && outputName) {
-    const inferencePromises = slices.map(async (sliceData) => {
-      const inputTensor = new ort.Tensor("float32", sliceData, tensorShape);
-      const results = await DetectSession!.run({ [inputName]: inputTensor });
-      return results[outputName].data;
-    });
-
-    return await Promise.all(inferencePromises);
-  } else {
+  if (!inputName || !outputName) {
     throw Error("Input and output names not set");
   }
-}
 
+  const resultsArray: Float32Array[] = [];
+
+  for (const sliceData of slices) {
+    const inputTensor = new ort.Tensor("float32", sliceData, tensorShape);
+    const results = await DetectSession!.run({ [inputName]: inputTensor });
+    resultsArray.push(results[outputName].data as Float32Array);
+  }
+  console.log("results ", resultsArray);
+  return resultsArray;
+}
 self.onmessage = async (event: MessageEvent) => {
   const message = event.data as DETECT_MESSAGE;
 
