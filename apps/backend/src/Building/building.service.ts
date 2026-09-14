@@ -5,13 +5,16 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { Building } from '../entities/index';
+import { Building, Venue } from '../entities/index';
 import { DatabaseService } from '../db/database.service';
 import {
+  BuildingDto,
+  BuildingListResponseDto,
+  BuildingQueryDto,
   BuildingSingleResponseDto,
   CreateBuildingInput,
 } from './dto/building.dto';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, isNotNull, isNull, ilike, sql } from 'drizzle-orm';
 import { AppDatabase } from 'src/auth/auth';
 import { UniversityService } from 'src/University/university.service';
 import { VenueService } from 'src/Venue/venue.service';
@@ -106,42 +109,42 @@ export class BuildingService {
   } //END_getById
 
   //GetAll
-  // async getAllBuildings(
-  //   uniId: string,
-  //   query: BuildingQueryDto,
-  //   tx?: AppDatabase
-  // ): Promise<BuildingListResponseDto> {
-  //   const db = tx ?? this.dbService.db;
+  async getAll(
+    uniId: string,
+    query: BuildingQueryDto,
+    tx?: AppDatabase,
+  ): Promise<BuildingListResponseDto> {
+    const db = tx ?? this.dbService.db;
 
-  //   const filters = [eq(Building.UniversityID, uniId)];
+    const filters = [eq(Building.UniversityID, uniId)];
 
-  //   if (query.mapped === true) {
-  //     filters.push(isNotNull(Building.Latitude));
-  //   } else if (query.mapped === false) {
-  //     filters.push(isNull(Building.Latitude));
-  //   }
+    if (query.mapped === true) {
+      filters.push(isNotNull(Building.Latitude));
+    } else if (query.mapped === false) {
+      filters.push(isNull(Building.Latitude));
+    }
 
-  //   if (query.search) {
-  //     filters.push(ilike(Building.BuildingName, `%${query.search}%`));
-  //   }
+    if (query.search) {
+      filters.push(ilike(Building.BuildingName, `%${query.search}%`));
+    }
 
-  //   const rows = await db
-  //     .select({
-  //       building: Building,
-  //       venueCount: sql<number>`count(${Venue.VenueID})::int`,
-  //     })
-  //     .from(Building)
-  //     .leftJoin(Venue, eq(Venue.BuildingID, Building.BuildingID))
-  //     .where(and(...filters))
-  //     .groupBy(Building.BuildingID)
-  //     .orderBy(Building.BuildingID);
+    const rows = await db
+      .select({
+        building: Building,
+        venueCount: sql<number>`count(${Venue.VenueID})::int`,
+      })
+      .from(Building)
+      .leftJoin(Venue, eq(Venue.BuildingID, Building.BuildingID))
+      .where(and(...filters))
+      .groupBy(Building.BuildingID)
+      .orderBy(Building.BuildingID);
 
-  //   return {
-  //     buildings: rows.map((row) =>
-  //       this.buildingDtoAdapter(row.building, row.venueCount),
-  //     ),
-  //   };
-  // }//END_getAllBuildings
+    return {
+      buildings: rows.map((r) =>
+        this.buildingDtoAdapter(r.building, r.venueCount),
+      ),
+    };
+  } //END_getAllBuildings
 
   //Update
   // async updateBuildingLocation(
@@ -195,25 +198,6 @@ export class BuildingService {
   // }//END_updateBuilding
 
   //Delete
-
-  // private buildingDtoAdapter(
-  //   row: BuildingEntity,
-  //   venueCount: number,
-  // ): BuildingDto {
-  //   const buildingHasLocation = row.Latitude != null && row.Longitude != null;
-
-  //   return {
-  //     buildingId: row.BuildingID,
-  //     buildingName: row.BuildingName,
-  //     location: buildingHasLocation
-  //       ? { lat: row.Latitude as number, lng: row.Longitude as number }
-  //       : null,
-  //     footprint: row.Footprint ?? null,
-  //     icon: row.Icon,
-  //     displayColour: row.DisplayColour,
-  //     venueCount,
-  //   };
-  // }
 
   // 🎅's little helpers
   private async validateCreateBuildingInput(
@@ -283,4 +267,23 @@ export class BuildingService {
 
     return building ? { building } : null;
   } //END_uniqueBuildingNamePerUniversity
+
+  private buildingDtoAdapter(
+    row: typeof Building.$inferSelect,
+    venueCount: number,
+  ): BuildingDto {
+    return {
+      BuildingID: row.BuildingID,
+      BuildingName: row.BuildingName,
+      UniversityID: row.UniversityID,
+      location:
+        row.Latitude !== null && row.Longitude !== null
+          ? { lat: row.Latitude, lng: row.Longitude }
+          : null,
+      footprint: row.Footprint,
+      icon: row.Icon,
+      displayColour: row.DisplayColour,
+      venueCount,
+    };
+  }
 }

@@ -153,9 +153,16 @@ export class BuildingSingleResponseDto {
   message?: string;
 } //END_BuildingSingleResponseDto
 
+export class BuildingDto extends BaseBuildingDto {
+  @ApiProperty({ example: 12 })
+  venueCount!: number;
+} //END_BuildingDto
+
 export class BuildingListResponseDto {
-  @ApiProperty({ type: [BaseBuildingDto] })
-  buildings!: BaseBuildingDto[];
+  @ApiProperty({ type: [BuildingDto] })
+  buildings!: BuildingDto[];
+
+  venueCount?: number;
 
   @ApiPropertyOptional()
   @IsOptional()

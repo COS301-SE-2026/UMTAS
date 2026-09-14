@@ -182,6 +182,123 @@ describe('BuildingService', () => {
     });
   }); //END_Test_getById
 
+  //GetAll
+  describe('Test_getAll', () => {
+    it('should return empty array when no buildings match', async () => {
+      //Arrange
+      mockDbResult(mockDb.select, []);
+
+      //Act
+      const result = await service.getAll(uniId, {});
+
+      //Assert
+      expect(result).toEqual({ buildings: [] });
+    });
+
+    it('should return buildings mapped with venue counts', async () => {
+      //Arrange
+      const building = createBuilding();
+      mockDbResult(mockDb.select, [{ building, venueCount: 3 }]);
+
+      //Act
+      const result = await service.getAll(uniId, {});
+
+      //Assert
+      expect(result.buildings).toHaveLength(1);
+      expect(result.buildings[0]).toMatchObject({
+        BuildingID: building.BuildingID,
+        BuildingName: building.BuildingName,
+        venueCount: 3,
+      });
+    });
+
+    it('should apply mapped=true filter', async () => {
+      //Arrange
+      const building = createBuilding({
+        Latitude: -25.7545,
+        Longitude: 28.2314,
+      });
+      mockDbResult(mockDb.select, [{ building, venueCount: 0 }]);
+
+      //Act
+      const result = await service.getAll(uniId, { mapped: true });
+
+      //Assert
+      expect(result.buildings).toHaveLength(1);
+      expect(mockDb.select).toHaveBeenCalledTimes(1);
+    });
+
+    it('should apply mapped=false filter', async () => {
+      //Arrange
+      const building = createBuilding({ Latitude: null, Longitude: null });
+      mockDbResult(mockDb.select, [{ building, venueCount: 0 }]);
+
+      //Act
+      const result = await service.getAll(uniId, { mapped: false });
+
+      //Assert
+      expect(result.buildings).toHaveLength(1);
+      expect(mockDb.select).toHaveBeenCalledTimes(1);
+    });
+
+    it('should apply search filter', async () => {
+      //Arrange
+      const building = createBuilding({ BuildingName: 'IT Building' });
+      mockDbResult(mockDb.select, [{ building, venueCount: 0 }]);
+
+      //Act
+      const result = await service.getAll(uniId, { search: 'IT' });
+
+      //Assert
+      expect(result.buildings).toHaveLength(1);
+      expect(mockDb.select).toHaveBeenCalledTimes(1);
+    });
+
+    it('should map location from Latitude and Longitude columns', async () => {
+      //Arrange
+      const building = createBuilding({
+        Latitude: -25.7545,
+        Longitude: 28.2314,
+      });
+      mockDbResult(mockDb.select, [{ building, venueCount: 0 }]);
+
+      //Act
+      const result = await service.getAll(uniId, {});
+
+      //Assert
+      expect(result.buildings[0].location).toEqual({
+        lat: -25.7545,
+        lng: 28.2314,
+      });
+    });
+
+    it('should map location to null when Latitude is null', async () => {
+      //Arrange
+      const building = createBuilding({ Latitude: null, Longitude: 28.2314 });
+      mockDbResult(mockDb.select, [{ building, venueCount: 0 }]);
+
+      //Act
+      const result = await service.getAll(uniId, {});
+
+      //Assert
+      expect(result.buildings[0].location).toBeNull();
+    });
+
+    it('should map location to null when Longitude is null', async () => {
+      //Arrange
+      const building = createBuilding({ Latitude: -25.7545, Longitude: null });
+      mockDbResult(mockDb.select, [{ building, venueCount: 0 }]);
+
+      //Act
+      const result = await service.getAll(uniId, {});
+
+      //Assert
+      expect(result.buildings[0].location).toBeNull();
+    });
+  }); //END_Test_getAll
+
+  //Update
+
   //Helpers
   describe('Test_validateCreateBuildingInput', () => {
     const input: CreateBuildingInput = {
