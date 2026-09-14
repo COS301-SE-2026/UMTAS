@@ -8,11 +8,14 @@ import {
 import { Building, Venue } from '../entities/index';
 import { DatabaseService } from '../db/database.service';
 import {
+  BaseBuildingDto,
   BuildingDto,
   BuildingListResponseDto,
   BuildingQueryDto,
   BuildingSingleResponseDto,
   CreateBuildingInput,
+  UpdateBuildingDto,
+  UpdateBuildingInput,
 } from './dto/building.dto';
 import { eq, and, isNotNull, isNull, ilike, sql } from 'drizzle-orm';
 import { AppDatabase } from 'src/auth/auth';
@@ -147,6 +150,61 @@ export class BuildingService {
   } //END_getAllBuildings
 
   //Update
+  async update(
+    uniId: string,
+    buildingId: string,
+    input: UpdateBuildingInput,
+    tx?: AppDatabase,
+  ): Promise<BuildingSingleResponseDto> {
+    if (!tx) {
+      return this.dbService.db.transaction(async (t: AppDatabase) => {
+        return this.update(uniId, buildingId, input, t);
+      });
+    }
+
+    //Fetch old building - throws 404 if not exists
+    const oldBuilding = (await this.getById(uniId, buildingId, tx)).building;
+
+    const updateFields: Partial<UpdateBuildingDto> =
+      await this.validateUpdateBuildingInput(oldBuilding, input, tx);
+
+    //No fields to update -> return early
+    if (Object.keys(updateFields).length === 0) {
+      return { building: oldBuilding };
+    }
+
+    //Update building
+    const [building] = await tx
+      .update(Building)
+      .set({
+        ...(updateFields.BuildingName !== undefined && {
+          BuildingName: updateFields.BuildingName,
+        }),
+        ...(updateFields.location !== undefined && {
+          Latitude: updateFields.location?.lat ?? null,
+          Longitude: updateFields.location?.lng ?? null,
+        }),
+        ...(updateFields.footprint !== undefined && {
+          Footprint: updateFields.footprint,
+        }),
+        ...(updateFields.icon !== undefined && { Icon: updateFields.icon }),
+        ...(updateFields.displayColour !== undefined && {
+          DisplayColour: updateFields.displayColour,
+        }),
+      })
+      .where(eq(Building.BuildingID, buildingId))
+      .returning();
+
+    if (!building) {
+      this.OOPSIE.fatal(
+        `Failed to update building[${JSON.stringify(oldBuilding)}] with fields[${JSON.stringify(updateFields)}]`,
+      );
+      throw new InternalServerErrorException(`Failed to update building`);
+    }
+
+    return { building, venues: [] };
+  } //END_update
+
   // async updateBuildingLocation(
   //   session: SessionData,
   //   buildingID: string,
@@ -285,5 +343,95 @@ export class BuildingService {
       displayColour: row.DisplayColour,
       venueCount,
     };
-  }
+  } //END_buildingDtoAdapter
+
+  private async validateUpdateBuildingInput(
+    oldBuilding: BaseBuildingDto,
+    input: UpdateBuildingInput,
+    tx: AppDatabase,
+  ): Promise<UpdateBuildingInput> {
+    //BuildingName
+    if (
+      input.BuildingName === undefined ||
+      input.BuildingName === oldBuilding.BuildingName
+    ) {
+      delete input.BuildingName;
+    } else {
+      //Check name uniqueness against other buildings at the same university
+      const duplicate = await this.uniqueBuildingNamePerUniversity(
+        input.BuildingName,
+        oldBuilding.UniversityID,
+        tx,
+      );
+      if (
+        duplicate &&
+        duplicate.building.BuildingID !== oldBuilding.BuildingID
+      ) {
+        this.OOPSIE.warn(
+          `Building[${input.BuildingName}] already exists for university[${oldBuilding.UniversityID}]`,
+        );
+        throw new ConflictException(
+          `Building name already exists for university`,
+        );
+      }
+    }
+
+    //Location - undefined means "don't touch", null means "clear pin", object means "set new"
+    if (input.location === undefined) {
+      delete input.location;
+    } else if (input.location === null) {
+      if (oldBuilding.location === null) {
+        delete input.location;
+      }
+      // else: keep null (unpin)
+    } else if (
+      oldBuilding.location !== null &&
+      input.location.lat === oldBuilding.location?.lat &&
+      input.location.lng === oldBuilding.location?.lng
+    ) {
+      delete input.location;
+    }
+    // else: keep new location
+
+    //Footprint — same three-state pattern
+    if (input.footprint === undefined) {
+      delete input.footprint;
+    } else if (input.footprint === null) {
+      if (oldBuilding.footprint === null) {
+        delete input.footprint;
+      }
+    } else if (
+      JSON.stringify(input.footprint) === JSON.stringify(oldBuilding.footprint)
+    ) {
+      delete input.footprint;
+    }
+
+    //Icon
+    if (input.icon === undefined) {
+      delete input.icon;
+    } else if (input.icon === null) {
+      if (oldBuilding.icon === null) {
+        delete input.icon;
+      }
+    } else {
+      const trimmed = input.icon.trim();
+      if (trimmed.length === 0) {
+        delete input.icon;
+      } else if (trimmed === oldBuilding.icon) {
+        delete input.icon;
+      } else {
+        input.icon = trimmed;
+      }
+    }
+
+    //DisplayColour
+    if (
+      input.displayColour === undefined ||
+      input.displayColour === oldBuilding.displayColour
+    ) {
+      delete input.displayColour;
+    }
+
+    return input;
+  } //END_validateUpdateBuildingInput
 }

@@ -17,7 +17,11 @@ import {
   createMockVenueService,
 } from 'src/Testing/Mocks/services';
 import { VenueService } from 'src/Venue/venue.service';
-import { CreateBuildingInput } from './dto/building.dto';
+import {
+  BaseBuildingDto,
+  CreateBuildingInput,
+  UpdateBuildingInput,
+} from './dto/building.dto';
 import { uniId } from 'src/Testing/constants';
 import { UniversityService } from 'src/University/university.service';
 import { createBuilding } from 'src/Testing/Factories';
@@ -298,6 +302,89 @@ describe('BuildingService', () => {
   }); //END_Test_getAll
 
   //Update
+  describe('Test_update', () => {
+    const input: UpdateBuildingInput = {};
+
+    it('should throw NotFoundException if building does not exist', async () => {
+      //Arrange
+      mockTransaction(mockDb, {
+        select: [[]],
+      });
+
+      //Act + Assert
+      await expect(service.update(uniId, 'building-1', input)).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+
+    it('should return old building when no fields to update', async () => {
+      //Arrange
+      const building = createBuilding();
+      mockTransaction(mockDb, {
+        select: [[building]],
+      });
+      jest
+        .spyOn(mockVenueService, 'getAllVenues')
+        .mockResolvedValue({ venues: [] });
+      jest
+        .spyOn(service as any, 'validateUpdateBuildingInput')
+        .mockResolvedValueOnce({});
+
+      //Act
+      const result = await service.update(uniId, building.BuildingID, {});
+
+      //Assert
+      expect(result.building).toEqual(building);
+      expect(mockDb.update).not.toHaveBeenCalled();
+    });
+
+    it('should update building and return updated row', async () => {
+      //Arrange
+      const building = createBuilding();
+      const updated = { ...building, BuildingName: 'New Name' };
+      mockTransaction(mockDb, {
+        select: [[building]],
+      });
+      jest
+        .spyOn(mockVenueService, 'getAllVenues')
+        .mockResolvedValue({ venues: [] });
+      jest
+        .spyOn(service as any, 'validateUpdateBuildingInput')
+        .mockResolvedValueOnce({ BuildingName: 'New Name' });
+      mockDbResult(mockDb.update, [updated]);
+
+      //Act
+      const result = await service.update(uniId, building.BuildingID, {
+        BuildingName: 'New Name',
+      });
+
+      //Assert
+      expect(result.building).toEqual(updated);
+      expect(mockDb.update).toHaveBeenCalledTimes(1);
+    });
+
+    it('should throw InternalServerErrorException when update returns no row', async () => {
+      //Arrange
+      const building = createBuilding();
+      mockTransaction(mockDb, {
+        select: [[building]],
+      });
+      jest
+        .spyOn(mockVenueService, 'getAllVenues')
+        .mockResolvedValue({ venues: [] });
+      jest
+        .spyOn(service as any, 'validateUpdateBuildingInput')
+        .mockResolvedValueOnce({ BuildingName: 'New Name' });
+      mockDbResult(mockDb.update, []);
+
+      //Act + Assert
+      await expect(
+        service.update(uniId, building.BuildingID, {
+          BuildingName: 'New Name',
+        }),
+      ).rejects.toThrow(InternalServerErrorException);
+    });
+  }); //END_Test_update
 
   //Helpers
   describe('Test_validateCreateBuildingInput', () => {
@@ -430,4 +517,447 @@ describe('BuildingService', () => {
       expect(result).toEqual({ building });
     });
   }); //END_Test_uniqueBuildingNamePerUniversity
+
+  describe('Test_validateUpdateBuildingInput', () => {
+    const oldBuilding: BaseBuildingDto = {
+      BuildingID: 'building-1',
+      BuildingName: 'IT Building',
+      UniversityID: uniId,
+      location: { lat: -25.7545, lng: 28.2314 },
+      footprint: null,
+      icon: 'school',
+      displayColour: '#4A5548',
+    };
+
+    it('should delete BuildingName when undefined', async () => {
+      //Arrange
+      const input: UpdateBuildingInput = {};
+
+      //Act
+      const result = await (service as any).validateUpdateBuildingInput(
+        oldBuilding,
+        input,
+        mockDb,
+      );
+
+      //Assert
+      expect('BuildingName' in result).toBe(false);
+    });
+
+    it('should delete BuildingName when same as old', async () => {
+      //Arrange
+      const input: UpdateBuildingInput = {
+        BuildingName: oldBuilding.BuildingName,
+      };
+
+      //Act
+      const result = await (service as any).validateUpdateBuildingInput(
+        oldBuilding,
+        input,
+        mockDb,
+      );
+
+      //Assert
+      expect('BuildingName' in result).toBe(false);
+    });
+
+    it('should throw ConflictException when new BuildingName is taken by another building', async () => {
+      //Arrange
+      const input: UpdateBuildingInput = { BuildingName: 'Other Building' };
+      mockDbResult(mockDb.select, [
+        { BuildingID: 'building-2', BuildingName: 'Other Building' },
+      ]);
+
+      //Act + Assert
+      await expect(
+        (service as any).validateUpdateBuildingInput(
+          oldBuilding,
+          input,
+          mockDb,
+        ),
+      ).rejects.toThrow(ConflictException);
+    });
+
+    it('should keep BuildingName when changed and unique', async () => {
+      //Arrange
+      const input: UpdateBuildingInput = { BuildingName: 'New Name' };
+      mockDbResult(mockDb.select, []);
+
+      //Act
+      const result = await (service as any).validateUpdateBuildingInput(
+        oldBuilding,
+        input,
+        mockDb,
+      );
+
+      //Assert
+      expect(result.BuildingName).toBe('New Name');
+    });
+
+    it('should delete location when undefined', async () => {
+      //Arrange
+      const input: UpdateBuildingInput = {};
+
+      //Act
+      const result = await (service as any).validateUpdateBuildingInput(
+        oldBuilding,
+        input,
+        mockDb,
+      );
+
+      //Assert
+      expect('location' in result).toBe(false);
+    });
+
+    it('should delete location when null and old is also null', async () => {
+      //Arrange
+      const input: UpdateBuildingInput = { location: null };
+      const old = { ...oldBuilding, location: null };
+
+      //Act
+      const result = await (service as any).validateUpdateBuildingInput(
+        old,
+        input,
+        mockDb,
+      );
+
+      //Assert
+      expect('location' in result).toBe(false);
+    });
+
+    it('should keep location null when unpinning', async () => {
+      //Arrange
+      const input: UpdateBuildingInput = { location: null };
+
+      //Act
+      const result = await (service as any).validateUpdateBuildingInput(
+        oldBuilding,
+        input,
+        mockDb,
+      );
+
+      //Assert
+      expect(result.location).toBeNull();
+    });
+
+    it('should delete location when same as old', async () => {
+      //Arrange
+      const input: UpdateBuildingInput = { location: oldBuilding.location };
+
+      //Act
+      const result = await (service as any).validateUpdateBuildingInput(
+        oldBuilding,
+        input,
+        mockDb,
+      );
+
+      //Assert
+      expect('location' in result).toBe(false);
+    });
+
+    it('should keep location when changed', async () => {
+      //Arrange
+      const input: UpdateBuildingInput = { location: { lat: -26, lng: 29 } };
+
+      //Act
+      const result = await (service as any).validateUpdateBuildingInput(
+        oldBuilding,
+        input,
+        mockDb,
+      );
+
+      //Assert
+      expect(result.location).toEqual({ lat: -26, lng: 29 });
+    });
+
+    it('should delete icon when same as old', async () => {
+      //Arrange
+      const input: UpdateBuildingInput = { icon: oldBuilding.icon };
+
+      //Act
+      const result = await (service as any).validateUpdateBuildingInput(
+        oldBuilding,
+        input,
+        mockDb,
+      );
+
+      //Assert
+      expect('icon' in result).toBe(false);
+    });
+
+    it('should delete icon when empty after trim', async () => {
+      //Arrange
+      const input: UpdateBuildingInput = { icon: '   ' };
+
+      //Act
+      const result = await (service as any).validateUpdateBuildingInput(
+        oldBuilding,
+        input,
+        mockDb,
+      );
+
+      //Assert
+      expect('icon' in result).toBe(false);
+    });
+
+    it('should trim and keep icon when changed', async () => {
+      //Arrange
+      const input: UpdateBuildingInput = { icon: '  library  ' };
+
+      //Act
+      const result = await (service as any).validateUpdateBuildingInput(
+        oldBuilding,
+        input,
+        mockDb,
+      );
+
+      //Assert
+      expect(result.icon).toBe('library');
+    });
+
+    it('should delete DisplayColour when same as old', async () => {
+      //Arrange
+      const input: UpdateBuildingInput = {
+        displayColour: oldBuilding.displayColour,
+      };
+
+      //Act
+      const result = await (service as any).validateUpdateBuildingInput(
+        oldBuilding,
+        input,
+        mockDb,
+      );
+
+      //Assert
+      expect('displayColour' in result).toBe(false);
+    });
+
+    it('should keep DisplayColour when changed', async () => {
+      //Arrange
+      const input: UpdateBuildingInput = { displayColour: '#ABCDEF' };
+
+      //Act
+      const result = await (service as any).validateUpdateBuildingInput(
+        oldBuilding,
+        input,
+        mockDb,
+      );
+
+      //Assert
+      expect(result.displayColour).toBe('#ABCDEF');
+    });
+
+    // BuildingName
+    it('should keep BuildingName when duplicate found with same ID (self-match)', async () => {
+      //Arrange
+      const input: UpdateBuildingInput = { BuildingName: 'New Name' };
+      mockDbResult(mockDb.select, [
+        { BuildingID: oldBuilding.BuildingID, BuildingName: 'New Name' },
+      ]);
+
+      //Act
+      const result = await (service as any).validateUpdateBuildingInput(
+        oldBuilding,
+        input,
+        mockDb,
+      );
+
+      //Assert
+      expect(result.BuildingName).toBe('New Name');
+    });
+
+    // Location
+    it('should keep location when old is null and new location provided', async () => {
+      //Arrange
+      const old = { ...oldBuilding, location: null };
+      const input: UpdateBuildingInput = { location: { lat: -26, lng: 29 } };
+
+      //Act
+      const result = await (service as any).validateUpdateBuildingInput(
+        old,
+        input,
+        mockDb,
+      );
+
+      //Assert
+      expect(result.location).toEqual({ lat: -26, lng: 29 });
+    });
+
+    // Footprint
+    it('should delete footprint when undefined', async () => {
+      //Arrange
+      const input: UpdateBuildingInput = {};
+
+      //Act
+      const result = await (service as any).validateUpdateBuildingInput(
+        oldBuilding,
+        input,
+        mockDb,
+      );
+
+      //Assert
+      expect('footprint' in result).toBe(false);
+    });
+
+    it('should delete footprint when null and old is also null', async () => {
+      //Arrange
+      const input: UpdateBuildingInput = { footprint: null };
+
+      //Act
+      const result = await (service as any).validateUpdateBuildingInput(
+        oldBuilding,
+        input,
+        mockDb,
+      );
+
+      //Assert
+      expect('footprint' in result).toBe(false);
+    });
+
+    it('should keep footprint null when clearing', async () => {
+      //Arrange
+      const old = {
+        ...oldBuilding,
+        footprint: {
+          type: 'Polygon' as const,
+          coordinates: [
+            [
+              [28.2, -25.7],
+              [28.3, -25.7],
+              [28.3, -25.8],
+              [28.2, -25.7],
+            ],
+          ],
+        },
+      };
+      const input: UpdateBuildingInput = { footprint: null };
+
+      //Act
+      const result = await (service as any).validateUpdateBuildingInput(
+        old,
+        input,
+        mockDb,
+      );
+
+      //Assert
+      expect(result.footprint).toBeNull();
+    });
+
+    it('should delete footprint when same as old', async () => {
+      //Arrange
+      const footprint = {
+        type: 'Polygon' as const,
+        coordinates: [
+          [
+            [28.2, -25.7],
+            [28.3, -25.7],
+            [28.3, -25.8],
+            [28.2, -25.7],
+          ],
+        ] as [number, number][][],
+      };
+      const old = { ...oldBuilding, footprint };
+      const input: UpdateBuildingInput = { footprint };
+
+      //Act
+      const result = await (service as any).validateUpdateBuildingInput(
+        old,
+        input,
+        mockDb,
+      );
+
+      //Assert
+      expect('footprint' in result).toBe(false);
+    });
+
+    it('should keep footprint when changed', async () => {
+      //Arrange
+      const input: UpdateBuildingInput = {
+        footprint: {
+          type: 'Polygon',
+          coordinates: [
+            [
+              [28.2, -25.7],
+              [28.3, -25.7],
+              [28.3, -25.8],
+              [28.2, -25.7],
+            ],
+          ],
+        },
+      };
+
+      //Act
+      const result = await (service as any).validateUpdateBuildingInput(
+        oldBuilding,
+        input,
+        mockDb,
+      );
+
+      //Assert
+      expect(result.footprint).toEqual(input.footprint);
+    });
+
+    // Icon
+    it('should delete icon when undefined', async () => {
+      //Arrange
+      const input: UpdateBuildingInput = {};
+
+      //Act
+      const result = await (service as any).validateUpdateBuildingInput(
+        oldBuilding,
+        input,
+        mockDb,
+      );
+
+      //Assert
+      expect('icon' in result).toBe(false);
+    });
+
+    it('should delete icon when null and old is also null', async () => {
+      //Arrange
+      const old = { ...oldBuilding, icon: null };
+      const input: UpdateBuildingInput = { icon: null };
+
+      //Act
+      const result = await (service as any).validateUpdateBuildingInput(
+        old,
+        input,
+        mockDb,
+      );
+
+      //Assert
+      expect('icon' in result).toBe(false);
+    });
+
+    it('should keep icon null when clearing an existing icon', async () => {
+      //Arrange
+      const input: UpdateBuildingInput = { icon: null };
+
+      //Act
+      const result = await (service as any).validateUpdateBuildingInput(
+        oldBuilding,
+        input,
+        mockDb,
+      );
+
+      //Assert
+      expect(result.icon).toBeNull();
+    });
+
+    // DisplayColour
+    it('should delete DisplayColour when undefined', async () => {
+      //Arrange
+      const input: UpdateBuildingInput = {};
+
+      //Act
+      const result = await (service as any).validateUpdateBuildingInput(
+        oldBuilding,
+        input,
+        mockDb,
+      );
+
+      //Assert
+      expect('displayColour' in result).toBe(false);
+    });
+  }); //END_Test_validateUpdateBuildingInput
 });
