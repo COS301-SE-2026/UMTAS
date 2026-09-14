@@ -18,10 +18,9 @@ function getVideoConstraints(): MediaStreamConstraints {
 }
 
 function getCanvasConstraints() {
-  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
   return {
-    width: isMobile ? 720 : 1280,
-    height: isMobile ? 1280 : 720,
+    width: 640,
+    height: 640,
   };
 }
 export interface DetectionSettings {
@@ -40,7 +39,7 @@ export default function CameraCanvas({
   return (
     <div className="w-full min-w-fit h-full justify-around flex flex-col gap-y-4 p-4">
       <div className="w-full min-w-fit h-full flex flex-col justify-center items-center text-center border rounded-2xl ">
-        <div className={` w-full min-w-fit h-full `}>
+        <div className="w-full h-full min-w-fit  justify-center items-center flex">
           <CanvasWebcam
             isCameraActive={isCameraActive}
             detectionSettings={detectionSettings}
@@ -131,9 +130,7 @@ function CanvasWebcam({ isCameraActive, detectionSettings }: CanvasCamProps) {
           detectionManager
             .run(imageData?.data, canvas.width, canvas.height)
             .then((results) => {
-              if (results) {
-                console.log("Detection finished: ", results);
-              }
+              // use the data parser pipeline
             });
         }
       }
@@ -154,7 +151,7 @@ function CanvasWebcam({ isCameraActive, detectionSettings }: CanvasCamProps) {
         ref={canvasRef}
         width={getCanvasConstraints().width}
         height={getCanvasConstraints().height}
-        className="w-full h-full  rounded-2xl object-cover "
+        className="w-full h-full rounded-2xl"
       ></canvas>
     </>
   ) : (
