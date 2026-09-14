@@ -16,7 +16,7 @@ function getVideoConstraints(): MediaStreamConstraints {
 }
 
 function getCanvasConstraints() {
-  const isMobile = window.innerWidth < 768;
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
   return {
     width: isMobile ? 720 : 1280,
     height: isMobile ? 1280 : 720,
@@ -24,7 +24,7 @@ function getCanvasConstraints() {
 }
 
 export default function CameraCanvas() {
-  const [cameraOn, setCameraOn] = useState(true);
+  const [cameraOn, setCameraOn] = useState(false);
 
   return (
     <div className="w-full min-w-fit h-full justify-around flex flex-col gap-y-4 p-4">

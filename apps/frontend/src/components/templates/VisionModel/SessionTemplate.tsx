@@ -3,13 +3,13 @@ import CameraCanvas from "@/components/organisms/VisionModel/CameraCanvas";
 
 export default function VM_SessionTemplate() {
   return (
-    <div className="h-[85vh]  items-center flex flex-col gap-6 w-full px-6">
+    <div className="h-[85vh]  items-center flex flex-col gap-6 w-full px-6 overflow-scroll">
       <div className="w-full h-full max-w-7xl overflow-auto border border-[var(--border)] rounded-xl bg-[var(--bg-surface)] shadow-sm flex flex-col">
         <h1 className="text-lg font-semibold text-[var(--text-primary)] pl-4 pt-4">
           Session Camera
         </h1>
-        <div className="grid gridgrid-cols-1 w-full h-full">
-          <div className="flex justify-center items-center w-full  ">
+        <div className="grid gridgrid-cols-1 w-full h-full ">
+          <div className="flex justify-center items-center w-full min-h-[40vh]  ">
             <CameraCanvas />
           </div>
           <div className="h-full  items-center flex flex-col  w-full ">
