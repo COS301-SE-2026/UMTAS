@@ -9,102 +9,152 @@ interface BarcodeCameraProps {
   onScan: (value: string) => void;
 }
 
+type CameraCapabilities = MediaTrackCapabilities & {
+  focusMode?: string[];
+  zoom?: {
+    min: number;
+    max: number;
+    step?: number;
+  };
+  torch?: boolean;
+};
+
+type CameraSettings = MediaTrackSettings & {
+  focusMode?: string;
+  zoom?: number;
+};
+
 export function BarcodeCamera({ onScan }: BarcodeCameraProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  const [cameraState, setCameraState] = useState<
-    "loading" | "ready" | "not-found" | "permission-denied" | "error"
-  >("loading");
+  const [status, setStatus] = useState("Starting camera...");
+  const [debug, setDebug] = useState("");
 
   useEffect(() => {
-    const hints = new Map();
-
-    hints.set(DecodeHintType.POSSIBLE_FORMATS, [BarcodeFormat.CODE_39]);
-
-    const reader = new BrowserMultiFormatReader(hints);
-
+    let stream: MediaStream | null = null;
     let controls: { stop: () => void } | undefined;
-    let mounted = true;
+    let cancelled = false;
 
-    async function startCamera() {
-      if (!videoRef.current) {
-        return;
-      }
-
+    async function start() {
       try {
-        controls = await reader.decodeFromConstraints(
-          {
-            video: {
-              facingMode: {
-                ideal: "environment",
-              },
+        stream = await navigator.mediaDevices.getUserMedia({
+          audio: false,
+          video: {
+            facingMode: {
+              ideal: "environment",
+            },
+            width: {
+              ideal: 1920,
+            },
+            height: {
+              ideal: 1080,
             },
           },
+        });
+
+        if (cancelled || !videoRef.current) {
+          stream.getTracks().forEach((track) => track.stop());
+          return;
+        }
+
+        const track = stream.getVideoTracks()[0];
+
+        const capabilities = track.getCapabilities() as CameraCapabilities;
+
+        console.log("Camera capabilities:", capabilities);
+        console.log("Camera settings:", track.getSettings());
+
+        setDebug(
+          JSON.stringify(
+            {
+              capabilities,
+              settings: track.getSettings(),
+            },
+            null,
+            2,
+          ),
+        );
+
+        videoRef.current.srcObject = stream;
+
+        await videoRef.current.play();
+
+        setStatus("Camera ready");
+
+        const hints = new Map();
+
+        hints.set(DecodeHintType.POSSIBLE_FORMATS, [BarcodeFormat.CODE_39]);
+
+        hints.set(DecodeHintType.TRY_HARDER, true);
+
+        const reader = new BrowserMultiFormatReader(hints);
+
+        controls = await reader.decodeFromStream(
+          stream,
           videoRef.current,
           (result) => {
             if (!result) {
               return;
             }
 
-            const value = result.getText();
+            console.log(
+              "Barcode:",
+              result.getText(),
+              result.getBarcodeFormat(),
+            );
 
-            console.log("Code 39 scanned:", value);
+            setStatus(`Scanned: ${result.getText()}`);
 
-            onScan(value);
+            onScan(result.getText());
           },
         );
-
-        if (mounted) {
-          setCameraState("ready");
-        }
       } catch (error) {
-        if (!mounted) {
+        console.error(error);
+
+        if (error instanceof DOMException) {
+          setStatus(`${error.name}: ${error.message}`);
           return;
         }
 
-        if (error instanceof DOMException) {
-          if (error.name === "NotFoundError") {
-            setCameraState("not-found");
-            return;
-          }
-
-          if (error.name === "NotAllowedError") {
-            setCameraState("permission-denied");
-            return;
-          }
-        }
-
-        setCameraState("error");
+        setStatus("Unable to start camera");
       }
     }
 
-    startCamera();
+    start();
 
     return () => {
-      mounted = false;
+      cancelled = true;
+
       controls?.stop();
+
+      stream?.getTracks().forEach((track) => {
+        track.stop();
+      });
     };
   }, [onScan]);
 
-  if (cameraState === "not-found") {
-    return <p>No camera found.</p>;
-  }
-
-  if (cameraState === "permission-denied") {
-    return <p>Camera access denied.</p>;
-  }
-
-  if (cameraState === "error") {
-    return <p>Unable to start camera.</p>;
-  }
-
   return (
-    <video
-      ref={videoRef}
-      autoPlay
-      muted
-      playsInline
-      className="aspect-[3/4] w-full rounded-xl object-cover"
-    />
+    <div className="flex flex-col gap-4">
+      <div className="relative overflow-hidden rounded-xl">
+        <video
+          ref={videoRef}
+          muted
+          playsInline
+          className="aspect-[3/4] w-full object-cover"
+        />
+
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <div className="h-24 w-[90%] rounded-md border-2 border-white" />
+        </div>
+      </div>
+
+      <p className="text-sm">{status}</p>
+
+      <details>
+        <summary className="cursor-pointer text-sm">Camera diagnostics</summary>
+
+        <pre className="mt-2 overflow-auto text-xs">{debug}</pre>
+      </details>
+    </div>
   );
 }
