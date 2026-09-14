@@ -3,10 +3,8 @@ import {
   DETECT_DATA_MESSAGE,
   DETECT_MESSAGE,
   PIXEL_PAYLOAD,
-} from "../../../../utilities/VisionModel/messageTypes";
-import init, {
-  slice_image_data,
-} from "../../../../wasm-engine/pkg/wasm_engine";
+} from "./messageTypes";
+import init, { slice_image_data } from "../../wasm-engine/pkg/wasm_engine";
 import * as ort from "onnxruntime-web";
 
 let wasmLoaded = false;
