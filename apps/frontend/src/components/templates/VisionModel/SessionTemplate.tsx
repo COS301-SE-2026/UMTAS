@@ -24,11 +24,11 @@ export default function VM_SessionTemplate() {
             {/* ------------ Settings hier asseblief --------------- */}
             <div className="w-full h-full overflow-auto  rounded-t-none  border-t  border-[var(--border)]  bg-[var(--bg-surface)] shadow-sm flex flex-col">
               <div className="grid grid-cols-1 divide-y gap-5    md:grid-cols-3 min-h-[10vh] justify-center w-full h-full text-center p-2">
-                <div className="h-full flex flex-col gap-y-5 p-2">
+                <div className="h-full flex flex-col gap-y-5 p-2 border-r">
                   <h1 className="text-md font-semibold  text-[var(--text-primary)] pl-4 py-4 ">
                     Camera Settings
                   </h1>
-                  <Label className=" flex flex-row w-full justify-center text-md font-medium text-[var(--text-primary)] text-left pl-1">
+                  <Label className=" flex flex-col  w-full justify-center text-md font-medium text-[var(--text-primary)] text-left pl-1">
                     Camera On
                     <Switch
                       checked={cameraOn}
