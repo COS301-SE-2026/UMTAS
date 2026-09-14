@@ -2,6 +2,7 @@
 import { Button } from "@/components/atoms/baseShadcn/button";
 import { useEffect, useRef, useState } from "react";
 import { CircleX } from "lucide-react";
+import { detectionManager } from "../../../../utilities/VisionModel/detectionManager";
 
 function getVideoConstraints(): MediaStreamConstraints {
   const isMobile = window.innerWidth < 768;
@@ -49,10 +50,12 @@ export default function CameraCanvas({
   );
 }
 
-function CanvasWebcam({ isCameraActive }: CanvasCamProps) {
+function CanvasWebcam({ isCameraActive, detectionSettings }: CanvasCamProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [cameraLoaded, setCameraLoaded] = useState<boolean>(false);
+
+  const lastRunRef = useRef<number>(0);
 
   useEffect(() => {
     if (isCameraActive == false) {
@@ -99,6 +102,25 @@ function CanvasWebcam({ isCameraActive }: CanvasCamProps) {
         const context = canvas.getContext("2d");
         if (context) {
           context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        }
+
+        const intervalMs = detectionSettings.DetectionInterval * 1000;
+
+        if (context && detectionSettings.runDetection) {
+          const imageData = context?.getImageData(
+            0,
+            0,
+            canvas.width,
+            canvas.height,
+          );
+
+          detectionManager
+            .run(imageData?.data, canvas.width, canvas.height)
+            .then((results) => {
+              if (results) {
+                console.log("Detection finished: ", results);
+              }
+            });
         }
       }
 
