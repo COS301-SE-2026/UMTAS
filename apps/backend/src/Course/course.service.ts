@@ -243,7 +243,12 @@ export class CourseService {
               ModuleID: GroupModules.ModuleID,
             })
             .from(GroupModules)
-            .where(inArray(GroupModules.ModuleID, moduleIds));
+            .where(
+              and(
+                inArray(GroupModules.ModuleID, moduleIds),
+                ne(GroupModules.GroupID, course.GroupID),
+              ),
+            );
 
           // Get IDs of modules owned by other groups
           const ownedByOtherGroupIds = modulesOwnedByOtherGroups.map(

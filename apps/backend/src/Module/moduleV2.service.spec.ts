@@ -1,7 +1,13 @@
 import { Test } from '@nestjs/testing';
 
 //Constants
-import { userId, courseId, uniId, groupId } from '../Testing/constants';
+import {
+  userId,
+  courseId,
+  uniId,
+  groupId,
+  moduleId,
+} from '../Testing/constants';
 
 //Actual Service imports
 import { ModuleServiceV2 } from './moduleV2.service';
@@ -13,6 +19,7 @@ import { EventService } from '../Events/event.service';
 //Mock Database and factories
 import { createMockDatabase } from '../Testing/Mocks/database.mock';
 import {
+  createDbChain,
   mockDbResult,
   mockTransaction,
 } from '../Testing/Mocks/database.helpers';
@@ -608,4 +615,50 @@ describe('ModuleServiceV2', () => {
       expect(result).toBeNull();
     });
   }); //END_Test_GetByExternalID
+
+  describe('Test_GetStatistics', () => {
+    it('should throw if university does not exist', async () => {
+      mockDbResult(mockDb.select, []);
+
+      await expect(service.getStatistics(uniId)).rejects.toThrow(
+        'University not found',
+      );
+    });
+
+    it('should return module statistics for a university', async () => {
+      const statistics = [
+        {
+          ModuleID: moduleId,
+          ModuleCode: 'COS301',
+          ModuleName: 'Computer Science',
+          EventCount: 3,
+          EnrolledStudents: 12,
+        },
+      ];
+
+      (mockDb.select as unknown as jest.Mock)
+        .mockReturnValueOnce(createDbChain([createCourse()]))
+        .mockReturnValueOnce(createDbChain(statistics));
+
+      await expect(service.getStatistics(uniId)).resolves.toEqual({
+        data: statistics,
+      });
+    });
+  });
+
+  describe('Test_Helpers', () => {
+    it('should validate and return an existing group id', async () => {
+      const group = createGroup({
+        GroupID: groupId,
+      });
+
+      mockGroupingService.getById?.mockResolvedValue(group);
+
+      await expect(
+        (service as any).getGroupId(mockDb, undefined, groupId),
+      ).resolves.toBe(groupId);
+
+      expect(mockGroupingService.getById).toHaveBeenCalledWith(groupId, mockDb);
+    });
+  });
 }); //END_ModuleServiceV2
