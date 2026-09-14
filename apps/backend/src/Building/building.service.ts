@@ -1,6 +1,7 @@
 import {
   ConflictException,
   Injectable,
+  InternalServerErrorException,
   Logger,
   NotFoundException,
 } from '@nestjs/common';
@@ -58,6 +59,13 @@ export class BuildingService {
       })
       .returning();
 
+    if (!building) {
+      this.OOPSIE.fatal(
+        `Failed to create building with input[${JSON.stringify(input)}]`,
+      );
+      throw new InternalServerErrorException(`Failed to create building`);
+    }
+
     return { building, venues: [] };
   } //END_createBuilding
 
@@ -73,7 +81,12 @@ export class BuildingService {
     const [building] = await db
       .select()
       .from(Building)
-      .where(eq(Building.BuildingID, buildingId))
+      .where(
+        and(
+          eq(Building.BuildingID, buildingId),
+          eq(Building.UniversityID, uniId),
+        ),
+      )
       .limit(1);
 
     if (!building) {
@@ -268,6 +281,6 @@ export class BuildingService {
       )
       .limit(1);
 
-    return { building };
+    return building ? { building } : null;
   } //END_uniqueBuildingNamePerUniversity
 }

@@ -1,103 +1,316 @@
-// import { createMockDatabase } from '../Testing/Mocks/database.mock';
-// import { mockDbResult } from '../Testing/Mocks/database.helpers';
-// import { BuildingService } from './building.service';
-// import { SessionData } from 'src/auth/session.decorator';
-// import { Test } from '@nestjs/testing';
-// import { DatabaseService } from '../db/database.service';
-// import { ConflictException, ForbiddenException } from '@nestjs/common';
+import { createMockDatabase } from '../Testing/Mocks/database.mock';
+import {
+  mockDbResult,
+  mockTransaction,
+} from '../Testing/Mocks/database.helpers';
+import { BuildingService } from './building.service';
+import { Test } from '@nestjs/testing';
+import { DatabaseService } from '../db/database.service';
+import {
+  ConflictException,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 
-// describe('BuildingService', () => {
-//   let buildingService: BuildingService;
+import {
+  createMockUniversityService,
+  createMockVenueService,
+} from 'src/Testing/Mocks/services';
+import { VenueService } from 'src/Venue/venue.service';
+import { CreateBuildingInput } from './dto/building.dto';
+import { uniId } from 'src/Testing/constants';
+import { UniversityService } from 'src/University/university.service';
+import { createBuilding } from 'src/Testing/Factories';
 
-//   const { mockDb, reset: resetDatabase } = createMockDatabase();
+export const DEFAULT_DISPLAY_COLOUR = '#808080';
 
-//   const mockSession: SessionData = {
-//     session: {
-//       id: 'jan-session',
-//       createdAt: '',
-//       expiresAt: '',
-//       token: '',
-//       updatedAt: '',
-//       userId: 'janneman-123',
-//     },
-//     user: {
-//       id: 'janneman-123',
-//       email: 'janbokkie@boertjie.com',
-//       banned: false,
-//       createdAt: 'home',
-//       emailVerified: true,
-//       name: 'Jan Bloukaas',
-//       role: 'user',
-//       updatedAt: 'uni',
-//     },
-//     uniId: 'pretoria-bru-123',
-//   };
+describe('BuildingService', () => {
+  let service: BuildingService;
 
-//   beforeEach(async () => {
-//     const module = await Test.createTestingModule({
-//       providers: [
-//         BuildingService,
-//         { provide: DatabaseService, useValue: { db: mockDb } },
-//       ],
-//     }).compile();
+  const { mockDb, reset: resetDatabase } = createMockDatabase();
+  const { mockUniversityService, reset: resetUni } =
+    createMockUniversityService();
+  const { mockVenueService, reset: resetVenue } = createMockVenueService();
 
-//     buildingService = module.get(BuildingService);
-//   });
+  beforeEach(async () => {
+    const module = await Test.createTestingModule({
+      providers: [
+        BuildingService,
+        { provide: DatabaseService, useValue: { db: mockDb } },
+        { provide: UniversityService, useValue: mockUniversityService },
+        { provide: VenueService, useValue: mockVenueService },
+      ],
+    }).compile();
 
-//   afterEach(() => {
-//     resetDatabase();
-//   });
+    service = module.get(BuildingService);
+  });
 
-//   describe('test_getAllBuildings', () => {
-//     it('should throw ForbiddenException if there is no active sessions', async () => {
-//       await expect(
-//         buildingService.getAllBuildings(null as any, {}),
-//       ).rejects.toThrow(ForbiddenException);
-//     });
-//   });
+  afterEach(() => {
+    resetDatabase();
+    resetUni();
+    resetVenue();
+    jest.clearAllMocks();
+  });
 
-//   it('should return list of all the mapped buildings', async () => {
-//     const mockData = [
-//       {
-//         building: {
-//           BuildingID: 'up-build-1',
-//           BuildingName: 'Chancellors',
-//           Latitude: 67.67,
-//           Longitude: -67.67,
-//           Footprint: null,
-//           Icon: 'iconic',
-//           DisplayColour: 'blue',
-//         },
-//         venueCount: 3,
-//       },
-//     ];
+  //Create
+  describe('Test_create', () => {
+    const input: CreateBuildingInput = {
+      BuildingName: 'IT Building',
+      UniversityID: uniId,
+      location: { lat: -25.7545, lng: 28.2314 },
+      footprint: null,
+      icon: null,
+      displayColour: '#808080',
+      CreatedBy: 'user-1',
+    };
 
-//     mockDbResult(mockDb.select, mockData);
+    it('should create a building and return it', async () => {
+      //Arrange
+      const building = createBuilding();
+      jest
+        .spyOn(service as any, 'validateCreateBuildingInput')
+        .mockResolvedValueOnce(input);
+      mockTransaction(mockDb, { insert: [[building]] });
 
-//     const result = await buildingService.getAllBuildings(mockSession, {
-//       mapped: true,
-//     });
+      //Act
+      const result = await service.create(input);
 
-//     expect(result).toMatchObject({
-//       buildings: [
-//         {
-//           buildingId: 'up-build-1',
-//           buildingName: 'Chancellors',
-//           venueCount: 3,
-//         },
-//       ],
-//     });
-//   });
+      //Assert
+      expect(result).toEqual({ building, venues: [] });
+    });
 
-//   describe('test_CreateBuilding', () => {
-//     it('should throw ConflictException if the name of the building already exists', async () => {
-//       mockDbResult(mockDb.select, [{ id: 'id-bru' }]);
+    it('should throw InternalServerErrorException when insert returns no row', async () => {
+      //Arrange
+      jest
+        .spyOn(service as any, 'validateCreateBuildingInput')
+        .mockResolvedValueOnce(input);
+      mockTransaction(mockDb, { insert: [[]] });
 
-//       await expect(
-//         buildingService.createBuilding(mockSession, {
-//           buildingName: 'IT building my favourite',
-//         }),
-//       ).rejects.toThrow(ConflictException);
-//     });
-//   });
-// });
+      //Act + Assert
+      await expect(service.create(input)).rejects.toThrow(
+        InternalServerErrorException,
+      );
+    });
+
+    it('should pass validated input to the insert', async () => {
+      //Arrange
+      const building = createBuilding();
+      jest
+        .spyOn(service as any, 'validateCreateBuildingInput')
+        .mockResolvedValueOnce(input);
+      mockTransaction(mockDb, { insert: [[building]] });
+
+      //Act
+      await service.create(input);
+
+      //Assert
+      expect(mockDb.insert).toHaveBeenCalledTimes(1);
+    });
+  }); //END_Test_create
+
+  //GetByid
+  describe('Test_getById', () => {
+    it('should throw NotFoundException if building does not exist', async () => {
+      //Arrange
+      mockDbResult(mockDb.select, []);
+
+      //Act + Assert
+      await expect(service.getById(uniId, 'building-1')).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+
+    it('should return building with its venues', async () => {
+      //Arrange
+      const building = createBuilding();
+      const venues = [
+        {
+          VenueID: 'venue-1',
+          VenueName: 'IT 2-26',
+          BuildingID: building.BuildingID,
+          UniversityID: uniId,
+        },
+        {
+          VenueID: 'venue-2',
+          VenueName: 'IT 2-27',
+          BuildingID: building.BuildingID,
+          UniversityID: uniId,
+        },
+      ];
+      mockDbResult(mockDb.select, [building]);
+      jest
+        .spyOn(mockVenueService, 'getAllVenues')
+        .mockResolvedValueOnce({ venues });
+
+      //Act
+      const result = await service.getById(uniId, building.BuildingID);
+
+      //Assert
+      expect(result).toEqual({ building, venues });
+    });
+
+    it('should return empty venues array when building has none', async () => {
+      //Arrange
+      const building = createBuilding();
+      mockDbResult(mockDb.select, [building]);
+      jest
+        .spyOn(mockVenueService, 'getAllVenues')
+        .mockResolvedValueOnce({ venues: [] });
+
+      //Act
+      const result = await service.getById(uniId, building.BuildingID);
+
+      //Assert
+      expect(result).toEqual({ building, venues: [] });
+    });
+
+    it('should query venues filtered by the building id', async () => {
+      //Arrange
+      const building = createBuilding();
+      mockDbResult(mockDb.select, [building]);
+      const spy = jest
+        .spyOn(mockVenueService, 'getAllVenues')
+        .mockResolvedValueOnce({ venues: [] });
+
+      //Act
+      await service.getById(uniId, building.BuildingID);
+
+      //Assert
+      expect(spy).toHaveBeenCalledWith(uniId, {
+        buildingId: building.BuildingID,
+      });
+    });
+  }); //END_Test_getById
+
+  //Helpers
+  describe('Test_validateCreateBuildingInput', () => {
+    const input: CreateBuildingInput = {
+      BuildingName: 'IT Building',
+      UniversityID: uniId,
+      location: null,
+      footprint: null,
+      icon: null,
+      displayColour: null,
+    };
+
+    it('should throw NotFoundException if university does not exist', async () => {
+      //Arrange
+      jest
+        .spyOn(mockUniversityService, 'getById')
+        .mockRejectedValueOnce(new NotFoundException('University not found'));
+
+      //Act + Assert
+      await expect(
+        (service as any).validateCreateBuildingInput(input, mockDb),
+      ).rejects.toThrow(NotFoundException);
+    });
+
+    it('should throw ConflictException if building name already exists', async () => {
+      //Arrange
+      jest
+        .spyOn(mockUniversityService, 'getById')
+        .mockResolvedValueOnce(undefined as any);
+      mockDbResult(mockDb.select, [{ BuildingID: 'building-1' }]);
+
+      //Act + Assert
+      await expect(
+        (service as any).validateCreateBuildingInput(input, mockDb),
+      ).rejects.toThrow(ConflictException);
+    });
+
+    it('should default location, footprint and icon to null when absent', async () => {
+      //Arrange
+      jest
+        .spyOn(mockUniversityService, 'getById')
+        .mockResolvedValueOnce(undefined as any);
+      mockDbResult(mockDb.select, []);
+      const sparse = {
+        BuildingName: 'IT Building',
+        UniversityID: uniId,
+      } as CreateBuildingInput;
+
+      //Act
+      const result = await (service as any).validateCreateBuildingInput(
+        sparse,
+        mockDb,
+      );
+
+      //Assert
+      expect(result.location).toBeNull();
+      expect(result.footprint).toBeNull();
+      expect(result.icon).toBeNull();
+    });
+
+    it('should trim icon and null it out when empty', async () => {
+      //Arrange
+      jest
+        .spyOn(mockUniversityService, 'getById')
+        .mockResolvedValueOnce(undefined as any);
+      mockDbResult(mockDb.select, []);
+      const withBlankIcon = { ...input, icon: '   ' };
+
+      //Act
+      const result = await (service as any).validateCreateBuildingInput(
+        withBlankIcon,
+        mockDb,
+      );
+
+      //Assert
+      expect(result.icon).toBeNull();
+    });
+
+    it('should default DisplayColour when absent', async () => {
+      //Arrange
+      jest
+        .spyOn(mockUniversityService, 'getById')
+        .mockResolvedValueOnce(undefined as any);
+      mockDbResult(mockDb.select, []);
+      const sparse = {
+        BuildingName: 'IT Building',
+        UniversityID: uniId,
+      } as CreateBuildingInput;
+
+      //Act
+      const result = await (service as any).validateCreateBuildingInput(
+        sparse,
+        mockDb,
+      );
+
+      //Assert
+      expect(result.displayColour).toBe(DEFAULT_DISPLAY_COLOUR);
+    });
+  }); //END_Test_validateCreateBuildingInput
+
+  describe('Test_uniqueBuildingNamePerUniversity', () => {
+    it('should return null when no building found', async () => {
+      //Arrange
+      mockDbResult(mockDb.select, []);
+
+      //Act
+      const result = await (service as any).uniqueBuildingNamePerUniversity(
+        'IT Building',
+        uniId,
+        mockDb,
+      );
+
+      //Assert
+      expect(result).toBeNull();
+    });
+
+    it('should return the building wrapped in a response when found', async () => {
+      //Arrange
+      const building = createBuilding();
+      mockDbResult(mockDb.select, [building]);
+
+      //Act
+      const result = await (service as any).uniqueBuildingNamePerUniversity(
+        building.BuildingName,
+        uniId,
+        mockDb,
+      );
+
+      //Assert
+      expect(result).toEqual({ building });
+    });
+  }); //END_Test_uniqueBuildingNamePerUniversity
+});
