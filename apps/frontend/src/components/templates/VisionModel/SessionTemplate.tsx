@@ -21,24 +21,24 @@ export default function VM_SessionTemplate() {
   // settings
 
   return (
-    <div className="h-[85vh]  items-center flex flex-col  w-full px-2 overflow-scroll">
+    <div className="h-[85vh]  items-center flex flex-col  w-full px-2 ">
       <div className="w-full h-full max-w-7xl overflow-auto border border-[var(--border)] rounded-xl shadow-sm flex flex-col">
         <h1 className="text-lg font-semibold text-[var(--text-primary)] pl-4 pt-4">
           Session Camera
         </h1>
-        <div className="flex flex-col   border justify-around w-full h-full ">
-          <div className="flex justify-center w-full h-full items-center rounded-2xl rounded-t-none">
-            <div className="flex justify-center items-center w-8/10 h-8/10 ">
+        <div className="flex flex-col overflow-scroll  border justify-around w-full h-full ">
+          <div className="flex  justify-center   items-center rounded-2xl rounded-t-none">
+            <div className="w-full h-full md:aspect-video">
               <CameraCanvas
                 isCameraActive={cameraOn}
                 detectionSettings={detectionSettings}
               />
             </div>
           </div>
-          <div className="   flex flex-row  w-full h-full rounded-2xl rounded-t-none">
+          <div className=" pb-4  flex flex-col md:flex-row   w-full h-full rounded-2xl rounded-t-none">
             {/* ------------ Settings hier asseblief --------------- */}
 
-            <div className="w-full h-full flex flex-col  gap-y-4 p-2 ">
+            <div className="w-full h-full flex flex-col  gap-y-4  ">
               <h1 className="text-md font-semibold text-center text-[var(--text-primary)] pl-4 py-4 ">
                 Camera Settings:
               </h1>
@@ -52,7 +52,7 @@ export default function VM_SessionTemplate() {
                 />
               </Label>
             </div>
-            <div className="w-full h-full flex flex-col  gap-y-4 p-2 ">
+            <div className="w-full h-full flex flex-col  gap-y-4  ">
               <h1 className="text-md font-semibold text-center text-[var(--text-primary)] pl-4 py-4 ">
                 Detection Settings
               </h1>
@@ -89,7 +89,7 @@ export default function VM_SessionTemplate() {
                 />
               </Label>
             </div>
-            <div className="w-full h-full flex flex-col  gap-y-4 p-2 ">
+            <div className="w-full h-full flex flex-col  gap-y-4  ">
               <h1 className="text-md font-semibold text-center text-[var(--text-primary)] pl-4 py-4 ">
                 Inference Settings
               </h1>
