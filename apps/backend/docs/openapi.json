@@ -6159,16 +6159,6 @@
             }
           }
         ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateBuildingLocationDto"
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "The building was updated successfully",
@@ -11647,21 +11637,29 @@
           "lng"
         ]
       },
-      "BuildingDto": {
+      "BaseBuildingDto": {
         "type": "object",
         "properties": {
-          "buildingId": {
+          "BuildingID": {
             "type": "string",
             "format": "uuid",
+            "description": "Unique building identifier.",
             "example": "00000000-0000-0000-0000-000000000000"
           },
-          "buildingName": {
+          "BuildingName": {
             "type": "string",
-            "example": "IT Building"
+            "maxLength": 100,
+            "description": "Building name. Unique per university. Max 100 chars.",
+            "example": "Information Technology Building"
+          },
+          "UniversityID": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Owning university. Required."
           },
           "location": {
             "nullable": true,
-            "description": "null when the building has not been placed on the map yet",
+            "description": "Map position. Omit if the building has not been placed on the map yet.",
             "type": "object",
             "allOf": [
               {
@@ -11672,43 +11670,42 @@
           "footprint": {
             "type": "object",
             "nullable": true,
+            "description": "GeoJSON Polygon outlining the building. Positions are [long, lat]. Send null to clear.",
             "additionalProperties": true
           },
           "icon": {
             "type": "string",
             "nullable": true,
+            "minLength": 1,
+            "maxLength": 64,
+            "description": "Icon key used when rendering the building marker.",
             "example": "school"
           },
           "displayColour": {
             "type": "string",
             "nullable": true,
-            "example": "#4A5468"
-          },
-          "venueCount": {
-            "type": "number",
-            "example": 12,
-            "description": "Number of venues assigned to this building (current count)"
+            "pattern": "^#?([0-9A-F]{3}|[0-9A-F]{4}|[0-9A-F]{6}|[0-9A-F]{8})$",
+            "description": "Hex colour used when rendering the building.",
+            "example": "#4A5548"
           }
         },
         "required": [
-          "buildingId",
-          "buildingName",
-          "location",
-          "footprint",
-          "icon",
-          "displayColour",
-          "venueCount"
+          "BuildingID",
+          "BuildingName",
+          "UniversityID"
         ]
       },
       "BuildingListResponseDto": {
         "type": "object",
         "properties": {
           "buildings": {
-            "description": "List of buildings",
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/BuildingDto"
+              "$ref": "#/components/schemas/BaseBuildingDto"
             }
+          },
+          "message": {
+            "type": "string"
           }
         },
         "required": [
@@ -11718,16 +11715,15 @@
       "CreateBuildingDto": {
         "type": "object",
         "properties": {
-          "buildingName": {
+          "BuildingName": {
             "type": "string",
-            "minLength": 1,
             "maxLength": 100,
-            "example": "Information Technology Building",
-            "description": "Name of the building. Must be unique within the university."
+            "description": "Building name. Unique per university. Max 100 chars.",
+            "example": "Information Technology Building"
           },
           "location": {
             "nullable": true,
-            "description": "Map position. Omit to create the building unpinned. Admin places it then later.",
+            "description": "Map position. Omit if the building has not been placed on the map yet.",
             "type": "object",
             "allOf": [
               {
@@ -11738,87 +11734,42 @@
           "footprint": {
             "type": "object",
             "nullable": true,
-            "additionalProperties": true,
-            "example": {
-              "type": "Polygon",
-              "coordinates": [
-                [
-                  [
-                    28.2314,
-                    -25.7545
-                  ],
-                  [
-                    28.2318,
-                    -25.7545
-                  ],
-                  [
-                    28.2318,
-                    -25.7549
-                  ],
-                  [
-                    28.2314,
-                    -25.7549
-                  ],
-                  [
-                    28.2314,
-                    -25.7545
-                  ]
-                ]
-              ]
-            },
-            "description": "GeoJSON Polygon outlining the building. Positions are [long, lat]. The ring must be closed..."
+            "description": "GeoJSON Polygon outlining the building. Positions are [long, lat]. Send null to clear.",
+            "additionalProperties": true
           },
           "icon": {
             "type": "string",
             "nullable": true,
             "minLength": 1,
             "maxLength": 64,
-            "example": "uni",
-            "description": "Icon key used when rendering the building marker"
+            "description": "Icon key used when rendering the building marker.",
+            "example": "school"
           },
           "displayColour": {
             "type": "string",
             "nullable": true,
             "pattern": "^#?([0-9A-F]{3}|[0-9A-F]{4}|[0-9A-F]{6}|[0-9A-F]{8})$",
-            "example": "#4A5548",
-            "description": "Hex colour used when rendering the building"
+            "description": "Hex colour used when rendering the building.",
+            "example": "#4A5548"
           }
         },
         "required": [
-          "buildingName"
+          "BuildingName"
         ]
       },
       "BuildingSingleResponseDto": {
         "type": "object",
         "properties": {
           "building": {
-            "$ref": "#/components/schemas/BuildingDto"
+            "$ref": "#/components/schemas/BaseBuildingDto"
+          },
+          "message": {
+            "type": "string"
           }
         },
         "required": [
           "building"
         ]
-      },
-      "UpdateBuildingLocationDto": {
-        "type": "object",
-        "properties": {
-          "location": {
-            "nullable": true,
-            "description": "The location of the building pin. Sending null will unpin",
-            "type": "object",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/LatLngDto"
-              }
-            ]
-          },
-          "footprint": {
-            "type": "object",
-            "nullable": true,
-            "description": "GeoJSON polygon outline for the building. Send null to clear the polygon.",
-            "additionalProperties": true
-          }
-        }
       },
       "MapConfigDto": {
         "type": "object",

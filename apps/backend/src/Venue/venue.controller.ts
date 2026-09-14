@@ -26,13 +26,9 @@ import { VenueService } from './venue.service';
 import { Roles } from 'src/auth/roles.guard';
 import { CurrentSession, type SessionData } from 'src/auth/session.decorator';
 import {
-  AssignVenueBuildingDto,
-  BulkAssignResponseDto,
-  BulkAssignVenuesDto,
   CreateVenueDto,
   UpdateVenueDto,
-  VenueMappingDto,
-  VenueMappingListResponseDto,
+  VenueListResponseDto,
   VenueQueryDto,
   VenueSingleResponseDto,
 } from './dto/venue.dto';
@@ -99,7 +95,7 @@ export class VenueController {
   })
   @ApiOkResponse({
     description: 'Venues returned successfully',
-    type: VenueMappingListResponseDto,
+    type: VenueListResponseDto,
   })
   @ApiForbiddenResponse({
     description: 'No uni selected or no role at uni',
@@ -107,8 +103,12 @@ export class VenueController {
   getAllVenues(
     @CurrentSession() session: SessionData,
     @Query() query: VenueQueryDto,
-  ): Promise<VenueMappingListResponseDto> {
-    return this.venueService.getAllVenues(session, query);
+  ): Promise<VenueListResponseDto> {
+    const uniId = session.uniId;
+
+    if (!uniId) throw new ForbiddenException(`No university selected`);
+
+    return this.venueService.getAllVenues(uniId, query);
   } //END_getAllVenues
 
   //Update
@@ -165,48 +165,48 @@ export class VenueController {
     return this.venueService.delete(venueId);
   } //END_delete
 
-  @Patch(':venueId/building')
-  @Roles('uni_admin')
-  @ApiOperation({
-    description: 'Send buildingId to assign or null to unassign the venue',
-    summary: 'Assign a venue to a building',
-  })
-  @ApiOkResponse({
-    description: 'Venue updated successfully',
-    type: VenueMappingDto,
-  })
-  @ApiNotFoundResponse({ description: 'Venue not found' })
-  @ApiForbiddenResponse({ description: 'Wrong permissions' })
-  @ApiBadRequestResponse({
-    description: 'Building does not belong to the selected university',
-  })
-  assignBuilding(
-    @CurrentSession() session: SessionData,
-    @Param('venueId') venueId: string,
-    @Body() assignVenueDto: AssignVenueBuildingDto,
-  ): Promise<VenueMappingDto> {
-    return this.venueService.assignBuilding(session, venueId, assignVenueDto);
-  }
+  // @Patch(':venueId/building')
+  // @Roles('uni_admin')
+  // @ApiOperation({
+  //   description: 'Send buildingId to assign or null to unassign the venue',
+  //   summary: 'Assign a venue to a building',
+  // })
+  // @ApiOkResponse({
+  //   description: 'Venue updated successfully',
+  //   type: VenueMappingDto,
+  // })
+  // @ApiNotFoundResponse({ description: 'Venue not found' })
+  // @ApiForbiddenResponse({ description: 'Wrong permissions' })
+  // @ApiBadRequestResponse({
+  //   description: 'Building does not belong to the selected university',
+  // })
+  // assignBuilding(
+  //   @CurrentSession() session: SessionData,
+  //   @Param('venueId') venueId: string,
+  //   @Body() assignVenueDto: AssignVenueBuildingDto,
+  // ): Promise<VenueMappingDto> {
+  //   return this.venueService.assignBuilding(session, venueId, assignVenueDto);
+  // }
 
-  @Post('assign')
-  @Roles('uni_admin')
-  @ApiOperation({
-    description:
-      'Used by the venue mapping screen for multiple selection assignment',
-    summary: 'Assign several venues to buildings in one request',
-  })
-  @ApiForbiddenResponse({ description: 'Wrong permissions bud' })
-  @ApiOkResponse({
-    description: 'Venues updated successfully',
-    type: BulkAssignResponseDto,
-  })
-  @ApiBadRequestResponse({
-    description: 'One/more buildings do not belong to the selected university',
-  })
-  bulkAssign(
-    @CurrentSession() session: SessionData,
-    @Body() bulkAssignDto: BulkAssignVenuesDto,
-  ): Promise<{ updated: number; success: boolean }> {
-    return this.venueService.bulkAssign(session, bulkAssignDto);
-  }
+  // @Post('assign')
+  // @Roles('uni_admin')
+  // @ApiOperation({
+  //   description:
+  //     'Used by the venue mapping screen for multiple selection assignment',
+  //   summary: 'Assign several venues to buildings in one request',
+  // })
+  // @ApiForbiddenResponse({ description: 'Wrong permissions bud' })
+  // @ApiOkResponse({
+  //   description: 'Venues updated successfully',
+  //   type: BulkAssignResponseDto,
+  // })
+  // @ApiBadRequestResponse({
+  //   description: 'One/more buildings do not belong to the selected university',
+  // })
+  // bulkAssign(
+  //   @CurrentSession() session: SessionData,
+  //   @Body() bulkAssignDto: BulkAssignVenuesDto,
+  // ): Promise<{ updated: number; success: boolean }> {
+  //   return this.venueService.bulkAssign(session, bulkAssignDto);
+  // }
 }
