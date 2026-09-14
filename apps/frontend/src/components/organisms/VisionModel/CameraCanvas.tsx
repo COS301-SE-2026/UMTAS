@@ -3,8 +3,20 @@ import { Button } from "@/components/atoms/baseShadcn/button";
 import { useEffect, useRef, useState } from "react";
 import { CircleX } from "lucide-react";
 
+function getVideoConstraints(): MediaStreamConstraints {
+  const isMobile = window.innerWidth < 768;
+  return {
+    video: {
+      width: isMobile ? { ideal: 720 } : { ideal: 1280 },
+      height: isMobile ? { ideal: 1280 } : { ideal: 720 },
+      facingMode: isMobile ? "user" : "environment",
+    },
+    audio: true,
+  };
+}
+
 export default function CameraCanvas() {
-  const [cameraOn, setCameraOn] = useState(true);
+  const [cameraOn, setCameraOn] = useState(false);
 
   return (
     <div className="w-full h-full justify-around flex flex-col gap-y-4 p-4">
@@ -23,15 +35,6 @@ export default function CameraCanvas() {
             <CircleX />
           </p>
         )}
-      </div>
-      <div className="flex flex-row justify-around">
-        <Button
-          onClick={() => {
-            setCameraOn(!cameraOn);
-          }}
-        >
-          {cameraOn ? <>Switch camera off</> : <>Switch camera on</>}
-        </Button>
       </div>
     </div>
   );
@@ -54,10 +57,9 @@ function CanvasWebcam({ isCameraActive }: CanvasCamProps) {
     let currentStream: MediaStream | null = null;
     async function startCam() {
       try {
-        currentStream = await navigator.mediaDevices.getUserMedia({
-          video: { width: 640, height: 480 },
-          audio: false,
-        });
+        currentStream = await navigator.mediaDevices.getUserMedia(
+          getVideoConstraints(),
+        );
         if (videoRef.current) {
           videoRef.current.srcObject = currentStream;
           videoRef.current.onloadedmetadata = () => {
