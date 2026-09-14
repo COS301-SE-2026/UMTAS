@@ -162,8 +162,6 @@ export class BuildingListResponseDto {
   @ApiProperty({ type: [BuildingDto] })
   buildings!: BuildingDto[];
 
-  venueCount?: number;
-
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()

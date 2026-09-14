@@ -1,5 +1,7 @@
 import {
   ConflictException,
+  forwardRef,
+  Inject,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -34,6 +36,7 @@ export class BuildingService {
   constructor(
     private readonly dbService: DatabaseService,
     private readonly uniService: UniversityService,
+    @Inject(forwardRef(() => VenueService))
     private readonly venueService: VenueService,
   ) {}
 
