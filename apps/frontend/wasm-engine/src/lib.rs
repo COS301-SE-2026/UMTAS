@@ -29,7 +29,6 @@ pub fn slice_image_data(
     let resized_width = target_width as usize;
     let slice_size = 640;
 
-    // the slices
     let top_left = SliceFormat {
         x: 0,
         y: 0,
@@ -72,9 +71,6 @@ pub fn extract_slice(
 ) -> js_sys::Float32Array {
     let total_pix = start_pix.slice_width * start_pix.slice_height;
 
-    let mut slice = vec![0.0; total_pix * 3];
-
-    // one for loop to creage all 3 buffers of slice
     let mut r_offset = 0;
     let mut g_offset = total_pix;
     let mut b_offset = total_pix * 2;
@@ -113,8 +109,7 @@ pub struct DetectedPerson {
     pub confidence: f32,
 }
 
-#[wasm_bindgen]
-pub fn read_result(slice_data: &Float32Array) -> Result<JsValue, JsValue> {
+pub fn read_result(slice_data: &Float32Array) -> Result<Vec<DetectedPerson>, String> {
     let data = slice_data.to_vec();
     let mut people: Vec<DetectedPerson> = Vec::new();
 
@@ -123,7 +118,7 @@ pub fn read_result(slice_data: &Float32Array) -> Result<JsValue, JsValue> {
     const CONFIDENCE_THRESHOLD: f32 = 0.25;
 
     if data.len() < NUM_ANCHORS * NUM_FEATURES {
-        return Err(JsValue::from_str("Invalid tensor data length"));
+        return Err("Invalid tensor data length".to_string());
     }
 
     for anchor_idx in 0..NUM_ANCHORS {
@@ -149,5 +144,5 @@ pub fn read_result(slice_data: &Float32Array) -> Result<JsValue, JsValue> {
         }
     }
 
-    return Ok((JsValue::from_str("s"))); // temp to remove compiler warning
+    return Ok(people);
 }
