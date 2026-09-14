@@ -99,12 +99,7 @@ export default function VM_SessionTemplate() {
                     Run Inference
                     <Switch
                       checked={detectionSettings.runDetection}
-                      onCheckedChange={(e) => {
-                        setDetectionSettings((settings) => ({
-                          ...settings,
-                          runDetection: e,
-                        }));
-                      }}
+                      onCheckedChange={(e) => {}}
                     />
                   </Label>
                   <Label className=" flex flex-col  w-full  text-md font-medium text-[var(--text-primary)] text-left pl-1">
