@@ -1,4 +1,9 @@
-import { ApiProperty, ApiPropertyOptional, PickType } from '@nestjs/swagger';
+import {
+  ApiProperty,
+  ApiPropertyOptional,
+  PartialType,
+  PickType,
+} from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import {
   ArrayMinSize,
@@ -81,6 +86,15 @@ export class VenueListResponseDto {
   @IsString()
   message?: string;
 } //END_VenueListResponseDto
+
+//Update
+export class UpdateVenueDto extends PartialType(
+  PickType(BaseVenueDto, ['BuildingID', 'VenueName']),
+) {} //END_UpdateVenueDto
+
+export class UpdateVenueInput extends UpdateVenueDto {
+  UniversityID!: string;
+}
 
 export class VenueMappingDto {
   @ApiProperty({

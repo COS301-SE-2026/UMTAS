@@ -18,6 +18,9 @@ import {
   BulkAssignVenuesDto,
   CreateVenueInput,
   VenueSingleResponseDto,
+  UpdateVenueInput,
+  UpdateVenueDto,
+  BaseVenueDto,
 } from './dto/venue.dto';
 import { inArray } from 'drizzle-orm';
 import { AppDatabase } from 'src/auth/auth';
@@ -129,7 +132,33 @@ export class VenueService {
 
     return { venues: rows };
   } //END_getAllVenues
+
   //Update
+  async update(
+    venueId: string,
+    input: UpdateVenueInput,
+    tx?: AppDatabase,
+  ): Promise<VenueSingleResponseDto> {
+    if (!tx) {
+      return this.dbService.db.transaction(async (t: AppDatabase) => {
+        return this.update(venueId, input, t);
+      }); //END_transaction
+    }
+
+    //Fetch old venue - throws 404 if not exists
+    const oldVenue = (await this.getById(venueId, tx)).venue;
+
+    const updateFields: Partial<UpdateVenueDto> =
+      await this.validateUpdateInput(oldVenue, input, tx);
+
+    //No fields to update -> return early
+    if (Object.keys(updateFields).length === 0) return { venue: oldVenue };
+
+    //Update venue
+    const [venue] = await tx.update(Venue).set(updateFields).returning();
+
+    return { venue };
+  } //END_Update
 
   //Delete
 
@@ -320,4 +349,46 @@ export class VenueService {
 
     return venue ? { venue } : null;
   } //END_uniqueVenueNamePerUniversity
+
+  private async validateUpdateInput(
+    oldVenue: BaseVenueDto,
+    input: UpdateVenueInput,
+    tx: AppDatabase,
+  ): Promise<UpdateVenueInput> {
+    //BuildingID
+    const buildingId = input.BuildingID;
+    if (buildingId === undefined) {
+      delete input.BuildingID;
+    } else if (buildingId === null) {
+      if (oldVenue.BuildingID === null) {
+        delete input.BuildingID;
+      }
+    } else if (buildingId === oldVenue.BuildingID) {
+      delete input.BuildingID;
+    } else {
+      //validate new building exists
+      await this.buildingService.getById(buildingId, tx);
+    }
+
+    //VenueName
+    const venueName = input.VenueName;
+    if (!venueName || (venueName && venueName === oldVenue.VenueName)) {
+      delete input.VenueName;
+    } else {
+      //Validate that venue name not already taken - throw conflictException
+      const duplicate = await this.uniqueVenueNamePerUniversity(
+        venueName,
+        input.UniversityID,
+        tx,
+      );
+      if (duplicate) {
+        this.OOPSIE.warn(
+          `Venue[${venueName}] already exists for university[${input.UniversityID}]`,
+        );
+        throw new ConflictException(`Venue name already exists for university`);
+      }
+    }
+
+    return input;
+  } //END_validateUpdateInput
 }

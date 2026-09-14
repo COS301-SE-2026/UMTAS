@@ -22,9 +22,13 @@ import {
 
 import { UniversityService } from 'src/University/university.service';
 import { BuildingService } from 'src/Building/building.service';
-import { venueId } from 'src/Testing/constants';
+import { uniId, venueId } from 'src/Testing/constants';
 import { createVenue } from 'src/Testing/Factories';
-import { VenueSingleResponseDto } from './dto/venue.dto';
+import {
+  BaseVenueDto,
+  UpdateVenueInput,
+  VenueSingleResponseDto,
+} from './dto/venue.dto';
 describe('VenueService', () => {
   let service: VenueService;
 
@@ -76,7 +80,7 @@ describe('VenueService', () => {
     jest.restoreAllMocks();
   });
 
-  describe('create', () => {
+  describe('Test_create', () => {
     const validInput = {
       VenueName: 'Main Lecture Hall',
       UniversityID: 'pretoria-bru-123',
@@ -191,7 +195,7 @@ describe('VenueService', () => {
         InternalServerErrorException,
       );
     });
-  });
+  }); //END_Test_create
 
   describe('Test_getById', () => {
     it('should throw if venue not found', async () => {
@@ -403,6 +407,61 @@ describe('VenueService', () => {
     });
   }); //END_Test_getAllVenues
 
+  describe('Test_update', () => {
+    it('should throw NotFoundException when venue does not exist', async () => {
+      //Arrange
+      mockTransaction(mockDb, {
+        select: [[]],
+      });
+
+      //Act + Assert
+      await expect(
+        service.update('venue-1', { UniversityID: uniId }),
+      ).rejects.toThrow(NotFoundException);
+    });
+
+    it('should return old venue when no fields to update', async () => {
+      //Arrange
+      const venue = createVenue();
+      mockTransaction(mockDb, {
+        select: [[venue]],
+      });
+      jest.spyOn(service as any, 'validateUpdateInput').mockResolvedValue({});
+
+      //Act
+      const result = await service.update(venue.VenueID, {
+        UniversityID: uniId,
+      });
+
+      //Assert
+      expect(result).toEqual({ venue });
+      expect(mockDb.update).not.toHaveBeenCalled();
+    });
+
+    it('should update venue with provided fields', async () => {
+      //Arrange
+      const venue = createVenue();
+      const updated = { ...venue, VenueName: 'New Name' };
+      mockTransaction(mockDb, {
+        select: [[venue]],
+      });
+      jest
+        .spyOn(service as any, 'validateUpdateInput')
+        .mockResolvedValue({ VenueName: 'New Name' });
+      mockDbResult(mockDb.update, [updated]);
+
+      //Act
+      const result = await service.update(venue.VenueID, {
+        VenueName: 'New Name',
+        UniversityID: uniId,
+      });
+
+      //Assert
+      expect(result).toEqual({ venue: updated });
+      expect(mockDb.update).toHaveBeenCalledTimes(1);
+    });
+  }); //END_Test_update
+
   describe('assignBuilding', () => {
     it('should throw NotFoundException if the venue does not belong to the selected university', async () => {
       mockDbResult(mockDb.select, []);
@@ -499,4 +558,174 @@ describe('VenueService', () => {
       expect(result).toEqual({ updated: 2, success: true });
     });
   });
+
+  //validateUpdateInput
+  describe('Test_validateUpdateInput', () => {
+    const oldVenue: BaseVenueDto = {
+      VenueID: 'venue-1',
+      VenueName: 'IT 2-26',
+      UniversityID: 'uni-1',
+      BuildingID: 'building-1',
+    };
+
+    it('should delete BuildingID when undefined', async () => {
+      //Arrange
+      const input: UpdateVenueInput = {
+        UniversityID: uniId,
+      };
+
+      //Act
+      const result = await (service as any).validateUpdateInput(
+        oldVenue,
+        input,
+        mockDb,
+      );
+
+      //Assert
+      expect('BuildingID' in result).toBe(false);
+    });
+
+    it('should delete BuildingID when null and old is also null', async () => {
+      //Arrange
+      const input: UpdateVenueInput = {
+        BuildingID: null,
+        UniversityID: uniId,
+      };
+      const old: BaseVenueDto = { ...oldVenue, BuildingID: null };
+
+      //Act
+      const result = await (service as any).validateUpdateInput(
+        old,
+        input,
+        mockDb,
+      );
+
+      //Assert
+      expect('BuildingID' in result).toBe(false);
+    });
+
+    it('should keep BuildingID as null when unassigning', async () => {
+      //Arrange
+      const input: UpdateVenueInput = {
+        BuildingID: null,
+        UniversityID: uniId,
+      };
+
+      //Act
+      const result = await (service as any).validateUpdateInput(
+        oldVenue,
+        input,
+        mockDb,
+      );
+
+      //Assert
+      expect(result.BuildingID).toBeNull();
+    });
+
+    it('should delete BuildingID when same as old', async () => {
+      //Arrange
+      const input: UpdateVenueInput = {
+        BuildingID: oldVenue.BuildingID,
+        UniversityID: uniId,
+      };
+
+      //Act
+      const result = await (service as any).validateUpdateInput(
+        oldVenue,
+        input,
+        mockDb,
+      );
+
+      //Assert
+      expect('BuildingID' in result).toBe(false);
+    });
+
+    it('should validate and keep BuildingID when changed', async () => {
+      //Arrange
+      const input: UpdateVenueInput = {
+        BuildingID: 'building-2',
+        UniversityID: uniId,
+      };
+      const spy = jest
+        .spyOn(mockBuildingService, 'getById')
+        .mockResolvedValue(undefined as any);
+
+      //Act
+      const result = await (service as any).validateUpdateInput(
+        oldVenue,
+        input,
+        mockDb,
+      );
+
+      //Assert
+      expect(spy).toHaveBeenCalledWith('building-2', mockDb);
+      expect(result.BuildingID).toBe('building-2');
+    });
+
+    it('should delete VenueName when undefined', async () => {
+      //Arrange
+      const input: UpdateVenueInput = { UniversityID: uniId };
+
+      //Act
+      const result = await (service as any).validateUpdateInput(
+        oldVenue,
+        input,
+        mockDb,
+      );
+
+      //Assert
+      expect('VenueName' in result).toBe(false);
+    });
+
+    it('should delete VenueName when same as old', async () => {
+      //Arrange
+      const input: UpdateVenueInput = {
+        VenueName: oldVenue.VenueName,
+        UniversityID: uniId,
+      };
+
+      //Act
+      const result = await (service as any).validateUpdateInput(
+        oldVenue,
+        input,
+        mockDb,
+      );
+
+      //Assert
+      expect('VenueName' in result).toBe(false);
+    });
+
+    it('should throw ConflictException when new VenueName already taken', async () => {
+      //Arrange
+      const input: UpdateVenueInput = {
+        VenueName: 'Thuto 1-1',
+        UniversityID: uniId,
+      };
+      mockDbResult(mockDb.select, [{ VenueID: 'venue-2' }]);
+
+      //Act + Assert
+      await expect(
+        (service as any).validateUpdateInput(oldVenue, input, mockDb),
+      ).rejects.toThrow(ConflictException);
+    });
+
+    it('should keep VenueName when changed and unique', async () => {
+      //Arrange
+      const input: UpdateVenueInput = {
+        VenueName: 'New Name',
+        UniversityID: uniId,
+      };
+      mockDbResult(mockDb.select, []);
+
+      //Act
+      const result = await (service as any).validateUpdateInput(
+        oldVenue,
+        input,
+        mockDb,
+      );
+
+      //Assert
+      expect(result.VenueName).toBe('New Name');
+    });
+  }); //END_Test_validateUpdateInput
 });
