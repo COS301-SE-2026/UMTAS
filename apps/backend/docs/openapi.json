@@ -5620,9 +5620,60 @@
       }
     },
     "/api/venues": {
+      "post": {
+        "description": "Create a venue for the users university.",
+        "operationId": "createVenue",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateVenueDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Venue created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VenueSingleResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid venue payload"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "description": "Wrong permissions"
+          },
+          "409": {
+            "description": "Venue name already exists for this university"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "security": [
+          {
+            "umtas-session": []
+          }
+        ],
+        "summary": "Create a venue",
+        "tags": [
+          "Venues"
+        ]
+      },
       "get": {
         "description": "Get all venues from current selected uni",
-        "operationId": "VenueController_getAllVenues",
+        "operationId": "getAllVenues",
         "parameters": [
           {
             "name": "buildingId",
@@ -5691,6 +5742,171 @@
         "tags": [
           "Venues"
         ]
+      }
+    },
+    "/api/venues/{venueId}": {
+      "get": {
+        "operationId": "getVenueById",
+        "parameters": [
+          {
+            "name": "venueId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Venue returned successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VenueSingleResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "description": "Venue not found"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "security": [
+          {
+            "umtas-session": []
+          }
+        ],
+        "summary": "Get a venue by ID",
+        "tags": [
+          "Venues"
+        ],
+        "description": "Get a venue by ID. This Venues operation is part of the versioned UMTAS HTTP contract."
+      },
+      "patch": {
+        "description": "Update venue name and/or building assignment. Only fields present in the body are updated.",
+        "operationId": "updateVenue",
+        "parameters": [
+          {
+            "name": "venueId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateVenueDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Venue updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VenueSingleResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid update payload"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "description": "Wrong permissions"
+          },
+          "404": {
+            "description": "Venue or building not found"
+          },
+          "409": {
+            "description": "Venue name already exists for this university"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "security": [
+          {
+            "umtas-session": []
+          }
+        ],
+        "summary": "Update a venue",
+        "tags": [
+          "Venues"
+        ]
+      },
+      "delete": {
+        "operationId": "deleteVenue",
+        "parameters": [
+          {
+            "name": "venueId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Venue deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VenueSingleResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "description": "Wrong permissions"
+          },
+          "404": {
+            "description": "Venue not found"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "security": [
+          {
+            "umtas-session": []
+          }
+        ],
+        "summary": "Delete a venue by ID",
+        "tags": [
+          "Venues"
+        ],
+        "description": "Delete a venue by ID. This Venues operation is part of the versioned UMTAS HTTP contract."
       }
     },
     "/api/venues/{venueId}/building": {
@@ -11213,6 +11429,73 @@
           "success"
         ]
       },
+      "CreateVenueDto": {
+        "type": "object",
+        "properties": {
+          "VenueName": {
+            "type": "string",
+            "maxLength": 30,
+            "description": "Venue name. Unique per university. Max 30 chars.",
+            "example": "Main Lecture Hall"
+          },
+          "BuildingID": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid",
+            "description": "Optional building identifier. Nulled if the building is deleted."
+          }
+        },
+        "required": [
+          "VenueName"
+        ]
+      },
+      "BaseVenueDto": {
+        "type": "object",
+        "properties": {
+          "VenueID": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique venue identifier.",
+            "example": "00000000-0000-4000-8000-000000000000"
+          },
+          "VenueName": {
+            "type": "string",
+            "maxLength": 30,
+            "description": "Venue name. Unique per university. Max 30 chars.",
+            "example": "Main Lecture Hall"
+          },
+          "UniversityID": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Owning university. Required."
+          },
+          "BuildingID": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid",
+            "description": "Optional building identifier. Nulled if the building is deleted."
+          }
+        },
+        "required": [
+          "VenueID",
+          "VenueName",
+          "UniversityID"
+        ]
+      },
+      "VenueSingleResponseDto": {
+        "type": "object",
+        "properties": {
+          "venue": {
+            "$ref": "#/components/schemas/BaseVenueDto"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "venue"
+        ]
+      },
       "Object": {
         "type": "object",
         "properties": {}
@@ -11263,6 +11546,23 @@
         "required": [
           "venues"
         ]
+      },
+      "UpdateVenueDto": {
+        "type": "object",
+        "properties": {
+          "VenueName": {
+            "type": "string",
+            "maxLength": 30,
+            "description": "Venue name. Unique per university. Max 30 chars.",
+            "example": "Main Lecture Hall"
+          },
+          "BuildingID": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid",
+            "description": "Optional building identifier. Nulled if the building is deleted."
+          }
+        }
       },
       "AssignVenueBuildingDto": {
         "type": "object",
