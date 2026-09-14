@@ -22,8 +22,11 @@ import {
 
 import { UniversityService } from 'src/University/university.service';
 import { BuildingService } from 'src/Building/building.service';
+import { venueId } from 'src/Testing/constants';
+import { createVenue } from 'src/Testing/Factories';
+import { VenueSingleResponseDto } from './dto/venue.dto';
 describe('VenueService', () => {
-  let venueService: VenueService;
+  let service: VenueService;
 
   const { mockDb, reset: resetDatabase } = createMockDatabase();
   const { mockUniversityService, reset: resetUni } =
@@ -63,7 +66,7 @@ describe('VenueService', () => {
       ],
     }).compile();
 
-    venueService = module.get(VenueService);
+    service = module.get(VenueService);
   });
 
   afterEach(() => {
@@ -98,7 +101,7 @@ describe('VenueService', () => {
       });
 
       // Act
-      const result = await venueService.create(validInput);
+      const result = await service.create(validInput);
 
       // Assert
       expect(result.venue.VenueID).toBe('venue-1');
@@ -112,7 +115,7 @@ describe('VenueService', () => {
       mockTransaction(mockDb, {});
 
       // Act + Assert
-      await expect(venueService.create(validInput)).rejects.toThrow(
+      await expect(service.create(validInput)).rejects.toThrow(
         NotFoundException,
       );
     });
@@ -132,7 +135,7 @@ describe('VenueService', () => {
       mockTransaction(mockDb, {});
 
       // Act + Assert
-      await expect(venueService.create(inputWithBuilding)).rejects.toThrow(
+      await expect(service.create(inputWithBuilding)).rejects.toThrow(
         NotFoundException,
       );
     });
@@ -146,7 +149,7 @@ describe('VenueService', () => {
       });
 
       // Act + Assert
-      await expect(venueService.create(validInput)).rejects.toThrow(
+      await expect(service.create(validInput)).rejects.toThrow(
         ConflictException,
       );
     });
@@ -166,7 +169,7 @@ describe('VenueService', () => {
       });
 
       // Act
-      const result = await venueService.create(inputWithoutBuilding);
+      const result = await service.create(inputWithoutBuilding);
 
       // Assert
       expect(result.venue.BuildingID).toBeNull();
@@ -184,29 +187,57 @@ describe('VenueService', () => {
       });
 
       // Act + Assert
-      await expect(venueService.create(validInput)).rejects.toThrow(
+      await expect(service.create(validInput)).rejects.toThrow(
         InternalServerErrorException,
       );
     });
   });
 
-  describe('getAllVenues', () => {
-    it('should throw ForbiddenException if no active session', async () => {
-      await expect(venueService.getAllVenues(null as any, {})).rejects.toThrow(
+  describe('Test_getById', () => {
+    it('should throw if venue not found', async () => {
+      //Arrange
+      mockDbResult(mockDb.select, []);
+
+      //Act + Assert
+      await expect(service.getById(venueId)).rejects.toThrow(NotFoundException);
+    });
+
+    it('should return venue found', async () => {
+      //Arrange
+      const venue = createVenue();
+      mockDbResult(mockDb.select, [venue]);
+
+      const expected: VenueSingleResponseDto = { venue };
+
+      //Act
+      const result = await service.getById(venueId);
+
+      //Assert
+      expect(result).toMatchObject(expected);
+    });
+  }); //END_Test_getById
+
+  describe('Test_getAllVenues', () => {
+    it('should throw if no active session', async () => {
+      //Act + Assert
+      await expect(service.getAllVenues(null as any, {})).rejects.toThrow(
         ForbiddenException,
       );
     });
 
-    it('should throw ForbiddenException if no university is selected', async () => {
-      const noUniversitySession = { ...mockSession, uniId: undefined } as any;
+    it('should throw if no university is selected', async () => {
+      //Arrange
+      const noUniSession = { ...mockSession, uniId: undefined } as any;
 
-      await expect(
-        venueService.getAllVenues(noUniversitySession, {}),
-      ).rejects.toThrow(ForbiddenException);
+      //Act + Assert
+      await expect(service.getAllVenues(noUniSession, {})).rejects.toThrow(
+        ForbiddenException,
+      );
     });
 
-    it('should return venues joined with their building, including unmapped ones', async () => {
-      const mockRows = [
+    it('should return all venues when no filters provided', async () => {
+      //Arrange
+      const venues = [
         {
           venueId: 'venue-1',
           venueName: 'IT 2-26',
@@ -220,16 +251,55 @@ describe('VenueService', () => {
           buildingName: null,
         },
       ];
+      mockDbResult(mockDb.select, venues);
 
-      mockDbResult(mockDb.select, mockRows);
+      //Act
+      const result = await service.getAllVenues(mockSession, {});
 
-      const result = await venueService.getAllVenues(mockSession, {});
-
-      expect(result).toEqual({ venues: mockRows });
+      //Assert
+      expect(result).toEqual({ venues });
     });
 
-    it('should not filter out unmapped venues when "mapped" is omitted', async () => {
-      const mockRows = [
+    it('should return empty array when university has no venues', async () => {
+      //Arrange
+      mockDbResult(mockDb.select, []);
+
+      //Act
+      const result = await service.getAllVenues(mockSession, {});
+
+      //Assert
+      expect(result).toEqual({ venues: [] });
+    });
+
+    it('should include unmapped venues when mapped filter omitted', async () => {
+      //Arrange
+      const venues = [
+        {
+          venueId: 'venue-1',
+          venueName: 'IT 2-26',
+          buildingId: 'building-1',
+          buildingName: 'IT Building',
+        },
+        {
+          venueId: 'venue-2',
+          venueName: 'Thuto 1-1',
+          buildingId: null,
+          buildingName: null,
+        },
+      ];
+      mockDbResult(mockDb.select, venues);
+
+      //Act
+      const result = await service.getAllVenues(mockSession, {});
+
+      //Assert
+      expect(result.venues).toHaveLength(2);
+      expect(result.venues[1].buildingId).toBeNull();
+    });
+
+    it('should filter by buildingId when provided', async () => {
+      //Arrange
+      const venues = [
         {
           venueId: 'venue-1',
           venueName: 'IT 2-26',
@@ -237,22 +307,108 @@ describe('VenueService', () => {
           buildingName: 'IT Building',
         },
       ];
+      mockDbResult(mockDb.select, venues);
 
-      mockDbResult(mockDb.select, mockRows);
+      //Act
+      const result = await service.getAllVenues(mockSession, {
+        buildingId: 'building-1',
+      });
 
-      const result = await venueService.getAllVenues(mockSession, {});
-
-      expect(result.venues).toHaveLength(1);
-      expect(result.venues[0].buildingId).not.toBeNull();
+      //Assert
+      expect(result).toEqual({ venues });
+      expect(mockDb.select).toHaveBeenCalledTimes(1);
     });
-  });
+
+    it('should filter to mapped venues when mapped is true', async () => {
+      //Arrange
+      const venues = [
+        {
+          venueId: 'venue-1',
+          venueName: 'IT 2-26',
+          buildingId: 'building-1',
+          buildingName: 'IT Building',
+        },
+      ];
+      mockDbResult(mockDb.select, venues);
+
+      //Act
+      const result = await service.getAllVenues(mockSession, { mapped: true });
+
+      //Assert
+      expect(result).toEqual({ venues });
+      expect(result.venues.every((v) => v.buildingId !== null)).toBe(true);
+    });
+
+    it('should filter to unmapped venues when mapped is false', async () => {
+      //Arrange
+      const venues = [
+        {
+          venueId: 'venue-2',
+          venueName: 'Thuto 1-1',
+          buildingId: null,
+          buildingName: null,
+        },
+      ];
+      mockDbResult(mockDb.select, venues);
+
+      //Act
+      const result = await service.getAllVenues(mockSession, { mapped: false });
+
+      //Assert
+      expect(result).toEqual({ venues });
+      expect(result.venues.every((v) => v.buildingId === null)).toBe(true);
+    });
+
+    it('should filter by search term when provided', async () => {
+      //Arrange
+      const venues = [
+        {
+          venueId: 'venue-1',
+          venueName: 'IT 2-26',
+          buildingId: 'building-1',
+          buildingName: 'IT Building',
+        },
+      ];
+      mockDbResult(mockDb.select, venues);
+
+      //Act
+      const result = await service.getAllVenues(mockSession, { search: 'IT' });
+
+      //Assert
+      expect(result).toEqual({ venues });
+    });
+
+    it('should apply all filters together when provided', async () => {
+      //Arrange
+      const venues = [
+        {
+          venueId: 'venue-1',
+          venueName: 'IT 2-26',
+          buildingId: 'building-1',
+          buildingName: 'IT Building',
+        },
+      ];
+      mockDbResult(mockDb.select, venues);
+
+      //Act
+      const result = await service.getAllVenues(mockSession, {
+        buildingId: 'building-1',
+        mapped: true,
+        search: 'IT',
+      });
+
+      //Assert
+      expect(result).toEqual({ venues });
+      expect(mockDb.select).toHaveBeenCalledTimes(1);
+    });
+  }); //END_Test_getAllVenues
 
   describe('assignBuilding', () => {
     it('should throw NotFoundException if the venue does not belong to the selected university', async () => {
       mockDbResult(mockDb.select, []);
 
       await expect(
-        venueService.assignBuilding(mockSession, 'venue-1', {
+        service.assignBuilding(mockSession, 'venue-1', {
           buildingId: 'building-1',
         }),
       ).rejects.toThrow(NotFoundException);
@@ -271,7 +427,7 @@ describe('VenueService', () => {
         },
       ]);
 
-      const result = await venueService.assignBuilding(mockSession, 'venue-1', {
+      const result = await service.assignBuilding(mockSession, 'venue-1', {
         buildingId: 'building-1',
       });
 
@@ -294,7 +450,7 @@ describe('VenueService', () => {
         },
       ]);
 
-      const result = await venueService.assignBuilding(mockSession, 'venue-1', {
+      const result = await service.assignBuilding(mockSession, 'venue-1', {
         buildingId: null,
       });
 
@@ -307,7 +463,7 @@ describe('VenueService', () => {
       mockDbResult(mockDb.select, [{ id: 'building-1' }]);
 
       await expect(
-        venueService.bulkAssign(mockSession, {
+        service.bulkAssign(mockSession, {
           assignments: [
             { venueId: 'venue-1', buildingId: 'building-1' },
             { venueId: 'venue-2', buildingId: 'wits-building' },
@@ -317,7 +473,7 @@ describe('VenueService', () => {
     });
 
     it('should skip the building ownership check entirely when every assignment gets unassigned', async () => {
-      const result = await venueService.bulkAssign(mockSession, {
+      const result = await service.bulkAssign(mockSession, {
         assignments: [
           { venueId: 'venue-1', buildingId: null },
           { venueId: 'venue-2', buildingId: null },
@@ -333,7 +489,7 @@ describe('VenueService', () => {
         update: [[{ VenueID: 'venue-1' }], [{ VenueID: 'venue-2' }]],
       });
 
-      const result = await venueService.bulkAssign(mockSession, {
+      const result = await service.bulkAssign(mockSession, {
         assignments: [
           { venueId: 'venue-1', buildingId: 'building-1' },
           { venueId: 'venue-2', buildingId: 'building-1' },

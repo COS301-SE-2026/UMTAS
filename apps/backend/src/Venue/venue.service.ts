@@ -70,42 +70,28 @@ export class VenueService {
   } //END_Create
 
   //GetById
+  async getById(
+    venueId: string,
+    tx?: AppDatabase,
+  ): Promise<VenueSingleResponseDto> {
+    const db = tx ?? this.dbService.db;
+
+    //Fetch venue
+    const [venue] = await db
+      .select()
+      .from(Venue)
+      .where(eq(Venue.VenueID, venueId))
+      .limit(1);
+
+    if (!venue) {
+      this.OOPSIE.warn(`Venue[${venueId}] not found`);
+      throw new NotFoundException(`Venue not found`);
+    }
+
+    return { venue };
+  } //END_getById
 
   //GetAll
-
-  //Update
-
-  //Delete
-
-  private requireUniId(session: SessionData | undefined): string {
-    if (!session?.user) {
-      throw new ForbiddenException('No active session');
-    }
-
-    if (!session?.uniId) {
-      throw new ForbiddenException('No university selected');
-    }
-
-    return session?.uniId;
-  }
-
-  private async venueToDto(venueId: string): Promise<VenueMappingDto> {
-    const database = this.dbService.db;
-
-    const [row] = await database
-      .select({
-        venueId: Venue.VenueID,
-        venueName: Venue.VenueName,
-        buildingId: Building.BuildingID,
-        buildingName: Building.BuildingName,
-      })
-      .from(Venue)
-      .leftJoin(Building, eq(Venue.BuildingID, Building.BuildingID))
-      .where(eq(Venue.VenueID, venueId));
-
-    return row;
-  }
-
   async getAllVenues(
     session: SessionData,
     query: VenueQueryDto,
@@ -142,6 +128,38 @@ export class VenueService {
       .orderBy(Venue.VenueName);
 
     return { venues: rows };
+  } //END_getAllVenues
+  //Update
+
+  //Delete
+
+  private requireUniId(session: SessionData | undefined): string {
+    if (!session?.user) {
+      throw new ForbiddenException('No active session');
+    }
+
+    if (!session?.uniId) {
+      throw new ForbiddenException('No university selected');
+    }
+
+    return session?.uniId;
+  }
+
+  private async venueToDto(venueId: string): Promise<VenueMappingDto> {
+    const database = this.dbService.db;
+
+    const [row] = await database
+      .select({
+        venueId: Venue.VenueID,
+        venueName: Venue.VenueName,
+        buildingId: Building.BuildingID,
+        buildingName: Building.BuildingName,
+      })
+      .from(Venue)
+      .leftJoin(Building, eq(Venue.BuildingID, Building.BuildingID))
+      .where(eq(Venue.VenueID, venueId));
+
+    return row;
   }
 
   async assignBuilding(
