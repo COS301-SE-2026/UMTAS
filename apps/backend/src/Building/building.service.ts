@@ -2,6 +2,7 @@ import {
   ConflictException,
   ForbiddenException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { Building, Venue } from '../entities/index';
@@ -16,13 +17,38 @@ import {
   UpdateBuildingLocationDto,
 } from './dto/building.dto';
 import { eq, ilike, isNotNull, isNull, sql, and, count } from 'drizzle-orm';
+import { AppDatabase } from 'src/auth/auth';
 
 //building row return drizzle gives us
 type BuildingEntity = typeof Building.$inferSelect;
 
 @Injectable()
 export class BuildingService {
-  constructor(private readonly databaseService: DatabaseService) {}
+  private readonly OOPSIE = new Logger(this.constructor.name);
+
+  constructor(private readonly dbService: DatabaseService) {}
+
+  //GetById
+  async getById(
+    buildingId: string,
+    tx?: AppDatabase,
+  ): Promise<BuildingSingleResponseDto> {
+    const db = tx ?? this.dbService.db;
+
+    //Fetch building by id
+    const [building] = await db
+      .select()
+      .from(Building)
+      .where(eq(Building.BuildingID, buildingId))
+      .limit(1);
+
+    if (!building) {
+      this.OOPSIE.warn(`Building[${buildingId}] not found`);
+      throw new NotFoundException(`Building not found`);
+    }
+
+    return { building: this.buildingDtoAdapter(building, 0) };
+  } //END_getById
 
   private requireUniId(session: SessionData | undefined): string {
     if (!session?.user) {
@@ -60,7 +86,7 @@ export class BuildingService {
     query: BuildingQueryDto,
   ): Promise<BuildingListResponseDto> {
     const universityID = this.requireUniId(session);
-    const database = this.databaseService.db;
+    const database = this.dbService.db;
 
     const filters = [eq(Building.UniversityID, universityID)];
 
@@ -97,7 +123,7 @@ export class BuildingService {
     buildingDto: CreateBuildingDto,
   ): Promise<BuildingSingleResponseDto> {
     const universityId = this.requireUniId(session);
-    const database = this.databaseService.db;
+    const database = this.dbService.db;
 
     //check if this building already exists
     const existingBuilding = await database
@@ -140,7 +166,7 @@ export class BuildingService {
     updateBuildingLocationDto: UpdateBuildingLocationDto,
   ): Promise<BuildingSingleResponseDto> {
     const universityId = this.requireUniId(session);
-    const database = this.databaseService.db;
+    const database = this.dbService.db;
 
     const [existingBuilding] = await database
       .select()
