@@ -1,6 +1,6 @@
+use image::{ImageBuffer, Rgba, imageops::FilterType};
 use std::usize;
 use wasm_bindgen::prelude::*;
-use image::{ImageBuffer,Rgba,imageops::FilterType}
 pub struct SliceFormat {
     x: usize,
     y: usize,
@@ -9,24 +9,50 @@ pub struct SliceFormat {
 }
 
 #[wasm_bindgen]
-pub fn slice_image_data(pixel_data: &[u8], width: usize, height: usize) -> Result<js_sys::Array, JsValue> {
-    let img = ImageBuffer::<Rgba<u8>, _>::from_raw(width as u32, height as u32, pixel_data.to_vec())
+pub fn slice_image_data(
+    pixel_data: &[u8],
+    width: usize,
+    height: usize,
+) -> Result<js_sys::Array, JsValue> {
+    let img =
+        ImageBuffer::<Rgba<u8>, _>::from_raw(width as u32, height as u32, pixel_data.to_vec())
             .ok_or_else(|| JsValue::from_str("Invalid pixel data dimensions"))?;
 
     let target_width = 1280;
     let target_height = 1280;
 
-    let resized_img = image::imageops::resize(&img, target_width, target_height, FilterType::Lanczos3);
+    let resized_img =
+        image::imageops::resize(&img, target_width, target_height, FilterType::Lanczos3);
 
     let resized_pixels = resized_img.into_raw();
     let resized_width = target_width as usize;
     let slice_size = 640;
 
     // the slices
-    let top_left = SliceFormat { x: 0, y: 0, slice_height: slice_size, slice_width: slice_size };
-        let top_right = SliceFormat { x: slice_size, y: 0, slice_height: slice_size, slice_width: slice_size };
-        let bottom_left = SliceFormat { x: 0, y: slice_size, slice_height: slice_size, slice_width: slice_size };
-        let bottom_right = SliceFormat { x: slice_size, y: slice_size, slice_height: slice_size, slice_width: slice_size };
+    let top_left = SliceFormat {
+        x: 0,
+        y: 0,
+        slice_height: slice_size,
+        slice_width: slice_size,
+    };
+    let top_right = SliceFormat {
+        x: slice_size,
+        y: 0,
+        slice_height: slice_size,
+        slice_width: slice_size,
+    };
+    let bottom_left = SliceFormat {
+        x: 0,
+        y: slice_size,
+        slice_height: slice_size,
+        slice_width: slice_size,
+    };
+    let bottom_right = SliceFormat {
+        x: slice_size,
+        y: slice_size,
+        slice_height: slice_size,
+        slice_width: slice_size,
+    };
 
     let result_arr = js_sys::Array::new();
 
