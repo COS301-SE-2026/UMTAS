@@ -1,4 +1,6 @@
+/// <reference lib="webworker" />
 import {
+  DETECT_DATA_MESSAGE,
   DETECT_MESSAGE,
   PIXEL_PAYLOAD,
 } from "../../../../utilities/VisionModel/messageTypes";
@@ -74,6 +76,20 @@ self.onmessage = async (event: MessageEvent) => {
 
     try {
       const results = await runModel(slices, payload);
+
+      const transferBuffers = results.map(
+        (tensorData) => (tensorData as Float32Array).buffer,
+      );
+
+      self.postMessage(
+        {
+          eventType: "DETECT_DATA",
+          payload: {
+            results: results,
+          },
+        } as DETECT_DATA_MESSAGE,
+        transferBuffers,
+      );
     } catch (err) {
       console.error(err);
     }

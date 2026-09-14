@@ -20,3 +20,9 @@ export type PIXEL_PAYLOAD = {
 };
 
 export type DETECT_MESSAGE = VisionModelEvent<PIXEL_PAYLOAD>;
+
+export type DETECT_DATA_PAYLOAD = {
+  results: Float32Array[];
+};
+
+export type DETECT_DATA_MESSAGE = VisionModelEvent<DETECT_DATA_PAYLOAD>;
