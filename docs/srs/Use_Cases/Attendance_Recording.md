@@ -16,7 +16,7 @@
 
     ??? warning "**Traceability Matrix**"
         <div align="center">
-        ![](./Traceability_Matrix/FR3_3.svg)
+        ![](./Traceability_Matrix/FR3_2.svg)
         </div>
 
     ---  

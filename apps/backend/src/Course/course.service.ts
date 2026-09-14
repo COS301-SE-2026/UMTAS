@@ -6,10 +6,10 @@ import {
   forwardRef,
   Inject,
 } from '@nestjs/common';
-import { eq, and, SQL, ilike } from 'drizzle-orm';
+import { eq, and, SQL, ilike, ne, inArray } from 'drizzle-orm';
 
 import { AppDatabase, DatabaseService } from '../db/database.service';
-import { Course } from '../entities';
+import { Course, GroupModules, ModuleGrouping, modules } from '../entities';
 import {
   CourseDto,
   CreateCourseDto,
@@ -207,6 +207,68 @@ export class CourseService {
       .delete(Course)
       .where(eq(Course.CourseID, courseId))
       .returning();
+
+    if (course?.GroupID) {
+      //OLD
+      const partnerCourses = await db
+        .select({ CourseID: Course.CourseID })
+        .from(Course)
+        .where(
+          and(
+            eq(Course.GroupID, course.GroupID),
+            ne(Course.CourseID, course.CourseID),
+          ),
+        );
+
+      // Only delete the group's modules if no other course uses the group
+      if (partnerCourses.length === 0) {
+        const groupModules = await this.groupingService.getById(
+          course.GroupID,
+          db,
+        );
+
+        const moduleIds = groupModules.modules;
+
+        //Delete the moduleGrouping and groupModules entries that wont be used anymore
+        await db
+          .delete(ModuleGrouping)
+          .where(eq(ModuleGrouping.GroupID, course.GroupID));
+
+        if (moduleIds && moduleIds.length > 0) {
+          //There are modules that need to be deleted
+
+          //Modules that belong to other groups
+          const modulesOwnedByOtherGroups = await db
+            .select({
+              ModuleID: GroupModules.ModuleID,
+            })
+            .from(GroupModules)
+            .where(
+              and(
+                inArray(GroupModules.ModuleID, moduleIds),
+                ne(GroupModules.GroupID, course.GroupID),
+              ),
+            );
+
+          // Get IDs of modules owned by other groups
+          const ownedByOtherGroupIds = modulesOwnedByOtherGroups.map(
+            (m) => m.ModuleID,
+          );
+
+          // Filter out modules that belong to groups
+          const modulesToDelete = moduleIds.filter(
+            (id) => !ownedByOtherGroupIds.includes(id),
+          );
+
+          // Delete only the modules that do NOT belong to other groups
+          if (modulesToDelete.length > 0) {
+            await db
+              .delete(modules)
+              .where(inArray(modules.moduleID, modulesToDelete));
+          }
+        }
+      }
+    }
 
     return {
       success: !!course,

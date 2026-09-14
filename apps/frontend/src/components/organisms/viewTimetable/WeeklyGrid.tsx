@@ -210,7 +210,11 @@ export function WeeklyGrid({ events, weekStart }: WeeklyGridProps) {
                 className="absolute left-0 right-0 p-0.5 z-20"
                 style={{ top, height }}
               >
-                <EventBlock event={event} date={isoDateStr(date)} />
+                <EventBlock
+                  event={event}
+                  date={isoDateStr(date)}
+                  compact={span <= 1}
+                />
               </div>
             );
           })}

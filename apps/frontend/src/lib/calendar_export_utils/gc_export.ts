@@ -6,7 +6,7 @@ import { GoogleApiError, GoogleAuthError, requestGoogle } from "./google_http";
 import { assertCalendarPayload } from "./validation";
 
 const BASE32_HEX = "0123456789abcdefghijklmnopqrstuv";
-const CONCURRENCY = 5;
+const CONCURRENCY = 2;
 const MAX_EVENT_LIST_PAGES = 20;
 const TEXT_ENCODER = new TextEncoder();
 
@@ -348,6 +348,29 @@ export async function syncToGoogleCalendar(
   await Promise.all(
     Array.from({ length: Math.min(CONCURRENCY, mappedEvents.length) }, worker),
   );
+
+  // Give transient quota failures one final, serial attempt after the worker
+  // burst has drained and the shared Google request pacer has slowed down.
+  for (const failure of [...result.failed]) {
+    if (failure.status !== 403 && failure.status !== 429) continue;
+    const index = sourceKeys.indexOf(failure.key);
+    if (index < 0) continue;
+
+    try {
+      await syncOne(mappedEvents[index]);
+      result.failed.splice(result.failed.indexOf(failure), 1);
+    } catch (error) {
+      if (
+        opts.signal?.aborted ||
+        (error instanceof DOMException && error.name === "AbortError") ||
+        error instanceof GoogleAuthError
+      ) {
+        throw error;
+      }
+      failure.status = error instanceof GoogleApiError ? error.status : 0;
+      failure.message = error instanceof Error ? error.message : String(error);
+    }
+  }
 
   if (opts.reconcile) {
     const desiredIds = new Set(mappedEvents.map((event) => event.id));

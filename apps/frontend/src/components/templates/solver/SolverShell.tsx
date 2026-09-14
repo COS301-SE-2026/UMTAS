@@ -50,7 +50,7 @@ export default function SolverShell() {
   const [moduleGroupingID, setModuleGroupingID] = useState<string | null>(null);
   const { university, isLoading: isUniversityLoading } = useUniversityState();
 
-  const { data: modulesData } = useQuery({
+  const { data: modulesData = [] } = useQuery({
     queryKey: ["PDF", "MODULES"],
     queryFn: async () => {
       return (
@@ -116,10 +116,12 @@ export default function SolverShell() {
           className="flex w-120 h-110 justify-center"
         >
           <SolverLock locked={currentStep < 1} loading={comingFromStep === 0}>
-            <SolverReview
-              modules={modulesData as ModuleResponseDto[]}
-              onComplete={() => handleStepCompleted(1)}
-            />
+            {modulesData != undefined && modulesData?.length != 0 && (
+              <SolverReview
+                modules={modulesData as ModuleResponseDto[]}
+                onComplete={() => handleStepCompleted(1)}
+              />
+            )}
           </SolverLock>
         </div>
         <div className="flex w-120 h-110 justify-center">

@@ -1,0 +1,10 @@
+coverage:
+  status:
+    project:
+      default:
+        flags:
+          - unit
+    patch:
+      default:
+        flags:
+          - unit

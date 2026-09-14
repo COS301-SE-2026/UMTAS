@@ -54,7 +54,7 @@ services:
       retries: 5
 
   minio:
-    image: minio/minio:RELEASE.2023-10-25T06-33-25Z
+    image: quay.io/minio/minio:RELEASE.2023-10-25T06-33-25Z
     restart: unless-stopped
     networks:
       - gateway
@@ -73,6 +73,34 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  minio-init:
+    image: quay.io/minio/minio:RELEASE.2023-10-25T06-33-25Z
+    networks:
+      - internal
+    depends_on:
+      minio:
+        condition: service_healthy
+    environment:
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      MINIO_BUCKET: ${MINIO_BUCKET:-umtas-uploads}
+    volumes:
+      - ./apps/pdf_parser/up_test_pdfs/LECTURES_S1.pdf:/seed/LECTURES_S1.pdf:ro
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -eu
+        /opt/bin/mc alias set local "$${MINIO_ENDPOINT}" "$${MINIO_ROOT_USER}" "$${MINIO_ROOT_PASSWORD}"
+        /opt/bin/mc mb --ignore-existing "local/$${MINIO_BUCKET}"
+        /opt/bin/mc cp --quiet /seed/LECTURES_S1.pdf "local/$${MINIO_BUCKET}/demo/pdf-parser/up/LECTURES_S1.pdf"
+    profiles:
+      - dev-docker
+      - dev-infra
+      - dev-pglite
+      - server
+
   mailhog:
     image: mailhog/mailhog:v1.0.1
     networks:
@@ -155,6 +183,11 @@ services:
     networks:
       - gateway
       - internal
+    depends_on:
+      minio:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
     environment:
       - PORT=${BACKEND_PORT}
       - NODE_ENV=production

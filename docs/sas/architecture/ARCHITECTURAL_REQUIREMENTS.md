@@ -14,8 +14,8 @@
 | **AR-8** | Solver engines shall remain independently selectable. | Requests select CP-SAT, genetic search, or automatic CP-SAT-first fallback. |
 | **AR-9** | Imported academic data shall preserve a validation state. | Parser-created modules and events are stored with `validated` set to false. |
 | **AR-10** | Long-running components shall scale independently. | Core, parser-worker, and solver-worker containers have separate runtime and concurrency controls. |
-| **AR-11** | University analytics shall expose aggregate information without disclosing or permitting reconstruction of individual student schedules. | Authentication and role boundaries exist. The analytics aggregation boundary, identifier dissociation, and privacy audit evidence are not yet implemented. |
-| **AR-12** | A reusable synthetic workload shall exercise the system at the client's 20,000-user target. | Asynchronous job processing provides a scaling boundary, but the simulation workload and successful production-scale test are not yet implemented. |
+| **AR-11** | University analytics shall expose aggregate information without disclosing or permitting reconstruction of individual student schedules. | Authentication and role boundaries are enforced. Analytics aggregate data using student UUIDs while excluding personally identifiable student information from the resulting statistics. |
+| **AR-12** | A reusable synthetic workload shall exercise the system at the client's 20,000-user per day target. | Asynchronous job processing provides a scaling boundary, tested with the simulation service. |
 
 ## State Ownership
 

@@ -17,6 +17,11 @@
     ??? tip "**Use Case Diagram**"
         ![](../../diagrams/requirements/Tyto_Simulation.svg)
 
+    ??? warning "**Traceability Matrix**"
+        <div align="center">
+        ![](./Traceability_Matrix/FR5.svg)
+        </div>
+
     ---
     ??? "UC-TY-01: Launch Simulation Batch"
         <a id="uc-ty-01"></a>
@@ -35,6 +40,7 @@
         | **Basic Flow** | 1. Administrator supplies the target adapter and population size to the runner script.<br>2. System launches the simulation as a Docker container with the given configuration.<br>3. System exposes live metrics ports for the running container.<br>4. Simulation batch executes until completion or manual stop. |
         | **Alternate Flow** | **A1: Adapter configuration missing**<br>System halts execution and logs an error that the specified adapter files were not found.<br><br>**A2: Container fails to start**<br>System reports the Docker startup failure and aborts the run. |
         | **Postcondition** | Simulation container is running with live metrics exposed. |
+        | **Requirements Covered** | R5.1 \| R5.1.1 \| R5.1.2 |
 
     ---
     ??? "UC-TY-02: Generate Synthetic Population"
@@ -54,6 +60,7 @@
         | **Basic Flow** | 1. System reads the declarative YAML schema defining the population's fields.<br>2. System generates profile values using Faker, sampling domain-specific fields from external CSV files where defined.<br>3. System exports the generated population to a structured JSON file for use by the simulation. |
         | **Alternate Flow** | **A1: Schema invalid or missing**<br>System halts generation and logs a schema error.<br><br>**A2: CSV sample file missing**<br>System halts generation and logs which domain CSV file could not be found. |
         | **Postcondition** | A structured JSON file of synthetic student profiles is available for the simulation run. |
+        | **Requirements Covered** | R5.2 \| R5.2.1 \| R5.2.2 \| R5.2.3 |
 
     ---
     ??? "UC-TY-03: View Simulation Analytics"
@@ -73,6 +80,7 @@
         | **Basic Flow** | 1. Administrator navigates to the live web UI, or triggers parsing of the raw CSV metrics.<br>2. System parses the CSV data into a single timestamped JSON report.<br>3. System aggregates and displays overall requests, RPS, and failure counts, plus per-endpoint latency (min, max, avg, median, p95, p99).<br>4. System removes the temporary CSV files once the report is produced.<br>5. Administrator reviews the results to identify bottlenecks or confirm the system withstood the applied load. |
         | **Alternate Flow** | **A1: No simulation data available**<br>System displays an idle state or an empty report directory.<br><br>**A2: Cleanup failed**<br>Report is generated successfully but temporary CSV files are not removed; administrator is notified residual files remain. |
         | **Postcondition** | A timestamped JSON report with aggregated performance metrics is available for review. |
+        | **Requirements Covered** | R5.3 \| R5.3.1 \| R5.3.2 \| R5.3.3 |
 
     ---
     ??? "UC-TY-04: Bootstrap Adapter from OpenAPI Spec"
@@ -92,6 +100,7 @@
         | **Basic Flow** | 1. Administrator provides the OpenAPI specification file to the scaffolding tool.<br>2. System parses the specification to discover available API methods.<br>3. System generates endpoint configuration files, synthetic data schemas, and executable Python simulation scripts mapped to each discovered method.<br>4. System places the generated adapter alongside existing adapters, ready for use in a simulation batch. |
         | **Alternate Flow** | **A1: Specification invalid**<br>System halts scaffolding and logs the parsing error.<br><br>**A2: Unsupported method type discovered**<br>System skips the unsupported method, logs a warning, and continues scaffolding the remaining methods. |
         | **Postcondition** | A new adapter is available for use in simulation batches. |
+        | **Requirements Covered** | R5.4 \| R5.4.1 \| R5.4.2 |
 
     ---
     ??? "UC-TY-05: Simulate UMTAS User Behaviours"
@@ -111,3 +120,4 @@
         | **Basic Flow** | 1. System simulates mock account creation, secure login, and session token management for each user.<br>2. System simulates uploading timetable PDF files, polling for parser job status, and retrieving results.<br>3. System simulates users browsing their enrolled Modules, available Events, and existing timetables.<br>4. System simulates submitting custom scheduling jobs to the solver and polling for execution status. |
         | **Alternate Flow** | **A1: Authentication failure**<br>Simulated users fail to retrieve valid bearer tokens; the engine logs the failure and halts further spawning to prevent spamming.<br><br>**A2: Core API overload**<br>The target API drops requests; the engine records the endpoint failure rate and continues or gracefully stops based on configuration. |
         | **Postcondition** | Simulated users have exercised the full range of UMTAS domain behaviours, with results captured for reporting. |
+        | **Requirements Covered** | R5.5 \| R5.5.1 \| R5.5.2 \| R5.5.3 \| R5.5.4 |

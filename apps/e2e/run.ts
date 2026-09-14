@@ -26,7 +26,7 @@ async function main(): Promise<void> {
     await prepareOutputDirectories();
     const exitCode = await compose([
       "up",
-      "--build",
+      ...(hasPrebuiltSharedImages() ? [] : ["--build"]),
       "--abort-on-container-exit",
       "--exit-code-from",
       "test-runner",
@@ -46,6 +46,14 @@ async function main(): Promise<void> {
   }
 
   if (failure) throw failure;
+}
+
+function hasPrebuiltSharedImages(): boolean {
+  return Boolean(
+    process.env.CI_BACKEND_IMAGE &&
+    process.env.CI_PDF_PARSER_IMAGE &&
+    process.env.CI_SOLVER_IMAGE,
+  );
 }
 
 async function prepareOutputDirectories(): Promise<void> {

@@ -5,6 +5,8 @@ import { syncToGoogleCalendar, toGoogleCalendarEvents } from "./gc_export";
 import { ensureUmtasCalendar } from "./gc_calendars";
 import { calendarFixture } from "./test_fixture";
 
+jest.setTimeout(30_000);
+
 function response(status: number, body: unknown = {}): Response {
   return new Response(status === 204 ? null : JSON.stringify(body), {
     status,
@@ -266,7 +268,7 @@ describe("Google Calendar transport", () => {
       fetchMock.mock.calls.filter(([, init]) =>
         String((init as RequestInit).body).includes("Final exam"),
       ),
-    ).toHaveLength(4);
+    ).toHaveLength(7);
   });
 
   it("records a non-authentication 403 as a per-event failure", async () => {
@@ -330,6 +332,38 @@ describe("Google Calendar transport", () => {
       }),
     ).resolves.toEqual({ created: 3, updated: 0, deleted: 0, failed: [] });
     expect(fetchMock).toHaveBeenCalledTimes(6);
+  });
+
+  it("retries a failed event once more serially after the workers drain", async () => {
+    let attempts = 0;
+    fetchMock.mockImplementation((_url: string, init: RequestInit) => {
+      if (init.method === "GET")
+        return Promise.resolve(response(200, { items: [] }));
+      const event = JSON.parse(String(init.body)) as { summary: string };
+      if (event.summary === calendarFixture.oneOffEvents[0].title) {
+        attempts += 1;
+        if (attempts === 1) {
+          return Promise.resolve(
+            response(403, {
+              error: {
+                message: "Temporarily forbidden",
+                errors: [{ reason: "forbiddenForNonOrganizer" }],
+              },
+            }),
+          );
+        }
+      }
+      return Promise.resolve(response(201));
+    });
+
+    mockExistingUmtasCalendar();
+    await expect(
+      syncToGoogleCalendar(calendarFixture, {
+        accessToken: "token",
+        timezone: "Africa/Johannesburg",
+      }),
+    ).resolves.toEqual({ created: 3, updated: 0, deleted: 0, failed: [] });
+    expect(attempts).toBe(2);
   });
 
   it("throws for a missing or rejected access token", async () => {

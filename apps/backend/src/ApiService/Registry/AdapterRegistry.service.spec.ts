@@ -47,14 +47,52 @@ describe('AdapterRegistryService', () => {
       ).toThrow(BadRequestException);
     });
 
-    //UnHappy - should throw NotFoundException
+    //UnHappy - should throw bRE
     it('should throw if university does not have ApiIdentifier - they dont want api integration', async () => {
       expect(() =>
         service.register({
           ...uni,
           ApiIdentifier: undefined,
         }),
-      ).toThrow(NotFoundException);
+      ).toThrow(BadRequestException);
+    });
+
+    //UnHappy - should throw bRE
+    it('should throw if university does not have ApiIdentifier - they dont want api integration', async () => {
+      expect(() =>
+        service.register({
+          ...uni,
+          BaseApiUrl: undefined,
+        }),
+      ).toThrow(BadRequestException);
+    });
+
+    it('should throw if the university adapter does not exist', async () => {
+      expect(() =>
+        service.register({
+          ...uni,
+          ApiIdentifier: 'UNKNOWN',
+          BaseApiUrl: 'testUrl',
+        }),
+      ).toThrow(
+        new NotFoundException(
+          `Adapter does not exist for ${JSON.stringify({
+            ...uni,
+            ApiIdentifier: 'UNKNOWN',
+            BaseApiUrl: 'testUrl',
+          })}`,
+        ),
+      );
+    });
+
+    it('should throw if university has no baseUrl', async () => {
+      expect(() =>
+        service.register({
+          ...uni,
+          ApiIdentifier: 'ML',
+          BaseApiUrl: undefined,
+        }),
+      ).toThrow(`BaseUrl does not exist for uni[${uni.UniversityName}]`);
     });
   }); //END_Test_Register
 
@@ -67,6 +105,7 @@ describe('AdapterRegistryService', () => {
       const adapter = service.getAdapter({
         ...uni,
         ApiIdentifier: 'ML',
+        BaseApiUrl: 'testUrl',
       });
 
       //Assert
@@ -83,6 +122,7 @@ describe('AdapterRegistryService', () => {
       const adapter = service.getAdapter({
         ...uni,
         ApiIdentifier: 'ML',
+        BaseApiUrl: 'testUrl',
       });
 
       //Assert
@@ -96,6 +136,7 @@ describe('AdapterRegistryService', () => {
       const mlUni: UniversityDto = {
         ...uni,
         ApiIdentifier: 'ML',
+        BaseApiUrl: 'testUrl',
       };
 
       const spy = jest.spyOn(service, 'register');

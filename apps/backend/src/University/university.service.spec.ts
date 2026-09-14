@@ -66,15 +66,18 @@ describe('UniversityService', () => {
   //TESTS
 
   describe('Test_createUniversity', () => {
-    it('if duplicate name,should throw exception', async () => {
+    const expectedResult = createUniversity();
+
+    it('if duplicate name,should return early without insert', async () => {
       mockTransaction(mockDb, {
-        select: [[{ UniversityName: trimName }]], // Duplicate found
+        select: [[expectedResult]], // Duplicate found
       });
 
-      //Act + Assert
-      await expect(service.create(dto)).rejects.toThrow(
-        new ConflictException(`University [${trimName}] already exists`),
-      );
+      //Act
+      const result = await service.create(dto);
+
+      //Assert
+      expect(result).toMatchObject(expectedResult);
       expect(mockDb.insert).not.toHaveBeenCalled();
     });
 
@@ -146,6 +149,10 @@ describe('UniversityService', () => {
   }); //END_Test_getById
 
   describe('Test_UpdateUniversity', () => {
+    const expectedResult = createUniversity({
+      UniversityName: 'UPDATED',
+    });
+
     //UnHappy
     it('should return early if nothing to update', async () => {
       //Arrange
@@ -190,7 +197,7 @@ describe('UniversityService', () => {
       });
       jest
         .spyOn(service, 'checkDuplicateUniversityName')
-        .mockResolvedValue(true);
+        .mockResolvedValue(expectedResult);
 
       //Act + Assert
       await expect(
@@ -209,7 +216,7 @@ describe('UniversityService', () => {
       });
       jest
         .spyOn(service, 'checkDuplicateUniversityName')
-        .mockResolvedValue(false);
+        .mockResolvedValue(null);
 
       mockTransaction(mockDb, {
         update: [[]], //update failed
@@ -233,7 +240,8 @@ describe('UniversityService', () => {
       });
       jest
         .spyOn(service, 'checkDuplicateUniversityName')
-        .mockResolvedValue(false);
+        .mockResolvedValue(null);
+
       const newUni = { UniversityID: uniId, UniversityName: 'nuwe naam' };
 
       mockTransaction(mockDb, {
@@ -243,6 +251,9 @@ describe('UniversityService', () => {
       //Act
       const result = await service.update(uniId, {
         UniversityName: 'nuwe naam',
+        ApiIdentifier: 'NEW',
+        BaseApiUrl: 'TestUrl',
+        ApiKey: 'TestKey',
       });
 
       //Assert
@@ -333,6 +344,33 @@ describe('UniversityService', () => {
         NotFoundException,
       );
       expect(spioen).toHaveBeenCalled();
+    });
+
+    //Unhappy - role insert failed
+    it('should throw if role insert failed', async () => {
+      //Arrange
+      const spioen = jest.spyOn(service, 'getById');
+      const myRoleVariable = undefined;
+      const dto: ApplyForUniRoleDto = {
+        UniversityID: uniId,
+        role: myRoleVariable,
+      };
+      mockTransaction(mockDb, {
+        select: [
+          [mockUniResponse], //getById
+          [], //select(UniversityRole) - no previouse role
+        ],
+        insert: [[]], //Insert failed
+      });
+
+      //Act + Assert
+      await expect(service.applyForUniRole(userId, dto)).rejects.toThrow(
+        InternalServerErrorException,
+      );
+      expect(spioen).toHaveBeenCalled();
+      expect(mockDb.select).toHaveBeenCalledTimes(2);
+      expect(mockDb.insert).toHaveBeenCalled();
+      expect(mockDb.update).not.toHaveBeenCalled();
     });
 
     it('should return early if user already has that role (UNI_ADMIN)', async () => {
@@ -467,6 +505,38 @@ describe('UniversityService', () => {
         UniversityID: uniId,
         userId: userId,
         isApproved: true,
+      };
+      const expectedResponse = {
+        UniversityID: uniId,
+        UserID: userId,
+        role: 'LECTURER',
+      };
+
+      mockTransaction(mockDb, {
+        select: [
+          [{ UniversityID: uniId, UserID: userId, role: myRoleVariable }],
+        ],
+        update: [[expectedResponse]],
+      });
+
+      //Act
+      const result = await service.approveUserRole(dto);
+
+      //Assert
+      expect(result).toMatchObject({ userId, success: true });
+      expect(mockDb.select).toHaveBeenCalled();
+      expect(mockDb.update).toHaveBeenCalled();
+    });
+
+    it('should approve user role and return updated role when role is specified', async () => {
+      //Arrange
+      const myRoleVariable =
+        'LECTURER_PENDING' as ApproveUsersRoleDto['provdedRole'];
+      const dto: ApproveUsersRoleDto = {
+        UniversityID: uniId,
+        userId: userId,
+        isApproved: true,
+        provdedRole: 'STUDENT',
       };
       const expectedResponse = {
         UniversityID: uniId,

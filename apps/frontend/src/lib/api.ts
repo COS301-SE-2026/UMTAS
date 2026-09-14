@@ -64,6 +64,26 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/auth/sign-in/guest": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Create and sign in as a University of Pretoria demo guest
+     * @description Create and sign in as a University of Pretoria demo guest. This Auth operation is part of the versioned UMTAS HTTP contract.
+     */
+    post: operations["signInGuest"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/auth/sign-out": {
     parameters: {
       query?: never;
@@ -774,6 +794,46 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/Courses/course-enrollment/{CourseId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /**
+     * Enroll the current user/student into a course
+     * @description Enroll the current user/student into a course. This Courses operation is part of the versioned UMTAS HTTP contract.
+     */
+    patch: operations["enrollStudentToCourse"];
+    trace?: never;
+  };
+  "/api/Courses/course-unenrollment/{CourseId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /**
+     * Enenroll the current user/student from a course
+     * @description Enenroll the current user/student from a course. This Courses operation is part of the versioned UMTAS HTTP contract.
+     */
+    delete: operations["UnenrollStudentFromCourse"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/universities": {
     parameters: {
       query?: never;
@@ -1296,6 +1356,26 @@ export interface paths {
      * @description Create a new event, to module specified or personal module
      */
     post: operations["BuilderController_createEvent"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/pdf-parser/demo-pdf": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Download the configured University of Pretoria demo timetable PDF
+     * @description Download the configured University of Pretoria demo timetable PDF. This PDF Parser operation is part of the versioned UMTAS HTTP contract.
+     */
+    get: operations["getDemoPdf"];
+    put?: never;
+    post?: never;
     delete?: never;
     options?: never;
     head?: never;
@@ -2774,6 +2854,11 @@ export interface components {
        * @example 12345
        */
       ExternalID?: string | null;
+      /**
+       * @description true if the user is enrolled in this course false if not
+       * @example false
+       */
+      isEnrolled?: boolean;
     };
     CourseFilters: {
       /**
@@ -2829,6 +2914,11 @@ export interface components {
        * @example 12345
        */
       ExternalID?: string | null;
+      /**
+       * @description true if the user is enrolled in this course false if not
+       * @example false
+       */
+      isEnrolled?: boolean;
     };
     CourseListResponseDto: {
       /** @description List of courses */
@@ -2875,6 +2965,11 @@ export interface components {
        * @example 12345
        */
       ExternalID?: string | null;
+      /**
+       * @description true if the user is enrolled in this course false if not
+       * @example false
+       */
+      isEnrolled?: boolean;
     };
     DeleteCourseResponseDto: {
       /**
@@ -2894,6 +2989,45 @@ export interface components {
     };
     CourseModuleStatsResponseDto: {
       data: components["schemas"]["CourseModuleStatsDto"][];
+    };
+    EnrollStudentToCourseResponseDto: {
+      /**
+       * Format: uuid
+       * @description Unique identifier of the enrolled student
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      UserID: string;
+      /**
+       * Format: uuid
+       * @description Unique identifier of the course the student enrolled in
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      CourseID: string;
+      /**
+       * Format: date-time
+       * @description Timestamp when the student enrolled in the course (UTC, ISO 8601)
+       * @example 2026-09-11T14:32:07.000Z
+       */
+      EnrolledAt: string;
+    };
+    UnenrollStudentFromCourseResponseDto: {
+      /**
+       * Format: uuid
+       * @description Unique identifier of the enrolled student
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      UserID: string;
+      /**
+       * Format: uuid
+       * @description Unique identifier of the course the student enrolled in
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      CourseID: string;
+      /**
+       * @description Message indicating success of unenrollment
+       * @example Succesfully unenrolled student from course
+       */
+      message?: string;
     };
     CreateUniversityDto: {
       /**
@@ -4705,6 +4839,52 @@ export interface operations {
       500: components["responses"]["InternalError"];
     };
   };
+  signInGuest: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": Record<string, never>;
+      };
+    };
+    responses: {
+      /** @description Guest created and signed in. Sets the normal Better Auth session cookie and the University of Pretoria selection cookie. */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AuthEnvelopeDto"];
+        };
+      };
+      /** @description The guest request contains fields. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description An authenticated session already exists and was not replaced. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      500: components["responses"]["InternalError"];
+      /** @description The University of Pretoria is unavailable. */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   signOut: {
     parameters: {
       query?: never;
@@ -6309,6 +6489,101 @@ export interface operations {
       500: components["responses"]["InternalError"];
     };
   };
+  enrollStudentToCourse: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        CourseId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Student successfully enrolled into course */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["EnrollStudentToCourseResponseDto"];
+        };
+      };
+      /** @description Invalid Course ID */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      /** @description Course not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      409: components["responses"]["ConflictError"];
+      /** @description Failed to enroll student to course. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": unknown;
+        };
+      };
+    };
+  };
+  UnenrollStudentFromCourse: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        CourseId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Student successfully unenrolled from course */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["UnenrollStudentFromCourseResponseDto"];
+        };
+      };
+      /** @description Invalid Course ID */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      /** @description Course not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Failed to unenroll student from course. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": unknown;
+        };
+      };
+    };
+  };
   getUniversities: {
     parameters: {
       query?: never;
@@ -7725,6 +8000,30 @@ export interface operations {
         content?: never;
       };
       409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  getDemoPdf: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The configured demo PDF is returned as an attachment. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/pdf": string;
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
       500: components["responses"]["InternalError"];
     };
   };
