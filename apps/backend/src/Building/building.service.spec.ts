@@ -386,6 +386,31 @@ describe('BuildingService', () => {
     });
   }); //END_Test_update
 
+  //Delete
+  describe('Test_delete', () => {
+    it('should throw InternalServerErrorException when delete returns no row', async () => {
+      //Arrange
+      mockDbResult(mockDb.delete, []);
+
+      //Act + Assert
+      await expect(service.delete('building-1')).rejects.toThrow(
+        InternalServerErrorException,
+      );
+    });
+
+    it('should return deleted building', async () => {
+      //Arrange
+      const building = createBuilding();
+      mockDbResult(mockDb.delete, [building]);
+
+      //Act
+      const result = await service.delete(building.BuildingID);
+
+      //Assert
+      expect(result).toEqual({ building });
+    });
+  });
+
   //Helpers
   describe('Test_validateCreateBuildingInput', () => {
     const input: CreateBuildingInput = {

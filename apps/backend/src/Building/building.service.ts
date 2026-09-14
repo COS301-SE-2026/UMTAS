@@ -202,60 +202,29 @@ export class BuildingService {
       throw new InternalServerErrorException(`Failed to update building`);
     }
 
-    return { building, venues: [] };
+    return { building };
   } //END_update
 
-  // async updateBuildingLocation(
-  //   session: SessionData,
-  //   buildingID: string,
-  //   updateBuildingLocationDto: UpdateBuildingLocationDto,
-  // ): Promise<BuildingSingleResponseDto> {
-  //   const database = this.dbService.db;
-
-  //   const [existingBuilding] = await database
-  //     .select()
-  //     .from(Building)
-  //     .where(
-  //       and(
-  //         eq(Building.BuildingID, buildingID),
-  //         eq(Building.UniversityID, universityId),
-  //       ),
-  //     )
-  //     .limit(1);
-
-  //   if (!existingBuilding) {
-  //     throw new NotFoundException('Building could not be found');
-  //   }
-
-  //   //everything is optional
-  //   const updateValues: Partial<typeof Building.$inferInsert> = {};
-
-  //   //only update what was sent
-  //   if (updateBuildingLocationDto.location != undefined) {
-  //     updateValues.Latitude = updateBuildingLocationDto.location?.lat ?? null;
-  //     updateValues.Longitude = updateBuildingLocationDto.location?.lng ?? null;
-  //   }
-
-  //   //only update what was sent
-  //   if (updateBuildingLocationDto.footprint != undefined) {
-  //     updateValues.Footprint = updateBuildingLocationDto.footprint;
-  //   }
-
-  //   const [row] = await database
-  //     .update(Building)
-  //     .set(updateValues)
-  //     .where(eq(Building.BuildingID, buildingID))
-  //     .returning();
-
-  //   const [{ venueCount }] = await database
-  //     .select({ venueCount: count(Venue.VenueID) })
-  //     .from(Venue)
-  //     .where(eq(Venue.BuildingID, buildingID));
-
-  //   return { building: this.buildingDtoAdapter(row, venueCount) };
-  // }//END_updateBuilding
-
   //Delete
+  async delete(
+    buildingId: string,
+    tx?: AppDatabase,
+  ): Promise<BuildingSingleResponseDto> {
+    const db = tx ?? this.dbService.db;
+
+    //Delete building
+    const [building] = await db
+      .delete(Building)
+      .where(eq(Building.BuildingID, buildingId))
+      .returning();
+
+    if (!building) {
+      this.OOPSIE.fatal(`Failed to delete building[${buildingId}]`);
+      throw new InternalServerErrorException(`Failed to delete building`);
+    }
+
+    return { building };
+  } //END_delete
 
   // 🎅's little helpers
   private async validateCreateBuildingInput(
