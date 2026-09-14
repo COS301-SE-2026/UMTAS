@@ -50,37 +50,6 @@ export class BuildingService {
     return { building: this.buildingDtoAdapter(building, 0) };
   } //END_getById
 
-  private requireUniId(session: SessionData | undefined): string {
-    if (!session?.user) {
-      throw new ForbiddenException('No active session');
-    }
-
-    if (!session?.uniId) {
-      throw new ForbiddenException('No university selected');
-    }
-
-    return session?.uniId;
-  }
-
-  private buildingDtoAdapter(
-    row: BuildingEntity,
-    venueCount: number,
-  ): BuildingDto {
-    const buildingHasLocation = row.Latitude != null && row.Longitude != null;
-
-    return {
-      buildingId: row.BuildingID,
-      buildingName: row.BuildingName,
-      location: buildingHasLocation
-        ? { lat: row.Latitude as number, lng: row.Longitude as number }
-        : null,
-      footprint: row.Footprint ?? null,
-      icon: row.Icon,
-      displayColour: row.DisplayColour,
-      venueCount,
-    };
-  }
-
   async getAllBuildings(
     session: SessionData,
     query: BuildingQueryDto,
@@ -209,5 +178,37 @@ export class BuildingService {
       .where(eq(Venue.BuildingID, buildingID));
 
     return { building: this.buildingDtoAdapter(row, venueCount) };
+  }
+
+  //helpers
+  private requireUniId(session: SessionData | undefined): string {
+    if (!session?.user) {
+      throw new ForbiddenException('No active session');
+    }
+
+    if (!session?.uniId) {
+      throw new ForbiddenException('No university selected');
+    }
+
+    return session?.uniId;
+  }
+
+  private buildingDtoAdapter(
+    row: BuildingEntity,
+    venueCount: number,
+  ): BuildingDto {
+    const buildingHasLocation = row.Latitude != null && row.Longitude != null;
+
+    return {
+      buildingId: row.BuildingID,
+      buildingName: row.BuildingName,
+      location: buildingHasLocation
+        ? { lat: row.Latitude as number, lng: row.Longitude as number }
+        : null,
+      footprint: row.Footprint ?? null,
+      icon: row.Icon,
+      displayColour: row.DisplayColour,
+      venueCount,
+    };
   }
 }

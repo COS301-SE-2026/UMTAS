@@ -5,3 +5,4 @@ export * from './builder.mock';
 export * from './event-import-fingerprint';
 export * from './grouping.mock';
 export * from './event.mock';
+export * from './building.mock';

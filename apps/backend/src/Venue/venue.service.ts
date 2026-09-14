@@ -1,11 +1,13 @@
 import {
   BadRequestException,
+  ConflictException,
   ForbiddenException,
   Injectable,
+  InternalServerErrorException,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { Building, Venue } from '../entities/index';
-import { DatabaseService } from '..//db/database.service';
 import { SessionData } from '../auth/session.decorator';
 import { eq, ilike, isNotNull, isNull, and } from 'drizzle-orm';
 import {
@@ -14,12 +16,66 @@ import {
   VenueMappingListResponseDto,
   VenueQueryDto,
   BulkAssignVenuesDto,
+  CreateVenueInput,
+  VenueSingleResponseDto,
 } from './dto/venue.dto';
 import { inArray } from 'drizzle-orm';
+import { AppDatabase } from 'src/auth/auth';
+import { UniversityService } from 'src/University/university.service';
+import { BuildingService } from 'src/Building/building.service';
+import { DatabaseService } from 'src/db/database.service';
 
 @Injectable()
 export class VenueService {
-  constructor(private readonly databaseService: DatabaseService) {}
+  private readonly OOPSIE = new Logger(this.constructor.name);
+
+  constructor(
+    private readonly dbService: DatabaseService,
+    private readonly uniService: UniversityService,
+    private readonly buildingService: BuildingService,
+  ) {}
+
+  //Create
+  async create(
+    input: CreateVenueInput,
+    tx?: AppDatabase,
+  ): Promise<VenueSingleResponseDto> {
+    if (!tx) {
+      return this.dbService.db.transaction(async (t: AppDatabase) => {
+        return this.create(input, t);
+      }); //END_transaction
+    }
+
+    //Validate input
+    await this.validateCreateInput(input, tx);
+
+    //Create new venue
+    const [newVenue] = await tx
+      .insert(Venue)
+      .values({
+        VenueName: input.VenueName,
+        UniversityID: input.UniversityID,
+        BuildingID: input.BuildingID,
+      })
+      .returning();
+
+    if (!newVenue) {
+      this.OOPSIE.fatal(`Failed to insert new venue[${JSON.stringify(input)}]`);
+      throw new InternalServerErrorException(`Failed to create new venue`);
+    }
+
+    return {
+      venue: newVenue,
+    };
+  } //END_Create
+
+  //GetById
+
+  //GetAll
+
+  //Update
+
+  //Delete
 
   private requireUniId(session: SessionData | undefined): string {
     if (!session?.user) {
@@ -34,7 +90,7 @@ export class VenueService {
   }
 
   private async venueToDto(venueId: string): Promise<VenueMappingDto> {
-    const database = this.databaseService.db;
+    const database = this.dbService.db;
 
     const [row] = await database
       .select({
@@ -55,7 +111,7 @@ export class VenueService {
     query: VenueQueryDto,
   ): Promise<VenueMappingListResponseDto> {
     const universityId = this.requireUniId(session);
-    const database = this.databaseService.db;
+    const database = this.dbService.db;
 
     const filters = [eq(Venue.UniversityID, universityId)];
 
@@ -94,7 +150,7 @@ export class VenueService {
     assignVenueDto: AssignVenueBuildingDto,
   ): Promise<VenueMappingDto> {
     const universityId = this.requireUniId(session);
-    const database = this.databaseService.db;
+    const database = this.dbService.db;
 
     const [venue] = await database
       .select()
@@ -139,7 +195,7 @@ export class VenueService {
     bulkAssignVenueDto: BulkAssignVenuesDto,
   ): Promise<{ updated: number; success: boolean }> {
     const universityId = this.requireUniId(session);
-    const database = this.databaseService.db;
+    const database = this.dbService.db;
 
     const buildingIds = [
       ...new Set(
@@ -159,6 +215,10 @@ export class VenueService {
             eq(Building.UniversityID, universityId),
           ),
         );
+
+      this.OOPSIE.log(
+        `Here: validBuildings[${JSON.stringify(validBuildings)}] | buildingIds[${JSON.stringify(buildingIds)}]`,
+      );
 
       if (validBuildings.length !== buildingIds.length) {
         throw new BadRequestException(
@@ -183,4 +243,63 @@ export class VenueService {
 
     return { updated: bulkAssignVenueDto.assignments.length, success: true };
   }
+
+  //🎅's little helpers
+
+  /**
+   * Validate CreateVenueInput - relationships and duplicates
+   * @param input - CreateVenueInput to validate
+   * @param tx
+   * @throws NotFoundException - for either uni or building
+   * @throw ConflictException - If duplicate venue exists at same university with same venue name
+   */
+  private async validateCreateInput(
+    input: CreateVenueInput,
+    tx: AppDatabase,
+  ): Promise<void> {
+    //Check that university valid - will throw 404
+    await this.uniService.getById(input.UniversityID, tx);
+
+    //If building provided -> validate it exists - will throw 404
+    if (input.BuildingID && input.BuildingID !== null) {
+      await this.buildingService.getById(input.BuildingID, tx);
+    } else {
+      input.BuildingID = null;
+    }
+
+    //Validate venue name is unique per university
+    const existing = await this.uniqueVenueNamePerUniversity(
+      input.VenueName,
+      input.UniversityID,
+      tx,
+    );
+    if (existing) {
+      this.OOPSIE.warn(
+        `Venue with name[${input.VenueName}] already exists for university[${input.UniversityID}]`,
+      );
+      throw new ConflictException(`Venue already exists with that name`);
+    }
+  } //END_validateCreateInput
+
+  /**
+   * Fetches venue from university with same name as venueName
+   * @param venueName - name to search for
+   * @param uniId - university to search with
+   * @param tx
+   * @returns The found duplicate venue | null if none found
+   */
+  private async uniqueVenueNamePerUniversity(
+    venueName: string,
+    uniId: string,
+    tx: AppDatabase,
+  ): Promise<VenueSingleResponseDto | null> {
+    //fetch venue with similar name for university
+    const [venue] = await tx
+      .select()
+      .from(Venue)
+      .where(and(eq(Venue.UniversityID, uniId), eq(Venue.VenueName, venueName)))
+      .limit(1);
+
+    return venue ? { venue } : null;
+  } //END_uniqueVenueNamePerUniversity
 }

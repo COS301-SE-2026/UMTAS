@@ -15,7 +15,7 @@ export const Venue = pgTable(
   'Venue',
   {
     VenueID: uuid('VenueID').primaryKey().defaultRandom(),
-    VenueName: varchar('VenueName', { length: 30 }),
+    VenueName: varchar('VenueName', { length: 30 }).notNull(),
     UniversityID: uuid('UniversityID')
       .references(() => University.UniversityID, { onDelete: 'cascade' })
       .notNull(),

@@ -38,7 +38,6 @@ const config: Config = {
     '!**/Building/**',
     '!**/Map-config/**',
     '!**/Route/**',
-    '!**/Venue/**',
     '!**/entities/**',
     '!**/health/**',
     '!**/mail/**',

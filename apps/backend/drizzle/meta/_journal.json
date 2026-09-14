@@ -15,6 +15,13 @@
       "when": 1789119096276,
       "tag": "0001_COURSE_ENROLLMENT_JOIN_TABLE",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1789376853648,
+      "tag": "0002_VENUE_NAME_MADE_NOT_NULL",
+      "breakpoints": true
     }
   ]
 }
