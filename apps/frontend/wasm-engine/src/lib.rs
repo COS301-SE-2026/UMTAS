@@ -22,7 +22,7 @@ pub fn slice_image_data(
     let target_height = 1280;
 
     let resized_img =
-        image::imageops::resize(&img, target_width, target_height, FilterType::Lanczos3);
+        image::imageops::resize(&img, target_width, target_height, FilterType::Nearest);
 
     let resized_pixels = resized_img.into_raw();
     let resized_width = target_width as usize;

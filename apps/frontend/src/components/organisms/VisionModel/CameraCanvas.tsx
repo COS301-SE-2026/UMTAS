@@ -120,6 +120,7 @@ function CanvasWebcam({ isCameraActive, detectionSettings }: CanvasCamProps) {
           detectionSettings.runDetection &&
           timestamp - lastRunRef.current >= intervalMs
         ) {
+          lastRunRef.current = timestamp;
           const imageData = context?.getImageData(
             0,
             0,
