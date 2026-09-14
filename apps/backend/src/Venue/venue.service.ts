@@ -157,10 +157,36 @@ export class VenueService {
     //Update venue
     const [venue] = await tx.update(Venue).set(updateFields).returning();
 
+    if (!venue) {
+      this.OOPSIE.fatal(
+        `Failed to update venue[${JSON.stringify(oldVenue)}] with fields[${JSON.stringify(updateFields)}]`,
+      );
+      throw new InternalServerErrorException(`Failed to update venue`);
+    }
+
     return { venue };
   } //END_Update
 
   //Delete
+  async delete(
+    venueId: string,
+    tx?: AppDatabase,
+  ): Promise<VenueSingleResponseDto> {
+    const db = tx ?? this.dbService.db;
+
+    //Delete venue
+    const [venue] = await db
+      .delete(Venue)
+      .where(eq(Venue.VenueID, venueId))
+      .returning();
+
+    if (!venue) {
+      this.OOPSIE.fatal(`Failed to delete venue[${venueId}]`);
+      throw new InternalServerErrorException(`Failed to delete venue`);
+    }
+
+    return { venue };
+  } //END_delete
 
   private requireUniId(session: SessionData | undefined): string {
     if (!session?.user) {

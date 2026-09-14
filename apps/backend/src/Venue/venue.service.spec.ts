@@ -460,7 +460,52 @@ describe('VenueService', () => {
       expect(result).toEqual({ venue: updated });
       expect(mockDb.update).toHaveBeenCalledTimes(1);
     });
+
+    it('should throw InternalServerErrorException when update returns no row', async () => {
+      //Arrange
+      const venue = createVenue();
+      mockTransaction(mockDb, {
+        select: [[venue]],
+      });
+      jest
+        .spyOn(service as any, 'validateUpdateInput')
+        .mockResolvedValue({ VenueName: 'New Name' });
+      mockDbResult(mockDb.update, []);
+
+      //Act + Assert
+      await expect(
+        service.update(venue.VenueID, {
+          VenueName: 'New Name',
+          UniversityID: uniId,
+        }),
+      ).rejects.toThrow(InternalServerErrorException);
+    });
   }); //END_Test_update
+
+  //delete
+  describe('Test_delete', () => {
+    it('should throw InternalServerErrorException when delete returns no row', async () => {
+      //Arrange
+      mockDbResult(mockDb.delete, []);
+
+      //Act + Assert
+      await expect(service.delete('venue-1')).rejects.toThrow(
+        InternalServerErrorException,
+      );
+    });
+
+    it('should return deleted venue', async () => {
+      //Arrange
+      const venue = createVenue();
+      mockDbResult(mockDb.delete, [venue]);
+
+      //Act
+      const result = await service.delete(venue.VenueID);
+
+      //Assert
+      expect(result).toEqual({ venue });
+    });
+  }); //END_Test_delete
 
   describe('assignBuilding', () => {
     it('should throw NotFoundException if the venue does not belong to the selected university', async () => {
