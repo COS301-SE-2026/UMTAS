@@ -14,7 +14,7 @@ export default function VM_SessionTemplate() {
   const [detectionSettings, setDetectionSettings] = useState<DetectionSettings>(
     {
       runDetection: false,
-      DetectionInterval: 5,
+      DetectionInterval: 1,
     },
   );
 

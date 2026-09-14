@@ -19,7 +19,6 @@ class DetectionManager {
       this.isProcessing = false;
     }
   }
-
   public run(
     PixelData: Uint8ClampedArray,
     width: number,
@@ -29,14 +28,21 @@ class DetectionManager {
       return Promise.resolve(null);
     }
     this.isProcessing = true;
+    const startTime = performance.now();
 
     return new Promise((resolve) => {
       const handleMessage = (event: MessageEvent) => {
-        const type = event.data.type as MessageType;
+        const type = event.data.eventType as MessageType;
         if (type === "DETECT_DATA") {
           const message = event.data as DETECT_DATA_MESSAGE;
           this.worker?.removeEventListener("message", handleMessage);
           this.isProcessing = false;
+
+          const durationSeconds = (performance.now() - startTime) / 1000;
+          console.log(
+            `Detection pipeline took: ${durationSeconds.toFixed(3)}s`,
+          );
+
           resolve(message.payload.results);
         }
       };
