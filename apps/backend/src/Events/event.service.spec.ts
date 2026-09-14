@@ -18,7 +18,9 @@ import { UniversityService } from '../University/university.service';
 
 //Mocks
 import {
+  createDbChain,
   createMockDatabase,
+  mockDbResult,
   mockSequentialResults,
   mockTransaction,
 } from '../Testing/Mocks/';
@@ -376,6 +378,19 @@ describe('EventService', () => {
 
     //Personal
     describe('Test_createPersonalEvent', () => {
+      it('should throw if personal event relationship insert fails', async () => {
+        const event = createEvent(EventSource.PERSONAL);
+
+        mockTransaction(mockDb, {
+          select: [[]],
+          insert: [[event], []],
+        });
+
+        await expect(
+          service.createPersonalEvent(userId, createCreateEventDto(event)),
+        ).rejects.toThrow(InternalServerErrorException);
+      });
+
       it('should create a personal event', async () => {
         const newEvent = createEvent(EventSource.PERSONAL);
         const personalEvent = createPersonalEvent({
@@ -399,6 +414,28 @@ describe('EventService', () => {
             startTime: expect.any(String),
             endTime: expect.any(String),
           }),
+        });
+      });
+
+      it('should create a personal event through create', async () => {
+        const event = createEvent(EventSource.PERSONAL);
+        const personalEvent = createPersonalEvent({
+          eventID: event.eventID,
+        });
+
+        mockTransaction(mockDb, {
+          select: [[]],
+          insert: [[event], [personalEvent]],
+        });
+
+        const result = await service.create(
+          userId,
+          createCreateEventDto(event),
+        );
+
+        expect(result.event).toMatchObject({
+          eventId: event.eventID,
+          eventCriteria: event.eventCriteria,
         });
       });
     });
@@ -502,6 +539,16 @@ describe('EventService', () => {
 
   //GetById
   describe('Test_GetEventById', () => {
+    it('should throw if event does not exist', async () => {
+      mockTransaction(mockDb, {
+        select: [[]],
+      });
+
+      await expect(service.getById(eventId)).rejects.toThrow(
+        `Event[${eventId}] not found`,
+      );
+    });
+
     it('should return event by eventId', async () => {
       const event = createEvent();
 
@@ -566,6 +613,99 @@ describe('EventService', () => {
       ).rejects.toThrow(
         'Recurring events require dayOfWeek and must not include date',
       );
+    });
+
+    it('should throw if event update fails', async () => {
+      const event = createEvent();
+
+      mockTransaction(mockDb, {
+        select: [[event], []],
+        update: [[]],
+      });
+
+      await expect(
+        service.updateEvent(userId, 'uni_admin', event.eventID, {
+          eventName: 'Updated event',
+        }),
+      ).rejects.toThrow(InternalServerErrorException);
+    });
+
+    it('should throw if no active university is selected when updating venue', async () => {
+      await expect(
+        service.updateEventVenue(
+          {
+            user: {
+              id: userId,
+              role: 'uni_admin',
+            },
+            uniId: undefined,
+          } as any,
+          eventId,
+          {
+            venueName: 'Test Venue',
+          },
+          mockDb,
+        ),
+      ).rejects.toThrow('No active university selected');
+    });
+
+    it('should throw if update event returns no event', async () => {
+      const existingEvent = createEvent();
+
+      jest.spyOn(service, 'getById').mockResolvedValue({
+        event: createEventDto({}, existingEvent.eventCriteria),
+      });
+
+      mockTransaction(mockDb, {
+        update: [[]],
+        select: [[]],
+      });
+
+      await expect(
+        service.updateEvent(userId, 'uni_admin', existingEvent.eventID, {
+          eventName: 'Updated event',
+        }),
+      ).rejects.toThrow(InternalServerErrorException);
+    });
+
+    it('should throw if updated event is missing', async () => {
+      jest.spyOn(service, 'getById').mockResolvedValue({
+        event: undefined as any,
+      });
+
+      mockTransaction(mockDb, {
+        update: [[createEvent()]],
+      });
+
+      await expect(
+        service.updateEvent(userId, 'uni_admin', eventId, {
+          eventName: 'Updated event',
+        }),
+      ).rejects.toThrow(`Event not found for eventId: ${eventId}`);
+    });
+
+    it('should update the university event module relationship', async () => {
+      const existingEvent = createEvent();
+      const updatedEvent = createEvent();
+
+      jest.spyOn(service, 'getById').mockResolvedValue({
+        event: createEventDto({}, existingEvent.eventCriteria),
+      });
+
+      mockTransaction(mockDb, {
+        update: [[updatedEvent], []],
+        select: [[]],
+      });
+
+      await expect(
+        service.updateEvent(userId, 'uni_admin', existingEvent.eventID, {
+          eventCriteria: {
+            moduleId,
+          },
+        }),
+      ).resolves.toBeDefined();
+
+      expect(mockDb.update).toHaveBeenCalledTimes(2);
     });
 
     it('should update all event fields', async () => {
@@ -633,6 +773,14 @@ describe('EventService', () => {
       expect(mockDb.delete).not.toHaveBeenCalled();
     });
 
+    it('should throw if the event does not exist during deletion', async () => {
+      jest.spyOn(service, 'getById').mockResolvedValue(undefined as any);
+
+      await expect(
+        service.deleteEvent(userId, 'uni_admin', eventId, mockDb),
+      ).rejects.toThrow(`Event [${eventId}] doesn't exist`);
+    });
+
     it('should delete event - admin', async () => {
       const event = createEvent();
 
@@ -655,4 +803,333 @@ describe('EventService', () => {
       });
     });
   }); //END_Test_DeleteEvent
+
+  describe('Test_Helpers', () => {
+    it('should check event ownership through a transaction', async () => {
+      mockTransaction(mockDb, {
+        select: [[{ moduleId }]],
+      });
+
+      mockModuleService.moduleOwnershipCheck?.mockResolvedValue(true);
+
+      await expect(
+        (service as any).ownershipCheck(userId, eventId),
+      ).resolves.toBe(true);
+    });
+
+    it('should insert event venues', async () => {
+      mockTransaction(mockDb, {
+        insert: [[]],
+      });
+
+      await (service as any).insertEventVenues(mockDb, eventId, [venueId]);
+
+      expect(mockDb.insert).toHaveBeenCalledTimes(1);
+    });
+
+    it('should return null when duplicate event fingerprint is missing', async () => {
+      await expect(
+        (service as any).duplicateEvent(null, mockDb),
+      ).resolves.toBeNull();
+    });
+
+    it('should return an existing duplicate event', async () => {
+      const event = createEvent();
+
+      mockSequentialResults(mockDb.select, [[event], []]);
+
+      const result = await (service as any).duplicateEvent(
+        'fingerprint',
+        mockDb,
+      );
+
+      expect(result).toMatchObject({
+        eventId: event.eventID,
+      });
+    });
+
+    it('should reject venue update by a student without ownership', async () => {
+      mockTransaction(mockDb, {
+        select: [[{ moduleId }]],
+      });
+
+      mockModuleService.moduleOwnershipCheck?.mockResolvedValue(false);
+
+      await expect(
+        service.updateEventVenue(
+          {
+            user: {
+              id: userId,
+              role: 'student',
+            },
+            uniId,
+          } as any,
+          eventId,
+          {
+            venueName: 'Test Venue',
+          },
+          mockDb,
+        ),
+      ).rejects.toThrow(ForbiddenException);
+    });
+
+    it('should update an existing venue and link it to the event', async () => {
+      const event = createEvent();
+      const mappedEvent = createEventDto({}, event.eventCriteria);
+
+      jest.spyOn(service, 'getById').mockResolvedValue({
+        event: mappedEvent,
+      });
+      jest
+        .spyOn(service as any, 'mapEventToDto')
+        .mockResolvedValue(mappedEvent);
+
+      mockTransaction(mockDb, {
+        select: [[{ id: venueId }], [event]],
+        update: [[]],
+        delete: [[]],
+        insert: [[], []],
+      });
+
+      const result = await service.updateEventVenue(
+        {
+          user: {
+            id: userId,
+            role: 'uni_admin',
+          },
+          uniId,
+        } as any,
+        event.eventID,
+        {
+          venueName: 'Test Venue',
+          buildingId: 'building-1',
+        },
+        mockDb,
+      );
+
+      expect(result.event).toMatchObject(mappedEvent);
+      expect(mockDb.update).toHaveBeenCalledTimes(1);
+    });
+
+    it('should create a venue and link it to the event', async () => {
+      const event = createEvent();
+      const mappedEvent = createEventDto({}, event.eventCriteria);
+
+      jest.spyOn(service, 'getById').mockResolvedValue({
+        event: mappedEvent,
+      });
+      jest
+        .spyOn(service as any, 'mapEventToDto')
+        .mockResolvedValue(mappedEvent);
+
+      mockTransaction(mockDb, {
+        select: [[], [event]],
+        delete: [[]],
+        insert: [[{ VenueID: venueId }], []],
+      });
+
+      const result = await service.updateEventVenue(
+        {
+          user: {
+            id: userId,
+            role: 'uni_admin',
+          },
+          uniId,
+        } as any,
+        event.eventID,
+        {
+          venueName: 'New Venue',
+        },
+        mockDb,
+      );
+
+      expect(result.event).toMatchObject(mappedEvent);
+      expect(mockDb.insert).toHaveBeenCalledTimes(1);
+    });
+
+    it('should reject duplicate venue ids', async () => {
+      await expect(
+        (service as any).validateVenueIds(mockDb, [
+          {
+            venueId,
+            venueName: 'Test Venue',
+          },
+          {
+            venueId,
+            venueName: 'Duplicate Venue',
+          },
+        ]),
+      ).rejects.toThrow('Event venues must not contain duplicates');
+    });
+
+    it('should merge day of week criteria', async () => {
+      const result = (service as any).mergeEventCriteria(
+        {
+          eventSource: EventSource.UNIVERSITY,
+          date: '2026-01-12',
+          startTime: '08:30',
+          endTime: '10:20',
+          moduleId,
+        },
+        {
+          dayOfWeek: 'monday',
+        },
+      );
+
+      expect(result).toMatchObject({
+        dayOfWeek: 'monday',
+        moduleId,
+      });
+      expect(result.date).toBeUndefined();
+    });
+
+    it('should authorize a student through owned parser links', async () => {
+      mockSequentialResults(mockDb.select, [
+        [{ role: 'student' }],
+        [],
+        [{ universityId: uniId }],
+        [],
+        [],
+      ]);
+
+      await expect(
+        (service as any).resolveAuthorizedModuleUniversity(
+          mockDb,
+          userId,
+          moduleId,
+          [uniId],
+          undefined,
+        ),
+      ).resolves.toBe(uniId);
+    });
+
+    it('should reject venues from another university', async () => {
+      (mockDb.select as unknown as jest.Mock).mockReturnValue(
+        createDbChain([]),
+      );
+
+      await expect(
+        (service as any).validateVenueIds(
+          mockDb,
+          [
+            {
+              venueId,
+              venueName: 'Test Venue',
+            },
+          ],
+          uniId,
+        ),
+      ).rejects.toThrow(
+        `One or more venueIds do not belong to the university[${uniId}]`,
+      );
+    });
+
+    it('should enter the transaction when updating an event venue', async () => {
+      mockTransaction(mockDb, {});
+
+      await expect(
+        service.updateEventVenue(
+          {
+            user: {
+              id: userId,
+              role: 'uni_admin',
+            },
+            uniId: undefined,
+          } as any,
+          eventId,
+          {
+            venueName: 'Test Venue',
+          },
+        ),
+      ).rejects.toThrow('No active university selected');
+    });
+
+    it('should throw if the event does not exist when updating venue', async () => {
+      jest.spyOn(service, 'getById').mockResolvedValue({
+        event: undefined as any,
+      });
+
+      await expect(
+        service.updateEventVenue(
+          {
+            user: {
+              id: userId,
+              role: 'uni_admin',
+            },
+            uniId,
+          } as any,
+          eventId,
+          {
+            venueName: 'Test Venue',
+          },
+          mockDb,
+        ),
+      ).rejects.toThrow(`Event not found for event id: ${eventId}`);
+    });
+
+    it('should create a new venue and link it to the event', async () => {
+      const event = createEvent();
+      const mappedEvent = createEventDto({}, event.eventCriteria);
+
+      jest.spyOn(service, 'getById').mockResolvedValue({
+        event: mappedEvent,
+      });
+      jest
+        .spyOn(service as any, 'mapEventToDto')
+        .mockResolvedValue(mappedEvent);
+
+      (mockDb.select as unknown as jest.Mock)
+        .mockReturnValueOnce(createDbChain([]))
+        .mockReturnValueOnce(createDbChain([event]));
+      (mockDb.insert as unknown as jest.Mock).mockReturnValue(
+        createDbChain([
+          {
+            VenueID: venueId,
+            VenueName: 'New Venue',
+            BuildingID: null,
+          },
+        ]),
+      );
+      (mockDb.delete as unknown as jest.Mock).mockReturnValue(
+        createDbChain([]),
+      );
+
+      const result = await service.updateEventVenue(
+        {
+          user: {
+            id: userId,
+            role: 'uni_admin',
+          },
+          uniId,
+        } as any,
+        event.eventID,
+        {
+          venueName: 'New Venue',
+        },
+        mockDb,
+      );
+
+      expect(result.event).toMatchObject(mappedEvent);
+    });
+
+    it('should map event venues to venue DTOs', async () => {
+      mockDbResult(mockDb.select, [
+        {
+          venueId,
+          venueName: 'Test Venue',
+          buildingId: 'building-1',
+        },
+      ]);
+
+      await expect(
+        (service as any).getEventVenues(eventId, mockDb),
+      ).resolves.toEqual([
+        {
+          venueId,
+          venueName: 'Test Venue',
+          buildingId: 'building-1',
+        },
+      ]);
+    });
+  });
 });

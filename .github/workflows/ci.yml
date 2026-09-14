@@ -100,12 +100,22 @@ jobs:
             apps/e2e/test-results
           retention-days: 30
 
-      - name: Upload coverage reports to Codecov
+      - name: Upload unit coverage to Codecov
         uses: codecov/codecov-action@75cd11691c0faa626561e295848008c8a7dddffe
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: apps/backend/coverage/lcov.info,apps/backend/coverage/integration/lcov.info
+          files: apps/backend/coverage/lcov.info
           disable_search: true
+          flags: unit
+
+      #When Integration tests actually contribut to coverage
+      # - name: Upload integration coverage to Codecov
+      #   uses: codecov/codecov-action@75cd11691c0faa626561e295848008c8a7dddffe
+      #   with:
+      #     token: ${{ secrets.CODECOV_TOKEN }}
+      #     files: apps/backend/coverage/integration/lcov.info
+      #     disable_search: true
+      #     flags: integration
 
       - name: Upload test results to Codecov
         if: ${{ !cancelled() }}
