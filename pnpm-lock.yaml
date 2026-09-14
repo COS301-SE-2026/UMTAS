@@ -357,6 +357,9 @@ importers:
       "@zxing/browser":
         specifier: ^0.2.1
         version: 0.2.1(@zxing/library@0.23.0)
+      "@zxing/library":
+        specifier: ^0.23.0
+        version: 0.23.0
       apexcharts:
         specifier: ^5.15.2
         version: 5.16.0
