@@ -1,4 +1,5 @@
 use image::{ImageBuffer, Rgba, imageops::FilterType};
+use js_sys::{Float32Array, Intl::TimeZoneNameFormat::ShortGeneric};
 use std::usize;
 use wasm_bindgen::prelude::*;
 pub struct SliceFormat {
@@ -103,9 +104,50 @@ pub fn normalize_pixel(colour: &u8) -> f32 {
 }
 
 pub struct DetectedPerson {
-    pub x: f32,
-    pub y: f32,
+    pub center_x: f32,
+    pub center_y: f32,
+    pub top_left_x: f32,
+    pub top_left_y: f32,
     pub width: f32,
     pub height: f32,
     pub confidence: f32,
+}
+
+#[wasm_bindgen]
+pub fn read_result(slice_data: &Float32Array) -> Result<JsValue, JsValue> {
+    let data = slice_data.to_vec();
+    let mut people: Vec<DetectedPerson> = Vec::new();
+
+    const NUM_ANCHORS: usize = 8400;
+    const NUM_FEATURES: usize = 84;
+    const CONFIDENCE_THRESHOLD: f32 = 0.25;
+
+    if data.len() < NUM_ANCHORS * NUM_FEATURES {
+        return Err(JsValue::from_str("Invalid tensor data length"));
+    }
+
+    for anchor_idx in 0..NUM_ANCHORS {
+        let confidence = data[4 * NUM_ANCHORS + anchor_idx];
+        if confidence >= CONFIDENCE_THRESHOLD {
+            let center_x = data[0 * NUM_ANCHORS + anchor_idx];
+            let center_y = data[1 * NUM_ANCHORS + anchor_idx];
+            let width = data[2 * NUM_ANCHORS + anchor_idx];
+            let height = data[3 * NUM_ANCHORS + anchor_idx];
+
+            let top_left_x = center_x - width / 2.0;
+            let top_left_y = center_y - height / 2.0;
+
+            people.push(DetectedPerson {
+                center_x,
+                center_y,
+                top_left_x,
+                top_left_y,
+                width,
+                height,
+                confidence,
+            });
+        }
+    }
+
+    return Ok((JsValue::from_str("s"))); // temp to remove compiler warning
 }
