@@ -20,6 +20,7 @@
     "@tanstack/react-table": "^8.21.3",
     "@types/google.maps": "^3.65.5",
     "@vis.gl/react-google-maps": "^1.9.0",
+    "@zxing/browser": "^0.2.1",
     "apexcharts": "^5.15.2",
     "better-auth": "1.6.27",
     "class-variance-authority": "^0.7.1",
