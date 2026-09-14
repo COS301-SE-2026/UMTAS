@@ -7,6 +7,8 @@ import {
 } from "../../../../../utilities/request";
 import { UserDetails } from "@/lib/userclass/userClass";
 
+export const DEMO_PDF_FILENAME = "umtas-demo-timetable.pdf";
+
 export type uploadPDF = paths["/api/pdf-parser/jobs/upload"]["post"];
 export type uploadPDFBody =
   uploadPDF["requestBody"]["content"]["multipart/form-data"];
@@ -46,6 +48,23 @@ export async function uploadPdfBuilder(
 
   if (!res.ok) throw new Error("Upload failed");
   return res.json();
+}
+
+export async function fetchDemoPdfBuilder(): Promise<File> {
+  const res = await fetch(createUrl("/pdf-parser/demo-pdf"), {
+    credentials: "include",
+  });
+
+  if (!res.ok) {
+    throw new Error(`Demo PDF request failed with status ${res.status}`);
+  }
+
+  const blob = await res.blob();
+  if (blob.size === 0) {
+    throw new Error("Demo PDF response was empty");
+  }
+
+  return new File([blob], DEMO_PDF_FILENAME, { type: "application/pdf" });
 }
 
 export type PDFjobLookup = paths["/api/pdf-parser/jobs/lookup"]["post"];

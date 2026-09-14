@@ -3,8 +3,8 @@ import { HelpPageSection, HelpStep } from "../../types/HelpPage";
 const dashboardSteps: HelpStep[] = [
   {
     stepNumber: 1,
-    title: "Build your own schedule",
-    description: `Click the 'Build a schedule' button to start building your own custom schedule.`,
+    title: "Build your own timetable",
+    description: `Click the 'Build a Timetable' button to start building your own custom schedule.`,
     imageUrl: `/images/Dashboard/steps/step1.png`,
   },
   {

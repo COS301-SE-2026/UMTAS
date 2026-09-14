@@ -46,7 +46,8 @@ both: rebuild-packages compile-wasm-dev
 
 # spin up local versions
 dev-infra:
-    WORKER_BACKEND_URL=http://host.docker.internal:3000 phase run -- docker compose --profile dev-infra up -d --build postgres redis minio mailhog pdf-parser-worker solver-worker
+    phase run -- docker compose --profile dev-infra up -d postgres redis minio minio-init mailhog
+    WORKER_BACKEND_URL=http://host.docker.internal:3000 phase run -- docker compose --profile dev-infra up -d --build pdf-parser-worker solver-worker
 
 # compelete reset
 sync:

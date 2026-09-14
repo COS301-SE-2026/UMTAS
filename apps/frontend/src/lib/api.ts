@@ -64,6 +64,26 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/auth/sign-in/guest": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Create and sign in as a University of Pretoria demo guest
+     * @description Create and sign in as a University of Pretoria demo guest. This Auth operation is part of the versioned UMTAS HTTP contract.
+     */
+    post: operations["signInGuest"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/auth/sign-out": {
     parameters: {
       query?: never;
@@ -1296,6 +1316,26 @@ export interface paths {
      * @description Create a new event, to module specified or personal module
      */
     post: operations["BuilderController_createEvent"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/pdf-parser/demo-pdf": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Download the configured University of Pretoria demo timetable PDF
+     * @description Download the configured University of Pretoria demo timetable PDF. This PDF Parser operation is part of the versioned UMTAS HTTP contract.
+     */
+    get: operations["getDemoPdf"];
+    put?: never;
+    post?: never;
     delete?: never;
     options?: never;
     head?: never;
@@ -4705,6 +4745,52 @@ export interface operations {
       500: components["responses"]["InternalError"];
     };
   };
+  signInGuest: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": Record<string, never>;
+      };
+    };
+    responses: {
+      /** @description Guest created and signed in. Sets the normal Better Auth session cookie and the University of Pretoria selection cookie. */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AuthEnvelopeDto"];
+        };
+      };
+      /** @description The guest request contains fields. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description An authenticated session already exists and was not replaced. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      500: components["responses"]["InternalError"];
+      /** @description The University of Pretoria is unavailable. */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   signOut: {
     parameters: {
       query?: never;
@@ -7725,6 +7811,30 @@ export interface operations {
         content?: never;
       };
       409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  getDemoPdf: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The configured demo PDF is returned as an attachment. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/pdf": string;
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
       500: components["responses"]["InternalError"];
     };
   };
