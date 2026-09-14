@@ -24,11 +24,11 @@ function getCanvasConstraints() {
 }
 
 export default function CameraCanvas() {
-  const [cameraOn, setCameraOn] = useState(false);
+  const [cameraOn, setCameraOn] = useState(true);
 
   return (
     <div className="w-full min-w-fit h-full justify-around flex flex-col gap-y-4 p-4">
-      <div className="w-full min-w-fit h-full flex flex-col justify-center items-center text-center border rounded-xl ">
+      <div className="w-full min-w-fit h-full flex flex-col justify-center items-center text-center border rounded-2xl ">
         <div className={` w-full min-w-fit h-full `}>
           <CanvasWebcam isCameraActive={cameraOn} />
         </div>
@@ -110,7 +110,7 @@ function CanvasWebcam({ isCameraActive }: CanvasCamProps) {
         ref={canvasRef}
         width={getCanvasConstraints().width}
         height={getCanvasConstraints().height}
-        className="w-full h-full  rounded-2xl object-contain "
+        className="w-full h-full  rounded-2xl object-cover "
       ></canvas>
     </>
   ) : (
