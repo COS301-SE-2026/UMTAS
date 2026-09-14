@@ -1,4 +1,8 @@
-import { DETECT_DATA_MESSAGE, MessageType } from "./messageTypes";
+import {
+  DETECT_DATA_MESSAGE,
+  DETECT_MESSAGE,
+  MessageType,
+} from "./messageTypes";
 
 class DetectionManager {
   private worker: Worker | null = null;
@@ -30,6 +34,25 @@ class DetectionManager {
           resolve(message.payload.results);
         }
       };
+      this.worker?.addEventListener("message", handleMessage);
+
+      const detectMessage: DETECT_MESSAGE = {
+        eventType: "DETECT",
+        payload: {
+          height: height,
+          pixelData: PixelData,
+          width: width,
+        },
+      };
+
+      this.worker?.postMessage(detectMessage, [PixelData.buffer]);
     });
   }
+
+  public terminate() {
+    this.worker?.terminate();
+    this.worker = null;
+  }
 }
+
+export const detectionManager = new DetectionManager();
