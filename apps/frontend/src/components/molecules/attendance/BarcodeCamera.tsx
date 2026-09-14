@@ -71,9 +71,7 @@ export function BarcodeCamera({ onScan }: BarcodeCameraProps) {
                 } as MediaTrackConstraintSet,
               ],
             });
-          } catch {
-            // Zoom is optional.
-          }
+          } catch {}
         }
 
         videoRef.current.srcObject = stream;

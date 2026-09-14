@@ -372,6 +372,9 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      cn:
+        specifier: ^0.3.0
+        version: 0.3.0
       ky:
         specifier: ^2.0.2
         version: 2.1.0
@@ -7281,6 +7284,14 @@ packages:
         integrity: sha512-rwHwUfXL40Chm1r08yrhU3qpUvdVlgkKNeyeGPOxnW8/SyVDvgRaed/Uz54AqWNaTCAThlj6QAs3TZcKI0xDEw==,
       }
     engines: { node: ">=0.10.0" }
+
+  cn@0.3.0:
+    resolution:
+      {
+        integrity: sha512-qRoU0ARrZD3Bbj1wKFftEKxPjSnzTEdFkf22NVhW+zU9D/wajhoP+qUZ5DChhhSOBCH1onV12hrmGqfu1+5Z2Q==,
+      }
+    engines: { node: ">=20" }
+    hasBin: true
 
   co@4.6.0:
     resolution:
@@ -20210,6 +20221,8 @@ snapshots:
   clsx@2.1.1: {}
 
   cluster-key-slot@1.1.1: {}
+
+  cn@0.3.0: {}
 
   co@4.6.0: {}
 
