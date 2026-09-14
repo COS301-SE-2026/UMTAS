@@ -1,5 +1,5 @@
 use image::{ImageBuffer, Rgba, imageops::FilterType};
-use js_sys::{Float32Array, Intl::TimeZoneNameFormat::ShortGeneric};
+use js_sys::Float32Array;
 use std::usize;
 use wasm_bindgen::prelude::*;
 pub struct SliceFormat {
@@ -23,7 +23,7 @@ pub fn slice_image_data(
     let target_height = 1280;
 
     let resized_img =
-        image::imageops::resize(&img, target_width, target_height, FilterType::Nearest);
+        image::imageops::resize(&img, target_width, target_height, FilterType::Lanczos3);
 
     let resized_pixels = resized_img.into_raw();
     let resized_width = target_width as usize;
@@ -70,7 +70,7 @@ pub fn extract_slice(
     full_width: usize,
 ) -> js_sys::Float32Array {
     let total_pix = start_pix.slice_width * start_pix.slice_height;
-
+    let mut slice = vec![0.0f32; total_pix * 3];
     let mut r_offset = 0;
     let mut g_offset = total_pix;
     let mut b_offset = total_pix * 2;
