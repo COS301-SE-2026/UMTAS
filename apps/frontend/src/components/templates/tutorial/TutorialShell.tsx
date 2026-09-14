@@ -38,8 +38,9 @@ export default function TutorialShell({ sections }: TutorialShellProps) {
         </p>
         <Select value={selectedSection} onValueChange={setSelectedSection}>
           <SelectTrigger
+            id="tutorial-guide-select"
             className="w-fit bg-[var(--bg-base)] border-[var(--border)] text-[var(--text-primary)] rounded-lg 
-          shadow-md ring-offset-[var(--bg-base)] focus:ring-2 focus:ring-[var(--ring)] focus:ring-offset-2"
+            shadow-md ring-offset-[var(--bg-base)] focus:ring-2 focus:ring-[var(--ring)] focus:ring-offset-2"
           >
             <SelectValue placeholder="Select a tutorial" />
           </SelectTrigger>
@@ -58,7 +59,7 @@ export default function TutorialShell({ sections }: TutorialShellProps) {
         </Select>
       </div>
 
-      <div className="w-full">
+      <div id="tutorial-guide-section" className="w-full">
         {activeSection && <TutorialSection section={activeSection} />}
       </div>
     </div>

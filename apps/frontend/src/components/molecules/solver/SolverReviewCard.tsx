@@ -97,6 +97,7 @@ export default function SolverReviewCard({
               <CustomiseEventPanel
                 event={isSelected && tempEvent ? tempEvent : event}
                 modules={modules}
+                isSelected={isSelected}
                 onClick={() => handleSelect(event)}
               />
 

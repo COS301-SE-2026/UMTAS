@@ -3,8 +3,10 @@ import {
   Injectable,
   Logger,
   OnModuleInit,
+  ServiceUnavailableException,
 } from '@nestjs/common';
 import { and, eq, ilike, ne } from 'drizzle-orm';
+import { randomBytes, randomUUID } from 'node:crypto';
 import { MailerService } from '../mail/mailer.service';
 import * as appSchema from '../entities';
 import { createRedisClient } from '../redis/redis';
@@ -19,6 +21,21 @@ import {
   DeleteMockUsersResponseDto,
   MockUserRole,
 } from './auth.dto';
+
+export interface ProvisionedUser {
+  userId: string;
+  email: string;
+  password: string;
+  uniId?: string;
+}
+
+interface ProvisioningOptions {
+  email: string;
+  password: string;
+  name: string;
+  role: appSchema.RoleTypeType;
+  universityName?: string;
+}
 
 @Injectable()
 export class AuthService implements OnModuleInit {
@@ -185,21 +202,37 @@ export class AuthService implements OnModuleInit {
     };
   } //END_selectUniversity
 
+  async createGuestUser(): Promise<ProvisionedUser> {
+    const email = `guest+${randomUUID()}@simulation.com`;
+    const password = randomBytes(32).toString('base64url');
+
+    return this.createProvisionedTestUser({
+      email,
+      password,
+      name: 'Guest',
+      role: 'STUDENT',
+      universityName: 'University of Pretoria',
+    });
+  }
+
+  async removeProvisionedUser(userId: string): Promise<void> {
+    try {
+      await this.databaseService.db
+        .delete(appSchema.usersTable)
+        .where(eq(appSchema.usersTable.id, userId));
+    } catch (error) {
+      this.logger.warn(
+        `Failed to compensate incomplete guest user[${userId}]`,
+        error instanceof Error ? error.stack : String(error),
+      );
+    }
+  }
+
   async createMockUser(
     dto: { email?: string; name?: string; password?: string },
     inRole?: MockUserRole,
     tx?: AppDatabase,
   ): Promise<CreateMockUserResponseDto> {
-    if (!tx) {
-      return await this.databaseService.db.transaction(
-        async (t: AppDatabase) => {
-          return this.createMockUser(dto, inRole, t);
-        },
-      );
-    } //END_tx precence check
-
-    const auth = this.getAuth();
-
     if (inRole === undefined) inRole = MockUserRole['STUDENT'];
 
     const email =
@@ -208,30 +241,126 @@ export class AuthService implements OnModuleInit {
     const name = dto?.name || 'Test User';
     const password = dto?.password || 'password123!';
 
+    const provisioned = await this.createProvisionedTestUser(
+      {
+        email,
+        name,
+        password,
+        role: inRole as appSchema.RoleTypeType,
+      },
+      tx,
+    );
+
+    return {
+      email: provisioned.email,
+      password: provisioned.password,
+      uniId: provisioned.uniId,
+    };
+  }
+
+  private async createProvisionedTestUser(
+    options: ProvisioningOptions,
+    tx?: AppDatabase,
+  ): Promise<ProvisionedUser> {
+    if (!tx) {
+      return this.databaseService.db.transaction((t: AppDatabase) =>
+        this.createProvisionedTestUser(options, t),
+      );
+    }
+
+    const auth = this.getAuth();
+
     const [existingUser] = await tx
       .select({
         id: appSchema.usersTable.id,
         email: appSchema.usersTable.email,
       })
       .from(appSchema.usersTable)
-      .where(ilike(appSchema.usersTable.email, email))
+      .where(ilike(appSchema.usersTable.email, options.email))
       .limit(1);
 
     if (existingUser) {
       return {
         email: existingUser.email,
-        password: password,
+        password: options.password,
+        userId: existingUser.id,
       };
     }
 
     const result = await auth.api.createUser({
-      body: { email, password, name, role: 'user' },
+      body: {
+        email: options.email,
+        password: options.password,
+        name: options.name,
+        role: 'user',
+      },
     });
 
-    await tx
-      .update(appSchema.usersTable)
-      .set({ emailVerified: true })
-      .where(eq(appSchema.usersTable.id, result.user.id));
+    let uni: { uniID: string } | undefined;
+    try {
+      await tx
+        .update(appSchema.usersTable)
+        .set({ emailVerified: true })
+        .where(eq(appSchema.usersTable.id, result.user.id));
+
+      uni = await this.resolveProvisionedUniversity(tx, options.universityName);
+
+      if (uni) {
+        await tx
+          .insert(appSchema.UniversityRole)
+          .values({
+            UserID: result.user.id,
+            UniversityID: uni.uniID,
+            role: options.role,
+          })
+          .returning();
+      }
+    } catch (error) {
+      try {
+        await tx
+          .delete(appSchema.usersTable)
+          .where(eq(appSchema.usersTable.id, result.user.id));
+      } catch (compensationError) {
+        this.logger.warn(
+          `Failed to compensate incomplete provisioned user[${result.user.id}]`,
+          compensationError instanceof Error
+            ? compensationError.stack
+            : String(compensationError),
+        );
+      }
+      throw error;
+    }
+
+    return {
+      email: options.email,
+      password: options.password,
+      userId: result.user.id,
+      uniId: uni?.uniID,
+    };
+  }
+
+  private async resolveProvisionedUniversity(
+    tx: AppDatabase,
+    configuredName?: string,
+  ): Promise<{ uniID: string } | undefined> {
+    if (configuredName) {
+      const [uni] = await tx
+        .select({
+          uniID: appSchema.University.UniversityID,
+          name: appSchema.University.UniversityName,
+        })
+        .from(appSchema.University)
+        .where(eq(appSchema.University.UniversityName, configuredName))
+        .limit(1);
+
+      if (!uni) {
+        throw new ServiceUnavailableException(
+          `${configuredName} is unavailable`,
+        );
+      }
+
+      return { uniID: uni.uniID };
+    }
 
     const [uni] = await tx
       .select({ uniID: appSchema.University.UniversityID })
@@ -239,22 +368,7 @@ export class AuthService implements OnModuleInit {
       .where(ilike(appSchema.University.UniversityName, `%Pretoria%`))
       .limit(1);
 
-    if (uni) {
-      await tx
-        .insert(appSchema.UniversityRole)
-        .values({
-          UserID: result.user.id,
-          UniversityID: uni.uniID,
-          role: inRole as appSchema.RoleTypeType,
-        })
-        .returning();
-    }
-
-    return {
-      email,
-      password,
-      uniId: uni?.uniID,
-    };
+    return uni;
   }
 
   async deleteMockUsers(tx?: AppDatabase): Promise<DeleteMockUsersResponseDto> {

@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Card } from "@/components/atoms/baseShadcn/card";
 import { Button } from "@/components/atoms/baseShadcn/button";
+import { Input } from "@/components/atoms/baseShadcn/input";
 import CustomiseModulePanel from "@/components/atoms/customise/CustomiseModulePanel";
 import { CustomiseModuleCard } from "@/components/molecules/customise/CustomiseModuleCard";
 import { EventResponse } from "@/app/builder/utils/events/eventRequestBuilder";
@@ -12,6 +13,13 @@ import {
   updateModStylingQ,
 } from "@/app/course-management/queries/modules/moduleQueries";
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/atoms/baseShadcn/dropdown-menu";
+import { ChevronDown } from "lucide-react";
 
 interface CustomiseShellProps {
   events: EventResponse[];
@@ -28,24 +36,30 @@ export default function ModulesShell({
   const [selectedModuleId, setSelectedModuleId] = useState<string>(
     modules[0]?.moduleID,
   );
+  const [searchQuery, setSearchQuery] = useState<string>("");
+
+  const filteredModules = useMemo(() => {
+    if (!searchQuery.trim()) return modules;
+    const q = searchQuery.toLowerCase();
+    return modules.filter((m) => {
+      const matchName = m.moduleName?.toLowerCase().includes(q);
+      const matchCode = m.moduleCode?.toLowerCase().includes(q);
+      return matchName || matchCode;
+    });
+  }, [modules, searchQuery]);
 
   const savedModule =
     modules.find((m) => m.moduleID === selectedModuleId) || modules[0];
 
-  //this keeps track of what has been changed
   const [tempModule, setTempModule] = useState<ModuleResponseDto>(savedModule);
 
-  //when saved set to temp
   const [prevSavedModule, setPrevSavedModule] = useState(savedModule);
 
   if (savedModule !== prevSavedModule) {
     setPrevSavedModule(savedModule);
     setTempModule(savedModule);
   }
-  // used for tracking editablilty
   const canEdit = UserDetails.userCanEdit();
-  //mutation for updating
-  // base options from your factory
 
   const finalOptions = {
     ...updateModQ(),
@@ -68,7 +82,6 @@ export default function ModulesShell({
 
   const { mutate: updateStyling } = useMutation(stylingMutOptions);
 
-  //bool check if the module actually changed
   const didModuleChange =
     !!tempModule &&
     !!savedModule &&
@@ -92,7 +105,6 @@ export default function ModulesShell({
     });
   }
 
-  //what gets called in the component
   function handleSave() {
     if (!tempModule) return;
     if (canEdit) {
@@ -125,52 +137,103 @@ export default function ModulesShell({
   }
 
   return (
-    <Card className="w-fit m-6 p-4">
-      <div className="flex flex-row gap-6">
-        <div className="flex flex-col gap-2 min-w-[240px]">
-          <div className="flex gap-1 bg-muted p-1 rounded-md mb-1">
-            <Button
-              size="sm"
-              variant="secondary"
-              className="h-7 text-xs flex-1 font-semibold"
-            >
-              Modules
-            </Button>
+    <Card className="w-[792px] h-[600px] m-6 p-4 flex flex-col overflow-hidden">
+      <div className="flex flex-col md:flex-row gap-6 h-full min-h-0">
+        <div className="flex flex-col gap-2 w-full md:min-w-[240px] md:w-auto h-auto md:h-full flex-shrink-0">
+          <div className="flex gap-1 bg-muted p-1 rounded-md mb-2 flex-shrink-0">
             <Button
               size="sm"
               variant="ghost"
-              className="h-7 text-xs flex-1 text-muted-foreground"
+              className="h-7 text-xs flex-1 text-muted-foreground cursor-pointer"
               onClick={() => {
                 onViewModeChange?.("Events");
               }}
             >
               Events
             </Button>
+            <Button
+              size="sm"
+              variant="secondary"
+              className="h-7 text-xs flex-1 font-semibold cursor-pointer"
+            >
+              Modules
+            </Button>
           </div>
 
-          <div className="flex flex-col gap-2 [280px]max-h- overflow-y-auto pr-1">
-            {modules.map((module) => (
+          <div className="md:hidden flex flex-row items-center gap-2 flex-shrink-0 mb-2">
+            <div className="flex-1 min-w-0">
+              <Input
+                placeholder="Search modules..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="h-8 text-sm bg-[var(--bg-surface)] border-[var(--border)] w-full"
+              />
+            </div>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="h-8 px-4 text-sm flex-shrink-0"
+                >
+                  <span className="truncate max-w-[120px]">
+                    {savedModule ? savedModule.moduleName : "Select"}
+                  </span>
+                  <ChevronDown className="h-4 w-4 opacity-50 ml-2 flex-shrink-0" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="max-h-60 bg-[var(--bg-surface)] border-[var(--border)] overflow-y-auto">
+                {filteredModules.map((module) => (
+                  <DropdownMenuItem
+                    key={module.moduleID}
+                    onClick={() => setSelectedModuleId(module.moduleID)}
+                    className="cursor-pointer text-xs"
+                  >
+                    <div className="truncate">
+                      <p className="font-medium">{module.moduleName}</p>
+                      <p className="text-muted-foreground font-mono text-[10px]">
+                        {module.moduleCode}
+                      </p>
+                    </div>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+          <div className="hidden md:flex flex-col gap-2 flex-shrink-0 mb-1">
+            <Input
+              placeholder="Search modules..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="h-8 text-xs bg-[var(--bg-surface)] border-[var(--border)]"
+            />
+          </div>
+
+          <div className="hidden md:flex flex-col gap-2 overflow-y-auto pr-1 flex-1">
+            {filteredModules.map((module) => (
               <CustomiseModulePanel
                 module={module}
                 key={module.moduleID}
+                isSelected={selectedModuleId === module.moduleID}
                 onClick={() => setSelectedModuleId(module.moduleID)}
               />
             ))}
           </div>
         </div>
 
-        <div className="w-[1px] bg-border self-stretch" />
+        <div className="hidden md:block w-[1px] bg-border self-stretch flex-shrink-0" />
 
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center justify-between pb-3 border-b min-w-[320px]">
-            <span className="text-sm font-semibold">
+        <div className="flex flex-col gap-4 flex-1 h-full min-h-0">
+          <div className="flex items-center justify-between pb-3 border-b min-w-0 md:min-w-[320px] flex-shrink-0">
+            <span className="text-sm font-semibold truncate pr-2">
               {tempModule.moduleName}
               {" | "}
               <span className="font-mono text-xs font-normal text-muted-foreground">
                 {tempModule.moduleCode}
               </span>
             </span>
-            <div className="flex gap-1.5">
+            <div className="flex gap-1.5 flex-shrink-0">
               <Button
                 size="sm"
                 variant="outline"
@@ -192,7 +255,9 @@ export default function ModulesShell({
             </div>
           </div>
 
-          <CustomiseModuleCard module={tempModule} onUpdate={handleUpdate} />
+          <div className="flex-1 overflow-y-auto pr-2">
+            <CustomiseModuleCard module={tempModule} onUpdate={handleUpdate} />
+          </div>
         </div>
       </div>
     </Card>

@@ -13,7 +13,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { getAllModulesQ } from "@/components/templates/builder/Queries/moduleQueries";
 import { getAllEventsQ } from "@/components/templates/builder/Queries/eventQueries";
-import { UserDetails } from "@/lib/userclass/userClass";
+import { X } from "lucide-react";
 
 export default function CustomiseShellPopup() {
   const { data: modules, isLoading: modulesLoading } =
@@ -26,22 +26,24 @@ export default function CustomiseShellPopup() {
     <div className="">
       <AlertDialog>
         <AlertDialogTrigger asChild>
-          <Button id="btn-customise-schedule" variant="outline">
+          <Button id="btn-customise-schedule" variant="default">
             Customise
           </Button>
         </AlertDialogTrigger>
 
-        <AlertDialogContent className="w-max max-w-[95vw] p-6">
-          <AlertDialogHeader className="flex flex-row justify-between items-center border-b pb-2">
+        <AlertDialogContent className="w-[768px] max-w-[95vw] p-0 flex flex-col gap-3">
+          <AlertDialogHeader className="flex flex-row justify-between items-center space-y-0 px-6 pt-6 pb-0">
             <AlertDialogTitle className="text-xl font-bold">
-              Customise your Events and Modules
+              Customise Events and Modules
             </AlertDialogTitle>
-            <AlertDialogCancel className="mt-0">Close</AlertDialogCancel>
+            <AlertDialogCancel className="mt-0 cursor-pointer h-8 w-8 p-0 rounded-full bg-transparent border-transparent">
+              <X className="h-4 w-4" />
+            </AlertDialogCancel>
           </AlertDialogHeader>
 
-          <div className="py-4 overflow-auto max-h-[80vh]">
+          <div className="overflow-auto max-h-[80vh]">
             {isLoading ? (
-              <p className="text-sm text-muted-foreground">Loading...</p>
+              <p className="text-sm text-muted-foreground p-6">Loading...</p>
             ) : (
               <CustomiseShell events={events ?? []} modules={modules ?? []} />
             )}

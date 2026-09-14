@@ -173,6 +173,52 @@
         "security": []
       }
     },
+    "/api/auth/sign-in/guest": {
+      "post": {
+        "operationId": "signInGuest",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "description": "No user-controlled fields are accepted."
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Guest created and signed in. Sets the normal Better Auth session cookie and the University of Pretoria selection cookie.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthEnvelopeDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The guest request contains fields."
+          },
+          "409": {
+            "description": "An authenticated session already exists and was not replaced."
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "description": "The University of Pretoria is unavailable."
+          }
+        },
+        "summary": "Create and sign in as a University of Pretoria demo guest",
+        "tags": ["Auth", "Auth Email"],
+        "description": "Create and sign in as a University of Pretoria demo guest. This Auth operation is part of the versioned UMTAS HTTP contract.",
+        "security": []
+      }
+    },
     "/api/auth/sign-out": {
       "post": {
         "operationId": "signOut",
@@ -4486,6 +4532,45 @@
             "cookie": []
           }
         ]
+      }
+    },
+    "/api/pdf-parser/demo-pdf": {
+      "get": {
+        "operationId": "getDemoPdf",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The configured demo PDF is returned as an attachment.",
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "security": [
+          {
+            "umtas-session": []
+          }
+        ],
+        "summary": "Download the configured University of Pretoria demo timetable PDF",
+        "tags": ["PDF Parser"],
+        "description": "Download the configured University of Pretoria demo timetable PDF. This PDF Parser operation is part of the versioned UMTAS HTTP contract."
       }
     },
     "/api/pdf-parser/jobs/lookup": {

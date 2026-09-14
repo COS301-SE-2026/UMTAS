@@ -28,3 +28,13 @@ The shared builder derives its types from the generated API schema and centraliz
 Backend tests use factories from `apps/backend/src/Testing/Factories` to create valid entities, DTOs, relationships, jobs, authentication records, and mock sessions with generated defaults.
 
 Each factory returns a fresh object and applies optional overrides last. Tests specify only scenario-relevant values, while shared defaults and schema changes remain centralized.
+
+## Heuristic system design patterns
+
+### Handler Pattern : Preference Type decorator creation
+
+Each handler parses a json and creates the according heuristic decorator. This separates concerns and ensures business rules are simply upheld in the code.
+
+### Decorator Pattern : Preference Decorator
+
+Each decorator takes in an event list and runs its selected heuristic on that list of events to evaluate its performance against the given metric

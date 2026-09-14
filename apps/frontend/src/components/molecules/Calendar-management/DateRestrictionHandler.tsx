@@ -137,6 +137,8 @@ function DateRestrictionHTML({
             className="h-10 w-full rounded-md border border-[var(--border)] bg-transparent px-3 text-left text-sm text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--ring)]"
           />
           <Button
+            data-testid="btn-delete-restriction"
+
             id="btn-delete-restriction"
             type="button"
             variant="ghost"
@@ -174,6 +176,7 @@ function DateRestrictionHTML({
           />
           <Button
             id="btn-save-restriction"
+            data-testid="btn-save-restriction"
             type="button"
             variant="ghost"
             size="icon"
