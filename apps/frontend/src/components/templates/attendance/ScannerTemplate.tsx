@@ -4,36 +4,28 @@ import AttendanceCounter from "@/components/organisms/attendance/AttendanceCount
 import { LastScannedStudent } from "@/components/organisms/attendance/LastScannedStudent";
 
 export default function ScannerTemplate() {
-  //   function BarcodeScanner() {
-  //     return <></>;
-  //   }
-
-  //   function LastScannedStudent() {}
   return (
-    <>
-      <div className="flex items-center flex-col">
-        <div className="mb-8">
-          <h1 className="text-2xl font-semibold text-[var(--text-primary)]">
-            Attendance Scanner
-          </h1>
-          <p className="text-sm font-normal text-[var(--text-secondary)]">
-            Scan Student Cards to Record Attendance
-          </p>
-        </div>
-        <div className="mb-2">
+    <div className="flex flex-col items-center p-4">
+      <div className="mb-8">
+        <h1 className="text-2xl font-semibold text-[var(--text-primary)]">
+          Attendance Scanner
+        </h1>
+        <p className="text-sm text-[var(--text-secondary)]">
+          Scan Student Cards to Record Attendance
+        </p>
+      </div>
+      <div className="flex flex-col items-center gap-4 w-full max-w-md">
+        <div>
           <Badge variant="secondary">Ready to Scan</Badge>
         </div>
-
-        <div className="border-2 rounded-xl aspect-video w-[90%] md:w-[50%] mb-4">
-          {/* Barcode scanner goes here */}
-        </div>
-        <div className="w-[50%] w-min-xl pb-8">
+        <div className="aspect-video w-full rounded-xl border-2"></div>
+        <div className="w-full">
           <AttendanceCounter numberAttended={20} numberExpected={50} />
         </div>
-        <div className="w-[50%]">
+        <div className="w-full pb-8">
           <LastScannedStudent studentNumber={null} />
         </div>
       </div>
-    </>
+    </div>
   );
 }
