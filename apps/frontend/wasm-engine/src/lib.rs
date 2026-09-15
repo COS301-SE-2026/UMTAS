@@ -250,12 +250,24 @@ pub fn non_maximum_sepression(
     mut people: Vec<DetectedPerson>,
     iou_threshold: f32,
 ) -> Vec<DetectedPerson> {
+    // standard means of weeding out redundant overlapping boxes
+    // order list in decending order of confidence score
+    // take a person and go down list comparing IOU against box.
+    // If any box has higher iou than threshold discard-> same person
+    // rather keep an parallel array of all discarded ones only
+    
     let mut final_people: Vec<DetectedPerson> = Vec::new();
     // parallel array for whos been removed
     let mut removed_people: Vec<bool> = vec![false; people.len()];
 
+    people.sort_by(|a, b| {
+        b.confidence
+            .partial_cmp(&a.confidence)
+            .unwrap_or(std::cmp::Ordering::Equal)
+    });
+
     for (idx, person) in people.iter().enumerate() {
-        if removed_people[idx] != false {
+        if removed_people[idx] == false {
             for compare_index in idx..people.len() {
                 let iou = intersection_over_union(person, &people[compare_index]);
                 if iou < iou_threshold {
@@ -271,12 +283,7 @@ pub fn non_maximum_sepression(
         }
     }
 
-    // standard means of weeding out redundant overlapping boxes
-    // order list in decending order of confidence score
-    // take a person and go down list comparing IOU against box.
-    // If any box has higher iou than threshold discard-> same person
-    // rather keep an parallel array of all discarded ones only
-    //
+
 
     return final_people;
 }
