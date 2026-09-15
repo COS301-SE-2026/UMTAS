@@ -19,14 +19,24 @@ pub fn slice_image_data(
         ImageBuffer::<Rgba<u8>, _>::from_raw(width as u32, height as u32, pixel_data.to_vec())
             .ok_or_else(|| JsValue::from_str("Invalid pixel data dimensions"))?;
 
+    let result_arr = js_sys::Array::new();
+
+    let full_img = image::imageops::resize(&img, 640, 640, FilterType::Lanczos3);
+    let full_pixels = full_img.into_raw();
+    let full_format = SliceFormat {
+        x: 0,
+        y: 0,
+        slice_height: 640,
+        slice_width: 640,
+    };
+    result_arr.push(&extract_slice(full_format, &full_pixels, 640));
+
     let target_width = 1280;
     let target_height = 1280;
-
     let resized_img =
         image::imageops::resize(&img, target_width, target_height, FilterType::Lanczos3);
 
     let resized_pixels = resized_img.into_raw();
-    let resized_width = target_width as usize;
     let slice_size = 640;
 
     let top_left = SliceFormat {
@@ -54,14 +64,28 @@ pub fn slice_image_data(
         slice_width: slice_size,
     };
 
-    let result_arr = js_sys::Array::new();
+    result_arr.push(&extract_slice(
+        top_left,
+        &resized_pixels,
+        target_width as usize,
+    ));
+    result_arr.push(&extract_slice(
+        top_right,
+        &resized_pixels,
+        target_width as usize,
+    ));
+    result_arr.push(&extract_slice(
+        bottom_left,
+        &resized_pixels,
+        target_width as usize,
+    ));
+    result_arr.push(&extract_slice(
+        bottom_right,
+        &resized_pixels,
+        target_width as usize,
+    ));
 
-    result_arr.push(&extract_slice(top_left, &resized_pixels, resized_width));
-    result_arr.push(&extract_slice(top_right, &resized_pixels, resized_width));
-    result_arr.push(&extract_slice(bottom_left, &resized_pixels, resized_width));
-    result_arr.push(&extract_slice(bottom_right, &resized_pixels, resized_width));
-
-    return Ok(result_arr);
+    Ok(result_arr)
 }
 // all slices must be broken into [all reds][all greens][all blues] for BCHW
 pub fn extract_slice(
@@ -110,9 +134,17 @@ pub struct DetectedPerson {
     pub confidence: f32,
 }
 #[wasm_bindgen]
-pub fn infer_detection_data(quadrants: js_sys::Array) -> Result<String, JsValue> {
+pub fn infer_detection_data(
+    quadrants: js_sys::Array,
+    full_data: js_sys::Float32Array,
+) -> Result<String, JsValue> {
     // function to call with 4 slices of data from TS
     let mut all_people: Vec<DetectedPerson> = Vec::new();
+
+    let data = full_data.to_vec();
+
+    let people = read_result(&data).map_err(|e| JsValue::from_str(&e))?;
+    all_people.extend(people);
 
     for (quad_idx, item) in quadrants.iter().enumerate() {
         let float_arr = item.dyn_ref::<js_sys::Float32Array>().ok_or_else(|| {

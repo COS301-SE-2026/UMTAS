@@ -45,6 +45,7 @@ async function runModel(slices: Float32Array[], payload: PIXEL_PAYLOAD) {
     throw Error("Input and output names not set");
   }
 
+  console.log(slices.length);
   const resultsArray: Float32Array[] = [];
 
   for (let i = 0; i < slices.length; i++) {
@@ -53,8 +54,10 @@ async function runModel(slices: Float32Array[], payload: PIXEL_PAYLOAD) {
     const results = await DetectSession!.run({ [inputName]: inputTensor });
     const sliceDuration = (performance.now() - sliceStart) / 1000;
 
-    console.log(`-> Slice ${i + 1} took: ${sliceDuration.toFixed(3)}s`);
-
+    if (i != 1)
+      console.log(`-> Slice ${i + 1} took: ${sliceDuration.toFixed(3)}s`);
+    else
+      console.log(`-> full image  ${i + 1} took: ${sliceDuration.toFixed(3)}s`);
     resultsArray.push(results[outputName].data as Float32Array);
   }
 
@@ -82,7 +85,7 @@ self.onmessage = async (event: MessageEvent) => {
         `[Worker] Init Detection Session took: ${((performance.now() - tSession) / 1000).toFixed(3)}s`,
       );
     }
-
+    console.log("got to before taking slices");
     const tSliceStart = performance.now();
     const slices = createSlices(payload);
     console.log(

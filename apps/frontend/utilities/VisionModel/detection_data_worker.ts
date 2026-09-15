@@ -28,7 +28,12 @@ self.onmessage = async (event: MessageEvent) => {
     }
 
     const tSliceStart = performance.now();
-    const people = infer_detection_data(payload.sliced_results);
+
+    const people = infer_detection_data(
+      payload.sliced_results.slice(1),
+      payload.sliced_results[0],
+    );
+
     console.log(
       `[Worker DATA PROCESSOR] parse People took: ${((performance.now() - tSliceStart) / 1000).toFixed(3)}s`,
     );
