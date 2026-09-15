@@ -1,6 +1,7 @@
 import { Badge } from "@/components/atoms/baseShadcn/badge";
 import { Progress } from "@/components/atoms/baseShadcn/progress";
 import AttendanceCounter from "@/components/organisms/attendance/AttendanceCounter";
+import { LastScannedStudent } from "@/components/organisms/attendance/LastScannedStudent";
 
 export default function ScannerTemplate() {
   //   function BarcodeScanner() {
@@ -23,11 +24,14 @@ export default function ScannerTemplate() {
           <Badge variant="secondary">Ready to Scan</Badge>
         </div>
 
-        <div className="border-2 rounded-xl aspect-video w-[50%] mb-4">
+        <div className="border-2 rounded-xl aspect-video w-[90%] md:w-[50%] mb-4">
           {/* Barcode scanner goes here */}
         </div>
-        <div className="w-[50%]">
+        <div className="w-[50%] w-min-xl pb-8">
           <AttendanceCounter numberAttended={20} numberExpected={50} />
+        </div>
+        <div className="w-[50%]">
+          <LastScannedStudent studentNumber={null} />
         </div>
       </div>
     </>
