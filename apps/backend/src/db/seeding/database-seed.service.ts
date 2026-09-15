@@ -13,6 +13,7 @@ import { AcademicCalendarSeedService } from './services/academic-calendar.seed.s
 import { PublicCalendarSeedService } from './services/public-calendar.seed.service';
 import { BuildingSeedService } from './services/buildings.seed.service';
 import { EventsSeedService } from './services/events.seed.service';
+import { VenuesSeedService } from './services/venues.seed.service';
 
 @Injectable()
 export class DatabaseSeedService {
@@ -29,6 +30,7 @@ export class DatabaseSeedService {
     private readonly persistence: SeedPersistenceService,
     private readonly buildingSeedService: BuildingSeedService,
     private readonly eventSeedService: EventsSeedService,
+    private readonly venueSeedService: VenuesSeedService,
   ) {}
 
   async seed(db: AppDatabase): Promise<void> {
@@ -60,6 +62,7 @@ export class DatabaseSeedService {
         'Hatfield buildings',
         (tx: AppDatabase) => this.buildingSeedService.seed(tx),
       ],
+      ['Venues', (tx: AppDatabase) => this.venueSeedService.seed(tx)],
     ] as const;
 
     this.logger.log(`Starting database seeding (${tasks.length} tasks)`);
