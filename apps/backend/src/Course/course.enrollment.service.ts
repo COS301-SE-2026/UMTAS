@@ -1,7 +1,7 @@
 import { AppDatabase } from 'src/auth/auth';
 import { CourseServiceV2 } from './courseV2.service';
 import { DatabaseService } from 'src/db/database.service';
-import { CourseEnrollment, ModuleEnrollment } from 'src/entities';
+import { CourseEnrollment } from 'src/entities';
 import { and, eq } from 'drizzle-orm';
 import {
   EnrollStudentToCourseResponseDto,
@@ -162,12 +162,12 @@ export class CourseEnrollmentService {
 
     //Might change !!!!
     //If user unenrolls from course -> unenroll from relevant modules
-    const modulesUnenrolledFrom = await tx
-      .delete(ModuleEnrollment)
-      .where(eq(ModuleEnrollment.UserID, userId))
-      .returning();
+    // const modulesUnenrolledFrom = await tx
+    //   .delete(ModuleEnrollment)
+    //   .where(eq(ModuleEnrollment.UserID, userId))
+    //   .returning();
 
-    response.message = `Successfully unenrolled student from course and [${modulesUnenrolledFrom.length}] modules`;
+    response.message = `Successfully unenrolled student from course[${deletedRecord.CourseID}]`;
 
     return response;
   } //END_unenrollStudentFromCourse
