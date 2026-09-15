@@ -168,10 +168,38 @@ pub fn read_result(slice_data: &Vec<f32>) -> Result<Vec<DetectedPerson>, String>
 }
 // original is 1280 by 1280 then in terms of 640 by 640
 // Global is the original 640 x 640
-pub fn map_to_global(people: Vec<DetectedPerson>) -> Vec<DetectedPerson> {
+pub fn map_to_global(mut people: Vec<DetectedPerson>, quad_idx: usize) -> Vec<DetectedPerson> {
     // will map a single array of People changing co-ords to be global instead of local
 
-    return Vec;
+    let (offset_x, offset_y) = match quad_idx {
+        0 => (0.0, 0.0),
+        1 => (640.0, 0.0),
+        2 => (0.0, 640.0),
+        3 => (640.0, 640.0),
+        _ => (0.0.0.0),
+    };
+
+    for person in &mut people {
+        // shift to upscaled image size
+        person.center_x += offset_x;
+        person.center_y += offset_y;
+        person.top_left_x += offset_x;
+        person.top_left_y += offset_y;
+
+        scale_person(person);
+    }
+
+    return people;
+}
+pub fn scale_person(person: &mut DetectedPerson) -> &mut DetectedPerson {
+    person.center_x *= 0.5;
+    person.center_y *= 0.5;
+    person.top_left_x *= 0.5;
+    person.top_left_y *= 0.5;
+    person.width *= 0.5;
+    person.height *= 0.5;
+
+    return person;
 }
 
 pub fn intersection_over_union(box1: &DetectedPerson, box2: &DetectedPerson) -> f32 {
