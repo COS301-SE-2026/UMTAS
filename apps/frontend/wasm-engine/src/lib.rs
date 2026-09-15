@@ -1,5 +1,6 @@
-use image::{ImageBuffer, Rgba, imageops::FilterType};
+use fast_image_resize as fr;
 use serde::Serialize;
+use std::num::NonZeroU32;
 use std::{usize, vec};
 use wasm_bindgen::prelude::*;
 pub struct SliceFormat {
@@ -9,20 +10,55 @@ pub struct SliceFormat {
     slice_width: usize,
 }
 
+pub fn resize_image(
+    pixel_data: &[u8],
+    src_width: usize,
+    src_height: usize,
+    dst_width: usize,
+    dst_height: usize,
+) -> Result<Vec<u8>, String> {
+    let src_w =
+        NonZeroU32::new(src_width as u32).ok_or_else(|| "Invalid source width".to_string())?;
+    let src_h =
+        NonZeroU32::new(src_height as u32).ok_or_else(|| "Invalid source height".to_string())?;
+    let dst_w =
+        NonZeroU32::new(dst_width as u32).ok_or_else(|| "Invalid destination width".to_string())?;
+    let dst_h = NonZeroU32::new(dst_height as u32)
+        .ok_or_else(|| "Invalid destination height".to_string())?;
+
+    let src_image = fr::images::Image::from_vec_u8(
+        src_w.get(),
+        src_h.get(),
+        pixel_data.to_vec(),
+        fr::PixelType::U8x4,
+    )
+    .map_err(|e| e.to_string())?;
+
+    let mut dst_image = fr::images::Image::new(dst_w.get(), dst_h.get(), src_image.pixel_type());
+
+    let mut resizer = fr::Resizer::new();
+
+    let mut options = fr::ResizeOptions::new();
+    options.algorithm = fr::ResizeAlg::Convolution(fr::FilterType::Lanczos3);
+
+    resizer
+        .resize(&src_image, &mut dst_image, Some(&options))
+        .map_err(|e| e.to_string())?;
+
+    Ok(dst_image.into_vec())
+}
 #[wasm_bindgen]
 pub fn slice_image_data(
     pixel_data: &[u8],
     width: usize,
     height: usize,
 ) -> Result<js_sys::Array, JsValue> {
-    let img =
-        ImageBuffer::<Rgba<u8>, _>::from_raw(width as u32, height as u32, pixel_data.to_vec())
-            .ok_or_else(|| JsValue::from_str("Invalid pixel data dimensions"))?;
-
     let result_arr = js_sys::Array::new();
 
-    let full_img = image::imageops::resize(&img, 640, 640, FilterType::Lanczos3);
-    let full_pixels = full_img.into_raw();
+    // full image
+    let full_pixels =
+        resize_image(pixel_data, width, height, 640, 640).map_err(|e| JsValue::from_str(&e))?;
+
     let full_format = SliceFormat {
         x: 0,
         y: 0,
@@ -31,12 +67,12 @@ pub fn slice_image_data(
     };
     result_arr.push(&extract_slice(full_format, &full_pixels, 640));
 
+    // quads
     let target_width = 1280;
     let target_height = 1280;
-    let resized_img =
-        image::imageops::resize(&img, target_width, target_height, FilterType::Lanczos3);
+    let resized_pixels = resize_image(pixel_data, width, height, target_width, target_height)
+        .map_err(|e| JsValue::from_str(&e))?;
 
-    let resized_pixels = resized_img.into_raw();
     let slice_size = 640;
 
     let top_left = SliceFormat {
@@ -64,26 +100,10 @@ pub fn slice_image_data(
         slice_width: slice_size,
     };
 
-    result_arr.push(&extract_slice(
-        top_left,
-        &resized_pixels,
-        target_width as usize,
-    ));
-    result_arr.push(&extract_slice(
-        top_right,
-        &resized_pixels,
-        target_width as usize,
-    ));
-    result_arr.push(&extract_slice(
-        bottom_left,
-        &resized_pixels,
-        target_width as usize,
-    ));
-    result_arr.push(&extract_slice(
-        bottom_right,
-        &resized_pixels,
-        target_width as usize,
-    ));
+    result_arr.push(&extract_slice(top_left, &resized_pixels, target_width));
+    result_arr.push(&extract_slice(top_right, &resized_pixels, target_width));
+    result_arr.push(&extract_slice(bottom_left, &resized_pixels, target_width));
+    result_arr.push(&extract_slice(bottom_right, &resized_pixels, target_width));
 
     Ok(result_arr)
 }
