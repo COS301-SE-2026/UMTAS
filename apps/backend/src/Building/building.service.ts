@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   forwardRef,
   Inject,
@@ -7,7 +8,14 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { Building, Venue } from '../entities/index';
+import {
+  Building,
+  EventAttendance,
+  EventVenue,
+  ModuleEnrollment,
+  UniversityEvent,
+  Venue,
+} from '../entities/index';
 import { DatabaseService } from '../db/database.service';
 import {
   BaseBuildingDto,
@@ -19,19 +27,40 @@ import {
   UpdateBuildingDto,
   UpdateBuildingInput,
 } from './dto/building.dto';
-import { eq, and, isNotNull, isNull, ilike, sql } from 'drizzle-orm';
+import {
+  eq,
+  and,
+  isNotNull,
+  isNull,
+  ilike,
+  sql,
+  countDistinct,
+  gte,
+  lte,
+  inArray,
+} from 'drizzle-orm';
 import { AppDatabase } from 'src/auth/auth';
 import { UniversityService } from 'src/University/university.service';
 import { VenueService } from 'src/Venue/venue.service';
 import {
   BuildingHeatmapQueryDto,
   BuildingHeatmapResponseDto,
+  BuildingHeatmapSummaryDto,
+  BuildingHeatmapView_ENUM,
+  VenueHeatmapDto,
 } from './dto/heatmap.dto';
+import { BaseVenueDto } from 'src/Venue/dto/venue.dto';
 
 //building row return drizzle gives us
 // type BuildingEntity = typeof Building.$inferSelect;
 
 const DEFAULT_DISPLAY_COLOUR = '#808080'; //neutral grey
+
+export type NormalizedBuildingHeatmapQuery = {
+  from: string;
+  to: string;
+  view: BuildingHeatmapView_ENUM;
+};
 
 @Injectable()
 export class BuildingService {
@@ -238,34 +267,56 @@ export class BuildingService {
     uniId: string,
     buildingId: string,
     query: BuildingHeatmapQueryDto,
+    tx?: AppDatabase,
   ): Promise<BuildingHeatmapResponseDto> {
-    const from = query.from ?? new Date().toISOString().slice(0, 10);
-    const to = query.to ?? from;
+    if (!tx) {
+      return this.dbService.db.transaction(async (t: AppDatabase) => {
+        return this.getHeatmap(uniId, buildingId, query, t);
+      });
+    }
+
+    const validatedQuery: NormalizedBuildingHeatmapQuery =
+      this.validateBuildingHeatmapQueryDto(query);
+
+    //Get building and venues - throws 404
+    const { building, venues } = await this.getById(uniId, buildingId, tx);
+
+    //Get heatmap data for all venues of building
+    const venuesHeatmap: VenueHeatmapDto[] = await this.getVenueHeatmapData(
+      venues ?? [],
+      validatedQuery,
+      tx,
+    );
+
+    //Build heatmap summary for building
+    const summary = this.buildHeatmapSummary(venuesHeatmap);
 
     return {
-      building: {
-        BuildingID: buildingId,
-        BuildingName: 'IT Building',
-        UniversityID: uniId,
-        location: null,
-        footprint: null,
-        icon: null,
-        displayColour: null,
+      building,
+      period: {
+        from: validatedQuery.from,
+        to: validatedQuery.to,
       },
-      period: { from, to },
-      summary: {
-        Capacity: 0,
-        projected: 0,
-        worstCase: 0,
-        actual: null,
-        projectedUtilisation: null,
-        worstCaseUtilisation: null,
-      },
-      venues: [],
+      summary,
+      venues: venuesHeatmap,
     };
-  }
+  } //END_getHeatmap
 
   // 🎅's little helpers
+
+  /**
+   * Validates and normalises a CreateBuildingInput.
+   *
+   * Ensures the university exists and the building name is unique within it.
+   * Defaults location, footprint and icon to null, and displayColour to the
+   * default colour when absent. Trims icon and nulls it if blank.
+   *
+   * @param input - The create payload to validate.
+   * @param tx - Active database transaction.
+   * @returns The normalised input.
+   * @throws NotFoundException when the university does not exist.
+   * @throws ConflictException when the building name is taken.
+   */
   private async validateCreateBuildingInput(
     input: CreateBuildingInput,
     tx: AppDatabase,
@@ -314,6 +365,14 @@ export class BuildingService {
     return input;
   } //END_validateCreateBuildingInput
 
+  /**
+   * Fetches a building with the given name for a university.
+   *
+   * @param buildingName - Name to search for.
+   * @param uniId - University to scope the search to.
+   * @param tx - Active database transaction.
+   * @returns The building wrapped in a response DTO, or null if none found.
+   */
   private async uniqueBuildingNamePerUniversity(
     buildingName: string,
     uniId: string,
@@ -334,6 +393,16 @@ export class BuildingService {
     return building ? { building } : null;
   } //END_uniqueBuildingNamePerUniversity
 
+  /**
+   * Maps a raw Building row to a BuildingDto.
+   *
+   * Collapses Latitude/Longitude into a location object (null when either is
+   * missing). All other fields pass through unchanged.
+   *
+   * @param row - Raw Building row from the database.
+   * @param venueCount - Number of venues attached to this building.
+   * @returns The mapped BuildingDto.
+   */
   private buildingDtoAdapter(
     row: typeof Building.$inferSelect,
     venueCount: number,
@@ -353,6 +422,20 @@ export class BuildingService {
     };
   } //END_buildingDtoAdapter
 
+  /**
+   * Validates and normalises an UpdateBuildingInput against the current building.
+   *
+   * Fields equal to the current value, or undefined, are stripped so the
+   * downstream update only touches changed columns. Handles the three-state
+   * pattern (undefined / null / value) for location, footprint and icon.
+   * New building names are checked for uniqueness, ignoring self-matches.
+   *
+   * @param oldBuilding - The current building DTO.
+   * @param input - The update payload to normalise.
+   * @param tx - Active database transaction.
+   * @returns The normalised input with unchanged fields removed.
+   * @throws ConflictException when the new building name is taken by another building.
+   */
   private async validateUpdateBuildingInput(
     oldBuilding: BaseBuildingDto,
     input: UpdateBuildingInput,
@@ -442,4 +525,208 @@ export class BuildingService {
 
     return input;
   } //END_validateUpdateBuildingInput
-}
+
+  /** Normalises and validates a BuildingHeatmapQueryDto.
+   *
+   * `from` defaults to today and `to` defaults to `from` when absent, so an
+   * empty query always produces a valid range.
+   *
+   * @param query - Raw heatmap query DTO from the request.
+   * @returns Normalised query with `from`, `to` and `view` required.
+   * @throws BadRequestException when `from` is after `to`.
+   */
+  private validateBuildingHeatmapQueryDto(
+    query: BuildingHeatmapQueryDto,
+  ): NormalizedBuildingHeatmapQuery {
+    //From - default to today
+    const from = query.from ?? new Date().toISOString().slice(0, 10);
+
+    //To - defaut to from
+    const to = query.to ?? from;
+
+    //Validate range
+    if (from > to) {
+      this.OOPSIE.warn(
+        `Invalid date range: from[${from}] must be <= to[${to}]`,
+      );
+      throw new BadRequestException(`Invalid date range`);
+    } //END_Range check
+
+    //validated in dto
+    const view = query.view;
+
+    return { from, to, view };
+  } //END_validateBuildingHeatmapQueryDto
+
+  /**
+   * Builds per-venue heatmap metrics for a set of venues.
+   *
+   * Runs one aggregation query per attendance view.
+   * Venues with no matching rows default to 0.
+   * Utilisation ratios are are null when the venue's capacity is 0.
+   *
+   * @param venues - Venue rows to compute metrics for. Empty array returns early.
+   * @param query - Normalised heatmap query (date range + view).
+   * @param tx - database transaction.
+   * @returns One VenueHeatmapDto per input venue.
+   */
+  private async getVenueHeatmapData(
+    venues: BaseVenueDto[],
+    query: NormalizedBuildingHeatmapQuery,
+    tx: AppDatabase,
+  ): Promise<VenueHeatmapDto[]> {
+    //return early if no venues
+    if (venues.length === 0) return [];
+
+    //extract venue Ids
+    const venueIds = venues.map((venue) => venue.VenueID);
+
+    //View
+    const shouldLoadProjected =
+      query.view === BuildingHeatmapView_ENUM.PROJECTED ||
+      query.view === BuildingHeatmapView_ENUM.ALL;
+
+    const shouldLoadWorstCase =
+      query.view === BuildingHeatmapView_ENUM.WORST_CASE ||
+      query.view === BuildingHeatmapView_ENUM.ALL;
+    //END_view
+
+    const projectedByVenue = new Map<string, number>();
+    const worstCaseByVenue = new Map<string, number>();
+
+    //Projected
+    if (shouldLoadProjected) {
+      const projectedRows = await tx
+        .select({
+          VenueID: EventVenue.VenueID,
+          projected: countDistinct(EventAttendance.UserID),
+        })
+        .from(EventVenue)
+        .innerJoin(
+          EventAttendance,
+          and(
+            eq(EventAttendance.eventID, EventVenue.EventID),
+            eq(EventAttendance.state, 'ATTENDING'),
+            gte(EventAttendance.eventDate, query.from),
+            lte(EventAttendance.eventDate, query.to),
+          ),
+        )
+        .where(inArray(EventVenue.VenueID, venueIds))
+        .groupBy(EventVenue.VenueID);
+
+      for (const row of projectedRows) {
+        projectedByVenue.set(row.VenueID, Number(row.projected));
+      } //END_row
+    } //END_Projected
+
+    //Worst Case
+    if (shouldLoadWorstCase) {
+      const worstCaseRows = await tx
+        .select({
+          VenueID: EventVenue.VenueID,
+          worstCase: countDistinct(ModuleEnrollment.UserID),
+        })
+        .from(EventVenue)
+        .innerJoin(
+          UniversityEvent,
+          eq(UniversityEvent.eventID, EventVenue.EventID),
+        )
+        .innerJoin(
+          ModuleEnrollment,
+          eq(ModuleEnrollment.ModuleID, UniversityEvent.moduleID),
+        )
+        .where(inArray(EventVenue.VenueID, venueIds))
+        .groupBy(EventVenue.VenueID);
+
+      for (const row of worstCaseRows) {
+        worstCaseByVenue.set(row.VenueID, Number(row.worstCase));
+      } //End_row
+    } //END_worstCase
+
+    //Format response
+    return venues.map((v): VenueHeatmapDto => {
+      const projected = projectedByVenue.get(v.VenueID) ?? 0;
+      const worstCase = worstCaseByVenue.get(v.VenueID) ?? 0;
+
+      const actual = null;
+
+      return {
+        VenueID: v.VenueID,
+        VenueName: v.VenueName,
+        Capacity: v.Capacity,
+        projected,
+        worstCase,
+        actual,
+        projectedUtilisation: this.calculateUtilisation(projected, v.Capacity),
+        worstCaseUtilisation: this.calculateUtilisation(worstCase, v.Capacity),
+      };
+    }); //END_Return
+  } //END_getVenueHeatmapData
+
+  /** Computes the utilisation ratio of a venue.
+   *
+   * @param attendance - The attendance figure to divide.
+   * @param capacity - The venue's capacity.
+   * @returns attendance / capacity, or null when capacity is 0.
+   */
+  private calculateUtilisation(
+    attendance: number,
+    capacity: number,
+  ): number | null {
+    if (capacity === 0) {
+      return null;
+    }
+
+    return attendance / capacity;
+  } //END_calculateUtilisation
+
+  /**
+   * Aggregates venue heatmap metrics into a building-level summary.
+   *
+   * Capacity, projected and worstCase are summed across all venues. `actual`
+   * is summed only if at least one venue has a non-null value, otherwise null.
+   * Utilisation ratios are computed via `calculateUtilisation`.
+   *
+   * @param venues - Venue heatmap DTOs to aggregate.
+   * @returns Building-level summary of the same metrics.
+   */
+  private buildHeatmapSummary(
+    venues: VenueHeatmapDto[],
+  ): BuildingHeatmapSummaryDto {
+    //Capacity
+    const Capacity = venues.reduce((total, venue) => total + venue.Capacity, 0);
+
+    //projected
+    const projected = venues.reduce(
+      (total, venue) => total + venue.projected,
+      0,
+    );
+
+    //Worst Case
+    const worstCase = venues.reduce(
+      (total, venue) => total + venue.worstCase,
+      0,
+    );
+
+    //Actual Attendance
+    const actualValues = venues
+      .map((venue) => venue.actual)
+      .filter((value): value is number => value !== null);
+
+    const actual =
+      actualValues.length > 0
+        ? actualValues.reduce((total, value) => total + value, 0)
+        : null;
+
+    return {
+      Capacity,
+      projected,
+      worstCase,
+      actual,
+
+      projectedUtilisation: this.calculateUtilisation(projected, Capacity),
+
+      worstCaseUtilisation: this.calculateUtilisation(worstCase, Capacity),
+    };
+  } //END_buildHeatmapSummary
+} //END_BuildingService

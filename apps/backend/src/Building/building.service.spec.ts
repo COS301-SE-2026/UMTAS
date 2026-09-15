@@ -1,12 +1,17 @@
 import { createMockDatabase } from '../Testing/Mocks/database.mock';
 import {
   mockDbResult,
+  mockSequentialResults,
   mockTransaction,
 } from '../Testing/Mocks/database.helpers';
-import { BuildingService } from './building.service';
+import {
+  BuildingService,
+  NormalizedBuildingHeatmapQuery,
+} from './building.service';
 import { Test } from '@nestjs/testing';
 import { DatabaseService } from '../db/database.service';
 import {
+  BadRequestException,
   ConflictException,
   InternalServerErrorException,
   NotFoundException,
@@ -24,7 +29,12 @@ import {
 } from './dto/building.dto';
 import { uniId } from 'src/Testing/constants';
 import { UniversityService } from 'src/University/university.service';
-import { createBuilding, createVenue } from 'src/Testing/Factories';
+import {
+  createBuilding,
+  createVenue,
+  createVenueHeatmap,
+} from 'src/Testing/Factories';
+import { BuildingHeatmapView_ENUM } from './dto/heatmap.dto';
 
 export const DEFAULT_DISPLAY_COLOUR = '#808080';
 
@@ -410,6 +420,97 @@ describe('BuildingService', () => {
       expect(result).toEqual({ building });
     });
   });
+
+  //getHeatmap
+  describe('Test_getHeatmap', () => {
+    const buildingId = 'building-1';
+    const validatedQuery = {
+      from: '2026-01-01',
+      to: '2026-06-30',
+      view: BuildingHeatmapView_ENUM.ALL,
+    };
+
+    const building: BaseBuildingDto = {
+      BuildingID: buildingId,
+      BuildingName: 'IT Building',
+      UniversityID: uniId,
+      location: null,
+      footprint: null,
+      icon: null,
+      displayColour: null,
+    };
+
+    it('should return the assembled heatmap response', async () => {
+      //Arrange
+      const venues = [createVenue({ VenueID: 'venue-1' })];
+      const venuesHeatmap = [createVenueHeatmap({ VenueID: 'venue-1' })];
+      const summary = {
+        Capacity: 100,
+        projected: 40,
+        worstCase: 80,
+        actual: null,
+        projectedUtilisation: 0.4,
+        worstCaseUtilisation: 0.8,
+      };
+
+      jest
+        .spyOn(service as any, 'validateBuildingHeatmapQueryDto')
+        .mockReturnValue(validatedQuery);
+      jest.spyOn(service, 'getById').mockResolvedValue({ building, venues });
+      jest
+        .spyOn(service as any, 'getVenueHeatmapData')
+        .mockResolvedValue(venuesHeatmap);
+      jest
+        .spyOn(service as any, 'buildHeatmapSummary')
+        .mockReturnValue(summary);
+
+      mockTransaction(mockDb, {});
+
+      //Act
+      const result = await service.getHeatmap(uniId, buildingId, {
+        view: BuildingHeatmapView_ENUM.ALL,
+      });
+
+      //Assert
+      expect(result).toEqual({
+        building,
+        period: { from: validatedQuery.from, to: validatedQuery.to },
+        summary,
+        venues: venuesHeatmap,
+      });
+    });
+
+    it('should default venues to empty array when getById returns none', async () => {
+      //Arrange
+      jest
+        .spyOn(service as any, 'validateBuildingHeatmapQueryDto')
+        .mockReturnValue(validatedQuery);
+      jest
+        .spyOn(service, 'getById')
+        .mockResolvedValue({ building, venues: undefined });
+      const heatmapSpy = jest
+        .spyOn(service as any, 'getVenueHeatmapData')
+        .mockResolvedValue([]);
+      jest.spyOn(service as any, 'buildHeatmapSummary').mockReturnValue({
+        Capacity: 0,
+        projected: 0,
+        worstCase: 0,
+        actual: null,
+        projectedUtilisation: null,
+        worstCaseUtilisation: null,
+      });
+
+      mockTransaction(mockDb, {});
+
+      //Act
+      await service.getHeatmap(uniId, buildingId, {
+        view: BuildingHeatmapView_ENUM.ALL,
+      });
+
+      //Assert
+      expect(heatmapSpy).toHaveBeenCalledWith([], validatedQuery, mockDb);
+    });
+  }); //END_Test_getHeatmap
 
   //Helpers
   describe('Test_validateCreateBuildingInput', () => {
@@ -985,4 +1086,259 @@ describe('BuildingService', () => {
       expect('displayColour' in result).toBe(false);
     });
   }); //END_Test_validateUpdateBuildingInput
+
+  describe('Test_validateBuildingHeatmapQueryDto', () => {
+    it('should default from and to to today when both absent', () => {
+      //Arrange
+      const today = new Date().toISOString().slice(0, 10);
+
+      //Act
+      const result = (service as any).validateBuildingHeatmapQueryDto({});
+
+      //Assert
+      expect(result.from).toBe(today);
+      expect(result.to).toBe(today);
+    });
+
+    it('should default to to match from when only from provided', () => {
+      //Act
+      const result = (service as any).validateBuildingHeatmapQueryDto({
+        from: '2026-03-01',
+      });
+
+      //Assert
+      expect(result.from).toBe('2026-03-01');
+      expect(result.to).toBe('2026-03-01');
+    });
+
+    it('should throw BadRequestException when from is after to', () => {
+      //Act + Assert
+      expect(() =>
+        (service as any).validateBuildingHeatmapQueryDto({
+          from: '2026-05-01',
+          to: '2026-03-01',
+        }),
+      ).toThrow(BadRequestException);
+    });
+
+    it('should preserve provided view', () => {
+      //Act
+      const result = (service as any).validateBuildingHeatmapQueryDto({
+        view: BuildingHeatmapView_ENUM.PROJECTED,
+      });
+
+      //Assert
+      expect(result.view).toBe(BuildingHeatmapView_ENUM.PROJECTED);
+    });
+  }); //END_Test_validateBuildingHeatmapQueryDto
+
+  describe('Test_getVenueHeatmapData', () => {
+    const normalizedQuery: NormalizedBuildingHeatmapQuery = {
+      from: '2026-01-01',
+      to: '2026-06-30',
+      view: BuildingHeatmapView_ENUM.ALL,
+    };
+
+    it('should return empty array when no venues provided', async () => {
+      //Act
+      const result = await (service as any).getVenueHeatmapData(
+        [],
+        normalizedQuery,
+        mockDb,
+      );
+
+      //Assert
+      expect(result).toEqual([]);
+      expect(mockDb.select).not.toHaveBeenCalled();
+    });
+
+    it('should return venues with projected and worstCase when view is ALL', async () => {
+      //Arrange
+      const venues = [
+        createVenue({
+          VenueID: 'venue-1',
+          VenueName: 'IT 2-26',
+          Capacity: 120,
+        }),
+        createVenue({ VenueID: 'venue-2', VenueName: 'IT 2-27', Capacity: 60 }),
+      ];
+      mockSequentialResults(mockDb.select, [
+        [{ VenueID: 'venue-1', projected: 45 }], // projected query
+        [{ VenueID: 'venue-1', worstCase: 100 }], // worstCase query
+      ]);
+
+      //Act
+      const result = await (service as any).getVenueHeatmapData(
+        venues,
+        normalizedQuery,
+        mockDb,
+      );
+
+      //Assert
+      expect(result).toHaveLength(2);
+      expect(result[0]).toMatchObject({
+        VenueID: 'venue-1',
+        projected: 45,
+        worstCase: 100,
+        actual: null,
+        projectedUtilisation: 45 / 120,
+        worstCaseUtilisation: 100 / 120,
+      });
+      expect(result[1]).toMatchObject({
+        VenueID: 'venue-2',
+        projected: 0,
+        worstCase: 0,
+        projectedUtilisation: 0,
+        worstCaseUtilisation: 0,
+      });
+    });
+
+    it('should only query projected when view is PROJECTED', async () => {
+      //Arrange
+      const venues = [createVenue({ VenueID: 'venue-1', Capacity: 100 })];
+      mockDbResult(mockDb.select, [{ VenueID: 'venue-1', projected: 30 }]);
+
+      //Act
+      const result = await (service as any).getVenueHeatmapData(
+        venues,
+        { ...normalizedQuery, view: BuildingHeatmapView_ENUM.PROJECTED },
+        mockDb,
+      );
+
+      //Assert
+      expect(result[0].projected).toBe(30);
+      expect(result[0].worstCase).toBe(0);
+      expect(mockDb.select).toHaveBeenCalledTimes(1);
+    });
+
+    it('should only query worstCase when view is WORST_CASE', async () => {
+      //Arrange
+      const venues = [createVenue({ VenueID: 'venue-1', Capacity: 100 })];
+      mockDbResult(mockDb.select, [{ VenueID: 'venue-1', worstCase: 80 }]);
+
+      //Act
+      const result = await (service as any).getVenueHeatmapData(
+        venues,
+        { ...normalizedQuery, view: BuildingHeatmapView_ENUM.WORST_CASE },
+        mockDb,
+      );
+
+      //Assert
+      expect(result[0].projected).toBe(0);
+      expect(result[0].worstCase).toBe(80);
+      expect(mockDb.select).toHaveBeenCalledTimes(1);
+    });
+
+    it('should set utilisation to null when capacity is 0', async () => {
+      //Arrange
+      const venues = [createVenue({ VenueID: 'venue-1', Capacity: 0 })];
+      mockDbResult(mockDb.select, [{ VenueID: 'venue-1', projected: 10 }]);
+      mockDbResult(mockDb.select, [{ VenueID: 'venue-1', worstCase: 20 }]);
+
+      //Act
+      const result = await (service as any).getVenueHeatmapData(
+        venues,
+        normalizedQuery,
+        mockDb,
+      );
+
+      //Assert
+      expect(result[0].projectedUtilisation).toBeNull();
+      expect(result[0].worstCaseUtilisation).toBeNull();
+    });
+  }); //END_Test_getVenueHeatmapData
+
+  describe('Test_calculateUtilisation', () => {
+    it('should return null when capacity is 0', () => {
+      //Act
+      const result = (service as any).calculateUtilisation(45, 0);
+
+      //Assert
+      expect(result).toBeNull();
+    });
+
+    it('should return attendance divided by capacity', () => {
+      //Act
+      const result = (service as any).calculateUtilisation(45, 120);
+
+      //Assert
+      expect(result).toBe(0.375);
+    });
+  }); //END_Test_calculateUtilisation
+
+  describe('Test_buildHeatmapSummary', () => {
+    it('should return zeros and nulls when no venues', () => {
+      //Act
+      const result = (service as any).buildHeatmapSummary([]);
+
+      //Assert
+      expect(result).toEqual({
+        Capacity: 0,
+        projected: 0,
+        worstCase: 0,
+        actual: null,
+        projectedUtilisation: null,
+        worstCaseUtilisation: null,
+      });
+    });
+
+    it('should sum Capacity, projected and worstCase across venues', () => {
+      //Arrange
+      const venues = [
+        createVenueHeatmap({ Capacity: 100, projected: 40, worstCase: 80 }),
+        createVenueHeatmap({ Capacity: 50, projected: 20, worstCase: 30 }),
+      ];
+
+      //Act
+      const result = (service as any).buildHeatmapSummary(venues);
+
+      //Assert
+      expect(result.Capacity).toBe(150);
+      expect(result.projected).toBe(60);
+      expect(result.worstCase).toBe(110);
+    });
+
+    it('should sum actual when at least one venue has a value', () => {
+      //Arrange
+      const venues = [
+        createVenueHeatmap({ actual: 30 }),
+        createVenueHeatmap({ actual: 15 }),
+      ];
+
+      //Act
+      const result = (service as any).buildHeatmapSummary(venues);
+
+      //Assert
+      expect(result.actual).toBe(45);
+    });
+
+    it('should return actual null when all venues have null actual', () => {
+      //Arrange
+      const venues = [
+        createVenueHeatmap({ actual: null }),
+        createVenueHeatmap({ actual: null }),
+      ];
+
+      //Act
+      const result = (service as any).buildHeatmapSummary(venues);
+
+      //Assert
+      expect(result.actual).toBeNull();
+    });
+
+    it('should compute utilisation from summed totals', () => {
+      //Arrange
+      const venues = [
+        createVenueHeatmap({ Capacity: 100, projected: 50, worstCase: 100 }),
+        createVenueHeatmap({ Capacity: 100, projected: 25, worstCase: 50 }),
+      ];
+
+      //Act
+      const result = (service as any).buildHeatmapSummary(venues);
+
+      //Assert
+      expect(result.projectedUtilisation).toBe(75 / 200);
+      expect(result.worstCaseUtilisation).toBe(150 / 200);
+    });
+  }); //END_Test_buildHeatmapSummary
 });
