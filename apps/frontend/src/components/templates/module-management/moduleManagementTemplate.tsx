@@ -156,17 +156,17 @@ export default function ModManagementTemplate() {
               className="w-full bg-[var(--background)]"
             />
           </div>
-          <div className="  flex items-center text-left gap-x-4 bg-[var(--background)] p-2 h-7.5 rounded-md">
-            <label className="focus:text-accent-foreground text-sm">
-              Show only enrolled modules
-            </label>
-            <Checkbox
-              checked={enrolledQ}
-              onCheckedChange={(checked: boolean) => setEnrolledQ(checked)}
-            />
-          </div>
 
-          <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+          <div className="flex flex-wrap items-center gap-3 w-full md:w-auto justify-end">
+            <div className="flex items-center text-left gap-x-4 bg-[var(--background)] px-4 h-7 rounded-md">
+              <label className="focus:text-accent-foreground text-sm">
+                Enrolled Modules
+              </label>
+              <Checkbox
+                checked={enrolledQ}
+                onCheckedChange={(checked: boolean) => setEnrolledQ(checked)}
+              />
+            </div>
             <Select value={selectedPrefix} onValueChange={setSelectedPrefix}>
               <SelectTrigger
                 id="select-module-prefixes"
