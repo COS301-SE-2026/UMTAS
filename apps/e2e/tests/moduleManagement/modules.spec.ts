@@ -2,11 +2,13 @@ import { expect, test } from "@playwright/test";
 
 test("Modules Page Loads", async ({ page }) => {
   await page.goto("/module-management");
+  await page.getByRole("tab", { name: "Modules" }).click();
   await expect(page.getByText("Module Management")).toBeVisible();
 });
 
 test("Modules update module", async ({ page }) => {
   await page.goto("/module-management");
+  await page.getByRole("tab", { name: "Modules" }).click();
   await page
     .getByTestId("modules-table-cell")
     .filter({ hasText: "COS151" })
@@ -16,6 +18,8 @@ test("Modules update module", async ({ page }) => {
   await page.getByTestId("save-changes-btn").click();
 
   await page.reload();
+
+  await page.getByRole("tab", { name: "Modules" }).click();
 
   await expect(page.getByText("COSTEST")).toBeVisible();
   await expect(page.getByText("updated Name")).toBeVisible();
