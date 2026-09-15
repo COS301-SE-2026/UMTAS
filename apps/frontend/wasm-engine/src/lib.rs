@@ -113,10 +113,23 @@ pub struct DetectedPerson {
 #[wasm_bindgen]
 pub fn infer_detection_data(quadrants: js_sys::Array) -> Result<String, JsValue> {
     // function to call with 4 slices of data from TS
+    let mut all_people: Vec<Vec<DetectedPerson>> = Vec::new();
+
+    for (quad_idx, item) in quadrants.iter().enumerate() {
+        let float_arr = item.dyn_ref::<js_sys::Float32Array>().ok_or_else(|| {
+            JsValue::from_str(&format!(
+                "Element at index {} is not a Float32Array",
+                quad_idx
+            ))
+        })?;
+
+        let people = read_result(&data).map_err(|e| JsValue::from_str(&e))?;
+        all_people.push(people);
+    }
 
     return Ok("".to_string()); // returns the json string for parsing
 }
-pub fn read_result(slice_data: &Float32Array) -> Result<Vec<DetectedPerson>, String> {
+pub fn read_result(slice_data: &Vec<f32>) -> Result<Vec<DetectedPerson>, String> {
     let data = slice_data.to_vec();
     let mut people: Vec<DetectedPerson> = Vec::new();
 
