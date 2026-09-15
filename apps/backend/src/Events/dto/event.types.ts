@@ -1,4 +1,5 @@
 import type { ActivityType } from 'shared-types';
+import { EventDto } from './EventDto.dto';
 
 export enum EventSource {
   UNIVERSITY = 'university',
@@ -33,3 +34,8 @@ export interface UniversityEventCriteria extends EventCriteria {
 export interface PersonalEventCriteria extends EventCriteria {
   eventSource: EventSource.PERSONAL;
 }
+
+export type EventWithModule = {
+  moduleId: string;
+  event: EventDto;
+};
