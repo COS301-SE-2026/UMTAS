@@ -277,7 +277,7 @@ export default function EditModuleEvent({
             <div className="flex flex-col gap-2 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4">
               <Label
                 htmlFor="module-description-input"
-                className="text-sm font-medium text-[var(--text-secondary)]"
+                className="text-sm font-medium text-[var(--text-primary)]"
               >
                 Module Enrollment
               </Label>
@@ -301,7 +301,7 @@ export default function EditModuleEvent({
             <div className="flex flex-col gap-2 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4">
               <Label
                 htmlFor="module-description-input"
-                className="text-sm font-medium text-[var(--text-secondary)]"
+                className="text-sm font-medium text-[var(--text-primary)]"
               >
                 Module Description
               </Label>

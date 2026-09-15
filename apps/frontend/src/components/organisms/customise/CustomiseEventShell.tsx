@@ -29,18 +29,20 @@ interface CustomiseShellProps {
   events: EventResponse[];
   modules: ModuleResponseDto[];
   onViewModeChange?: (tab: "Modules" | "Events") => void;
+  initialEventId?: string;
 }
 
 export default function EventsShell({
   events,
   modules,
+  initialEventId,
   onViewModeChange,
 }: CustomiseShellProps) {
   const { data: buildingsList } = useQuery(getAllBuildingsQ());
   const buildings = buildingsList ?? [];
 
   const [selectedEventId, setSelectedEventId] = useState<string>(
-    events[0]?.eventId,
+    initialEventId ?? events[0]?.eventId,
   );
   const [searchQuery, setSearchQuery] = useState<string>("");
 
@@ -177,7 +179,7 @@ export default function EventsShell({
   }
 
   return (
-    <Card className="w-[792px] h-[600px] m-6 p-4 flex flex-col overflow-hidden">
+    <Card className="w-full h-[600px] m-6 p-4 flex flex-col overflow-hidden">
       <div className="flex flex-col md:flex-row gap-6 h-full min-h-0">
         <div className="flex flex-col gap-2 w-full md:min-w-[240px] md:w-auto h-auto md:h-full flex-shrink-0">
           <div className="flex gap-1 bg-muted p-1 rounded-md mb-2 flex-shrink-0">
