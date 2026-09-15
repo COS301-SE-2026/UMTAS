@@ -1,7 +1,7 @@
 use image::{ImageBuffer, Rgba, imageops::FilterType};
 use js_sys::Float32Array;
 use serde::Serialize;
-use std::{io::Error, usize, vec};
+use std::{clone, io::Error, usize, vec};
 use wasm_bindgen::prelude::*;
 pub struct SliceFormat {
     x: usize,
@@ -123,6 +123,8 @@ pub fn infer_detection_data(quadrants: js_sys::Array) -> Result<String, JsValue>
             ))
         })?;
 
+        let data = float_arr.to_vec();
+
         let people = read_result(&data).map_err(|e| JsValue::from_str(&e))?;
         all_people.push(people);
     }
@@ -176,7 +178,7 @@ pub fn map_to_global(mut people: Vec<DetectedPerson>, quad_idx: usize) -> Vec<De
         1 => (640.0, 0.0),
         2 => (0.0, 640.0),
         3 => (640.0, 640.0),
-        _ => (0.0.0.0),
+        _ => (0.0, 0.0),
     };
 
     for person in &mut people {
@@ -209,13 +211,47 @@ pub fn intersection_over_union(box1: &DetectedPerson, box2: &DetectedPerson) -> 
     // Takes 2 bounding boxes calculates overlapping region
     // take overlap percentage
     // put into range
-    return 0.0;
+
+    let b1_min_x = box1.top_left_x;
+    let b1_min_y = box1.top_left_y;
+    let b1_max_x = box1.top_left_x + box1.width;
+    let b1_max_y = box1.top_left_y + box1.height;
+
+    let b2_min_x = box2.top_left_x;
+    let b2_min_y = box2.top_left_y;
+    let b2_max_x = box2.top_left_x + box2.width;
+    let b2_max_y = box2.top_left_y + box2.height;
+
+    let inter_x_min = b1_min_x.max(b2_min_x);
+    let inter_y_min = b1_min_y.max(b2_min_y);
+    let inter_x_max = b1_max_x.min(b2_max_x);
+    let inter_y_max = b1_max_y.min(b2_max_y);
+
+    let inter_width = (inter_x_max - inter_x_min).max(0.0);
+    let inter_height = (inter_y_max - inter_y_min).max(0.0);
+    let intersection_area = inter_width * inter_height;
+
+    if intersection_area == 0.0 {
+        return 0.0;
+    }
+
+    let b1_area = box1.width * box1.height;
+    let b2_area = box2.width * box2.height;
+    let union_area = b1_area + b2_area - intersection_area;
+
+    if union_area == 0.0 {
+        return 0.0;
+    }
+
+    return intersection_area / union_area;
 }
 
 pub fn non_maximum_sepression(
     mut people: Vec<DetectedPerson>,
     iou_threshold: f32,
 ) -> Vec<DetectedPerson> {
+    let final_people: Vec<DetectedPerson> = Vec::new();
+    let removed_people : Vec<DetectedPerson> =
     // standard means of weeding out redundant overlapping boxes
     // order list in decending order of confidence score
     // take a person and go down list comparing IOU against box.
@@ -223,5 +259,5 @@ pub fn non_maximum_sepression(
     // rather keep an parallel array of all discarded ones only
     //
 
-    return Vec;
+    return Vec::new();
 }

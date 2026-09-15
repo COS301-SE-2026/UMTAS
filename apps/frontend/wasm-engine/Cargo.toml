@@ -8,7 +8,7 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 console_error_panic_hook = "0.1.7"
-fast_image_resize = { version = "6.1.0", default-features = false }
+fast_image_resize = { version = "6.1.0", default-features = false, features = ["no_std"] }
 getrandom = { version = "0.4", features = ["wasm_js"] }
 image = { version = "0.24", default-features = false }
 js-sys = "0.3.105"
