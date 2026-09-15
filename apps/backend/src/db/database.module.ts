@@ -13,6 +13,7 @@ import { BuildingSeedService } from './seeding/services/buildings.seed.service';
 import { EventsSeedService } from './seeding/services/events.seed.service';
 import { SeedQueryService } from './seeding/services/seed-query.service';
 import { VenuesSeedService } from './seeding/services/venues.seed.service';
+import { EventVenuesSeedService } from './seeding/services/eventVenue.seed.service';
 
 @Global()
 @Module({
@@ -31,6 +32,7 @@ import { VenuesSeedService } from './seeding/services/venues.seed.service';
     AcademicCalendarSeedService,
     BuildingSeedService,
     VenuesSeedService,
+    EventVenuesSeedService,
   ],
   exports: [DatabaseService, SeedPersistenceService],
 })

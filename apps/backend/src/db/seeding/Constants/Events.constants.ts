@@ -1,5 +1,6 @@
 import { createHash } from 'crypto';
 import { ActivityType, DayOfWeek } from 'shared-types';
+import { VENUES_BY_ACTIVITY } from './Venues.constants';
 
 const ACTIVITY_TYPES: ActivityType[] = ['lecture', 'tutorial', 'prac'];
 const DAYS: DayOfWeek[] = [
@@ -15,6 +16,7 @@ export interface EventPattern {
   dayOfWeek: DayOfWeek;
   startTime: string;
   endTime: string;
+  venueName: string;
   label: string;
 }
 
@@ -54,11 +56,16 @@ export function getDeterministicPatterns(moduleCode: string): EventPattern[] {
     const day = DAYS[(seed + i * 7) % DAYS.length];
     const time = TIME_SLOTS[(seed + i * 13) % TIME_SLOTS.length];
 
+    const venueNames =
+      VENUES_BY_ACTIVITY[activity] ?? VENUES_BY_ACTIVITY.lecture!;
+    const venueName = venueNames[(seed + i * 17) % venueNames.length];
+
     patterns.push({
       activityType: activity,
       dayOfWeek: day,
       startTime: time.start,
       endTime: time.end,
+      venueName,
       label: activity.charAt(0).toUpperCase() + activity.slice(1),
     });
   }

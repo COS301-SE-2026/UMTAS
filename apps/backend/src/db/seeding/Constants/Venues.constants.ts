@@ -1,7 +1,39 @@
+import { ActivityType } from 'shared-types';
+
 type UpHatfieldVenueSeed = {
   name: string;
   buildingName: string;
   capacity?: number;
+};
+
+//links events to venues based of activity type
+export const VENUES_BY_ACTIVITY: Partial<
+  Record<ActivityType, readonly string[]>
+> = {
+  lecture: [
+    'Aula Auditorium',
+    'Musaion Auditorium',
+    'IT 2-23',
+    'Centenary 1',
+    'Thuto 1-1',
+    'HB 1-1',
+  ],
+  tutorial: [
+    'IT 4-1',
+    'IT 4-2',
+    'Centenary 2',
+    'Chancellors 1-1',
+    'Seminar Room 1',
+    'HB 2-1',
+  ],
+  prac: [
+    'IT 2-24',
+    'IT 2-25',
+    'Chemistry Lab 1-24',
+    'Chemistry Lab 1-40',
+    'NAS I 1-1',
+    'Botany & Zoology Lab 1',
+  ],
 };
 
 const AULA_VENUES: readonly UpHatfieldVenueSeed[] = [

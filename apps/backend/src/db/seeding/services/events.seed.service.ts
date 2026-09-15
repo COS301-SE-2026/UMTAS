@@ -84,23 +84,27 @@ export class EventsSeedService extends BaseSeedService {
           .where(eq(Event.importFingerprint, fingerprint))
           .limit(1);
 
-        const event =
-          existing ??
-          (
-            await this.persistence.insertEvents(db, [
-              {
-                eventName,
-                activityCode: code,
-                activityType: pattern.activityType,
-                eventCriteria: criteria,
-                isRecurring: true,
-                importFingerprint: fingerprint,
-              },
-            ])
-          )[0];
+        let eventId: string;
 
-        if (!event) continue;
-        if (!existing) eventsCreated++;
+        if (existing) {
+          eventId = existing.id;
+        } else {
+          const [created] = await this.persistence.insertEvents(db, [
+            {
+              eventName,
+              activityCode: code,
+              activityType: pattern.activityType,
+              eventCriteria: criteria,
+              isRecurring: true,
+              importFingerprint: fingerprint,
+            },
+          ]);
+
+          if (!created) continue;
+
+          eventId = created.eventID;
+          eventsCreated++;
+        }
 
         //Link event to relevant module
         const [relationship] = await db
@@ -108,7 +112,7 @@ export class EventsSeedService extends BaseSeedService {
           .from(UniversityEvent)
           .where(
             and(
-              eq(UniversityEvent.eventID, event.id),
+              eq(UniversityEvent.eventID, eventId),
               eq(UniversityEvent.moduleID, module.id),
             ),
           )
@@ -116,8 +120,12 @@ export class EventsSeedService extends BaseSeedService {
 
         if (!relationship) {
           await this.persistence.insertUniversityEvents(db, [
-            { eventID: event.id, moduleID: module.id },
+            {
+              eventID: eventId,
+              moduleID: module.id,
+            },
           ]);
+
           relationshipsCreated++;
         }
       } //END_pattern
