@@ -12,6 +12,7 @@ import { SeedPersistenceService } from './seed-persistence.service';
 import { AcademicCalendarSeedService } from './services/academic-calendar.seed.service';
 import { PublicCalendarSeedService } from './services/public-calendar.seed.service';
 import { BuildingSeedService } from './services/buildings.seed.service';
+import { EventsSeedService } from './services/events.seed.service';
 
 @Injectable()
 export class DatabaseSeedService {
@@ -27,6 +28,7 @@ export class DatabaseSeedService {
     private readonly academicCalendarSeedService: AcademicCalendarSeedService,
     private readonly persistence: SeedPersistenceService,
     private readonly buildingSeedService: BuildingSeedService,
+    private readonly eventSeedService: EventsSeedService,
   ) {}
 
   async seed(db: AppDatabase): Promise<void> {
@@ -44,6 +46,7 @@ export class DatabaseSeedService {
       ],
       ['courses', (tx: AppDatabase) => this.courseSeedService.seed(tx)],
       ['modules', (tx: AppDatabase) => this.moduleSeedService.seed(tx)],
+      ['event', (tx: AppDatabase) => this.eventSeedService.seed(tx)],
       [
         'public calendars',
         (tx: AppDatabase) => this.publicCalendarSeedService.seed(tx),

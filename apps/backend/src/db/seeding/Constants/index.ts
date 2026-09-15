@@ -5,3 +5,4 @@ export * from './Modules';
 export * from './AcademicCalendar.constants';
 export * from './PublicCalendars.constants';
 export * from './building.constants';
+export * from './Events.constants';
