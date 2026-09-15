@@ -1,6 +1,7 @@
 use image::{ImageBuffer, Rgba, imageops::FilterType};
 use js_sys::Float32Array;
-use std::usize;
+use serde::Serialize;
+use std::{io::Error, usize, vec};
 use wasm_bindgen::prelude::*;
 pub struct SliceFormat {
     x: usize,
@@ -99,7 +100,7 @@ pub fn normalize_pixel(colour: &u8) -> f32 {
     return (*colour as f32) / 255.0;
 }
 
-
+#[derive(Serialize)]
 pub struct DetectedPerson {
     pub center_x: f32,
     pub center_y: f32,
@@ -110,30 +111,11 @@ pub struct DetectedPerson {
     pub confidence: f32,
 }
 #[wasm_bindgen]
-pub fn infer_detectionData() {
+pub fn infer_detection_data(quadrants: js_sys::Array) -> Result<String, JsValue> {
     // function to call with 4 slices of data from TS
-}
-pub fn map_to_global() {
-    // will map a single array of People changing co-ords to be global instead of local
-}
 
-pub fn intersection_over_union() {
-    // standard means of detecting if 2 bounding boxes are the same person
-    // 0 -> 1, 0 means no intersection, 1 full intersection
-    // Does this via maf
-    // Takes 2 bounding boxes calculates overlapping region
-    // take overlap percentage
-    // put into range
+    return Ok("".to_string()); // returns the json string for parsing
 }
-
-pub fn non_maximum_sepression() {
-    // standard means of weeding out redundant overlapping boxes
-    // order list in decending order of confidence score
-    // take a person and go down list comparing IOU against box.
-    // If any box has higher iou than threshold discard-> same person
-    // rather keep an parallel array of all discarded ones only
-}
-
 pub fn read_result(slice_data: &Float32Array) -> Result<Vec<DetectedPerson>, String> {
     let data = slice_data.to_vec();
     let mut people: Vec<DetectedPerson> = Vec::new();
@@ -170,4 +152,35 @@ pub fn read_result(slice_data: &Float32Array) -> Result<Vec<DetectedPerson>, Str
     }
 
     return Ok(people);
+}
+// original is 1280 by 1280 then in terms of 640 by 640
+// Global is the original 640 x 640
+pub fn map_to_global(people: Vec<DetectedPerson>) -> Vec<DetectedPerson> {
+    // will map a single array of People changing co-ords to be global instead of local
+
+    return Vec;
+}
+
+pub fn intersection_over_union(box1: &DetectedPerson, box2: &DetectedPerson) -> f32 {
+    // standard means of detecting if 2 bounding boxes are the same person
+    // 0 -> 1, 0 means no intersection, 1 full intersection
+    // Does this via maf
+    // Takes 2 bounding boxes calculates overlapping region
+    // take overlap percentage
+    // put into range
+    return 0.0;
+}
+
+pub fn non_maximum_sepression(
+    mut people: Vec<DetectedPerson>,
+    iou_threshold: f32,
+) -> Vec<DetectedPerson> {
+    // standard means of weeding out redundant overlapping boxes
+    // order list in decending order of confidence score
+    // take a person and go down list comparing IOU against box.
+    // If any box has higher iou than threshold discard-> same person
+    // rather keep an parallel array of all discarded ones only
+    //
+
+    return Vec;
 }
