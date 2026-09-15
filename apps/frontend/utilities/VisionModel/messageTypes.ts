@@ -5,6 +5,8 @@ export type MessageType =
   | "POSE_FREE"
   | "DETECT_DATA"
   | "DETECT_POSE"
+  | "PROCESS_DETECT_DATA"
+  | "PROCESS_POSE_DATA"
   | "DETECT_DATA_PARSED"
   | "POSE_DATA_PARSED";
 
@@ -26,3 +28,25 @@ export type DETECT_DATA_PAYLOAD = {
 };
 
 export type DETECT_DATA_MESSAGE = VisionModelEvent<DETECT_DATA_PAYLOAD>;
+
+export type PROCESS_DETECT_DATA_PAYLOAD = {
+  sliced_results: Float32Array[];
+};
+
+export type PROCESS_DETECT_DATA_MESSAGE =
+  VisionModelEvent<PROCESS_DETECT_DATA_PAYLOAD>;
+
+export interface DetectedPerson {
+  center_x: number;
+  center_y: number;
+  top_left_x: number;
+  top_left_y: number;
+  width: number;
+  height: number;
+  confidence: number;
+}
+
+export type PROCESS_DETECT_DATA_RESULT = DetectedPerson[];
+
+export type RESULT_PROCESS_DETECT_DATA =
+  VisionModelEvent<PROCESS_DETECT_DATA_RESULT>;
