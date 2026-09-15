@@ -1,4 +1,5 @@
 import { randomUUID } from 'crypto';
+import { VenueHeatmapDto } from 'src/Building/dto/heatmap.dto';
 import { Building } from 'src/entities';
 
 type BuildingEntity = typeof Building.$inferSelect;
@@ -21,4 +22,21 @@ export function createBuilding(
     UpdateAt: new Date(),
     ...overrides,
   };
-}
+} //END_createBuilding
+
+export function createVenueHeatmap(
+  overrides: Partial<VenueHeatmapDto> = {},
+): VenueHeatmapDto {
+  return {
+    VenueID: randomUUID(),
+    VenueName: 'Test Venue',
+    Capacity: 100,
+    projected: 50,
+    worstCase: 90,
+    actual: 20,
+    projectedUtilisation: 0.5,
+    worstCaseUtilisation: 0.9,
+
+    ...overrides,
+  };
+} //END_createVenueHeatmap

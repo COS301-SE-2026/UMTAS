@@ -162,6 +162,8 @@ describe('UniversityService', () => {
 
       const dto = { UniversityName: undefined };
 
+      mockTransaction(mockDb, {});
+
       //Act
       const result = await service.update('1', dto);
 
@@ -199,6 +201,7 @@ describe('UniversityService', () => {
         .spyOn(service, 'checkDuplicateUniversityName')
         .mockResolvedValue(expectedResult);
 
+      mockTransaction(mockDb, {});
       //Act + Assert
       await expect(
         service.update(uniId, { UniversityName: 'nuwe naam' }),

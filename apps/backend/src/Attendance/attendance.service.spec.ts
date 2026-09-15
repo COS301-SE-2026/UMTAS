@@ -239,17 +239,17 @@ describe('Attendance Service', () => {
   describe('Test_updateAttendanceRecord', () => {
     //UnHappy - doesn't exist
     it('should throw if attendance record does not exist', async () => {
+      mockTransaction(mockDb, {
+        select: [[]],
+      });
+
       //Arrange
       const dto = createUpdateAttendanceDto();
-      const spy = jest
-        .spyOn(service, 'getById')
-        .mockRejectedValue(new NotFoundException());
 
       //Act + Assert
       await expect(
         service.updateAttendanceRecord(attendanceId, dto),
       ).rejects.toThrow(NotFoundException);
-      expect(spy).toHaveBeenCalled();
     });
 
     //UnHappy - nothing to update

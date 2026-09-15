@@ -14,6 +14,7 @@ import {
   CreateEventDtoV2,
   EventCriteriaDto,
   EventCriteriaDtoV2,
+  EventDto,
   EventSingleResponseDto,
   EventStatsVenueResponseDto,
   EventStatsWeeklyResponseDto,
@@ -35,8 +36,16 @@ import {
   UniversityDto,
   UniversitySingleResponseDto,
 } from 'src/University/dto/university.dto';
-import { DayOfWeek } from './dto/event.types';
-import { and, count, countDistinct, eq, inArray, sql } from 'drizzle-orm';
+import { DayOfWeek, EventWithModule } from './dto/event.types';
+import {
+  and,
+  count,
+  countDistinct,
+  eq,
+  getTableColumns,
+  inArray,
+  sql,
+} from 'drizzle-orm';
 
 export class EventServiceV2 extends EventService {
   private readonly OOPSIE = new Logger(this.constructor.name);
@@ -160,6 +169,45 @@ export class EventServiceV2 extends EventService {
       message: `Event[${updated.eventName}] validated=${updated.validated}`,
     };
   } //END_validateEvent
+
+  //non crud
+  async getEventsByModules(
+    moduleIds: string[],
+    db: AppDatabase,
+  ): Promise<EventWithModule[]> {
+    if (moduleIds.length === 0)
+      //return early
+      return [];
+
+    //Fetch events for modules
+    const eventRows = await db
+      .select({
+        moduleId: UniversityEvent.moduleID,
+        event: getTableColumns(Event),
+      })
+      .from(UniversityEvent)
+      .innerJoin(Event, eq(Event.eventID, UniversityEvent.eventID))
+      .where(inArray(UniversityEvent.moduleID, moduleIds));
+
+    const eventIds = eventRows.map((row) => row.event.eventID);
+
+    //Get venues for each event
+    const venuesByEvent = await this.getVenuesByEvents(eventIds, db);
+
+    return eventRows.map((row) => ({
+      moduleId: row.moduleId,
+      event: {
+        eventId: row.event.eventID,
+        eventName: row.event.eventName,
+        activityCode: row.event.activityCode ?? undefined,
+        activityType: row.event.activityType as EventDto['activityType'],
+        eventCriteria: row.event.eventCriteria,
+        isRecurring: row.event.isRecurring,
+        validated: row.event.validated,
+        venues: venuesByEvent.get(row.event.eventID) ?? [],
+      },
+    }));
+  } //END_getEventsByModules
 
   //Stats
 
@@ -556,4 +604,53 @@ export class EventServiceV2 extends EventService {
       buildingId: newVenue.BuildingID ?? undefined,
     };
   } //END_validateAndCreateVenue
+
+  /**
+   * Fetches venues grouped by event for the given event IDs.
+   *
+   * @param eventIds - Event IDs to fetch venues for.
+   * @param db - Active database transaction.
+   * @returns Map of event ID to its venue list. Empty when `eventIds` is empty.
+   */
+  private async getVenuesByEvents(
+    eventIds: string[],
+    db: AppDatabase,
+  ): Promise<Map<string, EventDto['venues']>> {
+    if (eventIds.length === 0)
+      //return early
+      return new Map();
+
+    //Fetch venues for events
+    const venueRows = await db
+      .select({
+        eventId: EventVenue.EventID,
+        venueId: Venue.VenueID,
+        venueName: Venue.VenueName,
+        buildingId: Venue.BuildingID,
+      })
+      .from(EventVenue)
+      .innerJoin(Venue, eq(EventVenue.VenueID, Venue.VenueID))
+      .where(inArray(EventVenue.EventID, eventIds));
+
+    //Map venues by eventId
+    const venuesByEvent = new Map<string, EventDto['venues']>();
+
+    for (const row of venueRows) {
+      const venue = {
+        venueId: row.venueId,
+        venueName: row.venueName ?? '',
+        buildingId: row.buildingId ?? undefined,
+      };
+
+      const venues = venuesByEvent.get(row.eventId);
+
+      if (venues) {
+        venues.push(venue);
+      } else {
+        venuesByEvent.set(row.eventId, [venue]);
+      }
+    } //END_row
+
+    return venuesByEvent;
+  } //END_getVenuesByEvents
 } //END_EventServiceV2

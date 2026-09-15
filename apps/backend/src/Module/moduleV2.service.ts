@@ -41,8 +41,10 @@ import {
 } from 'src/entities';
 import { CourseService } from 'src/Course/course.service';
 import { GroupingService } from 'src/Grouping/grouping.service';
-import { EventService } from 'src/Events/event.service';
 import { isNotNull } from 'drizzle-orm';
+import { EventDto } from 'src/Events/dto/EventDto.dto';
+import { EventWithModule } from 'src/Events/dto/event.types';
+import { EventServiceV2 } from 'src/Events/eventV2.service';
 
 @Injectable()
 export class ModuleServiceV2 extends ModuleService {
@@ -52,8 +54,8 @@ export class ModuleServiceV2 extends ModuleService {
     protected readonly dbService: DatabaseService,
     protected readonly courseService: CourseService,
     protected readonly groupingService: GroupingService,
-    @Inject(forwardRef(() => EventService))
-    protected readonly eventService: EventService,
+    @Inject(forwardRef(() => EventServiceV2))
+    protected readonly eventService: EventServiceV2,
   ) {
     super(dbService, courseService, groupingService);
   }
@@ -208,26 +210,10 @@ export class ModuleServiceV2 extends ModuleService {
     tx?: AppDatabase,
   ): Promise<ModuleListResponseDtoV2> {
     const db = tx ?? this.dbService.db;
-    const uniId = filters.universityId?.trim();
-    const courseId = filters.courseId?.trim();
-    const groupId = filters.GroupID?.trim();
-    const moduleCode = filters.moduleCode?.trim();
-    const enroll = filters.userEnrollment;
 
-    let foundModules: ModuleSingleResponseDto[] = [];
+    const whereClause = this.buildModuleFilters(userId, filters);
 
-    const conditions: SQL[] = [];
-
-    if (uniId) conditions.push(eq(Course.UniversityID, uniId));
-    if (courseId) conditions.push(eq(CourseModule.CourseID, courseId));
-    if (groupId) conditions.push(eq(GroupModules.GroupID, groupId));
-    if (moduleCode)
-      conditions.push(ilike(modules.moduleCode, `%${moduleCode}%`));
-    if (enroll) conditions.push(eq(ModuleEnrollment.UserID, userId));
-
-    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
-
-    foundModules = await db
+    const foundModules = await db
       .select({
         ...getTableColumns(modules),
         styling: ModuleStyling.styling ?? null,
@@ -258,36 +244,23 @@ export class ModuleServiceV2 extends ModuleService {
       .where(whereClause)
       .orderBy(modules.moduleCode);
 
-    //Filter for unique moduleIDs
-    const uniqueModules = foundModules.filter(
-      (module, index, self) =>
-        index === self.findIndex((m) => m.moduleID === module.moduleID),
-    );
+    const uniqueModules = this.deduplicateModules(foundModules);
 
-    //Add events per module
-    const modulesWithEvents = await Promise.all(
-      uniqueModules.map(async (module) => ({
-        ...module,
-        Events: (
-          await this.eventService.getAllEvents(
-            userId,
-            {
-              moduleId: module.moduleID,
-            },
-            tx,
-          )
-        ).events,
-      })),
-    ); //END_promise all
+    const moduleIds = uniqueModules.map((module) => module.moduleID);
+
+    const events = await this.eventService.getEventsByModules(moduleIds, db);
+
+    const eventsByModule = this.groupEventsByModule(events);
+
+    const modulesWithEvents = uniqueModules.map((module) => ({
+      ...module,
+      Events: eventsByModule.get(module.moduleID) ?? [],
+    }));
 
     return {
       modules: modulesWithEvents,
       message: `Returning: ${uniqueModules.length}-Modules. | With filters: ${JSON.stringify(filters)}`,
-      ...(filters.Stats && filters.Stats === true
-        ? {
-            count: foundModules.length,
-          }
-        : {}),
+      ...(filters.Stats ? { count: uniqueModules.length } : {}),
     };
   } //getAll
 
@@ -631,4 +604,98 @@ export class ModuleServiceV2 extends ModuleService {
     //If module exists with moduleCode for moduleGrouping, return true else false
     return this.getById(userId, existingModule.moduleId);
   }
-}
+
+  /**
+   * Builds a SQL WHERE clause from module filters.
+   *
+   * @param userId - User ID used when `userEnrollment` is set.
+   * @param filters - Module filter DTO.
+   * @returns Combined AND clause, or undefined when no filters are set.
+   */
+  private buildModuleFilters(
+    userId: string,
+    filters: ModuleFiltersDtoV2,
+  ): SQL | undefined {
+    const conditions: SQL[] = [];
+
+    const universityId = filters.universityId?.trim();
+    const courseId = filters.courseId?.trim();
+    const groupId = filters.GroupID?.trim();
+    const moduleCode = filters.moduleCode?.trim();
+
+    //UniId
+    if (universityId) {
+      conditions.push(eq(Course.UniversityID, universityId));
+    }
+
+    //CourseId
+    if (courseId) {
+      conditions.push(eq(CourseModule.CourseID, courseId));
+    }
+
+    //GroupId
+    if (groupId) {
+      conditions.push(eq(GroupModules.GroupID, groupId));
+    }
+
+    //Modulecode
+    if (moduleCode) {
+      conditions.push(ilike(modules.moduleCode, `%${moduleCode}%`));
+    }
+
+    //user enrollemnt
+    if (filters.userEnrollment) {
+      conditions.push(eq(ModuleEnrollment.UserID, userId));
+    }
+
+    return conditions.length > 0 ? and(...conditions) : undefined;
+  } //END_buildModuleFilters
+
+  /**
+   * Removes duplicate modules by moduleID, keeping the first occurrence.
+   *
+   * @param foundModules - Modules that may contain duplicates.
+   * @returns Modules with duplicates removed, original order preserved.
+   */
+  private deduplicateModules(
+    foundModules: ModuleSingleResponseDto[],
+  ): ModuleSingleResponseDto[] {
+    const seen = new Set<string>();
+    const uniqueModules: ModuleSingleResponseDto[] = [];
+
+    for (const m of foundModules) {
+      if (seen.has(m.moduleID)) {
+        continue;
+      }
+
+      seen.add(m.moduleID);
+      uniqueModules.push(m);
+    } //END_m
+
+    return uniqueModules;
+  } //END_deduplicateModules
+
+  /**
+   * Groups events by their module ID.
+   *
+   * @param events - Events with their module ID.
+   * @returns Map of module ID to its event list.
+   */
+  private groupEventsByModule(
+    events: EventWithModule[],
+  ): Map<string, EventDto[]> {
+    const eventsByModule = new Map<string, EventDto[]>();
+
+    for (const { moduleId, event } of events) {
+      const moduleEvents = eventsByModule.get(moduleId);
+
+      if (moduleEvents) {
+        moduleEvents.push(event);
+      } else {
+        eventsByModule.set(moduleId, [event]);
+      }
+    } //END_for
+
+    return eventsByModule;
+  } //END_groupEventsByModule
+} //END_ModuleV2Service

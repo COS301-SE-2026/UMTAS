@@ -76,7 +76,8 @@ export default function GoogleExportDialog({
           </p>
           <Button
             type="button"
-            className="w-fit cursor-pointer"
+            variant="outline"
+            className="flex w-fit cursor-pointer items-center gap-2 self-center border-[var(--border)] text-[var(--text-primary)] transition-colors duration-[var(--duration-fast)] hover:bg-[var(--bg-elevated)]"
             disabled={isLoading || isExporting}
             onClick={onSignIn}
           >
@@ -101,7 +102,8 @@ export default function GoogleExportDialog({
           </div>
           <Button
             type="button"
-            className="w-full max-w-52"
+            variant="outline"
+            className="flex w-full max-w-52 items-center gap-2 border-[var(--border)] text-[var(--text-primary)] transition-colors duration-[var(--duration-fast)] hover:bg-[var(--bg-elevated)]"
             disabled={!selectedSchedule || isExporting}
             onClick={() => {
               if (selectedSchedule) onExport(selectedSchedule.id);

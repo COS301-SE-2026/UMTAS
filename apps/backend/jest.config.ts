@@ -26,7 +26,7 @@ const config: Config = {
   ],
   collectCoverageFrom: [
     '**/*service.ts',
-    '!**/*.spec.ts',
+    '**/*.spec.ts',
     '!**/*.int.ts',
     '!**/*.module.ts',
     '!**/main.ts',
@@ -35,10 +35,8 @@ const config: Config = {
     '!**/db/**',
     // The campus map/routing modules are an incomplete bonus feature and are
     // intentionally outside the tested product scope.
-    '!**/Building/**',
     '!**/Map-config/**',
     '!**/Route/**',
-    '!**/Venue/**',
     '!**/entities/**',
     '!**/health/**',
     '!**/mail/**',

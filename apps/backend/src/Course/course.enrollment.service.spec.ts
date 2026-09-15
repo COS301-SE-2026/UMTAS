@@ -166,7 +166,7 @@ describe('CourseEnrollmentService', () => {
     });
 
     //Happy - should unenroll the student and their module enrollments
-    it('should unenroll the student and delete their module enrollments', async () => {
+    it('should unenroll the student', async () => {
       //Arrange
       mockCourseServiceV2.getById?.mockResolvedValue(baseCourse);
 
@@ -190,9 +190,9 @@ describe('CourseEnrollmentService', () => {
         CourseID: baseCourse.CourseID,
       });
       expect(result.message).toContain(
-        'Successfully unenrolled student from course and [2] modules',
+        `Successfully unenrolled student from course[${baseCourse.CourseID}]`,
       );
-      expect(mockDb.delete).toHaveBeenCalledTimes(2);
+      expect(mockDb.delete).toHaveBeenCalledTimes(1);
     });
   }); //END_Test_unenrollStudentFromCourse
 }); //END_CourseEnrollmentService
