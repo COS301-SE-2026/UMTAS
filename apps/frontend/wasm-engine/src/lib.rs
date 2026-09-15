@@ -271,18 +271,13 @@ pub fn non_maximum_sepression(
 
     for (idx, person) in people.iter().enumerate() {
         if removed_people[idx] == false {
+            final_people.push(person.clone());
             for compare_index in idx..people.len() {
                 let iou = intersection_over_union(person, &people[compare_index]);
-                if iou < iou_threshold {
+                if iou >= iou_threshold {
                     removed_people[compare_index] = true;
                 }
             }
-        }
-    }
-
-    for (idx, removed) in removed_people.into_iter().enumerate() {
-        if removed == false {
-            final_people.push(people[idx].clone());
         }
     }
 
