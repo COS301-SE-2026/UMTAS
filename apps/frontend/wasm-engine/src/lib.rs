@@ -113,7 +113,7 @@ pub struct DetectedPerson {
 #[wasm_bindgen]
 pub fn infer_detection_data(quadrants: js_sys::Array) -> Result<String, JsValue> {
     // function to call with 4 slices of data from TS
-    let mut all_people: Vec<Vec<DetectedPerson>> = Vec::new();
+    let mut all_people: Vec<DetectedPerson> = Vec::new();
 
     for (quad_idx, item) in quadrants.iter().enumerate() {
         let float_arr = item.dyn_ref::<js_sys::Float32Array>().ok_or_else(|| {
@@ -126,10 +126,13 @@ pub fn infer_detection_data(quadrants: js_sys::Array) -> Result<String, JsValue>
         let data = float_arr.to_vec();
 
         let people = read_result(&data).map_err(|e| JsValue::from_str(&e))?;
-        all_people.push(people);
+        let global_adjusted_person = map_to_global(people, quad_idx);
+        all_people.extend(global_adjusted_person);
     }
 
-    return Ok("".to_string()); // returns the json string for parsing
+    let res_people = non_maximum_sepression(all_people, 0.45);
+
+    return serde_json::to_string(&res_people).map_err(|e| JsValue::from_str(&e.to_string()));
 }
 pub fn read_result(slice_data: &Vec<f32>) -> Result<Vec<DetectedPerson>, String> {
     let data = slice_data.to_vec();
@@ -255,7 +258,7 @@ pub fn non_maximum_sepression(
     // take a person and go down list comparing IOU against box.
     // If any box has higher iou than threshold discard-> same person
     // rather keep an parallel array of all discarded ones only
-    
+
     let mut final_people: Vec<DetectedPerson> = Vec::new();
     // parallel array for whos been removed
     let mut removed_people: Vec<bool> = vec![false; people.len()];
@@ -282,8 +285,6 @@ pub fn non_maximum_sepression(
             final_people.push(people[idx].clone());
         }
     }
-
-
 
     return final_people;
 }
