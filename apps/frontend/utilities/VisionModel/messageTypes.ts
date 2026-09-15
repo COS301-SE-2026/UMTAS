@@ -10,8 +10,8 @@ export type MessageType =
   | "DETECT_DATA_PARSED"
   | "POSE_DATA_PARSED";
 
-export type VisionModelEvent<PayloadType> = {
-  eventType: MessageType;
+export type VisionModelEvent<Tmessage extends MessageType, PayloadType> = {
+  eventType: Tmessage;
   payload: PayloadType;
 };
 
@@ -21,20 +21,25 @@ export type PIXEL_PAYLOAD = {
   height: number;
 };
 
-export type DETECT_MESSAGE = VisionModelEvent<PIXEL_PAYLOAD>;
+export type DETECT_MESSAGE = VisionModelEvent<"DETECT", PIXEL_PAYLOAD>;
 
 export type DETECT_DATA_PAYLOAD = {
   results: Float32Array[];
 };
 
-export type DETECT_DATA_MESSAGE = VisionModelEvent<DETECT_DATA_PAYLOAD>;
+export type DETECT_DATA_MESSAGE = VisionModelEvent<
+  "DETECT_DATA",
+  DETECT_DATA_PAYLOAD
+>;
 
 export type PROCESS_DETECT_DATA_PAYLOAD = {
   sliced_results: Float32Array[];
 };
 
-export type PROCESS_DETECT_DATA_MESSAGE =
-  VisionModelEvent<PROCESS_DETECT_DATA_PAYLOAD>;
+export type PROCESS_DETECT_DATA_MESSAGE = VisionModelEvent<
+  "PROCESS_DETECT_DATA",
+  PROCESS_DETECT_DATA_PAYLOAD
+>;
 
 export interface DetectedPerson {
   center_x: number;
@@ -48,5 +53,7 @@ export interface DetectedPerson {
 
 export type PROCESS_DETECT_DATA_RESULT = DetectedPerson[];
 
-export type RESULT_PROCESS_DETECT_DATA =
-  VisionModelEvent<PROCESS_DETECT_DATA_RESULT>;
+export type RESULT_PROCESS_DETECT_DATA = VisionModelEvent<
+  "DETECT_DATA_PARSED",
+  PROCESS_DETECT_DATA_RESULT
+>;
