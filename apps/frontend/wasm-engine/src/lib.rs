@@ -140,7 +140,7 @@ pub fn read_result(slice_data: &Vec<f32>) -> Result<Vec<DetectedPerson>, String>
 
     const NUM_ANCHORS: usize = 8400;
     const NUM_FEATURES: usize = 84;
-    const CONFIDENCE_THRESHOLD: f32 = 0.25;
+    const CONFIDENCE_THRESHOLD: f32 = 0.50;
 
     if data.len() < NUM_ANCHORS * NUM_FEATURES {
         return Err("Invalid tensor data length".to_string());
