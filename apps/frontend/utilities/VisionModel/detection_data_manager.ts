@@ -1,7 +1,7 @@
 import {
-  DETECT_DATA_MESSAGE,
-  DETECT_MESSAGE,
-  MessageType,
+  DetectedPerson,
+  PROCESS_DETECT_DATA_MESSAGE,
+  RESULT_PROCESS_DETECT_DATA,
 } from "./messageTypes";
 
 class Detection_Data_Manager {
@@ -13,17 +13,16 @@ class Detection_Data_Manager {
     if (typeof window === "undefined") return;
 
     if (!this.worker) {
-      this.worker = new Worker(new URL("./modelWorker.ts", import.meta.url), {
-        type: "module",
-      });
+      this.worker = new Worker(
+        new URL("./detection_data_worker.ts", import.meta.url),
+        {
+          type: "module",
+        },
+      );
       this.isProcessing = false;
     }
   }
-  public run(
-    PixelData: Uint8ClampedArray,
-    width: number,
-    height: number,
-  ): Promise<Float32Array[] | null> {
+  public run(sliced_results: Float32Array[]): Promise<DetectedPerson[] | null> {
     if (this.isProcessing || !this.worker) {
       return Promise.resolve(null);
     }
@@ -32,32 +31,30 @@ class Detection_Data_Manager {
 
     return new Promise((resolve) => {
       const handleMessage = (event: MessageEvent) => {
-        const type = event.data.eventType as MessageType;
-        if (type === "DETECT_DATA") {
-          const message = event.data as DETECT_DATA_MESSAGE;
+        const message = event.data as RESULT_PROCESS_DETECT_DATA;
+        if (message.eventType === "DETECT_DATA_PARSED") {
           this.worker?.removeEventListener("message", handleMessage);
           this.isProcessing = false;
 
           const durationSeconds = (performance.now() - startTime) / 1000;
           console.log(
-            `Detection pipeline took: ${durationSeconds.toFixed(3)}s`,
+            `Detection data parsing pipeline took: ${durationSeconds.toFixed(3)}s`,
           );
 
-          resolve(message.payload.results);
+          resolve(message.payload);
         }
       };
       this.worker?.addEventListener("message", handleMessage);
 
-      const detectMessage: DETECT_MESSAGE = {
-        eventType: "DETECT",
+      const detectMessage: PROCESS_DETECT_DATA_MESSAGE = {
+        eventType: "PROCESS_DETECT_DATA",
         payload: {
-          height: height,
-          pixelData: PixelData,
-          width: width,
+          sliced_results: sliced_results,
         },
       };
 
-      this.worker?.postMessage(detectMessage, [PixelData.buffer]);
+      const transferBuffers = sliced_results.map((arr) => arr.buffer);
+      this.worker?.postMessage(detectMessage, transferBuffers);
     });
   }
 
