@@ -9,6 +9,7 @@ import { UserSeedService } from './seeding/services/users.seed.service';
 import { SeedPersistenceService } from './seeding/seed-persistence.service';
 import { AcademicCalendarSeedService } from './seeding/services/academic-calendar.seed.service';
 import { PublicCalendarSeedService } from './seeding/services/public-calendar.seed.service';
+import { BuildingSeedService } from './seeding/services/buildings.seed.service';
 
 @Global()
 @Module({
@@ -23,6 +24,7 @@ import { PublicCalendarSeedService } from './seeding/services/public-calendar.se
     SeedPersistenceService,
     PublicCalendarSeedService,
     AcademicCalendarSeedService,
+    BuildingSeedService,
   ],
   exports: [DatabaseService, SeedPersistenceService],
 })
