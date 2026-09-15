@@ -100,7 +100,7 @@ pub fn normalize_pixel(colour: &u8) -> f32 {
     return (*colour as f32) / 255.0;
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
 pub struct DetectedPerson {
     pub center_x: f32,
     pub center_y: f32,
@@ -250,8 +250,27 @@ pub fn non_maximum_sepression(
     mut people: Vec<DetectedPerson>,
     iou_threshold: f32,
 ) -> Vec<DetectedPerson> {
-    let final_people: Vec<DetectedPerson> = Vec::new();
-    let removed_people : Vec<DetectedPerson> =
+    let mut final_people: Vec<DetectedPerson> = Vec::new();
+    // parallel array for whos been removed
+    let mut removed_people: Vec<bool> = vec![false; people.len()];
+
+    for (idx, person) in people.iter().enumerate() {
+        if removed_people[idx] != false {
+            for compare_index in idx..people.len() {
+                let iou = intersection_over_union(person, &people[compare_index]);
+                if iou < iou_threshold {
+                    removed_people[compare_index] = true;
+                }
+            }
+        }
+    }
+
+    for (idx, removed) in removed_people.into_iter().enumerate() {
+        if removed == false {
+            final_people.push(people[idx].clone());
+        }
+    }
+
     // standard means of weeding out redundant overlapping boxes
     // order list in decending order of confidence score
     // take a person and go down list comparing IOU against box.
@@ -259,5 +278,5 @@ pub fn non_maximum_sepression(
     // rather keep an parallel array of all discarded ones only
     //
 
-    return Vec::new();
+    return final_people;
 }
