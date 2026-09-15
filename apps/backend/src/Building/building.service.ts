@@ -23,6 +23,10 @@ import { eq, and, isNotNull, isNull, ilike, sql } from 'drizzle-orm';
 import { AppDatabase } from 'src/auth/auth';
 import { UniversityService } from 'src/University/university.service';
 import { VenueService } from 'src/Venue/venue.service';
+import {
+  BuildingHeatmapQueryDto,
+  BuildingHeatmapResponseDto,
+} from './dto/heatmap.dto';
 
 //building row return drizzle gives us
 // type BuildingEntity = typeof Building.$inferSelect;
@@ -228,6 +232,38 @@ export class BuildingService {
 
     return { building };
   } //END_delete
+
+  //Heatmaps
+  async getHeatmap(
+    uniId: string,
+    buildingId: string,
+    query: BuildingHeatmapQueryDto,
+  ): Promise<BuildingHeatmapResponseDto> {
+    const from = query.from ?? new Date().toISOString().slice(0, 10);
+    const to = query.to ?? from;
+
+    return {
+      building: {
+        BuildingID: buildingId,
+        BuildingName: 'IT Building',
+        UniversityID: uniId,
+        location: null,
+        footprint: null,
+        icon: null,
+        displayColour: null,
+      },
+      period: { from, to },
+      summary: {
+        Capacity: 0,
+        projected: 0,
+        worstCase: 0,
+        actual: null,
+        projectedUtilisation: null,
+        worstCaseUtilisation: null,
+      },
+      venues: [],
+    };
+  }
 
   // 🎅's little helpers
   private async validateCreateBuildingInput(

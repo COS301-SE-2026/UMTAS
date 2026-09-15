@@ -35,6 +35,10 @@ import {
   CreateBuildingDto,
   UpdateBuildingDto,
 } from './dto/building.dto';
+import {
+  BuildingHeatmapQueryDto,
+  BuildingHeatmapResponseDto,
+} from './dto/heatmap.dto';
 
 @ApiTags('Buildings')
 @ApiSecurity('umtas-session')
@@ -159,4 +163,33 @@ export class BuildingController {
   ): Promise<BuildingSingleResponseDto> {
     return this.buildingService.delete(buildingId);
   } //END_delete
+
+  @Get(':buildingId/heatmap')
+  @Roles()
+  @ApiOperation({
+    summary: 'Get building occupancy heatmap',
+    description:
+      'Returns occupancy metrics for all venues assigned to a building.',
+    operationId: 'getBuildingHeatmap',
+  })
+  @ApiOkResponse({
+    description: 'Building heatmap returned successfully',
+    type: BuildingHeatmapResponseDto,
+  })
+  @ApiBadRequestResponse({
+    description: 'Invalid heatmap query parameters',
+  })
+  @ApiForbiddenResponse({
+    description: 'No university selected or insufficient permissions',
+  })
+  @ApiNotFoundResponse({
+    description: 'Building not found',
+  })
+  getHeatmap(
+    @CurrentUniId() uniId: string,
+    @Param('buildingId', ParseUUIDPipe) buildingId: string,
+    @Query() query: BuildingHeatmapQueryDto,
+  ): Promise<BuildingHeatmapResponseDto> {
+    return this.buildingService.getHeatmap(uniId, buildingId, query);
+  } //END_getHeatmap
 } //END_BuildingController

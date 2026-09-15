@@ -5796,7 +5796,7 @@
         "description": "Get a venue by ID. This Venues operation is part of the versioned UMTAS HTTP contract."
       },
       "patch": {
-        "description": "Update venue name and/or building assignment. Only fields present in the body are updated.",
+        "description": "Update venue name, capacity and/or building assignment. Only fields present in the body are updated.",
         "operationId": "updateVenue",
         "parameters": [
           {
@@ -6243,6 +6243,95 @@
           "Buildings"
         ],
         "description": "Delete a building by ID. This Buildings operation is part of the versioned UMTAS HTTP contract."
+      }
+    },
+    "/api/buildings/{buildingId}/heatmap": {
+      "get": {
+        "description": "Returns occupancy metrics for all venues assigned to a building.",
+        "operationId": "getBuildingHeatmap",
+        "parameters": [
+          {
+            "name": "buildingId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "description": "Inclusive start date for attendance aggregation.",
+            "schema": {
+              "format": "date",
+              "example": "2026-09-15",
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "description": "Inclusive end date for attendance aggregation.",
+            "schema": {
+              "format": "date",
+              "example": "2026-09-15",
+              "type": "string"
+            }
+          },
+          {
+            "name": "view",
+            "required": false,
+            "in": "query",
+            "description": "Attendance values to include in the response.",
+            "schema": {
+              "default": "all",
+              "type": "string",
+              "enum": [
+                "projected",
+                "worstCase",
+                "all"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Building heatmap returned successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BuildingHeatmapResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid heatmap query parameters"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "description": "No university selected or insufficient permissions"
+          },
+          "404": {
+            "description": "Building not found"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "security": [
+          {
+            "umtas-session": []
+          }
+        ],
+        "summary": "Get building occupancy heatmap",
+        "tags": [
+          "Buildings"
+        ]
       }
     },
     "/api/map-config": {
@@ -11478,6 +11567,12 @@
             "nullable": true,
             "format": "uuid",
             "description": "Optional building identifier. Nulled if the building is deleted."
+          },
+          "Capacity": {
+            "minimum": 0,
+            "type": "number",
+            "description": "Maximum capacity of the venue. Defaults to 0 if not provided.",
+            "example": 120
           }
         },
         "required": [
@@ -11895,6 +11990,165 @@
             "example": "#4A5548"
           }
         }
+      },
+      "BuildingHeatmapPeriodDto": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": "string",
+            "example": "2026-09-15",
+            "format": "date"
+          },
+          "to": {
+            "type": "string",
+            "example": "2026-09-15",
+            "format": "date"
+          }
+        },
+        "required": [
+          "from",
+          "to"
+        ]
+      },
+      "BuildingHeatmapSummaryDto": {
+        "type": "object",
+        "properties": {
+          "Capacity": {
+            "minimum": 0,
+            "type": "number",
+            "description": "Total capacity represented by this heatmap item.",
+            "example": 120
+          },
+          "projected": {
+            "minimum": 0,
+            "type": "number",
+            "description": "Expected attendance based on attendance intent.",
+            "example": 45
+          },
+          "worstCase": {
+            "minimum": 0,
+            "type": "number",
+            "description": "Maximum expected attendance based on module enrolments.",
+            "example": 120
+          },
+          "actual": {
+            "nullable": true,
+            "minimum": 0,
+            "type": "object",
+            "description": "Actual attendance. Null until a check-in source is implemented.",
+            "example": null
+          },
+          "projectedUtilisation": {
+            "nullable": true,
+            "type": "object",
+            "description": "Projected attendance divided by capacity. Null when capacity is zero.",
+            "example": 0.375
+          },
+          "worstCaseUtilisation": {
+            "nullable": true,
+            "type": "object",
+            "description": "Worst-case attendance divided by capacity. Null when capacity is zero.",
+            "example": 1
+          }
+        },
+        "required": [
+          "Capacity",
+          "projected",
+          "worstCase",
+          "actual",
+          "projectedUtilisation",
+          "worstCaseUtilisation"
+        ]
+      },
+      "VenueHeatmapDto": {
+        "type": "object",
+        "properties": {
+          "VenueID": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique venue identifier.",
+            "example": "00000000-0000-4000-8000-000000000000"
+          },
+          "VenueName": {
+            "type": "string",
+            "maxLength": 30,
+            "description": "Venue name. Unique per university. Max 30 chars.",
+            "example": "Main Lecture Hall"
+          },
+          "Capacity": {
+            "minimum": 0,
+            "type": "number",
+            "description": "Total capacity represented by this heatmap item.",
+            "example": 120
+          },
+          "projected": {
+            "minimum": 0,
+            "type": "number",
+            "description": "Expected attendance based on attendance intent.",
+            "example": 45
+          },
+          "worstCase": {
+            "minimum": 0,
+            "type": "number",
+            "description": "Maximum expected attendance based on module enrolments.",
+            "example": 120
+          },
+          "actual": {
+            "nullable": true,
+            "minimum": 0,
+            "type": "object",
+            "description": "Actual attendance. Null until a check-in source is implemented.",
+            "example": null
+          },
+          "projectedUtilisation": {
+            "nullable": true,
+            "type": "object",
+            "description": "Projected attendance divided by capacity. Null when capacity is zero.",
+            "example": 0.375
+          },
+          "worstCaseUtilisation": {
+            "nullable": true,
+            "type": "object",
+            "description": "Worst-case attendance divided by capacity. Null when capacity is zero.",
+            "example": 1
+          }
+        },
+        "required": [
+          "VenueID",
+          "VenueName",
+          "Capacity",
+          "projected",
+          "worstCase",
+          "actual",
+          "projectedUtilisation",
+          "worstCaseUtilisation"
+        ]
+      },
+      "BuildingHeatmapResponseDto": {
+        "type": "object",
+        "properties": {
+          "building": {
+            "$ref": "#/components/schemas/BaseBuildingDto"
+          },
+          "period": {
+            "$ref": "#/components/schemas/BuildingHeatmapPeriodDto"
+          },
+          "summary": {
+            "$ref": "#/components/schemas/BuildingHeatmapSummaryDto"
+          },
+          "venues": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VenueHeatmapDto"
+            }
+          }
+        },
+        "required": [
+          "building",
+          "period",
+          "summary",
+          "venues"
+        ]
       },
       "MapConfigDto": {
         "type": "object",
