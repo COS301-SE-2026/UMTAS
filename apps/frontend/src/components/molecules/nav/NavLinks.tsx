@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 
 import { usePathname, useRouter } from "next/navigation";
 
@@ -20,9 +20,17 @@ import {
   NavigationItem,
 } from "@/types/Nav";
 
+const emptySubscribe = () => () => {};
+
 export function NavLinks() {
   const pathname = usePathname();
   const router = useRouter();
+
+  const mounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false,
+  );
 
   const [, forceRefresh] = useState(0);
 
@@ -40,6 +48,10 @@ export function NavLinks() {
       );
     };
   }, []);
+
+  if (!mounted) {
+    return null;
+  }
 
   const universityDetails = UserDetails.getUniDetails();
 

@@ -33,13 +33,19 @@ import { errorName } from "../../../../utilities/errorCries";
 import { useErrorListener } from "@/hooks/errorListener";
 type solverProps = {
   modules: ModuleResponseDto[];
+  timetableName?: string;
   onJobCompleteAction?: () => void;
 };
 
 export default function SolverPreferences({
   modules,
+  timetableName: providedTimetableName,
   onJobCompleteAction,
 }: solverProps) {
+  const [localTimetableName, setLocalTimetableName] = useState("");
+
+  const timetableName = providedTimetableName ?? localTimetableName;
+  const hasProvidedTimetableName = providedTimetableName !== undefined;
   const [currentMode, setCurrentMode] = useState<
     "feasibility" | "optimization"
   >("feasibility");
@@ -47,7 +53,6 @@ export default function SolverPreferences({
   const [jobFailed, setJobFailed] = useState<boolean>(false);
   const [timetableCreated, setTimetableCreated] = useState<boolean>(false);
   const router = useRouter();
-  const [timetableName, setTimetableName] = useState<string>("");
 
   const [startTime, setStartTime] = useState<string>("07:30");
   const [startTimeChecked, SetStartTimeChecked] = useState<boolean>(false);
@@ -59,16 +64,19 @@ export default function SolverPreferences({
 
   function preferences() {
     return (
-      <div className="flex flex-col w-full min-w-100 max-w-120    ">
-        <div className="grid grid-cols-2  items-center gap-x-8  auto-rows-[minmax(30px,auto)]">
+      <div className="flex flex-col w-full min-w-100 max-w-120">
+        <div className="grid grid-cols-[1fr_80px] items-center gap-x-4 auto-rows-[minmax(30px,auto)]">
           <span className="text-sm font-medium text-[var(--text-primary)]">
             Choose Preferences
           </span>
+
           <span className="text-sm font-medium text-[var(--text-primary)] text-center">
             Activate
           </span>
-          <div className="col-span-2  border-b border-[var(--border)] " />
-          <div className=" col-span-2 grid grid-cols-2  items-center gap-x-8 max-h-45  auto-rows-[minmax(30px,auto)] overflow-scroll">
+
+          <div className="col-span-2 border-b border-[var(--border)]" />
+
+          <div className="col-span-2 grid grid-cols-[1fr_80px] items-center gap-x-4 gap-y-3 max-h-45 overflow-y-auto overflow-x-hidden pr-1 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[var(--border)] [scrollbar-color:var(--border)_transparent] [&_[role=checkbox]]:justify-self-center [&_[role=checkbox]]:border [&_[role=checkbox]]:border-[var(--text-secondary)] [&_[role=checkbox]]:bg-[var(--bg-surface)] [&_[role=checkbox][data-state=checked]]:border-[var(--btn-primary-bg)] [&_[role=checkbox][data-state=checked]]:bg-[var(--btn-primary-bg)]">
             <StartTimePref
               startTime={startTime}
               onChange={setStartTime}
@@ -76,19 +84,17 @@ export default function SolverPreferences({
               activePreference={startTimeChecked}
             />
 
-            <div className="col-span-2  " />
             <SkipDayPref
               setChecked={setSkipChecked}
               activePreference={skipChecked}
               day={skipDay}
               onChange={setSkipDay}
             />
-            <div className="col-span-2   " />
+
             <SmallGapsPref
               activePreference={smallGapsChecked}
               setChecked={setSmallGapsChecked}
             />
-            <div className="col-span-2  " />
           </div>
         </div>
       </div>
@@ -281,64 +287,38 @@ export default function SolverPreferences({
   }
   function ManageSolverOptions() {
     return (
-      <>
-        <div className="space-y-2">
-          <strong hidden>
-            <p>Solve mode</p>
-          </strong>
-          <div className="flex flex-row gap-4">
-            {" "}
-            <Button
-              hidden
-              disabled={loadingStatus()}
-              variant={"outline"}
-              onClick={() => {
-                setCurrentMode("feasibility");
-              }}
-            >
-              Feasibility
-            </Button>
-            <Button
-              hidden
-              disabled={loadingStatus()}
-              variant={"outline"}
-              onClick={() => {
-                setCurrentMode("optimization");
-              }}
-            >
-              Optimisation
-            </Button>
+      <div className="flex h-full flex-col">
+        {!hasProvidedTimetableName && (
+          <div className="mb-4">
+            <label className="flex w-full flex-col gap-1">
+              <span className="text-sm font-medium text-[var(--text-primary)]">
+                Timetable name
+              </span>
+
+              <Input
+                data-testid="input-solver-timetable-name"
+                id="input-name-timetable"
+                placeholder="My timetable"
+                value={localTimetableName}
+                className="h-8 w-full rounded-md border border-[var(--border)] bg-transparent px-3 text-left text-sm text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--ring)]"
+                onChange={(e) => setLocalTimetableName(e.target.value)}
+              />
+            </label>
           </div>
-        </div>
-        <div className="grid grid-cols-1 gap-y-2">
-          <label className="flex flex-col gap-1  w-full">
-            <span className="font-medium text-sm text-[var(--text-primary)]">
-              Timetable name
-            </span>
-            <Input
-              data-testid="input-solver-timetable-name"
-              id="input-name-timetable"
-              placeholder="My timetable"
-              value={timetableName}
-              className="h-8  w-full min-w-100 max-w-100 rounded-md border border-[var(--border)] bg-transparent px-3 text-left text-sm text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--ring)]"
+        )}
 
-              onChange={(e) => {
-                setTimetableName(e.target.value);
-              }}
-            ></Input>
-          </label>
+        <div>{preferences()}</div>
 
-          {preferences()}
-        </div>
-        <div className="grid grid-cols-1 gap-y-2 mt-2">
+        <div className="mt-auto flex justify-center pt-6">
           <Button
             data-testid="btn-upload-and-create-timetable"
             id="btn-upload-and-create-timetable"
             disabled={loadingStatus()}
             type="button"
             onClick={() => {
-              if (timetableName != "") enrollUser();
-              else {
+              if (timetableName != "") {
+                enrollUser();
+              } else {
                 window.dispatchEvent(
                   new CustomEvent(errorName, {
                     detail: {
@@ -348,12 +328,12 @@ export default function SolverPreferences({
                 );
               }
             }}
-            className=" w-fit h-8"
+            className="h-8 w-fit"
           >
             Upload and Create Timetable
           </Button>
         </div>
-      </>
+      </div>
     );
   }
   function handleError() {
@@ -363,12 +343,12 @@ export default function SolverPreferences({
   return (
     <>
       {/* {TimetableCreatedDialog()} */}
-      <Card className="shadow-lg border-[var(--border)] rounded-xl bg-[var(--bg-surface)] w-full h-full flex flex-col">
+      <Card className="shadow-lg border-[var(--border)] rounded-xl bg-[var(--bg-surface)] w-full flex flex-col">
         <CardHeader className="text-xl font-bold text-[var(--text-primary)]">
           Set your preferences
         </CardHeader>
 
-        <CardContent className=" overflow-y-auto flex-1">
+        <CardContent>
           {jobFailed == false ? (
             <>
               {!loadingStatus() ? (

@@ -1,5 +1,7 @@
 import {
   CreateBucketCommand,
+  GetObjectCommand,
+  type GetObjectCommandOutput,
   HeadBucketCommand,
   PutObjectCommand,
   S3Client,
@@ -15,7 +17,11 @@ import {
 
 export interface ObjectStorageClient {
   send(
-    command: HeadBucketCommand | CreateBucketCommand | PutObjectCommand,
+    command:
+      | HeadBucketCommand
+      | CreateBucketCommand
+      | PutObjectCommand
+      | GetObjectCommand,
   ): Promise<unknown>;
 }
 
@@ -76,6 +82,15 @@ export class ObjectStorageService implements OnModuleInit {
     );
 
     return { bucket: this.bucket, key: options.key };
+  }
+
+  async getObject(key: string): Promise<GetObjectCommandOutput> {
+    return (await this.client.send(
+      new GetObjectCommand({
+        Bucket: this.bucket,
+        Key: key,
+      }),
+    )) as GetObjectCommandOutput;
   }
 
   private async createBucket(): Promise<void> {

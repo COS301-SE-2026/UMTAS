@@ -13,12 +13,14 @@ import { GroupingService } from '../Grouping/grouping.service';
 import { createMockDatabase } from '../Testing/Mocks/database.mock';
 import {
   mockDbResult,
+  mockSequentialResults,
   mockTransaction,
 } from '../Testing/Mocks/database.helpers';
 import {
   createCourse,
   createCourseDto,
   createGroup,
+  createModule,
   createUniversity,
 } from '../Testing/Factories/';
 
@@ -37,6 +39,7 @@ import {
 
 //DTO's
 import { CourseFilters, UpdateCourseDto } from './dto/course.dto';
+import { ModulesDto } from 'src/Module/dto/module.dto';
 
 describe('CourseService', () => {
   let service: CourseService;
@@ -438,6 +441,43 @@ describe('CourseService', () => {
         success: true,
         CourseName: course.CourseName,
       });
+    });
+
+    //Happy
+    it('should delete relevant modules if no other group uses them', async () => {
+      //Arrange
+      const course = createCourse({
+        GroupID: groupId,
+      });
+      const modules: ModulesDto[] = [createModule(), createModule()];
+
+      mockSequentialResults(mockDb.delete, [
+        [course], //delete(Course)
+        [], //delete(ModuleGrouping)
+        [], //delete(modules)
+      ]);
+
+      mockSequentialResults(mockDb.select, [
+        [],
+        [{ ModuleID: modules[1].moduleID }],
+      ]);
+
+      mockGroupingService.getById?.mockResolvedValue({
+        GroupID: groupId,
+        modules: [modules[0].moduleID, modules[1].moduleID],
+        Hash: 'testHash',
+      });
+
+      //Act
+      const result = await service.delete(courseId);
+
+      //Assert
+      expect(result).toMatchObject({
+        success: true,
+        CourseName: course.CourseName,
+      });
+      expect(mockDb.select).toHaveBeenCalledTimes(2);
+      expect(mockDb.delete).toHaveBeenCalledTimes(3);
     });
   }); //END_Test_Delete
 }); //END_CourseService

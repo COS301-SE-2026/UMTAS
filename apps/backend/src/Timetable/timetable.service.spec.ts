@@ -167,6 +167,28 @@ describe('Timetable Service', () => {
       expect(mockDb.insert).toHaveBeenCalledTimes(3);
       expect(mockDb.select).toHaveBeenCalled();
     });
+
+    it('should throw if one or more event ids do not exist', async () => {
+      const event = createEvent();
+      const missingEventId = 'missing-event-id';
+      const dto = createCreateTimetableDto({
+        eventIds: [event.eventID, missingEventId],
+      });
+      const timetable = createTimetable();
+      const userTimetable = createUserTimetable({
+        UserID: userId,
+        TimetableID: timetable.timetableID,
+      });
+
+      mockTransaction(mockDb, {
+        select: [[event]],
+        insert: [[timetable], [userTimetable]],
+      });
+
+      await expect(service.createTimetable(userId, dto)).rejects.toThrow(
+        `Events not found or not owned by user: ${missingEventId}`,
+      );
+    });
   }); //END_Test_createTimetable
 
   //GetAll
