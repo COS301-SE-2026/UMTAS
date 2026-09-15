@@ -1,7 +1,6 @@
 use image::{ImageBuffer, Rgba, imageops::FilterType};
-use js_sys::Float32Array;
 use serde::Serialize;
-use std::{clone, io::Error, usize, vec};
+use std::{usize, vec};
 use wasm_bindgen::prelude::*;
 pub struct SliceFormat {
     x: usize,
@@ -249,6 +248,38 @@ pub fn intersection_over_union(box1: &DetectedPerson, box2: &DetectedPerson) -> 
     return intersection_area / union_area;
 }
 
+pub fn is_enveloped(box1: &DetectedPerson, box2: &DetectedPerson) -> bool {
+    let b1_min_x = box1.top_left_x;
+    let b1_min_y = box1.top_left_y;
+    let b1_max_x = box1.top_left_x + box1.width;
+    let b1_max_y = box1.top_left_y + box1.height;
+
+    let b2_min_x = box2.top_left_x;
+    let b2_min_y = box2.top_left_y;
+    let b2_max_x = box2.top_left_x + box2.width;
+    let b2_max_y = box2.top_left_y + box2.height;
+
+    let inter_x_min = b1_min_x.max(b2_min_x);
+    let inter_y_min = b1_min_y.max(b2_min_y);
+    let inter_x_max = b1_max_x.min(b2_max_x);
+    let inter_y_max = b1_max_y.min(b2_max_y);
+
+    let inter_width = (inter_x_max - inter_x_min).max(0.0);
+    let inter_height = (inter_y_max - inter_y_min).max(0.0);
+    let intersection_area = inter_width * inter_height;
+
+    if intersection_area == 0.0 {
+        return false;
+    }
+
+    let b1_area = box1.width * box1.height;
+    let b2_area = box2.width * box2.height;
+    let smaller_area = b1_area.min(b2_area);
+
+    // If the intersection covers e.g. 80% or more of the smaller box, it's enveloped
+    return (intersection_area / smaller_area) >= 0.80;
+}
+
 pub fn non_maximum_sepression(
     mut people: Vec<DetectedPerson>,
     iou_threshold: f32,
@@ -276,6 +307,12 @@ pub fn non_maximum_sepression(
                 let iou = intersection_over_union(person, &people[compare_index]);
                 if iou >= iou_threshold {
                     removed_people[compare_index] = true;
+                }
+                let is_within = is_enveloped(person, &people[compare_index]);
+                {
+                    if is_within {
+                        removed_people[compare_index] = true;
+                    }
                 }
             }
         }

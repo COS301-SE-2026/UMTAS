@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { CircleX } from "lucide-react";
 import { detectionManager } from "../../../../utilities/VisionModel/detectionManager";
 import { use } from "apexcharts";
+import { detection_data_manager } from "../../../../utilities/VisionModel/detection_data_manager";
+import { DetectedPerson } from "../../../../utilities/VisionModel/messageTypes";
 
 function getVideoConstraints(): MediaStreamConstraints {
   const isMobile = window.innerWidth < 768;
@@ -55,15 +57,18 @@ function CanvasWebcam({ isCameraActive, detectionSettings }: CanvasCamProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [cameraLoaded, setCameraLoaded] = useState<boolean>(false);
 
+  const detectedPeopleRef = useRef<DetectedPerson[]>([]);
   const lastRunRef = useRef<number>(0);
 
   useEffect(() => {
     if (detectionSettings.runDetection && isCameraActive) {
       detectionManager.start();
+      detection_data_manager.start();
     } else {
       detectionManager.terminate();
+      detection_data_manager.terminate();
     }
-  });
+  }, [detectionSettings.runDetection, isCameraActive]);
 
   useEffect(() => {
     if (isCameraActive == false) {
@@ -110,6 +115,26 @@ function CanvasWebcam({ isCameraActive, detectionSettings }: CanvasCamProps) {
         const context = canvas.getContext("2d", { willReadFrequently: true });
         if (context) {
           context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+          if (detectionSettings.runDetection)
+            for (const person of detectedPeopleRef.current) {
+              context.strokeStyle = "#00ff00";
+              context.lineWidth = 2;
+              context.strokeRect(
+                person.top_left_x,
+                person.top_left_y,
+                person.width,
+                person.height,
+              );
+
+              context.fillStyle = "#00ff00";
+              context.font = "14px sans-serif";
+              context.fillText(
+                `Person ${(person.confidence * 100).toFixed(0)}%`,
+                person.top_left_x,
+                Math.max(person.top_left_y - 5, 15),
+              );
+            }
         }
 
         const intervalMs = detectionSettings.DetectionInterval * 1000;
@@ -120,7 +145,7 @@ function CanvasWebcam({ isCameraActive, detectionSettings }: CanvasCamProps) {
           timestamp - lastRunRef.current >= intervalMs
         ) {
           lastRunRef.current = timestamp;
-          const imageData = context?.getImageData(
+          const imageData = context.getImageData(
             0,
             0,
             canvas.width,
@@ -130,7 +155,15 @@ function CanvasWebcam({ isCameraActive, detectionSettings }: CanvasCamProps) {
           detectionManager
             .run(imageData?.data, canvas.width, canvas.height)
             .then((results) => {
-              // use the data parser pipeline
+              if (results) {
+                detection_data_manager.run(results).then((people) => {
+                  if (people) {
+                    // Update the ref instantly so the next frame renders them
+                    detectedPeopleRef.current = people;
+                    console.log(people);
+                  }
+                });
+              }
             });
         }
       }
