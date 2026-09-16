@@ -18,7 +18,7 @@ import {
   RouteDto,
   RouteSingleResponseDto,
 } from './dto/route.dto';
-import { eq, and, inArray } from 'drizzle-orm';
+import { eq, and, inArray, asc } from 'drizzle-orm';
 import { OrsService } from './ors.service';
 import { AppDatabase } from 'src/auth/auth';
 
@@ -82,7 +82,14 @@ export class RouteService {
       .limit(1);
 
     if (reverseRoute) {
-      return this.routeDtoAdapter(reverseRoute);
+      const dto = this.routeDtoAdapter(reverseRoute);
+
+      return {
+        ...dto,
+        originBuildingId,
+        destinationBuildingId,
+        pathCoordinates: [...dto.pathCoordinates].reverse(),
+      };
     }
 
     if (routeIndex === 0) {
@@ -385,6 +392,7 @@ export class RouteService {
       .from(EventVenue)
       .innerJoin(Venue, eq(Venue.VenueID, EventVenue.VenueID))
       .where(eq(EventVenue.EventID, eventId))
+      .orderBy(asc(EventVenue.VenueID))
       .limit(1);
 
     return row?.buildingId ?? null;

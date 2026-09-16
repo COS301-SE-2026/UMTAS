@@ -219,6 +219,33 @@ export class StudentRoutesQueryDto {
   })
   @IsDateString({ strict: true })
   date!: string;
+
+  @ApiPropertyOptional({
+    format: 'uuid',
+    description: 'Origin event of the route override.',
+  })
+  @IsOptional()
+  @IsUUID()
+  overrideOriginEventId?: string;
+
+  @ApiPropertyOptional({
+    format: 'uuid',
+    description: 'Destination event of the route override.',
+  })
+  @IsOptional()
+  @IsUUID()
+  overrideDestinationEventId?: string;
+
+  @ApiPropertyOptional({
+    description: 'Zero-based route index for the overridden transition.',
+    example: 1,
+    minimum: 0,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
+  overrideRouteIndex?: number;
 } //END_StudentRoutesQueryDto
 
 /**

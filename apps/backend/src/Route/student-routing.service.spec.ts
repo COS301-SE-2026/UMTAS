@@ -298,8 +298,8 @@ describe('StudentRoutingService', () => {
       const destination = createEventContext({ buildingId: 'building-2' });
       const route = { pathCoordinates: [], distanceMetres: 0 };
       jest
-        .spyOn(mockRouteService, 'getOrCreateRoute')
-        .mockResolvedValue({ route } as any);
+        .spyOn(mockRouteService, 'getRouteVariant')
+        .mockResolvedValue(route as any);
 
       //Act
       const result = await (service as any).buildTransition(
@@ -315,10 +315,11 @@ describe('StudentRoutingService', () => {
         sameBuilding: false,
         route,
       });
-      expect(mockRouteService.getOrCreateRoute).toHaveBeenCalledWith(
+      expect(mockRouteService.getRouteVariant).toHaveBeenCalledWith(
         'uni-1',
         'building-1',
         'building-2',
+        0,
       );
     });
   }); //END_Test_buildTransition

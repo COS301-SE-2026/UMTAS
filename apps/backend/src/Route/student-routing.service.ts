@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { and, eq } from 'drizzle-orm';
+import { and, asc, eq } from 'drizzle-orm';
 
 import { DatabaseService, type AppDatabase } from 'src/db/database.service';
 import { Event, EventAttendance, EventVenue, Venue } from 'src/entities';
@@ -46,6 +46,24 @@ export class StudentRoutingService {
   ): Promise<StudentRoutesResponseDto> {
     const db = tx ?? this.databaseService.db;
 
+    const overrideFields = [
+      query.overrideOriginEventId,
+      query.overrideDestinationEventId,
+      query.overrideRouteIndex,
+    ];
+
+    const hasAnyOverride = overrideFields.some((value) => value !== undefined);
+
+    const hasCompleteOverride = overrideFields.every(
+      (value) => value !== undefined,
+    );
+
+    if (hasAnyOverride && !hasCompleteOverride) {
+      throw new BadRequestException(
+        'overrideOriginEventId, overrideDestinationEventId, and overrideRouteIndex must be provided together',
+      );
+    }
+
     //Get events for the date
     const events = await this.getStudentEventsForDate(
       userId,
@@ -63,11 +81,16 @@ export class StudentRoutingService {
     const routes: StudentRouteTransitionDto[] = [];
 
     for (let i = 0; i < eventContexts.length - 1; i += 1) {
+      const isOverride =
+        query.overrideOriginEventId === eventContexts[i].eventId &&
+        query.overrideDestinationEventId === eventContexts[i + 1].eventId;
+
       routes.push(
         await this.buildTransition(
           uniId,
           eventContexts[i],
           eventContexts[i + 1],
+          isOverride ? query.overrideRouteIndex : 0,
         ),
       );
     } //END_i
@@ -166,6 +189,7 @@ export class StudentRoutingService {
     uniId: string,
     originEvent: RouteEventContextDto,
     destinationEvent: RouteEventContextDto,
+    routeIndex = 0,
   ): Promise<StudentRouteTransitionDto> {
     if (!originEvent.buildingId || !destinationEvent.buildingId) {
       return {
@@ -186,10 +210,11 @@ export class StudentRoutingService {
       };
     }
 
-    const { route } = await this.routeService.getOrCreateRoute(
+    const route = await this.routeService.getRouteVariant(
       uniId,
       originEvent.buildingId,
       destinationEvent.buildingId,
+      routeIndex,
     );
 
     return {
@@ -235,7 +260,8 @@ export class StudentRoutingService {
           eq(EventAttendance.state, 'ATTENDING'),
           eq(Venue.UniversityID, uniId),
         ),
-      );
+      )
+      .orderBy(asc(EventVenue.VenueID));
 
     return this.selectFirstVenuePerEvent(
       rows.map((row) => ({
@@ -289,7 +315,8 @@ export class StudentRoutingService {
           eq(EventAttendance.state, 'ATTENDING'),
           eq(Venue.UniversityID, uniId),
         ),
-      );
+      )
+      .orderBy(asc(EventVenue.VenueID));
 
     const [event] = this.selectFirstVenuePerEvent(
       events.map((row) => ({
