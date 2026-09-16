@@ -370,6 +370,13 @@ export class RouteService {
   } //END_getActiveRoute
 
   //🎅's little helpers
+
+  /**
+   * Maps a Route row to a RouteDto.
+   *
+   * @param row - Raw Route row.
+   * @returns The mapped RouteDto.
+   */
   private routeDtoAdapter(row: RouteEntity): RouteDto {
     return {
       routeId: row.RouteID,
@@ -380,8 +387,16 @@ export class RouteService {
       distanceMetres: row.DistanceMetres,
       displayColour: row.DisplayColour,
     };
-  }
+  } //END_routeDtoAdapter
 
+  /**
+   * Returns the building ID for an event's first venue
+   *
+   * When an event has multiple venues, only the first one is used
+   *
+   * @param eventId - Event to look up
+   * @returns The building ID, or null if none found
+   */
   private async getMatchingBuildingId(eventId: string): Promise<string | null> {
     const database = this.databaseService.db;
 
@@ -396,8 +411,18 @@ export class RouteService {
       .limit(1);
 
     return row?.buildingId ?? null;
-  }
+  } //END_getMatchingBuildingId
 
+  /**
+   * Fetches two buildings and returns their pinned coordinates.
+   *
+   * @param uniId - University both buildings must belong to.
+   * @param originBuildingId - Starting building.
+   * @param destinationBuildingId - Ending building.
+   * @param tx - Active database transaction.
+   * @returns Origin and destination coordinates.
+   * @throws NotFoundException when either building is missing or unpinned.
+   */
   private async getBuildingsForRoute(
     uniId: string,
     originBuildingId: string,
@@ -460,6 +485,16 @@ export class RouteService {
     };
   } //END_getBuildingsForRoute
 
+  /**
+   * Inserts route variants, skipping already exist ones
+   *
+   * @param uniId - University the routes belong to
+   * @param originBuildingId - Starting building
+   * @param destinationBuildingId - Ending building
+   * @param routes - Route variants to persist
+   * @param tx - Active database transaction
+   * @returns Inserted rows. Empty when `routes` is empty
+   */
   private async persistRouteVariants(
     uniId: string,
     originBuildingId: string,

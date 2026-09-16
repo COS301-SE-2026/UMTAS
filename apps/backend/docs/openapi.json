@@ -6571,6 +6571,37 @@
               "example": "2026-09-16",
               "type": "string"
             }
+          },
+          {
+            "name": "overrideOriginEventId",
+            "required": false,
+            "in": "query",
+            "description": "Origin event of the route override.",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "overrideDestinationEventId",
+            "required": false,
+            "in": "query",
+            "description": "Destination event of the route override.",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "overrideRouteIndex",
+            "required": false,
+            "in": "query",
+            "description": "Zero-based route index for the overridden transition.",
+            "schema": {
+              "minimum": 0,
+              "example": 1,
+              "type": "number"
+            }
           }
         ],
         "responses": {
@@ -12406,6 +12437,12 @@
             "format": "uuid",
             "example": "00000000-0000-0000-0000-000000000000"
           },
+          "routeIndex": {
+            "minimum": 0,
+            "type": "number",
+            "example": 0,
+            "description": "Index of route | 0 for shortest, incrementally for alternatives."
+          },
           "pathCoordinates": {
             "description": "List of latitude/longitude coordinates for the route path.",
             "items": {
@@ -12433,6 +12470,7 @@
           "routeId",
           "originBuildingId",
           "destinationBuildingId",
+          "routeIndex",
           "pathCoordinates",
           "distanceMetres",
           "displayColour"
