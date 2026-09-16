@@ -6437,7 +6437,7 @@
             "name": "originBuildingId",
             "required": true,
             "in": "query",
-            "description": "The origin building that the student is walking from",
+            "description": "The building the student is walking from.",
             "schema": {
               "format": "uuid",
               "example": "00000000-0000-0000-0000-000000000000",
@@ -6448,7 +6448,7 @@
             "name": "destinationBuildingId",
             "required": true,
             "in": "query",
-            "description": "The destination building that the student is walking to",
+            "description": "The building the student is walking to.",
             "schema": {
               "format": "uuid",
               "example": "00000000-0000-0000-0000-000000000000",
@@ -6503,8 +6503,9 @@
             "name": "date",
             "required": true,
             "in": "query",
-            "description": "Calendar date that matches the EventAttendance date",
+            "description": "Calendar date matching the EventAttendance date.",
             "schema": {
+              "format": "date",
               "example": "2026-10-12",
               "type": "string"
             }
@@ -6513,9 +6514,8 @@
             "name": "time",
             "required": true,
             "in": "query",
-            "description": "Time in hh:mm",
+            "description": "Time in HH:mm format.",
             "schema": {
-              "pattern": "^([01]\\d|2[0-3]):([0-5]\\d)$",
               "example": "10:12",
               "type": "string"
             }
@@ -12261,7 +12261,7 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "pathCoordinates": {
-            "description": "List of lat/long coordinates for the route path",
+            "description": "List of latitude/longitude coordinates for the route path.",
             "items": {
               "type": "array",
               "items": {
@@ -12274,13 +12274,13 @@
             "minimum": 1,
             "type": "number",
             "example": 67,
-            "description": "The route distance in metres"
+            "description": "The route distance in metres."
           },
           "displayColour": {
             "type": "string",
             "pattern": "^#?([0-9A-F]{3}|[0-9A-F]{4}|[0-9A-F]{6}|[0-9A-F]{8})$",
             "example": "#0000FF",
-            "description": "The hex colour for the polyline (path)"
+            "description": "The hex colour for the route polyline."
           }
         },
         "required": [
@@ -12329,7 +12329,13 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "route": {
-            "$ref": "#/components/schemas/RouteDto"
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/RouteDto"
+              }
+            ]
           },
           "fromEventName": {
             "type": "string",

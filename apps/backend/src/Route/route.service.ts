@@ -1,11 +1,9 @@
 import {
   BadRequestException,
-  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { SessionData } from 'src/auth/session.decorator';
 import { LatLngDto } from 'src/Building/dto/building.dto';
 import { DatabaseService } from 'src/db/database.service';
 import {
@@ -36,17 +34,32 @@ export class RouteService {
   constructor(private readonly databaseService: DatabaseService) {}
   private orsApiKey = process.env.ORS_API_KEY;
 
-  private requireUniId(session: SessionData | undefined): string {
-    if (!session?.user) {
-      throw new ForbiddenException('No active session');
+  async getRouteVariant(
+    uniId: string,
+    originBuildingId: string,
+    destinationBuildingId: string,
+    routeIndex: number,
+  ): Promise<RouteDto> {
+    if (!Number.isInteger(routeIndex) || routeIndex < 0) {
+      throw new BadRequestException(
+        'routeIndex must be a non-negative integer',
+      );
     }
 
-    if (!session?.uniId) {
-      throw new ForbiddenException('No university selected');
+    if (routeIndex === 0) {
+      const { route } = await this.getOrCreateRoute(
+        uniId,
+        originBuildingId,
+        destinationBuildingId,
+      );
+
+      return route;
     }
 
-    return session?.uniId;
-  }
+    throw new NotFoundException(
+      `Route alternative with index ${routeIndex} is not available`,
+    );
+  } //END_getRouteVariant
 
   private routeDtoAdapter(row: RouteEntity): RouteDto {
     return {
@@ -60,7 +73,7 @@ export class RouteService {
   }
 
   public async getOrCreateRoute(
-    session: SessionData,
+    uniId: string,
     originBuildingId: string,
     destinationBuildingId: string,
   ): Promise<RouteSingleResponseDto> {
@@ -72,14 +85,12 @@ export class RouteService {
       );
     }
 
-    const universityId = this.requireUniId(session);
-
     const [directRoute] = await database
       .select()
       .from(Route)
       .where(
         and(
-          eq(Route.UniversityID, universityId),
+          eq(Route.UniversityID, uniId),
           eq(Route.OriginBuildingID, originBuildingId),
           eq(Route.DestinationBuildingID, destinationBuildingId),
         ),
@@ -95,7 +106,7 @@ export class RouteService {
       .from(Route)
       .where(
         and(
-          eq(Route.UniversityID, universityId),
+          eq(Route.UniversityID, uniId),
           eq(Route.OriginBuildingID, destinationBuildingId),
           eq(Route.DestinationBuildingID, originBuildingId),
         ),
@@ -146,7 +157,7 @@ export class RouteService {
     const [newRoute] = await database
       .insert(Route)
       .values({
-        UniversityID: universityId,
+        UniversityID: uniId,
         DestinationBuildingID: destinationBuildingId,
         OriginBuildingID: originBuildingId,
         PathCoordinates: orsResult.routeCoordinates,
@@ -158,11 +169,10 @@ export class RouteService {
   }
 
   public async getActiveRoute(
-    session: SessionData,
+    userId: string,
     date: string,
     time: string,
   ): Promise<ActiveRouteResponseDto> {
-    const userId = session.user.id;
     const database = this.databaseService.db;
 
     const attendedEvents = await database
@@ -217,7 +227,7 @@ export class RouteService {
         }
 
         const { route } = await this.getOrCreateRoute(
-          session,
+          userId,
           fromBuildingId,
           toBuildingId,
         );

@@ -36,7 +36,6 @@ const config: Config = {
     // The campus map/routing modules are an incomplete bonus feature and are
     // intentionally outside the tested product scope.
     '!**/Map-config/**',
-    '!**/Route/**',
     '!**/entities/**',
     '!**/health/**',
     '!**/mail/**',

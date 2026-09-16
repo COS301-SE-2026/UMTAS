@@ -14,7 +14,11 @@ import {
   RouteQueryDto,
   RouteSingleResponseDto,
 } from './dto/route.dto';
-import { CurrentSession, type SessionData } from 'src/auth/session.decorator';
+import {
+  CurrentSession,
+  CurrentUniId,
+  type SessionData,
+} from 'src/auth/session.decorator';
 import { RouteService } from './route.service';
 
 @ApiTags('Routes')
@@ -42,11 +46,11 @@ export class RouteController {
       'One or both buildings have not been pinned, or no walking path was found between the two buildings',
   })
   getRoute(
-    @CurrentSession() session: SessionData,
+    @CurrentUniId() uniId: string,
     @Query() query: RouteQueryDto,
   ): Promise<RouteSingleResponseDto> {
     return this.routeService.getOrCreateRoute(
-      session,
+      uniId,
       query.originBuildingId,
       query.destinationBuildingId,
     );
@@ -70,6 +74,10 @@ export class RouteController {
     @CurrentSession() session: SessionData,
     @Query() query: ActiveRouteQueryDto,
   ): Promise<ActiveRouteResponseDto> {
-    return this.routeService.getActiveRoute(session, query.date, query.time);
+    return this.routeService.getActiveRoute(
+      session.user.id,
+      query.date,
+      query.time,
+    );
   }
 }
