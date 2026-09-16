@@ -81,6 +81,15 @@ export class OrsService {
     };
   } //END_getWalkingRoute
 
+  /**
+   * Fetches walking route variants between two coordinates.
+   *
+   * @param start - Starting coordinate.
+   * @param end - Ending coordinate.
+   * @param maximumAlternatives - Number of alternatives to request.
+   * @returns Route variants, one per returned feature.
+   * @throws NotFoundException when the provider returns no features.
+   */
   async getWalkingRouteVariants(
     start: LatLngDto,
     end: LatLngDto,
@@ -242,6 +251,19 @@ export class OrsService {
     return Math.round(value);
   } //parseDistance
 
+  /**
+   * Fetches alternative walking routes from OpenRouteService.
+   *
+   * @param start - Starting coordinate
+   * @param end - Ending coordinate
+   * @param maximumAlternatives - Number of alternatives to request (1–5)
+   * @returns The parsed alternatives response
+   * @throws BadRequestException when maximumAlternatives is out of range
+   * @throws InternalServerErrorException when the API key is missing
+   * @throws GatewayTimeoutException when the request exceeds the timeout
+   * @throws ServiceUnavailableException when the request fails, returns a non-OK
+   *   response, or returns invalid JSON
+   */
   private async makeAlternativeRequest(
     start: LatLngDto,
     end: LatLngDto,
