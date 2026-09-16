@@ -122,6 +122,20 @@ describe('StudentRoutingService', () => {
       expect(result.routes).toEqual([transition]);
       expect(buildSpy).toHaveBeenCalledTimes(1);
     });
+
+    it('should throw BadRequestException when overrides are incomplete', async () => {
+      //Arrange
+      const query = {
+        date: '2026-09-16',
+        overrideOriginEventId: 'event-1',
+        // overrideDestinationEventId and overrideRouteIndex deliberately omitted
+      };
+
+      //Act + Assert
+      await expect(
+        service.getRoutesForDate('user-1', 'uni-1', query),
+      ).rejects.toThrow(BadRequestException);
+    });
   }); //END_Test_getRoutesForDate
 
   describe('Test_getAlternativeRouteBetweenEvents', () => {
