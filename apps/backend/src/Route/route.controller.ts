@@ -71,11 +71,13 @@ export class RouteController {
     description: 'No university or university role was selected',
   })
   getActiveRoute(
+    @CurrentUniId() uniId: string,
     @CurrentSession() session: SessionData,
     @Query() query: ActiveRouteQueryDto,
   ): Promise<ActiveRouteResponseDto> {
     return this.routeService.getActiveRoute(
       session.user.id,
+      uniId,
       query.date,
       query.time,
     );

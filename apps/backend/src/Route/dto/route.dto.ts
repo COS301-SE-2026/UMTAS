@@ -61,6 +61,16 @@ export class RouteDto {
   destinationBuildingId!: string;
 
   @ApiProperty({
+    example: 0,
+    minimum: 0,
+    description:
+      'Index of route | 0 for shortest, incrementally for alternatives.',
+  })
+  @IsInt()
+  @Min(0)
+  routeIndex!: number;
+
+  @ApiProperty({
     type: [LatLngDto],
     isArray: true,
     description: 'List of latitude/longitude coordinates for the route path.',

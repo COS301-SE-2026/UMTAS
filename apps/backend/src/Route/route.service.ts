@@ -18,8 +18,9 @@ import {
   RouteDto,
   RouteSingleResponseDto,
 } from './dto/route.dto';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, inArray } from 'drizzle-orm';
 import { OrsService } from './ors.service';
+import { AppDatabase } from 'src/auth/auth';
 
 type RouteEntity = typeof Route.$inferSelect;
 
@@ -42,35 +43,15 @@ export class RouteService {
       );
     }
 
-    if (routeIndex === 0) {
-      const { route } = await this.getOrCreateRoute(
-        uniId,
-        originBuildingId,
-        destinationBuildingId,
-      );
-
-      return route;
-    }
-
-    throw new NotFoundException(
-      `Route alternative with index ${routeIndex} is not available`,
-    );
-  } //END_getRouteVariant
-
-  async getOrCreateRoute(
-    uniId: string,
-    originBuildingId: string,
-    destinationBuildingId: string,
-  ): Promise<RouteSingleResponseDto> {
-    const database = this.databaseService.db;
-
     if (originBuildingId === destinationBuildingId) {
       throw new BadRequestException(
         'Origin and destination buildings need to be different',
       );
     }
 
-    const [directRoute] = await database
+    const db = this.databaseService.db;
+
+    const [cachedRoute] = await db
       .select()
       .from(Route)
       .where(
@@ -78,6 +59,114 @@ export class RouteService {
           eq(Route.UniversityID, uniId),
           eq(Route.OriginBuildingID, originBuildingId),
           eq(Route.DestinationBuildingID, destinationBuildingId),
+          eq(Route.RouteIndex, routeIndex),
+        ),
+      )
+      .limit(1);
+
+    if (cachedRoute) {
+      return this.routeDtoAdapter(cachedRoute);
+    }
+
+    const [reverseRoute] = await db
+      .select()
+      .from(Route)
+      .where(
+        and(
+          eq(Route.UniversityID, uniId),
+          eq(Route.OriginBuildingID, destinationBuildingId),
+          eq(Route.DestinationBuildingID, originBuildingId),
+          eq(Route.RouteIndex, routeIndex),
+        ),
+      )
+      .limit(1);
+
+    if (reverseRoute) {
+      return this.routeDtoAdapter(reverseRoute);
+    }
+
+    if (routeIndex === 0) {
+      const { route } = await this.getOrCreateRoute(
+        uniId,
+        originBuildingId,
+        destinationBuildingId,
+        db,
+      );
+
+      return route;
+    }
+
+    const buildings = await this.getBuildingsForRoute(
+      uniId,
+      originBuildingId,
+      destinationBuildingId,
+      db,
+    );
+
+    const orsRoutes = await this.orsService.getWalkingRouteVariants(
+      {
+        lat: buildings.origin.Latitude,
+        lng: buildings.origin.Longitude,
+      },
+      {
+        lat: buildings.destination.Latitude,
+        lng: buildings.destination.Longitude,
+      },
+    );
+
+    await this.persistRouteVariants(
+      uniId,
+      originBuildingId,
+      destinationBuildingId,
+      orsRoutes,
+      db,
+    );
+
+    const [requestedRoute] = await db
+      .select()
+      .from(Route)
+      .where(
+        and(
+          eq(Route.UniversityID, uniId),
+          eq(Route.OriginBuildingID, originBuildingId),
+          eq(Route.DestinationBuildingID, destinationBuildingId),
+          eq(Route.RouteIndex, routeIndex),
+        ),
+      )
+      .limit(1);
+
+    if (!requestedRoute) {
+      throw new NotFoundException(
+        `Route alternative with index ${routeIndex} is not available`,
+      );
+    }
+
+    return this.routeDtoAdapter(requestedRoute);
+  } //END_getRouteVariant
+
+  async getOrCreateRoute(
+    uniId: string,
+    originBuildingId: string,
+    destinationBuildingId: string,
+    tx?: AppDatabase,
+  ): Promise<RouteSingleResponseDto> {
+    if (originBuildingId === destinationBuildingId) {
+      throw new BadRequestException(
+        'Origin and destination buildings need to be different',
+      );
+    }
+
+    const db = tx ?? this.databaseService.db;
+
+    const [directRoute] = await db
+      .select()
+      .from(Route)
+      .where(
+        and(
+          eq(Route.UniversityID, uniId),
+          eq(Route.OriginBuildingID, originBuildingId),
+          eq(Route.DestinationBuildingID, destinationBuildingId),
+          eq(Route.RouteIndex, 0),
         ),
       )
       .limit(1);
@@ -86,7 +175,7 @@ export class RouteService {
       return { route: this.routeDtoAdapter(directRoute) };
     }
 
-    const [reverseRoute] = await database
+    const [reverseRoute] = await db
       .select()
       .from(Route)
       .where(
@@ -94,13 +183,14 @@ export class RouteService {
           eq(Route.UniversityID, uniId),
           eq(Route.OriginBuildingID, destinationBuildingId),
           eq(Route.DestinationBuildingID, originBuildingId),
+          eq(Route.RouteIndex, 0),
         ),
       )
       .limit(1);
 
-    //if we have path A->B, we don't want to make a call for B->A, we just reverse it. big brain
     if (reverseRoute) {
       const dto = this.routeDtoAdapter(reverseRoute);
+
       return {
         route: {
           ...dto,
@@ -111,50 +201,76 @@ export class RouteService {
       };
     }
 
-    const [originBuilding] = await database
-      .select()
+    const buildings = await db
+      .select({
+        buildingId: Building.BuildingID,
+        latitude: Building.Latitude,
+        longitude: Building.Longitude,
+      })
       .from(Building)
-      .where(eq(Building.BuildingID, originBuildingId))
-      .limit(1);
+      .where(
+        and(
+          eq(Building.UniversityID, uniId),
+          inArray(Building.BuildingID, [
+            originBuildingId,
+            destinationBuildingId,
+          ]),
+        ),
+      );
 
-    const [destinationBuilding] = await database
-      .select()
-      .from(Building)
-      .where(eq(Building.BuildingID, destinationBuildingId))
-      .limit(1);
+    const buildingsById = new Map(
+      buildings.map((building) => [building.buildingId, building]),
+    );
+
+    const originBuilding = buildingsById.get(originBuildingId);
+    const destinationBuilding = buildingsById.get(destinationBuildingId);
 
     if (
-      originBuilding?.Latitude == null ||
-      originBuilding?.Longitude == null ||
-      destinationBuilding?.Latitude == null ||
-      destinationBuilding?.Longitude == null
+      originBuilding?.latitude == null ||
+      originBuilding.longitude == null ||
+      destinationBuilding?.latitude == null ||
+      destinationBuilding.longitude == null
     ) {
       throw new NotFoundException(
-        'One/both buildings do not have coordinates pinned',
+        'One or both buildings do not exist in the selected university or do not have coordinates pinned',
       );
     }
 
     const orsResult = await this.orsService.getWalkingRoute(
-      { lat: originBuilding.Latitude, lng: originBuilding.Longitude },
-      { lat: destinationBuilding.Latitude, lng: destinationBuilding.Longitude },
+      {
+        lat: originBuilding.latitude,
+        lng: originBuilding.longitude,
+      },
+      {
+        lat: destinationBuilding.latitude,
+        lng: destinationBuilding.longitude,
+      },
     );
 
-    const [newRoute] = await database
+    const [newRoute] = await db
       .insert(Route)
       .values({
         UniversityID: uniId,
-        DestinationBuildingID: destinationBuildingId,
         OriginBuildingID: originBuildingId,
+        DestinationBuildingID: destinationBuildingId,
+        RouteIndex: 0,
         PathCoordinates: orsResult.routeCoordinates,
         DistanceMetres: orsResult.distanceMetres,
       })
       .returning();
 
-    return { route: this.routeDtoAdapter(newRoute) };
-  }
+    if (!newRoute) {
+      throw new NotFoundException('Route could not be created');
+    }
+
+    return {
+      route: this.routeDtoAdapter(newRoute),
+    };
+  } //END_getOrCreateRoute
 
   async getActiveRoute(
     userId: string,
+    uniId: string,
     date: string,
     time: string,
   ): Promise<ActiveRouteResponseDto> {
@@ -212,7 +328,7 @@ export class RouteService {
         }
 
         const { route } = await this.getOrCreateRoute(
-          userId,
+          uniId,
           fromBuildingId,
           toBuildingId,
         );
@@ -244,15 +360,16 @@ export class RouteService {
     }
 
     return { status: ActiveRouteStatus.NONE };
-  }
+  } //END_getActiveRoute
 
   //🎅's little helpers
   private routeDtoAdapter(row: RouteEntity): RouteDto {
     return {
       routeId: row.RouteID,
       originBuildingId: row.OriginBuildingID,
-      pathCoordinates: row.PathCoordinates,
       destinationBuildingId: row.DestinationBuildingID,
+      routeIndex: row.RouteIndex,
+      pathCoordinates: row.PathCoordinates,
       distanceMetres: row.DistanceMetres,
       displayColour: row.DisplayColour,
     };
@@ -272,4 +389,104 @@ export class RouteService {
 
     return row?.buildingId ?? null;
   }
+
+  private async getBuildingsForRoute(
+    uniId: string,
+    originBuildingId: string,
+    destinationBuildingId: string,
+    tx: AppDatabase,
+  ): Promise<{
+    origin: {
+      Latitude: number;
+      Longitude: number;
+    };
+    destination: {
+      Latitude: number;
+      Longitude: number;
+    };
+  }> {
+    const buildings = await tx
+      .select({
+        buildingId: Building.BuildingID,
+        latitude: Building.Latitude,
+        longitude: Building.Longitude,
+      })
+      .from(Building)
+      .where(
+        and(
+          eq(Building.UniversityID, uniId),
+          inArray(Building.BuildingID, [
+            originBuildingId,
+            destinationBuildingId,
+          ]),
+        ),
+      );
+
+    const buildingsById = new Map(
+      buildings.map((building) => [building.buildingId, building]),
+    );
+
+    const origin = buildingsById.get(originBuildingId);
+    const destination = buildingsById.get(destinationBuildingId);
+
+    if (
+      origin?.latitude == null ||
+      origin.longitude == null ||
+      destination?.latitude == null ||
+      destination.longitude == null
+    ) {
+      throw new NotFoundException(
+        'One or both buildings do not exist in the selected university or do not have coordinates pinned',
+      );
+    }
+
+    return {
+      origin: {
+        Latitude: origin.latitude,
+        Longitude: origin.longitude,
+      },
+      destination: {
+        Latitude: destination.latitude,
+        Longitude: destination.longitude,
+      },
+    };
+  } //END_getBuildingsForRoute
+
+  private async persistRouteVariants(
+    uniId: string,
+    originBuildingId: string,
+    destinationBuildingId: string,
+    routes: Array<{
+      routeIndex: number;
+      routeCoordinates: RouteEntity['PathCoordinates'];
+      distanceMetres: number;
+    }>,
+    tx: AppDatabase,
+  ): Promise<RouteEntity[]> {
+    if (routes.length === 0) {
+      return [];
+    }
+
+    return tx
+      .insert(Route)
+      .values(
+        routes.map((route) => ({
+          UniversityID: uniId,
+          OriginBuildingID: originBuildingId,
+          DestinationBuildingID: destinationBuildingId,
+          RouteIndex: route.routeIndex,
+          PathCoordinates: route.routeCoordinates,
+          DistanceMetres: route.distanceMetres,
+        })),
+      )
+      .onConflictDoNothing({
+        target: [
+          Route.UniversityID,
+          Route.OriginBuildingID,
+          Route.DestinationBuildingID,
+          Route.RouteIndex,
+        ],
+      })
+      .returning();
+  } //END_persistRouteVariants
 } //END_RouteService

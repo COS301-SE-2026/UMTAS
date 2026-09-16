@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   GatewayTimeoutException,
   Injectable,
   InternalServerErrorException,
@@ -11,6 +12,12 @@ export interface ORSWalkingResult {
   routeCoordinates: LatLngDto[];
   distanceMetres: number;
 } //ORSWalkingResult
+
+export interface ORSRouteVariantResult {
+  routeIndex: number;
+  routeCoordinates: LatLngDto[];
+  distanceMetres: number;
+} //ORSRouteVariantResult
 
 interface ORSFeature {
   geometry?: {
@@ -26,6 +33,10 @@ interface ORSFeature {
 interface ORSDirectionsResponse {
   features?: ORSFeature[];
 } //ORSDirectionsResponse
+
+interface ORSAlternativeRoutesResponse {
+  features?: ORSFeature[];
+} //ORSAlternativeRoutesResponse
 
 @Injectable()
 export class OrsService {
@@ -69,6 +80,32 @@ export class OrsService {
       distanceMetres,
     };
   } //END_getWalkingRoute
+
+  async getWalkingRouteVariants(
+    start: LatLngDto,
+    end: LatLngDto,
+    maximumAlternatives = 3,
+  ): Promise<ORSRouteVariantResult[]> {
+    const data = await this.makeAlternativeRequest(
+      start,
+      end,
+      maximumAlternatives,
+    );
+
+    const features = data.features;
+
+    if (!Array.isArray(features) || features.length === 0) {
+      throw new NotFoundException(
+        'No walking paths were found between the buildings',
+      );
+    }
+
+    return features.map((feature, routeIndex) => ({
+      routeIndex,
+      routeCoordinates: this.parseCoordinates(feature.geometry?.coordinates),
+      distanceMetres: this.parseDistance(feature.properties?.summary?.distance),
+    }));
+  } //END_getWalkingRouteVarients
 
   //🎅's little helpers
 
@@ -204,4 +241,78 @@ export class OrsService {
 
     return Math.round(value);
   } //parseDistance
+
+  private async makeAlternativeRequest(
+    start: LatLngDto,
+    end: LatLngDto,
+    maximumAlternatives: number,
+  ): Promise<ORSAlternativeRoutesResponse> {
+    if (
+      !Number.isInteger(maximumAlternatives) ||
+      maximumAlternatives < 1 ||
+      maximumAlternatives > 5
+    ) {
+      throw new BadRequestException(
+        'maximumAlternatives must be an integer between 1 and 5',
+      );
+    }
+
+    const apiKey = this.getApiKey();
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), this.requestTimeoutMs);
+
+    let response: Response;
+
+    try {
+      response = await fetch(
+        'https://api.openrouteservice.org/v2/directions/foot-walking/geojson',
+        {
+          method: 'POST',
+          headers: {
+            Authorization: apiKey,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            coordinates: [
+              [start.lng, start.lat],
+              [end.lng, end.lat],
+            ],
+            alternative_routes: {
+              target_count: maximumAlternatives,
+              weight_factor: 1.4,
+              share_factor: 0.6,
+            },
+          }),
+          signal: controller.signal,
+        },
+      );
+    } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        throw new GatewayTimeoutException(
+          'OpenRouteService alternative request timed out',
+        );
+      }
+
+      throw new ServiceUnavailableException(
+        'OpenRouteService could not be reached',
+      );
+    } finally {
+      clearTimeout(timeout);
+    }
+
+    if (!response.ok) {
+      throw new ServiceUnavailableException(
+        `OpenRouteService returned HTTP ${response.status}`,
+      );
+    }
+
+    try {
+      return (await response.json()) as ORSAlternativeRoutesResponse;
+    } catch {
+      throw new ServiceUnavailableException(
+        'OpenRouteService returned invalid JSON',
+      );
+    }
+  } //END_makeAlternativeRequest
 } //END_OrsService
