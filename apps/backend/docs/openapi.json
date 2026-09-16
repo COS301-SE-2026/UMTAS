@@ -6556,6 +6556,152 @@
         ]
       }
     },
+    "/api/routes/student": {
+      "get": {
+        "description": "Returns the students attended events for the requested date and the routes between events.",
+        "operationId": "getStudentRoutesForDate",
+        "parameters": [
+          {
+            "name": "date",
+            "required": true,
+            "in": "query",
+            "description": "Calendar date for which the student needs routes.",
+            "schema": {
+              "format": "date",
+              "example": "2026-09-16",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Student routes returned successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudentRoutesResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The requested date is invalid"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "description": "A required event, venue, building, or route was not found"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "security": [
+          {
+            "umtas-session": []
+          }
+        ],
+        "summary": "Get a students routes for a date",
+        "tags": [
+          "Student Routes"
+        ]
+      }
+    },
+    "/api/routes/student/alternatives": {
+      "get": {
+        "description": "Returns the selected indexed route between the buildings of two events on a requested date. Route index 0 is the default route.",
+        "operationId": "getAlternativeRouteBetweenEvents",
+        "parameters": [
+          {
+            "name": "originEventId",
+            "required": true,
+            "in": "query",
+            "description": "The event from which the student is travelling.",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "destinationEventId",
+            "required": true,
+            "in": "query",
+            "description": "The event to which the student is travelling.",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "date",
+            "required": true,
+            "in": "query",
+            "description": "Calendar date on which both events occur.",
+            "schema": {
+              "format": "date",
+              "example": "2026-09-16",
+              "type": "string"
+            }
+          },
+          {
+            "name": "routeIndex",
+            "required": false,
+            "in": "query",
+            "description": "Zero-based route index. Index 0 is the shortest/default route.",
+            "schema": {
+              "minimum": 0,
+              "default": 0,
+              "example": 1,
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/Object"
+                }
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Alternative route returned successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AlternativeRoutesResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The events are invalid, identical, in the same building, or the route index is invalid"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "description": "The events are not attended on the requested date, or the requested route is unavailable"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "security": [
+          {
+            "umtas-session": []
+          }
+        ],
+        "summary": "Get an alternative route between two events",
+        "tags": [
+          "Student Routes"
+        ]
+      }
+    },
     "/api/academic-calendar/generate": {
       "post": {
         "description": "Generates a restriction-aware pseudo-calendar snapshot using the selected university's requested academic year and a timetable owned by the authenticated student.",
@@ -12348,6 +12494,190 @@
         },
         "required": [
           "status"
+        ]
+      },
+      "RouteEventContextDto": {
+        "type": "object",
+        "properties": {
+          "eventId": {
+            "type": "string",
+            "format": "uuid",
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "eventName": {
+            "type": "string",
+            "example": "COS 301 Lecture"
+          },
+          "occurrenceDate": {
+            "type": "string",
+            "description": "Concrete occurrence date used for this route request.",
+            "example": "2026-09-16",
+            "format": "date"
+          },
+          "startTime": {
+            "type": "string",
+            "example": "08:30"
+          },
+          "endTime": {
+            "type": "string",
+            "example": "10:20"
+          },
+          "venueId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid"
+          },
+          "buildingId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "eventId",
+          "eventName",
+          "occurrenceDate",
+          "startTime",
+          "endTime"
+        ]
+      },
+      "StudentRouteTransitionDto": {
+        "type": "object",
+        "properties": {
+          "originEvent": {
+            "$ref": "#/components/schemas/RouteEventContextDto"
+          },
+          "destinationEvent": {
+            "$ref": "#/components/schemas/RouteEventContextDto"
+          },
+          "sameBuilding": {
+            "type": "object",
+            "description": "True when both events resolve to the same building.",
+            "example": false
+          },
+          "route": {
+            "nullable": true,
+            "description": "Walking route, or null when the events share a building or routing is unavailable.",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/RouteDto"
+              }
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "nullable": true,
+            "description": "Reason when a walking route cannot be returned.",
+            "example": "Destination venue has no building assigned."
+          }
+        },
+        "required": [
+          "originEvent",
+          "destinationEvent",
+          "sameBuilding"
+        ]
+      },
+      "StudentRoutesResponseDto": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "description": "Requested calendar date.",
+            "example": "2026-09-16",
+            "format": "date"
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RouteEventContextDto"
+            }
+          },
+          "routes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StudentRouteTransitionDto"
+            }
+          }
+        },
+        "required": [
+          "date",
+          "events",
+          "routes"
+        ]
+      },
+      "AlternativeRouteDto": {
+        "type": "object",
+        "properties": {
+          "routeIndex": {
+            "minimum": 0,
+            "type": "number",
+            "description": "Zero-based route index. Index 0 is the recommended shortest route.",
+            "example": 0
+          },
+          "pathCoordinates": {
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "latLngDto"
+              }
+            },
+            "type": "array"
+          },
+          "distanceMetres": {
+            "minimum": 0,
+            "type": "number",
+            "example": 820,
+            "description": "The route distance in metres."
+          },
+          "isRecommended": {
+            "type": "object",
+            "description": "True for route index 0, the provider-selected default route.",
+            "example": true
+          }
+        },
+        "required": [
+          "routeIndex",
+          "pathCoordinates",
+          "distanceMetres",
+          "isRecommended"
+        ]
+      },
+      "AlternativeRoutesResponseDto": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "example": "2026-09-16",
+            "format": "date"
+          },
+          "originEventId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "destinationEventId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "originBuildingId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "destinationBuildingId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "route": {
+            "$ref": "#/components/schemas/AlternativeRouteDto"
+          }
+        },
+        "required": [
+          "date",
+          "originEventId",
+          "destinationEventId",
+          "originBuildingId",
+          "destinationBuildingId",
+          "route"
         ]
       },
       "GenerateCalendarDto": {
