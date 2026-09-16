@@ -9,6 +9,7 @@ export function createRoute(overrides: Partial<RouteEntity> = {}): RouteEntity {
     UniversityID: randomUUID(),
     OriginBuildingID: randomUUID(),
     DestinationBuildingID: randomUUID(),
+    RouteIndex: 0,
     PathCoordinates: [
       //IT building
       { lat: -25.756111, lng: 28.233417 },

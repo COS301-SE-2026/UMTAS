@@ -1,10 +1,8 @@
 import {
   BadRequestException,
   Injectable,
-  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { LatLngDto } from 'src/Building/dto/building.dto';
 import { DatabaseService } from 'src/db/database.service';
 import {
   Building,
@@ -21,18 +19,16 @@ import {
   RouteSingleResponseDto,
 } from './dto/route.dto';
 import { eq, and } from 'drizzle-orm';
+import { OrsService } from './ors.service';
 
 type RouteEntity = typeof Route.$inferSelect;
 
-interface ORSWalkingResult {
-  routeCoordinates: LatLngDto[];
-  distanceMetres: number;
-}
-
 @Injectable()
 export class RouteService {
-  constructor(private readonly databaseService: DatabaseService) {}
-  private orsApiKey = process.env.ORS_API_KEY;
+  constructor(
+    private readonly databaseService: DatabaseService,
+    private readonly orsService: OrsService,
+  ) {}
 
   async getRouteVariant(
     uniId: string,
@@ -61,18 +57,7 @@ export class RouteService {
     );
   } //END_getRouteVariant
 
-  private routeDtoAdapter(row: RouteEntity): RouteDto {
-    return {
-      routeId: row.RouteID,
-      originBuildingId: row.OriginBuildingID,
-      pathCoordinates: row.PathCoordinates,
-      destinationBuildingId: row.DestinationBuildingID,
-      distanceMetres: row.DistanceMetres,
-      displayColour: row.DisplayColour,
-    };
-  }
-
-  public async getOrCreateRoute(
+  async getOrCreateRoute(
     uniId: string,
     originBuildingId: string,
     destinationBuildingId: string,
@@ -149,7 +134,7 @@ export class RouteService {
       );
     }
 
-    const orsResult = await this.fetchFromORS(
+    const orsResult = await this.orsService.getWalkingRoute(
       { lat: originBuilding.Latitude, lng: originBuilding.Longitude },
       { lat: destinationBuilding.Latitude, lng: destinationBuilding.Longitude },
     );
@@ -168,7 +153,7 @@ export class RouteService {
     return { route: this.routeDtoAdapter(newRoute) };
   }
 
-  public async getActiveRoute(
+  async getActiveRoute(
     userId: string,
     date: string,
     time: string,
@@ -261,6 +246,18 @@ export class RouteService {
     return { status: ActiveRouteStatus.NONE };
   }
 
+  //🎅's little helpers
+  private routeDtoAdapter(row: RouteEntity): RouteDto {
+    return {
+      routeId: row.RouteID,
+      originBuildingId: row.OriginBuildingID,
+      pathCoordinates: row.PathCoordinates,
+      destinationBuildingId: row.DestinationBuildingID,
+      distanceMetres: row.DistanceMetres,
+      displayColour: row.DisplayColour,
+    };
+  }
+
   private async getMatchingBuildingId(eventId: string): Promise<string | null> {
     const database = this.databaseService.db;
 
@@ -275,47 +272,4 @@ export class RouteService {
 
     return row?.buildingId ?? null;
   }
-
-  private async fetchFromORS(
-    start: LatLngDto,
-    end: LatLngDto,
-  ): Promise<ORSWalkingResult> {
-    const url = new URL(
-      'https://api.openrouteservice.org/v2/directions/foot-walking',
-    );
-
-    url.searchParams.set('api_key', this.orsApiKey ?? '');
-    url.searchParams.set('start', `${start.lng},${start.lat}`);
-    url.searchParams.set('end', `${end.lng},${end.lat}`);
-
-    const response = await fetch(url.toString());
-
-    if (!response.ok) {
-      throw new InternalServerErrorException(
-        `ORS routing has failed: ${response.statusText}`,
-      );
-    }
-
-    const data = await response.json();
-    const feature = data.features?.[0];
-
-    if (!feature) {
-      throw new NotFoundException(
-        'No walking path was found between the start and end buildings',
-      );
-    }
-
-    const coordinates: [number, number][] = feature.geometry.coordinates;
-    const routeCoordinates: LatLngDto[] = coordinates.map(([lng, lat]) => ({
-      lat,
-      lng,
-    }));
-
-    const summary = feature.properties.summary;
-
-    return {
-      routeCoordinates,
-      distanceMetres: Math.round(summary.distance),
-    };
-  }
-}
+} //END_RouteService
