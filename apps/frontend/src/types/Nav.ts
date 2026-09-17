@@ -91,7 +91,7 @@ export const navigationItems: NavigationItem[] = [
 
   {
     id: "module-management",
-    label: "Module Management",
+    label: "Module and Event Management",
     href: "/module-management",
     section: "actions",
     icon: "BookOpenIcon",
@@ -137,7 +137,6 @@ export const navigationItems: NavigationItem[] = [
     icon: "AcademicCapIcon",
     tourContent: "Manage university courses.",
     keywords: ["courses", "course management"],
-    roles: ["UNIVERSITY_ADMIN"],
     requiresUniversity: true,
     showInNavbar: true,
     showInCommandPalette: true,
