@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   ConflictException,
   forwardRef,
   Inject,
@@ -15,6 +14,7 @@ import {
   ModuleEnrollment,
   UniversityEvent,
   Venue,
+  Event,
 } from '../entities/index';
 import { DatabaseService } from '../db/database.service';
 import {
@@ -35,8 +35,6 @@ import {
   ilike,
   sql,
   countDistinct,
-  gte,
-  lte,
   inArray,
 } from 'drizzle-orm';
 import { AppDatabase } from 'src/auth/auth';
@@ -48,8 +46,11 @@ import {
   BuildingHeatmapSummaryDto,
   BuildingHeatmapView_ENUM,
   VenueHeatmapDto,
+  AllBuildingsHeatmapResponseDto,
+  HourlyHeatmapBucketDto,
 } from './dto/heatmap.dto';
 import { BaseVenueDto } from 'src/Venue/dto/venue.dto';
+import { RecurringEventService } from 'src/Events/recurring-event.service';
 
 //building row return drizzle gives us
 // type BuildingEntity = typeof Building.$inferSelect;
@@ -57,10 +58,15 @@ import { BaseVenueDto } from 'src/Venue/dto/venue.dto';
 const DEFAULT_DISPLAY_COLOUR = '#808080'; //neutral grey
 
 export type NormalizedBuildingHeatmapQuery = {
-  from: string;
-  to: string;
+  date: string;
   view: BuildingHeatmapView_ENUM;
 };
+
+interface OccurringEventRow {
+  venueId: string;
+  eventId: string;
+  linkedHours: number[];
+}
 
 @Injectable()
 export class BuildingService {
@@ -71,6 +77,7 @@ export class BuildingService {
     private readonly uniService: UniversityService,
     @Inject(forwardRef(() => VenueService))
     private readonly venueService: VenueService,
+    private readonly recurringEventService: RecurringEventService,
   ) {}
 
   //Create
@@ -293,14 +300,55 @@ export class BuildingService {
 
     return {
       building,
-      period: {
-        from: validatedQuery.from,
-        to: validatedQuery.to,
-      },
-      summary,
+      date: validatedQuery.date,
+      hourly: this.buildHourlySummary(venuesHeatmap),
+      summary: summary,
       venues: venuesHeatmap,
     };
   } //END_getHeatmap
+
+  async getAllBuildingsHeatmap(
+    uniId: string,
+    query: BuildingHeatmapQueryDto,
+    tx?: AppDatabase,
+  ): Promise<AllBuildingsHeatmapResponseDto> {
+    if (!tx) {
+      return this.dbService.db.transaction(async (t: AppDatabase) => {
+        return this.getAllBuildingsHeatmap(uniId, query, t);
+      });
+    }
+
+    const validateQuery = this.validateBuildingHeatmapQueryDto(query);
+    const allBuildings = await this.getAll(uniId, {}, tx);
+    const buildingHeatmaps: BuildingHeatmapResponseDto[] = [];
+
+    for (const building of allBuildings.buildings) {
+      const venues = (
+        await this.venueService.getAllVenues(
+          uniId,
+          { buildingId: building.BuildingID },
+          tx,
+        )
+      ).venues;
+
+      const venuesHeatmap = await this.getVenueHeatmapData(
+        venues,
+        validateQuery,
+        tx,
+      );
+
+      //something wrong here check
+      buildingHeatmaps.push({
+        building,
+        date: validateQuery.date,
+        hourly: this.buildHourlySummary(venuesHeatmap),
+        summary: this.buildHeatmapSummary(venuesHeatmap),
+        venues: venuesHeatmap,
+      });
+    }
+
+    return { buildings: buildingHeatmaps };
+  } //END_getAllBuildingsHeatmap
 
   // 🎅's little helpers
 
@@ -526,36 +574,11 @@ export class BuildingService {
     return input;
   } //END_validateUpdateBuildingInput
 
-  /** Normalises and validates a BuildingHeatmapQueryDto.
-   *
-   * `from` defaults to today and `to` defaults to `from` when absent, so an
-   * empty query always produces a valid range.
-   *
-   * @param query - Raw heatmap query DTO from the request.
-   * @returns Normalised query with `from`, `to` and `view` required.
-   * @throws BadRequestException when `from` is after `to`.
-   */
   private validateBuildingHeatmapQueryDto(
     query: BuildingHeatmapQueryDto,
   ): NormalizedBuildingHeatmapQuery {
-    //From - default to today
-    const from = query.from ?? new Date().toISOString().slice(0, 10);
-
-    //To - defaut to from
-    const to = query.to ?? from;
-
-    //Validate range
-    if (from > to) {
-      this.OOPSIE.warn(
-        `Invalid date range: from[${from}] must be <= to[${to}]`,
-      );
-      throw new BadRequestException(`Invalid date range`);
-    } //END_Range check
-
-    //validated in dto
-    const view = query.view;
-
-    return { from, to, view };
+    const date = query.date ?? new Date().toISOString().slice(0, 10);
+    return { date, view: query.view };
   } //END_validateBuildingHeatmapQueryDto
 
   /**
@@ -591,77 +614,295 @@ export class BuildingService {
       query.view === BuildingHeatmapView_ENUM.ALL;
     //END_view
 
-    const projectedByVenue = new Map<string, number>();
-    const worstCaseByVenue = new Map<string, number>();
+    const occuringEventRows = await this.getOccuringEventRows(
+      venueIds,
+      query.date,
+      tx,
+    );
+    const occuringEventIds = [
+      ...new Set(occuringEventRows.map((row) => row.eventId)),
+    ];
 
-    //Projected
-    if (shouldLoadProjected) {
-      const projectedRows = await tx
-        .select({
-          VenueID: EventVenue.VenueID,
-          projected: countDistinct(EventAttendance.UserID),
-        })
-        .from(EventVenue)
-        .innerJoin(
-          EventAttendance,
-          and(
-            eq(EventAttendance.eventID, EventVenue.EventID),
-            eq(EventAttendance.state, 'ATTENDING'),
-            gte(EventAttendance.eventDate, query.from),
-            lte(EventAttendance.eventDate, query.to),
-          ),
-        )
-        .where(inArray(EventVenue.VenueID, venueIds))
-        .groupBy(EventVenue.VenueID);
+    const projectedByEvent = shouldLoadProjected
+      ? await this.getProjectedCountsByEvent(occuringEventIds, query.date, tx)
+      : new Map<string, number>();
 
-      for (const row of projectedRows) {
-        projectedByVenue.set(row.VenueID, Number(row.projected));
-      } //END_row
-    } //END_Projected
+    const worstCaseByEvent = shouldLoadWorstCase
+      ? await this.getWorstCaseCountsByEvent(occuringEventIds, tx)
+      : new Map<string, number>();
 
-    //Worst Case
-    if (shouldLoadWorstCase) {
-      const worstCaseRows = await tx
-        .select({
-          VenueID: EventVenue.VenueID,
-          worstCase: countDistinct(ModuleEnrollment.UserID),
-        })
-        .from(EventVenue)
-        .innerJoin(
-          UniversityEvent,
-          eq(UniversityEvent.eventID, EventVenue.EventID),
-        )
-        .innerJoin(
-          ModuleEnrollment,
-          eq(ModuleEnrollment.ModuleID, UniversityEvent.moduleID),
-        )
-        .where(inArray(EventVenue.VenueID, venueIds))
-        .groupBy(EventVenue.VenueID);
+    const eventRowsByVenue = new Map<string, OccurringEventRow[]>();
 
-      for (const row of worstCaseRows) {
-        worstCaseByVenue.set(row.VenueID, Number(row.worstCase));
-      } //End_row
-    } //END_worstCase
+    for (const row of occuringEventRows) {
+      const existing = eventRowsByVenue.get(row.venueId) ?? [];
+      existing.push(row);
+      eventRowsByVenue.set(row.venueId, existing);
+    }
 
-    //Format response
-    return venues.map((v): VenueHeatmapDto => {
-      const projected = projectedByVenue.get(v.VenueID) ?? 0;
-      const worstCase = worstCaseByVenue.get(v.VenueID) ?? 0;
-
-      const actual = null;
-
-      return {
-        VenueID: v.VenueID,
-        VenueName: v.VenueName,
-        Capacity: v.Capacity,
-        projected,
-        worstCase,
-        actual,
-        projectedUtilisation: this.calculateUtilisation(projected, v.Capacity),
-        worstCaseUtilisation: this.calculateUtilisation(worstCase, v.Capacity),
-      };
-    }); //END_Return
+    return venues.map((venue) =>
+      this.buildVenueHeatmapFromEvents(
+        venue,
+        eventRowsByVenue.get(venue.VenueID) ?? [],
+        projectedByEvent,
+        worstCaseByEvent,
+      ),
+    );
   } //END_getVenueHeatmapData
+
+  // 🎅's little helpers
+
+  private getEventHours(startTime: string, endTime: string): number[] {
+    const [startHour, startMinute] = startTime.split(':').map(Number);
+    const [endHour, endMinute] = endTime.split(':').map(Number);
+
+    const startTotalMinutes = startHour * 60 + startMinute;
+    const endTotalMinutes = endHour * 60 + endMinute;
+
+    const eventHours: number[] = [];
+
+    for (let i = 0; i < 24; i++) {
+      const hourStartMinutes = i * 60;
+      const hourEndMinutesExclusive = hourStartMinutes + 60;
+
+      if (
+        startTotalMinutes < hourEndMinutesExclusive &&
+        endTotalMinutes > hourStartMinutes
+      ) {
+        eventHours.push(i);
+      }
+    }
+
+    return eventHours;
+  }
+
+  private async getOccuringEventRows(
+    venueIds: string[],
+    date: string,
+    tx: AppDatabase,
+  ): Promise<OccurringEventRow[]> {
+    if (venueIds.length <= 0) {
+      return [];
+    }
+
+    //check event table??
+    const eventRows = await tx
+      .select({
+        venueId: EventVenue.VenueID,
+        eventId: Event.eventID,
+        eventCriteria: Event.eventCriteria,
+        isRecurring: Event.isRecurring,
+      })
+      .from(EventVenue)
+      .innerJoin(Event, eq(Event.eventID, EventVenue.EventID))
+      .where(inArray(EventVenue.VenueID, venueIds));
+
+    const occuringRows: OccurringEventRow[] = [];
+
+    for (const i of eventRows) {
+      const eventOccursToday = this.recurringEventService.occursOnDate(
+        {
+          eventId: i.eventId,
+          eventCriteria: i.eventCriteria,
+          isRecurring: i.isRecurring,
+        },
+        date,
+      );
+
+      if (!eventOccursToday) {
+        continue;
+      }
+
+      occuringRows.push({
+        venueId: i.venueId,
+        eventId: i.eventId,
+        linkedHours: this.getEventHours(
+          i.eventCriteria.startTime,
+          i.eventCriteria.endTime,
+        ),
+      });
+    }
+
+    return occuringRows;
+  }
+
+  private async getProjectedCountsByEvent(
+    eventIds: string[],
+    date: string,
+    tx: AppDatabase,
+  ): Promise<Map<string, number>> {
+    const countsByEvent = new Map<string, number>();
+
+    if (eventIds.length <= 0) {
+      return countsByEvent;
+    }
+
+    const rows = await tx
+      .select({
+        eventId: EventAttendance.eventID,
+        count: countDistinct(EventAttendance.UserID),
+      })
+      .from(EventAttendance)
+      .where(
+        and(
+          inArray(EventAttendance.eventID, eventIds),
+          eq(EventAttendance.state, 'ATTENDING'),
+          eq(EventAttendance.eventDate, date),
+        ),
+      )
+      .groupBy(EventAttendance.eventID);
+
+    for (const row of rows) {
+      countsByEvent.set(row.eventId, Number(row.count));
+    }
+
+    return countsByEvent;
+  }
+
+  private async getWorstCaseCountsByEvent(
+    eventIds: string[],
+    tx: AppDatabase,
+  ): Promise<Map<string, number>> {
+    const countsByEvent = new Map<string, number>();
+
+    if (eventIds.length <= 0) {
+      return countsByEvent;
+    }
+
+    const rows = await tx
+      .select({
+        eventId: UniversityEvent.eventID,
+        count: countDistinct(ModuleEnrollment.UserID),
+      })
+      .from(UniversityEvent)
+      .innerJoin(
+        ModuleEnrollment,
+        eq(ModuleEnrollment.ModuleID, UniversityEvent.moduleID),
+      )
+      .where(inArray(UniversityEvent.eventID, eventIds))
+      .groupBy(UniversityEvent.eventID);
+
+    for (const row of rows) {
+      if (row.eventId === null) {
+        continue;
+      }
+
+      countsByEvent.set(row.eventId, Number(row.count));
+    }
+
+    return countsByEvent;
+  }
+
+  private createEmptyHourlyBuckets(): HourlyHeatmapBucketDto[] {
+    const buckets: HourlyHeatmapBucketDto[] = [];
+
+    for (let i = 0; i < 24; i++) {
+      buckets.push({
+        hour: i,
+        Capacity: 0,
+        projected: 0,
+        worstCase: 0,
+        actual: null,
+        projectedUtilisation: null,
+        worstCaseUtilisation: null,
+      });
+    }
+
+    return buckets;
+  }
+
+  private buildVenueHeatmapFromEvents(
+    venue: BaseVenueDto,
+    eventsForVenue: OccurringEventRow[],
+    projectedByEvent: Map<string, number>,
+    worstCaseByEvent: Map<string, number>,
+  ): VenueHeatmapDto {
+    const hourly = this.createEmptyHourlyBuckets();
+
+    let dailyProjected = 0;
+    let dailyWorstCase = 0;
+
+    for (const row of eventsForVenue) {
+      const eventProjected = projectedByEvent.get(row.eventId) ?? 0;
+      const eventWorstCase = worstCaseByEvent.get(row.eventId) ?? 0;
+
+      dailyProjected += eventProjected;
+      dailyWorstCase += eventWorstCase;
+
+      for (const hour of row.linkedHours) {
+        hourly[hour].projected += eventProjected;
+        hourly[hour].worstCase += eventWorstCase;
+      }
+    }
+
+    for (const bucket of hourly) {
+      bucket.Capacity = venue.Capacity;
+      bucket.projectedUtilisation = this.calculateUtilisation(
+        bucket.projected,
+        venue.Capacity,
+      );
+      bucket.worstCaseUtilisation = this.calculateUtilisation(
+        bucket.worstCase,
+        venue.Capacity,
+      );
+    }
+
+    return {
+      VenueID: venue.VenueID,
+      VenueName: venue.VenueName,
+      Capacity: venue.Capacity,
+      projected: dailyProjected,
+      worstCase: dailyWorstCase,
+      actual: null,
+      projectedUtilisation: this.calculateUtilisation(
+        dailyProjected,
+        venue.Capacity,
+      ),
+      worstCaseUtilisation: this.calculateUtilisation(
+        dailyWorstCase,
+        venue.Capacity,
+      ),
+      hourly: hourly,
+    };
+  }
+
+  private buildHourlySummary(
+    venues: VenueHeatmapDto[],
+  ): HourlyHeatmapBucketDto[] {
+    const totalCapacity = venues.reduce(
+      (total, venue) => total + venue.Capacity,
+      0,
+    );
+    const buildingHourly: HourlyHeatmapBucketDto[] = [];
+
+    //for each hour
+    for (let i = 0; i < 24; i++) {
+      let projected = 0;
+      let worstCase = 0;
+
+      for (const venue of venues) {
+        projected += venue.hourly[i].projected;
+        worstCase += venue.hourly[i].worstCase;
+      }
+
+      buildingHourly.push({
+        hour: i,
+        Capacity: totalCapacity,
+        projected: projected,
+        worstCase: worstCase,
+        actual: null,
+        projectedUtilisation: this.calculateUtilisation(
+          projected,
+          totalCapacity,
+        ),
+        worstCaseUtilisation: this.calculateUtilisation(
+          worstCase,
+          totalCapacity,
+        ),
+      });
+    }
+
+    return buildingHourly;
+  }
 
   /** Computes the utilisation ratio of a venue.
    *
