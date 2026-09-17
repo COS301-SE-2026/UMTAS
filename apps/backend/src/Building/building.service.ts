@@ -493,87 +493,136 @@ export class BuildingService {
     input: UpdateBuildingInput,
     tx: AppDatabase,
   ): Promise<UpdateBuildingInput> {
-    //BuildingName
+    await this.validateBuildingNameUpdate(oldBuilding, input, tx);
+
+    this.validateLocationUpdate(oldBuilding, input);
+    this.validateFootprintUpdate(oldBuilding, input);
+    this.validateIconUpdate(oldBuilding, input);
+    this.validateDisplayColourUpdate(oldBuilding, input);
+
+    return input;
+  } //END_validateUpdateBuildingInput
+
+  private async validateBuildingNameUpdate(
+    oldBuilding: BaseBuildingDto,
+    input: UpdateBuildingInput,
+    tx: AppDatabase,
+  ): Promise<void> {
     if (
       input.BuildingName === undefined ||
       input.BuildingName === oldBuilding.BuildingName
     ) {
       delete input.BuildingName;
-    } else {
-      //Check name uniqueness against other buildings at the same university
-      const duplicate = await this.uniqueBuildingNamePerUniversity(
-        input.BuildingName,
-        oldBuilding.UniversityID,
-        tx,
-      );
-      if (duplicate && duplicate.BuildingID !== oldBuilding.BuildingID) {
-        this.OOPSIE.warn(
-          `Building[${input.BuildingName}] already exists for university[${oldBuilding.UniversityID}]`,
-        );
-        throw new ConflictException(
-          `Building name already exists for university`,
-        );
-      }
+      return;
     }
 
-    //Location - undefined means "don't touch", null means "clear pin", object means "set new"
+    const duplicate = await this.uniqueBuildingNamePerUniversity(
+      input.BuildingName,
+      oldBuilding.UniversityID,
+      tx,
+    );
+
+    if (duplicate && duplicate.BuildingID !== oldBuilding.BuildingID) {
+      this.OOPSIE.warn(
+        `Building[${input.BuildingName}] already exists for university[${oldBuilding.UniversityID}]`,
+      );
+
+      throw new ConflictException(
+        'Building name already exists for university',
+      );
+    }
+  } //END_validateBuidlingNameUpdate
+
+  private validateLocationUpdate(
+    oldBuilding: BaseBuildingDto,
+    input: UpdateBuildingInput,
+  ): void {
     if (input.location === undefined) {
       delete input.location;
-    } else if (input.location === null) {
+      return;
+    }
+
+    if (input.location === null) {
       if (oldBuilding.location === null) {
         delete input.location;
       }
-      // else: keep null (unpin)
-    } else if (
+      return;
+    }
+
+    if (
       oldBuilding.location !== null &&
       input.location.lat === oldBuilding.location?.lat &&
       input.location.lng === oldBuilding.location?.lng
     ) {
       delete input.location;
     }
-    // else: keep new location
+  }
 
-    //Footprint — same three-state pattern
+  private validateFootprintUpdate(
+    oldBuilding: BaseBuildingDto,
+    input: UpdateBuildingInput,
+  ): void {
     if (input.footprint === undefined) {
       delete input.footprint;
-    } else if (input.footprint === null) {
+      return;
+    }
+
+    if (input.footprint === null) {
       if (oldBuilding.footprint === null) {
         delete input.footprint;
       }
-    } else if (
+      return;
+    }
+
+    if (
       JSON.stringify(input.footprint) === JSON.stringify(oldBuilding.footprint)
     ) {
       delete input.footprint;
     }
+  }
 
-    //Icon
+  private validateIconUpdate(
+    oldBuilding: BaseBuildingDto,
+    input: UpdateBuildingInput,
+  ): void {
     if (input.icon === undefined) {
       delete input.icon;
-    } else if (input.icon === null) {
+      return;
+    }
+
+    if (input.icon === null) {
       if (oldBuilding.icon === null) {
         delete input.icon;
       }
-    } else {
-      const trimmed = input.icon.trim();
-      if (trimmed.length === 0) {
-        delete input.icon;
-      } else if (trimmed === oldBuilding.icon) {
-        delete input.icon;
-      } else {
-        input.icon = trimmed;
-      }
+      return;
     }
 
-    //DisplayColour
+    const trimmed = input.icon.trim();
+
+    if (trimmed.length === 0) {
+      delete input.icon;
+      return;
+    }
+
+    if (trimmed === oldBuilding.icon) {
+      delete input.icon;
+      return;
+    }
+
+    input.icon = trimmed;
+  }
+
+  private validateDisplayColourUpdate(
+    oldBuilding: BaseBuildingDto,
+    input: UpdateBuildingInput,
+  ): void {
     if (
       input.displayColour === undefined ||
       input.displayColour === oldBuilding.displayColour
     ) {
       delete input.displayColour;
     }
-
-    return input;
-  } //END_validateUpdateBuildingInput
+  }
 
   private validateBuildingHeatmapQueryDto(
     query: BuildingHeatmapQueryDto,

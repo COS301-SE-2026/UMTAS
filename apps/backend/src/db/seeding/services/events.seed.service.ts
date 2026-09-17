@@ -31,110 +31,188 @@ export class EventsSeedService extends BaseSeedService {
       return;
     }
 
-    //get module codes from constants
     const codes = this.constants.ALL_SEED_MODULES.map((module) => module.Code);
 
-    //Fetch seeded modules
-    const seededModules = await db
-      .select({ id: modules.moduleID, code: modules.moduleCode })
-      .from(modules)
-      .where(inArray(modules.moduleCode, codes));
-
-    //Map code to module id
-    const modulesByCode = new Map(
-      seededModules.map((module) => [module.code, module]),
-    );
+    const modulesByCode = await this.getSeededModulesByCode(db, codes);
 
     let eventsCreated = 0;
     let relationshipsCreated = 0;
 
     for (const code of codes) {
       const module = modulesByCode.get(code);
+
       if (!module) {
         this.logger.warn(`Module [${code}] missing; skipping events`);
         continue;
       }
 
-      // hash-based deterministic patterns
-      const patterns = getDeterministicPatterns(code);
+      const result = await this.seedModuleEvents(db, code, module.id);
 
-      for (const pattern of patterns) {
-        const eventName = `${code} ${pattern.label}`;
-        const criteria: UniversityEventCriteria = {
-          eventSource: EventSource.UNIVERSITY,
-          moduleId: module.id,
-          activityType: pattern.activityType,
-          dayOfWeek: pattern.dayOfWeek,
-          startTime: pattern.startTime,
-          endTime: pattern.endTime,
-        };
-
-        const fingerprint = this.fingerprint(
-          module.id,
-          pattern.activityType,
-          pattern.dayOfWeek,
-          pattern.startTime,
-          pattern.endTime,
-          eventName,
-        );
-
-        const [existing] = await db
-          .select({ id: Event.eventID })
-          .from(Event)
-          .where(eq(Event.importFingerprint, fingerprint))
-          .limit(1);
-
-        let eventId: string;
-
-        if (existing) {
-          eventId = existing.id;
-        } else {
-          const [created] = await this.persistence.insertEvents(db, [
-            {
-              eventName,
-              activityCode: code,
-              activityType: pattern.activityType,
-              eventCriteria: criteria,
-              isRecurring: true,
-              importFingerprint: fingerprint,
-            },
-          ]);
-
-          if (!created) continue;
-
-          eventId = created.eventID;
-          eventsCreated++;
-        }
-
-        //Link event to relevant module
-        const [relationship] = await db
-          .select({ id: UniversityEvent.UniversityEventID })
-          .from(UniversityEvent)
-          .where(
-            and(
-              eq(UniversityEvent.eventID, eventId),
-              eq(UniversityEvent.moduleID, module.id),
-            ),
-          )
-          .limit(1);
-
-        if (!relationship) {
-          await this.persistence.insertUniversityEvents(db, [
-            {
-              eventID: eventId,
-              moduleID: module.id,
-            },
-          ]);
-
-          relationshipsCreated++;
-        }
-      } //END_pattern
-    } //END_code
+      eventsCreated += result.eventsCreated;
+      relationshipsCreated += result.relationshipsCreated;
+    }
 
     this.logResult('Hatfield recurring module events', eventsCreated);
     this.logResult('module event relationships', relationshipsCreated);
     this.logger.debug(`Module events scoped to university ${university}`);
   } //END_seed
+
+  private async seedModuleEvents(
+    db: AppDatabase,
+    code: string,
+    moduleId: string,
+  ): Promise<{
+    eventsCreated: number;
+    relationshipsCreated: number;
+  }> {
+    let eventsCreated = 0;
+    let relationshipsCreated = 0;
+
+    for (const pattern of getDeterministicPatterns(code)) {
+      const result = await this.getOrCreateModuleEvent(
+        db,
+        code,
+        moduleId,
+        pattern,
+      );
+
+      if (!result.eventId) {
+        continue;
+      }
+
+      if (result.created) {
+        eventsCreated++;
+      }
+
+      const relationshipCreated = await this.ensureModuleEventRelationship(
+        db,
+        result.eventId,
+        moduleId,
+      );
+
+      if (relationshipCreated) {
+        relationshipsCreated++;
+      }
+    }
+
+    return {
+      eventsCreated,
+      relationshipsCreated,
+    };
+  }
+
+  private async getSeededModulesByCode(
+    db: AppDatabase,
+    codes: string[],
+  ): Promise<Map<string, { id: string; code: string }>> {
+    const seededModules = await db
+      .select({
+        id: modules.moduleID,
+        code: modules.moduleCode,
+      })
+      .from(modules)
+      .where(inArray(modules.moduleCode, codes));
+
+    return new Map(seededModules.map((module) => [module.code, module]));
+  }
+
+  private async ensureModuleEventRelationship(
+    db: AppDatabase,
+    eventId: string,
+    moduleId: string,
+  ): Promise<boolean> {
+    const [relationship] = await db
+      .select({
+        id: UniversityEvent.UniversityEventID,
+      })
+      .from(UniversityEvent)
+      .where(
+        and(
+          eq(UniversityEvent.eventID, eventId),
+          eq(UniversityEvent.moduleID, moduleId),
+        ),
+      )
+      .limit(1);
+
+    if (relationship) {
+      return false;
+    }
+
+    await this.persistence.insertUniversityEvents(db, [
+      {
+        eventID: eventId,
+        moduleID: moduleId,
+      },
+    ]);
+
+    return true;
+  }
+
+  private async getOrCreateModuleEvent(
+    db: AppDatabase,
+    code: string,
+    moduleId: string,
+    pattern: ReturnType<typeof getDeterministicPatterns>[number],
+  ): Promise<{
+    eventId: string;
+    created: boolean;
+  }> {
+    const eventName = `${code} ${pattern.label}`;
+
+    const criteria: UniversityEventCriteria = {
+      eventSource: EventSource.UNIVERSITY,
+      moduleId,
+      activityType: pattern.activityType,
+      dayOfWeek: pattern.dayOfWeek,
+      startTime: pattern.startTime,
+      endTime: pattern.endTime,
+    };
+
+    const fingerprint = this.fingerprint(
+      moduleId,
+      pattern.activityType,
+      pattern.dayOfWeek,
+      pattern.startTime,
+      pattern.endTime,
+      eventName,
+    );
+
+    const [existing] = await db
+      .select({ id: Event.eventID })
+      .from(Event)
+      .where(eq(Event.importFingerprint, fingerprint))
+      .limit(1);
+
+    if (existing) {
+      return {
+        eventId: existing.id,
+        created: false,
+      };
+    }
+
+    const [created] = await this.persistence.insertEvents(db, [
+      {
+        eventName,
+        activityCode: code,
+        activityType: pattern.activityType,
+        eventCriteria: criteria,
+        isRecurring: true,
+        importFingerprint: fingerprint,
+      },
+    ]);
+
+    if (!created) {
+      return {
+        eventId: '',
+        created: false,
+      };
+    }
+
+    return {
+      eventId: created.eventID,
+      created: true,
+    };
+  }
 
   static fingerprint(...parts: string[]): string {
     const hash = createHash('sha256');

@@ -25,66 +25,90 @@ const MINIO_BUCKET = process.env.MINIO_BUCKET ?? 'umtas-uploads';
 const USE_EXISTING_SERVICES =
   process.env.INTEGRATION_USE_EXISTING_SERVICES === '1';
 
+async function runWithExistingServices(): Promise<Error | undefined> {
+  const ports = existingServicePorts();
+
+  const testExitCode = await runIntegrationTests(ports);
+
+  if (testExitCode !== 0) {
+    return new Error(`Integration tests exited with code ${testExitCode}.`);
+  }
+
+  const flushExitCode = await flushCoverage(ports);
+
+  if (flushExitCode !== 0) {
+    return new Error(
+      `Integration coverage flush exited with code ${flushExitCode}.`,
+    );
+  }
+
+  await assertCoverageDataExists();
+
+  const coverageExitCode = await reportCoverage();
+
+  if (coverageExitCode !== 0) {
+    return new Error(
+      `Integration coverage reporting exited with code ${coverageExitCode}.`,
+    );
+  }
+
+  return undefined;
+}
+
+async function runWithManagedServices(): Promise<Error | undefined> {
+  const exitCode = await compose([
+    'up',
+    ...(hasPrebuiltSharedImages() ? [] : ['--build']),
+    '--wait',
+  ]);
+
+  if (exitCode !== 0) {
+    return new Error(`Integration stack failed with code ${exitCode}.`);
+  }
+
+  const ports = await resolveServicePorts();
+  const testExitCode = await runIntegrationTests(ports);
+
+  if (testExitCode !== 0) {
+    return new Error(`Integration tests exited with code ${testExitCode}.`);
+  }
+
+  return undefined;
+}
+
+async function teardownServices(): Promise<Error | undefined> {
+  const exitCode = await compose(['down', '--volumes', '--remove-orphans']);
+
+  if (exitCode !== 0) {
+    return new Error(`Integration teardown exited with code ${exitCode}.`);
+  }
+
+  return undefined;
+}
+
 async function main(): Promise<void> {
   let failure: Error | undefined;
 
   try {
     await prepareCoverageDirectory();
     await prepareTestResultsDirectory();
-    if (USE_EXISTING_SERVICES) {
-      const testExitCode = await runIntegrationTests(existingServicePorts());
 
-      if (testExitCode !== 0) {
-        failure = new Error(
-          `Integration tests exited with code ${testExitCode}.`,
-        );
-      } else {
-        const flushExitCode = await flushCoverage(existingServicePorts());
-        if (flushExitCode !== 0) {
-          failure = new Error(
-            `Integration coverage flush exited with code ${flushExitCode}.`,
-          );
-        } else {
-          await assertCoverageDataExists();
-          const coverageExitCode = await reportCoverage();
-
-          if (coverageExitCode !== 0) {
-            failure = new Error(
-              `Integration coverage reporting exited with code ${coverageExitCode}.`,
-            );
-          }
-        }
-      }
-    } else {
-      const exitCode = await compose([
-        'up',
-        ...(hasPrebuiltSharedImages() ? [] : ['--build']),
-        '--wait',
-      ]);
-      if (exitCode !== 0) {
-        failure = new Error(`Integration stack failed with code ${exitCode}.`);
-      } else {
-        const ports = await resolveServicePorts();
-        const testExitCode = await runIntegrationTests(ports);
-        if (testExitCode !== 0) {
-          failure = new Error(
-            `Integration tests exited with code ${testExitCode}.`,
-          );
-        }
-      }
-    }
+    failure = USE_EXISTING_SERVICES
+      ? await runWithExistingServices()
+      : await runWithManagedServices();
   } finally {
     if (!USE_EXISTING_SERVICES) {
-      const exitCode = await compose(['down', '--volumes', '--remove-orphans']);
-      if (exitCode !== 0 && !failure) {
-        failure = new Error(
-          `Integration teardown exited with code ${exitCode}.`,
-        );
+      const teardownFailure = await teardownServices();
+
+      if (!failure) {
+        failure = teardownFailure;
       }
     }
   }
 
-  if (failure) throw failure;
+  if (failure) {
+    throw failure;
+  }
 }
 
 function flushCoverage(ports: ServicePorts): Promise<number> {
@@ -285,6 +309,8 @@ function reportCoverage(): Promise<number> {
         'dist/db/seeding/**',
         '--exclude',
         'dist/Map-config/**',
+        '--exclude',
+        '**/*ors.service*',
       ],
       {
         cwd: BACKEND_DIRECTORY,
