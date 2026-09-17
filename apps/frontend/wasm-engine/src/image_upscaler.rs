@@ -1,4 +1,5 @@
 use wasm_bindgen::prelude::*;
+use wgpu::util::DeviceExt;
 
 // wasm function to call
 #[wasm_bindgen]
@@ -42,6 +43,15 @@ pub fn create_buffers(
     width: usize,
     height: usize,
 ) -> Buffers {
+    // input buffer
+    let inputBuffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+        label: Some("INPUT_PIXEL_DATA"),
+        contents: pixel_data,
+        // compute shader can read == STORAGE
+        // data outside gpu can init == COPY_DST
+        usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_DST,
+    });
+
     todo!("init Buffer struct ")
 }
 
