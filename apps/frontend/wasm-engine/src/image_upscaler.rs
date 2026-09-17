@@ -44,7 +44,7 @@ pub fn create_buffers(
     height: usize,
 ) -> Buffers {
     // input buffer
-    let inputBuffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+    let input_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
         label: Some("INPUT_PIXEL_DATA"),
         contents: pixel_data,
         // compute shader can read == STORAGE
@@ -114,8 +114,35 @@ pub fn create_buffers(
             _pad: 0,
         },
     ];
+    let params_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+        label: Some("PARAMS_BUFFER"),
+        contents: bytemuck::cast_slice(&slice_params),
+        usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_DST,
+    });
 
-    todo!("init Buffer struct ")
+    let total_output_size = (5 * 640 * 640 * 4) as wgpu::BufferAddress;
+
+    let output_buffer = device.create_buffer(&wgpu::BufferDescriptor {
+        label: Some("OUTPUT_DATA"),
+        size: total_output_size,
+        usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_SRC,
+        mapped_at_creation: false,
+    });
+
+    let staging_buffer = device.create_buffer(&wgpu::BufferDescriptor {
+        label: Some("STAGING_BUFFER"),
+        size: total_output_size,
+        // map read lets me read from gpu
+        usage: wgpu::BufferUsages::MAP_READ | wgpu::BufferUsages::COPY_DST,
+        mapped_at_creation: false,
+    });
+
+    return Buffers {
+        input_buffer,
+        output_buffer,
+        staging_buffer,
+        params_buffer: params_buffer,
+    };
 }
 
 // needed to read the output to staging
