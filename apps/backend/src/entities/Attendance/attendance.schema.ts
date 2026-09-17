@@ -12,36 +12,6 @@ import { sql } from 'drizzle-orm';
 import { usersTable } from '../auth';
 import { Event } from '../Events';
 
-export const AttendanceSessionState = pgEnum('AttendanceSessionState', [
-  'SCHEDULED',
-  'OPEN',
-  'CLOSED',
-  'CANCELLED',
-]);
-
-export enum AttendanceSessionStateEnum {
-  SCHEDULED = 'SCHEDULED',
-  OPEN = 'OPEN',
-  CLOSED = 'CLOSED',
-  CANCELLED = 'CANCELLED',
-}
-
-export type AttendanceSessionStateType =
-  (typeof AttendanceSessionState.enumValues)[number];
-
-export const AttendanceCaptureMode = pgEnum('AttendanceCaptureMode', [
-  'IDENTIFIED',
-  'AGGREGATE',
-]);
-
-export enum AttendanceCaptureModeEnum {
-  IDENTIFIED = 'IDENTIFIED',
-  AGGREGATE = 'AGGREGATE',
-}
-
-export type AttendanceCaptureModeType =
-  (typeof AttendanceCaptureMode.enumValues)[number];
-
 export const SessionAttendanceCaptureMethod = pgEnum(
   'SessionAttendanceCaptureMethod',
   ['NFC', 'BARCODE', 'CAMERA', 'MANUAL'],
@@ -70,18 +40,6 @@ export const AttendanceSession = pgTable(
     scheduledEndAt: timestamp('scheduledEndAt', {
       withTimezone: true,
     }).notNull(),
-    captureOpensAt: timestamp('captureOpensAt', {
-      withTimezone: true,
-    }).notNull(),
-    captureClosesAt: timestamp('captureClosesAt', {
-      withTimezone: true,
-    }).notNull(),
-    state: AttendanceSessionState('state').notNull().default('SCHEDULED'),
-    captureMode: AttendanceCaptureMode('captureMode')
-      .notNull()
-      .default('IDENTIFIED'),
-    openedAt: timestamp('openedAt', { withTimezone: true }),
-    closedAt: timestamp('closedAt', { withTimezone: true }),
     createdAt: timestamp('createdAt', { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -96,7 +54,7 @@ export const AttendanceSession = pgTable(
     ),
     check(
       'attendance_session_schedule_check',
-      sql`${table.scheduledStartAt} < ${table.scheduledEndAt} AND ${table.captureOpensAt} < ${table.captureClosesAt}`,
+      sql`${table.scheduledStartAt} < ${table.scheduledEndAt}`,
     ),
   ],
 );
