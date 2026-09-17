@@ -282,7 +282,6 @@ test('[flow:routing] returns routes and active route status', async () => {
 
           async run(context) {
             const venue = context.require(venueKey);
-            const university = context.require(universityKey);
 
             const [user] = await context.runtime.database
               .select()
@@ -342,9 +341,7 @@ test('[flow:routing] returns routes and active route status', async () => {
 
           async run(context) {
             const university = context.require(universityKey);
-            const origin = context.require(originBuildingKey);
             const destination = context.require(destinationBuildingKey);
-            const venue = context.require(venueKey);
 
             const [user] = await context.runtime.database
               .select()
