@@ -53,7 +53,7 @@ pub fn create_buffers(
     });
 
     let src_w = width as u32;
-    let src_h = width as u32;
+    let src_h = height as u32;
     let scale_dbl_x = 1280.0 / src_w as f32;
     let scale_dbl_y = 1280.0 / src_h as f32;
 
@@ -120,7 +120,7 @@ pub fn create_buffers(
         usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_DST,
     });
 
-    let total_output_size = (5 * 640 * 640 * 4) as wgpu::BufferAddress;
+    let total_output_size = (5 * 640 * 640 * 3 * 4) as wgpu::BufferAddress;
 
     let output_buffer = device.create_buffer(&wgpu::BufferDescriptor {
         label: Some("OUTPUT_DATA"),
