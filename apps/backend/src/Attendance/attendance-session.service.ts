@@ -18,6 +18,7 @@ import {
   ModuleTeaches,
   SessionAttendance,
   SessionAttendanceEntity,
+  Event,
   UniversityEvent,
 } from '../entities';
 import {
@@ -136,8 +137,8 @@ export class AttendanceSessionService {
   }
 
   /**
-   * Generic manual identified capture. Protocol adapters can call this later
-   * after resolving a protocol payload to an existing user ID.
+   * Manual identified capture. Protocol adapters use the authenticated-user
+   * capture method below so clients cannot choose another attendee's user ID.
    */
   async recordIdentifiedAttendance(
     actor: AttendanceActor,
@@ -189,6 +190,149 @@ export class AttendanceSessionService {
       );
     }
     return { status: 'RECORDED', attendance };
+  }
+
+  /** Record the authenticated attendee without accepting a client-supplied user ID. */
+  async recordNfcAttendance(
+    actor: AttendanceActor,
+    sessionId: string,
+    tx?: AppDatabase,
+  ): Promise<AttendanceCaptureResultDto> {
+    if (!tx) {
+      return this.dbService.db.transaction((transaction: AppDatabase) =>
+        this.recordNfcAttendance(actor, sessionId, transaction),
+      );
+    }
+
+    let session = await this.getLockedSession(sessionId, tx);
+    session = await this.reconcileExpiry(session, tx);
+    this.assertCaptureAllowed(session);
+    if (session.captureMode !== 'IDENTIFIED') {
+      throw new BadRequestException(
+        'This session accepts aggregate attendance, not identified attendees',
+      );
+    }
+    await this.assertUserEnrolled(actor.userId, session.eventID, tx);
+
+    const [existing] = await tx
+      .select()
+      .from(SessionAttendance)
+      .where(
+        and(
+          eq(SessionAttendance.SessionID, session.SessionID),
+          eq(SessionAttendance.UserID, actor.userId),
+        ),
+      )
+      .limit(1);
+    if (existing) return { status: 'ALREADY_RECORDED', attendance: existing };
+
+    const [attendance] = await tx
+      .insert(SessionAttendance)
+      .values({
+        SessionID: session.SessionID,
+        UserID: actor.userId,
+        captureMethod: 'NFC',
+        guestCount: null,
+      })
+      .returning();
+    if (!attendance) {
+      throw new InternalServerErrorException('Failed to record NFC attendance');
+    }
+    return { status: 'RECORDED', attendance };
+  }
+
+  /** Create the current occurrence once and make it available for NFC capture. */
+  async createOrGetOpenOccurrenceSession(
+    operator: AttendanceActor,
+    eventId: string,
+    occurrence: { scheduledStartAt: Date; scheduledEndAt: Date },
+    tx?: AppDatabase,
+  ): Promise<AttendanceSessionEntity> {
+    if (!tx) {
+      return this.dbService.db.transaction((transaction: AppDatabase) =>
+        this.createOrGetOpenOccurrenceSession(
+          operator,
+          eventId,
+          occurrence,
+          transaction,
+        ),
+      );
+    }
+
+    if (occurrence.scheduledStartAt >= occurrence.scheduledEndAt) {
+      throw new BadRequestException(
+        'The event occurrence has an invalid time range',
+      );
+    }
+
+    // Serialize first-tap creation per event; the unique event/start index is
+    // the final guard if another caller races before this lock is acquired.
+    const [event] = await tx
+      .select({ eventID: Event.eventID })
+      .from(Event)
+      .where(eq(Event.eventID, eventId))
+      .for('update')
+      .limit(1);
+    if (!event) throw new NotFoundException('Event not found');
+    await this.assertOperatorForEvent(operator, eventId, tx);
+
+    const [existing] = await tx
+      .select()
+      .from(AttendanceSession)
+      .where(
+        and(
+          eq(AttendanceSession.eventID, eventId),
+          eq(AttendanceSession.scheduledStartAt, occurrence.scheduledStartAt),
+        ),
+      )
+      .for('update')
+      .limit(1);
+
+    if (existing) {
+      let session = await this.reconcileExpiry(existing, tx);
+      if (
+        session.state === 'SCHEDULED' &&
+        new Date() < session.captureClosesAt
+      ) {
+        const now = new Date();
+        const [opened] = await tx
+          .update(AttendanceSession)
+          .set({ state: 'OPEN', openedAt: now, updatedAt: now })
+          .where(eq(AttendanceSession.SessionID, session.SessionID))
+          .returning();
+        session = this.requireUpdatedSession(opened);
+      }
+      return session;
+    }
+
+    const now = new Date();
+    const [session] = await tx
+      .insert(AttendanceSession)
+      .values({
+        eventID: eventId,
+        scheduledStartAt: occurrence.scheduledStartAt,
+        scheduledEndAt: occurrence.scheduledEndAt,
+        captureOpensAt: occurrence.scheduledStartAt,
+        captureClosesAt: occurrence.scheduledEndAt,
+        state: 'OPEN',
+        captureMode: 'IDENTIFIED',
+        openedAt: now,
+      })
+      .returning();
+    if (!session) {
+      throw new InternalServerErrorException(
+        'Failed to create an attendance session for this occurrence',
+      );
+    }
+    return session;
+  }
+
+  async assertStudentEligible(
+    userId: string,
+    eventId: string,
+    tx: AppDatabase,
+  ): Promise<void> {
+    return this.assertUserEnrolled(userId, eventId, tx);
   }
 
   /** Generic manual replacement of the one aggregate guest count row. */
