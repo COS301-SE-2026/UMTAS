@@ -108,7 +108,10 @@ export class BuildingService {
       throw new InternalServerErrorException(`Failed to create building`);
     }
 
-    return { building, venues: [] };
+    return {
+      building: this.buildingDtoAdapter(building, 0),
+      venues: [],
+    };
   } //END_createBuilding
 
   //GetById
@@ -137,11 +140,12 @@ export class BuildingService {
     }
 
     //Attach venues
+    const venues = (
+      await this.venueService.getAllVenues(uniId, { buildingId: buildingId })
+    ).venues;
     const response: BuildingSingleResponseDto = {
-      building,
-      venues: (
-        await this.venueService.getAllVenues(uniId, { buildingId: buildingId })
-      ).venues,
+      building: this.buildingDtoAdapter(building, venues.length),
+      venues,
     };
 
     return response;
@@ -199,7 +203,11 @@ export class BuildingService {
     }
 
     //Fetch old building - throws 404 if not exists
-    const oldBuilding = (await this.getById(uniId, buildingId, tx)).building;
+    const { building: oldBuilding, venues } = await this.getById(
+      uniId,
+      buildingId,
+      tx,
+    );
 
     const updateFields: Partial<UpdateBuildingDto> =
       await this.validateUpdateBuildingInput(oldBuilding, input, tx);
@@ -238,7 +246,7 @@ export class BuildingService {
       throw new InternalServerErrorException(`Failed to update building`);
     }
 
-    return { building };
+    return { building: this.buildingDtoAdapter(building, venues?.length ?? 0) };
   } //END_update
 
   //Delete
@@ -259,7 +267,7 @@ export class BuildingService {
       throw new NotFoundException(`Failed to delete building`);
     }
 
-    return { building };
+    return { building: this.buildingDtoAdapter(building, 0) };
   } //END_delete
 
   //Heatmaps
@@ -377,7 +385,7 @@ export class BuildingService {
     buildingName: string,
     uniId: string,
     tx: AppDatabase,
-  ): Promise<BuildingSingleResponseDto | null> {
+  ): Promise<BaseBuildingDto | null> {
     //Check if another building with same name for university already exists
     const [building] = await tx
       .select()
@@ -390,7 +398,7 @@ export class BuildingService {
       )
       .limit(1);
 
-    return building ? { building } : null;
+    return building ? building : null;
   } //END_uniqueBuildingNamePerUniversity
 
   /**
@@ -454,10 +462,7 @@ export class BuildingService {
         oldBuilding.UniversityID,
         tx,
       );
-      if (
-        duplicate &&
-        duplicate.building.BuildingID !== oldBuilding.BuildingID
-      ) {
+      if (duplicate && duplicate.BuildingID !== oldBuilding.BuildingID) {
         this.OOPSIE.warn(
           `Building[${input.BuildingName}] already exists for university[${oldBuilding.UniversityID}]`,
         );

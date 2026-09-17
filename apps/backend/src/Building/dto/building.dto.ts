@@ -113,6 +113,11 @@ export class BaseBuildingDto {
   displayColour?: string | null;
 } //END_BaseBuildingDto
 
+export class BuildingDto extends BaseBuildingDto {
+  @ApiProperty({ example: 12 })
+  venueCount!: number;
+} //END_BuildingDto
+
 //Create Dto
 export class CreateBuildingDto extends PickType(BaseBuildingDto, [
   'BuildingName',
@@ -142,8 +147,8 @@ export class UpdateBuildingInput extends UpdateBuildingDto {} //END_UpdateBuildi
 
 //Responses
 export class BuildingSingleResponseDto {
-  @ApiProperty({ type: BaseBuildingDto })
-  building!: BaseBuildingDto;
+  @ApiProperty({ type: BuildingDto })
+  building!: BuildingDto;
 
   venues?: BaseVenueDto[];
 
@@ -152,11 +157,6 @@ export class BuildingSingleResponseDto {
   @IsString()
   message?: string;
 } //END_BuildingSingleResponseDto
-
-export class BuildingDto extends BaseBuildingDto {
-  @ApiProperty({ example: 12 })
-  venueCount!: number;
-} //END_BuildingDto
 
 export class BuildingListResponseDto {
   @ApiProperty({ type: [BuildingDto] })

@@ -1,3 +1,7 @@
+//utikities
+export * from './factory.util';
+
+//factories
 export * from './auth.factory';
 export * from './academic-calendar.factory';
 export * from './course.factory';

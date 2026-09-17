@@ -31,8 +31,17 @@ import { uniId } from 'src/Testing/constants';
 import { UniversityService } from 'src/University/university.service';
 import {
   createBuilding,
+  createBuildingDto,
+  createBuildingHeatmapQueryDto,
+  createBuildingHeatmapResponse,
+  createBuildingHeatmapSummaryDto,
+  createBuildingListResponse,
+  createBuildingQueryDto,
+  createBuildingSingleResponse,
+  createCreateBuildingInput,
+  createUpdateBuildingInput,
   createVenue,
-  createVenueHeatmap,
+  createVenueHeatmapDto,
 } from 'src/Testing/Factories';
 import { BuildingHeatmapView_ENUM } from './dto/heatmap.dto';
 
@@ -68,19 +77,15 @@ describe('BuildingService', () => {
 
   //Create
   describe('Test_create', () => {
-    const input: CreateBuildingInput = {
-      BuildingName: 'IT Building',
-      UniversityID: uniId,
-      location: { lat: -25.7545, lng: 28.2314 },
-      footprint: null,
-      icon: null,
-      displayColour: '#808080',
-      CreatedBy: 'user-1',
-    };
-
     it('should create a building and return it', async () => {
       //Arrange
-      const building = createBuilding();
+      const input = createCreateBuildingInput();
+      const building = createBuilding({
+        BuildingName: input.BuildingName,
+        UniversityID: input.UniversityID,
+        Latitude: input.location!.lat,
+        Longitude: input.location!.lng,
+      });
       jest
         .spyOn(service as any, 'validateCreateBuildingInput')
         .mockResolvedValueOnce(input);
@@ -90,11 +95,23 @@ describe('BuildingService', () => {
       const result = await service.create(input);
 
       //Assert
-      expect(result).toEqual({ building, venues: [] });
+      expect(result).toEqual(
+        createBuildingSingleResponse({
+          building: createBuildingDto({
+            BuildingID: building.BuildingID,
+            BuildingName: building.BuildingName,
+            UniversityID: building.UniversityID,
+            location: { lat: building.Latitude!, lng: building.Longitude! },
+            venueCount: 0,
+          }),
+          venues: [],
+        }),
+      );
     });
 
     it('should throw InternalServerErrorException when insert returns no row', async () => {
       //Arrange
+      const input = createCreateBuildingInput();
       jest
         .spyOn(service as any, 'validateCreateBuildingInput')
         .mockResolvedValueOnce(input);
@@ -108,6 +125,7 @@ describe('BuildingService', () => {
 
     it('should pass validated input to the insert', async () => {
       //Arrange
+      const input = createCreateBuildingInput();
       const building = createBuilding();
       jest
         .spyOn(service as any, 'validateCreateBuildingInput')
@@ -138,18 +156,8 @@ describe('BuildingService', () => {
       //Arrange
       const building = createBuilding();
       const venues = [
-        createVenue({
-          VenueID: 'venue-1',
-          VenueName: 'IT 2-26',
-          BuildingID: building.BuildingID,
-          UniversityID: uniId,
-        }),
-        createVenue({
-          VenueID: 'venue-2',
-          VenueName: 'IT 2-27',
-          BuildingID: building.BuildingID,
-          UniversityID: uniId,
-        }),
+        createVenue({ BuildingID: building.BuildingID, UniversityID: uniId }),
+        createVenue({ BuildingID: building.BuildingID, UniversityID: uniId }),
       ];
       mockDbResult(mockDb.select, [building]);
       jest
@@ -160,7 +168,18 @@ describe('BuildingService', () => {
       const result = await service.getById(uniId, building.BuildingID);
 
       //Assert
-      expect(result).toEqual({ building, venues });
+      expect(result).toEqual(
+        createBuildingSingleResponse({
+          building: createBuildingDto({
+            BuildingID: building.BuildingID,
+            BuildingName: building.BuildingName,
+            UniversityID: building.UniversityID,
+            location: { lat: building.Latitude!, lng: building.Longitude! },
+            venueCount: 2,
+          }),
+          venues,
+        }),
+      );
     });
 
     it('should return empty venues array when building has none', async () => {
@@ -175,7 +194,18 @@ describe('BuildingService', () => {
       const result = await service.getById(uniId, building.BuildingID);
 
       //Assert
-      expect(result).toEqual({ building, venues: [] });
+      expect(result).toEqual(
+        createBuildingSingleResponse({
+          building: createBuildingDto({
+            BuildingID: building.BuildingID,
+            BuildingName: building.BuildingName,
+            UniversityID: building.UniversityID,
+            location: { lat: building.Latitude!, lng: building.Longitude! },
+            venueCount: 0,
+          }),
+          venues: [],
+        }),
+      );
     });
 
     it('should query venues filtered by the building id', async () => {
@@ -203,7 +233,7 @@ describe('BuildingService', () => {
       mockDbResult(mockDb.select, []);
 
       //Act
-      const result = await service.getAll(uniId, {});
+      const result = await service.getAll(uniId, createBuildingQueryDto());
 
       //Assert
       expect(result).toEqual({ buildings: [] });
@@ -215,30 +245,49 @@ describe('BuildingService', () => {
       mockDbResult(mockDb.select, [{ building, venueCount: 3 }]);
 
       //Act
-      const result = await service.getAll(uniId, {});
+      const result = await service.getAll(uniId, createBuildingQueryDto());
 
       //Assert
-      expect(result.buildings).toHaveLength(1);
-      expect(result.buildings[0]).toMatchObject({
-        BuildingID: building.BuildingID,
-        BuildingName: building.BuildingName,
-        venueCount: 3,
-      });
+      expect(result).toEqual(
+        createBuildingListResponse({
+          buildings: [
+            createBuildingDto({
+              BuildingID: building.BuildingID,
+              BuildingName: building.BuildingName,
+              UniversityID: building.UniversityID,
+              location: { lat: building.Latitude!, lng: building.Longitude! },
+              venueCount: 3,
+            }),
+          ],
+        }),
+      );
     });
 
     it('should apply mapped=true filter', async () => {
       //Arrange
-      const building = createBuilding({
-        Latitude: -25.7545,
-        Longitude: 28.2314,
-      });
+      const building = createBuilding();
       mockDbResult(mockDb.select, [{ building, venueCount: 0 }]);
 
       //Act
-      const result = await service.getAll(uniId, { mapped: true });
+      const result = await service.getAll(
+        uniId,
+        createBuildingQueryDto({ mapped: true }),
+      );
 
       //Assert
-      expect(result.buildings).toHaveLength(1);
+      expect(result).toEqual(
+        createBuildingListResponse({
+          buildings: [
+            createBuildingDto({
+              BuildingID: building.BuildingID,
+              BuildingName: building.BuildingName,
+              UniversityID: building.UniversityID,
+              location: { lat: building.Latitude!, lng: building.Longitude! },
+              venueCount: 0,
+            }),
+          ],
+        }),
+      );
       expect(mockDb.select).toHaveBeenCalledTimes(1);
     });
 
@@ -248,10 +297,25 @@ describe('BuildingService', () => {
       mockDbResult(mockDb.select, [{ building, venueCount: 0 }]);
 
       //Act
-      const result = await service.getAll(uniId, { mapped: false });
+      const result = await service.getAll(
+        uniId,
+        createBuildingQueryDto({ mapped: false }),
+      );
 
       //Assert
-      expect(result.buildings).toHaveLength(1);
+      expect(result).toEqual(
+        createBuildingListResponse({
+          buildings: [
+            createBuildingDto({
+              BuildingID: building.BuildingID,
+              BuildingName: building.BuildingName,
+              UniversityID: building.UniversityID,
+              location: null,
+              venueCount: 0,
+            }),
+          ],
+        }),
+      );
       expect(mockDb.select).toHaveBeenCalledTimes(1);
     });
 
@@ -261,10 +325,25 @@ describe('BuildingService', () => {
       mockDbResult(mockDb.select, [{ building, venueCount: 0 }]);
 
       //Act
-      const result = await service.getAll(uniId, { search: 'IT' });
+      const result = await service.getAll(
+        uniId,
+        createBuildingQueryDto({ search: 'IT' }),
+      );
 
       //Assert
-      expect(result.buildings).toHaveLength(1);
+      expect(result).toEqual(
+        createBuildingListResponse({
+          buildings: [
+            createBuildingDto({
+              BuildingID: building.BuildingID,
+              BuildingName: 'IT Building',
+              UniversityID: building.UniversityID,
+              location: { lat: building.Latitude!, lng: building.Longitude! },
+              venueCount: 0,
+            }),
+          ],
+        }),
+      );
       expect(mockDb.select).toHaveBeenCalledTimes(1);
     });
 
@@ -277,7 +356,7 @@ describe('BuildingService', () => {
       mockDbResult(mockDb.select, [{ building, venueCount: 0 }]);
 
       //Act
-      const result = await service.getAll(uniId, {});
+      const result = await service.getAll(uniId, createBuildingQueryDto());
 
       //Assert
       expect(result.buildings[0].location).toEqual({
@@ -292,7 +371,7 @@ describe('BuildingService', () => {
       mockDbResult(mockDb.select, [{ building, venueCount: 0 }]);
 
       //Act
-      const result = await service.getAll(uniId, {});
+      const result = await service.getAll(uniId, createBuildingQueryDto());
 
       //Assert
       expect(result.buildings[0].location).toBeNull();
@@ -304,7 +383,7 @@ describe('BuildingService', () => {
       mockDbResult(mockDb.select, [{ building, venueCount: 0 }]);
 
       //Act
-      const result = await service.getAll(uniId, {});
+      const result = await service.getAll(uniId, createBuildingQueryDto());
 
       //Assert
       expect(result.buildings[0].location).toBeNull();
@@ -313,10 +392,9 @@ describe('BuildingService', () => {
 
   //Update
   describe('Test_update', () => {
-    const input: UpdateBuildingInput = {};
-
     it('should throw NotFoundException if building does not exist', async () => {
       //Arrange
+      const input = createUpdateBuildingInput();
       mockTransaction(mockDb, {
         select: [[]],
       });
@@ -329,6 +407,7 @@ describe('BuildingService', () => {
 
     it('should return old building when no fields to update', async () => {
       //Arrange
+      const input = createUpdateBuildingInput();
       const building = createBuilding();
       mockTransaction(mockDb, {
         select: [[building]],
@@ -341,17 +420,28 @@ describe('BuildingService', () => {
         .mockResolvedValueOnce({});
 
       //Act
-      const result = await service.update(uniId, building.BuildingID, {});
+      const result = await service.update(uniId, building.BuildingID, input);
 
       //Assert
-      expect(result.building).toEqual(building);
+      expect(result).toEqual(
+        createBuildingSingleResponse({
+          building: createBuildingDto({
+            BuildingID: building.BuildingID,
+            BuildingName: building.BuildingName,
+            UniversityID: building.UniversityID,
+            location: { lat: building.Latitude!, lng: building.Longitude! },
+            venueCount: 0,
+          }),
+        }),
+      );
       expect(mockDb.update).not.toHaveBeenCalled();
     });
 
     it('should update building and return updated row', async () => {
       //Arrange
+      const input = createUpdateBuildingInput({ BuildingName: 'New Name' });
       const building = createBuilding();
-      const updated = { ...building, BuildingName: 'New Name' };
+      const updated = createBuilding({ ...building, BuildingName: 'New Name' });
       mockTransaction(mockDb, {
         select: [[building]],
       });
@@ -364,17 +454,26 @@ describe('BuildingService', () => {
       mockDbResult(mockDb.update, [updated]);
 
       //Act
-      const result = await service.update(uniId, building.BuildingID, {
-        BuildingName: 'New Name',
-      });
+      const result = await service.update(uniId, building.BuildingID, input);
 
       //Assert
-      expect(result.building).toEqual(updated);
+      expect(result).toEqual(
+        createBuildingSingleResponse({
+          building: createBuildingDto({
+            BuildingID: updated.BuildingID,
+            BuildingName: 'New Name',
+            UniversityID: updated.UniversityID,
+            location: { lat: updated.Latitude!, lng: updated.Longitude! },
+            venueCount: 0,
+          }),
+        }),
+      );
       expect(mockDb.update).toHaveBeenCalledTimes(1);
     });
 
     it('should throw InternalServerErrorException when update returns no row', async () => {
       //Arrange
+      const input = createUpdateBuildingInput({ BuildingName: 'New Name' });
       const building = createBuilding();
       mockTransaction(mockDb, {
         select: [[building]],
@@ -389,9 +488,7 @@ describe('BuildingService', () => {
 
       //Act + Assert
       await expect(
-        service.update(uniId, building.BuildingID, {
-          BuildingName: 'New Name',
-        }),
+        service.update(uniId, building.BuildingID, input),
       ).rejects.toThrow(InternalServerErrorException);
     });
   }); //END_Test_update
@@ -417,41 +514,42 @@ describe('BuildingService', () => {
       const result = await service.delete(building.BuildingID);
 
       //Assert
-      expect(result).toEqual({ building });
+      expect(result).toEqual(
+        createBuildingSingleResponse({
+          building: createBuildingDto({
+            BuildingID: building.BuildingID,
+            BuildingName: building.BuildingName,
+            UniversityID: building.UniversityID,
+            location: { lat: building.Latitude!, lng: building.Longitude! },
+            venueCount: 0,
+          }),
+        }),
+      );
     });
-  });
+  }); //END_Test_delete
 
   //getHeatmap
   describe('Test_getHeatmap', () => {
-    const buildingId = 'building-1';
-    const validatedQuery = {
-      from: '2026-01-01',
-      to: '2026-06-30',
-      view: BuildingHeatmapView_ENUM.ALL,
-    };
-
-    const building: BaseBuildingDto = {
-      BuildingID: buildingId,
-      BuildingName: 'IT Building',
-      UniversityID: uniId,
-      location: null,
-      footprint: null,
-      icon: null,
-      displayColour: null,
-    };
-
     it('should return the assembled heatmap response', async () => {
       //Arrange
-      const venues = [createVenue({ VenueID: 'venue-1' })];
-      const venuesHeatmap = [createVenueHeatmap({ VenueID: 'venue-1' })];
-      const summary = {
+      const query = createBuildingHeatmapQueryDto();
+      const validatedQuery = {
+        from: query.from!,
+        to: query.to!,
+        view: query.view,
+      };
+      const building = createBuildingDto();
+      const venues = [createVenue({ BuildingID: building.BuildingID })];
+      const venuesHeatmap = [
+        createVenueHeatmapDto({ VenueID: venues[0].VenueID }),
+      ];
+      const summary = createBuildingHeatmapSummaryDto({
         Capacity: 100,
         projected: 40,
         worstCase: 80,
-        actual: null,
         projectedUtilisation: 0.4,
         worstCaseUtilisation: 0.8,
-      };
+      });
 
       jest
         .spyOn(service as any, 'validateBuildingHeatmapQueryDto')
@@ -467,21 +565,33 @@ describe('BuildingService', () => {
       mockTransaction(mockDb, {});
 
       //Act
-      const result = await service.getHeatmap(uniId, buildingId, {
-        view: BuildingHeatmapView_ENUM.ALL,
-      });
+      const result = await service.getHeatmap(
+        uniId,
+        building.BuildingID,
+        query,
+      );
 
       //Assert
-      expect(result).toEqual({
-        building,
-        period: { from: validatedQuery.from, to: validatedQuery.to },
-        summary,
-        venues: venuesHeatmap,
-      });
+      expect(result).toEqual(
+        createBuildingHeatmapResponse({
+          building,
+          period: { from: validatedQuery.from, to: validatedQuery.to },
+          summary,
+          venues: venuesHeatmap,
+        }),
+      );
     });
 
     it('should default venues to empty array when getById returns none', async () => {
       //Arrange
+      const query = createBuildingHeatmapQueryDto();
+      const validatedQuery = {
+        from: query.from!,
+        to: query.to!,
+        view: query.view,
+      };
+      const building = createBuildingDto();
+
       jest
         .spyOn(service as any, 'validateBuildingHeatmapQueryDto')
         .mockReturnValue(validatedQuery);
@@ -491,21 +601,14 @@ describe('BuildingService', () => {
       const heatmapSpy = jest
         .spyOn(service as any, 'getVenueHeatmapData')
         .mockResolvedValue([]);
-      jest.spyOn(service as any, 'buildHeatmapSummary').mockReturnValue({
-        Capacity: 0,
-        projected: 0,
-        worstCase: 0,
-        actual: null,
-        projectedUtilisation: null,
-        worstCaseUtilisation: null,
-      });
+      jest
+        .spyOn(service as any, 'buildHeatmapSummary')
+        .mockReturnValue(createBuildingHeatmapSummaryDto());
 
       mockTransaction(mockDb, {});
 
       //Act
-      await service.getHeatmap(uniId, buildingId, {
-        view: BuildingHeatmapView_ENUM.ALL,
-      });
+      await service.getHeatmap(uniId, building.BuildingID, query);
 
       //Assert
       expect(heatmapSpy).toHaveBeenCalledWith([], validatedQuery, mockDb);
@@ -627,7 +730,7 @@ describe('BuildingService', () => {
       expect(result).toBeNull();
     });
 
-    it('should return the building wrapped in a response when found', async () => {
+    it('should return the building when found', async () => {
       //Arrange
       const building = createBuilding();
       mockDbResult(mockDb.select, [building]);
@@ -640,7 +743,7 @@ describe('BuildingService', () => {
       );
 
       //Assert
-      expect(result).toEqual({ building });
+      expect(result).toEqual(building);
     });
   }); //END_Test_uniqueBuildingNamePerUniversity
 
@@ -1285,8 +1388,8 @@ describe('BuildingService', () => {
     it('should sum Capacity, projected and worstCase across venues', () => {
       //Arrange
       const venues = [
-        createVenueHeatmap({ Capacity: 100, projected: 40, worstCase: 80 }),
-        createVenueHeatmap({ Capacity: 50, projected: 20, worstCase: 30 }),
+        createVenueHeatmapDto({ Capacity: 100, projected: 40, worstCase: 80 }),
+        createVenueHeatmapDto({ Capacity: 50, projected: 20, worstCase: 30 }),
       ];
 
       //Act
@@ -1301,8 +1404,8 @@ describe('BuildingService', () => {
     it('should sum actual when at least one venue has a value', () => {
       //Arrange
       const venues = [
-        createVenueHeatmap({ actual: 30 }),
-        createVenueHeatmap({ actual: 15 }),
+        createVenueHeatmapDto({ actual: 30 }),
+        createVenueHeatmapDto({ actual: 15 }),
       ];
 
       //Act
@@ -1315,8 +1418,8 @@ describe('BuildingService', () => {
     it('should return actual null when all venues have null actual', () => {
       //Arrange
       const venues = [
-        createVenueHeatmap({ actual: null }),
-        createVenueHeatmap({ actual: null }),
+        createVenueHeatmapDto({ actual: null }),
+        createVenueHeatmapDto({ actual: null }),
       ];
 
       //Act
@@ -1329,8 +1432,8 @@ describe('BuildingService', () => {
     it('should compute utilisation from summed totals', () => {
       //Arrange
       const venues = [
-        createVenueHeatmap({ Capacity: 100, projected: 50, worstCase: 100 }),
-        createVenueHeatmap({ Capacity: 100, projected: 25, worstCase: 50 }),
+        createVenueHeatmapDto({ Capacity: 100, projected: 50, worstCase: 100 }),
+        createVenueHeatmapDto({ Capacity: 100, projected: 25, worstCase: 50 }),
       ];
 
       //Act
