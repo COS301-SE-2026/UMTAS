@@ -19,3 +19,4 @@ export * from './timetable.factory';
 export * from './building.factory';
 export * from './venue.factory';
 export * from './student-route.factory';
+export * from './route.factory';
