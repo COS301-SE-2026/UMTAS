@@ -20,4 +20,14 @@ fn main(
     @builtin(workgroup_id) workgroup_id: vec3<u32>
 ) {
     // upscale here
+    let out_x = global_id.x;
+    let out_y = global_id.y;
+    let slice_index = workgroup_id.z;
+
+    if (out_x >= 640 || out_y >=640){
+    return;
+    }
+
+    let params = params_list[slice_index];
+
 }
