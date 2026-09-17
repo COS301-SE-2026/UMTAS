@@ -30,4 +30,20 @@ fn main(
 
     let params = params_list[slice_index];
 
+    // map to 2x2 grid 
+    let  src_x_f = (f32(out_x) + f32(params.crop_x)) / params.scale_x;
+    let  src_y_f = (f32(out_y) + f32(params.crop_y)) / params.scale_y;
+
+
+    // set top left pixel of slice 
+    // keep indices between 0 and 1280
+    let x0 = clamp(u32(floor(max(src_x_f))), 0u, params.src_width -1u);
+    let y0 = clamp(u32(floor(max(src_y_f))), 0u, params.src_height -1u);
+
+    // set bottom right pxl 
+    let x1 = min(x0 + 1u, params.src_width - 1u);
+    let y1 = min(y0 + 1u, params.src_height - 1u);
+
+    // read px
+
 }
