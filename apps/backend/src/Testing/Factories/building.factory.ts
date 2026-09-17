@@ -36,6 +36,7 @@ export function createVenueHeatmap(
     actual: 20,
     projectedUtilisation: 0.5,
     worstCaseUtilisation: 0.9,
+    hourly: [],
 
     ...overrides,
   };
