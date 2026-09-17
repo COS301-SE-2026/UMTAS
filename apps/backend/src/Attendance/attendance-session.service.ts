@@ -6,32 +6,38 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { and, desc, eq, isNull } from 'drizzle-orm';
-import { DatabaseService, AppDatabase } from '../db/database.service';
+import { and, desc, eq, inArray, isNull } from 'drizzle-orm';
+import { DatabaseService, type AppDatabase } from '../db/database.service';
 import {
   AttendanceSession,
-  AttendanceSessionEntity,
-  AttendanceSessionStateType,
+  type AttendanceSessionEntity,
   Course,
+  Event,
   GroupModules,
   ModuleEnrollment,
   ModuleTeaches,
   SessionAttendance,
-  SessionAttendanceEntity,
-  Event,
+  type SessionAttendanceCaptureMethodType,
+  type SessionAttendanceEntity,
   UniversityEvent,
 } from '../entities';
-import {
-  AttendanceSessionResponseDto,
-  AttendanceCaptureResultDto,
-  CreateAttendanceSessionDto,
-  RecordIdentifiedAttendanceDto,
-  SessionAttendanceResponseDto,
-  SetGuestCountDto,
-  VerifiedAttendanceHistoryResponseDto,
-} from './dto/attendance-session.dto';
 import { EventService } from '../Events/event.service';
 import type { UniRole } from '../auth/roles';
+import {
+  type AttendanceCaptureResultDto,
+  type AttendanceSessionFiltersDto,
+  type AttendanceSessionListResponseDto,
+  type AttendanceSessionResponseDto,
+  type CreateAttendanceSessionDto,
+  type DeleteAttendanceSessionResponseDto,
+  type RecordIdentifiedAttendanceDto,
+  type SessionAttendanceResponseDto,
+  type SetGuestCountDto,
+  type UpdateAttendanceSessionDto,
+  type VerifiedAttendanceHistoryResponseDto,
+} from './dto/attendance-session.dto';
+
+const CAPTURE_BUFFER_MS = 10 * 60_000;
 
 export interface AttendanceActor {
   userId: string;
@@ -57,19 +63,13 @@ export class AttendanceSessionService {
       );
     }
 
-    const dates = this.validateSchedule(dto);
+    const schedule = this.validateSchedule(dto);
     await this.assertOperatorForEvent(actor, dto.eventID, tx);
-
-    const [existing] = await tx
-      .select({ SessionID: AttendanceSession.SessionID })
-      .from(AttendanceSession)
-      .where(
-        and(
-          eq(AttendanceSession.eventID, dto.eventID),
-          eq(AttendanceSession.scheduledStartAt, dates.scheduledStartAt),
-        ),
-      )
-      .limit(1);
+    const existing = await this.findOccurrence(
+      dto.eventID,
+      schedule.scheduledStartAt,
+      tx,
+    );
     if (existing) {
       throw new ConflictException(
         'An attendance session already exists for this event occurrence',
@@ -78,68 +78,164 @@ export class AttendanceSessionService {
 
     const [session] = await tx
       .insert(AttendanceSession)
-      .values({
-        eventID: dto.eventID,
-        ...dates,
-        captureMode: dto.captureMode,
-      })
+      .values({ eventID: dto.eventID, ...schedule })
       .returning();
+    return this.toSessionResponse(this.requireSession(session), []);
+  }
 
-    if (!session) {
-      throw new InternalServerErrorException(
-        'Failed to create attendance session',
-      );
-    }
+  async listSessions(
+    actor: AttendanceActor,
+    filters: AttendanceSessionFiltersDto,
+    tx: AppDatabase = this.dbService.db,
+  ): Promise<AttendanceSessionListResponseDto> {
+    const eventIds = await this.getOperatorEventIds(actor, tx);
+    const visibleEventIds = filters.eventID
+      ? eventIds.filter((eventId) => eventId === filters.eventID)
+      : eventIds;
+    if (!visibleEventIds.length) return { sessionList: [] };
 
-    return this.toSessionResponse(session, []);
+    const sessions = await tx
+      .select()
+      .from(AttendanceSession)
+      .where(inArray(AttendanceSession.eventID, visibleEventIds))
+      .orderBy(desc(AttendanceSession.scheduledStartAt));
+    const sessionList = await Promise.all(
+      sessions.map(async (session) =>
+        this.toSessionResponse(
+          session,
+          await this.getAttendanceRows(session.SessionID, tx),
+        ),
+      ),
+    );
+    return { sessionList };
   }
 
   async getSession(
     actor: AttendanceActor,
     sessionId: string,
+    tx: AppDatabase = this.dbService.db,
+  ): Promise<AttendanceSessionResponseDto> {
+    const session = await this.getSessionEntity(sessionId, tx);
+    await this.assertCanViewSession(actor, session, tx);
+    return this.toSessionResponse(
+      session,
+      await this.getAttendanceRows(sessionId, tx),
+    );
+  }
+
+  async updateSession(
+    actor: AttendanceActor,
+    sessionId: string,
+    dto: UpdateAttendanceSessionDto,
     tx?: AppDatabase,
   ): Promise<AttendanceSessionResponseDto> {
     if (!tx) {
       return this.dbService.db.transaction((transaction: AppDatabase) =>
-        this.getSession(actor, sessionId, transaction),
+        this.updateSession(actor, sessionId, dto, transaction),
       );
     }
 
-    let session = await this.getLockedSession(sessionId, tx);
-    await this.assertCanViewSession(actor, session, tx);
-    session = await this.reconcileExpiry(session, tx);
-    const rows = await this.getAttendanceRows(session.SessionID, tx);
-    return this.toSessionResponse(session, rows);
+    const current = await this.getLockedSession(sessionId, tx);
+    await this.assertOperatorForEvent(actor, current.eventID, tx);
+    const eventID = dto.eventID ?? current.eventID;
+    if (eventID !== current.eventID) {
+      await this.assertOperatorForEvent(actor, eventID, tx);
+    }
+    const schedule = this.validateSchedule({
+      eventID,
+      scheduledStartAt:
+        dto.scheduledStartAt ?? current.scheduledStartAt.toISOString(),
+      scheduledEndAt:
+        dto.scheduledEndAt ?? current.scheduledEndAt.toISOString(),
+    });
+    const duplicate = await this.findOccurrence(
+      eventID,
+      schedule.scheduledStartAt,
+      tx,
+    );
+    if (duplicate && duplicate.SessionID !== sessionId) {
+      throw new ConflictException(
+        'An attendance session already exists for this event occurrence',
+      );
+    }
+
+    const [updated] = await tx
+      .update(AttendanceSession)
+      .set({ eventID, ...schedule, updatedAt: new Date() })
+      .where(eq(AttendanceSession.SessionID, sessionId))
+      .returning();
+    const session = this.requireSession(updated);
+    return this.toSessionResponse(
+      session,
+      await this.getAttendanceRows(sessionId, tx),
+    );
   }
 
-  async openSession(
+  async deleteSession(
     actor: AttendanceActor,
     sessionId: string,
     tx?: AppDatabase,
-  ): Promise<AttendanceSessionResponseDto> {
-    return this.transitionSession(actor, sessionId, 'OPEN', tx);
+  ): Promise<DeleteAttendanceSessionResponseDto> {
+    if (!tx) {
+      return this.dbService.db.transaction((transaction: AppDatabase) =>
+        this.deleteSession(actor, sessionId, transaction),
+      );
+    }
+    const session = await this.getLockedSession(sessionId, tx);
+    await this.assertOperatorForEvent(actor, session.eventID, tx);
+    const deleted = await tx
+      .delete(AttendanceSession)
+      .where(eq(AttendanceSession.SessionID, sessionId))
+      .returning();
+    return { success: deleted.length === 1 };
   }
 
-  async closeSession(
-    actor: AttendanceActor,
-    sessionId: string,
+  async createOrGetOccurrenceSession(
+    operator: AttendanceActor,
+    eventID: string,
+    occurrence: { scheduledStartAt: Date; scheduledEndAt: Date },
     tx?: AppDatabase,
-  ): Promise<AttendanceSessionResponseDto> {
-    return this.transitionSession(actor, sessionId, 'CLOSED', tx);
+  ): Promise<AttendanceSessionEntity> {
+    if (!tx) {
+      return this.dbService.db.transaction((transaction: AppDatabase) =>
+        this.createOrGetOccurrenceSession(
+          operator,
+          eventID,
+          occurrence,
+          transaction,
+        ),
+      );
+    }
+    if (occurrence.scheduledStartAt >= occurrence.scheduledEndAt) {
+      throw new BadRequestException(
+        'The event occurrence has an invalid time range',
+      );
+    }
+
+    const [event] = await tx
+      .select({ eventID: Event.eventID })
+      .from(Event)
+      .where(eq(Event.eventID, eventID))
+      .for('update')
+      .limit(1);
+    if (!event) throw new NotFoundException('Event not found');
+    await this.assertOperatorForEvent(operator, eventID, tx);
+
+    const existing = await this.findOccurrence(
+      eventID,
+      occurrence.scheduledStartAt,
+      tx,
+      true,
+    );
+    if (existing) return existing;
+
+    const [session] = await tx
+      .insert(AttendanceSession)
+      .values({ eventID, ...occurrence })
+      .returning();
+    return this.requireSession(session);
   }
 
-  async cancelSession(
-    actor: AttendanceActor,
-    sessionId: string,
-    tx?: AppDatabase,
-  ): Promise<AttendanceSessionResponseDto> {
-    return this.transitionSession(actor, sessionId, 'CANCELLED', tx);
-  }
-
-  /**
-   * Manual identified capture. Protocol adapters use the authenticated-user
-   * capture method below so clients cannot choose another attendee's user ID.
-   */
   async recordIdentifiedAttendance(
     actor: AttendanceActor,
     sessionId: string,
@@ -151,191 +247,79 @@ export class AttendanceSessionService {
         this.recordIdentifiedAttendance(actor, sessionId, dto, transaction),
       );
     }
-
-    let session = await this.getLockedSession(sessionId, tx);
+    const session = await this.getLockedSession(sessionId, tx);
     await this.assertOperatorForEvent(actor, session.eventID, tx);
-    session = await this.reconcileExpiry(session, tx);
-    this.assertCaptureAllowed(session);
-    if (session.captureMode !== 'IDENTIFIED') {
-      throw new BadRequestException(
-        'This session accepts aggregate attendance, not identified attendees',
-      );
-    }
     await this.assertUserEnrolled(dto.UserID, session.eventID, tx);
-
-    const [existing] = await tx
-      .select()
-      .from(SessionAttendance)
-      .where(
-        and(
-          eq(SessionAttendance.SessionID, session.SessionID),
-          eq(SessionAttendance.UserID, dto.UserID),
-        ),
-      )
-      .limit(1);
-    if (existing) return { status: 'ALREADY_RECORDED', attendance: existing };
-
-    const [attendance] = await tx
-      .insert(SessionAttendance)
-      .values({
-        SessionID: session.SessionID,
-        UserID: dto.UserID,
-        captureMethod: 'MANUAL',
-        guestCount: null,
-      })
-      .returning();
-    if (!attendance) {
-      throw new InternalServerErrorException(
-        'Failed to record identified attendance',
-      );
-    }
-    return { status: 'RECORDED', attendance };
+    return this.insertIdentifiedAttendance(
+      sessionId,
+      dto.UserID,
+      dto.captureMethod,
+      tx,
+    );
   }
 
-  /** Record the authenticated attendee without accepting a client-supplied user ID. */
-  async recordNfcAttendance(
+  async recordAuthenticatedAttendance(
     actor: AttendanceActor,
     sessionId: string,
+    captureMethod: Exclude<SessionAttendanceCaptureMethodType, 'CAMERA'>,
     tx?: AppDatabase,
   ): Promise<AttendanceCaptureResultDto> {
     if (!tx) {
       return this.dbService.db.transaction((transaction: AppDatabase) =>
-        this.recordNfcAttendance(actor, sessionId, transaction),
-      );
-    }
-
-    let session = await this.getLockedSession(sessionId, tx);
-    session = await this.reconcileExpiry(session, tx);
-    this.assertCaptureAllowed(session);
-    if (session.captureMode !== 'IDENTIFIED') {
-      throw new BadRequestException(
-        'This session accepts aggregate attendance, not identified attendees',
-      );
-    }
-    await this.assertUserEnrolled(actor.userId, session.eventID, tx);
-
-    const [existing] = await tx
-      .select()
-      .from(SessionAttendance)
-      .where(
-        and(
-          eq(SessionAttendance.SessionID, session.SessionID),
-          eq(SessionAttendance.UserID, actor.userId),
-        ),
-      )
-      .limit(1);
-    if (existing) return { status: 'ALREADY_RECORDED', attendance: existing };
-
-    const [attendance] = await tx
-      .insert(SessionAttendance)
-      .values({
-        SessionID: session.SessionID,
-        UserID: actor.userId,
-        captureMethod: 'NFC',
-        guestCount: null,
-      })
-      .returning();
-    if (!attendance) {
-      throw new InternalServerErrorException('Failed to record NFC attendance');
-    }
-    return { status: 'RECORDED', attendance };
-  }
-
-  /** Create the current occurrence once and make it available for NFC capture. */
-  async createOrGetOpenOccurrenceSession(
-    operator: AttendanceActor,
-    eventId: string,
-    occurrence: { scheduledStartAt: Date; scheduledEndAt: Date },
-    tx?: AppDatabase,
-  ): Promise<AttendanceSessionEntity> {
-    if (!tx) {
-      return this.dbService.db.transaction((transaction: AppDatabase) =>
-        this.createOrGetOpenOccurrenceSession(
-          operator,
-          eventId,
-          occurrence,
+        this.recordAuthenticatedAttendance(
+          actor,
+          sessionId,
+          captureMethod,
           transaction,
         ),
       );
     }
+    const session = await this.getLockedSession(sessionId, tx);
+    this.assertCaptureAvailable(session);
+    await this.assertUserEnrolled(actor.userId, session.eventID, tx);
+    return this.insertIdentifiedAttendance(
+      sessionId,
+      actor.userId,
+      captureMethod,
+      tx,
+    );
+  }
 
-    if (occurrence.scheduledStartAt >= occurrence.scheduledEndAt) {
-      throw new BadRequestException(
-        'The event occurrence has an invalid time range',
+  async incrementGuestAttendance(
+    sessionId: string,
+    captureMethod: Exclude<SessionAttendanceCaptureMethodType, 'CAMERA'>,
+    tx?: AppDatabase,
+  ): Promise<SessionAttendanceResponseDto> {
+    if (!tx) {
+      return this.dbService.db.transaction((transaction: AppDatabase) =>
+        this.incrementGuestAttendance(sessionId, captureMethod, transaction),
       );
     }
-
-    // Serialize first-tap creation per event; the unique event/start index is
-    // the final guard if another caller races before this lock is acquired.
-    const [event] = await tx
-      .select({ eventID: Event.eventID })
-      .from(Event)
-      .where(eq(Event.eventID, eventId))
-      .for('update')
-      .limit(1);
-    if (!event) throw new NotFoundException('Event not found');
-    await this.assertOperatorForEvent(operator, eventId, tx);
-
-    const [existing] = await tx
-      .select()
-      .from(AttendanceSession)
-      .where(
-        and(
-          eq(AttendanceSession.eventID, eventId),
-          eq(AttendanceSession.scheduledStartAt, occurrence.scheduledStartAt),
-        ),
-      )
-      .for('update')
-      .limit(1);
-
-    if (existing) {
-      let session = await this.reconcileExpiry(existing, tx);
-      if (
-        session.state === 'SCHEDULED' &&
-        new Date() < session.captureClosesAt
-      ) {
-        const now = new Date();
-        const [opened] = await tx
-          .update(AttendanceSession)
-          .set({ state: 'OPEN', openedAt: now, updatedAt: now })
-          .where(eq(AttendanceSession.SessionID, session.SessionID))
+    const session = await this.getLockedSession(sessionId, tx);
+    this.assertCaptureAvailable(session);
+    const existing = await this.getGuestAttendance(sessionId, tx);
+    const [attendance] = existing
+      ? await tx
+          .update(SessionAttendance)
+          .set({
+            guestCount: (existing.guestCount ?? 0) + 1,
+            captureMethod,
+            updatedAt: new Date(),
+          })
+          .where(eq(SessionAttendance.AttendanceID, existing.AttendanceID))
+          .returning()
+      : await tx
+          .insert(SessionAttendance)
+          .values({
+            SessionID: sessionId,
+            UserID: null,
+            guestCount: 1,
+            captureMethod,
+          })
           .returning();
-        session = this.requireUpdatedSession(opened);
-      }
-      return session;
-    }
-
-    const now = new Date();
-    const [session] = await tx
-      .insert(AttendanceSession)
-      .values({
-        eventID: eventId,
-        scheduledStartAt: occurrence.scheduledStartAt,
-        scheduledEndAt: occurrence.scheduledEndAt,
-        captureOpensAt: occurrence.scheduledStartAt,
-        captureClosesAt: occurrence.scheduledEndAt,
-        state: 'OPEN',
-        captureMode: 'IDENTIFIED',
-        openedAt: now,
-      })
-      .returning();
-    if (!session) {
-      throw new InternalServerErrorException(
-        'Failed to create an attendance session for this occurrence',
-      );
-    }
-    return session;
+    return this.requireAttendance(attendance);
   }
 
-  async assertStudentEligible(
-    userId: string,
-    eventId: string,
-    tx: AppDatabase,
-  ): Promise<void> {
-    return this.assertUserEnrolled(userId, eventId, tx);
-  }
-
-  /** Generic manual replacement of the one aggregate guest count row. */
   async setGuestCount(
     actor: AttendanceActor,
     sessionId: string,
@@ -347,34 +331,16 @@ export class AttendanceSessionService {
         this.setGuestCount(actor, sessionId, dto, transaction),
       );
     }
-
-    let session = await this.getLockedSession(sessionId, tx);
+    const session = await this.getLockedSession(sessionId, tx);
     await this.assertOperatorForEvent(actor, session.eventID, tx);
-    session = await this.reconcileExpiry(session, tx);
-    this.assertCaptureAllowed(session);
-    if (session.captureMode !== 'AGGREGATE') {
-      throw new BadRequestException(
-        'This session accepts identified attendance, not an aggregate count',
-      );
-    }
-
-    const [existing] = await tx
-      .select()
-      .from(SessionAttendance)
-      .where(
-        and(
-          eq(SessionAttendance.SessionID, session.SessionID),
-          isNull(SessionAttendance.UserID),
-        ),
-      )
-      .limit(1);
-
+    if (dto.captureMethod === 'CAMERA') this.assertCaptureAvailable(session);
+    const existing = await this.getGuestAttendance(sessionId, tx);
     const [attendance] = existing
       ? await tx
           .update(SessionAttendance)
           .set({
             guestCount: dto.guestCount,
-            captureMethod: 'MANUAL',
+            captureMethod: dto.captureMethod,
             updatedAt: new Date(),
           })
           .where(eq(SessionAttendance.AttendanceID, existing.AttendanceID))
@@ -382,110 +348,100 @@ export class AttendanceSessionService {
       : await tx
           .insert(SessionAttendance)
           .values({
-            SessionID: session.SessionID,
+            SessionID: sessionId,
             UserID: null,
             guestCount: dto.guestCount,
-            captureMethod: 'MANUAL',
+            captureMethod: dto.captureMethod,
           })
           .returning();
+    return this.requireAttendance(attendance);
+  }
 
-    if (!attendance) {
-      throw new InternalServerErrorException('Failed to set guest count');
-    }
-    return attendance;
+  async assertStudentEligible(
+    userId: string,
+    eventId: string,
+    tx: AppDatabase,
+  ): Promise<void> {
+    return this.assertUserEnrolled(userId, eventId, tx);
   }
 
   async getOwnVerifiedHistory(
     actor: AttendanceActor,
-    tx?: AppDatabase,
+    tx: AppDatabase = this.dbService.db,
   ): Promise<VerifiedAttendanceHistoryResponseDto> {
-    if (!tx) {
-      return this.dbService.db.transaction((transaction: AppDatabase) =>
-        this.getOwnVerifiedHistory(actor, transaction),
-      );
-    }
-
-    const attendance = await tx
+    const attendanceList = await tx
       .select()
       .from(SessionAttendance)
       .where(eq(SessionAttendance.UserID, actor.userId))
       .orderBy(desc(SessionAttendance.recordedAt));
-    return { attendanceList: attendance };
+    return { attendanceList };
   }
 
-  private async transitionSession(
-    actor: AttendanceActor,
+  private async insertIdentifiedAttendance(
     sessionId: string,
-    target: Extract<
-      AttendanceSessionStateType,
-      'OPEN' | 'CLOSED' | 'CANCELLED'
-    >,
-    tx?: AppDatabase,
-  ): Promise<AttendanceSessionResponseDto> {
-    if (!tx) {
-      return this.dbService.db.transaction((transaction: AppDatabase) =>
-        this.transitionSession(actor, sessionId, target, transaction),
+    userId: string,
+    captureMethod: Exclude<SessionAttendanceCaptureMethodType, 'CAMERA'>,
+    tx: AppDatabase,
+  ): Promise<AttendanceCaptureResultDto> {
+    const [existing] = await tx
+      .select()
+      .from(SessionAttendance)
+      .where(
+        and(
+          eq(SessionAttendance.SessionID, sessionId),
+          eq(SessionAttendance.UserID, userId),
+        ),
+      )
+      .limit(1);
+    if (existing) return { status: 'ALREADY_RECORDED', attendance: existing };
+
+    const [attendance] = await tx
+      .insert(SessionAttendance)
+      .values({
+        SessionID: sessionId,
+        UserID: userId,
+        guestCount: null,
+        captureMethod,
+      })
+      .returning();
+    return {
+      status: 'RECORDED',
+      attendance: this.requireAttendance(attendance),
+    };
+  }
+
+  private async findOccurrence(
+    eventID: string,
+    scheduledStartAt: Date,
+    tx: AppDatabase,
+    lock = false,
+  ): Promise<AttendanceSessionEntity | undefined> {
+    const query = tx
+      .select()
+      .from(AttendanceSession)
+      .where(
+        and(
+          eq(AttendanceSession.eventID, eventID),
+          eq(AttendanceSession.scheduledStartAt, scheduledStartAt),
+        ),
       );
-    }
+    const rows = lock
+      ? await query.for('update').limit(1)
+      : await query.limit(1);
+    return rows[0];
+  }
 
-    let session = await this.getLockedSession(sessionId, tx);
-    await this.assertOperatorForEvent(actor, session.eventID, tx);
-    session = await this.reconcileExpiry(session, tx);
-    const now = new Date();
-
-    if (target === 'OPEN') {
-      if (session.state === 'OPEN') {
-        const rows = await this.getAttendanceRows(session.SessionID, tx);
-        return this.toSessionResponse(session, rows);
-      }
-      if (session.state !== 'SCHEDULED') {
-        throw new BadRequestException(
-          `Cannot open a ${session.state.toLowerCase()} attendance session`,
-        );
-      }
-      if (now >= session.captureClosesAt) {
-        throw new BadRequestException('The capture window has already closed');
-      }
-      const [updated] = await tx
-        .update(AttendanceSession)
-        .set({ state: 'OPEN', openedAt: now, updatedAt: now })
-        .where(eq(AttendanceSession.SessionID, session.SessionID))
-        .returning();
-      session = this.requireUpdatedSession(updated);
-    } else if (target === 'CLOSED') {
-      if (session.state === 'CLOSED') {
-        const rows = await this.getAttendanceRows(session.SessionID, tx);
-        return this.toSessionResponse(session, rows);
-      }
-      if (session.state !== 'OPEN') {
-        throw new BadRequestException(
-          `Cannot close a ${session.state.toLowerCase()} attendance session`,
-        );
-      }
-      const [updated] = await tx
-        .update(AttendanceSession)
-        .set({ state: 'CLOSED', closedAt: now, updatedAt: now })
-        .where(eq(AttendanceSession.SessionID, session.SessionID))
-        .returning();
-      session = this.requireUpdatedSession(updated);
-    } else {
-      if (session.state === 'CANCELLED') {
-        const rows = await this.getAttendanceRows(session.SessionID, tx);
-        return this.toSessionResponse(session, rows);
-      }
-      if (session.state === 'CLOSED') {
-        throw new BadRequestException('A closed session cannot be cancelled');
-      }
-      const [updated] = await tx
-        .update(AttendanceSession)
-        .set({ state: 'CANCELLED', closedAt: now, updatedAt: now })
-        .where(eq(AttendanceSession.SessionID, session.SessionID))
-        .returning();
-      session = this.requireUpdatedSession(updated);
-    }
-
-    const rows = await this.getAttendanceRows(session.SessionID, tx);
-    return this.toSessionResponse(session, rows);
+  private async getSessionEntity(
+    sessionId: string,
+    tx: AppDatabase,
+  ): Promise<AttendanceSessionEntity> {
+    const [session] = await tx
+      .select()
+      .from(AttendanceSession)
+      .where(eq(AttendanceSession.SessionID, sessionId))
+      .limit(1);
+    if (!session) throw new NotFoundException('Attendance session not found');
+    return session;
   }
 
   private async getLockedSession(
@@ -502,96 +458,64 @@ export class AttendanceSessionService {
     return session;
   }
 
-  private async reconcileExpiry(
-    session: AttendanceSessionEntity,
-    tx: AppDatabase,
-  ): Promise<AttendanceSessionEntity> {
-    if (session.state !== 'OPEN' || new Date() < session.captureClosesAt) {
-      return session;
-    }
-    const now = new Date();
-    const [closed] = await tx
-      .update(AttendanceSession)
-      .set({ state: 'CLOSED', closedAt: now, updatedAt: now })
-      .where(
-        and(
-          eq(AttendanceSession.SessionID, session.SessionID),
-          eq(AttendanceSession.state, 'OPEN'),
-        ),
-      )
-      .returning();
-    return (
-      closed ?? { ...session, state: 'CLOSED', closedAt: now, updatedAt: now }
-    );
-  }
-
-  private assertCaptureAllowed(session: AttendanceSessionEntity): void {
-    const now = new Date();
-    if (session.state !== 'OPEN') {
+  private assertCaptureAvailable(session: AttendanceSessionEntity): void {
+    const now = Date.now();
+    if (
+      now < session.scheduledStartAt.getTime() - CAPTURE_BUFFER_MS ||
+      now >= session.scheduledEndAt.getTime() + CAPTURE_BUFFER_MS
+    ) {
       throw new BadRequestException(
-        `Attendance capture is unavailable while the session is ${session.state.toLowerCase()}`,
+        'Attendance is outside the event time window',
       );
-    }
-    if (now < session.captureOpensAt || now >= session.captureClosesAt) {
-      throw new BadRequestException('Attendance capture is outside its window');
     }
   }
 
   private async assertOperatorForEvent(
     actor: AttendanceActor,
-    eventId: string,
+    eventID: string,
     tx: AppDatabase,
-  ): Promise<string | null> {
-    await this.eventService.getById(eventId, tx);
-
+  ): Promise<void> {
+    await this.eventService.getById(eventID, tx);
     const [universityEvent] = await tx
       .select({ moduleID: UniversityEvent.moduleID })
       .from(UniversityEvent)
-      .where(eq(UniversityEvent.eventID, eventId))
+      .where(eq(UniversityEvent.eventID, eventID))
       .limit(1);
-    const moduleId = universityEvent?.moduleID;
-    const role = actor.uniRole;
-
-    if (!moduleId) {
+    if (!universityEvent?.moduleID) {
       throw new ForbiddenException(
-        'Attendance sessions require a university module event',
+        'Attendance requires a university module event',
       );
     }
 
-    if (role === 'lecturer') {
+    if (actor.uniRole === 'lecturer') {
       const [teaching] = await tx
         .select({ ModuleID: ModuleTeaches.ModuleID })
         .from(ModuleTeaches)
         .where(
           and(
-            eq(ModuleTeaches.ModuleID, moduleId),
+            eq(ModuleTeaches.ModuleID, universityEvent.moduleID),
             eq(ModuleTeaches.UserID, actor.userId),
           ),
         )
         .limit(1);
-      if (!teaching) {
-        throw new ForbiddenException(
-          'The lecturer is not assigned to this module',
-        );
-      }
-      return moduleId;
+      if (teaching) return;
+      throw new ForbiddenException(
+        'The lecturer is not assigned to this module',
+      );
     }
 
-    if (role === 'uni_admin') {
-      if (!actor.uniId) {
-        throw new ForbiddenException('No active university selected');
-      }
-      const universityIds = await this.getModuleUniversityIds(moduleId, tx);
-      if (!universityIds.includes(actor.uniId)) {
-        throw new ForbiddenException(
-          'The event does not belong to the selected university',
-        );
-      }
-      return moduleId;
+    if (actor.uniRole === 'uni_admin' && actor.uniId) {
+      const universityIds = await this.getModuleUniversityIds(
+        universityEvent.moduleID,
+        tx,
+      );
+      if (universityIds.includes(actor.uniId)) return;
+      throw new ForbiddenException(
+        'The event does not belong to the selected university',
+      );
     }
-
     throw new ForbiddenException(
-      'Only lecturers and university admins may operate attendance sessions',
+      'Only lecturers and university admins may manage attendance sessions',
     );
   }
 
@@ -600,27 +524,21 @@ export class AttendanceSessionService {
     session: AttendanceSessionEntity,
     tx: AppDatabase,
   ): Promise<void> {
-    const role = actor.uniRole;
-    if (role === 'lecturer' || role === 'uni_admin') {
-      await this.assertOperatorForEvent(actor, session.eventID, tx);
-      return;
+    if (actor.uniRole === 'student') {
+      return this.assertUserEnrolled(actor.userId, session.eventID, tx);
     }
-    if (role === 'student') {
-      await this.assertUserEnrolled(actor.userId, session.eventID, tx);
-      return;
-    }
-    throw new ForbiddenException('You may not view this attendance session');
+    return this.assertOperatorForEvent(actor, session.eventID, tx);
   }
 
   private async assertUserEnrolled(
     userId: string,
-    eventId: string,
+    eventID: string,
     tx: AppDatabase,
   ): Promise<void> {
     const [universityEvent] = await tx
       .select({ moduleID: UniversityEvent.moduleID })
       .from(UniversityEvent)
-      .where(eq(UniversityEvent.eventID, eventId))
+      .where(eq(UniversityEvent.eventID, eventID))
       .limit(1);
     if (!universityEvent?.moduleID) {
       throw new ForbiddenException('The event is not attached to a module');
@@ -642,21 +560,66 @@ export class AttendanceSessionService {
     }
   }
 
+  private async getOperatorEventIds(
+    actor: AttendanceActor,
+    tx: AppDatabase,
+  ): Promise<string[]> {
+    if (!actor.uniId) throw new ForbiddenException('No university selected');
+    if (actor.uniRole === 'lecturer') {
+      const rows = await tx
+        .select({ eventID: UniversityEvent.eventID })
+        .from(ModuleTeaches)
+        .innerJoin(
+          UniversityEvent,
+          eq(UniversityEvent.moduleID, ModuleTeaches.ModuleID),
+        )
+        .innerJoin(
+          GroupModules,
+          eq(GroupModules.ModuleID, ModuleTeaches.ModuleID),
+        )
+        .innerJoin(Course, eq(Course.GroupID, GroupModules.GroupID))
+        .where(
+          and(
+            eq(ModuleTeaches.UserID, actor.userId),
+            eq(Course.UniversityID, actor.uniId),
+          ),
+        );
+      return [
+        ...new Set(rows.flatMap((row) => (row.eventID ? [row.eventID] : []))),
+      ];
+    }
+    if (actor.uniRole === 'uni_admin') {
+      const rows = await tx
+        .select({ eventID: UniversityEvent.eventID })
+        .from(UniversityEvent)
+        .innerJoin(
+          GroupModules,
+          eq(GroupModules.ModuleID, UniversityEvent.moduleID),
+        )
+        .innerJoin(Course, eq(Course.GroupID, GroupModules.GroupID))
+        .where(eq(Course.UniversityID, actor.uniId));
+      return [
+        ...new Set(rows.flatMap((row) => (row.eventID ? [row.eventID] : []))),
+      ];
+    }
+    throw new ForbiddenException(
+      'Only lecturers and university admins may view attendance sessions',
+    );
+  }
+
   private async getModuleUniversityIds(
     moduleId: string,
     tx: AppDatabase,
   ): Promise<string[]> {
-    const courseLinks = await tx
+    const rows = await tx
       .select({ universityId: Course.UniversityID })
       .from(GroupModules)
       .innerJoin(Course, eq(Course.GroupID, GroupModules.GroupID))
       .where(eq(GroupModules.ModuleID, moduleId));
-    return Array.from(
-      new Set(courseLinks.map(({ universityId }) => universityId)),
-    );
+    return [...new Set(rows.map((row) => row.universityId))];
   }
 
-  private async getAttendanceRows(
+  private getAttendanceRows(
     sessionId: string,
     tx: AppDatabase,
   ): Promise<SessionAttendanceEntity[]> {
@@ -664,6 +627,23 @@ export class AttendanceSessionService {
       .select()
       .from(SessionAttendance)
       .where(eq(SessionAttendance.SessionID, sessionId));
+  }
+
+  private async getGuestAttendance(
+    sessionId: string,
+    tx: AppDatabase,
+  ): Promise<SessionAttendanceEntity | undefined> {
+    const [attendance] = await tx
+      .select()
+      .from(SessionAttendance)
+      .where(
+        and(
+          eq(SessionAttendance.SessionID, sessionId),
+          isNull(SessionAttendance.UserID),
+        ),
+      )
+      .limit(1);
+    return attendance;
   }
 
   private toSessionResponse(
@@ -676,48 +656,43 @@ export class AttendanceSessionService {
       ...session,
       identifiedCount,
       guestCount,
-      attendedCount:
-        session.captureMode === 'AGGREGATE' ? guestCount : identifiedCount,
+      attendedCount: identifiedCount + guestCount,
     };
   }
 
-  private requireUpdatedSession(
+  private requireSession(
     session: AttendanceSessionEntity | undefined,
   ): AttendanceSessionEntity {
     if (!session) {
-      throw new InternalServerErrorException(
-        'Attendance session update returned no row',
-      );
+      throw new InternalServerErrorException('Attendance session write failed');
     }
     return session;
+  }
+
+  private requireAttendance(
+    attendance: SessionAttendanceEntity | undefined,
+  ): SessionAttendanceEntity {
+    if (!attendance) {
+      throw new InternalServerErrorException('Attendance record write failed');
+    }
+    return attendance;
   }
 
   private validateSchedule(dto: CreateAttendanceSessionDto): {
     scheduledStartAt: Date;
     scheduledEndAt: Date;
-    captureOpensAt: Date;
-    captureClosesAt: Date;
   } {
-    const dates = {
-      scheduledStartAt: this.parseDate(
-        dto.scheduledStartAt,
-        'scheduledStartAt',
-      ),
-      scheduledEndAt: this.parseDate(dto.scheduledEndAt, 'scheduledEndAt'),
-      captureOpensAt: this.parseDate(dto.captureOpensAt, 'captureOpensAt'),
-      captureClosesAt: this.parseDate(dto.captureClosesAt, 'captureClosesAt'),
-    };
-    if (dates.scheduledStartAt >= dates.scheduledEndAt) {
+    const scheduledStartAt = this.parseDate(
+      dto.scheduledStartAt,
+      'scheduledStartAt',
+    );
+    const scheduledEndAt = this.parseDate(dto.scheduledEndAt, 'scheduledEndAt');
+    if (scheduledStartAt >= scheduledEndAt) {
       throw new BadRequestException(
         'scheduledStartAt must be before scheduledEndAt',
       );
     }
-    if (dates.captureOpensAt >= dates.captureClosesAt) {
-      throw new BadRequestException(
-        'captureOpensAt must be before captureClosesAt',
-      );
-    }
-    return dates;
+    return { scheduledStartAt, scheduledEndAt };
   }
 
   private parseDate(value: string, field: string): Date {
