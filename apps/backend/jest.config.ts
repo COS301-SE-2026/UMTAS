@@ -44,6 +44,7 @@ const config: Config = {
   coverageDirectory: 'coverage',
   testEnvironment: 'node',
   coverageReporters: ['text', 'html', 'lcov'],
+  globalTeardown: '<rootDir>/src/Testing/jest.teardown.ts',
 };
 
 export default config;

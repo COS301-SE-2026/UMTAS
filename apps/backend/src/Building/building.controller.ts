@@ -40,12 +40,16 @@ import {
   BuildingHeatmapQueryDto,
   BuildingHeatmapResponseDto,
 } from './dto/heatmap.dto';
+import { BuildingHeatmapService } from './building.heatmap.service';
 
 @ApiTags('Buildings')
 @ApiSecurity('umtas-session')
 @Controller('buildings')
 export class BuildingController {
-  constructor(private readonly buildingService: BuildingService) {}
+  constructor(
+    private readonly buildingService: BuildingService,
+    private readonly heatmapService: BuildingHeatmapService,
+  ) {}
 
   //Get all building heatmaps
   @Get('heatmap')
@@ -68,7 +72,7 @@ export class BuildingController {
     @CurrentUniId() uniId: string,
     @Query() query: BuildingHeatmapQueryDto,
   ): Promise<AllBuildingsHeatmapResponseDto> {
-    return this.buildingService.getAllBuildingsHeatmap(uniId, query);
+    return this.heatmapService.getAllBuildingsHeatmap(uniId, query);
   } //END_getAllBuildingsHeatmap
 
   //Create
@@ -215,6 +219,6 @@ export class BuildingController {
     @Param('buildingId', ParseUUIDPipe) buildingId: string,
     @Query() query: BuildingHeatmapQueryDto,
   ): Promise<BuildingHeatmapResponseDto> {
-    return this.buildingService.getHeatmap(uniId, buildingId, query);
+    return this.heatmapService.getHeatmap(uniId, buildingId, query);
   } //END_getHeatmap
 } //END_BuildingController
