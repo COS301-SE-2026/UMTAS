@@ -7,6 +7,7 @@ edition = "2024"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
+bytemuck = { version = "1.25.2", features = ["derive"] }
 console_error_panic_hook = "0.1.7"
 fast_image_resize = { version = "6.1.0", default-features = false, features = ["no_std"] }
 getrandom = { version = "0.4", features = ["wasm_js"] }
