@@ -145,6 +145,10 @@ pub fn create_buffers(
     };
 }
 
+pub fn run_upscaler(device: &wgpu::Device, queue: &wgpu::Queue, buffers: &Buffers) {
+    
+}
+
 // needed to read the output to staging
 pub async fn read_slices(
     device: &wgpu::Device,
