@@ -25,13 +25,13 @@ pub struct Buffers {
 
 #[repr(C)]
 #[derive(Copy, Clone, bytemuck::Pod, bytemuck::Zeroable)]
-pub struct SliceParms {
+pub struct slice_parms {
     pub src_width: u32,
     pub src_height: u32,
     pub crop_x: u32,
     pub crop_y: u32,
-    pub scale_x: u32,
-    pub scale_y: u32,
+    pub scale_x: f32,
+    pub scale_y: f32,
     pub slice_index: u32,
     pub _pad: u32, // gpu padding needed
 }
@@ -51,6 +51,25 @@ pub fn create_buffers(
         // data outside gpu can init == COPY_DST
         usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_DST,
     });
+
+    let src_w = width as u32;
+    let src_h = width as u32;
+    let scale_dbl_x = 1280.0 / src_w as f32;
+    let scale_dbl_y = 1280.0 / src_h as f32;
+
+    let slice_params = [
+        // full image
+        slice_parms {
+            src_width: src_w,
+            src_height: src_h,
+            crop_x: 0,
+            crop_y: 0,
+            scale_x: 640.0 / src_w as f32,
+            scale_y: 640.0 / src_h as f32,
+            slice_index: 0,
+            _pad: 0,
+        },
+    ];
 
     todo!("init Buffer struct ")
 }
