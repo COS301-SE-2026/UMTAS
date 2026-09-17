@@ -11968,84 +11968,6 @@
           "BuildingName"
         ]
       },
-      "BaseBuildingDto": {
-        "type": "object",
-        "properties": {
-          "BuildingID": {
-            "type": "string",
-            "format": "uuid",
-            "description": "Unique building identifier.",
-            "example": "00000000-0000-0000-0000-000000000000"
-          },
-          "BuildingName": {
-            "type": "string",
-            "maxLength": 100,
-            "description": "Building name. Unique per university. Max 100 chars.",
-            "example": "Information Technology Building"
-          },
-          "UniversityID": {
-            "type": "string",
-            "format": "uuid",
-            "description": "Owning university. Required."
-          },
-          "location": {
-            "nullable": true,
-            "description": "Map position. Omit if the building has not been placed on the map yet.",
-            "type": "object",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/LatLngDto"
-              }
-            ]
-          },
-          "footprint": {
-            "type": "object",
-            "nullable": true,
-            "description": "GeoJSON Polygon outlining the building. Positions are [long, lat]. Send null to clear.",
-            "additionalProperties": true
-          },
-          "icon": {
-            "type": "string",
-            "nullable": true,
-            "minLength": 1,
-            "maxLength": 64,
-            "description": "Icon key used when rendering the building marker.",
-            "example": "school"
-          },
-          "displayColour": {
-            "type": "string",
-            "nullable": true,
-            "pattern": "^#?([0-9A-F]{3}|[0-9A-F]{4}|[0-9A-F]{6}|[0-9A-F]{8})$",
-            "description": "Hex colour used when rendering the building.",
-            "example": "#4A5548"
-          }
-        },
-        "required": [
-          "BuildingID",
-          "BuildingName",
-          "UniversityID"
-        ]
-      },
-      "BuildingSingleResponseDto": {
-        "type": "object",
-        "properties": {
-          "building": {
-            "$ref": "#/components/schemas/BaseBuildingDto"
-          },
-          "message": {
-            "type": "string"
-          },
-          "venues": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/BaseVenueDto"
-            }
-          }
-        },
-        "required": [
-          "building"
-        ]
-      },
       "BuildingDto": {
         "type": "object",
         "properties": {
@@ -12109,6 +12031,26 @@
           "venueCount"
         ]
       },
+      "BuildingSingleResponseDto": {
+        "type": "object",
+        "properties": {
+          "building": {
+            "$ref": "#/components/schemas/BuildingDto"
+          },
+          "message": {
+            "type": "string"
+          },
+          "venues": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BaseVenueDto"
+            }
+          }
+        },
+        "required": [
+          "building"
+        ]
+      },
       "BuildingListResponseDto": {
         "type": "object",
         "properties": {
@@ -12167,6 +12109,64 @@
             "example": "#4A5548"
           }
         }
+      },
+      "BaseBuildingDto": {
+        "type": "object",
+        "properties": {
+          "BuildingID": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique building identifier.",
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "BuildingName": {
+            "type": "string",
+            "maxLength": 100,
+            "description": "Building name. Unique per university. Max 100 chars.",
+            "example": "Information Technology Building"
+          },
+          "UniversityID": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Owning university. Required."
+          },
+          "location": {
+            "nullable": true,
+            "description": "Map position. Omit if the building has not been placed on the map yet.",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LatLngDto"
+              }
+            ]
+          },
+          "footprint": {
+            "type": "object",
+            "nullable": true,
+            "description": "GeoJSON Polygon outlining the building. Positions are [long, lat]. Send null to clear.",
+            "additionalProperties": true
+          },
+          "icon": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 64,
+            "description": "Icon key used when rendering the building marker.",
+            "example": "school"
+          },
+          "displayColour": {
+            "type": "string",
+            "nullable": true,
+            "pattern": "^#?([0-9A-F]{3}|[0-9A-F]{4}|[0-9A-F]{6}|[0-9A-F]{8})$",
+            "description": "Hex colour used when rendering the building.",
+            "example": "#4A5548"
+          }
+        },
+        "required": [
+          "BuildingID",
+          "BuildingName",
+          "UniversityID"
+        ]
       },
       "BuildingHeatmapPeriodDto": {
         "type": "object",
