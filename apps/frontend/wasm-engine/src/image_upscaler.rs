@@ -69,6 +69,50 @@ pub fn create_buffers(
             slice_index: 0,
             _pad: 0,
         },
+        // Top left
+        slice_parms {
+            src_width: src_w,
+            src_height: src_h,
+            crop_x: 0,
+            crop_y: 0,
+            scale_x: scale_dbl_x,
+            scale_y: scale_dbl_y,
+            slice_index: 1,
+            _pad: 0,
+        },
+        // top right
+        slice_parms {
+            src_width: src_w,
+            src_height: src_h,
+            crop_x: 640,
+            crop_y: 0,
+            scale_x: scale_dbl_x,
+            scale_y: scale_dbl_y,
+            slice_index: 2,
+            _pad: 0,
+        },
+        // bottom left
+        slice_parms {
+            src_width: src_w,
+            src_height: src_h,
+            crop_x: 0,
+            crop_y: 640,
+            scale_x: scale_dbl_x,
+            scale_y: scale_dbl_y,
+            slice_index: 3,
+            _pad: 0,
+        },
+        // bottom right
+        slice_parms {
+            src_width: src_w,
+            src_height: src_h,
+            crop_x: 640,
+            crop_y: 640,
+            scale_x: scale_dbl_x,
+            scale_y: scale_dbl_y,
+            slice_index: 4,
+            _pad: 0,
+        },
     ];
 
     todo!("init Buffer struct ")
