@@ -3,6 +3,9 @@ use serde::Serialize;
 use std::num::NonZeroU32;
 use std::{usize, vec};
 use wasm_bindgen::prelude::*;
+
+pub mod image_upscaler;
+
 pub struct SliceFormat {
     x: usize,
     y: usize,
