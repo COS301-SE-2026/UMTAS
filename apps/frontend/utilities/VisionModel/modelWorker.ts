@@ -45,7 +45,6 @@ async function runModel(slices: Float32Array[], payload: PIXEL_PAYLOAD) {
     throw Error("Input and output names not set");
   }
 
-  console.log(slices.length);
   const resultsArray: Float32Array[] = [];
 
   for (let i = 0; i < slices.length; i++) {

@@ -160,7 +160,6 @@ function CanvasWebcam({ isCameraActive, detectionSettings }: CanvasCamProps) {
                   if (people) {
                     // Update the ref instantly so the next frame renders them
                     detectedPeopleRef.current = people;
-                    console.log(people);
                   }
                 });
               }

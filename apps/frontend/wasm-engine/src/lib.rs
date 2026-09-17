@@ -328,8 +328,7 @@ pub fn is_enveloped(box1: &DetectedPerson, box2: &DetectedPerson) -> bool {
     let b2_area = box2.width * box2.height;
     let smaller_area = b1_area.min(b2_area);
 
-    // If the intersection covers e.g. 80% or more of the smaller box, it's enveloped
-    return (intersection_area / smaller_area) >= 0.80;
+    return (intersection_area / smaller_area) >= 0.50;
 }
 
 pub fn non_maximum_sepression(
