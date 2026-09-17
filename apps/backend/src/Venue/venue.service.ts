@@ -149,7 +149,11 @@ export class VenueService {
     if (Object.keys(updateFields).length === 0) return { venue: oldVenue };
 
     //Update venue
-    const [venue] = await tx.update(Venue).set(updateFields).returning();
+    const [venue] = await tx
+      .update(Venue)
+      .set(updateFields)
+      .where(eq(Venue.VenueID, venueId))
+      .returning();
 
     if (!venue) {
       this.OOPSIE.fatal(
@@ -272,8 +276,8 @@ export class VenueService {
     //If building provided -> validate it exists - will throw 404
     if (input.BuildingID && input.BuildingID !== null) {
       await this.buildingService.getById(
-        input.BuildingID,
         input.UniversityID,
+        input.BuildingID,
         tx,
       );
     } else {

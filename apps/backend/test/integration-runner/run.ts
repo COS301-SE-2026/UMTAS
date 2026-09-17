@@ -287,8 +287,6 @@ function reportCoverage(): Promise<number> {
         'dist/Map-config/**',
         '--exclude',
         'dist/Route/**',
-        '--exclude',
-        'dist/Venue/**',
       ],
       {
         cwd: BACKEND_DIRECTORY,

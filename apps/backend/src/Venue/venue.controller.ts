@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -163,6 +165,7 @@ export class VenueController {
 
   @Post('assign')
   @Roles('uni_admin')
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Assign venues to buildings',
     description: 'Assign one or many venues to buildings in a single request.',
