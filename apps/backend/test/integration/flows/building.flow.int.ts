@@ -365,24 +365,72 @@ test('[flow:building] manages buildings through the HTTP API', async () => {
               .values(attendance);
 
             const response = await administrator(context).request.get(
-              `/buildings/${building.buildingId}/heatmap?from=${attendance.eventDate}&to=${attendance.eventDate}&view=projected`,
+              `/buildings/${building.buildingId}/heatmap?date=${attendance.eventDate}&view=all`,
             );
 
             expectStatus(response, 200, 'get building heatmap');
-            expectObject(response.body, 'get building heatmap');
-            expectObject(response.body.building, 'heatmap building');
-            expectObject(response.body.period, 'heatmap period');
-            expectObject(response.body.summary, 'heatmap summary');
-            assert.ok(Array.isArray(response.body.venues));
 
-            const heatmapVenue = response.body.venues.find(
-              (item: Record<string, unknown>) => item.VenueID === venue.VenueID,
-            );
+            const body = response.body;
+            expectObject(body, 'get building heatmap');
+
+            const heatmapBuilding = body.building;
+            expectObject(heatmapBuilding, 'heatmap building');
+
+            const summary = body.summary;
+            expectObject(summary, 'heatmap summary');
+
+            assert.equal(body.date, attendance.eventDate);
+            assert.ok(Array.isArray(body.venues));
+
+            const heatmapVenue = (
+              body.venues as Array<Record<string, unknown>>
+            ).find((item) => item.VenueID === venue.VenueID);
 
             assert.ok(heatmapVenue, 'seeded venue must appear in heatmap');
             assert.equal(heatmapVenue.projected, 1);
             assert.equal(heatmapVenue.Capacity, venue.Capacity);
             assert.equal(heatmapVenue.actual, null);
+          },
+        },
+
+        {
+          name: 'get heatmap for all buildings',
+
+          async run(context) {
+            const building = context.require(buildingKey);
+            const attendanceDate = '2026-01-02';
+
+            const response = await administrator(context).request.get(
+              `/buildings/heatmap?date=${attendanceDate}&view=projected`,
+            );
+
+            expectStatus(response, 200, 'get all buildings heatmap');
+
+            const body = response.body;
+            expectObject(body, 'get all buildings heatmap');
+
+            const buildings = body.buildings;
+            assert.ok(Array.isArray(buildings), 'buildings must be an array');
+            assert.ok(
+              buildings.length > 0,
+              'at least one building heatmap expected',
+            );
+
+            const target = (buildings as Array<Record<string, unknown>>).find(
+              (item) => {
+                const itemBuilding = item.building as
+                  Record<string, unknown> | undefined;
+                return itemBuilding?.BuildingID === building.buildingId;
+              },
+            );
+
+            assert.ok(target, 'seeded building must appear in the response');
+            assert.equal(target.date, attendanceDate);
+            assert.ok(Array.isArray(target.venues));
+            assert.ok(Array.isArray(target.hourly));
+
+            const summary = target.summary;
+            expectObject(summary, 'heatmap summary');
           },
         },
 
