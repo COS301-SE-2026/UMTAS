@@ -36,6 +36,7 @@ import {
   UpdateBuildingDto,
 } from './dto/building.dto';
 import {
+  AllBuildingsHeatmapResponseDto,
   BuildingHeatmapQueryDto,
   BuildingHeatmapResponseDto,
 } from './dto/heatmap.dto';
@@ -45,6 +46,30 @@ import {
 @Controller('buildings')
 export class BuildingController {
   constructor(private readonly buildingService: BuildingService) {}
+
+  //Get all building heatmaps
+  @Get('heatmap')
+  @Roles()
+  @ApiOperation({
+    description:
+      'Returns occupancy for every building and its venues for a single date',
+    operationId: 'getAllBuildingsHeatmap',
+    summary: 'Get occupancy heatmap for every building in the university',
+  })
+  @ApiOkResponse({
+    type: AllBuildingsHeatmapResponseDto,
+    description: 'All building heatmaps returned successfully',
+  })
+  @ApiBadRequestResponse({
+    description: 'Invalid request parameters for heatmap query',
+  })
+  @ApiForbiddenResponse({ description: 'No university selected' })
+  getAllBuildingsHeatmap(
+    @CurrentUniId() uniId: string,
+    @Query() query: BuildingHeatmapQueryDto,
+  ): Promise<AllBuildingsHeatmapResponseDto> {
+    return this.buildingService.getAllBuildingsHeatmap(uniId, query);
+  } //END_getAllBuildingsHeatmap
 
   //Create
   @Post()

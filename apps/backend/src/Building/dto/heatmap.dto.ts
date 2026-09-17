@@ -10,6 +10,7 @@ import {
   IsInt,
   IsNumber,
   IsOptional,
+  Max,
   Min,
 } from 'class-validator';
 import { BaseBuildingDto } from './building.dto';
@@ -81,40 +82,17 @@ export class BaseHeatmapMetricsDto {
   worstCaseUtilisation!: number | null;
 } //END_BaseHeatmapMetricsDto
 
-//Date period for heatmap response
-export class BuildingHeatmapPeriodDto {
-  @ApiProperty({
-    example: '2026-09-15',
-    format: 'date',
-  })
-  from!: string;
-
-  @ApiProperty({
-    example: '2026-09-15',
-    format: 'date',
-  })
-  to!: string;
-}
-
 //Request dto for building heatmaps
 export class BuildingHeatmapQueryDto {
   @ApiPropertyOptional({
-    description: 'Inclusive start date for attendance aggregation.',
+    description:
+      'Date heatmap needs to compute. Default date is the current day',
     example: '2026-09-15',
     format: 'date',
   })
   @IsOptional()
   @IsDateString({ strict: true })
-  from?: string;
-
-  @ApiPropertyOptional({
-    description: 'Inclusive end date for attendance aggregation.',
-    example: '2026-09-15',
-    format: 'date',
-  })
-  @IsOptional()
-  @IsDateString({ strict: true })
-  to?: string;
+  date?: string;
 
   @ApiPropertyOptional({
     description: 'Attendance values to include in the response.',
@@ -126,11 +104,31 @@ export class BuildingHeatmapQueryDto {
   view: BuildingHeatmapView_ENUM = BuildingHeatmapView_ENUM.ALL;
 } //END_BuildingHeatmapQueryDto
 
+//Hourly buckets for heatmap
+export class HourlyHeatmapBucketDto extends BaseHeatmapMetricsDto {
+  @ApiProperty({
+    example: 10,
+    minimum: 0,
+    maximum: 23,
+    description: 'Hour of the day that the bucket represents',
+  })
+  @IsInt()
+  @Min(0)
+  @Max(23)
+  hour!: number;
+} //END_HourlyHeatmapBucketDto
+
 //Heatmap response per venue
 export class VenueHeatmapDto extends IntersectionType(
   PickType(BaseVenueDto, ['VenueID', 'VenueName'] as const),
   BaseHeatmapMetricsDto,
-) {} //END_VenueHeatmapDto
+) {
+  @ApiProperty({
+    description: 'The vnue splits into 24 hour buckets',
+    type: [HourlyHeatmapBucketDto],
+  })
+  hourly!: HourlyHeatmapBucketDto[];
+} //END_VenueHeatmapDto
 
 //Building specific heatmap response
 export class BuildingHeatmapSummaryDto extends BaseHeatmapMetricsDto {}
@@ -143,9 +141,17 @@ export class BuildingHeatmapResponseDto {
   building!: BaseBuildingDto;
 
   @ApiProperty({
-    type: BuildingHeatmapPeriodDto,
+    example: '2026-10-12',
+    format: 'date',
   })
-  period!: BuildingHeatmapPeriodDto;
+  date!: string;
+
+  @ApiProperty({
+    type: [HourlyHeatmapBucketDto],
+    description:
+      'The building splits into 24 hour buckets, summed across all of its assigned venues',
+  })
+  hourly!: HourlyHeatmapBucketDto[];
 
   @ApiProperty({
     type: BuildingHeatmapSummaryDto,
@@ -157,3 +163,10 @@ export class BuildingHeatmapResponseDto {
   })
   venues!: VenueHeatmapDto[];
 } //END_BuildingHeatmapResponseDto
+
+//Heatmap response for all buildings
+
+export class AllBuildingsHeatmapResponseDto {
+  @ApiProperty({ type: [BuildingHeatmapResponseDto] })
+  buildings!: BuildingHeatmapResponseDto[];
+} //END_AllBuildingsHeatmapResponseDto

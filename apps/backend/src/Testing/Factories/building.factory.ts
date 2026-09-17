@@ -5,6 +5,7 @@ import type {
   CreateBuildingInput,
   UpdateBuildingInput,
   BuildingQueryDto,
+  GeoJsonPolygon,
 } from '../../Building/dto/building.dto';
 import { Building } from '../../entities';
 import { type DeepPartial, mergeDeep } from './factory.util';
@@ -14,8 +15,10 @@ import {
   BuildingHeatmapResponseDto,
   BuildingHeatmapSummaryDto,
   BuildingHeatmapView_ENUM,
+  HourlyHeatmapBucketDto,
   VenueHeatmapDto,
 } from 'src/Building/dto/heatmap.dto';
+import { OccurringEventRow } from 'src/Building/building.service';
 
 const DEFAULT_BUILDING_ID = buildingId;
 const DEFAULT_UNIVERSITY_ID = uniId;
@@ -119,6 +122,7 @@ export function createVenueHeatmapDto(
     actual: 20,
     projectedUtilisation: 0.5,
     worstCaseUtilisation: 0.9,
+    hourly: [],
 
     ...overrides,
   };
@@ -162,8 +166,7 @@ export function createBuildingHeatmapQueryDto(
 ): BuildingHeatmapQueryDto {
   return mergeDeep(
     {
-      from: '2026-01-01',
-      to: '2026-06-30',
+      date: '2026-06-30',
       view: BuildingHeatmapView_ENUM.ALL,
     },
     overrides,
@@ -192,10 +195,59 @@ export function createBuildingHeatmapResponse(
   return mergeDeep(
     {
       building: createBuildingDto(),
-      period: { from: '2026-01-01', to: '2026-06-30' },
+      date: '2026-01-02',
       summary: createBuildingHeatmapSummaryDto(),
+      hourly: [createHourlyHeatmapBucketDto()],
       venues: [createVenueHeatmapDto()],
     },
     overrides,
   );
+}
+
+//HourlyHeatmapBucketDto
+export function createHourlyHeatmapBucketDto(
+  overrides: DeepPartial<HourlyHeatmapBucketDto> = {},
+): HourlyHeatmapBucketDto {
+  return {
+    Capacity: 120,
+    projected: 45,
+    worstCase: 120,
+    actual: null,
+    projectedUtilisation: 0.375,
+    worstCaseUtilisation: 1,
+    hour: 10,
+    ...overrides,
+  };
+}
+
+//OccurringEventRow
+export function createOccurringEventRow(
+  overrides: DeepPartial<OccurringEventRow> = {},
+): OccurringEventRow {
+  return mergeDeep(
+    {
+      venueId: 'venue-1',
+      eventId: 'event-1',
+      linkedHours: [10, 11],
+    },
+    overrides,
+  );
+}
+
+//Footprint
+export function createFootprint(
+  overrides: Partial<GeoJsonPolygon> = {},
+): GeoJsonPolygon {
+  return {
+    type: 'Polygon',
+    coordinates: [
+      [
+        [28.2, -25.7],
+        [28.3, -25.7],
+        [28.3, -25.8],
+        [28.2, -25.7],
+      ],
+    ],
+    ...overrides,
+  };
 }

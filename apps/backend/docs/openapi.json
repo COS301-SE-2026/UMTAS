@@ -5962,6 +5962,73 @@
         ]
       }
     },
+    "/api/buildings/heatmap": {
+      "get": {
+        "description": "Returns occupancy for every building and its venues for a single date",
+        "operationId": "getAllBuildingsHeatmap",
+        "parameters": [
+          {
+            "name": "date",
+            "required": false,
+            "in": "query",
+            "description": "Date heatmap needs to compute. Default date is the current day",
+            "schema": {
+              "format": "date",
+              "example": "2026-09-15",
+              "type": "string"
+            }
+          },
+          {
+            "name": "view",
+            "required": false,
+            "in": "query",
+            "description": "Attendance values to include in the response.",
+            "schema": {
+              "default": "all",
+              "type": "string",
+              "enum": [
+                "projected",
+                "worstCase",
+                "all"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "All building heatmaps returned successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AllBuildingsHeatmapResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request parameters for heatmap query"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "description": "No university selected"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "security": [
+          {
+            "umtas-session": []
+          }
+        ],
+        "summary": "Get occupancy heatmap for every building in the university",
+        "tags": [
+          "Buildings"
+        ]
+      }
+    },
     "/api/buildings": {
       "post": {
         "description": "Create a building for the users university.",
@@ -6259,21 +6326,10 @@
             }
           },
           {
-            "name": "from",
+            "name": "date",
             "required": false,
             "in": "query",
-            "description": "Inclusive start date for attendance aggregation.",
-            "schema": {
-              "format": "date",
-              "example": "2026-09-15",
-              "type": "string"
-            }
-          },
-          {
-            "name": "to",
-            "required": false,
-            "in": "query",
-            "description": "Inclusive end date for attendance aggregation.",
+            "description": "Date heatmap needs to compute. Default date is the current day",
             "schema": {
               "format": "date",
               "example": "2026-09-15",
@@ -11923,6 +11979,294 @@
           "lng"
         ]
       },
+      "BaseBuildingDto": {
+        "type": "object",
+        "properties": {
+          "BuildingID": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique building identifier.",
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "BuildingName": {
+            "type": "string",
+            "maxLength": 100,
+            "description": "Building name. Unique per university. Max 100 chars.",
+            "example": "Information Technology Building"
+          },
+          "UniversityID": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Owning university. Required."
+          },
+          "location": {
+            "nullable": true,
+            "description": "Map position. Omit if the building has not been placed on the map yet.",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LatLngDto"
+              }
+            ]
+          },
+          "footprint": {
+            "type": "object",
+            "nullable": true,
+            "description": "GeoJSON Polygon outlining the building. Positions are [long, lat]. Send null to clear.",
+            "additionalProperties": true
+          },
+          "icon": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 64,
+            "description": "Icon key used when rendering the building marker.",
+            "example": "school"
+          },
+          "displayColour": {
+            "type": "string",
+            "nullable": true,
+            "pattern": "^#?([0-9A-F]{3}|[0-9A-F]{4}|[0-9A-F]{6}|[0-9A-F]{8})$",
+            "description": "Hex colour used when rendering the building.",
+            "example": "#4A5548"
+          }
+        },
+        "required": [
+          "BuildingID",
+          "BuildingName",
+          "UniversityID"
+        ]
+      },
+      "HourlyHeatmapBucketDto": {
+        "type": "object",
+        "properties": {
+          "Capacity": {
+            "minimum": 0,
+            "type": "number",
+            "description": "Total capacity represented by this heatmap item.",
+            "example": 120
+          },
+          "projected": {
+            "minimum": 0,
+            "type": "number",
+            "description": "Expected attendance based on attendance intent.",
+            "example": 45
+          },
+          "worstCase": {
+            "minimum": 0,
+            "type": "number",
+            "description": "Maximum expected attendance based on module enrolments.",
+            "example": 120
+          },
+          "actual": {
+            "nullable": true,
+            "minimum": 0,
+            "type": "object",
+            "description": "Actual attendance. Null until a check-in source is implemented.",
+            "example": null
+          },
+          "projectedUtilisation": {
+            "nullable": true,
+            "type": "object",
+            "description": "Projected attendance divided by capacity. Null when capacity is zero.",
+            "example": 0.375
+          },
+          "worstCaseUtilisation": {
+            "nullable": true,
+            "type": "object",
+            "description": "Worst-case attendance divided by capacity. Null when capacity is zero.",
+            "example": 1
+          },
+          "hour": {
+            "minimum": 0,
+            "maximum": 23,
+            "type": "number",
+            "example": 10,
+            "description": "Hour of the day that the bucket represents"
+          }
+        },
+        "required": [
+          "Capacity",
+          "projected",
+          "worstCase",
+          "actual",
+          "projectedUtilisation",
+          "worstCaseUtilisation",
+          "hour"
+        ]
+      },
+      "BuildingHeatmapSummaryDto": {
+        "type": "object",
+        "properties": {
+          "Capacity": {
+            "minimum": 0,
+            "type": "number",
+            "description": "Total capacity represented by this heatmap item.",
+            "example": 120
+          },
+          "projected": {
+            "minimum": 0,
+            "type": "number",
+            "description": "Expected attendance based on attendance intent.",
+            "example": 45
+          },
+          "worstCase": {
+            "minimum": 0,
+            "type": "number",
+            "description": "Maximum expected attendance based on module enrolments.",
+            "example": 120
+          },
+          "actual": {
+            "nullable": true,
+            "minimum": 0,
+            "type": "object",
+            "description": "Actual attendance. Null until a check-in source is implemented.",
+            "example": null
+          },
+          "projectedUtilisation": {
+            "nullable": true,
+            "type": "object",
+            "description": "Projected attendance divided by capacity. Null when capacity is zero.",
+            "example": 0.375
+          },
+          "worstCaseUtilisation": {
+            "nullable": true,
+            "type": "object",
+            "description": "Worst-case attendance divided by capacity. Null when capacity is zero.",
+            "example": 1
+          }
+        },
+        "required": [
+          "Capacity",
+          "projected",
+          "worstCase",
+          "actual",
+          "projectedUtilisation",
+          "worstCaseUtilisation"
+        ]
+      },
+      "VenueHeatmapDto": {
+        "type": "object",
+        "properties": {
+          "VenueID": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique venue identifier.",
+            "example": "00000000-0000-4000-8000-000000000000"
+          },
+          "VenueName": {
+            "type": "string",
+            "maxLength": 30,
+            "description": "Venue name. Unique per university. Max 30 chars.",
+            "example": "Main Lecture Hall"
+          },
+          "Capacity": {
+            "minimum": 0,
+            "type": "number",
+            "description": "Total capacity represented by this heatmap item.",
+            "example": 120
+          },
+          "projected": {
+            "minimum": 0,
+            "type": "number",
+            "description": "Expected attendance based on attendance intent.",
+            "example": 45
+          },
+          "worstCase": {
+            "minimum": 0,
+            "type": "number",
+            "description": "Maximum expected attendance based on module enrolments.",
+            "example": 120
+          },
+          "actual": {
+            "nullable": true,
+            "minimum": 0,
+            "type": "object",
+            "description": "Actual attendance. Null until a check-in source is implemented.",
+            "example": null
+          },
+          "projectedUtilisation": {
+            "nullable": true,
+            "type": "object",
+            "description": "Projected attendance divided by capacity. Null when capacity is zero.",
+            "example": 0.375
+          },
+          "worstCaseUtilisation": {
+            "nullable": true,
+            "type": "object",
+            "description": "Worst-case attendance divided by capacity. Null when capacity is zero.",
+            "example": 1
+          },
+          "hourly": {
+            "description": "The vnue splits into 24 hour buckets",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HourlyHeatmapBucketDto"
+            }
+          }
+        },
+        "required": [
+          "VenueID",
+          "VenueName",
+          "Capacity",
+          "projected",
+          "worstCase",
+          "actual",
+          "projectedUtilisation",
+          "worstCaseUtilisation",
+          "hourly"
+        ]
+      },
+      "BuildingHeatmapResponseDto": {
+        "type": "object",
+        "properties": {
+          "building": {
+            "$ref": "#/components/schemas/BaseBuildingDto"
+          },
+          "date": {
+            "type": "string",
+            "example": "2026-10-12",
+            "format": "date"
+          },
+          "hourly": {
+            "description": "The building splits into 24 hour buckets, summed across all of its assigned venues",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HourlyHeatmapBucketDto"
+            }
+          },
+          "summary": {
+            "$ref": "#/components/schemas/BuildingHeatmapSummaryDto"
+          },
+          "venues": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VenueHeatmapDto"
+            }
+          }
+        },
+        "required": [
+          "building",
+          "date",
+          "hourly",
+          "summary",
+          "venues"
+        ]
+      },
+      "AllBuildingsHeatmapResponseDto": {
+        "type": "object",
+        "properties": {
+          "buildings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BuildingHeatmapResponseDto"
+            }
+          }
+        },
+        "required": [
+          "buildings"
+        ]
+      },
       "CreateBuildingDto": {
         "type": "object",
         "properties": {
@@ -12109,223 +12453,6 @@
             "example": "#4A5548"
           }
         }
-      },
-      "BaseBuildingDto": {
-        "type": "object",
-        "properties": {
-          "BuildingID": {
-            "type": "string",
-            "format": "uuid",
-            "description": "Unique building identifier.",
-            "example": "00000000-0000-0000-0000-000000000000"
-          },
-          "BuildingName": {
-            "type": "string",
-            "maxLength": 100,
-            "description": "Building name. Unique per university. Max 100 chars.",
-            "example": "Information Technology Building"
-          },
-          "UniversityID": {
-            "type": "string",
-            "format": "uuid",
-            "description": "Owning university. Required."
-          },
-          "location": {
-            "nullable": true,
-            "description": "Map position. Omit if the building has not been placed on the map yet.",
-            "type": "object",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/LatLngDto"
-              }
-            ]
-          },
-          "footprint": {
-            "type": "object",
-            "nullable": true,
-            "description": "GeoJSON Polygon outlining the building. Positions are [long, lat]. Send null to clear.",
-            "additionalProperties": true
-          },
-          "icon": {
-            "type": "string",
-            "nullable": true,
-            "minLength": 1,
-            "maxLength": 64,
-            "description": "Icon key used when rendering the building marker.",
-            "example": "school"
-          },
-          "displayColour": {
-            "type": "string",
-            "nullable": true,
-            "pattern": "^#?([0-9A-F]{3}|[0-9A-F]{4}|[0-9A-F]{6}|[0-9A-F]{8})$",
-            "description": "Hex colour used when rendering the building.",
-            "example": "#4A5548"
-          }
-        },
-        "required": [
-          "BuildingID",
-          "BuildingName",
-          "UniversityID"
-        ]
-      },
-      "BuildingHeatmapPeriodDto": {
-        "type": "object",
-        "properties": {
-          "from": {
-            "type": "string",
-            "example": "2026-09-15",
-            "format": "date"
-          },
-          "to": {
-            "type": "string",
-            "example": "2026-09-15",
-            "format": "date"
-          }
-        },
-        "required": [
-          "from",
-          "to"
-        ]
-      },
-      "BuildingHeatmapSummaryDto": {
-        "type": "object",
-        "properties": {
-          "Capacity": {
-            "minimum": 0,
-            "type": "number",
-            "description": "Total capacity represented by this heatmap item.",
-            "example": 120
-          },
-          "projected": {
-            "minimum": 0,
-            "type": "number",
-            "description": "Expected attendance based on attendance intent.",
-            "example": 45
-          },
-          "worstCase": {
-            "minimum": 0,
-            "type": "number",
-            "description": "Maximum expected attendance based on module enrolments.",
-            "example": 120
-          },
-          "actual": {
-            "nullable": true,
-            "minimum": 0,
-            "type": "object",
-            "description": "Actual attendance. Null until a check-in source is implemented.",
-            "example": null
-          },
-          "projectedUtilisation": {
-            "nullable": true,
-            "type": "object",
-            "description": "Projected attendance divided by capacity. Null when capacity is zero.",
-            "example": 0.375
-          },
-          "worstCaseUtilisation": {
-            "nullable": true,
-            "type": "object",
-            "description": "Worst-case attendance divided by capacity. Null when capacity is zero.",
-            "example": 1
-          }
-        },
-        "required": [
-          "Capacity",
-          "projected",
-          "worstCase",
-          "actual",
-          "projectedUtilisation",
-          "worstCaseUtilisation"
-        ]
-      },
-      "VenueHeatmapDto": {
-        "type": "object",
-        "properties": {
-          "VenueID": {
-            "type": "string",
-            "format": "uuid",
-            "description": "Unique venue identifier.",
-            "example": "00000000-0000-4000-8000-000000000000"
-          },
-          "VenueName": {
-            "type": "string",
-            "maxLength": 30,
-            "description": "Venue name. Unique per university. Max 30 chars.",
-            "example": "Main Lecture Hall"
-          },
-          "Capacity": {
-            "minimum": 0,
-            "type": "number",
-            "description": "Total capacity represented by this heatmap item.",
-            "example": 120
-          },
-          "projected": {
-            "minimum": 0,
-            "type": "number",
-            "description": "Expected attendance based on attendance intent.",
-            "example": 45
-          },
-          "worstCase": {
-            "minimum": 0,
-            "type": "number",
-            "description": "Maximum expected attendance based on module enrolments.",
-            "example": 120
-          },
-          "actual": {
-            "nullable": true,
-            "minimum": 0,
-            "type": "object",
-            "description": "Actual attendance. Null until a check-in source is implemented.",
-            "example": null
-          },
-          "projectedUtilisation": {
-            "nullable": true,
-            "type": "object",
-            "description": "Projected attendance divided by capacity. Null when capacity is zero.",
-            "example": 0.375
-          },
-          "worstCaseUtilisation": {
-            "nullable": true,
-            "type": "object",
-            "description": "Worst-case attendance divided by capacity. Null when capacity is zero.",
-            "example": 1
-          }
-        },
-        "required": [
-          "VenueID",
-          "VenueName",
-          "Capacity",
-          "projected",
-          "worstCase",
-          "actual",
-          "projectedUtilisation",
-          "worstCaseUtilisation"
-        ]
-      },
-      "BuildingHeatmapResponseDto": {
-        "type": "object",
-        "properties": {
-          "building": {
-            "$ref": "#/components/schemas/BaseBuildingDto"
-          },
-          "period": {
-            "$ref": "#/components/schemas/BuildingHeatmapPeriodDto"
-          },
-          "summary": {
-            "$ref": "#/components/schemas/BuildingHeatmapSummaryDto"
-          },
-          "venues": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/VenueHeatmapDto"
-            }
-          }
-        },
-        "required": [
-          "building",
-          "period",
-          "summary",
-          "venues"
-        ]
       },
       "MapConfigDto": {
         "type": "object",

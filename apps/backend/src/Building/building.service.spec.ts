@@ -1,7 +1,6 @@
 import { createMockDatabase } from '../Testing/Mocks/database.mock';
 import {
   mockDbResult,
-  mockSequentialResults,
   mockTransaction,
 } from '../Testing/Mocks/database.helpers';
 import {
@@ -11,22 +10,18 @@ import {
 import { Test } from '@nestjs/testing';
 import { DatabaseService } from '../db/database.service';
 import {
-  BadRequestException,
   ConflictException,
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 
 import {
+  createMockRecurringEventService,
   createMockUniversityService,
   createMockVenueService,
 } from 'src/Testing/Mocks/services';
 import { VenueService } from 'src/Venue/venue.service';
-import {
-  BaseBuildingDto,
-  CreateBuildingInput,
-  UpdateBuildingInput,
-} from './dto/building.dto';
+import { BaseBuildingDto, CreateBuildingInput } from './dto/building.dto';
 import { uniId } from 'src/Testing/constants';
 import { UniversityService } from 'src/University/university.service';
 import {
@@ -39,11 +34,16 @@ import {
   createBuildingQueryDto,
   createBuildingSingleResponse,
   createCreateBuildingInput,
+  createFootprint,
+  createHourlyHeatmapBucketDto,
+  createOccurringEventRow,
   createUpdateBuildingInput,
   createVenue,
   createVenueHeatmapDto,
 } from 'src/Testing/Factories';
 import { BuildingHeatmapView_ENUM } from './dto/heatmap.dto';
+import { RecurringEventService } from 'src/Events/recurring-event.service';
+import { EventSource } from 'src/Events/dto/event.types';
 
 export const DEFAULT_DISPLAY_COLOUR = '#808080';
 
@@ -54,6 +54,8 @@ describe('BuildingService', () => {
   const { mockUniversityService, reset: resetUni } =
     createMockUniversityService();
   const { mockVenueService, reset: resetVenue } = createMockVenueService();
+  const { mockRecurringEventService, reset: resetRecEvent } =
+    createMockRecurringEventService();
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
@@ -62,6 +64,7 @@ describe('BuildingService', () => {
         { provide: DatabaseService, useValue: { db: mockDb } },
         { provide: UniversityService, useValue: mockUniversityService },
         { provide: VenueService, useValue: mockVenueService },
+        { provide: RecurringEventService, useValue: mockRecurringEventService },
       ],
     }).compile();
 
@@ -72,6 +75,7 @@ describe('BuildingService', () => {
     resetDatabase();
     resetUni();
     resetVenue();
+    resetRecEvent();
     jest.clearAllMocks();
   });
 
@@ -534,8 +538,7 @@ describe('BuildingService', () => {
       //Arrange
       const query = createBuildingHeatmapQueryDto();
       const validatedQuery = {
-        from: query.from!,
-        to: query.to!,
+        date: '2026-01-02',
         view: query.view,
       };
       const building = createBuildingDto();
@@ -550,6 +553,7 @@ describe('BuildingService', () => {
         projectedUtilisation: 0.4,
         worstCaseUtilisation: 0.8,
       });
+      const hourly = [createHourlyHeatmapBucketDto()];
 
       jest
         .spyOn(service as any, 'validateBuildingHeatmapQueryDto')
@@ -561,6 +565,7 @@ describe('BuildingService', () => {
       jest
         .spyOn(service as any, 'buildHeatmapSummary')
         .mockReturnValue(summary);
+      jest.spyOn(service as any, 'buildHourlySummary').mockReturnValue(hourly);
 
       mockTransaction(mockDb, {});
 
@@ -575,8 +580,9 @@ describe('BuildingService', () => {
       expect(result).toEqual(
         createBuildingHeatmapResponse({
           building,
-          period: { from: validatedQuery.from, to: validatedQuery.to },
+          date: validatedQuery.date,
           summary,
+          hourly,
           venues: venuesHeatmap,
         }),
       );
@@ -586,8 +592,7 @@ describe('BuildingService', () => {
       //Arrange
       const query = createBuildingHeatmapQueryDto();
       const validatedQuery = {
-        from: query.from!,
-        to: query.to!,
+        date: '2026-01-02',
         view: query.view,
       };
       const building = createBuildingDto();
@@ -604,6 +609,7 @@ describe('BuildingService', () => {
       jest
         .spyOn(service as any, 'buildHeatmapSummary')
         .mockReturnValue(createBuildingHeatmapSummaryDto());
+      jest.spyOn(service as any, 'buildHourlySummary').mockReturnValue([]);
 
       mockTransaction(mockDb, {});
 
@@ -614,6 +620,96 @@ describe('BuildingService', () => {
       expect(heatmapSpy).toHaveBeenCalledWith([], validatedQuery, mockDb);
     });
   }); //END_Test_getHeatmap
+
+  //getALlBuildingsHeatmap
+  describe('Test_getAllBuildingsHeatmap', () => {
+    const validatedQuery = {
+      date: '2026-01-02',
+      view: BuildingHeatmapView_ENUM.ALL,
+    };
+
+    it('should return empty array when no buildings exist', async () => {
+      //Arrange
+      const query = createBuildingHeatmapQueryDto();
+      jest
+        .spyOn(service as any, 'validateBuildingHeatmapQueryDto')
+        .mockReturnValue(validatedQuery);
+      jest
+        .spyOn(service, 'getAll')
+        .mockResolvedValue(createBuildingListResponse({ buildings: [] }));
+
+      mockTransaction(mockDb, {});
+
+      //Act
+      const result = await service.getAllBuildingsHeatmap(uniId, query);
+
+      //Assert
+      expect(result).toEqual({ buildings: [] });
+    });
+
+    it('should assemble a heatmap for each building', async () => {
+      //Arrange
+      const query = createBuildingHeatmapQueryDto();
+      const buildingA = createBuildingDto({ BuildingID: 'building-1' });
+      const buildingB = createBuildingDto({ BuildingID: 'building-2' });
+      const venuesA = [
+        createVenue({ VenueID: 'venue-1', BuildingID: 'building-1' }),
+      ];
+      const venuesB = [
+        createVenue({ VenueID: 'venue-2', BuildingID: 'building-2' }),
+      ];
+      const heatmapA = [createVenueHeatmapDto({ VenueID: 'venue-1' })];
+      const heatmapB = [createVenueHeatmapDto({ VenueID: 'venue-2' })];
+      const hourly = [createHourlyHeatmapBucketDto()];
+      const summary = createBuildingHeatmapSummaryDto();
+
+      jest
+        .spyOn(service as any, 'validateBuildingHeatmapQueryDto')
+        .mockReturnValue(validatedQuery);
+      jest
+        .spyOn(service, 'getAll')
+        .mockResolvedValue(
+          createBuildingListResponse({ buildings: [buildingA, buildingB] }),
+        );
+      const venuesSpy = jest
+        .spyOn(mockVenueService, 'getAllVenues')
+        .mockResolvedValueOnce({ venues: venuesA })
+        .mockResolvedValueOnce({ venues: venuesB });
+      const heatmapSpy = jest
+        .spyOn(service as any, 'getVenueHeatmapData')
+        .mockResolvedValueOnce(heatmapA)
+        .mockResolvedValueOnce(heatmapB);
+      jest.spyOn(service as any, 'buildHourlySummary').mockReturnValue(hourly);
+      jest
+        .spyOn(service as any, 'buildHeatmapSummary')
+        .mockReturnValue(summary);
+
+      mockTransaction(mockDb, {});
+
+      //Act
+      const result = await service.getAllBuildingsHeatmap(uniId, query);
+
+      //Assert
+      expect(result.buildings).toEqual([
+        createBuildingHeatmapResponse({
+          building: buildingA,
+          date: validatedQuery.date,
+          hourly,
+          summary,
+          venues: heatmapA,
+        }),
+        createBuildingHeatmapResponse({
+          building: buildingB,
+          date: validatedQuery.date,
+          hourly,
+          summary,
+          venues: heatmapB,
+        }),
+      ]);
+      expect(venuesSpy).toHaveBeenCalledTimes(2);
+      expect(heatmapSpy).toHaveBeenCalledTimes(2);
+    });
+  }); //END_Test_getAllBuildingsHeatmap
 
   //Helpers
   describe('Test_validateCreateBuildingInput', () => {
@@ -748,7 +844,7 @@ describe('BuildingService', () => {
   }); //END_Test_uniqueBuildingNamePerUniversity
 
   describe('Test_validateUpdateBuildingInput', () => {
-    const oldBuilding: BaseBuildingDto = {
+    const oldBuilding: BaseBuildingDto = createBuildingDto({
       BuildingID: 'building-1',
       BuildingName: 'IT Building',
       UniversityID: uniId,
@@ -756,28 +852,26 @@ describe('BuildingService', () => {
       footprint: null,
       icon: 'school',
       displayColour: '#4A5548',
-    };
+    });
 
-    it('should delete BuildingName when undefined', async () => {
-      //Arrange
-      const input: UpdateBuildingInput = {};
-
+    it('should strip all fields when input is empty', async () => {
       //Act
       const result = await (service as any).validateUpdateBuildingInput(
         oldBuilding,
-        input,
+        createUpdateBuildingInput(),
         mockDb,
       );
 
       //Assert
-      expect('BuildingName' in result).toBe(false);
+      expect(result).toEqual({});
     });
 
+    // BuildingName
     it('should delete BuildingName when same as old', async () => {
       //Arrange
-      const input: UpdateBuildingInput = {
+      const input = createUpdateBuildingInput({
         BuildingName: oldBuilding.BuildingName,
-      };
+      });
 
       //Act
       const result = await (service as any).validateUpdateBuildingInput(
@@ -790,9 +884,11 @@ describe('BuildingService', () => {
       expect('BuildingName' in result).toBe(false);
     });
 
-    it('should throw ConflictException when new BuildingName is taken by another building', async () => {
+    it('should throw ConflictException when BuildingName is taken by another building', async () => {
       //Arrange
-      const input: UpdateBuildingInput = { BuildingName: 'Other Building' };
+      const input = createUpdateBuildingInput({
+        BuildingName: 'Other Building',
+      });
       mockDbResult(mockDb.select, [
         { BuildingID: 'building-2', BuildingName: 'Other Building' },
       ]);
@@ -809,7 +905,7 @@ describe('BuildingService', () => {
 
     it('should keep BuildingName when changed and unique', async () => {
       //Arrange
-      const input: UpdateBuildingInput = { BuildingName: 'New Name' };
+      const input = createUpdateBuildingInput({ BuildingName: 'New Name' });
       mockDbResult(mockDb.select, []);
 
       //Act
@@ -823,163 +919,9 @@ describe('BuildingService', () => {
       expect(result.BuildingName).toBe('New Name');
     });
 
-    it('should delete location when undefined', async () => {
+    it('should keep BuildingName when duplicate is self', async () => {
       //Arrange
-      const input: UpdateBuildingInput = {};
-
-      //Act
-      const result = await (service as any).validateUpdateBuildingInput(
-        oldBuilding,
-        input,
-        mockDb,
-      );
-
-      //Assert
-      expect('location' in result).toBe(false);
-    });
-
-    it('should delete location when null and old is also null', async () => {
-      //Arrange
-      const input: UpdateBuildingInput = { location: null };
-      const old = { ...oldBuilding, location: null };
-
-      //Act
-      const result = await (service as any).validateUpdateBuildingInput(
-        old,
-        input,
-        mockDb,
-      );
-
-      //Assert
-      expect('location' in result).toBe(false);
-    });
-
-    it('should keep location null when unpinning', async () => {
-      //Arrange
-      const input: UpdateBuildingInput = { location: null };
-
-      //Act
-      const result = await (service as any).validateUpdateBuildingInput(
-        oldBuilding,
-        input,
-        mockDb,
-      );
-
-      //Assert
-      expect(result.location).toBeNull();
-    });
-
-    it('should delete location when same as old', async () => {
-      //Arrange
-      const input: UpdateBuildingInput = { location: oldBuilding.location };
-
-      //Act
-      const result = await (service as any).validateUpdateBuildingInput(
-        oldBuilding,
-        input,
-        mockDb,
-      );
-
-      //Assert
-      expect('location' in result).toBe(false);
-    });
-
-    it('should keep location when changed', async () => {
-      //Arrange
-      const input: UpdateBuildingInput = { location: { lat: -26, lng: 29 } };
-
-      //Act
-      const result = await (service as any).validateUpdateBuildingInput(
-        oldBuilding,
-        input,
-        mockDb,
-      );
-
-      //Assert
-      expect(result.location).toEqual({ lat: -26, lng: 29 });
-    });
-
-    it('should delete icon when same as old', async () => {
-      //Arrange
-      const input: UpdateBuildingInput = { icon: oldBuilding.icon };
-
-      //Act
-      const result = await (service as any).validateUpdateBuildingInput(
-        oldBuilding,
-        input,
-        mockDb,
-      );
-
-      //Assert
-      expect('icon' in result).toBe(false);
-    });
-
-    it('should delete icon when empty after trim', async () => {
-      //Arrange
-      const input: UpdateBuildingInput = { icon: '   ' };
-
-      //Act
-      const result = await (service as any).validateUpdateBuildingInput(
-        oldBuilding,
-        input,
-        mockDb,
-      );
-
-      //Assert
-      expect('icon' in result).toBe(false);
-    });
-
-    it('should trim and keep icon when changed', async () => {
-      //Arrange
-      const input: UpdateBuildingInput = { icon: '  library  ' };
-
-      //Act
-      const result = await (service as any).validateUpdateBuildingInput(
-        oldBuilding,
-        input,
-        mockDb,
-      );
-
-      //Assert
-      expect(result.icon).toBe('library');
-    });
-
-    it('should delete DisplayColour when same as old', async () => {
-      //Arrange
-      const input: UpdateBuildingInput = {
-        displayColour: oldBuilding.displayColour,
-      };
-
-      //Act
-      const result = await (service as any).validateUpdateBuildingInput(
-        oldBuilding,
-        input,
-        mockDb,
-      );
-
-      //Assert
-      expect('displayColour' in result).toBe(false);
-    });
-
-    it('should keep DisplayColour when changed', async () => {
-      //Arrange
-      const input: UpdateBuildingInput = { displayColour: '#ABCDEF' };
-
-      //Act
-      const result = await (service as any).validateUpdateBuildingInput(
-        oldBuilding,
-        input,
-        mockDb,
-      );
-
-      //Assert
-      expect(result.displayColour).toBe('#ABCDEF');
-    });
-
-    // BuildingName
-    it('should keep BuildingName when duplicate found with same ID (self-match)', async () => {
-      //Arrange
-      const input: UpdateBuildingInput = { BuildingName: 'New Name' };
+      const input = createUpdateBuildingInput({ BuildingName: 'New Name' });
       mockDbResult(mockDb.select, [
         { BuildingID: oldBuilding.BuildingID, BuildingName: 'New Name' },
       ]);
@@ -996,10 +938,77 @@ describe('BuildingService', () => {
     });
 
     // Location
-    it('should keep location when old is null and new location provided', async () => {
+    it('should delete location when null and old is also null', async () => {
+      //Arrange
+      const input = createUpdateBuildingInput({ location: null });
+      const old = { ...oldBuilding, location: null };
+
+      //Act
+      const result = await (service as any).validateUpdateBuildingInput(
+        old,
+        input,
+        mockDb,
+      );
+
+      //Assert
+      expect('location' in result).toBe(false);
+    });
+
+    it('should keep location null when unpinning', async () => {
+      //Arrange
+      const input = createUpdateBuildingInput({ location: null });
+
+      //Act
+      const result = await (service as any).validateUpdateBuildingInput(
+        oldBuilding,
+        input,
+        mockDb,
+      );
+
+      //Assert
+      expect(result.location).toBeNull();
+    });
+
+    it('should delete location when same as old', async () => {
+      //Arrange
+      const input = createUpdateBuildingInput({
+        location: oldBuilding.location,
+      });
+
+      //Act
+      const result = await (service as any).validateUpdateBuildingInput(
+        oldBuilding,
+        input,
+        mockDb,
+      );
+
+      //Assert
+      expect('location' in result).toBe(false);
+    });
+
+    it('should keep location when changed', async () => {
+      //Arrange
+      const input = createUpdateBuildingInput({
+        location: { lat: -26, lng: 29 },
+      });
+
+      //Act
+      const result = await (service as any).validateUpdateBuildingInput(
+        oldBuilding,
+        input,
+        mockDb,
+      );
+
+      //Assert
+      expect(result.location).toEqual({ lat: -26, lng: 29 });
+    });
+
+    it('should keep location when old is null and new provided', async () => {
       //Arrange
       const old = { ...oldBuilding, location: null };
-      const input: UpdateBuildingInput = { location: { lat: -26, lng: 29 } };
+      const input = createUpdateBuildingInput({
+        location: { lat: -26, lng: 29 },
+      });
 
       //Act
       const result = await (service as any).validateUpdateBuildingInput(
@@ -1013,24 +1022,9 @@ describe('BuildingService', () => {
     });
 
     // Footprint
-    it('should delete footprint when undefined', async () => {
-      //Arrange
-      const input: UpdateBuildingInput = {};
-
-      //Act
-      const result = await (service as any).validateUpdateBuildingInput(
-        oldBuilding,
-        input,
-        mockDb,
-      );
-
-      //Assert
-      expect('footprint' in result).toBe(false);
-    });
-
     it('should delete footprint when null and old is also null', async () => {
       //Arrange
-      const input: UpdateBuildingInput = { footprint: null };
+      const input = createUpdateBuildingInput({ footprint: null });
 
       //Act
       const result = await (service as any).validateUpdateBuildingInput(
@@ -1045,21 +1039,9 @@ describe('BuildingService', () => {
 
     it('should keep footprint null when clearing', async () => {
       //Arrange
-      const old = {
-        ...oldBuilding,
-        footprint: {
-          type: 'Polygon' as const,
-          coordinates: [
-            [
-              [28.2, -25.7],
-              [28.3, -25.7],
-              [28.3, -25.8],
-              [28.2, -25.7],
-            ],
-          ],
-        },
-      };
-      const input: UpdateBuildingInput = { footprint: null };
+      const footprint = createFootprint();
+      const old = { ...oldBuilding, footprint };
+      const input = createUpdateBuildingInput({ footprint: null });
 
       //Act
       const result = await (service as any).validateUpdateBuildingInput(
@@ -1074,19 +1056,9 @@ describe('BuildingService', () => {
 
     it('should delete footprint when same as old', async () => {
       //Arrange
-      const footprint = {
-        type: 'Polygon' as const,
-        coordinates: [
-          [
-            [28.2, -25.7],
-            [28.3, -25.7],
-            [28.3, -25.8],
-            [28.2, -25.7],
-          ],
-        ] as [number, number][][],
-      };
+      const footprint = createFootprint();
       const old = { ...oldBuilding, footprint };
-      const input: UpdateBuildingInput = { footprint };
+      const input = createUpdateBuildingInput({ footprint });
 
       //Act
       const result = await (service as any).validateUpdateBuildingInput(
@@ -1101,19 +1073,7 @@ describe('BuildingService', () => {
 
     it('should keep footprint when changed', async () => {
       //Arrange
-      const input: UpdateBuildingInput = {
-        footprint: {
-          type: 'Polygon',
-          coordinates: [
-            [
-              [28.2, -25.7],
-              [28.3, -25.7],
-              [28.3, -25.8],
-              [28.2, -25.7],
-            ],
-          ],
-        },
-      };
+      const input = createUpdateBuildingInput({ footprint: createFootprint() });
 
       //Act
       const result = await (service as any).validateUpdateBuildingInput(
@@ -1127,25 +1087,10 @@ describe('BuildingService', () => {
     });
 
     // Icon
-    it('should delete icon when undefined', async () => {
-      //Arrange
-      const input: UpdateBuildingInput = {};
-
-      //Act
-      const result = await (service as any).validateUpdateBuildingInput(
-        oldBuilding,
-        input,
-        mockDb,
-      );
-
-      //Assert
-      expect('icon' in result).toBe(false);
-    });
-
     it('should delete icon when null and old is also null', async () => {
       //Arrange
       const old = { ...oldBuilding, icon: null };
-      const input: UpdateBuildingInput = { icon: null };
+      const input = createUpdateBuildingInput({ icon: null });
 
       //Act
       const result = await (service as any).validateUpdateBuildingInput(
@@ -1160,7 +1105,7 @@ describe('BuildingService', () => {
 
     it('should keep icon null when clearing an existing icon', async () => {
       //Arrange
-      const input: UpdateBuildingInput = { icon: null };
+      const input = createUpdateBuildingInput({ icon: null });
 
       //Act
       const result = await (service as any).validateUpdateBuildingInput(
@@ -1173,10 +1118,57 @@ describe('BuildingService', () => {
       expect(result.icon).toBeNull();
     });
 
-    // DisplayColour
-    it('should delete DisplayColour when undefined', async () => {
+    it('should delete icon when empty after trim', async () => {
       //Arrange
-      const input: UpdateBuildingInput = {};
+      const input = createUpdateBuildingInput({ icon: '   ' });
+
+      //Act
+      const result = await (service as any).validateUpdateBuildingInput(
+        oldBuilding,
+        input,
+        mockDb,
+      );
+
+      //Assert
+      expect('icon' in result).toBe(false);
+    });
+
+    it('should delete icon when same as old', async () => {
+      //Arrange
+      const input = createUpdateBuildingInput({ icon: oldBuilding.icon });
+
+      //Act
+      const result = await (service as any).validateUpdateBuildingInput(
+        oldBuilding,
+        input,
+        mockDb,
+      );
+
+      //Assert
+      expect('icon' in result).toBe(false);
+    });
+
+    it('should trim and keep icon when changed', async () => {
+      //Arrange
+      const input = createUpdateBuildingInput({ icon: '  library  ' });
+
+      //Act
+      const result = await (service as any).validateUpdateBuildingInput(
+        oldBuilding,
+        input,
+        mockDb,
+      );
+
+      //Assert
+      expect(result.icon).toBe('library');
+    });
+
+    // DisplayColour
+    it('should delete DisplayColour when same as old', async () => {
+      //Arrange
+      const input = createUpdateBuildingInput({
+        displayColour: oldBuilding.displayColour,
+      });
 
       //Act
       const result = await (service as any).validateUpdateBuildingInput(
@@ -1188,57 +1180,55 @@ describe('BuildingService', () => {
       //Assert
       expect('displayColour' in result).toBe(false);
     });
+
+    it('should keep DisplayColour when changed', async () => {
+      //Arrange
+      const input = createUpdateBuildingInput({ displayColour: '#ABCDEF' });
+
+      //Act
+      const result = await (service as any).validateUpdateBuildingInput(
+        oldBuilding,
+        input,
+        mockDb,
+      );
+
+      //Assert
+      expect(result.displayColour).toBe('#ABCDEF');
+    });
   }); //END_Test_validateUpdateBuildingInput
 
   describe('Test_validateBuildingHeatmapQueryDto', () => {
-    it('should default from and to to today when both absent', () => {
+    it('should default date to today when absent', () => {
       //Arrange
       const today = new Date().toISOString().slice(0, 10);
 
       //Act
-      const result = (service as any).validateBuildingHeatmapQueryDto({});
-
-      //Assert
-      expect(result.from).toBe(today);
-      expect(result.to).toBe(today);
-    });
-
-    it('should default to to match from when only from provided', () => {
-      //Act
       const result = (service as any).validateBuildingHeatmapQueryDto({
-        from: '2026-03-01',
+        view: BuildingHeatmapView_ENUM.ALL,
       });
 
       //Assert
-      expect(result.from).toBe('2026-03-01');
-      expect(result.to).toBe('2026-03-01');
+      expect(result).toEqual({
+        date: today,
+        view: BuildingHeatmapView_ENUM.ALL,
+      });
     });
 
-    it('should throw BadRequestException when from is after to', () => {
-      //Act + Assert
-      expect(() =>
-        (service as any).validateBuildingHeatmapQueryDto({
-          from: '2026-05-01',
-          to: '2026-03-01',
-        }),
-      ).toThrow(BadRequestException);
-    });
-
-    it('should preserve provided view', () => {
+    it('should preserve provided date', () => {
       //Act
       const result = (service as any).validateBuildingHeatmapQueryDto({
-        view: BuildingHeatmapView_ENUM.PROJECTED,
+        date: '2026-03-01',
+        view: BuildingHeatmapView_ENUM.ALL,
       });
 
       //Assert
-      expect(result.view).toBe(BuildingHeatmapView_ENUM.PROJECTED);
+      expect(result.date).toBe('2026-03-01');
     });
   }); //END_Test_validateBuildingHeatmapQueryDto
 
   describe('Test_getVenueHeatmapData', () => {
-    const normalizedQuery: NormalizedBuildingHeatmapQuery = {
-      from: '2026-01-01',
-      to: '2026-06-30',
+    const query: NormalizedBuildingHeatmapQuery = {
+      date: '2026-01-02',
       view: BuildingHeatmapView_ENUM.ALL,
     };
 
@@ -1246,108 +1236,121 @@ describe('BuildingService', () => {
       //Act
       const result = await (service as any).getVenueHeatmapData(
         [],
-        normalizedQuery,
+        query,
         mockDb,
       );
 
       //Assert
       expect(result).toEqual([]);
-      expect(mockDb.select).not.toHaveBeenCalled();
     });
 
-    it('should return venues with projected and worstCase when view is ALL', async () => {
+    it('should only load projected counts when view is PROJECTED', async () => {
       //Arrange
-      const venues = [
-        createVenue({
-          VenueID: 'venue-1',
-          VenueName: 'IT 2-26',
-          Capacity: 120,
-        }),
-        createVenue({ VenueID: 'venue-2', VenueName: 'IT 2-27', Capacity: 60 }),
-      ];
-      mockSequentialResults(mockDb.select, [
-        [{ VenueID: 'venue-1', projected: 45 }], // projected query
-        [{ VenueID: 'venue-1', worstCase: 100 }], // worstCase query
-      ]);
+      const venue = createVenue({ VenueID: 'venue-1' });
+      jest.spyOn(service as any, 'getOccuringEventRows').mockResolvedValue([]);
+      const projectedSpy = jest
+        .spyOn(service as any, 'getProjectedCountsByEvent')
+        .mockResolvedValue(new Map());
+      const worstCaseSpy = jest
+        .spyOn(service as any, 'getWorstCaseCountsByEvent')
+        .mockResolvedValue(new Map());
+      jest
+        .spyOn(service as any, 'buildVenueHeatmapFromEvents')
+        .mockReturnValue(createVenueHeatmapDto());
+
+      //Act
+      await (service as any).getVenueHeatmapData(
+        [venue],
+        { ...query, view: BuildingHeatmapView_ENUM.PROJECTED },
+        mockDb,
+      );
+
+      //Assert
+      expect(projectedSpy).toHaveBeenCalled();
+      expect(worstCaseSpy).not.toHaveBeenCalled();
+    });
+
+    it('should only load worstCase counts when view is WORST_CASE', async () => {
+      //Arrange
+      const venue = createVenue({ VenueID: 'venue-1' });
+      jest.spyOn(service as any, 'getOccuringEventRows').mockResolvedValue([]);
+      const projectedSpy = jest
+        .spyOn(service as any, 'getProjectedCountsByEvent')
+        .mockResolvedValue(new Map());
+      const worstCaseSpy = jest
+        .spyOn(service as any, 'getWorstCaseCountsByEvent')
+        .mockResolvedValue(new Map());
+      jest
+        .spyOn(service as any, 'buildVenueHeatmapFromEvents')
+        .mockReturnValue(createVenueHeatmapDto());
+
+      //Act
+      await (service as any).getVenueHeatmapData(
+        [venue],
+        { ...query, view: BuildingHeatmapView_ENUM.WORST_CASE },
+        mockDb,
+      );
+
+      //Assert
+      expect(projectedSpy).not.toHaveBeenCalled();
+      expect(worstCaseSpy).toHaveBeenCalled();
+    });
+
+    it('should group event rows by venue and delegate to buildVenueHeatmapFromEvents', async () => {
+      //Arrange
+      const venueA = createVenue({ VenueID: 'venue-1' });
+      const venueB = createVenue({ VenueID: 'venue-2' });
+
+      const rowA1 = {
+        venueId: 'venue-1',
+        eventId: 'event-1',
+        linkedHours: [8],
+      };
+      const rowA2 = {
+        venueId: 'venue-1',
+        eventId: 'event-2',
+        linkedHours: [9],
+      };
+      const rowB1 = {
+        venueId: 'venue-2',
+        eventId: 'event-3',
+        linkedHours: [10],
+      };
+
+      jest
+        .spyOn(service as any, 'getOccuringEventRows')
+        .mockResolvedValue([rowA1, rowA2, rowB1]);
+      jest
+        .spyOn(service as any, 'getProjectedCountsByEvent')
+        .mockResolvedValue(new Map());
+      jest
+        .spyOn(service as any, 'getWorstCaseCountsByEvent')
+        .mockResolvedValue(new Map());
+      const buildSpy = jest
+        .spyOn(service as any, 'buildVenueHeatmapFromEvents')
+        .mockReturnValue(createVenueHeatmapDto());
 
       //Act
       const result = await (service as any).getVenueHeatmapData(
-        venues,
-        normalizedQuery,
+        [venueA, venueB],
+        query,
         mockDb,
       );
 
       //Assert
       expect(result).toHaveLength(2);
-      expect(result[0]).toMatchObject({
-        VenueID: 'venue-1',
-        projected: 45,
-        worstCase: 100,
-        actual: null,
-        projectedUtilisation: 45 / 120,
-        worstCaseUtilisation: 100 / 120,
-      });
-      expect(result[1]).toMatchObject({
-        VenueID: 'venue-2',
-        projected: 0,
-        worstCase: 0,
-        projectedUtilisation: 0,
-        worstCaseUtilisation: 0,
-      });
-    });
-
-    it('should only query projected when view is PROJECTED', async () => {
-      //Arrange
-      const venues = [createVenue({ VenueID: 'venue-1', Capacity: 100 })];
-      mockDbResult(mockDb.select, [{ VenueID: 'venue-1', projected: 30 }]);
-
-      //Act
-      const result = await (service as any).getVenueHeatmapData(
-        venues,
-        { ...normalizedQuery, view: BuildingHeatmapView_ENUM.PROJECTED },
-        mockDb,
+      expect(buildSpy).toHaveBeenCalledWith(
+        venueA,
+        [rowA1, rowA2],
+        expect.anything(),
+        expect.anything(),
       );
-
-      //Assert
-      expect(result[0].projected).toBe(30);
-      expect(result[0].worstCase).toBe(0);
-      expect(mockDb.select).toHaveBeenCalledTimes(1);
-    });
-
-    it('should only query worstCase when view is WORST_CASE', async () => {
-      //Arrange
-      const venues = [createVenue({ VenueID: 'venue-1', Capacity: 100 })];
-      mockDbResult(mockDb.select, [{ VenueID: 'venue-1', worstCase: 80 }]);
-
-      //Act
-      const result = await (service as any).getVenueHeatmapData(
-        venues,
-        { ...normalizedQuery, view: BuildingHeatmapView_ENUM.WORST_CASE },
-        mockDb,
+      expect(buildSpy).toHaveBeenCalledWith(
+        venueB,
+        [rowB1],
+        expect.anything(),
+        expect.anything(),
       );
-
-      //Assert
-      expect(result[0].projected).toBe(0);
-      expect(result[0].worstCase).toBe(80);
-      expect(mockDb.select).toHaveBeenCalledTimes(1);
-    });
-
-    it('should set utilisation to null when capacity is 0', async () => {
-      //Arrange
-      const venues = [createVenue({ VenueID: 'venue-1', Capacity: 0 })];
-      mockDbResult(mockDb.select, [{ VenueID: 'venue-1', projected: 10 }]);
-      mockDbResult(mockDb.select, [{ VenueID: 'venue-1', worstCase: 20 }]);
-
-      //Act
-      const result = await (service as any).getVenueHeatmapData(
-        venues,
-        normalizedQuery,
-        mockDb,
-      );
-
-      //Assert
-      expect(result[0].projectedUtilisation).toBeNull();
-      expect(result[0].worstCaseUtilisation).toBeNull();
     });
   }); //END_Test_getVenueHeatmapData
 
@@ -1370,56 +1373,28 @@ describe('BuildingService', () => {
   }); //END_Test_calculateUtilisation
 
   describe('Test_buildHeatmapSummary', () => {
-    it('should return zeros and nulls when no venues', () => {
+    it('should return zeros and nulls when venues is empty', () => {
       //Act
       const result = (service as any).buildHeatmapSummary([]);
 
       //Assert
-      expect(result).toEqual({
-        Capacity: 0,
-        projected: 0,
-        worstCase: 0,
-        actual: null,
-        projectedUtilisation: null,
-        worstCaseUtilisation: null,
-      });
-    });
-
-    it('should sum Capacity, projected and worstCase across venues', () => {
-      //Arrange
-      const venues = [
-        createVenueHeatmapDto({ Capacity: 100, projected: 40, worstCase: 80 }),
-        createVenueHeatmapDto({ Capacity: 50, projected: 20, worstCase: 30 }),
-      ];
-
-      //Act
-      const result = (service as any).buildHeatmapSummary(venues);
-
-      //Assert
-      expect(result.Capacity).toBe(150);
-      expect(result.projected).toBe(60);
-      expect(result.worstCase).toBe(110);
-    });
-
-    it('should sum actual when at least one venue has a value', () => {
-      //Arrange
-      const venues = [
-        createVenueHeatmapDto({ actual: 30 }),
-        createVenueHeatmapDto({ actual: 15 }),
-      ];
-
-      //Act
-      const result = (service as any).buildHeatmapSummary(venues);
-
-      //Assert
-      expect(result.actual).toBe(45);
+      expect(result).toEqual(
+        createBuildingHeatmapSummaryDto({
+          Capacity: 0,
+          projected: 0,
+          worstCase: 0,
+          actual: null,
+          projectedUtilisation: null,
+          worstCaseUtilisation: null,
+        }),
+      );
     });
 
     it('should return actual null when all venues have null actual', () => {
       //Arrange
       const venues = [
-        createVenueHeatmapDto({ actual: null }),
-        createVenueHeatmapDto({ actual: null }),
+        createVenueHeatmapDto({ Capacity: 100, actual: null }),
+        createVenueHeatmapDto({ Capacity: 50, actual: null }),
       ];
 
       //Act
@@ -1429,19 +1404,331 @@ describe('BuildingService', () => {
       expect(result.actual).toBeNull();
     });
 
-    it('should compute utilisation from summed totals', () => {
+    it('should sum all metrics and compute utilisation when venues have values', () => {
       //Arrange
       const venues = [
-        createVenueHeatmapDto({ Capacity: 100, projected: 50, worstCase: 100 }),
-        createVenueHeatmapDto({ Capacity: 100, projected: 25, worstCase: 50 }),
+        createVenueHeatmapDto({
+          Capacity: 100,
+          projected: 40,
+          worstCase: 80,
+          actual: 30,
+        }),
+        createVenueHeatmapDto({
+          Capacity: 50,
+          projected: 20,
+          worstCase: 30,
+          actual: 15,
+        }),
       ];
 
       //Act
       const result = (service as any).buildHeatmapSummary(venues);
 
       //Assert
-      expect(result.projectedUtilisation).toBe(75 / 200);
-      expect(result.worstCaseUtilisation).toBe(150 / 200);
+      expect(result).toEqual(
+        createBuildingHeatmapSummaryDto({
+          Capacity: 150,
+          projected: 60,
+          worstCase: 110,
+          actual: 45,
+          projectedUtilisation: 60 / 150,
+          worstCaseUtilisation: 110 / 150,
+        }),
+      );
     });
   }); //END_Test_buildHeatmapSummary
+
+  describe('Test_buildHourlySummary', () => {
+    it('should return 24 zeroed buckets when venues is empty', () => {
+      //Act
+      const result = (service as any).buildHourlySummary([]);
+
+      //Assert
+      expect(result).toHaveLength(24);
+      expect(result[0]).toEqual(
+        createHourlyHeatmapBucketDto({
+          hour: 0,
+          Capacity: 0,
+          projected: 0,
+          worstCase: 0,
+          actual: null,
+          projectedUtilisation: null,
+          worstCaseUtilisation: null,
+        }),
+      );
+      expect(result[23].hour).toBe(23);
+    });
+
+    it('should sum per-venue hourly metrics across venues for each hour', () => {
+      //Arrange
+      const venueA = createVenueHeatmapDto({
+        Capacity: 100,
+        hourly: Array.from({ length: 24 }, (_, hour) =>
+          createHourlyHeatmapBucketDto({ hour, projected: 10, worstCase: 20 }),
+        ),
+      });
+      const venueB = createVenueHeatmapDto({
+        Capacity: 50,
+        hourly: Array.from({ length: 24 }, (_, hour) =>
+          createHourlyHeatmapBucketDto({ hour, projected: 5, worstCase: 15 }),
+        ),
+      });
+
+      //Act
+      const result = (service as any).buildHourlySummary([venueA, venueB]);
+
+      //Assert
+      expect(result).toHaveLength(24);
+      expect(result[0]).toEqual(
+        createHourlyHeatmapBucketDto({
+          hour: 0,
+          Capacity: 150,
+          projected: 15,
+          worstCase: 35,
+          actual: null,
+          projectedUtilisation: 15 / 150,
+          worstCaseUtilisation: 35 / 150,
+        }),
+      );
+    });
+  }); //END_Test_buildHourlySummary
+
+  describe('Test_buildVenueHeatmapFromEvents', () => {
+    const venue = createVenue();
+
+    it('should return zeroed metrics when no events for the venue', () => {
+      //Arrange
+      const projectedByEvent = new Map<string, number>();
+      const worstCaseByEvent = new Map<string, number>();
+
+      //Act
+      const result = (service as any).buildVenueHeatmapFromEvents(
+        venue,
+        [],
+        projectedByEvent,
+        worstCaseByEvent,
+      );
+
+      //Assert
+      expect(result.projected).toBe(0);
+      expect(result.worstCase).toBe(0);
+      expect(result.hourly).toHaveLength(24);
+      expect(result.hourly.every((h: any) => h.projected === 0)).toBe(true);
+      expect(result.hourly.every((h: any) => h.worstCase === 0)).toBe(true);
+    });
+
+    it('should accumulate daily and hourly totals from event data', () => {
+      //Arrange
+      const eventsForVenue = [
+        createOccurringEventRow({
+          eventId: 'event-1',
+          linkedHours: [8, 9],
+        }),
+        createOccurringEventRow({
+          eventId: 'event-2',
+          linkedHours: [8],
+        }),
+      ];
+      const projectedByEvent = new Map([
+        ['event-1', 30],
+        ['event-2', 10],
+      ]);
+      const worstCaseByEvent = new Map([
+        ['event-1', 40],
+        ['event-2', 20],
+      ]);
+
+      //Act
+      const result = (service as any).buildVenueHeatmapFromEvents(
+        venue,
+        eventsForVenue,
+        projectedByEvent,
+        worstCaseByEvent,
+      );
+
+      //Assert
+      expect(result.projected).toBe(40);
+      expect(result.worstCase).toBe(60);
+      expect(result.hourly[8].projected).toBe(40);
+      expect(result.hourly[8].worstCase).toBe(60);
+      expect(result.hourly[9].projected).toBe(30);
+      expect(result.hourly[9].worstCase).toBe(40);
+      expect(result.hourly[10].projected).toBe(0);
+    });
+
+    it('should default missing event metrics to zero', () => {
+      //Arrange
+      const eventsForVenue = [
+        createOccurringEventRow({
+          eventId: 'event-1',
+          linkedHours: [8],
+        }),
+      ];
+      const projectedByEvent = new Map<string, number>(); // empty
+      const worstCaseByEvent = new Map<string, number>(); // empty
+
+      //Act
+      const result = (service as any).buildVenueHeatmapFromEvents(
+        venue,
+        eventsForVenue,
+        projectedByEvent,
+        worstCaseByEvent,
+      );
+
+      //Assert
+      expect(result.projected).toBe(0);
+      expect(result.worstCase).toBe(0);
+      expect(result.hourly[8].projected).toBe(0);
+      expect(result.hourly[8].worstCase).toBe(0);
+    });
+  }); //END_Test_buildVenueHeatmapFromEvents
+
+  describe('Test_getProjectedCountsByEvent', () => {
+    it('should return empty map when no eventIds provided', async () => {
+      //Act
+      const result = await (service as any).getProjectedCountsByEvent(
+        [],
+        '2026-01-02',
+        mockDb,
+      );
+
+      //Assert
+      expect(result.size).toBe(0);
+      expect(mockDb.select).not.toHaveBeenCalled();
+    });
+
+    it('should map event IDs to distinct attending counts', async () => {
+      //Arrange
+      mockDbResult(mockDb.select, [
+        { eventId: 'event-1', count: '5' },
+        { eventId: 'event-2', count: '3' },
+      ]);
+
+      //Act
+      const result = await (service as any).getProjectedCountsByEvent(
+        ['event-1', 'event-2'],
+        '2026-01-02',
+        mockDb,
+      );
+
+      //Assert
+      expect(result.get('event-1')).toBe(5);
+      expect(result.get('event-2')).toBe(3);
+    });
+  }); //END_Test_getProjectedCountsByEvent
+
+  describe('Test_getWorstCaseCountsByEvent', () => {
+    it('should return empty map when no eventIds provided', async () => {
+      //Act
+      const result = await (service as any).getWorstCaseCountsByEvent(
+        [],
+        mockDb,
+      );
+
+      //Assert
+      expect(result.size).toBe(0);
+      expect(mockDb.select).not.toHaveBeenCalled();
+    });
+
+    it('should map event IDs to enrolment counts and skip null event IDs', async () => {
+      //Arrange
+      mockDbResult(mockDb.select, [
+        { eventId: 'event-1', count: '7' },
+        { eventId: null, count: '2' },
+        { eventId: 'event-2', count: '4' },
+      ]);
+
+      //Act
+      const result = await (service as any).getWorstCaseCountsByEvent(
+        ['event-1', 'event-2'],
+        mockDb,
+      );
+
+      //Assert
+      expect(result.size).toBe(2);
+      expect(result.get('event-1')).toBe(7);
+      expect(result.get('event-2')).toBe(4);
+    });
+  }); //END_Test_getWorstCaseCountsByEvent
+
+  describe('Test_getOccuringEventRows', () => {
+    it('should return empty array when no venueIds provided', async () => {
+      //Act
+      const result = await (service as any).getOccuringEventRows(
+        [],
+        '2026-01-02',
+        mockDb,
+      );
+
+      //Assert
+      expect(result).toEqual([]);
+      expect(mockDb.select).not.toHaveBeenCalled();
+    });
+
+    it('should skip events that do not occur on the date', async () => {
+      //Arrange
+      mockDbResult(mockDb.select, [
+        {
+          venueId: 'venue-1',
+          eventId: 'event-1',
+          eventCriteria: {
+            eventSource: EventSource.UNIVERSITY,
+            startTime: '08:00',
+            endTime: '09:00',
+            date: '2026-01-01',
+          },
+          isRecurring: false,
+        },
+      ]);
+      jest
+        .spyOn(mockRecurringEventService, 'occursOnDate')
+        .mockReturnValue(false);
+
+      //Act
+      const result = await (service as any).getOccuringEventRows(
+        ['venue-1'],
+        '2026-01-02',
+        mockDb,
+      );
+
+      //Assert
+      expect(result).toEqual([]);
+    });
+
+    it('should return occurring events with their linked hours', async () => {
+      //Arrange
+      mockDbResult(mockDb.select, [
+        {
+          venueId: 'venue-1',
+          eventId: 'event-1',
+          eventCriteria: {
+            eventSource: EventSource.UNIVERSITY,
+            startTime: '08:00',
+            endTime: '09:00',
+            date: '2026-01-02',
+          },
+          isRecurring: false,
+        },
+      ]);
+      jest
+        .spyOn(mockRecurringEventService, 'occursOnDate')
+        .mockReturnValue(true);
+
+      //Act
+      const result = await (service as any).getOccuringEventRows(
+        ['venue-1'],
+        '2026-01-02',
+        mockDb,
+      );
+
+      //Assert
+      expect(result).toEqual([
+        {
+          venueId: 'venue-1',
+          eventId: 'event-1',
+          linkedHours: [8],
+        },
+      ]);
+    });
+  }); //END_Test_getOccuringEventRows
 });
