@@ -4,7 +4,7 @@ import { Badge } from "@/components/atoms/baseShadcn/badge";
 import AttendanceCounter from "./AttendanceCounter";
 import { LastScannedStudent } from "./LastScannedStudent";
 import { useCallback, useState } from "react";
-import BarcodeCamera from "@/components/molecules/attendance/BarcodeCamera";
+import { BarcodeCamera } from "@/components/molecules/attendance/BarcodeCamera";
 import { ScannerBadge } from "@/components/molecules/attendance/ScannerBadge";
 
 interface AttendanceScannerProps {
@@ -34,8 +34,7 @@ export default function AttendanceScanner({
         <ScannerBadge status={status} />
       </div>
       <div className="aspect-video w-full rounded-xl border-2">
-        {/* update props after done implementing, remember to add handleScan as prop  */}
-        <BarcodeCamera />
+        <BarcodeCamera onScan={handleScan} />
       </div>
       <div className="w-full">
         <AttendanceCounter
