@@ -1,0 +1,14 @@
+apps/frontend/src/components/templates/attendance/ScannerTemplate.tsx
+  h_2d4b3dca70a3d8 13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "b53fe96c46dfa175a38323bdb5a218a65804749a",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
