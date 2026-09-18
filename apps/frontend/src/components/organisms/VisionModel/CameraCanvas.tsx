@@ -1,9 +1,7 @@
 "use client";
-import { Button } from "@/components/atoms/baseShadcn/button";
 import { useEffect, useRef, useState } from "react";
 import { CircleX } from "lucide-react";
 import { detectionManager } from "../../../../utilities/VisionModel/detectionManager";
-import { use } from "apexcharts";
 import { detection_data_manager } from "../../../../utilities/VisionModel/detection_data_manager";
 import { DetectedPerson } from "../../../../utilities/VisionModel/messageTypes";
 
@@ -27,22 +25,25 @@ function getCanvasConstraints() {
 }
 export interface DetectionSettings {
   runDetection: boolean;
-  DetectionInterval: number; // should be in seconds using a counter
+  DetectionInterval: number; // in seconds
 }
 interface CanvasCamProps {
   isCameraActive: boolean;
   detectionSettings: DetectionSettings;
+  imageFile: File | null;
 }
 
 export default function CameraCanvas({
   isCameraActive,
+  imageFile,
   detectionSettings,
 }: CanvasCamProps) {
   return (
     <div className="w-full min-w-fit h-full justify-around flex flex-col gap-y-4 p-4">
       <div className="w-full min-w-fit h-full flex flex-col justify-center items-center text-center border rounded-2xl ">
-        <div className="w-full h-full min-w-fit  justify-center items-center flex">
+        <div className="w-full h-full min-w-fit justify-center items-center flex">
           <CanvasWebcam
+            imageFile={imageFile}
             isCameraActive={isCameraActive}
             detectionSettings={detectionSettings}
           />
@@ -52,26 +53,63 @@ export default function CameraCanvas({
   );
 }
 
-function CanvasWebcam({ isCameraActive, detectionSettings }: CanvasCamProps) {
+function CanvasWebcam({
+  isCameraActive,
+  detectionSettings,
+  imageFile,
+}: CanvasCamProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const imageRef = useRef<HTMLImageElement | null>(null);
+
   const [cameraLoaded, setCameraLoaded] = useState<boolean>(false);
+  const [imageLoaded, setImageLoaded] = useState<boolean>(false);
 
   const detectedPeopleRef = useRef<DetectedPerson[]>([]);
   const lastRunRef = useRef<number>(0);
 
+  // Manage detection workers
   useEffect(() => {
-    if (detectionSettings.runDetection && isCameraActive) {
+    const isSourceActive = isCameraActive || imageFile !== null;
+    if (detectionSettings.runDetection && isSourceActive) {
       detectionManager.start();
       detection_data_manager.start();
     } else {
       detectionManager.terminate();
       detection_data_manager.terminate();
     }
-  }, [detectionSettings.runDetection, isCameraActive]);
+  }, [detectionSettings.runDetection, isCameraActive, imageFile]);
 
   useEffect(() => {
-    if (isCameraActive == false) {
+    if (!imageFile) {
+      imageRef.current = null;
+      // eslint-disable-next-line
+      setImageLoaded(false);
+      detectedPeopleRef.current = [];
+      return;
+    }
+
+    detectedPeopleRef.current = [];
+    lastRunRef.current = 0;
+
+    const img = new Image();
+    const objectUrl = URL.createObjectURL(imageFile);
+    img.src = objectUrl;
+
+    img.onload = () => {
+      imageRef.current = img;
+      setImageLoaded(true);
+    };
+
+    return () => {
+      URL.revokeObjectURL(objectUrl);
+    };
+  }, [imageFile]);
+
+  useEffect(() => {
+    if (imageFile || !isCameraActive) {
+      // eslint-disable-next-line
+      setCameraLoaded(false);
       return;
     }
 
@@ -100,23 +138,58 @@ function CanvasWebcam({ isCameraActive, detectionSettings }: CanvasCamProps) {
         currentStream.getTracks().forEach((track) => track.stop());
       }
     };
-  }, [isCameraActive]);
+  }, [isCameraActive, imageFile]);
 
+  // Render loop for Canvas
   useEffect(() => {
-    if (!cameraLoaded) return;
+    const isReady = imageFile ? imageLoaded : cameraLoaded;
+    if (!isReady) return;
 
     let animationFrameID: number;
 
     function renderFrame(timestamp: number) {
       const canvas = canvasRef.current;
       const video = videoRef.current;
+      const img = imageRef.current;
 
-      if (canvas && video) {
+      if (canvas) {
         const context = canvas.getContext("2d", { willReadFrequently: true });
         if (context) {
-          context.drawImage(video, 0, 0, canvas.width, canvas.height);
+          context.clearRect(0, 0, canvas.width, canvas.height);
 
-          if (detectionSettings.runDetection)
+          if (imageFile && img) {
+            context.drawImage(img, 0, 0, canvas.width, canvas.height);
+          } else if (video) {
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+          }
+
+          const intervalMs = detectionSettings.DetectionInterval * 1000;
+          if (
+            detectionSettings.runDetection &&
+            timestamp - lastRunRef.current >= intervalMs
+          ) {
+            lastRunRef.current = timestamp;
+            const imageData = context.getImageData(
+              0,
+              0,
+              canvas.width,
+              canvas.height,
+            );
+
+            detectionManager
+              .run(imageData?.data, canvas.width, canvas.height)
+              .then((results) => {
+                if (results) {
+                  detection_data_manager.run(results).then((people) => {
+                    if (people) {
+                      detectedPeopleRef.current = people;
+                    }
+                  });
+                }
+              });
+          }
+
+          if (detectionSettings.runDetection) {
             for (const person of detectedPeopleRef.current) {
               context.strokeStyle = "#00ff00";
               context.lineWidth = 2;
@@ -135,48 +208,23 @@ function CanvasWebcam({ isCameraActive, detectionSettings }: CanvasCamProps) {
                 Math.max(person.top_left_y - 5, 15),
               );
             }
-        }
-
-        const intervalMs = detectionSettings.DetectionInterval * 1000;
-
-        if (
-          context &&
-          detectionSettings.runDetection &&
-          timestamp - lastRunRef.current >= intervalMs
-        ) {
-          lastRunRef.current = timestamp;
-          const imageData = context.getImageData(
-            0,
-            0,
-            canvas.width,
-            canvas.height,
-          );
-
-          detectionManager
-            .run(imageData?.data, canvas.width, canvas.height)
-            .then((results) => {
-              if (results) {
-                detection_data_manager.run(results).then((people) => {
-                  if (people) {
-                    // Update the ref instantly so the next frame renders them
-                    detectedPeopleRef.current = people;
-                  }
-                });
-              }
-            });
+          }
         }
       }
 
       animationFrameID = requestAnimationFrame(renderFrame);
     }
+
     animationFrameID = requestAnimationFrame(renderFrame);
 
     return () => {
       cancelAnimationFrame(animationFrameID);
     };
-  }, [cameraLoaded, detectionSettings]);
+  }, [cameraLoaded, imageLoaded, imageFile, detectionSettings]);
 
-  return isCameraActive ? (
+  const showCanvas = imageFile !== null || isCameraActive;
+
+  return showCanvas ? (
     <>
       <video ref={videoRef} playsInline muted className="hidden"></video>
       <canvas
@@ -187,7 +235,7 @@ function CanvasWebcam({ isCameraActive, detectionSettings }: CanvasCamProps) {
       ></canvas>
     </>
   ) : (
-    <div className=" w-full h-full text-center items-center justify-center flex gap-x-2">
+    <div className="w-full h-full text-center items-center justify-center flex gap-x-2">
       Camera Disabled
       <CircleX />
     </div>

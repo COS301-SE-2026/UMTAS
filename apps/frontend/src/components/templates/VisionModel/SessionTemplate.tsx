@@ -14,9 +14,10 @@ export default function VM_SessionTemplate() {
   const [detectionSettings, setDetectionSettings] = useState<DetectionSettings>(
     {
       runDetection: false,
-      DetectionInterval: 1,
+      DetectionInterval: 0,
     },
   );
+  const [imageUpload, setImageUpload] = useState<File | null>(null);
 
   // settings
 
@@ -32,6 +33,7 @@ export default function VM_SessionTemplate() {
               <CameraCanvas
                 isCameraActive={cameraOn}
                 detectionSettings={detectionSettings}
+                imageFile={imageUpload}
               />
             </div>
           </div>
@@ -49,6 +51,20 @@ export default function VM_SessionTemplate() {
                   onCheckedChange={(e) => {
                     setCameraOn(e);
                   }}
+                />
+              </Label>
+              <Label className=" flex flex-col  w-full  text-md font-medium text-[var(--text-primary)] text-left pl-1">
+                Upload Image
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setImageUpload(file);
+                    }
+                  }}
+                  className="h-8 w-40 rounded-md border border-[var(--border)] bg-transparent px-2 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--ring)] file:mr-2 file:border-0 file:bg-transparent file:text-xs file:font-medium file:text-[var(--text-primary)] cursor-pointer"
                 />
               </Label>
             </div>
@@ -72,8 +88,6 @@ export default function VM_SessionTemplate() {
               <Label className=" flex flex-col  w-full  text-md font-medium text-[var(--text-primary)] text-left pl-1">
                 Detection Interval
                 <Input
-                  data-testid="course-Page-input"
-                  id="course-page"
                   value={detectionSettings.DetectionInterval}
                   onChange={(e) => {
                     setDetectionSettings((settings) => ({
@@ -81,8 +95,9 @@ export default function VM_SessionTemplate() {
                       DetectionInterval: Number(e.target.value),
                     }));
                   }}
-                  min={1}
+                  min={0}
                   max={100}
+                  step={0.2}
                   type="number"
                   placeholder="0"
                   className="h-8 w-40 rounded-md border border-[var(--border)] bg-transparent px-2 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--ring)]"
@@ -104,8 +119,6 @@ export default function VM_SessionTemplate() {
               <Label className=" flex flex-col  w-full  text-md font-medium text-[var(--text-primary)] text-left pl-1">
                 Inference Interval
                 <Input
-                  data-testid="course-Page-input"
-                  id="course-page"
                   value={detectionSettings.DetectionInterval}
                   onChange={(e) => {}}
                   min={1}

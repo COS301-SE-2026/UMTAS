@@ -184,7 +184,7 @@ pub fn infer_detection_data(
         all_people.extend(global_adjusted_person);
     }
 
-    let res_people = non_maximum_sepression(all_people, 0.35);
+    let res_people = non_maximum_sepression(all_people, 0.80);
 
     return serde_json::to_string(&res_people).map_err(|e| JsValue::from_str(&e.to_string()));
 }
@@ -194,7 +194,7 @@ pub fn read_result(slice_data: &Vec<f32>) -> Result<Vec<DetectedPerson>, String>
 
     const NUM_ANCHORS: usize = 8400;
     const NUM_FEATURES: usize = 84;
-    const CONFIDENCE_THRESHOLD: f32 = 0.50;
+    const CONFIDENCE_THRESHOLD: f32 = 0.10;
 
     if data.len() < NUM_ANCHORS * NUM_FEATURES {
         return Err("Invalid tensor data length".to_string());
@@ -331,7 +331,7 @@ pub fn is_enveloped(box1: &DetectedPerson, box2: &DetectedPerson) -> bool {
     let b2_area = box2.width * box2.height;
     let smaller_area = b1_area.min(b2_area);
 
-    return (intersection_area / smaller_area) >= 0.20;
+    return (intersection_area / smaller_area) >= 0.80;
 }
 
 pub fn non_maximum_sepression(
