@@ -9,6 +9,7 @@ import { join } from 'path';
 import { PostHog } from 'posthog-node';
 import { PostHogInterceptor } from 'posthog-node/nestjs';
 import { collectDefaultMetrics, register } from 'prom-client';
+import { takeCoverage } from 'node:v8';
 
 import { AppModule } from './app.module';
 import { StandardErrorFilter } from './common/standard-error.filter';
@@ -80,6 +81,17 @@ async function bootstrap() {
       res.status(500).send(err);
     }
   });
+  if (
+    process.env.NODE_ENV !== 'production' &&
+    process.env.INTEGRATION_COVERAGE_FLUSH === '1'
+  ) {
+    app
+      .getHttpAdapter()
+      .post('/coverage/flush', (_req: Request, res: Response) => {
+        takeCoverage();
+        res.status(204).send();
+      });
+  }
 
   const swaggerConfig = new DocumentBuilder()
     .setTitle('UMTAS API')

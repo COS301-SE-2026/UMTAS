@@ -27,6 +27,7 @@ export const Route = pgTable(
     DestinationBuildingID: uuid('DestinationBuildingID')
       .references(() => Building.BuildingID, { onDelete: 'cascade' })
       .notNull(),
+    RouteIndex: integer('RouteIndex').default(0).notNull(),
     PathCoordinates: jsonb('PathCoordinates').$type<LatLng[]>().notNull(),
     DistanceMetres: integer('DistanceMetres').notNull(),
     DisplayColour: varchar('DisplayColour', { length: 10 })
@@ -40,11 +41,21 @@ export const Route = pgTable(
       .notNull(),
   },
   (table) => ({
-    routeOriginDestinationUnique: uniqueIndex(
-      'route_origin_destination_unique',
-    ).on(table.OriginBuildingID, table.DestinationBuildingID),
-    routeUniversityByIdx: index('route_university_id_idx').on(
+    routeVariantUnique: uniqueIndex(
+      'route_university_origin_destination_variant_unique',
+    ).on(
       table.UniversityID,
+      table.OriginBuildingID,
+      table.DestinationBuildingID,
+      table.RouteIndex,
+    ),
+
+    routeUniversityOriginDestinationIdx: index(
+      'route_university_origin_destination_idx',
+    ).on(
+      table.UniversityID,
+      table.OriginBuildingID,
+      table.DestinationBuildingID,
     ),
   }),
 );

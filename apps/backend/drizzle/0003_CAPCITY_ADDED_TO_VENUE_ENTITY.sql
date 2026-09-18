@@ -1,0 +1,1 @@
+ALTER TABLE "Venue" ADD COLUMN "Capacity" integer DEFAULT 0 NOT NULL;

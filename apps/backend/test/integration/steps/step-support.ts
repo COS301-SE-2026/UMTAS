@@ -39,3 +39,25 @@ export function expectString(
 export function sorted(values: readonly string[]): string[] {
   return [...values].sort();
 }
+
+export function assertDeepStrictly<T>(
+  actual: unknown,
+  expected: T,
+  operation: string,
+): asserts actual is T {
+  assert.deepStrictEqual(
+    actual,
+    expected,
+    `${operation} did not match the expected DTO exactly`,
+  );
+}
+
+export function assertResponseBody<T>(
+  response: HttpResponse,
+  expectedBody: T,
+  expectedStatus: number | readonly number[],
+  operation: string,
+): asserts response is HttpResponse<T> {
+  expectStatus(response, expectedStatus, operation);
+  assertDeepStrictly(response.body, expectedBody, operation);
+}

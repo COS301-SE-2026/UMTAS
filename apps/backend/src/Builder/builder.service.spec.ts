@@ -364,6 +364,7 @@ describe('BuilderService', () => {
   //Update
   describe('Test_Update', () => {
     it('should fail if user is trying to update module they do not own', async () => {
+      mockTransaction(mockDb, {});
       mockModuleService.moduleOwnershipCheck!.mockResolvedValue(false);
 
       await expect(service.updateModule(userId, moduleId, {})).rejects.toThrow(
@@ -373,6 +374,8 @@ describe('BuilderService', () => {
 
     it('should update module that user owns', async () => {
       mockModuleService.moduleOwnershipCheck!.mockResolvedValue(true);
+
+      mockTransaction(mockDb, {});
 
       const module = createModule({ moduleID: moduleId });
       const updateModuleDto = {
@@ -409,6 +412,7 @@ describe('BuilderService', () => {
   describe('Test_Delete', () => {
     it('should throw if user does not own module', async () => {
       mockModuleService.moduleOwnershipCheck!.mockResolvedValue(false);
+      mockTransaction(mockDb, {});
 
       await expect(service.deleteModule(userId, moduleId)).rejects.toThrow(
         ForbiddenException,
@@ -421,6 +425,7 @@ describe('BuilderService', () => {
         moduleCode: 'someCode',
         success: true,
       });
+      mockTransaction(mockDb, {});
 
       const result = await service.deleteModule(userId, moduleId);
 

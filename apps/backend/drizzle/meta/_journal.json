@@ -15,6 +15,34 @@
       "when": 1789119096276,
       "tag": "0001_COURSE_ENROLLMENT_JOIN_TABLE",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1789376853648,
+      "tag": "0002_VENUE_NAME_MADE_NOT_NULL",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1789409826857,
+      "tag": "0003_CAPCITY_ADDED_TO_VENUE_ENTITY",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1789493594131,
+      "tag": "0004_MODULE_AND_EVENT_ID_NOT_NULL_FOR_UNIVERSITYEVENT",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1789564231479,
+      "tag": "0005_ADDED_ROUTEINDEX_TO_ROUTE_ENTITY_WITH_INDEXING",
+      "breakpoints": true
     }
   ]
 }
