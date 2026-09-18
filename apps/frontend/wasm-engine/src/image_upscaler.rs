@@ -2,14 +2,47 @@ use wasm_bindgen::prelude::*;
 use wgpu::util::DeviceExt;
 // wasm function to call
 #[wasm_bindgen]
-pub fn slice_image_data_gpu(
+pub async fn slice_image_data_gpu(
     pixel_data: &[u8],
     width: usize,
     height: usize,
 ) -> Result<js_sys::Array, JsValue> {
-    todo!("funtion to run from browser")
-}
+    let instance = wgpu::Instance::default();
 
+    let adapter = instance
+        .request_adapter(&wgpu::RequestAdapterOptions {
+            power_preference: wgpu::PowerPreference::HighPerformance,
+            force_fallback_adapter: false,
+            compatible_surface: None,
+            ..Default::default()
+        })
+        .await
+        .map_err(|e| {
+            JsValue::from_str(&format!(
+                "Failed to find a suitable WebGPU adapter: {:?}",
+                e
+            ))
+        })?;
+
+    let (device, queue) = adapter
+        .request_device(&wgpu::DeviceDescriptor {
+            label: Some("IMAGE_SLICER_DEVICE"),
+            required_features: wgpu::Features::empty(),
+            required_limits: wgpu::Limits::downlevel_defaults(),
+            memory_hints: wgpu::MemoryHints::Performance,
+            ..Default::default()
+        })
+        .await
+        .map_err(|e| JsValue::from_str(&format!("Failed to create WebGPU device: {:?}", e)))?;
+
+    let buffers = create_buffers(&device, pixel_data, width, height);
+
+    run_upscaler(&device, &queue, &buffers);
+
+    let slices = read_slices(&device, &queue, &buffers).await?;
+
+    return Ok(slices);
+}
 // Buffer setup
 pub struct Buffers {
     // where we put raw pixel data
@@ -276,16 +309,16 @@ pub async fn read_slices(
         .await
         .map_err(|_| JsValue::from_str("Buffer map channel dropped unexpectedly"))?
         .map_err(|e| JsValue::from_str(&format!("GPU buffer mapping failed: {:?}", e)))?;
-
     let result_array = js_sys::Array::new();
     {
-        let data = buffer_slice.get_mapped_range();
-        let float_slice: &[f32] = bytemuck::cast_slice(&data);
+        let data = buffer_slice
+            .get_mapped_range()
+            .map_err(|e| JsValue::from_str(&format!("Failed to get mapped range: {:?}", e)))?;
 
-        // Single slice float count: 3 channels (RGB) * 640 height * 640 width
+        let float_slice: &[f32] = bytemuck::cast_slice(&data[..]);
+
         let slice_float_count = 3 * 640 * 640;
 
-        // 4. Split planar floats into 5 individual Float32Array instances
         for i in 0..5 {
             let start = i * slice_float_count;
             let end = start + slice_float_count;
