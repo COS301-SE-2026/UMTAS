@@ -226,6 +226,23 @@ pub fn run_upscaler(device: &wgpu::Device, queue: &wgpu::Queue, buffers: &Buffer
         compilation_options: Default::default(),
         cache: None,
     });
+
+    let mut encoder = device.create_command_encoder(&wgpu::CommandEncoderDescriptor {
+        label: Some("UPSCALER_ENCODER"),
+    });
+
+    {
+        let mut compute_pass = encoder.begin_compute_pass(&wgpu::ComputePassDescriptor {
+            label: Some("COMPUTE PASS"),
+            timestamp_writes: None,
+        });
+
+        compute_pass.set_pipeline(&compute_pipeline);
+        compute_pass.set_bind_group(0, &bind_grp, &[]);
+        // 640/16 = 40 workgroups in xy, 5 slices in z
+        compute_pass.dispatch_workgroups(40, 50, 5);
+    }
+    queue.submit(Some(encoder.finish()));
 }
 
 // needed to read the output to staging
