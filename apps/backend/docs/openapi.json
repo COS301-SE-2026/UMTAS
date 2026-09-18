@@ -6484,6 +6484,76 @@
         "description": "Set or update map settings for the selected university. This Map Config operation is part of the versioned UMTAS HTTP contract."
       }
     },
+    "/api/routes/heatmap": {
+      "get": {
+        "description": "Returns route demand metrics for all persisted route variants in the selected university for a single date.",
+        "operationId": "getRoutingHeatmap",
+        "parameters": [
+          {
+            "name": "date",
+            "required": true,
+            "in": "query",
+            "description": "Date for which to return route heatmap statistics",
+            "schema": {
+              "format": "date",
+              "example": "2026-09-18",
+              "type": "string"
+            }
+          },
+          {
+            "name": "view",
+            "required": false,
+            "in": "query",
+            "description": "WHich metrics to include",
+            "schema": {
+              "default": "all",
+              "type": "string",
+              "enum": [
+                "projected",
+                "worstCase",
+                "all"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Routing heatmap returned successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoutingHeatmapResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid routing heatmap query parameters"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "description": "No university selected or insufficient permissions"
+          },
+          "404": {
+            "description": "Required route, event, venue, or building data was not found"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "security": [
+          {
+            "umtas-session": []
+          }
+        ],
+        "summary": "Get route demand heatmap",
+        "tags": [
+          "Routes"
+        ]
+      }
+    },
     "/api/routes": {
       "get": {
         "description": "Returns cached route if one exists, otherwise fetches it from OpenRouteService and caches it in the DB.",
@@ -12544,6 +12614,232 @@
           "WestLng",
           "DefaultZoom",
           "GoogleMapID"
+        ]
+      },
+      "RouteHeatmapBuildingDto": {
+        "type": "object",
+        "properties": {
+          "buildingId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "buildingName": {
+            "type": "string",
+            "example": "Information Technology Building"
+          }
+        },
+        "required": [
+          "buildingId",
+          "buildingName"
+        ]
+      },
+      "RouteHeatmapHourlyBucketDto": {
+        "type": "object",
+        "properties": {
+          "projected": {
+            "minimum": 0,
+            "type": "number",
+            "description": "Expected number of students projected to travel route",
+            "example": 42
+          },
+          "worstCase": {
+            "minimum": 0,
+            "type": "number",
+            "description": "Maximum expected route demand based on enrollments.",
+            "example": 85
+          },
+          "actual": {
+            "nullable": true,
+            "minimum": 0,
+            "type": "object",
+            "description": "Actual number of students recorded on the route",
+            "example": null
+          },
+          "hour": {
+            "minimum": 0,
+            "type": "number",
+            "description": "Hour for this bucket | 0 - 23",
+            "example": 9,
+            "maximum": 23
+          }
+        },
+        "required": [
+          "projected",
+          "worstCase",
+          "actual",
+          "hour"
+        ]
+      },
+      "RouteHeatmapTransitionDto": {
+        "type": "object",
+        "properties": {
+          "originEventId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "destinationEventId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "originEventName": {
+            "type": "string",
+            "example": "COS 301 Lecture"
+          },
+          "destinationEventName": {
+            "type": "string",
+            "example": "COS 301 Tutorial"
+          },
+          "originEndTime": {
+            "type": "string",
+            "example": "10:20"
+          },
+          "destinationStartTime": {
+            "type": "string",
+            "example": "11:00"
+          },
+          "projected": {
+            "minimum": 0,
+            "type": "number",
+            "description": "Number of students projected to make this transition.",
+            "example": 20
+          },
+          "worstCase": {
+            "minimum": 0,
+            "type": "number",
+            "description": "Maximum expected students for this transition.",
+            "example": 35
+          }
+        },
+        "required": [
+          "originEventId",
+          "destinationEventId",
+          "originEventName",
+          "destinationEventName",
+          "originEndTime",
+          "destinationStartTime",
+          "projected",
+          "worstCase"
+        ]
+      },
+      "RouteHeatmapDto": {
+        "type": "object",
+        "properties": {
+          "projected": {
+            "minimum": 0,
+            "type": "number",
+            "description": "Expected number of students projected to travel route",
+            "example": 42
+          },
+          "worstCase": {
+            "minimum": 0,
+            "type": "number",
+            "description": "Maximum expected route demand based on enrollments.",
+            "example": 85
+          },
+          "actual": {
+            "nullable": true,
+            "minimum": 0,
+            "type": "object",
+            "description": "Actual number of students recorded on the route",
+            "example": null
+          },
+          "routeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "routeIndex": {
+            "minimum": 0,
+            "type": "number",
+            "description": "Zero-based route variant index",
+            "example": 0
+          },
+          "origin": {
+            "$ref": "#/components/schemas/RouteHeatmapBuildingDto"
+          },
+          "destination": {
+            "$ref": "#/components/schemas/RouteHeatmapBuildingDto"
+          },
+          "distanceMetres": {
+            "minimum": 0,
+            "type": "number",
+            "description": "Walking distance in metres.",
+            "example": 650
+          },
+          "displayColour": {
+            "type": "string",
+            "maxLength": 10,
+            "description": "Colour assigned to the route for map rendering.",
+            "example": "#0000FF"
+          },
+          "pathCoordinates": {
+            "description": "Polyline coordinates for rendering the route.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LatLngDto"
+            }
+          },
+          "hourly": {
+            "description": "Demand split into 24 hourly buckets",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RouteHeatmapHourlyBucketDto"
+            }
+          },
+          "transitions": {
+            "description": "Events contributing demand to this route",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RouteHeatmapTransitionDto"
+            }
+          }
+        },
+        "required": [
+          "projected",
+          "worstCase",
+          "actual",
+          "routeId",
+          "routeIndex",
+          "origin",
+          "destination",
+          "distanceMetres",
+          "displayColour",
+          "pathCoordinates",
+          "hourly",
+          "transitions"
+        ]
+      },
+      "RoutingHeatmapResponseDto": {
+        "type": "object",
+        "properties": {
+          "universityId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "date": {
+            "type": "string",
+            "example": "2026-09-18",
+            "format": "date"
+          },
+          "view": {
+            "enum": [
+              "projected",
+              "worstCase",
+              "all"
+            ],
+            "type": "string"
+          },
+          "routes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RouteHeatmapDto"
+            }
+          }
+        },
+        "required": [
+          "universityId",
+          "date",
+          "view",
+          "routes"
         ]
       },
       "RouteDto": {
