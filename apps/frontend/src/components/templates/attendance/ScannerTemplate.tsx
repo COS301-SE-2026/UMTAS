@@ -25,20 +25,23 @@ export default function ScannerTemplate() {
     //.....
 
     return (
-      <div className="flex flex-col p-4">
-        <div className="flex w-full max-w-md flex-col gap-6 mx-auto">
-          <div className="w-full text-left">
-            <h1 className="text-2xl font-semibold text-[var(--text-primary)]">
+      <div className="flex w-full flex-col items-center gap-6 px-6 pt-6">
+        <div className="w-full max-w-6xl overflow-auto rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] shadow-sm">
+          <div className="border-b border-[var(--border)] px-5 py-4">
+            <h1 className="text-lg font-semibold text-[var(--text-primary)]">
               Attendance Scanner
             </h1>
-            <p className="text-sm text-[var(--text-secondary)]">
-              Scan Student Cards to Record Attendance
+            <p className="mt-1 text-sm text-[var(--text-secondary)]">
+              Scan student cards to record attendance.
             </p>
           </div>
-          <AttendanceScanner
-            // replace with expected attendance from backend integration
-            expectedNumber={100}
-          />
+
+          <div className="mx-auto w-full max-w-md p-5">
+            <AttendanceScanner
+              // replace with expected attendance from backend integration
+              expectedNumber={100}
+            />
+          </div>
         </div>
       </div>
     );

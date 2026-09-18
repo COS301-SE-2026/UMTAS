@@ -153,14 +153,14 @@ export default function CalTemplate() {
     <>
       {/* <Tutorial steps={steps} wait={true} /> */}
 
-      <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-6 px-4 sm:px-6 lg:px-8 capitalize">
+      <div className="flex w-full flex-col items-center gap-6 px-6 pt-6 capitalize">
         <div
           id="calendar-management"
-          className="mx-auto w-full max-w-7xl overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] shadow-sm"
+          className="w-full max-w-6xl overflow-auto rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] shadow-sm"
         >
           {/* Header */}
-          <div className="border-b border-[var(--border)] px-6 py-5">
-            <h1 className="text-xl font-semibold text-[var(--text-primary)]">
+          <div className="border-b border-[var(--border)] px-5 py-4">
+            <h1 className="text-lg font-semibold text-[var(--text-primary)]">
               Calendar Management
             </h1>
 

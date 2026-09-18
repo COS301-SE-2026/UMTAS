@@ -239,15 +239,17 @@ export default function CourseManagementTemplate() {
     <>
       <Tutorial steps={steps} wait={true} />
 
-      <div className="h-[80vh] items-center flex flex-col gap-6 w-full px-6">
-        <div className="w-full max-w-6xl overflow-auto border border-[var(--border)] rounded-xl bg-[var(--bg-surface)] shadow-sm">
-          <h1 className="text-lg font-semibold text-[var(--text-primary)] pl-4 pt-4">
-            Course Management
-          </h1>
-          <p className="text-sm text-[var(--text-secondary)] pl-4 pt-2 pb-2">
-            Search and filter courses, degrees and modules.
-          </p>
-          <div className="flex flex-col md:flex-row gap-4 p-5 border-b border-[var(--border)] items-center justify-between bg-[var(--bg-surface)]">
+      <div className="flex w-full flex-col items-center gap-6 px-6 pt-6">
+        <div className="w-full max-w-6xl overflow-auto rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] shadow-sm">
+          <div className="border-b border-[var(--border)] px-5 py-4">
+            <h1 className="text-lg font-semibold text-[var(--text-primary)]">
+              Course Management
+            </h1>
+            <p className="mt-1 text-sm text-[var(--text-secondary)]">
+              Search and filter courses, degrees and modules.
+            </p>
+          </div>
+          <div className="flex flex-col items-center justify-between gap-4 bg-[var(--bg-surface)] p-5 md:flex-row">
             <div className="w-full md:max-w-sm flex-1">
               <Input
                 id="input-search-courses-degrees-modules"

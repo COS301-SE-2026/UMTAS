@@ -55,7 +55,11 @@ export default function RoleManagementTemplate() {
     return (
       <>
         <Tutorial steps={steps} wait={true} />
-        <UserDirectoryCard />
+        <div className="flex w-full flex-col items-center gap-6 px-6 pt-6">
+          <div className="w-full max-w-6xl">
+            <UserDirectoryCard />
+          </div>
+        </div>
       </>
     );
   } else {
