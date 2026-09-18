@@ -1,5 +1,5 @@
 use wasm_bindgen::prelude::*;
-use wgpu::util::DeviceExt;
+use wgpu::{naga::compact::KeepUnused::No, util::DeviceExt};
 
 // wasm function to call
 #[wasm_bindgen]
@@ -218,7 +218,14 @@ pub fn run_upscaler(device: &wgpu::Device, queue: &wgpu::Queue, buffers: &Buffer
         immediate_size: 0,
     });
 
-    
+    let compute_pipeline = device.create_compute_pipeline(&wgpu::ComputePipelineDescriptor {
+        label: Some("PIPELINE_COMPUTE"),
+        layout: Some(&pipeline_layout),
+        module: &upscaler,
+        entry_point: Some("main"),
+        compilation_options: Default::default(),
+        cache: None,
+    });
 }
 
 // needed to read the output to staging
