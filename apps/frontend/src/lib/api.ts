@@ -801,17 +801,17 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    get?: never;
+    /**
+     * Enroll the current user/student into a course
+     * @description Enroll the current user/student into a course. This Courses operation is part of the versioned UMTAS HTTP contract.
+     */
+    get: operations["enrollStudentToCourse"];
     put?: never;
     post?: never;
     delete?: never;
     options?: never;
     head?: never;
-    /**
-     * Enroll the current user/student into a course
-     * @description Enroll the current user/student into a course. This Courses operation is part of the versioned UMTAS HTTP contract.
-     */
-    patch: operations["enrollStudentToCourse"];
+    patch?: never;
     trace?: never;
   };
   "/api/Courses/course-unenrollment/{CourseId}": {
@@ -1645,33 +1645,45 @@ export interface paths {
      * Get all venues
      * @description Get all venues from current selected uni
      */
-    get: operations["VenueController_getAllVenues"];
+    get: operations["getAllVenues"];
     put?: never;
-    post?: never;
+    /**
+     * Create a venue
+     * @description Create a venue for the users university.
+     */
+    post: operations["createVenue"];
     delete?: never;
     options?: never;
     head?: never;
     patch?: never;
     trace?: never;
   };
-  "/api/venues/{venueId}/building": {
+  "/api/venues/{venueId}": {
     parameters: {
       query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
-    get?: never;
+    /**
+     * Get a venue by ID
+     * @description Get a venue by ID. This Venues operation is part of the versioned UMTAS HTTP contract.
+     */
+    get: operations["getVenueById"];
     put?: never;
     post?: never;
-    delete?: never;
+    /**
+     * Delete a venue by ID
+     * @description Delete a venue by ID. This Venues operation is part of the versioned UMTAS HTTP contract.
+     */
+    delete: operations["deleteVenue"];
     options?: never;
     head?: never;
     /**
-     * Assign a venue to a building
-     * @description Send buildingId to assign or null to unassign the venue
+     * Update a venue
+     * @description Update venue name, capacity and/or building assignment. Only fields present in the body are updated.
      */
-    patch: operations["VenueController_assignBuilding"];
+    patch: operations["updateVenue"];
     trace?: never;
   };
   "/api/venues/assign": {
@@ -1684,10 +1696,30 @@ export interface paths {
     get?: never;
     put?: never;
     /**
-     * Assign several venues to buildings in one request
-     * @description Used by the venue mapping screen for multiple selection assignment
+     * Assign venues to buildings
+     * @description Assign one or many venues to buildings in a single request.
      */
-    post: operations["VenueController_bulkAssign"];
+    post: operations["assignVenuesToBuildings"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/buildings/heatmap": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get occupancy heatmap for every building in the university
+     * @description Returns occupancy for every building and its venues for a single date
+     */
+    get: operations["getAllBuildingsHeatmap"];
+    put?: never;
+    post?: never;
     delete?: never;
     options?: never;
     head?: never;
@@ -1705,13 +1737,13 @@ export interface paths {
      * Get all buildings
      * @description Get all buildings from current selected uni
      */
-    get: operations["BuildingController_getAllBuildings"];
+    get: operations["getAllBuildings"];
     put?: never;
     /**
-     * Create a building as uni admin
-     * @description Create a building as uni admin. This Buildings operation is part of the versioned UMTAS HTTP contract.
+     * Create a building
+     * @description Create a building for the users university.
      */
-    post: operations["BuildingController_createBuilding"];
+    post: operations["createBuilding"];
     delete?: never;
     options?: never;
     head?: never;
@@ -1725,17 +1757,45 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    get?: never;
+    /**
+     * Get a building by ID
+     * @description Get a building by ID. This Buildings operation is part of the versioned UMTAS HTTP contract.
+     */
+    get: operations["getBuildingById"];
+    put?: never;
+    post?: never;
+    /**
+     * Delete a building by ID
+     * @description Delete a building by ID. This Buildings operation is part of the versioned UMTAS HTTP contract.
+     */
+    delete: operations["deleteBuilding"];
+    options?: never;
+    head?: never;
+    /**
+     * Update a building
+     * @description Update building name, location, footprint, icon, and/or colour. Only fields present in the body are updated.
+     */
+    patch: operations["updateBuilding"];
+    trace?: never;
+  };
+  "/api/buildings/{buildingId}/heatmap": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get building occupancy heatmap
+     * @description Returns occupancy metrics for all venues assigned to a building.
+     */
+    get: operations["getBuildingHeatmap"];
     put?: never;
     post?: never;
     delete?: never;
     options?: never;
     head?: never;
-    /**
-     * Update a building pin and/or drawn polygon
-     * @description Only admins can do this. Send location and/or footprint, omitted fields are left unchanged. Send null to erase.
-     */
-    patch: operations["BuildingController_updateBuildingLocation"];
+    patch?: never;
     trace?: never;
   };
   "/api/map-config": {
@@ -1794,6 +1854,46 @@ export interface paths {
      * @description Returns whether the student as at a venue, moving between two venues, or has no planned event in that time
      */
     get: operations["RouteController_getActiveRoute"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/routes/student": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get a students routes for a date
+     * @description Returns the students attended events for the requested date and the routes between events.
+     */
+    get: operations["getStudentRoutesForDate"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/routes/student/alternatives": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get an alternative route between two events
+     * @description Returns the selected indexed route between the buildings of two events on a requested date. Route index 0 is the default route.
+     */
+    get: operations["getAlternativeRouteBetweenEvents"];
     put?: never;
     post?: never;
     delete?: never;
@@ -3953,33 +4053,76 @@ export interface components {
        */
       success: boolean;
     };
+    CreateVenueDto: {
+      /**
+       * @description Venue name. Unique per university. Max 30 chars.
+       * @example Main Lecture Hall
+       */
+      VenueName: string;
+      /**
+       * Format: uuid
+       * @description Optional building identifier. Nulled if the building is deleted.
+       */
+      BuildingID?: string | null;
+      /**
+       * @description Maximum capacity of the venue. Defaults to 0 if not provided.
+       * @example 120
+       */
+      Capacity?: number;
+    };
+    BaseVenueDto: {
+      /**
+       * Format: uuid
+       * @description Unique venue identifier.
+       * @example 00000000-0000-4000-8000-000000000000
+       */
+      VenueID: string;
+      /**
+       * @description Venue name. Unique per university. Max 30 chars.
+       * @example Main Lecture Hall
+       */
+      VenueName: string;
+      /**
+       * Format: uuid
+       * @description Owning university. Required.
+       */
+      UniversityID: string;
+      /**
+       * Format: uuid
+       * @description Optional building identifier. Nulled if the building is deleted.
+       */
+      BuildingID?: string | null;
+      /**
+       * @description Maximum capacity of the venue.
+       * @example 120
+       */
+      Capacity: number;
+    };
+    VenueSingleResponseDto: {
+      venue: components["schemas"]["BaseVenueDto"];
+      message?: string;
+    };
     Object: Record<string, never>;
-    VenueMappingDto: {
-      /**
-       * Format: uuid
-       * @example 00000000-0000-0000-0000-000000000000
-       */
-      venueId: string;
-      /** @example IT-2-26 */
-      venueName: string | null;
-      /**
-       * Format: uuid
-       * @example 00000000-0000-0000-0000-000000000000
-       */
-      buildingId: string | null;
-      /** @example IT Building */
-      buildingName: string | null;
+    VenueListResponseDto: {
+      venues: components["schemas"]["BaseVenueDto"][];
+      message?: string;
     };
-    VenueMappingListResponseDto: {
-      /** @description List of venue mappings */
-      venues: components["schemas"]["VenueMappingDto"][];
-    };
-    AssignVenueBuildingDto: {
+    UpdateVenueDto: {
+      /**
+       * @description Venue name. Unique per university. Max 30 chars.
+       * @example Main Lecture Hall
+       */
+      VenueName?: string;
       /**
        * Format: uuid
-       * @description Assigns a venue to a building
+       * @description Optional building identifier. Nulled if the building is deleted.
        */
-      buildingId: string | null;
+      BuildingID?: string | null;
+      /**
+       * @description Maximum capacity of the venue.
+       * @example 120
+       */
+      Capacity?: number;
     };
     VenueAssignmentDto: {
       /** Format: uuid */
@@ -4008,95 +4151,259 @@ export interface components {
        */
       lng: number;
     };
-    BuildingDto: {
+    BaseBuildingDto: {
       /**
        * Format: uuid
+       * @description Unique building identifier.
        * @example 00000000-0000-0000-0000-000000000000
        */
-      buildingId: string;
-      /** @example IT Building */
-      buildingName: string;
-      /** @description null when the building has not been placed on the map yet */
-      location: components["schemas"]["LatLngDto"] | null;
-      footprint: {
-        [key: string]: unknown;
-      } | null;
-      /** @example school */
-      icon: string | null;
-      /** @example #4A5468 */
-      displayColour: string | null;
+      BuildingID: string;
       /**
-       * @description Number of venues assigned to this building (current count)
-       * @example 12
-       */
-      venueCount: number;
-    };
-    BuildingListResponseDto: {
-      /** @description List of buildings */
-      buildings: components["schemas"]["BuildingDto"][];
-    };
-    CreateBuildingDto: {
-      /**
-       * @description Name of the building. Must be unique within the university.
+       * @description Building name. Unique per university. Max 100 chars.
        * @example Information Technology Building
        */
-      buildingName: string;
-      /** @description Map position. Omit to create the building unpinned. Admin places it then later. */
-      location?: components["schemas"]["LatLngDto"] | null;
+      BuildingName: string;
       /**
-       * @description GeoJSON Polygon outlining the building. Positions are [long, lat]. The ring must be closed...
-       * @example {
-       *       "type": "Polygon",
-       *       "coordinates": [
-       *         [
-       *           [
-       *             28.2314,
-       *             -25.7545
-       *           ],
-       *           [
-       *             28.2318,
-       *             -25.7545
-       *           ],
-       *           [
-       *             28.2318,
-       *             -25.7549
-       *           ],
-       *           [
-       *             28.2314,
-       *             -25.7549
-       *           ],
-       *           [
-       *             28.2314,
-       *             -25.7545
-       *           ]
-       *         ]
-       *       ]
-       *     }
+       * Format: uuid
+       * @description Owning university. Required.
        */
+      UniversityID: string;
+      /** @description Map position. Omit if the building has not been placed on the map yet. */
+      location?: components["schemas"]["LatLngDto"] | null;
+      /** @description GeoJSON Polygon outlining the building. Positions are [long, lat]. Send null to clear. */
       footprint?: {
         [key: string]: unknown;
       } | null;
       /**
-       * @description Icon key used when rendering the building marker
-       * @example uni
+       * @description Icon key used when rendering the building marker.
+       * @example school
        */
       icon?: string | null;
       /**
-       * @description Hex colour used when rendering the building
+       * @description Hex colour used when rendering the building.
        * @example #4A5548
        */
       displayColour?: string | null;
     };
-    BuildingSingleResponseDto: {
-      building: components["schemas"]["BuildingDto"];
+    HourlyHeatmapBucketDto: {
+      /**
+       * @description Total capacity represented by this heatmap item.
+       * @example 120
+       */
+      Capacity: number;
+      /**
+       * @description Expected attendance based on attendance intent.
+       * @example 45
+       */
+      projected: number;
+      /**
+       * @description Maximum expected attendance based on module enrolments.
+       * @example 120
+       */
+      worstCase: number;
+      /**
+       * @description Actual attendance. Null until a check-in source is implemented.
+       * @example null
+       */
+      actual: Record<string, never> | null;
+      /**
+       * @description Projected attendance divided by capacity. Null when capacity is zero.
+       * @example 0.375
+       */
+      projectedUtilisation: Record<string, never> | null;
+      /**
+       * @description Worst-case attendance divided by capacity. Null when capacity is zero.
+       * @example 1
+       */
+      worstCaseUtilisation: Record<string, never> | null;
+      /**
+       * @description Hour of the day that the bucket represents
+       * @example 10
+       */
+      hour: number;
     };
-    UpdateBuildingLocationDto: {
-      /** @description The location of the building pin. Sending null will unpin */
+    BuildingHeatmapSummaryDto: {
+      /**
+       * @description Total capacity represented by this heatmap item.
+       * @example 120
+       */
+      Capacity: number;
+      /**
+       * @description Expected attendance based on attendance intent.
+       * @example 45
+       */
+      projected: number;
+      /**
+       * @description Maximum expected attendance based on module enrolments.
+       * @example 120
+       */
+      worstCase: number;
+      /**
+       * @description Actual attendance. Null until a check-in source is implemented.
+       * @example null
+       */
+      actual: Record<string, never> | null;
+      /**
+       * @description Projected attendance divided by capacity. Null when capacity is zero.
+       * @example 0.375
+       */
+      projectedUtilisation: Record<string, never> | null;
+      /**
+       * @description Worst-case attendance divided by capacity. Null when capacity is zero.
+       * @example 1
+       */
+      worstCaseUtilisation: Record<string, never> | null;
+    };
+    VenueHeatmapDto: {
+      /**
+       * Format: uuid
+       * @description Unique venue identifier.
+       * @example 00000000-0000-4000-8000-000000000000
+       */
+      VenueID: string;
+      /**
+       * @description Venue name. Unique per university. Max 30 chars.
+       * @example Main Lecture Hall
+       */
+      VenueName: string;
+      /**
+       * @description Total capacity represented by this heatmap item.
+       * @example 120
+       */
+      Capacity: number;
+      /**
+       * @description Expected attendance based on attendance intent.
+       * @example 45
+       */
+      projected: number;
+      /**
+       * @description Maximum expected attendance based on module enrolments.
+       * @example 120
+       */
+      worstCase: number;
+      /**
+       * @description Actual attendance. Null until a check-in source is implemented.
+       * @example null
+       */
+      actual: Record<string, never> | null;
+      /**
+       * @description Projected attendance divided by capacity. Null when capacity is zero.
+       * @example 0.375
+       */
+      projectedUtilisation: Record<string, never> | null;
+      /**
+       * @description Worst-case attendance divided by capacity. Null when capacity is zero.
+       * @example 1
+       */
+      worstCaseUtilisation: Record<string, never> | null;
+      /** @description The vnue splits into 24 hour buckets */
+      hourly: components["schemas"]["HourlyHeatmapBucketDto"][];
+    };
+    BuildingHeatmapResponseDto: {
+      building: components["schemas"]["BaseBuildingDto"];
+      /**
+       * Format: date
+       * @example 2026-10-12
+       */
+      date: string;
+      /** @description The building splits into 24 hour buckets, summed across all of its assigned venues */
+      hourly: components["schemas"]["HourlyHeatmapBucketDto"][];
+      summary: components["schemas"]["BuildingHeatmapSummaryDto"];
+      venues: components["schemas"]["VenueHeatmapDto"][];
+    };
+    AllBuildingsHeatmapResponseDto: {
+      buildings: components["schemas"]["BuildingHeatmapResponseDto"][];
+    };
+    CreateBuildingDto: {
+      /**
+       * @description Building name. Unique per university. Max 100 chars.
+       * @example Information Technology Building
+       */
+      BuildingName: string;
+      /** @description Map position. Omit if the building has not been placed on the map yet. */
       location?: components["schemas"]["LatLngDto"] | null;
-      /** @description GeoJSON polygon outline for the building. Send null to clear the polygon. */
+      /** @description GeoJSON Polygon outlining the building. Positions are [long, lat]. Send null to clear. */
       footprint?: {
         [key: string]: unknown;
       } | null;
+      /**
+       * @description Icon key used when rendering the building marker.
+       * @example school
+       */
+      icon?: string | null;
+      /**
+       * @description Hex colour used when rendering the building.
+       * @example #4A5548
+       */
+      displayColour?: string | null;
+    };
+    BuildingDto: {
+      /**
+       * Format: uuid
+       * @description Unique building identifier.
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      BuildingID: string;
+      /**
+       * @description Building name. Unique per university. Max 100 chars.
+       * @example Information Technology Building
+       */
+      BuildingName: string;
+      /**
+       * Format: uuid
+       * @description Owning university. Required.
+       */
+      UniversityID: string;
+      /** @description Map position. Omit if the building has not been placed on the map yet. */
+      location?: components["schemas"]["LatLngDto"] | null;
+      /** @description GeoJSON Polygon outlining the building. Positions are [long, lat]. Send null to clear. */
+      footprint?: {
+        [key: string]: unknown;
+      } | null;
+      /**
+       * @description Icon key used when rendering the building marker.
+       * @example school
+       */
+      icon?: string | null;
+      /**
+       * @description Hex colour used when rendering the building.
+       * @example #4A5548
+       */
+      displayColour?: string | null;
+      /** @example 12 */
+      venueCount: number;
+    };
+    BuildingSingleResponseDto: {
+      building: components["schemas"]["BuildingDto"];
+      message?: string;
+      venues?: components["schemas"]["BaseVenueDto"][];
+    };
+    BuildingListResponseDto: {
+      buildings: components["schemas"]["BuildingDto"][];
+      message?: string;
+    };
+    UpdateBuildingDto: {
+      /**
+       * @description Building name. Unique per university. Max 100 chars.
+       * @example Information Technology Building
+       */
+      BuildingName?: string;
+      /** @description Map position. Omit if the building has not been placed on the map yet. */
+      location?: components["schemas"]["LatLngDto"] | null;
+      /** @description GeoJSON Polygon outlining the building. Positions are [long, lat]. Send null to clear. */
+      footprint?: {
+        [key: string]: unknown;
+      } | null;
+      /**
+       * @description Icon key used when rendering the building marker.
+       * @example school
+       */
+      icon?: string | null;
+      /**
+       * @description Hex colour used when rendering the building.
+       * @example #4A5548
+       */
+      displayColour?: string | null;
     };
     MapConfigDto: {
       /**
@@ -4178,15 +4485,20 @@ export interface components {
        * @example 00000000-0000-0000-0000-000000000000
        */
       destinationBuildingId: string;
-      /** @description List of lat/long coordinates for the route path */
+      /**
+       * @description Index of route | 0 for shortest, incrementally for alternatives.
+       * @example 0
+       */
+      routeIndex: number;
+      /** @description List of latitude/longitude coordinates for the route path. */
       pathCoordinates: Record<string, never>[][];
       /**
-       * @description The route distance in metres
+       * @description The route distance in metres.
        * @example 67
        */
       distanceMetres: number;
       /**
-       * @description The hex colour for the polyline (path)
+       * @description The hex colour for the route polyline.
        * @example #0000FF
        */
       displayColour: string;
@@ -4204,11 +4516,94 @@ export interface components {
        * @example 00000000-0000-0000-0000-000000000000
        */
       currentBuildingId?: string | null;
-      route?: components["schemas"]["RouteDto"];
+      route?: components["schemas"]["RouteDto"] | null;
       /** @example Lecture 1 */
       fromEventName?: string;
       /** @example Lecture 2 */
       toEventName?: string;
+    };
+    RouteEventContextDto: {
+      /**
+       * Format: uuid
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      eventId: string;
+      /** @example COS 301 Lecture */
+      eventName: string;
+      /**
+       * Format: date
+       * @description Concrete occurrence date used for this route request.
+       * @example 2026-09-16
+       */
+      occurrenceDate: string;
+      /** @example 08:30 */
+      startTime: string;
+      /** @example 10:20 */
+      endTime: string;
+      /** Format: uuid */
+      venueId?: string | null;
+      /** Format: uuid */
+      buildingId?: string | null;
+    };
+    StudentRouteTransitionDto: {
+      originEvent: components["schemas"]["RouteEventContextDto"];
+      destinationEvent: components["schemas"]["RouteEventContextDto"];
+      /**
+       * @description True when both events resolve to the same building.
+       * @example false
+       */
+      sameBuilding: Record<string, never>;
+      /** @description Walking route, or null when the events share a building or routing is unavailable. */
+      route?: components["schemas"]["RouteDto"] | null;
+      /**
+       * @description Reason when a walking route cannot be returned.
+       * @example Destination venue has no building assigned.
+       */
+      reason?: string | null;
+    };
+    StudentRoutesResponseDto: {
+      /**
+       * Format: date
+       * @description Requested calendar date.
+       * @example 2026-09-16
+       */
+      date: string;
+      events: components["schemas"]["RouteEventContextDto"][];
+      routes: components["schemas"]["StudentRouteTransitionDto"][];
+    };
+    AlternativeRouteDto: {
+      /**
+       * @description Zero-based route index. Index 0 is the recommended shortest route.
+       * @example 0
+       */
+      routeIndex: number;
+      pathCoordinates: Record<string, never>[][];
+      /**
+       * @description The route distance in metres.
+       * @example 820
+       */
+      distanceMetres: number;
+      /**
+       * @description True for route index 0, the provider-selected default route.
+       * @example true
+       */
+      isRecommended: Record<string, never>;
+    };
+    AlternativeRoutesResponseDto: {
+      /**
+       * Format: date
+       * @example 2026-09-16
+       */
+      date: string;
+      /** Format: uuid */
+      originEventId: string;
+      /** Format: uuid */
+      destinationEventId: string;
+      /** Format: uuid */
+      originBuildingId: string;
+      /** Format: uuid */
+      destinationBuildingId: string;
+      route: components["schemas"]["AlternativeRouteDto"];
     };
     GenerateCalendarDto: {
       /**
@@ -6525,7 +6920,6 @@ export interface operations {
         };
         content?: never;
       };
-      409: components["responses"]["ConflictError"];
       /** @description Failed to enroll student to course. */
       500: {
         headers: {
@@ -8494,7 +8888,7 @@ export interface operations {
       500: components["responses"]["InternalError"];
     };
   };
-  VenueController_getAllVenues: {
+  getAllVenues: {
     parameters: {
       query?: {
         buildingId?: string;
@@ -8513,7 +8907,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["VenueMappingListResponseDto"];
+          "application/json": components["schemas"]["VenueListResponseDto"];
         };
       };
       400: components["responses"]["BadRequestError"];
@@ -8528,31 +8922,29 @@ export interface operations {
       500: components["responses"]["InternalError"];
     };
   };
-  VenueController_assignBuilding: {
+  createVenue: {
     parameters: {
       query?: never;
       header?: never;
-      path: {
-        venueId: string;
-      };
+      path?: never;
       cookie?: never;
     };
     requestBody: {
       content: {
-        "application/json": components["schemas"]["AssignVenueBuildingDto"];
+        "application/json": components["schemas"]["CreateVenueDto"];
       };
     };
     responses: {
-      /** @description Venue updated successfully */
-      200: {
+      /** @description Venue created successfully */
+      201: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["VenueMappingDto"];
+          "application/json": components["schemas"]["VenueSingleResponseDto"];
         };
       };
-      /** @description Building does not belong to the selected university */
+      /** @description Invalid venue payload */
       400: {
         headers: {
           [name: string]: unknown;
@@ -8567,6 +8959,39 @@ export interface operations {
         };
         content?: never;
       };
+      /** @description Venue name already exists for this university */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      500: components["responses"]["InternalError"];
+    };
+  };
+  getVenueById: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        venueId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Venue returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["VenueSingleResponseDto"];
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
       /** @description Venue not found */
       404: {
         headers: {
@@ -8574,11 +8999,99 @@ export interface operations {
         };
         content?: never;
       };
-      409: components["responses"]["ConflictError"];
       500: components["responses"]["InternalError"];
     };
   };
-  VenueController_bulkAssign: {
+  deleteVenue: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        venueId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Venue deleted successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["VenueSingleResponseDto"];
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      /** @description Venue not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      500: components["responses"]["InternalError"];
+    };
+  };
+  updateVenue: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        venueId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateVenueDto"];
+      };
+    };
+    responses: {
+      /** @description Venue updated successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["VenueSingleResponseDto"];
+        };
+      };
+      /** @description Invalid update payload */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["UnauthorizedError"];
+      /** @description Wrong permissions */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Venue or building not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Venue name already exists for this university */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      500: components["responses"]["InternalError"];
+    };
+  };
+  assignVenuesToBuildings: {
     parameters: {
       query?: never;
       header?: never;
@@ -8600,7 +9113,7 @@ export interface operations {
           "application/json": components["schemas"]["BulkAssignResponseDto"];
         };
       };
-      /** @description One/more buildings do not belong to the selected university */
+      /** @description One or more buildings or venues do not belong to the selected university */
       400: {
         headers: {
           [name: string]: unknown;
@@ -8608,7 +9121,7 @@ export interface operations {
         content?: never;
       };
       401: components["responses"]["UnauthorizedError"];
-      /** @description Wrong permissions bud */
+      /** @description Wrong permissions */
       403: {
         headers: {
           [name: string]: unknown;
@@ -8619,7 +9132,48 @@ export interface operations {
       500: components["responses"]["InternalError"];
     };
   };
-  BuildingController_getAllBuildings: {
+  getAllBuildingsHeatmap: {
+    parameters: {
+      query?: {
+        /** @description Date heatmap needs to compute. Default date is the current day */
+        date?: string;
+        /** @description Attendance values to include in the response. */
+        view?: "projected" | "worstCase" | "all";
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description All building heatmaps returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AllBuildingsHeatmapResponseDto"];
+        };
+      };
+      /** @description Invalid request parameters for heatmap query */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["UnauthorizedError"];
+      /** @description No university selected */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      500: components["responses"]["InternalError"];
+    };
+  };
+  getAllBuildings: {
     parameters: {
       query?: {
         /** @description True: building with pin. False: only buildings without pin. Omit for all buildings. */
@@ -8654,7 +9208,7 @@ export interface operations {
       500: components["responses"]["InternalError"];
     };
   };
-  BuildingController_createBuilding: {
+  createBuilding: {
     parameters: {
       query?: never;
       header?: never;
@@ -8676,16 +9230,22 @@ export interface operations {
           "application/json": components["schemas"]["BuildingSingleResponseDto"];
         };
       };
-      400: components["responses"]["BadRequestError"];
+      /** @description Invalid building payload */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
       401: components["responses"]["UnauthorizedError"];
-      /** @description Incorrect role permissions */
+      /** @description Wrong permissions */
       403: {
         headers: {
           [name: string]: unknown;
         };
         content?: never;
       };
-      /** @description Building with this name already exists */
+      /** @description Building name already exists for this university */
       409: {
         headers: {
           [name: string]: unknown;
@@ -8695,7 +9255,7 @@ export interface operations {
       500: components["responses"]["InternalError"];
     };
   };
-  BuildingController_updateBuildingLocation: {
+  getBuildingById: {
     parameters: {
       query?: never;
       header?: never;
@@ -8704,13 +9264,9 @@ export interface operations {
       };
       cookie?: never;
     };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["UpdateBuildingLocationDto"];
-      };
-    };
+    requestBody?: never;
     responses: {
-      /** @description The building was updated successfully */
+      /** @description Building returned successfully */
       200: {
         headers: {
           [name: string]: unknown;
@@ -8721,21 +9277,159 @@ export interface operations {
       };
       400: components["responses"]["BadRequestError"];
       401: components["responses"]["UnauthorizedError"];
-      /** @description Your role is not admin, not allowed */
+      /** @description No university selected */
       403: {
         headers: {
           [name: string]: unknown;
         };
         content?: never;
       };
-      /** @description The building was not found in this uni */
+      /** @description Building not found */
       404: {
         headers: {
           [name: string]: unknown;
         };
         content?: never;
       };
-      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  deleteBuilding: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        buildingId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Building deleted successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BuildingSingleResponseDto"];
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      /** @description Building not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      500: components["responses"]["InternalError"];
+    };
+  };
+  updateBuilding: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        buildingId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateBuildingDto"];
+      };
+    };
+    responses: {
+      /** @description Building updated successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BuildingSingleResponseDto"];
+        };
+      };
+      /** @description Invalid update payload */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["UnauthorizedError"];
+      /** @description Wrong permissions */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Building not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Building name already exists for this university */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      500: components["responses"]["InternalError"];
+    };
+  };
+  getBuildingHeatmap: {
+    parameters: {
+      query?: {
+        /** @description Date heatmap needs to compute. Default date is the current day */
+        date?: string;
+        /** @description Attendance values to include in the response. */
+        view?: "projected" | "worstCase" | "all";
+      };
+      header?: never;
+      path: {
+        buildingId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Building heatmap returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BuildingHeatmapResponseDto"];
+        };
+      };
+      /** @description Invalid heatmap query parameters */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["UnauthorizedError"];
+      /** @description No university selected or insufficient permissions */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Building not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
       500: components["responses"]["InternalError"];
     };
   };
@@ -8814,9 +9508,9 @@ export interface operations {
   RouteController_getRoute: {
     parameters: {
       query: {
-        /** @description The origin building that the student is walking from */
+        /** @description The building the student is walking from. */
         originBuildingId: string;
-        /** @description The destination building that the student is walking to */
+        /** @description The building the student is walking to. */
         destinationBuildingId: string;
       };
       header?: never;
@@ -8856,9 +9550,9 @@ export interface operations {
   RouteController_getActiveRoute: {
     parameters: {
       query: {
-        /** @description Calendar date that matches the EventAttendance date */
+        /** @description Calendar date matching the EventAttendance date. */
         date: string;
-        /** @description Time in hh:mm */
+        /** @description Time in HH:mm format. */
         time: string;
       };
       header?: never;
@@ -8880,6 +9574,98 @@ export interface operations {
       401: components["responses"]["UnauthorizedError"];
       /** @description No university or university role was selected */
       403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      500: components["responses"]["InternalError"];
+    };
+  };
+  getStudentRoutesForDate: {
+    parameters: {
+      query: {
+        /** @description Calendar date for which the student needs routes. */
+        date: string;
+        /** @description Origin event of the route override. */
+        overrideOriginEventId?: string;
+        /** @description Destination event of the route override. */
+        overrideDestinationEventId?: string;
+        /** @description Zero-based route index for the overridden transition. */
+        overrideRouteIndex?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Student routes returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["StudentRoutesResponseDto"];
+        };
+      };
+      /** @description The requested date is invalid */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      /** @description A required event, venue, building, or route was not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      500: components["responses"]["InternalError"];
+    };
+  };
+  getAlternativeRouteBetweenEvents: {
+    parameters: {
+      query: {
+        /** @description The event from which the student is travelling. */
+        originEventId: string;
+        /** @description The event to which the student is travelling. */
+        destinationEventId: string;
+        /** @description Calendar date on which both events occur. */
+        date: string;
+        /** @description Zero-based route index. Index 0 is the shortest/default route. */
+        routeIndex?: components["schemas"]["Object"];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Alternative route returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AlternativeRoutesResponseDto"];
+        };
+      };
+      /** @description The events are invalid, identical, in the same building, or the route index is invalid */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      /** @description The events are not attended on the requested date, or the requested route is unavailable */
+      404: {
         headers: {
           [name: string]: unknown;
         };
