@@ -34,7 +34,8 @@ export type getAllBuildingsHeatmapQuery =
   paths["/api/buildings/heatmap"]["get"]["parameters"]["query"];
 export type getAllBuildingsHeatmapRes =
   paths["/api/buildings/heatmap"]["get"]["responses"]["200"]["content"]["application/json"];
-export type BuildingHeatmapType = getAllBuildingsRes["buildings"][number];
+export type BuildingHeatmapType =
+  getAllBuildingsHeatmapRes["buildings"][number];
 
 export class getAllBuildingsBuilder extends RequestBuilder<
   getAllBuildingsQuery,
