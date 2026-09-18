@@ -146,6 +146,11 @@ pub fn create_buffers(
 }
 
 pub fn run_upscaler(device: &wgpu::Device, queue: &wgpu::Queue, buffers: &Buffers) {
+    let upscaler = device.create_shader_module(wgpu::ShaderModuleDescriptor {
+        label: Some("IMAGE_UPSCALER_SHADER"),
+        source: wgpu::ShaderSource::Wgsl(include_str!("upscaler.wgsl").into()),
+    });
+
     
 }
 

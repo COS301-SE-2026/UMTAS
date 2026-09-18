@@ -43,7 +43,7 @@ fn main(
     let out_y = global_id.y;
     let slice_index = workgroup_id.z;
 
-    if (out_x >= 640 || out_y >=640){
+    if (out_x >= 640u || out_y >=640u){
     return;
     }
 
@@ -56,8 +56,8 @@ fn main(
 
     // set top left pixel of slice
     // keep indices between 0 and 1280
-    let x0 = clamp(u32(floor(max(src_x_f))), 0u, params.src_width -1u);
-    let y0 = clamp(u32(floor(max(src_y_f))), 0u, params.src_height -1u);
+    let x0 = clamp(u32(floor(max(src_x_f, 0.0))), 0u, params.src_width - 1u);
+    let y0 = clamp(u32(floor(max(src_y_f, 0.0))), 0u, params.src_height - 1u);
 
     // set bottom right pxl
     let x1 = min(x0 + 1u, params.src_width - 1u);
@@ -82,7 +82,7 @@ fn main(
     // exporting to buffer
     let spatial_area = 640u * 640u;
     let plane_size = spatial_area;
-    let slice_offset = slice_index * 3u * plane_size; 
+    let slice_offset = slice_index * 3u * plane_size;
     let pixel_idx = out_y * 640u + out_x;
     // indexes
     let r_dst = slice_offset + (0u * plane_size) + pixel_idx;
