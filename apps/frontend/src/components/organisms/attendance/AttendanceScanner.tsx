@@ -32,7 +32,7 @@ export default function AttendanceScanner({
   }, []);
 
   return (
-    <>
+    <div className="flex w-full flex-col gap-4">
       <div className="flex items-center justify-between">
         <ScannerBadge status={status} />
 
@@ -79,6 +79,6 @@ export default function AttendanceScanner({
       <div className="w-full pb-8">
         <LastScannedStudent studentNumber={lastScan} />
       </div>
-    </>
+    </div>
   );
 }

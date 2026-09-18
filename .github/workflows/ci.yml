@@ -49,81 +49,81 @@ jobs:
         with:
           node-version: 22
 
-    # - name: Setup Just
-    #   uses: extractions/setup-just@v2
+      - name: Setup Just
+        uses: extractions/setup-just@v2
 
-    # - name: Enable Corepack (pnpm)
-    #   run: corepack enable pnpm
+      - name: Enable Corepack (pnpm)
+        run: corepack enable pnpm
 
-    # - name: Install dependencies
-    #   run: pnpm install --frozen-lockfile
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
-    # - name: Run Linter
-    #   run: pnpm run lint
+      - name: Run Linter
+        run: pnpm run lint
 
-    # - name: Run Build
-    #   run: pnpm run build
+      - name: Run Build
+        run: pnpm run build
 
-    # # - name: Run Audit
-    # #   run: pnpm audit --audit-level=moderate
+      # - name: Run Audit
+      #   run: pnpm audit --audit-level=moderate
 
-    # - name: Run Unit Tests
-    #   run: |
-    #     pnpm --filter shared-types test
-    #     pnpm --filter bullmq-worker-core test
-    #     pnpm --filter solver-worker test
-    #     pnpm --filter pdf-parser-worker test
-    #     pnpm --filter backend exec jest --coverage --runInBand
+      - name: Run Unit Tests
+        run: |
+          pnpm --filter shared-types test
+          pnpm --filter bullmq-worker-core test
+          pnpm --filter solver-worker test
+          pnpm --filter pdf-parser-worker test
+          pnpm --filter backend exec jest --coverage --runInBand
 
-    # - name: Typecheck Full-Stack Integration Tests
-    #   run: pnpm --filter backend test:integration:typecheck
+      - name: Typecheck Full-Stack Integration Tests
+        run: pnpm --filter backend test:integration:typecheck
 
-    # - name: Build integration images in parallel
-    #   uses: docker/bake-action@d3418bd7d0e9324001bca92fa8ba175ea7e6dc9b # v7.3.0
-    #   with:
-    #     files: ./docker-bake.hcl
-    #     load: true
+      - name: Build integration images in parallel
+        uses: docker/bake-action@d3418bd7d0e9324001bca92fa8ba175ea7e6dc9b # v7.3.0
+        with:
+          files: ./docker-bake.hcl
+          load: true
 
-    # - name: Run Full-Stack Integration Tests
-    #   run: pnpm test:integration
+      - name: Run Full-Stack Integration Tests
+        run: pnpm test:integration
 
-    # - name: Run Browser E2E Tests
-    #   run: pnpm test:e2e
+      - name: Run Browser E2E Tests
+        run: pnpm test:e2e
 
-    # - name: Upload Playwright report
+      - name: Upload Playwright report
 
-    #   if: ${{ !cancelled() }}
-    #   uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-    #   with:
-    #     name: playwright-report
-    #     path: |
-    #       apps/e2e/playwright-report
-    #       apps/e2e/test-results
-    #     retention-days: 30
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: playwright-report
+          path: |
+            apps/e2e/playwright-report
+            apps/e2e/test-results
+          retention-days: 30
 
-    # - name: Upload unit coverage to Codecov
-    #   uses: codecov/codecov-action@75cd11691c0faa626561e295848008c8a7dddffe
-    #   with:
-    #     token: ${{ secrets.CODECOV_TOKEN }}
-    #     files: apps/backend/coverage/lcov.info
-    #     disable_search: true
-    #     flags: unit
+      - name: Upload unit coverage to Codecov
+        uses: codecov/codecov-action@75cd11691c0faa626561e295848008c8a7dddffe
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: apps/backend/coverage/lcov.info
+          disable_search: true
+          flags: unit
 
-    # #When Integration tests actually contribut to coverage
-    # # - name: Upload integration coverage to Codecov
-    # #   uses: codecov/codecov-action@75cd11691c0faa626561e295848008c8a7dddffe
-    # #   with:
-    # #     token: ${{ secrets.CODECOV_TOKEN }}
-    # #     files: apps/backend/coverage/integration/lcov.info
-    # #     disable_search: true
-    # #     flags: integration
+      #When Integration tests actually contribut to coverage
+      # - name: Upload integration coverage to Codecov
+      #   uses: codecov/codecov-action@75cd11691c0faa626561e295848008c8a7dddffe
+      #   with:
+      #     token: ${{ secrets.CODECOV_TOKEN }}
+      #     files: apps/backend/coverage/integration/lcov.info
+      #     disable_search: true
+      #     flags: integration
 
-    # - name: Upload test results to Codecov
-    #   if: ${{ !cancelled() }}
-    #   uses: codecov/test-results-action@0fa95f0e1eeaafde2c782583b36b28ad0d8c77d3
-    #   with:
-    #     token: ${{ secrets.CODECOV_TOKEN }}
-    #     files: "**/junit.xml"
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@0fa95f0e1eeaafde2c782583b36b28ad0d8c77d3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: "**/junit.xml"
 
   docker-staging:
     name: Build & Push Staging Images

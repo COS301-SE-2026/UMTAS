@@ -1,7 +1,7 @@
 export type NavigationRole = "UNIVERSITY_ADMIN" | "STUDENT" | "LECTURER";
 
 export type NavigationSection =
-  "primary" | "actions" | "admin" | "help" | "auth" | "tools";
+  "primary" | "actions" | "admin" | "help" | "auth";
 
 export type NavigationAction = "run-page-tutorial" | "run-cmdk-tutorial";
 
@@ -200,7 +200,7 @@ export const navigationItems: NavigationItem[] = [
     id: "attendance",
     label: "Attendance",
     href: "/attendance",
-    section: "tools",
+    section: "admin",
     icon: "UserPlusIcon",
     tourContent: "Mark attendance for your lecture.",
     keywords: ["attendance", "lecture", "mark attendance"],

@@ -19,6 +19,7 @@ export default function ScannerTemplate() {
 
   if (ViableRole) {
     const hasRole = university?.role != null;
+
     if (!hasRole) return <NoRoleSelected />;
 
     // backend integration query will be called here
@@ -31,12 +32,13 @@ export default function ScannerTemplate() {
             <h1 className="text-lg font-semibold text-[var(--text-primary)]">
               Attendance Scanner
             </h1>
+
             <p className="mt-1 text-sm text-[var(--text-secondary)]">
               Scan student cards to record attendance.
             </p>
           </div>
 
-          <div className="mx-auto w-full max-w-md p-5">
+          <div className="mx-auto w-full max-w-3xl p-5">
             <AttendanceScanner
               // replace with expected attendance from backend integration
               expectedNumber={100}
