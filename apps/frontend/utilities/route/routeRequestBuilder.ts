@@ -10,6 +10,12 @@ export type getActiveRouteQuery =
 export type getActiveRouteRes =
   paths["/api/routes/active"]["get"]["responses"]["200"]["content"]["application/json"];
 
+export type getRoutingHeatmapQuery =
+  paths["/api/routes/heatmap"]["get"]["parameters"]["query"];
+export type getRoutingHeatmapRes =
+  paths["/api/routes/heatmap"]["get"]["responses"]["200"]["content"]["application/json"];
+export type RouteHeatmapType = getRoutingHeatmapRes["routes"][number];
+
 export class getRouterBuilder extends RequestBuilder<
   getRouteQuery,
   undefined,
@@ -29,5 +35,17 @@ export class getActiveRouteBuilder extends RequestBuilder<
   constructor() {
     super();
     this.setUrl("/routes/active").setMethod(RequestMethod.GET);
+  }
+}
+
+export class getRoutingHeatmapBuilder extends RequestBuilder<
+  undefined,
+  undefined,
+  getRoutingHeatmapRes,
+  getRoutingHeatmapQuery
+> {
+  constructor() {
+    super();
+    this.setUrl("/routes/heatmap").setMethod(RequestMethod.GET);
   }
 }
