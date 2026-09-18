@@ -27,9 +27,15 @@ export interface DetectionSettings {
   runDetection: boolean;
   DetectionInterval: number; // in seconds
 }
+export interface InferenceSettings {
+  runInference: boolean;
+  InferenceInterval: number; // in seconds
+}
 interface CanvasCamProps {
   isCameraActive: boolean;
   detectionSettings: DetectionSettings;
+  inferenceSettings: InferenceSettings;
+
   imageFile: File | null;
 }
 
@@ -37,6 +43,7 @@ export default function CameraCanvas({
   isCameraActive,
   imageFile,
   detectionSettings,
+  inferenceSettings,
 }: CanvasCamProps) {
   return (
     <div className="w-full min-w-fit h-full justify-around flex flex-col gap-y-4 p-4">
@@ -46,6 +53,7 @@ export default function CameraCanvas({
             imageFile={imageFile}
             isCameraActive={isCameraActive}
             detectionSettings={detectionSettings}
+            inferenceSettings={inferenceSettings}
           />
         </div>
       </div>

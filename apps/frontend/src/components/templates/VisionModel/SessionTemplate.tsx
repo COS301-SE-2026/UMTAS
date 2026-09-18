@@ -5,6 +5,7 @@ import { Label } from "@/components/atoms/baseShadcn/label";
 import { Switch } from "@/components/atoms/baseShadcn/switch";
 import CameraCanvas, {
   DetectionSettings,
+  InferenceSettings,
 } from "@/components/organisms/VisionModel/CameraCanvas";
 import { useState } from "react";
 
@@ -15,6 +16,12 @@ export default function VM_SessionTemplate() {
     {
       runDetection: false,
       DetectionInterval: 0,
+    },
+  );
+  const [inferenceSettings, setInferenceSettings] = useState<InferenceSettings>(
+    {
+      runInference: false,
+      InferenceInterval: 0,
     },
   );
   const [imageUpload, setImageUpload] = useState<File | null>(null);
@@ -33,6 +40,7 @@ export default function VM_SessionTemplate() {
               <CameraCanvas
                 isCameraActive={cameraOn}
                 detectionSettings={detectionSettings}
+                inferenceSettings={inferenceSettings}
                 imageFile={imageUpload}
               />
             </div>
@@ -50,6 +58,7 @@ export default function VM_SessionTemplate() {
                   checked={cameraOn}
                   onCheckedChange={(e) => {
                     setCameraOn(e);
+                    setImageUpload(null);
                   }}
                 />
               </Label>
@@ -62,6 +71,7 @@ export default function VM_SessionTemplate() {
                     const file = e.target.files?.[0];
                     if (file) {
                       setImageUpload(file);
+                      setCameraOn(false);
                     }
                   }}
                   className="h-8 w-40 rounded-md border border-[var(--border)] bg-transparent px-2 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--ring)] file:mr-2 file:border-0 file:bg-transparent file:text-xs file:font-medium file:text-[var(--text-primary)] cursor-pointer"
@@ -78,6 +88,10 @@ export default function VM_SessionTemplate() {
                 <Switch
                   checked={detectionSettings.runDetection}
                   onCheckedChange={(e) => {
+                    setInferenceSettings((settings) => ({
+                      ...settings,
+                      runInference: false,
+                    }));
                     setDetectionSettings((settings) => ({
                       ...settings,
                       runDetection: e,
@@ -112,17 +126,32 @@ export default function VM_SessionTemplate() {
               <Label className=" flex flex-col  w-full text-md font-medium text-[var(--text-primary)] text-left pl-1">
                 Run Inference
                 <Switch
-                  checked={detectionSettings.runDetection}
-                  onCheckedChange={(e) => {}}
+                  checked={inferenceSettings.runInference}
+                  onCheckedChange={(e) => {
+                    setInferenceSettings((settings) => ({
+                      ...settings,
+                      runInference: e,
+                    }));
+                    setDetectionSettings((settings) => ({
+                      ...settings,
+                      runDetection: false,
+                    }));
+                  }}
                 />
               </Label>
               <Label className=" flex flex-col  w-full  text-md font-medium text-[var(--text-primary)] text-left pl-1">
                 Inference Interval
                 <Input
-                  value={detectionSettings.DetectionInterval}
-                  onChange={(e) => {}}
-                  min={1}
+                  value={inferenceSettings.InferenceInterval}
+                  onChange={(e) => {
+                    setInferenceSettings((settings) => ({
+                      ...settings,
+                      InferenceInterval: Number(e.target.value),
+                    }));
+                  }}
+                  min={0}
                   max={100}
+                  step={0.2}
                   type="number"
                   placeholder="0"
                   className="h-8 w-40 rounded-md border border-[var(--border)] bg-transparent px-2 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--ring)]"
