@@ -1,0 +1,24 @@
+apps/frontend/src/components/templates/attendance/ScannerTemplate.tsx
+  h_2d4b3dca70a3d8 28-31,34-35,38-44
+apps/frontend/src/components/templates/calendar-management/caltemplate.tsx
+  h_2d4b3dca70a3d8 156,159,162-163
+apps/frontend/src/components/templates/course-management/courseManageTemplate.tsx
+  h_2d4b3dca70a3d8 242-252
+apps/frontend/src/components/templates/module-management/eventManagementTemplate.tsx
+  h_2d4b3dca70a3d8 88,91-99,101
+apps/frontend/src/components/templates/module-management/moduleManagementTemplate.tsx
+  h_2d4b3dca70a3d8 130,133-141,151
+apps/frontend/src/components/templates/roleManagement/roleManagementTemplate.tsx
+  h_2d4b3dca70a3d8 58-62
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "6363a5c3a575f29c3fb0872f4a4af82d3b954e21",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
