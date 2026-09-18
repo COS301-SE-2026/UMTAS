@@ -1,0 +1,16 @@
+apps/backend/src/Course/course.enrollment.service.spec.ts
+  h_2d4b3dca70a3d8 10,32-36,45,56,80-82,95,97-101,115,117-118,127,144,146-313,341,357-358,364,378-380,382-386
+apps/backend/src/Course/course.enrollment.service.ts
+  h_2d4b3dca70a3d8 15,24,44,87,93-119,170,185,191-193,195
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "c1f62f0c068d96c404af3fa7da78613beb76f310",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
