@@ -1,0 +1,20 @@
+apps/frontend/package.json
+  h_2d4b3dca70a3d8 23-24,45-46
+apps/frontend/src/components/molecules/attendance/BarcodeCamera.tsx
+  h_2d4b3dca70a3d8 1-329
+apps/frontend/src/components/organisms/attendance/AttendanceScanner.tsx
+  h_2d4b3dca70a3d8 7,37
+pnpm-lock.yaml
+  h_2d4b3dca70a3d8 357-362,426-428,465,474,486,5542-5547,6225-6245,6785,14673-14679,15585-15592,16118,16125,16132,16137,16142,16152,16991,17005,17026,17040,19092-19093,19512-19526,19881-19886,19911-19916,20395,20401,21091,21096-21097,21123,21134,21138,21142,21145,21149,21160,21171-21172,22426,22428,22432,22435,22483,22509,22514,22540,22545,22571,23071,23073,23076,26026-26027,26032,26037,26085-26105,26723-26727
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "d2188793c49e975aa5b4bdeffa145e1581fd3763",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
