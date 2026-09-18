@@ -1,0 +1,16 @@
+apps/frontend/src/components/organisms/nav/Tutorial.tsx
+  h_2d4b3dca70a3d8 29-33,51-53
+apps/frontend/src/components/templates/calendar-management/caltemplate.tsx
+  h_2d4b3dca70a3d8 156,159,161-171,173-176,178-184,204,217,219-234,236-258,260-262,264-265,273,306-316,320-321,323,337,343
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "c091a3fab97998dca4a91c8318f7b747900dc1b3",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
