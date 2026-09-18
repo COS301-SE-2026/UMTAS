@@ -54,7 +54,7 @@ export function StudentNumberInput({ onScan }: StudentNumberInputProps) {
         <Button
           type="button"
           onClick={handleSubmit}
-          disabled={!/^\d{7}$/.test(studentNumber)}
+          disabled={!/^\d{8}$/.test(studentNumber)}
         >
           Add
         </Button>
