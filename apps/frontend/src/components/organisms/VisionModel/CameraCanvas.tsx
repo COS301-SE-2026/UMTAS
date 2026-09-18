@@ -267,8 +267,45 @@ function CanvasWebcam({
             }
           }
 
+          // will update later with set key points in json for readability
+          const SKELETON_CONNECTIONS: [number, number][] = [
+            [0, 1],
+            [1, 2],
+            [2, 3],
+            [3, 4],
+            [1, 5],
+            [5, 6],
+            [6, 7],
+          ];
+
           if (inferenceSettings.runInference) {
             for (const data of detectedPeoplePoseRef.current) {
+              const keypoints = data.keypoints;
+
+              if (keypoints && keypoints.length > 0) {
+                context.strokeStyle = "#00ffff";
+                context.lineWidth = 2;
+                for (const [p1Idx, p2Idx] of SKELETON_CONNECTIONS) {
+                  const kp1 = keypoints[p1Idx];
+                  const kp2 = keypoints[p2Idx];
+
+                  if (kp1 && kp2 && kp1.score > 0.15 && kp2.score > 0.15) {
+                    context.beginPath();
+                    context.moveTo(kp1.x, kp1.y);
+                    context.lineTo(kp2.x, kp2.y);
+                    context.stroke();
+                  }
+                }
+
+                for (const kp of keypoints) {
+                  if (kp.score > 0.15) {
+                    context.beginPath();
+                    context.arc(kp.x, kp.y, 1.5, 0, 2 * Math.PI);
+                    context.fillStyle = "#00ffff";
+                    context.fill();
+                  }
+                }
+              }
             }
           }
         }

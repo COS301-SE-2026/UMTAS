@@ -48,12 +48,18 @@ pub fn infer_pose_data(
 
     return serde_json::to_string(&res_people).map_err(|e| JsValue::from_str(&e.to_string()));
 }
+fn get_kp(slice_data: &[f32], coco_idx: usize, anchor_idx: usize, num_anchors: usize) -> Keypoint {
+    let kp_offset = 5 + (coco_idx * 3);
+    let x = slice_data[kp_offset * num_anchors + anchor_idx];
+    let y = slice_data[(kp_offset + 1) * num_anchors + anchor_idx];
+    let score = slice_data[(kp_offset + 2) * num_anchors + anchor_idx];
+    Keypoint { x, y, score }
+}
 
 pub fn read_result(slice_data: &[f32]) -> Result<Vec<DetectedPersonPose>, String> {
     let mut people: Vec<DetectedPersonPose> = Vec::new();
 
     const NUM_FEATURES: usize = 56;
-    const NUM_KEYPOINTS: usize = 17;
     const CONFIDENCE_THRESHOLD: f32 = 0.15;
 
     if slice_data.is_empty() || slice_data.len() % NUM_FEATURES != 0 {
@@ -78,15 +84,30 @@ pub fn read_result(slice_data: &[f32]) -> Result<Vec<DetectedPersonPose>, String
             let top_left_x = center_x - width / 2.0;
             let top_left_y = center_y - height / 2.0;
 
-            let mut keypoints = Vec::with_capacity(NUM_KEYPOINTS);
-            for kp_idx in 0..NUM_KEYPOINTS {
-                let kp_offset = 5 + (kp_idx * 3);
-                let x = slice_data[kp_offset * num_anchors + anchor_idx];
-                let y = slice_data[(kp_offset + 1) * num_anchors + anchor_idx];
-                let score = slice_data[(kp_offset + 2) * num_anchors + anchor_idx];
+            let nose = get_kp(slice_data, 0, anchor_idx, num_anchors);
+            let left_shoulder = get_kp(slice_data, 5, anchor_idx, num_anchors);
+            let right_shoulder = get_kp(slice_data, 6, anchor_idx, num_anchors);
+            let left_elbow = get_kp(slice_data, 7, anchor_idx, num_anchors);
+            let right_elbow = get_kp(slice_data, 8, anchor_idx, num_anchors);
+            let left_wrist = get_kp(slice_data, 9, anchor_idx, num_anchors);
+            let right_wrist = get_kp(slice_data, 10, anchor_idx, num_anchors);
 
-                keypoints.push(Keypoint { x, y, score });
-            }
+            let shoulder_midpoint = Keypoint {
+                x: (left_shoulder.x + right_shoulder.x) / 2.0,
+                y: (left_shoulder.y + right_shoulder.y) / 2.0,
+                score: (left_shoulder.score + right_shoulder.score) / 2.0,
+            };
+
+            let keypoints = vec![
+                nose,
+                shoulder_midpoint,
+                left_shoulder,
+                left_elbow,
+                left_wrist,
+                right_shoulder,
+                right_elbow,
+                right_wrist,
+            ];
 
             people.push(DetectedPersonPose {
                 person: DetectedPerson {
@@ -103,7 +124,7 @@ pub fn read_result(slice_data: &[f32]) -> Result<Vec<DetectedPersonPose>, String
         }
     }
 
-    return Ok(people);
+    Ok(people)
 }
 
 pub fn map_to_global(
