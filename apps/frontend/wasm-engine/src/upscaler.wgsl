@@ -12,7 +12,9 @@ struct slice_param {
 
 //PARM_LIST
 @group(0) @binding(0) var<storage, read> params_list: array<slice_param, 5>;
+// INPUT
 @group(0) @binding(1) var<storage, read> input_bytes: array<u32>;
+// OUTPUT
 @group(0) @binding(2) var<storage, read_write> output_floats: array<f32>;
 
 fn fetch_px(x:u32,y:u32,src_width:u32,src_height:u32)->vec3<f32>{
