@@ -1,0 +1,22 @@
+apps/frontend/src/components/molecules/attendance/USBBarcodeScanner.tsx
+  h_2d4b3dca70a3d8 17,51
+apps/frontend/src/components/molecules/viewTimetable/EventBlock.tsx
+  h_2d4b3dca70a3d8 22,24,33-44,46-65,70,73-79,81,84,95-111,122,140-143,175,186,198
+apps/frontend/src/components/organisms/solver/SolverPreferences.tsx
+  h_2d4b3dca70a3d8 279,351,357-359
+apps/frontend/src/components/organisms/viewTimetable/ScheduleView.tsx
+  h_2d4b3dca70a3d8 11,80,152-161,264,266,271,296-298,300-302,309-311,322,327,333,357,361,398,403-409,466-483,901
+apps/frontend/src/types/Nav.ts
+  h_2d4b3dca70a3d8 122
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "048bc2a25da4bcf70e5e052f347db1f134f8527c",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
