@@ -67,7 +67,7 @@ export function useHeatmapOverlay({
       radiusPixels,
       intensity,
       colorRange: HEATMAP_COLOUR_RANGE,
-      colorDomain: [0, buildingScale.max || 1],
+      colorDomain: [0, buildingScale.max],
     });
 
     const routeHeatmapLayer = new HeatmapLayer<WeightedPoint>({
@@ -77,8 +77,9 @@ export function useHeatmapOverlay({
       getWeight: (dot) => dot.weight,
       radiusPixels,
       intensity,
+      opacity: 0.6,
       colorRange: HEATMAP_COLOUR_RANGE,
-      colorDomain: [0, routeScale.max || 1],
+      colorDomain: [0, routeScale.max],
     });
 
     overlayRef.current.setProps({
