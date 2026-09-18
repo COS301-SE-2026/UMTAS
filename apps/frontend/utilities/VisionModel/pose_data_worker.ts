@@ -1,9 +1,10 @@
 import {
   DetectedPerson,
+  DetectedPersonPose,
   PROCESS_POSE_DATA_MESSAGE,
   RESULT_PROCESS_POSE_DATA,
 } from "./messageTypes";
-import init, { infer_detection_data } from "../../wasm-engine/pkg/wasm_engine";
+import init, { infer_pose_data } from "../../wasm-engine/pkg/wasm_engine";
 
 let wasmLoaded = false;
 
@@ -28,6 +29,10 @@ self.onmessage = async (event: MessageEvent) => {
     }
 
     const tSliceStart = performance.now();
+    const people = infer_pose_data(
+      payload.sliced_results.slice(1),
+      payload.sliced_results[0],
+    );
 
     console.log(
       `[POSE Worker DATA PROCESSOR] parse People took: ${((performance.now() - tSliceStart) / 1000).toFixed(3)}s`,
@@ -36,7 +41,7 @@ self.onmessage = async (event: MessageEvent) => {
     try {
       self.postMessage({
         eventType: "POSE_DATA_PARSED",
-        payload: "TODO",
+        payload: JSON.parse(people) as DetectedPersonPose[],
       } as RESULT_PROCESS_POSE_DATA);
     } catch (error) {
       console.error(error);

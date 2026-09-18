@@ -3,7 +3,12 @@ import { useEffect, useRef, useState } from "react";
 import { CircleX } from "lucide-react";
 import { detectionManager } from "../../../../utilities/VisionModel/detectionManager";
 import { detection_data_manager } from "../../../../utilities/VisionModel/detection_data_manager";
-import { DetectedPerson } from "../../../../utilities/VisionModel/messageTypes";
+import {
+  DetectedPerson,
+  DetectedPersonPose,
+} from "../../../../utilities/VisionModel/messageTypes";
+import { pose_Manager } from "../../../../utilities/VisionModel/pose_manager";
+import { pose_data_manager } from "../../../../utilities/VisionModel/pose_data_manager";
 
 function getVideoConstraints(): MediaStreamConstraints {
   const isMobile = window.innerWidth < 768;
@@ -65,6 +70,7 @@ function CanvasWebcam({
   isCameraActive,
   detectionSettings,
   imageFile,
+  inferenceSettings,
 }: CanvasCamProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -74,6 +80,7 @@ function CanvasWebcam({
   const [imageLoaded, setImageLoaded] = useState<boolean>(false);
 
   const detectedPeopleRef = useRef<DetectedPerson[]>([]);
+  const detectedPeoplePoseRef = useRef<DetectedPersonPose[]>([]);
   const lastRunRef = useRef<number>(0);
 
   // Manage detection workers
@@ -87,7 +94,20 @@ function CanvasWebcam({
       detectionManager.terminate();
       detection_data_manager.terminate();
     }
-  }, [detectionSettings.runDetection, isCameraActive, imageFile]);
+    if (inferenceSettings.runInference && isSourceActive) {
+      pose_Manager.start();
+      pose_data_manager.start();
+    } else {
+      detectedPeoplePoseRef.current = [];
+      pose_Manager.terminate();
+      pose_data_manager.terminate();
+    }
+  }, [
+    detectionSettings.runDetection,
+    inferenceSettings.runInference,
+    isCameraActive,
+    imageFile,
+  ]);
 
   useEffect(() => {
     if (!imageFile) {
@@ -172,10 +192,13 @@ function CanvasWebcam({
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
           }
 
-          const intervalMs = detectionSettings.DetectionInterval * 1000;
+          const detectionIntervalMs =
+            detectionSettings.DetectionInterval * 1000;
+          const inferenceIntervalMs =
+            inferenceSettings.InferenceInterval * 1000;
           if (
             detectionSettings.runDetection &&
-            timestamp - lastRunRef.current >= intervalMs
+            timestamp - lastRunRef.current >= detectionIntervalMs
           ) {
             lastRunRef.current = timestamp;
             const imageData = context.getImageData(
@@ -197,11 +220,36 @@ function CanvasWebcam({
                 }
               });
           }
+          if (
+            inferenceSettings.runInference &&
+            timestamp - lastRunRef.current >= inferenceIntervalMs
+          ) {
+            lastRunRef.current = timestamp;
+            const imageData = context.getImageData(
+              0,
+              0,
+              canvas.width,
+              canvas.height,
+            );
+
+            pose_Manager
+              .run(imageData?.data, canvas.width, canvas.height)
+              .then((results) => {
+                if (results) {
+                  pose_data_manager.run(results).then((people) => {
+                    if (people) {
+                      console.log(people);
+                      detectedPeoplePoseRef.current = people;
+                    }
+                  });
+                }
+              });
+          }
 
           if (detectionSettings.runDetection) {
             for (const person of detectedPeopleRef.current) {
               context.strokeStyle = "#00ff00";
-              context.lineWidth = 2;
+              context.lineWidth = 1.2;
               context.strokeRect(
                 person.top_left_x,
                 person.top_left_y,
@@ -218,6 +266,11 @@ function CanvasWebcam({
               );
             }
           }
+
+          if (inferenceSettings.runInference) {
+            for (const data of detectedPeoplePoseRef.current) {
+            }
+          }
         }
       }
 
@@ -229,7 +282,13 @@ function CanvasWebcam({
     return () => {
       cancelAnimationFrame(animationFrameID);
     };
-  }, [cameraLoaded, imageLoaded, imageFile, detectionSettings]);
+  }, [
+    cameraLoaded,
+    imageLoaded,
+    imageFile,
+    detectionSettings,
+    inferenceSettings,
+  ]);
 
   const showCanvas = imageFile !== null || isCameraActive;
 

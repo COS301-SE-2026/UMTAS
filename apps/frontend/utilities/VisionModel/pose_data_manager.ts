@@ -1,4 +1,5 @@
 import {
+  DetectedPersonPose,
   PROCESS_POSE_DATA_MESSAGE,
   RESULT_PROCESS_POSE_DATA,
 } from "./messageTypes";
@@ -21,9 +22,9 @@ class Pose_Data_Manager {
       this.isProcessing = false;
     }
   }
-  public run(sliced_results: Float32Array[]): Promise<null> {
+  public run(sliced_results: Float32Array[]): Promise<DetectedPersonPose[]> {
     if (this.isProcessing || !this.worker) {
-      return Promise.resolve(null);
+      return Promise.resolve([]);
     }
     this.isProcessing = true;
     const startTime = performance.now();
@@ -40,7 +41,7 @@ class Pose_Data_Manager {
             `POSE data parsing pipeline took: ${durationSeconds.toFixed(3)}s`,
           );
 
-          resolve(null); // TODO
+          resolve(message.payload); // TODO
         }
       };
       this.worker?.addEventListener("message", handleMessage);

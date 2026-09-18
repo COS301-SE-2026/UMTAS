@@ -71,5 +71,16 @@ export type PROCESS_POSE_DATA_MESSAGE = VisionModelEvent<
 
 export type RESULT_PROCESS_POSE_DATA = VisionModelEvent<
   "POSE_DATA_PARSED",
-  unknown
+  DetectedPersonPose[]
 >;
+
+export interface Keypoint {
+  x: number;
+  y: number;
+  score: number;
+}
+
+export interface DetectedPersonPose {
+  person: DetectedPerson;
+  keypoints: Keypoint[];
+}
