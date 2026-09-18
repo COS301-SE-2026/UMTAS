@@ -288,6 +288,7 @@ export function GenerateStep({
                     onCheckedChange={(checkedState) =>
                       checkboxLogic(event?.eventId ?? "", checkedState === true)
                     }
+                    className="cursor-pointer border border-[var(--text-secondary)] bg-[var(--bg-surface)] data-[state=checked]:border-[var(--btn-primary-bg)] data-[state=checked]:bg-[var(--btn-primary-bg)] data-[state=checked]:text-[var(--btn-primary-text)]"
                   />
                 </span>
               </div>

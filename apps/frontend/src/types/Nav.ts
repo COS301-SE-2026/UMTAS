@@ -104,19 +104,6 @@ export const navigationItems: NavigationItem[] = [
   },
 
   {
-    id: "module-management",
-    label: "Module Management",
-    href: "/module-management",
-    section: "actions",
-    icon: "BookOpenIcon",
-    tourContent: "Manage your university modules and events here.",
-    keywords: ["modules", "module management", "events", "manage events"],
-    requiresUniversity: true,
-    showInNavbar: true,
-    showInCommandPalette: true,
-  },
-
-  {
     id: "map",
     label: "Map",
     href: "/map",
@@ -124,6 +111,19 @@ export const navigationItems: NavigationItem[] = [
     icon: "MapIcon",
     tourContent: "Open the university map.",
     keywords: ["map", "campus", "locations", "venues"],
+    requiresUniversity: true,
+    showInNavbar: true,
+    showInCommandPalette: true,
+  },
+
+  {
+    id: "module-management",
+    label: "Module Management",
+    href: "/module-management",
+    section: "actions",
+    icon: "BookOpenIcon",
+    tourContent: "Manage your university modules and events here.",
+    keywords: ["modules", "module management", "events", "manage events"],
     requiresUniversity: true,
     showInNavbar: true,
     showInCommandPalette: true,

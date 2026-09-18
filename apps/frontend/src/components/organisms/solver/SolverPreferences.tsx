@@ -101,6 +101,24 @@ export default function SolverPreferences({
     );
   }
 
+  function handleCreateTimetable() {
+    const cleanedName = timetableName.trim();
+
+    if (!cleanedName) {
+      window.dispatchEvent(
+        new CustomEvent(errorName, {
+          detail: {
+            userMessage: "Please provide a timetable name.",
+          },
+        }),
+      );
+
+      return;
+    }
+
+    enrollUser();
+  }
+
   const { data: resultOfPoll, isFetching: pollFetching } = useQuery({
     queryKey: ["solver", "poll"],
     queryFn: async () => {
@@ -200,7 +218,7 @@ export default function SolverPreferences({
         const resultTT = await timetableBuilder.send({
           body: {
             eventIds: typeShiftedResults?.timetableSolution.selectedEventIds,
-            timetableName: timetableName == "" ? "My timetable" : timetableName,
+            timetableName: timetableName.trim(),
           },
         });
         return resultTT;
@@ -315,19 +333,7 @@ export default function SolverPreferences({
             id="btn-upload-and-create-timetable"
             disabled={loadingStatus()}
             type="button"
-            onClick={() => {
-              if (timetableName != "") {
-                enrollUser();
-              } else {
-                window.dispatchEvent(
-                  new CustomEvent(errorName, {
-                    detail: {
-                      userMessage: "Please ensure you provide a timetable name",
-                    },
-                  }),
-                );
-              }
-            }}
+            onClick={handleCreateTimetable}
             className="h-8 w-fit"
           >
             Upload and Create Timetable
