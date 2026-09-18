@@ -1,12 +1,15 @@
 "use client";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { AdvancedMarker, Pin } from "@vis.gl/react-google-maps";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { MapScreen } from "@/components/organisms/map/MapScreen";
 import { useShapeCreator } from "@/hooks/useShapeCreator";
 import { Badge } from "@/components/atoms/baseShadcn/badge";
-import { getAllBuildingsQ } from "../../../../utilities/building/buildingQueries";
+import {
+  getAllBuildingsHeatmapQ,
+  getAllBuildingsQ,
+} from "../../../../utilities/building/buildingQueries";
 import { BuildingType } from "../../../../utilities/building/buildingRequestBuilder";
 import {
   Sheet,
@@ -17,13 +20,23 @@ import {
 import NoRoleSelected from "@/components/molecules/roleManagement/NoRoleSelected";
 import { AdminDrawControls } from "@/components/organisms/map/AdminDrawControls";
 import { RouteLine } from "@/components/organisms/map/RouteLine";
-import { getActiveRouteQ } from "../../../../utilities/route/routeQueries";
+import {
+  getActiveRouteQ,
+  getRoutingHeatmapQ,
+} from "../../../../utilities/route/routeQueries";
 import {
   UniversityStateLoading,
   useUniversityState,
 } from "@/hooks/useUniversityState";
 import Tutorial from "@/components/organisms/nav/Tutorial";
 import { useBuildingDraw } from "@/hooks/useBuildingDraw";
+import {
+  buildingHeatmapRangeToPoints,
+  routeHeatmapRangeToPoints,
+  WeightedPoint,
+} from "../../../../utilities/heatmaps/heatmapAdapter";
+import { HourRangeSelect } from "@/components/molecules/heatmaps/HourRangeSelect";
+import { HeatmapOverlay } from "@/components/organisms/heatmaps/HeatmapOverlay";
 
 interface GeoJsonPolygon {
   type: "Polygon";
@@ -71,6 +84,12 @@ export function UniMap() {
   const [selectedDate, setSelectedDate] = useState(() =>
     new Date().toISOString().slice(0, 10),
   );
+
+  //heatmap use state stuff
+  const [mapMode, setMapMode] = useState<"route" | "heatmap">("route");
+  const [fromHour, setFromHour] = useState(8);
+  const [toHour, setToHour] = useState(15);
+
   //this needs to be in a very specific format. Looks super complicated, but the backend cries when I don't send the request in this format
   const [selectedTime, setSelectedTime] = useState(() => {
     const now = new Date();
@@ -85,8 +104,36 @@ export function UniMap() {
   //console.log("active route query:", { selectedDate, selectedTime });
   const { data: activeRoute } = useQuery({
     ...getActiveRouteQ({ date: selectedDate, time: selectedTime }),
-    enabled: !isLoading && university != null,
+    enabled: !isLoading && university != null && mapMode === "route",
   });
+
+  //heatmap queries
+  const { data: buildingHeatmaps = [] } = useQuery({
+    ...getAllBuildingsHeatmapQ({ date: selectedDate }),
+    enabled: !isLoading && university != null && mapMode === "heatmap",
+  });
+
+  const { data: routeHeatmaps = [] } = useQuery({
+    ...getRoutingHeatmapQ({ date: selectedDate }),
+    enabled: !isLoading && university != null && mapMode === "heatmap",
+  });
+
+  const buildingHeatmapPoints: WeightedPoint[] = useMemo(() => {
+    if (mapMode !== "heatmap") {
+      return [];
+    }
+
+    return buildingHeatmapRangeToPoints(buildingHeatmaps, fromHour, toHour);
+  }, [mapMode, buildingHeatmaps, fromHour, toHour]);
+
+  const routeHeatmapPoints: WeightedPoint[] = useMemo(() => {
+    if (mapMode !== "heatmap") {
+      return [];
+    }
+
+    return routeHeatmapRangeToPoints(routeHeatmaps, fromHour, toHour);
+  }, [mapMode, routeHeatmaps, fromHour, toHour]);
+
   const role = university?.role;
   const isAssignedRole = role != null;
 
@@ -137,36 +184,79 @@ export function UniMap() {
           id="map-date-time"
           className="flex items-center gap-4 rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] p-4"
         >
+          <div className="flex rounded-lg border border-[var(--border)] overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setMapMode("route")}
+              className={`px-2 py-1 text-sm cursor-pointer ${
+                mapMode === "route"
+                  ? ""
+                  : "bg-bg-elevated text-(--text-secondary)"
+              }`}
+            >
+              Route
+            </button>
+            <button
+              type="button"
+              onClick={() => setMapMode("heatmap")}
+              className={`px-2 py-1 text-sm cursor-pointer ${
+                mapMode === "heatmap"
+                  ? ""
+                  : "bg-bg-elevated text-(--text-secondary) "
+              }`}
+            >
+              Heatmap
+            </button>
+          </div>
+
           <input
             type="date"
             value={selectedDate}
+            className="text-sm"
             onChange={(e) => setSelectedDate(e.target.value)}
           />
 
-          <input
-            type="time"
-            value={selectedTime}
-            onChange={(e) => setSelectedTime(e.target.value)}
-            className="text-sm"
-          />
+          {mapMode === "route" && (
+            <>
+              <input
+                type="time"
+                value={selectedTime}
+                onChange={(e) => setSelectedTime(e.target.value)}
+                className="text-sm"
+              />
 
-          {activeRoute?.status === "NONE" && (
-            <span className="text-sm text-[var(--text-secondary)]">
-              Select a Time and Date to View Attending Event Routes
-            </span>
+              {activeRoute?.status === "NONE" && (
+                <span className="text-sm text-[var(--text-secondary)]">
+                  Select a Time and Date to View Attending Event Routes
+                </span>
+              )}
+
+              {activeRoute?.status === "AT_VENUE" && (
+                <span className="text-sm text-[var(--text-secondary)]">
+                  At {activeRoute.fromEventName}
+                </span>
+              )}
+
+              {activeRoute?.status === "MOVING" && (
+                <span className="text-sm text-[var(--text-secondary)]">
+                  Walking from {activeRoute.fromEventName} to{" "}
+                  {activeRoute.toEventName}
+                </span>
+              )}
+            </>
           )}
 
-          {activeRoute?.status === "AT_VENUE" && (
-            <span className="text-sm text-[var(--text-secondary)]">
-              At {activeRoute.fromEventName}
-            </span>
-          )}
-
-          {activeRoute?.status === "MOVING" && (
-            <span className="text-sm text-[var(--text-secondary)]">
-              Walking from {activeRoute.fromEventName} to{" "}
-              {activeRoute.toEventName}
-            </span>
+          {mapMode === "heatmap" && (
+            <HourRangeSelect
+              value={{
+                startTime: `${String(fromHour).padStart(2, "0")}:00`,
+                endTime: `${String(toHour).padStart(2, "0")}:00`,
+              }}
+              onChange={(slot) => {
+                setFromHour(parseInt(slot.startTime.split(":")[0], 10));
+                setToHour(parseInt(slot.endTime.split(":")[0], 10));
+              }}
+            />
           )}
         </div>
 
@@ -177,6 +267,13 @@ export function UniMap() {
             polygonPath={polygonPath}
             pinLocation={pinLocation}
           >
+            {mapMode === "heatmap" && (
+              <HeatmapOverlay
+                buildingPoints={buildingHeatmapPoints}
+                routePoints={routeHeatmapPoints}
+              />
+            )}
+
             {buildings.map((building) => (
               <div key={building.BuildingID}>
                 {building.location && (
