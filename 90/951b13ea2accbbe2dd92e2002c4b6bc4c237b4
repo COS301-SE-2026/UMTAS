@@ -1,0 +1,18 @@
+apps/backend/src/Course/course.enrollment.service.spec.ts
+  h_2d4b3dca70a3d8 210-213,271-277,316-318
+apps/frontend/src/components/organisms/attendance/AttendanceScanner.tsx
+  h_2d4b3dca70a3d8 5-7,11,14,16-22,25,27,30-90,92-196,238-239,243,246-249
+apps/frontend/src/components/templates/attendance/ScannerTemplate.tsx
+  h_2d4b3dca70a3d8 6,14,16,37,42
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "90951b13ea2accbbe2dd92e2002c4b6bc4c237b4",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
