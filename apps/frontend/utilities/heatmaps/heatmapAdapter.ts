@@ -99,15 +99,19 @@ function haversineMetres(
 }
 
 //adjust this to fine tune the look. smaller = smoother line, more points
-const HEATMAP_SPACING_METRES = 15;
+const HEATMAP_SPACING_METRES = 10;
 
 export function routePathToPoints(
   path: { lat: number; lng: number }[],
   weight: number,
 ): WeightedPoint[] {
+  if (!path || path.length === 0) {
+    return [];
+  }
+
   const points: WeightedPoint[] = [];
 
-  for (let i = 0; i < path.length; i++) {
+  for (let i = 0; i < path.length - 1; i++) {
     const start = path[i];
     const end = path[i + 1];
     const segmentLength = haversineMetres(start, end);
@@ -121,17 +125,15 @@ export function routePathToPoints(
       points.push({
         position: [
           start.lng + (end.lng - start.lng) * t,
-          start.lng + (end.lng - start.lng) * t,
+          start.lat + (end.lat - start.lat) * t,
         ],
         weight,
       });
     }
   }
 
-  if (path.length > 0) {
-    const last = path[path.length - 1];
-    points.push({ position: [last.lng, last.lat], weight });
-  }
+  const last = path[path.length - 1];
+  points.push({ position: [last.lng, last.lat], weight });
 
   return points;
 }
