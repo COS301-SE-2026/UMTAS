@@ -4,6 +4,8 @@ import {
   getActiveRouteQuery,
   getRouteQuery,
   getRouterBuilder,
+  getRoutingHeatmapBuilder,
+  getRoutingHeatmapQuery,
 } from "./routeRequestBuilder";
 
 export function getRouteQ(query: getRouteQuery) {
@@ -37,6 +39,17 @@ export function getActiveRouteQ(query: getActiveRouteQuery) {
       }
 
       const result = await res.json();
+      return result;
+    },
+  });
+}
+
+export function getRoutingHeatmapQ(query: getRoutingHeatmapQuery) {
+  return queryOptions({
+    queryKey: ["routes", "heatmap", query.date, query.view] as const,
+    queryFn: async () => {
+      const result = (await new getRoutingHeatmapBuilder().send({ query }))
+        .routes;
       return result;
     },
   });
