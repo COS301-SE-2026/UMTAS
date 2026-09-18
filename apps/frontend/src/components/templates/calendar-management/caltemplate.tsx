@@ -156,7 +156,7 @@ export default function CalTemplate() {
       <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-6 px-4 sm:px-6 lg:px-8 capitalize">
         <div
           id="calendar-management"
-          className="w-full max-w-7xl overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] shadow-sm"
+          className="mx-auto w-full max-w-7xl overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] shadow-sm"
         >
           {/* Header */}
           <div className="border-b border-[var(--border)] px-6 py-5">
