@@ -1822,6 +1822,26 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/routes/heatmap": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get route demand heatmap
+     * @description Returns route demand metrics for all persisted route variants in the selected university for a single date.
+     */
+    get: operations["getRoutingHeatmap"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/routes": {
     parameters: {
       query?: never;
@@ -4468,6 +4488,112 @@ export interface components {
        * @example lalala-123
        */
       GoogleMapID: string | null;
+    };
+    RouteHeatmapBuildingDto: {
+      /** Format: uuid */
+      buildingId: string;
+      /** @example Information Technology Building */
+      buildingName: string;
+    };
+    RouteHeatmapHourlyBucketDto: {
+      /**
+       * @description Expected number of students projected to travel route
+       * @example 42
+       */
+      projected: number;
+      /**
+       * @description Maximum expected route demand based on enrollments.
+       * @example 85
+       */
+      worstCase: number;
+      /**
+       * @description Actual number of students recorded on the route
+       * @example null
+       */
+      actual: Record<string, never> | null;
+      /**
+       * @description Hour for this bucket | 0 - 23
+       * @example 9
+       */
+      hour: number;
+    };
+    RouteHeatmapTransitionDto: {
+      /** Format: uuid */
+      originEventId: string;
+      /** Format: uuid */
+      destinationEventId: string;
+      /** @example COS 301 Lecture */
+      originEventName: string;
+      /** @example COS 301 Tutorial */
+      destinationEventName: string;
+      /** @example 10:20 */
+      originEndTime: string;
+      /** @example 11:00 */
+      destinationStartTime: string;
+      /**
+       * @description Number of students projected to make this transition.
+       * @example 20
+       */
+      projected: number;
+      /**
+       * @description Maximum expected students for this transition.
+       * @example 35
+       */
+      worstCase: number;
+    };
+    RouteHeatmapDto: {
+      /**
+       * @description Expected number of students projected to travel route
+       * @example 42
+       */
+      projected: number;
+      /**
+       * @description Maximum expected route demand based on enrollments.
+       * @example 85
+       */
+      worstCase: number;
+      /**
+       * @description Actual number of students recorded on the route
+       * @example null
+       */
+      actual: Record<string, never> | null;
+      /** Format: uuid */
+      routeId: string;
+      /**
+       * @description Zero-based route variant index
+       * @example 0
+       */
+      routeIndex: number;
+      origin: components["schemas"]["RouteHeatmapBuildingDto"];
+      destination: components["schemas"]["RouteHeatmapBuildingDto"];
+      /**
+       * @description Walking distance in metres.
+       * @example 650
+       */
+      distanceMetres: number;
+      /**
+       * @description Colour assigned to the route for map rendering.
+       * @example #0000FF
+       */
+      displayColour: string;
+      /** @description Polyline coordinates for rendering the route. */
+      pathCoordinates: components["schemas"]["LatLngDto"][];
+      /** @description Demand split into 24 hourly buckets */
+      hourly: components["schemas"]["RouteHeatmapHourlyBucketDto"][];
+      /** @description Events contributing demand to this route */
+      transitions: components["schemas"]["RouteHeatmapTransitionDto"][];
+    };
+    RoutingHeatmapResponseDto: {
+      /** Format: uuid */
+      universityId: string;
+      /**
+       * Format: date
+       * @example 2026-09-18
+       */
+      date: string;
+      /** @enum {string} */
+      view: "projected" | "worstCase" | "all";
+      routes: components["schemas"]["RouteHeatmapDto"][];
     };
     RouteDto: {
       /**
@@ -9502,6 +9628,54 @@ export interface operations {
         content?: never;
       };
       409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  getRoutingHeatmap: {
+    parameters: {
+      query: {
+        /** @description Date for which to return route heatmap statistics */
+        date: string;
+        /** @description WHich metrics to include */
+        view?: "projected" | "worstCase" | "all";
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Routing heatmap returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RoutingHeatmapResponseDto"];
+        };
+      };
+      /** @description Invalid routing heatmap query parameters */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["UnauthorizedError"];
+      /** @description No university selected or insufficient permissions */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Required route, event, venue, or building data was not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
       500: components["responses"]["InternalError"];
     };
   };
