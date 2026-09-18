@@ -5,6 +5,7 @@ use std::{usize, vec};
 use wasm_bindgen::prelude::*;
 
 pub mod image_upscaler;
+pub mod pose_inference;
 
 pub struct SliceFormat {
     x: usize,
