@@ -69,11 +69,12 @@ export default function GoogleExportDialog({
       )}
 
       {!hasGoogleCalendarAccess ? (
-        <div className="flex flex-col items-start justify-center gap-4">
-          <p className="text-start text-sm">
+        <div className="flex w-full flex-col items-center justify-center gap-4 text-center">
+          <p className="max-w-sm text-sm">
             Connect your Google Account to Add this Timetable to Your Google
             Calendar.
           </p>
+
           <Button
             type="button"
             className="w-fit cursor-pointer"
@@ -91,25 +92,30 @@ export default function GoogleExportDialog({
             selectedScheduleId={selectedSchedule?.id ?? ""}
             onScheduleChange={onScheduleChange}
           />
+
           <div className="w-full space-y-2 text-center">
             <p className="text-sm font-medium">
               Export “{selectedSchedule?.name ?? "selected timetable"}”
             </p>
+
             <p className="text-xs text-muted-foreground">
               This will update your UMTAS Calendar in Google Calendar.
             </p>
           </div>
-          <Button
-            type="button"
-            className="w-full max-w-52"
-            disabled={!selectedSchedule || isExporting}
-            onClick={() => {
-              if (selectedSchedule) onExport(selectedSchedule.id);
-            }}
-          >
-            <GoogleIcon />
-            {isExporting ? "Exporting…" : "Add to Google Calendar"}
-          </Button>
+
+          <div className="flex w-full justify-center">
+            <Button
+              type="button"
+              className="w-full max-w-52"
+              disabled={!selectedSchedule || isExporting}
+              onClick={() => {
+                if (selectedSchedule) onExport(selectedSchedule.id);
+              }}
+            >
+              <GoogleIcon />
+              {isExporting ? "Exporting…" : "Add to Google Calendar"}
+            </Button>
+          </div>
         </div>
       )}
     </DialogContent>
