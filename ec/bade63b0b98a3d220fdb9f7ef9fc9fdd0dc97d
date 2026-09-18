@@ -1,0 +1,16 @@
+apps/frontend/src/components/organisms/solver/SolverReview.tsx
+  h_2d4b3dca70a3d8 9,25-26,28,30-62
+apps/frontend/src/types/Nav.ts
+  h_2d4b3dca70a3d8 4,80-93,136,199-210
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "ecbade63b0b98a3d220fdb9f7ef9fc9fdd0dc97d",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
