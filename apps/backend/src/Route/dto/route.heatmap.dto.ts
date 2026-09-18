@@ -75,6 +75,7 @@ export class RouteHeatmapMetricsDto {
     description: 'Actual number of students recorded on the route',
     example: null,
     nullable: true,
+    type: 'number',
   })
   @IsOptional()
   @IsInt()

@@ -57,6 +57,7 @@ export class BaseHeatmapMetricsDto {
       'Actual attendance. Null until a check-in source is implemented.',
     example: null,
     nullable: true,
+    type: Number,
   })
   @IsOptional()
   @IsInt()
@@ -68,6 +69,7 @@ export class BaseHeatmapMetricsDto {
       'Projected attendance divided by capacity. Null when capacity is zero.',
     example: 0.375,
     nullable: true,
+    type: Number,
   })
   @IsNumber()
   projectedUtilisation!: number | null;
@@ -77,6 +79,7 @@ export class BaseHeatmapMetricsDto {
       'Worst-case attendance divided by capacity. Null when capacity is zero.',
     example: 1,
     nullable: true,
+    type: Number,
   })
   @IsNumber()
   worstCaseUtilisation!: number | null;

@@ -12131,19 +12131,19 @@
           "actual": {
             "nullable": true,
             "minimum": 0,
-            "type": "object",
+            "type": "number",
             "description": "Actual attendance. Null until a check-in source is implemented.",
             "example": null
           },
           "projectedUtilisation": {
             "nullable": true,
-            "type": "object",
+            "type": "number",
             "description": "Projected attendance divided by capacity. Null when capacity is zero.",
             "example": 0.375
           },
           "worstCaseUtilisation": {
             "nullable": true,
-            "type": "object",
+            "type": "number",
             "description": "Worst-case attendance divided by capacity. Null when capacity is zero.",
             "example": 1
           },
@@ -12189,19 +12189,19 @@
           "actual": {
             "nullable": true,
             "minimum": 0,
-            "type": "object",
+            "type": "number",
             "description": "Actual attendance. Null until a check-in source is implemented.",
             "example": null
           },
           "projectedUtilisation": {
             "nullable": true,
-            "type": "object",
+            "type": "number",
             "description": "Projected attendance divided by capacity. Null when capacity is zero.",
             "example": 0.375
           },
           "worstCaseUtilisation": {
             "nullable": true,
-            "type": "object",
+            "type": "number",
             "description": "Worst-case attendance divided by capacity. Null when capacity is zero.",
             "example": 1
           }
@@ -12251,19 +12251,19 @@
           "actual": {
             "nullable": true,
             "minimum": 0,
-            "type": "object",
+            "type": "number",
             "description": "Actual attendance. Null until a check-in source is implemented.",
             "example": null
           },
           "projectedUtilisation": {
             "nullable": true,
-            "type": "object",
+            "type": "number",
             "description": "Projected attendance divided by capacity. Null when capacity is zero.",
             "example": 0.375
           },
           "worstCaseUtilisation": {
             "nullable": true,
-            "type": "object",
+            "type": "number",
             "description": "Worst-case attendance divided by capacity. Null when capacity is zero.",
             "example": 1
           },
@@ -12651,7 +12651,7 @@
           "actual": {
             "nullable": true,
             "minimum": 0,
-            "type": "object",
+            "type": "number",
             "description": "Actual number of students recorded on the route",
             "example": null
           },
@@ -12739,7 +12739,7 @@
           "actual": {
             "nullable": true,
             "minimum": 0,
-            "type": "object",
+            "type": "number",
             "description": "Actual number of students recorded on the route",
             "example": null
           },
