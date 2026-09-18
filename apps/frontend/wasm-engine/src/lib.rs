@@ -184,7 +184,7 @@ pub fn infer_detection_data(
         all_people.extend(global_adjusted_person);
     }
 
-    let res_people = non_maximum_sepression(all_people, 0.45);
+    let res_people = non_maximum_sepression(all_people, 0.35);
 
     return serde_json::to_string(&res_people).map_err(|e| JsValue::from_str(&e.to_string()));
 }
@@ -331,7 +331,7 @@ pub fn is_enveloped(box1: &DetectedPerson, box2: &DetectedPerson) -> bool {
     let b2_area = box2.width * box2.height;
     let smaller_area = b1_area.min(b2_area);
 
-    return (intersection_area / smaller_area) >= 0.50;
+    return (intersection_area / smaller_area) >= 0.20;
 }
 
 pub fn non_maximum_sepression(

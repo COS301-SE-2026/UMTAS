@@ -24,19 +24,20 @@ async function initDetection() {
     executionProviders: ["webgpu", "wasm"],
   });
 }
-
-function createSlices(payload: PIXEL_PAYLOAD) {
+async function createSlices(payload: PIXEL_PAYLOAD): Promise<Float32Array[]> {
   const wasmPixels = new Uint8Array(
     payload.pixelData.buffer,
     payload.pixelData.byteOffset,
     payload.pixelData.byteLength,
   );
 
-  return slice_image_data(
+  const slices = await slice_image_data_gpu(
     wasmPixels,
     payload.width,
     payload.height,
-  ) as Float32Array[];
+  );
+
+  return slices as Float32Array[];
 }
 
 async function runModel(slices: Float32Array[], payload: PIXEL_PAYLOAD) {
@@ -89,7 +90,7 @@ self.onmessage = async (event: MessageEvent) => {
     }
     console.log("got to before taking slices");
     const tSliceStart = performance.now();
-    const slices = createSlices(payload);
+    const slices = await createSlices(payload);
     console.log(
       `[Worker] createSlices took: ${((performance.now() - tSliceStart) / 1000).toFixed(3)}s`,
     );
