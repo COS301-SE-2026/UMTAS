@@ -211,6 +211,14 @@ pub fn run_upscaler(device: &wgpu::Device, queue: &wgpu::Queue, buffers: &Buffer
             },
         ],
     });
+
+    let pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
+        label: Some("PIPELINE_LAYOUT"),
+        bind_group_layouts: &[Some(&bind_grp_layout)],
+        immediate_size: 0,
+    });
+
+    
 }
 
 // needed to read the output to staging
