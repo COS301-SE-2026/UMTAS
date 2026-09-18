@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 
-use crate::DetectedPerson;
+use crate::{DetectedPerson, intersection_over_union, is_enveloped};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Keypoint {
@@ -101,4 +101,89 @@ pub fn read_result(slice_data: &[f32]) -> Result<Vec<DetectedPersonPose>, String
     }
 
     return Ok(people);
+}
+
+pub fn map_to_global(
+    mut people: Vec<DetectedPersonPose>,
+    quad_idx: usize,
+) -> Vec<DetectedPersonPose> {
+    // will map a single array of People changing co-ords to be global instead of local
+
+    let (offset_x, offset_y) = match quad_idx {
+        0 => (0.0, 0.0),
+        1 => (640.0, 0.0),
+        2 => (0.0, 640.0),
+        3 => (640.0, 640.0),
+        _ => (0.0, 0.0),
+    };
+
+    for person in &mut people {
+        // shift to upscaled image size
+        person.person.center_x += offset_x;
+        person.person.center_y += offset_y;
+        person.person.top_left_x += offset_x;
+        person.person.top_left_y += offset_y;
+
+        scale_person(&mut person.person);
+
+        for kp in &mut person.keypoints {
+            kp.x += offset_x;
+            kp.x *= 0.5;
+            kp.y += offset_y;
+            kp.y *= 0.5;
+        }
+    }
+
+    return people;
+}
+pub fn scale_person(person: &mut DetectedPerson) -> &mut DetectedPerson {
+    person.center_x *= 0.5;
+    person.center_y *= 0.5;
+    person.top_left_x *= 0.5;
+    person.top_left_y *= 0.5;
+    person.width *= 0.5;
+    person.height *= 0.5;
+
+    return person;
+}
+
+pub fn non_maximum_sepression(
+    mut people: Vec<DetectedPersonPose>,
+    iou_threshold: f32,
+) -> Vec<DetectedPersonPose> {
+    // standard means of weeding out redundant overlapping boxes
+    // order list in decending order of confidence score
+    // take a person and go down list comparing IOU against box.
+    // If any box has higher iou than threshold discard-> same person
+    // rather keep an parallel array of all discarded ones only
+
+    let mut final_people: Vec<DetectedPersonPose> = Vec::new();
+    // parallel array for whos been removed
+    let mut removed_people: Vec<bool> = vec![false; people.len()];
+
+    people.sort_by(|a, b| {
+        b.person
+            .confidence
+            .partial_cmp(&a.person.confidence)
+            .unwrap_or(std::cmp::Ordering::Equal)
+    });
+
+    for (idx, person) in people.iter().enumerate() {
+        if removed_people[idx] == false {
+            final_people.push(person.clone());
+            for compare_index in idx..people.len() {
+                let iou = intersection_over_union(&person.person, &people[compare_index].person);
+                if iou >= iou_threshold {
+                    removed_people[compare_index] = true;
+                }
+                let is_within = is_enveloped(&person.person, &people[compare_index].person);
+
+                if is_within {
+                    removed_people[compare_index] = true;
+                }
+            }
+        }
+    }
+
+    return final_people;
 }
