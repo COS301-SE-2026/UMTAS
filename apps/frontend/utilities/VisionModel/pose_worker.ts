@@ -11,7 +11,7 @@ async function initWasm() {
   wasmLoaded = true;
 }
 async function initDetection() {
-  const fullUrl = `${location.origin}/models/yolov11n.onnx`;
+  const fullUrl = `${location.origin}/models/yolov11n-pose.onnx`;
 
   DetectSession = await ort.InferenceSession.create(fullUrl, {
     executionProviders: ["webgpu", "wasm"],
@@ -81,7 +81,7 @@ self.onmessage = async (event: MessageEvent) => {
         `[Worker] Init Pose Session took: ${((performance.now() - tSession) / 1000).toFixed(3)}s`,
       );
     }
-    console.log("got to before taking slices");
+
     const tSliceStart = performance.now();
     const slices = await createSlices(payload);
     console.log(
@@ -92,7 +92,7 @@ self.onmessage = async (event: MessageEvent) => {
       const tRunStart = performance.now();
       const results = await runModel(slices, payload);
       console.log(
-        `[Worker] runModel total took: ${((performance.now() - tRunStart) / 1000).toFixed(3)}s`,
+        `[Worker] run pose Model total took: ${((performance.now() - tRunStart) / 1000).toFixed(3)}s`,
       );
 
       const transferBuffers = results.map(

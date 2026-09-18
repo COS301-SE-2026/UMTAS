@@ -1,6 +1,5 @@
 import {
-  DetectedPerson,
-  PROCESS_DETECT_DATA_MESSAGE,
+  PROCESS_POSE_DATA_MESSAGE,
   RESULT_PROCESS_POSE_DATA,
 } from "./messageTypes";
 
@@ -22,7 +21,7 @@ class Pose_Data_Manager {
       this.isProcessing = false;
     }
   }
-  public run(sliced_results: Float32Array[]): Promise<DetectedPerson[] | null> {
+  public run(sliced_results: Float32Array[]): Promise<null> {
     if (this.isProcessing || !this.worker) {
       return Promise.resolve(null);
     }
@@ -46,15 +45,15 @@ class Pose_Data_Manager {
       };
       this.worker?.addEventListener("message", handleMessage);
 
-      const detectMessage: PROCESS_DETECT_DATA_MESSAGE = {
-        eventType: "PROCESS_DETECT_DATA",
+      const poseMessage: PROCESS_POSE_DATA_MESSAGE = {
+        eventType: "PROCESS_POSE_DATA",
         payload: {
           sliced_results: sliced_results,
         },
       };
 
       const transferBuffers = sliced_results.map((arr) => arr.buffer);
-      this.worker?.postMessage(detectMessage, transferBuffers);
+      this.worker?.postMessage(poseMessage, transferBuffers);
     });
   }
 

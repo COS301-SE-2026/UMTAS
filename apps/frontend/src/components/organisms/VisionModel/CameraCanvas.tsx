@@ -83,6 +83,7 @@ function CanvasWebcam({
       detectionManager.start();
       detection_data_manager.start();
     } else {
+      detectedPeopleRef.current = [];
       detectionManager.terminate();
       detection_data_manager.terminate();
     }
