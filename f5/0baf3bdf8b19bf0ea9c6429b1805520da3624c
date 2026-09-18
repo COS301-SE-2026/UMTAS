@@ -1,0 +1,14 @@
+apps/backend/src/Course/course.enrollment.service.spec.ts
+  h_2d4b3dca70a3d8 210-217,276-278,323-327
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "f50baf3bdf8b19bf0ea9c6429b1805520da3624c",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
