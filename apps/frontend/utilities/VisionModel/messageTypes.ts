@@ -4,7 +4,7 @@ export type MessageType =
   | "DETECT_FREE"
   | "POSE_FREE"
   | "DETECT_DATA"
-  | "DETECT_POSE"
+  | "POSE_DATA"
   | "PROCESS_DETECT_DATA"
   | "PROCESS_POSE_DATA"
   | "DETECT_DATA_PARSED"
@@ -22,6 +22,7 @@ export type PIXEL_PAYLOAD = {
 };
 
 export type DETECT_MESSAGE = VisionModelEvent<"DETECT", PIXEL_PAYLOAD>;
+export type POSE_MESSAGE = VisionModelEvent<"POSE", PIXEL_PAYLOAD>;
 
 export type DETECT_DATA_PAYLOAD = {
   results: Float32Array[];
@@ -29,6 +30,11 @@ export type DETECT_DATA_PAYLOAD = {
 
 export type DETECT_DATA_MESSAGE = VisionModelEvent<
   "DETECT_DATA",
+  DETECT_DATA_PAYLOAD
+>;
+
+export type POSE_DATA_MESSAGE = VisionModelEvent<
+  "POSE_DATA",
   DETECT_DATA_PAYLOAD
 >;
 
