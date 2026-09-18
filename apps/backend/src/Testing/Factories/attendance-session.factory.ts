@@ -16,12 +16,6 @@ export function createAttendanceSession(
     eventID: randomUUID(),
     scheduledStartAt: start,
     scheduledEndAt: end,
-    captureOpensAt: start,
-    captureClosesAt: end,
-    state: 'SCHEDULED',
-    captureMode: 'IDENTIFIED',
-    openedAt: null,
-    closedAt: null,
     createdAt: start,
     updatedAt: start,
     ...overrides,
@@ -35,9 +29,6 @@ export function createAttendanceSessionDto(
     eventID: randomUUID(),
     scheduledStartAt: start.toISOString(),
     scheduledEndAt: end.toISOString(),
-    captureOpensAt: start.toISOString(),
-    captureClosesAt: end.toISOString(),
-    captureMode: 'IDENTIFIED',
     ...overrides,
   };
 }

@@ -16,6 +16,7 @@ import {
   UniversityEvent,
   UniversityRole,
 } from '../../../src/entities';
+import { localDateAt } from '../../../src/Attendance/attendance-occurrence';
 import { flowKey, type OutputIntegrationStep } from '../framework/contracts';
 import type { AuthenticationStepOutput } from './authentication.step';
 import type { UniversityOutput } from './university.step';
@@ -30,11 +31,11 @@ export type AttendanceSessionLifecyclePlan = {
 
 export type AttendanceSessionLifecycleOutput = {
   readonly sessionId: string;
-  readonly finalState: 'CLOSED';
+  readonly finalState: 'PERSISTED';
 };
 
 export const ATTENDANCE_SESSION_LIFECYCLE_STEP_NAME =
-  'create, open, record, and close verified attendance';
+  'create, record, and correct verified attendance';
 
 export function attendanceSessionLifecycleStep<TPlan>(
   select: (plan: TPlan) => AttendanceSessionLifecyclePlan,
@@ -107,9 +108,6 @@ export function attendanceSessionLifecycleStep<TPlan>(
           eventID: eventId,
           scheduledStartAt: date(-3_600_000),
           scheduledEndAt: date(3_600_000),
-          captureOpensAt: date(-60_000),
-          captureClosesAt: date(600_000),
-          captureMode: 'AGGREGATE',
         },
       });
       expectStatus(created, 201, 'create verified attendance session');
@@ -117,16 +115,9 @@ export function attendanceSessionLifecycleStep<TPlan>(
       expectString(created.body.SessionID, 'attendance session ID');
       const sessionId = created.body.SessionID;
 
-      const opened = await operatorActor.request.post(
-        `/attendance/sessions/${sessionId}/open`,
-      );
-      expectStatus(opened, 201, 'open attendance session');
-      expectObject(opened.body, 'open attendance session');
-      assert.equal(opened.body.state, 'OPEN');
-
       const count = await operatorActor.request.put(
         `/attendance/sessions/${sessionId}/attendance/count`,
-        { json: { guestCount: 7 } },
+        { json: { guestCount: 7, captureMethod: 'MANUAL' } },
       );
       expectStatus(count, 200, 'set manual guest count');
       expectObject(count.body, 'set manual guest count');
@@ -146,9 +137,6 @@ export function attendanceSessionLifecycleStep<TPlan>(
             eventID: eventId,
             scheduledStartAt: date(-7_200_000),
             scheduledEndAt: date(-3_600_000),
-            captureOpensAt: date(-60_000),
-            captureClosesAt: date(600_000),
-            captureMode: 'IDENTIFIED',
           },
         },
       );
@@ -160,20 +148,213 @@ export function attendanceSessionLifecycleStep<TPlan>(
         ModuleID: moduleId,
         UserID: operator.userId,
       });
-      const identifiedOpened = await operatorActor.request.post(
-        `/attendance/sessions/${identifiedSessionId}/open`,
+
+      const currentInstant = new Date();
+      const localDate = localDateAt(
+        currentInstant,
+        process.env.ATTENDANCE_TIME_ZONE ?? 'Africa/Johannesburg',
       );
-      expectStatus(identifiedOpened, 201, 'open identified session');
+      const formatLocalTime = (value: Date) =>
+        new Intl.DateTimeFormat('en-GB', {
+          timeZone: process.env.ATTENDANCE_TIME_ZONE ?? 'Africa/Johannesburg',
+          hour: '2-digit',
+          minute: '2-digit',
+          hourCycle: 'h23',
+        }).format(value);
+      await db
+        .update(Event)
+        .set({
+          eventCriteria: {
+            eventSource: EventSource.UNIVERSITY,
+            moduleId,
+            date: localDate,
+            startTime: formatLocalTime(
+              new Date(currentInstant.getTime() - 5 * 60_000),
+            ),
+            endTime: formatLocalTime(
+              new Date(currentInstant.getTime() + 20 * 60_000),
+            ),
+          },
+        })
+        .where(eq(Event.eventID, eventId));
+
+      const student = context.actor('attendance-student');
+      const studentEmail = `attendance-student-${randomUUID()}@test.umtas.local`;
+      await authenticateRealActor(
+        student,
+        {
+          email: studentEmail,
+          password: 'Attendance!Student2026',
+          name: 'Attendance Student',
+        },
+        async () => ({
+          path: `/auth/verify-email?token=${encodeURIComponent(
+            await waitForVerificationToken(studentEmail),
+          )}`,
+        }),
+      );
+      const studentSession = await student.request.get('/auth/get-session');
+      expectStatus(studentSession, 200, 'read attendance student session');
+      expectObject(studentSession.body, 'read attendance student session');
+      const studentUser = studentSession.body.user as Record<string, unknown>;
+      expectString(studentUser.id, 'attendance student ID');
+      await db.insert(UniversityRole).values({
+        UserID: studentUser.id,
+        UniversityID: university.UniversityID,
+        role: 'STUDENT',
+      });
+      const studentSelected = await student.request.post(
+        '/auth/select-university',
+        { json: { uniId: university.UniversityID } },
+      );
+      expectStatus(studentSelected, [200, 201], 'select student university');
+      await db.insert(ModuleEnrollment).values({
+        ModuleID: moduleId,
+        UserID: studentUser.id,
+      });
+
+      const preparedTag = await operatorActor.request.post(
+        '/attendance/nfc-tags/registration',
+      );
+      expectStatus(preparedTag, 201, 'prepare NFC sticker registration');
+      expectObject(preparedTag.body, 'prepare NFC sticker registration');
+      expectString(preparedTag.body.tagId, 'prepared NFC tag ID');
+      expectString(preparedTag.body.token, 'prepared NFC token');
+      expectString(preparedTag.body.activationTicket, 'activation ticket');
+      const firstTagId = preparedTag.body.tagId;
+      const firstToken = preparedTag.body.token;
+      const confirmedTag = await operatorActor.request.post(
+        '/attendance/nfc-tags/registration/confirm',
+        { json: { activationTicket: preparedTag.body.activationTicket } },
+      );
+      expectStatus(confirmedTag, 201, 'confirm NFC sticker registration');
+      expectObject(confirmedTag.body, 'confirm NFC sticker registration');
+      assert.equal(confirmedTag.body.tagId, firstTagId);
+      const registeredTagStatus = await operatorActor.request.get(
+        '/attendance/nfc-tags/me',
+      );
+      expectStatus(registeredTagStatus, 200, 'read registered NFC sticker');
+      expectObject(registeredTagStatus.body, 'read registered NFC sticker');
+      const registeredTag = registeredTagStatus.body.tag as Record<
+        string,
+        unknown
+      >;
+      assert.equal(registeredTag.tagId, firstTagId);
+      assert.equal('token' in registeredTag, false);
+      assert.equal('tokenHash' in registeredTag, false);
+
+      const operatorSlots = await operatorActor.request.get(
+        `/attendance/operator/slots?date=${localDate}`,
+      );
+      expectStatus(operatorSlots, 200, 'read current operator slots');
+      expectObject(operatorSlots.body, 'read current operator slots');
+      assert.ok(Array.isArray(operatorSlots.body.slotList));
+      const firstCheckIn = await student.request.post('/attendance/records', {
+        json: { captureMethod: 'NFC', tagId: firstTagId, token: firstToken },
+      });
+      expectStatus(firstCheckIn, 201, 'record first NFC check-in');
+      expectObject(firstCheckIn.body, 'record first NFC check-in');
+      assert.equal(firstCheckIn.body.status, 'RECORDED');
+      expectString(firstCheckIn.body.sessionId, 'NFC-created session ID');
+      const nfcSessionId = firstCheckIn.body.sessionId;
+      const repeatedCheckIn = await student.request.post(
+        '/attendance/records',
+        {
+          json: { captureMethod: 'NFC', tagId: firstTagId, token: firstToken },
+        },
+      );
+      expectStatus(repeatedCheckIn, 201, 'repeat NFC check-in');
+      expectObject(repeatedCheckIn.body, 'repeat NFC check-in');
+      assert.equal(repeatedCheckIn.body.status, 'ALREADY_RECORDED');
+      const slotsAfterCheckIn = await operatorActor.request.get(
+        `/attendance/operator/slots?date=${localDate}`,
+      );
+      expectStatus(slotsAfterCheckIn, 200, 'read NFC attendance slot totals');
+      expectObject(slotsAfterCheckIn.body, 'read NFC attendance slot totals');
+      const nfcSlot = (
+        slotsAfterCheckIn.body.slotList as Record<string, unknown>[]
+      ).find((slot) => slot.eventID === eventId);
+      assert.ok(nfcSlot);
+      assert.equal(nfcSlot.attendanceCount, 1);
+      const createdByNfc = await db
+        .select()
+        .from(AttendanceSession)
+        .where(eq(AttendanceSession.SessionID, nfcSessionId));
+      assert.equal(createdByNfc.length, 1);
+      const nfcRows = await db
+        .select()
+        .from(SessionAttendance)
+        .where(eq(SessionAttendance.SessionID, nfcSessionId));
+      assert.equal(nfcRows.length, 1);
+      assert.equal(nfcRows[0]?.captureMethod, 'NFC');
+
+      const replacement = await operatorActor.request.post(
+        '/attendance/nfc-tags/registration',
+      );
+      expectStatus(replacement, 201, 'prepare replacement NFC sticker');
+      expectObject(replacement.body, 'prepare replacement NFC sticker');
+      const replacementTagId = replacement.body.tagId;
+      const replacementToken = replacement.body.token;
+      const replacementConfirmed = await operatorActor.request.post(
+        '/attendance/nfc-tags/registration/confirm',
+        { json: { activationTicket: replacement.body.activationTicket } },
+      );
+      expectStatus(replacementConfirmed, 201, 'activate replacement sticker');
+      const replacementStatus = await operatorActor.request.get(
+        '/attendance/nfc-tags/me',
+      );
+      expectStatus(replacementStatus, 200, 'read replacement NFC sticker');
+      expectObject(replacementStatus.body, 'read replacement NFC sticker');
+      const registeredReplacement = replacementStatus.body.tag as Record<
+        string,
+        unknown
+      >;
+      assert.equal(registeredReplacement.tagId, replacementTagId);
+      const invalidatedOldTag = await student.request.post(
+        '/attendance/records',
+        {
+          json: { captureMethod: 'NFC', tagId: firstTagId, token: firstToken },
+        },
+      );
+      expectStatus(invalidatedOldTag, 201, 'reject replaced sticker');
+      expectObject(invalidatedOldTag.body, 'reject replaced sticker');
+      assert.equal(invalidatedOldTag.body.status, 'INVALID_TAG');
+      const replacementCheckIn = await student.request.post(
+        '/attendance/records',
+        {
+          json: {
+            captureMethod: 'NFC',
+            tagId: replacementTagId,
+            token: replacementToken,
+          },
+        },
+      );
+      expectStatus(replacementCheckIn, 201, 'accept replacement sticker');
+      expectObject(replacementCheckIn.body, 'accept replacement sticker');
+      assert.equal(replacementCheckIn.body.status, 'ALREADY_RECORDED');
+
+      const guest = context.actor('attendance-guest');
+      const guestCheckIn = await guest.request.post('/attendance/records', {
+        json: {
+          captureMethod: 'NFC',
+          tagId: replacementTagId,
+          token: replacementToken,
+        },
+      });
+      expectStatus(guestCheckIn, 201, 'record anonymous NFC attendance');
+      expectObject(guestCheckIn.body, 'record anonymous NFC attendance');
+      assert.equal(guestCheckIn.body.status, 'RECORDED');
+
       const recorded = await operatorActor.request.post(
         `/attendance/sessions/${identifiedSessionId}/records`,
-        { json: { UserID: operator.userId } },
+        { json: { UserID: operator.userId, captureMethod: 'MANUAL' } },
       );
       expectStatus(recorded, 201, 'record identified attendance');
       expectObject(recorded.body, 'record identified attendance');
       assert.equal(recorded.body.status, 'RECORDED');
       const repeated = await operatorActor.request.post(
         `/attendance/sessions/${identifiedSessionId}/records`,
-        { json: { UserID: operator.userId } },
+        { json: { UserID: operator.userId, captureMethod: 'MANUAL' } },
       );
       expectStatus(repeated, 201, 'repeat identified attendance');
       expectObject(repeated.body, 'repeat identified attendance');
@@ -233,6 +414,18 @@ export function attendanceSessionLifecycleStep<TPlan>(
         },
       );
       expectStatus(outsiderSelected, [200, 201], 'select outsider university');
+      const unenrolledCheckIn = await outsider.request.post(
+        '/attendance/records',
+        {
+          json: {
+            captureMethod: 'NFC',
+            tagId: replacementTagId,
+            token: replacementToken,
+          },
+        },
+      );
+      expectStatus(unenrolledCheckIn, 403, 'reject unenrolled NFC check-in');
+      expectObject(unenrolledCheckIn.body, 'reject unenrolled NFC check-in');
       const outsiderHistory = await outsider.request.get(
         '/attendance/me/verified-history',
       );
@@ -268,30 +461,30 @@ export function attendanceSessionLifecycleStep<TPlan>(
         [200, 201],
         'select outsider lecturer role',
       );
-      const unrelatedOpen = await outsider.request.post(
-        `/attendance/sessions/${identifiedSessionId}/open`,
+      const unrelatedUpdate = await outsider.request.patch(
+        `/attendance/sessions/${identifiedSessionId}`,
+        { json: { scheduledEndAt: date(-3_000_000) } },
       );
-      expectStatus(unrelatedOpen, 403, 'reject unrelated lecturer operation');
+      expectStatus(unrelatedUpdate, 403, 'reject unrelated lecturer operation');
 
-      const closed = await operatorActor.request.post(
-        `/attendance/sessions/${sessionId}/close`,
+      const corrected = await operatorActor.request.patch(
+        `/attendance/sessions/${sessionId}`,
+        { json: { scheduledEndAt: date(4_000_000) } },
       );
-      expectStatus(closed, 201, 'close attendance session');
-      expectObject(closed.body, 'close attendance session');
-      assert.equal(closed.body.state, 'CLOSED');
+      expectStatus(corrected, 200, 'correct attendance session');
+      expectObject(corrected.body, 'correct attendance session');
+      assert.equal(corrected.body.scheduledEndAt, date(4_000_000));
 
-      const afterClose = await operatorActor.request.put(
-        `/attendance/sessions/${sessionId}/attendance/count`,
-        { json: { guestCount: 8 } },
-      );
-      expectStatus(afterClose, 400, 'reject count change after close');
+      const listed = await operatorActor.request.get('/attendance/sessions');
+      expectStatus(listed, 200, 'list attendance sessions');
+      expectObject(listed.body, 'list attendance sessions');
+      assert.ok(Array.isArray(listed.body.sessionList));
 
       const persisted = await db
         .select()
         .from(AttendanceSession)
         .where(eq(AttendanceSession.SessionID, sessionId));
       assert.equal(persisted.length, 1);
-      assert.equal(persisted[0].state, 'CLOSED');
       const rows = await db
         .select()
         .from(SessionAttendance)
@@ -299,7 +492,7 @@ export function attendanceSessionLifecycleStep<TPlan>(
       assert.equal(rows.length, 1);
       assert.equal(rows[0].guestCount, 7);
 
-      return { sessionId, finalState: 'CLOSED' };
+      return { sessionId, finalState: 'PERSISTED' };
     },
   };
 }
