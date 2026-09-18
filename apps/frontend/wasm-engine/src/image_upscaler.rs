@@ -151,7 +151,6 @@ pub fn run_upscaler(device: &wgpu::Device, queue: &wgpu::Queue, buffers: &Buffer
         source: wgpu::ShaderSource::Wgsl(include_str!("upscaler.wgsl").into()),
     });
 
-    
     let bind_grp_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
         label: Some(("BIND_GROUP_LAYOUT")),
         entries: &[
@@ -187,6 +186,28 @@ pub fn run_upscaler(device: &wgpu::Device, queue: &wgpu::Queue, buffers: &Buffer
                     min_binding_size: None,
                 },
                 count: None,
+            },
+        ],
+    });
+
+    let bind_grp = device.create_bind_group(&wgpu::BindGroupDescriptor {
+        label: Some(("BIND_GROUP")),
+        layout: &bind_grp_layout,
+        entries: &[
+            //PARM_LIST
+            wgpu::BindGroupEntry {
+                binding: 0,
+                resource: buffers.params_buffer.as_entire_binding(),
+            },
+            //INPUT
+            wgpu::BindGroupEntry {
+                binding: 1,
+                resource: buffers.input_buffer.as_entire_binding(),
+            },
+            //OUTPUT
+            wgpu::BindGroupEntry {
+                binding: 2,
+                resource: buffers.output_buffer.as_entire_binding(),
             },
         ],
     });
