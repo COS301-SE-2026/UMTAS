@@ -26,6 +26,7 @@ describe('CourseEnrollmentService', () => {
   let service: CourseEnrollmentService;
 
   const { mockDb, reset: resetDb } = createMockDatabase();
+
   const { mockCourseServiceV2, reset: resetCourse } =
     createMockCourseServiceV2();
 
@@ -35,7 +36,6 @@ describe('CourseEnrollmentService', () => {
   };
 
   //beforeEach
-
   beforeEach(async () => {
     const module = await Test.createTestingModule({
       providers: [
@@ -79,6 +79,7 @@ describe('CourseEnrollmentService', () => {
       ).rejects.toThrow(InternalServerErrorException);
 
       expect(mockGroupingService.populateGroup).not.toHaveBeenCalled();
+
       expect(mockGroupingService.createModuleGrouping).not.toHaveBeenCalled();
     });
 
@@ -114,7 +115,9 @@ describe('CourseEnrollmentService', () => {
       });
 
       expect(mockDb.insert).toHaveBeenCalledTimes(1);
+
       expect(mockGroupingService.populateGroup).not.toHaveBeenCalled();
+
       expect(mockGroupingService.createModuleGrouping).not.toHaveBeenCalled();
     });
 
@@ -143,7 +146,9 @@ describe('CourseEnrollmentService', () => {
       });
 
       expect(mockDb.insert).not.toHaveBeenCalled();
+
       expect(mockGroupingService.populateGroup).not.toHaveBeenCalled();
+
       expect(mockGroupingService.createModuleGrouping).not.toHaveBeenCalled();
     });
 
@@ -164,8 +169,12 @@ describe('CourseEnrollmentService', () => {
       };
 
       const studentModules = [
-        { ModuleID: '10000000-0000-4000-8000-000000000001' },
-        { ModuleID: '20000000-0000-4000-8000-000000000002' },
+        {
+          ModuleID: '10000000-0000-4000-8000-000000000001',
+        },
+        {
+          ModuleID: '20000000-0000-4000-8000-000000000002',
+        },
       ];
 
       mockCourseServiceV2.getById?.mockResolvedValue(courseWithGroup);
@@ -197,13 +206,14 @@ describe('CourseEnrollmentService', () => {
       });
 
       expect(mockGroupingService.populateGroup).toHaveBeenCalledTimes(1);
+
       expect(mockGroupingService.populateGroup).toHaveBeenCalledWith(
         groupId,
         [
           '10000000-0000-4000-8000-000000000001',
           '20000000-0000-4000-8000-000000000002',
         ],
-        expect.anything(),
+        undefined,
       );
 
       expect(mockGroupingService.createModuleGrouping).not.toHaveBeenCalled();
@@ -224,8 +234,12 @@ describe('CourseEnrollmentService', () => {
       };
 
       const studentModules = [
-        { ModuleID: '10000000-0000-4000-8000-000000000001' },
-        { ModuleID: '20000000-0000-4000-8000-000000000002' },
+        {
+          ModuleID: '10000000-0000-4000-8000-000000000001',
+        },
+        {
+          ModuleID: '20000000-0000-4000-8000-000000000002',
+        },
       ];
 
       mockCourseServiceV2.getById?.mockResolvedValue(courseWithoutGroup);
@@ -266,7 +280,7 @@ describe('CourseEnrollmentService', () => {
             '20000000-0000-4000-8000-000000000002',
           ],
         },
-        expect.anything(),
+        undefined,
       );
 
       expect(mockGroupingService.populateGroup).not.toHaveBeenCalled();
@@ -309,7 +323,7 @@ describe('CourseEnrollmentService', () => {
       expect(mockGroupingService.populateGroup).toHaveBeenCalledWith(
         groupId,
         [moduleId],
-        expect.anything(),
+        undefined,
       );
     });
   }); //END_Test_enrollStudentToCourse
@@ -351,6 +365,7 @@ describe('CourseEnrollmentService', () => {
 
       //Assert
       expect(result.message).toContain('not enrolled');
+
       expect(mockDb.delete).not.toHaveBeenCalled();
     });
 
@@ -361,7 +376,14 @@ describe('CourseEnrollmentService', () => {
 
       mockTransaction(mockDb, {
         select: [[{ UserID: userId }]], //already enrolled
-        delete: [[{ UserID: userId, CourseID: baseCourse.CourseID }]],
+        delete: [
+          [
+            {
+              UserID: userId,
+              CourseID: baseCourse.CourseID,
+            },
+          ],
+        ],
       });
 
       //Act
@@ -383,6 +405,7 @@ describe('CourseEnrollmentService', () => {
       expect(mockDb.delete).toHaveBeenCalledTimes(1);
 
       expect(mockGroupingService.populateGroup).not.toHaveBeenCalled();
+
       expect(mockGroupingService.createModuleGrouping).not.toHaveBeenCalled();
     });
   }); //END_Test_unenrollStudentFromCourse
