@@ -77,4 +77,19 @@ fn main(
     let top = mix(p00, p10, fx);
     let bottom = mix(p01, p11, fx);
     let final_rgb = mix(top, bottom, fy);
+
+
+    // exporting to buffer
+    let spatial_area = 640u * 640u;
+    let plane_size = spatial_area;
+    let slice_offset = slice_index * 3u * plane_size; 
+    let pixel_idx = out_y * 640u + out_x;
+    // indexes
+    let r_dst = slice_offset + (0u * plane_size) + pixel_idx;
+    let g_dst = slice_offset + (1u * plane_size) + pixel_idx;
+    let b_dst = slice_offset + (2u * plane_size) + pixel_idx;
+
+    output_floats[r_dst] = final_rgb.r;
+    output_floats[g_dst] = final_rgb.g;
+    output_floats[b_dst] = final_rgb.b;
 }
