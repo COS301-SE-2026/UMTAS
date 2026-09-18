@@ -1,0 +1,16 @@
+apps/frontend/src/components/molecules/attendance/USBBarcodeScanner.tsx
+  h_2d4b3dca70a3d8 1-64
+apps/frontend/src/components/organisms/attendance/AttendanceScanner.tsx
+  h_2d4b3dca70a3d8 8-10,22,36,38-59,61-69,71,78
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "6f43b3661c51f7e974ab72a3870bc8e573a9d143",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
