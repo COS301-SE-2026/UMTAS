@@ -9,6 +9,8 @@ struct slice_param {
     _pad: u32,
 };
 // tha buffers i made
+
+//PARM_LIST
 @group(0) @binding(0) var<storage, read> params_list: array<slice_param, 5>;
 @group(0) @binding(1) var<storage, read> input_bytes: array<u32>;
 @group(0) @binding(2) var<storage, read_write> output_floats: array<f32>;
