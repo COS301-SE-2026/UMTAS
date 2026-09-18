@@ -64,4 +64,17 @@ fn main(
     let y1 = min(y0 + 1u, params.src_height - 1u);
 
     // read px
+    let p00 = fetch_px(x0, y0, params.src_width, params.src_height); // TL
+    let p10 = fetch_px(x1, y0, params.src_width, params.src_height); // TR
+    let p01 = fetch_px(x0, y1, params.src_width, params.src_height); // BL
+    let p11 = fetch_px(x1, y1, params.src_width, params.src_height); // BR
+
+    // bi lin weights
+    let fx = fract(max(src_x_f, 0.0));
+    let fy = fract(max(src_y_f, 0.0));
+
+    // mixing the weights
+    let top = mix(p00, p10, fx);
+    let bottom = mix(p01, p11, fx);
+    let final_rgb = mix(top, bottom, fy);
 }
