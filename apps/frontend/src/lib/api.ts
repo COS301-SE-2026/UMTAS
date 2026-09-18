@@ -4225,17 +4225,17 @@ export interface components {
        * @description Actual attendance. Null until a check-in source is implemented.
        * @example null
        */
-      actual: Record<string, never> | null;
+      actual: number | null;
       /**
        * @description Projected attendance divided by capacity. Null when capacity is zero.
        * @example 0.375
        */
-      projectedUtilisation: Record<string, never> | null;
+      projectedUtilisation: number | null;
       /**
        * @description Worst-case attendance divided by capacity. Null when capacity is zero.
        * @example 1
        */
-      worstCaseUtilisation: Record<string, never> | null;
+      worstCaseUtilisation: number | null;
       /**
        * @description Hour of the day that the bucket represents
        * @example 10
@@ -4262,17 +4262,17 @@ export interface components {
        * @description Actual attendance. Null until a check-in source is implemented.
        * @example null
        */
-      actual: Record<string, never> | null;
+      actual: number | null;
       /**
        * @description Projected attendance divided by capacity. Null when capacity is zero.
        * @example 0.375
        */
-      projectedUtilisation: Record<string, never> | null;
+      projectedUtilisation: number | null;
       /**
        * @description Worst-case attendance divided by capacity. Null when capacity is zero.
        * @example 1
        */
-      worstCaseUtilisation: Record<string, never> | null;
+      worstCaseUtilisation: number | null;
     };
     VenueHeatmapDto: {
       /**
@@ -4305,17 +4305,17 @@ export interface components {
        * @description Actual attendance. Null until a check-in source is implemented.
        * @example null
        */
-      actual: Record<string, never> | null;
+      actual: number | null;
       /**
        * @description Projected attendance divided by capacity. Null when capacity is zero.
        * @example 0.375
        */
-      projectedUtilisation: Record<string, never> | null;
+      projectedUtilisation: number | null;
       /**
        * @description Worst-case attendance divided by capacity. Null when capacity is zero.
        * @example 1
        */
-      worstCaseUtilisation: Record<string, never> | null;
+      worstCaseUtilisation: number | null;
       /** @description The vnue splits into 24 hour buckets */
       hourly: components["schemas"]["HourlyHeatmapBucketDto"][];
     };
@@ -4510,7 +4510,7 @@ export interface components {
        * @description Actual number of students recorded on the route
        * @example null
        */
-      actual: Record<string, never> | null;
+      actual: number | null;
       /**
        * @description Hour for this bucket | 0 - 23
        * @example 9
@@ -4556,7 +4556,7 @@ export interface components {
        * @description Actual number of students recorded on the route
        * @example null
        */
-      actual: Record<string, never> | null;
+      actual: number | null;
       /** Format: uuid */
       routeId: string;
       /**
