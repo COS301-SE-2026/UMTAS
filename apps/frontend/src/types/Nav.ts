@@ -1,7 +1,7 @@
 export type NavigationRole = "UNIVERSITY_ADMIN" | "STUDENT" | "LECTURER";
 
 export type NavigationSection =
-  "primary" | "actions" | "admin" | "help" | "auth";
+  "primary" | "actions" | "admin" | "help" | "auth" | "tools";
 
 export type NavigationAction = "run-page-tutorial" | "run-cmdk-tutorial";
 
@@ -78,6 +78,20 @@ export const navigationItems: NavigationItem[] = [
   },
 
   {
+    id: "solver",
+    label: "Timetable Solver",
+    href: "/solver",
+    section: "primary",
+    icon: "AdjustmentsHorizontalIcon",
+    tourContent: "Upload timetable information and use the Timetable Solver.",
+    keywords: ["solver", "timetable solver", "upload pdf", "pdf"],
+    requiresUniversity: true,
+    universities: ["University of Pretoria"],
+    showInNavbar: true,
+    showInCommandPalette: true,
+  },
+
+  {
     id: "schedules",
     label: "Schedules",
     href: "/schedules",
@@ -116,24 +130,10 @@ export const navigationItems: NavigationItem[] = [
   },
 
   {
-    id: "solver",
-    label: "Timetable Solver",
-    href: "/solver",
-    section: "primary",
-    icon: "AdjustmentsHorizontalIcon",
-    tourContent: "Upload timetable information and use the Timetable Solver.",
-    keywords: ["solver", "timetable solver", "upload pdf", "pdf"],
-    requiresUniversity: true,
-    universities: ["University of Pretoria"],
-    showInNavbar: true,
-    showInCommandPalette: true,
-  },
-
-  {
     id: "course-management",
     label: "Course Management",
     href: "/course-management",
-    section: "admin",
+    section: "actions",
     icon: "AcademicCapIcon",
     tourContent: "Manage university courses.",
     keywords: ["courses", "course management"],
@@ -196,7 +196,18 @@ export const navigationItems: NavigationItem[] = [
     showInNavbar: true,
     showInCommandPalette: true,
   },
-
+  {
+    id: "attendance",
+    label: "Attendance",
+    href: "/attendance",
+    section: "tools",
+    icon: "UserPlusIcon",
+    tourContent: "Mark attendance for your lecture.",
+    keywords: ["attendance", "lecture", "mark attendance"],
+    showInNavbar: true,
+    roles: ["LECTURER", "UNIVERSITY_ADMIN"],
+    showInCommandPalette: true,
+  },
   {
     id: "faq",
     label: "Frequently Asked Questions",
