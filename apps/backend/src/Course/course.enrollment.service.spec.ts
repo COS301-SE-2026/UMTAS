@@ -207,9 +207,14 @@ describe('CourseEnrollmentService', () => {
 
       expect(mockGroupingService.populateGroup).toHaveBeenCalledTimes(1);
 
-      expect(mockGroupingService.populateGroup).toHaveBeenCalledWith(groupId, [
-        '10000000-0000-4000-8000-000000000001',
-        '20000000-0000-4000-8000-000000000002',
+      expect(
+        mockGroupingService.populateGroup.mock.calls[0]?.slice(0, 2),
+      ).toEqual([
+        groupId,
+        [
+          '10000000-0000-4000-8000-000000000001',
+          '20000000-0000-4000-8000-000000000002',
+        ],
       ]);
 
       expect(mockGroupingService.createModuleGrouping).not.toHaveBeenCalled();
@@ -268,7 +273,9 @@ describe('CourseEnrollmentService', () => {
 
       expect(mockGroupingService.createModuleGrouping).toHaveBeenCalledTimes(1);
 
-      expect(mockGroupingService.createModuleGrouping).toHaveBeenCalledWith({
+      expect(
+        mockGroupingService.createModuleGrouping.mock.calls[0]?.[0],
+      ).toEqual({
         CourseID: courseWithoutGroup.CourseID,
         modules: [
           '10000000-0000-4000-8000-000000000001',
@@ -313,9 +320,11 @@ describe('CourseEnrollmentService', () => {
       });
 
       //Assert
-      expect(mockGroupingService.populateGroup).toHaveBeenCalledWith(groupId, [
-        moduleId,
-      ]);
+      expect(mockGroupingService.populateGroup).toHaveBeenCalledTimes(1);
+
+      expect(
+        mockGroupingService.populateGroup.mock.calls[0]?.slice(0, 2),
+      ).toEqual([groupId, [moduleId]]);
     });
   }); //END_Test_enrollStudentToCourse
 
