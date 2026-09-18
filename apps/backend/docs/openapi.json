@@ -5690,11 +5690,7 @@
             "in": "query",
             "schema": {
               "example": true,
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/Object"
-                }
-              ]
+              "type": "boolean"
             }
           },
           {
@@ -6092,11 +6088,7 @@
             "description": "True: building with pin. False: only buildings without pin. Omit for all buildings.",
             "schema": {
               "example": true,
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/Object"
-                }
-              ]
+              "type": "boolean"
             }
           },
           {
@@ -6482,6 +6474,76 @@
           "Map Config"
         ],
         "description": "Set or update map settings for the selected university. This Map Config operation is part of the versioned UMTAS HTTP contract."
+      }
+    },
+    "/api/routes/heatmap": {
+      "get": {
+        "description": "Returns route demand metrics for all persisted route variants in the selected university for a single date.",
+        "operationId": "getRoutingHeatmap",
+        "parameters": [
+          {
+            "name": "date",
+            "required": true,
+            "in": "query",
+            "description": "Date for which to return route heatmap statistics",
+            "schema": {
+              "format": "date",
+              "example": "2026-09-18",
+              "type": "string"
+            }
+          },
+          {
+            "name": "view",
+            "required": false,
+            "in": "query",
+            "description": "WHich metrics to include",
+            "schema": {
+              "default": "all",
+              "type": "string",
+              "enum": [
+                "projected",
+                "worstCase",
+                "all"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Routing heatmap returned successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoutingHeatmapResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid routing heatmap query parameters"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "description": "No university selected or insufficient permissions"
+          },
+          "404": {
+            "description": "Required route, event, venue, or building data was not found"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "security": [
+          {
+            "umtas-session": []
+          }
+        ],
+        "summary": "Get route demand heatmap",
+        "tags": [
+          "Routes"
+        ]
       }
     },
     "/api/routes": {
@@ -7880,11 +7942,11 @@
             "nullable": true
           },
           "role": {
-            "type": "string",
             "enum": [
               "user",
               "sys_admin"
-            ]
+            ],
+            "type": "string"
           },
           "banned": {
             "type": "boolean"
@@ -7979,14 +8041,14 @@
             "format": "uuid"
           },
           "uniRole": {
-            "type": "string",
             "enum": [
               "student",
               "uni_admin",
               "lecturer",
               "uni_admin_pending",
               "lecturer_pending"
-            ]
+            ],
+            "type": "string"
           }
         },
         "required": [
@@ -8028,7 +8090,6 @@
         "type": "object",
         "properties": {
           "error": {
-            "type": "string",
             "enum": [
               "ACCOUNT_ALREADY_LINKED",
               "EMAIL_ALREADY_IN_USE",
@@ -8046,7 +8107,8 @@
               "USER_NOT_FOUND",
               "RATE_LIMITED",
               "INTERNAL_SERVER_ERROR"
-            ]
+            ],
+            "type": "string"
           },
           "message": {
             "type": "string"
@@ -8216,11 +8278,11 @@
             "default": "System Admin"
           },
           "role": {
-            "type": "string",
             "enum": [
               "user",
               "sys_admin"
             ],
+            "type": "string",
             "example": "user",
             "default": "user"
           }
@@ -8276,7 +8338,7 @@
         "type": "object",
         "properties": {
           "success": {
-            "type": "object"
+            "type": "boolean"
           },
           "message": {
             "type": "string"
@@ -8345,11 +8407,11 @@
             "example": "newemail@example.com"
           },
           "role": {
-            "type": "string",
             "enum": [
               "user",
               "sys_admin"
             ],
+            "type": "string",
             "example": "user"
           }
         },
@@ -8407,8 +8469,8 @@
             "description": "Identifies which part of the year the module takes part in for the course"
           },
           "YearOfStudy": {
-            "nullable": true,
             "type": "number",
+            "nullable": true,
             "example": 1,
             "description": "Which year does the module belong to for the course"
           }
@@ -8532,8 +8594,8 @@
             "description": "Identifies which part of the year the module takes part in for the course"
           },
           "YearOfStudy": {
-            "nullable": true,
             "type": "number",
+            "nullable": true,
             "example": 1,
             "description": "Which year does the module belong to for the course"
           }
@@ -8560,7 +8622,6 @@
             "description": "Required when the event is not recurring."
           },
           "dayOfWeek": {
-            "type": "string",
             "enum": [
               "monday",
               "tuesday",
@@ -8570,6 +8631,7 @@
               "saturday",
               "sunday"
             ],
+            "type": "string",
             "description": "Required when the event is recurring."
           },
           "startTime": {
@@ -8632,14 +8694,14 @@
             "maxLength": 10
           },
           "activityType": {
-            "type": "string",
             "enum": [
               "lecture",
               "tutorial",
               "prac",
               "test",
               "exam"
-            ]
+            ],
+            "type": "string"
           },
           "eventCriteria": {
             "$ref": "#/components/schemas/EventCriteriaDto"
@@ -8904,8 +8966,8 @@
             "description": "Identifies which part of the year the module takes part in for the course"
           },
           "YearOfStudy": {
-            "nullable": true,
             "type": "number",
+            "nullable": true,
             "example": 1,
             "description": "Which year does the module belong to for the course"
           }
@@ -9650,7 +9712,6 @@
             "description": "Key for authorisation on univerity api"
           },
           "role": {
-            "type": "string",
             "nullable": true,
             "enum": [
               "STUDENT",
@@ -9662,6 +9723,7 @@
               "SYSTEM_ADMIN",
               "REJECTED"
             ],
+            "type": "string",
             "example": "STUDENT",
             "description": "Role current user has for university"
           }
@@ -9712,7 +9774,6 @@
             "description": "Key for authorisation on univerity api"
           },
           "role": {
-            "type": "string",
             "nullable": true,
             "enum": [
               "STUDENT",
@@ -9724,6 +9785,7 @@
               "SYSTEM_ADMIN",
               "REJECTED"
             ],
+            "type": "string",
             "example": "STUDENT",
             "description": "Role current user has for university"
           }
@@ -9760,7 +9822,6 @@
             "format": "uuid"
           },
           "role": {
-            "type": "string",
             "enum": [
               "STUDENT",
               "STUDENT_OWNED",
@@ -9770,7 +9831,8 @@
               "LECTURER_PENDING",
               "SYSTEM_ADMIN",
               "REJECTED"
-            ]
+            ],
+            "type": "string"
           }
         },
         "required": [
@@ -9868,7 +9930,6 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "role": {
-            "type": "string",
             "nullable": true,
             "enum": [
               "STUDENT",
@@ -9880,6 +9941,7 @@
               "SYSTEM_ADMIN",
               "REJECTED"
             ],
+            "type": "string",
             "example": "LECTURER_PENDING"
           }
         },
@@ -9901,7 +9963,6 @@
             "description": "Unique identifier for a university"
           },
           "role": {
-            "type": "string",
             "nullable": true,
             "enum": [
               "STUDENT",
@@ -9913,6 +9974,7 @@
               "SYSTEM_ADMIN",
               "REJECTED"
             ],
+            "type": "string",
             "example": "STUDENT",
             "description": "Role current user has for university"
           }
@@ -9940,9 +10002,7 @@
             "description": "will be accecpted on true, rejected on false"
           },
           "provdedRole": {
-            "type": "string",
             "nullable": true,
-            "description": "role will be set to this if provided unless null",
             "enum": [
               "STUDENT",
               "STUDENT_OWNED",
@@ -9953,6 +10013,8 @@
               "SYSTEM_ADMIN",
               "REJECTED"
             ],
+            "type": "string",
+            "description": "role will be set to this if provided unless null",
             "example": "LECTURER_PENDING"
           }
         },
@@ -10064,7 +10126,6 @@
             "description": "Required when the event is not recurring."
           },
           "dayOfWeek": {
-            "type": "string",
             "enum": [
               "monday",
               "tuesday",
@@ -10074,6 +10135,7 @@
               "saturday",
               "sunday"
             ],
+            "type": "string",
             "description": "Required when the event is recurring."
           },
           "startTime": {
@@ -10108,14 +10170,14 @@
             "maxLength": 10
           },
           "activityType": {
-            "type": "string",
             "enum": [
               "lecture",
               "tutorial",
               "prac",
               "test",
               "exam"
-            ]
+            ],
+            "type": "string"
           },
           "isRecurring": {
             "type": "boolean"
@@ -10188,7 +10250,6 @@
             }
           },
           "activityType": {
-            "type": "string",
             "enum": [
               "lecture",
               "tutorial",
@@ -10196,6 +10257,7 @@
               "test",
               "exam"
             ],
+            "type": "string",
             "description": "Required when eventCriteria.moduleId is provided."
           }
         },
@@ -10241,7 +10303,6 @@
             "description": "Required when the event is not recurring."
           },
           "dayOfWeek": {
-            "type": "string",
             "enum": [
               "monday",
               "tuesday",
@@ -10251,6 +10312,7 @@
               "saturday",
               "sunday"
             ],
+            "type": "string",
             "description": "Required when the event is recurring."
           },
           "startTime": {
@@ -10282,14 +10344,14 @@
             "maxLength": 10
           },
           "activityType": {
-            "type": "string",
             "enum": [
               "lecture",
               "tutorial",
               "prac",
               "test",
               "exam"
-            ]
+            ],
+            "type": "string"
           },
           "isRecurring": {
             "type": "boolean"
@@ -10350,7 +10412,6 @@
         "type": "object",
         "properties": {
           "dayOfWeek": {
-            "type": "string",
             "enum": [
               "monday",
               "tuesday",
@@ -10359,7 +10420,8 @@
               "friday",
               "saturday",
               "sunday"
-            ]
+            ],
+            "type": "string"
           },
           "EventCount": {
             "type": "number"
@@ -10693,7 +10755,6 @@
             "type": "boolean"
           },
           "activityType": {
-            "type": "string",
             "enum": [
               "lecture",
               "tutorial",
@@ -10701,6 +10762,7 @@
               "test",
               "exam"
             ],
+            "type": "string",
             "description": "Required when eventCriteria.moduleId is provided."
           }
         }
@@ -10717,12 +10779,12 @@
             "example": "pdf-parse-2d82d1ff-fb51-4c67-80cf-61d88c12d596"
           },
           "status": {
-            "type": "string",
             "enum": [
               "queued",
               "completed",
               "failed"
-            ]
+            ],
+            "type": "string"
           },
           "moduleGroupingId": {
             "type": "string",
@@ -10769,14 +10831,14 @@
             "type": "string"
           },
           "activityType": {
-            "type": "string",
             "enum": [
               "lecture",
               "tutorial",
               "prac",
               "test",
               "exam"
-            ]
+            ],
+            "type": "string"
           },
           "activityCode": {
             "type": "string"
@@ -10809,7 +10871,6 @@
             }
           },
           "day": {
-            "type": "string",
             "enum": [
               "monday",
               "tuesday",
@@ -10818,7 +10879,8 @@
               "friday",
               "saturday",
               "sunday"
-            ]
+            ],
+            "type": "string"
           },
           "date": {
             "type": "string",
@@ -10853,14 +10915,14 @@
             "type": "string"
           },
           "activityType": {
-            "type": "string",
             "enum": [
               "lecture",
               "tutorial",
               "prac",
               "test",
               "exam"
-            ]
+            ],
+            "type": "string"
           },
           "activityCode": {
             "type": "string"
@@ -11025,12 +11087,12 @@
             "example": "up"
           },
           "status": {
-            "type": "string",
             "enum": [
               "queued",
               "completed",
               "failed"
-            ]
+            ],
+            "type": "string"
           },
           "result": {
             "$ref": "#/components/schemas/PdfParserResultDto"
@@ -11082,12 +11144,12 @@
             "example": "up"
           },
           "status": {
-            "type": "string",
             "enum": [
               "queued",
               "completed",
               "failed"
-            ]
+            ],
+            "type": "string"
           },
           "result": {
             "$ref": "#/components/schemas/PdfParserResultDto"
@@ -11120,11 +11182,11 @@
         "type": "object",
         "properties": {
           "status": {
-            "type": "string",
             "enum": [
               "completed",
               "failed"
-            ]
+            ],
+            "type": "string"
           },
           "result": {
             "$ref": "#/components/schemas/PdfParserResultDto"
@@ -11292,19 +11354,19 @@
             }
           },
           "solveMode": {
-            "type": "string",
             "enum": [
               "feasibility",
               "optimization"
-            ]
+            ],
+            "type": "string"
           },
           "engine": {
-            "type": "string",
             "enum": [
               "auto",
               "cp-sat",
               "ga"
-            ]
+            ],
+            "type": "string"
           },
           "preferences": {
             "example": {
@@ -11384,11 +11446,11 @@
             }
           },
           "solveMode": {
-            "type": "string",
             "enum": [
               "feasibility",
               "optimization"
-            ]
+            ],
+            "type": "string"
           }
         },
         "required": [
@@ -11401,18 +11463,18 @@
         "type": "object",
         "properties": {
           "engine": {
-            "type": "string",
             "enum": [
               "cp-sat",
               "ga"
-            ]
+            ],
+            "type": "string"
           },
           "outcome": {
-            "type": "string",
             "enum": [
               "conflict-free",
               "best-effort"
-            ]
+            ],
+            "type": "string"
           },
           "timetableSolution": {
             "$ref": "#/components/schemas/TimetableSolutionDto"
@@ -11454,12 +11516,12 @@
             "type": "string"
           },
           "status": {
-            "type": "string",
             "enum": [
               "queued",
               "completed",
               "failed"
-            ]
+            ],
+            "type": "string"
           },
           "result": {
             "$ref": "#/components/schemas/SolverResultDto"
@@ -11496,14 +11558,14 @@
             "type": "string"
           },
           "activityType": {
-            "type": "string",
             "enum": [
               "lecture",
               "tutorial",
               "prac",
               "test",
               "exam"
-            ]
+            ],
+            "type": "string"
           },
           "activityCode": {
             "type": "string"
@@ -11518,7 +11580,6 @@
             "format": "date"
           },
           "dayOfWeek": {
-            "type": "string",
             "enum": [
               "monday",
               "tuesday",
@@ -11527,7 +11588,8 @@
               "friday",
               "saturday",
               "sunday"
-            ]
+            ],
+            "type": "string"
           },
           "startTime": {
             "type": "string",
@@ -11593,27 +11655,27 @@
             "example": "solve-job-123"
           },
           "solveMode": {
-            "type": "string",
             "enum": [
               "feasibility",
               "optimization"
-            ]
+            ],
+            "type": "string"
           },
           "requestedEngine": {
-            "type": "string",
             "enum": [
               "auto",
               "cp-sat",
               "ga"
-            ]
+            ],
+            "type": "string"
           },
           "status": {
-            "type": "string",
             "enum": [
               "queued",
               "completed",
               "failed"
-            ]
+            ],
+            "type": "string"
           },
           "result": {
             "$ref": "#/components/schemas/SolverResultDto"
@@ -11650,11 +11712,11 @@
         "type": "object",
         "properties": {
           "status": {
-            "type": "string",
             "enum": [
               "completed",
               "failed"
-            ]
+            ],
+            "type": "string"
           },
           "result": {
             "description": "A valid timetable solution and its soft-heuristic scores.",
@@ -11687,11 +11749,11 @@
             "description": "Date of event for which attendance is recorded"
           },
           "state": {
-            "type": "string",
             "enum": [
               "ATTENDING",
               "NOT_ATTENDING"
             ],
+            "type": "string",
             "example": "ATTENDING",
             "description": "Is the user attending this event or not"
           }
@@ -11717,11 +11779,11 @@
             "description": "Date of event for which attendance is recorded"
           },
           "state": {
-            "type": "string",
             "enum": [
               "ATTENDING",
               "NOT_ATTENDING"
             ],
+            "type": "string",
             "example": "ATTENDING",
             "description": "Is the user attending this event or not"
           },
@@ -11763,11 +11825,11 @@
             "description": "Date of event for which attendance is recorded"
           },
           "state": {
-            "type": "string",
             "enum": [
               "ATTENDING",
               "NOT_ATTENDING"
             ],
+            "type": "string",
             "example": "ATTENDING",
             "description": "Is the user attending this event or not"
           }
@@ -11802,8 +11864,8 @@
             "description": "Optional building identifier. Nulled if the building is deleted."
           },
           "Capacity": {
-            "minimum": 0,
             "type": "number",
+            "minimum": 0,
             "description": "Maximum capacity of the venue. Defaults to 0 if not provided.",
             "example": 120
           }
@@ -11839,8 +11901,8 @@
             "description": "Optional building identifier. Nulled if the building is deleted."
           },
           "Capacity": {
-            "minimum": 0,
             "type": "number",
+            "minimum": 0,
             "description": "Maximum capacity of the venue.",
             "example": 120
           }
@@ -11865,10 +11927,6 @@
         "required": [
           "venue"
         ]
-      },
-      "Object": {
-        "type": "object",
-        "properties": {}
       },
       "VenueListResponseDto": {
         "type": "object",
@@ -11903,8 +11961,8 @@
             "description": "Optional building identifier. Nulled if the building is deleted."
           },
           "Capacity": {
-            "minimum": 0,
             "type": "number",
+            "minimum": 0,
             "description": "Maximum capacity of the venue.",
             "example": 120
           }
@@ -11951,7 +12009,7 @@
             "example": 7
           },
           "success": {
-            "type": "object",
+            "type": "boolean",
             "example": true
           }
         },
@@ -12041,46 +12099,46 @@
         "type": "object",
         "properties": {
           "Capacity": {
-            "minimum": 0,
             "type": "number",
+            "minimum": 0,
             "description": "Total capacity represented by this heatmap item.",
             "example": 120
           },
           "projected": {
-            "minimum": 0,
             "type": "number",
+            "minimum": 0,
             "description": "Expected attendance based on attendance intent.",
             "example": 45
           },
           "worstCase": {
-            "minimum": 0,
             "type": "number",
+            "minimum": 0,
             "description": "Maximum expected attendance based on module enrolments.",
             "example": 120
           },
           "actual": {
+            "type": "number",
             "nullable": true,
             "minimum": 0,
-            "type": "object",
             "description": "Actual attendance. Null until a check-in source is implemented.",
             "example": null
           },
           "projectedUtilisation": {
+            "type": "number",
             "nullable": true,
-            "type": "object",
             "description": "Projected attendance divided by capacity. Null when capacity is zero.",
             "example": 0.375
           },
           "worstCaseUtilisation": {
+            "type": "number",
             "nullable": true,
-            "type": "object",
             "description": "Worst-case attendance divided by capacity. Null when capacity is zero.",
             "example": 1
           },
           "hour": {
+            "type": "number",
             "minimum": 0,
             "maximum": 23,
-            "type": "number",
             "example": 10,
             "description": "Hour of the day that the bucket represents"
           }
@@ -12099,39 +12157,39 @@
         "type": "object",
         "properties": {
           "Capacity": {
-            "minimum": 0,
             "type": "number",
+            "minimum": 0,
             "description": "Total capacity represented by this heatmap item.",
             "example": 120
           },
           "projected": {
-            "minimum": 0,
             "type": "number",
+            "minimum": 0,
             "description": "Expected attendance based on attendance intent.",
             "example": 45
           },
           "worstCase": {
-            "minimum": 0,
             "type": "number",
+            "minimum": 0,
             "description": "Maximum expected attendance based on module enrolments.",
             "example": 120
           },
           "actual": {
+            "type": "number",
             "nullable": true,
             "minimum": 0,
-            "type": "object",
             "description": "Actual attendance. Null until a check-in source is implemented.",
             "example": null
           },
           "projectedUtilisation": {
+            "type": "number",
             "nullable": true,
-            "type": "object",
             "description": "Projected attendance divided by capacity. Null when capacity is zero.",
             "example": 0.375
           },
           "worstCaseUtilisation": {
+            "type": "number",
             "nullable": true,
-            "type": "object",
             "description": "Worst-case attendance divided by capacity. Null when capacity is zero.",
             "example": 1
           }
@@ -12161,39 +12219,39 @@
             "example": "Main Lecture Hall"
           },
           "Capacity": {
-            "minimum": 0,
             "type": "number",
+            "minimum": 0,
             "description": "Total capacity represented by this heatmap item.",
             "example": 120
           },
           "projected": {
-            "minimum": 0,
             "type": "number",
+            "minimum": 0,
             "description": "Expected attendance based on attendance intent.",
             "example": 45
           },
           "worstCase": {
-            "minimum": 0,
             "type": "number",
+            "minimum": 0,
             "description": "Maximum expected attendance based on module enrolments.",
             "example": 120
           },
           "actual": {
+            "type": "number",
             "nullable": true,
             "minimum": 0,
-            "type": "object",
             "description": "Actual attendance. Null until a check-in source is implemented.",
             "example": null
           },
           "projectedUtilisation": {
+            "type": "number",
             "nullable": true,
-            "type": "object",
             "description": "Projected attendance divided by capacity. Null when capacity is zero.",
             "example": 0.375
           },
           "worstCaseUtilisation": {
+            "type": "number",
             "nullable": true,
-            "type": "object",
             "description": "Worst-case attendance divided by capacity. Null when capacity is zero.",
             "example": 1
           },
@@ -12522,9 +12580,9 @@
             "example": -67.67
           },
           "DefaultZoom": {
+            "type": "number",
             "minimum": 1,
             "maximum": 20,
-            "type": "number",
             "description": "The zoom level for the map",
             "example": 10
           },
@@ -12546,6 +12604,232 @@
           "GoogleMapID"
         ]
       },
+      "RouteHeatmapBuildingDto": {
+        "type": "object",
+        "properties": {
+          "buildingId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "buildingName": {
+            "type": "string",
+            "example": "Information Technology Building"
+          }
+        },
+        "required": [
+          "buildingId",
+          "buildingName"
+        ]
+      },
+      "RouteHeatmapHourlyBucketDto": {
+        "type": "object",
+        "properties": {
+          "projected": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Expected number of students projected to travel route",
+            "example": 42
+          },
+          "worstCase": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Maximum expected route demand based on enrollments.",
+            "example": 85
+          },
+          "actual": {
+            "type": "number",
+            "nullable": true,
+            "minimum": 0,
+            "description": "Actual number of students recorded on the route",
+            "example": null
+          },
+          "hour": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Hour for this bucket | 0 - 23",
+            "example": 9,
+            "maximum": 23
+          }
+        },
+        "required": [
+          "projected",
+          "worstCase",
+          "actual",
+          "hour"
+        ]
+      },
+      "RouteHeatmapTransitionDto": {
+        "type": "object",
+        "properties": {
+          "originEventId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "destinationEventId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "originEventName": {
+            "type": "string",
+            "example": "COS 301 Lecture"
+          },
+          "destinationEventName": {
+            "type": "string",
+            "example": "COS 301 Tutorial"
+          },
+          "originEndTime": {
+            "type": "string",
+            "example": "10:20"
+          },
+          "destinationStartTime": {
+            "type": "string",
+            "example": "11:00"
+          },
+          "projected": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Number of students projected to make this transition.",
+            "example": 20
+          },
+          "worstCase": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Maximum expected students for this transition.",
+            "example": 35
+          }
+        },
+        "required": [
+          "originEventId",
+          "destinationEventId",
+          "originEventName",
+          "destinationEventName",
+          "originEndTime",
+          "destinationStartTime",
+          "projected",
+          "worstCase"
+        ]
+      },
+      "RouteHeatmapDto": {
+        "type": "object",
+        "properties": {
+          "projected": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Expected number of students projected to travel route",
+            "example": 42
+          },
+          "worstCase": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Maximum expected route demand based on enrollments.",
+            "example": 85
+          },
+          "actual": {
+            "type": "number",
+            "nullable": true,
+            "minimum": 0,
+            "description": "Actual number of students recorded on the route",
+            "example": null
+          },
+          "routeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "routeIndex": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Zero-based route variant index",
+            "example": 0
+          },
+          "origin": {
+            "$ref": "#/components/schemas/RouteHeatmapBuildingDto"
+          },
+          "destination": {
+            "$ref": "#/components/schemas/RouteHeatmapBuildingDto"
+          },
+          "distanceMetres": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Walking distance in metres.",
+            "example": 650
+          },
+          "displayColour": {
+            "type": "string",
+            "maxLength": 10,
+            "description": "Colour assigned to the route for map rendering.",
+            "example": "#0000FF"
+          },
+          "pathCoordinates": {
+            "description": "Polyline coordinates for rendering the route.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LatLngDto"
+            }
+          },
+          "hourly": {
+            "description": "Demand split into 24 hourly buckets",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RouteHeatmapHourlyBucketDto"
+            }
+          },
+          "transitions": {
+            "description": "Events contributing demand to this route",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RouteHeatmapTransitionDto"
+            }
+          }
+        },
+        "required": [
+          "projected",
+          "worstCase",
+          "actual",
+          "routeId",
+          "routeIndex",
+          "origin",
+          "destination",
+          "distanceMetres",
+          "displayColour",
+          "pathCoordinates",
+          "hourly",
+          "transitions"
+        ]
+      },
+      "RoutingHeatmapResponseDto": {
+        "type": "object",
+        "properties": {
+          "universityId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "date": {
+            "type": "string",
+            "example": "2026-09-18",
+            "format": "date"
+          },
+          "view": {
+            "enum": [
+              "projected",
+              "worstCase",
+              "all"
+            ],
+            "type": "string"
+          },
+          "routes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RouteHeatmapDto"
+            }
+          }
+        },
+        "required": [
+          "universityId",
+          "date",
+          "view",
+          "routes"
+        ]
+      },
       "RouteDto": {
         "type": "object",
         "properties": {
@@ -12565,8 +12849,8 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "routeIndex": {
-            "minimum": 0,
             "type": "number",
+            "minimum": 0,
             "example": 0,
             "description": "Index of route | 0 for shortest, incrementally for alternatives."
           },
@@ -12581,8 +12865,8 @@
             "type": "array"
           },
           "distanceMetres": {
-            "minimum": 1,
             "type": "number",
+            "minimum": 1,
             "example": 67,
             "description": "The route distance in metres."
           },
@@ -12716,7 +13000,7 @@
             "$ref": "#/components/schemas/RouteEventContextDto"
           },
           "sameBuilding": {
-            "type": "object",
+            "type": "boolean",
             "description": "True when both events resolve to the same building.",
             "example": false
           },
@@ -12771,12 +13055,16 @@
           "routes"
         ]
       },
+      "Object": {
+        "type": "object",
+        "properties": {}
+      },
       "AlternativeRouteDto": {
         "type": "object",
         "properties": {
           "routeIndex": {
-            "minimum": 0,
             "type": "number",
+            "minimum": 0,
             "description": "Zero-based route index. Index 0 is the recommended shortest route.",
             "example": 0
           },
@@ -12790,13 +13078,13 @@
             "type": "array"
           },
           "distanceMetres": {
-            "minimum": 0,
             "type": "number",
+            "minimum": 0,
             "example": 820,
             "description": "The route distance in metres."
           },
           "isRecommended": {
-            "type": "object",
+            "type": "boolean",
             "description": "True for route index 0, the provider-selected default route.",
             "example": true
           }
@@ -12855,9 +13143,9 @@
             "description": "Timetable containing the source events to generate."
           },
           "year": {
+            "type": "number",
             "minimum": 1000,
             "maximum": 9999,
-            "type": "number",
             "example": 2027,
             "description": "Academic year to generate. Defaults to the current UTC year."
           }
@@ -13205,9 +13493,9 @@
         "type": "object",
         "properties": {
           "year": {
+            "type": "number",
             "minimum": 1000,
             "maximum": 9999,
-            "type": "number",
             "example": 2026,
             "description": "Four-digit academic year. A university may have only one calendar per year."
           }
