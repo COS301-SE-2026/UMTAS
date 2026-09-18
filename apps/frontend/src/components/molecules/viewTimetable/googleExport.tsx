@@ -80,6 +80,7 @@ export default function GoogleExportDialog({
             className="w-fit cursor-pointer"
             disabled={isLoading || isExporting}
             onClick={onSignIn}
+            variant="outline"
           >
             <GoogleIcon />
             {isLoading ? "Checking Google access…" : "Sign in with Google"}

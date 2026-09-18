@@ -137,7 +137,7 @@ export const navigationItems: NavigationItem[] = [
     icon: "AcademicCapIcon",
     tourContent: "Manage university courses.",
     keywords: ["courses", "course management"],
-    roles: ["UNIVERSITY_ADMIN"],
+    roles: ["UNIVERSITY_ADMIN", "STUDENT"],
     requiresUniversity: true,
     showInNavbar: true,
     showInCommandPalette: true,

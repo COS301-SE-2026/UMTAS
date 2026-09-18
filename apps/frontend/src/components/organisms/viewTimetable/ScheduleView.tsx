@@ -464,21 +464,23 @@ export function ScheduleView({
           No timetables found.
         </p>
 
-        <div className="flex flex-col items-center gap-2">
+        <div className="flex items-center justify-center gap-3">
           <button
             id="ref-go-to-builder"
             onClick={createTimetable}
             className="text-sm font-medium text-[var(--btn-primary-bg)] hover:underline"
           >
-            Go to generator to create one
+            Go to generator
           </button>
+
+          <span className="text-sm text-[var(--text-secondary)]">or</span>
 
           <Link
             id="ref-go-to-solver"
             href="/solver"
             className="text-sm font-medium text-[var(--btn-primary-bg)] hover:underline"
           >
-            Upload a PDF to create one
+            Upload a PDF
           </Link>
         </div>
       </div>
@@ -774,7 +776,7 @@ export function ScheduleView({
                       aria-label="Connect Google Calendar"
                       id="btn-export-google-calendar"
                       type="button"
-                      variant="default"
+                      variant="outline"
                       disabled={exportingTo !== null}
                       className="h-8 px-3 hover:opacity-90 cursor-pointer"
                       onClick={handleGoogleCalendarExport}
