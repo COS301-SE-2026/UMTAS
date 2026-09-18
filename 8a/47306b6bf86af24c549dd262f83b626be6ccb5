@@ -1,0 +1,18 @@
+apps/frontend/src/app/calendar-management/page.tsx
+  h_2d4b3dca70a3d8 39
+apps/frontend/src/app/role-management/page.tsx
+  h_2d4b3dca70a3d8 3
+apps/frontend/src/components/templates/module-management/moduleEventTemplateTabs.tsx
+  h_2d4b3dca70a3d8 9,15-19,22,26,29,34-40,42-44,46-47
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "8a47306b6bf86af24c549dd262f83b626be6ccb5",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
