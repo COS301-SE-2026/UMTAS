@@ -85,7 +85,7 @@ export class getAllBuildingsHeatmapBuilder extends RequestBuilder<
   undefined,
   undefined,
   getAllBuildingsHeatmapRes,
-  getAllBuildingsQuery
+  getAllBuildingsHeatmapQuery
 > {
   constructor() {
     super();
