@@ -119,7 +119,7 @@ export const navigationItems: NavigationItem[] = [
     id: "solver",
     label: "Timetable Solver",
     href: "/solver",
-    section: "actions",
+    section: "primary",
     icon: "AdjustmentsHorizontalIcon",
     tourContent: "Upload timetable information and use the Timetable Solver.",
     keywords: ["solver", "timetable solver", "upload pdf", "pdf"],

@@ -14,7 +14,7 @@ export function StudentNumberInput({ onScan }: StudentNumberInputProps) {
   const handleSubmit = () => {
     const value = studentNumber.trim();
 
-    if (!/^\d{7}$/.test(value)) {
+    if (!/^\d{8}$/.test(value)) {
       return;
     }
 
@@ -48,7 +48,7 @@ export function StudentNumberInput({ onScan }: StudentNumberInputProps) {
           }}
           placeholder="Student number"
           inputMode="numeric"
-          maxLength={7}
+          maxLength={8}
         />
 
         <Button

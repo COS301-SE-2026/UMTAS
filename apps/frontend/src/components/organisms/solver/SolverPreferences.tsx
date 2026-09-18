@@ -276,7 +276,7 @@ export default function SolverPreferences({
       }
 
       return (
-        <div>
+        <div className="flex flex-col items-center justify-center gap-2 text-center">
           {spinnerText}
           <Spinner />
         </div>
@@ -348,13 +348,15 @@ export default function SolverPreferences({
           Set your preferences
         </CardHeader>
 
-        <CardContent>
+        <CardContent className="flex flex-1 flex-col">
           {jobFailed == false ? (
             <>
               {!loadingStatus() ? (
                 <>{ManageSolverOptions()}</>
               ) : (
-                <>{dynamicSpinner()}</>
+                <div className="flex flex-1 items-center justify-center">
+                  {dynamicSpinner()}
+                </div>
               )}
             </>
           ) : (

@@ -8,6 +8,7 @@ import React, {
   useMemo,
   useRef,
 } from "react";
+import Link from "next/link";
 import { Skeleton } from "@/components/atoms/baseShadcn/skeleton";
 import { WeeklyGrid } from "@/components/organisms/viewTimetable/WeeklyGrid";
 import { EmptySchedule } from "@/components/organisms/viewTimetable/EmptySchedule";
@@ -46,11 +47,9 @@ import {
   startCalendarConsent,
 } from "@/lib/auth/google-calendar";
 import GoogleExportDialog, {
-  type GoogleExportNotice,
   type GoogleScheduleOption,
 } from "@/components/molecules/viewTimetable/googleExport";
 import { Button } from "@/components/atoms/baseShadcn/button";
-import { Alert, AlertDescription } from "@/components/atoms/baseShadcn/alert";
 import { Dialog } from "@/components/atoms/baseShadcn/dialog";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
@@ -78,6 +77,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/atoms/baseShadcn/dropdown-menu";
 import { GoogleIcon } from "@/components/atoms/auth/GoogleIcon";
+import { errorName } from "../../../../utilities/errorCries";
 
 const CALENDAR_TIMEZONE = "Africa/Johannesburg";
 const GOOGLE_CALENDAR_EXPORT_TIMEOUT_MS = 60_000;
@@ -149,9 +149,16 @@ export function ScheduleView({
   const handledConsentReturn = useRef(false);
   const [isGoogleDialogOpen, setIsGoogleDialogOpen] = useState(false);
   const [googleDialogTimetableId, setGoogleDialogTimetableId] = useState("");
-  const [exportNotice, setExportNotice] = useState<GoogleExportNotice | null>(
-    null,
-  );
+
+  const showNotice = useCallback((message: string) => {
+    window.dispatchEvent(
+      new CustomEvent(errorName, {
+        detail: {
+          userMessage: message,
+        },
+      }),
+    );
+  }, []);
 
   const { data: allModules = [], isLoading: isLoadingModules } = useQuery({
     queryKey: ["Modules", "Courses"],
@@ -247,7 +254,6 @@ export function ScheduleView({
 
     exportInProgress.current = true;
     setExportingTo("ics");
-    setExportNotice(null);
     try {
       const payload = await generateCalendarPayload(selectedTimetableId);
       const icsContent = generateAcademicCalendarICS(
@@ -255,20 +261,14 @@ export function ScheduleView({
         CALENDAR_TIMEZONE,
       );
       downloadICS(icsContent, "umtas-schedule.ics");
-      setExportNotice({
-        variant: "success",
-        message: "Calendar exported to ICS.",
-      });
+      showNotice("Calendar exported to ICS.");
     } catch {
-      setExportNotice({
-        variant: "destructive",
-        message: "Could not export this calendar to ICS.",
-      });
+      showNotice("Could not export this calendar to ICS.");
     } finally {
       exportInProgress.current = false;
       setExportingTo(null);
     }
-  }, [selectedTimetableId]);
+  }, [selectedTimetableId, showNotice]);
 
   const exportToGoogleCalendar = useCallback(
     async (timetableId = selectedTimetableId) => {
@@ -276,7 +276,6 @@ export function ScheduleView({
 
       exportInProgress.current = true;
       setExportingTo("google");
-      setExportNotice(null);
       try {
         const token = await fetchGoogleCalendarToken();
         const payload = await generateCalendarPayload(timetableId);
@@ -294,26 +293,22 @@ export function ScheduleView({
           });
 
           if (result.failed.length > 0) {
-            setExportNotice({
-              variant: "default",
-              message: `UMTAS Calendar exported with ${result.failed.length} failed event${result.failed.length === 1 ? "" : "s"}.`,
-            });
+            showNotice(
+              `UMTAS Calendar exported with ${result.failed.length} failed event${result.failed.length === 1 ? "" : "s"}.`,
+            );
           } else {
-            setExportNotice({
-              variant: "success",
-              message: `UMTAS Calendar updated (${result.created} added, ${result.updated} updated).`,
-            });
+            showNotice(
+              `UMTAS Calendar updated (${result.created} added, ${result.updated} updated).`,
+            );
           }
         } finally {
           window.clearTimeout(timeoutId);
         }
       } catch (error) {
         if (error instanceof DOMException && error.name === "AbortError") {
-          setExportNotice({
-            variant: "destructive",
-            message:
-              "UMTAS Calendar export timed out. Please try again in a moment.",
-          });
+          showNotice(
+            "UMTAS Calendar export timed out. Please try again in a moment.",
+          );
           return;
         }
         if (error instanceof ConsentRequiredError) {
@@ -324,28 +319,21 @@ export function ScheduleView({
               `${returnUrl.pathname}${returnUrl.search}${returnUrl.hash}`,
             );
           } catch {
-            setExportNotice({
-              variant: "destructive",
-              message: "Could not start Google Calendar authorization.",
-            });
+            showNotice("Could not start Google Calendar authorization.");
           }
           return;
         }
 
-        setExportNotice({
-          variant: "destructive",
-          message: "Could not export this timetable to Google Calendar.",
-        });
+        showNotice("Could not export this timetable to Google Calendar.");
       } finally {
         exportInProgress.current = false;
         setExportingTo(null);
       }
     },
-    [selectedTimetableId],
+    [selectedTimetableId, showNotice],
   );
 
   const handleGoogleCalendarExport = useCallback(() => {
-    setExportNotice(null);
     setGoogleDialogTimetableId(selectedTimetableId);
     setIsGoogleDialogOpen(true);
   }, [selectedTimetableId]);
@@ -355,7 +343,6 @@ export function ScheduleView({
 
     exportInProgress.current = true;
     setExportingTo("google");
-    setExportNotice(null);
     const returnUrl = new URL(window.location.href);
     returnUrl.searchParams.set(
       "calendarExportTimetable",
@@ -367,14 +354,11 @@ export function ScheduleView({
         `${returnUrl.pathname}${returnUrl.search}${returnUrl.hash}`,
       );
     } catch {
-      setExportNotice({
-        variant: "destructive",
-        message: "Could not start Google Calendar authorization.",
-      });
+      showNotice("Could not start Google Calendar authorization.");
       exportInProgress.current = false;
       setExportingTo(null);
     }
-  }, [googleDialogTimetableId]);
+  }, [googleDialogTimetableId, showNotice]);
 
   const confirmGoogleCalendarExport = useCallback(
     async (timetableId: string) => {
@@ -411,15 +395,18 @@ export function ScheduleView({
       return () => window.clearTimeout(resumeExport);
     } else {
       const showDeniedNotice = window.setTimeout(() => {
-        setExportNotice({
-          variant: "destructive",
-          message: "Google Calendar access was not granted.",
-        });
+        showNotice("Google Calendar access was not granted.");
         router.replace(cleanedUrl);
       }, 0);
       return () => window.clearTimeout(showDeniedNotice);
     }
-  }, [exportToGoogleCalendar, router, searchParams, selectedTimetableId]);
+  }, [
+    exportToGoogleCalendar,
+    router,
+    searchParams,
+    selectedTimetableId,
+    showNotice,
+  ]);
 
   const currentWeekStart = useMemo(() => {
     const date = new Date(selectedDate);
@@ -465,7 +452,6 @@ export function ScheduleView({
   if (isLoading) {
     return renderLoadingSkeleton();
   }
-
   if (timetables.length === 0 && viewMode !== "Generate") {
     return (
       <div
@@ -477,13 +463,24 @@ export function ScheduleView({
         <p className="text-base text-[var(--text-secondary)]">
           No timetables found.
         </p>
-        <a
-          id="ref-go-to-builder"
-          onClick={createTimetable}
-          className="text-sm font-medium text-[var(--btn-primary-bg)] hover:underline"
-        >
-          Go to generator to create one
-        </a>
+
+        <div className="flex flex-col items-center gap-2">
+          <button
+            id="ref-go-to-builder"
+            onClick={createTimetable}
+            className="text-sm font-medium text-[var(--btn-primary-bg)] hover:underline"
+          >
+            Go to generator to create one
+          </button>
+
+          <Link
+            id="ref-go-to-solver"
+            href="/solver"
+            className="text-sm font-medium text-[var(--btn-primary-bg)] hover:underline"
+          >
+            Upload a PDF to create one
+          </Link>
+        </div>
       </div>
     );
   }
@@ -843,15 +840,6 @@ export function ScheduleView({
                   </Button>
                 </div>
               </div>
-              {exportNotice && (
-                <Alert
-                  variant={exportNotice.variant}
-                  aria-live="polite"
-                  className="mt-2"
-                >
-                  <AlertDescription>{exportNotice.message}</AlertDescription>
-                </Alert>
-              )}
               <AlertDialog
                 open={isDeleteDialogOpen}
                 onOpenChange={setIsDeleteDialogOpen}
@@ -910,7 +898,7 @@ export function ScheduleView({
           onExport={(timetableId) =>
             void confirmGoogleCalendarExport(timetableId)
           }
-          notice={exportNotice}
+          notice={null}
         />
       </Dialog>
     </>
