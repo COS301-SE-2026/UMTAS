@@ -1,0 +1,16 @@
+apps/frontend/src/components/molecules/roleManagement/DataTable.tsx
+  h_2d4b3dca70a3d8 2,42,82,103,112,114,121-123,126-128,130-141,143-168,170-196,198-232,234-237,239-241,243-248,250-254,258-263,265-270,272-276,278-301
+apps/frontend/src/components/templates/roleManagement/roleManagementTemplate.tsx
+  h_2d4b3dca70a3d8 2,11,55,61,63
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "fc534c22d4ea8a63c0452213642ec1a0f1cb7546",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
