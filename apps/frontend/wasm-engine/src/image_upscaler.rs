@@ -1,5 +1,5 @@
 use wasm_bindgen::prelude::*;
-use wgpu::{naga::compact::KeepUnused::No, util::DeviceExt};
+use wgpu::util::DeviceExt;
 
 // wasm function to call
 #[wasm_bindgen]
@@ -152,7 +152,7 @@ pub fn run_upscaler(device: &wgpu::Device, queue: &wgpu::Queue, buffers: &Buffer
     });
 
     let bind_grp_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
-        label: Some(("BIND_GROUP_LAYOUT")),
+        label: Some("BIND_GROUP_LAYOUT"),
         entries: &[
             //PARM_LIST
             wgpu::BindGroupLayoutEntry {
@@ -191,7 +191,7 @@ pub fn run_upscaler(device: &wgpu::Device, queue: &wgpu::Queue, buffers: &Buffer
     });
 
     let bind_grp = device.create_bind_group(&wgpu::BindGroupDescriptor {
-        label: Some(("BIND_GROUP")),
+        label: Some("BIND_GROUP"),
         layout: &bind_grp_layout,
         entries: &[
             //PARM_LIST
@@ -251,5 +251,24 @@ pub async fn read_slices(
     queue: &wgpu::Queue,
     buffers: &Buffers,
 ) -> Result<js_sys::Array, JsValue> {
-    todo!("copy output to staging buffer return uint arr")
+    let total_output_size = (5 * 640 * 640 * 3 * std::mem::size_of::<f32>()) as wgpu::BufferAddress;
+
+    let mut encoder = device.create_command_encoder(&wgpu::CommandEncoderDescriptor {
+        label: Some("STAGING_COPY_ENCODER"),
+    });
+
+    encoder.copy_buffer_to_buffer(
+        &buffers.output_buffer,
+        0,
+        &buffers.staging_buffer,
+        0,
+        total_output_size,
+    );
+
+    queue.submit(Some(encoder.finish()));
+
+    let buffer_slice = buffers.staging_buffer.slice(..);
+    
+
+    todo!("")
 }
