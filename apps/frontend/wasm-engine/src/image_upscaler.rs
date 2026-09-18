@@ -1,6 +1,5 @@
 use wasm_bindgen::prelude::*;
 use wgpu::util::DeviceExt;
-
 // wasm function to call
 #[wasm_bindgen]
 pub fn slice_image_data_gpu(
@@ -268,7 +267,34 @@ pub async fn read_slices(
     queue.submit(Some(encoder.finish()));
 
     let buffer_slice = buffers.staging_buffer.slice(..);
-    
+    let (sender, receiver) = futures_channel::oneshot::channel();
+    buffer_slice.map_async(wgpu::MapMode::Read, move |result| {
+        let _ = sender.send(result);
+    });
 
-    todo!("")
+    receiver
+        .await
+        .map_err(|_| JsValue::from_str("Buffer map channel dropped unexpectedly"))?
+        .map_err(|e| JsValue::from_str(&format!("GPU buffer mapping failed: {:?}", e)))?;
+
+    let result_array = js_sys::Array::new();
+    {
+        let data = buffer_slice.get_mapped_range();
+        let float_slice: &[f32] = bytemuck::cast_slice(&data);
+
+        // Single slice float count: 3 channels (RGB) * 640 height * 640 width
+        let slice_float_count = 3 * 640 * 640;
+
+        // 4. Split planar floats into 5 individual Float32Array instances
+        for i in 0..5 {
+            let start = i * slice_float_count;
+            let end = start + slice_float_count;
+            let slice_data = &float_slice[start..end];
+
+            let js_float_array = js_sys::Float32Array::from(slice_data);
+            result_array.push(&js_float_array);
+        }
+    }
+    buffers.staging_buffer.unmap();
+    return Ok(result_array);
 }
