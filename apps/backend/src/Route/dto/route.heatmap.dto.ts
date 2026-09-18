@@ -8,6 +8,7 @@ import {
   IsString,
   IsUUID,
   Matches,
+  MaxLength,
   Min,
   ValidateNested,
 } from 'class-validator';
@@ -213,6 +214,15 @@ export class RouteHeatmapDto extends RouteHeatmapMetricsDto {
   @IsInt()
   @Min(0)
   distanceMetres!: number;
+
+  @ApiProperty({
+    description: 'Colour assigned to the route for map rendering.',
+    example: '#0000FF',
+    maxLength: 10,
+  })
+  @IsString()
+  @MaxLength(10)
+  displayColour!: string;
 
   @ApiProperty({
     type: [LatLngDto],
