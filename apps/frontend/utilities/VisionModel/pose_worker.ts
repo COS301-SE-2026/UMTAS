@@ -1,11 +1,5 @@
 /// <reference lib="webworker" />
-import {
-  DETECT_DATA_MESSAGE,
-  DETECT_MESSAGE,
-  PIXEL_PAYLOAD,
-  POSE_DATA_MESSAGE,
-  POSE_MESSAGE,
-} from "./messageTypes";
+import { PIXEL_PAYLOAD, POSE_DATA_MESSAGE, POSE_MESSAGE } from "./messageTypes";
 import init, { slice_image_data_gpu } from "../../wasm-engine/pkg/wasm_engine";
 import * as ort from "onnxruntime-web";
 
@@ -84,7 +78,7 @@ self.onmessage = async (event: MessageEvent) => {
       const tSession = performance.now();
       await initDetection();
       console.log(
-        `[Worker] Init Detection Session took: ${((performance.now() - tSession) / 1000).toFixed(3)}s`,
+        `[Worker] Init Pose Session took: ${((performance.now() - tSession) / 1000).toFixed(3)}s`,
       );
     }
     console.log("got to before taking slices");

@@ -9,7 +9,7 @@ class PoseManager {
     if (typeof window === "undefined") return;
 
     if (!this.worker) {
-      this.worker = new Worker(new URL("./modelWorker.ts", import.meta.url), {
+      this.worker = new Worker(new URL("./pose_worker.ts", import.meta.url), {
         type: "module",
       });
       this.isProcessing = false;
@@ -61,4 +61,4 @@ class PoseManager {
   }
 }
 
-export const detectionManager = new PoseManager();
+export const pose_Manager = new PoseManager();

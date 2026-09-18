@@ -63,3 +63,13 @@ export type RESULT_PROCESS_DETECT_DATA = VisionModelEvent<
   "DETECT_DATA_PARSED",
   PROCESS_DETECT_DATA_RESULT
 >;
+
+export type PROCESS_POSE_DATA_MESSAGE = VisionModelEvent<
+  "PROCESS_POSE_DATA",
+  PROCESS_DETECT_DATA_PAYLOAD //same thing?
+>;
+
+export type RESULT_PROCESS_POSE_DATA = VisionModelEvent<
+  "POSE_DATA_PARSED",
+  unknown
+>;
