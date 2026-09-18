@@ -15,12 +15,12 @@ export type assignVenuePath =
 export type assignVenueRes =
   paths["/api/venues/{venueId}"]["patch"]["responses"]["200"]["content"]["application/json"];
 
-export type bulkAssignVenueBody =
-  paths["/api/venues/assign"]["post"]["requestBody"]["content"]["application/json"];
-export type bulkAssignVenuePath =
-  paths["/api/venues/assign"]["post"]["parameters"]["path"];
-export type bulkAssignVenueRes =
-  paths["/api/venues/assign"]["post"]["responses"]["200"]["content"]["application/json"];
+// export type bulkAssignVenueBody =
+//   paths["/api/venues/assign"]["post"]["requestBody"]["content"]["application/json"];
+// export type bulkAssignVenuePath =
+//   paths["/api/venues/assign"]["post"]["parameters"]["path"];
+// export type bulkAssignVenueRes =
+//   paths["/api/venues/assign"]["post"]["responses"]["200"]["content"]["application/json"];
 
 export type updateEventVenuePath =
   paths["/api/events/{id}/venue"]["patch"]["parameters"]["path"];
@@ -30,9 +30,10 @@ export type updateEventVenueRes =
   paths["/api/events/{id}/venue"]["patch"]["responses"]["200"]["content"]["application/json"];
 
 export class getAllVenuesBuilder extends RequestBuilder<
-  getAllVenuesQuery,
   undefined,
-  getAllVenuesRes
+  undefined,
+  getAllVenuesRes,
+  getAllVenuesQuery
 > {
   constructor() {
     super();
@@ -51,16 +52,16 @@ export class assignVenueBuilder extends RequestBuilder<
   }
 }
 
-export class bulkAssignVenueBuilder extends RequestBuilder<
-  bulkAssignVenuePath,
-  bulkAssignVenueBody,
-  bulkAssignVenueRes
-> {
-  constructor() {
-    super();
-    this.setUrl("/venues/assign").setMethod(RequestMethod.POST);
-  }
-}
+// export class bulkAssignVenueBuilder extends RequestBuilder<
+//   bulkAssignVenuePath,
+//   bulkAssignVenueBody,
+//   bulkAssignVenueRes
+// > {
+//   constructor() {
+//     super();
+//     this.setUrl("/venues/assign").setMethod(RequestMethod.POST);
+//   }
+// }
 export class updateEventVenueBuilder extends RequestBuilder<
   updateEventVenuePath,
   updateEventVenueBody,
