@@ -83,7 +83,11 @@ export class AuthService implements OnModuleInit {
       .filter(Boolean);
     const environment = process.env.NODE_ENV?.trim().toLowerCase();
     const isProduction = environment === 'production';
-    const useSecureCookies = isProduction || environment === 'staging';
+    const secureCookiesOverride = process.env.COOKIE_SECURE;
+    const useSecureCookies =
+      secureCookiesOverride === 'true' ||
+      (secureCookiesOverride !== 'false' &&
+        (isProduction || environment === 'staging'));
     const redisUrl = process.env.REDIS_URL ?? 'redis://localhost:6379';
 
     // PGlite is PostgreSQL-compatible, so both PGlite and Postgres use the 'pg'
