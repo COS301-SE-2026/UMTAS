@@ -9,11 +9,11 @@ export type getAllVenuesQuery =
   paths["/api/venues"]["get"]["parameters"]["query"];
 
 export type assignVenueBody =
-  paths["/api/venues/{venueId}/building"]["patch"]["requestBody"]["content"]["application/json"];
+  paths["/api/venues/{venueId}"]["patch"]["requestBody"]["content"]["application/json"];
 export type assignVenuePath =
-  paths["/api/venues/{venueId}/building"]["patch"]["parameters"]["path"];
+  paths["/api/venues/{venueId}"]["patch"]["parameters"]["path"];
 export type assignVenueRes =
-  paths["/api/venues/{venueId}/building"]["patch"]["responses"]["200"]["content"]["application/json"];
+  paths["/api/venues/{venueId}"]["patch"]["responses"]["200"]["content"]["application/json"];
 
 export type bulkAssignVenueBody =
   paths["/api/venues/assign"]["post"]["requestBody"]["content"]["application/json"];
@@ -47,7 +47,7 @@ export class assignVenueBuilder extends RequestBuilder<
 > {
   constructor() {
     super();
-    this.setUrl("/venues/{venueId}/building").setMethod(RequestMethod.PATCH);
+    this.setUrl("/venues/{venueId}").setMethod(RequestMethod.PATCH);
   }
 }
 

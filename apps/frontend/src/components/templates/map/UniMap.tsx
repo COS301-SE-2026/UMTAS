@@ -178,11 +178,11 @@ export function UniMap() {
             pinLocation={pinLocation}
           >
             {buildings.map((building) => (
-              <div key={building.buildingId}>
+              <div key={building.BuildingID}>
                 {building.location && (
                   <AdvancedMarker
                     position={building.location}
-                    title={building.buildingName}
+                    title={building.BuildingName}
                     onClick={() => handleMarkerClick(building)}
                   >
                     <Pin
@@ -202,7 +202,7 @@ export function UniMap() {
               (() => {
                 const currentBuilding = buildings.find(
                   (building) =>
-                    building.buildingId === activeRoute.currentBuildingId,
+                    building.BuildingID === activeRoute.currentBuildingId,
                 );
 
                 if (!currentBuilding?.location) {
@@ -250,7 +250,7 @@ export function UniMap() {
           <SheetContent side="right">
             <SheetHeader>
               <SheetTitle className="flex items-center gap-2">
-                {selectedBuilding?.buildingName}
+                {selectedBuilding?.BuildingName}
 
                 <Badge variant="secondary">
                   {selectedBuilding?.venueCount ?? 0} venues
