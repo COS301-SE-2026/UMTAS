@@ -21,7 +21,7 @@ const DATE_ONLY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 const TIME_ONLY_PATTERN = /^([01]\d|2[0-3]):([0-5]\d)$/;
 
 /**
- * Shared zero-based route ordering metadata.
+ * Index of route - 0 for shortest, 5 for 4th alternative
  */
 export class RouteVariantDto {
   @ApiProperty({
@@ -36,7 +36,7 @@ export class RouteVariantDto {
 } //END_RouteVariantDto
 
 /**
- * Database-backed walking route between two buildings.
+ * Db walking route between two buildings
  */
 export class RouteDto {
   @ApiProperty({

@@ -8,6 +8,10 @@ import { varchar } from 'drizzle-orm/pg-core';
 import { timestamp } from 'drizzle-orm/pg-core';
 import { uniqueIndex } from 'drizzle-orm/pg-core';
 import { index } from 'drizzle-orm/pg-core';
+import { check } from 'drizzle-orm/pg-core';
+import { sql } from 'drizzle-orm';
+import { doublePrecision } from 'drizzle-orm/pg-core';
+import { primaryKey } from 'drizzle-orm/pg-core';
 
 interface LatLng {
   lat: number;
@@ -58,4 +62,28 @@ export const Route = pgTable(
       table.DestinationBuildingID,
     ),
   }),
+);
+
+export const RouteDiversion = pgTable(
+  'RouteDiversion',
+  {
+    RouteID: uuid('RouteID')
+      .references(() => Route.RouteID, { onDelete: 'cascade' })
+      .notNull(),
+    Diversion: doublePrecision('Diversion').default(0).notNull(),
+    DivertToRoute: uuid('DivertToRoute')
+      .references(() => Route.RouteID, { onDelete: 'cascade' })
+      .notNull(),
+  },
+  (table) => [
+    check(
+      'diversion_range',
+      sql`${table.Diversion} >= 0 AND ${table.Diversion} <= 1`,
+    ),
+    check('no_self_diversion', sql`${table.RouteID}<>${table.DivertToRoute}`),
+
+    primaryKey({
+      columns: [table.RouteID, table.DivertToRoute],
+    }),
+  ],
 );
