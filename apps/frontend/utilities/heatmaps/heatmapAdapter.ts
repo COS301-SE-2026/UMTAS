@@ -16,10 +16,13 @@ interface HourlyMetricBucket {
   worstCaseUtilisation?: number | null;
 }
 
+export type HeatmapMetric = "projected" | "worstCase";
+
 function maxInHourRange(
   hourly: HourlyMetricBucket[],
   fromHour: number,
   toHour: number,
+  metric: HeatmapMetric,
 ): number {
   const bucketsInRange = hourly.filter(
     (bucket) => bucket.hour >= fromHour && bucket.hour <= toHour,
@@ -28,11 +31,13 @@ function maxInHourRange(
   let max = 0;
 
   for (const bucket of bucketsInRange) {
-    const value =
-      bucket.projectedUtilisation ??
-      bucket.worstCaseUtilisation ??
-      bucket.projected ??
-      0;
+    // const value =
+    //   bucket.projectedUtilisation ??
+    //   bucket.worstCaseUtilisation ??
+    //   bucket.projected ??
+    //   0;
+
+    const value = bucket[metric] ?? 0;
 
     if (value > max) {
       max = value;
@@ -69,6 +74,7 @@ export function buildingHeatmapRangeToPoints(
   heatmaps: BuildingHeatmapType[],
   fromHour: number,
   toHour: number,
+  metric: HeatmapMetric,
 ): WeightedPoint[] {
   return heatmaps
     .filter((heatmap) => heatmap.building?.location != null)
@@ -77,7 +83,7 @@ export function buildingHeatmapRangeToPoints(
         heatmap.building.location!.lng,
         heatmap.building.location!.lat,
       ],
-      weight: maxInHourRange(heatmap.hourly, fromHour, toHour),
+      weight: maxInHourRange(heatmap.hourly, fromHour, toHour, metric),
     }));
 }
 
@@ -142,11 +148,12 @@ export function routeHeatmapRangeToPoints(
   routes: RouteHeatmapType[],
   fromHour: number,
   toHour: number,
+  metric: HeatmapMetric,
 ): WeightedPoint[] {
   const points: WeightedPoint[] = [];
 
   for (const route of routes) {
-    const weight = maxInHourRange(route.hourly, fromHour, toHour);
+    const weight = maxInHourRange(route.hourly, fromHour, toHour, metric);
 
     if (weight <= 0) {
       continue;
