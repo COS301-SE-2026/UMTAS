@@ -77,7 +77,8 @@ export default function GoogleExportDialog({
 
           <Button
             type="button"
-            className="w-fit cursor-pointer"
+            variant="outline"
+            className="flex w-fit cursor-pointer items-center gap-2 self-center border-[var(--border)] text-[var(--text-primary)] transition-colors duration-[var(--duration-fast)] hover:bg-[var(--bg-elevated)]"
             disabled={isLoading || isExporting}
             onClick={onSignIn}
             variant="outline"
