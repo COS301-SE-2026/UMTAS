@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto';
 import { EventCriteria } from 'src/Events/dto/event.types';
-import { RouteEventContextDto } from 'src/Route/dto/route.dto';
+import { RouteEventContextDto } from 'src/Route/dto';
 import { StudentEventRow } from 'src/Route/student-routing.service';
 
 export function createStudentEventRow(
