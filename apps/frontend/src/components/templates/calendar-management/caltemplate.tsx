@@ -153,22 +153,35 @@ export default function CalTemplate() {
     <>
       {/* <Tutorial steps={steps} wait={true} /> */}
 
-      <div className="items-center flex flex-col gap-6 w-full px-6 capitalize">
+      <div className="flex w-full flex-col items-center gap-6 px-6 pt-6 capitalize">
         <div
           id="calendar-management"
-          className="w-full h-full max-w-6xl bg-[var(--bg-surface)] overflow-auto border border-[var(--border)] rounded-xl shadow-sm"
+          className="w-full max-w-6xl overflow-auto rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] shadow-sm"
         >
-          <h1 className="text-lg font-semibold text-[var(--text-primary)] pl-4 pt-4">
-            Calendar Management
-          </h1>
+          {/* Header */}
+          <div className="border-b border-[var(--border)] px-5 py-4">
+            <h1 className="text-lg font-semibold text-[var(--text-primary)]">
+              Calendar Management
+            </h1>
 
-          <p className="text-sm text-[var(--text-secondary)] pl-4 pt-2 pb-2">
-            Update and manage calendars by year
-          </p>
+            <p className="mt-1 text-sm normal-case text-[var(--text-secondary)]">
+              Manage academic periods, holidays, recesses and important
+              university dates.
+            </p>
+          </div>
 
-          <div className="flex flex-col md:flex-row gap-4 p-5 items-center justify-between">
-            <div className="flex flex-wrap items-start gap-3 w-full md:w-auto">
+          {/* Controls */}
+          <div className="mx-5 mt-5 flex flex-col gap-4 rounded-lg border border-[var(--border)] bg-[var(--bg-base)] p-4 md:flex-row md:items-end md:justify-between">
+            <div className="flex flex-wrap items-end gap-4">
+              {/* Academic Year */}
               <div className="flex flex-col gap-2">
+                <Label
+                  htmlFor="select-calendar-year"
+                  className="text-sm font-medium text-[var(--text-secondary)]"
+                >
+                  Academic Year
+                </Label>
+
                 <Select
                   value={selectedYear}
                   onValueChange={async (e) => {
@@ -188,7 +201,7 @@ export default function CalTemplate() {
                   <SelectTrigger
                     id="select-calendar-year"
                     data-testid="SELECT_NEW_YEAR"
-                    className="w-[180px] bg-[var(--background)]"
+                    className="w-[180px] bg-[var(--bg-surface)]"
                   >
                     <SelectValue placeholder="Year" />
                   </SelectTrigger>
@@ -201,40 +214,55 @@ export default function CalTemplate() {
                     ))}
                   </SelectContent>
                 </Select>
-
-                <Label
-                  htmlFor="include-public-holidays"
-                  className="cursor-pointer whitespace-nowrap flex items-center gap-2 pl-1 pt-2"
-                >
-                  <Checkbox
-                    id="include-public-holidays"
-                    checked={includePublicHolidays}
-                    disabled={
-                      !selectedAcID ||
-                      !publicHolidayCalendar ||
-                      isUpdatingSubscriptions
-                    }
-                    onCheckedChange={(checked) => {
-                      if (!selectedAcID || !publicHolidayCalendar) {
-                        return;
-                      }
-
-                      updateSubscriptions({
-                        paths: {
-                          id: selectedAcID,
-                        },
-                        body: {
-                          subscriptions: checked
-                            ? [publicHolidayCalendar.id]
-                            : [],
-                        },
-                      });
-                    }}
-                  />
-                  Include public holidays
-                </Label>
               </div>
 
+              {/* Public Holidays */}
+              <Label
+                htmlFor="include-public-holidays"
+                className="flex h-10 cursor-pointer items-center gap-2 whitespace-nowrap"
+              >
+                <Checkbox
+                  id="include-public-holidays"
+                  checked={includePublicHolidays}
+                  disabled={
+                    !selectedAcID ||
+                    !publicHolidayCalendar ||
+                    isUpdatingSubscriptions
+                  }
+                  onCheckedChange={(checked) => {
+                    if (!selectedAcID || !publicHolidayCalendar) {
+                      return;
+                    }
+
+                    updateSubscriptions({
+                      paths: {
+                        id: selectedAcID,
+                      },
+                      body: {
+                        subscriptions: checked
+                          ? [publicHolidayCalendar.id]
+                          : [],
+                      },
+                    });
+                  }}
+                  className="
+                  border
+                  border-[var(--text-secondary)]
+                  bg-[var(--bg-surface)]
+                  data-[state=checked]:border-[var(--btn-primary-bg)]
+                  data-[state=checked]:bg-[var(--btn-primary-bg)]
+                  data-[state=checked]:text-[var(--btn-primary-text)]
+                "
+                />
+
+                <span className="text-sm text-[var(--text-primary)]">
+                  Include public holidays
+                </span>
+              </Label>
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center gap-2">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
@@ -242,7 +270,7 @@ export default function CalTemplate() {
                     data-testid="CREATE_RESTRICTION"
                     className="w-fit capitalize"
                   >
-                    create restriction
+                    Create restriction
                   </Button>
                 </DropdownMenuTrigger>
 
@@ -275,25 +303,24 @@ export default function CalTemplate() {
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              <Button
-                hidden={!flagtempRes}
-                variant="destructive"
-                onClick={() => {
-                  setTempRes(null);
-                  setFlagTempRes(false);
-                }}
-              >
-                Clear
-              </Button>
+              {flagtempRes && (
+                <Button
+                  variant="destructive"
+                  onClick={() => {
+                    setTempRes(null);
+                    setFlagTempRes(false);
+                  }}
+                >
+                  Clear
+                </Button>
+              )}
             </div>
           </div>
 
-          <div
-            id="calendar-restrictions"
-            className="w-full flex flex-col items-center p-4 px-10"
-          >
+          {/* Restrictions */}
+          <div id="calendar-restrictions" className="flex w-full flex-col p-5">
             {flagtempRes && tempRes && selectedAcID && (
-              <div className="w-full max-w-2xl border-dashed border-2 rounded-2xl my-2 p-3">
+              <div className="mb-5 w-full rounded-xl border-2 border-dashed border-[var(--border)] p-4">
                 <div
                   data-testid="TEMP_CONTAINER"
                   key={tempRes.type}
@@ -307,13 +334,13 @@ export default function CalTemplate() {
               </div>
             )}
 
-            <div className="grid grid-cols-1 gap-y-10 p-5 w-full justify-items-center">
+            <div className="grid w-full grid-cols-1 gap-4 lg:grid-cols-2">
               {selectedAcID &&
                 restrictions?.restrictions.map((res) => (
                   <div
                     data-testid="ADDED_CONTAINER"
                     key={res.id}
-                    className="w-full max-w-2xl"
+                    className="w-full"
                   >
                     {handlers.handle(res, currentAC)}
                   </div>

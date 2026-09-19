@@ -36,9 +36,7 @@ export default function CourseManagement() {
     <>
       <Tutorial steps={steps} wait={true} />
 
-      <div className="overflow-y-hidden">
-        <CalTemplate />
-      </div>
+      <CalTemplate />
     </>
   );
 }

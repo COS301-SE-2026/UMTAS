@@ -101,6 +101,24 @@ export default function SolverPreferences({
     );
   }
 
+  function handleCreateTimetable() {
+    const cleanedName = timetableName.trim();
+
+    if (!cleanedName) {
+      window.dispatchEvent(
+        new CustomEvent(errorName, {
+          detail: {
+            userMessage: "Please provide a timetable name.",
+          },
+        }),
+      );
+
+      return;
+    }
+
+    enrollUser();
+  }
+
   const { data: resultOfPoll, isFetching: pollFetching } = useQuery({
     queryKey: ["solver", "poll"],
     queryFn: async () => {
@@ -200,7 +218,7 @@ export default function SolverPreferences({
         const resultTT = await timetableBuilder.send({
           body: {
             eventIds: typeShiftedResults?.timetableSolution.selectedEventIds,
-            timetableName: timetableName == "" ? "My timetable" : timetableName,
+            timetableName: timetableName.trim(),
           },
         });
         return resultTT;
@@ -276,7 +294,7 @@ export default function SolverPreferences({
       }
 
       return (
-        <div>
+        <div className="flex flex-col items-center justify-center gap-2 text-center">
           {spinnerText}
           <Spinner />
         </div>
@@ -315,19 +333,7 @@ export default function SolverPreferences({
             id="btn-upload-and-create-timetable"
             disabled={loadingStatus()}
             type="button"
-            onClick={() => {
-              if (timetableName != "") {
-                enrollUser();
-              } else {
-                window.dispatchEvent(
-                  new CustomEvent(errorName, {
-                    detail: {
-                      userMessage: "Please ensure you provide a timetable name",
-                    },
-                  }),
-                );
-              }
-            }}
+            onClick={handleCreateTimetable}
             className="h-8 w-fit"
           >
             Upload and Create Timetable
@@ -348,13 +354,15 @@ export default function SolverPreferences({
           Set your preferences
         </CardHeader>
 
-        <CardContent>
+        <CardContent className="flex flex-1 flex-col">
           {jobFailed == false ? (
             <>
               {!loadingStatus() ? (
                 <>{ManageSolverOptions()}</>
               ) : (
-                <>{dynamicSpinner()}</>
+                <div className="flex flex-1 items-center justify-center">
+                  {dynamicSpinner()}
+                </div>
               )}
             </>
           ) : (

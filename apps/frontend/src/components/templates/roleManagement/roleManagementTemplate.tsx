@@ -1,4 +1,5 @@
 "use client";
+
 import UserDirectoryCard from "@/components/organisms/roleManagement/UserDirectory";
 import Tutorial from "@/components/organisms/nav/Tutorial";
 import NotFound from "@/app/not-found";
@@ -7,6 +8,7 @@ import {
   UniversityStateLoading,
   useUniversityState,
 } from "@/hooks/useUniversityState";
+
 const steps = [
   {
     target: "#input-search-name-email-role",
@@ -50,12 +52,16 @@ export default function RoleManagementTemplate() {
 
   if (ViableRole) {
     const hasRole = university?.role != null;
+
     if (!hasRole) return <NoRoleSelected />;
 
     return (
       <>
         <Tutorial steps={steps} wait={true} />
-        <UserDirectoryCard />
+
+        <div className="flex w-full flex-col items-center gap-6 px-6 pt-6">
+          <UserDirectoryCard />
+        </div>
       </>
     );
   } else {
