@@ -1,7 +1,7 @@
 import { AppDatabase } from 'src/auth/auth';
 import { CourseServiceV2 } from './courseV2.service';
 import { DatabaseService } from 'src/db/database.service';
-import { CourseEnrollment } from 'src/entities';
+import { CourseEnrollment, ModuleEnrollment } from 'src/entities';
 import { and, eq } from 'drizzle-orm';
 import {
   EnrollStudentToCourseResponseDto,
