@@ -37,6 +37,7 @@ import {
 } from "../../../../utilities/heatmaps/heatmapAdapter";
 import { HourRangeSelect } from "@/components/molecules/heatmaps/HourRangeSelect";
 import { HeatmapOverlay } from "@/components/organisms/heatmaps/HeatmapOverlay";
+import { Button } from "@/components/atoms/baseShadcn/button";
 
 interface GeoJsonPolygon {
   type: "Polygon";
@@ -89,6 +90,9 @@ export function UniMap() {
   const [mapMode, setMapMode] = useState<"route" | "heatmap">("route");
   const [fromHour, setFromHour] = useState(8);
   const [toHour, setToHour] = useState(15);
+  const [metricMode, setMetricMode] = useState<"projected" | "worstCase">(
+    "projected",
+  );
 
   //this needs to be in a very specific format. Looks super complicated, but the backend cries when I don't send the request in this format
   const [selectedTime, setSelectedTime] = useState(() => {
@@ -123,16 +127,26 @@ export function UniMap() {
       return [];
     }
 
-    return buildingHeatmapRangeToPoints(buildingHeatmaps, fromHour, toHour);
-  }, [mapMode, buildingHeatmaps, fromHour, toHour]);
+    return buildingHeatmapRangeToPoints(
+      buildingHeatmaps,
+      fromHour,
+      toHour,
+      metricMode,
+    );
+  }, [mapMode, buildingHeatmaps, fromHour, toHour, metricMode]);
 
   const routeHeatmapPoints: WeightedPoint[] = useMemo(() => {
     if (mapMode !== "heatmap") {
       return [];
     }
 
-    return routeHeatmapRangeToPoints(routeHeatmaps, fromHour, toHour);
-  }, [mapMode, routeHeatmaps, fromHour, toHour]);
+    return routeHeatmapRangeToPoints(
+      routeHeatmaps,
+      fromHour,
+      toHour,
+      metricMode,
+    );
+  }, [mapMode, routeHeatmaps, fromHour, toHour, metricMode]);
 
   const role = university?.role;
   const isAssignedRole = role != null;
@@ -247,16 +261,35 @@ export function UniMap() {
           )}
 
           {mapMode === "heatmap" && (
-            <HourRangeSelect
-              value={{
-                startTime: `${String(fromHour).padStart(2, "0")}:00`,
-                endTime: `${String(toHour).padStart(2, "0")}:00`,
-              }}
-              onChange={(slot) => {
-                setFromHour(parseInt(slot.startTime.split(":")[0], 10));
-                setToHour(parseInt(slot.endTime.split(":")[0], 10));
-              }}
-            />
+            <>
+              <div>
+                <Button
+                  type="button"
+                  variant="default"
+                  onClick={() => setMetricMode("projected")}
+                >
+                  Projected
+                </Button>
+                <Button
+                  type="button"
+                  variant="default"
+                  onClick={() => setMetricMode("worstCase")}
+                >
+                  Worst Case
+                </Button>
+              </div>
+
+              <HourRangeSelect
+                value={{
+                  startTime: `${String(fromHour).padStart(2, "0")}:00`,
+                  endTime: `${String(toHour).padStart(2, "0")}:00`,
+                }}
+                onChange={(slot) => {
+                  setFromHour(parseInt(slot.startTime.split(":")[0], 10));
+                  setToHour(parseInt(slot.endTime.split(":")[0], 10));
+                }}
+              />
+            </>
           )}
         </div>
 
