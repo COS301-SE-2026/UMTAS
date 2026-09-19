@@ -6,6 +6,7 @@ import { StudentRoutingController } from './student-routing.controller';
 import { StudentRoutingService } from './student-routing.service';
 import { OrsService } from './ors.service';
 import { RouteHeatmapService } from './route.heatmap.service';
+import { RouteDiversionService } from './route.diversion.service';
 
 @Module({
   imports: [EventModule],
@@ -15,12 +16,14 @@ import { RouteHeatmapService } from './route.heatmap.service';
     StudentRoutingService,
     OrsService,
     RouteHeatmapService,
+    RouteDiversionService,
   ],
   providers: [
     RouteService,
     StudentRoutingService,
     OrsService,
     RouteHeatmapService,
+    RouteDiversionService,
   ],
 })
 export class RouteModule {}

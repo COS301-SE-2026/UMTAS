@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { DatabaseService } from 'src/db/database.service';
@@ -17,7 +18,7 @@ import {
   ActiveRouteStatus,
   RouteDto,
   RouteSingleResponseDto,
-} from './dto/route.dto';
+} from './dto';
 import { eq, and, inArray, asc } from 'drizzle-orm';
 import { OrsService } from './ors.service';
 import { AppDatabase } from 'src/auth/auth';
@@ -26,16 +27,43 @@ type RouteEntity = typeof Route.$inferSelect;
 
 @Injectable()
 export class RouteService {
+  private readonly OOPSIE = new Logger(this.constructor.name);
+
   constructor(
     private readonly databaseService: DatabaseService,
     private readonly orsService: OrsService,
   ) {}
+
+  //Crud
+  async getById(
+    routeId: string,
+    tx?: AppDatabase,
+  ): Promise<RouteSingleResponseDto> {
+    const db = tx ?? this.databaseService.db;
+
+    //fetch route
+    const [route] = await db
+      .select()
+      .from(Route)
+      .where(eq(Route.RouteID, routeId))
+      .limit(1);
+
+    if (!route) {
+      this.OOPSIE.warn(`Route[${routeId}] not found`);
+      throw new NotFoundException(`Route not found`);
+    }
+
+    const response: RouteDto = this.routeDtoAdapter(route);
+
+    return { route: response };
+  } //END_getById
 
   async getRouteVariant(
     uniId: string,
     originBuildingId: string,
     destinationBuildingId: string,
     routeIndex: number,
+    tx?: AppDatabase,
   ): Promise<RouteDto> {
     if (!Number.isInteger(routeIndex) || routeIndex < 0) {
       throw new BadRequestException(
@@ -49,7 +77,7 @@ export class RouteService {
       );
     }
 
-    const db = this.databaseService.db;
+    const db = tx ?? this.databaseService.db;
 
     const [cachedRoute] = await db
       .select()

@@ -1,6 +1,7 @@
 import {
   buildingId,
   destinationBuildingId,
+  routeId,
   uniId,
   userId,
 } from 'src/Testing/constants';
@@ -13,7 +14,10 @@ import {
 import { Test } from '@nestjs/testing';
 import { DatabaseService } from 'src/db/database.service';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
-import { createRoute } from 'src/Testing/Factories/route.factory';
+import {
+  createRoute,
+  createRouteDto,
+} from 'src/Testing/Factories/route.factory';
 import { ActiveRouteStatus } from './dto/route.dto';
 import { createMockOrsService } from 'src/Testing/Mocks/services/ors.mock';
 import { OrsService } from './ors.service';
@@ -43,6 +47,40 @@ describe('RouteService', () => {
   });
 
   //Tests
+  describe('Test_getById', () => {
+    it('should throw NotFoundException when route not found', async () => {
+      //Arrange
+      mockDbResult(mockDb.select, []);
+
+      //Act + Assert
+      await expect(service.getById(routeId)).rejects.toThrow(NotFoundException);
+    });
+
+    it('should return RouteSingleResponseDto for route found', async () => {
+      //Arrange
+      const route = createRoute();
+      mockDbResult(mockDb.select, [route]);
+      const routeDto = createRouteDto({
+        routeId: route.RouteID,
+        originBuildingId: route.OriginBuildingID,
+        destinationBuildingId: route.DestinationBuildingID,
+        routeIndex: route.RouteIndex,
+        pathCoordinates: route.PathCoordinates,
+        distanceMetres: route.DistanceMetres,
+        displayColour: route.DisplayColour,
+      });
+      const expected = {
+        route: routeDto,
+      };
+
+      //Act
+      const result = await service.getById(route.RouteID);
+
+      //Assert
+      expect(result).toMatchObject(expected);
+    });
+  });
+
   describe('Test_getRouteVariant', () => {
     const origin = buildingId;
     const destination = destinationBuildingId;
