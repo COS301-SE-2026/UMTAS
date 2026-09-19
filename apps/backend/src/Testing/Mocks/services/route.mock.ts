@@ -6,6 +6,7 @@ export function createMockRouteService() {
     getRouteVariant: jest.fn(),
     getOrCreateRoute: jest.fn(),
     getActiveRoute: jest.fn(),
+    getRecommendedRouteVariant: jest.fn(),
   };
 
   return {

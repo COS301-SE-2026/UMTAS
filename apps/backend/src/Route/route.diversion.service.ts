@@ -78,7 +78,7 @@ export class RouteDiversionService {
     if (dto.toRoute) {
       //Validate it exists
       toRoute = (await this.routeService.getById(dto.toRoute, tx)).route;
-    } else if (dto.toRouteIndex) {
+    } else if (dto.toRouteIndex !== undefined) {
       //Get alternate route
       toRoute = await this.routeService.getRouteVariant(
         uniId,
