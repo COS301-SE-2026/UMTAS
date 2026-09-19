@@ -7,7 +7,7 @@ import {
   getMedianAndMax,
   WeightedPoint,
 } from "../../utilities/heatmaps/heatmapAdapter";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 //temporary colours for the range. change as you go
 const HEATMAP_COLOUR_RANGE: [number, number, number, number][] = [
@@ -16,6 +16,9 @@ const HEATMAP_COLOUR_RANGE: [number, number, number, number][] = [
   [250, 204, 21, 200], //median
   [239, 68, 68, 255], //max
 ];
+
+//temporary for now until we get the simulation service up
+const HEATMAP_COLOUR_DOMAIN: [number, number] = [0, 5];
 
 interface UseHeatmapOverlayOptions {
   buildingPoints: WeightedPoint[];
@@ -32,6 +35,32 @@ export function useHeatmapOverlay({
 }: UseHeatmapOverlayOptions) {
   const map = useMap();
   const overlayRef = useRef<GoogleMapsOverlay | null>(null);
+
+  //this is to prevent the dots showing up when zooming in on the heatmap
+  const [radius, setRadius] = useState(radiusPixels);
+
+  // useEffect(() => {
+  //   if (!map) {
+  //     return;
+  //   }
+
+  //   function updateRadius() {
+  //     const zoom = map?.getZoom() ?? 15;
+  //     const lat = map?.getCenter()?.lat() ?? 0;
+  //     //calculates metres per pixel for smooth transition. prayed to the math gods to help me
+  //     const metresPerPixel =
+  //       (156543.03392 * Math.cos((lat * Math.PI) / 180)) / Math.pow(2, zoom);
+  //     //change this with testing
+  //     const wantedRadiusMetres = 40;
+
+  //     setRadius(wantedRadiusMetres / metresPerPixel);
+  //   }
+
+  //   updateRadius();
+
+  //   const listener = map.addListener("zoom_changed", updateRadius);
+  //   return () => listener.remove();
+  // }, [map]);
 
   useEffect(() => {
     if (!map) {
@@ -64,10 +93,10 @@ export function useHeatmapOverlay({
       data: buildingPoints,
       getPosition: (dot) => dot.position,
       getWeight: (dot) => dot.weight,
-      radiusPixels,
+      radiusPixels: 250,
       intensity,
       colorRange: HEATMAP_COLOUR_RANGE,
-      colorDomain: [0, buildingScale.max],
+      colorDomain: HEATMAP_COLOUR_DOMAIN,
     });
 
     const routeHeatmapLayer = new HeatmapLayer<WeightedPoint>({
@@ -75,15 +104,17 @@ export function useHeatmapOverlay({
       data: routePoints,
       getPosition: (dot) => dot.position,
       getWeight: (dot) => dot.weight,
-      radiusPixels,
+      radiusPixels: radiusPixels,
       intensity,
       opacity: 0.6,
       colorRange: HEATMAP_COLOUR_RANGE,
-      colorDomain: [0, routeScale.max],
+      colorDomain: HEATMAP_COLOUR_DOMAIN,
     });
 
     overlayRef.current.setProps({
       layers: [buildingHeatmapLayer, routeHeatmapLayer],
     });
-  }, [buildingPoints, routePoints, radiusPixels, intensity]);
+
+    console.log(radius, buildingPoints.length, routePoints.length);
+  }, [buildingPoints, routePoints, radius, intensity]);
 }
