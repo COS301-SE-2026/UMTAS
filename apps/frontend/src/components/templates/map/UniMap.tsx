@@ -38,6 +38,13 @@ import {
 import { HourRangeSelect } from "@/components/molecules/heatmaps/HourRangeSelect";
 import { HeatmapOverlay } from "@/components/organisms/heatmaps/HeatmapOverlay";
 import { Button } from "@/components/atoms/baseShadcn/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/atoms/baseShadcn/select";
 
 interface GeoJsonPolygon {
   type: "Polygon";
@@ -262,22 +269,34 @@ export function UniMap() {
 
           {mapMode === "heatmap" && (
             <>
-              <div>
-                <Button
-                  type="button"
-                  variant="default"
-                  onClick={() => setMetricMode("projected")}
+              <Select
+                value={metricMode}
+                onValueChange={(value: "projected" | "worstCase") =>
+                  setMetricMode(value)
+                }
+              >
+                <SelectTrigger
+                  id="select-metric-mode"
+                  className="bg-[var(--bg-surface)] border-[var(--border)] cursor-pointer"
+                  title="Select Metric"
                 >
-                  Projected
-                </Button>
-                <Button
-                  type="button"
-                  variant="default"
-                  onClick={() => setMetricMode("worstCase")}
-                >
-                  Worst Case
-                </Button>
-              </div>
+                  <SelectValue placeholder="Select Metric" />
+                </SelectTrigger>
+                <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)]">
+                  <SelectItem
+                    value="projected"
+                    className="text-[var(--text-primary)]"
+                  >
+                    Best Case
+                  </SelectItem>
+                  <SelectItem
+                    value="worstCase"
+                    className="text-[var(--text-primary)]"
+                  >
+                    Worst Case
+                  </SelectItem>
+                </SelectContent>
+              </Select>
 
               <HourRangeSelect
                 value={{
