@@ -5,13 +5,12 @@ import {
 } from './student-routing.service';
 
 //Actual services
-import { RecurringEventService } from 'src/Events/recurring-event.service';
-import { recommendedRouteVariantOptions, RouteService } from './route.service';
 import { DatabaseService } from 'src/db/database.service';
+import { recommendedRouteVariantOptions, RouteService } from './route.service';
 
 //Mock services and db
-import * as mockServiceFactory from 'src/Testing/Mocks/services';
 import { createMockDatabase, mockDbResult } from 'src/Testing/Mocks';
+import * as mockServiceFactory from 'src/Testing/Mocks/services';
 
 //Factories
 import {
@@ -24,6 +23,7 @@ import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 // idk just imports man
 import { Test } from '@nestjs/testing';
+import { RouteHelperService } from './route.helper.service';
 
 describe('StudentRoutingService', () => {
   let service: StudentRoutingService;
@@ -31,8 +31,8 @@ describe('StudentRoutingService', () => {
   const { mockDb, reset: resetDb } = createMockDatabase();
   const { mockRouteService, reset: resetRoute } =
     mockServiceFactory.createMockRouteService();
-  const { mockRecurringEventService, reset: resetReccuringEventService } =
-    mockServiceFactory.createMockRecurringEventService();
+  const { mockRouteHelperService, reset: resetRouteHelper } =
+    mockServiceFactory.createMockRouteHelperService();
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
@@ -40,7 +40,7 @@ describe('StudentRoutingService', () => {
         StudentRoutingService,
         { provide: DatabaseService, useValue: { db: mockDb } },
         { provide: RouteService, useValue: mockRouteService },
-        { provide: RecurringEventService, useValue: mockRecurringEventService },
+        { provide: RouteHelperService, useValue: mockRouteHelperService },
       ],
     }).compile();
 
@@ -50,7 +50,7 @@ describe('StudentRoutingService', () => {
   afterEach(() => {
     resetDb();
     resetRoute();
-    resetReccuringEventService();
+    resetRouteHelper();
 
     jest.clearAllMocks();
   });
@@ -60,7 +60,7 @@ describe('StudentRoutingService', () => {
     it('should return empty events and routes when no events found', async () => {
       //Arrange
       jest
-        .spyOn(service as any, 'getStudentEventsForDate')
+        .spyOn(mockRouteHelperService, 'getStudentEventsForDate')
         .mockResolvedValue([]);
 
       //Act
@@ -81,9 +81,11 @@ describe('StudentRoutingService', () => {
       const event = createStudentEventRow();
       const context = createEventContext({ eventId: 'event-1' });
       jest
-        .spyOn(service as any, 'getStudentEventsForDate')
+        .spyOn(mockRouteHelperService, 'getStudentEventsForDate')
         .mockResolvedValue([event]);
-      jest.spyOn(service as any, 'toEventContext').mockReturnValue(context);
+      jest
+        .spyOn(mockRouteHelperService, 'toEventContext')
+        .mockReturnValue(context);
 
       //Act
       const result = await service.getRoutesForDate('user-1', 'uni-1', {
@@ -104,13 +106,15 @@ describe('StudentRoutingService', () => {
       const transition = { originEvent: c1, destinationEvent: c2 } as any;
 
       jest
-        .spyOn(service as any, 'getStudentEventsForDate')
+        .spyOn(mockRouteHelperService, 'getStudentEventsForDate')
         .mockResolvedValue([e1, e2]);
       jest
-        .spyOn(service as any, 'toEventContext')
+        .spyOn(mockRouteHelperService, 'toEventContext')
         .mockReturnValueOnce(c1)
         .mockReturnValueOnce(c2);
-      jest.spyOn(service as any, 'compareEventContexts').mockReturnValue(0);
+      jest
+        .spyOn(mockRouteHelperService, 'compareEventContexts')
+        .mockReturnValue(0);
       const buildSpy = jest
         .spyOn(service as any, 'buildTransition')
         .mockResolvedValue(transition);
@@ -151,7 +155,7 @@ describe('StudentRoutingService', () => {
         .spyOn(service as any, 'getStudentEventForDate')
         .mockResolvedValue(createStudentEventRow());
       jest
-        .spyOn(service as any, 'toEventContext')
+        .spyOn(mockRouteHelperService, 'toEventContext')
         .mockReturnValueOnce(createEventContext({ buildingId: 'building-1' }))
         .mockReturnValueOnce(createEventContext({ buildingId: null }));
 
@@ -167,7 +171,7 @@ describe('StudentRoutingService', () => {
         .spyOn(service as any, 'getStudentEventForDate')
         .mockResolvedValue(createStudentEventRow());
       jest
-        .spyOn(service as any, 'toEventContext')
+        .spyOn(mockRouteHelperService, 'toEventContext')
         .mockReturnValue(createEventContext({ buildingId: 'building-1' }));
 
       //Act + Assert
@@ -188,7 +192,7 @@ describe('StudentRoutingService', () => {
         .spyOn(service as any, 'getStudentEventForDate')
         .mockResolvedValue(createStudentEventRow());
       jest
-        .spyOn(service as any, 'toEventContext')
+        .spyOn(mockRouteHelperService, 'toEventContext')
         .mockReturnValueOnce(originContext)
         .mockReturnValueOnce(destinationContext);
       jest
@@ -231,7 +235,7 @@ describe('StudentRoutingService', () => {
         .spyOn(service as any, 'getStudentEventForDate')
         .mockResolvedValue(createStudentEventRow());
       jest
-        .spyOn(service as any, 'toEventContext')
+        .spyOn(mockRouteHelperService, 'toEventContext')
         .mockReturnValueOnce(originContext)
         .mockReturnValueOnce(destinationContext);
       jest
@@ -342,39 +346,13 @@ describe('StudentRoutingService', () => {
     });
   }); //END_Test_buildTransition
 
-  describe('Test_getStudentEventsForDate', () => {
-    it('should map rows and delegate to selectFirstVenuePerEvent', async () => {
-      //Arrange
-      const row = createStudentEventRow({ eventId: 'event-1' });
-      mockDbResult(mockDb.select, [row]);
-      const spy = jest
-        .spyOn(service as any, 'selectFirstVenuePerEvent')
-        .mockReturnValue([row]);
-
-      //Act
-      const result = await (service as any).getStudentEventsForDate(
-        'user-1',
-        'uni-1',
-        '2026-09-16',
-        mockDb,
-      );
-
-      //Assert
-      expect(result).toEqual([row]);
-      expect(spy).toHaveBeenCalledWith(
-        [expect.objectContaining({ eventId: 'event-1' })],
-        '2026-09-16',
-      );
-    });
-  }); //END_Test_getStudentEventsForDate
-
   describe('Test_getStudentEventForDate', () => {
     it('should return the event when found', async () => {
       //Arrange
       const row = createStudentEventRow({ eventId: 'event-1' });
       mockDbResult(mockDb.select, [row]);
       jest
-        .spyOn(service as any, 'selectFirstVenuePerEvent')
+        .spyOn(mockRouteHelperService, 'selectFirstVenuePerEvent')
         .mockReturnValue([row]);
 
       //Act
@@ -394,7 +372,7 @@ describe('StudentRoutingService', () => {
       //Arrange
       mockDbResult(mockDb.select, []);
       jest
-        .spyOn(service as any, 'selectFirstVenuePerEvent')
+        .spyOn(mockRouteHelperService, 'selectFirstVenuePerEvent')
         .mockReturnValue([]);
 
       //Act + Assert
@@ -409,113 +387,4 @@ describe('StudentRoutingService', () => {
       ).rejects.toThrow(NotFoundException);
     });
   }); //END_Test_getStudentEventForDate
-
-  describe('Test_selectFirstVenuePerEvent', () => {
-    it('should return empty array when no events', () => {
-      //Act
-      const result = (service as any).selectFirstVenuePerEvent(
-        [],
-        '2026-09-16',
-      );
-
-      //Assert
-      expect(result).toEqual([]);
-    });
-
-    it('should skip events that do not occur on the date', () => {
-      //Arrange
-      jest
-        .spyOn(mockRecurringEventService, 'occursOnDate')
-        .mockReturnValue(false);
-      const event = createStudentEventRow();
-
-      //Act
-      const result = (service as any).selectFirstVenuePerEvent(
-        [event],
-        '2026-09-16',
-      );
-
-      //Assert
-      expect(result).toEqual([]);
-    });
-
-    it('should keep the first occurrence per event ID', () => {
-      //Arrange
-      jest
-        .spyOn(mockRecurringEventService, 'occursOnDate')
-        .mockReturnValue(true);
-      const first = createStudentEventRow({
-        eventId: 'event-1',
-        venueId: 'venue-1',
-      });
-      const duplicate = createStudentEventRow({
-        eventId: 'event-1',
-        venueId: 'venue-2',
-      });
-
-      //Act
-      const result = (service as any).selectFirstVenuePerEvent(
-        [first, duplicate],
-        '2026-09-16',
-      );
-
-      //Assert
-      expect(result).toHaveLength(1);
-      expect(result[0].venueId).toBe('venue-1');
-    });
-  }); //END_Test_selectFirstVenuePerEvent
-
-  describe('Test_toEventContext', () => {
-    it('should map a student event row to a route event context', () => {
-      //Arrange
-      const event = {
-        eventId: 'event-1',
-        eventName: 'Networks Lecture',
-        eventCriteria: { startTime: '08:30', endTime: '10:20' },
-        isRecurring: false,
-        venueId: 'venue-1',
-        buildingId: 'building-1',
-      };
-
-      //Act
-      const result = (service as any).toEventContext(event, '2026-09-16');
-
-      //Assert
-      expect(result).toEqual({
-        eventId: 'event-1',
-        eventName: 'Networks Lecture',
-        occurrenceDate: '2026-09-16',
-        startTime: '08:30',
-        endTime: '10:20',
-        venueId: 'venue-1',
-        buildingId: 'building-1',
-      });
-    });
-  }); //END_Test_toEventContext
-
-  describe('Test_compareEventContexts', () => {
-    it('should sort by startTime when start times differ', () => {
-      //Arrange
-      const l = { startTime: '08:00', eventId: 'event-2' } as any;
-      const r = { startTime: '09:00', eventId: 'event-1' } as any;
-
-      //Act
-      const result = (service as any).compareEventContexts(l, r);
-
-      //Assert
-      expect(result).toBeLessThan(0);
-    });
-
-    it('should sort by eventId when start times are equal', () => {
-      //Arrange
-      const l = { startTime: '08:00', eventId: 'event-1' } as any;
-      const r = { startTime: '08:00', eventId: 'event-2' } as any;
-
-      //Act
-      const result = (service as any).compareEventContexts(l, r);
-
-      //Assert
-      expect(result).toBeLessThan(0);
-    });
-  }); //END_Test_compareEventContexts
 }); //END_StudentRoutingService
