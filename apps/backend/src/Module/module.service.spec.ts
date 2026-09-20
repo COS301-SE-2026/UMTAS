@@ -297,7 +297,9 @@ describe('ModuleService', () => {
     it('should create group and module if no course/group provided', async () => {
       //Arrange
       const module = createModule();
-      const dto = createModuleDto();
+      const dto = createModuleDto({
+        styling: undefined,
+      });
 
       const group = createGroup();
       mockGroupingService.createModuleGrouping?.mockResolvedValue(group);
@@ -810,6 +812,7 @@ describe('ModuleService', () => {
         UserID: userId,
         styling: { colour: '#ABCDEF' },
       });
+      mockTransaction(mockDb, {});
       jest.spyOn(service, 'getById').mockResolvedValue(module);
       jest.spyOn(service, 'setStyling').mockResolvedValue(styling);
 
@@ -827,6 +830,8 @@ describe('ModuleService', () => {
         moduleID: moduleId,
         moduleCode: 'COS301',
       });
+
+      mockTransaction(mockDb, {});
 
       jest.spyOn(service, 'getById').mockResolvedValue(module);
       jest.spyOn(service, 'setStyling').mockResolvedValue(null as any);
@@ -868,6 +873,8 @@ describe('ModuleService', () => {
       const dto: AddModulesToCourseDto = {
         modules: ['someID'],
       };
+
+      mockTransaction(mockDb, {});
 
       //Act + Assert
       await expect(service.addModulesToCourse('someID', dto)).rejects.toThrow(

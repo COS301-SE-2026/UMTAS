@@ -1,0 +1,1 @@
+ALTER TABLE "Venue" ALTER COLUMN "VenueName" SET NOT NULL;

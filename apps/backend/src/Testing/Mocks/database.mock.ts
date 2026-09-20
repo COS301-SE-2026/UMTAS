@@ -1,6 +1,6 @@
 //Mocks the actual database used by the API
 //Basically replaces DatabaseService
-import { DeepMockProxy, mockClear, mockDeep } from 'jest-mock-extended';
+import { DeepMockProxy, mockDeep, mockReset } from 'jest-mock-extended';
 import { AppDatabase } from '../../db/database.service';
 
 export function createMockDatabase(): {
@@ -11,6 +11,6 @@ export function createMockDatabase(): {
 
   return {
     mockDb,
-    reset: () => mockClear(mockDb),
+    reset: () => mockReset(mockDb),
   };
 } //END_createMockDatabase

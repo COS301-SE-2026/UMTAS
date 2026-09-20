@@ -22,6 +22,7 @@ export function createMockEventServiceV2() {
 
     createV2: jest.fn(),
     validateEvent: jest.fn(),
+    getEventsByModules: jest.fn(),
   };
 
   return {

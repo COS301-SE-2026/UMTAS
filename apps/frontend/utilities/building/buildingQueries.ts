@@ -2,13 +2,19 @@ import {
   createBuildingBody,
   createBuildingBuilder,
   getAllBuildingsBuilder,
+  getAllBuildingsHeatmapBuilder,
+  getAllBuildingsHeatmapQuery,
   getAllBuildingsQuery,
+  getBuildingHeatmapBuilder,
+  getBuildingHeatmapPath,
+  getBuildingHeatmapQuery,
   updateBuildingLocationBody,
   updateBuildingLocationBuilder,
   updateBuildingLocationPath,
 } from "./buildingRequestBuilder";
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
 import { mutationOptions, queryOptions } from "@tanstack/react-query";
+import { resumeToPipeableStream } from "react-dom/server";
 
 export function getAllBuildingsQ(query?: getAllBuildingsQuery) {
   return queryOptions({
@@ -61,5 +67,37 @@ export function updateBuildingLocationMut() {
       });
     },
     onError: (err) => console.error("mutation failed", err),
+  });
+}
+
+export function getBuildingHeatmapQ(
+  path: getBuildingHeatmapPath,
+  query?: getBuildingHeatmapQuery,
+) {
+  return queryOptions({
+    queryKey: [
+      "buildings",
+      "heatmap",
+      path.buildingId,
+      query?.date,
+      query?.view,
+    ] as const,
+    queryFn: async () => {
+      const result = await new getBuildingHeatmapBuilder().send({
+        paths: { ...path, ...query },
+      });
+      return result;
+    },
+  });
+}
+
+export function getAllBuildingsHeatmapQ(query?: getAllBuildingsHeatmapQuery) {
+  return queryOptions({
+    queryKey: ["buildings, heatmap, all", query?.date, query?.view] as const,
+    queryFn: async () => {
+      const result = (await new getAllBuildingsHeatmapBuilder().send({ query }))
+        .buildings;
+      return result;
+    },
   });
 }

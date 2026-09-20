@@ -1,68 +1,139 @@
 import {
   ConflictException,
-  ForbiddenException,
+  forwardRef,
+  Inject,
   Injectable,
+  InternalServerErrorException,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { Building, Venue } from '../entities/index';
 import { DatabaseService } from '../db/database.service';
-import { SessionData } from 'src/auth/session.decorator';
 import {
+  BaseBuildingDto,
   BuildingDto,
   BuildingListResponseDto,
   BuildingQueryDto,
   BuildingSingleResponseDto,
-  CreateBuildingDto,
-  UpdateBuildingLocationDto,
+  CreateBuildingInput,
+  UpdateBuildingDto,
+  UpdateBuildingInput,
 } from './dto/building.dto';
-import { eq, ilike, isNotNull, isNull, sql, and, count } from 'drizzle-orm';
+import { eq, and, isNotNull, isNull, ilike, sql } from 'drizzle-orm';
+import { AppDatabase } from 'src/auth/auth';
+import { UniversityService } from 'src/University/university.service';
+import { VenueService } from 'src/Venue/venue.service';
 
-//building row return drizzle gives us
-type BuildingEntity = typeof Building.$inferSelect;
+const DEFAULT_DISPLAY_COLOUR = '#808080'; //neutral grey
+
+export interface OccurringEventRow {
+  venueId: string;
+  eventId: string;
+  linkedHours: number[];
+}
 
 @Injectable()
 export class BuildingService {
-  constructor(private readonly databaseService: DatabaseService) {}
+  private readonly OOPSIE = new Logger(this.constructor.name);
 
-  private requireUniId(session: SessionData | undefined): string {
-    if (!session?.user) {
-      throw new ForbiddenException('No active session');
+  constructor(
+    private readonly dbService: DatabaseService,
+    private readonly uniService: UniversityService,
+    @Inject(forwardRef(() => VenueService))
+    private readonly venueService: VenueService,
+  ) {}
+
+  //Create
+  async create(
+    input: CreateBuildingInput,
+    tx?: AppDatabase,
+  ): Promise<BuildingSingleResponseDto> {
+    if (!tx) {
+      return this.dbService.db.transaction(async (t: AppDatabase) => {
+        return this.create(input, t);
+      }); //END_transaction
     }
 
-    if (!session?.uniId) {
-      throw new ForbiddenException('No university selected');
+    //Validate createbuidlingInput
+    await this.validateCreateBuildingInput(input, tx);
+
+    const [building] = await tx
+      .insert(Building)
+      .values({
+        UniversityID: input.UniversityID,
+        BuildingName: input.BuildingName,
+        Latitude: input.location?.lat ?? null,
+        Longitude: input.location?.lng ?? null,
+        Footprint: input.footprint ?? null,
+        Icon: input.icon ?? null,
+        DisplayColour: input.displayColour ?? null,
+        CreatedBy: input.CreatedBy,
+      })
+      .returning();
+
+    if (!building) {
+      this.OOPSIE.fatal(
+        `Failed to create building with input[${JSON.stringify(input)}]`,
+      );
+      throw new InternalServerErrorException(`Failed to create building`);
     }
-
-    return session?.uniId;
-  }
-
-  private buildingDtoAdapter(
-    row: BuildingEntity,
-    venueCount: number,
-  ): BuildingDto {
-    const buildingHasLocation = row.Latitude != null && row.Longitude != null;
 
     return {
-      buildingId: row.BuildingID,
-      buildingName: row.BuildingName,
-      location: buildingHasLocation
-        ? { lat: row.Latitude as number, lng: row.Longitude as number }
-        : null,
-      footprint: row.Footprint ?? null,
-      icon: row.Icon,
-      displayColour: row.DisplayColour,
-      venueCount,
+      building: this.buildingDtoAdapter(building, 0),
+      venues: [],
     };
-  }
+  } //END_createBuilding
 
-  async getAllBuildings(
-    session: SessionData,
+  //GetById
+  async getById(
+    uniId: string,
+    buildingId: string,
+    tx?: AppDatabase,
+  ): Promise<BuildingSingleResponseDto> {
+    const db = tx ?? this.dbService.db;
+
+    //Fetch building by id
+    const [building] = await db
+      .select()
+      .from(Building)
+      .where(
+        and(
+          eq(Building.BuildingID, buildingId),
+          eq(Building.UniversityID, uniId),
+        ),
+      )
+      .limit(1);
+
+    if (!building) {
+      this.OOPSIE.warn(`Building[${buildingId}] not found`);
+      throw new NotFoundException(`Building not found`);
+    }
+
+    //Attach venues
+    const venues = (
+      await this.venueService.getAllVenues(
+        uniId,
+        { buildingId: buildingId },
+        tx,
+      )
+    ).venues;
+    const response: BuildingSingleResponseDto = {
+      building: this.buildingDtoAdapter(building, venues.length),
+      venues,
+    };
+
+    return response;
+  } //END_getById
+
+  //GetAll
+  async getAll(
+    uniId: string,
     query: BuildingQueryDto,
+    tx?: AppDatabase,
   ): Promise<BuildingListResponseDto> {
-    const universityID = this.requireUniId(session);
-    const database = this.databaseService.db;
+    const db = tx ?? this.dbService.db;
 
-    const filters = [eq(Building.UniversityID, universityID)];
+    const filters = [eq(Building.UniversityID, uniId)];
 
     if (query.mapped === true) {
       filters.push(isNotNull(Building.Latitude));
@@ -74,7 +145,7 @@ export class BuildingService {
       filters.push(ilike(Building.BuildingName, `%${query.search}%`));
     }
 
-    const rows = await database
+    const rows = await db
       .select({
         building: Building,
         venueCount: sql<number>`count(${Venue.VenueID})::int`,
@@ -86,102 +157,349 @@ export class BuildingService {
       .orderBy(Building.BuildingID);
 
     return {
-      buildings: rows.map((row) =>
-        this.buildingDtoAdapter(row.building, row.venueCount),
+      buildings: rows.map((r) =>
+        this.buildingDtoAdapter(r.building, r.venueCount),
       ),
     };
-  }
+  } //END_getAllBuildings
 
-  async createBuilding(
-    session: SessionData,
-    buildingDto: CreateBuildingDto,
+  //Update
+  async update(
+    uniId: string,
+    buildingId: string,
+    input: UpdateBuildingInput,
+    tx?: AppDatabase,
   ): Promise<BuildingSingleResponseDto> {
-    const universityId = this.requireUniId(session);
-    const database = this.databaseService.db;
+    if (!tx) {
+      return this.dbService.db.transaction(async (t: AppDatabase) => {
+        return this.update(uniId, buildingId, input, t);
+      });
+    }
 
-    //check if this building already exists
-    const existingBuilding = await database
-      .select({ id: Building.BuildingID })
-      .from(Building)
-      .where(
-        and(
-          eq(Building.UniversityID, universityId),
-          eq(Building.BuildingName, buildingDto.buildingName),
-        ),
-      )
-      .limit(1);
+    //Fetch old building - throws 404 if not exists
+    const { building: oldBuilding, venues } = await this.getById(
+      uniId,
+      buildingId,
+      tx,
+    );
 
-    if (existingBuilding.length > 0) {
+    const updateFields: Partial<UpdateBuildingDto> =
+      await this.validateUpdateBuildingInput(oldBuilding, input, tx);
+
+    //No fields to update -> return early
+    if (Object.keys(updateFields).length === 0) {
+      return { building: oldBuilding };
+    }
+
+    //Update building
+    const [building] = await tx
+      .update(Building)
+      .set({
+        ...(updateFields.BuildingName !== undefined && {
+          BuildingName: updateFields.BuildingName,
+        }),
+        ...(updateFields.location !== undefined && {
+          Latitude: updateFields.location?.lat ?? null,
+          Longitude: updateFields.location?.lng ?? null,
+        }),
+        ...(updateFields.footprint !== undefined && {
+          Footprint: updateFields.footprint,
+        }),
+        ...(updateFields.icon !== undefined && { Icon: updateFields.icon }),
+        ...(updateFields.displayColour !== undefined && {
+          DisplayColour: updateFields.displayColour,
+        }),
+      })
+      .where(eq(Building.BuildingID, buildingId))
+      .returning();
+
+    if (!building) {
+      this.OOPSIE.fatal(
+        `Failed to update building[${JSON.stringify(oldBuilding)}] with fields[${JSON.stringify(updateFields)}]`,
+      );
+      throw new InternalServerErrorException(`Failed to update building`);
+    }
+
+    return { building: this.buildingDtoAdapter(building, venues?.length ?? 0) };
+  } //END_update
+
+  //Delete
+  async delete(
+    buildingId: string,
+    tx?: AppDatabase,
+  ): Promise<BuildingSingleResponseDto> {
+    const db = tx ?? this.dbService.db;
+
+    //Delete building
+    const [building] = await db
+      .delete(Building)
+      .where(eq(Building.BuildingID, buildingId))
+      .returning();
+
+    if (!building) {
+      this.OOPSIE.fatal(`Failed to delete building[${buildingId}]`);
+      throw new NotFoundException(`Failed to delete building`);
+    }
+
+    return { building: this.buildingDtoAdapter(building, 0) };
+  } //END_delete
+
+  // 🎅's little helpers
+  /**
+   * Maps a raw Building row to a BuildingDto.
+   *
+   * Collapses Latitude/Longitude into a location object (null when either is
+   * missing). All other fields pass through unchanged.
+   *
+   * @param row - Raw Building row from the database.
+   * @param venueCount - Number of venues attached to this building.
+   * @returns The mapped BuildingDto.
+   */
+  private buildingDtoAdapter(
+    row: typeof Building.$inferSelect,
+    venueCount: number,
+  ): BuildingDto {
+    return {
+      BuildingID: row.BuildingID,
+      BuildingName: row.BuildingName,
+      UniversityID: row.UniversityID,
+      location:
+        row.Latitude !== null && row.Longitude !== null
+          ? { lat: row.Latitude, lng: row.Longitude }
+          : null,
+      footprint: row.Footprint,
+      icon: row.Icon,
+      displayColour: row.DisplayColour,
+      venueCount,
+    };
+  } //END_buildingDtoAdapter
+
+  /**
+   * Validates and normalises a CreateBuildingInput.
+   *
+   * Ensures the university exists and the building name is unique within it.
+   * Defaults location, footprint and icon to null, and displayColour to the
+   * default colour when absent. Trims icon and nulls it if blank.
+   *
+   * @param input - The create payload to validate.
+   * @param tx - Active database transaction.
+   * @returns The normalised input.
+   * @throws NotFoundException when the university does not exist.
+   * @throws ConflictException when the building name is taken.
+   */
+  private async validateCreateBuildingInput(
+    input: CreateBuildingInput,
+    tx: AppDatabase,
+  ): Promise<CreateBuildingInput> {
+    //Validate university - throws 404
+    await this.uniService.getById(input.UniversityID, tx);
+
+    //BuildingName - unique per university - throws conflict exception
+    const conflict = await this.uniqueBuildingNamePerUniversity(
+      input.BuildingName,
+      input.UniversityID,
+      tx,
+    );
+    if (conflict) {
+      this.OOPSIE.warn(
+        `Building[${input.BuildingName}] already exists for university[${input.UniversityID}]`,
+      );
       throw new ConflictException(
-        `A building named "${buildingDto.buildingName}" already exists`,
+        `Building name already exists for university`,
       );
     }
 
-    const [row] = await database
-      .insert(Building)
-      .values({
-        UniversityID: universityId,
-        BuildingName: buildingDto.buildingName,
-        Latitude: buildingDto.location?.lat ?? null,
-        Longitude: buildingDto.location?.lng ?? null,
-        Footprint: buildingDto.footprint ?? null,
-        Icon: buildingDto.icon ?? null,
-        DisplayColour: buildingDto.displayColour ?? null,
-        CreatedBy: session?.user.id,
-      })
-      .returning();
+    //Location - null if absent
+    if (!input.location) {
+      input.location = null;
+    }
 
-    return { building: this.buildingDtoAdapter(row, 0) };
-  }
+    //Footprint - null if absent
+    if (!input.footprint) {
+      input.footprint = null;
+    }
 
-  async updateBuildingLocation(
-    session: SessionData,
-    buildingID: string,
-    updateBuildingLocationDto: UpdateBuildingLocationDto,
-  ): Promise<BuildingSingleResponseDto> {
-    const universityId = this.requireUniId(session);
-    const database = this.databaseService.db;
+    //Icon
+    const icon = input.icon?.trim();
+    if (icon !== undefined && icon?.length > 0) {
+      input.icon = icon;
+    } else {
+      input.icon = null;
+    }
 
-    const [existingBuilding] = await database
+    //DisplayColour — normalise to null if absent
+    if (!input.displayColour) {
+      input.displayColour = DEFAULT_DISPLAY_COLOUR;
+    }
+
+    return input;
+  } //END_validateCreateBuildingInput
+
+  /**
+   * Fetches a building with the given name for a university.
+   *
+   * @param buildingName - Name to search for.
+   * @param uniId - University to scope the search to.
+   * @param tx - Active database transaction.
+   * @returns The building wrapped in a response DTO, or null if none found.
+   */
+  private async uniqueBuildingNamePerUniversity(
+    buildingName: string,
+    uniId: string,
+    tx: AppDatabase,
+  ): Promise<BaseBuildingDto | null> {
+    //Check if another building with same name for university already exists
+    const [building] = await tx
       .select()
       .from(Building)
       .where(
         and(
-          eq(Building.BuildingID, buildingID),
-          eq(Building.UniversityID, universityId),
+          eq(Building.BuildingName, buildingName),
+          eq(Building.UniversityID, uniId),
         ),
       )
       .limit(1);
 
-    if (!existingBuilding) {
-      throw new NotFoundException('Building could not be found');
+    return building ? building : null;
+  } //END_uniqueBuildingNamePerUniversity
+
+  /**
+   * Validates and normalises an UpdateBuildingInput against the current building
+   *
+   * @param oldBuilding - The current building DTO
+   * @param input - The update payload to normalise
+   * @param tx - Active database transaction
+   * @returns The normalised input with unchanged fields removed
+   * @throws ConflictException when the new building name is taken by another building.
+   */
+  private async validateUpdateBuildingInput(
+    oldBuilding: BaseBuildingDto,
+    input: UpdateBuildingInput,
+    tx: AppDatabase,
+  ): Promise<UpdateBuildingInput> {
+    await this.validateBuildingNameUpdate(oldBuilding, input, tx);
+
+    this.validateLocationUpdate(oldBuilding, input);
+    this.validateFootprintUpdate(oldBuilding, input);
+    this.validateIconUpdate(oldBuilding, input);
+    this.validateDisplayColourUpdate(oldBuilding, input);
+
+    return input;
+  } //END_validateUpdateBuildingInput
+
+  private async validateBuildingNameUpdate(
+    oldBuilding: BaseBuildingDto,
+    input: UpdateBuildingInput,
+    tx: AppDatabase,
+  ): Promise<void> {
+    if (
+      input.BuildingName === undefined ||
+      input.BuildingName === oldBuilding.BuildingName
+    ) {
+      delete input.BuildingName;
+      return;
     }
 
-    //everything is optional
-    const updateValues: Partial<typeof Building.$inferInsert> = {};
+    const duplicate = await this.uniqueBuildingNamePerUniversity(
+      input.BuildingName,
+      oldBuilding.UniversityID,
+      tx,
+    );
 
-    //only update what was sent
-    if (updateBuildingLocationDto.location != undefined) {
-      updateValues.Latitude = updateBuildingLocationDto.location?.lat ?? null;
-      updateValues.Longitude = updateBuildingLocationDto.location?.lng ?? null;
+    if (duplicate && duplicate.BuildingID !== oldBuilding.BuildingID) {
+      this.OOPSIE.warn(
+        `Building[${input.BuildingName}] already exists for university[${oldBuilding.UniversityID}]`,
+      );
+
+      throw new ConflictException(
+        'Building name already exists for university',
+      );
+    }
+  } //END_validateBuidlingNameUpdate
+
+  private validateLocationUpdate(
+    oldBuilding: BaseBuildingDto,
+    input: UpdateBuildingInput,
+  ): void {
+    if (input.location === undefined) {
+      delete input.location;
+      return;
     }
 
-    //only update what was sent
-    if (updateBuildingLocationDto.footprint != undefined) {
-      updateValues.Footprint = updateBuildingLocationDto.footprint;
+    if (input.location === null) {
+      if (oldBuilding.location === null) {
+        delete input.location;
+      }
+      return;
     }
 
-    const [row] = await database
-      .update(Building)
-      .set(updateValues)
-      .where(eq(Building.BuildingID, buildingID))
-      .returning();
+    if (
+      oldBuilding.location !== null &&
+      input.location.lat === oldBuilding.location?.lat &&
+      input.location.lng === oldBuilding.location?.lng
+    ) {
+      delete input.location;
+    }
+  } //END_validateLocationUpdate
 
-    const [{ venueCount }] = await database
-      .select({ venueCount: count(Venue.VenueID) })
-      .from(Venue)
-      .where(eq(Venue.BuildingID, buildingID));
+  private validateFootprintUpdate(
+    oldBuilding: BaseBuildingDto,
+    input: UpdateBuildingInput,
+  ): void {
+    if (input.footprint === undefined) {
+      delete input.footprint;
+      return;
+    }
 
-    return { building: this.buildingDtoAdapter(row, venueCount) };
-  }
-}
+    if (input.footprint === null) {
+      if (oldBuilding.footprint === null) {
+        delete input.footprint;
+      }
+      return;
+    }
+
+    if (
+      JSON.stringify(input.footprint) === JSON.stringify(oldBuilding.footprint)
+    ) {
+      delete input.footprint;
+    }
+  } //END_validateFootprintUpdate
+
+  private validateIconUpdate(
+    oldBuilding: BaseBuildingDto,
+    input: UpdateBuildingInput,
+  ): void {
+    if (input.icon === undefined) {
+      delete input.icon;
+      return;
+    }
+
+    if (input.icon === null) {
+      if (oldBuilding.icon === null) {
+        delete input.icon;
+      }
+      return;
+    }
+
+    const trimmed = input.icon.trim();
+
+    if (trimmed === oldBuilding.icon || trimmed.length === 0) {
+      delete input.icon;
+      return;
+    }
+
+    input.icon = trimmed;
+  } //END_validateIconUpdate
+
+  private validateDisplayColourUpdate(
+    oldBuilding: BaseBuildingDto,
+    input: UpdateBuildingInput,
+  ): void {
+    if (
+      input.displayColour === undefined ||
+      input.displayColour === oldBuilding.displayColour
+    ) {
+      delete input.displayColour;
+    }
+  } //END_validateDisplayColourUpdate
+} //END_BuildingService

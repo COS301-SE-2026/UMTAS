@@ -20,7 +20,7 @@ export async function authenticateRealActor(
   const signUp = await actor.request.post<{
     user?: { id?: string; email?: string };
   }>('/auth/sign-up/email', { json: input });
-  assertStatus(signUp.status, [200, 201], 'sign up');
+  assertStatus(signUp.status, [200, 201], 'sign up', signUp.body);
 
   const verification = await resolveVerificationRequest(input);
   const verificationResponse =
@@ -49,10 +49,11 @@ function assertStatus(
   actual: number,
   expected: readonly number[],
   operation: string,
+  body?: unknown,
 ): void {
   if (!expected.includes(actual)) {
     throw new Error(
-      `Real-auth ${operation} expected HTTP ${expected.join(' or ')}, received ${actual}`,
+      `Real-auth ${operation} expected HTTP ${expected.join(' or ')}, received ${actual}: ${JSON.stringify(body)}`,
     );
   }
 }
