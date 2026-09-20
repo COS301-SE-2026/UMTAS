@@ -6,6 +6,8 @@ import {
   getRouterBuilder,
   getRoutingHeatmapBuilder,
   getRoutingHeatmapQuery,
+  getStudentRoutesBuilder,
+  getStudentRoutesQuery,
 } from "./routeRequestBuilder";
 
 export function getRouteQ(query: getRouteQuery) {
@@ -50,6 +52,16 @@ export function getRoutingHeatmapQ(query: getRoutingHeatmapQuery) {
     queryFn: async () => {
       const result = (await new getRoutingHeatmapBuilder().send({ query }))
         .routes;
+      return result;
+    },
+  });
+}
+
+export function getStudentRoutesQ(query: getStudentRoutesQuery) {
+  return queryOptions({
+    queryKey: ["routes", "student", query.date] as const,
+    queryFn: async () => {
+      const result = await new getStudentRoutesBuilder().send({ query });
       return result;
     },
   });
