@@ -1,6 +1,11 @@
 import { randomUUID } from 'crypto';
-import { Route } from 'src/entities';
+import { Route, RouteDiversion } from 'src/entities';
 import { EventSource } from 'src/Events/dto/event.types';
+import {
+  DiversionRequestDto,
+  DiversionRouteResponseDto,
+  RouteDto,
+} from 'src/Route/dto';
 import {
   RouteHeatmapDto,
   RouteHeatmapTransitionDto,
@@ -157,3 +162,49 @@ export function createDemand(overrides: Partial<Demand> = {}): Demand {
     ...overrides,
   };
 } //END_Demand
+
+// src/Testing/Factories/route.factory.ts
+export function createRouteDto(overrides: Partial<RouteDto> = {}): RouteDto {
+  return {
+    routeId: 'route-1',
+    originBuildingId: 'building-1',
+    destinationBuildingId: 'building-2',
+    routeIndex: 0,
+    pathCoordinates: [{ lat: -25.7545, lng: 28.2314 }],
+    distanceMetres: 120,
+    displayColour: '#808080',
+    ...overrides,
+  };
+}
+
+export function createRouteDiversion(
+  overrides: Partial<typeof RouteDiversion.$inferSelect> = {},
+): typeof RouteDiversion.$inferSelect {
+  return {
+    RouteID: 'from-1',
+    DivertToRoute: 'to-1',
+    Diversion: 0.5,
+    ...overrides,
+  };
+}
+
+export function createDiversionRequestDto(
+  overrides: Partial<DiversionRequestDto> = {},
+): DiversionRequestDto {
+  return {
+    fromRoute: 'from-1',
+    diversion: 0.5,
+    ...overrides,
+  };
+}
+
+export function createDiversionRouteResponseDto(
+  overrides: Partial<DiversionRouteResponseDto> = {},
+): DiversionRouteResponseDto {
+  return {
+    fromRoute: createRouteDto(),
+    toRoute: createRouteDto(),
+    diversion: 0.5,
+    ...overrides,
+  };
+}

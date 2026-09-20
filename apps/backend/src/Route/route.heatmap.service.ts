@@ -23,7 +23,7 @@ import {
   RoutingHeatmapQueryDto,
   RoutingHeatmapResponseDto,
   RoutingHeatmapView,
-} from './dto/route.heatmap.dto';
+} from './dto';
 import { EventCriteria } from 'src/Events/dto/event.types';
 
 type RouteEntity = typeof Route.$inferSelect;

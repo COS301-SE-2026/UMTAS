@@ -7,6 +7,7 @@ import { userId } from '../Testing/constants';
 import { CourseEnrollmentService } from './course.enrollment.service';
 import { CourseServiceV2 } from './courseV2.service';
 import { DatabaseService } from '../db/database.service';
+import { GroupingService } from '../Grouping/grouping.service';
 
 //Mock Database and factories
 import { createMockDatabase } from '../Testing/Mocks/database.mock';
@@ -25,17 +26,23 @@ describe('CourseEnrollmentService', () => {
   let service: CourseEnrollmentService;
 
   const { mockDb, reset: resetDb } = createMockDatabase();
+
   const { mockCourseServiceV2, reset: resetCourse } =
     createMockCourseServiceV2();
 
-  //beforeEach
+  const mockGroupingService = {
+    populateGroup: jest.fn(),
+    createModuleGrouping: jest.fn(),
+  };
 
+  //beforeEach
   beforeEach(async () => {
     const module = await Test.createTestingModule({
       providers: [
         CourseEnrollmentService,
         { provide: DatabaseService, useValue: { db: mockDb } },
         { provide: CourseServiceV2, useValue: mockCourseServiceV2 },
+        { provide: GroupingService, useValue: mockGroupingService },
       ],
     }).compile();
 
@@ -46,6 +53,7 @@ describe('CourseEnrollmentService', () => {
   afterEach(() => {
     resetDb();
     resetCourse();
+    jest.clearAllMocks();
   });
 
   const baseCourse = createCourse();
@@ -69,6 +77,10 @@ describe('CourseEnrollmentService', () => {
           courseID: baseCourse.CourseID,
         }),
       ).rejects.toThrow(InternalServerErrorException);
+
+      expect(mockGroupingService.populateGroup).not.toHaveBeenCalled();
+
+      expect(mockGroupingService.createModuleGrouping).not.toHaveBeenCalled();
     });
 
     //Happy - should enroll a new student
@@ -81,9 +93,13 @@ describe('CourseEnrollmentService', () => {
       };
 
       mockCourseServiceV2.getById?.mockResolvedValue(baseCourse);
+
       mockTransaction(mockDb, {
-        select: [[]], //not already enrolled
-        insert: [[enrollment]], //insert returns new row
+        select: [
+          [], //not already enrolled
+          [], //student has no module enrollments
+        ],
+        insert: [[enrollment]],
       });
 
       //Act
@@ -97,7 +113,12 @@ describe('CourseEnrollmentService', () => {
         UserID: userId,
         CourseID: baseCourse.CourseID,
       });
+
       expect(mockDb.insert).toHaveBeenCalledTimes(1);
+
+      expect(mockGroupingService.populateGroup).not.toHaveBeenCalled();
+
+      expect(mockGroupingService.createModuleGrouping).not.toHaveBeenCalled();
     });
 
     //Happy - should return early if already enrolled
@@ -106,6 +127,7 @@ describe('CourseEnrollmentService', () => {
       const enrolledAt = new Date('2026-01-01');
 
       mockCourseServiceV2.getById?.mockResolvedValue(baseCourse);
+
       mockTransaction(mockDb, {
         select: [[{ enrolledAt }]], //already enrolled
       });
@@ -122,7 +144,187 @@ describe('CourseEnrollmentService', () => {
         CourseID: baseCourse.CourseID,
         EnrolledAt: enrolledAt,
       });
+
       expect(mockDb.insert).not.toHaveBeenCalled();
+
+      expect(mockGroupingService.populateGroup).not.toHaveBeenCalled();
+
+      expect(mockGroupingService.createModuleGrouping).not.toHaveBeenCalled();
+    });
+
+    //Happy - should populate existing course grouping with student's modules
+    it('should add student modules to the existing course grouping', async () => {
+      //Arrange
+      const groupId = '00000000-0000-4000-8000-000000000001';
+
+      const courseWithGroup = {
+        ...baseCourse,
+        GroupID: groupId,
+      };
+
+      const enrollment = {
+        UserID: userId,
+        CourseID: courseWithGroup.CourseID,
+        enrolledAt: new Date(),
+      };
+
+      const studentModules = [
+        {
+          ModuleID: '10000000-0000-4000-8000-000000000001',
+        },
+        {
+          ModuleID: '20000000-0000-4000-8000-000000000002',
+        },
+      ];
+
+      mockCourseServiceV2.getById?.mockResolvedValue(courseWithGroup);
+
+      mockGroupingService.populateGroup.mockResolvedValue({
+        GroupID: groupId,
+        Hash: 'hash',
+        modules: studentModules.map((module) => module.ModuleID),
+      });
+
+      mockTransaction(mockDb, {
+        select: [
+          [], //not already enrolled
+          studentModules, //student module enrollments
+        ],
+        insert: [[enrollment]],
+      });
+
+      //Act
+      const result = await service.enrollStudentToCourse({
+        userID: userId,
+        courseID: courseWithGroup.CourseID,
+      });
+
+      //Assert
+      expect(result).toMatchObject({
+        UserID: userId,
+        CourseID: courseWithGroup.CourseID,
+      });
+
+      expect(mockGroupingService.populateGroup).toHaveBeenCalledTimes(1);
+
+      expect(
+        mockGroupingService.populateGroup.mock.calls[0]?.slice(0, 2),
+      ).toEqual([
+        groupId,
+        [
+          '10000000-0000-4000-8000-000000000001',
+          '20000000-0000-4000-8000-000000000002',
+        ],
+      ]);
+
+      expect(mockGroupingService.createModuleGrouping).not.toHaveBeenCalled();
+    });
+
+    //Happy - should create grouping if course has no group
+    it('should create a module grouping if the course does not have one', async () => {
+      //Arrange
+      const courseWithoutGroup = {
+        ...baseCourse,
+        GroupID: null,
+      };
+
+      const enrollment = {
+        UserID: userId,
+        CourseID: courseWithoutGroup.CourseID,
+        enrolledAt: new Date(),
+      };
+
+      const studentModules = [
+        {
+          ModuleID: '10000000-0000-4000-8000-000000000001',
+        },
+        {
+          ModuleID: '20000000-0000-4000-8000-000000000002',
+        },
+      ];
+
+      mockCourseServiceV2.getById?.mockResolvedValue(courseWithoutGroup);
+
+      mockGroupingService.createModuleGrouping.mockResolvedValue({
+        GroupID: '00000000-0000-4000-8000-000000000003',
+        Hash: 'hash',
+        modules: studentModules.map((module) => module.ModuleID),
+      });
+
+      mockTransaction(mockDb, {
+        select: [
+          [], //not already enrolled
+          studentModules, //student module enrollments
+        ],
+        insert: [[enrollment]],
+      });
+
+      //Act
+      const result = await service.enrollStudentToCourse({
+        userID: userId,
+        courseID: courseWithoutGroup.CourseID,
+      });
+
+      //Assert
+      expect(result).toMatchObject({
+        UserID: userId,
+        CourseID: courseWithoutGroup.CourseID,
+      });
+
+      expect(mockGroupingService.createModuleGrouping).toHaveBeenCalledTimes(1);
+
+      expect(
+        mockGroupingService.createModuleGrouping.mock.calls[0]?.[0],
+      ).toEqual({
+        CourseID: courseWithoutGroup.CourseID,
+        modules: [
+          '10000000-0000-4000-8000-000000000001',
+          '20000000-0000-4000-8000-000000000002',
+        ],
+      });
+
+      expect(mockGroupingService.populateGroup).not.toHaveBeenCalled();
+    });
+
+    //Happy - should not duplicate module IDs
+    it('should remove duplicate module IDs before populating the course grouping', async () => {
+      //Arrange
+      const groupId = '00000000-0000-4000-8000-000000000001';
+      const moduleId = '10000000-0000-4000-8000-000000000001';
+
+      const courseWithGroup = {
+        ...baseCourse,
+        GroupID: groupId,
+      };
+
+      const enrollment = {
+        UserID: userId,
+        CourseID: courseWithGroup.CourseID,
+        enrolledAt: new Date(),
+      };
+
+      mockCourseServiceV2.getById?.mockResolvedValue(courseWithGroup);
+
+      mockTransaction(mockDb, {
+        select: [
+          [], //not already enrolled
+          [{ ModuleID: moduleId }, { ModuleID: moduleId }], //duplicate module enrollments
+        ],
+        insert: [[enrollment]],
+      });
+
+      //Act
+      await service.enrollStudentToCourse({
+        userID: userId,
+        courseID: courseWithGroup.CourseID,
+      });
+
+      //Assert
+      expect(mockGroupingService.populateGroup).toHaveBeenCalledTimes(1);
+
+      expect(
+        mockGroupingService.populateGroup.mock.calls[0]?.slice(0, 2),
+      ).toEqual([groupId, [moduleId]]);
     });
   }); //END_Test_enrollStudentToCourse
 
@@ -150,6 +352,7 @@ describe('CourseEnrollmentService', () => {
     it('should return early if the student is not enrolled', async () => {
       //Arrange
       mockCourseServiceV2.getById?.mockResolvedValue(baseCourse);
+
       mockTransaction(mockDb, {
         select: [[]], //not already enrolled
       });
@@ -162,20 +365,25 @@ describe('CourseEnrollmentService', () => {
 
       //Assert
       expect(result.message).toContain('not enrolled');
+
       expect(mockDb.delete).not.toHaveBeenCalled();
     });
 
-    //Happy - should unenroll the student and their module enrollments
-    it('should unenroll the student', async () => {
+    //Happy - should unenroll student but leave modules and grouping unchanged
+    it('should unenroll the student without modifying module enrollments or course grouping', async () => {
       //Arrange
       mockCourseServiceV2.getById?.mockResolvedValue(baseCourse);
 
       mockTransaction(mockDb, {
         select: [[{ UserID: userId }]], //already enrolled
         delete: [
-          [{ UserID: userId, CourseID: baseCourse.CourseID }], //deleted enrollment
-          [{ ModuleID: 'mod-1' }, { ModuleID: 'mod-2' }], //deleted modules
-        ], //delete returns nothing
+          [
+            {
+              UserID: userId,
+              CourseID: baseCourse.CourseID,
+            },
+          ],
+        ],
       });
 
       //Act
@@ -189,10 +397,16 @@ describe('CourseEnrollmentService', () => {
         UserID: userId,
         CourseID: baseCourse.CourseID,
       });
-      expect(result.message).toContain(
-        `Successfully unenrolled student from course[${baseCourse.CourseID}]`,
+
+      expect(result.message).toBe(
+        'Successfully unenrolled student from course',
       );
+
       expect(mockDb.delete).toHaveBeenCalledTimes(1);
+
+      expect(mockGroupingService.populateGroup).not.toHaveBeenCalled();
+
+      expect(mockGroupingService.createModuleGrouping).not.toHaveBeenCalled();
     });
   }); //END_Test_unenrollStudentFromCourse
 }); //END_CourseEnrollmentService

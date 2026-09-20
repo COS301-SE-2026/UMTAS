@@ -78,17 +78,23 @@ test('[flow:student-routing] returns student routes and alternatives', async () 
     context.actor('student');
 
   const universityKey = flowKey<UniversityOutput>('university.student-routing');
+
   const originBuildingKey = flowKey<BuildingOutput>(
     'building.student-routing.origin',
   );
+
   const destinationBuildingKey = flowKey<BuildingOutput>(
     'building.student-routing.destination',
   );
+
   const originVenueKey = flowKey<VenueOutput>('venue.student-routing.origin');
+
   const destinationVenueKey = flowKey<VenueOutput>(
     'venue.student-routing.destination',
   );
+
   const firstEventKey = flowKey<EventOutput>('event.student-routing.first');
+
   const secondEventKey = flowKey<EventOutput>('event.student-routing.second');
 
   const authentication = studentAuthenticationStep<StudentRoutingPlan>();
@@ -115,19 +121,21 @@ test('[flow:student-routing] returns student routes and alternatives', async () 
         authentication,
         adminSelection,
 
-        //  Setup:
         {
-          name: 'seed origin building',
+          //Origin Building
+          name: 'Origin building',
           outputKey: originBuildingKey,
 
           async run(context) {
             const university = context.require(universityKey);
+
             const building = createBuilding({
               UniversityID: university.UniversityID,
               BuildingName: context.plan.originBuildingName,
               Latitude: -25.7545,
               Longitude: 28.2314,
             });
+
             await context.runtime.database.insert(Building).values(building);
 
             return {
@@ -138,17 +146,20 @@ test('[flow:student-routing] returns student routes and alternatives', async () 
         },
 
         {
-          name: 'seed destination building',
+          //Destination Building
+          name: 'Destination building',
           outputKey: destinationBuildingKey,
 
           async run(context) {
             const university = context.require(universityKey);
+
             const building = createBuilding({
               UniversityID: university.UniversityID,
               BuildingName: context.plan.destinationBuildingName,
               Latitude: -25.755,
               Longitude: 28.232,
             });
+
             await context.runtime.database.insert(Building).values(building);
 
             return {
@@ -158,9 +169,9 @@ test('[flow:student-routing] returns student routes and alternatives', async () 
           },
         },
 
-        //  db route
         {
-          name: 'seed route between buildings',
+          //Building Route
+          name: 'Building route',
 
           async run(context) {
             const university = context.require(universityKey);
@@ -178,24 +189,27 @@ test('[flow:student-routing] returns student routes and alternatives', async () 
               ],
               DistanceMetres: 120,
             });
+
             await context.runtime.database.insert(Route).values(route);
           },
         },
 
-        //  Venues in each building
         {
-          name: 'seed origin venue',
+          //Origin Venue
+          name: 'Origin venue',
           outputKey: originVenueKey,
 
           async run(context) {
             const university = context.require(universityKey);
             const building = context.require(originBuildingKey);
+
             const venue = createVenue({
               UniversityID: university.UniversityID,
               BuildingID: building.buildingId,
               VenueName: 'Origin Lecture Hall',
               Capacity: 100,
             });
+
             await context.runtime.database.insert(Venue).values(venue);
 
             return { venueId: venue.VenueID, venueName: venue.VenueName };
@@ -203,27 +217,30 @@ test('[flow:student-routing] returns student routes and alternatives', async () 
         },
 
         {
-          name: 'seed destination venue',
+          //Destination Venue
+          name: 'Destination venue',
           outputKey: destinationVenueKey,
 
           async run(context) {
             const university = context.require(universityKey);
             const building = context.require(destinationBuildingKey);
+
             const venue = createVenue({
               UniversityID: university.UniversityID,
               BuildingID: building.buildingId,
               VenueName: 'Destination Lecture Hall',
               Capacity: 80,
             });
+
             await context.runtime.database.insert(Venue).values(venue);
 
             return { venueId: venue.VenueID, venueName: venue.VenueName };
           },
         },
 
-        //  Events + attendance
         {
-          name: 'seed first event at origin venue',
+          //Origin Event
+          name: 'Origin event',
           outputKey: firstEventKey,
 
           async run(context) {
@@ -239,6 +256,7 @@ test('[flow:student-routing] returns student routes and alternatives', async () 
                 moduleId: crypto.randomUUID(),
               },
             });
+
             const eventVenue = createEventVenue({
               EventID: event.eventID,
               VenueID: venue.venueId,
@@ -249,6 +267,7 @@ test('[flow:student-routing] returns student routes and alternatives', async () 
               .from(usersTable)
               .where(eq(usersTable.email, context.plan.email))
               .limit(1);
+
             assert.ok(user, 'user must exist');
 
             const attendance = createAttendance({
@@ -259,9 +278,11 @@ test('[flow:student-routing] returns student routes and alternatives', async () 
             });
 
             await context.runtime.database.insert(Event).values(event);
+
             await context.runtime.database
               .insert(EventVenue)
               .values(eventVenue);
+
             await context.runtime.database
               .insert(EventAttendance)
               .values(attendance);
@@ -271,7 +292,7 @@ test('[flow:student-routing] returns student routes and alternatives', async () 
         },
 
         {
-          name: 'seed second event at destination venue',
+          name: 'Destination event',
           outputKey: secondEventKey,
 
           async run(context) {
@@ -287,6 +308,7 @@ test('[flow:student-routing] returns student routes and alternatives', async () 
                 moduleId: crypto.randomUUID(),
               },
             });
+
             const eventVenue = createEventVenue({
               EventID: event.eventID,
               VenueID: venue.venueId,
@@ -297,6 +319,7 @@ test('[flow:student-routing] returns student routes and alternatives', async () 
               .from(usersTable)
               .where(eq(usersTable.email, context.plan.email))
               .limit(1);
+
             assert.ok(user, 'user must exist');
 
             const attendance = createAttendance({
@@ -307,9 +330,11 @@ test('[flow:student-routing] returns student routes and alternatives', async () 
             });
 
             await context.runtime.database.insert(Event).values(event);
+
             await context.runtime.database
               .insert(EventVenue)
               .values(eventVenue);
+
             await context.runtime.database
               .insert(EventAttendance)
               .values(attendance);
@@ -318,9 +343,8 @@ test('[flow:student-routing] returns student routes and alternatives', async () 
           },
         },
 
-        //GEt /routes/student
         {
-          name: 'get student routes for date',
+          name: 'Student routes',
 
           async run(context) {
             const firstEvent = context.require(firstEventKey);
@@ -334,11 +358,13 @@ test('[flow:student-routing] returns student routes and alternatives', async () 
             expectStatus(response, 200, 'get student routes');
 
             const body = response.body;
+
             expectObject(body, 'get student routes');
 
             assert.equal(body.date, context.plan.date);
             assert.ok(Array.isArray(body.events), 'events must be an array');
             assert.ok(Array.isArray(body.routes), 'routes must be an array');
+
             assert.equal(body.events.length, 2);
 
             const eventIds = (
@@ -349,6 +375,7 @@ test('[flow:student-routing] returns student routes and alternatives', async () 
               eventIds.includes(firstEvent.eventId),
               'first event must appear in response',
             );
+
             assert.ok(
               eventIds.includes(secondEvent.eventId),
               'second event must appear in response',
@@ -359,16 +386,19 @@ test('[flow:student-routing] returns student routes and alternatives', async () 
             const transition = (
               body.routes as Array<Record<string, unknown>>
             )[0];
+
             assert.equal(transition.sameBuilding, false);
             assert.ok(transition.route, 'transition must have a cached route');
 
             const route = transition.route as Record<string, unknown>;
+
             assert.equal(route.originBuildingId, originBuilding.buildingId);
           },
         },
-        //GET /routes/student/alternatives
+
         {
-          name: 'get alternative route between events',
+          //Alternative route
+          name: 'Alternative route',
 
           async run(context) {
             const firstEvent = context.require(firstEventKey);
@@ -383,6 +413,7 @@ test('[flow:student-routing] returns student routes and alternatives', async () 
             expectStatus(response, 200, 'get alternative route');
 
             const body = response.body;
+
             expectObject(body, 'get alternative route');
 
             assert.equal(body.date, context.plan.date);
@@ -392,15 +423,17 @@ test('[flow:student-routing] returns student routes and alternatives', async () 
             assert.equal(body.destinationBuildingId, destination.buildingId);
 
             const route = body.route;
+
             expectObject(route, 'alternative route');
+
             assert.equal(route.routeIndex, 0);
             assert.equal(route.isRecommended, true);
           },
         },
 
-        //  Validation branches
         {
-          name: 'reject alternatives when events are identical',
+          //Identical Events
+          name: 'Identical events',
 
           async run(context) {
             const firstEvent = context.require(firstEventKey);
@@ -414,21 +447,7 @@ test('[flow:student-routing] returns student routes and alternatives', async () 
         },
 
         {
-          name: 'reject partial overrides in routes query',
-
-          async run(context) {
-            const firstEvent = context.require(firstEventKey);
-
-            const response = await student(context).request.get(
-              `/routes/student?date=${context.plan.date}&overrideOriginEventId=${firstEvent.eventId}`,
-            );
-
-            expectStatus(response, 400, 'reject partial overrides');
-          },
-        },
-
-        {
-          name: 'return empty routes when no attended events',
+          name: 'Empty schedule',
 
           async run(context) {
             const response = await student(context).request.get(
@@ -438,6 +457,7 @@ test('[flow:student-routing] returns student routes and alternatives', async () 
             expectStatus(response, 200, 'get routes for empty date');
 
             const body = response.body;
+
             expectObject(body, 'get routes for empty date');
 
             assert.deepEqual(body.events, []);

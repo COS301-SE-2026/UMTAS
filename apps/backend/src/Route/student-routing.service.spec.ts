@@ -1,9 +1,12 @@
 //Service to test
-import { StudentRoutingService } from './student-routing.service';
+import {
+  BuildTransitionOptions,
+  StudentRoutingService,
+} from './student-routing.service';
 
 //Actual services
 import { RecurringEventService } from 'src/Events/recurring-event.service';
-import { RouteService } from './route.service';
+import { recommendedRouteVariantOptions, RouteService } from './route.service';
 import { DatabaseService } from 'src/db/database.service';
 
 //Mock services and db
@@ -121,20 +124,6 @@ describe('StudentRoutingService', () => {
       expect(result.events).toEqual([c1, c2]);
       expect(result.routes).toEqual([transition]);
       expect(buildSpy).toHaveBeenCalledTimes(1);
-    });
-
-    it('should throw BadRequestException when overrides are incomplete', async () => {
-      //Arrange
-      const query = {
-        date: '2026-09-16',
-        overrideOriginEventId: 'event-1',
-        // overrideDestinationEventId and overrideRouteIndex deliberately omitted
-      };
-
-      //Act + Assert
-      await expect(
-        service.getRoutesForDate('user-1', 'uni-1', query),
-      ).rejects.toThrow(BadRequestException);
     });
   }); //END_Test_getRoutesForDate
 
@@ -268,12 +257,15 @@ describe('StudentRoutingService', () => {
       const origin = createEventContext({ buildingId: 'building-1' });
       const destination = createEventContext({ buildingId: null });
 
+      const requestOptions: BuildTransitionOptions = {
+        uniId: 'uni-1',
+        originEvent: origin,
+        destinationEvent: destination,
+        tx: mockDb,
+      };
+
       //Act
-      const result = await (service as any).buildTransition(
-        'uni-1',
-        origin,
-        destination,
-      );
+      const result = await (service as any).buildTransition(requestOptions);
 
       //Assert
       expect(result).toEqual({
@@ -290,12 +282,15 @@ describe('StudentRoutingService', () => {
       const origin = createEventContext({ buildingId: 'building-1' });
       const destination = createEventContext({ buildingId: 'building-1' });
 
+      const requestOptions: BuildTransitionOptions = {
+        uniId: 'uni-1',
+        originEvent: origin,
+        destinationEvent: destination,
+        tx: mockDb,
+      };
+
       //Act
-      const result = await (service as any).buildTransition(
-        'uni-1',
-        origin,
-        destination,
-      );
+      const result = await (service as any).buildTransition(requestOptions);
 
       //Assert
       expect(result).toEqual({
@@ -312,15 +307,27 @@ describe('StudentRoutingService', () => {
       const destination = createEventContext({ buildingId: 'building-2' });
       const route = { pathCoordinates: [], distanceMetres: 0 };
       jest
-        .spyOn(mockRouteService, 'getRouteVariant')
+        .spyOn(mockRouteService, 'getRecommendedRouteVariant')
         .mockResolvedValue(route as any);
 
+      const requestOptions: BuildTransitionOptions = {
+        uniId: 'uni-1',
+        originEvent: origin,
+        destinationEvent: destination,
+        tx: mockDb,
+      };
+
+      const getRecommendedRouteVariantOptions: recommendedRouteVariantOptions =
+        {
+          originBuildingId: 'building-1',
+          destinationBuildingId: 'building-2',
+          startAtIndex: 0,
+          tx: mockDb,
+          uniId: 'uni-1',
+        };
+
       //Act
-      const result = await (service as any).buildTransition(
-        'uni-1',
-        origin,
-        destination,
-      );
+      const result = await (service as any).buildTransition(requestOptions);
 
       //Assert
       expect(result).toEqual({
@@ -329,11 +336,8 @@ describe('StudentRoutingService', () => {
         sameBuilding: false,
         route,
       });
-      expect(mockRouteService.getRouteVariant).toHaveBeenCalledWith(
-        'uni-1',
-        'building-1',
-        'building-2',
-        0,
+      expect(mockRouteService.getRecommendedRouteVariant).toHaveBeenCalledWith(
+        getRecommendedRouteVariantOptions,
       );
     });
   }); //END_Test_buildTransition

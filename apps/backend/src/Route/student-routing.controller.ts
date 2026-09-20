@@ -21,7 +21,7 @@ import {
   AlternativeRoutesResponseDto,
   StudentRoutesQueryDto,
   StudentRoutesResponseDto,
-} from './dto/route.dto';
+} from './dto';
 
 @ApiTags('Student Routes')
 @ApiSecurity('umtas-session')

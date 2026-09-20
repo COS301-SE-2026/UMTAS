@@ -6697,37 +6697,6 @@
               "example": "2026-09-16",
               "type": "string"
             }
-          },
-          {
-            "name": "overrideOriginEventId",
-            "required": false,
-            "in": "query",
-            "description": "Origin event of the route override.",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          },
-          {
-            "name": "overrideDestinationEventId",
-            "required": false,
-            "in": "query",
-            "description": "Destination event of the route override.",
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          },
-          {
-            "name": "overrideRouteIndex",
-            "required": false,
-            "in": "query",
-            "description": "Zero-based route index for the overridden transition.",
-            "schema": {
-              "minimum": 0,
-              "example": 1,
-              "type": "number"
-            }
           }
         ],
         "responses": {
@@ -12971,7 +12940,7 @@
           },
           "occurrenceDate": {
             "type": "string",
-            "description": "Concrete occurrence date used for this route request.",
+            "description": "Concrete occurrence date",
             "example": "2026-09-16",
             "format": "date"
           },

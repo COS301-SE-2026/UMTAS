@@ -1,6 +1,7 @@
 import {
   buildingId,
   destinationBuildingId,
+  routeId,
   uniId,
   userId,
 } from 'src/Testing/constants';
@@ -13,7 +14,10 @@ import {
 import { Test } from '@nestjs/testing';
 import { DatabaseService } from 'src/db/database.service';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
-import { createRoute } from 'src/Testing/Factories/route.factory';
+import {
+  createRoute,
+  createRouteDto,
+} from 'src/Testing/Factories/route.factory';
 import { ActiveRouteStatus } from './dto/route.dto';
 import { createMockOrsService } from 'src/Testing/Mocks/services/ors.mock';
 import { OrsService } from './ors.service';
@@ -43,6 +47,40 @@ describe('RouteService', () => {
   });
 
   //Tests
+  describe('Test_getById', () => {
+    it('should throw NotFoundException when route not found', async () => {
+      //Arrange
+      mockDbResult(mockDb.select, []);
+
+      //Act + Assert
+      await expect(service.getById(routeId)).rejects.toThrow(NotFoundException);
+    });
+
+    it('should return RouteSingleResponseDto for route found', async () => {
+      //Arrange
+      const route = createRoute();
+      mockDbResult(mockDb.select, [route]);
+      const routeDto = createRouteDto({
+        routeId: route.RouteID,
+        originBuildingId: route.OriginBuildingID,
+        destinationBuildingId: route.DestinationBuildingID,
+        routeIndex: route.RouteIndex,
+        pathCoordinates: route.PathCoordinates,
+        distanceMetres: route.DistanceMetres,
+        displayColour: route.DisplayColour,
+      });
+      const expected = {
+        route: routeDto,
+      };
+
+      //Act
+      const result = await service.getById(route.RouteID);
+
+      //Assert
+      expect(result).toMatchObject(expected);
+    });
+  });
+
   describe('Test_getRouteVariant', () => {
     const origin = buildingId;
     const destination = destinationBuildingId;
@@ -458,6 +496,83 @@ describe('RouteService', () => {
     });
   }); //END_Test_getActiveRoute
 
+  describe('Test_getRecommendedRouteVariant', () => {
+    const options = {
+      uniId,
+      originBuildingId: 'building-1',
+      destinationBuildingId: 'building-2',
+      startAtIndex: undefined as number | undefined,
+      tx: mockDb,
+    };
+
+    it('should return the start route when no diversion target exists', async () => {
+      //Arrange
+      const startRoute = createRouteDto({ routeId: 'start-route' });
+      const getVariantSpy = jest
+        .spyOn(service, 'getRouteVariant')
+        .mockResolvedValue(startRoute);
+      jest.spyOn(service as any, 'getDiversionTarget').mockResolvedValue(null);
+
+      //Act
+      const result = await service.getRecommendedRouteVariant(options);
+
+      //Assert
+      expect(result).toBe(startRoute);
+      expect(getVariantSpy).toHaveBeenCalledWith(
+        uniId,
+        'building-1',
+        'building-2',
+        0,
+        mockDb,
+      );
+    });
+
+    it('should recurse into the diverted route until the base case', async () => {
+      //Arrange
+      const startRoute = createRouteDto({
+        routeId: 'start-route',
+        routeIndex: 0,
+      });
+      const divertedRoute = createRouteDto({
+        routeId: 'diverted-route',
+        routeIndex: 1,
+      });
+      const finalRoute = createRouteDto({
+        routeId: 'final-route',
+        routeIndex: 2,
+      });
+
+      jest
+        .spyOn(service, 'getRouteVariant')
+        .mockResolvedValueOnce(startRoute)
+        .mockResolvedValueOnce(finalRoute);
+      jest
+        .spyOn(service as any, 'getDiversionTarget')
+        .mockResolvedValueOnce('diverted-route')
+        .mockResolvedValueOnce(null);
+      jest
+        .spyOn(service, 'getById')
+        .mockResolvedValueOnce({ route: divertedRoute });
+
+      //Act
+      const result = await service.getRecommendedRouteVariant({
+        ...options,
+        startAtIndex: 5,
+      });
+
+      //Assert
+      expect(result).toBe(finalRoute);
+      expect(service.getRouteVariant).toHaveBeenNthCalledWith(
+        2,
+        uniId,
+        'building-1',
+        'building-2',
+        divertedRoute.routeIndex,
+        mockDb,
+      );
+    });
+  }); //END_Test_getRecommendedRouteVariant
+
   //Helpers
   describe('Test_routeDtoAdapter', () => {
     it('should map a route row to a route DTO', () => {
@@ -625,4 +740,78 @@ describe('RouteService', () => {
       expect(mockDb.insert).toHaveBeenCalledTimes(1);
     });
   }); //END_Test_persistRouteVariants
+
+  describe('Test_getDiversionTarget', () => {
+    it('should return null when no diversion exists', async () => {
+      //Arrange
+      mockSequentialResults(mockDb.select, [
+        [],
+        [{ toRouteId: 'route-2', diversion: 0 }],
+      ]);
+
+      //Act
+      const result1 = await (service as any).getDiversionTarget(
+        'route-1',
+        mockDb,
+      );
+      const result2 = await (service as any).getDiversionTarget(
+        'route-1',
+        mockDb,
+      );
+
+      //Assert
+      expect(result1).toBeNull();
+      expect(result2).toBeNull();
+    });
+
+    it('should return the target route when shouldDivert is true', async () => {
+      //Arrange
+      mockDbResult(mockDb.select, [{ toRouteId: 'route-2', diversion: 0.5 }]);
+      jest.spyOn(service as any, 'shouldDivert').mockReturnValue(true);
+
+      //Act
+      const result = await (service as any).getDiversionTarget(
+        'route-1',
+        mockDb,
+      );
+
+      //Assert
+      expect(result).toBe('route-2');
+    });
+
+    it('should return null when shouldDivert is false', async () => {
+      //Arrange
+      mockDbResult(mockDb.select, [{ toRouteId: 'route-2', diversion: 0.5 }]);
+      jest.spyOn(service as any, 'shouldDivert').mockReturnValue(false);
+
+      //Act
+      const result = await (service as any).getDiversionTarget(
+        'route-1',
+        mockDb,
+      );
+
+      //Assert
+      expect(result).toBeNull();
+    });
+  }); //END_Test_getDiversionTarget
+
+  describe('Test_shouldDivert', () => {
+    it('should return true when probability is 1 or greater', () => {
+      //Act + Assert
+      expect((service as any).shouldDivert(1)).toBe(true);
+      expect((service as any).shouldDivert(1.5)).toBe(true);
+    });
+
+    it('should compare Math.random against the probability', () => {
+      //Arrange
+      const randomSpy = jest.spyOn(Math, 'random').mockReturnValue(0.4);
+
+      //Act + Assert
+      expect((service as any).shouldDivert(0.5)).toBe(true); // 0.4 < 0.5
+      expect((service as any).shouldDivert(0.3)).toBe(false); // 0.4 >= 0.3
+
+      //Assert
+      randomSpy.mockRestore();
+    });
+  }); //END_Test_shouldDivert
 }); //END_RouteService

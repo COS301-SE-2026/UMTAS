@@ -43,6 +43,13 @@
       "when": 1789564231479,
       "tag": "0005_ADDED_ROUTEINDEX_TO_ROUTE_ENTITY_WITH_INDEXING",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1789721324201,
+      "tag": "0006_ROUTE_DIVERSION_TABLE_ADDED",
+      "breakpoints": true
     }
   ]
 }

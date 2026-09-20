@@ -19,7 +19,7 @@ import {
   StudentRoutesQueryDto,
   StudentRoutesResponseDto,
   StudentRouteTransitionDto,
-} from './dto/route.dto';
+} from './dto/';
 
 export interface StudentEventRow {
   eventId: string;
@@ -29,6 +29,14 @@ export interface StudentEventRow {
   venueId: string | null;
   buildingId: string | null;
 } //END_StudentEventRow
+
+export interface BuildTransitionOptions {
+  uniId: string;
+  originEvent: RouteEventContextDto;
+  destinationEvent: RouteEventContextDto;
+  routeIndex?: number;
+  tx: AppDatabase;
+} //END_BuildTransitionOptions
 
 @Injectable()
 export class StudentRoutingService {
@@ -45,24 +53,6 @@ export class StudentRoutingService {
     tx?: AppDatabase,
   ): Promise<StudentRoutesResponseDto> {
     const db = tx ?? this.databaseService.db;
-
-    const overrideFields = [
-      query.overrideOriginEventId,
-      query.overrideDestinationEventId,
-      query.overrideRouteIndex,
-    ];
-
-    const hasAnyOverride = overrideFields.some((value) => value !== undefined);
-
-    const hasCompleteOverride = overrideFields.every(
-      (value) => value !== undefined,
-    );
-
-    if (hasAnyOverride && !hasCompleteOverride) {
-      throw new BadRequestException(
-        'overrideOriginEventId, overrideDestinationEventId, and overrideRouteIndex must be provided together',
-      );
-    }
 
     //Get events for the date
     const events = await this.getStudentEventsForDate(
@@ -81,17 +71,14 @@ export class StudentRoutingService {
     const routes: StudentRouteTransitionDto[] = [];
 
     for (let i = 0; i < eventContexts.length - 1; i += 1) {
-      const isOverride =
-        query.overrideOriginEventId === eventContexts[i].eventId &&
-        query.overrideDestinationEventId === eventContexts[i + 1].eventId;
-
       routes.push(
-        await this.buildTransition(
+        await this.buildTransition({
           uniId,
-          eventContexts[i],
-          eventContexts[i + 1],
-          isOverride ? query.overrideRouteIndex : 0,
-        ),
+          originEvent: eventContexts[i],
+          destinationEvent: eventContexts[i + 1],
+          routeIndex: 0, //default to shortest
+          tx: db,
+        }),
       );
     } //END_i
 
@@ -186,11 +173,14 @@ export class StudentRoutingService {
    * @returns The transition, or a no-route placeholder when nonapplicable.
    */
   private async buildTransition(
-    uniId: string,
-    originEvent: RouteEventContextDto,
-    destinationEvent: RouteEventContextDto,
-    routeIndex = 0,
+    options: BuildTransitionOptions,
   ): Promise<StudentRouteTransitionDto> {
+    //Extract fields
+    const { uniId, originEvent, destinationEvent, routeIndex, tx } = options;
+
+    const index = routeIndex ?? 0;
+
+    //Missing either origin or destination buildingID
     if (!originEvent.buildingId || !destinationEvent.buildingId) {
       return {
         originEvent,
@@ -201,6 +191,7 @@ export class StudentRoutingService {
       };
     }
 
+    //Same building
     if (originEvent.buildingId === destinationEvent.buildingId) {
       return {
         originEvent,
@@ -210,12 +201,14 @@ export class StudentRoutingService {
       };
     }
 
-    const route = await this.routeService.getRouteVariant(
+    //route diversion
+    const route = await this.routeService.getRecommendedRouteVariant({
       uniId,
-      originEvent.buildingId,
-      destinationEvent.buildingId,
-      routeIndex,
-    );
+      originBuildingId: originEvent.buildingId,
+      destinationBuildingId: destinationEvent.buildingId,
+      startAtIndex: index,
+      tx,
+    });
 
     return {
       originEvent,
