@@ -18,7 +18,8 @@ const HEATMAP_COLOUR_RANGE: [number, number, number, number][] = [
 ];
 
 //temporary for now until we get the simulation service up
-const HEATMAP_COLOUR_DOMAIN: [number, number] = [0, 5];
+//remember to tune this before sim service is up vro!
+const HEATMAP_COLOUR_DOMAIN: [number, number] = [0, 20];
 
 interface UseHeatmapOverlayOptions {
   buildingPoints: WeightedPoint[];
@@ -38,29 +39,38 @@ export function useHeatmapOverlay({
 
   //this is to prevent the dots showing up when zooming in on the heatmap
   const [radius, setRadius] = useState(radiusPixels);
+  const [intensityScale, setIntensityScale] = useState(1);
 
-  // useEffect(() => {
-  //   if (!map) {
-  //     return;
-  //   }
+  useEffect(() => {
+    if (!map) {
+      return;
+    }
 
-  //   function updateRadius() {
-  //     const zoom = map?.getZoom() ?? 15;
-  //     const lat = map?.getCenter()?.lat() ?? 0;
-  //     //calculates metres per pixel for smooth transition. prayed to the math gods to help me
-  //     const metresPerPixel =
-  //       (156543.03392 * Math.cos((lat * Math.PI) / 180)) / Math.pow(2, zoom);
-  //     //change this with testing
-  //     const wantedRadiusMetres = 40;
+    const REF_RADIUS_PIXELS = 40;
 
-  //     setRadius(wantedRadiusMetres / metresPerPixel);
-  //   }
+    function updateRadius() {
+      const zoom = map?.getZoom() ?? 15;
+      const lat = map?.getCenter()?.lat() ?? 0;
+      //calculates metres per pixel for smooth transition. prayed to the math gods to help me
+      const metresPerPixel =
+        (156543.03392 * Math.cos((lat * Math.PI) / 180)) / Math.pow(2, zoom);
+      //change this with testing
+      const wantedRadiusMetres = 40;
 
-  //   updateRadius();
+      const newRadius = wantedRadiusMetres / metresPerPixel;
+      const MIN_RADIUS_PIXELS = 45;
 
-  //   const listener = map.addListener("zoom_changed", updateRadius);
-  //   return () => listener.remove();
-  // }, [map]);
+      const finalRadius = Math.max(newRadius, MIN_RADIUS_PIXELS);
+
+      setRadius(finalRadius);
+      setIntensityScale(REF_RADIUS_PIXELS / finalRadius);
+    }
+
+    updateRadius();
+
+    const listener = map.addListener("zoom_changed", updateRadius);
+    return () => listener.remove();
+  }, [map]);
 
   useEffect(() => {
     if (!map) {
@@ -82,19 +92,19 @@ export function useHeatmapOverlay({
       return;
     }
 
-    const buildingWeights = buildingPoints.map((point) => point.weight);
-    const buildingScale = getMedianAndMax(buildingWeights);
+    //const buildingWeights = buildingPoints.map((point) => point.weight);
+    //const buildingScale = getMedianAndMax(buildingWeights);
 
-    const routeWeights = routePoints.map((point) => point.weight);
-    const routeScale = getMedianAndMax(routeWeights);
+    //const routeWeights = routePoints.map((point) => point.weight);
+    //const routeScale = getMedianAndMax(routeWeights);
 
     const buildingHeatmapLayer = new HeatmapLayer<WeightedPoint>({
       id: "uni-heatmap-buildings",
       data: buildingPoints,
       getPosition: (dot) => dot.position,
       getWeight: (dot) => dot.weight,
-      radiusPixels: 250,
-      intensity,
+      radiusPixels: radius + 250,
+      intensity: intensity * intensityScale,
       colorRange: HEATMAP_COLOUR_RANGE,
       colorDomain: HEATMAP_COLOUR_DOMAIN,
     });
@@ -104,8 +114,8 @@ export function useHeatmapOverlay({
       data: routePoints,
       getPosition: (dot) => dot.position,
       getWeight: (dot) => dot.weight,
-      radiusPixels: radiusPixels,
-      intensity,
+      radiusPixels: radius,
+      intensity: intensity * intensityScale,
       opacity: 0.6,
       colorRange: HEATMAP_COLOUR_RANGE,
       colorDomain: HEATMAP_COLOUR_DOMAIN,
@@ -115,6 +125,6 @@ export function useHeatmapOverlay({
       layers: [buildingHeatmapLayer, routeHeatmapLayer],
     });
 
-    console.log(radius, buildingPoints.length, routePoints.length);
-  }, [buildingPoints, routePoints, radius, intensity]);
+    //console.log(radius, buildingPoints.length, routePoints.length);
+  }, [buildingPoints, routePoints, radius, intensity, intensityScale]);
 }
