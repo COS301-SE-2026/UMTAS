@@ -1,6 +1,7 @@
 export * from './authentication.step';
 export * from './academic-calendar.step';
 export * from './attendance.step';
+export * from './attendance-session.step';
 export * from './builder.step';
 export * from './enrollment.step';
 export * from './event.step';

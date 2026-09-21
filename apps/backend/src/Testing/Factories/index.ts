@@ -11,4 +11,5 @@ export * from './session.factory';
 export * from './user.factory';
 export * from './university.factory';
 export * from './attendance.factory';
+export * from './attendance-session.factory';
 export * from './timetable.factory';
