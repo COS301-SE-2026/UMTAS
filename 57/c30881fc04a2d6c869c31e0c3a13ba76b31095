@@ -1,0 +1,16 @@
+apps/frontend/src/components/organisms/attendance/AttendanceScanner.tsx
+  h_2d4b3dca70a3d8 7,12,35-38,46,98-99,109
+apps/frontend/src/components/templates/attendance/Queries/attendanceQueries.ts
+  h_2d4b3dca70a3d8 1-41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "57c30881fc04a2d6c869c31e0c3a13ba76b31095",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
