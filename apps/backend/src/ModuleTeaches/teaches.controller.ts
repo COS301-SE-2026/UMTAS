@@ -5,7 +5,11 @@ import { CurrentSession, CurrentUniId } from '../auth/session.decorator';
 import type { SessionData } from '../auth/session.decorator';
 import { Roles } from '../auth/roles.guard';
 
-import { CreateTeachesDto, TeachesResponseDto } from './dto/teaches.dto';
+import {
+  CreateTeachesDto,
+  TeachesResponseDto,
+  SelfAssignTeachesDto,
+} from './dto/teaches.dto';
 import { TeachesService } from './teaches.service';
 
 @ApiTags('Teaches')
@@ -48,6 +52,23 @@ export class TeachesController {
   ): Promise<TeachesResponseDto> {
     return this.service.assignLecturer(session.user.id, uniId, dto);
   } //END_assignLecturer
+
+  @Post('me/modules')
+  @Roles('lecturer', 'uni_admin')
+  @ApiOperation({
+    summary: 'Assign the current lecturer or university admin to a module',
+    operationId: 'assignMeToModule',
+  })
+  assignMeToModule(
+    @CurrentUniId() uniId: string,
+    @CurrentSession() session: SessionData,
+    @Body() dto: SelfAssignTeachesDto,
+  ): Promise<TeachesResponseDto> {
+    return this.service.assignLecturer(session.user.id, uniId, {
+      ModuleID: dto.ModuleID,
+      UserID: session.user.id,
+    });
+  } //END_assignMeToModule
 
   @Get('me/modules')
   @Roles('lecturer')

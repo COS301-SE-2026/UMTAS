@@ -53,3 +53,13 @@ export class TeachesResponseDto {
   @Type(() => ModuleSingleResponseDto)
   module!: ModulesDto;
 } //END_TeachesResponseDto
+
+export class SelfAssignTeachesDto {
+  @ApiProperty({
+    example: '00000000-0000-0000-0000-000000000000',
+    description: 'Module to assign the current user to',
+  })
+  @IsUUID()
+  @IsNotEmpty()
+  ModuleID!: string;
+} //END_SelfAssignTeachesDto
