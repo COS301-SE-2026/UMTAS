@@ -186,7 +186,7 @@ pub fn infer_detection_data(
         all_people.extend(global_adjusted_person);
     }
 
-    let res_people = non_maximum_sepression(all_people, 0.50);
+    let res_people = non_maximum_sepression(all_people, 0.30);
 
     return serde_json::to_string(&res_people).map_err(|e| JsValue::from_str(&e.to_string()));
 }
