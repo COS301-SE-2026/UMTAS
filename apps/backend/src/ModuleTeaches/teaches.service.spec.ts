@@ -16,6 +16,7 @@ import {
   createCreateTeachesDto,
   createModuleTeaches,
   createModuleSingleResponseDto,
+  createTeachesResponseDto,
 } from 'src/Testing/Factories';
 
 describe('TeachesService', () => {
@@ -43,7 +44,7 @@ describe('TeachesService', () => {
     jest.restoreAllMocks();
   });
 
-  // ── Exposed methods ───────────────────────────────────────────
+  //Tests
   describe('Test_assignLecturer', () => {
     const actorUserId = 'actor-1';
     const dto = createCreateTeachesDto();
@@ -100,7 +101,47 @@ describe('TeachesService', () => {
     });
   }); //END_Test_assignLecturer
 
-  // ── Helpers ───────────────────────────────────────────────────
+  describe('Test_getLecturerModules', () => {
+    it('should return empty array when user has no teaches relations', async () => {
+      //Arrange
+      jest.spyOn(service as any, 'getTeachesRelations').mockResolvedValue([]);
+      mockTransaction(mockDb, {});
+
+      //Act
+      const result = await service.getLecturerModules('user-1', uniId);
+
+      //Assert
+      expect(result).toEqual([]);
+    });
+
+    it('should return a response per teaches relation', async () => {
+      //Arrange
+      const relations = [
+        createModuleTeaches({ ModuleID: 'module-1' }),
+        createModuleTeaches({ ModuleID: 'module-2' }),
+      ];
+      const responseA = createTeachesResponseDto({ ModuleID: 'module-1' });
+      const responseB = createTeachesResponseDto({ ModuleID: 'module-2' });
+
+      jest
+        .spyOn(service as any, 'getTeachesRelations')
+        .mockResolvedValue(relations);
+      const buildSpy = jest
+        .spyOn(service as any, 'buildTeachesResponse')
+        .mockResolvedValueOnce(responseA)
+        .mockResolvedValueOnce(responseB);
+      mockTransaction(mockDb, {});
+
+      //Act
+      const result = await service.getLecturerModules('user-1', uniId);
+
+      //Assert
+      expect(result).toEqual([responseA, responseB]);
+      expect(buildSpy).toHaveBeenCalledTimes(2);
+    });
+  }); //END_Test_getLecturerModules
+
+  //Helpers
   describe('Test_getExistingTeachesRelation', () => {
     it('should return null when no relation exists', async () => {
       //Arrange
@@ -133,4 +174,45 @@ describe('TeachesService', () => {
       expect(result).toEqual(relation);
     });
   }); //END_Test_getExistingTeachesRelation
+
+  describe('Test_getTeachesRelations', () => {
+    it('should return the teaches relations for a user', async () => {
+      //Arrange
+      const relations = [createModuleTeaches(), createModuleTeaches()];
+      mockDbResult(mockDb.select, relations);
+
+      //Act
+      const result = await (service as any).getTeachesRelations(
+        'user-1',
+        mockDb,
+      );
+
+      //Assert
+      expect(result).toEqual(relations);
+    });
+  }); //END_Test_getTeachesRelations
+
+  describe('Test_buildTeachesResponse', () => {
+    it('should return the relation with its module attached', async () => {
+      //Arrange
+      const relation = createModuleTeaches({ ModuleID: 'module-1' });
+      const module = createModuleSingleResponseDto();
+      jest.spyOn(mockModuleServiceV2, 'getByIdV2').mockResolvedValue(module);
+
+      //Act
+      const result = await (service as any).buildTeachesResponse(
+        relation,
+        'user-1',
+        mockDb,
+      );
+
+      //Assert
+      expect(result).toEqual({ ...relation, module });
+      expect(mockModuleServiceV2.getByIdV2).toHaveBeenCalledWith({
+        moduleId: 'module-1',
+        userId: 'user-1',
+        tx: mockDb,
+      });
+    });
+  }); //END_Test_buildTeachesResponse
 }); //END_TeachesService
