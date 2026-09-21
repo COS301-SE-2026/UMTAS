@@ -23,19 +23,70 @@ pub fn analyze_frame(
 
 // if new_frame_people size < prev frame => prev frame adds people
 // if new frame size > prev frame => new people added along with recounted / existing
-pub fn attach_id(new_frame_people: Vec<DetectedPersonPose>, prev_frame: FrameStore) -> FrameStore {
-    let new_people: Vec<SinglePersonSessionData>;
+pub fn attach_id(
+    frame: u32,
+    timestamp: f64,
+    new_frame_people: Vec<DetectedPersonPose>,
+    prev_frame: FrameStore,
+) -> FrameStore {
+    let mut new_people: Vec<SinglePersonSessionData> = [].to_vec();
     const IOU_THRESHOLD: f32 = 0.35;
     // check array
     let mut matched_prev_indices = vec![false; prev_frame.people.len()];
+    let mut matched_new_indices = vec![false; new_frame_people.len()];
+    let mut highest_id = 0;
 
-    for new_person in &new_frame_people {
-        for prev_person in &prev_frame.people {
-            if matching_person(new_person, &prev_person.pose_data, IOU_THRESHOLD) {
+    // finding matches
+    for (new_index, new_person) in new_frame_people.iter().enumerate() {
+        for (prev_index, prev_person) in prev_frame.people.iter().enumerate() {
+            if matched_prev_indices[prev_index] == false
+                && matching_person(new_person, &prev_person.pose_data, IOU_THRESHOLD)
+            {
                 // are matching
-            } else {
-                // not matching
+                matched_prev_indices[prev_index] = true;
+                matched_new_indices[new_index] = true;
+                new_people.push(SinglePersonSessionData {
+                    pose_data: new_person.clone(),
+                    assigned_id: prev_person.assigned_id,
+                    is_inferred: false,
+                    last_seen_frame: frame,
+                    last_seen_timestamp: timestamp,
+                    hand_up: is_hands_up(new_person),
+                });
             }
+        }
+    }
+    for (prev_index, prev_person) in prev_frame.people.iter().enumerate() {
+        if matched_prev_indices[prev_index] == false {
+            highest_id = highest_id.max(prev_person.assigned_id);
+
+            matched_prev_indices[prev_index] = true;
+
+            new_people.push(SinglePersonSessionData {
+                pose_data: prev_person.pose_data.clone(),
+                assigned_id: prev_person.assigned_id,
+                is_inferred: true,
+                last_seen_frame: prev_frame.frame_number,
+                last_seen_timestamp: prev_frame.timestamp,
+                hand_up: false,
+                // we do not look at hands up of inferred frames
+            });
+        }
+    }
+
+    for (new_index, new_person) in new_frame_people.iter().enumerate() {
+        let this_id = highest_id + 1;
+        highest_id += 1;
+        if matched_new_indices[new_index] == false {
+            matched_new_indices[new_index] = true;
+            new_people.push(SinglePersonSessionData {
+                pose_data: new_person.clone(),
+                assigned_id: this_id,
+                is_inferred: false,
+                last_seen_frame: frame,
+                last_seen_timestamp: timestamp,
+                hand_up: is_hands_up(new_person),
+            });
         }
     }
 
@@ -44,6 +95,9 @@ pub fn attach_id(new_frame_people: Vec<DetectedPersonPose>, prev_frame: FrameSto
         timestamp: 0.0,
         people: [].to_vec(),
     };
+}
+pub fn is_hands_up(new_person: &DetectedPersonPose) -> bool {
+    return new_person.right_arm[1].y > new_person.nose.y;
 }
 pub fn matching_person(
     new_person: &DetectedPersonPose,
