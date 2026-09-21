@@ -1,10 +1,14 @@
 import {
   createBuildingBody,
   createBuildingBuilder,
+  deleteBuildingBuilder,
+  deleteBuildingPath,
   getAllBuildingsBuilder,
   getAllBuildingsHeatmapBuilder,
   getAllBuildingsHeatmapQuery,
   getAllBuildingsQuery,
+  getBuildingByIdBuilder,
+  getBuildingByIDPath,
   getBuildingHeatmapBuilder,
   getBuildingHeatmapPath,
   getBuildingHeatmapQuery,
@@ -28,6 +32,16 @@ export function getAllBuildingsQ(query?: getAllBuildingsQuery) {
   });
 }
 
+export function getBuildingByIdQ(path: getBuildingByIDPath) {
+  return queryOptions({
+    queryKey: ["buildings", path.buildingId] as const,
+    queryFn: async () => {
+      const result = await new getBuildingByIdBuilder().send({ paths: path });
+      return result;
+    },
+  });
+}
+
 export function createBuildingMut() {
   return mutationOptions({
     mutationFn: async (vars: { body: createBuildingBody }) => {
@@ -46,7 +60,8 @@ export function createBuildingMut() {
   });
 }
 
-export function updateBuildingLocationMut() {
+//todo rename since it does not only update the building location
+export function updateBuildingMut() {
   return mutationOptions({
     mutationFn: async (vars: {
       body: updateBuildingLocationBody;
@@ -66,6 +81,19 @@ export function updateBuildingLocationMut() {
       });
     },
     onError: (err) => console.error("mutation failed", err),
+  });
+}
+
+export function deleteBuildingMut() {
+  return mutationOptions({
+    mutationFn: async (vars: { path: deleteBuildingPath }) => {
+      const result = new deleteBuildingBuilder().send({ paths: vars.path });
+      return result;
+    },
+    onSuccess: () => {
+      getQueryClient().invalidateQueries({ queryKey: ["buildings"] });
+    },
+    onError: (error) => console.error("mutation has failed", error),
   });
 }
 

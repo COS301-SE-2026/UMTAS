@@ -4,6 +4,10 @@ import {
   assignVenueBody,
   assignVenueBuilder,
   assignVenuePath,
+  createVenueBody,
+  createVenueBuilder,
+  deleteVenueBuilder,
+  deleteVenuePath,
   // bulkAssignVenueBody,
   // bulkAssignVenueBuilder,
   getAllVenuesBuilder,
@@ -17,6 +21,58 @@ export function getAllVenuesQ(query?: getAllVenuesQuery) {
       const result = (await new getAllVenuesBuilder().send({ query })).venues;
       //console.log(result, "Sent venues ");
       return result;
+    },
+  });
+}
+
+export function createVenueMut() {
+  return mutationOptions({
+    mutationFn: async (vars: { body: createVenueBody }) => {
+      const result = new createVenueBuilder().send({ body: vars.body });
+      return result;
+    },
+    onSuccess: () => {
+      getQueryClient().invalidateQueries({ queryKey: ["venues"] });
+      getQueryClient().invalidateQueries({ queryKey: ["buildings"] });
+    },
+    onError: (error) => console.error("mutation failed dude", error),
+  });
+}
+
+export function deleteVenueMut() {
+  return mutationOptions({
+    mutationFn: async (vars: { path: deleteVenuePath }) => {
+      const result = new deleteVenueBuilder().send({ paths: vars.path });
+      return result;
+    },
+    onSuccess: () => {
+      getQueryClient().invalidateQueries({ queryKey: ["venues"] });
+      getQueryClient().invalidateQueries({ queryKey: ["buildings"] });
+    },
+    onError: (error) => {
+      console.error("mutation error", error);
+    },
+  });
+}
+
+export function updateVenueMut() {
+  return mutationOptions({
+    mutationFn: async (vars: {
+      body: assignVenueBody;
+      path: assignVenuePath;
+    }) => {
+      const result = new assignVenueBuilder().send({
+        body: vars.body,
+        paths: vars.path,
+      });
+      return result;
+    },
+    onSuccess: () => {
+      getQueryClient().invalidateQueries({ queryKey: ["venues"] });
+      getQueryClient().invalidateQueries({ queryKey: ["buildings"] });
+    },
+    onError: (error) => {
+      console.error("mutation error", error);
     },
   });
 }

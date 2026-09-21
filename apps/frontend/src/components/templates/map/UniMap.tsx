@@ -45,6 +45,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/atoms/baseShadcn/select";
+import { BuildingSheet } from "@/components/organisms/map/BuildingSheet";
 
 interface GeoJsonPolygon {
   type: "Polygon";
@@ -392,22 +393,12 @@ export function UniMap() {
           </div>
         )}
 
-        <Sheet
+        <BuildingSheet
+          building={selectedBuilding}
+          buildings={buildings}
           open={!!selectedBuilding}
           onOpenChange={(open) => !open && setSelectedBuilding(null)}
-        >
-          <SheetContent side="right">
-            <SheetHeader>
-              <SheetTitle className="flex items-center gap-2">
-                {selectedBuilding?.BuildingName}
-
-                <Badge variant="secondary">
-                  {selectedBuilding?.venueCount ?? 0} venues
-                </Badge>
-              </SheetTitle>
-            </SheetHeader>
-          </SheetContent>
-        </Sheet>
+        />
       </div>
     </>
   );

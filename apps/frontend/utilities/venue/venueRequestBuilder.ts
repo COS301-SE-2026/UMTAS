@@ -29,6 +29,20 @@ export type updateEventVenueBody =
 export type updateEventVenueRes =
   paths["/api/events/{id}/venue"]["patch"]["responses"]["200"]["content"]["application/json"];
 
+export type createVenueBody =
+  paths["/api/venues"]["post"]["requestBody"]["content"]["application/json"];
+export type createVenueRes =
+  paths["/api/venues"]["post"]["responses"]["201"]["content"]["application/json"];
+
+export type deleteVenuePath =
+  paths["/api/venues/{venueId}"]["delete"]["parameters"]["path"];
+export type deleteVenueRes =
+  paths["/api/venues/{venueId}"]["delete"]["responses"]["200"]["content"]["application/json"];
+
+export type BaseVenueDto = assignVenueRes["venue"];
+export type UpdateVenueDto = assignVenueBody;
+export type CreateVenueDto = createVenueBody;
+
 export class getAllVenuesBuilder extends RequestBuilder<
   undefined,
   undefined,
@@ -70,5 +84,27 @@ export class updateEventVenueBuilder extends RequestBuilder<
   constructor() {
     super();
     this.setUrl("/events/{id}/venue").setMethod(RequestMethod.PATCH);
+  }
+}
+
+export class createVenueBuilder extends RequestBuilder<
+  undefined,
+  createVenueBody,
+  createVenueRes
+> {
+  constructor() {
+    super();
+    this.setUrl("/venues").setMethod(RequestMethod.POST);
+  }
+}
+
+export class deleteVenueBuilder extends RequestBuilder<
+  deleteVenuePath,
+  undefined,
+  deleteVenueRes
+> {
+  constructor() {
+    super();
+    this.setUrl("/venues/{venueId}").setMethod(RequestMethod.DELETE);
   }
 }

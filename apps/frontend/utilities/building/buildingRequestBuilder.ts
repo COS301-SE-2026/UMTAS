@@ -37,6 +37,16 @@ export type getAllBuildingsHeatmapRes =
 export type BuildingHeatmapType =
   getAllBuildingsHeatmapRes["buildings"][number];
 
+export type getBuildingByIDPath =
+  paths["/api/buildings/{buildingId}"]["get"]["parameters"]["path"];
+export type getBuildingByIDRes =
+  paths["/api/buildings/{buildingId}"]["get"]["responses"]["200"]["content"]["application/json"];
+
+export type deleteBuildingPath =
+  paths["/api/buildings/{buildingId}"]["delete"]["parameters"]["path"];
+export type deleteBuildingRes =
+  paths["/api/buildings/{buildingId}"]["delete"]["responses"]["200"]["content"]["application/json"];
+
 export class getAllBuildingsBuilder extends RequestBuilder<
   getAllBuildingsQuery,
   undefined,
@@ -91,5 +101,27 @@ export class getAllBuildingsHeatmapBuilder extends RequestBuilder<
   constructor() {
     super();
     this.setUrl("/buildings/heatmap").setMethod(RequestMethod.GET);
+  }
+}
+
+export class getBuildingByIdBuilder extends RequestBuilder<
+  getBuildingByIDPath,
+  undefined,
+  getBuildingByIDRes
+> {
+  constructor() {
+    super();
+    this.setUrl("/buildings/{buildingId}").setMethod(RequestMethod.GET);
+  }
+}
+
+export class deleteBuildingBuilder extends RequestBuilder<
+  deleteBuildingPath,
+  undefined,
+  deleteBuildingRes
+> {
+  constructor() {
+    super();
+    this.setUrl("/buildings/{buildingId}").setMethod(RequestMethod.DELETE);
   }
 }

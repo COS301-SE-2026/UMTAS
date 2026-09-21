@@ -19,7 +19,7 @@ const HEATMAP_COLOUR_RANGE: [number, number, number, number][] = [
 
 //temporary for now until we get the simulation service up
 //remember to tune this before sim service is up vro!
-const HEATMAP_COLOUR_DOMAIN: [number, number] = [0, 20];
+const HEATMAP_COLOUR_DOMAIN: [number, number] = [0, 15];
 
 interface UseHeatmapOverlayOptions {
   buildingPoints: WeightedPoint[];
@@ -103,8 +103,8 @@ export function useHeatmapOverlay({
       data: buildingPoints,
       getPosition: (dot) => dot.position,
       getWeight: (dot) => dot.weight,
-      radiusPixels: radius + 250,
-      intensity: intensity * intensityScale,
+      radiusPixels: radius * 5,
+      intensity: intensity * intensityScale * 1.5,
       colorRange: HEATMAP_COLOUR_RANGE,
       colorDomain: HEATMAP_COLOUR_DOMAIN,
     });
