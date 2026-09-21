@@ -28,6 +28,7 @@ import { ApiServiceModule } from './ApiService/ApiService.module';
 import { RouteModule } from './Route/route.module';
 import { AcademicCalendarModule } from './academic_calendar/academic_calendar.module';
 import { PostHogModule } from './posthog/posthog.module';
+import { TeachesModule } from './ModuleTeaches/teaches.module';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { PostHogModule } from './posthog/posthog.module';
     RouteModule,
     AcademicCalendarModule,
     ApiServiceModule,
+    TeachesModule,
   ],
   controllers: [AppController, AuthController],
   providers: [
