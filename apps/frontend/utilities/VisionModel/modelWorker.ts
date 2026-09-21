@@ -18,7 +18,7 @@ async function initWasm() {
   wasmLoaded = true;
 }
 async function initDetection() {
-  const fullUrl = `${location.origin}/models/yolov11n.onnx`;
+  const fullUrl = `${location.origin}/models/yolo26n.onnx`;
 
   DetectSession = await ort.InferenceSession.create(fullUrl, {
     executionProviders: ["webgpu", "wasm"],
