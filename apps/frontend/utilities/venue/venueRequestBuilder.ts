@@ -39,6 +39,10 @@ export type deleteVenuePath =
 export type deleteVenueRes =
   paths["/api/venues/{venueId}"]["delete"]["responses"]["200"]["content"]["application/json"];
 
+export type BaseVenueDto = assignVenueRes["venue"];
+export type UpdateVenueDto = assignVenueBody;
+export type CreateVenueDto = createVenueBody;
+
 export class getAllVenuesBuilder extends RequestBuilder<
   undefined,
   undefined,
