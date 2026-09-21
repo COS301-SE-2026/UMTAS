@@ -1,5 +1,5 @@
+use serde::Serialize;
 use std::collections::HashMap;
-use std::f32::consts::PI;
 use wasm_bindgen::prelude::*;
 
 use crate::pose_inference::Keypoint;
@@ -13,7 +13,7 @@ pub fn analyse_session(frames: JsValue) -> Result<String, JsValue> {
     let full_session = get_session_data(frames_parsed);
     let session_data = group_data(full_session);
 
-    return Ok("".to_string());
+    return serde_json::to_string(&session_data).map_err(|e| JsValue::from_str(&e.to_string()));
 }
 
 pub fn group_data(full_session: HashMap<usize, SessionPerson>) -> SessionAnalysis {
@@ -160,6 +160,7 @@ pub fn get_session_data(frames: Vec<FrameStore>) -> HashMap<usize, SessionPerson
     return all_session_people;
 }
 
+#[derive(Serialize)]
 pub struct SessionAnalysis {
     questions_asked: usize,
     // a measure of everyones center and the average movement of that point
