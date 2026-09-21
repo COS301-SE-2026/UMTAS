@@ -62,7 +62,7 @@ export function createBuildingMut() {
 }
 
 //todo rename since it does not only update the building location
-export function updateBuildingLocationMut() {
+export function updateBuildingMut() {
   return mutationOptions({
     mutationFn: async (vars: {
       body: updateBuildingLocationBody;
