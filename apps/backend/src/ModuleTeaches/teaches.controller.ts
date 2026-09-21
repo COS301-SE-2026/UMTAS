@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import { CurrentSession } from '../auth/session.decorator';
+import { CurrentSession, CurrentUniId } from '../auth/session.decorator';
 import type { SessionData } from '../auth/session.decorator';
 import { Roles } from '../auth/roles.guard';
 
@@ -42,10 +42,11 @@ export class TeachesController {
     description: 'Lecturer was not assigned to module',
   })
   assignLecturer(
+    @CurrentUniId() uniId: string,
     @CurrentSession() session: SessionData,
     @Body() dto: CreateTeachesDto,
   ): Promise<TeachesResponseDto> {
-    return this.service.assignLecturer(session.user.id, session.uniId!, dto);
+    return this.service.assignLecturer(session.user.id, uniId, dto);
   } //END_assignLecturer
 
   @Get('me/modules')
@@ -65,8 +66,9 @@ export class TeachesController {
     description: 'Insufficient permissions or no university selected',
   })
   getLecturerModules(
+    @CurrentUniId() uniId: string,
     @CurrentSession() session: SessionData,
   ): Promise<TeachesResponseDto[]> {
-    return this.service.getLecturerModules(session.user.id, session.uniId!);
+    return this.service.getLecturerModules(session.user.id, uniId);
   } //END_getLecturerModules
 } //TeachesController
