@@ -87,8 +87,8 @@ pub fn attach_id(
 
     // finding matches
     for (new_index, new_person) in new_frame_people.iter().enumerate() {
-        let mut best_iou: f32 = 0.0;
-        let mut best_index_prev_idx = 0;
+        let mut best_iou: f32 = IOU_THRESHOLD;
+        let mut best_index_prev_idx: Option<usize> = None;
         for (prev_index, prev_person) in prev_frame.people.iter().enumerate() {
             if matched_prev_indices[prev_index] {
                 continue;
@@ -96,25 +96,28 @@ pub fn attach_id(
 
             let iou = intersection_over_union(&new_person.person, &prev_person.pose_data.person);
             if best_iou < iou {
-                best_index_prev_idx = prev_index;
+                best_index_prev_idx = Some(prev_index);
                 best_iou = iou;
             }
         }
-        if best_iou > IOU_THRESHOLD
-            && matched_new_indices[new_index] == false
-            && matched_prev_indices[best_index_prev_idx] == false
-        {
-            matched_new_indices[new_index] = true;
-            matched_prev_indices[best_index_prev_idx] = true;
 
-            new_people.push(SinglePersonSessionData {
-                pose_data: new_person.clone(),
-                assigned_id: prev_frame.people[best_index_prev_idx].assigned_id,
-                is_inferred: false,
-                last_seen_frame: frame,
-                last_seen_timestamp: timestamp,
-                hand_up: is_hands_up(new_person),
-            });
+        if let Some(prev_idx) = best_index_prev_idx {
+            if best_iou >= IOU_THRESHOLD
+                && matched_new_indices[new_index] == false
+                && matched_prev_indices[prev_idx] == false
+            {
+                matched_new_indices[new_index] = true;
+                matched_prev_indices[prev_idx] = true;
+
+                new_people.push(SinglePersonSessionData {
+                    pose_data: new_person.clone(),
+                    assigned_id: prev_frame.people[prev_idx].assigned_id,
+                    is_inferred: false,
+                    last_seen_frame: frame,
+                    last_seen_timestamp: timestamp,
+                    hand_up: is_hands_up(new_person),
+                });
+            }
         }
     }
     for (prev_index, prev_person) in prev_frame.people.iter().enumerate() {
