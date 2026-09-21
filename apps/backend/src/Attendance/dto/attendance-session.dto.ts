@@ -90,7 +90,6 @@ export class RecordBarcodeAttendanceDto {
   @IsUUID()
   UserID!: string;
 }
-
 export class RecordCameraAttendanceDto {
   @ApiProperty({
     description: 'Current anonymous headcount observed by the camera',

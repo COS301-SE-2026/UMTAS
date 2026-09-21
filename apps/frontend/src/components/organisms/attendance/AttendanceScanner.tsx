@@ -4,10 +4,12 @@ import AttendanceCounter from "./AttendanceCounter";
 import { LastScannedStudent } from "./LastScannedStudent";
 
 import { ChangeEvent, useCallback, useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 
 import { BarcodeCamera } from "@/components/molecules/attendance/BarcodeCamera";
 import { ScannerBadge } from "@/components/molecules/attendance/ScannerBadge";
 import { StudentNumberInput } from "@/components/molecules/attendance/USBBarcodeScanner";
+import { updateAttendanceCountMut } from "@/components/templates/attendance/Queries/attendanceQueries";
 
 import { Switch } from "@/components/atoms/baseShadcn/switch";
 import { Label } from "@/components/atoms/baseShadcn/label";
@@ -30,6 +32,10 @@ export default function AttendanceScanner() {
   const [sessionStarted, setSessionStarted] = useState(false);
   const [sessionEnded, setSessionEnded] = useState(false);
 
+  const { mutate: updateAttendanceCount } = useMutation(
+    updateAttendanceCountMut(),
+  );
+
   const handleFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
 
@@ -37,7 +43,7 @@ export default function AttendanceScanner() {
 
     const text = await file.text();
 
-    //Extract every unique 8 digit student number from the file
+    // Extract every unique 8 digit student number from the file
     const studentNumbers = text.match(/\b\d{8}\b/g) ?? [];
 
     const uniqueStudentNumbers = [...new Set(studentNumbers)];
@@ -89,6 +95,8 @@ export default function AttendanceScanner() {
 
         updated.add(cleanedStudentNumber);
 
+        updateAttendanceCount(updated.size);
+
         return updated;
       });
 
@@ -98,7 +106,7 @@ export default function AttendanceScanner() {
         setStatus("READY");
       }, 1500);
     },
-    [expectedStudents, sessionEnded, sessionStarted],
+    [expectedStudents, sessionEnded, sessionStarted, updateAttendanceCount],
   );
 
   const startSession = () => {
