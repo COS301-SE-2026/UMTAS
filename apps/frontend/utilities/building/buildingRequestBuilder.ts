@@ -23,6 +23,20 @@ export type updateBuildingLocationPath =
 export type updateBuildingLocationRes =
   paths["/api/buildings/{buildingId}"]["patch"]["responses"]["200"]["content"]["application/json"];
 
+export type getBuildingHeatmapPath =
+  paths["/api/buildings/{buildingId}/heatmap"]["get"]["parameters"]["path"];
+export type getBuildingHeatmapQuery =
+  paths["/api/buildings/{buildingId}/heatmap"]["get"]["parameters"]["query"];
+export type getBuildingHeatmapRes =
+  paths["/api/buildings/{buildingId}/heatmap"]["get"]["responses"]["200"]["content"]["application/json"];
+
+export type getAllBuildingsHeatmapQuery =
+  paths["/api/buildings/heatmap"]["get"]["parameters"]["query"];
+export type getAllBuildingsHeatmapRes =
+  paths["/api/buildings/heatmap"]["get"]["responses"]["200"]["content"]["application/json"];
+export type BuildingHeatmapType =
+  getAllBuildingsHeatmapRes["buildings"][number];
+
 export class getAllBuildingsBuilder extends RequestBuilder<
   getAllBuildingsQuery,
   undefined,
@@ -53,5 +67,29 @@ export class updateBuildingLocationBuilder extends RequestBuilder<
   constructor() {
     super();
     this.setUrl("/buildings/{buildingId}").setMethod(RequestMethod.PATCH);
+  }
+}
+
+export class getBuildingHeatmapBuilder extends RequestBuilder<
+  getBuildingHeatmapPath,
+  undefined,
+  getBuildingHeatmapRes,
+  getBuildingHeatmapQuery
+> {
+  constructor() {
+    super();
+    this.setUrl("/buildings/{buildingId}/heatmap").setMethod(RequestMethod.GET);
+  }
+}
+
+export class getAllBuildingsHeatmapBuilder extends RequestBuilder<
+  undefined,
+  undefined,
+  getAllBuildingsHeatmapRes,
+  getAllBuildingsHeatmapQuery
+> {
+  constructor() {
+    super();
+    this.setUrl("/buildings/heatmap").setMethod(RequestMethod.GET);
   }
 }

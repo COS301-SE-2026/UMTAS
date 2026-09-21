@@ -8,6 +8,10 @@ import { varchar } from 'drizzle-orm/pg-core';
 import { timestamp } from 'drizzle-orm/pg-core';
 import { uniqueIndex } from 'drizzle-orm/pg-core';
 import { index } from 'drizzle-orm/pg-core';
+import { check } from 'drizzle-orm/pg-core';
+import { sql } from 'drizzle-orm';
+import { doublePrecision } from 'drizzle-orm/pg-core';
+import { primaryKey } from 'drizzle-orm/pg-core';
 
 interface LatLng {
   lat: number;
@@ -27,6 +31,7 @@ export const Route = pgTable(
     DestinationBuildingID: uuid('DestinationBuildingID')
       .references(() => Building.BuildingID, { onDelete: 'cascade' })
       .notNull(),
+    RouteIndex: integer('RouteIndex').default(0).notNull(),
     PathCoordinates: jsonb('PathCoordinates').$type<LatLng[]>().notNull(),
     DistanceMetres: integer('DistanceMetres').notNull(),
     DisplayColour: varchar('DisplayColour', { length: 10 })
@@ -40,11 +45,45 @@ export const Route = pgTable(
       .notNull(),
   },
   (table) => ({
-    routeOriginDestinationUnique: uniqueIndex(
-      'route_origin_destination_unique',
-    ).on(table.OriginBuildingID, table.DestinationBuildingID),
-    routeUniversityByIdx: index('route_university_id_idx').on(
+    routeVariantUnique: uniqueIndex(
+      'route_university_origin_destination_variant_unique',
+    ).on(
       table.UniversityID,
+      table.OriginBuildingID,
+      table.DestinationBuildingID,
+      table.RouteIndex,
+    ),
+
+    routeUniversityOriginDestinationIdx: index(
+      'route_university_origin_destination_idx',
+    ).on(
+      table.UniversityID,
+      table.OriginBuildingID,
+      table.DestinationBuildingID,
     ),
   }),
+);
+
+export const RouteDiversion = pgTable(
+  'RouteDiversion',
+  {
+    RouteID: uuid('RouteID')
+      .references(() => Route.RouteID, { onDelete: 'cascade' })
+      .notNull(),
+    Diversion: doublePrecision('Diversion').default(0).notNull(),
+    DivertToRoute: uuid('DivertToRoute')
+      .references(() => Route.RouteID, { onDelete: 'cascade' })
+      .notNull(),
+  },
+  (table) => [
+    check(
+      'diversion_range',
+      sql`${table.Diversion} >= 0 AND ${table.Diversion} <= 1`,
+    ),
+    check('no_self_diversion', sql`${table.RouteID}<>${table.DivertToRoute}`),
+
+    primaryKey({
+      columns: [table.RouteID, table.DivertToRoute],
+    }),
+  ],
 );

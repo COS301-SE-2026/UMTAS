@@ -13,6 +13,7 @@ import { UniversityService } from '../University/university.service';
 import {
   createDbChain,
   createMockDatabase,
+  mockDbResult,
   mockSequentialResults,
   mockTransaction,
 } from '../Testing/Mocks/';
@@ -479,6 +480,51 @@ describe('EventServiceV2', () => {
     });
   });
 
+  //Non Crud
+  describe('Test_getEventsByModules', () => {
+    it('should return empty array when no moduleIds provided', async () => {
+      //Act
+      const result = await (service as any).getEventsByModules([], mockDb);
+
+      //Assert
+      expect(result).toEqual([]);
+      expect(mockDb.select).not.toHaveBeenCalled();
+    });
+
+    it('should map event rows and attach venues', async () => {
+      //Arrange
+      const event = createEvent();
+      mockDbResult(mockDb.select, [{ moduleId: 'module-1', event }]);
+      const venuesByEvent = new Map([
+        [
+          event.eventID,
+          [
+            {
+              venueId: 'venue-1',
+              venueName: 'IT 2-26',
+              buildingId: 'building-1',
+            },
+          ],
+        ],
+      ]);
+      jest
+        .spyOn(service as any, 'getVenuesByEvents')
+        .mockResolvedValue(venuesByEvent);
+
+      //Act
+      const result = await (service as any).getEventsByModules(
+        ['module-1'],
+        mockDb,
+      );
+
+      //Assert
+      expect(result).toHaveLength(1);
+      expect(result[0].moduleId).toBe('module-1');
+      expect(result[0].event.eventId).toBe(event.eventID);
+      expect(result[0].event.venues).toHaveLength(1);
+    });
+  }); //END_Test_getEventsByModules
+
   describe('Test_Helpers', () => {
     it('should throw if the event fingerprint cannot be created', async () => {
       mockEventFingerprintService.buildForEvent?.mockReturnValue(null);
@@ -674,4 +720,91 @@ describe('EventServiceV2', () => {
       });
     });
   });
+
+  //helpers
+  describe('Test_getVenuesByEvents', () => {
+    it('should return empty map when no eventIds provided', async () => {
+      //Act
+      const result = await (service as any).getVenuesByEvents([], mockDb);
+
+      //Assert
+      expect(result.size).toBe(0);
+      expect(mockDb.select).not.toHaveBeenCalled();
+    });
+
+    it('should group venues by event id', async () => {
+      //Arrange
+      mockDbResult(mockDb.select, [
+        {
+          eventId: 'event-1',
+          venueId: 'venue-1',
+          venueName: 'IT 2-26',
+          buildingId: 'building-1',
+        },
+        {
+          eventId: 'event-1',
+          venueId: 'venue-2',
+          venueName: 'IT 2-27',
+          buildingId: 'building-1',
+        },
+        {
+          eventId: 'event-2',
+          venueId: 'venue-3',
+          venueName: 'Thuto 1-1',
+          buildingId: null,
+        },
+      ]);
+
+      //Act
+      const result = await (service as any).getVenuesByEvents(
+        ['event-1', 'event-2'],
+        mockDb,
+      );
+
+      //Assert
+      expect(result.size).toBe(2);
+      expect(result.get('event-1')).toEqual([
+        { venueId: 'venue-1', venueName: 'IT 2-26', buildingId: 'building-1' },
+        { venueId: 'venue-2', venueName: 'IT 2-27', buildingId: 'building-1' },
+      ]);
+      expect(result.get('event-2')).toEqual([
+        { venueId: 'venue-3', venueName: 'Thuto 1-1', buildingId: undefined },
+      ]);
+    });
+
+    it('should default null venueName to empty string', async () => {
+      //Arrange
+      mockDbResult(mockDb.select, [
+        {
+          eventId: 'event-1',
+          venueId: 'venue-1',
+          venueName: null,
+          buildingId: null,
+        },
+      ]);
+
+      //Act
+      const result = await (service as any).getVenuesByEvents(
+        ['event-1'],
+        mockDb,
+      );
+
+      //Assert
+      expect(result.get('event-1')?.[0].venueName).toBe('');
+    });
+
+    it('should return empty map when no matching venues found', async () => {
+      //Arrange
+      mockDbResult(mockDb.select, []);
+
+      //Act
+      const result = await (service as any).getVenuesByEvents(
+        ['event-1'],
+        mockDb,
+      );
+
+      //Assert
+      expect(result.size).toBe(0);
+    });
+  }); //END_Test_getVenuesByEvents
 });

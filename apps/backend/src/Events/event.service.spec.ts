@@ -540,9 +540,7 @@ describe('EventService', () => {
   //GetById
   describe('Test_GetEventById', () => {
     it('should throw if event does not exist', async () => {
-      mockTransaction(mockDb, {
-        select: [[]],
-      });
+      mockDbResult(mockDb.select, []);
 
       await expect(service.getById(eventId)).rejects.toThrow(
         `Event[${eventId}] not found`,
@@ -818,9 +816,7 @@ describe('EventService', () => {
     });
 
     it('should insert event venues', async () => {
-      mockTransaction(mockDb, {
-        insert: [[]],
-      });
+      mockDbResult(mockDb.insert, []);
 
       await (service as any).insertEventVenues(mockDb, eventId, [venueId]);
 
@@ -849,9 +845,10 @@ describe('EventService', () => {
     });
 
     it('should reject venue update by a student without ownership', async () => {
-      mockTransaction(mockDb, {
-        select: [[{ moduleId }]],
-      });
+      // mockTransaction(mockDb, {
+      //   select: [[{ moduleId }]],
+      // });
+      mockDbResult(mockDb.select, [{ moduleId }]);
 
       mockModuleService.moduleOwnershipCheck?.mockResolvedValue(false);
 
@@ -904,7 +901,6 @@ describe('EventService', () => {
           venueName: 'Test Venue',
           buildingId: 'building-1',
         },
-        mockDb,
       );
 
       expect(result.event).toMatchObject(mappedEvent);
@@ -940,11 +936,10 @@ describe('EventService', () => {
         {
           venueName: 'New Venue',
         },
-        mockDb,
       );
 
       expect(result.event).toMatchObject(mappedEvent);
-      expect(mockDb.insert).toHaveBeenCalledTimes(1);
+      expect(mockDb.insert).toHaveBeenCalledTimes(2);
     });
 
     it('should reject duplicate venue ids', async () => {

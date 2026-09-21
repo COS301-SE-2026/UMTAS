@@ -10,6 +10,7 @@ import {
 } from "../../../../utilities/eventAttendance/eventAttendanceQueries";
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
 import { errorName } from "../../../../utilities/errorCries";
+import { getStudentRoutesQ } from "../../../../utilities/route/routeQueries";
 
 interface EventBlockProps {
   event: ScheduleEvent;
@@ -55,6 +56,8 @@ export function EventBlock({ event, date, compact }: EventBlockProps) {
         ],
       });
 
+      void getQueryClient().prefetchQuery(getStudentRoutesQ({ date }));
+
       window.dispatchEvent(
         new CustomEvent(errorName, {
           detail: {
@@ -78,6 +81,8 @@ export function EventBlock({ event, date, compact }: EventBlockProps) {
           },
         ],
       });
+
+      void getQueryClient().prefetchQuery(getStudentRoutesQ({ date }));
 
       const attending =
         data.state === "ATTENDING" ? "Attending" : "Not attending";
