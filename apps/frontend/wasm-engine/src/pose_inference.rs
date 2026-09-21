@@ -13,7 +13,12 @@ pub struct Keypoint {
 #[derive(Serialize, Clone)]
 pub struct DetectedPersonPose {
     pub person: DetectedPerson,
-    pub keypoints: Vec<Keypoint>,
+    pub nose: Keypoint,
+    pub center_mass: Keypoint,
+    pub left_shoulder: Keypoint,
+    pub left_arm: Vec<Keypoint>, // 2 points
+    pub right_shoulder: Keypoint,
+    pub right_arm: Vec<Keypoint>, // 2 points
 }
 
 #[wasm_bindgen]
@@ -98,17 +103,6 @@ pub fn read_result(slice_data: &[f32]) -> Result<Vec<DetectedPersonPose>, String
                 score: (left_shoulder.score + right_shoulder.score) / 2.0,
             };
 
-            let keypoints = vec![
-                nose,
-                shoulder_midpoint,
-                left_shoulder,
-                left_elbow,
-                left_wrist,
-                right_shoulder,
-                right_elbow,
-                right_wrist,
-            ];
-
             people.push(DetectedPersonPose {
                 person: DetectedPerson {
                     center_x,
@@ -119,7 +113,12 @@ pub fn read_result(slice_data: &[f32]) -> Result<Vec<DetectedPersonPose>, String
                     height,
                     confidence,
                 },
-                keypoints,
+                left_shoulder,
+                right_shoulder,
+                left_arm: vec![left_elbow, left_wrist],
+                right_arm: vec![right_elbow, right_wrist],
+                center_mass: shoulder_midpoint,
+                nose,
             });
         }
     }
@@ -142,7 +141,6 @@ pub fn map_to_global(
     };
 
     for person in &mut people {
-        // shift to upscaled image size
         person.person.center_x += offset_x;
         person.person.center_y += offset_y;
         person.person.top_left_x += offset_x;
@@ -150,16 +148,27 @@ pub fn map_to_global(
 
         scale_person(&mut person.person);
 
-        for kp in &mut person.keypoints {
-            kp.x += offset_x;
-            kp.x *= 0.5;
-            kp.y += offset_y;
-            kp.y *= 0.5;
+        transform_keypoint(&mut person.nose, offset_x, offset_y);
+        transform_keypoint(&mut person.center_mass, offset_x, offset_y);
+        transform_keypoint(&mut person.left_shoulder, offset_x, offset_y);
+        transform_keypoint(&mut person.right_shoulder, offset_x, offset_y);
+
+        for kp in &mut person.left_arm {
+            transform_keypoint(kp, offset_x, offset_y);
+        }
+        for kp in &mut person.right_arm {
+            transform_keypoint(kp, offset_x, offset_y);
         }
     }
 
     return people;
 }
+
+fn transform_keypoint(kp: &mut Keypoint, offset_x: f32, offset_y: f32) {
+    kp.x = (kp.x + offset_x) * 0.5;
+    kp.y = (kp.y + offset_y) * 0.5;
+}
+
 pub fn scale_person(person: &mut DetectedPerson) -> &mut DetectedPerson {
     person.center_x *= 0.5;
     person.center_y *= 0.5;

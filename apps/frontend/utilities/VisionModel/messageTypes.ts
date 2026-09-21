@@ -82,5 +82,10 @@ export interface Keypoint {
 
 export interface DetectedPersonPose {
   person: DetectedPerson;
-  keypoints: Keypoint[];
+  nose: Keypoint;
+  center_mass: Keypoint;
+  left_shoulder: Keypoint;
+  left_arm: Keypoint[]; // [left_elbow, left_wrist]
+  right_shoulder: Keypoint;
+  right_arm: Keypoint[]; // [right_elbow, right_wrist]
 }

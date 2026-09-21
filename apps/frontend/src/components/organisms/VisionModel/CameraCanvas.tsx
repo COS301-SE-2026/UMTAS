@@ -6,9 +6,38 @@ import { detection_data_manager } from "../../../../utilities/VisionModel/detect
 import {
   DetectedPerson,
   DetectedPersonPose,
+  Keypoint,
 } from "../../../../utilities/VisionModel/messageTypes";
 import { pose_Manager } from "../../../../utilities/VisionModel/pose_manager";
 import { pose_data_manager } from "../../../../utilities/VisionModel/pose_data_manager";
+
+const KEY_SCORE_THRESHOLD = 0.05;
+
+function drawSegment(
+  ctx: CanvasRenderingContext2D,
+  kp1?: Keypoint,
+  kp2?: Keypoint,
+) {
+  if (
+    kp1 &&
+    kp2 &&
+    kp1.score > KEY_SCORE_THRESHOLD &&
+    kp2.score > KEY_SCORE_THRESHOLD
+  ) {
+    ctx.beginPath();
+    ctx.moveTo(kp1.x, kp1.y);
+    ctx.lineTo(kp2.x, kp2.y);
+    ctx.stroke();
+  }
+}
+
+function drawPoint(ctx: CanvasRenderingContext2D, kp?: Keypoint) {
+  if (kp && kp.score > KEY_SCORE_THRESHOLD) {
+    ctx.beginPath();
+    ctx.arc(kp.x, kp.y, 1.5, 0, 2 * Math.PI);
+    ctx.fill();
+  }
+}
 
 function getVideoConstraints(): MediaStreamConstraints {
   const isMobile = window.innerWidth < 768;
@@ -267,45 +296,36 @@ function CanvasWebcam({
             }
           }
 
-          // will update later with set key points in json for readability
-          const SKELETON_CONNECTIONS: [number, number][] = [
-            [0, 1],
-            [1, 2],
-            [2, 3],
-            [3, 4],
-            [1, 5],
-            [5, 6],
-            [6, 7],
-          ];
-
           if (inferenceSettings.runInference) {
             for (const data of detectedPeoplePoseRef.current) {
-              const keypoints = data.keypoints;
+              context.strokeStyle = "#00ffff";
+              context.fillStyle = "#00ffff";
+              context.lineWidth = 2;
 
-              if (keypoints && keypoints.length > 0) {
-                context.strokeStyle = "#00ffff";
-                context.lineWidth = 2;
-                for (const [p1Idx, p2Idx] of SKELETON_CONNECTIONS) {
-                  const kp1 = keypoints[p1Idx];
-                  const kp2 = keypoints[p2Idx];
+              const leftElbow = data.left_arm?.[0];
+              const leftWrist = data.left_arm?.[1];
 
-                  if (kp1 && kp2 && kp1.score > 0.15 && kp2.score > 0.15) {
-                    context.beginPath();
-                    context.moveTo(kp1.x, kp1.y);
-                    context.lineTo(kp2.x, kp2.y);
-                    context.stroke();
-                  }
-                }
+              const rightElbow = data.right_arm?.[0];
+              const rightWrist = data.right_arm?.[1];
 
-                for (const kp of keypoints) {
-                  if (kp.score > 0.15) {
-                    context.beginPath();
-                    context.arc(kp.x, kp.y, 1.5, 0, 2 * Math.PI);
-                    context.fillStyle = "#00ffff";
-                    context.fill();
-                  }
-                }
-              }
+              drawSegment(context, data.left_shoulder, data.center_mass);
+              drawSegment(context, data.right_shoulder, data.center_mass);
+
+              drawSegment(context, data.left_shoulder, leftElbow);
+              drawSegment(context, leftElbow, leftWrist);
+
+              drawSegment(context, data.right_shoulder, rightElbow);
+              drawSegment(context, rightElbow, rightWrist);
+              drawSegment(context, data.nose, data.center_mass);
+
+              drawPoint(context, data.nose);
+              drawPoint(context, data.center_mass);
+              drawPoint(context, data.left_shoulder);
+              drawPoint(context, leftElbow);
+              drawPoint(context, leftWrist);
+              drawPoint(context, data.right_shoulder);
+              drawPoint(context, rightElbow);
+              drawPoint(context, rightWrist);
             }
           }
         }
