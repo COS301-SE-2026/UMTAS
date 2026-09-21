@@ -10,7 +10,7 @@ pub struct Keypoint {
     pub score: f32,
 }
 
-#[derive(Serialize,Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct DetectedPersonPose {
     pub person: DetectedPerson,
     pub nose: Keypoint,
@@ -26,13 +26,20 @@ pub fn infer_pose_data(
     quadrants: js_sys::Array,
     full_data: js_sys::Float32Array,
 ) -> Result<String, JsValue> {
-    // function to call with 4 slices of data from TS
     let mut all_people: Vec<DetectedPersonPose> = Vec::new();
 
     let data = full_data.to_vec();
 
-    let people = read_result(&data).map_err(|e| JsValue::from_str(&e))?;
-    all_people.extend(people);
+    let mut full_image_people = read_result(&data).map_err(|e| JsValue::from_str(&e))?;
+
+    full_image_people.sort_by(|a, b| {
+        b.person
+            .confidence
+            .partial_cmp(&a.person.confidence)
+            .unwrap_or(std::cmp::Ordering::Equal)
+    });
+
+    let mut quadrant_people: Vec<DetectedPersonPose> = Vec::new();
 
     for (quad_idx, item) in quadrants.iter().enumerate() {
         let float_arr = item.dyn_ref::<js_sys::Float32Array>().ok_or_else(|| {
@@ -46,13 +53,24 @@ pub fn infer_pose_data(
 
         let people = read_result(&data).map_err(|e| JsValue::from_str(&e))?;
         let global_adjusted_person = map_to_global(people, quad_idx);
-        all_people.extend(global_adjusted_person);
+        quadrant_people.extend(global_adjusted_person);
     }
+
+    quadrant_people.sort_by(|a, b| {
+        b.person
+            .confidence
+            .partial_cmp(&a.person.confidence)
+            .unwrap_or(std::cmp::Ordering::Equal)
+    });
+
+    all_people.extend(full_image_people);
+    all_people.extend(quadrant_people);
 
     let res_people = non_maximum_sepression(all_people, 0.30);
 
     return serde_json::to_string(&res_people).map_err(|e| JsValue::from_str(&e.to_string()));
 }
+
 fn get_kp(slice_data: &[f32], coco_idx: usize, anchor_idx: usize, num_anchors: usize) -> Keypoint {
     let kp_offset = 5 + (coco_idx * 3);
     let x = slice_data[kp_offset * num_anchors + anchor_idx];
@@ -123,7 +141,7 @@ pub fn read_result(slice_data: &[f32]) -> Result<Vec<DetectedPersonPose>, String
         }
     }
 
-    Ok(people)
+    return Ok(people);
 }
 
 pub fn map_to_global(
@@ -181,30 +199,16 @@ pub fn scale_person(person: &mut DetectedPerson) -> &mut DetectedPerson {
 }
 
 pub fn non_maximum_sepression(
-    mut people: Vec<DetectedPersonPose>,
+    people: Vec<DetectedPersonPose>,
     iou_threshold: f32,
 ) -> Vec<DetectedPersonPose> {
-    // standard means of weeding out redundant overlapping boxes
-    // order list in decending order of confidence score
-    // take a person and go down list comparing IOU against box.
-    // If any box has higher iou than threshold discard-> same person
-    // rather keep an parallel array of all discarded ones only
-
     let mut final_people: Vec<DetectedPersonPose> = Vec::new();
-    // parallel array for whos been removed
     let mut removed_people: Vec<bool> = vec![false; people.len()];
-
-    people.sort_by(|a, b| {
-        b.person
-            .confidence
-            .partial_cmp(&a.person.confidence)
-            .unwrap_or(std::cmp::Ordering::Equal)
-    });
 
     for (idx, person) in people.iter().enumerate() {
         if removed_people[idx] == false {
             final_people.push(person.clone());
-            for compare_index in idx..people.len() {
+            for compare_index in (idx + 1)..people.len() {
                 let iou = intersection_over_union(&person.person, &people[compare_index].person);
                 if iou >= iou_threshold {
                     removed_people[compare_index] = true;
