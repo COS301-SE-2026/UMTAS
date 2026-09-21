@@ -1,3 +1,5 @@
+use std::string;
+
 use crate::pose_inference::{DetectedPersonPose, Keypoint};
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
@@ -11,14 +13,16 @@ pub fn analyze_frame(
     timestamp: f64,
     prev_frame: JsValue,
     people_val: JsValue,
-) -> Result<(), JsValue> {
+) -> Result<String, JsValue> {
     let people: Vec<DetectedPersonPose> = serde_wasm_bindgen::from_value(people_val)
         .map_err(|e| JsValue::from_str(&format!("Failed to parse people array: {}", e)))?;
 
     let prev_frame: FrameStore = serde_wasm_bindgen::from_value(prev_frame)
         .map_err(|e| JsValue::from_str(&format!("Failed to parse prev_frame array: {}", e)))?;
 
-    Ok(())
+    let frame: FrameStore = attach_id(frame, timestamp, people, prev_frame);
+
+    return serde_json::to_string(&frame).map_err(|e| JsValue::from_str(&e.to_string()));
 }
 
 // if new_frame_people size < prev frame => prev frame adds people
@@ -34,7 +38,13 @@ pub fn attach_id(
     // check array
     let mut matched_prev_indices = vec![false; prev_frame.people.len()];
     let mut matched_new_indices = vec![false; new_frame_people.len()];
-    let mut highest_id = 0;
+
+    let mut highest_id = prev_frame
+        .people
+        .iter()
+        .map(|p| p.assigned_id)
+        .max()
+        .unwrap_or(0);
 
     // finding matches
     for (new_index, new_person) in new_frame_people.iter().enumerate() {
@@ -42,7 +52,6 @@ pub fn attach_id(
             if matched_prev_indices[prev_index] == false
                 && matching_person(new_person, &prev_person.pose_data, IOU_THRESHOLD)
             {
-                // are matching
                 matched_prev_indices[prev_index] = true;
                 matched_new_indices[new_index] = true;
                 new_people.push(SinglePersonSessionData {
@@ -58,8 +67,6 @@ pub fn attach_id(
     }
     for (prev_index, prev_person) in prev_frame.people.iter().enumerate() {
         if matched_prev_indices[prev_index] == false {
-            highest_id = highest_id.max(prev_person.assigned_id);
-
             matched_prev_indices[prev_index] = true;
 
             new_people.push(SinglePersonSessionData {
@@ -74,10 +81,11 @@ pub fn attach_id(
         }
     }
 
+    // not previosuly detected
     for (new_index, new_person) in new_frame_people.iter().enumerate() {
-        let this_id = highest_id + 1;
-        highest_id += 1;
         if matched_new_indices[new_index] == false {
+            let this_id = highest_id + 1;
+            highest_id += 1;
             matched_new_indices[new_index] = true;
             new_people.push(SinglePersonSessionData {
                 pose_data: new_person.clone(),
@@ -91,14 +99,16 @@ pub fn attach_id(
     }
 
     return FrameStore {
-        frame_number: 0,
-        timestamp: 0.0,
-        people: [].to_vec(),
+        frame_number: frame,
+        timestamp: timestamp,
+        people: new_people,
     };
 }
 pub fn is_hands_up(new_person: &DetectedPersonPose) -> bool {
-    return new_person.right_arm[1].y > new_person.nose.y;
+    return new_person.right_arm[1].y < new_person.nose.y
+        || new_person.left_arm[1].y < new_person.nose.y;
 }
+
 pub fn matching_person(
     new_person: &DetectedPersonPose,
     prev_person: &DetectedPersonPose,
