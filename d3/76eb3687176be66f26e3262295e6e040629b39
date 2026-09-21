@@ -1,0 +1,22 @@
+apps/frontend/src/app/(auth)/verify-pending/page.tsx
+  h_2d4b3dca70a3d8 46,51
+apps/frontend/src/components/organisms/forms/ForgotPasswordForm.tsx
+  h_2d4b3dca70a3d8 64
+apps/frontend/src/components/organisms/forms/LoginForm.tsx
+  h_2d4b3dca70a3d8 186,191
+apps/frontend/src/components/organisms/forms/RegisterForm.tsx
+  h_2d4b3dca70a3d8 190
+apps/frontend/src/components/templates/auth/AuthPageTemplate.tsx
+  h_2d4b3dca70a3d8 10-13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "d376eb3687176be66f26e3262295e6e040629b39",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
