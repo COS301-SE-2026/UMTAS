@@ -13,6 +13,7 @@ import {
   getAttendanceSlotsQ,
   updateAttendanceCountMut,
 } from "@/components/templates/attendance/Queries/attendanceQueries";
+import { Upload } from "lucide-react";
 
 import { Switch } from "@/components/atoms/baseShadcn/switch";
 import { Label } from "@/components/atoms/baseShadcn/label";
@@ -60,7 +61,6 @@ export default function AttendanceScanner() {
 
     const text = await file.text();
 
-    // Extract every unique 8 digit student number from the file
     const studentNumbers = text.match(/\b\d{8}\b/g) ?? [];
 
     const uniqueStudentNumbers = [...new Set(studentNumbers)];
@@ -190,7 +190,12 @@ export default function AttendanceScanner() {
     return (
       <div className="flex w-full flex-col gap-6">
         <div className="flex flex-col gap-2">
-          <Label htmlFor="attendance-slot">Attendance Slot</Label>
+          <Label
+            htmlFor="attendance-slot"
+            className="text-sm font-medium text-[var(--text-primary)]"
+          >
+            Attendance Slot
+          </Label>
 
           {availableSlots.length > 0 ? (
             <Select value={selectedEventID} onValueChange={setSelectedEventID}>
@@ -213,33 +218,61 @@ export default function AttendanceScanner() {
           )}
         </div>
 
-        <div className="rounded-xl border border-dashed border-[var(--border)] p-8 text-center">
-          <p className="font-medium text-[var(--text-primary)]">
+        <label
+          htmlFor="student-list-upload"
+          className="group flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-[var(--border)] px-8 py-12 text-center transition-colors duration-200 hover:border-[var(--btn-primary-bg)] hover:bg-[var(--bg-elevated)]"
+        >
+          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[var(--bg-elevated)] text-[var(--text-primary)] transition-transform duration-200 group-hover:scale-110">
+            <Upload size={22} strokeWidth={1.8} />
+          </div>
+
+          <p className="text-base font-medium text-[var(--text-primary)]">
             Upload Student List
           </p>
 
-          <p className="mt-1 text-sm text-[var(--text-secondary)]">
-            Upload a CSV, TXT, or MD file containing 8 digit student numbers.
+          <p className="mt-2 max-w-sm text-sm text-[var(--text-secondary)]">
+            Select a CSV, TXT, or MD file containing 8 digit student numbers.
+          </p>
+
+          <div className="mt-5 rounded-md bg-[var(--btn-primary-bg)] px-4 py-2 text-sm font-medium text-[var(--btn-primary-text)] transition-opacity group-hover:opacity-90">
+            Choose File
+          </div>
+
+          <p className="mt-3 text-xs text-[var(--text-secondary)]">
+            CSV, TXT or MD
           </p>
 
           <input
+            id="student-list-upload"
             type="file"
             accept=".csv,.txt,.md,text/csv,text/plain,text/markdown"
             onChange={handleFileUpload}
-            className="mt-4 block w-full text-sm text-[var(--text-secondary)]"
+            className="sr-only"
           />
-        </div>
+        </label>
 
         {fileName && (
-          <div className="rounded-lg border border-[var(--border)] p-4">
-            <p className="text-sm font-medium text-[var(--text-primary)]">
-              {fileName}
-            </p>
+          <div className="flex items-center justify-between rounded-lg border border-[var(--border)] bg-[var(--bg-elevated)] p-4">
+            <div>
+              <p className="text-sm font-medium text-[var(--text-primary)]">
+                {fileName}
+              </p>
 
-            <p className="mt-1 text-sm text-[var(--text-secondary)]">
-              {expectedStudents.length} students found
-            </p>
+              <p className="mt-1 text-sm text-[var(--text-secondary)]">
+                {expectedStudents.length} students found
+              </p>
+            </div>
+
+            <div className="rounded-full bg-[var(--bg-primary)] px-3 py-1 text-xs font-medium text-[var(--text-secondary)]">
+              Ready
+            </div>
           </div>
+        )}
+
+        {availableSlots.length > 0 && !selectedEventID && (
+          <p className="text-center text-sm text-[var(--text-secondary)]">
+            Select an attendance slot before starting.
+          </p>
         )}
 
         <Button
@@ -257,7 +290,6 @@ export default function AttendanceScanner() {
       </div>
     );
   }
-
   return (
     <div className="flex w-full flex-col gap-4">
       <div className="flex items-center justify-between">
