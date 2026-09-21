@@ -11,7 +11,7 @@ import {
 import { pose_Manager } from "../../../../utilities/VisionModel/pose_manager";
 import { pose_data_manager } from "../../../../utilities/VisionModel/pose_data_manager";
 
-const KEY_SCORE_THRESHOLD = 0.05;
+const KEY_SCORE_THRESHOLD = 0.15;
 
 function drawSegment(
   ctx: CanvasRenderingContext2D,

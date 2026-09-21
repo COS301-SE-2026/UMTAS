@@ -10,7 +10,7 @@ export default class SessionStorePose {
   public sendData(
     frame: number,
     timestamp: number,
-    people: DetectedPersonPose,
+    people: DetectedPersonPose[],
   ): void {
     // run wasm and JSON parse the results
   }

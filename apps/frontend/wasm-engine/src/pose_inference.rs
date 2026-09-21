@@ -10,7 +10,7 @@ pub struct Keypoint {
     pub score: f32,
 }
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize,Deserialize, Clone)]
 pub struct DetectedPersonPose {
     pub person: DetectedPerson,
     pub nose: Keypoint,

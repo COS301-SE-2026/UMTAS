@@ -1,11 +1,12 @@
 use fast_image_resize as fr;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::num::NonZeroU32;
 use std::{usize, vec};
 use wasm_bindgen::prelude::*;
 
 pub mod image_upscaler;
 pub mod pose_inference;
+pub mod pose_parse;
 
 pub struct SliceFormat {
     x: usize,
@@ -147,7 +148,7 @@ pub fn normalize_pixel(colour: &u8) -> f32 {
     return (*colour as f32) / 255.0;
 }
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct DetectedPerson {
     pub center_x: f32,
     pub center_y: f32,
