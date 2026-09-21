@@ -61,6 +61,28 @@ export function updateVenueMut() {
       body: assignVenueBody;
       path: assignVenuePath;
     }) => {
+      const result = new assignVenueBuilder().send({
+        body: vars.body,
+        paths: vars.path,
+      });
+      return result;
+    },
+    onSuccess: () => {
+      getQueryClient().invalidateQueries({ queryKey: ["venues"] });
+      getQueryClient().invalidateQueries({ queryKey: ["buildings"] });
+    },
+    onError: (error) => {
+      console.error("mutation error", error);
+    },
+  });
+}
+
+export function assignVenueMut() {
+  return mutationOptions({
+    mutationFn: async (vars: {
+      body: assignVenueBody;
+      path: assignVenuePath;
+    }) => {
       //console.log(vars.body);
       const result = new assignVenueBuilder().send({
         body: vars.body,
@@ -70,8 +92,9 @@ export function updateVenueMut() {
       return result;
     },
     onSuccess: () => {
-      getQueryClient().invalidateQueries({ queryKey: ["venues"] });
-      getQueryClient().invalidateQueries({ queryKey: ["buildings"] });
+      getQueryClient().invalidateQueries({
+        queryKey: getAllVenuesQ().queryKey,
+      });
     },
     onError: (err) => console.error("mutation failed", err),
   });
