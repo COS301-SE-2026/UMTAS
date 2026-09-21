@@ -264,7 +264,7 @@ export default function AttendanceScanner() {
 
   if (sessionEnded) {
     return (
-      <div className="flex w-full flex-col items-center gap-6 py-10 text-center">
+      <div className="flex min-h-[650px] w-full flex-col items-center justify-center gap-6 text-center">
         <div>
           <p className="text-sm text-[var(--text-secondary)]">
             Session Complete
@@ -369,7 +369,7 @@ export default function AttendanceScanner() {
 
             <PopoverContent
               align="start"
-              className="w-[520px] max-w-[90vw] p-0"
+              className="w-[var(--radix-popover-trigger-width)] p-0"
             >
               <Command>
                 <CommandInput placeholder="Search events..." />
