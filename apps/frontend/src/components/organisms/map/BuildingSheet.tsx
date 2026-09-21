@@ -27,7 +27,7 @@ import { Badge } from "@/components/atoms/baseShadcn/badge";
 import { Label } from "@/components/atoms/baseShadcn/label";
 import { Input } from "@/components/atoms/baseShadcn/input";
 import { Button } from "@/components/atoms/baseShadcn/button";
-import { Check, Pencil, Plus, Trash2, X } from "lucide-react";
+import { Check, CircleCheck, Pencil, Plus, Trash2, X } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -222,16 +222,16 @@ export function BuildingSheet({
       <Sheet open={open} onOpenChange={onOpenChange}>
         <SheetContent
           side="right"
-          className="flex flex-col gap-4 overflow-y-auto"
+          className="flex flex-col gap-4 overflow-y-auto bg-bg-surface"
         >
           <SheetHeader>
-            <SheetTitle className="flex items-center gap-2">
+            <SheetTitle className="flex items-center gap-2 text-lg">
               {building.BuildingName}
               <Badge variant="secondary">{venues.length} venues</Badge>
             </SheetTitle>
           </SheetHeader>
-
           <div className="flex flex-col gap-2 px-4">
+            <Label className="text-lg">Edit Details</Label>
             <div className="flex flex-col gap-2">
               <Label>Building Name</Label>
               <Input
@@ -255,25 +255,28 @@ export function BuildingSheet({
                 variant="default"
                 onClick={handleSaveBuilding}
                 disabled={!hasChanges || savingBuilding}
+                className="cursor-pointer"
               >
+                <CircleCheck />
                 {savingBuilding ? "Saving.." : "Save"}
               </Button>
               <Button
                 variant="destructive"
                 onClick={() => setIsDeleteBuildingOpen(true)}
+                className="cursor-pointer"
               >
                 <Trash2 />
-                Delete Building
+                Delete
               </Button>
             </div>
           </div>
 
-          <div className="flex flex-col gap-2 pb-2 px-4">
-            <p className="text-xs text-(--text-primary)">Venues</p>
+          <div className="flex flex-col gap-2 pb-2 px-4 pt-4">
+            <Label className="text-lg">Venues</Label>
 
             {venues.map((venue) => (
               <div
-                className="flex flex-col rounded-md gap-2 border p-2 border-border"
+                className="flex flex-col gap-2 p-2 border-t-1"
                 key={venue.VenueID}
               >
                 {editingVenueId === venue.VenueID ? (
@@ -315,6 +318,7 @@ export function BuildingSheet({
                         variant="ghost"
                         onClick={() => handleSaveVenue(venue)}
                         disabled={updatingVenue}
+                        className="cursor-pointer"
                       >
                         <Check />
                         Save
@@ -322,6 +326,7 @@ export function BuildingSheet({
                       <Button
                         variant="ghost"
                         onClick={() => setEditingVenueId(null)}
+                        className="cursor-pointer"
                       >
                         <X />
                         Cancel
@@ -332,23 +337,25 @@ export function BuildingSheet({
                   <>
                     <div className="flex justify-between items-center">
                       <div>
-                        <p className="text-xs text-(--text-primary)">
+                        <p className="text-sm text-(--text-primary)">
                           {venue.VenueName}
                         </p>
                         <p className="text-xs text-(--text-primary)">
-                          {venue.Capacity}
+                          <strong>Cap:</strong> {venue.Capacity}
                         </p>
                       </div>
                       <div className="flex gap-2">
                         <Button
-                          variant="default"
+                          variant="outline"
                           onClick={() => startEditingVenue(venue)}
+                          className="cursor-pointer"
                         >
                           <Pencil />
                         </Button>
                         <Button
                           variant="destructive"
                           onClick={() => setVenueToDelete(venue.VenueID)}
+                          className="cursor-pointer"
                         >
                           <Trash2 />
                         </Button>
@@ -359,7 +366,8 @@ export function BuildingSheet({
               </div>
             ))}
 
-            <div className="flex flex-col rounded-lg gap-2 border border-border p-2">
+            <div className="flex flex-col items-start gap-2 border-t-1 pt-4">
+              <Label className="text-lg">Add New Venue</Label>
               <Input
                 value={newVenueName}
                 maxLength={50}
@@ -376,6 +384,7 @@ export function BuildingSheet({
               <Button
                 onClick={handleAddVenue}
                 disabled={creatingVenue || !newVenueName.trim()}
+                variant="default"
               >
                 <Plus />
                 Add Venue
