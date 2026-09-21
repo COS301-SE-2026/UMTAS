@@ -90,6 +90,7 @@ export class RecordBarcodeAttendanceDto {
   @IsUUID()
   UserID!: string;
 }
+
 export class RecordCameraAttendanceDto {
   @ApiProperty({
     description: 'Current anonymous headcount observed by the camera',
@@ -100,6 +101,15 @@ export class RecordCameraAttendanceDto {
   @IsInt()
   @Min(0)
   guestCount!: number;
+
+  @ApiPropertyOptional({
+    description: 'Event to record attendance against when selecting a slot',
+    format: 'uuid',
+    example: '00000000-0000-4000-8000-000000000000',
+  })
+  @IsOptional()
+  @IsUUID()
+  eventID?: string;
 }
 
 export class RecordAttendanceDto {

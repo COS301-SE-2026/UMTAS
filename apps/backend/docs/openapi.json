@@ -12938,6 +12938,12 @@
             "type": "number",
             "description": "Current anonymous headcount observed by the camera",
             "example": 42
+          },
+          "eventID": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Event to record attendance against when selecting a slot",
+            "example": "00000000-0000-4000-8000-000000000000"
           }
         },
         "required": [

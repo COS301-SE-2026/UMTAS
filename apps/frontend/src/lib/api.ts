@@ -4440,6 +4440,12 @@ export interface components {
        * @example 42
        */
       guestCount: number;
+      /**
+       * Format: uuid
+       * @description Event to record attendance against when selecting a slot
+       * @example 00000000-0000-4000-8000-000000000000
+       */
+      eventID?: string;
     };
     CreateAttendanceSessionDto: {
       /**
@@ -5223,7 +5229,7 @@ export interface components {
       eventName: string;
       /**
        * Format: date
-       * @description Concrete occurrence date used for this route request.
+       * @description Concrete occurrence date
        * @example 2026-09-16
        */
       occurrenceDate: string;
@@ -10780,12 +10786,6 @@ export interface operations {
       query: {
         /** @description Calendar date for which the student needs routes. */
         date: string;
-        /** @description Origin event of the route override. */
-        overrideOriginEventId?: string;
-        /** @description Destination event of the route override. */
-        overrideDestinationEventId?: string;
-        /** @description Zero-based route index for the overridden transition. */
-        overrideRouteIndex?: number;
       };
       header?: never;
       path?: never;

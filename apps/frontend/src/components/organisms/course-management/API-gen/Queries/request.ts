@@ -31,7 +31,6 @@ export type moduleResponseType =
 export async function fetchAPIserviceModules(
   params: APIserviceModulesParams,
 ): Promise<APIserviceModulesResp> {
-  console.log("Ran the fetch api service modules");
   if (params.courseId == "") return { modules: [], message: "" };
   const result = api
     .get("api-service/modules", {
@@ -45,9 +44,7 @@ export async function fetchAPIserviceModules(
 export async function fetchAllModules(
   courses: APIServiceCoursesResp["courses"],
 ): Promise<APIserviceModulesResp["modules"]> {
-  console.log(courses);
   const requests = courses.map((course) => {
-    console.log(course);
     return fetchAPIserviceModules({ courseId: course.CourseID ?? "" });
   });
 
