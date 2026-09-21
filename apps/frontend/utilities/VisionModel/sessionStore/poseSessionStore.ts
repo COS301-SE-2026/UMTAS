@@ -2,17 +2,40 @@
 // Will also be the frame of reference for the drawers to draw to screen
 
 import { DetectedPersonPose } from "../messageTypes";
+import init, { analyze_frame } from "../../../wasm-engine/pkg/wasm_engine";
 
 // if id is not found in a frame it draws them again
 export default class SessionStorePose {
   private frames: frameStore[] = [];
-  public constructor() {}
-  public sendData(
+  private isInitialized = false;
+  private initPromise: Promise<unknown>;
+  public constructor() {
+    this.initPromise = init().then(() => {
+      this.isInitialized = true;
+    });
+  }
+
+  public async ready(): Promise<void> {
+    await this.initPromise;
+  }
+
+  public async sendData(
     frame: number,
     timestamp: number,
     people: DetectedPersonPose[],
-  ): void {
-    // run wasm and JSON parse the results
+  ): Promise<void> {
+    if (frames.length == 0) {
+      throw Error(
+        "The first frame must be sent separately before sending all data",
+      );
+    }
+    if (!this.isInitialized) {
+      await this.initPromise;
+    }
+
+    const result = analyze_frame(frame, timestamp, this.getLastFrame(), people);
+    const parsed_frame: frameStore = JSON.parse(result);
+    this.frames.push(parsed_frame);
   }
   public getLastFrame() {
     return this.frames[this.frames.length - 1];
