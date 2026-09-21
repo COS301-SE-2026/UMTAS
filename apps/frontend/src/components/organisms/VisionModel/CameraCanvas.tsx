@@ -10,6 +10,7 @@ import {
 } from "../../../../utilities/VisionModel/messageTypes";
 import { pose_Manager } from "../../../../utilities/VisionModel/pose_manager";
 import { pose_data_manager } from "../../../../utilities/VisionModel/pose_data_manager";
+import SessionStorePose from "../../../../utilities/VisionModel/sessionStore/poseSessionStore";
 
 const KEY_SCORE_THRESHOLD = 0.15;
 
@@ -109,12 +110,15 @@ function CanvasWebcam({
   const [imageLoaded, setImageLoaded] = useState<boolean>(false);
 
   const detectedPeopleRef = useRef<DetectedPerson[]>([]);
-  const detectedPeoplePoseRef = useRef<DetectedPersonPose[]>([]);
+  const frameStore = useRef<SessionStorePose | null>(null);
   const lastRunRef = useRef<number>(0);
-
+  const frameCounterRef = useRef<number>(0);
   // Manage detection workers
+  // Lazy initialize frameStore once
+
   useEffect(() => {
     const isSourceActive = isCameraActive || imageFile !== null;
+
     if (detectionSettings.runDetection && isSourceActive) {
       detectionManager.start();
       detection_data_manager.start();
@@ -123,11 +127,13 @@ function CanvasWebcam({
       detectionManager.terminate();
       detection_data_manager.terminate();
     }
+
     if (inferenceSettings.runInference && isSourceActive) {
+      frameStore.current = new SessionStorePose();
+
       pose_Manager.start();
       pose_data_manager.start();
     } else {
-      detectedPeoplePoseRef.current = [];
       pose_Manager.terminate();
       pose_data_manager.terminate();
     }
@@ -267,8 +273,11 @@ function CanvasWebcam({
                 if (results) {
                   pose_data_manager.run(results).then((people) => {
                     if (people) {
-                      console.log(people);
-                      detectedPeoplePoseRef.current = people;
+                      const frame = ++frameCounterRef.current;
+                      if (frameStore.current?.getNumFrames() === 0) {
+                        frameStore.current.sendFirst(frame, timestamp, people);
+                      } else
+                        frameStore.current?.sendData(frame, timestamp, people);
                     }
                   });
                 }
@@ -297,7 +306,28 @@ function CanvasWebcam({
           }
 
           if (inferenceSettings.runInference) {
-            for (const data of detectedPeoplePoseRef.current) {
+            let handsUpCount = 0;
+            const ids: number[] = [];
+            for (const frameOfPeople of frameStore.current?.getLastFrame()
+              ?.people ?? []) {
+              const data = frameOfPeople.pose_data;
+
+              if (frameOfPeople.hand_up) {
+                handsUpCount++;
+                ids.push(frameOfPeople.assigned_id);
+              }
+
+              if (frameCounterRef.current - frameOfPeople.last_seen_frame > 5) {
+                continue;
+              }
+              context.fillStyle = "#00ff00";
+              context.font = "14px sans-serif";
+              context.fillText(
+                `ID ${frameOfPeople.assigned_id.toString()}`,
+                data.person.top_left_x,
+                Math.max(data.person.top_left_y - 5, 15),
+              );
+
               context.strokeStyle = "#00ffff";
               context.fillStyle = "#00ffff";
               context.lineWidth = 2;
@@ -327,6 +357,7 @@ function CanvasWebcam({
               drawPoint(context, rightElbow);
               drawPoint(context, rightWrist);
             }
+            console.log(`Number of hands up ${handsUpCount}`, ids);
           }
         }
       }

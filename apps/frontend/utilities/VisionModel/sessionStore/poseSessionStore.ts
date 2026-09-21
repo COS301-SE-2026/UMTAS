@@ -58,7 +58,8 @@ export default class SessionStorePose {
     this.frames.push(parsed_frame);
   }
   public getLastFrame() {
-    return this.frames[this.frames.length - 1];
+    if (this.getNumFrames() > 0) return this.frames[this.frames.length - 1];
+    else return null;
   }
   /**
    * @brief this does analysis on all frames stored here and returns a special object with anayltics to store in backend
