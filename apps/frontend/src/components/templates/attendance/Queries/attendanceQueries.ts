@@ -2,6 +2,7 @@ import { getQueryClient } from "@/components/tanstack/getQueryClient";
 import { mutationOptions, queryOptions } from "@tanstack/react-query";
 
 import type { paths } from "@/lib/api";
+
 import {
   RequestBuilder,
   RequestMethod,
@@ -20,6 +21,7 @@ export class GetAttendanceSlots extends RequestBuilder<
 > {
   constructor() {
     super();
+
     this.setUrl("/attendance/operator/slots").setMethod(RequestMethod.GET);
   }
 }
@@ -27,6 +29,7 @@ export class GetAttendanceSlots extends RequestBuilder<
 export function getAttendanceSlotsQ() {
   return queryOptions({
     queryKey: ["attendance-slots"] as const,
+
     queryFn: async () => {
       return new GetAttendanceSlots().send({});
     },
@@ -49,6 +52,7 @@ export class UpdateAttendanceCount extends RequestBuilder<
 > {
   constructor() {
     super();
+
     this.setUrl("/attendance/records/camera").setMethod(RequestMethod.PUT);
   }
 }
@@ -56,13 +60,15 @@ export class UpdateAttendanceCount extends RequestBuilder<
 export function updateAttendanceCountMut() {
   return mutationOptions({
     mutationFn: async (body: AttendanceCountBody) => {
-      return new UpdateAttendanceCount().send({ body });
+      return new UpdateAttendanceCount().send({
+        body,
+      });
     },
+
     onSuccess: () => {
       getQueryClient().invalidateQueries({
         queryKey: getAttendanceSlotsQ().queryKey,
       });
     },
-    onError: (err) => console.error("Failed to update attendance count", err),
   });
 }

@@ -8620,6 +8620,156 @@
           }
         ]
       }
+    },
+    "/api/teaches": {
+      "post": {
+        "operationId": "assignLecturer",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTeachesDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Lecturer assigned to module successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TeachesResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing or invalid teaches payload"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "description": "Insufficient permissions or no university selected"
+          },
+          "404": {
+            "description": "Module not found"
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError"
+          },
+          "500": {
+            "description": "Lecturer was not assigned to module"
+          }
+        },
+        "summary": "Assign a lecturer to a module",
+        "tags": [
+          "Teaches"
+        ],
+        "description": "Assign a lecturer to a module. This Teaches operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
+        ]
+      }
+    },
+    "/api/teaches/me/modules": {
+      "post": {
+        "operationId": "assignMeToModule",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SelfAssignTeachesDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "HTTP 201 response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TeachesResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "summary": "Assign the current lecturer or university admin to a module",
+        "tags": [
+          "Teaches"
+        ],
+        "description": "Assign the current lecturer or university admin to a module. This Teaches operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "getLecturerModules",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Lecturer modules returned successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TeachesResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "description": "Insufficient permissions or no university selected"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "summary": "Get modules taught by the current lecturer",
+        "tags": [
+          "Teaches"
+        ],
+        "description": "Get modules taught by the current lecturer. This Teaches operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
+        ]
+      }
     }
   },
   "info": {
@@ -15150,6 +15300,71 @@
         },
         "required": [
           "events"
+        ]
+      },
+      "CreateTeachesDto": {
+        "type": "object",
+        "properties": {
+          "ModuleID": {
+            "type": "string",
+            "format": "uuid",
+            "example": "00000000-0000-0000-0000-000000000000",
+            "description": "Module to assign the lecturer to"
+          },
+          "UserID": {
+            "type": "string",
+            "format": "uuid",
+            "example": "00000000-0000-0000-0000-000000000000",
+            "description": "Lecturer user to assign to the module"
+          }
+        },
+        "required": [
+          "ModuleID",
+          "UserID"
+        ]
+      },
+      "TeachesResponseDto": {
+        "type": "object",
+        "properties": {
+          "UserID": {
+            "type": "string",
+            "format": "uuid",
+            "example": "00000000-0000-0000-0000-000000000000",
+            "description": "User ID of the assigned lecturer"
+          },
+          "ModuleID": {
+            "type": "string",
+            "format": "uuid",
+            "example": "00000000-0000-0000-0000-000000000000",
+            "description": "Module ID of the teaching assignment"
+          },
+          "module": {
+            "description": "Module assigned to the lecturer",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ModuleSingleResponseDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "UserID",
+          "ModuleID",
+          "module"
+        ]
+      },
+      "SelfAssignTeachesDto": {
+        "type": "object",
+        "properties": {
+          "ModuleID": {
+            "type": "string",
+            "format": "uuid",
+            "example": "00000000-0000-0000-0000-000000000000",
+            "description": "Module to assign the current user to"
+          }
+        },
+        "required": [
+          "ModuleID"
         ]
       },
       "ErrorResponse": {

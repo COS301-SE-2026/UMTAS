@@ -2450,6 +2450,50 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/teaches": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Assign a lecturer to a module
+     * @description Assign a lecturer to a module. This Teaches operation is part of the versioned UMTAS HTTP contract.
+     */
+    post: operations["assignLecturer"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/teaches/me/modules": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get modules taught by the current lecturer
+     * @description Get modules taught by the current lecturer. This Teaches operation is part of the versioned UMTAS HTTP contract.
+     */
+    get: operations["getLecturerModules"];
+    put?: never;
+    /**
+     * Assign the current lecturer or university admin to a module
+     * @description Assign the current lecturer or university admin to a module. This Teaches operation is part of the versioned UMTAS HTTP contract.
+     */
+    post: operations["assignMeToModule"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -5608,6 +5652,44 @@ export interface components {
     EventListResponseDto: {
       events: components["schemas"]["EventDto"][];
       message?: string;
+    };
+    CreateTeachesDto: {
+      /**
+       * Format: uuid
+       * @description Module to assign the lecturer to
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      ModuleID: string;
+      /**
+       * Format: uuid
+       * @description Lecturer user to assign to the module
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      UserID: string;
+    };
+    TeachesResponseDto: {
+      /**
+       * Format: uuid
+       * @description User ID of the assigned lecturer
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      UserID: string;
+      /**
+       * Format: uuid
+       * @description Module ID of the teaching assignment
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      ModuleID: string;
+      /** @description Module assigned to the lecturer */
+      module: components["schemas"]["ModuleSingleResponseDto"];
+    };
+    SelfAssignTeachesDto: {
+      /**
+       * Format: uuid
+       * @description Module to assign the current user to
+       * @example 00000000-0000-0000-0000-000000000000
+       */
+      ModuleID: string;
     };
     /** @description Stable UMTAS error envelope. */
     ErrorResponse: {
@@ -11675,6 +11757,119 @@ export interface operations {
         };
         content?: never;
       };
+      500: components["responses"]["InternalError"];
+    };
+  };
+  assignLecturer: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateTeachesDto"];
+      };
+    };
+    responses: {
+      /** @description Lecturer assigned to module successfully */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TeachesResponseDto"];
+        };
+      };
+      /** @description Missing or invalid teaches payload */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      401: components["responses"]["UnauthorizedError"];
+      /** @description Insufficient permissions or no university selected */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Module not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      409: components["responses"]["ConflictError"];
+      /** @description Lecturer was not assigned to module */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getLecturerModules: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Lecturer modules returned successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TeachesResponseDto"][];
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      /** @description Insufficient permissions or no university selected */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      500: components["responses"]["InternalError"];
+    };
+  };
+  assignMeToModule: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SelfAssignTeachesDto"];
+      };
+    };
+    responses: {
+      /** @description HTTP 201 response. */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TeachesResponseDto"];
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      409: components["responses"]["ConflictError"];
       500: components["responses"]["InternalError"];
     };
   };
