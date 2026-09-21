@@ -4,12 +4,12 @@ import { and, eq } from 'drizzle-orm';
 import { AppDatabase, DatabaseService } from '../db/database.service';
 import { ModuleTeaches } from '../entities';
 
+import { ModuleServiceV2 } from 'src/Module/moduleV2.service';
 import type {
   CreateTeachesDto,
   ModuleTeachesType,
   TeachesResponseDto,
 } from './dto/teaches.dto';
-import { ModuleServiceV2 } from 'src/Module/moduleV2.service';
 
 @Injectable()
 export class TeachesService {
@@ -71,6 +71,33 @@ export class TeachesService {
     };
   } //END_assignLecturer
 
+  async getLecturerModules(
+    userId: string,
+    uniId: string,
+    tx?: AppDatabase,
+  ): Promise<TeachesResponseDto[]> {
+    if (!tx) {
+      return this.dbService.db.transaction((t: AppDatabase) =>
+        this.getLecturerModules(userId, uniId, t),
+      );
+    }
+
+    //Get all moduleTeaches rows for user
+    const teachesRelations = await this.getTeachesRelations(userId, tx);
+
+    //Return early
+    if (teachesRelations.length === 0) {
+      return [];
+    }
+
+    //Get each module with its events
+    return Promise.all(
+      teachesRelations.map((relation) =>
+        this.buildTeachesResponse(relation, userId, tx),
+      ),
+    );
+  } //END_getLecturerModules
+
   //🎅's little helpers
 
   /**
@@ -99,4 +126,48 @@ export class TeachesService {
 
     return existing ?? null;
   } //END_getExistingTeachesRelation
+
+  /**
+   * Fetches all teaches relations for a user.
+   *
+   * @param userId - User to look up.
+   * @param tx - Active database transaction.
+   * @returns All module teaches relations for the user.
+   */
+  private async getTeachesRelations(
+    userId: string,
+    tx: AppDatabase,
+  ): Promise<ModuleTeachesType[]> {
+    const teachesRelations = await tx
+      .select()
+      .from(ModuleTeaches)
+      .where(eq(ModuleTeaches.UserID, userId));
+
+    return teachesRelations;
+  } //END_getTeachesRelations
+
+  /**
+   * Builds a teaches response with the related module and events.
+   *
+   * @param relation - Module teaches relation.
+   * @param userId - User requesting the modules.
+   * @param tx - Active database transaction.
+   * @returns Teaches relation with module and events.
+   */
+  private async buildTeachesResponse(
+    relation: ModuleTeachesType,
+    userId: string,
+    tx: AppDatabase,
+  ): Promise<TeachesResponseDto> {
+    const module = await this.moduleService.getByIdV2({
+      moduleId: relation.ModuleID,
+      userId,
+      tx,
+    });
+
+    return {
+      ...relation,
+      module,
+    };
+  } //END_buildTeachesResponse
 } //TeachesService
