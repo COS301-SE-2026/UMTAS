@@ -35,8 +35,20 @@ pub fn analyse_questions(frames: Vec<FrameStore>) {
                         && let Some(last_frame_up) = stored_person.last_frame_hand_up
                     {
                         // Hand is up and there has been a hand up before
-
                         let distance_between_first_last = last_frame_up - first_frame_up;
+                        // the hand has been up before but has not gone down
+                        if distance_between_first_last > DISTANCE_BETWEEN_START_END {
+                            // hand has been up long enough to count the hand up
+                            stored_person.count_hand_up += 1;
+                            stored_person.first_frame_hand_up = None;
+                            stored_person.last_frame_hand_up = None;
+                            stored_person.frame_hand_down = Some(frame.frame_number);
+                        } else {
+                            // hand has not been up long enough for hand to go up
+                            stored_person.last_frame_hand_up = Some(frame.frame_number);
+                        }
+                    } else {
+                        // either hand was never up or hand has gone down
                         if let Some(hand_went_down) = stored_person.frame_hand_down {
                             // the hand has been up before and has gone down
                             let distance_between_down_new = frame.frame_number - hand_went_down;
@@ -51,22 +63,20 @@ pub fn analyse_questions(frames: Vec<FrameStore>) {
                                 stored_person.frame_hand_down = Some(frame.frame_number);
                             }
                         } else {
-                            // the hand has been up before but has not gone down
-                            if distance_between_first_last > DISTANCE_BETWEEN_START_END {
-                                // hand has been up long enough to count the hand up
-                                stored_person.count_hand_up += 1;
-                                stored_person.first_frame_hand_up = None;
-                                stored_person.last_frame_hand_up = None;
-                                stored_person.frame_hand_down = Some(frame.frame_number);
-                            } else {
-                                // hand has not been up long enough for hand to go up
-                                stored_person.last_frame_hand_up = Some(frame.frame_number);
-                            }
+                            // hand went down and start and end were Not set
+                            stored_person.first_frame_hand_up = Some(frame.frame_number);
+                            stored_person.last_frame_hand_up = Some(frame.frame_number);
                         }
-                    } else {
-                        // hand is up there was not a hand before
-                        stored_person.first_frame_hand_up = Some(frame.frame_number);
-                        stored_person.last_frame_hand_up = Some(frame.frame_number);
+                    }
+                } else {
+                    // will clear the old time stamp if the hand has been down for long
+                    if let Some(hand_went_down) = stored_person.frame_hand_down {
+                        // the hand has been up before and has gone down
+                        let distance_between_down_new = frame.frame_number - hand_went_down;
+
+                        if distance_between_down_new > DISTANCE_BETWEEN_END_NEW {
+                            stored_person.frame_hand_down = None;
+                        }
                     }
                 }
             } else {
