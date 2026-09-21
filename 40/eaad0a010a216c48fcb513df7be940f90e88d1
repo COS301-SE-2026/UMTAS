@@ -1,0 +1,34 @@
+apps/backend/docs/openapi.json
+  h_2d4b3dca70a3d8 8623-8772,15305-15369
+apps/frontend/package.json
+  h_2d4b3dca70a3d8 32-33
+apps/frontend/src/components/atoms/baseShadcn/command.tsx
+  h_2d4b3dca70a3d8 1-195
+apps/frontend/src/components/atoms/baseShadcn/input-group.tsx
+  h_2d4b3dca70a3d8 1-156
+apps/frontend/src/components/atoms/baseShadcn/popover.tsx
+  h_2d4b3dca70a3d8 1-88
+apps/frontend/src/components/organisms/attendance/AttendanceScanner.tsx
+  h_2d4b3dca70a3d8 8,13-19,24,33-47,50,65,68-85,91-134,139,151,154,160-162,221-227,231,234,241,248,251-252,254,257-259,261-262,291-301,303-322,324-440,445-456,459-463,465,477,490,495-510,512-519,524,534,537-546,575
+apps/frontend/src/components/templates/attendance/Queries/attendanceQueries.ts
+  h_2d4b3dca70a3d8 5,24,32,55,63-65,67
+apps/frontend/src/components/templates/attendance/Queries/teachesQueries.tsx
+  h_2d4b3dca70a3d8 1-40
+apps/frontend/src/components/templates/builder/Queries/moduleQueries.ts
+  h_2d4b3dca70a3d8 8,10,16-36,44,46,51-53,58,64-67,77,84,90-93,107,116,122-125
+apps/frontend/src/lib/api.ts
+  h_2d4b3dca70a3d8 2453-2496,5656-5693,11763-11875
+pnpm-lock.yaml
+  h_2d4b3dca70a3d8 387-392,7527-7535,7544-7551,20750-20761,20764-20765
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "40eaad0a010a216c48fcb513df7be940f90e88d1",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
