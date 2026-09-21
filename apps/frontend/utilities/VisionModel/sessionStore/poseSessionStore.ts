@@ -2,7 +2,10 @@
 // Will also be the frame of reference for the drawers to draw to screen
 
 import { DetectedPersonPose } from "../messageTypes";
-import init, { analyze_frame } from "../../../wasm-engine/pkg/wasm_engine";
+import init, {
+  analyze_frame,
+  first_frame,
+} from "../../../wasm-engine/pkg/wasm_engine";
 
 // if id is not found in a frame it draws them again
 export default class SessionStorePose {
@@ -19,12 +22,29 @@ export default class SessionStorePose {
     await this.initPromise;
   }
 
+  public async sendFirst(
+    frame: number,
+    timestamp: number,
+    people: DetectedPersonPose[],
+  ): Promise<void> {
+    // clears the frames
+    if (this.frames.length != 0) {
+      this.frames.length = 0;
+    }
+    if (!this.isInitialized) {
+      await this.initPromise;
+    }
+    const result = first_frame(frame, timestamp, people);
+    const parsed_frame: frameStore = JSON.parse(result);
+    this.frames.push(parsed_frame);
+  }
+
   public async sendData(
     frame: number,
     timestamp: number,
     people: DetectedPersonPose[],
   ): Promise<void> {
-    if (frames.length == 0) {
+    if (this.frames.length === 0) {
       throw Error(
         "The first frame must be sent separately before sending all data",
       );
@@ -46,8 +66,11 @@ export default class SessionStorePose {
    * Questions => measure of how many questions were asked => a number of frames in sequence where an id has hand up
    * they cannot be from isInferred
    */
-
   public analyseAllFrames() {}
+
+  public getNumFrames() {
+    return this.frames.length;
+  }
 }
 
 // this object stores an id and will be used from one frame to the next
