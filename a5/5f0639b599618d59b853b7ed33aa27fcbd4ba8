@@ -1,0 +1,16 @@
+apps/backend/src/ModuleTeaches/dto/teaches.dto.ts
+  h_2d4b3dca70a3d8 56-65
+apps/backend/src/ModuleTeaches/teaches.controller.ts
+  h_2d4b3dca70a3d8 8-12,56-72
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "a55f0639b599618d59b853b7ed33aa27fcbd4ba8",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
