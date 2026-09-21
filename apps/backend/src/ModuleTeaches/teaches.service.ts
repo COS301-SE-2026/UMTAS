@@ -2,7 +2,7 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { and, eq } from 'drizzle-orm';
 
 import { AppDatabase, DatabaseService } from '../db/database.service';
-import { ModuleTeaches } from '../entities';
+import { Course, GroupModules, ModuleTeaches } from '../entities';
 
 import { ModuleServiceV2 } from 'src/Module/moduleV2.service';
 import type {
@@ -83,7 +83,7 @@ export class TeachesService {
     }
 
     //Get all moduleTeaches rows for user
-    const teachesRelations = await this.getTeachesRelations(userId, tx);
+    const teachesRelations = await this.getTeachesRelations(userId, uniId, tx);
 
     //Return early
     if (teachesRelations.length === 0) {
@@ -136,12 +136,23 @@ export class TeachesService {
    */
   private async getTeachesRelations(
     userId: string,
+    uniId: string,
     tx: AppDatabase,
   ): Promise<ModuleTeachesType[]> {
     const teachesRelations = await tx
-      .select()
+      .select({
+        ModuleID: ModuleTeaches.ModuleID,
+        UserID: ModuleTeaches.UserID,
+      })
       .from(ModuleTeaches)
-      .where(eq(ModuleTeaches.UserID, userId));
+      .innerJoin(
+        GroupModules,
+        eq(GroupModules.ModuleID, ModuleTeaches.ModuleID),
+      )
+      .innerJoin(Course, eq(Course.GroupID, GroupModules.GroupID))
+      .where(
+        and(eq(ModuleTeaches.UserID, userId), eq(Course.UniversityID, uniId)),
+      );
 
     return teachesRelations;
   } //END_getTeachesRelations

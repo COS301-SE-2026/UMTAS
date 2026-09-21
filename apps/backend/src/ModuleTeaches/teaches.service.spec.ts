@@ -184,6 +184,7 @@ describe('TeachesService', () => {
       //Act
       const result = await (service as any).getTeachesRelations(
         'user-1',
+        uniId,
         mockDb,
       );
 
