@@ -24,7 +24,7 @@ export async function getAllCoursesV2(
 }
 
 export type enrollCourse =
-  paths["/api/Courses/course-enrollment/{CourseId}"]["patch"];
+  paths["/api/Courses/course-enrollment/{CourseId}"]["get"];
 
 export type enrollCourseParam = enrollCourse["parameters"]["path"];
 export type enrollCourseResp =

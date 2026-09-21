@@ -801,17 +801,17 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    get?: never;
+    /**
+     * Enroll the current user/student into a course
+     * @description Enroll the current user/student into a course. This Courses operation is part of the versioned UMTAS HTTP contract.
+     */
+    get: operations["enrollStudentToCourse"];
     put?: never;
     post?: never;
     delete?: never;
     options?: never;
     head?: never;
-    /**
-     * Enroll the current user/student into a course
-     * @description Enroll the current user/student into a course. This Courses operation is part of the versioned UMTAS HTTP contract.
-     */
-    patch: operations["enrollStudentToCourse"];
+    patch?: never;
     trace?: never;
   };
   "/api/Courses/course-unenrollment/{CourseId}": {
@@ -1576,6 +1576,278 @@ export interface paths {
      * @description Receive final solver worker callback. This Solver operation is part of the versioned UMTAS HTTP contract. Internal worker operation; requires the UMTAS worker bearer token.
      */
     post: operations["SolverController_receiveCallback"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/attendance/nfc-tags/me": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get the current operator NFC sticker status
+     * @description Get the current operator NFC sticker status. This Attendance operation is part of the versioned UMTAS HTTP contract.
+     */
+    get: operations["getMyNfcTag"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/attendance/nfc-tags/registration": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Prepare a replacement NFC sticker credential
+     * @description Prepare a replacement NFC sticker credential. This Attendance operation is part of the versioned UMTAS HTTP contract.
+     */
+    post: operations["prepareNfcTagRegistration"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/attendance/nfc-tags/registration/confirm": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Confirm a written NFC sticker and activate it
+     * @description Confirm a written NFC sticker and activate it. This Attendance operation is part of the versioned UMTAS HTTP contract.
+     */
+    post: operations["confirmNfcTagRegistration"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/attendance/nfc-tags/test": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Validate the current operator NFC sticker without attendance
+     * @description Validate the current operator NFC sticker without attendance. This Attendance operation is part of the versioned UMTAS HTTP contract.
+     */
+    post: operations["testNfcTag"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/attendance/operator/slots": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List the current operator event occurrences for one date
+     * @description List the current operator event occurrences for one date. This Attendance operation is part of the versioned UMTAS HTTP contract.
+     */
+    get: operations["getOperatorAttendanceSlots"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/attendance/records": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Record identified or guest attendance from an NFC sticker
+     * @description Record identified or guest attendance from an NFC sticker. This Attendance operation is part of the versioned UMTAS HTTP contract.
+     */
+    post: operations["recordAttendance"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/attendance/records/barcode": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Record the user resolved from a barcode in the current slot
+     * @description Record the user resolved from a barcode in the current slot. This Attendance operation is part of the versioned UMTAS HTTP contract.
+     */
+    post: operations["recordBarcodeAttendance"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/attendance/records/camera": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Replace the anonymous headcount for the current slot
+     * @description Replace the anonymous headcount for the current slot. This Attendance operation is part of the versioned UMTAS HTTP contract.
+     */
+    put: operations["recordCameraAttendance"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/attendance/sessions": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List attendance sessions visible to the operator
+     * @description List attendance sessions visible to the operator. This Attendance operation is part of the versioned UMTAS HTTP contract.
+     */
+    get: operations["listAttendanceSessions"];
+    put?: never;
+    /**
+     * Create an attendance session for an event occurrence
+     * @description Create an attendance session for an event occurrence. This Attendance operation is part of the versioned UMTAS HTTP contract.
+     */
+    post: operations["createAttendanceSession"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/attendance/sessions/{sessionId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get an attendance session and role-safe totals
+     * @description Get an attendance session and role-safe totals. This Attendance operation is part of the versioned UMTAS HTTP contract.
+     */
+    get: operations["getAttendanceSession"];
+    put?: never;
+    post?: never;
+    /**
+     * Delete an attendance session and its records
+     * @description Delete an attendance session and its records. This Attendance operation is part of the versioned UMTAS HTTP contract.
+     */
+    delete: operations["deleteAttendanceSession"];
+    options?: never;
+    head?: never;
+    /**
+     * Correct an attendance session
+     * @description Correct an attendance session. This Attendance operation is part of the versioned UMTAS HTTP contract.
+     */
+    patch: operations["updateAttendanceSession"];
+    trace?: never;
+  };
+  "/api/attendance/sessions/{sessionId}/records": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Record one identified attendee
+     * @description Record one identified attendee. This Attendance operation is part of the versioned UMTAS HTTP contract.
+     */
+    post: operations["recordIdentifiedAttendance"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/attendance/sessions/{sessionId}/attendance/count": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Replace the aggregate attendance count
+     * @description Replace the aggregate attendance count. This Attendance operation is part of the versioned UMTAS HTTP contract.
+     */
+    put: operations["setAttendanceCount"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/attendance/me/verified-history": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get only the current user’s identified attendance history
+     * @description Get only the current user’s identified attendance history. This Attendance operation is part of the versioned UMTAS HTTP contract.
+     */
+    get: operations["getVerifiedAttendanceHistory"];
+    put?: never;
+    post?: never;
     delete?: never;
     options?: never;
     head?: never;
@@ -3884,6 +4156,299 @@ export interface components {
       /** @description A valid timetable solution and its soft-heuristic scores. */
       result?: components["schemas"]["SolverResultDto"];
       error?: components["schemas"]["WorkerCallbackErrorDto"];
+    };
+    RegisteredNfcTagDto: {
+      /** Format: uuid */
+      tagId: string;
+      displayId: string;
+      /** Format: date-time */
+      registeredAt: string;
+    };
+    RegisteredNfcTagStatusDto: {
+      tag: components["schemas"]["RegisteredNfcTagDto"] | null;
+    };
+    NfcTagRegistrationResponseDto: {
+      /** Format: uuid */
+      tagId: string;
+      token: string;
+      /** Format: uri */
+      tagUrl: string;
+      activationTicket: string;
+      /** Format: date-time */
+      expiresAt: string;
+    };
+    ConfirmNfcTagRegistrationDto: {
+      activationTicket: string;
+    };
+    NfcCheckInDto: {
+      /** Format: uuid */
+      tagId: string;
+      token: string;
+    };
+    NfcTagTestResponseDto: {
+      valid: boolean;
+      message: string;
+      displayId?: string | null;
+    };
+    OperatorAttendanceSlotDto: {
+      /** Format: uuid */
+      eventID: string;
+      eventName: string;
+      /** Format: uuid */
+      moduleID: string;
+      moduleCode: string;
+      moduleName: string;
+      venue: string | null;
+      /** Format: date-time */
+      scheduledStartAt: string;
+      /** Format: date-time */
+      scheduledEndAt: string;
+      /** Format: uuid */
+      sessionId: string | null;
+      /**
+       * @description Availability derived from the event time and capture buffer
+       * @enum {string}
+       */
+      state: "UPCOMING" | "AVAILABLE" | "ENDED";
+      attendanceCount: number;
+    };
+    OperatorAttendanceSlotsResponseDto: {
+      slotList: components["schemas"]["OperatorAttendanceSlotDto"][];
+      ambiguous: boolean;
+      currentSlot?: components["schemas"]["OperatorAttendanceSlotDto"] | null;
+    };
+    RecordAttendanceDto: {
+      /**
+       * @description NFC is the capture adapter for this endpoint
+       * @example NFC
+       * @enum {string}
+       */
+      captureMethod: "NFC";
+      /**
+       * Format: uuid
+       * @description Registered NFC tag identifier
+       * @example 00000000-0000-4000-8000-000000000002
+       */
+      tagId: string;
+      /**
+       * @description Secret credential stored on the NFC tag
+       * @example abcdefghijklmnopqrstuvwxyz012345
+       */
+      token: string;
+    };
+    AttendanceRecordResponseDto: {
+      /**
+       * @description Outcome of the attendance capture
+       * @example RECORDED
+       * @enum {string}
+       */
+      status:
+        | "RECORDED"
+        | "ALREADY_RECORDED"
+        | "NO_CURRENT_EVENT"
+        | "AMBIGUOUS_EVENT"
+        | "INVALID_TAG";
+      /**
+       * @description Human-readable result suitable for a toast
+       * @example Attendance recorded.
+       */
+      message: string;
+      /**
+       * Format: uuid
+       * @description Resolved attendance session
+       */
+      sessionId?: string | null;
+      /**
+       * Format: date-time
+       * @description Time at which attendance was recorded
+       */
+      recordedAt?: string | null;
+    };
+    RecordBarcodeAttendanceDto: {
+      /**
+       * Format: uuid
+       * @description University user resolved from the scanned barcode
+       * @example 00000000-0000-4000-8000-000000000001
+       */
+      UserID: string;
+    };
+    SessionAttendanceResponseDto: {
+      /**
+       * Format: uuid
+       * @description Attendance record identifier
+       */
+      AttendanceID: string;
+      /**
+       * Format: uuid
+       * @description Parent attendance session
+       */
+      SessionID: string;
+      /**
+       * Format: uuid
+       * @description Identified attendee, or null for the anonymous count row
+       */
+      UserID: string | null;
+      /** @description Anonymous count, or null for an identified attendee */
+      guestCount: number | null;
+      /**
+       * @description Most recent capture method for this record
+       * @enum {string}
+       */
+      captureMethod: "NFC" | "BARCODE" | "CAMERA" | "MANUAL";
+      /**
+       * Format: date-time
+       * @description Initial recording time
+       */
+      recordedAt: string;
+      /**
+       * Format: date-time
+       * @description Last update time
+       */
+      updatedAt: string;
+    };
+    AttendanceCaptureResultDto: {
+      /**
+       * @description Whether a new identified record was inserted
+       * @enum {string}
+       */
+      status: "RECORDED" | "ALREADY_RECORDED";
+      attendance: components["schemas"]["SessionAttendanceResponseDto"];
+    };
+    RecordCameraAttendanceDto: {
+      /**
+       * @description Current anonymous headcount observed by the camera
+       * @example 42
+       */
+      guestCount: number;
+    };
+    CreateAttendanceSessionDto: {
+      /**
+       * Format: uuid
+       * @description Event represented by this dated attendance session
+       * @example 00000000-0000-4000-8000-000000000000
+       */
+      eventID: string;
+      /**
+       * Format: date-time
+       * @description Scheduled occurrence start time
+       * @example 2026-09-15T08:00:00.000Z
+       */
+      scheduledStartAt: string;
+      /**
+       * Format: date-time
+       * @description Scheduled occurrence end time
+       * @example 2026-09-15T10:00:00.000Z
+       */
+      scheduledEndAt: string;
+    };
+    AttendanceSessionResponseDto: {
+      /**
+       * Format: uuid
+       * @description Attendance session identifier
+       */
+      SessionID: string;
+      /**
+       * Format: uuid
+       * @description Related event identifier
+       */
+      eventID: string;
+      /**
+       * Format: date-time
+       * @description Scheduled occurrence start
+       */
+      scheduledStartAt: string;
+      /**
+       * Format: date-time
+       * @description Scheduled occurrence end
+       */
+      scheduledEndAt: string;
+      /**
+       * Format: date-time
+       * @description Session creation time
+       */
+      createdAt: string;
+      /**
+       * Format: date-time
+       * @description Last session update time
+       */
+      updatedAt: string;
+      /**
+       * @description Number of distinct identified attendees
+       * @example 8
+       */
+      identifiedCount: number;
+      /**
+       * @description Current anonymous attendance count
+       * @example 3
+       */
+      guestCount: number;
+      /**
+       * @description Identified plus anonymous attendance
+       * @example 11
+       */
+      attendedCount: number;
+    };
+    AttendanceSessionListResponseDto: {
+      /** @description Attendance sessions visible to the operator */
+      sessionList: components["schemas"]["AttendanceSessionResponseDto"][];
+    };
+    UpdateAttendanceSessionDto: {
+      /**
+       * Format: uuid
+       * @description Event represented by this dated attendance session
+       * @example 00000000-0000-4000-8000-000000000000
+       */
+      eventID?: string;
+      /**
+       * Format: date-time
+       * @description Scheduled occurrence start time
+       * @example 2026-09-15T08:00:00.000Z
+       */
+      scheduledStartAt?: string;
+      /**
+       * Format: date-time
+       * @description Scheduled occurrence end time
+       * @example 2026-09-15T10:00:00.000Z
+       */
+      scheduledEndAt?: string;
+    };
+    DeleteAttendanceSessionResponseDto: {
+      /**
+       * @description Whether the session was deleted
+       * @example true
+       */
+      success: Record<string, never>;
+    };
+    RecordIdentifiedAttendanceDto: {
+      /**
+       * Format: uuid
+       * @description Existing university user to record
+       * @example 00000000-0000-4000-8000-000000000001
+       */
+      UserID: string;
+      /**
+       * @description How the attendee was identified
+       * @example BARCODE
+       * @enum {string}
+       */
+      captureMethod: "BARCODE" | "MANUAL";
+    };
+    SetGuestCountDto: {
+      /**
+       * @description Anonymous attendance total replacing the current value
+       * @example 12
+       */
+      guestCount: number;
+      /**
+       * @description Source of the replacement count
+       * @example CAMERA
+       * @enum {string}
+       */
+      captureMethod: "CAMERA" | "MANUAL";
+    };
+    VerifiedAttendanceHistoryResponseDto: {
+      /** @description Identified attendance belonging to the current user */
+      attendanceList: components["schemas"]["SessionAttendanceResponseDto"][];
     };
     CreateAttendanceDto: {
       /**
@@ -6525,7 +7090,6 @@ export interface operations {
         };
         content?: never;
       };
-      409: components["responses"]["ConflictError"];
       /** @description Failed to enroll student to course. */
       500: {
         headers: {
@@ -8343,6 +8907,460 @@ export interface operations {
       401: components["responses"]["UnauthorizedError"];
       404: components["responses"]["NotFoundError"];
       409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  getMyNfcTag: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description HTTP 200 response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RegisteredNfcTagStatusDto"];
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  prepareNfcTagRegistration: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": Record<string, never>;
+      };
+    };
+    responses: {
+      /** @description HTTP 201 response. */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["NfcTagRegistrationResponseDto"];
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  confirmNfcTagRegistration: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ConfirmNfcTagRegistrationDto"];
+      };
+    };
+    responses: {
+      /** @description HTTP 201 response. */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RegisteredNfcTagDto"];
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  testNfcTag: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["NfcCheckInDto"];
+      };
+    };
+    responses: {
+      /** @description HTTP 201 response. */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["NfcTagTestResponseDto"];
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  getOperatorAttendanceSlots: {
+    parameters: {
+      query?: {
+        date?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description HTTP 200 response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperatorAttendanceSlotsResponseDto"];
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  recordAttendance: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RecordAttendanceDto"];
+      };
+    };
+    responses: {
+      /** @description HTTP 201 response. */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AttendanceRecordResponseDto"];
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  recordBarcodeAttendance: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RecordBarcodeAttendanceDto"];
+      };
+    };
+    responses: {
+      /** @description HTTP 201 response. */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AttendanceCaptureResultDto"];
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  recordCameraAttendance: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RecordCameraAttendanceDto"];
+      };
+    };
+    responses: {
+      /** @description HTTP 200 response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SessionAttendanceResponseDto"];
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  listAttendanceSessions: {
+    parameters: {
+      query?: {
+        /** @description Limit results to one event */
+        eventID?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description HTTP 200 response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AttendanceSessionListResponseDto"];
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  createAttendanceSession: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateAttendanceSessionDto"];
+      };
+    };
+    responses: {
+      /** @description HTTP 201 response. */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AttendanceSessionResponseDto"];
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  getAttendanceSession: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        sessionId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description HTTP 200 response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AttendanceSessionResponseDto"];
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      404: components["responses"]["NotFoundError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  deleteAttendanceSession: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        sessionId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description HTTP 200 response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DeleteAttendanceSessionResponseDto"];
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      404: components["responses"]["NotFoundError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  updateAttendanceSession: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        sessionId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateAttendanceSessionDto"];
+      };
+    };
+    responses: {
+      /** @description HTTP 200 response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AttendanceSessionResponseDto"];
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      404: components["responses"]["NotFoundError"];
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  recordIdentifiedAttendance: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        sessionId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["RecordIdentifiedAttendanceDto"];
+      };
+    };
+    responses: {
+      /** @description HTTP 201 response. */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AttendanceCaptureResultDto"];
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      404: components["responses"]["NotFoundError"];
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  setAttendanceCount: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        sessionId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SetGuestCountDto"];
+      };
+    };
+    responses: {
+      /** @description HTTP 200 response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SessionAttendanceResponseDto"];
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      404: components["responses"]["NotFoundError"];
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  getVerifiedAttendanceHistory: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description HTTP 200 response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["VerifiedAttendanceHistoryResponseDto"];
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
       500: components["responses"]["InternalError"];
     };
   };
