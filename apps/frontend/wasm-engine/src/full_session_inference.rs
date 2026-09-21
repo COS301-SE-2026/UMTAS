@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::f32::consts::PI;
 use wasm_bindgen::prelude::*;
 
 use crate::pose_inference::Keypoint;
@@ -9,11 +10,65 @@ pub fn analyse_session(frames: JsValue) -> Result<String, JsValue> {
     let frames_parsed: Vec<FrameStore> = serde_wasm_bindgen::from_value(frames)
         .map_err(|e| JsValue::from_str(&format!("Failed to parse people array: {}", e)))?;
 
+    let full_session = get_session_data(frames_parsed);
+    let session_data = group_data(full_session);
+
     return Ok("".to_string());
 }
 
-// needs to analyse per person so accumulate for an ID and then check distance between each and so on
-pub fn analyse_questions(frames: Vec<FrameStore>) {
+pub fn group_data(full_session: HashMap<usize, SessionPerson>) -> SessionAnalysis {
+    let mut total_restless: usize = 0;
+    let mut total_question: usize = 0;
+
+    for (id, session) in full_session {
+        if evaluate_restlessness(&session.all_center_mass) {
+            total_restless += 1;
+        }
+        total_question += session.count_hand_up;
+    }
+
+    return SessionAnalysis {
+        detected_restless: total_restless,
+        questions_asked: total_question,
+    };
+}
+
+pub fn evaluate_restlessness(centers: &[Keypoint]) -> bool {
+    if centers.is_empty() {
+        return false;
+    }
+
+    const NOISE: f32 = 5.0;
+    // ratio of how many frames they are expected to be moving for
+    const R_RATIO: f32 = 0.3;
+
+    let mut sumx = 0.0;
+    let mut sumy = 0.0;
+    for kp in centers {
+        sumx += kp.x;
+        sumy += kp.y;
+    }
+    let len = centers.len() as f32;
+    let baseline_x = sumx / len;
+    let baseline_y = sumy / len;
+
+    let mut restless_frame_count = 0;
+
+    for kp in centers {
+        let dx = kp.x - baseline_x;
+        let dy = kp.y - baseline_y;
+        let distance = (dx.powi(2) + dy.powi(2)).sqrt();
+
+        if distance > NOISE {
+            restless_frame_count += 1;
+        }
+    }
+
+    let restlessness_ratio = restless_frame_count as f32 / len;
+
+    return restlessness_ratio > R_RATIO;
+}
+pub fn get_session_data(frames: Vec<FrameStore>) -> HashMap<usize, SessionPerson> {
     // must remain sorted
     let mut all_session_people: HashMap<usize, SessionPerson> = HashMap::new();
     const DISTANCE_BETWEEN_START_END: usize = 10;
@@ -102,12 +157,13 @@ pub fn analyse_questions(frames: Vec<FrameStore>) {
             }
         }
     }
+    return all_session_people;
 }
 
-pub struct session_analysis {
+pub struct SessionAnalysis {
     questions_asked: usize,
     // a measure of everyones center and the average movement of that point
-    mean_movement: usize,
+    detected_restless: usize,
 }
 
 #[derive(Clone)]

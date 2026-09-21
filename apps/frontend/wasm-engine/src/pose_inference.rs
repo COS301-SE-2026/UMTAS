@@ -3,7 +3,7 @@ use wasm_bindgen::prelude::*;
 
 use crate::{DetectedPerson, intersection_over_union, is_enveloped};
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy)]
 pub struct Keypoint {
     pub x: f32,
     pub y: f32,
