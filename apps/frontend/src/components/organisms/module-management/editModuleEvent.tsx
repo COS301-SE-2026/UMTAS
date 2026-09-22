@@ -42,6 +42,10 @@ import { getQueryClient } from "@/components/tanstack/getQueryClient";
 import { useErrorListener } from "@/hooks/errorListener";
 import { errorName } from "../../../../utilities/errorCries";
 import { getAllBuildingsQ } from "../../../../utilities/building/buildingQueries";
+import {
+  assignMeToModuleMut,
+  getMyTaughtModulesQ,
+} from "@/components/templates/attendance/Queries/teachesQueries";
 
 export default function EditModuleEvent({
   data,
@@ -52,6 +56,19 @@ export default function EditModuleEvent({
 }) {
   const [moduleState, setModuleState] = useState(data.modules);
   const [eventsState, setEventsState] = useState(data.events);
+  const role = UserDetails.getUniDetails()?.role;
+  const isAttendanceOperator =
+    role === "LECTURER" || role === "UNIVERSITY_ADMIN";
+  const { data: taughtModules = [] } = useQuery({
+    ...getMyTaughtModulesQ(),
+    enabled: isAttendanceOperator,
+  });
+  const { mutate: assignMeToModule, isPending: teachingPending } = useMutation(
+    assignMeToModuleMut(),
+  );
+  const teachesModule = taughtModules.some(
+    (assignment) => assignment.ModuleID === moduleState.moduleID,
+  );
 
   const [feedback, setFeedback] = useState<{
     type: "success" | "error";
@@ -271,30 +288,52 @@ export default function EditModuleEvent({
               module={moduleState}
               onUpdate={handleModuleUpdate}
             />
-            <div className="flex flex-col gap-2 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4">
-              <Label
-                htmlFor="module-description-input"
-                className="text-sm font-medium text-[var(--text-primary)]"
-              >
-                Module Enrollment
-              </Label>
-              <Label
-                htmlFor="module-description-input"
-                className="text-sm font-medium text-[var(--text-secondary)]"
-              >
-                Enroll
-                <Checkbox
-                  checked={moduleState.Enrolled ?? false}
-                  onCheckedChange={(checked) => {
-                    setModuleState((mod) => ({
-                      ...mod,
-                      Enrolled: Boolean(checked),
-                    }));
-                    updateEnrollment({ enroll: Boolean(checked) });
-                  }}
-                />
-              </Label>
-            </div>
+            {isAttendanceOperator ? (
+              <div className="flex flex-col gap-2 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4">
+                <Label className="text-sm font-medium text-[var(--text-primary)]">
+                  Teaching assignment
+                </Label>
+                <Label className="flex items-center gap-2 text-sm font-medium text-[var(--text-secondary)]">
+                  <Checkbox
+                    checked={teachesModule}
+                    disabled={teachesModule || teachingPending}
+                    onCheckedChange={(checked) => {
+                      if (checked) assignMeToModule(moduleState.moduleID);
+                    }}
+                  />
+                  I teach this module
+                </Label>
+                <p className="text-xs text-[var(--text-secondary)]">
+                  This assignment lets you take attendance for the module&apos;s
+                  classes.
+                </p>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4">
+                <Label
+                  htmlFor="module-description-input"
+                  className="text-sm font-medium text-[var(--text-primary)]"
+                >
+                  Module Enrollment
+                </Label>
+                <Label
+                  htmlFor="module-description-input"
+                  className="text-sm font-medium text-[var(--text-secondary)]"
+                >
+                  Enroll
+                  <Checkbox
+                    checked={moduleState.Enrolled ?? false}
+                    onCheckedChange={(checked) => {
+                      setModuleState((mod) => ({
+                        ...mod,
+                        Enrolled: Boolean(checked),
+                      }));
+                      updateEnrollment({ enroll: Boolean(checked) });
+                    }}
+                  />
+                </Label>
+              </div>
+            )}
             <div className="flex flex-col gap-2 rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4">
               <Label
                 htmlFor="module-description-input"

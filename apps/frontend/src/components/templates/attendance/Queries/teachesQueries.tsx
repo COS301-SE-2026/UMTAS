@@ -1,4 +1,5 @@
-import { mutationOptions } from "@tanstack/react-query";
+import { mutationOptions, queryOptions } from "@tanstack/react-query";
+import { getQueryClient } from "@/components/tanstack/getQueryClient";
 
 import type { paths } from "@/lib/api";
 
@@ -14,6 +15,28 @@ type AssignMeBody =
 
 type AssignMeResponse =
   AssignMeEndpoint["responses"]["201"]["content"]["application/json"];
+
+type GetMyTaughtModulesEndpoint = paths["/api/teaches/me/modules"]["get"];
+type GetMyTaughtModulesResponse =
+  GetMyTaughtModulesEndpoint["responses"]["200"]["content"]["application/json"];
+
+export class GetMyTaughtModules extends RequestBuilder<
+  undefined,
+  undefined,
+  GetMyTaughtModulesResponse
+> {
+  constructor() {
+    super();
+    this.setUrl("/teaches/me/modules").setMethod(RequestMethod.GET);
+  }
+}
+
+export function getMyTaughtModulesQ() {
+  return queryOptions({
+    queryKey: ["teaches", "me"] as const,
+    queryFn: () => new GetMyTaughtModules().send({}),
+  });
+}
 
 class AssignMeToModule extends RequestBuilder<
   undefined,
@@ -35,6 +58,14 @@ export function assignMeToModuleMut() {
           ModuleID: moduleID,
         },
       });
+    },
+    onSuccess: async () => {
+      await Promise.all([
+        getQueryClient().invalidateQueries({
+          queryKey: getMyTaughtModulesQ().queryKey,
+        }),
+        getQueryClient().invalidateQueries({ queryKey: ["Modules"] }),
+      ]);
     },
   });
 }
