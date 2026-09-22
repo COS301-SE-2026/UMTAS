@@ -71,6 +71,8 @@ RUN mkdir -p apps/frontend/public/wasm && \
     find . -name "ort-wasm*.wasm" -exec cp {} apps/frontend/public/wasm/ \; || true && \
     cp node_modules/onnxruntime-web/dist/ort-wasm*.mjs apps/frontend/public/wasm/ 2>/dev/null || true
 
+RUN ls -la apps/frontend/wasm-engine/pkg
+
 RUN pnpm --filter=shared-types build
 RUN pnpm --filter=frontend build
 
