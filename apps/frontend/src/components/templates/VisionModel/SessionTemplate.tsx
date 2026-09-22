@@ -66,12 +66,16 @@ export default function VM_SessionTemplate() {
                 <Button
                   type="button"
                   variant={"outline"}
-                  onClick={() => uploadImageRef.current?.click()}
+                  onClick={() => {
+                    if (imageUpload == null) uploadImageRef.current?.click();
+                    else setImageUpload(null);
+                  }}
                   size="default"
                   className="h-8 w-40  cursor-pointer"
                 >
-                  Upload Image
+                  {imageUpload == null ? <>Upload Image</> : <>Remove Image</>}
                 </Button>
+
                 <Input
                   ref={uploadImageRef}
                   type="file"
