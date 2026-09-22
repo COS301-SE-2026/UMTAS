@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/atoms/baseShadcn/button";
 import { Input } from "@/components/atoms/baseShadcn/input";
 import { Label } from "@/components/atoms/baseShadcn/label";
 import { Switch } from "@/components/atoms/baseShadcn/switch";
@@ -7,7 +8,7 @@ import CameraCanvas, {
   DetectionSettings,
   InferenceSettings,
 } from "@/components/organisms/VisionModel/CameraCanvas";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 export default function VM_SessionTemplate() {
   // settings
@@ -26,6 +27,7 @@ export default function VM_SessionTemplate() {
   );
   const [imageUpload, setImageUpload] = useState<File | null>(null);
 
+  const uploadImageRef = useRef<HTMLInputElement>(null);
   // settings
 
   return (
@@ -47,7 +49,44 @@ export default function VM_SessionTemplate() {
           </div>
           <div className=" pb-4  flex flex-col md:flex-row   w-full h-full rounded-2xl rounded-t-none">
             {/* ------------ Settings hier asseblief --------------- */}
-
+            <div className="w-full h-full flex flex-col  gap-y-4  ">
+              <h1 className="text-md font-semibold text-center text-[var(--text-primary)] pl-4 py-4 ">
+                Upload
+              </h1>
+              <Label className=" flex flex-col  w-full  text-md font-medium text-[var(--text-primary)] text-left pl-1 gap-y-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {}}
+                  size="default"
+                  className="h-8 w-40  cursor-pointer"
+                >
+                  Upload Video
+                </Button>
+                <Button
+                  type="button"
+                  variant={"outline"}
+                  onClick={() => uploadImageRef.current?.click()}
+                  size="default"
+                  className="h-8 w-40  cursor-pointer"
+                >
+                  Upload Image
+                </Button>
+                <Input
+                  ref={uploadImageRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setImageUpload(file);
+                      setCameraOn(false);
+                    }
+                  }}
+                  className="h-8 w-40 hidden rounded-md border border-[var(--border)] bg-transparent px-2 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--ring)] file:mr-2 file:border-0 file:bg-transparent file:text-xs file:font-medium file:text-[var(--text-primary)] cursor-pointer"
+                />
+              </Label>
+            </div>
             <div className="w-full h-full flex flex-col  gap-y-4  ">
               <h1 className="text-md font-semibold text-center text-[var(--text-primary)] pl-4 py-4 ">
                 Camera Settings:
@@ -62,22 +101,8 @@ export default function VM_SessionTemplate() {
                   }}
                 />
               </Label>
-              <Label className=" flex flex-col  w-full  text-md font-medium text-[var(--text-primary)] text-left pl-1">
-                Upload Image
-                <Input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      setImageUpload(file);
-                      setCameraOn(false);
-                    }
-                  }}
-                  className="h-8 w-40 rounded-md border border-[var(--border)] bg-transparent px-2 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--ring)] file:mr-2 file:border-0 file:bg-transparent file:text-xs file:font-medium file:text-[var(--text-primary)] cursor-pointer"
-                />
-              </Label>
             </div>
+
             <div className="w-full h-full flex flex-col  gap-y-4  ">
               <h1 className="text-md font-semibold text-center text-[var(--text-primary)] pl-4 py-4 ">
                 Detection Settings
