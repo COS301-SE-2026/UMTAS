@@ -119,11 +119,20 @@ export class OperatorAttendanceSlotsResponseDto {
   @ApiProperty({ type: [OperatorAttendanceSlotDto] })
   slotList!: OperatorAttendanceSlotDto[];
 
-  @ApiProperty({ type: Boolean })
-  ambiguous!: boolean;
-
   @ApiPropertyOptional({ type: OperatorAttendanceSlotDto, nullable: true })
   currentSlot!: OperatorAttendanceSlotDto | null;
+
+  @ApiProperty({ nullable: true, format: 'uuid' })
+  preferredEventId!: string | null;
+
+  @ApiProperty({ type: Boolean })
+  requiresSelection!: boolean;
+}
+
+export class SelectPreferredEventDto {
+  @ApiProperty({ format: 'uuid' })
+  @IsUUID()
+  eventID!: string;
 }
 
 export class OperatorSlotsQueryDto {

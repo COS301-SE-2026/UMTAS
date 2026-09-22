@@ -53,6 +53,7 @@ export function attendanceSessionLifecycleStep<TPlan>(
       const db = context.runtime.database;
       const moduleId = randomUUID();
       const eventId = randomUUID();
+      const overlappingEventId = randomUUID();
       const groupingId = randomUUID();
       const operatorActor = await actor(context);
 
@@ -177,6 +178,25 @@ export function attendanceSessionLifecycleStep<TPlan>(
           },
         })
         .where(eq(Event.eventID, eventId));
+      await db.insert(Event).values({
+        eventID: overlappingEventId,
+        eventName: 'Overlapping attendance event',
+        eventCriteria: {
+          eventSource: EventSource.UNIVERSITY,
+          moduleId,
+          date: localDate,
+          startTime: formatLocalTime(
+            new Date(currentInstant.getTime() - 5 * 60_000),
+          ),
+          endTime: formatLocalTime(
+            new Date(currentInstant.getTime() + 20 * 60_000),
+          ),
+        },
+      });
+      await db.insert(UniversityEvent).values({
+        eventID: overlappingEventId,
+        moduleID: moduleId,
+      });
 
       const student = context.actor('attendance-student');
       const studentEmail = `attendance-student-${randomUUID()}@test.umtas.local`;
@@ -249,6 +269,31 @@ export function attendanceSessionLifecycleStep<TPlan>(
       expectStatus(operatorSlots, 200, 'read current operator slots');
       expectObject(operatorSlots.body, 'read current operator slots');
       assert.ok(Array.isArray(operatorSlots.body.slotList));
+      assert.equal(operatorSlots.body.requiresSelection, true);
+      assert.equal(operatorSlots.body.currentSlot, null);
+      const selectedPreference = await operatorActor.request.put(
+        '/attendance/operator/preferred-event',
+        { json: { eventID: eventId } },
+      );
+      expectStatus(
+        selectedPreference,
+        200,
+        'select preferred attendance event',
+      );
+      expectObject(
+        selectedPreference.body,
+        'select preferred attendance event',
+      );
+      assert.equal(selectedPreference.body.eventID, eventId);
+      const resolvedSlots = await operatorActor.request.get(
+        `/attendance/operator/slots?date=${localDate}`,
+      );
+      expectStatus(resolvedSlots, 200, 'resolve preferred attendance event');
+      expectObject(resolvedSlots.body, 'resolve preferred attendance event');
+      assert.equal(resolvedSlots.body.requiresSelection, false);
+      assert.equal(resolvedSlots.body.preferredEventId, eventId);
+      expectObject(resolvedSlots.body.currentSlot, 'resolved current slot');
+      assert.equal(resolvedSlots.body.currentSlot.eventID, eventId);
       const firstCheckIn = await student.request.post('/attendance/records', {
         json: { captureMethod: 'NFC', tagId: firstTagId, token: firstToken },
       });
@@ -310,6 +355,19 @@ export function attendanceSessionLifecycleStep<TPlan>(
         unknown
       >;
       assert.equal(registeredReplacement.tagId, replacementTagId);
+      const preferenceAfterReplacement = await operatorActor.request.get(
+        `/attendance/operator/slots?date=${localDate}`,
+      );
+      expectStatus(
+        preferenceAfterReplacement,
+        200,
+        'retain preferred event after replacing NFC sticker',
+      );
+      expectObject(
+        preferenceAfterReplacement.body,
+        'retain preferred event after replacing NFC sticker',
+      );
+      assert.equal(preferenceAfterReplacement.body.preferredEventId, eventId);
       const invalidatedOldTag = await student.request.post(
         '/attendance/records',
         {
