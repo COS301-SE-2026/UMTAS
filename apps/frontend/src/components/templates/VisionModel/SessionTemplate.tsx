@@ -9,6 +9,7 @@ import CameraCanvas, {
   DetectionSettings,
   InferenceSettings,
 } from "@/components/organisms/VisionModel/CameraCanvas";
+import VideoUploadComp from "@/components/organisms/VisionModel/videoUpload";
 import { useRef, useState } from "react";
 
 export default function VM_SessionTemplate() {
@@ -204,7 +205,9 @@ export default function VM_SessionTemplate() {
       </div>
 
       {showVideoPopUp && (
-        <Popup onClose={() => SetShowVideoPopUp(false)}></Popup>
+        <Popup onClose={() => SetShowVideoPopUp(false)}>
+          <VideoUploadComp />
+        </Popup>
       )}
     </>
   );
