@@ -123,28 +123,6 @@ pub fn create_buffers(
             slice_index: 2,
             _pad: 0,
         },
-        // bottom left
-        slice_parms {
-            src_width: src_w,
-            src_height: src_h,
-            crop_x: 0,
-            crop_y: 640,
-            scale_x: scale_dbl_x,
-            scale_y: scale_dbl_y,
-            slice_index: 3,
-            _pad: 0,
-        },
-        // bottom right
-        slice_parms {
-            src_width: src_w,
-            src_height: src_h,
-            crop_x: 640,
-            crop_y: 640,
-            scale_x: scale_dbl_x,
-            scale_y: scale_dbl_y,
-            slice_index: 4,
-            _pad: 0,
-        },
     ];
     let params_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
         label: Some("PARAMS_BUFFER"),
@@ -152,7 +130,7 @@ pub fn create_buffers(
         usage: wgpu::BufferUsages::STORAGE | wgpu::BufferUsages::COPY_DST,
     });
 
-    let total_output_size = (5 * 640 * 640 * 3 * 4) as wgpu::BufferAddress;
+    let total_output_size = (3 * 640 * 640 * 3 * 4) as wgpu::BufferAddress;
 
     let output_buffer = device.create_buffer(&wgpu::BufferDescriptor {
         label: Some("OUTPUT_DATA"),
@@ -271,8 +249,8 @@ pub fn run_upscaler(device: &wgpu::Device, queue: &wgpu::Queue, buffers: &Buffer
 
         compute_pass.set_pipeline(&compute_pipeline);
         compute_pass.set_bind_group(0, &bind_grp, &[]);
-        // 640/16 = 40 workgroups in xy, 5 slices in z
-        compute_pass.dispatch_workgroups(40, 50, 5);
+        // 640/16 = 40 workgroups in xy, 3 slices in z
+        compute_pass.dispatch_workgroups(40, 50, 3);
     }
     queue.submit(Some(encoder.finish()));
 }
@@ -283,7 +261,7 @@ pub async fn read_slices(
     queue: &wgpu::Queue,
     buffers: &Buffers,
 ) -> Result<js_sys::Array, JsValue> {
-    let total_output_size = (5 * 640 * 640 * 3 * std::mem::size_of::<f32>()) as wgpu::BufferAddress;
+    let total_output_size = (3 * 640 * 640 * 3 * std::mem::size_of::<f32>()) as wgpu::BufferAddress;
 
     let mut encoder = device.create_command_encoder(&wgpu::CommandEncoderDescriptor {
         label: Some("STAGING_COPY_ENCODER"),
@@ -319,7 +297,7 @@ pub async fn read_slices(
 
         let slice_float_count = 3 * 640 * 640;
 
-        for i in 0..5 {
+        for i in 0..3 {
             let start = i * slice_float_count;
             let end = start + slice_float_count;
             let slice_data = &float_slice[start..end];

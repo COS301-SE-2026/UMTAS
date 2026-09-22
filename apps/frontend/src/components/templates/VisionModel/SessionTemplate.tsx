@@ -10,6 +10,7 @@ import CameraCanvas, {
   InferenceSettings,
 } from "@/components/organisms/VisionModel/CameraCanvas";
 import VideoUploadComp from "@/components/organisms/VisionModel/videoUpload";
+import { flattenError } from "better-auth";
 import { useRef, useState } from "react";
 
 export default function VM_SessionTemplate() {
@@ -63,6 +64,15 @@ export default function VM_SessionTemplate() {
                     type="button"
                     variant="outline"
                     onClick={() => {
+                      setInferenceSettings((settings) => ({
+                        ...settings,
+                        runInference: false,
+                      }));
+                      setDetectionSettings((settings) => ({
+                        ...settings,
+                        runDetection: false,
+                      }));
+                      setImageUpload(null);
                       SetShowVideoPopUp(true);
                     }}
                     size="default"

@@ -11,7 +11,7 @@ struct slice_param {
 // tha buffers i made
 
 //PARM_LIST
-@group(0) @binding(0) var<storage, read> params_list: array<slice_param, 5>;
+@group(0) @binding(0) var<storage, read> params_list: array<slice_param, 3>;
 // INPUT
 @group(0) @binding(1) var<storage, read> input_bytes: array<u32>;
 // OUTPUT
@@ -47,7 +47,7 @@ fn main(
     let out_y = global_id.y;
     let slice_index = workgroup_id.z;
 
-    if (out_x >= 640u || out_y >=640u){
+    if (out_x >= 640u || out_y >=640u || slice_index >= 3u){
     return;
     }
 

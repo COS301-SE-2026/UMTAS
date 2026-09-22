@@ -36,11 +36,6 @@ class Pose_Data_Manager {
           this.worker?.removeEventListener("message", handleMessage);
           this.isProcessing = false;
 
-          const durationSeconds = (performance.now() - startTime) / 1000;
-          console.log(
-            `POSE data parsing pipeline took: ${durationSeconds.toFixed(3)}s`,
-          );
-
           resolve(message.payload); // TODO
         }
       };

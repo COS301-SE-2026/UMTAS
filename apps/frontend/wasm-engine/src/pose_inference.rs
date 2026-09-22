@@ -83,8 +83,8 @@ pub fn read_result(slice_data: &[f32]) -> Result<Vec<DetectedPersonPose>, String
     let mut people: Vec<DetectedPersonPose> = Vec::new();
 
     const NUM_FEATURES: usize = 56;
-    const CONFIDENCE_THRESHOLD: f32 = 0.5;
-    const KEYPOINT_CONFIDENCE_THRESHOLD: f32 = 0.3;
+    const CONFIDENCE_THRESHOLD: f32 = 0.15;
+    const KEYPOINT_CONFIDENCE_THRESHOLD: f32 = 0.2;
 
     if slice_data.is_empty() || slice_data.len() % NUM_FEATURES != 0 {
         return Err(format!(
@@ -118,7 +118,7 @@ pub fn read_result(slice_data: &[f32]) -> Result<Vec<DetectedPersonPose>, String
             {
                 continue;
             }
-            
+
             let left_elbow = get_kp(slice_data, 7, anchor_idx, num_anchors);
             let right_elbow = get_kp(slice_data, 8, anchor_idx, num_anchors);
             let left_wrist = get_kp(slice_data, 9, anchor_idx, num_anchors);
@@ -157,13 +157,9 @@ pub fn map_to_global(
     mut people: Vec<DetectedPersonPose>,
     quad_idx: usize,
 ) -> Vec<DetectedPersonPose> {
-    // will map a single array of People changing co-ords to be global instead of local
-
     let (offset_x, offset_y) = match quad_idx {
         0 => (0.0, 0.0),
         1 => (640.0, 0.0),
-        2 => (0.0, 640.0),
-        3 => (640.0, 640.0),
         _ => (0.0, 0.0),
     };
 

@@ -251,8 +251,6 @@ pub fn map_to_global(mut people: Vec<DetectedPerson>, quad_idx: usize) -> Vec<De
     let (offset_x, offset_y) = match quad_idx {
         0 => (0.0, 0.0),
         1 => (640.0, 0.0),
-        2 => (0.0, 640.0),
-        3 => (640.0, 640.0),
         _ => (0.0, 0.0),
     };
 
