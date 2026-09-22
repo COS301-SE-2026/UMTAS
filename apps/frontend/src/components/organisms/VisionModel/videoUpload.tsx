@@ -8,6 +8,7 @@ import SessionStorePose, {
   frameStore,
 } from "../../../../utilities/VisionModel/sessionStore/poseSessionStore";
 import { drawPoint, drawSegment } from "./CameraCanvas";
+import { Label } from "@/components/atoms/baseShadcn/label";
 
 export default function VideoUploadComp() {
   const [video, SetVideo] = useState<File | null>(null);
@@ -17,10 +18,17 @@ export default function VideoUploadComp() {
   const uploadVideoRef = useRef<HTMLInputElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const frameStore = useRef<SessionStorePose>(null);
+  const [frameInterval, setFrameInterval] = useState<number>(0.5);
+  const frameIntervalRef = useRef<number>(0.5);
+
+  const [eta, setEta] = useState<string>("Calculating...");
+  const [currentTimeDisplay, setCurrentTimeDisplay] = useState<string>("0:00");
+  const startTimeRef = useRef<number>(0);
 
   async function processVideo(file: File) {
     setIsProcessing(true);
     setProgress(0);
+    startTimeRef.current = performance.now();
 
     const videoUrl = URL.createObjectURL(file);
     const video = document.createElement("video");
@@ -36,9 +44,8 @@ export default function VideoUploadComp() {
     if (frameStore.current == null) {
       frameStore.current = new SessionStorePose();
       await frameStore.current.ready();
-      frameStore.current.clear();
     }
-
+    frameStore.current.clear();
     const canvas = canvasRef.current;
     const context = canvas?.getContext("2d", { willReadFrequently: true });
 
@@ -49,7 +56,7 @@ export default function VideoUploadComp() {
     }
 
     const duration = video.duration;
-    const STEP_SECONDS = 0.5;
+
     let currentTime = 0;
     let numFrames = 0;
 
@@ -90,6 +97,10 @@ export default function VideoUploadComp() {
           ?.people ?? []) {
           const data = frameOfPeople.pose_data;
 
+          if (numFrames - frameOfPeople.last_seen_frame > 3) {
+            continue;
+          }
+
           context.fillStyle = "#00ff00";
           context.font = "14px sans-serif";
           context.fillText(
@@ -128,12 +139,27 @@ export default function VideoUploadComp() {
           drawPoint(context, rightWrist);
         }
 
-        currentTime += STEP_SECONDS;
+        currentTime += frameIntervalRef.current;
         if (currentTime > duration) {
           currentTime = duration;
         }
         const progressVal = (currentTime / duration) * 100;
         setProgress(progressVal);
+
+        const elapsed = (performance.now() - startTimeRef.current) / 1000;
+        const rate = currentTime / elapsed;
+        const remainingSeconds = rate > 0 ? (duration - currentTime) / rate : 0;
+        const mins = Math.floor(remainingSeconds / 60);
+        const secs = Math.floor(remainingSeconds % 60);
+        setEta(`${mins}:${secs.toString().padStart(2, "0")}`);
+
+        const curMins = Math.floor(currentTime / 60);
+        const curSecs = Math.floor(currentTime % 60);
+        const durMins = Math.floor(duration / 60);
+        const durSecs = Math.floor(duration % 60);
+        setCurrentTimeDisplay(
+          `${curMins}:${curSecs.toString().padStart(2, "0")} / ${durMins}:${durSecs.toString().padStart(2, "0")}`,
+        );
       }
     } catch (err) {
       console.error("Error Processing video", err);
@@ -151,7 +177,13 @@ export default function VideoUploadComp() {
         </h1>
         <div className="h-full w-full p-2">
           <div className="w-full h-1/10 p-2 gap-y-1 flex flex-col ">
-            <h1>Progress {video && `${progress.toFixed(2)}`} </h1>
+            <div className="flex justify-between text-sm text-[var(--text-secondary)]">
+              <h1>
+                Progress {video && `${progress.toFixed(2)}%`} (
+                {currentTimeDisplay})
+              </h1>
+              <h1>ETA: {video ? eta : "--:--"}</h1>
+            </div>
             <Progress className="border h-5 " value={progress}></Progress>
           </div>
           <div className="h-9/10 p-2 w-full grid grid-cols-2 ">
@@ -195,16 +227,25 @@ export default function VideoUploadComp() {
                 >
                   {video == null ? <>Upload Video</> : <>Cancel Upload</>}
                 </Button>
-                <Button
-                  disabled={video == null}
-                  type="button"
-                  variant="outline"
-                  onClick={() => {}}
-                  size="default"
-                  className="h-8 w-40  cursor-pointer"
-                >
-                  Pause Upload
-                </Button>
+                <Label className=" flex flex-col  w-full  text-md font-medium text-[var(--text-primary)] text-left pl-1">
+                  Detection Interval
+                  <Input
+                    value={frameInterval}
+                    onChange={(e) => {
+                      if (Number(e.target.value) > 0.5) {
+                        const val = Number(e.target.value);
+                        setFrameInterval(val);
+                        frameIntervalRef.current = val;
+                      }
+                    }}
+                    min={0.5}
+                    max={100}
+                    step={0.5}
+                    type="number"
+                    placeholder="0"
+                    className="h-8 w-40 rounded-md border border-[var(--border)] bg-transparent px-2 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--ring)]"
+                  />
+                </Label>
               </div>
             </div>
             <div className="w-full h-full  p-2">

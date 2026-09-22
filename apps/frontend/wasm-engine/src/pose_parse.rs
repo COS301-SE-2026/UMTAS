@@ -73,7 +73,7 @@ pub fn attach_id(
     prev_frame: FrameStore,
 ) -> FrameStore {
     let mut new_people: Vec<SinglePersonSessionData> = [].to_vec();
-    const IOU_THRESHOLD: f32 = 0.10;
+    const IOU_THRESHOLD: f32 = 0.1;
     // check array
     let mut matched_prev_indices = vec![false; prev_frame.people.len()];
     let mut matched_new_indices = vec![false; new_frame_people.len()];
