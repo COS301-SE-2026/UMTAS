@@ -1,0 +1,14 @@
+apps/backend/test/integration/steps/attendance-session.step.ts
+  h_2d4b3dca70a3d8 92-93
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "bf53526132633eecfa6fbc11c91dd5c7bdd1f5f8",
+  "prompts": {},
+  "humans": {
+    "h_2d4b3dca70a3d8": {
+      "author": "marcelstoltz00 <marcelstoltz00@gmail.com>"
+    }
+  }
+}
