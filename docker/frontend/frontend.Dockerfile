@@ -62,8 +62,7 @@ ENV NEXT_PUBLIC_APP_ENV=${NEXT_PUBLIC_APP_ENV}
 COPY packages/shared-types/ ./packages/shared-types/
 COPY apps/frontend/ ./apps/frontend/
 
-# Copy built Rust wasm engine output to frontend apps directory
-COPY --from=rust-builder /app/wasm-engine/pkg ./apps/frontend/wasm-engine/pkg
+COPY --from=rust-builder /app/wasm-engine/pkg ./wasm-engine/pkg
 
 # Copy both exported vision models into public models path
 COPY --from=rust-builder /app/models-output/yolo26n.onnx ./apps/frontend/public/models/yolo26n.onnx
