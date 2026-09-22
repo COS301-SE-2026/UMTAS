@@ -32,6 +32,34 @@ export default function VideoUploadComp() {
       setIsProcessing(false);
       return;
     }
+
+    const duration = video.duration;
+    const STEP_SECONDS = 0.5;
+    let currentTime = 0;
+
+    try {
+      while (currentTime < duration) {
+        video.currentTime = currentTime;
+        await new Promise((res) => {
+          video.onseeked = res;
+        });
+
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const imageData = context.getImageData(
+          0,
+          0,
+          canvas.width,
+          canvas.height,
+        );
+
+        currentTime += STEP_SECONDS;
+      }
+    } catch (err) {
+      console.error("Error Processing video", err);
+    } finally {
+      URL.revokeObjectURL(videoUrl);
+      setIsProcessing(false);
+    }
   }
 
   return (
