@@ -7,6 +7,7 @@ import { pose_data_manager } from "../../../../utilities/VisionModel/pose_data_m
 import SessionStorePose, {
   frameStore,
 } from "../../../../utilities/VisionModel/sessionStore/poseSessionStore";
+import { drawPoint, drawSegment } from "./CameraCanvas";
 
 export default function VideoUploadComp() {
   const [video, SetVideo] = useState<File | null>(null);
@@ -67,22 +68,69 @@ export default function VideoUploadComp() {
           canvas.height,
         );
 
-        await pose_Manager
-          .run(imageData?.data, canvas.width, canvas.height)
-          .then((results) => {
-            if (results) {
-              pose_data_manager.run(results).then((people) => {
-                if (people) {
-                  const frame = ++numFrames;
-                  if (frameStore.current?.getNumFrames() === 0) {
-                    frameStore.current.sendFirst(frame, timestamp, people);
-                  } else frameStore.current?.sendData(frame, timestamp, people);
-                }
-              });
+        const results = await pose_Manager.run(
+          imageData?.data,
+          canvas.width,
+          canvas.height,
+        );
+        if (results) {
+          const people = await pose_data_manager.run(results);
+          if (people) {
+            const frame = ++numFrames;
+            if (frameStore.current?.getNumFrames() === 0) {
+              frameStore.current.sendFirst(frame, timestamp, people);
+            } else {
+              frameStore.current?.sendData(frame, timestamp, people);
             }
-          });
+          }
+        }
+
+        for (const frameOfPeople of frameStore.current?.getLastFrame()
+          ?.people ?? []) {
+          const data = frameOfPeople.pose_data;
+
+          context.fillStyle = "#00ff00";
+          context.font = "14px sans-serif";
+          context.fillText(
+            `ID ${frameOfPeople.assigned_id.toString()}`,
+            data.person.top_left_x,
+            Math.max(data.person.top_left_y - 5, 15),
+          );
+
+          context.strokeStyle = "#00ffff";
+          context.fillStyle = "#00ffff";
+          context.lineWidth = 2;
+
+          const leftElbow = data.left_arm?.[0];
+          const leftWrist = data.left_arm?.[1];
+
+          const rightElbow = data.right_arm?.[0];
+          const rightWrist = data.right_arm?.[1];
+
+          drawSegment(context, data.left_shoulder, data.center_mass);
+          drawSegment(context, data.right_shoulder, data.center_mass);
+
+          drawSegment(context, data.left_shoulder, leftElbow);
+          drawSegment(context, leftElbow, leftWrist);
+
+          drawSegment(context, data.right_shoulder, rightElbow);
+          drawSegment(context, rightElbow, rightWrist);
+          drawSegment(context, data.nose, data.center_mass);
+
+          drawPoint(context, data.nose);
+          drawPoint(context, data.center_mass);
+          drawPoint(context, data.left_shoulder);
+          drawPoint(context, leftElbow);
+          drawPoint(context, leftWrist);
+          drawPoint(context, data.right_shoulder);
+          drawPoint(context, rightElbow);
+          drawPoint(context, rightWrist);
+        }
 
         currentTime += STEP_SECONDS;
+        numFrames++;
+        const progressVal = (currentTime / duration) * 100;
+        setProgress(progressVal);
       }
     } catch (err) {
       console.error("Error Processing video", err);
@@ -101,7 +149,7 @@ export default function VideoUploadComp() {
         <div className="h-full w-full p-2">
           <div className="w-full h-1/10 p-2 gap-y-1 flex flex-col ">
             <h1>Progress </h1>
-            <Progress value={progress}></Progress>
+            <Progress className="border h-2" value={progress}></Progress>
           </div>
           <div className="h-9/10 p-2 w-full grid grid-cols-2 ">
             <div className="w-full h-full p-2  ">

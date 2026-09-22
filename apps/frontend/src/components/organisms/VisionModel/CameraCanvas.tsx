@@ -14,7 +14,7 @@ import SessionStorePose from "../../../../utilities/VisionModel/sessionStore/pos
 
 const KEY_SCORE_THRESHOLD = 0.15;
 
-function drawSegment(
+export function drawSegment(
   ctx: CanvasRenderingContext2D,
   kp1?: Keypoint,
   kp2?: Keypoint,
@@ -32,7 +32,7 @@ function drawSegment(
   }
 }
 
-function drawPoint(ctx: CanvasRenderingContext2D, kp?: Keypoint) {
+export function drawPoint(ctx: CanvasRenderingContext2D, kp?: Keypoint) {
   if (kp && kp.score > KEY_SCORE_THRESHOLD) {
     ctx.beginPath();
     ctx.arc(kp.x, kp.y, 1.5, 0, 2 * Math.PI);
