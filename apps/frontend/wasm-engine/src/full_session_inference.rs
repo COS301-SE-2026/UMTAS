@@ -18,6 +18,7 @@ pub fn analyse_session(frames: JsValue) -> Result<String, JsValue> {
 
 pub fn group_data(full_session: HashMap<usize, SessionPerson>) -> SessionAnalysis {
     let mut total_restless: usize = 0;
+
     let mut total_question: usize = 0;
 
     for (id, session) in full_session {

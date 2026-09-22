@@ -294,28 +294,14 @@ function CanvasWebcam({
                 person.width,
                 person.height,
               );
-
-              context.fillStyle = "#00ff00";
-              context.font = "14px sans-serif";
-              context.fillText(
-                `Person ${(person.confidence * 100).toFixed(0)}%`,
-                person.top_left_x,
-                Math.max(person.top_left_y - 5, 15),
-              );
             }
           }
 
           if (inferenceSettings.runInference) {
-            let handsUpCount = 0;
             const ids: number[] = [];
             for (const frameOfPeople of frameStore.current?.getLastFrame()
               ?.people ?? []) {
               const data = frameOfPeople.pose_data;
-
-              if (frameOfPeople.hand_up) {
-                handsUpCount++;
-                ids.push(frameOfPeople.assigned_id);
-              }
 
               if (frameCounterRef.current - frameOfPeople.last_seen_frame > 5) {
                 continue;
@@ -357,7 +343,6 @@ function CanvasWebcam({
               drawPoint(context, rightElbow);
               drawPoint(context, rightWrist);
             }
-            console.log(`Number of hands up ${handsUpCount}`, ids);
           }
         }
       }
