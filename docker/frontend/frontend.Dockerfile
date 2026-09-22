@@ -2,6 +2,7 @@ FROM rust:slim AS rust-builder
 RUN apt-get update && apt-get install -y \
     curl \
     python3 \
+    python3-venv \
     python3-pip \
     build-essential \
     libxcb1 \
@@ -12,10 +13,15 @@ RUN apt-get update && apt-get install -y \
 RUN curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 WORKDIR /app
 
-RUN pip3 install --no-cache-dir ultralytics onnx onnxruntime --break-system-packages && \
+
+RUN python3 -m venv .venv && \
+    .venv/bin/pip install --no-cache-dir ultralytics onnx onnxruntime && \
     mkdir -p /app/models-output && \
-    yolo export model=yolov11n.pt format=onnx imgsz=640 && \
-    mv yolov11n.onnx /app/models-output/yolov11n.onnx
+    .venv/bin/yolo export model=yolo26n.pt format=onnx imgsz=640 && \
+    mv yolo26n.onnx /app/models-output/yolo26n.onnx && \
+    .venv/bin/yolo export model=yolo26n-pose.pt format=onnx imgsz=640 && \
+    mv yolo26n-pose.onnx /app/models-output/yolo26n-pose.onnx && \
+    rm -rf .venv
 
 COPY apps/frontend/wasm-engine ./wasm-engine
 WORKDIR /app/wasm-engine
@@ -53,15 +59,17 @@ ENV NEXT_PUBLIC_POSTHOG_PT=${NEXT_PUBLIC_POSTHOG_PT}
 ENV NEXT_PUBLIC_POSTHOG_API_HOST=${NEXT_PUBLIC_POSTHOG_API_HOST}
 ENV NEXT_PUBLIC_APP_ENV=${NEXT_PUBLIC_APP_ENV}
 
-
 COPY packages/shared-types/ ./packages/shared-types/
 COPY apps/frontend/ ./apps/frontend/
 
-# rust stuff -->deprecated
+# Copy built Rust wasm engine output to frontend apps directory
 COPY --from=rust-builder /app/wasm-engine/pkg ./apps/frontend/wasm-engine/pkg
-COPY --from=rust-builder /app/models-output/yolov11n.onnx ./apps/frontend/public/models/yolov11n.onnx
 
-# Wasm stuff 
+# Copy both exported vision models into public models path
+COPY --from=rust-builder /app/models-output/yolo26n.onnx ./apps/frontend/public/models/yolo26n.onnx
+COPY --from=rust-builder /app/models-output/yolo26n-pose.onnx ./apps/frontend/public/models/yolo26n-pose.onnx
+
+# Wasm runtime setup stuff
 RUN mkdir -p apps/frontend/public/wasm && \
     cp node_modules/onnxruntime-web/dist/ort-wasm*.wasm apps/frontend/public/wasm/ 2>/dev/null || \
     cp apps/frontend/node_modules/onnxruntime-web/dist/ort-wasm*.wasm apps/frontend/public/wasm/ 2>/dev/null || \
