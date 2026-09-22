@@ -41,8 +41,10 @@ import {
 } from 'src/entities';
 import { CourseService } from 'src/Course/course.service';
 import { GroupingService } from 'src/Grouping/grouping.service';
-import { EventService } from 'src/Events/event.service';
 import { isNotNull } from 'drizzle-orm';
+import { EventDto } from 'src/Events/dto/EventDto.dto';
+import { EventWithModule } from 'src/Events/dto/event.types';
+import { EventServiceV2 } from 'src/Events/eventV2.service';
 
 @Injectable()
 export class ModuleServiceV2 extends ModuleService {
@@ -52,8 +54,8 @@ export class ModuleServiceV2 extends ModuleService {
     protected readonly dbService: DatabaseService,
     protected readonly courseService: CourseService,
     protected readonly groupingService: GroupingService,
-    @Inject(forwardRef(() => EventService))
-    protected readonly eventService: EventService,
+    @Inject(forwardRef(() => EventServiceV2))
+    protected readonly eventService: EventServiceV2,
   ) {
     super(dbService, courseService, groupingService);
   }
@@ -64,148 +66,141 @@ export class ModuleServiceV2 extends ModuleService {
     dto: CreateModuleDto,
     tx?: AppDatabase,
   ): Promise<ModuleSingleResponseDto> {
-    try {
-      if (!tx) {
-        return this.dbService.db.transaction(async (t: AppDatabase) => {
-          return this.create(userId, dto, t);
-        }); //END_transaction
-      } //END_transaction precencer check
+    if (!tx) {
+      return this.dbService.db.transaction(async (t: AppDatabase) => {
+        return this.create(userId, dto, t);
+      }); //END_transaction
+    } //END_transaction precencer check
 
-      //Get + Validate GroupId with CourseID and ModulegroupingID
-      const groupId = await this.getGroupId(
-        tx,
-        dto.CourseID,
-        dto.ModuleGroupingID,
+    //Get + Validate GroupId with CourseID and ModulegroupingID
+    const groupId = await this.getGroupId(
+      tx,
+      dto.CourseID,
+      dto.ModuleGroupingID,
+    );
+
+    //Validate dto
+    const validatedDto: CreateModuleDto =
+      await this.validateCreateModuleDto(dto);
+
+    const code = validatedDto.moduleCode;
+    const name = validatedDto.moduleName;
+    const description = validatedDto.moduleDescription;
+    const ExternalID = validatedDto.ExternalID;
+    const validated = validatedDto.validated;
+
+    //Check for duplicate moduleCode in ModuleGrouping
+    const existing = await this.existingModuleCodeForModuleGroupingV2(
+      userId,
+      code,
+      groupId,
+      tx,
+    );
+
+    if (existing) return existing; //Return Early if already exists
+
+    //Create new module
+    const [newModule] = await tx
+      .insert(modules)
+      .values({
+        moduleCode: code,
+        moduleName: name,
+        moduleDescription: description,
+        validated,
+        ExternalID,
+        createdAt: new Date(),
+      })
+      .returning();
+
+    if (!newModule) {
+      this.OOPSIE.fatal(
+        `Failed to create module for CreateModuleDto[${JSON.stringify(validatedDto)}]`,
       );
+      throw new InternalServerErrorException('Module failed to be created');
+    }
 
-      //Validate dto
-      const validatedDto: CreateModuleDto =
-        await this.validateCreateModuleDto(dto);
+    //Start constructing response
+    const response: ModuleSingleResponseDto = {
+      ...newModule,
+    };
 
-      const code = validatedDto.moduleCode;
-      const name = validatedDto.moduleName;
-      const description = validatedDto.moduleDescription;
-      const ExternalID = validatedDto.ExternalID;
-      const validated = validatedDto.validated;
+    //Group module to its group
+    const moduleGroup = await this.groupingService.populateGroup(
+      groupId,
+      [newModule.moduleID],
+      tx,
+    );
 
-      //Check for duplicate moduleCode in ModuleGrouping
-      const existing = await this.existingModuleCodeForModuleGroupingV2(
-        userId,
-        code,
-        groupId,
-        tx,
-      );
+    response.ModuleGroupingID = moduleGroup.GroupID;
 
-      if (existing) return existing; //Return Early if already exists
+    //Course Module metadata logic - only when courseId specified
+    const courseId = dto.CourseID;
 
-      //Create new module
-      const [newModule] = await tx
-        .insert(modules)
+    if (courseId && dto.CourseModuleInfo) {
+      //Fetch GroupModule entry for module to add metadata to
+      const [groupModule] = await tx
+        .select()
+        .from(GroupModules)
+        .where(
+          and(
+            eq(GroupModules.GroupID, moduleGroup.GroupID),
+            eq(GroupModules.ModuleID, newModule.moduleID),
+          ),
+        )
+        .limit(1);
+
+      if (!groupModule) {
+        this.OOPSIE.error(
+          `No GroupModules entry for your module[${JSON.stringify(response)}]`,
+        );
+        throw new InternalServerErrorException(
+          `Couldn't find group module entry in join table :(`,
+        );
+      }
+
+      //Default fields
+      const core = validatedDto.CourseModuleInfo?.Core ?? false;
+      const semOfStudy =
+        validatedDto.CourseModuleInfo?.SemesterOfStudy ?? 'yearly';
+      const yearOfStudy = validatedDto.CourseModuleInfo?.YearOfStudy ?? 1;
+
+      //Add metadata to groupModule entity
+      const [courseModuleInfo] = await tx
+        .insert(CourseModule)
         .values({
-          moduleCode: code,
-          moduleName: name,
-          moduleDescription: description,
-          validated,
-          ExternalID,
-          createdAt: new Date(),
+          CourseID: courseId,
+          GroupModuleID: groupModule.GroupModuleID,
+          Core: core,
+          SemesterOfStudy: semOfStudy,
+          YearOfStudy: yearOfStudy,
         })
         .returning();
 
-      if (!newModule) {
+      if (!courseModuleInfo) {
         this.OOPSIE.fatal(
-          `Failed to create module for CreateModuleDto[${JSON.stringify(validatedDto)}]`,
+          `Failed to add CourseModule metadata for groupModule entry[${groupModule.GroupModuleID}]`,
         );
-        throw new InternalServerErrorException('Module failed to be created');
+        throw new InternalServerErrorException(
+          `Failed to add CourseModule metadata for groupModule entry[${groupModule.GroupModuleID}]`,
+        );
       }
 
-      //Start constructing response
-      const response: ModuleSingleResponseDto = {
-        ...newModule,
-      };
+      response.CourseModuleInfo = courseModuleInfo;
+    } //END_COurseModule metadata logic
 
-      //Group module to its group
-      const moduleGroup = await this.groupingService.populateGroup(
-        groupId,
-        [newModule.moduleID],
+    //Styling
+    if (dto.styling) {
+      const styling = await this.setStyling(
+        newModule.moduleID,
+        userId,
+        dto.styling.colour,
         tx,
       );
 
-      response.ModuleGroupingID = moduleGroup.GroupID;
+      response.styling = styling.styling;
+    } //END_Styling
 
-      //Course Module metadata logic - only when courseId specified
-      const courseId = dto.CourseID;
-
-      if (courseId && dto.CourseModuleInfo) {
-        //Fetch GroupModule entry for module to add metadata to
-        const [groupModule] = await tx
-          .select()
-          .from(GroupModules)
-          .where(
-            and(
-              eq(GroupModules.GroupID, moduleGroup.GroupID),
-              eq(GroupModules.ModuleID, newModule.moduleID),
-            ),
-          )
-          .limit(1);
-
-        if (!groupModule) {
-          this.OOPSIE.error(
-            `No GroupModules entry for your module[${JSON.stringify(response)}]`,
-          );
-          throw new InternalServerErrorException(
-            `Couldn't find group module entry in join table :(`,
-          );
-        }
-
-        //Default fields
-        const core = validatedDto.CourseModuleInfo?.Core ?? false;
-        const semOfStudy =
-          validatedDto.CourseModuleInfo?.SemesterOfStudy ?? 'yearly';
-        const yearOfStudy = validatedDto.CourseModuleInfo?.YearOfStudy ?? 1;
-
-        //Add metadata to groupModule entity
-        const [courseModuleInfo] = await tx
-          .insert(CourseModule)
-          .values({
-            CourseID: courseId,
-            GroupModuleID: groupModule.GroupModuleID,
-            Core: core,
-            SemesterOfStudy: semOfStudy,
-            YearOfStudy: yearOfStudy,
-          })
-          .returning();
-
-        if (!courseModuleInfo) {
-          this.OOPSIE.fatal(
-            `Failed to add CourseModule metadata for groupModule entry[${groupModule.GroupModuleID}]`,
-          );
-          throw new InternalServerErrorException(
-            `Failed to add CourseModule metadata for groupModule entry[${groupModule.GroupModuleID}]`,
-          );
-        }
-
-        response.CourseModuleInfo = courseModuleInfo;
-      } //END_COurseModule metadata logic
-
-      //Styling
-      if (dto.styling) {
-        const styling = await this.setStyling(
-          newModule.moduleID,
-          userId,
-          dto.styling.colour,
-          tx,
-        );
-
-        response.styling = styling.styling;
-      } //END_Styling
-
-      return response;
-    } catch (error) {
-      this.OOPSIE.warn(`create: Something went wrong - [${error}]`);
-      throw new InternalServerErrorException(
-        `CreateModule - V2: Something went wrong`,
-      );
-    }
+    return response;
   }
 
   //getAll, overwrite
@@ -215,26 +210,10 @@ export class ModuleServiceV2 extends ModuleService {
     tx?: AppDatabase,
   ): Promise<ModuleListResponseDtoV2> {
     const db = tx ?? this.dbService.db;
-    const uniId = filters.universityId?.trim();
-    const courseId = filters.courseId?.trim();
-    const groupId = filters.GroupID?.trim();
-    const moduleCode = filters.moduleCode?.trim();
-    const enroll = filters.userEnrollment;
 
-    let foundModules: ModuleSingleResponseDto[] = [];
+    const whereClause = this.buildModuleFilters(userId, filters);
 
-    const conditions: SQL[] = [];
-
-    if (uniId) conditions.push(eq(Course.UniversityID, uniId));
-    if (courseId) conditions.push(eq(CourseModule.CourseID, courseId));
-    if (groupId) conditions.push(eq(GroupModules.GroupID, groupId));
-    if (moduleCode)
-      conditions.push(ilike(modules.moduleCode, `%${moduleCode}%`));
-    if (enroll) conditions.push(eq(ModuleEnrollment.UserID, userId));
-
-    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
-
-    foundModules = await db
+    const foundModules = await db
       .select({
         ...getTableColumns(modules),
         styling: ModuleStyling.styling ?? null,
@@ -265,36 +244,23 @@ export class ModuleServiceV2 extends ModuleService {
       .where(whereClause)
       .orderBy(modules.moduleCode);
 
-    //Filter for unique moduleIDs
-    const uniqueModules = foundModules.filter(
-      (module, index, self) =>
-        index === self.findIndex((m) => m.moduleID === module.moduleID),
-    );
+    const uniqueModules = this.deduplicateModules(foundModules);
 
-    //Add events per module
-    const modulesWithEvents = await Promise.all(
-      uniqueModules.map(async (module) => ({
-        ...module,
-        Events: (
-          await this.eventService.getAllEvents(
-            userId,
-            {
-              moduleId: module.moduleID,
-            },
-            tx,
-          )
-        ).events,
-      })),
-    ); //END_promise all
+    const moduleIds = uniqueModules.map((module) => module.moduleID);
+
+    const events = await this.eventService.getEventsByModules(moduleIds, db);
+
+    const eventsByModule = this.groupEventsByModule(events);
+
+    const modulesWithEvents = uniqueModules.map((module) => ({
+      ...module,
+      Events: eventsByModule.get(module.moduleID) ?? [],
+    }));
 
     return {
       modules: modulesWithEvents,
       message: `Returning: ${uniqueModules.length}-Modules. | With filters: ${JSON.stringify(filters)}`,
-      ...(filters.Stats && filters.Stats === true
-        ? {
-            count: foundModules.length,
-          }
-        : {}),
+      ...(filters.Stats ? { count: uniqueModules.length } : {}),
     };
   } //getAll
 
@@ -613,7 +579,7 @@ export class ModuleServiceV2 extends ModuleService {
     userId: string,
     moduleCode: string,
     groupId: string,
-    tx: DatabaseService['db'],
+    tx: AppDatabase,
   ): Promise<ModuleSingleResponseDto | null> {
     const [existingModule] = await tx
       .select({
@@ -638,4 +604,98 @@ export class ModuleServiceV2 extends ModuleService {
     //If module exists with moduleCode for moduleGrouping, return true else false
     return this.getById(userId, existingModule.moduleId);
   }
-}
+
+  /**
+   * Builds a SQL WHERE clause from module filters.
+   *
+   * @param userId - User ID used when `userEnrollment` is set.
+   * @param filters - Module filter DTO.
+   * @returns Combined AND clause, or undefined when no filters are set.
+   */
+  private buildModuleFilters(
+    userId: string,
+    filters: ModuleFiltersDtoV2,
+  ): SQL | undefined {
+    const conditions: SQL[] = [];
+
+    const universityId = filters.universityId?.trim();
+    const courseId = filters.courseId?.trim();
+    const groupId = filters.GroupID?.trim();
+    const moduleCode = filters.moduleCode?.trim();
+
+    //UniId
+    if (universityId) {
+      conditions.push(eq(Course.UniversityID, universityId));
+    }
+
+    //CourseId
+    if (courseId) {
+      conditions.push(eq(CourseModule.CourseID, courseId));
+    }
+
+    //GroupId
+    if (groupId) {
+      conditions.push(eq(GroupModules.GroupID, groupId));
+    }
+
+    //Modulecode
+    if (moduleCode) {
+      conditions.push(ilike(modules.moduleCode, `%${moduleCode}%`));
+    }
+
+    //user enrollemnt
+    if (filters.userEnrollment) {
+      conditions.push(eq(ModuleEnrollment.UserID, userId));
+    }
+
+    return conditions.length > 0 ? and(...conditions) : undefined;
+  } //END_buildModuleFilters
+
+  /**
+   * Removes duplicate modules by moduleID, keeping the first occurrence.
+   *
+   * @param foundModules - Modules that may contain duplicates.
+   * @returns Modules with duplicates removed, original order preserved.
+   */
+  private deduplicateModules(
+    foundModules: ModuleSingleResponseDto[],
+  ): ModuleSingleResponseDto[] {
+    const seen = new Set<string>();
+    const uniqueModules: ModuleSingleResponseDto[] = [];
+
+    for (const m of foundModules) {
+      if (seen.has(m.moduleID)) {
+        continue;
+      }
+
+      seen.add(m.moduleID);
+      uniqueModules.push(m);
+    } //END_m
+
+    return uniqueModules;
+  } //END_deduplicateModules
+
+  /**
+   * Groups events by their module ID.
+   *
+   * @param events - Events with their module ID.
+   * @returns Map of module ID to its event list.
+   */
+  private groupEventsByModule(
+    events: EventWithModule[],
+  ): Map<string, EventDto[]> {
+    const eventsByModule = new Map<string, EventDto[]>();
+
+    for (const { moduleId, event } of events) {
+      const moduleEvents = eventsByModule.get(moduleId);
+
+      if (moduleEvents) {
+        moduleEvents.push(event);
+      } else {
+        eventsByModule.set(moduleId, [event]);
+      }
+    } //END_for
+
+    return eventsByModule;
+  } //END_groupEventsByModule
+} //END_ModuleV2Service

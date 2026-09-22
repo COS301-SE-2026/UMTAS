@@ -1,12 +1,15 @@
 "use client";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { AdvancedMarker, Pin } from "@vis.gl/react-google-maps";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { MapScreen } from "@/components/organisms/map/MapScreen";
 import { useShapeCreator } from "@/hooks/useShapeCreator";
 import { Badge } from "@/components/atoms/baseShadcn/badge";
-import { getAllBuildingsQ } from "../../../../utilities/building/buildingQueries";
+import {
+  getAllBuildingsHeatmapQ,
+  getAllBuildingsQ,
+} from "../../../../utilities/building/buildingQueries";
 import { BuildingType } from "../../../../utilities/building/buildingRequestBuilder";
 import {
   Sheet,
@@ -17,13 +20,32 @@ import {
 import NoRoleSelected from "@/components/molecules/roleManagement/NoRoleSelected";
 import { AdminDrawControls } from "@/components/organisms/map/AdminDrawControls";
 import { RouteLine } from "@/components/organisms/map/RouteLine";
-import { getActiveRouteQ } from "../../../../utilities/route/routeQueries";
+import {
+  getActiveRouteQ,
+  getRoutingHeatmapQ,
+} from "../../../../utilities/route/routeQueries";
 import {
   UniversityStateLoading,
   useUniversityState,
 } from "@/hooks/useUniversityState";
 import Tutorial from "@/components/organisms/nav/Tutorial";
 import { useBuildingDraw } from "@/hooks/useBuildingDraw";
+import {
+  buildingHeatmapRangeToPoints,
+  routeHeatmapRangeToPoints,
+  WeightedPoint,
+} from "../../../../utilities/heatmaps/heatmapAdapter";
+import { HourRangeSelect } from "@/components/molecules/heatmaps/HourRangeSelect";
+import { HeatmapOverlay } from "@/components/organisms/heatmaps/HeatmapOverlay";
+import { Button } from "@/components/atoms/baseShadcn/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/atoms/baseShadcn/select";
+import { BuildingSheet } from "@/components/organisms/map/BuildingSheet";
 
 interface GeoJsonPolygon {
   type: "Polygon";
@@ -71,6 +93,15 @@ export function UniMap() {
   const [selectedDate, setSelectedDate] = useState(() =>
     new Date().toISOString().slice(0, 10),
   );
+
+  //heatmap use state stuff
+  const [mapMode, setMapMode] = useState<"route" | "heatmap">("route");
+  const [fromHour, setFromHour] = useState(8);
+  const [toHour, setToHour] = useState(15);
+  const [metricMode, setMetricMode] = useState<"projected" | "worstCase">(
+    "projected",
+  );
+
   //this needs to be in a very specific format. Looks super complicated, but the backend cries when I don't send the request in this format
   const [selectedTime, setSelectedTime] = useState(() => {
     const now = new Date();
@@ -85,8 +116,46 @@ export function UniMap() {
   //console.log("active route query:", { selectedDate, selectedTime });
   const { data: activeRoute } = useQuery({
     ...getActiveRouteQ({ date: selectedDate, time: selectedTime }),
-    enabled: !isLoading && university != null,
+    enabled: !isLoading && university != null && mapMode === "route",
   });
+
+  //heatmap queries
+  const { data: buildingHeatmaps = [] } = useQuery({
+    ...getAllBuildingsHeatmapQ({ date: selectedDate }),
+    enabled: !isLoading && university != null && mapMode === "heatmap",
+  });
+
+  const { data: routeHeatmaps = [] } = useQuery({
+    ...getRoutingHeatmapQ({ date: selectedDate }),
+    enabled: !isLoading && university != null && mapMode === "heatmap",
+  });
+
+  const buildingHeatmapPoints: WeightedPoint[] = useMemo(() => {
+    if (mapMode !== "heatmap") {
+      return [];
+    }
+
+    return buildingHeatmapRangeToPoints(
+      buildingHeatmaps,
+      fromHour,
+      toHour,
+      metricMode,
+    );
+  }, [mapMode, buildingHeatmaps, fromHour, toHour, metricMode]);
+
+  const routeHeatmapPoints: WeightedPoint[] = useMemo(() => {
+    if (mapMode !== "heatmap") {
+      return [];
+    }
+
+    return routeHeatmapRangeToPoints(
+      routeHeatmaps,
+      fromHour,
+      toHour,
+      metricMode,
+    );
+  }, [mapMode, routeHeatmaps, fromHour, toHour, metricMode]);
+
   const role = university?.role;
   const isAssignedRole = role != null;
 
@@ -137,36 +206,110 @@ export function UniMap() {
           id="map-date-time"
           className="flex items-center gap-4 rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] p-4"
         >
+          <div className="flex rounded-lg border border-[var(--border)] overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setMapMode("route")}
+              className={`px-2 py-1 text-sm cursor-pointer ${
+                mapMode === "route"
+                  ? ""
+                  : "bg-bg-elevated text-(--text-secondary)"
+              }`}
+            >
+              Route
+            </button>
+            <button
+              type="button"
+              onClick={() => setMapMode("heatmap")}
+              className={`px-2 py-1 text-sm cursor-pointer ${
+                mapMode === "heatmap"
+                  ? ""
+                  : "bg-bg-elevated text-(--text-secondary) "
+              }`}
+            >
+              Heatmap
+            </button>
+          </div>
+
           <input
             type="date"
             value={selectedDate}
+            className="text-sm"
             onChange={(e) => setSelectedDate(e.target.value)}
           />
 
-          <input
-            type="time"
-            value={selectedTime}
-            onChange={(e) => setSelectedTime(e.target.value)}
-            className="text-sm"
-          />
+          {mapMode === "route" && (
+            <>
+              <input
+                type="time"
+                value={selectedTime}
+                onChange={(e) => setSelectedTime(e.target.value)}
+                className="text-sm"
+              />
 
-          {activeRoute?.status === "NONE" && (
-            <span className="text-sm text-[var(--text-secondary)]">
-              Select a Time and Date to View Attending Event Routes
-            </span>
+              {activeRoute?.status === "NONE" && (
+                <span className="text-sm text-[var(--text-secondary)]">
+                  Select a Time and Date to View Attending Event Routes
+                </span>
+              )}
+
+              {activeRoute?.status === "AT_VENUE" && (
+                <span className="text-sm text-[var(--text-secondary)]">
+                  At {activeRoute.fromEventName}
+                </span>
+              )}
+
+              {activeRoute?.status === "MOVING" && (
+                <span className="text-sm text-[var(--text-secondary)]">
+                  Walking from {activeRoute.fromEventName} to{" "}
+                  {activeRoute.toEventName}
+                </span>
+              )}
+            </>
           )}
 
-          {activeRoute?.status === "AT_VENUE" && (
-            <span className="text-sm text-[var(--text-secondary)]">
-              At {activeRoute.fromEventName}
-            </span>
-          )}
+          {mapMode === "heatmap" && (
+            <>
+              <Select
+                value={metricMode}
+                onValueChange={(value: "projected" | "worstCase") =>
+                  setMetricMode(value)
+                }
+              >
+                <SelectTrigger
+                  id="select-metric-mode"
+                  className="bg-[var(--bg-surface)] border-[var(--border)] cursor-pointer"
+                  title="Select Metric"
+                >
+                  <SelectValue placeholder="Select Metric" />
+                </SelectTrigger>
+                <SelectContent className="bg-[var(--bg-surface)] border-[var(--border)]">
+                  <SelectItem
+                    value="projected"
+                    className="text-[var(--text-primary)]"
+                  >
+                    Best Case
+                  </SelectItem>
+                  <SelectItem
+                    value="worstCase"
+                    className="text-[var(--text-primary)]"
+                  >
+                    Worst Case
+                  </SelectItem>
+                </SelectContent>
+              </Select>
 
-          {activeRoute?.status === "MOVING" && (
-            <span className="text-sm text-[var(--text-secondary)]">
-              Walking from {activeRoute.fromEventName} to{" "}
-              {activeRoute.toEventName}
-            </span>
+              <HourRangeSelect
+                value={{
+                  startTime: `${String(fromHour).padStart(2, "0")}:00`,
+                  endTime: `${String(toHour).padStart(2, "0")}:00`,
+                }}
+                onChange={(slot) => {
+                  setFromHour(parseInt(slot.startTime.split(":")[0], 10));
+                  setToHour(parseInt(slot.endTime.split(":")[0], 10));
+                }}
+              />
+            </>
           )}
         </div>
 
@@ -177,12 +320,19 @@ export function UniMap() {
             polygonPath={polygonPath}
             pinLocation={pinLocation}
           >
+            {mapMode === "heatmap" && (
+              <HeatmapOverlay
+                buildingPoints={buildingHeatmapPoints}
+                routePoints={routeHeatmapPoints}
+              />
+            )}
+
             {buildings.map((building) => (
-              <div key={building.buildingId}>
+              <div key={building.BuildingID}>
                 {building.location && (
                   <AdvancedMarker
                     position={building.location}
-                    title={building.buildingName}
+                    title={building.BuildingName}
                     onClick={() => handleMarkerClick(building)}
                   >
                     <Pin
@@ -202,7 +352,7 @@ export function UniMap() {
               (() => {
                 const currentBuilding = buildings.find(
                   (building) =>
-                    building.buildingId === activeRoute.currentBuildingId,
+                    building.BuildingID === activeRoute.currentBuildingId,
                 );
 
                 if (!currentBuilding?.location) {
@@ -243,22 +393,12 @@ export function UniMap() {
           </div>
         )}
 
-        <Sheet
+        <BuildingSheet
+          building={selectedBuilding}
+          buildings={buildings}
           open={!!selectedBuilding}
           onOpenChange={(open) => !open && setSelectedBuilding(null)}
-        >
-          <SheetContent side="right">
-            <SheetHeader>
-              <SheetTitle className="flex items-center gap-2">
-                {selectedBuilding?.buildingName}
-
-                <Badge variant="secondary">
-                  {selectedBuilding?.venueCount ?? 0} venues
-                </Badge>
-              </SheetTitle>
-            </SheetHeader>
-          </SheetContent>
-        </Sheet>
+        />
       </div>
     </>
   );

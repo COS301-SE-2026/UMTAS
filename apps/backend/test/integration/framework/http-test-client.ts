@@ -132,6 +132,13 @@ export function createFetchHttpTransport(baseUrl: string): HttpTransport {
   const normalizedBaseUrl = `${baseUrl.replace(/\/+$/u, '')}/`;
   return async (input) => {
     const headers = new Headers(input.headers);
+
+    headers.set(
+      'origin',
+      process.env.INTEGRATION_ORIGIN ??
+        process.env.CORS_ORIGIN ??
+        'http://localhost:3001',
+    );
     let body: BodyInit | undefined;
     if (input.files?.length || input.fields) {
       const form = new FormData();

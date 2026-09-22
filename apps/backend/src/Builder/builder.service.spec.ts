@@ -206,6 +206,65 @@ describe('BuilderService', () => {
         styling: createModuleDto.styling,
       });
     });
+
+    it('should throw if user is not enrolled to created module', async () => {
+      //Arrange
+      mockTransaction(mockDb, {
+        select: [
+          [
+            {
+              UserID: userId,
+              UniversityID: uniId,
+              role: 'STUDENT_OWNED',
+            },
+          ],
+        ],
+        insert: [[]],
+      });
+
+      mockCourseService.getAll!.mockResolvedValue({
+        courses: [
+          {
+            CourseID: courseId,
+            CourseName: 'somename',
+            UniversityID: uniId,
+          },
+        ],
+      });
+
+      const moduleDto = createModule({
+        moduleID: moduleId,
+      });
+
+      mockModuleService.create!.mockResolvedValue(moduleDto);
+
+      //Act + Assert
+      await expect(service.createModule(userId, moduleDto)).rejects.toThrow(
+        `User [${userId}] was not enrolled to module [${moduleId}]`,
+      );
+    });
+
+    it('should throw if user university role creation fails', async () => {
+      //Arrange
+      mockTransaction(mockDb, {
+        select: [[]],
+        insert: [[]],
+      });
+
+      mockUniversityService.getByName!.mockResolvedValue({
+        UniversityID: uniId,
+        UniversityName: 'somename',
+      });
+
+      const moduleDto = createModule({
+        moduleID: moduleId,
+      });
+
+      //Act + Assert
+      await expect(service.createModule(userId, moduleDto)).rejects.toThrow(
+        `Failed to create university role for user: ${userId}`,
+      );
+    });
   }); //END_Test_Create
 
   //GetAll
@@ -305,6 +364,7 @@ describe('BuilderService', () => {
   //Update
   describe('Test_Update', () => {
     it('should fail if user is trying to update module they do not own', async () => {
+      mockTransaction(mockDb, {});
       mockModuleService.moduleOwnershipCheck!.mockResolvedValue(false);
 
       await expect(service.updateModule(userId, moduleId, {})).rejects.toThrow(
@@ -314,6 +374,8 @@ describe('BuilderService', () => {
 
     it('should update module that user owns', async () => {
       mockModuleService.moduleOwnershipCheck!.mockResolvedValue(true);
+
+      mockTransaction(mockDb, {});
 
       const module = createModule({ moduleID: moduleId });
       const updateModuleDto = {
@@ -350,6 +412,7 @@ describe('BuilderService', () => {
   describe('Test_Delete', () => {
     it('should throw if user does not own module', async () => {
       mockModuleService.moduleOwnershipCheck!.mockResolvedValue(false);
+      mockTransaction(mockDb, {});
 
       await expect(service.deleteModule(userId, moduleId)).rejects.toThrow(
         ForbiddenException,
@@ -362,6 +425,7 @@ describe('BuilderService', () => {
         moduleCode: 'someCode',
         success: true,
       });
+      mockTransaction(mockDb, {});
 
       const result = await service.deleteModule(userId, moduleId);
 

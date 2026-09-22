@@ -254,10 +254,10 @@ export function EventCard({
               ) : (
                 buildings.map((building) => (
                   <SelectItem
-                    key={building.buildingId}
-                    value={building.buildingId}
+                    key={building.BuildingID}
+                    value={building.BuildingID}
                   >
-                    {building.buildingName}
+                    {building.BuildingName}
                   </SelectItem>
                 ))
               )}

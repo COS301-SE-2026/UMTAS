@@ -5,7 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 import { MapPin, Pentagon, Check, X } from "lucide-react";
 import { Button } from "@/components/atoms/baseShadcn/button";
 import { useBuildingDraw } from "@/hooks/useBuildingDraw";
-import { updateBuildingLocationMut } from "../../../../utilities/building/buildingQueries";
+import { updateBuildingMut } from "../../../../utilities/building/buildingQueries";
 import { BuildingType } from "../../../../utilities/building/buildingRequestBuilder";
 import {
   Select,
@@ -43,7 +43,7 @@ export function AdminDrawControls({
     onModeChange(mode);
   }, [mode, onModeChange]);
 
-  const { mutate, isPending } = useMutation(updateBuildingLocationMut());
+  const { mutate, isPending } = useMutation(updateBuildingMut());
 
   function handleSave() {
     if (!selectedBuildingId) {
@@ -78,8 +78,8 @@ export function AdminDrawControls({
         </SelectTrigger>
         <SelectContent>
           {buildings.map((building) => (
-            <SelectItem key={building.buildingId} value={building.buildingId}>
-              {building.buildingName}
+            <SelectItem key={building.BuildingID} value={building.BuildingID}>
+              {building.BuildingName}
             </SelectItem>
           ))}
         </SelectContent>

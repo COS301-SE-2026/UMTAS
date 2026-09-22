@@ -1,13 +1,13 @@
 "use client";
 import { getAllCoursesQ } from "@/app/course-management/queries/courses/courseQueries";
 import { Spinner } from "@/components/atoms/baseShadcn/spinner";
-import { useMutation, useQuery } from "@tanstack/react-query";
 import { CourseTableData } from "@/components/organisms/course-management/courseColumns";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
-import { useState, useMemo, Fragment } from "react";
 import { moduleDTO } from "@/app/course-management/queries/modules/moduleBuilder";
-import { Input } from "@/components/atoms/baseShadcn/input";
 import { Button } from "@/components/atoms/baseShadcn/button";
+import { Input } from "@/components/atoms/baseShadcn/input";
+import { Fragment, useMemo, useState } from "react";
 
 import {
   Select,
@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from "@/components/atoms/baseShadcn/select";
 
+import { CourseDTO } from "@/app/course-management/queries/courses/courseBuilder";
 import {
   Table,
   TableBody,
@@ -25,24 +26,27 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/atoms/baseShadcn/table";
-import { CourseDTO } from "@/app/course-management/queries/courses/courseBuilder";
 
-import Tutorial from "@/components/organisms/nav/Tutorial";
 import NotFound from "@/app/not-found";
-import { AddCoursePopup } from "@/components/organisms/course-management/AddCoursePopup";
-import NoRoleSelected from "@/components/molecules/roleManagement/NoRoleSelected";
-import { EditCoursePopup } from "@/components/organisms/course-management/EditCoursePopup";
-import { ExternalCoursesPopup } from "@/components/organisms/course-management/API-gen/externalCoursesPopup";
 import Popup from "@/components/atoms/utility/floatContainer";
+import NoRoleSelected from "@/components/molecules/roleManagement/NoRoleSelected";
+import { AddCoursePopup } from "@/components/organisms/course-management/AddCoursePopup";
+import { ExternalCoursesPopup } from "@/components/organisms/course-management/API-gen/externalCoursesPopup";
 import {
   addCourseEvents,
   addCourseModules,
 } from "@/components/organisms/course-management/API-gen/Queries/request";
+import { EditCoursePopup } from "@/components/organisms/course-management/EditCoursePopup";
+import Tutorial from "@/components/organisms/nav/Tutorial";
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
 import {
   UniversityStateLoading,
   useUniversityState,
 } from "@/hooks/useUniversityState";
+import {
+  DeleteEnrollUserCourseMut,
+  enrollUserCourseMut,
+} from "../../../../utilities/V2-Builders/Courses";
 
 const steps = [
   {
@@ -79,7 +83,8 @@ export default function CourseManagementTemplate() {
   const [showAddCourse, setShowAddCourse] = useState(false);
   const [courseToEdit, setCourseToEdit] = useState<CourseDTO | null>(null);
 
-  const ViableRole = university?.role === "UNIVERSITY_ADMIN";
+  const ViableRole =
+    university?.role === "UNIVERSITY_ADMIN" || university?.role === "STUDENT";
 
   const { mutate: addExternalModules, isPending: modulesPending } = useMutation(
     {
@@ -95,6 +100,14 @@ export default function CourseManagementTemplate() {
       },
     },
   );
+
+  const { mutateAsync: enrollUserIntoCourse, isPending: enrollmentPending } =
+    useMutation(enrollUserCourseMut());
+
+  const {
+    mutateAsync: DeleteEnrollUserIntoCourse,
+    isPending: delEnrollPending,
+  } = useMutation(DeleteEnrollUserCourseMut());
 
   const { mutate: addExternalEvents, isPending: eventsPending } = useMutation({
     ...addCourseEvents(),
@@ -218,19 +231,25 @@ export default function CourseManagementTemplate() {
     //console.log("account not admin");
   }
 
+  const isStudent = university.role === "STUDENT";
+
+  const enrolledCourse = courseData.find((course) => course.isEnrolled);
+
   return (
     <>
       <Tutorial steps={steps} wait={true} />
 
-      <div className="h-[80vh] items-center flex flex-col gap-6 w-full px-6">
-        <div className="w-full max-w-6xl overflow-auto border border-[var(--border)] rounded-xl bg-[var(--bg-surface)] shadow-sm">
-          <h1 className="text-lg font-semibold text-[var(--text-primary)] pl-4 pt-4">
-            Course Management
-          </h1>
-          <p className="text-sm text-[var(--text-secondary)] pl-4 pt-2 pb-2">
-            Search and filter courses, degrees and modules.
-          </p>
-          <div className="flex flex-col md:flex-row gap-4 p-5 border-b border-[var(--border)] items-center justify-between bg-[var(--bg-surface)]">
+      <div className="flex w-full flex-col items-center gap-6 px-6 pt-6">
+        <div className="w-full max-w-6xl overflow-auto rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] shadow-sm">
+          <div className="border-b border-[var(--border)] px-5 py-4">
+            <h1 className="text-lg font-semibold text-[var(--text-primary)]">
+              Course Management
+            </h1>
+            <p className="mt-1 text-sm text-[var(--text-secondary)]">
+              Search and filter courses, degrees and modules.
+            </p>
+          </div>
+          <div className="flex flex-col items-center justify-between gap-4 bg-[var(--bg-surface)] p-5 md:flex-row">
             <div className="w-full md:max-w-sm flex-1">
               <Input
                 id="input-search-courses-degrees-modules"
@@ -278,19 +297,25 @@ export default function CourseManagementTemplate() {
                   ))}
                 </SelectContent>
               </Select>
-              <Button
-                data-testid="show-add-course"
-                onClick={() => {
-                  if (university?.UniversityName === "University of Maryland") {
-                    setExternalCourses(true);
-                  } else {
-                    setShowAddCourse(true);
-                  }
-                }}
-              >
-                Add Courses
-              </Button>
-              {showAddCourse && (
+              {isStudent === false && (
+                <Button
+                  data-testid="show-add-course"
+                  onClick={() => {
+                    if (
+                      // updated to be more agnostic
+                      university?.ApiKey != null ||
+                      university?.ApiKey != undefined
+                    ) {
+                      setExternalCourses(true);
+                    } else {
+                      setShowAddCourse(true);
+                    }
+                  }}
+                >
+                  Add Courses
+                </Button>
+              )}
+              {showAddCourse && isStudent === false && (
                 <AddCoursePopup onClose={() => setShowAddCourse(false)} />
               )}
               {showExternalCourses && (
@@ -344,13 +369,46 @@ export default function CourseManagementTemplate() {
                         </TableCell>
                         <TableCell className="p-4 text-right">
                           <div className="flex justify-end gap-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => setCourseToEdit(course)}
-                            >
-                              Edit
-                            </Button>
+                            {isStudent == false ? (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => setCourseToEdit(course)}
+                              >
+                                Edit
+                              </Button>
+                            ) : enrolledCourse?.CourseID == null ? (
+                              <Button
+                                disabled={enrollmentPending}
+                                size="sm"
+                                variant="outline"
+                                onClick={async () => {
+                                  const result = await enrollUserIntoCourse({
+                                    CourseId: course.CourseID,
+                                  });
+                                  console.log(result);
+                                }}
+                              >
+                                Enroll
+                              </Button>
+                            ) : enrolledCourse.CourseID == course.CourseID ? (
+                              <Button
+                                disabled={delEnrollPending}
+                                size="sm"
+                                variant="outline"
+                                onClick={async () => {
+                                  const result =
+                                    await DeleteEnrollUserIntoCourse({
+                                      CourseId: course.CourseID,
+                                    });
+                                  console.log(result);
+                                }}
+                              >
+                                Un-Enroll
+                              </Button>
+                            ) : (
+                              <></>
+                            )}
                             <Button
                               id="btn-view-modules"
                               size="sm"
@@ -382,17 +440,18 @@ export default function CourseManagementTemplate() {
                                   No modules assigned to this course group.
                                 </span>
 
-                                {course.ExternalID != undefined && (
-                                  <Button
-                                    size="sm"
-                                    variant="default"
-                                    onClick={() =>
-                                      addExternalModules(course.CourseID)
-                                    }
-                                  >
-                                    Add Modules and Events
-                                  </Button>
-                                )}
+                                {course.ExternalID != undefined &&
+                                  isStudent === false && (
+                                    <Button
+                                      size="sm"
+                                      variant="default"
+                                      onClick={() =>
+                                        addExternalModules(course.CourseID)
+                                      }
+                                    >
+                                      Add Modules and Events
+                                    </Button>
+                                  )}
                               </div>
                             ) : (
                               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">

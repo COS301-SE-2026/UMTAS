@@ -191,6 +191,7 @@ export default function SolverUpload({
               <Button
                 data-testid="btn-demo-pdf"
                 type="button"
+                variant="outline"
                 disabled={isDemoPdfSelected || demoPdfMutation.isPending}
                 onClick={() => void handleUseDemoPdf()}
                 className="font-mono"

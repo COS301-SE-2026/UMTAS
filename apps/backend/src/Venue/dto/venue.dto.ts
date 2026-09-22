@@ -1,40 +1,121 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  ApiProperty,
+  ApiPropertyOptional,
+  PartialType,
+  PickType,
+} from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import {
   ArrayMinSize,
   IsBoolean,
+  IsInt,
+  IsNotEmpty,
   IsOptional,
   IsString,
   IsUUID,
   Length,
+  MaxLength,
+  Min,
   ValidateNested,
 } from 'class-validator';
 
-export class VenueMappingDto {
+export class BaseVenueDto {
   @ApiProperty({
+    description: 'Unique venue identifier.',
     format: 'uuid',
-    example: '00000000-0000-0000-0000-000000000000',
+    example: '00000000-0000-4000-8000-000000000000',
   })
-  venueId!: string;
+  @IsUUID()
+  VenueID!: string;
 
   @ApiProperty({
-    example: 'IT-2-26',
-    nullable: true,
+    description: 'Venue name. Unique per university. Max 30 chars.',
+    maxLength: 30,
+    example: 'Main Lecture Hall',
   })
-  venueName!: string | null;
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(30)
+  VenueName!: string;
 
   @ApiProperty({
+    description: 'Owning university. Required.',
     format: 'uuid',
-    example: '00000000-0000-0000-0000-000000000000',
+  })
+  @IsUUID()
+  UniversityID!: string;
+
+  @ApiPropertyOptional({
+    description:
+      'Optional building identifier. Nulled if the building is deleted.',
+    format: 'uuid',
     nullable: true,
   })
-  buildingId!: string | null;
+  @IsOptional()
+  @IsUUID()
+  BuildingID?: string | null;
 
   @ApiProperty({
-    example: 'IT Building',
-    nullable: true,
+    description: 'Maximum capacity of the venue.',
+    example: 120,
+    minimum: 0,
   })
-  buildingName!: string | null;
+  @IsInt()
+  @Min(0)
+  Capacity!: number;
+} //END_BaseVenueDto
+
+//Create
+export class CreateVenueDto extends PickType(BaseVenueDto, [
+  'VenueName',
+  'BuildingID',
+]) {
+  @ApiPropertyOptional({
+    description:
+      'Maximum capacity of the venue. Defaults to 0 if not provided.',
+    example: 120,
+    minimum: 0,
+  })
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  Capacity?: number;
+}
+
+//Create Service Input
+export class CreateVenueInput extends CreateVenueDto {
+  UniversityID!: string;
+} //END_CreateVenueInput
+
+//Single Response
+export class VenueSingleResponseDto {
+  @ApiProperty({ type: BaseVenueDto })
+  venue!: BaseVenueDto;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  message?: string;
+} //END_VenueSingleResponseDto
+
+//List response
+export class VenueListResponseDto {
+  @ApiProperty({ type: [BaseVenueDto] })
+  venues!: BaseVenueDto[];
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  message?: string;
+} //END_VenueListResponseDto
+
+//Update
+export class UpdateVenueDto extends PartialType(
+  PickType(BaseVenueDto, ['BuildingID', 'VenueName', 'Capacity']),
+) {} //END_UpdateVenueDto
+
+export class UpdateVenueInput extends UpdateVenueDto {
+  UniversityID!: string;
 }
 
 export class VenueQueryDto {
@@ -60,14 +141,6 @@ export class VenueQueryDto {
   @IsString()
   @Length(1, 100)
   search?: string;
-}
-
-export class VenueMappingListResponseDto {
-  @ApiProperty({
-    type: [VenueMappingDto],
-    description: 'List of venue mappings',
-  })
-  venues!: VenueMappingDto[];
 }
 
 export class AssignVenueBuildingDto {

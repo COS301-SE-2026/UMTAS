@@ -92,7 +92,6 @@ export class ModuleService {
 
     if (groupId) {
       //check that module Grouping groupId is valid
-      // console.log('This should be null ', groupId);
       await this.groupingService.getById(groupId, tx);
 
       //Check for duplicate moduleCode in ModuleGrouping
@@ -137,14 +136,6 @@ export class ModuleService {
       [newModule.moduleID],
       tx,
     );
-
-    //if grouping failed -- removed this check, should be handled by grouping service
-    // if (!moduleGroup)
-    //   throw new InternalServerErrorException(
-    //     `Failed to group module[${newModule.moduleID}] to group [${groupId}]`,
-    //   );
-
-    // console.log(`CreateModule: dto.styling: ${JSON.stringify(dto.styling)}`);
 
     //Course Module metadata logic - only when courseId specified
     let courseModuleInfo: CourseModuleDto | null = null;
@@ -542,7 +533,6 @@ export class ModuleService {
 
       //If Partner course exists -> Create new group as copy and add modules to new group
       if (partnerCourses.length > 0) {
-        // console.log(`Partner courses identified. Amount: ${partnerCourses.length}`);
         //Get current groups modules
         const oldGroup = await this.groupingService.getById(course.GroupID, tx);
 
@@ -550,8 +540,6 @@ export class ModuleService {
           ...(oldGroup.modules ?? []),
           ...dto.modules,
         ];
-
-        // console.log(`MergedModules: ${JSON.stringify(mergedModules)}`);
 
         //Create new group with copy of modules + new modules
         group = await this.groupingService.createModuleGrouping(
@@ -764,7 +752,7 @@ export class ModuleService {
       dto.styling.colour,
       tx,
     );
-    console.log(updatedStyling);
+
     if (updatedStyling) {
       return {
         message: `Successfully updated the module ${module.moduleCode} updated to ${updatedStyling.styling.colour}`,

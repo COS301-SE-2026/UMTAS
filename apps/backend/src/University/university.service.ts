@@ -33,6 +33,7 @@ import {
   UserUniversityRoleResponseDto,
   GetRoleFilterDto,
   UniversityCourseStatsResponseDto,
+  UniversityDto,
 } from './dto/university.dto';
 
 @Injectable()
@@ -49,12 +50,15 @@ export class UniversityService {
       });
     } //END_tx precence check
 
-    //Check if university already exists
-    if (await this.checkDuplicateUniversityName(dto.UniversityName.trim(), tx))
-      throw new ConflictException(
-        `University [${dto.UniversityName.trim()}] already exists`,
-      );
+    const uniName = dto.UniversityName.trim();
 
+    //Check if university already exists
+    const alreadyExists = await this.checkDuplicateUniversityName(uniName, tx);
+    if (alreadyExists)
+      //Return early
+      return alreadyExists;
+
+    //Create University
     const [newUni] = await tx
       .insert(University)
       .values({
@@ -248,11 +252,6 @@ export class UniversityService {
 
     //Check that uni exists
     const uni = await this.getById(dto.UniversityID, tx);
-
-    // if (!uni)
-    //   throw new BadRequestException(
-    //     `University[${dto.UniversityID}] does not exist`,
-    //   );
 
     const uniId = uni.UniversityID;
 
@@ -493,13 +492,13 @@ export class UniversityService {
   async checkDuplicateUniversityName(
     uniName: string,
     tx: DatabaseService['db'],
-  ): Promise<boolean> {
+  ): Promise<UniversityDto | null> {
     const [uni] = await tx
       .select()
       .from(University)
       .where(eq(University.UniversityName, uniName))
       .limit(1);
 
-    return !!uni;
+    return uni;
   } //END_checkDuplicateUniversityName
 } //UniversityService

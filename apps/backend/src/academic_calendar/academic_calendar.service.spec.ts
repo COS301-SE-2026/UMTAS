@@ -72,6 +72,7 @@ describe('AcademicCalendarService', () => {
 
   afterEach(() => {
     reset();
+    jest.resetAllMocks();
     jest.restoreAllMocks();
   });
 
@@ -106,6 +107,26 @@ describe('AcademicCalendarService', () => {
         ConflictException,
         'already exists',
       );
+    });
+
+    it('should throw if calendar creation returns no row', async () => {
+      mockDbResult(mockDb.insert as jest.Mock, []);
+
+      await expect(
+        service.createCalendar(universityId, { year: 2026 }),
+      ).rejects.toThrow('Academic calendar was not created');
+    });
+
+    it('should rethrow non-constraint calendar creation errors', async () => {
+      const error = new Error('database unavailable');
+
+      (mockDb.insert as jest.Mock).mockReturnValue(
+        createDbChain(Promise.reject(error)),
+      );
+
+      await expect(
+        service.createCalendar(universityId, { year: 2026 }),
+      ).rejects.toThrow('database unavailable');
     });
 
     it('gets a calendar in the selected university', async () => {
@@ -171,6 +192,34 @@ describe('AcademicCalendarService', () => {
       await expect(
         service.deleteCalendar(universityId, calendarId),
       ).resolves.toEqual({ success: true });
+    });
+
+    it('should reject deleting a calendar referenced by generated snapshots', async () => {
+      (mockDb.delete as jest.Mock).mockReturnValue(
+        createDbChain(
+          Promise.reject(
+            Object.assign(new Error('foreign key violation'), {
+              code: '23503',
+            }),
+          ),
+        ),
+      );
+
+      await expect(
+        service.deleteCalendar(universityId, calendarId),
+      ).rejects.toThrow('Generated snapshots still reference this calendar');
+    });
+
+    it('should rethrow non-constraint calendar deletion errors', async () => {
+      const error = new Error('database unavailable');
+
+      (mockDb.delete as jest.Mock).mockReturnValue(
+        createDbChain(Promise.reject(error)),
+      );
+
+      await expect(
+        service.deleteCalendar(universityId, calendarId),
+      ).rejects.toThrow('database unavailable');
     });
   });
 
@@ -279,8 +328,69 @@ describe('AcademicCalendarService', () => {
       });
     });
 
+    it('should throw if restriction creation returns no row', async () => {
+      mockSequentialResults(mockDb.select as jest.Mock, [[calendar], []]);
+      mockDbResult(mockDb.insert as jest.Mock, []);
+
+      await expect(
+        service.createRestriction(universityId, calendarId, {
+          type: 'PUBLIC_HOLIDAY',
+          startDate: '2026-04-27',
+        }),
+      ).rejects.toThrow('Calendar restriction was not created');
+    });
+
+    it('should rethrow non-constraint restriction creation errors', async () => {
+      const error = new Error('database unavailable');
+
+      mockSequentialResults(mockDb.select as jest.Mock, [[calendar], []]);
+      (mockDb.insert as jest.Mock).mockReturnValue(
+        createDbChain(Promise.reject(error)),
+      );
+
+      await expect(
+        service.createRestriction(universityId, calendarId, {
+          type: 'PUBLIC_HOLIDAY',
+          startDate: '2026-04-27',
+        }),
+      ).rejects.toThrow('database unavailable');
+    });
+
+    it('should map a duplicate restriction update to a conflict', async () => {
+      const error = Object.assign(new Error('unique constraint violation'), {
+        code: '23505',
+      });
+
+      mockSequentialResults(mockDb.select as jest.Mock, [
+        [calendar],
+        [holiday],
+      ]);
+      (mockDb.update as jest.Mock).mockReturnValue(
+        createDbChain(Promise.reject(error)),
+      );
+
+      await expect(
+        service.updateRestriction(universityId, calendarId, restrictionId, {
+          type: 'PUBLIC_HOLIDAY',
+          startDate: '2026-04-27',
+        }),
+      ).rejects.toThrow('A day swap already exists');
+    });
+
+    it('should reject replacement weekdays for non-day-swap restrictions', async () => {
+      mockSequentialResults(mockDb.select as jest.Mock, [[calendar], []]);
+
+      await expect(
+        service.createRestriction(universityId, calendarId, {
+          type: 'PUBLIC_HOLIDAY',
+          startDate: '2026-04-27',
+          replacementWeekday: 'MONDAY',
+        }),
+      ).rejects.toThrow('replacementWeekday is allowed only for DAY_SWAP');
+    });
+
     it('rejects restriction dates outside the academic calendar year', async () => {
-      mockDbResult(mockDb.select as jest.Mock, [calendar]);
+      mockSequentialResults(mockDb.select as jest.Mock, [[calendar], []]);
 
       await expectDomainError(
         service.createRestriction(universityId, calendarId, {
@@ -555,6 +665,25 @@ describe('AcademicCalendarService', () => {
       );
       expect(mockDb.delete).not.toHaveBeenCalled();
     });
+
+    it('should rethrow non-constraint restriction update errors', async () => {
+      const error = new Error('database unavailable');
+
+      mockSequentialResults(mockDb.select as jest.Mock, [
+        [calendar],
+        [holiday],
+      ]);
+      (mockDb.update as jest.Mock).mockReturnValue(
+        createDbChain(Promise.reject(error)),
+      );
+
+      await expect(
+        service.updateRestriction(universityId, calendarId, restrictionId, {
+          type: 'PUBLIC_HOLIDAY',
+          startDate: '2026-04-27',
+        }),
+      ).rejects.toThrow('database unavailable');
+    });
   });
 
   describe('calendar generation', () => {
@@ -672,6 +801,16 @@ describe('AcademicCalendarService', () => {
       expect(mockDb.insert).not.toHaveBeenCalled();
     });
 
+    it('should throw when the owned timetable does not exist', async () => {
+      mockSequentialResults(mockDb.select as jest.Mock, [[calendar], []]);
+
+      await expect(
+        service.generateCalendar(userId, universityId, {
+          timetableId,
+        }),
+      ).rejects.toThrow(`Timetable not found for id: ${timetableId}`);
+    });
+
     it('uses an explicitly requested academic year', async () => {
       mockDbResult(mockDb.select as jest.Mock, []);
 
@@ -709,6 +848,29 @@ describe('AcademicCalendarService', () => {
       await service.generateCalendar(userId, universityId, { timetableId });
 
       expect(mockDb.select).toHaveBeenCalledTimes(4);
+    });
+
+    it('should throw if the generated calendar snapshot is not saved', async () => {
+      mockSequentialResults(mockDb.select as jest.Mock, [
+        [calendar],
+        [
+          {
+            timetable: createTimetable({
+              timetableID: timetableId,
+              timetableName: 'My timetable',
+            }),
+          },
+        ],
+        restrictions,
+        [],
+      ]);
+      mockDbResult(mockDb.insert as jest.Mock, []);
+
+      await expect(
+        service.generateCalendar(userId, universityId, {
+          timetableId,
+        }),
+      ).rejects.toThrow('Generated calendar snapshot was not saved');
     });
 
     it('merges subscribed public restrictions into generation input', async () => {
@@ -932,6 +1094,14 @@ describe('AcademicCalendarService', () => {
       await expect(
         service.getGeneratedCalendar(userId, universityId, generatedId),
       ).resolves.toEqual({ id: generatedId, payload: {} });
+    });
+
+    it('should throw when the generated calendar does not exist', async () => {
+      mockDbResult(mockDb.select as jest.Mock, []);
+
+      await expect(
+        service.getGeneratedCalendar(userId, universityId, generatedId),
+      ).rejects.toThrow(`Generated calendar not found for id: ${generatedId}`);
     });
   });
 });

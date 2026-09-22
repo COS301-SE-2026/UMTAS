@@ -227,7 +227,11 @@ docker-build-multiarch image_tag registry="vigilcs/umtas":
 
 ############################## Backend specific
 
-# Complete restart of backend, I'm getting lazy
+#FOr local integration tests
+testInt:
+    phase run -- pnpm --filter backend run test:integration:local
+
+#Complete restart of backend, I'm getting lazy
 resetBack:
     just dockerClean
     just sync

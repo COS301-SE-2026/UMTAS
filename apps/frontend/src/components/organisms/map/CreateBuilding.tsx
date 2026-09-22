@@ -40,7 +40,7 @@ export function CreateBuilding() {
     mutate(
       {
         body: {
-          buildingName: name,
+          BuildingName: name,
           icon: icon || null,
           displayColour: colour,
         },
