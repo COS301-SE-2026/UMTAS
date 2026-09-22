@@ -24,7 +24,6 @@ export class AttendanceService {
     private readonly eventService: EventService,
   ) {}
 
-  //Create attendance record
   async createAttendance(
     userId: string,
     dto: CreateAttendanceDto,
@@ -33,14 +32,13 @@ export class AttendanceService {
     if (!tx) {
       return this.dbService.db.transaction(async (t: AppDatabase) => {
         return this.createAttendance(userId, dto, t);
-      }); //END_transaction
-    } //END_transaction precencer check
+      });
+    }
 
     const eventId = dto.eventID;
     const date = dto.eventDate;
     const state = dto.state;
 
-    //Check if attendance record already exists - return early
     const existingAttendance = await this.findAttendance(
       userId,
       eventId,
@@ -49,10 +47,8 @@ export class AttendanceService {
     );
     if (existingAttendance) return existingAttendance;
 
-    //Check that event actually exists - will throw if doesnt exist
     await this.eventService.getById(eventId, tx);
 
-    //Create attendance record
     const [attendance] = await tx
       .insert(EventAttendance)
       .values({
@@ -69,10 +65,8 @@ export class AttendanceService {
       );
 
     return attendance;
-  } //END_createAttendance
+  }
 
-  //get all attendance records
-  //No filters - default to userId
   async getAllAttendanceRecords(
     userId: string,
     filters?: AttendanceFilters,
@@ -81,8 +75,8 @@ export class AttendanceService {
     if (!tx) {
       return this.dbService.db.transaction(async (t: AppDatabase) => {
         return this.getAllAttendanceRecords(userId, filters, t);
-      }); //END_transaction
-    } //END_transaction precencer check
+      });
+    }
 
     const conditions: SQL[] = [];
 
@@ -105,7 +99,6 @@ export class AttendanceService {
         conditions.push(eq(EventAttendance.UserID, userId));
     }
 
-    //get all Attendance records
     const attendance = await tx
       .select()
       .from(EventAttendance)
@@ -114,10 +107,8 @@ export class AttendanceService {
     return {
       attendanceList: attendance,
     };
-  } //END_getAllAttendanceRecords
+  }
 
-  //basically getById
-  //get specific attendance record
   async getById(
     eventAttendanceId: string,
     tx?: AppDatabase,
@@ -136,9 +127,8 @@ export class AttendanceService {
       );
 
     return attendance;
-  } //END_getSpecificAttendance
+  }
 
-  //update attendance record
   async updateAttendanceRecord(
     eventAttendanceId: string,
     dto: UpdateAttendanceDto,
@@ -147,10 +137,9 @@ export class AttendanceService {
     if (!tx) {
       return this.dbService.db.transaction(async (t: AppDatabase) => {
         return this.updateAttendanceRecord(eventAttendanceId, dto, t);
-      }); //END_transaction
-    } //END_transaction precencer check
+      });
+    }
 
-    //Get + check that attendance record exists
     const oldAttendance = await this.getById(eventAttendanceId, tx);
 
     const updateFields: Partial<typeof EventAttendance.$inferSelect> = {};
@@ -159,7 +148,6 @@ export class AttendanceService {
     if (dto.state && dto.state !== oldAttendance.state)
       updateFields.state = dto.state;
 
-    //if nothing to update - return early - exception?
     if (Object.keys(updateFields).length === 0) return oldAttendance;
 
     const [newAttendance] = await tx
@@ -174,16 +162,14 @@ export class AttendanceService {
       );
 
     return newAttendance;
-  } //END_updateAttendanceRecord
+  }
 
-  //delete attendance record - basically NOT_STATED
   async deleteAttendance(
     eventAttendanceId: string,
     tx?: AppDatabase,
   ): Promise<deleteAttendanceResponse> {
     const db = tx ?? this.dbService.db;
 
-    //Delete attendance record
     const [result] = await db
       .delete(EventAttendance)
       .where(eq(EventAttendance.AttendanceID, eventAttendanceId))
@@ -192,29 +178,8 @@ export class AttendanceService {
     return {
       success: !!result,
     };
-  } //END_deleteAttendance
+  }
 
-  //🎅's Little Helpers
-
-  /**
-   * Retrieve a specific attendance record for a user at a given event and date.
-   *
-   * @param userId - ID of the user to verify
-   * @param eventId - ID of the event to check
-   * @param date - Date of the attendance entry
-   * @param tx - Optional transaction instance
-   *
-   * @returns An AttendanceSingleResponse object if found, otherwise undefined
-   *
-   * @remarks
-   * Limits the query to one record. Useful for checking a single attendance entry.
-   *
-   * @example
-   * ```ts
-   * const existing = await findAttendance("user123", "event456", "2026-07-26");
-   * console.log(existing); // AttendanceSingleResponse or undefined
-   * ```
-   */
   private async findAttendance(
     userId: string,
     eventId: string,
@@ -236,5 +201,5 @@ export class AttendanceService {
       .limit(1);
 
     return attendance;
-  } //END_getSpecificAttendance
-} //END_AttendanceService
+  }
+}

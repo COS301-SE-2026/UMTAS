@@ -16,6 +16,8 @@ import { normalizeSession } from './auth';
 // Decorator to mark routes as public (no auth required)
 export const IS_PUBLIC_KEY = 'isPublic';
 export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
+export const IS_OPTIONAL_AUTH_KEY = 'isOptionalAuth';
+export const OptionalAuth = () => SetMetadata(IS_OPTIONAL_AUTH_KEY, true);
 
 export interface RequestWithSession extends IncomingMessage {
   session?: SessionData;
@@ -36,6 +38,10 @@ export class AuthGuard implements CanActivate {
       context.getClass(),
     ]);
     if (isPublic) return true;
+    const isOptionalAuth = this.reflector.getAllAndOverride<boolean>(
+      IS_OPTIONAL_AUTH_KEY,
+      [context.getHandler(), context.getClass()],
+    );
 
     const req = context.switchToHttp().getRequest<RequestWithSession>();
     const auth = this.authService.getAuth();
@@ -59,6 +65,7 @@ export class AuthGuard implements CanActivate {
       const rawSession = result as AuthSession | null;
       session = rawSession ? normalizeSession(rawSession) : null;
     } catch (error) {
+      if (isOptionalAuth) return true;
       this.logger.error(
         'Session fetch failed',
         error instanceof Error ? error.stack : String(error),
@@ -67,6 +74,7 @@ export class AuthGuard implements CanActivate {
     }
 
     if (!session) {
+      if (isOptionalAuth) return true;
       throw new UnauthorizedException('No active session');
     }
 
@@ -74,6 +82,7 @@ export class AuthGuard implements CanActivate {
     // a cached identity into application tables unless its user row still
     // exists in the authoritative database.
     if (!(await this.authService.userExistsById(session.user.id))) {
+      if (isOptionalAuth) return true;
       throw new UnauthorizedException('Session user no longer exists');
     }
 

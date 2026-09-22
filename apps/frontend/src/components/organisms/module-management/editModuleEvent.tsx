@@ -53,7 +53,6 @@ export default function EditModuleEvent({
   const [moduleState, setModuleState] = useState(data.modules);
   const [eventsState, setEventsState] = useState(data.events);
 
-  console.log(moduleState, "This is module state ");
   const [feedback, setFeedback] = useState<{
     type: "success" | "error";
     message: string;
@@ -74,8 +73,6 @@ export default function EditModuleEvent({
       });
     },
     onError: (err) => {
-      console.log(err);
-
       window.dispatchEvent(
         new CustomEvent(errorName, {
           detail: {

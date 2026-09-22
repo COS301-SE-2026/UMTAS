@@ -164,6 +164,7 @@ describe('AuthService', () => {
       ['staging', true],
       ['production', true],
     ])('configures secure cookies for NODE_ENV=%p', (nodeEnv, secure) => {
+      delete process.env.COOKIE_SECURE;
       if (nodeEnv === undefined) delete process.env.NODE_ENV;
       else process.env.NODE_ENV = nodeEnv;
       if (nodeEnv === 'production') {
@@ -172,6 +173,34 @@ describe('AuthService', () => {
       service.getAuth();
       const config = lastBetterAuthConfig();
       expect(config.advanced.useSecureCookies).toBe(secure);
+    });
+
+    it('uses secure cookies for the HTTPS mobile-development configuration', () => {
+      process.env.NODE_ENV = 'development';
+      process.env.COOKIE_SECURE = 'true';
+      process.env.BETTER_AUTH_URL = 'https://my-umtas.ngrok-free.app/api/auth';
+      process.env.NEXT_PUBLIC_APP_URL = 'https://my-umtas.ngrok-free.app';
+      process.env.BETTER_AUTH_TRUSTED_ORIGINS =
+        'https://my-umtas.ngrok-free.app';
+
+      service.getAuth();
+
+      const config = lastBetterAuthConfig();
+      expect(config.advanced.useSecureCookies).toBe(true);
+      expect(config.baseURL).toBe('https://my-umtas.ngrok-free.app/api/auth');
+      expect(config.trustedOrigins).toEqual([
+        'https://my-umtas.ngrok-free.app',
+      ]);
+    });
+
+    it('allows an explicit insecure-cookie override in production', () => {
+      process.env.NODE_ENV = 'production';
+      process.env.COOKIE_SECURE = 'false';
+      jest.mocked(getRedisClient).mockReturnValue({} as never);
+
+      service.getAuth();
+
+      expect(lastBetterAuthConfig().advanced.useSecureCookies).toBe(false);
     });
 
     it('uses default URLs and filters empty trusted origins', () => {

@@ -45,7 +45,6 @@ export function getBuildingByIdQ(path: getBuildingByIDPath) {
 export function createBuildingMut() {
   return mutationOptions({
     mutationFn: async (vars: { body: createBuildingBody }) => {
-      console.log(vars.body);
       const result = new createBuildingBuilder().send({
         body: vars.body,
       });

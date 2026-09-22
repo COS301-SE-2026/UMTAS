@@ -11,7 +11,6 @@ import { Transform } from 'class-transformer';
 import { AttendanceStateEnum } from '../../entities';
 import type { AttendanceStateType } from '../../entities';
 
-//Create attendance record
 export class CreateAttendanceDto {
   @ApiProperty({
     example: '00000000-0000-0000-0000-000000000000',
@@ -41,14 +40,12 @@ export class CreateAttendanceDto {
   })
   @IsNotEmpty()
   state!: AttendanceStateType;
-} //END_createAttendance
+}
 
 export class UpdateAttendanceDto extends PartialType(
   OmitType(CreateAttendanceDto, ['eventID']),
 ) {}
 
-//Responses
-//Single
 export class AttendanceSingleResponse extends CreateAttendanceDto {
   @ApiProperty({
     example: '00000000-0000-0000-0000-000000000000',
@@ -59,16 +56,14 @@ export class AttendanceSingleResponse extends CreateAttendanceDto {
   AttendanceID!: string;
 }
 
-//List
 export class AttendanceListResponse {
   @ApiProperty({
     type: [AttendanceSingleResponse],
     description: 'List of attendance records',
   })
   attendanceList!: AttendanceSingleResponse[];
-} //END_AttendanceListResponse
+}
 
-//Delete
 export class deleteAttendanceResponse {
   @ApiProperty({
     type: Boolean,
@@ -78,8 +73,6 @@ export class deleteAttendanceResponse {
   success!: boolean;
 }
 
-//filters
-//Get all filters
 export class AttendanceFilters extends PartialType(CreateAttendanceDto) {
   @ApiProperty({
     type: Boolean,
@@ -95,4 +88,4 @@ export class AttendanceFilters extends PartialType(CreateAttendanceDto) {
   @IsBoolean()
   @IsOptional()
   AlsoFilterByUser?: boolean;
-} //END_AttendanceFilters
+}

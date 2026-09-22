@@ -83,7 +83,7 @@ export default function SolverReviewCard({
     setTempEvent(null);
   }
 
-  console.log(modules);
+  // console.log(modules);
   return (
     <>
       {modules.map((module) =>

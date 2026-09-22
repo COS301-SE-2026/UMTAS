@@ -60,7 +60,7 @@ export function BarcodeCamera({ onScan }: BarcodeCameraProps) {
         time: now,
       };
 
-      console.log(`Barcode decoded by ${source}:`, value);
+      // console.log(`Barcode decoded by ${source}:`, value);
 
       setScanFlash(true);
 

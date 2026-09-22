@@ -106,7 +106,6 @@ export function ModulesStep({ modules }: ModulesStepProps) {
     value: ModuleResponseDto[K],
   ) {
     setIsDirty(true);
-    console.log(id, field, value);
 
     getQueryClient().setQueryData(
       getAllModulesQ().queryKey,

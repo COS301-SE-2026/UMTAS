@@ -59,7 +59,7 @@ export function NoPermissionsEventCard({
     "placeholder:text-[var(--text-disabled)] focus-visible:ring-2 focus-visible:ring-offset-2 " +
     "focus-visible:ring-[var(--ring)] text-sm";
 
-  console.log(event.eventCriteria, "Event being inserted into timeslot");
+  // console.log(event.eventCriteria, "Event being inserted into timeslot");
   const timeSlotValue: TimeSlot = {
     day: "",
     startTime: event.eventCriteria?.startTime || "",

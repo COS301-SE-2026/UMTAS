@@ -68,7 +68,6 @@ export class deleteEnrollCourseBuilder extends RequestBuilder<
 export function enrollUserCourseMut() {
   return mutationOptions({
     mutationFn: async (paths: enrollCourseParam) => {
-      console.log("Enrolling user into course", paths.CourseId);
       const result = await new enrollCourseBuilder().send({ paths: paths });
       return result;
     },
