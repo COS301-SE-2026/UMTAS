@@ -55,6 +55,8 @@ import {
   OperatorSlotsQueryDto,
   RegisteredNfcTagDto,
   RegisteredNfcTagStatusDto,
+  SelectPreferredEventDto,
+  OperatorAttendanceSlotDto,
 } from './dto/nfc-attendance.dto';
 
 @ApiTags('Attendance')
@@ -139,6 +141,31 @@ export class AttendanceController {
       this.actor(session),
       query.date,
     );
+  }
+
+  @Put('operator/preferred-event')
+  @Roles('lecturer', 'uni_admin')
+  @ApiOperation({
+    summary: 'Select the operator preferred attendance event',
+    operationId: 'selectPreferredAttendanceEvent',
+  })
+  selectPreferredAttendanceEvent(
+    @CurrentSession() session: SessionData,
+    @Body() dto: SelectPreferredEventDto,
+  ): Promise<OperatorAttendanceSlotDto> {
+    return this.captureService.selectPreferredEvent(this.actor(session), dto);
+  }
+
+  @Delete('operator/preferred-event')
+  @Roles('lecturer', 'uni_admin')
+  @ApiOperation({
+    summary: 'Clear the operator preferred attendance event',
+    operationId: 'clearPreferredAttendanceEvent',
+  })
+  clearPreferredAttendanceEvent(
+    @CurrentSession() session: SessionData,
+  ): Promise<void> {
+    return this.captureService.clearPreferredEvent(this.actor(session));
   }
 
   @Post('records')

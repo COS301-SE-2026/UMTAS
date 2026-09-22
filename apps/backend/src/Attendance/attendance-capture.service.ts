@@ -20,6 +20,7 @@ import {
 } from '../entities';
 import type { EventCriteria } from '../Events/dto/event.types';
 import type { AttendanceActor } from './attendance-session.service';
+import { AttendancePreferenceService } from './attendance-preference.service';
 import { AttendanceSessionService } from './attendance-session.service';
 import {
   AttendanceRecordStatus,
@@ -33,6 +34,7 @@ import {
 import type {
   OperatorAttendanceSlotDto,
   OperatorAttendanceSlotsResponseDto,
+  SelectPreferredEventDto,
 } from './dto/nfc-attendance.dto';
 import {
   attendanceAvailable,
@@ -63,6 +65,7 @@ export class AttendanceCaptureService {
   constructor(
     private readonly dbService: DatabaseService,
     private readonly attendanceSessionService: AttendanceSessionService,
+    private readonly attendancePreferenceService: AttendancePreferenceService,
     private readonly nfcService: NfcAttendanceService,
   ) {}
 
@@ -151,12 +154,105 @@ export class AttendanceCaptureService {
         };
       },
     );
-    const available = slotList.filter((slot) => slot.state === 'AVAILABLE');
+    const availableOccurrences = occurrences.filter((occurrence) =>
+      attendanceAvailable(occurrence, now),
+    );
+    const preference = await this.attendancePreferenceService.getPreference(
+      actor.userId,
+      actor.uniId,
+      tx,
+    );
+    const resolvedOccurrence = this.resolveOccurrence(
+      availableOccurrences,
+      preference?.preferredEventId ?? null,
+    );
+    const resolvedSlot = resolvedOccurrence
+      ? (slotList.find(
+          (slot) =>
+            this.occurrenceKey(
+              slot.eventID,
+              new Date(slot.scheduledStartAt),
+            ) ===
+            this.occurrenceKey(
+              resolvedOccurrence.eventID,
+              resolvedOccurrence.scheduledStartAt,
+            ),
+        ) ?? null)
+      : null;
     return {
       slotList,
-      ambiguous: available.length > 1,
-      currentSlot: available.length === 1 ? available[0] : null,
+      currentSlot: resolvedSlot,
+      preferredEventId: preference?.preferredEventId ?? null,
+      requiresSelection:
+        availableOccurrences.length > 1 && resolvedOccurrence === null,
     };
+  }
+
+  async selectPreferredEvent(
+    actor: AttendanceActor,
+    dto: SelectPreferredEventDto,
+    tx?: AppDatabase,
+  ): Promise<OperatorAttendanceSlotDto> {
+    if (!tx) {
+      return this.dbService.db.transaction((transaction: AppDatabase) =>
+        this.selectPreferredEvent(actor, dto, transaction),
+      );
+    }
+    this.assertOperator(actor);
+    if (!actor.uniId) throw new ForbiddenException('No university selected');
+
+    const date = localDateAt(new Date(), ATTENDANCE_TIME_ZONE);
+    const occurrences = await this.findOperatorOccurrences(
+      actor.userId,
+      actor.uniId,
+      actor.uniRole === 'uni_admin',
+      date,
+      tx,
+    );
+    const selected = occurrences.find(
+      (occurrence) => occurrence.eventID === dto.eventID,
+    );
+    if (!selected) {
+      throw new ForbiddenException(
+        'This attendance slot is not assigned to the current operator',
+      );
+    }
+    const now = new Date();
+    if (
+      !attendanceAvailable(selected, now) &&
+      now >= selected.scheduledStartAt
+    ) {
+      throw new BadRequestException('This attendance event has ended');
+    }
+
+    await this.attendancePreferenceService.setPreferredEvent(
+      actor.userId,
+      actor.uniId,
+      selected.eventID,
+      tx,
+    );
+    const overview = await this.getOperatorSlots(actor, date, tx);
+    const slot = overview.slotList.find(
+      (candidate) =>
+        candidate.eventID === selected.eventID &&
+        new Date(candidate.scheduledStartAt).getTime() ===
+          selected.scheduledStartAt.getTime(),
+    );
+    if (!slot) throw new BadRequestException('Attendance slot unavailable');
+    return slot;
+  }
+
+  async clearPreferredEvent(
+    actor: AttendanceActor,
+    tx: AppDatabase = this.dbService.db,
+  ): Promise<void> {
+    this.assertOperator(actor);
+    if (!actor.uniId) throw new ForbiddenException('No university selected');
+    await this.attendancePreferenceService.clearPreference(
+      actor.userId,
+      actor.uniId,
+      tx,
+    );
   }
 
   async recordAttendance(
@@ -206,14 +302,22 @@ export class AttendanceCaptureService {
         message: 'There is no attendance slot available for this sticker.',
       };
     }
-    if (available.length > 1) {
+    const preference = await this.attendancePreferenceService.getPreference(
+      operator.userId,
+      tag.universityId,
+      tx,
+    );
+    const occurrence = this.resolveOccurrence(
+      available,
+      preference?.preferredEventId ?? null,
+    );
+    if (!occurrence) {
       return {
         status: AttendanceRecordStatus.AMBIGUOUS_EVENT,
-        message: 'The lecturer has more than one attendance slot available.',
+        message:
+          'The lecturer must choose the current class on their attendance page.',
       };
     }
-
-    const occurrence = available[0];
     if (actor) {
       await this.attendanceSessionService.assertStudentEligible(
         actor.userId,
@@ -356,12 +460,34 @@ export class AttendanceCaptureService {
     if (!available.length) {
       throw new BadRequestException('There is no attendance slot available');
     }
-    if (available.length > 1) {
+    const preference = await this.attendancePreferenceService.getPreference(
+      actor.userId,
+      actor.uniId,
+      tx,
+    );
+    const occurrence = this.resolveOccurrence(
+      available,
+      preference?.preferredEventId ?? null,
+    );
+    if (!occurrence) {
       throw new BadRequestException(
         'The lecturer has more than one attendance slot available',
       );
     }
-    return available[0];
+    return occurrence;
+  }
+
+  private resolveOccurrence(
+    available: EventOccurrenceRow[],
+    preferredEventId: string | null,
+  ): EventOccurrenceRow | null {
+    if (available.length === 1) return available[0];
+    if (available.length <= 1 || !preferredEventId) return null;
+
+    const preferred = available.filter(
+      (occurrence) => occurrence.eventID === preferredEventId,
+    );
+    return preferred.length === 1 ? preferred[0] : null;
   }
 
   private async getOperator(
