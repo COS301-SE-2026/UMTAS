@@ -1,7 +1,7 @@
 import { Button } from "@/components/atoms/baseShadcn/button";
 import { Input } from "@/components/atoms/baseShadcn/input";
 import { Progress } from "@/components/atoms/baseShadcn/progress";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { pose_Manager } from "../../../../utilities/VisionModel/pose_manager";
 import { pose_data_manager } from "../../../../utilities/VisionModel/pose_data_manager";
 import SessionStorePose, {
@@ -24,6 +24,12 @@ export default function VideoUploadComp() {
   const [eta, setEta] = useState<string>("Calculating...");
   const [currentTimeDisplay, setCurrentTimeDisplay] = useState<string>("0:00");
   const startTimeRef = useRef<number>(0);
+
+  useEffect(() => {
+    return () => {
+      isProcessingRef.current = false;
+    };
+  }, []);
 
   async function processVideo(file: File) {
     setIsProcessing(true);
@@ -67,6 +73,7 @@ export default function VideoUploadComp() {
         await new Promise((res) => {
           video.onseeked = res;
         });
+        if (!isProcessingRef.current) break;
 
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
         const imageData = context.getImageData(
@@ -81,8 +88,12 @@ export default function VideoUploadComp() {
           canvas.width,
           canvas.height,
         );
+        if (!isProcessingRef.current) break;
+
         if (results) {
           const people = await pose_data_manager.run(results);
+          if (!isProcessingRef.current) break;
+
           if (people) {
             const frame = ++numFrames;
             if (frameStore.current?.getNumFrames() === 0) {
@@ -167,6 +178,9 @@ export default function VideoUploadComp() {
       URL.revokeObjectURL(videoUrl);
       setIsProcessing(false);
     }
+
+    const results = await frameStore.current.analyseAllFrames();
+    console.log(results);
   }
 
   return (
@@ -228,7 +242,12 @@ export default function VideoUploadComp() {
                   {video == null ? <>Upload Video</> : <>Cancel Upload</>}
                 </Button>
                 <Label className=" flex flex-col  w-full  text-md font-medium text-[var(--text-primary)] text-left pl-1">
-                  Detection Interval
+                  <span className="relative group  inline-block w-fit">
+                    Detection Interval
+                    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:block w-48 p-1.5 bg-[var(--bg-surface)] border border-[var(--border)] text-xs text-[var(--text-secondary)] rounded-md shadow-md text-center z-50">
+                      Please note increasing the time decreases accuracy
+                    </span>
+                  </span>
                   <Input
                     value={frameInterval}
                     onChange={(e) => {
@@ -240,9 +259,9 @@ export default function VideoUploadComp() {
                     }}
                     min={0.5}
                     max={100}
-                    step={0.5}
+                    step={0.1}
                     type="number"
-                    placeholder="0"
+                    placeholder="0.5"
                     className="h-8 w-40 rounded-md border border-[var(--border)] bg-transparent px-2 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--ring)]"
                   />
                 </Label>

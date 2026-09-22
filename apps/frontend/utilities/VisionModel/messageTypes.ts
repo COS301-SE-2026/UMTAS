@@ -89,3 +89,9 @@ export interface DetectedPersonPose {
   right_shoulder: Keypoint;
   right_arm: Keypoint[]; // [right_elbow, right_wrist]
 }
+
+export interface SessionInferenceResult {
+  questions_asked: number;
+  detected_restless: number;
+  restless_ids: number[];
+}

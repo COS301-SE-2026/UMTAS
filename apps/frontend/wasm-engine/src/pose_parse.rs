@@ -159,23 +159,14 @@ pub fn attach_id(
         people: new_people,
     };
 }
+
 pub fn is_hands_up(new_person: &DetectedPersonPose) -> bool {
-    const MIN_KP_SCORE: f32 = 0.5;
+    let bottom_boundary = (new_person.center_mass.y + new_person.nose.y) / 2.0;
 
-    let head_height = (new_person.center_mass.y - new_person.nose.y).abs();
+    let right_hand_up =
+        new_person.right_arm.len() > 1 && new_person.right_arm[1].y <= bottom_boundary;
 
-    let top_boundary = new_person.nose.y - head_height;
-    let bottom_boundary = new_person.center_mass.y;
-
-    let right_hand_up = new_person.right_arm.len() > 1
-        && new_person.right_arm[1].score >= MIN_KP_SCORE
-        && new_person.right_arm[1].y >= top_boundary
-        && new_person.right_arm[1].y <= bottom_boundary;
-
-    let left_hand_up = new_person.left_arm.len() > 1
-        && new_person.left_arm[1].score >= MIN_KP_SCORE
-        && new_person.left_arm[1].y >= top_boundary
-        && new_person.left_arm[1].y <= bottom_boundary;
+    let left_hand_up = new_person.left_arm.len() > 1 && new_person.left_arm[1].y <= bottom_boundary;
 
     right_hand_up || left_hand_up
 }

@@ -31,6 +31,7 @@ pub fn group_data(full_session: HashMap<usize, SessionPerson>) -> SessionAnalysi
     return SessionAnalysis {
         detected_restless: total_restless,
         questions_asked: total_question,
+        restless_ids: [0].to_vec(),
     };
 }
 
@@ -39,7 +40,7 @@ pub fn evaluate_restlessness(centers: &[Keypoint]) -> bool {
         return false;
     }
 
-    const NOISE: f32 = 5.0;
+    const NOISE: f32 = 10.0;
     // ratio of how many frames they are expected to be moving for
     const R_RATIO: f32 = 0.3;
 
@@ -69,21 +70,49 @@ pub fn evaluate_restlessness(centers: &[Keypoint]) -> bool {
 
     return restlessness_ratio > R_RATIO;
 }
+
 pub fn get_session_data(frames: Vec<FrameStore>) -> HashMap<usize, SessionPerson> {
+    let mut total_frames_count: HashMap<usize, usize> = HashMap::new();
+    let mut inferred_frames_count: HashMap<usize, usize> = HashMap::new();
+
+    for frame in &frames {
+        for person in &frame.people {
+            *total_frames_count.entry(person.assigned_id).or_insert(0) += 1;
+            if person.is_inferred {
+                *inferred_frames_count.entry(person.assigned_id).or_insert(0) += 1;
+            }
+        }
+    }
+
+    let mut excluded_ids = std::collections::HashSet::new();
+    const MAX_INFERRED_RATIO: f32 = 0.5;
+
+    for (&id, &total) in &total_frames_count {
+        let inferred = *inferred_frames_count.get(&id).unwrap_or(&0);
+        if (inferred as f32 / total as f32) > MAX_INFERRED_RATIO {
+            excluded_ids.insert(id);
+        }
+    }
+
     // must remain sorted
     let mut all_session_people: HashMap<usize, SessionPerson> = HashMap::new();
-    const DISTANCE_BETWEEN_START_END: usize = 10;
-    const DISTANCE_BETWEEN_END_NEW: usize = 10;
+    const DISTANCE_BETWEEN_START_END: usize = 5;
+    const DISTANCE_BETWEEN_END_NEW: usize = 5;
 
     for frame in frames {
         for person in frame.people {
-            let id = &person.assigned_id;
+            let id = person.assigned_id;
 
-            if let Some(stored_person) = all_session_people.get_mut(id) {
-                stored_person
-                    .all_center_mass
-                    .push(person.pose_data.center_mass);
+            if excluded_ids.contains(&id) {
+                continue;
+            }
 
+            if let Some(stored_person) = all_session_people.get_mut(&id) {
+                if !person.is_inferred {
+                    stored_person
+                        .all_center_mass
+                        .push(person.pose_data.center_mass);
+                }
                 // question logic
 
                 if person.hand_up {
@@ -166,6 +195,7 @@ pub struct SessionAnalysis {
     questions_asked: usize,
     // a measure of everyones center and the average movement of that point
     detected_restless: usize,
+    restless_ids: Vec<usize>,
 }
 
 #[derive(Clone)]

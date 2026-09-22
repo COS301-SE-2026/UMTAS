@@ -1,10 +1,11 @@
 // will store the data given for people
 // Will also be the frame of reference for the drawers to draw to screen
 
-import { DetectedPersonPose } from "../messageTypes";
+import { DetectedPersonPose, SessionInferenceResult } from "../messageTypes";
 import init, {
   analyze_frame,
   first_frame,
+  analyse_session,
 } from "../../../wasm-engine/pkg/wasm_engine";
 
 // if id is not found in a frame it draws them again
@@ -73,7 +74,16 @@ export default class SessionStorePose {
    * Questions => measure of how many questions were asked => a number of frames in sequence where an id has hand up
    * they cannot be from isInferred
    */
-  public analyseAllFrames() {}
+  public async analyseAllFrames() {
+    if (!this.isInitialized) {
+      await this.initPromise;
+    }
+
+    const result = analyse_session(this.frames);
+    const jsResult: SessionInferenceResult = JSON.parse(result);
+
+    return jsResult;
+  }
 
   public getNumFrames() {
     return this.frames.length;
