@@ -32,6 +32,12 @@ type OperatorSlotsOperation = paths["/api/attendance/operator/slots"]["get"];
 type OperatorSlotsResponse =
   OperatorSlotsOperation["responses"]["200"]["content"]["application/json"];
 type OperatorSlotDto = OperatorSlotsResponse["slotList"][number];
+type SelectPreferredEventOperation =
+  paths["/api/attendance/operator/preferred-event"]["put"];
+type SelectPreferredEventBody =
+  SelectPreferredEventOperation["requestBody"]["content"]["application/json"];
+type SelectPreferredEventResponse =
+  SelectPreferredEventOperation["responses"]["200"]["content"]["application/json"];
 type CheckInOperation = paths["/api/attendance/records"]["post"];
 type CheckInBody =
   CheckInOperation["requestBody"]["content"]["application/json"];
@@ -44,7 +50,7 @@ type AttendanceSessionResponse =
   AttendanceSessionOperation["responses"]["200"]["content"]["application/json"];
 
 const EMPTY_BODY: Record<string, never> = {};
-export const NFC_STATE_CHANGE_EVENT = "umtas-nfc-state-change";
+export const ATTENDANCE_STATE_CHANGE_EVENT = "umtas-attendance-state-change";
 
 class GetRegisteredTagBuilder extends RequestBuilder<
   undefined,
@@ -105,6 +111,32 @@ class GetOperatorSlotsBuilder extends RequestBuilder<
   }
 }
 
+class SelectPreferredEventBuilder extends RequestBuilder<
+  undefined,
+  SelectPreferredEventBody,
+  SelectPreferredEventResponse
+> {
+  constructor() {
+    super();
+    this.setUrl("/attendance/operator/preferred-event").setMethod(
+      RequestMethod.PUT,
+    );
+  }
+}
+
+class ClearPreferredEventBuilder extends RequestBuilder<
+  undefined,
+  undefined,
+  undefined
+> {
+  constructor() {
+    super();
+    this.setUrl("/attendance/operator/preferred-event").setMethod(
+      RequestMethod.DELETE,
+    );
+  }
+}
+
 class NfcCheckInBuilder extends RequestBuilder<
   undefined,
   CheckInBody,
@@ -161,7 +193,7 @@ export async function confirmTagRegistration(
     body: { activationTicket: registration.activationTicket },
   });
   if (typeof window !== "undefined") {
-    window.dispatchEvent(new Event(NFC_STATE_CHANGE_EVENT));
+    window.dispatchEvent(new Event(ATTENDANCE_STATE_CHANGE_EVENT));
   }
   return tag;
 }
@@ -183,9 +215,31 @@ export async function getOperatorAttendanceOverview(): Promise<{
     slots,
     preview: {
       slot: result.currentSlot ? toAttendanceSlot(result.currentSlot) : null,
-      ambiguous: result.ambiguous,
+      preferredEventId: result.preferredEventId,
+      requiresSelection: result.requiresSelection,
     },
   };
+}
+
+export async function selectPreferredEvent(
+  slot: AttendanceSlot,
+): Promise<AttendanceSlot> {
+  const selected = await new SelectPreferredEventBuilder().send({
+    body: {
+      eventID: slot.eventID,
+    },
+  });
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event(ATTENDANCE_STATE_CHANGE_EVENT));
+  }
+  return toAttendanceSlot(selected);
+}
+
+export async function clearPreferredEvent(): Promise<void> {
+  await new ClearPreferredEventBuilder().send({});
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event(ATTENDANCE_STATE_CHANGE_EVENT));
+  }
 }
 
 export async function getTodayAttendanceSlots(): Promise<AttendanceSlot[]> {

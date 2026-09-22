@@ -9,6 +9,7 @@ import {
 import { mockTransaction } from '../Testing/Mocks/database.helpers';
 import { createMockDatabase } from '../Testing/Mocks/database.mock';
 import { AttendanceCaptureService } from './attendance-capture.service';
+import { AttendancePreferenceService } from './attendance-preference.service';
 import { AttendanceSessionService } from './attendance-session.service';
 import { NfcAttendanceService } from './nfc-attendance.service';
 
@@ -22,7 +23,14 @@ describe('AttendanceCaptureService', () => {
     recordIdentifiedAttendance: jest.fn(),
     setGuestCount: jest.fn(),
   };
-  const nfcService = { authenticateTag: jest.fn() };
+  const nfcService = {
+    authenticateTag: jest.fn(),
+  };
+  const preferenceService = {
+    getPreference: jest.fn(),
+    setPreferredEvent: jest.fn(),
+    clearPreference: jest.fn(),
+  };
   const operator = {
     userId: '11111111-1111-4111-8111-111111111111',
     uniId: '22222222-2222-4222-8222-222222222222',
@@ -61,6 +69,7 @@ describe('AttendanceCaptureService', () => {
         AttendanceCaptureService,
         { provide: DatabaseService, useValue: { db: mockDb } },
         { provide: AttendanceSessionService, useValue: sessionService },
+        { provide: AttendancePreferenceService, useValue: preferenceService },
         { provide: NfcAttendanceService, useValue: nfcService },
       ],
     }).compile();
@@ -73,6 +82,7 @@ describe('AttendanceCaptureService', () => {
     });
     mockTransaction(mockDb, {});
     nfcService.authenticateTag.mockResolvedValue(tag);
+    preferenceService.getPreference.mockResolvedValue(null);
   });
 
   afterEach(() => {
@@ -186,5 +196,142 @@ describe('AttendanceCaptureService', () => {
     await expect(
       service.recordCameraAttendance(operator, { guestCount: 21 }),
     ).resolves.toEqual(attendance);
+  });
+
+  it('returns AMBIGUOUS_EVENT when two occurrences are available without a preference', async () => {
+    const secondOccurrence = {
+      ...occurrence,
+      eventID: '77777777-7777-4777-8777-777777777777',
+      eventName: 'Overlapping lecture',
+    };
+    (service as any).findOperatorOccurrences.mockResolvedValue([
+      occurrence,
+      secondOccurrence,
+    ]);
+
+    const result = await service.recordAttendance(undefined, {
+      captureMethod: 'NFC',
+      tagId: tag.tagId,
+      token: 'x'.repeat(32),
+    });
+
+    expect(result.status).toBe('AMBIGUOUS_EVENT');
+    expect(sessionService.createOrGetOccurrenceSession).not.toHaveBeenCalled();
+  });
+
+  it('records against the occurrence identified by the preferred event', async () => {
+    const secondOccurrence = {
+      ...occurrence,
+      eventID: '77777777-7777-4777-8777-777777777777',
+      eventName: 'Overlapping lecture',
+    };
+    const pinnedSession = createAttendanceSession({
+      eventID: secondOccurrence.eventID,
+      scheduledStartAt: secondOccurrence.scheduledStartAt,
+      scheduledEndAt: secondOccurrence.scheduledEndAt,
+    });
+    (service as any).findOperatorOccurrences.mockResolvedValue([
+      occurrence,
+      secondOccurrence,
+    ]);
+    preferenceService.getPreference.mockResolvedValue({
+      ownerUserId: operator.userId,
+      universityId: operator.uniId,
+      preferredEventId: secondOccurrence.eventID,
+      selectedAt: new Date(now),
+      updatedAt: new Date(now),
+    });
+    sessionService.createOrGetOccurrenceSession.mockResolvedValue(
+      pinnedSession,
+    );
+    sessionService.incrementGuestAttendance.mockResolvedValue(
+      createSessionAttendance({
+        SessionID: pinnedSession.SessionID,
+        UserID: null,
+        guestCount: 1,
+        captureMethod: 'NFC',
+      }),
+    );
+
+    const result = await service.recordAttendance(undefined, {
+      captureMethod: 'NFC',
+      tagId: tag.tagId,
+      token: 'x'.repeat(32),
+    });
+
+    expect(result.status).toBe('RECORDED');
+    expect(sessionService.createOrGetOccurrenceSession).toHaveBeenCalledWith(
+      operator,
+      secondOccurrence.eventID,
+      secondOccurrence,
+      mockDb,
+    );
+  });
+
+  it('returns AMBIGUOUS_EVENT when the preferred event is no longer available', async () => {
+    const secondOccurrence = {
+      ...occurrence,
+      eventID: '77777777-7777-4777-8777-777777777777',
+      eventName: 'Overlapping lecture',
+    };
+    (service as any).findOperatorOccurrences.mockResolvedValue([
+      occurrence,
+      secondOccurrence,
+    ]);
+    preferenceService.getPreference.mockResolvedValue({
+      ownerUserId: operator.userId,
+      universityId: operator.uniId,
+      preferredEventId: '88888888-8888-4888-8888-888888888888',
+      selectedAt: new Date(now),
+      updatedAt: new Date(now),
+    });
+
+    const result = await service.recordAttendance(undefined, {
+      captureMethod: 'NFC',
+      tagId: tag.tagId,
+      token: 'x'.repeat(32),
+    });
+
+    expect(result.status).toBe('AMBIGUOUS_EVENT');
+  });
+
+  it('saves an event preference without creating an attendance session', async () => {
+    const selectedSlot = {
+      eventID: occurrence.eventID,
+      eventName: occurrence.eventName,
+      moduleID: occurrence.moduleID,
+      moduleCode: occurrence.moduleCode,
+      moduleName: occurrence.moduleName,
+      venue: occurrence.venue,
+      scheduledStartAt: occurrence.scheduledStartAt,
+      scheduledEndAt: occurrence.scheduledEndAt,
+      sessionId: null,
+      state: 'AVAILABLE' as const,
+      attendanceCount: 0,
+    };
+    Object.defineProperty(service, 'getOperatorSlots', {
+      value: jest.fn().mockResolvedValue({ slotList: [selectedSlot] }),
+    });
+
+    await expect(
+      service.selectPreferredEvent(operator, { eventID: occurrence.eventID }),
+    ).resolves.toEqual(selectedSlot);
+    expect(preferenceService.setPreferredEvent).toHaveBeenCalledWith(
+      operator.userId,
+      operator.uniId,
+      occurrence.eventID,
+      mockDb,
+    );
+    expect(sessionService.createOrGetOccurrenceSession).not.toHaveBeenCalled();
+  });
+
+  it('forbids selecting an occurrence the operator does not teach', async () => {
+    (service as any).findOperatorOccurrences.mockResolvedValue([]);
+
+    await expect(
+      service.selectPreferredEvent(operator, {
+        eventID: occurrence.eventID,
+      }),
+    ).rejects.toThrow(ForbiddenException);
   });
 });

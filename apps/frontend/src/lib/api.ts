@@ -1682,6 +1682,30 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/attendance/operator/preferred-event": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Select the operator preferred attendance event
+     * @description Select the operator preferred attendance event. This Attendance operation is part of the versioned UMTAS HTTP contract.
+     */
+    put: operations["selectPreferredAttendanceEvent"];
+    post?: never;
+    /**
+     * Clear the operator preferred attendance event
+     * @description Clear the operator preferred attendance event. This Attendance operation is part of the versioned UMTAS HTTP contract.
+     */
+    delete: operations["clearPreferredAttendanceEvent"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/attendance/records": {
     parameters: {
       query?: never;
@@ -4378,8 +4402,14 @@ export interface components {
     };
     OperatorAttendanceSlotsResponseDto: {
       slotList: components["schemas"]["OperatorAttendanceSlotDto"][];
-      ambiguous: boolean;
       currentSlot?: components["schemas"]["OperatorAttendanceSlotDto"] | null;
+      /** Format: uuid */
+      preferredEventId: string | null;
+      requiresSelection: boolean;
+    };
+    SelectPreferredEventDto: {
+      /** Format: uuid */
+      eventID: string;
     };
     RecordAttendanceDto: {
       /**
@@ -9649,6 +9679,57 @@ export interface operations {
         content: {
           "application/json": components["schemas"]["OperatorAttendanceSlotsResponseDto"];
         };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  selectPreferredAttendanceEvent: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SelectPreferredEventDto"];
+      };
+    };
+    responses: {
+      /** @description HTTP 200 response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperatorAttendanceSlotDto"];
+        };
+      };
+      400: components["responses"]["BadRequestError"];
+      401: components["responses"]["UnauthorizedError"];
+      403: components["responses"]["ForbiddenError"];
+      409: components["responses"]["ConflictError"];
+      500: components["responses"]["InternalError"];
+    };
+  };
+  clearPreferredAttendanceEvent: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description HTTP 200 response. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
       400: components["responses"]["BadRequestError"];
       401: components["responses"]["UnauthorizedError"];

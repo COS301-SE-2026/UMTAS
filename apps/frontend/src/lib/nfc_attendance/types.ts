@@ -79,7 +79,8 @@ export interface AttendanceSlot {
 
 export interface CurrentSlotPreview {
   slot: AttendanceSlot | null;
-  ambiguous: boolean;
+  preferredEventId: string | null;
+  requiresSelection: boolean;
   message?: string;
 }
 
