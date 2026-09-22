@@ -43,13 +43,13 @@ export function SlotSummaryCard({
           status={slot.state}
           className="hidden sm:inline-flex"
         />
-        {onSelect && (
+        {onSelect && !selected && (
           <Button variant="ghost" size="sm" onClick={onSelect} disabled={busy}>
             {busy
               ? "Selecting…"
               : slot.state === "AVAILABLE"
-                ? "View current class"
-                : "View"}
+                ? "Use for attendance"
+                : "Set as preferred"}
           </Button>
         )}
       </div>

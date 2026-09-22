@@ -3,47 +3,25 @@
 import AttendanceCounter from "./AttendanceCounter";
 import { LastScannedStudent } from "./LastScannedStudent";
 
-import { ChangeEvent, useCallback, useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Check, ChevronsUpDown, Upload } from "lucide-react";
+import { Upload } from "lucide-react";
 
 import { BarcodeCamera } from "@/components/molecules/attendance/BarcodeCamera";
 import { ScannerBadge } from "@/components/molecules/attendance/ScannerBadge";
 import { StudentNumberInput } from "@/components/molecules/attendance/USBBarcodeScanner";
 
-import { updateAttendanceCountMut } from "@/components/templates/attendance/Queries/attendanceQueries";
-import { assignMeToModuleMut } from "@/components/templates/attendance/Queries/teachesQueries";
-
-import { useUniversityState } from "@/hooks/useUniversityState";
-
-import { fetchAllModulesv2 } from "../../../../utilities/V2-Builders/Modules";
+import {
+  getAttendanceSlotsQ,
+  updateAttendanceCountMut,
+} from "@/components/templates/attendance/Queries/attendanceQueries";
+import { ConflictingEventDialog } from "./ConflictingEventDialog";
+import { selectPreferredEvent } from "@/lib/nfc_attendance/nfc_api";
+import type { AttendanceSlot } from "@/lib/nfc_attendance/types";
 
 import { Switch } from "@/components/atoms/baseShadcn/switch";
 import { Label } from "@/components/atoms/baseShadcn/label";
 import { Button } from "@/components/atoms/baseShadcn/button";
-
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/atoms/baseShadcn/select";
-
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/atoms/baseShadcn/popover";
-
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/atoms/baseShadcn/command";
 
 export default function AttendanceScanner() {
   const [expectedStudents, setExpectedStudents] = useState<string[]>([]);
@@ -62,47 +40,41 @@ export default function AttendanceScanner() {
   const [sessionStarted, setSessionStarted] = useState(false);
   const [sessionEnded, setSessionEnded] = useState(false);
 
-  const [selectedModuleID, setSelectedModuleID] = useState("");
-  const [selectedEventID, setSelectedEventID] = useState("");
+  const [selectedSlotOverride, setSelectedSlotOverride] =
+    useState<AttendanceSlot | null>(null);
+  const [conflictOpen, setConflictOpen] = useState(false);
+  const [selectingSlot, setSelectingSlot] = useState(false);
 
-  const [eventPickerOpen, setEventPickerOpen] = useState(false);
-
-  const { university, isLoading: universityLoading } = useUniversityState();
-
-  const { data: modules = [], isLoading: modulesLoading } = useQuery({
-    queryKey: ["attendance-modules", university?.UniversityID ?? ""],
-
-    queryFn: async () => {
-      const response = await fetchAllModulesv2({
-        universityId: university?.UniversityID,
-        userEnrollment: false,
-      });
-
-      return response.modules ?? [];
-    },
-
-    enabled: !universityLoading && university?.UniversityID != null,
-  });
+  const {
+    data: slotData,
+    isLoading: slotsLoading,
+    refetch,
+  } = useQuery(getAttendanceSlotsQ());
+  const slots: AttendanceSlot[] = (slotData?.slotList ?? []).map((slot) => ({
+    id: `${slot.eventID}:${slot.scheduledStartAt}`,
+    eventID: slot.eventID,
+    scheduledStartAt: slot.scheduledStartAt,
+    sessionId: slot.sessionId,
+    moduleCode: slot.moduleCode,
+    moduleName: slot.moduleName,
+    venue: slot.venue ?? "Venue not set",
+    startAt: slot.scheduledStartAt,
+    endAt: slot.scheduledEndAt,
+    state: slot.state,
+    attendanceCount: slot.attendanceCount,
+  }));
+  const currentSlot = slotData?.currentSlot
+    ? (slots.find(
+        (slot) =>
+          slot.eventID === slotData.currentSlot?.eventID &&
+          slot.scheduledStartAt === slotData.currentSlot.scheduledStartAt,
+      ) ?? null)
+    : null;
+  const selectedSlot = selectedSlotOverride ?? currentSlot;
+  const selectedEventID = selectedSlot?.eventID ?? "";
 
   const { mutate: updateAttendanceCount } = useMutation(
     updateAttendanceCountMut(),
-  );
-
-  const {
-    mutate: assignMeToModule,
-    isPending: isJoiningModule,
-    isSuccess: moduleReady,
-    reset: resetModuleMutation,
-  } = useMutation(assignMeToModuleMut());
-
-  const selectedModule = modules.find(
-    (module) => module.moduleID === selectedModuleID,
-  );
-
-  const moduleEvents = selectedModule?.Events ?? [];
-
-  const selectedEvent = moduleEvents.find(
-    (event) => event.eventId === selectedEventID,
   );
 
   const resetUploadedList = () => {
@@ -112,24 +84,17 @@ export default function AttendanceScanner() {
     setLastScan(null);
   };
 
-  const handleModuleChange = (moduleID: string) => {
-    setSelectedModuleID(moduleID);
-    setSelectedEventID("");
-    setEventPickerOpen(false);
-
-    resetUploadedList();
-    resetModuleMutation();
-  };
-
-  const handleUseModule = () => {
-    if (!selectedModuleID) return;
-
-    assignMeToModule(selectedModuleID);
-  };
-
-  const handleEventChange = (eventID: string) => {
-    setSelectedEventID(eventID);
-
+  const handleSlotSelect = async (slot: AttendanceSlot) => {
+    setSelectingSlot(true);
+    try {
+      setSelectedSlotOverride(await selectPreferredEvent(slot));
+      setConflictOpen(false);
+      await refetch();
+    } catch {
+      setConflictOpen(true);
+    } finally {
+      setSelectingSlot(false);
+    }
     resetUploadedList();
   };
 
@@ -155,74 +120,61 @@ export default function AttendanceScanner() {
     setStatus("READY");
   };
 
-  const handleScan = useCallback(
-    (studentNumber: string) => {
-      if (!sessionStarted || sessionEnded || !selectedEventID) {
-        return;
-      }
+  const handleScan = (studentNumber: string) => {
+    if (!sessionStarted || sessionEnded || !selectedEventID) {
+      return;
+    }
 
-      const cleanedStudentNumber = studentNumber.trim();
+    const cleanedStudentNumber = studentNumber.trim();
 
-      setLastScan(cleanedStudentNumber);
+    setLastScan(cleanedStudentNumber);
 
-      if (!/^\d{8}$/.test(cleanedStudentNumber)) {
-        setStatus("ERROR");
-
-        window.setTimeout(() => {
-          setStatus("READY");
-        }, 1500);
-
-        return;
-      }
-
-      if (!expectedStudents.includes(cleanedStudentNumber)) {
-        setStatus("ERROR");
-
-        window.setTimeout(() => {
-          setStatus("READY");
-        }, 1500);
-
-        return;
-      }
-
-      setAttendedStudents((current) => {
-        if (current.has(cleanedStudentNumber)) {
-          return current;
-        }
-
-        const updated = new Set(current);
-
-        updated.add(cleanedStudentNumber);
-
-        updateAttendanceCount({
-          guestCount: updated.size,
-          eventID: selectedEventID,
-        });
-
-        return updated;
-      });
-
-      setStatus("SUCCESS");
+    if (!/^\d{8}$/.test(cleanedStudentNumber)) {
+      setStatus("ERROR");
 
       window.setTimeout(() => {
         setStatus("READY");
       }, 1500);
-    },
-    [
-      expectedStudents,
-      selectedEventID,
-      sessionEnded,
-      sessionStarted,
-      updateAttendanceCount,
-    ],
-  );
+
+      return;
+    }
+
+    if (!expectedStudents.includes(cleanedStudentNumber)) {
+      setStatus("ERROR");
+
+      window.setTimeout(() => {
+        setStatus("READY");
+      }, 1500);
+
+      return;
+    }
+
+    setAttendedStudents((current) => {
+      if (current.has(cleanedStudentNumber)) {
+        return current;
+      }
+
+      const updated = new Set(current);
+
+      updated.add(cleanedStudentNumber);
+
+      updateAttendanceCount({
+        guestCount: updated.size,
+        eventID: selectedEventID,
+      });
+
+      return updated;
+    });
+
+    setStatus("SUCCESS");
+
+    window.setTimeout(() => {
+      setStatus("READY");
+    }, 1500);
+  };
 
   const startSession = () => {
-    if (
-      expectedStudents.length === 0 ||
-      !selectedModuleID ||
-      !selectedEventID
-    ) {
+    if (expectedStudents.length === 0 || !selectedEventID) {
       return;
     }
 
@@ -249,17 +201,10 @@ export default function AttendanceScanner() {
     setFileName(null);
     setLastScan(null);
 
-    setSelectedModuleID("");
-    setSelectedEventID("");
-
     setSessionStarted(false);
     setSessionEnded(false);
 
-    setEventPickerOpen(false);
-
     setStatus("READY");
-
-    resetModuleMutation();
   };
 
   if (sessionEnded) {
@@ -295,152 +240,55 @@ export default function AttendanceScanner() {
           </h2>
 
           <p className="mt-1 text-sm text-[var(--text-secondary)]">
-            Select a module, event and expected student list.
+            Confirm the automatically resolved class and upload the expected
+            student list.
           </p>
         </div>
 
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="attendance-module">Module</Label>
-
-          <Select value={selectedModuleID} onValueChange={handleModuleChange}>
-            <SelectTrigger id="attendance-module" className="w-full">
-              <SelectValue
-                placeholder={
-                  modulesLoading ? "Loading modules..." : "Select module"
-                }
-              />
-            </SelectTrigger>
-
-            <SelectContent>
-              {modules.map((module) => (
-                <SelectItem key={module.moduleID} value={module.moduleID}>
-                  {module.moduleCode} - {module.moduleName}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <Button
-          type="button"
-          variant="outline"
-          disabled={!selectedModuleID || isJoiningModule || moduleReady}
-          onClick={handleUseModule}
-          className="w-full"
-        >
-          {isJoiningModule
-            ? "Setting Up Module..."
-            : moduleReady
-              ? "Module Ready"
-              : "Use This Module"}
-        </Button>
-
-        <div className="flex flex-col gap-2">
-          <Label>Event</Label>
-
-          <Popover open={eventPickerOpen} onOpenChange={setEventPickerOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                type="button"
-                variant="outline"
-                role="combobox"
-                aria-expanded={eventPickerOpen}
-                disabled={!moduleReady}
-                className="h-10 w-full justify-between px-3 font-normal"
-              >
-                <span className="truncate text-left">
-                  {selectedEvent
-                    ? `${selectedEvent.eventName}${
-                        selectedEvent.activityCode
-                          ? ` • ${selectedEvent.activityCode}`
-                          : ""
-                      }`
-                    : moduleReady
-                      ? "Select event"
-                      : "Select and use a module first"}
-                </span>
-
-                <ChevronsUpDown
-                  size={16}
-                  className="ml-2 shrink-0 opacity-50"
-                />
-              </Button>
-            </PopoverTrigger>
-
-            <PopoverContent
-              align="start"
-              className="w-[var(--radix-popover-trigger-width)] p-0"
-            >
-              <Command>
-                <CommandInput placeholder="Search events..." />
-
-                <CommandList>
-                  <CommandEmpty>No events found.</CommandEmpty>
-
-                  <CommandGroup>
-                    {moduleEvents.map((event) => {
-                      const selected = selectedEventID === event.eventId;
-
-                      const dayOrDate = event.isRecurring
-                        ? event.eventCriteria?.dayOfWeek || "Recurring"
-                        : event.eventCriteria?.date || "No date";
-
-                      const startTime =
-                        event.eventCriteria?.startTime || "--:--";
-
-                      const endTime = event.eventCriteria?.endTime || "--:--";
-
-                      return (
-                        <CommandItem
-                          key={event.eventId}
-                          value={`${event.eventName} ${
-                            event.activityCode ?? ""
-                          } ${dayOrDate} ${startTime} ${endTime}`}
-                          onSelect={() => {
-                            handleEventChange(event.eventId);
-                            setEventPickerOpen(false);
-                          }}
-                          className="cursor-pointer py-3"
-                        >
-                          <Check
-                            size={16}
-                            className={`mr-3 shrink-0 ${
-                              selected ? "opacity-100" : "opacity-0"
-                            }`}
-                          />
-
-                          <div className="flex min-w-0 flex-1 flex-col gap-1">
-                            <div className="flex items-center gap-2">
-                              <span className="truncate text-sm font-medium text-[var(--text-primary)]">
-                                {event.eventName}
-                              </span>
-
-                              {event.activityCode && (
-                                <span className="shrink-0 rounded-md bg-[var(--bg-elevated)] px-2 py-0.5 text-xs text-[var(--text-secondary)]">
-                                  {event.activityCode}
-                                </span>
-                              )}
-                            </div>
-
-                            <span className="text-xs text-[var(--text-secondary)]">
-                              {dayOrDate} • {startTime} - {endTime}
-                            </span>
-                          </div>
-                        </CommandItem>
-                      );
-                    })}
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
-
-          {moduleReady && moduleEvents.length === 0 && (
-            <p className="text-xs text-[var(--text-secondary)]">
-              No events are available for this module.
+        <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4">
+          <Label>Current class</Label>
+          {slotsLoading ? (
+            <p className="mt-2 text-sm text-[var(--text-secondary)]">
+              Resolving current class…
+            </p>
+          ) : selectedSlot ? (
+            <div className="mt-2">
+              <p className="text-sm font-medium text-[var(--text-primary)]">
+                {selectedSlot.moduleCode} · {selectedSlot.moduleName}
+              </p>
+              <p className="mt-1 text-xs text-[var(--text-secondary)]">
+                {selectedSlot.venue}
+              </p>
+              {(slotData?.slotList.filter((slot) => slot.state === "AVAILABLE")
+                .length ?? 0) > 1 && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="mt-3"
+                  onClick={() => setConflictOpen(true)}
+                >
+                  Change class
+                </Button>
+              )}
+            </div>
+          ) : (
+            <p className="mt-2 text-sm text-[var(--text-secondary)]">
+              {slotData?.requiresSelection
+                ? "Choose which class is currently running."
+                : "No attendance class is currently available."}
             </p>
           )}
         </div>
+
+        <ConflictingEventDialog
+          open={Boolean(slotData?.requiresSelection) || conflictOpen}
+          onOpenChange={setConflictOpen}
+          slots={slots.filter((slot) => slot.state === "AVAILABLE")}
+          selectedSlotId={selectedSlot?.id ?? null}
+          busy={selectingSlot}
+          onSelect={(slot) => void handleSlotSelect(slot)}
+        />
 
         <div className="border-t border-[var(--border)]" />
 
@@ -513,16 +361,14 @@ export default function AttendanceScanner() {
             <p className="text-sm text-[var(--text-secondary)]">
               {selectedEventID
                 ? "No student list uploaded."
-                : "Select an event before uploading a student list."}
+                : "A current class is required before uploading a student list."}
             </p>
           )}
         </div>
 
         <Button
           type="button"
-          disabled={
-            !moduleReady || !selectedEventID || expectedStudents.length === 0
-          }
+          disabled={!selectedEventID || expectedStudents.length === 0}
           onClick={startSession}
           className="w-full"
         >

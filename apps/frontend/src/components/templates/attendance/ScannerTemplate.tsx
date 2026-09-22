@@ -12,7 +12,7 @@ import {
 export default function ScannerTemplate() {
   const { university, isLoading } = useUniversityState();
 
-  const allowedRoles = ["UNIVERSITY_ADMIN", "LECTURER", "STUDENT"];
+  const allowedRoles = ["UNIVERSITY_ADMIN", "LECTURER"];
 
   const ViableRole = university?.role
     ? allowedRoles.includes(university.role)

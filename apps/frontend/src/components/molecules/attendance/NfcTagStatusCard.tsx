@@ -3,17 +3,20 @@ import { Button } from "@/components/atoms/baseShadcn/button";
 import { Card, CardContent } from "@/components/atoms/baseShadcn/card";
 import { AttendanceStatusPill } from "@/components/atoms/attendance/AttendanceStatusPill";
 import type { RegisteredNfcTag } from "@/lib/nfc_attendance/types";
+import Link from "next/link";
 
 export function NfcTagStatusCard({
   tag,
   onRegister,
   onTest,
+  registerHref,
   busy = false,
   testing = false,
 }: {
   tag: RegisteredNfcTag | null;
-  onRegister: () => void;
-  onTest: () => void;
+  onRegister?: () => void;
+  onTest?: () => void;
+  registerHref?: string;
   busy?: boolean;
   testing?: boolean;
 }) {
@@ -36,18 +39,30 @@ export function NfcTagStatusCard({
               is ready to use for your classes.
             </p>
             <div className="flex flex-wrap gap-2">
-              <Button size="sm" onClick={onTest} disabled={busy || testing}>
-                <Nfc size={14} aria-hidden="true" />
-                {testing ? "Scanning…" : "Test tag"}
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={onRegister}
-                disabled={busy}
-              >
-                <RotateCcw size={14} aria-hidden="true" /> Register replacement
-              </Button>
+              {onTest && (
+                <Button size="sm" onClick={onTest} disabled={busy || testing}>
+                  <Nfc size={14} aria-hidden="true" />
+                  {testing ? "Scanning…" : "Test tag"}
+                </Button>
+              )}
+              {registerHref ? (
+                <Button asChild variant="outline" size="sm">
+                  <Link href={registerHref}>
+                    <RotateCcw size={14} aria-hidden="true" /> Register
+                    replacement
+                  </Link>
+                </Button>
+              ) : (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={onRegister}
+                  disabled={busy}
+                >
+                  <RotateCcw size={14} aria-hidden="true" /> Register
+                  replacement
+                </Button>
+              )}
             </div>
           </>
         ) : (
@@ -55,9 +70,15 @@ export function NfcTagStatusCard({
             <p className="text-sm text-[var(--text-secondary)]">
               Register a sticker before students can check in.
             </p>
-            <Button onClick={onRegister} disabled={busy}>
-              Register sticker
-            </Button>
+            {registerHref ? (
+              <Button asChild>
+                <Link href={registerHref}>Register sticker</Link>
+              </Button>
+            ) : (
+              <Button onClick={onRegister} disabled={busy}>
+                Register sticker
+              </Button>
+            )}
           </div>
         )}
       </CardContent>
