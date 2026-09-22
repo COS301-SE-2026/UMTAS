@@ -298,7 +298,6 @@ function CanvasWebcam({
           }
 
           if (inferenceSettings.runInference) {
-            const ids: number[] = [];
             for (const frameOfPeople of frameStore.current?.getLastFrame()
               ?.people ?? []) {
               const data = frameOfPeople.pose_data;

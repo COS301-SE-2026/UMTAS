@@ -2,6 +2,11 @@ import { Button } from "@/components/atoms/baseShadcn/button";
 import { Input } from "@/components/atoms/baseShadcn/input";
 import { Progress } from "@/components/atoms/baseShadcn/progress";
 import { useRef, useState } from "react";
+import { pose_Manager } from "../../../../utilities/VisionModel/pose_manager";
+import { pose_data_manager } from "../../../../utilities/VisionModel/pose_data_manager";
+import SessionStorePose, {
+  frameStore,
+} from "../../../../utilities/VisionModel/sessionStore/poseSessionStore";
 
 export default function VideoUploadComp() {
   const [video, SetVideo] = useState<File | null>(null);
@@ -10,6 +15,7 @@ export default function VideoUploadComp() {
 
   const uploadVideoRef = useRef<HTMLInputElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const frameStore = useRef<SessionStorePose>(null);
 
   async function processVideo(file: File) {
     setIsProcessing(true);
@@ -24,6 +30,13 @@ export default function VideoUploadComp() {
       video.onloadedmetadata = () => resolve(true);
     });
 
+    pose_Manager.start();
+    pose_data_manager.start();
+    if (frameStore.current == null) {
+      frameStore.current = new SessionStorePose();
+      await frameStore.current.ready();
+    }
+
     const canvas = canvasRef.current;
     const context = canvas?.getContext("2d", { willReadFrequently: true });
 
@@ -36,9 +49,11 @@ export default function VideoUploadComp() {
     const duration = video.duration;
     const STEP_SECONDS = 0.5;
     let currentTime = 0;
+    let numFrames = 0;
 
     try {
       while (currentTime < duration) {
+        const timestamp = currentTime * 1000;
         video.currentTime = currentTime;
         await new Promise((res) => {
           video.onseeked = res;
@@ -51,6 +66,21 @@ export default function VideoUploadComp() {
           canvas.width,
           canvas.height,
         );
+
+        await pose_Manager
+          .run(imageData?.data, canvas.width, canvas.height)
+          .then((results) => {
+            if (results) {
+              pose_data_manager.run(results).then((people) => {
+                if (people) {
+                  const frame = ++numFrames;
+                  if (frameStore.current?.getNumFrames() === 0) {
+                    frameStore.current.sendFirst(frame, timestamp, people);
+                  } else frameStore.current?.sendData(frame, timestamp, people);
+                }
+              });
+            }
+          });
 
         currentTime += STEP_SECONDS;
       }
@@ -90,7 +120,7 @@ export default function VideoUploadComp() {
                     const file = e.target.files?.[0];
                     if (file) {
                       SetVideo(file);
-                      setIsProcessing(true);
+                      processVideo(file);
                     }
                   }}
                   className="hidden "
