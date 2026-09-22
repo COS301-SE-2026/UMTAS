@@ -4,10 +4,7 @@ import {
   DETECT_MESSAGE,
   PIXEL_PAYLOAD,
 } from "./messageTypes";
-import init, {
-  slice_image_data,
-  slice_image_data_gpu,
-} from "../../wasm-engine/pkg/wasm_engine";
+import init, { slice_image_data_gpu } from "../../wasm-engine/pkg/wasm_engine";
 import * as ort from "onnxruntime-web";
 
 let wasmLoaded = false;
@@ -52,10 +49,10 @@ async function runModel(slices: Float32Array[], payload: PIXEL_PAYLOAD) {
   const resultsArray: Float32Array[] = [];
 
   for (let i = 0; i < slices.length; i++) {
-    const sliceStart = performance.now();
     const inputTensor = new ort.Tensor("float32", slices[i], tensorShape);
     const results = await DetectSession!.run({ [inputName]: inputTensor });
-    const sliceDuration = (performance.now() - sliceStart) / 1000;
+
+    resultsArray.push(results[outputName].data as Float32Array);
   }
 
   return resultsArray;

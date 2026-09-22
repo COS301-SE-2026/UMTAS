@@ -1,5 +1,4 @@
 import {
-  DetectedPerson,
   DetectedPersonPose,
   PROCESS_POSE_DATA_MESSAGE,
   RESULT_PROCESS_POSE_DATA,
@@ -18,13 +17,11 @@ self.onmessage = async (event: MessageEvent) => {
 
   if (message.eventType === "PROCESS_POSE_DATA") {
     const payload = message.payload;
-    const tTotalStart = performance.now();
 
     if (!wasmLoaded) {
       await initWasm();
     }
 
-    const tSliceStart = performance.now();
     const people = infer_pose_data(
       payload.sliced_results.slice(1),
       payload.sliced_results[0],

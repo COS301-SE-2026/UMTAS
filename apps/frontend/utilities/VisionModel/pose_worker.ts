@@ -14,7 +14,7 @@ async function initDetection() {
   const fullUrl = `${location.origin}/models/yolo26n-pose.onnx`;
 
   DetectSession = await ort.InferenceSession.create(fullUrl, {
-    executionProviders: ["webgpu", "webgl"],
+    executionProviders: ["webgpu", "wasm"],
   });
 }
 async function createSlices(payload: PIXEL_PAYLOAD): Promise<Float32Array[]> {
