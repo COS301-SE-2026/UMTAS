@@ -13,7 +13,6 @@ RUN apt-get update && apt-get install -y \
 RUN curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
 WORKDIR /app
 
-
 RUN python3 -m venv .venv && \
     .venv/bin/pip install --no-cache-dir ultralytics onnx onnxruntime && \
     mkdir -p /app/models-output && \
@@ -23,8 +22,8 @@ RUN python3 -m venv .venv && \
     mv yolo26n-pose.onnx /app/models-output/yolo26n-pose.onnx && \
     rm -rf .venv
 
-COPY apps/frontend/wasm-engine ./wasm-engine
-WORKDIR /app/wasm-engine
+COPY apps/frontend/wasm-engine ./apps/frontend/wasm-engine
+WORKDIR /app/apps/frontend/wasm-engine
 
 RUN rustup target add wasm32-unknown-unknown
 RUN wasm-pack build --target web --release
@@ -62,13 +61,10 @@ ENV NEXT_PUBLIC_APP_ENV=${NEXT_PUBLIC_APP_ENV}
 COPY packages/shared-types/ ./packages/shared-types/
 COPY apps/frontend/ ./apps/frontend/
 
-COPY --from=rust-builder /app/wasm-engine/pkg ./wasm-engine/pkg
-
-# Copy both exported vision models into public models path
+COPY --from=rust-builder /app/apps/frontend/wasm-engine/pkg ./apps/frontend/wasm-engine/pkg
 COPY --from=rust-builder /app/models-output/yolo26n.onnx ./apps/frontend/public/models/yolo26n.onnx
 COPY --from=rust-builder /app/models-output/yolo26n-pose.onnx ./apps/frontend/public/models/yolo26n-pose.onnx
 
-# Wasm runtime setup stuff
 RUN mkdir -p apps/frontend/public/wasm && \
     cp node_modules/onnxruntime-web/dist/ort-wasm*.wasm apps/frontend/public/wasm/ 2>/dev/null || \
     cp apps/frontend/node_modules/onnxruntime-web/dist/ort-wasm*.wasm apps/frontend/public/wasm/ 2>/dev/null || \
