@@ -18,6 +18,8 @@ import {
   RouteSingleResponseDto,
   RoutingHeatmapQueryDto,
   RoutingHeatmapResponseDto,
+  StudentStopRouteQueryDto,
+  StudentStopRouteResponseDto,
 } from './dto';
 import {
   CurrentSession,
@@ -27,6 +29,7 @@ import {
 import { RouteService } from './route.service';
 import { RouteHeatmapService } from './route.heatmap.service';
 import { RouteDiversionService } from './route.diversion.service';
+import { RouteStopService } from './route.stop.service';
 
 @ApiTags('Routes')
 @ApiSecurity('umtas-session')
@@ -36,6 +39,7 @@ export class RouteController {
     private readonly routeService: RouteService,
     private readonly routeHeatmapService: RouteHeatmapService,
     private readonly diversionService: RouteDiversionService,
+    private readonly routeStopService: RouteStopService,
   ) {}
 
   @Get('heatmap')
@@ -147,5 +151,39 @@ export class RouteController {
     @Body() dto: DiversionRequestDto,
   ): Promise<DiversionRouteResponseDto> {
     return this.diversionService.divertRoute(uniId, dto);
+  }
+
+  @Get('stop-route')
+  @Roles('student')
+  @ApiOperation({
+    summary: 'Get a stop-via route for a student on a date',
+    description:
+      "Returns the route from the student's current event to a stop building and from the stop to the next event, based on the requested time or the largest gap.",
+    operationId: 'getRouteViaBuilding',
+  })
+  @ApiOkResponse({
+    description: 'Stop route returned successfully',
+    type: StudentStopRouteResponseDto,
+  })
+  @ApiBadRequestResponse({
+    description: 'Invalid stop route query parameters',
+  })
+  @ApiNotFoundResponse({
+    description:
+      'No attended events found for the date, or no route could be determined for the stop',
+  })
+  @ApiForbiddenResponse({
+    description: 'No university selected or insufficient permissions',
+  })
+  getRouteViaBuilding(
+    @CurrentSession() session: SessionData,
+    @CurrentUniId() uniId: string,
+    @Query() query: StudentStopRouteQueryDto,
+  ): Promise<StudentStopRouteResponseDto> {
+    return this.routeStopService.getRouteViaBuilding(
+      session.user.id,
+      uniId,
+      query,
+    );
   }
 }
