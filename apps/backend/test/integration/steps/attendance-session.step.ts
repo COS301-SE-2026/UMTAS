@@ -89,6 +89,8 @@ export function attendanceSessionLifecycleStep<TPlan>(
       await db.insert(Event).values({
         eventID: eventId,
         eventName: 'Attendance test event',
+        validated: true,
+        isRecurring: false,
         eventCriteria: {
           eventSource: EventSource.UNIVERSITY,
           moduleId,
