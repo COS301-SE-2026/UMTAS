@@ -5,7 +5,35 @@ import { useRef, useState } from "react";
 
 export default function VideoUploadComp() {
   const [video, SetVideo] = useState<File | null>(null);
+  const [progress, setProgress] = useState<number>(0);
+  const [isProcessing, setIsProcessing] = useState<boolean>();
+
   const uploadVideoRef = useRef<HTMLInputElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  async function processVideo(file: File) {
+    setIsProcessing(true);
+    setProgress(0);
+
+    const videoUrl = URL.createObjectURL(file);
+    const video = document.createElement("video");
+    video.src = videoUrl;
+    video.playsInline = true;
+
+    await new Promise((resolve) => {
+      video.onloadedmetadata = () => resolve(true);
+    });
+
+    const canvas = canvasRef.current;
+    const context = canvas?.getContext("2d", { willReadFrequently: true });
+
+    if (!canvas || !context) {
+      URL.revokeObjectURL(videoUrl);
+      setIsProcessing(false);
+      return;
+    }
+  }
+
   return (
     <div className="h-3/4 w-1/2  items-center flex flex-col   px-2 ">
       <div className="w-full h-full max-w-7xl overflow-auto border border-[var(--border)] bg-[var(--bg-surface)] rounded-xl shadow-sm flex flex-col">
@@ -15,11 +43,12 @@ export default function VideoUploadComp() {
         <div className="h-full w-full p-2">
           <div className="w-full h-1/10 p-2 gap-y-1 flex flex-col ">
             <h1>Progress </h1>
-            <Progress value={42}></Progress>
+            <Progress value={progress}></Progress>
           </div>
           <div className="h-9/10 p-2 w-full grid grid-cols-2 ">
             <div className="w-full h-full p-2  ">
               <canvas
+                ref={canvasRef}
                 width={640}
                 height={640}
                 className="object-scale-down w-full h-3/4 rounded-2xl border "
@@ -33,6 +62,7 @@ export default function VideoUploadComp() {
                     const file = e.target.files?.[0];
                     if (file) {
                       SetVideo(file);
+                      setIsProcessing(true);
                     }
                   }}
                   className="hidden "
@@ -45,6 +75,7 @@ export default function VideoUploadComp() {
                       uploadVideoRef.current?.click();
                     } else {
                       SetVideo(null);
+                      setIsProcessing(false);
                     }
                   }}
                   size="default"
