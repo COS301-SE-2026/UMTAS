@@ -18,9 +18,7 @@ export function getAllTimetablesQ() {
   return queryOptions({
     queryKey: ["timetables"] as const,
     queryFn: async () => {
-      console.log("request sent");
       const result = await fetchAllTimetablesv2();
-      console.log(result);
       return result.timetables;
     },
   });

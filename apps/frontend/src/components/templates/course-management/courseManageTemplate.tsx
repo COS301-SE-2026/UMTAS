@@ -386,7 +386,6 @@ export default function CourseManagementTemplate() {
                                   const result = await enrollUserIntoCourse({
                                     CourseId: course.CourseID,
                                   });
-                                  console.log(result);
                                 }}
                               >
                                 Enroll
@@ -401,7 +400,6 @@ export default function CourseManagementTemplate() {
                                     await DeleteEnrollUserIntoCourse({
                                       CourseId: course.CourseID,
                                     });
-                                  console.log(result);
                                 }}
                               >
                                 Un-Enroll

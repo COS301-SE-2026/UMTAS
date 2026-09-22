@@ -5317,6 +5317,855 @@
         "x-internal": true
       }
     },
+    "/api/attendance/nfc-tags/me": {
+      "get": {
+        "operationId": "getMyNfcTag",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "HTTP 200 response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegisteredNfcTagStatusDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "summary": "Get the current operator NFC sticker status",
+        "tags": [
+          "Attendance"
+        ],
+        "description": "Get the current operator NFC sticker status. This Attendance operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
+        ]
+      }
+    },
+    "/api/attendance/nfc-tags/registration": {
+      "post": {
+        "operationId": "prepareNfcTagRegistration",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "HTTP 201 response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NfcTagRegistrationResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "summary": "Prepare a replacement NFC sticker credential",
+        "tags": [
+          "Attendance"
+        ],
+        "description": "Prepare a replacement NFC sticker credential. This Attendance operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
+        ]
+      }
+    },
+    "/api/attendance/nfc-tags/registration/confirm": {
+      "post": {
+        "operationId": "confirmNfcTagRegistration",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmNfcTagRegistrationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "HTTP 201 response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegisteredNfcTagDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "summary": "Confirm a written NFC sticker and activate it",
+        "tags": [
+          "Attendance"
+        ],
+        "description": "Confirm a written NFC sticker and activate it. This Attendance operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
+        ]
+      }
+    },
+    "/api/attendance/nfc-tags/test": {
+      "post": {
+        "operationId": "testNfcTag",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NfcCheckInDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "HTTP 201 response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NfcTagTestResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "summary": "Validate the current operator NFC sticker without attendance",
+        "tags": [
+          "Attendance"
+        ],
+        "description": "Validate the current operator NFC sticker without attendance. This Attendance operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
+        ]
+      }
+    },
+    "/api/attendance/operator/slots": {
+      "get": {
+        "operationId": "getOperatorAttendanceSlots",
+        "parameters": [
+          {
+            "name": "date",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+              "example": "2026-09-17",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "HTTP 200 response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperatorAttendanceSlotsResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "summary": "List the current operator event occurrences for one date",
+        "tags": [
+          "Attendance"
+        ],
+        "description": "List the current operator event occurrences for one date. This Attendance operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
+        ]
+      }
+    },
+    "/api/attendance/records": {
+      "post": {
+        "operationId": "recordAttendance",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecordAttendanceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "HTTP 201 response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttendanceRecordResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "security": [
+          {
+            "cookie": []
+          },
+          {}
+        ],
+        "summary": "Record identified or guest attendance from an NFC sticker",
+        "tags": [
+          "Attendance"
+        ],
+        "description": "Record identified or guest attendance from an NFC sticker. This Attendance operation is part of the versioned UMTAS HTTP contract."
+      }
+    },
+    "/api/attendance/records/barcode": {
+      "post": {
+        "operationId": "recordBarcodeAttendance",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecordBarcodeAttendanceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "HTTP 201 response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttendanceCaptureResultDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "summary": "Record the user resolved from a barcode in the current slot",
+        "tags": [
+          "Attendance"
+        ],
+        "description": "Record the user resolved from a barcode in the current slot. This Attendance operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
+        ]
+      }
+    },
+    "/api/attendance/records/camera": {
+      "put": {
+        "operationId": "recordCameraAttendance",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecordCameraAttendanceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "HTTP 200 response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionAttendanceResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "summary": "Replace the anonymous headcount for the current slot",
+        "tags": [
+          "Attendance"
+        ],
+        "description": "Replace the anonymous headcount for the current slot. This Attendance operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
+        ]
+      }
+    },
+    "/api/attendance/sessions": {
+      "post": {
+        "operationId": "createAttendanceSession",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAttendanceSessionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "HTTP 201 response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttendanceSessionResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "summary": "Create an attendance session for an event occurrence",
+        "tags": [
+          "Attendance"
+        ],
+        "description": "Create an attendance session for an event occurrence. This Attendance operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "listAttendanceSessions",
+        "parameters": [
+          {
+            "name": "eventID",
+            "required": false,
+            "in": "query",
+            "description": "Limit results to one event",
+            "schema": {
+              "format": "uuid",
+              "example": "00000000-0000-4000-8000-000000000000",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "HTTP 200 response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttendanceSessionListResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "summary": "List attendance sessions visible to the operator",
+        "tags": [
+          "Attendance"
+        ],
+        "description": "List attendance sessions visible to the operator. This Attendance operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
+        ]
+      }
+    },
+    "/api/attendance/sessions/{sessionId}": {
+      "get": {
+        "operationId": "getAttendanceSession",
+        "parameters": [
+          {
+            "name": "sessionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "HTTP 200 response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttendanceSessionResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "summary": "Get an attendance session and role-safe totals",
+        "tags": [
+          "Attendance"
+        ],
+        "description": "Get an attendance session and role-safe totals. This Attendance operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
+        ]
+      },
+      "patch": {
+        "operationId": "updateAttendanceSession",
+        "parameters": [
+          {
+            "name": "sessionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAttendanceSessionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "HTTP 200 response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttendanceSessionResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "summary": "Correct an attendance session",
+        "tags": [
+          "Attendance"
+        ],
+        "description": "Correct an attendance session. This Attendance operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "deleteAttendanceSession",
+        "parameters": [
+          {
+            "name": "sessionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "HTTP 200 response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteAttendanceSessionResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "summary": "Delete an attendance session and its records",
+        "tags": [
+          "Attendance"
+        ],
+        "description": "Delete an attendance session and its records. This Attendance operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
+        ]
+      }
+    },
+    "/api/attendance/sessions/{sessionId}/records": {
+      "post": {
+        "operationId": "recordIdentifiedAttendance",
+        "parameters": [
+          {
+            "name": "sessionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecordIdentifiedAttendanceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "HTTP 201 response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttendanceCaptureResultDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "summary": "Record one identified attendee",
+        "tags": [
+          "Attendance"
+        ],
+        "description": "Record one identified attendee. This Attendance operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
+        ]
+      }
+    },
+    "/api/attendance/sessions/{sessionId}/attendance/count": {
+      "put": {
+        "operationId": "setAttendanceCount",
+        "parameters": [
+          {
+            "name": "sessionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetGuestCountDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "HTTP 200 response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionAttendanceResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundError"
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "summary": "Replace the aggregate attendance count",
+        "tags": [
+          "Attendance"
+        ],
+        "description": "Replace the aggregate attendance count. This Attendance operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
+        ]
+      }
+    },
+    "/api/attendance/me/verified-history": {
+      "get": {
+        "operationId": "getVerifiedAttendanceHistory",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "HTTP 200 response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerifiedAttendanceHistoryResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "summary": "Get only the current user’s identified attendance history",
+        "tags": [
+          "Attendance"
+        ],
+        "description": "Get only the current user’s identified attendance history. This Attendance operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
+        ]
+      }
+    },
     "/api/attendance": {
       "post": {
         "operationId": "createAttendance",
@@ -7765,6 +8614,156 @@
         "tags": [
           "ApiService"
         ],
+        "security": [
+          {
+            "cookie": []
+          }
+        ]
+      }
+    },
+    "/api/teaches": {
+      "post": {
+        "operationId": "assignLecturer",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTeachesDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Lecturer assigned to module successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TeachesResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing or invalid teaches payload"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "description": "Insufficient permissions or no university selected"
+          },
+          "404": {
+            "description": "Module not found"
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError"
+          },
+          "500": {
+            "description": "Lecturer was not assigned to module"
+          }
+        },
+        "summary": "Assign a lecturer to a module",
+        "tags": [
+          "Teaches"
+        ],
+        "description": "Assign a lecturer to a module. This Teaches operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
+        ]
+      }
+    },
+    "/api/teaches/me/modules": {
+      "post": {
+        "operationId": "assignMeToModule",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SelfAssignTeachesDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "HTTP 201 response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TeachesResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "summary": "Assign the current lecturer or university admin to a module",
+        "tags": [
+          "Teaches"
+        ],
+        "description": "Assign the current lecturer or university admin to a module. This Teaches operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "getLecturerModules",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Lecturer modules returned successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TeachesResponseDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "description": "Insufficient permissions or no university selected"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "summary": "Get modules taught by the current lecturer",
+        "tags": [
+          "Teaches"
+        ],
+        "description": "Get modules taught by the current lecturer. This Teaches operation is part of the versioned UMTAS HTTP contract.",
         "security": [
           {
             "cookie": []
@@ -11711,6 +12710,599 @@
           "status"
         ]
       },
+      "RegisteredNfcTagDto": {
+        "type": "object",
+        "properties": {
+          "tagId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "displayId": {
+            "type": "string"
+          },
+          "registeredAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "tagId",
+          "displayId",
+          "registeredAt"
+        ]
+      },
+      "RegisteredNfcTagStatusDto": {
+        "type": "object",
+        "properties": {
+          "tag": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/RegisteredNfcTagDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "tag"
+        ]
+      },
+      "NfcTagRegistrationResponseDto": {
+        "type": "object",
+        "properties": {
+          "tagId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "token": {
+            "type": "string"
+          },
+          "tagUrl": {
+            "type": "string",
+            "format": "uri"
+          },
+          "activationTicket": {
+            "type": "string"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "tagId",
+          "token",
+          "tagUrl",
+          "activationTicket",
+          "expiresAt"
+        ]
+      },
+      "ConfirmNfcTagRegistrationDto": {
+        "type": "object",
+        "properties": {
+          "activationTicket": {
+            "type": "string",
+            "minLength": 40,
+            "maxLength": 2048
+          }
+        },
+        "required": [
+          "activationTicket"
+        ]
+      },
+      "NfcCheckInDto": {
+        "type": "object",
+        "properties": {
+          "tagId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "token": {
+            "type": "string",
+            "minLength": 32,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9_-]+$"
+          }
+        },
+        "required": [
+          "tagId",
+          "token"
+        ]
+      },
+      "NfcTagTestResponseDto": {
+        "type": "object",
+        "properties": {
+          "valid": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "displayId": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "valid",
+          "message"
+        ]
+      },
+      "OperatorAttendanceSlotDto": {
+        "type": "object",
+        "properties": {
+          "eventID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "eventName": {
+            "type": "string"
+          },
+          "moduleID": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "moduleCode": {
+            "type": "string"
+          },
+          "moduleName": {
+            "type": "string"
+          },
+          "venue": {
+            "type": "string",
+            "nullable": true
+          },
+          "scheduledStartAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "scheduledEndAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "sessionId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid"
+          },
+          "state": {
+            "type": "string",
+            "description": "Availability derived from the event time and capture buffer",
+            "enum": [
+              "UPCOMING",
+              "AVAILABLE",
+              "ENDED"
+            ]
+          },
+          "attendanceCount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "eventID",
+          "eventName",
+          "moduleID",
+          "moduleCode",
+          "moduleName",
+          "venue",
+          "scheduledStartAt",
+          "scheduledEndAt",
+          "sessionId",
+          "state",
+          "attendanceCount"
+        ]
+      },
+      "OperatorAttendanceSlotsResponseDto": {
+        "type": "object",
+        "properties": {
+          "slotList": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OperatorAttendanceSlotDto"
+            }
+          },
+          "ambiguous": {
+            "type": "boolean"
+          },
+          "currentSlot": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/OperatorAttendanceSlotDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "slotList",
+          "ambiguous"
+        ]
+      },
+      "RecordAttendanceDto": {
+        "type": "object",
+        "properties": {
+          "captureMethod": {
+            "type": "string",
+            "description": "NFC is the capture adapter for this endpoint",
+            "enum": [
+              "NFC"
+            ],
+            "example": "NFC"
+          },
+          "tagId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Registered NFC tag identifier",
+            "example": "00000000-0000-4000-8000-000000000002"
+          },
+          "token": {
+            "type": "string",
+            "minLength": 32,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "description": "Secret credential stored on the NFC tag",
+            "example": "abcdefghijklmnopqrstuvwxyz012345"
+          }
+        },
+        "required": [
+          "captureMethod",
+          "tagId",
+          "token"
+        ]
+      },
+      "AttendanceRecordResponseDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "enum": [
+              "RECORDED",
+              "ALREADY_RECORDED",
+              "NO_CURRENT_EVENT",
+              "AMBIGUOUS_EVENT",
+              "INVALID_TAG"
+            ],
+            "type": "string",
+            "description": "Outcome of the attendance capture",
+            "example": "RECORDED"
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable result suitable for a toast",
+            "example": "Attendance recorded."
+          },
+          "sessionId": {
+            "type": "string",
+            "nullable": true,
+            "description": "Resolved attendance session",
+            "format": "uuid"
+          },
+          "recordedAt": {
+            "format": "date-time",
+            "type": "string",
+            "nullable": true,
+            "description": "Time at which attendance was recorded"
+          }
+        },
+        "required": [
+          "status",
+          "message"
+        ]
+      },
+      "RecordBarcodeAttendanceDto": {
+        "type": "object",
+        "properties": {
+          "UserID": {
+            "type": "string",
+            "format": "uuid",
+            "description": "University user resolved from the scanned barcode",
+            "example": "00000000-0000-4000-8000-000000000001"
+          }
+        },
+        "required": [
+          "UserID"
+        ]
+      },
+      "SessionAttendanceResponseDto": {
+        "type": "object",
+        "properties": {
+          "AttendanceID": {
+            "type": "string",
+            "description": "Attendance record identifier",
+            "format": "uuid"
+          },
+          "SessionID": {
+            "type": "string",
+            "description": "Parent attendance session",
+            "format": "uuid"
+          },
+          "UserID": {
+            "type": "string",
+            "nullable": true,
+            "description": "Identified attendee, or null for the anonymous count row",
+            "format": "uuid"
+          },
+          "guestCount": {
+            "nullable": true,
+            "type": "number",
+            "description": "Anonymous count, or null for an identified attendee",
+            "minimum": 0
+          },
+          "captureMethod": {
+            "type": "string",
+            "description": "Most recent capture method for this record",
+            "enum": [
+              "NFC",
+              "BARCODE",
+              "CAMERA",
+              "MANUAL"
+            ]
+          },
+          "recordedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Initial recording time"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Last update time"
+          }
+        },
+        "required": [
+          "AttendanceID",
+          "SessionID",
+          "UserID",
+          "guestCount",
+          "captureMethod",
+          "recordedAt",
+          "updatedAt"
+        ]
+      },
+      "AttendanceCaptureResultDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "Whether a new identified record was inserted",
+            "enum": [
+              "RECORDED",
+              "ALREADY_RECORDED"
+            ]
+          },
+          "attendance": {
+            "$ref": "#/components/schemas/SessionAttendanceResponseDto"
+          }
+        },
+        "required": [
+          "status",
+          "attendance"
+        ]
+      },
+      "RecordCameraAttendanceDto": {
+        "type": "object",
+        "properties": {
+          "guestCount": {
+            "minimum": 0,
+            "type": "number",
+            "description": "Current anonymous headcount observed by the camera",
+            "example": 42
+          },
+          "eventID": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Event to record attendance against when selecting a slot",
+            "example": "00000000-0000-4000-8000-000000000000"
+          }
+        },
+        "required": [
+          "guestCount"
+        ]
+      },
+      "CreateAttendanceSessionDto": {
+        "type": "object",
+        "properties": {
+          "eventID": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Event represented by this dated attendance session",
+            "example": "00000000-0000-4000-8000-000000000000"
+          },
+          "scheduledStartAt": {
+            "type": "string",
+            "description": "Scheduled occurrence start time",
+            "format": "date-time",
+            "example": "2026-09-15T08:00:00.000Z"
+          },
+          "scheduledEndAt": {
+            "type": "string",
+            "description": "Scheduled occurrence end time",
+            "format": "date-time",
+            "example": "2026-09-15T10:00:00.000Z"
+          }
+        },
+        "required": [
+          "eventID",
+          "scheduledStartAt",
+          "scheduledEndAt"
+        ]
+      },
+      "AttendanceSessionResponseDto": {
+        "type": "object",
+        "properties": {
+          "SessionID": {
+            "type": "string",
+            "description": "Attendance session identifier",
+            "format": "uuid"
+          },
+          "eventID": {
+            "type": "string",
+            "description": "Related event identifier",
+            "format": "uuid"
+          },
+          "scheduledStartAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Scheduled occurrence start"
+          },
+          "scheduledEndAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Scheduled occurrence end"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Session creation time"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Last session update time"
+          },
+          "identifiedCount": {
+            "type": "number",
+            "description": "Number of distinct identified attendees",
+            "example": 8
+          },
+          "guestCount": {
+            "type": "number",
+            "description": "Current anonymous attendance count",
+            "example": 3
+          },
+          "attendedCount": {
+            "type": "number",
+            "description": "Identified plus anonymous attendance",
+            "example": 11
+          }
+        },
+        "required": [
+          "SessionID",
+          "eventID",
+          "scheduledStartAt",
+          "scheduledEndAt",
+          "createdAt",
+          "updatedAt",
+          "identifiedCount",
+          "guestCount",
+          "attendedCount"
+        ]
+      },
+      "AttendanceSessionListResponseDto": {
+        "type": "object",
+        "properties": {
+          "sessionList": {
+            "description": "Attendance sessions visible to the operator",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AttendanceSessionResponseDto"
+            }
+          }
+        },
+        "required": [
+          "sessionList"
+        ]
+      },
+      "UpdateAttendanceSessionDto": {
+        "type": "object",
+        "properties": {
+          "eventID": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Event represented by this dated attendance session",
+            "example": "00000000-0000-4000-8000-000000000000"
+          },
+          "scheduledStartAt": {
+            "type": "string",
+            "description": "Scheduled occurrence start time",
+            "format": "date-time",
+            "example": "2026-09-15T08:00:00.000Z"
+          },
+          "scheduledEndAt": {
+            "type": "string",
+            "description": "Scheduled occurrence end time",
+            "format": "date-time",
+            "example": "2026-09-15T10:00:00.000Z"
+          }
+        }
+      },
+      "DeleteAttendanceSessionResponseDto": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "object",
+            "description": "Whether the session was deleted",
+            "example": true
+          }
+        },
+        "required": [
+          "success"
+        ]
+      },
+      "RecordIdentifiedAttendanceDto": {
+        "type": "object",
+        "properties": {
+          "UserID": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Existing university user to record",
+            "example": "00000000-0000-4000-8000-000000000001"
+          },
+          "captureMethod": {
+            "type": "string",
+            "enum": [
+              "BARCODE",
+              "MANUAL"
+            ],
+            "description": "How the attendee was identified",
+            "example": "BARCODE"
+          }
+        },
+        "required": [
+          "UserID",
+          "captureMethod"
+        ]
+      },
+      "SetGuestCountDto": {
+        "type": "object",
+        "properties": {
+          "guestCount": {
+            "minimum": 0,
+            "type": "number",
+            "description": "Anonymous attendance total replacing the current value",
+            "example": 12
+          },
+          "captureMethod": {
+            "type": "string",
+            "enum": [
+              "CAMERA",
+              "MANUAL"
+            ],
+            "description": "Source of the replacement count",
+            "example": "CAMERA"
+          }
+        },
+        "required": [
+          "guestCount",
+          "captureMethod"
+        ]
+      },
+      "VerifiedAttendanceHistoryResponseDto": {
+        "type": "object",
+        "properties": {
+          "attendanceList": {
+            "description": "Identified attendance belonging to the current user",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SessionAttendanceResponseDto"
+            }
+          }
+        },
+        "required": [
+          "attendanceList"
+        ]
+      },
       "CreateAttendanceDto": {
         "type": "object",
         "properties": {
@@ -13708,6 +15300,71 @@
         },
         "required": [
           "events"
+        ]
+      },
+      "CreateTeachesDto": {
+        "type": "object",
+        "properties": {
+          "ModuleID": {
+            "type": "string",
+            "format": "uuid",
+            "example": "00000000-0000-0000-0000-000000000000",
+            "description": "Module to assign the lecturer to"
+          },
+          "UserID": {
+            "type": "string",
+            "format": "uuid",
+            "example": "00000000-0000-0000-0000-000000000000",
+            "description": "Lecturer user to assign to the module"
+          }
+        },
+        "required": [
+          "ModuleID",
+          "UserID"
+        ]
+      },
+      "TeachesResponseDto": {
+        "type": "object",
+        "properties": {
+          "UserID": {
+            "type": "string",
+            "format": "uuid",
+            "example": "00000000-0000-0000-0000-000000000000",
+            "description": "User ID of the assigned lecturer"
+          },
+          "ModuleID": {
+            "type": "string",
+            "format": "uuid",
+            "example": "00000000-0000-0000-0000-000000000000",
+            "description": "Module ID of the teaching assignment"
+          },
+          "module": {
+            "description": "Module assigned to the lecturer",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ModuleSingleResponseDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "UserID",
+          "ModuleID",
+          "module"
+        ]
+      },
+      "SelfAssignTeachesDto": {
+        "type": "object",
+        "properties": {
+          "ModuleID": {
+            "type": "string",
+            "format": "uuid",
+            "example": "00000000-0000-0000-0000-000000000000",
+            "description": "Module to assign the current user to"
+          }
+        },
+        "required": [
+          "ModuleID"
         ]
       },
       "ErrorResponse": {

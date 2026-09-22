@@ -22,18 +22,14 @@ export class RolesGuard implements CanActivate {
     const request = context.switchToHttp().getRequest<RequestWithSession>();
     const requiredUniRoles =
       (Reflect.getMetadata(ROLES_KEY, context.getHandler()) as
-        | ApprovedUniRole[]
-        | undefined) ??
+        ApprovedUniRole[] | undefined) ??
       (Reflect.getMetadata(ROLES_KEY, context.getClass()) as
-        | ApprovedUniRole[]
-        | undefined);
+        ApprovedUniRole[] | undefined);
     const requiresSystemAdmin =
       (Reflect.getMetadata(SYSTEM_ADMIN_KEY, context.getHandler()) as
-        | boolean
-        | undefined) ??
+        boolean | undefined) ??
       (Reflect.getMetadata(SYSTEM_ADMIN_KEY, context.getClass()) as
-        | boolean
-        | undefined) ??
+        boolean | undefined) ??
       false;
 
     if (!requiresSystemAdmin && requiredUniRoles === undefined) return true;

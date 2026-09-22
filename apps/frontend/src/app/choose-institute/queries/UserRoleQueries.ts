@@ -37,7 +37,7 @@ export function getAllUni() {
     queryKey: ["university"],
     queryFn: async () => {
       const result = new getallUnisBuilder().send({});
-      console.log(result);
+      // console.log(result);
       return result;
     },
   });

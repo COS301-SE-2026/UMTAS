@@ -24,8 +24,6 @@ export default function SolverReview({
 }: SolverReviewProps) {
   const [eventsConfirmed, setEventsConfirmed] = useState(false);
 
-  console.log(modules, "From solver review");
-
   return (
     <Card className="shadow-lg border-[var(--border)] rounded-xl bg-[var(--bg-surface)] w-full h-full flex flex-col">
       <CardHeader className="text-xl font-bold text-[var(--text-primary)]">

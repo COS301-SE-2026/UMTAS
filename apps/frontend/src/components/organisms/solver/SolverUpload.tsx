@@ -48,13 +48,11 @@ export default function SolverUpload({
     queryFn: async () => {
       const builder = new PDFjobStatusBuilder();
       const result = await builder.send({ paths: { jobId: jobId || "" } });
-      console.log("polled", result);
 
       if (
         result?.moduleGroupingId != null &&
         moduleGroupID != result.moduleGroupingId
       ) {
-        console.log("stopped polling");
         SetCurrentlyPolling(false);
         setModuleGroupID(result.moduleGroupingId);
         onComplete();
@@ -126,7 +124,6 @@ export default function SolverUpload({
       universityId: UserDetails.getUniDetails()?.UniversityID || "",
       adapterKey: "up",
     });
-    console.log(result.jobId, "PDF uploaded");
     await setJobID(result.jobId);
   }
 

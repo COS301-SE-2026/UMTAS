@@ -12,7 +12,6 @@ export function getMapConfigQ() {
     queryKey: ["map-config"] as const,
     queryFn: async () => {
       const result = await new getMapConfigBuilder().send({});
-      console.log(result, "Sent map config ");
       return result;
     },
     staleTime: Infinity,
@@ -27,12 +26,10 @@ export function updateMapConfigQ() {
       body: updateMapConfigBody;
       path: updateMapConfigPath;
     }) => {
-      console.log(vars.body);
       const result = new updateMapConfigBuilder().send({
         body: vars.body,
         paths: vars.path,
       });
-      console.log("result", await result);
       return result;
     },
     onSuccess: () => {

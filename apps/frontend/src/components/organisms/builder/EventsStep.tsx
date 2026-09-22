@@ -212,11 +212,11 @@ export function EventsStep({
         }),
       );
     } else {
-      console.log(
-        result.event.eventId,
-        "created event",
-        createdEvent?.event.eventId,
-      );
+      // console.log(
+      //   result.event.eventId,
+      //   "created event",
+      //   createdEvent?.event.eventId,
+      // );
       setCreatedEvent(result);
     }
   }

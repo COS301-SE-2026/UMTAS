@@ -75,6 +75,21 @@ describe('AuthGuard', () => {
       );
     });
 
+    it('allows optional authentication without a session', async () => {
+      jest
+        .spyOn(reflector, 'getAllAndOverride')
+        .mockReturnValueOnce(false)
+        .mockReturnValueOnce(true);
+      jest.spyOn(mockAuthService, 'getAuth').mockReturnValueOnce({
+        api: {
+          getSession: jest.fn().mockResolvedValue(null),
+        },
+      });
+
+      await expect(guard.canActivate(mockExecutionContext)).resolves.toBe(true);
+      expect(mockRequest.session).toBeUndefined();
+    });
+
     it('should attach session to request when valid', async () => {
       const mockSession = {
         user: {

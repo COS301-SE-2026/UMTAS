@@ -84,7 +84,6 @@ export const UpdateRestrictionMutation = mutationOptions({
     });
   },
   onSuccess: (result) => {
-    console.log(result);
     getQueryClient().invalidateQueries({
       queryKey: ["Restrictions"],
     });
@@ -122,7 +121,6 @@ export function GetAllRestrictions(paths?: getAcRestrictionPaths) {
       const res = await new getAcRestrictionBuilder().send({
         paths: paths,
       });
-      console.log(res, "Restrictions ");
       return res;
     },
   });
@@ -156,7 +154,6 @@ export const DelRestrictionMut = mutationOptions({
     const res = await new DeleteAcRestrictionBuilder().send({
       paths: paths,
     });
-    console.log(res);
   },
   onSuccess: () => {
     getQueryClient().invalidateQueries({

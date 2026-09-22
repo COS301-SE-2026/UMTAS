@@ -12,8 +12,7 @@ import { ac, sysAdmin, user } from './permissions';
 import { SessionData } from './session.decorator';
 
 export type AppDatabase =
-  | NodePgDatabase<typeof appSchema>
-  | PgliteDatabase<typeof appSchema>;
+  NodePgDatabase<typeof appSchema> | PgliteDatabase<typeof appSchema>;
 type Database = AppDatabase;
 
 export type AuthInstance = ReturnType<typeof createAuth>;
@@ -402,14 +401,11 @@ export function createAuth(input: CreateAuthInput) {
             if (!data.id) data.id = crypto.randomUUID();
 
             const contextObj = ctx?.context as
-              | Record<string, unknown>
-              | undefined;
+              Record<string, unknown> | undefined;
             const sessionObj = contextObj?.session as
-              | Record<string, unknown>
-              | undefined;
+              Record<string, unknown> | undefined;
             const userObj = sessionObj?.user as
-              | Record<string, unknown>
-              | undefined;
+              Record<string, unknown> | undefined;
             const actorRole = userObj?.role;
             const requestedRole = data.role;
 

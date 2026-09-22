@@ -26,7 +26,7 @@ export function createAttendance(
 
     ...overrides,
   };
-} //END_createAttendance
+}
 
 export function createAttendanceDto(
   overrides: Partial<CreateAttendanceDto> = {},
@@ -38,7 +38,7 @@ export function createAttendanceDto(
 
     ...overrides,
   };
-} //END_createAttendanceDto
+}
 
 export function createUpdateAttendanceDto(
   overrides: Partial<UpdateAttendanceDto> = {},
@@ -49,4 +49,4 @@ export function createUpdateAttendanceDto(
 
     ...overrides,
   };
-} //END_createUpdateAttendanceDto
+}
