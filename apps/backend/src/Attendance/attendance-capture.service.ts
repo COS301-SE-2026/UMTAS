@@ -301,7 +301,11 @@ export class AttendanceCaptureService {
         this.recordCameraAttendance(actor, dto, transaction),
       );
     }
-    const occurrence = await this.getAvailableOperatorOccurrence(actor, tx);
+    const occurrence = await this.getAvailableOperatorOccurrence(
+      actor,
+      tx,
+      dto.eventID,
+    );
     const session =
       await this.attendanceSessionService.createOrGetOccurrenceSession(
         actor,
@@ -328,6 +332,7 @@ export class AttendanceCaptureService {
   private async getAvailableOperatorOccurrence(
     actor: AttendanceActor,
     tx: AppDatabase,
+    eventID?: string,
   ): Promise<EventOccurrenceRow> {
     this.assertOperator(actor);
     if (!actor.uniId) throw new ForbiddenException('No university selected');
@@ -338,9 +343,16 @@ export class AttendanceCaptureService {
       localDateAt(new Date(), ATTENDANCE_TIME_ZONE),
       tx,
     );
-    const available = occurrences.filter((occurrence) =>
+    let available = occurrences.filter((occurrence) =>
       attendanceAvailable(occurrence),
     );
+
+    if (eventID) {
+      available = available.filter(
+        (occurrence) => occurrence.eventID === eventID,
+      );
+    }
+
     if (!available.length) {
       throw new BadRequestException('There is no attendance slot available');
     }

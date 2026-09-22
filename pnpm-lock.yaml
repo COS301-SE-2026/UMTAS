@@ -384,6 +384,12 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      cmdk:
+        specifier: ^1.1.1
+        version: 1.1.1(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      cn:
+        specifier: ^0.3.2
+        version: 0.3.2
       ky:
         specifier: ^2.0.2
         version: 2.1.0
@@ -7518,10 +7524,27 @@ packages:
       }
     engines: { node: ">=0.10.0" }
 
+  cmdk@1.1.1:
+    resolution:
+      {
+        integrity: sha512-Vsv7kFaXm+ptHDMZ7izaRsP70GgrW9NBNGswt9OZaVBLlE0SNpDq8eu/VGXyF9r7M0azK3Wy7OlYXsuyYLFzHg==,
+      }
+    peerDependencies:
+      react: ^18 || ^19 || ^19.0.0-rc
+      react-dom: ^18 || ^19 || ^19.0.0-rc
+
   cn@0.2.6:
     resolution:
       {
         integrity: sha512-+i4L0zUGgRcEnhsxueVrP7iBGxBx5iD0WOTYg1MwFEu2ZyCmH5Ov2V1cul2Ht5UchRQQgftCf4be/RxspuW6QQ==,
+      }
+    engines: { node: ">=20" }
+    hasBin: true
+
+  cn@0.3.2:
+    resolution:
+      {
+        integrity: sha512-RKzY5Edavc8B2Ka6tjJecKFC4nm0p7lADY72xzICmiJSf4TkaxWXt0fHsib2P2G4FkFyXfSDi9oDtIBuCZvY2g==,
       }
     engines: { node: ">=20" }
     hasBin: true
@@ -20724,7 +20747,21 @@ snapshots:
 
   cluster-key-slot@1.1.1: {}
 
+  cmdk@1.1.1(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
+    dependencies:
+      "@radix-ui/react-compose-refs": 1.1.5(@types/react@19.3.0)(react@19.2.4)
+      "@radix-ui/react-dialog": 1.1.23(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      "@radix-ui/react-id": 1.1.4(@types/react@19.3.0)(react@19.2.4)
+      "@radix-ui/react-primitive": 2.1.10(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      react: 19.2.4
+      react-dom: 19.2.4(react@19.2.4)
+    transitivePeerDependencies:
+      - "@types/react"
+      - "@types/react-dom"
+
   cn@0.2.6: {}
+
+  cn@0.3.2: {}
 
   co@4.6.0: {}
 

@@ -42,7 +42,6 @@ export function getAllEventsQ() {
     queryKey: ["events"] as const,
     queryFn: async () => {
       const result = (await new getAllEventsBuilder().send({})).events;
-      console.log(result, "Sent event ");
       return result;
     },
   });
@@ -51,11 +50,9 @@ export function getAllEventsQ() {
 export function addUniEventMut() {
   return mutationOptions({
     mutationFn: async (vars: { body: BuilderEventV2Body }) => {
-      console.log(vars.body);
       const result = new CreateBuilderEventsV2().send({
         body: vars.body,
       });
-      console.log("result", await result);
       return await result;
     },
     onSuccess: () => {
@@ -94,7 +91,6 @@ export function updateEventMut() {
       path: updateEventByIdPath;
       body: updateEventByIdBody;
     }) => {
-      console.log(vars.body, "update event body");
       return new updateEventByID().send({
         paths: vars.path,
         body: vars.body,

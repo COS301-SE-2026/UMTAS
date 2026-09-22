@@ -128,7 +128,7 @@ export default function SolverPreferences({
           jobId: jobID || "",
         },
       });
-      console.log("Polled", resultOfPoll);
+
       return resultOfPoll;
     },
     enabled: jobID != null && jobID != "",
@@ -213,7 +213,6 @@ export default function SolverPreferences({
       if (resultOfPoll && timetableCreated === false && !pollFetching) {
         setTimetableCreated(true);
         const typeShiftedResults = resultOfPoll.result;
-        console.log("Poll closed result finished", resultOfPoll.result);
         const timetableBuilder = new createTimeTableBuilder();
         const resultTT = await timetableBuilder.send({
           body: {
@@ -240,7 +239,6 @@ export default function SolverPreferences({
 
     const result = await createJobMutation.mutateAsync();
     if (result) {
-      console.log("New result for solve for users", result);
       setJobID(result.jobId || "");
     }
   }
@@ -263,7 +261,6 @@ export default function SolverPreferences({
         }
       }
       if (resultOfPoll.status === "failed" && jobFailed === false) {
-        console.log("set job to failed");
         setJobFailed(true);
       }
     }
