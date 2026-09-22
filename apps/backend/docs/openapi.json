@@ -5568,6 +5568,90 @@
         ]
       }
     },
+    "/api/attendance/operator/preferred-event": {
+      "put": {
+        "operationId": "selectPreferredAttendanceEvent",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SelectPreferredEventDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "HTTP 200 response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperatorAttendanceSlotDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "summary": "Select the operator preferred attendance event",
+        "tags": [
+          "Attendance"
+        ],
+        "description": "Select the operator preferred attendance event. This Attendance operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "clearPreferredAttendanceEvent",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "HTTP 200 response."
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequestError"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        },
+        "summary": "Clear the operator preferred attendance event",
+        "tags": [
+          "Attendance"
+        ],
+        "description": "Clear the operator preferred attendance event. This Attendance operation is part of the versioned UMTAS HTTP contract.",
+        "security": [
+          {
+            "cookie": []
+          }
+        ]
+      }
+    },
     "/api/attendance/records": {
       "post": {
         "operationId": "recordAttendance",
@@ -12902,9 +12986,6 @@
               "$ref": "#/components/schemas/OperatorAttendanceSlotDto"
             }
           },
-          "ambiguous": {
-            "type": "boolean"
-          },
           "currentSlot": {
             "nullable": true,
             "type": "object",
@@ -12913,11 +12994,32 @@
                 "$ref": "#/components/schemas/OperatorAttendanceSlotDto"
               }
             ]
+          },
+          "preferredEventId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid"
+          },
+          "requiresSelection": {
+            "type": "boolean"
           }
         },
         "required": [
           "slotList",
-          "ambiguous"
+          "preferredEventId",
+          "requiresSelection"
+        ]
+      },
+      "SelectPreferredEventDto": {
+        "type": "object",
+        "properties": {
+          "eventID": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "eventID"
         ]
       },
       "RecordAttendanceDto": {
