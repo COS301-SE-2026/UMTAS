@@ -26,8 +26,11 @@ export default function Tutorial({
     };
 
     window.addEventListener(eventName, start);
-    return () => window.removeEventListener(eventName, start);
-  }, []);
+
+    return () => {
+      window.removeEventListener(eventName, start);
+    };
+  }, [eventName]);
 
   useEffect(() => {
     if (!wait) {
@@ -45,6 +48,9 @@ export default function Tutorial({
       run={run}
       continuous={true}
       scrollToFirstStep={true}
+      options={{
+        zIndex: 10000,
+      }}
       // @ts-expect-error idk why this keeps giving an error but it works haha
       callback={(data: { status: string; action: string }) => {
         if (["finished", "skipped"].includes(data.status)) {

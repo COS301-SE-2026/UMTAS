@@ -1,18 +1,24 @@
 import { Test } from '@nestjs/testing';
 
 //Constants
-import { userId, courseId, uniId, groupId } from '../Testing/constants';
+import {
+  userId,
+  courseId,
+  uniId,
+  groupId,
+  moduleId,
+} from '../Testing/constants';
 
 //Actual Service imports
 import { ModuleServiceV2 } from './moduleV2.service';
 import { DatabaseService } from '../db/database.service';
 import { CourseService } from '../Course/course.service';
 import { GroupingService } from '../Grouping/grouping.service';
-import { EventService } from '../Events/event.service';
 
 //Mock Database and factories
 import { createMockDatabase } from '../Testing/Mocks/database.mock';
 import {
+  createDbChain,
   mockDbResult,
   mockTransaction,
 } from '../Testing/Mocks/database.helpers';
@@ -30,7 +36,7 @@ import {
 import {
   createMockCourseService,
   createMockGroupingService,
-  createMockEventService,
+  createMockEventServiceV2,
 } from '../Testing/Mocks/services';
 
 import {
@@ -38,6 +44,8 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import { ModuleSingleResponseDto } from './dto/module.dto';
+import { EventServiceV2 } from 'src/Events/eventV2.service';
 
 //DTO's
 
@@ -48,7 +56,7 @@ describe('ModuleServiceV2', () => {
   const { mockCourseService, reset: resetCourse } = createMockCourseService();
   const { mockGroupingService, reset: resetGrouping } =
     createMockGroupingService();
-  const { mockEventService, reset: resetEvent } = createMockEventService();
+  const { mockEventServiceV2, reset: resetEvent } = createMockEventServiceV2();
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
@@ -57,7 +65,7 @@ describe('ModuleServiceV2', () => {
         { provide: DatabaseService, useValue: { db: mockDb } },
         { provide: CourseService, useValue: mockCourseService },
         { provide: GroupingService, useValue: mockGroupingService },
-        { provide: EventService, useValue: mockEventService },
+        { provide: EventServiceV2, useValue: mockEventServiceV2 },
       ],
     }).compile();
 
@@ -84,7 +92,7 @@ describe('ModuleServiceV2', () => {
 
       //Act + Assert
       await expect(service.create(userId, dto)).rejects.toThrow(
-        InternalServerErrorException,
+        NotFoundException,
       );
       expect(mockCourseService.getById).toHaveBeenCalled();
     });
@@ -97,6 +105,7 @@ describe('ModuleServiceV2', () => {
       mockGroupingService.createModuleGrouping?.mockResolvedValue(group);
 
       mockTransaction(mockDb, {
+        select: [[]],
         insert: [[]],
       });
 
@@ -274,88 +283,52 @@ describe('ModuleServiceV2', () => {
     });
   }); //END_Test_CreateModule
 
-  describe('Test_GetAll', () => {
-    it('should return empty array of modules if none found', async () => {
+  describe('Test_getAll', () => {
+    it('should return modules with events, count when Stats is set, and use provided tx', async () => {
       //Arrange
-      mockDbResult(mockDb.select, []);
+      const moduleRow = createModule({ moduleID: 'module-1' });
+      const event = createEventDto({ eventId: 'event-1' }, {});
+      mockDbResult(mockDb.select, [moduleRow]);
+      jest
+        .spyOn(service as any, 'deduplicateModules')
+        .mockReturnValue([moduleRow]);
+      jest
+        .spyOn(mockEventServiceV2, 'getEventsByModules')
+        .mockResolvedValue([{ moduleId: 'module-1', event }]);
+      jest
+        .spyOn(service as any, 'groupEventsByModule')
+        .mockReturnValue(new Map([['module-1', [event]]]));
 
       //Act
-      const result = await service.getAll(userId, {});
+      const result = await service.getAll('user-1', { Stats: true }, mockDb);
 
       //Assert
-      expect(result).toMatchObject({ modules: [] });
+      expect(result.modules).toEqual([{ ...moduleRow, Events: [event] }]);
+      expect(result.count).toBe(1);
     });
 
-    it('should return modules with filters', async () => {
+    it('should default events to empty array and omit count when Stats is absent', async () => {
       //Arrange
-      const module1 = createModule();
-      const module2 = createModule();
-
-      mockDbResult(mockDb.select, [module1, module2]);
-
-      mockEventService.getAllEvents?.mockResolvedValue({
-        events: [],
-      });
+      const moduleRow = createModule({ moduleID: 'module-1' });
+      mockDbResult(mockDb.select, [moduleRow]);
+      jest
+        .spyOn(service as any, 'deduplicateModules')
+        .mockReturnValue([moduleRow]);
+      jest
+        .spyOn(mockEventServiceV2, 'getEventsByModules')
+        .mockResolvedValue([]);
+      jest
+        .spyOn(service as any, 'groupEventsByModule')
+        .mockReturnValue(new Map());
 
       //Act
-      const result = await service.getAll(userId, {
-        universityId: uniId,
-        courseId,
-        GroupID: groupId,
-        moduleCode: 'someCode',
-        userEnrollment: true,
-      });
+      const result = await service.getAll('user-1', {});
 
       //Assert
-      expect(result).toMatchObject({
-        modules: [module1, module2],
-      });
-
-      expect(mockEventService.getAllEvents).toHaveBeenCalledTimes(2);
+      expect(result.modules[0].Events).toEqual([]);
+      expect(result.count).toBeUndefined();
     });
-
-    it('should return count when Stats is true', async () => {
-      //Arrange
-      const module1 = createModule();
-      const module2 = createModule();
-
-      mockDbResult(mockDb.select, [module1, module2]);
-
-      mockEventService.getAllEvents?.mockResolvedValue({
-        events: [],
-      });
-
-      //Act
-      const result = await service.getAll(userId, {
-        Stats: true,
-      });
-
-      //Assert
-      expect(result.count).toBe(2);
-    });
-
-    it('should include events for each module', async () => {
-      //Arrange
-      const module = createModule();
-
-      const events = [createEventDto({}, {})];
-
-      mockDbResult(mockDb.select, [module]);
-
-      mockEventService.getAllEvents?.mockResolvedValue({
-        events,
-      });
-
-      //Act
-      const result = await service.getAll(userId, {});
-
-      //Assert
-      expect(result.modules[0]).toMatchObject({
-        ...module,
-        Events: events,
-      });
-    });
-  }); //END_Test_GetAll
+  }); //END_Test_getAll //END_Test_GetAll
 
   describe('Test_GetByIdV2', () => {
     it('should throw if moduleId is invalid', async () => {
@@ -392,7 +365,7 @@ describe('ModuleServiceV2', () => {
 
       //Assert
       expect(result).toMatchObject(module);
-      expect(mockEventService.getAllEvents).not.toHaveBeenCalled();
+      expect(mockEventServiceV2.getAllEvents).not.toHaveBeenCalled();
     });
 
     it('should return module with styling and events when userId is provided', async () => {
@@ -403,7 +376,7 @@ describe('ModuleServiceV2', () => {
 
       const event = createEventDto({}, {});
 
-      mockEventService.getAllEvents?.mockResolvedValue({
+      mockEventServiceV2.getAllEvents?.mockResolvedValue({
         events: [event],
       });
 
@@ -419,7 +392,7 @@ describe('ModuleServiceV2', () => {
         Events: [event],
       });
 
-      expect(mockEventService.getAllEvents).toHaveBeenCalledWith(userId, {
+      expect(mockEventServiceV2.getAllEvents).toHaveBeenCalledWith(userId, {
         moduleId: module.moduleID,
       });
     });
@@ -607,4 +580,180 @@ describe('ModuleServiceV2', () => {
       expect(result).toBeNull();
     });
   }); //END_Test_GetByExternalID
+
+  describe('Test_GetStatistics', () => {
+    it('should throw if university does not exist', async () => {
+      mockDbResult(mockDb.select, []);
+
+      await expect(service.getStatistics(uniId)).rejects.toThrow(
+        'University not found',
+      );
+    });
+
+    it('should return module statistics for a university', async () => {
+      const statistics = [
+        {
+          ModuleID: moduleId,
+          ModuleCode: 'COS301',
+          ModuleName: 'Computer Science',
+          EventCount: 3,
+          EnrolledStudents: 12,
+        },
+      ];
+
+      (mockDb.select as unknown as jest.Mock)
+        .mockReturnValueOnce(createDbChain([createCourse()]))
+        .mockReturnValueOnce(createDbChain(statistics));
+
+      await expect(service.getStatistics(uniId)).resolves.toEqual({
+        data: statistics,
+      });
+    });
+  });
+
+  //Helpers
+  describe('Test_Helpers', () => {
+    it('should validate and return an existing group id', async () => {
+      const group = createGroup({
+        GroupID: groupId,
+      });
+
+      mockGroupingService.getById?.mockResolvedValue(group);
+
+      await expect(
+        (service as any).getGroupId(mockDb, undefined, groupId),
+      ).resolves.toBe(groupId);
+
+      expect(mockGroupingService.getById).toHaveBeenCalledWith(groupId, mockDb);
+    });
+  });
+
+  describe('Test_buildModuleFilters', () => {
+    it('should return undefined when no filters provided', () => {
+      //Act
+      const result = (service as any).buildModuleFilters('user-1', {});
+
+      //Assert
+      expect(result).toBeUndefined();
+    });
+
+    it('should build filter for universityId only', () => {
+      //Act
+      const result = (service as any).buildModuleFilters('user-1', {
+        universityId: 'uni-1',
+      });
+
+      //Assert
+      expect(result).toBeDefined();
+    });
+
+    it('should build filter for courseId only', () => {
+      //Act
+      const result = (service as any).buildModuleFilters('user-1', {
+        courseId: 'course-1',
+      });
+
+      //Assert
+      expect(result).toBeDefined();
+    });
+
+    it('should build filter for GroupID only', () => {
+      //Act
+      const result = (service as any).buildModuleFilters('user-1', {
+        GroupID: 'group-1',
+      });
+
+      //Assert
+      expect(result).toBeDefined();
+    });
+
+    it('should build filter for moduleCode only', () => {
+      //Act
+      const result = (service as any).buildModuleFilters('user-1', {
+        moduleCode: 'COS',
+      });
+
+      //Assert
+      expect(result).toBeDefined();
+    });
+
+    it('should build filter for userEnrollment using the userId', () => {
+      //Act
+      const result = (service as any).buildModuleFilters('user-1', {
+        userEnrollment: true,
+      });
+
+      //Assert
+      expect(result).toBeDefined();
+    });
+
+    it('should combine multiple filters', () => {
+      //Act
+      const result = (service as any).buildModuleFilters('user-1', {
+        universityId: 'uni-1',
+        courseId: 'course-1',
+        moduleCode: 'COS',
+      });
+
+      //Assert
+      expect(result).toBeDefined();
+    });
+
+    it('should treat blank strings as absent', () => {
+      //Act
+      const result = (service as any).buildModuleFilters('user-1', {
+        universityId: '   ',
+        courseId: '',
+        moduleCode: '  ',
+      });
+
+      //Assert
+      expect(result).toBeUndefined();
+    });
+  }); //END_Test_buildModuleFilters
+
+  describe('Test_deduplicateModules', () => {
+    it('should remove duplicates', () => {
+      //Arrange
+      const first = { moduleID: 'm-1', moduleCode: 'COS301' };
+      const duplicate = { moduleID: 'm-1', moduleCode: 'COS301-DUP' };
+      const modules = [first, duplicate] as ModuleSingleResponseDto[];
+
+      //Act
+      const result = (service as any).deduplicateModules(modules);
+
+      //Assert
+      expect(result).toHaveLength(1);
+      expect(result[0]).toBe(first);
+    });
+  }); //END_Test_deduplicateModules
+
+  describe('Test_groupEventsByModule', () => {
+    it('should return empty map when input is empty', () => {
+      //Act
+      const result = (service as any).groupEventsByModule([]);
+
+      //Assert
+      expect(result.size).toBe(0);
+    });
+
+    it('should group events by module id', () => {
+      //Arrange
+      const event1 = createEventDto({ eventId: 'event-1' }, {});
+      const event2 = createEventDto({ eventId: 'event-2' }, {});
+      const event3 = createEventDto({ eventId: 'event-3' }, {});
+      const events = [
+        { moduleId: 'module-1', event: event1 },
+        { moduleId: 'module-1', event: event2 },
+        { moduleId: 'module-2', event: event3 },
+      ];
+
+      //Act
+      const result = (service as any).groupEventsByModule(events);
+
+      //Assert
+      expect(result.get('module-1')).toEqual([event1, event2]);
+      expect(result.get('module-2')).toEqual([event3]);
+    });
+  }); //END_Test_groupEventsByModule
 }); //END_ModuleServiceV2

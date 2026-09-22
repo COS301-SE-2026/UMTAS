@@ -21,14 +21,22 @@ export function ChooseInstituteTemplate({
 }: ChooseInstituteTemplateProps) {
   const { university, isLoading } = useUniversityState();
 
-  if (isLoading) return <UniversityStateLoading />;
+  if (isLoading) {
+    return <UniversityStateLoading />;
+  }
 
   return (
-    <Card className="w-full max-w-md mx-auto bg-[var(--bg-surface)] p-4 sm:p-6 border-0 sm:border shadow-none sm:shadow-sm">
-      <CardHeader>
+    <Card className="mx-auto w-full max-w-md border-0 bg-[var(--bg-surface)] p-4 shadow-none sm:border sm:p-6 sm:shadow-sm">
+      <CardHeader className="p-0 pb-6 text-left">
         <CardTitle className="text-xl sm:text-2xl">Choose Institute</CardTitle>
-        {university && <>Current University : {university.UniversityName}</>}
+
+        {university && (
+          <p className="text-sm text-muted-foreground">
+            Current University: {university.UniversityName}
+          </p>
+        )}
       </CardHeader>
+
       <CardContent className="p-0">
         <InstituteSelector onClose={onClose} />
       </CardContent>

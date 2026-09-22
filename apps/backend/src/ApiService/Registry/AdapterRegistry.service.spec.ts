@@ -10,7 +10,7 @@ import { uniId } from 'src/Testing/constants';
 //Factories
 import { createUniversity } from 'src/Testing/Factories';
 
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { ML_Adapter } from '../Adapter/Maryland/ML_Adapter';
 import { UniversityDto } from 'src/University/dto/university.dto';
 
@@ -65,6 +65,34 @@ describe('AdapterRegistryService', () => {
           BaseApiUrl: undefined,
         }),
       ).toThrow(BadRequestException);
+    });
+
+    it('should throw if the university adapter does not exist', async () => {
+      expect(() =>
+        service.register({
+          ...uni,
+          ApiIdentifier: 'UNKNOWN',
+          BaseApiUrl: 'testUrl',
+        }),
+      ).toThrow(
+        new NotFoundException(
+          `Adapter does not exist for ${JSON.stringify({
+            ...uni,
+            ApiIdentifier: 'UNKNOWN',
+            BaseApiUrl: 'testUrl',
+          })}`,
+        ),
+      );
+    });
+
+    it('should throw if university has no baseUrl', async () => {
+      expect(() =>
+        service.register({
+          ...uni,
+          ApiIdentifier: 'ML',
+          BaseApiUrl: undefined,
+        }),
+      ).toThrow(`BaseUrl does not exist for uni[${uni.UniversityName}]`);
     });
   }); //END_Test_Register
 

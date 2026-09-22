@@ -34,7 +34,8 @@ both: rebuild-packages
 
 # spin up local versions
 dev-infra:
-    WORKER_BACKEND_URL=http://host.docker.internal:3000 phase run -- docker compose --profile dev-infra up -d --build postgres redis minio mailhog pdf-parser-worker solver-worker
+    phase run -- docker compose --profile dev-infra up -d postgres redis minio minio-init mailhog
+    WORKER_BACKEND_URL=http://host.docker.internal:3000 phase run -- docker compose --profile dev-infra up -d --build pdf-parser-worker solver-worker
 
 # compelete reset
 sync:
@@ -208,6 +209,10 @@ docker-build-multiarch image_tag registry="vigilcs/umtas":
     DOCKER_REGISTRY={{ registry }} IMAGE_TAG={{ image_tag }} pnpm docker:build:all:multiarch
 
 ############################## Backend specific
+
+#FOr local integration tests
+testInt:
+    phase run -- pnpm --filter backend run test:integration:local
 
 #Complete restart of backend, I'm getting lazy
 resetBack:

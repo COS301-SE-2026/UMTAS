@@ -7,6 +7,7 @@ import { ModuleModule } from 'src/Module/module.module';
 import { CourseModule } from 'src/Course/course.module';
 import { UniversityService } from 'src/University/university.service';
 import { EventServiceV2 } from './eventV2.service';
+import { RecurringEventService } from './recurring-event.service';
 
 @Module({
   imports: [forwardRef(() => ModuleModule), CourseModule],
@@ -16,12 +17,14 @@ import { EventServiceV2 } from './eventV2.service';
     EventServiceV2,
     EventImportFingerprintService,
     UniversityService,
+    RecurringEventService,
   ],
   exports: [
     EventService,
     EventServiceV2,
     EventImportFingerprintService,
     UniversityService,
+    RecurringEventService,
   ],
 })
 export class EventModule {}

@@ -1,5 +1,6 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import {
+  ApiBadRequestResponse,
   ApiForbiddenResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -14,14 +15,54 @@ import {
   RouteQueryDto,
   RouteSingleResponseDto,
 } from './dto/route.dto';
-import { CurrentSession, type SessionData } from 'src/auth/session.decorator';
+import {
+  CurrentSession,
+  CurrentUniId,
+  type SessionData,
+} from 'src/auth/session.decorator';
 import { RouteService } from './route.service';
+import {
+  RoutingHeatmapQueryDto,
+  RoutingHeatmapResponseDto,
+} from './dto/route.heatmap.dto';
+import { RouteHeatmapService } from './route.heatmap.service';
 
 @ApiTags('Routes')
 @ApiSecurity('umtas-session')
 @Controller('routes')
 export class RouteController {
-  constructor(private readonly routeService: RouteService) {}
+  constructor(
+    private readonly routeService: RouteService,
+    private readonly routeHeatmapService: RouteHeatmapService,
+  ) {}
+
+  @Get('heatmap')
+  @Roles()
+  @ApiOperation({
+    summary: 'Get route demand heatmap',
+    description:
+      'Returns route demand metrics for all persisted route variants in the selected university for a single date.',
+    operationId: 'getRoutingHeatmap',
+  })
+  @ApiOkResponse({
+    description: 'Routing heatmap returned successfully',
+    type: RoutingHeatmapResponseDto,
+  })
+  @ApiBadRequestResponse({
+    description: 'Invalid routing heatmap query parameters',
+  })
+  @ApiForbiddenResponse({
+    description: 'No university selected or insufficient permissions',
+  })
+  @ApiNotFoundResponse({
+    description: 'Required route, event, venue, or building data was not found',
+  })
+  getRoutingHeatmap(
+    @CurrentUniId() uniId: string,
+    @Query() query: RoutingHeatmapQueryDto,
+  ): Promise<RoutingHeatmapResponseDto> {
+    return this.routeHeatmapService.getRoutingHeatmap(uniId, query);
+  }
 
   @Get()
   @Roles('student')
@@ -42,11 +83,11 @@ export class RouteController {
       'One or both buildings have not been pinned, or no walking path was found between the two buildings',
   })
   getRoute(
-    @CurrentSession() session: SessionData,
+    @CurrentUniId() uniId: string,
     @Query() query: RouteQueryDto,
   ): Promise<RouteSingleResponseDto> {
     return this.routeService.getOrCreateRoute(
-      session,
+      uniId,
       query.originBuildingId,
       query.destinationBuildingId,
     );
@@ -67,9 +108,15 @@ export class RouteController {
     description: 'No university or university role was selected',
   })
   getActiveRoute(
+    @CurrentUniId() uniId: string,
     @CurrentSession() session: SessionData,
     @Query() query: ActiveRouteQueryDto,
   ): Promise<ActiveRouteResponseDto> {
-    return this.routeService.getActiveRoute(session, query.date, query.time);
+    return this.routeService.getActiveRoute(
+      session.user.id,
+      uniId,
+      query.date,
+      query.time,
+    );
   }
 }

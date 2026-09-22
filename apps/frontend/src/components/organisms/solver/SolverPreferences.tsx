@@ -29,15 +29,23 @@ import {
   StartTimePref,
 } from "@/components/molecules/solver/PreferenceHandler";
 import { getAllTimetablesQ } from "@/components/templates/builder/Queries/timetableQueries";
+import { errorName } from "../../../../utilities/errorCries";
+import { useErrorListener } from "@/hooks/errorListener";
 type solverProps = {
   modules: ModuleResponseDto[];
+  timetableName?: string;
   onJobCompleteAction?: () => void;
 };
 
 export default function SolverPreferences({
   modules,
+  timetableName: providedTimetableName,
   onJobCompleteAction,
 }: solverProps) {
+  const [localTimetableName, setLocalTimetableName] = useState("");
+
+  const timetableName = providedTimetableName ?? localTimetableName;
+  const hasProvidedTimetableName = providedTimetableName !== undefined;
   const [currentMode, setCurrentMode] = useState<
     "feasibility" | "optimization"
   >("feasibility");
@@ -45,46 +53,70 @@ export default function SolverPreferences({
   const [jobFailed, setJobFailed] = useState<boolean>(false);
   const [timetableCreated, setTimetableCreated] = useState<boolean>(false);
   const router = useRouter();
-  const [timetableName, setTimetableName] = useState<string>("");
 
-  const [startTime, setStartTime] = useState<string>("");
+  const [startTime, setStartTime] = useState<string>("07:30");
   const [startTimeChecked, SetStartTimeChecked] = useState<boolean>(false);
 
-  const [skipDay, setSkipDay] = useState<string>("");
+  const [skipDay, setSkipDay] = useState<string>("Monday");
   const [skipChecked, setSkipChecked] = useState<boolean>(false);
 
   const [smallGapsChecked, setSmallGapsChecked] = useState<boolean>(false);
 
   function preferences() {
     return (
-      <div className="flex flex-col w-full gap-y-5">
-        <div className="grid grid-cols-2 w-full h-full justify-items-start items-center gap-5">
-          <label className="flex items-center gap-2 cursor-pointer text-sm font-medium">
-            <span>Choose Preferences</span>
-          </label>
+      <div className="flex flex-col w-full min-w-100 max-w-120">
+        <div className="grid grid-cols-[1fr_80px] items-center gap-x-4 auto-rows-[minmax(30px,auto)]">
+          <span className="text-sm font-medium text-[var(--text-primary)]">
+            Choose Preferences
+          </span>
 
-          <label className="flex items-center gap-2 cursor-pointer text-sm font-medium">
-            <span>Activate Preference</span>
-          </label>
+          <span className="text-sm font-medium text-[var(--text-primary)] text-center">
+            Activate
+          </span>
+
+          <div className="col-span-2 border-b border-[var(--border)]" />
+
+          <div className="col-span-2 grid grid-cols-[1fr_80px] items-center gap-x-4 gap-y-3 max-h-45 overflow-y-auto overflow-x-hidden pr-1 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-[var(--border)] [scrollbar-color:var(--border)_transparent] [&_[role=checkbox]]:justify-self-center [&_[role=checkbox]]:border [&_[role=checkbox]]:border-[var(--text-secondary)] [&_[role=checkbox]]:bg-[var(--bg-surface)] [&_[role=checkbox][data-state=checked]]:border-[var(--btn-primary-bg)] [&_[role=checkbox][data-state=checked]]:bg-[var(--btn-primary-bg)]">
+            <StartTimePref
+              startTime={startTime}
+              onChange={setStartTime}
+              setChecked={SetStartTimeChecked}
+              activePreference={startTimeChecked}
+            />
+
+            <SkipDayPref
+              setChecked={setSkipChecked}
+              activePreference={skipChecked}
+              day={skipDay}
+              onChange={setSkipDay}
+            />
+
+            <SmallGapsPref
+              activePreference={smallGapsChecked}
+              setChecked={setSmallGapsChecked}
+            />
+          </div>
         </div>
-        <StartTimePref
-          startTime={startTime}
-          onChange={setStartTime}
-          setChecked={SetStartTimeChecked}
-          activePreference={startTimeChecked}
-        />
-        <SkipDayPref
-          setChecked={setSkipChecked}
-          activePreference={skipChecked}
-          day={skipDay}
-          onChange={setSkipDay}
-        />
-        <SmallGapsPref
-          activePreference={smallGapsChecked}
-          setChecked={setSmallGapsChecked}
-        />
       </div>
     );
+  }
+
+  function handleCreateTimetable() {
+    const cleanedName = timetableName.trim();
+
+    if (!cleanedName) {
+      window.dispatchEvent(
+        new CustomEvent(errorName, {
+          detail: {
+            userMessage: "Please provide a timetable name.",
+          },
+        }),
+      );
+
+      return;
+    }
+
+    enrollUser();
   }
 
   const { data: resultOfPoll, isFetching: pollFetching } = useQuery({
@@ -186,7 +218,7 @@ export default function SolverPreferences({
         const resultTT = await timetableBuilder.send({
           body: {
             eventIds: typeShiftedResults?.timetableSolution.selectedEventIds,
-            timetableName: timetableName == "" ? "My timetable" : timetableName,
+            timetableName: timetableName.trim(),
           },
         });
         return resultTT;
@@ -236,7 +268,7 @@ export default function SolverPreferences({
       }
     }
   }
-
+  useErrorListener();
   handleStatus();
 
   function loadingStatus() {
@@ -262,7 +294,7 @@ export default function SolverPreferences({
       }
 
       return (
-        <div>
+        <div className="flex flex-col items-center justify-center gap-2 text-center">
           {spinnerText}
           <Spinner />
         </div>
@@ -273,58 +305,41 @@ export default function SolverPreferences({
   }
   function ManageSolverOptions() {
     return (
-      <>
-        <div className="space-y-2">
-          <strong hidden>
-            <p>Solve mode</p>
-          </strong>
-          <div className="flex flex-row gap-4">
-            {" "}
-            <Button
-              hidden
-              disabled={loadingStatus()}
-              variant={"outline"}
-              onClick={() => {
-                setCurrentMode("feasibility");
-              }}
-            >
-              Feasibility
-            </Button>
-            <Button
-              hidden
-              disabled={loadingStatus()}
-              variant={"outline"}
-              onClick={() => {
-                setCurrentMode("optimization");
-              }}
-            >
-              Optimisation
-            </Button>
+      <div className="flex h-full flex-col">
+        {!hasProvidedTimetableName && (
+          <div className="mb-4">
+            <label className="flex w-full flex-col gap-1">
+              <span className="text-sm font-medium text-[var(--text-primary)]">
+                Timetable name
+              </span>
+
+              <Input
+                data-testid="input-solver-timetable-name"
+                id="input-name-timetable"
+                placeholder="My timetable"
+                value={localTimetableName}
+                className="h-8 w-full rounded-md border border-[var(--border)] bg-transparent px-3 text-left text-sm text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--ring)]"
+                onChange={(e) => setLocalTimetableName(e.target.value)}
+              />
+            </label>
           </div>
-        </div>
-        {preferences()}
-        <div className="flex flex-col gap-y-2">
-          <Input
-            data-testid="input-solver-timetable-name"
-            id="input-name-timetable"
-            placeholder="Name timetable"
-            value={timetableName}
-            onChange={(e) => {
-              setTimetableName(e.target.value);
-            }}
-          ></Input>
+        )}
+
+        <div>{preferences()}</div>
+
+        <div className="mt-auto flex justify-center pt-6">
           <Button
             data-testid="btn-upload-and-create-timetable"
             id="btn-upload-and-create-timetable"
             disabled={loadingStatus()}
             type="button"
-            onClick={enrollUser}
-            className="mt-4 w-fit"
+            onClick={handleCreateTimetable}
+            className="h-8 w-fit"
           >
             Upload and Create Timetable
           </Button>
         </div>
-      </>
+      </div>
     );
   }
   function handleError() {
@@ -334,22 +349,20 @@ export default function SolverPreferences({
   return (
     <>
       {/* {TimetableCreatedDialog()} */}
-      <Card className="shadow-lg border-[var(--border)] rounded-xl bg-[var(--bg-surface)] w-full h-full flex flex-col">
+      <Card className="shadow-lg border-[var(--border)] rounded-xl bg-[var(--bg-surface)] w-full flex flex-col">
         <CardHeader className="text-xl font-bold text-[var(--text-primary)]">
           Set your preferences
         </CardHeader>
-        <CardDescription className="px-4">
-          These are soft preferences. They shape which timetable is picked,
-          never making a timetable invalid
-        </CardDescription>
 
-        <CardContent className="space-y-4 overflow-y-auto flex-1">
+        <CardContent className="flex flex-1 flex-col">
           {jobFailed == false ? (
             <>
               {!loadingStatus() ? (
                 <>{ManageSolverOptions()}</>
               ) : (
-                <>{dynamicSpinner()}</>
+                <div className="flex flex-1 items-center justify-center">
+                  {dynamicSpinner()}
+                </div>
               )}
             </>
           ) : (

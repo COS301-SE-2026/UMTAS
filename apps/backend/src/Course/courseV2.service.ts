@@ -13,9 +13,9 @@ import { AppDatabase } from 'src/auth/auth';
 import { and, countDistinct, desc, eq, ilike, SQL } from 'drizzle-orm';
 import {
   Course,
+  CourseEnrollment,
   Event,
   GroupModules,
-  ModuleEnrollment,
   modules,
   UniversityEvent,
 } from 'src/entities';
@@ -54,9 +54,21 @@ export class CourseServiceV2 extends CourseService {
 
     const courses = await db.select().from(Course).where(whereClause);
 
+    const enrollments = await db
+      .select()
+      .from(CourseEnrollment)
+      .where(eq(CourseEnrollment.UserID, userId));
+
+    const enrolledCourseIds = new Set(enrollments.map((e) => e.CourseID));
+
+    const UpdatedCourses = courses.map((course) => ({
+      ...course,
+      isEnrolled: enrolledCourseIds.has(course.CourseID),
+    }));
+
     //Attach modules to course
     const coursesWithModules = await Promise.all(
-      courses.map(async (course) => ({
+      UpdatedCourses.map(async (course) => ({
         ...course,
         Modules: (
           await this.moduleService.getAll(
@@ -99,7 +111,11 @@ export class CourseServiceV2 extends CourseService {
     const courseWithModules = {
       ...course,
       Modules: (
-        await this.moduleService.getAll(userId, { courseId: course.CourseID })
+        await this.moduleService.getAll(
+          userId,
+          { courseId: course.CourseID },
+          db,
+        )
       ).modules,
     };
 
@@ -137,15 +153,15 @@ export class CourseServiceV2 extends CourseService {
         CourseName: Course.CourseName,
         ModuleCount: countDistinct(modules.moduleID),
         EventCount: countDistinct(Event.eventID),
-        EnrolledStudents: countDistinct(ModuleEnrollment.UserID),
+        EnrolledStudents: countDistinct(CourseEnrollment.UserID),
       })
       .from(Course)
+      .leftJoin(
+        CourseEnrollment,
+        eq(CourseEnrollment.CourseID, Course.CourseID),
+      )
       .leftJoin(GroupModules, eq(GroupModules.GroupID, Course.GroupID))
       .leftJoin(modules, eq(modules.moduleID, GroupModules.ModuleID))
-      .leftJoin(
-        ModuleEnrollment,
-        eq(ModuleEnrollment.ModuleID, modules.moduleID),
-      )
       .leftJoin(UniversityEvent, eq(UniversityEvent.moduleID, modules.moduleID))
       .leftJoin(Event, eq(Event.eventID, UniversityEvent.eventID))
       .where(eq(Course.UniversityID, uniId))

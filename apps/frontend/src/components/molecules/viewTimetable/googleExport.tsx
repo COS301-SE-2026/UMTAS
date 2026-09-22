@@ -54,11 +54,11 @@ export default function GoogleExportDialog({
     schedules[0];
 
   return (
-    <DialogContent>
+    <DialogContent className="bg-[var(--bg-surface)]">
       <DialogHeader>
         <DialogTitle>Export to Google Calendar</DialogTitle>
         <DialogDescription>
-          Choose a timetable to add to your UMTAS Calendar.
+          Add a Timetable to Your UMTAS Calendar.
         </DialogDescription>
       </DialogHeader>
 
@@ -69,13 +69,16 @@ export default function GoogleExportDialog({
       )}
 
       {!hasGoogleCalendarAccess ? (
-        <div className="flex flex-col items-center justify-center gap-4">
-          <p className="text-center text-sm text-muted-foreground">
-            Connect your Google account to add this timetable to Calendar.
+        <div className="flex w-full flex-col items-center justify-center gap-4 text-center">
+          <p className="max-w-sm text-sm">
+            Connect your Google Account to Add this Timetable to Your Google
+            Calendar.
           </p>
+
           <Button
             type="button"
-            className="w-full max-w-52"
+            variant="outline"
+            className="flex w-fit cursor-pointer items-center gap-2 self-center border-[var(--border)] text-[var(--text-primary)] transition-colors duration-[var(--duration-fast)] hover:bg-[var(--bg-elevated)]"
             disabled={isLoading || isExporting}
             onClick={onSignIn}
           >
@@ -90,25 +93,30 @@ export default function GoogleExportDialog({
             selectedScheduleId={selectedSchedule?.id ?? ""}
             onScheduleChange={onScheduleChange}
           />
+
           <div className="w-full space-y-2 text-center">
             <p className="text-sm font-medium">
               Export “{selectedSchedule?.name ?? "selected timetable"}”
             </p>
+
             <p className="text-xs text-muted-foreground">
               This will update your UMTAS Calendar in Google Calendar.
             </p>
           </div>
-          <Button
-            type="button"
-            className="w-full max-w-52"
-            disabled={!selectedSchedule || isExporting}
-            onClick={() => {
-              if (selectedSchedule) onExport(selectedSchedule.id);
-            }}
-          >
-            <GoogleIcon />
-            {isExporting ? "Exporting…" : "Add to Google Calendar"}
-          </Button>
+
+          <div className="flex w-full justify-center">
+            <Button
+              type="button"
+              className="w-full max-w-52"
+              disabled={!selectedSchedule || isExporting}
+              onClick={() => {
+                if (selectedSchedule) onExport(selectedSchedule.id);
+              }}
+            >
+              <GoogleIcon />
+              {isExporting ? "Exporting…" : "Add to Google Calendar"}
+            </Button>
+          </div>
         </div>
       )}
     </DialogContent>

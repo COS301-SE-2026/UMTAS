@@ -8,15 +8,9 @@ function resolveApiBaseUrl(): string {
   );
 }
 
-// url is something like /universities
 export function createBaseURL(): string {
   const cleanBase = resolveApiBaseUrl().replace(/\/+$/, "");
 
-  // The configured base can be absolute ("https://api.example.com") or a
-  // same-origin path ("/api", which the e2e compose build sets), so resolve
-  // against a dummy origin: `new URL("/api")` on its own throws. Comparing the
-  // pathname rather than the whole string keeps hosts like "api.example.com"
-  // from being mistaken for an existing "/api" prefix.
   const pathname = new URL(cleanBase, "http://localhost").pathname.replace(
     /\/+$/,
     "",
@@ -51,11 +45,13 @@ export type intTest<
   PathType = undefined,
   RequestType = undefined,
   ResponseType = undefined,
+  QueryType = undefined,
 > = {
   tName: string;
   args: {
     paths?: PathType;
     body?: RequestType;
+    query?: QueryType;
   };
   expectedResponse?: ResponseType;
 };
@@ -64,10 +60,12 @@ export class RequestBuilder<
   PathType = undefined,
   RequestType = undefined,
   ResponseType = undefined,
+  QueryType = undefined,
 > {
   private url: string = "";
   private method: RequestMethod = RequestMethod.GET;
-  private arrTests: intTest<PathType, RequestType, ResponseType>[] = [];
+  private arrTests: intTest<PathType, RequestType, ResponseType, QueryType>[] =
+    [];
   private headers: Record<string, string> = {
     "Content-Type": "application/json",
   };
@@ -78,7 +76,6 @@ export class RequestBuilder<
     if (this.url.includes("/api/api")) {
     }
     if (typeof window === "undefined") {
-      // Automatically set Origin header in Node.js environments for CORS/CSRF
       this.headers["Origin"] = cleanBase();
     }
 
@@ -138,7 +135,7 @@ export class RequestBuilder<
   }
 
   public addIntegrationTest(
-    test: intTest<PathType, RequestType, ResponseType>,
+    test: intTest<PathType, RequestType, ResponseType, QueryType>,
   ): this {
     this.arrTests.push(test);
     return this;
@@ -161,8 +158,9 @@ export class RequestBuilder<
   public async send(args: {
     paths?: PathType;
     body?: RequestType;
+    query?: QueryType;
   }): Promise<ResponseType> {
-    const { paths, body } = args;
+    const { paths, body, query } = args;
     const methodsRequiringBody: RequestMethod[] = [
       RequestMethod.POST,
       RequestMethod.PUT,
@@ -182,6 +180,19 @@ export class RequestBuilder<
           finalUrl = finalUrl.split(`:${key}`).join(String(value));
         },
       );
+    }
+
+    if (query && typeof query === "object") {
+      const searchParams = new URLSearchParams();
+      Object.entries(query as Record<string, unknown>).forEach(([k, v]) => {
+        if (v !== undefined && v !== null) {
+          searchParams.append(k, String(v));
+        }
+      });
+      const queryString = searchParams.toString();
+      if (queryString) {
+        finalUrl += (finalUrl.includes("?") ? "&" : "?") + queryString;
+      }
     }
 
     const response = await fetch(finalUrl, {

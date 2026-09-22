@@ -8,6 +8,7 @@ import React, {
   useMemo,
   useRef,
 } from "react";
+import Link from "next/link";
 import { Skeleton } from "@/components/atoms/baseShadcn/skeleton";
 import { WeeklyGrid } from "@/components/organisms/viewTimetable/WeeklyGrid";
 import { EmptySchedule } from "@/components/organisms/viewTimetable/EmptySchedule";
@@ -46,11 +47,9 @@ import {
   startCalendarConsent,
 } from "@/lib/auth/google-calendar";
 import GoogleExportDialog, {
-  type GoogleExportNotice,
   type GoogleScheduleOption,
 } from "@/components/molecules/viewTimetable/googleExport";
 import { Button } from "@/components/atoms/baseShadcn/button";
-import { Alert, AlertDescription } from "@/components/atoms/baseShadcn/alert";
 import { Dialog } from "@/components/atoms/baseShadcn/dialog";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
@@ -63,29 +62,55 @@ import {
 import { getQueryClient } from "@/components/tanstack/getQueryClient";
 import Tutorial from "@/components/organisms/nav/Tutorial";
 import { fetchAllModulesv2 } from "../../../../utilities/V2-Builders/Modules";
+import {
+  CalendarPlus,
+  FileDown,
+  MoreVertical,
+  SquarePen,
+  Trash2,
+} from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/atoms/baseShadcn/dropdown-menu";
+import { GoogleIcon } from "@/components/atoms/auth/GoogleIcon";
+import { errorName } from "../../../../utilities/errorCries";
 
 const CALENDAR_TIMEZONE = "Africa/Johannesburg";
 const GOOGLE_CALENDAR_EXPORT_TIMEOUT_MS = 60_000;
 
 const emptySteps = [
   {
+    target: "#empty-schedule",
+    content: "You do not have any timetables yet.",
+  },
+  {
     target: "#ref-go-to-builder",
-    content: "Go to the builder page to create a schedule",
+    content: "Go to the generator to create your first timetable.",
   },
 ];
 
 const steps = [
   {
     target: "#select-timetable",
-    content: "Select your schedule here.",
+    content: "Select which saved timetable you want to view.",
   },
   {
-    target: "#btn-edit",
-    content: "Edit your schedule here.",
+    target: "#week-navigation",
+    content: "Move between weeks or choose a specific date to view.",
   },
   {
-    target: "#btn-delete",
-    content: "Delete your schedule.",
+    target: "#schedule-actions",
+    content:
+      "Export, create, edit, or delete your timetable using these actions.",
+  },
+  {
+    target: "#weekly-schedule",
+    content:
+      "View your scheduled modules and events for the selected week here.",
   },
 ];
 
@@ -124,9 +149,16 @@ export function ScheduleView({
   const handledConsentReturn = useRef(false);
   const [isGoogleDialogOpen, setIsGoogleDialogOpen] = useState(false);
   const [googleDialogTimetableId, setGoogleDialogTimetableId] = useState("");
-  const [exportNotice, setExportNotice] = useState<GoogleExportNotice | null>(
-    null,
-  );
+
+  const showNotice = useCallback((message: string) => {
+    window.dispatchEvent(
+      new CustomEvent(errorName, {
+        detail: {
+          userMessage: message,
+        },
+      }),
+    );
+  }, []);
 
   const { data: allModules = [], isLoading: isLoadingModules } = useQuery({
     queryKey: ["Modules", "Courses"],
@@ -222,7 +254,6 @@ export function ScheduleView({
 
     exportInProgress.current = true;
     setExportingTo("ics");
-    setExportNotice(null);
     try {
       const payload = await generateCalendarPayload(selectedTimetableId);
       const icsContent = generateAcademicCalendarICS(
@@ -230,20 +261,14 @@ export function ScheduleView({
         CALENDAR_TIMEZONE,
       );
       downloadICS(icsContent, "umtas-schedule.ics");
-      setExportNotice({
-        variant: "success",
-        message: "Calendar exported to ICS.",
-      });
+      showNotice("Calendar exported to ICS.");
     } catch {
-      setExportNotice({
-        variant: "destructive",
-        message: "Could not export this calendar to ICS.",
-      });
+      showNotice("Could not export this calendar to ICS.");
     } finally {
       exportInProgress.current = false;
       setExportingTo(null);
     }
-  }, [selectedTimetableId]);
+  }, [selectedTimetableId, showNotice]);
 
   const exportToGoogleCalendar = useCallback(
     async (timetableId = selectedTimetableId) => {
@@ -251,7 +276,6 @@ export function ScheduleView({
 
       exportInProgress.current = true;
       setExportingTo("google");
-      setExportNotice(null);
       try {
         const token = await fetchGoogleCalendarToken();
         const payload = await generateCalendarPayload(timetableId);
@@ -269,26 +293,22 @@ export function ScheduleView({
           });
 
           if (result.failed.length > 0) {
-            setExportNotice({
-              variant: "default",
-              message: `UMTAS Calendar exported with ${result.failed.length} failed event${result.failed.length === 1 ? "" : "s"}.`,
-            });
+            showNotice(
+              `UMTAS Calendar exported with ${result.failed.length} failed event${result.failed.length === 1 ? "" : "s"}.`,
+            );
           } else {
-            setExportNotice({
-              variant: "success",
-              message: `UMTAS Calendar updated (${result.created} added, ${result.updated} updated).`,
-            });
+            showNotice(
+              `UMTAS Calendar updated (${result.created} added, ${result.updated} updated).`,
+            );
           }
         } finally {
           window.clearTimeout(timeoutId);
         }
       } catch (error) {
         if (error instanceof DOMException && error.name === "AbortError") {
-          setExportNotice({
-            variant: "destructive",
-            message:
-              "UMTAS Calendar export timed out. Please try again in a moment.",
-          });
+          showNotice(
+            "UMTAS Calendar export timed out. Please try again in a moment.",
+          );
           return;
         }
         if (error instanceof ConsentRequiredError) {
@@ -299,28 +319,21 @@ export function ScheduleView({
               `${returnUrl.pathname}${returnUrl.search}${returnUrl.hash}`,
             );
           } catch {
-            setExportNotice({
-              variant: "destructive",
-              message: "Could not start Google Calendar authorization.",
-            });
+            showNotice("Could not start Google Calendar authorization.");
           }
           return;
         }
 
-        setExportNotice({
-          variant: "destructive",
-          message: "Could not export this timetable to Google Calendar.",
-        });
+        showNotice("Could not export this timetable to Google Calendar.");
       } finally {
         exportInProgress.current = false;
         setExportingTo(null);
       }
     },
-    [selectedTimetableId],
+    [selectedTimetableId, showNotice],
   );
 
   const handleGoogleCalendarExport = useCallback(() => {
-    setExportNotice(null);
     setGoogleDialogTimetableId(selectedTimetableId);
     setIsGoogleDialogOpen(true);
   }, [selectedTimetableId]);
@@ -330,7 +343,6 @@ export function ScheduleView({
 
     exportInProgress.current = true;
     setExportingTo("google");
-    setExportNotice(null);
     const returnUrl = new URL(window.location.href);
     returnUrl.searchParams.set(
       "calendarExportTimetable",
@@ -342,14 +354,11 @@ export function ScheduleView({
         `${returnUrl.pathname}${returnUrl.search}${returnUrl.hash}`,
       );
     } catch {
-      setExportNotice({
-        variant: "destructive",
-        message: "Could not start Google Calendar authorization.",
-      });
+      showNotice("Could not start Google Calendar authorization.");
       exportInProgress.current = false;
       setExportingTo(null);
     }
-  }, [googleDialogTimetableId]);
+  }, [googleDialogTimetableId, showNotice]);
 
   const confirmGoogleCalendarExport = useCallback(
     async (timetableId: string) => {
@@ -386,15 +395,18 @@ export function ScheduleView({
       return () => window.clearTimeout(resumeExport);
     } else {
       const showDeniedNotice = window.setTimeout(() => {
-        setExportNotice({
-          variant: "destructive",
-          message: "Google Calendar access was not granted.",
-        });
+        showNotice("Google Calendar access was not granted.");
         router.replace(cleanedUrl);
       }, 0);
       return () => window.clearTimeout(showDeniedNotice);
     }
-  }, [exportToGoogleCalendar, router, searchParams, selectedTimetableId]);
+  }, [
+    exportToGoogleCalendar,
+    router,
+    searchParams,
+    selectedTimetableId,
+    showNotice,
+  ]);
 
   const currentWeekStart = useMemo(() => {
     const date = new Date(selectedDate);
@@ -440,22 +452,37 @@ export function ScheduleView({
   if (isLoading) {
     return renderLoadingSkeleton();
   }
-
   if (timetables.length === 0 && viewMode !== "Generate") {
     return (
-      <div className="flex flex-col items-center gap-4 py-20 text-center">
+      <div
+        id="empty-schedule"
+        className="flex flex-col items-center gap-4 py-20 text-center"
+      >
         <Tutorial steps={emptySteps} wait={true} />
 
         <p className="text-base text-[var(--text-secondary)]">
           No timetables found.
         </p>
-        <a
-          id="ref-go-to-builder"
-          onClick={createTimetable}
-          className="text-sm font-medium text-[var(--btn-primary-bg)] hover:underline"
-        >
-          Go to generator to create one
-        </a>
+
+        <div className="flex items-center justify-center gap-3">
+          <button
+            id="ref-go-to-builder"
+            onClick={createTimetable}
+            className="text-sm font-medium text-[var(--btn-primary-bg)] hover:underline"
+          >
+            Go to generator
+          </button>
+
+          <span className="text-sm text-[var(--text-secondary)]">or</span>
+
+          <Link
+            id="ref-go-to-solver"
+            href="/solver"
+            className="text-sm font-medium text-[var(--btn-primary-bg)] hover:underline"
+          >
+            Upload a PDF
+          </Link>
+        </div>
       </div>
     );
   }
@@ -592,7 +619,7 @@ export function ScheduleView({
           className="flex flex-col gap-3"
         >
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <div className="w-full sm:w-64">
+            <div className="flex flex-row w-full sm:w-64">
               <Select
                 value={String(selectedTimetableId)}
                 onValueChange={(newValue) => {
@@ -602,7 +629,8 @@ export function ScheduleView({
               >
                 <SelectTrigger
                   id="select-timetable"
-                  className="bg-[var(--bg-surface)] border-[var(--border)]"
+                  className="bg-[var(--bg-surface)] border-[var(--border)] cursor-pointer"
+                  title="Select Timetable"
                 >
                   <SelectValue placeholder="Select a Timetable" />
                 </SelectTrigger>
@@ -619,88 +647,185 @@ export function ScheduleView({
                   ))}
                 </SelectContent>
               </Select>
-            </div>
+              <div id="week-navigation" className="pl-4">
+                <WeekNavBar
+                  selectedDate={selectedDate}
+                  onDateChange={setSelectedDate}
+                  weekStart={currentWeekStart}
+                  onPrev={handlePrevWeek}
+                  onNext={handleNextWeek}
+                />
+              </div>
+              <div className="sm:hidden flex justify-end ml-auto">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      aria-label="Timetable actions"
+                      id="btn-actions-menu"
+                      className="cursor-pointer"
+                      type="button"
+                      variant={"default"}
+                    >
+                      Actions
+                      <MoreVertical />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="end"
+                    className="bg-[var(--bg-surface)] border-[var(--border)]"
+                  >
+                    <DropdownMenuItem
+                      aria-label="Export to ICS"
+                      id="export-ics-item"
+                      disabled={exportingTo !== null}
+                      onClick={() => void exportToICS()}
+                      className="cursor-pointer"
+                    >
+                      {exportingTo === "ics" ? "Exporting…" : "Export .ics"}
+                      <FileDown />
+                    </DropdownMenuItem>
+                    {!isLoadingGoogleCalendarAccess && (
+                      <DropdownMenuItem
+                        aria-label="Connect Google Calendar"
+                        id="export-google-calendar-item"
+                        disabled={exportingTo !== null}
+                        onClick={handleGoogleCalendarExport}
+                        className="cursor-pointer"
+                      >
+                        {exportingTo === "google" ? (
+                          "Exporting…"
+                        ) : hasGoogleCalendarAccess ? (
+                          <>
+                            <span className="hidden sm:inline">
+                              Export to UMTAS Calendar
+                            </span>
+                            <span className="sm:hidden">Export</span>
+                          </>
+                        ) : (
+                          <>
+                            <span className="hidden sm:inline">
+                              Connect Google Calendar
+                            </span>
+                            <span className="sm:hidden">
+                              Save to Google Calendar
+                            </span>
+                          </>
+                        )}
+                      </DropdownMenuItem>
+                    )}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      aria-label="Create Timetable"
+                      id="create-item"
+                      className="cursor-pointer"
+                      onClick={createTimetable}
+                    >
+                      Create Timetable
+                      <CalendarPlus />
+                    </DropdownMenuItem>
 
-            <div className="grid grid-cols-2 gap-2 w-full sm:flex sm:w-auto sm:flex-wrap">
-              <Button
-                aria-label="Export to ICS"
-                id="btn-export-ics"
-                type="button"
-                variant="outline"
-                disabled={exportingTo !== null}
-                className="h-8 px-3 text-xs hover:opacity-90"
-                onClick={() => void exportToICS()}
-              >
-                {exportingTo === "ics" ? "Exporting…" : "Export to ICS"}
-              </Button>
-              {!isLoadingGoogleCalendarAccess && (
-                <Button
-                  aria-label="Connect Google Calendar"
-                  id="btn-export-google-calendar"
-                  type="button"
-                  variant="outline"
-                  disabled={exportingTo !== null}
-                  className="h-8 px-3 text-xs hover:opacity-90"
-                  onClick={handleGoogleCalendarExport}
-                >
-                  {exportingTo === "google" ? (
-                    "Exporting…"
-                  ) : hasGoogleCalendarAccess ? (
-                    <>
-                      <span className="hidden sm:inline">
-                        Export to UMTAS Calendar
-                      </span>
-                      <span className="sm:hidden">Export</span>
-                    </>
-                  ) : (
-                    <>
-                      <span className="hidden sm:inline">
-                        Connect Google Calendar
-                      </span>
-                      <span className="sm:hidden">Connect</span>
-                    </>
-                  )}
-                </Button>
-              )}
+                    <DropdownMenuItem
+                      aria-label="Edit Timetable"
+                      id="edit-item"
+                      className="cursor-pointer"
+                      onClick={editTimetable}
+                    >
+                      Edit Timetable
+                      <SquarePen />
+                    </DropdownMenuItem>
+
+                    <DropdownMenuItem
+                      aria-label="Delete Timetable"
+                      id="delete-item"
+                      variant={"destructive"}
+                      className="cursor-pointer"
+                      onClick={deleteDialog}
+                    >
+                      Delete Timetable
+                      <Trash2 />
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
           </div>
 
           {!currentWeekStart || events.length === 0 ? (
             <EmptySchedule />
           ) : (
-            <div className="flex flex-col">
-              <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between w-full pb-2">
-                <div className="flex justify-center md:justify-start">
-                  <WeekNavBar
-                    selectedDate={selectedDate}
-                    onDateChange={setSelectedDate}
-                    weekStart={currentWeekStart}
-                    onPrev={handlePrevWeek}
-                    onNext={handleNextWeek}
-                  />
+            <div id="weekly-schedule" className="flex flex-col">
+              <div
+                id="schedule-actions"
+                className="flex flex-col gap-2 flex-row items-center justify-between w-full pb-2"
+              >
+                <div className="hidden sm:flex sm:w-auto sm:flex-wrap gap-2">
+                  <Button
+                    aria-label="Export to ICS"
+                    id="btn-export-ics"
+                    type="button"
+                    variant="outline"
+                    disabled={exportingTo !== null}
+                    className="h-8 px-3 hover:opacity-90 cursor-pointer"
+                    onClick={() => void exportToICS()}
+                  >
+                    <FileDown />
+                    {exportingTo === "ics" ? "Exporting…" : "Export .ics"}
+                  </Button>
+                  {!isLoadingGoogleCalendarAccess && (
+                    <Button
+                      aria-label="Connect Google Calendar"
+                      id="btn-export-google-calendar"
+                      type="button"
+                      variant="outline"
+                      disabled={exportingTo !== null}
+                      className="h-8 px-3 hover:opacity-90 cursor-pointer"
+                      onClick={handleGoogleCalendarExport}
+                    >
+                      {exportingTo === "google" ? (
+                        "Exporting…"
+                      ) : hasGoogleCalendarAccess ? (
+                        <>
+                          <span className="hidden sm:inline">
+                            Export to UMTAS Calendar
+                          </span>
+                          <span className="sm:hidden">Export</span>
+                        </>
+                      ) : (
+                        <>
+                          <GoogleIcon />
+                          <span className="hidden sm:inline">
+                            Save to Google Calendar
+                          </span>
+
+                          <span className="sm:hidden">Google Calendar</span>
+                        </>
+                      )}
+                    </Button>
+                  )}
                 </div>
-                <div className="grid grid-cols-3 gap-2 w-full md:flex md:w-auto md:flex-wrap md:justify-end">
+                <div className="hidden sm:flex sm:w-auto sm:flex-wrap sm:justify-end gap-2">
                   <Button
                     aria-label="Create Timetable"
                     id="btn-create"
                     type="button"
                     variant="default"
-                    className="h-8 px-3 text-xs hover:opacity-90"
+                    className="h-8 px-3 text-xs hover:opacity-90 cursor-pointer"
                     onClick={createTimetable}
+                    title="Add Timetable"
                   >
-                    <span className="hidden sm:inline">Create Timetable</span>
-                    <span className="sm:hidden">Create</span>
+                    <CalendarPlus />
                   </Button>
 
                   <Button
                     aria-label="Edit Timetable"
                     id="btn-edit"
                     type="button"
-                    className="h-8 px-3 text-xs bg-[var(--bg-surface)] text-[var(--text-primary)] border-[var(--border)] hover:opacity-90"
+                    variant="outline"
+                    className="h-8 px-3 text-xs hover:opacity-90 cursor-pointer"
                     onClick={editTimetable}
+                    title="Edit Timetable"
                   >
-                    <span className="hidden sm:inline">Edit Timetable</span>
-                    <span className="sm:hidden">Edit</span>
+                    <SquarePen />
                   </Button>
 
                   <Button
@@ -708,23 +833,15 @@ export function ScheduleView({
                     id="btn-delete"
                     data-testid="schedules-Delete-Btn"
                     type="button"
-                    className="h-8 px-3 text-xs bg-[var(--destructive)] text-[var(--text-primary)] border-[var(--border)] hover:opacity-90"
+                    variant={"destructive"}
+                    className="h-8 px-3 text-xs hover:opacity-90 cursor-pointer"
                     onClick={deleteDialog}
+                    title="Delete Timetable"
                   >
-                    <span className="hidden sm:inline">Delete Timetable</span>
-                    <span className="sm:hidden">Delete</span>
+                    <Trash2 />
                   </Button>
                 </div>
               </div>
-              {exportNotice && (
-                <Alert
-                  variant={exportNotice.variant}
-                  aria-live="polite"
-                  className="mt-2"
-                >
-                  <AlertDescription>{exportNotice.message}</AlertDescription>
-                </Alert>
-              )}
               <AlertDialog
                 open={isDeleteDialogOpen}
                 onOpenChange={setIsDeleteDialogOpen}
@@ -783,7 +900,7 @@ export function ScheduleView({
           onExport={(timetableId) =>
             void confirmGoogleCalendarExport(timetableId)
           }
-          notice={exportNotice}
+          notice={null}
         />
       </Dialog>
     </>

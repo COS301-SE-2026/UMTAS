@@ -9,20 +9,30 @@ import { UserSeedService } from './seeding/services/users.seed.service';
 import { SeedPersistenceService } from './seeding/seed-persistence.service';
 import { AcademicCalendarSeedService } from './seeding/services/academic-calendar.seed.service';
 import { PublicCalendarSeedService } from './seeding/services/public-calendar.seed.service';
+import { BuildingSeedService } from './seeding/services/buildings.seed.service';
+import { EventsSeedService } from './seeding/services/events.seed.service';
+import { SeedQueryService } from './seeding/services/seed-query.service';
+import { VenuesSeedService } from './seeding/services/venues.seed.service';
+import { EventVenuesSeedService } from './seeding/services/eventVenue.seed.service';
 
 @Global()
 @Module({
   providers: [
+    SeedPersistenceService,
+    SeedQueryService,
     DatabaseService,
     DatabaseSeedService,
     CourseSeedService,
     ModuleSeedService,
+    EventsSeedService,
     UniversitySeedService,
     UniRolesSeedService,
     UserSeedService,
-    SeedPersistenceService,
     PublicCalendarSeedService,
     AcademicCalendarSeedService,
+    BuildingSeedService,
+    VenuesSeedService,
+    EventVenuesSeedService,
   ],
   exports: [DatabaseService, SeedPersistenceService],
 })
