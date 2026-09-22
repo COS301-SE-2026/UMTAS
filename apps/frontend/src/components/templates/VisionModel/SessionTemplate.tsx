@@ -98,7 +98,7 @@ export default function VM_SessionTemplate() {
                         setCameraOn(false);
                       }
                     }}
-                    className="h-8 w-40 hidden rounded-md border border-[var(--border)] bg-transparent px-2 text-sm text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--ring)] file:mr-2 file:border-0 file:bg-transparent file:text-xs file:font-medium file:text-[var(--text-primary)] cursor-pointer"
+                    className="hidden "
                   />
                 </Label>
               </div>
