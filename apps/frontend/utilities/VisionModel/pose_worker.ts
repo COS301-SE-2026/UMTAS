@@ -14,7 +14,7 @@ async function initDetection() {
   const fullUrl = `${location.origin}/models/yolo26n-pose.onnx`;
 
   DetectSession = await ort.InferenceSession.create(fullUrl, {
-    executionProviders: ["webgpu", "wasm"],
+    executionProviders: ["webgpu", "webgl"],
   });
 }
 async function createSlices(payload: PIXEL_PAYLOAD): Promise<Float32Array[]> {
@@ -45,15 +45,9 @@ async function runModel(slices: Float32Array[], payload: PIXEL_PAYLOAD) {
   const resultsArray: Float32Array[] = [];
 
   for (let i = 0; i < slices.length; i++) {
-    const sliceStart = performance.now();
     const inputTensor = new ort.Tensor("float32", slices[i], tensorShape);
     const results = await DetectSession!.run({ [inputName]: inputTensor });
-    const sliceDuration = (performance.now() - sliceStart) / 1000;
 
-    if (i != 1)
-      console.log(`-> Slice ${i + 1} took: ${sliceDuration.toFixed(3)}s`);
-    else
-      console.log(`-> full image  ${i + 1} took: ${sliceDuration.toFixed(3)}s`);
     resultsArray.push(results[outputName].data as Float32Array);
   }
 
@@ -64,36 +58,19 @@ self.onmessage = async (event: MessageEvent) => {
 
   if (message.eventType === "POSE") {
     const payload = message.payload;
-    const tTotalStart = performance.now();
 
     if (!wasmLoaded) {
-      const tWasm = performance.now();
       await initWasm();
-      console.log(
-        `[Worker] Init WASM took: ${((performance.now() - tWasm) / 1000).toFixed(3)}s`,
-      );
     }
 
     if (!DetectSession) {
-      const tSession = performance.now();
       await initDetection();
-      console.log(
-        `[Worker] Init Pose Session took: ${((performance.now() - tSession) / 1000).toFixed(3)}s`,
-      );
     }
 
-    const tSliceStart = performance.now();
     const slices = await createSlices(payload);
-    console.log(
-      `[Worker] createSlices took: ${((performance.now() - tSliceStart) / 1000).toFixed(3)}s`,
-    );
 
     try {
-      const tRunStart = performance.now();
       const results = await runModel(slices, payload);
-      console.log(
-        `[Worker] run pose Model total took: ${((performance.now() - tRunStart) / 1000).toFixed(3)}s`,
-      );
 
       const transferBuffers = results.map(
         (tensorData) => (tensorData as Float32Array).buffer,
@@ -107,10 +84,6 @@ self.onmessage = async (event: MessageEvent) => {
           },
         } as POSE_DATA_MESSAGE,
         transferBuffers,
-      );
-
-      console.log(
-        `[Worker] Total message cycle took: ${((performance.now() - tTotalStart) / 1000).toFixed(3)}s`,
       );
     } catch (err) {
       console.error(err);

@@ -56,12 +56,6 @@ async function runModel(slices: Float32Array[], payload: PIXEL_PAYLOAD) {
     const inputTensor = new ort.Tensor("float32", slices[i], tensorShape);
     const results = await DetectSession!.run({ [inputName]: inputTensor });
     const sliceDuration = (performance.now() - sliceStart) / 1000;
-
-    if (i != 1)
-      console.log(`-> Slice ${i + 1} took: ${sliceDuration.toFixed(3)}s`);
-    else
-      console.log(`-> full image  ${i + 1} took: ${sliceDuration.toFixed(3)}s`);
-    resultsArray.push(results[outputName].data as Float32Array);
   }
 
   return resultsArray;
@@ -71,36 +65,19 @@ self.onmessage = async (event: MessageEvent) => {
 
   if (message.eventType === "DETECT") {
     const payload = message.payload;
-    const tTotalStart = performance.now();
 
     if (!wasmLoaded) {
-      const tWasm = performance.now();
       await initWasm();
-      console.log(
-        `[Worker] Init WASM took: ${((performance.now() - tWasm) / 1000).toFixed(3)}s`,
-      );
     }
 
     if (!DetectSession) {
-      const tSession = performance.now();
       await initDetection();
-      console.log(
-        `[Worker] Init Detection Session took: ${((performance.now() - tSession) / 1000).toFixed(3)}s`,
-      );
     }
-    console.log("got to before taking slices");
-    const tSliceStart = performance.now();
+
     const slices = await createSlices(payload);
-    console.log(
-      `[Worker] createSlices took: ${((performance.now() - tSliceStart) / 1000).toFixed(3)}s`,
-    );
 
     try {
-      const tRunStart = performance.now();
       const results = await runModel(slices, payload);
-      console.log(
-        `[Worker] runModel total took: ${((performance.now() - tRunStart) / 1000).toFixed(3)}s`,
-      );
 
       const transferBuffers = results.map(
         (tensorData) => (tensorData as Float32Array).buffer,
@@ -114,10 +91,6 @@ self.onmessage = async (event: MessageEvent) => {
           },
         } as DETECT_DATA_MESSAGE,
         transferBuffers,
-      );
-
-      console.log(
-        `[Worker] Total message cycle took: ${((performance.now() - tTotalStart) / 1000).toFixed(3)}s`,
       );
     } catch (err) {
       console.error(err);

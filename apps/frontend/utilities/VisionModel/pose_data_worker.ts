@@ -21,21 +21,13 @@ self.onmessage = async (event: MessageEvent) => {
     const tTotalStart = performance.now();
 
     if (!wasmLoaded) {
-      const tWasm = performance.now();
       await initWasm();
-      console.log(
-        `[Worker DATA PROCESSOR] Init WASM took: ${((performance.now() - tWasm) / 1000).toFixed(3)}s`,
-      );
     }
 
     const tSliceStart = performance.now();
     const people = infer_pose_data(
       payload.sliced_results.slice(1),
       payload.sliced_results[0],
-    );
-
-    console.log(
-      `[POSE Worker DATA PROCESSOR] parse People took: ${((performance.now() - tSliceStart) / 1000).toFixed(3)}s`,
     );
 
     try {
@@ -46,9 +38,5 @@ self.onmessage = async (event: MessageEvent) => {
     } catch (error) {
       console.error(error);
     }
-
-    console.log(
-      `[POSE Worker DATA PROCESSOR] Total data process cycle took: ${((performance.now() - tTotalStart) / 1000).toFixed(3)}s`,
-    );
   }
 };
