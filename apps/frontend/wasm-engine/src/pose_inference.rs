@@ -83,7 +83,8 @@ pub fn read_result(slice_data: &[f32]) -> Result<Vec<DetectedPersonPose>, String
     let mut people: Vec<DetectedPersonPose> = Vec::new();
 
     const NUM_FEATURES: usize = 56;
-    const CONFIDENCE_THRESHOLD: f32 = 0.2;
+    const CONFIDENCE_THRESHOLD: f32 = 0.5;
+    const KEYPOINT_CONFIDENCE_THRESHOLD: f32 = 0.3;
 
     if slice_data.is_empty() || slice_data.len() % NUM_FEATURES != 0 {
         return Err(format!(
@@ -110,6 +111,14 @@ pub fn read_result(slice_data: &[f32]) -> Result<Vec<DetectedPersonPose>, String
             let nose = get_kp(slice_data, 0, anchor_idx, num_anchors);
             let left_shoulder = get_kp(slice_data, 5, anchor_idx, num_anchors);
             let right_shoulder = get_kp(slice_data, 6, anchor_idx, num_anchors);
+
+            if nose.score < KEYPOINT_CONFIDENCE_THRESHOLD
+                || left_shoulder.score < KEYPOINT_CONFIDENCE_THRESHOLD
+                || right_shoulder.score < KEYPOINT_CONFIDENCE_THRESHOLD
+            {
+                continue;
+            }
+            
             let left_elbow = get_kp(slice_data, 7, anchor_idx, num_anchors);
             let right_elbow = get_kp(slice_data, 8, anchor_idx, num_anchors);
             let left_wrist = get_kp(slice_data, 9, anchor_idx, num_anchors);

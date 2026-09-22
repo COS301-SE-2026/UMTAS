@@ -13,7 +13,7 @@ export default function VideoUploadComp() {
   const [video, SetVideo] = useState<File | null>(null);
   const [progress, setProgress] = useState<number>(0);
   const [isProcessing, setIsProcessing] = useState<boolean>();
-
+  const isProcessingRef = useRef<boolean>(false);
   const uploadVideoRef = useRef<HTMLInputElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const frameStore = useRef<SessionStorePose>(null);
@@ -36,6 +36,7 @@ export default function VideoUploadComp() {
     if (frameStore.current == null) {
       frameStore.current = new SessionStorePose();
       await frameStore.current.ready();
+      frameStore.current.clear();
     }
 
     const canvas = canvasRef.current;
@@ -53,7 +54,7 @@ export default function VideoUploadComp() {
     let numFrames = 0;
 
     try {
-      while (currentTime < duration) {
+      while (currentTime < duration && isProcessingRef.current) {
         const timestamp = currentTime * 1000;
         video.currentTime = currentTime;
         await new Promise((res) => {
@@ -128,7 +129,9 @@ export default function VideoUploadComp() {
         }
 
         currentTime += STEP_SECONDS;
-        numFrames++;
+        if (currentTime > duration) {
+          currentTime = duration;
+        }
         const progressVal = (currentTime / duration) * 100;
         setProgress(progressVal);
       }
@@ -148,8 +151,8 @@ export default function VideoUploadComp() {
         </h1>
         <div className="h-full w-full p-2">
           <div className="w-full h-1/10 p-2 gap-y-1 flex flex-col ">
-            <h1>Progress </h1>
-            <Progress className="border h-2" value={progress}></Progress>
+            <h1>Progress {video && `${progress.toFixed(2)}`} </h1>
+            <Progress className="border h-5 " value={progress}></Progress>
           </div>
           <div className="h-9/10 p-2 w-full grid grid-cols-2 ">
             <div className="w-full h-full p-2  ">
@@ -168,6 +171,7 @@ export default function VideoUploadComp() {
                     const file = e.target.files?.[0];
                     if (file) {
                       SetVideo(file);
+                      isProcessingRef.current = true;
                       processVideo(file);
                     }
                   }}
@@ -181,6 +185,8 @@ export default function VideoUploadComp() {
                       uploadVideoRef.current?.click();
                     } else {
                       SetVideo(null);
+                      isProcessingRef.current = false;
+
                       setIsProcessing(false);
                     }
                   }}

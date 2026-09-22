@@ -17,6 +17,12 @@ export default class SessionStorePose {
       this.isInitialized = true;
     });
   }
+  public clear() {
+    // clears the frames
+    if (this.frames.length != 0) {
+      this.frames.length = 0;
+    }
+  }
 
   public async ready(): Promise<void> {
     await this.initPromise;
