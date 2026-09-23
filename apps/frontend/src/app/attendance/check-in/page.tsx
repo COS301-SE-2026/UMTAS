@@ -9,7 +9,7 @@ export default function AttendanceCheckInPage() {
         </div>
       }
     >
-      <AttendanceCheckInPanel />;
+      <AttendanceCheckInPanel />
     </Suspense>
   );
 }

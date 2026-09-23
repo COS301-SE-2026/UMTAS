@@ -5706,16 +5706,16 @@
         "description": "Record identified or guest attendance from an NFC sticker. This Attendance operation is part of the versioned UMTAS HTTP contract."
       }
     },
-    "/api/attendance/records/camera": {
+    "/api/attendance/records/barcode": {
       "put": {
-        "operationId": "recordCameraAttendance",
+        "operationId": "recordBarcodeAttendance",
         "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/RecordCameraAttendanceDto"
+                "$ref": "#/components/schemas/RecordBarcodeAttendanceDto"
               }
             }
           }
@@ -5747,11 +5747,11 @@
             "$ref": "#/components/responses/InternalError"
           }
         },
-        "summary": "Replace the anonymous headcount for the current slot",
+        "summary": "Update the barcode guest count for the current slot",
         "tags": [
           "Attendance"
         ],
-        "description": "Replace the anonymous headcount for the current slot. This Attendance operation is part of the versioned UMTAS HTTP contract.",
+        "description": "Update the barcode guest count for the current slot. This Attendance operation is part of the versioned UMTAS HTTP contract.",
         "security": [
           {
             "cookie": []
@@ -12974,13 +12974,13 @@
           "message"
         ]
       },
-      "RecordCameraAttendanceDto": {
+      "RecordBarcodeAttendanceDto": {
         "type": "object",
         "properties": {
           "guestCount": {
             "minimum": 0,
             "type": "number",
-            "description": "Current anonymous headcount observed by the camera",
+            "description": "Current guest headcount observed by the scanner",
             "example": 42
           },
           "eventID": {
@@ -13025,7 +13025,6 @@
             "enum": [
               "NFC",
               "BARCODE",
-              "CAMERA",
               "MANUAL"
             ]
           },
@@ -13202,11 +13201,11 @@
           "captureMethod": {
             "type": "string",
             "enum": [
-              "CAMERA",
+              "BARCODE",
               "MANUAL"
             ],
             "description": "Source of the replacement count",
-            "example": "CAMERA"
+            "example": "BARCODE"
           }
         },
         "required": [

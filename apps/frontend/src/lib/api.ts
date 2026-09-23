@@ -1726,7 +1726,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/api/attendance/records/camera": {
+  "/api/attendance/records/barcode": {
     parameters: {
       query?: never;
       header?: never;
@@ -1735,10 +1735,10 @@ export interface paths {
     };
     get?: never;
     /**
-     * Replace the anonymous headcount for the current slot
-     * @description Replace the anonymous headcount for the current slot. This Attendance operation is part of the versioned UMTAS HTTP contract.
+     * Update the barcode guest count for the current slot
+     * @description Update the barcode guest count for the current slot. This Attendance operation is part of the versioned UMTAS HTTP contract.
      */
-    put: operations["recordCameraAttendance"];
+    put: operations["recordBarcodeAttendance"];
     post?: never;
     delete?: never;
     options?: never;
@@ -4418,9 +4418,9 @@ export interface components {
        */
       recordedAt?: string | null;
     };
-    RecordCameraAttendanceDto: {
+    RecordBarcodeAttendanceDto: {
       /**
-       * @description Current anonymous headcount observed by the camera
+       * @description Current guest headcount observed by the scanner
        * @example 42
        */
       guestCount: number;
@@ -4453,7 +4453,7 @@ export interface components {
        * @description Most recent capture method for this record
        * @enum {string}
        */
-      captureMethod: "NFC" | "BARCODE" | "CAMERA" | "MANUAL";
+      captureMethod: "NFC" | "BARCODE" | "MANUAL";
       /**
        * Format: date-time
        * @description Initial recording time
@@ -4571,10 +4571,10 @@ export interface components {
       guestCount: number;
       /**
        * @description Source of the replacement count
-       * @example CAMERA
+       * @example BARCODE
        * @enum {string}
        */
-      captureMethod: "CAMERA" | "MANUAL";
+      captureMethod: "BARCODE" | "MANUAL";
     };
     VerifiedAttendanceHistoryResponseDto: {
       /** @description Identified attendance belonging to the current user */
@@ -9696,7 +9696,7 @@ export interface operations {
       500: components["responses"]["InternalError"];
     };
   };
-  recordCameraAttendance: {
+  recordBarcodeAttendance: {
     parameters: {
       query?: never;
       header?: never;
@@ -9705,7 +9705,7 @@ export interface operations {
     };
     requestBody: {
       content: {
-        "application/json": components["schemas"]["RecordCameraAttendanceDto"];
+        "application/json": components["schemas"]["RecordBarcodeAttendanceDto"];
       };
     };
     responses: {

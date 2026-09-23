@@ -3,11 +3,10 @@
 import AttendanceCounter from "./AttendanceCounter";
 import { LastScannedStudent } from "./LastScannedStudent";
 
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Upload } from "lucide-react";
 
-import { BarcodeCamera } from "@/components/molecules/attendance/BarcodeCamera";
 import { ScannerBadge } from "@/components/molecules/attendance/ScannerBadge";
 import { StudentNumberInput } from "@/components/molecules/attendance/USBBarcodeScanner";
 
@@ -19,11 +18,11 @@ import { ConflictingEventDialog } from "./ConflictingEventDialog";
 import { selectPreferredEvent } from "@/lib/nfc_attendance/nfc_api";
 import type { AttendanceSlot } from "@/lib/nfc_attendance/types";
 
-import { Switch } from "@/components/atoms/baseShadcn/switch";
-import { Label } from "@/components/atoms/baseShadcn/label";
 import { Button } from "@/components/atoms/baseShadcn/button";
 
 export default function AttendanceScanner() {
+  const pendingScans = useRef(new Set<string>());
+  const recordedScans = useRef(new Set<string>());
   const [expectedStudents, setExpectedStudents] = useState<string[]>([]);
 
   const [attendedStudents, setAttendedStudents] = useState<Set<string>>(
@@ -34,8 +33,6 @@ export default function AttendanceScanner() {
   const [lastScan, setLastScan] = useState<string | null>(null);
 
   const [status, setStatus] = useState<"READY" | "SUCCESS" | "ERROR">("READY");
-
-  const [useCamera, setUseCamera] = useState(true);
 
   const [sessionStarted, setSessionStarted] = useState(false);
   const [sessionEnded, setSessionEnded] = useState(false);
@@ -72,13 +69,64 @@ export default function AttendanceScanner() {
     : null;
   const selectedSlot = currentSlot;
   const selectedEventID = selectedSlot?.eventID ?? "";
-
-  const { mutate: updateAttendanceCount } = useMutation(
+  const { mutateAsync: updateAttendanceCount } = useMutation(
     updateAttendanceCountMut(),
   );
 
+  useEffect(() => {
+    if (!selectedEventID) return;
+    let cancelled = false;
+    const key = `attendance-scanner:${selectedEventID}`;
+    const saved = window.sessionStorage.getItem(key);
+    if (saved) {
+      try {
+        const state = JSON.parse(saved) as {
+          expected: string[];
+          scanned: string[];
+          fileName: string;
+          active: boolean;
+        };
+        queueMicrotask(() => {
+          if (cancelled) return;
+          setExpectedStudents(state.expected);
+          recordedScans.current = new Set(state.scanned ?? []);
+          setAttendedStudents(new Set(recordedScans.current));
+          setFileName(state.fileName);
+          setSessionStarted(state.active);
+        });
+      } catch {
+        window.sessionStorage.removeItem(key);
+      }
+    }
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedEventID]);
+
+  useEffect(() => {
+    if (!selectedEventID || !fileName) return;
+    window.sessionStorage.setItem(
+      `attendance-scanner:${selectedEventID}`,
+      JSON.stringify({
+        expected: expectedStudents,
+        scanned: [...attendedStudents],
+        fileName,
+        active: sessionStarted,
+      }),
+    );
+  }, [
+    selectedEventID,
+    expectedStudents,
+    attendedStudents,
+    fileName,
+    sessionStarted,
+  ]);
+
   const resetUploadedList = () => {
+    if (selectedEventID)
+      window.sessionStorage.removeItem(`attendance-scanner:${selectedEventID}`);
     setExpectedStudents([]);
+    recordedScans.current = new Set();
     setAttendedStudents(new Set());
     setFileName(null);
     setLastScan(null);
@@ -88,6 +136,7 @@ export default function AttendanceScanner() {
     setSelectingSlot(true);
     try {
       await selectPreferredEvent(slot);
+      resetUploadedList();
       setConflictOpen(false);
       await refetch();
     } catch {
@@ -95,7 +144,6 @@ export default function AttendanceScanner() {
     } finally {
       setSelectingSlot(false);
     }
-    resetUploadedList();
   };
 
   const handleFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -111,7 +159,6 @@ export default function AttendanceScanner() {
     setExpectedStudents(uniqueStudentNumbers);
     setFileName(file.name);
 
-    setAttendedStudents(new Set());
     setLastScan(null);
 
     setSessionStarted(false);
@@ -120,7 +167,7 @@ export default function AttendanceScanner() {
     setStatus("READY");
   };
 
-  const handleScan = (studentNumber: string) => {
+  const handleScan = async (studentNumber: string) => {
     if (!sessionStarted || sessionEnded || !selectedEventID) {
       return;
     }
@@ -149,24 +196,24 @@ export default function AttendanceScanner() {
       return;
     }
 
-    setAttendedStudents((current) => {
-      if (current.has(cleanedStudentNumber)) {
-        return current;
-      }
-
-      const updated = new Set(current);
-
-      updated.add(cleanedStudentNumber);
-
-      updateAttendanceCount({
-        guestCount: updated.size,
+    if (pendingScans.current.has(cleanedStudentNumber)) return;
+    pendingScans.current.add(cleanedStudentNumber);
+    if (!recordedScans.current.has(cleanedStudentNumber)) {
+      recordedScans.current.add(cleanedStudentNumber);
+      setAttendedStudents(new Set(recordedScans.current));
+    }
+    try {
+      await updateAttendanceCount({
+        guestCount: recordedScans.current.size,
         eventID: selectedEventID,
       });
-
-      return updated;
-    });
-
-    setStatus("SUCCESS");
+      setStatus("SUCCESS");
+      void refetch();
+    } catch {
+      setStatus("ERROR");
+    } finally {
+      pendingScans.current.delete(cleanedStudentNumber);
+    }
 
     window.setTimeout(() => {
       setStatus("READY");
@@ -178,7 +225,7 @@ export default function AttendanceScanner() {
       return;
     }
 
-    setAttendedStudents(new Set());
+    setAttendedStudents(new Set(recordedScans.current));
     setLastScan(null);
 
     setSessionEnded(false);
@@ -195,8 +242,10 @@ export default function AttendanceScanner() {
   };
 
   const resetSession = () => {
+    if (selectedEventID)
+      window.sessionStorage.removeItem(`attendance-scanner:${selectedEventID}`);
     setExpectedStudents([]);
-    setAttendedStudents(new Set());
+    setAttendedStudents(new Set(recordedScans.current));
 
     setFileName(null);
     setLastScan(null);
@@ -211,16 +260,10 @@ export default function AttendanceScanner() {
     return (
       <div className="flex min-h-[650px] w-full flex-col items-center justify-center gap-6 text-center">
         <div>
-          <p className="text-sm text-[var(--text-secondary)]">
-            Session Complete
-          </p>
+          <p className="text-sm text-[var(--text-secondary)]">Completed</p>
 
           <p className="mt-2 text-4xl font-semibold text-[var(--text-primary)]">
             {attendedStudents.size} / {expectedStudents.length}
-          </p>
-
-          <p className="mt-2 text-sm text-[var(--text-secondary)]">
-            students attended
           </p>
         </div>
 
@@ -234,25 +277,16 @@ export default function AttendanceScanner() {
   if (!sessionStarted) {
     return (
       <div className="mx-auto flex w-full max-w-2xl flex-col gap-5">
-        <div>
-          <h2 className="text-lg font-semibold text-[var(--text-primary)]">
-            Attendance Setup
-          </h2>
-
-          <p className="mt-1 text-sm text-[var(--text-secondary)]">
-            Confirm the automatically resolved class and upload the expected
-            student list.
-          </p>
-        </div>
-
         <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-surface)] p-4">
-          <Label>Current class</Label>
+          <p className="mb-2 text-xs font-medium text-[var(--text-secondary)]">
+            Current class
+          </p>
           {slotsLoading || !isFetchedAfterMount ? (
-            <p className="mt-2 text-sm text-[var(--text-secondary)]">
-              Resolving current class…
+            <p className="text-sm text-[var(--text-secondary)]">
+              Loading class…
             </p>
           ) : selectedSlot ? (
-            <div className="mt-2">
+            <div>
               <p className="text-sm font-medium text-[var(--text-primary)]">
                 {selectedSlot.moduleCode} · {selectedSlot.moduleName}
               </p>
@@ -273,7 +307,7 @@ export default function AttendanceScanner() {
               )}
             </div>
           ) : (
-            <p className="mt-2 text-sm text-[var(--text-secondary)]">
+            <p className="text-sm text-[var(--text-secondary)]">
               {slotData?.requiresSelection
                 ? "Choose which class is currently running."
                 : "No attendance class is currently available."}
@@ -290,44 +324,24 @@ export default function AttendanceScanner() {
           onSelect={(slot) => void handleSlotSelect(slot)}
         />
 
-        <div className="border-t border-[var(--border)]" />
-
-        <div>
-          <h3 className="text-sm font-medium text-[var(--text-primary)]">
-            Student List
-          </h3>
-
-          <p className="mt-1 text-sm text-[var(--text-secondary)]">
-            Upload the expected students for this attendance session.
-          </p>
-        </div>
-
         <label
           htmlFor="student-list-upload"
-          className={`flex min-h-[210px] flex-col items-center justify-center rounded-xl border-2 border-dashed px-8 py-8 text-center transition-colors duration-200 ${
+          className={`flex min-h-[150px] flex-col items-center justify-center rounded-xl border-2 border-dashed px-8 py-6 text-center transition-colors duration-200 ${
             selectedEventID
               ? "group cursor-pointer border-[var(--border)] hover:border-[var(--btn-primary-bg)] hover:bg-[var(--bg-elevated)]"
               : "cursor-not-allowed border-[var(--border)] opacity-50"
           }`}
         >
-          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[var(--bg-elevated)] text-[var(--text-primary)]">
+          <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[var(--bg-elevated)] text-[var(--text-primary)]">
             <Upload size={22} strokeWidth={1.8} />
           </div>
 
           <p className="text-base font-medium text-[var(--text-primary)]">
-            Upload Student List
+            Upload student list
           </p>
 
-          <p className="mt-2 max-w-sm text-sm text-[var(--text-secondary)]">
-            Select a CSV, TXT, or MD file containing 8 digit student numbers.
-          </p>
-
-          <div className="mt-5 rounded-md bg-[var(--btn-primary-bg)] px-4 py-2 text-sm font-medium text-[var(--btn-primary-text)]">
-            Choose File
-          </div>
-
-          <p className="mt-3 text-xs text-[var(--text-secondary)]">
-            CSV, TXT or MD
+          <p className="mt-1 text-xs text-[var(--text-secondary)]">
+            CSV, TXT or MD · 8 digit numbers
           </p>
 
           <input
@@ -340,31 +354,11 @@ export default function AttendanceScanner() {
           />
         </label>
 
-        <div className="min-h-[52px]">
-          {fileName ? (
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-[var(--text-primary)]">
-                  {fileName}
-                </p>
-
-                <p className="mt-1 text-sm text-[var(--text-secondary)]">
-                  {expectedStudents.length} students found
-                </p>
-              </div>
-
-              <span className="text-xs font-medium text-[var(--text-secondary)]">
-                Ready
-              </span>
-            </div>
-          ) : (
-            <p className="text-sm text-[var(--text-secondary)]">
-              {selectedEventID
-                ? "No student list uploaded."
-                : "A current class is required before uploading a student list."}
-            </p>
-          )}
-        </div>
+        {fileName && (
+          <p className="text-sm text-[var(--text-secondary)]">
+            {fileName} · {expectedStudents.length} students
+          </p>
+        )}
 
         <Button
           type="button"
@@ -372,7 +366,7 @@ export default function AttendanceScanner() {
           onClick={startSession}
           className="w-full"
         >
-          Start Attendance Session
+          Start scanning
         </Button>
       </div>
     );
@@ -380,50 +374,12 @@ export default function AttendanceScanner() {
 
   return (
     <div className="flex w-full flex-col gap-4">
-      <div>
-        <p className="text-sm font-medium text-[var(--text-primary)]">
-          Attendance Session Active
-        </p>
-
-        <p className="mt-1 text-sm text-[var(--text-secondary)]">
-          Scan student cards or enter student numbers manually.
-        </p>
-      </div>
-
       <div className="flex items-center justify-between">
         <ScannerBadge status={status} />
-
-        <div className="flex items-center gap-2">
-          <Label
-            htmlFor="scanner-mode"
-            className="text-sm text-[var(--text-secondary)]"
-          >
-            Scanner / Manual
-          </Label>
-
-          <Switch
-            id="scanner-mode"
-            checked={useCamera}
-            onCheckedChange={setUseCamera}
-          />
-
-          <Label
-            htmlFor="scanner-mode"
-            className="text-sm text-[var(--text-secondary)]"
-          >
-            Camera
-          </Label>
-        </div>
       </div>
 
       <div className="w-full">
-        {useCamera ? (
-          <div className="aspect-video w-full rounded-xl border-2 border-[var(--border)]">
-            <BarcodeCamera onScan={handleScan} />
-          </div>
-        ) : (
-          <StudentNumberInput onScan={handleScan} />
-        )}
+        <StudentNumberInput onScan={handleScan} />
       </div>
 
       <div className="w-full">
@@ -433,9 +389,7 @@ export default function AttendanceScanner() {
         />
       </div>
 
-      <div className="w-full">
-        <LastScannedStudent studentNumber={lastScan} />
-      </div>
+      <LastScannedStudent studentNumber={lastScan} />
 
       <Button type="button" onClick={endSession} className="w-full">
         End Attendance Session

@@ -39,7 +39,7 @@ export function getAttendanceSlotsQ() {
 }
 
 export type AttendanceCountEndpoint =
-  paths["/api/attendance/records/camera"]["put"];
+  paths["/api/attendance/records/barcode"]["put"];
 
 export type AttendanceCountBody =
   AttendanceCountEndpoint["requestBody"]["content"]["application/json"];
@@ -55,7 +55,7 @@ export class UpdateAttendanceCount extends RequestBuilder<
   constructor() {
     super();
 
-    this.setUrl("/attendance/records/camera").setMethod(RequestMethod.PUT);
+    this.setUrl("/attendance/records/barcode").setMethod(RequestMethod.PUT);
   }
 }
 
